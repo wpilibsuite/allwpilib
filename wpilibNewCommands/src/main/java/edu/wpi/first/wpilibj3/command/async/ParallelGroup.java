@@ -101,46 +101,27 @@ public class ParallelGroup implements AsyncCommand {
 
   @Override
   public void run() {
-    Logger.log(name, "Starting");
     for (AsyncCommand command : commands) {
-      Logger.log(name, "Scheduling child command " + command);
       scheduler.schedule(command);
     }
     scheduler.yield();
 
     while (true) {
-      Logger.log(name, "Checking for group completion");
       if (requiredCommands.isEmpty()) {
         // No command is required, so we run until at least one command completes
-        Logger.log(name, "Checking if any command has completed yet");
-
-        boolean completed = false;
-        for (AsyncCommand c : commands) {
-          Logger.log(name, "Child command " + c + " running: " + scheduler.isRunning(c));
-          if (!scheduler.isRunning(c)) {
-            Logger.log(name, "Command " + c + " completed!");
-            completed = true;
-            break;
-          }
-        }
-        if (completed) {
-          Logger.log(name, "Completed");
+        if (!commands.stream().allMatch(scheduler::isRunning)) {
           break;
         }
       } else {
         // We run all commands until every required command has completed
-        Logger.log(name, "Checking if all required commands have completed yet");
         if (requiredCommands.stream().noneMatch(scheduler::isRunning)) {
-          Logger.log(name, "Completed");
           break;
         }
       }
 
-      Logger.log(name, "Yielding to the scheduler");
       scheduler.yield();
     }
 
-    Logger.log(name, "Cancelling composed commands after completion");
     for (AsyncCommand command : commands) {
       scheduler.cancel(command);
     }

@@ -114,14 +114,11 @@ public class AsyncScheduler {
    * @param command the command to schedule
    */
   public void schedule(AsyncCommand command) {
-    Logger.log("SCHEDULE", "Attempting to schedule " + command);
-
     if (currentCommand == null) {
       // Scheduling from outside a command, eg a trigger binding or manual schedule call
       // Check for conflicts with the commands that are already running
       for (AsyncCommand c : commandStates.keySet()) {
         if (c.conflictsWith(command) && command.isLowerPriorityThan(c)) {
-          Logger.log("SCHEDULE", command + " conflicts with and is lower priority than " + c + ", not scheduling");
           return;
         }
       }
@@ -153,7 +150,6 @@ public class AsyncScheduler {
       if (command.isLowerPriorityThan(scheduledCommand)) {
         // Lower priority than an already-scheduled (but not yet running) command that requires at
         // one of the same resource
-        Logger.log("SCHEDULE", command + " is lower priority than already-scheduled command " + scheduledCommand + ", not scheduling");
         return;
       }
     }
@@ -163,10 +159,8 @@ public class AsyncScheduler {
     // so at this point we're guaranteed to be >= priority than anything already on deck
     onDeck.removeIf(c -> c.conflictsWith(command));
 
-    Logger.log("SCHEDULE", "Adding " + command + " to on deck commands");
     onDeck.add(command);
 
-    Logger.log("SCHEDULE", "Dropping commands that conflict with " + command);
     commandStates
         .entrySet()
         .removeIf(e -> e.getKey() != currentCommand && e.getKey().conflictsWith(command));
@@ -183,9 +177,6 @@ public class AsyncScheduler {
 
   public void run() {
     runNum++;
-    Logger.log("RUN", "Starting run #" + runNum);
-
-    Logger.log("RUN", "Polling event loop");
     eventLoop.poll();
 
     // Apply scheduled commands, evicting any commands that require the same resources
@@ -193,16 +184,13 @@ public class AsyncScheduler {
     // Note that if multiple commands are scheduled in the same loop that use the same resources,
     // then the final scheduled command will win out.
     for (var command : onDeck) {
-      Logger.log("RUN", "Building continuation for " + command);
       commandStates.put(command, new CommandState(command, buildContinuation(command)));
     }
 
     // Clear the set of on-deck commands,
     // since we just put them all into the set of running commands
-    Logger.log("RUN", "Clearing scheduled commands");
     onDeck.clear();
 
-    Logger.log("RUN", "Executing periodic callbacks");
     for (Continuation callback : periodicCallbacks) {
       callback.run();
     }
@@ -210,7 +198,6 @@ public class AsyncScheduler {
     periodicCallbacks.removeIf(Continuation::isDone);
 
     // Tick every command that hasn't been completed yet
-    Logger.log("RUN", "Updating commands (" + commandStates.keySet() + ")");
     for (var entry : List.copyOf(commandStates.entrySet())) {
       final var command = entry.getKey();
       Continuation continuation = entry.getValue().continuation;
@@ -222,47 +209,33 @@ public class AsyncScheduler {
 
       if (!continuation.isDone()) {
         currentCommand = command;
-        Logger.log("RUN", "Current command is " + command);
-        Logger.log("RUN", "Mounting continuation for command " + command);
         mountContinuation(continuation);
         try {
-          Logger.log("RUN", "Running continuation for command " + command + " until it yields");
           continuation.run();
         } finally {
-          Logger.log("RUN", "Unmounting continuation for command " + command);
           mountContinuation(null);
         }
-      } else {
-        Logger.log("RUN", "Command " + command + " is done, not running");
       }
     }
 
     currentCommand = null;
 
     // Remove completed commands
-    Logger.log("RUN", "Cleaning up after completed commands");
     commandStates.entrySet().removeIf(e -> e.getValue().continuation.isDone());
 
     // Schedule default commands for any resource currently without a command
     for (var resource : defaultCommands.keySet()) {
-      Logger.log("RUN", "Checking if default command needs to run for " + resource + "...");
-      var owner = commandStates.keySet().stream().filter(c -> c.requires(resource)).findAny();
-      if (owner.isPresent()) {
-        Logger.log("RUN", "No, already running " + owner.get());
-      } else {
-        Logger.log("RUN", "Yes, scheduling");
+      var unowned = commandStates.keySet().stream().noneMatch(c -> c.requires(resource));
+      if (unowned) {
         scheduleDefault(resource);
       }
     }
-
-    Logger.log("RUN", "Ending run #" + runNum);
   }
 
   private Continuation buildContinuation(AsyncCommand command) {
     return new Continuation(scope, () -> {
       try {
         command.run();
-        Logger.log("CONTINUATION", "Command " + command + " completed naturally");
       } catch (Exception e) {
         throw new CommandExecutionException(command, e);
       }

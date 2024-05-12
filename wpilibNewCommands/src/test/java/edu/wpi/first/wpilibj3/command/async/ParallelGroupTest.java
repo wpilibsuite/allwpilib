@@ -13,19 +13,11 @@ class ParallelGroupTest {
 
   @BeforeEach
   void setup() {
-    Logger.clear();
-
     // Any command that calls AsyncCommand.park() or AsyncCommand.yield() uses the default
     // scheduler instance. Notably, this includes commands with timeouts, wait commands, and
     // the default idle commands
     scheduler = new AsyncScheduler();
     AsyncScheduler.setDefaultScheduler(scheduler);
-  }
-
-  @AfterEach
-  void printLogs() {
-    System.out.println(Logger.formattedLogTable());
-    Logger.clear();
   }
 
   @Test

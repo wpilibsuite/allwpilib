@@ -20,19 +20,11 @@ class AsyncSchedulerTest {
 
   @BeforeEach
   void setup() {
-    Logger.clear();
-
     // Any command that calls AsyncCommand.park() or AsyncCommand.yield() uses the default
     // scheduler instance. Notably, this includes commands with timeouts, wait commands, and
     // the default idle commands
     scheduler = new AsyncScheduler();
     AsyncScheduler.setDefaultScheduler(scheduler);
-  }
-
-  @AfterEach
-  void printLogs() {
-    System.out.println(Logger.formattedLogTable());
-    Logger.clear();
   }
 
   @Test
@@ -53,7 +45,6 @@ class AsyncSchedulerTest {
     enabled.set(true);
     scheduler.run();
     if (scheduler.isRunning(command)) {
-      System.err.println(Logger.formattedLogTable());
       fail("Command should no longer be running after awaiting its completion");
     }
 
@@ -91,11 +82,9 @@ class AsyncSchedulerTest {
     scheduler.schedule(lower);
     scheduler.run();
     if (!scheduler.isRunning(higher)) {
-      System.err.println(Logger.formattedLogTable());
       fail("Higher priority command should still be running");
     }
     if (scheduler.isRunning(lower)) {
-      System.err.println(Logger.formattedLogTable());
       fail("Lower priority command should not be running");
     }
   }
@@ -315,9 +304,7 @@ class AsyncSchedulerTest {
 
     for (var resource : resources) {
       if (!scheduler.isRunning(resource.getDefaultCommand())) {
-        System.err.println(Logger.formattedLogTable());
-        System.err.println("Running commands: " + scheduler.getRunningCommands());
-        fail("Default command for " + resource.getName() + " should have been scheduled after cancelAll() was called");
+        fail("Resource " + resource + " is not running the default command.");
       }
     }
   }
