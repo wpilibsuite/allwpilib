@@ -108,6 +108,6 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
       - name: Build with Gradle
         run: ./gradlew docs:zipDocs -PbuildServer -PdocWarningsAsErrors ${{ env.EXTRA_GRADLE_ARGS }}
