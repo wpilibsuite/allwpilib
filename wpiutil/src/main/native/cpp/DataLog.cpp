@@ -27,13 +27,12 @@
 #include <random>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "wpi/Endian.h"
 #include "wpi/Logger.h"
 #include "wpi/MathExtras.h"
 #include "wpi/SmallString.h"
 #include "wpi/fs.h"
+#include "wpi/print.h"
 #include "wpi/timestamp.h"
 
 using namespace wpi::log;
@@ -142,9 +141,9 @@ class DataLog::Buffer {
 static void DefaultLog(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {
   if (level > wpi::WPI_LOG_INFO) {
-    fmt::print(stderr, "DataLog: {}\n", msg);
+    wpi::print(stderr, "DataLog: {}\n", msg);
   } else if (level == wpi::WPI_LOG_INFO) {
-    fmt::print("DataLog: {}\n", msg);
+    wpi::print("DataLog: {}\n", msg);
   }
 }
 
