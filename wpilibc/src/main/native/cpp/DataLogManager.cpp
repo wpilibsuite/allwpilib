@@ -11,12 +11,12 @@
 #include <random>
 
 #include <fmt/chrono.h>
-#include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/DataLog.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
+#include <wpi/print.h>
 #include <wpi/timestamp.h>
 
 #include "frc/DriverStation.h"
@@ -157,7 +157,7 @@ void Thread::Main() {
             break;
           }
         } else {
-          fmt::print(stderr, "DataLogManager: could not delete {}\n",
+          wpi::print(stderr, "DataLogManager: could not delete {}\n",
                      entry.path().string());
         }
       }
@@ -307,7 +307,7 @@ Instance::Instance(std::string_view dir, std::string_view filename,
     if (wpi::starts_with(entry.path().stem().string(), "FRC_TBD_") &&
         entry.path().extension() == ".wpilog") {
       if (!fs::remove(entry, ec)) {
-        fmt::print(stderr, "DataLogManager: could not delete {}\n",
+        wpi::print(stderr, "DataLogManager: could not delete {}\n",
                    entry.path().string());
       }
     }
@@ -339,7 +339,7 @@ void DataLogManager::Stop() {
 
 void DataLogManager::Log(std::string_view message) {
   GetInstance().owner.GetThread()->m_messageLog.Append(message);
-  fmt::print("{}\n", message);
+  wpi::print("{}\n", message);
 }
 
 wpi::log::DataLog& DataLogManager::GetLog() {
