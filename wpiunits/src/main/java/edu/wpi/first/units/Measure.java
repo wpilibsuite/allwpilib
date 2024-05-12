@@ -141,7 +141,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @return the resulting measure
    */
   default <U2 extends Unit<U2>> Measure<?> divide(Measure<U2> other) {
-    if (other.unit() instanceof Dimensionless) {
+    if (unit().equals(other.unit()) || other.unit() instanceof Dimensionless) {
       return divide(other.baseUnitMagnitude());
     }
     if (other.unit() instanceof Velocity<?> velocity) {

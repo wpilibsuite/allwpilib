@@ -4,7 +4,6 @@
 
 package edu.wpi.first.units;
 
-import static edu.wpi.first.units.Units.Amps;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -169,6 +168,7 @@ class MeasureTest {
     var m1 = Units.Meters.of(6);
     var m2 = Units.Value.of(3);
     assertEquals(m1.divide(m2).magnitude(), 2);
+    assertEquals(Units.Meters.of(8).divide(Units.Meters.of(4)).magnitude(), 2);
     // Velocity divide
     var m3 = Units.Meters.of(8);
     var m4 = Units.Meters.per(Units.Second).of(4);
@@ -186,7 +186,7 @@ class MeasureTest {
     var m8 = Units.Amps.of(2);
     result = m7.divide(m8);
     assertEquals(result.magnitude(), 5);
-    assertEquals(result.unit(), Units.Seconds.per(Amps));
+    assertEquals(result.unit(), Units.Seconds.per(Units.Amps));
   }
 
   @Test
