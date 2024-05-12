@@ -21,6 +21,7 @@ def main():
     os.chdir(upstream_root)
     for f in [
         "0001-Suppress-warnings-we-can-t-fix.patch",
+        "0002-Fix-tautological-compare-warning.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/fmt_patches", f))
 
