@@ -21,12 +21,14 @@ static uint64_t mockNow = 0;
 static JException illegalArgEx;
 static JException indexOobEx;
 static JException interruptedEx;
+static JException ioEx;
 static JException nullPointerEx;
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgEx},
     {"java/lang/IndexOutOfBoundsException", &indexOobEx},
     {"java/lang/InterruptedException", &interruptedEx},
+    {"java/io/IOException", &ioEx},
     {"java/lang/NullPointerException", &nullPointerEx}};
 
 void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
@@ -35,6 +37,10 @@ void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
 
 void wpi::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
   indexOobEx.Throw(env, msg);
+}
+
+void wpi::ThrowIOException(JNIEnv* env, std::string_view msg) {
+  ioEx.Throw(env, msg);
 }
 
 void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {

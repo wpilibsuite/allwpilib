@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DataLogBackgroundWriter;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import java.io.File;
@@ -40,7 +41,7 @@ import java.util.Random;
  * <p>By default, all NetworkTables value changes are stored to the data log.
  */
 public final class DataLogManager {
-  private static DataLog m_log;
+  private static DataLogBackgroundWriter m_log;
   private static boolean m_stopped;
   private static String m_logDir;
   private static boolean m_filenameOverride;
@@ -113,7 +114,7 @@ public final class DataLogManager {
           }
         }
       }
-      m_log = new DataLog(m_logDir, makeLogFilename(filename), period);
+      m_log = new DataLogBackgroundWriter(m_logDir, makeLogFilename(filename), period);
       m_messageLog = new StringLogEntry(m_log, "messages");
 
       // Log all NT entries and connections

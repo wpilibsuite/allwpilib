@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "wpi/DataLog.h"
+#include "wpi/DataLogBackgroundWriter.h"
 #include "wpi/print.h"
 
 int main(int argc, char** argv) {
@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     kNumRuns = std::stoi(argv[1]);
   }
 
-  wpi::log::DataLog log;
+  wpi::log::DataLogBackgroundWriter log;
   log.SetFilename("test.wpilog");
 
   auto testVec =
