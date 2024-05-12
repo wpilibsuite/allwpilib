@@ -6,7 +6,7 @@
 
 #include <concepts>
 #include <cstring>
-#include <memory>
+#include <limits>
 #include <span>
 #include <string>
 #include <string_view>
@@ -443,6 +443,10 @@ O* ConvertToC(const std::vector<I>& in, size_t* out_len) {
 
 template <typename O, typename I>
 O* ConvertToC(const std::basic_string<I>& in, size_t* out_len) {
+  if (in.size() == std::numeric_limits<size_t>::max()) {
+    wpi::report_bad_alloc_error("Allocation failed");
+  }
+
   char* out = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
   std::memmove(out, in.data(), in.size());  // NOLINT
   out[in.size()] = '\0';

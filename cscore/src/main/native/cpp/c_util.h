@@ -5,8 +5,8 @@
 #ifndef CSCORE_C_UTIL_H_
 #define CSCORE_C_UTIL_H_
 
-#include <cstdlib>
 #include <cstring>
+#include <limits>
 #include <string_view>
 
 #include <wpi/MemAlloc.h>
@@ -14,6 +14,10 @@
 namespace cs {
 
 inline char* ConvertToC(std::string_view in) {
+  if (in.size() == std::numeric_limits<size_t>::max()) {
+    wpi::report_bad_alloc_error("Allocation failed");
+  }
+
   char* out = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
   std::memmove(out, in.data(), in.size());
   out[in.size()] = '\0';
