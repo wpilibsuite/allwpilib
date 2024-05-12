@@ -54,8 +54,10 @@ class EncoderTest {
     // distance per tick = distance per rotation / ticks per rotation
     var wheelDiameter = Inches.of(6);
     var gearRatio = Value.of(10); // 10:1 ratio
+    @SuppressWarnings("unchecked")
     Measure<Distance> distancePerPulse =
-        wheelDiameter.times(Math.PI).divide(gearRatio).divide(ticksPerRevolution);
+        (Measure<Distance>)
+            wheelDiameter.times(Math.PI).divide(gearRatio).divide(ticksPerRevolution);
     encoder.setDistancePerPulse(distancePerPulse);
 
     encoder.m_ticks = 0;
@@ -78,7 +80,8 @@ class EncoderTest {
 
     var encoder = new Encoder<Angle>();
 
-    Measure<Angle> distancePerPulse = Revolutions.of(1).divide(ticksPerRevolution);
+    @SuppressWarnings("unchecked")
+    Measure<Angle> distancePerPulse = (Measure<Angle>) Revolutions.of(1).divide(ticksPerRevolution);
     encoder.setDistancePerPulse(distancePerPulse);
 
     encoder.m_ticks = 0;
