@@ -185,7 +185,11 @@ public final class UnitBuilder<U extends Unit<U>> {
     return toBase(x -> x * aggregation).fromBase(b -> b / aggregation);
   }
 
-  /** A functional interface for constructing new units without relying on reflection. */
+  /**
+   * A functional interface for constructing new units without relying on reflection.
+   *
+   * @param <U> the type of the unit
+   */
   @FunctionalInterface
   public interface UnitConstructorFunction<U extends Unit<U>> {
     /**
