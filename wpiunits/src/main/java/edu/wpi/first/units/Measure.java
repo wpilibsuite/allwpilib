@@ -143,8 +143,10 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @return the resulting measure
    */
   default <U2 extends Unit<U2>> Measure<?> divide(Measure<U2> other) {
-    if (unit().m_baseType.equals(other.unit().m_baseType)
-        || other.unit() instanceof Dimensionless) {
+    if (unit().m_baseType.equals(other.unit().m_baseType)) {
+      return Units.Value.ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
+    }
+    if (other.unit() instanceof Dimensionless) {
       return divide(other.baseUnitMagnitude());
     }
     if (other.unit() instanceof Velocity<?> velocity
