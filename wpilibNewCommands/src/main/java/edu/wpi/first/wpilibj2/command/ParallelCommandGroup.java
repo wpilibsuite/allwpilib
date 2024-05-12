@@ -18,8 +18,17 @@ import java.util.List;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class ParallelCommandGroup extends Command {
-  private final List<Command> m_commands = new ArrayList<>();
-  private final List<Boolean> m_commandsAreRunning = new ArrayList<>();
+  private static class CommandInfo {
+    private final Command m_command;
+    private boolean m_isRunning;
+
+    private CommandInfo(Command command, boolean isRunning) {
+      m_command = command;
+      m_isRunning = isRunning;
+    }
+  }
+
+  private final List<CommandInfo> m_commandInfo = new ArrayList<>();
   private boolean m_runWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
@@ -40,9 +49,11 @@ public class ParallelCommandGroup extends Command {
    * @param commands Commands to add to the group.
    */
   public final void addCommands(Command... commands) {
-    if (m_commandsAreRunning.contains(true)) {
-      throw new IllegalStateException(
-          "Commands cannot be added to a composition while it's running");
+    for (CommandInfo commandInfo : m_commandInfo) {
+      if (commandInfo.m_isRunning) {
+        throw new IllegalStateException(
+            "Commands cannot be added to a composition while it's running");
+      }
     }
 
     CommandScheduler.getInstance().registerComposedCommands(commands);
@@ -52,8 +63,7 @@ public class ParallelCommandGroup extends Command {
         throw new IllegalArgumentException(
             "Multiple commands in a parallel composition cannot require the same subsystems");
       }
-      m_commands.add(command);
-      m_commandsAreRunning.add(false);
+      m_commandInfo.add(new CommandInfo(command, false));
       m_requirements.addAll(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
       if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
@@ -64,22 +74,22 @@ public class ParallelCommandGroup extends Command {
 
   @Override
   public final void initialize() {
-    for (int i = 0; i < m_commands.size(); ++i) {
-      m_commands.get(i).initialize();
-      m_commandsAreRunning.set(i, true);
+    for (CommandInfo commandInfo : m_commandInfo) {
+      commandInfo.m_command.initialize();
+      commandInfo.m_isRunning = true;
     }
   }
 
   @Override
   public final void execute() {
-    for (int i = 0; i < m_commands.size(); ++i) {
-      if (!m_commandsAreRunning.get(i)) {
+    for (CommandInfo commandInfo : m_commandInfo) {
+      if (!commandInfo.m_isRunning) {
         continue;
       }
-      m_commands.get(i).execute();
-      if (m_commands.get(i).isFinished()) {
-        m_commands.get(i).end(false);
-        m_commandsAreRunning.set(i, false);
+      commandInfo.m_command.execute();
+      if (commandInfo.m_command.isFinished()) {
+        commandInfo.m_command.end(false);
+        commandInfo.m_isRunning = false;
       }
     }
   }
@@ -87,9 +97,9 @@ public class ParallelCommandGroup extends Command {
   @Override
   public final void end(boolean interrupted) {
     if (interrupted) {
-      for (int i = 0; i < m_commands.size(); ++i) {
-        if (m_commandsAreRunning.get(i)) {
-          m_commands.get(i).end(true);
+      for (CommandInfo commandInfo : m_commandInfo) {
+        if (commandInfo.m_isRunning) {
+          commandInfo.m_command.end(true);
         }
       }
     }
@@ -97,7 +107,12 @@ public class ParallelCommandGroup extends Command {
 
   @Override
   public final boolean isFinished() {
-    return !m_commandsAreRunning.contains(true);
+    for (CommandInfo commandInfo : m_commandInfo) {
+      if (commandInfo.m_isRunning) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
