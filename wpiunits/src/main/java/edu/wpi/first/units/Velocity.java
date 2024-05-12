@@ -149,6 +149,7 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
 
   /**
    * Returns the reciprocal of this velocity.
+   *
    * @return the reciprocal
    */
   public Per<Time, D> reciprocal() {

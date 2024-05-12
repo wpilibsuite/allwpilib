@@ -99,6 +99,7 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
 
   /**
    * Returns the reciprocal of this Per.
+   *
    * @return the reciprocal
    */
   public Per<D, N> reciprocal() {
