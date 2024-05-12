@@ -8,13 +8,14 @@
 
 #include <fmt/format.h>
 #include <wpi/fs.h>
+#include <wpi/print.h>
 
 using namespace cs;
 
 static void def_log_func(unsigned int level, const char* file,
                          unsigned int line, const char* msg) {
   if (level == 20) {
-    fmt::print(stderr, "CS: {}\n", msg);
+    wpi::print(stderr, "CS: {}\n", msg);
     return;
   }
 
@@ -28,7 +29,7 @@ static void def_log_func(unsigned int level, const char* file,
   } else {
     return;
   }
-  fmt::print(stderr, "CS: {}: {} ({}:{})\n", levelmsg, msg,
+  wpi::print(stderr, "CS: {}: {} ({}:{})\n", levelmsg, msg,
              fs::path{file}.filename().string(), line);
 }
 

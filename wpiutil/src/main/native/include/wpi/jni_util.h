@@ -15,14 +15,13 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/core.h>
-
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/mutex.h"
+#include "wpi/print.h"
 #include "wpi/raw_ostream.h"
 
 /** Java Native Interface (JNI) utility functions */
@@ -160,7 +159,7 @@ class JStringRef {
         env->ReleaseStringCritical(str, chars);
       }
     } else {
-      fmt::print(stderr, "JStringRef was passed a null pointer at\n",
+      wpi::print(stderr, "JStringRef was passed a null pointer at\n",
                  GetJavaStackTrace(env));
     }
     // Ensure str is null-terminated.
@@ -283,7 +282,7 @@ class JSpanBase {
         m_elements{static_cast<std::remove_cv_t<T>*>(
             bb ? env->GetDirectBufferAddress(bb) : nullptr)} {
     if (!bb) {
-      fmt::print(stderr, "JSpan was passed a null pointer at\n",
+      wpi::print(stderr, "JSpan was passed a null pointer at\n",
                  GetJavaStackTrace(env));
     }
   }
@@ -302,7 +301,7 @@ class JSpanBase {
         m_elements = ArrHelper::GetArrayElements(env, jarr);
       }
     } else {
-      fmt::print(stderr, "JSpan was passed a null pointer at\n",
+      wpi::print(stderr, "JSpan was passed a null pointer at\n",
                  GetJavaStackTrace(env));
     }
   }

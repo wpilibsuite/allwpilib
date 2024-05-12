@@ -118,7 +118,7 @@ EIGEN_DEVICE_FUNC inline const CwiseUnaryOp<CustomUnaryOp, const Derived> unaryE
   return CwiseUnaryOp<CustomUnaryOp, const Derived>(derived(), func);
 }
 
-/// \returns an expression of a custom coefficient-wise unary operator \a func of *this
+/// \returns a const expression of a custom coefficient-wise unary operator \a func of *this
 ///
 /// The template parameter \a CustomUnaryOp is the type of the functor
 /// of the custom unary operator.
@@ -135,6 +135,21 @@ template <typename CustomViewOp>
 EIGEN_DEVICE_FUNC inline const CwiseUnaryView<CustomViewOp, const Derived> unaryViewExpr(
     const CustomViewOp& func = CustomViewOp()) const {
   return CwiseUnaryView<CustomViewOp, const Derived>(derived(), func);
+}
+
+/// \returns a non-const expression of a custom coefficient-wise unary view \a func of *this
+///
+/// The template parameter \a CustomUnaryOp is the type of the functor
+/// of the custom unary operator.
+///
+EIGEN_DOC_UNARY_ADDONS(unaryViewExpr, unary function)
+///
+/// \sa unaryExpr, binaryExpr class CwiseUnaryOp
+///
+template <typename CustomViewOp>
+EIGEN_DEVICE_FUNC inline CwiseUnaryView<CustomViewOp, Derived> unaryViewExpr(
+    const CustomViewOp& func = CustomViewOp()) {
+  return CwiseUnaryView<CustomViewOp, Derived>(derived(), func);
 }
 
 /// \returns a non const expression of the real part of \c *this.

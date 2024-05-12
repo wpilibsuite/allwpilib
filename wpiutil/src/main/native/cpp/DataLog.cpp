@@ -13,6 +13,7 @@
 #include "wpi/Endian.h"
 #include "wpi/Logger.h"
 #include "wpi/SmallString.h"
+#include "wpi/print.h"
 #include "wpi/timestamp.h"
 
 using namespace wpi::log;
@@ -22,9 +23,9 @@ static constexpr size_t kRecordMaxHeaderSize = 17;
 static void DefaultLog(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {
   if (level > wpi::WPI_LOG_INFO) {
-    fmt::print(stderr, "DataLog: {}\n", msg);
+    wpi::print(stderr, "DataLog: {}\n", msg);
   } else if (level == wpi::WPI_LOG_INFO) {
-    fmt::print("DataLog: {}\n", msg);
+    wpi::print("DataLog: {}\n", msg);
   }
 }
 
