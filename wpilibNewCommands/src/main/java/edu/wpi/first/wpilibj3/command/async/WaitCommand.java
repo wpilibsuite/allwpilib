@@ -22,7 +22,7 @@ public class WaitCommand implements AsyncCommand {
     var timer = new Timer();
     timer.start();
     while (!timer.hasElapsed(duration.in(Seconds))) {
-      AsyncCommand.yield();
+      AsyncScheduler.getInstance().yield();
     }
   }
 

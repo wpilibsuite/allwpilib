@@ -35,4 +35,9 @@ public record IdleCommand(HardwareResource resource) implements AsyncCommand {
   public String toString() {
     return name();
   }
+
+  @Override
+  public RobotDisabledBehavior robotDisabledBehavior() {
+    return RobotDisabledBehavior.RunWhileDisabled;
+  }
 }

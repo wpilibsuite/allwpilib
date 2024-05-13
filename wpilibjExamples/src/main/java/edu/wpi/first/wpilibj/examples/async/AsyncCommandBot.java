@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.examples.async.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.async.subsystems.Shooter;
 import edu.wpi.first.wpilibj.examples.async.subsystems.Storage;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.ParallelGroup;
 import edu.wpi.first.wpilibj3.command.async.button.AsyncCommandXboxController;
 import edu.wpi.first.wpilibj3.command.async.button.AsyncTrigger;
 
@@ -63,25 +62,31 @@ public class AsyncCommandBot {
     m_driverController.y().onTrue(m_intake.retractCommand());
 
     // Fire the shooter with the A button
-    m_driverController
-        .a()
-        .onTrue(
-            AsyncCommand
-                .requiring(m_shooter, m_storage)
-                .executing(() -> {
-                  while (true) {
-                    AsyncCommand.yield();
-                    m_storage.run();
-                    m_shooter.ramp(ShooterConstants.kShooterTarget);
-                    m_shooter.tryFeed();
-                  }
-                })
-                .named("Shoot"));
+    m_driverController.a().onTrue(loadAndShoot());
 
     // Toggle compressor with the Start button
     m_driverController.start()
         .onTrue(m_pneumatics.disableCompressor())
         .onFalse(m_pneumatics.enableCompressor());
+  }
+
+  private AsyncCommand loadAndShoot() {
+    return AsyncCommand
+               .requiring(m_shooter, m_storage)
+               .executing(() -> {
+                 while (true) {
+                   AsyncCommand.yield();
+                   m_storage.run();
+                   m_shooter.ramp(ShooterConstants.kShooterTarget);
+
+                   if (m_shooter.atSetpoint()) {
+                     m_shooter.feed();
+                   } else {
+                     m_shooter.stop();
+                   }
+                 }
+               })
+               .named("Shoot");
   }
 
   /**

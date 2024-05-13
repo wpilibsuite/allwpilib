@@ -54,11 +54,15 @@ public class Shooter extends HardwareResource {
             m_shooterEncoder.getRate(), setpoint.in(RotationsPerSecond)));
   }
 
-  public void tryFeed() {
-    if (m_shooterFeedback.atSetpoint()) {
-      m_feederMotor.set(1);
-    } else {
-      m_feederMotor.set(0);
-    }
+  public boolean atSetpoint() {
+    return m_shooterFeedback.atSetpoint();
+  }
+
+  public void feed() {
+    m_feederMotor.set(1);
+  }
+
+  public void stop() {
+    m_feederMotor.set(0);
   }
 }

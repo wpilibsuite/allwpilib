@@ -54,21 +54,6 @@ public class HardwareResource {
     return idle().withTimeout(duration);
   }
 
-  public AsyncCommandBuilder runSequence(AsyncCommand... commands) {
-    // All commands most only have this resource as a requirement
-    for (AsyncCommand command : commands) {
-      if (command.requirements().size() != 1 || !command.requires(this)) {
-        throw new IllegalArgumentException("Command " + command.name() + " can only require " + getName());
-      }
-    }
-
-    return new AsyncCommandBuilder().requiring(this).executing(() -> {
-      for (AsyncCommand command : commands) {
-        command.run();
-      }
-    });
-  }
-
   @Override
   public String toString() {
     return name;

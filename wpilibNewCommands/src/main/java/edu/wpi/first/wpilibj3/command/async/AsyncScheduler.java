@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj3.command.async;
 
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -7,6 +8,8 @@ import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,12 +33,27 @@ public class AsyncScheduler {
     }
   }
 
-  private record CommandState(AsyncCommand command, Continuation continuation) { }
+  /**
+   * Represents the state of a command as it is executed by the scheduler.
+   *
+   * @param command The command being tracked.
+   * @param parent The parent command composition that scheduled the tracked command. Null if the
+   *               command was scheduled by a top level construct like trigger bindings or manually
+   *               scheduled by a user. For deeply nested compositions, this tracks the <i>direct
+   *               parent command</i> that invoked the schedule() call; in this manner, an ancestry
+   *               tree can be built, where each {@code CommandState} object references a parent
+   *               node in the tree.
+   * @param continuation The continuation to which the command is bound.
+   */
+  private record CommandState(
+      AsyncCommand command,
+      AsyncCommand parent,
+      Continuation continuation) { }
 
   /** The default commands for each resource. */
   private final Map<HardwareResource, AsyncCommand> defaultCommands = new HashMap<>();
   /** The set of commands scheduled since the start of the previous run. */
-  private final Set<AsyncCommand> onDeck = new LinkedHashSet<>();
+  private final Set<CommandState> onDeck = new LinkedHashSet<>();
   /** The states of all running commands (does not include on deck commands). */
   private final Map<AsyncCommand, CommandState> commandStates = new LinkedHashMap<>();
   /** The periodic callbacks to run, outside of the command structure. */
@@ -57,6 +75,12 @@ public class AsyncScheduler {
     AsyncScheduler.defaultScheduler = defaultScheduler;
   }
 
+  /**
+   * Gets the default scheduler instance for use in a robot program. Some built in command types
+   * use the default scheduler and will not work as expected if used on another scheduler instance.
+   *
+   * @return the default scheduler instance.
+   */
   public static AsyncScheduler getInstance() {
     return defaultScheduler;
   }
@@ -64,14 +88,33 @@ public class AsyncScheduler {
   public AsyncScheduler() {
   }
 
+  /**
+   * Registers a resource with the scheduler and assigns it a default idle command.
+   * @param resource the resource to schedule
+   */
   public void registerResource(HardwareResource resource) {
     registerResource(resource, new IdleCommand(resource));
   }
 
+  /**
+   * Registers a resource with the scheduler and its default command.
+   *
+   * @param resource the resource to schedule
+   * @param defaultCommand the default command to use for the resource
+   */
   public void registerResource(HardwareResource resource, AsyncCommand defaultCommand) {
     setDefaultCommand(resource, defaultCommand);
   }
 
+  /**
+   * Sets the default command for a resource. The command must require the resource, and cannot
+   * require any others. A default command will run if no other commands are scheduled to use its
+   * resource.
+   *
+   * @param resource the resource for which to set the default command
+   * @param defaultCommand the default command to execute on the resource
+   * @throws IllegalArgumentException if the command does not require only the give resource
+   */
   public void setDefaultCommand(HardwareResource resource, AsyncCommand defaultCommand) {
     if (!defaultCommand.requires(resource)) {
       throw new IllegalArgumentException("A resource's default command must require that resource");
@@ -86,14 +129,51 @@ public class AsyncScheduler {
     schedule(defaultCommand);
   }
 
+  /**
+   * Gets the registered default command for a given resource. If no default command has been
+   * explicitly provided with {@link #setDefaultCommand(HardwareResource, AsyncCommand)}, then
+   * an {@link IdleCommand} will be set as the default by the scheduler.
+   *
+   * @param resource the resource for which to retrieve the configured default command
+   * @return the default command
+   */
   public AsyncCommand getDefaultCommand(HardwareResource resource) {
     return defaultCommands.get(resource);
   }
 
+  /**
+   * Adds a callback to run as part of the scheduler. The callback should not manipulate or control
+   * any resources, but can be used to log information, update data (such as simulations or LED
+   * data buffers), or perform some other helpful task. The callback is responsible for managing its
+   * own control flow and end conditions. If you want to run a single task periodically for the
+   * entire lifespan of the scheduler, use {@link #addPeriodic(Runnable)}.
+   *
+   * <p><strong>Note:</strong> Like commands, any loops in the callback must appropriately yield
+   * control back to the scheduler with {@link #yield()} or {@link AsyncCommand#yield()} or risk
+   * stalling your program in an unrecoverable infinite loop!
+   *
+   * @param callback the callback to sideload
+   */
   public void sideload(Runnable callback) {
     periodicCallbacks.add(new Continuation(scope, callback));
   }
 
+  /**
+   * Adds a task to run repeatedly for as long as the scheduler runs. This internally handles the
+   * looping and control yielding necessary for proper function. The callback will run at the same
+   * periodic frequency as the scheduler.
+   *
+   * <p>For example:</p>
+   * <pre>{@code
+   *   scheduler.addPeriodic(() -> leds.setData(ledDataBuffer));
+   *   scheduler.addPeriodic(() -> {
+   *     SmartDashboard.putNumber("X", getX());
+   *     SmartDashboard.putNumber("Y", getY());
+   *   });
+   * }</pre>
+   *
+   * @param callback the periodic function to run
+   */
   public void addPeriodic(Runnable callback) {
     sideload(() -> {
       while (true) {
@@ -142,12 +222,12 @@ public class AsyncScheduler {
       }
     }
 
-    for (var scheduledCommand : onDeck) {
-      if (!command.conflictsWith(scheduledCommand)) {
+    for (var scheduledState : onDeck) {
+      if (!command.conflictsWith(scheduledState.command())) {
         // No shared requirements, skip
         continue;
       }
-      if (command.isLowerPriorityThan(scheduledCommand)) {
+      if (command.isLowerPriorityThan(scheduledState.command())) {
         // Lower priority than an already-scheduled (but not yet running) command that requires at
         // one of the same resource
         return;
@@ -157,44 +237,90 @@ public class AsyncScheduler {
     // Evict conflicting on-deck commands
     // We check above if the input command is lower priority than any of these,
     // so at this point we're guaranteed to be >= priority than anything already on deck
-    onDeck.removeIf(c -> c.conflictsWith(command));
+    onDeck.removeIf(c -> c.command().conflictsWith(command));
 
-    onDeck.add(command);
+    var state = new CommandState(command, currentCommand, buildContinuation(command));
+    onDeck.add(state);
 
-    commandStates
-        .entrySet()
-        .removeIf(e -> e.getKey() != currentCommand && e.getKey().conflictsWith(command));
+    // Immediately evict any conflicting running command, except for commands in its ancestry
+    for (var iterator = commandStates.entrySet().iterator(); iterator.hasNext(); ) {
+      var entry = iterator.next();
+      var cmd = entry.getKey();
+      if (command.conflictsWith(cmd) && !inheritsFrom(state, cmd)) {
+        // The scheduled command conflicts with and does not inherit from this command
+        // Cancel this command and its children
+        iterator.remove();
+        removeOrphanedChildren(cmd);
+      }
+    }
   }
 
+  /**
+   * Checks if a particular command is an ancestor of another.
+   *
+   * @param state the state to check
+   * @param ancestor the potential ancestor for which to search
+   * @return true if {@code ancestor} is the direct parent or indirect ancestor, false if not
+   */
+  private boolean inheritsFrom(CommandState state, AsyncCommand ancestor) {
+    if (state.parent() == null) {
+      return false;
+    }
+    if (!commandStates.containsKey(ancestor)) {
+      return false;
+    }
+    if (state.parent() == ancestor) {
+      return true;
+    }
+    return commandStates.values().stream().anyMatch(s -> inheritsFrom(s, ancestor));
+  }
+
+  /**
+   * Cancels a command and any other command scheduled by it. This occurs immediately and does not
+   * need to wait for a call to {@link #run()}. Any command that it scheduled will also be canceled
+   * to ensure commands within compositions do not continue to run.
+   *
+   * @param command the command to cancel
+   */
   public void cancel(AsyncCommand command) {
     // Evict the command. The next call to run() will schedule the default command for all its
     // required resources, unless another command requiring those resources is scheduled between
     // calling cancel() and calling run()
     commandStates.remove(command);
+
+    // Clean up any orphaned child commands; their lifespan must not exceed the parent's
+    removeOrphanedChildren(command);
   }
 
-  private int runNum = 0;
-
+  /**
+   * Updates the command scheduler. This will process trigger bindings on anything attached to the
+   * {@link #getDefaultButtonLoop() default event loop}, begin running any commands scheduled since
+   * the previous call to {@code run()}, process periodic callbacks added with
+   * {@link #addPeriodic(Runnable)} and {@link #sideload(Runnable)}, update running commands, and
+   * schedule default commands for any resources that are not owned by a running command.
+   *
+   * <p>This method is intended to be called in a periodic loop like
+   * {@link TimedRobot#robotPeriodic()}</p>
+   */
   public void run() {
-    runNum++;
+    // Process triggers first; these tend to queue and cancel commands
     eventLoop.poll();
 
-    // Apply scheduled commands, evicting any commands that require the same resources
-    // Priority checking is done at schedule time so we don't need to repeat those checks here
-    // Note that if multiple commands are scheduled in the same loop that use the same resources,
-    // then the final scheduled command will win out.
-    for (var command : onDeck) {
-      commandStates.put(command, new CommandState(command, buildContinuation(command)));
+    // Move any scheduled commands to the running set
+    for (var queuedState : onDeck) {
+      commandStates.put(queuedState.command, queuedState);
     }
 
     // Clear the set of on-deck commands,
     // since we just put them all into the set of running commands
     onDeck.clear();
 
+    // Update periodic callbacks
     for (Continuation callback : periodicCallbacks) {
       callback.run();
     }
 
+    // And remove any periodic callbacks that have completed
     periodicCallbacks.removeIf(Continuation::isDone);
 
     // Tick every command that hasn't been completed yet
@@ -207,18 +333,22 @@ public class AsyncScheduler {
         continue;
       }
 
-      if (!continuation.isDone()) {
-        currentCommand = command;
-        mountContinuation(continuation);
-        try {
-          continuation.run();
-        } finally {
-          mountContinuation(null);
-        }
+      currentCommand = command;
+      mountContinuation(continuation);
+      try {
+        continuation.run();
+      } finally {
+        currentCommand = null;
+        mountContinuation(null);
+      }
+
+      if (continuation.isDone()) {
+        // Immediately check if the command has completed and remove any children commands.
+        // This prevents child commands from being executed one extra time in the run() loop
+        commandStates.remove(command);
+        removeOrphanedChildren(command);
       }
     }
-
-    currentCommand = null;
 
     // Remove completed commands
     commandStates.entrySet().removeIf(e -> e.getValue().continuation.isDone());
@@ -232,6 +362,29 @@ public class AsyncScheduler {
     }
   }
 
+  /**
+   * Removes all commands descended from a parent command. This is used to ensure that any command
+   * scheduled within a composition or group cannot live longer than any ancestor.
+   *
+   * @param parent the root command whose descendants to remove from the scheduler
+   */
+  private void removeOrphanedChildren(AsyncCommand parent) {
+    for (var iterator = commandStates.values().iterator(); iterator.hasNext(); ) {
+      var state = iterator.next();
+      if (state.parent == parent) {
+        iterator.remove();
+        removeOrphanedChildren(state.command);
+      }
+    }
+  }
+
+  /**
+   * Builds a continuation object that the command will be bound to. The continuation will be scoped
+   * to this scheduler object and cannot be used by another scheduler instance.
+   *
+   * @param command the command for which to build a continuation
+   * @return the binding continuation
+   */
   private Continuation buildContinuation(AsyncCommand command) {
     return new Continuation(scope, () -> {
       try {
@@ -242,6 +395,12 @@ public class AsyncScheduler {
     });
   }
 
+  /**
+   * Mounds a continuation to the current thread. Accepts null for clearing the currently mounted
+   * continuation.
+   *
+   * @param continuation the continuation to mount
+   */
   private void mountContinuation(Continuation continuation) {
     try {
       if (continuation == null) {
@@ -267,6 +426,32 @@ public class AsyncScheduler {
     return commandStates.containsKey(command);
   }
 
+  /**
+   * Checks if a command is currently scheduled to run, but is not yet running.
+   *
+   * @param command the command to check
+   * @return true if the command is scheduled to run, false if not
+   */
+  public boolean isScheduled(AsyncCommand command) {
+    return onDeck.stream().anyMatch(state -> state.command == command);
+  }
+
+  /**
+   * Checks if a command is currently scheduled to run, or is already running.
+   *
+   * @param command the command to check
+   * @return true if the command is scheduled to run or is already running, false if not
+   */
+  public boolean isScheduledOrRunning(AsyncCommand command) {
+    return isScheduled(command) || isRunning(command);
+  }
+
+  /**
+   * Gets the set of all currently running commands. Commands are returned in the order in which
+   * they were scheduled. The returned set is read-only.
+   *
+   * @return the currently running commands
+   */
   public Set<AsyncCommand> getRunningCommands() {
     return Collections.unmodifiableSet(commandStates.keySet());
   }
@@ -290,8 +475,15 @@ public class AsyncScheduler {
     schedule(defaultCommand);
   }
 
-  public boolean yield() {
-    return Continuation.yield(scope);
+  /**
+   * Called by {@link AsyncCommand#run()}, this will cause the command's execution to pause and
+   * cede control back to the scheduler.
+   *
+   * @throws IllegalStateException if called outside a command that is currently being executed by
+   * the scheduler
+   */
+  public void yield() {
+    Continuation.yield(scope);
   }
 
   public EventLoop getDefaultButtonLoop() {

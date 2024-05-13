@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj3.command.async;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -17,7 +18,6 @@ public class ParallelGroup implements AsyncCommand {
 
   public ParallelGroup(
       String name,
-      AsyncScheduler scheduler,
       Collection<AsyncCommand> allCommands,
       Collection<AsyncCommand> requiredCommands) {
     if (!allCommands.containsAll(requiredCommands)) {
@@ -43,7 +43,7 @@ public class ParallelGroup implements AsyncCommand {
     }
 
     this.name = name;
-    this.scheduler = scheduler;
+    this.scheduler = AsyncScheduler.getInstance();
     this.commands.addAll(allCommands);
     this.requiredCommands.addAll(requiredCommands);
 
@@ -76,7 +76,6 @@ public class ParallelGroup implements AsyncCommand {
   public static ParallelGroup race(String name, AsyncCommand... commands) {
     return new ParallelGroup(
         name,
-        AsyncScheduler.getInstance(),
         List.of(commands),
         Set.of()
     );
@@ -93,7 +92,6 @@ public class ParallelGroup implements AsyncCommand {
   public static ParallelGroup all(String name, AsyncCommand... commands) {
     return new ParallelGroup(
         name,
-        AsyncScheduler.getInstance(),
         List.of(commands),
         List.of(commands)
     );
@@ -101,29 +99,20 @@ public class ParallelGroup implements AsyncCommand {
 
   @Override
   public void run() {
-    for (AsyncCommand command : commands) {
-      scheduler.schedule(command);
-    }
-    scheduler.yield();
+    commands.forEach(scheduler::schedule);
 
-    while (true) {
-      if (requiredCommands.isEmpty()) {
-        // No command is required, so we run until at least one command completes
-        if (!commands.stream().allMatch(scheduler::isRunning)) {
-          break;
-        }
-      } else {
-        // We run all commands until every required command has completed
-        if (requiredCommands.stream().noneMatch(scheduler::isRunning)) {
-          break;
-        }
-      }
-
+    while (shouldRun()) {
       scheduler.yield();
     }
+  }
 
-    for (AsyncCommand command : commands) {
-      scheduler.cancel(command);
+  private boolean shouldRun() {
+    if (requiredCommands.isEmpty()) {
+      // No command is required, so we only need to continue running while every child still runs
+      return commands.stream().allMatch(scheduler::isScheduledOrRunning);
+    } else {
+      // Only run so long as at least one required command still runs
+      return requiredCommands.stream().anyMatch(scheduler::isScheduledOrRunning);
     }
   }
 
@@ -150,5 +139,44 @@ public class ParallelGroup implements AsyncCommand {
   @Override
   public String toString() {
     return "ParallelGroup[name=" + name + "]";
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+    private final Set<AsyncCommand> commands = new LinkedHashSet<>();
+    private final Set<AsyncCommand> requiredCommands = new HashSet<>();
+
+    public Builder running(AsyncCommand... commands) {
+      this.commands.addAll(Arrays.asList(commands));
+      return this;
+    }
+
+    public Builder requiring(AsyncCommand... commands) {
+      requiredCommands.addAll(Arrays.asList(commands));
+      this.commands.addAll(requiredCommands);
+      return this;
+    }
+
+    public Builder racing() {
+      requiredCommands.clear();
+      return this;
+    }
+
+    public Builder requireAll() {
+      requiredCommands.clear();
+      requiredCommands.addAll(commands);
+      return this;
+    }
+
+    public ParallelGroup named(String name) {
+      return new ParallelGroup(
+          name,
+          commands,
+          requiredCommands
+      );
+    }
   }
 }
