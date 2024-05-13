@@ -228,7 +228,8 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
    * @param outputIndices the list of output indices to include in the sliced system.
    * @return the sliced LinearSystem with outputs set to row vectors of LinearSystem.
    * @throws IllegalArgumentException if any outputIndices are outside the range of system outputs.
-   * @throws IllegalArgumentException if number of outputIndices exceeds the system output number.
+   * @throws IllegalArgumentException if number of outputIndices exceeds the number of system
+   * outpus.
    * @throws IllegalArgumentException if duplication exists in outputIndices.
    */
   public LinearSystem<States, Inputs, ? extends Num> slice(int... outputIndices) {
