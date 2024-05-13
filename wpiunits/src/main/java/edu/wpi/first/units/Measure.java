@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. Two
  * measures with the same <i>unit</i> and <i>magnitude</i> are effectively equivalent objects.
@@ -91,28 +93,28 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     }
 
     if (unit() instanceof Per
-        && other.unit().m_baseType.equals(((Per<?, ?>) unit()).denominator().m_baseType)) {
+        && other.unit().getBaseUnit().equals(((Per<?, ?>) unit()).denominator().getBaseUnit())) {
       // denominator of the Per cancels out, return with just the units of the numerator
       Unit<?> numerator = ((Per<?, ?>) unit()).numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (unit() instanceof Velocity && other.unit().m_baseType.equals(Time.class)) {
+    } else if (unit() instanceof Velocity && other.unit().getBaseUnit().equals(Seconds)) {
       // Multiplying a velocity by a time, return the scalar unit (eg Distance)
       Unit<?> numerator = ((Velocity<?>) unit()).getUnit();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     } else if (other.unit() instanceof Per
-        && unit().m_baseType.equals(((Per<?, ?>) other.unit()).denominator().m_baseType)) {
+        && unit().getBaseUnit().equals(((Per<?, ?>) other.unit()).denominator().getBaseUnit())) {
       Unit<?> numerator = ((Per<?, ?>) other.unit()).numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     } else if (unit() instanceof Per
         && other.unit() instanceof Per
         && ((Per<?, ?>) unit())
             .denominator()
-            .m_baseType
-            .equals(((Per<?, U>) other.unit()).numerator().m_baseType)
+            .getBaseUnit()
+            .equals(((Per<?, U>) other.unit()).numerator().getBaseUnit())
         && ((Per<?, ?>) unit())
             .numerator()
-            .m_baseType
-            .equals(((Per<?, ?>) other.unit()).denominator().m_baseType)) {
+            .getBaseUnit()
+            .equals(((Per<?, ?>) other.unit()).denominator().getBaseUnit())) {
       // multiplying eg meters per second * milliseconds per foot
       // return a scalar
       return Units.Value.of(baseUnitMagnitude() * other.baseUnitMagnitude());
@@ -255,7 +257,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @return true if this unit is near the other measure, otherwise false
    */
   default boolean isNear(Measure<?> other, double varianceThreshold) {
-    if (this.unit().m_baseType != other.unit().m_baseType) {
+    if (!this.unit().getBaseUnit().equivalent(other.unit().getBaseUnit())) {
       return false; // Disjoint units, not compatible
     }
 
@@ -291,7 +293,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @return true if this measure is equivalent, false otherwise
    */
   default boolean isEquivalent(Measure<?> other) {
-    if (this.unit().m_baseType != other.unit().m_baseType) {
+    if (!this.unit().getBaseUnit().equals(other.unit().getBaseUnit())) {
       return false; // Disjoint units, not compatible
     }
 

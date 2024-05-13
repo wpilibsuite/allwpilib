@@ -6,12 +6,11 @@
 
 #include <jni.h>
 
-#include <fmt/format.h>
-
 #include "edu_wpi_first_util_WPIUtilJNI.h"
 #include "wpi/RawFrame.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
+#include "wpi/print.h"
 #include "wpi/timestamp.h"
 
 using namespace wpi::java;
@@ -22,12 +21,14 @@ static uint64_t mockNow = 0;
 static JException illegalArgEx;
 static JException indexOobEx;
 static JException interruptedEx;
+static JException ioEx;
 static JException nullPointerEx;
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgEx},
     {"java/lang/IndexOutOfBoundsException", &indexOobEx},
     {"java/lang/InterruptedException", &interruptedEx},
+    {"java/io/IOException", &ioEx},
     {"java/lang/NullPointerException", &nullPointerEx}};
 
 void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
@@ -36,6 +37,10 @@ void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
 
 void wpi::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
   indexOobEx.Throw(env, msg);
+}
+
+void wpi::ThrowIOException(JNIEnv* env, std::string_view msg) {
+  ioEx.Throw(env, msg);
 }
 
 void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
@@ -80,7 +85,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_writeStderr
   (JNIEnv* env, jclass, jstring str)
 {
-  fmt::print(stderr, "{}", JStringRef{env, str}.str());
+  wpi::print(stderr, "{}", JStringRef{env, str}.str());
 }
 
 /*
@@ -93,7 +98,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
   (JNIEnv*, jclass)
 {
 #ifdef __FRC_ROBORIO__
-  fmt::print(stderr, "WPIUtil: Mocking time is not available on the Rio\n");
+  wpi::print(stderr, "WPIUtil: Mocking time is not available on the Rio\n");
 #else
   mockTimeEnabled = true;
   wpi::SetNowImpl([] { return mockNow; });

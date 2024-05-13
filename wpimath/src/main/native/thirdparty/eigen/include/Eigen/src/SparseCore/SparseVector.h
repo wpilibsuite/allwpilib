@@ -304,6 +304,24 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
     return *this;
   }
 
+  inline SparseVector(SparseVector&& other) : SparseVector() { this->swap(other); }
+
+  template <typename OtherDerived>
+  inline SparseVector(SparseCompressedBase<OtherDerived>&& other) : SparseVector() {
+    *this = other.derived().markAsRValue();
+  }
+
+  inline SparseVector& operator=(SparseVector&& other) {
+    this->swap(other);
+    return *this;
+  }
+
+  template <typename OtherDerived>
+  inline SparseVector& operator=(SparseCompressedBase<OtherDerived>&& other) {
+    *this = other.derived().markAsRValue();
+    return *this;
+  }
+
 #ifndef EIGEN_PARSED_BY_DOXYGEN
   template <typename Lhs, typename Rhs>
   inline SparseVector& operator=(const SparseSparseProduct<Lhs, Rhs>& product) {

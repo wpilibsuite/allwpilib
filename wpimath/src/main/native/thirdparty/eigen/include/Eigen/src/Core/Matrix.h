@@ -30,7 +30,7 @@ struct traits<Matrix<Scalar_, Rows_, Cols_, Options_, MaxRows_, MaxCols_>> {
     actual_alignment = ((Options_ & DontAlign) == 0) ? default_alignment : 0,
     required_alignment = unpacket_traits<PacketScalar>::alignment,
     packet_access_bit = (packet_traits<Scalar_>::Vectorizable &&
-                         (EIGEN_UNALIGNED_VECTORIZE || (actual_alignment >= required_alignment)))
+                         (EIGEN_UNALIGNED_VECTORIZE || (int(actual_alignment) >= int(required_alignment))))
                             ? PacketAccessBit
                             : 0
   };
@@ -48,7 +48,7 @@ struct traits<Matrix<Scalar_, Rows_, Cols_, Options_, MaxRows_, MaxCols_>> {
     Flags = compute_matrix_flags(Options_),
     Options = Options_,
     InnerStrideAtCompileTime = 1,
-    OuterStrideAtCompileTime = (Options & RowMajor) ? ColsAtCompileTime : RowsAtCompileTime,
+    OuterStrideAtCompileTime = (int(Options) & int(RowMajor)) ? ColsAtCompileTime : RowsAtCompileTime,
 
     // FIXME, the following flag in only used to define NeedsToAlign in PlainObjectBase
     EvaluatorFlags = LinearAccessBit | DirectAccessBit | packet_access_bit | row_major_bit,
@@ -207,7 +207,7 @@ class Matrix : public PlainObjectBase<Matrix<Scalar_, Rows_, Cols_, Options_, Ma
    *
    * \callgraph
    */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Matrix& operator=(const Matrix& other) { return Base::_set(other); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Matrix& operator=(const Matrix& other) { return Base::_set(other); }
 
   /** \internal
    * \brief Copies the value of the expression \a other into \c *this with automatic resizing.
@@ -250,17 +250,18 @@ class Matrix : public PlainObjectBase<Matrix<Scalar_, Rows_, Cols_, Options_, Ma
    *
    * \sa resize(Index,Index)
    */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Matrix()
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Matrix()
       : Base(){EIGEN_INITIALIZE_COEFFS_IF_THAT_OPTION_IS_ENABLED}
 
         // FIXME is it still needed
-        EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit Matrix(internal::constructor_without_unaligned_array_assert)
+        EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr explicit Matrix(
+            internal::constructor_without_unaligned_array_assert)
       : Base(internal::constructor_without_unaligned_array_assert()){EIGEN_INITIALIZE_COEFFS_IF_THAT_OPTION_IS_ENABLED}
 
-        EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Matrix(Matrix && other)
+        EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Matrix(Matrix && other)
             EIGEN_NOEXCEPT_IF(std::is_nothrow_move_constructible<Scalar>::value)
       : Base(std::move(other)) {}
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Matrix& operator=(Matrix&& other)
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Matrix& operator=(Matrix&& other)
       EIGEN_NOEXCEPT_IF(std::is_nothrow_move_assignable<Scalar>::value) {
     Base::operator=(std::move(other));
     return *this;
