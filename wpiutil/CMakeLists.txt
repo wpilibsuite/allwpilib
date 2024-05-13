@@ -161,7 +161,7 @@ target_link_libraries(wpiutil protobuf::libprotobuf Threads::Threads ${CMAKE_DL_
 
 if(Protobuf_VERSION VERSION_GREATER_EQUAL 4)
     find_package(absl REQUIRED)
-    target_link_libraries(wpiutil PUBLIC absl::spinlock_wait)
+    target_link_libraries(wpiutil absl::spinlock_wait)
 endif()
 
 if(ATOMIC)
