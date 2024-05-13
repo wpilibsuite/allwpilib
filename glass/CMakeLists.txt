@@ -41,7 +41,7 @@ set_property(TARGET libglassnt PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_property(TARGET libglassnt PROPERTY FOLDER "libraries")
 
 wpilib_target_warnings(libglassnt)
-target_link_libraries(libglassnt PUBLIC absl::spinlock_wait ntcore libglass)
+target_link_libraries(libglassnt PUBLIC ntcore libglass)
 
 target_include_directories(
     libglassnt
