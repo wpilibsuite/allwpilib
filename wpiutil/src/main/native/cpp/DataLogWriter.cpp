@@ -63,12 +63,12 @@ bool DataLogWriter::BufferFull() {
 
 extern "C" {
 
-struct WPI_DataLog* WPI_DataLog_CreateWriter(const char* filename,
-                                             int* errorCode,
-                                             const char* extraHeader) {
+struct WPI_DataLog* WPI_DataLog_CreateWriter(
+    const struct WPI_String* filename, int* errorCode,
+    const struct WPI_String* extraHeader) {
   std::error_code ec;
-  auto rv = reinterpret_cast<WPI_DataLog*>(
-      new DataLogWriter{filename, ec, extraHeader});
+  auto rv = reinterpret_cast<WPI_DataLog*>(new DataLogWriter{
+      wpi::to_string_view(filename), ec, wpi::to_string_view(extraHeader)});
   *errorCode = ec.value();
   return rv;
 }
