@@ -7,21 +7,11 @@
 #include <stddef.h>  // NOLINT
 
 #include <stdint.h>
+#include <wpi/string.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * A datalog string (for use with string array).
- */
-struct WPI_DataLog_String {
-  /** Contents. */
-  const char* str;
-
-  /** Length. */
-  size_t len;
-};
 
 /** C-compatible data log (opaque struct). */
 struct WPI_DataLog;
@@ -33,9 +23,9 @@ struct WPI_DataLog;
  * @param errorCode error if file failed to open (output)
  * @param extraHeader extra header data
  */
-struct WPI_DataLog* WPI_DataLog_CreateWriter(const char* filename,
-                                             int* errorCode,
-                                             const char* extraHeader);
+struct WPI_DataLog* WPI_DataLog_CreateWriter(
+    const struct WPI_String* filename, int* errorCode,
+    const struct WPI_String* extraHeader);
 
 /**
  * Construct a new Data Log background writer.  The log will be initially
@@ -48,10 +38,9 @@ struct WPI_DataLog* WPI_DataLog_CreateWriter(const char* filename,
  *               this is a time/storage tradeoff
  * @param extraHeader extra header data
  */
-struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter(const char* dir,
-                                                       const char* filename,
-                                                       double period,
-                                                       const char* extraHeader);
+struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter(
+    const struct WPI_String* dir, const struct WPI_String* filename,
+    double period, const struct WPI_String* extraHeader);
 
 /**
  * Construct a new Data Log background writer that passes its output to the
@@ -67,7 +56,7 @@ struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter(const char* dir,
  */
 struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter_Func(
     void (*write)(void* ptr, const uint8_t* data, size_t len), void* ptr,
-    double period, const char* extraHeader);
+    double period, const struct WPI_String* extraHeader);
 
 /**
  * Change log filename.  Can only be used on background writer data logs.
@@ -76,7 +65,7 @@ struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter_Func(
  * @param filename filename
  */
 void WPI_DataLog_SetBackgroundWriterFilename(struct WPI_DataLog* datalog,
-                                             const char* filename);
+                                             const struct WPI_String* filename);
 
 /**
  * Releases a data log object. Closes the file and returns resources to the
@@ -134,9 +123,10 @@ void WPI_DataLog_Stop(struct WPI_DataLog* datalog);
  *
  * @return Entry index
  */
-int WPI_DataLog_Start(struct WPI_DataLog* datalog, const char* name,
-                      const char* type, const char* metadata,
-                      int64_t timestamp);
+int WPI_DataLog_Start(struct WPI_DataLog* datalog,
+                      const struct WPI_String* name,
+                      const struct WPI_String* type,
+                      const struct WPI_String* metadata, int64_t timestamp);
 
 /**
  * Finish an entry.
@@ -157,7 +147,8 @@ void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
  * @param timestamp Time stamp (may be 0 to indicate now)
  */
 void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
-                             const char* metadata, int64_t timestamp);
+                             const struct WPI_String* metadata,
+                             int64_t timestamp);
 
 /**
  * Appends a raw record to the log.
@@ -221,11 +212,11 @@ void WPI_DataLog_AppendDouble(struct WPI_DataLog* datalog, int entry,
  * @param datalog data log
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param value String value to record
- * @param len Length of string
  * @param timestamp Time stamp (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendString(struct WPI_DataLog* datalog, int entry,
-                              const char* value, size_t len, int64_t timestamp);
+                              const struct WPI_String* value,
+                              int64_t timestamp);
 
 /**
  * Appends a boolean array record to the log.
@@ -302,15 +293,18 @@ void WPI_DataLog_AppendDoubleArray(struct WPI_DataLog* datalog, int entry,
  * @param timestamp Time stamp (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
-                                   const WPI_DataLog_String* arr, size_t len,
+                                   const struct WPI_String* arr, size_t len,
                                    int64_t timestamp);
 
-void WPI_DataLog_AddSchemaString(struct WPI_DataLog* datalog, const char* name,
-                                 const char* type, const char* schema,
+void WPI_DataLog_AddSchemaString(struct WPI_DataLog* datalog,
+                                 const struct WPI_String* name,
+                                 const struct WPI_String* type,
+                                 const struct WPI_String* schema,
                                  int64_t timestamp);
 
-void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog, const char* name,
-                           const char* type, const uint8_t* schema,
+void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog,
+                           const struct WPI_String* name,
+                           const struct WPI_String* type, const uint8_t* schema,
                            size_t schema_len, int64_t timestamp);
 
 #ifdef __cplusplus

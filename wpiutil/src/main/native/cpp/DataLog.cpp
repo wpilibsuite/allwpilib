@@ -596,7 +596,7 @@ void DataLog::AppendStringArray(int entry,
 }
 
 void DataLog::AppendStringArray(int entry,
-                                std::span<const WPI_DataLog_String> arr,
+                                std::span<const struct WPI_String> arr,
                                 int64_t timestamp) {
   if (entry <= 0) {
     return;
@@ -640,11 +640,13 @@ void WPI_DataLog_Stop(struct WPI_DataLog* datalog) {
   reinterpret_cast<DataLog*>(datalog)->Stop();
 }
 
-int WPI_DataLog_Start(struct WPI_DataLog* datalog, const char* name,
-                      const char* type, const char* metadata,
-                      int64_t timestamp) {
-  return reinterpret_cast<DataLog*>(datalog)->Start(name, type, metadata,
-                                                    timestamp);
+int WPI_DataLog_Start(struct WPI_DataLog* datalog,
+                      const struct WPI_String* name,
+                      const struct WPI_String* type,
+                      const struct WPI_String* metadata, int64_t timestamp) {
+  return reinterpret_cast<DataLog*>(datalog)->Start(
+      wpi::to_string_view(name), wpi::to_string_view(type),
+      wpi::to_string_view(metadata), timestamp);
 }
 
 void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
@@ -653,8 +655,10 @@ void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
 }
 
 void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
-                             const char* metadata, int64_t timestamp) {
-  reinterpret_cast<DataLog*>(datalog)->SetMetadata(entry, metadata, timestamp);
+                             const struct WPI_String* metadata,
+                             int64_t timestamp) {
+  reinterpret_cast<DataLog*>(datalog)->SetMetadata(
+      entry, wpi::to_string_view(metadata), timestamp);
 }
 
 void WPI_DataLog_AppendRaw(struct WPI_DataLog* datalog, int entry,
@@ -683,10 +687,10 @@ void WPI_DataLog_AppendDouble(struct WPI_DataLog* datalog, int entry,
 }
 
 void WPI_DataLog_AppendString(struct WPI_DataLog* datalog, int entry,
-                              const char* value, size_t len,
+                              const struct WPI_String* value,
                               int64_t timestamp) {
-  reinterpret_cast<DataLog*>(datalog)->AppendString(entry, {value, len},
-                                                    timestamp);
+  reinterpret_cast<DataLog*>(datalog)->AppendString(
+      entry, {value->str, value->len}, timestamp);
 }
 
 void WPI_DataLog_AppendBooleanArray(struct WPI_DataLog* datalog, int entry,
@@ -725,23 +729,29 @@ void WPI_DataLog_AppendDoubleArray(struct WPI_DataLog* datalog, int entry,
 }
 
 void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
-                                   const WPI_DataLog_String* arr, size_t len,
+                                   const struct WPI_String* arr, size_t len,
                                    int64_t timestamp) {
   reinterpret_cast<DataLog*>(datalog)->AppendStringArray(entry, {arr, len},
                                                          timestamp);
 }
 
-void WPI_DataLog_AddSchemaString(struct WPI_DataLog* datalog, const char* name,
-                                 const char* type, const char* schema,
+void WPI_DataLog_AddSchemaString(struct WPI_DataLog* datalog,
+                                 const struct WPI_String* name,
+                                 const struct WPI_String* type,
+                                 const struct WPI_String* schema,
                                  int64_t timestamp) {
-  reinterpret_cast<DataLog*>(datalog)->AddSchema(name, type, schema, timestamp);
+  reinterpret_cast<DataLog*>(datalog)->AddSchema(
+      wpi::to_string_view(name), wpi::to_string_view(type),
+      wpi::to_string_view(schema), timestamp);
 }
 
-void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog, const char* name,
-                           const char* type, const uint8_t* schema,
+void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog,
+                           const struct WPI_String* name,
+                           const struct WPI_String* type, const uint8_t* schema,
                            size_t schema_len, int64_t timestamp) {
   reinterpret_cast<DataLog*>(datalog)->AddSchema(
-      name, type, std::span<const uint8_t>{schema, schema_len}, timestamp);
+      wpi::to_string_view(name), wpi::to_string_view(type),
+      std::span<const uint8_t>{schema, schema_len}, timestamp);
 }
 
 }  // extern "C"
