@@ -180,7 +180,7 @@ class LinearSystem {
    * @throws std::domain_error if any outputIndices are outside the range of
    * system outputs.
    * @throws std::domain_error if number of outputIndices exceeds the system
-   * system outputs.
+   * outputs.
    * @throws std::domain_error if duplication exists in outputIndices.
    */
   template <std::same_as<int>... OutputIndices>
