@@ -19,13 +19,13 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SysIdRoutineTest {
-  interface Mechanism extends Subsystem {
+  interface Mechanism extends Resource {
     void recordState(SysIdRoutineLog.State state);
 
     void drive(Measure<Voltage> voltage);
@@ -57,7 +57,7 @@ class SysIdRoutineTest {
     m_sysidRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(null, null, null, m_mechanism::recordState),
-            new SysIdRoutine.Mechanism(m_mechanism::drive, m_mechanism::log, new Subsystem() {}));
+            new SysIdRoutine.Mechanism(m_mechanism::drive, m_mechanism::log, new Resource() {}));
     m_quasistaticForward = m_sysidRoutine.quasistatic(SysIdRoutine.Direction.kForward);
     m_quasistaticReverse = m_sysidRoutine.quasistatic(SysIdRoutine.Direction.kReverse);
     m_dynamicForward = m_sysidRoutine.dynamic(SysIdRoutine.Direction.kForward);

@@ -89,10 +89,10 @@ class ParallelCommandGroupTest extends MultiCompositionTestBase<ParallelCommandG
 
   @Test
   void parallelGroupRequirementTest() {
-    Subsystem system1 = new SubsystemBase() {};
-    Subsystem system2 = new SubsystemBase() {};
-    Subsystem system3 = new SubsystemBase() {};
-    Subsystem system4 = new SubsystemBase() {};
+    Resource system1 = new SubsystemBase() {};
+    Resource system2 = new SubsystemBase() {};
+    Resource system3 = new SubsystemBase() {};
+    Resource system4 = new SubsystemBase() {};
 
     try (CommandScheduler scheduler = new CommandScheduler()) {
       MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
@@ -114,9 +114,9 @@ class ParallelCommandGroupTest extends MultiCompositionTestBase<ParallelCommandG
 
   @Test
   void parallelGroupRequirementErrorTest() {
-    Subsystem system1 = new SubsystemBase() {};
-    Subsystem system2 = new SubsystemBase() {};
-    Subsystem system3 = new SubsystemBase() {};
+    Resource system1 = new SubsystemBase() {};
+    Resource system2 = new SubsystemBase() {};
+    Resource system3 = new SubsystemBase() {};
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
     Command command1 = command1Holder.getMock();

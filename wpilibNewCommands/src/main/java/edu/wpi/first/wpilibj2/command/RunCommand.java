@@ -21,7 +21,7 @@ public class RunCommand extends FunctionalCommand {
    * @param toRun the Runnable to run
    * @param requirements the subsystems to require
    */
-  public RunCommand(Runnable toRun, Subsystem... requirements) {
+  public RunCommand(Runnable toRun, Resource... requirements) {
     super(() -> {}, toRun, interrupted -> {}, () -> false, requirements);
   }
 }

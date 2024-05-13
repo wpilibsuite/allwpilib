@@ -103,7 +103,7 @@ public class MecanumControllerCommand extends Command {
       PIDController rearRightController,
       Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
       Consumer<MecanumDriveMotorVoltages> outputDriveVoltages,
-      Subsystem... requirements) {
+      Resource... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumControllerCommand");
     m_pose = requireNonNullParam(pose, "pose", "MecanumControllerCommand");
     m_feedforward = requireNonNullParam(feedforward, "feedforward", "MecanumControllerCommand");
@@ -189,7 +189,7 @@ public class MecanumControllerCommand extends Command {
       PIDController rearRightController,
       Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
       Consumer<MecanumDriveMotorVoltages> outputDriveVoltages,
-      Subsystem... requirements) {
+      Resource... requirements) {
     this(
         trajectory,
         pose,
@@ -241,7 +241,7 @@ public class MecanumControllerCommand extends Command {
       Supplier<Rotation2d> desiredRotation,
       double maxWheelVelocityMetersPerSecond,
       Consumer<MecanumDriveWheelSpeeds> outputWheelSpeeds,
-      Subsystem... requirements) {
+      Resource... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumControllerCommand");
     m_pose = requireNonNullParam(pose, "pose", "MecanumControllerCommand");
     m_feedforward = new SimpleMotorFeedforward(0, 0, 0);
@@ -307,7 +307,7 @@ public class MecanumControllerCommand extends Command {
       ProfiledPIDController thetaController,
       double maxWheelVelocityMetersPerSecond,
       Consumer<MecanumDriveWheelSpeeds> outputWheelSpeeds,
-      Subsystem... requirements) {
+      Resource... requirements) {
     this(
         trajectory,
         pose,

@@ -29,7 +29,7 @@ import java.util.function.BooleanSupplier;
  */
 public abstract class Command implements Sendable {
   /** Requirements set. */
-  protected Set<Subsystem> m_requirements = new HashSet<>();
+  protected Set<Resource> m_requirements = new HashSet<>();
 
   /** Default constructor. */
   @SuppressWarnings("this-escape")
@@ -77,7 +77,7 @@ public abstract class Command implements Sendable {
    * @return the set of subsystems that are required
    * @see InterruptionBehavior
    */
-  public Set<Subsystem> getRequirements() {
+  public Set<Resource> getRequirements() {
     return m_requirements;
   }
 
@@ -90,8 +90,8 @@ public abstract class Command implements Sendable {
    *
    * @param requirements the requirements to add
    */
-  public final void addRequirements(Subsystem... requirements) {
-    for (Subsystem requirement : requirements) {
+  public final void addRequirements(Resource... requirements) {
+    for (Resource requirement : requirements) {
       m_requirements.add(requireNonNullParam(requirement, "requirement", "addRequirements"));
     }
   }
@@ -218,7 +218,7 @@ public abstract class Command implements Sendable {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  public SequentialCommandGroup beforeStarting(Runnable toRun, Subsystem... requirements) {
+  public SequentialCommandGroup beforeStarting(Runnable toRun, Resource... requirements) {
     return beforeStarting(new InstantCommand(toRun, requirements));
   }
 
@@ -251,7 +251,7 @@ public abstract class Command implements Sendable {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  public SequentialCommandGroup andThen(Runnable toRun, Subsystem... requirements) {
+  public SequentialCommandGroup andThen(Runnable toRun, Resource... requirements) {
     return andThen(new InstantCommand(toRun, requirements));
   }
 
@@ -532,7 +532,7 @@ public abstract class Command implements Sendable {
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required
    */
-  public boolean hasRequirement(Subsystem requirement) {
+  public boolean hasRequirement(Resource requirement) {
     return getRequirements().contains(requirement);
   }
 

@@ -93,7 +93,7 @@ class MecanumControllerCommandTest {
   @Test
   @ResourceLock("timing")
   void testReachesReference() {
-    final var subsystem = new Subsystem() {};
+    final var subsystem = new Resource() {};
 
     final var waypoints = new ArrayList<Pose2d>();
     waypoints.add(Pose2d.kZero);

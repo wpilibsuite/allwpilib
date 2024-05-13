@@ -48,7 +48,7 @@ public class ProfiledPIDCommand extends Command {
       DoubleSupplier measurementSource,
       Supplier<State> goalSource,
       BiConsumer<Double, State> useOutput,
-      Subsystem... requirements) {
+      Resource... requirements) {
     requireNonNullParam(controller, "controller", "ProfiledPIDCommand");
     requireNonNullParam(measurementSource, "measurementSource", "ProfiledPIDCommand");
     requireNonNullParam(goalSource, "goalSource", "ProfiledPIDCommand");
@@ -76,7 +76,7 @@ public class ProfiledPIDCommand extends Command {
       DoubleSupplier measurementSource,
       DoubleSupplier goalSource,
       BiConsumer<Double, State> useOutput,
-      Subsystem... requirements) {
+      Resource... requirements) {
     requireNonNullParam(controller, "controller", "SynchronousPIDCommand");
     requireNonNullParam(measurementSource, "measurementSource", "SynchronousPIDCommand");
     requireNonNullParam(goalSource, "goalSource", "SynchronousPIDCommand");
@@ -104,7 +104,7 @@ public class ProfiledPIDCommand extends Command {
       DoubleSupplier measurementSource,
       State goal,
       BiConsumer<Double, State> useOutput,
-      Subsystem... requirements) {
+      Resource... requirements) {
     this(controller, measurementSource, () -> goal, useOutput, requirements);
   }
 
@@ -123,7 +123,7 @@ public class ProfiledPIDCommand extends Command {
       DoubleSupplier measurementSource,
       double goal,
       BiConsumer<Double, State> useOutput,
-      Subsystem... requirements) {
+      Resource... requirements) {
     this(controller, measurementSource, () -> goal, useOutput, requirements);
   }
 

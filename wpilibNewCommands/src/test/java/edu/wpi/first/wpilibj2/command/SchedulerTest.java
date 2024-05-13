@@ -71,9 +71,9 @@ class SchedulerTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
 
-      Subsystem subsystem = new Subsystem() {};
-      Command command = subsystem.run(() -> {});
-      Command interruptor = subsystem.runOnce(() -> {});
+      Resource resource = new Resource() {};
+      Command command = resource.run(() -> {});
+      Command interruptor = resource.runOnce(() -> {});
 
       scheduler.onCommandInterrupt(
           (interrupted, cause) -> {
@@ -94,9 +94,9 @@ class SchedulerTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
 
-      Subsystem subsystem = new Subsystem() {};
-      Command command = subsystem.run(() -> {});
-      Command interruptor = subsystem.runOnce(() -> {});
+      Resource resource = new Resource() {};
+      Command command = resource.run(() -> {});
+      Command interruptor = resource.runOnce(() -> {});
       // This command will schedule interruptor in execute() inside the run loop
       Command interruptorScheduler = Commands.runOnce(() -> scheduler.schedule(interruptor));
 
@@ -120,7 +120,7 @@ class SchedulerTest extends CommandTestBase {
   void registerSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
-      Subsystem system =
+      Resource system =
           new SubsystemBase() {
             @Override
             public void periodic() {
@@ -128,7 +128,7 @@ class SchedulerTest extends CommandTestBase {
             }
           };
 
-      assertDoesNotThrow(() -> scheduler.registerSubsystem(system));
+      assertDoesNotThrow(() -> scheduler.registerResources(system));
 
       scheduler.run();
       assertEquals(1, counter.get());
@@ -139,14 +139,14 @@ class SchedulerTest extends CommandTestBase {
   void unregisterSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
-      Subsystem system =
+      Resource system =
           new SubsystemBase() {
             @Override
             public void periodic() {
               counter.incrementAndGet();
             }
           };
-      scheduler.registerSubsystem(system);
+      scheduler.registerResources(system);
       assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
 
       scheduler.run();

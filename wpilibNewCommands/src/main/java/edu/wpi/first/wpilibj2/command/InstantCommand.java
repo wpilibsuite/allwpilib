@@ -18,7 +18,7 @@ public class InstantCommand extends FunctionalCommand {
    * @param toRun the Runnable to run
    * @param requirements the subsystems required by this command
    */
-  public InstantCommand(Runnable toRun, Subsystem... requirements) {
+  public InstantCommand(Runnable toRun, Resource... requirements) {
     super(toRun, () -> {}, interrupted -> {}, () -> true, requirements);
   }
 

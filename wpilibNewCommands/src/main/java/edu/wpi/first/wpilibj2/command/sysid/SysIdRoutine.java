@@ -18,7 +18,8 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.Resource;
+
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -141,7 +142,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
     public final Consumer<SysIdRoutineLog> m_log;
 
     /** The subsystem containing the motor(s) that is (or are) being characterized. */
-    public final Subsystem m_subsystem;
+    public final Resource m_resource;
 
     /** The name of the mechanism being tested. */
     public final String m_name;
@@ -156,7 +157,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     call one or more of the chainable logging handles (e.g. `voltage`) on the returned
      *     `MotorLog`. Multiple motors can be logged in a single callback by calling `motor`
      *     multiple times.
-     * @param subsystem The subsystem containing the motor(s) that is (or are) being characterized.
+     * @param resource The subsystem containing the motor(s) that is (or are) being characterized.
      *     Will be declared as a requirement for the returned test commands.
      * @param name The name of the mechanism being tested. Will be appended to the log entry title
      *     for the routine's test state, e.g. "sysid-test-state-mechanism". Defaults to the name of
@@ -165,12 +166,12 @@ public class SysIdRoutine extends SysIdRoutineLog {
     public Mechanism(
         Consumer<Measure<Voltage>> drive,
         Consumer<SysIdRoutineLog> log,
-        Subsystem subsystem,
+        Resource resource,
         String name) {
       m_drive = drive;
       m_log = log != null ? log : l -> {};
-      m_subsystem = subsystem;
-      m_name = name != null ? name : subsystem.getName();
+      m_resource = resource;
+      m_name = name != null ? name : resource.getName();
     }
 
     /**
@@ -184,14 +185,14 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     call one or more of the chainable logging handles (e.g. `voltage`) on the returned
      *     `MotorLog`. Multiple motors can be logged in a single callback by calling `motor`
      *     multiple times.
-     * @param subsystem The subsystem containing the motor(s) that is (or are) being characterized.
+     * @param resource The subsystem containing the motor(s) that is (or are) being characterized.
      *     Will be declared as a requirement for the returned test commands. The subsystem's `name`
      *     will be appended to the log entry title for the routine's test state, e.g.
      *     "sysid-test-state-subsystem".
      */
     public Mechanism(
-        Consumer<Measure<Voltage>> drive, Consumer<SysIdRoutineLog> log, Subsystem subsystem) {
-      this(drive, log, subsystem, null);
+        Consumer<Measure<Voltage>> drive, Consumer<SysIdRoutineLog> log, Resource resource) {
+      this(drive, log, resource, null);
     }
   }
 
@@ -225,10 +226,10 @@ public class SysIdRoutine extends SysIdRoutineLog {
 
     Timer timer = new Timer();
     return m_mechanism
-        .m_subsystem
+        .m_resource
         .runOnce(timer::restart)
         .andThen(
-            m_mechanism.m_subsystem.run(
+            m_mechanism.m_resource.run(
                 () -> {
                   m_mechanism.m_drive.accept(
                       m_outputVolts.mut_replace(
@@ -266,11 +267,11 @@ public class SysIdRoutine extends SysIdRoutineLog {
             .get(direction);
 
     return m_mechanism
-        .m_subsystem
+        .m_resource
         .runOnce(
             () -> m_outputVolts.mut_replace(m_config.m_stepVoltage.in(Volts) * outputSign, Volts))
         .andThen(
-            m_mechanism.m_subsystem.run(
+            m_mechanism.m_resource.run(
                 () -> {
                   m_mechanism.m_drive.accept(m_outputVolts);
                   m_mechanism.m_log.accept(this);
