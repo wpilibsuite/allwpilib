@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Fri, 20 Jan 2023 23:41:56 -0800
-Subject: [PATCH 2/2] Intellisense fix
+Subject: [PATCH 2/3] Intellisense fix
 
 ---
  Eigen/src/Core/util/Macros.h | 10 ++++++++++
  1 file changed, 10 insertions(+)
 
 diff --git a/Eigen/src/Core/util/Macros.h b/Eigen/src/Core/util/Macros.h
-index 5d054e67c4355a549b1351f1ecc5e49a96e91ace..fda6ad91eedacc9958a5a0bc34db33d8b4e57cd6 100644
+index 4d10eecd05db826ea5e6a65115022b19f1112c6a..5c8b3a3b3ea66c7bf5159f50c9ce09f7b90182d4 100644
 --- a/Eigen/src/Core/util/Macros.h
 +++ b/Eigen/src/Core/util/Macros.h
 @@ -60,6 +60,16 @@

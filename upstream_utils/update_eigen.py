@@ -109,6 +109,7 @@ def main():
     for f in [
         "0001-Disable-warnings.patch",
         "0002-Intellisense-fix.patch",
+        "0003-Suppress-C-23-deprecation-warnings-for-std-has_denor.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/eigen_patches", f))
 
