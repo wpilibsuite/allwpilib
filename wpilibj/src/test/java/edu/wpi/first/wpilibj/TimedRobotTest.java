@@ -48,6 +48,7 @@ class TimedRobotTest {
     }
 
     @Override
+    @SuppressWarnings("removal")
     public void robotInit() {
       m_robotInitCount.addAndGet(1);
     }
