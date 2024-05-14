@@ -2,6 +2,33 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+/**
+ * Example program demonstrating:
+ * 
+ * Splitting a common resource into two separately used resources (LEDs)
+ * Configure button trigger
+ * Triggers
+ * Use of command parameters set at command creation time
+ * Use of command parameters set at changable at runtime (Suppliers)
+ * Use of method reference
+ * Inject TimedRobot.addPeriodic() into other classes
+ * Some commentary on composite commands and mode changes
+ * Command logging
+ * Configuring an autonomous commnad
+ * Use of Xbox controller to produce fake events
+ * Use of Xbox controller to trigger an event
+ * Use of public command factories in subsystems
+ * Use of private non-Command methods to prevent other classes from forgetting to lock a subsystem
+ * Change TimeRobot loop speed
+ * Change LED update rate different from the TimedRobot loop speed
+ * Overloading method parameter types
+ * 
+ * There is some unused code and commented out code anticipating extensions to the WPILib addressable LED class.
+ * This example program runs in real or simulated mode of the 2024 WPILib.
+ * 
+ * This is a refactor and modest extension of code donated by ChiefDelphi @illinar.
+ * Any errors or confusions are the fault and responsibility of ChiefDelphi @SLAB-Mr.Thomas.
+ */
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -9,9 +36,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  private Command m_autonomousCommand;
+
+  Robot() {
+    super(1.); // slow things down to human speed
+  }
 
   @Override
   public void robotInit() {
@@ -24,7 +55,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {} // commands running from another mode haven't been cancelled
 
   @Override
   public void disabledPeriodic() {}
@@ -33,7 +64,7 @@ public class Robot extends TimedRobot {
   public void disabledExit() {}
 
   @Override
-  public void autonomousInit() {
+  public void autonomousInit() { // commands running from another mode haven't been cancelled
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -48,7 +79,7 @@ public class Robot extends TimedRobot {
   public void autonomousExit() {}
 
   @Override
-  public void teleopInit() {
+  public void teleopInit() { // commands running from another mode haven't been cancelled except the one below
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -71,65 +102,3 @@ public class Robot extends TimedRobot {
   @Override
   public void testExit() {}
 }
-/*
-
-C:\Users\RKT\frc\FRC2024\allwpilib-main\wpilibjExamples\src\main\java\edu\wpi\first\wpilibj\examples\addressableled\Main.java
-
-
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-package edu.wpi.first.wpilibj.examples.addressableled;
-
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.TimedRobot;
-
-public class Robot extends TimedRobot {
-  private AddressableLED m_led;
-  private AddressableLEDBuffer m_ledBuffer;
-  // Store what the last hue of the first pixel is
-  private int m_rainbowFirstPixelHue;
-
-  @Override
-  public void robotInit() {
-    // PWM port 9
-    // Must be a PWM header, not MXP or DIO
-    m_led = new AddressableLED(9);
-
-    // Reuse buffer
-    // Default to a length of 60, start empty output
-    // Length is expensive to set, so only set it once, then just update data
-    m_ledBuffer = new AddressableLEDBuffer(60);
-    m_led.setLength(m_ledBuffer.getLength());
-
-    // Set the data
-    m_led.setData(m_ledBuffer);
-    m_led.start();
-  }
-
-  @Override
-  public void robotPeriodic() {
-    // Fill the buffer with a rainbow
-    rainbow();
-    // Set the LEDs
-    m_led.setData(m_ledBuffer);
-  }
-
-  private void rainbow() {
-    // For every pixel
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      // Calculate the hue - hue is easier for rainbows because the color
-      // shape is a circle so only one value needs to precess
-      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
-      // Set the value
-      m_ledBuffer.setHSV(i, hue, 255, 128);
-    }
-    // Increase by to make the rainbow "move"
-    m_rainbowFirstPixelHue += 3;
-    // Check bounds
-    m_rainbowFirstPixelHue %= 180;
-  }
-}
-*/
