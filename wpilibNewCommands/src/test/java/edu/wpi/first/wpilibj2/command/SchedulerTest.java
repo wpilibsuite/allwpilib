@@ -120,7 +120,7 @@ class SchedulerTest extends CommandTestBase {
   void registerSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
-      Resource system =
+      Subsystem system =
           new SubsystemBase() {
             @Override
             public void periodic() {
@@ -128,7 +128,7 @@ class SchedulerTest extends CommandTestBase {
             }
           };
 
-      assertDoesNotThrow(() -> scheduler.registerResources(system));
+      assertDoesNotThrow(() -> scheduler.registerSubsystem(system));
 
       scheduler.run();
       assertEquals(1, counter.get());
@@ -139,14 +139,14 @@ class SchedulerTest extends CommandTestBase {
   void unregisterSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
-      Resource system =
+      SubsystemBase system =
           new SubsystemBase() {
             @Override
             public void periodic() {
               counter.incrementAndGet();
             }
           };
-      scheduler.registerResources(system);
+      scheduler.registerSubsystem(system);
       assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
 
       scheduler.run();

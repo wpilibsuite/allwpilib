@@ -41,7 +41,7 @@ import java.util.function.Consumer;
  * The scheduler responsible for running {@link Command}s. A Command-based robot should call {@link
  * CommandScheduler#run()} on the singleton instance in its periodic block in order to run commands
  * synchronously from the main loop. Subsystems should be registered with the scheduler using {@link
- * CommandScheduler#registerResources(Resource...)} in order for their {@link Resource#periodic()}
+ * CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link Subsystem#periodic()}
  * methods to be called and for their default commands to be scheduled.
  *
  * <p>This class is provided by the NewCommands VendorDep
@@ -71,11 +71,11 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   // A map from required resources to their requiring commands. Also used as a set of the
   // currently-required resources.
-  private final Map<Resource, Command> m_requirements = new LinkedHashMap<>();
-
-  // A map from resources registered with the scheduler to their default commands.  Also used
-  // as a list of currently-registered resources.
   private final Map<Resource, Command> m_resources = new LinkedHashMap<>();
+
+  // A map from resources subsystems with the scheduler to their default commands.  Also used
+  // as a list of currently-registered subsystems.
+  private final Map<Subsystem, Command> m_subsystems = new LinkedHashMap<>();
 
   private final EventLoop m_defaultButtonLoop = new EventLoop();
   // The set of currently-registered buttons that will be polled every iteration.
@@ -164,7 +164,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private void initCommand(Command command, Set<Resource> requirements) {
     m_scheduledCommands.add(command);
     for (Resource requirement : requirements) {
-      m_requirements.put(requirement, command);
+      m_resources.put(requirement, command);
     }
     command.initialize();
     for (Consumer<Command> action : m_initActions) {
@@ -205,7 +205,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     Set<Resource> requirements = command.getRequirements();
 
     // Schedule the command if the requirements are not currently in-use.
-    if (Collections.disjoint(m_requirements.keySet(), requirements)) {
+    if (Collections.disjoint(m_resources.keySet(), requirements)) {
       initCommand(command, requirements);
     } else {
       // Else check if the requirements that are in use have all have interruptible commands,
@@ -259,12 +259,12 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_watchdog.reset();
 
     // Run the periodic method of all registered resources.
-    for (Resource resource : m_resources.keySet()) {
-      resource.periodic();
+    for (Subsystem subsystem : m_subsystems.keySet()) {
+      subsystem.periodic();
       if (RobotBase.isSimulation()) {
-        resource.simulationPeriodic();
+        subsystem.simulationPeriodic();
       }
-      m_watchdog.addEpoch(resource.getName() + ".periodic()");
+      m_watchdog.addEpoch(subsystem.getName() + ".periodic()");
     }
 
     // Cache the active instance to avoid concurrency problems if setActiveLoop() is called from
@@ -299,7 +299,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
         m_endingCommands.remove(command);
         iterator.remove();
 
-        m_requirements.keySet().removeAll(command.getRequirements());
+        m_resources.keySet().removeAll(command.getRequirements());
         m_watchdog.addEpoch(command.getName() + ".end(false)");
       }
     }
@@ -319,10 +319,10 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_toCancelInterruptors.clear();
 
     // Add default commands for un-required registered resources.
-    for (Map.Entry<Resource, Command> resourceCommand : m_resources.entrySet()) {
-      if (!m_requirements.containsKey(resourceCommand.getKey())
-          && resourceCommand.getValue() != null) {
-        schedule(resourceCommand.getValue());
+    for (Map.Entry<Subsystem, Command> subsystemCommand : m_subsystems.entrySet()) {
+      if (!m_resources.containsKey(subsystemCommand.getKey())
+          && subsystemCommand.getValue() != null) {
+        schedule(subsystemCommand.getValue());
       }
     }
 
@@ -334,86 +334,58 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Registers resources with the scheduler. This must be called for the resource's periodic block
-   * to run when the scheduler is run, and for the resource's default command to be scheduled. It
-   * is recommended to call this from the constructor of your resource implementations.
+   * Registers subsystems with the scheduler. This must be called for the subsystem's periodic block
+   * to run when the scheduler is run, and for the subsystem's default command to be scheduled. It
+   * is recommended to call this from the constructor of your subsystem implementations.
    *
-   * @param resources the resources to register
+   * @param subsystems the subsystems to register
    */
-  public void registerResources(Resource... resources) {
-    for (Resource resource : resources) {
-      if (resource == null) {
-        DriverStation.reportWarning("Tried to register a null resource", true);
+  public void registerSubsystem(Subsystem... subsystems) {
+    for (Subsystem subsystem : subsystems) {
+      if (subsystem == null) {
+        DriverStation.reportWarning("Tried to register a null subsystem", true);
         continue;
       }
-      if (m_resources.containsKey(resource)) {
-        DriverStation.reportWarning("Tried to register an already-registered resource", true);
+      if (m_subsystems.containsKey(subsystem)) {
+        DriverStation.reportWarning("Tried to register an already-registered subsystem", true);
         continue;
       }
-      m_resources.put(resource, null);
+      m_subsystems.put(subsystem, null);
     }
   }
 
   /**
-   * Alias of {@link CommandScheduler#registerResources(Resource...)}.  See {@link Subsystem} for
-   * details regarding the name change.
-   *
-   * @param subsystems the subsystem(s to register
-   */
-  public void registerSubsystem(Subsystem... subsystems) {
-    registerResources(subsystems);
-  }
-
-  /**
-   * Un-registers resources with the scheduler. The resources will no longer have their periodic
+   * Un-registers subsystems with the scheduler. The subsystems will no longer have their periodic
    * block called, and will not have their default command scheduled.
-   *
-   * @param resources the resources to un-register
-   */
-  public void unregisterResources(Resource... resources) {
-    m_resources.keySet().removeAll(Set.of(resources));
-  }
-
-  /**
-   * Alias of {@link CommandScheduler#unregisterResources(Resource...)}.  See {@link Subsystem} for
-   * details regarding the name change.
    *
    * @param subsystems the subsystems to un-register
    */
-  public void unregisterSubsystem(Resource... subsystems) {
-    unregisterResources(subsystems);
+  public void unregisterSubsystem(Subsystem... subsystems) {
+    m_subsystems.keySet().removeAll(Set.of(subsystems));
   }
 
   /**
-   * Un-registers all registered {@link Resource}s  with the scheduler. All currently registered
-   * resources will no longer have their periodic block called, and will not have their default
+   * Un-registers all registered {@link Subsystem}s  with the scheduler. All currently registered
+   * subsystems will no longer have their periodic block called, and will not have their default
    * command scheduled.
    */
-  public void unregisterAllResources() {
-    m_resources.clear();
-  }
-
-  /**
-   * Alias of {@link CommandScheduler#unregisterAllResources()}.  See {@link Subsystem} for
-   * details regarding the name change.
-   */
   public void unregisterAllSubsystems() {
-    unregisterAllResources();
+    m_subsystems.clear();
   }
 
   /**
-   * Sets the default command for a resource. Registers that resource if it is not already
+   * Sets the default command for a subsystem. Registers that subsystem if it is not already
    * registered. Default commands will run whenever there is no other command currently scheduled
-   * that requires the resource. Default commands should be written to never end (i.e. their {@link
+   * that requires the subsystem. Default commands should be written to never end (i.e. their {@link
    * Command#isFinished()} method should return false), as they would simply be re-scheduled if they
-   * do. Default commands must also require their resource.
+   * do. Default commands must also require their subsystem.
    *
-   * @param resource the resource whose default command will be set
-   * @param defaultCommand the default command to associate with the resource
+   * @param subsystem the subsystem whose default command will be set
+   * @param defaultCommand the default command to associate with the subsystem
    */
-  public void setDefaultCommand(Resource resource, Command defaultCommand) {
-    if (resource == null) {
-      DriverStation.reportWarning("Tried to set a default command for a null resource", true);
+  public void setDefaultCommand(Subsystem subsystem, Command defaultCommand) {
+    if (subsystem == null) {
+      DriverStation.reportWarning("Tried to set a default command for a null subsystem", true);
       return;
     }
     if (defaultCommand == null) {
@@ -423,46 +395,46 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
     requireNotComposed(defaultCommand);
 
-    if (!defaultCommand.getRequirements().contains(resource)) {
-      throw new IllegalArgumentException("Default commands must require their resource!");
+    if (!defaultCommand.getRequirements().contains(subsystem)) {
+      throw new IllegalArgumentException("Default commands must require their subsystem!");
     }
 
     if (defaultCommand.getInterruptionBehavior() == InterruptionBehavior.kCancelIncoming) {
       DriverStation.reportWarning(
           "Registering a non-interruptible default command!\n"
-              + "This will likely prevent any other commands from requiring this resource.",
+              + "This will likely prevent any other commands from requiring this subsystem.",
           true);
       // Warn, but allow -- there might be a use case for this.
     }
 
-    m_resources.put(resource, defaultCommand);
+    m_subsystems.put(subsystem, defaultCommand);
   }
 
   /**
-   * Removes the default command for a resource. The current default command will run until another
-   * command is scheduled that requires the resource, at which point the current default command
+   * Removes the default command for a subsystem. The current default command will run until another
+   * command is scheduled that requires the subsystem, at which point the current default command
    * will not be re-scheduled.
    *
-   * @param resource the resource whose default command will be removed
+   * @param subsystem the subsystem whose default command will be removed
    */
-  public void removeDefaultCommand(Resource resource) {
-    if (resource == null) {
-      DriverStation.reportWarning("Tried to remove a default command for a null resource", true);
+  public void removeDefaultCommand(Subsystem subsystem) {
+    if (subsystem == null) {
+      DriverStation.reportWarning("Tried to remove a default command for a null subsystem", true);
       return;
     }
 
-    m_resources.put(resource, null);
+    m_subsystems.put(subsystem, null);
   }
 
   /**
-   * Gets the default command associated with this resource. Null if this resource has no default
+   * Gets the default command associated with this subsystem. Null if this subsystem has no default
    * command associated with it.
    *
-   * @param resource the resource to inquire about
-   * @return the default command associated with the resource
+   * @param subsystem the subsystem to inquire about
+   * @return the default command associated with the subsystem
    */
-  public Command getDefaultCommand(Resource resource) {
-    return m_resources.get(resource);
+  public Command getDefaultCommand(Subsystem subsystem) {
+    return m_subsystems.get(subsystem);
   }
 
   /**
@@ -514,7 +486,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     }
     m_endingCommands.remove(command);
     m_scheduledCommands.remove(command);
-    m_requirements.keySet().removeAll(command.getRequirements());
+    m_resources.keySet().removeAll(command.getRequirements());
     m_watchdog.addEpoch(command.getName() + ".end(true)");
   }
 
@@ -545,7 +517,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    *     scheduled
    */
   public Command requiring(Resource resource) {
-    return m_requirements.get(resource);
+    return m_resources.get(resource);
   }
 
   /** Disables the command scheduler. */
