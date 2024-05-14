@@ -53,10 +53,7 @@ public class Sequence implements AsyncCommand {
   public void run() {
     for (var command : commands) {
       scheduler.schedule(command);
-
-      while (scheduler.isScheduledOrRunning(command)) {
-        scheduler.yield();
-      }
+      scheduler.waitFor(command);
     }
   }
 

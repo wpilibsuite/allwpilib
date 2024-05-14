@@ -101,18 +101,10 @@ public class ParallelGroup implements AsyncCommand {
   public void run() {
     commands.forEach(scheduler::schedule);
 
-    while (shouldRun()) {
-      scheduler.yield();
-    }
-  }
-
-  private boolean shouldRun() {
     if (requiredCommands.isEmpty()) {
-      // No command is required, so we only need to continue running while every child still runs
-      return commands.stream().allMatch(scheduler::isScheduledOrRunning);
+      scheduler.waitForAny(commands);
     } else {
-      // Only run so long as at least one required command still runs
-      return requiredCommands.stream().anyMatch(scheduler::isScheduledOrRunning);
+      scheduler.waitForAll(requiredCommands);
     }
   }
 

@@ -6,10 +6,9 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -444,6 +443,75 @@ public class AsyncScheduler {
    */
   public boolean isScheduledOrRunning(AsyncCommand command) {
     return isScheduled(command) || isRunning(command);
+  }
+
+  /**
+   * When called from a command group or composition, this method will keep that group paused until
+   * the specified command completes.
+   *
+   * @param command the command to wait for
+   */
+  public void waitFor(AsyncCommand command) {
+    checkWaitable(command);
+
+    while (isScheduledOrRunning(command)) {
+      this.yield();
+    }
+  }
+
+  /**
+   * When called from a command group or composition, this method will keep that group paused until
+   * every specified command completes.
+   *
+   * @param commands the commands to wait for
+   */
+  public void waitForAll(Collection<AsyncCommand> commands) {
+    for (var command : commands) {
+      checkWaitable(command);
+    }
+
+    // Wait as long as at least one command is still running
+    while (commands.stream().anyMatch(this::isScheduledOrRunning)) {
+      this.yield();
+    }
+  }
+
+  /**
+   * When called from a command group or composition, this method will keep that group paused until
+   * any of the specified commands completes.
+   *
+   * @param commands the commands to wait for
+   */
+  public void waitForAny(Collection<AsyncCommand> commands) {
+    for (var command : commands) {
+      checkWaitable(command);
+    }
+
+    // Wait as long as all commands are still running
+    while (commands.stream().allMatch(this::isScheduledOrRunning)) {
+      this.yield();
+    }
+  }
+
+  /**
+   * Checks if the currently running command is permitted to wait for completion of another command.
+   * @param command the command to check
+   */
+  private void checkWaitable(AsyncCommand command) {
+    if (!isScheduledOrRunning(command)) {
+      throw new IllegalStateException(
+          "Cannot wait for command " + command + " because it is not currently running");
+    }
+
+    var state =
+        commandStates.getOrDefault(
+            command,
+            onDeck.stream().filter(s -> s.command() == command).findFirst().orElseThrow());
+
+    if (state.parent() != null && state.parent() != currentCommand) {
+      throw new IllegalStateException(
+          "Only " + state.parent() + " can wait for " + command);
+    }
   }
 
   /**
