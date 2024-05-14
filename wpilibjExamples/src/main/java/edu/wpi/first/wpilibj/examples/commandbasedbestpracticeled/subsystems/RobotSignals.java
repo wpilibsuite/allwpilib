@@ -26,6 +26,10 @@ public class RobotSignals  {
 
   // layout by LED number of the single physical buffer
   // into two logical segments (subsystems) called Main and Top
+  // Some layouts may be problematic. Overlaps or discontinuous could cause problems or not.
+  // Buffer is not cleared in any case.
+  // It's just an example.
+  // (New anticipated functions for LED views may make this all easy and better.)
   public final AddressableLEDBuffer bufferLED;
   private final int firstMainLED = 11; // inclusive
   private final int lastMainLED = 32; // inclusive
@@ -36,7 +40,7 @@ public class RobotSignals  {
   public LEDMainSubsystem Main;
 
   public RobotSignals(int port, PeriodicTask periodicTask) {
-    int length = Math.max(lastTopLED, lastMainLED) - Math.min(firstTopLED, firstMainLED) + 1;
+    int length = Math.max(lastTopLED, lastMainLED) + 1; // simplistic view of 2 segments; assume one starts at 0
     // start updating the physical LED strip
     strip = new AddressableLED(port);
     strip.setLength(length);
@@ -67,6 +71,7 @@ public class RobotSignals  {
    */
   private void setTopSignal(AddressableLEDBuffer buffer)
   {//FIXME check for buffer short and clear remainder of Top buffer
+   // simplistic mapping may cause glitches if overlapped or discontinuous 
       int i = 0;
       for(int index=firstTopLED; index<=lastTopLED; index++ ) {
         bufferLED.setLED(index, buffer.getLED(i++));      
@@ -90,6 +95,7 @@ public class RobotSignals  {
    */
   private void setMainSignal(AddressableLEDBuffer buffer)
   {//FIXME check for buffer short and clear remainder of Main buffer
+   // simplistic mapping may cause glitches if overlapped or discontinuous 
       int i = 0;
       for(int index=firstMainLED; index<=lastMainLED; index++ ) {
         bufferLED.setLED(index, buffer.getLED(i++));      

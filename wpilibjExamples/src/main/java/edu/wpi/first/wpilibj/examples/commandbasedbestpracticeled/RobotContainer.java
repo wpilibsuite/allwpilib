@@ -48,16 +48,17 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    Color autoColor = new Color(0.4, 0.6, 0.2);
+    Color autoTopSignal = new Color(0.2, 0.6, 0.2);
+    Color autoMainSignal = new Color(0.4, 0.9, 0.4);
     return
       parallel // interrupting either of the two parallel commands with an external command interupts the group
       (
       /*parallel cmd*/
-        robotSignals.Top.setSignal(autoColor)
+        robotSignals.Top.setSignal(autoTopSignal)
           .withTimeout(6.) // this ends but the group continues and the default command is not activated here with or without the andThen command
-        .andThen(robotSignals.Top.setSignal(autoColor)),
+        .andThen(robotSignals.Top.setSignal(autoTopSignal)),
       /*parallel cmd*/
-        robotSignals.Main.setSignal(autoColor)
+        robotSignals.Main.setSignal(autoMainSignal)
       )
       /*composite*/
       .withName("AutoSignal");

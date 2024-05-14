@@ -22,12 +22,30 @@
  * Change TimeRobot loop speed
  * Change LED update rate different from the TimedRobot loop speed
  * Overloading method parameter types
+ * No commands with the word Command in the name
+ * No triggers with the word Trigger in the name
  * 
  * There is some unused code and commented out code anticipating extensions to the WPILib addressable LED class.
  * This example program runs in real or simulated mode of the 2024 WPILib.
  * 
  * This is a refactor and modest extension of code donated by ChiefDelphi @illinar.
  * Any errors or confusions are the fault and responsibility of ChiefDelphi @SLAB-Mr.Thomas.
+ * 
+ * Functions
+ * Xbox controller "X" starts a command for slowly changing "Top" segment going around the color wheel
+ * Xbox controller "A" while pressed indicates vision target acquired
+ * Xbox controller "B" while pressed indicates game piece acquired
+ * Default command for "Top" is magenta
+ * Default command for "Main" is cyan
+ * Auto command "Top" is medium green
+ * Auto command "Main" is light green
+ * Intake game piece acquired "Main" is white
+ * Target vision target acquired "Top" is pure green
+ * There are some variations with commands that may run disabled or not (most can).
+ * All commands are interruptible.
+ * Loop speed is slow (1 second)
+ * Button presses are debounced (slow; 1 second)
+ * 
  */
 package frc.robot;
 
