@@ -15,7 +15,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated elevator mechanism. */
-public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
+public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the elevator.
   private final DCMotor m_gearbox;
 
@@ -43,13 +43,13 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    */
   @SuppressWarnings("this-escape")
   public ElevatorSim(
-      LinearSystem<N2, N1, N1> plant,
+      LinearSystem<N2, N1, N2> plant,
       DCMotor gearbox,
       double minHeightMeters,
       double maxHeightMeters,
       boolean simulateGravity,
       double startingHeightMeters,
-      Matrix<N1, N1> measurementStdDevs) {
+      Matrix<N2, N1> measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_minHeight = minHeightMeters;
@@ -72,7 +72,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param simulateGravity Whether gravity should be simulated or not.
    */
   public ElevatorSim(
-      LinearSystem<N2, N1, N1> plant,
+      LinearSystem<N2, N1, N2> plant,
       DCMotor gearbox,
       double minHeightMeters,
       double maxHeightMeters,
@@ -138,7 +138,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double maxHeightMeters,
       boolean simulateGravity,
       double startingHeightMeters,
-      Matrix<N1, N1> measurementStdDevs) {
+      Matrix<N2, N1> measurementStdDevs) {
     this(
         LinearSystemId.identifyPositionSystem(kV, kA),
         gearbox,
@@ -171,7 +171,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double maxHeightMeters,
       boolean simulateGravity,
       double startingHeightMeters,
-      Matrix<N1, N1> measurementStdDevs) {
+      Matrix<N2, N1> measurementStdDevs) {
     this(
         LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
         gearbox,
@@ -281,7 +281,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @return The velocity of the elevator.
    */
   public double getVelocityMetersPerSecond() {
-    return m_x.get(1, 0);
+    return getOutput(1);
   }
 
   /**
@@ -297,8 +297,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     // v = r w, so w = v/r
     double kA = 1 / m_plant.getB().get(1, 0);
     double kV = -m_plant.getA().get(1, 1) * kA;
-    double motorVelocityRadPerSec =
-        getVelocityMetersPerSecond() * kV * m_gearbox.KvRadPerSecPerVolt;
+    double motorVelocityRadPerSec = m_x.get(1, 0) * kV * m_gearbox.KvRadPerSecPerVolt;
     var appliedVoltage = m_u.get(0, 0);
     return m_gearbox.getCurrent(motorVelocityRadPerSec, appliedVoltage)
         * Math.signum(appliedVoltage);

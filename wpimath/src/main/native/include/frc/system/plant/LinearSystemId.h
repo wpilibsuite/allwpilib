@@ -44,7 +44,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param gearing Gear ratio from motor to carriage.
    * @throws std::domain_error if mass <= 0, radius <= 0, or gearing <= 0.
    */
-  static LinearSystem<2, 1, 1> ElevatorSystem(DCMotor motor,
+  static LinearSystem<2, 1, 2> ElevatorSystem(DCMotor motor,
                                               units::kilogram_t mass,
                                               units::meter_t radius,
                                               double gearing);
@@ -59,7 +59,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param gearing Gear ratio from motor to arm.
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
-  static LinearSystem<2, 1, 1> SingleJointedArmSystem(
+  static LinearSystem<2, 1, 2> SingleJointedArmSystem(
       DCMotor motor, units::kilogram_square_meter_t J, double gearing);
 
   /**
