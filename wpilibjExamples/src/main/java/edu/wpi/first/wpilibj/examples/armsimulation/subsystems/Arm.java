@@ -51,7 +51,7 @@ public class Arm implements AutoCloseable {
           true,
           0,
           Constants.kArmEncoderDistPerPulse,
-          0.0// Add noise with a std-dev of 1 tick
+          0.0 // Add noise with a std-dev of 1 tick
           );
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
