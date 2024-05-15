@@ -43,8 +43,8 @@
  * Target vision target acquired "Top" is pure green
  * There are some variations with commands that may run disabled or not (most can).
  * All commands are interruptible.
- * Loop speed is slow (1 second)
- * Button presses are debounced (slow; 1 second)
+ * Loop speed is optionally slow (commented out Robot constructor code)
+ * Button "X" presses are debounced
  * 
  */
 package frc.robot;
@@ -58,9 +58,9 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private Command m_autonomousCommand;
 
-  Robot() {
-    super(1.); // slow things down to human speed
-  }
+  // Robot() {
+  //   super(1.); // slow things down to human speed
+  // }
 
   @Override
   public void robotInit() {

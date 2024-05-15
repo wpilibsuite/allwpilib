@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.PeriodicTask;
 
@@ -25,159 +24,134 @@ public class RobotSignals  {
   private final AddressableLED strip;
 
   // layout by LED number of the single physical buffer
-  // into two logical segments (subsystems) called Main and Top
-  // Some layouts may be problematic. Overlaps or discontinuous could cause problems or not.
-  // Buffer is not cleared in any case.
+  // into two logical views (segments; subsystems) called Main and Top
+  // Assume views don't overlaps
+  // Asume a view is not discontinuous.
+  // Views do not have to be adjacent to another (gaps are allowed)
+  // Assume only one view starts at 0.
+  // Buffer is not cleared.
   // It's just an example.
   // (New anticipated functions for LED views may make this all easy and better.)
-  public final AddressableLEDBuffer bufferLED;
+  private final AddressableLEDBuffer bufferLED;
   private final int firstMainLED = 11; // inclusive
   private final int lastMainLED = 32; // inclusive
   private final int firstTopLED = 0; // inclusive
   private final int lastTopLED = 10; // inclusive
-
-  public LEDTopSubsystem Top;
-  public LEDMainSubsystem Main;
+  private final Color TopDefault = new Color(0., 0., 1.);
+  private final Color MainDefault = new Color(0., 1., 1.);
+  public LEDView Top;
+  public LEDView Main;
 
   public RobotSignals(int port, PeriodicTask periodicTask) {
-    int length = Math.max(lastTopLED, lastMainLED) + 1; // simplistic view of 2 segments; assume one starts at 0
-    // start updating the physical LED strip
+  
+    // start updating the physical LED strip  
+    int length = Math.max(lastTopLED, lastMainLED) + 1; // simplistic view of 2 segments - one starts at 0
     strip = new AddressableLED(port);
     strip.setLength(length);
     strip.start();
 
-    bufferLED = new AddressableLEDBuffer(length);
-    Top = new LEDTopSubsystem();
-    Main = new LEDMainSubsystem();
+    bufferLED = new AddressableLEDBuffer(length); // buffer for the all LEDs
 
-    // start the periodic process to send the buffered data to the LED
-    periodicTask.register(()->strip.setData(bufferLED), 0.24, 0.019);
+    // createthe two resources (subsystems) as views of the primary buffer
+    Top = new LEDView(lastTopLED - firstTopLED + 1, TopDefault);
+    Main = new LEDView(lastMainLED - firstMainLED + 1, MainDefault);
+
+    // start the periodic process to send all views to the buffer and then to the LED
+    periodicTask.register(this::mergeViewsAndUpdate, 0.24, 0.019);
   }
 
-  /**
-   * Sets all LEDs in the segment to the same color
-   * @param color
-   */
-  private void setTopSignal(Color color)
-  {
-      for(int index=firstTopLED; index<=lastTopLED; index++ ) {
-        bufferLED.setLED(index, color);      
-      }
-  }
+  private void mergeViewsAndUpdate() {
+    int indexSource; // index of the source buffer
 
-  /**
-   * Sets the LEDS in a segment to the param value
-   * @param buffer
-   */
-  private void setTopSignal(AddressableLEDBuffer buffer)
-  {//FIXME check for buffer short and clear remainder of Top buffer
-   // simplistic mapping may cause glitches if overlapped or discontinuous 
-      int i = 0;
-      for(int index=firstTopLED; index<=lastTopLED; index++ ) {
-        bufferLED.setLED(index, buffer.getLED(i++));      
-      }
-  }
-
-  /**
-   * Sets all LEDs in the segment to the same color
-   * @param color
-   */
-  private void setMainSignal(Color color)
-  {
-    for(int index=firstMainLED; index<=lastMainLED; index++) {
-      bufferLED.setLED(index, color);    
+    // deep copy Top view to LED buffer
+    indexSource = 0;
+    for(int indexDestination = firstTopLED; indexDestination <= lastTopLED; indexDestination++)
+    {
+      bufferLED.setLED(indexDestination, Top.view.getLED(indexSource++));
     }
+
+    // deep copy Main view to LED buffer
+    indexSource = 0;
+    for(int indexDestination = firstMainLED; indexDestination <= lastMainLED; indexDestination++)
+    {
+      bufferLED.setLED(indexDestination, Main.view.getLED(indexSource++));
+    }
+
+    // update LEDs
+    strip.setData(bufferLED);
   }
 
   /**
-   * Sets the LEDS in a segment to the param value
-   * @param buffer
+   * LED view resource (subsystem)
    */
-  private void setMainSignal(AddressableLEDBuffer buffer)
-  {//FIXME check for buffer short and clear remainder of Main buffer
-   // simplistic mapping may cause glitches if overlapped or discontinuous 
-      int i = 0;
-      for(int index=firstMainLED; index<=lastMainLED; index++ ) {
-        bufferLED.setLED(index, buffer.getLED(i++));      
+  public class LEDView extends SubsystemBase {
+
+    private final int length;
+    private final AddressableLEDBuffer view;
+
+    private LEDView(int length, Color defaultColor) {
+      this.length = length;
+      view = new AddressableLEDBuffer(length);
+
+      setDefaultCommand(Default(defaultColor));
+    }
+
+    /**
+     * Sets all LEDs in the view to the same parameter color
+     * @param color
+     */
+    private void setSignalView(Color color)
+    {
+      for(int index = 0; index < length; index++) {
+        view.setLED(index, color);    
       }
-  }
+    }
 
-  /**
-   * Main LEDs subsystem
-   */
-  public class LEDMainSubsystem extends SubsystemBase {
+    /**
+     * Sets the LEDS in a view to the parameter buffer
+     * @param buffer
+     */
+    private void setSignalView(AddressableLEDBuffer buffer)
+    {
+      // deep copy parameter buffer to view
+      for(int index = 0; index < length; index++)
+      {
+        view.setLED(index, buffer.getLED(index));
+      }
+    }
 
-    public LEDMainSubsystem() {
-      setDefaultCommand(
-        Commands.run(()->setMainSignal(new Color(0., 1., 1.)), this)
+    private Command Default(Color color) {
+      return
+        run(()->setSignalView(color))
           .ignoringDisable(true)
-          .withName("LedDefaultMain"));
+          .withName("LedDefault");
     }
 
     public Command setSignal(Color color) {
       return
-        run(()->setMainSignal(color))
+        run(()->setSignalView(color))
           .ignoringDisable(true)
-          .withName("LedSetMainC");
+          .withName("LedSetC");
     }
 
     public Command setSignal(AddressableLEDBuffer buffer) {
       return
-        run(()->setMainSignal(buffer))
+        run(()->setSignalView(buffer))
           .ignoringDisable(true)
-          .withName("LedSetMainB");
+          .withName("LedSetB");
     }
 
     public Command setSignal(Supplier<Color> color) {
       return
-        run(()->setTopSignal(color.get()))
+        run(()->setSignalView(color.get()))
           .ignoringDisable(true)
-          .withName("LedSetMainS");
+          .withName("LedSetS");
     }
 
     public Command runPattern(LEDPattern pattern) {
       return run(() -> pattern.applyTo());
     }
-  } // End Main LEDs subsystem
-
-  /**
-   * Top LEDs subsystem
-   */
-  public class LEDTopSubsystem extends SubsystemBase {
-
-    public LEDTopSubsystem() {
-      Color defaultColor = new Color(1., 0., 1.);
-      setDefaultCommand(
-        Commands.run(()->setTopSignal(defaultColor), this)
-          .ignoringDisable(true)
-          .withName("LedDefaultTop"));
-    }
-
-    public Command setSignal(Color color) {
-      return
-        run(()->setTopSignal(color))
-          .ignoringDisable(true)
-          .withName("LedSetTopC");
-    }
-
-    public Command setSignal(AddressableLEDBuffer buffer) {
-      return
-        run(()->setTopSignal(buffer))
-          .ignoringDisable(true)
-          .withName("LedSetTopB");
-    }
-
-    public Command setSignal(Supplier<Color> color) {
-      return
-        run(()->setTopSignal(color.get()))
-          .ignoringDisable(true)
-          .withName("LedSetTopS");
-    }
-
-    public Command runPattern(LEDPattern pattern) {
-      return run(() -> pattern.applyTo());
-    }
-  } // End Top LEDs subsystem
+  } // End LEDView
 }
 
 
@@ -198,7 +172,6 @@ public class RobotSignals  {
   ledMain.setDefaultCommand(ledMain.runPattern(defaultPattern).ignoringDisable(true).withName("LedDefaultMain"));
   ledTop.setDefaultCommand(ledTop.runPattern(defaultPattern).ignoringDisable(true).withName("LedDefaultTop"));
 
-
 C:\Users\RKT\frc\FRC2024\allwpilib-main\wpilibjExamples\src\main\java\edu\wpi\first\wpilibj\examples\addressableled\Main.java
     private void rainbow() {
     // For every pixel
@@ -214,5 +187,4 @@ C:\Users\RKT\frc\FRC2024\allwpilib-main\wpilibjExamples\src\main\java\edu\wpi\fi
     // Check bounds
     m_rainbowFirstPixelHue %= 180;
   }
-
  */

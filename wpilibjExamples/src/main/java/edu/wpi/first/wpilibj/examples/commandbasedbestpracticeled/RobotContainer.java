@@ -38,7 +38,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    operatorController.x().debounce(1., DebounceType.kBoth)
+    operatorController.x().debounce(0.04, DebounceType.kBoth)
       .onTrue(robotSignals.Top.setSignal(colorWheel()));
   }
 
