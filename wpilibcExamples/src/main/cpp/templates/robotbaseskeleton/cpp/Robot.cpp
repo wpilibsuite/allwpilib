@@ -11,7 +11,7 @@
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTable.h>
 
-void Robot::RobotInit() {}
+Robot::Robot() {}
 
 void Robot::Disabled() {}
 

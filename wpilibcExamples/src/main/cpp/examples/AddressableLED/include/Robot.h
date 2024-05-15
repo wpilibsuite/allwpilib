@@ -12,7 +12,7 @@
 class Robot : public frc::TimedRobot {
  public:
   void Rainbow();
-  void RobotInit() override;
+  Robot();
   void RobotPeriodic() override;
 
  private:

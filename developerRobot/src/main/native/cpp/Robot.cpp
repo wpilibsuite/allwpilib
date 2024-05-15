@@ -9,7 +9,7 @@ class Robot : public frc::TimedRobot {
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
-  void RobotInit() override {}
+  Robot() {}
 
   /**
    * This function is run once each time the robot enters autonomous mode

@@ -22,7 +22,7 @@ static const auto KICKER_THRESHOLD = 15_mm;
 
 class Robot : public frc::TimedRobot {
  public:
-  void RobotInit() override {
+  Robot() {
     m_controller.SetTolerance(TOLERANCE.value());
 
     frc::BooleanEvent isBallAtKicker{&m_loop, [&kickerSensor = m_kickerSensor] {

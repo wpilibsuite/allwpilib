@@ -25,7 +25,7 @@ class Robot : public frc::TimedRobot {
   frc::Encoder m_encoder{0, 1};
 
  public:
-  void RobotInit() override {
+  Robot() {
     // Trigger on falling edge of dma trigger output
     m_dma.SetExternalTrigger(&m_dmaTrigger, false, true);
 

@@ -23,7 +23,6 @@ Robot::Robot() : frc::TimesliceRobot{5_ms, 10_ms} {
   // 9 ms / 10 ms -> 90% allocated
 }
 
-void Robot::RobotInit() {}
 void Robot::RobotPeriodic() {}
 
 void Robot::AutonomousInit() {}

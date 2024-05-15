@@ -9,13 +9,13 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public class Robot extends TimedRobot {
-  private AddressableLED m_led;
-  private AddressableLEDBuffer m_ledBuffer;
+  private final AddressableLED m_led;
+  private final AddressableLEDBuffer m_ledBuffer;
   // Store what the last hue of the first pixel is
   private int m_rainbowFirstPixelHue;
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     // PWM port 9
     // Must be a PWM header, not MXP or DIO
     m_led = new AddressableLED(9);

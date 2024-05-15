@@ -34,8 +34,8 @@ public class Robot extends TimedRobot {
    */
   private final Encoder m_encoder = new Encoder(1, 2, false, CounterBase.EncodingType.k4X);
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     /*
      * Defines the number of samples to average when determining the rate.
      * On a quadrature encoder, values range from 1-255;

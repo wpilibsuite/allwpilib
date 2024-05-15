@@ -13,8 +13,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * to the dashboard. Just add this to the robotInit() method in your program.
  */
 public class Robot extends TimedRobot {
-  @Override
-  public void robotInit() {
+  public Robot() {
     CameraServer.startAutomaticCapture();
   }
 }

@@ -15,8 +15,7 @@ public class Robot extends TimedRobot {
   private static final double m_fullRange = 1.3;
   private static final double m_expectedZero = 0;
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     // 2nd parameter is the range of values. This sensor will output between
     // 0 and the passed in value.
     // 3rd parameter is the the physical value where you want "0" to be. How

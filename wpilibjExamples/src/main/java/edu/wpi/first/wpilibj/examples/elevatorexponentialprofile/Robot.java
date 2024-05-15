@@ -24,8 +24,7 @@ public class Robot extends TimedRobot {
   private ExponentialProfile.State m_goal = new ExponentialProfile.State(0, 0);
   private ExponentialProfile.State m_setpoint = new ExponentialProfile.State(0, 0);
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
     m_motor.setPID(1.3, 0.0, 0.7);
   }

@@ -30,8 +30,8 @@ import org.opencv.imgproc.Imgproc;
  * <p>Be aware that the performance on this is much worse than a coprocessor solution!
  */
 public class Robot extends TimedRobot {
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     var visionThread = new Thread(this::apriltagVisionThreadProc);
     visionThread.setDaemon(true);
     visionThread.start();

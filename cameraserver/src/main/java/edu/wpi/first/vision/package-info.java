@@ -43,7 +43,7 @@
  *      }
  *
  *     {@literal @}Override
- *      public void robotInit() {
+ *      public Robot() {
  *          usbCamera = CameraServer.startAutomaticCapture(0);
  *          findTotePipeline = new MyFindTotePipeline();
  *          findToteThread = new VisionThread(usbCamera, findTotePipeline, this);

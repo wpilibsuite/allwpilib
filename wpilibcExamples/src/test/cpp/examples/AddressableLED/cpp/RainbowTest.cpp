@@ -19,7 +19,6 @@ void AssertIndexColor(std::array<frc::AddressableLED::LEDData, 60> data,
 
 TEST(RainbowTest, RainbowPattern) {
   Robot robot;
-  robot.RobotInit();
   frc::sim::AddressableLEDSim ledSim =
       frc::sim::AddressableLEDSim::CreateForChannel(9);
   EXPECT_TRUE(ledSim.GetRunning());

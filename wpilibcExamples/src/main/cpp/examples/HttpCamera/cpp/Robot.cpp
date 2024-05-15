@@ -51,7 +51,7 @@ class Robot : public frc::TimedRobot {
     }
   }
 
-  void RobotInit() override {
+  Robot() {
     // We need to run our vision program in a separate thread. If not, our robot
     // program will not run.
     std::thread visionThread(VisionThread);

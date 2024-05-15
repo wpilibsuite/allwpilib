@@ -45,11 +45,7 @@ class TimedRobotTest {
 
     MockRobot() {
       super(kPeriod);
-    }
 
-    @Override
-    @SuppressWarnings("removal")
-    public void robotInit() {
       m_robotInitCount.addAndGet(1);
     }
 

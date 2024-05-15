@@ -19,7 +19,6 @@ class RainbowTest {
   void rainbowPatternTest() {
     HAL.initialize(500, 0);
     try (var robot = new Robot()) {
-      robot.robotInit();
       AddressableLEDSim ledSim = AddressableLEDSim.createForChannel(9);
       assertTrue(ledSim.getRunning());
       assertEquals(60, ledSim.getLength());
