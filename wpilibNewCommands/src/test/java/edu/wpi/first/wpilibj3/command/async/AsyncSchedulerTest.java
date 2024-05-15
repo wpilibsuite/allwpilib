@@ -2,6 +2,7 @@ package edu.wpi.first.wpilibj3.command.async;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -119,7 +120,6 @@ class AsyncSchedulerTest {
     // less than the expected 50,000
     int numCommands = 100;
     int iterations = 500;
-    var commands = new ArrayList<AsyncCommand>(numCommands);
 
     for (int cmdCount = 0; cmdCount < numCommands; cmdCount++) {
       var command =
@@ -133,7 +133,6 @@ class AsyncSchedulerTest {
               .named("CountCommand[" + cmdCount + "]");
 
       scheduler.schedule(command);
-      commands.add(command);
     }
 
     for (int i = 0; i < iterations; i++) {
@@ -240,7 +239,7 @@ class AsyncSchedulerTest {
         count.incrementAndGet();
         scheduler.yield();
       }
-    }).named("Default Command");
+    }).suspendingOnInterrupt().named("Default Command");
 
     var newerCmd = resource.run(() -> {
     }).named("Newer Command");
@@ -303,9 +302,15 @@ class AsyncSchedulerTest {
     }
 
     for (var resource : resources) {
-      if (!scheduler.isRunning(resource.getDefaultCommand())) {
-        fail("Resource " + resource + " is not running the default command.");
-      }
+      var runningCommands = scheduler.getRunningCommandsFor(resource);
+      assertEquals(
+          1,
+          runningCommands.size(),
+          "Resource " + resource + " should have exactly one running command");
+      assertInstanceOf(
+          IdleCommand.class,
+          runningCommands.getFirst(),
+          "Resource " + resource + " is not running the default command");
     }
   }
 

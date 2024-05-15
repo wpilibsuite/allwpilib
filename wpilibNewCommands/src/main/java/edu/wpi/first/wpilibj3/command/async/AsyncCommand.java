@@ -138,6 +138,30 @@ public interface AsyncCommand {
     return RobotDisabledBehavior.CancelWhileDisabled;
   }
 
+  enum InterruptBehavior {
+    /**
+     * Cancels the command when interrupted by a higher priority command. The command will be
+     * removed from the scheduler without being allowed to complete.
+     */
+    CancelOnInterrupt,
+    /**
+     * Suspends the command when interrupted by a higher priority command. The scheduler will keep
+     * the command around and will be resumed when every conflicting higher priority command has
+     * completed or been canceled.
+     */
+    SuspendOnInterrupt,
+  }
+
+  /**
+   * The behavior of the command when it is interrupted by a higher priority command. Defaults to
+   * {@link InterruptBehavior#CancelOnInterrupt}.
+   *
+   * @return the command's behavior when interrupted
+   */
+  default InterruptBehavior interruptBehavior() {
+    return InterruptBehavior.CancelOnInterrupt;
+  }
+
   /**
    * Checks if this command has a lower {@link #priority() priority} than another command.
    *

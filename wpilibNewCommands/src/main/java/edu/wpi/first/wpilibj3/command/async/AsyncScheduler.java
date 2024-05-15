@@ -1,5 +1,7 @@
 package edu.wpi.first.wpilibj3.command.async;
 
+import static edu.wpi.first.wpilibj3.command.async.AsyncCommand.InterruptBehavior.SuspendOnInterrupt;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import java.lang.invoke.MethodHandle;
@@ -8,11 +10,13 @@ import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 public class AsyncScheduler {
@@ -49,12 +53,20 @@ public class AsyncScheduler {
       AsyncCommand parent,
       Continuation continuation) { }
 
-  /** The default commands for each resource. */
-  private final Map<HardwareResource, AsyncCommand> defaultCommands = new HashMap<>();
+  private final Set<HardwareResource> registeredResources = new HashSet<>();
   /** The set of commands scheduled since the start of the previous run. */
   private final Set<CommandState> onDeck = new LinkedHashSet<>();
   /** The states of all running commands (does not include on deck commands). */
   private final Map<AsyncCommand, CommandState> commandStates = new LinkedHashMap<>();
+
+  /**
+   * A priority queue of suspended commands. Suspended commands will be resumed at the end of each
+   * run() call if all their requirements are available, and are attempted to be resumed based on
+   * their priority values (higher priority = earlier attempt).
+   */
+  private final PriorityQueue<CommandState> suspendedStates =
+      new PriorityQueue<>(Comparator.comparingInt(s -> s.command().priority()));
+
   /** The periodic callbacks to run, outside of the command structure. */
   private final List<Continuation> periodicCallbacks = new ArrayList<>();
   /** Event loop for trigger bindings. */
@@ -102,6 +114,7 @@ public class AsyncScheduler {
    * @param defaultCommand the default command to use for the resource
    */
   public void registerResource(HardwareResource resource, AsyncCommand defaultCommand) {
+    registeredResources.add(resource);
     setDefaultCommand(resource, defaultCommand);
   }
 
@@ -124,20 +137,12 @@ public class AsyncScheduler {
           "A resource's default command cannot require other resources");
     }
 
-    defaultCommands.put(resource, defaultCommand);
-    schedule(defaultCommand);
-  }
+    if (defaultCommand.interruptBehavior() != SuspendOnInterrupt) {
+      throw new IllegalArgumentException(
+          "Default commands have interrupt behavior set to SuspendOnInterrupt");
+    }
 
-  /**
-   * Gets the registered default command for a given resource. If no default command has been
-   * explicitly provided with {@link #setDefaultCommand(HardwareResource, AsyncCommand)}, then
-   * an {@link IdleCommand} will be set as the default by the scheduler.
-   *
-   * @param resource the resource for which to retrieve the configured default command
-   * @return the default command
-   */
-  public AsyncCommand getDefaultCommand(HardwareResource resource) {
-    return defaultCommands.get(resource);
+    schedule(defaultCommand);
   }
 
   /**
@@ -193,20 +198,20 @@ public class AsyncScheduler {
    * @param command the command to schedule
    */
   public void schedule(AsyncCommand command) {
-    if (currentCommand == null) {
-      // Scheduling from outside a command, eg a trigger binding or manual schedule call
-      // Check for conflicts with the commands that are already running
-      for (AsyncCommand c : commandStates.keySet()) {
-        if (c.conflictsWith(command) && command.isLowerPriorityThan(c)) {
-          return;
-        }
-      }
-    } else {
+    if (!isSchedulable(command)) {
+      return;
+    }
+
+    if (currentCommand != null) {
       // Scheduled by a command.
       // Instead of checking for conflicts with all running commands (which would include the
       // parent), we instead need to verify that the scheduled command ONLY uses resources also
       // used by the parent. Technically, we should also verify that the scheduled command also
       // does not require any of the same resources as any sibling, either. But that can come later.
+      // TODO: If we allow resources to be nested, do not throw if requiring a nested resource owned
+      //       by a requirement of the parent command. eg if currentCommand = PinkArm.doSomething(),
+      //       allow that command to schedule something that requires PinkArm.pivot even if it
+      //       doesn't directly require the pivot
       if (!currentCommand.requirements().containsAll(command.requirements())) {
         var disallowedResources = new LinkedHashSet<>(command.requirements());
         disallowedResources.removeIf(currentCommand::requires);
@@ -229,6 +234,9 @@ public class AsyncScheduler {
       if (command.isLowerPriorityThan(scheduledState.command())) {
         // Lower priority than an already-scheduled (but not yet running) command that requires at
         // one of the same resource
+        if (command.interruptBehavior() == SuspendOnInterrupt) {
+          suspend(new CommandState(command, currentCommand, buildContinuation(command)));
+        }
         return;
       }
     }
@@ -236,20 +244,62 @@ public class AsyncScheduler {
     // Evict conflicting on-deck commands
     // We check above if the input command is lower priority than any of these,
     // so at this point we're guaranteed to be >= priority than anything already on deck
-    onDeck.removeIf(c -> c.command().conflictsWith(command));
+    evictConflictingOnDeckCommands(command);
 
     var state = new CommandState(command, currentCommand, buildContinuation(command));
     onDeck.add(state);
 
     // Immediately evict any conflicting running command, except for commands in its ancestry
+    evictConflictingRunningCommands(state);
+  }
+
+  private boolean isSchedulable(AsyncCommand command) {
+    if (currentCommand != null) {
+      // Bypass scheduling check if being scheduled as a nested command.
+      // The schedule() method will throw an error when attempting to schedule a nested command
+      // that requires a resource that the parent doesn't
+      return true;
+    }
+
+    // Scheduling from outside a command, eg a trigger binding or manual schedule call
+    // Check for conflicts with the commands that are already running
+    for (AsyncCommand c : commandStates.keySet()) {
+      if (c.conflictsWith(command) && command.isLowerPriorityThan(c)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private void evictConflictingOnDeckCommands(AsyncCommand command) {
+    for (var iterator = onDeck.iterator(); iterator.hasNext(); ) {
+      var scheduledState = iterator.next();
+      var scheduledCommand = scheduledState.command();
+      if (scheduledCommand.conflictsWith(command)) {
+        // Remove the lower priority conflicting command from the on deck commands.
+        // We don't need to call removeOrphanedChildren here because it hasn't started yet,
+        // meaning it hasn't had a chance to schedule any children
+        iterator.remove();
+        if (scheduledCommand.interruptBehavior() == SuspendOnInterrupt) {
+          suspend(scheduledState);
+        }
+      }
+    }
+  }
+
+  private void evictConflictingRunningCommands(CommandState state) {
     for (var iterator = commandStates.entrySet().iterator(); iterator.hasNext(); ) {
       var entry = iterator.next();
       var cmd = entry.getKey();
-      if (command.conflictsWith(cmd) && !inheritsFrom(state, cmd)) {
+      if (state.command().conflictsWith(cmd) && !inheritsFrom(state, cmd)) {
         // The scheduled command conflicts with and does not inherit from this command
         // Cancel this command and its children
         iterator.remove();
         removeOrphanedChildren(cmd);
+        if (cmd.interruptBehavior() == SuspendOnInterrupt) {
+          suspend(entry.getValue());
+        }
       }
     }
   }
@@ -286,9 +336,15 @@ public class AsyncScheduler {
     // required resources, unless another command requiring those resources is scheduled between
     // calling cancel() and calling run()
     commandStates.remove(command);
+    onDeck.removeIf(state -> state.command() == command);
+    suspendedStates.removeIf(state -> state.command() == command);
 
     // Clean up any orphaned child commands; their lifespan must not exceed the parent's
     removeOrphanedChildren(command);
+  }
+
+  private void suspend(CommandState state) {
+    suspendedStates.add(state);
   }
 
   /**
@@ -352,12 +408,14 @@ public class AsyncScheduler {
     // Remove completed commands
     commandStates.entrySet().removeIf(e -> e.getValue().continuation.isDone());
 
-    // Schedule default commands for any resource currently without a command
-    for (var resource : defaultCommands.keySet()) {
-      var unowned = commandStates.keySet().stream().noneMatch(c -> c.requires(resource));
-      if (unowned) {
-        scheduleDefault(resource);
+    // Attempt to schedule as many suspended commands as possible
+    // Work on a copy since we'll be popping elements off the queue
+    for (var suspendedState : List.copyOf(suspendedStates).reversed()) {
+      if (isSchedulable(suspendedState.command())) {
+        schedule(suspendedState.command());
+        suspendedStates.remove(suspendedState);
       }
+      // TODO: Early exit once every resource has a scheduled or running command
     }
   }
 
@@ -373,6 +431,7 @@ public class AsyncScheduler {
       if (state.parent == parent) {
         iterator.remove();
         removeOrphanedChildren(state.command);
+        suspendedStates.remove(state);
       }
     }
   }
@@ -525,22 +584,26 @@ public class AsyncScheduler {
   }
 
   /**
+   * Gets all the currently running commands that require a particular resource. Commands are
+   * returned in the order in which they were scheduled. The returned list is read-only.
+   *
+   * @param resource the resource to get the commands for
+   * @return the currently running commands that require the resource.
+   */
+  public List<AsyncCommand> getRunningCommandsFor(HardwareResource resource) {
+    return commandStates
+               .keySet()
+               .stream()
+               .filter(command -> command.requires(resource))
+               .toList();
+  }
+
+  /**
    * Cancels all currently running commands, then starts the default commands for any resources
    * that had canceled commands. A default command that is currently running will not be canceled.
    */
   public void cancelAll() {
     commandStates.clear();
-  }
-
-  /**
-   * Schedules the default command for the given resource. If no default command exists, then a new
-   * idle command will be created and assigned as the default.
-   *
-   * @param resource the resource to schedule the default command for
-   */
-  public void scheduleDefault(HardwareResource resource) {
-    var defaultCommand = defaultCommands.computeIfAbsent(resource, IdleCommand::new);
-    schedule(defaultCommand);
   }
 
   /**

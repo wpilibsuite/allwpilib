@@ -38,10 +38,6 @@ public class HardwareResource {
     registeredScheduler.setDefaultCommand(this, defaultCommand);
   }
 
-  public AsyncCommand getDefaultCommand() {
-    return registeredScheduler.getDefaultCommand(this);
-  }
-
   public AsyncCommandBuilder run(Runnable command) {
     return new AsyncCommandBuilder().requiring(this).executing(command);
   }

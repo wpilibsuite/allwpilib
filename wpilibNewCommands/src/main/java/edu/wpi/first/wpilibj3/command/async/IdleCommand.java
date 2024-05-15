@@ -40,4 +40,9 @@ public record IdleCommand(HardwareResource resource) implements AsyncCommand {
   public RobotDisabledBehavior robotDisabledBehavior() {
     return RobotDisabledBehavior.RunWhileDisabled;
   }
+
+  @Override
+  public InterruptBehavior interruptBehavior() {
+    return InterruptBehavior.SuspendOnInterrupt;
+  }
 }
