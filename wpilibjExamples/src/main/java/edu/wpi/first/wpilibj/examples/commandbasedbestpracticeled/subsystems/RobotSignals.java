@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
@@ -14,13 +12,45 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.PeriodicTask;
 
 /*
- * All Commands factories are "public."
+ * All Commands factories (except the default command) are "public."
  * 
  * All other methods are "private" to prevent other classes from forgetting to
  * add requirements of these resources if creating commands from these methods.
  */
 
 public class RobotSignals  {
+
+// Can't overload methods using generic interfaces parameters like Supplier
+// so make our own interfaces to use in overloads
+
+/**
+ * Represents a supplier of Color.
+ */
+@FunctionalInterface
+public interface ColorSupplier {
+
+    /**
+     * Gets a result.
+     *
+     * @return a result
+     */
+    Color get();
+}
+
+/**
+ * Represents a supplier of AddressableLEDBuffer.
+ */
+@FunctionalInterface
+public interface AddressableLEDBufferSupplier {
+
+    /**
+     * Gets a result.
+     *
+     * @return a result
+     */
+    AddressableLEDBuffer get();
+}
+
   private final AddressableLED strip;
 
   // layout by LED number of the single physical buffer
@@ -126,12 +156,21 @@ public class RobotSignals  {
           .ignoringDisable(true)
           .withName("LedDefault");
     }
-
+/*
+ * Public Commands
+ */
     public Command setSignal(Color color) {
       return
         run(()->setSignalView(color))
           .ignoringDisable(true)
           .withName("LedSetC");
+    }
+
+    public Command setSignal(ColorSupplier color) {
+      return
+        run(()->setSignalView(color.get()))
+          .ignoringDisable(true)
+          .withName("LedSetSC");
     }
 
     public Command setSignal(AddressableLEDBuffer buffer) {
@@ -141,11 +180,11 @@ public class RobotSignals  {
           .withName("LedSetB");
     }
 
-    public Command setSignal(Supplier<Color> color) {
-      return
-        run(()->setSignalView(color.get()))
-          .ignoringDisable(true)
-          .withName("LedSetS");
+    public Command setSignal(AddressableLEDBufferSupplier buffer) {
+        return
+          run(()->setSignalView(buffer.get()))
+            .ignoringDisable(true)
+            .withName("LedSetSB");
     }
 
     public Command runPattern(LEDPattern pattern) {

@@ -4,9 +4,8 @@
 
 package frc.robot;
 
-import java.util.function.Supplier;
-
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
@@ -42,9 +41,9 @@ public class RobotContainer {
       .onTrue(robotSignals.Top.setSignal(colorWheel()));
   }
 
-  private Supplier<Color> colorWheel() {
-    // produce a color based on the timer current seconds
-    return ()->Color.fromHSV((int)(Timer.getFPGATimestamp()%60.)*3, 200, 200);
+  private RobotSignals.ColorSupplier colorWheel() {
+    // produce a color based on the timer current seconds of the minute
+    return ()->Color.fromHSV((int)(Timer.getFPGATimestamp()%60./*seconds of the minute*/)*3/*scale seconds to 180 hues per color wheel*/, 200, 200);
   }
 
   public Command getAutonomousCommand() {
