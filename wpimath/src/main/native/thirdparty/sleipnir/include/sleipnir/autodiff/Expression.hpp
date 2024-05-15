@@ -21,8 +21,7 @@ namespace sleipnir::detail {
 
 struct SLEIPNIR_DLLEXPORT Expression;
 
-inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr);
-// FIXME: Make constexpr after upgrading to GCC 12+
+inline void IntrusiveSharedPtrIncRefCount(Expression* expr);
 inline void IntrusiveSharedPtrDecRefCount(Expression* expr);
 
 /**
@@ -410,7 +409,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(const ExpressionPtr& x);
  *
  * @param expr The shared pointer's managed object.
  */
-inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr) {
+inline void IntrusiveSharedPtrIncRefCount(Expression* expr) {
   ++expr->refCount;
 }
 
@@ -419,7 +418,6 @@ inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr) {
  *
  * @param expr The shared pointer's managed object.
  */
-// FIXME: Make constexpr after upgrading to GCC 12+
 inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
   // If a deeply nested tree is being deallocated all at once, calling the
   // Expression destructor when expr's refcount reaches zero can cause a stack
