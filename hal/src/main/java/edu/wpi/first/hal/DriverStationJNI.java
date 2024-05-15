@@ -243,7 +243,7 @@ public class DriverStationJNI extends JNIWrapper {
    * @param rawAxesArray all joystick axes as int
    * @param povsArray all povs
    * @param buttonsAndMetadata array of long joystick axes count, long joystick povs count, long
-   *     jostick buttons count, long joystick buttons values
+   *     joystick buttons count, long joystick buttons values
    * @see "HAL_GetAllJoystickData"
    */
   public static native void getAllJoystickData(

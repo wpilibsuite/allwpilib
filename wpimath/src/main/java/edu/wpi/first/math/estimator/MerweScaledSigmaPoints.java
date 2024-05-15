@@ -19,7 +19,7 @@ import org.ejml.simple.SimpleMatrix;
  *
  * <p>States is the dimensionality of the state. 2*States+1 weights will be generated.
  *
- * <p>[1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilitic Inference in Dynamic
+ * <p>[1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilistic Inference in Dynamic
  * State-Space Models" (Doctoral dissertation)
  *
  * @param <S> The dimensionality of the state. 2 * States + 1 weights will be generated.

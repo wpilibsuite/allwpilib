@@ -245,7 +245,7 @@ class SwerveDrivePoseEstimatorTest {
 
   @Test
   void testSimultaneousVisionMeasurements() {
-    // This tests for multiple vision measurements appled at the same time. The expected behavior
+    // This tests for multiple vision measurements applied at the same time. The expected behavior
     // is that all measurements affect the estimated pose. The alternative result is that only one
     // vision measurement affects the outcome. If that were the case, after 1000 measurements, the
     // estimated pose would converge to that measurement.

@@ -13,7 +13,7 @@
 
 namespace frc::sim {
 
-TEST(AcclerometerSimTest, ActiveCallback) {
+TEST(AccelerometerSimTest, ActiveCallback) {
   HAL_Initialize(500, 0);
 
   BuiltInAccelerometerSim sim;
@@ -39,7 +39,7 @@ TEST(AcclerometerSimTest, ActiveCallback) {
   EXPECT_TRUE(sim.GetActive());
 }
 
-TEST(AcclerometerSimTest, SetX) {
+TEST(AccelerometerSimTest, SetX) {
   HAL_Initialize(500, 0);
   BuiltInAccelerometerSim sim;
   sim.ResetData();
@@ -56,7 +56,7 @@ TEST(AcclerometerSimTest, SetX) {
   EXPECT_EQ(kTestValue, callback.GetLastValue());
 }
 
-TEST(AcclerometerSimTest, SetY) {
+TEST(AccelerometerSimTest, SetY) {
   HAL_Initialize(500, 0);
   BuiltInAccelerometerSim sim;
   sim.ResetData();
@@ -73,7 +73,7 @@ TEST(AcclerometerSimTest, SetY) {
   EXPECT_EQ(kTestValue, callback.GetLastValue());
 }
 
-TEST(AcclerometerSimTest, SetZ) {
+TEST(AccelerometerSimTest, SetZ) {
   HAL_Initialize(500, 0);
 
   BuiltInAccelerometer accel;
@@ -91,7 +91,7 @@ TEST(AcclerometerSimTest, SetZ) {
   EXPECT_EQ(kTestValue, callback.GetLastValue());
 }
 
-TEST(AcclerometerSimTest, SetRange) {
+TEST(AccelerometerSimTest, SetRange) {
   HAL_Initialize(500, 0);
 
   BuiltInAccelerometerSim sim;

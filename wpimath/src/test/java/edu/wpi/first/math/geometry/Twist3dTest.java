@@ -40,7 +40,7 @@ class Twist3dTest {
   }
 
   @Test
-  void testQuarterCirle() {
+  void testQuarterCircle() {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var quarterCircle = new Twist3d(5.0 / 2.0 * Math.PI, 0.0, 0.0, 0.0, 0.0, Math.PI / 2.0);

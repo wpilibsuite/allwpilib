@@ -132,7 +132,7 @@ class TrapezoidProfile {
    *
    * @return The total time the profile takes to reach the goal.
    */
-  units::second_t TotalTime() const { return m_endDeccel; }
+  units::second_t TotalTime() const { return m_endDecel; }
 
   /**
    * Returns true if the profile has reached the goal.
@@ -174,7 +174,7 @@ class TrapezoidProfile {
 
   units::second_t m_endAccel;
   units::second_t m_endFullSpeed;
-  units::second_t m_endDeccel;
+  units::second_t m_endDecel;
 };
 }  // namespace frc
 

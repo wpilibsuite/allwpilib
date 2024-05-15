@@ -55,7 +55,7 @@ void WPI_InitString(struct WPI_String* wpiString, const char* utf8String);
 
 /**
  * Initializes a WPI_String from a UTF-8 string and length.
- * If input string is null or 0 length, initilizes output to 0 length.
+ * If input string is null or 0 length, initializes output to 0 length.
  * The input string does not need to be null terminated.
  *
  * The lifetime of the output string is the lifetime of the input string.

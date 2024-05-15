@@ -514,7 +514,7 @@ public class AnalogJNI extends JNIWrapper {
   public static native boolean getAnalogTriggerOutput(int analogTriggerHandle, int type);
 
   /**
-   * Get the FPGA index for the AnlogTrigger.
+   * Get the FPGA index for the AnalogTrigger.
    *
    * @param analogTriggerHandle the trigger handle
    * @return the FPGA index

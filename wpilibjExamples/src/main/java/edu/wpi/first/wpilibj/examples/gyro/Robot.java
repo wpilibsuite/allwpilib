@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  */
 public class Robot extends TimedRobot {
   private static final double kAngleSetpoint = 0.0;
-  private static final double kP = 0.005; // propotional turning constant
+  private static final double kP = 0.005; // proportional turning constant
 
   // gyro calibration constant, may need to be adjusted;
   // gyro value of 360 is set to correspond to one full revolution
