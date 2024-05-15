@@ -52,8 +52,7 @@ public class Sequence implements AsyncCommand {
   @Override
   public void run() {
     for (var command : commands) {
-      scheduler.schedule(command);
-      scheduler.waitFor(command);
+      scheduler.scheduleAndWait(command);
     }
   }
 

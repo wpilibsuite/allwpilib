@@ -305,6 +305,17 @@ public class AsyncScheduler {
   }
 
   /**
+   * Schedules and waits for a command to complete. Shorthand for
+   * {@code schedule(command); waitFor(command);}.
+   *
+   * @param command the command to schedule
+   */
+  public void scheduleAndWait(AsyncCommand command) {
+    schedule(command);
+    waitFor(command);
+  }
+
+  /**
    * Checks if a particular command is an ancestor of another.
    *
    * @param state the state to check
