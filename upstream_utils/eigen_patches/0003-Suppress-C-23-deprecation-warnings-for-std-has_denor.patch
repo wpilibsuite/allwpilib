@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Mon, 13 May 2024 12:46:15 -0700
-Subject: [PATCH 3/3] Suppress C++23 deprecation warnings for std::has_denorm
+Subject: [PATCH 3/4] Suppress C++23 deprecation warnings for std::has_denorm
  and std::has_denorm_loss
 
 ---
