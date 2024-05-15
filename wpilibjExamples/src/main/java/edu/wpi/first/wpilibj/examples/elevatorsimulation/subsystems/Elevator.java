@@ -54,7 +54,8 @@ public class Elevator implements AutoCloseable {
           Constants.kMaxElevatorHeightMeters,
           true,
           0,
-          0.01);
+          0.01,
+          0.0);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
   private final PWMSim m_motorSim = new PWMSim(m_motor);
 
