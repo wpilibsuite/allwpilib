@@ -141,7 +141,7 @@ struct numeric_limits_bfloat16_impl {
   static EIGEN_CONSTEXPR const bool has_signaling_NaN = true;
 #if __cplusplus >= 202302L
   EIGEN_DIAGNOSTICS(push)
-  EIGEN_DISABLE_DEPRECATION_WARNING
+  EIGEN_DISABLE_DEPRECATED_WARNING
 #endif
   static EIGEN_CONSTEXPR const std::float_denorm_style has_denorm = std::denorm_present;
   static EIGEN_CONSTEXPR const bool has_denorm_loss = false;
@@ -196,7 +196,7 @@ template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_bfloat16_impl<T>::has_signaling_NaN;
 #if __cplusplus >= 202302L
 EIGEN_DIAGNOSTICS(push)
-EIGEN_DISABLE_DEPRECATION_WARNING
+EIGEN_DISABLE_DEPRECATED_WARNING
 #endif
 template <typename T>
 EIGEN_CONSTEXPR const std::float_denorm_style numeric_limits_bfloat16_impl<T>::has_denorm;

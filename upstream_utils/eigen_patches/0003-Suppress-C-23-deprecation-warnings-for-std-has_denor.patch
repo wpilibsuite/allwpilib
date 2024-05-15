@@ -19,7 +19,7 @@ index f31c6cee6e97e8f1ad6fa4341fec2c1e65dec705..c6fa034b04896e7666e8de53e0e011f9
    static EIGEN_CONSTEXPR const bool has_signaling_NaN = true;
 +#if __cplusplus >= 202302L
 +  EIGEN_DIAGNOSTICS(push)
-+  EIGEN_DISABLE_DEPRECATION_WARNING
++  EIGEN_DISABLE_DEPRECATED_WARNING
 +#endif
    static EIGEN_CONSTEXPR const std::float_denorm_style has_denorm = std::denorm_present;
    static EIGEN_CONSTEXPR const bool has_denorm_loss = false;
@@ -35,7 +35,7 @@ index f31c6cee6e97e8f1ad6fa4341fec2c1e65dec705..c6fa034b04896e7666e8de53e0e011f9
  EIGEN_CONSTEXPR const bool numeric_limits_bfloat16_impl<T>::has_signaling_NaN;
 +#if __cplusplus >= 202302L
 +EIGEN_DIAGNOSTICS(push)
-+EIGEN_DISABLE_DEPRECATION_WARNING
++EIGEN_DISABLE_DEPRECATED_WARNING
 +#endif
  template <typename T>
  EIGEN_CONSTEXPR const std::float_denorm_style numeric_limits_bfloat16_impl<T>::has_denorm;
@@ -57,7 +57,7 @@ index 9c195c12a17fcb791c96a0ce6cf873f455c4f8be..506feca058bb7940663d9cda8b2fe902
    static EIGEN_CONSTEXPR const bool has_signaling_NaN = true;
 +#if __cplusplus >= 202302L
 +  EIGEN_DIAGNOSTICS(push)
-+  EIGEN_DISABLE_DEPRECATION_WARNING
++  EIGEN_DISABLE_DEPRECATED_WARNING
 +#endif
    static EIGEN_CONSTEXPR const std::float_denorm_style has_denorm = std::denorm_present;
    static EIGEN_CONSTEXPR const bool has_denorm_loss = false;
@@ -73,7 +73,7 @@ index 9c195c12a17fcb791c96a0ce6cf873f455c4f8be..506feca058bb7940663d9cda8b2fe902
  EIGEN_CONSTEXPR const bool numeric_limits_half_impl<T>::has_signaling_NaN;
 +#if __cplusplus >= 202302L
 +EIGEN_DIAGNOSTICS(push)
-+EIGEN_DISABLE_DEPRECATION_WARNING
++EIGEN_DISABLE_DEPRECATED_WARNING
 +#endif
  template <typename T>
  EIGEN_CONSTEXPR const std::float_denorm_style numeric_limits_half_impl<T>::has_denorm;
