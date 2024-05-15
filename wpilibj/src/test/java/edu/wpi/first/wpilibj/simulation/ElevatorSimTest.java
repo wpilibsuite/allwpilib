@@ -58,7 +58,7 @@ class ElevatorSimTest {
   void testMinMax() {
     var sim =
         new ElevatorSim(
-            DCMotor.getVex775Pro(4), 14.67, 8.0, 0.75 * 25.4 / 1000.0, 0.0, 1.0, true, 0.0, 0.01);
+            DCMotor.getVex775Pro(4), 14.67, 8.0, 0.75 * 25.4 / 1000.0, 0.0, 1.0, true, 0.0, 0.01, 0.00);
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(0));
