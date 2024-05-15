@@ -68,7 +68,7 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *
    * @return The flywheel current draw.
    */
-  units::ampere_t GetCurrentDraw() const override;
+  units::ampere_t GetCurrentDraw() const;
 
   /**
    * Sets the input voltage for the flywheel.

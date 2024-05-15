@@ -43,4 +43,5 @@ units::ampere_t FlywheelSim::GetCurrentDraw() const {
 
 void FlywheelSim::SetInputVoltage(units::volt_t voltage) {
   SetInput(Vectord<1>{voltage.value()});
+  ClampInput(frc::RobotController::GetBatteryVoltage().value());
 }

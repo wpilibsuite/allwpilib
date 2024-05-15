@@ -98,6 +98,7 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
 
 void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
   SetInput(Vectord<1>{voltage.value()});
+  ClampInput(frc::RobotController::GetBatteryVoltage().value());
 }
 
 Vectord<2> ElevatorSim::UpdateX(const Vectord<2>& currentXhat,
