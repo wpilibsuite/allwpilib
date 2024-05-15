@@ -14,11 +14,11 @@ import org.junit.jupiter.api.Test;
 class DifferentialDriveOdometryTest {
   private static final double kEpsilon = 1E-9;
   private final DifferentialDriveOdometry m_odometry =
-      new DifferentialDriveOdometry(new Rotation2d(), 0, 0);
+      new DifferentialDriveOdometry(Rotation2d.kZero, 0, 0);
 
   @Test
   void testOdometryWithEncoderDistances() {
-    m_odometry.resetPosition(Rotation2d.fromDegrees(45), 0, 0, new Pose2d());
+    m_odometry.resetPosition(Rotation2d.fromDegrees(45), 0, 0, Pose2d.kZero);
     var pose = m_odometry.update(Rotation2d.fromDegrees(135.0), 0.0, 5 * Math.PI);
 
     assertAll(

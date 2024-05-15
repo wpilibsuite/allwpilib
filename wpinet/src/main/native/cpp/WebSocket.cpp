@@ -9,11 +9,11 @@
 #include <string>
 #include <string_view>
 
-#include <fmt/format.h>
 #include <wpi/Base64.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/print.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/sha1.h>
 
@@ -714,7 +714,7 @@ static void VerboseDebug(const WebSocket::Frame& frame) {
       str.append(std::string_view(d.base, d.len));
     }
 #endif
-    fmt::print("WS SendText({})\n", str.str());
+    wpi::print("WS SendText({})\n", str.str());
   } else if ((frame.opcode & 0x7f) == 0x02) {
     SmallString<128> str;
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
@@ -725,7 +725,7 @@ static void VerboseDebug(const WebSocket::Frame& frame) {
       }
     }
 #endif
-    fmt::print("WS SendBinary({})\n", str.str());
+    wpi::print("WS SendBinary({})\n", str.str());
   } else {
     SmallString<128> str;
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
@@ -736,7 +736,7 @@ static void VerboseDebug(const WebSocket::Frame& frame) {
       }
     }
 #endif
-    fmt::print("WS SendOp({}, {})\n", frame.opcode, str.str());
+    wpi::print("WS SendOp({}, {})\n", frame.opcode, str.str());
   }
 #endif
 }

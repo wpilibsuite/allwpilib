@@ -86,15 +86,6 @@ class Notifier {
    * Change the callback function.
    *
    * @param callback The callback function.
-   * @deprecated Use SetCallback() instead.
-   */
-  [[deprecated("Use SetCallback() instead.")]]
-  void SetHandler(std::function<void()> callback);
-
-  /**
-   * Change the callback function.
-   *
-   * @param callback The callback function.
    */
   void SetCallback(std::function<void()> callback);
 

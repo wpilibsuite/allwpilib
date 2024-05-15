@@ -40,10 +40,10 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 17
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.33
+        run: pip3 install wpiformat==2024.34
       - name: Run wpiformat
         run: wpiformat
       - name: Run spotlessApply

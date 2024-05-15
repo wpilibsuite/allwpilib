@@ -6,43 +6,26 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
 #include <concepts>
-#include <functional>
 #include <initializer_list>
-#include <memory>
 #include <ranges>
 #include <span>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
 #include <version>
 
+#include "wpi/DataLog_c.h"
 #include "wpi/DenseMap.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringMap.h"
-#include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
 #include "wpi/protobuf/Protobuf.h"
+#include "wpi/string.h"
 #include "wpi/struct/Struct.h"
 #include "wpi/timestamp.h"
-#endif  // __cplusplus
-
-/**
- * A datalog string (for use with string array).
- */
-struct WPI_DataLog_String {
-  /** Contents. */
-  const char* str;
-
-  /** Length. */
-  size_t len;
-};
-
-#ifdef __cplusplus
 
 namespace wpi {
 class Logger;
@@ -61,15 +44,10 @@ enum ControlRecordType {
 }  // namespace impl
 
 /**
- * A data log. The log file is created immediately upon construction with a
- * temporary filename.  The file may be renamed at any time using the
- * SetFilename() function.
+ * A data log for high-speed writing of data values.
  *
  * The lifetime of the data log object must be longer than any data log entry
  * objects that refer to it.
- *
- * The data log is periodically flushed to disk.  It can also be explicitly
- * flushed to disk by using the Flush() function.
  *
  * Finish() is needed only to indicate in the log that a particular entry is
  * no longer being used (it releases the name to ID mapping).  Finish() is not
@@ -87,105 +65,36 @@ enum ControlRecordType {
  * arbitrary values), records in the log are not guaranteed to be sorted by
  * timestamp.
  */
-class DataLog final {
+class DataLog {
  public:
-  /**
-   * Construct a new Data Log.  The log will be initially created with a
-   * temporary filename.
-   *
-   * @param dir directory to store the log
-   * @param filename filename to use; if none provided, a random filename is
-   *                 generated of the form "wpilog_{}.wpilog"
-   * @param period time between automatic flushes to disk, in seconds;
-   *               this is a time/storage tradeoff
-   * @param extraHeader extra header data
-   */
-  explicit DataLog(std::string_view dir = "", std::string_view filename = "",
-                   double period = 0.25, std::string_view extraHeader = "");
+  virtual ~DataLog() = default;
 
-  /**
-   * Construct a new Data Log.  The log will be initially created with a
-   * temporary filename.
-   *
-   * @param msglog message logger (will be called from separate thread)
-   * @param dir directory to store the log
-   * @param filename filename to use; if none provided, a random filename is
-   *                 generated of the form "wpilog_{}.wpilog"
-   * @param period time between automatic flushes to disk, in seconds;
-   *               this is a time/storage tradeoff
-   * @param extraHeader extra header data
-   */
-  explicit DataLog(wpi::Logger& msglog, std::string_view dir = "",
-                   std::string_view filename = "", double period = 0.25,
-                   std::string_view extraHeader = "");
-
-  /**
-   * Construct a new Data Log that passes its output to the provided function
-   * rather than a file.  The write function will be called on a separate
-   * background thread and may block.  The write function is called with an
-   * empty data array when the thread is terminating.
-   *
-   * @param write write function
-   * @param period time between automatic calls to write, in seconds;
-   *               this is a time/storage tradeoff
-   * @param extraHeader extra header data
-   */
-  explicit DataLog(std::function<void(std::span<const uint8_t> data)> write,
-                   double period = 0.25, std::string_view extraHeader = "");
-
-  /**
-   * Construct a new Data Log that passes its output to the provided function
-   * rather than a file.  The write function will be called on a separate
-   * background thread and may block.  The write function is called with an
-   * empty data array when the thread is terminating.
-   *
-   * @param msglog message logger (will be called from separate thread)
-   * @param write write function
-   * @param period time between automatic calls to write, in seconds;
-   *               this is a time/storage tradeoff
-   * @param extraHeader extra header data
-   */
-  explicit DataLog(wpi::Logger& msglog,
-                   std::function<void(std::span<const uint8_t> data)> write,
-                   double period = 0.25, std::string_view extraHeader = "");
-
-  ~DataLog();
   DataLog(const DataLog&) = delete;
   DataLog& operator=(const DataLog&) = delete;
   DataLog(DataLog&&) = delete;
   DataLog& operator=(const DataLog&&) = delete;
 
   /**
-   * Change log filename.
-   *
-   * @param filename filename
-   */
-  void SetFilename(std::string_view filename);
-
-  /**
    * Explicitly flushes the log data to disk.
    */
-  void Flush();
+  virtual void Flush() = 0;
 
   /**
    * Pauses appending of data records to the log.  While paused, no data records
    * are saved (e.g. AppendX is a no-op).  Has no effect on entry starts /
    * finishes / metadata changes.
    */
-  void Pause();
+  virtual void Pause();
 
   /**
-   * Resumes appending of data records to the log.  If called after Stop(),
-   * opens a new file (with random name if SetFilename was not called after
-   * Stop()) and appends Start records and schema data values for all previously
-   * started entries and schemas.
+   * Resumes appending of data records to the log.
    */
-  void Resume();
+  virtual void Resume();
 
   /**
-   * Stops appending all records to the log, and closes the log file.
+   * Stops appending start/metadata/schema records to the log.
    */
-  void Stop();
+  virtual void Stop();
 
   /**
    * Returns whether there is a data schema already registered with the given
@@ -465,16 +374,119 @@ class DataLog final {
    * @param arr String array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void AppendStringArray(int entry, std::span<const WPI_DataLog_String> arr,
+  void AppendStringArray(int entry, std::span<const struct WPI_String> arr,
                          int64_t timestamp);
 
- private:
-  struct WriterThreadState;
+ protected:
+  static constexpr size_t kBlockSize = 16 * 1024;
+  static wpi::Logger s_defaultMessageLog;
 
-  void StartLogFile(WriterThreadState& state);
-  void WriterThreadMain(std::string_view dir);
-  void WriterThreadMain(
-      std::function<void(std::span<const uint8_t> data)> write);
+  class Buffer {
+   public:
+    explicit Buffer(size_t alloc = kBlockSize)
+        : m_buf{new uint8_t[alloc]}, m_maxLen{alloc} {}
+    ~Buffer() { delete[] m_buf; }
+
+    Buffer(const Buffer&) = delete;
+    Buffer& operator=(const Buffer&) = delete;
+
+    Buffer(Buffer&& oth)
+        : m_buf{oth.m_buf}, m_len{oth.m_len}, m_maxLen{oth.m_maxLen} {
+      oth.m_buf = nullptr;
+      oth.m_len = 0;
+      oth.m_maxLen = 0;
+    }
+
+    Buffer& operator=(Buffer&& oth) {
+      if (m_buf) {
+        delete[] m_buf;
+      }
+      m_buf = oth.m_buf;
+      m_len = oth.m_len;
+      m_maxLen = oth.m_maxLen;
+      oth.m_buf = nullptr;
+      oth.m_len = 0;
+      oth.m_maxLen = 0;
+      return *this;
+    }
+
+    uint8_t* Reserve(size_t size) {
+      assert(size <= GetRemaining());
+      uint8_t* rv = m_buf + m_len;
+      m_len += size;
+      return rv;
+    }
+
+    void Unreserve(size_t size) { m_len -= size; }
+
+    void Clear() { m_len = 0; }
+
+    size_t GetRemaining() const { return m_maxLen - m_len; }
+
+    std::span<uint8_t> GetData() { return {m_buf, m_len}; }
+    std::span<const uint8_t> GetData() const { return {m_buf, m_len}; }
+
+   private:
+    uint8_t* m_buf;
+    size_t m_len = 0;
+    size_t m_maxLen;
+  };
+
+  /**
+   * Constructs the log.  StartFile() must be called to actually start the
+   * file output.
+   *
+   * @param msglog message logger (will be called from separate thread)
+   * @param extraHeader extra header metadata
+   */
+  explicit DataLog(wpi::Logger& msglog, std::string_view extraHeader = "")
+      : m_msglog{msglog}, m_extraHeader{extraHeader} {}
+
+  /**
+   * Starts the log.  Appends file header and Start records and schema data
+   * values for all previously started entries and schemas.  No effect unless
+   * the data log is currently stopped.
+   */
+  void StartFile();
+
+  /**
+   * Provides complete set of all buffers that need to be written.
+   *
+   * Any existing contents of writeBufs will be released as if ReleaseBufs()
+   * was called prior to this call.
+   *
+   * Returned buffers should provided back via ReleaseBufs() after the write is
+   * complete.
+   *
+   * @param writeBufs buffers to be written (output)
+   */
+  void FlushBufs(std::vector<Buffer>* writeBufs);
+
+  /**
+   * Releases memory for a set of buffers back to the internal buffer pool.
+   *
+   * @param bufs buffers; empty on return
+   */
+  void ReleaseBufs(std::vector<Buffer>* bufs);
+
+  /**
+   * Called when internal buffers are half the maximum count.  Called with
+   * internal mutex held; do not call any other DataLog functions from this
+   * function.
+   */
+  virtual void BufferHalfFull();
+
+  /**
+   * Called when internal buffers reach the maximum count.  Called with internal
+   * mutex held; do not call any other DataLog functions from this function.
+   *
+   * @return true if log should be paused (don't call PauseLog)
+   */
+  virtual bool BufferFull() = 0;
+
+ private:
+  static constexpr size_t kMaxBufferCount = 1024 * 1024 / kBlockSize;
+  static constexpr size_t kMaxFreeCount = 256 * 1024 / kBlockSize;
 
   // must be called with m_mutex held
   int StartImpl(std::string_view name, std::string_view type,
@@ -486,22 +498,16 @@ class DataLog final {
   void AppendStringImpl(std::string_view str);
   void AppendStartRecord(int id, std::string_view name, std::string_view type,
                          std::string_view metadata, int64_t timestamp);
+  void DoReleaseBufs(std::vector<Buffer>* bufs);
 
+ protected:
   wpi::Logger& m_msglog;
+
+ private:
   mutable wpi::mutex m_mutex;
-  wpi::condition_variable m_cond;
-  bool m_doFlush{false};
-  bool m_shutdown{false};
-  enum State {
-    kStart,
-    kActive,
-    kPaused,
-    kStopped,
-  } m_state = kActive;
-  double m_period;
+  bool m_active = false;
+  bool m_paused = false;
   std::string m_extraHeader;
-  std::string m_newFilename;
-  class Buffer;
   std::vector<Buffer> m_free;
   std::vector<Buffer> m_outgoing;
   struct EntryInfo {
@@ -516,7 +522,6 @@ class DataLog final {
   };
   wpi::DenseMap<int, EntryInfo2> m_entryIds;
   int m_lastId = 0;
-  std::thread m_thread;
 };
 
 /**
@@ -1103,286 +1108,3 @@ class ProtobufLogEntry : public DataLogEntry {
 };
 
 }  // namespace wpi::log
-
-extern "C" {
-#endif  // __cplusplus
-
-/** C-compatible data log (opaque struct). */
-struct WPI_DataLog;
-
-/**
- * Construct a new Data Log.  The log will be initially created with a
- * temporary filename.
- *
- * @param dir directory to store the log
- * @param filename filename to use; if none provided, a random filename is
- *                 generated of the form "wpilog_{}.wpilog"
- * @param period time between automatic flushes to disk, in seconds;
- *               this is a time/storage tradeoff
- * @param extraHeader extra header data
- */
-struct WPI_DataLog* WPI_DataLog_Create(const char* dir, const char* filename,
-                                       double period, const char* extraHeader);
-
-/**
- * Construct a new Data Log that passes its output to the provided function
- * rather than a file.  The write function will be called on a separate
- * background thread and may block.  The write function is called with an
- * empty data array (data=NULL, len=0) when the thread is terminating.
- *
- * @param write write function
- * @param ptr pointer to pass to write function ptr parameter
- * @param period time between automatic calls to write, in seconds;
- *               this is a time/storage tradeoff
- * @param extraHeader extra header data
- */
-struct WPI_DataLog* WPI_DataLog_Create_Func(
-    void (*write)(void* ptr, const uint8_t* data, size_t len), void* ptr,
-    double period, const char* extraHeader);
-
-/**
- * Releases a data log object. Closes the file and returns resources to the
- * system.
- *
- * @param datalog data log
- */
-void WPI_DataLog_Release(struct WPI_DataLog* datalog);
-
-/**
- * Change log filename.
- *
- * @param datalog data log
- * @param filename filename
- */
-void WPI_DataLog_SetFilename(struct WPI_DataLog* datalog, const char* filename);
-
-/**
- * Explicitly flushes the log data to disk.
- *
- * @param datalog data log
- */
-void WPI_DataLog_Flush(struct WPI_DataLog* datalog);
-
-/**
- * Pauses appending of data records to the log.  While paused, no data records
- * are saved (e.g. AppendX is a no-op).  Has no effect on entry starts /
- * finishes / metadata changes.
- *
- * @param datalog data log
- */
-void WPI_DataLog_Pause(struct WPI_DataLog* datalog);
-
-/**
- * Resumes appending of data records to the log.  If called after Stop(),
- * opens a new file (with random name if SetFilename was not called after
- * Stop()) and appends Start records and schema data values for all previously
- * started entries and schemas.
- *
- * @param datalog data log
- */
-void WPI_DataLog_Resume(struct WPI_DataLog* datalog);
-
-/**
- * Stops appending all records to the log, and closes the log file.
- *
- * @param datalog data log
- */
-void WPI_DataLog_Stop(struct WPI_DataLog* datalog);
-
-/**
- * Start an entry.  Duplicate names are allowed (with the same type), and
- * result in the same index being returned (Start/Finish are reference
- * counted).  A duplicate name with a different type will result in an error
- * message being printed to the console and 0 being returned (which will be
- * ignored by the Append functions).
- *
- * @param datalog data log
- * @param name Name
- * @param type Data type
- * @param metadata Initial metadata (e.g. data properties)
- * @param timestamp Time stamp (may be 0 to indicate now)
- *
- * @return Entry index
- */
-int WPI_DataLog_Start(struct WPI_DataLog* datalog, const char* name,
-                      const char* type, const char* metadata,
-                      int64_t timestamp);
-
-/**
- * Finish an entry.
- *
- * @param datalog data log
- * @param entry Entry index
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
-                        int64_t timestamp);
-
-/**
- * Updates the metadata for an entry.
- *
- * @param datalog data log
- * @param entry Entry index
- * @param metadata New metadata for the entry
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
-                             const char* metadata, int64_t timestamp);
-
-/**
- * Appends a raw record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param data Byte array to record
- * @param len Length of byte array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendRaw(struct WPI_DataLog* datalog, int entry,
-                           const uint8_t* data, size_t len, int64_t timestamp);
-
-/**
- * Appends a boolean record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param value Boolean value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendBoolean(struct WPI_DataLog* datalog, int entry,
-                               int value, int64_t timestamp);
-
-/**
- * Appends an integer record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param value Integer value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendInteger(struct WPI_DataLog* datalog, int entry,
-                               int64_t value, int64_t timestamp);
-
-/**
- * Appends a float record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param value Float value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendFloat(struct WPI_DataLog* datalog, int entry,
-                             float value, int64_t timestamp);
-
-/**
- * Appends a double record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param value Double value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendDouble(struct WPI_DataLog* datalog, int entry,
-                              double value, int64_t timestamp);
-
-/**
- * Appends a string record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param value String value to record
- * @param len Length of string
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendString(struct WPI_DataLog* datalog, int entry,
-                              const char* value, size_t len, int64_t timestamp);
-
-/**
- * Appends a boolean array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr Boolean array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendBooleanArray(struct WPI_DataLog* datalog, int entry,
-                                    const int* arr, size_t len,
-                                    int64_t timestamp);
-
-/**
- * Appends a boolean array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr Boolean array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendBooleanArrayByte(struct WPI_DataLog* datalog, int entry,
-                                        const uint8_t* arr, size_t len,
-                                        int64_t timestamp);
-
-/**
- * Appends an integer array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr Integer array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendIntegerArray(struct WPI_DataLog* datalog, int entry,
-                                    const int64_t* arr, size_t len,
-                                    int64_t timestamp);
-
-/**
- * Appends a float array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr Float array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendFloatArray(struct WPI_DataLog* datalog, int entry,
-                                  const float* arr, size_t len,
-                                  int64_t timestamp);
-
-/**
- * Appends a double array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr Double array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendDoubleArray(struct WPI_DataLog* datalog, int entry,
-                                   const double* arr, size_t len,
-                                   int64_t timestamp);
-
-/**
- * Appends a string array record to the log.
- *
- * @param datalog data log
- * @param entry Entry index, as returned by WPI_DataLog_Start()
- * @param arr String array to record
- * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
- */
-void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
-                                   const WPI_DataLog_String* arr, size_t len,
-                                   int64_t timestamp);
-
-void WPI_DataLog_AddSchemaString(struct WPI_DataLog* datalog, const char* name,
-                                 const char* type, const char* schema,
-                                 int64_t timestamp);
-
-void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog, const char* name,
-                           const char* type, const uint8_t* schema,
-                           size_t schema_len, int64_t timestamp);
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus

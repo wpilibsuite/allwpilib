@@ -67,7 +67,7 @@ void SimplicialCholeskyBase<Derived>::analyzePattern_preordered(const CholMatrix
 }
 
 template <typename Derived>
-template <bool DoLDLT>
+template <bool DoLDLT, bool NonHermitian>
 void SimplicialCholeskyBase<Derived>::factorize_preordered(const CholMatrixType& ap) {
   using std::sqrt;
 
@@ -97,7 +97,7 @@ void SimplicialCholeskyBase<Derived>::factorize_preordered(const CholMatrixType&
     for (typename CholMatrixType::InnerIterator it(ap, k); it; ++it) {
       StorageIndex i = it.index();
       if (i <= k) {
-        y[i] += numext::conj(it.value()); /* scatter A(i,k) into Y (sum duplicates) */
+        y[i] += getSymm(it.value()); /* scatter A(i,k) into Y (sum duplicates) */
         Index len;
         for (len = 0; tags[i] != k; i = m_parent[i]) {
           pattern[len++] = i; /* L(k,i) is nonzero */
@@ -109,8 +109,8 @@ void SimplicialCholeskyBase<Derived>::factorize_preordered(const CholMatrixType&
 
     /* compute numerical values kth row of L (a sparse triangular solve) */
 
-    RealScalar d =
-        numext::real(y[k]) * m_shiftScale + m_shiftOffset;  // get D(k,k), apply the shift function, and clear Y(k)
+    DiagonalScalar d =
+        getDiag(y[k]) * m_shiftScale + m_shiftOffset;  // get D(k,k), apply the shift function, and clear Y(k)
     y[k] = Scalar(0);
     for (; top < size; ++top) {
       Index i = pattern[top]; /* pattern[top:n-1] is pattern of L(:,k) */
@@ -120,14 +120,14 @@ void SimplicialCholeskyBase<Derived>::factorize_preordered(const CholMatrixType&
       /* the nonzero entry L(k,i) */
       Scalar l_ki;
       if (DoLDLT)
-        l_ki = yi / numext::real(m_diag[i]);
+        l_ki = yi / getDiag(m_diag[i]);
       else
         yi = l_ki = yi / Lx[Lp[i]];
 
       Index p2 = Lp[i] + m_nonZerosPerCol[i];
       Index p;
-      for (p = Lp[i] + (DoLDLT ? 0 : 1); p < p2; ++p) y[Li[p]] -= numext::conj(Lx[p]) * yi;
-      d -= numext::real(l_ki * numext::conj(yi));
+      for (p = Lp[i] + (DoLDLT ? 0 : 1); p < p2; ++p) y[Li[p]] -= getSymm(Lx[p]) * yi;
+      d -= getDiag(l_ki * getSymm(yi));
       Li[p] = k; /* store L(k,i) in column form of L */
       Lx[p] = l_ki;
       ++m_nonZerosPerCol[i]; /* increment count of nonzeros in col i */
@@ -141,7 +141,7 @@ void SimplicialCholeskyBase<Derived>::factorize_preordered(const CholMatrixType&
     } else {
       Index p = Lp[k] + m_nonZerosPerCol[k]++;
       Li[p] = k; /* store L(k,k) = sqrt (d) in column k */
-      if (d <= RealScalar(0)) {
+      if (NonHermitian ? d == RealScalar(0) : numext::real(d) <= RealScalar(0)) {
         ok = false; /* failure, matrix is not positive definite */
         break;
       }

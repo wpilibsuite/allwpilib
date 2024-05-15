@@ -21,6 +21,7 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This class wraps {@link Odometry} to fuse latency-compensated vision measurements with encoder
@@ -123,6 +124,16 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    */
   public Pose2d getEstimatedPosition() {
     return m_odometry.getPoseMeters();
+  }
+
+  /**
+   * Return the pose at a given timestamp, if the buffer is not empty.
+   *
+   * @param timestampSeconds The pose's timestamp in seconds.
+   * @return The pose at the given timestamp (or Optional.empty() if the buffer is empty).
+   */
+  public Optional<Pose2d> sampleAt(double timestampSeconds) {
+    return m_poseBuffer.getSample(timestampSeconds).map(record -> record.poseMeters);
   }
 
   /**

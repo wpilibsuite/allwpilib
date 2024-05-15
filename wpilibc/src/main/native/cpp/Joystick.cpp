@@ -122,16 +122,6 @@ double Joystick::GetMagnitude() const {
   return std::hypot(GetX(), GetY());
 }
 
-double Joystick::GetDirectionRadians() const {
-  return std::atan2(GetX(), -GetY());
-}
-
-double Joystick::GetDirectionDegrees() const {
-  WPI_IGNORE_DEPRECATED
-  return (180 / std::numbers::pi) * GetDirectionRadians();
-  WPI_UNIGNORE_DEPRECATED
-}
-
 units::radian_t Joystick::GetDirection() const {
   return units::math::atan2(units::dimensionless::scalar_t{GetX()},
                             units::dimensionless::scalar_t{-GetY()});

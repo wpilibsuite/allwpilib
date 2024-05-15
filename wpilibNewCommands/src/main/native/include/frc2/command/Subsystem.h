@@ -160,6 +160,16 @@ class Subsystem {
   CommandPtr RunEnd(std::function<void()> run, std::function<void()> end);
 
   /**
+   * Constructs a command that runs an action once, and then runs an action
+   * every iteration until interrupted. Requires this subsystem.
+   *
+   * @param start the action to run on start
+   * @param run the action to run every iteration
+   */
+  [[nodiscard]]
+  CommandPtr StartRun(std::function<void()> start, std::function<void()> run);
+
+  /**
    * Constructs a DeferredCommand with the provided supplier. This subsystem is
    * added as a requirement.
    *

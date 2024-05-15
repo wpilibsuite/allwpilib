@@ -12,9 +12,10 @@ import org.junit.jupiter.api.Test;
 class DistanceTest {
   @Test
   void testBaseUnitDistancePerTime() {
-    Velocity<Distance> anonBaseUnit = new Distance(1, "D", "d").per(new Time(1, "T", "t"));
+    Velocity<Distance> anonBaseUnit =
+        new Distance(null, 1, "D", "d").per(new Time(null, 1, "T", "t"));
 
-    assertTrue(BaseUnits.Velocity.equivalent(anonBaseUnit));
+    assertTrue(Units.MetersPerSecond.equivalent(anonBaseUnit));
   }
 
   @Test

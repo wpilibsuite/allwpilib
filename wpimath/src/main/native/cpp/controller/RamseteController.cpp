@@ -4,6 +4,8 @@
 
 #include "frc/controller/RamseteController.h"
 
+#include <wpi/deprecated.h>
+
 #include "units/angle.h"
 #include "units/math.h"
 
@@ -26,9 +28,13 @@ RamseteController::RamseteController(units::unit_t<b_unit> b,
                                      units::unit_t<zeta_unit> zeta)
     : m_b{b}, m_zeta{zeta} {}
 
+WPI_IGNORE_DEPRECATED
+
 RamseteController::RamseteController()
     : RamseteController{units::unit_t<b_unit>{2.0},
                         units::unit_t<zeta_unit>{0.7}} {}
+
+WPI_UNIGNORE_DEPRECATED
 
 bool RamseteController::AtReference() const {
   const auto& eTranslate = m_poseError.Translation();

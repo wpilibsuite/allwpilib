@@ -18,7 +18,7 @@ class AnalogEncoderSimTest {
         var analogEncoder = new AnalogEncoder(analogInput)) {
       var encoderSim = new AnalogEncoderSim(analogEncoder);
 
-      encoderSim.setPosition(Rotation2d.fromDegrees(180));
+      encoderSim.setPosition(Rotation2d.kPi);
       assertEquals(analogEncoder.get(), 0.5, 1E-8);
       assertEquals(encoderSim.getTurns(), 0.5, 1E-8);
       assertEquals(encoderSim.getPosition().getRadians(), Math.PI, 1E-8);

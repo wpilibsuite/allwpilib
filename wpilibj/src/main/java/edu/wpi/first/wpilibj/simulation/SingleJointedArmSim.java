@@ -16,7 +16,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated single jointed arm mechanism. */
-public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
+public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   // The gearbox for the arm.
   private final DCMotor m_gearbox;
 
@@ -53,7 +53,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    */
   @SuppressWarnings("this-escape")
   public SingleJointedArmSim(
-      LinearSystem<N2, N1, N1> plant,
+      LinearSystem<N2, N1, N2> plant,
       DCMotor gearbox,
       double gearing,
       double armLengthMeters,
@@ -165,7 +165,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return The current arm angle.
    */
   public double getAngleRads() {
-    return m_y.get(0, 0);
+    return getOutput(0);
   }
 
   /**
@@ -174,7 +174,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return The current arm velocity.
    */
   public double getVelocityRadPerSec() {
-    return m_x.get(1, 0);
+    return getOutput(1);
   }
 
   /**

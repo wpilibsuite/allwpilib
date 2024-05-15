@@ -9,7 +9,6 @@
 #pragma warning(disable : 4521)
 #endif
 
-#include <concepts>
 #include <limits>
 #include <memory>
 #include <type_traits>
@@ -18,7 +17,6 @@
 
 #include <wpi/DecayedDerivedFrom.h>
 
-#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {

@@ -115,7 +115,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
     // I = V / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
     // 2x faster than the output
-    return m_gearbox.getCurrent(getAngularVelocityRadPerSec() * m_gearing, m_u.get(0, 0))
+    return m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing, m_u.get(0, 0))
         * Math.signum(m_u.get(0, 0));
   }
 

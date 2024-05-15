@@ -57,11 +57,11 @@ class TravelingSalesmanTest {
     // ...................
     var poses =
         new Pose2d[] {
-          new Pose2d(3, 3, new Rotation2d(0)),
-          new Pose2d(11, 5, new Rotation2d(0)),
-          new Pose2d(9, 2, new Rotation2d(0)),
-          new Pose2d(5, 5, new Rotation2d(0)),
-          new Pose2d(14, 3, new Rotation2d(0))
+          new Pose2d(3, 3, Rotation2d.kZero),
+          new Pose2d(11, 5, Rotation2d.kZero),
+          new Pose2d(9, 2, Rotation2d.kZero),
+          new Pose2d(5, 5, Rotation2d.kZero),
+          new Pose2d(14, 3, Rotation2d.kZero)
         };
 
     var traveler = new TravelingSalesman();
@@ -82,16 +82,16 @@ class TravelingSalesmanTest {
     // ...................
     var poses =
         new Pose2d[] {
-          new Pose2d(2, 4, new Rotation2d(0)),
-          new Pose2d(10, 1, new Rotation2d(0)),
-          new Pose2d(12, 1, new Rotation2d(0)),
-          new Pose2d(7, 1, new Rotation2d(0)),
-          new Pose2d(3, 2, new Rotation2d(0)),
-          new Pose2d(9, 5, new Rotation2d(0)),
-          new Pose2d(5, 1, new Rotation2d(0)),
-          new Pose2d(6, 5, new Rotation2d(0)),
-          new Pose2d(13, 5, new Rotation2d(0)),
-          new Pose2d(14, 3, new Rotation2d(0))
+          new Pose2d(2, 4, Rotation2d.kZero),
+          new Pose2d(10, 1, Rotation2d.kZero),
+          new Pose2d(12, 1, Rotation2d.kZero),
+          new Pose2d(7, 1, Rotation2d.kZero),
+          new Pose2d(3, 2, Rotation2d.kZero),
+          new Pose2d(9, 5, Rotation2d.kZero),
+          new Pose2d(5, 1, Rotation2d.kZero),
+          new Pose2d(6, 5, Rotation2d.kZero),
+          new Pose2d(13, 5, Rotation2d.kZero),
+          new Pose2d(14, 3, Rotation2d.kZero)
         };
 
     var traveler = new TravelingSalesman();

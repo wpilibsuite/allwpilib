@@ -5,7 +5,7 @@
 #include <frc/TimedRobot.h>
 #include <frc/Timer.h>
 #include <frc/XboxController.h>
-#include <frc/controller/RamseteController.h>
+#include <frc/controller/LTVUnicycleController.h>
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 
@@ -29,7 +29,7 @@ class Robot : public frc::TimedRobot {
   void AutonomousPeriodic() override {
     auto elapsed = m_timer.Get();
     auto reference = m_trajectory.Sample(elapsed);
-    auto speeds = m_ramsete.Calculate(m_drive.GetPose(), reference);
+    auto speeds = m_feedback.Calculate(m_drive.GetPose(), reference);
     m_drive.Drive(speeds.vx, speeds.omega);
   }
 
@@ -61,7 +61,7 @@ class Robot : public frc::TimedRobot {
 
   Drivetrain m_drive;
   frc::Trajectory m_trajectory;
-  frc::RamseteController m_ramsete;
+  frc::LTVUnicycleController m_feedback{20_ms};
   frc::Timer m_timer;
 };
 
