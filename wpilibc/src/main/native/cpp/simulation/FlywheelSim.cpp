@@ -36,11 +36,12 @@ units::ampere_t FlywheelSim::GetCurrentDraw() const {
   // I = V / R - omega / (Kv * R)
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
-  return m_gearbox.Current(GetAngularVelocity() * m_gearing,
+  return m_gearbox.Current(units::radians_per_second_t{m_x(0)} * m_gearing,
                            units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
 }
 
 void FlywheelSim::SetInputVoltage(units::volt_t voltage) {
   SetInput(Vectord<1>{voltage.value()});
+  ClampInput(frc::RobotController::GetBatteryVoltage().value());
 }

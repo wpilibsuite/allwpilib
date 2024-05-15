@@ -23,6 +23,7 @@
 #include "wpi/StringMap.h"
 #include "wpi/mutex.h"
 #include "wpi/protobuf/Protobuf.h"
+#include "wpi/string.h"
 #include "wpi/struct/Struct.h"
 #include "wpi/timestamp.h"
 
@@ -373,7 +374,7 @@ class DataLog {
    * @param arr String array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void AppendStringArray(int entry, std::span<const WPI_DataLog_String> arr,
+  void AppendStringArray(int entry, std::span<const struct WPI_String> arr,
                          int64_t timestamp);
 
  protected:

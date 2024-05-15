@@ -461,23 +461,25 @@ void DataLogBackgroundWriter::WriterThreadMain(
 extern "C" {
 
 struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter(
-    const char* dir, const char* filename, double period,
-    const char* extraHeader) {
-  return reinterpret_cast<WPI_DataLog*>(
-      new DataLogBackgroundWriter{dir, filename, period, extraHeader});
+    const struct WPI_String* dir, const struct WPI_String* filename,
+    double period, const struct WPI_String* extraHeader) {
+  return reinterpret_cast<WPI_DataLog*>(new DataLogBackgroundWriter{
+      wpi::to_string_view(dir), wpi::to_string_view(filename), period,
+      wpi::to_string_view(extraHeader)});
 }
 
 struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter_Func(
     void (*write)(void* ptr, const uint8_t* data, size_t len), void* ptr,
-    double period, const char* extraHeader) {
+    double period, const struct WPI_String* extraHeader) {
   return reinterpret_cast<WPI_DataLog*>(new DataLogBackgroundWriter{
       [=](auto data) { write(ptr, data.data(), data.size()); }, period,
-      extraHeader});
+      wpi::to_string_view(extraHeader)});
 }
 
-void WPI_DataLog_SetBackgroundWriterFilename(struct WPI_DataLog* datalog,
-                                             const char* filename) {
-  reinterpret_cast<DataLogBackgroundWriter*>(datalog)->SetFilename(filename);
+void WPI_DataLog_SetBackgroundWriterFilename(
+    struct WPI_DataLog* datalog, const struct WPI_String* filename) {
+  reinterpret_cast<DataLogBackgroundWriter*>(datalog)->SetFilename(
+      wpi::to_string_view(filename));
 }
 
 }  // extern "C"

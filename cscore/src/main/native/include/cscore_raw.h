@@ -28,17 +28,17 @@ uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* rawImage,
 uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct WPI_RawFrame* rawImage,
                                     double timeout, CS_Status* status);
 
-CS_Sink CS_CreateRawSink(const char* name, CS_Bool isCv, CS_Status* status);
+CS_Sink CS_CreateRawSink(const struct WPI_String* name, CS_Bool isCv,
+                         CS_Status* status);
 
-CS_Sink CS_CreateRawSinkCallback(const char* name, CS_Bool isCv, void* data,
-                                 void (*processFrame)(void* data,
-                                                      uint64_t time),
-                                 CS_Status* status);
+CS_Sink CS_CreateRawSinkCallback(
+    const struct WPI_String* name, CS_Bool isCv, void* data,
+    void (*processFrame)(void* data, uint64_t time), CS_Status* status);
 
 void CS_PutRawSourceFrame(CS_Source source, const struct WPI_RawFrame* image,
                           CS_Status* status);
 
-CS_Source CS_CreateRawSource(const char* name, CS_Bool isCv,
+CS_Source CS_CreateRawSource(const struct WPI_String* name, CS_Bool isCv,
                              const CS_VideoMode* mode, CS_Status* status);
 /** @} */
 
