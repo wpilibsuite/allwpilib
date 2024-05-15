@@ -27,7 +27,16 @@ class ElevatorSimTest {
 
     var sim =
         new ElevatorSim(
-            DCMotor.getVex775Pro(4), 14.67, 8, 0.75 * 25.4 / 1000.0, 0.0, 3.0, true, 0.0, 0.01, 0.00);
+            DCMotor.getVex775Pro(4),
+            14.67,
+            8,
+            0.75 * 25.4 / 1000.0,
+            0.0,
+            3.0,
+            true,
+            0.0,
+            0.01,
+            0.00);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1)) {
@@ -58,7 +67,16 @@ class ElevatorSimTest {
   void testMinMax() {
     var sim =
         new ElevatorSim(
-            DCMotor.getVex775Pro(4), 14.67, 8.0, 0.75 * 25.4 / 1000.0, 0.0, 1.0, true, 0.0, 0.01, 0.0);
+            DCMotor.getVex775Pro(4),
+            14.67,
+            8.0,
+            0.75 * 25.4 / 1000.0,
+            0.0,
+            1.0,
+            true,
+            0.0,
+            0.01,
+            0.0);
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(0));
