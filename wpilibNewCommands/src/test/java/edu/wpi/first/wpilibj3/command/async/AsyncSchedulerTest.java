@@ -314,6 +314,43 @@ class AsyncSchedulerTest {
     }
   }
 
+  @Test
+  void nestedResourceNestedCommands() {
+    var inner = new HardwareResource("Inner", scheduler);
+    var outer = new HardwareResource("Outer", scheduler) {
+      @Override
+      public Set<HardwareResource> nestedResources() {
+        return Set.of(inner);
+      }
+    };
+
+    var innerRan = new AtomicBoolean(false);
+    var outerRan = new AtomicBoolean(false);
+
+    var innerCommand = inner.run(() -> {
+      innerRan.set(true);
+    }).named("Inner Command");
+
+    var outerCommand = outer.run(() -> {
+      scheduler.scheduleAndWait(innerCommand);
+      outerRan.set(true);
+    }).named("Outer Command");
+
+    scheduler.schedule(outerCommand);
+    // First run: schedules the inner command
+    scheduler.run();
+
+    // Second run: inner command sets the flag and exits
+    scheduler.run();
+    assertTrue(innerRan.get());
+    assertFalse(scheduler.isRunning(innerCommand));
+
+    // Third run: outer command sets the flag and exits
+    scheduler.run();
+    assertTrue(outerRan.get());
+    assertFalse(scheduler.isRunning(outerCommand));
+  }
+
   record PriorityCommand(int priority, HardwareResource... subsystems) implements AsyncCommand {
     @Override
     public void run() {

@@ -2,6 +2,7 @@ package edu.wpi.first.wpilibj3.command.async;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
+import java.util.Set;
 
 public class HardwareResource {
   private final String name;
@@ -48,6 +49,19 @@ public class HardwareResource {
 
   public AsyncCommand idle(Measure<Time> duration) {
     return idle().withTimeout(duration);
+  }
+
+  /**
+   * Gets the set of nested resources encapsulated by this one. For compound mechanisms that need
+   * to have flexible control over individual components, this will allow the scheduler to permit
+   * nested commands to have ownership of just those components and not the entire compound
+   * mechanism. In effect, this will allow default commands to run for the components not directly
+   * used by that nested command.
+   *
+   * @return the nested resources
+   */
+  public Set<HardwareResource> nestedResources() {
+    return Set.of();
   }
 
   @Override

@@ -204,25 +204,30 @@ public class AsyncScheduler {
 
     if (currentCommand != null) {
       // Scheduled by a command.
-      // Instead of checking for conflicts with all running commands (which would include the
-      // parent), we instead need to verify that the scheduled command ONLY uses resources also
-      // used by the parent. Technically, we should also verify that the scheduled command also
-      // does not require any of the same resources as any sibling, either. But that can come later.
-      // TODO: If we allow resources to be nested, do not throw if requiring a nested resource owned
-      //       by a requirement of the parent command. eg if currentCommand = PinkArm.doSomething(),
-      //       allow that command to schedule something that requires PinkArm.pivot even if it
-      //       doesn't directly require the pivot
-      if (!currentCommand.requirements().containsAll(command.requirements())) {
-        var disallowedResources = new LinkedHashSet<>(command.requirements());
-        disallowedResources.removeIf(currentCommand::requires);
-        throw new IllegalStateException(
-            "Nested commands can only require resources used by their parents. "
-                + "Command "
-                + command
-                + " requires these resources that are not used by "
-                + currentCommand
-                + ": "
-                + disallowedResources);
+      // Permit disjoint requirement sets iff every requirement of the scheduled command is a nested
+      // resource under a single requirement of the parent command
+      if (currentCommand
+              .requirements()
+              .stream()
+              .anyMatch(parentReq -> parentReq.nestedResources().containsAll(command.requirements()))) {
+        // Allow
+      } else {
+        // Instead of checking for conflicts with all running commands (which would include the
+        // parent), we instead need to verify that the scheduled command ONLY uses resources also
+        // used by the parent. Technically, we should also verify that the scheduled command also
+        // does not require any of the same resources as any sibling, either. But that can come later.
+        if (!currentCommand.requirements().containsAll(command.requirements())) {
+          var disallowedResources = new LinkedHashSet<>(command.requirements());
+          disallowedResources.removeIf(currentCommand::requires);
+          throw new IllegalStateException(
+              "Nested commands can only require resources used by their parents. "
+                  + "Command "
+                  + command
+                  + " requires these resources that are not used by "
+                  + currentCommand
+                  + ": "
+                  + disallowedResources);
+        }
       }
     }
 
