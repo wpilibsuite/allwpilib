@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * A command composition that runs a set of commands in parallel, ending only when a specific
@@ -21,17 +21,8 @@ import java.util.List;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class ParallelDeadlineGroup extends Command {
-  private static class CommandInfo {
-    private final Command m_command;
-    private boolean m_isRunning;
-
-    private CommandInfo(Command command, boolean isRunning) {
-      m_command = command;
-      m_isRunning = isRunning;
-    }
-  }
-
-  private final List<CommandInfo> m_commandInfo = new ArrayList<>();
+  // maps commands in this composition to whether they are still running
+  private final Map<Command, Boolean> m_commands = new LinkedHashMap<>();
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
   private Command m_deadline;
@@ -65,11 +56,9 @@ public class ParallelDeadlineGroup extends Command {
     if (isAlreadyDeadline) {
       return;
     }
-    for (CommandInfo commandInfo : m_commandInfo) {
-      if (commandInfo.m_command.equals(deadline)) {
-        throw new IllegalArgumentException(
-            "The deadline command cannot also be in the other commands!");
-      }
+    if (m_commands.containsKey(deadline)) {
+      throw new IllegalArgumentException(
+          "The deadline command cannot also be in the other commands!");
     }
     addCommands(deadline);
     m_deadline = deadline;
@@ -93,7 +82,7 @@ public class ParallelDeadlineGroup extends Command {
         throw new IllegalArgumentException(
             "Multiple commands in a parallel group cannot require the same subsystems");
       }
-      m_commandInfo.add(new CommandInfo(command, false));
+      m_commands.put(command, false);
       m_requirements.addAll(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
       if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
@@ -104,24 +93,24 @@ public class ParallelDeadlineGroup extends Command {
 
   @Override
   public final void initialize() {
-    for (CommandInfo commandInfo : m_commandInfo) {
-      commandInfo.m_command.initialize();
-      commandInfo.m_isRunning = true;
+    for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
+      commandRunning.getKey().initialize();
+      commandRunning.setValue(true);
     }
     m_finished = false;
   }
 
   @Override
   public final void execute() {
-    for (CommandInfo commandInfo : m_commandInfo) {
-      if (!commandInfo.m_isRunning) {
+    for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
+      if (!commandRunning.getValue()) {
         continue;
       }
-      commandInfo.m_command.execute();
-      if (commandInfo.m_command.isFinished()) {
-        commandInfo.m_command.end(false);
-        commandInfo.m_isRunning = false;
-        if (commandInfo.m_command.equals(m_deadline)) {
+      commandRunning.getKey().execute();
+      if (commandRunning.getKey().isFinished()) {
+        commandRunning.getKey().end(false);
+        commandRunning.setValue(false);
+        if (commandRunning.getKey().equals(m_deadline)) {
           m_finished = true;
         }
       }
@@ -130,9 +119,9 @@ public class ParallelDeadlineGroup extends Command {
 
   @Override
   public final void end(boolean interrupted) {
-    for (CommandInfo commandInfo : m_commandInfo) {
-      if (commandInfo.m_isRunning) {
-        commandInfo.m_command.end(true);
+    for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
+      if (commandRunning.getValue()) {
+        commandRunning.getKey().end(true);
       }
     }
   }

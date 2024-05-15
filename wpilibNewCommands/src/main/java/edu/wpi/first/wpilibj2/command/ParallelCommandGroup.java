@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * A command composition that runs a set of commands in parallel, ending when the last command ends.
@@ -18,17 +18,8 @@ import java.util.List;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class ParallelCommandGroup extends Command {
-  private static class CommandInfo {
-    private final Command m_command;
-    private boolean m_isRunning;
-
-    private CommandInfo(Command command, boolean isRunning) {
-      m_command = command;
-      m_isRunning = isRunning;
-    }
-  }
-
-  private final List<CommandInfo> m_commandInfo = new ArrayList<>();
+  // maps commands in this composition to whether they are still running
+  private final Map<Command, Boolean> m_commands = new LinkedHashMap<>();
   private boolean m_runWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
@@ -49,11 +40,9 @@ public class ParallelCommandGroup extends Command {
    * @param commands Commands to add to the group.
    */
   public final void addCommands(Command... commands) {
-    for (CommandInfo commandInfo : m_commandInfo) {
-      if (commandInfo.m_isRunning) {
-        throw new IllegalStateException(
-            "Commands cannot be added to a composition while it's running");
-      }
+    if (m_commands.containsValue(true)) {
+      throw new IllegalStateException(
+          "Commands cannot be added to a composition while it's running");
     }
 
     CommandScheduler.getInstance().registerComposedCommands(commands);
@@ -63,7 +52,7 @@ public class ParallelCommandGroup extends Command {
         throw new IllegalArgumentException(
             "Multiple commands in a parallel composition cannot require the same subsystems");
       }
-      m_commandInfo.add(new CommandInfo(command, false));
+      m_commands.put(command, false);
       m_requirements.addAll(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
       if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
@@ -74,22 +63,22 @@ public class ParallelCommandGroup extends Command {
 
   @Override
   public final void initialize() {
-    for (CommandInfo commandInfo : m_commandInfo) {
-      commandInfo.m_command.initialize();
-      commandInfo.m_isRunning = true;
+    for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
+      commandRunning.getKey().initialize();
+      commandRunning.setValue(true);
     }
   }
 
   @Override
   public final void execute() {
-    for (CommandInfo commandInfo : m_commandInfo) {
-      if (!commandInfo.m_isRunning) {
+    for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
+      if (!commandRunning.getValue()) {
         continue;
       }
-      commandInfo.m_command.execute();
-      if (commandInfo.m_command.isFinished()) {
-        commandInfo.m_command.end(false);
-        commandInfo.m_isRunning = false;
+      commandRunning.getKey().execute();
+      if (commandRunning.getKey().isFinished()) {
+        commandRunning.getKey().end(false);
+        commandRunning.setValue(false);
       }
     }
   }
@@ -97,9 +86,9 @@ public class ParallelCommandGroup extends Command {
   @Override
   public final void end(boolean interrupted) {
     if (interrupted) {
-      for (CommandInfo commandInfo : m_commandInfo) {
-        if (commandInfo.m_isRunning) {
-          commandInfo.m_command.end(true);
+      for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
+        if (commandRunning.getValue()) {
+          commandRunning.getKey().end(true);
         }
       }
     }
@@ -107,12 +96,7 @@ public class ParallelCommandGroup extends Command {
 
   @Override
   public final boolean isFinished() {
-    for (CommandInfo commandInfo : m_commandInfo) {
-      if (commandInfo.m_isRunning) {
-        return false;
-      }
-    }
-    return true;
+    return !m_commands.containsValue(true);
   }
 
   @Override
