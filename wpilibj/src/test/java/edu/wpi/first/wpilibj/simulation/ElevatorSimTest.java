@@ -36,7 +36,7 @@ class ElevatorSimTest {
             true,
             0.0,
             0.01,
-            0.00);
+            0.0);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1)) {
