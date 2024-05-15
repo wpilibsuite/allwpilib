@@ -12,17 +12,12 @@ using namespace frc;
 using namespace frc::sim;
 
 FlywheelSim::FlywheelSim(const LinearSystem<1, 1, 1>& plant,
-                         const DCMotor& gearbox, double gearing,
+                         const DCMotor& gearbox,
                          const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim<1, 1, 1>(plant, measurementStdDevs),
       m_gearbox(gearbox),
-      m_gearing(gearing) {}
-
-FlywheelSim::FlywheelSim(const DCMotor& gearbox, double gearing,
-                         units::kilogram_square_meter_t moi,
-                         const std::array<double, 1>& measurementStdDevs)
-    : FlywheelSim(LinearSystemId::FlywheelSystem(gearbox, moi, gearing),
-                  gearbox, gearing, measurementStdDevs) {}
+      m_gearing(gearbox.Kt.value() * m_plant.A(0,0) / m_plant.B(0,0)),
+      m_j(m_gearing * gearbox.Kt.value() / (gearbox.R.value() * m_plant.B(0, 0))) {}
 
 void FlywheelSim::SetState(units::radians_per_second_t velocity) {
   LinearSystemSim::SetState(Vectord<1>{velocity.value()});
@@ -39,6 +34,10 @@ units::ampere_t FlywheelSim::GetCurrentDraw() const {
   return m_gearbox.Current(units::radians_per_second_t{m_x(0)} * m_gearing,
                            units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
+}
+
+units::volt_t FlywheelSim::GetInputVoltage() const {
+  return units::volt_t{GetInput(0)};
 }
 
 void FlywheelSim::SetInputVoltage(units::volt_t voltage) {

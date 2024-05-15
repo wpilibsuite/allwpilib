@@ -4,58 +4,50 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism. */
 public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   // Gearbox for the flywheel.
-  private final DCMotor m_gearbox;
+  public final DCMotor m_gearbox;
 
   // The gearing from the motors to the output.
-  private final double m_gearing;
+  public final double m_gearing;
+
+  // The moment of inertia for the flywheel mechanism.
+  public final double m_jKgMetersSquared;
+
+  // The angular velocity of the system.
+  private final MutableMeasure<Velocity<Angle>> m_angularVelocity =
+      MutableMeasure.zero(RadiansPerSecond);
 
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant The linear system that represents the flywheel.
+   * @param plant The linear system that represents the flywheel. Use either {@link
+   *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants
+   *     or {@link LinearSystemId#identifyVelocitySystem(kV, kA)} if using system characterization.
    * @param gearbox The type of and number of motors in the flywheel gearbox.
-   * @param gearing The gearing of the flywheel (numbers greater than 1 represent reductions).
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for velocity.
    */
   public FlywheelSim(
-      LinearSystem<N1, N1, N1> plant,
-      DCMotor gearbox,
-      double gearing,
-      double... measurementStdDevs) {
+      LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
-    m_gearing = gearing;
-  }
-
-  /**
-   * Creates a simulated flywheel mechanism.
-   *
-   * @param gearbox The type of and number of motors in the flywheel gearbox.
-   * @param gearing The gearing of the flywheel (numbers greater than 1 represent reductions).
-   * @param jKgMetersSquared The moment of inertia of the flywheel. If this is unknown, use the
-   *     {@link #FlywheelSim(LinearSystem, DCMotor, double, double...)} constructor.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for velocity.
-   */
-  public FlywheelSim(
-      DCMotor gearbox, double gearing, double jKgMetersSquared, double... measurementStdDevs) {
-    super(
-        LinearSystemId.createFlywheelSystem(gearbox, jKgMetersSquared, gearing),
-        measurementStdDevs);
-    m_gearbox = gearbox;
-    m_gearing = gearing;
+    m_gearing = gearbox.KtNMPerAmp * plant.getA(0, 0) / plant.getB(0, 0);
+    m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(0, 0));
   }
 
   /**
@@ -73,7 +65,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel velocity.
    */
   public double getAngularVelocityRadPerSec() {
-    return getOutput(0);
+    return m_angularVelocity.in(RadiansPerSecond);
   }
 
   /**
@@ -82,7 +74,16 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel velocity in RPM.
    */
   public double getAngularVelocityRPM() {
-    return Units.radiansPerSecondToRotationsPerMinute(getOutput(0));
+    return m_angularVelocity.in(RPM);
+  }
+
+  /**
+   * Returns the flywheel velocity.
+   *
+   * @return The flywheel velocity
+   */
+  public Measure<Velocity<Angle>> getAngularVelocity() {
+    return m_angularVelocity;
   }
 
   /**
@@ -94,8 +95,17 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
     // I = V / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
     // 2x faster than the flywheel
-    return m_gearbox.getCurrent(getAngularVelocityRadPerSec() * m_gearing, m_u.get(0, 0))
+    return m_gearbox.getCurrent(m_x.get(0, 0) * m_gearing, m_u.get(0, 0))
         * Math.signum(m_u.get(0, 0));
+  }
+
+  /**
+   * Gets the input voltage for the flywheel.
+   *
+   * @return The flywheel input voltage.
+   */
+  public double getInputVoltage() {
+    return getInput(0);
   }
 
   /**
@@ -106,5 +116,11 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   public void setInputVoltage(double volts) {
     setInput(volts);
     clampInput(RobotController.getBatteryVoltage());
+  }
+
+  @Override
+  public void update(double dtSeconds) {
+    super.update(dtSeconds);
+    m_angularVelocity.mut_setMagnitude(getOutput(0));
   }
 }

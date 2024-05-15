@@ -92,8 +92,8 @@ class Robot : public frc::TimedRobot {
   static constexpr units::kilogram_square_meter_t kFlywheelMomentOfInertia =
       0.5 * 1.5_lb * 4_in * 4_in;
 
-  frc::sim::FlywheelSim m_flywheelSim{frc::DCMotor::NEO(1), kFlywheelGearing,
-                                      kFlywheelMomentOfInertia};
+  frc::sim::FlywheelSim m_flywheelSim{frc::LinearSystemId::FlywheelSystem(frc::DCMotor::NEO(1), kFlywheelMomentOfInertia,
+                                      kFlywheelGearing), frc::DCMotor::NEO(1)};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 };
 
