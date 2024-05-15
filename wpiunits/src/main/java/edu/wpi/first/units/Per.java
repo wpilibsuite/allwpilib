@@ -109,6 +109,15 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
     return m_denominator;
   }
 
+  /**
+   * Returns the reciprocal of this Per.
+   *
+   * @return the reciprocal
+   */
+  public Per<D, N> reciprocal() {
+    return m_denominator.per(m_numerator);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
