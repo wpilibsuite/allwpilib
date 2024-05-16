@@ -4,11 +4,13 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.util.Color;
+import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Color;
+import frc.robot.LEDPattern;
 
 public class IntakeSubsystem extends SubsystemBase {
   private final RobotSignals robotSignals;
@@ -22,7 +24,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public Command gamePieceAcquired() {
-    Color gamePieceAcquiredSignal = new Color(1., 1., 1.);
+    LEDPattern gamePieceAcquiredSignal = LEDPattern.solid(Color.kMagenta).blink(Seconds.of(0.2));
     return
       robotSignals.Main.setSignal(gamePieceAcquiredSignal) // this command locks the robotSignals.Main subsystem only
         .ignoringDisable(true)

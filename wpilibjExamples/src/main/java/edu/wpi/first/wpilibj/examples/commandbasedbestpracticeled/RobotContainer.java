@@ -4,27 +4,34 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.RobotSignals;
+import frc.robot.subsystems.RobotSignals.LEDPatternSupplier;
 import frc.robot.subsystems.TargetVisionSubsystem;
 
 public class RobotContainer {
 
-  boolean log = false;
+  boolean log = false; // switch command logging on/off; a lot of output for the command execute methods
   int operatorControllerPort = 0; 
   private final CommandXboxController operatorController = new CommandXboxController(operatorControllerPort);
   private final IntakeSubsystem intake;
   private final TargetVisionSubsystem vision;
 
   private final RobotSignals robotSignals;
+  private final LEDPattern TopDefaultSignal = LEDPattern.solid(new Color(0., 0., 1.));
+  private final LEDPattern MainDefaultSignal = LEDPattern.solid(new Color(0., 1., 1.));
+  private final LEDPattern disabled = LEDPattern.solid(Color.kRed).breathe(Seconds.of(2));
+  private final LEDPattern enabled = LEDPattern.solid(Color.kGreen).breathe(Seconds.of(2));
+  private final LEDPatternSupplier EnableDisableDefaultSignal = () -> (DriverStation.isDisabled() ? disabled : enabled);
 
   public RobotContainer(PeriodicTask periodicTask) {
     robotSignals = new RobotSignals(1, periodicTask);
@@ -32,23 +39,54 @@ public class RobotContainer {
     vision = new TargetVisionSubsystem(robotSignals, operatorController);
 
     configureBindings();
+    configureDefaultCommands();
 
     if(log) configureLogging();
   }
 
+  /**
+   * configure driver and operator controllers buttons
+   */
   private void configureBindings() {
     operatorController.x().debounce(0.04, DebounceType.kBoth)
       .onTrue(robotSignals.Top.setSignal(colorWheel()));
   }
 
-  private RobotSignals.ColorSupplier colorWheel() {
+  /**
+   * Test "rainbow" supplier
+   * @return
+   */
+  private RobotSignals.LEDPatternSupplier colorWheel() {
     // produce a color based on the timer current seconds of the minute
-    return ()->Color.fromHSV((int)(Timer.getFPGATimestamp()%60./*seconds of the minute*/)*3/*scale seconds to 180 hues per color wheel*/, 200, 200);
+    return ()->LEDPattern.solid(
+      Color.fromHSV((int)(Timer.getFPGATimestamp()%60./*seconds of the minute*/)*3/*scale seconds to 180 hues per color wheel*/,
+       200, 200));
   }
 
+  /**
+   * Configure the LED Signal Views Default Commands 
+   */
+  private void configureDefaultCommands() {
+
+    final Command TopDefault = robotSignals.Top.setSignal(TopDefaultSignal)
+                                .ignoringDisable(true).withName("TopDefault");
+    final Command MainDefault = robotSignals.Main.setSignal(MainDefaultSignal)
+                                .ignoringDisable(true).withName("MainDefault");
+    final Command EnableDisableDefault = robotSignals.EnableDisable.setSignal(EnableDisableDefaultSignal)
+                                .ignoringDisable(true).withName("EnableDisableDefault");
+
+    robotSignals.Top.setDefaultCommand(TopDefault);
+    robotSignals.Main.setDefaultCommand(MainDefault);
+    robotSignals.EnableDisable.setDefaultCommand(EnableDisableDefault);
+  }
+
+  /**
+   * Create a command to run in Autonomous
+   * @return
+   */
   public Command getAutonomousCommand() {
-    Color autoTopSignal = new Color(0.2, 0.6, 0.2);
-    Color autoMainSignal = new Color(0.4, 0.9, 0.4);
+    LEDPattern autoTopSignal = LEDPattern.solid(new Color(0.2, 0.6, 0.2));
+    LEDPattern autoMainSignal = LEDPattern.solid(new Color(0.4, 0.9, 0.4));
     return
       parallel // interrupting either of the two parallel commands with an external command interupts the group
       (
@@ -63,6 +101,9 @@ public class RobotContainer {
       .withName("AutoSignal");
     }
 
+  /**
+   * Configure Command logging
+   */
   private void configureLogging() {
     //_________________________________________________________________________________
     CommandScheduler.getInstance()
@@ -99,22 +140,3 @@ public class RobotContainer {
     //_________________________________________________________________________________
   }
 }
-
-
-
-/* Parking Lot
-  private final LEDPattern disabled = LEDPattern.solid(Color.kRed).breathe(Seconds.of(2));
-  private final LEDPattern enabled = LEDPattern.solid(Color.kGreen).breathe(Seconds.of(2));
-  private final LEDPattern defaultPattern = () -> (DriverStation.isDisabled() ? disabled : enabled).applyTo();
-  private final LEDPattern blink = LEDPattern.solid(Color.kMagenta).blink(Seconds.of(0.2));
-  private final LEDPattern orange = LEDPattern.solid(Color.kOrange);
-
-  ledTop.setDefaultCommand(ledTop.runPattern(defaultPattern).ignoringDisable(true).withName("LedDefaultTop"));
-  ledMain.setDefaultCommand(ledMain.runPattern(defaultPattern).ignoringDisable(true).withName("LedDefaultMain"));
-
-  intake.gamePieceAcquired.onTrue(
-    ledMain.runPattern(blink).withTimeout(1.0).withName("LedAcquiredGamePiece"));
-
-  vision.targetAcquired.whileTrue(
-    ledTop.runPattern(orange).withName("LedVisionTargetInSight"));
-*/

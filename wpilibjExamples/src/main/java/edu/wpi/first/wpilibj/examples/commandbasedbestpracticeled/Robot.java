@@ -24,6 +24,9 @@
  * Overloading method parameter types
  * No commands with the word Command in the name
  * No triggers with the word Trigger in the name
+ * Supplier of dynamic LED pattern
+ * Static LED pattern
+ * Restrict Subsystem Default Command to none until set once at any time and then unchangeable
  * 
  * There is some unused code and commented out code anticipating extensions to the WPILib addressable LED class.
  * This example program runs in real or simulated mode of the 2024 WPILib.
@@ -37,6 +40,7 @@
  * Xbox controller "B" while pressed indicates game piece acquired
  * Default command for "Top" is magenta
  * Default command for "Main" is cyan
+ * Default command for EnableDisable signal enable
  * Auto command "Top" is medium green
  * Auto command "Main" is light green
  * Intake game piece acquired "Main" is white
@@ -45,6 +49,7 @@
  * All commands are interruptible.
  * Loop speed is optionally slow (commented out Robot constructor code)
  * Button "X" presses are debounced
+ * 
  * 
  */
 package frc.robot;
@@ -82,7 +87,8 @@ public class Robot extends TimedRobot {
   public void disabledExit() {}
 
   @Override
-  public void autonomousInit() { // commands running from another mode haven't been cancelled
+  public void autonomousInit() {
+    // commands running from another mode haven't been cancelled directly but may be interrupted by this command
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -94,10 +100,14 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+       if (m_autonomousCommand != null) {
+      m_autonomousCommand.cancel();
+    }
+  }
 
   @Override
-  public void teleopInit() { // commands running from another mode haven't been cancelled except the one below
+  public void teleopInit() { // commands running from another mode haven't been cancelled directly except the one below
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

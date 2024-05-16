@@ -4,12 +4,13 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Color;
+import frc.robot.LEDPattern;
 
 public class TargetVisionSubsystem extends SubsystemBase {
   private final RobotSignals robotSignals;
@@ -23,14 +24,14 @@ public class TargetVisionSubsystem extends SubsystemBase {
   }
   
   public Command targetAcquired() {
-    Color targetAcquiredSignal = new Color(0., 1., 0.);
+    LEDPattern targetAcquiredSignal = LEDPattern.solid(Color.kOrange);
     return
       /*sequential*/
       robotSignals.Top.setSignal(targetAcquiredSignal) // this command locks the robotSignals.Top subsystem only
       /*sequential*/
       .andThen(Commands.idle(this).withTimeout(0.)) // command created in this subsystem will lock this subsystem also
       /*composite*/
-        .withName("TopTargetAcquiredSignal")
+        .withName("LedVisionTargetInSight")
         .ignoringDisable(true); // ignore disable true must be here on the composite; on the first command doesn't do anything
   }
 
