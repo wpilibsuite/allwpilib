@@ -210,7 +210,7 @@ void CommandScheduler::Run() {
   m_impl->inRunLoop = true;
   bool isDisabled = frc::RobotState::IsDisabled();
   // Run scheduled commands, remove finished commands.
-  auto toRemove = std::vector<Command*>(m_impl->scheduledCommands.size());
+  wpi::SmallVector<Command*, 10> toRemove;
   for (Command* command : m_impl->scheduledCommands) {
     if (isDisabled && !command->RunsWhenDisabled()) {
       Cancel(command, std::nullopt);
