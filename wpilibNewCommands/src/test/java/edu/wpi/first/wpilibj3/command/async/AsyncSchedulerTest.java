@@ -239,7 +239,7 @@ class AsyncSchedulerTest {
         count.incrementAndGet();
         scheduler.yield();
       }
-    }).suspendingOnInterrupt().named("Default Command");
+    }).suspendingOnInterrupt().withPriority(-1).named("Default Command");
 
     var newerCmd = resource.run(() -> {
     }).named("Newer Command");

@@ -9,6 +9,8 @@ public class HardwareResource {
 
   private final AsyncScheduler registeredScheduler;
 
+  private AsyncCommand defaultCommand = new IdleCommand(this);
+
   public HardwareResource(String name) {
     this(name, AsyncScheduler.getInstance());
   }
@@ -26,9 +28,9 @@ public class HardwareResource {
   /**
    * Sets the default command to run on the resource when no other command is scheduled. The default
    * command's priority is effectively the minimum allowable priority for any command requiring a
-   * resource. For this reason, it's recommended that a default command have a priority no greater
-   * than {@link AsyncCommand#DEFAULT_PRIORITY} to prevent it from blocking other, non-default
-   * commands from running.
+   * resource. For this reason, it's required that a default command have a priority less than
+   * {@link AsyncCommand#DEFAULT_PRIORITY} to prevent it from blocking other, non-default commands
+   * from running.
    *
    * <p>The default command is initially an idle command that merely parks the execution thread.
    * This command has the lowest possible priority so as to allow any other command to run.
@@ -36,7 +38,12 @@ public class HardwareResource {
    * @param defaultCommand the new default command
    */
   public void setDefaultCommand(AsyncCommand defaultCommand) {
-    registeredScheduler.setDefaultCommand(this, defaultCommand);
+    this.defaultCommand = defaultCommand;
+    registeredScheduler.scheduleAsDefaultCommand(this, defaultCommand);
+  }
+
+  public AsyncCommand getDefaultCommand() {
+    return defaultCommand;
   }
 
   public AsyncCommandBuilder run(Runnable command) {

@@ -100,34 +100,28 @@ public class AsyncScheduler {
   }
 
   /**
-   * Registers a resource with the scheduler and assigns it a default idle command.
-   * @param resource the resource to schedule
+   * Registers a resource with the scheduler and schedules its default command.
+   * @param resource the resource to register
    */
   public void registerResource(HardwareResource resource) {
-    registerResource(resource, new IdleCommand(resource));
-  }
-
-  /**
-   * Registers a resource with the scheduler and its default command.
-   *
-   * @param resource the resource to schedule
-   * @param defaultCommand the default command to use for the resource
-   */
-  public void registerResource(HardwareResource resource, AsyncCommand defaultCommand) {
     registeredResources.add(resource);
-    setDefaultCommand(resource, defaultCommand);
+    if (resource.getDefaultCommand() instanceof AsyncCommand defaultCommand) {
+      scheduleAsDefaultCommand(resource, defaultCommand);
+    }
   }
 
   /**
    * Sets the default command for a resource. The command must require the resource, and cannot
-   * require any others. A default command will run if no other commands are scheduled to use its
-   * resource.
+   * require any others. Default commands must
+   * {@link AsyncCommand.InterruptBehavior#SuspendOnInterrupt suspend on interrupt} and have a lower
+   * priority than {@link AsyncCommand#DEFAULT_PRIORITY} to function properly.
    *
    * @param resource the resource for which to set the default command
    * @param defaultCommand the default command to execute on the resource
-   * @throws IllegalArgumentException if the command does not require only the give resource
+   * @throws IllegalArgumentException if the command does not meet the requirements for being a
+   *    default command
    */
-  public void setDefaultCommand(HardwareResource resource, AsyncCommand defaultCommand) {
+  public void scheduleAsDefaultCommand(HardwareResource resource, AsyncCommand defaultCommand) {
     if (!defaultCommand.requires(resource)) {
       throw new IllegalArgumentException("A resource's default command must require that resource");
     }
@@ -139,7 +133,11 @@ public class AsyncScheduler {
 
     if (defaultCommand.interruptBehavior() != SuspendOnInterrupt) {
       throw new IllegalArgumentException(
-          "Default commands have interrupt behavior set to SuspendOnInterrupt");
+          "Default commands must have interrupt behavior set to SuspendOnInterrupt");
+    }
+
+    if (defaultCommand.priority() >= AsyncCommand.DEFAULT_PRIORITY) {
+      throw new IllegalArgumentException("Default commands must be low priority");
     }
 
     schedule(defaultCommand);
@@ -432,6 +430,19 @@ public class AsyncScheduler {
         suspendedStates.remove(suspendedState);
       }
       // TODO: Early exit once every resource has a scheduled or running command
+    }
+
+    // Schedule the default commands for every resource that doesn't currently have a running or
+    // scheduled command.
+    for (var resource : registeredResources) {
+      if (commandStates.keySet().stream().noneMatch(c -> c.requires(resource))
+              && onDeck.stream().noneMatch(c -> c.command().requires(resource))) {
+        // Nothing currently running or scheduled
+        // Schedule the resource's default command, if it has one
+        if (resource.getDefaultCommand() instanceof AsyncCommand defaultCommand) {
+          schedule(defaultCommand);
+        }
+      }
     }
   }
 
