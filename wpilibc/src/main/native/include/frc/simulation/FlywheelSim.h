@@ -22,13 +22,13 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *
    * @param plant              The linear system representing the flywheel. This
    *                           system can be created with
-   *                           LinearSystemId::FlywheelSystem() or LinearSystemId::IdentifyVelocitySystem().
+   *                           LinearSystemId::FlywheelSystem() or
+   * LinearSystemId::IdentifyVelocitySystem().
    * @param gearbox            The type of and number of motors in the flywheel
    *                           gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  FlywheelSim(const LinearSystem<1, 1, 1>& plant,
-              const DCMotor& gearbox,
+  FlywheelSim(const LinearSystem<1, 1, 1>& plant, const DCMotor& gearbox,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   using LinearSystemSim::SetState;
@@ -71,18 +71,17 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   /**
    * Returns the gearbox.
    */
-  DCMotor Gearbox() const {return m_gearbox;}
+  DCMotor Gearbox() const { return m_gearbox; }
 
   /**
    * Returns the gearing;
    */
-  double Gearing() const {return m_gearing;}
+  double Gearing() const { return m_gearing; }
 
   /**
-   * Returns the moment of inertia 
+   * Returns the moment of inertia
    */
-  units::kilogram_square_meter_t J() const {return m_j;}
- 
+  units::kilogram_square_meter_t J() const { return m_j; }
 
  private:
   DCMotor m_gearbox;

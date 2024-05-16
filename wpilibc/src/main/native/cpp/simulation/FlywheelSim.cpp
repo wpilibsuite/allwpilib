@@ -16,8 +16,9 @@ FlywheelSim::FlywheelSim(const LinearSystem<1, 1, 1>& plant,
                          const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim<1, 1, 1>(plant, measurementStdDevs),
       m_gearbox(gearbox),
-      m_gearing(gearbox.Kt.value() * m_plant.A(0,0) / m_plant.B(0,0)),
-      m_j(m_gearing * gearbox.Kt.value() / (gearbox.R.value() * m_plant.B(0, 0))) {}
+      m_gearing(gearbox.Kt.value() * m_plant.A(0, 0) / m_plant.B(0, 0)),
+      m_j(m_gearing * gearbox.Kt.value() /
+          (gearbox.R.value() * m_plant.B(0, 0))) {}
 
 void FlywheelSim::SetState(units::radians_per_second_t velocity) {
   LinearSystemSim::SetState(Vectord<1>{velocity.value()});
