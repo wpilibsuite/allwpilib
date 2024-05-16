@@ -20,13 +20,13 @@ import edu.wpi.first.wpilibj.RobotController;
 /** Represents a simulated flywheel mechanism. */
 public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   // Gearbox for the flywheel.
-  public final DCMotor m_gearbox;
+  private final DCMotor m_gearbox;
 
   // The gearing from the motors to the output.
-  public final double m_gearing;
+  private final double m_gearing;
 
   // The moment of inertia for the flywheel mechanism.
-  public final double m_jKgMetersSquared;
+  private final double m_jKgMetersSquared;
 
   // The angular velocity of the system.
   private final MutableMeasure<Velocity<Angle>> m_angularVelocity =
@@ -37,7 +37,8 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @param plant The linear system that represents the flywheel. Use either {@link
    *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants
-   *     or {@link LinearSystemId#identifyVelocitySystem(kV, kA)} if using system characterization.
+   *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
+   *     characterization.
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for velocity.
@@ -60,11 +61,39 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   }
 
   /**
+   * Returns the gear ratio of the flywheel.
+   *
+   * @return the flywheel's gear ratio.
+   */
+  public double getGearing() {
+    return m_gearing;
+  }
+
+  /**
+   * Returns the moment of inertia in kilograms meters squared.
+   *
+   * @return The flywheel's moment of inertia.
+   */
+  public double getJKgMetersSquared() {
+    return m_jKgMetersSquared;
+  }
+
+  /**
+   * Returns the gearbox for the flywheel.
+   *
+   * @return The flywheel's gearbox.
+   */
+  public DCMotor getGearBox() {
+    return m_gearbox;
+  }
+
+  /**
    * Returns the flywheel velocity.
    *
    * @return The flywheel velocity.
    */
   public double getAngularVelocityRadPerSec() {
+    m_angularVelocity.mut_setMagnitude(getOutput(0));
     return m_angularVelocity.in(RadiansPerSecond);
   }
 
@@ -116,11 +145,5 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   public void setInputVoltage(double volts) {
     setInput(volts);
     clampInput(RobotController.getBatteryVoltage());
-  }
-
-  @Override
-  public void update(double dtSeconds) {
-    super.update(dtSeconds);
-    m_angularVelocity.mut_setMagnitude(getOutput(0));
   }
 }
