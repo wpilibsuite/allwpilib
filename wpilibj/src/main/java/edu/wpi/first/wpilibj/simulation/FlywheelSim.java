@@ -16,6 +16,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated flywheel mechanism. */
 public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
