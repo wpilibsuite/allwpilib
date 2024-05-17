@@ -67,7 +67,7 @@ class LinearSystemIDTest {
 
   @Test
   void testDCMotorSystem() {
-    var model = LinearSystemId.createDCMotorSystem(DCMotor.getNEO(2), 0.00032, 1.0);
+    var model = LinearSystemId.createAngularSystem(DCMotor.getNEO(2), 0.00032, 1.0);
     assertTrue(
         model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -26.87032), 0.001));
 

@@ -55,7 +55,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   public DCMotorSim(
       DCMotor gearbox, double gearing, double jKgMetersSquared, double... measurementStdDevs) {
     super(
-        LinearSystemId.createDCMotorSystem(gearbox, jKgMetersSquared, gearing), measurementStdDevs);
+        LinearSystemId.createAngularSystem(gearbox, jKgMetersSquared, gearing), measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
   }

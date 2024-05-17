@@ -87,9 +87,9 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a DC motor system. The states of the system are [angular
-   * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
-   * velocity].
+   * Create a state-space model of a mechanism controlled by a DC motor system. The states of the
+   * system are [angular position, angular velocity], inputs are [voltage], and outputs are [angular
+   * position, angular velocity].
    *
    * @param motor The motor (or gearbox) attached to system.
    * @param JKgMetersSquared The moment of inertia J of the DC motor.
@@ -97,7 +97,7 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;= 0.
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorSystem(
+  public static LinearSystem<N2, N1, N2> createAngularSystem(
       DCMotor motor, double JKgMetersSquared, double gearing) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
@@ -123,24 +123,24 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a DC motor system. The states of the system are [angular
-   * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
-   * velocity].
+   * Create a state-space model of a mechanism controlled by a DC motor system. The states of the
+   * system are [angular position, angular velocity], inputs are [voltage], and outputs are [angular
+   * position, angular velocity].
    *
-   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
+   * <p>The distance unit you choose MUST be radians). You can use the {@link
+   * edu.wpi.first.math.util.Units} class for converting between unit types.
    *
    * <p>The parameters provided by the user are from this feedforward model:
    *
    * <p>u = K_v v + K_a a
    *
-   * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec²)
+   * @param kV The velocity gain, in volts/(radians/sec)
+   * @param kA The acceleration gain, in volts/(radians/sec²)
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
+  public static LinearSystem<N2, N1, N2> createAngularSystem(double kV, double kA) {
     if (kV < 0.0) {
       throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
     }

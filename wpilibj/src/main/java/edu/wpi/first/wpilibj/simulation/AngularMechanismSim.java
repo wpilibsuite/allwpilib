@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.simulation;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
@@ -15,6 +16,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.RobotController;
@@ -31,31 +33,54 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
   private final MutableMeasure<Angle> m_angle = MutableMeasure.zero(Radians);
 
   // The angular velocity of the system.
-  private final MutableMeasure<Velocity<Angle>> m_angularVelocity = MutableMeasure.zero(RadiansPerSecond);
+  private final MutableMeasure<Velocity<Angle>> m_angularVelocity =
+      MutableMeasure.zero(RadiansPerSecond);
+
+  // The angular acceleration of the system.
+  private final MutableMeasure<Velocity<Velocity<Angle>>> m_angularAcceleration =
+      MutableMeasure.zero(RadiansPerSecondPerSecond);
 
   // The mechanism's plant
   private final LinearSystem<N2, N1, N2> m_plant;
 
   /**
    * Creates a simulated angular mechanism.
-   * <p> Note that gravitational effects are not included in this model.  
    *
-   * @param plant The linear system representing the angular mechanism.  Use either {@link
-   * LinearSystemId#createDCMotorSystem(DCMotor, double, double)} if using physical constants or {@link LinearSystemId#identifyPositionSystem(double, double)}
-   * if using system characterization. 
+   * <p>Note that gravitational effects are not included in this model.
+   *
+   * @param plant The linear system representing the angular mechanism. Use either {@link
+   *     LinearSystemId#createAngularSystem(DCMotor, double, double)} if using physical constants or
+   *     {@link LinearSystemId#identifyPositionSystem(double, double)} if using system
+   *     characterization.
    * @param gearbox The type of and number of motors in the mechanism's gearbox.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
   public AngularMechanismSim(
-      LinearSystem<N2, N1, N2> plant,
-      DCMotor gearbox,
-      double... measurementStdDevs) {
+      LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearbox.KtNMPerAmp * plant.getA(1, 1) / plant.getB(1, 0);
     m_plant = plant;
+  }
+
+  /**
+   * Returns the gear ratio of the mechanism.
+   *
+   * @return the mechanism's gear ratio
+   */
+  public double getGearing() {
+    return m_gearing;
+  }
+
+  /**
+   * Returns the moment of inertia in kilograms meters squared.
+   *
+   * @return The mechanisms's moment of inertia.
+   */
+  public double getJKgMetersSquared() {
+    return m_gearing * m_gearbox.KtNMPerAmp / (m_gearbox.rOhms * m_plant.getB(0, 0));
   }
 
   /**
@@ -73,50 +98,107 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @param angularPositionRad The new position in radians.
    */
-    public void setState(double angularPositionRad) {
-     setState(VecBuilder.fill(angularPositionRad, m_x.get(1, 0)));
+  public void setPosition(double angularPositionRad) {
+    setState(VecBuilder.fill(angularPositionRad, m_x.get(1, 0)));
   }
 
   /**
-   * Returns the DC motor position.
+   * Sets the velocity of the mechanism.
    *
-   * @return The DC motor position.
+   * @param angularVelocityRadPerSec The new velocity in radians per second.
+   */
+  public void setVelocity(double angularVelocityRadPerSec) {
+    setState(VecBuilder.fill(m_x.get(0, 0), angularVelocityRadPerSec));
+  }
+
+  /**
+   * Returns the position of the mechanism in radians.
+   *
+   * @return The mechanism's position in radians.
    */
   public double getAngularPositionRad() {
     return getOutput(0);
   }
 
   /**
-   * Returns the DC motor position in rotations.
+   * Returns the position of the mechanism in rotations.
    *
-   * @return The DC motor position in rotations.
+   * @return The mechanism's position in rotations.
    */
   public double getAngularPositionRotations() {
     return Units.radiansToRotations(getAngularPositionRad());
   }
 
   /**
-   * Returns the DC motor velocity.
+   * Returns the position of the mechanism.
    *
-   * @return The DC motor velocity.
+   * @return The mechanism's position
+   */
+  public Measure<Angle> getAngularPosition() {
+    m_angle.mut_setMagnitude(getAngularPositionRad());
+    return m_angle;
+  }
+
+  /**
+   * Returns the velocity of the mechanism in radians per second.
+   *
+   * @return The mechanism's velocity in radians per second.
    */
   public double getAngularVelocityRadPerSec() {
     return getOutput(1);
   }
 
   /**
-   * Returns the DC motor velocity in RPM.
+   * Returns the velocity of the mechanism in RPM.
    *
-   * @return The DC motor velocity in RPM.
+   * @return The mechanism's velocity in RPM.
    */
   public double getAngularVelocityRPM() {
     return Units.radiansPerSecondToRotationsPerMinute(getAngularVelocityRadPerSec());
   }
 
   /**
-   * Returns the DC motor current draw.
+   * Returns the velocity of the mechanism.
    *
-   * @return The DC motor current draw.
+   * @return The mechanism's velocity.
+   */
+  public Measure<Velocity<Angle>> getAngularVelocity() {
+    m_angularVelocity.mut_setMagnitude(getAngularPositionRad());
+    return m_angularVelocity;
+  }
+
+  /**
+   * Returns the acceleration of the mechanism in radians per second squared.
+   *
+   * @return the mechanism's acceleration in radians per second squared.
+   */
+  public double getAngularAccelerationRadPerSecSq() {
+    return m_gearbox.KtNMPerAmp * getCurrentDrawAmps() / getJKgMetersSquared();
+  }
+
+  /**
+   * Returns the acceleration of the mechanism.
+   *
+   * @return the mechanism's acceleration.
+   */
+  public Measure<Velocity<Velocity<Angle>>> getAngularAcceleration() {
+    m_angularAcceleration.mut_setMagnitude(getAngularAccelerationRadPerSecSq());
+    return m_angularAcceleration;
+  }
+
+  /**
+   * Returns the mechanism's torque in Newton-Meters.
+   *
+   * @return The mechanism's torque in Newton-Meters.
+   */
+  public double getTorqueNewtonMeters() {
+    return getAngularAccelerationRadPerSecSq() * getJKgMetersSquared();
+  }
+
+  /**
+   * Returns the mechanism's DC motor current draw.
+   *
+   * @return The mechanism's DC motor current draw.
    */
   public double getCurrentDrawAmps() {
     // I = V / R - omega / (Kv * R)
@@ -127,7 +209,7 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the input voltage for the DC motor.
+   * Sets the input voltage for the mechanism's DC motor.
    *
    * @param volts The input voltage.
    */
