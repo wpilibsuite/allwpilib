@@ -218,7 +218,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
                                               double gearing);
 
   /**
-   * Create a state-space model of a DC motor system. The states of the system
+   * Create a state-space model of a mechanism controlled by a DC motor system. The states of the system
    * are [angular position, angular velocity], inputs are [voltage], and outputs
    * are [angular position, angular velocity].
    *
@@ -229,18 +229,18 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @see <a
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  static LinearSystem<2, 1, 2> DCMotorSystem(DCMotor motor,
+  static LinearSystem<2, 1, 2> CreateAngularSystem(DCMotor motor,
                                              units::kilogram_square_meter_t J,
                                              double gearing);
 
   /**
-   * Create a state-space model of a DC motor system from its kV
-   * (volts/(unit/sec)) and kA (volts/(unit/sec²)). These constants can be
+   * Create a state-space model of a mechanism controlled by a DC motor system from its kV
+   * (volts/(radians/sec)) and kA (volts/(radians/sec²)). These constants can be
    * found using SysId. the states of the system are [position, velocity],
    * inputs are [voltage], and outputs are [position].
    *
-   * You MUST use an SI unit (i.e. meters or radians) for the Distance template
-   * argument. You may still use non-SI units (such as feet or inches) for the
+   * You MUST use radians for the Distance template
+   * argument. You may still use non-SI units (such as degreess or rotations) for the
    * actual method arguments; they will automatically be converted to SI
    * internally.
    *
@@ -248,15 +248,14 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * u = K_v v + K_a a
    *
-   * @param kV The velocity gain, in volts/(unit/sec).
-   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param kV The velocity gain, in volts/(radians/sec).
+   * @param kA The acceleration gain, in volts/(radians/sec²).
    *
    * @throws std::domain_error if kV < 0 or kA <= 0.
    */
   template <typename Distance>
-    requires std::same_as<units::meter, Distance> ||
-             std::same_as<units::radian, Distance>
-  static LinearSystem<2, 1, 2> DCMotorSystem(
+    requires std::same_as<units::radian, Distance>
+  static LinearSystem<2, 1, 2> CreateAngularSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
     if (kV < decltype(kV){0}) {

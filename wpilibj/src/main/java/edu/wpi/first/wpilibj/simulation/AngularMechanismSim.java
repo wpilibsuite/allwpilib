@@ -68,7 +68,7 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns the gear ratio of the mechanism.
    *
-   * @return the mechanism's gear ratio
+   * @return the mechanism's gear ratio.
    */
   public double getGearing() {
     return m_gearing;
@@ -80,7 +80,7 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
    * @return The mechanisms's moment of inertia.
    */
   public double getJKgMetersSquared() {
-    return m_gearing * m_gearbox.KtNMPerAmp / (m_gearbox.rOhms * m_plant.getB(0, 0));
+    return m_gearing * m_gearbox.KtNMPerAmp / (m_gearbox.rOhms * m_plant.getB(1, 0));
   }
 
   /**
@@ -206,6 +206,14 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
     // 2x faster than the output
     return m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing, m_u.get(0, 0))
         * Math.signum(m_u.get(0, 0));
+  }
+
+  /**
+   * Gets the input voltage for the mechanism's DC motor.
+   * @return The mechanism's DC motor's voltage.
+   */
+  public double getInputVoltage(){
+    return getInput(0);
   }
 
   /**
