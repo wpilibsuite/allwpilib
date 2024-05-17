@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.VecBuilder;
