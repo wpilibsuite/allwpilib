@@ -35,7 +35,8 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
       MutableMeasure.zero(RadiansPerSecond);
 
   // The angular acceleration of the system.
-  private final MutableMeasure<Velocity<Velocity<Angle>>> m_angularAcceleration = MutableMeasure.zero(RadiansPerSecondPerSecond);
+  private final MutableMeasure<Velocity<Velocity<Angle>>> m_angularAcceleration =
+      MutableMeasure.zero(RadiansPerSecondPerSecond);
 
   /**
    * Creates a simulated flywheel mechanism.
@@ -125,7 +126,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's acceleration in Radians Per Second Squared.
    */
-  public double getAngularAccelerationRadPerSecSq(){
+  public double getAngularAccelerationRadPerSecSq() {
     return m_gearbox.KtNMPerAmp * getCurrentDrawAmps() / m_jKgMetersSquared;
   }
 
@@ -134,17 +135,17 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's acceleration.
    */
-  public Measure<Velocity<Velocity<Angle>>> getAngularAcceleration(){
+  public Measure<Velocity<Velocity<Angle>>> getAngularAcceleration() {
     m_angularAcceleration.mut_setMagnitude(getAngularAccelerationRadPerSecSq());
     return m_angularAcceleration;
   }
 
   /**
    * Returns the flywheel's torque in Newton-Meters.
-   * 
+   *
    * @return The flywheel's torque in Newton-Meters.
    */
-  public double getTorqueNewtonMeters(){
+  public double getTorqueNewtonMeters() {
     return getAngularAccelerationRadPerSecSq() * m_jKgMetersSquared;
   }
 

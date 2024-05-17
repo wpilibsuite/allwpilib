@@ -51,16 +51,16 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
 
   /**
    * Returns the flywheel's acceleration.
-   * 
+   *
    * @return The flywheel's acceleration
-  */
+   */
   units::radians_per_second_squared_t GetAngularAcceleration() const;
 
   /**
    * Returns the flywheel's torque.
-   * 
+   *
    * @return The flywheel's torque
-  */
+   */
   units::newton_meter_t GetTorque() const;
 
   /**
