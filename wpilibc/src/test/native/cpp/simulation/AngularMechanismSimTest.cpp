@@ -12,12 +12,14 @@
 #include "frc/simulation/AngularMechanismSim.h"
 #include "frc/simulation/EncoderSim.h"
 #include "frc/simulation/RoboRioSim.h"
+#include "frc/system/plant/LinearSystemId.h"
 
 TEST(AngularMechanismSimTest, VoltageSteadyState) {
   frc::DCMotor gearbox = frc::DCMotor::NEO(1);
+  frc::LinearSystem<2, 1, 2> plant{
+    frc::LinearSystemId::AngularSystem(gearbox, units::kilogram_square_meter_t{0.0005}, 1.0)};
 
-  frc::sim::AngularMechanismSim sim{frc::LinearSystemId.CreateAngularSystem(gearbox, units::kilogram_square_meter_t{0.0005}, 1.0), 1.0,
-                           units::kilogram_square_meter_t{0.0005}};
+  frc::sim::AngularMechanismSim sim{plant, gearbox};
 
   frc::Encoder encoder{0, 1};
   frc::sim::EncoderSim encoderSim{encoder};
@@ -40,7 +42,7 @@ TEST(AngularMechanismSimTest, VoltageSteadyState) {
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
-  EXPECT_NEAR((gearbox.Kv * 12_V).value(), encoder.GetRate(), 0.1);
+  EXPECT_NEAR((gearbox.Kv * frc::RobotController::GetBatteryVoltage()).value(), encoder.GetRate(), 0.1);
 
   // Decay
   for (int i = 0; i < 100; i++) {
@@ -61,8 +63,11 @@ TEST(AngularMechanismSimTest, VoltageSteadyState) {
 
 TEST(AngularMechanismSimTest, PositionFeedbackControl) {
   frc::DCMotor gearbox = frc::DCMotor::NEO(1);
-  frc::sim::AngularMechanismSim sim{frc::LinearSystemId.CreateAngularSystem(gearbox, units::kilogram_square_meter_t{0.0005}, 1.0), 1.0,
-                           units::kilogram_square_meter_t{0.0005}};
+  frc::LinearSystem<2, 1, 2> plant{
+    frc::LinearSystemId::AngularSystem(gearbox, units::kilogram_square_meter_t{0.0005}, 1.0)};
+
+  frc::sim::AngularMechanismSim sim{plant, gearbox};
+
 
   frc::PIDController controller{0.04, 0.0, 0.001};
 

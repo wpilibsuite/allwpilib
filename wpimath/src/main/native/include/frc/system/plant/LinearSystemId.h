@@ -229,7 +229,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @see <a
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  static LinearSystem<2, 1, 2> CreateAngularSystem(DCMotor motor,
+  static LinearSystem<2, 1, 2> AngularSystem(DCMotor motor,
                                              units::kilogram_square_meter_t J,
                                              double gearing);
 
@@ -255,7 +255,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    */
   template <typename Distance>
     requires std::same_as<units::radian, Distance>
-  static LinearSystem<2, 1, 2> CreateAngularSystem(
+  static LinearSystem<2, 1, 2> AngularSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
     if (kV < decltype(kV){0}) {

@@ -138,7 +138,7 @@ LinearSystem<1, 1, 1> LinearSystemId::FlywheelSystem(
   return LinearSystem<1, 1, 1>(A, B, C, D);
 }
 
-LinearSystem<2, 1, 2> LinearSystemId::CreateAngularSystem(
+LinearSystem<2, 1, 2> LinearSystemId::AngularSystem(
     DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
   if (J <= 0_kg_sq_m) {
     throw std::domain_error("J must be greater than zero.");

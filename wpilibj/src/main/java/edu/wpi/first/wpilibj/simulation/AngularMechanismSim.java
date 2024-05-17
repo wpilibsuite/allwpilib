@@ -210,9 +210,10 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
 
   /**
    * Gets the input voltage for the mechanism's DC motor.
+   *
    * @return The mechanism's DC motor's voltage.
    */
-  public double getInputVoltage(){
+  public double getInputVoltage() {
     return getInput(0);
   }
 
