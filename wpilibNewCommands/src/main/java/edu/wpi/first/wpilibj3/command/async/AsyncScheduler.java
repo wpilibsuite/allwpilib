@@ -339,6 +339,24 @@ public class AsyncScheduler {
     // Process triggers first; these tend to queue and cancel commands
     eventLoop.poll();
 
+    promoteScheduledCommands();
+    runPeriodicSideloads();
+    runCommands();
+    resumeSuspendedCommands();
+    scheduleDefaultCommands();
+  }
+
+  private void runPeriodicSideloads() {
+    // Update periodic callbacks
+    for (Continuation callback : periodicCallbacks) {
+      callback.run();
+    }
+
+    // And remove any periodic callbacks that have completed
+    periodicCallbacks.removeIf(Continuation::isDone);
+  }
+
+  private void promoteScheduledCommands() {
     // Move any scheduled commands to the running set
     for (var queuedState : onDeck) {
       commandStates.put(queuedState.command(), queuedState);
@@ -347,19 +365,13 @@ public class AsyncScheduler {
     // Clear the set of on-deck commands,
     // since we just put them all into the set of running commands
     onDeck.clear();
+  }
 
-    // Update periodic callbacks
-    for (Continuation callback : periodicCallbacks) {
-      callback.run();
-    }
-
-    // And remove any periodic callbacks that have completed
-    periodicCallbacks.removeIf(Continuation::isDone);
-
+  private void runCommands() {
     // Tick every command that hasn't been completed yet
     for (var entry : List.copyOf(commandStates.entrySet())) {
       final var command = entry.getKey();
-      Continuation continuation = entry.getValue().continuation();
+      var continuation = entry.getValue().continuation();
 
       if (!commandStates.containsKey(command)) {
         // Probably canceled by an owning composition, do not run
@@ -382,10 +394,9 @@ public class AsyncScheduler {
         removeOrphanedChildren(command);
       }
     }
+  }
 
-    // Remove completed commands
-    commandStates.entrySet().removeIf(e -> e.getValue().continuation().isDone());
-
+  private void resumeSuspendedCommands() {
     // Attempt to schedule as many suspended commands as possible
     // Work on a copy since we'll be popping elements off the queue
     for (var suspendedState : List.copyOf(suspendedStates).reversed()) {
@@ -395,7 +406,9 @@ public class AsyncScheduler {
       }
       // TODO: Early exit once every resource has a scheduled or running command
     }
+  }
 
+  private void scheduleDefaultCommands() {
     // Schedule the default commands for every resource that doesn't currently have a running or
     // scheduled command.
     for (var resource : registeredResources) {
