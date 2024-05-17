@@ -12,6 +12,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
@@ -94,8 +95,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel velocity.
    */
   public double getAngularVelocityRadPerSec() {
-    m_angularVelocity.mut_setMagnitude(getOutput(0));
-    return m_angularVelocity.in(RadiansPerSecond);
+    return getOutput(0);
   }
 
   /**
@@ -104,7 +104,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel velocity in RPM.
    */
   public double getAngularVelocityRPM() {
-    return m_angularVelocity.in(RPM);
+    return Units.radiansPerSecondToRotationsPerMinute(getAngularVelocityRadPerSec());
   }
 
   /**
@@ -113,6 +113,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel velocity
    */
   public Measure<Velocity<Angle>> getAngularVelocity() {
+    m_angularVelocity.mut_setMagnitude(getAngularVelocityRadPerSec());
     return m_angularVelocity;
   }
 
