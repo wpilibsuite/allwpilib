@@ -84,7 +84,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @param dtSeconds The duration of the timestep.
    * @return Twist2d.
    */
-  public Twist2d ToTwist2d(double dtSeconds) {
+  public Twist2d toTwist2d(double dtSeconds) {
     // Construct the desired pose after a timestep, relative to the current pose. The desired pose
     // has decoupled translation and rotation.
     var desiredDeltaPose =
