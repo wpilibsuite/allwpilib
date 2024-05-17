@@ -4,9 +4,6 @@ import static edu.wpi.first.wpilibj3.command.async.AsyncCommand.InterruptBehavio
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.event.EventLoop;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,39 +17,6 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 public class AsyncScheduler {
-  private static final MethodHandle java_lang_thread_setContinuation;
-
-  static {
-    try {
-      var lookup = MethodHandles.privateLookupIn(Thread.class, MethodHandles.lookup());
-
-      java_lang_thread_setContinuation = lookup.findVirtual(
-          Thread.class,
-          "setContinuation",
-          MethodType.methodType(void.class, Continuation.jdk_internal_vm_Continuation)
-      );
-    } catch (Throwable t) {
-      throw new ExceptionInInitializerError(t);
-    }
-  }
-
-  /**
-   * Represents the state of a command as it is executed by the scheduler.
-   *
-   * @param command The command being tracked.
-   * @param parent The parent command composition that scheduled the tracked command. Null if the
-   *               command was scheduled by a top level construct like trigger bindings or manually
-   *               scheduled by a user. For deeply nested compositions, this tracks the <i>direct
-   *               parent command</i> that invoked the schedule() call; in this manner, an ancestry
-   *               tree can be built, where each {@code CommandState} object references a parent
-   *               node in the tree.
-   * @param continuation The continuation to which the command is bound.
-   */
-  private record CommandState(
-      AsyncCommand command,
-      AsyncCommand parent,
-      Continuation continuation) { }
-
   private final Set<HardwareResource> registeredResources = new HashSet<>();
   /** The set of commands scheduled since the start of the previous run. */
   private final Set<CommandState> onDeck = new LinkedHashSet<>();
@@ -377,7 +341,7 @@ public class AsyncScheduler {
 
     // Move any scheduled commands to the running set
     for (var queuedState : onDeck) {
-      commandStates.put(queuedState.command, queuedState);
+      commandStates.put(queuedState.command(), queuedState);
     }
 
     // Clear the set of on-deck commands,
@@ -395,7 +359,7 @@ public class AsyncScheduler {
     // Tick every command that hasn't been completed yet
     for (var entry : List.copyOf(commandStates.entrySet())) {
       final var command = entry.getKey();
-      Continuation continuation = entry.getValue().continuation;
+      Continuation continuation = entry.getValue().continuation();
 
       if (!commandStates.containsKey(command)) {
         // Probably canceled by an owning composition, do not run
@@ -403,12 +367,12 @@ public class AsyncScheduler {
       }
 
       currentCommand = command;
-      mountContinuation(continuation);
+      Continuation.mountContinuation(continuation);
       try {
         continuation.run();
       } finally {
         currentCommand = null;
-        mountContinuation(null);
+        Continuation.mountContinuation(null);
       }
 
       if (continuation.isDone()) {
@@ -420,7 +384,7 @@ public class AsyncScheduler {
     }
 
     // Remove completed commands
-    commandStates.entrySet().removeIf(e -> e.getValue().continuation.isDone());
+    commandStates.entrySet().removeIf(e -> e.getValue().continuation().isDone());
 
     // Attempt to schedule as many suspended commands as possible
     // Work on a copy since we'll be popping elements off the queue
@@ -455,9 +419,9 @@ public class AsyncScheduler {
   private void removeOrphanedChildren(AsyncCommand parent) {
     for (var iterator = commandStates.values().iterator(); iterator.hasNext(); ) {
       var state = iterator.next();
-      if (state.parent == parent) {
+      if (state.parent() == parent) {
         iterator.remove();
-        removeOrphanedChildren(state.command);
+        removeOrphanedChildren(state.command());
         suspendedStates.remove(state);
       }
     }
@@ -481,27 +445,6 @@ public class AsyncScheduler {
   }
 
   /**
-   * Mounds a continuation to the current thread. Accepts null for clearing the currently mounted
-   * continuation.
-   *
-   * @param continuation the continuation to mount
-   */
-  private void mountContinuation(Continuation continuation) {
-    try {
-      if (continuation == null) {
-        java_lang_thread_setContinuation.invoke(Thread.currentThread(), null);
-      } else {
-        java_lang_thread_setContinuation.invoke(Thread.currentThread(), continuation.continuation);
-      }
-    } catch (Throwable t) {
-      // Anything thrown internally by Thread.setContinuation.
-      // It only assigns to a field, no way to throw
-      // However, if the invocation fails for some reason, we'll end up with an
-      // IllegalStateException when attempting to run an unmounted continuation
-    }
-  }
-
-  /**
    * Checks if a command is currently running.
    *
    * @param command the command to check
@@ -518,7 +461,7 @@ public class AsyncScheduler {
    * @return true if the command is scheduled to run, false if not
    */
   public boolean isScheduled(AsyncCommand command) {
-    return onDeck.stream().anyMatch(state -> state.command == command);
+    return onDeck.stream().anyMatch(state -> state.command() == command);
   }
 
   /**

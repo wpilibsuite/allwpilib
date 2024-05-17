@@ -18,6 +18,8 @@ public final class Continuation {
   private static final MethodHandle RUN;
   private static final MethodHandle IS_DONE;
 
+  private static final MethodHandle java_lang_thread_setContinuation;
+
   static {
     try {
       jdk_internal_vm_Continuation = Class.forName("jdk.internal.vm.Continuation");
@@ -45,6 +47,20 @@ public final class Continuation {
           jdk_internal_vm_Continuation,
           "isDone",
           MethodType.methodType(boolean.class)
+      );
+    } catch (Throwable t) {
+      throw new ExceptionInInitializerError(t);
+    }
+  }
+
+  static {
+    try {
+      var lookup = MethodHandles.privateLookupIn(Thread.class, MethodHandles.lookup());
+
+      java_lang_thread_setContinuation = lookup.findVirtual(
+          Thread.class,
+          "setContinuation",
+          MethodType.methodType(void.class, Continuation.jdk_internal_vm_Continuation)
       );
     } catch (Throwable t) {
       throw new ExceptionInInitializerError(t);
@@ -107,6 +123,27 @@ public final class Continuation {
       return (boolean) IS_DONE.invoke(continuation);
     } catch (Throwable t) {
       throw new RuntimeException(t);
+    }
+  }
+
+  /**
+   * Mounds a continuation to the current thread. Accepts null for clearing the currently mounted
+   * continuation.
+   *
+   * @param continuation the continuation to mount
+   */
+  public static void mountContinuation(Continuation continuation) {
+    try {
+      if (continuation == null) {
+        java_lang_thread_setContinuation.invoke(Thread.currentThread(), null);
+      } else {
+        java_lang_thread_setContinuation.invoke(Thread.currentThread(), continuation.continuation);
+      }
+    } catch (Throwable t) {
+      // Anything thrown internally by Thread.setContinuation.
+      // It only assigns to a field, no way to throw
+      // However, if the invocation fails for some reason, we'll end up with an
+      // IllegalStateException when attempting to run an unmounted continuation
     }
   }
 
