@@ -218,9 +218,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
                                               double gearing);
 
   /**
-   * Create a state-space model of a mechanism controlled by a DC motor system. The states of the system
-   * are [angular position, angular velocity], inputs are [voltage], and outputs
-   * are [angular position, angular velocity].
+   * Create a state-space model of a mechanism controlled by a DC motor system.
+   * The states of the system are [angular position, angular velocity], inputs
+   * are [voltage], and outputs are [angular position, angular velocity].
    *
    * @param motor The motor (or gearbox) attached to the system.
    * @param J the moment of inertia J of the DC motor.
@@ -234,14 +234,14 @@ class WPILIB_DLLEXPORT LinearSystemId {
                                              double gearing);
 
   /**
-   * Create a state-space model of a mechanism controlled by a DC motor system from its kV
-   * (volts/(radians/sec)) and kA (volts/(radians/sec²)). These constants can be
-   * found using SysId. the states of the system are [position, velocity],
-   * inputs are [voltage], and outputs are [position].
+   * Create a state-space model of a mechanism controlled by a DC motor system
+   * from its kV (volts/(radians/sec)) and kA (volts/(radians/sec²)). These
+   * constants can be found using SysId. the states of the system are [position,
+   * velocity], inputs are [voltage], and outputs are [position].
    *
    * You MUST use radians for the Distance template
-   * argument. You may still use non-SI units (such as degreess or rotations) for the
-   * actual method arguments; they will automatically be converted to SI
+   * argument. You may still use non-SI units (such as degreess or rotations)
+   * for the actual method arguments; they will automatically be converted to SI
    * internally.
    *
    * The parameters provided by the user are from this feedforward model:

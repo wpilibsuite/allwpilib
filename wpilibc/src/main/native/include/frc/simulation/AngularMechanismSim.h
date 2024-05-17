@@ -24,32 +24,33 @@ class AngularMechanismSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Creates a simulated angular mechanism controller by a DC motor.
    *
-   * @param plant              The linear system representing the angular mechanism. This
-   *                           system can be created with
+   * @param plant              The linear system representing the angular
+   * mechanism. This system can be created with
    *                           LinearSystemId::CreateAngularSystem().
    * @param gearbox            The type of and number of motors in the DC motor
    * gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  AngularMechanismSim(const LinearSystem<2, 1, 2>& plant, const DCMotor& gearbox,
-             const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
+  AngularMechanismSim(const LinearSystem<2, 1, 2>& plant,
+                      const DCMotor& gearbox,
+                      const std::array<double, 2>& measurementStdDevs = {0.0,
+                                                                         0.0});
 
   using LinearSystemSim::SetState;
 
   /**
    * Returns the gear ratio of the mechanism.
-   * 
+   *
    * @return the mechanism's gear ratio.
-  */
- double GetGearing(){ return m_gearing; }
+   */
+  double GetGearing() { return m_gearing; }
 
- /**
-  * Returns the moment of inertia of the mechanism.
-  * 
-  * @return the mechanism's moment of inertia.
- */
+  /**
+   * Returns the moment of inertia of the mechanism.
+   *
+   * @return the mechanism's moment of inertia.
+   */
   units::kilogram_square_meter_t GetJ() const;
-
 
   /**
    * Sets the state of the mechanism.
@@ -62,16 +63,16 @@ class AngularMechanismSim : public LinearSystemSim<2, 1, 2> {
 
   /**
    * Sets the position of the mechanism.
-   * 
+   *
    * @param angularPosition The new position
-  */
+   */
   void SetPosition(units::radian_t angularPosition);
 
   /**
    * Sets the velocity of the mechanism.
-   * 
+   *
    * @param angularVelocity The new position
-  */
+   */
   void SetVelocity(units::radians_per_second_t angularVelocity);
 
   /**
@@ -90,17 +91,17 @@ class AngularMechanismSim : public LinearSystemSim<2, 1, 2> {
 
   /**
    * Returns the acceleration of the mechanism.
-   * 
+   *
    * @return the mechanism's acceleration.
-  */
- units::radians_per_second_squared_t GetAngularAcceleration() const;
+   */
+  units::radians_per_second_squared_t GetAngularAcceleration() const;
 
- /**
-  * Returns the torque of the mechanism.
-  * 
-  * @return the mechanism's torque.
- */
-units::newton_meter_t GetTorque() const;
+  /**
+   * Returns the torque of the mechanism.
+   *
+   * @return the mechanism's torque.
+   */
+  units::newton_meter_t GetTorque() const;
 
   /**
    * Returns the mechanism's DC motor current draw.
@@ -118,10 +119,10 @@ units::newton_meter_t GetTorque() const;
 
   /**
    * Gets the input voltage for the mechanism's DC motor.
-   * 
+   *
    * @return the mechanism's DC motor input voltage.
-  */
- units::volt_t GetInputVoltage() const;
+   */
+  units::volt_t GetInputVoltage() const;
 
  private:
   DCMotor m_gearbox;
