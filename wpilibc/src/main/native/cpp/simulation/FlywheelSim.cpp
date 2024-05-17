@@ -20,12 +20,20 @@ FlywheelSim::FlywheelSim(const LinearSystem<1, 1, 1>& plant,
       m_j(m_gearing * gearbox.Kt.value() /
           (gearbox.R.value() * m_plant.B(0, 0))) {}
 
-void FlywheelSim::SetState(units::radians_per_second_t velocity) {
+void FlywheelSim::SetVelocity(units::radians_per_second_t velocity) {
   LinearSystemSim::SetState(Vectord<1>{velocity.value()});
 }
 
 units::radians_per_second_t FlywheelSim::GetAngularVelocity() const {
   return units::radians_per_second_t{GetOutput(0)};
+}
+
+units::radians_per_second_squared_t FlywheelSim::GetAngularAcceleration() const {
+  return units::radians_per_second_squared_t{m_gearbox.Kt.value() * GetCurrentDraw().value() / m_j.value()};
+}
+
+units::newton_meter_t FlywheelSim::GetTorque() const {
+  return units::newton_meter_t{GetAngularAcceleration().value() * m_j.value()};
 }
 
 units::ampere_t FlywheelSim::GetCurrentDraw() const {

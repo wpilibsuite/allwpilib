@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include <units/angular_acceleration.h>
 #include <units/angular_velocity.h>
 #include <units/moment_of_inertia.h>
+#include <units/torque.h>
 
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/system/LinearSystem.h"
@@ -34,23 +36,37 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   using LinearSystemSim::SetState;
 
   /**
-   * Sets the flywheel's state.
+   * Sets the flywheel's angular velocity.
    *
    * @param velocity The new velocity
    */
-  void SetState(units::radians_per_second_t velocity);
+  void SetVelocity(units::radians_per_second_t velocity);
 
   /**
-   * Returns the flywheel velocity.
+   * Returns the flywheel's velocity.
    *
-   * @return The flywheel velocity.
+   * @return The flywheel's velocity.
    */
   units::radians_per_second_t GetAngularVelocity() const;
 
   /**
-   * Returns the flywheel current draw.
+   * Returns the flywheel's acceleration.
+   * 
+   * @return The flywheel's acceleration
+  */
+  units::radians_per_second_squared_t GetAngularAcceleration() const;
+
+  /**
+   * Returns the flywheel's torque.
+   * 
+   * @return The flywheel's torque
+  */
+  units::newton_meter_t GetTorque() const;
+
+  /**
+   * Returns the flywheel's current draw.
    *
-   * @return The flywheel current draw.
+   * @return The flywheel's current draw.
    */
   units::ampere_t GetCurrentDraw() const;
 

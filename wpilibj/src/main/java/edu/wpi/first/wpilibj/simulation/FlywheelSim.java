@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
@@ -33,6 +34,9 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   private final MutableMeasure<Velocity<Angle>> m_angularVelocity =
       MutableMeasure.zero(RadiansPerSecond);
 
+  // The angular acceleration of the system.
+  private final MutableMeasure<Velocity<Velocity<Angle>>> m_angularAcceleration = MutableMeasure.zero(RadiansPerSecondPerSecond);
+
   /**
    * Creates a simulated flywheel mechanism.
    *
@@ -53,11 +57,11 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   }
 
   /**
-   * Sets the flywheel's state.
+   * Sets the flywheel's angular velocity.
    *
    * @param velocityRadPerSec The new velocity in radians per second.
    */
-  public void setState(double velocityRadPerSec) {
+  public void setAngularVelocity(double velocityRadPerSec) {
     setState(VecBuilder.fill(velocityRadPerSec));
   }
 
@@ -89,27 +93,27 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   }
 
   /**
-   * Returns the flywheel velocity.
+   * Returns the flywheel's velocity in Radians Per Second.
    *
-   * @return The flywheel velocity.
+   * @return The flywheel's velocity in Radians Per Second.
    */
   public double getAngularVelocityRadPerSec() {
     return getOutput(0);
   }
 
   /**
-   * Returns the flywheel velocity in RPM.
+   * Returns the flywheel's velocity in RPM.
    *
-   * @return The flywheel velocity in RPM.
+   * @return The flywheel's velocity in RPM.
    */
   public double getAngularVelocityRPM() {
     return Units.radiansPerSecondToRotationsPerMinute(getAngularVelocityRadPerSec());
   }
 
   /**
-   * Returns the flywheel velocity.
+   * Returns the flywheel's velocity.
    *
-   * @return The flywheel velocity
+   * @return The flywheel's velocity
    */
   public Measure<Velocity<Angle>> getAngularVelocity() {
     m_angularVelocity.mut_setMagnitude(getAngularVelocityRadPerSec());
@@ -117,9 +121,37 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   }
 
   /**
-   * Returns the flywheel current draw.
+   * Returns the flywheel's acceleration in Radians Per Second Squared.
    *
-   * @return The flywheel current draw.
+   * @return The flywheel's acceleration in Radians Per Second Squared.
+   */
+  public double getAngularAccelerationRadPerSecSq(){
+    return m_gearbox.KtNMPerAmp * getCurrentDrawAmps() / m_jKgMetersSquared;
+  }
+
+  /**
+   * Returns the flywheel's acceleration.
+   *
+   * @return The flywheel's acceleration.
+   */
+  public Measure<Velocity<Velocity<Angle>>> getAngularAcceleration(){
+    m_angularAcceleration.mut_setMagnitude(getAngularAccelerationRadPerSecSq());
+    return m_angularAcceleration;
+  }
+
+  /**
+   * Returns the flywheel's torque in Newton-Meters.
+   * 
+   * @return The flywheel's torque in Newton-Meters.
+   */
+  public double getTorqueNewtonMeters(){
+    return getAngularAccelerationRadPerSecSq() * m_jKgMetersSquared;
+  }
+
+  /**
+   * Returns the flywheel's current draw.
+   *
+   * @return The flywheel's current draw.
    */
   public double getCurrentDrawAmps() {
     // I = V / R - omega / (Kv * R)
