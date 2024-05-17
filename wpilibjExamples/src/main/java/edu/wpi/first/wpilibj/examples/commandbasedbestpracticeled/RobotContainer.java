@@ -27,14 +27,10 @@ public class RobotContainer {
   private final TargetVisionSubsystem vision;
 
   private final RobotSignals robotSignals;
-  private final LEDPattern TopDefaultSignal = LEDPattern.solid(new Color(0., 0., 1.));
-  private final LEDPattern MainDefaultSignal = LEDPattern.solid(new Color(0., 1., 1.));
-  private final LEDPattern disabled = LEDPattern.solid(Color.kRed).breathe(Seconds.of(2));
-  private final LEDPattern enabled = LEDPattern.solid(Color.kGreen).breathe(Seconds.of(2));
-  private final LEDPatternSupplier EnableDisableDefaultSignal = () -> (DriverStation.isDisabled() ? disabled : enabled);
 
-  public RobotContainer(PeriodicTask periodicTask) {
-    robotSignals = new RobotSignals(1, periodicTask);
+  public RobotContainer() {
+
+    robotSignals = new RobotSignals(1);
     intake = new IntakeSubsystem(robotSignals, operatorController);
     vision = new TargetVisionSubsystem(robotSignals, operatorController);
 
@@ -48,15 +44,17 @@ public class RobotContainer {
    * configure driver and operator controllers buttons
    */
   private void configureBindings() {
-    operatorController.x().debounce(0.04, DebounceType.kBoth)
+
+    operatorController.x().debounce(0.03, DebounceType.kBoth)
       .onTrue(robotSignals.Top.setSignal(colorWheel()));
   }
 
   /**
-   * Test "rainbow" supplier
+   * "color wheel" supplier runs when commanded
    * @return
    */
   private RobotSignals.LEDPatternSupplier colorWheel() {
+
     // produce a color based on the timer current seconds of the minute
     return ()->LEDPattern.solid(
       Color.fromHSV((int)(Timer.getFPGATimestamp()%60./*seconds of the minute*/)*3/*scale seconds to 180 hues per color wheel*/,
@@ -67,6 +65,12 @@ public class RobotContainer {
    * Configure the LED Signal Views Default Commands 
    */
   private void configureDefaultCommands() {
+
+    final LEDPattern TopDefaultSignal = LEDPattern.solid(new Color(0., 0., 1.));
+    final LEDPattern MainDefaultSignal = LEDPattern.solid(new Color(0., 1., 1.));
+    final LEDPattern disabled = LEDPattern.solid(Color.kRed).breathe(Seconds.of(2));
+    final LEDPattern enabled = LEDPattern.solid(Color.kGreen).breathe(Seconds.of(2));
+    final LEDPatternSupplier EnableDisableDefaultSignal = () -> (DriverStation.isDisabled() ? disabled : enabled);
 
     final Command TopDefault = robotSignals.Top.setSignal(TopDefaultSignal)
                                 .ignoringDisable(true).withName("TopDefault");
@@ -85,26 +89,31 @@ public class RobotContainer {
    * @return
    */
   public Command getAutonomousCommand() {
+
     LEDPattern autoTopSignal = LEDPattern.solid(new Color(0.2, 0.6, 0.2));
     LEDPattern autoMainSignal = LEDPattern.solid(new Color(0.4, 0.9, 0.4));
+    // statements before the return are run early at intialization time
     return
+    // statements returned are run later when the command is scheduled
       parallel // interrupting either of the two parallel commands with an external command interupts the group
       (
       /*parallel cmd*/
         robotSignals.Top.setSignal(autoTopSignal)
-          .withTimeout(6.) // this ends but the group continues and the default command is not activated here with or without the andThen command
-        .andThen(robotSignals.Top.setSignal(autoTopSignal)),
+          .withTimeout(6.) // example this ends but the group continues and the default command is not activated here with or without the andThen command
+          .andThen(robotSignals.Top.setSignal(autoTopSignal)),
       /*parallel cmd*/
         robotSignals.Main.setSignal(autoMainSignal)
       )
       /*composite*/
-      .withName("AutoSignal");
+        .withName("AutoSignal");
+      // command ends here so default command runs if no subsequant command runs for the subsystem
     }
 
   /**
    * Configure Command logging
    */
   private void configureLogging() {
+    
     //_________________________________________________________________________________
     CommandScheduler.getInstance()
         .onCommandInitialize(
@@ -138,5 +147,27 @@ public class RobotContainer {
             }
         );
     //_________________________________________________________________________________
+  }
+
+  /**
+   * Run periodically before commands - read sensors
+   * Include all classes that have periodic inputs
+   */
+  public void beforeCommands() {
+
+    intake.beforeCommands();
+    vision.beforeCommands();
+    robotSignals.beforeCommands();
+  }
+
+  /**
+   * Run periodically after commands - write logs, dashboards, indicators
+   * Include all classes that have periodic outputs
+   */
+  public void afterCommands() {
+
+    intake.afterCommands();
+    vision.afterCommands();
+    robotSignals.afterCommands();
   }
 }

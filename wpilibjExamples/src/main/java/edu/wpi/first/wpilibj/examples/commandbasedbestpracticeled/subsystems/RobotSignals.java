@@ -10,7 +10,6 @@ import frc.robot.AddressableLED;
 import frc.robot.AddressableLEDBuffer;
 import frc.robot.AddressableLEDBufferView;
 import frc.robot.LEDPattern;
-import frc.robot.PeriodicTask;
 
 /*
  * All Commands factories are "public."
@@ -58,7 +57,7 @@ public interface LEDPatternSupplier {
   public LEDView Main;
   public LEDView EnableDisable;
 
-  public RobotSignals(int port, PeriodicTask periodicTask) {
+  public RobotSignals(int port) {
   
     // start updating the physical LED strip  
     int length = Math.max(Math.max(lastTopLED, lastMainLED), lastEnableDisableLED) + 1; // simplistic view of 3 segments - one starts at 0
@@ -66,18 +65,20 @@ public interface LEDPatternSupplier {
     strip.setLength(length);
     strip.start();
 
-    bufferLED = new AddressableLEDBuffer(length); // buffer for the all LEDs
+    bufferLED = new AddressableLEDBuffer(length); // buffer for all of the LEDs
 
-    // create the Three resources (subsystems) as views of the primary buffer
+    // create the three resources (subsystems) as views of the LED buffer
     Top = new LEDView(bufferLED.createView(firstTopLED, lastTopLED));
     Main = new LEDView(bufferLED.createView(firstMainLED, lastMainLED));
     EnableDisable = new LEDView(bufferLED.createView(firstEnableDisableLED, lastEnableDisableLED));
-    // start the periodic process to send (slowly) the buffer to the LEDs
-    periodicTask.register(this::update, 0.24, 0.019);
+
   }
 
-  private void update() {
-    strip.setData(bufferLED);
+  public void beforeCommands() {}
+
+  public void afterCommands() {
+
+    strip.setData(bufferLED); // run periodically to send the buffer to the LEDs
   }
 
   /**
@@ -97,10 +98,11 @@ public interface LEDPatternSupplier {
      */
 
     /**
-     * Allow no more than one set of the view (resource, subsystem) default command
+     * Allow no more than one call to this set of the view (resource, subsystem) default command
      */
     @Override
     public void setDefaultCommand(Command def) {
+
       if (isDefaultSet) {
         throw new IllegalArgumentException("Default Command already set");
       }
@@ -117,10 +119,11 @@ public interface LEDPatternSupplier {
      * @return
      */
     public Command setSignal(LEDPattern pattern) {
+
       return
         run(()->pattern.applyTo(view))
           .ignoringDisable(true)
-          .withName("LedSetC");
+          .withName("LedSet");
     }
 
     /**
@@ -130,10 +133,11 @@ public interface LEDPatternSupplier {
      * @return
      */
     public Command setSignal(LEDPatternSupplier pattern) {
+      
       return
         run(()->pattern.get().applyTo(view))
           .ignoringDisable(true)
-          .withName("LedSetSC");
+          .withName("LedSetS");
     }
   } // End LEDView
 }

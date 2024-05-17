@@ -13,17 +13,20 @@ import frc.robot.Color;
 import frc.robot.LEDPattern;
 
 public class TargetVisionSubsystem extends SubsystemBase {
+
   private final RobotSignals robotSignals;
   private final CommandXboxController operatorController;
   public final Trigger targetAcquired = new Trigger(this::canSeeTarget);
 
   public TargetVisionSubsystem(RobotSignals robotSignals, CommandXboxController operatorController) {
+
     this.robotSignals = robotSignals;
     this.operatorController = operatorController;
     targetAcquired.whileTrue(targetAcquired());
   }
   
   public Command targetAcquired() {
+
     LEDPattern targetAcquiredSignal = LEDPattern.solid(Color.kOrange);
     return
       /*sequential*/
@@ -36,6 +39,11 @@ public class TargetVisionSubsystem extends SubsystemBase {
   }
 
   private boolean canSeeTarget() {
+    
     return operatorController.getHID().getAButton(); // fake event source for can see target
   }
+
+  public void beforeCommands() {}
+
+  public void afterCommands() {}
 }

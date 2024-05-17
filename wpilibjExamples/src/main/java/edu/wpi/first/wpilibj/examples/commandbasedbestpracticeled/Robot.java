@@ -69,12 +69,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_robotContainer = new RobotContainer(this::addPeriodic);
+
+    m_robotContainer = new RobotContainer();
   }
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
+
+    m_robotContainer.beforeCommands();    // get a consistent set of all inputs
+    CommandScheduler.getInstance().run(); // check all the triggers and run all the scheduled commands
+    m_robotContainer.afterCommands();     // write outputs such as logging, dashboards and indicators
   }
 
   @Override
@@ -88,6 +92,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+
     // commands running from another mode haven't been cancelled directly but may be interrupted by this command
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -101,6 +106,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousExit() {
+
        if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -108,6 +114,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() { // commands running from another mode haven't been cancelled directly except the one below
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -121,6 +128,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    
     CommandScheduler.getInstance().cancelAll();
   }
 

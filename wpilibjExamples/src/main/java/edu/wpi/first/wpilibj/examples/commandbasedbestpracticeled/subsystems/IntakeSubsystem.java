@@ -13,17 +13,20 @@ import frc.robot.Color;
 import frc.robot.LEDPattern;
 
 public class IntakeSubsystem extends SubsystemBase {
+  
   private final RobotSignals robotSignals;
   private final CommandXboxController operatorController;
   public final Trigger gamePieceAcquired = new Trigger(this::hasGamePieceAcquired);
 
   public IntakeSubsystem(RobotSignals robotSignals, CommandXboxController operatorController) {
+
     this.robotSignals = robotSignals;
     this.operatorController = operatorController;
     gamePieceAcquired.whileTrue(gamePieceAcquired());
   }
 
   public Command gamePieceAcquired() {
+
     LEDPattern gamePieceAcquiredSignal = LEDPattern.solid(Color.kMagenta).blink(Seconds.of(0.2));
     return
       robotSignals.Main.setSignal(gamePieceAcquiredSignal) // this command locks the robotSignals.Main subsystem only
@@ -32,6 +35,11 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   private boolean hasGamePieceAcquired() {
+
     return operatorController.getHID().getBButton(); // fake event source for game piece acquired
   }
+  
+  public void beforeCommands() {}
+
+  public void afterCommands() {}
 }
