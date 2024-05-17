@@ -39,6 +39,25 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   units::radians_per_second_t omega = 0_rad_per_s;
 
   /**
+   * Creates a Twist2d from ChassisSpeeds.
+   * 
+   * @param dt The duration of the timestep.
+   * 
+   * @return Twist2d.
+  */
+  Twist2d ToTwist2d(units::second_t dt) const {
+    // Construct the desired pose after a timestep, relative to the current
+    // pose. The desired pose has decoupled translation and rotation.
+    Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
+
+    // Find the chassis translation/rotation deltas in the robot frame that move
+    // the robot from its current pose to the desired pose
+    auto twist = Pose2d{}.Log(desiredDeltaPose);
+
+    return twist;    
+  }
+
+  /**
    * Disretizes a continuous-time chassis speed.
    *
    * This function converts a continuous-time chassis speed into a discrete-time
