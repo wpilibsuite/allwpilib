@@ -261,17 +261,11 @@ public class Color {
    * @return the value of the stored color channel
    */
   public static int unpackRGB(int packedColor, RGBChannel channel) {
-    switch (channel) {
-      case kRed:
-        return (packedColor >> 16) & 0xFF;
-      case kGreen:
-        return (packedColor >> 8) & 0xFF;
-      case kBlue:
-        return packedColor & 0xFF;
-      default:
-        DriverStation.reportWarning("Unknown color channel for unpacking: " + channel, true);
-        return 0;
-    }
+    return switch (channel) {
+      case kRed -> (packedColor >> 16) & 0xFF;
+      case kGreen -> (packedColor >> 8) & 0xFF;
+      case kBlue -> packedColor & 0xFF;
+    };
   }
 
   /**
