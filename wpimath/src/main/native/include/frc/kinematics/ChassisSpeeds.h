@@ -46,9 +46,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * @return Twist2d.
    */
   Twist2d ToTwist2d(units::second_t dt) const {
-    return Twist2d{vx * dt,
-                   vy * dt,
-                   omega * dt};
+    return Twist2d{vx * dt, vy * dt, omega * dt};
   }
 
   /**

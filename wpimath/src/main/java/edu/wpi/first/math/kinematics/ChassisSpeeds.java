@@ -85,9 +85,10 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return Twist2d.
    */
   public Twist2d toTwist2d(double dtSeconds) {
-    return new Twist2d(vxMetersPerSecond * dtSeconds,
-                       vyMetersPerSecond * dtSeconds,
-                       omegaRadiansPerSecond * dtSeconds);
+    return new Twist2d(
+        vxMetersPerSecond * dtSeconds,
+        vyMetersPerSecond * dtSeconds,
+        omegaRadiansPerSecond * dtSeconds);
   }
 
   /**
