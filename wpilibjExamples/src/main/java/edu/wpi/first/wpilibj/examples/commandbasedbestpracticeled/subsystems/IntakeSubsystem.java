@@ -11,14 +11,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Color;
 import frc.robot.LEDPattern;
+import frc.robot.subsystems.RobotSignals.LEDView;
 
 public class IntakeSubsystem extends SubsystemBase {
   
-  private final RobotSignals robotSignals;
+  private final LEDView robotSignals;
   private final CommandXboxController operatorController;
   public final Trigger gamePieceAcquired = new Trigger(this::hasGamePieceAcquired);
 
-  public IntakeSubsystem(RobotSignals robotSignals, CommandXboxController operatorController) {
+  public IntakeSubsystem(LEDView robotSignals, CommandXboxController operatorController) {
 
     this.robotSignals = robotSignals;
     this.operatorController = operatorController;
@@ -29,7 +30,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     LEDPattern gamePieceAcquiredSignal = LEDPattern.solid(Color.kMagenta).blink(Seconds.of(0.2));
     return
-      robotSignals.Main.setSignal(gamePieceAcquiredSignal) // this command locks the robotSignals.Main subsystem only
+      robotSignals.setSignal(gamePieceAcquiredSignal) // this command locks the robotSignals.Main subsystem only
         .ignoringDisable(true)
         .withName("MainGamePieceAcquiredSignal");
   }

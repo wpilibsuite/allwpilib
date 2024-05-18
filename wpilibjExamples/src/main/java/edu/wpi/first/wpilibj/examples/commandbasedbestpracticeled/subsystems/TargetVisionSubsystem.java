@@ -11,14 +11,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Color;
 import frc.robot.LEDPattern;
+import frc.robot.subsystems.RobotSignals.LEDView;
 
 public class TargetVisionSubsystem extends SubsystemBase {
 
-  private final RobotSignals robotSignals;
+  private final LEDView robotSignals;
   private final CommandXboxController operatorController;
   public final Trigger targetAcquired = new Trigger(this::canSeeTarget);
 
-  public TargetVisionSubsystem(RobotSignals robotSignals, CommandXboxController operatorController) {
+  public TargetVisionSubsystem(LEDView robotSignals, CommandXboxController operatorController) {
 
     this.robotSignals = robotSignals;
     this.operatorController = operatorController;
@@ -30,7 +31,7 @@ public class TargetVisionSubsystem extends SubsystemBase {
     LEDPattern targetAcquiredSignal = LEDPattern.solid(Color.kOrange);
     return
       /*sequential*/
-      robotSignals.Top.setSignal(targetAcquiredSignal) // this command locks the robotSignals.Top subsystem only
+      robotSignals.setSignal(targetAcquiredSignal) // this command locks the robotSignals.Top subsystem only
       /*sequential*/
       .andThen(Commands.idle(this).withTimeout(0.)) // command created in this subsystem will lock this subsystem also
       /*composite*/

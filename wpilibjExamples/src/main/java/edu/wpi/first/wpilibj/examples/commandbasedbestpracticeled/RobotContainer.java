@@ -7,12 +7,16 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.AchieveHueGoal;
+import frc.robot.subsystems.HistoryFSM;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.RobotSignals;
 import frc.robot.subsystems.RobotSignals.LEDPatternSupplier;
@@ -20,30 +24,36 @@ import frc.robot.subsystems.TargetVisionSubsystem;
 
 public class RobotContainer {
 
-  boolean log = false; // switch command logging on/off; a lot of output for the command execute methods
-  int operatorControllerPort = 0; 
+  private boolean logCommands = false; // switch command logging on/off; a lot of output for the command execute methods
+  private int operatorControllerPort = 0; 
   private final CommandXboxController operatorController = new CommandXboxController(operatorControllerPort);
+  private DoubleSupplier hueGoal = ()->operatorController.getRightTriggerAxis() * 180.; // scale joystick 0 to 1 to computer color wheel hue 0 to 180
   private final IntakeSubsystem intake;
   private final TargetVisionSubsystem vision;
+  private final HistoryFSM historyFSM;
+  private final AchieveHueGoal achieveHueGoal;
 
   private final RobotSignals robotSignals;
 
   public RobotContainer() {
 
     robotSignals = new RobotSignals(1);
-    intake = new IntakeSubsystem(robotSignals, operatorController);
-    vision = new TargetVisionSubsystem(robotSignals, operatorController);
+    intake = new IntakeSubsystem(robotSignals.Main, operatorController);
+    vision = new TargetVisionSubsystem(robotSignals.Top, operatorController);
+    historyFSM = new HistoryFSM(robotSignals.HistoryDemo, operatorController);
+    achieveHueGoal = new AchieveHueGoal(robotSignals.AchieveHueGoal, hueGoal);
 
     configureBindings();
+
     configureDefaultCommands();
 
-    if(log) configureLogging();
+    if(logCommands) configureLogging();
   }
 
   /**
    * configure driver and operator controllers buttons
    */
-  private void configureBindings() {
+    private void configureBindings() {
 
     operatorController.x().debounce(0.03, DebounceType.kBoth)
       .onTrue(robotSignals.Top.setSignal(colorWheel()));
@@ -109,6 +119,17 @@ public class RobotContainer {
       // command ends here so default command runs if no subsequant command runs for the subsystem
     }
 
+    /*
+     * vision target
+     * intake
+     *  release vision target
+     *  intake
+     * 
+     */
+
+
+
+
   /**
    * Configure Command logging
    */
@@ -150,7 +171,7 @@ public class RobotContainer {
   }
 
   /**
-   * Run periodically before commands - read sensors
+   * Run periodically before commands are run - read sensors
    * Include all classes that have periodic inputs
    */
   public void beforeCommands() {
@@ -158,10 +179,12 @@ public class RobotContainer {
     intake.beforeCommands();
     vision.beforeCommands();
     robotSignals.beforeCommands();
+    historyFSM.beforeCommands();
+    achieveHueGoal.beforeCommands();
   }
 
   /**
-   * Run periodically after commands - write logs, dashboards, indicators
+   * Run periodically after commands are run - write logs, dashboards, indicators
    * Include all classes that have periodic outputs
    */
   public void afterCommands() {
@@ -169,5 +192,7 @@ public class RobotContainer {
     intake.afterCommands();
     vision.afterCommands();
     robotSignals.afterCommands();
+    historyFSM.afterCommands();
+    achieveHueGoal.afterCommands();
   }
 }

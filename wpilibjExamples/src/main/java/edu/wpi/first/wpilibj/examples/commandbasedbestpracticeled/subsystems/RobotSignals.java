@@ -46,32 +46,48 @@ public interface LEDPatternSupplier {
   // It's just an example.
 
   private final AddressableLEDBuffer bufferLED;
-  private final int firstMainLED = 11; // inclusive
-  private final int lastMainLED = 32; // inclusive
-  private final int firstTopLED = 0; // inclusive
-  private final int lastTopLED = 10; // inclusive
-  private final int firstEnableDisableLED = 33; // inclusive
-  private final int lastEnableDisableLED = 40; // inclusive
+
+  // first and last LED ids are inclusive of that LED number
+  private final int firstTopLED = 0;
+  private final int lastTopLED = 9;
+  private final int firstMainLED = 10;
+  private final int lastMainLED = 19;
+  private final int firstEnableDisableLED = 20;
+  private final int lastEnableDisableLED = 29;
+  private final int firstHistoryDemoLED = 30;
+  private final int lastHistoryDemoLED = 39;
+  private final int firstAchieveHueGoal = 40;
+  private final int lastAchieveHueGoal = 49;
   
   public LEDView Top;
   public LEDView Main;
   public LEDView EnableDisable;
+  public LEDView HistoryDemo;
+  public LEDView AchieveHueGoal;
 
   public RobotSignals(int port) {
   
-    // start updating the physical LED strip  
-    int length = Math.max(Math.max(lastTopLED, lastMainLED), lastEnableDisableLED) + 1; // simplistic view of 3 segments - one starts at 0
+    // start updating the physical LED strip 
+
+    //  CAUTION
+    //  CAUTION
+    //  CAUTION
+    //  CAUTION
+    // update this length for each view defined
+    // 
+    int length = Math.max(Math.max(Math.max(Math.max(lastTopLED, lastMainLED), lastEnableDisableLED), lastHistoryDemoLED), lastAchieveHueGoal) + 1; // simplistic view of segments - one starts at 0
     strip = new AddressableLED(port);
     strip.setLength(length);
     strip.start();
 
     bufferLED = new AddressableLEDBuffer(length); // buffer for all of the LEDs
 
-    // create the three resources (subsystems) as views of the LED buffer
+    // create the resources (subsystems) as views of the LED buffer
     Top = new LEDView(bufferLED.createView(firstTopLED, lastTopLED));
     Main = new LEDView(bufferLED.createView(firstMainLED, lastMainLED));
     EnableDisable = new LEDView(bufferLED.createView(firstEnableDisableLED, lastEnableDisableLED));
-
+    HistoryDemo = new LEDView(bufferLED.createView(firstHistoryDemoLED, lastHistoryDemoLED));
+    AchieveHueGoal = new LEDView(bufferLED.createView(firstAchieveHueGoal, lastAchieveHueGoal));
   }
 
   public void beforeCommands() {}
@@ -102,6 +118,11 @@ public interface LEDPatternSupplier {
      */
     @Override
     public void setDefaultCommand(Command def) {
+
+      StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+      StackTraceElement element = stackTrace[2];
+      System.out.println("I was called by a method named: " + element.getMethodName());
+      System.out.println("That method is in class: " + element.getClassName());
 
       if (isDefaultSet) {
         throw new IllegalArgumentException("Default Command already set");
