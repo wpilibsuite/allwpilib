@@ -87,12 +87,12 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a mechanism controlled by a DC motor system. The states of the
-   * system are [angular position, angular velocity], inputs are [voltage], and outputs are [angular
-   * position, angular velocity].
+   * Create a state-space model of an angular mechanism controlled by a DC motor system. The states
+   * of the system are [angular position, angular velocity], inputs are [voltage], and outputs are
+   * [angular position, angular velocity].
    *
    * @param motor The motor (or gearbox) attached to system.
-   * @param JKgMetersSquared The moment of inertia J of the DC motor.
+   * @param JKgMetersSquared The moment of inertia J of the mechanism.
    * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;= 0.
@@ -118,39 +118,6 @@ public final class LinearSystemId {
                 * motor.KtNMPerAmp
                 / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgMetersSquared)),
         VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * JKgMetersSquared)),
-        Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));
-  }
-
-  /**
-   * Create a state-space model of a mechanism controlled by a DC motor system. The states of the
-   * system are [angular position, angular velocity], inputs are [voltage], and outputs are [angular
-   * position, angular velocity].
-   *
-   * <p>The distance unit you choose MUST be radians). You can use the {@link
-   * edu.wpi.first.math.util.Units} class for converting between unit types.
-   *
-   * <p>The parameters provided by the user are from this feedforward model:
-   *
-   * <p>u = K_v v + K_a a
-   *
-   * @param kV The velocity gain, in volts/(radians/sec)
-   * @param kA The acceleration gain, in volts/(radians/sec²)
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
-   * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
-   */
-  public static LinearSystem<N2, N1, N2> createAngularSystem(double kV, double kA) {
-    if (kV < 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
-    }
-    if (kA <= 0.0) {
-      throw new IllegalArgumentException("Ka must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -kV / kA),
-        VecBuilder.fill(0, 1 / kA),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }
