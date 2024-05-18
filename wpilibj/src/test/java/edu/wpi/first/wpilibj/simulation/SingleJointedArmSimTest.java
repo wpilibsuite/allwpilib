@@ -7,17 +7,26 @@ package edu.wpi.first.wpilibj.simulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
 
 class SingleJointedArmSimTest {
+  double m_armMassKg = 15.500;
+  double m_armLengthMeters = Units.inchesToMeters(30.0);
+  LinearSystem<N2, N1, N2> m_plant =
+      LinearSystemId.createSingleJointedArmSystem(
+          DCMotor.getVex775Pro(2), m_armMassKg, m_armLengthMeters, 300);
   SingleJointedArmSim m_sim =
       new SingleJointedArmSim(
+          m_plant,
           DCMotor.getVex775Pro(2),
           300,
-          3.0,
-          Units.inchesToMeters(30.0),
+          m_armLengthMeters,
           -Math.PI,
           0.0,
           true,

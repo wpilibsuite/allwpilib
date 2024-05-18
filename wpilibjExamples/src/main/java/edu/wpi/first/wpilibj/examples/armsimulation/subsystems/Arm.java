@@ -5,7 +5,11 @@
 package edu.wpi.first.wpilibj.examples.armsimulation.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
@@ -40,19 +44,22 @@ public class Arm implements AutoCloseable {
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
+  private final LinearSystem<N2, N1, N2> m_plant =
+      LinearSystemId.createSingleJointedArmSystem(
+          m_armGearbox, Constants.kArmMass, Constants.kArmLength, Constants.kArmReduction);
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
+          m_plant,
           m_armGearbox,
           Constants.kArmReduction,
-          SingleJointedArmSim.estimateMOI(Constants.kArmLength, Constants.kArmMass),
           Constants.kArmLength,
           Constants.kMinAngleRads,
           Constants.kMaxAngleRads,
           true,
           0,
           Constants.kArmEncoderDistPerPulse,
-          0.0 // Add noise with a std-dev of 1 tick
-          );
+          0.0);
+
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.

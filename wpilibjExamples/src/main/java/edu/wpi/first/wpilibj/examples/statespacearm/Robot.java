@@ -34,7 +34,8 @@ public class Robot extends TimedRobot {
 
   // Moment of inertia of the arm, in kg * m^2. Can be estimated with CAD. If finding this constant
   // is difficult, LinearSystem.identifyPositionSystem may be better.
-  private static final double kArmMOI = 1.2;
+  private static final double kArmLengthMeters = 1.0;
+  private static final double kArmMassKilograms = 3.6;
 
   // Reduction between motors and encoder, as output over input. If the arm spins slower than
   // the motors, this number should be greater than one.
@@ -53,7 +54,8 @@ public class Robot extends TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   private final LinearSystem<N2, N1, N2> m_armPlant =
-      LinearSystemId.createSingleJointedArmSystem(DCMotor.getNEO(2), kArmMOI, kArmGearing);
+      LinearSystemId.createSingleJointedArmSystem(
+          DCMotor.getNEO(2), kArmMassKilograms, kArmLengthMeters, kArmGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")

@@ -17,12 +17,12 @@ AngularMechanismSim::AngularMechanismSim(
     : LinearSystemSim<2, 1, 2>(plant, measurementStdDevs),
       m_gearbox(gearbox),
       m_gearing(gearbox.Kt.value() * plant.A(1, 1) / plant.B(1, 0)),
-      m_plant(plant) {}
+      m_j(units::kilogram_square_meter_t{
+          m_gearing * m_gearbox.Kt.value() /
+          (m_gearbox.R.value() * m_plant.B(0, 0))}) {}
 
 units::kilogram_square_meter_t AngularMechanismSim::GetJ() const {
-  return units::kilogram_square_meter_t{
-      m_gearing * m_gearbox.Kt.value() /
-      (m_gearbox.R.value() * m_plant.B(0, 0))};
+  return m_j;
 }
 
 void AngularMechanismSim::SetState(

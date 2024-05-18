@@ -181,33 +181,24 @@ public final class LinearSystemId {
    * angular velocity], inputs are [voltage], and outputs are [angle].
    *
    * @param motor The motor (or gearbox) attached to the arm.
-   * @param JKgSquaredMeters The moment of inertia J of the arm.
+   * @param armMassKg The mass of the arm.
+   * @param armLengthMeters The length of the arm.
    * @param gearing The gearing between the motor and arm, in output over input. Most of the time
    *     this will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
   public static LinearSystem<N2, N1, N2> createSingleJointedArmSystem(
-      DCMotor motor, double JKgSquaredMeters, double gearing) {
-    if (JKgSquaredMeters <= 0.0) {
-      throw new IllegalArgumentException("JKgSquaredMeters must be greater than zero.");
+      DCMotor motor, double armMassKg, double armLengthMeters, double gearing) {
+    if (armMassKg <= 0.0) {
+      throw new IllegalArgumentException("armMassKg must be greater than zero.");
     }
-    if (gearing <= 0.0) {
-      throw new IllegalArgumentException("gearing must be greater than zero.");
+    if (armLengthMeters <= 0.0) {
+      throw new IllegalArgumentException("armLengthMeters must be greater than zero.");
     }
 
-    return new LinearSystem<>(
-        MatBuilder.fill(
-            Nat.N2(),
-            Nat.N2(),
-            0,
-            1,
-            0,
-            -Math.pow(gearing, 2)
-                * motor.KtNMPerAmp
-                / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgSquaredMeters)),
-        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * JKgSquaredMeters)),
-        Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));
+    double JKgSquaredMeters = (1.0 / 3.0) * armMassKg * Math.pow(armLengthMeters, 2);
+
+    return createAngularSystem(motor, JKgSquaredMeters, gearing);
   }
 
   /**

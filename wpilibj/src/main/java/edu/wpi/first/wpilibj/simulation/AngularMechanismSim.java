@@ -29,6 +29,9 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
   // The gearing from the motors to the output.
   private final double m_gearing;
 
+  // The moment of inertia of the mechanism.
+  private final double m_jKgMetersSquared;
+
   // The angular position of the system.
   private final MutableMeasure<Angle> m_angle = MutableMeasure.zero(Radians);
 
@@ -39,9 +42,6 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
   // The angular acceleration of the system.
   private final MutableMeasure<Velocity<Velocity<Angle>>> m_angularAcceleration =
       MutableMeasure.zero(RadiansPerSecondPerSecond);
-
-  // The mechanism's plant
-  private final LinearSystem<N2, N1, N2> m_plant;
 
   /**
    * Creates a simulated angular mechanism.
@@ -62,7 +62,7 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearbox.KtNMPerAmp * plant.getA(1, 1) / plant.getB(1, 0);
-    m_plant = plant;
+    m_jKgMetersSquared = m_gearing * m_gearbox.KtNMPerAmp / (m_gearbox.rOhms * m_plant.getB(1, 0));
   }
 
   /**
@@ -80,7 +80,7 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
    * @return The mechanisms's moment of inertia.
    */
   public double getJKgMetersSquared() {
-    return m_gearing * m_gearbox.KtNMPerAmp / (m_gearbox.rOhms * m_plant.getB(1, 0));
+    return m_jKgMetersSquared;
   }
 
   /**

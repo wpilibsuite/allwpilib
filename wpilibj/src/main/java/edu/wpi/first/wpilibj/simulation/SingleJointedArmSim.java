@@ -12,7 +12,6 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated single jointed arm mechanism. */
@@ -40,7 +39,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @param plant The linear system that represents the arm. This system can be created with {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
-   *     double, double)}.
+   *     double, double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
    * @param armLengthMeters The length of the arm.
@@ -71,42 +70,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
     m_simulateGravity = simulateGravity;
 
     setState(startingAngleRads, 0.0);
-  }
-
-  /**
-   * Creates a simulated arm mechanism.
-   *
-   * @param gearbox The type of and number of motors in the arm gearbox.
-   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
-   * @param jKgMetersSquared The moment of inertia of the arm; can be calculated from CAD software.
-   * @param armLengthMeters The length of the arm.
-   * @param minAngleRads The minimum angle that the arm is capable of.
-   * @param maxAngleRads The maximum angle that the arm is capable of.
-   * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingAngleRads The initial position of the Arm simulation in radians.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 1 element for position.
-   */
-  public SingleJointedArmSim(
-      DCMotor gearbox,
-      double gearing,
-      double jKgMetersSquared,
-      double armLengthMeters,
-      double minAngleRads,
-      double maxAngleRads,
-      boolean simulateGravity,
-      double startingAngleRads,
-      double... measurementStdDevs) {
-    this(
-        LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
-        gearbox,
-        gearing,
-        armLengthMeters,
-        minAngleRads,
-        maxAngleRads,
-        simulateGravity,
-        startingAngleRads,
-        measurementStdDevs);
   }
 
   /**

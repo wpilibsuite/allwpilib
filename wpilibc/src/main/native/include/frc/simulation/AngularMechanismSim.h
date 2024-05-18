@@ -127,6 +127,6 @@ class AngularMechanismSim : public LinearSystemSim<2, 1, 2> {
  private:
   DCMotor m_gearbox;
   double m_gearing;
-  LinearSystem<2, 1, 2> m_plant;
+  units::kilogram_square_meter_t m_j;
 };
 }  // namespace frc::sim
