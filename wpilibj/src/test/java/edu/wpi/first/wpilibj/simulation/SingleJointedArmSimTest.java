@@ -23,14 +23,7 @@ class SingleJointedArmSimTest {
           DCMotor.getVex775Pro(2), m_armMassKg, m_armLengthMeters, 300);
   SingleJointedArmSim m_sim =
       new SingleJointedArmSim(
-          m_plant,
-          DCMotor.getVex775Pro(2),
-          300,
-          m_armLengthMeters,
-          -Math.PI,
-          0.0,
-          true,
-          Math.PI / 2.0);
+          m_plant, DCMotor.getVex775Pro(2), m_armLengthMeters, -Math.PI, 0.0, true, Math.PI / 2.0);
 
   @Test
   void testArmDisabled() {
@@ -43,6 +36,6 @@ class SingleJointedArmSimTest {
     }
 
     // the arm should swing down
-    assertEquals(-Math.PI / 2.0, m_sim.getAngleRads(), 0.1);
+    assertEquals(-Math.PI / 2.0, m_sim.getAngularPositionRad(), 0.1);
   }
 }

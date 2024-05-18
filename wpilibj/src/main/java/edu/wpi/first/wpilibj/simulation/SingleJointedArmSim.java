@@ -12,16 +12,9 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated single jointed arm mechanism. */
-public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
-  // The gearbox for the arm.
-  private final DCMotor m_gearbox;
-
-  // The gearing between the motors and the output.
-  private final double m_gearing;
-
+public class SingleJointedArmSim extends AngularMechanismSim {
   // The length of the arm.
   private final double m_armLenMeters;
 
@@ -41,7 +34,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
    *     double, double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
-   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
    * @param armLengthMeters The length of the arm.
    * @param minAngleRads The minimum angle that the arm is capable of.
    * @param maxAngleRads The maximum angle that the arm is capable of.
@@ -54,16 +46,13 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   public SingleJointedArmSim(
       LinearSystem<N2, N1, N2> plant,
       DCMotor gearbox,
-      double gearing,
       double armLengthMeters,
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
       double startingAngleRads,
       double... measurementStdDevs) {
-    super(plant, measurementStdDevs);
-    m_gearbox = gearbox;
-    m_gearing = gearing;
+    super(plant, gearbox, measurementStdDevs);
     m_armLenMeters = armLengthMeters;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
@@ -79,9 +68,15 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @param angleRadians The new angle in radians.
    * @param velocityRadPerSec The new angular velocity in radians per second.
    */
+  @Override
   public final void setState(double angleRadians, double velocityRadPerSec) {
     setState(
         VecBuilder.fill(MathUtil.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
+  }
+
+  @Override
+  public void setPosition(double angularPositionRad) {
+    super.setPosition(MathUtil.clamp(angularPositionRad, m_minAngle, m_maxAngle));
   }
 
   /**
@@ -110,7 +105,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @return Whether the arm has hit the lower limit.
    */
   public boolean hasHitLowerLimit() {
-    return wouldHitLowerLimit(getAngleRads());
+    return wouldHitLowerLimit(getAngularPositionRad());
   }
 
   /**
@@ -119,47 +114,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @return Whether the arm has hit the upper limit.
    */
   public boolean hasHitUpperLimit() {
-    return wouldHitUpperLimit(getAngleRads());
-  }
-
-  /**
-   * Returns the current arm angle.
-   *
-   * @return The current arm angle.
-   */
-  public double getAngleRads() {
-    return getOutput(0);
-  }
-
-  /**
-   * Returns the current arm velocity.
-   *
-   * @return The current arm velocity.
-   */
-  public double getVelocityRadPerSec() {
-    return getOutput(1);
-  }
-
-  /**
-   * Returns the arm current draw.
-   *
-   * @return The aram current draw.
-   */
-  public double getCurrentDrawAmps() {
-    // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
-    // spinning 10x faster than the output
-    var motorVelocity = m_x.get(1, 0) * m_gearing;
-    return m_gearbox.getCurrent(motorVelocity, m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
-  }
-
-  /**
-   * Sets the input voltage for the arm.
-   *
-   * @param volts The input voltage.
-   */
-  public void setInputVoltage(double volts) {
-    setInput(volts);
-    clampInput(RobotController.getBatteryVoltage());
+    return wouldHitUpperLimit(getAngularPositionRad());
   }
 
   /**
