@@ -39,6 +39,21 @@ LEDPattern LEDPattern::OffsetBy(int offset) {
   }};
 }
 
+// floorDiv algorithm taken from Java
+constexpr static int floorDiv(int x, int y) {
+  int r = x / y;
+  // if the signs are different and modulo not zero, round down
+  if ((x ^ y) < 0 && (r * y != x)) {
+    r--;
+  }
+  return r;
+}
+
+// floorMod algorithm taken from Java
+constexpr static int floorMod(int x, int y) {
+  return x - floorDiv(x, y) * y;
+}
+
 LEDPattern LEDPattern::ScrollAtRelativeSpeed(double velocity) {
   // velocity is in terms of LED lengths per second (1.0 = full cycle per
   // second, 0.5 = half cycle per second, 2.0 = two cycles per second) invert
@@ -54,8 +69,8 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(double velocity) {
     int offset = static_cast<int>(t * bufLen);
 
     ApplyTo(data, [&](int i, Color color) {
-      // remainder so if the offset is negative, we still get positive outputs
-      int shiftedIndex = std::remainder(i + offset, bufLen);
+      // floorMod so if the offset is negative, we still get positive outputs
+      int shiftedIndex = floorMod(i + offset, bufLen);
       writer(shiftedIndex, color);
     });
   }};
@@ -74,8 +89,8 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
 
     auto offset = now / microsPerLed;
     ApplyTo(data, [&](int i, Color color) {
-      // remainder so if the offset is negative, we still get positive outputs
-      int shiftedIndex = std::remainder(i + offset, bufLen);
+      // floorMod so if the offset is negative, we still get positive outputs
+      int shiftedIndex = floorMod(i + offset, bufLen);
 
       writer(shiftedIndex, color);
     });
