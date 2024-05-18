@@ -8,6 +8,7 @@
 #include <cmath>
 #include <numbers>
 
+#include <wpi/MathExtras.h>
 #include <wpi/timestamp.h>
 
 using namespace frc;
@@ -39,36 +40,22 @@ LEDPattern LEDPattern::OffsetBy(int offset) {
   }};
 }
 
-// floorDiv algorithm taken from Java
-constexpr static int floorDiv(int x, int y) {
-  int r = x / y;
-  // if the signs are different and modulo not zero, round down
-  if ((x ^ y) < 0 && (r * y != x)) {
-    r--;
-  }
-  return r;
-}
-
-// floorMod algorithm taken from Java
-constexpr static int floorMod(int x, int y) {
-  return x - floorDiv(x, y) * y;
-}
-
 LEDPattern LEDPattern::ScrollAtRelativeSpeed(double velocity) {
   // velocity is in terms of LED lengths per second (1.0 = full cycle per
   // second, 0.5 = half cycle per second, 2.0 = two cycles per second) invert
   // and multiply by 1,000,000 to get microseconds
-  auto periodMicros = 1e6 / velocity;
+  double periodMicros = 1e6 / velocity;
 
-  return LEDPattern{[&](auto data, auto writer) {
+  return LEDPattern{[=, this](auto data, auto writer) {
     auto bufLen = data.size();
     auto now = wpi::Now();
 
     // index should move by (bufLen) / (period)
-    double t = (now % static_cast<uint64_t>(periodMicros)) / periodMicros;
-    int offset = static_cast<int>(t * bufLen);
+    double t =
+        (now % static_cast<uint64_t>(std::floor(periodMicros))) / periodMicros;
+    int offset = static_cast<int>(std::floor(t * bufLen));
 
-    ApplyTo(data, [&](int i, Color color) {
+    ApplyTo(data, [=](int i, Color color) {
       // floorMod so if the offset is negative, we still get positive outputs
       int shiftedIndex = floorMod(i + offset, bufLen);
       writer(shiftedIndex, color);
@@ -201,7 +188,7 @@ LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
 LEDPattern LEDPattern::kOff = LEDPattern::Solid(Color::kBlack);
 
 LEDPattern LEDPattern::Solid(const Color color) {
-  return LEDPattern{[&](auto data, auto writer) {
+  return LEDPattern{[=](auto data, auto writer) {
     auto bufLen = data.size();
     for (size_t i = 0; i < bufLen; i++) {
       writer(i, color);
@@ -265,7 +252,7 @@ LEDPattern LEDPattern::Gradient(std::span<Color> colors) {
     return LEDPattern::Solid(colors[0]);
   }
   size_t numSegments = colors.size();
-  return LEDPattern{[&](auto data, auto writer) {
+  return LEDPattern{[=](auto data, auto writer) {
     auto bufLen = data.size();
     int ledsPerSegment = bufLen / numSegments;
 
@@ -277,16 +264,16 @@ LEDPattern LEDPattern::Gradient(std::span<Color> colors) {
       auto color = colors[colorIndex];
       auto nextColor = colors[nextColorIndex];
 
-      Color gradientColor{(color.red * (t - 1) + nextColor.red * t),
-                          (color.green * (t - 1) + nextColor.green * t),
-                          (color.blue * (t - 1) + nextColor.blue * t)};
+      Color gradientColor{wpi::Lerp(color.red, nextColor.red, t),
+                          wpi::Lerp(color.green, nextColor.green, t),
+                          wpi::Lerp(color.blue, nextColor.blue, t)};
       writer(led, gradientColor);
     }
   }};
 }
 
 LEDPattern LEDPattern::Rainbow(uint8_t saturation, uint8_t value) {
-  return LEDPattern{[&](auto data, auto writer) {
+  return LEDPattern{[=](auto data, auto writer) {
     auto bufLen = data.size();
     for (size_t led = 0; led < bufLen; led++) {
       int hue = ((led * 180) / bufLen) % 180;
