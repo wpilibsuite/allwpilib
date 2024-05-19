@@ -34,7 +34,7 @@ class LEDPattern {
  public:
   explicit LEDPattern(const LEDPatternFn& impl);
 
-  ~LEDPattern() = default;
+  ~LEDPattern();
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called
@@ -62,6 +62,7 @@ class LEDPattern {
    *
    * @return the reverse pattern
    */
+  [[nodiscard]]
   LEDPattern Reversed();
 
   /**
@@ -71,6 +72,7 @@ class LEDPattern {
    * @param offset how many LEDs to offset by
    * @return the offset pattern
    */
+  [[nodiscard]]
   LEDPattern OffsetBy(int offset);
 
   /**
@@ -80,6 +82,7 @@ class LEDPattern {
    * 10 LEDs long will travel twice as fast as on a segment that's only 5 LEDs
    * long (assuming equal LED density on both segments).
    */
+  [[nodiscard]]
   LEDPattern ScrollAtRelativeSpeed(double velocity);
 
   /**
@@ -108,6 +111,7 @@ class LEDPattern {
    * strip
    * @return the scrolling pattern
    */
+  [[nodiscard]]
   LEDPattern ScrollAtAbsoluteSpeed(units::meters_per_second_t velocity,
                                    units::meter_t ledSpacing);
 
@@ -119,6 +123,7 @@ class LEDPattern {
    * @param offTime how long the pattern should be turned off for, per cycle
    * @return the blinking pattern
    */
+  [[nodiscard]]
   LEDPattern Blink(units::second_t onTime, units::second_t offTime);
 
   /**
@@ -129,6 +134,7 @@ class LEDPattern {
    * per cycle
    * @return the blinking pattern
    */
+  [[nodiscard]]
   LEDPattern Blink(units::second_t onTime);
 
   /**
@@ -140,6 +146,7 @@ class LEDPattern {
    * @param signal the signal to synchronize with
    * @return the blinking pattern
    */
+  [[nodiscard]]
   LEDPattern SynchronizedBlink(std::function<bool()> signal);
 
   /**
@@ -149,6 +156,7 @@ class LEDPattern {
    * @param period how fast the breathing pattern should complete a single cycle
    * @return the breathing pattern
    */
+  [[nodiscard]]
   LEDPattern Breathe(units::second_t period);
 
   /**
@@ -159,6 +167,7 @@ class LEDPattern {
    * @param base the base pattern to overlay on top of
    * @return the combined overlay pattern
    */
+  [[nodiscard]]
   LEDPattern OverlayOn(LEDPattern& base);
 
   /**
@@ -174,6 +183,7 @@ class LEDPattern {
    * @param other the pattern to blend with
    * @return the blended pattern
    */
+  [[nodiscard]]
   LEDPattern Blend(LEDPattern& other);
 
   /**
@@ -189,6 +199,7 @@ class LEDPattern {
    * @param mask the mask to apply
    * @return the masked pattern
    */
+  [[nodiscard]]
   LEDPattern Mask(LEDPattern& mask);
 
   /**
@@ -217,6 +228,7 @@ class LEDPattern {
    * brightness
    * @return the input pattern, displayed at
    */
+  [[nodiscard]]
   LEDPattern AtBrightness(double relativeBrightness);
 
   /** A pattern that turns off all LEDs. */
@@ -292,7 +304,7 @@ class LEDPattern {
    * @param value the value of the HSV colors, in [0, 255]
    * @return the rainbow pattern
    */
-  static LEDPattern Rainbow(uint8_t saturation, uint8_t value);
+  static LEDPattern Rainbow(int saturation, int value);
 
   // floorDiv algorithm taken from Java
   constexpr static int floorDiv(int x, int y) {

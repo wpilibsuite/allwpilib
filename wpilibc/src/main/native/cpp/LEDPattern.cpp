@@ -6,6 +6,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
+#include <memory>
 #include <numbers>
 
 #include <wpi/MathExtras.h>
@@ -14,6 +16,10 @@
 using namespace frc;
 
 LEDPattern::LEDPattern(const LEDPatternFn& impl) : m_impl(std::move(impl)) {}
+
+LEDPattern::~LEDPattern() {
+  std::cout << "Destroying a pattern!" << std::endl;
+}
 
 void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data,
                          LEDWriterFn writer) {
@@ -25,16 +31,16 @@ void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data) {
 }
 
 LEDPattern LEDPattern::Reversed() {
-  return LEDPattern{[&](auto data, auto writer) {
-    m_impl(data,
-           [&](int i, Color color) { writer((data.size() - 1) - i, color); });
+  return LEDPattern{[this](auto data, auto writer) {
+    ApplyTo(data,
+            [&](int i, Color color) { writer((data.size() - 1) - i, color); });
   }};
 }
 
 LEDPattern LEDPattern::OffsetBy(int offset) {
-  return LEDPattern{[&](auto data, auto writer) {
-    m_impl(data, [=](int i, Color color) {
-      int shiftedIndex = (i + offset) % data.size();
+  return LEDPattern{[=, this](auto data, auto writer) {
+    ApplyTo(data, [&data, &writer, offset](int i, Color color) {
+      int shiftedIndex = floorMod(i + offset, data.size());
       writer(shiftedIndex, color);
     });
   }};
@@ -68,14 +74,19 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
   // Velocity is in terms of meters per second
   // Multiply by 1,000,000 to use microseconds instead of seconds
   auto microsPerLed =
-      static_cast<uint64_t>(std::floor((ledSpacing / velocity).value()) * 1e6);
+      static_cast<int64_t>(std::floor((ledSpacing / velocity).value() * 1e6));
 
-  return LEDPattern{[&](auto data, auto writer) {
+  return LEDPattern{[=, this](auto data, auto writer) {
     auto bufLen = data.size();
     auto now = wpi::Now();
 
-    auto offset = now / microsPerLed;
-    ApplyTo(data, [&](int i, Color color) {
+    // every step in time that's a multiple of microsPerLED will increment
+    // the offset by 1
+    // cast unsigned int64 `now` to a signed int64 so we can get negative
+    // offset values for negative velocities
+    auto offset = static_cast<int64_t>(now) / microsPerLed;
+
+    ApplyTo(data, [=, &writer](int i, Color color) {
       // floorMod so if the offset is negative, we still get positive outputs
       int shiftedIndex = floorMod(i + offset, bufLen);
 
@@ -85,11 +96,11 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
 }
 
 LEDPattern LEDPattern::Blink(units::second_t onTime, units::second_t offTime) {
-  auto totalMicros = units::microsecond_t{onTime + offTime}.value();
-  auto onMicros = units::microsecond_t{onTime}.value();
+  auto totalMicros = units::microsecond_t{onTime + offTime}.to<uint64_t>();
+  auto onMicros = units::microsecond_t{onTime}.to<uint64_t>();
 
-  return LEDPattern{[&](auto data, auto writer) {
-    if (std::remainder(wpi::Now(), totalMicros) < onMicros) {
+  return LEDPattern{[=, this](auto data, auto writer) {
+    if (wpi::Now() % totalMicros < onMicros) {
       ApplyTo(data, writer);
     } else {
       LEDPattern::kOff.ApplyTo(data, writer);
@@ -102,7 +113,7 @@ LEDPattern LEDPattern::Blink(units::second_t onTime) {
 }
 
 LEDPattern LEDPattern::SynchronizedBlink(std::function<bool()> signal) {
-  return LEDPattern{[&](auto data, auto writer) {
+  return LEDPattern{[=, this](auto data, auto writer) {
     if (signal()) {
       ApplyTo(data, writer);
     } else {
@@ -112,16 +123,17 @@ LEDPattern LEDPattern::SynchronizedBlink(std::function<bool()> signal) {
 }
 
 LEDPattern LEDPattern::Breathe(units::second_t period) {
-  auto periodMicros = units::microsecond_t{period}.value();
+  auto periodMicros = units::microsecond_t{period};
 
-  return LEDPattern{[&](auto data, auto writer) {
-    ApplyTo(data, [&](int i, Color color) {
-      double t = std::remainder(wpi::Now(), periodMicros) / periodMicros;
+  return LEDPattern{[periodMicros, this](auto data, auto writer) {
+    ApplyTo(data, [&data, &writer, periodMicros](int i, Color color) {
+      double t = (wpi::Now() % periodMicros.to<uint64_t>()) /
+                 periodMicros.to<double>();
       double phase = t * 2 * std::numbers::pi;
 
       // Apply the cosine function and shift its output from [-1, 1] to [0, 1]
       // Use cosine so the period starts at 100% brightness
-      double dim = 1 - (std::cos(phase) + 1) / 2.0;
+      double dim = (std::cos(phase) + 1) / 2.0;
 
       writer(i, Color{color.red * dim, color.green * dim, color.blue * dim});
     });
@@ -129,7 +141,7 @@ LEDPattern LEDPattern::Breathe(units::second_t period) {
 }
 
 LEDPattern LEDPattern::OverlayOn(LEDPattern& base) {
-  return LEDPattern{[&](auto data, auto writer) {
+  return LEDPattern{[this, &base](auto data, auto writer) {
     // write the base pattern down first...
     base.ApplyTo(data, writer);
 
@@ -174,7 +186,7 @@ LEDPattern LEDPattern::Mask(LEDPattern& mask) {
 }
 
 LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
-  return LEDPattern{[&](auto data, auto writer) {
+  return LEDPattern{[=, this](auto data, auto writer) {
     ApplyTo(data, [&](int i, Color color) {
       writer(i, Color{color.red * relativeBrightness,
                       color.green * relativeBrightness,
@@ -183,7 +195,7 @@ LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
   }};
 }
 
-// // Static constants and functions
+// Static constants and functions
 
 LEDPattern LEDPattern::kOff = LEDPattern::Solid(Color::kBlack);
 
@@ -222,7 +234,7 @@ LEDPattern LEDPattern::Steps(std::span<std::pair<double, Color>> steps) {
     return LEDPattern::Solid(steps[0].second);
   }
 
-  return LEDPattern{[&](auto data, auto writer) {
+  return LEDPattern{[=](auto data, auto writer) {
     auto bufLen = data.size();
 
     // precompute relevant positions for this buffer so we don't need to do a
@@ -272,7 +284,7 @@ LEDPattern LEDPattern::Gradient(std::span<Color> colors) {
   }};
 }
 
-LEDPattern LEDPattern::Rainbow(uint8_t saturation, uint8_t value) {
+LEDPattern LEDPattern::Rainbow(int saturation, int value) {
   return LEDPattern{[=](auto data, auto writer) {
     auto bufLen = data.size();
     for (size_t led = 0; led < bufLen; led++) {
