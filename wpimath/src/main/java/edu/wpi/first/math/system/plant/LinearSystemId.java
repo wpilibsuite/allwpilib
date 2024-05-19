@@ -183,21 +183,35 @@ public final class LinearSystemId {
    * @param motor The motor (or gearbox) attached to the arm.
    * @param armMassKg The mass of the arm.
    * @param armLengthMeters The length of the arm.
+   * @param pivotPositionMeters The pivot location of the arm. A value of 0 or equal to
+   *     armLengthMeters indicates that the arm is pivoted at one of the ends.
    * @param gearing The gearing between the motor and arm, in output over input. Most of the time
    *     this will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
   public static LinearSystem<N2, N1, N2> createSingleJointedArmSystem(
-      DCMotor motor, double armMassKg, double armLengthMeters, double gearing) {
+      DCMotor motor,
+      double armMassKg,
+      double armLengthMeters,
+      double pivotPositionMeters,
+      double gearing) {
     if (armMassKg <= 0.0) {
       throw new IllegalArgumentException("armMassKg must be greater than zero.");
     }
     if (armLengthMeters <= 0.0) {
       throw new IllegalArgumentException("armLengthMeters must be greater than zero.");
     }
+    if (pivotPositionMeters >= armLengthMeters) {
+      throw new IllegalArgumentException("pivotPositionMeters must be less than the arm length.");
+    }
+    if (pivotPositionMeters < 0.0) {
+      throw new IllegalArgumentException("pivotPositionMeters must be greater than or equal to 0");
+    }
 
-    double JKgSquaredMeters = (1.0 / 3.0) * armMassKg * Math.pow(armLengthMeters, 2);
-
+    double centerToPivotDistanceMeters = Math.abs((armLengthMeters / 2.0) - pivotPositionMeters);
+    double JKgSquaredMetersCenter = (1.0 / 12.0) * armMassKg * Math.pow(armLengthMeters, 2);
+    double JKgSquareMetersCentralAxisTheorem = armMassKg * Math.pow(centerToPivotDistanceMeters, 2);
+    double JKgSquaredMeters = JKgSquareMetersCentralAxisTheorem + JKgSquaredMetersCenter;
     return createAngularSystem(motor, JKgSquaredMeters, gearing);
   }
 

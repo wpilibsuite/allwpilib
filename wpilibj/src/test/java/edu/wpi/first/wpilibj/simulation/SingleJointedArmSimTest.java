@@ -20,10 +20,17 @@ class SingleJointedArmSimTest {
   double m_armLengthMeters = Units.inchesToMeters(30.0);
   LinearSystem<N2, N1, N2> m_plant =
       LinearSystemId.createSingleJointedArmSystem(
-          DCMotor.getVex775Pro(2), m_armMassKg, m_armLengthMeters, 300);
+          DCMotor.getVex775Pro(2), m_armMassKg, m_armLengthMeters, 0.0, 300);
   SingleJointedArmSim m_sim =
       new SingleJointedArmSim(
-          m_plant, DCMotor.getVex775Pro(2), m_armLengthMeters, -Math.PI, 0.0, true, Math.PI / 2.0);
+          m_plant,
+          DCMotor.getVex775Pro(2),
+          m_armLengthMeters,
+          0.0,
+          -Math.PI,
+          0.0,
+          true,
+          Math.PI / 2.0);
 
   @Test
   void testArmDisabled() {

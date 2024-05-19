@@ -46,12 +46,13 @@ public class Arm implements AutoCloseable {
   // to 255 degrees (rotated down in the back).
   private final LinearSystem<N2, N1, N2> m_plant =
       LinearSystemId.createSingleJointedArmSystem(
-          m_armGearbox, Constants.kArmMass, Constants.kArmLength, Constants.kArmReduction);
+          m_armGearbox, Constants.kArmMass, Constants.kArmLength, 0.0, Constants.kArmReduction);
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
           m_plant,
           m_armGearbox,
           Constants.kArmLength,
+          0.0,
           Constants.kMinAngleRads,
           Constants.kMaxAngleRads,
           true,

@@ -12,11 +12,15 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated single jointed arm mechanism. */
 public class SingleJointedArmSim extends AngularMechanismSim {
   // The length of the arm.
   private final double m_armLenMeters;
+
+  // The pivot point of the arm.
+  private final double m_pivotPointMeters;
 
   // The minimum angle that the arm is capable of.
   private final double m_minAngle;
@@ -32,9 +36,10 @@ public class SingleJointedArmSim extends AngularMechanismSim {
    *
    * @param plant The linear system that represents the arm. This system can be created with {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
-   *     double, double, double)}.
+   *     double, double, double)} or {@link LinearSystemId#identifyPositionSystem(double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param armLengthMeters The length of the arm.
+   * @param pivotPointMeters The pivot point of the arm.
    * @param minAngleRads The minimum angle that the arm is capable of.
    * @param maxAngleRads The maximum angle that the arm is capable of.
    * @param simulateGravity Whether gravity should be simulated or not.
@@ -47,6 +52,7 @@ public class SingleJointedArmSim extends AngularMechanismSim {
       LinearSystem<N2, N1, N2> plant,
       DCMotor gearbox,
       double armLengthMeters,
+      double pivotPointMeters,
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
@@ -54,11 +60,58 @@ public class SingleJointedArmSim extends AngularMechanismSim {
       double... measurementStdDevs) {
     super(plant, gearbox, measurementStdDevs);
     m_armLenMeters = armLengthMeters;
+    m_pivotPointMeters = pivotPointMeters;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
     m_simulateGravity = simulateGravity;
 
     setState(startingAngleRads, 0.0);
+  }
+
+  /**
+   * Returns the arm length of the system.
+   *
+   * @return the arm length.
+   */
+  public double getArmLengthMeters() {
+    return m_armLenMeters;
+  }
+
+  /**
+   * Returns the pivot point of the system.
+   *
+   * @return the pivot point.
+   */
+  public double getPivotPointMeters() {
+    return m_pivotPointMeters;
+  }
+
+  /**
+   * Returns the minimum angle of the system.
+   *
+   * @return the minimum angle.
+   */
+  public double getMinimumAngleRadians() {
+    return m_minAngle;
+  }
+
+  /**
+   * Returns the minimum angle of the system.
+   *
+   * @return the minimum angle.
+   */
+  public double getMaximumAngleRadians() {
+    return m_maxAngle;
+  }
+
+  /**
+   * Returns the mass of the system.
+   *
+   * @return the mass.
+   */
+  public double getMassKilograms() {
+    return getJKgMetersSquared()
+        / ((1.0 / 12.0) * Math.pow(m_armLenMeters, 2) + Math.pow(m_pivotPointMeters, 2));
   }
 
   /**
@@ -164,9 +217,14 @@ public class SingleJointedArmSim extends AngularMechanismSim {
     Matrix<N2, N1> updatedXhat =
         NumericalIntegration.rkdp(
             (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
+              double alphaGravConstant =
+                  -9.8
+                      * (3.0 / 2.0)
+                      * Math.abs(1 - 2 * m_pivotPointMeters / m_armLenMeters)
+                      / m_armLenMeters;
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
               if (m_simulateGravity) {
-                double alphaGrav = 3.0 / 2.0 * -9.8 * Math.cos(x.get(0, 0)) / m_armLenMeters;
+                double alphaGrav = alphaGravConstant * Math.cos(x.get(0, 0));
                 xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
               }
               return xdot;

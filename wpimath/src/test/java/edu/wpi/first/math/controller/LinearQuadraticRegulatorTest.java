@@ -61,7 +61,7 @@ class LinearQuadraticRegulatorTest {
     var r = 0.4;
     var G = 100.0;
 
-    var plant = LinearSystemId.createSingleJointedArmSystem(motors, m, r, G);
+    var plant = LinearSystemId.createSingleJointedArmSystem(motors, m, r, 0.0, G);
 
     var qElms = VecBuilder.fill(0.01745, 0.08726);
     var rElms = VecBuilder.fill(12.0);

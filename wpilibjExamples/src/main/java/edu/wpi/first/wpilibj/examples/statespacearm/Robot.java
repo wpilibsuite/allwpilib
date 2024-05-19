@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
   // Outputs (what we can measure): [position], in radians.
   private final LinearSystem<N2, N1, N2> m_armPlant =
       LinearSystemId.createSingleJointedArmSystem(
-          DCMotor.getNEO(2), kArmMassKilograms, kArmLengthMeters, kArmGearing);
+          DCMotor.getNEO(2), kArmMassKilograms, kArmLengthMeters, 0.0, kArmGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")
