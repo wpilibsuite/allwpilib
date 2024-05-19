@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.async.subsystems;
+package edu.wpi.first.wpilibj.examples.coroutines.subsystems;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -13,7 +13,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
-import edu.wpi.first.wpilibj.examples.async.Constants.ShooterConstants;
+import edu.wpi.first.wpilibj.examples.coroutines.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 public class Shooter extends RequireableResource {

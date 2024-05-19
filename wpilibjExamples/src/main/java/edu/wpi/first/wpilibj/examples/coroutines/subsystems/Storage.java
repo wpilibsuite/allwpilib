@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.async.subsystems;
+package edu.wpi.first.wpilibj.examples.coroutines.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.commandsv3.AsyncCommand;
+import edu.wpi.first.wpilibj.commandsv3.Command;
 import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
-import edu.wpi.first.wpilibj.examples.async.Constants.StorageConstants;
+import edu.wpi.first.wpilibj.commandsv3.button.Trigger;
+import edu.wpi.first.wpilibj.examples.coroutines.Constants.StorageConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.commandsv3.button.AsyncTrigger;
 
 public class Storage extends RequireableResource {
   private final PWMSparkMax m_motor = new PWMSparkMax(StorageConstants.kMotorPort);
@@ -19,7 +19,7 @@ public class Storage extends RequireableResource {
   // inter-subsystem communications
   /** Whether the ball storage is full. */
   @SuppressWarnings("checkstyle:MemberName")
-  public final AsyncTrigger hasCargo = new AsyncTrigger(m_ballSensor::get);
+  public final Trigger hasCargo = new Trigger(m_ballSensor::get);
 
   /** Create a new Storage subsystem. */
   public Storage() {
@@ -37,7 +37,7 @@ public class Storage extends RequireableResource {
   }
 
   /** Returns a command that runs the storage motor indefinitely. */
-  public AsyncCommand runCommand() {
+  public Command runCommand() {
     return run((coroutine) -> {
       while (coroutine.yield()) {
         run();

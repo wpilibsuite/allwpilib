@@ -9,11 +9,11 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.wpilibj.GenericHID;
 
 /**
- * A {@link AsyncTrigger} that gets its state from a {@link GenericHID}.
+ * A {@link Trigger} that gets its state from a {@link GenericHID}.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class JoystickButton extends AsyncTrigger {
+public class JoystickButton extends Trigger {
   /**
    * Creates a joystick button for triggering commands.
    *

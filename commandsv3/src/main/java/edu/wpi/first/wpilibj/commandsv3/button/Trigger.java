@@ -7,8 +7,8 @@ package edu.wpi.first.wpilibj.commandsv3.button;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.wpilibj.commandsv3.AsyncCommand;
-import edu.wpi.first.wpilibj.commandsv3.AsyncScheduler;
+import edu.wpi.first.wpilibj.commandsv3.Command;
+import edu.wpi.first.wpilibj.commandsv3.Scheduler;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.function.BooleanSupplier;
 
@@ -23,7 +23,7 @@ import java.util.function.BooleanSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class AsyncTrigger implements BooleanSupplier {
+public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_condition;
   private final EventLoop m_loop;
 
@@ -33,7 +33,7 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param loop The loop instance that polls this trigger.
    * @param condition the condition represented by this trigger
    */
-  public AsyncTrigger(EventLoop loop, BooleanSupplier condition) {
+  public Trigger(EventLoop loop, BooleanSupplier condition) {
     m_loop = requireNonNullParam(loop, "loop", "Trigger");
     m_condition = requireNonNullParam(condition, "condition", "Trigger");
   }
@@ -45,8 +45,8 @@ public class AsyncTrigger implements BooleanSupplier {
    *
    * @param condition the condition represented by this trigger
    */
-  public AsyncTrigger(BooleanSupplier condition) {
-    this(AsyncScheduler.getInstance().getDefaultButtonLoop(), condition);
+  public Trigger(BooleanSupplier condition) {
+    this(Scheduler.getInstance().getDefaultButtonLoop(), condition);
   }
 
   /**
@@ -55,7 +55,7 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
-  public AsyncTrigger onTrue(AsyncCommand command) {
+  public Trigger onTrue(Command command) {
     requireNonNullParam(command, "command", "onTrue");
     m_loop.bind(
         new Runnable() {
@@ -81,7 +81,7 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
-  public AsyncTrigger onFalse(AsyncCommand command) {
+  public Trigger onFalse(Command command) {
     requireNonNullParam(command, "command", "onFalse");
     m_loop.bind(
         new Runnable() {
@@ -110,7 +110,7 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
-  public AsyncTrigger whileTrue(AsyncCommand command) {
+  public Trigger whileTrue(Command command) {
     requireNonNullParam(command, "command", "whileTrue");
     m_loop.bind(
         new Runnable() {
@@ -141,7 +141,7 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
-  public AsyncTrigger whileFalse(AsyncCommand command) {
+  public Trigger whileFalse(Command command) {
     requireNonNullParam(command, "command", "whileFalse");
     m_loop.bind(
         new Runnable() {
@@ -169,7 +169,7 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
    */
-  public AsyncTrigger toggleOnTrue(AsyncCommand command) {
+  public Trigger toggleOnTrue(Command command) {
     requireNonNullParam(command, "command", "toggleOnTrue");
     m_loop.bind(
         new Runnable() {
@@ -199,7 +199,7 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
    */
-  public AsyncTrigger toggleOnFalse(AsyncCommand command) {
+  public Trigger toggleOnFalse(Command command) {
     requireNonNullParam(command, "command", "toggleOnFalse");
     m_loop.bind(
         new Runnable() {
@@ -234,8 +234,8 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param trigger the condition to compose with
    * @return A trigger which is active when both component triggers are active.
    */
-  public AsyncTrigger and(BooleanSupplier trigger) {
-    return new AsyncTrigger(m_loop, () -> m_condition.getAsBoolean() && trigger.getAsBoolean());
+  public Trigger and(BooleanSupplier trigger) {
+    return new Trigger(m_loop, () -> m_condition.getAsBoolean() && trigger.getAsBoolean());
   }
 
   /**
@@ -244,8 +244,8 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param trigger the condition to compose with
    * @return A trigger which is active when either component trigger is active.
    */
-  public AsyncTrigger or(BooleanSupplier trigger) {
-    return new AsyncTrigger(m_loop, () -> m_condition.getAsBoolean() || trigger.getAsBoolean());
+  public Trigger or(BooleanSupplier trigger) {
+    return new Trigger(m_loop, () -> m_condition.getAsBoolean() || trigger.getAsBoolean());
   }
 
   /**
@@ -254,8 +254,8 @@ public class AsyncTrigger implements BooleanSupplier {
    *
    * @return the negated trigger
    */
-  public AsyncTrigger negate() {
-    return new AsyncTrigger(m_loop, () -> !m_condition.getAsBoolean());
+  public Trigger negate() {
+    return new Trigger(m_loop, () -> !m_condition.getAsBoolean());
   }
 
   /**
@@ -265,7 +265,7 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param seconds The debounce period.
    * @return The debounced trigger (rising edges debounced only)
    */
-  public AsyncTrigger debounce(double seconds) {
+  public Trigger debounce(double seconds) {
     return debounce(seconds, Debouncer.DebounceType.kRising);
   }
 
@@ -277,8 +277,8 @@ public class AsyncTrigger implements BooleanSupplier {
    * @param type The debounce type.
    * @return The debounced trigger.
    */
-  public AsyncTrigger debounce(double seconds, Debouncer.DebounceType type) {
-    return new AsyncTrigger(
+  public Trigger debounce(double seconds, Debouncer.DebounceType type) {
+    return new Trigger(
         m_loop,
         new BooleanSupplier() {
           final Debouncer m_debouncer = new Debouncer(seconds, type);

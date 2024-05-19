@@ -7,73 +7,73 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class AsyncCommandBuilder {
+public class CommandBuilder {
   private final Set<RequireableResource> requirements = new HashSet<>();
   private Consumer<Coroutine> impl;
   private String name;
-  private int priority = AsyncCommand.DEFAULT_PRIORITY;
-  private AsyncCommand.RobotDisabledBehavior disabledBehavior =
-      AsyncCommand.RobotDisabledBehavior.CancelWhileDisabled;
-  private AsyncCommand.InterruptBehavior interruptBehavior =
-      AsyncCommand.InterruptBehavior.CancelOnInterrupt;
+  private int priority = Command.DEFAULT_PRIORITY;
+  private Command.RobotDisabledBehavior disabledBehavior =
+      Command.RobotDisabledBehavior.CancelWhileDisabled;
+  private Command.InterruptBehavior interruptBehavior =
+      Command.InterruptBehavior.CancelOnInterrupt;
 
-  public AsyncCommandBuilder requiring(RequireableResource resource) {
+  public CommandBuilder requiring(RequireableResource resource) {
     requirements.add(resource);
     return this;
   }
 
-  public AsyncCommandBuilder requiring(RequireableResource... resources) {
+  public CommandBuilder requiring(RequireableResource... resources) {
     requirements.addAll(Arrays.asList(resources));
     return this;
   }
 
-  public AsyncCommandBuilder requiring(Collection<RequireableResource> resources) {
+  public CommandBuilder requiring(Collection<RequireableResource> resources) {
     requirements.addAll(resources);
     return this;
   }
 
-  public AsyncCommandBuilder withName(String name) {
+  public CommandBuilder withName(String name) {
     this.name = name;
     return this;
   }
 
-  public AsyncCommand named(String name) {
+  public Command named(String name) {
     return withName(name).make();
   }
 
-  public AsyncCommandBuilder withPriority(int priority) {
+  public CommandBuilder withPriority(int priority) {
     this.priority = priority;
     return this;
   }
 
-  public AsyncCommandBuilder ignoringDisable() {
-    return withDisabledBehavior(AsyncCommand.RobotDisabledBehavior.RunWhileDisabled);
+  public CommandBuilder ignoringDisable() {
+    return withDisabledBehavior(Command.RobotDisabledBehavior.RunWhileDisabled);
   }
 
-  public AsyncCommandBuilder withDisabledBehavior(AsyncCommand.RobotDisabledBehavior behavior) {
+  public CommandBuilder withDisabledBehavior(Command.RobotDisabledBehavior behavior) {
     this.disabledBehavior = behavior;
     return this;
   }
 
-  public AsyncCommandBuilder suspendingOnInterrupt() {
-    return withInterruptBehavior(AsyncCommand.InterruptBehavior.SuspendOnInterrupt);
+  public CommandBuilder suspendingOnInterrupt() {
+    return withInterruptBehavior(Command.InterruptBehavior.SuspendOnInterrupt);
   }
 
-  public AsyncCommandBuilder withInterruptBehavior(AsyncCommand.InterruptBehavior behavior) {
+  public CommandBuilder withInterruptBehavior(Command.InterruptBehavior behavior) {
     this.interruptBehavior = behavior;
     return this;
   }
 
-  public AsyncCommandBuilder executing(Consumer<Coroutine> impl) {
+  public CommandBuilder executing(Consumer<Coroutine> impl) {
     this.impl = impl;
     return this;
   }
 
-  public AsyncCommand make() {
+  public Command make() {
     Objects.requireNonNull(name, "Name was not specified");
     Objects.requireNonNull(impl, "Command logic was not specified");
 
-    return new AsyncCommand() {
+    return new Command() {
       @Override
       public void run(Coroutine coroutine) {
         impl.accept(coroutine);

@@ -9,15 +9,15 @@ import java.util.function.Consumer;
 public class RequireableResource {
   private final String name;
 
-  private final AsyncScheduler registeredScheduler;
+  private final Scheduler registeredScheduler;
 
-  private AsyncCommand defaultCommand;
+  private Command defaultCommand;
 
   public RequireableResource(String name) {
-    this(name, AsyncScheduler.getInstance());
+    this(name, Scheduler.getInstance());
   }
 
-  public RequireableResource(String name, AsyncScheduler scheduler) {
+  public RequireableResource(String name, Scheduler scheduler) {
     this.name = name;
     this.registeredScheduler = scheduler;
     this.defaultCommand = idle();
@@ -32,7 +32,7 @@ public class RequireableResource {
    * Sets the default command to run on the resource when no other command is scheduled. The default
    * command's priority is effectively the minimum allowable priority for any command requiring a
    * resource. For this reason, it's required that a default command have a priority less than
-   * {@link AsyncCommand#DEFAULT_PRIORITY} to prevent it from blocking other, non-default commands
+   * {@link Command#DEFAULT_PRIORITY} to prevent it from blocking other, non-default commands
    * from running.
    *
    * <p>The default command is initially an idle command that merely parks the execution thread.
@@ -40,24 +40,24 @@ public class RequireableResource {
    *
    * @param defaultCommand the new default command
    */
-  public void setDefaultCommand(AsyncCommand defaultCommand) {
+  public void setDefaultCommand(Command defaultCommand) {
     this.defaultCommand = defaultCommand;
     registeredScheduler.scheduleAsDefaultCommand(this, defaultCommand);
   }
 
-  public AsyncCommand getDefaultCommand() {
+  public Command getDefaultCommand() {
     return defaultCommand;
   }
 
-  public AsyncCommandBuilder run(Consumer<Coroutine> command) {
-    return new AsyncCommandBuilder().requiring(this).executing(command);
+  public CommandBuilder run(Consumer<Coroutine> command) {
+    return new CommandBuilder().requiring(this).executing(command);
   }
 
-  public AsyncCommand idle() {
+  public Command idle() {
     return new IdleCommand(this);
   }
 
-  public AsyncCommand idle(Measure<Time> duration) {
+  public Command idle(Measure<Time> duration) {
     return idle().withTimeout(duration);
   }
 

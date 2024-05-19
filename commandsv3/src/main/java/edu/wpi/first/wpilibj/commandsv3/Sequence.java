@@ -11,9 +11,9 @@ import java.util.Set;
  * any of its commands. If all commands in the sequence are able to run while the robot is disabled,
  * then the sequence itself will be allowed to run while the robot is disabled.
  */
-public class Sequence implements AsyncCommand {
+public class Sequence implements Command {
   private final String name;
-  private final List<AsyncCommand> commands = new ArrayList<>();
+  private final List<Command> commands = new ArrayList<>();
   private final Set<RequireableResource> requirements = new HashSet<>();
   private final int priority;
   private RobotDisabledBehavior robotDisabledBehavior;
@@ -24,7 +24,7 @@ public class Sequence implements AsyncCommand {
    * @param name the name of the sequence
    * @param commands the commands to execute within the sequence
    */
-  public Sequence(String name, List<AsyncCommand> commands) {
+  public Sequence(String name, List<Command> commands) {
     this.name = name;
     this.commands.addAll(commands);
 
@@ -34,9 +34,9 @@ public class Sequence implements AsyncCommand {
 
     this.priority =
         commands.stream()
-            .mapToInt(AsyncCommand::priority)
+            .mapToInt(Command::priority)
             .max()
-            .orElse(AsyncCommand.DEFAULT_PRIORITY);
+            .orElse(Command.DEFAULT_PRIORITY);
 
     this.robotDisabledBehavior = RobotDisabledBehavior.RunWhileDisabled;
     for (var command : commands) {

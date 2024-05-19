@@ -7,14 +7,14 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * An asynchronous command allows command logic to be written in a traditional imperative style
- * using the collaborative concurrency tools added in Java 21; namely, continuations. Continuations
+ * Performs some task using one or more {@link RequireableResource resources} using the
+ * collaborative concurrency tools added in Java 21; namely, continuations. Continuations
  * allow commands to be executed concurrently in a collaborative manner as coroutines. Instead of
  * needing to split command behavior into distinct functions (initialize(), execute(), end(),
- * and isFinished()), async commands can be implemented with a single, imperative loop.
+ * and isFinished()), commands can be implemented with a single, imperative loop.
  *
  * <p><strong>Note:</strong> Because coroutines are <i>opt-in</i> collaborate constructs, every
- * async command implementation <strong>must</strong> call {@link Coroutine#yield()} within
+ * command implementation <strong>must</strong> call {@link Coroutine#yield()} within
  * any periodic loop. Failure to do so may result in an unrecoverable infinite loop.</p>
  *
  * {@snippet lang = java:
@@ -53,7 +53,7 @@ import java.util.function.Consumer;
  *   ).withName("The Command");
  *
  * // Can be represented with a 2025-style async-based definition
- * AsyncCommand command = requiredSubsystem.run((coroutine) -> {
+ * Command command = requiredSubsystem.run((coroutine) -> {
  *   initialize();
  *   while (!isFinished()) {
  *     coroutine.yield();
@@ -63,7 +63,7 @@ import java.util.function.Consumer;
  * }).named("The Command");
  *}
  */
-public interface AsyncCommand {
+public interface Command {
   /** The default command priority. */
   int DEFAULT_PRIORITY = 0;
   /**
@@ -83,8 +83,8 @@ public interface AsyncCommand {
    * simply run a while loop like {@code while (!atGoal() && coroutine.yield()) { ... } }.
    *
    * <p><strong>Warning:</strong> any loops in a command must call {@code coroutine.yield()}.
-   * Failure to do so will prevent anything else in your robot code from running. Async commands
-   * are <i>opt-in</i> collaborative constructs; don't be greedy!</p>
+   * Failure to do so will prevent anything else in your robot code from running. Commands are
+   * <i>opt-in</i> collaborative constructs; don't be greedy!</p>
    *
    * @param coroutine the coroutine backing the command's execution
    */
@@ -176,7 +176,7 @@ public interface AsyncCommand {
    * @param other the command to compare with
    * @return true if this command has a lower priority than the other one, false otherwise
    */
-  default boolean isLowerPriorityThan(AsyncCommand other) {
+  default boolean isLowerPriorityThan(Command other) {
     if (other == null) return false;
 
     return priority() < other.priority();
@@ -199,12 +199,12 @@ public interface AsyncCommand {
    * @return true if both commands require at least one of the same resource, false if both commands
    *   have completely different requirements
    */
-  default boolean conflictsWith(AsyncCommand other) {
+  default boolean conflictsWith(Command other) {
     return !Collections.disjoint(requirements(), other.requirements());
   }
 
   /**
-   * Creates an async command that does not require any hardware; that is, it does not affect the
+   * Creates a command that does not require any hardware; that is, it does not affect the
    * state of any physical objects. This is useful for commands that do some house cleaning work
    * like resetting odometry and sensors that you don't want to interrupt a command that's
    * controlling the resources it affects.
@@ -212,23 +212,23 @@ public interface AsyncCommand {
    * @param impl the implementation of the command logic
    * @return a builder that can be used to configure the resulting command
    */
-  static AsyncCommandBuilder noRequirements(Consumer<Coroutine> impl) {
-    return new AsyncCommandBuilder().executing(impl);
+  static CommandBuilder noRequirements(Consumer<Coroutine> impl) {
+    return new CommandBuilder().executing(impl);
   }
 
-  /** Schedules this command with the default async scheduler. */
+  /** Schedules this command with the default scheduler. */
   default void schedule() {
-    AsyncScheduler.getInstance().schedule(this);
+    Scheduler.getInstance().schedule(this);
   }
 
-  /** Cancels this command, if running on the default async scheduler. */
+  /** Cancels this command, if running on the default scheduler. */
   default void cancel() {
-    AsyncScheduler.getInstance().cancel(this);
+    Scheduler.getInstance().cancel(this);
   }
 
-  /** Checks if this command is currently scheduled to be running on the default async scheduler. */
+  /** Checks if this command is currently scheduled to be running on the default scheduler. */
   default boolean isScheduled() {
-    return AsyncScheduler.getInstance().isRunning(this);
+    return Scheduler.getInstance().isRunning(this);
   }
 
   /**
@@ -242,11 +242,11 @@ public interface AsyncCommand {
    *                values will result in the command running only once before being canceled.
    * @return the timed out command.
    */
-  default AsyncCommand withTimeout(Measure<Time> timeout) {
+  default Command withTimeout(Measure<Time> timeout) {
     return ParallelGroup.race(name(), this, new WaitCommand(timeout));
   }
 
-  static AsyncCommandBuilder requiring(RequireableResource requirement, RequireableResource... rest) {
-    return new AsyncCommandBuilder().requiring(requirement).requiring(rest);
+  static CommandBuilder requiring(RequireableResource requirement, RequireableResource... rest) {
+    return new CommandBuilder().requiring(requirement).requiring(rest);
   }
 }

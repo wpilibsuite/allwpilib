@@ -5,16 +5,16 @@
 package edu.wpi.first.wpilibj.commandsv3.button;
 
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.commandsv3.AsyncScheduler;
+import edu.wpi.first.wpilibj.commandsv3.Scheduler;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
 /**
- * A version of {@link XboxController} with {@link AsyncTrigger} factories for command-based.
+ * A version of {@link XboxController} with {@link Trigger} factories for command-based.
  *
  * @see XboxController
  */
 @SuppressWarnings("MethodName")
-public class AsyncCommandXboxController extends AsyncCommandGenericHID {
+public class CommandXboxController extends CommandGenericHID {
   private final XboxController m_hid;
 
   /**
@@ -22,7 +22,7 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    *
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
-  public AsyncCommandXboxController(int port) {
+  public CommandXboxController(int port) {
     super(port);
     m_hid = new XboxController(port);
   }
@@ -41,11 +41,11 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * Constructs an event instance around the left bumper's digital signal.
    *
    * @return an event instance representing the left bumper's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #leftBumper(EventLoop)
    */
-  public AsyncTrigger leftBumper() {
-    return leftBumper(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger leftBumper() {
+    return leftBumper(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -55,19 +55,19 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * @return an event instance representing the right bumper's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger leftBumper(EventLoop loop) {
-    return m_hid.leftBumper(loop).castTo(AsyncTrigger::new);
+  public Trigger leftBumper(EventLoop loop) {
+    return m_hid.leftBumper(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the right bumper's digital signal.
    *
    * @return an event instance representing the right bumper's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #rightBumper(EventLoop)
    */
-  public AsyncTrigger rightBumper() {
-    return rightBumper(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger rightBumper() {
+    return rightBumper(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -77,19 +77,19 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * @return an event instance representing the left bumper's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger rightBumper(EventLoop loop) {
-    return m_hid.rightBumper(loop).castTo(AsyncTrigger::new);
+  public Trigger rightBumper(EventLoop loop) {
+    return m_hid.rightBumper(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the left stick button's digital signal.
    *
    * @return an event instance representing the left stick button's digital signal attached to the
-   *     {@link AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #leftStick(EventLoop)
    */
-  public AsyncTrigger leftStick() {
-    return leftStick(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger leftStick() {
+    return leftStick(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -99,19 +99,19 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * @return an event instance representing the left stick button's digital signal attached to the
    *     given loop.
    */
-  public AsyncTrigger leftStick(EventLoop loop) {
-    return m_hid.leftStick(loop).castTo(AsyncTrigger::new);
+  public Trigger leftStick(EventLoop loop) {
+    return m_hid.leftStick(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the right stick button's digital signal.
    *
    * @return an event instance representing the right stick button's digital signal attached to the
-   *     {@link AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #rightStick(EventLoop)
    */
-  public AsyncTrigger rightStick() {
-    return rightStick(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger rightStick() {
+    return rightStick(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -121,19 +121,19 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * @return an event instance representing the right stick button's digital signal attached to the
    *     given loop.
    */
-  public AsyncTrigger rightStick(EventLoop loop) {
-    return m_hid.rightStick(loop).castTo(AsyncTrigger::new);
+  public Trigger rightStick(EventLoop loop) {
+    return m_hid.rightStick(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the A button's digital signal.
    *
    * @return an event instance representing the A button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #a(EventLoop)
    */
-  public AsyncTrigger a() {
-    return a(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger a() {
+    return a(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -143,19 +143,19 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * @return an event instance representing the A button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger a(EventLoop loop) {
-    return m_hid.a(loop).castTo(AsyncTrigger::new);
+  public Trigger a(EventLoop loop) {
+    return m_hid.a(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the B button's digital signal.
    *
    * @return an event instance representing the B button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #b(EventLoop)
    */
-  public AsyncTrigger b() {
-    return b(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger b() {
+    return b(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -165,19 +165,19 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * @return an event instance representing the B button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger b(EventLoop loop) {
-    return m_hid.b(loop).castTo(AsyncTrigger::new);
+  public Trigger b(EventLoop loop) {
+    return m_hid.b(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the X button's digital signal.
    *
    * @return an event instance representing the X button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #x(EventLoop)
    */
-  public AsyncTrigger x() {
-    return x(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger x() {
+    return x(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -187,19 +187,19 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * @return an event instance representing the X button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger x(EventLoop loop) {
-    return m_hid.x(loop).castTo(AsyncTrigger::new);
+  public Trigger x(EventLoop loop) {
+    return m_hid.x(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the Y button's digital signal.
    *
    * @return an event instance representing the Y button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #y(EventLoop)
    */
-  public AsyncTrigger y() {
-    return y(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger y() {
+    return y(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -209,19 +209,19 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * @return an event instance representing the Y button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger y(EventLoop loop) {
-    return m_hid.y(loop).castTo(AsyncTrigger::new);
+  public Trigger y(EventLoop loop) {
+    return m_hid.y(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the start button's digital signal.
    *
    * @return an event instance representing the start button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #start(EventLoop)
    */
-  public AsyncTrigger start() {
-    return start(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger start() {
+    return start(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -231,19 +231,19 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * @return an event instance representing the start button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger start(EventLoop loop) {
-    return m_hid.start(loop).castTo(AsyncTrigger::new);
+  public Trigger start(EventLoop loop) {
+    return m_hid.start(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the back button's digital signal.
    *
    * @return an event instance representing the back button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #back(EventLoop)
    */
-  public AsyncTrigger back() {
-    return back(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger back() {
+    return back(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -253,36 +253,36 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * @return an event instance representing the back button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger back(EventLoop loop) {
-    return m_hid.back(loop).castTo(AsyncTrigger::new);
+  public Trigger back(EventLoop loop) {
+    return m_hid.back(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs a Trigger instance around the axis value of the left trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
-   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This
    *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @param loop the event loop instance to attach the Trigger to.
    * @return a Trigger instance that is true when the left trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
    */
-  public AsyncTrigger leftTrigger(double threshold, EventLoop loop) {
-    return m_hid.leftTrigger(threshold, loop).castTo(AsyncTrigger::new);
+  public Trigger leftTrigger(double threshold, EventLoop loop) {
+    return m_hid.leftTrigger(threshold, loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs a Trigger instance around the axis value of the left trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
-   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This
    *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @return a Trigger instance that is true when the left trigger's axis exceeds the provided
-   *     threshold, attached to the {@link AsyncScheduler#getDefaultButtonLoop() default scheduler
+   *     threshold, attached to the {@link Scheduler#getDefaultButtonLoop() default scheduler
    *     button loop}.
    */
-  public AsyncTrigger leftTrigger(double threshold) {
-    return leftTrigger(threshold, AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger leftTrigger(double threshold) {
+    return leftTrigger(threshold, Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -290,9 +290,9 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * will be true when the axis value is greater than 0.5.
    *
    * @return a Trigger instance that is true when the left trigger's axis exceeds 0.5, attached to
-   *     the {@link AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger leftTrigger() {
+  public Trigger leftTrigger() {
     return leftTrigger(0.5);
   }
 
@@ -300,28 +300,28 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * Constructs a Trigger instance around the axis value of the right trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
-   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This
    *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @param loop the event loop instance to attach the Trigger to.
    * @return a Trigger instance that is true when the right trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
    */
-  public AsyncTrigger rightTrigger(double threshold, EventLoop loop) {
-    return m_hid.rightTrigger(threshold, loop).castTo(AsyncTrigger::new);
+  public Trigger rightTrigger(double threshold, EventLoop loop) {
+    return m_hid.rightTrigger(threshold, loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs a Trigger instance around the axis value of the right trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
-   * @param threshold the minimum axis value for the returned {@link AsyncTrigger} to be true. This
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This
    *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @return a Trigger instance that is true when the right trigger's axis exceeds the provided
-   *     threshold, attached to the {@link AsyncScheduler#getDefaultButtonLoop() default scheduler
+   *     threshold, attached to the {@link Scheduler#getDefaultButtonLoop() default scheduler
    *     button loop}.
    */
-  public AsyncTrigger rightTrigger(double threshold) {
-    return rightTrigger(threshold, AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger rightTrigger(double threshold) {
+    return rightTrigger(threshold, Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -329,9 +329,9 @@ public class AsyncCommandXboxController extends AsyncCommandGenericHID {
    * will be true when the axis value is greater than 0.5.
    *
    * @return a Trigger instance that is true when the right trigger's axis exceeds 0.5, attached to
-   *     the {@link AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger rightTrigger() {
+  public Trigger rightTrigger() {
     return rightTrigger(0.5);
   }
 

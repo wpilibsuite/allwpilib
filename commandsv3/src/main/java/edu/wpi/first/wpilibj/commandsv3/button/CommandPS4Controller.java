@@ -4,27 +4,27 @@
 
 package edu.wpi.first.wpilibj.commandsv3.button;
 
-import edu.wpi.first.wpilibj.PS5Controller;
-import edu.wpi.first.wpilibj.commandsv3.AsyncScheduler;
+import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.commandsv3.Scheduler;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
 /**
- * A version of {@link PS5Controller} with {@link AsyncTrigger} factories for command-based.
+ * A version of {@link PS4Controller} with {@link Trigger} factories for command-based.
  *
- * @see PS5Controller
+ * @see PS4Controller
  */
 @SuppressWarnings("MethodName")
-public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
-  private final PS5Controller m_hid;
+public class CommandPS4Controller extends CommandGenericHID {
+  private final PS4Controller m_hid;
 
   /**
    * Construct an instance of a device.
    *
    * @param port The port index on the Driver Station that the device is plugged into.
    */
-  public AsyncCommandPS5Controller(int port) {
+  public CommandPS4Controller(int port) {
     super(port);
-    m_hid = new PS5Controller(port);
+    m_hid = new PS4Controller(port);
   }
 
   /**
@@ -33,7 +33,7 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return the wrapped GenericHID object
    */
   @Override
-  public PS5Controller getHID() {
+  public PS4Controller getHID() {
     return m_hid;
   }
 
@@ -41,10 +41,10 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * Constructs an event instance around the L2 button's digital signal.
    *
    * @return an event instance representing the L2 button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger L2() {
-    return L2(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger L2() {
+    return L2(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -54,18 +54,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the L2 button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger L2(EventLoop loop) {
-    return m_hid.L2(loop).castTo(AsyncTrigger::new);
+  public Trigger L2(EventLoop loop) {
+    return m_hid.L2(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the R2 button's digital signal.
    *
    * @return an event instance representing the R2 button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger R2() {
-    return R2(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger R2() {
+    return R2(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -75,18 +75,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the R2 button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger R2(EventLoop loop) {
-    return m_hid.R2(loop).castTo(AsyncTrigger::new);
+  public Trigger R2(EventLoop loop) {
+    return m_hid.R2(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the L1 button's digital signal.
    *
    * @return an event instance representing the L1 button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger L1() {
-    return L1(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger L1() {
+    return L1(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -96,18 +96,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the L1 button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger L1(EventLoop loop) {
-    return m_hid.L1(loop).castTo(AsyncTrigger::new);
+  public Trigger L1(EventLoop loop) {
+    return m_hid.L1(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the R1 button's digital signal.
    *
    * @return an event instance representing the R1 button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger R1() {
-    return R1(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger R1() {
+    return R1(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -117,18 +117,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the R1 button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger R1(EventLoop loop) {
-    return m_hid.R1(loop).castTo(AsyncTrigger::new);
+  public Trigger R1(EventLoop loop) {
+    return m_hid.R1(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the L3 button's digital signal.
    *
    * @return an event instance representing the L3 button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger L3() {
-    return L3(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger L3() {
+    return L3(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -138,18 +138,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the L3 button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger L3(EventLoop loop) {
-    return m_hid.L3(loop).castTo(AsyncTrigger::new);
+  public Trigger L3(EventLoop loop) {
+    return m_hid.L3(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the R3 button's digital signal.
    *
    * @return an event instance representing the R3 button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger R3() {
-    return R3(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger R3() {
+    return R3(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -159,18 +159,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the R3 button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger R3(EventLoop loop) {
-    return m_hid.R3(loop).castTo(AsyncTrigger::new);
+  public Trigger R3(EventLoop loop) {
+    return m_hid.R3(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the square button's digital signal.
    *
    * @return an event instance representing the square button's digital signal attached to the
-   *     {@link AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger square() {
-    return square(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger square() {
+    return square(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -180,18 +180,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the square button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger square(EventLoop loop) {
-    return m_hid.square(loop).castTo(AsyncTrigger::new);
+  public Trigger square(EventLoop loop) {
+    return m_hid.square(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the cross button's digital signal.
    *
    * @return an event instance representing the cross button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger cross() {
-    return cross(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger cross() {
+    return cross(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -201,18 +201,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the cross button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger cross(EventLoop loop) {
-    return m_hid.cross(loop).castTo(AsyncTrigger::new);
+  public Trigger cross(EventLoop loop) {
+    return m_hid.cross(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the triangle button's digital signal.
    *
    * @return an event instance representing the triangle button's digital signal attached to the
-   *     {@link AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger triangle() {
-    return triangle(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger triangle() {
+    return triangle(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -222,18 +222,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the triangle button's digital signal attached to the
    *     given loop.
    */
-  public AsyncTrigger triangle(EventLoop loop) {
-    return m_hid.triangle(loop).castTo(AsyncTrigger::new);
+  public Trigger triangle(EventLoop loop) {
+    return m_hid.triangle(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the circle button's digital signal.
    *
    * @return an event instance representing the circle button's digital signal attached to the
-   *     {@link AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger circle() {
-    return circle(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger circle() {
+    return circle(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -243,39 +243,39 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the circle button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger circle(EventLoop loop) {
-    return m_hid.circle(loop).castTo(AsyncTrigger::new);
+  public Trigger circle(EventLoop loop) {
+    return m_hid.circle(loop).castTo(Trigger::new);
   }
 
   /**
-   * Constructs an event instance around the create button's digital signal.
+   * Constructs an event instance around the share button's digital signal.
    *
-   * @return an event instance representing the create button's digital signal attached to the
-   *     {@link AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @return an event instance representing the share button's digital signal attached to the {@link
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger create() {
-    return create(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger share() {
+    return share(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
-   * Constructs an event instance around the create button's digital signal.
+   * Constructs an event instance around the share button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the create button's digital signal attached to the given
+   * @return an event instance representing the share button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger create(EventLoop loop) {
-    return m_hid.create(loop).castTo(AsyncTrigger::new);
+  public Trigger share(EventLoop loop) {
+    return m_hid.share(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the PS button's digital signal.
    *
    * @return an event instance representing the PS button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger PS() {
-    return PS(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger PS() {
+    return PS(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -285,18 +285,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the PS button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger PS(EventLoop loop) {
-    return m_hid.PS(loop).castTo(AsyncTrigger::new);
+  public Trigger PS(EventLoop loop) {
+    return m_hid.PS(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the options button's digital signal.
    *
    * @return an event instance representing the options button's digital signal attached to the
-   *     {@link AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger options() {
-    return options(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger options() {
+    return options(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -306,18 +306,18 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the options button's digital signal attached to the
    *     given loop.
    */
-  public AsyncTrigger options(EventLoop loop) {
-    return m_hid.options(loop).castTo(AsyncTrigger::new);
+  public Trigger options(EventLoop loop) {
+    return m_hid.options(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the touchpad's digital signal.
    *
    * @return an event instance representing the touchpad's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    */
-  public AsyncTrigger touchpad() {
-    return touchpad(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger touchpad() {
+    return touchpad(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -327,8 +327,8 @@ public class AsyncCommandPS5Controller extends AsyncCommandGenericHID {
    * @return an event instance representing the touchpad's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger touchpad(EventLoop loop) {
-    return m_hid.touchpad(loop).castTo(AsyncTrigger::new);
+  public Trigger touchpad(EventLoop loop) {
+    return m_hid.touchpad(loop).castTo(Trigger::new);
   }
 
   /**

@@ -1,12 +1,12 @@
 package edu.wpi.first.wpilibj.commandsv3;
 
 /**
- * An exception thrown when an {@link AsyncCommand} encountered an error while running in an {@link
- * AsyncScheduler}.
+ * An exception thrown when an {@link Command} encountered an error while running in an {@link
+ * Scheduler}.
  */
 public class CommandExecutionException extends RuntimeException {
   /** The command that had the exception. */
-  private final AsyncCommand command;
+  private final Command command;
 
   /**
    * Creates a new CommandExecutionException.
@@ -14,7 +14,7 @@ public class CommandExecutionException extends RuntimeException {
    * @param command the command that encountered the exception
    * @param cause the exception itself
    */
-  public CommandExecutionException(AsyncCommand command, Throwable cause) {
+  public CommandExecutionException(Command command, Throwable cause) {
     super("An exception was detected while running command " + command, cause);
     this.command = command;
   }
@@ -24,7 +24,7 @@ public class CommandExecutionException extends RuntimeException {
    *
    * @return the command
    */
-  public AsyncCommand getCommand() {
+  public Command getCommand() {
     return command;
   }
 }

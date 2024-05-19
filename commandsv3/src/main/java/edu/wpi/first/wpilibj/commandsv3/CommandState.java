@@ -11,4 +11,4 @@ package edu.wpi.first.wpilibj.commandsv3;
  *     CommandState} object references a parent node in the tree.
  * @param continuation The continuation to which the command is bound.
  */
-record CommandState(AsyncCommand command, AsyncCommand parent, Continuation continuation) {}
+record CommandState(Command command, Command parent, Continuation continuation) {}

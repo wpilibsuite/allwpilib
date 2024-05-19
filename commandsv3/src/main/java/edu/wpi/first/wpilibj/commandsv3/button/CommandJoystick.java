@@ -5,15 +5,15 @@
 package edu.wpi.first.wpilibj.commandsv3.button;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.commandsv3.AsyncScheduler;
+import edu.wpi.first.wpilibj.commandsv3.Scheduler;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
 /**
- * A version of {@link Joystick} with {@link AsyncTrigger} factories for command-based.
+ * A version of {@link Joystick} with {@link Trigger} factories for command-based.
  *
  * @see Joystick
  */
-public class AsyncCommandJoystick extends AsyncCommandGenericHID {
+public class CommandJoystick extends CommandGenericHID {
   private final Joystick m_hid;
 
   /**
@@ -21,7 +21,7 @@ public class AsyncCommandJoystick extends AsyncCommandGenericHID {
    *
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
-  public AsyncCommandJoystick(int port) {
+  public CommandJoystick(int port) {
     super(port);
     m_hid = new Joystick(port);
   }
@@ -40,11 +40,11 @@ public class AsyncCommandJoystick extends AsyncCommandGenericHID {
    * Constructs an event instance around the trigger button's digital signal.
    *
    * @return an event instance representing the trigger button's digital signal attached to the
-   *     {@link AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #trigger(EventLoop)
    */
-  public AsyncTrigger trigger() {
-    return trigger(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger trigger() {
+    return trigger(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -54,19 +54,19 @@ public class AsyncCommandJoystick extends AsyncCommandGenericHID {
    * @return an event instance representing the trigger button's digital signal attached to the
    *     given loop.
    */
-  public AsyncTrigger trigger(EventLoop loop) {
-    return m_hid.trigger(loop).castTo(AsyncTrigger::new);
+  public Trigger trigger(EventLoop loop) {
+    return m_hid.trigger(loop).castTo(Trigger::new);
   }
 
   /**
    * Constructs an event instance around the top button's digital signal.
    *
    * @return an event instance representing the top button's digital signal attached to the {@link
-   *     AsyncScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultButtonLoop() default scheduler button loop}.
    * @see #top(EventLoop)
    */
-  public AsyncTrigger top() {
-    return top(AsyncScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger top() {
+    return top(Scheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -76,8 +76,8 @@ public class AsyncCommandJoystick extends AsyncCommandGenericHID {
    * @return an event instance representing the top button's digital signal attached to the given
    *     loop.
    */
-  public AsyncTrigger top(EventLoop loop) {
-    return m_hid.top(loop).castTo(AsyncTrigger::new);
+  public Trigger top(EventLoop loop) {
+    return m_hid.top(loop).castTo(Trigger::new);
   }
 
   /**

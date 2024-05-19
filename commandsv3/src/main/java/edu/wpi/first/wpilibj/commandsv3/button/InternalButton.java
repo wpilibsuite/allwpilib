@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class InternalButton extends AsyncTrigger {
+public class InternalButton extends Trigger {
   // need to be references, so they can be mutated after being captured in the constructor.
   private final AtomicBoolean m_pressed;
   private final AtomicBoolean m_inverted;

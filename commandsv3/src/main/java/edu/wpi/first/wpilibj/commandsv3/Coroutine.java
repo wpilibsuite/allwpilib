@@ -3,7 +3,7 @@ package edu.wpi.first.wpilibj.commandsv3;
 import java.util.Collection;
 
 /**
- * A coroutine object is injected into command's {@link AsyncCommand#run(Coroutine)} method to allow
+ * A coroutine object is injected into command's {@link Command#run(Coroutine)} method to allow
  * commands to yield and compositions to run other commands.
  */
 public interface Coroutine {
@@ -34,7 +34,7 @@ public interface Coroutine {
    *
    * @param command the command to await
    */
-  default void await(AsyncCommand command) {
+  default void await(Command command) {
     if (!scheduler().isScheduledOrRunning(command)) {
       scheduler().schedule(command);
     }
@@ -42,7 +42,7 @@ public interface Coroutine {
   }
 
   /**
-   * Awaits completion of all given commands. Unlike {@link #await(AsyncCommand)}, none of the given
+   * Awaits completion of all given commands. Unlike {@link #await(Command)}, none of the given
    * commands will be scheduled.
    *
    * @param commands the commands to await
@@ -50,12 +50,12 @@ public interface Coroutine {
    * @throws IllegalStateException if any of the given commands uses a resource not owned by the
    *     calling command
    */
-  default void awaitAll(Collection<AsyncCommand> commands) {
+  default void awaitAll(Collection<Command> commands) {
     scheduler().awaitAll(commands);
   }
 
   /**
-   * Awaits completion of any given commands. Unlike {@link #await(AsyncCommand)}, none of the given
+   * Awaits completion of any given commands. Unlike {@link #await(Command)}, none of the given
    * commands will be scheduled. Once any of the givne commands completes, the rest will be
    * canceled.
    *
@@ -64,7 +64,7 @@ public interface Coroutine {
    * @throws IllegalStateException if any of the given commands uses a resource not owned by the
    *     calling command
    */
-  default void awaitAny(Collection<AsyncCommand> commands) {
+  default void awaitAny(Collection<Command> commands) {
     scheduler().awaitAny(commands);
   }
 
@@ -74,5 +74,5 @@ public interface Coroutine {
    *
    * @return the command scheduler backing this coroutine
    */
-  AsyncScheduler scheduler();
+  Scheduler scheduler();
 }

@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.commandsv3.button;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /**
- * A class containing static {@link AsyncTrigger} factories for running callbacks when the robot
+ * A class containing static {@link Trigger} factories for running callbacks when the robot
  * mode changes.
  */
 public final class RobotModeTriggers {
@@ -19,8 +19,8 @@ public final class RobotModeTriggers {
    *
    * @return A trigger that is true when the robot is enabled in autonomous mode.
    */
-  public static AsyncTrigger autonomous() {
-    return new AsyncTrigger(DriverStation::isAutonomousEnabled);
+  public static Trigger autonomous() {
+    return new Trigger(DriverStation::isAutonomousEnabled);
   }
 
   /**
@@ -28,8 +28,8 @@ public final class RobotModeTriggers {
    *
    * @return A trigger that is true when the robot is enabled in teleop mode.
    */
-  public static AsyncTrigger teleop() {
-    return new AsyncTrigger(DriverStation::isTeleopEnabled);
+  public static Trigger teleop() {
+    return new Trigger(DriverStation::isTeleopEnabled);
   }
 
   /**
@@ -37,8 +37,8 @@ public final class RobotModeTriggers {
    *
    * @return A trigger that is true when the robot is disabled.
    */
-  public static AsyncTrigger disabled() {
-    return new AsyncTrigger(DriverStation::isDisabled);
+  public static Trigger disabled() {
+    return new Trigger(DriverStation::isDisabled);
   }
 
   /**
@@ -46,7 +46,7 @@ public final class RobotModeTriggers {
    *
    * @return A trigger that is true when the robot is enabled in test mode.
    */
-  public static AsyncTrigger test() {
-    return new AsyncTrigger(DriverStation::isTestEnabled);
+  public static Trigger test() {
+    return new Trigger(DriverStation::isTestEnabled);
   }
 }

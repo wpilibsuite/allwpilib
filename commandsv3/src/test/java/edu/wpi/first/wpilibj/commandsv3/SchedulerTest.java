@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 @Timeout(5)
-class AsyncSchedulerTest {
-  private AsyncScheduler scheduler;
+class SchedulerTest {
+  private Scheduler scheduler;
 
   @BeforeEach
   void setup() {
-    scheduler = new AsyncScheduler();
+    scheduler = new Scheduler();
   }
 
   @Test
@@ -28,7 +28,7 @@ class AsyncSchedulerTest {
     var enabled = new AtomicBoolean(false);
     var ran = new AtomicBoolean(false);
     var command =
-        AsyncCommand.noRequirements(
+        Command.noRequirements(
                 (coroutine) -> {
                   do {
                     coroutine.yield();
@@ -121,7 +121,7 @@ class AsyncSchedulerTest {
 
     for (int cmdCount = 0; cmdCount < numCommands; cmdCount++) {
       var command =
-          AsyncCommand.noRequirements(
+          Command.noRequirements(
                   (coroutine) -> {
                     for (int i = 0; i < iterations; i++) {
                       coroutine.yield();
@@ -183,7 +183,7 @@ class AsyncSchedulerTest {
           int x = 0;
         };
 
-    AsyncCommand countToTen =
+    Command countToTen =
         example
             .run(
                 (coroutine) -> {
@@ -211,13 +211,13 @@ class AsyncSchedulerTest {
     var resource = new RequireableResource("Resource", scheduler);
 
     var interrupter =
-        AsyncCommand.requiring(resource)
+        Command.requiring(resource)
             .executing((coroutine) -> {})
             .withPriority(2)
             .named("Interrupter");
 
     var canceledCommand =
-        AsyncCommand.requiring(resource)
+        Command.requiring(resource)
             .executing(
                 (coroutine) -> {
                   count.set(1);
@@ -269,14 +269,14 @@ class AsyncSchedulerTest {
 
   @Test
   void cancelAllCancelsAll() {
-    var commands = new ArrayList<AsyncCommand>(10);
+    var commands = new ArrayList<Command>(10);
     for (int i = 1; i <= 10; i++) {
-      commands.add(AsyncCommand.noRequirements(Coroutine::yield).named("Command " + i));
+      commands.add(Command.noRequirements(Coroutine::yield).named("Command " + i));
     }
     commands.forEach(scheduler::schedule);
     scheduler.run();
     scheduler.cancelAll();
-    for (AsyncCommand command : commands) {
+    for (Command command : commands) {
       if (scheduler.isRunning(command)) {
         fail(command.name() + " was not canceled by cancelAll()");
       }
@@ -291,7 +291,7 @@ class AsyncSchedulerTest {
     }
 
     var command =
-        new AsyncCommandBuilder()
+        new CommandBuilder()
             .requiring(resources)
             .executing(Coroutine::yield)
             .named("Big Command");
@@ -371,7 +371,7 @@ class AsyncSchedulerTest {
     assertFalse(scheduler.isRunning(outerCommand));
   }
 
-  record PriorityCommand(int priority, RequireableResource... subsystems) implements AsyncCommand {
+  record PriorityCommand(int priority, RequireableResource... subsystems) implements Command {
     @Override
     public void run(Coroutine coroutine) {
       coroutine.park();

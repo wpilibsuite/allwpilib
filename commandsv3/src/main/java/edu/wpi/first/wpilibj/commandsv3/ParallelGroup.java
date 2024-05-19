@@ -7,9 +7,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ParallelGroup implements AsyncCommand {
-  private final Collection<AsyncCommand> commands = new LinkedHashSet<>();
-  private final Collection<AsyncCommand> requiredCommands = new HashSet<>();
+public class ParallelGroup implements Command {
+  private final Collection<Command> commands = new LinkedHashSet<>();
+  private final Collection<Command> requiredCommands = new HashSet<>();
   private final Set<RequireableResource> requirements = new HashSet<>();
   private final String name;
   private final int priority;
@@ -17,14 +17,14 @@ public class ParallelGroup implements AsyncCommand {
 
   public ParallelGroup(
       String name,
-      Collection<AsyncCommand> allCommands,
-      Collection<AsyncCommand> requiredCommands) {
+      Collection<Command> allCommands,
+      Collection<Command> requiredCommands) {
     if (!allCommands.containsAll(requiredCommands)) {
       throw new IllegalArgumentException("Required commands must also be composed");
     }
 
-    for (AsyncCommand c1 : allCommands) {
-      for (AsyncCommand c2 : allCommands) {
+    for (Command c1 : allCommands) {
+      for (Command c2 : allCommands) {
         if (c1 == c2) {
           // Commands can't conflict with themselves
           continue;
@@ -50,12 +50,12 @@ public class ParallelGroup implements AsyncCommand {
 
     this.priority =
         allCommands.stream()
-            .mapToInt(AsyncCommand::priority)
+            .mapToInt(Command::priority)
             .max()
-            .orElse(AsyncCommand.DEFAULT_PRIORITY);
+            .orElse(Command.DEFAULT_PRIORITY);
 
     this.disabledBehavior = RobotDisabledBehavior.RunWhileDisabled;
-    for (AsyncCommand command : allCommands) {
+    for (Command command : allCommands) {
       if (command.robotDisabledBehavior() == RobotDisabledBehavior.CancelWhileDisabled) {
         this.disabledBehavior = RobotDisabledBehavior.CancelWhileDisabled;
         break;
@@ -70,7 +70,7 @@ public class ParallelGroup implements AsyncCommand {
    * @param commands the commands to run in parallel
    * @return the group
    */
-  public static ParallelGroup race(String name, AsyncCommand... commands) {
+  public static ParallelGroup race(String name, Command... commands) {
     return new ParallelGroup(name, List.of(commands), Set.of());
   }
 
@@ -82,7 +82,7 @@ public class ParallelGroup implements AsyncCommand {
    * @param commands the commands to run in parallel
    * @return the group
    */
-  public static ParallelGroup all(String name, AsyncCommand... commands) {
+  public static ParallelGroup all(String name, Command... commands) {
     return new ParallelGroup(name, List.of(commands), List.of(commands));
   }
 
@@ -127,15 +127,15 @@ public class ParallelGroup implements AsyncCommand {
   }
 
   public static class Builder {
-    private final Set<AsyncCommand> commands = new LinkedHashSet<>();
-    private final Set<AsyncCommand> requiredCommands = new HashSet<>();
+    private final Set<Command> commands = new LinkedHashSet<>();
+    private final Set<Command> requiredCommands = new HashSet<>();
 
-    public Builder running(AsyncCommand... commands) {
+    public Builder running(Command... commands) {
       this.commands.addAll(Arrays.asList(commands));
       return this;
     }
 
-    public Builder requiring(AsyncCommand... commands) {
+    public Builder requiring(Command... commands) {
       requiredCommands.addAll(Arrays.asList(commands));
       this.commands.addAll(requiredCommands);
       return this;

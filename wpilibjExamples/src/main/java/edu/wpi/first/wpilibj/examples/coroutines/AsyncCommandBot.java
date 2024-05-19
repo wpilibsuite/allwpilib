@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.async;
+package edu.wpi.first.wpilibj.examples.coroutines;
 
-import edu.wpi.first.wpilibj.commandsv3.AsyncCommand;
-import edu.wpi.first.wpilibj.commandsv3.button.AsyncCommandXboxController;
-import edu.wpi.first.wpilibj.commandsv3.button.AsyncTrigger;
-import edu.wpi.first.wpilibj.examples.async.Constants.AutoConstants;
-import edu.wpi.first.wpilibj.examples.async.Constants.OIConstants;
-import edu.wpi.first.wpilibj.examples.async.Constants.ShooterConstants;
-import edu.wpi.first.wpilibj.examples.async.subsystems.Drive;
-import edu.wpi.first.wpilibj.examples.async.subsystems.Intake;
-import edu.wpi.first.wpilibj.examples.async.subsystems.Pneumatics;
-import edu.wpi.first.wpilibj.examples.async.subsystems.Shooter;
-import edu.wpi.first.wpilibj.examples.async.subsystems.Storage;
+import edu.wpi.first.wpilibj.commandsv3.Command;
+import edu.wpi.first.wpilibj.commandsv3.button.CommandXboxController;
+import edu.wpi.first.wpilibj.commandsv3.button.Trigger;
+import edu.wpi.first.wpilibj.examples.coroutines.Constants.AutoConstants;
+import edu.wpi.first.wpilibj.examples.coroutines.Constants.OIConstants;
+import edu.wpi.first.wpilibj.examples.coroutines.Constants.ShooterConstants;
+import edu.wpi.first.wpilibj.examples.coroutines.subsystems.Drive;
+import edu.wpi.first.wpilibj.examples.coroutines.subsystems.Intake;
+import edu.wpi.first.wpilibj.examples.coroutines.subsystems.Pneumatics;
+import edu.wpi.first.wpilibj.examples.coroutines.subsystems.Shooter;
+import edu.wpi.first.wpilibj.examples.coroutines.subsystems.Storage;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,8 +31,8 @@ public class AsyncCommandBot {
   private final Pneumatics m_pneumatics = new Pneumatics();
 
   // The driver's controller
-  private final AsyncCommandXboxController m_driverController =
-      new AsyncCommandXboxController(OIConstants.kDriverControllerPort);
+  private final CommandXboxController m_driverController =
+      new CommandXboxController(OIConstants.kDriverControllerPort);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for
@@ -40,7 +40,7 @@ public class AsyncCommandBot {
    *
    * <p>Should be called during {@link Robot#robotInit()}.
    *
-   * <p>Event binding methods are available on the {@link AsyncTrigger} class.
+   * <p>Event binding methods are available on the {@link Trigger} class.
    */
   public void configureBindings() {
     // Automatically run the storage motor whenever the ball storage is not full,
@@ -70,8 +70,8 @@ public class AsyncCommandBot {
         .onFalse(m_pneumatics.enableCompressor());
   }
 
-  private AsyncCommand loadAndShoot() {
-    return AsyncCommand
+  private Command loadAndShoot() {
+    return Command
                .requiring(m_shooter, m_storage)
                .executing((coroutine) -> {
                  while (coroutine.yield()) {
@@ -93,7 +93,7 @@ public class AsyncCommandBot {
    *
    * <p>Scheduled during {@link Robot#autonomousInit()}.
    */
-  public AsyncCommand getAutonomousCommand() {
+  public Command getAutonomousCommand() {
     // Drive forward for 2 meters at half speed with a 3 second timeout
     return m_drive
                .driveDistanceCommand(AutoConstants.kDriveDistance, AutoConstants.kDriveSpeed)

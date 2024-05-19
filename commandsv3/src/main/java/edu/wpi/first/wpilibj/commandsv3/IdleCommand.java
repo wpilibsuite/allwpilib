@@ -7,7 +7,7 @@ import java.util.Set;
  *
  * @param resource the resource to idle.
  */
-public record IdleCommand(RequireableResource resource) implements AsyncCommand {
+public record IdleCommand(RequireableResource resource) implements Command {
   @Override
   public void run(Coroutine coroutine) {
     coroutine.park();

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.async.subsystems;
+package edu.wpi.first.wpilibj.examples.coroutines.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
 
@@ -10,10 +10,10 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.commandsv3.AsyncCommand;
+import edu.wpi.first.wpilibj.commandsv3.Command;
 import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.examples.async.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.coroutines.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import java.util.function.DoubleSupplier;
 
@@ -70,7 +70,7 @@ public class Drive extends RequireableResource {
    * @param fwd the commanded forward movement
    * @param rot the commanded rotation
    */
-  public AsyncCommand arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
+  public Command arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
     // A split-stick arcade command, with forward/backward controlled by the left
     // hand, and turning controlled by the right.
     return run((coroutine) -> {
@@ -86,7 +86,7 @@ public class Drive extends RequireableResource {
    * @param distance The distance to drive forward in meters
    * @param speed The fraction of max speed at which to drive
    */
-  public AsyncCommand driveDistanceCommand(Measure<Distance> distance, double speed) {
+  public Command driveDistanceCommand(Measure<Distance> distance, double speed) {
     double distanceMeters = distance.in(Meters);
 
     return run((coroutine) -> {

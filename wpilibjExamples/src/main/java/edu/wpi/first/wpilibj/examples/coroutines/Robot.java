@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.async;
+package edu.wpi.first.wpilibj.examples.coroutines;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.commandsv3.AsyncCommand;
-import edu.wpi.first.wpilibj.commandsv3.AsyncScheduler;
+import edu.wpi.first.wpilibj.commandsv3.Command;
+import edu.wpi.first.wpilibj.commandsv3.Scheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.commandsv3.AsyncScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-  private AsyncCommand m_autonomousCommand;
+  private Command m_autonomousCommand;
 
   private final AsyncCommandBot m_robot = new AsyncCommandBot();
 
@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    AsyncScheduler.getInstance().run();
+    Scheduler.getInstance().run();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
     m_autonomousCommand = m_robot.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
-      AsyncScheduler.getInstance().schedule(m_autonomousCommand);
+      Scheduler.getInstance().schedule(m_autonomousCommand);
     }
   }
 
@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    AsyncScheduler.getInstance().cancel(m_autonomousCommand);
+    Scheduler.getInstance().cancel(m_autonomousCommand);
   }
 
   /** This function is called periodically during operator control. */
@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
-    AsyncScheduler.getInstance().cancelAll();
+    Scheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically during test mode. */

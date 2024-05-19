@@ -1,6 +1,6 @@
 package edu.wpi.first.wpilibj.commandsv3;
 
-import static edu.wpi.first.wpilibj.commandsv3.AsyncCommand.InterruptBehavior.SuspendOnInterrupt;
+import static edu.wpi.first.wpilibj.commandsv3.Command.InterruptBehavior.SuspendOnInterrupt;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.event.EventLoop;
@@ -17,14 +17,14 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class AsyncScheduler {
+public class Scheduler {
   private final Set<RequireableResource> registeredResources = new HashSet<>();
 
   /** The set of commands scheduled since the start of the previous run. */
   private final Set<CommandState> onDeck = new LinkedHashSet<>();
 
   /** The states of all running commands (does not include on deck commands). */
-  private final Map<AsyncCommand, CommandState> commandStates = new LinkedHashMap<>();
+  private final Map<Command, CommandState> commandStates = new LinkedHashMap<>();
 
   /**
    * A priority queue of suspended commands. Suspended commands will be resumed at the end of each
@@ -41,15 +41,15 @@ public class AsyncScheduler {
   private final EventLoop eventLoop = new EventLoop();
 
   /** The currently executing command. */
-  private AsyncCommand currentCommand = null;
+  private Command currentCommand = null;
 
   /** The scope for continuations to yield to. */
-  private final ContinuationScope scope = new ContinuationScope("async command");
+  private final ContinuationScope scope = new ContinuationScope("coroutine commands");
 
   /** The default scheduler instance. */
-  private static final AsyncScheduler defaultScheduler = new AsyncScheduler();
+  private static final Scheduler defaultScheduler = new Scheduler();
 
-  private final Coroutine coroutine = () -> AsyncScheduler.this;
+  private final Coroutine coroutine = () -> Scheduler.this;
 
   /**
    * Gets the default scheduler instance for use in a robot program. Some built in command types use
@@ -57,11 +57,11 @@ public class AsyncScheduler {
    *
    * @return the default scheduler instance.
    */
-  public static AsyncScheduler getInstance() {
+  public static Scheduler getInstance() {
     return defaultScheduler;
   }
 
-  public AsyncScheduler() {}
+  public Scheduler() {}
 
   /**
    * Registers a resource with the scheduler and schedules its default command.
@@ -70,7 +70,7 @@ public class AsyncScheduler {
    */
   public void registerResource(RequireableResource resource) {
     registeredResources.add(resource);
-    if (resource.getDefaultCommand() instanceof AsyncCommand defaultCommand) {
+    if (resource.getDefaultCommand() instanceof Command defaultCommand) {
       scheduleAsDefaultCommand(resource, defaultCommand);
     }
   }
@@ -78,15 +78,15 @@ public class AsyncScheduler {
   /**
    * Sets the default command for a resource. The command must require the resource, and cannot
    * require any others. Default commands must {@link
-   * AsyncCommand.InterruptBehavior#SuspendOnInterrupt suspend on interrupt} and have a lower
-   * priority than {@link AsyncCommand#DEFAULT_PRIORITY} to function properly.
+   * Command.InterruptBehavior#SuspendOnInterrupt suspend on interrupt} and have a lower
+   * priority than {@link Command#DEFAULT_PRIORITY} to function properly.
    *
    * @param resource the resource for which to set the default command
    * @param defaultCommand the default command to execute on the resource
    * @throws IllegalArgumentException if the command does not meet the requirements for being a
    *     default command
    */
-  public void scheduleAsDefaultCommand(RequireableResource resource, AsyncCommand defaultCommand) {
+  public void scheduleAsDefaultCommand(RequireableResource resource, Command defaultCommand) {
     if (!defaultCommand.requires(resource)) {
       throw new IllegalArgumentException("A resource's default command must require that resource");
     }
@@ -101,7 +101,7 @@ public class AsyncScheduler {
           "Default commands must have interrupt behavior set to SuspendOnInterrupt");
     }
 
-    if (defaultCommand.priority() >= AsyncCommand.DEFAULT_PRIORITY) {
+    if (defaultCommand.priority() >= Command.DEFAULT_PRIORITY) {
       throw new IllegalArgumentException("Default commands must be low priority");
     }
 
@@ -166,7 +166,7 @@ public class AsyncScheduler {
    *
    * @param command the command to schedule
    */
-  public void schedule(AsyncCommand command) {
+  public void schedule(Command command) {
     if (!isSchedulable(command)) {
       return;
     }
@@ -226,7 +226,7 @@ public class AsyncScheduler {
     evictConflictingRunningCommands(state);
   }
 
-  private boolean isSchedulable(AsyncCommand command) {
+  private boolean isSchedulable(Command command) {
     if (currentCommand != null) {
       // Bypass scheduling check if being scheduled as a nested command.
       // The schedule() method will throw an error when attempting to schedule a nested command
@@ -236,7 +236,7 @@ public class AsyncScheduler {
 
     // Scheduling from outside a command, eg a trigger binding or manual schedule call
     // Check for conflicts with the commands that are already running
-    for (AsyncCommand c : commandStates.keySet()) {
+    for (Command c : commandStates.keySet()) {
       if (c.conflictsWith(command) && command.isLowerPriorityThan(c)) {
         return false;
       }
@@ -245,7 +245,7 @@ public class AsyncScheduler {
     return true;
   }
 
-  private void evictConflictingOnDeckCommands(AsyncCommand command) {
+  private void evictConflictingOnDeckCommands(Command command) {
     for (var iterator = onDeck.iterator(); iterator.hasNext(); ) {
       var scheduledState = iterator.next();
       var scheduledCommand = scheduledState.command();
@@ -283,7 +283,7 @@ public class AsyncScheduler {
    *
    * @param command the command to schedule
    */
-  public void scheduleAndWait(AsyncCommand command) {
+  public void scheduleAndWait(Command command) {
     schedule(command);
     await(command);
   }
@@ -295,7 +295,7 @@ public class AsyncScheduler {
    * @param ancestor the potential ancestor for which to search
    * @return true if {@code ancestor} is the direct parent or indirect ancestor, false if not
    */
-  private boolean inheritsFrom(CommandState state, AsyncCommand ancestor) {
+  private boolean inheritsFrom(CommandState state, Command ancestor) {
     if (state.parent() == null) {
       return false;
     }
@@ -315,7 +315,7 @@ public class AsyncScheduler {
    *
    * @param command the command to cancel
    */
-  public void cancel(AsyncCommand command) {
+  public void cancel(Command command) {
     // Evict the command. The next call to run() will schedule the default command for all its
     // required resources, unless another command requiring those resources is scheduled between
     // calling cancel() and calling run()
@@ -422,7 +422,7 @@ public class AsyncScheduler {
           && onDeck.stream().noneMatch(c -> c.command().requires(resource))) {
         // Nothing currently running or scheduled
         // Schedule the resource's default command, if it has one
-        if (resource.getDefaultCommand() instanceof AsyncCommand defaultCommand) {
+        if (resource.getDefaultCommand() instanceof Command defaultCommand) {
           schedule(defaultCommand);
         }
       }
@@ -435,7 +435,7 @@ public class AsyncScheduler {
    *
    * @param parent the root command whose descendants to remove from the scheduler
    */
-  private void removeOrphanedChildren(AsyncCommand parent) {
+  private void removeOrphanedChildren(Command parent) {
     for (var iterator = commandStates.values().iterator(); iterator.hasNext(); ) {
       var state = iterator.next();
       if (state.parent() == parent) {
@@ -453,7 +453,7 @@ public class AsyncScheduler {
    * @param command the command for which to build a continuation
    * @return the binding continuation
    */
-  private Continuation buildContinuation(AsyncCommand command) {
+  private Continuation buildContinuation(Command command) {
     return new Continuation(
         scope,
         () -> {
@@ -471,7 +471,7 @@ public class AsyncScheduler {
    * @param command the command to check
    * @return true if the command is running, false if not
    */
-  public boolean isRunning(AsyncCommand command) {
+  public boolean isRunning(Command command) {
     return commandStates.containsKey(command);
   }
 
@@ -481,7 +481,7 @@ public class AsyncScheduler {
    * @param command the command to check
    * @return true if the command is scheduled to run, false if not
    */
-  public boolean isScheduled(AsyncCommand command) {
+  public boolean isScheduled(Command command) {
     return onDeck.stream().anyMatch(state -> state.command() == command);
   }
 
@@ -491,7 +491,7 @@ public class AsyncScheduler {
    * @param command the command to check
    * @return true if the command is scheduled to run or is already running, false if not
    */
-  public boolean isScheduledOrRunning(AsyncCommand command) {
+  public boolean isScheduledOrRunning(Command command) {
     return isScheduled(command) || isRunning(command);
   }
 
@@ -501,7 +501,7 @@ public class AsyncScheduler {
    *
    * @param command the command to wait for
    */
-  public void await(AsyncCommand command) {
+  public void await(Command command) {
     checkWaitable(command);
 
     while (isScheduledOrRunning(command)) {
@@ -515,7 +515,7 @@ public class AsyncScheduler {
    *
    * @param commands the commands to wait for
    */
-  public void awaitAll(Collection<AsyncCommand> commands) {
+  public void awaitAll(Collection<Command> commands) {
     for (var command : commands) {
       checkWaitable(command);
     }
@@ -532,7 +532,7 @@ public class AsyncScheduler {
    *
    * @param commands the commands to wait for
    */
-  public void awaitAny(Collection<AsyncCommand> commands) {
+  public void awaitAny(Collection<Command> commands) {
     for (var command : commands) {
       checkWaitable(command);
     }
@@ -548,7 +548,7 @@ public class AsyncScheduler {
    *
    * @param command the command to check
    */
-  private void checkWaitable(AsyncCommand command) {
+  private void checkWaitable(Command command) {
     if (!isScheduledOrRunning(command)) {
       throw new IllegalStateException(
           "Cannot wait for command " + command + " because it is not currently running");
@@ -569,7 +569,7 @@ public class AsyncScheduler {
    *
    * @return the currently running commands
    */
-  public Set<AsyncCommand> getRunningCommands() {
+  public Set<Command> getRunningCommands() {
     return Collections.unmodifiableSet(commandStates.keySet());
   }
 
@@ -580,7 +580,7 @@ public class AsyncScheduler {
    * @param resource the resource to get the commands for
    * @return the currently running commands that require the resource.
    */
-  public List<AsyncCommand> getRunningCommandsFor(RequireableResource resource) {
+  public List<Command> getRunningCommandsFor(RequireableResource resource) {
     return commandStates.keySet().stream().filter(command -> command.requires(resource)).toList();
   }
 
@@ -593,7 +593,7 @@ public class AsyncScheduler {
   }
 
   /**
-   * Called by {@link AsyncCommand#run(Coroutine)}, this will cause the command's execution to pause
+   * Called by {@link Command#run(Coroutine)}, this will cause the command's execution to pause
    * and cede control back to the scheduler.
    *
    * @return true

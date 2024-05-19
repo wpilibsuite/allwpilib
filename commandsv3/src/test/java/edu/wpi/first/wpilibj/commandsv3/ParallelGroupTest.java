@@ -8,11 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ParallelGroupTest {
-  private AsyncScheduler scheduler;
+  private Scheduler scheduler;
 
   @BeforeEach
   void setup() {
-    scheduler = new AsyncScheduler();
+    scheduler = new Scheduler();
   }
 
   @Test
