@@ -34,7 +34,7 @@ class LEDPattern {
  public:
   explicit LEDPattern(const LEDPatternFn& impl);
 
-  ~LEDPattern();
+  ~LEDPattern() = default;
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called

@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <memory>
 #include <numbers>
 
@@ -16,10 +15,6 @@
 using namespace frc;
 
 LEDPattern::LEDPattern(const LEDPatternFn& impl) : m_impl(std::move(impl)) {}
-
-LEDPattern::~LEDPattern() {
-  std::cout << "Destroying a pattern!" << std::endl;
-}
 
 void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data,
                          LEDWriterFn writer) {
@@ -126,7 +121,7 @@ LEDPattern LEDPattern::Breathe(units::second_t period) {
   auto periodMicros = units::microsecond_t{period};
 
   return LEDPattern{[periodMicros, this](auto data, auto writer) {
-    ApplyTo(data, [&data, &writer, periodMicros](int i, Color color) {
+    ApplyTo(data, [&writer, periodMicros](int i, Color color) {
       double t = (wpi::Now() % periodMicros.to<uint64_t>()) /
                  periodMicros.to<double>();
       double phase = t * 2 * std::numbers::pi;
