@@ -36,7 +36,8 @@ public class SingleJointedArmSim extends AngularMechanismSim {
    *
    * @param plant The linear system that represents the arm. This system can be created with {@link
    *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
-   *     double, double, double)} or {@link LinearSystemId#identifyPositionSystem(double, double)}.
+   *     double, double, double)} or 
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param armLengthMeters The length of the arm.
    * @param pivotPointMeters The pivot point of the arm.
