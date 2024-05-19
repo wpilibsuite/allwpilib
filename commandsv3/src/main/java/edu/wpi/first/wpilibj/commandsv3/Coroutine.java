@@ -1,5 +1,7 @@
 package edu.wpi.first.wpilibj.commandsv3;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import java.util.Collection;
 
 /**
@@ -66,6 +68,27 @@ public interface Coroutine {
    */
   default void awaitAny(Collection<Command> commands) {
     scheduler().awaitAny(commands);
+  }
+
+  /**
+   * Waits for some duration of time to elapse. Returns immediately if the given duration is zero
+   * or negative. Call this within a command or command composition to introduce a simple delay.
+   *
+   * <p>For example, a basic autonomous routine that drives straight for 5 seconds:
+   * {@snippet lang = java :
+   * AsyncCommand timedDrive() {
+   *   return drivebase.run((coroutine) -> {
+   *     drivebase.tankDrive(1, 1);
+   *     coroutine.wait(Seconds.of(5));
+   *     drivebase.stop();
+   *   }).named("Timed Drive");
+   * }
+   * }
+   *
+   * @param duration the duration of time to wait
+   */
+  default void wait(Measure<Time> duration) {
+    await(new WaitCommand(duration));
   }
 
   /**
