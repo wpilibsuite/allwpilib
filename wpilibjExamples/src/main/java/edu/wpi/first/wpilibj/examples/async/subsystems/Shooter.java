@@ -14,10 +14,9 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.examples.async.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.HardwareResource;
+import edu.wpi.first.wpilibj3.command.async.RequireableResource;
 
-public class Shooter extends HardwareResource {
+public class Shooter extends RequireableResource {
   private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
   private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
   private final Encoder m_shooterEncoder =

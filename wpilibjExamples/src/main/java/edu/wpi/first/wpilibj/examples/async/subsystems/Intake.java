@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.HardwareResource;
+import edu.wpi.first.wpilibj3.command.async.RequireableResource;
 
-public class Intake extends HardwareResource {
+public class Intake extends RequireableResource {
   private final PWMSparkMax m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID

@@ -52,7 +52,7 @@ class AsyncSchedulerTest {
 
   @Test
   void higherPriorityCancels() {
-    var subsystem = new HardwareResource("Subsystem", scheduler);
+    var subsystem = new RequireableResource("Subsystem", scheduler);
 
     var lower = new PriorityCommand(-1000, subsystem);
     var higher = new PriorityCommand(+1000, subsystem);
@@ -69,7 +69,7 @@ class AsyncSchedulerTest {
 
   @Test
   void lowerPriorityDoesNotCancel() {
-    var subsystem = new HardwareResource("Subsystem", scheduler);
+    var subsystem = new RequireableResource("Subsystem", scheduler);
 
     var lower = new PriorityCommand(-1000, subsystem);
     var higher = new PriorityCommand(+1000, subsystem);
@@ -90,7 +90,7 @@ class AsyncSchedulerTest {
 
   @Test
   void samePriorityCancels() {
-    var subsystem = new HardwareResource("Subsystem", scheduler);
+    var subsystem = new RequireableResource("Subsystem", scheduler);
 
     var first = new PriorityCommand(512, subsystem);
     var second = new PriorityCommand(512, subsystem);
@@ -108,7 +108,7 @@ class AsyncSchedulerTest {
   @Test
   void atomicity() {
     var resource =
-        new HardwareResource("X", scheduler) {
+        new RequireableResource("X", scheduler) {
           int x = 0;
         };
 
@@ -143,7 +143,7 @@ class AsyncSchedulerTest {
 
   @Test
   void errorDetection() throws Exception {
-    var resource = new HardwareResource("X", scheduler);
+    var resource = new RequireableResource("X", scheduler);
 
     var command =
         resource
@@ -179,7 +179,7 @@ class AsyncSchedulerTest {
   @Test
   void runResource() {
     var example =
-        new HardwareResource("Counting", scheduler) {
+        new RequireableResource("Counting", scheduler) {
           int x = 0;
         };
 
@@ -208,7 +208,7 @@ class AsyncSchedulerTest {
   void cancelOnInterruptDoesNotResume() throws Exception {
     var count = new AtomicInteger(0);
 
-    var resource = new HardwareResource("Resource", scheduler);
+    var resource = new RequireableResource("Resource", scheduler);
 
     var interrupter =
         AsyncCommand.requiring(resource)
@@ -239,7 +239,7 @@ class AsyncSchedulerTest {
   void scheduleOverDefaultDoesNotRescheduleDefault() throws Exception {
     var count = new AtomicInteger(0);
 
-    var resource = new HardwareResource("Resource", scheduler);
+    var resource = new RequireableResource("Resource", scheduler);
     var defaultCmd =
         resource
             .run(
@@ -285,9 +285,9 @@ class AsyncSchedulerTest {
 
   @Test
   void cancelAllStartsDefaults() {
-    var resources = new ArrayList<HardwareResource>(10);
+    var resources = new ArrayList<RequireableResource>(10);
     for (int i = 1; i <= 10; i++) {
-      resources.add(new HardwareResource("System " + i, scheduler));
+      resources.add(new RequireableResource("System " + i, scheduler));
     }
 
     var command =
@@ -327,11 +327,11 @@ class AsyncSchedulerTest {
 
   @Test
   void nestedResourceNestedCommands() {
-    var inner = new HardwareResource("Inner", scheduler);
+    var inner = new RequireableResource("Inner", scheduler);
     var outer =
-        new HardwareResource("Outer", scheduler) {
+        new RequireableResource("Outer", scheduler) {
           @Override
-          public Set<HardwareResource> nestedResources() {
+          public Set<RequireableResource> nestedResources() {
             return Set.of(inner);
           }
         };
@@ -371,14 +371,14 @@ class AsyncSchedulerTest {
     assertFalse(scheduler.isRunning(outerCommand));
   }
 
-  record PriorityCommand(int priority, HardwareResource... subsystems) implements AsyncCommand {
+  record PriorityCommand(int priority, RequireableResource... subsystems) implements AsyncCommand {
     @Override
     public void run(Coroutine coroutine) {
       coroutine.park();
     }
 
     @Override
-    public Set<HardwareResource> requirements() {
+    public Set<RequireableResource> requirements() {
       return Set.of(subsystems);
     }
 

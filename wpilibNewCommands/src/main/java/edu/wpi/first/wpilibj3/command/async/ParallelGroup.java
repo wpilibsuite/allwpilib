@@ -10,7 +10,7 @@ import java.util.Set;
 public class ParallelGroup implements AsyncCommand {
   private final Collection<AsyncCommand> commands = new LinkedHashSet<>();
   private final Collection<AsyncCommand> requiredCommands = new HashSet<>();
-  private final Set<HardwareResource> requirements = new HashSet<>();
+  private final Set<RequireableResource> requirements = new HashSet<>();
   private final String name;
   private final int priority;
   private RobotDisabledBehavior disabledBehavior;
@@ -103,7 +103,7 @@ public class ParallelGroup implements AsyncCommand {
   }
 
   @Override
-  public Set<HardwareResource> requirements() {
+  public Set<RequireableResource> requirements() {
     return requirements;
   }
 

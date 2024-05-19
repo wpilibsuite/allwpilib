@@ -6,18 +6,18 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 @SuppressWarnings("this-escape")
-public class HardwareResource {
+public class RequireableResource {
   private final String name;
 
   private final AsyncScheduler registeredScheduler;
 
   private AsyncCommand defaultCommand;
 
-  public HardwareResource(String name) {
+  public RequireableResource(String name) {
     this(name, AsyncScheduler.getInstance());
   }
 
-  public HardwareResource(String name, AsyncScheduler scheduler) {
+  public RequireableResource(String name, AsyncScheduler scheduler) {
     this.name = name;
     this.registeredScheduler = scheduler;
     this.defaultCommand = idle();
@@ -70,7 +70,7 @@ public class HardwareResource {
    *
    * @return the nested resources
    */
-  public Set<HardwareResource> nestedResources() {
+  public Set<RequireableResource> nestedResources() {
     return Set.of();
   }
 

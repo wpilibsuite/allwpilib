@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class AsyncScheduler {
-  private final Set<HardwareResource> registeredResources = new HashSet<>();
+  private final Set<RequireableResource> registeredResources = new HashSet<>();
 
   /** The set of commands scheduled since the start of the previous run. */
   private final Set<CommandState> onDeck = new LinkedHashSet<>();
@@ -68,7 +68,7 @@ public class AsyncScheduler {
    *
    * @param resource the resource to register
    */
-  public void registerResource(HardwareResource resource) {
+  public void registerResource(RequireableResource resource) {
     registeredResources.add(resource);
     if (resource.getDefaultCommand() instanceof AsyncCommand defaultCommand) {
       scheduleAsDefaultCommand(resource, defaultCommand);
@@ -86,7 +86,7 @@ public class AsyncScheduler {
    * @throws IllegalArgumentException if the command does not meet the requirements for being a
    *     default command
    */
-  public void scheduleAsDefaultCommand(HardwareResource resource, AsyncCommand defaultCommand) {
+  public void scheduleAsDefaultCommand(RequireableResource resource, AsyncCommand defaultCommand) {
     if (!defaultCommand.requires(resource)) {
       throw new IllegalArgumentException("A resource's default command must require that resource");
     }
@@ -580,7 +580,7 @@ public class AsyncScheduler {
    * @param resource the resource to get the commands for
    * @return the currently running commands that require the resource.
    */
-  public List<AsyncCommand> getRunningCommandsFor(HardwareResource resource) {
+  public List<AsyncCommand> getRunningCommandsFor(RequireableResource resource) {
     return commandStates.keySet().stream().filter(command -> command.requires(resource)).toList();
   }
 

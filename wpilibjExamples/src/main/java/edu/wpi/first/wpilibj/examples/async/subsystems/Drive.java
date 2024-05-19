@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.async.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.HardwareResource;
+import edu.wpi.first.wpilibj3.command.async.RequireableResource;
 import java.util.function.DoubleSupplier;
 
-public class Drive extends HardwareResource {
+public class Drive extends RequireableResource {
   // The motors on the left side of the drive.
   private final PWMSparkMax m_leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
   private final PWMSparkMax m_leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);

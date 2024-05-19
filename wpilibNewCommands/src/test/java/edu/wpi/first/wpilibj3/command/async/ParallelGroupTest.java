@@ -17,8 +17,8 @@ class ParallelGroupTest {
 
   @Test
   void parallelAll() {
-    var r1 = new HardwareResource("R1", scheduler);
-    var r2 = new HardwareResource("R2", scheduler);
+    var r1 = new RequireableResource("R1", scheduler);
+    var r2 = new RequireableResource("R2", scheduler);
 
     var c1Count = new AtomicInteger(0);
     var c2Count = new AtomicInteger(0);
@@ -81,8 +81,8 @@ class ParallelGroupTest {
 
   @Test
   void race() {
-    var r1 = new HardwareResource("R1", scheduler);
-    var r2 = new HardwareResource("R2", scheduler);
+    var r1 = new RequireableResource("R1", scheduler);
+    var r2 = new RequireableResource("R2", scheduler);
 
     var c1Count = new AtomicInteger(0);
     var c2Count = new AtomicInteger(0);
@@ -135,7 +135,7 @@ class ParallelGroupTest {
 
   @Test
   void nested() {
-    var resource = new HardwareResource("Resource", scheduler);
+    var resource = new RequireableResource("Resource", scheduler);
 
     var count = new AtomicInteger(0);
 

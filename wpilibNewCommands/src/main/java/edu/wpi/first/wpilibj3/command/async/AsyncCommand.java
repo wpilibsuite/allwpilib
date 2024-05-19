@@ -104,7 +104,7 @@ public interface AsyncCommand {
    *
    * @return the set of resources required by the command
    */
-  Set<HardwareResource> requirements();
+  Set<RequireableResource> requirements();
 
   /**
    * The priority of the command. If a command is scheduled that conflicts with another running
@@ -188,7 +188,7 @@ public interface AsyncCommand {
    * @param resource the resource to check
    * @return true if the resource is a member of the required resources, false if not
    */
-  default boolean requires(HardwareResource resource) {
+  default boolean requires(RequireableResource resource) {
     return requirements().contains(resource);
   }
 
@@ -246,7 +246,7 @@ public interface AsyncCommand {
     return ParallelGroup.race(name(), this, new WaitCommand(timeout));
   }
 
-  static AsyncCommandBuilder requiring(HardwareResource requirement, HardwareResource... rest) {
+  static AsyncCommandBuilder requiring(RequireableResource requirement, RequireableResource... rest) {
     return new AsyncCommandBuilder().requiring(requirement).requiring(rest);
   }
 }

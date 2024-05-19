@@ -30,7 +30,7 @@ public class WaitCommand implements AsyncCommand {
   }
 
   @Override
-  public Set<HardwareResource> requirements() {
+  public Set<RequireableResource> requirements() {
     return Set.of();
   }
 }

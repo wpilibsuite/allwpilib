@@ -7,14 +7,14 @@ import java.util.Set;
  *
  * @param resource the resource to idle.
  */
-public record IdleCommand(HardwareResource resource) implements AsyncCommand {
+public record IdleCommand(RequireableResource resource) implements AsyncCommand {
   @Override
   public void run(Coroutine coroutine) {
     coroutine.park();
   }
 
   @Override
-  public Set<HardwareResource> requirements() {
+  public Set<RequireableResource> requirements() {
     return Set.of(resource);
   }
 

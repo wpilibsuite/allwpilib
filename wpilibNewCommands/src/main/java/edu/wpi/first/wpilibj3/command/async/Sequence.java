@@ -14,7 +14,7 @@ import java.util.Set;
 public class Sequence implements AsyncCommand {
   private final String name;
   private final List<AsyncCommand> commands = new ArrayList<>();
-  private final Set<HardwareResource> requirements = new HashSet<>();
+  private final Set<RequireableResource> requirements = new HashSet<>();
   private final int priority;
   private RobotDisabledBehavior robotDisabledBehavior;
 
@@ -60,7 +60,7 @@ public class Sequence implements AsyncCommand {
   }
 
   @Override
-  public Set<HardwareResource> requirements() {
+  public Set<RequireableResource> requirements() {
     return requirements;
   }
 

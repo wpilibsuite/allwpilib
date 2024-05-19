@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class AsyncCommandBuilder {
-  private final Set<HardwareResource> requirements = new HashSet<>();
+  private final Set<RequireableResource> requirements = new HashSet<>();
   private Consumer<Coroutine> impl;
   private String name;
   private int priority = AsyncCommand.DEFAULT_PRIORITY;
@@ -17,17 +17,17 @@ public class AsyncCommandBuilder {
   private AsyncCommand.InterruptBehavior interruptBehavior =
       AsyncCommand.InterruptBehavior.CancelOnInterrupt;
 
-  public AsyncCommandBuilder requiring(HardwareResource resource) {
+  public AsyncCommandBuilder requiring(RequireableResource resource) {
     requirements.add(resource);
     return this;
   }
 
-  public AsyncCommandBuilder requiring(HardwareResource... resources) {
+  public AsyncCommandBuilder requiring(RequireableResource... resources) {
     requirements.addAll(Arrays.asList(resources));
     return this;
   }
 
-  public AsyncCommandBuilder requiring(Collection<HardwareResource> resources) {
+  public AsyncCommandBuilder requiring(Collection<RequireableResource> resources) {
     requirements.addAll(resources);
     return this;
   }
@@ -85,7 +85,7 @@ public class AsyncCommandBuilder {
       }
 
       @Override
-      public Set<HardwareResource> requirements() {
+      public Set<RequireableResource> requirements() {
         return requirements;
       }
 
