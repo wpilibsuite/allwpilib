@@ -35,8 +35,7 @@ public class SingleJointedArmSim extends AngularMechanismSim {
    * Creates a simulated arm mechanism.
    *
    * @param plant The linear system that represents the arm. This system can be created with {@link
-   *     LinearSystemId#createSingleJointedArmSystem(DCMotor,
-   *     double, double, double, double)} or
+   *     LinearSystemId#createSingleJointedArmSystem(DCMotor, double, double, double, double)} or
    *     {@link LinearSystemId#identifyPositionSystem(double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param armLengthMeters The length of the arm.
