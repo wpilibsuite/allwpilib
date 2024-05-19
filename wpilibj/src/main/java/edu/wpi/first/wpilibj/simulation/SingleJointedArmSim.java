@@ -12,6 +12,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated single jointed arm mechanism. */
 public class SingleJointedArmSim extends AngularMechanismSim {
@@ -34,9 +35,9 @@ public class SingleJointedArmSim extends AngularMechanismSim {
    * Creates a simulated arm mechanism.
    *
    * @param plant The linear system that represents the arm. This system can be created with {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
+   *     LinearSystemId#createSingleJointedArmSystem(DCMotor,
    *     double, double, double)} or 
-   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}.
+   *     {@link LinearSystemId#identifyPositionSystem(double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param armLengthMeters The length of the arm.
    * @param pivotPointMeters The pivot point of the arm.
