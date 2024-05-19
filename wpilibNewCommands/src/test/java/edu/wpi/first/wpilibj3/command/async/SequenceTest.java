@@ -17,7 +17,7 @@ class SequenceTest {
 
   @Test
   void single() {
-    var command = AsyncCommand.noHardware(Coroutine::yield).named("The Command");
+    var command = AsyncCommand.noRequirements(Coroutine::yield).named("The Command");
 
     var sequence = new Sequence("The Sequence", List.of(command));
     scheduler.schedule(sequence);
@@ -45,8 +45,8 @@ class SequenceTest {
 
   @Test
   void twoCommands() {
-    var c1 = AsyncCommand.noHardware(Coroutine::yield).named("C1");
-    var c2 = AsyncCommand.noHardware(Coroutine::yield).named("C2");
+    var c1 = AsyncCommand.noRequirements(Coroutine::yield).named("C1");
+    var c2 = AsyncCommand.noRequirements(Coroutine::yield).named("C2");
 
     var sequence = new Sequence("C1 > C2", List.of(c1, c2));
     scheduler.schedule(sequence);

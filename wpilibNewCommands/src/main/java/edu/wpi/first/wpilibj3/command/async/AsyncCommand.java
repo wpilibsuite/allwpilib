@@ -212,7 +212,7 @@ public interface AsyncCommand {
    * @param impl the implementation of the command logic
    * @return a builder that can be used to configure the resulting command
    */
-  static AsyncCommandBuilder noHardware(Consumer<Coroutine> impl) {
+  static AsyncCommandBuilder noRequirements(Consumer<Coroutine> impl) {
     return new AsyncCommandBuilder().executing(impl);
   }
 

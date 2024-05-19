@@ -28,7 +28,7 @@ class AsyncSchedulerTest {
     var enabled = new AtomicBoolean(false);
     var ran = new AtomicBoolean(false);
     var command =
-        AsyncCommand.noHardware(
+        AsyncCommand.noRequirements(
                 (coroutine) -> {
                   do {
                     coroutine.yield();
@@ -121,7 +121,7 @@ class AsyncSchedulerTest {
 
     for (int cmdCount = 0; cmdCount < numCommands; cmdCount++) {
       var command =
-          AsyncCommand.noHardware(
+          AsyncCommand.noRequirements(
                   (coroutine) -> {
                     for (int i = 0; i < iterations; i++) {
                       coroutine.yield();
@@ -271,7 +271,7 @@ class AsyncSchedulerTest {
   void cancelAllCancelsAll() {
     var commands = new ArrayList<AsyncCommand>(10);
     for (int i = 1; i <= 10; i++) {
-      commands.add(AsyncCommand.noHardware(Coroutine::yield).named("Command " + i));
+      commands.add(AsyncCommand.noRequirements(Coroutine::yield).named("Command " + i));
     }
     commands.forEach(scheduler::schedule);
     scheduler.run();
