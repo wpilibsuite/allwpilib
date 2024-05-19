@@ -329,9 +329,9 @@ public interface LEDPattern {
 
             // Apply the cosine function and shift its output from [-1, 1] to [0, 1]
             // Use cosine so the period starts at 100% brightness
-            double dim = 1 - (Math.cos(phase) + 1) / 2.0;
+            double dim = (Math.cos(phase) + 1) / 2.0;
 
-            int output = Color.lerpRGB(r, g, b, 0, 0, 0, dim);
+            int output = Color.lerpRGB(0, 0, 0, r, g, b, dim);
 
             writer.setRGB(
                 i,
