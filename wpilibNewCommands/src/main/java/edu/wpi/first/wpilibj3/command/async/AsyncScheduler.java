@@ -19,8 +19,10 @@ import java.util.function.Consumer;
 
 public class AsyncScheduler {
   private final Set<HardwareResource> registeredResources = new HashSet<>();
+
   /** The set of commands scheduled since the start of the previous run. */
   private final Set<CommandState> onDeck = new LinkedHashSet<>();
+
   /** The states of all running commands (does not include on deck commands). */
   private final Map<AsyncCommand, CommandState> commandStates = new LinkedHashMap<>();
 
@@ -34,6 +36,7 @@ public class AsyncScheduler {
 
   /** The periodic callbacks to run, outside of the command structure. */
   private final List<Continuation> periodicCallbacks = new ArrayList<>();
+
   /** Event loop for trigger bindings. */
   private final EventLoop eventLoop = new EventLoop();
 
@@ -49,8 +52,8 @@ public class AsyncScheduler {
   private final Coroutine coroutine = () -> AsyncScheduler.this;
 
   /**
-   * Gets the default scheduler instance for use in a robot program. Some built in command types
-   * use the default scheduler and will not work as expected if used on another scheduler instance.
+   * Gets the default scheduler instance for use in a robot program. Some built in command types use
+   * the default scheduler and will not work as expected if used on another scheduler instance.
    *
    * @return the default scheduler instance.
    */
@@ -58,11 +61,11 @@ public class AsyncScheduler {
     return defaultScheduler;
   }
 
-  public AsyncScheduler() {
-  }
+  public AsyncScheduler() {}
 
   /**
    * Registers a resource with the scheduler and schedules its default command.
+   *
    * @param resource the resource to register
    */
   public void registerResource(HardwareResource resource) {
@@ -74,14 +77,14 @@ public class AsyncScheduler {
 
   /**
    * Sets the default command for a resource. The command must require the resource, and cannot
-   * require any others. Default commands must
-   * {@link AsyncCommand.InterruptBehavior#SuspendOnInterrupt suspend on interrupt} and have a lower
+   * require any others. Default commands must {@link
+   * AsyncCommand.InterruptBehavior#SuspendOnInterrupt suspend on interrupt} and have a lower
    * priority than {@link AsyncCommand#DEFAULT_PRIORITY} to function properly.
    *
    * @param resource the resource for which to set the default command
    * @param defaultCommand the default command to execute on the resource
    * @throws IllegalArgumentException if the command does not meet the requirements for being a
-   *    default command
+   *     default command
    */
   public void scheduleAsDefaultCommand(HardwareResource resource, AsyncCommand defaultCommand) {
     if (!defaultCommand.requires(resource)) {
@@ -107,10 +110,10 @@ public class AsyncScheduler {
 
   /**
    * Adds a callback to run as part of the scheduler. The callback should not manipulate or control
-   * any resources, but can be used to log information, update data (such as simulations or LED
-   * data buffers), or perform some other helpful task. The callback is responsible for managing its
-   * own control flow and end conditions. If you want to run a single task periodically for the
-   * entire lifespan of the scheduler, use {@link #addPeriodic(Runnable)}.
+   * any resources, but can be used to log information, update data (such as simulations or LED data
+   * buffers), or perform some other helpful task. The callback is responsible for managing its own
+   * control flow and end conditions. If you want to run a single task periodically for the entire
+   * lifespan of the scheduler, use {@link #addPeriodic(Runnable)}.
    *
    * <p><strong>Note:</strong> Like commands, any loops in the callback must appropriately yield
    * control back to the scheduler with {@link Coroutine#yield} or risk stalling your program in an
@@ -119,9 +122,12 @@ public class AsyncScheduler {
    * @param callback the callback to sideload
    */
   public void sideload(Consumer<Coroutine> callback) {
-    periodicCallbacks.add(new Continuation(scope, () -> {
-      callback.accept(coroutine);
-    }));
+    periodicCallbacks.add(
+        new Continuation(
+            scope,
+            () -> {
+              callback.accept(coroutine);
+            }));
   }
 
   /**
@@ -129,32 +135,34 @@ public class AsyncScheduler {
    * looping and control yielding necessary for proper function. The callback will run at the same
    * periodic frequency as the scheduler.
    *
-   * <p>For example:</p>
+   * <p>For example:
+   *
    * <pre>{@code
-   *   scheduler.addPeriodic(() -> leds.setData(ledDataBuffer));
-   *   scheduler.addPeriodic(() -> {
-   *     SmartDashboard.putNumber("X", getX());
-   *     SmartDashboard.putNumber("Y", getY());
-   *   });
+   * scheduler.addPeriodic(() -> leds.setData(ledDataBuffer));
+   * scheduler.addPeriodic(() -> {
+   *   SmartDashboard.putNumber("X", getX());
+   *   SmartDashboard.putNumber("Y", getY());
+   * });
    * }</pre>
    *
    * @param callback the periodic function to run
    */
   public void addPeriodic(Runnable callback) {
-    sideload((coroutine) -> {
-      while (coroutine.yield()) {
-        callback.run();
-      }
-    });
+    sideload(
+        (coroutine) -> {
+          while (coroutine.yield()) {
+            callback.run();
+          }
+        });
   }
 
   /**
    * Schedules a command to run. If a running command schedules another command (for example,
    * parallel groups will do this), then the new command is assumed to be a bound child of the
    * running command. The scheduling command is expected to have ownership over the scheduled
-   * command, including cancelling it if the parent command completes before the child does
-   * (for example, deadline groups will cancel unfinished child commands when all the required
-   * commands in the group have completed).
+   * command, including cancelling it if the parent command completes before the child does (for
+   * example, deadline groups will cancel unfinished child commands when all the required commands
+   * in the group have completed).
    *
    * @param command the command to schedule
    */
@@ -167,16 +175,15 @@ public class AsyncScheduler {
       // Scheduled by a command.
       // Permit disjoint requirement sets iff every requirement of the scheduled command is a nested
       // resource under a single requirement of the parent command
-      if (currentCommand
-              .requirements()
-              .stream()
-              .anyMatch(parentReq -> parentReq.nestedResources().containsAll(command.requirements()))) {
+      if (currentCommand.requirements().stream()
+          .anyMatch(parentReq -> parentReq.nestedResources().containsAll(command.requirements()))) {
         // Allow
       } else {
         // Instead of checking for conflicts with all running commands (which would include the
         // parent), we instead need to verify that the scheduled command ONLY uses resources also
         // used by the parent. Technically, we should also verify that the scheduled command also
-        // does not require any of the same resources as any sibling, either. But that can come later.
+        // does not require any of the same resources as any sibling, either. But that can come
+        // later.
         if (!currentCommand.requirements().containsAll(command.requirements())) {
           var disallowedResources = new LinkedHashSet<>(command.requirements());
           disallowedResources.removeIf(currentCommand::requires);
@@ -271,8 +278,8 @@ public class AsyncScheduler {
   }
 
   /**
-   * Schedules and waits for a command to complete. Shorthand for
-   * {@code schedule(command); waitFor(command);}.
+   * Schedules and waits for a command to complete. Shorthand for {@code schedule(command);
+   * waitFor(command);}.
    *
    * @param command the command to schedule
    */
@@ -327,12 +334,12 @@ public class AsyncScheduler {
   /**
    * Updates the command scheduler. This will process trigger bindings on anything attached to the
    * {@link #getDefaultButtonLoop() default event loop}, begin running any commands scheduled since
-   * the previous call to {@code run()}, process periodic callbacks added with
-   * {@link #addPeriodic(Runnable)} and {@link #sideload(Consumer)}, update running commands, and
-   * schedule default commands for any resources that are not owned by a running command.
+   * the previous call to {@code run()}, process periodic callbacks added with {@link
+   * #addPeriodic(Runnable)} and {@link #sideload(Consumer)}, update running commands, and schedule
+   * default commands for any resources that are not owned by a running command.
    *
-   * <p>This method is intended to be called in a periodic loop like
-   * {@link TimedRobot#robotPeriodic()}</p>
+   * <p>This method is intended to be called in a periodic loop like {@link
+   * TimedRobot#robotPeriodic()}
    */
   public void run() {
     // Process triggers first; these tend to queue and cancel commands
@@ -412,7 +419,7 @@ public class AsyncScheduler {
     // scheduled command.
     for (var resource : registeredResources) {
       if (commandStates.keySet().stream().noneMatch(c -> c.requires(resource))
-              && onDeck.stream().noneMatch(c -> c.command().requires(resource))) {
+          && onDeck.stream().noneMatch(c -> c.command().requires(resource))) {
         // Nothing currently running or scheduled
         // Schedule the resource's default command, if it has one
         if (resource.getDefaultCommand() instanceof AsyncCommand defaultCommand) {
@@ -447,13 +454,15 @@ public class AsyncScheduler {
    * @return the binding continuation
    */
   private Continuation buildContinuation(AsyncCommand command) {
-    return new Continuation(scope, () -> {
-      try {
-        command.run(coroutine);
-      } catch (Exception e) {
-        throw new CommandExecutionException(command, e);
-      }
-    });
+    return new Continuation(
+        scope,
+        () -> {
+          try {
+            command.run(coroutine);
+          } catch (Exception e) {
+            throw new CommandExecutionException(command, e);
+          }
+        });
   }
 
   /**
@@ -536,6 +545,7 @@ public class AsyncScheduler {
 
   /**
    * Checks if the currently running command is permitted to wait for completion of another command.
+   *
    * @param command the command to check
    */
   private void checkWaitable(AsyncCommand command) {
@@ -546,12 +556,10 @@ public class AsyncScheduler {
 
     var state =
         commandStates.getOrDefault(
-            command,
-            onDeck.stream().filter(s -> s.command() == command).findFirst().orElseThrow());
+            command, onDeck.stream().filter(s -> s.command() == command).findFirst().orElseThrow());
 
     if (state.parent() != null && state.parent() != currentCommand) {
-      throw new IllegalStateException(
-          "Only " + state.parent() + " can wait for " + command);
+      throw new IllegalStateException("Only " + state.parent() + " can wait for " + command);
     }
   }
 
@@ -573,16 +581,12 @@ public class AsyncScheduler {
    * @return the currently running commands that require the resource.
    */
   public List<AsyncCommand> getRunningCommandsFor(HardwareResource resource) {
-    return commandStates
-               .keySet()
-               .stream()
-               .filter(command -> command.requires(resource))
-               .toList();
+    return commandStates.keySet().stream().filter(command -> command.requires(resource)).toList();
   }
 
   /**
-   * Cancels all currently running commands, then starts the default commands for any resources
-   * that had canceled commands. A default command that is currently running will not be canceled.
+   * Cancels all currently running commands, then starts the default commands for any resources that
+   * had canceled commands. A default command that is currently running will not be canceled.
    */
   public void cancelAll() {
     commandStates.clear();
@@ -594,7 +598,7 @@ public class AsyncScheduler {
    *
    * @return true
    * @throws IllegalStateException if called outside a command that is currently being executed by
-   * the scheduler
+   *     the scheduler
    */
   public boolean yield() {
     return Continuation.yield(scope);

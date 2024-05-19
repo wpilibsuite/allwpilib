@@ -7,9 +7,7 @@ import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.Set;
 
-/**
- * A command with no requirements that merely waits for a specified duration of time to elapse.
- */
+/** A command with no requirements that merely waits for a specified duration of time to elapse. */
 public class WaitCommand implements AsyncCommand {
   private final Measure<Time> duration;
 

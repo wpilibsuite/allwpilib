@@ -16,15 +16,12 @@ public final class ContinuationScope {
     try {
       jdk_internal_vm_ContinuationScope = Class.forName("jdk.internal.vm.ContinuationScope");
 
-      var lookup = MethodHandles.privateLookupIn(
-          jdk_internal_vm_ContinuationScope,
-          MethodHandles.lookup()
-      );
+      var lookup =
+          MethodHandles.privateLookupIn(jdk_internal_vm_ContinuationScope, MethodHandles.lookup());
 
-      CONSTRUCTOR = lookup.findConstructor(
-          jdk_internal_vm_ContinuationScope,
-          MethodType.methodType(void.class, String.class)
-      );
+      CONSTRUCTOR =
+          lookup.findConstructor(
+              jdk_internal_vm_ContinuationScope, MethodType.methodType(void.class, String.class));
     } catch (Throwable t) {
       throw new ExceptionInInitializerError(t);
     }

@@ -48,7 +48,7 @@ public interface Coroutine {
    * @param commands the commands to await
    * @throws IllegalStateException if any of the given commands is not already running or scheduled
    * @throws IllegalStateException if any of the given commands uses a resource not owned by the
-   *  calling command
+   *     calling command
    */
   default void awaitAll(Collection<AsyncCommand> commands) {
     scheduler().awaitAll(commands);
@@ -62,7 +62,7 @@ public interface Coroutine {
    * @param commands the commands to await
    * @throws IllegalStateException if any of the given commands is not already running or scheduled
    * @throws IllegalStateException if any of the given commands uses a resource not owned by the
-   *  calling command
+   *     calling command
    */
   default void awaitAny(Collection<AsyncCommand> commands) {
     scheduler().awaitAny(commands);

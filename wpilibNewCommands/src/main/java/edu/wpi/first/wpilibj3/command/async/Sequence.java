@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A sequence of commands that run one after another. Each successive command only starts after
- * its predecessor completes execution. The priority of a sequence is equal to the highest priority
- * of any of its commands. If all commands in the sequence are able to run while the robot is
- * disabled, then the sequence itself will be allowed to run while the robot is disabled.
+ * A sequence of commands that run one after another. Each successive command only starts after its
+ * predecessor completes execution. The priority of a sequence is equal to the highest priority of
+ * any of its commands. If all commands in the sequence are able to run while the robot is disabled,
+ * then the sequence itself will be allowed to run while the robot is disabled.
  */
 public class Sequence implements AsyncCommand {
   private final String name;
@@ -33,8 +33,7 @@ public class Sequence implements AsyncCommand {
     }
 
     this.priority =
-        commands
-            .stream()
+        commands.stream()
             .mapToInt(AsyncCommand::priority)
             .max()
             .orElse(AsyncCommand.DEFAULT_PRIORITY);

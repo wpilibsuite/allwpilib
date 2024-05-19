@@ -5,9 +5,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.WrongMethodTypeException;
 
-/**
- * A wrapper around the JDK internal Continuation class.
- */
+/** A wrapper around the JDK internal Continuation class. */
 public final class Continuation {
   // The underlying jdk.internal.vm.Continuation object
   final Object continuation;
@@ -24,30 +22,29 @@ public final class Continuation {
     try {
       jdk_internal_vm_Continuation = Class.forName("jdk.internal.vm.Continuation");
 
-      var lookup = MethodHandles.privateLookupIn(jdk_internal_vm_Continuation, MethodHandles.lookup());
+      var lookup =
+          MethodHandles.privateLookupIn(jdk_internal_vm_Continuation, MethodHandles.lookup());
 
-      CONSTRUCTOR = lookup.findConstructor(
-          jdk_internal_vm_Continuation,
-          MethodType.methodType(void.class, ContinuationScope.jdk_internal_vm_ContinuationScope, Runnable.class)
-      );
+      CONSTRUCTOR =
+          lookup.findConstructor(
+              jdk_internal_vm_Continuation,
+              MethodType.methodType(
+                  void.class, ContinuationScope.jdk_internal_vm_ContinuationScope, Runnable.class));
 
-      YIELD = lookup.findStatic(
-          jdk_internal_vm_Continuation,
-          "yield",
-          MethodType.methodType(boolean.class, ContinuationScope.jdk_internal_vm_ContinuationScope)
-      );
+      YIELD =
+          lookup.findStatic(
+              jdk_internal_vm_Continuation,
+              "yield",
+              MethodType.methodType(
+                  boolean.class, ContinuationScope.jdk_internal_vm_ContinuationScope));
 
-      RUN = lookup.findVirtual(
-          jdk_internal_vm_Continuation,
-          "run",
-          MethodType.methodType(void.class)
-      );
+      RUN =
+          lookup.findVirtual(
+              jdk_internal_vm_Continuation, "run", MethodType.methodType(void.class));
 
-      IS_DONE = lookup.findVirtual(
-          jdk_internal_vm_Continuation,
-          "isDone",
-          MethodType.methodType(boolean.class)
-      );
+      IS_DONE =
+          lookup.findVirtual(
+              jdk_internal_vm_Continuation, "isDone", MethodType.methodType(boolean.class));
     } catch (Throwable t) {
       throw new ExceptionInInitializerError(t);
     }
@@ -57,11 +54,11 @@ public final class Continuation {
     try {
       var lookup = MethodHandles.privateLookupIn(Thread.class, MethodHandles.lookup());
 
-      java_lang_thread_setContinuation = lookup.findVirtual(
-          Thread.class,
-          "setContinuation",
-          MethodType.methodType(void.class, Continuation.jdk_internal_vm_Continuation)
-      );
+      java_lang_thread_setContinuation =
+          lookup.findVirtual(
+              Thread.class,
+              "setContinuation",
+              MethodType.methodType(void.class, Continuation.jdk_internal_vm_Continuation));
     } catch (Throwable t) {
       throw new ExceptionInInitializerError(t);
     }
@@ -116,6 +113,7 @@ public final class Continuation {
 
   /**
    * Tests whether this continuation is completed
+   *
    * @return whether this continuation is completed
    */
   public boolean isDone() {

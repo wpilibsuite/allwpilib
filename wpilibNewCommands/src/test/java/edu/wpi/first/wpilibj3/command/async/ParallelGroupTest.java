@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,18 +23,24 @@ class ParallelGroupTest {
     var c1Count = new AtomicInteger(0);
     var c2Count = new AtomicInteger(0);
 
-    var c1 = r1.run((coroutine) -> {
-      for (int i = 0; i < 5; i++) {
-        coroutine.yield();
-        c1Count.incrementAndGet();
-      }
-    }).named("C1");
-    var c2 = r2.run((coroutine) -> {
-      for (int i = 0; i < 10; i++) {
-        coroutine.yield();
-        c2Count.incrementAndGet();
-      }
-    }).named("C2");
+    var c1 =
+        r1.run(
+                (coroutine) -> {
+                  for (int i = 0; i < 5; i++) {
+                    coroutine.yield();
+                    c1Count.incrementAndGet();
+                  }
+                })
+            .named("C1");
+    var c2 =
+        r2.run(
+                (coroutine) -> {
+                  for (int i = 0; i < 10; i++) {
+                    coroutine.yield();
+                    c2Count.incrementAndGet();
+                  }
+                })
+            .named("C2");
 
     var parallel = new ParallelGroup("Parallel", List.of(c1, c2), List.of(c1, c2));
     scheduler.schedule(parallel);
@@ -82,18 +87,24 @@ class ParallelGroupTest {
     var c1Count = new AtomicInteger(0);
     var c2Count = new AtomicInteger(0);
 
-    var c1 = r1.run((coroutine) -> {
-      for (int i = 0; i < 5; i++) {
-        coroutine.yield();
-        c1Count.incrementAndGet();
-      }
-    }).named("C1");
-    var c2 = r2.run((coroutine) -> {
-      for (int i = 0; i < 10; i++) {
-        coroutine.yield();
-        c2Count.incrementAndGet();
-      }
-    }).named("C2");
+    var c1 =
+        r1.run(
+                (coroutine) -> {
+                  for (int i = 0; i < 5; i++) {
+                    coroutine.yield();
+                    c1Count.incrementAndGet();
+                  }
+                })
+            .named("C1");
+    var c2 =
+        r2.run(
+                (coroutine) -> {
+                  for (int i = 0; i < 10; i++) {
+                    coroutine.yield();
+                    c2Count.incrementAndGet();
+                  }
+                })
+            .named("C2");
 
     var race = new ParallelGroup("Race", List.of(c1, c2), List.of());
     scheduler.schedule(race);
@@ -128,12 +139,16 @@ class ParallelGroupTest {
 
     var count = new AtomicInteger(0);
 
-    var command = resource.run((coroutine) -> {
-      for (int i = 0; i < 5; i++) {
-        coroutine.yield();
-        count.incrementAndGet();
-      }
-    }).named("Command");
+    var command =
+        resource
+            .run(
+                (coroutine) -> {
+                  for (int i = 0; i < 5; i++) {
+                    coroutine.yield();
+                    count.incrementAndGet();
+                  }
+                })
+            .named("Command");
 
     var inner = ParallelGroup.all("Inner", command);
     var outer = ParallelGroup.all("Outer", inner);

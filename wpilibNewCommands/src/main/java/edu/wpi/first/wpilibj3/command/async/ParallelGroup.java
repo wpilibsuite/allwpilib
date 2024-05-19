@@ -20,8 +20,7 @@ public class ParallelGroup implements AsyncCommand {
       Collection<AsyncCommand> allCommands,
       Collection<AsyncCommand> requiredCommands) {
     if (!allCommands.containsAll(requiredCommands)) {
-      throw new IllegalArgumentException(
-          "Required commands must also be composed");
+      throw new IllegalArgumentException("Required commands must also be composed");
     }
 
     for (AsyncCommand c1 : allCommands) {
@@ -50,8 +49,7 @@ public class ParallelGroup implements AsyncCommand {
     }
 
     this.priority =
-        allCommands
-            .stream()
+        allCommands.stream()
             .mapToInt(AsyncCommand::priority)
             .max()
             .orElse(AsyncCommand.DEFAULT_PRIORITY);
@@ -67,16 +65,13 @@ public class ParallelGroup implements AsyncCommand {
 
   /**
    * Creates a parallel group that runs all the given commands until any of them finish.
+   *
    * @param name the name of the group
    * @param commands the commands to run in parallel
    * @return the group
    */
   public static ParallelGroup race(String name, AsyncCommand... commands) {
-    return new ParallelGroup(
-        name,
-        List.of(commands),
-        Set.of()
-    );
+    return new ParallelGroup(name, List.of(commands), Set.of());
   }
 
   /**
@@ -88,11 +83,7 @@ public class ParallelGroup implements AsyncCommand {
    * @return the group
    */
   public static ParallelGroup all(String name, AsyncCommand... commands) {
-    return new ParallelGroup(
-        name,
-        List.of(commands),
-        List.of(commands)
-    );
+    return new ParallelGroup(name, List.of(commands), List.of(commands));
   }
 
   @Override
@@ -162,11 +153,7 @@ public class ParallelGroup implements AsyncCommand {
     }
 
     public ParallelGroup named(String name) {
-      return new ParallelGroup(
-          name,
-          commands,
-          requiredCommands
-      );
+      return new ParallelGroup(name, commands, requiredCommands);
     }
   }
 }

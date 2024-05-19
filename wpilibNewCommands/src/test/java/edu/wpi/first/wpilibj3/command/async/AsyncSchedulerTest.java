@@ -27,12 +27,15 @@ class AsyncSchedulerTest {
   void basic() throws Exception {
     var enabled = new AtomicBoolean(false);
     var ran = new AtomicBoolean(false);
-    var command = AsyncCommand.noHardware((coroutine) -> {
-      do {
-        coroutine.yield();
-      } while (!enabled.get());
-      ran.set(true);
-    }).named("Basic Command");
+    var command =
+        AsyncCommand.noHardware(
+                (coroutine) -> {
+                  do {
+                    coroutine.yield();
+                  } while (!enabled.get());
+                  ran.set(true);
+                })
+            .named("Basic Command");
 
     scheduler.schedule(command);
     scheduler.run();
@@ -207,14 +210,22 @@ class AsyncSchedulerTest {
 
     var resource = new HardwareResource("Resource", scheduler);
 
-    var interrupter = AsyncCommand.requiring(resource).executing((coroutine) -> {
-    }).withPriority(2).named("Interrupter");
+    var interrupter =
+        AsyncCommand.requiring(resource)
+            .executing((coroutine) -> {})
+            .withPriority(2)
+            .named("Interrupter");
 
-    var canceledCommand = AsyncCommand.requiring(resource).executing((coroutine) -> {
-      count.set(1);
-      coroutine.yield();
-      count.set(2);
-    }).withPriority(1).named("Cancel By Default");
+    var canceledCommand =
+        AsyncCommand.requiring(resource)
+            .executing(
+                (coroutine) -> {
+                  count.set(1);
+                  coroutine.yield();
+                  count.set(2);
+                })
+            .withPriority(1)
+            .named("Cancel By Default");
 
     scheduler.schedule(canceledCommand);
     scheduler.run();
@@ -229,15 +240,20 @@ class AsyncSchedulerTest {
     var count = new AtomicInteger(0);
 
     var resource = new HardwareResource("Resource", scheduler);
-    var defaultCmd = resource.run((coroutine) -> {
-      while (true) {
-        count.incrementAndGet();
-        coroutine.yield();
-      }
-    }).suspendingOnInterrupt().withPriority(-1).named("Default Command");
+    var defaultCmd =
+        resource
+            .run(
+                (coroutine) -> {
+                  while (true) {
+                    count.incrementAndGet();
+                    coroutine.yield();
+                  }
+                })
+            .suspendingOnInterrupt()
+            .withPriority(-1)
+            .named("Default Command");
 
-    var newerCmd = resource.run((coroutine) -> {
-    }).named("Newer Command");
+    var newerCmd = resource.run((coroutine) -> {}).named("Newer Command");
     resource.setDefaultCommand(defaultCmd);
     scheduler.run();
     assertTrue(scheduler.isRunning(defaultCmd), "Default command should be running");
@@ -312,24 +328,33 @@ class AsyncSchedulerTest {
   @Test
   void nestedResourceNestedCommands() {
     var inner = new HardwareResource("Inner", scheduler);
-    var outer = new HardwareResource("Outer", scheduler) {
-      @Override
-      public Set<HardwareResource> nestedResources() {
-        return Set.of(inner);
-      }
-    };
+    var outer =
+        new HardwareResource("Outer", scheduler) {
+          @Override
+          public Set<HardwareResource> nestedResources() {
+            return Set.of(inner);
+          }
+        };
 
     var innerRan = new AtomicBoolean(false);
     var outerRan = new AtomicBoolean(false);
 
-    var innerCommand = inner.run((coroutine) -> {
-      innerRan.set(true);
-    }).named("Inner Command");
+    var innerCommand =
+        inner
+            .run(
+                (coroutine) -> {
+                  innerRan.set(true);
+                })
+            .named("Inner Command");
 
-    var outerCommand = outer.run((coroutine) -> {
-      scheduler.scheduleAndWait(innerCommand);
-      outerRan.set(true);
-    }).named("Outer Command");
+    var outerCommand =
+        outer
+            .run(
+                (coroutine) -> {
+                  scheduler.scheduleAndWait(innerCommand);
+                  outerRan.set(true);
+                })
+            .named("Outer Command");
 
     scheduler.schedule(outerCommand);
     // First run: schedules the inner command

@@ -62,8 +62,8 @@ public class HardwareResource {
   }
 
   /**
-   * Gets the set of nested resources encapsulated by this one. For compound mechanisms that need
-   * to have flexible control over individual components, this will allow the scheduler to permit
+   * Gets the set of nested resources encapsulated by this one. For compound mechanisms that need to
+   * have flexible control over individual components, this will allow the scheduler to permit
    * nested commands to have ownership of just those components and not the entire compound
    * mechanism. In effect, this will allow default commands to run for the components not directly
    * used by that nested command.

@@ -1,8 +1,8 @@
 package edu.wpi.first.wpilibj3.command.async;
 
 /**
- * An exception thrown when an {@link AsyncCommand} encountered an error while running in an
- * {@link AsyncScheduler}.
+ * An exception thrown when an {@link AsyncCommand} encountered an error while running in an {@link
+ * AsyncScheduler}.
  */
 public class CommandExecutionException extends RuntimeException {
   /** The command that had the exception. */
@@ -10,6 +10,7 @@ public class CommandExecutionException extends RuntimeException {
 
   /**
    * Creates a new CommandExecutionException.
+   *
    * @param command the command that encountered the exception
    * @param cause the exception itself
    */
@@ -20,6 +21,7 @@ public class CommandExecutionException extends RuntimeException {
 
   /**
    * Gets the command that encountered the exception.
+   *
    * @return the command
    */
   public AsyncCommand getCommand() {

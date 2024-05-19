@@ -12,8 +12,10 @@ public class AsyncCommandBuilder {
   private Consumer<Coroutine> impl;
   private String name;
   private int priority = AsyncCommand.DEFAULT_PRIORITY;
-  private AsyncCommand.RobotDisabledBehavior disabledBehavior = AsyncCommand.RobotDisabledBehavior.CancelWhileDisabled;
-  private AsyncCommand.InterruptBehavior interruptBehavior = AsyncCommand.InterruptBehavior.CancelOnInterrupt;
+  private AsyncCommand.RobotDisabledBehavior disabledBehavior =
+      AsyncCommand.RobotDisabledBehavior.CancelWhileDisabled;
+  private AsyncCommand.InterruptBehavior interruptBehavior =
+      AsyncCommand.InterruptBehavior.CancelOnInterrupt;
 
   public AsyncCommandBuilder requiring(HardwareResource resource) {
     requirements.add(resource);
