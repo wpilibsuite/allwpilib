@@ -620,18 +620,168 @@ TEST(LEDPatternTest, Breathe) {
   WPI_SetNowImpl(nullptr);  // cleanup
 }
 
-TEST(LEDPatternTest, OverlaySolidOnSolid) {}
-TEST(LEDPatternTest, OverlayNearlyBlack) {}
-TEST(LEDPatternTest, OverlayMixed) {}
-TEST(LEDPatternTest, Blend) {}
-TEST(LEDPatternTest, BinaryMask) {}
-TEST(LEDPatternTest, ChannelwiseMask) {}
-TEST(LEDPatternTest, ProcessMaskLayer) {}
-TEST(LEDPatternTest, ZeroBrightness) {}
-TEST(LEDPatternTest, SameBrightness) {}
-TEST(LEDPatternTest, HigherBrightness) {}
-TEST(LEDPatternTest, NegativeBrightness) {}
-TEST(LEDPatternTest, ClippingBrightness) {}
+TEST(LEDPatternTest, OverlaySolidOnSolid) {
+  std::array<AddressableLED::LEDData, 1> buffer;
+
+  auto base = LEDPattern::Solid(Color::kWhite);
+  auto overlay = LEDPattern::Solid(Color::kYellow);
+  auto pattern = overlay.OverlayOn(base);
+  pattern.ApplyTo(buffer);
+
+  AssertIndexColor(buffer, 0, Color::kYellow);
+}
+
+TEST(LEDPatternTest, OverlayNearlyBlack) {
+  std::array<AddressableLED::LEDData, 1> buffer;
+
+  auto base = LEDPattern::Solid(Color::kWhite);
+  auto overlay = LEDPattern::Solid(Color{1, 0, 0});
+  auto pattern = overlay.OverlayOn(base);
+  pattern.ApplyTo(buffer);
+
+  AssertIndexColor(buffer, 0, Color{1, 0, 0});
+}
+
+TEST(LEDPatternTest, OverlayMixed) {
+  std::array<AddressableLED::LEDData, 2> buffer;
+
+  auto base = LEDPattern::Solid(Color::kWhite);
+  std::array<std::pair<double, Color>, 2> steps{std::pair{0.0, Color::kYellow},
+                                                std::pair{0.5, Color::kBlack}};
+  auto overlay = LEDPattern::Steps(steps);
+  auto pattern = overlay.OverlayOn(base);
+  pattern.ApplyTo(buffer);
+
+  AssertIndexColor(buffer, 0, Color::kYellow);
+  AssertIndexColor(buffer, 1, Color::kWhite);
+}
+
+TEST(LEDPatternTest, Blend) {
+  std::array<AddressableLED::LEDData, 1> buffer;
+
+  auto pattern1 = LEDPattern::Solid(Color::kBlue);
+  auto pattern2 = LEDPattern::Solid(Color::kRed);
+  auto blend = pattern1.Blend(pattern2);
+  blend.ApplyTo(buffer);
+
+  // Individual RGB channels are averaged
+  // #0000FF blended with #FF0000 yields #7F007F
+  AssertIndexColor(buffer, 0, Color{127, 0, 127});
+}
+
+TEST(LEDPatternTest, BinaryMask) {
+  std::array<AddressableLED::LEDData, 10> buffer;
+
+  Color color{123, 123, 123};
+  auto base = LEDPattern::Solid(color);
+
+  // first 50% mask on, last 50% mask off
+  std::array<std::pair<double, Color>, 2> steps{std::pair{0.0, Color::kWhite},
+                                                std::pair{0.5, Color::kBlack}};
+  auto mask = LEDPattern::Steps(steps);
+  auto masked = base.Mask(mask);
+  masked.ApplyTo(buffer);
+
+  for (int i = 0; i < 5; i++) {
+    AssertIndexColor(buffer, i, color);
+  }
+
+  for (int i = 5; i < 10; i++) {
+    AssertIndexColor(buffer, i, Color::kBlack);
+  }
+}
+
+TEST(LEDPatternTest, ChannelwiseMask) {
+  std::array<AddressableLED::LEDData, 5> buffer;
+
+  Color baseColor{123, 123, 123};
+  Color halfGray{0.5, 0.5, 0.5};
+  auto base = LEDPattern::Solid(baseColor);
+  std::array<std::pair<double, Color>, 5> steps{
+      std::pair{0.0, Color::kRed}, std::pair{0.2, Color::kLime},
+      std::pair{0.4, Color::kBlue}, std::pair{0.6, halfGray},
+      std::pair{0.8, Color::kWhite}};
+  auto mask = LEDPattern::Steps(steps);
+  auto masked = base.Mask(mask);
+  masked.ApplyTo(buffer);
+
+  AssertIndexColor(buffer, 0, Color{123, 0, 0});
+  AssertIndexColor(buffer, 1, Color{0, 123, 0});
+  AssertIndexColor(buffer, 2, Color{0, 0, 123});
+
+  // mask channels are all 0b00111111, base is 0b00111011,
+  // so the AND should give us the unmodified base color
+  AssertIndexColor(buffer, 3, baseColor);
+  AssertIndexColor(buffer, 4, baseColor);
+}
+
+TEST(LEDPatternTest, ProcessMaskLayer) {
+  std::array<AddressableLED::LEDData, 100> buffer;
+
+  double progress = 0.0;
+  auto maskLayer =
+      LEDPattern::ProgressMaskLayer([&progress]() { return progress; });
+
+  for (double t = 0; t <= 1.0; t += 0.01) {
+    SCOPED_TRACE(fmt::format("Time {}", t));
+    progress = t;
+    maskLayer.ApplyTo(buffer);
+
+    int lastMaskedLED = static_cast<int>(t * 100);
+    for (int i = 0; i < lastMaskedLED; i++) {
+      SCOPED_TRACE(fmt::format("LED {}", i));
+      AssertIndexColor(buffer, i, Color::kWhite);
+    }
+    for (int i = lastMaskedLED; i < 100; i++) {
+      SCOPED_TRACE(fmt::format("LED {}", i));
+      AssertIndexColor(buffer, i, Color::kBlack);
+    }
+  }
+}
+
+TEST(LEDPatternTest, ZeroBrightness) {
+  std::array<AddressableLED::LEDData, 1> buffer;
+
+  auto base = LEDPattern::Solid(Color::kRed);
+  auto pattern = base.AtBrightness(0);
+  pattern.ApplyTo(buffer);
+  AssertIndexColor(buffer, 0, Color::kBlack);
+}
+
+TEST(LEDPatternTest, SameBrightness) {
+  std::array<AddressableLED::LEDData, 1> buffer;
+
+  auto base = LEDPattern::Solid(Color::kMagenta);
+  auto pattern = base.AtBrightness(1.0);
+  pattern.ApplyTo(buffer);
+  AssertIndexColor(buffer, 0, Color::kMagenta);
+}
+
+TEST(LEDPatternTest, HigherBrightness) {
+  std::array<AddressableLED::LEDData, 1> buffer;
+
+  auto base = LEDPattern::Solid(Color::kMagenta);
+  auto pattern = base.AtBrightness(4 / 3.0);
+  pattern.ApplyTo(buffer);
+  AssertIndexColor(buffer, 0, Color::kMagenta);
+}
+
+TEST(LEDPatternTest, NegativeBrightness) {
+  std::array<AddressableLED::LEDData, 1> buffer;
+
+  auto base = LEDPattern::Solid(Color::kWhite);
+  auto pattern = base.AtBrightness(-1.0);
+  pattern.ApplyTo(buffer);
+  AssertIndexColor(buffer, 0, Color::kBlack);
+}
+
+TEST(LEDPatternTest, ClippingBrightness) {
+  std::array<AddressableLED::LEDData, 1> buffer;
+  auto base = LEDPattern::Solid(Color::kMidnightBlue);
+  auto pattern = base.AtBrightness(100);
+  pattern.ApplyTo(buffer);
+  AssertIndexColor(buffer, 0, Color::kWhite);
+}
 
 void AssertIndexColor(std::span<AddressableLED::LEDData> data, int index,
                       Color color) {
