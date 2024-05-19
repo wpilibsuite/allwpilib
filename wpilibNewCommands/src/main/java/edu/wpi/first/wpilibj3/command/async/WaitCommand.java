@@ -18,11 +18,11 @@ public class WaitCommand implements AsyncCommand {
   }
 
   @Override
-  public void run() {
+  public void run(Coroutine coroutine) {
     var timer = new Timer();
     timer.start();
     while (!timer.hasElapsed(duration.in(Seconds))) {
-      AsyncScheduler.getInstance().yield();
+      coroutine.yield();
     }
   }
 

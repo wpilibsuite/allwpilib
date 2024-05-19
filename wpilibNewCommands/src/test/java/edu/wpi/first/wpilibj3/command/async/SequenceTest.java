@@ -12,16 +12,12 @@ class SequenceTest {
 
   @BeforeEach
   void setup() {
-    // Any command that calls AsyncCommand.park() or AsyncCommand.yield() uses the default
-    // scheduler instance. Notably, this includes commands with timeouts, wait commands, and
-    // the default idle commands
     scheduler = new AsyncScheduler();
-    AsyncScheduler.setDefaultScheduler(scheduler);
   }
 
   @Test
   void single() {
-    var command = AsyncCommand.noHardware(scheduler::yield).named("The Command");
+    var command = AsyncCommand.noHardware(Coroutine::yield).named("The Command");
 
     var sequence = new Sequence("The Sequence", List.of(command));
     scheduler.schedule(sequence);
@@ -49,8 +45,8 @@ class SequenceTest {
 
   @Test
   void twoCommands() {
-    var c1 = AsyncCommand.noHardware(scheduler::yield).named("C1");
-    var c2 = AsyncCommand.noHardware(scheduler::yield).named("C2");
+    var c1 = AsyncCommand.noHardware(Coroutine::yield).named("C1");
+    var c2 = AsyncCommand.noHardware(Coroutine::yield).named("C2");
 
     var sequence = new Sequence("C1 > C2", List.of(c1, c2));
     scheduler.schedule(sequence);

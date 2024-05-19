@@ -28,9 +28,9 @@ public class Storage extends HardwareResource {
     super("Storage");
 
     // Set default command to turn off the storage motor and then idle
-    setDefaultCommand(run(() -> {
+    setDefaultCommand(run((coroutine) -> {
       m_motor.disable();
-      AsyncCommand.park();
+      coroutine.park();
     }).named("Idle"));
   }
 
@@ -40,9 +40,8 @@ public class Storage extends HardwareResource {
 
   /** Returns a command that runs the storage motor indefinitely. */
   public AsyncCommand runCommand() {
-    return run(() -> {
-      while (true) {
-        AsyncCommand.yield();
+    return run((coroutine) -> {
+      while (coroutine.yield()) {
         run();
       }
     }).named("Run");

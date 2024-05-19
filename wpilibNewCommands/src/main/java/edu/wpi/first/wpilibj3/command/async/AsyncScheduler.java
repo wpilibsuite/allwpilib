@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class AsyncScheduler {
   private final Set<HardwareResource> registeredResources = new HashSet<>();
@@ -43,12 +44,9 @@ public class AsyncScheduler {
   private final ContinuationScope scope = new ContinuationScope("async command");
 
   /** The default scheduler instance. */
-  private static AsyncScheduler defaultScheduler = new AsyncScheduler();
+  private static final AsyncScheduler defaultScheduler = new AsyncScheduler();
 
-  // package-private for tests
-  static void setDefaultScheduler(AsyncScheduler defaultScheduler) {
-    AsyncScheduler.defaultScheduler = defaultScheduler;
-  }
+  private final Coroutine coroutine = () -> AsyncScheduler.this;
 
   /**
    * Gets the default scheduler instance for use in a robot program. Some built in command types
@@ -115,13 +113,15 @@ public class AsyncScheduler {
    * entire lifespan of the scheduler, use {@link #addPeriodic(Runnable)}.
    *
    * <p><strong>Note:</strong> Like commands, any loops in the callback must appropriately yield
-   * control back to the scheduler with {@link #yield()} or {@link AsyncCommand#yield()} or risk
-   * stalling your program in an unrecoverable infinite loop!
+   * control back to the scheduler with {@link Coroutine#yield} or risk stalling your program in an
+   * unrecoverable infinite loop!
    *
    * @param callback the callback to sideload
    */
-  public void sideload(Runnable callback) {
-    periodicCallbacks.add(new Continuation(scope, callback));
+  public void sideload(Consumer<Coroutine> callback) {
+    periodicCallbacks.add(new Continuation(scope, () -> {
+      callback.accept(coroutine);
+    }));
   }
 
   /**
@@ -141,9 +141,8 @@ public class AsyncScheduler {
    * @param callback the periodic function to run
    */
   public void addPeriodic(Runnable callback) {
-    sideload(() -> {
-      while (true) {
-        AsyncScheduler.this.yield();
+    sideload((coroutine) -> {
+      while (coroutine.yield()) {
         callback.run();
       }
     });
@@ -279,7 +278,7 @@ public class AsyncScheduler {
    */
   public void scheduleAndWait(AsyncCommand command) {
     schedule(command);
-    waitFor(command);
+    await(command);
   }
 
   /**
@@ -329,7 +328,7 @@ public class AsyncScheduler {
    * Updates the command scheduler. This will process trigger bindings on anything attached to the
    * {@link #getDefaultButtonLoop() default event loop}, begin running any commands scheduled since
    * the previous call to {@code run()}, process periodic callbacks added with
-   * {@link #addPeriodic(Runnable)} and {@link #sideload(Runnable)}, update running commands, and
+   * {@link #addPeriodic(Runnable)} and {@link #sideload(Consumer)}, update running commands, and
    * schedule default commands for any resources that are not owned by a running command.
    *
    * <p>This method is intended to be called in a periodic loop like
@@ -450,7 +449,7 @@ public class AsyncScheduler {
   private Continuation buildContinuation(AsyncCommand command) {
     return new Continuation(scope, () -> {
       try {
-        command.run();
+        command.run(coroutine);
       } catch (Exception e) {
         throw new CommandExecutionException(command, e);
       }
@@ -493,7 +492,7 @@ public class AsyncScheduler {
    *
    * @param command the command to wait for
    */
-  public void waitFor(AsyncCommand command) {
+  public void await(AsyncCommand command) {
     checkWaitable(command);
 
     while (isScheduledOrRunning(command)) {
@@ -507,7 +506,7 @@ public class AsyncScheduler {
    *
    * @param commands the commands to wait for
    */
-  public void waitForAll(Collection<AsyncCommand> commands) {
+  public void awaitAll(Collection<AsyncCommand> commands) {
     for (var command : commands) {
       checkWaitable(command);
     }
@@ -524,7 +523,7 @@ public class AsyncScheduler {
    *
    * @param commands the commands to wait for
    */
-  public void waitForAny(Collection<AsyncCommand> commands) {
+  public void awaitAny(Collection<AsyncCommand> commands) {
     for (var command : commands) {
       checkWaitable(command);
     }
@@ -590,14 +589,15 @@ public class AsyncScheduler {
   }
 
   /**
-   * Called by {@link AsyncCommand#run()}, this will cause the command's execution to pause and
-   * cede control back to the scheduler.
+   * Called by {@link AsyncCommand#run(Coroutine)}, this will cause the command's execution to pause
+   * and cede control back to the scheduler.
    *
+   * @return true
    * @throws IllegalStateException if called outside a command that is currently being executed by
    * the scheduler
    */
-  public void yield() {
-    Continuation.yield(scope);
+  public boolean yield() {
+    return Continuation.yield(scope);
   }
 
   public EventLoop getDefaultButtonLoop() {

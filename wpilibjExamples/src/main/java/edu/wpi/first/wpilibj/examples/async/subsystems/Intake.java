@@ -28,10 +28,9 @@ public class Intake extends HardwareResource {
 
   /** Returns a command that deploys the intake, and then runs the intake motor indefinitely. */
   public AsyncCommand intakeCommand() {
-    return run(() -> {
+    return run((coroutine) -> {
       m_pistons.set(DoubleSolenoid.Value.kForward);
-      while (true) {
-        AsyncCommand.yield();
+      while (coroutine.yield()) {
         m_motor.set(1);
       }
     }).named("Intake");
@@ -39,7 +38,7 @@ public class Intake extends HardwareResource {
 
   /** Returns a command that turns off and retracts the intake. */
   public AsyncCommand retractCommand() {
-    return run(() -> {
+    return run((coroutine) -> {
       m_motor.disable();
       m_pistons.set(DoubleSolenoid.Value.kReverse);
     }).named("Retract");

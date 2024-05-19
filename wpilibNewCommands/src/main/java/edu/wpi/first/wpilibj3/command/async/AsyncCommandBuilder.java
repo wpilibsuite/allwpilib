@@ -5,10 +5,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class AsyncCommandBuilder {
   private final Set<HardwareResource> requirements = new HashSet<>();
-  private Runnable impl;
+  private Consumer<Coroutine> impl;
   private String name;
   private int priority = AsyncCommand.DEFAULT_PRIORITY;
   private AsyncCommand.RobotDisabledBehavior disabledBehavior = AsyncCommand.RobotDisabledBehavior.CancelWhileDisabled;
@@ -61,7 +62,7 @@ public class AsyncCommandBuilder {
     return this;
   }
 
-  public AsyncCommandBuilder executing(Runnable impl) {
+  public AsyncCommandBuilder executing(Consumer<Coroutine> impl) {
     this.impl = impl;
     return this;
   }
@@ -72,8 +73,8 @@ public class AsyncCommandBuilder {
 
     return new AsyncCommand() {
       @Override
-      public void run() {
-        impl.run();
+      public void run(Coroutine coroutine) {
+        impl.accept(coroutine);
       }
 
       @Override

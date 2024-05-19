@@ -17,7 +17,6 @@ public class Sequence implements AsyncCommand {
   private final Set<HardwareResource> requirements = new HashSet<>();
   private final int priority;
   private RobotDisabledBehavior robotDisabledBehavior;
-  private final AsyncScheduler scheduler = AsyncScheduler.getInstance();
 
   /**
    * Creates a new command sequence.
@@ -50,9 +49,9 @@ public class Sequence implements AsyncCommand {
   }
 
   @Override
-  public void run() {
+  public void run(Coroutine coroutine) {
     for (var command : commands) {
-      scheduler.scheduleAndWait(command);
+      coroutine.await(command);
     }
   }
 

@@ -73,8 +73,11 @@ public class Drive extends HardwareResource {
   public AsyncCommand arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
     // A split-stick arcade command, with forward/backward controlled by the left
     // hand, and turning controlled by the right.
-    return run(() -> m_drive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()))
-        .named("arcadeDrive");
+    return run((coroutine) -> {
+      while (coroutine.yield()) {
+        m_drive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble());
+      }
+    }).named("arcadeDrive");
   }
 
   /**
@@ -86,12 +89,12 @@ public class Drive extends HardwareResource {
   public AsyncCommand driveDistanceCommand(Measure<Distance> distance, double speed) {
     double distanceMeters = distance.in(Meters);
 
-    return run(() -> {
+    return run((coroutine) -> {
       m_leftEncoder.reset();
       m_rightEncoder.reset();
 
       while (Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance()) < distanceMeters) {
-        AsyncCommand.yield();
+        coroutine.yield();
         m_drive.arcadeDrive(speed, 0);
       }
 

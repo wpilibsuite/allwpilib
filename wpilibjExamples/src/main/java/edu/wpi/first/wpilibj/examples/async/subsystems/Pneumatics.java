@@ -50,7 +50,10 @@ public class Pneumatics extends HardwareResource {
    * @return command
    */
   public AsyncCommand disableCompressor() {
-    return run(m_compressor::disable).named("Disable Compressor");
+    return run((coroutine) -> {
+      m_compressor.disable();
+      coroutine.park();
+    }).named("Disable Compressor");
   }
 
   /**
@@ -60,6 +63,9 @@ public class Pneumatics extends HardwareResource {
    * @return command
    */
   public AsyncCommand enableCompressor() {
-    return run(m_compressor::enableDigital).named("Enable Compressor");
+    return run((coroutine) -> {
+      m_compressor.enableDigital();
+      coroutine.park();
+    }).named("Enable Compressor");
   }
 }

@@ -2,11 +2,9 @@ package edu.wpi.first.wpilibj3.command.async;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
 /**
  * An asynchronous command allows command logic to be written in a traditional imperative style
@@ -16,7 +14,7 @@ import java.util.stream.Collectors;
  * and isFinished()), async commands can be implemented with a single, imperative loop.
  *
  * <p><strong>Note:</strong> Because coroutines are <i>opt-in</i> collaborate constructs, every
- * async command implementation <strong>must</strong> call {@link AsyncCommand#yield()} within
+ * async command implementation <strong>must</strong> call {@link Coroutine#yield()} within
  * any periodic loop. Failure to do so may result in an unrecoverable infinite loop.</p>
  *
  * {@snippet lang = java:
@@ -55,10 +53,10 @@ import java.util.stream.Collectors;
  *   ).withName("The Command");
  *
  * // Can be represented with a 2025-style async-based definition
- * AsyncCommand command = requiredSubsystem.run(() -> {
+ * AsyncCommand command = requiredSubsystem.run((coroutine) -> {
  *   initialize();
  *   while (!isFinished()) {
- *     AsyncCommand.yield();
+ *     coroutine.yield();
  *     execute();
  *   }
  *   end();
@@ -80,7 +78,17 @@ public interface AsyncCommand {
    */
   int HIGHEST_PRIORITY = Integer.MAX_VALUE;
 
-  void run();
+  /**
+   * Runs the command. Commands that need to periodically run until a goal state is reached should
+   * simply run a while loop like {@code while (!atGoal() && coroutine.yield()) { ... } }.
+   *
+   * <p><strong>Warning:</strong> any loops in a command must call {@code coroutine.yield()}.
+   * Failure to do so will prevent anything else in your robot code from running. Async commands
+   * are <i>opt-in</i> collaborative constructs; don't be greedy!</p>
+   *
+   * @param coroutine the coroutine backing the command's execution
+   */
+  void run(Coroutine coroutine);
 
   /**
    * The name of the command.
@@ -204,7 +212,7 @@ public interface AsyncCommand {
    * @param impl the implementation of the command logic
    * @return a builder that can be used to configure the resulting command
    */
-  static AsyncCommandBuilder noHardware(Runnable impl) {
+  static AsyncCommandBuilder noHardware(Consumer<Coroutine> impl) {
     return new AsyncCommandBuilder().executing(impl);
   }
 
@@ -240,29 +248,5 @@ public interface AsyncCommand {
 
   static AsyncCommandBuilder requiring(HardwareResource requirement, HardwareResource... rest) {
     return new AsyncCommandBuilder().requiring(requirement).requiring(rest);
-  }
-
-  /**
-   * Called by {@link AsyncCommand#run()}, this will cause the command's execution to pause and
-   * cede control back to the scheduler to allow other commands to run.
-   *
-   * @throws IllegalStateException if called outside a command that is currently being executed by
-   * the scheduler
-   */
-  static void yield() {
-    AsyncScheduler.getInstance().yield();
-  }
-
-  /**
-   * Parks the current async command in an infinite loop until it is cancelled or interrupted by
-   * a higher priority command.
-   *
-   * @throws IllegalStateException if called outside a command that is currently being executed by
-   * the scheduler
-   */
-  static void park() {
-    while (true) {
-      AsyncCommand.yield();
-    }
   }
 }

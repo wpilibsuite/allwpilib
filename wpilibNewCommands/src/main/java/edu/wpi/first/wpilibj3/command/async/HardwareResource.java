@@ -3,13 +3,15 @@ package edu.wpi.first.wpilibj3.command.async;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import java.util.Set;
+import java.util.function.Consumer;
 
+@SuppressWarnings("this-escape")
 public class HardwareResource {
   private final String name;
 
   private final AsyncScheduler registeredScheduler;
 
-  private AsyncCommand defaultCommand = new IdleCommand(this);
+  private AsyncCommand defaultCommand;
 
   public HardwareResource(String name) {
     this(name, AsyncScheduler.getInstance());
@@ -18,6 +20,7 @@ public class HardwareResource {
   public HardwareResource(String name, AsyncScheduler scheduler) {
     this.name = name;
     this.registeredScheduler = scheduler;
+    this.defaultCommand = idle();
     scheduler.registerResource(this);
   }
 
@@ -46,7 +49,7 @@ public class HardwareResource {
     return defaultCommand;
   }
 
-  public AsyncCommandBuilder run(Runnable command) {
+  public AsyncCommandBuilder run(Consumer<Coroutine> command) {
     return new AsyncCommandBuilder().requiring(this).executing(command);
   }
 

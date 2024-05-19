@@ -11,7 +11,6 @@ public class ParallelGroup implements AsyncCommand {
   private final Collection<AsyncCommand> commands = new LinkedHashSet<>();
   private final Collection<AsyncCommand> requiredCommands = new HashSet<>();
   private final Set<HardwareResource> requirements = new HashSet<>();
-  private final AsyncScheduler scheduler;
   private final String name;
   private final int priority;
   private RobotDisabledBehavior disabledBehavior;
@@ -43,7 +42,6 @@ public class ParallelGroup implements AsyncCommand {
     }
 
     this.name = name;
-    this.scheduler = AsyncScheduler.getInstance();
     this.commands.addAll(allCommands);
     this.requiredCommands.addAll(requiredCommands);
 
@@ -98,13 +96,13 @@ public class ParallelGroup implements AsyncCommand {
   }
 
   @Override
-  public void run() {
-    commands.forEach(scheduler::schedule);
+  public void run(Coroutine coroutine) {
+    commands.forEach(coroutine.scheduler()::schedule);
 
     if (requiredCommands.isEmpty()) {
-      scheduler.waitForAny(commands);
+      coroutine.awaitAny(commands);
     } else {
-      scheduler.waitForAll(requiredCommands);
+      coroutine.awaitAll(requiredCommands);
     }
   }
 

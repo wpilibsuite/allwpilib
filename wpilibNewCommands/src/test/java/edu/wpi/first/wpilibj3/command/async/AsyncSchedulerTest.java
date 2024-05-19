@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -21,20 +20,16 @@ class AsyncSchedulerTest {
 
   @BeforeEach
   void setup() {
-    // Any command that calls AsyncCommand.park() or AsyncCommand.yield() uses the default
-    // scheduler instance. Notably, this includes commands with timeouts, wait commands, and
-    // the default idle commands
     scheduler = new AsyncScheduler();
-    AsyncScheduler.setDefaultScheduler(scheduler);
   }
 
   @Test
   void basic() throws Exception {
     var enabled = new AtomicBoolean(false);
     var ran = new AtomicBoolean(false);
-    var command = AsyncCommand.noHardware(() -> {
+    var command = AsyncCommand.noHardware((coroutine) -> {
       do {
-        scheduler.yield();
+        coroutine.yield();
       } while (!enabled.get());
       ran.set(true);
     }).named("Basic Command");
@@ -124,9 +119,9 @@ class AsyncSchedulerTest {
     for (int cmdCount = 0; cmdCount < numCommands; cmdCount++) {
       var command =
           AsyncCommand.noHardware(
-                  () -> {
+                  (coroutine) -> {
                     for (int i = 0; i < iterations; i++) {
-                      scheduler.yield();
+                      coroutine.yield();
                       resource.x++;
                     }
                   })
@@ -150,7 +145,7 @@ class AsyncSchedulerTest {
     var command =
         resource
             .run(
-                () -> {
+                (coroutine) -> {
                   throw new RuntimeException("The exception");
                 })
             .named("Bad Behavior");
@@ -188,10 +183,10 @@ class AsyncSchedulerTest {
     AsyncCommand countToTen =
         example
             .run(
-                () -> {
+                (coroutine) -> {
                   example.x = 0;
                   for (int i = 0; i < 10; i++) {
-                    scheduler.yield();
+                    coroutine.yield();
                     example.x++;
                   }
                 })
@@ -212,12 +207,12 @@ class AsyncSchedulerTest {
 
     var resource = new HardwareResource("Resource", scheduler);
 
-    var interrupter = AsyncCommand.requiring(resource).executing(() -> {
+    var interrupter = AsyncCommand.requiring(resource).executing((coroutine) -> {
     }).withPriority(2).named("Interrupter");
 
-    var canceledCommand = AsyncCommand.requiring(resource).executing(() -> {
+    var canceledCommand = AsyncCommand.requiring(resource).executing((coroutine) -> {
       count.set(1);
-      scheduler.yield();
+      coroutine.yield();
       count.set(2);
     }).withPriority(1).named("Cancel By Default");
 
@@ -234,14 +229,14 @@ class AsyncSchedulerTest {
     var count = new AtomicInteger(0);
 
     var resource = new HardwareResource("Resource", scheduler);
-    var defaultCmd = resource.run(() -> {
+    var defaultCmd = resource.run((coroutine) -> {
       while (true) {
         count.incrementAndGet();
-        scheduler.yield();
+        coroutine.yield();
       }
     }).suspendingOnInterrupt().withPriority(-1).named("Default Command");
 
-    var newerCmd = resource.run(() -> {
+    var newerCmd = resource.run((coroutine) -> {
     }).named("Newer Command");
     resource.setDefaultCommand(defaultCmd);
     scheduler.run();
@@ -260,7 +255,7 @@ class AsyncSchedulerTest {
   void cancelAllCancelsAll() {
     var commands = new ArrayList<AsyncCommand>(10);
     for (int i = 1; i <= 10; i++) {
-      commands.add(AsyncCommand.noHardware(scheduler::yield).named("Command " + i));
+      commands.add(AsyncCommand.noHardware(Coroutine::yield).named("Command " + i));
     }
     commands.forEach(scheduler::schedule);
     scheduler.run();
@@ -282,7 +277,7 @@ class AsyncSchedulerTest {
     var command =
         new AsyncCommandBuilder()
             .requiring(resources)
-            .executing(scheduler::yield)
+            .executing(Coroutine::yield)
             .named("Big Command");
 
     // Scheduling the command should evict the on-deck default commands
@@ -327,11 +322,11 @@ class AsyncSchedulerTest {
     var innerRan = new AtomicBoolean(false);
     var outerRan = new AtomicBoolean(false);
 
-    var innerCommand = inner.run(() -> {
+    var innerCommand = inner.run((coroutine) -> {
       innerRan.set(true);
     }).named("Inner Command");
 
-    var outerCommand = outer.run(() -> {
+    var outerCommand = outer.run((coroutine) -> {
       scheduler.scheduleAndWait(innerCommand);
       outerRan.set(true);
     }).named("Outer Command");
@@ -353,10 +348,8 @@ class AsyncSchedulerTest {
 
   record PriorityCommand(int priority, HardwareResource... subsystems) implements AsyncCommand {
     @Override
-    public void run() {
-      while (true) {
-        AsyncScheduler.getInstance().yield();
-      }
+    public void run(Coroutine coroutine) {
+      coroutine.park();
     }
 
     @Override

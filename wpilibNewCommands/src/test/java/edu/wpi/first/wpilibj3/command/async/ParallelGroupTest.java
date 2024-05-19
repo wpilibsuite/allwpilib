@@ -13,11 +13,7 @@ class ParallelGroupTest {
 
   @BeforeEach
   void setup() {
-    // Any command that calls AsyncCommand.park() or AsyncCommand.yield() uses the default
-    // scheduler instance. Notably, this includes commands with timeouts, wait commands, and
-    // the default idle commands
     scheduler = new AsyncScheduler();
-    AsyncScheduler.setDefaultScheduler(scheduler);
   }
 
   @Test
@@ -28,15 +24,15 @@ class ParallelGroupTest {
     var c1Count = new AtomicInteger(0);
     var c2Count = new AtomicInteger(0);
 
-    var c1 = r1.run(() -> {
+    var c1 = r1.run((coroutine) -> {
       for (int i = 0; i < 5; i++) {
-        scheduler.yield();
+        coroutine.yield();
         c1Count.incrementAndGet();
       }
     }).named("C1");
-    var c2 = r2.run(() -> {
+    var c2 = r2.run((coroutine) -> {
       for (int i = 0; i < 10; i++) {
-        scheduler.yield();
+        coroutine.yield();
         c2Count.incrementAndGet();
       }
     }).named("C2");
@@ -86,15 +82,15 @@ class ParallelGroupTest {
     var c1Count = new AtomicInteger(0);
     var c2Count = new AtomicInteger(0);
 
-    var c1 = r1.run(() -> {
+    var c1 = r1.run((coroutine) -> {
       for (int i = 0; i < 5; i++) {
-        scheduler.yield();
+        coroutine.yield();
         c1Count.incrementAndGet();
       }
     }).named("C1");
-    var c2 = r2.run(() -> {
+    var c2 = r2.run((coroutine) -> {
       for (int i = 0; i < 10; i++) {
-        scheduler.yield();
+        coroutine.yield();
         c2Count.incrementAndGet();
       }
     }).named("C2");
@@ -132,9 +128,9 @@ class ParallelGroupTest {
 
     var count = new AtomicInteger(0);
 
-    var command = resource.run(() -> {
+    var command = resource.run((coroutine) -> {
       for (int i = 0; i < 5; i++) {
-        scheduler.yield();
+        coroutine.yield();
         count.incrementAndGet();
       }
     }).named("Command");

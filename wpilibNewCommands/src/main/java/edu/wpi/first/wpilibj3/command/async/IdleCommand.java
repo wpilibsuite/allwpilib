@@ -9,10 +9,8 @@ import java.util.Set;
  */
 public record IdleCommand(HardwareResource resource) implements AsyncCommand {
   @Override
-  public void run() {
-    while (true) {
-      AsyncScheduler.getInstance().yield();
-    }
+  public void run(Coroutine coroutine) {
+    coroutine.park();
   }
 
   @Override

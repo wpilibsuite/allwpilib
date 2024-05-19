@@ -39,10 +39,10 @@ public class Shooter extends HardwareResource {
     // Set default command to turn off both the shooter and feeder motors, and then idle
     setDefaultCommand(
       run(
-        () -> {
+        (coroutine) -> {
           m_shooterMotor.disable();
           m_feederMotor.disable();
-          AsyncCommand.park();
+          coroutine.park();
         })
         .named("Idle"));
   }

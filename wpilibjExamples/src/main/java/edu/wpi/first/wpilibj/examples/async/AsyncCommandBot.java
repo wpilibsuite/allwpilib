@@ -73,9 +73,8 @@ public class AsyncCommandBot {
   private AsyncCommand loadAndShoot() {
     return AsyncCommand
                .requiring(m_shooter, m_storage)
-               .executing(() -> {
-                 while (true) {
-                   AsyncCommand.yield();
+               .executing((coroutine) -> {
+                 while (coroutine.yield()) {
                    m_storage.run();
                    m_shooter.ramp(ShooterConstants.kShooterTarget);
 
