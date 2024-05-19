@@ -7,9 +7,9 @@ package edu.wpi.first.wpilibj.examples.async.subsystems;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.commandsv3.AsyncCommand;
+import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.RequireableResource;
 
 /** Subsystem for managing the compressor, pressure sensor, etc. */
 public class Pneumatics extends RequireableResource {

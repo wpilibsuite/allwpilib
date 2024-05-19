@@ -12,9 +12,9 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
 import edu.wpi.first.wpilibj.examples.async.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj3.command.async.RequireableResource;
 
 public class Shooter extends RequireableResource {
   private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);

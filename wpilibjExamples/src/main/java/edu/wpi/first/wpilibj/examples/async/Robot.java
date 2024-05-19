@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj.examples.async;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.AsyncScheduler;
+import edu.wpi.first.wpilibj.commandsv3.AsyncCommand;
+import edu.wpi.first.wpilibj.commandsv3.AsyncScheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to

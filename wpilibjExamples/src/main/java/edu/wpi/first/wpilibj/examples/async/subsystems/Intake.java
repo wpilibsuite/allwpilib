@@ -8,9 +8,9 @@ import static edu.wpi.first.wpilibj.examples.async.Constants.IntakeConstants;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.commandsv3.AsyncCommand;
+import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.RequireableResource;
 
 public class Intake extends RequireableResource {
   private final PWMSparkMax m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);

@@ -23,12 +23,6 @@ dependencies {
     implementation project(':wpilibj')
     testImplementation 'org.mockito:mockito-core:4.1.0'
 }
-
-tasks.withType(Javadoc) {
-    options.addBooleanOption("-enable-preview", true)
-    options.addStringOption("-release", "21")
-}
-
 nativeUtils.exportsConfigs {
     wpilibNewCommands {
         x64ExcludeSymbols = [
@@ -103,13 +97,5 @@ test {
     testLogging {
         outputs.upToDateWhen {false}
         showStandardStreams = true
-    }
-    doFirst {
-        jvmArgs = [
-            '--add-opens',
-            'java.base/jdk.internal.vm=ALL-UNNAMED',
-            '--add-opens',
-            'java.base/java.lang=ALL-UNNAMED',
-        ]
     }
 }

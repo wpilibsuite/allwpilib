@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.async;
 
+import edu.wpi.first.wpilibj.commandsv3.AsyncCommand;
+import edu.wpi.first.wpilibj.commandsv3.button.AsyncCommandXboxController;
+import edu.wpi.first.wpilibj.commandsv3.button.AsyncTrigger;
 import edu.wpi.first.wpilibj.examples.async.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.async.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.async.Constants.ShooterConstants;
@@ -12,9 +15,6 @@ import edu.wpi.first.wpilibj.examples.async.subsystems.Intake;
 import edu.wpi.first.wpilibj.examples.async.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.async.subsystems.Shooter;
 import edu.wpi.first.wpilibj.examples.async.subsystems.Storage;
-import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.button.AsyncCommandXboxController;
-import edu.wpi.first.wpilibj3.command.async.button.AsyncTrigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

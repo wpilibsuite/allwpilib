@@ -10,11 +10,11 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.commandsv3.AsyncCommand;
+import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.async.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj3.command.async.AsyncCommand;
-import edu.wpi.first.wpilibj3.command.async.RequireableResource;
 import java.util.function.DoubleSupplier;
 
 public class Drive extends RequireableResource {
