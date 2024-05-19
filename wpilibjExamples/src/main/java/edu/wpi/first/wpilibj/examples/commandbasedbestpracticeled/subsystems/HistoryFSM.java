@@ -15,6 +15,7 @@ package frc.robot.subsystems;
 import java.util.Arrays;
 import java.util.Random;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -89,6 +90,16 @@ public class HistoryFSM extends SubsystemBase {
 
         persistentPatternDemo = LEDPattern.solid(Color.fromHSV(randomHue, 200, 200));
     }
+
+    /**
+     * Disallow default command
+     * This prevents accidentally assuming the default command will run in composite commands which it wont.
+     */
+    @Override
+    public void setDefaultCommand(Command def) {
+
+        throw new IllegalArgumentException("Default Command not allowed");
+      }
 
     /**
      * beforeCommands() and afterCommands() run from the Robot.periodic()

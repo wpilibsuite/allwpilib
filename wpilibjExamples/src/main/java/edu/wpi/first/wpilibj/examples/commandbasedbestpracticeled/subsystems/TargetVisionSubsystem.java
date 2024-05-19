@@ -44,6 +44,16 @@ public class TargetVisionSubsystem extends SubsystemBase {
     return operatorController.getHID().getAButton(); // fake event source for can see target
   }
 
+  /**
+   * Disallow default command
+   * This prevents accidentally assuming the default command will run in composite commands which it wont.
+   */
+  @Override
+  public void setDefaultCommand(Command def) {
+
+      throw new IllegalArgumentException("Default Command not allowed");
+  }
+
   public void beforeCommands() {}
 
   public void afterCommands() {}

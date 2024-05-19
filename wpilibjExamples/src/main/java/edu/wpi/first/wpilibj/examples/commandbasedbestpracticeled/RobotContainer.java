@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.AchieveHueGoal;
 import frc.robot.subsystems.HistoryFSM;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -41,7 +42,7 @@ public class RobotContainer {
     intake = new IntakeSubsystem(robotSignals.Main, operatorController);
     vision = new TargetVisionSubsystem(robotSignals.Top, operatorController);
     historyFSM = new HistoryFSM(robotSignals.HistoryDemo, operatorController);
-    achieveHueGoal = new AchieveHueGoal(robotSignals.AchieveHueGoal, hueGoal);
+    achieveHueGoal = new AchieveHueGoal(robotSignals.AchieveHueGoal/*, hueGoal*/);
 
     configureBindings();
 
@@ -57,6 +58,10 @@ public class RobotContainer {
 
     operatorController.x().debounce(0.03, DebounceType.kBoth)
       .onTrue(robotSignals.Top.setSignal(colorWheel()));
+
+    
+    final Trigger startAcceptingSetpoints = new Trigger(operatorController.rightTrigger(0.05))
+      .onTrue(achieveHueGoal.hueGoal.setHueGoal(hueGoal));
   }
 
   /**
@@ -72,7 +77,15 @@ public class RobotContainer {
   }
 
   /**
-   * Configure the LED Signal Views Default Commands 
+   * Configure the LED Signal Views Default Commands
+   * 
+   * DANGER DANGER DANGER
+   * Default commands are not run in composed commands.
+   * Suggest not using default commands to prevent assuming they run
+   * (Example included on how to disable the setDefaultCommand)
+   * If using the default command sugegst not setting it more than once
+   * to prevent confusion on which one is set.
+   * (Example included on how to prevent more than one setting of the default command)
    */
   private void configureDefaultCommands() {
 

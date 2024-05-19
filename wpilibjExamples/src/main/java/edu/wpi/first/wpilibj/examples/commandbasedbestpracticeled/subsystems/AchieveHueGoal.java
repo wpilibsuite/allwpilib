@@ -3,9 +3,7 @@
  * implementer class to achieve that goal.
  * 
  * Note that this is a simple contrived example based on a PID controller.
- * There are better ways to do PID controller entirely within a subsystem.
- * Rarely would a resource need to escape any perceived limitations of the
- * command based subsystem architecture and this is no exception.
+ * There may be better ways to do PID controller entirely within a subsystem.
  * 
  * This example uses the Xbox right trigger (injected from RobotContainer)
  * to set a goal of a position on the color wheel displayed on the LEDs.
@@ -18,7 +16,6 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Color;
@@ -28,7 +25,11 @@ import frc.robot.subsystems.RobotSignals.LEDView;
 public class AchieveHueGoal {
     
     // PID intialization
-    private final double kP = 0.05;
+    // It starts running immediately controlling with the initial
+    // "currentStateHue" and "hueSetpoint".
+    // There is no running command to accept new setpoints until
+    // the Xbox right trigger axis is pressed.
+    private final double kP = 0.03;
     private final double kI = 0.0;
     private final double kD = 0.0;
     private PIDController HueController = new PIDController(kP, kI, kD);
@@ -36,14 +37,14 @@ public class AchieveHueGoal {
     private double maximumHue = 180.;
     private double hueSetpoint = 0.;
     private double currentStateHue = 0.;
-    private DoubleSupplier defaultHueGoal;
+    // private DoubleSupplier defaultHueGoal;
     
     private LEDView robotSignals; // where the output is displayed
 
-    private HueGoal hueGoal = new HueGoal(); // subsystem protected goal
+    public HueGoal hueGoal = new HueGoal(); // subsystem protected goal
 
-    public AchieveHueGoal(LEDView robotSignals, DoubleSupplier defaultHueGoal) {
-        this.defaultHueGoal = defaultHueGoal;
+    public AchieveHueGoal(LEDView robotSignals/*, DoubleSupplier defaultHueGoal*/) {
+        // this.defaultHueGoal = defaultHueGoal;
         this.robotSignals = robotSignals;
     }
 
@@ -53,7 +54,7 @@ public class AchieveHueGoal {
     // Methods and triggers that inquire about the system should be "publc".
 
     // this particular state inquiry is an example only and isn't used for the demonstration
-    public final Trigger atHueGoal= new Trigger(this::isAtHueGoal);
+    public final Trigger atHueGoal = new Trigger(this::isAtHueGoal);
     private boolean isAtHueGoal() {
 
         return HueController.atSetpoint();
@@ -76,17 +77,27 @@ public class AchieveHueGoal {
     public class HueGoal extends SubsystemBase {
 
         private HueGoal() {
-        
-            Command defaultCommand = 
-                    Commands.run( ()-> hueSetpoint = defaultHueGoal.getAsDouble() , this);
-            setDefaultCommand(defaultCommand);
+
+            // This command could run "perpetually" with its pre-determined supplier of the hue goal but
+            // it's disabled in favor of no default command to prevent assuming there is one always running.
+            // Command defaultCommand = 
+            //         Commands.run( ()-> hueSetpoint = defaultHueGoal.getAsDouble() , this);
+            // setDefaultCommand(defaultCommand);
+        }
+
+        /**
+         * Disallow default command
+         * This prevents accidentally assuming the default command will run in composite commands which it wont.
+         */
+        @Override
+        public void setDefaultCommand(Command def) {
+
+            throw new IllegalArgumentException("Default Command not allowed");
         }
 
         /**
          * Set the goal.
          * 
-         * These commands could be used situationally (one-shot) instead of a "perpetually"
-         * running default command with its pre-determined supplier of the hue goal.
          * @param goal hue 0 to 180
          * @return command that can be used to set the goal
          */

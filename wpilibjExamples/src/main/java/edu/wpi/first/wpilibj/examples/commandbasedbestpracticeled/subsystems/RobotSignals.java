@@ -103,7 +103,6 @@ public interface LEDPatternSupplier {
   public class LEDView extends SubsystemBase {
 
     private final AddressableLEDBufferView view;
-    private boolean isDefaultSet = false; // locks out multiple set default command
 
     private LEDView(AddressableLEDBufferView view) {
       this.view = view;
@@ -114,24 +113,34 @@ public interface LEDPatternSupplier {
      */
 
     /**
+     * Recommendation is don't use the setDefaultCommand because default commands are not
+     * run inside composed commands.
+     * If you insist then recommendation is don't use more than one default command
+     * because it may not be obvious which default command is active (last one set is active)
      * Allow no more than one call to this set of the view (resource, subsystem) default command
+     * You're on your own to remember if there is a default command set or not.
      */
     @Override
     public void setDefaultCommand(Command def) {
 
-      StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-      StackTraceElement element = stackTrace[2];
-      System.out.println("I was called by a method named: " + element.getMethodName());
-      System.out.println("That method is in class: " + element.getClassName());
-
-      if (isDefaultSet) {
+      if (getDefaultCommand() != null) {
         throw new IllegalArgumentException("Default Command already set");
       }
-      isDefaultSet = true;
+
       if(def != null) {
         super.setDefaultCommand(def);
       }
     }
+
+  // /**
+  //  * Disallow default command
+  //  * This prevents accidentally assuming the default command will run in composite commands which it wont.
+  //  */
+  // @Override
+  // public void setDefaultCommand(Command def) {
+
+  //     throw new IllegalArgumentException("Default Command not allowed");
+  // }
 
     /**
      * Put an LED Pattern into the view

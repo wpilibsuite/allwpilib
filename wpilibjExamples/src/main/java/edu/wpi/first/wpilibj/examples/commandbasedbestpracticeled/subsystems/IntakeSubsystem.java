@@ -39,6 +39,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
     return operatorController.getHID().getBButton(); // fake event source for game piece acquired
   }
+
+  /**
+   * Disallow default command
+   * This prevents accidentally assuming the default command will run in composite commands which it wont.
+   */
+  @Override
+  public void setDefaultCommand(Command def) {
+
+    throw new IllegalArgumentException("Default Command not allowed");
+  }
   
   public void beforeCommands() {}
 
