@@ -23,7 +23,7 @@ public class InterpolatingDoubleTreeMap extends InterpolatingTreeMap<Double, Dou
    * @return The map filled with the {@code entries}.
    */
   @SafeVarargs
-  public static InterpolatingDoubleTreeMap of(Map.Entry<Double, Double>... entries) {
+  public static InterpolatingDoubleTreeMap ofEntries(Map.Entry<Double, Double>... entries) {
     InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
     for (var entry : entries) {
       map.put(entry.getKey(), entry.getValue());
