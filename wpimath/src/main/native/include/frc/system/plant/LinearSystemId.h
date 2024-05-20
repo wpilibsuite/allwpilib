@@ -6,6 +6,7 @@
 
 #include <concepts>
 #include <stdexcept>
+#include <cmath>
 
 #include <wpi/SymbolExports.h>
 
@@ -55,12 +56,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * [angle].
    *
    * @param motor The motor (or gearbox) attached to the arm.
-   * @param J The moment of inertia J of the arm.
+   * @param armMass The mass of the arm.
+   * @param armLength The length of the arm.
+   * @param pivotPosition The pivot location of the arm.  A value of 0 or equal to armLength 
+   *    indicates that the arm is pivoted at one of the ends.
    * @param gearing Gear ratio from motor to arm.
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static LinearSystem<2, 1, 2> SingleJointedArmSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double gearing);
+      DCMotor motor, units::kilogram_t armMass, units::meter_t armLength,
+      units::meter_t pivotPosition, double gearing);
 
   /**
    * Create a state-space model for a 1 DOF velocity system from its kV

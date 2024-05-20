@@ -34,23 +34,33 @@ LinearSystem<2, 1, 2> LinearSystemId::ElevatorSystem(DCMotor motor,
 }
 
 LinearSystem<2, 1, 2> LinearSystemId::SingleJointedArmSystem(
-    DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
-  if (J <= 0_kg_sq_m) {
-    throw std::domain_error("J must be greater than zero.");
+    DCMotor motor, units::kilogram_t armMass, units::meter_t armLength,
+      units::meter_t pivotPosition, double gearing) {
+  if (armMass <= 0_kg) {
+    throw std::domain_error("armMass must be greater than zero.");
+  }
+  if (armLength <= 0_m) {
+    throw std::domain_error("armLength must be greater than zero.");
+  }
+  if (pivotPosition >= armLength) {
+    throw std::domain_error("pivotPosition must be less than the arm length.");
+  }
+  if (pivotPosition < 0_m) {
+    throw std::domain_error("pivotPosition must be greater than or equal to 0");
   }
   if (gearing <= 0.0) {
     throw std::domain_error("gearing must be greater than zero.");
   }
 
-  Matrixd<2, 2> A{
-      {0.0, 1.0},
-      {0.0,
-       (-std::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
-  Matrixd<2, 1> B{0.0, (gearing * motor.Kt / (motor.R * J)).value()};
-  Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
-  Matrixd<2, 1> D{{0.0}, {0.0}};
+  units::meter_t centerToPivotDistance = units::meter_t{
+    std::abs((armLength.value() / 2.0) - pivotPosition.value())};
+  units::kilogram_square_meter_t JCenter = units::kilogram_square_meter_t{
+    (1.0 / 12.0) * armMass.value() * pow(armLength.value(), 2)};
+  units::kilogram_square_meter_t JCentralAxisTheorem = units::kilogram_square_meter_t{
+    armMass.value() * pow(centerToPivotDistance.value(), 2)};
+  units::kilogram_square_meter_t J = JCenter + JCentralAxisTheorem;
 
-  return LinearSystem<2, 1, 2>(A, B, C, D);
+  return AngularSystem(motor, J, gearing);
 }
 
 LinearSystem<2, 2, 2> LinearSystemId::IdentifyDrivetrainSystem(

@@ -32,13 +32,13 @@ void Arm::SimulationPeriodic() {
 
   // Finally, we set our simulated encoder's readings and simulated battery
   // voltage
-  m_encoderSim.SetDistance(m_armSim.GetAngle().value());
+  m_encoderSim.SetDistance(m_armSim.GetAngularPosition().value());
   // SimBattery estimates loaded battery voltages
   frc::sim::RoboRioSim::SetVInVoltage(
       frc::sim::BatterySim::Calculate({m_armSim.GetCurrentDraw()}));
 
   // Update the Mechanism Arm angle based on the simulated arm angle
-  m_arm->SetAngle(m_armSim.GetAngle());
+  m_arm->SetAngle(m_armSim.GetAngularPosition());
 }
 
 void Arm::LoadPreferences() {

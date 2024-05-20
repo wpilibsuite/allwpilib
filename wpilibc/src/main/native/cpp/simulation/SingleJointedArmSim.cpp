@@ -16,35 +16,29 @@ using namespace frc;
 using namespace frc::sim;
 
 SingleJointedArmSim::SingleJointedArmSim(
-    const LinearSystem<2, 1, 2>& system, const DCMotor& gearbox, double gearing,
-    units::meter_t armLength, units::radian_t minAngle,
+    const LinearSystem<2, 1, 2>& system, const DCMotor& gearbox, units::meter_t armLength,
+    units::meter_t pivotPoint, units::radian_t minAngle,
     units::radian_t maxAngle, bool simulateGravity,
     units::radian_t startingAngle,
     const std::array<double, 2>& measurementStdDevs)
-    : LinearSystemSim<2, 1, 2>(system, measurementStdDevs),
+    : AngularMechanismSim(system, gearbox, measurementStdDevs),
       m_armLen(armLength),
+      m_pivotPoint(pivotPoint),
       m_minAngle(minAngle),
       m_maxAngle(maxAngle),
       m_gearbox(gearbox),
-      m_gearing(gearing),
       m_simulateGravity(simulateGravity) {
   SetState(startingAngle, 0_rad_per_s);
 }
 
-SingleJointedArmSim::SingleJointedArmSim(
-    const DCMotor& gearbox, double gearing, units::kilogram_square_meter_t moi,
-    units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, bool simulateGravity,
-    units::radian_t startingAngle,
-    const std::array<double, 2>& measurementStdDevs)
-    : SingleJointedArmSim(
-          LinearSystemId::SingleJointedArmSystem(gearbox, moi, gearing),
-          gearbox, gearing, armLength, minAngle, maxAngle, simulateGravity,
-          startingAngle, measurementStdDevs) {}
-
 void SingleJointedArmSim::SetState(units::radian_t angle,
                                    units::radians_per_second_t velocity) {
-  SetState(Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), velocity});
+  AngularMechanismSim::SetState(Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), velocity});
+}
+
+void SingleJointedArmSim::SetPosition(units::radian_t angle) {
+  AngularMechanismSim::SetState(Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), m_x(1, 0)});
+
 }
 
 bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
@@ -61,27 +55,6 @@ bool SingleJointedArmSim::HasHitLowerLimit() const {
 
 bool SingleJointedArmSim::HasHitUpperLimit() const {
   return WouldHitUpperLimit(units::radian_t{m_y(0)});
-}
-
-units::radian_t SingleJointedArmSim::GetAngle() const {
-  return units::radian_t{m_y(0)};
-}
-
-units::radians_per_second_t SingleJointedArmSim::GetVelocity() const {
-  return units::radians_per_second_t{m_x(1)};
-}
-
-units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
-  // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
-  // is spinning 10x faster than the output
-  units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
-  return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
-         wpi::sgn(m_u(0));
-}
-
-void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(Vectord<1>{voltage.value()});
-  ClampInput(frc::RobotController::GetBatteryVoltage().value());
 }
 
 Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
@@ -116,8 +89,13 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
         Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
+          double alphaGravConstant = 
+          -9.8 
+          * (3.0 / 2.0)
+          * std::abs(1 - 2 * m_pivotPoint.value() / m_armLen.value())
+          / m_armLen.value();
           xdot += Vectord<2>{
-              0.0, (3.0 / 2.0 * -9.8 / m_armLen * std::cos(x(0))).value()};
+              0.0, (alphaGravConstant * std::cos(x(0)))};
         }
         return xdot;
       },
