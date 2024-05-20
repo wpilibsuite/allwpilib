@@ -17,7 +17,7 @@ public class InterpolatingDoubleTreeMap extends InterpolatingTreeMap<Double, Dou
   }
 
   /**
-   * Creates an {@link InterpolatingDoubleTreeMap} from a list of entries.
+   * Creates an {@link InterpolatingDoubleTreeMap} from the given entries.
    *
    * @param entries The entries to add to the map.
    * @return The map filled with the {@code entries}.
