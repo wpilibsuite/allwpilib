@@ -23,7 +23,8 @@ namespace {
 class State {
  public:
   /// X position in global coordinate frame.
-  [[maybe_unused]] static constexpr int kX = 0;
+  [[maybe_unused]]
+  static constexpr int kX = 0;
 
   /// Y position in global coordinate frame.
   static constexpr int kY = 1;

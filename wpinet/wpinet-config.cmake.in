@@ -5,3 +5,6 @@ include(CMakeFindDependencyMacro)
 
 @FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/wpinet.cmake)
+if(@WITH_JAVA@)
+    include(${SELF_DIR}/wpinet_jar.cmake)
+endif()

@@ -4,15 +4,13 @@
 
 #pragma once
 
-#include <frc/motorcontrol/MotorController.h>
-
 /**
  * A simplified stub class that simulates the API of a common "smart" motor
  * controller.
  *
  * <p>Has no actual functionality.
  */
-class ExampleSmartMotorController : public frc::MotorController {
+class ExampleSmartMotorController {
  public:
   enum PIDMode { kPosition, kVelocity, kMovementWitchcraft };
 
@@ -68,15 +66,15 @@ class ExampleSmartMotorController : public frc::MotorController {
    */
   void ResetEncoder() {}
 
-  void Set(double speed) override {}
+  void Set(double speed) {}
 
-  double Get() const override { return 0; }
+  double Get() const { return 0; }
 
-  void SetInverted(bool isInverted) override {}
+  void SetInverted(bool isInverted) {}
 
-  bool GetInverted() const override { return false; }
+  bool GetInverted() const { return false; }
 
-  void Disable() override {}
+  void Disable() {}
 
-  void StopMotor() override {}
+  void StopMotor() {}
 };

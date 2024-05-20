@@ -26,6 +26,9 @@ public class DMAJNISample {
   private long m_timeStamp;
   private Map<Integer, BaseStore> m_propertyMap = new HashMap<>();
 
+  /** Default constructor. */
+  public DMAJNISample() {}
+
   public int update(int dmaHandle, double timeoutSeconds) {
     m_timeStamp = DMAJNI.readDMA(dmaHandle, timeoutSeconds, m_dataBuffer, m_storage);
     return m_storage[25];
@@ -131,8 +134,7 @@ public class DMAJNISample {
     }
 
     // + 2 Hack, but needed to not have to call into JNI
-    int value = readValue(data.m_valueType + 2, data.m_index);
-    return value;
+    return readValue(data.m_valueType + 2, data.m_index);
   }
 
   public void getAnalogAccumulator(int analogInputHandle, AccumulatorResult result) {

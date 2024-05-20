@@ -5,10 +5,10 @@
 #include <cstdio>
 #include <thread>
 
-#include <fmt/format.h>
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
+#include <wpi/print.h>
 
 extern "C" int HALSIM_InitExtension(void);
 
@@ -24,7 +24,7 @@ int main() {
   while (cycleCount < 1000) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     cycleCount++;
-    fmt::print("Count: {}\n", cycleCount);
+    wpi::print("Count: {}\n", cycleCount);
   }
 
   std::puts("DONE");

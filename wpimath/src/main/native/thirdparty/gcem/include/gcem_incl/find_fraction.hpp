@@ -25,6 +25,9 @@
 #ifndef _gcem_find_fraction_HPP
 #define _gcem_find_fraction_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -39,6 +42,8 @@ noexcept
                 x - internal::floor_check(x) - sgn(x) : 
             //else 
                 x - internal::floor_check(x) );
+}
+
 }
 
 }

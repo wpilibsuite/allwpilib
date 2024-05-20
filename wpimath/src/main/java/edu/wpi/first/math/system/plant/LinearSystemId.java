@@ -12,6 +12,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 
+/** Linear system ID utility functions. */
 public final class LinearSystemId {
   private LinearSystemId() {
     // Utility class
@@ -28,7 +29,7 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if massKg &lt;= 0, radiusMeters &lt;= 0, or gearing &lt;= 0.
    */
-  public static LinearSystem<N2, N1, N1> createElevatorSystem(
+  public static LinearSystem<N2, N1, N2> createElevatorSystem(
       DCMotor motor, double massKg, double radiusMeters, double gearing) {
     if (massKg <= 0.0) {
       throw new IllegalArgumentException("massKg must be greater than zero.");
@@ -51,8 +52,8 @@ public final class LinearSystemId {
                 * motor.KtNMPerAmp
                 / (motor.rOhms * radiusMeters * radiusMeters * massKg * motor.KvRadPerSecPerVolt)),
         VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * radiusMeters * massKg)),
-        MatBuilder.fill(Nat.N1(), Nat.N2(), 1, 0),
-        new Matrix<>(Nat.N1(), Nat.N1()));
+        Matrix.eye(Nat.N2()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
   }
 
   /**
@@ -134,14 +135,14 @@ public final class LinearSystemId {
    * <p>u = K_v v + K_a a
    *
    * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec^2)
+   * @param kA The acceleration gain, in volts/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
-    if (kV <= 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than zero.");
+    if (kV < 0.0) {
+      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
     }
     if (kA <= 0.0) {
       throw new IllegalArgumentException("Ka must be greater than zero.");
@@ -218,7 +219,7 @@ public final class LinearSystemId {
    *     this will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
-  public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(
+  public static LinearSystem<N2, N1, N2> createSingleJointedArmSystem(
       DCMotor motor, double JKgSquaredMeters, double gearing) {
     if (JKgSquaredMeters <= 0.0) {
       throw new IllegalArgumentException("JKgSquaredMeters must be greater than zero.");
@@ -238,8 +239,8 @@ public final class LinearSystemId {
                 * motor.KtNMPerAmp
                 / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgSquaredMeters)),
         VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * JKgSquaredMeters)),
-        MatBuilder.fill(Nat.N1(), Nat.N2(), 1, 0),
-        new Matrix<>(Nat.N1(), Nat.N1()));
+        Matrix.eye(Nat.N2()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
   }
 
   /**
@@ -255,14 +256,14 @@ public final class LinearSystemId {
    * <p>u = K_v v + K_a a
    *
    * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec^2)
+   * @param kA The acceleration gain, in volts/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA) {
-    if (kV <= 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than zero.");
+    if (kV < 0.0) {
+      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
     }
     if (kA <= 0.0) {
       throw new IllegalArgumentException("Ka must be greater than zero.");
@@ -290,12 +291,12 @@ public final class LinearSystemId {
    * @param kV The velocity gain, in volts/(unit/sec)
    * @param kA The acceleration gain, in volts/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
+   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  public static LinearSystem<N2, N1, N1> identifyPositionSystem(double kV, double kA) {
-    if (kV <= 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than zero.");
+  public static LinearSystem<N2, N1, N2> identifyPositionSystem(double kV, double kA) {
+    if (kV < 0.0) {
+      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
     }
     if (kA <= 0.0) {
       throw new IllegalArgumentException("Ka must be greater than zero.");
@@ -304,8 +305,8 @@ public final class LinearSystemId {
     return new LinearSystem<>(
         MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, 0.0, -kV / kA),
         VecBuilder.fill(0.0, 1.0 / kA),
-        MatBuilder.fill(Nat.N1(), Nat.N2(), 1.0, 0.0),
-        VecBuilder.fill(0.0));
+        Matrix.eye(Nat.N2()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
   }
 
   /**

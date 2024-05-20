@@ -183,7 +183,7 @@ void CommandScheduler::Run() {
     if constexpr (frc::RobotBase::IsSimulation()) {
       subsystem.getFirst()->SimulationPeriodic();
     }
-    m_watchdog.AddEpoch("Subsystem Periodic()");
+    m_watchdog.AddEpoch(subsystem.getFirst()->GetName() + ".Periodic()");
   }
 
   // Cache the active instance to avoid concurrency problems if SetActiveLoop()
@@ -428,6 +428,10 @@ void CommandScheduler::Enable() {
   m_impl->disabled = false;
 }
 
+void CommandScheduler::PrintWatchdogEpochs() {
+  m_watchdog.PrintEpochs();
+}
+
 void CommandScheduler::OnCommandInitialize(Action action) {
   m_impl->initActions.emplace_back(std::move(action));
 }
@@ -453,11 +457,13 @@ void CommandScheduler::OnCommandFinish(Action action) {
 }
 
 void CommandScheduler::RequireUngrouped(const Command* command) {
-  if (command->IsComposed()) {
+  auto stacktrace = command->GetPreviousCompositionSite();
+  if (stacktrace.has_value()) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "Commands that have been composed may not be added to "
-                        "another composition or scheduled "
-                        "individually!");
+                        "another composition or scheduled individually!"
+                        "\nOriginally composed at:\n{}",
+                        stacktrace.value());
   }
 }
 
@@ -472,6 +478,29 @@ void CommandScheduler::RequireUngrouped(
     std::initializer_list<const Command*> commands) {
   for (auto&& command : commands) {
     RequireUngrouped(command);
+  }
+}
+
+void CommandScheduler::RequireUngroupedAndUnscheduled(const Command* command) {
+  if (IsScheduled(command)) {
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
+                        "Commands that have been scheduled individually may "
+                        "not be added to another composition!");
+  }
+  RequireUngrouped(command);
+}
+
+void CommandScheduler::RequireUngroupedAndUnscheduled(
+    std::span<const std::unique_ptr<Command>> commands) {
+  for (auto&& command : commands) {
+    RequireUngroupedAndUnscheduled(command.get());
+  }
+}
+
+void CommandScheduler::RequireUngroupedAndUnscheduled(
+    std::initializer_list<const Command*> commands) {
+  for (auto&& command : commands) {
+    RequireUngroupedAndUnscheduled(command);
   }
 }
 

@@ -25,6 +25,9 @@
 #ifndef _gcem_inv_sqrt_HPP
 #define _gcem_inv_sqrt_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -83,6 +86,8 @@ inv_sqrt(const T x)
 noexcept
 {
     return internal::inv_sqrt_check( static_cast<return_t<T>>(x) );
+}
+
 }
 
 #endif

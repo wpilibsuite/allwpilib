@@ -19,18 +19,19 @@ public class Servo extends PWM {
   private static final double kMaxServoAngle = 180.0;
   private static final double kMinServoAngle = 0.0;
 
-  protected static final int kDefaultMaxServoPWM = 2400;
-  protected static final int kDefaultMinServoPWM = 600;
+  private static final int kDefaultMaxServoPWM = 2400;
+  private static final int kDefaultMinServoPWM = 600;
 
   /**
-   * Constructor.<br>
+   * Constructor.
    *
-   * <p>By default {@value #kDefaultMaxServoPWM} ms is used as the maxPWM value<br>
-   * By default {@value #kDefaultMinServoPWM} ms is used as the minPWM value<br>
+   * <p>By default, {@value #kDefaultMaxServoPWM} ms is used as the max PWM value and {@value
+   * #kDefaultMinServoPWM} ms is used as the minPWM value.
    *
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
+  @SuppressWarnings("this-escape")
   public Servo(final int channel) {
     super(channel);
     setBoundsMicroseconds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
@@ -83,7 +84,7 @@ public class Servo extends PWM {
       degrees = kMaxServoAngle;
     }
 
-    setPosition(((degrees - kMinServoAngle)) / getServoAngleRange());
+    setPosition((degrees - kMinServoAngle) / getServoAngleRange());
   }
 
   /**

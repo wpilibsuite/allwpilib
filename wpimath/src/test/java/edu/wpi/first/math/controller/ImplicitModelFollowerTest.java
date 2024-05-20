@@ -21,7 +21,7 @@ class ImplicitModelFollowerTest {
 
     var plant = LinearSystemId.identifyDrivetrainSystem(1.0, 1.0, 1.0, 1.0);
 
-    var imf = new ImplicitModelFollower<N2, N2, N2>(plant, plant);
+    var imf = new ImplicitModelFollower<>(plant, plant);
 
     Matrix<N2, N1> x = VecBuilder.fill(0.0, 0.0);
     Matrix<N2, N1> xImf = VecBuilder.fill(0.0, 0.0);
@@ -66,7 +66,7 @@ class ImplicitModelFollowerTest {
     // Linear acceleration is slower, but angular acceleration is the same
     var plantRef = LinearSystemId.identifyDrivetrainSystem(1.0, 2.0, 1.0, 1.0);
 
-    var imf = new ImplicitModelFollower<N2, N2, N2>(plant, plantRef);
+    var imf = new ImplicitModelFollower<>(plant, plantRef);
 
     Matrix<N2, N1> x = VecBuilder.fill(0.0, 0.0);
     Matrix<N2, N1> xImf = VecBuilder.fill(0.0, 0.0);

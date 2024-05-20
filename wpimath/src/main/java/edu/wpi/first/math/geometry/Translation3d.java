@@ -11,15 +11,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.proto.Translation3dProto;
+import edu.wpi.first.math.geometry.struct.Translation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.proto.Geometry3D.ProtobufTranslation3d;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /**
  * Represents a translation in 3D space. This object can be used to represent a point or a vector.
@@ -30,7 +32,15 @@ import us.hebi.quickbuf.Descriptors.Descriptor;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Translation3d implements Interpolatable<Translation3d> {
+public class Translation3d
+    implements Interpolatable<Translation3d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Translation3d representing the origin.
+   *
+   * <p>This exists to avoid allocations for common translations.
+   */
+  public static final Translation3d kZero = new Translation3d();
+
   private final double m_x;
   private final double m_y;
   private final double m_z;
@@ -84,6 +94,16 @@ public class Translation3d implements Interpolatable<Translation3d> {
   }
 
   /**
+   * Constructs a Translation3d from the provided translation vector's X, Y, and Z components. The
+   * values are assumed to be in meters.
+   *
+   * @param vector The translation vector to represent.
+   */
+  public Translation3d(Vector<N3> vector) {
+    this(vector.get(0), vector.get(1), vector.get(2));
+  }
+
+  /**
    * Calculates the distance between two translations in 3D space.
    *
    * <p>The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²+(z₂−z₁)²).
@@ -124,6 +144,15 @@ public class Translation3d implements Interpolatable<Translation3d> {
   @JsonProperty
   public double getZ() {
     return m_z;
+  }
+
+  /**
+   * Returns a vector representation of this translation.
+   *
+   * @return A Vector representation of this translation.
+   */
+  public Vector<N3> toVector() {
+    return VecBuilder.fill(m_x, m_y, m_z);
   }
 
   /**
@@ -253,71 +282,9 @@ public class Translation3d implements Interpolatable<Translation3d> {
         MathUtil.interpolate(this.getZ(), endValue.getZ(), t));
   }
 
-  public static final class AStruct implements Struct<Translation3d> {
-    @Override
-    public Class<Translation3d> getTypeClass() {
-      return Translation3d.class;
-    }
+  /** Translation3d protobuf for serialization. */
+  public static final Translation3dProto proto = new Translation3dProto();
 
-    @Override
-    public String getTypeString() {
-      return "struct:Translation3d";
-    }
-
-    @Override
-    public int getSize() {
-      return kSizeDouble * 3;
-    }
-
-    @Override
-    public String getSchema() {
-      return "double x;double y;double z";
-    }
-
-    @Override
-    public Translation3d unpack(ByteBuffer bb) {
-      double x = bb.getDouble();
-      double y = bb.getDouble();
-      double z = bb.getDouble();
-      return new Translation3d(x, y, z);
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Translation3d value) {
-      bb.putDouble(value.m_x);
-      bb.putDouble(value.m_y);
-      bb.putDouble(value.m_z);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Translation3d, ProtobufTranslation3d> {
-    @Override
-    public Class<Translation3d> getTypeClass() {
-      return Translation3d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufTranslation3d.getDescriptor();
-    }
-
-    @Override
-    public ProtobufTranslation3d createMessage() {
-      return ProtobufTranslation3d.newInstance();
-    }
-
-    @Override
-    public Translation3d unpack(ProtobufTranslation3d msg) {
-      return new Translation3d(msg.getX(), msg.getY(), msg.getZ());
-    }
-
-    @Override
-    public void pack(ProtobufTranslation3d msg, Translation3d value) {
-      msg.setX(value.m_x).setY(value.m_y).setZ(value.m_z);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  /** Translation3d struct for serialization. */
+  public static final Translation3dStruct struct = new Translation3dStruct();
 }

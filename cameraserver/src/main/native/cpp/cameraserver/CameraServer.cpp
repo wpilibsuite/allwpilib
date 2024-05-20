@@ -113,6 +113,8 @@ static std::string_view MakeSourceValue(CS_Source source,
     }
     case CS_SOURCE_CV:
       return "cv:";
+    case CS_SOURCE_RAW:
+      return "raw:";
     default:
       return "unknown:";
   }
@@ -502,6 +504,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   return camera;
 }
 
+WPI_IGNORE_DEPRECATED
 cs::AxisCamera CameraServer::AddAxisCamera(std::string_view host) {
   return AddAxisCamera("Axis Camera", host);
 }
@@ -557,7 +560,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
   csShared->ReportAxisCamera(camera.GetHandle());
   return camera;
 }
-
+WPI_UNIGNORE_DEPRECATED
 cs::MjpegServer CameraServer::AddSwitchedCamera(std::string_view name) {
   auto& inst = ::GetInstance();
   // create a dummy CvSource
@@ -622,6 +625,33 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
   return newsink;
 }
 
+cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera,
+                                  cs::VideoMode::PixelFormat pixelFormat) {
+  auto& inst = ::GetInstance();
+  wpi::SmallString<64> name{"opencv_"};
+  name += camera.GetName();
+
+  {
+    std::scoped_lock lock(inst.m_mutex);
+    auto it = inst.m_sinks.find(name);
+    if (it != inst.m_sinks.end()) {
+      auto kind = it->second.GetKind();
+      if (kind != cs::VideoSink::kCv) {
+        auto csShared = GetCameraServerShared();
+        csShared->SetCameraServerError("expected OpenCV sink, but got {}",
+                                       static_cast<int>(kind));
+        return cs::CvSink{};
+      }
+      return *static_cast<cs::CvSink*>(&it->second);
+    }
+  }
+
+  cs::CvSink newsink{name.str(), pixelFormat};
+  newsink.SetSource(camera);
+  AddServer(newsink);
+  return newsink;
+}
+
 cs::CvSink CameraServer::GetVideo(std::string_view name) {
   auto& inst = ::GetInstance();
   cs::VideoSource source;
@@ -636,6 +666,23 @@ cs::CvSink CameraServer::GetVideo(std::string_view name) {
     source = it->second;
   }
   return GetVideo(source);
+}
+
+cs::CvSink CameraServer::GetVideo(std::string_view name,
+                                  cs::VideoMode::PixelFormat pixelFormat) {
+  auto& inst = ::GetInstance();
+  cs::VideoSource source;
+  {
+    std::scoped_lock lock(inst.m_mutex);
+    auto it = inst.m_sources.find(name);
+    if (it == inst.m_sources.end()) {
+      auto csShared = GetCameraServerShared();
+      csShared->SetCameraServerError("could not find camera {}", name);
+      return cs::CvSink{};
+    }
+    source = it->second;
+  }
+  return GetVideo(source, pixelFormat);
 }
 
 cs::CvSource CameraServer::PutVideo(std::string_view name, int width,

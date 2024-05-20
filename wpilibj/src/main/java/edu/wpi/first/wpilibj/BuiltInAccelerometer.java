@@ -17,9 +17,13 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
 public class BuiltInAccelerometer implements Sendable, AutoCloseable {
+  /** Accelerometer range. */
   public enum Range {
+    /** 2 Gs max. */
     k2G,
+    /** 4 Gs max. */
     k4G,
+    /** 8 Gs max. */
     k8G
   }
 
@@ -28,6 +32,7 @@ public class BuiltInAccelerometer implements Sendable, AutoCloseable {
    *
    * @param range The range the accelerometer will measure
    */
+  @SuppressWarnings("this-escape")
   public BuiltInAccelerometer(Range range) {
     setRange(range);
     HAL.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
@@ -50,7 +55,7 @@ public class BuiltInAccelerometer implements Sendable, AutoCloseable {
    * @param range The maximum acceleration, positive or negative, that the accelerometer will
    *     measure.
    */
-  public void setRange(Range range) {
+  public final void setRange(Range range) {
     AccelerometerJNI.setAccelerometerActive(false);
 
     switch (range) {

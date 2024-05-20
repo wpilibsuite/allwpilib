@@ -5,6 +5,8 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -70,7 +72,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   private final double m_period;
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
-  private boolean m_lwEnabledInTest = true;
+  private boolean m_lwEnabledInTest;
   private boolean m_calledDsConnected;
 
   /**
@@ -257,15 +259,21 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_ntFlushEnabled = enabled;
   }
 
+  private boolean m_reportedLw;
+
   /**
    * Sets whether LiveWindow operation is enabled during test mode. Calling
    *
-   * @param testLW True to enable, false to disable. Defaults to true.
+   * @param testLW True to enable, false to disable. Defaults to false.
    * @throws ConcurrentModificationException if this is called during test mode.
    */
   public void enableLiveWindowInTest(boolean testLW) {
     if (isTestEnabled()) {
       throw new ConcurrentModificationException("Can't configure test mode while in test mode!");
+    }
+    if (!m_reportedLw && testLW) {
+      HAL.report(tResourceType.kResourceType_SmartDashboard, tInstances.kSmartDashboard_LiveWindow);
+      m_reportedLw = true;
     }
     m_lwEnabledInTest = testLW;
   }
@@ -288,6 +296,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     return m_period;
   }
 
+  /** Loop function. */
   protected void loopFunc() {
     DriverStation.refreshData();
     m_watchdog.reset();
@@ -397,6 +406,11 @@ public abstract class IterativeRobotBase extends RobotBase {
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
+  }
+
+  /** Prints list of epochs added so far and their times. */
+  public void printWatchdogEpochs() {
+    m_watchdog.printEpochs();
   }
 
   private void printLoopOverrunMessage() {

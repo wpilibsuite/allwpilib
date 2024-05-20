@@ -6,7 +6,6 @@
 
 #include <algorithm>
 
-#include <wpi/deprecated.h>
 #include <wpi/timestamp.h>
 
 #include "units/time.h"
@@ -47,7 +46,7 @@ class SlewRateLimiter {
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
         m_prevTime{
-            units::microsecond_t(wpi::math::MathSharedStore::GetTimestamp())} {}
+            units::microsecond_t{wpi::math::MathSharedStore::GetTimestamp()}} {}
 
   /**
    * Creates a new SlewRateLimiter with the given positive rate limit and
@@ -74,6 +73,13 @@ class SlewRateLimiter {
     m_prevTime = currentTime;
     return m_prevVal;
   }
+
+  /**
+   * Returns the value last calculated by the SlewRateLimiter.
+   *
+   * @return The last value.
+   */
+  Unit_t LastValue() const { return m_prevVal; }
 
   /**
    * Resets the slew rate limiter to the specified value; ignores the rate limit

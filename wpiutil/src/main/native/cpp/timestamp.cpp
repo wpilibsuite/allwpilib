@@ -5,6 +5,7 @@
 #include "wpi/timestamp.h"
 
 #include <atomic>
+#include <optional>
 
 #ifdef __FRC_ROBORIO__
 #include <stdint.h>
@@ -12,9 +13,7 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wignored-qualifiers"
 #include <FRC_FPGA_ChipObject/RoboRIO_FRC_ChipObject_Aliases.h>
-#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/nInterfaceGlobals.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tHMB.h>
-#include <FRC_NetworkCommunication/LoadOut.h>
 #pragma GCC diagnostic pop
 namespace fpga {
 using namespace nFPGA;
@@ -36,7 +35,7 @@ using namespace nRoboRIO_FPGANamespace;
 
 #include <cstdio>
 
-#include <fmt/format.h>
+#include "wpi/print.h"
 
 #ifdef __FRC_ROBORIO__
 namespace {
@@ -50,67 +49,109 @@ using NiFpga_OpenHmbFunc = NiFpga_Status (*)(const NiFpga_Session session,
                                              const char* memoryName,
                                              size_t* memorySize,
                                              void** virtualAddress);
+using NiFpga_FindRegisterFunc = NiFpga_Status (*)(NiFpga_Session session,
+                                                  const char* registerName,
+                                                  uint32_t* registerOffset);
+using NiFpga_ReadU32Func = NiFpga_Status (*)(NiFpga_Session session,
+                                             uint32_t indicator,
+                                             uint32_t* value);
+using NiFpga_WriteU32Func = NiFpga_Status (*)(NiFpga_Session session,
+                                              uint32_t control, uint32_t value);
+static void dlcloseWrapper(void* handle) {
+  dlclose(handle);
+}
 static std::atomic_flag hmbInitialized = ATOMIC_FLAG_INIT;
-struct HMBHolder {
-  ~HMBHolder() {
-    hmbInitialized.clear();
-    if (hmb) {
-      closeHmb(hmb->getSystemInterface()->getHandle(), hmbName);
-      dlclose(niFpga);
-    }
-  }
-  void Configure() {
-    nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
-        nLoadOut::getTargetClass();
+static std::atomic_flag nowUseDefaultOnFailure = ATOMIC_FLAG_INIT;
+struct HMBLowLevel {
+  ~HMBLowLevel() { Reset(); }
+  bool Configure(const NiFpga_Session session) {
     int32_t status = 0;
-    hmb.reset(fpga::tHMB::create(&status));
-    niFpga = dlopen("libNiFpga.so", RTLD_LAZY);
+    niFpga.reset(dlopen("libNiFpga.so", RTLD_LAZY));
     if (!niFpga) {
-      hmb = nullptr;
-      return;
+      wpi::print(stderr, "Could not open libNiFpga.so\n");
+      return false;
     }
     NiFpga_OpenHmbFunc openHmb = reinterpret_cast<NiFpga_OpenHmbFunc>(
-        dlsym(niFpga, "NiFpgaDll_OpenHmb"));
+        dlsym(niFpga.get(), "NiFpgaDll_OpenHmb"));
     closeHmb = reinterpret_cast<NiFpga_CloseHmbFunc>(
-        dlsym(niFpga, "NiFpgaDll_CloseHmb"));
-    if (openHmb == nullptr || closeHmb == nullptr) {
+        dlsym(niFpga.get(), "NiFpgaDll_CloseHmb"));
+    NiFpga_FindRegisterFunc findRegister =
+        reinterpret_cast<NiFpga_FindRegisterFunc>(
+            dlsym(niFpga.get(), "NiFpgaDll_FindRegister"));
+    NiFpga_ReadU32Func readU32 = reinterpret_cast<NiFpga_ReadU32Func>(
+        dlsym(niFpga.get(), "NiFpgaDll_ReadU32"));
+    NiFpga_WriteU32Func writeU32 = reinterpret_cast<NiFpga_WriteU32Func>(
+        dlsym(niFpga.get(), "NiFpgaDll_WriteU32"));
+    if (openHmb == nullptr || closeHmb == nullptr || findRegister == nullptr ||
+        writeU32 == nullptr || readU32 == nullptr) {
+      wpi::print(stderr, "Could not find HMB symbols in libNiFpga.so\n");
+      niFpga = nullptr;
+      return false;
+    }
+    uint32_t hmbConfigRegister = 0;
+    status = findRegister(session, "HMB.Config", &hmbConfigRegister);
+    if (status != 0) {
+      wpi::print(stderr, "Failed to find HMB.Config register, status code {}\n",
+                 status);
       closeHmb = nullptr;
-      dlclose(niFpga);
-      hmb = nullptr;
-      return;
+      niFpga = nullptr;
+      return false;
     }
     size_t hmbBufferSize = 0;
     status =
-        openHmb(hmb->getSystemInterface()->getHandle(), hmbName, &hmbBufferSize,
+        openHmb(session, hmbName, &hmbBufferSize,
                 reinterpret_cast<void**>(const_cast<uint32_t**>(&hmbBuffer)));
     if (status != 0) {
+      wpi::print(stderr, "Failed to open HMB, status code {}\n", status);
       closeHmb = nullptr;
-      dlclose(niFpga);
-      hmb = nullptr;
-      return;
+      niFpga = nullptr;
+      return false;
     }
-    auto cfg = hmb->readConfig(&status);
+    fpga::tHMB::tConfig cfg;
+    uint32_t read = 0;
+    status = readU32(session, hmbConfigRegister, &read);
+    cfg.value = read;
     cfg.Enables_Timestamp = 1;
-    hmb->writeConfig(cfg, &status);
+    status = writeU32(session, hmbConfigRegister, cfg.value);
+    hmbSession.emplace(session);
     hmbInitialized.test_and_set();
+    return true;
   }
   void Reset() {
     hmbInitialized.clear();
-    if (hmb) {
-      std::unique_ptr<fpga::tHMB> oldHmb;
-      oldHmb.swap(hmb);
-      closeHmb(oldHmb->getSystemInterface()->getHandle(), hmbName);
-      closeHmb = nullptr;
-      hmbBuffer = nullptr;
-      oldHmb.reset();
-      dlclose(niFpga);
+    std::optional<NiFpga_Session> oldSesh;
+    hmbSession.swap(oldSesh);
+    if (oldSesh.has_value()) {
+      closeHmb(oldSesh.value(), hmbName);
       niFpga = nullptr;
     }
   }
-  std::unique_ptr<fpga::tHMB> hmb;
-  void* niFpga = nullptr;
+  std::optional<NiFpga_Session> hmbSession;
   NiFpga_CloseHmbFunc closeHmb = nullptr;
   volatile uint32_t* hmbBuffer = nullptr;
+  std::unique_ptr<void, decltype(&dlcloseWrapper)> niFpga{nullptr,
+                                                          dlcloseWrapper};
+};
+struct HMBHolder {
+  bool Configure(void* col, std::unique_ptr<fpga::tHMB> hmbObject) {
+    hmb = std::move(hmbObject);
+    chipObjectLibrary.reset(col);
+    if (!lowLevel.Configure(hmb->getSystemInterface()->getHandle())) {
+      hmb = nullptr;
+      chipObjectLibrary = nullptr;
+      return false;
+    }
+    return true;
+  }
+  void Reset() {
+    lowLevel.Reset();
+    hmb = nullptr;
+    chipObjectLibrary = nullptr;
+  }
+  HMBLowLevel lowLevel;
+  std::unique_ptr<fpga::tHMB> hmb;
+  std::unique_ptr<void, decltype(&dlcloseWrapper)> chipObjectLibrary{
+      nullptr, dlcloseWrapper};
 };
 static HMBHolder hmb;
 }  // namespace
@@ -189,12 +230,30 @@ uint64_t wpi::NowDefault() {
 
 static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
 
-void wpi::impl::SetupNowRio() {
+void wpi::impl::SetupNowDefaultOnRio() {
+#ifdef __FRC_ROBORIO__
+  nowUseDefaultOnFailure.test_and_set();
+#endif
+}
+
+#ifdef __FRC_ROBORIO__
+template <>
+bool wpi::impl::SetupNowRio(void* chipObjectLibrary,
+                            std::unique_ptr<fpga::tHMB> hmbObject) {
+  if (!hmbInitialized.test()) {
+    return hmb.Configure(chipObjectLibrary, std::move(hmbObject));
+  }
+  return true;
+}
+#endif
+
+bool wpi::impl::SetupNowRio(uint32_t session) {
 #ifdef __FRC_ROBORIO__
   if (!hmbInitialized.test()) {
-    hmb.Configure();
+    return hmb.lowLevel.Configure(session);
   }
 #endif
+  return true;
 }
 
 void wpi::impl::ShutdownNowRio() {
@@ -211,24 +270,32 @@ uint64_t wpi::Now() {
 #ifdef __FRC_ROBORIO__
   // Same code as HAL_GetFPGATime()
   if (!hmbInitialized.test()) {
-    std::fputs(
-        "FPGA not yet configured in wpi::Now(). Time will not be correct",
-        stderr);
-    std::fflush(stderr);
-    return 1;
+    if (nowUseDefaultOnFailure.test()) {
+      return timestamp() - offset_val;
+    } else {
+      wpi::print(stderr,
+                 "FPGA not yet configured in wpi::Now(). This is a fatal "
+                 "error. The process is being terminated.\n");
+      std::fflush(stderr);
+      // Attempt to force a segfault to get a better java log
+      *reinterpret_cast<int*>(0) = 0;
+      // If that fails, terminate
+      std::terminate();
+      return 1;
+    }
   }
 
   asm("dmb");
-  uint64_t upper1 = hmb.hmbBuffer[timestampUpperOffset];
+  uint64_t upper1 = hmb.lowLevel.hmbBuffer[timestampUpperOffset];
   asm("dmb");
-  uint32_t lower = hmb.hmbBuffer[timestampLowerOffset];
+  uint32_t lower = hmb.lowLevel.hmbBuffer[timestampLowerOffset];
   asm("dmb");
-  uint64_t upper2 = hmb.hmbBuffer[timestampUpperOffset];
+  uint64_t upper2 = hmb.lowLevel.hmbBuffer[timestampUpperOffset];
 
   if (upper1 != upper2) {
     // Rolled over between the lower call, reread lower
     asm("dmb");
-    lower = hmb.hmbBuffer[timestampLowerOffset];
+    lower = hmb.lowLevel.hmbBuffer[timestampLowerOffset];
   }
   // 5 is added here because the time to write from the FPGA
   // to the HMB buffer is longer then the time to read
@@ -247,8 +314,12 @@ uint64_t wpi::GetSystemTime() {
 
 extern "C" {
 
-void WPI_Impl_SetupNowRio(void) {
-  return wpi::impl::SetupNowRio();
+void WPI_Impl_SetupNowUseDefaultOnRio(void) {
+  return wpi::impl::SetupNowDefaultOnRio();
+}
+
+void WPI_Impl_SetupNowRioWithSession(uint32_t session) {
+  wpi::impl::SetupNowRio(session);
 }
 
 void WPI_Impl_ShutdownNowRio(void) {

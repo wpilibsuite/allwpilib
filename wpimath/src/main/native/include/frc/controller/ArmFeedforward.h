@@ -11,6 +11,7 @@
 #include "units/angular_velocity.h"
 #include "units/math.h"
 #include "units/voltage.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 /**
@@ -29,20 +30,31 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   using ka_unit =
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
-  constexpr ArmFeedforward() = default;
-
   /**
    * Creates a new ArmFeedforward with the specified gains.
    *
-   * @param kS   The static gain, in volts.
+   * @param kS The static gain, in volts.
    * @param kG The gravity gain, in volts.
-   * @param kV   The velocity gain, in volt seconds per radian.
-   * @param kA   The acceleration gain, in volt seconds² per radian.
+   * @param kV The velocity gain, in volt seconds per radian.
+   * @param kA The acceleration gain, in volt seconds² per radian.
    */
   constexpr ArmFeedforward(
       units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : kS(kS), kG(kG), kV(kV), kA(kA) {}
+      : kS(kS), kG(kG), kV(kV), kA(kA) {
+    if (kV.value() < 0) {
+      wpi::math::MathSharedStore::ReportError(
+          "kV must be a non-negative number, got {}!", kV.value());
+      kV = units::unit_t<kv_unit>{0};
+      wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
+    }
+    if (kA.value() < 0) {
+      wpi::math::MathSharedStore::ReportError(
+          "kA must be a non-negative number, got {}!", kA.value());
+      kA = units::unit_t<ka_unit>{0};
+      wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
+    }
+  }
 
   /**
    * Calculates the feedforward from the gains and setpoints.
@@ -63,6 +75,23 @@ class WPILIB_DLLEXPORT ArmFeedforward {
     return kS * wpi::sgn(velocity) + kG * units::math::cos(angle) +
            kV * velocity + kA * acceleration;
   }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param currentAngle The current angle in radians. This angle should be
+   *   measured from the horizontal (i.e. if the provided angle is 0, the arm
+   *   should be parallel to the floor). If your encoder does not follow this
+   *   convention, an offset should be added.
+   * @param currentVelocity The current velocity setpoint in radians per second.
+   * @param nextVelocity The next velocity setpoint in radians per second.
+   * @param dt Time between velocity setpoints in seconds.
+   * @return The computed feedforward in volts.
+   */
+  units::volt_t Calculate(units::unit_t<Angle> currentAngle,
+                          units::unit_t<Velocity> currentVelocity,
+                          units::unit_t<Velocity> nextVelocity,
+                          units::second_t dt) const;
 
   // Rearranging the main equation from the calculate() method yields the
   // formulas for the methods below:
@@ -163,9 +192,19 @@ class WPILIB_DLLEXPORT ArmFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, angle, velocity);
   }
 
-  units::volt_t kS{0};
-  units::volt_t kG{0};
-  units::unit_t<kv_unit> kV{0};
-  units::unit_t<ka_unit> kA{0};
+  /// The static gain, in volts.
+  const units::volt_t kS;
+
+  /// The gravity gain, in volts.
+  const units::volt_t kG;
+
+  /// The velocity gain, in volt seconds per radian.
+  const units::unit_t<kv_unit> kV;
+
+  /// The acceleration gain, in volt seconds² per radian.
+  const units::unit_t<ka_unit> kA;
 };
 }  // namespace frc
+
+#include "frc/controller/proto/ArmFeedforwardProto.h"
+#include "frc/controller/struct/ArmFeedforwardStruct.h"

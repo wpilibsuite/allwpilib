@@ -63,6 +63,9 @@ class Image {
       case VideoMode::kBGR:
         type = CV_8UC3;
         break;
+      case VideoMode::kBGRA:
+        type = CV_8UC4;
+        break;
       case VideoMode::kGray:
       case VideoMode::kMJPEG:
       default:
@@ -70,6 +73,25 @@ class Image {
         break;
     }
     return cv::Mat{height, width, type, m_data.data()};
+  }
+
+  int GetStride() const {
+    switch (pixelFormat) {
+      case VideoMode::kYUYV:
+      case VideoMode::kRGB565:
+      case VideoMode::kY16:
+      case VideoMode::kUYVY:
+        return 2 * width;
+      case VideoMode::kBGR:
+        return 3 * width;
+      case VideoMode::kBGRA:
+        return 4 * width;
+      case VideoMode::kGray:
+        return width;
+      case VideoMode::kMJPEG:
+      default:
+        return 0;
+    }
   }
 
   cv::_InputArray AsInputArray() { return cv::_InputArray{m_data}; }

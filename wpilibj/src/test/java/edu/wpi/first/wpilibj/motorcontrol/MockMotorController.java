@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
+@SuppressWarnings("removal")
 public class MockMotorController implements MotorController {
   private double m_speed;
   private boolean m_isInverted;

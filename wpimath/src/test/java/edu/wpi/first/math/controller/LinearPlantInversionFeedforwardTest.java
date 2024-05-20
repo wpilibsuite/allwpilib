@@ -21,7 +21,7 @@ class LinearPlantInversionFeedforwardTest {
     Matrix<N2, N1> B = VecBuilder.fill(0, 1);
 
     LinearPlantInversionFeedforward<N2, N1, N1> feedforward =
-        new LinearPlantInversionFeedforward<N2, N1, N1>(A, B, 0.02);
+        new LinearPlantInversionFeedforward<>(A, B, 0.02);
 
     assertEquals(
         47.502599,

@@ -21,6 +21,7 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This class wraps {@link Odometry} to fuse latency-compensated vision measurements with encoder
@@ -34,6 +35,8 @@ import java.util.Objects;
  *
  * <p>{@link PoseEstimator#addVisionMeasurement} can be called as infrequently as you want; if you
  * never call it then this class will behave exactly like regular encoder odometry.
+ *
+ * @param <T> Wheel positions type.
  */
 public class PoseEstimator<T extends WheelPositions<T>> {
   private final Kinematics<?, T> m_kinematics;
@@ -80,7 +83,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
    *     theta]ᵀ, with units in meters and radians.
    */
-  public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
+  public final void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
     var r = new double[3];
     for (int i = 0; i < 3; ++i) {
       r[i] = visionMeasurementStdDevs.get(i, 0) * visionMeasurementStdDevs.get(i, 0);
@@ -121,6 +124,16 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    */
   public Pose2d getEstimatedPosition() {
     return m_odometry.getPoseMeters();
+  }
+
+  /**
+   * Return the pose at a given timestamp, if the buffer is not empty.
+   *
+   * @param timestampSeconds The pose's timestamp in seconds.
+   * @return The pose at the given timestamp (or Optional.empty() if the buffer is empty).
+   */
+  public Optional<Pose2d> sampleAt(double timestampSeconds) {
+    return m_poseBuffer.getSample(timestampSeconds).map(record -> record.poseMeters);
   }
 
   /**

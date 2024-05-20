@@ -9,7 +9,6 @@
 #include <frc/drive/MecanumDrive.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
-#include <frc/interfaces/Gyro.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
@@ -148,7 +147,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::PWMSparkMax m_rearRight;
 
   // The robot's drive
-  frc::MecanumDrive m_drive{m_frontLeft, m_rearLeft, m_frontRight, m_rearRight};
+  frc::MecanumDrive m_drive{[&](double output) { m_frontLeft.Set(output); },
+                            [&](double output) { m_rearLeft.Set(output); },
+                            [&](double output) { m_frontRight.Set(output); },
+                            [&](double output) { m_rearRight.Set(output); }};
 
   // The front-left-side drive encoder
   frc::Encoder m_frontLeftEncoder;

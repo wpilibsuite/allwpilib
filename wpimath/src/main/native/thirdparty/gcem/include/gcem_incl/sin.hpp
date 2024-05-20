@@ -27,6 +27,12 @@
 #ifndef _gcem_sin_HPP
 #define _gcem_sin_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -79,7 +85,13 @@ return_t<T>
 sin(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::sin_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::sin(x);
+  }
+}
+
 }
 
 #endif

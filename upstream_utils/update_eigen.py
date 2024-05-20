@@ -95,7 +95,12 @@ def unsupported_inclusions(dp, f):
 
 
 def main():
-    upstream_root = clone_repo("https://gitlab.com/libeigen/eigen.git", "3.4.0")
+    upstream_root = clone_repo(
+        "https://gitlab.com/libeigen/eigen.git",
+        # master on 2024-05-07
+        "99c18bce6eb225fa5a4861af97189ada1bca3103",
+        shallow=False,
+    )
     wpilib_root = get_repo_root()
     wpimath = os.path.join(wpilib_root, "wpimath")
 
@@ -104,15 +109,13 @@ def main():
     for f in [
         "0001-Disable-warnings.patch",
         "0002-Intellisense-fix.patch",
-        "0003-Eigen-Sparse-fix-warnings-Wunused-but-set-variable.patch",
+        "0003-Suppress-C-23-deprecation-warnings-for-std-has_denor.patch",
+        "0004-Fix-compilation-failures-on-constexpr-matrices-with-.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/eigen_patches", f))
 
     # Delete old install
-    for d in [
-        "src/main/native/thirdparty/eigen/include/Eigen",
-        "src/main/native/thirdparty/eigen/include/unsupported",
-    ]:
+    for d in ["src/main/native/thirdparty/eigen/include"]:
         shutil.rmtree(os.path.join(wpimath, d), ignore_errors=True)
 
     # Copy Eigen headers into allwpilib
@@ -135,6 +138,11 @@ def main():
         comment_out_invalid_includes(
             f, [os.path.join(wpimath, "src/main/native/thirdparty/eigen/include")]
         )
+
+    shutil.copyfile(
+        os.path.join(upstream_root, ".clang-format"),
+        os.path.join(wpimath, "src/main/native/thirdparty/eigen/include/.clang-format"),
+    )
 
 
 if __name__ == "__main__":

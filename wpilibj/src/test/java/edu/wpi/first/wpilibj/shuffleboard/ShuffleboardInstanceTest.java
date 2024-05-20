@@ -136,7 +136,7 @@ class ShuffleboardInstanceTest {
     try (StringSubscriber subscriber =
         m_ntInstance
             .getStringTopic("/Shuffleboard/.metadata/Selected")
-            .subscribe("", PubSubOption.keepDuplicates(true)); ) {
+            .subscribe("", PubSubOption.keepDuplicates(true))) {
       listener =
           m_ntInstance.addListener(
               subscriber,

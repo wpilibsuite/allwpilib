@@ -8,9 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+/** A thread-safe container for handling events. */
 public class EventVector {
   private final ReentrantLock m_lock = new ReentrantLock();
   private final List<Integer> m_events = new ArrayList<>();
+
+  /** Default constructor. */
+  public EventVector() {}
 
   /**
    * Adds an event to the event vector.

@@ -9,50 +9,37 @@
 
 #include "cscore_c.h"
 
+// NOLINTBEGIN
 #ifdef __cplusplus
 #include "cscore_oo.h"
 #endif
 
-/**
- * Raw Frame
- */
-typedef struct CS_RawFrame {  // NOLINT
-  char* data;
-  int dataLength;
-  int pixelFormat;
-  int width;
-  int height;
-  int totalData;
-} CS_RawFrame;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+// NOLINTEND
 
 /**
  * @defgroup cscore_raw_cfunc Raw Image Functions
  * @{
  */
-void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize);
-void CS_FreeRawFrameData(CS_RawFrame* frame);
-
-uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct CS_RawFrame* rawImage,
+uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* rawImage,
                              CS_Status* status);
-uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct CS_RawFrame* rawImage,
+uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct WPI_RawFrame* rawImage,
                                     double timeout, CS_Status* status);
 
-CS_Sink CS_CreateRawSink(const char* name, CS_Status* status);
+CS_Sink CS_CreateRawSink(const struct WPI_String* name, CS_Bool isCv,
+                         CS_Status* status);
 
-CS_Sink CS_CreateRawSinkCallback(const char* name, void* data,
-                                 void (*processFrame)(void* data,
-                                                      uint64_t time),
-                                 CS_Status* status);
+CS_Sink CS_CreateRawSinkCallback(
+    const struct WPI_String* name, CS_Bool isCv, void* data,
+    void (*processFrame)(void* data, uint64_t time), CS_Status* status);
 
-void CS_PutRawSourceFrame(CS_Source source, const struct CS_RawFrame* image,
+void CS_PutRawSourceFrame(CS_Source source, const struct WPI_RawFrame* image,
                           CS_Status* status);
 
-CS_Source CS_CreateRawSource(const char* name, const CS_VideoMode* mode,
-                             CS_Status* status);
+CS_Source CS_CreateRawSource(const struct WPI_String* name, CS_Bool isCv,
+                             const CS_VideoMode* mode, CS_Status* status);
 /** @} */
 
 #ifdef __cplusplus
@@ -62,36 +49,23 @@ CS_Source CS_CreateRawSource(const char* name, const CS_VideoMode* mode,
 #ifdef __cplusplus
 namespace cs {
 
-struct RawFrame : public CS_RawFrame {
-  RawFrame() {
-    data = nullptr;
-    dataLength = 0;
-    pixelFormat = CS_PIXFMT_UNKNOWN;
-    width = 0;
-    height = 0;
-    totalData = 0;
-  }
-
-  ~RawFrame() { CS_FreeRawFrameData(this); }
-};
-
 /**
  * @defgroup cscore_raw_func Raw Image Functions
  * @{
  */
 
-CS_Source CreateRawSource(std::string_view name, const VideoMode& mode,
-                          CS_Status* status);
+CS_Source CreateRawSource(std::string_view name, bool isCv,
+                          const VideoMode& mode, CS_Status* status);
 
-CS_Sink CreateRawSink(std::string_view name, CS_Status* status);
-CS_Sink CreateRawSinkCallback(std::string_view name,
+CS_Sink CreateRawSink(std::string_view name, bool isCv, CS_Status* status);
+CS_Sink CreateRawSinkCallback(std::string_view name, bool isCv,
                               std::function<void(uint64_t time)> processFrame,
                               CS_Status* status);
 
-void PutSourceFrame(CS_Source source, const CS_RawFrame& image,
+void PutSourceFrame(CS_Source source, const WPI_RawFrame& image,
                     CS_Status* status);
-uint64_t GrabSinkFrame(CS_Sink sink, CS_RawFrame& image, CS_Status* status);
-uint64_t GrabSinkFrameTimeout(CS_Sink sink, CS_RawFrame& image, double timeout,
+uint64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status);
+uint64_t GrabSinkFrameTimeout(CS_Sink sink, WPI_RawFrame& image, double timeout,
                               CS_Status* status);
 
 /**
@@ -129,7 +103,7 @@ class RawSource : public ImageSource {
    *
    * @param image raw frame image
    */
-  void PutFrame(RawFrame& image);
+  void PutFrame(wpi::RawFrame& image);
 };
 
 /**
@@ -177,7 +151,7 @@ class RawSink : public ImageSink {
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrame(RawFrame& image, double timeout = 0.225) const;
+  uint64_t GrabFrame(wpi::RawFrame& image, double timeout = 0.225) const;
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -188,40 +162,40 @@ class RawSink : public ImageSink {
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameNoTimeout(RawFrame& image) const;
+  uint64_t GrabFrameNoTimeout(wpi::RawFrame& image) const;
 };
 
 inline RawSource::RawSource(std::string_view name, const VideoMode& mode) {
-  m_handle = CreateRawSource(name, mode, &m_status);
+  m_handle = CreateRawSource(name, false, mode, &m_status);
 }
 
 inline RawSource::RawSource(std::string_view name,
                             VideoMode::PixelFormat format, int width,
                             int height, int fps) {
-  m_handle =
-      CreateRawSource(name, VideoMode{format, width, height, fps}, &m_status);
+  m_handle = CreateRawSource(name, false, VideoMode{format, width, height, fps},
+                             &m_status);
 }
 
-inline void RawSource::PutFrame(RawFrame& image) {
+inline void RawSource::PutFrame(wpi::RawFrame& image) {
   m_status = 0;
   PutSourceFrame(m_handle, image, &m_status);
 }
 
 inline RawSink::RawSink(std::string_view name) {
-  m_handle = CreateRawSink(name, &m_status);
+  m_handle = CreateRawSink(name, false, &m_status);
 }
 
 inline RawSink::RawSink(std::string_view name,
                         std::function<void(uint64_t time)> processFrame) {
-  m_handle = CreateRawSinkCallback(name, processFrame, &m_status);
+  m_handle = CreateRawSinkCallback(name, false, processFrame, &m_status);
 }
 
-inline uint64_t RawSink::GrabFrame(RawFrame& image, double timeout) const {
+inline uint64_t RawSink::GrabFrame(wpi::RawFrame& image, double timeout) const {
   m_status = 0;
   return GrabSinkFrameTimeout(m_handle, image, timeout, &m_status);
 }
 
-inline uint64_t RawSink::GrabFrameNoTimeout(RawFrame& image) const {
+inline uint64_t RawSink::GrabFrameNoTimeout(wpi::RawFrame& image) const {
   m_status = 0;
   return GrabSinkFrame(m_handle, image, &m_status);
 }

@@ -71,11 +71,9 @@ struct FeedbackControllerPreset {
 enum class FeedbackControllerLoopType { kPosition, kVelocity };
 
 namespace presets {
-constexpr FeedbackControllerPreset kDefault{1.0, 1.0, 20_ms, true, 0_s};
+inline constexpr FeedbackControllerPreset kDefault{1.0, 1.0, 20_ms, true, 0_s};
 
-constexpr FeedbackControllerPreset kWPILibNew{kDefault};
-constexpr FeedbackControllerPreset kWPILibOld{1.0 / 12.0, 1.0, 50_ms, false,
-                                              0_s};
+inline constexpr FeedbackControllerPreset kWPILib{kDefault};
 
 // Measurement delay from a moving average filter:
 //
@@ -117,19 +115,19 @@ constexpr FeedbackControllerPreset kWPILibOld{1.0 / 12.0, 1.0, 50_ms, false,
  *
  * Total delay = 50 ms + 31.5 ms = 81.5 ms.
  */
-constexpr FeedbackControllerPreset kCTRECANCoder{1.0 / 12.0, 60.0, 1_ms, true,
-                                                 81.5_ms};
-constexpr FeedbackControllerPreset kCTREDefault{1023.0 / 12.0, 0.1, 1_ms, false,
-                                                81.5_ms};
+inline constexpr FeedbackControllerPreset kCTREv5CANCoder{1.0 / 12.0, 60.0,
+                                                          1_ms, true, 81.5_ms};
+inline constexpr FeedbackControllerPreset kCTREv5{1023.0 / 12.0, 0.1, 1_ms,
+                                                  false, 81.5_ms};
 /**
  * https://api.ctr-electronics.com/phoenixpro/release/cpp/classctre_1_1phoenixpro_1_1hardware_1_1core_1_1_core_c_a_ncoder.html#a718a1a214b58d3c4543e88e3cb51ade5
  *
- * Phoenix Pro uses standard units and Voltage output. This means the output
+ * Phoenix 6 uses standard units and Voltage output. This means the output
  * is 1.0, time factor is 1.0, and closed loop operates at 1 millisecond. All
- * Pro devices make use of Kalman filters default-tuned to lowest latency, which
- * in testing is roughly 1 millisecond
+ * Phoenix 6 devices make use of Kalman filters default-tuned to lowest latency,
+ * which in testing is roughly 1 millisecond
  */
-constexpr FeedbackControllerPreset kCTREProDefault{1.0, 1.0, 1_ms, true, 1_ms};
+inline constexpr FeedbackControllerPreset kCTREv6{1.0, 1.0, 1_ms, true, 1_ms};
 
 /**
  * https://github.com/wpilibsuite/sysid/issues/258#issuecomment-1010658237
@@ -138,8 +136,8 @@ constexpr FeedbackControllerPreset kCTREProDefault{1.0, 1.0, 1_ms, true, 1_ms};
  *
  * Total delay = 8-tap moving average delay = (8 - 1) / 2 * 32 ms = 112 ms.
  */
-constexpr FeedbackControllerPreset kREVNEOBuiltIn{1.0 / 12.0, 60.0, 1_ms, false,
-                                                  112_ms};
+inline constexpr FeedbackControllerPreset kREVNEOBuiltIn{1.0 / 12.0, 60.0, 1_ms,
+                                                         false, 112_ms};
 
 /**
  * https://www.revrobotics.com/content/sw/max/sw-docs/cpp/classrev_1_1_c_a_n_encoder.html#a7e6ce792bc0c0558fb944771df572e6a
@@ -150,15 +148,15 @@ constexpr FeedbackControllerPreset kREVNEOBuiltIn{1.0 / 12.0, 60.0, 1_ms, false,
  *
  * Total delay = 50 ms + 31.5 ms = 81.5 ms.
  */
-constexpr FeedbackControllerPreset kREVNonNEO{1.0 / 12.0, 60.0, 1_ms, false,
-                                              81.5_ms};
+inline constexpr FeedbackControllerPreset kREVNonNEO{1.0 / 12.0, 60.0, 1_ms,
+                                                     false, 81.5_ms};
 
 /**
  * https://github.com/wpilibsuite/sysid/pull/138#issuecomment-841734229
  *
  * Backward finite difference delay = 10 ms / 2 = 5 ms.
  */
-constexpr FeedbackControllerPreset kVenom{4096.0 / 12.0, 60.0, 1_ms, false,
-                                          5_ms};
+inline constexpr FeedbackControllerPreset kVenom{4096.0 / 12.0, 60.0, 1_ms,
+                                                 false, 5_ms};
 }  // namespace presets
 }  // namespace sysid

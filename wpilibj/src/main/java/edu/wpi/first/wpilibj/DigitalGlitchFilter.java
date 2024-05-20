@@ -20,6 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   /** Configures the Digital Glitch Filter to its default settings. */
+  @SuppressWarnings("this-escape")
   public DigitalGlitchFilter() {
     m_mutex.lock();
     try {

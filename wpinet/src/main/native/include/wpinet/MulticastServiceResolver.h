@@ -21,15 +21,36 @@ class MulticastServiceResolver {
   explicit MulticastServiceResolver(std::string_view serviceType);
   ~MulticastServiceResolver() noexcept;
   struct ServiceData {
+    /// IPv4 address.
     unsigned int ipv4Address;
+    /// Port number.
     int port;
+    /// Service name.
     std::string serviceName;
+    /// Host name.
     std::string hostName;
+    /// Service data payload.
     std::vector<std::pair<std::string, std::string>> txt;
   };
+  /**
+   * Starts multicast service resolver.
+   */
   void Start();
+  /**
+   * Stops multicast service resolver.
+   */
   void Stop();
+  /**
+   * Returns event handle.
+   *
+   * @return Event handle.
+   */
   WPI_EventHandle GetEventHandle() const { return event.GetHandle(); }
+  /**
+   * Returns multicast service resolver data.
+   *
+   * @return Multicast service resolver data.
+   */
   std::vector<ServiceData> GetData() {
     std::scoped_lock lock{mutex};
     event.Reset();
@@ -40,6 +61,11 @@ class MulticastServiceResolver {
     queue.swap(ret);
     return ret;
   }
+  /**
+   * Returns true if there's a multicast service resolver implementation.
+   *
+   * @return True if there's a multicast service resolver implementation.
+   */
   bool HasImplementation() const;
   struct Impl;
 
@@ -55,6 +81,9 @@ class MulticastServiceResolver {
   std::unique_ptr<Impl> pImpl;
 };
 }  // namespace wpi
+#endif
+
+#ifdef __cplusplus
 extern "C" {
 #endif
 

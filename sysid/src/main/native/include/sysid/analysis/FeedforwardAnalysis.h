@@ -4,22 +4,50 @@
 
 #pragma once
 
+#include <string>
 #include <tuple>
 #include <vector>
 
 #include "sysid/analysis/AnalysisType.h"
+#include "sysid/analysis/OLS.h"
 #include "sysid/analysis/Storage.h"
 
 namespace sysid {
 
 /**
+ * Exception for data that doesn't sample enough of the state-input space.
+ */
+class InsufficientSamplesError : public std::exception {
+ public:
+  /**
+   * Constructs an InsufficientSamplesError.
+   *
+   * @param message The error message
+   */
+  explicit InsufficientSamplesError(std::string_view message) {
+    m_message = message;
+  }
+
+  const char* what() const noexcept override { return m_message.c_str(); }
+
+ private:
+  /**
+   * Stores the error message
+   */
+  std::string m_message;
+};
+
+/**
  * Calculates feedforward gains given the data and the type of analysis to
  * perform.
  *
- * @return Tuple containing the coefficients of the analysis along with the
- *         r-squared (coefficient of determination) and RMSE (standard deviation
- * of the residuals) of the fit.
+ * @param data The OLS input data.
+ * @param type The analysis type.
+ * @param throwOnRankDeficiency Whether to throw if the fit is going to be poor.
+ *   This option is provided for unit testing purposes.
  */
-std::tuple<std::vector<double>, double, double> CalculateFeedforwardGains(
-    const Storage& data, const AnalysisType& type);
+OLSResult CalculateFeedforwardGains(const Storage& data,
+                                    const AnalysisType& type,
+                                    bool throwOnRankDeficiency = true);
+
 }  // namespace sysid

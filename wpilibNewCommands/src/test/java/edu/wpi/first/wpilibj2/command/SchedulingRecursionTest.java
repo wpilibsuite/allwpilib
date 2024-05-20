@@ -288,7 +288,7 @@ class SchedulingRecursionTest extends CommandTestBase {
       scheduler.schedule(cCancelsD);
       scheduler.schedule(dCancelsAll);
 
-      assertDoesNotThrow(() -> scheduler.run());
+      assertDoesNotThrow(scheduler::run);
       assertEquals(4, counter.get());
       assertFalse(scheduler.isScheduled(aCancelsB));
       assertFalse(scheduler.isScheduled(bCancelsC));

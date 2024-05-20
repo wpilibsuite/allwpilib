@@ -5,7 +5,9 @@
 package edu.wpi.first.wpilibj.event;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ConcurrentModificationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
@@ -57,5 +59,34 @@ class EventLoopTest {
     loop.poll();
     // shouldn't change
     assertEquals(1, counter.get());
+  }
+
+  @Test
+  void testConcurrentModification() {
+    var loop = new EventLoop();
+
+    loop.bind(
+        () -> {
+          assertThrows(
+              ConcurrentModificationException.class,
+              () -> {
+                loop.bind(() -> {});
+              });
+        });
+
+    loop.poll();
+
+    loop.clear();
+
+    loop.bind(
+        () -> {
+          assertThrows(
+              ConcurrentModificationException.class,
+              () -> {
+                loop.clear();
+              });
+        });
+
+    loop.poll();
   }
 }

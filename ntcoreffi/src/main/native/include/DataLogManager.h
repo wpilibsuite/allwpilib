@@ -20,8 +20,8 @@ namespace wpi {
  * Centralized data log that provides automatic data log file management. It
  * automatically cleans up old files when disk space is low and renames the file
  * based either on current date/time or (if available) competition match number.
- * The deta file will be saved to a USB flash drive if one is attached, or to
- * /home/lvuser otherwise.
+ * The data file will be saved to a USB flash drive in a folder named "logs" if
+ * one is attached, or to /home/lvuser/logs otherwise.
  *
  * Log files are initially named "FRC_TBD_{random}.wpilog" until the DS
  * connects. After the DS connects, the log file is renamed to

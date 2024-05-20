@@ -10,8 +10,8 @@ import static org.junit.Assert.assertTrue;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class MotorInvertingTest extends AbstractComsSetup {
   @Parameters(name = "{index}: {0}")
   public static Collection<MotorEncoderFixture<?>[]> generateData() {
     // logger.fine("Loading the MotorList");
-    return Arrays.asList(
+    return List.of(
         new MotorEncoderFixture<?>[][] {
           {TestBench.getTalonPair()}, {TestBench.getVictorPair()}, {TestBench.getJaguarPair()}
         });

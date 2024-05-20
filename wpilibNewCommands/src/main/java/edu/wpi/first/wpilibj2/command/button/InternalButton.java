@@ -42,10 +42,20 @@ public class InternalButton extends Trigger {
     this.m_inverted = inverted;
   }
 
+  /**
+   * Sets whether to invert button state.
+   *
+   * @param inverted Whether button state should be inverted.
+   */
   public void setInverted(boolean inverted) {
     m_inverted.set(inverted);
   }
 
+  /**
+   * Sets whether button is pressed.
+   *
+   * @param pressed Whether button is pressed.
+   */
   public void setPressed(boolean pressed) {
     m_pressed.set(pressed);
   }

@@ -144,8 +144,12 @@ unsigned int GetEntryFlags(NT_Entry entry) {
 }
 
 std::vector<Value> ReadQueueValue(NT_Handle subentry) {
+  return ReadQueueValue(subentry, 0);
+}
+
+std::vector<Value> ReadQueueValue(NT_Handle subentry, unsigned int types) {
   if (auto ii = InstanceImpl::GetHandle(subentry)) {
-    return ii->localStorage.ReadQueueValue(subentry);
+    return ii->localStorage.ReadQueueValue(subentry, types);
   } else {
     return {};
   }
@@ -258,6 +262,22 @@ void SetTopicRetained(NT_Topic topic, bool value) {
 bool GetTopicRetained(NT_Topic topic) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.GetTopicRetained(topic);
+  } else {
+    return {};
+  }
+}
+
+void SetTopicCached(NT_Topic topic, bool value) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    ii->localStorage.SetTopicCached(topic, value);
+  } else {
+    return;
+  }
+}
+
+bool GetTopicCached(NT_Topic topic) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetTopicCached(topic);
   } else {
     return {};
   }
@@ -610,7 +630,7 @@ void StopLocal(NT_Inst inst) {
 }
 
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 const char* listen_address, unsigned int port3,
+                 std::string_view listen_address, unsigned int port3,
                  unsigned int port4) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     ii->StartServer(persist_filename, listen_address, port3, port4);
@@ -641,7 +661,7 @@ void StopClient(NT_Inst inst) {
   }
 }
 
-void SetServer(NT_Inst inst, const char* server_name, unsigned int port) {
+void SetServer(NT_Inst inst, std::string_view server_name, unsigned int port) {
   SetServer(inst, {{{server_name, port}}});
 }
 

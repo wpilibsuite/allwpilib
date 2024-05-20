@@ -83,5 +83,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::SimpleMotorFeedforward<units::meters> m_feedforward;
 
   // The robot's drive
-  frc::DifferentialDrive m_drive{m_leftLeader, m_rightLeader};
+  frc::DifferentialDrive m_drive{
+      [&](double output) { m_leftLeader.Set(output); },
+      [&](double output) { m_rightLeader.Set(output); }};
 };

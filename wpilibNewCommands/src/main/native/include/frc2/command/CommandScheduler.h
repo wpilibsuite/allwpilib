@@ -334,6 +334,11 @@ class CommandScheduler final : public wpi::Sendable,
   void Enable();
 
   /**
+   * Prints list of epochs added so far and their times.
+   */
+  void PrintWatchdogEpochs();
+
+  /**
    * Adds an action to perform on the initialization of any command by the
    * scheduler.
    *
@@ -374,7 +379,7 @@ class CommandScheduler final : public wpi::Sendable,
   void OnCommandFinish(Action action);
 
   /**
-   * Requires that the specified command hasn't been already added to a
+   * Requires that the specified command hasn't already been added to a
    * composition.
    *
    * @param command The command to check
@@ -383,7 +388,7 @@ class CommandScheduler final : public wpi::Sendable,
   void RequireUngrouped(const Command* command);
 
   /**
-   * Requires that the specified commands not have been already added to a
+   * Requires that the specified commands have not already been added to a
    * composition.
    *
    * @param commands The commands to check
@@ -392,7 +397,7 @@ class CommandScheduler final : public wpi::Sendable,
   void RequireUngrouped(std::span<const std::unique_ptr<Command>> commands);
 
   /**
-   * Requires that the specified commands not have been already added to a
+   * Requires that the specified commands have not already been added to a
    * composition.
    *
    * @param commands The commands to check
@@ -400,6 +405,38 @@ class CommandScheduler final : public wpi::Sendable,
    * composed.
    */
   void RequireUngrouped(std::initializer_list<const Command*> commands);
+
+  /**
+   * Requires that the specified command has not already been added to a
+   * composition and is not currently scheduled.
+   *
+   * @param command The command to check
+   * @throws IllegalArgumentException if the given command has already been
+   * composed or scheduled.
+   */
+  void RequireUngroupedAndUnscheduled(const Command* command);
+
+  /**
+   * Requires that the specified commands have not already been added to a
+   * composition and are not currently scheduled.
+   *
+   * @param commands The commands to check
+   * @throws IllegalArgumentException if the given commands have already been
+   * composed.
+   */
+  void RequireUngroupedAndUnscheduled(
+      std::span<const std::unique_ptr<Command>> commands);
+
+  /**
+   * Requires that the specified commands have not already been added to a
+   * composition and are not currently scheduled.
+   *
+   * @param commands The commands to check
+   * @throws IllegalArgumentException if the given commands have already been
+   * composed or scheduled.
+   */
+  void RequireUngroupedAndUnscheduled(
+      std::initializer_list<const Command*> commands);
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 

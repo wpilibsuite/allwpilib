@@ -62,7 +62,7 @@ Command::InterruptionBehavior ParallelDeadlineGroup::GetInterruptionBehavior()
 
 void ParallelDeadlineGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
-  CommandScheduler::GetInstance().RequireUngrouped(commands);
+  CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(commands);
 
   if (!m_finished) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,

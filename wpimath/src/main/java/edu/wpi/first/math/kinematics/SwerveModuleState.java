@@ -7,18 +7,29 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.proto.SwerveModuleStateProto;
+import edu.wpi.first.math.kinematics.struct.SwerveModuleStateStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents the state of one swerve module. */
-public class SwerveModuleState implements Comparable<SwerveModuleState> {
+public class SwerveModuleState
+    implements Comparable<SwerveModuleState>, ProtobufSerializable, StructSerializable {
   /** Speed of the wheel of the module. */
   public double speedMetersPerSecond;
 
   /** Angle of the module. */
-  public Rotation2d angle = Rotation2d.fromDegrees(0);
+  public Rotation2d angle = Rotation2d.kZero;
+
+  /** SwerveModuleState protobuf for serialization. */
+  public static final SwerveModuleStateProto proto = new SwerveModuleStateProto();
+
+  /** SwerveModuleState struct for serialization. */
+  public static final SwerveModuleStateStruct struct = new SwerveModuleStateStruct();
 
   /** Constructs a SwerveModuleState with zeros for speed and angle. */
   public SwerveModuleState() {}
@@ -91,8 +102,7 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
     var delta = desiredState.angle.minus(currentAngle);
     if (Math.abs(delta.getDegrees()) > 90.0) {
       return new SwerveModuleState(
-          -desiredState.speedMetersPerSecond,
-          desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
+          -desiredState.speedMetersPerSecond, desiredState.angle.rotateBy(Rotation2d.kPi));
     } else {
       return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
     }

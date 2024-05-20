@@ -5,8 +5,6 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Rotation3d.h"
 #include "units/angle.h"
@@ -80,34 +78,5 @@ struct WPILIB_DLLEXPORT Twist3d {
 };
 }  // namespace frc
 
-template <>
-struct wpi::Struct<frc::Twist3d> {
-  static constexpr std::string_view kTypeString = "struct:Twist3d";
-  static constexpr size_t kSize = 48;
-  static constexpr std::string_view kSchema =
-      "double dx;double dy;double dz;double rx;double ry;double rz";
-  static frc::Twist3d Unpack(std::span<const uint8_t, 48> data) {
-    return {units::meter_t{wpi::UnpackStruct<double, 0>(data)},
-            units::meter_t{wpi::UnpackStruct<double, 8>(data)},
-            units::meter_t{wpi::UnpackStruct<double, 16>(data)},
-            units::radian_t{wpi::UnpackStruct<double, 24>(data)},
-            units::radian_t{wpi::UnpackStruct<double, 32>(data)},
-            units::radian_t{wpi::UnpackStruct<double, 40>(data)}};
-  }
-  static void Pack(std::span<uint8_t, 48> data, const frc::Twist3d& value) {
-    wpi::PackStruct<0>(data, value.dx.value());
-    wpi::PackStruct<8>(data, value.dy.value());
-    wpi::PackStruct<16>(data, value.dz.value());
-    wpi::PackStruct<24>(data, value.rx.value());
-    wpi::PackStruct<32>(data, value.ry.value());
-    wpi::PackStruct<40>(data, value.rz.value());
-  }
-};
-
-template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Twist3d> {
-  static constexpr std::string_view kTypeString = "proto:Twist3d";
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Twist3d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg, const frc::Twist3d& value);
-};
+#include "frc/geometry/proto/Twist3dProto.h"
+#include "frc/geometry/struct/Twist3dStruct.h"

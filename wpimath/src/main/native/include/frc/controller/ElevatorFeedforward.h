@@ -12,6 +12,7 @@
 #include "units/length.h"
 #include "units/time.h"
 #include "units/voltage.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 /**
@@ -29,8 +30,6 @@ class ElevatorFeedforward {
   using ka_unit =
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
-  ElevatorFeedforward() = default;
-
   /**
    * Creates a new ElevatorFeedforward with the specified gains.
    *
@@ -42,7 +41,20 @@ class ElevatorFeedforward {
   constexpr ElevatorFeedforward(
       units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : kS(kS), kG(kG), kV(kV), kA(kA) {}
+      : kS(kS), kG(kG), kV(kV), kA(kA) {
+    if (kV.value() < 0) {
+      wpi::math::MathSharedStore::ReportError(
+          "kV must be a non-negative number, got {}!", kV.value());
+      kV = units::unit_t<kv_unit>{0};
+      wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
+    }
+    if (kA.value() < 0) {
+      wpi::math::MathSharedStore::ReportError(
+          "kA must be a non-negative number, got {}!", kA.value());
+      kA = units::unit_t<ka_unit>{0};
+      wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
+    }
+  }
 
   /**
    * Calculates the feedforward from the gains and setpoints.
@@ -170,9 +182,19 @@ class ElevatorFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 
-  units::volt_t kS{0};
-  units::volt_t kG{0};
-  units::unit_t<kv_unit> kV{0};
-  units::unit_t<ka_unit> kA{0};
+  /// The static gain.
+  const units::volt_t kS;
+
+  /// The gravity gain.
+  const units::volt_t kG;
+
+  /// The velocity gain.
+  const units::unit_t<kv_unit> kV;
+
+  /// The acceleration gain.
+  const units::unit_t<ka_unit> kA;
 };
 }  // namespace frc
+
+#include "frc/controller/proto/ElevatorFeedforwardProto.h"
+#include "frc/controller/struct/ElevatorFeedforwardStruct.h"

@@ -7,3 +7,6 @@ find_dependency(OpenCV)
 
 @FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/cameraserver.cmake)
+if(@WITH_JAVA@)
+    include(${SELF_DIR}/cameraserver_jar.cmake)
+endif()

@@ -144,11 +144,7 @@ class TimedRobotTest {
   void disabledModeTest() {
     MockRobot robot = new MockRobot();
 
-    Thread robotThread =
-        new Thread(
-            () -> {
-              robot.startCompetition();
-            });
+    Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
     DriverStationSim.setEnabled(false);
@@ -231,11 +227,7 @@ class TimedRobotTest {
   void autonomousModeTest() {
     MockRobot robot = new MockRobot();
 
-    Thread robotThread =
-        new Thread(
-            () -> {
-              robot.startCompetition();
-            });
+    Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
     DriverStationSim.setEnabled(true);
@@ -320,11 +312,7 @@ class TimedRobotTest {
   void teleopModeTest() {
     MockRobot robot = new MockRobot();
 
-    Thread robotThread =
-        new Thread(
-            () -> {
-              robot.startCompetition();
-            });
+    Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
     DriverStationSim.setEnabled(true);
@@ -411,11 +399,7 @@ class TimedRobotTest {
     MockRobot robot = new MockRobot();
     robot.enableLiveWindowInTest(isLW);
 
-    Thread robotThread =
-        new Thread(
-            () -> {
-              robot.startCompetition();
-            });
+    Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
     DriverStationSim.setEnabled(true);
@@ -531,11 +515,7 @@ class TimedRobotTest {
   void modeChangeTest() {
     MockRobot robot = new MockRobot();
 
-    Thread robotThread =
-        new Thread(
-            () -> {
-              robot.startCompetition();
-            });
+    Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
     // Start in disabled
@@ -655,17 +635,9 @@ class TimedRobotTest {
     MockRobot robot = new MockRobot();
 
     final AtomicInteger callbackCount = new AtomicInteger(0);
-    robot.addPeriodic(
-        () -> {
-          callbackCount.addAndGet(1);
-        },
-        kPeriod / 2.0);
+    robot.addPeriodic(() -> callbackCount.addAndGet(1), kPeriod / 2.0);
 
-    Thread robotThread =
-        new Thread(
-            () -> {
-              robot.startCompetition();
-            });
+    Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
     DriverStationSim.setEnabled(false);
@@ -704,12 +676,7 @@ class TimedRobotTest {
     MockRobot robot = new MockRobot();
 
     final AtomicInteger callbackCount = new AtomicInteger(0);
-    robot.addPeriodic(
-        () -> {
-          callbackCount.addAndGet(1);
-        },
-        kPeriod / 2.0,
-        kPeriod / 4.0);
+    robot.addPeriodic(() -> callbackCount.addAndGet(1), kPeriod / 2.0, kPeriod / 4.0);
 
     // Expirations in this test (ms)
     //
@@ -720,11 +687,7 @@ class TimedRobotTest {
     //     p |    0.75p
     //    2p |    1.25p
 
-    Thread robotThread =
-        new Thread(
-            () -> {
-              robot.startCompetition();
-            });
+    Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
     DriverStationSim.setEnabled(false);

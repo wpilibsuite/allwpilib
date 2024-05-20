@@ -42,8 +42,7 @@ class DARETest extends UtilityClassTest<DARE> {
                     .times((B.transpose().times(X).times(B).plus(R)).inv())
                     .times(B.transpose().times(X).times(A)))
             .plus(Q);
-    assertMatrixEqual(
-        new Matrix<States, States>(new SimpleMatrix(Y.getNumRows(), Y.getNumCols())), Y);
+    assertMatrixEqual(new Matrix<>(new SimpleMatrix(Y.getNumRows(), Y.getNumCols())), Y);
   }
 
   <States extends Num, Inputs extends Num> void assertDARESolution(
@@ -63,8 +62,7 @@ class DARETest extends UtilityClassTest<DARE> {
                     .times((B.transpose().times(X).times(B).plus(R)).inv())
                     .times(B.transpose().times(X).times(A).plus(N.transpose())))
             .plus(Q);
-    assertMatrixEqual(
-        new Matrix<States, States>(new SimpleMatrix(Y.getNumRows(), Y.getNumCols())), Y);
+    assertMatrixEqual(new Matrix<>(new SimpleMatrix(Y.getNumRows(), Y.getNumCols())), Y);
   }
 
   @Test

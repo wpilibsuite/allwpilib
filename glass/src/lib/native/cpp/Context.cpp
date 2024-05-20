@@ -178,8 +178,6 @@ static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
 
 static bool LoadStorageImpl(Context* ctx, std::string_view dir,
                             std::string_view name) {
-  WorkspaceResetImpl();
-
   bool rv = true;
   for (auto&& root : ctx->storageRoots) {
     std::string filename;
@@ -421,6 +419,7 @@ std::string glass::GetStorageDir() {
 bool glass::LoadStorage(std::string_view dir) {
   SaveStorage();
   SetStorageDir(dir);
+  WorkspaceResetImpl();
   LoadWindowStorageImpl((fs::path{gContext->storageLoadDir} /
                          fmt::format("{}-window.json", gContext->storageName))
                             .string());

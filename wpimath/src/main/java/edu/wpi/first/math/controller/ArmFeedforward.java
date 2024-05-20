@@ -4,15 +4,34 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.WPIMathJNI;
+import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
+import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
+
 /**
  * A helper class that computes feedforward outputs for a simple arm (modeled as a motor acting
  * against the force of gravity on a beam suspended at an angle).
  */
-public class ArmFeedforward {
+public class ArmFeedforward implements ProtobufSerializable, StructSerializable {
+  /** The static gain, in volts. */
   public final double ks;
+
+  /** The gravity gain, in volts. */
   public final double kg;
+
+  /** The velocity gain, in volt seconds per radian. */
   public final double kv;
+
+  /** The acceleration gain, in volt seconds² per radian. */
   public final double ka;
+
+  /** Arm feedforward protobuf for serialization. */
+  public static final ArmFeedforwardProto proto = new ArmFeedforwardProto();
+
+  /** Arm feedforward struct for serialization. */
+  public static final ArmFeedforwardStruct struct = new ArmFeedforwardStruct();
 
   /**
    * Creates a new ArmFeedforward with the specified gains. Units of the gain values will dictate
@@ -22,12 +41,20 @@ public class ArmFeedforward {
    * @param kg The gravity gain.
    * @param kv The velocity gain.
    * @param ka The acceleration gain.
+   * @throws IllegalArgumentException for kv &lt; zero.
+   * @throws IllegalArgumentException for ka &lt; zero.
    */
   public ArmFeedforward(double ks, double kg, double kv, double ka) {
     this.ks = ks;
     this.kg = kg;
     this.kv = kv;
     this.ka = ka;
+    if (kv < 0.0) {
+      throw new IllegalArgumentException("kv must be a non-negative number, got " + kv + "!");
+    }
+    if (ka < 0.0) {
+      throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
+    }
   }
 
   /**
@@ -72,6 +99,22 @@ public class ArmFeedforward {
    */
   public double calculate(double positionRadians, double velocity) {
     return calculate(positionRadians, velocity, 0);
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param currentAngle The current angle in radians. This angle should be measured from the
+   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel to the floor). If
+   *     your encoder does not follow this convention, an offset should be added.
+   * @param currentVelocity The current velocity setpoint in radians per second.
+   * @param nextVelocity The next velocity setpoint in radians per second.
+   * @param dt Time between velocity setpoints in seconds.
+   * @return The computed feedforward in volts.
+   */
+  public double calculate(
+      double currentAngle, double currentVelocity, double nextVelocity, double dt) {
+    return WPIMathJNI.calculate(ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, dt);
   }
 
   // Rearranging the main equation from the calculate() method yields the

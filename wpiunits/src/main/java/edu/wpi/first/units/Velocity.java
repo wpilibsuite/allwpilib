@@ -7,6 +7,19 @@ package edu.wpi.first.units;
 import edu.wpi.first.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 
+/**
+ * Unit of velocity dimension that is a combination of a distance unit (numerator) and a time unit
+ * (denominator).
+ *
+ * <p>This is the base type for units of velocity dimension. It is also used in combination with a
+ * distance dimension to specify the dimension for {@link Measure}. For example: <code>
+ * Measure&lt;Velocity&lt;Distance&gt;&gt;</code>.
+ *
+ * <p>Actual units (such as {@link Units#MetersPerSecond} and {@link Units#RPM}) can be found in the
+ * {@link Units} class.
+ *
+ * @param <D> the distance unit, such as {@link Angle} or {@link Distance}
+ */
 public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
   private final D m_unit;
   private final Time m_period;
@@ -20,7 +33,7 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
 
   /** Generates a cache key used for cache lookups. */
   private static long cacheKey(Unit<?> numerator, Unit<?> denominator) {
-    return ((long) numerator.hashCode()) << 32L | ((long) denominator.hashCode()) & 0xFFFFFFFFL;
+    return ((long) numerator.hashCode()) << 32L | (((long) denominator.hashCode()) & 0xFFFFFFFFL);
   }
 
   /**
@@ -103,17 +116,27 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   Velocity(D unit, Time period, String name, String symbol) {
-    super((Class) Velocity.class, unit.toBaseUnits(1) / period.toBaseUnits(1), name, symbol);
+    super(
+        unit.isBaseUnit() && period.isBaseUnit()
+            ? null
+            : combine(unit.getBaseUnit(), period.getBaseUnit()),
+        unit.toBaseUnits(1) / period.toBaseUnits(1),
+        name,
+        symbol);
     this.m_unit = unit;
     this.m_period = period;
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   Velocity(
-      UnaryFunction toBaseConverter, UnaryFunction fromBaseConverter, String name, String symbol) {
-    super((Class) Velocity.class, toBaseConverter, fromBaseConverter, name, symbol);
-    this.m_unit = Units.anonymous();
-    this.m_period = Units.Seconds;
+      Velocity<D> baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+    this.m_unit = baseUnit.getUnit();
+    this.m_period = baseUnit.getPeriod();
   }
 
   /**
@@ -132,6 +155,15 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    */
   public Time getPeriod() {
     return m_period;
+  }
+
+  /**
+   * Returns the reciprocal of this velocity.
+   *
+   * @return the reciprocal
+   */
+  public Per<Time, D> reciprocal() {
+    return m_period.per(m_unit);
   }
 
   @Override

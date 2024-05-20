@@ -8,6 +8,7 @@
 
 #include <hal/CAN.h>
 #include <hal/HALBase.h>
+#include <hal/LEDs.h>
 #include <hal/Power.h>
 
 #include "frc/Errors.h"
@@ -29,16 +30,19 @@ int64_t RobotController::GetFPGARevision() {
 }
 
 std::string RobotController::GetSerialNumber() {
-  // Serial number is 8 characters
-  char serialNum[9];
-  size_t len = HAL_GetSerialNumber(serialNum, sizeof(serialNum));
-  return std::string(serialNum, len);
+  WPI_String serialNum;
+  HAL_GetSerialNumber(&serialNum);
+  std::string ret{wpi::to_string_view(&serialNum)};
+  WPI_FreeString(&serialNum);
+  return ret;
 }
 
 std::string RobotController::GetComments() {
-  char comments[65];
-  size_t len = HAL_GetComments(comments, sizeof(comments));
-  return std::string(comments, len);
+  WPI_String comments;
+  HAL_GetComments(&comments);
+  std::string ret{wpi::to_string_view(&comments)};
+  WPI_FreeString(&comments);
+  return ret;
 }
 
 int32_t RobotController::GetTeamNumber() {
@@ -228,6 +232,30 @@ units::celsius_t RobotController::GetCPUTemp() {
   double retVal = HAL_GetCPUTemp(&status);
   FRC_CheckErrorStatus(status, "GetCPUTemp");
   return units::celsius_t{retVal};
+}
+
+static_assert(RadioLEDState::kOff ==
+              static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kOff));
+static_assert(
+    RadioLEDState::kGreen ==
+    static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kGreen));
+static_assert(RadioLEDState::kRed ==
+              static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kRed));
+static_assert(
+    RadioLEDState::kOrange ==
+    static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kOrange));
+
+void RobotController::SetRadioLEDState(RadioLEDState state) {
+  int32_t status = 0;
+  HAL_SetRadioLEDState(static_cast<HAL_RadioLEDState>(state), &status);
+  FRC_CheckErrorStatus(status, "SetRadioLEDState");
+}
+
+RadioLEDState RobotController::GetRadioLEDState() {
+  int32_t status = 0;
+  auto retVal = static_cast<RadioLEDState>(HAL_GetRadioLEDState(&status));
+  FRC_CheckErrorStatus(status, "GetRadioLEDState");
+  return retVal;
 }
 
 CANStatus RobotController::GetCANStatus() {

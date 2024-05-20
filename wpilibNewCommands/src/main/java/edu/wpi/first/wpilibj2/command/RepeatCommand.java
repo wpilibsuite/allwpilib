@@ -20,7 +20,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class RepeatCommand extends Command {
-  protected final Command m_command;
+  private final Command m_command;
   private boolean m_ended;
 
   /**
@@ -29,6 +29,7 @@ public class RepeatCommand extends Command {
    *
    * @param command the command to run repeatedly
    */
+  @SuppressWarnings("this-escape")
   public RepeatCommand(Command command) {
     m_command = requireNonNullParam(command, "command", "RepeatCommand");
     CommandScheduler.getInstance().registerComposedCommands(command);

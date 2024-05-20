@@ -16,11 +16,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/** Loads dynamic libraries for all platforms. */
 public final class CombinedRuntimeLoader {
   private CombinedRuntimeLoader() {}
 
   private static String extractionDirectory;
 
+  /**
+   * Returns library extraction directory.
+   *
+   * @return Library extraction directory.
+   */
   public static synchronized String getExtractionDirectory() {
     return extractionDirectory;
   }
@@ -29,6 +35,12 @@ public final class CombinedRuntimeLoader {
     extractionDirectory = directory;
   }
 
+  /**
+   * Sets DLL directory.
+   *
+   * @param directory Directory.
+   * @return DLL directory.
+   */
   public static native String setDllDirectory(String directory);
 
   private static String getLoadErrorMessage(String libraryName, UnsatisfiedLinkError ule) {
@@ -59,8 +71,7 @@ public final class CombinedRuntimeLoader {
   @SuppressWarnings("unchecked")
   public static <T> List<String> extractLibraries(Class<T> clazz, String resourceName)
       throws IOException {
-    TypeReference<HashMap<String, Object>> typeRef =
-        new TypeReference<HashMap<String, Object>>() {};
+    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() {};
     ObjectMapper mapper = new ObjectMapper();
     Map<String, Object> map;
     try (var stream = clazz.getResourceAsStream(resourceName)) {

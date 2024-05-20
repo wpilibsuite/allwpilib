@@ -7,6 +7,9 @@ package edu.wpi.first.cscore.raw;
 import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.cscore.ImageSource;
 import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.util.PixelFormat;
+import edu.wpi.first.util.RawFrame;
+import java.nio.ByteBuffer;
 
 /**
  * A source for user code to provide video frames as raw bytes.
@@ -23,7 +26,7 @@ public class RawSource extends ImageSource {
   public RawSource(String name, VideoMode mode) {
     super(
         CameraServerJNI.createRawSource(
-            name, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
+            name, false, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
   }
 
   /**
@@ -35,8 +38,8 @@ public class RawSource extends ImageSource {
    * @param height height
    * @param fps fps
    */
-  public RawSource(String name, VideoMode.PixelFormat pixelFormat, int width, int height, int fps) {
-    super(CameraServerJNI.createRawSource(name, pixelFormat.getValue(), width, height, fps));
+  public RawSource(String name, PixelFormat pixelFormat, int width, int height, int fps) {
+    super(CameraServerJNI.createRawSource(name, false, pixelFormat.getValue(), width, height, fps));
   }
 
   /**
@@ -44,35 +47,41 @@ public class RawSource extends ImageSource {
    *
    * @param image raw frame image
    */
-  protected void putFrame(RawFrame image) {
-    CameraServerJNI.putRawSourceFrame(m_handle, image);
+  public void putFrame(RawFrame image) {
+    CameraServerJNI.putRawSourceFrame(m_handle, image.getNativeObj());
   }
 
   /**
    * Put a raw image and notify sinks.
    *
-   * @param data raw frame data pointer
+   * @param data raw frame native data pointer
+   * @param size total size in bytes
    * @param width frame width
    * @param height frame height
+   * @param stride size of each row in bytes
    * @param pixelFormat pixel format
-   * @param totalData length of data in total
-   */
-  protected void putFrame(long data, int width, int height, int pixelFormat, int totalData) {
-    CameraServerJNI.putRawSourceFrame(m_handle, data, width, height, pixelFormat, totalData);
-  }
-
-  /**
-   * Put a raw image and notify sinks.
-   *
-   * @param data raw frame data pointer
-   * @param width frame width
-   * @param height frame height
-   * @param pixelFormat pixel format
-   * @param totalData length of data in total
    */
   protected void putFrame(
-      long data, int width, int height, VideoMode.PixelFormat pixelFormat, int totalData) {
-    CameraServerJNI.putRawSourceFrame(
-        m_handle, data, width, height, pixelFormat.getValue(), totalData);
+      long data, int size, int width, int height, int stride, PixelFormat pixelFormat) {
+    CameraServerJNI.putRawSourceFrameData(
+        m_handle, data, size, width, height, stride, pixelFormat.getValue());
+  }
+
+  /**
+   * Put a raw image and notify sinks.
+   *
+   * @param data raw frame native ByteBuffer
+   * @param width frame width
+   * @param height frame height
+   * @param stride size of each row in bytes
+   * @param pixelFormat pixel format
+   */
+  public void putFrame(
+      ByteBuffer data, int width, int height, int stride, PixelFormat pixelFormat) {
+    if (!data.isDirect()) {
+      throw new UnsupportedOperationException("ByteBuffer must be direct");
+    }
+    CameraServerJNI.putRawSourceFrameBB(
+        m_handle, data, data.limit(), width, height, stride, pixelFormat.getValue());
   }
 }

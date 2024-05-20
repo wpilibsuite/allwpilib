@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -72,13 +72,13 @@ public class PIDTest extends AbstractComsSetup {
   @Parameters
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
-    Collection<Object[]> data = new ArrayList<Object[]>();
+    Collection<Object[]> data = new ArrayList<>();
     double kp = 0.001;
     double ki = 0.0005;
     double kd = 0.0;
     for (int i = 0; i < 1; i++) {
       data.addAll(
-          Arrays.asList(
+          List.of(
               new Object[][] {
                 {kp, ki, kd, TestBench.getTalonPair()},
                 {kp, ki, kd, TestBench.getVictorPair()},

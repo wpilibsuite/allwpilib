@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.hal.LEDJNI;
 import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
@@ -33,7 +34,7 @@ public final class RobotController {
    * @return FPGA Revision number.
    */
   public static long getFPGARevision() {
-    return (long) HALUtil.getFPGARevision();
+    return HALUtil.getFPGARevision();
   }
 
   /**
@@ -77,6 +78,10 @@ public final class RobotController {
 
   /**
    * Get the state of the "USER" button on the roboRIO.
+   *
+   * <p>Warning: the User Button is used to stop user programs from automatically loading if it is
+   * held for more then 5 seconds. Because of this, it's not recommended to be used by teams for any
+   * other purpose.
    *
    * @return true if the button is currently pressed down
    */
@@ -313,6 +318,66 @@ public final class RobotController {
    */
   public static double getCPUTemp() {
     return PowerJNI.getCPUTemp();
+  }
+
+  /** State for the radio led. */
+  public enum RadioLEDState {
+    /** Off. */
+    kOff(LEDJNI.RADIO_LED_STATE_OFF),
+    /** Green. */
+    kGreen(LEDJNI.RADIO_LED_STATE_GREEN),
+    /** Red. */
+    kRed(LEDJNI.RADIO_LED_STATE_RED),
+    /** Orange. */
+    kOrange(LEDJNI.RADIO_LED_STATE_ORANGE);
+
+    /** The native value for this state. */
+    public final int value;
+
+    RadioLEDState(int value) {
+      this.value = value;
+    }
+
+    /**
+     * Gets a state from an int value.
+     *
+     * @param value int value
+     * @return state
+     */
+    public static RadioLEDState fromValue(int value) {
+      switch (value) {
+        case LEDJNI.RADIO_LED_STATE_OFF:
+          return RadioLEDState.kOff;
+        case LEDJNI.RADIO_LED_STATE_GREEN:
+          return RadioLEDState.kGreen;
+        case LEDJNI.RADIO_LED_STATE_RED:
+          return RadioLEDState.kRed;
+        case LEDJNI.RADIO_LED_STATE_ORANGE:
+          return RadioLEDState.kOrange;
+        default:
+          return RadioLEDState.kOff;
+      }
+    }
+  }
+
+  /**
+   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so this function should
+   * not be called multiple times per loop cycle to avoid overruns.
+   *
+   * @param state The state to set the LED to.
+   */
+  public static void setRadioLEDState(RadioLEDState state) {
+    LEDJNI.setRadioLEDState(state.value);
+  }
+
+  /**
+   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so this function
+   * should not be called multiple times per loop cycle to avoid overruns.
+   *
+   * @return The state of the LED.
+   */
+  public static RadioLEDState getRadioLEDState() {
+    return RadioLEDState.fromValue(LEDJNI.getRadioLEDState());
   }
 
   /**

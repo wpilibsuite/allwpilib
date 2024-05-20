@@ -31,10 +31,9 @@ class RungeKuttaTimeVaryingTest {
 
     final var y1 =
         RungeKuttaTimeVarying.rungeKuttaTimeVarying(
-            (Double t, Matrix<N1, N1> x) -> {
-              return MatBuilder.fill(
-                  Nat.N1(), Nat.N1(), x.get(0, 0) * (2.0 / (Math.exp(t) + 1.0) - 1.0));
-            },
+            (Double t, Matrix<N1, N1> x) ->
+                MatBuilder.fill(
+                    Nat.N1(), Nat.N1(), x.get(0, 0) * (2.0 / (Math.exp(t) + 1.0) - 1.0)),
             5.0,
             y0,
             1.0);

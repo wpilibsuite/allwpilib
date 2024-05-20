@@ -118,6 +118,25 @@ public class Topic {
   }
 
   /**
+   * Allow storage of the topic's last value, allowing the value to be read (and not just accessed
+   * through event queues and listeners).
+   *
+   * @param cached True for cached, false for not cached.
+   */
+  public void setCached(boolean cached) {
+    NetworkTablesJNI.setTopicCached(m_handle, cached);
+  }
+
+  /**
+   * Returns whether the topic's last value is stored.
+   *
+   * @return True if the topic is cached.
+   */
+  public boolean isCached() {
+    return NetworkTablesJNI.getTopicCached(m_handle);
+  }
+
+  /**
    * Determines if the topic is currently being published.
    *
    * @return True if the topic exists, false otherwise.
@@ -317,6 +336,9 @@ public class Topic {
     return m_handle;
   }
 
+  /** NetworkTables instance. */
   protected NetworkTableInstance m_inst;
+
+  /** NetworkTables handle. */
   protected int m_handle;
 }

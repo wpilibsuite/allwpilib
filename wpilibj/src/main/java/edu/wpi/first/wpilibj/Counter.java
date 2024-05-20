@@ -38,6 +38,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
     /** mode: external direction. */
     kExternalDirection(3);
 
+    /** Mode value. */
     public final int value;
 
     Mode(int value) {
@@ -45,19 +46,30 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
     }
   }
 
-  protected DigitalSource m_upSource; // /< What makes the counter count up.
-  protected DigitalSource m_downSource; // /< What makes the counter count down.
+  /** What makes the counter count up. */
+  protected DigitalSource m_upSource;
+
+  /** What makes the counter count down. */
+  protected DigitalSource m_downSource;
+
   private boolean m_allocatedUpSource;
   private boolean m_allocatedDownSource;
-  int m_counter; // /< The FPGA counter object.
-  private int m_index; // /< The index of this counter.
-  private double m_distancePerPulse = 1; // distance of travel for each tick
+
+  /** The FPGA counter object. */
+  int m_counter;
+
+  /** The index of this counter. */
+  private int m_index;
+
+  /** Distance of travel for each tick. */
+  private double m_distancePerPulse = 1;
 
   /**
    * Create an instance of a counter with the given mode.
    *
    * @param mode The counter mode.
    */
+  @SuppressWarnings("this-escape")
   public Counter(final Mode mode) {
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order
@@ -95,6 +107,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @param source the digital source to count
    */
+  @SuppressWarnings("this-escape")
   public Counter(DigitalSource source) {
     this();
 
@@ -109,6 +122,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @param channel the DIO channel to use as the up source. 0-9 are on-board, 10-25 are on the MXP
    */
+  @SuppressWarnings("this-escape")
   public Counter(int channel) {
     this();
     setUpSource(channel);
@@ -125,6 +139,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    * @param downSource second source for direction
    * @param inverted true to invert the count
    */
+  @SuppressWarnings("this-escape")
   public Counter(
       EncodingType encodingType,
       DigitalSource upSource,
@@ -162,6 +177,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @param trigger the analog trigger to count
    */
+  @SuppressWarnings("this-escape")
   public Counter(AnalogTrigger trigger) {
     this();
 
@@ -200,7 +216,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @param channel the DIO channel to count 0-9 are on-board, 10-25 are on the MXP
    */
-  public void setUpSource(int channel) {
+  public final void setUpSource(int channel) {
     setUpSource(new DigitalInput(channel));
     m_allocatedUpSource = true;
     SendableRegistry.addChild(this, m_upSource);
@@ -401,7 +417,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    * @param maxPeriod The maximum period where the counted device is considered moving in seconds.
    */
   @Override
-  public void setMaxPeriod(double maxPeriod) {
+  public final void setMaxPeriod(double maxPeriod) {
     CounterJNI.setCounterMaxPeriod(m_counter, maxPeriod);
   }
 

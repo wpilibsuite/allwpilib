@@ -49,12 +49,12 @@ class ProfiledPIDController
    * Kd. Users should call reset() when they first start running the controller
    * to avoid unwanted behavior.
    *
-   * @param Kp          The proportional coefficient.
-   * @param Ki          The integral coefficient.
-   * @param Kd          The derivative coefficient.
+   * @param Kp          The proportional coefficient. Must be >= 0.
+   * @param Ki          The integral coefficient. Must be >= 0.
+   * @param Kd          The derivative coefficient. Must be >= 0.
    * @param constraints Velocity and acceleration constraints for goal.
    * @param period      The period between controller updates in seconds. The
-   *                    default is 20 milliseconds.
+   *                    default is 20 milliseconds. Must be positive.
    */
   ProfiledPIDController(double Kp, double Ki, double Kd,
                         Constraints constraints, units::second_t period = 20_ms)
@@ -79,9 +79,9 @@ class ProfiledPIDController
    *
    * Sets the proportional, integral, and differential coefficients.
    *
-   * @param Kp Proportional coefficient
-   * @param Ki Integral coefficient
-   * @param Kd Differential coefficient
+   * @param Kp The proportional coefficient. Must be >= 0.
+   * @param Ki The integral coefficient. Must be >= 0.
+   * @param Kd The differential coefficient. Must be >= 0.
    */
   void SetPID(double Kp, double Ki, double Kd) {
     m_controller.SetPID(Kp, Ki, Kd);
@@ -90,21 +90,21 @@ class ProfiledPIDController
   /**
    * Sets the proportional coefficient of the PID controller gain.
    *
-   * @param Kp proportional coefficient
+   * @param Kp The proportional coefficient. Must be >= 0.
    */
   void SetP(double Kp) { m_controller.SetP(Kp); }
 
   /**
    * Sets the integral coefficient of the PID controller gain.
    *
-   * @param Ki integral coefficient
+   * @param Ki The integral coefficient. Must be >= 0.
    */
   void SetI(double Ki) { m_controller.SetI(Ki); }
 
   /**
    * Sets the differential coefficient of the PID controller gain.
    *
-   * @param Kd differential coefficient
+   * @param Kd The differential coefficient. Must be >= 0.
    */
   void SetD(double Kd) { m_controller.SetD(Kd); }
 
@@ -116,7 +116,8 @@ class ProfiledPIDController
    * non-negative. Passing a value of zero will effectively disable integral
    * gain. Passing a value of infinity disables IZone functionality.
    *
-   * @param iZone Maximum magnitude of error to allow integral control.
+   * @param iZone Maximum magnitude of error to allow integral control. Must be
+   *   >= 0.
    */
   void SetIZone(double iZone) { m_controller.SetIZone(iZone); }
 

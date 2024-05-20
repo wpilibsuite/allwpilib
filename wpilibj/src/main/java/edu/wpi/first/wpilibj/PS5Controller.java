@@ -13,6 +13,10 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * <p>This class handles PS5 input that comes from the Driver Station. Each time a value is
  * requested the most recent value is returned. There is a single class instance for each controller
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
+ *
+ * <p>Only first party controllers from Sony are guaranteed to have the correct mapping, and only
+ * through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any 3rd
+ * party controllers.
  */
 public class PS5Controller extends GenericHID {
   /**
@@ -27,21 +31,36 @@ public class PS5Controller extends GenericHID {
 
   /** Represents a digital button on a PS5Controller. */
   public enum Button {
-    kCross(1),
-    kCircle(2),
-    kSquare(3),
+    /** Square button. */
+    kSquare(1),
+    /** X button. */
+    kCross(2),
+    /** Circle button. */
+    kCircle(3),
+    /** Triangle button. */
     kTriangle(4),
+    /** Left trigger 1 button. */
     kL1(5),
+    /** Right trigger 1 button. */
     kR1(6),
+    /** Left trigger 2 button. */
     kL2(7),
+    /** Right trigger 2 button. */
     kR2(8),
+    /** Create button. */
     kCreate(9),
+    /** Options button. */
     kOptions(10),
-    kPS(11),
-    kL3(12),
-    kR3(13),
+    /** Left stick button. */
+    kL3(11),
+    /** Right stick button. */
+    kR3(12),
+    /** PlayStation button. */
+    kPS(13),
+    /** Touchpad click button. */
     kTouchpad(14);
 
+    /** Button value. */
     public final int value;
 
     Button(int index) {
@@ -68,13 +87,20 @@ public class PS5Controller extends GenericHID {
 
   /** Represents an axis on a PS5Controller. */
   public enum Axis {
+    /** Left X axis. */
     kLeftX(0),
+    /** Left Y axis. */
     kLeftY(1),
-    kL2(2),
-    kRightX(3),
-    kRightY(4),
-    kR2(5);
+    /** Right X axis. */
+    kRightX(2),
+    /** Right Y axis. */
+    kRightY(5),
+    /** Left Trigger 2. */
+    kL2(3),
+    /** Right Trigger 2. */
+    kR2(4);
 
+    /** Axis value. */
     public final int value;
 
     Axis(int index) {

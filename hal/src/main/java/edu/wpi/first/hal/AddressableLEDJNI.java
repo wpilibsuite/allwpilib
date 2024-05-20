@@ -97,4 +97,7 @@ public class AddressableLEDJNI extends JNIWrapper {
    * @see "HAL_StopAddressableLEDOutput"
    */
   public static native void stop(int handle);
+
+  /** Utility class. */
+  private AddressableLEDJNI() {}
 }

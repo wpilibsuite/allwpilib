@@ -7,11 +7,12 @@
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/struct/Struct.h>
 
 namespace frc {
 
+/**
+ * Represents a quaternion.
+ */
 class WPILIB_DLLEXPORT Quaternion {
  public:
   /**
@@ -190,31 +191,5 @@ void from_json(const wpi::json& json, Quaternion& quaternion);
 
 }  // namespace frc
 
-template <>
-struct wpi::Struct<frc::Quaternion> {
-  static constexpr std::string_view kTypeString = "struct:Quaternion";
-  static constexpr size_t kSize = 32;
-  static constexpr std::string_view kSchema =
-      "double w;double x;double y;double z";
-  static frc::Quaternion Unpack(std::span<const uint8_t, 32> data) {
-    return {wpi::UnpackStruct<double, 0>(data),
-            wpi::UnpackStruct<double, 8>(data),
-            wpi::UnpackStruct<double, 16>(data),
-            wpi::UnpackStruct<double, 24>(data)};
-  }
-  static void Pack(std::span<uint8_t, 32> data, const frc::Quaternion& value) {
-    wpi::PackStruct<0>(data, value.W());
-    wpi::PackStruct<8>(data, value.X());
-    wpi::PackStruct<16>(data, value.Y());
-    wpi::PackStruct<24>(data, value.Z());
-  }
-};
-
-template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Quaternion> {
-  static constexpr std::string_view kTypeString = "proto:Quaternion";
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Quaternion Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Quaternion& value);
-};
+#include "frc/geometry/proto/QuaternionProto.h"
+#include "frc/geometry/struct/QuaternionStruct.h"

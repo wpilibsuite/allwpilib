@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
-import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class Pose3dTest {
@@ -51,17 +51,11 @@ class Pose3dTest {
 
   @Test
   void testTransformByRotations() {
-    var initialPose =
-        new Pose3d(
-            new Translation3d(0.0, 0.0, 0.0),
-            new Rotation3d(
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(0.0)));
+    var initialPose = Pose3d.kZero;
 
     var transform1 =
         new Transform3d(
-            new Translation3d(0.0, 0.0, 0.0),
+            Translation3d.kZero,
             new Rotation3d(
                 Units.degreesToRadians(90.0),
                 Units.degreesToRadians(45.0),
@@ -69,7 +63,7 @@ class Pose3dTest {
 
     var transform2 =
         new Transform3d(
-            new Translation3d(0.0, 0.0, 0.0),
+            Translation3d.kZero,
             new Rotation3d(
                 Units.degreesToRadians(-90.0),
                 Units.degreesToRadians(0.0),
@@ -77,7 +71,7 @@ class Pose3dTest {
 
     var transform3 =
         new Transform3d(
-            new Translation3d(0.0, 0.0, 0.0),
+            Translation3d.kZero,
             new Rotation3d(
                 Units.degreesToRadians(0.0),
                 Units.degreesToRadians(-45.0),
@@ -194,7 +188,7 @@ class Pose3dTest {
   @Test
   void testComplexTwists() {
     var initial_poses =
-        Arrays.asList(
+        List.of(
             new Pose3d(
                 new Translation3d(0.698303, -0.959096, 0.271076),
                 new Rotation3d(new Quaternion(0.86403, -0.076866, 0.147234, 0.475254))),
@@ -212,7 +206,7 @@ class Pose3dTest {
                 new Rotation3d(new Quaternion(0.807886, 0.029298, 0.257788, 0.529157))));
 
     var final_poses =
-        Arrays.asList(
+        List.of(
             new Pose3d(
                 new Translation3d(-0.230448, -0.511957, 0.198406),
                 new Rotation3d(new Quaternion(0.753984, 0.347016, 0.409105, 0.379106))),
@@ -267,7 +261,7 @@ class Pose3dTest {
   @Test
   void testTwistNaN() {
     var initial_poses =
-        Arrays.asList(
+        List.of(
             new Pose3d(
                 new Translation3d(6.32, 4.12, 0.00),
                 new Rotation3d(
@@ -277,7 +271,7 @@ class Pose3dTest {
                 new Rotation3d(
                     new Quaternion(0.9999999999999793, 0.0, 0.0, 2.0352360299846772E-7))));
     var final_poses =
-        Arrays.asList(
+        List.of(
             new Pose3d(
                 new Translation3d(6.33, 4.15, 0.00),
                 new Rotation3d(

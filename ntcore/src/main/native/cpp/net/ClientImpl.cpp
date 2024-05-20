@@ -20,7 +20,6 @@
 #include "NetworkInterface.h"
 #include "WireConnection.h"
 #include "WireEncoder.h"
-#include "net/NetworkOutgoingQueue.h"
 #include "networktables/NetworkTableValue.h"
 
 using namespace nt;
@@ -68,26 +67,28 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
     DEBUG4("BinaryMessage({})", id);
 
     // handle RTT ping response (only use first one)
-    if (!m_haveTimeOffset && id == -1) {
-      if (!value.IsInteger()) {
-        WARN("RTT ping response with non-integer type {}",
-             static_cast<int>(value.type()));
-        continue;
-      }
-      DEBUG4("RTT ping response time {} value {}", value.time(),
-             value.GetInteger());
-      if (m_wire.GetVersion() < 0x0401) {
-        m_pongTimeMs = curTimeMs;
-      }
-      int64_t now = wpi::Now();
-      int64_t rtt2 = (now - value.GetInteger()) / 2;
-      if (rtt2 < m_rtt2Us) {
-        m_rtt2Us = rtt2;
-        int64_t serverTimeOffsetUs = value.server_time() + rtt2 - now;
-        DEBUG3("Time offset: {}", serverTimeOffsetUs);
-        m_outgoing.SetTimeOffset(serverTimeOffsetUs);
-        m_haveTimeOffset = true;
-        m_timeSyncUpdated(serverTimeOffsetUs, m_rtt2Us, true);
+    if (id == -1) {
+      if (!m_haveTimeOffset) {
+        if (!value.IsInteger()) {
+          WARN("RTT ping response with non-integer type {}",
+               static_cast<int>(value.type()));
+          continue;
+        }
+        DEBUG4("RTT ping response time {} value {}", value.time(),
+               value.GetInteger());
+        if (m_wire.GetVersion() < 0x0401) {
+          m_pongTimeMs = curTimeMs;
+        }
+        int64_t now = wpi::Now();
+        int64_t rtt2 = (now - value.GetInteger()) / 2;
+        if (rtt2 < m_rtt2Us) {
+          m_rtt2Us = rtt2;
+          int64_t serverTimeOffsetUs = value.server_time() + rtt2 - now;
+          DEBUG3("Time offset: {}", serverTimeOffsetUs);
+          m_outgoing.SetTimeOffset(serverTimeOffsetUs);
+          m_haveTimeOffset = true;
+          m_timeSyncUpdated(serverTimeOffsetUs, m_rtt2Us, true);
+        }
       }
       continue;
     }

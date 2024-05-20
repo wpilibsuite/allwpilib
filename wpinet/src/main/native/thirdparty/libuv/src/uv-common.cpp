@@ -802,7 +802,6 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
   }
 }
 
-
 #ifdef __clang__
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wvarargs"

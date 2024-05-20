@@ -6,6 +6,9 @@ package edu.wpi.first.math;
 
 /** A number expressed as a java class. */
 public abstract class Num {
+  /** Default constructor. */
+  public Num() {}
+
   /**
    * The number this is backing.
    *

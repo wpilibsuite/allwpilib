@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <wpi/deprecated.h>
 
 #include "motorcontrol/MockMotorController.h"
 
@@ -31,6 +32,8 @@ std::ostream& operator<<(std::ostream& os,
 
   return os;
 }
+
+WPI_IGNORE_DEPRECATED
 
 /**
  * A fixture used for MotorControllerGroup testing.
@@ -124,3 +127,5 @@ TEST_P(MotorControllerGroupTest, StopMotor) {
 
 INSTANTIATE_TEST_SUITE_P(Tests, MotorControllerGroupTest,
                          testing::Values(TEST_ONE, TEST_TWO, TEST_THREE));
+
+WPI_UNIGNORE_DEPRECATED

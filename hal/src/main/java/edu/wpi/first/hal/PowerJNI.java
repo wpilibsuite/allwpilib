@@ -167,4 +167,7 @@ public class PowerJNI extends JNIWrapper {
    * @return current CPU temperature in degrees Celsius
    */
   public static native double getCPUTemp();
+
+  /** Utility class. */
+  private PowerJNI() {}
 }

@@ -31,8 +31,31 @@ class Relay : public MotorSafety,
               public wpi::Sendable,
               public wpi::SendableHelper<Relay> {
  public:
-  enum Value { kOff, kOn, kForward, kReverse };
-  enum Direction { kBothDirections, kForwardOnly, kReverseOnly };
+  /**
+   * The state to drive a Relay to.
+   */
+  enum Value {
+    /// Off.
+    kOff,
+    /// On.
+    kOn,
+    /// Forward.
+    kForward,
+    /// Reverse.
+    kReverse
+  };
+
+  /**
+   * The Direction(s) that a relay is configured to operate in.
+   */
+  enum Direction {
+    /// Both directions are valid.
+    kBothDirections,
+    /// Only forward is valid.
+    kForwardOnly,
+    /// Only reverse is valid.
+    kReverseOnly
+  };
 
   /**
    * Relay constructor given a channel.

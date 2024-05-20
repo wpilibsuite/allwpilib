@@ -34,6 +34,7 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
    * @param countSource The source for counting.
    * @param directionSource The source for selecting count direction.
    */
+  @SuppressWarnings("this-escape")
   public ExternalDirectionCounter(DigitalSource countSource, DigitalSource directionSource) {
     m_countSource = requireNonNullParam(countSource, "countSource", "ExternalDirectionCounter");
     m_directionSource =

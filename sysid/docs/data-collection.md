@@ -15,7 +15,7 @@ Here is a list of the NT entries that are used to send and collect data between 
 
 ## Telemetry Format
 
-There are two formats used to send telemetry from the robot program. One format is for non-drivetrain mechanisms, whereas the other is for all drivetrain tests (linear and angular).
+There are two formats used to send telemetry from the robot program. One format is for non-drivetrain mechanisms, whereas the other is for all drivetrain tests (linear and angular). All timestamps must be in seconds.
 
 ### Non-Drivetrain Mechanisms
 

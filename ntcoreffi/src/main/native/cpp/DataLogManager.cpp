@@ -7,14 +7,17 @@
 #include <algorithm>
 #include <ctime>
 #include <random>
+#include <string>
+#include <string_view>
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/DataLog.h>
+#include <wpi/DataLogBackgroundWriter.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
+#include <wpi/print.h>
 #include <wpi/timestamp.h>
 
 #ifdef __FRC_ROBORIO__
@@ -192,7 +195,7 @@ struct Thread final : public wpi::SafeThread {
 
   std::string m_logDir;
   bool m_filenameOverride;
-  wpi::log::DataLog m_log;
+  wpi::log::DataLogBackgroundWriter m_log;
   bool m_ntLoggerEnabled = false;
   NT_DataLogger m_ntEntryLogger = 0;
   NT_ConnectionDataLogger m_ntConnLogger = 0;
@@ -217,12 +220,12 @@ static std::string MakeLogDir(std::string_view dir) {
   }
 #ifdef __FRC_ROBORIO__
   // prefer a mounted USB drive if one is accessible
-  constexpr std::string_view usbDir{"/u"};
   std::error_code ec;
-  auto s = fs::status(usbDir, ec);
+  auto s = fs::status("/u", ec);
   if (!ec && fs::is_directory(s) &&
       (s.permissions() & fs::perms::others_write) != fs::perms::none) {
-    return std::string{usbDir};
+    fs::create_directory("/u/logs", ec);
+    return "/u/logs";
   }
   if (RobotBase::GetRuntimeType() == kRoboRIO) {
     FRC_ReportError(warn::Warning,
@@ -232,7 +235,10 @@ static std::string MakeLogDir(std::string_view dir) {
   fs::create_directory("/home/lvuser/logs", ec);
   return "/home/lvuser/logs";
 #else
-  return filesystem::GetOperatingDirectory();
+  std::string logDir = filesystem::GetOperatingDirectory() + "/logs";
+  std::error_code ec;
+  fs::create_directory(logDir, ec);
+  return logDir;
 #endif
 }
 
@@ -307,7 +313,7 @@ void Thread::Main() {
             break;
           }
         } else {
-          fmt::print(stderr, "DataLogManager: could not delete {}\n",
+          wpi::print(stderr, "DataLogManager: could not delete {}\n",
                      entry.path().string());
         }
       }
@@ -458,7 +464,7 @@ Instance::Instance(std::string_view dir, std::string_view filename,
     if (wpi::starts_with(entry.path().stem().string(), "FRC_TBD_") &&
         entry.path().extension() == ".wpilog") {
       if (!fs::remove(entry, ec)) {
-        fmt::print(stderr, "DataLogManager: could not delete {}\n",
+        wpi::print(stderr, "DataLogManager: could not delete {}\n",
                    entry.path().string());
       }
     }
@@ -490,7 +496,7 @@ void DataLogManager::Stop() {
 
 void DataLogManager::Log(std::string_view message) {
   GetInstance().owner.GetThread()->m_messageLog.Append(message);
-  fmt::print("{}\n", message);
+  wpi::print("{}\n", message);
 }
 
 wpi::log::DataLog& DataLogManager::GetLog() {

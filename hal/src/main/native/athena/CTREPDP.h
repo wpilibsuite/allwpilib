@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include "hal/PowerDistribution.h"
 #include "hal/Types.h"
 
 /**
@@ -130,6 +131,15 @@ void HAL_ResetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status);
  * @param handle the module handle
  */
 void HAL_ClearPDPStickyFaults(HAL_PDPHandle handle, int32_t* status);
+
+void HAL_StartPDPStream(HAL_PDPHandle handle, int32_t* status);
+
+HAL_PowerDistributionChannelData* HAL_GetPDPStreamData(HAL_PDPHandle handle,
+                                                       int32_t* count,
+                                                       int32_t* status);
+
+void HAL_StopPDPStream(HAL_PDPHandle handle, int32_t* status);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

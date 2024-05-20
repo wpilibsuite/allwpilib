@@ -34,7 +34,7 @@ public final class StructLogEntry<T> extends DataLogEntry {
    */
   public static <T> StructLogEntry<T> create(
       DataLog log, String name, Struct<T> struct, String metadata, long timestamp) {
-    return new StructLogEntry<T>(log, name, struct, metadata, timestamp);
+    return new StructLogEntry<>(log, name, struct, metadata, timestamp);
   }
 
   /**

@@ -136,6 +136,7 @@ class GenericHIDSim {
   double GetRumble(GenericHID::RumbleType type);
 
  protected:
+  /// GenericHID port.
   int m_port;
 };
 

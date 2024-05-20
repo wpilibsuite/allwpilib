@@ -58,6 +58,19 @@ Pose2d PoseEstimator<WheelSpeeds, WheelPositions>::GetEstimatedPosition()
 }
 
 template <typename WheelSpeeds, WheelPositions WheelPositions>
+std::optional<Pose2d> PoseEstimator<WheelSpeeds, WheelPositions>::SampleAt(
+    units::second_t timestamp) const {
+  // TODO Replace with std::optional::transform() in C++23
+  std::optional<PoseEstimator<WheelSpeeds, WheelPositions>::InterpolationRecord>
+      sample = m_poseBuffer.Sample(timestamp);
+  if (sample) {
+    return sample->pose;
+  } else {
+    return std::nullopt;
+  }
+}
+
+template <typename WheelSpeeds, WheelPositions WheelPositions>
 void PoseEstimator<WheelSpeeds, WheelPositions>::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
   // Step 0: If this measurement is old enough to be outside the pose buffer's

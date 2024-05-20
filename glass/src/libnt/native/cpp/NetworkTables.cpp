@@ -28,11 +28,13 @@
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/mpack.h>
+#include <wpi/print.h>
 #include <wpi/raw_ostream.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
 #include "glass/Storage.h"
+#include "glass/support/ExtraGuiWidgets.h"
 
 using namespace glass;
 using namespace mpack;
@@ -874,12 +876,15 @@ void NetworkTablesModel::Update() {
           std::string err;
           auto desc = m_structDb.Add(typeStr, schema, &err);
           if (!desc) {
-            fmt::print("could not decode struct '{}' schema '{}': {}\n",
+            wpi::print("could not decode struct '{}' schema '{}': {}\n",
                        entry->info.name, schema, err);
           } else if (desc->IsValid()) {
             // loop over all entries with this type and update
             for (auto&& entryPair : m_entries) {
-              auto ts = entryPair.second->info.type_str;
+              if (!entryPair.second) {
+                continue;
+              }
+              std::string_view ts = entryPair.second->info.type_str;
               if (!wpi::starts_with(ts, "struct:")) {
                 continue;
               }
@@ -896,12 +901,15 @@ void NetworkTablesModel::Update() {
           // protobuf descriptor handling
           auto filename = wpi::drop_front(entry->info.name, 15);
           if (!m_protoDb.Add(filename, entry->value.GetRaw())) {
-            fmt::print("could not decode protobuf '{}' filename '{}'\n",
+            wpi::print("could not decode protobuf '{}' filename '{}'\n",
                        entry->info.name, filename);
           } else {
             // loop over all protobuf entries and update (conservatively)
             for (auto&& entryPair : m_entries) {
-              auto& ts = entryPair.second->info.type_str;
+              if (!entryPair.second) {
+                continue;
+              }
+              std::string_view ts = entryPair.second->info.type_str;
               if (wpi::starts_with(ts, "proto:")) {
                 entryPair.second->UpdateFromValue(*this);
               }
@@ -1019,7 +1027,7 @@ void NetworkTablesModel::Client::UpdatePublishers(
   if (auto pubs = nt::meta::DecodeClientPublishers(data)) {
     publishers = std::move(*pubs);
   } else {
-    fmt::print(stderr, "Failed to update publishers\n");
+    wpi::print(stderr, "Failed to update publishers\n");
   }
 }
 
@@ -1032,7 +1040,7 @@ void NetworkTablesModel::Client::UpdateSubscribers(
       subscribers.emplace_back(std::move(sub));
     }
   } else {
-    fmt::print(stderr, "Failed to update subscribers\n");
+    wpi::print(stderr, "Failed to update subscribers\n");
   }
 }
 
@@ -1377,8 +1385,8 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_INTEGER: {
       int64_t v = val.GetInteger();
-      if (ImGui::InputScalar(typeStr, ImGuiDataType_S64, &v, nullptr, nullptr,
-                             nullptr, ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (InputExpr<int64_t>(typeStr, &v, "%d",
+                             ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_INTEGER, "int");
         }
@@ -1388,8 +1396,8 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_FLOAT: {
       float v = val.GetFloat();
-      if (ImGui::InputFloat(typeStr, &v, 0, 0, "%.6f",
-                            ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (InputExpr<float>(typeStr, &v, "%.6f",
+                           ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_FLOAT, "float");
         }
@@ -1405,9 +1413,9 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
-      if (ImGui::InputDouble(typeStr, &v, 0, 0,
-                             fmt::format("%.{}f", precision).c_str(),
-                             ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (InputExpr<double>(typeStr, &v,
+                            fmt::format("%.{}f", precision).c_str(),
+                            ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_DOUBLE, "double");
         }

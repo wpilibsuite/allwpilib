@@ -37,6 +37,7 @@ public class BangBangController implements Sendable {
    *
    * @param tolerance Tolerance for {@link #atSetpoint() atSetpoint}.
    */
+  @SuppressWarnings("this-escape")
   public BangBangController(double tolerance) {
     instances++;
 
@@ -89,7 +90,7 @@ public class BangBangController implements Sendable {
    *
    * @param tolerance Position error which is tolerable.
    */
-  public void setTolerance(double tolerance) {
+  public final void setTolerance(double tolerance) {
     m_tolerance = tolerance;
   }
 

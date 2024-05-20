@@ -11,18 +11,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.proto.Translation2dProto;
+import edu.wpi.first.math.geometry.struct.Translation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.proto.Geometry2D.ProtobufTranslation2d;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /**
  * Represents a translation in 2D space. This object can be used to represent a point or a vector.
@@ -32,7 +34,15 @@ import us.hebi.quickbuf.Descriptors.Descriptor;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Translation2d implements Interpolatable<Translation2d> {
+public class Translation2d
+    implements Interpolatable<Translation2d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Translation2d representing the origin.
+   *
+   * <p>This exists to avoid allocations for common translations.
+   */
+  public static final Translation2d kZero = new Translation2d();
+
   private final double m_x;
   private final double m_y;
 
@@ -79,6 +89,16 @@ public class Translation2d implements Interpolatable<Translation2d> {
   }
 
   /**
+   * Constructs a Translation2d from the provided translation vector's X and Y components. The
+   * values are assumed to be in meters.
+   *
+   * @param vector The translation vector to represent.
+   */
+  public Translation2d(Vector<N2> vector) {
+    this(vector.get(0), vector.get(1));
+  }
+
+  /**
    * Calculates the distance between two translations in 2D space.
    *
    * <p>The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
@@ -108,6 +128,15 @@ public class Translation2d implements Interpolatable<Translation2d> {
   @JsonProperty
   public double getY() {
     return m_y;
+  }
+
+  /**
+   * Returns a vector representation of this translation.
+   *
+   * @return A Vector representation of this translation.
+   */
+  public Vector<N2> toVector() {
+    return VecBuilder.fill(m_x, m_y);
   }
 
   /**
@@ -250,69 +279,9 @@ public class Translation2d implements Interpolatable<Translation2d> {
         MathUtil.interpolate(this.getY(), endValue.getY(), t));
   }
 
-  public static final class AStruct implements Struct<Translation2d> {
-    @Override
-    public Class<Translation2d> getTypeClass() {
-      return Translation2d.class;
-    }
+  /** Translation2d protobuf for serialization. */
+  public static final Translation2dProto proto = new Translation2dProto();
 
-    @Override
-    public String getTypeString() {
-      return "struct:Translation2d";
-    }
-
-    @Override
-    public int getSize() {
-      return kSizeDouble * 2;
-    }
-
-    @Override
-    public String getSchema() {
-      return "double x;double y";
-    }
-
-    @Override
-    public Translation2d unpack(ByteBuffer bb) {
-      double x = bb.getDouble();
-      double y = bb.getDouble();
-      return new Translation2d(x, y);
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Translation2d value) {
-      bb.putDouble(value.m_x);
-      bb.putDouble(value.m_y);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Translation2d, ProtobufTranslation2d> {
-    @Override
-    public Class<Translation2d> getTypeClass() {
-      return Translation2d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufTranslation2d.getDescriptor();
-    }
-
-    @Override
-    public ProtobufTranslation2d createMessage() {
-      return ProtobufTranslation2d.newInstance();
-    }
-
-    @Override
-    public Translation2d unpack(ProtobufTranslation2d msg) {
-      return new Translation2d(msg.getX(), msg.getY());
-    }
-
-    @Override
-    public void pack(ProtobufTranslation2d msg, Translation2d value) {
-      msg.setX(value.m_x).setY(value.m_y);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  /** Translation2d struct for serialization. */
+  public static final Translation2dStruct struct = new Translation2dStruct();
 }

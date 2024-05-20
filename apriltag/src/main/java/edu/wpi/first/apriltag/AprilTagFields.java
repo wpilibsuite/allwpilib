@@ -4,19 +4,27 @@
 
 package edu.wpi.first.apriltag;
 
-import java.io.IOException;
 import java.io.UncheckedIOException;
 
+/** Loadable AprilTag field layouts. */
 public enum AprilTagFields {
+  /** 2022 Rapid React. */
   k2022RapidReact("2022-rapidreact.json"),
-  k2023ChargedUp("2023-chargedup.json");
+  /** 2023 Charged Up. */
+  k2023ChargedUp("2023-chargedup.json"),
+  /** 2024 Crescendo. */
+  k2024Crescendo("2024-crescendo.json");
 
+  /** Base resource directory. */
   public static final String kBaseResourceDir = "/edu/wpi/first/apriltag/";
 
   /** Alias to the current game. */
-  public static final AprilTagFields kDefaultField = k2023ChargedUp;
+  public static final AprilTagFields kDefaultField = k2024Crescendo;
 
+  /** Resource filename. */
   public final String m_resourceFile;
+
+  AprilTagFieldLayout m_fieldLayout;
 
   AprilTagFields(String resourceFile) {
     m_resourceFile = kBaseResourceDir + resourceFile;
@@ -27,13 +35,10 @@ public enum AprilTagFields {
    *
    * @return AprilTagFieldLayout of the field
    * @throws UncheckedIOException If the layout does not exist
+   * @deprecated Use {@link AprilTagFieldLayout#loadField(AprilTagFields)} instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public AprilTagFieldLayout loadAprilTagLayoutField() {
-    try {
-      return AprilTagFieldLayout.loadFromResource(m_resourceFile);
-    } catch (IOException e) {
-      throw new UncheckedIOException(
-          "Could not load AprilTagFieldLayout from " + m_resourceFile, e);
-    }
+    return AprilTagFieldLayout.loadField(this);
   }
 }

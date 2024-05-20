@@ -139,6 +139,7 @@ static nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env, jobject joptions) {
   FIELD(disableRemote, "Z");
   FIELD(disableLocal, "Z");
   FIELD(excludeSelf, "Z");
+  FIELD(hidden, "Z");
 
 #undef FIELD
 
@@ -154,7 +155,8 @@ static nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env, jobject joptions) {
           FIELD(bool, Boolean, prefixMatch),
           FIELD(bool, Boolean, disableRemote),
           FIELD(bool, Boolean, disableLocal),
-          FIELD(bool, Boolean, excludeSelf)};
+          FIELD(bool, Boolean, excludeSelf),
+          FIELD(bool, Boolean, hidden)};
 
 #undef GET
 #undef FIELD
@@ -669,6 +671,30 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicRetained
   (JNIEnv*, jclass, jint topic)
 {
   return nt::GetTopicRetained(topic);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    setTopicCached
+ * Signature: (IZ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicCached
+  (JNIEnv*, jclass, jint topic, jboolean value)
+{
+  nt::SetTopicCached(topic, value);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    getTopicCached
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicCached
+  (JNIEnv*, jclass, jint topic)
+{
+  return nt::GetTopicCached(topic);
 }
 
 /*

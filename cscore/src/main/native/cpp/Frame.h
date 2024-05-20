@@ -22,6 +22,10 @@ namespace cs {
 
 class SourceImpl;
 
+std::unique_ptr<Image> CreateImageFromBGRA(cs::SourceImpl* source, size_t width,
+                                           size_t height, size_t stride,
+                                           const uint8_t* data);
+
 class Frame {
   friend class SourceImpl;
 
@@ -206,6 +210,7 @@ class Frame {
   Image* ConvertGrayToMJPEG(Image* image, int quality);
   Image* ConvertGrayToY16(Image* image);
   Image* ConvertY16ToGray(Image* image);
+  Image* ConvertBGRToBGRA(Image* image);
 
   Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat) {
     if (pixelFormat == VideoMode::kMJPEG) {
@@ -219,10 +224,11 @@ class Frame {
                         defaultQuality);
   }
 
-  bool GetCv(cv::Mat& image) {
-    return GetCv(image, GetOriginalWidth(), GetOriginalHeight());
+  bool GetCv(cv::Mat& image, VideoMode::PixelFormat pixelFormat) {
+    return GetCv(image, GetOriginalWidth(), GetOriginalHeight(), pixelFormat);
   }
-  bool GetCv(cv::Mat& image, int width, int height);
+  bool GetCv(cv::Mat& image, int width, int height,
+             VideoMode::PixelFormat pixelFormat);
 
  private:
   Image* ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,

@@ -60,3 +60,6 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
   }
 };
 }  // namespace frc
+
+#include "frc/kinematics/proto/MecanumDriveWheelPositionsProto.h"
+#include "frc/kinematics/struct/MecanumDriveWheelPositionsStruct.h"

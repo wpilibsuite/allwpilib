@@ -11,6 +11,7 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/SwerveControllerCommand.h>
@@ -48,7 +49,7 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureButtonBindings() {}
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
@@ -73,24 +74,32 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
                                         units::radian_t{std::numbers::pi});
 
-  frc2::SwerveControllerCommand<4> swerveControllerCommand(
-      exampleTrajectory, [this]() { return m_drive.GetPose(); },
+  frc2::CommandPtr swerveControllerCommand =
+      frc2::SwerveControllerCommand<4>(
+          exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
-      m_drive.kDriveKinematics,
+          m_drive.kDriveKinematics,
 
-      frc::PIDController{AutoConstants::kPXController, 0, 0},
-      frc::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+          frc::PIDController{AutoConstants::kPXController, 0, 0},
+          frc::PIDController{AutoConstants::kPYController, 0, 0},
+          thetaController,
 
-      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+          [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 
-      {&m_drive});
+          {&m_drive})
+          .ToPtr();
 
-  // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
-
-  // no auto
-  return new frc2::SequentialCommandGroup(
+  // Reset odometry to the initial pose of the trajectory, run path following
+  // command, then stop at the end.
+  return frc2::cmd::Sequence(
+      frc2::InstantCommand(
+          [this, initialPose = exampleTrajectory.InitialPose()]() {
+            m_drive.ResetOdometry(initialPose);
+          },
+          {})
+          .ToPtr(),
       std::move(swerveControllerCommand),
       frc2::InstantCommand(
-          [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));
+          [this] { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {})
+          .ToPtr());
 }

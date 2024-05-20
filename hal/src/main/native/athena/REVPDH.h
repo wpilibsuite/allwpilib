@@ -158,6 +158,13 @@ void HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
  */
 void HAL_ClearREVPDHStickyFaults(HAL_REVPDHHandle handle, int32_t* status);
 
+void HAL_StartREVPDHStream(HAL_REVPDHHandle handle, int32_t* status);
+
+HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
+    HAL_REVPDHHandle handle, int32_t* count, int32_t* status);
+
+void HAL_StopREVPDHStream(HAL_REVPDHHandle handle, int32_t* status);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

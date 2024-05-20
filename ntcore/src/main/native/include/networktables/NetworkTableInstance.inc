@@ -44,16 +44,18 @@ inline ProtobufTopic<T> NetworkTableInstance::GetProtobufTopic(
   return ProtobufTopic<T>{GetTopic(name)};
 }
 
-template <wpi::StructSerializable T>
-inline StructTopic<T> NetworkTableInstance::GetStructTopic(
-    std::string_view name) const {
-  return StructTopic<T>{GetTopic(name)};
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+inline StructTopic<T, I...> NetworkTableInstance::GetStructTopic(
+    std::string_view name, I... info) const {
+  return StructTopic<T, I...>{GetTopic(name), std::move(info)...};
 }
 
-template <wpi::StructSerializable T>
-inline StructArrayTopic<T> NetworkTableInstance::GetStructArrayTopic(
-    std::string_view name) const {
-  return StructArrayTopic<T>{GetTopic(name)};
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+inline StructArrayTopic<T, I...> NetworkTableInstance::GetStructArrayTopic(
+    std::string_view name, I... info) const {
+  return StructArrayTopic<T, I...>{GetTopic(name), std::move(info)...};
 }
 
 inline std::vector<Topic> NetworkTableInstance::GetTopics() {
@@ -166,7 +168,7 @@ inline void NetworkTableInstance::StopClient() {
   ::nt::StopClient(m_handle);
 }
 
-inline void NetworkTableInstance::SetServer(const char* server_name,
+inline void NetworkTableInstance::SetServer(std::string_view server_name,
                                             unsigned int port) {
   ::nt::SetServer(m_handle, server_name, port);
 }
@@ -257,6 +259,12 @@ inline void NetworkTableInstance::AddSchema(std::string_view name,
   ::nt::AddSchema(m_handle, name, type, schema);
 }
 
+// Suppress unused-lambda-capture warning on AddSchema() call
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-lambda-capture"
+#endif
+
 template <wpi::ProtobufSerializable T>
 void NetworkTableInstance::AddProtobufSchema(wpi::ProtobufMessage<T>& msg) {
   msg.ForEachProtobufDescriptor(
@@ -266,11 +274,18 @@ void NetworkTableInstance::AddProtobufSchema(wpi::ProtobufMessage<T>& msg) {
       });
 }
 
-template <wpi::StructSerializable T>
-void NetworkTableInstance::AddStructSchema() {
-  wpi::ForEachStructSchema<T>([this](auto typeString, auto schema) {
-    AddSchema(typeString, "structschema", schema);
-  });
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
+void NetworkTableInstance::AddStructSchema(const I&... info) {
+  wpi::ForEachStructSchema<T>(
+      [this](auto typeString, auto schema) {
+        AddSchema(typeString, "structschema", schema);
+      },
+      info...);
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }  // namespace nt

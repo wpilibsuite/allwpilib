@@ -16,6 +16,10 @@ namespace frc {
  * value is requested the most recent value is returned. There is a single class
  * instance for each controller and the mapping of ports to hardware buttons
  * depends on the code in the Driver Station.
+ *
+ * Only first party controllers from Microsoft are guaranteed to have the
+ * correct mapping, and only through the official NI DS. Sim is not guaranteed
+ * to have the same mapping, as well as any 3rd party controllers.
  */
 class XboxController : public GenericHID {
  public:
@@ -422,25 +426,43 @@ class XboxController : public GenericHID {
    */
   BooleanEvent RightTrigger(EventLoop* loop) const;
 
+  /** Represents a digital button on an XboxController. */
   struct Button {
+    /// Left bumper.
     static constexpr int kLeftBumper = 5;
+    /// Right bumper.
     static constexpr int kRightBumper = 6;
+    /// Left stick.
     static constexpr int kLeftStick = 9;
+    /// Right stick.
     static constexpr int kRightStick = 10;
+    /// A.
     static constexpr int kA = 1;
+    /// B.
     static constexpr int kB = 2;
+    /// X.
     static constexpr int kX = 3;
+    /// Y.
     static constexpr int kY = 4;
+    /// Back.
     static constexpr int kBack = 7;
+    /// Start.
     static constexpr int kStart = 8;
   };
 
+  /** Represents an axis on an XboxController. */
   struct Axis {
+    /// Left X.
     static constexpr int kLeftX = 0;
+    /// Right X.
     static constexpr int kRightX = 4;
+    /// Left Y.
     static constexpr int kLeftY = 1;
+    /// Right Y.
     static constexpr int kRightY = 5;
+    /// Left trigger.
     static constexpr int kLeftTrigger = 2;
+    /// Right trigger.
     static constexpr int kRightTrigger = 3;
   };
 };

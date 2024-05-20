@@ -138,6 +138,34 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
    */
   Twist2d ToTwist2d(const MecanumDriveWheelPositions& wheelDeltas) const;
 
+  /**
+   * Returns the front-left wheel translation.
+   *
+   * @return The front-left wheel translation.
+   */
+  const Translation2d& GetFrontLeft() const { return m_frontLeftWheel; }
+
+  /**
+   * Returns the front-right wheel translation.
+   *
+   * @return The front-right wheel translation.
+   */
+  const Translation2d& GetFrontRight() const { return m_frontRightWheel; }
+
+  /**
+   * Returns the rear-left wheel translation.
+   *
+   * @return The rear-left wheel translation.
+   */
+  const Translation2d& GetRearLeft() const { return m_rearLeftWheel; }
+
+  /**
+   * Returns the rear-right wheel translation.
+   *
+   * @return The rear-right wheel translation.
+   */
+  const Translation2d& GetRearRight() const { return m_rearRightWheel; }
+
  private:
   mutable Matrixd<4, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Matrixd<4, 3>> m_forwardKinematics;
@@ -165,3 +193,6 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
 };
 
 }  // namespace frc
+
+#include "frc/kinematics/proto/MecanumDriveKinematicsProto.h"
+#include "frc/kinematics/struct/MecanumDriveKinematicsStruct.h"

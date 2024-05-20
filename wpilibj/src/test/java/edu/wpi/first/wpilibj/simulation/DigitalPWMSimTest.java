@@ -25,7 +25,7 @@ class DigitalPWMSimTest {
       BooleanCallback initializeCallback = new BooleanCallback();
       DoubleCallback dutyCycleCallback = new DoubleCallback();
       try (CallbackStore initCb = sim.registerInitializedCallback(initializeCallback, false);
-          CallbackStore dutyCycleCb = sim.registerDutyCycleCallback(dutyCycleCallback, false); ) {
+          CallbackStore dutyCycleCb = sim.registerDutyCycleCallback(dutyCycleCallback, false)) {
         final double kTestDutyCycle = 0.191;
         output.enablePWM(kTestDutyCycle);
 

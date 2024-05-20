@@ -15,6 +15,5 @@ message ProtobufTrajectoryState {
 }
 
 message ProtobufTrajectory {
-  double total_time = 1;
   repeated ProtobufTrajectoryState states = 2;
 }

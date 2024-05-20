@@ -58,6 +58,8 @@ class SshSession {
    */
   void Execute(std::string_view cmd);
 
+  std::string ExecuteResult(std::string_view cmd, int* exitStatus);
+
   /**
    * Puts a file on the server using SFTP.
    *

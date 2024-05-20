@@ -36,15 +36,15 @@ Eigen::Matrix3d RotationVectorToMatrix(const Eigen::Vector3d& rotation) {
 }  // namespace
 
 Pose3d::Pose3d(Translation3d translation, Rotation3d rotation)
-    : m_translation(std::move(translation)), m_rotation(std::move(rotation)) {}
+    : m_translation{std::move(translation)}, m_rotation{std::move(rotation)} {}
 
 Pose3d::Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
                Rotation3d rotation)
-    : m_translation(x, y, z), m_rotation(std::move(rotation)) {}
+    : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
 Pose3d::Pose3d(const Pose2d& pose)
-    : m_translation(pose.X(), pose.Y(), 0_m),
-      m_rotation(0_rad, 0_rad, pose.Rotation().Radians()) {}
+    : m_translation{pose.X(), pose.Y(), 0_m},
+      m_rotation{0_rad, 0_rad, pose.Rotation().Radians()} {}
 
 Pose3d Pose3d::operator+(const Transform3d& other) const {
   return TransformBy(other);
@@ -188,24 +188,4 @@ void frc::to_json(wpi::json& json, const Pose3d& pose) {
 void frc::from_json(const wpi::json& json, Pose3d& pose) {
   pose = Pose3d{json.at("translation").get<Translation3d>(),
                 json.at("rotation").get<Rotation3d>()};
-}
-
-google::protobuf::Message* wpi::Protobuf<frc::Pose3d>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufPose3d>(
-      arena);
-}
-
-frc::Pose3d wpi::Protobuf<frc::Pose3d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufPose3d*>(&msg);
-  return Pose3d{wpi::UnpackProtobuf<frc::Translation3d>(m->translation()),
-                wpi::UnpackProtobuf<frc::Rotation3d>(m->rotation())};
-}
-
-void wpi::Protobuf<frc::Pose3d>::Pack(google::protobuf::Message* msg,
-                                      const frc::Pose3d& value) {
-  auto m = static_cast<wpi::proto::ProtobufPose3d*>(msg);
-  wpi::PackProtobuf(m->mutable_translation(), value.Translation());
-  wpi::PackProtobuf(m->mutable_rotation(), value.Rotation());
 }

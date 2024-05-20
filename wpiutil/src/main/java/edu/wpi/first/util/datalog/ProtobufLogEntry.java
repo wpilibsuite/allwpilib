@@ -37,7 +37,7 @@ public final class ProtobufLogEntry<T> extends DataLogEntry {
    */
   public static <T, MessageType extends ProtoMessage<?>> ProtobufLogEntry<T> create(
       DataLog log, String name, Protobuf<T, MessageType> proto, String metadata, long timestamp) {
-    return new ProtobufLogEntry<T>(log, name, proto, metadata, timestamp);
+    return new ProtobufLogEntry<>(log, name, proto, metadata, timestamp);
   }
 
   /**

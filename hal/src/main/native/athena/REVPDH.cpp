@@ -4,6 +4,7 @@
 
 #include "REVPDH.h"
 
+#include <hal/CAN.h>
 #include <hal/CANAPI.h>
 #include <hal/CANAPITypes.h>
 #include <hal/Errors.h>
@@ -37,6 +38,8 @@ struct REV_PDHObj {
   HAL_CANHandle hcan;
   std::string previousAllocation;
   HAL_PowerDistributionVersion versionInfo;
+  bool streamHandleAllocated{false};
+  uint32_t streamSessionHandles[4];
 };
 
 }  // namespace
@@ -634,6 +637,273 @@ void HAL_ClearREVPDHStickyFaults(HAL_REVPDHHandle handle, int32_t* status) {
   uint8_t packedData[8] = {0};
   HAL_WriteCANPacket(hpdh->hcan, packedData, PDH_CLEAR_FAULTS_LENGTH,
                      PDH_CLEAR_FAULTS_FRAME_API, status);
+}
+
+uint32_t HAL_StartCANStream(HAL_CANHandle handle, int32_t apiId, int32_t depth,
+                            int32_t* status);
+
+void HAL_StartREVPDHStream(HAL_REVPDHHandle handle, int32_t* status) {
+  auto hpdh = REVPDHHandles->Get(handle);
+  if (hpdh == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  if (hpdh->streamHandleAllocated) {
+    *status = RESOURCE_IS_ALLOCATED;
+    return;
+  }
+
+  hpdh->streamSessionHandles[0] =
+      HAL_StartCANStream(hpdh->hcan, PDH_STATUS_0_FRAME_API, 50, status);
+  if (*status != 0) {
+    return;
+  }
+  hpdh->streamSessionHandles[1] =
+      HAL_StartCANStream(hpdh->hcan, PDH_STATUS_1_FRAME_API, 50, status);
+  if (*status != 0) {
+    HAL_CAN_CloseStreamSession(hpdh->streamSessionHandles[0]);
+    return;
+  }
+  hpdh->streamSessionHandles[2] =
+      HAL_StartCANStream(hpdh->hcan, PDH_STATUS_2_FRAME_API, 50, status);
+  if (*status != 0) {
+    HAL_CAN_CloseStreamSession(hpdh->streamSessionHandles[0]);
+    HAL_CAN_CloseStreamSession(hpdh->streamSessionHandles[1]);
+    return;
+  }
+  hpdh->streamSessionHandles[3] =
+      HAL_StartCANStream(hpdh->hcan, PDH_STATUS_3_FRAME_API, 50, status);
+  if (*status != 0) {
+    HAL_CAN_CloseStreamSession(hpdh->streamSessionHandles[0]);
+    HAL_CAN_CloseStreamSession(hpdh->streamSessionHandles[1]);
+    HAL_CAN_CloseStreamSession(hpdh->streamSessionHandles[3]);
+    return;
+  }
+  hpdh->streamHandleAllocated = true;
+}
+
+HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
+    HAL_REVPDHHandle handle, int32_t* count, int32_t* status) {
+  auto hpdh = REVPDHHandles->Get(handle);
+  if (hpdh == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return nullptr;
+  }
+
+  if (!hpdh->streamHandleAllocated) {
+    *status = RESOURCE_OUT_OF_RANGE;
+    return nullptr;
+  }
+
+  *count = 0;
+  // 4 streams, 6 channels per stream, 50 depth per stream
+  HAL_PowerDistributionChannelData* retData =
+      new HAL_PowerDistributionChannelData[4 * 6 * 50];
+
+  HAL_CANStreamMessage messages[50];
+  uint32_t messagesRead = 0;
+  HAL_CAN_ReadStreamSession(hpdh->streamSessionHandles[0], messages, 50,
+                            &messagesRead, status);
+  if (*status < 0) {
+    goto Exit;
+  }
+
+  for (uint32_t i = 0; i < messagesRead; i++) {
+    PDH_status_0_t statusFrame0;
+    PDH_status_0_unpack(&statusFrame0, messages[i].data, PDH_STATUS_0_LENGTH);
+    uint32_t timestamp = messages[i].timeStamp;
+
+    retData[*count].current =
+        PDH_status_0_channel_0_current_decode(statusFrame0.channel_0_current);
+    retData[*count].channel = 1;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_0_channel_1_current_decode(statusFrame0.channel_1_current);
+    retData[*count].channel = 2;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_0_channel_2_current_decode(statusFrame0.channel_2_current);
+    retData[*count].channel = 3;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_0_channel_3_current_decode(statusFrame0.channel_3_current);
+    retData[*count].channel = 4;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_0_channel_4_current_decode(statusFrame0.channel_4_current);
+    retData[*count].channel = 5;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_0_channel_5_current_decode(statusFrame0.channel_5_current);
+    retData[*count].channel = 6;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+  }
+
+  messagesRead = 0;
+  HAL_CAN_ReadStreamSession(hpdh->streamSessionHandles[1], messages, 50,
+                            &messagesRead, status);
+  if (*status < 0) {
+    goto Exit;
+  }
+
+  for (uint32_t i = 0; i < messagesRead; i++) {
+    PDH_status_1_t statusFrame1;
+    PDH_status_1_unpack(&statusFrame1, messages[i].data, PDH_STATUS_1_LENGTH);
+    uint32_t timestamp = messages[i].timeStamp;
+
+    retData[*count].current =
+        PDH_status_1_channel_6_current_decode(statusFrame1.channel_6_current);
+    retData[*count].channel = 7;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_1_channel_7_current_decode(statusFrame1.channel_7_current);
+    retData[*count].channel = 8;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_1_channel_8_current_decode(statusFrame1.channel_8_current);
+    retData[*count].channel = 9;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_1_channel_9_current_decode(statusFrame1.channel_9_current);
+    retData[*count].channel = 10;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_1_channel_10_current_decode(statusFrame1.channel_10_current);
+    retData[*count].channel = 11;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_1_channel_11_current_decode(statusFrame1.channel_11_current);
+    retData[*count].channel = 12;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+  }
+
+  messagesRead = 0;
+  HAL_CAN_ReadStreamSession(hpdh->streamSessionHandles[2], messages, 50,
+                            &messagesRead, status);
+  if (*status < 0) {
+    goto Exit;
+  }
+
+  for (uint32_t i = 0; i < messagesRead; i++) {
+    PDH_status_2_t statusFrame2;
+    PDH_status_2_unpack(&statusFrame2, messages[i].data, PDH_STATUS_2_LENGTH);
+    uint32_t timestamp = messages[i].timeStamp;
+
+    retData[*count].current =
+        PDH_status_2_channel_12_current_decode(statusFrame2.channel_12_current);
+    retData[*count].channel = 13;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_2_channel_13_current_decode(statusFrame2.channel_13_current);
+    retData[*count].channel = 14;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_2_channel_14_current_decode(statusFrame2.channel_14_current);
+    retData[*count].channel = 15;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_2_channel_15_current_decode(statusFrame2.channel_15_current);
+    retData[*count].channel = 16;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_2_channel_16_current_decode(statusFrame2.channel_16_current);
+    retData[*count].channel = 17;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_2_channel_17_current_decode(statusFrame2.channel_17_current);
+    retData[*count].channel = 18;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+  }
+
+  messagesRead = 0;
+  HAL_CAN_ReadStreamSession(hpdh->streamSessionHandles[3], messages, 50,
+                            &messagesRead, status);
+  if (*status < 0) {
+    goto Exit;
+  }
+
+  for (uint32_t i = 0; i < messagesRead; i++) {
+    PDH_status_3_t statusFrame3;
+    PDH_status_3_unpack(&statusFrame3, messages[i].data, PDH_STATUS_3_LENGTH);
+    uint32_t timestamp = messages[i].timeStamp;
+
+    retData[*count].current =
+        PDH_status_3_channel_18_current_decode(statusFrame3.channel_18_current);
+    retData[*count].channel = 19;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_3_channel_19_current_decode(statusFrame3.channel_19_current);
+    retData[*count].channel = 20;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_3_channel_20_current_decode(statusFrame3.channel_20_current);
+    retData[*count].channel = 21;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_3_channel_21_current_decode(statusFrame3.channel_21_current);
+    retData[*count].channel = 22;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_3_channel_22_current_decode(statusFrame3.channel_22_current);
+    retData[*count].channel = 23;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+    retData[*count].current =
+        PDH_status_3_channel_23_current_decode(statusFrame3.channel_23_current);
+    retData[*count].channel = 24;
+    retData[*count].timestamp = timestamp;
+    (*count)++;
+  }
+
+Exit:
+  if (*status < 0) {
+    delete[] retData;
+    retData = nullptr;
+  }
+  return retData;
+}
+
+void HAL_StopREVPDHStream(HAL_REVPDHHandle handle, int32_t* status) {
+  auto hpdh = REVPDHHandles->Get(handle);
+  if (hpdh == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  if (!hpdh->streamHandleAllocated) {
+    *status = RESOURCE_OUT_OF_RANGE;
+    return;
+  }
+
+  HAL_CAN_CloseStreamSession(hpdh->streamSessionHandles[0]);
+  HAL_CAN_CloseStreamSession(hpdh->streamSessionHandles[1]);
+  HAL_CAN_CloseStreamSession(hpdh->streamSessionHandles[2]);
+  HAL_CAN_CloseStreamSession(hpdh->streamSessionHandles[3]);
+
+  hpdh->streamHandleAllocated = false;
 }
 
 }  // extern "C"

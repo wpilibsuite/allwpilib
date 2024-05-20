@@ -4,38 +4,12 @@
 
 package edu.wpi.first.cscore;
 
+import edu.wpi.first.util.PixelFormat;
 import java.util.Objects;
 
 /** Video mode. */
 @SuppressWarnings("MemberName")
 public class VideoMode {
-  public enum PixelFormat {
-    kUnknown(0),
-    kMJPEG(1),
-    kYUYV(2),
-    kRGB565(3),
-    kBGR(4),
-    kGray(5),
-    kY16(6),
-    kUYVY(7);
-
-    private final int value;
-
-    PixelFormat(int value) {
-      this.value = value;
-    }
-
-    public int getValue() {
-      return value;
-    }
-  }
-
-  private static final PixelFormat[] m_pixelFormatValues = PixelFormat.values();
-
-  public static PixelFormat getPixelFormatFromInt(int pixelFormat) {
-    return m_pixelFormatValues[pixelFormat];
-  }
-
   /**
    * Create a new video mode.
    *
@@ -45,7 +19,7 @@ public class VideoMode {
    * @param fps The camera's frames per second.
    */
   public VideoMode(int pixelFormat, int width, int height, int fps) {
-    this.pixelFormat = getPixelFormatFromInt(pixelFormat);
+    this.pixelFormat = PixelFormat.getFromInt(pixelFormat);
     this.width = width;
     this.height = height;
     this.fps = fps;

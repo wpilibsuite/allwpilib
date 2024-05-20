@@ -23,11 +23,16 @@ public class SynchronousInterrupt implements AutoCloseable {
 
   /** Event trigger combinations for a synchronous interrupt. */
   public enum WaitResult {
+    /** Timeout event. */
     kTimeout(0x0),
+    /** Rising edge event. */
     kRisingEdge(0x1),
+    /** Falling edge event. */
     kFallingEdge(0x100),
+    /** Both rising and falling edge events. */
     kBoth(0x101);
 
+    /** WaitResult value. */
     public final int value;
 
     WaitResult(int value) {
@@ -77,21 +82,6 @@ public class SynchronousInterrupt implements AutoCloseable {
   @Override
   public void close() {
     InterruptJNI.cleanInterrupts(m_handle);
-  }
-
-  /**
-   * Wait for interrupt that returns the raw result value from the hardware.
-   *
-   * <p>Used by AsynchronousInterrupt. Users should use waitForInterrupt.
-   *
-   * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
-   * @param ignorePrevious True to ignore if a previous interrupt has occurred, and only wait for a
-   *     new trigger. False will consider if an interrupt has occurred since the last time the
-   *     interrupt was read.
-   * @return The raw hardware interrupt result
-   */
-  long waitForInterruptRaw(double timeoutSeconds, boolean ignorePrevious) {
-    return InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
   }
 
   /**

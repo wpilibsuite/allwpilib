@@ -34,6 +34,7 @@ public class Tachometer implements Sendable, AutoCloseable {
    *
    * @param source The DigitalSource (e.g. DigitalInput) of the Tachometer.
    */
+  @SuppressWarnings("this-escape")
   public Tachometer(DigitalSource source) {
     m_source = requireNonNullParam(source, "source", "Tachometer");
 

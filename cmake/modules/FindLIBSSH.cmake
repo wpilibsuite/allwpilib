@@ -38,30 +38,28 @@ if(LIBSSH_LIBRARIES AND LIBSSH_INCLUDE_DIRS)
     # in cache already
     set(LIBSSH_FOUND TRUE)
 else()
-    find_path(LIBSSH_INCLUDE_DIR
-        NAMES
-        libssh/libssh.h
+    find_path(
+        LIBSSH_INCLUDE_DIR
+        NAMES libssh/libssh.h
         PATHS
-        /usr/include
-        /usr/local/include
-        /opt/local/include
-        /sw/include
-        ${CMAKE_INCLUDE_PATH}
-        ${CMAKE_INSTALL_PREFIX}/include
+            /usr/include
+            /usr/local/include
+            /opt/local/include
+            /sw/include
+            ${CMAKE_INCLUDE_PATH}
+            ${CMAKE_INSTALL_PREFIX}/include
     )
 
-    find_library(LIBSSH_LIBRARY
-        NAMES
-        ssh.so
-        libssh.so
-        libssh.dylib
+    find_library(
+        LIBSSH_LIBRARY
+        NAMES ssh.so libssh.so libssh.dylib
         PATHS
-        /usr/lib
-        /usr/local/lib
-        /opt/local/lib
-        /sw/lib
-        ${CMAKE_LIBRARY_PATH}
-        ${CMAKE_INSTALL_PREFIX}/lib
+            /usr/lib
+            /usr/local/lib
+            /opt/local/lib
+            /sw/lib
+            ${CMAKE_LIBRARY_PATH}
+            ${CMAKE_INSTALL_PREFIX}/lib
     )
 
     if(LIBSSH_INCLUDE_DIR AND LIBSSH_LIBRARY)
@@ -71,34 +69,60 @@ else()
         else()
             set(LIBSSH_HEADER_PATH ${LIBSSH_INCLUDE_DIR}/libssh/libssh.h)
         endif()
-        file(STRINGS ${LIBSSH_HEADER_PATH} LIBSSH_VERSION_MAJOR
-            REGEX "#define[ ]+LIBSSH_VERSION_MAJOR[ ]+[0-9]+")
+        file(
+            STRINGS
+            ${LIBSSH_HEADER_PATH}
+            LIBSSH_VERSION_MAJOR
+            REGEX "#define[ ]+LIBSSH_VERSION_MAJOR[ ]+[0-9]+"
+        )
         if(NOT LIBSSH_VERSION_MAJOR)
-            message(STATUS "LIBSSH_VERSION_MAJOR not found, assuming libssh is too old and cannot be used!")
+            message(
+                STATUS
+                "LIBSSH_VERSION_MAJOR not found, assuming libssh is too old and cannot be used!"
+            )
             set(LIBSSH_INCLUDE_DIR "LIBSSH_INCLUDE_DIR-NOTFOUND")
             set(LIBSSH_LIBRARY "LIBSSH_LIBRARY-NOTFOUND")
         else()
             string(REGEX MATCH "[0-9]+" LIBSSH_VERSION_MAJOR ${LIBSSH_VERSION_MAJOR})
-            file(STRINGS ${LIBSSH_HEADER_PATH} LIBSSH_VERSION_MINOR
-                REGEX "#define[ ]+LIBSSH_VERSION_MINOR[ ]+[0-9]+")
+            file(
+                STRINGS
+                ${LIBSSH_HEADER_PATH}
+                LIBSSH_VERSION_MINOR
+                REGEX "#define[ ]+LIBSSH_VERSION_MINOR[ ]+[0-9]+"
+            )
             string(REGEX MATCH "[0-9]+" LIBSSH_VERSION_MINOR ${LIBSSH_VERSION_MINOR})
-            file(STRINGS ${LIBSSH_HEADER_PATH} LIBSSH_VERSION_PATCH
-                REGEX "#define[ ]+LIBSSH_VERSION_MICRO[ ]+[0-9]+")
+            file(
+                STRINGS
+                ${LIBSSH_HEADER_PATH}
+                LIBSSH_VERSION_PATCH
+                REGEX "#define[ ]+LIBSSH_VERSION_MICRO[ ]+[0-9]+"
+            )
             string(REGEX MATCH "[0-9]+" LIBSSH_VERSION_PATCH ${LIBSSH_VERSION_PATCH})
 
-            set(LIBSSH_VERSION ${LIBSSH_VERSION_MAJOR}.${LIBSSH_VERSION_MINOR}.${LIBSSH_VERSION_PATCH})
+            set(LIBSSH_VERSION
+                ${LIBSSH_VERSION_MAJOR}.${LIBSSH_VERSION_MINOR}.${LIBSSH_VERSION_PATCH}
+            )
 
             if(LIBSSH_VERSION VERSION_LESS 0.8.0)
                 # libssh_threads also needs to be linked for these versions
-                string(REPLACE "libssh.so" "libssh_threads.so"
+                string(
+                    REPLACE
+                    "libssh.so"
+                    "libssh_threads.so"
                     LIBSSH_THREADS_LIBRARY
                     ${LIBSSH_LIBRARY}
                 )
-                string(REPLACE "libssh.dylib" "libssh_threads.dylib"
+                string(
+                    REPLACE
+                    "libssh.dylib"
+                    "libssh_threads.dylib"
                     LIBSSH_THREADS_LIBRARY
                     ${LIBSSH_THREADS_LIBRARY}
                 )
-                string(REPLACE "ssh.so" "ssh_threads.so"
+                string(
+                    REPLACE
+                    "ssh.so"
+                    "ssh_threads.so"
                     LIBSSH_THREADS_LIBRARY
                     ${LIBSSH_THREADS_LIBRARY}
                 )
@@ -110,7 +134,10 @@ else()
     set(LIBSSH_LIBRARIES ${LIBSSH_LIBRARY} ${LIBSSH_THREADS_LIBRARY})
     mark_as_advanced(LIBSSH_INCLUDE_DIRS LIBSSH_LIBRARIES)
 
-    find_package_handle_standard_args(LIBSSH FOUND_VAR LIBSSH_FOUND
+    find_package_handle_standard_args(
+        LIBSSH
+        FOUND_VAR LIBSSH_FOUND
         REQUIRED_VARS LIBSSH_INCLUDE_DIRS LIBSSH_LIBRARIES
-        VERSION_VAR LIBSSH_VERSION)
+        VERSION_VAR LIBSSH_VERSION
+    )
 endif()

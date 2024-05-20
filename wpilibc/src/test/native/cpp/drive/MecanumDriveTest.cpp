@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "frc/drive/MecanumDrive.h"
-#include "motorcontrol/MockMotorController.h"
+#include "motorcontrol/MockPWMMotorController.h"
 
 TEST(MecanumDriveTest, CartesianIK) {
   // Forward
@@ -82,11 +82,14 @@ TEST(MecanumDriveTest, CartesianIKGyro90CW) {
 }
 
 TEST(MecanumDriveTest, Cartesian) {
-  frc::MockMotorController fl;
-  frc::MockMotorController rl;
-  frc::MockMotorController fr;
-  frc::MockMotorController rr;
-  frc::MecanumDrive drive{fl, rl, fr, rr};
+  frc::MockPWMMotorController fl;
+  frc::MockPWMMotorController rl;
+  frc::MockPWMMotorController fr;
+  frc::MockPWMMotorController rr;
+  frc::MecanumDrive drive{[&](double output) { fl.Set(output); },
+                          [&](double output) { rl.Set(output); },
+                          [&](double output) { fr.Set(output); },
+                          [&](double output) { rr.Set(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
@@ -126,11 +129,14 @@ TEST(MecanumDriveTest, Cartesian) {
 }
 
 TEST(MecanumDriveTest, CartesianGyro90CW) {
-  frc::MockMotorController fl;
-  frc::MockMotorController fr;
-  frc::MockMotorController rl;
-  frc::MockMotorController rr;
-  frc::MecanumDrive drive{fl, rl, fr, rr};
+  frc::MockPWMMotorController fl;
+  frc::MockPWMMotorController rl;
+  frc::MockPWMMotorController fr;
+  frc::MockPWMMotorController rr;
+  frc::MecanumDrive drive{[&](double output) { fl.Set(output); },
+                          [&](double output) { rl.Set(output); },
+                          [&](double output) { fr.Set(output); },
+                          [&](double output) { rr.Set(output); }};
   drive.SetDeadband(0.0);
 
   // Forward in global frame; left in robot frame
@@ -170,11 +176,14 @@ TEST(MecanumDriveTest, CartesianGyro90CW) {
 }
 
 TEST(MecanumDriveTest, Polar) {
-  frc::MockMotorController fl;
-  frc::MockMotorController fr;
-  frc::MockMotorController rl;
-  frc::MockMotorController rr;
-  frc::MecanumDrive drive{fl, rl, fr, rr};
+  frc::MockPWMMotorController fl;
+  frc::MockPWMMotorController rl;
+  frc::MockPWMMotorController fr;
+  frc::MockPWMMotorController rr;
+  frc::MecanumDrive drive{[&](double output) { fl.Set(output); },
+                          [&](double output) { rl.Set(output); },
+                          [&](double output) { fr.Set(output); },
+                          [&](double output) { rr.Set(output); }};
   drive.SetDeadband(0.0);
 
   // Forward

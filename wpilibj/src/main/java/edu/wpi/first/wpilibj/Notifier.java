@@ -113,7 +113,7 @@ public class Notifier implements AutoCloseable {
                     updateAlarm();
                   } else {
                     // Need to update the alarm to cause it to wait again
-                    updateAlarm((long) -1);
+                    updateAlarm(-1);
                   }
                 } finally {
                   m_processLock.unlock();
@@ -134,7 +134,7 @@ public class Notifier implements AutoCloseable {
             error = cause;
           }
           DriverStation.reportError(
-              "Unhandled exception in Notifier thread: " + error.toString(), error.getStackTrace());
+              "Unhandled exception in Notifier thread: " + error, error.getStackTrace());
           DriverStation.reportError(
               "The Runnable for this Notifier (or methods called by it) should have handled "
                   + "the exception above.\n"
@@ -153,22 +153,6 @@ public class Notifier implements AutoCloseable {
   public void setName(String name) {
     m_thread.setName(name);
     NotifierJNI.setNotifierName(m_notifier.get(), name);
-  }
-
-  /**
-   * Change the callback function.
-   *
-   * @param callback The callback function.
-   * @deprecated Use setCallback() instead.
-   */
-  @Deprecated(forRemoval = true, since = "2024")
-  public void setHandler(Runnable callback) {
-    m_processLock.lock();
-    try {
-      m_callback = callback;
-    } finally {
-      m_processLock.unlock();
-    }
   }
 
   /**

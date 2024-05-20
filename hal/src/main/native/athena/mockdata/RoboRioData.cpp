@@ -30,32 +30,27 @@ DEFINE_CAPI(int32_t, UserFaults3V3, 0)
 DEFINE_CAPI(double, BrownoutVoltage, 6.75)
 DEFINE_CAPI(double, CPUTemp, 45.0)
 DEFINE_CAPI(int32_t, TeamNumber, 0)
+DEFINE_CAPI(HAL_RadioLEDState, RadioLEDState, HAL_RadioLED_kOff);
 
 int32_t HALSIM_RegisterRoboRioSerialNumberCallback(
     HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
   return 0;
 }
 void HALSIM_CancelRoboRioSerialNumberCallback(int32_t uid) {}
-size_t HALSIM_GetRoboRioSerialNumber(char* buffer, size_t size) {
-  if (size > 0) {
-    buffer[0] = '\0';
-  }
-  return 0;
+void HALSIM_GetRoboRioSerialNumber(struct WPI_String* serialNumber) {
+  WPI_AllocateString(serialNumber, 0);
 }
-void HALSIM_SetRoboRioSerialNumber(const char* buffer, size_t size) {}
+void HALSIM_SetRoboRioSerialNumber(const struct WPI_String* serialNumber) {}
 
 int32_t HALSIM_RegisterRoboRioCommentsCallback(
     HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
   return 0;
 }
 void HALSIM_CancelRoboRioCommentsCallback(int32_t uid) {}
-size_t HALSIM_GetRoboRioComments(char* buffer, size_t size) {
-  if (size > 0) {
-    buffer[0] = '\0';
-  }
-  return 0;
+void HALSIM_GetRoboRioComments(struct WPI_String* comments) {
+  WPI_AllocateString(comments, 0);
 }
-void HALSIM_SetRoboRioComments(const char* buffer, size_t size) {}
+void HALSIM_SetRoboRioComments(const struct WPI_String* comments) {}
 
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify) {}

@@ -4,13 +4,26 @@
 
 package edu.wpi.first.units;
 
+/**
+ * Unit of power dimension.
+ *
+ * <p>This is the base type for units of power dimension. It is also used to specify the dimension
+ * for {@link Measure}: <code>Measure&lt;Power&gt;</code>.
+ *
+ * <p>Actual units (such as {@link Units#Watts} and {@link Units#Horsepower}) can be found in the
+ * {@link Units} class.
+ */
 public class Power extends Unit<Power> {
-  Power(double baseUnitEquivalent, String name, String symbol) {
-    super(Power.class, baseUnitEquivalent, name, symbol);
+  Power(Power baseUnit, double baseUnitEquivalent, String name, String symbol) {
+    super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
   Power(
-      UnaryFunction toBaseConverter, UnaryFunction fromBaseConverter, String name, String symbol) {
-    super(Power.class, toBaseConverter, fromBaseConverter, name, symbol);
+      Power baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 }

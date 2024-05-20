@@ -23,7 +23,7 @@ Version 4.1 makes the following key changes to address these weaknesses:
 * Recommend that timestamp synchronization occur immediately following connection establishment and prior to any other control messages
 * Recommend text and binary combining into a single WebSockets frame be limited to the network MTU (unless necessary to transport the message)
 * Recommend WebSockets fragmentation be used on large frames to enable rapid handling of PING messages
-* Add an option for topics to be marked transient (in which case no last value is retained by the server or sent to clients on initial subscription)
+* Add a (default true) option for topics to be marked cached (in which case the last value is retained by the server and sent to clients on initial subscription)
 * Recommend clients subscribe to the `$sub$<topic>` meta-topic for each topic published by the client, and use this information to control what value updates are sent over the network to the server
 
 Version 4.1 uses a different WebSockets subprotocol string than version 4.0, so it is easy for both clients and servers to simultaneously support both versions 4.0 and 4.1. Due to WebSockets implementation bugs in version 4.0, version 4.1 implementations must not send WebSockets PING messages on version 4.0 connections.
@@ -100,7 +100,7 @@ If using timestamp messages for aliveness checking on the primary connection, th
 [[reconnection]]
 === Caching and Reconnection Handling
 
-Servers shall keep a retained value for each topic for the purposes of <<msg-subscribe>> requests; the retained value shall be the value in the largest timestamp (greater-than or equal-to) message received for that topic.  This retained value is deleted if the topic is deleted (e.g. there are no more publishers).
+Servers shall keep a retained value for each cached topic for the purposes of <<msg-subscribe>> requests; the retained value shall be the value in the largest timestamp (greater-than or equal-to) message received for that topic.  This retained value is deleted if the topic is deleted (e.g. there are no more publishers).
 
 Clients may similarly keep a retained value for each topic for ease of use by user code.  If this is done, this retained value shall be updated by both locally published values and received messages for that topic with greater-than/equal-to timestamps, and the retained value shall be deleted when a <<msg-unannounce>> is received.
 
@@ -419,6 +419,7 @@ Each published topic may also have properties associated to it.  Properties are 
 |Property|Type|Description|Notes
 |`persistent`|boolean|Persistent Flag|If true, the last set value will be periodically saved to persistent storage on the server and be restored during server startup.  Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
 |`retained`|boolean|Retained Flag|Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
+|`cached`|boolean|Cached Flag|If false, the server and clients will not store the value of the topic.  This means that only value updates will be available for the topic.
 |===
 
 [[sub-options]]
@@ -619,7 +620,7 @@ If a property is not included in the update map, its value is not changed.  If a
 [[msg-subscribe]]
 ==== Subscribe Message (`subscribe`)
 
-Sent from a client to the server to indicate the client wants to subscribe to value changes for the specified topics / groups of topics.  The server shall send MessagePack messages containing the current values for any existing topics upon receipt, and continue sending MessagePack messages for future value changes.  If a topic does not yet exist, no message is sent until it is created (via a publish), at which point a <<msg-announce>> will be sent and MessagePack messages will automatically follow as they are published.
+Sent from a client to the server to indicate the client wants to subscribe to value changes for the specified topics / groups of topics.  The server shall send MessagePack messages containing the current values for any existing cached topics upon receipt, and continue sending MessagePack messages for future value changes.  If a topic does not yet exist, no message is sent until it is created (via a publish), at which point a <<msg-announce>> will be sent and MessagePack messages will automatically follow as they are published.
 
 Subscriptions may overlap; only one MessagePack message is sent per value change regardless of the number of subscriptions.  Sending a `subscribe` message with the same subscription UID as a previous `subscribe` message results in updating the subscription (replacing the array of identifiers and updating any specified options).
 

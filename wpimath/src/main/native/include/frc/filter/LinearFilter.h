@@ -272,6 +272,74 @@ class LinearFilter {
   }
 
   /**
+   * Resets the filter state, initializing internal buffers to the provided
+   * values.
+   *
+   * These are the expected lengths of the buffers, depending on what type of
+   * linear filter used:
+   *
+   * <table>
+   *   <tr>
+   *     <th>Type</th>
+   *     <th>Input Buffer Size</th>
+   *     <th>Output Buffer Size</th>
+   *   </tr>
+   *   <tr>
+   *     <td>Unspecified</td>
+   *     <td>size of {@code ffGains}</td>
+   *     <td>size of {@code fbGains}</td>
+   *   </tr>
+   *   <tr>
+   *     <td>Single Pole IIR</td>
+   *     <td>1</td>
+   *     <td>1</td>
+   *   </tr>
+   *   <tr>
+   *     <td>High-Pass</td>
+   *     <td>2</td>
+   *     <td>1</td>
+   *   </tr>
+   *   <tr>
+   *     <td>Moving Average</td>
+   *     <td>{@code taps}</td>
+   *     <td>0</td>
+   *   </tr>
+   *   <tr>
+   *     <td>Finite Difference</td>
+   *     <td>size of {@code stencil}</td>
+   *     <td>0</td>
+   *   </tr>
+   *   <tr>
+   *     <td>Backward Finite Difference</td>
+   *     <td>{@code Samples}</td>
+   *     <td>0</td>
+   *   </tr>
+   * </table>
+   *
+   * @param inputBuffer Values to initialize input buffer.
+   * @param outputBuffer Values to initialize output buffer.
+   * @throws std::runtime_error if size of inputBuffer or outputBuffer does not
+   *   match the size of ffGains and fbGains provided in the constructor.
+   */
+  void Reset(std::span<const T> inputBuffer, std::span<const T> outputBuffer) {
+    // Clear buffers
+    Reset();
+
+    if (inputBuffer.size() != m_inputGains.size() ||
+        outputBuffer.size() != m_outputGains.size()) {
+      throw std::runtime_error(
+          "Incorrect length of inputBuffer or outputBuffer");
+    }
+
+    for (size_t i = 0; i < inputBuffer.size(); ++i) {
+      m_inputs.push_front(inputBuffer[i]);
+    }
+    for (size_t i = 0; i < outputBuffer.size(); ++i) {
+      m_outputs.push_front(outputBuffer[i]);
+    }
+  }
+
+  /**
    * Calculates the next value of the filter.
    *
    * @param input Current input value.
@@ -301,6 +369,13 @@ class LinearFilter {
 
     return retVal;
   }
+
+  /**
+   * Returns the last value calculated by the LinearFilter.
+   *
+   * @return The last value.
+   */
+  T LastValue() const { return m_outputs.front(); }
 
  private:
   wpi::circular_buffer<T> m_inputs;

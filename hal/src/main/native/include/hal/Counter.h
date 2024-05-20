@@ -15,7 +15,6 @@
  * @{
  */
 
-// clang-format off
 /**
  * The counter mode.
  */
@@ -25,7 +24,6 @@ HAL_ENUM(HAL_Counter_Mode) {
   HAL_Counter_kPulseLength = 2,
   HAL_Counter_kExternalDirection = 3
 };
-// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

@@ -262,21 +262,3 @@ void frc::to_json(wpi::json& json, const Rotation3d& rotation) {
 void frc::from_json(const wpi::json& json, Rotation3d& rotation) {
   rotation = Rotation3d{json.at("quaternion").get<Quaternion>()};
 }
-
-google::protobuf::Message* wpi::Protobuf<frc::Rotation3d>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufRotation3d>(
-      arena);
-}
-
-frc::Rotation3d wpi::Protobuf<frc::Rotation3d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufRotation3d*>(&msg);
-  return Rotation3d{wpi::UnpackProtobuf<frc::Quaternion>(m->q())};
-}
-
-void wpi::Protobuf<frc::Rotation3d>::Pack(google::protobuf::Message* msg,
-                                          const frc::Rotation3d& value) {
-  auto m = static_cast<wpi::proto::ProtobufRotation3d*>(msg);
-  wpi::PackProtobuf(m->mutable_q(), value.GetQuaternion());
-}

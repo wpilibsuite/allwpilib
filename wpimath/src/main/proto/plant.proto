@@ -10,7 +10,4 @@ message ProtobufDCMotor {
   double stall_current = 3;
   double free_current = 4;
   double free_speed = 5;
-  double r = 6;
-  double kv = 7;
-  double kt = 8;
 }

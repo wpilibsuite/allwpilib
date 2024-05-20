@@ -25,6 +25,9 @@
 #ifndef _gcem_pow_integral_HPP
 #define _gcem_pow_integral_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -121,6 +124,8 @@ pow_integral(const T1 base, const T2 exp_term)
 noexcept
 {
     return internal::pow_integral_type_check(base,exp_term);
+}
+
 }
 
 }

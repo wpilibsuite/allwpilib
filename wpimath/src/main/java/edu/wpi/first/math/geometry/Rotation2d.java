@@ -11,16 +11,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.proto.Rotation2dProto;
+import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.proto.Geometry2D.ProtobufRotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /**
  * A rotation in a 2D coordinate frame represented by a point on the unit circle (cosine and sine).
@@ -31,7 +30,57 @@ import us.hebi.quickbuf.Descriptors.Descriptor;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Rotation2d implements Interpolatable<Rotation2d> {
+public class Rotation2d
+    implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Rotation2d representing no rotation.
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kZero = new Rotation2d();
+
+  /**
+   * A preallocated Rotation2d representing a clockwise rotation by π/2 rad (90°).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCW_Pi_2 = new Rotation2d(-Math.PI / 2);
+
+  /**
+   * A preallocated Rotation2d representing a clockwise rotation by 90° (π/2 rad).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCW_90deg = kCW_Pi_2;
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by π/2 rad (90°).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCCW_Pi_2 = new Rotation2d(Math.PI / 2);
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by 90° (π/2 rad).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kCCW_90deg = kCCW_Pi_2;
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by π rad (180°).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d kPi = new Rotation2d(Math.PI);
+
+  /**
+   * A preallocated Rotation2d representing a counterclockwise rotation by 180° (π rad).
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation2d k180deg = kPi;
+
   private final double m_value;
   private final double m_cos;
   private final double m_sin;
@@ -188,6 +237,15 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
+   * Returns the measure of the Rotation2d.
+   *
+   * @return The measure of the Rotation2d.
+   */
+  public Measure<Angle> getMeasure() {
+    return Radians.of(getRadians());
+  }
+
+  /**
    * Returns the radian value of the Rotation2d.
    *
    * @return The radian value of the Rotation2d.
@@ -275,66 +333,9 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
 
-  public static final class AStruct implements Struct<Rotation2d> {
-    @Override
-    public Class<Rotation2d> getTypeClass() {
-      return Rotation2d.class;
-    }
+  /** Rotation2d protobuf for serialization. */
+  public static final Rotation2dProto proto = new Rotation2dProto();
 
-    @Override
-    public String getTypeString() {
-      return "struct:Rotation2d";
-    }
-
-    @Override
-    public int getSize() {
-      return kSizeDouble;
-    }
-
-    @Override
-    public String getSchema() {
-      return "double value";
-    }
-
-    @Override
-    public Rotation2d unpack(ByteBuffer bb) {
-      return new Rotation2d(bb.getDouble());
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Rotation2d value) {
-      bb.putDouble(value.m_value);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Rotation2d, ProtobufRotation2d> {
-    @Override
-    public Class<Rotation2d> getTypeClass() {
-      return Rotation2d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufRotation2d.getDescriptor();
-    }
-
-    @Override
-    public ProtobufRotation2d createMessage() {
-      return ProtobufRotation2d.newInstance();
-    }
-
-    @Override
-    public Rotation2d unpack(ProtobufRotation2d msg) {
-      return new Rotation2d(msg.getValue());
-    }
-
-    @Override
-    public void pack(ProtobufRotation2d msg, Rotation2d value) {
-      msg.setValue(value.m_value);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  /** Rotation2d struct for serialization. */
+  public static final Rotation2dStruct struct = new Rotation2dStruct();
 }

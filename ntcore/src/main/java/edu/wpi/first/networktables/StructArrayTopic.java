@@ -32,7 +32,7 @@ public final class StructArrayTopic<T> extends Topic {
    * @return StructArrayTopic for value class
    */
   public static <T> StructArrayTopic<T> wrap(Topic topic, Struct<T> struct) {
-    return new StructArrayTopic<T>(topic, struct);
+    return new StructArrayTopic<>(topic, struct);
   }
 
   /**
@@ -47,7 +47,7 @@ public final class StructArrayTopic<T> extends Topic {
    */
   public static <T> StructArrayTopic<T> wrap(
       NetworkTableInstance inst, int handle, Struct<T> struct) {
-    return new StructArrayTopic<T>(inst, handle, struct);
+    return new StructArrayTopic<>(inst, handle, struct);
   }
 
   /**
@@ -63,7 +63,7 @@ public final class StructArrayTopic<T> extends Topic {
    * @return subscriber
    */
   public StructArraySubscriber<T> subscribe(T[] defaultValue, PubSubOption... options) {
-    return new StructArrayEntryImpl<T>(
+    return new StructArrayEntryImpl<>(
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.subscribe(
@@ -87,7 +87,7 @@ public final class StructArrayTopic<T> extends Topic {
    */
   public StructArrayPublisher<T> publish(PubSubOption... options) {
     m_inst.addSchema(m_struct);
-    return new StructArrayEntryImpl<T>(
+    return new StructArrayEntryImpl<>(
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.publish(
@@ -113,7 +113,7 @@ public final class StructArrayTopic<T> extends Topic {
    */
   public StructArrayPublisher<T> publishEx(String properties, PubSubOption... options) {
     m_inst.addSchema(m_struct);
-    return new StructArrayEntryImpl<T>(
+    return new StructArrayEntryImpl<>(
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.publishEx(
@@ -144,7 +144,7 @@ public final class StructArrayTopic<T> extends Topic {
    * @return entry
    */
   public StructArrayEntry<T> getEntry(T[] defaultValue, PubSubOption... options) {
-    return new StructArrayEntryImpl<T>(
+    return new StructArrayEntryImpl<>(
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.getEntry(
@@ -153,6 +153,11 @@ public final class StructArrayTopic<T> extends Topic {
         false);
   }
 
+  /**
+   * Returns the struct.
+   *
+   * @return The struct.
+   */
   public Struct<T> getStruct() {
     return m_struct;
   }

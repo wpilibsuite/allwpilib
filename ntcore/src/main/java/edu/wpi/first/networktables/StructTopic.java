@@ -32,7 +32,7 @@ public final class StructTopic<T> extends Topic {
    * @return StructTopic for value class
    */
   public static <T> StructTopic<T> wrap(Topic topic, Struct<T> struct) {
-    return new StructTopic<T>(topic, struct);
+    return new StructTopic<>(topic, struct);
   }
 
   /**
@@ -46,7 +46,7 @@ public final class StructTopic<T> extends Topic {
    * @return StructTopic for value class
    */
   public static <T> StructTopic<T> wrap(NetworkTableInstance inst, int handle, Struct<T> struct) {
-    return new StructTopic<T>(inst, handle, struct);
+    return new StructTopic<>(inst, handle, struct);
   }
 
   /**
@@ -62,7 +62,7 @@ public final class StructTopic<T> extends Topic {
    * @return subscriber
    */
   public StructSubscriber<T> subscribe(T defaultValue, PubSubOption... options) {
-    return new StructEntryImpl<T>(
+    return new StructEntryImpl<>(
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.subscribe(
@@ -86,7 +86,7 @@ public final class StructTopic<T> extends Topic {
    */
   public StructPublisher<T> publish(PubSubOption... options) {
     m_inst.addSchema(m_struct);
-    return new StructEntryImpl<T>(
+    return new StructEntryImpl<>(
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.publish(
@@ -112,7 +112,7 @@ public final class StructTopic<T> extends Topic {
    */
   public StructPublisher<T> publishEx(String properties, PubSubOption... options) {
     m_inst.addSchema(m_struct);
-    return new StructEntryImpl<T>(
+    return new StructEntryImpl<>(
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.publishEx(
@@ -143,7 +143,7 @@ public final class StructTopic<T> extends Topic {
    * @return entry
    */
   public StructEntry<T> getEntry(T defaultValue, PubSubOption... options) {
-    return new StructEntryImpl<T>(
+    return new StructEntryImpl<>(
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.getEntry(
@@ -152,6 +152,11 @@ public final class StructTopic<T> extends Topic {
         false);
   }
 
+  /**
+   * Returns the struct.
+   *
+   * @return The struct.
+   */
   public Struct<T> getStruct() {
     return m_struct;
   }

@@ -9,7 +9,6 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.wpilibj.RobotController;
 import org.ejml.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
 
@@ -23,44 +22,48 @@ import org.ejml.simple.SimpleMatrix;
  *
  * <p>Set simulated sensor readings with the simulated positions in {@link #getOutput()}
  *
- * @param <States> The number of states of the system.
- * @param <Inputs> The number of inputs to the system.
- * @param <Outputs> The number of outputs of the system.
+ * @param <States> Number of states of the system.
+ * @param <Inputs> Number of inputs to the system.
+ * @param <Outputs> Number of outputs of the system.
  */
 public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs extends Num> {
-  // The plant that represents the linear system.
+  /** The plant that represents the linear system. */
   protected final LinearSystem<States, Inputs, Outputs> m_plant;
 
-  // Variables for state, output, and input.
+  /** State vector. */
   protected Matrix<States, N1> m_x;
-  protected Matrix<Outputs, N1> m_y;
+
+  /** Input vector. */
   protected Matrix<Inputs, N1> m_u;
 
-  // The standard deviations of measurements, used for adding noise
-  // to the measurements.
-  protected final Matrix<Outputs, N1> m_measurementStdDevs;
+  /** Output vector. */
+  protected Matrix<Outputs, N1> m_y;
 
-  /**
-   * Creates a simulated generic linear system.
-   *
-   * @param system The system to simulate.
-   */
-  public LinearSystemSim(LinearSystem<States, Inputs, Outputs> system) {
-    this(system, null);
-  }
+  /** The standard deviations of measurements, used for adding noise to the measurements. */
+  protected final Matrix<Outputs, N1> m_measurementStdDevs;
 
   /**
    * Creates a simulated generic linear system with measurement noise.
    *
    * @param system The system being controlled.
-   * @param measurementStdDevs Standard deviations of measurements. Can be null if no noise is
-   *     desired.
+   * @param measurementStdDevs Standard deviations of measurements. Can be empty if no noise is
+   *     desired. If present must have same number of items as Outputs
    */
   public LinearSystemSim(
-      LinearSystem<States, Inputs, Outputs> system, Matrix<Outputs, N1> measurementStdDevs) {
+      LinearSystem<States, Inputs, Outputs> system, double... measurementStdDevs) {
+    if (measurementStdDevs.length != 0 && measurementStdDevs.length != system.getC().getNumRows()) {
+      throw new MatrixDimensionException(
+          "Malformed measurementStdDevs! Got "
+              + measurementStdDevs.length
+              + " elements instead of "
+              + system.getC().getNumRows());
+    }
     this.m_plant = system;
-    this.m_measurementStdDevs = measurementStdDevs;
-
+    if (measurementStdDevs.length == 0) {
+      m_measurementStdDevs = new Matrix<>(new SimpleMatrix(system.getC().getNumRows(), 1));
+    } else {
+      m_measurementStdDevs = new Matrix<>(new SimpleMatrix(measurementStdDevs));
+    }
     m_x = new Matrix<>(new SimpleMatrix(system.getA().getNumRows(), 1));
     m_u = new Matrix<>(new SimpleMatrix(system.getB().getNumCols(), 1));
     m_y = new Matrix<>(new SimpleMatrix(system.getC().getNumRows(), 1));
@@ -109,7 +112,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * @param u The system inputs.
    */
   public void setInput(Matrix<Inputs, N1> u) {
-    this.m_u = clampInput(u);
+    this.m_u = u;
   }
 
   /**
@@ -120,7 +123,6 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    */
   public void setInput(int row, double value) {
     m_u.set(row, 0, value);
-    m_u = clampInput(m_u);
   }
 
   /**
@@ -137,22 +139,31 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   }
 
   /**
+   * Returns the current input of the plant.
+   *
+   * @return The current input of the plant.
+   */
+  public Matrix<Inputs, N1> getInput() {
+    return m_u;
+  }
+
+  /**
+   * Returns an element of the current input of the plant.
+   *
+   * @param row The row to return.
+   * @return An element of the current input of the plant.
+   */
+  public double getInput(int row) {
+    return m_u.get(row, 0);
+  }
+
+  /**
    * Sets the system state.
    *
    * @param state The new state.
    */
   public void setState(Matrix<States, N1> state) {
     m_x = state;
-  }
-
-  /**
-   * Returns the current drawn by this simulated system. Override this method to add a custom
-   * current calculation.
-   *
-   * @return The current drawn by this simulated mechanism.
-   */
-  public double getCurrentDrawAmps() {
-    return 0.0;
   }
 
   /**
@@ -169,13 +180,12 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   }
 
   /**
-   * Clamp the input vector such that no element exceeds the given voltage. If any does, the
+   * Clamp the input vector such that no element exceeds the maximum allowed value. If any does, the
    * relative magnitudes of the input will be maintained.
    *
-   * @param u The input vector.
-   * @return The normalized input.
+   * @param maxInput The maximum magnitude of the input vector after clamping.
    */
-  protected Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> u) {
-    return StateSpaceUtil.desaturateInputVector(u, RobotController.getBatteryVoltage());
+  protected void clampInput(double maxInput) {
+    m_u = StateSpaceUtil.desaturateInputVector(m_u, maxInput);
   }
 }

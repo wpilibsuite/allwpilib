@@ -166,7 +166,7 @@ void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
   auto k = units::math::max(translationalK, rotationalK);
 
   auto scale = units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
-                                units::scalar_t(1));
+                                units::scalar_t{1});
   for (auto& module : states) {
     module.speed = module.speed * scale;
   }

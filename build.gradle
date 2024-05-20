@@ -23,7 +23,7 @@ plugins {
     id 'net.ltgt.errorprone' version '3.1.0' apply false
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
     id 'com.diffplug.spotless' version '6.20.0' apply false
-    id 'com.github.spotbugs' version '5.1.3' apply false
+    id 'com.github.spotbugs' version '6.0.2' apply false
     id 'com.google.protobuf' version '0.9.3' apply false
 }
 
@@ -49,6 +49,9 @@ buildScan {
 
     publishAlways()
 }
+
+import com.github.spotbugs.snom.Effort
+ext.spotbugsEffort = Effort.MAX
 
 ext.licenseFile = files("$rootDir/LICENSE.md", "$rootDir/ThirdPartyNotices.txt")
 
@@ -111,8 +114,8 @@ subprojects {
 
     plugins.withType(JavaPlugin) {
         java {
-            sourceCompatibility = 11
-            targetCompatibility = 11
+            sourceCompatibility = 17
+            targetCompatibility = 17
         }
     }
 
@@ -171,5 +174,5 @@ ext.getCurrentArch = {
 }
 
 wrapper {
-    gradleVersion = '8.4'
+    gradleVersion = '8.5'
 }

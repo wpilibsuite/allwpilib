@@ -39,6 +39,7 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
+  @SuppressWarnings("this-escape")
   public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {
     m_module = PneumaticsBase.getForType(module, moduleType);
 

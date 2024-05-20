@@ -120,3 +120,6 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
   }
 };
 }  // namespace frc
+
+#include "frc/kinematics/proto/MecanumDriveWheelSpeedsProto.h"
+#include "frc/kinematics/struct/MecanumDriveWheelSpeedsStruct.h"

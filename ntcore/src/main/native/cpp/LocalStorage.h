@@ -136,6 +136,22 @@ class LocalStorage final : public net::ILocalStorage {
     }
   }
 
+  void SetTopicCached(NT_Topic topicHandle, bool value) {
+    std::scoped_lock lock{m_mutex};
+    if (auto topic = m_impl.m_topics.Get(topicHandle)) {
+      m_impl.SetCached(topic, value);
+    }
+  }
+
+  bool GetTopicCached(NT_Topic topicHandle) {
+    std::scoped_lock lock{m_mutex};
+    if (auto topic = m_impl.m_topics.Get(topicHandle)) {
+      return (topic->flags & NT_UNCACHED) == 0;
+    } else {
+      return false;
+    }
+  }
+
   bool GetTopicExists(NT_Handle handle) {
     std::scoped_lock lock{m_mutex};
     TopicData* topic = m_impl.GetTopic(handle);
@@ -238,13 +254,13 @@ class LocalStorage final : public net::ILocalStorage {
       wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
       typename TypeInfo<T>::View defaultValue);
 
-  std::vector<Value> ReadQueueValue(NT_Handle subentry) {
+  std::vector<Value> ReadQueueValue(NT_Handle subentry, unsigned int types) {
     std::scoped_lock lock{m_mutex};
     auto subscriber = m_impl.GetSubEntry(subentry);
     if (!subscriber) {
       return {};
     }
-    return subscriber->pollStorage.ReadValue();
+    return subscriber->pollStorage.ReadValue(types);
   }
 
   template <ValidType T>
@@ -360,6 +376,8 @@ class LocalStorage final : public net::ILocalStorage {
         : handle{handle}, name{name}, special{IsSpecial(name)} {}
 
     bool Exists() const { return onNetwork || !localPublishers.empty(); }
+
+    bool IsCached() const { return (flags & NT_UNCACHED) == 0; }
 
     TopicInfo GetTopicInfo() const;
 
@@ -565,14 +583,15 @@ class LocalStorage final : public net::ILocalStorage {
     void CheckReset(TopicData* topic);
 
     bool SetValue(TopicData* topic, const Value& value, unsigned int eventFlags,
-                  bool isDuplicate, bool suppressIfDuplicate,
-                  const PublisherData* publisher);
-    void NotifyValue(TopicData* topic, unsigned int eventFlags,
-                     bool isDuplicate, const PublisherData* publisher);
+                  bool suppressIfDuplicate, const PublisherData* publisher);
+    void NotifyValue(TopicData* topic, const Value& value,
+                     unsigned int eventFlags, bool isDuplicate,
+                     const PublisherData* publisher);
 
     void SetFlags(TopicData* topic, unsigned int flags);
     void SetPersistent(TopicData* topic, bool value);
     void SetRetained(TopicData* topic, bool value);
+    void SetCached(TopicData* topic, bool value);
     void SetProperties(TopicData* topic, const wpi::json& update,
                        bool sendNetwork);
     void PropertiesUpdated(TopicData* topic, const wpi::json& update,

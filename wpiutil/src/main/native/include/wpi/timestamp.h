@@ -8,15 +8,13 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-extern "C" {
+#include <memory>  // NOLINT
+
 #endif
 
-/**
- * Initialize the on-Rio Now() implementation to use the FPGA timestamp.
- * No effect on non-Rio platforms. This is called by HAL_Initialize() and
- * thus should generally not be called by user code.
- */
-void WPI_Impl_SetupNowRio(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * De-initialize the on-Rio Now() implementation. No effect on non-Rio
@@ -63,11 +61,33 @@ namespace wpi {
 
 namespace impl {
 /**
+ * Initialize the on-Rio Now() implementation to use the desktop timestamp.
+ * No effect on non-Rio platforms. This should only be used for testing
+ * purposes if the HAL is not available.
+ */
+void SetupNowDefaultOnRio();
+
+/**
  * Initialize the on-Rio Now() implementation to use the FPGA timestamp.
  * No effect on non-Rio platforms. This is called by HAL_Initialize() and
  * thus should generally not be called by user code.
  */
-void SetupNowRio();
+#ifdef __FRC_ROBORIO__
+template <typename T>
+bool SetupNowRio(void* chipObjectLibrary, std::unique_ptr<T> hmbObject);
+#else
+template <typename T>
+inline bool SetupNowRio(void*, std::unique_ptr<T>) {
+  return true;
+}
+#endif
+
+/**
+ * Initialize the on-Rio Now() implementation to use the FPGA timestamp.
+ * No effect on non-Rio platforms. This take an FPGA session that has
+ * already been initialized, and is used from LabVIEW.
+ */
+bool SetupNowRio(uint32_t session);
 
 /**
  * De-initialize the on-Rio Now() implementation. No effect on non-Rio

@@ -250,7 +250,7 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_SetJoystickOutputs"
    */
   public static native int setJoystickOutputs(
-      byte joystickNum, int outputs, short leftRumble, short rightRumble);
+      byte joystickNum, int outputs, int leftRumble, int rightRumble);
 
   /**
    * Gets whether a specific joystick is considered to be an XBox controller.
@@ -372,5 +372,6 @@ public class DriverStationJNI extends JNIWrapper {
    */
   public static native boolean getOutputsActive();
 
+  /** Utility class. */
   private DriverStationJNI() {}
 }

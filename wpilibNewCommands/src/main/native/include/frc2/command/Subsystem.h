@@ -6,6 +6,7 @@
 
 #include <concepts>
 #include <functional>
+#include <string>
 #include <utility>
 
 #include <wpi/FunctionExtras.h>
@@ -58,6 +59,13 @@ class Subsystem {
    * sensor readings.
    */
   virtual void SimulationPeriodic();
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  virtual std::string GetName() const;
 
   /**
    * Sets the default Command of the subsystem.  The default command will be
@@ -150,6 +158,16 @@ class Subsystem {
    */
   [[nodiscard]]
   CommandPtr RunEnd(std::function<void()> run, std::function<void()> end);
+
+  /**
+   * Constructs a command that runs an action once, and then runs an action
+   * every iteration until interrupted. Requires this subsystem.
+   *
+   * @param start the action to run on start
+   * @param run the action to run every iteration
+   */
+  [[nodiscard]]
+  CommandPtr StartRun(std::function<void()> start, std::function<void()> run);
 
   /**
    * Constructs a DeferredCommand with the provided supplier. This subsystem is

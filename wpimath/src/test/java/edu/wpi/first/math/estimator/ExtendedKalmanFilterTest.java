@@ -22,7 +22,6 @@ import edu.wpi.first.math.system.NumericalJacobian;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -114,8 +113,8 @@ class ExtendedKalmanFilterTest {
             dtSeconds);
 
     List<Pose2d> waypoints =
-        Arrays.asList(
-            new Pose2d(2.75, 22.521, new Rotation2d()),
+        List.of(
+            new Pose2d(2.75, 22.521, Rotation2d.kZero),
             new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
     var trajectory =
         TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1));

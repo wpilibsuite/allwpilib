@@ -7,6 +7,7 @@ package edu.wpi.first.math;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
+/** Computer vision utility functions. */
 public final class ComputerVisionUtil {
   private ComputerVisionUtil() {
     throw new AssertionError("utility class");
@@ -26,7 +27,7 @@ public final class ComputerVisionUtil {
    *     either be a constant for a rigidly mounted camera, or variable if the camera is mounted to
    *     a turret. If the camera was mounted 3 inches in front of the "origin" (usually physical
    *     center) of the robot, this would be new Transform3d(Units.inchesToMeters(3.0), 0.0, 0.0,
-   *     new Rotation3d()).
+   *     Rotation3d.kZero).
    * @return The robot's field-relative pose.
    */
   public static Pose3d objectToRobotPose(

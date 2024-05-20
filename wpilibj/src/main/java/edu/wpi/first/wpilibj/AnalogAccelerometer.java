@@ -36,6 +36,7 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
    *
    * @param channel The channel number for the analog input the accelerometer is connected to
    */
+  @SuppressWarnings("this-escape")
   public AnalogAccelerometer(final int channel) {
     this(new AnalogInput(channel), true);
     SendableRegistry.addChild(this, m_analogChannel);
@@ -49,10 +50,12 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
    * @param channel The existing AnalogInput object for the analog input the accelerometer is
    *     connected to
    */
+  @SuppressWarnings("this-escape")
   public AnalogAccelerometer(final AnalogInput channel) {
     this(channel, false);
   }
 
+  @SuppressWarnings("this-escape")
   private AnalogAccelerometer(final AnalogInput channel, final boolean allocatedChannel) {
     requireNonNullParam(channel, "channel", "AnalogAccelerometer");
     m_allocatedChannel = allocatedChannel;

@@ -6,22 +6,19 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
+#include <wpi/StackTrace.h>
 #include <wpi/sendable/Sendable.h>
 
 #include "frc2/command/Requirements.h"
 #include "frc2/command/Subsystem.h"
 
 namespace frc2 {
-
-template <typename T>
-std::string GetTypeName(const T& type) {
-  return wpi::Demangle(typeid(type).name());
-}
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -252,14 +249,17 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   CommandPtr Repeatedly() &&;
 
   /**
-   * Decorates this command to run "by proxy" by wrapping it in a
-   * ProxyCommand. This is useful for "forking off" from command groups
-   * when the user does not wish to extend the command's requirements to the
-   * entire command group.
+   * Decorates this command to run "by proxy" by wrapping it in a ProxyCommand.
+   * Use this for "forking off" from command compositions when the user does not
+   * wish to extend the command's requirements to the entire command
+   * composition. ProxyCommand has unique implications and semantics, see <a
+   * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">the
+   * WPILib docs</a> for a full explanation.
    *
    * <p>This overload transfers command ownership to the returned CommandPtr.
    *
    * @return the decorated command
+   * @see ProxyCommand
    */
   [[nodiscard]]
   CommandPtr AsProxy() &&;
@@ -393,6 +393,14 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   void SetComposed(bool isComposed);
 
   /**
+   * Get the stacktrace of where this command was composed, or an empty
+   * optional. Intended for internal use.
+   *
+   * @return optional string representation of the composition site stack trace.
+   */
+  std::optional<std::string> GetPreviousCompositionSite() const;
+
+  /**
    * Whether the given command should run when the robot is disabled.  Override
    * to return true if the command should run when disabled.
    *
@@ -421,15 +429,17 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  protected:
   Command();
 
+  /// Requirements set.
   wpi::SmallSet<Subsystem*, 4> m_requirements;
 
   /**
    * Transfers ownership of this command to a unique pointer.  Used for
    * decorator methods.
    */
+  [[deprecated("Use ToPtr() instead")]]
   virtual std::unique_ptr<Command> TransferOwnership() && = 0;
 
-  bool m_isComposed = false;
+  std::optional<std::string> m_previousComposition;
 };
 
 /**

@@ -46,10 +46,17 @@ bool LocalStorage::MultiSubscriberData::Matches(std::string_view name,
 }
 
 int LocalStorage::DataLoggerData::Start(TopicData* topic, int64_t time) {
+  std::string_view typeStr = topic->typeStr;
+  // NT and DataLog use different standard representations for int and int[]
+  if (typeStr == "int") {
+    typeStr = "int64";
+  } else if (typeStr == "int[]") {
+    typeStr = "int64[]";
+  }
   return log.Start(fmt::format("{}{}", logPrefix,
                                wpi::drop_front(topic->name, prefix.size())),
-                   topic->typeStr == "int" ? "int64" : topic->typeStr,
-                   DataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
+                   typeStr, DataLoggerEntry::MakeMetadata(topic->propertiesStr),
+                   time);
 }
 
 void LocalStorage::DataLoggerEntry::Append(const Value& v) {
@@ -175,22 +182,26 @@ void LocalStorage::Impl::CheckReset(TopicData* topic) {
 }
 
 bool LocalStorage::Impl::SetValue(TopicData* topic, const Value& value,
-                                  unsigned int eventFlags, bool isDuplicate,
+                                  unsigned int eventFlags,
                                   bool suppressIfDuplicate,
                                   const PublisherData* publisher) {
+  const bool isDuplicate = topic->IsCached() && topic->lastValue == value;
   DEBUG4("SetValue({}, {}, {}, {})", topic->name, value.time(), eventFlags,
          isDuplicate);
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
+  // Make sure value isn't older than last value
   if (!topic->lastValue || topic->lastValue.time() == 0 ||
       value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
     if (!(suppressIfDuplicate && isDuplicate)) {
       topic->type = value.type();
-      topic->lastValue = value;
-      topic->lastValueFromNetwork = false;
-      NotifyValue(topic, eventFlags, isDuplicate, publisher);
+      if (topic->IsCached()) {
+        topic->lastValue = value;
+        topic->lastValueFromNetwork = false;
+      }
+      NotifyValue(topic, value, eventFlags, isDuplicate, publisher);
       if (topic->datalogType == value.type()) {
         for (auto&& datalog : topic->datalogs) {
           datalog.Append(value);
@@ -202,8 +213,8 @@ bool LocalStorage::Impl::SetValue(TopicData* topic, const Value& value,
   return true;
 }
 
-void LocalStorage::Impl::NotifyValue(TopicData* topic, unsigned int eventFlags,
-                                     bool isDuplicate,
+void LocalStorage::Impl::NotifyValue(TopicData* topic, const Value& value,
+                                     unsigned int eventFlags, bool isDuplicate,
                                      const PublisherData* publisher) {
   bool isNetwork = (eventFlags & NT_EVENT_VALUE_REMOTE) != 0;
   for (auto&& subscriber : topic->localSubscribers) {
@@ -213,11 +224,11 @@ void LocalStorage::Impl::NotifyValue(TopicData* topic, unsigned int eventFlags,
          (!isNetwork && !subscriber->config.disableLocal)) &&
         (!publisher || (publisher && (subscriber->config.excludePublisher !=
                                       publisher->handle)))) {
-      subscriber->pollStorage.emplace_back(topic->lastValue);
+      subscriber->pollStorage.emplace_back(value);
       subscriber->handle.Set();
       if (!subscriber->valueListeners.empty()) {
         m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
-                                 topic->handle, 0, topic->lastValue);
+                                 topic->handle, 0, value);
       }
     }
   }
@@ -227,7 +238,7 @@ void LocalStorage::Impl::NotifyValue(TopicData* topic, unsigned int eventFlags,
       subscriber->handle.Set();
       if (!subscriber->valueListeners.empty()) {
         m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
-                                 topic->handle, 0, topic->lastValue);
+                                 topic->handle, 0, value);
       }
     }
   }
@@ -248,6 +259,22 @@ void LocalStorage::Impl::SetFlags(TopicData* topic, unsigned int flags) {
   } else {
     topic->properties.erase("retained");
     update["retained"] = wpi::json();
+  }
+  if ((flags & NT_UNCACHED) != 0) {
+    topic->properties["cached"] = false;
+    update["cached"] = false;
+  } else {
+    topic->properties.erase("cached");
+    update["cached"] = wpi::json();
+  }
+  if ((flags & NT_UNCACHED) != 0) {
+    topic->lastValue = {};
+    topic->lastValueNetwork = {};
+    topic->lastValueFromNetwork = false;
+  }
+  if ((flags & NT_UNCACHED) != 0 && (flags & NT_PERSISTENT) != 0) {
+    WARN("topic {}: disabling cached property disables persistent storage",
+         topic->name);
   }
   topic->flags = flags;
   if (!update.empty()) {
@@ -279,6 +306,20 @@ void LocalStorage::Impl::SetRetained(TopicData* topic, bool value) {
     topic->flags &= ~NT_RETAINED;
     topic->properties.erase("retained");
     update["retained"] = wpi::json();
+  }
+  PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
+}
+
+void LocalStorage::Impl::SetCached(TopicData* topic, bool value) {
+  wpi::json update = wpi::json::object();
+  if (value) {
+    topic->flags &= ~NT_UNCACHED;
+    topic->properties.erase("cached");
+    update["cached"] = wpi::json();
+  } else {
+    topic->flags |= NT_UNCACHED;
+    topic->properties["cached"] = false;
+    update["cached"] = false;
   }
   PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
@@ -327,6 +368,28 @@ void LocalStorage::Impl::PropertiesUpdated(TopicData* topic,
           topic->flags &= ~NT_RETAINED;
         }
       }
+    }
+    it = topic->properties.find("cached");
+    if (it != topic->properties.end()) {
+      if (auto val = it->get_ptr<bool*>()) {
+        if (*val) {
+          topic->flags &= ~NT_UNCACHED;
+        } else {
+          topic->flags |= NT_UNCACHED;
+        }
+      }
+    }
+
+    if ((topic->flags & NT_UNCACHED) != 0) {
+      topic->lastValue = {};
+      topic->lastValueNetwork = {};
+      topic->lastValueFromNetwork = false;
+    }
+
+    if ((topic->flags & NT_UNCACHED) != 0 &&
+        (topic->flags & NT_PERSISTENT) != 0) {
+      WARN("topic {}: disabling cached property disables persistent storage",
+           topic->name);
     }
   }
 
@@ -548,7 +611,7 @@ LocalStorage::SubscriberData* LocalStorage::Impl::AddLocalSubscriber(
         "published as '{}')",
         topic->name, config.typeStr, topic->typeStr);
   }
-  if (m_network) {
+  if (m_network && !subscriber->config.hidden) {
     DEBUG4("-> NetworkSubscribe({})", topic->name);
     m_network->Subscribe(subscriber->handle, {{topic->name}}, config);
   }
@@ -577,7 +640,7 @@ LocalStorage::Impl::RemoveLocalSubscriber(NT_Subscriber subHandle) {
         listener.getSecond()->subscriber = nullptr;
       }
     }
-    if (m_network) {
+    if (m_network && !subscriber->config.hidden) {
       m_network->Unsubscribe(subscriber->handle);
     }
   }
@@ -613,7 +676,7 @@ LocalStorage::MultiSubscriberData* LocalStorage::Impl::AddMultiSubscriber(
       }
     }
   }
-  if (m_network) {
+  if (m_network && !subscriber->options.hidden) {
     DEBUG4("-> NetworkSubscribe");
     m_network->Subscribe(subscriber->handle, subscriber->prefixes,
                          subscriber->options);
@@ -633,7 +696,7 @@ LocalStorage::Impl::RemoveMultiSubscriber(NT_MultiSubscriber subHandle) {
         listener.getSecond()->multiSubscriber = nullptr;
       }
     }
-    if (m_network) {
+    if (m_network && !subscriber->options.hidden) {
       m_network->Unsubscribe(subscriber->handle);
     }
   }
@@ -895,20 +958,22 @@ bool LocalStorage::Impl::PublishLocalValue(PublisherData* publisher,
     return false;
   }
   if (publisher->active) {
-    bool isDuplicate, isNetworkDuplicate, suppressDuplicates;
+    bool isNetworkDuplicate, suppressDuplicates;
     if (force || publisher->config.keepDuplicates) {
       suppressDuplicates = false;
       isNetworkDuplicate = false;
     } else {
       suppressDuplicates = true;
-      isNetworkDuplicate = (publisher->topic->lastValueNetwork == value);
+      isNetworkDuplicate = publisher->topic->IsCached() &&
+                           (publisher->topic->lastValueNetwork == value);
     }
-    isDuplicate = (publisher->topic->lastValue == value);
     if (!isNetworkDuplicate && m_network) {
-      publisher->topic->lastValueNetwork = value;
+      if (publisher->topic->IsCached()) {
+        publisher->topic->lastValueNetwork = value;
+      }
       m_network->SetValue(publisher->handle, value);
     }
-    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL, isDuplicate,
+    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL,
                     suppressDuplicates, publisher);
   } else {
     return false;
@@ -940,6 +1005,10 @@ bool LocalStorage::Impl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
     return false;
   }
   if (auto topic = GetTopic(pubsubentryHandle)) {
+    if (!topic->IsCached()) {
+      WARN("ignoring default value on non-cached topic '{}'", topic->name);
+      return false;
+    }
     if (!topic->lastValue &&
         (topic->type == NT_UNASSIGNED || topic->type == value.type() ||
          IsNumericCompatible(topic->type, value.type()))) {
@@ -1026,10 +1095,11 @@ void LocalStorage::NetworkPropertiesUpdate(std::string_view name,
 void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl.m_topics.Get(topicHandle)) {
-    if (m_impl.SetValue(topic, value, NT_EVENT_VALUE_REMOTE,
-                        value == topic->lastValue, false, nullptr)) {
-      topic->lastValueNetwork = value;
-      topic->lastValueFromNetwork = true;
+    if (m_impl.SetValue(topic, value, NT_EVENT_VALUE_REMOTE, false, nullptr)) {
+      if (topic->IsCached()) {
+        topic->lastValueNetwork = value;
+        topic->lastValueFromNetwork = true;
+      }
     }
   }
 }
@@ -1058,12 +1128,16 @@ void LocalStorage::Impl::StartNetwork(net::NetworkInterface* network) {
     }
   }
   for (auto&& subscriber : m_subscribers) {
-    network->Subscribe(subscriber->handle, {{subscriber->topic->name}},
-                       subscriber->config);
+    if (!subscriber->config.hidden) {
+      network->Subscribe(subscriber->handle, {{subscriber->topic->name}},
+                         subscriber->config);
+    }
   }
   for (auto&& subscriber : m_multiSubscribers) {
-    network->Subscribe(subscriber->handle, subscriber->prefixes,
-                       subscriber->options);
+    if (!subscriber->options.hidden) {
+      network->Subscribe(subscriber->handle, subscriber->prefixes,
+                         subscriber->options);
+    }
   }
 }
 

@@ -5,8 +5,6 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/struct/Struct.h>
 
 #include "units/angle.h"
 #include "units/length.h"
@@ -60,27 +58,5 @@ struct WPILIB_DLLEXPORT Twist2d {
 };
 }  // namespace frc
 
-template <>
-struct wpi::Struct<frc::Twist2d> {
-  static constexpr std::string_view kTypeString = "struct:Twist2d";
-  static constexpr size_t kSize = 24;
-  static constexpr std::string_view kSchema =
-      "double dx;double dy;double dtheta";
-  static frc::Twist2d Unpack(std::span<const uint8_t, 24> data) {
-    return {units::meter_t{wpi::UnpackStruct<double, 0>(data)},
-            units::meter_t{wpi::UnpackStruct<double, 8>(data)},
-            units::radian_t{wpi::UnpackStruct<double, 16>(data)}};
-  }
-  static void Pack(std::span<uint8_t, 24> data, const frc::Twist2d& value) {
-    wpi::PackStruct<0>(data, value.dx.value());
-    wpi::PackStruct<8>(data, value.dy.value());
-    wpi::PackStruct<16>(data, value.dtheta.value());
-  }
-};
-
-template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Twist2d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Twist2d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg, const frc::Twist2d& value);
-};
+#include "frc/geometry/proto/Twist2dProto.h"
+#include "frc/geometry/struct/Twist2dStruct.h"

@@ -25,13 +25,13 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  */
 public class AnalogGyro implements Sendable, AutoCloseable {
   private static final double kDefaultVoltsPerDegreePerSecond = 0.007;
-  protected AnalogInput m_analog;
+  private AnalogInput m_analog;
   private boolean m_channelAllocated;
 
   private int m_gyroHandle;
 
   /** Initialize the gyro. Calibration is handled by calibrate(). */
-  public void initGyro() {
+  private void initGyro() {
     if (m_gyroHandle == 0) {
       m_gyroHandle = AnalogGyroJNI.initializeAnalogGyro(m_analog.m_port);
     }
@@ -78,6 +78,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @param channel The analog channel the gyro is connected to. Gyros can only be used on on-board
    *     channels 0-1.
    */
+  @SuppressWarnings("this-escape")
   public AnalogGyro(int channel) {
     this(new AnalogInput(channel));
     m_channelAllocated = true;
@@ -91,6 +92,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @param channel The AnalogInput object that the gyro is connected to. Gyros can only be used on
    *     on-board channels 0-1.
    */
+  @SuppressWarnings("this-escape")
   public AnalogGyro(AnalogInput channel) {
     requireNonNullParam(channel, "channel", "AnalogGyro");
 
@@ -108,6 +110,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @param center Preset uncalibrated value to use as the accumulator center value.
    * @param offset Preset uncalibrated value to use as the gyro offset.
    */
+  @SuppressWarnings("this-escape")
   public AnalogGyro(int channel, int center, double offset) {
     this(new AnalogInput(channel), center, offset);
     m_channelAllocated = true;
@@ -123,6 +126,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @param center Preset uncalibrated value to use as the accumulator center value.
    * @param offset Preset uncalibrated value to use as the gyro offset.
    */
+  @SuppressWarnings("this-escape")
   public AnalogGyro(AnalogInput channel, int center, double offset) {
     requireNonNullParam(channel, "channel", "AnalogGyro");
 

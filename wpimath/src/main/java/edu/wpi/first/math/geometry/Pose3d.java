@@ -9,25 +9,31 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.WPIMathJNI;
+import edu.wpi.first.math.geometry.proto.Pose3dProto;
+import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.proto.Geometry3D.ProtobufPose3d;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /** Represents a 3D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Pose3d implements Interpolatable<Pose3d> {
+public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Pose3d representing the origin.
+   *
+   * <p>This exists to avoid allocations for common poses.
+   */
+  public static final Pose3d kZero = new Pose3d();
+
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
   public Pose3d() {
-    m_translation = new Translation3d();
-    m_rotation = new Rotation3d();
+    m_translation = Translation3d.kZero;
+    m_rotation = Rotation3d.kZero;
   }
 
   /**
@@ -324,82 +330,9 @@ public class Pose3d implements Interpolatable<Pose3d> {
     }
   }
 
-  public static final class AStruct implements Struct<Pose3d> {
-    @Override
-    public Class<Pose3d> getTypeClass() {
-      return Pose3d.class;
-    }
+  /** Pose3d protobuf for serialization. */
+  public static final Pose3dProto proto = new Pose3dProto();
 
-    @Override
-    public String getTypeString() {
-      return "struct:Pose3d";
-    }
-
-    @Override
-    public int getSize() {
-      return Translation3d.struct.getSize() + Rotation3d.struct.getSize();
-    }
-
-    @Override
-    public String getSchema() {
-      return "Translation3d translation;Rotation3d rotation";
-    }
-
-    @Override
-    public Struct<?>[] getNested() {
-      return new Struct<?>[] {Translation3d.struct, Rotation3d.struct};
-    }
-
-    @Override
-    public Pose3d unpack(ByteBuffer bb) {
-      Translation3d translation = Translation3d.struct.unpack(bb);
-      Rotation3d rotation = Rotation3d.struct.unpack(bb);
-      return new Pose3d(translation, rotation);
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Pose3d value) {
-      Translation3d.struct.pack(bb, value.m_translation);
-      Rotation3d.struct.pack(bb, value.m_rotation);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Pose3d, ProtobufPose3d> {
-    @Override
-    public Class<Pose3d> getTypeClass() {
-      return Pose3d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufPose3d.getDescriptor();
-    }
-
-    @Override
-    public Protobuf<?, ?>[] getNested() {
-      return new Protobuf<?, ?>[] {Translation3d.proto, Rotation3d.proto};
-    }
-
-    @Override
-    public ProtobufPose3d createMessage() {
-      return ProtobufPose3d.newInstance();
-    }
-
-    @Override
-    public Pose3d unpack(ProtobufPose3d msg) {
-      return new Pose3d(
-          Translation3d.proto.unpack(msg.getTranslation()),
-          Rotation3d.proto.unpack(msg.getRotation()));
-    }
-
-    @Override
-    public void pack(ProtobufPose3d msg, Pose3d value) {
-      Translation3d.proto.pack(msg.getMutableTranslation(), value.m_translation);
-      Rotation3d.proto.pack(msg.getMutableRotation(), value.m_rotation);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  /** Pose3d struct for serialization. */
+  public static final Pose3dStruct struct = new Pose3dStruct();
 }

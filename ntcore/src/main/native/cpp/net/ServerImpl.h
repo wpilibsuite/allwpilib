@@ -98,11 +98,15 @@ class ServerImpl final {
   struct SubscriberData;
 
   struct TopicData {
-    TopicData(std::string_view name, std::string_view typeStr)
-        : name{name}, typeStr{typeStr} {}
-    TopicData(std::string_view name, std::string_view typeStr,
-              wpi::json properties)
-        : name{name}, typeStr{typeStr}, properties(std::move(properties)) {
+    TopicData(wpi::Logger& logger, std::string_view name,
+              std::string_view typeStr)
+        : m_logger{logger}, name{name}, typeStr{typeStr} {}
+    TopicData(wpi::Logger& logger, std::string_view name,
+              std::string_view typeStr, wpi::json properties)
+        : m_logger{logger},
+          name{name},
+          typeStr{typeStr},
+          properties(std::move(properties)) {
       RefreshProperties();
     }
 
@@ -117,6 +121,7 @@ class ServerImpl final {
 
     NT_Handle GetIdHandle() const { return Handle(0, id, Handle::kTopic); }
 
+    wpi::Logger& m_logger;  // Must be m_logger for WARN macro to work
     std::string name;
     unsigned int id;
     Value lastValue;
@@ -126,6 +131,7 @@ class ServerImpl final {
     unsigned int publisherCount{0};
     bool persistent{false};
     bool retained{false};
+    bool cached{true};
     bool special{false};
     NT_Topic localHandle{0};
 
@@ -148,10 +154,12 @@ class ServerImpl final {
 
       bool AddSubscriber(SubscriberData* sub) {
         bool added = subscribers.insert(sub).second;
-        if (!sub->options.topicsOnly && sendMode == ValueSendMode::kDisabled) {
-          sendMode = ValueSendMode::kNormal;
-        } else if (sub->options.sendAll) {
-          sendMode = ValueSendMode::kAll;
+        if (!sub->options.topicsOnly) {
+          if (sub->options.sendAll) {
+            sendMode = ValueSendMode::kAll;
+          } else if (sendMode == ValueSendMode::kDisabled) {
+            sendMode = ValueSendMode::kNormal;
+          }
         }
         return added;
       }
@@ -200,9 +208,10 @@ class ServerImpl final {
     std::string_view GetName() const { return m_name; }
     int GetId() const { return m_id; }
 
-   protected:
-    virtual void UpdatePeriodic(TopicData* topic) {}
+    virtual void UpdatePeriod(TopicData::TopicClientData& tcd,
+                              TopicData* topic) {}
 
+   protected:
     std::string m_name;
     std::string m_connInfo;
     bool m_local;  // local to machine
@@ -244,9 +253,6 @@ class ServerImpl final {
     void ClientUnsubscribe(int64_t subuid) final;
 
     void ClientSetValue(int64_t pubuid, const Value& value);
-
-    virtual void UpdatePeriod(TopicData::TopicClientData& tcd,
-                              TopicData* topic) {}
 
     wpi::DenseMap<TopicData*, bool> m_announceSent;
   };

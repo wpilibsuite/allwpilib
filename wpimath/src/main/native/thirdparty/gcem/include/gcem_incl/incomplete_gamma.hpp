@@ -25,6 +25,9 @@
 #ifndef _gcem_incomplete_gamma_HPP
 #define _gcem_incomplete_gamma_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -242,6 +245,8 @@ incomplete_gamma(const T1 a, const T2 x)
 noexcept
 {
     return internal::incomplete_gamma_type_check(a,x);
+}
+
 }
 
 #endif

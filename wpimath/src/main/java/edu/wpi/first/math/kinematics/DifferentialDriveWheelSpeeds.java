@@ -6,17 +6,29 @@ package edu.wpi.first.math.kinematics;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelSpeedsProto;
+import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelSpeedsStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /** Represents the wheel speeds for a differential drive drivetrain. */
-public class DifferentialDriveWheelSpeeds {
+public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, StructSerializable {
   /** Speed of the left side of the robot. */
   public double leftMetersPerSecond;
 
   /** Speed of the right side of the robot. */
   public double rightMetersPerSecond;
+
+  /** DifferentialDriveWheelSpeeds protobuf for serialization. */
+  public static final DifferentialDriveWheelSpeedsProto proto =
+      new DifferentialDriveWheelSpeedsProto();
+
+  /** DifferentialDriveWheelSpeeds struct for serialization. */
+  public static final DifferentialDriveWheelSpeedsStruct struct =
+      new DifferentialDriveWheelSpeedsStruct();
 
   /** Constructs a DifferentialDriveWheelSpeeds with zeros for left and right speeds. */
   public DifferentialDriveWheelSpeeds() {}

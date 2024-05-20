@@ -5,6 +5,7 @@
 #include "hal/HAL.h"
 
 #include <cstdio>
+#include <cstring>
 #include <vector>
 
 #include <wpi/mutex.h>
@@ -280,12 +281,12 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return 0;  // TODO: Find a better number to return;
 }
 
-size_t HAL_GetSerialNumber(char* buffer, size_t size) {
-  return HALSIM_GetRoboRioSerialNumber(buffer, size);
+void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
+  HALSIM_GetRoboRioSerialNumber(serialNumber);
 }
 
-size_t HAL_GetComments(char* buffer, size_t size) {
-  return HALSIM_GetRoboRioComments(buffer, size);
+void HAL_GetComments(struct WPI_String* comments) {
+  HALSIM_GetRoboRioComments(comments);
 }
 
 int32_t HAL_GetTeamNumber(void) {
@@ -367,12 +368,12 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 #ifdef _WIN32
   TIMECAPS tc;
   if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
-    UINT target = min(1, tc.wPeriodMin);
+    UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
     timeBeginPeriod(target);
     std::atexit([]() {
       TIMECAPS tc;
       if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
-        UINT target = min(1, tc.wPeriodMin);
+        UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
         timeEndPeriod(target);
       }
     });

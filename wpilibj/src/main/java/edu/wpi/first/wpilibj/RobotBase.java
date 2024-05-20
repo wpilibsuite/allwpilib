@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.cameraserver.CameraServerShared;
 import edu.wpi.first.cameraserver.CameraServerSharedStore;
-import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -178,6 +177,11 @@ public abstract class RobotBase implements AutoCloseable {
     Shuffleboard.disableActuatorWidgets();
   }
 
+  /**
+   * Returns the main thread ID.
+   *
+   * @return The main thread ID.
+   */
   public static long getMainThreadId() {
     return m_threadId;
   }
@@ -321,8 +325,7 @@ public abstract class RobotBase implements AutoCloseable {
         robotName = elements[0].getClassName();
       }
       DriverStation.reportError(
-          "Unhandled exception instantiating robot " + robotName + " " + throwable.toString(),
-          elements);
+          "Unhandled exception instantiating robot " + robotName + " " + throwable, elements);
       DriverStation.reportError(
           "The robot program quit unexpectedly."
               + " This is usually due to a code error.\n"
@@ -353,8 +356,7 @@ public abstract class RobotBase implements AutoCloseable {
           output.write(WPILibVersion.Version.getBytes(StandardCharsets.UTF_8));
         }
       } catch (IOException ex) {
-        DriverStation.reportError(
-            "Could not write FRC_Lib_Version.ini: " + ex.toString(), ex.getStackTrace());
+        DriverStation.reportError("Could not write FRC_Lib_Version.ini: " + ex, ex.getStackTrace());
       }
     }
 
@@ -366,8 +368,7 @@ public abstract class RobotBase implements AutoCloseable {
       if (cause != null) {
         throwable = cause;
       }
-      DriverStation.reportError(
-          "Unhandled exception: " + throwable.toString(), throwable.getStackTrace());
+      DriverStation.reportError("Unhandled exception: " + throwable, throwable.getStackTrace());
       errorOnExit = true;
     } finally {
       m_runMutex.lock();
@@ -418,10 +419,6 @@ public abstract class RobotBase implements AutoCloseable {
     // Force refresh DS data
     DriverStation.refreshData();
 
-    // Call a CameraServer JNI function to force OpenCV native library loading
-    // Needed because all the OpenCV JNI functions don't have built in loading
-    CameraServerJNI.enumerateSinks();
-
     HAL.report(
         tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0, WPILibVersion.Version);
 
@@ -455,6 +452,11 @@ public abstract class RobotBase implements AutoCloseable {
     } else {
       runRobot(robotSupplier);
     }
+
+    // On RIO, this will just terminate rather than shutting down cleanly (it's a no-op in sim).
+    // It's not worth the risk of hanging on shutdown when we want the code to restart as quickly
+    // as possible.
+    HAL.terminate();
 
     HAL.shutdown();
 

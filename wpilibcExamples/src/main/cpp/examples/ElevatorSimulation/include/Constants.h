@@ -25,31 +25,31 @@
 
 namespace Constants {
 
-static constexpr int kMotorPort = 0;
-static constexpr int kEncoderAChannel = 0;
-static constexpr int kEncoderBChannel = 1;
-static constexpr int kJoystickPort = 0;
+inline constexpr int kMotorPort = 0;
+inline constexpr int kEncoderAChannel = 0;
+inline constexpr int kEncoderBChannel = 1;
+inline constexpr int kJoystickPort = 0;
 
-static constexpr double kElevatorKp = 5.0;
-static constexpr double kElevatorKi = 0.0;
-static constexpr double kElevatorKd = 0.0;
+inline constexpr double kElevatorKp = 5.0;
+inline constexpr double kElevatorKi = 0.0;
+inline constexpr double kElevatorKd = 0.0;
 
-static constexpr units::volt_t kElevatorkS = 0.0_V;
-static constexpr units::volt_t kElevatorkG = 0.762_V;
-static constexpr auto kElevatorkV = 0.762_V / 1_mps;
-static constexpr auto kElevatorkA = 0.0_V / 1_mps_sq;
+inline constexpr units::volt_t kElevatorkS = 0.0_V;
+inline constexpr units::volt_t kElevatorkG = 0.762_V;
+inline constexpr auto kElevatorkV = 0.762_V / 1_mps;
+inline constexpr auto kElevatorkA = 0.0_V / 1_mps_sq;
 
-static constexpr double kElevatorGearing = 10.0;
-static constexpr units::meter_t kElevatorDrumRadius = 2_in;
-static constexpr units::kilogram_t kCarriageMass = 4.0_kg;
+inline constexpr double kElevatorGearing = 10.0;
+inline constexpr units::meter_t kElevatorDrumRadius = 2_in;
+inline constexpr units::kilogram_t kCarriageMass = 4.0_kg;
 
-static constexpr units::meter_t kSetpoint = 75_cm;
-static constexpr units::meter_t kMinElevatorHeight = 0_cm;
-static constexpr units::meter_t kMaxElevatorHeight = 1.25_m;
+inline constexpr units::meter_t kSetpoint = 75_cm;
+inline constexpr units::meter_t kMinElevatorHeight = 0_cm;
+inline constexpr units::meter_t kMaxElevatorHeight = 1.25_m;
 
 // distance per pulse = (distance per revolution) / (pulses per revolution)
 //  = (Pi * D) / ppr
-static constexpr double kArmEncoderDistPerPulse =
+inline constexpr double kArmEncoderDistPerPulse =
     2.0 * std::numbers::pi * kElevatorDrumRadius.value() / 4096.0;
 
 }  // namespace Constants

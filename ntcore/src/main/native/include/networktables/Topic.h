@@ -103,6 +103,21 @@ class Topic {
   bool IsRetained() const;
 
   /**
+   * Allow storage of the topic's last value, allowing the value to be read (and
+   * not just accessed through event queues and listeners).
+   *
+   * @param cached True for cached, false for not cached.
+   */
+  void SetCached(bool cached);
+
+  /**
+   * Returns whether the topic's last value is stored.
+   *
+   * @return True if the topic is cached.
+   */
+  bool IsCached() const;
+
+  /**
    * Determines if the topic is currently being published.
    *
    * @return True if the topic exists, false otherwise.
@@ -381,6 +396,7 @@ class Publisher {
   Publisher() = default;
   explicit Publisher(NT_Publisher handle) : m_pubHandle{handle} {}
 
+  /// NetworkTables handle.
   NT_Publisher m_pubHandle{0};
 };
 

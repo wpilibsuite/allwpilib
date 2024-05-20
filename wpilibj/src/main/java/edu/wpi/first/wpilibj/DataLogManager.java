@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DataLogBackgroundWriter;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import java.io.File;
@@ -25,8 +26,8 @@ import java.util.Random;
 /**
  * Centralized data log that provides automatic data log file management. It automatically cleans up
  * old files when disk space is low and renames the file based either on current date/time or (if
- * available) competition match number. The deta file will be saved to a USB flash drive if one is
- * attached, or to /home/lvuser otherwise.
+ * available) competition match number. The data file will be saved to a USB flash drive in a folder
+ * named "logs" if one is attached, or to /home/lvuser/logs otherwise.
  *
  * <p>Log files are initially named "FRC_TBD_{random}.wpilog" until the DS connects. After the DS
  * connects, the log file is renamed to "FRC_yyyyMMdd_HHmmss.wpilog" (where the date/time is UTC).
@@ -40,7 +41,7 @@ import java.util.Random;
  * <p>By default, all NetworkTables value changes are stored to the data log.
  */
 public final class DataLogManager {
-  private static DataLog m_log;
+  private static DataLogBackgroundWriter m_log;
   private static boolean m_stopped;
   private static String m_logDir;
   private static boolean m_filenameOverride;
@@ -113,7 +114,7 @@ public final class DataLogManager {
           }
         }
       }
-      m_log = new DataLog(m_logDir, makeLogFilename(filename), period);
+      m_log = new DataLogBackgroundWriter(m_logDir, makeLogFilename(filename), period);
       m_messageLog = new StringLogEntry(m_log, "messages");
 
       // Log all NT entries and connections
@@ -214,7 +215,10 @@ public final class DataLogManager {
         // prefer a mounted USB drive if one is accessible
         Path usbDir = Paths.get("/u").toRealPath();
         if (Files.isWritable(usbDir)) {
-          return usbDir.toString();
+          if (!new File("/u/logs").mkdir()) {
+            // ignored
+          }
+          return "/u/logs";
         }
       } catch (IOException ex) {
         // ignored
@@ -230,7 +234,11 @@ public final class DataLogManager {
       }
       return "/home/lvuser/logs";
     }
-    return Filesystem.getOperatingDirectory().getAbsolutePath();
+    String logDir = Filesystem.getOperatingDirectory().getAbsolutePath() + "/logs";
+    if (!new File(logDir).mkdir()) {
+      // ignored
+    }
+    return logDir;
   }
 
   private static String makeLogFilename(String filenameOverride) {
@@ -262,7 +270,7 @@ public final class DataLogManager {
     // based on free disk space, scan for "old" FRC_*.wpilog files and remove
     {
       File logDir = new File(m_logDir);
-      long freeSpace = logDir.getFreeSpace();
+      long freeSpace = logDir.getUsableSpace();
       if (freeSpace < kFreeSpaceThreshold) {
         // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just created one)
         File[] files =
@@ -297,7 +305,7 @@ public final class DataLogManager {
                 + freeSpace / 1000000
                 + " MB of free space remaining! Logs will get deleted below "
                 + kFreeSpaceThreshold / 1000000
-                + " MB of free space."
+                + " MB of free space. "
                 + "Consider deleting logs off the storage device.",
             false);
       }

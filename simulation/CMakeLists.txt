@@ -1,4 +1,4 @@
-if (WITH_GUI)
+if(WITH_GUI)
     add_subdirectory(halsim_gui)
 endif()
 add_subdirectory(halsim_ds_socket)

@@ -108,6 +108,11 @@ public class Ultrasonic implements Sendable, AutoCloseable {
     SendableRegistry.addLW(this, "Ultrasonic", m_echoChannel.getChannel());
   }
 
+  /**
+   * Returns the echo channel.
+   *
+   * @return The echo channel.
+   */
   public int getEchoChannel() {
     return m_echoChannel.getChannel();
   }
@@ -121,6 +126,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
    * @param echoChannel The digital input channel that receives the echo. The length of time that
    *     the echo is high represents the round trip time of the ping, and the distance.
    */
+  @SuppressWarnings("this-escape")
   public Ultrasonic(final int pingChannel, final int echoChannel) {
     m_pingChannel = new DigitalOutput(pingChannel);
     m_echoChannel = new DigitalInput(echoChannel);
@@ -138,6 +144,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
    *     10uS pulse to start.
    * @param echoChannel The digital input object that times the return pulse to determine the range.
    */
+  @SuppressWarnings("this-escape")
   public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel) {
     requireNonNullParam(pingChannel, "pingChannel", "Ultrasonic");
     requireNonNullParam(echoChannel, "echoChannel", "Ultrasonic");

@@ -275,4 +275,7 @@ public class EncoderJNI extends JNIWrapper {
    * @see "HAL_GetEncoderEncodingType"
    */
   public static native int getEncoderEncodingType(int encoderHandle);
+
+  /** Utility class. */
+  private EncoderJNI() {}
 }

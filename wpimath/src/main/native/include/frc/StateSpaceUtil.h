@@ -34,18 +34,28 @@ namespace frc {
  * @return State excursion or control effort cost matrix.
  */
 template <std::same_as<double>... Ts>
-Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(Ts... tolerances) {
-  Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
-  auto& diag = result.diagonal();
+constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(
+    Ts... tolerances) {
+  Matrixd<sizeof...(Ts), sizeof...(Ts)> result;
+
+  for (int row = 0; row < result.rows(); ++row) {
+    for (int col = 0; col < result.cols(); ++col) {
+      if (row != col) {
+        result.coeffRef(row, col) = 0.0;
+      }
+    }
+  }
+
   wpi::for_each(
       [&](int i, double tolerance) {
         if (tolerance == std::numeric_limits<double>::infinity()) {
-          diag(i) = 0.0;
+          result.coeffRef(i, i) = 0.0;
         } else {
-          diag(i) = 1.0 / std::pow(tolerance, 2);
+          result.coeffRef(i, i) = 1.0 / (tolerance * tolerance);
         }
       },
       tolerances...);
+
   return result;
 }
 
@@ -62,11 +72,21 @@ Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(Ts... tolerances) {
  * @return Process noise or measurement noise covariance matrix.
  */
 template <std::same_as<double>... Ts>
-Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
-  Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
-  auto& diag = result.diagonal();
-  wpi::for_each([&](int i, double stdDev) { diag(i) = std::pow(stdDev, 2); },
-                stdDevs...);
+constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
+  Matrixd<sizeof...(Ts), sizeof...(Ts)> result;
+
+  for (int row = 0; row < result.rows(); ++row) {
+    for (int col = 0; col < result.cols(); ++col) {
+      if (row != col) {
+        result.coeffRef(row, col) = 0.0;
+      }
+    }
+  }
+
+  wpi::for_each(
+      [&](int i, double stdDev) { result.coeffRef(i, i) = stdDev * stdDev; },
+      stdDevs...);
+
   return result;
 }
 
@@ -84,16 +104,23 @@ Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
  * @return State excursion or control effort cost matrix.
  */
 template <size_t N>
-Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
-  Eigen::DiagonalMatrix<double, N> result;
-  auto& diag = result.diagonal();
-  for (size_t i = 0; i < costs.size(); ++i) {
-    if (costs[i] == std::numeric_limits<double>::infinity()) {
-      diag(i) = 0.0;
-    } else {
-      diag(i) = 1.0 / std::pow(costs[i], 2);
+constexpr Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
+  Matrixd<N, N> result;
+
+  for (int row = 0; row < result.rows(); ++row) {
+    for (int col = 0; col < result.cols(); ++col) {
+      if (row == col) {
+        if (costs[row] == std::numeric_limits<double>::infinity()) {
+          result.coeffRef(row, col) = 0.0;
+        } else {
+          result.coeffRef(row, col) = 1.0 / (costs[row] * costs[row]);
+        }
+      } else {
+        result.coeffRef(row, col) = 0.0;
+      }
     }
   }
+
   return result;
 }
 
@@ -110,12 +137,19 @@ Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
  * @return Process noise or measurement noise covariance matrix.
  */
 template <size_t N>
-Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
-  Eigen::DiagonalMatrix<double, N> result;
-  auto& diag = result.diagonal();
-  for (size_t i = 0; i < N; ++i) {
-    diag(i) = std::pow(stdDevs[i], 2);
+constexpr Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
+  Matrixd<N, N> result;
+
+  for (int row = 0; row < result.rows(); ++row) {
+    for (int col = 0; col < result.cols(); ++col) {
+      if (row == col) {
+        result.coeffRef(row, col) = stdDevs[row] * stdDevs[row];
+      } else {
+        result.coeffRef(row, col) = 0.0;
+      }
+    }
   }
+
   return result;
 }
 
@@ -194,8 +228,8 @@ Eigen::Vector4d PoseTo4dVector(const Pose2d& pose);
  * any, have absolute values less than one, where an eigenvalue is
  * uncontrollable if rank([λI - A, B]) < n where n is the number of states.
  *
- * @tparam States The number of states.
- * @tparam Inputs The number of inputs.
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
  * @param A System matrix.
  * @param B Input matrix.
  */
@@ -253,8 +287,8 @@ IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(const Eigen::MatrixXd& A,
  * any, have absolute values less than one, where an eigenvalue is unobservable
  * if rank([λI - A; C]) < n where n is the number of states.
  *
- * @tparam States The number of states.
- * @tparam Outputs The number of outputs.
+ * @tparam States Number of states.
+ * @tparam Outputs Number of outputs.
  * @param A System matrix.
  * @param C Output matrix.
  */
@@ -277,7 +311,7 @@ Eigen::Vector3d PoseToVector(const Pose2d& pose);
 /**
  * Clamps input vector between system's minimum and maximum allowable input.
  *
- * @tparam Inputs The number of inputs.
+ * @tparam Inputs Number of inputs.
  * @param u Input vector to clamp.
  * @param umin The minimum input magnitude.
  * @param umax The maximum input magnitude.
@@ -298,7 +332,7 @@ Vectord<Inputs> ClampInputMaxMagnitude(const Vectord<Inputs>& u,
  * Renormalize all inputs if any exceeds the maximum magnitude. Useful for
  * systems such as differential drivetrains.
  *
- * @tparam Inputs      The number of inputs.
+ * @tparam Inputs      Number of inputs.
  * @param u            The input vector.
  * @param maxMagnitude The maximum magnitude any input can have.
  * @return The normalizedInput

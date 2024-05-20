@@ -14,23 +14,30 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.proto.Rotation3dProto;
+import edu.wpi.first.math.geometry.struct.Rotation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.proto.Geometry3D.ProtobufRotation3d;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Rotation3d implements Interpolatable<Rotation3d> {
+public class Rotation3d
+    implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable {
+  /**
+   * A preallocated Rotation3d representing no rotation.
+   *
+   * <p>This exists to avoid allocations for common rotations.
+   */
+  public static final Rotation3d kZero = new Rotation3d();
+
   private final Quaternion m_q;
 
-  /** Constructs a Rotation3d with a default angle of 0 degrees. */
+  /** Constructs a Rotation3d representing no rotation. */
   public Rotation3d() {
     m_q = new Quaternion();
   }
@@ -120,19 +127,15 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     // Require that the rotation matrix is special orthogonal. This is true if
     // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
     if (R.times(R.transpose()).minus(Matrix.eye(Nat.N3())).normF() > 1e-9) {
-      var builder = new StringBuilder("Rotation matrix isn't orthogonal\n\nR =\n");
-      builder.append(R.getStorage().toString()).append('\n');
-
-      var msg = builder.toString();
+      var msg = "Rotation matrix isn't orthogonal\n\nR =\n" + R.getStorage().toString() + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }
     if (Math.abs(R.det() - 1.0) > 1e-9) {
-      var builder =
-          new StringBuilder("Rotation matrix is orthogonal but not special orthogonal\n\nR =\n");
-      builder.append(R.getStorage().toString()).append('\n');
-
-      var msg = builder.toString();
+      var msg =
+          "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
+              + R.getStorage().toString()
+              + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }
@@ -194,7 +197,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
       // If the dot product is 1, the two vectors point in the same direction so
       // there's no rotation. The default initialization of m_q will work.
       m_q = new Quaternion();
-      return;
     } else if (dotNorm < -1.0 + 1E-9) {
       // If the dot product is -1, the two vectors point in opposite directions
       // so a 180 degree rotation is required. Any orthogonal vector can be used
@@ -437,76 +439,9 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
 
-  public static final class AStruct implements Struct<Rotation3d> {
-    @Override
-    public Class<Rotation3d> getTypeClass() {
-      return Rotation3d.class;
-    }
+  /** Rotation3d protobuf for serialization. */
+  public static final Rotation3dProto proto = new Rotation3dProto();
 
-    @Override
-    public String getTypeString() {
-      return "struct:Rotation3d";
-    }
-
-    @Override
-    public int getSize() {
-      return Quaternion.struct.getSize();
-    }
-
-    @Override
-    public String getSchema() {
-      return "Quaternion q";
-    }
-
-    @Override
-    public Struct<?>[] getNested() {
-      return new Struct<?>[] {Quaternion.struct};
-    }
-
-    @Override
-    public Rotation3d unpack(ByteBuffer bb) {
-      return new Rotation3d(Quaternion.struct.unpack(bb));
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Rotation3d value) {
-      Quaternion.struct.pack(bb, value.m_q);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Rotation3d, ProtobufRotation3d> {
-    @Override
-    public Class<Rotation3d> getTypeClass() {
-      return Rotation3d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufRotation3d.getDescriptor();
-    }
-
-    @Override
-    public Protobuf<?, ?>[] getNested() {
-      return new Protobuf<?, ?>[] {Quaternion.proto};
-    }
-
-    @Override
-    public ProtobufRotation3d createMessage() {
-      return ProtobufRotation3d.newInstance();
-    }
-
-    @Override
-    public Rotation3d unpack(ProtobufRotation3d msg) {
-      return new Rotation3d(Quaternion.proto.unpack(msg.getQ()));
-    }
-
-    @Override
-    public void pack(ProtobufRotation3d msg, Rotation3d value) {
-      Quaternion.proto.pack(msg.getMutableQ(), value.m_q);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  /** Rotation3d struct for serialization. */
+  public static final Rotation3dStruct struct = new Rotation3dStruct();
 }

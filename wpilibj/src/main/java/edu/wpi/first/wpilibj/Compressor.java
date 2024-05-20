@@ -31,6 +31,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * @param module The module ID to use.
    * @param moduleType The module type to use.
    */
+  @SuppressWarnings("this-escape")
   public Compressor(int module, PneumaticsModuleType moduleType) {
     m_module = PneumaticsBase.getForType(module, moduleType);
 

@@ -12,14 +12,15 @@ bool NetworkPing::Send(uint64_t curTimeMs) {
   if (curTimeMs < m_nextPingTimeMs) {
     return true;
   }
-  // if we didn't receive a timely response to our last ping, disconnect
-  uint64_t lastPing = m_wire.GetLastPingResponse();
+  // if we haven't received data in a while, disconnect
+  // (we should at least be getting PONG responses)
+  uint64_t lastData = m_wire.GetLastReceivedTime();
   // DEBUG4("WS ping: lastPing={} curTime={} pongTimeMs={}\n", lastPing,
   //        curTimeMs, m_pongTimeMs);
-  if (lastPing == 0) {
-    lastPing = m_pongTimeMs;
+  if (lastData == 0) {
+    lastData = m_pongTimeMs;
   }
-  if (m_pongTimeMs != 0 && curTimeMs > (lastPing + kPingTimeoutMs)) {
+  if (m_pongTimeMs != 0 && curTimeMs > (lastData + kPingTimeoutMs)) {
     m_wire.Disconnect("connection timed out");
     return false;
   }

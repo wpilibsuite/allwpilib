@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
  */
 public class RomiMotor extends PWMMotorController {
   /** Common initialization code called by all constructors. */
-  protected void initRomiMotor() {
+  protected final void initRomiMotor() {
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();

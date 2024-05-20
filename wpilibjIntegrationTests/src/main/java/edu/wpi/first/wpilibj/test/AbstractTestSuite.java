@@ -34,15 +34,11 @@ public abstract class AbstractTestSuite {
    */
   protected List<Class<?>> getAnnotatedTestClasses() {
     SuiteClasses annotation = getClass().getAnnotation(SuiteClasses.class);
-    List<Class<?>> classes = new ArrayList<>();
     if (annotation == null) {
       throw new RuntimeException(
           String.format("class '%s' must have a SuiteClasses annotation", getClass().getName()));
     }
-    for (Class<?> c : annotation.value()) {
-      classes.add(c);
-    }
-    return classes;
+    return List.of(annotation.value());
   }
 
   private boolean areAnySuperClassesOfTypeAbstractTestSuite(Class<?> check) {

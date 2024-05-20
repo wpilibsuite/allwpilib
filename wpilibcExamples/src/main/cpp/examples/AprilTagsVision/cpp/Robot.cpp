@@ -37,13 +37,16 @@ class Robot : public frc::TimedRobot {
  private:
   static void VisionThread() {
     frc::AprilTagDetector detector;
-    // look for tag16h5, don't correct any error bits
-    detector.AddFamily("tag16h5", 0);
+    // look for tag36h11, correct 1 error bit
+    // hamming 1 allocates 781KB, 2 allocates 27.4 MB, 3 allocates 932 MB
+    // max of 1 recommended for RoboRIO 1, while hamming 2 is feasible on the
+    // RoboRIO 2
+    detector.AddFamily("tag36h11", 1);
 
     // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000
     // (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
     frc::AprilTagPoseEstimator::Config poseEstConfig = {
-        .tagSize = units::length::inch_t(6.0),
+        .tagSize = units::length::inch_t(6.5),
         .fx = 699.3778103158814,
         .fy = 677.7161226393544,
         .cx = 345.6059345433618,

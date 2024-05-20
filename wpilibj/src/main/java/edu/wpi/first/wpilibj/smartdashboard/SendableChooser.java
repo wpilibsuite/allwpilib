@@ -53,6 +53,7 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
   private static final AtomicInteger s_instances = new AtomicInteger();
 
   /** Instantiates a {@link SendableChooser}. */
+  @SuppressWarnings("this-escape")
   public SendableChooser() {
     m_instance = s_instances.getAndIncrement();
     SendableRegistry.add(this, "SendableChooser", m_instance);

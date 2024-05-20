@@ -4,11 +4,13 @@
 
 package edu.wpi.first.util;
 
-import java.util.Arrays;
-
-/** This is a simple circular buffer so we don't need to "bucket brigade" copy old values. */
-public class CircularBuffer {
-  private double[] m_data;
+/**
+ * This is a simple circular buffer so we don't need to "bucket brigade" copy old values.
+ *
+ * @param <T> Buffer element type.
+ */
+public class CircularBuffer<T> {
+  private T[] m_data;
 
   // Index of element at front of buffer
   private int m_front;
@@ -19,11 +21,11 @@ public class CircularBuffer {
   /**
    * Create a CircularBuffer with the provided size.
    *
-   * @param size The size of the circular buffer.
+   * @param size Maximum number of buffer elements.
    */
+  @SuppressWarnings("unchecked")
   public CircularBuffer(int size) {
-    m_data = new double[size];
-    Arrays.fill(m_data, 0.0);
+    m_data = (T[]) new Object[size];
   }
 
   /**
@@ -40,7 +42,7 @@ public class CircularBuffer {
    *
    * @return value at front of buffer
    */
-  public double getFirst() {
+  public T getFirst() {
     return m_data[m_front];
   }
 
@@ -48,11 +50,13 @@ public class CircularBuffer {
    * Get value at back of buffer.
    *
    * @return value at back of buffer
+   * @throws IndexOutOfBoundsException if the index is out of range (index &lt; 0 || index &gt;=
+   *     size())
    */
-  public double getLast() {
+  public T getLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
-      return 0.0;
+      throw new IndexOutOfBoundsException("getLast() called on an empty container");
     }
 
     return m_data[(m_front + m_length - 1) % m_data.length];
@@ -64,7 +68,7 @@ public class CircularBuffer {
    *
    * @param value The value to push.
    */
-  public void addFirst(double value) {
+  public void addFirst(T value) {
     if (m_data.length == 0) {
       return;
     }
@@ -84,7 +88,7 @@ public class CircularBuffer {
    *
    * @param value The value to push.
    */
-  public void addLast(double value) {
+  public void addLast(T value) {
     if (m_data.length == 0) {
       return;
     }
@@ -103,14 +107,16 @@ public class CircularBuffer {
    * Pop value at front of buffer.
    *
    * @return value at front of buffer
+   * @throws IndexOutOfBoundsException if the index is out of range (index &lt; 0 || index &gt;=
+   *     size())
    */
-  public double removeFirst() {
+  public T removeFirst() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
-      return 0.0;
+      throw new IndexOutOfBoundsException("removeFirst() called on an empty container");
     }
 
-    double temp = m_data[m_front];
+    T temp = m_data[m_front];
     m_front = moduloInc(m_front);
     m_length--;
     return temp;
@@ -120,11 +126,13 @@ public class CircularBuffer {
    * Pop value at back of buffer.
    *
    * @return value at back of buffer
+   * @throws IndexOutOfBoundsException if the index is out of range (index &lt; 0 || index &gt;=
+   *     size())
    */
-  public double removeLast() {
+  public T removeLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
-      return 0.0;
+      throw new IndexOutOfBoundsException("removeLast() called on an empty container");
     }
 
     m_length--;
@@ -138,8 +146,9 @@ public class CircularBuffer {
    *
    * @param size New buffer size.
    */
+  @SuppressWarnings("unchecked")
   public void resize(int size) {
-    double[] newBuffer = new double[size];
+    var newBuffer = (T[]) new Object[size];
     m_length = Math.min(m_length, size);
     for (int i = 0; i < m_length; i++) {
       newBuffer[i] = m_data[(m_front + i) % m_data.length];
@@ -150,7 +159,6 @@ public class CircularBuffer {
 
   /** Sets internal buffer contents to zero. */
   public void clear() {
-    Arrays.fill(m_data, 0.0);
     m_front = 0;
     m_length = 0;
   }
@@ -161,23 +169,25 @@ public class CircularBuffer {
    * @param index Index into the buffer.
    * @return Element at index starting from front of buffer.
    */
-  public double get(int index) {
+  public T get(int index) {
     return m_data[(m_front + index) % m_data.length];
   }
 
   /**
-   * Increment an index modulo the length of the m_data buffer.
+   * Increment an index modulo the length of the buffer.
    *
    * @param index Index into the buffer.
+   * @return The incremented index.
    */
   private int moduloInc(int index) {
     return (index + 1) % m_data.length;
   }
 
   /**
-   * Decrement an index modulo the length of the m_data buffer.
+   * Decrement an index modulo the length of the buffer.
    *
    * @param index Index into the buffer.
+   * @return The decremented index.
    */
   private int moduloDec(int index) {
     if (index == 0) {

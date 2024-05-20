@@ -76,6 +76,11 @@ union trivial_helper {
 
 } // end namespace detail
 
+// https://stackoverflow.com/questions/55288555/c-check-if-statement-can-be-evaluated-constexpr
+template<class Lambda, int=(Lambda{}(), 0)>
+constexpr bool is_constexpr(Lambda) { return true; }
+constexpr bool is_constexpr(...) { return false; }
+
 } // end namespace wpi
 
 #endif // WPIUTIL_WPI_TYPE_TRAITS_H

@@ -8,7 +8,6 @@
 
 #include <frc/Encoder.h>
 #include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
@@ -45,10 +44,9 @@ class Drive : public frc2::SubsystemBase {
   frc::PWMSparkMax m_rightLeader{DriveConstants::kRightMotor1Port};
   frc::PWMSparkMax m_rightFollower{DriveConstants::kRightMotor2Port};
 
-  frc::MotorControllerGroup m_leftMotors{m_leftLeader, m_leftFollower};
-  frc::MotorControllerGroup m_rightMotors{m_rightLeader, m_rightFollower};
-
-  frc::DifferentialDrive m_drive{m_leftMotors, m_rightMotors};
+  frc::DifferentialDrive m_drive{
+      [&](double output) { m_leftLeader.Set(output); },
+      [&](double output) { m_rightLeader.Set(output); }};
 
   frc::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
                              DriveConstants::kLeftEncoderPorts[1],

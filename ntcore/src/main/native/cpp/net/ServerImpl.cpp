@@ -917,6 +917,7 @@ void ServerImpl::ClientData3::EntryAssign(std::string_view name,
   auto typeStr = TypeToString(value.type());
   wpi::json properties = wpi::json::object();
   properties["retained"] = true;  // treat all NT3 published topics as retained
+  properties["cached"] = true;    // treat all NT3 published topics as cached
   if ((flags & NT_PERSISTENT) != 0) {
     properties["persistent"] = true;
   }
@@ -1095,6 +1096,7 @@ bool ServerImpl::TopicData::SetProperties(const wpi::json& update) {
 void ServerImpl::TopicData::RefreshProperties() {
   persistent = false;
   retained = false;
+  cached = true;
 
   auto persistentIt = properties.find("persistent");
   if (persistentIt != properties.end()) {
@@ -1109,6 +1111,23 @@ void ServerImpl::TopicData::RefreshProperties() {
       retained = *val;
     }
   }
+
+  auto cachedIt = properties.find("cached");
+  if (cachedIt != properties.end()) {
+    if (auto val = cachedIt->get_ptr<bool*>()) {
+      cached = *val;
+    }
+  }
+
+  if (!cached) {
+    lastValue = {};
+    lastValueClient = nullptr;
+  }
+
+  if (!cached && persistent) {
+    WARN("topic {}: disabling cached property disables persistent storage",
+         name);
+  }
 }
 
 bool ServerImpl::TopicData::SetFlags(unsigned int flags_) {
@@ -1121,6 +1140,30 @@ bool ServerImpl::TopicData::SetFlags(unsigned int flags_) {
     updated = persistent;
     persistent = false;
     properties.erase("persistent");
+  }
+  if ((flags_ & NT_RETAINED) != 0) {
+    updated |= !retained;
+    retained = true;
+    properties["retained"] = true;
+  } else {
+    updated |= retained;
+    retained = false;
+    properties.erase("retained");
+  }
+  if ((flags_ & NT_UNCACHED) != 0) {
+    updated |= cached;
+    cached = false;
+    properties["cached"] = false;
+    lastValue = {};
+    lastValueClient = nullptr;
+  } else {
+    updated |= !cached;
+    cached = true;
+    properties.erase("cached");
+  }
+  if (!cached && persistent) {
+    WARN("topic {}: disabling cached property disables persistent storage",
+         name);
   }
   return updated;
 }
@@ -1642,7 +1685,7 @@ ServerImpl::TopicData* ServerImpl::CreateTopic(ClientData* client,
   } else {
     // new topic
     unsigned int id = m_topics.emplace_back(
-        std::make_unique<TopicData>(name, typeStr, properties));
+        std::make_unique<TopicData>(m_logger, name, typeStr, properties));
     topic = m_topics[id].get();
     topic->id = id;
     topic->special = special;
@@ -1663,8 +1706,14 @@ ServerImpl::TopicData* ServerImpl::CreateTopic(ClientData* client,
       }
 
       auto& tcd = topic->clients[aClient.get()];
+      bool added = false;
       for (auto subscriber : subscribers) {
-        tcd.AddSubscriber(subscriber);
+        if (tcd.AddSubscriber(subscriber)) {
+          added = true;
+        }
+      }
+      if (added) {
+        aClient->UpdatePeriod(tcd, topic);
       }
 
       if (aClient.get() == client) {
@@ -1707,6 +1756,7 @@ void ServerImpl::DeleteTopic(TopicData* topic) {
   // unannounce to all subscribers
   for (auto&& tcd : topic->clients) {
     if (!tcd.second.subscribers.empty()) {
+      tcd.first->UpdatePeriod(tcd.second, topic);
       tcd.first->SendUnannounce(topic);
     }
   }
@@ -1751,8 +1801,9 @@ void ServerImpl::SetFlags(ClientData* client, TopicData* topic,
 void ServerImpl::SetValue(ClientData* client, TopicData* topic,
                           const Value& value) {
   // update retained value if from same client or timestamp newer
-  if (!topic->lastValue || topic->lastValueClient == client ||
-      topic->lastValue.time() == 0 || value.time() >= topic->lastValue.time()) {
+  if (topic->cached && (!topic->lastValue || topic->lastValueClient == client ||
+                        topic->lastValue.time() == 0 ||
+                        value.time() >= topic->lastValue.time())) {
     DEBUG4("updating '{}' last value (time was {} is {})", topic->name,
            topic->lastValue.time(), value.time());
     topic->lastValue = value;
@@ -1765,7 +1816,8 @@ void ServerImpl::SetValue(ClientData* client, TopicData* topic,
   }
 
   for (auto&& tcd : topic->clients) {
-    if (tcd.second.sendMode != ValueSendMode::kDisabled) {
+    if (tcd.first != client &&
+        tcd.second.sendMode != ValueSendMode::kDisabled) {
       tcd.first->SendValue(topic, value, tcd.second.sendMode);
     }
   }

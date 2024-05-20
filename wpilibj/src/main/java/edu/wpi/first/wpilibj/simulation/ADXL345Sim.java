@@ -9,10 +9,11 @@ import edu.wpi.first.wpilibj.ADXL345_I2C;
 import edu.wpi.first.wpilibj.ADXL345_SPI;
 import java.util.Objects;
 
+/** Class to control a simulated ADXL345. */
 public class ADXL345Sim {
-  protected SimDouble m_simX;
-  protected SimDouble m_simY;
-  protected SimDouble m_simZ;
+  private SimDouble m_simX;
+  private SimDouble m_simY;
+  private SimDouble m_simZ;
 
   /**
    * Constructor.
@@ -48,15 +49,30 @@ public class ADXL345Sim {
     Objects.requireNonNull(m_simZ);
   }
 
-  public void setX(double x) {
-    m_simX.set(x);
+  /**
+   * Sets the X acceleration.
+   *
+   * @param accel The X acceleration.
+   */
+  public void setX(double accel) {
+    m_simX.set(accel);
   }
 
-  public void setY(double y) {
-    m_simY.set(y);
+  /**
+   * Sets the Y acceleration.
+   *
+   * @param accel The Y acceleration.
+   */
+  public void setY(double accel) {
+    m_simY.set(accel);
   }
 
-  public void setZ(double z) {
-    m_simZ.set(z);
+  /**
+   * Sets the Z acceleration.
+   *
+   * @param accel The Z acceleration.
+   */
+  public void setZ(double accel) {
+    m_simZ.set(accel);
   }
 }

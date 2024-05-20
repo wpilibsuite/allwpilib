@@ -36,7 +36,7 @@ public class Tracer {
   }
 
   /** Restarts the epoch timer. */
-  public void resetTimer() {
+  public final void resetTimer() {
     m_startTime = RobotController.getFPGATime();
   }
 
@@ -75,9 +75,7 @@ public class Tracer {
       StringBuilder sb = new StringBuilder();
       m_lastEpochsPrintTime = now;
       m_epochs.forEach(
-          (key, value) -> {
-            sb.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6));
-          });
+          (key, value) -> sb.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6)));
       if (sb.length() > 0) {
         output.accept(sb.toString());
       }

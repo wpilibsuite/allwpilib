@@ -4,12 +4,11 @@
 
 package edu.wpi.first.math.geometry;
 
-import edu.wpi.first.math.proto.Geometry2D.ProtobufTwist2d;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
+import edu.wpi.first.math.geometry.proto.Twist2dProto;
+import edu.wpi.first.math.geometry.struct.Twist2dStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
 /**
  * A change in distance along a 2D arc since the last pose update. We can use ideas from
@@ -17,7 +16,7 @@ import us.hebi.quickbuf.Descriptors.Descriptor;
  *
  * <p>A Twist can be used to represent a difference between two poses.
  */
-public class Twist2d {
+public class Twist2d implements ProtobufSerializable, StructSerializable {
   /** Linear "dx" component. */
   public double dx;
 
@@ -27,6 +26,7 @@ public class Twist2d {
   /** Angular "dtheta" component (radians). */
   public double dtheta;
 
+  /** Default constructor. */
   public Twist2d() {}
 
   /**
@@ -68,71 +68,9 @@ public class Twist2d {
     return Objects.hash(dx, dy, dtheta);
   }
 
-  public static final class AStruct implements Struct<Twist2d> {
-    @Override
-    public Class<Twist2d> getTypeClass() {
-      return Twist2d.class;
-    }
+  /** Twist2d protobuf for serialization. */
+  public static final Twist2dProto proto = new Twist2dProto();
 
-    @Override
-    public String getTypeString() {
-      return "struct:Twist2d";
-    }
-
-    @Override
-    public int getSize() {
-      return kSizeDouble * 3;
-    }
-
-    @Override
-    public String getSchema() {
-      return "double dx;double dy;double dtheta";
-    }
-
-    @Override
-    public Twist2d unpack(ByteBuffer bb) {
-      double dx = bb.getDouble();
-      double dy = bb.getDouble();
-      double dtheta = bb.getDouble();
-      return new Twist2d(dx, dy, dtheta);
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Twist2d value) {
-      bb.putDouble(value.dx);
-      bb.putDouble(value.dy);
-      bb.putDouble(value.dtheta);
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Twist2d, ProtobufTwist2d> {
-    @Override
-    public Class<Twist2d> getTypeClass() {
-      return Twist2d.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufTwist2d.getDescriptor();
-    }
-
-    @Override
-    public ProtobufTwist2d createMessage() {
-      return ProtobufTwist2d.newInstance();
-    }
-
-    @Override
-    public Twist2d unpack(ProtobufTwist2d msg) {
-      return new Twist2d(msg.getDx(), msg.getDy(), msg.getDtheta());
-    }
-
-    @Override
-    public void pack(ProtobufTwist2d msg, Twist2d value) {
-      msg.setDx(value.dx).setDy(value.dy).setDtheta(value.dtheta);
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  /** Twist2d struct for serialization. */
+  public static final Twist2dStruct struct = new Twist2dStruct();
 }

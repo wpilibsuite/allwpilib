@@ -21,6 +21,12 @@
 #ifndef _gcem_fmod_HPP
 #define _gcem_fmod_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -64,7 +70,13 @@ common_return_t<T1,T2>
 fmod(const T1 x, const T2 y)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::fmod_type_check(x,y);
+  } else {
+    return std::fmod(x, y);
+  }
+}
+
 }
 
 #endif

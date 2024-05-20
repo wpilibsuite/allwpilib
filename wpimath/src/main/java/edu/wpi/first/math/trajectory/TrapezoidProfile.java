@@ -47,20 +47,21 @@ public class TrapezoidProfile {
 
   private final Constraints m_constraints;
   private State m_current;
-  private State m_goal; // TODO: Remove
-  private final boolean m_newAPI; // TODO: Remove
 
   private double m_endAccel;
   private double m_endFullSpeed;
   private double m_endDeccel;
 
+  /** Profile constraints. */
   public static class Constraints {
+    /** Maximum velocity. */
     public final double maxVelocity;
 
+    /** Maximum acceleration. */
     public final double maxAcceleration;
 
     /**
-     * Construct constraints for a TrapezoidProfile.
+     * Constructs constraints for a TrapezoidProfile.
      *
      * @param maxVelocity maximum velocity
      * @param maxAcceleration maximum acceleration
@@ -71,24 +72,48 @@ public class TrapezoidProfile {
       MathSharedStore.reportUsage(MathUsageId.kTrajectory_TrapezoidProfile, 1);
     }
 
+    /**
+     * Constructs constraints for a TrapezoidProfile.
+     *
+     * @param <U> Unit type.
+     * @param maxVelocity maximum velocity
+     * @param maxAcceleration maximum acceleration
+     */
     public <U extends Unit<U>> Constraints(
         Measure<Velocity<U>> maxVelocity, Measure<Velocity<Velocity<U>>> maxAcceleration) {
       this(maxVelocity.baseUnitMagnitude(), maxAcceleration.baseUnitMagnitude());
     }
   }
 
+  /** Profile state. */
   public static class State {
+    /** The position at this state. */
     public double position;
 
+    /** The velocity at this state. */
     public double velocity;
 
+    /** Default constructor. */
     public State() {}
 
+    /**
+     * Constructs constraints for a Trapezoid Profile.
+     *
+     * @param position The position at this state.
+     * @param velocity The velocity at this state.
+     */
     public State(double position, double velocity) {
       this.position = position;
       this.velocity = velocity;
     }
 
+    /**
+     * Constructs constraints for a Trapezoid Profile.
+     *
+     * @param <U> Unit type.
+     * @param position The position at this state.
+     * @param velocity The velocity at this state.
+     */
     public <U extends Unit<U>> State(Measure<U> position, Measure<Velocity<U>> velocity) {
       this(position.baseUnitMagnitude(), velocity.baseUnitMagnitude());
     }
@@ -110,120 +135,19 @@ public class TrapezoidProfile {
   }
 
   /**
-   * Construct a TrapezoidProfile.
+   * Constructs a TrapezoidProfile.
    *
    * @param constraints The constraints on the profile, like maximum velocity.
    */
   public TrapezoidProfile(Constraints constraints) {
     m_constraints = constraints;
-    m_newAPI = true;
   }
 
   /**
-   * Construct a TrapezoidProfile.
+   * Calculates the position and velocity for the profile at a time t where the current state is at
+   * time t = 0.
    *
-   * @param constraints The constraints on the profile, like maximum velocity.
-   * @param goal The desired state when the profile is complete.
-   * @param initial The initial state (usually the current state).
-   * @deprecated Pass the desired and current state into calculate instead of constructing a new
-   *     TrapezoidProfile with the desired and current state
-   */
-  @Deprecated(since = "2024", forRemoval = true)
-  public TrapezoidProfile(Constraints constraints, State goal, State initial) {
-    m_direction = shouldFlipAcceleration(initial, goal) ? -1 : 1;
-    m_constraints = constraints;
-    m_current = direct(initial);
-    m_goal = direct(goal);
-    m_newAPI = false;
-    if (m_current.velocity > m_constraints.maxVelocity) {
-      m_current.velocity = m_constraints.maxVelocity;
-    }
-
-    // Deal with a possibly truncated motion profile (with nonzero initial or
-    // final velocity) by calculating the parameters as if the profile began and
-    // ended at zero velocity
-    double cutoffBegin = m_current.velocity / m_constraints.maxAcceleration;
-    double cutoffDistBegin = cutoffBegin * cutoffBegin * m_constraints.maxAcceleration / 2.0;
-
-    double cutoffEnd = m_goal.velocity / m_constraints.maxAcceleration;
-    double cutoffDistEnd = cutoffEnd * cutoffEnd * m_constraints.maxAcceleration / 2.0;
-
-    // Now we can calculate the parameters as if it was a full trapezoid instead
-    // of a truncated one
-
-    double fullTrapezoidDist =
-        cutoffDistBegin + (m_goal.position - m_current.position) + cutoffDistEnd;
-    double accelerationTime = m_constraints.maxVelocity / m_constraints.maxAcceleration;
-
-    double fullSpeedDist =
-        fullTrapezoidDist - accelerationTime * accelerationTime * m_constraints.maxAcceleration;
-
-    // Handle the case where the profile never reaches full speed
-    if (fullSpeedDist < 0) {
-      accelerationTime = Math.sqrt(fullTrapezoidDist / m_constraints.maxAcceleration);
-      fullSpeedDist = 0;
-    }
-
-    m_endAccel = accelerationTime - cutoffBegin;
-    m_endFullSpeed = m_endAccel + fullSpeedDist / m_constraints.maxVelocity;
-    m_endDeccel = m_endFullSpeed + accelerationTime - cutoffEnd;
-  }
-
-  /**
-   * Construct a TrapezoidProfile.
-   *
-   * @param constraints The constraints on the profile, like maximum velocity.
-   * @param goal The desired state when the profile is complete.
-   * @deprecated Pass the desired and current state into calculate instead of constructing a new
-   *     TrapezoidProfile with the desired and current state
-   */
-  @Deprecated(since = "2024", forRemoval = true)
-  public TrapezoidProfile(Constraints constraints, State goal) {
-    this(constraints, goal, new State(0, 0));
-  }
-
-  /**
-   * Calculate the correct position and velocity for the profile at a time t where the beginning of
-   * the profile was at time t = 0.
-   *
-   * @param t The time since the beginning of the profile.
-   * @return The position and velocity of the profile at time t.
-   * @deprecated Pass the desired and current state into calculate instead of constructing a new
-   *     TrapezoidProfile with the desired and current state
-   */
-  @Deprecated(since = "2024", forRemoval = true)
-  public State calculate(double t) {
-    if (m_newAPI) {
-      throw new RuntimeException("Cannot use new constructor with deprecated calculate()");
-    }
-    State result = new State(m_current.position, m_current.velocity);
-
-    if (t < m_endAccel) {
-      result.velocity += t * m_constraints.maxAcceleration;
-      result.position += (m_current.velocity + t * m_constraints.maxAcceleration / 2.0) * t;
-    } else if (t < m_endFullSpeed) {
-      result.velocity = m_constraints.maxVelocity;
-      result.position +=
-          (m_current.velocity + m_endAccel * m_constraints.maxAcceleration / 2.0) * m_endAccel
-              + m_constraints.maxVelocity * (t - m_endAccel);
-    } else if (t <= m_endDeccel) {
-      result.velocity = m_goal.velocity + (m_endDeccel - t) * m_constraints.maxAcceleration;
-      double timeLeft = m_endDeccel - t;
-      result.position =
-          m_goal.position
-              - (m_goal.velocity + timeLeft * m_constraints.maxAcceleration / 2.0) * timeLeft;
-    } else {
-      result = m_goal;
-    }
-
-    return direct(result);
-  }
-
-  /**
-   * Calculate the correct position and velocity for the profile at a time t where the beginning of
-   * the profile was at time t = 0.
-   *
-   * @param t The time since the beginning of the profile.
+   * @param t How long to advance from the current state toward the desired state.
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.

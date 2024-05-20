@@ -11,6 +11,9 @@
 
 using namespace frc;
 
+Translation2d::Translation2d(const Eigen::Vector2d& vector)
+    : m_x{units::meter_t{vector.x()}}, m_y{units::meter_t{vector.y()}} {}
+
 units::meter_t Translation2d::Distance(const Translation2d& other) const {
   return units::math::hypot(other.m_x - m_x, other.m_y - m_y);
 }
@@ -48,23 +51,4 @@ void frc::to_json(wpi::json& json, const Translation2d& translation) {
 void frc::from_json(const wpi::json& json, Translation2d& translation) {
   translation = Translation2d{units::meter_t{json.at("x").get<double>()},
                               units::meter_t{json.at("y").get<double>()}};
-}
-
-google::protobuf::Message* wpi::Protobuf<frc::Translation2d>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufTranslation2d>(arena);
-}
-
-frc::Translation2d wpi::Protobuf<frc::Translation2d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufTranslation2d*>(&msg);
-  return frc::Translation2d{units::meter_t{m->x()}, units::meter_t{m->y()}};
-}
-
-void wpi::Protobuf<frc::Translation2d>::Pack(google::protobuf::Message* msg,
-                                             const frc::Translation2d& value) {
-  auto m = static_cast<wpi::proto::ProtobufTranslation2d*>(msg);
-  m->set_x(value.X().value());
-  m->set_y(value.Y().value());
 }

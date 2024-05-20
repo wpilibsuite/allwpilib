@@ -230,7 +230,7 @@ public final class Preferences {
    */
   public static void setLong(String key, long value) {
     NetworkTableEntry entry = m_table.getEntry(key);
-    entry.setDouble(value);
+    entry.setInteger(value);
     entry.setPersistent();
   }
 
@@ -242,7 +242,7 @@ public final class Preferences {
    */
   public static void initLong(String key, long value) {
     NetworkTableEntry entry = m_table.getEntry(key);
-    entry.setDefaultDouble(value);
+    entry.setDefaultInteger(value);
     entry.setPersistent();
   }
 
@@ -345,6 +345,6 @@ public final class Preferences {
    * @return either the value in the table, or the backup
    */
   public static long getLong(String key, long backup) {
-    return (long) m_table.getEntry(key).getDouble(backup);
+    return m_table.getEntry(key).getInteger(backup);
   }
 }

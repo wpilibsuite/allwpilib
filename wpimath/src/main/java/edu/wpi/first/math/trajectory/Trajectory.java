@@ -7,6 +7,9 @@ package edu.wpi.first.math.trajectory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.trajectory.proto.TrajectoryProto;
+import edu.wpi.first.math.trajectory.proto.TrajectoryStateProto;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +19,10 @@ import java.util.stream.Collectors;
  * Represents a time-parameterized trajectory. The trajectory contains of various States that
  * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
  */
-public class Trajectory {
+public class Trajectory implements ProtobufSerializable {
+  /** Trajectory protobuf for serialization. */
+  public static final TrajectoryProto proto = new TrajectoryProto();
+
   private final double m_totalTimeSeconds;
   private final List<State> m_states;
 
@@ -263,29 +269,33 @@ public class Trajectory {
    * Represents a time-parameterized trajectory. The trajectory contains of various States that
    * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
    */
-  public static class State {
-    // The time elapsed since the beginning of the trajectory.
+  public static class State implements ProtobufSerializable {
+    /** Trajectory.State protobuf for serialization. */
+    public static final TrajectoryStateProto proto = new TrajectoryStateProto();
+
+    /** The time elapsed since the beginning of the trajectory. */
     @JsonProperty("time")
     public double timeSeconds;
 
-    // The speed at that point of the trajectory.
+    /** The speed at that point of the trajectory. */
     @JsonProperty("velocity")
     public double velocityMetersPerSecond;
 
-    // The acceleration at that point of the trajectory.
+    /** The acceleration at that point of the trajectory. */
     @JsonProperty("acceleration")
     public double accelerationMetersPerSecondSq;
 
-    // The pose at that point of the trajectory.
+    /** The pose at that point of the trajectory. */
     @JsonProperty("pose")
     public Pose2d poseMeters;
 
-    // The curvature at that point of the trajectory.
+    /** The curvature at that point of the trajectory. */
     @JsonProperty("curvature")
     public double curvatureRadPerMeter;
 
+    /** Default constructor. */
     public State() {
-      poseMeters = new Pose2d();
+      poseMeters = Pose2d.kZero;
     }
 
     /**

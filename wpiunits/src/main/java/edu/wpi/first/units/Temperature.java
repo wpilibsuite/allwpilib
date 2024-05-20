@@ -4,9 +4,22 @@
 
 package edu.wpi.first.units;
 
+/**
+ * Unit of temperature dimension.
+ *
+ * <p>This is the base type for units of temperature dimension. It is also used to specify the
+ * dimension for {@link Measure}: <code>Measure&lt;Temperature&gt;</code>.
+ *
+ * <p>Actual units (such as {@link Units#Celsius} and {@link Units#Fahrenheit}) can be found in the
+ * {@link Units} class.
+ */
 public class Temperature extends Unit<Temperature> {
   Temperature(
-      UnaryFunction toBaseConverter, UnaryFunction fromBaseConverter, String name, String symbol) {
-    super(Temperature.class, toBaseConverter, fromBaseConverter, name, symbol);
+      Temperature baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 }

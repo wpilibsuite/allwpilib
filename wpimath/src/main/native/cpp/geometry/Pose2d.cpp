@@ -9,7 +9,6 @@
 #include <wpi/json.h>
 
 #include "frc/MathUtil.h"
-#include "geometry2d.pb.h"
 
 using namespace frc;
 
@@ -108,24 +107,4 @@ void frc::to_json(wpi::json& json, const Pose2d& pose) {
 void frc::from_json(const wpi::json& json, Pose2d& pose) {
   pose = Pose2d{json.at("translation").get<Translation2d>(),
                 json.at("rotation").get<Rotation2d>()};
-}
-
-google::protobuf::Message* wpi::Protobuf<frc::Pose2d>::New(
-    google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufPose2d>(
-      arena);
-}
-
-frc::Pose2d wpi::Protobuf<frc::Pose2d>::Unpack(
-    const google::protobuf::Message& msg) {
-  auto m = static_cast<const wpi::proto::ProtobufPose2d*>(&msg);
-  return Pose2d{wpi::UnpackProtobuf<frc::Translation2d>(m->translation()),
-                wpi::UnpackProtobuf<frc::Rotation2d>(m->rotation())};
-}
-
-void wpi::Protobuf<frc::Pose2d>::Pack(google::protobuf::Message* msg,
-                                      const frc::Pose2d& value) {
-  auto m = static_cast<wpi::proto::ProtobufPose2d*>(msg);
-  wpi::PackProtobuf(m->mutable_translation(), value.Translation());
-  wpi::PackProtobuf(m->mutable_rotation(), value.Rotation());
 }

@@ -50,16 +50,12 @@ public class Pneumatics extends SubsystemBase {
    */
   public Command disableCompressorCommand() {
     return startEnd(
-            () -> {
-              // Disable closed-loop mode on the compressor.
-              m_compressor.disable();
-            },
-            () -> {
-              // Enable closed-loop mode based on the digital pressure switch connected to the
-              // PCM/PH.
-              // The switch is open when the pressure is over ~120 PSI.
-              m_compressor.enableDigital();
-            })
+            // Disable closed-loop mode on the compressor.
+            m_compressor::disable,
+            // Enable closed-loop mode based on the digital pressure switch connected to the
+            // PCM/PH.
+            // The switch is open when the pressure is over ~120 PSI.
+            m_compressor::enableDigital)
         .withName("Compressor Disabled");
   }
 }

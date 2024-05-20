@@ -5,7 +5,13 @@
 #pragma once
 
 #include <algorithm>
+#include <stdexcept>
 #include <string>
+#include <string_view>
+
+#include <fmt/core.h>
+#include <wpi/StringExtras.h>
+#include <wpi/ct_string.h>
 
 #include "Color.h"
 
@@ -16,6 +22,9 @@ namespace frc {
  */
 class Color8Bit {
  public:
+  /**
+   * Constructs a default color (black).
+   */
   constexpr Color8Bit() = default;
 
   /**
@@ -40,21 +49,79 @@ class Color8Bit {
         green(color.green * 255),
         blue(color.blue * 255) {}
 
+  /**
+   * Constructs a Color8Bit from a hex string.
+   *
+   * @param hexString a string of the format <tt>\#RRGGBB</tt>
+   * @throws std::invalid_argument if the hex string is invalid.
+   */
+  explicit constexpr Color8Bit(std::string_view hexString) {
+    if (hexString.length() != 7 || !hexString.starts_with("#") ||
+        !wpi::isHexDigit(hexString[1]) || !wpi::isHexDigit(hexString[2]) ||
+        !wpi::isHexDigit(hexString[3]) || !wpi::isHexDigit(hexString[4]) ||
+        !wpi::isHexDigit(hexString[5]) || !wpi::isHexDigit(hexString[6])) {
+      throw std::invalid_argument(
+          fmt::format("Invalid hex string for Color \"{}\"", hexString));
+    }
+
+    red = wpi::hexDigitValue(hexString[1]) * 16 +
+          wpi::hexDigitValue(hexString[2]);
+    green = wpi::hexDigitValue(hexString[3]) * 16 +
+            wpi::hexDigitValue(hexString[4]);
+    blue = wpi::hexDigitValue(hexString[5]) * 16 +
+           wpi::hexDigitValue(hexString[6]);
+  }
+
+  constexpr bool operator==(const Color8Bit&) const = default;
+
   constexpr operator Color() const {  // NOLINT
     return Color(red / 255.0, green / 255.0, blue / 255.0);
   }
 
-  constexpr bool operator==(const Color8Bit&) const = default;
+  /**
+   * Create a Color8Bit from a hex string.
+   *
+   * @param hexString a string of the format <tt>\#RRGGBB</tt>
+   * @return Color8Bit object from hex string.
+   * @throws std::invalid_argument if the hex string is invalid.
+   */
+  static constexpr Color8Bit FromHexString(std::string_view hexString) {
+    if (hexString.length() != 7 || !hexString.starts_with("#") ||
+        !wpi::isHexDigit(hexString[1]) || !wpi::isHexDigit(hexString[2]) ||
+        !wpi::isHexDigit(hexString[3]) || !wpi::isHexDigit(hexString[4]) ||
+        !wpi::isHexDigit(hexString[5]) || !wpi::isHexDigit(hexString[6])) {
+      throw std::invalid_argument(
+          fmt::format("Invalid hex string for Color \"{}\"", hexString));
+    }
+
+    int r = wpi::hexDigitValue(hexString[0]) * 16 +
+            wpi::hexDigitValue(hexString[1]);
+    int g = wpi::hexDigitValue(hexString[2]) * 16 +
+            wpi::hexDigitValue(hexString[3]);
+    int b = wpi::hexDigitValue(hexString[4]) * 16 +
+            wpi::hexDigitValue(hexString[5]);
+    return Color8Bit{r, g, b};
+  }
 
   /**
    * Return this color represented as a hex string.
    *
    * @return a string of the format <tt>\#RRGGBB</tt>
    */
-  std::string HexString() const;
+  constexpr auto HexString() const {
+    return wpi::ct_string<char, std::char_traits<char>, 7>{
+        {'#', wpi::hexdigit(red / 16), wpi::hexdigit(red % 16),
+         wpi::hexdigit(green / 16), wpi::hexdigit(green % 16),
+         wpi::hexdigit(blue / 16), wpi::hexdigit(blue % 16)}};
+  }
 
+  /// Red component (0-255).
   int red = 0;
+
+  /// Green component (0-255).
   int green = 0;
+
+  /// Blue component (0-255).
   int blue = 0;
 };
 

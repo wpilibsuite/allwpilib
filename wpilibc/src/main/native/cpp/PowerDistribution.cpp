@@ -172,6 +172,118 @@ PowerDistribution::Faults PowerDistribution::GetFaults() const {
   return faults;
 }
 
+bool PowerDistribution::Faults::GetBreakerFault(int channel) const {
+  switch (channel) {
+    case 0:
+      return Channel0BreakerFault != 0;
+    case 1:
+      return Channel1BreakerFault != 0;
+    case 2:
+      return Channel2BreakerFault != 0;
+    case 3:
+      return Channel3BreakerFault != 0;
+    case 4:
+      return Channel4BreakerFault != 0;
+    case 5:
+      return Channel5BreakerFault != 0;
+    case 6:
+      return Channel6BreakerFault != 0;
+    case 7:
+      return Channel7BreakerFault != 0;
+    case 8:
+      return Channel8BreakerFault != 0;
+    case 9:
+      return Channel9BreakerFault != 0;
+    case 10:
+      return Channel10BreakerFault != 0;
+    case 11:
+      return Channel11BreakerFault != 0;
+    case 12:
+      return Channel12BreakerFault != 0;
+    case 13:
+      return Channel13BreakerFault != 0;
+    case 14:
+      return Channel14BreakerFault != 0;
+    case 15:
+      return Channel15BreakerFault != 0;
+    case 16:
+      return Channel16BreakerFault != 0;
+    case 17:
+      return Channel17BreakerFault != 0;
+    case 18:
+      return Channel18BreakerFault != 0;
+    case 19:
+      return Channel19BreakerFault != 0;
+    case 20:
+      return Channel20BreakerFault != 0;
+    case 21:
+      return Channel21BreakerFault != 0;
+    case 22:
+      return Channel22BreakerFault != 0;
+    case 23:
+      return Channel23BreakerFault != 0;
+    default:
+      throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                          "Power distribution fault channel out of bounds!");
+  }
+}
+
+bool PowerDistribution::StickyFaults::GetBreakerFault(int channel) const {
+  switch (channel) {
+    case 0:
+      return Channel0BreakerFault != 0;
+    case 1:
+      return Channel1BreakerFault != 0;
+    case 2:
+      return Channel2BreakerFault != 0;
+    case 3:
+      return Channel3BreakerFault != 0;
+    case 4:
+      return Channel4BreakerFault != 0;
+    case 5:
+      return Channel5BreakerFault != 0;
+    case 6:
+      return Channel6BreakerFault != 0;
+    case 7:
+      return Channel7BreakerFault != 0;
+    case 8:
+      return Channel8BreakerFault != 0;
+    case 9:
+      return Channel9BreakerFault != 0;
+    case 10:
+      return Channel10BreakerFault != 0;
+    case 11:
+      return Channel11BreakerFault != 0;
+    case 12:
+      return Channel12BreakerFault != 0;
+    case 13:
+      return Channel13BreakerFault != 0;
+    case 14:
+      return Channel14BreakerFault != 0;
+    case 15:
+      return Channel15BreakerFault != 0;
+    case 16:
+      return Channel16BreakerFault != 0;
+    case 17:
+      return Channel17BreakerFault != 0;
+    case 18:
+      return Channel18BreakerFault != 0;
+    case 19:
+      return Channel19BreakerFault != 0;
+    case 20:
+      return Channel20BreakerFault != 0;
+    case 21:
+      return Channel21BreakerFault != 0;
+    case 22:
+      return Channel22BreakerFault != 0;
+    case 23:
+      return Channel23BreakerFault != 0;
+    default:
+      throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                          "Power distribution fault channel out of bounds!");
+  }
+}
+
 PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
   int32_t status = 0;
   HAL_PowerDistributionStickyFaults halStickyFaults;

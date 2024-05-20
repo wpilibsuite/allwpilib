@@ -22,10 +22,22 @@
 
 using namespace frc2;
 
+CommandPtr::CommandPtr(std::unique_ptr<Command>&& command)
+    : m_ptr(std::move(command)) {
+  AssertValid();
+}
+
+CommandPtr::CommandPtr(CommandPtr&& rhs) {
+  m_ptr = std::move(rhs.m_ptr);
+  AssertValid();
+  rhs.m_moveOutSite = wpi::GetStackTrace(1);
+}
+
 void CommandPtr::AssertValid() const {
   if (!m_ptr) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
-                        "Moved-from CommandPtr object used!");
+                        "Moved-from CommandPtr object used!\nMoved out at:\n{}",
+                        m_moveOutSite);
   }
 }
 
@@ -154,6 +166,15 @@ CommandPtr CommandPtr::OnlyIf(std::function<bool()> condition) && {
 }
 
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
+  AssertValid();
+  std::vector<std::unique_ptr<Command>> vec;
+  vec.emplace_back(std::move(parallel).Unwrap());
+  m_ptr =
+      std::make_unique<ParallelDeadlineGroup>(std::move(m_ptr), std::move(vec));
+  return std::move(*this);
+}
+
+CommandPtr CommandPtr::DeadlineFor(CommandPtr&& parallel) && {
   AssertValid();
   std::vector<std::unique_ptr<Command>> vec;
   vec.emplace_back(std::move(parallel).Unwrap());

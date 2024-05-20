@@ -21,6 +21,9 @@
 #ifndef _gcem_lbeta_HPP
 #define _gcem_lbeta_HPP
 
+namespace gcem
+{
+
 /**
  * Compile-time log-beta function
  *
@@ -37,6 +40,8 @@ lbeta(const T1 a, const T2 b)
 noexcept
 {
     return( (lgamma(a) + lgamma(b)) - lgamma(a+b) );
+}
+
 }
 
 #endif

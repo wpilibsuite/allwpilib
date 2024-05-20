@@ -26,9 +26,17 @@ public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
     m_proto = proto;
   }
 
+  /**
+   * Creates a ProtobufBuffer for the given Protobuf object.
+   *
+   * @param <T> The type to serialize.
+   * @param <MessageType> The Protobuf message type.
+   * @param proto The Protobuf object.
+   * @return A ProtobufBuffer for the given Protobuf object.
+   */
   public static <T, MessageType extends ProtoMessage<?>> ProtobufBuffer<T, MessageType> create(
       Protobuf<T, MessageType> proto) {
-    return new ProtobufBuffer<T, MessageType>(proto);
+    return new ProtobufBuffer<>(proto);
   }
 
   /**

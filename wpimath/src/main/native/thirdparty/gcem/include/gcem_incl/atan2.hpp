@@ -25,6 +25,12 @@
 #ifndef _gcem_atan2_HPP
 #define _gcem_atan2_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -82,7 +88,13 @@ common_return_t<T1,T2>
 atan2(const T1 y, const T2 x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::atan2_type_check(x,y);
+  } else {
+    return std::atan2(y, x);
+  }
+}
+
 }
 
 #endif

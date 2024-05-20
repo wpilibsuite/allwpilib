@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.Set;
 
 /**
@@ -15,6 +16,7 @@ import java.util.Set;
  * subsystems its components require.
  */
 public abstract class WrapperCommand extends Command {
+  /** Command being wrapped. */
   protected final Command m_command;
 
   /**
@@ -23,6 +25,7 @@ public abstract class WrapperCommand extends Command {
    * @param command the command being wrapped. Trying to directly schedule this command or add it to
    *     a composition will throw an exception.
    */
+  @SuppressWarnings("this-escape")
   protected WrapperCommand(Command command) {
     CommandScheduler.getInstance().registerComposedCommands(command);
     m_command = command;
@@ -97,5 +100,10 @@ public abstract class WrapperCommand extends Command {
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
     return m_command.getInterruptionBehavior();
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    m_command.initSendable(builder);
   }
 }

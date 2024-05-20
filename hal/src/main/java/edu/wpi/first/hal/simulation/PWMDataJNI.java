@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for PWM data. */
 public class PWMDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -62,4 +63,7 @@ public class PWMDataJNI extends JNIWrapper {
   public static native void setZeroLatch(int index, boolean zeroLatch);
 
   public static native void resetData(int index);
+
+  /** Utility class. */
+  private PWMDataJNI() {}
 }

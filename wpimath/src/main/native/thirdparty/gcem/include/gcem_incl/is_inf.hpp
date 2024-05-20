@@ -25,6 +25,9 @@
 #ifndef _gcem_is_inf_HPP
 #define _gcem_is_inf_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -165,6 +168,8 @@ all_inf(const T1 x, const T2 y, const T3 z)
 noexcept
 {
     return( is_inf(x) && is_inf(y) && is_inf(z) );
+}
+
 }
 
 }

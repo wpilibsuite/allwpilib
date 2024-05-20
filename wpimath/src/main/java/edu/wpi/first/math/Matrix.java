@@ -24,6 +24,7 @@ import org.ejml.simple.SimpleMatrix;
  * @param <C> The number of columns in this matrix.
  */
 public class Matrix<R extends Num, C extends Num> {
+  /** Storage for underlying EJML matrix. */
   protected final SimpleMatrix m_storage;
 
   /**
@@ -288,7 +289,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The resultant matrix.
    */
   public Matrix<R, C> div(int value) {
-    return new Matrix<>(this.m_storage.divide((double) value));
+    return new Matrix<>(this.m_storage.divide(value));
   }
 
   /**
@@ -488,7 +489,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The element by element power of "this" and b.
    */
   public final Matrix<R, C> elementPower(int b) {
-    return new Matrix<>(this.m_storage.elementPower((double) b));
+    return new Matrix<>(this.m_storage.elementPower(b));
   }
 
   /**
@@ -545,7 +546,7 @@ public class Matrix<R extends Num, C extends Num> {
    */
   public final <R2 extends Num, C2 extends Num> Matrix<R2, C2> block(
       int height, int width, int startingRow, int startingCol) {
-    return new Matrix<R2, C2>(
+    return new Matrix<>(
         this.m_storage.extractMatrix(
             startingRow, startingRow + height, startingCol, startingCol + width));
   }
@@ -607,8 +608,7 @@ public class Matrix<R extends Num, C extends Num> {
         return new Matrix<>(new SimpleMatrix(temp.getNumRows(), temp.getNumCols()));
       }
 
-      throw new RuntimeException(
-          "Cholesky decomposition failed! Input matrix:\n" + m_storage.toString());
+      throw new RuntimeException("Cholesky decomposition failed! Input matrix:\n" + m_storage);
     }
 
     return new Matrix<>(SimpleMatrix.wrap(chol.getT(null)));
@@ -643,23 +643,6 @@ public class Matrix<R extends Num, C extends Num> {
    */
   public static <D extends Num> Matrix<D, D> eye(D dim) {
     return new Matrix<>(SimpleMatrix.identity(Objects.requireNonNull(dim).getNum()));
-  }
-
-  /**
-   * Entrypoint to the {@link MatBuilder} class for creation of custom matrices with the given
-   * dimensions and contents.
-   *
-   * @param rows The number of rows of the desired matrix.
-   * @param cols The number of columns of the desired matrix.
-   * @param <R> The number of rows of the desired matrix as a generic.
-   * @param <C> The number of columns of the desired matrix as a generic.
-   * @return A builder to construct the matrix.
-   * @deprecated Use {@link MatBuilder#fill} instead.
-   */
-  @Deprecated(since = "2024", forRemoval = true)
-  @SuppressWarnings("removal")
-  public static <R extends Num, C extends Num> MatBuilder<R, C> mat(Nat<R> rows, Nat<C> cols) {
-    return new MatBuilder<>(Objects.requireNonNull(rows), Objects.requireNonNull(cols));
   }
 
   /**

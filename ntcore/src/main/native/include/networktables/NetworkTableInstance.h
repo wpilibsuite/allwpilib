@@ -37,9 +37,11 @@ class ProtobufTopic;
 class RawTopic;
 class StringArrayTopic;
 class StringTopic;
-template <wpi::StructSerializable T>
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
 class StructArrayTopic;
-template <wpi::StructSerializable T>
+template <typename T, typename... I>
+  requires wpi::StructSerializable<T, I...>
 class StructTopic;
 class Subscriber;
 class Topic;
@@ -260,19 +262,24 @@ class NetworkTableInstance final {
    * Gets a raw struct serialized value topic.
    *
    * @param name topic name
+   * @param info optional struct type info
    * @return Topic
    */
-  template <wpi::StructSerializable T>
-  StructTopic<T> GetStructTopic(std::string_view name) const;
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  StructTopic<T, I...> GetStructTopic(std::string_view name, I... info) const;
 
   /**
    * Gets a raw struct serialized array topic.
    *
    * @param name topic name
+   * @param info optional struct type info
    * @return Topic
    */
-  template <wpi::StructSerializable T>
-  StructArrayTopic<T> GetStructArrayTopic(std::string_view name) const;
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  StructArrayTopic<T, I...> GetStructArrayTopic(std::string_view name,
+                                                I... info) const;
 
   /**
    * Get Published Topics.
@@ -589,10 +596,10 @@ class NetworkTableInstance final {
   /**
    * Sets server address and port for client (without restarting client).
    *
-   * @param server_name server name (UTF-8 string, null terminated)
+   * @param server_name server name (UTF-8 string)
    * @param port        port to communicate over (0 = default)
    */
-  void SetServer(const char* server_name, unsigned int port = 0);
+  void SetServer(std::string_view server_name, unsigned int port = 0);
 
   /**
    * Sets server addresses and ports for client (without restarting client).
@@ -818,10 +825,12 @@ class NetworkTableInstance final {
    * Registers a struct schema. Duplicate calls to this function with the same
    * name are silently ignored.
    *
-   * @param T struct serializable type
+   * @tparam T struct serializable type
+   * @param info optional struct type info
    */
-  template <wpi::StructSerializable T>
-  void AddStructSchema();
+  template <typename T, typename... I>
+    requires wpi::StructSerializable<T, I...>
+  void AddStructSchema(const I&... info);
 
   /**
    * Equality operator.  Returns true if both instances refer to the same

@@ -196,6 +196,8 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
         mode.pixelFormat = cs::VideoMode::kRGB565;
       } else if (wpi::equals_lower(str, "bgr")) {
         mode.pixelFormat = cs::VideoMode::kBGR;
+      } else if (wpi::equals_lower(str, "bgra")) {
+        mode.pixelFormat = cs::VideoMode::kBGRA;
       } else if (wpi::equals_lower(str, "gray")) {
         mode.pixelFormat = cs::VideoMode::kGray;
       } else if (wpi::equals_lower(str, "y16")) {
@@ -361,6 +363,9 @@ wpi::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
     case VideoMode::kBGR:
       pixelFormat = "bgr";
       break;
+    case VideoMode::kBGRA:
+      pixelFormat = "bgra";
+      break;
     case VideoMode::kGray:
       pixelFormat = "gray";
       break;
@@ -450,6 +455,15 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
 
 void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
                           int height, std::string_view data, Frame::Time time) {
+  if (pixelFormat == VideoMode::PixelFormat::kBGRA) {
+    // Write BGRA as BGR to save a copy
+    auto image =
+        CreateImageFromBGRA(this, width, height, width * 4,
+                            reinterpret_cast<const uint8_t*>(data.data()));
+    PutFrame(std::move(image), time);
+    return;
+  }
+
   auto image = AllocImage(pixelFormat, width, height, data.size());
 
   // Copy in image data

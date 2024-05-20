@@ -41,6 +41,15 @@ public interface Subsystem {
   default void simulationPeriodic() {}
 
   /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  default String getName() {
+    return this.getClass().getSimpleName();
+  }
+
+  /**
    * Sets the default {@link Command} of the subsystem. The default command will be automatically
    * scheduled when no other commands are scheduled that require the subsystem. Default commands
    * should generally not end on their own, i.e. their {@link Command#isFinished()} method should
@@ -135,6 +144,18 @@ public interface Subsystem {
    */
   default Command runEnd(Runnable run, Runnable end) {
     return Commands.runEnd(run, end, this);
+  }
+
+  /**
+   * Constructs a command that runs an action once and then runs another action every iteration
+   * until interrupted. Requires this subsystem.
+   *
+   * @param start the action to run on start
+   * @param run the action to run every iteration
+   * @return the command
+   */
+  default Command startRun(Runnable start, Runnable run) {
+    return Commands.startRun(start, run, this);
   }
 
   /**

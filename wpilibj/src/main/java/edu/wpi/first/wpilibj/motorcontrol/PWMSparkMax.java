@@ -31,6 +31,7 @@ public class PWMSparkMax extends PWMMotorController {
    *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    */
+  @SuppressWarnings("this-escape")
   public PWMSparkMax(final int channel) {
     super("PWMSparkMax", channel);
 

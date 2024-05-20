@@ -2,28 +2,43 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <stdint.h>
+
+#include <bitset>
 #include <cmath>
+#include <span>
 
 #include <gtest/gtest.h>
 #include <units/time.h>
 #include <units/voltage.h>
 
 #include "sysid/analysis/AnalysisManager.h"
+#include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/ArmSim.h"
 #include "sysid/analysis/ElevatorSim.h"
 #include "sysid/analysis/FeedforwardAnalysis.h"
 #include "sysid/analysis/SimpleMotorSim.h"
 
+namespace {
+
+enum Movements : uint32_t {
+  kSlowForward,
+  kSlowBackward,
+  kFastForward,
+  kFastBackward
+};
+
+inline constexpr int kMovementCombinations = 16;
+
 /**
  * Return simulated test data for a given simulation model.
  *
- * @param Ks Static friction gain.
- * @param Kv Velocity gain.
- * @param Ka Acceleration gain.
- * @param Kg Gravity cosine gain.
+ * @tparam Model The model type.
+ * @param model The simulation model.
+ * @param movements Which movements to do.
  */
 template <typename Model>
-sysid::Storage CollectData(Model& model) {
+sysid::Storage CollectData(Model& model, std::bitset<4> movements) {
   constexpr auto kUstep = 0.25_V / 1_s;
   constexpr units::volt_t kUmax = 7_V;
   constexpr units::second_t T = 5_ms;
@@ -31,221 +46,247 @@ sysid::Storage CollectData(Model& model) {
 
   sysid::Storage storage;
   auto& [slowForward, slowBackward, fastForward, fastBackward] = storage;
-
-  // Slow forward test
   auto voltage = 0_V;
-  for (int i = 0; i < (kTestDuration / T).value(); ++i) {
-    slowForward.emplace_back(sysid::PreparedData{
-        i * T, voltage.value(), model.GetPosition(), model.GetVelocity(), T,
-        model.GetAcceleration(voltage), std::cos(model.GetPosition()),
-        std::sin(model.GetPosition())});
 
-    model.Update(voltage, T);
-    voltage += kUstep * T;
+  // Slow forward
+  if (movements.test(Movements::kSlowForward)) {
+    model.Reset();
+    voltage = 0_V;
+    for (int i = 0; i < (kTestDuration / T).value(); ++i) {
+      slowForward.emplace_back(sysid::PreparedData{
+          i * T, voltage.value(), model.GetPosition(), model.GetVelocity(), T,
+          model.GetAcceleration(voltage), std::cos(model.GetPosition()),
+          std::sin(model.GetPosition())});
+
+      model.Update(voltage, T);
+      voltage += kUstep * T;
+    }
   }
 
-  // Slow backward test
-  model.Reset();
-  voltage = 0_V;
-  for (int i = 0; i < (kTestDuration / T).value(); ++i) {
-    slowBackward.emplace_back(sysid::PreparedData{
-        i * T, voltage.value(), model.GetPosition(), model.GetVelocity(), T,
-        model.GetAcceleration(voltage), std::cos(model.GetPosition()),
-        std::sin(model.GetPosition())});
+  // Slow backward
+  if (movements.test(Movements::kSlowBackward)) {
+    model.Reset();
+    voltage = 0_V;
+    for (int i = 0; i < (kTestDuration / T).value(); ++i) {
+      slowBackward.emplace_back(sysid::PreparedData{
+          i * T, voltage.value(), model.GetPosition(), model.GetVelocity(), T,
+          model.GetAcceleration(voltage), std::cos(model.GetPosition()),
+          std::sin(model.GetPosition())});
 
-    model.Update(voltage, T);
-    voltage -= kUstep * T;
+      model.Update(voltage, T);
+      voltage -= kUstep * T;
+    }
   }
 
-  // Fast forward test
-  model.Reset();
-  voltage = 0_V;
-  for (int i = 0; i < (kTestDuration / T).value(); ++i) {
-    fastForward.emplace_back(sysid::PreparedData{
-        i * T, voltage.value(), model.GetPosition(), model.GetVelocity(), T,
-        model.GetAcceleration(voltage), std::cos(model.GetPosition()),
-        std::sin(model.GetPosition())});
+  // Fast forward
+  if (movements.test(Movements::kFastForward)) {
+    model.Reset();
+    voltage = 0_V;
+    for (int i = 0; i < (kTestDuration / T).value(); ++i) {
+      fastForward.emplace_back(sysid::PreparedData{
+          i * T, voltage.value(), model.GetPosition(), model.GetVelocity(), T,
+          model.GetAcceleration(voltage), std::cos(model.GetPosition()),
+          std::sin(model.GetPosition())});
 
-    model.Update(voltage, T);
-    voltage = kUmax;
+      model.Update(voltage, T);
+      voltage = kUmax;
+    }
   }
 
-  // Fast backward test
-  model.Reset();
-  voltage = 0_V;
-  for (int i = 0; i < (kTestDuration / T).value(); ++i) {
-    fastBackward.emplace_back(sysid::PreparedData{
-        i * T, voltage.value(), model.GetPosition(), model.GetVelocity(), T,
-        model.GetAcceleration(voltage), std::cos(model.GetPosition()),
-        std::sin(model.GetPosition())});
+  // Fast backward
+  if (movements.test(Movements::kFastBackward)) {
+    model.Reset();
+    voltage = 0_V;
+    for (int i = 0; i < (kTestDuration / T).value(); ++i) {
+      fastBackward.emplace_back(sysid::PreparedData{
+          i * T, voltage.value(), model.GetPosition(), model.GetVelocity(), T,
+          model.GetAcceleration(voltage), std::cos(model.GetPosition()),
+          std::sin(model.GetPosition())});
 
-    model.Update(voltage, T);
-    voltage = -kUmax;
+      model.Update(voltage, T);
+      voltage = -kUmax;
+    }
   }
 
   return storage;
 }
 
-TEST(FeedforwardAnalysisTest, Arm1) {
-  constexpr double Ks = 1.01;
-  constexpr double Kv = 3.060;
-  constexpr double Ka = 0.327;
-  constexpr double Kg = 0.211;
+/**
+ * Asserts success if the gains contain NaNs or are too far from their expected
+ * values.
+ *
+ * @param expectedGains The expected feedforward gains.
+ * @param actualGains The calculated feedforward gains.
+ * @param tolerances The tolerances for the coefficient comparisons.
+ */
+testing::AssertionResult FitIsBad(std::span<const double> expectedGains,
+                                  std::span<const double> actualGains,
+                                  std::span<const double> tolerances) {
+  // Check for NaN
+  for (const auto& coeff : actualGains) {
+    if (std::isnan(coeff)) {
+      return testing::AssertionSuccess();
+    }
+  }
 
-  for (const auto& offset : {-2.0, -1.0, 0.0, 1.0, 2.0}) {
-    sysid::ArmSim model{Ks, Kv, Ka, Kg, offset};
-    auto ff = sysid::CalculateFeedforwardGains(CollectData(model),
-                                               sysid::analysis::kArm);
-    auto& gains = std::get<0>(ff);
+  for (size_t i = 0; i < expectedGains.size(); ++i) {
+    if (std::abs(expectedGains[i] - actualGains[i]) >= tolerances[i]) {
+      return testing::AssertionSuccess();
+    }
+  }
 
-    EXPECT_NEAR(gains[0], Ks, 0.003);
-    EXPECT_NEAR(gains[1], Kv, 0.003);
-    EXPECT_NEAR(gains[2], Ka, 0.003);
-    EXPECT_NEAR(gains[3], Kg, 0.003);
-    EXPECT_NEAR(gains[4], offset, 0.007);
+  auto result = testing::AssertionFailure();
+
+  result << "\n";
+  for (size_t i = 0; i < expectedGains.size(); ++i) {
+    if (i == 0) {
+      result << "Ks";
+    } else if (i == 1) {
+      result << "Kv";
+    } else if (i == 2) {
+      result << "Ka";
+    } else if (i == 3) {
+      result << "Kg";
+    } else if (i == 4) {
+      result << "offset";
+    }
+
+    result << ":\n";
+    result << "  expected " << expectedGains[i] << ",\n";
+    result << "  actual " << actualGains[i] << ",\n";
+    result << "  diff " << std::abs(expectedGains[i] - actualGains[i]) << "\n";
+  }
+
+  return result;
+}
+
+/**
+ * Asserts that two arrays are equal.
+ *
+ * @param expected The expected array.
+ * @param actual The actual array.
+ * @param tolerances The tolerances for the element comparisons.
+ */
+void ExpectArrayNear(std::span<const double> expected,
+                     std::span<const double> actual,
+                     std::span<const double> tolerances) {
+  // Check size
+  const size_t size = expected.size();
+  EXPECT_EQ(size, actual.size());
+  EXPECT_EQ(size, tolerances.size());
+
+  // Check elements
+  for (size_t i = 0; i < size; ++i) {
+    EXPECT_NEAR(expected[i], actual[i], tolerances[i]) << "where i = " << i;
   }
 }
 
-TEST(FeedforwardAnalysisTest, Arm2) {
-  constexpr double Ks = 0.547;
-  constexpr double Kv = 0.0693;
-  constexpr double Ka = 0.1170;
-  constexpr double Kg = 0.122;
+/**
+ * @tparam Model The model type.
+ * @param model The simulation model.
+ * @param type The analysis type.
+ * @param expectedGains The expected feedforward gains.
+ * @param tolerances The tolerances for the coefficient comparisons.
+ */
+template <typename Model>
+void RunTests(Model& model, const sysid::AnalysisType& type,
+              std::span<const double> expectedGains,
+              std::span<const double> tolerances) {
+  // Iterate through all combinations of movements
+  for (int movements = 0; movements < kMovementCombinations; ++movements) {
+    try {
+      auto ff =
+          sysid::CalculateFeedforwardGains(CollectData(model, movements), type);
 
-  for (const auto& offset : {-2.0, -1.0, 0.0, 1.0, 2.0}) {
-    sysid::ArmSim model{Ks, Kv, Ka, Kg, offset};
-    auto ff = sysid::CalculateFeedforwardGains(CollectData(model),
-                                               sysid::analysis::kArm);
-    auto& gains = std::get<0>(ff);
-
-    EXPECT_NEAR(gains[0], Ks, 0.003);
-    EXPECT_NEAR(gains[1], Kv, 0.003);
-    EXPECT_NEAR(gains[2], Ka, 0.003);
-    EXPECT_NEAR(gains[3], Kg, 0.003);
-    EXPECT_NEAR(gains[4], offset, 0.007);
+      ExpectArrayNear(expectedGains, ff.coeffs, tolerances);
+    } catch (sysid::InsufficientSamplesError&) {
+      // If calculation threw an exception, confirm at least one of the gains
+      // doesn't match
+      auto ff = sysid::CalculateFeedforwardGains(CollectData(model, movements),
+                                                 type, false);
+      EXPECT_TRUE(FitIsBad(expectedGains, ff.coeffs, tolerances));
+    }
   }
 }
 
-TEST(FeedforwardAnalysisTest, Drivetrain1) {
-  constexpr double Ks = 1.01;
-  constexpr double Kv = 3.060;
-  constexpr double Ka = 0.327;
+}  // namespace
 
-  sysid::SimpleMotorSim model{Ks, Kv, Ka};
-  auto ff = sysid::CalculateFeedforwardGains(CollectData(model),
-                                             sysid::analysis::kDrivetrain);
-  auto& gains = std::get<0>(ff);
+TEST(FeedforwardAnalysisTest, Arm) {
+  {
+    constexpr double Ks = 1.01;
+    constexpr double Kv = 3.060;
+    constexpr double Ka = 0.327;
+    constexpr double Kg = 0.211;
 
-  EXPECT_NEAR(gains[0], Ks, 0.003);
-  EXPECT_NEAR(gains[1], Kv, 0.003);
-  EXPECT_NEAR(gains[2], Ka, 0.003);
+    for (const auto& offset : {-2.0, -1.0, 0.0, 1.0, 2.0}) {
+      sysid::ArmSim model{Ks, Kv, Ka, Kg, offset};
+
+      RunTests(model, sysid::analysis::kArm, {{Ks, Kv, Ka, Kg, offset}},
+               {{8e-3, 8e-3, 8e-3, 8e-3, 3e-2}});
+    }
+  }
+
+  {
+    constexpr double Ks = 0.547;
+    constexpr double Kv = 0.0693;
+    constexpr double Ka = 0.1170;
+    constexpr double Kg = 0.122;
+
+    for (const auto& offset : {-2.0, -1.0, 0.0, 1.0, 2.0}) {
+      sysid::ArmSim model{Ks, Kv, Ka, Kg, offset};
+
+      RunTests(model, sysid::analysis::kArm, {{Ks, Kv, Ka, Kg, offset}},
+               {{8e-3, 8e-3, 8e-3, 8e-3, 5e-2}});
+    }
+  }
 }
 
-TEST(FeedforwardAnalysisTest, Drivetrain2) {
-  constexpr double Ks = 0.547;
-  constexpr double Kv = 0.0693;
-  constexpr double Ka = 0.1170;
+TEST(FeedforwardAnalysisTest, Elevator) {
+  {
+    constexpr double Ks = 1.01;
+    constexpr double Kv = 3.060;
+    constexpr double Ka = 0.327;
+    constexpr double Kg = -0.211;
 
-  sysid::SimpleMotorSim model{Ks, Kv, Ka};
-  auto ff = sysid::CalculateFeedforwardGains(CollectData(model),
-                                             sysid::analysis::kDrivetrain);
-  auto& gains = std::get<0>(ff);
+    sysid::ElevatorSim model{Ks, Kv, Ka, Kg};
 
-  EXPECT_NEAR(gains[0], Ks, 0.003);
-  EXPECT_NEAR(gains[1], Kv, 0.003);
-  EXPECT_NEAR(gains[2], Ka, 0.003);
+    RunTests(model, sysid::analysis::kElevator, {{Ks, Kv, Ka, Kg}},
+             {{8e-3, 8e-3, 8e-3, 8e-3}});
+  }
+
+  {
+    constexpr double Ks = 0.547;
+    constexpr double Kv = 0.0693;
+    constexpr double Ka = 0.1170;
+    constexpr double Kg = -0.122;
+
+    sysid::ElevatorSim model{Ks, Kv, Ka, Kg};
+
+    RunTests(model, sysid::analysis::kElevator, {{Ks, Kv, Ka, Kg}},
+             {{8e-3, 8e-3, 8e-3, 8e-3}});
+  }
 }
 
-TEST(FeedforwardAnalysisTest, DrivetrainAngular1) {
-  constexpr double Ks = 1.01;
-  constexpr double Kv = 3.060;
-  constexpr double Ka = 0.327;
+TEST(FeedforwardAnalysisTest, Simple) {
+  {
+    constexpr double Ks = 1.01;
+    constexpr double Kv = 3.060;
+    constexpr double Ka = 0.327;
 
-  sysid::SimpleMotorSim model{Ks, Kv, Ka};
-  auto ff = sysid::CalculateFeedforwardGains(
-      CollectData(model), sysid::analysis::kDrivetrainAngular);
-  auto& gains = std::get<0>(ff);
+    sysid::SimpleMotorSim model{Ks, Kv, Ka};
 
-  EXPECT_NEAR(gains[0], Ks, 0.003);
-  EXPECT_NEAR(gains[1], Kv, 0.003);
-  EXPECT_NEAR(gains[2], Ka, 0.003);
-}
+    RunTests(model, sysid::analysis::kSimple, {{Ks, Kv, Ka}},
+             {{8e-3, 8e-3, 8e-3}});
+  }
 
-TEST(FeedforwardAnalysisTest, DrivetrainAngular2) {
-  constexpr double Ks = 0.547;
-  constexpr double Kv = 0.0693;
-  constexpr double Ka = 0.1170;
+  {
+    constexpr double Ks = 0.547;
+    constexpr double Kv = 0.0693;
+    constexpr double Ka = 0.1170;
 
-  sysid::SimpleMotorSim model{Ks, Kv, Ka};
-  auto ff = sysid::CalculateFeedforwardGains(
-      CollectData(model), sysid::analysis::kDrivetrainAngular);
-  auto& gains = std::get<0>(ff);
+    sysid::SimpleMotorSim model{Ks, Kv, Ka};
 
-  EXPECT_NEAR(gains[0], Ks, 0.003);
-  EXPECT_NEAR(gains[1], Kv, 0.003);
-  EXPECT_NEAR(gains[2], Ka, 0.003);
-}
-
-TEST(FeedforwardAnalysisTest, Elevator1) {
-  constexpr double Ks = 1.01;
-  constexpr double Kv = 3.060;
-  constexpr double Ka = 0.327;
-  constexpr double Kg = -0.211;
-
-  sysid::ElevatorSim model{Ks, Kv, Ka, Kg};
-  auto ff = sysid::CalculateFeedforwardGains(CollectData(model),
-                                             sysid::analysis::kElevator);
-  auto& gains = std::get<0>(ff);
-
-  EXPECT_NEAR(gains[0], Ks, 0.003);
-  EXPECT_NEAR(gains[1], Kv, 0.003);
-  EXPECT_NEAR(gains[2], Ka, 0.003);
-  EXPECT_NEAR(gains[3], Kg, 0.003);
-}
-
-TEST(FeedforwardAnalysisTest, Elevator2) {
-  constexpr double Ks = 0.547;
-  constexpr double Kv = 0.0693;
-  constexpr double Ka = 0.1170;
-  constexpr double Kg = -0.122;
-
-  sysid::ElevatorSim model{Ks, Kv, Ka, Kg};
-  auto ff = sysid::CalculateFeedforwardGains(CollectData(model),
-                                             sysid::analysis::kElevator);
-  auto& gains = std::get<0>(ff);
-
-  EXPECT_NEAR(gains[0], Ks, 0.003);
-  EXPECT_NEAR(gains[1], Kv, 0.003);
-  EXPECT_NEAR(gains[2], Ka, 0.003);
-  EXPECT_NEAR(gains[3], Kg, 0.003);
-}
-
-TEST(FeedforwardAnalysisTest, Simple1) {
-  constexpr double Ks = 1.01;
-  constexpr double Kv = 3.060;
-  constexpr double Ka = 0.327;
-
-  sysid::SimpleMotorSim model{Ks, Kv, Ka};
-  auto ff = sysid::CalculateFeedforwardGains(CollectData(model),
-                                             sysid::analysis::kSimple);
-  auto& gains = std::get<0>(ff);
-
-  EXPECT_NEAR(gains[0], Ks, 0.003);
-  EXPECT_NEAR(gains[1], Kv, 0.003);
-  EXPECT_NEAR(gains[2], Ka, 0.003);
-}
-
-TEST(FeedforwardAnalysisTest, Simple2) {
-  constexpr double Ks = 0.547;
-  constexpr double Kv = 0.0693;
-  constexpr double Ka = 0.1170;
-
-  sysid::SimpleMotorSim model{Ks, Kv, Ka};
-  auto ff = sysid::CalculateFeedforwardGains(CollectData(model),
-                                             sysid::analysis::kSimple);
-  auto& gains = std::get<0>(ff);
-
-  EXPECT_NEAR(gains[0], Ks, 0.003);
-  EXPECT_NEAR(gains[1], Kv, 0.003);
-  EXPECT_NEAR(gains[2], Ka, 0.003);
+    RunTests(model, sysid::analysis::kSimple, {{Ks, Kv, Ka}},
+             {{8e-3, 8e-3, 8e-3}});
+  }
 }

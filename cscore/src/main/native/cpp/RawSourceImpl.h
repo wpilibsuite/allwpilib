@@ -25,7 +25,7 @@ class RawSourceImpl : public ConfigurableSourceImpl {
   ~RawSourceImpl() override;
 
   // Raw-specific functions
-  void PutFrame(const CS_RawFrame& image);
+  void PutFrame(const WPI_RawFrame& image);
 
  private:
   std::atomic_bool m_connected{true};

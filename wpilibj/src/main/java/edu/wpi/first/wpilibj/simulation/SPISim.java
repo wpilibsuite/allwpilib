@@ -74,6 +74,13 @@ public class SPISim {
     return new CallbackStore(m_index, uid, SPIDataJNI::cancelWriteCallback);
   }
 
+  /**
+   * Register a callback to be run whenever an auto receive buffer is received.
+   *
+   * @param callback the callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
   public CallbackStore registerReadAutoReceiveBufferCallback(
       SpiReadAutoReceiveBufferCallback callback) {
     int uid = SPIDataJNI.registerReadAutoReceiveBufferCallback(m_index, callback);

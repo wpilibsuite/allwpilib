@@ -12,6 +12,7 @@
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/MecanumControllerCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
@@ -47,7 +48,7 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnFalse(&m_driveFullSpeed);
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
@@ -65,48 +66,57 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
-  frc2::MecanumControllerCommand mecanumControllerCommand(
-      exampleTrajectory, [this]() { return m_drive.GetPose(); },
+  frc2::CommandPtr mecanumControllerCommand =
+      frc2::MecanumControllerCommand(
+          exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
-      frc::SimpleMotorFeedforward<units::meters>(ks, kv, ka),
-      DriveConstants::kDriveKinematics,
+          frc::SimpleMotorFeedforward<units::meters>(ks, kv, ka),
+          DriveConstants::kDriveKinematics,
 
-      frc::PIDController{AutoConstants::kPXController, 0, 0},
-      frc::PIDController{AutoConstants::kPYController, 0, 0},
-      frc::ProfiledPIDController<units::radians>(
-          AutoConstants::kPThetaController, 0, 0,
-          AutoConstants::kThetaControllerConstraints),
+          frc::PIDController{AutoConstants::kPXController, 0, 0},
+          frc::PIDController{AutoConstants::kPYController, 0, 0},
+          frc::ProfiledPIDController<units::radians>(
+              AutoConstants::kPThetaController, 0, 0,
+              AutoConstants::kThetaControllerConstraints),
 
-      AutoConstants::kMaxSpeed,
+          AutoConstants::kMaxSpeed,
 
-      [this]() {
-        return frc::MecanumDriveWheelSpeeds{
-            units::meters_per_second_t{m_drive.GetFrontLeftEncoder().GetRate()},
-            units::meters_per_second_t{
-                m_drive.GetFrontRightEncoder().GetRate()},
-            units::meters_per_second_t{m_drive.GetRearLeftEncoder().GetRate()},
-            units::meters_per_second_t{
-                m_drive.GetRearRightEncoder().GetRate()}};
-      },
+          [this]() {
+            return frc::MecanumDriveWheelSpeeds{
+                units::meters_per_second_t{
+                    m_drive.GetFrontLeftEncoder().GetRate()},
+                units::meters_per_second_t{
+                    m_drive.GetFrontRightEncoder().GetRate()},
+                units::meters_per_second_t{
+                    m_drive.GetRearLeftEncoder().GetRate()},
+                units::meters_per_second_t{
+                    m_drive.GetRearRightEncoder().GetRate()}};
+          },
 
-      frc::PIDController{DriveConstants::kPFrontLeftVel, 0, 0},
-      frc::PIDController{DriveConstants::kPRearLeftVel, 0, 0},
-      frc::PIDController{DriveConstants::kPFrontRightVel, 0, 0},
-      frc::PIDController{DriveConstants::kPRearRightVel, 0, 0},
+          frc::PIDController{DriveConstants::kPFrontLeftVel, 0, 0},
+          frc::PIDController{DriveConstants::kPRearLeftVel, 0, 0},
+          frc::PIDController{DriveConstants::kPFrontRightVel, 0, 0},
+          frc::PIDController{DriveConstants::kPRearRightVel, 0, 0},
 
-      [this](units::volt_t frontLeft, units::volt_t rearLeft,
-             units::volt_t frontRight, units::volt_t rearRight) {
-        m_drive.SetMotorControllersVolts(frontLeft, rearLeft, frontRight,
-                                         rearRight);
-      },
+          [this](units::volt_t frontLeft, units::volt_t rearLeft,
+                 units::volt_t frontRight, units::volt_t rearRight) {
+            m_drive.SetMotorControllersVolts(frontLeft, rearLeft, frontRight,
+                                             rearRight);
+          },
 
-      {&m_drive});
+          {&m_drive})
+          .ToPtr();
 
-  // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
-
-  // no auto
-  return new frc2::SequentialCommandGroup(
+  // Reset odometry to the initial pose of the trajectory, run path following
+  // command, then stop at the end.
+  return frc2::cmd::Sequence(
+      frc2::InstantCommand(
+          [this, initialPose = exampleTrajectory.InitialPose()]() {
+            m_drive.ResetOdometry(initialPose);
+          },
+          {})
+          .ToPtr(),
       std::move(mecanumControllerCommand),
-      frc2::InstantCommand([this]() { m_drive.Drive(0, 0, 0, false); }, {}));
+      frc2::InstantCommand([this]() { m_drive.Drive(0, 0, 0, false); }, {})
+          .ToPtr());
 }

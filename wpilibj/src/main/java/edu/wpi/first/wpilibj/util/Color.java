@@ -14,12 +14,23 @@ import java.util.Objects;
  */
 @SuppressWarnings("MemberName")
 public class Color {
-  private static final double kPrecision = Math.pow(2, -12);
-
+  /** Red component (0-1). */
   public final double red;
+
+  /** Green component (0-1). */
   public final double green;
+
+  /** Blue component (0-1). */
   public final double blue;
+
   private String m_name;
+
+  /** Constructs a default color (black). */
+  public Color() {
+    red = 0.0;
+    green = 0.0;
+    blue = 0.0;
+  }
 
   /**
    * Constructs a Color from doubles.
@@ -67,6 +78,22 @@ public class Color {
     this.green = roundAndClamp(green);
     this.blue = roundAndClamp(blue);
     this.m_name = name;
+  }
+
+  /**
+   * Constructs a Color from a hex string.
+   *
+   * @param hexString a string of the format <code>#RRGGBB</code>
+   * @throws IllegalArgumentException if the hex string is invalid.
+   */
+  public Color(String hexString) {
+    if (hexString.length() != 7 || !hexString.startsWith("#")) {
+      throw new IllegalArgumentException("Invalid hex string \"" + hexString + "\"");
+    }
+
+    this.red = Integer.valueOf(hexString.substring(1, 3), 16) / 255.0;
+    this.green = Integer.valueOf(hexString.substring(3, 5), 16) / 255.0;
+    this.blue = Integer.valueOf(hexString.substring(5, 7), 16) / 255.0;
   }
 
   /**
@@ -155,8 +182,7 @@ public class Color {
   }
 
   private static double roundAndClamp(double value) {
-    final var rounded = Math.round((value + kPrecision / 2) / kPrecision) * kPrecision;
-    return MathUtil.clamp(rounded, 0.0, 1.0);
+    return MathUtil.clamp(Math.ceil(value * (1 << 12)) / (1 << 12), 0.0, 1.0);
   }
 
   /*

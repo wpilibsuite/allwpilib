@@ -28,19 +28,19 @@ class WPILIB_DLLEXPORT Trajectory {
    * Represents one point on the trajectory.
    */
   struct WPILIB_DLLEXPORT State {
-    // The time elapsed since the beginning of the trajectory.
+    /// The time elapsed since the beginning of the trajectory.
     units::second_t t = 0_s;
 
-    // The speed at that point of the trajectory.
+    /// The speed at that point of the trajectory.
     units::meters_per_second_t velocity = 0_mps;
 
-    // The acceleration at that point of the trajectory.
+    /// The acceleration at that point of the trajectory.
     units::meters_per_second_squared_t acceleration = 0_mps_sq;
 
-    // The pose at that point of the trajectory.
+    /// The pose at that point of the trajectory.
     Pose2d pose;
 
-    // The curvature at that point of the trajectory.
+    /// The curvature at that point of the trajectory.
     units::curvature_t curvature{0.0};
 
     /**
@@ -145,3 +145,6 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Trajectory::State& state);
 
 }  // namespace frc
+
+#include "frc/trajectory/proto/TrajectoryProto.h"
+#include "frc/trajectory/proto/TrajectoryStateProto.h"

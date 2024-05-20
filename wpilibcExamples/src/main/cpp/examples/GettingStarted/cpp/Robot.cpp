@@ -11,6 +11,9 @@
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_left);
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_right);
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -48,7 +51,9 @@ class Robot : public frc::TimedRobot {
   // Robot drive system
   frc::PWMSparkMax m_left{0};
   frc::PWMSparkMax m_right{1};
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc::DifferentialDrive m_robotDrive{
+      [&](double output) { m_left.Set(output); },
+      [&](double output) { m_right.Set(output); }};
 
   frc::XboxController m_controller{0};
   frc::Timer m_timer;

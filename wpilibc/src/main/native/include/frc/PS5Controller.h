@@ -11,10 +11,14 @@ namespace frc {
 /**
  * Handle input from PS5 controllers connected to the Driver Station.
  *
- * <p>This class handles PS5 input that comes from the Driver Station. Each time
+ * This class handles PS5 input that comes from the Driver Station. Each time
  * a value is requested the most recent value is returned. There is a single
  * class instance for each controller and the mapping of ports to hardware
  * buttons depends on the code in the Driver Station.
+ *
+ * Only first party controllers from Sony are guaranteed to have the correct
+ * mapping, and only through the official NI DS. Sim is not guaranteed to have
+ * the same mapping, as well as any 3rd party controllers.
  */
 class PS5Controller : public GenericHID {
  public:
@@ -499,30 +503,56 @@ class PS5Controller : public GenericHID {
    */
   BooleanEvent Touchpad(EventLoop* loop) const;
 
+  /**
+   * Represents a digital button on a PS5Controller.
+   */
   struct Button {
-    static constexpr int kSquare = 3;
-    static constexpr int kCross = 1;
-    static constexpr int kCircle = 2;
+    /// Square button.
+    static constexpr int kSquare = 1;
+    /// X button.
+    static constexpr int kCross = 2;
+    /// Circle button.
+    static constexpr int kCircle = 3;
+    /// Triangle button.
     static constexpr int kTriangle = 4;
+    /// Left trigger 1 button.
     static constexpr int kL1 = 5;
+    /// Right trigger 1 button.
     static constexpr int kR1 = 6;
+    /// Left trigger 2 button.
     static constexpr int kL2 = 7;
+    /// Right trigger 2 button.
     static constexpr int kR2 = 8;
+    /// Create button.
     static constexpr int kCreate = 9;
+    /// Options button.
     static constexpr int kOptions = 10;
-    static constexpr int kL3 = 12;
-    static constexpr int kR3 = 13;
-    static constexpr int kPS = 11;
+    /// Left stick button.
+    static constexpr int kL3 = 11;
+    /// Right stick button.
+    static constexpr int kR3 = 12;
+    /// PlayStation button.
+    static constexpr int kPS = 13;
+    /// Touchpad click button.
     static constexpr int kTouchpad = 14;
   };
 
+  /**
+   * Represents an axis on a PS5Controller.
+   */
   struct Axis {
+    /// Left X axis.
     static constexpr int kLeftX = 0;
+    /// Left Y axis.
     static constexpr int kLeftY = 1;
-    static constexpr int kRightX = 3;
-    static constexpr int kRightY = 4;
-    static constexpr int kL2 = 2;
-    static constexpr int kR2 = 5;
+    /// Right X axis.
+    static constexpr int kRightX = 2;
+    /// Right Y axis.
+    static constexpr int kRightY = 5;
+    /// Left Trigger 2.
+    static constexpr int kL2 = 3;
+    /// Right Trigger 2.
+    static constexpr int kR2 = 4;
   };
 };
 

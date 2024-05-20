@@ -6,20 +6,49 @@ package edu.wpi.first.util.datalog;
 
 /** Log array of float values. */
 public class FloatArrayLogEntry extends DataLogEntry {
+  /** The data type for float array values. */
   public static final String kDataType = "float[]";
 
+  /**
+   * Constructs a float array log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param metadata metadata
+   * @param timestamp entry creation timestamp (0=now)
+   */
   public FloatArrayLogEntry(DataLog log, String name, String metadata, long timestamp) {
     super(log, name, kDataType, metadata, timestamp);
   }
 
+  /**
+   * Constructs a float array log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param metadata metadata
+   */
   public FloatArrayLogEntry(DataLog log, String name, String metadata) {
     this(log, name, metadata, 0);
   }
 
+  /**
+   * Constructs a float array log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   * @param timestamp entry creation timestamp (0=now)
+   */
   public FloatArrayLogEntry(DataLog log, String name, long timestamp) {
     this(log, name, "", timestamp);
   }
 
+  /**
+   * Constructs a float array log entry.
+   *
+   * @param log datalog
+   * @param name name of the entry
+   */
   public FloatArrayLogEntry(DataLog log, String name) {
     this(log, name, 0);
   }

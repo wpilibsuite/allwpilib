@@ -16,9 +16,13 @@ package edu.wpi.first.hal;
  * edu.wpi.first.wpilibj.ADXRS450_Gyro} for an example implementation.
  */
 public class SimDevice implements AutoCloseable {
+  /** Sim device direction. */
   public enum Direction {
+    /** Input direction for simulation devices. */
     kInput(SimDeviceJNI.kInput),
+    /** Output direction for simulation devices. */
     kOutput(SimDeviceJNI.kOutput),
+    /** Bidirectional direction for simulation devices. */
     kBidir(SimDeviceJNI.kBidir);
 
     public final int m_value;

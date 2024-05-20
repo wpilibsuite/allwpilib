@@ -10,17 +10,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.proto.QuaternionProto;
+import edu.wpi.first.math.geometry.struct.QuaternionStruct;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.proto.Geometry3D.ProtobufQuaternion;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import java.nio.ByteBuffer;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
-import us.hebi.quickbuf.Descriptors.Descriptor;
 
+/** Represents a quaternion. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Quaternion {
+public class Quaternion implements ProtobufSerializable, StructSerializable {
   // Scalar r in versor form
   private final double m_w;
 
@@ -285,11 +285,12 @@ public class Quaternion {
    * @return The logarithm of this quaternion.
    */
   public Quaternion log() {
-    var scalar = Math.log(norm());
+    var norm = norm();
+    var scalar = Math.log(norm);
 
     var v_norm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
 
-    var s_norm = getW() / norm();
+    var s_norm = getW() / norm;
 
     if (Math.abs(s_norm + 1) < 1e-9) {
       return new Quaternion(scalar, -Math.PI, 0, 0);
@@ -406,73 +407,9 @@ public class Quaternion {
     return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
   }
 
-  public static final class AStruct implements Struct<Quaternion> {
-    @Override
-    public Class<Quaternion> getTypeClass() {
-      return Quaternion.class;
-    }
+  /** Quaternion protobuf for serialization. */
+  public static final QuaternionProto proto = new QuaternionProto();
 
-    @Override
-    public String getTypeString() {
-      return "struct:Quaternion";
-    }
-
-    @Override
-    public int getSize() {
-      return kSizeDouble * 4;
-    }
-
-    @Override
-    public String getSchema() {
-      return "double w;double x;double y;double z";
-    }
-
-    @Override
-    public Quaternion unpack(ByteBuffer bb) {
-      double w = bb.getDouble();
-      double x = bb.getDouble();
-      double y = bb.getDouble();
-      double z = bb.getDouble();
-      return new Quaternion(w, x, y, z);
-    }
-
-    @Override
-    public void pack(ByteBuffer bb, Quaternion value) {
-      bb.putDouble(value.getW());
-      bb.putDouble(value.getX());
-      bb.putDouble(value.getY());
-      bb.putDouble(value.getZ());
-    }
-  }
-
-  public static final AStruct struct = new AStruct();
-
-  public static final class AProto implements Protobuf<Quaternion, ProtobufQuaternion> {
-    @Override
-    public Class<Quaternion> getTypeClass() {
-      return Quaternion.class;
-    }
-
-    @Override
-    public Descriptor getDescriptor() {
-      return ProtobufQuaternion.getDescriptor();
-    }
-
-    @Override
-    public ProtobufQuaternion createMessage() {
-      return ProtobufQuaternion.newInstance();
-    }
-
-    @Override
-    public Quaternion unpack(ProtobufQuaternion msg) {
-      return new Quaternion(msg.getW(), msg.getX(), msg.getY(), msg.getZ());
-    }
-
-    @Override
-    public void pack(ProtobufQuaternion msg, Quaternion value) {
-      msg.setW(value.getW()).setX(value.getX()).setY(value.getY()).setZ(value.getZ());
-    }
-  }
-
-  public static final AProto proto = new AProto();
+  /** Quaternion struct for serialization. */
+  public static final QuaternionStruct struct = new QuaternionStruct();
 }

@@ -13,6 +13,7 @@ public class XboxControllerSim extends GenericHIDSim {
    *
    * @param joystick controller to simulate
    */
+  @SuppressWarnings("this-escape")
   public XboxControllerSim(XboxController joystick) {
     super(joystick);
     setAxisCount(6);
@@ -25,6 +26,7 @@ public class XboxControllerSim extends GenericHIDSim {
    *
    * @param port port number
    */
+  @SuppressWarnings("this-escape")
   public XboxControllerSim(int port) {
     super(port);
     setAxisCount(6);

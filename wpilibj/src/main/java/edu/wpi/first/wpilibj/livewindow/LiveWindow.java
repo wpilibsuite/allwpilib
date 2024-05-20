@@ -50,7 +50,7 @@ public final class LiveWindow {
   private static Runnable disabledListener;
 
   static {
-    SendableRegistry.setLiveWindowBuilderFactory(() -> new SendableBuilderImpl());
+    SendableRegistry.setLiveWindowBuilderFactory(SendableBuilderImpl::new);
     enabledPub.set(false);
   }
 
@@ -67,14 +67,29 @@ public final class LiveWindow {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
+  /**
+   * Sets function to be called when LiveWindow is enabled.
+   *
+   * @param runnable function (or null for none)
+   */
   public static synchronized void setEnabledListener(Runnable runnable) {
     enabledListener = runnable;
   }
 
+  /**
+   * Sets function to be called when LiveWindow is disabled.
+   *
+   * @param runnable function (or null for none)
+   */
   public static synchronized void setDisabledListener(Runnable runnable) {
     disabledListener = runnable;
   }
 
+  /**
+   * Returns true if LiveWindow is enabled.
+   *
+   * @return True if LiveWindow is enabled.
+   */
   public static synchronized boolean isEnabled() {
     return liveWindowEnabled;
   }
@@ -105,10 +120,7 @@ public final class LiveWindow {
       } else {
         System.out.println("stopping live window mode.");
         SendableRegistry.foreachLiveWindow(
-            dataHandle,
-            cbdata -> {
-              ((SendableBuilderImpl) cbdata.builder).stopLiveWindowMode();
-            });
+            dataHandle, cbdata -> ((SendableBuilderImpl) cbdata.builder).stopLiveWindowMode());
         if (disabledListener != null) {
           disabledListener.run();
         }

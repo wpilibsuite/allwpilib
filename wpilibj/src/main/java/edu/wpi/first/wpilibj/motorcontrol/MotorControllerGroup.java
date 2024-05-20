@@ -9,7 +9,14 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.Arrays;
 
-/** Allows multiple {@link MotorController} objects to be linked together. */
+/**
+ * Allows multiple {@link MotorController} objects to be linked together.
+ *
+ * @deprecated Use {@link PWMMotorController#addFollower(PWMMotorController)} or if using CAN motor
+ *     controllers, use their method of following.
+ */
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true, since = "2024")
 public class MotorControllerGroup implements MotorController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final MotorController[] m_motorControllers;
@@ -21,6 +28,7 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
    * @param motorController The first MotorController to add
    * @param motorControllers The MotorControllers to add
    */
+  @SuppressWarnings("this-escape")
   public MotorControllerGroup(
       MotorController motorController, MotorController... motorControllers) {
     m_motorControllers = new MotorController[motorControllers.length + 1];
@@ -29,6 +37,12 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
     init();
   }
 
+  /**
+   * Create a new MotorControllerGroup with the provided MotorControllers.
+   *
+   * @param motorControllers The MotorControllers to add.
+   */
+  @SuppressWarnings("this-escape")
   public MotorControllerGroup(MotorController[] motorControllers) {
     m_motorControllers = Arrays.copyOf(motorControllers, motorControllers.length);
     init();

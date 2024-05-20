@@ -57,7 +57,7 @@ class UltrasonicPIDTest : public testing::TestWithParam<double> {
     m_driveSim.Update(20_ms);
 
     auto startingDistance = units::meter_t{GetParam()};
-    m_distance = startingDistance - m_driveSim.GetLeftPosition();
+    m_distance = m_driveSim.GetLeftPosition() - startingDistance;
 
     m_ultrasonicSim.SetRange(m_distance);
   }
@@ -99,8 +99,7 @@ TEST_P(UltrasonicPIDTest, Auto) {
   }
 
   {
-    // advance 100 timesteps
-    frc::sim::StepTiming(2_s);
+    frc::sim::StepTiming(5_s);
 
     EXPECT_NEAR(Robot::kHoldDistance.value(), m_distance.value(), 10.0);
   }

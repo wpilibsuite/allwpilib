@@ -16,8 +16,7 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 
-class ParallelRaceGroupTest extends CommandTestBase
-    implements MultiCompositionTestBase<ParallelRaceGroup> {
+class ParallelRaceGroupTest extends MultiCompositionTestBase<ParallelRaceGroup> {
   @Test
   void parallelRaceScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -153,7 +152,7 @@ class ParallelRaceGroupTest extends CommandTestBase
       scheduler.run();
       command2Holder.setFinished(true);
       // at this point the sequential group should be done
-      assertDoesNotThrow(() -> scheduler.run());
+      assertDoesNotThrow(scheduler::run);
       assertFalse(scheduler.isScheduled(group2));
     }
   }

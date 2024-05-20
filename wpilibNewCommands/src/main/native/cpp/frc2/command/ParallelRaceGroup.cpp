@@ -50,7 +50,7 @@ Command::InterruptionBehavior ParallelRaceGroup::GetInterruptionBehavior()
 
 void ParallelRaceGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
-  CommandScheduler::GetInstance().RequireUngrouped(commands);
+  CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(commands);
 
   if (isRunning) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,

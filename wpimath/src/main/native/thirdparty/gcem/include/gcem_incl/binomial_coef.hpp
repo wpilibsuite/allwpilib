@@ -21,6 +21,9 @@
 #ifndef _gcem_binomial_coef_HPP
 #define _gcem_binomial_coef_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -86,6 +89,8 @@ binomial_coef(const T1 n, const T2 k)
 noexcept
 {
     return internal::binomial_coef_type_check(n,k);
+}
+
 }
 
 #endif

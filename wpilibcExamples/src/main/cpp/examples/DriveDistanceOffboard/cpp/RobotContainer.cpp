@@ -4,6 +4,8 @@
 
 #include "RobotContainer.h"
 
+#include <frc2/command/Commands.h>
+
 #include "commands/DriveDistanceProfiled.h"
 
 RobotContainer::RobotContainer() {
@@ -60,7 +62,7 @@ void RobotContainer::ConfigureButtonBindings() {
           .WithTimeout(10_s));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
-  return nullptr;
+  return frc2::cmd::None();
 }

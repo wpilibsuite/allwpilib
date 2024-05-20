@@ -4,7 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
+/** Pneumatics module type. */
 public enum PneumaticsModuleType {
+  /** CTRE PCM. */
   CTREPCM,
-  REVPH;
+  /** REV PH. */
+  REVPH
 }

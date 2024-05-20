@@ -4,11 +4,10 @@
 
 package edu.wpi.first.networktables;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,9 +30,9 @@ class RawTest {
   void testGenericByteArray() {
     GenericEntry entry = m_inst.getTopic("test").getGenericEntry("raw");
     entry.setRaw(new byte[] {5}, 10);
-    assertTrue(Arrays.equals(entry.getRaw(new byte[] {}), new byte[] {5}));
+    assertArrayEquals(entry.getRaw(new byte[] {}), new byte[] {5});
     entry.setRaw(new byte[] {5, 6, 7}, 1, 2, 15);
-    assertTrue(Arrays.equals(entry.getRaw(new byte[] {}), new byte[] {6, 7}));
+    assertArrayEquals(entry.getRaw(new byte[] {}), new byte[] {6, 7});
     assertThrows(IndexOutOfBoundsException.class, () -> entry.setRaw(new byte[] {5}, -1, 2, 20));
     assertThrows(IndexOutOfBoundsException.class, () -> entry.setRaw(new byte[] {5}, 1, -2, 20));
     assertThrows(IndexOutOfBoundsException.class, () -> entry.setRaw(new byte[] {5}, 1, 1, 20));
@@ -43,9 +42,9 @@ class RawTest {
   void testRawByteArray() {
     RawEntry entry = m_inst.getRawTopic("test").getEntry("raw", new byte[] {});
     entry.set(new byte[] {5}, 10);
-    assertTrue(Arrays.equals(entry.get(new byte[] {}), new byte[] {5}));
+    assertArrayEquals(entry.get(new byte[] {}), new byte[] {5});
     entry.set(new byte[] {5, 6, 7}, 1, 2, 15);
-    assertTrue(Arrays.equals(entry.get(new byte[] {}), new byte[] {6, 7}));
+    assertArrayEquals(entry.get(new byte[] {}), new byte[] {6, 7});
     assertThrows(IndexOutOfBoundsException.class, () -> entry.set(new byte[] {5}, -1, 1, 20));
     assertThrows(IndexOutOfBoundsException.class, () -> entry.set(new byte[] {5}, 1, -1, 20));
     assertThrows(IndexOutOfBoundsException.class, () -> entry.set(new byte[] {5}, 1, 1, 20));
@@ -55,15 +54,15 @@ class RawTest {
   void testGenericByteBuffer() {
     GenericEntry entry = m_inst.getTopic("test").getGenericEntry("raw");
     entry.setRaw(ByteBuffer.wrap(new byte[] {5}), 10);
-    assertTrue(Arrays.equals(entry.getRaw(new byte[] {}), new byte[] {5}));
+    assertArrayEquals(entry.getRaw(new byte[] {}), new byte[] {5});
     entry.setRaw(ByteBuffer.wrap(new byte[] {5, 6, 7}).position(1), 15);
-    assertTrue(Arrays.equals(entry.getRaw(new byte[] {}), new byte[] {6, 7}));
+    assertArrayEquals(entry.getRaw(new byte[] {}), new byte[] {6, 7});
     entry.setRaw(ByteBuffer.wrap(new byte[] {5, 6, 7}).position(1).limit(2), 16);
-    assertTrue(Arrays.equals(entry.getRaw(new byte[] {}), new byte[] {6}));
+    assertArrayEquals(entry.getRaw(new byte[] {}), new byte[] {6});
     entry.setRaw(ByteBuffer.wrap(new byte[] {8, 9, 0}), 1, 2, 20);
-    assertTrue(Arrays.equals(entry.getRaw(new byte[] {}), new byte[] {9, 0}));
+    assertArrayEquals(entry.getRaw(new byte[] {}), new byte[] {9, 0});
     entry.setRaw(ByteBuffer.wrap(new byte[] {1, 2, 3}).position(2), 0, 2, 25);
-    assertTrue(Arrays.equals(entry.getRaw(new byte[] {}), new byte[] {1, 2}));
+    assertArrayEquals(entry.getRaw(new byte[] {}), new byte[] {1, 2});
     assertThrows(
         IndexOutOfBoundsException.class,
         () -> entry.setRaw(ByteBuffer.wrap(new byte[] {5}), -1, 1, 30));
@@ -79,15 +78,15 @@ class RawTest {
   void testRawByteBuffer() {
     RawEntry entry = m_inst.getRawTopic("test").getEntry("raw", new byte[] {});
     entry.set(ByteBuffer.wrap(new byte[] {5}), 10);
-    assertTrue(Arrays.equals(entry.get(new byte[] {}), new byte[] {5}));
+    assertArrayEquals(entry.get(new byte[] {}), new byte[] {5});
     entry.set(ByteBuffer.wrap(new byte[] {5, 6, 7}).position(1), 15);
-    assertTrue(Arrays.equals(entry.get(new byte[] {}), new byte[] {6, 7}));
+    assertArrayEquals(entry.get(new byte[] {}), new byte[] {6, 7});
     entry.set(ByteBuffer.wrap(new byte[] {5, 6, 7}).position(1).limit(2), 16);
-    assertTrue(Arrays.equals(entry.get(new byte[] {}), new byte[] {6}));
+    assertArrayEquals(entry.get(new byte[] {}), new byte[] {6});
     entry.set(ByteBuffer.wrap(new byte[] {8, 9, 0}), 1, 2, 20);
-    assertTrue(Arrays.equals(entry.get(new byte[] {}), new byte[] {9, 0}));
+    assertArrayEquals(entry.get(new byte[] {}), new byte[] {9, 0});
     entry.set(ByteBuffer.wrap(new byte[] {1, 2, 3}).position(2), 0, 2, 25);
-    assertTrue(Arrays.equals(entry.get(new byte[] {}), new byte[] {1, 2}));
+    assertArrayEquals(entry.get(new byte[] {}), new byte[] {1, 2});
     assertThrows(
         IndexOutOfBoundsException.class,
         () -> entry.set(ByteBuffer.wrap(new byte[] {5}), -1, 1, 30));
@@ -105,13 +104,13 @@ class RawTest {
     ByteBuffer bb = ByteBuffer.allocateDirect(3);
     bb.put(new byte[] {5, 6, 7});
     entry.setRaw(bb.position(1), 15);
-    assertTrue(Arrays.equals(entry.getRaw(new byte[] {}), new byte[] {6, 7}));
+    assertArrayEquals(entry.getRaw(new byte[] {}), new byte[] {6, 7});
     entry.setRaw(bb.limit(2), 16);
-    assertTrue(Arrays.equals(entry.getRaw(new byte[] {}), new byte[] {6}));
+    assertArrayEquals(entry.getRaw(new byte[] {}), new byte[] {6});
     bb.clear();
     bb.put(new byte[] {8, 9, 0});
     entry.setRaw(bb, 1, 2, 20);
-    assertTrue(Arrays.equals(entry.getRaw(new byte[] {}), new byte[] {9, 0}));
+    assertArrayEquals(entry.getRaw(new byte[] {}), new byte[] {9, 0});
     assertThrows(IndexOutOfBoundsException.class, () -> entry.setRaw(bb, -1, 1, 25));
     assertThrows(IndexOutOfBoundsException.class, () -> entry.setRaw(bb, 1, -1, 25));
     assertThrows(IndexOutOfBoundsException.class, () -> entry.setRaw(bb, 2, 2, 25));
@@ -123,13 +122,13 @@ class RawTest {
     ByteBuffer bb = ByteBuffer.allocateDirect(3);
     bb.put(new byte[] {5, 6, 7});
     entry.set(bb.position(1), 15);
-    assertTrue(Arrays.equals(entry.get(new byte[] {}), new byte[] {6, 7}));
+    assertArrayEquals(entry.get(new byte[] {}), new byte[] {6, 7});
     entry.set(bb.limit(2), 16);
-    assertTrue(Arrays.equals(entry.get(new byte[] {}), new byte[] {6}));
+    assertArrayEquals(entry.get(new byte[] {}), new byte[] {6});
     bb.clear();
     bb.put(new byte[] {8, 9, 0});
     entry.set(bb, 1, 2, 20);
-    assertTrue(Arrays.equals(entry.get(new byte[] {}), new byte[] {9, 0}));
+    assertArrayEquals(entry.get(new byte[] {}), new byte[] {9, 0});
     assertThrows(IndexOutOfBoundsException.class, () -> entry.set(bb, -1, 1, 25));
     assertThrows(IndexOutOfBoundsException.class, () -> entry.set(bb, 1, -1, 25));
     assertThrows(IndexOutOfBoundsException.class, () -> entry.set(bb, 2, 2, 25));

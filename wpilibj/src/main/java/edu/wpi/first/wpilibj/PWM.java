@@ -54,6 +54,7 @@ public class PWM implements Sendable, AutoCloseable {
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    * @param registerSendable If true, adds this instance to SendableRegistry and LiveWindow
    */
+  @SuppressWarnings("this-escape")
   public PWM(final int channel, final boolean registerSendable) {
     SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
@@ -200,7 +201,7 @@ public class PWM implements Sendable, AutoCloseable {
   }
 
   /** Temporarily disables the PWM output. The next set call will re-enable the output. */
-  public void setDisabled() {
+  public final void setDisabled() {
     PWMJNI.setPWMDisabled(m_handle);
   }
 
@@ -228,6 +229,7 @@ public class PWM implements Sendable, AutoCloseable {
     }
   }
 
+  /** Latches PWM to zero. */
   public void setZeroLatch() {
     PWMJNI.latchPWMZero(m_handle);
   }

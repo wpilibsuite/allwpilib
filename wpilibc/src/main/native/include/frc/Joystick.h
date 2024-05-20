@@ -22,14 +22,42 @@ namespace frc {
  */
 class Joystick : public GenericHID {
  public:
+  /// Default X axis channel.
   static constexpr int kDefaultXChannel = 0;
+  /// Default Y axis channel.
   static constexpr int kDefaultYChannel = 1;
+  /// Default Z axis channel.
   static constexpr int kDefaultZChannel = 2;
+  /// Default twist axis channel.
   static constexpr int kDefaultTwistChannel = 2;
+  /// Default throttle axis channel.
   static constexpr int kDefaultThrottleChannel = 3;
 
-  enum AxisType { kXAxis, kYAxis, kZAxis, kTwistAxis, kThrottleAxis };
-  enum ButtonType { kTriggerButton, kTopButton };
+  /**
+   * Represents an analog axis on a joystick.
+   */
+  enum AxisType {
+    /// X axis.
+    kXAxis,
+    /// Y axis.
+    kYAxis,
+    /// Z axis.
+    kZAxis,
+    /// Twist axis.
+    kTwistAxis,
+    /// Throttle axis.
+    kThrottleAxis
+  };
+
+  /**
+   * Represents a digital button on a joystick.
+   */
+  enum ButtonType {
+    /// kTrigger.
+    kTriggerButton,
+    /// kTop.
+    kTopButton
+  };
 
   /**
    * Construct an instance of a joystick.
@@ -222,26 +250,6 @@ class Joystick : public GenericHID {
    * @return The magnitude of the direction vector
    */
   double GetMagnitude() const;
-
-  /**
-   * Get the direction of the vector formed by the joystick and its origin
-   * in radians.
-   *
-   * @return The direction of the vector in radians
-   * @deprecated Use GetDirection() instead.
-   */
-  [[deprecated("Use GetDirection() instead.")]]
-  double GetDirectionRadians() const;
-
-  /**
-   * Get the direction of the vector formed by the joystick and its origin
-   * in degrees.
-   *
-   * @return The direction of the vector in degrees
-   * @deprecated Use GetDirection() instead.
-   */
-  [[deprecated("Use GetDirection() instead.")]]
-  double GetDirectionDegrees() const;
 
   /**
    * Get the direction of the vector formed by the joystick and its origin.

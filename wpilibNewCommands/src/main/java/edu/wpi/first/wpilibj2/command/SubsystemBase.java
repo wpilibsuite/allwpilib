@@ -15,10 +15,22 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class SubsystemBase implements Subsystem, Sendable {
-  /** Constructor. */
+  /** Constructor. Telemetry/log name defaults to the classname. */
+  @SuppressWarnings("this-escape")
   public SubsystemBase() {
     String name = this.getClass().getSimpleName();
     name = name.substring(name.lastIndexOf('.') + 1);
+    SendableRegistry.addLW(this, name, name);
+    CommandScheduler.getInstance().registerSubsystem(this);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param name Name of the subsystem for telemetry and logging.
+   */
+  @SuppressWarnings("this-escape")
+  public SubsystemBase(String name) {
     SendableRegistry.addLW(this, name, name);
     CommandScheduler.getInstance().registerSubsystem(this);
   }
@@ -28,6 +40,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    *
    * @return Name
    */
+  @Override
   public String getName() {
     return SendableRegistry.getName(this);
   }

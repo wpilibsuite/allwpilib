@@ -7,10 +7,9 @@
 #include <initializer_list>
 #include <span>
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Rotation2d.h"
 #include "units/length.h"
@@ -51,6 +50,14 @@ class WPILIB_DLLEXPORT Translation2d {
   constexpr Translation2d(units::meter_t distance, const Rotation2d& angle);
 
   /**
+   * Constructs a Translation2d from the provided translation vector's X and Y
+   * components. The values are assumed to be in meters.
+   *
+   * @param vector The translation vector to represent.
+   */
+  explicit Translation2d(const Eigen::Vector2d& vector);
+
+  /**
    * Calculates the distance between two translations in 2D space.
    *
    * The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
@@ -74,6 +81,13 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return The Y component of the translation.
    */
   constexpr units::meter_t Y() const { return m_y; }
+
+  /**
+   * Returns a vector representation of this translation.
+   *
+   * @return A Vector representation of this translation.
+   */
+  constexpr Eigen::Vector2d ToVector() const;
 
   /**
    * Returns the norm, or distance from the origin to the translation.
@@ -200,28 +214,6 @@ void from_json(const wpi::json& json, Translation2d& state);
 
 }  // namespace frc
 
-template <>
-struct wpi::Struct<frc::Translation2d> {
-  static constexpr std::string_view kTypeString = "struct:Translation2d";
-  static constexpr size_t kSize = 16;
-  static constexpr std::string_view kSchema = "double x;double y";
-  static frc::Translation2d Unpack(std::span<const uint8_t, 16> data) {
-    return {units::meter_t{wpi::UnpackStruct<double, 0>(data)},
-            units::meter_t{wpi::UnpackStruct<double, 8>(data)}};
-  }
-  static void Pack(std::span<uint8_t, 16> data,
-                   const frc::Translation2d& value) {
-    wpi::PackStruct<0>(data, value.X().value());
-    wpi::PackStruct<8>(data, value.Y().value());
-  }
-};
-
-template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Translation2d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Translation2d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Translation2d& value);
-};
-
+#include "frc/geometry/proto/Translation2dProto.h"
+#include "frc/geometry/struct/Translation2dStruct.h"
 #include "frc/geometry/Translation2d.inc"

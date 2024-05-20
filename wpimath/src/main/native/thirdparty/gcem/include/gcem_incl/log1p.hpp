@@ -25,6 +25,12 @@
 #ifndef _gcem_log1p_HPP
 #define _gcem_log1p_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -74,7 +80,13 @@ return_t<T>
 log1p(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::log1p_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::log1p(x);
+  }
+}
+
 }
 
 #endif

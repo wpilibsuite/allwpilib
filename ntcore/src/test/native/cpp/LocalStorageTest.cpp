@@ -101,6 +101,17 @@ TEST_F(LocalStorageTest, GetTopicInfoUnpublished) {
   EXPECT_FALSE(storage.GetTopicExists(fooTopic));
 }
 
+TEST_F(LocalStorageTest, DefaultProps) {
+  EXPECT_CALL(network, Publish(_, fooTopic, std::string_view{"foo"},
+                               std::string_view{"boolean"}, wpi::json::object(),
+                               IsDefaultPubSubOptions()));
+  storage.Publish(fooTopic, NT_BOOLEAN, "boolean", wpi::json::object(), {});
+
+  EXPECT_FALSE(storage.GetTopicPersistent(fooTopic));
+  EXPECT_FALSE(storage.GetTopicRetained(fooTopic));
+  EXPECT_TRUE(storage.GetTopicCached(fooTopic));
+}
+
 TEST_F(LocalStorageTest, PublishNewNoProps) {
   EXPECT_CALL(network, Publish(_, fooTopic, std::string_view{"foo"},
                                std::string_view{"boolean"}, wpi::json::object(),

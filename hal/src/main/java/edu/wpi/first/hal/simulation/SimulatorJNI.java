@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
+/** JNI for simulator. */
 public class SimulatorJNI extends JNIWrapper {
   public static native void setRuntimeType(int type);
 
@@ -28,4 +29,7 @@ public class SimulatorJNI extends JNIWrapper {
   public static native void stepTimingAsync(long delta);
 
   public static native void resetHandles();
+
+  /** Utility class. */
+  private SimulatorJNI() {}
 }

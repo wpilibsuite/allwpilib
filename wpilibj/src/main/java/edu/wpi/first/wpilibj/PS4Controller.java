@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
@@ -13,6 +15,10 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * <p>This class handles PS4 input that comes from the Driver Station. Each time a value is
  * requested the most recent value is returned. There is a single class instance for each controller
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
+ *
+ * <p>Only first party controllers from Sony are guaranteed to have the correct mapping, and only
+ * through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any 3rd
+ * party controllers.
  */
 public class PS4Controller extends GenericHID {
   /**
@@ -23,27 +29,41 @@ public class PS4Controller extends GenericHID {
   public PS4Controller(int port) {
     super(port);
 
-    // re-enable when PS4Controller is added to Usage Reporting
-    // HAL.report(tResourceType.kResourceType_PS4Controller, port + 1); /
+    HAL.report(tResourceType.kResourceType_PS4Controller, port + 1);
   }
 
   /** Represents a digital button on a PS4Controller. */
   public enum Button {
+    /** Square button. */
     kSquare(1),
+    /** X button. */
     kCross(2),
+    /** Circle button. */
     kCircle(3),
+    /** Triangle button. */
     kTriangle(4),
+    /** Left Trigger 1 button. */
     kL1(5),
+    /** Right Trigger 1 button. */
     kR1(6),
+    /** Left Trigger 2 button. */
     kL2(7),
+    /** Right Trigger 2 button. */
     kR2(8),
+    /** Share button. */
     kShare(9),
+    /** Option button. */
     kOptions(10),
+    /** Left stick button. */
     kL3(11),
+    /** Right stick button. */
     kR3(12),
+    /** PlayStation button. */
     kPS(13),
+    /** Touchpad click button. */
     kTouchpad(14);
 
+    /** Button value. */
     public final int value;
 
     Button(int index) {
@@ -70,13 +90,20 @@ public class PS4Controller extends GenericHID {
 
   /** Represents an axis on a PS4Controller. */
   public enum Axis {
+    /** Left X axis. */
     kLeftX(0),
+    /** Left Y axis. */
     kLeftY(1),
+    /** Right X axis. */
     kRightX(2),
+    /** Right Y axis. */
     kRightY(5),
+    /** Left Trigger 2. */
     kL2(3),
+    /** Right Trigger 2. */
     kR2(4);
 
+    /** Axis value. */
     public final int value;
 
     Axis(int index) {

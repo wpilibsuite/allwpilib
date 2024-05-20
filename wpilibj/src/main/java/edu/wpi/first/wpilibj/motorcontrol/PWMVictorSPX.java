@@ -32,6 +32,7 @@ public class PWMVictorSPX extends PWMMotorController {
    * @param channel The PWM channel that the PWMVictorSPX is attached to. 0-9 are on-board, 10-19
    *     are on the MXP port
    */
+  @SuppressWarnings("this-escape")
   public PWMVictorSPX(final int channel) {
     super("PWMVictorSPX", channel);
 

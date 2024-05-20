@@ -20,7 +20,10 @@ import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -61,7 +64,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   private static final Optional<Command> kNoInterruptor = Optional.empty();
 
-  private final Set<Command> m_composedCommands = Collections.newSetFromMap(new WeakHashMap<>());
+  private final Map<Command, Exception> m_composedCommands = new WeakHashMap<>();
 
   // A set of the currently-running commands.
   private final Set<Command> m_scheduledCommands = new LinkedHashSet<>();
@@ -261,7 +264,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       if (RobotBase.isSimulation()) {
         subsystem.simulationPeriodic();
       }
-      m_watchdog.addEpoch(subsystem.getClass().getSimpleName() + ".periodic()");
+      m_watchdog.addEpoch(subsystem.getName() + ".periodic()");
     }
 
     // Cache the active instance to avoid concurrency problems if setActiveLoop() is called from
@@ -527,6 +530,11 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_disabled = false;
   }
 
+  /** Prints list of epochs added so far and their times. */
+  public void printWatchdogEpochs() {
+    m_watchdog.printEpochs();
+  }
+
   /**
    * Adds an action to perform on the initialization of any command by the scheduler.
    *
@@ -581,12 +589,25 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * directly or added to a composition.
    *
    * @param commands the commands to register
-   * @throws IllegalArgumentException if the given commands have already been composed.
+   * @throws IllegalArgumentException if the given commands have already been composed, or the array
+   *     of commands has duplicates.
    */
   public void registerComposedCommands(Command... commands) {
-    var commandSet = Set.of(commands);
-    requireNotComposed(commandSet);
-    m_composedCommands.addAll(commandSet);
+    Set<Command> commandSet;
+    try {
+      commandSet = Set.of(commands);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(
+          "Cannot compose a command twice in the same composition! (Original exception: "
+              + e
+              + ")");
+    }
+    requireNotComposedOrScheduled(commandSet);
+    var exception = new Exception("Originally composed at:");
+    exception.fillInStackTrace();
+    for (var command : commands) {
+      m_composedCommands.put(command, exception);
+    }
   }
 
   /**
@@ -613,30 +634,81 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Requires that the specified command hasn't been already added to a composition.
+   * Strip additional leading stack trace elements that are in the framework package.
    *
-   * @param command The command to check
+   * @param stacktrace the original stacktrace
+   * @return the stacktrace stripped of leading elements so there is at max one leading element from
+   *     the edu.wpi.first.wpilibj2.command package.
+   */
+  private StackTraceElement[] stripFrameworkStackElements(StackTraceElement[] stacktrace) {
+    int i = stacktrace.length - 1;
+    for (; i > 0; i--) {
+      if (stacktrace[i].getClassName().startsWith("edu.wpi.first.wpilibj2.command.")) {
+        break;
+      }
+    }
+    return Arrays.copyOfRange(stacktrace, i, stacktrace.length);
+  }
+
+  /**
+   * Requires that the specified command hasn't already been added to a composition.
+   *
+   * @param commands The commands to check
    * @throws IllegalArgumentException if the given commands have already been composed.
    */
-  public void requireNotComposed(Command command) {
-    if (m_composedCommands.contains(command)) {
-      throw new IllegalArgumentException(
-          "Commands that have been composed may not be added to another composition or scheduled "
-              + "individually!");
+  public void requireNotComposed(Command... commands) {
+    for (var command : commands) {
+      var exception = m_composedCommands.getOrDefault(command, null);
+      if (exception != null) {
+        exception.setStackTrace(stripFrameworkStackElements(exception.getStackTrace()));
+        var buffer = new StringWriter();
+        var writer = new PrintWriter(buffer);
+        writer.println(
+            "Commands that have been composed may not be added to another composition or scheduled "
+                + "individually!");
+        exception.printStackTrace(writer);
+        var thrownException = new IllegalArgumentException(buffer.toString());
+        thrownException.setStackTrace(stripFrameworkStackElements(thrownException.getStackTrace()));
+        throw thrownException;
+      }
     }
   }
 
   /**
-   * Requires that the specified commands not have been already added to a composition.
+   * Requires that the specified commands have not already been added to a composition.
    *
    * @param commands The commands to check
    * @throws IllegalArgumentException if the given commands have already been composed.
    */
   public void requireNotComposed(Collection<Command> commands) {
-    if (!Collections.disjoint(commands, getComposedCommands())) {
+    requireNotComposed(commands.toArray(Command[]::new));
+  }
+
+  /**
+   * Requires that the specified command hasn't already been added to a composition, and is not
+   * currently scheduled.
+   *
+   * @param command The command to check
+   * @throws IllegalArgumentException if the given command has already been composed or scheduled.
+   */
+  public void requireNotComposedOrScheduled(Command command) {
+    if (isScheduled(command)) {
       throw new IllegalArgumentException(
-          "Commands that have been composed may not be added to another composition or scheduled "
-              + "individually!");
+          "Commands that have been scheduled individually may not be added to a composition!");
+    }
+    requireNotComposed(command);
+  }
+
+  /**
+   * Requires that the specified commands have not already been added to a composition, and are not
+   * currently scheduled.
+   *
+   * @param commands The commands to check
+   * @throws IllegalArgumentException if the given commands have already been composed or scheduled.
+   */
+  public void requireNotComposedOrScheduled(Collection<Command> commands) {
+    for (var command : commands) {
+      requireNotComposedOrScheduled(command);
     }
   }
 
@@ -651,7 +723,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   Set<Command> getComposedCommands() {
-    return m_composedCommands;
+    return m_composedCommands.keySet();
   }
 
   @Override
@@ -683,9 +755,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
         null);
     builder.addIntegerArrayProperty(
         "Cancel",
-        () -> {
-          return new long[] {};
-        },
+        () -> new long[] {},
         toCancel -> {
           Map<Long, Command> ids = new LinkedHashMap<>();
           for (Command command : m_scheduledCommands) {

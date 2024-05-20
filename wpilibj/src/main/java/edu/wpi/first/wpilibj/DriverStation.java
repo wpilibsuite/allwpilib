@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
 public final class DriverStation {
-  /** Number of Joystick Ports. */
+  /** Number of Joystick ports. */
   public static final int kJoystickPorts = 6;
 
   private static class HALJoystickButtons {
@@ -48,6 +48,8 @@ public final class DriverStation {
 
   private static class HALJoystickAxesRaw {
     public int[] m_axes;
+
+    @SuppressWarnings("unused")
     public int m_count;
 
     HALJoystickAxesRaw(int count) {
@@ -69,14 +71,21 @@ public final class DriverStation {
 
   /** The robot alliance that the robot is a part of. */
   public enum Alliance {
+    /** Red alliance. */
     Red,
+    /** Blue alliance. */
     Blue
   }
 
+  /** The type of robot match that the robot is part of. */
   public enum MatchType {
+    /** None. */
     None,
+    /** Practice. */
     Practice,
+    /** Qualification. */
     Qualification,
+    /** Elimination. */
     Elimination
   }
 
@@ -239,6 +248,7 @@ public final class DriverStation {
         for (int i = 0; i < count; i++) {
           if (axes.m_axes[i] != m_prevAxes.m_axes[i]) {
             needToLog = true;
+            break;
           }
         }
       }
@@ -255,6 +265,7 @@ public final class DriverStation {
         for (int i = 0; i < count; i++) {
           if (povs.m_povs[i] != m_prevPOVs.m_povs[i]) {
             needToLog = true;
+            break;
           }
         }
       }
@@ -1113,7 +1124,7 @@ public final class DriverStation {
    *
    * <p>If the FMS is not connected, it is set from the team alliance setting on the driver station.
    *
-   * @return the current alliance
+   * @return The alliance (red or blue) or an empty optional if the alliance is invalid
    */
   public static Optional<Alliance> getAlliance() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
@@ -1312,10 +1323,20 @@ public final class DriverStation {
     }
   }
 
+  /**
+   * Registers the given handle for DS data refresh notifications.
+   *
+   * @param handle The event handle.
+   */
   public static void provideRefreshedDataEventHandle(int handle) {
     m_refreshEvents.add(handle);
   }
 
+  /**
+   * Unregisters the given handle from DS data refresh notifications.
+   *
+   * @param handle The event handle.
+   */
   public static void removeRefreshedDataEventHandle(int handle) {
     m_refreshEvents.remove(handle);
   }

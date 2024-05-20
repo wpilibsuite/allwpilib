@@ -61,6 +61,69 @@ public class PowerDistributionFaults {
   public final boolean HardwareFault;
 
   /**
+   * Gets whether there is a breaker fault at the specified channel.
+   *
+   * @param channel Channel to check for faults.
+   * @return True if there is a breaker fault at the channel, otherwise false.
+   * @throws IndexOutOfBoundsException if the provided channel is outside of the range supported by
+   *     the hardware.
+   */
+  public final boolean getBreakerFault(int channel) {
+    switch (channel) {
+      case 0:
+        return Channel0BreakerFault;
+      case 1:
+        return Channel1BreakerFault;
+      case 2:
+        return Channel2BreakerFault;
+      case 3:
+        return Channel3BreakerFault;
+      case 4:
+        return Channel4BreakerFault;
+      case 5:
+        return Channel5BreakerFault;
+      case 6:
+        return Channel6BreakerFault;
+      case 7:
+        return Channel7BreakerFault;
+      case 8:
+        return Channel8BreakerFault;
+      case 9:
+        return Channel9BreakerFault;
+      case 10:
+        return Channel10BreakerFault;
+      case 11:
+        return Channel11BreakerFault;
+      case 12:
+        return Channel12BreakerFault;
+      case 13:
+        return Channel13BreakerFault;
+      case 14:
+        return Channel14BreakerFault;
+      case 15:
+        return Channel15BreakerFault;
+      case 16:
+        return Channel16BreakerFault;
+      case 17:
+        return Channel17BreakerFault;
+      case 18:
+        return Channel18BreakerFault;
+      case 19:
+        return Channel19BreakerFault;
+      case 20:
+        return Channel20BreakerFault;
+      case 21:
+        return Channel21BreakerFault;
+      case 22:
+        return Channel22BreakerFault;
+      case 23:
+        return Channel23BreakerFault;
+      default:
+        throw new IndexOutOfBoundsException("Power distribution fault channel out of bounds!");
+    }
+  }
+
+  /**
    * Constructs from a bitfield.
    *
    * @param faults faults

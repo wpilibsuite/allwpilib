@@ -25,6 +25,9 @@
 #ifndef _gcem_mantissa_HPP
 #define _gcem_mantissa_HPP
 
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -40,6 +43,8 @@ noexcept
                 mantissa(x / T(10)) :
             // else
                 x );
+}
+
 }
 
 }

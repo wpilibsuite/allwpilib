@@ -22,9 +22,31 @@ namespace frc {
  */
 class DriverStation final {
  public:
-  enum Alliance { kRed, kBlue };
-  enum MatchType { kNone, kPractice, kQualification, kElimination };
+  /**
+   * The robot alliance that the robot is a part of.
+   */
+  enum Alliance {
+    /// Red alliance.
+    kRed,
+    /// Blue alliance.
+    kBlue
+  };
 
+  /**
+   * The type of robot match that the robot is part of.
+   */
+  enum MatchType {
+    /// None.
+    kNone,
+    /// Practice.
+    kPractice,
+    /// Qualification.
+    kQualification,
+    /// Elimination.
+    kElimination
+  };
+
+  /// Number of Joystick ports.
   static constexpr int kJoystickPorts = 6;
 
   /**
@@ -274,14 +296,13 @@ class DriverStation final {
   static int GetReplayNumber();
 
   /**
-   * Return the alliance that the driver station says it is on from the FMS.
+   * Get the current alliance from the FMS.
    *
    * If the FMS is not connected, it is set from the team alliance setting on
    * the driver station.
    *
-   * This could return kRed or kBlue.
-   *
-   * @return The Alliance enum (kRed, kBlue or kInvalid)
+   * @return The alliance (red or blue) or an empty optional if the alliance is
+   * invalid
    */
   static std::optional<Alliance> GetAlliance();
 
@@ -334,9 +355,25 @@ class DriverStation final {
    */
   static double GetBatteryVoltage();
 
+  /**
+   * Copy data from the DS task for the user. If no new data exists, it will
+   * just be returned, otherwise the data will be copied from the DS polling
+   * loop.
+   */
   static void RefreshData();
 
+  /**
+   * Registers the given handle for DS data refresh notifications.
+   *
+   * @param handle The event handle.
+   */
   static void ProvideRefreshedDataEventHandle(WPI_EventHandle handle);
+
+  /**
+   * Unregisters the given handle from DS data refresh notifications.
+   *
+   * @param handle The event handle.
+   */
   static void RemoveRefreshedDataEventHandle(WPI_EventHandle handle);
 
   /**

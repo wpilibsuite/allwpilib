@@ -14,7 +14,10 @@ import java.util.Deque;
 public class CleanupPool implements AutoCloseable {
   // Use a Deque instead of a Stack, as Stack's iterators go the wrong way, and docs
   // state ArrayDeque is faster anyway.
-  private final Deque<AutoCloseable> m_closers = new ArrayDeque<AutoCloseable>();
+  private final Deque<AutoCloseable> m_closers = new ArrayDeque<>();
+
+  /** Default constructor. */
+  public CleanupPool() {}
 
   /**
    * Registers an object in the object stack for cleanup.

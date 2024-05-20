@@ -54,6 +54,9 @@ public class LongToObjectHashMap<V> {
   @SuppressWarnings("unchecked")
   private V[] m_values = (V[]) new Object[m_capacity];
 
+  /** Default constructor. */
+  public LongToObjectHashMap() {}
+
   /**
    * Puts a value {@code value} corresponding to key {@code key} in the map.
    *
@@ -222,8 +225,19 @@ public class LongToObjectHashMap<V> {
     return List.copyOf(values); // return a readonly copy
   }
 
+  /**
+   * Interface for map iterator function.
+   *
+   * @param <V> Value type.
+   */
   @FunctionalInterface
   public interface IteratorFunction<V> {
+    /**
+     * Accepts a key-value pair from the map.
+     *
+     * @param key The key.
+     * @param value The value.
+     */
     void accept(long key, V value);
   }
 

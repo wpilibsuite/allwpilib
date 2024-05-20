@@ -937,9 +937,11 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getSerialNumber
   (JNIEnv* env, jclass)
 {
-  char serialNum[9];
-  size_t len = HALSIM_GetRoboRioSerialNumber(serialNum, sizeof(serialNum));
-  return MakeJString(env, std::string_view(serialNum, len));
+  WPI_String str;
+  HALSIM_GetRoboRioSerialNumber(&str);
+  auto jstr = MakeJString(env, wpi::to_string_view(&str));
+  WPI_FreeString(&str);
+  return jstr;
 }
 
 /*
@@ -952,8 +954,8 @@ Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setSerialNumber
   (JNIEnv* env, jclass, jstring serialNumber)
 {
   JStringRef serialNumberJString{env, serialNumber};
-  HALSIM_SetRoboRioSerialNumber(serialNumberJString.c_str(),
-                                serialNumberJString.size());
+  auto str = wpi::make_string(serialNumberJString);
+  HALSIM_SetRoboRioSerialNumber(&str);
 }
 
 /*
@@ -965,9 +967,11 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getComments
   (JNIEnv* env, jclass)
 {
-  char comments[65];
-  size_t len = HALSIM_GetRoboRioComments(comments, sizeof(comments));
-  return MakeJString(env, std::string_view(comments, len));
+  WPI_String str;
+  HALSIM_GetRoboRioComments(&str);
+  auto jstr = MakeJString(env, wpi::to_string_view(&str));
+  WPI_FreeString(&str);
+  return jstr;
 }
 
 /*
@@ -980,7 +984,59 @@ Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setComments
   (JNIEnv* env, jclass, jstring comments)
 {
   JStringRef commentsJString{env, comments};
-  HALSIM_SetRoboRioComments(commentsJString.c_str(), commentsJString.size());
+  auto str = wpi::make_string(commentsJString);
+  HALSIM_SetRoboRioComments(&str);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    registerRadioLEDStateCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_registerRadioLEDStateCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterRoboRioRadioLEDStateCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    cancelRadioLEDStateCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_cancelRadioLEDStateCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(env, handle,
+                                  &HALSIM_CancelRoboRioRadioLEDStateCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    getRadioLEDState
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getRadioLEDState
+  (JNIEnv*, jclass)
+{
+  return HALSIM_GetRoboRioRadioLEDState();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RoboRioDataJNI
+ * Method:    setRadioLEDState
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setRadioLEDState
+  (JNIEnv*, jclass, jint value)
+{
+  HALSIM_SetRoboRioRadioLEDState(static_cast<HAL_RadioLEDState>(value));
 }
 
 /*

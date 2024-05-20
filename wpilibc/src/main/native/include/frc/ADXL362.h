@@ -19,13 +19,40 @@ namespace frc {
  */
 class ADXL362 : public nt::NTSendable, public wpi::SendableHelper<ADXL362> {
  public:
-  enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2 };
+  /**
+   * Accelerometer range.
+   */
+  enum Range {
+    /// 2 Gs max.
+    kRange_2G = 0,
+    /// 4 Gs max.
+    kRange_4G = 1,
+    /// 8 Gs max.
+    kRange_8G = 2
+  };
 
-  enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
+  /**
+   * Accelerometer axes.
+   */
+  enum Axes {
+    /// X axis.
+    kAxis_X = 0x00,
+    /// Y axis.
+    kAxis_Y = 0x02,
+    /// Z axis.
+    kAxis_Z = 0x04
+  };
+
+  /**
+   * Container type for accelerations from all axes.
+   */
   struct AllAxes {
-    double XAxis;
-    double YAxis;
-    double ZAxis;
+    /// Acceleration along the X axis in g-forces.
+    double XAxis = 0.0;
+    /// Acceleration along the Y axis in g-forces.
+    double YAxis = 0.0;
+    /// Acceleration along the Z axis in g-forces.
+    double ZAxis = 0.0;
   };
 
  public:

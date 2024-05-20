@@ -11,11 +11,16 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.proto.ChassisSpeedsProto;
+import edu.wpi.first.math.kinematics.struct.ChassisSpeedsStruct;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /**
  * Represents the speed of a robot chassis. Although this class contains similar members compared to
@@ -26,7 +31,7 @@ import edu.wpi.first.units.Velocity;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
-public class ChassisSpeeds {
+public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /** Velocity along the x-axis. (Fwd is +) */
   public double vxMetersPerSecond;
 
@@ -35,6 +40,12 @@ public class ChassisSpeeds {
 
   /** Represents the angular velocity of the robot frame. (CCW is +) */
   public double omegaRadiansPerSecond;
+
+  /** ChassisSpeeds protobuf for serialization. */
+  public static final ChassisSpeedsProto proto = new ChassisSpeedsProto();
+
+  /** ChassisSpeeds struct for serialization. */
+  public static final ChassisSpeedsStruct struct = new ChassisSpeedsStruct();
 
   /** Constructs a ChassisSpeeds with zeros for dx, dy, and theta. */
   public ChassisSpeeds() {}
@@ -68,6 +79,19 @@ public class ChassisSpeeds {
   }
 
   /**
+   * Creates a Twist2d from ChassisSpeeds.
+   *
+   * @param dtSeconds The duration of the timestep.
+   * @return Twist2d.
+   */
+  public Twist2d toTwist2d(double dtSeconds) {
+    return new Twist2d(
+        vxMetersPerSecond * dtSeconds,
+        vyMetersPerSecond * dtSeconds,
+        omegaRadiansPerSecond * dtSeconds);
+  }
+
+  /**
    * Discretizes a continuous-time chassis speed.
    *
    * <p>This function converts a continuous-time chassis speed into a discrete-time one such that
@@ -89,12 +113,19 @@ public class ChassisSpeeds {
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       double dtSeconds) {
+    // Construct the desired pose after a timestep, relative to the current pose. The desired pose
+    // has decoupled translation and rotation.
     var desiredDeltaPose =
         new Pose2d(
             vxMetersPerSecond * dtSeconds,
             vyMetersPerSecond * dtSeconds,
             new Rotation2d(omegaRadiansPerSecond * dtSeconds));
-    var twist = new Pose2d().log(desiredDeltaPose);
+
+    // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
+    // current pose to the desired pose
+    var twist = Pose2d.kZero.log(desiredDeltaPose);
+
+    // Turn the chassis translation/rotation deltas into average velocities
     return new ChassisSpeeds(twist.dx / dtSeconds, twist.dy / dtSeconds, twist.dtheta / dtSeconds);
   }
 

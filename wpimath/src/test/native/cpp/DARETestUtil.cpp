@@ -5,8 +5,8 @@
 #include "DARETestUtil.h"
 
 #include <Eigen/Eigenvalues>
-#include <fmt/core.h>
 #include <gtest/gtest.h>
+#include <wpi/print.h>
 
 #include "frc/fmt/Eigen.h"
 
@@ -20,9 +20,9 @@ void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
   }
 
   if (::testing::Test::HasFailure()) {
-    fmt::print("lhs =\n{}\n", lhs);
-    fmt::print("rhs =\n{}\n", rhs);
-    fmt::print("delta =\n{}\n", Eigen::MatrixXd{lhs - rhs});
+    wpi::print("lhs =\n{}\n", lhs);
+    wpi::print("rhs =\n{}\n", rhs);
+    wpi::print("delta =\n{}\n", Eigen::MatrixXd{lhs - rhs});
   }
 }
 

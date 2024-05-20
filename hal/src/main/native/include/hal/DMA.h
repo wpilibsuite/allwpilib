@@ -13,7 +13,6 @@
  * @{
  */
 
-// clang-format off
 /**
  * The DMA Read Status.
  */
@@ -22,7 +21,6 @@ HAL_ENUM(HAL_DMAReadStatus) {
   HAL_DMA_TIMEOUT = 2,
   HAL_DMA_ERROR = 3,
 };
-// clang-format on
 
 /**
  * Buffer for containing all DMA data for a specific sample.
@@ -139,6 +137,8 @@ void HAL_AddDMACounter(HAL_DMAHandle handle, HAL_CounterHandle counterHandle,
 
 /**
  * Adds timer data for an counter to be collected by DMA.
+ *
+ * This can only be called if DMA is not started.
  *
  * @param[in] handle the dma handle
  * @param[in] counterHandle the counter to add

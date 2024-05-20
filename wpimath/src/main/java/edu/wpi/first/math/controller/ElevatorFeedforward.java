@@ -6,17 +6,34 @@ package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.controller.proto.ElevatorFeedforwardProto;
+import edu.wpi.first.math.controller.struct.ElevatorFeedforwardStruct;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /**
  * A helper class that computes feedforward outputs for a simple elevator (modeled as a motor acting
  * against the force of gravity).
  */
-public class ElevatorFeedforward {
+public class ElevatorFeedforward implements ProtobufSerializable, StructSerializable {
+  /** The static gain. */
   public final double ks;
+
+  /** The gravity gain. */
   public final double kg;
+
+  /** The velocity gain. */
   public final double kv;
+
+  /** The acceleration gain. */
   public final double ka;
+
+  /** ElevatorFeedforward protobuf for serialization. */
+  public static final ElevatorFeedforwardProto proto = new ElevatorFeedforwardProto();
+
+  /** ElevatorFeedforward struct for serialization. */
+  public static final ElevatorFeedforwardStruct struct = new ElevatorFeedforwardStruct();
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains. Units of the gain values will
@@ -26,12 +43,20 @@ public class ElevatorFeedforward {
    * @param kg The gravity gain.
    * @param kv The velocity gain.
    * @param ka The acceleration gain.
+   * @throws IllegalArgumentException for kv &lt; zero.
+   * @throws IllegalArgumentException for ka &lt; zero.
    */
   public ElevatorFeedforward(double ks, double kg, double kv, double ka) {
     this.ks = ks;
     this.kg = kg;
     this.kv = kv;
     this.ka = ka;
+    if (kv < 0.0) {
+      throw new IllegalArgumentException("kv must be a non-negative number, got " + kv + "!");
+    }
+    if (ka < 0.0) {
+      throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
+    }
   }
 
   /**

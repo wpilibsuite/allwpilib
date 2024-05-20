@@ -7,8 +7,6 @@
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/struct/Struct.h>
 
 #include "frc/geometry/Quaternion.h"
 #include "frc/geometry/Rotation2d.h"
@@ -22,7 +20,7 @@ namespace frc {
 class WPILIB_DLLEXPORT Rotation3d {
  public:
   /**
-   * Constructs a Rotation3d with a default angle of 0 degrees.
+   * Constructs a Rotation3d representing no rotation.
    */
   Rotation3d() = default;
 
@@ -197,30 +195,5 @@ void from_json(const wpi::json& json, Rotation3d& rotation);
 
 }  // namespace frc
 
-template <>
-struct wpi::Struct<frc::Rotation3d> {
-  static constexpr std::string_view kTypeString = "struct:Rotation3d";
-  static constexpr size_t kSize = wpi::Struct<frc::Quaternion>::kSize;
-  static constexpr std::string_view kSchema = "Quaternion q";
-  static frc::Rotation3d Unpack(std::span<const uint8_t, kSize> data) {
-    return frc::Rotation3d{wpi::UnpackStruct<frc::Quaternion, 0>(data)};
-  }
-  static void Pack(std::span<uint8_t, kSize> data,
-                   const frc::Rotation3d& value) {
-    wpi::PackStruct<0>(data, value.GetQuaternion());
-  }
-  static void ForEachNested(
-      std::invocable<std::string_view, std::string_view> auto fn) {
-    wpi::ForEachStructSchema<frc::Quaternion>(fn);
-  }
-};
-
-static_assert(wpi::HasNestedStruct<frc::Rotation3d>);
-
-template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Rotation3d> {
-  static google::protobuf::Message* New(google::protobuf::Arena* arena);
-  static frc::Rotation3d Unpack(const google::protobuf::Message& msg);
-  static void Pack(google::protobuf::Message* msg,
-                   const frc::Rotation3d& value);
-};
+#include "frc/geometry/proto/Rotation3dProto.h"
+#include "frc/geometry/struct/Rotation3dStruct.h"

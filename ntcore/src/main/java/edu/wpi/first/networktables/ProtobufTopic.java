@@ -32,7 +32,7 @@ public final class ProtobufTopic<T> extends Topic {
    * @return ProtobufTopic for value class
    */
   public static <T> ProtobufTopic<T> wrap(Topic topic, Protobuf<T, ?> proto) {
-    return new ProtobufTopic<T>(topic, proto);
+    return new ProtobufTopic<>(topic, proto);
   }
 
   /**
@@ -47,7 +47,7 @@ public final class ProtobufTopic<T> extends Topic {
    */
   public static <T> ProtobufTopic<T> wrap(
       NetworkTableInstance inst, int handle, Protobuf<T, ?> proto) {
-    return new ProtobufTopic<T>(inst, handle, proto);
+    return new ProtobufTopic<>(inst, handle, proto);
   }
 
   /**
@@ -63,7 +63,7 @@ public final class ProtobufTopic<T> extends Topic {
    * @return subscriber
    */
   public ProtobufSubscriber<T> subscribe(T defaultValue, PubSubOption... options) {
-    return new ProtobufEntryImpl<T>(
+    return new ProtobufEntryImpl<>(
         this,
         ProtobufBuffer.create(m_proto),
         NetworkTablesJNI.subscribe(
@@ -87,7 +87,7 @@ public final class ProtobufTopic<T> extends Topic {
    */
   public ProtobufPublisher<T> publish(PubSubOption... options) {
     m_inst.addSchema(m_proto);
-    return new ProtobufEntryImpl<T>(
+    return new ProtobufEntryImpl<>(
         this,
         ProtobufBuffer.create(m_proto),
         NetworkTablesJNI.publish(
@@ -113,7 +113,7 @@ public final class ProtobufTopic<T> extends Topic {
    */
   public ProtobufPublisher<T> publishEx(String properties, PubSubOption... options) {
     m_inst.addSchema(m_proto);
-    return new ProtobufEntryImpl<T>(
+    return new ProtobufEntryImpl<>(
         this,
         ProtobufBuffer.create(m_proto),
         NetworkTablesJNI.publishEx(
@@ -144,7 +144,7 @@ public final class ProtobufTopic<T> extends Topic {
    * @return entry
    */
   public ProtobufEntry<T> getEntry(T defaultValue, PubSubOption... options) {
-    return new ProtobufEntryImpl<T>(
+    return new ProtobufEntryImpl<>(
         this,
         ProtobufBuffer.create(m_proto),
         NetworkTablesJNI.getEntry(
@@ -153,6 +153,11 @@ public final class ProtobufTopic<T> extends Topic {
         false);
   }
 
+  /**
+   * Returns the protobuf.
+   *
+   * @return The protobuf.
+   */
   public Protobuf<T, ?> getProto() {
     return m_proto;
   }

@@ -25,6 +25,12 @@
 #ifndef _gcem_acos_HPP
 #define _gcem_acos_HPP
 
+#include <cmath>
+#include <type_traits>
+
+namespace gcem
+{
+
 namespace internal
 {
 
@@ -78,7 +84,13 @@ return_t<T>
 acos(const T x)
 noexcept
 {
+  if (std::is_constant_evaluated()) {
     return internal::acos_check( static_cast<return_t<T>>(x) );
+  } else {
+    return std::acos(x);
+  }
+}
+
 }
 
 #endif

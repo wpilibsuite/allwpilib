@@ -62,11 +62,12 @@ public abstract class MotorSafety {
   }
 
   /** MotorSafety constructor. */
+  @SuppressWarnings("this-escape")
   public MotorSafety() {
     synchronized (m_listMutex) {
       m_instanceList.add(this);
       if (m_safetyThread == null) {
-        m_safetyThread = new Thread(() -> threadMain(), "MotorSafety Thread");
+        m_safetyThread = new Thread(MotorSafety::threadMain, "MotorSafety Thread");
         m_safetyThread.setDaemon(true);
         m_safetyThread.start();
       }
@@ -185,7 +186,13 @@ public abstract class MotorSafety {
     }
   }
 
+  /** Called to stop the motor when the timeout expires. */
   public abstract void stopMotor();
 
+  /**
+   * Returns a description to print when an error occurs.
+   *
+   * @return Description to print when an error occurs.
+   */
   public abstract String getDescription();
 }

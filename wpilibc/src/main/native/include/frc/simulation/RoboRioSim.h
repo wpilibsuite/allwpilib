@@ -11,6 +11,7 @@
 #include <units/temperature.h>
 #include <units/voltage.h>
 
+#include "frc/RobotController.h"
 #include "frc/simulation/CallbackStore.h"
 
 namespace frc::sim {
@@ -513,6 +514,32 @@ class RoboRioSim {
    * @param comments The comments.
    */
   static void SetComments(std::string_view comments);
+
+  /**
+   * Register a callback to be run whenever the Radio led state changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether the callback should be called with the
+   *                      initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterRadioLEDStateCallback(
+      NotifyCallback callback, bool initialNotify);
+
+  /**
+   * Get the state of the radio led.
+   *
+   * @return The state of the radio led.
+   */
+  static RadioLEDState GetRadioLEDState();
+
+  /**
+   * Set the state of the radio led.
+   *
+   * @param state The state of the radio led.
+   */
+  static void SetRadioLEDState(RadioLEDState state);
 
   /**
    * Reset all simulation data.

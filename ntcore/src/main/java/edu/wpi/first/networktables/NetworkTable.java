@@ -330,7 +330,7 @@ public final class NetworkTable {
    * @return true if the table as a value assigned to the given key
    */
   public boolean containsKey(String key) {
-    return !("".equals(key)) && getTopic(key).exists();
+    return !"".equals(key) && getTopic(key).exists();
   }
 
   /**
@@ -574,7 +574,7 @@ public final class NetworkTable {
     return m_inst.addListener(
         new String[] {m_pathWithSep},
         EnumSet.of(NetworkTableEvent.Kind.kPublish, NetworkTableEvent.Kind.kImmediate),
-        new Consumer<NetworkTableEvent>() {
+        new Consumer<>() {
           final Set<String> m_notifiedTables = new HashSet<>();
 
           @Override

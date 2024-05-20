@@ -6,9 +6,13 @@
 
 #include <utility>
 
+#include <units/velocity.h>
+#include <units/voltage.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;
+using kv_unit = units::compound_unit<units::volts,
+                                     units::inverse<units::meters_per_second>>;
 
 RamseteCommand::RamseteCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
@@ -42,6 +46,7 @@ RamseteCommand::RamseteCommand(
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
+      m_feedforward(0_V, units::unit_t<kv_unit>{0}),
       m_kinematics(std::move(kinematics)),
       m_outputVel(std::move(output)),
       m_usePID(false) {

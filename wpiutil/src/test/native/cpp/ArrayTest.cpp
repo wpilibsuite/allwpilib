@@ -16,17 +16,20 @@ class MoveOnlyType {
 }  // namespace
 
 TEST(ArrayTest, CopyableTypeCompiles) {
-  [[maybe_unused]] constexpr wpi::array<int, 3> arr1{1, 2, 3};
+  [[maybe_unused]]
+  constexpr wpi::array<int, 3> arr1{1, 2, 3};
 
   // Test deduction guide
-  [[maybe_unused]] constexpr wpi::array arr2{1, 2, 3};
+  [[maybe_unused]]
+  constexpr wpi::array arr2{1, 2, 3};
 }
 
 TEST(ArrayTest, MoveOnlyTypeCompiles) {
-  [[maybe_unused]] constexpr wpi::array<MoveOnlyType, 3> arr1{
-      MoveOnlyType{}, MoveOnlyType{}, MoveOnlyType{}};
+  [[maybe_unused]]
+  constexpr wpi::array<MoveOnlyType, 3> arr1{MoveOnlyType{}, MoveOnlyType{},
+                                             MoveOnlyType{}};
 
   // Test deduction guide
-  [[maybe_unused]] constexpr wpi::array arr2{MoveOnlyType{}, MoveOnlyType{},
-                                             MoveOnlyType{}};
+  [[maybe_unused]]
+  constexpr wpi::array arr2{MoveOnlyType{}, MoveOnlyType{}, MoveOnlyType{}};
 }

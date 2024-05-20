@@ -38,22 +38,47 @@ public class ServiceData {
     }
   }
 
+  /**
+   * Returns service data payload.
+   *
+   * @return Service data payload.
+   */
   public Map<String, String> getTxt() {
     return m_txt;
   }
 
+  /**
+   * Returns host name.
+   *
+   * @return Host name.
+   */
   public String getHostName() {
     return m_hostName;
   }
 
+  /**
+   * Returns service name.
+   *
+   * @return Service name.
+   */
   public String getServiceName() {
     return m_serviceName;
   }
 
+  /**
+   * Returns port number.
+   *
+   * @return Port number.
+   */
   public int getPort() {
     return m_port;
   }
 
+  /**
+   * Returns IPv4 address.
+   *
+   * @return IPv4 address.
+   */
   public long getIpv4Address() {
     return m_ipv4Address;
   }
