@@ -11,6 +11,7 @@
 #include <random>
 
 #include <fmt/chrono.h>
+#include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/DataLog.h>
 #include <wpi/DataLogBackgroundWriter.h>
@@ -24,7 +25,6 @@
 #include "frc/Filesystem.h"
 #include "frc/RobotBase.h"
 #include "frc/RobotController.h"
-#include <hal/FRCUsageReporting.h>
 
 using namespace frc;
 
@@ -315,7 +315,7 @@ Instance::Instance(std::string_view dir, std::string_view filename,
     }
   }
   HAL_Report(HALUsageReporting::kResourceType_DataLogManager, 0);
-  
+
   owner.Start(logDir, filename, period);
 }
 
