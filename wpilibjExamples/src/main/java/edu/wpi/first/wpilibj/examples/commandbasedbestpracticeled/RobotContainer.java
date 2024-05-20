@@ -174,20 +174,20 @@ public class RobotContainer {
   }
 
   /**
-   * Run a group of commands sewquentially.
-   * 
-   * <p>Each component command is run individually by proxy and thus the requirements
-   * of each command are only for the duration of that command and are not required
-   * for the entire group process.
+   * Runs a group of commands in series, one after the other.
    *
-   * @param components - list of commands to run sequentially
-   * 
-   * @return the loosely grouped commands to run
+   * <p>Each command is run individually by proxy. The requirements
+   * of each command are only for the duration of that command and
+   * are not required for the entire group process.
+   
+   * @param commands the commands to include
+   * @return the command group
+   * @see SequentialCommandGroup
    */
-  static public Command looseSequence(Command... components) {
+  public static Command looseSequence(Command... commands) {
     SequentialCommandGroup sequence = new SequentialCommandGroup();
-    for (Command component : components) {
-      sequence.addCommands(component.asProxy());
+    for (Command command : commands) {
+      sequence.addCommands(command.asProxy());
     }
     return sequence;
   }
