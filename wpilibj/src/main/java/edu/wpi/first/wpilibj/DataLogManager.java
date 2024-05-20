@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.concurrent.Event;
@@ -121,6 +123,7 @@ public final class DataLogManager {
       if (m_ntLoggerEnabled) {
         startNtLog();
       }
+      HAL.report(tResourceType.kResourceType_DataLogManager, 0);
     } else if (m_stopped) {
       m_log.setFilename(makeLogFilename(filename));
       m_log.resume();

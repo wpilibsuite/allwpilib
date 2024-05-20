@@ -250,6 +250,8 @@ public final class FRCNetComm {
     public static final int kResourceType_RevSparkFlexCAN = 114;
     /** kResourceType_RevSparkFlexPWM = 115. */
     public static final int kResourceType_RevSparkFlexPWM = 115;
+    /** kResourceType_DataLogManager = 116. */
+    public static final int kResourceType_DataLogManager = 116;
   }
 
   /**
