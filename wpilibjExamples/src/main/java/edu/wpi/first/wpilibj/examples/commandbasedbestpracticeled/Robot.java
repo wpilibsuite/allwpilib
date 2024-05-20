@@ -69,6 +69,8 @@
  */
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.print;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -133,6 +135,31 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    // demonstrate method to run a loosely grouped sequence of commands such
+    // that their requirements are not required for the entire group process.
+    Command test1 = print("testing 1");
+    Command test2 = print("testing 2");
+    Command test3 = print("testing 3");
+    Command test4 = print("testing 4");
+
+    RobotContainer.looseSequence(test1, test2, test3, test4, test1)
+      .andThen(
+    RobotContainer.looseSequence() )
+      .andThen(
+    RobotContainer.looseSequence(test4, test2, test1, test3)).schedule();
+
+    /*
+    testing 1
+    testing 2
+    testing 3
+    testing 4
+    testing 1
+    testing 4
+    testing 2
+    testing 1
+    testing 3
+    */
   }
 
   @Override
@@ -143,7 +170,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    
+
     CommandScheduler.getInstance().cancelAll();
   }
 
