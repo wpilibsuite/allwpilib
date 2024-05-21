@@ -235,7 +235,6 @@ public final class Commands {
    * @see SequentialCommandGroup
    */
   public static Command separatedSequence(Command... commands) {
-
     return sequence(proxyAll(commands));
   }
 
