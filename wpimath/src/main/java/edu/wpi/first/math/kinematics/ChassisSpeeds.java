@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.ChassisSpeedsProto;
 import edu.wpi.first.math.kinematics.struct.ChassisSpeedsStruct;
 import edu.wpi.first.units.Angle;
@@ -75,6 +76,19 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
       Measure<Velocity<Distance>> vy,
       Measure<Velocity<Angle>> omega) {
     this(vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond));
+  }
+
+  /**
+   * Creates a Twist2d from ChassisSpeeds.
+   *
+   * @param dtSeconds The duration of the timestep.
+   * @return Twist2d.
+   */
+  public Twist2d toTwist2d(double dtSeconds) {
+    return new Twist2d(
+        vxMetersPerSecond * dtSeconds,
+        vyMetersPerSecond * dtSeconds,
+        omegaRadiansPerSecond * dtSeconds);
   }
 
   /**
