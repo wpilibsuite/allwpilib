@@ -24,6 +24,7 @@ import java.util.Scanner;
  */
 public final class RuntimeLoader<T> {
   private static String defaultExtractionRoot;
+  private static final String fallbackExtractionRoot;
 
   /**
    * Gets the default extraction root location (~/.wpilib/nativecache).
@@ -37,6 +38,20 @@ public final class RuntimeLoader<T> {
     String home = System.getProperty("user.home");
     defaultExtractionRoot = Paths.get(home, ".wpilib", "nativecache").toString();
     return defaultExtractionRoot;
+  }
+
+   /**
+   * Gets the fallback extraction root location (/tmp/.wpilib/nativecache).
+   *
+   * @return The fallback extraction root location.
+   */
+  public static synchronized String getFallbackExtractionRoot() {
+    if (fallbackExtractionRoot != null) {
+      return fallbackExtractionRoot;
+    }
+    String home = System.getProperty("java.io.tmpdir");
+    fallbackExtractionRoot = Paths.get(home, ".wpilib", "nativecache").toString();
+    return fallbackExtractionRoot;
   }
 
   private final String m_libraryName;
@@ -87,6 +102,20 @@ public final class RuntimeLoader<T> {
    */
   public void loadLibrary() throws IOException {
     try {
+      loadLibrary(m_extractionRoot)
+    } catch (NoSuchFileException e) {
+      // thrown if filesystem is read-only and folders/files cannot be created -- try again in user temp directory
+      loadLibrary(getFallbackExtractionRoot());
+    }
+  }
+
+  /**
+   * Loads a native library.
+   * @param tryFallback if we should try falling back to extracting to a tempfolder
+   * @throws IOException if the library fails to load
+   */
+  public void loadLibrary(String extractionRoot) throws IOException {
+    try {
       // First, try loading path
       System.loadLibrary(m_libraryName);
     } catch (UnsatisfiedLinkError ule) {
@@ -99,7 +128,7 @@ public final class RuntimeLoader<T> {
         }
         try (Scanner scanner = new Scanner(hashIs, StandardCharsets.UTF_8)) {
           String hash = scanner.nextLine();
-          File jniLibrary = new File(m_extractionRoot, resName + "." + hash);
+          File jniLibrary = new File(extractionRoot, resName + "." + hash);
           try {
             // Try to load from an already extracted hash
             System.load(jniLibrary.getAbsolutePath());
