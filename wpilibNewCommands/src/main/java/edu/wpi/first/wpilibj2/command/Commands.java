@@ -229,17 +229,14 @@ public final class Commands {
    * <p>Each command is run individually by proxy. The requirements
    * of each command are only for the duration of that command and
    * are not required for the entire group process.
-   
+   *
    * @param commands the commands to include
    * @return the command group
    * @see SequentialCommandGroup
    */
-  public static Command looseSequence(Command... commands) {
-    SequentialCommandGroup sequence = new SequentialCommandGroup();
-    for (Command command : commands) {
-      sequence.addCommands(command.asProxy());
-    }
-    return sequence;
+  public static Command separatedSequence(Command... commands) {
+
+    return sequence(proxyAll(commands));
   }
 
   /**
