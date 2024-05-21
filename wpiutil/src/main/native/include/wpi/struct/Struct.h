@@ -457,6 +457,19 @@ struct Struct<bool> {
 };
 
 /**
+ * Raw struct support for char values.
+ * Primarily useful for higher level struct implementations.
+ */
+template <>
+struct Struct<char> {
+  static constexpr std::string_view GetTypeString() { return "struct:char"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() { return "char value"; }
+  static char Unpack(std::span<const uint8_t> data) { return data[0]; }
+  static void Pack(std::span<uint8_t> data, char value) { data[0] = value; }
+};
+
+/**
  * Raw struct support for uint8_t values.
  * Primarily useful for higher level struct implementations.
  */

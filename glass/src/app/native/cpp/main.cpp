@@ -223,16 +223,19 @@ int main(int argc, char** argv) {
 
   gPlotProvider = std::make_unique<glass::PlotProvider>(
       glass::GetStorageRoot().GetChild("Plots"));
-  gNtProvider = std::make_unique<glass::NetworkTablesProvider>(
-      glass::GetStorageRoot().GetChild("NetworkTables"));
 
   glass::SetStorageName("glass");
   glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
                                        : saveDir);
   gPlotProvider->GlobalInit();
   gui::AddInit([] { glass::ResetTime(); });
-  gNtProvider->GlobalInit();
   NtInitialize();
+
+  // TODO: Hack; moved this below so the model is initialized
+  gNtProvider = std::make_unique<glass::NetworkTablesProvider>(
+      glass::GetStorageRoot().GetChild("NetworkTables"),
+      gNetworkTablesModel->GetStructDatabase());
+  gNtProvider->GlobalInit();
 
   glass::AddStandardNetworkTablesViews(*gNtProvider);
 
