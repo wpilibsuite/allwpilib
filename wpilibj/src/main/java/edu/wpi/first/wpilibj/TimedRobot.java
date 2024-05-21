@@ -76,25 +76,6 @@ public class TimedRobot extends IterativeRobotBase {
 
   private final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
-  /** Constructor for TimedRobot. */
-  protected TimedRobot() {
-    this(kDefaultPeriod);
-  }
-
-  /**
-   * Constructor for TimedRobot.
-   *
-   * @param period Period in seconds.
-   */
-  protected TimedRobot(double period) {
-    super(period);
-    m_startTimeUs = RobotController.getFPGATime();
-    addPeriodic(this::loopFunc, period);
-    NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
-
-    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
-  }
-
   @Override
   public void close() {
     NotifierJNI.stopNotifier(m_notifier);
@@ -157,6 +138,25 @@ public class TimedRobot extends IterativeRobotBase {
   @Override
   public void endCompetition() {
     NotifierJNI.stopNotifier(m_notifier);
+  }
+
+  /** Constructor for TimedRobot. */
+  protected TimedRobot() {
+    this(kDefaultPeriod);
+  }
+
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param period Period in seconds.
+   */
+  protected TimedRobot(double period) {
+    super(period);
+    m_startTimeUs = RobotController.getFPGATime();
+    addPeriodic(this::loopFunc, period);
+    NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
+
+    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
   }
 
   /**

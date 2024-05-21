@@ -8,11 +8,6 @@
 
 using namespace frc;
 
-TimesliceRobot::TimesliceRobot(units::second_t robotPeriodicAllocation,
-                               units::second_t controllerPeriod)
-    : m_nextOffset{robotPeriodicAllocation},
-      m_controllerPeriod{controllerPeriod} {}
-
 void TimesliceRobot::Schedule(std::function<void()> func,
                               units::second_t allocation) {
   if (m_nextOffset + allocation > m_controllerPeriod) {
@@ -25,3 +20,8 @@ void TimesliceRobot::Schedule(std::function<void()> func,
   AddPeriodic(func, m_controllerPeriod, m_nextOffset);
   m_nextOffset += allocation;
 }
+
+TimesliceRobot::TimesliceRobot(units::second_t robotPeriodicAllocation,
+                               units::second_t controllerPeriod)
+    : m_nextOffset{robotPeriodicAllocation},
+      m_controllerPeriod{controllerPeriod} {}
