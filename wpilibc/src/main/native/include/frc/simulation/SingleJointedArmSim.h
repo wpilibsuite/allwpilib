@@ -11,12 +11,11 @@
 #include <units/length.h>
 #include <units/mass.h>
 #include <units/moment_of_inertia.h>
-
-#include "frc/simulation/AngularMechanismSim.h"
-#include "frc/system/plant/DCMotor.h"
-#include "frc/EigenCore.h"
 #include <wpi/SmallVector.h>
 
+#include "frc/EigenCore.h"
+#include "frc/simulation/AngularMechanismSim.h"
+#include "frc/system/plant/DCMotor.h"
 
 namespace frc::sim {
 /**
@@ -52,36 +51,28 @@ class SingleJointedArmSim : public AngularMechanismSim {
    *
    * @return the arm length.
    */
-  units::meter_t GetArmLength() {
-    return m_armLen;
-  }
+  units::meter_t GetArmLength() { return m_armLen; }
 
   /**
    * Returns the pivot point of the system.
    *
    * @return the pivot point.
    */
-  units::meter_t GetPivotPoint() {
-    return m_pivotPoint;
-  }
+  units::meter_t GetPivotPoint() { return m_pivotPoint; }
 
   /**
    * Returns the minimum angle of the system.
    *
    * @return the minimum angle.
    */
-  units::radian_t GetMinAngle() {
-    return m_minAngle;
-  }
+  units::radian_t GetMinAngle() { return m_minAngle; }
 
   /**
    * Returns the minimum angle of the system.
    *
    * @return the minimum angle.
    */
-  units::radian_t GetMaxAngle() {
-    return m_maxAngle;
-  }
+  units::radian_t GetMaxAngle() { return m_maxAngle; }
 
   /**
    * Returns the mass of the system.
@@ -89,8 +80,9 @@ class SingleJointedArmSim : public AngularMechanismSim {
    * @return the mass.
    */
   units::kilogram_t GetMass() {
-    return units::kilogram_t{GetJ().value()
-        / ((1.0 / 12.0) * pow(m_armLen.value(), 2) + pow(m_pivotPoint.value(), 2))};
+    return units::kilogram_t{GetJ().value() /
+                             ((1.0 / 12.0) * std::pow(m_armLen.value(), 2) +
+                              std::pow(m_pivotPoint.value(), 2))};
   }
 
   /**
@@ -103,11 +95,11 @@ class SingleJointedArmSim : public AngularMechanismSim {
   void SetState(units::radian_t angle, units::radians_per_second_t velocity);
 
   /**
-   * Sets the arm's position.  The new angle will be limited between the minimum and
-   * maximum allowed limits.
-   * 
+   * Sets the arm's position.  The new angle will be limited between the minimum
+   * and maximum allowed limits.
+   *
    * @param angle The new angle.
-  */
+   */
   void SetPosition(units::radian_t angle);
 
   /**

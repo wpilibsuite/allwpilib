@@ -35,7 +35,7 @@ LinearSystem<2, 1, 2> LinearSystemId::ElevatorSystem(DCMotor motor,
 
 LinearSystem<2, 1, 2> LinearSystemId::SingleJointedArmSystem(
     DCMotor motor, units::kilogram_t armMass, units::meter_t armLength,
-      units::meter_t pivotPosition, double gearing) {
+    units::meter_t pivotPosition, double gearing) {
   if (armMass <= 0_kg) {
     throw std::domain_error("armMass must be greater than zero.");
   }
@@ -53,11 +53,12 @@ LinearSystem<2, 1, 2> LinearSystemId::SingleJointedArmSystem(
   }
 
   units::meter_t centerToPivotDistance = units::meter_t{
-    std::abs((armLength.value() / 2.0) - pivotPosition.value())};
+      std::abs((armLength.value() / 2.0) - pivotPosition.value())};
   units::kilogram_square_meter_t JCenter = units::kilogram_square_meter_t{
-    (1.0 / 12.0) * armMass.value() * pow(armLength.value(), 2)};
-  units::kilogram_square_meter_t JCentralAxisTheorem = units::kilogram_square_meter_t{
-    armMass.value() * pow(centerToPivotDistance.value(), 2)};
+      (1.0 / 12.0) * armMass.value() * std::pow(armLength.value(), 2)};
+  units::kilogram_square_meter_t JCentralAxisTheorem =
+      units::kilogram_square_meter_t{
+          armMass.value() * std::pow(centerToPivotDistance.value(), 2)};
   units::kilogram_square_meter_t J = JCenter + JCentralAxisTheorem;
 
   return AngularSystem(motor, J, gearing);

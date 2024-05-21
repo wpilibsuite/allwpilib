@@ -50,8 +50,7 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
     // Gear ratio
     constexpr double G = 100.0;
 
-    return frc::LinearSystemId::SingleJointedArmSystem(motors,
-                                                       1.0 / 3.0 * m * r * r, G)
+    return frc::LinearSystemId::SingleJointedArmSystem(motors, m, r, 0_m, G)
         .Slice(0);
   }();
 

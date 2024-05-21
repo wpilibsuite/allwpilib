@@ -16,9 +16,9 @@ using namespace frc;
 using namespace frc::sim;
 
 SingleJointedArmSim::SingleJointedArmSim(
-    const LinearSystem<2, 1, 2>& system, const DCMotor& gearbox, units::meter_t armLength,
-    units::meter_t pivotPoint, units::radian_t minAngle,
-    units::radian_t maxAngle, bool simulateGravity,
+    const LinearSystem<2, 1, 2>& system, const DCMotor& gearbox,
+    units::meter_t armLength, units::meter_t pivotPoint,
+    units::radian_t minAngle, units::radian_t maxAngle, bool simulateGravity,
     units::radian_t startingAngle,
     const std::array<double, 2>& measurementStdDevs)
     : AngularMechanismSim(system, gearbox, measurementStdDevs),
@@ -33,12 +33,13 @@ SingleJointedArmSim::SingleJointedArmSim(
 
 void SingleJointedArmSim::SetState(units::radian_t angle,
                                    units::radians_per_second_t velocity) {
-  AngularMechanismSim::SetState(Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), velocity});
+  AngularMechanismSim::SetState(
+      Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), velocity});
 }
 
 void SingleJointedArmSim::SetPosition(units::radian_t angle) {
-  AngularMechanismSim::SetState(Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), m_x(1, 0)});
-
+  AngularMechanismSim::SetState(
+      Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), m_x(1, 0)});
 }
 
 bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
@@ -89,13 +90,11 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
         Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
-          double alphaGravConstant = 
-          -9.8 
-          * (3.0 / 2.0)
-          * std::abs(1 - 2 * m_pivotPoint.value() / m_armLen.value())
-          / m_armLen.value();
-          xdot += Vectord<2>{
-              0.0, (alphaGravConstant * std::cos(x(0)))};
+          double alphaGravConstant =
+              -9.8 * (3.0 / 2.0) *
+              std::abs(1 - 2 * m_pivotPoint.value() / m_armLen.value()) /
+              m_armLen.value();
+          xdot += Vectord<2>{0.0, (alphaGravConstant * std::cos(x(0)))};
         }
         return xdot;
       },

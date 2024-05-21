@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <cmath>
 #include <concepts>
 #include <stdexcept>
-#include <cmath>
 
 #include <wpi/SymbolExports.h>
 
@@ -58,8 +58,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param motor The motor (or gearbox) attached to the arm.
    * @param armMass The mass of the arm.
    * @param armLength The length of the arm.
-   * @param pivotPosition The pivot location of the arm.  A value of 0 or equal to armLength 
-   *    indicates that the arm is pivoted at one of the ends.
+   * @param pivotPosition The pivot location of the arm.  A value of 0 or equal
+   * to armLength indicates that the arm is pivoted at one of the ends.
    * @param gearing Gear ratio from motor to arm.
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */

@@ -46,18 +46,13 @@ class Arm {
   // This sim represents an arm with 2 775s, a 600:1 reduction, a mass of 5kg,
   // 30in overall arm length, range of motion in [-75, 255] degrees, and noise
   // with a standard deviation of 1 encoder tick.
-  frc::LinearSystem<2, 1, 2> system = frc::LinearSystemId::SingleJointedArmSystem(
-            frc::DCMotor::Vex775Pro(2), 15.5_kg, 30_in, 0_m, 300.0);
+  frc::LinearSystem<2, 1, 2> system =
+      frc::LinearSystemId::SingleJointedArmSystem(frc::DCMotor::Vex775Pro(2),
+                                                  15.5_kg, 30_in, 0_m, 300.0);
   frc::sim::SingleJointedArmSim m_armSim{
-      system,
-      m_armGearbox,
-      kArmLength,
-      0_m,
-      kMinAngle,
-      kMaxAngle,
-      true,
-      0_deg,
-      {kArmEncoderDistPerPulse}};
+      system, m_armGearbox, kArmLength,
+      0_m,    kMinAngle,    kMaxAngle,
+      true,   0_deg,        {kArmEncoderDistPerPulse}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
   // Create a Mechanism2d display of an Arm
@@ -67,5 +62,6 @@ class Arm {
       m_armBase->Append<frc::MechanismLigament2d>(
           "Arm Tower", 30, -90_deg, 6, frc::Color8Bit{frc::Color::kBlue});
   frc::MechanismLigament2d* m_arm = m_armBase->Append<frc::MechanismLigament2d>(
-      "Arm", 30, m_armSim.GetAngularPosition(), 6, frc::Color8Bit{frc::Color::kYellow});
+      "Arm", 30, m_armSim.GetAngularPosition(), 6,
+      frc::Color8Bit{frc::Color::kYellow});
 };

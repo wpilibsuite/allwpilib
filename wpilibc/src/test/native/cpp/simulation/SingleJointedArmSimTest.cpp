@@ -11,9 +11,9 @@
 
 TEST(SingleJointedArmTest, Disabled) {
   auto system = frc::LinearSystemId::SingleJointedArmSystem(
-    frc::DCMotor::Vex775Pro(2), 15.5_kg, 30_in, 0_m, 300.0);
-  frc::sim::SingleJointedArmSim sim(system, frc::DCMotor::Vex775Pro(2), 30_in, 0_m, 
-                  -180_deg, 0_deg, true, 90_deg);
+      frc::DCMotor::Vex775Pro(2), 15.5_kg, 30_in, 0_m, 300.0);
+  frc::sim::SingleJointedArmSim sim(system, frc::DCMotor::Vex775Pro(2), 30_in,
+                                    0_m, -180_deg, 0_deg, true, 90_deg);
   sim.SetState(0_rad, 0_rad_per_s);
 
   for (size_t i = 0; i < 12 / 0.02; ++i) {
