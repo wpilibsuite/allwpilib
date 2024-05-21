@@ -226,9 +226,9 @@ public final class Commands {
   /**
    * Runs a group of commands in series, one after the other.
    *
-   * <p>Each command is run individually by proxy. The requirements
-   * of each command are only for the duration of that command and
-   * are not required for the entire group process.
+   * <p>Each command is run individually by proxy. The requirements of
+   * each command are reserved only for the duration of that command and
+   * are not reserved for the entire group process.
    *
    * @param commands the commands to include
    * @return the command group
