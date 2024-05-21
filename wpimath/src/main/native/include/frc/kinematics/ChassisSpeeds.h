@@ -39,6 +39,17 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   units::radians_per_second_t omega = 0_rad_per_s;
 
   /**
+   * Creates a Twist2d from ChassisSpeeds.
+   *
+   * @param dt The duration of the timestep.
+   *
+   * @return Twist2d.
+   */
+  Twist2d ToTwist2d(units::second_t dt) const {
+    return Twist2d{vx * dt, vy * dt, omega * dt};
+  }
+
+  /**
    * Disretizes a continuous-time chassis speed.
    *
    * This function converts a continuous-time chassis speed into a discrete-time
