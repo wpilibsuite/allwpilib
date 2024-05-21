@@ -163,7 +163,6 @@ class SingleJointedArmSim : public AngularMechanismSim {
   units::radian_t m_minAngle;
   units::radian_t m_maxAngle;
   const DCMotor m_gearbox;
-  double m_gearing;
   bool m_simulateGravity;
 };
 }  // namespace frc::sim
