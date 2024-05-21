@@ -29,6 +29,22 @@
  * There are some variations with commands that may run disabled or not (most can).
  * All commands are interruptible.
  * Some button presses are debounced.
+ * _____________________________________________________________________________________
+ * 
+ * Sample program to demonstrate loose coupling of Commands in a sequential grouping.
+ *
+ * A standard sequence locks all of the requirements of all of the subsystems used in
+ * the group for the duration of the sequential execution. Default commands do not run
+ * until the entire sequence completes.
+ * 
+ * A loosely connected sequence created by the RobotContainer.looseSequence() sequential
+ * group demonstrates that each command runs independently and when a command ends its
+ * subsystems default command runs.
+ * 
+ * Running the same sequence normally with Commands.sequence demonstrates that the
+ * subsystem requirements are maintained for the entire group execution duration and
+ * the default command is not activated unto the sequence group ends.
+ * 
  */
 
 /**
@@ -58,6 +74,7 @@
  * Restrict Subsystem Default Command to none until set once at any time and then unchangeable
  * Goal setting subsystem for a resource
  * Triggers available for other systems to use
+ * Default commands can either run or not run within a sequential group depending on how the group is defined
  * 
  * This code anticipates extensions to the WPILib addressable LED class which are included here.
  * This example program runs in real or simulated mode of the 2024 WPILib.
@@ -68,8 +85,6 @@
  * 
  */
 package frc.robot;
-
-import static edu.wpi.first.wpilibj2.command.Commands.print;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -129,6 +144,8 @@ public class Robot extends TimedRobot {
     }
   }
 
+  private int count;
+
   @Override
   public void teleopInit() { // commands running from another mode haven't been cancelled directly except the one below
 
@@ -136,34 +153,19 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
-    // demonstrate method to run a loosely grouped sequence of commands such
-    // that their requirements are not required for the entire group process.
-    Command test1 = print("testing 1");
-    Command test2 = print("testing 2");
-    Command test3 = print("testing 3");
-    Command test4 = print("testing 4");
-
-    RobotContainer.looseSequence(test1, test2, test3, test4, test1)
-      .andThen(
-    RobotContainer.looseSequence() )
-      .andThen(
-    RobotContainer.looseSequence(test4, test2, test1, test3)).schedule();
-
-    /*
-    testing 1
-    testing 2
-    testing 3
-    testing 4
-    testing 1
-    testing 4
-    testing 2
-    testing 1
-    testing 3
-    */
+    count = 0;
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    
+    // demonstrate method to run a loosely grouped sequence of commands such
+    // that their requirements are not required for the entire group process
+    // and the default command will run.
+    count++;
+    if (count == 500) m_robotContainer.testLooseSequence.schedule();
+    if (count == 600) m_robotContainer.testSequence.schedule();
+  }
 
   @Override
   public void teleopExit() {}

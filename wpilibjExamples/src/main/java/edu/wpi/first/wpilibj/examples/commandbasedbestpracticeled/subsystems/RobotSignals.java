@@ -18,7 +18,7 @@ import frc.robot.LEDPattern;
  * add requirements of these resources if creating commands from these methods.
  */
 
-public class RobotSignals  {
+public class RobotSignals {
 
 /**
  * Represents a supplier of LEDPattern for creating dynamic LEDPatterns.

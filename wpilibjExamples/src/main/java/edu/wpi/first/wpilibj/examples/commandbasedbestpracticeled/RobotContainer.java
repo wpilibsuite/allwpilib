@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
 import java.util.function.DoubleSupplier;
 
@@ -22,6 +24,7 @@ import frc.robot.subsystems.HistoryFSM;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.RobotSignals;
 import frc.robot.subsystems.RobotSignals.LEDPatternSupplier;
+import frc.robot.subsystems.SequentialTest;
 import frc.robot.subsystems.TargetVisionSubsystem;
 
 public class RobotContainer {
@@ -36,6 +39,7 @@ public class RobotContainer {
   private final AchieveHueGoal achieveHueGoal;
 
   private final RobotSignals robotSignals;
+  private final SequentialTest sequentialTest = new SequentialTest();
 
   public RobotContainer() {
 
@@ -172,6 +176,21 @@ public class RobotContainer {
         );
     //_________________________________________________________________________________
   }
+  
+  // Demonstration of loosely connected commands in a sequential group such that the subsystem
+  // default commands run if the subsystem is not active.
+  // Standard behavior is all subsystems are locked for the duration of the group execution and
+  // no default commands even if the subsystem isn't continuous active.
+
+  public final Command testLooseSequence =
+    looseSequence(
+      sequentialTest.setTest(1), waitSeconds(0.08), sequentialTest.setTest(2), waitSeconds(0.08),
+       sequentialTest.setTest(3));
+
+  public final Command testSequence =
+    sequence(
+      sequentialTest.setTest(4), waitSeconds(0.08), sequentialTest.setTest(5), waitSeconds(0.08),
+       sequentialTest.setTest(6));
 
   /**
    * Runs a group of commands in series, one after the other.
@@ -203,6 +222,7 @@ public class RobotContainer {
     robotSignals.beforeCommands();
     historyFSM.beforeCommands();
     achieveHueGoal.beforeCommands();
+    sequentialTest.beforeCommands();
   }
 
   /**
@@ -216,5 +236,123 @@ public class RobotContainer {
     robotSignals.afterCommands();
     historyFSM.afterCommands();
     achieveHueGoal.afterCommands();
+    sequentialTest.afterCommands();
   }
 }
+/* sequential group test output
+...
+default command
+default command
+default command
+default command
+default command
+testing 1
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+testing 2
+default command
+default command
+default command
+default command
+default command
+default command
+testing 3
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+default command
+testing 4
+testing 5
+testing 6
+default command
+default command
+default command
+default command
+default command
+...
+ */
