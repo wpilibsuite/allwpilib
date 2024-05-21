@@ -76,25 +76,6 @@ public class TimedRobot extends IterativeRobotBase {
 
   private final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
-  /** Constructor for TimedRobot. */
-  protected TimedRobot() {
-    this(kDefaultPeriod);
-  }
-
-  /**
-   * Constructor for TimedRobot.
-   *
-   * @param period Period in seconds.
-   */
-  protected TimedRobot(double period) {
-    super(period);
-    m_startTime = Timer.getFPGATimestamp();
-    addPeriodic(this::loopFunc, period);
-    NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
-
-    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
-  }
-
   @Override
   public void close() {
     NotifierJNI.stopNotifier(m_notifier);
@@ -151,6 +132,25 @@ public class TimedRobot extends IterativeRobotBase {
     NotifierJNI.stopNotifier(m_notifier);
   }
 
+  /** Constructor for TimedRobot. */
+  protected TimedRobot() {
+    this(kDefaultPeriod);
+  }
+
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param period Period in seconds.
+   */
+  protected TimedRobot(double period) {
+    super(period);
+    m_startTime = Timer.getFPGATimestamp();
+    addPeriodic(this::loopFunc, period);
+    NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
+
+    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
+  }
+
   /**
    * Add a callback to run at a specific period.
    *
@@ -160,7 +160,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param callback The callback to run.
    * @param periodSeconds The period at which to run the callback in seconds.
    */
-  public final void addPeriodic(Runnable callback, double periodSeconds) {
+  protected final void addPeriodic(Runnable callback, double periodSeconds) {
     m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, 0.0));
   }
 
@@ -175,7 +175,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
-  public final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
+  protected final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
     m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));
   }
 }

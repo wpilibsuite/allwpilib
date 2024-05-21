@@ -83,7 +83,7 @@ namespace frc {
  * boot the roboRIO into safe mode and delete the robot program to recover.
  */
 class TimesliceRobot : public TimedRobot {
- public:
+ protected:
   /**
    * Constructor for TimesliceRobot.
    *
