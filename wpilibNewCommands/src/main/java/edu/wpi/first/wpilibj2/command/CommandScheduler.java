@@ -264,9 +264,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
     boolean isDisabled = RobotState.isDisabled();
     // Run scheduled commands, remove finished commands.
-    for (Iterator<Command> iterator = Set.copyOf(m_scheduledCommands).iterator();
-        iterator.hasNext(); ) {
-      Command command = iterator.next();
+    for (Command command : Set.copyOf(m_scheduledCommands)) {
       if (!isScheduled(command)) {
         continue; // skip as the normal scheduledCommands was modified and that command was canceled
       }
