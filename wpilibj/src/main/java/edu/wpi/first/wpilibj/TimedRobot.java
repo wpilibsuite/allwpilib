@@ -77,7 +77,7 @@ public class TimedRobot extends IterativeRobotBase {
   private final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
   /** Constructor for TimedRobot. */
-  protected TimedRobot() {
+  public TimedRobot() {
     this(kDefaultPeriod);
   }
 
@@ -86,7 +86,7 @@ public class TimedRobot extends IterativeRobotBase {
    *
    * @param period Period in seconds.
    */
-  protected TimedRobot(double period) {
+  public TimedRobot(double period) {
     super(period);
     m_startTime = Timer.getFPGATimestamp();
     addPeriodic(this::loopFunc, period);
