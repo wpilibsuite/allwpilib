@@ -82,7 +82,9 @@ class DifferentialDrive : public RobotDriveBase,
    *
    * @param leftMotor Left motor.
    * @param rightMotor Right motor.
+   * @deprecated Use DifferentialDrive constructor with function arguments.
    */
+  [[deprecated("Use DifferentialDrive constructor with function arguments")]]
   DifferentialDrive(MotorController& leftMotor, MotorController& rightMotor);
 
   WPI_UNIGNORE_DEPRECATED
