@@ -12,6 +12,7 @@ package frc.robot.subsystems;
  * This command essentially runs periodically the hard way. There are better ways to do that simple scheduling structure.
  * (The use of the "afterCommands()" periodic as used for a sub-purpose here is a good way.)
  */
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -27,12 +28,16 @@ public class HistoryFSM extends SubsystemBase {
 
     private final LEDView robotSignals;
     Random rand = new Random();
+    
+    // Periodic output variable used for each run of "afterCommands()"
     LEDPattern persistentPatternDemo = LEDPattern.solid(Color.kBlack); // this is used before command to set it is run so start with LEDs off
 
-    //  Add a color [hue number as subscript] and last used time to the history.
-    //  Make the history in as narrow of scope as possible.
-    //  For this simple example the scope is perfectly narrow (this instance scope)
-    //  as the history doesn't depend on any values from other subsystems.
+    //    Add a color [hue number as subscript] and last time used to the history
+    //  so that color isn't used again during a lockout period.
+    //    Make the history in as narrow of scope as possible. For this simple example the scope is perfectly narrow
+    //  (this instance scope) since the history doesn't depend on any values from other subsystems.
+    //    Also saved from historical values are the "current" color so it persists through multiple iterations.
+    //    Time data is saved for how long a color is to persist in the display.
     long[] lastTimeHistoryOfColors = new long[180];
 
     Color persistentCurrentColor = new Color(); // color to be seen that we want to persist through multiple iterations
@@ -54,7 +59,8 @@ public class HistoryFSM extends SubsystemBase {
     private boolean timesUp() {
 
         if( System.currentTimeMillis() >= nextTime) {
-            nextTime = Long.MAX_VALUE; // reset; if a command is running it'll set the right time. If it isn't running then wait for "Y" press
+            nextTime = Long.MAX_VALUE; // reset; if a command is running it'll set the right time. If it isn't running then
+                                       // wait for "Y" press
             // this locks-out automatic restarting on disable to enable change; "Y" must be pressed to get it started again.
             return true;
         }
@@ -64,7 +70,7 @@ public class HistoryFSM extends SubsystemBase {
     /**
      * this command sets a color and quits immediately assuming the color persists
      * somehow (in "persistentCurrentColor") until the next color is later requested.
-     * Set random color that hasn't been used in the last "colorLockoutPeriod"
+     * Set a random color that hasn't been used in the last "colorLockoutPeriod"
      */
     public void getHSV() {
 
@@ -94,6 +100,7 @@ public class HistoryFSM extends SubsystemBase {
     /**
      * Disallow default command
      * This prevents accidentally assuming the default command will run in composite commands which it wont.
+     * Or "ungroupedSequence()" could be used. Default command not used in this example.
      */
     @Override
     public void setDefaultCommand(Command def) {

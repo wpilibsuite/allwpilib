@@ -4,6 +4,11 @@
 
 package frc.robot.subsystems;
 
+/*
+ * Example subsystem that acquires a target (simulated fake boolean by pressing a button).
+ * A signal is displayed to indicate the status of the Target Vision (acquired target or not).
+ */
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,23 +35,23 @@ public class TargetVisionSubsystem extends SubsystemBase {
 
     LEDPattern targetAcquiredSignal = LEDPattern.solid(Color.kOrange);
     return
-      /*sequential*/
+                  
       robotSignals.setSignal(targetAcquiredSignal) // this command locks the robotSignals.Top subsystem only
-      /*sequential*/
       .andThen(Commands.idle(this).withTimeout(0.)) // command created in this subsystem will lock this subsystem also
       /*composite*/
-        .withName("LedVisionTargetInSight")
-        .ignoringDisable(true); // ignore disable true must be here on the composite; on the first command doesn't do anything
+      .withName("LedVisionTargetInSight")
+      .ignoringDisable(true); // ignore disable true must be here on the composite; on the first command doesn't do anything
   }
 
   private boolean canSeeTarget() {
     
-    return operatorController.getHID().getAButton(); // fake event source for can see target
+    return operatorController.getHID().getAButton(); // fake event source for target acquired
   }
 
   /**
    * Disallow default command
-   * This prevents accidentally assuming the default command will run in composite commands which it wont.
+   * This prevents accidentally assuming the default command will run in composite commands which it wont
+   * unless using "ungroupedSequence()".
    */
   @Override
   public void setDefaultCommand(Command def) {

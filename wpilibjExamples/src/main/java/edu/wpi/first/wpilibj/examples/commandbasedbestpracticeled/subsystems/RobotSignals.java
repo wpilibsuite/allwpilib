@@ -48,6 +48,8 @@ public interface LEDPatternSupplier {
   private final AddressableLEDBuffer bufferLED;
 
   // first and last LED ids are inclusive of that LED number
+  // Better ways to semi-automatically register usage of LEDs.
+  // This example is simple and relies on suer remembering to do it.
   private final int firstTopLED = 0;
   private final int lastTopLED = 9;
   private final int firstMainLED = 10;
@@ -113,12 +115,19 @@ public interface LEDPatternSupplier {
      */
 
     /**
-     * Recommendation is don't use the setDefaultCommand because default commands are not
-     * run inside composed commands.
-     * If you insist then recommendation is don't use more than one default command
-     * because it may not be obvious which default command is active (last one set is active)
-     * Allow no more than one call to this set of the view (resource, subsystem) default command
-     * You're on your own to remember if there is a default command set or not.
+     * Suggestion is don't use the setDefaultCommand because default commands are not
+     * run inside composed commands except if using "ungroupedSequence()".
+     * 
+     * If you insist, then recommendation is don't use more than one default command
+     * because it may not be obvious which default command is active (last one set is
+     * active).
+     */
+
+    // If a subsystem may have one or no default command then use the following:
+    // You're on your own to remember if there is a default command set or not.
+  
+    /**
+     * Allow one (or none) default command to be set.
      */
     @Override
     public void setDefaultCommand(Command def) {
@@ -131,6 +140,8 @@ public interface LEDPatternSupplier {
         super.setDefaultCommand(def);
       }
     }
+
+  // If a subsystem must not have a default command then use the following:
 
   // /**
   //  * Disallow default command

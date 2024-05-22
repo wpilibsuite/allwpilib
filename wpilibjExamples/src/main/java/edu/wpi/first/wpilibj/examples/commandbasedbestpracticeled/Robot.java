@@ -3,28 +3,37 @@
 // the WPILib BSD license file in the root directory of this project.
 
 /**
- * Sample program that shows a variety of command based and programming
- * "best practices" (we are hopeful).
+ * Example program that shows a variety of command based and programming
+ * "best practices."
  * 
- * Demonstration output is on a five sets of ten LEDs to show the program
- * is operating; operator input is Xbox controller.
+ * Demonstration output is on five sets of ten LEDs to show the program is
+ * operating; operator input is Xbox controller. The sixth demonstration
+ * output is the console "prints."
  * 
- * 1. Top
+ * 1.  Target Vision Acquired subsystem output Top LEDView subsystem (runs disabled, too)
  *     default blue;
- *     auto mode dark green;
- *     target vision sees orange (simulate target detected "A" button);
- *     slowly around the color wheel (initiated by "X" button)
- * 2. Main
+ *     autonomous mode command dark green (no requirement for Target Vision Acquired);
+ *     target vision acquired orange (simulate target acquired by pressing "A" button);
+ *     slowly around the color wheel (initiated by pressing "X" button) (no requirement
+ *       for Target Vision Acquired)
+ * 2. Game Piece Intake Acquired subsystem output Main LEDView subsystem
  *     default cyan;
- *     auto mode light green;
- *     intake game piece acquired magenta fast blink (simulate game piece intake acquired "B" button)
- * 3. EnableDisable
+ *     autonomous mode command light green (no requirement for Game Piece Intake Acquired);
+ *     intake game piece acquired magenta fast blink (simulate game piece intake
+ *       acquired by pressing "B" button)
+ * 3. EnableDisable LEDView subsystem
  *     enabled mode green slow blink
  *     disabled mode red slow blink
- * 4. History
- *     random colors that don't repeat for awhile (initiated by "Y" button then self perpetuating)
- * 5. Goal
- *     colors on color wheel position showing controller converging on a color selected by Xbox right trigger
+ * 4. HistoryFSM subsystem HistoryDemo LEDView subsystem
+ *     random colors that don't repeat for awhile (history) (initiated by pressing "Y"
+ *       button then self perpetuating)
+ * 5. AchieveHueGoal subsystem output AchieveHueGoal LEDView subsystem
+ *     Subsystem based controller runs continuously and responds to a goal setting
+ *       subsystem. Colors on color wheel position showing PID controller subsystem
+ *       converging on a color selected by Xbox right trigger axis
+ * 6. Ungrouped Sequential Group Demo console output initiated by teleop enable mode
+ *     Show default command runs after a subsystem requirement completes in an ungrouped
+ *       sequence but not a normal sequence
  * 
  * There are some variations with commands that may run disabled or not (most can).
  * All commands are interruptible.
@@ -163,8 +172,9 @@ public class Robot extends TimedRobot {
     // that their requirements are not required for the entire group process
     // and the default command will run.
     count++;
-    if (count == 500) m_robotContainer.testLooseSequence.schedule();
-    if (count == 600) m_robotContainer.testSequence.schedule();
+    if (count == 400) m_robotContainer.testUngroupedSequence.schedule();
+    if (count == 500) m_robotContainer.testSequence.schedule();
+    if (count == 600) m_robotContainer.unregisterGroupedUngroupedTest();
   }
 
   @Override

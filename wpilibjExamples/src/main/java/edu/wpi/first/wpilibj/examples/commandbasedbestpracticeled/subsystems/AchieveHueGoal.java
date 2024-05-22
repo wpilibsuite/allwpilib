@@ -72,7 +72,14 @@ public class AchieveHueGoal {
      * subsystem to lock the resource if a command is running and provide a default command
      * Note that the technique of restricting use of the default command is not implemented
      * in this example. That is insecure and anybody can change it that has access to the
-     * instance.
+     * instance. The default command is disabled in this example.
+     * 
+     * A decision must be made on how to set the goal. The controller is always running.
+     * Does the goal supplier have to always be running or is it set and forget until a new
+     * goal is needed? The default command could be activated to provide the goal if no
+     * other goal supplier is running. If set once and forget is used then it is inappropriate
+     * to use a default command as that would immediately reset to the default after setting
+     * a goal.
      */
     public class HueGoal extends SubsystemBase {
 
@@ -87,7 +94,9 @@ public class AchieveHueGoal {
 
         /**
          * Disallow default command
-         * This prevents accidentally assuming the default command will run in composite commands which it wont.
+         * This prevents accidentally assuming the default command will run in composite commands which it
+         * wont although use of "ungroupedSequence()" mitigates this problem since it allows the default
+         * command to run at the end of each component command in the sequence.
          */
         @Override
         public void setDefaultCommand(Command def) {

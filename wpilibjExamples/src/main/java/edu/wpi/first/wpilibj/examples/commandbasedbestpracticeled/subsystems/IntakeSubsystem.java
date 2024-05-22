@@ -4,6 +4,11 @@
 
 package frc.robot.subsystems;
 
+/*
+ * Example subsystem that acquires a game piece (simulated fake boolean by pressing a button).
+ * A signal is displayed to indicate the status of the Intake (acquired game piece or not).
+ */
+
 import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
