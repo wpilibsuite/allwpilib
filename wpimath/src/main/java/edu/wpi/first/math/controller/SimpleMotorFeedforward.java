@@ -5,7 +5,10 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
@@ -19,9 +22,57 @@ public class SimpleMotorFeedforward {
   /** The acceleration gain. */
   public final double ka;
 
+  /** The period in seconds. */
+  public final double dtSeconds;
+
+  /** The plant. */
+  private final LinearSystem<N1, N1, N1> plant;
+
+  /** The feedforward. */
+  private final LinearPlantInversionFeedforward<N1, N1, N1> feedforward;
+
+  /** The current reference */
+  private final Matrix<N1, N1> r;
+
+  /** The next reference */
+  private Matrix<N1, N1> nextR;
+
   /**
-   * Creates a new SimpleMotorFeedforward with the specified gains. Units of the gain values will
+   * Creates a new SimpleMotorFeedforward with the specified gains and period. Units of the gain values will
    * dictate units of the computed feedforward.
+   *
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
+   * @param period The period in seconds.
+   * @throws IllegalArgumentException for kv &lt; zero.
+   * @throws IllegalArgumentException for ka &lt; zero.
+   * @throws IllegalArgumentException for period &le zero.
+   */
+  public SimpleMotorFeedforward(double ks, double kv, double ka, double period) {
+    this.ks = ks;
+    this.kv = kv;
+    this.ka = ka;
+    this.dtSeconds = 0.020;
+    if (kv < 0.0) {
+      throw new IllegalArgumentException("kv must be a non-negative number, got " + kv + "!");
+    }
+    if (ka < 0.0) {
+      throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
+    }
+    if (period <= 0.0){
+      throw new IllegalArgumentException("period must be a positive number, got " + period + "!");
+    }
+    this.plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
+    this.feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
+
+    this.r = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0);
+    this.nextR = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0);
+  }
+
+  /**
+   * Creates a new SimpleMotorFeedforward with the specified gains and period. The period is defaulted to 20 ms.
+   * Units of the gain values will dictate units of the computed feedforward.
    *
    * @param ks The static gain.
    * @param kv The velocity gain.
@@ -30,53 +81,41 @@ public class SimpleMotorFeedforward {
    * @throws IllegalArgumentException for ka &lt; zero.
    */
   public SimpleMotorFeedforward(double ks, double kv, double ka) {
-    this.ks = ks;
-    this.kv = kv;
-    this.ka = ka;
-    if (kv < 0.0) {
-      throw new IllegalArgumentException("kv must be a non-negative number, got " + kv + "!");
-    }
-    if (ka < 0.0) {
-      throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
-    }
+    this(ks, kv, ka, 0.020);
   }
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains. Acceleration gain is defaulted
-   * to zero. Units of the gain values will dictate units of the computed feedforward.
+   * to zero. The period is defaulted to 20 ms.  Units of the gain values will dictate units of the computed feedforward.
    *
    * @param ks The static gain.
    * @param kv The velocity gain.
    */
   public SimpleMotorFeedforward(double ks, double kv) {
-    this(ks, kv, 0);
+    this(ks, kv, 0, 0.020);
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
+   * Calculates the feedforward from the gains and setpoints assuming continuous control.
    *
    * @param velocity The velocity setpoint.
    * @param acceleration The acceleration setpoint.
    * @return The computed feedforward.
    */
-  public double calculate(double velocity, double acceleration) {
+  public double calculateContinuous(double velocity, double acceleration) {
     return ks * Math.signum(velocity) + kv * velocity + ka * acceleration;
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
+   * Calculates the feedforward from the gains and setpoints assuming discrete control.
    *
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity The next velocity setpoint.
-   * @param dtSeconds Time between velocity setpoints in seconds.
    * @return The computed feedforward.
    */
-  public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
-    var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
-    var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
-
-    var r = MatBuilder.fill(Nat.N1(), Nat.N1(), currentVelocity);
-    var nextR = MatBuilder.fill(Nat.N1(), Nat.N1(), nextVelocity);
+  public double calculateDiscrete(double currentVelocity, double nextVelocity) {
+    r.set(0, 0, currentVelocity);
+    nextR.set(0, 0, nextVelocity);
 
     return ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
   }
@@ -92,7 +131,7 @@ public class SimpleMotorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(double velocity) {
-    return calculate(velocity, 0);
+    return calculateContinuous(velocity, 0);
   }
 
   /**
