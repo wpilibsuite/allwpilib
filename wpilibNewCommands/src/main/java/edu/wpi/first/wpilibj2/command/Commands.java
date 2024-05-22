@@ -224,17 +224,18 @@ public final class Commands {
   }
 
   /**
-   * Runs a group of commands in series, one after the other.
+   * Runs individual commands in a series without grouped sequence behavior.
    *
-   * <p>Each command is run individually by proxy. The requirements of
+   * <p>Each command is run independently by proxy. The requirements of
    * each command are reserved only for the duration of that command and
-   * are not reserved for the entire group process.
+   * are not reserved for an entire group process as they are in a
+   * grouped sequence.
    *
-   * @param commands the commands to include
-   * @return the command group
-   * @see SequentialCommandGroup
+   * @param commands the commands to include in the series
+   * @return the command to run the series of commands
+   * @see #sequence() use sequence() to invoke group sequence behavior
    */
-  public static Command separatedSequence(Command... commands) {
+  public static Command ungroupedSequence(Command... commands) {
     return sequence(proxyAll(commands));
   }
 
