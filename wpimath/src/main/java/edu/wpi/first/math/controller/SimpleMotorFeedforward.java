@@ -22,9 +22,6 @@ public class SimpleMotorFeedforward {
   /** The acceleration gain. */
   public final double ka;
 
-  /** The period in seconds. */
-  public final double dtSeconds;
-
   /** The plant. */
   private final LinearSystem<N1, N1, N1> plant;
 
@@ -44,27 +41,26 @@ public class SimpleMotorFeedforward {
    * @param ks The static gain.
    * @param kv The velocity gain.
    * @param ka The acceleration gain.
-   * @param period The period in seconds.
+   * @param periodSeconds The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le zero.
    */
-  public SimpleMotorFeedforward(double ks, double kv, double ka, double period) {
+  public SimpleMotorFeedforward(double ks, double kv, double ka, double periodSeconds) {
     this.ks = ks;
     this.kv = kv;
     this.ka = ka;
-    this.dtSeconds = 0.020;
     if (kv < 0.0) {
       throw new IllegalArgumentException("kv must be a non-negative number, got " + kv + "!");
     }
     if (ka < 0.0) {
       throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
     }
-    if (period <= 0.0){
-      throw new IllegalArgumentException("period must be a positive number, got " + period + "!");
+    if (periodSeconds <= 0.0){
+      throw new IllegalArgumentException("period must be a positive number, got " + periodSeconds + "!");
     }
     this.plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
-    this.feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
+    this.feedforward = new LinearPlantInversionFeedforward<>(plant, periodSeconds);
 
     this.r = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0);
     this.nextR = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0);
@@ -96,42 +92,17 @@ public class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous control.
-   *
-   * @param velocity The velocity setpoint.
-   * @param acceleration The acceleration setpoint.
-   * @return The computed feedforward.
-   */
-  public double calculateContinuous(double velocity, double acceleration) {
-    return ks * Math.signum(velocity) + kv * velocity + ka * acceleration;
-  }
-
-  /**
    * Calculates the feedforward from the gains and setpoints assuming discrete control.
    *
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity The next velocity setpoint.
    * @return The computed feedforward.
    */
-  public double calculateDiscrete(double currentVelocity, double nextVelocity) {
+  public double calculate(double currentVelocity, double nextVelocity) {
     r.set(0, 0, currentVelocity);
     nextR.set(0, 0, nextVelocity);
 
     return ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
-  }
-
-  // Rearranging the main equation from the calculate() method yields the
-  // formulas for the methods below:
-
-  /**
-   * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to be
-   * zero).
-   *
-   * @param velocity The velocity setpoint.
-   * @return The computed feedforward.
-   */
-  public double calculate(double velocity) {
-    return calculateContinuous(velocity, 0);
   }
 
   /**
