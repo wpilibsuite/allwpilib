@@ -39,6 +39,11 @@
         value=".*'.*Arguments\(\)'.*" />
     </properties>
   </rule>
+  <rule ref="category/java/bestpractices.xml/UnusedLocalVariable">
+    <properties>
+      <property name="violationSuppressXPath" value="//Resource"/>
+    </properties>
+  </rule>
 
   <rule ref="category/java/design.xml">
     <exclude name="AvoidThrowingRawExceptionTypes" />
