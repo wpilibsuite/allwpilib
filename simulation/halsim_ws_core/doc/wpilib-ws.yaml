@@ -601,7 +601,7 @@ components:
             const: SimDevice
           device:
             type: string
-            format: "[^:]+"
+            format: "(?!(DutyCycle|CAN(Motor|Encoder|Gyro|Accel|AIn|DIO|DutyCycle)):.+).+"
           data:
             type: object
             additionalProperties:
