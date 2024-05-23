@@ -31,7 +31,7 @@ units::radians_per_second_t FlywheelSim::GetAngularVelocity() const {
 units::radians_per_second_squared_t FlywheelSim::GetAngularAcceleration()
     const {
   return units::radians_per_second_squared_t{
-      m_gearbox.Kt.value() * GetCurrentDraw().value() / m_j.value()};
+      (m_plant.A() * m_x + m_plant.B() * m_u)(0,0)};
 }
 
 units::newton_meter_t FlywheelSim::GetTorque() const {
