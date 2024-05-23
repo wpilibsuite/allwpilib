@@ -80,15 +80,12 @@ class Replicate : public internal::dense_xpr_base<Replicate<MatrixType, RowFacto
 
   template <typename OriginalMatrixType>
   EIGEN_DEVICE_FUNC inline Replicate(const OriginalMatrixType& matrix, Index rowFactor, Index colFactor)
-      : m_matrix(matrix),
-        m_rowFactor(rowFactor),
-        m_colFactor(colFactor){
-            EIGEN_STATIC_ASSERT((internal::is_same<std::remove_const_t<MatrixType>, OriginalMatrixType>::value),
-                                THE_MATRIX_OR_EXPRESSION_THAT_YOU_PASSED_DOES_NOT_HAVE_THE_EXPECTED_TYPE)}
-
-        EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const {
-    return m_matrix.rows() * m_rowFactor.value();
+      : m_matrix(matrix), m_rowFactor(rowFactor), m_colFactor(colFactor) {
+    EIGEN_STATIC_ASSERT((internal::is_same<std::remove_const_t<MatrixType>, OriginalMatrixType>::value),
+                        THE_MATRIX_OR_EXPRESSION_THAT_YOU_PASSED_DOES_NOT_HAVE_THE_EXPECTED_TYPE)
   }
+
+  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const { return m_matrix.rows() * m_rowFactor.value(); }
   EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const { return m_matrix.cols() * m_colFactor.value(); }
 
   EIGEN_DEVICE_FUNC const MatrixTypeNested_& nestedExpression() const { return m_matrix; }
