@@ -224,7 +224,7 @@ public final class Commands {
   }
 
   /**
-   * Runs individual commands in a series without grouped sequence behavior.
+   * Runs individual commands in a series without grouped behavior.
    *
    * <p>Each command is run independently by proxy. The requirements of
    * each command are reserved only for the duration of that command and
@@ -233,9 +233,9 @@ public final class Commands {
    *
    * @param commands the commands to include in the series
    * @return the command to run the series of commands
-   * @see #sequence() use sequence() to invoke group sequence behavior
+   * @see #sequence(Command...) use sequence() to invoke group sequence behavior
    */
-  public static Command ungroupedSequence(Command... commands) {
+  public static Command disjointSequence(Command... commands) {
     return sequence(proxyAll(commands));
   }
 
@@ -261,6 +261,23 @@ public final class Commands {
    */
   public static Command parallel(Command... commands) {
     return new ParallelCommandGroup(commands);
+  }
+  
+  /**
+   * Runs individual commands at the same time without grouped behavior and ends once all commands finish.
+   *
+   * <p>Each command is run independently by proxy. The requirements of
+   * each command are reserved only for the duration of that command and
+   * are not reserved for an entire group process as they are in a
+   * grouped parallel.
+   *
+   * @param commands the commands to run in parallel
+   * @return the command to run the commands in parallel
+   * @see #parallel(Command...) use parallel() to invoke group parallel behavior
+   */
+  public static Command disjointParallel(Command... commands) {
+    new ParallelCommandGroup(commands);
+    return parallel(proxyAll(commands));
   }
 
   /**
