@@ -678,4 +678,3 @@ components:
             format: "CANDutyCycle:.+"
           data:
             $ref: "#/components/schemas/dutycycleData/properties/data"
-
