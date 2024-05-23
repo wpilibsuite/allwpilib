@@ -230,6 +230,8 @@ public final class Commands {
    * each command are reserved only for the duration of that command and
    * are not reserved for an entire group process as they are in a
    * grouped sequence.
+   * 
+   * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
    *
    * @param commands the commands to include in the series
    * @return the command to run the series of commands
@@ -259,6 +261,8 @@ public final class Commands {
    * each command are reserved only for the duration of that command and
    * are not reserved for an entire group process as they are in a
    * grouped sequence.
+   * 
+   * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
    *
    * @param commands the commands to include in the series
    * @return the command to run the series of commands repeatedly
@@ -288,6 +292,8 @@ public final class Commands {
    * each command are reserved only for the duration of that command and
    * are not reserved for an entire group process as they are in a
    * grouped parallel.
+   * 
+   * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
    *
    * @param commands the commands to run in parallel
    * @return the command to run the commands in parallel
@@ -295,6 +301,7 @@ public final class Commands {
    */
   public static Command disjointParallel(Command... commands) {
     new ParallelCommandGroup(commands); // check parallel constraints
+    for (Command cmd : commands) CommandScheduler.getInstance().removeComposedCommand(cmd);
     return parallel(proxyAll(commands));
   }
 
@@ -330,6 +337,8 @@ public final class Commands {
    * <p>Each otherCommand is run independently by proxy. The requirements of
    * each command are reserved only for the duration of that command and are
    * not reserved for an entire group process as they are in a grouped deadline.
+   * 
+   * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
    *
    * @param deadline the deadline command
    * @param otherCommands the other commands to include and will be cancelled when the deadline ends
@@ -339,6 +348,8 @@ public final class Commands {
    */
   public static Command disjointDeadline(Command deadline, Command... otherCommands) {
     new ParallelDeadlineGroup(deadline, otherCommands); // check parallel deadline constraints
+    CommandScheduler.getInstance().removeComposedCommand(deadline);
+    for (Command cmd : otherCommands) CommandScheduler.getInstance().removeComposedCommand(cmd);
     return deadline(deadline, proxyAll(otherCommands));
   }
 
