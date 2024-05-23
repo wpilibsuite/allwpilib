@@ -253,6 +253,24 @@ public final class Commands {
   }
 
   /**
+   * Runs individual commands in a series without grouped behavior; once the last command ends, the series is restarted.
+   *
+   * <p>Each command is run independently by proxy. The requirements of
+   * each command are reserved only for the duration of that command and
+   * are not reserved for an entire group process as they are in a
+   * grouped sequence.
+   *
+   * @param commands the commands to include in the series
+   * @return the command to run the series of commands repeatedly
+   * @see #sequence(Command...) use sequenceRepeatedly() to invoke repeated group sequence behavior
+   * @see #disjointSequence(Command...)
+   * @see Command#repeatedly() 
+   */
+  public static Command repeatingDisjointSequence(Command... commands) {
+    return disjointSequence(commands).repeatedly();
+  }
+
+  /**
    * Runs a group of commands at the same time. Ends once all commands in the group finish.
    *
    * @param commands the commands to include
@@ -276,7 +294,7 @@ public final class Commands {
    * @see #parallel(Command...) use parallel() to invoke group parallel behavior
    */
   public static Command disjointParallel(Command... commands) {
-    new ParallelCommandGroup(commands);
+    new ParallelCommandGroup(commands); // check parallel constraints
     return parallel(proxyAll(commands));
   }
 
@@ -304,6 +322,24 @@ public final class Commands {
    */
   public static Command deadline(Command deadline, Command... otherCommands) {
     return new ParallelDeadlineGroup(deadline, otherCommands);
+  }
+
+  /**
+   * Runs individual commands at the same time without grouped behavior; when the deadline command ends the otherCommands are cancelled.
+   *
+   * <p>Each otherCommand is run independently by proxy. The requirements of
+   * each command are reserved only for the duration of that command and are
+   * not reserved for an entire group process as they are in a grouped deadline.
+   *
+   * @param deadline the deadline command
+   * @param otherCommands the other commands to include and will be cancelled when the deadline ends
+   * @return the command to run the deadline command and otherCommands
+   * @see #deadline(Command, Command...) use deadline() to invoke group parallel deadline behavior
+   * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
+   */
+  public static Command disjointDeadline(Command deadline, Command... otherCommands) {
+    new ParallelDeadlineGroup(deadline, otherCommands); // check parallel deadline constraints
+    return deadline(deadline, proxyAll(otherCommands));
   }
 
   private Commands() {
