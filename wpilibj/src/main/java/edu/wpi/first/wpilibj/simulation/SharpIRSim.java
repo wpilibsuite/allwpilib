@@ -32,18 +32,18 @@ public class SharpIRSim {
   }
 
   /**
-   * Set range in inches.
+   * Set the range in inches returned by the distance sensor.
    *
-   * @param inches range
+   * @param inches range in inches of the target returned by the sensor
    */
   public void setRangeInches(double inches) {
     m_simRange.set(Units.inchesToMeters(inches) * 100.0);
   }
 
   /**
-   * Set range in centimeters.
+   * Set the range in centimeters returned by the distance sensor.
    *
-   * @param cm range
+   * @param cm range in centimeters of the target returned by the sensor
    */
   public void setRangeCm(double cm) {
     m_simRange.set(cm);
