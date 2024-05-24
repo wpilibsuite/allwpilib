@@ -40,6 +40,15 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
 
   /**
    * Creates a simulated flywheel mechanism.
+   * Some derivations 
+   * a = A x + B u
+   * and 
+   * a = ((-G² * K_t) / (K_v * R * J)) x + ((G * K_t) / (R * J)) u
+   * A = (-G² * K_t) / (K_v * R * J)
+   * B = (G * K_t) / (R * J)
+   * so J = (G K_t) / (R B)
+   * A / B = (-G) / K_v
+   * G = - A * K_v / B
    *
    * @param plant The linear system that represents the flywheel. Use either {@link
    *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants
@@ -53,7 +62,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
       LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
-    m_gearing = gearbox.KtNMPerAmp * plant.getA(0, 0) / plant.getB(0, 0);
+    m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0);
     m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(0, 0));
   }
 

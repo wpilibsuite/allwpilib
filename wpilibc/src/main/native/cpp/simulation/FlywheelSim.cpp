@@ -11,12 +11,21 @@
 using namespace frc;
 using namespace frc::sim;
 
+// Some derivations 
+// a = A x + B u
+// and 
+// a = ((-G² * K_t) / (K_v * R * J)) x + ((G * K_t) / (R * J)) u
+// A = (-G² * K_t) / (K_v * R * J)
+// B = (G * K_t) / (R * J)
+// so J = (G K_t) / (R B)
+// A / B = (-G) / K_v
+// G = - A * K_v / B
 FlywheelSim::FlywheelSim(const LinearSystem<1, 1, 1>& plant,
                          const DCMotor& gearbox,
                          const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim<1, 1, 1>(plant, measurementStdDevs),
       m_gearbox(gearbox),
-      m_gearing(gearbox.Kt.value() * m_plant.A(0, 0) / m_plant.B(0, 0)),
+      m_gearing(-gearbox.Kv.value() * m_plant.A(0, 0) / m_plant.B(0, 0)),
       m_j(m_gearing * gearbox.Kt.value() /
           (gearbox.R.value() * m_plant.B(0, 0))) {}
 
