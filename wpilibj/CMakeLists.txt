@@ -5,7 +5,6 @@ if(WITH_JAVA)
     find_package(OpenCV REQUIRED)
     find_package(Java REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/OpenCV/java/)
 
@@ -39,6 +38,7 @@ if(WITH_JAVA)
             wpiutil_jar
         OUTPUT_NAME wpilibj
     )
+    set_property(TARGET wpilibj_jar PROPERTY FOLDER "java")
 
     install_jar(wpilibj_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS wpilibj_jar FILE wpilibj.cmake DESTINATION share/wpilibj)
