@@ -101,7 +101,9 @@ int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
                                             int32_t* status);
 
 /**
- * Gets the temperature of the PowerDistribution.
+ * Gets the temperature of the Power Distribution Panel.
+ *
+ * Not supported on the Rev PDH and returns 0.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -156,7 +158,9 @@ double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
                                             int32_t* status);
 
 /**
- * Gets the total power of the PowerDistribution.
+ * Gets the total power of the Power Distribution Panel.
+ *
+ * Not supported on the Rev PDH and returns 0.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -166,7 +170,9 @@ double HAL_GetPowerDistributionTotalPower(HAL_PowerDistributionHandle handle,
                                           int32_t* status);
 
 /**
- * Gets the total energy of the PowerDistribution.
+ * Gets the total energy of the Power Distribution Panel.
+ *
+ * Not supported on the Rev PDH and returns 0.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.
@@ -177,6 +183,8 @@ double HAL_GetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
 
 /**
  * Resets the PowerDistribution accumulated energy.
+ *
+ * Not supported on the Rev PDH and does nothing.
  *
  * @param[in] handle the module handle
  * @param[out] status Error status variable. 0 on success.

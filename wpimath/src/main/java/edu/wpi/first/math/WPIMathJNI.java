@@ -11,16 +11,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** WPIMath JNI. */
 public final class WPIMathJNI {
   static boolean libraryLoaded = false;
-  static RuntimeLoader<WPIMathJNI> loader = null;
 
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader =
-            new RuntimeLoader<>(
-                "wpimathjni", RuntimeLoader.getDefaultExtractionRoot(), WPIMathJNI.class);
-        loader.loadLibrary();
-      } catch (IOException ex) {
+        RuntimeLoader.loadLibrary("wpimathjni");
+      } catch (Exception ex) {
         ex.printStackTrace();
         System.exit(1);
       }
@@ -37,12 +33,36 @@ public final class WPIMathJNI {
     if (libraryLoaded) {
       return;
     }
-    loader =
-        new RuntimeLoader<>(
-            "wpimathjni", RuntimeLoader.getDefaultExtractionRoot(), WPIMathJNI.class);
-    loader.loadLibrary();
+    RuntimeLoader.loadLibrary("wpimathjni");
     libraryLoaded = true;
   }
+
+  // ArmFeedforward wrappers
+
+  /**
+   * Obtain a feedforward voltage from a single jointed arm feedforward object.
+   *
+   * <p>Constructs an ArmFeedforward object and runs its currentVelocity and nextVelocity overload
+   *
+   * @param ks The ArmFeedforward's static gain in volts.
+   * @param kv The ArmFeedforward's velocity gain in volt seconds per radian.
+   * @param ka The ArmFeedforward's acceleration gain in volt seconds² per radian.
+   * @param kg The ArmFeedforward's gravity gain in volts.
+   * @param currentAngle The current angle in the calculation in radians.
+   * @param currentVelocity The current velocity in the calculation in radians per second.
+   * @param nextVelocity The next velocity in the calculation in radians per second.
+   * @param dt The time between velocity setpoints in seconds.
+   * @return The calculated feedforward in volts.
+   */
+  public static native double calculate(
+      double ks,
+      double kv,
+      double ka,
+      double kg,
+      double currentAngle,
+      double currentVelocity,
+      double nextVelocity,
+      double dt);
 
   // DARE wrappers
 

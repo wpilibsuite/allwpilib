@@ -85,21 +85,6 @@ public class SynchronousInterrupt implements AutoCloseable {
   }
 
   /**
-   * Wait for interrupt that returns the raw result value from the hardware.
-   *
-   * <p>Used by AsynchronousInterrupt. Users should use waitForInterrupt.
-   *
-   * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
-   * @param ignorePrevious True to ignore if a previous interrupt has occurred, and only wait for a
-   *     new trigger. False will consider if an interrupt has occurred since the last time the
-   *     interrupt was read.
-   * @return The raw hardware interrupt result
-   */
-  long waitForInterruptRaw(double timeoutSeconds, boolean ignorePrevious) {
-    return InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
-  }
-
-  /**
    * Wait for an interrupt.
    *
    * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.

@@ -4,7 +4,7 @@ include(AddTest)
 include(SubDirList)
 
 subdir_list(TEMPLATES ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/main/cpp/templates)
-subdir_list(EXAMPLES  ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/main/cpp/examples)
+subdir_list(EXAMPLES ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/main/cpp/examples)
 
 foreach(example ${EXAMPLES})
     file(

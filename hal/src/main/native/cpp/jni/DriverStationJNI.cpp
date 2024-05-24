@@ -294,12 +294,11 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickButtons
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    setJoystickOutputs
- * Signature: (BISS)I
+ * Signature: (BIII)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_setJoystickOutputs
-  (JNIEnv*, jclass, jbyte port, jint outputs, jshort leftRumble,
-   jshort rightRumble)
+  (JNIEnv*, jclass, jbyte port, jint outputs, jint leftRumble, jint rightRumble)
 {
   return HAL_SetJoystickOutputs(port, outputs, leftRumble, rightRumble);
 }
@@ -337,9 +336,10 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_getJoystickName
   (JNIEnv* env, jclass, jbyte port)
 {
-  char* joystickName = HAL_GetJoystickName(port);
-  jstring str = MakeJString(env, joystickName);
-  HAL_FreeJoystickName(joystickName);
+  WPI_String joystickName;
+  HAL_GetJoystickName(&joystickName, port);
+  jstring str = MakeJString(env, wpi::to_string_view(&joystickName));
+  WPI_FreeString(&joystickName);
   return str;
 }
 

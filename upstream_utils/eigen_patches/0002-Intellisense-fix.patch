@@ -4,27 +4,24 @@ Date: Fri, 20 Jan 2023 23:41:56 -0800
 Subject: [PATCH 2/2] Intellisense fix
 
 ---
- Eigen/src/Core/util/Macros.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ Eigen/src/Core/util/ConfigureVectorization.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/Eigen/src/Core/util/Macros.h b/Eigen/src/Core/util/Macros.h
-index 5d054e67c4355a549b1351f1ecc5e49a96e91ace..fda6ad91eedacc9958a5a0bc34db33d8b4e57cd6 100644
---- a/Eigen/src/Core/util/Macros.h
-+++ b/Eigen/src/Core/util/Macros.h
-@@ -60,6 +60,16 @@
- // Compiler identification, EIGEN_COMP_*
- //------------------------------------------------------------------------------------------
+diff --git a/Eigen/src/Core/util/ConfigureVectorization.h b/Eigen/src/Core/util/ConfigureVectorization.h
+index 1c7217339bcb2c29366360c56343863126d8aafc..e8f5d2ce0d5917ec7df65800ff115f59e028e14b 100644
+--- a/Eigen/src/Core/util/ConfigureVectorization.h
++++ b/Eigen/src/Core/util/ConfigureVectorization.h
+@@ -165,6 +165,13 @@
  
-+/// \internal Disable NEON features in Intellisense
-+#if __INTELLISENSE__
-+#ifdef __ARM_NEON
-+#undef __ARM_NEON
-+#endif
-+#ifdef __ARM_NEON__
-+#undef __ARM_NEON__
+ //----------------------------------------------------------------------
+ 
++// Disable vectorization in intellisense
++#ifdef __INTELLISENSE__
++#ifndef EIGEN_DONT_VECTORIZE
++#define EIGEN_DONT_VECTORIZE
 +#endif
 +#endif
 +
- /// \internal EIGEN_COMP_GNUC set to version (e.g., 951 for GCC 9.5.1) for all compilers compatible with GCC
- #ifdef __GNUC__
- #define EIGEN_COMP_GNUC (__GNUC__ * 100 + __GNUC_MINOR__ * 10 + __GNUC_PATCHLEVEL__)
+ // if alignment is disabled, then disable vectorization. Note: EIGEN_MAX_ALIGN_BYTES is the proper check, it takes into
+ // account both the user's will (EIGEN_MAX_ALIGN_BYTES,EIGEN_DONT_ALIGN) and our own platform checks
+ #if EIGEN_MAX_ALIGN_BYTES == 0

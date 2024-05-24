@@ -9,7 +9,6 @@ find_package(OpenCV REQUIRED)
 if(WITH_JAVA)
     find_package(Java REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     #find java files, copy them locally
 
@@ -30,6 +29,7 @@ if(WITH_JAVA)
         INCLUDE_JARS wpiutil_jar cscore_jar ntcore_jar ${OPENCV_JAR_FILE}
         OUTPUT_NAME cameraserver
     )
+    set_property(TARGET cameraserver_jar PROPERTY FOLDER "java")
 
     install_jar(cameraserver_jar DESTINATION ${java_lib_dest})
     install_jar_exports(
@@ -73,6 +73,7 @@ target_link_libraries(cameraserver PUBLIC ntcore cscore wpiutil ${OpenCV_LIBS})
 set_property(TARGET cameraserver PROPERTY FOLDER "libraries")
 
 install(TARGETS cameraserver EXPORT cameraserver)
+export(TARGETS cameraserver FILE cameraserver.cmake NAMESPACE cameraserver::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cameraserver")
 
 configure_file(cameraserver-config.cmake.in ${WPILIB_BINARY_DIR}/cameraserver-config.cmake)

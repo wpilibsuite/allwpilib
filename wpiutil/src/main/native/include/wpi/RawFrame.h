@@ -55,6 +55,7 @@ enum WPI_PixelFormat {
   WPI_PIXFMT_GRAY,         // Grayscale, 8 bpp
   WPI_PIXFMT_Y16,          // Grayscale, 16 bpp
   WPI_PIXFMT_UYVY,         // YUV 4:2:2, 16 bpp
+  WPI_PIXFMT_BGRA,         // BGRA 8-8-8-8-, 32 bpp
 };
 
 // Returns nonzero if the frame data was allocated/reallocated

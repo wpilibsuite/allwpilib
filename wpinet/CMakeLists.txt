@@ -12,7 +12,6 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     set(CMAKE_JNI_TARGET true)
 
@@ -25,6 +24,7 @@ if(WITH_JAVA)
         OUTPUT_NAME wpinet
         GENERATE_NATIVE_HEADERS wpinet_jni_headers
     )
+    set_property(TARGET wpinet_jar PROPERTY FOLDER "java")
 
     install_jar(wpinet_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS wpinet_jar FILE wpinet_jar.cmake DESTINATION share/wpinet)
@@ -39,6 +39,7 @@ if(WITH_JAVA)
     add_dependencies(wpinetjni wpinet_jar)
 
     install(TARGETS wpinetjni EXPORT wpinetjni)
+    export(TARGETS wpinetjni FILE wpinetjni.cmake NAMESPACE wpinetjni::)
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -196,6 +197,7 @@ target_include_directories(
 )
 
 install(TARGETS wpinet EXPORT wpinet)
+export(TARGETS wpinet FILE wpinet.cmake NAMESPACE wpinet::)
 
 configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)

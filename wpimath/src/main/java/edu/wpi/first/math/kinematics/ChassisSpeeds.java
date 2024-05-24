@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.ChassisSpeedsProto;
 import edu.wpi.first.math.kinematics.struct.ChassisSpeedsStruct;
 import edu.wpi.first.units.Angle;
@@ -20,6 +21,7 @@ import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.util.Objects;
 
 /**
  * Represents the speed of a robot chassis. Although this class contains similar members compared to
@@ -78,6 +80,19 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+   * Creates a Twist2d from ChassisSpeeds.
+   *
+   * @param dtSeconds The duration of the timestep.
+   * @return Twist2d.
+   */
+  public Twist2d toTwist2d(double dtSeconds) {
+    return new Twist2d(
+        vxMetersPerSecond * dtSeconds,
+        vyMetersPerSecond * dtSeconds,
+        omegaRadiansPerSecond * dtSeconds);
+  }
+
+  /**
    * Discretizes a continuous-time chassis speed.
    *
    * <p>This function converts a continuous-time chassis speed into a discrete-time one such that
@@ -99,12 +114,19 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       double dtSeconds) {
+    // Construct the desired pose after a timestep, relative to the current pose. The desired pose
+    // has decoupled translation and rotation.
     var desiredDeltaPose =
         new Pose2d(
             vxMetersPerSecond * dtSeconds,
             vyMetersPerSecond * dtSeconds,
             new Rotation2d(omegaRadiansPerSecond * dtSeconds));
-    var twist = new Pose2d().log(desiredDeltaPose);
+
+    // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
+    // current pose to the desired pose
+    var twist = Pose2d.kZero.log(desiredDeltaPose);
+
+    // Turn the chassis translation/rotation deltas into average velocities
     return new ChassisSpeeds(twist.dx / dtSeconds, twist.dy / dtSeconds, twist.dtheta / dtSeconds);
   }
 
@@ -360,6 +382,28 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   public ChassisSpeeds div(double scalar) {
     return new ChassisSpeeds(
         vxMetersPerSecond / scalar, vyMetersPerSecond / scalar, omegaRadiansPerSecond / scalar);
+  }
+
+  @Override
+  public final int hashCode() {
+    return Objects.hash(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+
+    if (!(o instanceof ChassisSpeeds)) {
+      return false;
+    }
+
+    ChassisSpeeds c = (ChassisSpeeds) o;
+
+    return vxMetersPerSecond == c.vxMetersPerSecond
+        && vyMetersPerSecond == c.vyMetersPerSecond
+        && omegaRadiansPerSecond == c.omegaRadiansPerSecond;
   }
 
   @Override

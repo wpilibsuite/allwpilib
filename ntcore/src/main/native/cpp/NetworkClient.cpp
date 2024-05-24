@@ -362,6 +362,7 @@ void NetworkClient::HandleLocal() {
 }
 
 void NetworkClient::TcpConnected(uv::Tcp& tcp) {
+  tcp.SetLogger(&m_logger);
   tcp.SetNoDelay(true);
   // Start the WS client
   if (m_logger.min_level() >= wpi::WPI_LOG_DEBUG4) {
@@ -401,9 +402,8 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
   INFO("CONNECTED NT4 to {} port {}", connInfo.remote_ip, connInfo.remote_port);
   m_connHandle = m_connList.AddConnection(connInfo);
 
-  m_wire =
-      std::make_shared<net::WebSocketConnection>(ws, connInfo.protocol_version);
-  m_wire->Start();
+  m_wire = std::make_shared<net::WebSocketConnection>(
+      ws, connInfo.protocol_version, m_logger);
   m_clientImpl = std::make_unique<net::ClientImpl>(
       m_loop.Now().count(), m_inst, *m_wire, m_logger, m_timeSyncUpdated,
       [this](uint32_t repeatMs) {

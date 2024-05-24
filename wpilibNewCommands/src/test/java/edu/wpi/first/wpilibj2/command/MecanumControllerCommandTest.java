@@ -41,7 +41,7 @@ class MecanumControllerCommandTest {
   }
 
   private final Timer m_timer = new Timer();
-  private Rotation2d m_angle = new Rotation2d(0);
+  private Rotation2d m_angle = Rotation2d.kZero;
 
   private double m_frontLeftSpeed;
   private double m_frontLeftDistance;
@@ -71,10 +71,7 @@ class MecanumControllerCommandTest {
 
   private final MecanumDriveOdometry m_odometry =
       new MecanumDriveOdometry(
-          m_kinematics,
-          new Rotation2d(0),
-          new MecanumDriveWheelPositions(),
-          new Pose2d(0, 0, new Rotation2d(0)));
+          m_kinematics, Rotation2d.kZero, new MecanumDriveWheelPositions(), Pose2d.kZero);
 
   public void setWheelSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
     this.m_frontLeftSpeed = wheelSpeeds.frontLeftMetersPerSecond;
@@ -99,7 +96,7 @@ class MecanumControllerCommandTest {
     final var subsystem = new Subsystem() {};
 
     final var waypoints = new ArrayList<Pose2d>();
-    waypoints.add(new Pose2d(0, 0, new Rotation2d(0)));
+    waypoints.add(Pose2d.kZero);
     waypoints.add(new Pose2d(1, 5, new Rotation2d(3)));
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);

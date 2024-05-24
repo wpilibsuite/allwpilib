@@ -78,7 +78,7 @@ int DigitalOutput::GetChannel() const {
 
 void DigitalOutput::Pulse(units::second_t pulseLength) {
   int32_t status = 0;
-  HAL_Pulse(m_handle, pulseLength.to<double>(), &status);
+  HAL_Pulse(m_handle, pulseLength.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 

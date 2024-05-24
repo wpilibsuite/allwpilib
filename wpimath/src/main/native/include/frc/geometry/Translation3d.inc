@@ -13,10 +13,14 @@ namespace frc {
 
 constexpr Translation3d::Translation3d(units::meter_t x, units::meter_t y,
                                        units::meter_t z)
-    : m_x(x), m_y(y), m_z(z) {}
+    : m_x{x}, m_y{y}, m_z{z} {}
 
 constexpr Translation2d Translation3d::ToTranslation2d() const {
   return Translation2d{m_x, m_y};
+}
+
+constexpr Eigen::Vector3d Translation3d::ToVector() const {
+  return Eigen::Vector3d{{m_x.value(), m_y.value(), m_z.value()}};
 }
 
 constexpr Translation3d Translation3d::operator+(

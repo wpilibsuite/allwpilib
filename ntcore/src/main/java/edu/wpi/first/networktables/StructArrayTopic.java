@@ -153,6 +153,11 @@ public final class StructArrayTopic<T> extends Topic {
         false);
   }
 
+  /**
+   * Returns the struct.
+   *
+   * @return The struct.
+   */
   public Struct<T> getStruct() {
     return m_struct;
   }

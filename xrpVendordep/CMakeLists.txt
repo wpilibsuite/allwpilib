@@ -7,7 +7,6 @@ include(AddTest)
 if(WITH_JAVA)
     find_package(Java REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     add_jar(
@@ -24,6 +23,7 @@ if(WITH_JAVA)
             wpilibj_jar
         OUTPUT_NAME xrpVendordep
     )
+    set_property(TARGET xrpVendordep_jar PROPERTY FOLDER "java")
 
     install_jar(xrpVendordep_jar DESTINATION ${java_lib_dest})
     install_jar_exports(
@@ -67,6 +67,7 @@ target_include_directories(
 )
 
 install(TARGETS xrpVendordep EXPORT xrpvendordep DESTINATION "${main_lib_dest}")
+export(TARGETS xrpVendordep FILE xrpvendordep.cmake NAMESPACE xrpvendordep::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 
 configure_file(xrpvendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)

@@ -106,16 +106,16 @@ class ADIS16470_IMU : public wpi::Sendable,
   /**
    * Creates a new ADIS16740 IMU object.
    *
-   * The default setup is the onboard SPI port with a calibration time of 4
-   * seconds. Yaw, pitch, and roll are kZ, kX, and kY respectively.
+   * The default setup is the onboard SPI port with a calibration time of 1
+   * second. Yaw, pitch, and roll are kZ, kX, and kY respectively.
    */
   ADIS16470_IMU();
 
   /**
    * Creates a new ADIS16740 IMU object.
    *
-   * The default setup is the onboard SPI port with a calibration time of 4
-   * seconds.
+   * The default setup is the onboard SPI port with a calibration time of 1
+   * second.
    *
    * <b><i>Input axes limited to kX, kY and kZ. Specifying kYaw, kPitch,or kRoll
    * will result in an error.</i></b>
@@ -423,8 +423,8 @@ class ADIS16470_IMU : public wpi::Sendable,
   static constexpr double grav = 9.81;
 
   /** @brief Resources **/
-  DigitalInput* m_reset_in;
-  DigitalOutput* m_status_led;
+  DigitalInput* m_reset_in = nullptr;
+  DigitalOutput* m_status_led = nullptr;
 
   /**
    * @brief Switches to standard SPI operation. Primarily used when exiting auto

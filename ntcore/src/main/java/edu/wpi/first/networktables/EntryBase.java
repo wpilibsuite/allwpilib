@@ -40,5 +40,6 @@ public abstract class EntryBase implements Subscriber, Publisher {
     return NetworkTablesJNI.getEntryLastChange(m_handle);
   }
 
+  /** NetworkTables handle. */
   protected int m_handle;
 }

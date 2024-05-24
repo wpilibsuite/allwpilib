@@ -174,6 +174,15 @@ CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
   return std::move(*this);
 }
 
+CommandPtr CommandPtr::DeadlineFor(CommandPtr&& parallel) && {
+  AssertValid();
+  std::vector<std::unique_ptr<Command>> vec;
+  vec.emplace_back(std::move(parallel).Unwrap());
+  m_ptr =
+      std::make_unique<ParallelDeadlineGroup>(std::move(m_ptr), std::move(vec));
+  return std::move(*this);
+}
+
 CommandPtr CommandPtr::AlongWith(CommandPtr&& parallel) && {
   AssertValid();
   std::vector<std::unique_ptr<Command>> vec;

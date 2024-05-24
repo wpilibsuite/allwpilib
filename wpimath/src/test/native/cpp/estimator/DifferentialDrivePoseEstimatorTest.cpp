@@ -8,6 +8,7 @@
 #include <utility>
 
 #include <gtest/gtest.h>
+#include <wpi/print.h>
 
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
@@ -50,7 +51,7 @@ void testFollowTrajectory(
   double errorSum = 0;
 
   if (debug) {
-    fmt::print(
+    wpi::print(
         "time, est_x, est_y, est_theta, true_x, true_y, true_theta, left, "
         "right\n");
   }
@@ -95,7 +96,7 @@ void testFollowTrajectory(
         leftDistance, rightDistance);
 
     if (debug) {
-      fmt::print(
+      wpi::print(
           "{}, {}, {}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
           xhat.Y().value(), xhat.Rotation().Radians().value(),
           groundTruthState.pose.X().value(), groundTruthState.pose.Y().value(),
@@ -116,14 +117,14 @@ void testFollowTrajectory(
   }
 
   if (debug) {
-    fmt::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
+    wpi::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
 
     units::second_t apply_time;
     units::second_t measure_time;
     frc::Pose2d vision_pose;
     for (auto record : visionLog) {
       std::tie(apply_time, measure_time, vision_pose) = record;
-      fmt::print("{}, {}, {}, {}, {}\n", apply_time.value(),
+      wpi::print("{}, {}, {}, {}, {}\n", apply_time.value(),
                  measure_time.value(), vision_pose.X().value(),
                  vision_pose.Y().value(),
                  vision_pose.Rotation().Radians().value());
@@ -292,4 +293,63 @@ TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
   EXPECT_NEAR(odometryPose.Rotation().Radians().value(),
               estimator.GetEstimatedPosition().Rotation().Radians().value(),
               1e-6);
+}
+
+TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
+  frc::DifferentialDriveKinematics kinematics{1_m};
+  frc::DifferentialDrivePoseEstimator estimator{
+      kinematics,      frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{},
+      {1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
+
+  // Returns empty when null
+  EXPECT_EQ(std::nullopt, estimator.SampleAt(1_s));
+
+  // Add odometry measurements, but don't fill up the buffer
+  // Add a tiny tolerance for the upper bound because of floating point rounding
+  // error
+  for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
+    estimator.UpdateWithTime(units::second_t{time}, frc::Rotation2d{},
+                             units::meter_t{time}, units::meter_t{time});
+  }
+
+  // Sample at an added time
+  EXPECT_EQ(std::optional(frc::Pose2d{1.02_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.02_s));
+  // Sample between updates (test interpolation)
+  EXPECT_EQ(std::optional(frc::Pose2d{1.01_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.01_s));
+  // Sampling before the oldest value returns the oldest value
+  EXPECT_EQ(std::optional(frc::Pose2d{1_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(0.5_s));
+  // Sampling after the newest value returns the newest value
+  EXPECT_EQ(std::optional(frc::Pose2d{2_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(2.5_s));
+
+  // Add a vision measurement after the odometry measurements (while keeping all
+  // of the old odometry measurements)
+  estimator.AddVisionMeasurement(frc::Pose2d{2_m, 0_m, frc::Rotation2d{1_rad}},
+                                 2.2_s);
+
+  // Make sure nothing changed (except the newest value)
+  EXPECT_EQ(std::optional(frc::Pose2d{1.02_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.02_s));
+  EXPECT_EQ(std::optional(frc::Pose2d{1.01_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(std::optional(frc::Pose2d{1_m, 0_m, frc::Rotation2d{}}),
+            estimator.SampleAt(0.5_s));
+
+  // Add a vision measurement before the odometry measurements that's still in
+  // the buffer
+  estimator.AddVisionMeasurement(frc::Pose2d{1_m, 0.2_m, frc::Rotation2d{}},
+                                 0.9_s);
+
+  // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
+  EXPECT_EQ(std::optional(frc::Pose2d{1.02_m, 0.1_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.02_s));
+  EXPECT_EQ(std::optional(frc::Pose2d{1.01_m, 0.1_m, frc::Rotation2d{}}),
+            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(std::optional(frc::Pose2d{1_m, 0.1_m, frc::Rotation2d{}}),
+            estimator.SampleAt(0.5_s));
+  EXPECT_EQ(std::optional(frc::Pose2d{2_m, 0.1_m, frc::Rotation2d{}}),
+            estimator.SampleAt(2.5_s));
 }

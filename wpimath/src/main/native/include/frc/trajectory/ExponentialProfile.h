@@ -81,7 +81,7 @@ class ExponentialProfile {
   class Constraints {
    public:
     /**
-     * Construct constraints for an ExponentialProfile.
+     * Constructs constraints for an ExponentialProfile.
      *
      * @param maxInput maximum unsigned input voltage
      * @param A The State-Space 1x1 system matrix.
@@ -91,7 +91,7 @@ class ExponentialProfile {
         : maxInput{maxInput}, A{A}, B{B} {}
 
     /**
-     * Construct constraints for an ExponentialProfile from characteristics.
+     * Constructs constraints for an ExponentialProfile from characteristics.
      *
      * @param maxInput maximum unsigned input voltage
      * @param kV The velocity gain.
@@ -130,7 +130,7 @@ class ExponentialProfile {
   };
 
   /**
-   * Construct a ExponentialProfile.
+   * Constructs a ExponentialProfile.
    *
    * @param constraints The constraints on the profile, like maximum input.
    */
@@ -142,41 +142,72 @@ class ExponentialProfile {
   ExponentialProfile& operator=(ExponentialProfile&&) = default;
 
   /**
-   * Calculate the correct position and velocity for the profile at a time t
-   * where the current state is at time t = 0.
+   * Calculates the position and velocity for the profile at a time t where the
+   * current state is at time t = 0.
+   *
+   * @param t How long to advance from the current state toward the desired
+   *     state.
+   * @param current The current state.
+   * @param goal The desired state when the profile is complete.
+   * @return The position and velocity of the profile at time t.
    */
   State Calculate(const units::second_t& t, const State& current,
                   const State& goal) const;
 
   /**
-   * Calculate the point after which the fastest way to reach the goal state is
+   * Calculates the point after which the fastest way to reach the goal state is
    * to apply input in the opposite direction.
+   *
+   * @param current The current state.
+   * @param goal The desired state when the profile is complete.
+   * @return The position and velocity of the profile at the inflection point.
    */
   State CalculateInflectionPoint(const State& current, const State& goal) const;
 
   /**
-   * Calculate the time it will take for this profile to reach the goal state.
+   * Calculates the time it will take for this profile to reach the goal state.
+   *
+   * @param current The current state.
+   * @param goal The desired state when the profile is complete.
+   * @return The total duration of this profile.
    */
   units::second_t TimeLeftUntil(const State& current, const State& goal) const;
 
   /**
-   * Calculate the time it will take for this profile to reach the inflection
+   * Calculates the time it will take for this profile to reach the inflection
    * point, and the time it will take for this profile to reach the goal state.
+   *
+   * @param current The current state.
+   * @param goal The desired state when the profile is complete.
+   * @return The timing information for this profile.
    */
   ProfileTiming CalculateProfileTiming(const State& current,
                                        const State& goal) const;
 
  private:
   /**
-   * Calculate the point after which the fastest way to reach the goal state is
+   * Calculates the point after which the fastest way to reach the goal state is
    * to apply input in the opposite direction.
+   *
+   * @param current The current state.
+   * @param goal The desired state when the profile is complete.
+   * @param input The signed input applied to this profile from the current
+   *     state.
+   * @return The position and velocity of the profile at the inflection point.
    */
   State CalculateInflectionPoint(const State& current, const State& goal,
                                  const Input_t& input) const;
 
   /**
-   * Calculate the time it will take for this profile to reach the inflection
+   * Calculates the time it will take for this profile to reach the inflection
    * point, and the time it will take for this profile to reach the goal state.
+   *
+   * @param current The current state.
+   * @param inflectionPoint The inflection point of this profile.
+   * @param goal The desired state when the profile is complete.
+   * @param input The signed input applied to this profile from the current
+   *     state.
+   * @return The timing information for this profile.
    */
   ProfileTiming CalculateProfileTiming(const State& current,
                                        const State& inflectionPoint,
@@ -184,40 +215,70 @@ class ExponentialProfile {
                                        const Input_t& input) const;
 
   /**
-   * Calculate the velocity reached after t seconds when applying an input from
+   * Calculates the position reached after t seconds when applying an input from
    * the initial state.
-   */
-  Velocity_t ComputeVelocityFromTime(const units::second_t& time,
-                                     const Input_t& input,
-                                     const State& initial) const;
-
-  /**
-   * Calculate the position reached after t seconds when applying an input from
-   * the initial state.
+   *
+   * @param t The time since the initial state.
+   * @param input The signed input applied to this profile from the initial
+   *     state.
+   * @param initial The initial state.
+   * @return The distance travelled by this profile.
    */
   Distance_t ComputeDistanceFromTime(const units::second_t& time,
                                      const Input_t& input,
                                      const State& initial) const;
 
   /**
-   * Calculate the distance reached at the same time as the given velocity when
-   * applying the given input from the initial state.
+   * Calculates the velocity reached after t seconds when applying an input from
+   * the initial state.
+   *
+   * @param t The time since the initial state.
+   * @param input The signed input applied to this profile from the initial
+   *     state.
+   * @param initial The initial state.
+   * @return The distance travelled by this profile.
    */
-  Distance_t ComputeDistanceFromVelocity(const Velocity_t& velocity,
-                                         const Input_t& input,
-                                         const State& initial) const;
+  Velocity_t ComputeVelocityFromTime(const units::second_t& time,
+                                     const Input_t& input,
+                                     const State& initial) const;
 
   /**
-   * Calculate the time required to reach a specified velocity given the initial
-   * velocity.
+   * Calculates the time required to reach a specified velocity given the
+   * initial velocity.
+   *
+   * @param velocity The goal velocity.
+   * @param input The signed input applied to this profile from the initial
+   *     state.
+   * @param initial The initial velocity.
+   * @return The time required to reach the goal velocity.
    */
   units::second_t ComputeTimeFromVelocity(const Velocity_t& velocity,
                                           const Input_t& input,
                                           const Velocity_t& initial) const;
 
   /**
-   * Calculate the velocity at which input should be reversed in order to reach
+   * Calculates the distance reached at the same time as the given velocity when
+   * applying the given input from the initial state.
+   *
+   * @param velocity The velocity reached by this profile
+   * @param input The signed input applied to this profile from the initial
+   *     state.
+   * @param initial The initial state.
+   * @return The distance reached when the given velocity is reached.
+   */
+  Distance_t ComputeDistanceFromVelocity(const Velocity_t& velocity,
+                                         const Input_t& input,
+                                         const State& initial) const;
+
+  /**
+   * Calculates the velocity at which input should be reversed in order to reach
    * the goal state from the current state.
+   *
+   * @param input The signed input applied to this profile from the current
+   *     state.
+   * @param current The current state.
+   * @param goal The goal state.
+   * @return The inflection velocity.
    */
   Velocity_t SolveForInflectionVelocity(const Input_t& input,
                                         const State& current,
@@ -226,8 +287,11 @@ class ExponentialProfile {
   /**
    * Returns true if the profile should be inverted.
    *
-   * <p>The profile is inverted if we should first apply negative input in order
-   * to reach the goal state.
+   * The profile is inverted if we should first apply negative input in order to
+   * reach the goal state.
+   *
+   * @param current The initial state (usually the current state).
+   * @param goal The desired state when the profile is complete.
    */
   bool ShouldFlipInput(const State& current, const State& goal) const;
 

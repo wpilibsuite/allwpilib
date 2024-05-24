@@ -12,11 +12,11 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
 
 ## General Contribution Rules
 
-- Everything in the library must work for the 3000+ teams that will be using it.
+- Everything in the library must work for the 4000+ teams that will be using it.
 - We need to be able to maintain submitted changes, even if you are no longer working on the project.
 - Tool suite changes must be generally useful to a broad range of teams
 - Excluding bug fixes, changes in one language generally need to have corresponding changes in other languages.
-    - Some features, such the addition of C++11 for WPILibC or Functional Interfaces for WPILibJ, are specific to that version of WPILib only.
+    - Some features, such the addition of C++23 for WPILibC or Functional Interfaces for WPILibJ, are specific to that version of WPILib only. New language features added to C++ must be wrappable in Python for [RobotPy](https://github.com/robotpy).
     - Substantial changes often need to have corresponding LabVIEW changes. To do this, we will work with NI on these large changes.
 - Changes should have tests.
 - Code should be well documented.
@@ -27,7 +27,8 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
 - Bug reports and fixes
     - We will generally accept bug fixes without too much question. If they are only implemented for one language, we will implement them for any other necessary languages. Bug reports are also welcome, please submit them to our GitHub issue tracker.
 - While we do welcome improvements to the API, there are a few important rules to consider:
-    - Features must be added to both WPILibC and WPILibJ, with rare exceptions.
+    - Features must be added to Java (WPILibJ), C++ (WPILibC), with rare exceptions.
+        - Most of Python (RobotPy) is created by wrapping WPILibC with pybind11 via robotpy-build. However, new features to the command framework should also be submitted to [robotpy-commands-v2](https://github.com/robotpy/robotpy-commands-v2) as the command framework is reimplemented in Python.
     - During competition season, we will not merge any new feature additions. We want to ensure that the API is stable during the season to help minimize issues for teams.
     - Ask about large changes before spending a bunch of time on them! You can create a new issue on our GitHub tracker for feature request/discussion and talk about it with us there.
     - Features that make it easier for teams with less experience to be more successful are more likely to be accepted.
@@ -78,6 +79,8 @@ xₖ₊₁ = Axₖ + Buₖ
 ### Pull Request Format
 
 Changes should be submitted as a Pull Request against the main branch of WPILib. For most changes, commits will be squashed upon merge. For particularly large changes, multiple commits are ok, but assume one commit unless asked otherwise. We may ask you to break a PR into multiple standalone PRs or commits for rebase within one PR to separate unrelated changes. No change will be merged unless it is up to date with the current main branch. We do this to make sure that the git history isn't too cluttered.
+
+During the build season, breaking changes or other changes intended for the next season can be created as a pull request against the development branch of WPILib. After the season is over, the changes in the development branch will be merged into main.
 
 ### Merge Process
 

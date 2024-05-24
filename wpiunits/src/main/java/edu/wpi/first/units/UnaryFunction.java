@@ -6,8 +6,18 @@ package edu.wpi.first.units;
 
 import java.util.Objects;
 
+/**
+ * A function that accepts a single {@code double} and returns a {@code double} result. This is used
+ * to represent arbitrary mapping functions for converting units to and from a base unit
+ * representation. Temperature units, in particular, typically have an offset from a value in Kelvin
+ * and may have a multiplication factor added in, which means that units cannot always be
+ * represented as simple ratios of their base units.
+ */
 @FunctionalInterface
 public interface UnaryFunction {
+  /** The identity function that simply returns the input value. */
+  UnaryFunction IDENTITY = x -> x;
+
   /**
    * Applies this function to the input value and returns the result.
    *

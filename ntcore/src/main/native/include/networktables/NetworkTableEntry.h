@@ -34,12 +34,6 @@ class Topic;
 class NetworkTableEntry final {
  public:
   /**
-   * Flag values (as returned by GetFlags()).
-   * @deprecated Use IsPersistent() instead.
-   */
-  enum Flags { kPersistent = NT_PERSISTENT };
-
-  /**
    * Construct invalid instance.
    */
   NetworkTableEntry();
@@ -92,15 +86,6 @@ class NetworkTableEntry final {
    * @return the entry's type
    */
   NetworkTableType GetType() const;
-
-  /**
-   * Returns the flags.
-   *
-   * @return the flags (bitmask)
-   * @deprecated Use IsPersistent() or topic properties instead
-   */
-  [[deprecated("Use IsPersistent() or topic properties instead")]]
-  unsigned int GetFlags() const;
 
   /**
    * Gets the last time the entry's value was changed.
@@ -461,24 +446,6 @@ class NetworkTableEntry final {
   bool SetStringArray(std::span<const std::string> value, int64_t time = 0);
 
   /**
-   * Sets flags.
-   *
-   * @param flags the flags to set (bitmask)
-   * @deprecated Use SetPersistent() or topic properties instead
-   */
-  [[deprecated("Use SetPersistent() or topic properties instead")]]
-  void SetFlags(unsigned int flags);
-
-  /**
-   * Clears flags.
-   *
-   * @param flags the flags to clear (bitmask)
-   * @deprecated Use SetPersistent() or topic properties instead
-   */
-  [[deprecated("Use SetPersistent() or topic properties instead")]]
-  void ClearFlags(unsigned int flags);
-
-  /**
    * Make value persistent through program restarts.
    */
   void SetPersistent();
@@ -499,13 +466,6 @@ class NetworkTableEntry final {
    * Stops publishing the entry if it's been published.
    */
   void Unpublish();
-
-  /**
-   * Deletes the entry.
-   * @deprecated Use Unpublish() instead.
-   */
-  [[deprecated("Use Unpublish() instead")]]
-  void Delete();
 
   /**
    * Gets the entry's topic.

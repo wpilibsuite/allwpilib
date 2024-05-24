@@ -350,8 +350,8 @@ class ADIS16448_IMU : public wpi::Sendable,
   };
 
   /** @brief Internal Resources **/
-  DigitalInput* m_reset_in;
-  DigitalOutput* m_status_led;
+  DigitalInput* m_reset_in = nullptr;
+  DigitalOutput* m_status_led = nullptr;
 
   bool SwitchToStandardSPI();
 

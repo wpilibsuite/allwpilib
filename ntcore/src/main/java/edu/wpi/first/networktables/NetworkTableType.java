@@ -39,10 +39,20 @@ public enum NetworkTableType {
     m_valueStr = valueStr;
   }
 
+  /**
+   * Returns the NetworkTable type value.
+   *
+   * @return The NetworkTable type value.
+   */
   public int getValue() {
     return m_value;
   }
 
+  /**
+   * Returns the NetworkTable type value as as string.
+   *
+   * @return The NetworkTable type value as a string.
+   */
   public String getValueStr() {
     return m_valueStr;
   }

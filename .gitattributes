@@ -1,7 +1,7 @@
-*.cpp text
+*.cpp text eol=lf
 *.gradle text eol=lf
-*.h text
-*.inc text
+*.h text eol=lf
+*.inc text eol=lf
 *.java text eol=lf
 *.json text eol=lf
 *.md text eol=lf

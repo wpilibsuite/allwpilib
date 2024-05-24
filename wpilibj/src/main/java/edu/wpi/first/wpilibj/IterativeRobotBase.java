@@ -408,6 +408,11 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
   }
 
+  /** Prints list of epochs added so far and their times. */
+  public void printWatchdogEpochs() {
+    m_watchdog.printEpochs();
+  }
+
   private void printLoopOverrunMessage() {
     DriverStation.reportWarning("Loop time of " + m_period + "s overrun\n", false);
   }

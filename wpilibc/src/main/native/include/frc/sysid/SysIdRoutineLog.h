@@ -194,7 +194,7 @@ class SysIdRoutineLog {
  private:
   LogEntries m_logEntries;
   std::string m_logName;
-  bool m_stateInitialized;
+  bool m_stateInitialized = false;
   wpi::log::StringLogEntry m_state;
 };
 }  // namespace frc::sysid

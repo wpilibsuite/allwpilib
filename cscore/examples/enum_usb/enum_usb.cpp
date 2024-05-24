@@ -4,7 +4,7 @@
 
 #include <cstdio>
 
-#include <fmt/format.h>
+#include <wpi/print.h>
 
 #include "cscore.h"
 
@@ -12,11 +12,11 @@ int main() {
   CS_Status status = 0;
 
   for (const auto& caminfo : cs::EnumerateUsbCameras(&status)) {
-    fmt::print("{}: {} ({})\n", caminfo.dev, caminfo.path, caminfo.name);
+    wpi::print("{}: {} ({})\n", caminfo.dev, caminfo.path, caminfo.name);
     if (!caminfo.otherPaths.empty()) {
       std::puts("Other device paths:");
       for (auto&& path : caminfo.otherPaths) {
-        fmt::print("  {}\n", path);
+        wpi::print("  {}\n", path);
       }
     }
 
@@ -24,26 +24,26 @@ int main() {
 
     std::puts("Properties:");
     for (const auto& prop : camera.EnumerateProperties()) {
-      fmt::print("  {}", prop.GetName());
+      wpi::print("  {}", prop.GetName());
       switch (prop.GetKind()) {
         case cs::VideoProperty::kBoolean:
-          fmt::print(" (bool): value={} default={}", prop.Get(),
+          wpi::print(" (bool): value={} default={}", prop.Get(),
                      prop.GetDefault());
           break;
         case cs::VideoProperty::kInteger:
-          fmt::print(" (int): value={} min={} max={} step={} default={}",
+          wpi::print(" (int): value={} min={} max={} step={} default={}",
                      prop.Get(), prop.GetMin(), prop.GetMax(), prop.GetStep(),
                      prop.GetDefault());
           break;
         case cs::VideoProperty::kString:
-          fmt::print(" (string): {}", prop.GetString());
+          wpi::print(" (string): {}", prop.GetString());
           break;
         case cs::VideoProperty::kEnum: {
-          fmt::print(" (enum): value={}", prop.Get());
+          wpi::print(" (enum): value={}", prop.Get());
           auto choices = prop.GetChoices();
           for (size_t i = 0; i < choices.size(); ++i) {
             if (!choices[i].empty()) {
-              fmt::print("\n    {}: {}", i, choices[i]);
+              wpi::print("\n    {}: {}", i, choices[i]);
             }
           }
           break;
@@ -71,7 +71,7 @@ int main() {
           pixelFormat = "Unknown";
           break;
       }
-      fmt::print("  PixelFormat:{} Width:{} Height:{} FPS:{}\n", pixelFormat,
+      wpi::print("  PixelFormat:{} Width:{} Height:{} FPS:{}\n", pixelFormat,
                  mode.width, mode.height, mode.fps);
     }
   }

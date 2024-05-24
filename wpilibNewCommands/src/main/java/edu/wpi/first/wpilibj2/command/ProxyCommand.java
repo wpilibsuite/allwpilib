@@ -10,8 +10,13 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.function.Supplier;
 
 /**
- * Schedules the given command when this command is initialized, and ends when it ends. Useful for
- * forking off from CommandGroups. If this command is interrupted, it will cancel the command.
+ * Schedules a given command when this command is initialized and ends when it ends, but does not
+ * directly run it. Use this for including a command in a composition without adding its
+ * requirements, <strong>but only if you know what you are doing. If you are unsure, see <a
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#scheduling-other-commands">the
+ * WPILib docs</a> for a complete explanation of proxy semantics.</strong> Do not proxy a command
+ * from a subsystem already required by the composition, or else the composition will cancel itself
+ * when the proxy is reached. If this command is interrupted, it will cancel the command.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
@@ -21,10 +26,19 @@ public class ProxyCommand extends Command {
 
   /**
    * Creates a new ProxyCommand that schedules the supplied command when initialized, and ends when
-   * it is no longer scheduled. Useful for lazily creating commands at runtime.
+   * it is no longer scheduled. Use this for lazily creating <strong>proxied</strong> commands at
+   * runtime. Proxying should only be done to escape from composition requirement semantics, so if
+   * only initialization time command construction is needed, use {@link DeferredCommand} instead.
    *
    * @param supplier the command supplier
+   * @deprecated This constructor's similarity to {@link DeferredCommand} is confusing and opens
+   *     potential footguns for users who do not fully understand the semantics and implications of
+   *     proxying, but who simply want runtime construction. Users who do know what they are doing
+   *     and need a supplier-constructed proxied command should instead proxy a DeferredCommand
+   *     using the <code>asProxy</code> decorator.
+   * @see DeferredCommand
    */
+  @Deprecated(since = "2025", forRemoval = true)
   public ProxyCommand(Supplier<Command> supplier) {
     m_supplier = requireNonNullParam(supplier, "supplier", "ProxyCommand");
   }
@@ -37,8 +51,9 @@ public class ProxyCommand extends Command {
    */
   @SuppressWarnings("this-escape")
   public ProxyCommand(Command command) {
-    this(() -> command);
-    setName("Proxy(" + command.getName() + ")");
+    Command nullCheckedCommand = requireNonNullParam(command, "command", "ProxyCommand");
+    m_supplier = () -> nullCheckedCommand;
+    setName("Proxy(" + nullCheckedCommand.getName() + ")");
   }
 
   @Override

@@ -225,8 +225,19 @@ public class LongToObjectHashMap<V> {
     return List.copyOf(values); // return a readonly copy
   }
 
+  /**
+   * Interface for map iterator function.
+   *
+   * @param <V> Value type.
+   */
   @FunctionalInterface
   public interface IteratorFunction<V> {
+    /**
+     * Accepts a key-value pair from the map.
+     *
+     * @param key The key.
+     * @param value The value.
+     */
     void accept(long key, V value);
   }
 

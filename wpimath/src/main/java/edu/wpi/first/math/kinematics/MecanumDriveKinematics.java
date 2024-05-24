@@ -46,7 +46,7 @@ public class MecanumDriveKinematics
   private final Translation2d m_rearLeftWheelMeters;
   private final Translation2d m_rearRightWheelMeters;
 
-  private Translation2d m_prevCoR = new Translation2d();
+  private Translation2d m_prevCoR = Translation2d.kZero;
 
   /** MecanumDriveKinematics protobuf for serialization. */
   public static final MecanumDriveKinematicsProto proto = new MecanumDriveKinematicsProto();
@@ -140,7 +140,7 @@ public class MecanumDriveKinematics
    */
   @Override
   public MecanumDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
-    return toWheelSpeeds(chassisSpeeds, new Translation2d());
+    return toWheelSpeeds(chassisSpeeds, Translation2d.kZero);
   }
 
   /**

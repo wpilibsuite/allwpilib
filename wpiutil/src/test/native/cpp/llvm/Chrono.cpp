@@ -7,7 +7,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/Chrono.h"
-#include "wpi/SmallVector.h"
 #include "gtest/gtest.h"
 
 using namespace wpi;

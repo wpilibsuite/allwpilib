@@ -159,22 +159,6 @@ public class Notifier implements AutoCloseable {
    * Change the callback function.
    *
    * @param callback The callback function.
-   * @deprecated Use setCallback() instead.
-   */
-  @Deprecated(forRemoval = true, since = "2024")
-  public void setHandler(Runnable callback) {
-    m_processLock.lock();
-    try {
-      m_callback = callback;
-    } finally {
-      m_processLock.unlock();
-    }
-  }
-
-  /**
-   * Change the callback function.
-   *
-   * @param callback The callback function.
    */
   public void setCallback(Runnable callback) {
     m_processLock.lock();

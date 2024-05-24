@@ -7,6 +7,9 @@ package edu.wpi.first.hal.can;
 import edu.wpi.first.hal.communication.NIRioStatus;
 import edu.wpi.first.hal.util.UncleanStatusException;
 
+/**
+ * Checks the status of a CAN message and throws an exception of the appropriate type if necessary.
+ */
 public final class CANExceptionFactory {
   // FRC Error codes
   static final int ERR_CANSessionMux_InvalidBuffer = -44086;

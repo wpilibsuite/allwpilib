@@ -181,7 +181,7 @@ TEST_F(ServerImplTest, PublishLocal) {
     // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // AddClient()
     EXPECT_CALL(setPeriodic, Call(100));  // ClientSubscribe()
     // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // ClientSubscribe()
-    EXPECT_CALL(wire, GetLastPingResponse()).WillOnce(Return(0));
+    EXPECT_CALL(wire, GetLastReceivedTime()).WillOnce(Return(0));
     EXPECT_CALL(wire, SendPing(100));
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendControl()
     EXPECT_CALL(
@@ -258,7 +258,7 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
     // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // AddClient()
     EXPECT_CALL(setPeriodic, Call(100));  // ClientSubscribe()
     // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // ClientSubscribe()
-    EXPECT_CALL(wire, GetLastPingResponse()).WillOnce(Return(0));
+    EXPECT_CALL(wire, GetLastReceivedTime()).WillOnce(Return(0));
     EXPECT_CALL(wire, SendPing(100));
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendValues()
     EXPECT_CALL(

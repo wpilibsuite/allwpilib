@@ -58,7 +58,10 @@ class PowerDistribution : public wpi::Sendable,
   double GetVoltage() const;
 
   /**
-   * Query the temperature of the PDP/PDH.
+   * Query the temperature of the PDP.
+   *
+   * Not supported on the Rev PDH and returns 0.
+   *
    *
    * @return The temperature in degrees Celsius
    */
@@ -80,21 +83,27 @@ class PowerDistribution : public wpi::Sendable,
   double GetTotalCurrent() const;
 
   /**
-   * Query the total power drawn from all monitored PDP/PDH channels.
+   * Query the total power drawn from all monitored PDP channels.
+   *
+   * Not supported on the Rev PDH and returns 0.
    *
    * @return The total power drawn in Watts
    */
   double GetTotalPower() const;
 
   /**
-   * Query the total energy drawn from the monitored PDP/PDH channels.
+   * Query the total energy drawn from the monitored PDP channels.
+   *
+   * Not supported on the Rev PDH and returns 0.
    *
    * @return The total energy drawn in Joules
    */
   double GetTotalEnergy() const;
 
   /**
-   * Reset the total energy drawn from the PDP/PDH.
+   * Reset the total energy drawn from the PDP.
+   *
+   * Not supported on the Rev PDH and does nothing.
    *
    * @see PowerDistribution#GetTotalEnergy
    */

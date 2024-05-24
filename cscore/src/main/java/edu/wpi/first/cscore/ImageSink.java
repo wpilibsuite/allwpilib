@@ -4,7 +4,13 @@
 
 package edu.wpi.first.cscore;
 
+/** A base class for single image reading sinks. */
 public abstract class ImageSink extends VideoSink {
+  /**
+   * Constructs an ImageSink.
+   *
+   * @param handle The image sink handle.
+   */
   protected ImageSink(int handle) {
     super(handle);
   }

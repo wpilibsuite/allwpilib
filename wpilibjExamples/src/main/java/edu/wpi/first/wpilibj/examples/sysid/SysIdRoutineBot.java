@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.sysid;
 
-import static edu.wpi.first.wpilibj.examples.sysid.Constants.OIConstants;
-
+import edu.wpi.first.wpilibj.examples.sysid.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.sysid.subsystems.Drive;
+import edu.wpi.first.wpilibj.examples.sysid.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 public class SysIdRoutineBot {
   // The robot's subsystems
   private final Drive m_drive = new Drive();
+  private final Shooter m_shooter = new Shooter();
 
   // The driver's controller
   CommandXboxController m_driverController =
@@ -42,10 +43,44 @@ public class SysIdRoutineBot {
 
     // Bind full set of SysId routine tests to buttons; a complete routine should run each of these
     // once.
-    m_driverController.a().whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    m_driverController.b().whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    m_driverController.x().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    m_driverController.y().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // Using bumpers as a modifier and combining it with the buttons so that we can have both sets
+    // of bindings at once
+    m_driverController
+        .a()
+        .and(m_driverController.rightBumper())
+        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    m_driverController
+        .b()
+        .and(m_driverController.rightBumper())
+        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    m_driverController
+        .x()
+        .and(m_driverController.rightBumper())
+        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    m_driverController
+        .y()
+        .and(m_driverController.rightBumper())
+        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    // Control the shooter wheel with the left trigger
+    m_shooter.setDefaultCommand(m_shooter.runShooter(m_driverController::getLeftTriggerAxis));
+
+    m_driverController
+        .a()
+        .and(m_driverController.leftBumper())
+        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    m_driverController
+        .b()
+        .and(m_driverController.leftBumper())
+        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    m_driverController
+        .x()
+        .and(m_driverController.leftBumper())
+        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    m_driverController
+        .y()
+        .and(m_driverController.leftBumper())
+        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**

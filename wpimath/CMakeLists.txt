@@ -19,6 +19,7 @@ protobuf_generate_cpp(
 
 file(
     GLOB wpimath_jni_src
+    src/main/native/cpp/jni/WPIMathJNI_ArmFeedforward.cpp
     src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
     src/main/native/cpp/jni/WPIMathJNI_Eigen.cpp
     src/main/native/cpp/jni/WPIMathJNI_Exceptions.cpp
@@ -32,7 +33,6 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.43.1.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
@@ -40,25 +40,32 @@ if(WITH_JAVA)
 
         message(STATUS "Downloading EJML jarfiles...")
 
-        download_and_check("${BASE_URL}org/ejml/ejml-cdense/0.43.1/ejml-cdense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-cdense/0.43.1/ejml-cdense-0.43.1.jar"
             "${JAR_ROOT}/ejml-cdense-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-core/0.43.1/ejml-core-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-core/0.43.1/ejml-core-0.43.1.jar"
             "${JAR_ROOT}/ejml-core-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-ddense/0.43.1/ejml-ddense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-ddense/0.43.1/ejml-ddense-0.43.1.jar"
             "${JAR_ROOT}/ejml-ddense-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-dsparse/0.43.1/ejml-dsparse-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-dsparse/0.43.1/ejml-dsparse-0.43.1.jar"
             "${JAR_ROOT}/ejml-dsparse-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-fdense/0.43.1/ejml-fdense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-fdense/0.43.1/ejml-fdense-0.43.1.jar"
             "${JAR_ROOT}/ejml-fdense-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-simple/0.43.1/ejml-simple-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-simple/0.43.1/ejml-simple-0.43.1.jar"
             "${JAR_ROOT}/ejml-simple-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-zdense/0.43.1/ejml-zdense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-zdense/0.43.1/ejml-zdense-0.43.1.jar"
             "${JAR_ROOT}/ejml-zdense-0.43.1.jar"
         )
 
@@ -82,6 +89,7 @@ if(WITH_JAVA)
         OUTPUT_NAME wpimath
         GENERATE_NATIVE_HEADERS wpimath_jni_headers
     )
+    set_property(TARGET wpimath_jar PROPERTY FOLDER "java")
 
     install_jar(wpimath_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS wpimath_jar FILE wpimath_jar.cmake DESTINATION share/wpimath)
@@ -96,6 +104,7 @@ if(WITH_JAVA)
     add_dependencies(wpimathjni wpimath_jar)
 
     install(TARGETS wpimathjni EXPORT wpimathjni)
+    export(TARGETS wpimathjni FILE wpimathjni.cmake NAMESPACE wpimathjni::)
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -148,7 +157,11 @@ if(WITH_JAVA_SOURCE)
     set_property(TARGET wpimath_src_jar PROPERTY FOLDER "java")
 endif()
 
-file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
+file(
+    GLOB_RECURSE wpimath_native_src
+    src/main/native/cpp/*.cpp
+    src/main/native/thirdparty/sleipnir/src/*.cpp
+)
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
@@ -157,7 +170,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
-target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS)
+target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
 
 target_compile_features(wpimath PUBLIC cxx_std_20)
 if(MSVC)
@@ -183,6 +196,18 @@ else()
     target_link_libraries(wpimath Eigen3::Eigen)
 endif()
 
+install(
+    DIRECTORY src/main/native/thirdparty/sleipnir/include/
+    DESTINATION "${include_dest}/wpimath"
+)
+target_include_directories(
+    wpimath
+    SYSTEM
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
+)
+
 install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(
     wpimath
@@ -200,6 +225,7 @@ target_include_directories(
 )
 
 install(TARGETS wpimath EXPORT wpimath)
+export(TARGETS wpimath FILE wpimath.cmake NAMESPACE wpimath::)
 
 configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)

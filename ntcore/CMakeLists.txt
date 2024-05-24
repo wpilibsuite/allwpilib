@@ -29,6 +29,7 @@ target_link_libraries(ntcore PUBLIC wpinet wpiutil)
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
 install(TARGETS ntcore EXPORT ntcore)
+export(TARGETS ntcore FILE ntcore.cmake NAMESPACE ntcore::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
 install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
 
@@ -41,7 +42,6 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
 
@@ -59,6 +59,7 @@ if(WITH_JAVA)
         OUTPUT_NAME ntcore
         GENERATE_NATIVE_HEADERS ntcore_jni_headers
     )
+    set_property(TARGET ntcore_jar PROPERTY FOLDER "java")
 
     install_jar(ntcore_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS ntcore_jar FILE ntcore_jar.cmake DESTINATION share/ntcore)
@@ -77,6 +78,7 @@ if(WITH_JAVA)
     add_dependencies(ntcorejni ntcore_jar)
 
     install(TARGETS ntcorejni EXPORT ntcorejni)
+    export(TARGETS ntcorejni FILE ntcorejni.cmake NAMESPACE ntcorejni::)
 endif()
 
 if(WITH_JAVA_SOURCE)

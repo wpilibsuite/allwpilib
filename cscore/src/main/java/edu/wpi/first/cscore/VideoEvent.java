@@ -7,6 +7,7 @@ package edu.wpi.first.cscore;
 /** Video event. */
 @SuppressWarnings("MemberName")
 public class VideoEvent {
+  /** VideoEvent kind. */
   public enum Kind {
     /** Unknown video event. */
     kUnknown(0x0000),
@@ -57,6 +58,11 @@ public class VideoEvent {
       this.value = value;
     }
 
+    /**
+     * Returns the kind value.
+     *
+     * @return The kind value.
+     */
     public int getValue() {
       return value;
     }
@@ -139,39 +145,67 @@ public class VideoEvent {
     this.listener = listener;
   }
 
+  /** The video event kind. */
   public Kind kind;
 
-  // Valid for kSource* and kSink* respectively
+  /**
+   * The source handle.
+   *
+   * <p>Valid for kSource* and kSink* respectively.
+   */
   public int sourceHandle;
 
+  /** The sink handle. */
   public int sinkHandle;
 
-  // Source/sink/property name
+  /** Source/sink/property name. */
   public String name;
 
-  // Fields for kSourceVideoModeChanged event
+  // Fields for kSourceVideoModeChanged event.
+
+  /** New source video mode. */
   public VideoMode mode;
 
-  // Fields for kSourceProperty* events
+  // Fields for kSourceProperty* events.
+
+  /** Source property handle. */
   public int propertyHandle;
 
+  /** Source property kind. */
   public VideoProperty.Kind propertyKind;
 
+  /** Event value. */
   public int value;
 
+  /** Event value as a string. */
   public String valueStr;
 
-  // Listener that was triggered
+  /** Listener that was triggered. */
   public int listener;
 
+  /**
+   * Returns the source associated with the event (if any).
+   *
+   * @return The source associated with the event (if any).
+   */
   public VideoSource getSource() {
     return new VideoSource(CameraServerJNI.copySource(sourceHandle));
   }
 
+  /**
+   * Returns the sink associated with the event (if any).
+   *
+   * @return The sink associated with the event (if any).
+   */
   public VideoSink getSink() {
     return new VideoSink(CameraServerJNI.copySink(sinkHandle));
   }
 
+  /**
+   * Returns the property associated with the event (if any).
+   *
+   * @return The property associated with the event (if any).
+   */
   public VideoProperty getProperty() {
     return new VideoProperty(propertyHandle, propertyKind);
   }

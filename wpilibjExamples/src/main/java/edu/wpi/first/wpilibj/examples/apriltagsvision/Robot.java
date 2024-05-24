@@ -39,8 +39,10 @@ public class Robot extends TimedRobot {
 
   void apriltagVisionThreadProc() {
     var detector = new AprilTagDetector();
-    // look for tag36h11, correct 3 error bits
-    detector.addFamily("tag36h11", 3);
+    // look for tag36h11, correct 1 error bit (hamming distance 1)
+    // hamming 1 allocates 781KB, 2 allocates 27.4 MB, 3 allocates 932 MB
+    // max of 1 recommended for RoboRIO 1, while hamming 2 is feasible on the RoboRIO 2
+    detector.addFamily("tag36h11", 1);
 
     // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000
     // (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)

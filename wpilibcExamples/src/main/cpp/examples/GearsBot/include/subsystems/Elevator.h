@@ -44,7 +44,6 @@ class Elevator : public frc2::PIDSubsystem {
 
  private:
   frc::PWMSparkMax m_motor{5};
-  double m_setpoint = 0;
 
 // Conversion value of potentiometer varies between the real world and
 // simulation

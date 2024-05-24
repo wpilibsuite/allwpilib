@@ -32,7 +32,13 @@ if(WITH_JAVA)
     set_property(TARGET field_images_jar PROPERTY FOLDER "java")
 endif()
 
-generate_resources(src/main/native/resources/edu/wpi/first/fields generated/main/cpp FIELDS fields field_images_resources_src)
+generate_resources(
+    src/main/native/resources/edu/wpi/first/fields
+    generated/main/cpp
+    FIELDS
+    fields
+    field_images_resources_src
+)
 
 add_library(fieldImages src/main/native/cpp/fields.cpp ${field_images_resources_src})
 set_target_properties(fieldImages PROPERTIES DEBUG_POSTFIX "d")
@@ -50,3 +56,6 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/fields>
 )
+
+install(TARGETS fieldImages EXPORT fieldimages)
+export(TARGETS fieldImages FILE fieldimages.cmake NAMESPACE fieldimages::)

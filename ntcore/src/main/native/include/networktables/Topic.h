@@ -396,6 +396,7 @@ class Publisher {
   Publisher() = default;
   explicit Publisher(NT_Publisher handle) : m_pubHandle{handle} {}
 
+  /// NetworkTables handle.
   NT_Publisher m_pubHandle{0};
 };
 

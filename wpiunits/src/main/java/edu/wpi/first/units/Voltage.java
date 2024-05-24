@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import static edu.wpi.first.units.Units.Watts;
+
 /**
  * Unit of electric voltage dimension.
  *
@@ -14,16 +16,31 @@ package edu.wpi.first.units;
  * {@link Units} class.
  */
 public class Voltage extends Unit<Voltage> {
-  Voltage(double baseUnitEquivalent, String name, String symbol) {
-    super(Voltage.class, baseUnitEquivalent, name, symbol);
+  Voltage(Voltage baseUnit, double baseUnitEquivalent, String name, String symbol) {
+    super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
   Voltage(
-      UnaryFunction toBaseConverter, UnaryFunction fromBaseConverter, String name, String symbol) {
-    super(Voltage.class, toBaseConverter, fromBaseConverter, name, symbol);
+      Voltage baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Constructs a unit of power equivalent to this unit of voltage multiplied by another unit of
+   * electrical current. For example, {@code Volts.times(Amps)} will return a unit of power
+   * equivalent to one Watt; {@code Volts.times(Milliams)} will return a unit of power equivalent to
+   * a milliwatt, and so on.
+   *
+   * @param current the current unit to multiply by
+   * @param name the name of the resulting unit of power
+   * @param symbol the symbol used to represent the unit of power
+   * @return the power unit
+   */
   public Power times(Unit<Current> current, String name, String symbol) {
-    return new Power(toBaseUnits(1) * current.toBaseUnits(1), name, symbol);
+    return new Power(Watts, toBaseUnits(1) * current.toBaseUnits(1), name, symbol);
   }
 }
