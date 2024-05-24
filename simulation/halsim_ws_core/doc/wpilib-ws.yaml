@@ -668,7 +668,7 @@ components:
             type: string
             format: "CANDIO:.+"
           data:
-            ref: "#/components/schemas/dioData/properties/data"
+            $ref: "#/components/schemas/dioData/properties/data"
       - properties:
           type:
             type: string
