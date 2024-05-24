@@ -7,30 +7,31 @@
 
 #include "Trigger.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/button/CommandGenericHID.h"
 
 namespace frc2 {
 /**
- * A version of {@link StadiaController} with {@link Trigger} factories for
+ * A version of {@link frc::StadiaController} with {@link Trigger} factories for
  * command-based.
  *
- * @see StadiaController
+ * @see frc::StadiaController
  */
-class CommandStadiaController : public frc::StadiaController {
+class CommandStadiaController : public CommandGenericHID {
  public:
-  using StadiaController::StadiaController;
+  /**
+   * Construct an instance of a controller.
+   *
+   * @param port The port index on the Driver Station that the controller is
+   * plugged into.
+   */
+  explicit CommandStadiaController(int port);
 
   /**
-   * Constructs an event instance around this button's digital signal.
+   * Get the underlying GenericHID object.
    *
-   * @param button the button index
-   * @param loop the event loop instance to attach the event to. Defaults to the
-   * CommandScheduler's default loop.
-   * @return an event instance representing the button's digital signal attached
-   * to the given loop.
+   * @return the wrapped GenericHID object
    */
-  Trigger Button(int button,
-                 frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                            .GetDefaultButtonLoop()) const;
+  frc::StadiaController& GetHID();
 
   /**
    * Constructs an event instance around the left bumper's digital signal.
@@ -197,5 +198,36 @@ class CommandStadiaController : public frc::StadiaController {
   Trigger RightTrigger(
       frc::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+  /**
+   * Get the X axis value of left side of the controller.
+   *
+   * @return the axis value
+   */
+  double GetLeftX() const;
+
+  /**
+   * Get the X axis value of right side of the controller.
+   *
+   * @return the axis value
+   */
+  double GetRightX() const;
+
+  /**
+   * Get the Y axis value of left side of the controller.
+   *
+   * @return the axis value
+   */
+  double GetLeftY() const;
+
+  /**
+   * Get the Y axis value of right side of the controller.
+   *
+   * @return the axis value
+   */
+  double GetRightY() const;
+
+ private:
+  frc::StadiaController m_hid;
 };
 }  // namespace frc2
