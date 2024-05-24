@@ -90,12 +90,7 @@ jobs:
             build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
-<<<<<<< ci-windows-build-dir
-          - os: macOS-12
-=======
-            build-dir: "c:\\work"
           - os: macOS-14
->>>>>>> main
             artifact-name: macOS
             architecture: aarch64
             task: "build"
