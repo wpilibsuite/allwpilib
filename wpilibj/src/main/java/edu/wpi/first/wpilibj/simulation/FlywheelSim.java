@@ -39,16 +39,9 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
       MutableMeasure.zero(RadiansPerSecondPerSecond);
 
   /**
-   * Creates a simulated flywheel mechanism.
-   * Some derivations 
-   * a = A x + B u
-   * and 
-   * a = ((-G² * K_t) / (K_v * R * J)) x + ((G * K_t) / (R * J)) u
-   * A = (-G² * K_t) / (K_v * R * J)
-   * B = (G * K_t) / (R * J)
-   * so J = (G K_t) / (R B)
-   * A / B = (-G) / K_v
-   * G = - A * K_v / B
+   * Creates a simulated flywheel mechanism. Some derivations a = A x + B u and a = ((-G² * K_t) /
+   * (K_v * R * J)) x + ((G * K_t) / (R * J)) u A = (-G² * K_t) / (K_v * R * J) B = (G * K_t) / (R *
+   * J) so J = (G K_t) / (R B) A / B = (-G) / K_v G = - A * K_v / B
    *
    * @param plant The linear system that represents the flywheel. Use either {@link
    *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants

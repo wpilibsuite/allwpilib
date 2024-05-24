@@ -11,9 +11,9 @@
 using namespace frc;
 using namespace frc::sim;
 
-// Some derivations 
+// Some derivations
 // a = A x + B u
-// and 
+// and
 // a = ((-G² * K_t) / (K_v * R * J)) x + ((G * K_t) / (R * J)) u
 // A = (-G² * K_t) / (K_v * R * J)
 // B = (G * K_t) / (R * J)
