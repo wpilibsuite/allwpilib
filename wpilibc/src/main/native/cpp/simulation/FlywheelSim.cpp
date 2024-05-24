@@ -11,20 +11,28 @@
 using namespace frc;
 using namespace frc::sim;
 
-// Some derivations
-// a = A x + B u
-// and
-// a = ((-G² * K_t) / (K_v * R * J)) x + ((G * K_t) / (R * J)) u
-// A = (-G² * K_t) / (K_v * R * J)
-// B = (G * K_t) / (R * J)
-// so J = (G K_t) / (R B)
-// A / B = (-G) / K_v
-// G = - A * K_v / B
 FlywheelSim::FlywheelSim(const LinearSystem<1, 1, 1>& plant,
                          const DCMotor& gearbox,
                          const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim<1, 1, 1>(plant, measurementStdDevs),
       m_gearbox(gearbox),
+      // By theorem 6.10.1 of
+      // https://file.tavsys.net/control/controls-engineering-in-frc.pdf, the
+      // flywheel state-space model is:
+      //
+      //   dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
+      //   A = -G²Kₜ/(KᵥRJ)
+      //   B = GKₜ/(RJ)
+      //
+      // Solve for G.
+      //
+      //   A/B = -G/Kᵥ
+      //   G = -KᵥA/B
+      //
+      // Solve for J.
+      //
+      //   B = GKₜ/(RJ)
+      //   J = GKₜ/(RB)
       m_gearing(-gearbox.Kv.value() * m_plant.A(0, 0) / m_plant.B(0, 0)),
       m_j(m_gearing * gearbox.Kt.value() /
           (gearbox.R.value() * m_plant.B(0, 0))) {}

@@ -52,16 +52,24 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   public FlywheelSim(
       LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
-    // Some derivations
-    // a = A x + B u
-    // and
-    // a = ((-G² * K_t) / (K_v * R * J)) x + ((G * K_t) / (R * J)) u
-    // A = (-G² * K_t) / (K_v * R * J)
-    // B = (G * K_t) / (R * J)
-    // so J = (G K_t) / (R B)
-    // A / B = (-G) / K_v
-    // G = - A * K_v / B
     m_gearbox = gearbox;
+
+    // By theorem 6.10.1 of https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
+    // the flywheel state-space model is:
+    //
+    //   dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
+    //   A = -G²Kₜ/(KᵥRJ)
+    //   B = GKₜ/(RJ)
+    //
+    // Solve for G.
+    //
+    //   A/B = -G/Kᵥ
+    //   G = -KᵥA/B
+    //
+    // Solve for J.
+    //
+    //   B = GKₜ/(RJ)
+    //   J = GKₜ/(RB)
     m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0);
     m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(0, 0));
   }
