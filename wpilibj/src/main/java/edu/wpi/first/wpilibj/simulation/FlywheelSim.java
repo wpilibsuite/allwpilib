@@ -39,7 +39,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
       MutableMeasure.zero(RadiansPerSecondPerSecond);
 
   /**
-   * Creates a simulated flywheel mechanism. 
+   * Creates a simulated flywheel mechanism.
    *
    * @param plant The linear system that represents the flywheel. Use either {@link
    *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants
