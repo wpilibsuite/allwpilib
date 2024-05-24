@@ -261,12 +261,14 @@ C++/Java implementation note: these are created as SimDevice nodes where the dev
 
 Only one of ``"supplyCurrent"`` or ``"motorCurrent"`` should be sent by the hardware; the other value should be set to zero.  If ``"busVoltage"`` is not simulated it should also be set to zero.
 
-| Data Key             | Type             | Description                                      |
-| -------------------- | ---------------- | ------------------------------------------------ |
-| ``"<percentOutput"`` | Integer or Float | Percent output (-1 to 1 range)                   |
-| ``">supplyCurrent"`` | Float            | The supply current in amps as simulated/measured |
-| ``">motorCurrent"``  | Float            | The motor current in amps as simulated/measured  |
-| ``">busVoltage"``    | Float            | The bus voltage as simulated/measured            |
+| Data Key             | Type             | Description                                                                         |
+| -------------------- | ---------------- | ----------------------------------------------------------------------------------- |
+| ``"<percentOutput"`` | Integer or Float | Percent output (-1 to 1 range)                                                      |
+| ``"<brakeMode"``     | Boolean          | Whether to brake (true) or coast (false) when `\|percentOutput\| < neutralDeadband` |
+| `"<neutralDeadband"` | Float            | `\|percentOutput\|` below which `brakeMode` matters (0 to 1)                        |
+| ``">supplyCurrent"`` | Float            | The supply current in amps as simulated/measured                                    |
+| ``">motorCurrent"``  | Float            | The motor current in amps as simulated/measured                                     |
+| ``">busVoltage"``    | Float            | The bus voltage as simulated/measured                                               |
 
 #### CANEncoder
 

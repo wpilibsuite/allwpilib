@@ -229,6 +229,16 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
                             Requirements requirements = {}) &&;
 
   /**
+   * Decorates this command with another command to run before this command
+   * starts.
+   *
+   * @param before the command to run before this one
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr BeforeStarting(CommandPtr&& before) &&;
+
+  /**
    * Decorates this command with a runnable to run after the command finishes.
    *
    * @param toRun the Runnable to run
@@ -238,6 +248,17 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   [[nodiscard]]
   CommandPtr AndThen(std::function<void()> toRun,
                      Requirements requirements = {}) &&;
+
+  /**
+   * Decorates this command with a set of commands to run after it in sequence.
+   * Often more convenient/less-verbose than constructing a
+   * SequentialCommandGroup explicitly.
+   *
+   * @param next the commands to run next
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr AndThen(CommandPtr&& next) &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -287,6 +308,40 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    */
   [[nodiscard]]
   CommandPtr OnlyIf(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command with a set of commands to run parallel to it, ending
+   * when the calling command ends and interrupting all the others. Often more
+   * convenient/less-verbose than constructing a new {@link
+   * ParallelDeadlineGroup} explicitly.
+   *
+   * @param parallel the commands to run in parallel. Note the parallel commands
+   * will be interupted when the deadline command ends
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr DeadlineFor(CommandPtr&& parallel) &&;
+  /**
+   * Decorates this command with a set of commands to run parallel to it, ending
+   * when the last command ends. Often more convenient/less-verbose than
+   * constructing a new {@link ParallelCommandGroup} explicitly.
+   *
+   * @param parallel the commands to run in parallel
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr AlongWith(CommandPtr&& parallel) &&;
+
+  /**
+   * Decorates this command with a set of commands to run parallel to it, ending
+   * when the first command ends. Often more convenient/less-verbose than
+   * constructing a new {@link ParallelRaceGroup} explicitly.
+   *
+   * @param parallel the commands to run in parallel
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr RaceWith(CommandPtr&& parallel) &&;
 
   /**
    * Decorates this command to run or stop when disabled.
