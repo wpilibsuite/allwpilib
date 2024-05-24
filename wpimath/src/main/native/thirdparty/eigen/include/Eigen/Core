@@ -404,6 +404,7 @@ using std::ptrdiff_t;
 #endif
 
 #include "src/Core/GlobalFunctions.h"
+#include "src/Core/DeviceWrapper.h"
 // IWYU pragma: end_exports
 
 #include "src/Core/util/ReenableStupidWarnings.h"

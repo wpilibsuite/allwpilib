@@ -42,7 +42,6 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
 
@@ -60,6 +59,7 @@ if(WITH_JAVA)
         OUTPUT_NAME ntcore
         GENERATE_NATIVE_HEADERS ntcore_jni_headers
     )
+    set_property(TARGET ntcore_jar PROPERTY FOLDER "java")
 
     install_jar(ntcore_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS ntcore_jar FILE ntcore_jar.cmake DESTINATION share/ntcore)

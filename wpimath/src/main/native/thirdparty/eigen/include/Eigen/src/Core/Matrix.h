@@ -125,7 +125,7 @@ struct traits<Matrix<Scalar_, Rows_, Cols_, Options_, MaxRows_, MaxCols_>> {
  * coefficients.</dd>
  *
  * <dt><b>\anchor fixedsize Fixed-size versus dynamic-size:</b></dt>
- * <dd>Fixed-size means that the numbers of rows and columns are known are compile-time. In this case, Eigen allocates
+ * <dd>Fixed-size means that the numbers of rows and columns are known at compile-time. In this case, Eigen allocates
  * the array of coefficients as a fixed-size array, as a class member. This makes sense for very small matrices,
  * typically up to 4x4, sometimes up to 16x16. Larger matrices should be declared as dynamic-size even if one happens to
  * know their size at compile-time.
@@ -139,7 +139,7 @@ struct traits<Matrix<Scalar_, Rows_, Cols_, Options_, MaxRows_, MaxCols_>> {
  * <dt><b>\anchor maxrows MaxRows_ and MaxCols_:</b></dt>
  * <dd>In most cases, one just leaves these parameters to the default values.
  * These parameters mean the maximum size of rows and columns that the matrix may have. They are useful in cases
- * when the exact numbers of rows and columns are not known are compile-time, but it is known at compile-time that they
+ * when the exact numbers of rows and columns are not known at compile-time, but it is known at compile-time that they
  * cannot exceed a certain value. This happens when taking dynamic-size blocks inside fixed-size matrices: in this case
  * MaxRows_ and MaxCols_ are the dimensions of the original matrix, while Rows_ and Cols_ are Dynamic.</dd>
  * </dl>
