@@ -581,7 +581,7 @@ components:
           properties:
             <init:
               type: boolean
-              description: "If CANMotor is initialized in the robot program"
+              description: "If CANEncoder is initialized in the robot program"
             ">position":
               type: number
               description: "Position in rotations"
