@@ -11,11 +11,28 @@
 
 namespace frc {
 
+/** Simulation class for Sharp IR sensors. */
 class SharpIRSim {
  public:
+  /**
+   * Constructor.
+   *
+   * @param sharpIR The real sensor to simulate
+   */
   explicit SharpIRSim(const SharpIR& sharpIR);
+
+  /**
+   * Constructor.
+   *
+   * @param channel Analog channel for this sensor
+   */
   explicit SharpIRSim(int channel);
 
+  /**
+   * Set range.
+   *
+   * @param rng range
+   */
   void SetRange(units::centimeter_t rng);
 
  private:
