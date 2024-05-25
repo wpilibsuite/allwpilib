@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
-public class RapidReactCommandBot {
+public class RapidReactCommandBot implements AutoCloseable {
   // The robot's subsystems
   private final Drive m_drive = new Drive();
   private final Intake m_intake = new Intake();
@@ -87,5 +87,14 @@ public class RapidReactCommandBot {
     return m_drive
         .driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed)
         .withTimeout(AutoConstants.kTimeoutSeconds);
+  }
+
+  @Override
+  public void close() {
+    m_drive.close();
+    m_intake.close();
+    m_storage.close();
+    m_shooter.close();
+    m_pneumatics.close();
   }
 }

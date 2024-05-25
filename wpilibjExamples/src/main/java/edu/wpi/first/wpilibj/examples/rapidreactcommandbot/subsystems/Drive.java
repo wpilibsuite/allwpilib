@@ -10,10 +10,11 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
 
-public class Drive extends SubsystemBase {
+public class Drive extends SubsystemBase implements AutoCloseable {
   // The motors on the left side of the drive.
   private final PWMSparkMax m_leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
   private final PWMSparkMax m_leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
@@ -93,5 +94,37 @@ public class Drive extends SubsystemBase {
                     >= distanceMeters)
         // Stop the drive when the command ends
         .finallyDo(interrupted -> m_drive.stopMotor());
+  }
+
+  /**
+   * Get the distance measured by the left encoder.
+   *
+   * @return in meters
+   */
+  public double getLeftEncoder() {
+    return m_leftEncoder.getDistance();
+  }
+
+  /**
+   * Get the distance measured by the left encoder.
+   *
+   * @return in meters
+   */
+  public double getRightEncoder() {
+    return m_rightEncoder.getDistance();
+  }
+
+  @Override
+  public void close() {
+    m_leftLeader.close();
+    m_leftFollower.close();
+    m_rightLeader.close();
+    m_rightFollower.close();
+    m_drive.close();
+    m_rightEncoder.close();
+    m_leftEncoder.close();
+    m_leftMotors.close();
+    m_rightMotors.close();
+    CommandScheduler.getInstance().unregisterSubsystem(this);
   }
 }
