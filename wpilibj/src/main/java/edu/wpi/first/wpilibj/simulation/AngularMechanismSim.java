@@ -62,26 +62,25 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
       LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
-    m_gearing = gearbox.KtNMPerAmp * plant.getA(1, 1) / plant.getB(1, 0);
+
+    // By theorem 6.10.1 of https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
+    // the flywheel state-space model is:
+    //
+    //   dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
+    //   A = -G²Kₜ/(KᵥRJ)
+    //   B = GKₜ/(RJ)
+    //
+    // Solve for G.
+    //
+    //   A/B = -G/Kᵥ
+    //   G = -KᵥA/B
+    //
+    // Solve for J.
+    //
+    //   B = GKₜ/(RJ)
+    //   J = GKₜ/(RB)
+    m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(1, 1) / plant.getB(1, 0);
     m_jKgMetersSquared = m_gearing * m_gearbox.KtNMPerAmp / (m_gearbox.rOhms * m_plant.getB(1, 0));
-  }
-
-  /**
-   * Returns the gear ratio of the mechanism.
-   *
-   * @return the mechanism's gear ratio.
-   */
-  public double getGearing() {
-    return m_gearing;
-  }
-
-  /**
-   * Returns the moment of inertia in kilograms meters squared.
-   *
-   * @return The mechanisms's moment of inertia.
-   */
-  public double getJKgMetersSquared() {
-    return m_jKgMetersSquared;
   }
 
   /**
@@ -110,6 +109,33 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
    */
   public void setVelocity(double angularVelocityRadPerSec) {
     setState(VecBuilder.fill(m_x.get(0, 0), angularVelocityRadPerSec));
+  }
+
+  /**
+   * Returns the gear ratio of the mechanism.
+   *
+   * @return the mechanism's gear ratio.
+   */
+  public double getGearing() {
+    return m_gearing;
+  }
+
+  /**
+   * Returns the moment of inertia in kilograms meters squared.
+   *
+   * @return The mechanisms's moment of inertia.
+   */
+  public double getJKgMetersSquared() {
+    return m_jKgMetersSquared;
+  }
+
+  /**
+   * Returns the gearbox for the angular system.
+   *
+   * @return The angular system's gearbox.
+   */
+  public DCMotor getGearBox() {
+    return m_gearbox;
   }
 
   /**
@@ -174,7 +200,8 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
    * @return the mechanism's acceleration in radians per second squared.
    */
   public double getAngularAccelerationRadPerSecSq() {
-    return m_gearbox.KtNMPerAmp * getCurrentDrawAmps() / getJKgMetersSquared();
+    var acceleration = (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u));
+    return acceleration.get(0, 0);
   }
 
   /**

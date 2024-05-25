@@ -208,10 +208,16 @@ public final class LinearSystemId {
       throw new IllegalArgumentException("pivotPositionMeters must be greater than or equal to 0");
     }
 
-    double centerToPivotDistanceMeters = Math.abs((armLengthMeters / 2.0) - pivotPositionMeters);
-    double JKgSquaredMetersCenter = (1.0 / 12.0) * armMassKg * Math.pow(armLengthMeters, 2);
-    double JKgSquareMetersCentralAxisTheorem = armMassKg * Math.pow(centerToPivotDistanceMeters, 2);
-    double JKgSquaredMeters = JKgSquareMetersCentralAxisTheorem + JKgSquaredMetersCenter;
+    // From the central axis theorem the moment of inertia translated
+    // a distance d from the pivot is:
+    //
+    //   J = J_com + 1/2 m * d^2
+    //   J_com = 1/12 m * l^2 for a uniform rod of mass m and length l
+    //   d = |(1/2 L) - p| where p is the pivot location and p >= 0 and p <= l
+
+    double d = Math.abs((armLengthMeters / 2.0) - pivotPositionMeters);
+    double JKgSquaredMetersCenterOfMass = (1.0 / 12.0) * armMassKg * Math.pow(armLengthMeters, 2);
+    double JKgSquaredMeters = JKgSquaredMetersCenterOfMass + armMassKg * Math.pow(d, 2);
     return createAngularSystem(motor, JKgSquaredMeters, gearing);
   }
 

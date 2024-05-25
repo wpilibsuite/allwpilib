@@ -8,18 +8,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import org.junit.jupiter.api.Test;
 
-class DCMotorSimTest {
+class AngularMechanismSimTest {
   @Test
   void testVoltageSteadyState() {
     RoboRioSim.resetData();
 
     DCMotor gearbox = DCMotor.getNEO(1);
-    DCMotorSim sim = new DCMotorSim(gearbox, 1.0, 0.0005);
+    var plant = LinearSystemId.createAngularSystem(gearbox, 0.0005, 1.0);
+    AngularMechanismSim sim = new AngularMechanismSim(plant, gearbox);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1)) {
@@ -59,7 +61,8 @@ class DCMotorSimTest {
     RoboRioSim.resetData();
 
     DCMotor gearbox = DCMotor.getNEO(1);
-    DCMotorSim sim = new DCMotorSim(gearbox, 1.0, 0.0005);
+    var plant = LinearSystemId.createAngularSystem(gearbox, 0.0005, 1.0);
+    AngularMechanismSim sim = new AngularMechanismSim(plant, gearbox);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1);

@@ -16,7 +16,24 @@ AngularMechanismSim::AngularMechanismSim(
     const std::array<double, 2>& measurementStdDevs)
     : LinearSystemSim<2, 1, 2>(plant, measurementStdDevs),
       m_gearbox(gearbox),
-      m_gearing(gearbox.Kt.value() * plant.A(1, 1) / plant.B(1, 0)),
+      // By theorem 6.10.1 of
+      // https://file.tavsys.net/control/controls-engineering-in-frc.pdf, the
+      // flywheel state-space model is:
+      //
+      //   dx/dt = -G²Kₜ/(KᵥRJ)x + (GKₜ)/(RJ)u
+      //   A = -G²Kₜ/(KᵥRJ)
+      //   B = GKₜ/(RJ)
+      //
+      // Solve for G.
+      //
+      //   A/B = -G/Kᵥ
+      //   G = -KᵥA/B
+      //
+      // Solve for J.
+      //
+      //   B = GKₜ/(RJ)
+      //   J = GKₜ/(RB)
+      m_gearing(-gearbox.Kv.value() * plant.A(1, 1) / plant.B(1, 0)),
       m_j(units::kilogram_square_meter_t{
           m_gearing * m_gearbox.Kt.value() /
           (m_gearbox.R.value() * m_plant.B(0, 0))}) {}
@@ -51,7 +68,7 @@ units::radians_per_second_t AngularMechanismSim::GetAngularVelocity() const {
 units::radians_per_second_squared_t
 AngularMechanismSim::GetAngularAcceleration() const {
   return units::radians_per_second_squared_t{
-      m_gearbox.Kt.value() * GetCurrentDraw().value() / GetJ().value()};
+      (m_plant.A() * m_x + m_plant.B() * m_u)(0, 0)};
 }
 
 units::newton_meter_t AngularMechanismSim::GetTorque() const {

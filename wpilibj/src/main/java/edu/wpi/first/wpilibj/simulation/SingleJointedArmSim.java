@@ -69,6 +69,55 @@ public class SingleJointedArmSim extends AngularMechanismSim {
   }
 
   /**
+   * Sets the arm's state. The new angle will be limited between the minimum and maximum allowed
+   * limits.
+   *
+   * @param angleRadians The new angle in radians.
+   * @param velocityRadPerSec The new angular velocity in radians per second.
+   */
+  @Override
+  public final void setState(double angleRadians, double velocityRadPerSec) {
+    setState(
+        VecBuilder.fill(MathUtil.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
+  }
+
+  @Override
+  public void setPosition(double angularPositionRad) {
+    super.setPosition(MathUtil.clamp(angularPositionRad, m_minAngle, m_maxAngle));
+  }
+
+  @Override
+  public double getAngularAccelerationRadPerSecSq() {
+    // The torque on the arm is given by τ = F⋅r, where F is the force applied by
+    // gravity and r the distance from pivot to center of mass. Recall from
+    // dynamics that the sum of torques for a rigid body is τ = J⋅α, were τ is
+    // torque on the arm, J is the mass-moment of inertia about the pivot axis,
+    // and α is the angular acceleration in rad/s². Rearranging yields: α = F⋅r/J
+    //
+    // We substitute in F = m⋅g⋅cos(θ), where θ is the angle from horizontal:
+    //
+    //   α = (m⋅g⋅cos(θ))⋅r/J
+    //
+    // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
+    //
+    //   f(x, u) = Ax + Bu + [0  α]ᵀ
+    //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
+    double a = super.getAngularAccelerationRadPerSecSq();
+    if (m_simulateGravity) {
+      double m = getMassKilograms();
+      double g = -9.8;
+      double l = getArmLengthMeters();
+      double p = getPivotPointMeters();
+      double r = Math.abs((l / 2) - p);
+      double J = getJKgMetersSquared();
+
+      double alphaGrav = (m * g * r / J) * Math.cos(m_x.get(0, 0));
+      a += alphaGrav;
+    }
+    return a;
+  }
+
+  /**
    * Returns the arm length of the system.
    *
    * @return the arm length.
@@ -112,24 +161,6 @@ public class SingleJointedArmSim extends AngularMechanismSim {
   public double getMassKilograms() {
     return getJKgMetersSquared()
         / ((1.0 / 12.0) * Math.pow(m_armLenMeters, 2) + Math.pow(m_pivotPointMeters, 2));
-  }
-
-  /**
-   * Sets the arm's state. The new angle will be limited between the minimum and maximum allowed
-   * limits.
-   *
-   * @param angleRadians The new angle in radians.
-   * @param velocityRadPerSec The new angular velocity in radians per second.
-   */
-  @Override
-  public final void setState(double angleRadians, double velocityRadPerSec) {
-    setState(
-        VecBuilder.fill(MathUtil.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
-  }
-
-  @Override
-  public void setPosition(double angularPositionRad) {
-    super.setPosition(MathUtil.clamp(angularPositionRad, m_minAngle, m_maxAngle));
   }
 
   /**
@@ -200,15 +231,6 @@ public class SingleJointedArmSim extends AngularMechanismSim {
     //
     //   α = (m⋅g⋅cos(θ))⋅r/J
     //
-    // Multiply RHS by cos(θ) to account for the arm angle. Further, we know the
-    // arm mass-moment of inertia J of our arm is given by J=1/3 mL², modeled as a
-    // rod rotating about it's end, where L is the overall rod length. The mass
-    // distribution is assumed to be uniform. Substitute r=L/2 to find:
-    //
-    //   α = (m⋅g⋅cos(θ))⋅r/(1/3 mL²)
-    //   α = (m⋅g⋅cos(θ))⋅(L/2)/(1/3 mL²)
-    //   α = 3/2⋅g⋅cos(θ)/L
-    //
     // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
     //
     //   f(x, u) = Ax + Bu + [0  α]ᵀ
@@ -217,14 +239,16 @@ public class SingleJointedArmSim extends AngularMechanismSim {
     Matrix<N2, N1> updatedXhat =
         NumericalIntegration.rkdp(
             (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
-              double alphaGravConstant =
-                  -9.8
-                      * (3.0 / 2.0)
-                      * Math.abs(1 - 2 * m_pivotPointMeters / m_armLenMeters)
-                      / m_armLenMeters;
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
               if (m_simulateGravity) {
-                double alphaGrav = alphaGravConstant * Math.cos(x.get(0, 0));
+                double m = getMassKilograms();
+                double g = -9.8;
+                double l = getArmLengthMeters();
+                double p = getPivotPointMeters();
+                double r = Math.abs((l / 2) - p);
+                double J = getJKgMetersSquared();
+
+                double alphaGrav = (m * g * r / J) * Math.cos(x.get(0, 0));
                 xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
               }
               return xdot;

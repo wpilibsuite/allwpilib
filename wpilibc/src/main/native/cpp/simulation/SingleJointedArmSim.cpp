@@ -11,6 +11,7 @@
 
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
+#include <units/acceleration.h>
 
 using namespace frc;
 using namespace frc::sim;
@@ -42,6 +43,42 @@ void SingleJointedArmSim::SetPosition(units::radian_t angle) {
       Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), m_x(1, 0)});
 }
 
+units::kilogram_t SingleJointedArmSim::GetMass() const {
+    return units::kilogram_t{GetJ().value() /
+                             ((1.0 / 12.0) * std::pow(m_armLen.value(), 2) +
+                              std::pow(m_pivotPoint.value(), 2))};
+}
+
+units::radians_per_second_squared_t
+SingleJointedArmSim::GetAngularAcceleration() const {
+  // The torque on the arm is given by τ = F⋅r, where F is the force applied by
+  // gravity and r the distance from pivot to center of mass. Recall from
+  // dynamics that the sum of torques for a rigid body is τ = J⋅α, were τ is
+  // torque on the arm, J is the mass-moment of inertia about the pivot axis,
+  // and α is the angular acceleration in rad/s². Rearranging yields: α = F⋅r/J
+  //
+  // We substitute in F = m⋅g⋅cos(θ), where θ is the angle from horizontal:
+  //
+  //   α = (m⋅g⋅cos(θ))⋅r/J
+  //
+  // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
+  //
+  //   f(x, u) = Ax + Bu + [0  α]ᵀ
+  //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
+  units::radians_per_second_squared_t a{
+      (m_plant.A() * m_x + m_plant.B() * m_u)(0, 0)};
+  if (m_simulateGravity) {
+    units::kilogram_t m = GetMass();
+    units::meters_per_second_squared_t g = -9.8_mps_sq;
+    units::meter_t r = units::meter_t{std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
+    units::kilogram_square_meter_t J = GetJ();
+    units::radians_per_second_squared_t alphaGrav = 
+      units::radians_per_second_squared_t{(m.value() * g.value() * r.value() / J.value()) * std::cos(m_x(0))};
+    return a + alphaGrav;
+  }
+  return a;
+}
+
 bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
   return armAngle <= m_minAngle;
 }
@@ -71,15 +108,6 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
   //
   //   α = (m⋅g⋅cos(θ))⋅r/J
   //
-  // Multiply RHS by cos(θ) to account for the arm angle. Further, we know the
-  // arm mass-moment of inertia J of our arm is given by J=1/3 mL², modeled as a
-  // rod rotating about it's end, where L is the overall rod length. The mass
-  // distribution is assumed to be uniform. Substitute r=L/2 to find:
-  //
-  //   α = (m⋅g⋅cos(θ))⋅r/(1/3 mL²)
-  //   α = (m⋅g⋅cos(θ))⋅(L/2)/(1/3 mL²)
-  //   α = 3/2⋅g⋅cos(θ)/L
-  //
   // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
   //
   //   f(x, u) = Ax + Bu + [0  α]ᵀ
@@ -90,10 +118,12 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
         Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
-          double alphaGravConstant =
-              -9.8 * (3.0 / 2.0) *
-              std::abs(1 - 2 * m_pivotPoint.value() / m_armLen.value()) /
-              m_armLen.value();
+          units::kilogram_t m = GetMass();
+          units::meters_per_second_squared_t g = -9.8_mps_sq;
+          units::meter_t r = units::meter_t{std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
+          units::kilogram_square_meter_t J = GetJ();
+          units::radians_per_second_squared_t alphaGravConstant = 
+              units::radians_per_second_squared_t{(m.value() * g.value() * r.value() / J.value()) * std::cos(m_x(0))};
           xdot += Vectord<2>{0.0, (alphaGravConstant * std::cos(x(0)))};
         }
         return xdot;

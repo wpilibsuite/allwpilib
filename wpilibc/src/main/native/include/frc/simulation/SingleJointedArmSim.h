@@ -45,6 +45,7 @@ class SingleJointedArmSim : public AngularMechanismSim {
                       units::radian_t startingAngle,
                       const std::array<double, 2>& measurementStdDevs = {0.0,
                                                                          0.0});
+  using AngularMechanismSim::GetAngularAcceleration;
 
   /**
    * Returns the arm length of the system.
@@ -79,11 +80,14 @@ class SingleJointedArmSim : public AngularMechanismSim {
    *
    * @return the mass.
    */
-  units::kilogram_t GetMass() {
-    return units::kilogram_t{GetJ().value() /
-                             ((1.0 / 12.0) * std::pow(m_armLen.value(), 2) +
-                              std::pow(m_pivotPoint.value(), 2))};
-  }
+  units::kilogram_t GetMass() const;
+
+  /**
+   * Returns the acceleration of the mechanism.
+   *
+   * @return the mechanism's acceleration.
+   */
+  units::radians_per_second_squared_t GetAngularAcceleration() const;
 
   /**
    * Sets the arm's state. The new angle will be limited between the minimum and
