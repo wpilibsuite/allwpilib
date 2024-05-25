@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-public class Storage extends SubsystemBase {
+public class Storage extends SubsystemBase implements AutoCloseable {
   private final PWMSparkMax m_motor = new PWMSparkMax(StorageConstants.kMotorPort);
   private final DigitalInput m_ballSensor = new DigitalInput(StorageConstants.kBallSensorPort);
 
@@ -29,6 +29,12 @@ public class Storage extends SubsystemBase {
 
   /** Returns a command that runs the storage motor indefinitely. */
   public Command runCommand() {
-    return run(() -> m_motor.set(1)).withName("run");
+    return run(() -> m_motor.set(StorageConstants.kStorageDutyCycle)).withName("run");
+  }
+
+  @Override
+  public void close() {
+    m_motor.close();
+    m_ballSensor.close();
   }
 }
