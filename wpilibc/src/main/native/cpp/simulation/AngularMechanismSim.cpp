@@ -33,10 +33,9 @@ AngularMechanismSim::AngularMechanismSim(
       //
       //   B = GKₜ/(RJ)
       //   J = GKₜ/(RB)
-      m_gearing(-gearbox.Kv.value() * plant.A(1, 1) / plant.B(1, 0)),
-      m_j(units::kilogram_square_meter_t{
-          m_gearing * m_gearbox.Kt.value() /
-          (m_gearbox.R.value() * m_plant.B(0, 0))}) {}
+      m_gearing(-gearbox.Kv.value() * m_plant.A(1, 1) / m_plant.B(1, 0)),
+      m_j(m_gearing * gearbox.Kt.value() /
+          (gearbox.R.value() * m_plant.B(1, 0))) {}
 
 units::kilogram_square_meter_t AngularMechanismSim::GetJ() const {
   return m_j;

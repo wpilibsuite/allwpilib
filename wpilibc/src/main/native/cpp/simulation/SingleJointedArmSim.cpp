@@ -124,14 +124,13 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
 
         if (m_simulateGravity) {
           units::kilogram_t m = GetMass();
-          units::meters_per_second_squared_t g = -9.8_mps_sq;
           units::meter_t r = units::meter_t{
               std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
           units::kilogram_square_meter_t J = GetJ();
           units::radians_per_second_squared_t alphaGravConstant =
               units::radians_per_second_squared_t{
-                  (m.value() * g.value() * r.value() / J.value())};
-          xdot += Vectord<2>{0.0, (alphaGravConstant.value() * std::cos(x(0)))};
+                  (m.value() * -9.8 * r.value() / J.value()) * std::cos(x(0))};
+          xdot += Vectord<2>{0.0, alphaGravConstant.value()};
         }
         return xdot;
       },
