@@ -242,18 +242,15 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
 }  // namespace cs
 
 extern "C" {
-void CS_SetSinkDescription(CS_Sink sink, const char* description,
+void CS_SetSinkDescription(CS_Sink sink, const struct WPI_String* description,
                            CS_Status* status) {
-  return cs::SetSinkDescription(sink, description, status);
+  return cs::SetSinkDescription(sink, wpi::to_string_view(description), status);
 }
 
-char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {
+void CS_GetSinkError(CS_Sink sink, struct WPI_String* error,
+                     CS_Status* status) {
   wpi::SmallString<128> buf;
-  auto str = cs::GetSinkError(sink, buf, status);
-  if (*status != 0) {
-    return nullptr;
-  }
-  return cs::ConvertToC(str);
+  cs::ConvertToC(error, cs::GetSinkError(sink, buf, status));
 }
 
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status) {

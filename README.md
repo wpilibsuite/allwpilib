@@ -60,7 +60,7 @@ On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be ab
 
 ## Setup
 
-Clone the WPILib repository and follow the instructions above for installing any required tooling.
+Clone the WPILib repository and follow the instructions above for installing any required tooling. The build process uses versioning information from git. Downloading the source is not sufficient to run the build.
 
 See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions.
 
