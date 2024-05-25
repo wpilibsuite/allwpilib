@@ -43,7 +43,7 @@ class Arm {
   frc::PWMSparkMax m_motor{kMotorPort};
 
   // Simulation classes help us simulate what's going on, including gravity.
-  // This sim represents an arm with 2 775s, a 600:1 reduction, a mass of 5kg,
+  // This sim represents an arm with 2 775s, a 200:1 reduction, a mass of 8kg,
   // 30in overall arm length, range of motion in [-75, 255] degrees, and noise
   // with a standard deviation of 1 encoder tick.
   frc::LinearSystem<2, 1, 2> system =

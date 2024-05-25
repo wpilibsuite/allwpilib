@@ -28,8 +28,12 @@ SingleJointedArmSim::SingleJointedArmSim(
       m_pivotPoint(pivotPoint),
       m_minAngle(minAngle),
       m_maxAngle(maxAngle),
-      m_gearbox(gearbox),
-      m_simulateGravity(simulateGravity) {
+      m_simulateGravity(simulateGravity),
+      m_distanceToPivot(units::meter_t{
+          std::abs((1.0 / 2.0) * m_armLen.value() - m_pivotPoint.value())}),
+      m_mass(units::kilogram_t{GetJ().value() /
+                               ((1.0 / 12.0) * std::pow(m_armLen.value(), 2) +
+                                std::pow(m_distanceToPivot.value(), 2))}) {
   SetState(startingAngle, 0_rad_per_s);
 }
 
@@ -42,14 +46,6 @@ void SingleJointedArmSim::SetState(units::radian_t angle,
 void SingleJointedArmSim::SetPosition(units::radian_t angle) {
   AngularMechanismSim::SetState(
       Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), m_x(1, 0)});
-}
-
-units::kilogram_t SingleJointedArmSim::GetMass() const {
-  units::meter_t r =
-      units::meter_t{std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
-  return units::kilogram_t{GetJ().value() /
-                           ((1.0 / 12.0) * std::pow(r.value(), 2) +
-                            std::pow(m_pivotPoint.value(), 2))};
 }
 
 units::radians_per_second_squared_t
@@ -71,14 +67,10 @@ SingleJointedArmSim::GetAngularAcceleration() const {
   units::radians_per_second_squared_t a{
       (m_plant.A() * m_x + m_plant.B() * m_u)(1, 0)};
   if (m_simulateGravity) {
-    units::kilogram_t m = GetMass();
-    units::meters_per_second_squared_t g = -9.8_mps_sq;
-    units::meter_t r = units::meter_t{
-        std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
-    units::kilogram_square_meter_t J = GetJ();
     units::radians_per_second_squared_t alphaGrav =
         units::radians_per_second_squared_t{
-            (m.value() * g.value() * r.value() / J.value()) * std::cos(m_x(0))};
+            (m_mass.value() * -9.8 * m_distanceToPivot.value() / m_j.value()) *
+            std::cos(m_x(0))};
     return a + alphaGrav;
   }
   return a;
@@ -123,14 +115,11 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
         Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
-          units::kilogram_t m = GetMass();
-          units::meter_t r = units::meter_t{
-              std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
-          units::kilogram_square_meter_t J = GetJ();
           units::radians_per_second_squared_t alphaGravConstant =
               units::radians_per_second_squared_t{
-                  (m.value() * -9.8 * r.value() / J.value()) * std::cos(x(0))};
-          xdot += Vectord<2>{0.0, alphaGravConstant.value()};
+                  (m_mass.value() * -9.8 * m_distanceToPivot.value() /
+                   m_j.value())};
+          xdot += Vectord<2>{0.0, alphaGravConstant.value() * std::cos(x(0))};
         }
         return xdot;
       },

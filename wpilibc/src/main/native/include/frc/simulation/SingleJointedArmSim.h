@@ -80,7 +80,7 @@ class SingleJointedArmSim : public AngularMechanismSim {
    *
    * @return the mass.
    */
-  units::kilogram_t GetMass() const;
+  units::kilogram_t GetMass() const { return m_mass; }
 
   /**
    * Returns the acceleration of the mechanism.
@@ -166,7 +166,8 @@ class SingleJointedArmSim : public AngularMechanismSim {
   units::meter_t m_pivotPoint;
   units::radian_t m_minAngle;
   units::radian_t m_maxAngle;
-  const DCMotor m_gearbox;
   bool m_simulateGravity;
+  units::meter_t m_distanceToPivot;
+  units::kilogram_t m_mass;
 };
 }  // namespace frc::sim

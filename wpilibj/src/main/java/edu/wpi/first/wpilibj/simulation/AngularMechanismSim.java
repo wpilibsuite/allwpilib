@@ -24,13 +24,13 @@ import edu.wpi.first.wpilibj.RobotController;
 /** Represents a simulated angular mechanism controlled by a DC motor. */
 public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the DC motor.
-  private final DCMotor m_gearbox;
+  protected final DCMotor m_gearbox;
 
   // The gearing from the motors to the output.
-  private final double m_gearing;
+  protected final double m_gearing;
 
   // The moment of inertia of the mechanism.
-  private final double m_jKgMetersSquared;
+  protected final double m_jKgMetersSquared;
 
   // The angular position of the system.
   private final MutableMeasure<Angle> m_angle = MutableMeasure.zero(Radians);

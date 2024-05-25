@@ -31,6 +31,12 @@ public class SingleJointedArmSim extends AngularMechanismSim {
   // Whether the simulator should simulate gravity.
   private final boolean m_simulateGravity;
 
+  // The mass of the arm
+  private final double m_massKg;
+
+  // The distance from the center of mass to the pivot point
+  private final double m_distanceToPivotMeter;
+
   /**
    * Creates a simulated arm mechanism.
    *
@@ -64,6 +70,10 @@ public class SingleJointedArmSim extends AngularMechanismSim {
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
     m_simulateGravity = simulateGravity;
+    m_distanceToPivotMeter = Math.abs((1.0 / 2.0) * m_armLenMeters - m_pivotPointMeters);
+    m_massKg =
+        m_jKgMetersSquared
+            / ((1.0 / 12.0) * Math.pow(m_armLenMeters, 2) + Math.pow(m_distanceToPivotMeter, 2));
 
     setState(startingAngleRads, 0.0);
   }
@@ -104,14 +114,8 @@ public class SingleJointedArmSim extends AngularMechanismSim {
     //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
     double a = super.getAngularAccelerationRadPerSecSq();
     if (m_simulateGravity) {
-      double m = getMassKilograms();
-      double g = -9.8;
-      double l = getArmLengthMeters();
-      double p = getPivotPointMeters();
-      double r = Math.abs((l / 2) - p);
-      double J = getJKgMetersSquared();
-
-      double alphaGrav = (m * g * r / J) * Math.cos(m_x.get(0, 0));
+      double alphaGrav =
+          (m_massKg * -9.8 * m_distanceToPivotMeter / m_jKgMetersSquared) * Math.cos(m_x.get(0, 0));
       a += alphaGrav;
     }
     return a;
@@ -159,10 +163,7 @@ public class SingleJointedArmSim extends AngularMechanismSim {
    * @return the mass.
    */
   public double getMassKilograms() {
-    double l = getArmLengthMeters();
-    double p = getPivotPointMeters();
-    double r = Math.abs((l / 2) - p);
-    return getJKgMetersSquared() / ((1.0 / 12.0) * Math.pow(m_armLenMeters, 2) + Math.pow(r, 2));
+    return m_massKg;
   }
 
   /**
@@ -243,14 +244,9 @@ public class SingleJointedArmSim extends AngularMechanismSim {
             (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
               if (m_simulateGravity) {
-                double m = getMassKilograms();
-                double g = -9.8;
-                double l = getArmLengthMeters();
-                double p = getPivotPointMeters();
-                double r = Math.abs((l / 2) - p);
-                double J = getJKgMetersSquared();
-
-                double alphaGrav = (m * g * r / J) * Math.cos(x.get(0, 0));
+                double alphaGrav =
+                    (m_massKg * -9.8 * m_distanceToPivotMeter / m_jKgMetersSquared)
+                        * Math.cos(x.get(0, 0));
                 xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
               }
               return xdot;

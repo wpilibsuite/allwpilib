@@ -127,7 +127,7 @@ class AngularMechanismSim : public LinearSystemSim<2, 1, 2> {
    */
   units::volt_t GetInputVoltage() const;
 
- private:
+ protected:
   DCMotor m_gearbox;
   double m_gearing;
   units::kilogram_square_meter_t m_j;
