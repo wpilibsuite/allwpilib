@@ -1,31 +1,41 @@
 # WPILib CMake Support
 
-WPILib is normally built with Gradle, however for some systems, such as Linux based coprocessors, Gradle doesn't work correctly, especially if cscore is needed, which requires OpenCV. Furthermore, the CMake build can be used for C++ development because it provides better build caching compared to Gradle. We provide the CMake build for these cases. Although it is supported on Windows, these docs will only go over Linux builds.
+WPILib is normally built with Gradle, however for some systems, such as Linux based coprocessors, Gradle doesn't work correctly, especially if cscore is needed, which requires OpenCV. Furthermore, the CMake build can be used for C++ development because it provides better build caching compared to Gradle. We provide the CMake build for these cases. Although macOS is supported, these docs will only go over Linux and Windows builds, but should mostly work for macOS as well. If you are stuck, you can look at the GitHub workflows for any OS to see how it works.
 
 ## Libraries that get built
-* wpiutil
-* ntcore
-* cscore
+* apriltag
 * cameraserver
-* hal
-* wpilib
-* halsim
+* cscore
+* hal (simulation HAL only)
+* ntcore
+* romiVendordep
+* simulation extensions
 * wpigui
-* wpimath
-* wpiunits
+* wpilib (wpilibc, wpilibj, and myRobot)
 * wpilibNewCommands
+* wpimath
+* wpinet
+* wpiunits
+* wpiutil
+* xrpVendordep
 
-By default, all libraries except for the HAL and WPILib get built with a default CMake setup. The libraries are built as shared libraries, and include the JNI libraries as well as building the Java JARs.
+## GUI apps that get built
+* datalogtool
+* glass
+* outlineviewer
+* roborioteamnumbersetter
+* sysid
+* halsim_gui (if simulation extensions are enabled)
+
+By default, all libraries get built with a default CMake setup. The libraries are built as shared libraries, and include the JNI libraries as well as building the Java JARs. Data Log Tool and the roboRIO Team Number Setter are only built if libssh is available.
 
 ## Prerequisites
 
-The jinja2 pip package is needed to generate classes for NT4's pubsub.
-
-The protobuf library and compiler are needed for protobuf generation. The QuickBuffers protoc-gen package is also required when Java is being built; this can be obtained from https://github.com/HebiRobotics/QuickBuffers/releases/.
+The protobuf library and compiler are needed for protobuf generation.
 
 OpenCV needs to be findable by CMake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build OpenCV from source and install it.
 
-If you want JNI and Java, you will need a JDK of at least version 11 installed. In addition, you need a `JAVA_HOME` environment variable set properly and set to the JDK directory.
+If you want JNI and Java, you will need a JDK of at least version 17 installed. In addition, you need a `JAVA_HOME` environment variable set properly and set to the JDK directory.
 
 If you are building with unit tests or simulation modules, you will also need an Internet connection for the initial setup process, as CMake will clone google-test and imgui from GitHub.
 
@@ -33,34 +43,34 @@ If you are building with unit tests or simulation modules, you will also need an
 
 The following build options are available:
 
-* `WITH_JAVA` (ON Default)
-  * This option will enable Java and JNI builds. If this is on, `WITH_SHARED_LIBS` must be on. Otherwise CMake will error.
-* `WITH_JAVA_SOURCE` (ON Default)
-  * This option will build Java source JARs for each enabled Java library. This does not require `WITH_JAVA` to be on, allowing source JARs to be built without the compiled JARs if desired.
-* `WITH_SHARED_LIBS` (ON Default)
-  * This option will cause cmake to build static libraries instead of shared libraries. If this is off, `WITH_JAVA` must be off. Otherwise CMake will error.
+* `BUILD_SHARED_LIBS` (ON Default)
+  * This option will cause CMake to build static libraries instead of shared libraries. If this is off, `WITH_JAVA` must be off. Otherwise CMake will error.
 * `WITH_CSCORE` (ON Default)
-  * This option will cause cscore to be built. Turning this off will implicitly disable cameraserver, the hal and wpilib as well, irrespective of their specific options. If this is off, the OpenCV build requirement is removed.
+  * This option will cause cscore to be built. Turning this off will implicitly disable cameraserver. If this is off, the OpenCV build requirement is removed.
+* `WITH_EXAMPLES` (OFF Default)
+  * This option will build C++ examples.
+* `WITH_GUI` (ON Default)
+  * This option will build GUI items. If this is off, and `WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built.
+* `WITH_JAVA` (ON Default)
+  * This option will enable Java and JNI builds. If this is on, `BUILD_SHARED_LIBS` must be on. Otherwise CMake will error.
+* `WITH_JAVA_SOURCE` (`WITH_JAVA` Default)
+  * This option will build Java source JARs for each enabled Java library. This does not require `WITH_JAVA` to be on, allowing source JARs to be built without the compiled JARs if desired.
 * `WITH_NTCORE` (ON Default)
-  * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet and wpilib as well, irrespective of their specific options.
+  * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet, and will cause an error if `WITH_WPILIB` is enabled.
+* `WITH_SIMULATION_MODULES` (ON Default)
+  * This option will build simulation modules.
+* `WITH_TESTS` (ON Default)
+  * This option will build C++ unit tests. These can be run via `ctest -C <config>`, where `<config>` is the build configuration, e.g. `Debug` or `Release`.
+* `WITH_WPILIB` (ON Default)
+  * This option will build the HAL and wpilibc/j during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for the roboRIO.
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
 * `WITH_WPIUNITS` (ON Default)
   * This option will build the wpiunits library. This option must be on to build the Java wpimath library and requires `WITH_JAVA` to also be on.
-* `WITH_WPILIB` (ON Default)
-  * This option will build the hal and wpilibc/j during the build. The HAL is the simulator hal, unless the external hal options are used. The cmake build has no capability to build for the RoboRIO.
-* `WITH_EXAMPLES` (ON Default)
-  * This option will build C++ examples.
-* `WITH_TESTS` (ON Default)
-  * This option will build C++ unit tests. These can be run via `make test`.
-* `WITH_GUI` (ON Default)
-  * This option will build GUI items.
-* `WITH_SIMULATION_MODULES` (ON Default)
-  * This option will build simulation modules, including wpigui and the HALSim plugins.
 * `WITH_EXTERNAL_HAL` (OFF Default)
-  * TODO
+  * This option will build wpilib with an externally built HAL.
 * `EXTERNAL_HAL_FILE`
-  * TODO
+  * Set this option to the CMake File of the externally built HAL. NOTE: set it to the file itself, not the folder the file is located in!
 * `OPENCV_JAVA_INSTALL_DIR`
   * Set this option to the location of the archive of the OpenCV Java bindings (it should be called opencv-xxx.jar, with the x'es being version numbers). NOTE: set it to the LOCATION of the file, not the file itself!
 * `NO_WERROR` (OFF Default)
@@ -78,24 +88,28 @@ cmake path/to/allwpilib/root
 
 If you want to change any of the options, add `-DOPTIONHERE=VALUE` to the `cmake` command. This will check for any dependencies. If everything works properly this will succeed. If not, please check out the troubleshooting section for help.
 
-If you want, you can also use `ccmake` in order to visually set these properties as well. [Here](https://cmake.org/cmake/help/v3.0/manual/ccmake.1.html) is the link to the documentation for that program.
+If you want, you can also use `ccmake` in order to visually set these properties as well. [Here](https://cmake.org/cmake/help/v3.0/manual/ccmake.1.html) is the link to the documentation for that program. On Windows, you can use `cmake-gui` instead.
+
+Note that if you are cross-compiling, you will need to override the protobuf options manually to point to the libraries for the target platform. Leave the protoc binary location as the path to the binary for the host platform, since protoc needs to execute on the host platform.
 
 ## Building
 
-Once you have cmake setup. run `make` from the directory you configured CMake in. This will build all libraries possible. If you have a multicore system, we recommend running `make` with multiple jobs. The usual rule of thumb is 1.5x the number of cores you have. To run a multiple job build, run the following command with x being the number of jobs you want.
+Once you have CMake setup. run `cmake --build .` from the directory you configured CMake in. This will build all libraries possible. We recommend running `cmake --build .` with multiple jobs. For allwpilib, a good rule of thumb is one worker for every 2 GB of available RAM. To run a multiple job build, run the following command with x being the number of jobs you want.
 
 ```
-make -jx
+cmake --build . --parallel x
 ```
 
-The `ninja` generator is also supported, and can be enabled by passing `-GNinja` to the initial `cmake` command.
+Note: wpimath takes gigabytes of RAM to compile. Because of this, the compilers may crash while building due to a lack of memory and your computer may slow down. If you have less than 16 GB of RAM available, you may want to consider building it separately first by adding `--target wpimath` and running it with ~3 jobs to prevent crashes from running out of memory.
+
+To build with a certain configuration, like `Debug` or `Release`, add `--config <config>`, where `<config>` is the name of the configuration you want to build with.
 
 ## Installing
 
-After build, the easiest way to use the libraries is to install them. Run the following command to install the libraries. This will install them so that they can be used from external cmake projects.
+After build, the easiest way to use the libraries is to install them. Run the following command to install the libraries. This will install them so that they can be used from external CMake projects.
 
 ```
-sudo make install
+sudo cmake --build . --target install
 ```
 
 ## Using the installed libraries for C++.
@@ -104,7 +118,7 @@ Using the libraries from C++ is the easiest way to use the built libraries.
 
 To do so, create a new folder to contain your project. Add the following code below to a `CMakeLists.txt` file in that directory.
 
-```
+```cmake
 cmake_minimum_required(VERSION 3.11)
 project(vision_app) # Project Name Here
 
@@ -114,7 +128,7 @@ add_executable(my_vision_app main.cpp) # executable name as first parameter
 target_link_libraries(my_vision_app cameraserver ntcore cscore wpiutil)
 ```
 
-If you are using them, `wpilibc` and `hal` should be added before the `cameraserver` declaration in the `target_link_libraries` function.
+If you want to use other libraries or are building a robot program, `wpilibc` and `hal` should be added in the `target_link_libraries` function, along with any other libraries you plan on using, e.g. `wpimath`.
 
 Add a `main.cpp` file to contain your code, and create a build folder. Move into the build folder, and run
 
@@ -122,11 +136,43 @@ Add a `main.cpp` file to contain your code, and create a build folder. Move into
 cmake /path/to/folder/containing/CMakeLists
 ```
 
-After that, run `make`. That will create your executable. Then you should be able to run `./my_vision_app` to run your application.
+After that, run `cmake --build .`. That will create your executable. Then you should be able to run `./my_vision_app` to run your application.
 
 
 ## Using the installed libraries for Java
-TODO
+
+Using the built JARs is move involved than using the C++ libraries, but mostly consists of adding the correct directories to PATH.
+
+Add the directory where the JARs are located (e.g, `/usr/local/java`) to PATH. If you are on Windows, you also need to add the `lib`, `bin`, and `share` directories to PATH. Then, create a new folder to contain your project. Add the following code below to a `CMakeLists.txt` file in that directory.
+
+```cmake
+cmake_minimum_required(VERSION 3.11)
+project(robot)
+
+find_package(Java REQUIRED COMPONENTS Development)
+include(UseJava)
+find_package(wpilib REQUIRED)
+find_jar(opencvJar opencv-xxx PATHS ENV PATH) # Change to OpenCV version
+
+file(GLOB_RECURSE JAVA_SOURCES *.java)
+# If you want Gradle compatibility or you are using one of the templates/examples, comment out the above line and uncomment this line instead:
+# file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+add_jar(robot ${JAVA_SOURCES}
+    INCLUDE_JARS apriltag_jar cscore_jar hal_jar ntcore_jar wpilibNewCommands_jar wpimath_jar wpinet_jar wpiutil_jar wpiunits_jar wpilibj_jar ${opencvJar})
+export_jars(TARGETS robot FILE robot.jar)
+```
+This includes all the built JARs except for the vendordeps. If you are not using a JAR/library, you may remove it.
+Add a `Main.java` file to contain your code, and create a build folder. Move into the build folder, and run
+
+```
+cmake /path/to/folder/containing/CMakeLists
+```
+
+After that, run `cmake --build .` to create your JAR file. To execute the JAR file, you need to include the wpilib JARs and your JAR in the classpath, and execute your Java program's entry point. If you are using cscore or cameraserver, you also need to include the path to the OpenCV JAR. If you built it from source, it will be in your OpenCV build directory. If it's installed on the system, CMake may find it from PATH, but you will likely need to locate the JAR and manually give CMake the JAR directory. If you are on Linux, you will also need to add the path of the libraries to `LD_LIBRARY_PATH`. This can be done by prepending `LD_LIBRARY_PATH=/path/to/libraries` to the Java command. If you need to add more paths, separate them with colons. The final command should look like `java -cp "robot.jar:/path/to/library_jars/*" main.package.Main`, using a semicolon to separate paths instead of a colon if you are on Windows. If you are on Linux, the final command should look more like `LD_LIBRARY_PATH=/path/to/libraries java -cp robot.jar:/path/to/library_jars/* main.package.Main`.
+
+## Using vendordeps
+
+Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVenderdep`. Note that wpilibNewCommands, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
 
 ## Troubleshooting
 Below are some common issues that are run into when building.
@@ -153,7 +199,7 @@ CMake Error at cscore/CMakeLists.txt:3 (find_package):
   installed.
 ```
 
-If you get that, you need make sure opencv was installed, and then reattempt to configure. If that doesn't work, set the `OpenCV_DIR` variable to the directory where you built OpenCV.
+If you get that, you need make sure OpenCV was installed, and then reattempt to configure. If that doesn't work, set the `OpenCV_DIR` variable to the directory where you built OpenCV.
 
 #### Missing Java
 
@@ -167,3 +213,18 @@ CMake Error at /usr/share/cmake-3.5/Modules/FindPackageHandleStandardArgs.cmake:
 If this happens, make sure you have a JDK of at least version 8 installed, and that your JAVA_HOME variable is set properly to point to the JDK.
 
 In addition, if you do not need Java, you can disable it with `-DWITH_JAVA=OFF`.
+
+#### Java: Can't find dependent libraries
+
+If one of the libraries can't be found, you will get an error similar to this one:
+
+```
+java.io.IOException: wpiHaljni could not be loaded from path or an embedded resource.
+        attempted to load for platform /windows/x86-64/
+Last Load Error:
+C:\Program Files (x86)\allwpilib\bin\wpiHaljni.dll: Can't find dependent libraries
+```
+
+If you get this error, that's usually an indication that not all your libraries are in your PATH. The two libraries that should be in your PATH are OpenCV and protobuf. If the error is coming from cscore, it's likely you're missing OpenCV. Otherwise, it's likely you're missing protobuf.
+
+Note that Linux will not have this specific type of error, as it will usually tell you the dependent library you are missing. In that case, you most likely need to add the library to `LD_LIBRARY_PATH`.

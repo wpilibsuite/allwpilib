@@ -29,15 +29,10 @@ class AprilTagDetectorTest {
   @SuppressWarnings("MemberName")
   AprilTagDetector detector;
 
-  static RuntimeLoader<Core> loader;
-
   @BeforeAll
   static void beforeAll() {
     try {
-      loader =
-          new RuntimeLoader<>(
-              Core.NATIVE_LIBRARY_NAME, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
-      loader.loadLibrary();
+      RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     } catch (IOException ex) {
       fail(ex);
     }
@@ -158,7 +153,7 @@ class AprilTagDetectorTest {
       var estimator =
           new AprilTagPoseEstimator(new AprilTagPoseEstimator.Config(0.2, 500, 500, 320, 240));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
-      assertEquals(new Transform3d(), est.pose2);
+      assertEquals(Transform3d.kZero, est.pose2);
       Transform3d pose = estimator.estimate(results[0]);
       assertEquals(est.pose1, pose);
     } finally {

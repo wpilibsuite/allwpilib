@@ -150,7 +150,7 @@ public class AprilTagFieldLayout {
   public final void setOrigin(OriginPosition origin) {
     switch (origin) {
       case kBlueAllianceWallRightSide:
-        setOrigin(new Pose3d());
+        setOrigin(Pose3d.kZero);
         break;
       case kRedAllianceWallRightSide:
         setOrigin(
@@ -230,12 +230,19 @@ public class AprilTagFieldLayout {
    * @throws UncheckedIOException If the layout does not exist.
    */
   public static AprilTagFieldLayout loadField(AprilTagFields field) {
-    try {
-      return loadFromResource(field.m_resourceFile);
-    } catch (IOException e) {
-      throw new UncheckedIOException(
-          "Could not load AprilTagFieldLayout from " + field.m_resourceFile, e);
+    if (field.m_fieldLayout == null) {
+      try {
+        field.m_fieldLayout = loadFromResource(field.m_resourceFile);
+      } catch (IOException e) {
+        throw new UncheckedIOException(
+            "Could not load AprilTagFieldLayout from " + field.m_resourceFile, e);
+      }
     }
+    // Copy layout because the layout's origin is mutable
+    return new AprilTagFieldLayout(
+        field.m_fieldLayout.getTags(),
+        field.m_fieldLayout.getFieldLength(),
+        field.m_fieldLayout.getFieldWidth());
   }
 
   /**

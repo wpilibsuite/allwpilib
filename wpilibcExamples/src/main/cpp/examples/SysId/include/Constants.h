@@ -48,7 +48,7 @@ inline constexpr std::array<int, 2> kEncoderPorts = {4, 5};
 inline constexpr bool kEncoderReversed = false;
 inline constexpr int kEncoderCpr = 1024;
 inline constexpr units::turn_t kEncoderDistancePerPulse =
-    units::turn_t{1.0} / static_cast<double>(kEncoderCpr);
+    1_tr / static_cast<double>(kEncoderCpr);
 
 inline constexpr int kShooterMotorPort = 4;
 inline constexpr int kFeederMotorPort = 5;
@@ -61,7 +61,7 @@ inline constexpr double kP = 1.0;
 
 inline constexpr units::volt_t kS = 0.05_V;
 inline constexpr kv_unit_t kV = (12_V) / kShooterFreeSpeed;
-inline constexpr ka_unit_t kA = 0_V * 1_s * 1_s / units::turn_t{1};
+inline constexpr ka_unit_t kA = 0_V * 1_s * 1_s / 1_tr;
 
 inline constexpr double kFeederSpeed = 0.5;
 }  // namespace shooter

@@ -10,7 +10,6 @@
 #include <memory>
 #include <string_view>
 
-#include <fmt/format.h>
 #include <glass/Context.h>
 #include <glass/MainMenuBar.h>
 #include <glass/Storage.h>
@@ -20,6 +19,7 @@
 #include <imgui.h>
 #include <uv.h>
 #include <wpi/Logger.h>
+#include <wpi/print.h>
 #include <wpigui.h>
 #include <wpigui_openurl.h>
 
@@ -89,7 +89,7 @@ void Application(std::string_view saveDir) {
     std::string filename = std::filesystem::path{file}.filename().string();
     gLog.Append(fmt::format("{}{} ({}:{})\n", lvl, msg, filename, line));
 #ifndef NDEBUG
-    fmt::print(stderr, "{}{} ({}:{})\n", lvl, msg, filename, line);
+    wpi::print(stderr, "{}{} ({}:{})\n", lvl, msg, filename, line);
 #endif
   });
 

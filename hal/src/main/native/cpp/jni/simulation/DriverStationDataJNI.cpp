@@ -733,7 +733,8 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickName
   (JNIEnv* env, jclass, jint stick, jstring name)
 {
   JStringRef nameJString{env, name};
-  HALSIM_SetJoystickName(stick, nameJString.c_str(), nameJString.size());
+  auto str = wpi::make_string(nameJString);
+  HALSIM_SetJoystickName(stick, &str);
 }
 
 /*
@@ -758,7 +759,8 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setGameSpecificMessage
   (JNIEnv* env, jclass, jstring message)
 {
   JStringRef messageJString{env, message};
-  HALSIM_SetGameSpecificMessage(messageJString.c_str(), messageJString.size());
+  auto str = wpi::make_string(messageJString);
+  HALSIM_SetGameSpecificMessage(&str);
 }
 
 /*
@@ -771,7 +773,8 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setEventName
   (JNIEnv* env, jclass, jstring name)
 {
   JStringRef nameJString{env, name};
-  HALSIM_SetEventName(nameJString.c_str(), nameJString.size());
+  auto str = wpi::make_string(nameJString);
+  HALSIM_SetEventName(&str);
 }
 
 /*

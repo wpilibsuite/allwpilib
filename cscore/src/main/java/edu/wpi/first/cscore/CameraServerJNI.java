@@ -15,8 +15,6 @@ import java.util.function.Consumer;
 public class CameraServerJNI {
   static boolean libraryLoaded = false;
 
-  static RuntimeLoader<CameraServerJNI> loader = null;
-
   /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
@@ -46,10 +44,7 @@ public class CameraServerJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader =
-            new RuntimeLoader<>(
-                "cscorejni", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
-        loader.loadLibrary();
+        RuntimeLoader.loadLibrary("cscorejni");
       } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);
@@ -67,10 +62,7 @@ public class CameraServerJNI {
     if (libraryLoaded) {
       return;
     }
-    loader =
-        new RuntimeLoader<>(
-            "cscorejni", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
-    loader.loadLibrary();
+    RuntimeLoader.loadLibrary("cscorejni");
     libraryLoaded = true;
   }
 
@@ -212,6 +204,7 @@ public class CameraServerJNI {
    * Creates a raw source.
    *
    * @param name Source name.
+   * @param isCv true for a Cv source.
    * @param pixelFormat Pixel format.
    * @param width Image width.
    * @param height Image height.
@@ -219,7 +212,7 @@ public class CameraServerJNI {
    * @return Raw source handle.
    */
   public static native int createRawSource(
-      String name, int pixelFormat, int width, int height, int fps);
+      String name, boolean isCv, int pixelFormat, int width, int height, int fps);
 
   //
   // Source Functions
@@ -630,9 +623,10 @@ public class CameraServerJNI {
    * Creates a raw sink.
    *
    * @param name Sink name.
+   * @param isCv true for a Cv source.
    * @return Raw sink handle.
    */
-  public static native int createRawSink(String name);
+  public static native int createRawSink(String name, boolean isCv);
 
   //
   // Sink Functions

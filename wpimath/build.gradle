@@ -9,6 +9,23 @@ ext {
 
     nativeName = 'wpimath'
     devMain = 'edu.wpi.first.math.DevMain'
+
+    splitSetup = {
+        it.sources {
+            sleipnirCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/sleipnir/src'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/eigen/include',
+                            'src/main/native/thirdparty/fmt/include',
+                            'src/main/native/thirdparty/sleipnir/include',
+                            'src/main/native/thirdparty/sleipnir/src'
+                }
+            }
+        }
+    }
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
@@ -24,6 +41,9 @@ cppHeadersZip {
         into '/wpimath/protobuf'
         include '*.h'
     }
+    from('src/main/native/thirdparty/sleipnir/include') {
+        into '/'
+    }
 }
 
 cppHeadersZip.dependsOn generateProto
@@ -35,9 +55,15 @@ model {
                 it.exportedHeaders {
                     srcDirs 'src/main/native/include',
                             'src/main/native/thirdparty/eigen/include',
-                            'src/main/native/thirdparty/gcem/include'
+                            'src/main/native/thirdparty/gcem/include',
+                            'src/main/native/thirdparty/sleipnir/include'
                 }
             }
+        }
+    }
+    binaries {
+        all {
+            it.cppCompiler.define 'SLEIPNIR_EXPORTS'
         }
     }
 }

@@ -14,6 +14,8 @@
 
 #endif
 
+#include <wpi/string.h>
+
 #include "hal/Types.h"
 
 /**
@@ -79,20 +81,16 @@ int64_t HAL_GetFPGARevision(int32_t* status);
 /**
  * Returns the roboRIO serial number.
  *
- * @param[out] buffer The roboRIO serial number.
- * @param size The maximum characters to copy into buffer.
- * @return Number of characters copied into buffer.
+ * @param[out] serialNumber The roboRIO serial number. Free with WPI_FreeString
  */
-size_t HAL_GetSerialNumber(char* buffer, size_t size);
+void HAL_GetSerialNumber(struct WPI_String* serialNumber);
 
 /**
  * Returns the comments from the roboRIO web interface.
  *
- * @param[out] buffer The comments string.
- * @param size The maximum characters to copy into buffer.
- * @return Number of characters copied into buffer.
+ * @param[out] comments The comments string. Free with WPI_FreeString
  */
-size_t HAL_GetComments(char* buffer, size_t size);
+void HAL_GetComments(struct WPI_String* comments);
 
 /**
  * Returns the team number configured for the robot controller.

@@ -216,8 +216,7 @@ void Encoder::InitSendable(wpi::SendableBuilder& builder) {
     builder.SetSmartDashboardType("Encoder");
   }
 
-  builder.AddDoubleProperty(
-      "Speed", [=, this] { return GetRate(); }, nullptr);
+  builder.AddDoubleProperty("Speed", [=, this] { return GetRate(); }, nullptr);
   builder.AddDoubleProperty(
       "Distance", [=, this] { return GetDistance(); }, nullptr);
   builder.AddDoubleProperty(

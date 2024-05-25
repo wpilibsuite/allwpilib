@@ -646,23 +646,6 @@ public class Matrix<R extends Num, C extends Num> {
   }
 
   /**
-   * Entrypoint to the {@link MatBuilder} class for creation of custom matrices with the given
-   * dimensions and contents.
-   *
-   * @param rows The number of rows of the desired matrix.
-   * @param cols The number of columns of the desired matrix.
-   * @param <R> The number of rows of the desired matrix as a generic.
-   * @param <C> The number of columns of the desired matrix as a generic.
-   * @return A builder to construct the matrix.
-   * @deprecated Use {@link MatBuilder#fill} instead.
-   */
-  @Deprecated(since = "2024", forRemoval = true)
-  @SuppressWarnings("removal")
-  public static <R extends Num, C extends Num> MatBuilder<R, C> mat(Nat<R> rows, Nat<C> cols) {
-    return new MatBuilder<>(Objects.requireNonNull(rows), Objects.requireNonNull(cols));
-  }
-
-  /**
    * Reassigns dimensions of a {@link Matrix} to allow for operations with other matrices that have
    * wildcard dimensions.
    *

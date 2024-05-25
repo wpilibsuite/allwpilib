@@ -14,13 +14,6 @@ public final class Units {
 
   // Pseudo-classes describing the more common units of measure.
 
-  /**
-   * Used as an internal placeholder value when a specific unit type cannot be determined. Do not
-   * use this directly.
-   */
-  @SuppressWarnings("rawtypes")
-  public static final Unit AnonymousBaseUnit = new Dimensionless(1, "<?>", "<?>");
-
   // Distance
   /** The base unit of distance. */
   public static final Distance Meters = BaseUnits.Distance;
@@ -98,7 +91,8 @@ public final class Units {
    * A single turn of an object around an external axis. Numerically equivalent to {@link
    * #Rotations}, but may be semantically more expressive in certain scenarios.
    */
-  public static final Angle Revolutions = new Angle(2 * Math.PI, "Revolution", "R");
+  public static final Angle Revolutions =
+      derive(Radians).aggregate(2 * Math.PI).named("Revolution").symbol("R").make();
 
   /**
    * A single turn of an object around an external axis. Numerically equivalent to a {@link
@@ -110,7 +104,7 @@ public final class Units {
    * A single turn of an object around an internal axis. Numerically equivalent to {@link
    * #Revolutions}, but may be semantically more expressive in certain scenarios.
    */
-  public static final Angle Rotations = new Angle(2 * Math.PI, "Rotation", "R"); // alias revolution
+  public static final Angle Rotations = derive(Revolutions).named("Rotation").symbol("R").make();
 
   /**
    * A single turn of an object around an internal axis. Numerically equivalent to a {@link
@@ -183,6 +177,34 @@ public final class Units {
       MetersPerSecond.per(Second);
 
   /**
+   * A unit of linear acceleration equivalent to accelerating at a rate of one {@link #Foot Foot}
+   * per {@link #Second} every second.
+   */
+  public static final Velocity<Velocity<Distance>> FeetPerSecondPerSecond =
+      FeetPerSecond.per(Second);
+
+  /**
+   * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Rotations
+   * Rotation} per {@link #Second} every second.
+   */
+  public static final Velocity<Velocity<Angle>> RotationsPerSecondPerSecond =
+      RotationsPerSecond.per(Second);
+
+  /**
+   * The standard SI unit of angular acceleration, equivalent to accelerating at a rate of one
+   * {@link #Radians Radian} per {@link #Second} every second.
+   */
+  public static final Velocity<Velocity<Angle>> RadiansPerSecondPerSecond =
+      RadiansPerSecond.per(Second);
+
+  /**
+   * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Degrees
+   * Degree} per {@link #Second} every second.
+   */
+  public static final Velocity<Velocity<Angle>> DegreesPerSecondPerSecond =
+      DegreesPerSecond.per(Second);
+
+  /**
    * A unit of acceleration equivalent to the pull of gravity on an object at sea level on Earth.
    */
   public static final Velocity<Velocity<Distance>> Gs =
@@ -222,6 +244,11 @@ public final class Units {
 
   /** 1/16 of a {@link #Pound}. */
   public static final Mass Ounce = Ounces; // alias
+
+  // Moment of Inertia
+  /** The base SI unit for moment of inertia. */
+  public static final Mult<Mult<Mass, Distance>, Distance> KilogramSquareMeters =
+      Kilograms.mult(Meters).mult(Meters);
 
   // Unitless
   /** A dimensionless unit that performs no scaling whatsoever. */
@@ -476,17 +503,5 @@ public final class Units {
   @SuppressWarnings("unchecked")
   public static <U extends Unit<U>> UnitBuilder<U> derive(Unit<U> unit) {
     return new UnitBuilder<>((U) unit);
-  }
-
-  /**
-   * Returns an anonymous unit for use when a specific unit type is not known. Do not use this
-   * directly.
-   *
-   * @param <U> the dimension of the desired anonymous unit
-   * @return the anonymous unit
-   */
-  @SuppressWarnings("unchecked")
-  public static <U extends Unit<U>> U anonymous() {
-    return (U) AnonymousBaseUnit;
   }
 }

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <wpi/deprecated.h>
-
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -104,23 +102,6 @@ class TrapezoidProfile {
    * @param constraints The constraints on the profile, like maximum velocity.
    */
   TrapezoidProfile(Constraints constraints);  // NOLINT
-
-  /**
-   * Constructs a TrapezoidProfile.
-   *
-   * @param constraints The constraints on the profile, like maximum velocity.
-   * @param goal        The desired state when the profile is complete.
-   * @param initial     The initial state (usually the current state).
-   * @deprecated Pass the desired and current state into calculate instead of
-   * constructing a new TrapezoidProfile with the desired and current state
-   */
-  WPI_DEPRECATED(
-      "Pass the desired and current state into calculate instead of "
-      "constructing a new TrapezoidProfile with the desired and current "
-      "state")
-  TrapezoidProfile(Constraints constraints, State goal,
-                   State initial = State{Distance_t{0}, Velocity_t{0}});
-
   TrapezoidProfile(const TrapezoidProfile&) = default;
   TrapezoidProfile& operator=(const TrapezoidProfile&) = default;
   TrapezoidProfile(TrapezoidProfile&&) = default;
@@ -206,8 +187,6 @@ class TrapezoidProfile {
 
   Constraints m_constraints;
   State m_current;
-  State m_goal;   // TODO: remove
-  bool m_newAPI;  // TODO: remove
 
   units::second_t m_endAccel;
   units::second_t m_endFullSpeed;

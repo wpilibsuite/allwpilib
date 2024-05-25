@@ -53,9 +53,9 @@ class RectangularRegionConstraintTest {
             new Translation2d(Units.feetToMeters(7.0), Units.feetToMeters(27.0)),
             maxVelocityConstraint);
 
-    assertFalse(regionConstraint.isPoseInRegion(new Pose2d()));
+    assertFalse(regionConstraint.isPoseInRegion(Pose2d.kZero));
     assertTrue(
         regionConstraint.isPoseInRegion(
-            new Pose2d(Units.feetToMeters(3.0), Units.feetToMeters(14.5), new Rotation2d())));
+            new Pose2d(Units.feetToMeters(3.0), Units.feetToMeters(14.5), Rotation2d.kZero)));
   }
 }

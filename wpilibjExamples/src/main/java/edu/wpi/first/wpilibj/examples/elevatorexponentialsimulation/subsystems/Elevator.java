@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.elevatorexponentialsimulation.subsystems;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -60,7 +59,8 @@ public class Elevator implements AutoCloseable {
           Constants.kMaxElevatorHeightMeters,
           true,
           0,
-          VecBuilder.fill(0.005));
+          0.005,
+          0.0);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
   private final PWMSim m_motorSim = new PWMSim(m_motor);
 

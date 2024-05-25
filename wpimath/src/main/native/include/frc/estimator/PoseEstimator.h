@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
@@ -88,6 +90,15 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @return The estimated robot pose in meters.
    */
   Pose2d GetEstimatedPosition() const;
+
+  /**
+   * Return the pose at a given timestamp, if the buffer is not empty.
+   *
+   * @param timestamp The pose's timestamp.
+   * @return The pose at the given timestamp (or std::nullopt if the buffer is
+   * empty).
+   */
+  std::optional<Pose2d> SampleAt(units::second_t timestamp) const;
 
   /**
    * Adds a vision measurement to the Kalman Filter. This will correct

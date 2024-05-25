@@ -8,6 +8,7 @@
 #include <stdint.h>
 
 #include <wpi/RawFrame.h>
+#include <wpi/string.h>
 
 #ifdef __cplusplus
 #include <cstddef>
@@ -204,7 +205,7 @@ struct CS_Event {
   CS_Sink sink;
 
   // Source/sink/property name
-  const char* name;
+  struct WPI_String name;
 
   // Fields for CS_SOURCE_VIDEOMODE_CHANGED event
   CS_VideoMode mode;
@@ -213,7 +214,7 @@ struct CS_Event {
   CS_Property property;
   enum CS_PropertyKind propertyKind;
   int value;
-  const char* valueStr;
+  struct WPI_String valueStr;
 
   // Listener that was triggered
   CS_Listener listener;
@@ -224,10 +225,10 @@ struct CS_Event {
  */
 typedef struct CS_UsbCameraInfo {
   int dev;
-  char* path;
-  char* name;
+  struct WPI_String path;
+  struct WPI_String name;
   int otherPathsCount;
-  char** otherPaths;
+  struct WPI_String* otherPaths;
   int vendorId;
   int productId;
 } CS_UsbCameraInfo;
@@ -238,34 +239,40 @@ typedef struct CS_UsbCameraInfo {
  */
 enum CS_PropertyKind CS_GetPropertyKind(CS_Property property,
                                         CS_Status* status);
-char* CS_GetPropertyName(CS_Property property, CS_Status* status);
+void CS_GetPropertyName(CS_Property property, struct WPI_String* name,
+                        CS_Status* status);
 int CS_GetProperty(CS_Property property, CS_Status* status);
 void CS_SetProperty(CS_Property property, int value, CS_Status* status);
 int CS_GetPropertyMin(CS_Property property, CS_Status* status);
 int CS_GetPropertyMax(CS_Property property, CS_Status* status);
 int CS_GetPropertyStep(CS_Property property, CS_Status* status);
 int CS_GetPropertyDefault(CS_Property property, CS_Status* status);
-char* CS_GetStringProperty(CS_Property property, CS_Status* status);
-void CS_SetStringProperty(CS_Property property, const char* value,
+void CS_GetStringProperty(CS_Property property, struct WPI_String* value,
                           CS_Status* status);
-char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
-                                 CS_Status* status);
+void CS_SetStringProperty(CS_Property property, const struct WPI_String* value,
+                          CS_Status* status);
+struct WPI_String* CS_GetEnumPropertyChoices(CS_Property property, int* count,
+                                             CS_Status* status);
 /** @} */
 
 /**
  * @defgroup cscore_source_create_cfunc Source Creation Functions
  * @{
  */
-CS_Source CS_CreateUsbCameraDev(const char* name, int dev, CS_Status* status);
-CS_Source CS_CreateUsbCameraPath(const char* name, const char* path,
+CS_Source CS_CreateUsbCameraDev(const struct WPI_String* name, int dev,
+                                CS_Status* status);
+CS_Source CS_CreateUsbCameraPath(const struct WPI_String* name,
+                                 const struct WPI_String* path,
                                  CS_Status* status);
-CS_Source CS_CreateHttpCamera(const char* name, const char* url,
+CS_Source CS_CreateHttpCamera(const struct WPI_String* name,
+                              const struct WPI_String* url,
                               enum CS_HttpCameraKind kind, CS_Status* status);
-CS_Source CS_CreateHttpCameraMulti(const char* name, const char** urls,
-                                   int count, enum CS_HttpCameraKind kind,
+CS_Source CS_CreateHttpCameraMulti(const struct WPI_String* name,
+                                   const struct WPI_String* urls, int count,
+                                   enum CS_HttpCameraKind kind,
                                    CS_Status* status);
-CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
-                            CS_Status* status);
+CS_Source CS_CreateCvSource(const struct WPI_String* name,
+                            const CS_VideoMode* mode, CS_Status* status);
 /** @} */
 
 /**
@@ -273,15 +280,18 @@ CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
  * @{
  */
 enum CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status);
-char* CS_GetSourceName(CS_Source source, CS_Status* status);
-char* CS_GetSourceDescription(CS_Source source, CS_Status* status);
+void CS_GetSourceName(CS_Source source, struct WPI_String* name,
+                      CS_Status* status);
+void CS_GetSourceDescription(CS_Source source, struct WPI_String* description,
+                             CS_Status* status);
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
 void CS_SetSourceConnectionStrategy(CS_Source source,
                                     enum CS_ConnectionStrategy strategy,
                                     CS_Status* status);
 CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status);
 CS_Bool CS_IsSourceEnabled(CS_Source source, CS_Status* status);
-CS_Property CS_GetSourceProperty(CS_Source source, const char* name,
+CS_Property CS_GetSourceProperty(CS_Source source,
+                                 const struct WPI_String* name,
                                  CS_Status* status);
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
                                           CS_Status* status);
@@ -299,9 +309,11 @@ CS_Bool CS_SetSourcePixelFormat(CS_Source source,
 CS_Bool CS_SetSourceResolution(CS_Source source, int width, int height,
                                CS_Status* status);
 CS_Bool CS_SetSourceFPS(CS_Source source, int fps, CS_Status* status);
-CS_Bool CS_SetSourceConfigJson(CS_Source source, const char* config,
+CS_Bool CS_SetSourceConfigJson(CS_Source source,
+                               const struct WPI_String* config,
                                CS_Status* status);
-char* CS_GetSourceConfigJson(CS_Source source, CS_Status* status);
+void CS_GetSourceConfigJson(CS_Source source, struct WPI_String* config,
+                            CS_Status* status);
 CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
                                            CS_Status* status);
 CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
@@ -330,9 +342,12 @@ void CS_SetCameraExposureManual(CS_Source source, int value, CS_Status* status);
  * @defgroup cscore_usbcamera_cfunc UsbCamera Source Functions
  * @{
  */
-void CS_SetUsbCameraPath(CS_Source source, const char* path, CS_Status* status);
-char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status);
-CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status);
+void CS_SetUsbCameraPath(CS_Source source, const struct WPI_String* path,
+                         CS_Status* status);
+void CS_GetUsbCameraPath(CS_Source source, struct WPI_String* path,
+                         CS_Status* status);
+void CS_GetUsbCameraInfo(CS_Source source, CS_UsbCameraInfo* info,
+                         CS_Status* status);
 /** @} */
 
 /**
@@ -341,38 +356,43 @@ CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status);
  */
 enum CS_HttpCameraKind CS_GetHttpCameraKind(CS_Source source,
                                             CS_Status* status);
-void CS_SetHttpCameraUrls(CS_Source source, const char** urls, int count,
-                          CS_Status* status);
-char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status);
+void CS_SetHttpCameraUrls(CS_Source source, const struct WPI_String* urls,
+                          int count, CS_Status* status);
+struct WPI_String* CS_GetHttpCameraUrls(CS_Source source, int* count,
+                                        CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_opencv_source_cfunc OpenCV Source Functions
+ * @defgroup cscore_frame_source_cfunc Frame Source Functions
  * @{
  */
-void CS_NotifySourceError(CS_Source source, const char* msg, CS_Status* status);
+void CS_NotifySourceError(CS_Source source, const struct WPI_String* msg,
+                          CS_Status* status);
 void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
                            CS_Status* status);
-void CS_SetSourceDescription(CS_Source source, const char* description,
+void CS_SetSourceDescription(CS_Source source,
+                             const struct WPI_String* description,
                              CS_Status* status);
-CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
+CS_Property CS_CreateSourceProperty(CS_Source source,
+                                    const struct WPI_String* name,
                                     enum CS_PropertyKind kind, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value, CS_Status* status);
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
-                                     const char** choices, int count,
-                                     CS_Status* status);
+                                     const struct WPI_String* choices,
+                                     int count, CS_Status* status);
 /** @} */
 
 /**
  * @defgroup cscore_sink_create_cfunc Sink Creation Functions
  * @{
  */
-CS_Sink CS_CreateMjpegServer(const char* name, const char* listenAddress,
-                             int port, CS_Status* status);
-CS_Sink CS_CreateCvSink(const char* name, enum WPI_PixelFormat pixelFormat,
-                        CS_Status* status);
-CS_Sink CS_CreateCvSinkCallback(const char* name,
+CS_Sink CS_CreateMjpegServer(const struct WPI_String* name,
+                             const struct WPI_String* listenAddress, int port,
+                             CS_Status* status);
+CS_Sink CS_CreateCvSink(const struct WPI_String* name,
+                        enum WPI_PixelFormat pixelFormat, CS_Status* status);
+CS_Sink CS_CreateCvSinkCallback(const struct WPI_String* name,
                                 enum WPI_PixelFormat pixelFormat, void* data,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status);
@@ -383,18 +403,21 @@ CS_Sink CS_CreateCvSinkCallback(const char* name,
  * @{
  */
 enum CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status);
-char* CS_GetSinkName(CS_Sink sink, CS_Status* status);
-char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status);
-CS_Property CS_GetSinkProperty(CS_Sink sink, const char* name,
+void CS_GetSinkName(CS_Sink sink, struct WPI_String* name, CS_Status* status);
+void CS_GetSinkDescription(CS_Sink sink, struct WPI_String* description,
+                           CS_Status* status);
+CS_Property CS_GetSinkProperty(CS_Sink sink, const struct WPI_String* name,
                                CS_Status* status);
 CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
                                         CS_Status* status);
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
-CS_Property CS_GetSinkSourceProperty(CS_Sink sink, const char* name,
+CS_Property CS_GetSinkSourceProperty(CS_Sink sink,
+                                     const struct WPI_String* name,
                                      CS_Status* status);
-CS_Bool CS_SetSinkConfigJson(CS_Sink sink, const char* config,
+CS_Bool CS_SetSinkConfigJson(CS_Sink sink, const struct WPI_String* config,
                              CS_Status* status);
-char* CS_GetSinkConfigJson(CS_Sink sink, CS_Status* status);
+void CS_GetSinkConfigJson(CS_Sink sink, struct WPI_String* config,
+                          CS_Status* status);
 CS_Source CS_GetSinkSource(CS_Sink sink, CS_Status* status);
 CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status);
 void CS_ReleaseSink(CS_Sink sink, CS_Status* status);
@@ -404,17 +427,19 @@ void CS_ReleaseSink(CS_Sink sink, CS_Status* status);
  * @defgroup cscore_mjpegserver_cfunc MjpegServer Sink Functions
  * @{
  */
-char* CS_GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status);
+void CS_GetMjpegServerListenAddress(CS_Sink sink,
+                                    struct WPI_String* listenAddress,
+                                    CS_Status* status);
 int CS_GetMjpegServerPort(CS_Sink sink, CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_opencv_sink_cfunc OpenCV Sink Functions
+ * @defgroup cscore_frame_sink_cfunc Frame Sink Functions
  * @{
  */
-void CS_SetSinkDescription(CS_Sink sink, const char* description,
+void CS_SetSinkDescription(CS_Sink sink, const struct WPI_String* description,
                            CS_Status* status);
-char* CS_GetSinkError(CS_Sink sink, CS_Status* status);
+void CS_GetSinkError(CS_Sink sink, struct WPI_String* error, CS_Status* status);
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status);
 /** @} */
 
@@ -459,9 +484,10 @@ double CS_GetTelemetryAverageValue(CS_Handle handle, enum CS_TelemetryKind kind,
  * @defgroup cscore_logging_cfunc Logging Functions
  * @{
  */
-typedef void (*CS_LogFunc)(unsigned int level, const char* file,
-                           unsigned int line, const char* msg);
-void CS_SetLogger(CS_LogFunc func, unsigned int min_level);
+typedef void (*CS_LogFunc)(void* data, unsigned int level,
+                           const struct WPI_String* file, unsigned int line,
+                           const struct WPI_String* msg);
+void CS_SetLogger(CS_LogFunc func, void* data, unsigned int min_level);
 void CS_SetDefaultLogger(unsigned int min_level);
 /** @} */
 
@@ -486,18 +512,14 @@ void CS_ReleaseEnumeratedSources(CS_Source* sources, int count);
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status);
 void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count);
 
-void CS_FreeString(char* str);
-void CS_FreeEnumPropertyChoices(char** choices, int count);
 void CS_FreeUsbCameraInfo(CS_UsbCameraInfo* info);
-void CS_FreeHttpCameraUrls(char** urls, int count);
 
 void CS_FreeEnumeratedProperties(CS_Property* properties, int count);
 void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count);
 
-char* CS_GetHostname(void);
+void CS_GetHostname(struct WPI_String* hostName);
 
-char** CS_GetNetworkInterfaces(int* count);
-void CS_FreeNetworkInterfaces(char** interfaces, int count);
+struct WPI_String* CS_GetNetworkInterfaces(int* count);
 /** @} */
 
 /** @} */

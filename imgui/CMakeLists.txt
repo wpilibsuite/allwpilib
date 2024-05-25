@@ -45,6 +45,7 @@ if(NOT glfw3_POPULATED)
     add_subdirectory(${glfw3_SOURCE_DIR} ${glfw3_BINARY_DIR} EXCLUDE_FROM_ALL)
     set_property(TARGET glfw PROPERTY POSITION_INDEPENDENT_CODE ON)
     set(BUILD_SHARED_LIBS ${SAVE_BUILD_SHARED_LIBS})
+    export(TARGETS glfw FILE glfw.cmake NAMESPACE glfw::)
 endif()
 
 # Don't use gl3w CMakeLists.txt due to https://github.com/skaslev/gl3w/issues/66
@@ -106,3 +107,6 @@ target_include_directories(
 
 set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_features(imgui PUBLIC cxx_std_20)
+
+install(TARGETS imgui EXPORT imgui)
+export(TARGETS imgui FILE imgui.cmake NAMESPACE imgui::)

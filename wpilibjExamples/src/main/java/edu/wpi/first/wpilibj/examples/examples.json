@@ -318,12 +318,12 @@
     "commandversion": 2
   },
   {
-    "name": "Axis Camera Sample",
-    "description": "Acquire images from an Axis network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
+    "name": "HTTP Camera",
+    "description": "Acquire images from an HTTP network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
     "tags": [
       "Vision"
     ],
-    "foldername": "axiscamera",
+    "foldername": "httpcamera",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -505,25 +505,6 @@
     "commandversion": 2
   },
   {
-    "name": "RamseteCommand",
-    "description": "Follow a pre-generated trajectory with a differential drive using RamseteCommand.",
-    "tags": [
-      "Differential Drive",
-      "Command-based",
-      "Ramsete",
-      "Trajectory",
-      "Path Following",
-      "Odometry",
-      "Encoder",
-      "Gyro",
-      "XboxController"
-    ],
-    "foldername": "ramsetecommand",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "Arcade Drive Xbox Controller",
     "description": "Control a differential drive with split-stick arcade drive in teleop.",
     "tags": [
@@ -686,24 +667,6 @@
     "commandversion": 2
   },
   {
-    "name": "RamseteController",
-    "description": "Follow a pre-generated trajectory with a differential drive using RamseteController.",
-    "tags": [
-      "Basic Robot",
-      "Differential Drive",
-      "Ramsete",
-      "PID",
-      "Odometry",
-      "Path Following",
-      "Trajectory",
-      "XboxController"
-    ],
-    "foldername": "ramsetecontroller",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "StateSpaceFlywheel",
     "description": "Control a flywheel using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
     "tags": [
@@ -782,21 +745,6 @@
       "Simulation"
     ],
     "foldername": "simpledifferentialdrivesimulation",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "StateSpaceDriveSimulation",
-    "description": "Simulate a differential drivetrain and follow trajectories with RamseteCommand (command-based).",
-    "tags": [
-      "Command-based",
-      "Differential Drive",
-      "State-Space",
-      "XboxController",
-      "Simulation"
-    ],
-    "foldername": "statespacedifferentialdrivesimulation",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2

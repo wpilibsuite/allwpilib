@@ -48,6 +48,7 @@ target_link_libraries(cscore PUBLIC wpinet wpiutil ${OpenCV_LIBS})
 set_property(TARGET cscore PROPERTY FOLDER "libraries")
 
 install(TARGETS cscore EXPORT cscore)
+export(TARGETS cscore FILE cscore.cmake NAMESPACE cscore::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
 
 configure_file(cscore-config.cmake.in ${WPILIB_BINARY_DIR}/cscore-config.cmake)
@@ -83,7 +84,6 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     #find java files, copy them locally
 
@@ -128,6 +128,7 @@ if(WITH_JAVA)
         OUTPUT_NAME cscore
         GENERATE_NATIVE_HEADERS cscore_jni_headers
     )
+    set_property(TARGET cscore_jar PROPERTY FOLDER "java")
 
     install_jar(cscore_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS cscore_jar FILE cscore_jar.cmake DESTINATION share/cscore)
@@ -163,6 +164,7 @@ if(WITH_JAVA)
     add_dependencies(cscorejni cscore_jar)
 
     install(TARGETS cscorejni EXPORT cscorejni)
+    export(TARGETS cscorejni FILE cscorejni.cmake NAMESPACE cscorejni::)
 endif()
 
 if(WITH_JAVA_SOURCE)

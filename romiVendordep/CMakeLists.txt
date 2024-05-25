@@ -7,7 +7,6 @@ include(AddTest)
 if(WITH_JAVA)
     find_package(Java REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     add_jar(
@@ -24,6 +23,7 @@ if(WITH_JAVA)
             wpilibj_jar
         OUTPUT_NAME romiVendordep
     )
+    set_property(TARGET romiVendordep_jar PROPERTY FOLDER "java")
 
     install_jar(romiVendordep_jar DESTINATION ${java_lib_dest})
     install_jar_exports(
@@ -67,6 +67,7 @@ target_include_directories(
 )
 
 install(TARGETS romiVendordep EXPORT romivendordep DESTINATION "${main_lib_dest}")
+export(TARGETS romiVendordep FILE romivendordep.cmake NAMESPACE romivendordep::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/romiVendordep")
 
 configure_file(romivendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romivendordep-config.cmake)

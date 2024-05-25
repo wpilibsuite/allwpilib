@@ -28,6 +28,8 @@
 
 #include <cmath>
 
+#include <gcem.hpp>
+
 #include "units/angle.h"
 #include "units/base.h"
 #include "units/dimensionless.h"
@@ -58,12 +60,12 @@ namespace units::math {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class AngleUnit>
-dimensionless::scalar_t cos(const AngleUnit angle) noexcept {
+constexpr dimensionless::scalar_t cos(const AngleUnit angle) noexcept {
   static_assert(
       traits::is_angle_unit<AngleUnit>::value,
       "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
   return dimensionless::scalar_t(
-      std::cos(angle.template convert<angle::radian>()()));
+      gcem::cos(angle.template convert<angle::radian>()()));
 }
 #endif
 
@@ -78,12 +80,12 @@ dimensionless::scalar_t cos(const AngleUnit angle) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class AngleUnit>
-dimensionless::scalar_t sin(const AngleUnit angle) noexcept {
+constexpr dimensionless::scalar_t sin(const AngleUnit angle) noexcept {
   static_assert(
       traits::is_angle_unit<AngleUnit>::value,
       "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
   return dimensionless::scalar_t(
-      std::sin(angle.template convert<angle::radian>()()));
+      gcem::sin(angle.template convert<angle::radian>()()));
 }
 #endif
 /**
@@ -97,12 +99,12 @@ dimensionless::scalar_t sin(const AngleUnit angle) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class AngleUnit>
-dimensionless::scalar_t tan(const AngleUnit angle) noexcept {
+constexpr dimensionless::scalar_t tan(const AngleUnit angle) noexcept {
   static_assert(
       traits::is_angle_unit<AngleUnit>::value,
       "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
   return dimensionless::scalar_t(
-      std::tan(angle.template convert<angle::radian>()()));
+      gcem::tan(angle.template convert<angle::radian>()()));
 }
 #endif
 
@@ -116,11 +118,11 @@ dimensionless::scalar_t tan(const AngleUnit angle) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class ScalarUnit>
-angle::radian_t acos(const ScalarUnit x) noexcept {
+constexpr angle::radian_t acos(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(std::acos(x()));
+  return angle::radian_t(gcem::acos(x()));
 }
 #endif
 
@@ -134,11 +136,11 @@ angle::radian_t acos(const ScalarUnit x) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class ScalarUnit>
-angle::radian_t asin(const ScalarUnit x) noexcept {
+constexpr angle::radian_t asin(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(std::asin(x()));
+  return angle::radian_t(gcem::asin(x()));
 }
 #endif
 
@@ -156,11 +158,11 @@ angle::radian_t asin(const ScalarUnit x) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class ScalarUnit>
-angle::radian_t atan(const ScalarUnit x) noexcept {
+constexpr angle::radian_t atan(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(std::atan(x()));
+  return angle::radian_t(gcem::atan(x()));
 }
 #endif
 
@@ -176,15 +178,15 @@ angle::radian_t atan(const ScalarUnit x) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class Y, class X>
-angle::radian_t atan2(const Y y, const X x) noexcept {
+constexpr angle::radian_t atan2(const Y y, const X x) noexcept {
   static_assert(traits::is_dimensionless_unit<decltype(y / x)>::value,
                 "The quantity y/x must yield a dimensionless ratio.");
 
   // X and Y could be different length units, so normalize them
   return angle::radian_t(
-      std::atan2(y.template convert<
-                     typename units::traits::unit_t_traits<X>::unit_type>()(),
-                 x()));
+      gcem::atan2(y.template convert<
+                      typename units::traits::unit_t_traits<X>::unit_type>()(),
+                  x()));
 }
 #endif
 
@@ -203,12 +205,12 @@ angle::radian_t atan2(const Y y, const X x) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class AngleUnit>
-dimensionless::scalar_t cosh(const AngleUnit angle) noexcept {
+constexpr dimensionless::scalar_t cosh(const AngleUnit angle) noexcept {
   static_assert(
       traits::is_angle_unit<AngleUnit>::value,
       "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
   return dimensionless::scalar_t(
-      std::cosh(angle.template convert<angle::radian>()()));
+      gcem::cosh(angle.template convert<angle::radian>()()));
 }
 #endif
 
@@ -223,12 +225,12 @@ dimensionless::scalar_t cosh(const AngleUnit angle) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class AngleUnit>
-dimensionless::scalar_t sinh(const AngleUnit angle) noexcept {
+constexpr dimensionless::scalar_t sinh(const AngleUnit angle) noexcept {
   static_assert(
       traits::is_angle_unit<AngleUnit>::value,
       "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
   return dimensionless::scalar_t(
-      std::sinh(angle.template convert<angle::radian>()()));
+      gcem::sinh(angle.template convert<angle::radian>()()));
 }
 #endif
 
@@ -243,12 +245,12 @@ dimensionless::scalar_t sinh(const AngleUnit angle) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class AngleUnit>
-dimensionless::scalar_t tanh(const AngleUnit angle) noexcept {
+constexpr dimensionless::scalar_t tanh(const AngleUnit angle) noexcept {
   static_assert(
       traits::is_angle_unit<AngleUnit>::value,
       "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
   return dimensionless::scalar_t(
-      std::tanh(angle.template convert<angle::radian>()()));
+      gcem::tanh(angle.template convert<angle::radian>()()));
 }
 #endif
 
@@ -264,11 +266,11 @@ dimensionless::scalar_t tanh(const AngleUnit angle) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class ScalarUnit>
-angle::radian_t acosh(const ScalarUnit x) noexcept {
+constexpr angle::radian_t acosh(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(std::acosh(x()));
+  return angle::radian_t(gcem::acosh(x()));
 }
 #endif
 
@@ -281,11 +283,11 @@ angle::radian_t acosh(const ScalarUnit x) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class ScalarUnit>
-angle::radian_t asinh(const ScalarUnit x) noexcept {
+constexpr angle::radian_t asinh(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(std::asinh(x()));
+  return angle::radian_t(gcem::asinh(x()));
 }
 #endif
 
@@ -300,11 +302,11 @@ angle::radian_t asinh(const ScalarUnit x) noexcept {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 template <class ScalarUnit>
-angle::radian_t atanh(const ScalarUnit x) noexcept {
+constexpr angle::radian_t atanh(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(std::atanh(x()));
+  return angle::radian_t(gcem::atanh(x()));
 }
 #endif
 
@@ -329,11 +331,11 @@ angle::radian_t atanh(const ScalarUnit x) noexcept {
  *          error occurs.
  */
 template <class ScalarUnit>
-dimensionless::scalar_t exp(const ScalarUnit x) noexcept {
+constexpr dimensionless::scalar_t exp(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(std::exp(x()));
+  return dimensionless::scalar_t(gcem::exp(x()));
 }
 
 /**
@@ -346,11 +348,11 @@ dimensionless::scalar_t exp(const ScalarUnit x) noexcept {
  * @returns Natural logarithm of x.
  */
 template <class ScalarUnit>
-dimensionless::scalar_t log(const ScalarUnit x) noexcept {
+constexpr dimensionless::scalar_t log(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(std::log(x()));
+  return dimensionless::scalar_t(gcem::log(x()));
 }
 
 /**
@@ -362,11 +364,11 @@ dimensionless::scalar_t log(const ScalarUnit x) noexcept {
  * @returns Common logarithm of x.
  */
 template <class ScalarUnit>
-dimensionless::scalar_t log10(const ScalarUnit x) noexcept {
+constexpr dimensionless::scalar_t log10(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(std::log10(x()));
+  return dimensionless::scalar_t(gcem::log10(x()));
 }
 
 /**
@@ -417,11 +419,11 @@ dimensionless::scalar_t exp2(const ScalarUnit x) noexcept {
  * @returns e raised to the power of x, minus one.
  */
 template <class ScalarUnit>
-dimensionless::scalar_t expm1(const ScalarUnit x) noexcept {
+constexpr dimensionless::scalar_t expm1(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(std::expm1(x()));
+  return dimensionless::scalar_t(gcem::expm1(x()));
 }
 
 /**
@@ -434,11 +436,11 @@ dimensionless::scalar_t expm1(const ScalarUnit x) noexcept {
  * @returns The natural logarithm of (1+x).
  */
 template <class ScalarUnit>
-dimensionless::scalar_t log1p(const ScalarUnit x) noexcept {
+constexpr dimensionless::scalar_t log1p(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(std::log1p(x()));
+  return dimensionless::scalar_t(gcem::log1p(x()));
 }
 
 /**
@@ -450,11 +452,11 @@ dimensionless::scalar_t log1p(const ScalarUnit x) noexcept {
  * @returns The binary logarithm of x: log2x.
  */
 template <class ScalarUnit>
-dimensionless::scalar_t log2(const ScalarUnit x) noexcept {
+constexpr dimensionless::scalar_t log2(const ScalarUnit x) noexcept {
   static_assert(
       traits::is_dimensionless_unit<ScalarUnit>::value,
       "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(std::log2(x()));
+  return dimensionless::scalar_t(gcem::log2(x()));
 }
 
 //----------------------------------
@@ -480,14 +482,15 @@ dimensionless::scalar_t log2(const ScalarUnit x) noexcept {
 template <
     class UnitType,
     std::enable_if_t<units::traits::has_linear_scale<UnitType>::value, int> = 0>
-inline auto sqrt(const UnitType& value) noexcept -> unit_t<
-    square_root<typename units::traits::unit_t_traits<UnitType>::unit_type>,
-    typename units::traits::unit_t_traits<UnitType>::underlying_type,
-    linear_scale> {
+inline constexpr auto sqrt(const UnitType& value) noexcept
+    -> unit_t<
+        square_root<typename units::traits::unit_t_traits<UnitType>::unit_type>,
+        typename units::traits::unit_t_traits<UnitType>::underlying_type,
+        linear_scale> {
   return unit_t<
       square_root<typename units::traits::unit_t_traits<UnitType>::unit_type>,
       typename units::traits::unit_t_traits<UnitType>::underlying_type,
-      linear_scale>(std::sqrt(value()));
+      linear_scale>(gcem::sqrt(value()));
 }
 
 /**
@@ -502,10 +505,10 @@ template <class UnitTypeLhs, class UnitTypeRhs,
           std::enable_if_t<
               units::traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value,
               int> = 0>
-inline UnitTypeLhs hypot(const UnitTypeLhs& x, const UnitTypeRhs& y) {
+inline constexpr UnitTypeLhs hypot(const UnitTypeLhs& x, const UnitTypeRhs& y) {
   static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
                 "Parameters of hypot() function are not compatible units.");
-  return UnitTypeLhs(std::hypot(
+  return UnitTypeLhs(gcem::hypot(
       x(),
       y.template convert<
           typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
@@ -525,8 +528,8 @@ inline UnitTypeLhs hypot(const UnitTypeLhs& x, const UnitTypeRhs& y) {
  */
 template <class UnitType,
           class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
-UnitType ceil(const UnitType x) noexcept {
-  return UnitType(std::ceil(x()));
+constexpr UnitType ceil(const UnitType x) noexcept {
+  return UnitType(gcem::ceil(x()));
 }
 
 /**
@@ -539,8 +542,8 @@ UnitType ceil(const UnitType x) noexcept {
  */
 template <class UnitType,
           class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
-UnitType floor(const UnitType x) noexcept {
-  return UnitType(std::floor(x()));
+constexpr UnitType floor(const UnitType x) noexcept {
+  return UnitType(gcem::floor(x()));
 }
 
 /**
@@ -555,10 +558,11 @@ UnitType floor(const UnitType x) noexcept {
 template <class UnitTypeLhs, class UnitTypeRhs,
           class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
                                    traits::is_unit_t<UnitTypeRhs>::value>>
-UnitTypeLhs fmod(const UnitTypeLhs numer, const UnitTypeRhs denom) noexcept {
+constexpr UnitTypeLhs fmod(const UnitTypeLhs numer,
+                           const UnitTypeRhs denom) noexcept {
   static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
                 "Parameters of fmod() function are not compatible units.");
-  return UnitTypeLhs(std::fmod(
+  return UnitTypeLhs(gcem::fmod(
       numer(),
       denom.template convert<
           typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
@@ -574,8 +578,8 @@ UnitTypeLhs fmod(const UnitTypeLhs numer, const UnitTypeRhs denom) noexcept {
  */
 template <class UnitType,
           class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
-UnitType trunc(const UnitType x) noexcept {
-  return UnitType(std::trunc(x()));
+constexpr UnitType trunc(const UnitType x) noexcept {
+  return UnitType(gcem::trunc(x()));
 }
 
 /**
@@ -588,8 +592,8 @@ UnitType trunc(const UnitType x) noexcept {
  */
 template <class UnitType,
           class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
-UnitType round(const UnitType x) noexcept {
-  return UnitType(std::round(x()));
+constexpr UnitType round(const UnitType x) noexcept {
+  return UnitType(gcem::round(x()));
 }
 
 //----------------------------------
@@ -608,17 +612,18 @@ UnitType round(const UnitType x) noexcept {
 template <class UnitTypeLhs, class UnitTypeRhs,
           class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
                                    traits::is_unit_t<UnitTypeRhs>::value>>
-UnitTypeLhs copysign(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
-  return UnitTypeLhs(std::copysign(
+constexpr UnitTypeLhs copysign(const UnitTypeLhs x,
+                               const UnitTypeRhs y) noexcept {
+  return UnitTypeLhs(gcem::copysign(
       x(), y()));  // no need for conversion to get the correct sign.
 }
 
 /// Overload to copy the sign from a raw double
 template <class UnitTypeLhs,
           class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value>>
-UnitTypeLhs copysign(const UnitTypeLhs x,
-                     const UNIT_LIB_DEFAULT_TYPE y) noexcept {
-  return UnitTypeLhs(std::copysign(x(), y));
+constexpr UnitTypeLhs copysign(const UnitTypeLhs x,
+                               const UNIT_LIB_DEFAULT_TYPE y) noexcept {
+  return UnitTypeLhs(gcem::copysign(x(), y));
 }
 
 //----------------------------------
@@ -660,10 +665,10 @@ UnitTypeLhs fdim(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
 template <class UnitTypeLhs, class UnitTypeRhs,
           class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
                                    traits::is_unit_t<UnitTypeRhs>::value>>
-UnitTypeLhs fmax(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
+constexpr UnitTypeLhs fmax(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
   static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
                 "Parameters of fmax() function are not compatible units.");
-  return UnitTypeLhs(std::fmax(
+  return UnitTypeLhs(gcem::max<double, double>(
       x(),
       y.template convert<
           typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
@@ -683,10 +688,10 @@ UnitTypeLhs fmax(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
 template <class UnitTypeLhs, class UnitTypeRhs,
           class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
                                    traits::is_unit_t<UnitTypeRhs>::value>>
-UnitTypeLhs fmin(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
+constexpr UnitTypeLhs fmin(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
   static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
                 "Parameters of fmin() function are not compatible units.");
-  return UnitTypeLhs(std::fmin(
+  return UnitTypeLhs(gcem::min<double, double>(
       x(),
       y.template convert<
           typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
@@ -705,8 +710,8 @@ UnitTypeLhs fmin(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
  */
 template <class UnitType,
           class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
-UnitType fabs(const UnitType x) noexcept {
-  return UnitType(std::fabs(x()));
+constexpr UnitType fabs(const UnitType x) noexcept {
+  return UnitType(gcem::abs(x()));
 }
 
 /**
@@ -718,8 +723,8 @@ UnitType fabs(const UnitType x) noexcept {
  */
 template <class UnitType,
           class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
-UnitType abs(const UnitType x) noexcept {
-  return UnitType(std::fabs(x()));
+constexpr UnitType abs(const UnitType x) noexcept {
+  return UnitType(gcem::abs(x()));
 }
 
 /**
@@ -737,8 +742,8 @@ template <class UnitTypeLhs, class UnitMultiply, class UnitAdd,
           class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
                                    traits::is_unit_t<UnitMultiply>::value &&
                                    traits::is_unit_t<UnitAdd>::value>>
-auto fma(const UnitTypeLhs x, const UnitMultiply y, const UnitAdd z) noexcept
-    -> decltype(x * y) {
+auto fma(const UnitTypeLhs x, const UnitMultiply y,
+         const UnitAdd z) noexcept -> decltype(x * y) {
   using resultType = decltype(x * y);
   static_assert(
       traits::is_convertible_unit_t<

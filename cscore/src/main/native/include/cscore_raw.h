@@ -28,18 +28,18 @@ uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* rawImage,
 uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct WPI_RawFrame* rawImage,
                                     double timeout, CS_Status* status);
 
-CS_Sink CS_CreateRawSink(const char* name, CS_Status* status);
+CS_Sink CS_CreateRawSink(const struct WPI_String* name, CS_Bool isCv,
+                         CS_Status* status);
 
-CS_Sink CS_CreateRawSinkCallback(const char* name, void* data,
-                                 void (*processFrame)(void* data,
-                                                      uint64_t time),
-                                 CS_Status* status);
+CS_Sink CS_CreateRawSinkCallback(
+    const struct WPI_String* name, CS_Bool isCv, void* data,
+    void (*processFrame)(void* data, uint64_t time), CS_Status* status);
 
 void CS_PutRawSourceFrame(CS_Source source, const struct WPI_RawFrame* image,
                           CS_Status* status);
 
-CS_Source CS_CreateRawSource(const char* name, const CS_VideoMode* mode,
-                             CS_Status* status);
+CS_Source CS_CreateRawSource(const struct WPI_String* name, CS_Bool isCv,
+                             const CS_VideoMode* mode, CS_Status* status);
 /** @} */
 
 #ifdef __cplusplus
@@ -54,11 +54,11 @@ namespace cs {
  * @{
  */
 
-CS_Source CreateRawSource(std::string_view name, const VideoMode& mode,
-                          CS_Status* status);
+CS_Source CreateRawSource(std::string_view name, bool isCv,
+                          const VideoMode& mode, CS_Status* status);
 
-CS_Sink CreateRawSink(std::string_view name, CS_Status* status);
-CS_Sink CreateRawSinkCallback(std::string_view name,
+CS_Sink CreateRawSink(std::string_view name, bool isCv, CS_Status* status);
+CS_Sink CreateRawSinkCallback(std::string_view name, bool isCv,
                               std::function<void(uint64_t time)> processFrame,
                               CS_Status* status);
 
@@ -166,14 +166,14 @@ class RawSink : public ImageSink {
 };
 
 inline RawSource::RawSource(std::string_view name, const VideoMode& mode) {
-  m_handle = CreateRawSource(name, mode, &m_status);
+  m_handle = CreateRawSource(name, false, mode, &m_status);
 }
 
 inline RawSource::RawSource(std::string_view name,
                             VideoMode::PixelFormat format, int width,
                             int height, int fps) {
-  m_handle =
-      CreateRawSource(name, VideoMode{format, width, height, fps}, &m_status);
+  m_handle = CreateRawSource(name, false, VideoMode{format, width, height, fps},
+                             &m_status);
 }
 
 inline void RawSource::PutFrame(wpi::RawFrame& image) {
@@ -182,12 +182,12 @@ inline void RawSource::PutFrame(wpi::RawFrame& image) {
 }
 
 inline RawSink::RawSink(std::string_view name) {
-  m_handle = CreateRawSink(name, &m_status);
+  m_handle = CreateRawSink(name, false, &m_status);
 }
 
 inline RawSink::RawSink(std::string_view name,
                         std::function<void(uint64_t time)> processFrame) {
-  m_handle = CreateRawSinkCallback(name, processFrame, &m_status);
+  m_handle = CreateRawSinkCallback(name, false, processFrame, &m_status);
 }
 
 inline uint64_t RawSink::GrabFrame(wpi::RawFrame& image, double timeout) const {

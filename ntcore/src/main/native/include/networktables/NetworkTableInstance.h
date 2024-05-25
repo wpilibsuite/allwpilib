@@ -596,10 +596,10 @@ class NetworkTableInstance final {
   /**
    * Sets server address and port for client (without restarting client).
    *
-   * @param server_name server name (UTF-8 string, null terminated)
+   * @param server_name server name (UTF-8 string)
    * @param port        port to communicate over (0 = default)
    */
-  void SetServer(const char* server_name, unsigned int port = 0);
+  void SetServer(std::string_view server_name, unsigned int port = 0);
 
   /**
    * Sets server addresses and ports for client (without restarting client).

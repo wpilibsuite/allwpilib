@@ -33,7 +33,7 @@ class ConfigurableSourceImpl : public SourceImpl {
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
-  // OpenCV-specific functions
+  // Frame based specific functions
   void NotifyError(std::string_view msg);
   int CreateProperty(std::string_view name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value);

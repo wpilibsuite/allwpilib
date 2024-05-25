@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Victor Zverovich <viz@meta.com>
+Date: Mon, 29 Jan 2024 07:48:48 -0800
+Subject: [PATCH 2/2] Fix tautological-compare warning
+
+---
+ include/fmt/ranges.h | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/include/fmt/ranges.h b/include/fmt/ranges.h
+index 3638fffb83bce6035c13659f26fe13749c8b19ea..767378c6203fc34e7d763075bd663d2bb6774a97 100644
+--- a/include/fmt/ranges.h
++++ b/include/fmt/ranges.h
+@@ -206,12 +206,13 @@ class is_tuple_formattable_ {
+   static constexpr const bool value = false;
+ };
+ template <typename T, typename C> class is_tuple_formattable_<T, C, true> {
+-  template <std::size_t... Is>
+-  static auto check2(index_sequence<Is...>,
+-                     integer_sequence<bool, (Is == Is)...>) -> std::true_type;
+-  static auto check2(...) -> std::false_type;
+-  template <std::size_t... Is>
+-  static auto check(index_sequence<Is...>) -> decltype(check2(
++  template <size_t... Is>
++  static auto all_true(index_sequence<Is...>,
++                       integer_sequence<bool, (Is >= 0)...>) -> std::true_type;
++  static auto all_true(...) -> std::false_type;
++
++  template <size_t... Is>
++  static auto check(index_sequence<Is...>) -> decltype(all_true(
+       index_sequence<Is...>{},
+       integer_sequence<bool,
+                        (is_formattable<typename std::tuple_element<Is, T>::type,

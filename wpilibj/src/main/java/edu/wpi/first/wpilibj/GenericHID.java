@@ -95,8 +95,8 @@ public class GenericHID {
 
   private final int m_port;
   private int m_outputs;
-  private short m_leftRumble;
-  private short m_rightRumble;
+  private int m_leftRumble;
+  private int m_rightRumble;
 
   /**
    * Construct an instance of a device.
@@ -455,8 +455,7 @@ public class GenericHID {
    */
   public void setRumble(RumbleType type, double value) {
     value = MathUtil.clamp(value, 0, 1);
-    short rumbleValue = (short) (value * 65535);
-
+    int rumbleValue = (int) (value * 65535);
     switch (type) {
       case kLeftRumble:
         this.m_leftRumble = rumbleValue;

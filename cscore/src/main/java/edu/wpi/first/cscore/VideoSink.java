@@ -48,6 +48,8 @@ public class VideoSink implements AutoCloseable {
         return Kind.kMjpeg;
       case 4:
         return Kind.kCv;
+      case 8:
+        return Kind.kRaw;
       default:
         return Kind.kUnknown;
     }
