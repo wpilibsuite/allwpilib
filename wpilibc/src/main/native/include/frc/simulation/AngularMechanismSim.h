@@ -23,7 +23,7 @@ class AngularMechanismSim : public LinearSystemSim<2, 1, 2> {
  public:
   /**
    * Creates a simulated angular mechanism controller by a DC motor.
-   * This class is useful for simulating mechanisms like
+   * This class is useful for simulating mechanisms like single motors,
    * turrets, wrists, swerve module steers, etc.
    * Note that gravitational effects are not included in this model.
    *
