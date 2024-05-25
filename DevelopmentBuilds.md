@@ -19,7 +19,7 @@ To build a project using a development build, find the build.gradle file and ope
 wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
 wpi.versions.wpilibVersion = 'YEAR.+'
-wpi.versions.wpimathVersion = 'YEAR.+
+wpi.versions.wpimathVersion = 'YEAR.+'
 ```
 
 The top of your ``build.gradle`` file should now look similar to the code below. Ignore any differences in versions.
