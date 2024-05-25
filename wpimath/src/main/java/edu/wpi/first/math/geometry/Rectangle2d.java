@@ -38,19 +38,6 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Constructs a rectangle at the specified position and rotation with the specified x width and y
-   * width.
-   *
-   * @param center The center of the rectangle.
-   * @param xWidth The x size component of the rectangle, in unrotated coordinate frame.
-   * @param yWidth The y size component of the rectangle, in unrotated coordinate frame.
-   * @param rotation The rotation of the rectangle.
-   */
-  public Rectangle2d(Translation2d center, double xWidth, double yWidth, Rotation2d rotation) {
-    this(new Pose2d(center, rotation), xWidth, yWidth);
-  }
-
-  /**
    * Creates an unrotated rectangle from the given corners. The corners should be diagonally
    * opposite of each other.
    *
@@ -59,10 +46,9 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    */
   public Rectangle2d(Translation2d cornerA, Translation2d cornerB) {
     this(
-        cornerA.plus(cornerB).div(2.0),
+        new Pose2d(cornerA.plus(cornerB).div(2.0), Rotation2d.kZero),
         Math.abs(cornerA.getX() - cornerB.getX()),
-        Math.abs(cornerA.getY() - cornerB.getY()),
-        new Rotation2d());
+        Math.abs(cornerA.getY() - cornerB.getY()));
   }
 
   /**
