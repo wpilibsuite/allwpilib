@@ -6,12 +6,12 @@
 
 #include <cmath>
 
+#include <units/acceleration.h>
 #include <units/voltage.h>
 #include <wpi/MathExtras.h>
 
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
-#include <units/acceleration.h>
 
 using namespace frc;
 using namespace frc::sim;
@@ -44,9 +44,9 @@ void SingleJointedArmSim::SetPosition(units::radian_t angle) {
 }
 
 units::kilogram_t SingleJointedArmSim::GetMass() const {
-    return units::kilogram_t{GetJ().value() /
-                             ((1.0 / 12.0) * std::pow(m_armLen.value(), 2) +
-                              std::pow(m_pivotPoint.value(), 2))};
+  return units::kilogram_t{GetJ().value() /
+                           ((1.0 / 12.0) * std::pow(m_armLen.value(), 2) +
+                            std::pow(m_pivotPoint.value(), 2))};
 }
 
 units::radians_per_second_squared_t
@@ -70,10 +70,12 @@ SingleJointedArmSim::GetAngularAcceleration() const {
   if (m_simulateGravity) {
     units::kilogram_t m = GetMass();
     units::meters_per_second_squared_t g = -9.8_mps_sq;
-    units::meter_t r = units::meter_t{std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
+    units::meter_t r = units::meter_t{
+        std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
     units::kilogram_square_meter_t J = GetJ();
-    units::radians_per_second_squared_t alphaGrav = 
-      units::radians_per_second_squared_t{(m.value() * g.value() * r.value() / J.value()) * std::cos(m_x(0))};
+    units::radians_per_second_squared_t alphaGrav =
+        units::radians_per_second_squared_t{
+            (m.value() * g.value() * r.value() / J.value()) * std::cos(m_x(0))};
     return a + alphaGrav;
   }
   return a;
@@ -120,10 +122,13 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
         if (m_simulateGravity) {
           units::kilogram_t m = GetMass();
           units::meters_per_second_squared_t g = -9.8_mps_sq;
-          units::meter_t r = units::meter_t{std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
+          units::meter_t r = units::meter_t{
+              std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
           units::kilogram_square_meter_t J = GetJ();
-          units::radians_per_second_squared_t alphaGravConstant = 
-              units::radians_per_second_squared_t{(m.value() * g.value() * r.value() / J.value()) * std::cos(m_x(0))};
+          units::radians_per_second_squared_t alphaGravConstant =
+              units::radians_per_second_squared_t{
+                  (m.value() * g.value() * r.value() / J.value()) *
+                  std::cos(m_x(0))};
           xdot += Vectord<2>{0.0, (alphaGravConstant * std::cos(x(0)))};
         }
         return xdot;

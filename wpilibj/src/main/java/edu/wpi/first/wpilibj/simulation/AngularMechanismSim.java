@@ -46,8 +46,8 @@ public class AngularMechanismSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated angular mechanism.
    *
-   * <p>This class is useful for simulating mechanisms like turrets, wrists, single motors, swerve module steers,
-   * etc. Note that gravitational effects are not included in this model.
+   * <p>This class is useful for simulating mechanisms like turrets, wrists, single motors, swerve
+   * module steers, etc. Note that gravitational effects are not included in this model.
    *
    * @param plant The linear system representing the angular mechanism. Use either {@link
    *     LinearSystemId#createAngularSystem(DCMotor, double, double)} if using physical constants or
