@@ -271,8 +271,7 @@ TEST_F(CommandDecoratorTest, DeadlineForOrder) {
     EXPECT_TRUE(dictatorWasPolled);
   });
 
-  auto group =
-      std::move(dictator).ToPtr().DeadlineFor(std::move(other).ToPtr());
+  auto group = std::move(dictator).DeadlineFor(std::move(other).ToPtr());
 
   scheduler.Schedule(group);
   scheduler.Run();
@@ -298,8 +297,7 @@ TEST_F(CommandDecoratorTest, AlongWithOrder) {
     EXPECT_TRUE(firstWasPolled);
   });
 
-  auto group =
-      std::move(command1).ToPtr().AlongWith(std::move(command2).ToPtr());
+  auto group = std::move(command1).AlongWith(std::move(command2).ToPtr());
 
   scheduler.Schedule(group);
   scheduler.Run();
@@ -325,8 +323,7 @@ TEST_F(CommandDecoratorTest, RaceWithOrder) {
     EXPECT_TRUE(firstWasPolled);
   });
 
-  auto group =
-      std::move(command1).ToPtr().RaceWith(std::move(command2).ToPtr());
+  auto group = std::move(command1).RaceWith(std::move(command2).ToPtr());
 
   scheduler.Schedule(group);
   scheduler.Run();
