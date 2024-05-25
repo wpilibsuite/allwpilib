@@ -47,8 +47,8 @@ class Arm {
   // 30in overall arm length, range of motion in [-75, 255] degrees, and noise
   // with a standard deviation of 1 encoder tick.
   frc::LinearSystem<2, 1, 2> system =
-      frc::LinearSystemId::SingleJointedArmSystem(frc::DCMotor::Vex775Pro(2),
-                                                  15.5_kg, 30_in, 0_m, 300.0);
+      frc::LinearSystemId::SingleJointedArmSystem(
+          frc::DCMotor::Vex775Pro(2), kArmMass, kArmLength, 0_m, kArmReduction);
   frc::sim::SingleJointedArmSim m_armSim{
       system, m_armGearbox, kArmLength,
       0_m,    kMinAngle,    kMaxAngle,

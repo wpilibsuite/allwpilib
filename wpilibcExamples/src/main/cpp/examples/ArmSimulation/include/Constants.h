@@ -36,8 +36,8 @@ inline constexpr units::degree_t kDefaultArmSetpoint = 75.0_deg;
 inline constexpr units::radian_t kMinAngle = -75.0_deg;
 inline constexpr units::radian_t kMaxAngle = 255.0_deg;
 
-inline constexpr double kArmReduction = 200.0;
-inline constexpr units::kilogram_t kArmMass = 8.0_kg;
+inline constexpr double kArmReduction = 600.0;
+inline constexpr units::kilogram_t kArmMass = 5.0_kg;
 inline constexpr units::meter_t kArmLength = 30.0_in;
 
 // distance per pulse = (angle per revolution) / (pulses per revolution)

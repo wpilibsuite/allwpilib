@@ -5,11 +5,11 @@
 #include "frc/simulation/SingleJointedArmSim.h"
 
 #include <cmath>
+#include <iostream>
 
 #include <units/acceleration.h>
 #include <units/voltage.h>
 #include <wpi/MathExtras.h>
-#include <iostream>
 
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
@@ -45,8 +45,8 @@ void SingleJointedArmSim::SetPosition(units::radian_t angle) {
 }
 
 units::kilogram_t SingleJointedArmSim::GetMass() const {
- units::meter_t r = units::meter_t{
-    std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
+  units::meter_t r =
+      units::meter_t{std::abs((0.5) * m_armLen.value() - m_pivotPoint.value())};
   return units::kilogram_t{GetJ().value() /
                            ((1.0 / 12.0) * std::pow(r.value(), 2) +
                             std::pow(m_pivotPoint.value(), 2))};
@@ -69,7 +69,7 @@ SingleJointedArmSim::GetAngularAcceleration() const {
   //   f(x, u) = Ax + Bu + [0  α]ᵀ
   //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
   units::radians_per_second_squared_t a{
-      (m_plant.A() * m_x + m_plant.B() * m_u)(0, 0)};
+      (m_plant.A() * m_x + m_plant.B() * m_u)(1, 0)};
   if (m_simulateGravity) {
     units::kilogram_t m = GetMass();
     units::meters_per_second_squared_t g = -9.8_mps_sq;
