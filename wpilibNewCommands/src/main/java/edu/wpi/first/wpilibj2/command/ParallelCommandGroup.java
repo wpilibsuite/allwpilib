@@ -19,6 +19,8 @@ import java.util.Map;
  */
 public class ParallelCommandGroup extends Command {
   // maps commands in this composition to whether they are still running
+  // LinkedHashMap guarantees we iterate over commands in the order they were added (Note that
+  // changing the value associated with a command does NOT change the order)
   private final Map<Command, Boolean> m_commands = new LinkedHashMap<>();
   private boolean m_runWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;

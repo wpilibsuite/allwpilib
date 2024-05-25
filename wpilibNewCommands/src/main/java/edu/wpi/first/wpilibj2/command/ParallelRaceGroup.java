@@ -19,6 +19,7 @@ import java.util.Set;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class ParallelRaceGroup extends Command {
+  // LinkedHashSet guarantees we iterate over commands in the order they were added
   private final Set<Command> m_commands = new LinkedHashSet<>();
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
