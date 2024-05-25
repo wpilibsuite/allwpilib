@@ -159,8 +159,10 @@ public class SingleJointedArmSim extends AngularMechanismSim {
    * @return the mass.
    */
   public double getMassKilograms() {
-    return getJKgMetersSquared()
-        / ((1.0 / 12.0) * Math.pow(m_armLenMeters, 2) + Math.pow(m_pivotPointMeters, 2));
+    double l = getArmLengthMeters();
+    double p = getPivotPointMeters();
+    double r = Math.abs((l / 2) - p);
+    return getJKgMetersSquared() / ((1.0 / 12.0) * Math.pow(m_armLenMeters, 2) + Math.pow(r, 2));
   }
 
   /**
