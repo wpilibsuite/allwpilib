@@ -23,7 +23,7 @@ public final class CombinedRuntimeLoader {
   private static boolean skipSetDllDirectory;
 
   /**
-   * Flag to test not setting DLL directory for loading
+   * Flag to test not setting DLL directory for loading.
    *
    * @param skip Skip setting DLL directory
    */
