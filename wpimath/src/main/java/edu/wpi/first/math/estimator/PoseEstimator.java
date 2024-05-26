@@ -325,13 +325,11 @@ public class PoseEstimator<T> {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      return obj instanceof PoseEstimator<?>.InterpolationRecord record
-          && Objects.equals(gyroAngle, record.gyroAngle)
-          && Objects.equals(wheelPositions, record.wheelPositions)
-          && Objects.equals(poseMeters, record.poseMeters);
+      return this == obj
+          || obj instanceof PoseEstimator<?>.InterpolationRecord record
+              && Objects.equals(gyroAngle, record.gyroAngle)
+              && Objects.equals(wheelPositions, record.wheelPositions)
+              && Objects.equals(poseMeters, record.poseMeters);
     }
 
     @Override

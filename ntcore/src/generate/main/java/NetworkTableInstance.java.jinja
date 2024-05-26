@@ -1241,10 +1241,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-    return other instanceof NetworkTableInstance inst && m_handle == inst.m_handle;
+    return other == this || other instanceof NetworkTableInstance inst && m_handle == inst.m_handle;
   }
 
   @Override
