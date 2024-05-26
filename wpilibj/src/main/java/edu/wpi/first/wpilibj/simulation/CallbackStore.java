@@ -78,6 +78,9 @@ public class CallbackStore implements AutoCloseable {
   @Override
   public void close() {
     switch (m_cancelType) {
+      case -1:
+        // Already cancelled so do nothing so that close() is idempotent.
+        return;
       case kNormalCancel:
         m_cancelCallback.cancel(m_index, m_uid);
         break;
