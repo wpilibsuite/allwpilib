@@ -20,6 +20,21 @@ import java.util.Objects;
 public final class CombinedRuntimeLoader {
   private CombinedRuntimeLoader() {}
 
+  private static boolean skipSetDllDirectory;
+
+  /**
+   * Flag to test not setting DLL directory for loading
+   *
+   * @param skip Skip setting DLL directory
+   */
+  public static synchronized void setSkipSetDllDirectory(boolean skip) {
+    skipSetDllDirectory = skip;
+  }
+
+  private static synchronized boolean getSkipSetDllDirectory() {
+    return skipSetDllDirectory;
+  }
+
   private static String extractionDirectory;
 
   /**
@@ -101,6 +116,14 @@ public final class CombinedRuntimeLoader {
    * @return DLL directory.
    */
   public static native String setDllDirectory(String directory);
+
+  private static String setDllDirectoryShim(String directory) {
+    if (getSkipSetDllDirectory()) {
+      return null;
+    } else {
+      return setDllDirectory(directory);
+    }
+  }
 
   private static String getLoadErrorMessage(String libraryName, UnsatisfiedLinkError ule) {
     StringBuilder msg = new StringBuilder(512);
@@ -202,7 +225,7 @@ public final class CombinedRuntimeLoader {
     try {
       if (System.getProperty("os.name").startsWith("Windows")) {
         var extractionPathString = getExtractionDirectory();
-        oldDllDirectory = setDllDirectory(extractionPathString);
+        oldDllDirectory = setDllDirectoryShim(extractionPathString);
       }
       for (var extractedFile : extractedFiles) {
         if (extractedFile.contains(libraryName)) {
@@ -217,7 +240,7 @@ public final class CombinedRuntimeLoader {
       throw new IOException(getLoadErrorMessage(currentPath, ule));
     } finally {
       if (oldDllDirectory != null) {
-        setDllDirectory(oldDllDirectory);
+        setDllDirectoryShim(oldDllDirectory);
       }
     }
   }
@@ -238,15 +261,17 @@ public final class CombinedRuntimeLoader {
 
     String currentPath = "";
 
-    try {
-      if (System.getProperty("os.name").startsWith("Windows")) {
-        var extractionPathString = getExtractionDirectory();
-        // Load windows, set dll directory
-        currentPath = Paths.get(extractionPathString, "WindowsLoaderHelper.dll").toString();
-        System.load(currentPath);
+    if (!getSkipSetDllDirectory()) {
+      try {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+          var extractionPathString = getExtractionDirectory();
+          // Load windows, set dll directory
+          currentPath = Paths.get(extractionPathString, "WindowsLoaderHelper.dll").toString();
+          System.load(currentPath);
+        }
+      } catch (UnsatisfiedLinkError ule) {
+        throw new IOException(getLoadErrorMessage(currentPath, ule));
       }
-    } catch (UnsatisfiedLinkError ule) {
-      throw new IOException(getLoadErrorMessage(currentPath, ule));
     }
 
     for (var library : librariesToLoad) {
