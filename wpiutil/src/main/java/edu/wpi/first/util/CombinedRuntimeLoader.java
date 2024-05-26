@@ -35,6 +35,23 @@ public final class CombinedRuntimeLoader {
     extractionDirectory = directory;
   }
 
+  private static String defaultExtractionRoot;
+
+  /**
+   * Gets the default extraction root location (~/.wpilib/nativecache) for use if
+   * setExtractionDirectory is not set.
+   *
+   * @return The default extraction root location.
+   */
+  public static synchronized String getDefaultExtractionRoot() {
+    if (defaultExtractionRoot != null) {
+      return defaultExtractionRoot;
+    }
+    String home = System.getProperty("user.home");
+    defaultExtractionRoot = Paths.get(home, ".wpilib", "nativecache").toString();
+    return defaultExtractionRoot;
+  }
+
   /**
    * Returns platform path.
    *
@@ -89,7 +106,7 @@ public final class CombinedRuntimeLoader {
     StringBuilder msg = new StringBuilder(512);
     msg.append(libraryName)
         .append(" could not be loaded from path\n" + "\tattempted to load for platform ")
-        .append(CombinedRuntimeLoader.getPlatformPath())
+        .append(getPlatformPath())
         .append("\nLast Load Error: \n")
         .append(ule.getMessage())
         .append('\n');
@@ -120,7 +137,7 @@ public final class CombinedRuntimeLoader {
       map = mapper.readValue(stream, typeRef);
     }
 
-    var platformPath = Paths.get(CombinedRuntimeLoader.getPlatformPath());
+    var platformPath = Paths.get(getPlatformPath());
     var platform = platformPath.getName(0).toString();
     var arch = platformPath.getName(1).toString();
 
@@ -133,7 +150,7 @@ public final class CombinedRuntimeLoader {
     if (extractionPathString == null) {
       String hash = (String) map.get("hash");
 
-      var defaultExtractionRoot = CombinedRuntimeLoader.getExtractionDirectory();
+      var defaultExtractionRoot = getDefaultExtractionRoot();
       var extractionPath = Paths.get(defaultExtractionRoot, platform, arch, hash);
       extractionPathString = extractionPath.toString();
 
