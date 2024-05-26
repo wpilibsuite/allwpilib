@@ -257,7 +257,7 @@ public final class SplineHelper {
       CubicHermiteSpline cb = new CubicHermiteSpline(bInitial.x, bFinal.x, bInitial.y, bFinal.y);
 
       // Calculate the second derivatives at the knot points.
-      SimpleMatrix bases = new SimpleMatrix(4, 1, true, new double[] {1, 1, 1, 1});
+      SimpleMatrix bases = new SimpleMatrix(4, 1, true, 1, 1, 1, 1);
       SimpleMatrix combinedA = ca.getCoefficients().mult(bases);
 
       double ddxA = combinedA.get(4, 0);
