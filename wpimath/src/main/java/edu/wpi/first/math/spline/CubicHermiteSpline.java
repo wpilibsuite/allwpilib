@@ -105,6 +105,7 @@ public class CubicHermiteSpline extends Spline {
    *
    * @return The hermite basis matrix for cubic hermite spline interpolation.
    */
+  @SuppressWarnings("PMD.UnnecessaryVarargsArrayCreation")
   private SimpleMatrix makeHermiteBasis() {
     if (hermiteBasis == null) {
       // Given P(i), P'(i), P(i+1), P'(i+1), the control vectors, we want to find
@@ -148,6 +149,7 @@ public class CubicHermiteSpline extends Spline {
    * @param finalVector The control vector for the final point.
    * @return The control vector matrix for a dimension.
    */
+  @SuppressWarnings("PMD.UnnecessaryVarargsArrayCreation")
   private SimpleMatrix getControlVectorFromArrays(double[] initialVector, double[] finalVector) {
     if (initialVector.length < 2 || finalVector.length < 2) {
       throw new IllegalArgumentException("Size of vectors must be 2 or greater.");
