@@ -15,6 +15,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -419,8 +420,10 @@ public abstract class Command implements Sendable {
    * @return the decorated command
    */
   public ParallelRaceGroup repeatedly(int times) {
-    int[] counter = {0};
-    return this.finallyDo(() -> counter[0]++).repeatedly().until(() -> counter[0] >= times);
+    AtomicInteger counter = new AtomicInteger(0);
+    return this.finallyDo(counter::getAndIncrement)
+        .repeatedly()
+        .until(() -> counter.get() >= times);
   }
 
   /**
