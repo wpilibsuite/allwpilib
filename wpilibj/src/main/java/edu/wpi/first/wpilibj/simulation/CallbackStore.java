@@ -37,7 +37,7 @@ public class CallbackStore implements AutoCloseable {
     this.m_cancelCallbackChannel = null;
   }
 
-    /**
+  /**
    * <b>Note: This constructor is for simulation classes only. It should not be called by teams!</b>
    *
    * @param index TODO
