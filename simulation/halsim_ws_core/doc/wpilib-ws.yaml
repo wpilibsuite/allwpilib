@@ -505,21 +505,24 @@ components:
           type: string
           description: Device Identifier (usually channel)
         data:
-          <init:
-            type: boolean
-            description: "If PCM is initialized in the robot program"
-          ">on":
-            type: boolean
-            description: "Whether the compressor is running"
-          "<closed_loop":
-            type: boolean
-            description: "Whether closed-loop control is enabled"
-          ">pressure_switch":
-            type: boolean
-            description: "The value of the pressure switch"
-          ">current":
-            type: number
-            description: "The amount of current being drawn by the compressor, in Amps"
+          type: object
+          description:
+          properties:
+            <init:
+              type: boolean
+              description: "If PCM is initialized in the robot program"
+            ">on":
+              type: boolean
+              description: "Whether the compressor is running"
+            "<closed_loop":
+              type: boolean
+              description: "Whether closed-loop control is enabled"
+            ">pressure_switch":
+              type: boolean
+              description: "The value of the pressure switch"
+            ">current":
+              type: number
+              description: "The amount of current being drawn by the compressor, in Amps"
 
     pwmData:
       type: object
