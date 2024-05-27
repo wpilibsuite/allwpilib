@@ -509,7 +509,7 @@ components:
           description: Device Identifier (usually channel)
         data:
           type: object
-          description:
+          description: "PCM Output Data (type: PCM, device: module number)"
           properties:
             <init:
               type: boolean
