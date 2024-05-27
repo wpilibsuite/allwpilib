@@ -46,8 +46,8 @@ TEST(LinearSystemIDTest, FlywheelSystem) {
   ASSERT_TRUE(model.D().isApprox(frc::Matrixd<1, 1>{0.0}, 0.001));
 }
 
-TEST(LinearSystemIDTest, DCMotorSystem) {
-  auto model = frc::LinearSystemId::DCMotorSystem(frc::DCMotor::NEO(2),
+TEST(LinearSystemIDTest, AngularSystem) {
+  auto model = frc::LinearSystemId::AngularSystem(frc::DCMotor::NEO(2),
                                                   0.00032_kg_sq_m, 1.0);
   ASSERT_TRUE(
       model.A().isApprox(frc::Matrixd<2, 2>{{0, 1}, {0, -26.87032}}, 0.001));

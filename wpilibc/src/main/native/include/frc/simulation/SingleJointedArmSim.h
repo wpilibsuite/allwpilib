@@ -5,20 +5,23 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 
 #include <units/angle.h>
 #include <units/length.h>
 #include <units/mass.h>
 #include <units/moment_of_inertia.h>
+#include <wpi/SmallVector.h>
 
-#include "frc/simulation/LinearSystemSim.h"
+#include "frc/EigenCore.h"
+#include "frc/simulation/AngularMechanismSim.h"
 #include "frc/system/plant/DCMotor.h"
 
 namespace frc::sim {
 /**
  * Represents a simulated arm mechanism.
  */
-class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
+class SingleJointedArmSim : public AngularMechanismSim {
  public:
   /**
    * Creates a simulated arm mechanism.
@@ -27,9 +30,8 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    *                           be created with
    *                           LinearSystemId::SingleJointedArmSystem().
    * @param gearbox            The type and number of motors on the arm gearbox.
-   * @param gearing            The gear ratio of the arm (numbers greater than 1
-   *                           represent reductions).
    * @param armLength          The length of the arm.
+   * @param pivotPoint         The pivot point of the arm.
    * @param minAngle           The minimum angle that the arm is capable of.
    * @param maxAngle           The maximum angle that the arm is capable of.
    * @param simulateGravity    Whether gravity should be simulated or not.
@@ -37,36 +39,55 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   SingleJointedArmSim(const LinearSystem<2, 1, 2>& system,
-                      const DCMotor& gearbox, double gearing,
-                      units::meter_t armLength, units::radian_t minAngle,
+                      const DCMotor& gearbox, units::meter_t armLength,
+                      units::meter_t pivotPoint, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
                       units::radian_t startingAngle,
                       const std::array<double, 2>& measurementStdDevs = {0.0,
                                                                          0.0});
-  /**
-   * Creates a simulated arm mechanism.
-   *
-   * @param gearbox            The type and number of motors on the arm gearbox.
-   * @param gearing            The gear ratio of the arm (numbers greater than 1
-   *                           represent reductions).
-   * @param moi                The moment of inertia of the arm. This can be
-   *                           calculated from CAD software.
-   * @param armLength          The length of the arm.
-   * @param minAngle           The minimum angle that the arm is capable of.
-   * @param maxAngle           The maximum angle that the arm is capable of.
-   * @param simulateGravity    Whether gravity should be simulated or not.
-   * @param startingAngle      The initial position of the arm.
-   * @param measurementStdDevs The standard deviation of the measurement noise.
-   */
-  SingleJointedArmSim(const DCMotor& gearbox, double gearing,
-                      units::kilogram_square_meter_t moi,
-                      units::meter_t armLength, units::radian_t minAngle,
-                      units::radian_t maxAngle, bool simulateGravity,
-                      units::radian_t startingAngle,
-                      const std::array<double, 2>& measurementStdDevs = {0.0,
-                                                                         0.0});
+  using AngularMechanismSim::GetAngularAcceleration;
 
-  using LinearSystemSim::SetState;
+  /**
+   * Returns the arm length of the system.
+   *
+   * @return the arm length.
+   */
+  units::meter_t GetArmLength() { return m_armLen; }
+
+  /**
+   * Returns the pivot point of the system.
+   *
+   * @return the pivot point.
+   */
+  units::meter_t GetPivotPoint() { return m_pivotPoint; }
+
+  /**
+   * Returns the minimum angle of the system.
+   *
+   * @return the minimum angle.
+   */
+  units::radian_t GetMinAngle() { return m_minAngle; }
+
+  /**
+   * Returns the minimum angle of the system.
+   *
+   * @return the minimum angle.
+   */
+  units::radian_t GetMaxAngle() { return m_maxAngle; }
+
+  /**
+   * Returns the mass of the system.
+   *
+   * @return the mass.
+   */
+  units::kilogram_t GetMass() const { return m_mass; }
+
+  /**
+   * Returns the acceleration of the mechanism.
+   *
+   * @return the mechanism's acceleration.
+   */
+  units::radians_per_second_squared_t GetAngularAcceleration() const;
 
   /**
    * Sets the arm's state. The new angle will be limited between the minimum and
@@ -76,6 +97,14 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param velocity The new angular velocity.
    */
   void SetState(units::radian_t angle, units::radians_per_second_t velocity);
+
+  /**
+   * Sets the arm's position.  The new angle will be limited between the minimum
+   * and maximum allowed limits.
+   *
+   * @param angle The new angle.
+   */
+  void SetPosition(units::radian_t angle);
 
   /**
    * Returns whether the arm would hit the lower limit.
@@ -108,34 +137,6 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
   bool HasHitUpperLimit() const;
 
   /**
-   * Returns the current arm angle.
-   *
-   * @return The current arm angle.
-   */
-  units::radian_t GetAngle() const;
-
-  /**
-   * Returns the current arm velocity.
-   *
-   * @return The current arm velocity.
-   */
-  units::radians_per_second_t GetVelocity() const;
-
-  /**
-   * Returns the arm current draw.
-   *
-   * @return The arm current draw.
-   */
-  units::ampere_t GetCurrentDraw() const;
-
-  /**
-   * Sets the input voltage for the arm.
-   *
-   * @param voltage The input voltage.
-   */
-  void SetInputVoltage(units::volt_t voltage);
-
-  /**
    * Calculates a rough estimate of the moment of inertia of an arm given its
    * length and mass.
    *
@@ -162,10 +163,11 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
 
  private:
   units::meter_t m_armLen;
+  units::meter_t m_pivotPoint;
   units::radian_t m_minAngle;
   units::radian_t m_maxAngle;
-  const DCMotor m_gearbox;
-  double m_gearing;
   bool m_simulateGravity;
+  units::meter_t m_distanceToPivot;
+  units::kilogram_t m_mass;
 };
 }  // namespace frc::sim

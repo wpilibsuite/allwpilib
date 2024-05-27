@@ -39,6 +39,10 @@ class Robot : public frc::TimedRobot {
   // spins slower than the motors, this number should be greater than one.
   static constexpr double kArmGearing = 10.0;
 
+  static constexpr units::meter_t kArmLength = 1.0_m;
+
+  static constexpr units::kilogram_t kArmMass = 3.6_kg;
+
   // The plant holds a state-space model of our arm. This system has the
   // following properties:
   //
@@ -46,8 +50,8 @@ class Robot : public frc::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   frc::LinearSystem<2, 1, 1> m_armPlant =
-      frc::LinearSystemId::SingleJointedArmSystem(frc::DCMotor::NEO(2), kArmMOI,
-                                                  kArmGearing)
+      frc::LinearSystemId::SingleJointedArmSystem(
+          frc::DCMotor::NEO(2), kArmMass, kArmLength, 0_m, kArmGearing)
           .Slice(0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.

@@ -87,17 +87,17 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a DC motor system. The states of the system are [angular
-   * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
-   * velocity].
+   * Create a state-space model of an angular mechanism controlled by a DC motor system. The states
+   * of the system are [angular position, angular velocity], inputs are [voltage], and outputs are
+   * [angular position, angular velocity].
    *
    * @param motor The motor (or gearbox) attached to system.
-   * @param JKgMetersSquared The moment of inertia J of the DC motor.
+   * @param JKgMetersSquared The moment of inertia J of the mechanism.
    * @param gearing The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if JKgMetersSquared &lt;= 0 or gearing &lt;= 0.
    */
-  public static LinearSystem<N2, N1, N2> createDCMotorSystem(
+  public static LinearSystem<N2, N1, N2> createAngularSystem(
       DCMotor motor, double JKgMetersSquared, double gearing) {
     if (JKgMetersSquared <= 0.0) {
       throw new IllegalArgumentException("J must be greater than zero.");
@@ -118,39 +118,6 @@ public final class LinearSystemId {
                 * motor.KtNMPerAmp
                 / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgMetersSquared)),
         VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * JKgMetersSquared)),
-        Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));
-  }
-
-  /**
-   * Create a state-space model of a DC motor system. The states of the system are [angular
-   * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
-   * velocity].
-   *
-   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
-   *
-   * <p>The parameters provided by the user are from this feedforward model:
-   *
-   * <p>u = K_v v + K_a a
-   *
-   * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec²)
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
-   * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
-   */
-  public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
-    if (kV < 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than or equal to zero.");
-    }
-    if (kA <= 0.0) {
-      throw new IllegalArgumentException("Ka must be greater than zero.");
-    }
-
-    return new LinearSystem<>(
-        MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -kV / kA),
-        VecBuilder.fill(0, 1 / kA),
         Matrix.eye(Nat.N2()),
         new Matrix<>(Nat.N2(), Nat.N1()));
   }
@@ -214,33 +181,44 @@ public final class LinearSystemId {
    * angular velocity], inputs are [voltage], and outputs are [angle].
    *
    * @param motor The motor (or gearbox) attached to the arm.
-   * @param JKgSquaredMeters The moment of inertia J of the arm.
+   * @param armMassKg The mass of the arm.
+   * @param armLengthMeters The length of the arm.
+   * @param pivotPositionMeters The pivot location of the arm. A value of 0 or equal to
+   *     armLengthMeters indicates that the arm is pivoted at one of the ends.
    * @param gearing The gearing between the motor and arm, in output over input. Most of the time
    *     this will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
   public static LinearSystem<N2, N1, N2> createSingleJointedArmSystem(
-      DCMotor motor, double JKgSquaredMeters, double gearing) {
-    if (JKgSquaredMeters <= 0.0) {
-      throw new IllegalArgumentException("JKgSquaredMeters must be greater than zero.");
+      DCMotor motor,
+      double armMassKg,
+      double armLengthMeters,
+      double pivotPositionMeters,
+      double gearing) {
+    if (armMassKg <= 0.0) {
+      throw new IllegalArgumentException("armMassKg must be greater than zero.");
     }
-    if (gearing <= 0.0) {
-      throw new IllegalArgumentException("gearing must be greater than zero.");
+    if (armLengthMeters <= 0.0) {
+      throw new IllegalArgumentException("armLengthMeters must be greater than zero.");
+    }
+    if (pivotPositionMeters >= armLengthMeters) {
+      throw new IllegalArgumentException("pivotPositionMeters must be less than the arm length.");
+    }
+    if (pivotPositionMeters < 0.0) {
+      throw new IllegalArgumentException("pivotPositionMeters must be greater than or equal to 0");
     }
 
-    return new LinearSystem<>(
-        MatBuilder.fill(
-            Nat.N2(),
-            Nat.N2(),
-            0,
-            1,
-            0,
-            -Math.pow(gearing, 2)
-                * motor.KtNMPerAmp
-                / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgSquaredMeters)),
-        VecBuilder.fill(0, gearing * motor.KtNMPerAmp / (motor.rOhms * JKgSquaredMeters)),
-        Matrix.eye(Nat.N2()),
-        new Matrix<>(Nat.N2(), Nat.N1()));
+    // From the central axis theorem the moment of inertia translated
+    // a distance d from the pivot is:
+    //
+    //   J = J_com + 1/2 m * d^2
+    //   J_com = 1/12 m * l^2 for a uniform rod of mass m and length l
+    //   d = |(1/2 L) - p| where p is the pivot location and p >= 0 and p <= l
+
+    double d = Math.abs((armLengthMeters / 2.0) - pivotPositionMeters);
+    double JKgSquaredMetersCenterOfMass = (1.0 / 12.0) * armMassKg * Math.pow(armLengthMeters, 2);
+    double JKgSquaredMeters = JKgSquaredMetersCenterOfMass + armMassKg * Math.pow(d, 2);
+    return createAngularSystem(motor, JKgSquaredMeters, gearing);
   }
 
   /**

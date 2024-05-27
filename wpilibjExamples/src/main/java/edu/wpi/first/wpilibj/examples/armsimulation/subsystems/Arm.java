@@ -5,7 +5,11 @@
 package edu.wpi.first.wpilibj.examples.armsimulation.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
@@ -40,19 +44,22 @@ public class Arm implements AutoCloseable {
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
+  private final LinearSystem<N2, N1, N2> m_plant =
+      LinearSystemId.createSingleJointedArmSystem(
+          m_armGearbox, Constants.kArmMass, Constants.kArmLength, 0.0, Constants.kArmReduction);
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
+          m_plant,
           m_armGearbox,
-          Constants.kArmReduction,
-          SingleJointedArmSim.estimateMOI(Constants.kArmLength, Constants.kArmMass),
           Constants.kArmLength,
+          0.0,
           Constants.kMinAngleRads,
           Constants.kMaxAngleRads,
           true,
           0,
           Constants.kArmEncoderDistPerPulse,
-          0.0 // Add noise with a std-dev of 1 tick
-          );
+          0.0);
+
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
@@ -65,7 +72,7 @@ public class Arm implements AutoCloseable {
           new MechanismLigament2d(
               "Arm",
               30,
-              Units.radiansToDegrees(m_armSim.getAngleRads()),
+              Units.radiansToDegrees(m_armSim.getAngularPositionRad()),
               6,
               new Color8Bit(Color.kYellow)));
 
@@ -92,13 +99,13 @@ public class Arm implements AutoCloseable {
     m_armSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_encoderSim.setDistance(m_armSim.getAngleRads());
+    m_encoderSim.setDistance(m_armSim.getAngularPositionRad());
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));
 
     // Update the Mechanism Arm angle based on the simulated arm angle
-    m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
+    m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngularPositionRad()));
   }
 
   /** Load setpoint and kP from preferences. */
