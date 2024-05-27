@@ -4,6 +4,7 @@
     "files.associations": {
         // Workaround for VSCode C++ extension's inability to recognize standard library files because they don't have an extension.
         // See issue https://github.com/microsoft/vscode-cpptools/issues/4077
-        "**/include/c++/**": "cpp"
+        "**/include/c++/**": "cpp",
+        "**/MSVC/**/include/**": "cpp"
     }
 }
