@@ -80,6 +80,7 @@ public class SharpIR implements Sendable, AutoCloseable {
    * @param minCM Minimum distance to report in centimeters
    * @param maxCM Maximum distance to report in centimeters
    */
+  @SuppressWarnings("this-escape")
   public SharpIR(int channel, double a, double b, double minCM, double maxCM) {
     m_sensor = new AnalogInput(channel);
 

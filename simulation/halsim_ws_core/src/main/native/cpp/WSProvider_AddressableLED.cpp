@@ -51,7 +51,7 @@ void HALSimWSProviderAddressableLED::RegisterCallbacks() {
         }
 
         wpi::json payload;
-        payload[">data"] = jsonData;
+        payload["<data"] = jsonData;
 
         provider->ProcessHalCallback(payload);
       },
