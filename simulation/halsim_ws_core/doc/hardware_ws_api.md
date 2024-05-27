@@ -119,7 +119,7 @@ C++/Java implementation note: these are created as either BuiltInAccelerometer o
 | ``"<output_port"`` | Integer | DIO pin number                                       |
 | ``"<length"``      | Integer | The number of leds in the strip                      |
 | ``"<running"``     | Boolean | Whether the strip is outputting data                 |
-| ``"<data"``        | Array (See Below)  | One value per led; value is an object with ``"r"``, ``"g"``, and ``"b"`` keys, representing the rgb (0-255) components of the color |
+| ``"<data"``        | Array   | One value per led; value is an object with ``"r"``, ``"g"``, and ``"b"`` keys, representing the rgb (0-255) components of the color |
 
 #### Analog Input ("AI")
 
