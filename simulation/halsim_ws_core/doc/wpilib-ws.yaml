@@ -490,6 +490,9 @@ components:
               description: "Right rumble"
               minimum: 0.0
               maximum: 1.0
+            <outputs:
+              type: integer
+              description: "Bitmask of joystick HID outputs"
 
     pcmData:
       type: object
