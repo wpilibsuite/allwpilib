@@ -293,6 +293,18 @@ class SwerveDriveKinematics
       units::meters_per_second_t attainableMaxRobotTranslationSpeed,
       units::radians_per_second_t attainableMaxRobotRotationSpeed);
 
+  SwerveDriveWheelPositions<NumModules> Interpolate(
+      const SwerveDriveWheelPositions<NumModules>& start,
+      const SwerveDriveWheelPositions<NumModules>& end,
+      double t) const override {
+    auto result =
+        wpi::array<SwerveModulePosition, NumModules>(wpi::empty_array);
+    for (size_t i = 0; i < NumModules; ++i) {
+      result[i] = start.positions[i].Interpolate(end.positions[i], t);
+    }
+    return {result};
+  }
+
  private:
   mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>> m_forwardKinematics;

@@ -406,4 +406,22 @@ public class SwerveDriveKinematics
         attainableMaxTranslationalSpeed.in(MetersPerSecond),
         attainableMaxRotationalVelocity.in(RadiansPerSecond));
   }
+
+  @Override
+  public SwerveDriveWheelPositions copy(SwerveDriveWheelPositions positions) {
+    return new SwerveDriveWheelPositions(positions.positions);
+  }
+
+  @Override
+  public SwerveDriveWheelPositions interpolate(
+      SwerveDriveWheelPositions startValue, SwerveDriveWheelPositions endValue, double t) {
+    if (endValue.positions.length != startValue.positions.length) {
+      throw new IllegalArgumentException("Inconsistent number of modules!");
+    }
+    var newPositions = new SwerveModulePosition[startValue.positions.length];
+    for (int i = 0; i < startValue.positions.length; ++i) {
+      newPositions[i] = startValue.positions[i].interpolate(endValue.positions[i], t);
+    }
+    return new SwerveDriveWheelPositions(newPositions);
+  }
 }
