@@ -119,7 +119,7 @@ C++/Java implementation note: these are created as either BuiltInAccelerometer o
 | ``"<output_port"`` | Integer | DIO pin number                                       |
 | ``"<length"``      | Integer | The number of leds in the strip                      |
 | ``"<running"``     | Boolean | Whether the strip is outputting data                 |
-| ``"<data"``        | Array (See Below)  | One value per led; value is an object with ``"r"``, ``"g"``, and ``"b"`` keys, representing the rgb (0-255) components of the color |
+| ``"<data"``        | Array   | One value per led; value is an object with ``"r"``, ``"g"``, and ``"b"`` keys, representing the rgb (0-255) components of the color |
 
 #### Analog Input ("AI")
 
@@ -127,17 +127,17 @@ C++/Java implementation note: these are created as either BuiltInAccelerometer o
 
 The basic analog input just reads a voltage. An analog input can also be configured to use an averaging and oversampling engine.
 
-| Data Key              | Type    | Description                                         |
-| --------------------- | ------- | --------------------------------------------------- |
-| ``"<init"``           | Boolean | If analog input is initialized in the robot program |
-| ``"<avg_bits"``       | Integer | The number of averaging bits                        |
-| ``"<oversample_bits"` | Integer | The number of oversampling bits                     |
-| ``">voltage"``        | Float   | Input voltage, in volts                             |
-| ``"<accum_init"``     | Boolean | If the accumulator is initialized in the robot program |
-| ``">accum_value"``    | Integer | The accumulated value                               |
-| ``">accum_count"``    | Integer | The number of accumulated values                    |
-| ``"<accum_center"``   | Integer | The center value of the accumulator                 |
-| ``"<accum_deadband"`` | Integer | The accumulator's deadband                          |
+| Data Key               | Type    | Description                                         |
+| ---------------------- | ------- | --------------------------------------------------- |
+| ``"<init"``            | Boolean | If analog input is initialized in the robot program |
+| ``"<avg_bits"``        | Integer | The number of averaging bits                        |
+| ``"<oversample_bits"`` | Integer | The number of oversampling bits                     |
+| ``">voltage"``         | Float   | Input voltage, in volts                             |
+| ``"<accum_init"``      | Boolean | If the accumulator is initialized in the robot program |
+| ``">accum_value"``     | Integer | The accumulated value                               |
+| ``">accum_count"``     | Integer | The number of accumulated values                    |
+| ``"<accum_center"``    | Integer | The center value of the accumulator                 |
+| ``"<accum_deadband"``  | Integer | The accumulator's deadband                          |
 
 #### Analog Output ("AO")
 
@@ -261,12 +261,13 @@ Joystick data is an input to the robot program and should be updated for each in
 | ``">axes"``         | Array of float   | One array element per axis; value is -1 to 1 range |
 | ``">povs"``         | Array of integer | One array element per POV; value is angle in degrees of the POV (e.g. 0, 90, 315) if pressed, or -1 if the POV is not pressed |
 | ``">buttons"``      | Array of boolean | One array element per button; true if button is pressed, false if button is released |
+| ``"<outputs"``      | Integer          | Bitmask of joystick HID outputs |
 | ``"<rumble_left"``  | Float            | Left rumble, value is 0-1 range |
 | ``"<rumble_right"`` | Float            | Right rumble, value is 0-1 range |
 
 #### PCM Data ("CTREPCM")
 
-[``"CTREPCM"``]#pcm-data-ctrepcm
+[``"CTREPCM"``]:#pcm-data-ctrepcm
 
 A pneumatic control module is used to regulate the pressure in a pneumatic system by switching a compressor on or off.
 
