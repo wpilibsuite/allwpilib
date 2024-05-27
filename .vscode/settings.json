@@ -1,4 +1,9 @@
 {
     "java.format.settings.url": "https://raw.githubusercontent.com/wpilibsuite/styleguide/main/ide/eclipse-java-google-style.xml",
-    "editor.formatOnSaveMode": "modificationsIfAvailable"
+    "editor.formatOnSaveMode": "modificationsIfAvailable",
+    "files.associations": {
+        // Workaround for VSCode C++ extension's inability to recognize standard library files because they don't have an extension.
+        // See issue https://github.com/microsoft/vscode-cpptools/issues/4077
+        "**/include/c++/**": "cpp"
+    }
 }
