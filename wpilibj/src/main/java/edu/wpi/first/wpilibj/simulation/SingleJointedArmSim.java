@@ -180,7 +180,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns the arm current draw.
    *
-   * @return The aram current draw.
+   * @return The arm current draw.
    */
   public double getCurrentDrawAmps() {
     // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
