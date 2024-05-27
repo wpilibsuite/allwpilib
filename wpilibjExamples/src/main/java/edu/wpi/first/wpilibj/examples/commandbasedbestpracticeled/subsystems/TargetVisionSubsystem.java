@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 /*
- * Example subsystem that acquires a target (simulated fake boolean by pressing a button).
+ * Example subsystem that acquires a target (simulated fake boolean by pressing "A" button).
  * A signal is displayed to indicate the status of the Target Vision (acquired target or not).
  */
 
@@ -51,7 +51,7 @@ public class TargetVisionSubsystem extends SubsystemBase {
   /**
    * Disallow default command
    * This prevents accidentally assuming the default command will run in composite commands which it wont
-   * unless using "ungroupedSequence()".
+   * unless using "disjointSequence()".
    */
   @Override
   public void setDefaultCommand(Command def) {

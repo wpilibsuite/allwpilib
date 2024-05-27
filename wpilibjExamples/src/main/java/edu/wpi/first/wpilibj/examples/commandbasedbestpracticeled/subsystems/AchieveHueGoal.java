@@ -7,6 +7,7 @@
  * 
  * This example uses the Xbox right trigger (injected from RobotContainer)
  * to set a goal of a position on the color wheel displayed on the LEDs.
+ * 
  * The PID is tuned to slowly converge on the requested color.
  */
 package frc.robot.subsystems;
@@ -24,11 +25,14 @@ import frc.robot.subsystems.RobotSignals.LEDView;
 
 public class AchieveHueGoal {
     
-    // PID intialization
+    // PID intialization.
+
     // It starts running immediately controlling with the initial
     // "currentStateHue" and "hueSetpoint".
+
     // There is no running command to accept new setpoints until
     // the Xbox right trigger axis is pressed.
+
     private final double kP = 0.03;
     private final double kI = 0.0;
     private final double kD = 0.0;
@@ -37,24 +41,23 @@ public class AchieveHueGoal {
     private double maximumHue = 180.;
     private double hueSetpoint = 0.;
     private double currentStateHue = 0.;
-    // private DoubleSupplier defaultHueGoal;
     
     private LEDView robotSignals; // where the output is displayed
 
     public HueGoal hueGoal = new HueGoal(); // subsystem protected goal
 
-    public AchieveHueGoal(LEDView robotSignals/*, DoubleSupplier defaultHueGoal*/) {
-        // this.defaultHueGoal = defaultHueGoal;
+    public AchieveHueGoal(LEDView robotSignals) {
         this.robotSignals = robotSignals;
     }
 
     // Example of methods and triggers that the system will require are put here.
-    //
+
     // Methods that change the system should be "private".
     // Methods and triggers that inquire about the system should be "publc".
 
-    // this particular state inquiry is an example only and isn't used for the demonstration
+    // This particular state inquiry is an example only and isn't used for the demonstration.
     public final Trigger atHueGoal = new Trigger(this::isAtHueGoal);
+
     private boolean isAtHueGoal() {
 
         return HueController.atSetpoint();
@@ -65,7 +68,7 @@ public class AchieveHueGoal {
     public void afterCommands() {
         currentStateHue = MathUtil.clamp(currentStateHue + HueController.calculate(currentStateHue, hueSetpoint), minimumHue, maximumHue);
         LEDPattern persistentPatternDemo = LEDPattern.solid(Color.fromHSV((int)currentStateHue, 200, 200));// display state;
-        robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDS is only by command so do it that way.
+        robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDS is only by command in this example so do it that way.
     }
 
     /**
@@ -85,17 +88,17 @@ public class AchieveHueGoal {
 
         private HueGoal() {
 
-            // This command could run "perpetually" with its pre-determined supplier of the hue goal but
-            // it's disabled in favor of no default command to prevent assuming there is one always running.
-            // Command defaultCommand = 
-            //         Commands.run( ()-> hueSetpoint = defaultHueGoal.getAsDouble() , this);
-            // setDefaultCommand(defaultCommand);
+        // This subsystem could run "perpetually" with a pre-determined hue goal but it's disabled in
+        // this example in favor of no default command to prevent assuming there is one always running.
+        // Command defaultCommand = 
+        //         Commands.run( ()-> hueSetpoint = defaultHueGoal , this);
+        // setDefaultCommand(defaultCommand);
         }
 
         /**
          * Disallow default command
          * This prevents accidentally assuming the default command will run in composite commands which it
-         * wont although use of "ungroupedSequence()" mitigates this problem since it allows the default
+         * wont although use of "disjointSequence()" mitigates this problem since it allows the default
          * command to run at the end of each component command in the sequence.
          */
         @Override

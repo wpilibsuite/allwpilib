@@ -9,8 +9,9 @@ package frc.robot.subsystems;
  * This demonstrates running a command periodically.
  * 
  * Caution - this is a simple, contrived example.
- * This command essentially runs periodically the hard way. There are better ways to do that simple scheduling structure.
- * (The use of the "afterCommands()" periodic as used for a sub-purpose here is a good way.)
+ * This command essentially runs periodically the hard way using memory of a time and a trigger on the time.
+ * There may be better ways to do that simple scheduling structure, for example, the use of the "afterCommands()"
+ * periodic as used for a sub-purpose here is a good way.
  */
 
 import java.util.Arrays;
@@ -34,10 +35,14 @@ public class HistoryFSM extends SubsystemBase {
 
     //    Add a color [hue number as subscript] and last time used to the history
     //  so that color isn't used again during a lockout period.
+
     //    Make the history in as narrow of scope as possible. For this simple example the scope is perfectly narrow
     //  (this instance scope) since the history doesn't depend on any values from other subsystems.
+
     //    Also saved from historical values are the "current" color so it persists through multiple iterations.
+
     //    Time data is saved for how long a color is to persist in the display.
+
     long[] lastTimeHistoryOfColors = new long[180];
 
     Color persistentCurrentColor = new Color(); // color to be seen that we want to persist through multiple iterations
@@ -70,7 +75,8 @@ public class HistoryFSM extends SubsystemBase {
     /**
      * this command sets a color and quits immediately assuming the color persists
      * somehow (in "persistentCurrentColor") until the next color is later requested.
-     * Set a random color that hasn't been used in the last "colorLockoutPeriod"
+     * 
+     * <p>Set a random color that hasn't been used in the last "colorLockoutPeriod"
      */
     public void getHSV() {
 
@@ -100,7 +106,7 @@ public class HistoryFSM extends SubsystemBase {
     /**
      * Disallow default command
      * This prevents accidentally assuming the default command will run in composite commands which it wont.
-     * Or "ungroupedSequence()" could be used. Default command not used in this example.
+     * Or "disjointSequence()" could be used. Default command not used in this example.
      */
     @Override
     public void setDefaultCommand(Command def) {
@@ -124,12 +130,12 @@ public class HistoryFSM extends SubsystemBase {
         // Being done here for illustrative purposes.
 
         robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDS is only by command so do it that way.
-        // Note that becasue this method runs in disabled mode, the color persists in Disabled mode even if the command was
+        // Note that because this method runs in disabled mode, the color persists in Disabled mode even if the command was
         // not to run in disabled mode.
         // Could check here for that and black out if necessary. Or do something in disabledInit().
 
         // Thus, we end up demonstrating how to run a command periodically (as a minor part of the bigger picture).
-        // This usage within a subsystem is NOT the same as a command directly scheduling another command;
+        // This usage within a subsystem is NOT (maybe) the same as a command directly scheduling another command;
         // that technique should be avoided.
     }
 }

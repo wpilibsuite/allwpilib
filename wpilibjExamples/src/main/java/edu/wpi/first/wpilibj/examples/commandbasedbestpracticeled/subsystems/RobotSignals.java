@@ -116,7 +116,7 @@ public interface LEDPatternSupplier {
 
     /**
      * Suggestion is don't use the setDefaultCommand because default commands are not
-     * run inside composed commands except if using "ungroupedSequence()".
+     * run inside composed commands except if using "disjointSequence()".
      * 
      * If you insist, then recommendation is don't use more than one default command
      * because it may not be obvious which default command is active (last one set is

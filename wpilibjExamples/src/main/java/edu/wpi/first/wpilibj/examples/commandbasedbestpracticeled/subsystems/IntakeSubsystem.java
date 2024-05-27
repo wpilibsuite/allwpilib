@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 /*
- * Example subsystem that acquires a game piece (simulated fake boolean by pressing a button).
+ * Example subsystem that acquires a game piece (simulated fake boolean by pressing "B" button).
  * A signal is displayed to indicate the status of the Intake (acquired game piece or not).
  */
 

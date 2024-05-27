@@ -10,7 +10,7 @@
  * operating; operator input is Xbox controller. The sixth demonstration
  * output is the console "prints."
  * 
- * 1.  Target Vision Acquired subsystem output Top LEDView subsystem (runs disabled, too)
+ * 1. Target Vision Acquired subsystem output Top LEDView subsystem (runs disabled, too)
  *     default blue;
  *     autonomous mode command dark green (no requirement for Target Vision Acquired);
  *     target vision acquired orange (simulate target acquired by pressing "A" button);
@@ -26,34 +26,18 @@
  *     disabled mode red slow blink
  * 4. HistoryFSM subsystem HistoryDemo LEDView subsystem
  *     random colors that don't repeat for awhile (history) (initiated by pressing "Y"
- *       button then self perpetuating)
+ *       button then self perpetuating) (runs in enabled mode)
  * 5. AchieveHueGoal subsystem output AchieveHueGoal LEDView subsystem
  *     Subsystem based controller runs continuously and responds to a goal setting
  *       subsystem. Colors on color wheel position showing PID controller subsystem
- *       converging on a color selected by Xbox right trigger axis
- * 6. Ungrouped Sequential Group Demo console output initiated by teleop enable mode
- *     Show default command runs after a subsystem requirement completes in an ungrouped
- *       sequence but not a normal sequence
+ *       converging on a color selected by Xbox right trigger axis (press to start)
+ * 6. Disjoint Sequential Group Demo console output initiated by teleop enable mode
+ *     Show subsystem default command doesn't run within a group command unless the
+ *     command with the subsystem requirement is disjointed from the group by using
+ *     a Proxy structure. (runs in teleop mode)
  * 
- * There are some variations with commands that may run disabled or not (most can).
  * All commands are interruptible.
  * Some button presses are debounced.
- * _____________________________________________________________________________________
- * 
- * Sample program to demonstrate loose coupling of Commands in a sequential grouping.
- *
- * A standard sequence locks all of the requirements of all of the subsystems used in
- * the group for the duration of the sequential execution. Default commands do not run
- * until the entire sequence completes.
- * 
- * A loosely connected sequence created by the RobotContainer.looseSequence() sequential
- * group demonstrates that each command runs independently and when a command ends its
- * subsystems default command runs.
- * 
- * Running the same sequence normally with Commands.sequence demonstrates that the
- * subsystem requirements are maintained for the entire group execution duration and
- * the default command is not activated unto the sequence group ends.
- * 
  */
 
 /**
@@ -104,10 +88,6 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private Command m_autonomousCommand;
 
-  // Robot() {
-  //   super(1.); // slow things down to human speed
-  // }
-
   @Override
   public void robotInit() {
 
@@ -153,7 +133,7 @@ public class Robot extends TimedRobot {
     }
   }
 
-  private int count;
+  public static int teleopIterationCounter;
 
   @Override
   public void teleopInit() { // commands running from another mode haven't been cancelled directly except the one below
@@ -161,20 +141,13 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-
-    count = 0;
+    teleopIterationCounter = 0;
+    m_robotContainer.disjointedSequenceTestJob.schedule();
   }
 
   @Override
   public void teleopPeriodic() {
-    
-    // demonstrate method to run a loosely grouped sequence of commands such
-    // that their requirements are not required for the entire group process
-    // and the default command will run.
-    count++;
-    if (count == 400) m_robotContainer.testUngroupedSequence.schedule();
-    if (count == 500) m_robotContainer.testSequence.schedule();
-    if (count == 600) m_robotContainer.unregisterGroupedUngroupedTest();
+    teleopIterationCounter++;
   }
 
   @Override
