@@ -22,12 +22,10 @@ public class CallbackStore implements AutoCloseable {
   }
 
   /**
-   * Constructs an empty CallbackStore. This constructor is to allow 3rd party
-   * sim providers (eg vendors) to subclass this class (without needing provide
-   * dummy constructing parameters) so that the register methods of their sim
-   * classes can return CallbackStores like the builtin sims. <b>Note: It should
-   * not be called by teams that are just using sims!</b>
-   *
+   * Constructs an empty CallbackStore. This constructor is to allow 3rd party sim providers (eg
+   * vendors) to subclass this class (without needing provide dummy constructing parameters) so that
+   * the register methods of their sim classes can return CallbackStores like the builtin sims.
+   * <b>Note: It should not be called by teams that are just using sims!</b>
    */
   protected CallbackStore() {
     this.m_cancelType = -1;
