@@ -69,6 +69,7 @@ public class CallbackStore implements AutoCloseable {
   private CancelCallbackFunc m_cancelCallback;
   private CancelCallbackChannelFunc m_cancelCallbackChannel;
   private CancelCallbackNoIndexFunc m_cancelCallbackNoIndex;
+  private static final int kAlreadyCancelled = -1;
   private static final int kNormalCancel = 0;
   private static final int kChannelCancel = 1;
   private static final int kNoIndexCancel = 2;
@@ -78,7 +79,7 @@ public class CallbackStore implements AutoCloseable {
   @Override
   public void close() {
     switch (m_cancelType) {
-      case -1:
+      case kAlreadyCancelled:
         // Already cancelled so do nothing so that close() is idempotent.
         return;
       case kNormalCancel:
@@ -94,6 +95,6 @@ public class CallbackStore implements AutoCloseable {
         assert false;
         break;
     }
-    m_cancelType = -1;
+    m_cancelType = kAlreadyCancelled;
   }
 }
