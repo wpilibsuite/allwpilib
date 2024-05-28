@@ -250,6 +250,14 @@ public final class Units {
   public static final Mult<Mult<Mass, Distance>, Distance> KilogramSquareMeters =
       Kilograms.mult(Meters).mult(Meters);
 
+  // Force
+  /** The base SI unit for force */
+  public static final Mult<Mass, Velocity<Velocity<Distance>>> Newtons = 
+      Kilograms.mult(Meters.per(Second).per(Second));
+
+  public static final Mult<Mass, Velocity<Velocity<Distance>>> Newton = Newtons; // alias;
+
+
   // Unitless
   /** A dimensionless unit that performs no scaling whatsoever. */
   public static final Dimensionless Value = BaseUnits.Value;
