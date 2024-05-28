@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.deadline;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
+import static edu.wpi.first.wpilibj2.command.Commands.print;
 import static edu.wpi.first.wpilibj2.command.Commands.race;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
@@ -148,10 +149,6 @@ public class RobotContainer {
     robotSignals.Top.setDefaultCommand(TopDefault);
     robotSignals.Main.setDefaultCommand(MainDefault);
     robotSignals.EnableDisable.setDefaultCommand(EnableDisableDefault);
-
-    groupDisjointTest[A].setDefaultCommand();
-    groupDisjointTest[B].setDefaultCommand();
-    groupDisjointTest[C].setDefaultCommand();
   }
 
   /**
@@ -188,7 +185,7 @@ public class RobotContainer {
     CommandScheduler.getInstance()
         .onCommandInitialize(
             command ->
-            {
+            {if ( ! command.getName().equals("LedSet"))
               System.out.println(/*command.getClass() + " " +*/ command.getName() + " initialized " + command.getRequirements());
             }
         );
@@ -196,7 +193,7 @@ public class RobotContainer {
     CommandScheduler.getInstance()
         .onCommandInterrupt(
             command ->
-            {
+            {if ( ! command.getName().equals("LedSet"))
               System.out.println(/*command.getClass() + " " +*/ command.getName() + " interrupted " + command.getRequirements());
             }
         );
@@ -204,7 +201,7 @@ public class RobotContainer {
     CommandScheduler.getInstance()
         .onCommandFinish(
             command ->
-            {
+            {if ( ! command.getName().equals("LedSet"))
               System.out.println(/*command.getClass() + " " +*/ command.getName() + " finished " + command.getRequirements());
             }
         );
@@ -212,7 +209,7 @@ public class RobotContainer {
     CommandScheduler.getInstance()
         .onCommandExecute( // this can generate a lot of events
             command ->
-            {
+            {if ( ! command.getName().equals("LedSet"))
               System.out.println(/*command.getClass() + " " +*/ command.getName() + " executed " + command.getRequirements());
             }
         );
@@ -360,43 +357,50 @@ public class RobotContainer {
 
     Command[] allTests =
     {
-      // need a "Runnable" as a supplier for the dynamic "teleopIterationCounter"
-      // The print Command is static so its "teleopIterationCounter" would be the value when the command was made - not run.
-      // "teleopIterationCounter" isn't much value in these examples - a curiosity to see the timing.
+      // Printing a static message so use the Commands.print. If message contained variables, then
+      // need a "Runnable" as a supplier for the dynamic values such as
+      // ()->System.out.println(supplier variable or field variable). Otherwise the variable would
+      // print its value from when the command was made - not when it's run.
 
-      runOnce(()->System.out.println("\nSTART testSequence " + Robot.teleopIterationCounter)),
+      runOnce(()->
+              {
+                groupDisjointTest[A].setDefaultCommand();
+                groupDisjointTest[B].setDefaultCommand();
+                groupDisjointTest[C].setDefaultCommand();
+              }),
+      print("\nSTART testSequence"),
        testSequence,
-        runOnce(()->System.out.println("\nEND testSequence " + Robot.teleopIterationCounter)),
-      runOnce(()->System.out.println("\nSTART testDisjointSequence " + Robot.teleopIterationCounter)),
+        print("\nEND testSequence"),
+      print("\nSTART testDisjointSequence"),
        testDisjointSequence,
-        runOnce(()->System.out.println("\nEND testDisjointSequence " + Robot.teleopIterationCounter)),
-      runOnce(()->System.out.println("\nSTART testRepeatingSequence " + Robot.teleopIterationCounter)),
+        print("\nEND testDisjointSequence"),
+      print("\nSTART testRepeatingSequence"),
        testRepeatingSequence,
-        runOnce(()->System.out.println("\nEND testRepeatingSequence " + Robot.teleopIterationCounter)),
-      runOnce(()->System.out.println("\nSTART testDisjointRepeatingSequence " + Robot.teleopIterationCounter)),
+        print("\nEND testRepeatingSequence"),
+      print("\nSTART testDisjointRepeatingSequence - incorrect results - not supported"),
        testDisjointRepeatingSequence,
-        runOnce(()->System.out.println("\nEND testDisjointRepeatingSequence " + Robot.teleopIterationCounter)),
-      runOnce(()->System.out.println("\nSTART testParallel " + Robot.teleopIterationCounter)),
+        print("\nEND testDisjointRepeatingSequence - incorrect results - not supported"),
+      print("\nSTART testParallel"),
        testParallel,
-        runOnce(()->System.out.println("\nEND testParallel " + Robot.teleopIterationCounter)),
-      runOnce(()->System.out.println("\nSTART testDisjointParallel " + Robot.teleopIterationCounter)),
+        print("\nEND testParallel"),
+      print("\nSTART testDisjointParallel"),
        testDisjointParallel,
-        runOnce(()->System.out.println("\nEND testDisjointParallel " + Robot.teleopIterationCounter)),
-      runOnce(()->System.out.println("\nSTART testManualDisjointParallel " + Robot.teleopIterationCounter)),
+        print("\nEND testDisjointParallel"),
+      print("\nSTART testManualDisjointParallel"),
        testManualDisjointParallel,
-        runOnce(()->System.out.println("\nEND testManualDisjointParallel " + Robot.teleopIterationCounter)),
-      runOnce(()->System.out.println("\nSTART testDeadlineParallel " + Robot.teleopIterationCounter)),
+        print("\nEND testManualDisjointParallel"),
+      print("\nSTART testDeadlineParallel"),
        testDeadline,
-        runOnce(()->System.out.println("\nEND testDeadlineParallel " + Robot.teleopIterationCounter)),
-      runOnce(()->System.out.println("\nSTART testDisjointDeadlineParallel " + Robot.teleopIterationCounter)),
+        print("\nEND testDeadlineParallel"),
+      print("\nSTART testDisjointDeadlineParallel"),
        testDisjointDeadline,
-        runOnce(()->System.out.println("\nEND testDisjointDeadlineParallel " + Robot.teleopIterationCounter)),
-      runOnce(()->System.out.println("\nSTART testRaceParallel " + Robot.teleopIterationCounter)),
+        print("\nEND testDisjointDeadlineParallel"),
+      print("\nSTART testRaceParallel"),
        testRace,
-        runOnce(()->System.out.println("\nEND testRaceParallel " + Robot.teleopIterationCounter)),
-      runOnce(()->System.out.println("\nSTART testDisjointRaceParallel " + Robot.teleopIterationCounter)),
+        print("\nEND testRaceParallel"),
+      print("\nSTART testDisjointRaceParallel"),
        testDisjointRace,
-        runOnce(()->System.out.println("\nEND testDisjointRaceParallel " + Robot.teleopIterationCounter)),
+        print("\nEND testDisjointRaceParallel"),
       runOnce(()->
               {
                 // stop default commands to stop the output
@@ -498,7 +502,8 @@ public class RobotContainer {
    * @see Command#repeatedly() 
    */
   public static Command repeatingDisjointSequence(Command... commands) {
-    return disjointSequence(commands).repeatedly();
+    throw new IllegalArgumentException("RepeatCommand doesn't support use of required ProxyCommand");
+    // return disjointSequence(commands).repeatedly();
   }
 
   /**
@@ -583,195 +588,90 @@ public class RobotContainer {
 }
 
 /*
-Triggered sequence - no default commands running
+triggered sequence - default commands running; scrubbed to make pretty
 
-START testSequence 0
-A1A2
-END testSequence 10
-
-START testDisjointSequence 11
-A1A2
-END testDisjointSequence 23
-
-START testRepeatingSequence 24
-A1A1A1A1B1B1B1C1C1C1A1A1A1A1B1B1B1C1C1C1A1A1A1A1B1B1
-END testRepeatingSequence 51
-
-START testDisjointRepeatingSequence 52
-A1A1A1A1B1B1B1C1C1C1A1B1A1B1A1B1C1C1C1A1B1A1B1A1B1
-END testDisjointRepeatingSequence 79
-
-START testParallel 80
-B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1B1B1B1B1B1B1B1A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2B2B2B2B2B2B2B2B2
-END testParallel 171
-
-START testDisjointParallel 172
-B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1B1B1B1B1B1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1A1B1B1B1B1B1B1B1B1B1
-END testDisjointParallel 265
-
-START testManualDisjointParallel 266
-B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1B1B1B1B1B1B1B1A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2B2B2B2B2B2B2B2B2B2
-END testManualDisjointParallel 359
-
-START testDeadlineParallel 360
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
-END testDeadlineParallel 373
-
-START testDisjointDeadlineParallel 374
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1B1C1B1C1
-END testDisjointDeadlineParallel 388
-
-START testRaceParallel 389
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1B1C1
-END testRaceParallel 403
-
-START testDisjointRaceParallel 404
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1B1C1B1C1
-END testDisjointRaceParallel 419
-*/
-
-
-/*
-triggered sequence - default commands running
-
-START testSequence 0
-A1BdCdBdCdBdCdBdCdBdCdBdCdBdCdA2BdCd
-END testSequence 10
-
-AdBdCd
-
-START testDisjointSequence 11
-AdBdCdA1BdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdA2BdCdAdBdCd
-END testDisjointSequence 22
-
-AdBdCd
-
-START testRepeatingSequence 23
-AdBdCdA1A1A1A1B1B1B1C1C1C1A1A1A1A1B1B1B1C1C1C1A1A1A1A1B1B1
-END testRepeatingSequence 50
-
-AdBdCd
-
-START testDisjointRepeatingSequence 51
-AdBdCdA1BdCdA1BdCdA1BdCdA1BdCdAdBdCdAdB1CdAdB1CdAdB1CdAdBdCdAdBdC1AdBdC1AdBdC1AdBdCdAdBdCdA1B1CdA1B1CdA1B1CdAdBdCdAdBdC1AdBdC1AdBdC1AdBdCdAdBdCdA1B1CdA1B1CdA1B1CdAdBdCd
-END testDisjointRepeatingSequence 79
-
-AdBdCd
-
-START testParallel 80
-AdBdCdB1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1B1B1B1B1B1B1A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2B2B2B2B2B2B2B2B2B2
-END testParallel 171
-
-AdBdCd
-
-START testDisjointParallel 172
-AdBdCdAdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdBdCdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1
-CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdBdCdAdBdCdAdBdCd
-END testDisjointParallel 267
-
-AdBdCd
-
-START testManualDisjointParallel 268
-AdBdCdAdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdBdCdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdBdCd
-END testManualDisjointParallel 359
-
-AdBdCd
-
-START testDeadlineParallel 360
-AdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1C1A1C1A1C1A1C1A1C1A1C1A1C1
-END testDeadlineParallel 375
-
-AdBdCd
-
-START testDisjointDeadlineParallel 376
-AdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1BdC1A1BdC1A1BdC1A1BdC1A1BdC1AdBdC1AdBdC1
-END testDisjointDeadlineParallel 392
-
-AdBdCd
-
-START testRaceParallel 393
-AdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCdAdBdCd
-END testRaceParallel 408
-
-AdBdCd
-
-START testDisjointRaceParallel 409
-AdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1
-C1A1B1C1A1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCdAdBdCdAdBdCd
-END testDisjointRaceParallel 426
-
-AdBdCd
-
-*/
-
-/*
-disjointSequence - default commands running
-
-START testSequence 0
+START testSequence
 AdBdCdA1BdCdBdCdBdCdBdCdBdCdBdCdBdCdA2BdCd
-END testSequence 11
+END testSequence
 
-AdBdCdAdBdCd
+AdBdCd
 
-START testDisjointSequence 13
-AdBdCdAdBdCdAdBdCdA1BdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdA2BdCdAdBdCd
-END testDisjointSequence 25
+START testDisjointSequence
+AdBdCdA1BdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdA2BdCdAdBdCd
+END testDisjointSequence
 
-AdBdCdAdBdCd
+AdBdCd
 
-START testRepeatingSequence 27
-AdBdCdAdBdCdAdBdCdA1A1A1B1B1B1C1C1C1A1A1A1A1B1B1B1C1C1C1A1A1A1A1B1B1B1
-END testRepeatingSequence 56
+START testRepeatingSequence
+AdBdCdA1A1A1A1B1B1B1C1C1C1A1A1A1A1B1B1B1C1C1C1A1A1A1A1B1B1
+END testRepeatingSequence
 
-AdBdCdAdBdCd
+AdBdCd
 
-START testDisjointRepeatingSequence 58
-AdBdCdAdBdCdAdBdCdA1BdCdA1BdCdA1BdCdAdBdCdAdB1CdAdB1CdAdB1CdAdBdCdAdBdC1AdBdC1AdBdC1AdBdCdAdBdCdA1B1CdA1B1CdA1B1CdAdBdCdAdBdC1AdBdC1AdBdC1AdBdCdAdBdCdA1B1CdA1
-B1Cd
-END testDisjointRepeatingSequence 85
+START testDisjointRepeatingSequence - incorrect results - not supported
+AdBdCdA1BdCdA1BdCdA1BdCdA1BdCdAdBdCdAdB1CdAdB1CdAdB1CdAdBdCdAdBdC1AdBdC1AdBdC1AdBdCdAdBdCd
+A1B1CdA1B1CdA1B1CdAdBdCdAdBdC1AdBdC1AdBdC1AdBdCdAdBdCdA1B1CdA1B1CdA1B1CdAdBdCd
+END testDisjointRepeatingSequence - incorrect results - not supported
 
-AdBdCdAdBdCd
+AdBdCd
 
-START testParallel 87
-AdBdCdAdBdCdAdBdCdB1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1B1B1B1B1B1A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2B2B2B2B2B2B2B2B2
-END testParallel 178
+START testParallel
+AdBdCdB1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1
+B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1
+B1B1B1B1B1B1B1
+A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2
+A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2B2B2B2B2B2B2B2B2
+END testParallel
 
-AdBdCdAdBdCd
+AdBdCd
 
-START testDisjointParallel 180
-AdBdCdAdBdCdAdBdCdAdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdBdCdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdWarning at edu.wpi.first.wpilibj.IterativeRobotBase.printLoopOverrunMessage(IterativeRobotBase.java:412): Loop time of 0.02s overrun
-A1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdBdCdAdBdCdAdBdCd
-END testDisjointParallel 276
-
-AdBdCdAdBdCd
-
-START testManualDisjointParallel 278
-AdBdCdAdBdCdAdBdCdAdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdBdCdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdBdCd
-END testManualDisjointParallel 371
-
-AdBdCdAdBdCd
-
-START testDeadlineParallel 373
-AdBdCdAdBdCdAdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1C1A1C1A1C1A1C1A1C1A1C1
-END testDeadlineParallel 389
-
-AdBdCdAdBdCd
-
-START testDisjointDeadlineParallel 391
-AdBdCdAdBdCdAdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1BdC1A1BdC1A1BdC1A1BdC1A1BdC1AdBdC1AdBdC1
-END testDisjointDeadlineParallel 408
-
-AdBdCdAdBdCd
-
-START testRaceParallel 410
-AdBdCdAdBdCdAdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1BdCdA1BdCdA1BdCdA1BdCdA1BdCdAdBdCd
-END testRaceParallel 426
-
-AdBdCdAdBdCd
-
-START testDisjointRaceParallel 428
-AdBdCdAdBdCdAdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCdAdBdCdAdBdCd
-END testDisjointRaceParallel 445
-
+START testDisjointParallel
+AdBdCdAdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdBdCd
+A1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1Cd
+A1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1Cd
+A1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdA1B1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1Cd
 AdBdCdAdBdCdAdBdCd
+END testDisjointParallel
+
+AdBdCd
+
+START testManualDisjointParallel
+AdBdCdAdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1Cd
+AdBdCdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
+A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
+A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
+AdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdBdCd
+END testManualDisjointParallel
+
+AdBdCd
+
+START testDeadlineParallel
+AdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1C1C1C1C1C1C1C1C1C1C1C1
+END testDeadlineParallel
+
+AdBdCd
+
+START testDisjointDeadlineParallel
+AdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1AdB1C1
+AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1
+END testDisjointDeadlineParallel
+
+AdBdCd
+
+START testRaceParallel
+AdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCdAdBdCd
+END testRaceParallel
+
+AdBdCd
+
+START testDisjointRaceParallel
+AdBdCdA1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1BdCdA1BdCdA1BdCdA1BdCdA1BdCdAdBdCdAdBdCd
+END testDisjointRaceParallel
+
+AdBdCd
+
 */

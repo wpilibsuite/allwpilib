@@ -133,21 +133,18 @@ public class Robot extends TimedRobot {
     }
   }
 
-  public static int teleopIterationCounter;
-
   @Override
   public void teleopInit() { // commands running from another mode haven't been cancelled directly except the one below
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    teleopIterationCounter = 0;
+
     m_robotContainer.disjointedSequenceTestJob.schedule();
   }
 
   @Override
   public void teleopPeriodic() {
-    teleopIterationCounter++;
   }
 
   @Override
