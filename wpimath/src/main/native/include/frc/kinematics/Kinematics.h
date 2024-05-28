@@ -63,8 +63,8 @@ class WPILIB_DLLEXPORT Kinematics {
   /**
    * Performs interpolation between two values.
    *
-   * @param startValue The value to start at.
-   * @param endValue The value to end at.
+   * @param start The value to start at.
+   * @param end The value to end at.
    * @param t How far between the two values to interpolate. This should be
    * bounded to [0, 1].
    * @return The interpolated value.
