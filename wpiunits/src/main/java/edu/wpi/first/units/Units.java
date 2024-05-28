@@ -255,7 +255,7 @@ public final class Units {
   public static final Mult<Mass, Velocity<Velocity<Distance>>> Newtons =
       Kilograms.mult(Meters.per(Second).per(Second));
 
-  /** Singular alias for Newtons */
+  /** Singular alias for Newtons. */
   public static final Mult<Mass, Velocity<Velocity<Distance>>> Newton = Newtons; // alias;
 
   // Torque
@@ -263,7 +263,7 @@ public final class Units {
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> NewtonMeters =
       Newtons.mult(Meters);
 
-  /** Singular alias for NewtonMeters */
+  /** Singular alias for NewtonMeters. */
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> NewtonMeter =
       NewtonMeters; // alias;
 
