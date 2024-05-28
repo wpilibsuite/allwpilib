@@ -157,6 +157,38 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
     return solveEllipseEquation(point) <= 1.0;
   }
 
+  /**
+   * Returns the distance between the perimeter of the ellipse and the point.
+   *
+   * @param point The point to check.
+   * @return The distance (0, if the point is contained by the ellipse)
+   */
+  public double getDistance(Translation2d point) {
+    return findNearestPoint(point).getDistance(point);
+  }
+
+  /**
+   * Returns the nearest point that is contained within the ellipse.
+   *
+   * @param point The point that this will find the nearest point to.
+   * @return A new point that is nearest to {@code point} and contained in the ellipse.
+   */
+  public Translation2d findNearestPoint(Translation2d point) {
+    // Check if already in ellipse
+    if (contains(point)) {
+      return point;
+    }
+
+    // Rotate the point by the inverse of the ellipse's rotation
+    point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
+
+    // Find nearest point
+    // TODO
+
+    // Undo rotation
+    return point.rotateAround(m_center.getTranslation(), m_center.getRotation());
+  }
+
   @Override
   public String toString() {
     return String.format(

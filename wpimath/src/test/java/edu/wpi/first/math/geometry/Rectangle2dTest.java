@@ -63,10 +63,10 @@ class Rectangle2dTest {
     var point4 = new Translation2d(-1.0, 2.5);
 
     assertAll(
-        () -> assertEquals(0.5, rect.distance(point1), kEpsilon),
-        () -> assertEquals(0.0, rect.distance(point2), kEpsilon),
-        () -> assertEquals(0.5, rect.distance(point3), kEpsilon),
-        () -> assertEquals(1.0, rect.distance(point4), kEpsilon));
+        () -> assertEquals(0.5, rect.getDistance(point1), kEpsilon),
+        () -> assertEquals(0.0, rect.getDistance(point2), kEpsilon),
+        () -> assertEquals(0.5, rect.getDistance(point3), kEpsilon),
+        () -> assertEquals(1.0, rect.getDistance(point4), kEpsilon));
   }
 
   @Test

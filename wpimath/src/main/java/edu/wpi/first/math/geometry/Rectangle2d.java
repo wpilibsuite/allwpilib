@@ -153,21 +153,8 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @param point The point to check.
    * @return The distance (0, if the point is contained by the rectangle)
    */
-  public double distance(Translation2d point) {
-    if (contains(point)) {
-      return 0.0;
-    }
-
-    // Move the point into the rectangle's coordinate frame
-    point = point.minus(m_center.getTranslation());
-    point = point.rotateBy(m_center.getRotation().unaryMinus());
-
-    // Find x and y distances
-    double dx = Math.max(0.0, Math.abs(point.getX()) - m_xWidth / 2.0);
-    double dy = Math.max(0.0, Math.abs(point.getY()) - m_yWidth / 2.0);
-
-    // Distance formula
-    return Math.hypot(dx, dy);
+  public double getDistance(Translation2d point) {
+    return findNearestPoint(point).getDistance(point);
   }
 
   /**
