@@ -39,8 +39,9 @@ import org.ejml.simple.SimpleMatrix;
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
+@SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveDriveKinematics.SwerveDriveWheelStates, SwerveDriveWheelPositions> {
+    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]> {
   /** Wrapper class for swerve module states. */
   public static class SwerveDriveWheelStates {
     /** Swerve module states. */
@@ -200,8 +201,8 @@ public class SwerveDriveKinematics
   }
 
   @Override
-  public SwerveDriveWheelStates toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
-    return new SwerveDriveWheelStates(toSwerveModuleStates(chassisSpeeds));
+  public SwerveModuleState[] toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
+    return toSwerveModuleStates(chassisSpeeds);
   }
 
   /**
@@ -214,6 +215,7 @@ public class SwerveDriveKinematics
    *     passed into the constructor of this class.
    * @return The resulting chassis speed.
    */
+  @Override
   public ChassisSpeeds toChassisSpeeds(SwerveModuleState... moduleStates) {
     if (moduleStates.length != m_numModules) {
       throw new IllegalArgumentException(
@@ -233,11 +235,6 @@ public class SwerveDriveKinematics
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
         chassisSpeedsVector.get(2, 0));
-  }
-
-  @Override
-  public ChassisSpeeds toChassisSpeeds(SwerveDriveWheelStates wheelStates) {
-    return toChassisSpeeds(wheelStates.states);
   }
 
   /**
@@ -270,14 +267,14 @@ public class SwerveDriveKinematics
   }
 
   @Override
-  public Twist2d toTwist2d(SwerveDriveWheelPositions start, SwerveDriveWheelPositions end) {
-    if (start.positions.length != end.positions.length) {
+  public Twist2d toTwist2d(SwerveModulePosition[] start, SwerveModulePosition[] end) {
+    if (start.length != end.length) {
       throw new IllegalArgumentException("Inconsistent number of modules!");
     }
-    var newPositions = new SwerveModulePosition[start.positions.length];
-    for (int i = 0; i < start.positions.length; i++) {
-      var startModule = start.positions[i];
-      var endModule = end.positions[i];
+    var newPositions = new SwerveModulePosition[start.length];
+    for (int i = 0; i < start.length; i++) {
+      var startModule = start[i];
+      var endModule = end[i];
       newPositions[i] =
           new SwerveModulePosition(
               endModule.distanceMeters - startModule.distanceMeters, endModule.angle);
@@ -408,20 +405,24 @@ public class SwerveDriveKinematics
   }
 
   @Override
-  public SwerveDriveWheelPositions copy(SwerveDriveWheelPositions positions) {
-    return new SwerveDriveWheelPositions(positions.positions);
+  public SwerveModulePosition[] copy(SwerveModulePosition[] positions) {
+    var newPositions = new SwerveModulePosition[positions.length];
+    for (int i = 0; i < positions.length; ++i) {
+      newPositions[i] = positions[i].copy();
+    }
+    return newPositions;
   }
 
   @Override
-  public SwerveDriveWheelPositions interpolate(
-      SwerveDriveWheelPositions startValue, SwerveDriveWheelPositions endValue, double t) {
-    if (endValue.positions.length != startValue.positions.length) {
+  public SwerveModulePosition[] interpolate(
+      SwerveModulePosition[] startValue, SwerveModulePosition[] endValue, double t) {
+    if (endValue.length != startValue.length) {
       throw new IllegalArgumentException("Inconsistent number of modules!");
     }
-    var newPositions = new SwerveModulePosition[startValue.positions.length];
-    for (int i = 0; i < startValue.positions.length; ++i) {
-      newPositions[i] = startValue.positions[i].interpolate(endValue.positions[i], t);
+    var newPositions = new SwerveModulePosition[startValue.length];
+    for (int i = 0; i < startValue.length; ++i) {
+      newPositions[i] = startValue[i].interpolate(endValue[i], t);
     }
-    return new SwerveDriveWheelPositions(newPositions);
+    return newPositions;
   }
 }
