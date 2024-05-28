@@ -257,6 +257,14 @@ public final class Units {
 
   public static final Mult<Mass, Velocity<Velocity<Distance>>> Newton = Newtons; // alias;
 
+  // Torque
+  /** The base SI unit for torque. */
+  public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> NewtonMeters =
+      Newtons.mult(Meters);
+
+  public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> NewtonMeter =
+      NewtonMeters; // alias;
+
   // Unitless
   /** A dimensionless unit that performs no scaling whatsoever. */
   public static final Dimensionless Value = BaseUnits.Value;
