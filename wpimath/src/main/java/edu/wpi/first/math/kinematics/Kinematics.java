@@ -49,6 +49,7 @@ public interface Kinematics<S, P> extends Interpolator<P> {
   /**
    * Returns a copy of the wheel positions object.
    *
+   * @param positions The wheel positions object to copy.
    * @return A copy.
    */
   P copy(P positions);
