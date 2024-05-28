@@ -194,9 +194,7 @@ NO
 
 # VSCode
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
+!.vscode/settings.default.json
 !.vscode/extensions.json
 
 #classpaths and projects
