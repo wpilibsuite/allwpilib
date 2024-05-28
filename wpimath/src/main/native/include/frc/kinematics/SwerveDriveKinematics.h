@@ -24,9 +24,6 @@
 
 namespace frc {
 
-template <size_t NumModules>
-using SwerveDriveWheelSpeeds = wpi::array<SwerveModuleState, NumModules>;
-
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
  * into individual module states (speed and angle).

@@ -42,24 +42,6 @@ import org.ejml.simple.SimpleMatrix;
 @SuppressWarnings("overrides")
 public class SwerveDriveKinematics
     implements Kinematics<SwerveModuleState[], SwerveModulePosition[]> {
-  /** Wrapper class for swerve module states. */
-  public static class SwerveDriveWheelStates {
-    /** Swerve module states. */
-    public SwerveModuleState[] states;
-
-    /**
-     * Creates a new SwerveDriveWheelStates instance.
-     *
-     * @param states The swerve module states. This will be deeply copied.
-     */
-    public SwerveDriveWheelStates(SwerveModuleState[] states) {
-      this.states = new SwerveModuleState[states.length];
-      for (int i = 0; i < states.length; i++) {
-        this.states[i] = new SwerveModuleState(states[i].speedMetersPerSecond, states[i].angle);
-      }
-    }
-  }
-
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
