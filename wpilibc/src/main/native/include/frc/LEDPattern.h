@@ -350,19 +350,6 @@ class LEDPattern {
    */
   static LEDPattern Rainbow(int saturation, int value);
 
-  // floorDiv algorithm taken from Java
-  constexpr static int floorDiv(int x, int y) {
-    int r = x / y;
-    // if the signs are different and modulo not zero, round down
-    if ((x ^ y) < 0 && (r * y != x)) {
-      r--;
-    }
-    return r;
-  }
-
-  // floorMod algorithm taken from Java
-  constexpr static int floorMod(int x, int y) { return x - floorDiv(x, y) * y; }
-
  private:
   LEDPatternFn m_impl;
 };

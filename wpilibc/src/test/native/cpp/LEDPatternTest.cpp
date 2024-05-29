@@ -180,7 +180,7 @@ TEST(LEDPatternTest, ScrollRelativeForward) {
       // t=2,   channel value = (254, 255, 0, ..., 252, 253)
       // t=255, channel value = (1, 2, 3, ..., 255, 0)
       // t=256, channel value = (0, 1, 2, ..., 254, 255)
-      int ch = LEDPattern::floorMod(led - time, 256);
+      int ch = wpi::FloorMod(led - time, 256);
       AssertIndexColor(buffer, led, Color{ch, ch, ch});
     }
   }
@@ -223,7 +223,7 @@ TEST(LEDPatternTest, ScrollRelativeBackward) {
       // t=2,   channel value = (254, 255, 0, ..., 252, 253)
       // t=255, channel value = (1, 2, 3, ..., 255, 0)
       // t=256, channel value = (0, 1, 2, ..., 254, 255)
-      int ch = LEDPattern::floorMod(led + time, 256);
+      int ch = wpi::FloorMod(led + time, 256);
       AssertIndexColor(buffer, led, Color{ch, ch, ch});
     }
   }
@@ -267,7 +267,7 @@ TEST(LEDPatternTest, ScrollAbsoluteForward) {
       // t=2,   channel value = (254, 255, 0, ..., 252, 253)
       // t=255, channel value = (1, 2, 3, ..., 255, 0)
       // t=256, channel value = (0, 1, 2, ..., 254, 255)
-      int ch = LEDPattern::floorMod(led - time, 256);
+      int ch = wpi::FloorMod(led - time, 256);
       AssertIndexColor(buffer, led, Color{ch, ch, ch});
     }
   }
@@ -311,7 +311,7 @@ TEST(LEDPatternTest, ScrollAbsoluteBackward) {
       // t=2,   channel value = (254, 255, 0, ..., 252, 253)
       // t=255, channel value = (1, 2, 3, ..., 255, 0)
       // t=256, channel value = (0, 1, 2, ..., 254, 255)
-      int ch = LEDPattern::floorMod(led + time, 256);
+      int ch = wpi::FloorMod(led + time, 256);
       AssertIndexColor(buffer, led, Color{ch, ch, ch});
     }
   }

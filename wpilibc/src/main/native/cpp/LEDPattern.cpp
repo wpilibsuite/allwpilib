@@ -36,7 +36,7 @@ LEDPattern LEDPattern::Reversed() {
 LEDPattern LEDPattern::OffsetBy(int offset) {
   return LEDPattern{[=, self = *this](auto data, auto writer) {
     self.ApplyTo(data, [&data, &writer, offset](int i, Color color) {
-      int shiftedIndex = floorMod(i + offset, data.size());
+      int shiftedIndex = wpi::FloorMod(i + offset, data.size());
       writer(shiftedIndex, color);
     });
   }};
@@ -59,7 +59,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
 
     self.ApplyTo(data, [=](int i, Color color) {
       // floorMod so if the offset is negative, we still get positive outputs
-      int shiftedIndex = floorMod(i + offset, bufLen);
+      int shiftedIndex = wpi::FloorMod(i + offset, bufLen);
       writer(shiftedIndex, color);
     });
   }};
@@ -83,8 +83,8 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
     auto offset = static_cast<int64_t>(now) / microsPerLed;
 
     self.ApplyTo(data, [=, &writer](int i, Color color) {
-      // floorMod so if the offset is negative, we still get positive outputs
-      int shiftedIndex = floorMod(i + offset, bufLen);
+      // FloorMod so if the offset is negative, we still get positive outputs
+      int shiftedIndex = wpi::FloorMod(i + offset, bufLen);
 
       writer(shiftedIndex, color);
     });
