@@ -142,7 +142,7 @@ class LEDPattern {
   LEDPattern Blink(units::second_t onTime, units::second_t offTime);
 
   /**
-   * Like {@link #blink(Measure, Measure) blink(onTime, offTime)}, but where the
+   * Like {@link LEDPattern::Blink(units::second_t)}, but where the
    * "off" time is exactly equal to the "on" time.
    *
    * @param onTime how long the pattern should play for (and be turned off for),
@@ -176,8 +176,8 @@ class LEDPattern {
 
   /**
    * Creates a pattern that plays this pattern overlaid on another. Anywhere
-   * this pattern sets an LED to off (or {@link Color#kBlack}), the base pattern
-   * will be displayed instead.
+   * this pattern sets an LED to off (or {@link frc::Color::kBlack}), the base
+   * pattern will be displayed instead.
    *
    * @param base the base pattern to overlay on top of
    * @return the combined overlay pattern
@@ -192,8 +192,8 @@ class LEDPattern {
    * set to that color, but if one pattern sets to one color and the other
    * pattern sets it to off, then it will show the color of the first pattern
    * but at approximately half brightness. This is different from {@link
-   * #overlayOn}, which will show the base pattern at full brightness if the
-   * overlay is set to off at that position.
+   * LEDPattern::OverlayOn(const LEDPattern&)}, which will show the base pattern
+   * at full brightness if the overlay is set to off at that position.
    *
    * @param other the pattern to blend with
    * @return the blended pattern
@@ -202,14 +202,14 @@ class LEDPattern {
   LEDPattern Blend(const LEDPattern& other);
 
   /**
-   * Similar to {@link #blend(LEDPattern)}, but performs a bitwise mask on each
-   * color channel rather than averaging the colors for each LED. This can be
-   * helpful for displaying only a portion of the base pattern by applying a
-   * mask that sets the desired area to white, and all other areas to black.
-   * However, it can also be used to display only certain color channels or
-   * hues; for example, masking with {@code LEDPattern.color(Color.kRed)} will
-   * turn off the green and blue channels on the output pattern, leaving only
-   * the red LEDs to be illuminated.
+   * Similar to {@link LEDPattern::Blend(const LEDPattern&)}, but performs a
+   * bitwise mask on each color channel rather than averaging the colors for
+   * each LED. This can be helpful for displaying only a portion of the base
+   * pattern by applying a mask that sets the desired area to white, and all
+   * other areas to black. However, it can also be used to display only certain
+   * color channels or hues; for example, masking with {@code
+   * LEDPattern.color(Color.kRed)} will turn off the green and blue channels on
+   * the output pattern, leaving only the red LEDs to be illuminated.
    *
    * @param mask the mask to apply
    * @return the masked pattern
@@ -259,23 +259,25 @@ class LEDPattern {
   static LEDPattern Solid(const Color color);
 
   /**
-   * Creates a pattern that works as a mask layer for {@link #mask(LEDPattern)}
-   * that illuminates only the portion of the LED strip corresponding with some
-   * progress. The mask pattern will start from the base and set LEDs to white
-   * at a proportion equal to the progress returned by the function. Some usages
-   * for this could be for displaying progress of a flywheel to its target
-   * velocity, progress of a complex autonomous sequence, or the height of an
-   * elevator.
+   * Creates a pattern that works as a mask layer for {@link
+   * LEDPattern::Mask(const LEDPattern&)} that illuminates only the portion of
+   * the LED strip corresponding with some progress. The mask pattern will start
+   * from the base and set LEDs to white at a proportion equal to the progress
+   * returned by the function. Some usages for this could be for displaying
+   * progress of a flywheel to its target velocity, progress of a complex
+   * autonomous sequence, or the height of an elevator.
    *
    * <p>For example, creating a mask for displaying a red-to-blue gradient,
    * starting from the red end, based on where an elevator is in its range of
    * travel.
    *
    * <pre>
-   *   frc::LEDPattern basePattern = frc::LEDPattern::Gradient(frc::Color::kRed,
-   * frc::Color::kBlue); frc::LEDPattern progressPattern =
-   *     basePattern.Mask(frc::LEDPattern::ProgressMaskLayer([&]() { return
-   * elevator.GetHeight() / elevator.MaxHeight(); });
+   * frc::LEDPattern basePattern =
+   *   frc::LEDPattern::Gradient(frc::Color::kRed, frc::Color::kBlue);
+   * frc::LEDPattern progressPattern =
+   *   basePattern.Mask(frc::LEDPattern::ProgressMaskLayer([&]() {
+   *     return elevator.GetHeight() / elevator.MaxHeight();
+   *   });
    * </pre>
    *
    * @param progressFunction the function to call to determine the progress.
@@ -311,7 +313,8 @@ class LEDPattern {
    * position along the LED strip
    * @return a motionless step pattern
    */
-  static LEDPattern Steps(std::initializer_list<std::pair<double, Color>> steps);
+  static LEDPattern Steps(
+      std::initializer_list<std::pair<double, Color>> steps);
 
   /**
    * Creates a pattern that displays a non-animated gradient of colors across
