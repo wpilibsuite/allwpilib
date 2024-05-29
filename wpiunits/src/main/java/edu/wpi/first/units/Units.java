@@ -279,11 +279,11 @@ public final class Units {
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundFoot =
       PoundFeet;
 
-  /* A unit of torque equivalent to 0.1129848 {@link #NewtonMeters}. */
+  /** A unit of torque equivalent to 0.1129848 {@link #NewtonMeters}. */
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundInches =
       derive(NewtonMeters).named("Pound-Inches").symbol("lb-in").make();
 
-  /* Singular alias for PoundInches. */
+  /** Singular alias for PoundInches. */
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundInch =
       PoundInches;
 
