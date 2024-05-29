@@ -251,7 +251,8 @@ LEDPattern LEDPattern::Steps(std::span<std::pair<double, Color>> steps) {
   }};
 }
 
-LEDPattern LEDPattern::Steps(std::initializer_list<std::pair<double, Color>> steps) {
+LEDPattern LEDPattern::Steps(
+    std::initializer_list<std::pair<double, Color>> steps) {
   return Steps(std::span{steps.begin(), steps.end()});
 }
 
