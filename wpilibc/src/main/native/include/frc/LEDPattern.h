@@ -299,7 +299,7 @@ class LEDPattern {
    * position along the LED strip
    * @return a motionless step pattern
    */
-  static LEDPattern Steps(std::span<std::pair<double, Color>> steps);
+  static LEDPattern Steps(std::span<const std::pair<double, Color>> steps);
 
   /**
    * Display a set of colors in steps across the length of the LED strip. No
@@ -326,7 +326,7 @@ class LEDPattern {
    * @param colors the colors to display in the gradient
    * @return a motionless gradient pattern
    */
-  static LEDPattern Gradient(std::span<Color> colors);
+  static LEDPattern Gradient(std::span<const Color> colors);
 
   /**
    * Creates a pattern that displays a non-animated gradient of colors across

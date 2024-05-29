@@ -220,7 +220,7 @@ LEDPattern LEDPattern::ProgressMaskLayer(
   }};
 }
 
-LEDPattern LEDPattern::Steps(std::span<std::pair<double, Color>> steps) {
+LEDPattern LEDPattern::Steps(std::span<const std::pair<double, Color>> steps) {
   if (steps.size() == 0) {
     // no colors specified
     return LEDPattern::kOff;
@@ -256,7 +256,7 @@ LEDPattern LEDPattern::Steps(
   return Steps(std::span{steps.begin(), steps.end()});
 }
 
-LEDPattern LEDPattern::Gradient(std::span<Color> colors) {
+LEDPattern LEDPattern::Gradient(std::span<const Color> colors) {
   if (colors.size() == 0) {
     // no colors specified
     return LEDPattern::kOff;
