@@ -253,19 +253,40 @@ public final class Units {
   // Force
   /** The base SI unit for force. */
   public static final Mult<Mass, Velocity<Velocity<Distance>>> Newtons =
-      Kilograms.mult(Meters.per(Second).per(Second));
+      derive(Kilograms.mult(Meters.per(Second).per(Second)))
+      .named("Newtons").symbol("N").make();
 
   /** Singular alias for Newtons. */
   public static final Mult<Mass, Velocity<Velocity<Distance>>> Newton = Newtons; // alias;
 
+  /** A unit of force equivalent to 4.448222 {@link #Newtons}. */
+  public static final Mult<Mass, Velocity<Velocity<Distance>>> PoundsForce = 
+          derive(Newtons)
+          .named("Pounds-Force").symbol("lb.").make();
+
   // Torque
   /** The base SI unit for torque. */
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> NewtonMeters =
-      Newtons.mult(Meters);
+      derive(Newtons.mult(Meters)).named("Newton-Meters").symbol("Nm").make();
 
   /** Singular alias for NewtonMeters. */
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> NewtonMeter =
       NewtonMeters; // alias;
+
+  /** A unit of torque equivalent to 1.355818 {@link #NewtonMeters}. */
+  public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundFeet = 
+      derive(NewtonMeters).named("Pound-Feet").symbol("lb-ft").make();
+
+  /** Singular alias for PoundFeet */
+  public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundFoot =
+     PoundFeet;
+
+  /* A unit of torque equivalent to 0.1129848 {@link #NewtonMeters}. */
+  public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundInches = 
+    derive(NewtonMeters).named("Pound-Inches").symbol("lb-in").make();
+
+  /* Singular alias for PoundInches. */
+  public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundInch = PoundInches;
 
   // Unitless
   /** A dimensionless unit that performs no scaling whatsoever. */
@@ -344,6 +365,15 @@ public final class Units {
    * usage.
    */
   public static final Energy Kilojoule = Kilojoules; // alias
+
+  /** A unit of energy equal to 1.355818 Joules. */
+  public static final Energy FootPounds = derive(Joules).aggregate(1.355818).named("Foot-Pounds").symbol("ft-lb").make();
+
+  /** Singular alias for FootPounds. */
+  public static final Energy FootPound = FootPounds;
+
+  /** A unit of energy equal to  0.1129848 Joules*/
+  public static final Energy InchPounds = derive(Joules).aggregate(0.1129848).named("Inch-Pounds").symbol("in-lb").make();
 
   // Power
   /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
