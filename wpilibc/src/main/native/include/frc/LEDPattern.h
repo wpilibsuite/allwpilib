@@ -300,6 +300,20 @@ class LEDPattern {
   static LEDPattern Steps(std::span<std::pair<double, Color>> steps);
 
   /**
+   * Display a set of colors in steps across the length of the LED strip. No
+   * interpolation is done between colors. Colors are specified by the first LED
+   * on the strip to show that color. The last color in the map will be
+   * displayed all the way to the end of the strip. LEDs positioned before the
+   * first specified step will be turned off (you can think of this as if
+   * there's a 0 -> black step by default).
+   *
+   * @param steps a map of progress to the color to start displaying at that
+   * position along the LED strip
+   * @return a motionless step pattern
+   */
+  static LEDPattern Steps(std::initializer_list<std::pair<double, Color>> steps);
+
+  /**
    * Creates a pattern that displays a non-animated gradient of colors across
    * the entire length of the LED strip. The gradient wraps around so the start
    * and end of the strip are the same color, which allows the gradient to be
@@ -310,6 +324,18 @@ class LEDPattern {
    * @return a motionless gradient pattern
    */
   static LEDPattern Gradient(std::span<Color> colors);
+
+  /**
+   * Creates a pattern that displays a non-animated gradient of colors across
+   * the entire length of the LED strip. The gradient wraps around so the start
+   * and end of the strip are the same color, which allows the gradient to be
+   * modified with a scrolling effect with no discontinuities. Colors are evenly
+   * distributed along the full length of the LED strip.
+   *
+   * @param colors the colors to display in the gradient
+   * @return a motionless gradient pattern
+   */
+  static LEDPattern Gradient(std::initializer_list<Color> colors);
 
   /**
    * Creates an LED pattern that displays a rainbow across the color wheel. The

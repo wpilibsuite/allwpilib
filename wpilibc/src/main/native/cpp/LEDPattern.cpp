@@ -251,6 +251,10 @@ LEDPattern LEDPattern::Steps(std::span<std::pair<double, Color>> steps) {
   }};
 }
 
+LEDPattern LEDPattern::Steps(std::initializer_list<std::pair<double, Color>> steps) {
+  return Steps(std::span{steps.begin(), steps.end()});
+}
+
 LEDPattern LEDPattern::Gradient(std::span<Color> colors) {
   if (colors.size() == 0) {
     // no colors specified
@@ -281,6 +285,10 @@ LEDPattern LEDPattern::Gradient(std::span<Color> colors) {
       writer(led, gradientColor);
     }
   }};
+}
+
+LEDPattern LEDPattern::Gradient(std::initializer_list<Color> colors) {
+  return Gradient(std::span{colors.begin(), colors.end()});
 }
 
 LEDPattern LEDPattern::Rainbow(int saturation, int value) {
