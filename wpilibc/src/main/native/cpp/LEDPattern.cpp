@@ -14,27 +14,28 @@
 
 using namespace frc;
 
-LEDPattern::LEDPattern(const LEDPatternFn& impl) : m_impl(std::move(impl)) {}
+LEDPattern::LEDPattern(LEDPatternFn impl) : m_impl(std::move(impl)) {}
 
 void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data,
-                         LEDWriterFn writer) {
+                         LEDWriterFn writer) const {
   m_impl(data, writer);
 }
 
-void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data) {
+void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data) const {
   ApplyTo(data, [&](int index, Color color) { data[index].SetLED(color); });
 }
 
 LEDPattern LEDPattern::Reversed() {
-  return LEDPattern{[this](auto data, auto writer) {
-    ApplyTo(data,
-            [&](int i, Color color) { writer((data.size() - 1) - i, color); });
+  return LEDPattern{[self = *this](auto data, auto writer) {
+    self.ApplyTo(data, [&](int i, Color color) {
+      writer((data.size() - 1) - i, color);
+    });
   }};
 }
 
 LEDPattern LEDPattern::OffsetBy(int offset) {
-  return LEDPattern{[=, this](auto data, auto writer) {
-    ApplyTo(data, [&data, &writer, offset](int i, Color color) {
+  return LEDPattern{[=, self = *this](auto data, auto writer) {
+    self.ApplyTo(data, [&data, &writer, offset](int i, Color color) {
       int shiftedIndex = floorMod(i + offset, data.size());
       writer(shiftedIndex, color);
     });
@@ -47,7 +48,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(double velocity) {
   // and multiply by 1,000,000 to get microseconds
   double periodMicros = 1e6 / velocity;
 
-  return LEDPattern{[=, this](auto data, auto writer) {
+  return LEDPattern{[=, self = *this](auto data, auto writer) {
     auto bufLen = data.size();
     auto now = wpi::Now();
 
@@ -56,7 +57,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(double velocity) {
         (now % static_cast<uint64_t>(std::floor(periodMicros))) / periodMicros;
     int offset = static_cast<int>(std::floor(t * bufLen));
 
-    ApplyTo(data, [=](int i, Color color) {
+    self.ApplyTo(data, [=](int i, Color color) {
       // floorMod so if the offset is negative, we still get positive outputs
       int shiftedIndex = floorMod(i + offset, bufLen);
       writer(shiftedIndex, color);
@@ -71,7 +72,7 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
   auto microsPerLed =
       static_cast<int64_t>(std::floor((ledSpacing / velocity).value() * 1e6));
 
-  return LEDPattern{[=, this](auto data, auto writer) {
+  return LEDPattern{[=, self = *this](auto data, auto writer) {
     auto bufLen = data.size();
     auto now = wpi::Now();
 
@@ -81,7 +82,7 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
     // offset values for negative velocities
     auto offset = static_cast<int64_t>(now) / microsPerLed;
 
-    ApplyTo(data, [=, &writer](int i, Color color) {
+    self.ApplyTo(data, [=, &writer](int i, Color color) {
       // floorMod so if the offset is negative, we still get positive outputs
       int shiftedIndex = floorMod(i + offset, bufLen);
 
@@ -94,9 +95,9 @@ LEDPattern LEDPattern::Blink(units::second_t onTime, units::second_t offTime) {
   auto totalMicros = units::microsecond_t{onTime + offTime}.to<uint64_t>();
   auto onMicros = units::microsecond_t{onTime}.to<uint64_t>();
 
-  return LEDPattern{[=, this](auto data, auto writer) {
+  return LEDPattern{[=, self = *this](auto data, auto writer) {
     if (wpi::Now() % totalMicros < onMicros) {
-      ApplyTo(data, writer);
+      self.ApplyTo(data, writer);
     } else {
       LEDPattern::kOff.ApplyTo(data, writer);
     }
@@ -108,9 +109,9 @@ LEDPattern LEDPattern::Blink(units::second_t onTime) {
 }
 
 LEDPattern LEDPattern::SynchronizedBlink(std::function<bool()> signal) {
-  return LEDPattern{[=, this](auto data, auto writer) {
+  return LEDPattern{[=, self = *this](auto data, auto writer) {
     if (signal()) {
-      ApplyTo(data, writer);
+      self.ApplyTo(data, writer);
     } else {
       LEDPattern::kOff.ApplyTo(data, writer);
     }
@@ -120,8 +121,8 @@ LEDPattern LEDPattern::SynchronizedBlink(std::function<bool()> signal) {
 LEDPattern LEDPattern::Breathe(units::second_t period) {
   auto periodMicros = units::microsecond_t{period};
 
-  return LEDPattern{[periodMicros, this](auto data, auto writer) {
-    ApplyTo(data, [&writer, periodMicros](int i, Color color) {
+  return LEDPattern{[periodMicros, self = *this](auto data, auto writer) {
+    self.ApplyTo(data, [&writer, periodMicros](int i, Color color) {
       double t = (wpi::Now() % periodMicros.to<uint64_t>()) /
                  periodMicros.to<double>();
       double phase = t * 2 * std::numbers::pi;
@@ -135,13 +136,13 @@ LEDPattern LEDPattern::Breathe(units::second_t period) {
   }};
 }
 
-LEDPattern LEDPattern::OverlayOn(LEDPattern& base) {
-  return LEDPattern{[this, &base](auto data, auto writer) {
+LEDPattern LEDPattern::OverlayOn(const LEDPattern& base) {
+  return LEDPattern{[self = *this, base](auto data, auto writer) {
     // write the base pattern down first...
     base.ApplyTo(data, writer);
 
     // ... then, overwrite with illuminated LEDs from the overlay
-    ApplyTo(data, [&](int i, Color color) {
+    self.ApplyTo(data, [&](int i, Color color) {
       if (color.red > 0 || color.green > 0 || color.blue > 0) {
         writer(i, color);
       }
@@ -149,10 +150,10 @@ LEDPattern LEDPattern::OverlayOn(LEDPattern& base) {
   }};
 }
 
-LEDPattern LEDPattern::Blend(LEDPattern& other) {
-  return LEDPattern{[&](auto data, auto writer) {
+LEDPattern LEDPattern::Blend(const LEDPattern& other) {
+  return LEDPattern{[self = *this, other](auto data, auto writer) {
     // Apply the current pattern down as normal...
-    ApplyTo(data, writer);
+    self.ApplyTo(data, writer);
 
     other.ApplyTo(data, [&](int i, Color color) {
       // ... then read the result and average it with the output from the other
@@ -164,10 +165,10 @@ LEDPattern LEDPattern::Blend(LEDPattern& other) {
   }};
 }
 
-LEDPattern LEDPattern::Mask(LEDPattern& mask) {
-  return LEDPattern{[&](auto data, auto writer) {
+LEDPattern LEDPattern::Mask(const LEDPattern& mask) {
+  return LEDPattern{[self = *this, mask](auto data, auto writer) {
     // Apply the current pattern down as normal...
-    ApplyTo(data, writer);
+    self.ApplyTo(data, writer);
 
     mask.ApplyTo(data, [&](int i, Color color) {
       auto currentColor = data[i];
@@ -181,8 +182,8 @@ LEDPattern LEDPattern::Mask(LEDPattern& mask) {
 }
 
 LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
-  return LEDPattern{[=, this](auto data, auto writer) {
-    ApplyTo(data, [&](int i, Color color) {
+  return LEDPattern{[relativeBrightness, self = *this](auto data, auto writer) {
+    self.ApplyTo(data, [&](int i, Color color) {
       writer(i, Color{color.red * relativeBrightness,
                       color.green * relativeBrightness,
                       color.blue * relativeBrightness});
@@ -205,7 +206,7 @@ LEDPattern LEDPattern::Solid(const Color color) {
 
 LEDPattern LEDPattern::ProgressMaskLayer(
     std::function<double()> progressFunction) {
-  return LEDPattern{[&](auto data, auto writer) {
+  return LEDPattern{[=](auto data, auto writer) {
     double progress = std::clamp(progressFunction(), 0.0, 1.0);
     auto bufLen = data.size();
     auto max = (size_t)(bufLen * progress);
@@ -229,7 +230,8 @@ LEDPattern LEDPattern::Steps(std::span<std::pair<double, Color>> steps) {
     return LEDPattern::Solid(steps[0].second);
   }
 
-  return LEDPattern{[=](auto data, auto writer) {
+  return LEDPattern{[steps = std::vector(steps.begin(), steps.end())](
+                        auto data, auto writer) {
     auto bufLen = data.size();
 
     // precompute relevant positions for this buffer so we don't need to do a
@@ -258,8 +260,10 @@ LEDPattern LEDPattern::Gradient(std::span<Color> colors) {
     // only one color specified, just show a static color
     return LEDPattern::Solid(colors[0]);
   }
-  size_t numSegments = colors.size();
-  return LEDPattern{[=](auto data, auto writer) {
+
+  return LEDPattern{[colors = std::vector(colors.begin(), colors.end())](
+                        auto data, auto writer) {
+    size_t numSegments = colors.size();
     auto bufLen = data.size();
     int ledsPerSegment = bufLen / numSegments;
 

@@ -32,9 +32,7 @@ using LEDPatternFn =
 
 class LEDPattern {
  public:
-  explicit LEDPattern(const LEDPatternFn& impl);
-
-  ~LEDPattern() = default;
+  explicit LEDPattern(LEDPatternFn impl);
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called
@@ -45,10 +43,26 @@ class LEDPattern {
    * and writing data. By splitting them up, we can easily modify the behavior
    * of some base pattern to make it scroll, blink, or breathe by intercepting
    * the data writes to transform their behavior to whatever we like.
+   *
+   * @param data the current data of the LED strip
+   * @param writer data writer for setting new LED colors on the LED strip
    */
   void ApplyTo(std::span<frc::AddressableLED::LEDData> data,
-               LEDWriterFn writer);
-  void ApplyTo(std::span<frc::AddressableLED::LEDData> data);
+               LEDWriterFn writer) const;
+
+  /**
+   * Writes the pattern to an LED buffer. Dynamic animations should be called
+   * periodically (such as with a command or with a periodic method) to refresh
+   * the buffer over time.
+   *
+   * This method is intentionally designed to use separate objects for reading
+   * and writing data. By splitting them up, we can easily modify the behavior
+   * of some base pattern to make it scroll, blink, or breathe by intercepting
+   * the data writes to transform their behavior to whatever we like.
+   *
+   * @param data the current data of the LED strip
+   */
+  void ApplyTo(std::span<frc::AddressableLED::LEDData> data) const;
 
   /**
    * Creates a pattern that displays this one in reverse. Scrolling patterns
@@ -168,7 +182,7 @@ class LEDPattern {
    * @return the combined overlay pattern
    */
   [[nodiscard]]
-  LEDPattern OverlayOn(LEDPattern& base);
+  LEDPattern OverlayOn(const LEDPattern& base);
 
   /**
    * Creates a pattern that displays outputs as a combination of this pattern
@@ -184,7 +198,7 @@ class LEDPattern {
    * @return the blended pattern
    */
   [[nodiscard]]
-  LEDPattern Blend(LEDPattern& other);
+  LEDPattern Blend(const LEDPattern& other);
 
   /**
    * Similar to {@link #blend(LEDPattern)}, but performs a bitwise mask on each
@@ -200,7 +214,7 @@ class LEDPattern {
    * @return the masked pattern
    */
   [[nodiscard]]
-  LEDPattern Mask(LEDPattern& mask);
+  LEDPattern Mask(const LEDPattern& mask);
 
   /**
    * Creates a pattern that plays this one, but at a different brightness.
