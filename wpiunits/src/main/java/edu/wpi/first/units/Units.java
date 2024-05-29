@@ -275,7 +275,7 @@ public final class Units {
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundFeet =
       derive(NewtonMeters).named("Pound-Feet").symbol("lb-ft").make();
 
-  /** Singular alias for PoundFeet */
+  /** Singular alias for PoundFeet. */
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundFoot =
       PoundFeet;
 
