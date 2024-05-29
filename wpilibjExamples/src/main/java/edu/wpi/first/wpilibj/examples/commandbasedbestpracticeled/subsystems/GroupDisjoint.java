@@ -47,7 +47,7 @@ public class GroupDisjoint extends SubsystemBase {
       boolean compressOutput = false; // option selection hiding here: output all or compressed
 
       if (compressOutput)
-      { // process "output" variable; count and supress duplicates values; stale, persistent values are also output
+      { // process "output" variable; count and suppress duplicates values; stale, persistent values are also output
 
     // Note that using this periodic output scheme - as implemented - causes the last output
     // value to persist through iterative periods if it hasn't changed. This behavior could be

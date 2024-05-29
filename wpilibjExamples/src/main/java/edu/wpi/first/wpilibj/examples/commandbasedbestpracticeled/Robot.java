@@ -58,12 +58,12 @@
  * Configure button trigger
  * Triggers
  * Use of command parameters set at command creation time
- * Use of command parameters set at changable at runtime (Suppliers)
+ * Use of command parameters set at changeable at runtime (Suppliers)
  * Use of method reference
  * Inject TimedRobot.addPeriodic() into other classes
  * Some commentary on composite commands and mode changes
  * Command logging
- * Configuring an autonomous commnad
+ * Configuring an autonomous command
  * Use of Xbox controller to produce fake events
  * Use of Xbox controller to trigger an event
  * Use of public command factories in subsystems
@@ -79,14 +79,14 @@
  * Goal setting subsystem for a resource
  * Triggers available for other systems to use
  * Default commands can either run or not run within a sequential group depending on how the group is defined using Proxy
- * Commands run in sequenced by triggering succesive commands
+ * Commands run in sequenced by triggering successive commands
  */
 
 /* Default Commands can be useful but they normally do not run within grouped
  * commands even if their associated subsystem is not active at all times within
  * the group.
  * 
- *  There are several possibilites to accomodate that restriction:
+ *  There are several possibilities to accommodate that restriction:
  *  1. do without default commands at any time
  *  2. do without the default command only within the group
  *  3. manually code the function of the default command within a group
@@ -94,7 +94,7 @@
  *  5. consider using Proxy branching out of the group restriction
  * 
  *   Using Triggers to sequence successive commands may help better organize the
- *   command flow and isolate some subsytem requirements so the default command can
+ *   command flow and isolate some subsystem requirements so the default command can
  *   run. That’s okay and is preferred to using proxied commands.
  * 
  *   Usage of Proxies to hide the subsystem requirements from normal checks and
@@ -116,7 +116,7 @@
  *   After thoroughly understanding the structure of your groups extremely carefully
  *   add asProxy() to as few interior commands as possible to accomplish what you need.
  * 
- *   Known probelms:
+ *   Known problems:
  *
  *      Proxies break the sanity check that warn of a subsystem running in parallel
  *      commands. There is no warning - just wrong results (a warning might be added to

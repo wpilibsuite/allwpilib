@@ -121,10 +121,10 @@ public class RobotContainer {
 
         LEDPattern autoTopSignal = LEDPattern.solid(new Color(0.2, 0.6, 0.2));
         LEDPattern autoMainSignal = LEDPattern.solid(new Color(0.4, 0.9, 0.4));
-        // statements before the return are run early at intialization time
+        // statements before the return are run early at initialization time
         return
         // statements returned are run later when the command is scheduled
-          parallel // interrupting either of the two parallel commands with an external command interupts the group
+          parallel // interrupting either of the two parallel commands with an external command interrupts the group
           (
           /*parallel cmd*/
             robotSignals.Top.setSignal(autoTopSignal)
@@ -135,7 +135,7 @@ public class RobotContainer {
           )
           /*composite*/
             .withName("AutoSignal");
-          // command ends here so default command runs if no subsequant command runs for the subsystem
+          // command ends here so default command runs if no subsequent command runs for the subsystem
       }
 
     /**

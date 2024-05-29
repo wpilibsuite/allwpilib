@@ -30,7 +30,7 @@ import frc.robot.subsystems.RobotSignals.LEDView;
 
 public class AchieveHueGoal {
     
-    // PID intialization.
+    // PID initialization.
 
     // It starts running immediately controlling with the initial
     // "currentStateHue" and "hueSetpoint" - choose carefully!
@@ -60,7 +60,7 @@ public class AchieveHueGoal {
     // Example of methods and triggers that the system will require are put here.
 
     // Methods that change the system should be "private".
-    // Methods and triggers that inquire about the system should be "publc".
+    // Methods and triggers that inquire about the system should be "public".
 
     // This particular state inquiry is an example only and isn't used for the demonstration.
     public final Trigger atHueGoal = new Trigger(this::isAtHueGoal);
