@@ -1,6 +1,12 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems;
 
-/*
+/**
+ * Display a random color signal periodically and don't reuse the same color too soon (if reasonably possible).
+ *
  * This is a FSM that depends on the current state, the transition event trigger, and the historical previous states.
  * 
  * This demonstrates a command that calls another command upon completion by setting up a trigger.
@@ -28,25 +34,23 @@ import frc.robot.subsystems.RobotSignals.LEDView;
 public class HistoryFSM extends SubsystemBase {
 
     private final LEDView robotSignals;
-    Random rand = new Random();
+    private Random rand = new Random();
     
     // Periodic output variable used for each run of "afterCommands()"
-    LEDPattern persistentPatternDemo = LEDPattern.solid(Color.kBlack); // this is used before command to set it is run so start with LEDs off
+    private LEDPattern persistentPatternDemo = LEDPattern.solid(Color.kBlack); // this is used before command to set it is run so start with LEDs off
 
-    //    Add a color [hue number as subscript] and last time used to the history
+    //  Add a color [hue number as subscript] and last time used to the history
     //  so that color isn't used again during a lockout period.
 
-    //    Make the history in as narrow of scope as possible. For this simple example the scope is perfectly narrow
+    //  Make the history in as narrow of scope as possible. For this simple example the scope is perfectly narrow
     //  (this instance scope) since the history doesn't depend on any values from other subsystems.
 
-    //    Also saved from historical values are the "current" color so it persists through multiple iterations.
+    //  Also saved from historical values are the "current" color so it persists through multiple iterations.
 
-    //    Time data is saved for how long a color is to persist in the display.
+    //  Time data is saved for how long a color is to persist in the display.
 
-    long[] lastTimeHistoryOfColors = new long[180];
-
-    Color persistentCurrentColor = new Color(); // color to be seen that we want to persist through multiple iterations
-    long nextTime = Long.MAX_VALUE; // initialize so the time doesn't trigger anything until the "Y" button is pressed
+    private long[] lastTimeHistoryOfColors = new long[180];
+    private long nextTime = Long.MAX_VALUE; // initialize so the time doesn't trigger anything until the "Y" button is pressed
     private Trigger timeOfNewColor = new Trigger(this::timesUp);
 
     public HistoryFSM(LEDView robotSignals, CommandXboxController operatorController) {
@@ -57,15 +61,18 @@ public class HistoryFSM extends SubsystemBase {
         // Trigger if it's time for a new color or the operator pressed their "Y" button
         timeOfNewColor.or(operatorController.y().debounce(.04)).onTrue(runOnce(this::getHSV)/*.ignoringDisable(true)*/);
     }
+
     /**
+     * Elapsed Timer determines if in the color change lockout period or not.
+     * Resets automatically.
      * 
      * @return has time elapsed
      */
     private boolean timesUp() {
 
         if( System.currentTimeMillis() >= nextTime) {
-            nextTime = Long.MAX_VALUE; // reset; if a command is running it'll set the right time. If it isn't running then
-                                       // wait for "Y" press
+            nextTime = Long.MAX_VALUE; // reset; if a command is running that will set the correct "nextTime".
+                                       // If it isn't running, then wait for "Y" press
             // this locks-out automatic restarting on disable to enable change; "Y" must be pressed to get it started again.
             return true;
         }
@@ -74,7 +81,7 @@ public class HistoryFSM extends SubsystemBase {
 
     /**
      * this command sets a color and quits immediately assuming the color persists
-     * somehow (in "persistentCurrentColor") until the next color is later requested.
+     * somehow (in "persistentPatternDemo") until the next color is later requested.
      * 
      * <p>Set a random color that hasn't been used in the last "colorLockoutPeriod"
      */
@@ -104,9 +111,7 @@ public class HistoryFSM extends SubsystemBase {
     }
 
     /**
-     * Disallow default command
-     * This prevents accidentally assuming the default command will run in composite commands which it wont.
-     * Or "disjointSequence()" could be used. Default command not used in this example.
+     * Example of how to disallow default command
      */
     @Override
     public void setDefaultCommand(Command def) {

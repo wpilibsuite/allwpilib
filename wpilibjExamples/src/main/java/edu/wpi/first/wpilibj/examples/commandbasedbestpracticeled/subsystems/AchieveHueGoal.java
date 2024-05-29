@@ -1,3 +1,9 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.subsystems;
+
 /*
  * Example of a subsystem composed only of a goal wrapped in its
  * implementer class to achieve that goal.
@@ -10,7 +16,6 @@
  * 
  * The PID is tuned to slowly converge on the requested color.
  */
-package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
@@ -28,12 +33,14 @@ public class AchieveHueGoal {
     // PID intialization.
 
     // It starts running immediately controlling with the initial
-    // "currentStateHue" and "hueSetpoint".
+    // "currentStateHue" and "hueSetpoint" - choose carefully!
 
-    // There is no running command to accept new setpoints until
-    // the Xbox right trigger axis is pressed.
+    // There is no running command to make new setpoints until
+    // the Xbox right trigger axis is pressed. This is handled in
+    // RobotContainer.java and this class shouldn't even know that
+    // to be able to comment here on how the setpoint is determined.
 
-    private final double kP = 0.03;
+    private final double kP = 0.025;
     private final double kI = 0.0;
     private final double kD = 0.0;
     private PIDController HueController = new PIDController(kP, kI, kD);
@@ -90,16 +97,15 @@ public class AchieveHueGoal {
 
         // This subsystem could run "perpetually" with a pre-determined hue goal but it's disabled in
         // this example in favor of no default command to prevent assuming there is one always running.
+        // That means the last setpoint is running as no default takes over. For the Xbox trigger, that
+        // goes to 0 when released but again we're not supposed to know that from RobotContainer.java.
         // Command defaultCommand = 
         //         Commands.run( ()-> hueSetpoint = defaultHueGoal , this);
         // setDefaultCommand(defaultCommand);
         }
 
         /**
-         * Disallow default command
-         * This prevents accidentally assuming the default command will run in composite commands which it
-         * wont although use of "disjointSequence()" mitigates this problem since it allows the default
-         * command to run at the end of each component command in the sequence.
+         * Example of how to disallow default command
          */
         @Override
         public void setDefaultCommand(Command def) {

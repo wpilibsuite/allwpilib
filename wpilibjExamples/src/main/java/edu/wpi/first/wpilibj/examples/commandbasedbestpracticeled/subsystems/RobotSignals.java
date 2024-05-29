@@ -4,6 +4,12 @@
 
 package frc.robot.subsystems;
 
+/**
+ * Manage the addressable LEDs as signaling subsystems.
+ * 
+ * This is the creator and container of the LEDView subsystems.
+ */
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.AddressableLED;
@@ -20,22 +26,22 @@ import frc.robot.LEDPattern;
 
 public class RobotSignals {
 
-/**
- * Represents a supplier of LEDPattern for creating dynamic LEDPatterns.
- * 
- * Can't overload methods using generic interfaces parameters like Supplier
- * so make our own interface to use in overloads
- * 
- */
-@FunctionalInterface
-public interface LEDPatternSupplier {
-    /**
-     * Gets a result.
-     *
-     * @return a result
-     */
-    LEDPattern get();
-}
+  /**
+   * Represents a supplier of LEDPattern for creating dynamic LEDPatterns.
+   * 
+   * Can't overload methods using generic interfaces parameters like Supplier
+   * so make our own interface to use in overloads
+   * 
+   */
+  @FunctionalInterface
+  public interface LEDPatternSupplier {
+      /**
+       * Gets a result.
+       *
+       * @return a result
+       */
+      LEDPattern get();
+  }
 
   private final AddressableLED strip;
 
@@ -48,8 +54,8 @@ public interface LEDPatternSupplier {
   private final AddressableLEDBuffer bufferLED;
 
   // first and last LED ids are inclusive of that LED number
-  // Better ways to semi-automatically register usage of LEDs.
-  // This example is simple and relies on suer remembering to do it.
+  // Needs a better way to semi-automatically register usage of LEDs.
+  // This example is simple and relies on user remembering to do it.
   private final int firstTopLED = 0;
   private final int lastTopLED = 9;
   private final int firstMainLED = 10;
@@ -75,9 +81,10 @@ public interface LEDPatternSupplier {
     //  CAUTION
     //  CAUTION
     //  CAUTION
-    // update this length for each view defined
-    // 
-    int length = Math.max(Math.max(Math.max(Math.max(lastTopLED, lastMainLED), lastEnableDisableLED), lastHistoryDemoLED), lastAchieveHueGoal) + 1; // simplistic view of segments - one starts at 0
+    // Update this length for each view defined.
+    // Needs a better way of registering LED usage; this is really (too) simple
+    // simplistic view of segments - assume one starts at 0
+    int length = Math.max(Math.max(Math.max(Math.max(lastTopLED, lastMainLED), lastEnableDisableLED), lastHistoryDemoLED), lastAchieveHueGoal) + 1;
     strip = new AddressableLED(port);
     strip.setLength(length);
     strip.start();
@@ -115,19 +122,7 @@ public interface LEDPatternSupplier {
      */
 
     /**
-     * Suggestion is don't use the setDefaultCommand because default commands are not
-     * run inside composed commands except if using "disjointSequence()".
-     * 
-     * If you insist, then recommendation is don't use more than one default command
-     * because it may not be obvious which default command is active (last one set is
-     * active).
-     */
-
-    // If a subsystem may have one or no default command then use the following:
-    // You're on your own to remember if there is a default command set or not.
-  
-    /**
-     * Allow one (or none) default command to be set.
+     * Example of how to allow one (or none) default command to be set.
      */
     @Override
     public void setDefaultCommand(Command def) {
@@ -140,18 +135,6 @@ public interface LEDPatternSupplier {
         super.setDefaultCommand(def);
       }
     }
-
-  // If a subsystem must not have a default command then use the following:
-
-  // /**
-  //  * Disallow default command
-  //  * This prevents accidentally assuming the default command will run in composite commands which it wont.
-  //  */
-  // @Override
-  // public void setDefaultCommand(Command def) {
-
-  //     throw new IllegalArgumentException("Default Command not allowed");
-  // }
 
     /**
      * Put an LED Pattern into the view
@@ -182,83 +165,3 @@ public interface LEDPatternSupplier {
     }
   } // End LEDView
 }
-
-
-/* parking lot
-
-C:\Users\RKT\frc\FRC2024\allwpilib-main\wpilibjExamples\src\main\java\edu\wpi\first\wpilibj\examples\addressableled\Main.java
-    private void rainbow() {
-    // For every pixel
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      // Calculate the hue - hue is easier for rainbows because the color
-      // shape is a circle so only one value needs to precess
-      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
-      // Set the value
-      m_ledBuffer.setHSV(i, hue, 255, 128);
-    }
-    // Increase by to make the rainbow "move"
-    m_rainbowFirstPixelHue += 3;
-    // Check bounds
-    m_rainbowFirstPixelHue %= 180;
-  }
-
-
-///// Sam's Robot.java
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-package edu.wpi.first.wpilibj.examples.addressableled;
-
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.TimedRobot;
-
-public class Robot extends TimedRobot {
-  private AddressableLED m_led;
-  private AddressableLEDBuffer m_ledBuffer;
-
-  // Create an LED pattern that will display a rainbow across
-  // all hues at maximum saturation and half brightness
-  private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
-
-  // Our LED strip has a density of 120 LEDs per meter
-  private static final Measure<Distance> kLedSpacing = Meters.of(1 / 120.0);
-
-  // Create a new pattern that scrolls the rainbow pattern across the LED strip, moving at a speed
-  // of 1 meter per second.
-  private final LEDPattern m_scrollingRainbow =
-      m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
-
-  @Override
-  public void robotInit() {
-    // PWM port 9
-    // Must be a PWM header, not MXP or DIO
-    m_led = new AddressableLED(9);
-
-    // Reuse buffer
-    // Default to a length of 60, start empty output
-    // Length is expensive to set, so only set it once, then just update data
-    m_ledBuffer = new AddressableLEDBuffer(60);
-    m_led.setLength(m_ledBuffer.getLength());
-
-    // Set the data
-    m_led.setData(m_ledBuffer);
-    m_led.start();
-  }
-
-  @Override
-  public void robotPeriodic() {
-    // Update the buffer with the rainbow animation
-    m_scrollingRainbow.applyTo(m_ledBuffer);
-    // Set the LEDs
-    m_led.setData(m_ledBuffer);
-  }
-}
- */
