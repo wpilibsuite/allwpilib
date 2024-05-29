@@ -54,7 +54,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
 
     // index should move by (bufLen) / (period)
     double t =
-        (now % static_cast<uint64_t>(std::floor(periodMicros))) / periodMicros;
+        (now % static_cast<int64_t>(std::floor(periodMicros))) / periodMicros;
     int offset = static_cast<int>(std::floor(t * bufLen));
 
     self.ApplyTo(data, [=](int i, Color color) {
