@@ -42,11 +42,11 @@ LEDPattern LEDPattern::OffsetBy(int offset) {
   }};
 }
 
-LEDPattern LEDPattern::ScrollAtRelativeSpeed(double velocity) {
-  // velocity is in terms of LED lengths per second (1.0 = full cycle per
-  // second, 0.5 = half cycle per second, 2.0 = two cycles per second) invert
-  // and multiply by 1,000,000 to get microseconds
-  double periodMicros = 1e6 / velocity;
+LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
+  // velocity is in terms of LED lengths per second (1_hz= full cycle per
+  // second, 0.5_hz = half cycle per second, 2_hz = two cycles per second)
+  // Multiply by 1,000,000 to get microseconds
+  double periodMicros = 1e6 / velocity.value();
 
   return LEDPattern{[=, self = *this](auto data, auto writer) {
     auto bufLen = data.size();

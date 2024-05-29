@@ -8,6 +8,7 @@
 #include <span>
 #include <utility>
 
+#include <units/frequency.h>
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
@@ -97,7 +98,7 @@ class LEDPattern {
    * long (assuming equal LED density on both segments).
    */
   [[nodiscard]]
-  LEDPattern ScrollAtRelativeSpeed(double velocity);
+  LEDPattern ScrollAtRelativeSpeed(units::hertz_t velocity);
 
   /**
    * Creates a pattern that plays this one scrolling up an LED strip. A negative
