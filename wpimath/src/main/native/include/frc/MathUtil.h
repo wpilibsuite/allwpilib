@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <numbers>
 #include <type_traits>
 
@@ -180,11 +181,12 @@ constexpr units::radian_t AngleModulus(units::radian_t angle) {
  * @return the largest (closest to positive infinity)
  *   {@code int} value that is less than or equal to the algebraic quotient.
  */
-constexpr std::integral auto FloorDiv(std::integral auto x, std::integral auto y) {
+constexpr std::signed_integral auto FloorDiv(std::signed_integral auto x,
+                                             std::signed_integral auto y) {
   auto quot = x / y;
   auto rem = x % y;
   // if the signs are different and modulo not zero, round down
-  if ((x ^ y) < 0 && rem != 0) {
+  if (std::signbit(x) != std::signbit(y) && rem != 0) {
     --quot;
   }
   return quot;
@@ -201,7 +203,8 @@ constexpr std::integral auto FloorDiv(std::integral auto x, std::integral auto y
  * @param y the divisor
  * @return the floor modulus {@code x - (floorDiv(x, y) * y)}
  */
-constexpr std::integral auto FloorMod(std::integral auto x, std::integral auto y) {
+constexpr std::signed_integral auto FloorMod(std::signed_integral auto x,
+                                             std::signed_integral auto y) {
   return x - FloorDiv(x, y) * y;
 }
 }  // namespace frc
