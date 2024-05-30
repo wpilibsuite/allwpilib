@@ -842,7 +842,7 @@ components:
           type: string
           description: "Should have the form DutyCycleClassName[id]"
         data:
-          $ref: "#/components/schemas/dutyCycleData/properties/data"
+          $ref: "#/components/schemas/dutycycleData/properties/data"
 
     simdeviceData:
       type: object
