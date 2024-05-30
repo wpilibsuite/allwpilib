@@ -407,7 +407,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefault(NetworkTableValue defaultValue);
 
@@ -415,7 +415,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    * @throws IllegalArgumentException if the value is not a known type
    */
   boolean setDefaultValue(Object defaultValue);
@@ -425,7 +425,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultBoolean(boolean defaultValue);
 
@@ -434,7 +434,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultInteger(long defaultValue);
 
@@ -443,7 +443,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultFloat(float defaultValue);
 
@@ -452,7 +452,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultDouble(double defaultValue);
 
@@ -461,7 +461,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultString(String defaultValue);
 
@@ -470,7 +470,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   default boolean setDefaultRaw(byte[] defaultValue) {
     return setDefaultRaw(defaultValue, 0, defaultValue.length);
@@ -481,8 +481,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    *
    * @param defaultValue the default value to set; will send from defaultValue.position() to
    *                     defaultValue.limit()
-   * @return False if the entry exists with a different type
-   */
+   * @return False if the entry exists
   default boolean setDefaultRaw(ByteBuffer defaultValue) {
     int pos = defaultValue.position();
     return setDefaultRaw(defaultValue, pos, defaultValue.limit() - pos);
@@ -494,7 +493,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * @param defaultValue the default value to set
    * @param start Start position of data (in buffer)
    * @param len Length of data (must be less than or equal to value.length - start)
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultRaw(byte[] defaultValue, int start, int len);
 
@@ -504,7 +503,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * @param defaultValue the default value to set
    * @param start Start position of data (in buffer)
    * @param len Length of data (must be less than or equal to value.capacity() - start)
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultRaw(ByteBuffer defaultValue, int start, int len);
 
@@ -513,7 +512,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultBooleanArray(boolean[] defaultValue);
 
@@ -521,7 +520,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultBooleanArray(Boolean[] defaultValue);
 
@@ -530,7 +529,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultIntegerArray(long[] defaultValue);
 
@@ -538,7 +537,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultIntegerArray(Long[] defaultValue);
 
@@ -547,7 +546,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultFloatArray(float[] defaultValue);
 
@@ -555,7 +554,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultFloatArray(Float[] defaultValue);
 
@@ -564,7 +563,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultDoubleArray(double[] defaultValue);
 
@@ -572,7 +571,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultDoubleArray(Double[] defaultValue);
 
@@ -581,7 +580,7 @@ public interface GenericPublisher extends Publisher, Consumer<NetworkTableValue>
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   boolean setDefaultStringArray(String[] defaultValue);
 

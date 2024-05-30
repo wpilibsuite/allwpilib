@@ -359,7 +359,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    * @throws IllegalArgumentException if the value is not a known type
    */
   public boolean setDefaultValue(Object defaultValue) {
@@ -435,7 +435,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exist
    */
   public boolean setDefaultBoolean(boolean defaultValue) {
     return NetworkTablesJNI.setDefaultBoolean(m_handle, 0, defaultValue);
@@ -445,7 +445,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultInteger(long defaultValue) {
     return NetworkTablesJNI.setDefaultInteger(m_handle, 0, defaultValue);
@@ -455,7 +455,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultFloat(float defaultValue) {
     return NetworkTablesJNI.setDefaultFloat(m_handle, 0, defaultValue);
@@ -465,7 +465,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry
    */
   public boolean setDefaultDouble(double defaultValue) {
     return NetworkTablesJNI.setDefaultDouble(m_handle, 0, defaultValue);
@@ -475,7 +475,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultString(String defaultValue) {
     return NetworkTablesJNI.setDefaultString(m_handle, 0, defaultValue);
@@ -485,7 +485,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultRaw(byte[] defaultValue) {
     return NetworkTablesJNI.setDefaultRaw(m_handle, 0, defaultValue);
@@ -496,7 +496,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    *
    * @param defaultValue the default value to set; will send from defaultValue.position() to
    *                     defaultValue.capacity()
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultRaw(ByteBuffer defaultValue) {
     return NetworkTablesJNI.setDefaultRaw(m_handle, 0, defaultValue);
@@ -508,7 +508,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * @param defaultValue the default value to set
    * @param start Start position of data (in buffer)
    * @param len Length of data (must be less than or equal to value.length - start)
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultRaw(byte[] defaultValue, int start, int len) {
     return NetworkTablesJNI.setDefaultRaw(m_handle, 0, defaultValue, start, len);
@@ -520,7 +520,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * @param defaultValue the default value to set
    * @param start Start position of data (in buffer)
    * @param len Length of data (must be less than or equal to value.capacity() - start)
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultRaw(ByteBuffer defaultValue, int start, int len) {
     return NetworkTablesJNI.setDefaultRaw(m_handle, 0, defaultValue, start, len);
@@ -530,7 +530,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultBooleanArray(boolean[] defaultValue) {
     return NetworkTablesJNI.setDefaultBooleanArray(m_handle, 0, defaultValue);
@@ -540,7 +540,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultBooleanArray(Boolean[] defaultValue) {
     return setDefaultBooleanArray(NetworkTableValue.toNativeBooleanArray(defaultValue));
@@ -550,7 +550,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultIntegerArray(long[] defaultValue) {
     return NetworkTablesJNI.setDefaultIntegerArray(m_handle, 0, defaultValue);
@@ -560,7 +560,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultIntegerArray(Long[] defaultValue) {
     return setDefaultIntegerArray(NetworkTableValue.toNativeIntegerArray(defaultValue));
@@ -570,7 +570,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultFloatArray(float[] defaultValue) {
     return NetworkTablesJNI.setDefaultFloatArray(m_handle, 0, defaultValue);
@@ -580,7 +580,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultFloatArray(Float[] defaultValue) {
     return setDefaultFloatArray(NetworkTableValue.toNativeFloatArray(defaultValue));
@@ -590,7 +590,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultDoubleArray(double[] defaultValue) {
     return NetworkTablesJNI.setDefaultDoubleArray(m_handle, 0, defaultValue);
@@ -600,7 +600,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultDoubleArray(Double[] defaultValue) {
     return setDefaultDoubleArray(NetworkTableValue.toNativeDoubleArray(defaultValue));
@@ -610,7 +610,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultStringArray(String[] defaultValue) {
     return NetworkTablesJNI.setDefaultStringArray(m_handle, 0, defaultValue);
@@ -620,7 +620,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultNumber(Number defaultValue) {
     return setDefaultDouble(defaultValue.doubleValue());
@@ -630,7 +630,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return False if the entry exists
    */
   public boolean setDefaultNumberArray(Number[] defaultValue) {
     return setDefaultDoubleArray(NetworkTableValue.toNativeDoubleArray(defaultValue));
