@@ -1233,7 +1233,7 @@ void BDCSVD<MatrixType, Options>::deflation44(Index firstColu, Index firstColm, 
   using std::conj;
   using std::pow;
   using std::sqrt;
-  
+
   RealScalar s = m_computed(firstColm + i, firstColm);
   RealScalar c = m_computed(firstColm + j, firstColm);
   RealScalar r = numext::hypot(c, s);
@@ -1424,8 +1424,7 @@ void BDCSVD<MatrixType, Options>::deflation(Index firstCol, Index lastCol, Index
       if ((diag(i) - diag(i - 1)) < epsilon_strict) {
 #ifdef EIGEN_BDCSVD_DEBUG_VERBOSE
         std::cout << "deflation 4.4 with i = " << i << " because " << diag(i) << " - " << diag(i - 1)
-                  << " == " << (diag(i) - diag(i - 1)) << " < "
-                  << epsilon_strict << "\n";
+                  << " == " << (diag(i) - diag(i - 1)) << " < " << epsilon_strict << "\n";
 #endif
         eigen_internal_assert(abs(diag(i) - diag(i - 1)) < epsilon_coarse &&
                               " diagonal entries are not properly sorted");

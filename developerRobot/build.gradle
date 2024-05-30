@@ -22,8 +22,8 @@ application {
 }
 
 ext {
-    sharedCvConfigs = [myRobotCpp: []]
-    staticCvConfigs = [myRobotCppStatic: []]
+    sharedCvConfigs = [developerRobotCpp: []]
+    staticCvConfigs = [developerRobotCppStatic: []]
     useJava = true
     useCpp = true
     skipDev = true
@@ -94,30 +94,30 @@ deploy {
                     }
                 }
 
-                myRobotCpp(NativeExecutableArtifact) {
+                developerRobotCpp(NativeExecutableArtifact) {
                     libraryDirectory = '/usr/local/frc/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/lvuser/myRobotCpp' > /home/lvuser/robotCommand")
+                        ctx.execute("echo '/home/lvuser/developerRobotCpp' > /home/lvuser/robotCommand")
                         ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
-                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/myRobotCpp\"")
-                        ctx.execute('chmod +x myRobotCpp')
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/developerRobotCpp\"")
+                        ctx.execute('chmod +x developerRobotCpp')
                     }
                 }
 
-                myRobotCppStatic(NativeExecutableArtifact) {
+                developerRobotCppStatic(NativeExecutableArtifact) {
                     libraryDirectory = '/usr/local/frc/third-party/lib'
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/lvuser/myRobotCppStatic' > /home/lvuser/robotCommand")
+                        ctx.execute("echo '/home/lvuser/developerRobotCppStatic' > /home/lvuser/robotCommand")
                         ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
-                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/myRobotCppStatic\"")
-                        ctx.execute('chmod +x myRobotCppStatic')
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/developerRobotCppStatic\"")
+                        ctx.execute('chmod +x developerRobotCppStatic')
                     }
                 }
 
-                myRobotCppJava(NativeExecutableArtifact) {
+                developerRobotCppJava(NativeExecutableArtifact) {
                     libraryDirectory = '/usr/local/frc/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
@@ -127,10 +127,10 @@ deploy {
                 jre(WPIJREArtifact) {
                 }
 
-                myRobotJava(JavaArtifact) {
+                developerRobotJava(JavaArtifact) {
                     jarTask = shadowJar
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseSerialGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/myRobot-all.jar' > /home/lvuser/robotCommand")
+                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseSerialGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/developerRobot-all.jar' > /home/lvuser/robotCommand")
                         ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
                     }
                 }
@@ -142,29 +142,29 @@ deploy {
 tasks.register('deployJava') {
     try {
         dependsOn tasks.named('deployjreroborio')
-        dependsOn tasks.named('deploymyRobotJavaroborio')
-        dependsOn tasks.named('deploymyRobotCppJavaroborio') // Deploying shared C++ is how to get the Java shared libraries.
+        dependsOn tasks.named('deploydeveloperRobotJavaroborio')
+        dependsOn tasks.named('deploydeveloperRobotCppJavaroborio') // Deploying shared C++ is how to get the Java shared libraries.
     } catch (ignored) {
     }
 }
 
 tasks.register('deployShared') {
     try {
-        dependsOn tasks.named('deploymyRobotCpproborio')
+        dependsOn tasks.named('deploydeveloperRobotCpproborio')
     } catch (ignored) {
     }
 }
 
 tasks.register('deployStatic') {
     try {
-        dependsOn tasks.named('deploymyRobotCppStaticroborio')
+        dependsOn tasks.named('deploydeveloperRobotCppStaticroborio')
     } catch (ignored) {
     }
 }
 
 model {
     components {
-        myRobotCpp(NativeExecutableSpec) {
+        developerRobotCpp(NativeExecutableSpec) {
             targetBuildTypes 'debug'
             sources {
                 cpp {
@@ -181,8 +181,8 @@ model {
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     if (binary.buildType.name == 'debug') {
-                        deploy.targets.roborio.artifacts.myRobotCpp.binary = binary
-                        deploy.targets.roborio.artifacts.myRobotCppJava.binary = binary
+                        deploy.targets.roborio.artifacts.developerRobotCpp.binary = binary
+                        deploy.targets.roborio.artifacts.developerRobotCppJava.binary = binary
                     }
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
@@ -213,7 +213,7 @@ model {
                 }
             }
         }
-        myRobotCppStatic(NativeExecutableSpec) {
+        developerRobotCppStatic(NativeExecutableSpec) {
             targetBuildTypes 'debug'
             nativeUtils.excludeBinariesFromStrip(it)
             sources {
@@ -231,7 +231,7 @@ model {
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     if (binary.buildType.name == 'debug') {
-                        deploy.targets.roborio.artifacts.myRobotCppStatic.binary = binary
+                        deploy.targets.roborio.artifacts.developerRobotCppStatic.binary = binary
                     }
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
@@ -254,12 +254,12 @@ model {
         def c = $.components
         project.tasks.create('runCpp', Exec) {
             group = 'WPILib'
-            description = "Run the myRobotCpp executable"
+            description = "Run the developerRobotCpp executable"
             def found = false
             def systemArch = getCurrentArch()
             def runTask = it
             c.each {
-                if (it in NativeExecutableSpec && it.name == "myRobotCpp") {
+                if (it in NativeExecutableSpec && it.name == "developerRobotCpp") {
                     it.binaries.each {
                         if (!found) {
                             def arch = it.targetPlatform.name
@@ -308,14 +308,14 @@ model {
         }
         installAthena(Task) {
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'myRobotCpp') {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'developerRobotCpp') {
                     dependsOn it.tasks.install
                 }
             }
         }
         installAthenaStatic(Task) {
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'myRobotCppStatic') {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'developerRobotCppStatic') {
                     dependsOn it.tasks.install
                 }
             }

@@ -4,7 +4,7 @@
 
 #include <frc/TimedRobot.h>
 
-class MyRobot : public frc::TimedRobot {
+class Robot : public frc::TimedRobot {
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -43,5 +43,5 @@ class MyRobot : public frc::TimedRobot {
 };
 
 int main() {
-  return frc::StartRobot<MyRobot>();
+  return frc::StartRobot<Robot>();
 }

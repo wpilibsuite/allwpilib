@@ -7,30 +7,31 @@
 
 #include "Trigger.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/button/CommandGenericHID.h"
 
 namespace frc2 {
 /**
- * A version of {@link PS5Controller} with {@link Trigger} factories for
+ * A version of {@link frc::PS5Controller} with {@link Trigger} factories for
  * command-based.
  *
- * @see PS5Controller
+ * @see frc::PS5Controller
  */
-class CommandPS5Controller : public frc::PS5Controller {
+class CommandPS5Controller : public CommandGenericHID {
  public:
-  using PS5Controller::PS5Controller;
+  /**
+   * Construct an instance of a device.
+   *
+   * @param port The port index on the Driver Station that the device is plugged
+   * into.
+   */
+  explicit CommandPS5Controller(int port);
 
   /**
-   * Constructs an event instance around this button's digital signal.
+   * Get the underlying GenericHID object.
    *
-   * @param button the button index
-   * @param loop the event loop instance to attach the event to. Defaults to the
-   * CommandScheduler's default loop.
-   * @return an event instance representing the button's digital signal attached
-   * to the given loop.
+   * @return the wrapped GenericHID object
    */
-  Trigger Button(int button,
-                 frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                            .GetDefaultButtonLoop()) const;
+  frc::PS5Controller& GetHID();
 
   /**
    * Constructs an event instance around the square button's digital signal.
@@ -174,5 +175,52 @@ class CommandPS5Controller : public frc::PS5Controller {
    */
   Trigger Touchpad(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
+
+  /**
+   * Get the R2 axis value of the controller. Note that this axis is bound to
+   * the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return the axis value.
+   */
+  double GetR2Axis();
+
+  /**
+   * Get the L2 axis value of the controller. Note that this axis is bound to
+   * the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return the axis value.
+   */
+  double GetL2Axis();
+
+  /**
+   * Get the Y axis value of right side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetRightY();
+
+  /**
+   * Get the Y axis value of left side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetLeftY();
+
+  /**
+   * Get the X axis value of right side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetRightX();
+
+  /**
+   * Get the X axis value of left side of the controller.
+   *
+   * @return the axis value.
+   */
+  double GetLeftX();
+
+ private:
+  frc::PS5Controller m_hid;
 };
 }  // namespace frc2

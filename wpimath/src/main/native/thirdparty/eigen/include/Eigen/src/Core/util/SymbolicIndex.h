@@ -96,17 +96,17 @@ class BaseExpr {
     return AddExpr<Derived, ValueExpr<>>(derived(), -a);
   }
   constexpr ProductExpr<Derived, ValueExpr<>> operator*(Index a) const {
-    return ProductExpr<Derived, ValueExpr<> >(derived(), a);
+    return ProductExpr<Derived, ValueExpr<>>(derived(), a);
   }
   constexpr QuotientExpr<Derived, ValueExpr<>> operator/(Index a) const {
-    return QuotientExpr<Derived, ValueExpr<> >(derived(), a);
+    return QuotientExpr<Derived, ValueExpr<>>(derived(), a);
   }
 
   friend constexpr AddExpr<Derived, ValueExpr<>> operator+(Index a, const BaseExpr& b) {
-    return AddExpr<Derived, ValueExpr<> >(b.derived(), a);
+    return AddExpr<Derived, ValueExpr<>>(b.derived(), a);
   }
   friend constexpr AddExpr<NegateExpr<Derived>, ValueExpr<>> operator-(Index a, const BaseExpr& b) {
-    return AddExpr<NegateExpr<Derived>, ValueExpr<> >(-b.derived(), a);
+    return AddExpr<NegateExpr<Derived>, ValueExpr<>>(-b.derived(), a);
   }
   friend constexpr ProductExpr<ValueExpr<>, Derived> operator*(Index a, const BaseExpr& b) {
     return ProductExpr<ValueExpr<>, Derived>(a, b.derived());
@@ -117,41 +117,41 @@ class BaseExpr {
 
   template <int N>
   constexpr AddExpr<Derived, ValueExpr<internal::FixedInt<N>>> operator+(internal::FixedInt<N>) const {
-    return AddExpr<Derived, ValueExpr<internal::FixedInt<N> > >(derived(), ValueExpr<internal::FixedInt<N> >());
+    return AddExpr<Derived, ValueExpr<internal::FixedInt<N>>>(derived(), ValueExpr<internal::FixedInt<N>>());
   }
   template <int N>
   constexpr AddExpr<Derived, ValueExpr<internal::FixedInt<-N>>> operator-(internal::FixedInt<N>) const {
-    return AddExpr<Derived, ValueExpr<internal::FixedInt<-N> > >(derived(), ValueExpr<internal::FixedInt<-N> >());
+    return AddExpr<Derived, ValueExpr<internal::FixedInt<-N>>>(derived(), ValueExpr<internal::FixedInt<-N>>());
   }
   template <int N>
   constexpr ProductExpr<Derived, ValueExpr<internal::FixedInt<N>>> operator*(internal::FixedInt<N>) const {
-    return ProductExpr<Derived, ValueExpr<internal::FixedInt<N> > >(derived(), ValueExpr<internal::FixedInt<N> >());
+    return ProductExpr<Derived, ValueExpr<internal::FixedInt<N>>>(derived(), ValueExpr<internal::FixedInt<N>>());
   }
   template <int N>
   constexpr QuotientExpr<Derived, ValueExpr<internal::FixedInt<N>>> operator/(internal::FixedInt<N>) const {
-    return QuotientExpr<Derived, ValueExpr<internal::FixedInt<N> > >(derived(), ValueExpr<internal::FixedInt<N> >());
+    return QuotientExpr<Derived, ValueExpr<internal::FixedInt<N>>>(derived(), ValueExpr<internal::FixedInt<N>>());
   }
 
   template <int N>
   friend constexpr AddExpr<Derived, ValueExpr<internal::FixedInt<N>>> operator+(internal::FixedInt<N>,
                                                                                 const BaseExpr& b) {
-    return AddExpr<Derived, ValueExpr<internal::FixedInt<N> > >(b.derived(), ValueExpr<internal::FixedInt<N> >());
+    return AddExpr<Derived, ValueExpr<internal::FixedInt<N>>>(b.derived(), ValueExpr<internal::FixedInt<N>>());
   }
   template <int N>
   friend constexpr AddExpr<NegateExpr<Derived>, ValueExpr<internal::FixedInt<N>>> operator-(internal::FixedInt<N>,
                                                                                             const BaseExpr& b) {
-    return AddExpr<NegateExpr<Derived>, ValueExpr<internal::FixedInt<N> > >(-b.derived(),
-                                                                            ValueExpr<internal::FixedInt<N> >());
+    return AddExpr<NegateExpr<Derived>, ValueExpr<internal::FixedInt<N>>>(-b.derived(),
+                                                                          ValueExpr<internal::FixedInt<N>>());
   }
   template <int N>
   friend constexpr ProductExpr<ValueExpr<internal::FixedInt<N>>, Derived> operator*(internal::FixedInt<N>,
                                                                                     const BaseExpr& b) {
-    return ProductExpr<ValueExpr<internal::FixedInt<N> >, Derived>(ValueExpr<internal::FixedInt<N> >(), b.derived());
+    return ProductExpr<ValueExpr<internal::FixedInt<N>>, Derived>(ValueExpr<internal::FixedInt<N>>(), b.derived());
   }
   template <int N>
   friend constexpr QuotientExpr<ValueExpr<internal::FixedInt<N>>, Derived> operator/(internal::FixedInt<N>,
                                                                                      const BaseExpr& b) {
-    return QuotientExpr<ValueExpr<internal::FixedInt<N> >, Derived>(ValueExpr<internal::FixedInt<N> >(), b.derived());
+    return QuotientExpr<ValueExpr<internal::FixedInt<N>>, Derived>(ValueExpr<internal::FixedInt<N>>(), b.derived());
   }
 
   template <typename OtherDerived>
@@ -161,7 +161,7 @@ class BaseExpr {
 
   template <typename OtherDerived>
   constexpr AddExpr<Derived, NegateExpr<OtherDerived>> operator-(const BaseExpr<OtherDerived>& b) const {
-    return AddExpr<Derived, NegateExpr<OtherDerived> >(derived(), -b.derived());
+    return AddExpr<Derived, NegateExpr<OtherDerived>>(derived(), -b.derived());
   }
 
   template <typename OtherDerived>
@@ -179,7 +179,7 @@ template <typename T>
 struct is_symbolic {
   // BaseExpr has no conversion ctor, so we only have to check whether T can be statically cast to its base class
   // BaseExpr<T>.
-  enum { value = internal::is_convertible<T, BaseExpr<T> >::value };
+  enum { value = internal::is_convertible<T, BaseExpr<T>>::value };
 };
 
 // A simple wrapper around an integral value to provide the eval method.
@@ -317,7 +317,7 @@ struct EvalSymbolValueHelper<Tag, T1, OtherTypes...> {
 
 /** Expression of a symbol uniquely identified by the template parameter type \c tag */
 template <typename tag>
-class SymbolExpr : public BaseExpr<SymbolExpr<tag> > {
+class SymbolExpr : public BaseExpr<SymbolExpr<tag>> {
  public:
   /** Alias to the template parameter \c tag */
   typedef tag Tag;
@@ -349,7 +349,7 @@ class SymbolExpr : public BaseExpr<SymbolExpr<tag> > {
 };
 
 template <typename Arg0>
-class NegateExpr : public BaseExpr<NegateExpr<Arg0> > {
+class NegateExpr : public BaseExpr<NegateExpr<Arg0>> {
  public:
   constexpr NegateExpr() = default;
   constexpr NegateExpr(const Arg0& arg0) : m_arg0(arg0) {}
@@ -370,7 +370,7 @@ class NegateExpr : public BaseExpr<NegateExpr<Arg0> > {
 };
 
 template <typename Arg0, typename Arg1>
-class AddExpr : public BaseExpr<AddExpr<Arg0, Arg1> > {
+class AddExpr : public BaseExpr<AddExpr<Arg0, Arg1>> {
  public:
   constexpr AddExpr() = default;
   constexpr AddExpr(const Arg0& arg0, const Arg1& arg1) : m_arg0(arg0), m_arg1(arg1) {}
@@ -393,7 +393,7 @@ class AddExpr : public BaseExpr<AddExpr<Arg0, Arg1> > {
 };
 
 template <typename Arg0, typename Arg1>
-class ProductExpr : public BaseExpr<ProductExpr<Arg0, Arg1> > {
+class ProductExpr : public BaseExpr<ProductExpr<Arg0, Arg1>> {
  public:
   constexpr ProductExpr() = default;
   constexpr ProductExpr(const Arg0& arg0, const Arg1& arg1) : m_arg0(arg0), m_arg1(arg1) {}
@@ -416,7 +416,7 @@ class ProductExpr : public BaseExpr<ProductExpr<Arg0, Arg1> > {
 };
 
 template <typename Arg0, typename Arg1>
-class QuotientExpr : public BaseExpr<QuotientExpr<Arg0, Arg1> > {
+class QuotientExpr : public BaseExpr<QuotientExpr<Arg0, Arg1>> {
  public:
   constexpr QuotientExpr() = default;
   constexpr QuotientExpr(const Arg0& arg0, const Arg1& arg1) : m_arg0(arg0), m_arg1(arg1) {}
