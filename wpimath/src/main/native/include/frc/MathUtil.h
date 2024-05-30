@@ -194,11 +194,13 @@ constexpr static int FloorDiv(int x, int y) {
  * <p>
  * The floor modulus is {@code r = x - (floorDiv(x, y) * y)},
  * has the same sign as the divisor {@code y} or is zero, and
- * is in the range of {@code -abs(y) < r < +abs(y)}.
+ * is in the range of {@code -std::abs(y) < r < +std::abs(y)}.
  *
  * @param x the dividend
  * @param y the divisor
  * @return the floor modulus {@code x - (floorDiv(x, y) * y)}
  */
-constexpr static int FloorMod(int x, int y) { return x - FloorDiv(x, y) * y; }
+constexpr static int FloorMod(int x, int y) {
+  return x - FloorDiv(x, y) * y;
+}
 }  // namespace frc
