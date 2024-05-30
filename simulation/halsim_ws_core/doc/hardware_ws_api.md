@@ -99,7 +99,7 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 
 A 3-axis accelerometer.
 
-C++/Java implementation note: these are created as either BuiltInAccelerometer or SimDevice nodes where the device name is prefixed by ``"Accel:"``, for example ``"Accel:ADXL362[1]"``.  The BuiltInAccelerometer uses a device name of ``"BuiltInAccel"``.
+C++/Java implementation note: these are created as either BuiltInAccelerometer or SimDevice nodes where the device name is prefixed by ``"Accel:"``. For example, the device ``"Accel:ADXL362[1]"`` would have a device value of ``ADXL362[1]``.  The BuiltInAccelerometer uses a device name of ``"BuiltInAccel"``.
 
 | Data Key     | Type    | Description                                          |
 | ------------ | ------- | ---------------------------------------------------- |
@@ -194,7 +194,7 @@ The basic analog output just sends a voltage.
 
 Duty Cycle inputs are commonly used for absolute encoders.  The position is accumulated over multiple rotations.
 
-C++/Java implementation note: these are created as SimDevice nodes where the device name is prefixed by ``"DutyCycle:"``, for example ``"DutyCycle:DutyCycleEncoder[1]"``.
+C++/Java implementation note: these can be created through the API as SimDevice nodes where the device name is prefixed by ``"DutyCycle:"``. For example, the device ``"DutyCycle:DutyCycleEncoder[1]"`` would have a device value of ``DutyCycleEncoder[1]``.
 
 | Data Key         | Type    | Description                      |
 | ---------------- | ------- | -------------------------------- |
@@ -223,7 +223,7 @@ A relative encoder.  For absolute encoders, use ``"DutyCycle"``.
 
 A single axis or 3-axis gyro.  Single axis gyros only use the X angle parameter.
 
-C++/Java implementation note: these are created as SimDevice nodes where the device name is prefixed by ``"Gyro:"``, for example ``"Gyro:ADXRS450[1]"``.
+C++/Java implementation note: these can be created created as SimDevice nodes where the device name is prefixed by ``"Gyro:"``. For example, the device ``"Gyro:ADXRS450[1]"`` would have a device value of ``ADXRS450[1]``.
 
 | Data Key          | Type    | Description                                               |
 | ----------------- | ------- | --------------------------------------------------------- |
@@ -322,7 +322,7 @@ CAN messages all use a device value of ``"DeviceType[Number]"``, where the Devic
 
 Many of the CAN messages use the same data key/values as other standard messages.  They are separately namespaced to make it easier for implementations to separate them from main robot controller messages.
 
-C++/Java implementation note: these are created as SimDevice nodes where the device name is prefixed by the message name and ``":"``, for example ``"CANMotor:Controller[1]"``.
+C++/Java implementation note: these can be created through the API as SimDevice nodes where the device name is prefixed by the message name and ``":"``. For example, ``"CANMotor:Controller[1]"`` would create a device with a type value of ``CANMotor`` and a device value of ``Controller[1]``.
 
 #### CANMotor
 
