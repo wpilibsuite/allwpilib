@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <memory>
+#include <cstddef>
 #include <numbers>
 
 #include <wpi/MathExtras.h>
@@ -214,7 +214,7 @@ LEDPattern LEDPattern::ProgressMaskLayer(
   return LEDPattern{[=](auto data, auto writer) {
     double progress = std::clamp(progressFunction(), 0.0, 1.0);
     auto bufLen = data.size();
-    auto max = (size_t)(bufLen * progress);
+    size_t max = bufLen * progress;
 
     for (size_t led = 0; led < max; led++) {
       writer(led, Color::kWhite);

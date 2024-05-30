@@ -15,7 +15,6 @@
 
 #include "frc/AddressableLED.h"
 #include "util/Color.h"
-#include "util/Color8Bit.h"
 
 namespace frc {
 
