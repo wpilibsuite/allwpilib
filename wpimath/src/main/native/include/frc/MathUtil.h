@@ -180,13 +180,14 @@ constexpr units::radian_t AngleModulus(units::radian_t angle) {
  * @return the largest (closest to positive infinity)
  *   {@code int} value that is less than or equal to the algebraic quotient.
  */
-constexpr static int FloorDiv(int x, int y) {
-  int r = x / y;
+constexpr std::integral auto FloorDiv(std::integral auto x, std::integral auto y) {
+  auto quot = x / y;
+  auto rem = x % y;
   // if the signs are different and modulo not zero, round down
-  if ((x ^ y) < 0 && (r * y != x)) {
-    r--;
+  if ((x ^ y) < 0 && rem != 0) {
+    --quot;
   }
-  return r;
+  return quot;
 }
 
 /**
@@ -200,7 +201,7 @@ constexpr static int FloorDiv(int x, int y) {
  * @param y the divisor
  * @return the floor modulus {@code x - (floorDiv(x, y) * y)}
  */
-constexpr static int FloorMod(int x, int y) {
+constexpr std::integral auto FloorMod(std::integral auto x, std::integral auto y) {
   return x - FloorDiv(x, y) * y;
 }
 }  // namespace frc
