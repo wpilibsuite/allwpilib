@@ -17,7 +17,7 @@ namespace frc::sim {
 /**
  * Represents a simulated elevator mechanism.
  */
-class ElevatorSim : public LinearSystemSim<2, 1, 1> {
+class ElevatorSim : public LinearSystemSim<2, 1, 2> {
  public:
   template <typename Distance>
   using Velocity_t = units::unit_t<
@@ -42,10 +42,10 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
-  ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
+  ElevatorSim(const LinearSystem<2, 1, 2>& plant, const DCMotor& gearbox,
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
-              const std::array<double, 1>& measurementStdDevs = {0.0});
+              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   /**
    * Constructs a simulated elevator mechanism.
@@ -67,7 +67,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
               units::kilogram_t carriageMass, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
-              const std::array<double, 1>& measurementStdDevs = {0.0});
+              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   /**
    * Constructs a simulated elevator mechanism.
@@ -90,7 +90,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
               const DCMotor& gearbox, units::meter_t minHeight,
               units::meter_t maxHeight, bool simulateGravity,
               units::meter_t startingHeight,
-              const std::array<double, 1>& measurementStdDevs = {0.0});
+              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
   using LinearSystemSim::SetState;
 
   /**
@@ -150,7 +150,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    *
    * @return The elevator current draw.
    */
-  units::ampere_t GetCurrentDraw() const override;
+  units::ampere_t GetCurrentDraw() const;
 
   /**
    * Sets the input voltage for the elevator.

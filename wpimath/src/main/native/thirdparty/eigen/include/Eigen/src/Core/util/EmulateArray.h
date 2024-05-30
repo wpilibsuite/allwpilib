@@ -27,16 +27,14 @@ class array {
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE iterator end() { return values + n; }
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const_iterator end() const { return values + n; }
 
-#if !defined(EIGEN_GPUCC)
   typedef std::reverse_iterator<iterator> reverse_iterator;
   typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE reverse_iterator rbegin() { return reverse_iterator(end()); }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+  EIGEN_STRONG_INLINE reverse_iterator rbegin() { return reverse_iterator(end()); }
+  EIGEN_STRONG_INLINE const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE reverse_iterator rend() { return reverse_iterator(begin()); }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
-#endif
+  EIGEN_STRONG_INLINE reverse_iterator rend() { return reverse_iterator(begin()); }
+  EIGEN_STRONG_INLINE const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE T& operator[](size_t index) {
     eigen_internal_assert(index < size());
@@ -204,19 +202,19 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const T& array_get(const array<T, N>& a) {
 
 template <class T, std::size_t N>
 struct array_size<array<T, N> > {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 template <class T, std::size_t N>
 struct array_size<array<T, N>&> {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 template <class T, std::size_t N>
 struct array_size<const array<T, N> > {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 template <class T, std::size_t N>
 struct array_size<const array<T, N>&> {
-  enum { value = N };
+  static constexpr Index value = N;
 };
 
 }  // end namespace internal

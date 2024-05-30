@@ -16,7 +16,7 @@ index 3a88178cfbbcf7062a958c7de820247bc913ab33..54137a331ca9e752b02c0f16ae996094
  #include "llvm/Support/Threading.h"
  #include "llvm/Support/WindowsError.h"
 -#include "llvm/Support/raw_ostream.h"
-+#include "fmt/format.h"
++#include "wpi/print.h"
  #include <cassert>
  #include <cstdlib>
  #include <mutex>
@@ -33,7 +33,7 @@ index 3a88178cfbbcf7062a958c7de820247bc913ab33..54137a331ca9e752b02c0f16ae996094
 -    std::string_view MessageStr = OS.str();
 -    ssize_t written = ::write(2, MessageStr.data(), MessageStr.size());
 -    (void)written; // If something went wrong, we deliberately just give up.
-+    fmt::print(stderr, "LLVM ERROR: {}\n", Reason);
++    wpi::print(stderr, "LLVM ERROR: {}\n", Reason);
    }
  
    // If we reached here, we are failing ungracefully. Run the interrupt handlers
@@ -43,13 +43,13 @@ index 3a88178cfbbcf7062a958c7de820247bc913ab33..54137a331ca9e752b02c0f16ae996094
    if (msg)
 -    dbgs() << msg << "\n";
 -  dbgs() << "UNREACHABLE executed";
-+    fmt::print(stderr, "{}\n", msg);
++    wpi::print(stderr, "{}\n", msg);
 +  std::fputs("UNREACHABLE executed", stderr);
    if (file)
 -    dbgs() << " at " << file << ":" << line;
 -  dbgs() << "!\n";
-+    fmt::print(stderr, " at {}:{}", file, line);
-+  fmt::print(stderr, "!\n");
++    wpi::print(stderr, " at {}:{}", file, line);
++  wpi::print(stderr, "!\n");
    abort();
  #ifdef LLVM_BUILTIN_UNREACHABLE
    // Windows systems and possibly others don't declare abort() to be noreturn,
