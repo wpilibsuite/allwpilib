@@ -805,10 +805,10 @@ components:
         type:
           type: string
           description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
-          const: CANGyro
+          const: CANAIn
         device:
           type: string
-          description: "Should have the form GyroClassName[id]"
+          description: "Should have the form AnalogInputClassName[id]"
         data:
           $ref: "#/components/schemas/aiData/properties/data"
 
