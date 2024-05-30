@@ -266,12 +266,12 @@ public final class Commands {
    *
    * @param commands the commands to include in the series
    * @return the command to run the series of commands repeatedly
-   * @see #sequence(Command...) use sequenceRepeatedly() to invoke repeated group sequence behavior
-   * @see #disjointSequence(Command...)
-   * @see Command#repeatedly() 
+   * @see #repeatingSequence(Command...) use sequenceRepeatedly() to invoke repeated group sequence behavior
+   * @see #disjointSequence(Command...) use disjointSequence() for no repeating behavior
    */
   public static Command repeatingDisjointSequence(Command... commands) {
-    return disjointSequence(commands).repeatedly();
+    throw new IllegalArgumentException("Not Supported - RepeatCommand bug prevents correct use of Proxy");
+    // return disjointSequence(commands).repeatedly();
   }
 
   /**
@@ -285,7 +285,7 @@ public final class Commands {
     return new ParallelCommandGroup(commands);
   }
   
-  /**
+/**
    * Runs individual commands at the same time without grouped behavior and ends once all commands finish.
    *
    * <p>Each command is run independently by proxy. The requirements of
@@ -318,6 +318,22 @@ public final class Commands {
   }
 
   /**
+   * Runs a group of commands at the same time. Ends once any command in the group finishes, and
+   * cancels the others.
+   *
+   * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
+   *
+   * @param commands the commands to include
+   * @return the command group
+   * @see ParallelRaceGroup
+   */
+  public static Command disjointRace(Command... commands) {
+    new ParallelRaceGroup(commands); // check parallel constraints
+    for (Command cmd : commands) CommandScheduler.getInstance().removeComposedCommand(cmd);
+    return race(proxyAll(commands));
+  }
+  
+  /**
    * Runs a group of commands at the same time. Ends once a specific command finishes, and cancels
    * the others.
    *
@@ -337,7 +353,7 @@ public final class Commands {
    * <p>Each otherCommand is run independently by proxy. The requirements of
    * each command are reserved only for the duration of that command and are
    * not reserved for an entire group process as they are in a grouped deadline.
-   * 
+   *
    * <p>disjoint...() does not propagate to interior groups. Use additional disjoint...() as needed.
    *
    * @param deadline the deadline command
@@ -349,8 +365,10 @@ public final class Commands {
   public static Command disjointDeadline(Command deadline, Command... otherCommands) {
     new ParallelDeadlineGroup(deadline, otherCommands); // check parallel deadline constraints
     CommandScheduler.getInstance().removeComposedCommand(deadline);
-    for (Command cmd : otherCommands) CommandScheduler.getInstance().removeComposedCommand(cmd);
-    return deadline(deadline, proxyAll(otherCommands));
+    for (Command cmd : otherCommands) {
+      CommandScheduler.getInstance().removeComposedCommand(cmd);
+    }
+    return deadline(deadline.asProxy(), proxyAll(otherCommands));
   }
 
   private Commands() {
