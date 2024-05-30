@@ -235,9 +235,7 @@ class SwerveDriveKinematics
     auto result =
         wpi::array<SwerveModulePosition, NumModules>(wpi::empty_array);
     for (size_t i = 0; i < NumModules; i++) {
-      auto startModule = start[i];
-      auto endModule = end[i];
-      result[i] = {endModule.distance - startModule.distance, endModule.angle};
+      result[i] = {end[i].distance - start[i].distance, end[i].angle};
     }
     return ToTwist2d(result);
   }

@@ -255,11 +255,8 @@ public class SwerveDriveKinematics
     }
     var newPositions = new SwerveModulePosition[start.length];
     for (int i = 0; i < start.length; i++) {
-      var startModule = start[i];
-      var endModule = end[i];
       newPositions[i] =
-          new SwerveModulePosition(
-              endModule.distanceMeters - startModule.distanceMeters, endModule.angle);
+          new SwerveModulePosition(end[i].distanceMeters - start[i].distanceMeters, end[i].angle);
     }
     return toTwist2d(newPositions);
   }
