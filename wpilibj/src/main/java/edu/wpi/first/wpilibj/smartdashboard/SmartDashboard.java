@@ -196,11 +196,11 @@ public final class SmartDashboard {
   }
 
   /**
-   * Set the value in the table if key does not exist
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
-   * @return True: success; False the key already existed 
+   * @return True: success; False the key already existed
    */
   public static boolean setDefaultBoolean(String key, boolean defaultValue) {
     return getEntry(key).setDefaultBoolean(defaultValue);
@@ -231,7 +231,7 @@ public final class SmartDashboard {
   }
 
   /**
-   * Set the value in the table if key does not exist
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
@@ -266,7 +266,7 @@ public final class SmartDashboard {
   }
 
   /**
-   * Set the value in the table if key does not exist
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
@@ -312,7 +312,7 @@ public final class SmartDashboard {
   }
 
   /**
-   * Set the value in the table if key does not exist
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
@@ -323,7 +323,7 @@ public final class SmartDashboard {
   }
 
   /**
-   * Set the value in the table if key does not exist
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
@@ -382,7 +382,7 @@ public final class SmartDashboard {
   }
 
   /**
-   * Set the value in the table if key does not exist
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
@@ -393,7 +393,7 @@ public final class SmartDashboard {
   }
 
   /**
-   * Set the value in the table if key does not exist
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
@@ -441,7 +441,7 @@ public final class SmartDashboard {
   }
 
   /**
-   * Set the value in the table if key does not exist
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
@@ -476,7 +476,7 @@ public final class SmartDashboard {
   }
 
   /**
-   * Set the value in the table if key does not exist
+   * Set the value in the table if key does not exist.
    *
    * @param key the key
    * @param defaultValue the value to set if key does not exist
