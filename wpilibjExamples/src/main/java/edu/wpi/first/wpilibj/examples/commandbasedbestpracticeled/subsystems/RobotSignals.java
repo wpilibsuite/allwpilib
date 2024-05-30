@@ -8,6 +8,13 @@ package frc.robot.subsystems;
  * Manage the addressable LEDs as signaling subsystems.
  * 
  * This is the creator and container of the LEDView subsystems.
+ * 
+ * Buffer is not cleared.
+ * 
+ * It's just a simple example.
+ * 
+ * Needs a better way of registering LED usage; this is really (too) simple
+ * and relies on the user finding it here and remembering to do it.
  */
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,46 +52,38 @@ public class RobotSignals {
 
   private final AddressableLED strip;
 
-  // layout by LED number of the single physical buffer into three logical views
-  // (segments; subsystems) called Main, Top, and EnableDisable.
-  // Assume one view starts at 0.
-  // Buffer is not cleared.
-  // It's just an example.
+  // Layout by LED number of the single physical buffer into multiple logical
+  // views or resources/subsystems.
 
-  private final AddressableLEDBuffer bufferLED;
-
+  // simplistic view of segments - assume one starts at 0.
   // first and last LED ids are inclusive of that LED number
-  // Needs a better way to semi-automatically register usage of LEDs.
-  // This example is simple and relies on user remembering to do it.
+ 
   private final int firstTopLED = 0;
-  private final int lastTopLED = 9;
-  private final int firstMainLED = 10;
-  private final int lastMainLED = 19;
-  private final int firstEnableDisableLED = 20;
-  private final int lastEnableDisableLED = 29;
-  private final int firstHistoryDemoLED = 30;
-  private final int lastHistoryDemoLED = 39;
-  private final int firstAchieveHueGoal = 40;
-  private final int lastAchieveHueGoal = 49;
-  
+  private final int lastTopLED = 7;
+  private final int firstMainLED = 8;
+  private final int lastMainLED = 15;
+  private final int firstEnableDisableLED = 16;
+  private final int lastEnableDisableLED = 23;
+  private final int firstHistoryDemoLED = 24;
+  private final int lastHistoryDemoLED = 31;
+  private final int firstAchieveHueGoal = 32;
+  private final int lastAchieveHueGoal = 39;
+  // CAUTION CAUTION CAUTION -- Update this length for each view defined.
+  private final int length = Math.max(Math.max(Math.max(Math.max(
+      lastTopLED, lastMainLED), lastEnableDisableLED), lastHistoryDemoLED), lastAchieveHueGoal) + 1;
+ 
   public LEDView Top;
   public LEDView Main;
   public LEDView EnableDisable;
   public LEDView HistoryDemo;
   public LEDView AchieveHueGoal;
 
+  private final AddressableLEDBuffer bufferLED;
+
   public RobotSignals(int port) {
   
     // start updating the physical LED strip 
 
-    //  CAUTION
-    //  CAUTION
-    //  CAUTION
-    //  CAUTION
-    // Update this length for each view defined.
-    // Needs a better way of registering LED usage; this is really (too) simple
-    // simplistic view of segments - assume one starts at 0
-    int length = Math.max(Math.max(Math.max(Math.max(lastTopLED, lastMainLED), lastEnableDisableLED), lastHistoryDemoLED), lastAchieveHueGoal) + 1;
     strip = new AddressableLED(port);
     strip.setLength(length);
     strip.start();

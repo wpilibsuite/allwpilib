@@ -6,7 +6,7 @@
  * Example program that shows a variety of command based and programming
  * "best practices."
  * 
- * Demonstration output is on five sets of ten identical LEDs to show the program is
+ * Demonstration output is on five sets of eight identical LEDs to show the program is
  * operating; operator input is Xbox controller. The sixth demonstration
  * output is the terminal console "prints."
  * 

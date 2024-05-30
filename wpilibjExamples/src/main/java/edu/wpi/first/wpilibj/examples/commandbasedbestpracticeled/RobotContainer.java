@@ -119,23 +119,24 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
 
-        LEDPattern autoTopSignal = LEDPattern.solid(new Color(0.2, 0.6, 0.2));
-        LEDPattern autoMainSignal = LEDPattern.solid(new Color(0.4, 0.9, 0.4));
+        LEDPattern autoTopSignal =
+            LEDPattern.solid(new Color(0.1, 0.2, 0.2))
+            .blend(
+            LEDPattern.solid(new Color(0.7, 0.2, 0.2))
+             .blink(Seconds.of(0.1)));
+        LEDPattern autoMainSignal = LEDPattern.solid(new Color(0.3, 1., 0.3));
         // statements before the return are run early at initialization time
         return
         // statements returned are run later when the command is scheduled
           parallel // interrupting either of the two parallel commands with an external command interrupts the group
           (
-          /*parallel cmd*/
             robotSignals.Top.setSignal(autoTopSignal)
               .withTimeout(6.) // example this ends but the group continues and the default command is not activated here with or without the andThen command
               .andThen(robotSignals.Top.setSignal(autoTopSignal)),
-          /*parallel cmd*/
+
             robotSignals.Main.setSignal(autoMainSignal)
           )
-          /*composite*/
             .withName("AutoSignal");
-          // command ends here so default command runs if no subsequent command runs for the subsystem
       }
 
     /**
