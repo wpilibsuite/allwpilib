@@ -169,4 +169,36 @@ constexpr units::radian_t AngleModulus(units::radian_t angle) {
                                        units::radian_t{std::numbers::pi});
 }
 
+// floorDiv and floorMod algorithms taken from Java
+
+/**
+ * Returns the largest (closest to positive infinity)
+ * {@code int} value that is less than or equal to the algebraic quotient.
+ *
+ * @param x the dividend
+ * @param y the divisor
+ * @return the largest (closest to positive infinity)
+ *   {@code int} value that is less than or equal to the algebraic quotient.
+ */
+constexpr static int FloorDiv(int x, int y) {
+  int r = x / y;
+  // if the signs are different and modulo not zero, round down
+  if ((x ^ y) < 0 && (r * y != x)) {
+    r--;
+  }
+  return r;
+}
+
+/**
+ * Returns the floor modulus of the {@code int} arguments.
+ * <p>
+ * The floor modulus is {@code r = x - (floorDiv(x, y) * y)},
+ * has the same sign as the divisor {@code y} or is zero, and
+ * is in the range of {@code -abs(y) < r < +abs(y)}.
+ *
+ * @param x the dividend
+ * @param y the divisor
+ * @return the floor modulus {@code x - (floorDiv(x, y) * y)}
+ */
+constexpr static int FloorMod(int x, int y) { return x - FloorDiv(x, y) * y; }
 }  // namespace frc

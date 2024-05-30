@@ -12,6 +12,8 @@
 #include <wpi/MathExtras.h>
 #include <wpi/timestamp.h>
 
+#include "frc/MathUtil.h"
+
 using namespace frc;
 
 LEDPattern::LEDPattern(LEDPatternFn impl) : m_impl(std::move(impl)) {}
@@ -36,7 +38,7 @@ LEDPattern LEDPattern::Reversed() {
 LEDPattern LEDPattern::OffsetBy(int offset) {
   return LEDPattern{[=, self = *this](auto data, auto writer) {
     self.ApplyTo(data, [&data, &writer, offset](int i, Color color) {
-      int shiftedIndex = wpi::FloorMod(i + offset, data.size());
+      int shiftedIndex = frc::FloorMod(i + offset, data.size());
       writer(shiftedIndex, color);
     });
   }};
@@ -59,7 +61,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
 
     self.ApplyTo(data, [=](int i, Color color) {
       // floorMod so if the offset is negative, we still get positive outputs
-      int shiftedIndex = wpi::FloorMod(i + offset, bufLen);
+      int shiftedIndex = frc::FloorMod(i + offset, bufLen);
       writer(shiftedIndex, color);
     });
   }};
@@ -84,7 +86,7 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
 
     self.ApplyTo(data, [=, &writer](int i, Color color) {
       // FloorMod so if the offset is negative, we still get positive outputs
-      int shiftedIndex = wpi::FloorMod(i + offset, bufLen);
+      int shiftedIndex = frc::FloorMod(i + offset, bufLen);
 
       writer(shiftedIndex, color);
     });
