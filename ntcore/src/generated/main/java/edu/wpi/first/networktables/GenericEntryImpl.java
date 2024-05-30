@@ -552,7 +552,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    * @throws IllegalArgumentException if the value is not a known type
    */
   @Override
@@ -600,7 +600,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultBoolean(boolean defaultValue) {
@@ -612,7 +612,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultInteger(long defaultValue) {
@@ -624,7 +624,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultFloat(float defaultValue) {
@@ -636,7 +636,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultDouble(double defaultValue) {
@@ -648,7 +648,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultString(String defaultValue) {
@@ -662,7 +662,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * @param defaultValue the default value to set
    * @param start Start position of data (in buffer)
    * @param len Length of data (must be less than or equal to value.length - start)
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultRaw(byte[] defaultValue, int start, int len) {
@@ -675,7 +675,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * @param defaultValue the default value to set
    * @param start Start position of data (in buffer)
    * @param len Length of data (must be less than or equal to value.capacity() - start)
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultRaw(ByteBuffer defaultValue, int start, int len) {
@@ -687,7 +687,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultBooleanArray(boolean[] defaultValue) {
@@ -698,7 +698,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultBooleanArray(Boolean[] defaultValue) {
@@ -710,7 +710,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultIntegerArray(long[] defaultValue) {
@@ -721,7 +721,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultIntegerArray(Long[] defaultValue) {
@@ -733,7 +733,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultFloatArray(float[] defaultValue) {
@@ -744,7 +744,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultFloatArray(Float[] defaultValue) {
@@ -756,7 +756,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultDoubleArray(double[] defaultValue) {
@@ -767,7 +767,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultDoubleArray(Double[] defaultValue) {
@@ -779,7 +779,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   @Override
   public boolean setDefaultStringArray(String[] defaultValue) {
@@ -790,7 +790,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   public boolean setDefaultNumber(Number defaultValue) {
     return setDefaultDouble(defaultValue.doubleValue());
@@ -800,7 +800,7 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists
+   * @return False if the entry exists with a different type
    */
   public boolean setDefaultNumberArray(Number[] defaultValue) {
     return setDefaultDoubleArray(NetworkTableValue.toNativeDoubleArray(defaultValue));

@@ -537,12 +537,12 @@ public final class NetworkTablesJNI {
   public static native boolean getBoolean(int entry, boolean defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultBoolean(int entry, long time, boolean defaultValue);
 
@@ -593,12 +593,12 @@ public final class NetworkTablesJNI {
   public static native long getInteger(int entry, long defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultInteger(int entry, long time, long defaultValue);
 
@@ -649,12 +649,12 @@ public final class NetworkTablesJNI {
   public static native float getFloat(int entry, float defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultFloat(int entry, long time, float defaultValue);
 
@@ -705,12 +705,12 @@ public final class NetworkTablesJNI {
   public static native double getDouble(int entry, double defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultDouble(int entry, long time, double defaultValue);
 
@@ -761,12 +761,12 @@ public final class NetworkTablesJNI {
   public static native String getString(int entry, String defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultString(int entry, long time, String defaultValue);
 
@@ -885,36 +885,36 @@ public final class NetworkTablesJNI {
   public static native byte[] getRaw(int entry, byte[] defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default raw topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static boolean setDefaultRaw(int entry, long time, byte[] defaultValue) {
     return setDefaultRaw(entry, time, defaultValue, 0, defaultValue.length);
   }
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default raw topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
    * @param start Value's offset into buffer.
    * @param len Length of value in buffer.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultRaw(int entry, long time, byte[] defaultValue, int start, int len);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default raw topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static boolean setDefaultRaw(int entry, long time, ByteBuffer defaultValue) {
     int pos = defaultValue.position();
@@ -922,14 +922,14 @@ public final class NetworkTablesJNI {
   }
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default raw topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
    * @param start Value's offset into buffer.
    * @param len Length of value in buffer.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static boolean setDefaultRaw(int entry, long time, ByteBuffer defaultValue, int start, int len) {
     if (defaultValue.isDirect()) {
@@ -951,14 +951,14 @@ public final class NetworkTablesJNI {
   }
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default raw topic value buffer.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
    * @param start Value's offset into buffer.
    * @param len Length of value in buffer.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   private static native boolean setDefaultRawBuffer(int entry, long time, ByteBuffer defaultValue, int start, int len);
 
@@ -1009,12 +1009,12 @@ public final class NetworkTablesJNI {
   public static native boolean[] getBooleanArray(int entry, boolean[] defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultBooleanArray(int entry, long time, boolean[] defaultValue);
 
@@ -1065,12 +1065,12 @@ public final class NetworkTablesJNI {
   public static native long[] getIntegerArray(int entry, long[] defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultIntegerArray(int entry, long time, long[] defaultValue);
 
@@ -1121,12 +1121,12 @@ public final class NetworkTablesJNI {
   public static native float[] getFloatArray(int entry, float[] defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultFloatArray(int entry, long time, float[] defaultValue);
 
@@ -1177,12 +1177,12 @@ public final class NetworkTablesJNI {
   public static native double[] getDoubleArray(int entry, double[] defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultDoubleArray(int entry, long time, double[] defaultValue);
 
@@ -1233,12 +1233,12 @@ public final class NetworkTablesJNI {
   public static native String[] getStringArray(int entry, String[] defaultValue);
 
   /**
-   * Sets topic value if it does not exist.
+   * Sets default topic value.
    *
    * @param entry Entry handle.
    * @param time Time in microseconds.
    * @param defaultValue Default value.
-   * @return False if the entry exists.
+   * @return True if set succeeded.
    */
   public static native boolean setDefaultStringArray(int entry, long time, String[] defaultValue);
 
