@@ -239,6 +239,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
 
   /**
    * Returns the inverse of this measure.
+   *
    * @return the resulting measure
    */
   default Measure<?> inverse() {

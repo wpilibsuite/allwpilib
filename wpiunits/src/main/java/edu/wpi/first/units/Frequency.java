@@ -7,14 +7,13 @@ package edu.wpi.first.units;
 /**
  * Unit of frequency dimension.
  *
- * <p>This is the base type for units of frequency dimension. It is also used to specify the dimension
- * for {@link Measure}: <code>Measure&lt;Frequency&gt;</code>.
+ * <p>This is the base type for units of frequency dimension. It is also used to specify the
+ * dimension for {@link Measure}: <code>Measure&lt;Frequency&gt;</code>.
  *
- * <p>Actual units (such as {@link Units#Hertz}) can be found in
- * the {@link Units} class.
+ * <p>Actual units (such as {@link Units#Hertz}) can be found in the {@link Units} class.
  */
 public class Frequency extends Unit<Frequency> {
-    Frequency(Frequency baseUnit, double baseUnitEquivalent, String name, String symbol) {
+  Frequency(Frequency baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
