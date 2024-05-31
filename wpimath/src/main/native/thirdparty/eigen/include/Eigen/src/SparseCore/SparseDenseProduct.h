@@ -45,7 +45,6 @@ struct sparse_time_dense_product_impl<SparseLhsType, DenseRhsType, DenseResType,
 
     Index n = lhs.outerSize();
 #ifdef EIGEN_HAS_OPENMP
-    Eigen::initParallel();
     Index threads = Eigen::nbThreads();
 #endif
 
@@ -125,7 +124,6 @@ struct sparse_time_dense_product_impl<SparseLhsType, DenseRhsType, DenseResType,
     LhsEval lhsEval(lhs);
 
 #ifdef EIGEN_HAS_OPENMP
-    Eigen::initParallel();
     Index threads = Eigen::nbThreads();
     // This 20000 threshold has been found experimentally on 2D and 3D Poisson problems.
     // It basically represents the minimal amount of work to be done to be worth it.

@@ -9,15 +9,29 @@
 #include "frc2/command/CommandScheduler.h"
 
 namespace frc2 {
+
 /**
- * A subclass of {@link GenericHID} with {@link Trigger} factories for
+ * A version of {@link frc::GenericHID} with {@link Trigger} factories for
  * command-based.
  *
  * @see GenericHID
  */
-class CommandGenericHID : public frc::GenericHID {
+class CommandGenericHID {
  public:
-  using GenericHID::GenericHID;
+  /**
+   * Construct an instance of a device.
+   *
+   * @param port The port index on the Driver Station that the device is plugged
+   * into.
+   */
+  explicit CommandGenericHID(int port);
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  frc::GenericHID& GetHID();
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -215,5 +229,8 @@ class CommandGenericHID : public frc::GenericHID {
       int axis, double threshold,
       frc::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+ private:
+  frc::GenericHID m_hid;
 };
 }  // namespace frc2

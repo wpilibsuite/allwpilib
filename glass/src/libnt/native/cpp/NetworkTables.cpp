@@ -1428,8 +1428,9 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_STRING: {
       char* v = GetTextBuffer(entry.valueStr);
-      if (ImGui::InputText(typeStr, v, kTextBufferSize,
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
+      ImGui::InputText(typeStr, v, kTextBufferSize,
+                       ImGuiInputTextFlags_EnterReturnsTrue);
+      if (ImGui::IsItemDeactivatedAfterEdit()) {
         if (v[0] == '"') {
           if (entry.publisher == 0) {
             entry.publisher =

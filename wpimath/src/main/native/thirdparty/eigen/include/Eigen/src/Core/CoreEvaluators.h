@@ -167,7 +167,7 @@ class plainobjectbase_evaluator_data<Scalar, Dynamic> {
 };
 
 template <typename Derived>
-struct evaluator<PlainObjectBase<Derived> > : evaluator_base<Derived> {
+struct evaluator<PlainObjectBase<Derived>> : evaluator_base<Derived> {
   typedef PlainObjectBase<Derived> PlainObjectType;
   typedef typename PlainObjectType::Scalar Scalar;
   typedef typename PlainObjectType::CoeffReturnType CoeffReturnType;
@@ -247,31 +247,29 @@ struct evaluator<PlainObjectBase<Derived> > : evaluator_base<Derived> {
 };
 
 template <typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxCols>
-struct evaluator<Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> >
-    : evaluator<PlainObjectBase<Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> > > {
+struct evaluator<Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>>
+    : evaluator<PlainObjectBase<Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>>> {
   typedef Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> XprType;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE evaluator() {}
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit evaluator(const XprType& m)
-      : evaluator<PlainObjectBase<XprType> >(m) {}
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit evaluator(const XprType& m) : evaluator<PlainObjectBase<XprType>>(m) {}
 };
 
 template <typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxCols>
-struct evaluator<Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols> >
-    : evaluator<PlainObjectBase<Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols> > > {
+struct evaluator<Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols>>
+    : evaluator<PlainObjectBase<Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols>>> {
   typedef Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols> XprType;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE evaluator() {}
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit evaluator(const XprType& m)
-      : evaluator<PlainObjectBase<XprType> >(m) {}
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit evaluator(const XprType& m) : evaluator<PlainObjectBase<XprType>>(m) {}
 };
 
 // -------------------- Transpose --------------------
 
 template <typename ArgType>
-struct unary_evaluator<Transpose<ArgType>, IndexBased> : evaluator_base<Transpose<ArgType> > {
+struct unary_evaluator<Transpose<ArgType>, IndexBased> : evaluator_base<Transpose<ArgType>> {
   typedef Transpose<ArgType> XprType;
 
   enum {
@@ -460,8 +458,8 @@ struct nullary_wrapper<Scalar,NullaryOp,true,true,true>
 #endif  // MSVC workaround
 
 template <typename NullaryOp, typename PlainObjectType>
-struct evaluator<CwiseNullaryOp<NullaryOp, PlainObjectType> >
-    : evaluator_base<CwiseNullaryOp<NullaryOp, PlainObjectType> > {
+struct evaluator<CwiseNullaryOp<NullaryOp, PlainObjectType>>
+    : evaluator_base<CwiseNullaryOp<NullaryOp, PlainObjectType>> {
   typedef CwiseNullaryOp<NullaryOp, PlainObjectType> XprType;
   typedef internal::remove_all_t<PlainObjectType> PlainObjectTypeCleaned;
 
@@ -509,7 +507,7 @@ struct evaluator<CwiseNullaryOp<NullaryOp, PlainObjectType> >
 // -------------------- CwiseUnaryOp --------------------
 
 template <typename UnaryOp, typename ArgType>
-struct unary_evaluator<CwiseUnaryOp<UnaryOp, ArgType>, IndexBased> : evaluator_base<CwiseUnaryOp<UnaryOp, ArgType> > {
+struct unary_evaluator<CwiseUnaryOp<UnaryOp, ArgType>, IndexBased> : evaluator_base<CwiseUnaryOp<UnaryOp, ArgType>> {
   typedef CwiseUnaryOp<UnaryOp, ArgType> XprType;
 
   enum {
@@ -762,17 +760,17 @@ struct unary_evaluator<CwiseUnaryOp<core_cast_op<SrcType, DstType>, ArgType>, In
 
 // this is a ternary expression
 template <typename TernaryOp, typename Arg1, typename Arg2, typename Arg3>
-struct evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> >
-    : public ternary_evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> > {
+struct evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3>>
+    : public ternary_evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3>> {
   typedef CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> XprType;
-  typedef ternary_evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> > Base;
+  typedef ternary_evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3>> Base;
 
   EIGEN_DEVICE_FUNC explicit evaluator(const XprType& xpr) : Base(xpr) {}
 };
 
 template <typename TernaryOp, typename Arg1, typename Arg2, typename Arg3>
 struct ternary_evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3>, IndexBased, IndexBased>
-    : evaluator_base<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> > {
+    : evaluator_base<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3>> {
   typedef CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> XprType;
 
   enum {
@@ -865,16 +863,16 @@ struct evaluator<CwiseTernaryOp<scalar_boolean_select_op<Scalar, Scalar, bool>, 
 
 // this is a binary expression
 template <typename BinaryOp, typename Lhs, typename Rhs>
-struct evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs> > : public binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs> > {
+struct evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>> : public binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>> {
   typedef CwiseBinaryOp<BinaryOp, Lhs, Rhs> XprType;
-  typedef binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs> > Base;
+  typedef binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>> Base;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit evaluator(const XprType& xpr) : Base(xpr) {}
 };
 
 template <typename BinaryOp, typename Lhs, typename Rhs>
 struct binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>, IndexBased, IndexBased>
-    : evaluator_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs> > {
+    : evaluator_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs>> {
   typedef CwiseBinaryOp<BinaryOp, Lhs, Rhs> XprType;
 
   enum {
@@ -939,7 +937,7 @@ struct binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>, IndexBased, IndexBase
 
 template <typename UnaryOp, typename ArgType, typename StrideType>
 struct unary_evaluator<CwiseUnaryView<UnaryOp, ArgType, StrideType>, IndexBased>
-    : evaluator_base<CwiseUnaryView<UnaryOp, ArgType, StrideType> > {
+    : evaluator_base<CwiseUnaryView<UnaryOp, ArgType, StrideType>> {
   typedef CwiseUnaryView<UnaryOp, ArgType, StrideType> XprType;
 
   enum {
@@ -1067,7 +1065,7 @@ struct mapbase_evaluator : evaluator_base<Derived> {
 };
 
 template <typename PlainObjectType, int MapOptions, typename StrideType>
-struct evaluator<Map<PlainObjectType, MapOptions, StrideType> >
+struct evaluator<Map<PlainObjectType, MapOptions, StrideType>>
     : public mapbase_evaluator<Map<PlainObjectType, MapOptions, StrideType>, PlainObjectType> {
   typedef Map<PlainObjectType, MapOptions, StrideType> XprType;
   typedef typename XprType::Scalar Scalar;
@@ -1100,13 +1098,13 @@ struct evaluator<Map<PlainObjectType, MapOptions, StrideType> >
 // -------------------- Ref --------------------
 
 template <typename PlainObjectType, int RefOptions, typename StrideType>
-struct evaluator<Ref<PlainObjectType, RefOptions, StrideType> >
+struct evaluator<Ref<PlainObjectType, RefOptions, StrideType>>
     : public mapbase_evaluator<Ref<PlainObjectType, RefOptions, StrideType>, PlainObjectType> {
   typedef Ref<PlainObjectType, RefOptions, StrideType> XprType;
 
   enum {
-    Flags = evaluator<Map<PlainObjectType, RefOptions, StrideType> >::Flags,
-    Alignment = evaluator<Map<PlainObjectType, RefOptions, StrideType> >::Alignment
+    Flags = evaluator<Map<PlainObjectType, RefOptions, StrideType>>::Flags,
+    Alignment = evaluator<Map<PlainObjectType, RefOptions, StrideType>>::Alignment
   };
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit evaluator(const XprType& ref)
@@ -1120,7 +1118,7 @@ template <typename ArgType, int BlockRows, int BlockCols, bool InnerPanel,
 struct block_evaluator;
 
 template <typename ArgType, int BlockRows, int BlockCols, bool InnerPanel>
-struct evaluator<Block<ArgType, BlockRows, BlockCols, InnerPanel> >
+struct evaluator<Block<ArgType, BlockRows, BlockCols, InnerPanel>>
     : block_evaluator<ArgType, BlockRows, BlockCols, InnerPanel> {
   typedef Block<ArgType, BlockRows, BlockCols, InnerPanel> XprType;
   typedef typename XprType::Scalar Scalar;
@@ -1171,7 +1169,7 @@ struct evaluator<Block<ArgType, BlockRows, BlockCols, InnerPanel> >
 // no direct-access => dispatch to a unary evaluator
 template <typename ArgType, int BlockRows, int BlockCols, bool InnerPanel>
 struct block_evaluator<ArgType, BlockRows, BlockCols, InnerPanel, /*HasDirectAccess*/ false>
-    : unary_evaluator<Block<ArgType, BlockRows, BlockCols, InnerPanel> > {
+    : unary_evaluator<Block<ArgType, BlockRows, BlockCols, InnerPanel>> {
   typedef Block<ArgType, BlockRows, BlockCols, InnerPanel> XprType;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit block_evaluator(const XprType& block)
@@ -1180,7 +1178,7 @@ struct block_evaluator<ArgType, BlockRows, BlockCols, InnerPanel, /*HasDirectAcc
 
 template <typename ArgType, int BlockRows, int BlockCols, bool InnerPanel>
 struct unary_evaluator<Block<ArgType, BlockRows, BlockCols, InnerPanel>, IndexBased>
-    : evaluator_base<Block<ArgType, BlockRows, BlockCols, InnerPanel> > {
+    : evaluator_base<Block<ArgType, BlockRows, BlockCols, InnerPanel>> {
   typedef Block<ArgType, BlockRows, BlockCols, InnerPanel> XprType;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit unary_evaluator(const XprType& block)
@@ -1293,8 +1291,8 @@ struct block_evaluator<ArgType, BlockRows, BlockCols, InnerPanel, /* HasDirectAc
 
 // TODO enable vectorization for Select
 template <typename ConditionMatrixType, typename ThenMatrixType, typename ElseMatrixType>
-struct evaluator<Select<ConditionMatrixType, ThenMatrixType, ElseMatrixType> >
-    : evaluator_base<Select<ConditionMatrixType, ThenMatrixType, ElseMatrixType> > {
+struct evaluator<Select<ConditionMatrixType, ThenMatrixType, ElseMatrixType>>
+    : evaluator_base<Select<ConditionMatrixType, ThenMatrixType, ElseMatrixType>> {
   typedef Select<ConditionMatrixType, ThenMatrixType, ElseMatrixType> XprType;
   enum {
     CoeffReadCost = evaluator<ConditionMatrixType>::CoeffReadCost +
@@ -1335,8 +1333,8 @@ struct evaluator<Select<ConditionMatrixType, ThenMatrixType, ElseMatrixType> >
 // -------------------- Replicate --------------------
 
 template <typename ArgType, int RowFactor, int ColFactor>
-struct unary_evaluator<Replicate<ArgType, RowFactor, ColFactor> >
-    : evaluator_base<Replicate<ArgType, RowFactor, ColFactor> > {
+struct unary_evaluator<Replicate<ArgType, RowFactor, ColFactor>>
+    : evaluator_base<Replicate<ArgType, RowFactor, ColFactor>> {
   typedef Replicate<ArgType, RowFactor, ColFactor> XprType;
   typedef typename XprType::CoeffReturnType CoeffReturnType;
   enum { Factor = (RowFactor == Dynamic || ColFactor == Dynamic) ? Dynamic : RowFactor * ColFactor };
@@ -1461,19 +1459,19 @@ struct evaluator_wrapper_base : evaluator_base<XprType> {
 };
 
 template <typename TArgType>
-struct unary_evaluator<MatrixWrapper<TArgType> > : evaluator_wrapper_base<MatrixWrapper<TArgType> > {
+struct unary_evaluator<MatrixWrapper<TArgType>> : evaluator_wrapper_base<MatrixWrapper<TArgType>> {
   typedef MatrixWrapper<TArgType> XprType;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit unary_evaluator(const XprType& wrapper)
-      : evaluator_wrapper_base<MatrixWrapper<TArgType> >(wrapper.nestedExpression()) {}
+      : evaluator_wrapper_base<MatrixWrapper<TArgType>>(wrapper.nestedExpression()) {}
 };
 
 template <typename TArgType>
-struct unary_evaluator<ArrayWrapper<TArgType> > : evaluator_wrapper_base<ArrayWrapper<TArgType> > {
+struct unary_evaluator<ArrayWrapper<TArgType>> : evaluator_wrapper_base<ArrayWrapper<TArgType>> {
   typedef ArrayWrapper<TArgType> XprType;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit unary_evaluator(const XprType& wrapper)
-      : evaluator_wrapper_base<ArrayWrapper<TArgType> >(wrapper.nestedExpression()) {}
+      : evaluator_wrapper_base<ArrayWrapper<TArgType>>(wrapper.nestedExpression()) {}
 };
 
 // -------------------- Reverse --------------------
@@ -1483,7 +1481,7 @@ template <typename PacketType, bool ReversePacket>
 struct reverse_packet_cond;
 
 template <typename ArgType, int Direction>
-struct unary_evaluator<Reverse<ArgType, Direction> > : evaluator_base<Reverse<ArgType, Direction> > {
+struct unary_evaluator<Reverse<ArgType, Direction>> : evaluator_base<Reverse<ArgType, Direction>> {
   typedef Reverse<ArgType, Direction> XprType;
   typedef typename XprType::Scalar Scalar;
   typedef typename XprType::CoeffReturnType CoeffReturnType;
@@ -1584,7 +1582,7 @@ struct unary_evaluator<Reverse<ArgType, Direction> > : evaluator_base<Reverse<Ar
 // -------------------- Diagonal --------------------
 
 template <typename ArgType, int DiagIndex>
-struct evaluator<Diagonal<ArgType, DiagIndex> > : evaluator_base<Diagonal<ArgType, DiagIndex> > {
+struct evaluator<Diagonal<ArgType, DiagIndex>> : evaluator_base<Diagonal<ArgType, DiagIndex>> {
   typedef Diagonal<ArgType, DiagIndex> XprType;
 
   enum {
@@ -1643,10 +1641,10 @@ template <typename ArgType>
 class EvalToTemp;
 
 template <typename ArgType>
-struct traits<EvalToTemp<ArgType> > : public traits<ArgType> {};
+struct traits<EvalToTemp<ArgType>> : public traits<ArgType> {};
 
 template <typename ArgType>
-class EvalToTemp : public dense_xpr_base<EvalToTemp<ArgType> >::type {
+class EvalToTemp : public dense_xpr_base<EvalToTemp<ArgType>>::type {
  public:
   typedef typename dense_xpr_base<EvalToTemp>::type Base;
   EIGEN_GENERIC_PUBLIC_INTERFACE(EvalToTemp)
@@ -1664,7 +1662,7 @@ class EvalToTemp : public dense_xpr_base<EvalToTemp<ArgType> >::type {
 };
 
 template <typename ArgType>
-struct evaluator<EvalToTemp<ArgType> > : public evaluator<typename ArgType::PlainObject> {
+struct evaluator<EvalToTemp<ArgType>> : public evaluator<typename ArgType::PlainObject> {
   typedef EvalToTemp<ArgType> XprType;
   typedef typename ArgType::PlainObject PlainObject;
   typedef evaluator<PlainObject> Base;

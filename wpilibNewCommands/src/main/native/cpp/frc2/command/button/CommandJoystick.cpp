@@ -6,14 +6,25 @@
 
 using namespace frc2;
 
-Trigger CommandJoystick::Button(int button, frc::EventLoop* loop) const {
-  return GenericHID::Button(button, loop).CastTo<class Trigger>();
+CommandJoystick::CommandJoystick(int port)
+    : CommandGenericHID(port), m_hid{frc::Joystick(port)} {}
+
+frc::Joystick& CommandJoystick::GetHID() {
+  return m_hid;
 }
 
 Trigger CommandJoystick::Trigger(frc::EventLoop* loop) const {
-  return Joystick::Trigger(loop).CastTo<class Trigger>();
+  return m_hid.Trigger(loop).CastTo<class Trigger>();
 }
 
 Trigger CommandJoystick::Top(frc::EventLoop* loop) const {
-  return Joystick::Top(loop).CastTo<class Trigger>();
+  return m_hid.Top(loop).CastTo<class Trigger>();
+}
+
+double CommandJoystick::GetMagnitude() const {
+  return m_hid.GetMagnitude();
+}
+
+units::radian_t CommandJoystick::GetDirection() const {
+  return m_hid.GetDirection();
 }

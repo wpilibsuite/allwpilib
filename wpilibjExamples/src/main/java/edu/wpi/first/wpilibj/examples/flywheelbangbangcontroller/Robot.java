@@ -6,7 +6,10 @@ package edu.wpi.first.wpilibj.examples.flywheelbangbangcontroller;
 
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
@@ -54,8 +57,12 @@ public class Robot extends TimedRobot {
   private static final double kFlywheelMomentOfInertia =
       0.5 * Units.lbsToKilograms(1.5) * Math.pow(Units.inchesToMeters(4), 2);
 
-  private final FlywheelSim m_flywheelSim =
-      new FlywheelSim(DCMotor.getNEO(1), kFlywheelGearing, kFlywheelMomentOfInertia);
+  private final DCMotor m_gearbox = DCMotor.getNEO(1);
+
+  private final LinearSystem<N1, N1, N1> m_plant =
+      LinearSystemId.createFlywheelSystem(m_gearbox, kFlywheelGearing, kFlywheelMomentOfInertia);
+
+  private final FlywheelSim m_flywheelSim = new FlywheelSim(m_plant, m_gearbox);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
   @Override
