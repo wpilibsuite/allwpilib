@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cmath>
 #include <numbers>
 #include <type_traits>
 
@@ -186,7 +185,7 @@ constexpr std::signed_integral auto FloorDiv(std::signed_integral auto x,
   auto quot = x / y;
   auto rem = x % y;
   // if the signs are different and modulo not zero, round down
-  if (std::signbit(x) != std::signbit(y) && rem != 0) {
+  if ((x < 0) != (y < 0) && rem != 0) {
     --quot;
   }
   return quot;
