@@ -16,6 +16,9 @@ public final class BaseUnits {
   /** The standard unit of time, seconds. */
   public static final Time Time = new Time(null, 1, "Second", "s");
 
+  /** The standard unit of frequency, hertz. */
+  public static final Frequency Frequency = new Frequency(null, 1, "Hertz", "Hz");
+
   /** The standard unit of mass, kilograms. */
   public static final Mass Mass = new Mass(null, 1, "Kilogram", "Kg");
 

@@ -238,6 +238,23 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Returns the inverse of this measure.
+   * @return the resulting measure
+   */
+  default Measure<?> inverse() {
+    if (unit() instanceof Time) {
+      return Units.Hertz.ofBaseUnits(1 / baseUnitMagnitude());
+    }
+    if (unit() instanceof Velocity<?> velocity) {
+      return velocity.reciprocal().ofBaseUnits(1 / baseUnitMagnitude());
+    }
+    if (unit() instanceof Per<?, ?> per) {
+      return per.reciprocal().ofBaseUnits(1 / baseUnitMagnitude());
+    }
+    return Units.Value.per(unit()).ofBaseUnits(1 / baseUnitMagnitude());
+  }
+
+  /**
    * Returns an immutable copy of this measure. The copy can be used freely and is guaranteed never
    * to change.
    *
