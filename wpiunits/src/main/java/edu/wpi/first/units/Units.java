@@ -260,7 +260,7 @@ public final class Units {
 
   /** A unit of force equivalent to 4.448222 {@link #Newtons}. */
   public static final Mult<Mass, Velocity<Velocity<Distance>>> PoundsForce =
-      derive(Newtons).named("Pounds-Force").symbol("lb.").make();
+      derive(Newtons).aggregate(4.448222).named("Pounds-Force").symbol("lb.").make();
 
   // Torque
   /** The base SI unit for torque. */
@@ -273,7 +273,7 @@ public final class Units {
 
   /** A unit of torque equivalent to 1.355818 {@link #NewtonMeters}. */
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundFeet =
-      derive(NewtonMeters).named("Pound-Feet").symbol("lb-ft").make();
+      derive(NewtonMeters).aggregate(1.355818).named("Pound-Feet").symbol("lb-ft").make();
 
   /** Singular alias for PoundFeet. */
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundFoot =
@@ -281,7 +281,7 @@ public final class Units {
 
   /** A unit of torque equivalent to 0.1129848 {@link #NewtonMeters}. */
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundInches =
-      derive(NewtonMeters).named("Pound-Inches").symbol("lb-in").make();
+      derive(NewtonMeters).aggregate(0.1129848).named("Pound-Inches").symbol("lb-in").make();
 
   /** Singular alias for PoundInches. */
   public static final Mult<Mult<Mass, Velocity<Velocity<Distance>>>, Distance> PoundInch =
