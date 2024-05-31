@@ -347,7 +347,7 @@ public final class Commands {
     return new ParallelDeadlineGroup(deadline, otherCommands);
   }
 
-  /**
+ /**
    * Runs individual commands at the same time without grouped behavior; when the deadline command ends the otherCommands are cancelled.
    *
    * <p>Each otherCommand is run independently by proxy. The requirements of
@@ -368,8 +368,34 @@ public final class Commands {
     for (Command cmd : otherCommands) {
       CommandScheduler.getInstance().removeComposedCommand(cmd);
     }
-    return deadline(deadline.asProxy(), proxyAll(otherCommands));
+    if ( ! deadline.getRequirements().isEmpty()) {
+      deadline = deadline.asProxy();
+    }
+    return deadline(deadline, proxyAll(otherCommands));
   }
+
+  /**
+   * Maps an array of commands by adding proxy to every element that has requirements using {@link Command#asProxy()}.
+   *
+   * <p>This is useful to ensure that default commands of subsystems within a command group are
+   * still triggered despite command groups requiring the union of their members' requirements
+   *
+   * @param commands an array of commands
+   * @return an array of commands to run by proxy if a command has requirements
+   */
+  public static Command[] proxyAll(Command... commands) {
+    Command[] out = new Command[commands.length];
+    for (int i = 0; i < commands.length; i++) {
+      if (commands[i].getRequirements().isEmpty()) {
+        out[i] = commands[i];
+      }
+      else {
+        out[i] = commands[i].asProxy();
+      }
+    }
+    return out;
+  }
+}
 
   private Commands() {
     throw new UnsupportedOperationException("This is a utility class");
