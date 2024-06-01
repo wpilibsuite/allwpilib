@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** WPIUtil JNI. */
 public class WPIUtilJNI {
   static boolean libraryLoaded = false;
-  static RuntimeLoader<WPIUtilJNI> loader = null;
 
   /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
@@ -42,11 +41,8 @@ public class WPIUtilJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader =
-            new RuntimeLoader<>(
-                "wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
-        loader.loadLibrary();
-      } catch (IOException ex) {
+        RuntimeLoader.loadLibrary("wpiutiljni");
+      } catch (Exception ex) {
         ex.printStackTrace();
         System.exit(1);
       }
@@ -63,10 +59,7 @@ public class WPIUtilJNI {
     if (libraryLoaded) {
       return;
     }
-    loader =
-        new RuntimeLoader<>(
-            "wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
-    loader.loadLibrary();
+    RuntimeLoader.loadLibrary("wpiutiljni");
     libraryLoaded = true;
   }
 

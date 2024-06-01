@@ -107,11 +107,11 @@ class DriverStationData {
 
   void SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox);
   void SetJoystickType(int32_t stick, int32_t type);
-  void SetJoystickName(int32_t stick, const char* name, size_t size);
+  void SetJoystickName(int32_t stick, std::string_view message);
   void SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type);
 
-  void SetGameSpecificMessage(const char* message, size_t size);
-  void SetEventName(const char* name, size_t size);
+  void SetGameSpecificMessage(std::string_view message);
+  void SetEventName(std::string_view name);
   void SetMatchType(HAL_MatchType type);
   void SetMatchNumber(int32_t matchNumber);
   void SetReplayNumber(int32_t replayNumber);

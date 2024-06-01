@@ -17,12 +17,10 @@
 
 TEST(AnalogEncoderSimTest, Basic) {
   frc::AnalogInput ai(0);
-  frc::AnalogEncoder encoder{ai};
+  frc::AnalogEncoder encoder{ai, 360, 0};
   frc::sim::AnalogEncoderSim encoderSim{encoder};
 
-  encoderSim.SetPosition(180_deg);
-  EXPECT_NEAR(encoder.Get().value(), 0.5, 1E-8);
-  EXPECT_NEAR(encoderSim.GetTurns().value(), 0.5, 1E-8);
-  EXPECT_NEAR(encoderSim.GetPosition().Radians().value(), std::numbers::pi,
-              1E-8);
+  encoderSim.Set(180);
+  EXPECT_NEAR(encoder.Get(), 180, 1E-8);
+  EXPECT_NEAR(encoderSim.Get(), 180, 1E-8);
 }

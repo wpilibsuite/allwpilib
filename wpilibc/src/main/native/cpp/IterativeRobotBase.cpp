@@ -6,10 +6,10 @@
 
 #include <frc/DriverStation.h>
 
-#include <fmt/format.h>
 #include <hal/DriverStation.h>
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/print.h>
 
 #include "frc/DSControlWord.h"
 #include "frc/Errors.h"
@@ -40,7 +40,7 @@ void IterativeRobotBase::TestInit() {}
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -48,7 +48,7 @@ void IterativeRobotBase::RobotPeriodic() {
 void IterativeRobotBase::SimulationPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -56,7 +56,7 @@ void IterativeRobotBase::SimulationPeriodic() {
 void IterativeRobotBase::DisabledPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -64,7 +64,7 @@ void IterativeRobotBase::DisabledPeriodic() {
 void IterativeRobotBase::AutonomousPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -72,7 +72,7 @@ void IterativeRobotBase::AutonomousPeriodic() {
 void IterativeRobotBase::TeleopPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -80,7 +80,7 @@ void IterativeRobotBase::TeleopPeriodic() {
 void IterativeRobotBase::TestPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -231,4 +231,8 @@ void IterativeRobotBase::LoopFunc() {
 
 void IterativeRobotBase::PrintLoopOverrunMessage() {
   FRC_ReportError(err::Error, "Loop time of {:.6f}s overrun", m_period.value());
+}
+
+void IterativeRobotBase::PrintWatchdogEpochs() {
+  m_watchdog.PrintEpochs();
 }

@@ -37,6 +37,7 @@ typedef CwiseUnaryOp<internal::scalar_round_op<Scalar>, const Derived> RoundRetu
 typedef CwiseUnaryOp<internal::scalar_rint_op<Scalar>, const Derived> RintReturnType;
 typedef CwiseUnaryOp<internal::scalar_floor_op<Scalar>, const Derived> FloorReturnType;
 typedef CwiseUnaryOp<internal::scalar_ceil_op<Scalar>, const Derived> CeilReturnType;
+typedef CwiseUnaryOp<internal::scalar_trunc_op<Scalar>, const Derived> TruncReturnType;
 typedef CwiseUnaryOp<internal::scalar_isnan_op<Scalar>, const Derived> IsNaNReturnType;
 typedef CwiseUnaryOp<internal::scalar_isinf_op<Scalar>, const Derived> IsInfReturnType;
 typedef CwiseUnaryOp<internal::scalar_isfinite_op<Scalar>, const Derived> IsFiniteReturnType;
@@ -346,6 +347,15 @@ EIGEN_DEVICE_FUNC inline const FloorReturnType floor() const { return FloorRetur
  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_ceil">Math functions</a>, floor(), round()
  */
 EIGEN_DEVICE_FUNC inline const CeilReturnType ceil() const { return CeilReturnType(derived()); }
+
+/** \returns an expression of the coefficient-wise truncation of *this.
+ *
+ * Example: \include Cwise_trunc.cpp
+ * Output: \verbinclude Cwise_trunc.out
+ *
+ * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_trunc">Math functions</a>, floor(), round()
+ */
+EIGEN_DEVICE_FUNC inline const TruncReturnType trunc() const { return TruncReturnType(derived()); }
 
 template <int N>
 struct ShiftRightXpr {

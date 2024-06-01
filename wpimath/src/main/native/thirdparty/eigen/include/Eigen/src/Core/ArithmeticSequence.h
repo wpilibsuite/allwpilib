@@ -61,26 +61,28 @@ seqN(FirstType first, SizeType size, IncrType incr);
 template <typename FirstType, typename SizeType, typename IncrType>
 class ArithmeticSequence {
  public:
-  ArithmeticSequence(FirstType first, SizeType size) : m_first(first), m_size(size) {}
-  ArithmeticSequence(FirstType first, SizeType size, IncrType incr) : m_first(first), m_size(size), m_incr(incr) {}
+  constexpr ArithmeticSequence() = default;
+  constexpr ArithmeticSequence(FirstType first, SizeType size) : m_first(first), m_size(size) {}
+  constexpr ArithmeticSequence(FirstType first, SizeType size, IncrType incr)
+      : m_first(first), m_size(size), m_incr(incr) {}
 
   enum {
-    SizeAtCompileTime = internal::get_fixed_value<SizeType>::value,
+    // SizeAtCompileTime = internal::get_fixed_value<SizeType>::value,
     IncrAtCompileTime = internal::get_fixed_value<IncrType, DynamicIndex>::value
   };
 
   /** \returns the size, i.e., number of elements, of the sequence */
-  Index size() const { return m_size; }
+  constexpr Index size() const { return m_size; }
 
   /** \returns the first element \f$ a_0 \f$ in the sequence */
-  Index first() const { return m_first; }
+  constexpr Index first() const { return m_first; }
 
   /** \returns the value \f$ a_i \f$ at index \a i in the sequence. */
-  Index operator[](Index i) const { return m_first + i * m_incr; }
+  constexpr Index operator[](Index i) const { return m_first + i * m_incr; }
 
-  const FirstType& firstObject() const { return m_first; }
-  const SizeType& sizeObject() const { return m_size; }
-  const IncrType& incrObject() const { return m_incr; }
+  constexpr const FirstType& firstObject() const { return m_first; }
+  constexpr const SizeType& sizeObject() const { return m_size; }
+  constexpr const IncrType& incrObject() const { return m_incr; }
 
  protected:
   FirstType m_first;
@@ -88,7 +90,7 @@ class ArithmeticSequence {
   IncrType m_incr;
 
  public:
-  auto reverse() const -> decltype(Eigen::seqN(m_first + (m_size + fix<-1>()) * m_incr, m_size, -m_incr)) {
+  constexpr auto reverse() const -> decltype(Eigen::seqN(m_first + (m_size + fix<-1>()) * m_incr, m_size, -m_incr)) {
     return seqN(m_first + (m_size + fix<-1>()) * m_incr, m_size, -m_incr);
   }
 };
@@ -200,33 +202,6 @@ auto lastN(SizeType size) -> decltype(seqN(Eigen::placeholders::last + fix<1>() 
 }
 
 }  // namespace placeholders
-
-namespace internal {
-
-// Convert a symbolic span into a usable one (i.e., remove last/end "keywords")
-template <typename T>
-struct make_size_type {
-  typedef std::conditional_t<symbolic::is_symbolic<T>::value, Index, T> type;
-};
-
-template <typename FirstType, typename SizeType, typename IncrType, int XprSize>
-struct IndexedViewCompatibleType<ArithmeticSequence<FirstType, SizeType, IncrType>, XprSize> {
-  typedef ArithmeticSequence<Index, typename make_size_type<SizeType>::type, IncrType> type;
-};
-
-template <typename FirstType, typename SizeType, typename IncrType>
-ArithmeticSequence<Index, typename make_size_type<SizeType>::type, IncrType> makeIndexedViewCompatible(
-    const ArithmeticSequence<FirstType, SizeType, IncrType>& ids, Index size, SpecializedType) {
-  return ArithmeticSequence<Index, typename make_size_type<SizeType>::type, IncrType>(
-      eval_expr_given_size(ids.firstObject(), size), eval_expr_given_size(ids.sizeObject(), size), ids.incrObject());
-}
-
-template <typename FirstType, typename SizeType, typename IncrType>
-struct get_compile_time_incr<ArithmeticSequence<FirstType, SizeType, IncrType> > {
-  enum { value = get_fixed_value<IncrType, DynamicIndex>::value };
-};
-
-}  // end namespace internal
 
 /** \namespace Eigen::indexing
   * \ingroup Core_Module

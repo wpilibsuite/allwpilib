@@ -481,9 +481,7 @@ void SparseQR<MatrixType, OrderingType>::factorize(const MatrixType& mat) {
       tdot *= m_hcoeffs(curIdx);
 
       // Then update tval = tval - q * tau
-      // FIXME: tval -= tdot * m_Q.col(curIdx) should amount to the same (need to check/add support for efficient "dense
-      // ?= sparse")
-      for (typename QRMatrixType::InnerIterator itq(m_Q, curIdx); itq; ++itq) tval(itq.row()) -= itq.value() * tdot;
+      tval -= tdot * m_Q.col(curIdx);
 
       // Detect fill-in for the current column of Q
       if (m_etree(Ridx(i)) == nonzeroCol) {

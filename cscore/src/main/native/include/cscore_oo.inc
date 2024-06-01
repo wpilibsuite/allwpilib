@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/deprecated.h>
+
 #include "cscore_oo.h"
 
 namespace cs {
@@ -350,7 +352,7 @@ inline std::vector<std::string> HttpCamera::GetUrls() const {
   m_status = 0;
   return ::cs::GetHttpCameraUrls(m_handle, &m_status);
 }
-
+WPI_IGNORE_DEPRECATED
 inline std::vector<std::string> AxisCamera::HostToUrl(
     std::span<const std::string> hosts) {
   std::vector<std::string> rv;
@@ -389,6 +391,7 @@ template <typename T>
 inline AxisCamera::AxisCamera(std::string_view name,
                               std::initializer_list<T> hosts)
     : HttpCamera(name, HostToUrl(hosts), kAxis) {}
+WPI_UNIGNORE_DEPRECATED
 
 inline void ImageSource::NotifyError(std::string_view msg) {
   m_status = 0;

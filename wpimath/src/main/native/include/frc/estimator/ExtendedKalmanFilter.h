@@ -236,7 +236,7 @@ class ExtendedKalmanFilter {
   std::function<OutputVector(const OutputVector&, const OutputVector&)>
       m_residualFuncY;
   std::function<StateVector(const StateVector&, const StateVector&)> m_addFuncX;
-  StateVector m_xHat;
+  StateVector m_xHat = StateVector::Zero();
   StateMatrix m_P;
   StateMatrix m_contQ;
   Matrixd<Outputs, Outputs> m_contR;

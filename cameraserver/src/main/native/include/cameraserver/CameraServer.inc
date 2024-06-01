@@ -11,6 +11,7 @@
 
 namespace frc {
 
+WPI_IGNORE_DEPRECATED
 template <typename T>
 inline cs::AxisCamera CameraServer::AddAxisCamera(
     std::initializer_list<T> hosts) {
@@ -27,5 +28,6 @@ inline cs::AxisCamera CameraServer::AddAxisCamera(
   }
   return AddAxisCamera(name, vec);
 }
+WPI_UNIGNORE_DEPRECATED
 
 }  // namespace frc

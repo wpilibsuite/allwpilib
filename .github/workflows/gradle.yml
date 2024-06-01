@@ -61,7 +61,7 @@ jobs:
 
   build-host:
     env:
-      MACOSX_DEPLOYMENT_TARGET: 12
+      MACOSX_DEPLOYMENT_TARGET: 13
     strategy:
       fail-fast: false
       matrix:
@@ -72,40 +72,34 @@ jobs:
             task: "build"
             build-options: "-PciDebugOnly"
             outputs: "build/allOutputs"
-            build-dir: "c:\\work"
           - os: windows-2022
             artifact-name: Win64Release
             architecture: x64
             build-options: "-PciReleaseOnly"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
-            build-dir: "c:\\work"
           - os: windows-2022
             artifact-name: WinArm64Debug
             architecture: x64
             task: "build"
             build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             outputs: "build/allOutputs"
-            build-dir: "c:\\work"
           - os: windows-2022
             artifact-name: WinArm64Release
             architecture: x64
             build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
-            build-dir: "c:\\work"
           - os: macOS-14
             artifact-name: macOS
             architecture: aarch64
             task: "build"
             outputs: "build/allOutputs"
-            build-dir: "."
           - os: windows-2022
             artifact-name: Win32
             architecture: x86
             task: ":ntcoreffi:build"
             outputs: "ntcoreffi/build/outputs"
-            build-dir: "c:\\work"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
@@ -114,7 +108,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 17
           architecture: ${{ matrix.architecture }}
       - name: Import Developer ID Certificate
@@ -138,21 +132,16 @@ jobs:
       - name: Set Java Heap Size
         run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
         if: matrix.artifact-name == 'Win32'
-      - name: Configure build directory (Windows)
-        run: xcopy . ${{ matrix.build-dir }} /i /s /e /h /q
-        if: matrix.os == 'windows-2022'
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
-        working-directory: ${{ matrix.build-dir }}
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Sign Libraries with Developer ID
         run: ./gradlew copyAllOutputs --build-cache -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
-        working-directory: ${{ matrix.build-dir }}
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
@@ -162,7 +151,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
-          path: ${{ matrix.build-dir }}/${{ matrix.outputs }}
+          path: ${{ matrix.outputs }}
 
   build-documentation:
     name: "Build - Documentation"
@@ -173,7 +162,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 17
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
@@ -235,7 +224,7 @@ jobs:
           github.repository_owner == 'wpilibsuite' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 17
       - name: Combine (Main)
         if: |

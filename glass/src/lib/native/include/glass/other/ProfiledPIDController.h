@@ -15,14 +15,18 @@ class ProfiledPIDControllerModel : public Model {
   virtual DataSource* GetPData() = 0;
   virtual DataSource* GetIData() = 0;
   virtual DataSource* GetDData() = 0;
-  virtual DataSource* GetGoalData() = 0;
   virtual DataSource* GetIZoneData() = 0;
+  virtual DataSource* GetMaxVelocityData() = 0;
+  virtual DataSource* GetMaxAccelerationData() = 0;
+  virtual DataSource* GetGoalData() = 0;
 
   virtual void SetP(double value) = 0;
   virtual void SetI(double value) = 0;
   virtual void SetD(double value) = 0;
-  virtual void SetGoal(double value) = 0;
   virtual void SetIZone(double value) = 0;
+  virtual void SetMaxVelocity(double value) = 0;
+  virtual void SetMaxAcceleration(double value) = 0;
+  virtual void SetGoal(double value) = 0;
 };
 void DisplayProfiledPIDController(ProfiledPIDControllerModel* m);
 }  // namespace glass

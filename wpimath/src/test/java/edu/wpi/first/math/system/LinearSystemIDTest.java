@@ -48,9 +48,9 @@ class LinearSystemIDTest {
 
     assertTrue(model.getB().isEqual(VecBuilder.fill(0, 20.8), 0.001));
 
-    assertTrue(model.getC().isEqual(MatBuilder.fill(Nat.N1(), Nat.N2(), 1, 0), 0.001));
+    assertTrue(model.getC().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 1), 0.001));
 
-    assertTrue(model.getD().isEqual(VecBuilder.fill(0), 0.001));
+    assertTrue(model.getD().isEqual(VecBuilder.fill(0, 0), 0.001));
   }
 
   @Test

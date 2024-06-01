@@ -6,13 +6,13 @@ package edu.wpi.first.wpilibj.romi;
 
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.networktables.NetworkTablesJNI;
-import edu.wpi.first.util.RuntimeDetector;
+import edu.wpi.first.util.CombinedRuntimeLoader;
 
 public final class DevMain {
   /** Main entry point. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
-    System.out.println(RuntimeDetector.getPlatformPath());
+    System.out.println(CombinedRuntimeLoader.getPlatformPath());
     System.out.println(NetworkTablesJNI.now());
     System.out.println(HALUtil.getHALRuntimeType());
   }

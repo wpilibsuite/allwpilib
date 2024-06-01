@@ -60,16 +60,6 @@
 // Compiler identification, EIGEN_COMP_*
 //------------------------------------------------------------------------------------------
 
-/// \internal Disable NEON features in Intellisense
-#if __INTELLISENSE__
-#ifdef __ARM_NEON
-#undef __ARM_NEON
-#endif
-#ifdef __ARM_NEON__
-#undef __ARM_NEON__
-#endif
-#endif
-
 /// \internal EIGEN_COMP_GNUC set to version (e.g., 951 for GCC 9.5.1) for all compilers compatible with GCC
 #ifdef __GNUC__
 #define EIGEN_COMP_GNUC (__GNUC__ * 100 + __GNUC_MINOR__ * 10 + __GNUC_PATCHLEVEL__)
@@ -716,7 +706,7 @@
     (EIGEN_COMP_ICC && EIGEN_COMP_ICC < 1500) || (EIGEN_COMP_NVCC && EIGEN_COMP_NVCC < 80000) ||       \
     (EIGEN_COMP_CLANG_STRICT && EIGEN_COMP_CLANG < 390) ||                                             \
     (EIGEN_COMP_CLANGAPPLE && EIGEN_COMP_CLANGAPPLE < 9000000) || (EIGEN_COMP_GNUC_STRICT && EIGEN_COMP_GNUC < 510)
-#error This compiler appears to be too old to be supported by Eigen
+#error Eigen requires at least c++14 support.
 #endif
 
 // Does the compiler support C99?
@@ -974,6 +964,10 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void ignore_unused_variable(cons
 // added then subtracted, which is otherwise compiled away with -ffast-math.
 //
 // See bug 1674
+#if defined(EIGEN_GPU_COMPILE_PHASE)
+#define EIGEN_OPTIMIZATION_BARRIER(X)
+#endif
+
 #if !defined(EIGEN_OPTIMIZATION_BARRIER)
 #if EIGEN_COMP_GNUC
    // According to https://gcc.gnu.org/onlinedocs/gcc/Constraints.html:

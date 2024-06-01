@@ -45,7 +45,8 @@ class Robot : public frc::TimedRobot {
   // Outputs (what we can measure): [position], in meters.
   frc::LinearSystem<2, 1, 1> m_elevatorPlant =
       frc::LinearSystemId::ElevatorSystem(frc::DCMotor::NEO(2), kCarriageMass,
-                                          kDrumRadius, kGearRatio);
+                                          kDrumRadius, kGearRatio)
+          .Slice(0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   frc::KalmanFilter<2, 1, 1> m_observer{

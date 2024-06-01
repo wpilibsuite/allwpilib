@@ -58,9 +58,6 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
-
-    configure_file(src/generate/FRCNetComm.java.in FRCNetComm.java)
 
     file(GLOB_RECURSE hal_shared_jni_src src/main/native/cpp/jni/*.cpp)
 
@@ -74,6 +71,7 @@ if(WITH_JAVA)
         OUTPUT_NAME wpiHal
         GENERATE_NATIVE_HEADERS hal_jni_headers
     )
+    set_property(TARGET hal_jar PROPERTY FOLDER "java")
 
     install_jar(hal_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS hal_jar FILE hal_jar.cmake DESTINATION share/hal)

@@ -22,7 +22,15 @@ namespace Eigen {
 namespace internal {
 
 EIGEN_INSTANTIATE_GENERIC_MATH_FUNCS_FLOAT(Packet8f)
-EIGEN_INSTANTIATE_GENERIC_MATH_FUNCS_DOUBLE(Packet4d)
+
+EIGEN_DOUBLE_PACKET_FUNCTION(atan, Packet4d)
+EIGEN_DOUBLE_PACKET_FUNCTION(log, Packet4d)
+EIGEN_DOUBLE_PACKET_FUNCTION(log2, Packet4d)
+EIGEN_DOUBLE_PACKET_FUNCTION(exp, Packet4d)
+#ifdef EIGEN_VECTORIZE_AVX2
+EIGEN_DOUBLE_PACKET_FUNCTION(sin, Packet4d)
+EIGEN_DOUBLE_PACKET_FUNCTION(cos, Packet4d)
+#endif
 
 // Notice that for newer processors, it is counterproductive to use Newton
 // iteration for square root. In particular, Skylake and Zen2 processors

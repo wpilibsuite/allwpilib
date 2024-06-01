@@ -57,7 +57,7 @@ EIGEN_STRONG_INLINE void trsmKernelL<Scalar, Index, Mode, Conjugate, TriStorageO
     Index rs = size - k - 1;  // remaining size
     Index s = TriStorageOrder == RowMajor ? (IsLower ? 0 : i + 1) : IsLower ? i + 1 : i - rs;
 
-    Scalar a = (Mode & UnitDiag) ? Scalar(1) : Scalar(1) / conj(tri(i, i));
+    Scalar a = (Mode & UnitDiag) ? Scalar(1) : Scalar(Scalar(1) / conj(tri(i, i)));
     for (Index j = 0; j < otherSize; ++j) {
       if (TriStorageOrder == RowMajor) {
         Scalar b(0);

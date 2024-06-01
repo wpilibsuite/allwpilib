@@ -8,6 +8,7 @@
 #include <type_traits>
 
 #include <gtest/gtest.h>
+#include <wpi/print.h>
 
 #include "units/acceleration.h"
 #include "units/angle.h"
@@ -1426,59 +1427,59 @@ TEST_F(UnitContainer, cout) {
 #if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 TEST_F(UnitContainer, fmtlib) {
   testing::internal::CaptureStdout();
-  fmt::print("{}", degree_t(349.87));
+  wpi::print("{}", degree_t(349.87));
   std::string output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("349.87 deg", output.c_str());
 
   testing::internal::CaptureStdout();
-  fmt::print("{}", meter_t(1.0));
+  wpi::print("{}", meter_t(1.0));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("1 m", output.c_str());
 
   testing::internal::CaptureStdout();
-  fmt::print("{}", dB_t(31.0));
+  wpi::print("{}", dB_t(31.0));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("31 dB", output.c_str());
 
   testing::internal::CaptureStdout();
-  fmt::print("{}", volt_t(21.79));
+  wpi::print("{}", volt_t(21.79));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("21.79 V", output.c_str());
 
   testing::internal::CaptureStdout();
-  fmt::print("{}", dBW_t(12.0));
+  wpi::print("{}", dBW_t(12.0));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("12 dBW", output.c_str());
 
   testing::internal::CaptureStdout();
-  fmt::print("{}", dBm_t(120.0));
+  wpi::print("{}", dBm_t(120.0));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("120 dBm", output.c_str());
 
   testing::internal::CaptureStdout();
-  fmt::print("{}", miles_per_hour_t(72.1));
+  wpi::print("{}", miles_per_hour_t(72.1));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("72.1 mph", output.c_str());
 
   // undefined unit
   testing::internal::CaptureStdout();
-  fmt::print("{}", units::math::cpow<4>(meter_t(2)));
+  wpi::print("{}", units::math::cpow<4>(meter_t(2)));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("16 m^4", output.c_str());
 
   testing::internal::CaptureStdout();
-  fmt::print("{}", units::math::cpow<3>(foot_t(2)));
+  wpi::print("{}", units::math::cpow<3>(foot_t(2)));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("8 cu_ft", output.c_str());
 
   testing::internal::CaptureStdout();
-  fmt::print("{:.9}", units::math::cpow<4>(foot_t(2)));
+  wpi::print("{:.9}", units::math::cpow<4>(foot_t(2)));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("0.138095597 m^4", output.c_str());
 
   // constants
   testing::internal::CaptureStdout();
-  fmt::print("{:.8}", constants::k_B);
+  wpi::print("{:.8}", constants::k_B);
   output = testing::internal::GetCapturedStdout();
 #if defined(_MSC_VER) && (_MSC_VER <= 1800)
   EXPECT_STREQ("1.3806485e-023 m^2 kg s^-2 K^-1", output.c_str());
@@ -1487,7 +1488,7 @@ TEST_F(UnitContainer, fmtlib) {
 #endif
 
   testing::internal::CaptureStdout();
-  fmt::print("{:.9}", constants::mu_B);
+  wpi::print("{:.9}", constants::mu_B);
   output = testing::internal::GetCapturedStdout();
 #if defined(_MSC_VER) && (_MSC_VER <= 1800)
   EXPECT_STREQ("9.27400999e-024 m^2 A", output.c_str());
@@ -1496,7 +1497,7 @@ TEST_F(UnitContainer, fmtlib) {
 #endif
 
   testing::internal::CaptureStdout();
-  fmt::print("{:.7}", constants::sigma);
+  wpi::print("{:.7}", constants::sigma);
   output = testing::internal::GetCapturedStdout();
 #if defined(_MSC_VER) && (_MSC_VER <= 1800)
   EXPECT_STREQ("5.670367e-008 kg s^-3 K^-4", output.c_str());

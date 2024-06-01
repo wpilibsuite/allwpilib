@@ -9,7 +9,6 @@ find_package(OpenCV REQUIRED)
 if(WITH_JAVA)
     find_package(Java REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     #find java files, copy them locally
 
@@ -30,6 +29,7 @@ if(WITH_JAVA)
         INCLUDE_JARS wpiutil_jar cscore_jar ntcore_jar ${OPENCV_JAR_FILE}
         OUTPUT_NAME cameraserver
     )
+    set_property(TARGET cameraserver_jar PROPERTY FOLDER "java")
 
     install_jar(cameraserver_jar DESTINATION ${java_lib_dest})
     install_jar_exports(

@@ -17,7 +17,8 @@ namespace Eigen {
 
 template <typename Derived>
 template <typename OtherDerived>
-typename internal::traits<Derived>::Scalar SparseMatrixBase<Derived>::dot(const MatrixBase<OtherDerived>& other) const {
+inline typename internal::traits<Derived>::Scalar SparseMatrixBase<Derived>::dot(
+    const MatrixBase<OtherDerived>& other) const {
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived)
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(OtherDerived)
   EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(Derived, OtherDerived)
@@ -30,17 +31,23 @@ typename internal::traits<Derived>::Scalar SparseMatrixBase<Derived>::dot(const 
 
   internal::evaluator<Derived> thisEval(derived());
   typename internal::evaluator<Derived>::InnerIterator i(thisEval, 0);
-  Scalar res(0);
-  while (i) {
-    res += numext::conj(i.value()) * other.coeff(i.index());
+  // Two accumulators, which breaks the dependency chain on the accumulator
+  // and allows more instruction-level parallelism in the following loop.
+  Scalar res1(0);
+  Scalar res2(0);
+  for (; i; ++i) {
+    res1 += numext::conj(i.value()) * other.coeff(i.index());
     ++i;
+    if (i) {
+      res2 += numext::conj(i.value()) * other.coeff(i.index());
+    }
   }
-  return res;
+  return res1 + res2;
 }
 
 template <typename Derived>
 template <typename OtherDerived>
-typename internal::traits<Derived>::Scalar SparseMatrixBase<Derived>::dot(
+inline typename internal::traits<Derived>::Scalar SparseMatrixBase<Derived>::dot(
     const SparseMatrixBase<OtherDerived>& other) const {
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived)
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(OtherDerived)

@@ -78,7 +78,7 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    *
    * @return The DC motor current draw.
    */
-  units::ampere_t GetCurrentDraw() const override;
+  units::ampere_t GetCurrentDraw() const;
 
   /**
    * Sets the input voltage for the DC motor.

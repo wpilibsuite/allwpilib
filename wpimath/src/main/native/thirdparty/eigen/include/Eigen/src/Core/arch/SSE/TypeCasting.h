@@ -37,6 +37,13 @@ template <>
 struct type_casting_traits<double, int> : vectorized_type_casting_traits<double, int> {};
 template <>
 struct type_casting_traits<int, double> : vectorized_type_casting_traits<int, double> {};
+
+#ifndef EIGEN_VECTORIZE_AVX2
+template <>
+struct type_casting_traits<double, int64_t> : vectorized_type_casting_traits<double, int64_t> {};
+template <>
+struct type_casting_traits<int64_t, double> : vectorized_type_casting_traits<int64_t, double> {};
+#endif
 #endif
 
 template <>
@@ -77,6 +84,22 @@ template <>
 EIGEN_STRONG_INLINE Packet4i pcast<Packet2d, Packet4i>(const Packet2d& a, const Packet2d& b) {
   return _mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(_mm_cvttpd_epi32(a)), _mm_castsi128_ps(_mm_cvttpd_epi32(b)),
                                          (1 << 2) | (1 << 6)));
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet2l pcast<Packet2d, Packet2l>(const Packet2d& a) {
+#if EIGEN_ARCH_x86_64
+  return _mm_set_epi64x(_mm_cvttsd_si64(preverse(a)), _mm_cvttsd_si64(a));
+#else
+  return _mm_set_epi64x(static_cast<int64_t>(pfirst(preverse(a))), static_cast<int64_t>(pfirst(a)));
+#endif
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet2d pcast<Packet2l, Packet2d>(const Packet2l& a) {
+  EIGEN_ALIGN16 int64_t aux[2];
+  pstore(aux, a);
+  return _mm_set_pd(static_cast<double>(aux[1]), static_cast<double>(aux[0]));
 }
 
 template <>
@@ -127,6 +150,15 @@ EIGEN_STRONG_INLINE Packet2d preinterpret<Packet2d, Packet4i>(const Packet4i& a)
 }
 
 template <>
+EIGEN_STRONG_INLINE Packet2d preinterpret<Packet2d, Packet2l>(const Packet2l& a) {
+  return _mm_castsi128_pd(a);
+}
+template <>
+EIGEN_STRONG_INLINE Packet2l preinterpret<Packet2l, Packet2d>(const Packet2d& a) {
+  return _mm_castpd_si128(a);
+}
+
+template <>
 EIGEN_STRONG_INLINE Packet4i preinterpret<Packet4i, Packet2d>(const Packet2d& a) {
   return _mm_castpd_si128(a);
 }
@@ -140,6 +172,7 @@ template <>
 EIGEN_STRONG_INLINE Packet4i preinterpret<Packet4i, Packet4ui>(const Packet4ui& a) {
   return Packet4i(a);
 }
+
 // Disable the following code since it's broken on too many platforms / compilers.
 // #elif defined(EIGEN_VECTORIZE_SSE) && (!EIGEN_ARCH_x86_64) && (!EIGEN_COMP_MSVC)
 #if 0

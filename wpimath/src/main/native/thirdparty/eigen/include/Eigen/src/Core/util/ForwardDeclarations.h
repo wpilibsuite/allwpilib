@@ -91,6 +91,8 @@ template <typename XprType, typename RowIndices, typename ColIndices>
 class IndexedView;
 template <typename XprType, int Rows = Dynamic, int Cols = Dynamic, int Order = 0>
 class Reshaped;
+template <typename FirstType, typename SizeType, typename IncrType>
+class ArithmeticSequence;
 
 template <typename MatrixType, int Size = Dynamic>
 class VectorBlock;
@@ -499,6 +501,9 @@ struct stem_function {
   typedef ComplexScalar type(ComplexScalar, int);
 };
 }  // namespace internal
+
+template <typename XprType, typename Device>
+struct DeviceWrapper;
 
 }  // end namespace Eigen
 

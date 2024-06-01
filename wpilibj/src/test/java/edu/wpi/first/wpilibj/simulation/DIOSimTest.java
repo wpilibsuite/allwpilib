@@ -72,13 +72,13 @@ class DIOSimTest {
       BooleanCallback valueCallback = new BooleanCallback();
 
       try (CallbackStore cb = sim.registerValueCallback(valueCallback, false)) {
-        assertFalse(output.get());
-        assertFalse(sim.getValue());
+        assertTrue(output.get());
+        assertTrue(sim.getValue());
 
         assertFalse(valueCallback.wasTriggered());
-        output.set(true);
+        output.set(false);
         assertTrue(valueCallback.wasTriggered());
-        assertTrue(valueCallback.getSetValue());
+        assertFalse(valueCallback.getSetValue());
       }
     }
   }

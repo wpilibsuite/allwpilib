@@ -52,7 +52,10 @@ template <typename MatrixType, int Options, int QRPreconditioner, int Case>
 class qr_preconditioner_impl<MatrixType, Options, QRPreconditioner, Case, false> {
  public:
   void allocate(const JacobiSVD<MatrixType, Options>&) {}
-  bool run(JacobiSVD<MatrixType, Options>&, const MatrixType&) { return false; }
+  template <typename Xpr>
+  bool run(JacobiSVD<MatrixType, Options>&, const Xpr&) {
+    return false;
+  }
 };
 
 /*** preconditioner using FullPivHouseholderQR ***/
@@ -75,8 +78,8 @@ class qr_preconditioner_impl<MatrixType, Options, FullPivHouseholderQRPreconditi
     }
     if (svd.m_computeFullU) m_workspace.resize(svd.rows());
   }
-
-  bool run(SVDType& svd, const MatrixType& matrix) {
+  template <typename Xpr>
+  bool run(SVDType& svd, const Xpr& matrix) {
     if (matrix.rows() > matrix.cols()) {
       m_qr.compute(matrix);
       svd.m_workMatrix = m_qr.matrixQR().block(0, 0, matrix.cols(), matrix.cols()).template triangularView<Upper>();
@@ -105,7 +108,7 @@ class qr_preconditioner_impl<MatrixType, Options, FullPivHouseholderQRPreconditi
     ColsAtCompileTime = MatrixType::ColsAtCompileTime,
     MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,
     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime,
-    MatrixOptions = MatrixType::Options
+    MatrixOptions = traits<MatrixType>::Options
   };
 
   typedef typename internal::make_proper_matrix_type<Scalar, ColsAtCompileTime, RowsAtCompileTime, MatrixOptions,
@@ -117,14 +120,12 @@ class qr_preconditioner_impl<MatrixType, Options, FullPivHouseholderQRPreconditi
       internal::destroy_at(&m_qr);
       internal::construct_at(&m_qr, svd.cols(), svd.rows());
     }
-    m_adjoint.resize(svd.cols(), svd.rows());
     if (svd.m_computeFullV) m_workspace.resize(svd.cols());
   }
-
-  bool run(SVDType& svd, const MatrixType& matrix) {
+  template <typename Xpr>
+  bool run(SVDType& svd, const Xpr& matrix) {
     if (matrix.cols() > matrix.rows()) {
-      m_adjoint = matrix.adjoint();
-      m_qr.compute(m_adjoint);
+      m_qr.compute(matrix.adjoint());
       svd.m_workMatrix =
           m_qr.matrixQR().block(0, 0, matrix.rows(), matrix.rows()).template triangularView<Upper>().adjoint();
       if (svd.m_computeFullV) m_qr.matrixQ().evalTo(svd.m_matrixV, m_workspace);
@@ -137,7 +138,6 @@ class qr_preconditioner_impl<MatrixType, Options, FullPivHouseholderQRPreconditi
  private:
   typedef FullPivHouseholderQR<TransposeTypeWithSameStorageOrder> QRType;
   QRType m_qr;
-  TransposeTypeWithSameStorageOrder m_adjoint;
   typename plain_row_type<MatrixType>::type m_workspace;
 };
 
@@ -167,8 +167,8 @@ class qr_preconditioner_impl<MatrixType, Options, ColPivHouseholderQRPreconditio
     else if (svd.m_computeThinU)
       m_workspace.resize(svd.cols());
   }
-
-  bool run(SVDType& svd, const MatrixType& matrix) {
+  template <typename Xpr>
+  bool run(SVDType& svd, const Xpr& matrix) {
     if (matrix.rows() > matrix.cols()) {
       m_qr.compute(matrix);
       svd.m_workMatrix = m_qr.matrixQR().block(0, 0, matrix.cols(), matrix.cols()).template triangularView<Upper>();
@@ -202,7 +202,7 @@ class qr_preconditioner_impl<MatrixType, Options, ColPivHouseholderQRPreconditio
     ColsAtCompileTime = MatrixType::ColsAtCompileTime,
     MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,
     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime,
-    MatrixOptions = MatrixType::Options,
+    MatrixOptions = internal::traits<MatrixType>::Options,
     WorkspaceSize = internal::traits<SVDType>::MatrixVColsAtCompileTime,
     MaxWorkspaceSize = internal::traits<SVDType>::MatrixVMaxColsAtCompileTime
   };
@@ -222,13 +222,11 @@ class qr_preconditioner_impl<MatrixType, Options, ColPivHouseholderQRPreconditio
       m_workspace.resize(svd.cols());
     else if (svd.m_computeThinV)
       m_workspace.resize(svd.rows());
-    m_adjoint.resize(svd.cols(), svd.rows());
   }
-
-  bool run(SVDType& svd, const MatrixType& matrix) {
+  template <typename Xpr>
+  bool run(SVDType& svd, const Xpr& matrix) {
     if (matrix.cols() > matrix.rows()) {
-      m_adjoint = matrix.adjoint();
-      m_qr.compute(m_adjoint);
+      m_qr.compute(matrix.adjoint());
 
       svd.m_workMatrix =
           m_qr.matrixQR().block(0, 0, matrix.rows(), matrix.rows()).template triangularView<Upper>().adjoint();
@@ -247,7 +245,6 @@ class qr_preconditioner_impl<MatrixType, Options, ColPivHouseholderQRPreconditio
  private:
   typedef ColPivHouseholderQR<TransposeTypeWithSameStorageOrder> QRType;
   QRType m_qr;
-  TransposeTypeWithSameStorageOrder m_adjoint;
   WorkspaceType m_workspace;
 };
 
@@ -276,8 +273,8 @@ class qr_preconditioner_impl<MatrixType, Options, HouseholderQRPreconditioner, P
     else if (svd.m_computeThinU)
       m_workspace.resize(svd.cols());
   }
-
-  bool run(SVDType& svd, const MatrixType& matrix) {
+  template <typename Xpr>
+  bool run(SVDType& svd, const Xpr& matrix) {
     if (matrix.rows() > matrix.cols()) {
       m_qr.compute(matrix);
       svd.m_workMatrix = m_qr.matrixQR().block(0, 0, matrix.cols(), matrix.cols()).template triangularView<Upper>();
@@ -310,7 +307,7 @@ class qr_preconditioner_impl<MatrixType, Options, HouseholderQRPreconditioner, P
     ColsAtCompileTime = MatrixType::ColsAtCompileTime,
     MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,
     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime,
-    MatrixOptions = MatrixType::Options,
+    MatrixOptions = internal::traits<MatrixType>::Options,
     WorkspaceSize = internal::traits<SVDType>::MatrixVColsAtCompileTime,
     MaxWorkspaceSize = internal::traits<SVDType>::MatrixVMaxColsAtCompileTime
   };
@@ -330,13 +327,12 @@ class qr_preconditioner_impl<MatrixType, Options, HouseholderQRPreconditioner, P
       m_workspace.resize(svd.cols());
     else if (svd.m_computeThinV)
       m_workspace.resize(svd.rows());
-    m_adjoint.resize(svd.cols(), svd.rows());
   }
 
-  bool run(SVDType& svd, const MatrixType& matrix) {
+  template <typename Xpr>
+  bool run(SVDType& svd, const Xpr& matrix) {
     if (matrix.cols() > matrix.rows()) {
-      m_adjoint = matrix.adjoint();
-      m_qr.compute(m_adjoint);
+      m_qr.compute(matrix.adjoint());
 
       svd.m_workMatrix =
           m_qr.matrixQR().block(0, 0, matrix.rows(), matrix.rows()).template triangularView<Upper>().adjoint();
@@ -355,7 +351,6 @@ class qr_preconditioner_impl<MatrixType, Options, HouseholderQRPreconditioner, P
  private:
   typedef HouseholderQR<TransposeTypeWithSameStorageOrder> QRType;
   QRType m_qr;
-  TransposeTypeWithSameStorageOrder m_adjoint;
   WorkspaceType m_workspace;
 };
 
@@ -509,7 +504,6 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
   typedef MatrixType_ MatrixType;
   typedef typename Base::Scalar Scalar;
   typedef typename Base::RealScalar RealScalar;
-  typedef typename Base::Index Index;
   enum : int {
     Options = Options_,
     QRPreconditioner = internal::get_qr_preconditioner(Options),
@@ -618,7 +612,18 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
   using Base::rows;
 
  private:
-  void allocate(Index rows, Index cols, unsigned int computationOptions);
+  void allocate(Index rows_, Index cols_, unsigned int computationOptions) {
+    if (Base::allocate(rows_, cols_, computationOptions)) return;
+    eigen_assert(!(ShouldComputeThinU && int(QRPreconditioner) == int(FullPivHouseholderQRPreconditioner)) &&
+                 !(ShouldComputeThinU && int(QRPreconditioner) == int(FullPivHouseholderQRPreconditioner)) &&
+                 "JacobiSVD: can't compute thin U or thin V with the FullPivHouseholderQR preconditioner. "
+                 "Use the ColPivHouseholderQR preconditioner instead.");
+
+    m_workMatrix.resize(diagSize(), diagSize());
+    if (cols() > rows()) m_qr_precond_morecols.allocate(*this);
+    if (rows() > cols()) m_qr_precond_morerows.allocate(*this);
+  }
+
   JacobiSVD& compute_impl(const MatrixType& matrix, unsigned int computationOptions);
 
  protected:
@@ -654,23 +659,7 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
   internal::qr_preconditioner_impl<MatrixType, Options, QRPreconditioner, internal::PreconditionIfMoreRowsThanCols>
       m_qr_precond_morerows;
   WorkMatrixType m_workMatrix;
-  MatrixType m_scaledMatrix;
 };
-
-template <typename MatrixType, int Options>
-void JacobiSVD<MatrixType, Options>::allocate(Index rows_, Index cols_, unsigned int computationOptions_) {
-  if (Base::allocate(rows_, cols_, computationOptions_)) return;
-
-  eigen_assert(!(ShouldComputeThinU && int(QRPreconditioner) == int(FullPivHouseholderQRPreconditioner)) &&
-               !(ShouldComputeThinU && int(QRPreconditioner) == int(FullPivHouseholderQRPreconditioner)) &&
-               "JacobiSVD: can't compute thin U or thin V with the FullPivHouseholderQR preconditioner. "
-               "Use the ColPivHouseholderQR preconditioner instead.");
-
-  m_workMatrix.resize(diagSize(), diagSize());
-  if (cols() > rows()) m_qr_precond_morecols.allocate(*this);
-  if (rows() > cols()) m_qr_precond_morerows.allocate(*this);
-  if (rows() != cols()) m_scaledMatrix.resize(rows(), cols());
-}
 
 template <typename MatrixType, int Options>
 JacobiSVD<MatrixType, Options>& JacobiSVD<MatrixType, Options>::compute_impl(const MatrixType& matrix,
@@ -699,9 +688,8 @@ JacobiSVD<MatrixType, Options>& JacobiSVD<MatrixType, Options>::compute_impl(con
   /*** step 1. The R-SVD step: we use a QR decomposition to reduce to the case of a square matrix */
 
   if (rows() != cols()) {
-    m_scaledMatrix = matrix / scale;
-    m_qr_precond_morecols.run(*this, m_scaledMatrix);
-    m_qr_precond_morerows.run(*this, m_scaledMatrix);
+    m_qr_precond_morecols.run(*this, matrix / scale);
+    m_qr_precond_morerows.run(*this, matrix / scale);
   } else {
     m_workMatrix =
         matrix.template topLeftCorner<DiagSizeAtCompileTime, DiagSizeAtCompileTime>(diagSize(), diagSize()) / scale;

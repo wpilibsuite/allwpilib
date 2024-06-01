@@ -104,6 +104,11 @@ struct EigenBase {
     // derived class can reimplement it in a more optimized way.
     dst = this->derived() * dst;
   }
+
+  template <typename Device>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE DeviceWrapper<Derived, Device> device(Device& device);
+  template <typename Device>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE DeviceWrapper<const Derived, Device> device(Device& device) const;
 };
 
 /***************************************************************************

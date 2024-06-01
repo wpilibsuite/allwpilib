@@ -35,7 +35,7 @@ using namespace nRoboRIO_FPGANamespace;
 
 #include <cstdio>
 
-#include <fmt/format.h>
+#include "wpi/print.h"
 
 #ifdef __FRC_ROBORIO__
 namespace {
@@ -68,7 +68,7 @@ struct HMBLowLevel {
     int32_t status = 0;
     niFpga.reset(dlopen("libNiFpga.so", RTLD_LAZY));
     if (!niFpga) {
-      fmt::print(stderr, "Could not open libNiFpga.so\n");
+      wpi::print(stderr, "Could not open libNiFpga.so\n");
       return false;
     }
     NiFpga_OpenHmbFunc openHmb = reinterpret_cast<NiFpga_OpenHmbFunc>(
@@ -84,14 +84,14 @@ struct HMBLowLevel {
         dlsym(niFpga.get(), "NiFpgaDll_WriteU32"));
     if (openHmb == nullptr || closeHmb == nullptr || findRegister == nullptr ||
         writeU32 == nullptr || readU32 == nullptr) {
-      fmt::print(stderr, "Could not find HMB symbols in libNiFpga.so\n");
+      wpi::print(stderr, "Could not find HMB symbols in libNiFpga.so\n");
       niFpga = nullptr;
       return false;
     }
     uint32_t hmbConfigRegister = 0;
     status = findRegister(session, "HMB.Config", &hmbConfigRegister);
     if (status != 0) {
-      fmt::print(stderr, "Failed to find HMB.Config register, status code {}\n",
+      wpi::print(stderr, "Failed to find HMB.Config register, status code {}\n",
                  status);
       closeHmb = nullptr;
       niFpga = nullptr;
@@ -102,7 +102,7 @@ struct HMBLowLevel {
         openHmb(session, hmbName, &hmbBufferSize,
                 reinterpret_cast<void**>(const_cast<uint32_t**>(&hmbBuffer)));
     if (status != 0) {
-      fmt::print(stderr, "Failed to open HMB, status code {}\n", status);
+      wpi::print(stderr, "Failed to open HMB, status code {}\n", status);
       closeHmb = nullptr;
       niFpga = nullptr;
       return false;
@@ -273,7 +273,7 @@ uint64_t wpi::Now() {
     if (nowUseDefaultOnFailure.test()) {
       return timestamp() - offset_val;
     } else {
-      fmt::print(stderr,
+      wpi::print(stderr,
                  "FPGA not yet configured in wpi::Now(). This is a fatal "
                  "error. The process is being terminated.\n");
       std::fflush(stderr);

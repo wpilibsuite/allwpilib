@@ -272,17 +272,12 @@ int32_t HAL_GetJoystickType(int32_t joystickNum) {
   return desc.type;
 }
 
-char* HAL_GetJoystickName(int32_t joystickNum) {
+void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   HAL_JoystickDescriptor desc;
   SimDriverStationData->GetJoystickDescriptor(joystickNum, &desc);
   size_t len = std::strlen(desc.name);
-  char* name = static_cast<char*>(std::malloc(len + 1));
-  std::memcpy(name, desc.name, len + 1);
-  return name;
-}
-
-void HAL_FreeJoystickName(char* name) {
-  std::free(name);
+  auto write = WPI_AllocateString(name, len);
+  std::memcpy(write, desc.name, len);
 }
 
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {

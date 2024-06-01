@@ -11,11 +11,11 @@
 #include "Value_internal.h"
 
 extern "C" {
-struct NT_String* NT_GetStringForTesting(const char* str, int* struct_size) {
-  struct NT_String* strout =
-      static_cast<NT_String*>(wpi::safe_calloc(1, sizeof(NT_String)));
+struct WPI_String* NT_GetStringForTesting(const char* str, int* struct_size) {
+  struct WPI_String* strout =
+      static_cast<WPI_String*>(wpi::safe_calloc(1, sizeof(WPI_String)));
   nt::ConvertToC(str, strout);
-  *struct_size = sizeof(NT_String);
+  *struct_size = sizeof(WPI_String);
   return strout;
 }
 
@@ -33,8 +33,9 @@ struct NT_TopicInfo* NT_GetTopicInfoForTesting(const char* name,
 }
 
 void NT_FreeTopicInfoForTesting(struct NT_TopicInfo* info) {
-  std::free(info->name.str);
-  std::free(info->type_str.str);
+  WPI_FreeString(&info->name);
+  WPI_FreeString(&info->type_str);
+  WPI_FreeString(&info->properties);
   std::free(info);
 }
 
@@ -53,8 +54,8 @@ struct NT_ConnectionInfo* NT_GetConnectionInfoForTesting(
 }
 
 void NT_FreeConnectionInfoForTesting(struct NT_ConnectionInfo* info) {
-  std::free(info->remote_id.str);
-  std::free(info->remote_ip.str);
+  WPI_FreeString(&info->remote_id);
+  WPI_FreeString(&info->remote_ip);
   std::free(info);
 }
 
@@ -136,21 +137,19 @@ struct NT_Value* NT_GetValueDoubleArrayForTesting(uint64_t last_change,
 }
 
 struct NT_Value* NT_GetValueStringArrayForTesting(uint64_t last_change,
-                                                  const struct NT_String* arr,
+                                                  const struct WPI_String* arr,
                                                   size_t array_len,
                                                   int* struct_size) {
   struct NT_Value* value =
       static_cast<NT_Value*>(wpi::safe_calloc(1, sizeof(NT_Value)));
   value->type = NT_BOOLEAN;
   value->last_change = last_change;
-  value->data.arr_string.arr = NT_AllocateStringArray(array_len);
+  value->data.arr_string.arr = WPI_AllocateStringArray(array_len);
   value->data.arr_string.size = array_len;
   for (size_t i = 0; i < value->data.arr_string.size; ++i) {
     size_t len = arr[i].len;
-    value->data.arr_string.arr[i].len = len;
-    value->data.arr_string.arr[i].str =
-        static_cast<char*>(wpi::safe_malloc(len + 1));
-    std::memcpy(value->data.arr_string.arr[i].str, arr[i].str, len + 1);
+    auto write = WPI_AllocateString(&value->data.arr_string.arr[i], len);
+    std::memcpy(write, arr[i].str, len);
   }
   *struct_size = sizeof(NT_Value);
   return value;

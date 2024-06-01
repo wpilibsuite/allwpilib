@@ -13,16 +13,15 @@ from upstream_utils import (
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/fmtlib/fmt", "10.1.1")
+    upstream_root = clone_repo("https://github.com/fmtlib/fmt", "10.2.1")
     wpilib_root = get_repo_root()
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 
     # Apply patches to upstream Git repo
     os.chdir(upstream_root)
     for f in [
-        "0001-Don-t-throw-on-write-failure.patch",
-        "0002-Suppress-warnings-we-can-t-fix.patch",
-        "0003-Remove-this-from-decltype.patch",
+        "0001-Suppress-warnings-we-can-t-fix.patch",
+        "0002-Fix-tautological-compare-warning.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/fmt_patches", f))
 

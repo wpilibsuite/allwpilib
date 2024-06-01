@@ -58,6 +58,7 @@ struct traits<SparseMatrix<Scalar_, Options_, StorageIndex_>> {
     ColsAtCompileTime = Dynamic,
     MaxRowsAtCompileTime = Dynamic,
     MaxColsAtCompileTime = Dynamic,
+    Options = Options_,
     Flags = Options_ | NestByRefBit | LvalueBit | CompressedAccessBit,
     SupportedAccessPatterns = InnerRandomAccessPattern
   };
@@ -216,15 +217,18 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
     return m_data.atInRange(m_outerIndex[outer], end, inner);
   }
 
-  /** \returns a non-const reference to the value of the matrix at position \a i, \a j
+  /** \returns a non-const reference to the value of the matrix at position \a i, \a j.
    *
    * If the element does not exist then it is inserted via the insert(Index,Index) function
    * which itself turns the matrix into a non compressed form if that was not the case.
+   * The output parameter `inserted` is set to true.
+   *
+   * Otherwise, if the element does exist, `inserted` will be set to false.
    *
    * This is a O(log(nnz_j)) operation (binary search) plus the cost of insert(Index,Index)
    * function if the element does not already exist.
    */
-  inline Scalar& coeffRef(Index row, Index col) {
+  inline Scalar& findOrInsertCoeff(Index row, Index col, bool* inserted) {
     eigen_assert(row >= 0 && row < rows() && col >= 0 && col < cols());
     const Index outer = IsRowMajor ? row : col;
     const Index inner = IsRowMajor ? col : row;
@@ -239,16 +243,36 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
         m_innerNonZeros[outer]++;
         m_data.index(end) = StorageIndex(inner);
         m_data.value(end) = Scalar(0);
+        if (inserted != nullptr) {
+          *inserted = true;
+        }
         return m_data.value(end);
       }
     }
-    if ((dst < end) && (m_data.index(dst) == inner))
+    if ((dst < end) && (m_data.index(dst) == inner)) {
       // this coefficient exists, return a refernece to it
+      if (inserted != nullptr) {
+        *inserted = false;
+      }
       return m_data.value(dst);
-    else
+    } else {
+      if (inserted != nullptr) {
+        *inserted = true;
+      }
       // insertion will require reconfiguring the buffer
       return insertAtByOuterInner(outer, inner, dst);
+    }
   }
+
+  /** \returns a non-const reference to the value of the matrix at position \a i, \a j
+   *
+   * If the element does not exist then it is inserted via the insert(Index,Index) function
+   * which itself turns the matrix into a non compressed form if that was not the case.
+   *
+   * This is a O(log(nnz_j)) operation (binary search) plus the cost of insert(Index,Index)
+   * function if the element does not already exist.
+   */
+  inline Scalar& coeffRef(Index row, Index col) { return findOrInsertCoeff(row, col, nullptr); }
 
   /** \returns a reference to a novel non zero coefficient with coordinates \a row x \a col.
    * The non zero coefficient must \b not already exist.
@@ -539,6 +563,8 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
   /** \internal
    * same as insert(Index,Index) except that the indices are given relative to the storage order */
   Scalar& insertByOuterInner(Index j, Index i) {
+    eigen_assert(j >= 0 && j < m_outerSize && "invalid outer index");
+    eigen_assert(i >= 0 && i < m_innerSize && "invalid inner index");
     Index start = m_outerIndex[j];
     Index end = isCompressed() ? m_outerIndex[j + 1] : start + m_innerNonZeros[j];
     Index dst = start == end ? end : m_data.searchLowerIndex(start, end, i);
@@ -764,8 +790,11 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
     Base::operator=(other);
   }
 
-  inline SparseMatrix(SparseMatrix&& other)
-      : Base(), m_outerSize(0), m_innerSize(0), m_outerIndex(0), m_innerNonZeros(0) {
+  /** Move constructor */
+  inline SparseMatrix(SparseMatrix&& other) : SparseMatrix() { this->swap(other); }
+
+  template <typename OtherDerived>
+  inline SparseMatrix(SparseCompressedBase<OtherDerived>&& other) : SparseMatrix() {
     *this = other.derived().markAsRValue();
   }
 
@@ -833,7 +862,10 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
     return *this;
   }
 
-  inline SparseMatrix& operator=(SparseMatrix&& other) { return *this = other.derived().markAsRValue(); }
+  inline SparseMatrix& operator=(SparseMatrix&& other) {
+    this->swap(other);
+    return *this;
+  }
 
 #ifndef EIGEN_PARSED_BY_DOXYGEN
   template <typename OtherDerived>
@@ -847,6 +879,12 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
 
   template <typename OtherDerived>
   EIGEN_DONT_INLINE SparseMatrix& operator=(const SparseMatrixBase<OtherDerived>& other);
+
+  template <typename OtherDerived>
+  inline SparseMatrix& operator=(SparseCompressedBase<OtherDerived>&& other) {
+    *this = other.derived().markAsRValue();
+    return *this;
+  }
 
 #ifndef EIGEN_NO_IO
   friend std::ostream& operator<<(std::ostream& s, const SparseMatrix& m) {

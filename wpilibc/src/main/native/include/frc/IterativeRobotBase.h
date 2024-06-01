@@ -231,6 +231,11 @@ class IterativeRobotBase : public RobotBase {
   units::second_t GetPeriod() const;
 
   /**
+   * Prints list of epochs added so far and their times.
+   */
+  void PrintWatchdogEpochs();
+
+  /**
    * Constructor for IterativeRobotBase.
    *
    * @param period Period.
