@@ -194,5 +194,10 @@ public class Compressor implements Sendable, AutoCloseable {
     builder.setSmartDashboardType("Compressor");
     builder.addBooleanProperty("Enabled", this::isEnabled, null);
     builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
+    builder.addDoubleProperty("Current (A)", this::getCurrent, null);
+    if (m_module instanceof PneumaticHub) { // These are not supported by the CTRE PCM
+      builder.addDoubleProperty("Analog Voltage", this::getAnalogVoltage, null);
+      builder.addDoubleProperty("Pressure (PSI)", this::getPressure, null);
+    }
   }
 }
