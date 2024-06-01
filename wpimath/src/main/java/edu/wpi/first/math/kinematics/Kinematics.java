@@ -5,6 +5,7 @@
 package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.interpolation.Interpolator;
 
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) into wheel speeds. Robot
@@ -14,7 +15,7 @@ import edu.wpi.first.math.geometry.Twist2d;
  * @param <S> The type of the wheel speeds.
  * @param <P> The type of the wheel positions.
  */
-public interface Kinematics<S, P> {
+public interface Kinematics<S, P> extends Interpolator<P> {
   /**
    * Performs forward kinematics to return the resulting chassis speed from the wheel speeds. This
    * method is often used for odometry -- determining the robot's position on the field using data
@@ -44,4 +45,12 @@ public interface Kinematics<S, P> {
    * @return The resulting Twist2d in the robot's movement.
    */
   Twist2d toTwist2d(P start, P end);
+
+  /**
+   * Returns a copy of the wheel positions object.
+   *
+   * @param positions The wheel positions object to copy.
+   * @return A copy.
+   */
+  P copy(P positions);
 }
