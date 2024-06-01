@@ -53,9 +53,10 @@ int LocalStorage::DataLoggerData::Start(TopicData* topic, int64_t time) {
   } else if (typeStr == "int[]") {
     typeStr = "int64[]";
   }
-  return log.Start(
-      fmt::format("{}{}", logPrefix, *wpi::remove_prefix(topic->name, prefix)),
-      typeStr, DataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
+  return log.Start(fmt::format("{}{}", logPrefix,
+                               wpi::remove_prefix(topic->name, prefix).value()),
+                   typeStr, DataLoggerEntry::MakeMetadata(topic->propertiesStr),
+                   time);
 }
 
 void LocalStorage::DataLoggerEntry::Append(const Value& v) {

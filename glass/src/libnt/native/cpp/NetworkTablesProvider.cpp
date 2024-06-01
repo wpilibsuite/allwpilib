@@ -157,7 +157,7 @@ void NetworkTablesProvider::Update() {
       }
 
       auto topicName = nt::GetTopicName(valueData->topic);
-      auto tableName = *wpi::remove_prefix(topicName, "/.type");
+      auto tableName = wpi::remove_suffix(topicName, "/.type").value();
 
       GetOrCreateView(builderIt->second, nt::Topic{valueData->topic},
                       tableName);
