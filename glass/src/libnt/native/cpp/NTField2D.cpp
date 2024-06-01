@@ -126,7 +126,7 @@ void NTField2DModel::Update() {
   for (auto&& event : m_poller.ReadQueue()) {
     if (auto info = event.GetTopicInfo()) {
       // handle publish/unpublish
-      auto name = wpi::remove_prefix(info->name, m_path);
+      auto name = *wpi::remove_prefix(info->name, m_path);
       if (name.empty() || name[0] == '.') {
         continue;
       }
@@ -198,7 +198,7 @@ void NTField2DModel::ForEachFieldObject(
         func) {
   for (auto&& obj : m_objects) {
     if (obj->Exists()) {
-      func(*obj, wpi::remove_prefix(obj->GetName(), m_path));
+      func(*obj, *wpi::remove_prefix(obj->GetName(), m_path));
     }
   }
 }

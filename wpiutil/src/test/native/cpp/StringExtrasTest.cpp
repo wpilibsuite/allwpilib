@@ -8,29 +8,29 @@
 
 TEST(StringExtrasTest, RemovePrefix) {
   std::string_view original = "wpilib";
-  std::string_view modified = wpi::remove_prefix(original, "wpi");
+  auto modified = wpi::remove_prefix(original, "wpi");
   EXPECT_EQ(original, "wpilib");
-  EXPECT_EQ(modified, "lib");
+  EXPECT_EQ(modified, std::optional{"lib"});
 }
 
 TEST(StringExtrasTest, RemoveSuffix) {
   std::string_view original = "wpilib";
   EXPECT_TRUE(original.ends_with("lib"));
-  std::string_view modified = wpi::remove_suffix(original, "lib");
+  auto modified = wpi::remove_suffix(original, "lib");
   EXPECT_EQ(original, "wpilib");
-  EXPECT_EQ(modified, "wpi");
+  EXPECT_EQ(modified, std::optional{"wpi"});
 }
 
 TEST(StringExtrasTest, RemovePrefixNoMatch) {
   std::string_view original = "wpilib";
-  std::string_view modified = wpi::remove_prefix(original, "foo");
+  auto modified = wpi::remove_prefix(original, "foo");
   EXPECT_EQ(original, "wpilib");
-  EXPECT_EQ(modified, "wpilib");
+  EXPECT_EQ(modified, std::nullopt);
 }
 
 TEST(StringExtrasTest, RemoveSuffixNoMatch) {
   std::string_view original = "wpilib";
-  std::string_view modified = wpi::remove_suffix(original, "foo");
+  auto modified = wpi::remove_suffix(original, "foo");
   EXPECT_EQ(original, "wpilib");
-  EXPECT_EQ(modified, "wpilib");
+  EXPECT_EQ(modified, std::nullopt);
 }

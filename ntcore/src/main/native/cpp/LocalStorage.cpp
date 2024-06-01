@@ -54,7 +54,7 @@ int LocalStorage::DataLoggerData::Start(TopicData* topic, int64_t time) {
     typeStr = "int64[]";
   }
   return log.Start(
-      fmt::format("{}{}", logPrefix, wpi::remove_prefix(topic->name, prefix)),
+      fmt::format("{}{}", logPrefix, *wpi::remove_prefix(topic->name, prefix)),
       typeStr, DataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
 }
 
