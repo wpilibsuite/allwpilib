@@ -50,12 +50,7 @@ public class Transform2dStruct implements Struct<Transform2d> {
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Transform2d clone(Transform2d obj) {
-    return obj.clone();
   }
 }

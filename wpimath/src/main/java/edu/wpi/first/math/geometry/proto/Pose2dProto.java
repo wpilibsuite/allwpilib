@@ -46,12 +46,7 @@ public class Pose2dProto implements Protobuf<Pose2d, ProtobufPose2d> {
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Pose2d clone(Pose2d obj) {
-    return obj.clone();
   }
 }

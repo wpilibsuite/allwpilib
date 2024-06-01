@@ -36,12 +36,7 @@ public class Rotation2dProto implements Protobuf<Rotation2d, ProtobufRotation2d>
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Rotation2d clone(Rotation2d obj) {
-    return obj.clone();
   }
 }

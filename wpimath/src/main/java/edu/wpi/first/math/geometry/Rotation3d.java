@@ -27,7 +27,7 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d
-    implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable, Cloneable {
+    implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Rotation3d representing no rotation.
    *
@@ -432,11 +432,6 @@ public class Rotation3d
   @Override
   public int hashCode() {
     return Objects.hash(m_q);
-  }
-
-  @Override
-  public Rotation3d clone() {
-    return this; // immutable
   }
 
   @Override

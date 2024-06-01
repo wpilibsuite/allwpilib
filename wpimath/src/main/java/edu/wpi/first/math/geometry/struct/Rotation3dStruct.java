@@ -47,12 +47,7 @@ public class Rotation3dStruct implements Struct<Rotation3d> {
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Rotation3d clone(Rotation3d obj) {
-    return obj.clone();
   }
 }

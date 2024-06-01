@@ -25,7 +25,7 @@ import java.util.Objects;
 /** Represents a 2D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable, Cloneable {
+public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Pose2d representing the origin.
    *
@@ -318,11 +318,6 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
   @Override
   public int hashCode() {
     return Objects.hash(m_translation, m_rotation);
-  }
-
-  @Override
-  public Pose2d clone() {
-    return this; // immutable
   }
 
   @Override

@@ -41,12 +41,7 @@ public class Rotation2dStruct implements Struct<Rotation2d> {
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Rotation2d clone(Rotation2d obj) {
-    return obj.clone();
   }
 }

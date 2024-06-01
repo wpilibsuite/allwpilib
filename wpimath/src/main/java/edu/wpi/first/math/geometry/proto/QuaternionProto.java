@@ -39,12 +39,7 @@ public class QuaternionProto implements Protobuf<Quaternion, ProtobufQuaternion>
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Quaternion clone(Quaternion obj) {
-    return obj.clone();
   }
 }

@@ -50,12 +50,7 @@ public class Transform3dStruct implements Struct<Transform3d> {
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Transform3d clone(Transform3d obj) {
-    return obj.clone();
   }
 }

@@ -31,7 +31,7 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d
-    implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable, Cloneable {
+    implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Rotation2d representing no rotation.
    *
@@ -326,11 +326,6 @@ public class Rotation2d
   @Override
   public int hashCode() {
     return Objects.hash(m_value);
-  }
-
-  @Override
-  public Rotation2d clone() {
-    return this; // immutable
   }
 
   @Override

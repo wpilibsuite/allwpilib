@@ -45,12 +45,7 @@ public class Translation3dStruct implements Struct<Translation3d> {
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Translation3d clone(Translation3d obj) {
-    return obj.clone();
   }
 }

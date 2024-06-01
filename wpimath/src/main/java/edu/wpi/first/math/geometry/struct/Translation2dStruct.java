@@ -43,12 +43,7 @@ public class Translation2dStruct implements Struct<Translation2d> {
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Translation2d clone(Translation2d obj) {
-    return obj.clone();
   }
 }

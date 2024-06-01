@@ -35,7 +35,7 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation2d
-    implements Interpolatable<Translation2d>, ProtobufSerializable, StructSerializable, Cloneable {
+    implements Interpolatable<Translation2d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Translation2d representing the origin.
    *
@@ -270,11 +270,6 @@ public class Translation2d
   @Override
   public int hashCode() {
     return Objects.hash(m_x, m_y);
-  }
-
-  @Override
-  public Translation2d clone() {
-    return this; // immutable
   }
 
   @Override

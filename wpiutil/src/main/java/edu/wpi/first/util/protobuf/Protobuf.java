@@ -108,6 +108,16 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
   }
 
   /**
+   * Returns whether or not objects are immutable. Immutable objects must also be comparable using
+   * the equals() method. Default implementation returns false.
+   *
+   * @return True if object is immutable
+   */
+  default boolean isImmutable() {
+    return false;
+  }
+
+  /**
    * Creates a (deep) clone of the object. May also return the object directly if the object is
    * immutable. Default implementation throws CloneNotSupportedException. Typically this should
    * be implemented by implementing clone() on the object itself, and calling it from here.

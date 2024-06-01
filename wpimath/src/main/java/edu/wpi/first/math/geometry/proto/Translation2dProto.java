@@ -37,12 +37,7 @@ public class Translation2dProto implements Protobuf<Translation2d, ProtobufTrans
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Translation2d clone(Translation2d obj) {
-    return obj.clone();
   }
 }

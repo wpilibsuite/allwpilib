@@ -50,12 +50,7 @@ public class Pose2dStruct implements Struct<Pose2d> {
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Pose2d clone(Pose2d obj) {
-    return obj.clone();
   }
 }

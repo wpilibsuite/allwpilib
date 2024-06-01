@@ -15,7 +15,7 @@ import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose2d in the pose's frame. */
-public class Transform2d implements ProtobufSerializable, StructSerializable, Cloneable {
+public class Transform2d implements ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Transform2d representing no transformation.
    *
@@ -184,11 +184,6 @@ public class Transform2d implements ProtobufSerializable, StructSerializable, Cl
           && ((Transform2d) obj).m_rotation.equals(m_rotation);
     }
     return false;
-  }
-
-  @Override
-  public Transform2d clone() {
-    return this; // immutable
   }
 
   @Override

@@ -46,12 +46,7 @@ public class Transform2dProto implements Protobuf<Transform2d, ProtobufTransform
   }
 
   @Override
-  public boolean isCloneable() {
+  public boolean isImmutable() {
     return true;
-  }
-
-  @Override
-  public Transform2d clone(Transform2d obj) {
-    return obj.clone();
   }
 }

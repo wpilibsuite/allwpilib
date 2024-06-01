@@ -33,7 +33,7 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation3d
-    implements Interpolatable<Translation3d>, ProtobufSerializable, StructSerializable, Cloneable {
+    implements Interpolatable<Translation3d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Translation3d representing the origin.
    *
@@ -272,11 +272,6 @@ public class Translation3d
   @Override
   public int hashCode() {
     return Objects.hash(m_x, m_y, m_z);
-  }
-
-  @Override
-  public Translation3d clone() {
-    return this; // immutable
   }
 
   @Override
