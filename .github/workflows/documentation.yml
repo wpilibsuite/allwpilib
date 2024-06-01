@@ -22,8 +22,8 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 13
+          distribution: 'temurin'
+          java-version: 17
       - name: Set environment variables (Development)
         run: |
           echo "BRANCH=development" >> $GITHUB_ENV

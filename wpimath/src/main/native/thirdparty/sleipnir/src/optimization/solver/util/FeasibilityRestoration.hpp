@@ -82,7 +82,7 @@ inline void FeasibilityRestoration(
     fr_decisionVariables.emplace_back();
   }
 
-  auto it = fr_decisionVariables.cbegin();
+  auto it = fr_decisionVariables.data();
 
   VariableMatrix xAD{std::span{it, it + decisionVariables.size()}};
   it += decisionVariables.size();

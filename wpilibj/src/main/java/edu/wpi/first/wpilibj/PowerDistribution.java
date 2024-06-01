@@ -114,6 +114,17 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
+   * Query all currents of the PDP.
+   *
+   * @return The current of each channel in Amperes
+   */
+  public double[] getAllCurrents() {
+    double[] currents = new double[getNumChannels()];
+    PowerDistributionJNI.getAllCurrents(m_handle, currents);
+    return currents;
+  }
+
+  /**
    * Query the current of all monitored channels.
    *
    * @return The current of all the channels in Amperes

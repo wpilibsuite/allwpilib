@@ -13,9 +13,10 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated single jointed arm mechanism. */
-public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
+public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   // The gearbox for the arm.
   private final DCMotor m_gearbox;
 
@@ -47,11 +48,12 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param maxAngleRads The maximum angle that the arm is capable of.
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param startingAngleRads The initial position of the Arm simulation in radians.
-   * @param measurementStdDevs The standard deviations of the measurements.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
    */
   @SuppressWarnings("this-escape")
   public SingleJointedArmSim(
-      LinearSystem<N2, N1, N1> plant,
+      LinearSystem<N2, N1, N2> plant,
       DCMotor gearbox,
       double gearing,
       double armLengthMeters,
@@ -59,7 +61,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double maxAngleRads,
       boolean simulateGravity,
       double startingAngleRads,
-      Matrix<N1, N1> measurementStdDevs) {
+      double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
@@ -74,74 +76,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   /**
    * Creates a simulated arm mechanism.
    *
-   * @param plant The linear system that represents the arm. This system can be created with {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
-   *     double, double)}.
-   * @param gearbox The type of and number of motors in the arm gearbox.
-   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
-   * @param armLengthMeters The length of the arm.
-   * @param minAngleRads The minimum angle that the arm is capable of.
-   * @param maxAngleRads The maximum angle that the arm is capable of.
-   * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingAngleRads The initial position of the Arm simulation in radians.
-   */
-  public SingleJointedArmSim(
-      LinearSystem<N2, N1, N1> plant,
-      DCMotor gearbox,
-      double gearing,
-      double armLengthMeters,
-      double minAngleRads,
-      double maxAngleRads,
-      boolean simulateGravity,
-      double startingAngleRads) {
-    this(
-        plant,
-        gearbox,
-        gearing,
-        armLengthMeters,
-        minAngleRads,
-        maxAngleRads,
-        simulateGravity,
-        startingAngleRads,
-        null);
-  }
-
-  /**
-   * Creates a simulated arm mechanism.
-   *
-   * @param gearbox The type of and number of motors in the arm gearbox.
-   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
-   * @param jKgMetersSquared The moment of inertia of the arm, can be calculated from CAD software.
-   * @param armLengthMeters The length of the arm.
-   * @param minAngleRads The minimum angle that the arm is capable of.
-   * @param maxAngleRads The maximum angle that the arm is capable of.
-   * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingAngleRads The initial position of the Arm simulation in radians.
-   */
-  public SingleJointedArmSim(
-      DCMotor gearbox,
-      double gearing,
-      double jKgMetersSquared,
-      double armLengthMeters,
-      double minAngleRads,
-      double maxAngleRads,
-      boolean simulateGravity,
-      double startingAngleRads) {
-    this(
-        gearbox,
-        gearing,
-        jKgMetersSquared,
-        armLengthMeters,
-        minAngleRads,
-        maxAngleRads,
-        simulateGravity,
-        startingAngleRads,
-        null);
-  }
-
-  /**
-   * Creates a simulated arm mechanism.
-   *
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
    * @param jKgMetersSquared The moment of inertia of the arm; can be calculated from CAD software.
@@ -150,7 +84,8 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param maxAngleRads The maximum angle that the arm is capable of.
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param startingAngleRads The initial position of the Arm simulation in radians.
-   * @param measurementStdDevs The standard deviations of the measurements.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
    */
   public SingleJointedArmSim(
       DCMotor gearbox,
@@ -161,7 +96,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double maxAngleRads,
       boolean simulateGravity,
       double startingAngleRads,
-      Matrix<N1, N1> measurementStdDevs) {
+      double... measurementStdDevs) {
     this(
         LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
         gearbox,
@@ -230,7 +165,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return The current arm angle.
    */
   public double getAngleRads() {
-    return m_y.get(0, 0);
+    return getOutput(0);
   }
 
   /**
@@ -239,15 +174,14 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return The current arm velocity.
    */
   public double getVelocityRadPerSec() {
-    return m_x.get(1, 0);
+    return getOutput(1);
   }
 
   /**
    * Returns the arm current draw.
    *
-   * @return The aram current draw.
+   * @return The arm current draw.
    */
-  @Override
   public double getCurrentDrawAmps() {
     // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
     // spinning 10x faster than the output
@@ -262,6 +196,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    */
   public void setInputVoltage(double volts) {
     setInput(volts);
+    clampInput(RobotController.getBatteryVoltage());
   }
 
   /**

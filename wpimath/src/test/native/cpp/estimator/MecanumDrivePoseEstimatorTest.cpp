@@ -7,6 +7,7 @@
 #include <tuple>
 
 #include <gtest/gtest.h>
+#include <wpi/print.h>
 
 #include "frc/estimator/MecanumDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
@@ -42,7 +43,7 @@ void testFollowTrajectory(
   double errorSum = 0;
 
   if (debug) {
-    fmt::print("time, est_x, est_y, est_theta, true_x, true_y, true_theta\n");
+    wpi::print("time, est_x, est_y, est_theta, true_x, true_y, true_theta\n");
   }
 
   while (t < trajectory.TotalTime()) {
@@ -87,7 +88,7 @@ void testFollowTrajectory(
         wheelPositions);
 
     if (debug) {
-      fmt::print("{}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
+      wpi::print("{}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
                  xhat.Y().value(), xhat.Rotation().Radians().value(),
                  groundTruthState.pose.X().value(),
                  groundTruthState.pose.Y().value(),
@@ -107,14 +108,14 @@ void testFollowTrajectory(
   }
 
   if (debug) {
-    fmt::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
+    wpi::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
 
     units::second_t apply_time;
     units::second_t measure_time;
     frc::Pose2d vision_pose;
     for (auto record : visionLog) {
       std::tie(apply_time, measure_time, vision_pose) = record;
-      fmt::print("{}, {}, {}, {}, {}\n", apply_time.value(),
+      wpi::print("{}, {}, {}, {}, {}\n", apply_time.value(),
                  measure_time.value(), vision_pose.X().value(),
                  vision_pose.Y().value(),
                  vision_pose.Rotation().Radians().value());

@@ -630,7 +630,7 @@ void StopLocal(NT_Inst inst) {
 }
 
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 const char* listen_address, unsigned int port3,
+                 std::string_view listen_address, unsigned int port3,
                  unsigned int port4) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     ii->StartServer(persist_filename, listen_address, port3, port4);
@@ -661,7 +661,7 @@ void StopClient(NT_Inst inst) {
   }
 }
 
-void SetServer(NT_Inst inst, const char* server_name, unsigned int port) {
+void SetServer(NT_Inst inst, std::string_view server_name, unsigned int port) {
   SetServer(inst, {{{server_name, port}}});
 }
 

@@ -28,6 +28,7 @@
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/mpack.h>
+#include <wpi/print.h>
 #include <wpi/raw_ostream.h>
 
 #include "glass/Context.h"
@@ -880,7 +881,7 @@ void NetworkTablesModel::Update() {
           std::string err;
           auto desc = m_structDb.Add(*typeStr, schema, &err);
           if (!desc) {
-            fmt::print("could not decode struct '{}' schema '{}': {}\n",
+            wpi::print("could not decode struct '{}' schema '{}': {}\n",
                        entry->info.name, schema, err);
           } else if (desc->IsValid()) {
             // loop over all entries with this type and update
@@ -902,7 +903,7 @@ void NetworkTablesModel::Update() {
                    entry->info.type_str == "proto:FileDescriptorProto") {
           // protobuf descriptor handling
           if (!m_protoDb.Add(*filename, entry->value.GetRaw())) {
-            fmt::print("could not decode protobuf '{}' filename '{}'\n",
+            wpi::print("could not decode protobuf '{}' filename '{}'\n",
                        entry->info.name, *filename);
           } else {
             // loop over all protobuf entries and update (conservatively)
@@ -1028,7 +1029,7 @@ void NetworkTablesModel::Client::UpdatePublishers(
   if (auto pubs = nt::meta::DecodeClientPublishers(data)) {
     publishers = std::move(*pubs);
   } else {
-    fmt::print(stderr, "Failed to update publishers\n");
+    wpi::print(stderr, "Failed to update publishers\n");
   }
 }
 
@@ -1041,7 +1042,7 @@ void NetworkTablesModel::Client::UpdateSubscribers(
       subscribers.emplace_back(std::move(sub));
     }
   } else {
-    fmt::print(stderr, "Failed to update subscribers\n");
+    wpi::print(stderr, "Failed to update subscribers\n");
   }
 }
 
@@ -1429,8 +1430,9 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_STRING: {
       char* v = GetTextBuffer(entry.valueStr);
-      if (ImGui::InputText(typeStr, v, kTextBufferSize,
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
+      ImGui::InputText(typeStr, v, kTextBufferSize,
+                       ImGuiInputTextFlags_EnterReturnsTrue);
+      if (ImGui::IsItemDeactivatedAfterEdit()) {
         if (v[0] == '"') {
           if (entry.publisher == 0) {
             entry.publisher =

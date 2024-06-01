@@ -11,16 +11,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** WPIMath JNI. */
 public final class WPIMathJNI {
   static boolean libraryLoaded = false;
-  static RuntimeLoader<WPIMathJNI> loader = null;
 
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader =
-            new RuntimeLoader<>(
-                "wpimathjni", RuntimeLoader.getDefaultExtractionRoot(), WPIMathJNI.class);
-        loader.loadLibrary();
-      } catch (IOException ex) {
+        RuntimeLoader.loadLibrary("wpimathjni");
+      } catch (Exception ex) {
         ex.printStackTrace();
         System.exit(1);
       }
@@ -37,10 +33,7 @@ public final class WPIMathJNI {
     if (libraryLoaded) {
       return;
     }
-    loader =
-        new RuntimeLoader<>(
-            "wpimathjni", RuntimeLoader.getDefaultExtractionRoot(), WPIMathJNI.class);
-    loader.loadLibrary();
+    RuntimeLoader.loadLibrary("wpimathjni");
     libraryLoaded = true;
   }
 

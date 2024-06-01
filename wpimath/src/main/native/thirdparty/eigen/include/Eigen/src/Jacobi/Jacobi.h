@@ -265,7 +265,7 @@ EIGEN_DEVICE_FUNC inline void MatrixBase<Derived>::applyOnTheLeft(Index p, Index
   internal::apply_rotation_in_the_plane(x, y, j);
 }
 
-/** \ingroup Jacobi_Module
+/** \jacobi_module
  * Applies the rotation in the plane \a j to the columns \a p and \a q of \c *this, i.e., it computes B = B * J
  * with \f$ B = \left ( \begin{array}{cc} \text{*this.col}(p) & \text{*this.col}(q) \end{array} \right ) \f$.
  *
