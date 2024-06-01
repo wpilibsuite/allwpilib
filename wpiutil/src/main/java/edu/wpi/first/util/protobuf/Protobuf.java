@@ -98,6 +98,39 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
   }
 
   /**
+   * Returns whether or not objects are immutable. Immutable objects must also be comparable using
+   * the equals() method. Default implementation returns false.
+   *
+   * @return True if object is immutable
+   */
+  default boolean isImmutable() {
+    return false;
+  }
+
+  /**
+   * Returns whether or not objects are cloneable using the clone() method. Clonable objects must
+   * also be comparable using the equals() method. Default implementation returns false.
+   *
+   * @return True if object is clonable
+   */
+  default boolean isCloneable() {
+    return false;
+  }
+
+  /**
+   * Creates a (deep) clone of the object. May also return the object directly if the object is
+   * immutable. Default implementation throws CloneNotSupportedException. Typically this should be
+   * implemented by implementing clone() on the object itself, and calling it from here.
+   *
+   * @param obj object to clone
+   * @return Clone of object (if immutable, may be same object)
+   * @throws CloneNotSupportedException if clone not supported
+   */
+  default T clone(T obj) throws CloneNotSupportedException {
+    throw new CloneNotSupportedException();
+  }
+
+  /**
    * Loops over all protobuf descriptors including nested/referenced descriptors.
    *
    * @param exists function that returns false if fn should be called for the given type string
