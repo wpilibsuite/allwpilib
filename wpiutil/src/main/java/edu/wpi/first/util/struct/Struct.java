@@ -131,6 +131,7 @@ public interface Struct<T> {
    *
    * @param obj object to clone
    * @return Clone of object (if immutable, may be same object)
+   * @throws CloneNotSupportedException if clone not supported
    */
   default T clone(T obj) throws CloneNotSupportedException {
     throw new CloneNotSupportedException();
