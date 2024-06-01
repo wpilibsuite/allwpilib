@@ -98,22 +98,22 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
   }
 
   /**
-   * Returns whether or not objects are cloneable using the clone() method. Clonable objects must
-   * also be comparable using the equals() method. Default implementation returns false.
-   *
-   * @return True if object is clonable
-   */
-  default boolean isCloneable() {
-    return false;
-  }
-
-  /**
    * Returns whether or not objects are immutable. Immutable objects must also be comparable using
    * the equals() method. Default implementation returns false.
    *
    * @return True if object is immutable
    */
   default boolean isImmutable() {
+    return false;
+  }
+
+  /**
+   * Returns whether or not objects are cloneable using the clone() method. Clonable objects must
+   * also be comparable using the equals() method. Default implementation returns false.
+   *
+   * @return True if object is clonable
+   */
+  default boolean isCloneable() {
     return false;
   }
 
