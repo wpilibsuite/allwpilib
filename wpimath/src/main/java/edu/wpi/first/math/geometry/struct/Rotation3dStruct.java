@@ -45,4 +45,14 @@ public class Rotation3dStruct implements Struct<Rotation3d> {
   public void pack(ByteBuffer bb, Rotation3d value) {
     Quaternion.struct.pack(bb, value.getQuaternion());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Rotation3d clone(Rotation3d obj) {
+    return obj.clone();
+  }
 }

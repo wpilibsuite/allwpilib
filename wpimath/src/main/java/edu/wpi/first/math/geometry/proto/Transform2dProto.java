@@ -44,4 +44,14 @@ public class Transform2dProto implements Protobuf<Transform2d, ProtobufTransform
     Translation2d.proto.pack(msg.getMutableTranslation(), value.getTranslation());
     Rotation2d.proto.pack(msg.getMutableRotation(), value.getRotation());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Transform2d clone(Transform2d obj) {
+    return obj.clone();
+  }
 }

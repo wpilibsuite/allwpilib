@@ -34,4 +34,14 @@ public class Rotation2dProto implements Protobuf<Rotation2d, ProtobufRotation2d>
   public void pack(ProtobufRotation2d msg, Rotation2d value) {
     msg.setValue(value.getRadians());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Rotation2d clone(Rotation2d obj) {
+    return obj.clone();
+  }
 }

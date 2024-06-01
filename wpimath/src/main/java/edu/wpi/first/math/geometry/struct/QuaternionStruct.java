@@ -45,4 +45,14 @@ public class QuaternionStruct implements Struct<Quaternion> {
     bb.putDouble(value.getY());
     bb.putDouble(value.getZ());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Quaternion clone(Quaternion obj) {
+    return obj.clone();
+  }
 }

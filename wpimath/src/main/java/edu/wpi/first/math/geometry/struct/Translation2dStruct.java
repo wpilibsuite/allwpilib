@@ -41,4 +41,14 @@ public class Translation2dStruct implements Struct<Translation2d> {
     bb.putDouble(value.getX());
     bb.putDouble(value.getY());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Translation2d clone(Translation2d obj) {
+    return obj.clone();
+  }
 }

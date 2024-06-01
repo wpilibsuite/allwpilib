@@ -37,4 +37,14 @@ public class QuaternionProto implements Protobuf<Quaternion, ProtobufQuaternion>
     msg.setY(value.getY());
     msg.setZ(value.getZ());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Quaternion clone(Quaternion obj) {
+    return obj.clone();
+  }
 }

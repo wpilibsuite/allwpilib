@@ -19,7 +19,7 @@ import java.util.Objects;
 /** Represents a 3D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, StructSerializable {
+public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, StructSerializable, Cloneable {
   /**
    * A preallocated Pose3d representing the origin.
    *
@@ -313,6 +313,11 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   @Override
   public int hashCode() {
     return Objects.hash(m_translation, m_rotation);
+  }
+
+  @Override
+  public Pose3d clone() {
+    return this; // immutable
   }
 
   @Override

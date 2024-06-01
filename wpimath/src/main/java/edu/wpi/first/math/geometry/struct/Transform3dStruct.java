@@ -48,4 +48,14 @@ public class Transform3dStruct implements Struct<Transform3d> {
     Translation3d.struct.pack(bb, value.getTranslation());
     Rotation3d.struct.pack(bb, value.getRotation());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Transform3d clone(Transform3d obj) {
+    return obj.clone();
+  }
 }

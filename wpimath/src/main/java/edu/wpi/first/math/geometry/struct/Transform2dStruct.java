@@ -48,4 +48,14 @@ public class Transform2dStruct implements Struct<Transform2d> {
     Translation2d.struct.pack(bb, value.getTranslation());
     Rotation2d.struct.pack(bb, value.getRotation());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Transform2d clone(Transform2d obj) {
+    return obj.clone();
+  }
 }

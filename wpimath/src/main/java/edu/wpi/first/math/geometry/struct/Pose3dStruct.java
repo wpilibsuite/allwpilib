@@ -48,4 +48,14 @@ public class Pose3dStruct implements Struct<Pose3d> {
     Translation3d.struct.pack(bb, value.getTranslation());
     Rotation3d.struct.pack(bb, value.getRotation());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Pose3d clone(Pose3d obj) {
+    return obj.clone();
+  }
 }

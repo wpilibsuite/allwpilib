@@ -39,4 +39,14 @@ public class Rotation2dStruct implements Struct<Rotation2d> {
   public void pack(ByteBuffer bb, Rotation2d value) {
     bb.putDouble(value.getRadians());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Rotation2d clone(Rotation2d obj) {
+    return obj.clone();
+  }
 }

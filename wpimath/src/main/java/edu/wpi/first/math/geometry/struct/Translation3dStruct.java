@@ -43,4 +43,14 @@ public class Translation3dStruct implements Struct<Translation3d> {
     bb.putDouble(value.getY());
     bb.putDouble(value.getZ());
   }
+
+  @Override
+  public boolean isCloneable() {
+    return true;
+  }
+
+  @Override
+  public Translation3d clone(Translation3d obj) {
+    return obj.clone();
+  }
 }
