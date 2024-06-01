@@ -27,7 +27,6 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @param yWidth The y size component of the rectangle, in unrotated coordinate frame.
    */
   public Rectangle2d(Pose2d center, double xWidth, double yWidth) {
-    // Safety check size
     if (xWidth < 0 || yWidth < 0) {
       throw new IllegalArgumentException("Rectangle2d dimensions cannot be less than 0!");
     }

@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.geometry;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.proto.Ellipse2dProto;
 import edu.wpi.first.math.geometry.struct.Ellipse2dStruct;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -24,7 +25,6 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @param ySemiAxis The y semi-axis.
    */
   public Ellipse2d(Pose2d center, double xSemiAxis, double ySemiAxis) {
-    // Safety check
     if (xSemiAxis <= 0 || ySemiAxis <= 0) {
       throw new IllegalArgumentException("Ellipse2d semi-axes must be positive");
     }
@@ -72,25 +72,24 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Returns either of the focal points of the ellipse. In a perfect circle, this will always return
-   * the center.
+   * Returns the focal points of the ellipse. In a perfect circle, this will always return the
+   * center.
    *
-   * @param first Whether to return the first (-c) or second (+c) focal point.
-   * @return A focal point.
+   * @return The focal points.
    */
-  public Translation2d getFocalPoint(boolean first) {
+  public Pair<Translation2d, Translation2d> getFocalPoints() {
     double a = Math.max(m_xSemiAxis, m_ySemiAxis); // Major semi-axis
     double b = Math.min(m_xSemiAxis, m_ySemiAxis); // Minor semi-axis
     double c = Math.sqrt(a * a - b * b);
 
-    c = first ? -c : c;
-
     if (m_xSemiAxis > m_ySemiAxis) {
-      Transform2d diff = new Transform2d(c, 0.0, Rotation2d.kZero);
-      return m_center.plus(diff).getTranslation();
+      return new Pair<>(
+          m_center.plus(new Transform2d(-c, 0.0, Rotation2d.kZero)).getTranslation(),
+          m_center.plus(new Transform2d(c, 0.0, Rotation2d.kZero)).getTranslation());
     } else {
-      Transform2d diff = new Transform2d(0.0, c, Rotation2d.kZero);
-      return m_center.plus(diff).getTranslation();
+      return new Pair<>(
+          m_center.plus(new Transform2d(0.0, -c, Rotation2d.kZero)).getTranslation(),
+          m_center.plus(new Transform2d(0.0, c, Rotation2d.kZero)).getTranslation());
     }
   }
 
@@ -112,28 +111,6 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    */
   public Ellipse2d rotateBy(Rotation2d other) {
     return new Ellipse2d(m_center.rotateBy(other), m_xSemiAxis, m_ySemiAxis);
-  }
-
-  /**
-   * Solves the equation of an ellipse from the given point. This is a helper function used to
-   * determine if that point lies inside of or on an ellipse.
-   *
-   * <pre>
-   * (x-h)^2 / a^2 + (y-k)^2 / b^2 = 1
-   * </pre>
-   *
-   * @param point The point to solve for.
-   * @return < 1.0 if the point lies inside the ellipse, == 1.0 if a point lies on the ellipse, and
-   *     > 1.0 if the point lies outsides the ellipse.
-   */
-  private double solveEllipseEquation(Translation2d point) {
-    // Rotate the point by the inverse of the ellipse's rotation
-    point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
-
-    double x = point.getX() - m_center.getX();
-    double y = point.getY() - m_center.getY();
-
-    return (x * x) / (m_xSemiAxis * m_xSemiAxis) + (y * y) / (m_ySemiAxis * m_ySemiAxis);
   }
 
   /**
@@ -214,6 +191,28 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   @Override
   public int hashCode() {
     return Objects.hash(m_center, m_xSemiAxis, m_ySemiAxis);
+  }
+
+  /**
+   * Solves the equation of an ellipse from the given point. This is a helper function used to
+   * determine if that point lies inside of or on an ellipse.
+   *
+   * <pre>
+   * (x - h)²/a² + (y - k)²/b² = 1
+   * </pre>
+   *
+   * @param point The point to solve for.
+   * @return < 1.0 if the point lies inside the ellipse, == 1.0 if a point lies on the ellipse, and
+   *     > 1.0 if the point lies outsides the ellipse.
+   */
+  private double solveEllipseEquation(Translation2d point) {
+    // Rotate the point by the inverse of the ellipse's rotation
+    point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
+
+    double x = point.getX() - m_center.getX();
+    double y = point.getY() - m_center.getY();
+
+    return (x * x) / (m_xSemiAxis * m_xSemiAxis) + (y * y) / (m_ySemiAxis * m_ySemiAxis);
   }
 
   /** Ellipse2d protobuf for serialization. */

@@ -18,8 +18,9 @@ class Ellipse2dTest {
     var center = new Pose2d(1, 2, new Rotation2d());
     var ellipse = new Ellipse2d(center, 5.0, 4.0);
 
-    var a = ellipse.getFocalPoint(true);
-    var b = ellipse.getFocalPoint(false);
+    var pair = ellipse.getFocalPoints();
+    var a = pair.getFirst();
+    var b = pair.getSecond();
 
     assertAll(
         () -> assertEquals(new Translation2d(-2.0, 2.0), a),
