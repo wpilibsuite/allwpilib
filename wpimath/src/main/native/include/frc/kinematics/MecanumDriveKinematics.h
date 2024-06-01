@@ -166,6 +166,15 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
    */
   const Translation2d& GetRearRight() const { return m_rearRightWheel; }
 
+  MecanumDriveWheelPositions Interpolate(
+      const MecanumDriveWheelPositions& start,
+      const MecanumDriveWheelPositions& end, double t) const override {
+    return {wpi::Lerp(start.frontLeft, end.frontLeft, t),
+            wpi::Lerp(start.frontRight, end.frontRight, t),
+            wpi::Lerp(start.rearLeft, end.rearLeft, t),
+            wpi::Lerp(start.rearRight, end.rearRight, t)};
+  }
+
  private:
   mutable Matrixd<4, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Matrixd<4, 3>> m_forwardKinematics;
