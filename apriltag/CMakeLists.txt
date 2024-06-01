@@ -30,7 +30,6 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     set(CMAKE_JNI_TARGET true)
 
@@ -63,6 +62,7 @@ if(WITH_JAVA)
         OUTPUT_NAME apriltag
         GENERATE_NATIVE_HEADERS apriltag_jni_headers
     )
+    set_property(TARGET apriltag_jar PROPERTY FOLDER "java")
 
     install_jar(apriltag_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS apriltag_jar FILE apriltag_jar.cmake DESTINATION share/apriltag)
@@ -100,7 +100,13 @@ if(WITH_JAVA_SOURCE)
     set_property(TARGET apriltag_src_jar PROPERTY FOLDER "java")
 endif()
 
-generate_resources(src/main/native/resources/edu/wpi/first/apriltag generated/main/cpp APRILTAG frc apriltag_resources_src)
+generate_resources(
+    src/main/native/resources/edu/wpi/first/apriltag
+    generated/main/cpp
+    APRILTAG
+    frc
+    apriltag_resources_src
+)
 
 file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)
 

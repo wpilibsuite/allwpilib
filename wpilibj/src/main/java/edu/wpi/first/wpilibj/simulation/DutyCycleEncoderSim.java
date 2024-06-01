@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 /** Class to control a simulated duty cycle encoder. */
 public class DutyCycleEncoderSim {
   private final SimDouble m_simPosition;
-  private final SimDouble m_simDistancePerRotation;
-  private final SimDouble m_simAbsolutePosition;
   private final SimBoolean m_simIsConnected;
 
   /**
@@ -31,10 +29,8 @@ public class DutyCycleEncoderSim {
    */
   public DutyCycleEncoderSim(int channel) {
     SimDeviceSim wrappedSimDevice = new SimDeviceSim("DutyCycle:DutyCycleEncoder", channel);
-    m_simPosition = wrappedSimDevice.getDouble("position");
-    m_simDistancePerRotation = wrappedSimDevice.getDouble("distance_per_rot");
-    m_simAbsolutePosition = wrappedSimDevice.getDouble("absPosition");
-    m_simIsConnected = wrappedSimDevice.getBoolean("connected");
+    m_simPosition = wrappedSimDevice.getDouble("Position");
+    m_simIsConnected = wrappedSimDevice.getBoolean("Connected");
   }
 
   /**
@@ -47,57 +43,12 @@ public class DutyCycleEncoderSim {
   }
 
   /**
-   * Set the position in turns.
+   * Set the position.
    *
-   * @param turns The position.
+   * @param value The position.
    */
-  public void set(double turns) {
-    m_simPosition.set(turns);
-  }
-
-  /**
-   * Get the distance.
-   *
-   * @return The distance.
-   */
-  public double getDistance() {
-    return m_simPosition.get() * m_simDistancePerRotation.get();
-  }
-
-  /**
-   * Set the distance.
-   *
-   * @param distance The distance.
-   */
-  public void setDistance(double distance) {
-    m_simPosition.set(distance / m_simDistancePerRotation.get());
-  }
-
-  /**
-   * Get the absolute position.
-   *
-   * @return The absolute position
-   */
-  public double getAbsolutePosition() {
-    return m_simAbsolutePosition.get();
-  }
-
-  /**
-   * Set the absolute position.
-   *
-   * @param position The absolute position
-   */
-  public void setAbsolutePosition(double position) {
-    m_simAbsolutePosition.set(position);
-  }
-
-  /**
-   * Get the distance per rotation for this encoder.
-   *
-   * @return The scale factor that will be used to convert rotation to useful units.
-   */
-  public double getDistancePerRotation() {
-    return m_simDistancePerRotation.get();
+  public void set(double value) {
+    m_simPosition.set(value);
   }
 
   /**

@@ -16,11 +16,11 @@ static inline std::span<const T> ConvertFromC(const T* arr, size_t size) {
   return {arr, size};
 }
 
-static inline std::string_view ConvertFromC(const char* arr, size_t size) {
-  return {arr, size};
+static inline std::string_view ConvertFromC(const struct WPI_String* str) {
+  return wpi::to_string_view(str);
 }
 
-static std::vector<std::string> ConvertFromC(const NT_String* arr, size_t size) {
+static std::vector<std::string> ConvertFromC(const struct WPI_String* arr, size_t size) {
   std::vector<std::string> v;
   v.reserve(size);
   for (size_t i = 0; i < size; ++i) {
@@ -57,7 +57,7 @@ static void ConvertToC(const nt::TimestampedDouble& in, NT_TimestampedDouble* ou
 static void ConvertToC(const nt::TimestampedString& in, NT_TimestampedString* out) {
   out->time = in.time;
   out->serverTime = in.serverTime;
-  out->value = ConvertToC<char>(in.value, &out->len);
+  ConvertToC(in.value, &out->value);
 }
 
 static void ConvertToC(const nt::TimestampedRaw& in, NT_TimestampedRaw* out) {
@@ -93,7 +93,7 @@ static void ConvertToC(const nt::TimestampedDoubleArray& in, NT_TimestampedDoubl
 static void ConvertToC(const nt::TimestampedStringArray& in, NT_TimestampedStringArray* out) {
   out->time = in.time;
   out->serverTime = in.serverTime;
-  out->value = ConvertToC<struct NT_String>(in.value, &out->len);
+  out->value = ConvertToC<struct WPI_String>(in.value, &out->len);
 }
 
 
@@ -247,26 +247,26 @@ double* NT_ReadQueueValuesDouble(NT_Handle subentry, size_t* len) {
 }
 
 
-NT_Bool NT_SetString(NT_Handle pubentry, int64_t time, const char* value, size_t len) {
-  return nt::SetString(pubentry, ConvertFromC(value, len), time);
+NT_Bool NT_SetString(NT_Handle pubentry, int64_t time, const struct WPI_String* value) {
+  return nt::SetString(pubentry, ConvertFromC(value), time);
 }
 
-NT_Bool NT_SetDefaultString(NT_Handle pubentry, const char* defaultValue, size_t defaultValueLen) {
-  return nt::SetDefaultString(pubentry, ConvertFromC(defaultValue, defaultValueLen));
+NT_Bool NT_SetDefaultString(NT_Handle pubentry, const struct WPI_String* defaultValue) {
+  return nt::SetDefaultString(pubentry, ConvertFromC(defaultValue));
 }
 
-char* NT_GetString(NT_Handle subentry, const char* defaultValue, size_t defaultValueLen, size_t* len) {
-  auto cppValue = nt::GetString(subentry, ConvertFromC(defaultValue, defaultValueLen));
-  return ConvertToC<char>(cppValue, len);
+void NT_GetString(NT_Handle subentry, const struct WPI_String* defaultValue, struct WPI_String* value) {
+  auto cppValue = nt::GetString(subentry, ConvertFromC(defaultValue));
+  ConvertToC(cppValue, value);
 }
 
-void NT_GetAtomicString(NT_Handle subentry, const char* defaultValue, size_t defaultValueLen, struct NT_TimestampedString* value) {
-  auto cppValue = nt::GetAtomicString(subentry, ConvertFromC(defaultValue, defaultValueLen));
+void NT_GetAtomicString(NT_Handle subentry, const struct WPI_String* defaultValue, struct NT_TimestampedString* value) {
+  auto cppValue = nt::GetAtomicString(subentry, ConvertFromC(defaultValue));
   ConvertToC(cppValue, value);
 }
 
 void NT_DisposeTimestampedString(struct NT_TimestampedString* value) {
-  std::free(value->value);
+  WPI_FreeString(&value->value);
 }
 
 struct NT_TimestampedString* NT_ReadQueueString(NT_Handle subentry, size_t* len) {
@@ -457,26 +457,26 @@ void NT_FreeQueueDoubleArray(struct NT_TimestampedDoubleArray* arr, size_t len) 
 }
 
 
-NT_Bool NT_SetStringArray(NT_Handle pubentry, int64_t time, const struct NT_String* value, size_t len) {
+NT_Bool NT_SetStringArray(NT_Handle pubentry, int64_t time, const struct WPI_String* value, size_t len) {
   return nt::SetStringArray(pubentry, ConvertFromC(value, len), time);
 }
 
-NT_Bool NT_SetDefaultStringArray(NT_Handle pubentry, const struct NT_String* defaultValue, size_t defaultValueLen) {
+NT_Bool NT_SetDefaultStringArray(NT_Handle pubentry, const struct WPI_String* defaultValue, size_t defaultValueLen) {
   return nt::SetDefaultStringArray(pubentry, ConvertFromC(defaultValue, defaultValueLen));
 }
 
-struct NT_String* NT_GetStringArray(NT_Handle subentry, const struct NT_String* defaultValue, size_t defaultValueLen, size_t* len) {
+struct WPI_String* NT_GetStringArray(NT_Handle subentry, const struct WPI_String* defaultValue, size_t defaultValueLen, size_t* len) {
   auto cppValue = nt::GetStringArray(subentry, ConvertFromC(defaultValue, defaultValueLen));
-  return ConvertToC<struct NT_String>(cppValue, len);
+  return ConvertToC<struct WPI_String>(cppValue, len);
 }
 
-void NT_GetAtomicStringArray(NT_Handle subentry, const struct NT_String* defaultValue, size_t defaultValueLen, struct NT_TimestampedStringArray* value) {
+void NT_GetAtomicStringArray(NT_Handle subentry, const struct WPI_String* defaultValue, size_t defaultValueLen, struct NT_TimestampedStringArray* value) {
   auto cppValue = nt::GetAtomicStringArray(subentry, ConvertFromC(defaultValue, defaultValueLen));
   ConvertToC(cppValue, value);
 }
 
 void NT_DisposeTimestampedStringArray(struct NT_TimestampedStringArray* value) {
-  NT_FreeStringArray(value->value, value->len);
+  WPI_FreeStringArray(value->value, value->len);
 }
 
 struct NT_TimestampedStringArray* NT_ReadQueueStringArray(NT_Handle subentry, size_t* len) {

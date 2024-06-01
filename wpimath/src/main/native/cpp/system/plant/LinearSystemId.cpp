@@ -6,7 +6,7 @@
 
 using namespace frc;
 
-LinearSystem<2, 1, 1> LinearSystemId::ElevatorSystem(DCMotor motor,
+LinearSystem<2, 1, 2> LinearSystemId::ElevatorSystem(DCMotor motor,
                                                      units::kilogram_t mass,
                                                      units::meter_t radius,
                                                      double gearing) {
@@ -27,13 +27,13 @@ LinearSystem<2, 1, 1> LinearSystemId::ElevatorSystem(DCMotor motor,
                 .value()}};
   Matrixd<2, 1> B{0.0,
                   (gearing * motor.Kt / (motor.R * radius * mass)).value()};
-  Matrixd<1, 2> C{1.0, 0.0};
-  Matrixd<1, 1> D{0.0};
+  Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+  Matrixd<2, 1> D{0.0, 0.0};
 
-  return LinearSystem<2, 1, 1>(A, B, C, D);
+  return LinearSystem<2, 1, 2>(A, B, C, D);
 }
 
-LinearSystem<2, 1, 1> LinearSystemId::SingleJointedArmSystem(
+LinearSystem<2, 1, 2> LinearSystemId::SingleJointedArmSystem(
     DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
   if (J <= 0_kg_sq_m) {
     throw std::domain_error("J must be greater than zero.");
@@ -47,10 +47,10 @@ LinearSystem<2, 1, 1> LinearSystemId::SingleJointedArmSystem(
       {0.0,
        (-std::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
   Matrixd<2, 1> B{0.0, (gearing * motor.Kt / (motor.R * J)).value()};
-  Matrixd<1, 2> C{1.0, 0.0};
-  Matrixd<1, 1> D{0.0};
+  Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+  Matrixd<2, 1> D{{0.0}, {0.0}};
 
-  return LinearSystem<2, 1, 1>(A, B, C, D);
+  return LinearSystem<2, 1, 2>(A, B, C, D);
 }
 
 LinearSystem<2, 2, 2> LinearSystemId::IdentifyDrivetrainSystem(

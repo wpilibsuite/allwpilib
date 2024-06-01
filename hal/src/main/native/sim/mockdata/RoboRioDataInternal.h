@@ -72,14 +72,14 @@ class RoboRioData {
   int32_t RegisterSerialNumberCallback(HAL_RoboRioStringCallback callback,
                                        void* param, HAL_Bool initialNotify);
   void CancelSerialNumberCallback(int32_t uid);
-  size_t GetSerialNumber(char* buffer, size_t size);
-  void SetSerialNumber(const char* serialNumber, size_t size);
+  void GetSerialNumber(struct WPI_String* serialNumber);
+  void SetSerialNumber(std::string_view serialNumber);
 
   int32_t RegisterCommentsCallback(HAL_RoboRioStringCallback callback,
                                    void* param, HAL_Bool initialNotify);
   void CancelCommentsCallback(int32_t uid);
-  size_t GetComments(char* buffer, size_t size);
-  void SetComments(const char* comments, size_t size);
+  void GetComments(struct WPI_String* comments);
+  void SetComments(std::string_view comments);
 
   virtual void ResetData();
 

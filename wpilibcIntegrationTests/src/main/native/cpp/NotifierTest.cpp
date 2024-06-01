@@ -4,8 +4,8 @@
 
 #include "frc/Notifier.h"  // NOLINT(build/include_order)
 
-#include <fmt/core.h>
 #include <gtest/gtest.h>
+#include <wpi/print.h>
 
 #include "frc/Timer.h"
 
@@ -20,13 +20,13 @@ TEST(NotifierTest, StartPeriodicAndStop) {
   notifier.Stop();
   EXPECT_EQ(10u, counter) << "Received " << counter
                           << " notifications in 10.5 seconds\n";
-  fmt::print("Received {} notifications in 10.5 seconds\n", counter);
+  wpi::print("Received {} notifications in 10.5 seconds\n", counter);
 
   frc::Wait(3_s);
 
   EXPECT_EQ(10u, counter) << "Received " << counter - 10
                           << " notifications in 3 seconds\n";
-  fmt::print("Received {} notifications in 3 seconds\n", counter - 10);
+  wpi::print("Received {} notifications in 3 seconds\n", counter - 10);
 }
 
 TEST(NotifierTest, StartSingle) {
@@ -39,5 +39,5 @@ TEST(NotifierTest, StartSingle) {
 
   EXPECT_EQ(1u, counter) << "Received " << counter
                          << " notifications in 10.5 seconds\n";
-  fmt::print("Received {} notifications in 10.5 seconds\n", counter);
+  wpi::print("Received {} notifications in 10.5 seconds\n", counter);
 }

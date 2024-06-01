@@ -4,7 +4,7 @@ if (project.hasProperty('onlylinuxathena')) {
     return;
 }
 
-description = "roboRIO Team Number Setter"
+description = "A tool to download datalogs from a roborio"
 
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'

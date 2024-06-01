@@ -206,6 +206,64 @@ struct functor_traits {
   enum { Cost = 10, PacketAccess = false, IsRepeatable = false };
 };
 
+// estimates the cost of lazily evaluating a generic functor by unwinding the expression
+template <typename Xpr>
+struct nested_functor_cost {
+  static constexpr Index Cost = static_cast<Index>(functor_traits<Xpr>::Cost);
+};
+
+template <typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxCols>
+struct nested_functor_cost<Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>> {
+  static constexpr Index Cost = 1;
+};
+
+template <typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxCols>
+struct nested_functor_cost<Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols>> {
+  static constexpr Index Cost = 1;
+};
+
+// TODO: assign a cost to the stride type?
+template <typename PlainObjectType, int MapOptions, typename StrideType>
+struct nested_functor_cost<Map<PlainObjectType, MapOptions, StrideType>> : nested_functor_cost<PlainObjectType> {};
+
+template <typename Func, typename Xpr>
+struct nested_functor_cost<CwiseUnaryOp<Func, Xpr>> {
+  using XprCleaned = remove_all_t<Xpr>;
+  using FuncCleaned = remove_all_t<Func>;
+  static constexpr Index Cost = nested_functor_cost<FuncCleaned>::Cost + nested_functor_cost<XprCleaned>::Cost;
+};
+
+template <typename Func, typename Xpr>
+struct nested_functor_cost<CwiseNullaryOp<Func, Xpr>> {
+  using XprCleaned = remove_all_t<Xpr>;
+  using FuncCleaned = remove_all_t<Func>;
+  static constexpr Index Cost = nested_functor_cost<FuncCleaned>::Cost + nested_functor_cost<XprCleaned>::Cost;
+};
+
+template <typename Func, typename LhsXpr, typename RhsXpr>
+struct nested_functor_cost<CwiseBinaryOp<Func, LhsXpr, RhsXpr>> {
+  using LhsXprCleaned = remove_all_t<LhsXpr>;
+  using RhsXprCleaned = remove_all_t<RhsXpr>;
+  using FuncCleaned = remove_all_t<Func>;
+  static constexpr Index Cost = nested_functor_cost<FuncCleaned>::Cost + nested_functor_cost<LhsXprCleaned>::Cost +
+                                nested_functor_cost<RhsXprCleaned>::Cost;
+};
+
+template <typename Func, typename LhsXpr, typename MidXpr, typename RhsXpr>
+struct nested_functor_cost<CwiseTernaryOp<Func, LhsXpr, MidXpr, RhsXpr>> {
+  using LhsXprCleaned = remove_all_t<LhsXpr>;
+  using MidXprCleaned = remove_all_t<MidXpr>;
+  using RhsXprCleaned = remove_all_t<RhsXpr>;
+  using FuncCleaned = remove_all_t<Func>;
+  static constexpr Index Cost = nested_functor_cost<FuncCleaned>::Cost + nested_functor_cost<LhsXprCleaned>::Cost +
+                                nested_functor_cost<MidXprCleaned>::Cost + nested_functor_cost<RhsXprCleaned>::Cost;
+};
+
+template <typename Xpr>
+struct functor_cost {
+  static constexpr Index Cost = plain_enum_max(nested_functor_cost<Xpr>::Cost, 1);
+};
+
 template <typename T>
 struct packet_traits;
 
@@ -484,7 +542,7 @@ struct nested_eval {
                                       //      solution could be to count the number of temps?
     NAsInteger = n == Dynamic ? HugeCost : n,
     CostEval = (NAsInteger + 1) * ScalarReadCost + CoeffReadCost,
-    CostNoEval = NAsInteger * CoeffReadCost,
+    CostNoEval = int(NAsInteger) * int(CoeffReadCost),
     Evaluate = (int(evaluator<T>::Flags) & EvalBeforeNestingBit) || (int(CostEval) < int(CostNoEval))
   };
 
@@ -927,6 +985,12 @@ struct block_xpr_helper<Block<XprType, BlockRows, BlockCols, InnerPanel>> {
 template <typename XprType, int BlockRows, int BlockCols, bool InnerPanel>
 struct block_xpr_helper<const Block<XprType, BlockRows, BlockCols, InnerPanel>>
     : block_xpr_helper<Block<XprType, BlockRows, BlockCols, InnerPanel>> {};
+
+template <typename XprType>
+struct is_matrix_base_xpr : std::is_base_of<MatrixBase<remove_all_t<XprType>>, remove_all_t<XprType>> {};
+
+template <typename XprType>
+struct is_permutation_base_xpr : std::is_base_of<PermutationBase<remove_all_t<XprType>>, remove_all_t<XprType>> {};
 
 }  // end namespace internal
 

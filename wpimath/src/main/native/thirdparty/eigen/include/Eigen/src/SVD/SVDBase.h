@@ -125,7 +125,6 @@ class SVDBase : public SolverBase<SVDBase<Derived> > {
   typedef typename MatrixType::Scalar Scalar;
   typedef typename NumTraits<typename MatrixType::Scalar>::Real RealScalar;
   typedef typename Eigen::internal::traits<SVDBase>::StorageIndex StorageIndex;
-  typedef Eigen::Index Index;  ///< \deprecated since Eigen 3.3
 
   static constexpr bool ShouldComputeFullU = internal::traits<Derived>::ShouldComputeFullU;
   static constexpr bool ShouldComputeThinU = internal::traits<Derived>::ShouldComputeThinU;
@@ -139,7 +138,7 @@ class SVDBase : public SolverBase<SVDBase<Derived> > {
     MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,
     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime,
     MaxDiagSizeAtCompileTime = internal::min_size_prefer_fixed(MaxRowsAtCompileTime, MaxColsAtCompileTime),
-    MatrixOptions = MatrixType::Options,
+    MatrixOptions = internal::traits<MatrixType>::Options,
     MatrixUColsAtCompileTime = internal::traits<Derived>::MatrixUColsAtCompileTime,
     MatrixVColsAtCompileTime = internal::traits<Derived>::MatrixVColsAtCompileTime,
     MatrixUMaxColsAtCompileTime = internal::traits<Derived>::MatrixUMaxColsAtCompileTime,
@@ -355,11 +354,11 @@ class SVDBase : public SolverBase<SVDBase<Derived> > {
         m_isInitialized(false),
         m_isAllocated(false),
         m_usePrescribedThreshold(false),
-        m_computeFullU(false),
-        m_computeThinU(false),
-        m_computeFullV(false),
-        m_computeThinV(false),
-        m_computationOptions(0),
+        m_computeFullU(ShouldComputeFullU),
+        m_computeThinU(ShouldComputeThinU),
+        m_computeFullV(ShouldComputeFullV),
+        m_computeThinV(ShouldComputeThinV),
+        m_computationOptions(internal::traits<Derived>::Options),
         m_nonzeroSingularValues(0),
         m_rows(RowsAtCompileTime),
         m_cols(ColsAtCompileTime),

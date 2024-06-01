@@ -1,7 +1,7 @@
 asyncapi: 2.0.0
 info:
   title: WPILib WebSocket Remote Endpoint API
-  version: "1.0.0"
+  version: "1.1.0"
   description: |
     API to route WPILib HAL calls over WebSockets.
   license:
@@ -40,18 +40,30 @@ components:
         type: object
         oneOf:
             - $ref: "#/components/schemas/accelData"
+            - $ref: "#/components/schemas/addressableLEDData"
             - $ref: "#/components/schemas/aiData"
+            - $ref: "#/components/schemas/aoData"
             - $ref: "#/components/schemas/dioData"
             - $ref: "#/components/schemas/dpwmData"
             - $ref: "#/components/schemas/driverstationData"
             - $ref: "#/components/schemas/dutycycleData"
             - $ref: "#/components/schemas/encoderData"
             - $ref: "#/components/schemas/gyroData"
+            - $ref: "#/components/schemas/halData"
             - $ref: "#/components/schemas/joystickData"
+            - $ref: "#/components/schemas/pcmData"
             - $ref: "#/components/schemas/pwmData"
             - $ref: "#/components/schemas/relayData"
             - $ref: "#/components/schemas/solenoidData"
             - $ref: "#/components/schemas/roborioData"
+            - $ref: "#/components/schemas/canmotorData"
+            - $ref: "#/components/schemas/canencoderData"
+            - $ref: "#/components/schemas/cangyroData"
+            - $ref: "#/components/schemas/canaccelData"
+            - $ref: "#/components/schemas/canainData"
+            - $ref: "#/components/schemas/candioData"
+            - $ref: "#/components/schemas/candutycycleData"
+            - $ref: "#/components/schemas/simdeviceData"
 
   schemas:
     accelData:
@@ -87,6 +99,49 @@ components:
               type: number
               description: "Acceleration in G’s "
 
+    addressableLEDData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: AddressableLED
+        device:
+          type: string
+          description: Arbitrary device number
+        data:
+          type: object
+          description: "Addressable LED Data (type: AddressableLED, device: arbitrary)"
+          properties:
+            <init:
+              type: boolean
+              description: "If the led strip is initialized in the robot program"
+            "<output_port":
+              type: integer
+              description: "DIO pin number"
+            "<length":
+              type: integer
+              description: "The number of leds in the strip"
+            "<running":
+              type: boolean
+              description: "Whether the strip is outputting data"
+            "<data":
+              type: array
+              description: "One value per led"
+              items:
+                type: object
+                description: "An object with \"r\", \"g\", and \"b\" keys, representing the rgb (0-255) components of the color"
+                properties:
+                  r:
+                    type: integer
+                  g:
+                    type: integer
+                  b:
+                    type: integer
+
     aiData:
       type: object
       required:
@@ -107,9 +162,54 @@ components:
             <init:
               type: boolean
               description: "If analog input is initialized in the robot program"
+            "<avg_bits":
+              type: integer
+              description: "The number of averaging bits"
+            "<oversample_bits":
+              type: integer
+              description: "The number of oversampling bits"
             ">voltage":
               type: number
               description: "Input voltage, in volts"
+            "<accum_init":
+              type: boolean
+              description: "If the accumulator is initialized in the robot program"
+            ">accum_value":
+              type: integer
+              description: "The accumulated value"
+            ">accum_count":
+              type: integer
+              description: "The number of accumulated values"
+            "<accum_center":
+              type: integer
+              description: "The center value of the accumulator"
+            "<accum_deadband":
+              type: integer
+              description: "The accumulator's deadband"
+
+    aoData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: AO
+        device:
+          type: string
+          description: Device Identifier (usually channel)
+        data:
+          type: object
+          description: "Analog Output Data (type: AO, device: channel number)"
+          properties:
+            <init:
+              type: boolean
+              description: "If analog output is initialized in the robot program"
+            "<voltage":
+              type: number
+              description: "Output voltage, in volts"
 
     dioData:
       type: object
@@ -137,6 +237,9 @@ components:
             <>value:
               type: boolean
               description: "Input or output state"
+            "<pulse_length":
+              type: number
+              description: "Reserved for future use"
 
     dpwmData:
       type: object
@@ -274,6 +377,9 @@ components:
             ">period":
               type: number
               description: "Period between pulses in seconds"
+            "<reverse_direction":
+              type: boolean
+              description: "If the encoder direction should be inverted"
 
     gyroData:
       type: object
@@ -319,6 +425,31 @@ components:
             ">rate_z":
               type: number
               description: "The current gyro angular rate of change in degrees/second"
+
+    halData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: HAL
+        device:
+          type: string
+          description: "\"HAL\""
+          const: HAL
+        data:
+          type: object
+          description: "HAL Data (type: HAL, device: HAL)"
+          properties:
+            ">sim_periodic_before":
+              type: boolean
+              description: "Sent by the robot before running periodic simulation functions"
+            ">sim_periodic_after":
+              type: boolean
+              description: "Sent by the robot after running periodic simulation functions"
 
     joystickData:
       type: object
@@ -366,6 +497,42 @@ components:
               description: "Right rumble"
               minimum: 0.0
               maximum: 1.0
+            <outputs:
+              type: integer
+              description: "Bitmask of joystick HID outputs"
+
+    pcmData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CTREPCM
+        device:
+          type: string
+          description: Device Identifier (usually channel)
+        data:
+          type: object
+          description: "PCM Output Data (type: PCM, device: module number)"
+          properties:
+            <init:
+              type: boolean
+              description: "If PCM is initialized in the robot program"
+            ">on":
+              type: boolean
+              description: "Whether the compressor is running"
+            "<closed_loop":
+              type: boolean
+              description: "Whether closed-loop control is enabled"
+            ">pressure_switch":
+              type: boolean
+              description: "The value of the pressure switch"
+            ">current":
+              type: number
+              description: "The amount of current being drawn by the compressor, in Amps"
 
     pwmData:
       type: object
@@ -397,6 +564,15 @@ components:
               description: "Servo position"
               minimum: 0.0
               maximum: 1.0
+            "<raw":
+              type: integer
+              description: "The pulse time in microseconds"
+            "<period_scale":
+              type: integer
+              description: "Scales the PWM signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values)"
+            "<zero_latch":
+              type: boolean
+              description: "Whether the PWM should be latched to 0"
 
     relayData:
       type: object
@@ -514,3 +690,172 @@ components:
             ">3v3_faults":
               type: integer
               description: "Number of faults on 3.3V rail"
+
+    canmotorData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANMotor
+        device:
+          type: string
+          description: "Should have the form ControllerClassName[id]"
+        data:
+          type: object
+          description: "CANMotor Data"
+          properties:
+            <init:
+              type: boolean
+              description: "If CANMotor is initialized in the robot program"
+            "<percentOutput":
+              type: number
+              description: "Percent Output"
+              minimum: -1.0
+              maximum: 1.0
+            ">supplyCurrent":
+              type: number
+              description: "Supply current in Amps"
+              minimum: 0.0
+            ">motorCurrent":
+              type: number
+              description: "Motor current in Amps"
+              minimum: 0.0
+            ">busVoltage":
+              type: number
+              description: "Bus voltage in Volts"
+              minimum: 0.0
+            "<neutralDeadband":
+              type: number
+              description: "Neutral Deadband"
+              minimum: 0
+              maximum: 1.0
+            "<brakeMode":
+              type: boolean
+              description: "Is in brake mode"
+
+    canencoderData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANEncoder
+        device:
+          type: string
+          description: "Should have the form EncoderClassName[id]"
+        data:
+          type: object
+          description: "CANEncoder Data"
+          properties:
+            <init:
+              type: boolean
+              description: "If CANEncoder is initialized in the robot program"
+            ">position":
+              type: number
+              description: "Position in rotations"
+            ">velocity":
+              type: number
+              description: "Velocity in rotations per second"
+
+    cangyroData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANGyro
+        device:
+          type: string
+          description: "Should have the form GyroClassName[id]"
+        data:
+          $ref: "#/components/schemas/gyroData/properties/data"
+
+    canaccelData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANAccel
+        device:
+          type: string
+          description: "Should have the form AccelClassName[id]"
+        data:
+          $ref: "#/components/schemas/accelData/properties/data"
+
+    canainData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANAIn
+        device:
+          type: string
+          description: "Should have the form AnalogInputClassName[id]"
+        data:
+          $ref: "#/components/schemas/aiData/properties/data"
+
+    candioData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANDIO
+        device:
+          type: string
+          description: "Should have the form DIOClassName[id]"
+        data:
+          $ref: "#/components/schemas/dioData/properties/data"
+
+    candutycycleData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANDutyCycle
+        device:
+          type: string
+          description: "Should have the form DutyCycleClassName[id]"
+        data:
+          $ref: "#/components/schemas/dutycycleData/properties/data"
+
+    simdeviceData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          const: SimDevice
+        device:
+          type: string
+        data:
+          type: object
+          additionalProperties:
+            type: string

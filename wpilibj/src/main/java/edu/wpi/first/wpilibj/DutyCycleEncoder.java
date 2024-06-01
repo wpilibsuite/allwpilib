@@ -11,7 +11,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 
 /**
  * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with PWM Output, the
@@ -21,74 +20,106 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private final DutyCycle m_dutyCycle;
   private boolean m_ownsDutyCycle;
   private DigitalInput m_digitalInput;
-  private AnalogTrigger m_analogTrigger;
-  private Counter m_counter;
   private int m_frequencyThreshold = 100;
-  private double m_positionOffset;
-  private double m_distancePerRotation = 1.0;
-  private double m_lastPosition;
+  private double m_fullRange;
+  private double m_expectedZero;
+  private double m_periodNanos;
   private double m_sensorMin;
   private double m_sensorMax = 1.0;
+  private boolean m_isInverted;
 
   private SimDevice m_simDevice;
   private SimDouble m_simPosition;
-  private SimDouble m_simAbsolutePosition;
-  private SimDouble m_simDistancePerRotation;
   private SimBoolean m_simIsConnected;
 
   /**
    * Construct a new DutyCycleEncoder on a specific channel.
    *
    * @param channel the channel to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   @SuppressWarnings("this-escape")
-  public DutyCycleEncoder(int channel) {
+  public DutyCycleEncoder(int channel, double fullRange, double expectedZero) {
     m_digitalInput = new DigitalInput(channel);
     m_ownsDutyCycle = true;
     m_dutyCycle = new DutyCycle(m_digitalInput);
-    init();
+    init(fullRange, expectedZero);
   }
 
   /**
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
    * @param dutyCycle the duty cycle to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
    */
   @SuppressWarnings("this-escape")
-  public DutyCycleEncoder(DutyCycle dutyCycle) {
+  public DutyCycleEncoder(DutyCycle dutyCycle, double fullRange, double expectedZero) {
     m_dutyCycle = dutyCycle;
-    init();
+    init(fullRange, expectedZero);
   }
 
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
    * @param source the digital source to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  @SuppressWarnings("this-escape")
+  public DutyCycleEncoder(DigitalSource source, double fullRange, double expectedZero) {
+    m_ownsDutyCycle = true;
+    m_dutyCycle = new DutyCycle(source);
+    init(fullRange, expectedZero);
+  }
+
+  /**
+   * Construct a new DutyCycleEncoder on a specific channel.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
+   * @param channel the channel to attach to
+   */
+  @SuppressWarnings("this-escape")
+  public DutyCycleEncoder(int channel) {
+    this(channel, 1.0, 0.0);
+  }
+
+  /**
+   * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
+   * @param dutyCycle the duty cycle to attach to
+   */
+  @SuppressWarnings("this-escape")
+  public DutyCycleEncoder(DutyCycle dutyCycle) {
+    this(dutyCycle, 1.0, 0.0);
+  }
+
+  /**
+   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
+   * @param source the digital source to attach to
    */
   @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DigitalSource source) {
-    m_ownsDutyCycle = true;
-    m_dutyCycle = new DutyCycle(source);
-    init();
+    this(source, 1.0, 0.0);
   }
 
-  private void init() {
+  private void init(double fullRange, double expectedZero) {
     m_simDevice = SimDevice.create("DutyCycle:DutyCycleEncoder", m_dutyCycle.getSourceChannel());
 
     if (m_simDevice != null) {
-      m_simPosition = m_simDevice.createDouble("position", SimDevice.Direction.kInput, 0.0);
-      m_simDistancePerRotation =
-          m_simDevice.createDouble("distance_per_rot", SimDevice.Direction.kOutput, 1.0);
-      m_simAbsolutePosition =
-          m_simDevice.createDouble("absPosition", SimDevice.Direction.kInput, 0.0);
-      m_simIsConnected = m_simDevice.createBoolean("connected", SimDevice.Direction.kInput, true);
-    } else {
-      m_counter = new Counter();
-      m_analogTrigger = new AnalogTrigger(m_dutyCycle);
-      m_analogTrigger.setLimitsDutyCycle(0.25, 0.75);
-      m_counter.setUpSource(m_analogTrigger, AnalogTriggerType.kRisingPulse);
-      m_counter.setDownSource(m_analogTrigger, AnalogTriggerType.kFallingPulse);
+      m_simPosition = m_simDevice.createDouble("Position", SimDevice.Direction.kInput, 0.0);
+      m_simIsConnected = m_simDevice.createBoolean("Connected", SimDevice.Direction.kInput, true);
     }
+
+    m_fullRange = fullRange;
+    m_expectedZero = expectedZero;
 
     SendableRegistry.addLW(this, "DutyCycle Encoder", m_dutyCycle.getSourceChannel());
   }
@@ -105,11 +136,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     return pos;
   }
 
-  private boolean doubleEquals(double a, double b) {
-    double epsilon = 0.00001d;
-    return Math.abs(a - b) < epsilon;
-  }
-
   /**
    * Get the encoder value since the last reset.
    *
@@ -122,67 +148,28 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
       return m_simPosition.get();
     }
 
-    // As the values are not atomic, keep trying until we get 2 reads of the same
-    // value
-    // If we don't within 10 attempts, error
-    for (int i = 0; i < 10; i++) {
-      double counter = m_counter.get();
-      double pos = m_dutyCycle.getOutput();
-      double counter2 = m_counter.get();
-      double pos2 = m_dutyCycle.getOutput();
-      if (counter == counter2 && doubleEquals(pos, pos2)) {
-        // map sensor range
-        pos = mapSensorRange(pos);
-        double position = counter + pos - m_positionOffset;
-        m_lastPosition = position;
-        return position;
-      }
+    double pos;
+    // Compute output percentage (0-1)
+    if (m_periodNanos == 0.0) {
+      pos = m_dutyCycle.getOutput();
+    } else {
+      int highTime = m_dutyCycle.getHighTimeNanoseconds();
+      pos = highTime / m_periodNanos;
     }
 
-    DriverStation.reportWarning(
-        "Failed to read Analog Encoder. Potential Speed Overrun. Returning last value", false);
-    return m_lastPosition;
-  }
+    // Map sensor range if range isn't full
+    pos = mapSensorRange(pos);
 
-  /**
-   * Get the absolute position of the duty cycle encoder.
-   *
-   * <p>getAbsolutePosition() - getPositionOffset() will give an encoder absolute position relative
-   * to the last reset. This could potentially be negative, which needs to be accounted for.
-   *
-   * <p>This will not account for rollovers, and will always be just the raw absolute position.
-   *
-   * @return the absolute position
-   */
-  public double getAbsolutePosition() {
-    if (m_simAbsolutePosition != null) {
-      return m_simAbsolutePosition.get();
+    // Compute full range and offset
+    pos = pos * m_fullRange - m_expectedZero;
+
+    // Map from 0 - Full Range
+    double result = MathUtil.inputModulus(pos, 0, m_fullRange);
+    // Invert if necessary
+    if (m_isInverted) {
+      return m_fullRange - result;
     }
-
-    return mapSensorRange(m_dutyCycle.getOutput());
-  }
-
-  /**
-   * Get the offset of position relative to the last reset.
-   *
-   * <p>getAbsolutePosition() - getPositionOffset() will give an encoder absolute position relative
-   * to the last reset. This could potentially be negative, which needs to be accounted for.
-   *
-   * @return the position offset
-   */
-  public double getPositionOffset() {
-    return m_positionOffset;
-  }
-
-  /**
-   * Set the position offset.
-   *
-   * <p>This must be in the range of 0-1.
-   *
-   * @param offset the offset
-   */
-  public void setPositionOffset(double offset) {
-    m_positionOffset = MathUtil.clamp(offset, 0.0, 1.0);
+    return result;
   }
 
   /**
@@ -202,57 +189,12 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Set the distance per rotation of the encoder. This sets the multiplier used to determine the
-   * distance driven based on the rotation value from the encoder. Set this value based on how far
-   * the mechanism travels in 1 rotation of the encoder, and factor in gearing reductions following
-   * the encoder shaft. This distance can be in any units you like, linear or angular.
-   *
-   * @param distancePerRotation the distance per rotation of the encoder
-   */
-  public void setDistancePerRotation(double distancePerRotation) {
-    m_distancePerRotation = distancePerRotation;
-    if (m_simDistancePerRotation != null) {
-      m_simDistancePerRotation.set(distancePerRotation);
-    }
-  }
-
-  /**
-   * Get the distance per rotation for this encoder.
-   *
-   * @return The scale factor that will be used to convert rotation to useful units.
-   */
-  public double getDistancePerRotation() {
-    return m_distancePerRotation;
-  }
-
-  /**
-   * Get the distance the sensor has driven since the last reset as scaled by the value from {@link
-   * #setDistancePerRotation(double)}.
-   *
-   * @return The distance driven since the last reset
-   */
-  public double getDistance() {
-    return get() * getDistancePerRotation();
-  }
-
-  /**
    * Get the frequency in Hz of the duty cycle signal from the encoder.
    *
    * @return duty cycle frequency in Hz
    */
   public int getFrequency() {
     return m_dutyCycle.getFrequency();
-  }
-
-  /** Reset the Encoder distance to zero. */
-  public void reset() {
-    if (m_counter != null) {
-      m_counter.reset();
-    }
-    if (m_simPosition != null) {
-      m_simPosition.set(0);
-    }
-    m_positionOffset = getAbsolutePosition();
   }
 
   /**
@@ -284,14 +226,35 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     m_frequencyThreshold = frequency;
   }
 
+  /**
+   * Sets the assumed frequency of the connected device.
+   *
+   * <p>By default, the DutyCycle engine has to compute the frequency of the input signal. This can
+   * result in both delayed readings and jumpy readings. To solve this, you can pass the expected
+   * frequency of the sensor to this function. This will use that frequency to compute the DutyCycle
+   * percentage, rather than the computed frequency.
+   *
+   * @param frequency the assumed frequency of the sensor
+   */
+  public void setAssumedFrequency(double frequency) {
+    if (frequency == 0.0) {
+      m_periodNanos = 0.0;
+    } else {
+      m_periodNanos = 1000000000 / frequency;
+    }
+  }
+
+  /**
+   * Set if this encoder is inverted.
+   *
+   * @param inverted true to invert the encoder, false otherwise
+   */
+  public void setInverted(boolean inverted) {
+    m_isInverted = inverted;
+  }
+
   @Override
   public void close() {
-    if (m_counter != null) {
-      m_counter.close();
-    }
-    if (m_analogTrigger != null) {
-      m_analogTrigger.close();
-    }
     if (m_ownsDutyCycle) {
       m_dutyCycle.close();
     }
@@ -324,8 +287,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("AbsoluteEncoder");
-    builder.addDoubleProperty("Distance", this::getDistance, null);
-    builder.addDoubleProperty("Distance Per Rotation", this::getDistancePerRotation, null);
+    builder.addDoubleProperty("Position", this::get, null);
     builder.addBooleanProperty("Is Connected", this::isConnected, null);
   }
 }

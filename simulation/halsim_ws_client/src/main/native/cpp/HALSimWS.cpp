@@ -6,10 +6,10 @@
 
 #include <cstdio>
 
-#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/print.h>
 #include <wpinet/uv/util.h>
 
 #include "HALSimWSClientConnection.h"
@@ -26,7 +26,7 @@ HALSimWS::HALSimWS(wpi::uv::Loop& loop, ProviderContainer& providers,
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
-    fmt::print(stderr, "HALSim WS Client libuv Error: {}\n", err.str());
+    wpi::print(stderr, "HALSim WS Client libuv Error: {}\n", err.str());
   });
 
   m_tcp_client = uv::Tcp::Create(m_loop);
@@ -54,7 +54,7 @@ bool HALSimWS::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      fmt::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
+      wpi::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
       return false;
     }
   } else {
@@ -109,16 +109,16 @@ void HALSimWS::Start() {
 
   // Print any filters we are using
   if (m_useMsgFiltering) {
-    fmt::print("WS Message Filters:");
+    wpi::print("WS Message Filters:");
     for (auto filter : m_msgFilters.keys()) {
-      fmt::print("* \"{}\"\n", filter);
+      wpi::print("* \"{}\"\n", filter);
     }
   } else {
-    fmt::print("No WS Message Filters specified");
+    wpi::print("No WS Message Filters specified");
   }
 
   // Set up the connection timer
-  fmt::print("Will attempt to connect to ws://{}:{}{}\n", m_host, m_port,
+  wpi::print("Will attempt to connect to ws://{}:{}{}\n", m_host, m_port,
              m_uri);
 
   // Set up the timer to attempt connection
@@ -132,7 +132,7 @@ void HALSimWS::Start() {
 void HALSimWS::AttemptConnect() {
   m_connect_attempts++;
 
-  fmt::print("Connection Attempt {}\n", m_connect_attempts);
+  wpi::print("Connection Attempt {}\n", m_connect_attempts);
 
   struct sockaddr_in dest;
   uv::NameToAddr(m_host, m_port, &dest);
@@ -197,7 +197,7 @@ void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
       provider->OnNetValueChanged(msg.at("data"));
     }
   } catch (wpi::json::exception& e) {
-    fmt::print(stderr, "Error with incoming message: {}\n", e.what());
+    wpi::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }
 

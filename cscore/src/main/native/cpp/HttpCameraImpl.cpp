@@ -634,55 +634,47 @@ std::vector<std::string> GetHttpCameraUrls(CS_Source source,
 
 extern "C" {
 
-CS_Source CS_CreateHttpCamera(const char* name, const char* url,
+CS_Source CS_CreateHttpCamera(const struct WPI_String* name,
+                              const struct WPI_String* url,
                               CS_HttpCameraKind kind, CS_Status* status) {
-  return cs::CreateHttpCamera(name, url, kind, status);
+  return cs::CreateHttpCamera(wpi::to_string_view(name),
+                              wpi::to_string_view(url), kind, status);
 }
 
-CS_Source CS_CreateHttpCameraMulti(const char* name, const char** urls,
-                                   int count, CS_HttpCameraKind kind,
-                                   CS_Status* status) {
+CS_Source CS_CreateHttpCameraMulti(const struct WPI_String* name,
+                                   const struct WPI_String* urls, int count,
+                                   CS_HttpCameraKind kind, CS_Status* status) {
   wpi::SmallVector<std::string, 4> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
-    vec.push_back(urls[i]);
+    vec.emplace_back(wpi::to_string_view(&urls[i]));
   }
-  return cs::CreateHttpCamera(name, vec, kind, status);
+  return cs::CreateHttpCamera(wpi::to_string_view(name), vec, kind, status);
 }
 
 CS_HttpCameraKind CS_GetHttpCameraKind(CS_Source source, CS_Status* status) {
   return cs::GetHttpCameraKind(source, status);
 }
 
-void CS_SetHttpCameraUrls(CS_Source source, const char** urls, int count,
-                          CS_Status* status) {
+void CS_SetHttpCameraUrls(CS_Source source, const struct WPI_String* urls,
+                          int count, CS_Status* status) {
   wpi::SmallVector<std::string, 4> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
-    vec.push_back(urls[i]);
+    vec.emplace_back(wpi::to_string_view(&urls[i]));
   }
   cs::SetHttpCameraUrls(source, vec, status);
 }
 
-char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status) {
+WPI_String* CS_GetHttpCameraUrls(CS_Source source, int* count,
+                                 CS_Status* status) {
   auto urls = cs::GetHttpCameraUrls(source, status);
-  char** out =
-      static_cast<char**>(wpi::safe_malloc(urls.size() * sizeof(char*)));
+  WPI_String* out = WPI_AllocateStringArray(urls.size());
   *count = urls.size();
   for (size_t i = 0; i < urls.size(); ++i) {
-    out[i] = cs::ConvertToC(urls[i]);
+    cs::ConvertToC(&out[i], urls[i]);
   }
   return out;
-}
-
-void CS_FreeHttpCameraUrls(char** urls, int count) {
-  if (!urls) {
-    return;
-  }
-  for (int i = 0; i < count; ++i) {
-    std::free(urls[i]);
-  }
-  std::free(urls);
 }
 
 }  // extern "C"

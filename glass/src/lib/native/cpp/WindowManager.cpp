@@ -8,6 +8,7 @@
 #include <cstdio>
 
 #include <fmt/format.h>
+#include <wpi/print.h>
 #include <wpigui.h>
 
 #include "glass/Context.h"
@@ -31,7 +32,7 @@ Window* WindowManager::AddWindow(std::string_view id,
     return nullptr;
   }
   if (win->HasView()) {
-    fmt::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
+    wpi::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
     return nullptr;
   }
   win->SetView(MakeFunctionView(std::move(display)));
@@ -46,7 +47,7 @@ Window* WindowManager::AddWindow(std::string_view id,
     return nullptr;
   }
   if (win->HasView()) {
-    fmt::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
+    wpi::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
     return nullptr;
   }
   win->SetView(std::move(view));
@@ -61,7 +62,7 @@ Window* WindowManager::GetOrAddWindow(std::string_view id, bool duplicateOk,
       [](const auto& elem, std::string_view s) { return elem->GetId() < s; });
   if (it != m_windows.end() && (*it)->GetId() == id) {
     if (!duplicateOk) {
-      fmt::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
+      wpi::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
       return nullptr;
     }
     return it->get();

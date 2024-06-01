@@ -67,7 +67,7 @@ class GeneralizedEigenSolver {
   enum {
     RowsAtCompileTime = MatrixType::RowsAtCompileTime,
     ColsAtCompileTime = MatrixType::ColsAtCompileTime,
-    Options = MatrixType::Options,
+    Options = internal::traits<MatrixType>::Options,
     MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,
     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime
   };

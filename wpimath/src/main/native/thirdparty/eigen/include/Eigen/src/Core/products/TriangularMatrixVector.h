@@ -287,21 +287,39 @@ struct trmv_selector<Mode, RowMajor> {
 
     constexpr bool DirectlyUseRhs = ActualRhsTypeCleaned::InnerStrideAtCompileTime == 1;
 
+    const RhsScalar* actualRhsPtr = actualRhs.data();
+
+    // Potentially create a temporary buffer to copy RHS to contiguous memory.
     gemv_static_vector_if<RhsScalar, ActualRhsTypeCleaned::SizeAtCompileTime,
                           ActualRhsTypeCleaned::MaxSizeAtCompileTime, !DirectlyUseRhs>
-        static_rhs;
-
-    ei_declare_aligned_stack_constructed_variable(
-        RhsScalar, actualRhsPtr, actualRhs.size(),
-        DirectlyUseRhs ? const_cast<RhsScalar*>(actualRhs.data()) : static_rhs.data());
-
+        static_rhs;  // Fixed-sized array.
+    RhsScalar* buffer = nullptr;
     if (!DirectlyUseRhs) {
+      // Maybe used fixed-sized buffer, otherwise allocate.
+      if (static_rhs.data() != nullptr) {
+        buffer = static_rhs.data();
+      } else {
+        // Allocate either with alloca or malloc.
+        Eigen::internal::check_size_for_overflow<RhsScalar>(actualRhs.size());
+#ifdef EIGEN_ALLOCA
+        buffer = static_cast<RhsScalar*>((sizeof(RhsScalar) * actualRhs.size() <= EIGEN_STACK_ALLOCATION_LIMIT)
+                                             ? EIGEN_ALIGNED_ALLOCA(sizeof(RhsScalar) * actualRhs.size())
+                                             : Eigen::internal::aligned_malloc(sizeof(RhsScalar) * actualRhs.size()));
+#else
+        buffer = static_cast<RhsScalar*>(Eigen::internal::aligned_malloc(sizeof(RhsScalar) * actualRhs.size()));
+#endif
+      }
 #ifdef EIGEN_DENSE_STORAGE_CTOR_PLUGIN
       Index size = actualRhs.size();
       EIGEN_DENSE_STORAGE_CTOR_PLUGIN
 #endif
-      Map<typename ActualRhsTypeCleaned::PlainObject>(actualRhsPtr, actualRhs.size()) = actualRhs;
+      Map<typename ActualRhsTypeCleaned::PlainObject, Eigen::AlignedMax>(buffer, actualRhs.size()) = actualRhs;
+      actualRhsPtr = buffer;
     }
+    // Deallocate only if malloced.
+    Eigen::internal::aligned_stack_memory_handler<RhsScalar> buffer_stack_memory_destructor(
+        buffer, actualRhs.size(),
+        !DirectlyUseRhs && static_rhs.data() == nullptr && actualRhs.size() > EIGEN_STACK_ALLOCATION_LIMIT);
 
     internal::triangular_matrix_vector_product<Index, Mode, LhsScalar, LhsBlasTraits::NeedToConjugate, RhsScalar,
                                                RhsBlasTraits::NeedToConjugate, RowMajor>::run(actualLhs.rows(),

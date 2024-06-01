@@ -4,11 +4,15 @@
 
 #include <jni.h>
 
+#include <vector>
+
 #include <fmt/format.h>
 
 #include "WPIUtilJNI.h"
 #include "edu_wpi_first_util_datalog_DataLogJNI.h"
 #include "wpi/DataLog.h"
+#include "wpi/DataLogBackgroundWriter.h"
+#include "wpi/DataLogWriter.h"
 #include "wpi/jni_util.h"
 
 using namespace wpi::java;
@@ -18,11 +22,11 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_util_datalog_DataLogJNI
- * Method:    create
+ * Method:    bgCreate
  * Signature: (Ljava/lang/String;Ljava/lang/String;DLjava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_create
+Java_edu_wpi_first_util_datalog_DataLogJNI_bgCreate
   (JNIEnv* env, jclass, jstring dir, jstring filename, jdouble period,
    jstring extraHeader)
 {
@@ -38,18 +42,18 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_create
     wpi::ThrowNullPointerException(env, "extraHeader is null");
     return 0;
   }
-  return reinterpret_cast<jlong>(new DataLog{JStringRef{env, dir},
-                                             JStringRef{env, filename}, period,
-                                             JStringRef{env, extraHeader}});
+  return reinterpret_cast<jlong>(new DataLogBackgroundWriter{
+      JStringRef{env, dir}, JStringRef{env, filename}, period,
+      JStringRef{env, extraHeader}});
 }
 
 /*
  * Class:     edu_wpi_first_util_datalog_DataLogJNI
- * Method:    setFilename
+ * Method:    bgSetFilename
  * Signature: (JLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_datalog_DataLogJNI_setFilename
+Java_edu_wpi_first_util_datalog_DataLogJNI_bgSetFilename
   (JNIEnv* env, jclass, jlong impl, jstring filename)
 {
   if (impl == 0) {
@@ -60,7 +64,36 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_setFilename
     wpi::ThrowNullPointerException(env, "filename is null");
     return;
   }
-  reinterpret_cast<DataLog*>(impl)->SetFilename(JStringRef{env, filename});
+  reinterpret_cast<DataLogBackgroundWriter*>(impl)->SetFilename(
+      JStringRef{env, filename});
+}
+
+/*
+ * Class:     edu_wpi_first_util_datalog_DataLogJNI
+ * Method:    fgCreate
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_datalog_DataLogJNI_fgCreate
+  (JNIEnv* env, jclass, jstring filename, jstring extraHeader)
+{
+  if (!filename) {
+    wpi::ThrowNullPointerException(env, "filename is null");
+    return 0;
+  }
+  if (!extraHeader) {
+    wpi::ThrowNullPointerException(env, "extraHeader is null");
+    return 0;
+  }
+  std::error_code ec;
+  auto writer = new DataLogWriter{JStringRef{env, filename}, ec,
+                                  JStringRef{env, extraHeader}};
+  if (ec) {
+    wpi::ThrowIOException(env, ec.message());
+    delete writer;
+    return 0;
+  }
+  return reinterpret_cast<jlong>(writer);
 }
 
 /*
@@ -76,7 +109,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_flush
     wpi::ThrowNullPointerException(env, "impl is null");
     return;
   }
-  reinterpret_cast<DataLog*>(impl)->Flush();
+  reinterpret_cast<DataLogBackgroundWriter*>(impl)->Flush();
 }
 
 /*
@@ -92,7 +125,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_pause
     wpi::ThrowNullPointerException(env, "impl is null");
     return;
   }
-  reinterpret_cast<DataLog*>(impl)->Pause();
+  reinterpret_cast<DataLogBackgroundWriter*>(impl)->Pause();
 }
 
 /*
@@ -108,7 +141,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_resume
     wpi::ThrowNullPointerException(env, "impl is null");
     return;
   }
-  reinterpret_cast<DataLog*>(impl)->Resume();
+  reinterpret_cast<DataLogBackgroundWriter*>(impl)->Resume();
 }
 
 /*
@@ -124,7 +157,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_stop
     wpi::ThrowNullPointerException(env, "impl is null");
     return;
   }
-  reinterpret_cast<DataLog*>(impl)->Stop();
+  reinterpret_cast<DataLogBackgroundWriter*>(impl)->Stop();
 }
 
 /*

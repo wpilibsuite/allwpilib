@@ -163,6 +163,40 @@ class MeasureTest {
   }
 
   @Test
+  void testDivideMeasure() {
+    // Dimensionless divide
+    var m1 = Units.Meters.of(6);
+    var m2 = Units.Value.of(3);
+    var result = m1.divide(m2);
+    assertEquals(m1.divide(m2).magnitude(), 2);
+    assertEquals(result.unit(), Units.Meters);
+    // Velocity divide
+    var m3 = Units.Meters.of(8);
+    var m4 = Units.Meters.per(Units.Second).of(4);
+    result = m3.divide(m4);
+    assertEquals(result.magnitude(), 2);
+    assertEquals(result.unit(), Units.Second);
+    // Per divide
+    var m5 = Units.Volts.of(6);
+    var m6 = Units.Volts.per(Units.Meter).of(2);
+    result = m5.divide(m6);
+    assertEquals(result.magnitude(), 3);
+    assertEquals(result.unit(), Units.Meter);
+    // Fallthrough divide
+    var m7 = Units.Seconds.of(10);
+    var m8 = Units.Amps.of(2);
+    result = m7.divide(m8);
+    assertEquals(result.magnitude(), 5);
+    assertEquals(result.unit(), Units.Seconds.per(Units.Amps));
+    // Same base unit divide
+    var m9 = Units.Meters.of(8);
+    var m10 = Units.Meters.of(4);
+    result = m9.divide(m10);
+    assertEquals(result.magnitude(), 2);
+    assertEquals(result.unit(), Units.Value);
+  }
+
+  @Test
   void testToShortString() {
     var measure = Units.Volts.of(343);
     assertEquals("3.430e+02 V", measure.toShortString());

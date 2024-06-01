@@ -14,18 +14,10 @@ AnalogEncoderSim::AnalogEncoderSim(const frc::AnalogEncoder& encoder) {
   m_positionSim = deviceSim.GetDouble("Position");
 }
 
-void AnalogEncoderSim::SetPosition(frc::Rotation2d angle) {
-  SetTurns(angle.Degrees());
+void AnalogEncoderSim::Set(double value) {
+  m_positionSim.Set(value);
 }
 
-void AnalogEncoderSim::SetTurns(units::turn_t turns) {
-  m_positionSim.Set(turns.value());
-}
-
-units::turn_t AnalogEncoderSim::GetTurns() {
-  return units::turn_t{m_positionSim.Get()};
-}
-
-frc::Rotation2d AnalogEncoderSim::GetPosition() {
-  return units::radian_t{GetTurns()};
+double AnalogEncoderSim::Get() {
+  return m_positionSim.Get();
 }

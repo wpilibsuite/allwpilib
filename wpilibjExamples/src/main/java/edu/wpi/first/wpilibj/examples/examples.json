@@ -318,12 +318,12 @@
     "commandversion": 2
   },
   {
-    "name": "Axis Camera Sample",
-    "description": "Acquire images from an Axis network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
+    "name": "HTTP Camera",
+    "description": "Acquire images from an HTTP network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
     "tags": [
       "Vision"
     ],
-    "foldername": "axiscamera",
+    "foldername": "httpcamera",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2

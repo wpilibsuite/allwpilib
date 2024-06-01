@@ -16,6 +16,9 @@ public class SimDeviceJNI extends JNIWrapper {
    * instances of the same device are desired, recommend appending the instance/unique identifier in
    * brackets to the base name, e.g. "device[1]".
    *
+   * <p>Using a device name of the form "Type:Name" will create a WebSockets node with a type value
+   * of "Type" and a device value of "Name"
+   *
    * <p>0 is returned if not in simulation.
    *
    * @param name device name

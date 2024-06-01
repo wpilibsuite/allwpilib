@@ -39,6 +39,17 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   units::radians_per_second_t omega = 0_rad_per_s;
 
   /**
+   * Creates a Twist2d from ChassisSpeeds.
+   *
+   * @param dt The duration of the timestep.
+   *
+   * @return Twist2d.
+   */
+  Twist2d ToTwist2d(units::second_t dt) const {
+    return Twist2d{vx * dt, vy * dt, omega * dt};
+  }
+
+  /**
    * Disretizes a continuous-time chassis speed.
    *
    * This function converts a continuous-time chassis speed into a discrete-time
@@ -256,6 +267,15 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   constexpr ChassisSpeeds operator/(double scalar) const {
     return operator*(1.0 / scalar);
   }
+
+  /**
+   * Compares the ChassisSpeeds with another ChassisSpeed.
+   *
+   * @param other The other ChassisSpeeds.
+   *
+   * @return The result of the comparison. Is true if they are the same.
+   */
+  constexpr bool operator==(const ChassisSpeeds& other) const = default;
 };
 }  // namespace frc
 

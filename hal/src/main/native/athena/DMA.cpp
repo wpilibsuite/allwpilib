@@ -10,7 +10,7 @@
 #include <memory>
 #include <type_traits>
 
-#include <fmt/format.h>
+#include <wpi/print.h>
 
 #include "AnalogInternal.h"
 #include "ConstantsInternal.h"
@@ -737,7 +737,7 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                      &remainingBytes, status);
 
   if ((remainingBytes % dma->captureStore.captureSize) != 0) {
-    fmt::print(
+    wpi::print(
         "Remaining bytes {} is not a multiple of capture size {}. This is "
         "likely a "
         "bug in WPILib. Please report this issue with a copy of your code.\n",

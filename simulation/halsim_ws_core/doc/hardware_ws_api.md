@@ -77,13 +77,17 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 | Type value              | Description                | Device value              |
 | ----------------------- | -------------------------- | ------------------------- |
 | [``"Accel"``][]         | Accelerometer              | Arbitrary device name     |
+| [``"AddressableLED"``][]| Addressable LED Strip      | Arbitrary device number   |
 | [``"AI"``][]            | Analog input               | Port index, e.g. "1", "2" |
+| [``"AO"``][]            | Analog output              | Port index, e.g. "1", "2" |
+| [``"CTREPCM"``][]       | PCM                        | Module number, e.g. "1", "2" |
 | [``"DIO"``][]           | Digital input/output       | Port index, e.g. "1", "2" |
 | [``"dPWM"``][]          | Duty cycle output          | Arbitrary device number   |
 | [``"DriverStation"``][] | Driver station / FMS state | Blank                     |
 | [``"DutyCycle"``][]     | Duty cycle input           | Arbitrary device name     |
 | [``"Encoder"``][]       | Quadrature encoder         | Arbitrary device number   |
 | [``"Gyro"``][]          | Gyro                       | Arbitrary device name     |
+| [``"HAL"``][]           | HAL data                   | ``"HAL"``                 |
 | [``"Joystick"``][]      | Joystick data              | Joystick number           |
 | [``"PWM"``][]           | PWM output                 | Port index, e.g. "1", "2" |
 | [``"Relay"``][]         | Relay output               | Port index, e.g. "1", "2" |
@@ -95,7 +99,7 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 
 A 3-axis accelerometer.
 
-C++/Java implementation note: these are created as either BuiltInAccelerometer or SimDevice nodes where the device name is prefixed by ``"Accel:"``, for example ``"Accel:ADXL362[1]"``.  The BuiltInAccelerometer uses a device name of ``"BuiltInAccel"``.
+C++/Java implementation note: these are created as either BuiltInAccelerometer or SimDevice nodes where the device name is prefixed by ``"Accel:"``. For example, the device ``"Accel:ADXL362[1]"`` would have a device value of ``ADXL362[1]``.  The BuiltInAccelerometer uses a device name of ``"BuiltInAccel"``.
 
 | Data Key     | Type    | Description                                          |
 | ------------ | ------- | ---------------------------------------------------- |
@@ -105,16 +109,46 @@ C++/Java implementation note: these are created as either BuiltInAccelerometer o
 | ``">y"``     | Float   | Acceleration in G’s                                  |
 | ``">z"``     | Float   | Acceleration in G’s                                  |
 
+#### Addressable LED Strip ("AddressableLED")
+
+[``"AddressableLED"``]:#addressable-led-strip-addressableled
+
+| Data Key           | Type    | Description                                          |
+| ------------------ | ------- | ---------------------------------------------------- |
+| ``"<init"``        | Boolean | If the led strip is initialized in the robot program |
+| ``"<output_port"`` | Integer | DIO pin number                                       |
+| ``"<length"``      | Integer | The number of leds in the strip                      |
+| ``"<running"``     | Boolean | Whether the strip is outputting data                 |
+| ``"<data"``        | Array   | One value per led; value is an object with ``"r"``, ``"g"``, and ``"b"`` keys, representing the rgb (0-255) components of the color |
+
 #### Analog Input ("AI")
 
 [``"AI"``]:#analog-input-ai
 
-The basic analog input just reads a voltage.
+The basic analog input just reads a voltage. An analog input can also be configured to use an averaging and oversampling engine.
 
-| Data Key       | Type    | Description                                         |
-| -------------- | ------- | --------------------------------------------------- |
-| ``"<init"``    | Boolean | If analog input is initialized in the robot program |
-| ``">voltage"`` | Float   | Input voltage, in volts                             |
+| Data Key               | Type    | Description                                         |
+| ---------------------- | ------- | --------------------------------------------------- |
+| ``"<init"``            | Boolean | If analog input is initialized in the robot program |
+| ``"<avg_bits"``        | Integer | The number of averaging bits                        |
+| ``"<oversample_bits"`` | Integer | The number of oversampling bits                     |
+| ``">voltage"``         | Float   | Input voltage, in volts                             |
+| ``"<accum_init"``      | Boolean | If the accumulator is initialized in the robot program |
+| ``">accum_value"``     | Integer | The accumulated value                               |
+| ``">accum_count"``     | Integer | The number of accumulated values                    |
+| ``"<accum_center"``    | Integer | The center value of the accumulator                 |
+| ``"<accum_deadband"``  | Integer | The accumulator's deadband                          |
+
+#### Analog Output ("AO")
+
+[``"AO"``]:#analog-output-ao
+
+The basic analog output just sends a voltage.
+
+| Data Key              | Type    | Description                                          |
+| --------------------- | ------- | ---------------------------------------------------- |
+| ``"<init"``           | Boolean | If analog output is initialized in the robot program |
+| ``"<voltage"``        | Float   | Output voltage, in volts                             |
 
 #### Digital Input/Output ("DIO")
 
@@ -125,6 +159,7 @@ The basic analog input just reads a voltage.
 | ``"<init"``   | Boolean | If DIO is initialized in the robot program |
 | ``"<input"``  | Boolean | True if input, false if output             |
 | ``"<>value"`` | Boolean | Input or output state                      |
+| ``"<pulse_length"`` | Float | Reserved for future use                |
 
 #### Duty Cycle Output ("dPWM")
 
@@ -159,7 +194,7 @@ The basic analog input just reads a voltage.
 
 Duty Cycle inputs are commonly used for absolute encoders.  The position is accumulated over multiple rotations.
 
-C++/Java implementation note: these are created as SimDevice nodes where the device name is prefixed by ``"DutyCycle:"``, for example ``"DutyCycle:DutyCycleEncoder[1]"``.
+C++/Java implementation note: these can be created through the API as SimDevice nodes where the device name is prefixed by ``"DutyCycle:"``. For example, the device ``"DutyCycle:DutyCycleEncoder[1]"`` would have a device value of ``DutyCycleEncoder[1]``.
 
 | Data Key         | Type    | Description                      |
 | ---------------- | ------- | -------------------------------- |
@@ -172,14 +207,15 @@ C++/Java implementation note: these are created as SimDevice nodes where the dev
 
 A relative encoder.  For absolute encoders, use ``"DutyCycle"``.
 
-| Data Key              | Type    | Description                                         |
-| --------------------- | ------- | --------------------------------------------------- |
-| ``"<init"``           | Boolean | If encoder is initialized in the robot program      |
-| ``"<channel_a"``      | Integer | Digital channel number for “A” phase                |
-| ``"<channel_b"``      | Integer | Digital channel number for “B” phase                |
-| ``"<samples_to_avg"`` | Integer | Number of samples to average for period measurement |
-| ``">count"``          | Integer | Accumulated count (pulses)                          |
-| ``">period"``         | Float   | Period between pulses in seconds                    |
+| Data Key                 | Type    | Description                                         |
+| ------------------------ | ------- | --------------------------------------------------- |
+| ``"<init"``              | Boolean | If encoder is initialized in the robot program      |
+| ``"<channel_a"``         | Integer | Digital channel number for “A” phase                |
+| ``"<channel_b"``         | Integer | Digital channel number for “B” phase                |
+| ``"<samples_to_avg"``    | Integer | Number of samples to average for period measurement |
+| ``">count"``             | Integer | Accumulated count (pulses)                          |
+| ``">period"``            | Float   | Period between pulses in seconds                    |
+| ``"<reverse_direction"`` | Boolean | If the encoder direction should be inverted         |
 
 #### Gyro ("Gyro")
 
@@ -187,7 +223,7 @@ A relative encoder.  For absolute encoders, use ``"DutyCycle"``.
 
 A single axis or 3-axis gyro.  Single axis gyros only use the X angle parameter.
 
-C++/Java implementation note: these are created as SimDevice nodes where the device name is prefixed by ``"Gyro:"``, for example ``"Gyro:ADXRS450[1]"``.
+C++/Java implementation note: these can be created created as SimDevice nodes where the device name is prefixed by ``"Gyro:"``. For example, the device ``"Gyro:ADXRS450[1]"`` would have a device value of ``ADXRS450[1]``.
 
 | Data Key          | Type    | Description                                               |
 | ----------------- | ------- | --------------------------------------------------------- |
@@ -201,6 +237,19 @@ C++/Java implementation note: these are created as SimDevice nodes where the dev
 | ``">rate_y"``     | Float   | The current gyro angular rate of change in degrees/second |
 | ``">rate_z"``     | Float   | The current gyro angular rate of change in degrees/second |
 
+#### HAL Data ("HAL")
+
+[``"HAL"``]:#hal-data-hal
+
+Only sent in XRP mode.
+
+Only one of ``">sim_periodic_before"`` or ``">sim_periodic_after"`` should be sent in a single message.
+
+| Data Key                   | Type    | Description                                                    |
+| -------------------------- | ------- | -------------------------------------------------------------- |
+| ``">sim_periodic_before"`` | Boolean | Sent by the robot before running periodic simulation functions |
+| ``">sim_periodic_after"``  | Boolean | Sent by the robot after running periodic simulation functions  |
+
 #### Joystick Data ("Joystick")
 
 [``"Joystick"``]:#joystick-data-joystick
@@ -212,20 +261,38 @@ Joystick data is an input to the robot program and should be updated for each in
 | ``">axes"``         | Array of float   | One array element per axis; value is -1 to 1 range |
 | ``">povs"``         | Array of integer | One array element per POV; value is angle in degrees of the POV (e.g. 0, 90, 315) if pressed, or -1 if the POV is not pressed |
 | ``">buttons"``      | Array of boolean | One array element per button; true if button is pressed, false if button is released |
+| ``"<outputs"``      | Integer          | Bitmask of joystick HID outputs |
 | ``"<rumble_left"``  | Float            | Left rumble, value is 0-1 range |
 | ``"<rumble_right"`` | Float            | Right rumble, value is 0-1 range |
+
+#### PCM Data ("CTREPCM")
+
+[``"CTREPCM"``]:#pcm-data-ctrepcm
+
+A pneumatic control module is used to regulate the pressure in a pneumatic system by switching a compressor on or off.
+
+| Data Key               | Type    | Description                                |
+| ---------------------- | ------- | ------------------------------------------ |
+| ``"<init"``            | Boolean | If PCM is initialized in the robot program |
+| ``">on"``              | Boolean | Whether the compressor is running          |
+| ``"<closed_loop"``     | Boolean | Whether closed-loop control is enabled     |
+| ``">pressure_switch"`` | Boolean | The value of the pressure switch           |
+| ``">current"``         | Float   | The amount of current being drawn by the compressor, in Amps |
 
 #### PWM Output ("PWM")
 
 [``"PWM"``]:#pwm-output-pwm
 
-PWMs may be used to control either motor controllers or servos.  Typically only one of either ``"<speed"`` (for a motor controller) or ``"<position"`` (for a servo) is used for a given PWM.
+PWMs may be used to control either motor controllers or servos.  Typically only one of either ``"<speed"`` (for a motor controller) ``"<position"`` (for a servo), or ``"raw"`` is used for a given PWM.
 
-| Data Key        | Type    | Description                                |
-| --------------- | ------- | ------------------------------------------ |
-| ``"<init"``     | Boolean | If PWM is initialized in the robot program |
-| ``"<speed"``    | Float   | Speed, -1.0 to 1.0 range                   |
-| ``"<position"`` | Float   | Servo position, 0.0 to 1.0 range           |
+| Data Key            | Type    | Description                                |
+| ------------------- | ------- | ------------------------------------------ |
+| ``"<init"``         | Boolean | If PWM is initialized in the robot program |
+| ``"<speed"``        | Float   | Speed, -1.0 to 1.0 range                   |
+| ``"<position"``     | Float   | Servo position, 0.0 to 1.0 range           |
+| ``"<raw"``          | Integer | The pulse time in microseconds             |
+| ``"<period_scale"`` | Integer | Scales the PWM signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values) |
+| ``"<zero_latch"``   | Boolean | Whether the PWM should be latched to 0     |
 
 #### Relay Output ("Relay")
 
@@ -255,18 +322,20 @@ CAN messages all use a device value of ``"DeviceType[Number]"``, where the Devic
 
 Many of the CAN messages use the same data key/values as other standard messages.  They are separately namespaced to make it easier for implementations to separate them from main robot controller messages.
 
-C++/Java implementation note: these are created as SimDevice nodes where the device name is prefixed by the message name and ``":"``, for example ``"CANMotor:Controller[1]"``.
+C++/Java implementation note: these can be created through the API as SimDevice nodes where the device name is prefixed by the message name and ``":"``. For example, ``"CANMotor:Controller[1]"`` would create a device with a type value of ``CANMotor`` and a device value of ``Controller[1]``.
 
 #### CANMotor
 
 Only one of ``"supplyCurrent"`` or ``"motorCurrent"`` should be sent by the hardware; the other value should be set to zero.  If ``"busVoltage"`` is not simulated it should also be set to zero.
 
-| Data Key             | Type             | Description                                      |
-| -------------------- | ---------------- | ------------------------------------------------ |
-| ``"<percentOutput"`` | Integer or Float | Percent output (-1 to 1 range)                   |
-| ``">supplyCurrent"`` | Float            | The supply current in amps as simulated/measured |
-| ``">motorCurrent"``  | Float            | The motor current in amps as simulated/measured  |
-| ``">busVoltage"``    | Float            | The bus voltage as simulated/measured            |
+| Data Key             | Type             | Description                                                                         |
+| -------------------- | ---------------- | ----------------------------------------------------------------------------------- |
+| ``"<percentOutput"`` | Integer or Float | Percent output (-1 to 1 range)                                                      |
+| ``"<brakeMode"``     | Boolean          | Whether to brake (true) or coast (false) when `\|percentOutput\| < neutralDeadband` |
+| `"<neutralDeadband"` | Float            | `\|percentOutput\|` below which `brakeMode` matters (0 to 1)                        |
+| ``">supplyCurrent"`` | Float            | The supply current in amps as simulated/measured                                    |
+| ``">motorCurrent"``  | Float            | The motor current in amps as simulated/measured                                     |
+| ``">busVoltage"``    | Float            | The bus voltage as simulated/measured                                               |
 
 #### CANEncoder
 

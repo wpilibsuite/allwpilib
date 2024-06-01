@@ -26,18 +26,28 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
    * Creates a new product unit. Consider using {@link #combine} instead of manually calling this
    * constructor.
    *
-   * @param baseType the base type representing the unit product
    * @param a the first unit of the product
    * @param b the second unit of the product
    */
-  protected Mult(Class<? extends Mult<A, B>> baseType, A a, B b) {
+  protected Mult(A a, B b) {
     super(
-        baseType,
+        a.isBaseUnit() && b.isBaseUnit() ? null : combine(a.getBaseUnit(), b.getBaseUnit()),
         a.toBaseUnits(1) * b.toBaseUnits(1),
         a.name() + "-" + b.name(),
         a.symbol() + "*" + b.symbol());
     m_unitA = a;
     m_unitB = b;
+  }
+
+  Mult(
+      Mult<A, B> baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+    m_unitA = baseUnit.unitA();
+    m_unitB = baseUnit.unitB();
   }
 
   /**
@@ -63,7 +73,7 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
       return cache.get(key);
     }
 
-    var mult = new Mult<A, B>((Class) Mult.class, a, b);
+    var mult = new Mult<A, B>(a, b);
     cache.put(key, mult);
     return mult;
   }

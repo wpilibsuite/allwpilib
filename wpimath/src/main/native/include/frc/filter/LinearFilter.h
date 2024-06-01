@@ -321,8 +321,7 @@ class LinearFilter {
    * @throws std::runtime_error if size of inputBuffer or outputBuffer does not
    *   match the size of ffGains and fbGains provided in the constructor.
    */
-  void Reset(std::span<const double> inputBuffer,
-             std::span<const double> outputBuffer) {
+  void Reset(std::span<const T> inputBuffer, std::span<const T> outputBuffer) {
     // Clear buffers
     Reset();
 

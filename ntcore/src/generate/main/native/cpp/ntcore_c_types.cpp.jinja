@@ -16,11 +16,11 @@ static inline std::span<const T> ConvertFromC(const T* arr, size_t size) {
   return {arr, size};
 }
 
-static inline std::string_view ConvertFromC(const char* arr, size_t size) {
-  return {arr, size};
+static inline std::string_view ConvertFromC(const struct WPI_String* str) {
+  return wpi::to_string_view(str);
 }
 
-static std::vector<std::string> ConvertFromC(const NT_String* arr, size_t size) {
+static std::vector<std::string> ConvertFromC(const struct WPI_String* arr, size_t size) {
   std::vector<std::string> v;
   v.reserve(size);
   for (size_t i = 0; i < size; ++i) {
@@ -35,6 +35,8 @@ static void ConvertToC(const nt::Timestamped{{ t.TypeName }}& in, NT_Timestamped
   out->serverTime = in.serverTime;
 {%- if t.c.IsArray %}
   out->value = ConvertToC<{{ t.c.ValueType[:-1] }}>(in.value, &out->len);
+{% elif t.c.ValueInline %}
+  ConvertToC(in.value, &out->value);
 {% else %}
   out->value = in.value;
 {% endif -%}
@@ -46,6 +48,8 @@ extern "C" {
 NT_Bool NT_Set{{ t.TypeName }}(NT_Handle pubentry, int64_t time, {{ t.c.ParamType }} value{% if t.c.IsArray %}, size_t len{% endif %}) {
 {%- if t.c.IsArray %}
   return nt::Set{{ t.TypeName }}(pubentry, ConvertFromC(value, len), time);
+{%- elif t.c.ValueInline %}
+  return nt::Set{{ t.TypeName }}(pubentry, ConvertFromC(value), time);
 {%- else %}
   return nt::Set{{ t.TypeName }}(pubentry, value, time);
 {%- endif %}
@@ -54,10 +58,20 @@ NT_Bool NT_Set{{ t.TypeName }}(NT_Handle pubentry, int64_t time, {{ t.c.ParamTyp
 NT_Bool NT_SetDefault{{ t.TypeName }}(NT_Handle pubentry, {{ t.c.ParamType }} defaultValue{% if t.c.IsArray %}, size_t defaultValueLen{% endif %}) {
 {%- if t.c.IsArray %}
   return nt::SetDefault{{ t.TypeName }}(pubentry, ConvertFromC(defaultValue, defaultValueLen));
+{%- elif t.c.ValueInline %}
+  return nt::SetDefault{{ t.TypeName }}(pubentry, ConvertFromC(defaultValue));
 {%- else %}
   return nt::SetDefault{{ t.TypeName }}(pubentry, defaultValue);
 {%- endif %}
 }
+
+{%- if t.c.ValueInline %}
+
+void NT_Get{{ t.TypeName }}(NT_Handle subentry, {{ t.c.ParamType }} defaultValue, {{ t.c.ValueType }} value) {
+  auto cppValue = nt::Get{{ t.TypeName }}(subentry, ConvertFromC(defaultValue));
+  ConvertToC(cppValue, value);
+}
+{%- else %}
 
 {{ t.c.ValueType }} NT_Get{{ t.TypeName }}(NT_Handle subentry, {{ t.c.ParamType }} defaultValue{% if t.c.IsArray %}, size_t defaultValueLen, size_t* len{% endif %}) {
 {%- if t.c.IsArray %}
@@ -67,10 +81,13 @@ NT_Bool NT_SetDefault{{ t.TypeName }}(NT_Handle pubentry, {{ t.c.ParamType }} de
   return nt::Get{{ t.TypeName }}(subentry, defaultValue);
 {%- endif %}
 }
+{%- endif %}
 
 void NT_GetAtomic{{ t.TypeName }}(NT_Handle subentry, {{ t.c.ParamType }} defaultValue{% if t.c.IsArray %}, size_t defaultValueLen{% endif %}, struct NT_Timestamped{{ t.TypeName }}* value) {
 {%- if t.c.IsArray %}
   auto cppValue = nt::GetAtomic{{ t.TypeName }}(subentry, ConvertFromC(defaultValue, defaultValueLen));
+{%- elif t.c.ValueInline %}
+  auto cppValue = nt::GetAtomic{{ t.TypeName }}(subentry, ConvertFromC(defaultValue));
 {%- else %}
   auto cppValue = nt::GetAtomic{{ t.TypeName }}(subentry, defaultValue);
 {%- endif %}
@@ -79,7 +96,9 @@ void NT_GetAtomic{{ t.TypeName }}(NT_Handle subentry, {{ t.c.ParamType }} defaul
 
 void NT_DisposeTimestamped{{ t.TypeName }}(struct NT_Timestamped{{ t.TypeName }}* value) {
 {%- if t.TypeName == "StringArray" %}
-  NT_FreeStringArray(value->value, value->len);
+  WPI_FreeStringArray(value->value, value->len);
+{%- elif t.TypeName == "String" %}
+  WPI_FreeString(&value->value);
 {%- elif t.c.IsArray %}
   std::free(value->value);
 {%- endif %}
@@ -97,7 +116,7 @@ void NT_FreeQueue{{ t.TypeName }}(struct NT_Timestamped{{ t.TypeName }}* arr, si
   std::free(arr);
 }
 
-{%- if not t.c.IsArray %}
+{%- if not t.c.IsArray and not t.c.ValueInline %}
 {{ t.c.ValueType }}* NT_ReadQueueValues{{ t.TypeName }}(NT_Handle subentry, size_t* len) {
   auto arr = nt::ReadQueueValues{{ t.TypeName }}(subentry);
   return ConvertToC<{{ t.c.ValueType }}>(arr, len);

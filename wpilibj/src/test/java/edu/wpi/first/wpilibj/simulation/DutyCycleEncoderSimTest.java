@@ -15,47 +15,11 @@ import org.junit.jupiter.api.Test;
 class DutyCycleEncoderSimTest {
   @Test
   void setTest() {
-    try (DutyCycleEncoder encoder = new DutyCycleEncoder(0)) {
+    try (DutyCycleEncoder encoder = new DutyCycleEncoder(0, 5.67, 0)) {
       DutyCycleEncoderSim sim = new DutyCycleEncoderSim(encoder);
 
       sim.set(5.67);
       assertEquals(5.67, encoder.get());
-    }
-  }
-
-  @Test
-  void setDistanceTest() {
-    HAL.initialize(500, 0);
-
-    try (DutyCycleEncoder encoder = new DutyCycleEncoder(0)) {
-      DutyCycleEncoderSim sim = new DutyCycleEncoderSim(encoder);
-
-      sim.setDistance(19.1);
-      assertEquals(19.1, encoder.getDistance());
-    }
-  }
-
-  @Test
-  void setDistancePerRotationTest() {
-    HAL.initialize(500, 0);
-
-    try (DutyCycleEncoder encoder = new DutyCycleEncoder(0)) {
-      DutyCycleEncoderSim sim = new DutyCycleEncoderSim(encoder);
-      sim.set(1.5);
-      encoder.setDistancePerRotation(42);
-      assertEquals(63.0, encoder.getDistance());
-    }
-  }
-
-  @Test
-  void setAbsolutePositionTest() {
-    HAL.initialize(500, 0);
-
-    try (DutyCycleEncoder encoder = new DutyCycleEncoder(0)) {
-      DutyCycleEncoderSim sim = new DutyCycleEncoderSim(encoder);
-
-      sim.setAbsolutePosition(0.75);
-      assertEquals(0.75, encoder.getAbsolutePosition());
     }
   }
 
@@ -70,20 +34,6 @@ class DutyCycleEncoderSimTest {
       assertTrue(encoder.isConnected());
       sim.setConnected(false);
       assertFalse(encoder.isConnected());
-    }
-  }
-
-  @Test
-  void resetTest() {
-    HAL.initialize(500, 0);
-
-    try (DutyCycleEncoder encoder = new DutyCycleEncoder(0)) {
-      DutyCycleEncoderSim sim = new DutyCycleEncoderSim(encoder);
-
-      sim.setDistance(2.5);
-      assertEquals(2.5, encoder.getDistance());
-      encoder.reset();
-      assertEquals(0.0, encoder.getDistance());
     }
   }
 }

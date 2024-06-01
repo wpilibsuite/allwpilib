@@ -64,7 +64,7 @@ option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
 option(WITH_WPIUNITS "Build wpiunits" ON)
-option(WITH_WPILIB "Build hal, wpilibc/j, and myRobot (needs OpenCV)" ON)
+option(WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
@@ -198,6 +198,9 @@ endif()
 set(include_dest include)
 set(java_lib_dest java)
 set(jni_lib_dest jni)
+if(WITH_JAVA)
+    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
+endif()
 
 if(USE_SYSTEM_LIBUV)
     set(LIBUV_SYSTEM_REPLACE
@@ -284,7 +287,7 @@ set(CMAKE_EXE_LINKER_FLAGS_ASAN
 set(CMAKE_SHARED_LINKER_FLAGS_ASAN
     "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address"
     CACHE STRING
-    "Linker lags to be used to create shared libraries for Asan build type."
+    "Linker flags to be used to create shared libraries for Asan build type."
     FORCE
 )
 
@@ -312,7 +315,7 @@ set(CMAKE_EXE_LINKER_FLAGS_TSAN
 set(CMAKE_SHARED_LINKER_FLAGS_TSAN
     "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=thread"
     CACHE STRING
-    "Linker lags to be used to create shared libraries for Tsan build type."
+    "Linker flags to be used to create shared libraries for Tsan build type."
     FORCE
 )
 
@@ -340,7 +343,7 @@ set(CMAKE_EXE_LINKER_FLAGS_UBSAN
 set(CMAKE_SHARED_LINKER_FLAGS_UBSAN
     "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=undefined"
     CACHE STRING
-    "Linker lags to be used to create shared libraries for Ubsan build type."
+    "Linker flags to be used to create shared libraries for Ubsan build type."
     FORCE
 )
 
@@ -405,7 +408,7 @@ if(WITH_WPILIB)
     if(WITH_EXAMPLES)
         add_subdirectory(wpilibcExamples)
     endif()
-    add_subdirectory(myRobot)
+    add_subdirectory(developerRobot)
 endif()
 
 if(WITH_SIMULATION_MODULES AND NOT WITH_EXTERNAL_HAL)

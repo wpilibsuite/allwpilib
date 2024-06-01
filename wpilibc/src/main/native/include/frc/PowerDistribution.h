@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -51,6 +53,13 @@ class PowerDistribution : public wpi::Sendable,
   PowerDistribution& operator=(PowerDistribution&&) = default;
 
   /**
+   * Gets the number of channels for this power distribution object.
+   *
+   * @return Number of output channels (16 for PDP, 24 for PDH).
+   */
+  int GetNumChannels() const;
+
+  /**
    * Query the input voltage of the PDP/PDH.
    *
    * @return The input voltage in volts
@@ -74,6 +83,13 @@ class PowerDistribution : public wpi::Sendable,
    * @return The current of the channel in Amperes
    */
   double GetCurrent(int channel) const;
+
+  /**
+   * Query all currents of the PDP.
+   *
+   * @return The current of each channel in Amperes
+   */
+  std::vector<double> GetAllCurrents() const;
 
   /**
    * Query the total current of all monitored PDP/PDH channels.

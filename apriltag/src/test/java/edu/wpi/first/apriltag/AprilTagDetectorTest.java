@@ -29,15 +29,10 @@ class AprilTagDetectorTest {
   @SuppressWarnings("MemberName")
   AprilTagDetector detector;
 
-  static RuntimeLoader<Core> loader;
-
   @BeforeAll
   static void beforeAll() {
     try {
-      loader =
-          new RuntimeLoader<>(
-              Core.NATIVE_LIBRARY_NAME, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
-      loader.loadLibrary();
+      RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     } catch (IOException ex) {
       fail(ex);
     }

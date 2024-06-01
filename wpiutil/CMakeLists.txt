@@ -17,7 +17,6 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.15.2.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
@@ -25,13 +24,16 @@ if(WITH_JAVA)
 
         message(STATUS "Downloading Jackson jarfiles...")
 
-        download_and_check("${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar"
+        download_and_check(
+            "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar"
             "${JAR_ROOT}/jackson-core-2.15.2.jar"
         )
-        download_and_check("${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar"
+        download_and_check(
+            "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar"
             "${JAR_ROOT}/jackson-databind-2.15.2.jar"
         )
-        download_and_check("${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar"
+        download_and_check(
+            "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar"
             "${JAR_ROOT}/jackson-annotations-2.15.2.jar"
         )
 
@@ -69,6 +71,7 @@ if(WITH_JAVA)
         OUTPUT_NAME wpiutil
         GENERATE_NATIVE_HEADERS wpiutil_jni_headers
     )
+    set_property(TARGET wpiutil_jar PROPERTY FOLDER "java")
 
     install_jar(wpiutil_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS wpiutil_jar FILE wpiutil_jar.cmake DESTINATION share/wpiutil)
@@ -158,6 +161,11 @@ if(MSVC)
 endif()
 wpilib_target_warnings(wpiutil)
 target_link_libraries(wpiutil protobuf::libprotobuf Threads::Threads ${CMAKE_DL_LIBS})
+
+if(Protobuf_VERSION VERSION_GREATER_EQUAL 4)
+    find_package(absl REQUIRED)
+    target_link_libraries(wpiutil absl::spinlock_wait)
+endif()
 
 if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})

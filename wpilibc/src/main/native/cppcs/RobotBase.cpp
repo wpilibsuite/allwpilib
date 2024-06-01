@@ -11,10 +11,10 @@
 #include <cstdio>
 
 #include <cameraserver/CameraServerShared.h>
-#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/print.h>
 #include <wpi/timestamp.h>
 #include <wpimath/MathShared.h>
 
@@ -244,7 +244,7 @@ RobotBase::RobotBase() {
     std::this_thread::sleep_for(10ms);
     ++count;
     if (count > 100) {
-      fmt::print(stderr, "timed out while waiting for NT server to start\n");
+      wpi::print(stderr, "timed out while waiting for NT server to start\n");
       break;
     }
   }

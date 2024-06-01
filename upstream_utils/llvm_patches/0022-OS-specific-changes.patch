@@ -12,7 +12,7 @@ index e253d6f7a5ca3aee75823efdb9717dcd93fff5dc..5c08e469e2e44b27e69f4aa974bc59de
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -96,15 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
-     fmt::print(stderr, "LLVM ERROR: {}\n", Reason);
+     wpi::print(stderr, "LLVM ERROR: {}\n", Reason);
    }
  
 -  // If we reached here, we are failing ungracefully. Run the interrupt handlers

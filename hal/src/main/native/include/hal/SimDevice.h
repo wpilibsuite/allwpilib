@@ -48,6 +48,9 @@ extern "C" {
  * appending the instance/unique identifier in brackets to the base name,
  * e.g. "device[1]".
  *
+ * Using a device name of the form "Type:Name" will create a WebSockets node
+ * with a type value of "Type" and a device value of "Name"
+ *
  * 0 is returned if not in simulation.
  *
  * @param name device name
@@ -664,6 +667,9 @@ class SimDevice {
    * recommend appending the instance/unique identifier in brackets to the base
    * name, e.g. "device[1]".
    *
+   * Using a device name of the form "Type:Name" will create a WebSockets node
+   * with a type value of "Type" and a device value of "Name"
+   *
    * If not in simulation, results in an "empty" object that evaluates to false
    * in a boolean context.
    *
@@ -678,6 +684,9 @@ class SimDevice {
    * already exists.  This is a convenience method that appends index in
    * brackets to the device name, e.g. passing index=1 results in "device[1]"
    * for the device name.
+   *
+   * Using a device name of the form "Type:Name" will create a WebSockets node
+   * with a type value of "Type" and a device value of "Name"
    *
    * If not in simulation, results in an "empty" object that evaluates to false
    * in a boolean context.
@@ -694,6 +703,9 @@ class SimDevice {
    * already exists.  This is a convenience method that appends index and
    * channel in brackets to the device name, e.g. passing index=1 and channel=2
    * results in "device[1,2]" for the device name.
+   *
+   * Using a device name of the form "Type:Name" will create a WebSockets node
+   * with a type value of "Type" and a device value of "Name"
    *
    * If not in simulation, results in an "empty" object that evaluates to false
    * in a boolean context.
