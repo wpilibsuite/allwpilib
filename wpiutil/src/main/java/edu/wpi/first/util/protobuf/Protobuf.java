@@ -119,8 +119,8 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
 
   /**
    * Creates a (deep) clone of the object. May also return the object directly if the object is
-   * immutable. Default implementation throws CloneNotSupportedException. Typically this should
-   * be implemented by implementing clone() on the object itself, and calling it from here.
+   * immutable. Default implementation throws CloneNotSupportedException. Typically this should be
+   * implemented by implementing clone() on the object itself, and calling it from here.
    *
    * @param obj object to clone
    * @return Clone of object (if immutable, may be same object)
