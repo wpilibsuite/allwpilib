@@ -87,7 +87,7 @@ void Compressor::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddDoubleProperty(
       "Current (A)", [this] { return GetCurrent().value(); }, nullptr);
   // These are not supported by the CTRE PCM
-  if (typeid(*m_module) == typeid(PneumaticHub)) {
+  if (dynamic_cast<PneumaticHub*>(m_module.get())) {
     builder.AddDoubleProperty(
         "Analog Voltage", [this] { return GetAnalogVoltage().value(); },
         nullptr);
