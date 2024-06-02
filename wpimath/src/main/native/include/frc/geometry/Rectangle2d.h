@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Transform2d.h"
@@ -20,7 +22,7 @@ namespace frc {
  * Represents a 2d rectangular space containing translational, rotational, and
  * scaling components.
  */
-class Rectangle2d {
+class WPILIB_DLLEXPORT Rectangle2d {
  public:
   /**
    * Constructs a rectangle at the specified position with the specified width

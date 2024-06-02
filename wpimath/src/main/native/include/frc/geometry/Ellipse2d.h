@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include <gcem.hpp>
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "frc/geometry/Pose2d.h"
@@ -22,7 +23,7 @@ namespace frc {
  * Represents a 2d ellipse space containing translational, rotational, and
  * scaling components.
  */
-class Ellipse2d {
+class WPILIB_DLLEXPORT Ellipse2d {
  public:
   /**
    * Constructs an ellipse around a center point and two semi-axes, a horizontal
