@@ -271,7 +271,7 @@ public final class UnitBuilder<U extends Unit<U>> {
         });
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
   private static <U extends Unit<U>> Constructor<? extends Unit<U>> getConstructor(U baseUnit)
       throws NoSuchMethodException {
     var baseClass = baseUnit.getClass();
