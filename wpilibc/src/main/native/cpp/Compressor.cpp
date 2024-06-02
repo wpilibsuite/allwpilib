@@ -16,7 +16,8 @@
 using namespace frc;
 
 Compressor::Compressor(int module, PneumaticsModuleType moduleType)
-    : m_module{PneumaticsBase::GetForType(module, moduleType)} {
+    : m_module{PneumaticsBase::GetForType(module, moduleType)},
+      m_moduleType{moduleType} {
   if (!m_module->ReserveCompressor()) {
     throw FRC_MakeError(err::ResourceAlreadyAllocated, "{}", module);
   }
@@ -87,7 +88,7 @@ void Compressor::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddDoubleProperty(
       "Current (A)", [this] { return GetCurrent().value(); }, nullptr);
   // These are not supported by the CTRE PCM
-  if (dynamic_cast<PneumaticHub*>(m_module.get())) {
+  if (m_moduleType == PneumaticsModuleType::REVPH) {
     builder.AddDoubleProperty(
         "Analog Voltage", [this] { return GetAnalogVoltage().value(); },
         nullptr);
