@@ -205,3 +205,6 @@ class WPILIB_DLLEXPORT Rectangle2d {
 };
 
 }  // namespace frc
+
+#include "frc/geometry/proto/Rectangle2dProto.h"
+#include "frc/geometry/struct/Rectangle2dStruct.h"

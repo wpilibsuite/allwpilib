@@ -207,3 +207,6 @@ class WPILIB_DLLEXPORT Ellipse2d {
 };
 
 }  // namespace frc
+
+#include "frc/geometry/proto/Ellipse2dProto.h"
+#include "frc/geometry/struct/Ellipse2dStruct.h"
