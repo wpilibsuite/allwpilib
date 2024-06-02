@@ -4,12 +4,10 @@
 
 #pragma once
 
-#include <algorithm>
-#include <array>
-#include <cmath>
 #include <stdexcept>
 
 #include <gcem.hpp>
+#include <wpi/array.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -80,17 +78,17 @@ class Ellipse2d {
    *
    * @return The focal points.
    */
-  constexpr std::array<Translation2d, 2> FocalPoints() const {
+  constexpr wpi::array<Translation2d, 2> FocalPoints() const {
     auto a = units::math::max(m_xSemiAxis, m_ySemiAxis);  // Major semi-axis
     auto b = units::math::min(m_xSemiAxis, m_ySemiAxis);  // Minor semi-axis
     auto c = units::math::sqrt(a * a - b * b);
 
     if (m_xSemiAxis > m_ySemiAxis) {
-      return std::array{
+      return wpi::array{
           (m_center + Transform2d{-c, 0_m, Rotation2d{}}).Translation(),
           (m_center + Transform2d{c, 0_m, Rotation2d{}}).Translation()};
     } else {
-      return std::array{
+      return wpi::array{
           (m_center + Transform2d{0_m, -c, Rotation2d{}}).Translation(),
           (m_center + Transform2d{0_m, c, Rotation2d{}}).Translation()};
     }
