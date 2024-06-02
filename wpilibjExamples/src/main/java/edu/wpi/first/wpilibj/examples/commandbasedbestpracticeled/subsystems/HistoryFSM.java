@@ -70,12 +70,10 @@ public class HistoryFSM extends SubsystemBase {
     private double debounceTime = 0.04;
 
     public HistoryFSM(LEDView robotSignals, CommandXboxController operatorController) {
+
         this.robotSignals = robotSignals;
 
-        // initialize all the hues of the color wheel
-        for (int i = 0; i < computerColorWheel; i++) {
-            fillInitialTimes();
-        }
+        fillInitialTimes();// initialize last time used for all the hues of the color wheel
 
         // Trigger if it's time for a new color or the operator pressed their "Y" button
         timeOfNewColor.or(operatorController.y().debounce(debounceTime)).onTrue(runOnce(this::getHSV)/*.ignoringDisable(true)*/);
@@ -99,11 +97,14 @@ public class HistoryFSM extends SubsystemBase {
     }
 
     /**
-     * Create an initialized element in the list
+     * Create an initialized list of hues
      */
     private void fillInitialTimes() {
-        var time = Seconds.of(beginningOfTime); // indicate color hasn't been used in a long time ago so available immediately
-        lastTimeHistoryOfColors.add(time);
+        
+        // initially indicate hue hasn't been used in a long time ago so available immediately
+        for (int i = 0; i < computerColorWheel; i++) {
+            lastTimeHistoryOfColors.add(Seconds.of(beginningOfTime));
+        }
     }
 
     /**
@@ -151,7 +152,14 @@ public class HistoryFSM extends SubsystemBase {
      */
     public void beforeCommands() {}
 
+    // int counter = 0; // limit prints
     public void afterCommands() {
+
+        // counter++;
+        // if(counter%600 == 0) {
+        //     for(int i = 0; i < lastTimeHistoryOfColors.size(); i++)
+        //     System.out.println(i + " " + lastTimeHistoryOfColors.get(i).toLongString());
+        // }
 
         // Set and refresh the color could be done many ways:
         // here which is called periodically through Robot.periodic(),
