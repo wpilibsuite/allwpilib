@@ -48,4 +48,9 @@ public class Transform2dStruct implements Struct<Transform2d> {
     Translation2d.struct.pack(bb, value.getTranslation());
     Rotation2d.struct.pack(bb, value.getRotation());
   }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
+  }
 }

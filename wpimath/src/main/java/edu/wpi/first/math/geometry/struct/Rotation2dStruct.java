@@ -39,4 +39,9 @@ public class Rotation2dStruct implements Struct<Rotation2d> {
   public void pack(ByteBuffer bb, Rotation2d value) {
     bb.putDouble(value.getRadians());
   }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
+  }
 }

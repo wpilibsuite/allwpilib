@@ -35,4 +35,9 @@ public class Translation2dProto implements Protobuf<Translation2d, ProtobufTrans
     msg.setX(value.getX());
     msg.setY(value.getY());
   }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
+  }
 }

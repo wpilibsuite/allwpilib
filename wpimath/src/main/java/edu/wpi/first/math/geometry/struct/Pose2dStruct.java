@@ -48,4 +48,9 @@ public class Pose2dStruct implements Struct<Pose2d> {
     Translation2d.struct.pack(bb, value.getTranslation());
     Rotation2d.struct.pack(bb, value.getRotation());
   }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
+  }
 }
