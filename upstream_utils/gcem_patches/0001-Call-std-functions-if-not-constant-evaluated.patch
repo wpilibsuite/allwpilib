@@ -1454,14 +1454,14 @@ index af23ea21d247327fa224370544e5f4410eac214b..4c95110d627568577440e5e662e72fde
 +
  #endif
 diff --git a/include/gcem_incl/max.hpp b/include/gcem_incl/max.hpp
-index ddc3e4e6caff1a781e662a3ded8909cb703729ab..9f3901b4b19eb35331cd22be16c5b3a1ab5f65d6 100644
+index ddc3e4e6caff1a781e662a3ded8909cb703729ab..258031508ec490b49c71dbf60f3c5669f4c7c380 100644
 --- a/include/gcem_incl/max.hpp
 +++ b/include/gcem_incl/max.hpp
 @@ -21,6 +21,12 @@
  #ifndef _gcem_max_HPP
  #define _gcem_max_HPP
  
-+#include <cmath>
++#include <algorithm>
 +#include <type_traits>
 +
 +namespace gcem
@@ -1485,14 +1485,14 @@ index ddc3e4e6caff1a781e662a3ded8909cb703729ab..9f3901b4b19eb35331cd22be16c5b3a1
  
  #endif
 diff --git a/include/gcem_incl/min.hpp b/include/gcem_incl/min.hpp
-index 5ce70b38e6d243267a053ec33fae31e59f6a359f..a35bcf6e2cb65f8712b873d3ef2827aca2d4d0f0 100644
+index 5ce70b38e6d243267a053ec33fae31e59f6a359f..af1be618776413f8de8bcce5d56fc838ee5c968a 100644
 --- a/include/gcem_incl/min.hpp
 +++ b/include/gcem_incl/min.hpp
 @@ -21,6 +21,12 @@
  #ifndef _gcem_min_HPP
  #define _gcem_min_HPP
  
-+#include <cmath>
++#include <algorithm>
 +#include <type_traits>
 +
 +namespace gcem
