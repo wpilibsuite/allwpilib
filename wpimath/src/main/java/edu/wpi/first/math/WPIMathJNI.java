@@ -295,7 +295,7 @@ public final class WPIMathJNI {
    * @param pointY The y coordinate of the point that this will find the nearest point to.
    * @param nearestPoint Array to store nearest point into.
    */
-  public static native void Ellipse2dFindNearestPoint(
+  public static native void ellipse2dFindNearestPoint(
       double centerX,
       double centerY,
       double centerHeading,

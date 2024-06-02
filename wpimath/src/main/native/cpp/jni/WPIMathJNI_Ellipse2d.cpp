@@ -16,11 +16,11 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    Ellipse2dFindNearestPoint
+ * Method:    ellipse2dFindNearestPoint
  * Signature: (DDDDDDD[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_Ellipse2dFindNearestPoint
+Java_edu_wpi_first_math_WPIMathJNI_ellipse2dFindNearestPoint
   (JNIEnv* env, jclass, jdouble centerX, jdouble centerY, jdouble centerHeading,
    jdouble xSemiAxis, jdouble ySemiAxis, jdouble pointX, jdouble pointY,
    jdoubleArray nearestPoint)

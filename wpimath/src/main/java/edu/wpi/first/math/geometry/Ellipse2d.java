@@ -172,7 +172,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
     // Find nearest point
     var nearestPoint = new double[2];
-    WPIMathJNI.Ellipse2dFindNearestPoint(
+    WPIMathJNI.ellipse2dFindNearestPoint(
         m_center.getX(),
         m_center.getY(),
         m_center.getRotation().getRadians(),
