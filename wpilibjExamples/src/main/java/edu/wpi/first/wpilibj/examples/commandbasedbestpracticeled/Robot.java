@@ -80,6 +80,7 @@
  * Triggers available for other systems to use
  * Default commands can either run or not run within a sequential group depending on how the group is defined using Proxy
  * Commands run in sequenced by triggering successive commands
+ * Use of Measure<Time>
  */
 
 /* Default Commands can be useful but they normally do not run within grouped

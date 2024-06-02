@@ -20,13 +20,18 @@ package frc.robot.subsystems;
  * periodic as used for a sub-purpose here is a good way.
  */
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import frc.robot.Color;
 import frc.robot.LEDPattern;
 import frc.robot.subsystems.RobotSignals.LEDView;
@@ -49,17 +54,31 @@ public class HistoryFSM extends SubsystemBase {
 
     //  Time data is saved for how long a color is to persist in the display.
 
-    private long[] lastTimeHistoryOfColors = new long[180];
-    private long nextTime = Long.MAX_VALUE; // initialize so the time doesn't trigger anything until the "Y" button is pressed
+    int computerColorWheel = 180; // max count of hues numbered 0 to 179
+    // list of the last times of all the colors so try not to repeat for a long time so repeats are rare
+    private List<Measure<Time>> lastTimeHistoryOfColors = new ArrayList<>(computerColorWheel);
+
+    private double beginningOfTime = 0.;
+    private double endOfTime = Double.MAX_VALUE;
+
+    // time the current color display should end and a new color selected
+    private Measure<Time> nextTime = Milliseconds.of(endOfTime); // initialize so the time doesn't trigger anything until the "Y" button is pressed
+    Measure<Time> changeColorPeriod = Seconds.of(2.); // display color for this long
+    Measure<Time> colorLockoutPeriod = Seconds.of(20.); // try not to reuse a color for this long
+    // elapsed timer
     private Trigger timeOfNewColor = new Trigger(this::timesUp);
+    private double debounceTime = 0.04;
 
     public HistoryFSM(LEDView robotSignals, CommandXboxController operatorController) {
         this.robotSignals = robotSignals;
 
-        Arrays.fill(lastTimeHistoryOfColors, 0); // initially indicate color hasn't been used since a long time ago
+        // initialize all the hues of the color wheel
+        for (int i = 0; i < computerColorWheel; i++) {
+            fillInitialTimes();
+        }
 
         // Trigger if it's time for a new color or the operator pressed their "Y" button
-        timeOfNewColor.or(operatorController.y().debounce(.04)).onTrue(runOnce(this::getHSV)/*.ignoringDisable(true)*/);
+        timeOfNewColor.or(operatorController.y().debounce(debounceTime)).onTrue(runOnce(this::getHSV)/*.ignoringDisable(true)*/);
     }
 
     /**
@@ -70,13 +89,21 @@ public class HistoryFSM extends SubsystemBase {
      */
     private boolean timesUp() {
 
-        if( System.currentTimeMillis() >= nextTime) {
-            nextTime = Long.MAX_VALUE; // reset; if a command is running that will set the correct "nextTime".
+        if( nextTime.lt(Milliseconds.of(System.currentTimeMillis()))) {
+            nextTime = Milliseconds.of(endOfTime); // reset; if a command is running that will set the correct "nextTime".
                                        // If it isn't running, then wait for "Y" press
             // this locks-out automatic restarting on disable to enable change; "Y" must be pressed to get it started again.
             return true;
         }
         return false; // not time to trigger yet
+    }
+
+    /**
+     * Create an initialized element in the list
+     */
+    private void fillInitialTimes() {
+        var time = Seconds.of(beginningOfTime); // indicate color hasn't been used in a long time ago so available immediately
+        lastTimeHistoryOfColors.add(time);
     }
 
     /**
@@ -87,20 +114,19 @@ public class HistoryFSM extends SubsystemBase {
      */
     public void getHSV() {
 
-        long currentTime = System.currentTimeMillis();
-        long changeColorPeriod = 2_000; // milliseconds
-        long colorLockoutPeriod = 20_000; // milliseconds
-        nextTime = currentTime + changeColorPeriod; // this method sets up the time for the trigger of its next run
+        Measure<Time> currentTime = Milliseconds.of(System.currentTimeMillis());
+        nextTime = currentTime.plus(changeColorPeriod); // this method sets up the time for the trigger of its next run
         int randomHue; // to be the next color
         int loopCounter = 1; // count attempts to find a different hue
         int loopCounterLimit = 100; // limit attempts to find a different hue
 
         do {
-            // Generate random integers in range 0 to 180 (a computer color wheel)
-            randomHue = rand.nextInt(180);
+            // Generate random numbers for hues in range of the computer color wheel
+            randomHue = rand.nextInt(computerColorWheel);
             // if hue hasn't been used recently, then use it now and update its history
-            if(lastTimeHistoryOfColors[randomHue] < currentTime - colorLockoutPeriod) {
-                lastTimeHistoryOfColors[randomHue] = currentTime;
+            var colorTime = lastTimeHistoryOfColors.get(randomHue); // get the associated time
+            if(colorTime.lt(currentTime.minus(colorLockoutPeriod))) {
+                lastTimeHistoryOfColors.set(randomHue, currentTime);
                 break;
             }
         // hue used recently so loop to get another hue
