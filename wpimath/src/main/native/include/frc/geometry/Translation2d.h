@@ -131,7 +131,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * <pre>
    * [x_new]   [rot.cos, -rot.sin][x - other.x]   [other.x]
-   * [y_new] = [rot.sin, rot.cos][y - other.y]  + [other.y]
+   * [y_new] = [rot.sin,  rot.cos][y - other.y] + [other.y]
    * </pre>
    *
    * @param other The other translation to rotate around.
