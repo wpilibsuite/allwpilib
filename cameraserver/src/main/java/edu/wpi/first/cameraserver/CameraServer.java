@@ -342,13 +342,11 @@ public final class CameraServer {
         } else {
           yield "ip:";
         }
-      case kCv:
-        return "cv:";
-      case kRaw:
-        return "raw:";
-      default:
-        return "unknown:";
-    }
+      }
+      case kCv -> "cv:";
+      case kRaw -> "raw:";
+      case kUnknown -> "unknown:";
+    };
   }
 
   /**
@@ -487,8 +485,11 @@ public final class CameraServer {
       case kYUYV -> "YUYV";
       case kRGB565 -> "RGB565";
       case kBGR -> "BGR";
+      case kBGRA -> "BGRA";
       case kGray -> "Gray";
-      case kUnknown, kUYVY, kY16 -> "Unknown";
+      case kY16 -> "Y16";
+      case kUYVY -> "UYVY";
+      case kUnknown -> "Unknown";
     };
   }
 

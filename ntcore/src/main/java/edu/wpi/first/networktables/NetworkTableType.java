@@ -124,8 +124,8 @@ public enum NetworkTableType {
       case Long[] l -> "int[]";
       case double[] d -> "double[]";
       case Double[] d -> "double[]";
-      // Treat any other boxed numeric type (byte, char, short) as double
-      // Note that byte arrays are checked earlier because those are raw values
+        // Treat any other boxed numeric type (byte, char, short) as double
+        // Note that byte arrays are checked earlier because those are raw values
       case Number n -> "double";
       case Number[] n -> "double[]";
       default -> "";

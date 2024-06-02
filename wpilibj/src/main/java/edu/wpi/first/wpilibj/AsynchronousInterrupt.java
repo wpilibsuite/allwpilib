@@ -139,18 +139,17 @@ public class AsynchronousInterrupt implements AutoCloseable {
       boolean rising = false;
       boolean falling = false;
       switch (result) {
-        case kBoth:
+        case kBoth -> {
           rising = true;
           falling = true;
-          break;
-        case kFallingEdge:
+        }
+        case kFallingEdge -> {
           falling = true;
-          break;
-        case kRisingEdge:
+        }
+        case kRisingEdge -> {
           rising = true;
-          break;
-        default:
-          break;
+        }
+        case kTimeout -> {}
       }
 
       m_callback.accept(rising, falling);

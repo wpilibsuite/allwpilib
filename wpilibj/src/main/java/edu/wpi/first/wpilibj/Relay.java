@@ -223,9 +223,6 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
           RelayJNI.setRelay(m_reverseHandle, true);
         }
       }
-      default -> {
-        // Cannot hit this, limited by Value enum
-      }
     }
   }
 

@@ -394,14 +394,8 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
     if (o == this) {
       return true;
     }
-
-    if (!(o instanceof ChassisSpeeds)) {
-      return false;
-    }
-
-    ChassisSpeeds c = (ChassisSpeeds) o;
-
-    return vxMetersPerSecond == c.vxMetersPerSecond
+    return o instanceof ChassisSpeeds c
+        && vxMetersPerSecond == c.vxMetersPerSecond
         && vyMetersPerSecond == c.vyMetersPerSecond
         && omegaRadiansPerSecond == c.omegaRadiansPerSecond;
   }

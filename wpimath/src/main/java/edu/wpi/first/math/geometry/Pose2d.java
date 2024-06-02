@@ -309,8 +309,8 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Pose2d pose
-             && m_translation.equals(pose.m_translation)
-             && m_rotation.equals(pose.m_rotation);
+        && m_translation.equals(pose.m_translation)
+        && m_rotation.equals(pose.m_rotation);
   }
 
   @Override

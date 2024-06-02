@@ -609,8 +609,8 @@ public final class NetworkTable {
   @Override
   public boolean equals(Object other) {
     return other instanceof NetworkTable ntOther
-             && m_inst.equals(ntOther.m_inst)
-             && m_path.equals(ntOther.m_path);
+        && m_inst.equals(ntOther.m_inst)
+        && m_path.equals(ntOther.m_path);
   }
 
   @Override
