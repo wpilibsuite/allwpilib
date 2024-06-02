@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class Ellipse2dTest {
+  private static final double kEpsilon = 1E-9;
+
   @Test
   void testGetFocalPoints() {
     var center = new Pose2d(1, 2, new Rotation2d());
@@ -50,6 +52,41 @@ class Ellipse2dTest {
 
     assertAll(
         () -> assertTrue(ellipse.contains(pointA)), () -> assertFalse(ellipse.contains(pointB)));
+  }
+
+  @Test
+  void testDistanceToPoint() {
+    var center = new Pose2d(1.0, 2.0, Rotation2d.fromDegrees(270.0));
+    var ellipse = new Ellipse2d(center, 1.0, 2.0);
+
+    var point1 = new Translation2d(2.5, 2.0);
+    var point2 = new Translation2d(1.0, 2.0);
+    var point3 = new Translation2d(1.0, 1.0);
+    var point4 = new Translation2d(-1.0, 2.5);
+
+    assertAll(
+        () -> assertEquals(0.5, ellipse.getDistance(point1), kEpsilon),
+        () -> assertEquals(0.0, ellipse.getDistance(point2), kEpsilon),
+        () -> assertEquals(0.5, ellipse.getDistance(point3), kEpsilon),
+        () -> assertEquals(1.0, ellipse.getDistance(point4), kEpsilon));
+  }
+
+  @Test
+  void testFindNearestPoint() {
+    var center = new Pose2d(1.0, 1.0, Rotation2d.fromDegrees(90.0));
+    var ellipse = new Ellipse2d(center, 3.0, 4.0);
+
+    var point1 = new Translation2d(1.0, 3.0);
+    var nearestPoint1 = ellipse.findNearestPoint(point1);
+
+    var point2 = new Translation2d(0.0, 0.0);
+    var nearestPoint2 = ellipse.findNearestPoint(point2);
+
+    assertAll(
+        () -> assertEquals(1.0, nearestPoint1.getX(), kEpsilon),
+        () -> assertEquals(2.5, nearestPoint1.getY(), kEpsilon),
+        () -> assertEquals(0.0, nearestPoint2.getX(), kEpsilon),
+        () -> assertEquals(0.0, nearestPoint2.getY(), kEpsilon));
   }
 
   @Test
