@@ -49,10 +49,10 @@ TEST(Ellipse2dTest, DistanceToPoint) {
   constexpr frc::Translation2d point3{1_m, 1_m};
   constexpr frc::Translation2d point4{-1_m, 2.5_m};
 
-  EXPECT_NEAR(0.5, ellipse.Distance(point1).value(), kEpsilon);
+  EXPECT_NEAR(0, ellipse.Distance(point1).value(), kEpsilon);
   EXPECT_NEAR(0, ellipse.Distance(point2).value(), kEpsilon);
-  EXPECT_NEAR(0.5, ellipse.Distance(point3).value(), kEpsilon);
-  EXPECT_NEAR(1, ellipse.Distance(point4).value(), kEpsilon);
+  EXPECT_NEAR(0, ellipse.Distance(point3).value(), kEpsilon);
+  EXPECT_NEAR(0.19210128384806818, ellipse.Distance(point4).value(), kEpsilon);
 }
 
 TEST(Ellipse2dTest, FindNearestPoint) {
@@ -68,7 +68,7 @@ TEST(Ellipse2dTest, FindNearestPoint) {
   auto nearestPoint2 = ellipse.FindNearestPoint(point2);
 
   EXPECT_NEAR(1.0, nearestPoint1.X().value(), kEpsilon);
-  EXPECT_NEAR(2.5, nearestPoint1.Y().value(), kEpsilon);
+  EXPECT_NEAR(3.0, nearestPoint1.Y().value(), kEpsilon);
   EXPECT_NEAR(0.0, nearestPoint2.X().value(), kEpsilon);
   EXPECT_NEAR(0.0, nearestPoint2.Y().value(), kEpsilon);
 }

@@ -159,7 +159,7 @@ class Ellipse2d {
    *
    * @param point The point that this will find the nearest point to.
    * @return A new point that is nearest to {@code point} and contained in the
-   * ellipse.
+   *   ellipse.
    */
   Translation2d FindNearestPoint(const Translation2d& point) const;
 

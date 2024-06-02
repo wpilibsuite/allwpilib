@@ -65,10 +65,10 @@ class Ellipse2dTest {
     var point4 = new Translation2d(-1.0, 2.5);
 
     assertAll(
-        () -> assertEquals(0.5, ellipse.getDistance(point1), kEpsilon),
+        () -> assertEquals(0.0, ellipse.getDistance(point1), kEpsilon),
         () -> assertEquals(0.0, ellipse.getDistance(point2), kEpsilon),
-        () -> assertEquals(0.5, ellipse.getDistance(point3), kEpsilon),
-        () -> assertEquals(1.0, ellipse.getDistance(point4), kEpsilon));
+        () -> assertEquals(0.0, ellipse.getDistance(point3), kEpsilon),
+        () -> assertEquals(0.19210128384806818, ellipse.getDistance(point4), kEpsilon));
   }
 
   @Test
@@ -84,7 +84,7 @@ class Ellipse2dTest {
 
     assertAll(
         () -> assertEquals(1.0, nearestPoint1.getX(), kEpsilon),
-        () -> assertEquals(2.5, nearestPoint1.getY(), kEpsilon),
+        () -> assertEquals(3.0, nearestPoint1.getY(), kEpsilon),
         () -> assertEquals(0.0, nearestPoint2.getX(), kEpsilon),
         () -> assertEquals(0.0, nearestPoint2.getY(), kEpsilon));
   }

@@ -5,6 +5,7 @@
 package edu.wpi.first.math.geometry;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.proto.Ellipse2dProto;
 import edu.wpi.first.math.geometry.struct.Ellipse2dStruct;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -169,14 +170,18 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
       return point;
     }
 
-    // Rotate the point by the inverse of the ellipse's rotation
-    point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
-
     // Find nearest point
-    // TODO
-
-    // Undo rotation
-    return point.rotateAround(m_center.getTranslation(), m_center.getRotation());
+    var nearestPoint = new double[2];
+    WPIMathJNI.Ellipse2dFindNearestPoint(
+        m_center.getX(),
+        m_center.getY(),
+        m_center.getRotation().getRadians(),
+        m_xSemiAxis,
+        m_ySemiAxis,
+        point.getX(),
+        point.getY(),
+        nearestPoint);
+    return new Translation2d(nearestPoint[0], nearestPoint[1]);
   }
 
   @Override
