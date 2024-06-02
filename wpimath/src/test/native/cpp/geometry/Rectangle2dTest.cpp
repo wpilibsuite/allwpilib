@@ -44,13 +44,15 @@ TEST(Rectangle2dTest, DistanceToPoint) {
   constexpr frc::Rectangle2d rect{center, 1_m, 2_m};
 
   constexpr frc::Translation2d point1{2.5_m, 2_m};
-  constexpr frc::Translation2d point2{1_m, 2_m};
-  constexpr frc::Translation2d point3{1_m, 1_m};
-  constexpr frc::Translation2d point4{-1_m, 2.5_m};
-
   EXPECT_NEAR(0.5, rect.Distance(point1).value(), kEpsilon);
+
+  constexpr frc::Translation2d point2{1_m, 2_m};
   EXPECT_NEAR(0, rect.Distance(point2).value(), kEpsilon);
+
+  constexpr frc::Translation2d point3{1_m, 1_m};
   EXPECT_NEAR(0.5, rect.Distance(point3).value(), kEpsilon);
+
+  constexpr frc::Translation2d point4{-1_m, 2.5_m};
   EXPECT_NEAR(1, rect.Distance(point4).value(), kEpsilon);
 }
 
@@ -62,12 +64,11 @@ TEST(Rectangle2dTest, FindNearestPoint) {
 
   constexpr frc::Translation2d point1{1_m, 3_m};
   auto nearestPoint1 = rect.FindNearestPoint(point1);
-
-  frc::Translation2d point2{0_m, 0_m};
-  auto nearestPoint2 = rect.FindNearestPoint(point2);
-
   EXPECT_NEAR(1.0, nearestPoint1.X().value(), kEpsilon);
   EXPECT_NEAR(2.5, nearestPoint1.Y().value(), kEpsilon);
+
+  constexpr frc::Translation2d point2{0_m, 0_m};
+  auto nearestPoint2 = rect.FindNearestPoint(point2);
   EXPECT_NEAR(0.0, nearestPoint2.X().value(), kEpsilon);
   EXPECT_NEAR(0.0, nearestPoint2.Y().value(), kEpsilon);
 }

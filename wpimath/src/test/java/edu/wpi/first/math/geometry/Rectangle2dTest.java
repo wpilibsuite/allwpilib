@@ -58,15 +58,16 @@ class Rectangle2dTest {
     var rect = new Rectangle2d(center, 1.0, 2.0);
 
     var point1 = new Translation2d(2.5, 2.0);
-    var point2 = new Translation2d(1.0, 2.0);
-    var point3 = new Translation2d(1.0, 1.0);
-    var point4 = new Translation2d(-1.0, 2.5);
+    assertEquals(0.5, rect.getDistance(point1), kEpsilon);
 
-    assertAll(
-        () -> assertEquals(0.5, rect.getDistance(point1), kEpsilon),
-        () -> assertEquals(0.0, rect.getDistance(point2), kEpsilon),
-        () -> assertEquals(0.5, rect.getDistance(point3), kEpsilon),
-        () -> assertEquals(1.0, rect.getDistance(point4), kEpsilon));
+    var point2 = new Translation2d(1.0, 2.0);
+    assertEquals(0.0, rect.getDistance(point2), kEpsilon);
+
+    var point3 = new Translation2d(1.0, 1.0);
+    assertEquals(0.5, rect.getDistance(point3), kEpsilon);
+
+    var point4 = new Translation2d(-1.0, 2.5);
+    assertEquals(1.0, rect.getDistance(point4), kEpsilon);
   }
 
   @Test
@@ -76,13 +77,13 @@ class Rectangle2dTest {
 
     var point1 = new Translation2d(1.0, 3.0);
     var nearestPoint1 = rect.findNearestPoint(point1);
+    assertAll(
+        () -> assertEquals(1.0, nearestPoint1.getX(), kEpsilon),
+        () -> assertEquals(2.5, nearestPoint1.getY(), kEpsilon));
 
     var point2 = new Translation2d(0.0, 0.0);
     var nearestPoint2 = rect.findNearestPoint(point2);
-
     assertAll(
-        () -> assertEquals(1.0, nearestPoint1.getX(), kEpsilon),
-        () -> assertEquals(2.5, nearestPoint1.getY(), kEpsilon),
         () -> assertEquals(0.0, nearestPoint2.getX(), kEpsilon),
         () -> assertEquals(0.0, nearestPoint2.getY(), kEpsilon));
   }
