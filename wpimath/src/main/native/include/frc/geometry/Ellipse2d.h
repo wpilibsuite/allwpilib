@@ -56,7 +56,14 @@ class Ellipse2d {
    *
    * @return The center of the ellipse.
    */
-  constexpr Pose2d Center() const { return m_center; }
+  constexpr const Pose2d& Center() const { return m_center; }
+
+  /**
+   * Returns the rotational component of the ellipse.
+   *
+   * @return The rotational component of the ellipse.
+   */
+  constexpr const Rotation2d& Rotation() const { return m_center.Rotation(); }
 
   /**
    * Returns the x semi-axis.
@@ -79,8 +86,12 @@ class Ellipse2d {
    * @return The focal points.
    */
   constexpr wpi::array<Translation2d, 2> FocalPoints() const {
-    auto a = units::math::max(m_xSemiAxis, m_ySemiAxis);  // Major semi-axis
-    auto b = units::math::min(m_xSemiAxis, m_ySemiAxis);  // Minor semi-axis
+    // Major semi-axis
+    auto a = units::math::max(m_xSemiAxis, m_ySemiAxis);
+
+    // Minor semi-axis
+    auto b = units::math::min(m_xSemiAxis, m_ySemiAxis);  // NOLINT
+
     auto c = units::math::sqrt(a * a - b * b);
 
     if (m_xSemiAxis > m_ySemiAxis) {

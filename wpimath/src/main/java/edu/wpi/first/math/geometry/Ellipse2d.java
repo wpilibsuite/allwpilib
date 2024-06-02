@@ -54,6 +54,15 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+   * Returns the rotational component of the ellipse.
+   *
+   * @return The rotational component of the ellipse.
+   */
+  public Rotation2d getRotation() {
+    return m_center.getRotation();
+  }
+
+  /**
    * Returns the x semi-axis.
    *
    * @return The x semi-axis.
@@ -78,8 +87,12 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @return The focal points.
    */
   public Pair<Translation2d, Translation2d> getFocalPoints() {
-    double a = Math.max(m_xSemiAxis, m_ySemiAxis); // Major semi-axis
-    double b = Math.min(m_xSemiAxis, m_ySemiAxis); // Minor semi-axis
+    // Major semi-axis
+    double a = Math.max(m_xSemiAxis, m_ySemiAxis);
+
+    // Minor semi-axis
+    double b = Math.min(m_xSemiAxis, m_ySemiAxis);
+
     double c = Math.sqrt(a * a - b * b);
 
     if (m_xSemiAxis > m_ySemiAxis) {

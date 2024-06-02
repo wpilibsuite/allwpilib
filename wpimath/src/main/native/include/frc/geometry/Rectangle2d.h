@@ -59,14 +59,14 @@ class Rectangle2d {
    *
    * @return The center of the rectangle.
    */
-  constexpr Pose2d Center() const { return m_center; }
+  constexpr const Pose2d& Center() const { return m_center; }
 
   /**
    * Returns the rotational component of the rectangle.
    *
    * @return The rotational component of the rectangle.
    */
-  constexpr Rotation2d Rotation() const { return m_center.Rotation(); }
+  constexpr const Rotation2d& Rotation() const { return m_center.Rotation(); }
 
   /**
    * Returns the x size component of the rectangle.
@@ -113,14 +113,14 @@ class Rectangle2d {
     auto pointInRect = point - m_center.Translation();
     pointInRect = pointInRect.RotateBy(-m_center.Rotation());
 
-    if (units::math::abs(units::math::abs(point.X()) - m_xWidth / 2.0) <=
+    if (units::math::abs(units::math::abs(pointInRect.X()) - m_xWidth / 2.0) <=
         1E-9_m) {
       // Point rests on left/right perimeter
-      return units::math::abs(point.Y()) <= m_yWidth / 2.0;
-    } else if (units::math::abs(units::math::abs(point.Y()) - m_yWidth / 2.0) <=
-               1E-9_m) {
+      return units::math::abs(pointInRect.Y()) <= m_yWidth / 2.0;
+    } else if (units::math::abs(units::math::abs(pointInRect.Y()) -
+                                m_yWidth / 2.0) <= 1E-9_m) {
       // Point rests on top/bottom perimeter
-      return units::math::abs(point.X()) <= m_xWidth / 2.0;
+      return units::math::abs(pointInRect.X()) <= m_xWidth / 2.0;
     }
 
     return false;
