@@ -175,9 +175,9 @@ class Rectangle2d {
 
     // Find nearest point
     rotPoint =
-        Translation2d{std::clamp(point.X(), m_center.X() - m_xWidth / 2.0,
+        Translation2d{std::clamp(rotPoint.X(), m_center.X() - m_xWidth / 2.0,
                                  m_center.X() + m_xWidth / 2.0),
-                      std::clamp(point.Y(), m_center.Y() - m_yWidth / 2.0,
+                      std::clamp(rotPoint.Y(), m_center.Y() - m_yWidth / 2.0,
                                  m_center.Y() + m_yWidth / 2.0)};
 
     // Undo rotation
