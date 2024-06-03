@@ -246,6 +246,9 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     if (unit() instanceof Time) {
       return Units.Hertz.ofBaseUnits(1 / baseUnitMagnitude());
     }
+    if (unit() instanceof Frequency) {
+      return Units.Seconds.ofBaseUnits(1 / baseUnitMagnitude());
+    }
     if (unit() instanceof Velocity<?> velocity) {
       return velocity.reciprocal().ofBaseUnits(1 / baseUnitMagnitude());
     }

@@ -197,6 +197,35 @@ class MeasureTest {
   }
 
   @Test
+  void testInverse() {
+    // Time
+    var m1 = Units.Seconds.of(2);
+    var result = m1.inverse();
+    assertEquals(0.5, result.magnitude());
+    assertEquals(BaseUnits.Frequency, result.unit().getBaseUnit());
+    // Frequency
+    var m2 = Units.Hertz.of(0.5);
+    result = m2.inverse();
+    assertEquals(2, result.magnitude());
+    assertEquals(BaseUnits.Time, result.unit().getBaseUnit());
+    // Velocity
+    var m3 = Units.Meters.per(Units.Second).of(4);
+    result = m3.inverse();
+    assertEquals(0.25, result.magnitude());
+    assertEquals(Units.Seconds.per(Units.Meter), result.unit());
+    // Per
+    var m4 = Units.Volts.per(Units.Amp).of(0.1);
+    result = m4.inverse();
+    assertEquals(10, result.magnitude());
+    assertEquals(Units.Amps.per(Units.Volt), result.unit());
+    // Fallthrough
+    var m5 = Units.Celsius.of(20);
+    result = m5.inverse();
+    assertEquals(0.05, result.magnitude());
+    assertEquals(Units.Value.per(Units.Celsius), result.unit());
+  }
+
+  @Test
   void testToShortString() {
     var measure = Units.Volts.of(343);
     assertEquals("3.430e+02 V", measure.toShortString());
