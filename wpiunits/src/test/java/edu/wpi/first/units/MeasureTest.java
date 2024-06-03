@@ -219,10 +219,10 @@ class MeasureTest {
     assertEquals(10, result.magnitude());
     assertEquals(Units.Amps.per(Units.Volt), result.unit());
     // Fallthrough
-    var m5 = Units.Celsius.of(20);
+    var m5 = Units.Feet.of(8);
     result = m5.inverse();
-    assertEquals(0.05, result.magnitude());
-    assertEquals(Units.Value.per(Units.Celsius), result.unit());
+    assertEquals(0.125, result.magnitude());
+    assertEquals(Units.Value.per(Units.Feet), result.unit());
   }
 
   @Test
