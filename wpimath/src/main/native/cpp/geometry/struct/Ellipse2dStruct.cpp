@@ -7,7 +7,7 @@
 namespace {
 constexpr size_t kCenterOff = 0;
 constexpr size_t kXSemiAxisOff = kCenterOff + wpi::GetStructSize<frc::Pose2d>();
-constexpr size_t kYSemiAxisOff = kXSemiAxisOff + sizeof(units::meter_t);
+constexpr size_t kYSemiAxisOff = kXSemiAxisOff + 8;
 }  // namespace
 
 using StructType = wpi::Struct<frc::Ellipse2d>;

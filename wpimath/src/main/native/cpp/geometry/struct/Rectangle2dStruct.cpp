@@ -7,7 +7,7 @@
 namespace {
 constexpr size_t kCenterOff = 0;
 constexpr size_t kXWidthOff = kCenterOff + wpi::GetStructSize<frc::Pose2d>();
-constexpr size_t kYWidthOff = kXWidthOff + sizeof(units::meter_t);
+constexpr size_t kYWidthOff = kXWidthOff + 8;
 }  // namespace
 
 using StructType = wpi::Struct<frc::Rectangle2d>;
