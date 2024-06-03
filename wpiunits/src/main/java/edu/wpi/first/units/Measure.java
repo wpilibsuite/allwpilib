@@ -88,8 +88,11 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   @SuppressWarnings("unchecked")
   default <U2 extends Unit<U2>> Measure<?> times(Measure<U2> other) {
     if (other.unit() instanceof Dimensionless) {
-      // scalar multiplication
+      // scalar multiplication of this
       return times(other.baseUnitMagnitude());
+    } else if (unit() instanceof Dimensionless) {
+      // scalar multiplication of other
+      return other.times(baseUnitMagnitude());
     }
 
     if (unit() instanceof Per
@@ -104,6 +107,10 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     } else if (other.unit() instanceof Per
         && unit().getBaseUnit().equals(((Per<?, ?>) other.unit()).denominator().getBaseUnit())) {
       Unit<?> numerator = ((Per<?, ?>) other.unit()).numerator();
+      return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
+    } else if (other.unit() instanceof Velocity && unit().getBaseUnit().equals(Seconds)) {
+      // Multiplying a time by a velocity, return the scalar unit (eg Distance)
+      Unit<?> numerator = ((Velocity<?>) other.unit()).getUnit();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     } else if (unit() instanceof Per
         && other.unit() instanceof Per
@@ -150,6 +157,18 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     }
     if (other.unit() instanceof Dimensionless) {
       return divide(other.baseUnitMagnitude());
+    }
+    if (unit() instanceof Dimensionless) {
+      if (other.unit() instanceof Velocity<?> velocity) {
+        return velocity.reciprocal().ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
+      }
+      if (other.unit() instanceof Per<?, ?> per) {
+        if (per.numerator() instanceof Time time) {
+          return Velocity.combine(per.denominator(), time)
+              .ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
+        }
+        return per.reciprocal().ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
+      }
     }
     if (other.unit() instanceof Velocity<?> velocity
         && velocity.getUnit().getBaseUnit().equals(unit().getBaseUnit())) {

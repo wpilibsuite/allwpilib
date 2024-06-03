@@ -117,6 +117,13 @@ class MeasureTest {
 
     assertEquals(2.5 * 1.25, result.magnitude());
     assertEquals(2.5 * 1.25 * 6, result.baseUnitMagnitude());
+
+    // the reverse should also be equivalent
+    result = multiplier.times(measure);
+    assertSame(unit, result.unit());
+
+    assertEquals(2.5 * 1.25, result.magnitude());
+    assertEquals(2.5 * 1.25 * 6, result.baseUnitMagnitude());
   }
 
   @Test
@@ -154,6 +161,7 @@ class MeasureTest {
     // 19 ft/ms = 19,000 ft/s
     // 19,000 ft/s * 44s = 836,000 ft
     assertTrue(Units.Feet.of(836_000).isNear(m1.times(m2), 1e-12));
+    assertTrue(Units.Feet.of(836_000).isNear(m2.times(m1), 1e-12));
 
     // 42 ex per foot * 17mm = 42 ex * 17mm / (304.8mm/ft) = 42 * 17 / 304.8 = 2.34252
     var exampleUnit = new ExampleUnit(1);
@@ -194,6 +202,24 @@ class MeasureTest {
     result = m9.divide(m10);
     assertEquals(result.magnitude(), 2);
     assertEquals(result.unit(), Units.Value);
+    // Dimensionless divided by Velocity
+    var m11 = Units.Value.of(8);
+    var m12 = Units.Meters.per(Units.Second).of(4);
+    result = m11.divide(m12);
+    assertEquals(result.magnitude(), 2);
+    assertEquals(result.unit(), Units.Seconds.per(Units.Meter));
+    // Dimensionless divided by Per
+    var m13 = Units.Value.of(6);
+    var m14 = Units.Volts.per(Units.Meter).of(2);
+    result = m13.divide(m14);
+    assertEquals(result.magnitude(), 3);
+    assertEquals(result.unit(), Units.Meters.per(Units.Volt));
+    // Dimensionless divided by Per<Time, U>
+    var m15 = Units.Value.of(10);
+    var m16 = Units.Milliseconds.per(Units.Meter).of(2);
+    result = m15.divide(m16);
+    assertEquals(result.magnitude(), 5);
+    assertEquals(result.unit(), Units.Meters.per(Units.Millisecond));
   }
 
   @Test
