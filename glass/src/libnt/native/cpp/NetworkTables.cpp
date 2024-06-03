@@ -811,7 +811,7 @@ void NetworkTablesModel::Update() {
             m_server.subscribers.clear();
           } else if (auto client =
                          wpi::remove_prefix(info->name, "$clientpub$")) {
-            auto it = m_clients.find(client);
+            auto it = m_clients.find(*client);
             if (it != m_clients.end()) {
               it->second.publishers.clear();
             }
@@ -891,7 +891,8 @@ void NetworkTablesModel::Update() {
               }
               if (auto ts = wpi::remove_prefix(entryPair.second->info.type_str,
                                                "struct:")) {
-                if (wpi::remove_suffix(*ts, "[]").value_or(*ts) == typeStr) {
+                if (*ts == *typeStr ||
+                    wpi::remove_suffix(*ts, "[]").value_or(*ts) == *typeStr) {
                   entryPair.second->UpdateFromValue(*this);
                 }
               }
@@ -1089,7 +1090,7 @@ static bool GetHeadingTypeString(std::string_view* ts) {
       *ts = wpi::substr(*ts, lastdot + 1);
     }
     if (auto withoutProtobuf = wpi::remove_prefix(*ts, "Protobuf")) {
-      *ts = *ts;
+      *ts = *withoutProtobuf;
     }
     return true;
   } else if (auto withoutStruct = wpi::remove_prefix(*ts, "struct:")) {
