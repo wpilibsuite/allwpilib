@@ -101,20 +101,14 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
       // Multiplying a velocity by a time, return the scalar unit (eg Distance)
       Unit<?> numerator = v.getUnit();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (other.unit() instanceof Per
-        && unit().getBaseUnit().equals(((Per<?, ?>) other.unit()).denominator().getBaseUnit())) {
-      Unit<?> numerator = ((Per<?, ?>) other.unit()).numerator();
+    } else if (other.unit() instanceof Per<?, ?> per
+        && unit().getBaseUnit().equals(per.denominator().getBaseUnit())) {
+      Unit<?> numerator = per.numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (unit() instanceof Per
-        && other.unit() instanceof Per
-        && ((Per<?, ?>) unit())
-            .denominator()
-            .getBaseUnit()
-            .equals(((Per<?, U>) other.unit()).numerator().getBaseUnit())
-        && ((Per<?, ?>) unit())
-            .numerator()
-            .getBaseUnit()
-            .equals(((Per<?, ?>) other.unit()).denominator().getBaseUnit())) {
+    } else if (unit() instanceof Per<?, ?> per
+        && other.unit() instanceof Per<?, ?> otherPer
+        && per.denominator().getBaseUnit().equals(otherPer.numerator().getBaseUnit())
+        && per.numerator().getBaseUnit().equals(otherPer.denominator().getBaseUnit())) {
       // multiplying eg meters per second * milliseconds per foot
       // return a scalar
       return Units.Value.of(baseUnitMagnitude() * other.baseUnitMagnitude());

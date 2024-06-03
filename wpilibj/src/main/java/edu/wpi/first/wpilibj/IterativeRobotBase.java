@@ -334,9 +334,8 @@ public abstract class IterativeRobotBase extends RobotBase {
           }
           testExit();
         }
-        default -> {
-          // Unknown mode, error in development (NOP in release)
-          assert false;
+        case kNone -> {
+          // NOP
         }
       }
 
@@ -362,9 +361,8 @@ public abstract class IterativeRobotBase extends RobotBase {
           testInit();
           m_watchdog.addEpoch("testInit()");
         }
-        default -> {
-          // Unknown mode, error in development (NOP in release)
-          assert false;
+        case kNone -> {
+          // NOP
         }
       }
 

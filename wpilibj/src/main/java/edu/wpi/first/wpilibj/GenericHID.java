@@ -459,7 +459,7 @@ public class GenericHID {
     switch (type) {
       case kLeftRumble -> this.m_leftRumble = rumbleValue;
       case kRightRumble -> this.m_rightRumble = rumbleValue;
-      default -> {
+      case kBothRumble -> {
         this.m_leftRumble = rumbleValue;
         this.m_rightRumble = rumbleValue;
       }

@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,7 +40,7 @@ class LoadConfigTest {
             Rotation3d.kZero);
     Optional<Pose3d> maybePose = layout.getTagPose(1);
     assertTrue(maybePose.isPresent());
-    assertEquals(expectedPose, maybePose.unwrap());
+    assertEquals(expectedPose, maybePose.get());
 
     // Blue Terminal Near Station
     expectedPose =
@@ -50,7 +51,7 @@ class LoadConfigTest {
             new Rotation3d(0, 0, Math.toRadians(46.25)));
     maybePose = layout.getTagPose(5);
     assertTrue(maybePose.isPresent());
-    assertEquals(expectedPose, maybePose.unwrap());
+    assertEquals(expectedPose, maybePose.get());
 
     // Upper Hub Blue-Near
     expectedPose =
@@ -61,7 +62,7 @@ class LoadConfigTest {
             new Rotation3d(0, Math.toRadians(26.75), Math.toRadians(69)));
     maybePose = layout.getTagPose(53);
     assertTrue(maybePose.isPresent());
-    assertEquals(expectedPose, maybePose.unwrap());
+    assertEquals(expectedPose, maybePose.get());
 
     // Doesn't exist
     maybePose = layout.getTagPose(54);

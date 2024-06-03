@@ -21,9 +21,9 @@ public class RawCVMatSink extends ImageSink {
 
   private int getCVFormat(PixelFormat pixelFormat) {
     return switch (pixelFormat) {
-      case kYUYV, kRGB565 -> CvType.CV_8UC2;
+      case kYUYV, kRGB565, kY16, kUYVY -> CvType.CV_8UC2;
       case kBGR -> CvType.CV_8UC3;
-      case kGray, kMJPEG -> CvType.CV_8UC1;
+      case kBGRA -> CvType.CV_8UC4;
       default -> CvType.CV_8UC1;
     };
   }

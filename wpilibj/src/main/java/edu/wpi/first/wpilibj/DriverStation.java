@@ -141,14 +141,12 @@ public final class DriverStation {
           switch (allianceID) {
             case Blue1, Red1 -> 1;
             case Blue2, Red2 -> 2;
-            case Blue3, Red3 -> 3;
-            default -> 3;
+            case Blue3, Red3, Unknown -> 3;
           };
       final boolean isRedAlliance =
           switch (allianceID) {
             case Blue1, Blue2, Blue3 -> false;
-            case Red1, Red2, Red3 -> true;
-            case Unknown -> true;
+            case Red1, Red2, Red3, Unknown -> true;
           };
 
       String currentEventName;
@@ -1044,16 +1042,12 @@ public final class DriverStation {
     } finally {
       m_cacheDataMutex.unlock();
     }
-    switch (matchType) {
-      case 1:
-        return MatchType.Practice;
-      case 2:
-        return MatchType.Qualification;
-      case 3:
-        return MatchType.Elimination;
-      default:
-        return MatchType.None;
-    }
+    return switch (matchType) {
+      case 1 -> MatchType.Practice;
+      case 2 -> MatchType.Qualification;
+      case 3 -> MatchType.Elimination;
+      default -> MatchType.None;
+    };
   }
 
   /**

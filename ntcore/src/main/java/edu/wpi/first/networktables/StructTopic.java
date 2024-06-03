@@ -166,7 +166,9 @@ public final class StructTopic<T> extends Topic {
     if (other == this) {
       return true;
     }
-    return other instanceof StructTopic<?> topic && super.equals(topic) && m_struct == topic.m_struct;
+    return other instanceof StructTopic<?> topic
+        && super.equals(topic)
+        && m_struct == topic.m_struct;
   }
 
   @Override
