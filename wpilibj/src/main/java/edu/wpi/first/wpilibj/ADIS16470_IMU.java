@@ -1159,25 +1159,27 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The Yaw axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle() {
-    switch (m_yaw_axis) {
-      case kX:
+    return switch (m_yaw_axis) {
+      case kX -> {
         if (m_simGyroAngleX != null) {
-          return m_simGyroAngleX.get();
+          yield m_simGyroAngleX.get();
         }
-        return m_integ_angle_x;
-      case kY:
+        yield m_integ_angle_x;
+      }
+      case kY -> {
         if (m_simGyroAngleY != null) {
-          return m_simGyroAngleY.get();
+          yield m_simGyroAngleY.get();
         }
-        return m_integ_angle_y;
-      case kZ:
+        yield m_integ_angle_y;
+      }
+      case kZ -> {
         if (m_simGyroAngleZ != null) {
-          return m_simGyroAngleZ.get();
+          yield m_simGyroAngleZ.get();
         }
-        return m_integ_angle_z;
-      default:
-    }
-    return 0.0;
+        yield m_integ_angle_z;
+      }
+      default -> 0.0;
+    };
   }
 
   /**
@@ -1224,25 +1226,27 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return Yaw axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate() {
-    switch (m_yaw_axis) {
-      case kX:
+    return switch (m_yaw_axis) {
+      case kX -> {
         if (m_simGyroRateX != null) {
-          return m_simGyroRateX.get();
+          yield m_simGyroRateX.get();
         }
-        return m_gyro_rate_x;
-      case kY:
+        yield m_gyro_rate_x;
+      }
+      case kY -> {
         if (m_simGyroRateY != null) {
-          return m_simGyroRateY.get();
+          yield m_simGyroRateY.get();
         }
-        return m_gyro_rate_y;
-      case kZ:
+        yield m_gyro_rate_y;
+      }
+      case kZ -> {
         if (m_simGyroRateZ != null) {
-          return m_simGyroRateZ.get();
+          yield m_simGyroRateZ.get();
         }
-        return m_gyro_rate_z;
-      default:
-    }
-    return 0.0;
+        yield m_gyro_rate_z;
+      }
+      default -> 0.0;
+    };
   }
 
   /**
