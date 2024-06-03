@@ -22,3 +22,14 @@ SwerveModuleState SwerveModuleState::Optimize(
     return {desiredState.speed, desiredState.angle};
   }
 }
+
+SwerveModuleState SwerveModuleState::CosineCompensation(
+    const SwerveModuleState& desiredState, const Rotation2d& currentAngle) {
+  auto delta = desiredState.angle - currentAngle;
+  double speed = desiredState.speed.value() * delta.Cos();
+  if (units::math::abs(delta.Degrees()) > 90_deg) {
+    return {speed, desiredState.angle + Rotation2d{180_deg}};
+  } else {
+    return {speed, desiredState.angle};
+  }
+}

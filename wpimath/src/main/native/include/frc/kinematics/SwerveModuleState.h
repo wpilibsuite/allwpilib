@@ -40,11 +40,31 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    * used with the PIDController class's continuous input functionality, the
    * furthest a wheel will ever rotate is 90 degrees.
    *
+   * Note: This method should not be used together with the CosineCompensation method. 
+   * Both methods perform angle optimization, and using them together is redundant.
+   *
    * @param desiredState The desired state.
    * @param currentAngle The current module angle.
    */
   static SwerveModuleState Optimize(const SwerveModuleState& desiredState,
                                     const Rotation2d& currentAngle);
+
+  /**
+   * Scales the module speed by the cosine of the angle error. This reduces skew caused by changing direction.
+   * 
+   * For example, if the current angle of the module matches the desired angle (i.e., there is no error), 
+   * the speed of the module remains unchanged as cos(0) = 1. However, if the current angle is 90 degrees off 
+   * from the desired angle, the speed of the module becomes 0 as cos(90°) = 0. This means the module will stop 
+   * moving, allowing it to correct its angle without moving in the wrong direction.
+   * 
+   * Note: This method should not be used together with the Optimize method.
+   * Both methods perform angle optimization, and using them together is redundant.
+   * 
+   * @param desiredState The desired state.
+   * @param currentAngle The current module angle.
+   * @return The cosine compensated swerve module state.
+   */
+   static SwerveModuleState CosineCompensation(const SwerveModuleState& desiredState, const Rotation2d& currentAngle);
 };
 }  // namespace frc
 

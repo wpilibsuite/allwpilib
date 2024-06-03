@@ -50,4 +50,37 @@ class SwerveModuleStateTest {
         () -> assertEquals(-2.0, optimizedB.speedMetersPerSecond, kEpsilon),
         () -> assertEquals(-2.0, optimizedB.angle.getDegrees(), kEpsilon));
   }
+
+  @Test
+  void testCosineOptimizationNoError() {
+    var currentAngle = Rotation2d.kZero;
+    var desiredState = new SwerveModuleState(2.0, Rotation2d.kZero);
+    var optimizedState = SwerveModuleState.cosineCompensation(desiredState, currentAngle);
+
+    assertAll(
+        () -> assertEquals(2.0, optimizedState.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, optimizedState.angle.getDegrees(), kEpsilon));
+  }
+
+  @Test
+  void testCosineOptimization90DegreesError() {
+    var currentAngle = Rotation2d.kZero;
+    var desiredState = new SwerveModuleState(2.0, Rotation2d.fromDegrees(90));
+    var optimizedState = SwerveModuleState.cosineCompensation(desiredState, currentAngle);
+
+    assertAll(
+        () -> assertEquals(0.0, optimizedState.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(90.0, optimizedState.angle.getDegrees(), kEpsilon));
+  }
+
+  @Test
+  void testCosineOptimization180DegreesError() {
+    var currentAngle = Rotation2d.kZero;
+    var desiredState = new SwerveModuleState(2.0, Rotation2d.fromDegrees(180));
+    var optimizedState = SwerveModuleState.cosineCompensation(desiredState, currentAngle);
+
+    assertAll(
+        () -> assertEquals(-2.0, optimizedState.speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, optimizedState.angle.getDegrees(), kEpsilon));
+  }
 }

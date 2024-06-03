@@ -92,7 +92,10 @@ public class SwerveModuleState
    * Minimize the change in heading the desired swerve module state would require by potentially
    * reversing the direction the wheel spins. If this is used with the PIDController class's
    * continuous input functionality, the furthest a wheel will ever rotate is 90 degrees.
-   *
+   * <p>
+   * Note: This method should not be used together with the {@link #cosineOptimization} method. 
+   * Both methods perform angle optimization, and using them together is redundant.
+   * 
    * @param desiredState The desired state.
    * @param currentAngle The current module angle.
    * @return Optimized swerve module state.
@@ -105,6 +108,33 @@ public class SwerveModuleState
           -desiredState.speedMetersPerSecond, desiredState.angle.rotateBy(Rotation2d.kPi));
     } else {
       return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
+    }
+  }
+
+  /**
+   * Scales the module speed by the cosine of the angle error. This reduces skew caused by changing direction.
+   * <p>
+   * For example, if the current angle of the module matches the desired angle (i.e., there is no error), 
+   * the speed of the module remains unchanged as <strong>cos(0) = 1</strong>. However, if the current angle is 90 degrees off 
+   * from the desired angle, the speed of the module becomes 0 as <strong>cos(90°) = 0</strong>. This means the module will stop 
+   * moving, allowing it to correct its angle without moving in the wrong direction.
+   * <p>
+   * Note: This method should not be used together with the {@link #optimize} method.
+   * Both methods perform angle optimization, and using them together is redundant.
+   * 
+   * @param desiredState The desired state.
+   * @param currentAngle The current module angle.
+   * @return The cosine compensated swerve module state.
+   */
+  public static SwerveModuleState cosineOptimization(
+      SwerveModuleState desiredState, Rotation2d currentAngle) {
+    var delta = desiredState.angle.minus(currentAngle);
+    double speed = desiredState.speedMetersPerSecond * delta.getCos();
+
+    if (Math.abs(delta.getDegrees()) > 90.0) {
+      return new SwerveModuleState(speed, desiredState.angle.rotateBy(Rotation2d.kPi));
+    } else {
+      return new SwerveModuleState(speed, desiredState.angle);
     }
   }
 }

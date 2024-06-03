@@ -56,3 +56,30 @@ TEST(SwerveModuleStateTest, Inequality) {
   EXPECT_NE(state1, state2);
   EXPECT_NE(state1, state3);
 }
+
+TEST(SwerveModuleStateTest, COSNoError) {
+  frc::Rotation2d angleA{0_deg};
+  frc::SwerveModuleState refA{2_mps, 0_deg};
+  auto optimizedA = frc::SwerveModuleState::CosineCompensation(refA, angleA);
+
+  EXPECT_NEAR(optimizedA.speed.value(), 2.0, kEpsilon);
+  EXPECT_NEAR(optimizedA.angle.Degrees().value(), 0.0, kEpsilon);
+}
+
+TEST(SwerveModuleStateTest, COS90Error) {
+  frc::Rotation2d angleA{0_deg};
+  frc::SwerveModuleState refA{2_mps, 90_deg};
+  auto optimizedA = frc::SwerveModuleState::CosineCompensation(refA, angleA);
+
+  EXPECT_NEAR(optimizedA.speed.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(optimizedA.angle.Degrees().value(), 90.0, kEpsilon);
+}
+
+TEST(SwerveModuleStateTest, COS180Error) {
+  frc::Rotation2d angleA{0_deg};
+  frc::SwerveModuleState refA{2_mps, 180_deg};
+  auto optimizedA = frc::SwerveModuleState::CosineCompensation(refA, angleA);
+
+  EXPECT_NEAR(optimizedA.speed.value(), -2.0, kEpsilon);
+  EXPECT_NEAR(optimizedA.angle.Degrees().value(), 0.0, kEpsilon);
+}
