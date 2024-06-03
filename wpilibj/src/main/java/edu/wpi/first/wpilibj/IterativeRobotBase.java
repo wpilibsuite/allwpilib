@@ -334,7 +334,7 @@ public abstract class IterativeRobotBase extends RobotBase {
           }
           testExit();
         }
-        case kNone -> {
+        default -> {
           // NOP
         }
       }
@@ -361,7 +361,7 @@ public abstract class IterativeRobotBase extends RobotBase {
           testInit();
           m_watchdog.addEpoch("testInit()");
         }
-        case kNone -> {
+        default -> {
           // NOP
         }
       }

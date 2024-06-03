@@ -41,7 +41,7 @@ public class Debouncer {
     resetTimer();
 
     m_baseline =
-        switch (m_debounceType) {
+        m_debounceType) {
           case kBoth, kRising -> false;
           case kFalling -> true;
         };

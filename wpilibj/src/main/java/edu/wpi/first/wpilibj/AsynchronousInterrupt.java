@@ -144,7 +144,7 @@ public class AsynchronousInterrupt implements AutoCloseable {
         case kRisingEdge -> {
           rising = true;
         }
-        case kTimeout -> {
+        default -> {
           continue;
         }
       }

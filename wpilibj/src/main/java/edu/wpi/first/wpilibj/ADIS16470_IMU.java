@@ -1073,6 +1073,9 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       case kX -> setGyroAngleX(angle);
       case kY -> setGyroAngleY(angle);
       case kZ -> setGyroAngleZ(angle);
+      default -> {
+        // NOP
+      }
     }
   }
 

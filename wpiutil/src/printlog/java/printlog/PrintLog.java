@@ -132,6 +132,9 @@ public final class PrintLog {
             case "double[]" -> System.out.println("  " + List.of(record.getDoubleArray()));
             case "int64[]" -> System.out.println("  " + List.of(record.getIntegerArray()));
             case "string[]" -> System.out.println("  " + List.of(record.getStringArray()));
+            default -> {
+              // NOP
+            }
           }
         } catch (InputMismatchException ex) {
           System.out.println("  invalid");

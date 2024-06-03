@@ -109,7 +109,7 @@ public final class CameraServer {
             m_stringValueEntry.set(event.valueStr);
           }
         }
-        case kNone -> {
+        default -> {
           // NOP
         }
       }
@@ -314,6 +314,9 @@ public final class CameraServer {
                     kNetworkInterfacesChanged -> {
                   m_addresses = CameraServerJNI.getNetworkInterfaces();
                   updateStreamValues();
+                }
+                default -> {
+                  // NOP
                 }
               }
             }

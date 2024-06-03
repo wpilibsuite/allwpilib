@@ -100,6 +100,9 @@ public class CallbackStore implements AutoCloseable {
       case kNormalCancel -> m_cancelCallback.cancel(m_index, m_uid);
       case kChannelCancel -> m_cancelCallbackChannel.cancel(m_index, m_channel, m_uid);
       case kNoIndexCancel -> m_cancelCallbackNoIndex.cancel(m_uid);
+      default -> {
+        assert false;
+      }
     }
     m_cancelType = kAlreadyCancelled;
   }

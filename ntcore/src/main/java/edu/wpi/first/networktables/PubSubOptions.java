@@ -25,6 +25,9 @@ public class PubSubOptions {
         case excludePublisher -> excludePublisher = option.m_iValue;
         case excludeSelf -> excludeSelf = option.m_bValue;
         case hidden -> hidden = option.m_bValue;
+        default -> {
+          // NOP
+        }
       }
     }
   }
