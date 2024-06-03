@@ -12,12 +12,12 @@ package frc.robot.subsystems;
  * This demonstrates a command that calls another command upon completion by setting up a trigger.
  * This demonstrates accessing historical data to determine the next state.
  * This demonstrates using persistent data to periodically refresh outputs past the completion of this command.
- * This demonstrates running a command periodically.
+ * This demonstrates running a command periodically based on the past time history.
  * 
  * Caution - this is a simple, contrived example.
  * This command essentially runs periodically the hard way using memory of a time and a trigger on the time.
- * There may be better ways to do that simple scheduling structure, for example, the use of the "afterCommands()"
- * periodic as used for a sub-purpose here is a good way.
+ * There may be better ways to do that simple scheduling structure, for example, the use of the
+ * "beforeCommands()" or "afterCommands()" periodic methods as used for a sub-purpose here is a good way.
  */
 
 import java.util.List;
@@ -76,26 +76,13 @@ public class HistoryFSM extends SubsystemBase {
         fillInitialTimes();// initialize last time used for all the hues of the color wheel
 
         // Trigger if it's time for a new color or the operator pressed their "Y" button
-        timeOfNewColor.or(operatorController.y().debounce(debounceTime)).onTrue(runOnce(this::getHSV)/*.ignoringDisable(true)*/);
+        timeOfNewColor.or(operatorController.y().debounce(debounceTime))
+        .onTrue(
+            runOnce(this::getHSV) // new color
+            .andThen(runOnce(this::setNextTime)) // next time for new color
+            );
     }
-
-    /**
-     * Elapsed Timer determines if in the color change lockout period or not.
-     * Resets automatically.
-     * 
-     * @return has time elapsed
-     */
-    private boolean timesUp() {
-
-        if( nextTime.lt(Milliseconds.of(System.currentTimeMillis()))) {
-            nextTime = Milliseconds.of(endOfTime); // reset; if a command is running that will set the correct "nextTime".
-                                       // If it isn't running, then wait for "Y" press
-            // this locks-out automatic restarting on disable to enable change; "Y" must be pressed to get it started again.
-            return true;
-        }
-        return false; // not time to trigger yet
-    }
-
+    
     /**
      * Create an initialized list of hues
      */
@@ -108,7 +95,34 @@ public class HistoryFSM extends SubsystemBase {
     }
 
     /**
-     * this command sets a color and quits immediately assuming the color persists
+     * Sets the time for the trigger of its next periodic run
+     */
+    private void setNextTime() {
+
+        Measure<Time> currentTime = Milliseconds.of(System.currentTimeMillis());
+        nextTime = currentTime.plus(changeColorPeriod);
+    }
+
+    /**
+     * Elapsed Timer determines if in the color change lockout period or not.
+     * Resets automatically.
+     * 
+     * @return has time elapsed
+     */
+    private boolean timesUp() {
+
+        if (nextTime.lt(Milliseconds.of(System.currentTimeMillis()))) {
+            // reset; a command may run that will set the correct periodic "nextTime".
+            // Otherwise wait for other triggering to restart.
+            // This locks-out automatic restarting on disable-to-enable change; other trigger required to get it started again.
+            nextTime = Milliseconds.of(endOfTime);
+            return true;
+        }
+        return false; // not time to trigger yet
+    }
+
+    /**
+     * Sets a color and quits immediately assuming the color persists
      * somehow (in "persistentPatternDemo") until the next color is later requested.
      * 
      * <p>Set a random color that hasn't been used in the last "colorLockoutPeriod"
@@ -116,10 +130,11 @@ public class HistoryFSM extends SubsystemBase {
     public void getHSV() {
 
         Measure<Time> currentTime = Milliseconds.of(System.currentTimeMillis());
-        nextTime = currentTime.plus(changeColorPeriod); // this method sets up the time for the trigger of its next run
         int randomHue; // to be the next color
         int loopCounter = 1; // count attempts to find a different hue
-        int loopCounterLimit = 100; // limit attempts to find a different hue
+        int loopCounterLimit = 20; // limit attempts to find a different hue
+        // reasonable limit related to:
+        // number of colors, how often colors change, how long to lockout a color.
 
         do {
             // Generate random numbers for hues in range of the computer color wheel
@@ -152,13 +167,16 @@ public class HistoryFSM extends SubsystemBase {
      */
     public void beforeCommands() {}
 
-    // int counter = 0; // limit prints
+    // int counter = 0; // limit testing prints counter
     public void afterCommands() {
 
+        // testing prints
         // counter++;
         // if(counter%600 == 0) {
-        //     for(int i = 0; i < lastTimeHistoryOfColors.size(); i++)
-        //     System.out.println(i + " " + lastTimeHistoryOfColors.get(i).toLongString());
+        //     System.out.println("current time " + System.currentTimeMillis());
+        //     for(int i = 0; i < lastTimeHistoryOfColors.size(); i++) {
+        //         System.out.println(i + " " + lastTimeHistoryOfColors.get(i).toLongString());
+        //     }
         // }
 
         // Set and refresh the color could be done many ways:
