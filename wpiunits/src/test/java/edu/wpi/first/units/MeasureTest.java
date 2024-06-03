@@ -220,6 +220,12 @@ class MeasureTest {
     result = m15.divide(m16);
     assertEquals(result.magnitude(), 5);
     assertEquals(result.unit(), Units.Meters.per(Units.Millisecond));
+    // Time divide
+    var m17 = Units.Meters.of(8);
+    var m18 = Units.Seconds.of(2);
+    result = m17.divide(m18);
+    assertEquals(result.magnitude(), 4);
+    assertEquals(result.unit(), Units.Meters.per(Units.Second));
   }
 
   @Test

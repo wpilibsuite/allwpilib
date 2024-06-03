@@ -164,7 +164,8 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
       }
       if (other.unit() instanceof Per<?, ?> per) {
         if (per.numerator() instanceof Time time) {
-          return Velocity.combine(per.denominator(), time)
+          return per.denominator()
+              .per(time)
               .ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
         }
         return per.reciprocal().ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
@@ -177,6 +178,9 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     if (other.unit() instanceof Per<?, ?> per
         && per.numerator().getBaseUnit().equals(unit().getBaseUnit())) {
       return times(per.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
+    }
+    if (other.unit() instanceof Time time) {
+      return unit().per(time).ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
     }
     return unit().per(other.unit()).ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
   }
