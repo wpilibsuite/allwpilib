@@ -5,8 +5,8 @@
 package edu.wpi.first.math.interpolation;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.util.Option;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.TreeMap;
 
 /**
@@ -100,15 +100,15 @@ public final class TimeInterpolatableBuffer<T> {
    * @param timeSeconds The time at which to sample.
    * @return The interpolated value at that timestamp or an empty Optional.
    */
-  public Option<T> getSample(double timeSeconds) {
+  public Optional<T> getSample(double timeSeconds) {
     if (m_pastSnapshots.isEmpty()) {
-      return Option.none();
+      return Optional.empty();
     }
 
     // Special case for when the requested time is the same as a sample
     var nowEntry = m_pastSnapshots.get(timeSeconds);
     if (nowEntry != null) {
-      return Option.some(nowEntry);
+      return Optional.of(nowEntry);
     }
 
     var topBound = m_pastSnapshots.ceilingEntry(timeSeconds);
@@ -116,16 +116,16 @@ public final class TimeInterpolatableBuffer<T> {
 
     // Return null if neither sample exists, and the opposite bound if the other is null
     if (topBound == null && bottomBound == null) {
-      return Option.none();
+      return Optional.empty();
     } else if (topBound == null) {
-      return Option.some(bottomBound.getValue());
+      return Optional.of(bottomBound.getValue());
     } else if (bottomBound == null) {
-      return Option.some(topBound.getValue());
+      return Optional.of(topBound.getValue());
     } else {
       // Otherwise, interpolate. Because T is between [0, 1], we want the ratio of (the difference
       // between the current time and bottom bound) and (the difference between top and bottom
       // bounds).
-      return Option.some(
+      return Optional.of(
           m_interpolatingFunc.interpolate(
               bottomBound.getValue(),
               topBound.getValue(),

@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.util.Option;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Class for representing a layout of AprilTags on a field and reading them from a JSON format.
@@ -189,12 +189,12 @@ public class AprilTagFieldLayout {
    *     was not found.
    */
   @SuppressWarnings("ParameterName")
-  public Option<Pose3d> getTagPose(int ID) {
+  public Optional<Pose3d> getTagPose(int ID) {
     AprilTag tag = m_apriltags.get(ID);
     if (tag == null) {
-      return Option.none();
+      return Optional.empty();
     }
-    return Option.some(tag.pose.relativeTo(m_origin));
+    return Optional.of(tag.pose.relativeTo(m_origin));
   }
 
   /**
@@ -278,7 +278,6 @@ public class AprilTagFieldLayout {
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-  @SuppressWarnings("PMD.ImmutableField")
   private static class FieldDimensions {
     @SuppressWarnings("MemberName")
     @JsonProperty(value = "length")

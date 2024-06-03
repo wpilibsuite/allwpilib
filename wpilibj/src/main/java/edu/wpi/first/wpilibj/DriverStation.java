@@ -15,7 +15,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.EventVector;
-import edu.wpi.first.util.Option;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.datalog.BooleanArrayLogEntry;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
@@ -24,6 +23,8 @@ import edu.wpi.first.util.datalog.FloatArrayLogEntry;
 import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
@@ -1043,12 +1044,16 @@ public final class DriverStation {
     } finally {
       m_cacheDataMutex.unlock();
     }
-    return switch (matchType) {
-      case 1 -> MatchType.Practice;
-      case 2 -> MatchType.Qualification;
-      case 3 -> MatchType.Elimination;
-      default -> MatchType.None;
-    };
+    switch (matchType) {
+      case 1:
+        return MatchType.Practice;
+      case 2:
+        return MatchType.Qualification;
+      case 3:
+        return MatchType.Elimination;
+      default:
+        return MatchType.None;
+    }
   }
 
   /**
@@ -1079,26 +1084,25 @@ public final class DriverStation {
     }
   }
 
-  // Store option objects in a lookup table to avoid allocations at call time
-  private static final Map<AllianceStationID, Option<Alliance>> m_allianceMap =
+  private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap =
       Map.of(
-          AllianceStationID.Unknown, Option.none(),
-          AllianceStationID.Red1, Option.some(Alliance.Red),
-          AllianceStationID.Red2, Option.some(Alliance.Red),
-          AllianceStationID.Red3, Option.some(Alliance.Red),
-          AllianceStationID.Blue1, Option.some(Alliance.Blue),
-          AllianceStationID.Blue2, Option.some(Alliance.Blue),
-          AllianceStationID.Blue3, Option.some(Alliance.Blue));
+          AllianceStationID.Unknown, Optional.empty(),
+          AllianceStationID.Red1, Optional.of(Alliance.Red),
+          AllianceStationID.Red2, Optional.of(Alliance.Red),
+          AllianceStationID.Red3, Optional.of(Alliance.Red),
+          AllianceStationID.Blue1, Optional.of(Alliance.Blue),
+          AllianceStationID.Blue2, Optional.of(Alliance.Blue),
+          AllianceStationID.Blue3, Optional.of(Alliance.Blue));
 
-  private static final Map<AllianceStationID, Option<Integer>> m_stationMap =
+  private static Map<AllianceStationID, OptionalInt> m_stationMap =
       Map.of(
-          AllianceStationID.Unknown, Option.none(),
-          AllianceStationID.Red1, Option.some(1),
-          AllianceStationID.Red2, Option.some(2),
-          AllianceStationID.Red3, Option.some(3),
-          AllianceStationID.Blue1, Option.some(1),
-          AllianceStationID.Blue2, Option.some(2),
-          AllianceStationID.Blue3, Option.some(3));
+          AllianceStationID.Unknown, OptionalInt.empty(),
+          AllianceStationID.Red1, OptionalInt.of(1),
+          AllianceStationID.Red2, OptionalInt.of(2),
+          AllianceStationID.Red3, OptionalInt.of(3),
+          AllianceStationID.Blue1, OptionalInt.of(1),
+          AllianceStationID.Blue2, OptionalInt.of(2),
+          AllianceStationID.Blue3, OptionalInt.of(3));
 
   /**
    * Get the current alliance from the FMS.
@@ -1107,7 +1111,7 @@ public final class DriverStation {
    *
    * @return The alliance (red or blue) or an empty optional if the alliance is invalid
    */
-  public static Option<Alliance> getAlliance() {
+  public static Optional<Alliance> getAlliance() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
       allianceStationID = AllianceStationID.Unknown;
@@ -1123,7 +1127,7 @@ public final class DriverStation {
    *
    * @return the location of the team's driver station controls: 1, 2, or 3
    */
-  public static Option<Integer> getLocation() {
+  public static OptionalInt getLocation() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
       allianceStationID = AllianceStationID.Unknown;

@@ -11,11 +11,11 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.RelayJNI;
 import edu.wpi.first.hal.util.HalHandleException;
 import edu.wpi.first.hal.util.UncleanStatusException;
-import edu.wpi.first.util.Option;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Class for VEX Robotics Spike style relay outputs. Relays are intended to be connected to Spikes
@@ -74,9 +74,8 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
      * @param value The pretty string.
      * @return The value or an empty optional if there is no corresponding value.
      */
-    public static Option<Value> getValueOf(String value) {
-      return Option.wrapOptional(
-          Arrays.stream(Value.values()).filter(v -> v.m_prettyValue.equals(value)).findFirst());
+    public static Optional<Value> getValueOf(String value) {
+      return Arrays.stream(Value.values()).filter(v -> v.m_prettyValue.equals(value)).findFirst();
     }
   }
 
