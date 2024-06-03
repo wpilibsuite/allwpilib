@@ -247,19 +247,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     if (unit() instanceof Temperature) {
       throw new IllegalArgumentException("Can't take the inverse of a Temperature!");
     }
-    if (unit() instanceof Time) {
-      return Units.Hertz.ofBaseUnits(1 / baseUnitMagnitude());
-    }
-    if (unit() instanceof Frequency) {
-      return Units.Seconds.ofBaseUnits(1 / baseUnitMagnitude());
-    }
-    if (unit() instanceof Velocity<?> velocity) {
-      return velocity.reciprocal().ofBaseUnits(1 / baseUnitMagnitude());
-    }
-    if (unit() instanceof Per<?, ?> per) {
-      return per.reciprocal().ofBaseUnits(1 / baseUnitMagnitude());
-    }
-    return Units.Value.per(unit()).ofBaseUnits(1 / baseUnitMagnitude());
+    return Units.Value.of(1).divide(this);
   }
 
   /**

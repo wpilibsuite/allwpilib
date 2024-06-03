@@ -202,12 +202,12 @@ class MeasureTest {
     var m1 = Units.Seconds.of(2);
     var result = m1.inverse();
     assertEquals(0.5, result.magnitude());
-    assertEquals(BaseUnits.Frequency, result.unit().getBaseUnit());
+    assertEquals(Units.Hertz, result.unit());
     // Frequency
     var m2 = Units.Hertz.of(0.5);
     result = m2.inverse();
     assertEquals(2, result.magnitude());
-    assertEquals(BaseUnits.Time, result.unit().getBaseUnit());
+    assertEquals(Units.Seconds, result.unit());
     // Velocity
     var m3 = Units.Meters.per(Units.Second).of(4);
     result = m3.inverse();

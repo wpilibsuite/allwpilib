@@ -74,10 +74,6 @@ public final class Units {
   /** Alias for {@link #Minutes} to make combined unit definitions read more smoothly. */
   public static final Time Minute = Minutes; // singularized alias
 
-  // Frequency
-  /** The base unit of frequency. */
-  public static final Frequency Hertz = BaseUnits.Frequency;
-
   // Angle
   /**
    * The base SI unit of angle, represented by the distance that the radius of a unit circle can
@@ -264,6 +260,10 @@ public final class Units {
    */
   public static final Dimensionless Percent =
       derive(Value).splitInto(100).named("Percent").symbol("%").make();
+
+  // Frequency
+  /** The unit of frequency. */
+  public static final Velocity<Dimensionless> Hertz = Value.per(Second);
 
   // Voltage
   /** The base unit of electric potential. */
