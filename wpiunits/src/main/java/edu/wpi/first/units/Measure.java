@@ -85,7 +85,6 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @param other the unit to multiply by
    * @return the multiplicative unit
    */
-  @SuppressWarnings("unchecked")
   default <U2 extends Unit<U2>> Measure<?> times(Measure<U2> other) {
     if (other.unit() instanceof Dimensionless) {
       // scalar multiplication
@@ -93,7 +92,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     }
 
     if (unit() instanceof Per<?, ?> per
-        && other.unit().getBaseUnit().equals(((Per<?, ?>) unit()).denominator().getBaseUnit())) {
+        && other.unit().getBaseUnit().equals(per.denominator().getBaseUnit())) {
       // denominator of the Per cancels out, return with just the units of the numerator
       Unit<?> numerator = per.numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
