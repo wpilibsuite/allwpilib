@@ -6,7 +6,7 @@
 
 #include <wpi/jni_util.h>
 
-#include "edu_wpi_first_math_WPIMathJNI.h"
+#include "edu_wpi_first_math_jni_Pose3dJNI.h"
 #include "frc/geometry/Pose3d.h"
 
 using namespace wpi::java;
@@ -14,12 +14,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    expPose3d
+ * Class:     edu_wpi_first_math_jni_Pose3dJNI
+ * Method:    exp
  * Signature: (DDDDDDDDDDDDD)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_expPose3d
+Java_edu_wpi_first_math_jni_Pose3dJNI_exp
   (JNIEnv* env, jclass, jdouble poseX, jdouble poseY, jdouble poseZ,
    jdouble poseQw, jdouble poseQx, jdouble poseQy, jdouble poseQz,
    jdouble twistDx, jdouble twistDy, jdouble twistDz, jdouble twistRx,
@@ -42,12 +42,12 @@ Java_edu_wpi_first_math_WPIMathJNI_expPose3d
 }
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    logPose3d
+ * Class:     edu_wpi_first_math_jni_Pose3dJNI
+ * Method:    log
  * Signature: (DDDDDDDDDDDDDD)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_logPose3d
+Java_edu_wpi_first_math_jni_Pose3dJNI_log
   (JNIEnv* env, jclass, jdouble startX, jdouble startY, jdouble startZ,
    jdouble startQw, jdouble startQx, jdouble startQy, jdouble startQz,
    jdouble endX, jdouble endY, jdouble endZ, jdouble endQw, jdouble endQx,
