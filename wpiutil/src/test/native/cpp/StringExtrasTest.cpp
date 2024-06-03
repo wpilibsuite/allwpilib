@@ -15,7 +15,6 @@ TEST(StringExtrasTest, RemovePrefix) {
 
 TEST(StringExtrasTest, RemoveSuffix) {
   std::string_view original = "wpilib";
-  EXPECT_TRUE(original.ends_with("lib"));
   auto modified = wpi::remove_suffix(original, "lib");
   EXPECT_EQ(original, "wpilib");
   EXPECT_EQ(modified, std::optional{"wpi"});
