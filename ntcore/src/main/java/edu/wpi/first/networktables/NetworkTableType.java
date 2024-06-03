@@ -110,25 +110,33 @@ public enum NetworkTableType {
    * @return type string of the data, or empty string if no match
    */
   public static String getStringFromObject(Object data) {
-    return switch (data) {
-      case Boolean b -> "boolean";
-      case byte[] raw -> "raw";
-      case Byte[] raw -> "raw";
-      case Integer i -> "int";
-      case Long l -> "int";
-      case Float f -> "float";
-      case Double d -> "double";
-      case int[] i -> "int[]";
-      case Integer[] i -> "int[]";
-      case long[] l -> "int[]";
-      case Long[] l -> "int[]";
-      case double[] d -> "double[]";
-      case Double[] d -> "double[]";
-        // Treat any other boxed numeric type (byte, char, short) as double
-        // Note that byte arrays are checked earlier because those are raw values
-      case Number n -> "double";
-      case Number[] n -> "double[]";
-      default -> "";
-    };
+    if (data instanceof Boolean) {
+      return "boolean";
+    } else if (data instanceof Float) {
+      return "float";
+    } else if (data instanceof Long) {
+      // Checking Long because NT supports 64-bit integers
+      return "int";
+    } else if (data instanceof Double || data instanceof Number) {
+      // If typeof Number class, return "double" as the type. Functions as a "catch-all".
+      return "double";
+    } else if (data instanceof String) {
+      return "string";
+    } else if (data instanceof boolean[] || data instanceof Boolean[]) {
+      return "boolean[]";
+    } else if (data instanceof float[] || data instanceof Float[]) {
+      return "float[]";
+    } else if (data instanceof long[] || data instanceof Long[]) {
+      return "int[]";
+    } else if (data instanceof double[] || data instanceof Double[] || data instanceof Number[]) {
+      // If typeof Number class, return "double[]" as the type. Functions as a "catch-all".
+      return "double[]";
+    } else if (data instanceof String[]) {
+      return "string[]";
+    } else if (data instanceof byte[] || data instanceof Byte[]) {
+      return "raw";
+    } else {
+      return "";
+    }
   }
 }
