@@ -26,8 +26,6 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::Rectangle2d> {
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
     wpi::ForEachStructSchema<frc::Pose2d>(fn);
-    wpi::ForEachStructSchema<units::meter_t>(fn);
-    wpi::ForEachStructSchema<units::meter_t>(fn);
   }
 };
 
