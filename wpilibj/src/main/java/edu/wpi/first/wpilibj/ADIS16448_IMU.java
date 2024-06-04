@@ -18,6 +18,9 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.geometry.Quaternion;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
@@ -206,15 +209,19 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
 
   private SimDevice m_simDevice;
   private SimBoolean m_simConnected;
-  private SimDouble m_simGyroAngleX;
-  private SimDouble m_simGyroAngleY;
-  private SimDouble m_simGyroAngleZ;
+  private SimDouble m_simOrientationW;
+  private SimDouble m_simOrientationX;
+  private SimDouble m_simOrientationY;
+  private SimDouble m_simOrientationZ;
   private SimDouble m_simGyroRateX;
   private SimDouble m_simGyroRateY;
   private SimDouble m_simGyroRateZ;
   private SimDouble m_simAccelX;
   private SimDouble m_simAccelY;
   private SimDouble m_simAccelZ;
+
+  /* Internal orientation offset*/
+  private Rotation3d m_angleOffset = new Rotation3d();
 
   /* CRC-16 Look-Up Table */
   int[] adiscrc =
@@ -288,9 +295,10 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     m_simDevice = SimDevice.create("Gyro:ADIS16448", port.value);
     if (m_simDevice != null) {
       m_simConnected = m_simDevice.createBoolean("connected", SimDevice.Direction.kInput, true);
-      m_simGyroAngleX = m_simDevice.createDouble("gyro_angle_x", SimDevice.Direction.kInput, 0.0);
-      m_simGyroAngleY = m_simDevice.createDouble("gyro_angle_y", SimDevice.Direction.kInput, 0.0);
-      m_simGyroAngleZ = m_simDevice.createDouble("gyro_angle_z", SimDevice.Direction.kInput, 0.0);
+      m_simOrientationW = m_simDevice.createDouble("gyro_quat_w", SimDevice.Direction.kInput, 0.0);
+      m_simOrientationX = m_simDevice.createDouble("gyro_quat_x", SimDevice.Direction.kInput, 0.0);
+      m_simOrientationY = m_simDevice.createDouble("gyro_quat_y", SimDevice.Direction.kInput, 0.0);
+      m_simOrientationZ = m_simDevice.createDouble("gyro_quat_z", SimDevice.Direction.kInput, 0.0);
       m_simGyroRateX = m_simDevice.createDouble("gyro_rate_x", SimDevice.Direction.kInput, 0.0);
       m_simGyroRateY = m_simDevice.createDouble("gyro_rate_y", SimDevice.Direction.kInput, 0.0);
       m_simGyroRateZ = m_simDevice.createDouble("gyro_rate_z", SimDevice.Direction.kInput, 0.0);
@@ -724,6 +732,49 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
       m_integ_gyro_angle_x = 0.0;
       m_integ_gyro_angle_y = 0.0;
       m_integ_gyro_angle_z = 0.0;
+
+      if (m_simOrientationW != null) {
+        m_simOrientationW.set(0.0);
+      }
+      if (m_simOrientationX != null) {
+        m_simOrientationX.set(0.0);
+      }
+      if (m_simOrientationY != null) {
+        m_simOrientationY.set(0.0);
+      }
+      if (m_simOrientationZ != null) {
+        m_simOrientationZ.set(0.0);
+      }
+      m_angleOffset = new Rotation3d();
+    }
+  }
+
+  /**
+   * Reset the gyro.
+   *
+   * <p>Resets the gyro angle to an orientation specified by the user.
+   *
+   * @param newAngle The 3d angle to reset the device to
+   */
+  public void reset(Rotation3d newAngle) {
+    synchronized (this) {
+      m_integ_gyro_angle_x = 0.0;
+      m_integ_gyro_angle_y = 0.0;
+      m_integ_gyro_angle_z = 0.0;
+
+      if (m_simOrientationW != null) {
+        m_simOrientationW.set(0.0);
+      }
+      if (m_simOrientationX != null) {
+        m_simOrientationX.set(0.0);
+      }
+      if (m_simOrientationY != null) {
+        m_simOrientationY.set(0.0);
+      }
+      if (m_simOrientationZ != null) {
+        m_simOrientationZ.set(0.0);
+      }
+      m_angleOffset = newAngle;
     }
   }
 
@@ -1056,7 +1107,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return Yaw axis angle in degrees (CCW positive).
    */
-  public synchronized double getAngle() {
+  public double getAngle() {
     switch (m_yaw_axis) {
       case kX:
         return getGyroAngleX();
@@ -1074,7 +1125,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return Yaw axis angular rate in degrees per second (CCW positive).
    */
-  public synchronized double getRate() {
+  public double getRate() {
     switch (m_yaw_axis) {
       case kX:
         return getGyroRateX();
@@ -1097,15 +1148,49 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
   }
 
   /**
+   * Returns the raw (un-offset) orientation of the device as a Rotation3d
+   *
+   * @return Rotation3d representing the device orientation
+   */
+  private Rotation3d getGyroOrientation() {
+    synchronized (this) {
+      if (m_simOrientationW != null
+          && m_simOrientationX != null
+          && m_simOrientationY != null
+          && m_simOrientationZ != null) {
+        return new Rotation3d(
+            new Quaternion(
+                m_simOrientationW.get(),
+                m_simOrientationX.get(),
+                m_simOrientationY.get(),
+                m_simOrientationZ.get()));
+      } else {
+        return new Rotation3d(
+            Units.degreesToRadians(m_integ_gyro_angle_x),
+            Units.degreesToRadians(m_integ_gyro_angle_y),
+            Units.degreesToRadians(m_integ_gyro_angle_z));
+      }
+    }
+  }
+
+  /**
+   * Returns a Rotation3d representing the orientation of the gyro.
+   *
+   * @return A Rotation3d representing the orientation of the gyro.
+   */
+  public Rotation3d getRotation3d() {
+    return getGyroOrientation().plus(m_angleOffset);
+  }
+
+  /**
    * Returns the accumulated gyro angle in the X axis in degrees.
    *
    * @return The accumulated gyro angle in the X axis in degrees.
    */
-  public synchronized double getGyroAngleX() {
-    if (m_simGyroAngleX != null) {
-      return m_simGyroAngleX.get();
+  public double getGyroAngleX() {
+    synchronized (this) {
+      return Units.radiansToDegrees(getGyroOrientation().plus(m_angleOffset).getX());
     }
-    return m_integ_gyro_angle_x;
   }
 
   /**
@@ -1113,11 +1198,10 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The accumulated gyro angle in the Y axis in degrees.
    */
-  public synchronized double getGyroAngleY() {
-    if (m_simGyroAngleY != null) {
-      return m_simGyroAngleY.get();
+  public double getGyroAngleY() {
+    synchronized (this) {
+      return Units.radiansToDegrees(getGyroOrientation().plus(m_angleOffset).getY());
     }
-    return m_integ_gyro_angle_y;
   }
 
   /**
@@ -1125,11 +1209,10 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The accumulated gyro angle in the Z axis in degrees.
    */
-  public synchronized double getGyroAngleZ() {
-    if (m_simGyroAngleZ != null) {
-      return m_simGyroAngleZ.get();
+  public double getGyroAngleZ() {
+    synchronized (this) {
+      return Units.radiansToDegrees(getGyroOrientation().plus(m_angleOffset).getZ());
     }
-    return m_integ_gyro_angle_z;
   }
 
   /**
@@ -1137,11 +1220,13 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The gyro angular rate in the X axis in degrees per second.
    */
-  public synchronized double getGyroRateX() {
-    if (m_simGyroRateX != null) {
-      return m_simGyroRateX.get();
+  public double getGyroRateX() {
+    synchronized (this) {
+      if (m_simGyroRateX != null) {
+        return m_simGyroRateX.get();
+      }
+      return m_gyro_rate_x;
     }
-    return m_gyro_rate_x;
   }
 
   /**
@@ -1149,11 +1234,13 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The gyro angular rate in the Y axis in degrees per second.
    */
-  public synchronized double getGyroRateY() {
-    if (m_simGyroRateY != null) {
-      return m_simGyroRateY.get();
+  public double getGyroRateY() {
+    synchronized (this) {
+      if (m_simGyroRateY != null) {
+        return m_simGyroRateY.get();
+      }
+      return m_gyro_rate_y;
     }
-    return m_gyro_rate_y;
   }
 
   /**
@@ -1161,11 +1248,13 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The gyro angular rate in the Z axis in degrees per second.
    */
-  public synchronized double getGyroRateZ() {
-    if (m_simGyroRateZ != null) {
-      return m_simGyroRateZ.get();
+  public double getGyroRateZ() {
+    synchronized (this) {
+      if (m_simGyroRateZ != null) {
+        return m_simGyroRateZ.get();
+      }
+      return m_gyro_rate_z;
     }
-    return m_gyro_rate_z;
   }
 
   /**
@@ -1173,11 +1262,13 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The acceleration in the X axis in meters per second squared.
    */
-  public synchronized double getAccelX() {
-    if (m_simAccelX != null) {
-      return m_simAccelX.get();
+  public double getAccelX() {
+    synchronized (this) {
+      if (m_simAccelX != null) {
+        return m_simAccelX.get();
+      }
+      return m_accel_x * 9.81;
     }
-    return m_accel_x * 9.81;
   }
 
   /**
@@ -1185,11 +1276,13 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The acceleration in the Y axis in meters per second squared.
    */
-  public synchronized double getAccelY() {
-    if (m_simAccelY != null) {
-      return m_simAccelY.get();
+  public double getAccelY() {
+    synchronized (this) {
+      if (m_simAccelY != null) {
+        return m_simAccelY.get();
+      }
+      return m_accel_y * 9.81;
     }
-    return m_accel_y * 9.81;
   }
 
   /**
@@ -1197,11 +1290,13 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The acceleration in the Z axis in meters per second squared.
    */
-  public synchronized double getAccelZ() {
-    if (m_simAccelZ != null) {
-      return m_simAccelZ.get();
+  public double getAccelZ() {
+    synchronized (this) {
+      if (m_simAccelZ != null) {
+        return m_simAccelZ.get();
+      }
+      return m_accel_z * 9.81;
     }
-    return m_accel_z * 9.81;
   }
 
   /**
@@ -1209,9 +1304,11 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The magnetic field strength in the X axis in Tesla.
    */
-  public synchronized double getMagneticFieldX() {
-    // mG to T
-    return m_mag_x * 1e-7;
+  public double getMagneticFieldX() {
+    synchronized (this) {
+      // mG to T
+      return m_mag_x * 1e-7;
+    }
   }
 
   /**
@@ -1219,9 +1316,11 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The magnetic field strength in the Y axis in Tesla.
    */
-  public synchronized double getMagneticFieldY() {
-    // mG to T
-    return m_mag_y * 1e-7;
+  public double getMagneticFieldY() {
+    synchronized (this) {
+      // mG to T
+      return m_mag_y * 1e-7;
+    }
   }
 
   /**
@@ -1229,9 +1328,11 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The magnetic field strength in the Z axis in Tesla.
    */
-  public synchronized double getMagneticFieldZ() {
-    // mG to T
-    return m_mag_z * 1e-7;
+  public double getMagneticFieldZ() {
+    synchronized (this) {
+      // mG to T
+      return m_mag_z * 1e-7;
+    }
   }
 
   /**
@@ -1240,8 +1341,10 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The X-axis complementary angle in degrees.
    */
-  public synchronized double getXComplementaryAngle() {
-    return m_compAngleX;
+  public double getXComplementaryAngle() {
+    synchronized (this) {
+      return m_compAngleX;
+    }
   }
 
   /**
@@ -1250,8 +1353,10 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The Y-axis complementary angle in degrees.
    */
-  public synchronized double getYComplementaryAngle() {
-    return m_compAngleY;
+  public double getYComplementaryAngle() {
+    synchronized (this) {
+      return m_compAngleY;
+    }
   }
 
   /**
@@ -1259,8 +1364,10 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The X-axis filtered acceleration angle in degrees.
    */
-  public synchronized double getXFilteredAccelAngle() {
-    return m_accelAngleX;
+  public double getXFilteredAccelAngle() {
+    synchronized (this) {
+      return m_accelAngleX;
+    }
   }
 
   /**
@@ -1268,8 +1375,10 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The Y-axis filtered acceleration angle in degrees.
    */
-  public synchronized double getYFilteredAccelAngle() {
-    return m_accelAngleY;
+  public double getYFilteredAccelAngle() {
+    synchronized (this) {
+      return m_accelAngleY;
+    }
   }
 
   /**
@@ -1277,9 +1386,11 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The barometric pressure in PSI.
    */
-  public synchronized double getBarometricPressure() {
-    // mbar to PSI conversion
-    return m_baro * 0.0145;
+  public double getBarometricPressure() {
+    synchronized (this) {
+      // mbar to PSI conversion
+      return m_baro * 0.0145;
+    }
   }
 
   /**
@@ -1287,8 +1398,10 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    *
    * @return The temperature in degrees Celsius.
    */
-  public synchronized double getTemperature() {
-    return m_temp;
+  public double getTemperature() {
+    synchronized (this) {
+      return m_temp;
+    }
   }
 
   /**

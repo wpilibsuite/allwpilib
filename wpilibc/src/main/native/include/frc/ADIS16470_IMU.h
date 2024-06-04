@@ -30,6 +30,7 @@
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
 #include "frc/SPI.h"
+#include "frc/geometry/Rotation3d.h"
 
 namespace frc {
 /**
@@ -177,6 +178,15 @@ class ADIS16470_IMU : public wpi::Sendable,
   void Reset();
 
   /**
+   * Reset the gyro.
+   *
+   * Resets the gyro accumulations to a heading of zero. This can be used if
+   * there is significant drift in the gyro and it needs to be recalibrated
+   * after running.
+   */
+  void Reset(Rotation3d offset);
+
+  /**
    * Allow the designated gyro angle to be set to a given value. This may happen
    * with unread values in the buffer, it is suggested that the IMU is not
    * moving when this method is run.
@@ -221,6 +231,13 @@ class ADIS16470_IMU : public wpi::Sendable,
    * @return The axis angle (CCW positive).
    */
   units::degree_t GetAngle(IMUAxis axis = IMUAxis::kYaw) const;
+
+  /**
+   * Returns the orientation of the IMU as a Rotation3d.
+   *
+   * @return The Rotation3d representing the orientation of the IMU.
+   */
+  frc::Rotation3d GetRotation3d() const;
 
   /**
    * Returns the axis angular rate (CCW positive).
@@ -525,6 +542,9 @@ class ADIS16470_IMU : public wpi::Sendable,
   hal::SimDouble m_simAccelX;
   hal::SimDouble m_simAccelY;
   hal::SimDouble m_simAccelZ;
+
+  frc::Rotation3d m_angleOffset;
+  frc::Rotation3d GetGyroOrientation() const;
 
   struct NonMovableMutexWrapper {
     wpi::mutex mutex;

@@ -33,6 +33,7 @@
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
 #include "frc/SPI.h"
+#include "frc/geometry/Rotation3d.h"
 
 namespace frc {
 /**
@@ -149,6 +150,15 @@ class ADIS16448_IMU : public wpi::Sendable,
    * after running.
    */
   void Reset();
+
+  /**
+   * Reset the gyro.
+   *
+   * Resets the gyro accumulations to a heading of zero. This can be used if
+   * there is significant drift in the gyro and it needs to be recalibrated
+   * after running.
+   */
+  void Reset(Rotation3d offset);
 
   /**
    * Returns the yaw axis angle in degrees (CCW positive).
@@ -279,6 +289,8 @@ class ADIS16448_IMU : public wpi::Sendable,
   int GetPort() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
+
+  frc::Rotation3d GetRotation3d() const;
 
  private:
   /** @brief ADIS16448 Register Map Declaration */
@@ -440,6 +452,9 @@ class ADIS16448_IMU : public wpi::Sendable,
   hal::SimDouble m_simAccelX;
   hal::SimDouble m_simAccelY;
   hal::SimDouble m_simAccelZ;
+
+  frc::Rotation3d m_angleOffset;
+  frc::Rotation3d GetGyroOrientation() const;
 
   struct NonMovableMutexWrapper {
     wpi::mutex mutex;
