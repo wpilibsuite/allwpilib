@@ -21,7 +21,7 @@
 #ifndef _gcem_max_HPP
 #define _gcem_max_HPP
 
-#include <cmath>
+#include <algorithm>
 #include <type_traits>
 
 namespace gcem
