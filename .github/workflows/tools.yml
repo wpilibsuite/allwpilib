@@ -58,8 +58,8 @@ jobs:
           name: MavenArtifacts
       - name: Patch RobotBuilder to use local development
         run: cd src/main/resources/export && echo "wpi.maven.useLocal = false" >> java/build.gradle && echo "wpi.maven.useFrcMavenLocalDevelopment = true" >> java/build.gradle && echo "wpi.versions.wpilibVersion = '$YEAR.424242.+'" >> java/build.gradle && echo "wpi.versions.wpimathVersion = '$YEAR.424242.+'" >> java/build.gradle && echo "wpi.maven.useLocal = false" >> cpp/build.gradle && echo "wpi.maven.useFrcMavenLocalDevelopment = true" >> cpp/build.gradle && echo "wpi.versions.wpilibVersion = '$YEAR.424242.+'" >> cpp/build.gradle && echo "wpi.versions.wpimathVersion = '$YEAR.424242.+'" >> cpp/build.gradle
-      - name: Install and runn xvfb
-        run: sudo apt-get update && sudo apt-get install -y xvfb && Xvfb :10 &
+      - name: Install and run xvfb
+        run: sudo apt-get update && sudo apt-get install -y xvfb && Xvfb $DISPLAY &
       - name: Move artifacts
         run: mkdir -p ~/releases/maven/development && cp -r edu ~/releases/maven/development
       - uses: actions/setup-java@v4
@@ -67,7 +67,7 @@ jobs:
           java-version: 17
           distribution: 'temurin'
       - name: Build RobotBuilder with Gradle
-        run: ./gradlew build test --tests 'robotbuilder.exporters.*' -x htmlSanityCheck -PbuildServer -PreleaseMode ; cd build/test-results/test ; cat TEST-robotbuilder.exporters.JavaExportTest.xml ; cat TEST-robotbuilder.exporters.CppExportTest.xml
+        run: ./gradlew build test --tests 'robotbuilder.exporters.*' -x htmlSanityCheck -PbuildServer -PreleaseMode ; cat build/test-results/test/TEST-robotbuilder.exporters.*.xml ;
       - name: Summarize RobotBuilder Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
