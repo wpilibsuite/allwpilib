@@ -386,10 +386,13 @@ public abstract class IterativeRobotBase extends RobotBase {
         teleopPeriodic();
         m_watchdog.addEpoch("teleopPeriodic()");
       }
-      default -> {
+      case kTest -> {
         DriverStationJNI.observeUserProgramTest();
         testPeriodic();
         m_watchdog.addEpoch("testPeriodic()");
+      }
+      default -> {
+        // NOP
       }
     }
 
