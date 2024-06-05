@@ -59,8 +59,8 @@ public final class SimpleWidget extends ShuffleboardWidget<SimpleWidget> impleme
 
   private void forceGenerate() {
     ShuffleboardContainer parent = getParent();
-    while (parent instanceof ShuffleboardLayout) {
-      parent = ((ShuffleboardLayout) parent).getParent();
+    while (parent instanceof ShuffleboardLayout layout) {
+      parent = layout.getParent();
     }
     ShuffleboardTab tab = (ShuffleboardTab) parent;
     tab.getRoot().update();

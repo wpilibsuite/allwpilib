@@ -22,6 +22,7 @@ file(
     src/main/native/cpp/jni/WPIMathJNI_ArmFeedforward.cpp
     src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
     src/main/native/cpp/jni/WPIMathJNI_Eigen.cpp
+    src/main/native/cpp/jni/WPIMathJNI_Ellipse2d.cpp
     src/main/native/cpp/jni/WPIMathJNI_Exceptions.cpp
     src/main/native/cpp/jni/WPIMathJNI_Pose3d.cpp
     src/main/native/cpp/jni/WPIMathJNI_StateSpaceUtil.cpp

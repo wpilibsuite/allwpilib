@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -25,7 +24,7 @@ import edu.wpi.first.math.numbers.N3;
  * <p>{@link SwerveDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
  * want; if you never call it, then this class will behave as regular encoder odometry.
  */
-public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveDriveWheelPositions> {
+public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition[]> {
   private final int m_numModules;
 
   /**
@@ -85,52 +84,10 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveDriveWheelPosi
     m_numModules = modulePositions.length;
   }
 
-  /**
-   * Resets the robot's position on the field.
-   *
-   * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
-   * automatically takes care of offsetting the gyro angle.
-   *
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param modulePositions The current distance measurements and rotations of the swerve modules.
-   * @param poseMeters The position on the field that your robot is at.
-   */
-  public void resetPosition(
-      Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
-    resetPosition(gyroAngle, new SwerveDriveWheelPositions(modulePositions), poseMeters);
-  }
-
-  /**
-   * Updates the pose estimator with wheel encoder and gyro information. This should be called every
-   * loop.
-   *
-   * @param gyroAngle The current gyro angle.
-   * @param modulePositions The current distance measurements and rotations of the swerve modules.
-   * @return The estimated pose of the robot in meters.
-   */
-  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    return update(gyroAngle, new SwerveDriveWheelPositions(modulePositions));
-  }
-
-  /**
-   * Updates the pose estimator with wheel encoder and gyro information. This should be called every
-   * loop.
-   *
-   * @param currentTimeSeconds Time at which this method was called, in seconds.
-   * @param gyroAngle The current gyroscope angle.
-   * @param modulePositions The current distance measurements and rotations of the swerve modules.
-   * @return The estimated pose of the robot in meters.
-   */
-  public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    return updateWithTime(
-        currentTimeSeconds, gyroAngle, new SwerveDriveWheelPositions(modulePositions));
-  }
-
   @Override
   public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, SwerveDriveWheelPositions wheelPositions) {
-    if (wheelPositions.positions.length != m_numModules) {
+      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] wheelPositions) {
+    if (wheelPositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
               + "constructor");

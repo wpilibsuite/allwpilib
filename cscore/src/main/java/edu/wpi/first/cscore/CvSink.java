@@ -32,27 +32,12 @@ public class CvSink extends ImageSink {
   }
 
   private int getCVFormat(PixelFormat pixelFormat) {
-    int type = 0;
-    switch (pixelFormat) {
-      case kYUYV:
-      case kRGB565:
-      case kY16:
-      case kUYVY:
-        type = CvType.CV_8UC2;
-        break;
-      case kBGR:
-        type = CvType.CV_8UC3;
-        break;
-      case kBGRA:
-        type = CvType.CV_8UC4;
-        break;
-      case kGray:
-      case kMJPEG:
-      default:
-        type = CvType.CV_8UC1;
-        break;
-    }
-    return type;
+    return switch (pixelFormat) {
+      case kYUYV, kRGB565, kY16, kUYVY -> CvType.CV_8UC2;
+      case kBGR -> CvType.CV_8UC3;
+      case kBGRA -> CvType.CV_8UC4;
+      case kGray, kMJPEG, kUnknown -> CvType.CV_8UC1;
+    };
   }
 
   /**

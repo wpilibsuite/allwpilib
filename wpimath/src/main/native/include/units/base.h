@@ -3408,7 +3408,7 @@ namespace units {
 		// the "_min" user-defined literal in time.h.
 
 		template<class UnitTypeLhs, class UnitTypeRhs>
-		UnitTypeLhs (min)(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
+		constexpr UnitTypeLhs (min)(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
 		{
 			static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value, "Unit types are not compatible.");
 			UnitTypeLhs r(rhs);
@@ -3416,7 +3416,7 @@ namespace units {
 		}
 
 		template<class UnitTypeLhs, class UnitTypeRhs>
-		UnitTypeLhs (max)(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
+		constexpr UnitTypeLhs (max)(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
 		{
 			static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value, "Unit types are not compatible.");
 			UnitTypeLhs r(rhs);

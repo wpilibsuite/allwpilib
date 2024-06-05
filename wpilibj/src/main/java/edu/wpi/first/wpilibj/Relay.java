@@ -182,23 +182,23 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    */
   public void set(Value value) {
     switch (value) {
-      case kOff:
+      case kOff -> {
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
           RelayJNI.setRelay(m_forwardHandle, false);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
           RelayJNI.setRelay(m_reverseHandle, false);
         }
-        break;
-      case kOn:
+      }
+      case kOn -> {
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
           RelayJNI.setRelay(m_forwardHandle, true);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
           RelayJNI.setRelay(m_reverseHandle, true);
         }
-        break;
-      case kForward:
+      }
+      case kForward -> {
         if (m_direction == Direction.kReverse) {
           throw new InvalidValueException(
               "A relay configured for reverse cannot be set to " + "forward");
@@ -209,8 +209,8 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
         if (m_direction == Direction.kBoth) {
           RelayJNI.setRelay(m_reverseHandle, false);
         }
-        break;
-      case kReverse:
+      }
+      case kReverse -> {
         if (m_direction == Direction.kForward) {
           throw new InvalidValueException(
               "A relay configured for forward cannot be set to " + "reverse");
@@ -221,9 +221,10 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
           RelayJNI.setRelay(m_reverseHandle, true);
         }
-        break;
-      default:
+      }
+      default -> {
         // Cannot hit this, limited by Value enum
+      }
     }
   }
 

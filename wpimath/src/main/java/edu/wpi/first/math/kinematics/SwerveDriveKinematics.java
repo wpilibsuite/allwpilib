@@ -39,26 +39,9 @@ import org.ejml.simple.SimpleMatrix;
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
+@SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveDriveKinematics.SwerveDriveWheelStates, SwerveDriveWheelPositions> {
-  /** Wrapper class for swerve module states. */
-  public static class SwerveDriveWheelStates {
-    /** Swerve module states. */
-    public SwerveModuleState[] states;
-
-    /**
-     * Creates a new SwerveDriveWheelStates instance.
-     *
-     * @param states The swerve module states. This will be deeply copied.
-     */
-    public SwerveDriveWheelStates(SwerveModuleState[] states) {
-      this.states = new SwerveModuleState[states.length];
-      for (int i = 0; i < states.length; i++) {
-        this.states[i] = new SwerveModuleState(states[i].speedMetersPerSecond, states[i].angle);
-      }
-    }
-  }
-
+    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]> {
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
@@ -200,8 +183,8 @@ public class SwerveDriveKinematics
   }
 
   @Override
-  public SwerveDriveWheelStates toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
-    return new SwerveDriveWheelStates(toSwerveModuleStates(chassisSpeeds));
+  public SwerveModuleState[] toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
+    return toSwerveModuleStates(chassisSpeeds);
   }
 
   /**
@@ -214,6 +197,7 @@ public class SwerveDriveKinematics
    *     passed into the constructor of this class.
    * @return The resulting chassis speed.
    */
+  @Override
   public ChassisSpeeds toChassisSpeeds(SwerveModuleState... moduleStates) {
     if (moduleStates.length != m_numModules) {
       throw new IllegalArgumentException(
@@ -233,11 +217,6 @@ public class SwerveDriveKinematics
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
         chassisSpeedsVector.get(2, 0));
-  }
-
-  @Override
-  public ChassisSpeeds toChassisSpeeds(SwerveDriveWheelStates wheelStates) {
-    return toChassisSpeeds(wheelStates.states);
   }
 
   /**
@@ -270,17 +249,14 @@ public class SwerveDriveKinematics
   }
 
   @Override
-  public Twist2d toTwist2d(SwerveDriveWheelPositions start, SwerveDriveWheelPositions end) {
-    if (start.positions.length != end.positions.length) {
+  public Twist2d toTwist2d(SwerveModulePosition[] start, SwerveModulePosition[] end) {
+    if (start.length != end.length) {
       throw new IllegalArgumentException("Inconsistent number of modules!");
     }
-    var newPositions = new SwerveModulePosition[start.positions.length];
-    for (int i = 0; i < start.positions.length; i++) {
-      var startModule = start.positions[i];
-      var endModule = end.positions[i];
+    var newPositions = new SwerveModulePosition[start.length];
+    for (int i = 0; i < start.length; i++) {
       newPositions[i] =
-          new SwerveModulePosition(
-              endModule.distanceMeters - startModule.distanceMeters, endModule.angle);
+          new SwerveModulePosition(end[i].distanceMeters - start[i].distanceMeters, end[i].angle);
     }
     return toTwist2d(newPositions);
   }
@@ -405,5 +381,27 @@ public class SwerveDriveKinematics
         attainableMaxModuleSpeed.in(MetersPerSecond),
         attainableMaxTranslationalSpeed.in(MetersPerSecond),
         attainableMaxRotationalVelocity.in(RadiansPerSecond));
+  }
+
+  @Override
+  public SwerveModulePosition[] copy(SwerveModulePosition[] positions) {
+    var newPositions = new SwerveModulePosition[positions.length];
+    for (int i = 0; i < positions.length; ++i) {
+      newPositions[i] = positions[i].copy();
+    }
+    return newPositions;
+  }
+
+  @Override
+  public SwerveModulePosition[] interpolate(
+      SwerveModulePosition[] startValue, SwerveModulePosition[] endValue, double t) {
+    if (endValue.length != startValue.length) {
+      throw new IllegalArgumentException("Inconsistent number of modules!");
+    }
+    var newPositions = new SwerveModulePosition[startValue.length];
+    for (int i = 0; i < startValue.length; ++i) {
+      newPositions[i] = startValue[i].interpolate(endValue[i], t);
+    }
+    return newPositions;
   }
 }

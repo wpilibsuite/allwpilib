@@ -28,3 +28,15 @@ message ProtobufTwist2d {
   double dy = 2;
   double dtheta = 3;
 }
+
+message ProtobufRectangle2d {
+  ProtobufPose2d center = 1;
+  double xWidth = 2;
+  double yWidth = 3;
+}
+
+message ProtobufEllipse2d {
+  ProtobufPose2d center = 1;
+  double xSemiAxis = 2;
+  double ySemiAxis = 3;
+}

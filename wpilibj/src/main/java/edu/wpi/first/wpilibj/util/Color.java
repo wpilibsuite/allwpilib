@@ -126,20 +126,14 @@ public class Color {
     // Goes from 0 to chroma as hue increases
     final int X = (chroma * remainder) >> 8;
 
-    switch (region) {
-      case 0:
-        return new Color(v, X + m, m);
-      case 1:
-        return new Color(v - X, v, m);
-      case 2:
-        return new Color(m, v, X + m);
-      case 3:
-        return new Color(m, v - X, v);
-      case 4:
-        return new Color(X + m, m, v);
-      default:
-        return new Color(v, m, v - X);
-    }
+    return switch (region) {
+      case 0 -> new Color(v, X + m, m);
+      case 1 -> new Color(v - X, v, m);
+      case 2 -> new Color(m, v, X + m);
+      case 3 -> new Color(m, v - X, v);
+      case 4 -> new Color(X + m, m, v);
+      default -> new Color(v, m, v - X);
+    };
   }
 
   @Override

@@ -16,7 +16,7 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 /** A layout in a Shuffleboard tab. Layouts can contain widgets and other layouts. */
-public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout>
+public final class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout>
     implements ShuffleboardContainer {
   private final ContainerHelper m_helper = new ContainerHelper(this);
 

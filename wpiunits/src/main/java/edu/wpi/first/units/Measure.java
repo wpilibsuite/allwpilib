@@ -85,38 +85,30 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @param other the unit to multiply by
    * @return the multiplicative unit
    */
-  @SuppressWarnings("unchecked")
   default <U2 extends Unit<U2>> Measure<?> times(Measure<U2> other) {
     // First try to eliminate any common units
-    if (unit() instanceof Per
-        && other.unit().getBaseUnit().equals(((Per<?, ?>) unit()).denominator().getBaseUnit())) {
+    if (unit() instanceof Per<?, ?> per
+        && other.unit().getBaseUnit().equals(per.denominator().getBaseUnit())) {
       // Case 1: denominator of the Per cancels out, return with just the units of the numerator
-      Unit<?> numerator = ((Per<?, ?>) unit()).numerator();
+      Unit<?> numerator = per.numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (unit() instanceof Velocity && other.unit().getBaseUnit().equals(Seconds)) {
+    } else if (unit() instanceof Velocity<?> v && other.unit().getBaseUnit().equals(Seconds)) {
       // Case 2: Multiplying a velocity by a time, return the scalar unit (eg Distance)
-      Unit<?> numerator = ((Velocity<?>) unit()).getUnit();
+      Unit<?> numerator = v.getUnit();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (other.unit() instanceof Per
-        && unit().getBaseUnit().equals(((Per<?, ?>) other.unit()).denominator().getBaseUnit())) {
+    } else if (other.unit() instanceof Per<?, ?> per
+        && unit().getBaseUnit().equals(per.denominator().getBaseUnit())) {
       // Same as Case 1, just flipped between this and other
-      Unit<?> numerator = ((Per<?, ?>) other.unit()).numerator();
+      Unit<?> numerator = per.numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (other.unit() instanceof Velocity<?> velocity
-        && unit().getBaseUnit().equals(Seconds)) {
+    } else if (other.unit() instanceof Velocity<?> v && unit().getBaseUnit().equals(Seconds)) {
       // Same as Case 2, just flipped between this and other
-      Unit<?> numerator = velocity.getUnit();
+      Unit<?> numerator = v.getUnit();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (unit() instanceof Per
-        && other.unit() instanceof Per
-        && ((Per<?, ?>) unit())
-            .denominator()
-            .getBaseUnit()
-            .equals(((Per<?, U>) other.unit()).numerator().getBaseUnit())
-        && ((Per<?, ?>) unit())
-            .numerator()
-            .getBaseUnit()
-            .equals(((Per<?, ?>) other.unit()).denominator().getBaseUnit())) {
+    } else if (unit() instanceof Per<?, ?> per
+        && other.unit() instanceof Per<?, ?> otherPer
+        && per.denominator().getBaseUnit().equals(otherPer.numerator().getBaseUnit())
+        && per.numerator().getBaseUnit().equals(otherPer.denominator().getBaseUnit())) {
       // multiplying eg meters per second * milliseconds per foot
       // return a scalar
       return Units.Value.of(baseUnitMagnitude() * other.baseUnitMagnitude());
