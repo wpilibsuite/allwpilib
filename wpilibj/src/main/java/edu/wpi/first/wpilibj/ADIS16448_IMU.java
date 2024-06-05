@@ -700,7 +700,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
 
         // Read number of bytes currently stored in the buffer
         int data_count = m_spi.readAutoReceivedData(buffer, 0, 0);
-        // Check if frame is incomplete. Add 1 because of timestamp
+        // Check if frame is incomplete
         int data_remainder = data_count % dataset_len;
         // Remove incomplete data from read count
         int data_to_read = data_count - data_remainder;
