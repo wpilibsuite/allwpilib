@@ -29,14 +29,11 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
+#include "frc/MathUtil.h"
 
 /* Helpful conversion functions */
 static inline uint16_t BuffToUShort(const uint32_t* buf) {
   return (static_cast<uint16_t>(buf[0]) << 8) | buf[1];
-}
-
-static inline uint8_t BuffToUByte(const uint32_t* buf) {
-  return static_cast<uint8_t>(buf[0]);
 }
 
 static inline int16_t BuffToShort(const uint32_t* buf) {
@@ -100,11 +97,11 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
     // Relies on the RIO hardware by default configuring an output as low
     // and configuring an input as high Z. The 10k pull-up resistor internal to
     // the IMU then forces the reset line high for normal operation.
-    DigitalOutput* m_reset_out = new DigitalOutput(18);  // Drive MXP DIO8 low
-    Wait(10_ms);                                         // Wait 10ms
-    delete m_reset_out;
+    DigitalOutput* reset_out = new DigitalOutput(18);  // Drive MXP DIO8 low
+    Wait(10_ms);
+    delete reset_out;
     m_reset_in = new DigitalInput(18);  // Set MXP DIO8 high
-    Wait(500_ms);                       // Wait 500ms for reset to complete
+    Wait(500_ms);                       // Wait for reset to complete
 
     ConfigCalTime(cal_time);
 
@@ -112,15 +109,12 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
     if (!SwitchToStandardSPI()) {
       return;
     }
-
-    // Set up flash state variable
-    bool m_needs_flash = false;
-
+    bool needsFlash = false;
     // Set IMU internal decimation to 1 (output data rate of 819.2 SPS / (1 + 1)
     // = 409.6Hz), output bandwidth = 204.8Hz
     if (ReadRegister(SMPL_PRD) != 0x0001) {
       WriteRegister(SMPL_PRD, 0x0001);
-      m_needs_flash = true;
+      needsFlash = true;
       REPORT_WARNING(
           "ADIS16448: SMPL_PRD register configuration inconsistent! Scheduling "
           "flash update.");
@@ -129,7 +123,7 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
     // Set data ready polarity (LOW = Good Data) on DIO1 (PWM0 on MXP)
     if (ReadRegister(MSC_CTRL) != 0x0016) {
       WriteRegister(MSC_CTRL, 0x0016);
-      m_needs_flash = true;
+      needsFlash = true;
       REPORT_WARNING(
           "ADIS16448: MSC_CTRL register configuration inconsistent! Scheduling "
           "flash update.");
@@ -139,7 +133,7 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
     // set IMU scale factor (range)
     if (ReadRegister(SENS_AVG) != 0x0400) {
       WriteRegister(SENS_AVG, 0x0400);
-      m_needs_flash = true;
+      needsFlash = true;
       REPORT_WARNING(
           "ADIS16448: SENS_AVG register configuration inconsistent! Scheduling "
           "flash update.");
@@ -147,7 +141,7 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
     // Clear offset registers
     if (ReadRegister(XGYRO_OFF) != 0x0000) {
       WriteRegister(XGYRO_OFF, 0x0000);
-      m_needs_flash = true;
+      needsFlash = true;
       REPORT_WARNING(
           "ADIS16448: XGYRO_OFF register configuration inconsistent! "
           "Scheduling flash update.");
@@ -155,7 +149,7 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
 
     if (ReadRegister(YGYRO_OFF) != 0x0000) {
       WriteRegister(YGYRO_OFF, 0x0000);
-      m_needs_flash = true;
+      needsFlash = true;
       REPORT_WARNING(
           "ADIS16448: YGYRO_OFF register configuration inconsistent! "
           "Scheduling flash update.");
@@ -163,7 +157,7 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
 
     if (ReadRegister(ZGYRO_OFF) != 0x0000) {
       WriteRegister(ZGYRO_OFF, 0x0000);
-      m_needs_flash = true;
+      needsFlash = true;
       REPORT_WARNING(
           "ADIS16448: ZGYRO_OFF register configuration inconsistent! "
           "Scheduling flash update.");
@@ -171,16 +165,15 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
 
     // If any registers on the IMU don't match the config, trigger a flash
     // update
-    if (m_needs_flash) {
+    if (needsFlash) {
       REPORT_WARNING(
           "ADIS16448: Register configuration changed! Starting IMU flash "
           "update.");
       WriteRegister(GLOB_CMD, 0x0008);
-      // Wait long enough for the flash update to finish (72ms minimum as per
+      // Wait long enough for the flash update to finish (75ms minimum as per
       // the datasheet)
       Wait(0.5_s);
       REPORT_WARNING("ADIS16448: Flash update finished!");
-      m_needs_flash = false;
     } else {
       REPORT_WARNING(
           "ADIS16448: Flash and RAM configuration consistent. No flash update "
@@ -202,11 +195,11 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
     // Tell the acquire loop that we're done starting up
     m_start_up_mode = false;
 
-    // Let the user know the IMU was initiallized successfully
+    // Let the user know the IMU was initialized successfully
     REPORT_WARNING("ADIS16448 IMU Successfully Initialized!");
 
     // TODO: Find what the proper pin is to turn this LED
-    //  Drive MXP PWM5 (IMU ready LED) low (active low)
+    // Drive MXP PWM5 (IMU ready LED) low (active low)
     m_status_led = new DigitalOutput(19);
   }
 
@@ -232,7 +225,6 @@ ADIS16448_IMU::ADIS16448_IMU(ADIS16448_IMU&& other)
       m_mag_z{std::move(other.m_mag_z)},
       m_baro{std::move(other.m_baro)},
       m_temp{std::move(other.m_temp)},
-      m_tau{std::move(other.m_tau)},
       m_dt{std::move(other.m_dt)},
       m_alpha{std::move(other.m_alpha)},
       m_compAngleX{std::move(other.m_compAngleX)},
@@ -291,7 +283,6 @@ ADIS16448_IMU& ADIS16448_IMU::operator=(ADIS16448_IMU&& other) {
   std::swap(this->m_mag_z, other.m_mag_z);
   std::swap(this->m_baro, other.m_baro);
   std::swap(this->m_temp, other.m_temp);
-  std::swap(this->m_tau, other.m_tau);
   std::swap(this->m_dt, other.m_dt);
   std::swap(this->m_alpha, other.m_alpha);
   std::swap(this->m_compAngleX, other.m_compAngleX);
@@ -365,18 +356,18 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
     if (m_spi != nullptr && m_auto_configured) {
       m_spi->StopAuto();
       // We need to get rid of all the garbage left in the auto SPI buffer after
-      // stopping it. Sometimes data magically reappears, so we have to check
-      // the buffer size a couple of times
-      //  to be sure we got it all. Yuck.
+      // stopping it.
+      // Sometimes data magically reappears, so we have to check
+      // the buffer size a couple of times to be sure we got it all. Yuck.
       uint32_t trashBuffer[200];
       Wait(100_ms);
       int data_count = m_spi->ReadAutoReceivedData(trashBuffer, 0, 0_s);
       while (data_count > 0) {
-        /* Dequeue 200 at a time, or the remainder of the buffer if less than
-         * 200 */
+        // Dequeue 200 at a time, or the remainder of the buffer if less than
+        // 200
         m_spi->ReadAutoReceivedData(trashBuffer, (std::min)(200, data_count),
                                     0_s);
-        /* Update remaining buffer count */
+        // Update remaining buffer count
         data_count = m_spi->ReadAutoReceivedData(trashBuffer, 0, 0_s);
       }
     }
@@ -443,11 +434,9 @@ void ADIS16448_IMU::InitOffsetBuffer(int size) {
  **/
 bool ADIS16448_IMU::SwitchToAutoSPI() {
   // No SPI port has been set up. Go set one up first.
-  if (m_spi == nullptr) {
-    if (!SwitchToStandardSPI()) {
-      REPORT_ERROR("Failed to start/restart auto SPI");
-      return false;
-    }
+  if (m_spi == nullptr && !SwitchToStandardSPI()) {
+    REPORT_ERROR("Failed to start/restart auto SPI");
+    return false;
   }
   // Only set up the interrupt if needed.
   if (m_auto_interrupt == nullptr) {
@@ -489,9 +478,6 @@ bool ADIS16448_IMU::SwitchToAutoSPI() {
   return true;
 }
 
-/**
- *
- **/
 int ADIS16448_IMU::ConfigCalTime(CalibrationTime new_cal_time) {
   if (m_calibration_time == new_cal_time) {
     return 1;
@@ -503,9 +489,6 @@ int ADIS16448_IMU::ConfigCalTime(CalibrationTime new_cal_time) {
   }
 }
 
-/**
- *
- **/
 void ADIS16448_IMU::Calibrate() {
   std::scoped_lock sync(m_mutex);
   // Calculate the running average
@@ -547,9 +530,9 @@ uint16_t ADIS16448_IMU::ReadRegister(uint8_t reg) {
 /**
  * This function writes an unsigned, 16-bit value into adjacent 8-bit addresses
  *via SPI. The upper and lower bytes that make up the 16-bit value are split
- *into two unsined, 8-bit values and written to the upper and lower addresses of
- *the specified register value. Only the lower (base) address must be specified.
- *This function assumes the controller is set to standard SPI mode.
+ *into two unsigned, 8-bit values and written to the upper and lower addresses
+ *of the specified register value. Only the lower (base) address must be
+ *specified. This function assumes the controller is set to standard SPI mode.
  **/
 void ADIS16448_IMU::WriteRegister(uint8_t reg, uint16_t val) {
   uint8_t buf[2];
@@ -609,126 +592,95 @@ ADIS16448_IMU::~ADIS16448_IMU() {
 void ADIS16448_IMU::Acquire() {
   // Set data packet length
   const int dataset_len = 29;  // 18 data points + timestamp
-
   const int BUFFER_SIZE = 4000;
 
   // This buffer can contain many datasets
   uint32_t buffer[BUFFER_SIZE];
-  int data_count = 0;
-  int data_remainder = 0;
-  int data_to_read = 0;
-  int bufferAvgIndex = 0;
   uint32_t previous_timestamp = 0;
-  double gyro_rate_x = 0.0;
-  double gyro_rate_y = 0.0;
-  double gyro_rate_z = 0.0;
-  double accel_x = 0.0;
-  double accel_y = 0.0;
-  double accel_z = 0.0;
-  double mag_x = 0.0;
-  double mag_y = 0.0;
-  double mag_z = 0.0;
-  double baro = 0.0;
-  double temp = 0.0;
-  double gyro_rate_x_si = 0.0;
-  double gyro_rate_y_si = 0.0;
-  // double gyro_rate_z_si = 0.0;
-  double accel_x_si = 0.0;
-  double accel_y_si = 0.0;
-  double accel_z_si = 0.0;
   double compAngleX = 0.0;
   double compAngleY = 0.0;
-  double accelAngleX = 0.0;
-  double accelAngleY = 0.0;
-
   while (true) {
-    // Sleep loop for 10ms (wait for data)
+    // Wait for data
     Wait(10_ms);
 
     if (m_thread_active) {
-      data_count = m_spi->ReadAutoReceivedData(
-          buffer, 0,
-          0_s);  // Read number of bytes currently stored in the buffer
-      data_remainder =
-          data_count % dataset_len;  // Check if frame is incomplete
-      data_to_read = data_count -
-                     data_remainder;  // Remove incomplete data from read count
-      /* Want to cap the data to read in a single read at the buffer size */
+      // Read number of bytes currently stored in the buffer
+      int data_count = m_spi->ReadAutoReceivedData(buffer, 0, 0_s);
+      // Check if frame is incomplete
+      int data_remainder = data_count % dataset_len;
+      // Remove incomplete data from read count
+      int data_to_read = data_count - data_remainder;
+      // Want to cap the data to read in a single read at the buffer size
       if (data_to_read > BUFFER_SIZE) {
         REPORT_WARNING(
             "ADIS16448 data processing thread overrun has occurred!");
         data_to_read = BUFFER_SIZE - (BUFFER_SIZE % dataset_len);
       }
-      m_spi->ReadAutoReceivedData(buffer, data_to_read,
-                                  0_s);  // Read data from DMA buffer
+      // Read data from DMA buffer
+      m_spi->ReadAutoReceivedData(buffer, data_to_read, 0_s);
 
       // Could be multiple data sets in the buffer. Handle each one.
       for (int i = 0; i < data_to_read; i += dataset_len) {
         // Calculate CRC-16 on each data packet
         uint16_t calc_crc = 0xFFFF;  // Starting word
-        uint8_t byte = 0;
-        uint16_t imu_crc = 0;
-        for (int k = 5; k < 27;
-             k += 2)  // Cycle through XYZ GYRO, XYZ ACCEL, XYZ MAG, BARO, TEMP
-                      // (Ignore Status & CRC)
-        {
-          byte = BuffToUByte(&buffer[i + k + 1]);  // Process LSB
-          calc_crc = (calc_crc >> 8) ^ adiscrc[(calc_crc & 0x00FF) ^ byte];
-          byte = BuffToUByte(&buffer[i + k]);  // Process MSB
-          calc_crc = (calc_crc >> 8) ^ adiscrc[(calc_crc & 0x00FF) ^ byte];
+        // Cycle through XYZ GYRO, XYZ ACCEL, XYZ MAG, BARO, TEMP (Ignore Status
+        // & CRC)
+        for (int k = 5; k < 27; k += 2) {
+          // Process LSB
+          uint8_t byte = static_cast<uint8_t>(buffer[i + k + 1]);
+          calc_crc = (calc_crc >> 8) ^ m_adiscrc[(calc_crc & 0x00FF) ^ byte];
+          // Process MSB
+          byte = static_cast<uint8_t>(buffer[i + k]);
+          calc_crc = (calc_crc >> 8) ^ m_adiscrc[(calc_crc & 0x00FF) ^ byte];
         }
-        calc_crc = ~calc_crc;  // Complement
-        calc_crc = static_cast<uint16_t>((calc_crc << 8) |
-                                         (calc_crc >> 8));  // Flip LSB & MSB
-        imu_crc =
-            BuffToUShort(&buffer[i + 27]);  // Extract DUT CRC from data buffer
+        // Complement
+        calc_crc = ~calc_crc;
+        // Flip LSB & MSB
+        calc_crc = static_cast<uint16_t>((calc_crc << 8) | (calc_crc >> 8));
+        // Extract DUT CRC from data buffer
+        uint16_t imu_crc = BuffToUShort(&buffer[i + 27]);
 
         // Compare calculated vs read CRC. Don't update outputs or dt if CRC-16
         // is bad
         if (calc_crc == imu_crc) {
           // Timestamp is at buffer[i]
           m_dt = (buffer[i] - previous_timestamp) / 1000000.0;
-          // Split array and scale data
-          gyro_rate_x = BuffToShort(&buffer[i + 5]) * 0.04;
-          gyro_rate_y = BuffToShort(&buffer[i + 7]) * 0.04;
-          gyro_rate_z = BuffToShort(&buffer[i + 9]) * 0.04;
-          accel_x = BuffToShort(&buffer[i + 11]) * 0.833;
-          accel_y = BuffToShort(&buffer[i + 13]) * 0.833;
-          accel_z = BuffToShort(&buffer[i + 15]) * 0.833;
-          mag_x = BuffToShort(&buffer[i + 17]) * 0.1429;
-          mag_y = BuffToShort(&buffer[i + 19]) * 0.1429;
-          mag_z = BuffToShort(&buffer[i + 21]) * 0.1429;
-          baro = BuffToShort(&buffer[i + 23]) * 0.02;
-          temp = BuffToShort(&buffer[i + 25]) * 0.07386 + 31.0;
+          // Scale sensor data
+          double gyro_rate_x = BuffToShort(&buffer[i + 5]) * 0.04;
+          double gyro_rate_y = BuffToShort(&buffer[i + 7]) * 0.04;
+          double gyro_rate_z = BuffToShort(&buffer[i + 9]) * 0.04;
+          double accel_x = BuffToShort(&buffer[i + 11]) * 0.833;
+          double accel_y = BuffToShort(&buffer[i + 13]) * 0.833;
+          double accel_z = BuffToShort(&buffer[i + 15]) * 0.833;
+          double mag_x = BuffToShort(&buffer[i + 17]) * 0.1429;
+          double mag_y = BuffToShort(&buffer[i + 19]) * 0.1429;
+          double mag_z = BuffToShort(&buffer[i + 21]) * 0.1429;
+          double baro = BuffToShort(&buffer[i + 23]) * 0.02;
+          double temp = BuffToShort(&buffer[i + 25]) * 0.07386 + 31.0;
 
           // Convert scaled sensor data to SI units
-          gyro_rate_x_si = gyro_rate_x * deg_to_rad;
-          gyro_rate_y_si = gyro_rate_y * deg_to_rad;
-          // gyro_rate_z_si = gyro_rate_z * deg_to_rad;
-          accel_x_si = accel_x * grav;
-          accel_y_si = accel_y * grav;
-          accel_z_si = accel_z * grav;
+          double gyro_rate_x_si = gyro_rate_x * deg_to_rad;
+          double gyro_rate_y_si = gyro_rate_y * deg_to_rad;
+          // double gyro_rate_z_si = gyro_rate_z * deg_to_rad;
+          double accel_x_si = accel_x * grav;
+          double accel_y_si = accel_y * grav;
+          double accel_z_si = accel_z * grav;
           // Store timestamp for next iteration
           previous_timestamp = buffer[i];
           // Calculate alpha for use with the complementary filter
-          m_alpha = m_tau / (m_tau + m_dt);
+          m_alpha = 0.5 / (0.5 + m_dt);
+          // Run inclinometer calculations
+          double accelAngleX = atan2f(
+              -accel_x_si,
+              sqrtf((accel_y_si * accel_y_si) + (-accel_z_si * -accel_z_si)));
+          double accelAngleY = atan2f(
+              accel_y_si,
+              sqrtf((-accel_x_si * -accel_x_si) + (-accel_z_si * -accel_z_si)));
           // Calculate complementary filter
           if (m_first_run) {
-            accelAngleX = atan2f(
-                -accel_x_si,
-                sqrtf((accel_y_si * accel_y_si) + (-accel_z_si * -accel_z_si)));
-            accelAngleY =
-                atan2f(accel_y_si, sqrtf((-accel_x_si * -accel_x_si) +
-                                         (-accel_z_si * -accel_z_si)));
             compAngleX = accelAngleX;
             compAngleY = accelAngleY;
           } else {
-            accelAngleX = atan2f(
-                -accel_x_si,
-                sqrtf((accel_y_si * accel_y_si) + (-accel_z_si * -accel_z_si)));
-            accelAngleY =
-                atan2f(accel_y_si, sqrtf((-accel_x_si * -accel_x_si) +
-                                         (-accel_z_si * -accel_z_si)));
             accelAngleX = FormatAccelRange(accelAngleX, -accel_z_si);
             accelAngleY = FormatAccelRange(accelAngleY, -accel_z_si);
             compAngleX =
@@ -748,7 +700,7 @@ void ADIS16448_IMU::Acquire() {
             } else {
               // Accumulate gyro for offset calibration
               // Add most recent sample data to buffer
-              bufferAvgIndex = m_accum_count % m_avg_size;
+              int bufferAvgIndex = m_accum_count % m_avg_size;
               m_offset_buffer[bufferAvgIndex] =
                   OffsetData{gyro_rate_x, gyro_rate_y, gyro_rate_z};
               // Increment counter
@@ -787,31 +739,9 @@ void ADIS16448_IMU::Acquire() {
       }
     } else {
       m_thread_idle = true;
-      data_count = 0;
-      data_remainder = 0;
-      data_to_read = 0;
       previous_timestamp = 0.0;
-      gyro_rate_x = 0.0;
-      gyro_rate_y = 0.0;
-      gyro_rate_z = 0.0;
-      accel_x = 0.0;
-      accel_y = 0.0;
-      accel_z = 0.0;
-      mag_x = 0.0;
-      mag_y = 0.0;
-      mag_z = 0.0;
-      baro = 0.0;
-      temp = 0.0;
-      gyro_rate_x_si = 0.0;
-      gyro_rate_y_si = 0.0;
-      // gyro_rate_z_si = 0.0;
-      accel_x_si = 0.0;
-      accel_y_si = 0.0;
-      accel_z_si = 0.0;
       compAngleX = 0.0;
       compAngleY = 0.0;
-      accelAngleX = 0.0;
-      accelAngleY = 0.0;
     }
   }
 }
@@ -821,16 +751,6 @@ double ADIS16448_IMU::FormatFastConverge(double compAngle, double accAngle) {
   if (compAngle > accAngle + std::numbers::pi) {
     compAngle = compAngle - 2.0 * std::numbers::pi;
   } else if (accAngle > compAngle + std::numbers::pi) {
-    compAngle = compAngle + 2.0 * std::numbers::pi;
-  }
-  return compAngle;
-}
-
-double ADIS16448_IMU::FormatRange0to2PI(double compAngle) {
-  while (compAngle >= 2 * std::numbers::pi) {
-    compAngle = compAngle - 2.0 * std::numbers::pi;
-  }
-  while (compAngle < 0.0) {
     compAngle = compAngle + 2.0 * std::numbers::pi;
   }
   return compAngle;
@@ -850,43 +770,35 @@ double ADIS16448_IMU::CompFilterProcess(double compAngle, double accelAngle,
   compAngle = FormatFastConverge(compAngle, accelAngle);
   compAngle =
       m_alpha * (compAngle + omega * m_dt) + (1.0 - m_alpha) * accelAngle;
-  compAngle = FormatRange0to2PI(compAngle);
-  if (compAngle > std::numbers::pi) {
-    compAngle = compAngle - 2.0 * std::numbers::pi;
-  }
-  return compAngle;
+  return frc::InputModulus(compAngle, -std::numbers::pi, std::numbers::pi);
 }
 
 int ADIS16448_IMU::ConfigDecRate(uint16_t decimationRate) {
   // Switches the active SPI port to standard SPI mode, writes a new value to
-  // the DECIMATE register in the IMU, and re-enables auto SPI.
-  //
-  // This function enters standard SPI mode, writes a new DECIMATE setting to
-  // the IMU, adjusts the sample scale factor, and re-enters auto SPI mode.
-  uint16_t writeValue = decimationRate;
-  uint16_t readbackValue;
+  // the DECIMATE register in the IMU, adjusts the sample scale factor, and
+  // re-enables auto SPI.
   if (!SwitchToStandardSPI()) {
     REPORT_ERROR("Failed to configure/reconfigure standard SPI.");
     return 2;
   }
 
-  /* Check max */
+  // Check max
   if (decimationRate > 9) {
     REPORT_ERROR(
         "Attempted to write an invalid decimation value. Capping at 9");
     decimationRate = 9;
   }
 
-  /* Shift decimation setting to correct position and select internal sync */
-  writeValue = (decimationRate << 8) | 0x1;
+  // Shift decimation setting to correct position and select internal sync
+  uint16_t writeValue = (decimationRate << 8) | 0x1;
 
-  /* Apply to IMU */
+  // Apply to IMU
   WriteRegister(SMPL_PRD, writeValue);
 
-  /* Perform read back to verify write */
-  readbackValue = ReadRegister(SMPL_PRD);
+  // Perform read back to verify write
+  uint16_t readbackValue = ReadRegister(SMPL_PRD);
 
-  /* Throw error for invalid write */
+  // Throw error for invalid write
   if (readbackValue != writeValue) {
     REPORT_ERROR("ADIS16448 SMPL_PRD write failed.");
   }
@@ -1059,12 +971,6 @@ int ADIS16448_IMU::GetPort() const {
   return m_spi_port;
 }
 
-/**
- * @brief Builds a Sendable object to push IMU data to the driver station.
- *
- * This function pushes the most recent angle estimates for all axes to the
- *driver station.
- **/
 void ADIS16448_IMU::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("ADIS16448 IMU");
   builder.AddDoubleProperty(
