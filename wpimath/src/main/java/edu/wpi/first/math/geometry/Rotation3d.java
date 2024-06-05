@@ -422,11 +422,8 @@ public class Rotation3d
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Rotation3d) {
-      var other = (Rotation3d) obj;
-      return Math.abs(Math.abs(m_q.dot(other.m_q)) - m_q.norm() * other.m_q.norm()) < 1e-9;
-    }
-    return false;
+    return obj instanceof Rotation3d other
+        && Math.abs(Math.abs(m_q.dot(other.m_q)) - m_q.norm() * other.m_q.norm()) < 1e-9;
   }
 
   @Override

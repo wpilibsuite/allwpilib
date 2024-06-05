@@ -328,11 +328,8 @@ public class PoseEstimator<T> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof PoseEstimator.InterpolationRecord)) {
-        return false;
-      }
-      var record = (PoseEstimator<?>.InterpolationRecord) obj;
-      return Objects.equals(gyroAngle, record.gyroAngle)
+      return obj instanceof PoseEstimator<?>.InterpolationRecord record
+          && Objects.equals(gyroAngle, record.gyroAngle)
           && Objects.equals(wheelPositions, record.wheelPositions)
           && Objects.equals(poseMeters, record.poseMeters);
     }

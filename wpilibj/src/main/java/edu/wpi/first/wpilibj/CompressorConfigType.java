@@ -31,16 +31,12 @@ public enum CompressorConfigType {
    * @return type
    */
   public static CompressorConfigType fromValue(int value) {
-    switch (value) {
-      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_HYBRID:
-        return Hybrid;
-      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_ANALOG:
-        return Analog;
-      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_DIGITAL:
-        return Digital;
-      default:
-        return Disabled;
-    }
+    return switch (value) {
+      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_HYBRID -> Hybrid;
+      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_ANALOG -> Analog;
+      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_DIGITAL -> Digital;
+      default -> Disabled;
+    };
   }
 
   /**

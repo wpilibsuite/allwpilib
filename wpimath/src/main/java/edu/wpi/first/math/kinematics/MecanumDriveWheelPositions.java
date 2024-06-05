@@ -79,14 +79,11 @@ public class MecanumDriveWheelPositions
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof MecanumDriveWheelPositions) {
-      MecanumDriveWheelPositions other = (MecanumDriveWheelPositions) obj;
-      return Math.abs(other.frontLeftMeters - frontLeftMeters) < 1E-9
-          && Math.abs(other.frontRightMeters - frontRightMeters) < 1E-9
-          && Math.abs(other.rearLeftMeters - rearLeftMeters) < 1E-9
-          && Math.abs(other.rearRightMeters - rearRightMeters) < 1E-9;
-    }
-    return false;
+    return obj instanceof MecanumDriveWheelPositions other
+        && Math.abs(other.frontLeftMeters - frontLeftMeters) < 1E-9
+        && Math.abs(other.frontRightMeters - frontRightMeters) < 1E-9
+        && Math.abs(other.rearLeftMeters - rearLeftMeters) < 1E-9
+        && Math.abs(other.rearRightMeters - rearRightMeters) < 1E-9;
   }
 
   @Override
