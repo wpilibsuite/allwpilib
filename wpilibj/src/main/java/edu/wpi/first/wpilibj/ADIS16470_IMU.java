@@ -205,6 +205,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   // Complementary filter variables
   private double m_dt = 0.0;
   private double m_alpha = 0.0;
+  private static final double kTau = 1.0;
   private double m_compAngleX = 0.0;
   private double m_compAngleY = 0.0;
   private double m_accelAngleX = 0.0;
@@ -743,7 +744,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
           // Store timestamp for next iteration
           previous_timestamp = buffer[i];
 
-          m_alpha = 1.0 / (1.0 + m_dt);
+          m_alpha = kTau / (kTau + m_dt);
 
           // Run inclinometer calculations
           double accelAngleX =
