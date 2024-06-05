@@ -10,6 +10,8 @@ HAL_SimDeviceHandle HAL_CreateSimDevice(const char* name) {
   return 0;
 }
 
+void HAL_DisableSimDeviceCreation(bool disabled) {}
+
 void HAL_FreeSimDevice(HAL_SimDeviceHandle handle) {}
 
 const char* HAL_GetSimDeviceName(HAL_SimDeviceHandle handle) {
