@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "REVPHSimGui.h"
+#include "PHSimGui.h"
 
 #include <glass/hardware/PCM.h>
 #include <glass/other/DeviceTree.h>
@@ -85,9 +85,9 @@ class SolenoidSimModel : public glass::SolenoidModel {
   REVPHSolenoidOutputSource m_output;
 };
 
-class REVPHSimModel : public glass::PHModel {
+class PHSimModel : public glass::PHModel {
  public:
-  explicit REVPHSimModel(int32_t index)
+  explicit PHSimModel(int32_t index)
       : m_index{index},
         m_compressor{index},
         m_solenoids(HAL_GetNumCTRESolenoidChannels()) {}
@@ -111,23 +111,23 @@ class REVPHSimModel : public glass::PHModel {
   int m_solenoidInitCount = 0;
 };
 
-class REVPHsSimModel : public glass::PHsModel {
+class PHsSimModel : public glass::PHsModel {
  public:
-  REVPHsSimModel() : m_models(HAL_GetNumREVPHModules()) {}
+  PHsSimModel() : m_models(HAL_GetNumREVPHModules()) {}
 
   void Update() override;
 
   bool Exists() override { return true; }
 
-  void ForEachREVPH(wpi::function_ref<void(glass::PHModel& model, int index)>
+  void ForEachPH(wpi::function_ref<void(glass::PHModel& model, int index)>
                         func) override;
 
  private:
-  std::vector<std::unique_ptr<REVPHSimModel>> m_models;
+  std::vector<std::unique_ptr<PHSimModel>> m_models;
 };
 }  // namespace
 
-void REVPHSimModel::Update() {
+void PHSimModel::Update() {
   int32_t numChannels = m_solenoids.size();
   m_solenoidInitCount = 0;
   for (int32_t i = 0; i < numChannels; ++i) {
@@ -143,7 +143,7 @@ void REVPHSimModel::Update() {
   }
 }
 
-void REVPHSimModel::ForEachSolenoid(
+void PHSimModel::ForEachSolenoid(
     wpi::function_ref<void(glass::SolenoidModel& model, int index)> func) {
   if (m_solenoidInitCount == 0) {
     return;
@@ -156,13 +156,13 @@ void REVPHSimModel::ForEachSolenoid(
   }
 }
 
-void REVPHsSimModel::Update() {
+void PHsSimModel::Update() {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
        ++i) {
     auto& model = m_models[i];
     if (HALSIM_GetREVPHInitialized(i)) {
       if (!model) {
-        model = std::make_unique<REVPHSimModel>(i);
+        model = std::make_unique<PHSimModel>(i);
       }
       model->Update();
     } else {
@@ -171,7 +171,7 @@ void REVPHsSimModel::Update() {
   }
 }
 
-void REVPHsSimModel::ForEachREVPH(
+void PHsSimModel::ForEachPH(
     wpi::function_ref<void(glass::PHModel& model, int index)> func) {
   int32_t numREVPHs = m_models.size();
   for (int32_t i = 0; i < numREVPHs; ++i) {
@@ -181,7 +181,7 @@ void REVPHsSimModel::ForEachREVPH(
   }
 }
 
-static bool REVPHsAnyInitialized() {
+static bool PHsAnyInitialized() {
   static const int32_t num = HAL_GetNumREVPHModules();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetREVPHInitialized(i)) {
@@ -191,17 +191,17 @@ static bool REVPHsAnyInitialized() {
   return false;
 }
 
-void REVPHSimGui::Initialize() {
-  HALSimGui::halProvider->RegisterModel("REVPHs", REVPHsAnyInitialized, [] {
-    return std::make_unique<REVPHsSimModel>();
+void PHSimGui::Initialize() {
+  HALSimGui::halProvider->RegisterModel("REVPHs", PHsAnyInitialized, [] {
+    return std::make_unique<PHsSimModel>();
   });
   HALSimGui::halProvider->RegisterView(
       "Solenoids", "REVPHs",
       [](glass::Model* model) {
         bool any = false;
-        static_cast<REVPHsSimModel*>(model)->ForEachREVPH(
+        static_cast<PHsSimModel*>(model)->ForEachPH(
             [&](glass::PHModel& REVPH, int) {
-              if (static_cast<REVPHSimModel*>(&REVPH)->GetNumSolenoids() > 0) {
+              if (static_cast<PHSimModel*>(&REVPH)->GetNumSolenoids() > 0) {
                 any = true;
               }
             });
@@ -212,7 +212,7 @@ void REVPHSimGui::Initialize() {
         win->SetDefaultPos(290, 20);
         return glass::MakeFunctionView([=] {
           glass::DisplayPHsSolenoids(
-              static_cast<REVPHsSimModel*>(model),
+              static_cast<PHsSimModel*>(model),
               HALSimGui::halProvider->AreOutputsEnabled());
         });
       });
@@ -220,7 +220,7 @@ void REVPHSimGui::Initialize() {
   SimDeviceGui::GetDeviceTree().Add(
       HALSimGui::halProvider->GetModel("REVPHs"), [](glass::Model* model) {
         glass::DisplayCompressorsDevice(
-            static_cast<REVPHsSimModel*>(model),
+            static_cast<PHsSimModel*>(model),
             HALSimGui::halProvider->AreOutputsEnabled());
       });
 }

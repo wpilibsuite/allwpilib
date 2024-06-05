@@ -6,7 +6,7 @@
 
 namespace halsimgui {
 
-class REVPHSimGui {
+class PHSimGui {
  public:
   static void Initialize();
 };

@@ -34,7 +34,16 @@ class SolenoidModel : public Model {
   virtual void SetOutput(bool val) = 0;
 };
 
+
 class PCMModel : public Model {
+ public:
+  virtual CompressorModel* GetCompressor() = 0;
+
+  virtual void ForEachSolenoid(
+      wpi::function_ref<void(SolenoidModel& model, int index)> func) = 0;
+};
+
+class PHModel : public Model {
  public:
   virtual CompressorModel* GetCompressor() = 0;
 
@@ -48,26 +57,19 @@ class PCMsModel : public Model {
       wpi::function_ref<void(PCMModel& model, int index)> func) = 0;
 };
 
-class PHModel : public Model {
- public:
-  virtual CompressorModel* GetCompressor() = 0;
-
-  virtual void ForEachSolenoid(
-      wpi::function_ref<void(SolenoidModel& model, int index)> func) = 0;
-};
-
 class PHsModel : public Model {
  public:
-  virtual void ForEachREVPH(
+  virtual void ForEachPH(
       wpi::function_ref<void(PHModel& model, int index)> func) = 0;
 };
 
-bool DisplayPCMSolenoids(PCMModel* model, int index, bool outputsEnabled);
-bool DisplayPHSolenoids(PHModel* model, int index, bool outputsEnabled);
+bool DisplaySolenoids(
+    wpi::function_ref<void(SolenoidModel& model, int index)> forEachSolenoid, int index,
+    bool outputsEnabled, std::string headerLabel);
 void DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
                           std::string_view noneMsg = "No solenoids");
 void DisplayPHsSolenoids(PHsModel* model, bool outputsEnabled,
-                            std::string_view noneMsg = "No solenoids");
+                         std::string_view noneMsg = "No solenoids");
 
 void DisplayCompressorDevice(CompressorModel* model, int index,
                              bool outputsEnabled);

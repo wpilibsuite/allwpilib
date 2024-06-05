@@ -20,10 +20,11 @@
 
 using namespace glass;
 
-bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
-                                bool outputsEnabled) {
+bool glass::DisplaySolenoids(
+    wpi::function_ref<void(SolenoidModel& model, int index)> forEachSolenoid,
+    int index, bool outputsEnabled, std::string headerLabel) {
   wpi::SmallVector<int, 16> channels;
-  model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
+  forEachSolenoid([&](SolenoidModel& solenoid, int j) {
     if (auto data = solenoid.GetOutputData()) {
       if (j >= static_cast<int>(channels.size())) {
         channels.resize(j + 1);
@@ -50,72 +51,8 @@ bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
     wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
                            index);
   } else {
-    wpi::format_to_n_c_str(label, sizeof(label), "PCM[{}]###header", index);
-  }
-
-  // header
-  bool open = CollapsingHeader(label);
-
-  PopupEditName("header", &name);
-
-  ImGui::SetItemAllowOverlap();
-  ImGui::SameLine();
-
-  // show channels as LED indicators
-  static const ImU32 colors[] = {IM_COL32(255, 255, 102, 255),
-                                 IM_COL32(128, 128, 128, 255)};
-  DrawLEDs(channels.data(), channels.size(), channels.size(), colors);
-
-  if (open) {
-    ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
-    model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
-      if (auto data = solenoid.GetOutputData()) {
-        PushID(j);
-        char label[64];
-        NameSetting name{data->GetName()};
-        name.GetLabel(label, sizeof(label), "Solenoid", j);
-        data->LabelText(label, "%s", channels[j] == 1 ? "On" : "Off");
-        name.PopupEditName(j);
-        PopID();
-      }
-    });
-    ImGui::PopItemWidth();
-  }
-
-  return true;
-}
-
-bool glass::DisplayPHSolenoids(PHModel* model, int index,
-                                  bool outputsEnabled) {
-  wpi::SmallVector<int, 16> channels;
-  model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
-    if (auto data = solenoid.GetOutputData()) {
-      if (j >= static_cast<int>(channels.size())) {
-        channels.resize(j + 1);
-      }
-      channels[j] = (outputsEnabled && data->GetValue()) ? 1 : -1;
-    }
-  });
-
-  if (channels.empty()) {
-    return false;
-  }
-
-  // show nonexistent channels as empty
-  for (auto&& ch : channels) {
-    if (ch == 0) {
-      ch = -2;
-    }
-  }
-
-  // build header label
-  std::string& name = GetStorage().GetString("name");
-  char label[128];
-  if (!name.empty()) {
-    wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
+    wpi::format_to_n_c_str(label, sizeof(label), headerLabel + "[{}]###header",
                            index);
-  } else {
-    wpi::format_to_n_c_str(label, sizeof(label), "REVPH[{}]###header", index);
   }
 
   // header
@@ -133,7 +70,7 @@ bool glass::DisplayPHSolenoids(PHModel* model, int index,
 
   if (open) {
     ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
-    model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
+    forEachSolenoid([&](SolenoidModel& solenoid, int j) {
       if (auto data = solenoid.GetOutputData()) {
         PushID(j);
         char label[64];
@@ -155,7 +92,7 @@ void glass::DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
   bool hasAny = false;
   model->ForEachPCM([&](PCMModel& pcm, int i) {
     PushID(i);
-    if (DisplayPCMSolenoids(&pcm, i, outputsEnabled)) {
+    if (DisplaySolenoids([&] { pcm.ForEachSolenoid({}); }, i, outputsEnabled, "PCM")) {
       hasAny = true;
     }
     PopID();
@@ -166,11 +103,11 @@ void glass::DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
 }
 
 void glass::DisplayPHsSolenoids(PHsModel* model, bool outputsEnabled,
-                                   std::string_view noneMsg) {
+                                std::string_view noneMsg) {
   bool hasAny = false;
-  model->ForEachREVPH([&](PHModel& revph, int i) {
+  model->ForEachPH([&](PHModel& ph, int i) {
     PushID(i);
-    if (DisplayPHSolenoids(&revph, i, outputsEnabled)) {
+    if (DisplaySolenoids(&ph, i, outputsEnabled, "PH")) {
       hasAny = true;
     }
     PopID();
@@ -184,7 +121,7 @@ void glass::DisplayCompressorDevice(CompressorModel* model, int index,
                                     bool outputsEnabled) {
   if (!model || !model->Exists()) {
     return;
-  }      
+  }
   char name[32];
   wpi::format_to_n_c_str(name, sizeof(name), "Compressor[{}]", index);
 
@@ -236,7 +173,7 @@ void glass::DisplayCompressorsDevice(PCMsModel* model, bool outputsEnabled) {
 }
 
 void glass::DisplayCompressorsDevice(PHsModel* model, bool outputsEnabled) {
-  model->ForEachREVPH([&](PHModel& revph, int i) {
-    DisplayCompressorDevice(revph.GetCompressor(), i, outputsEnabled);
+  model->ForEachPH([&](PHModel& ph, int i) {
+    DisplayCompressorDevice(ph.GetCompressor(), i, outputsEnabled);
   });
 }

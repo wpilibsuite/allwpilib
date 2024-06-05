@@ -86,7 +86,7 @@ __declspec(dllexport)
   PowerDistributionSimGui::Initialize();
   PWMSimGui::Initialize();
   RelaySimGui::Initialize();
-  REVPHSimGui::Initialize();
+  PHSimGui::Initialize();
   RoboRioSimGui::Initialize();
   TimingGui::Initialize();
 
