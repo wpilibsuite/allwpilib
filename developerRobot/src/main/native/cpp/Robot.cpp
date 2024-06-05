@@ -5,11 +5,12 @@
 #include <frc/TimedRobot.h>
 
 class Robot : public frc::TimedRobot {
+ public:
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
-  Robot() {}
+  Robot() : frc::TimedRobot() {}
 
   /**
    * This function is run once each time the robot enters autonomous mode
