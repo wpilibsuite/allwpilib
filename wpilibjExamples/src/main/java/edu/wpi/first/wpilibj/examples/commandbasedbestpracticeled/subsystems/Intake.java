@@ -11,72 +11,58 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 
-import frc.robot.Color;
-import frc.robot.LEDPattern;
-import frc.robot.subsystems.RobotSignals.LEDView;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Color;
+import frc.robot.LEDPattern;
+import frc.robot.subsystems.RobotSignals.LEDView;
 
 public class Intake extends SubsystemBase {
-
   private final LEDView robotSignals;
   private final CommandXboxController operatorController;
 
-  public final Trigger gamePieceAcquired =
-      new Trigger(this::hasGamePieceAcquired);
+  public final Trigger gamePieceAcquired = new Trigger(this::hasGamePieceAcquired);
 
-  public Intake(LEDView robotSignals,
-      CommandXboxController operatorController) {
-
+  public Intake(LEDView robotSignals, CommandXboxController operatorController) {
     this.robotSignals = robotSignals;
     this.operatorController = operatorController;
     gamePieceAcquired.whileTrue(gamePieceIsAcquired());
   }
 
   /**
-   * 
    * @return command to set the signal indicating game piece acquired
    */
   public Command gamePieceIsAcquired() {
-
-    LEDPattern gamePieceAcquiredSignal =
-        LEDPattern.solid(Color.kMagenta).blink(Seconds.of(0.2));
-    return robotSignals.setSignal(gamePieceAcquiredSignal) // this command locks the
-                                                           // robotSignals.Main subsystem only
+    LEDPattern gamePieceAcquiredSignal = LEDPattern.solid(Color.kMagenta).blink(Seconds.of(0.2));
+    return robotSignals
+        .setSignal(gamePieceAcquiredSignal) // this command locks the
+        // robotSignals.Main subsystem only
         .ignoringDisable(true)
         .withName("MainGamePieceAcquiredSignal");
   }
 
   /**
-   * 
    * @return status of fake event source for game piece acquired
    */
   private boolean hasGamePieceAcquired() {
-
     return operatorController.getHID().getBButton();
   }
 
   /**
    * Example of how to disallow default command
-   * 
+   *
    * @param def default command (not used)
    */
   @Override
   public void setDefaultCommand(Command def) {
-
     throw new IllegalArgumentException("Default Command not allowed");
   }
 
-  /**
-   * Run before commands and triggers
-   */
+  /** Run before commands and triggers */
   public void beforeCommands() {}
 
-  /**
-   * Run after commands and triggers
-   */
+  /** Run after commands and triggers */
   public void afterCommands() {}
 }

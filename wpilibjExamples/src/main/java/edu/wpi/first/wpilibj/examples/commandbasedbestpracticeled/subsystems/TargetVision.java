@@ -9,81 +9,67 @@ package frc.robot.subsystems;
  * signal is displayed to indicate the status of the Target Vision (acquired target or not).
  */
 
-import frc.robot.Color;
-import frc.robot.LEDPattern;
-import frc.robot.subsystems.RobotSignals.LEDView;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Color;
+import frc.robot.LEDPattern;
+import frc.robot.subsystems.RobotSignals.LEDView;
 
 public class TargetVision extends SubsystemBase {
-
   private final LEDView m_RobotSignals;
   private final CommandXboxController m_OperatorController;
 
   public final Trigger m_TargetAcquired = new Trigger(this::canSeeTarget);
 
   /**
-   * 
    * @param robotSignals
    * @param operatorController
    */
-  public TargetVision(LEDView robotSignals,
-      CommandXboxController operatorController) {
-
+  public TargetVision(LEDView robotSignals, CommandXboxController operatorController) {
     this.m_RobotSignals = robotSignals;
     this.m_OperatorController = operatorController;
     m_TargetAcquired.whileTrue(targetIsAcquired());
   }
 
   /**
-   * 
    * @return command to set the signal indicating target acquired
    */
   public Command targetIsAcquired() {
-
     LEDPattern targetAcquiredSignal = LEDPattern.solid(Color.kOrange);
-    return
-
-    m_RobotSignals.setSignal(targetAcquiredSignal) // this command locks the robotSignals.Top
-                                                 // subsystem only
+    return m_RobotSignals
+        .setSignal(targetAcquiredSignal) // this command locks the robotSignals.Top
+        // subsystem only
         .andThen(Commands.idle(this).withTimeout(0.)) // command created in this subsystem will lock
-                                                      // this subsystem also
+        // this subsystem also
         /* composite */
-        .withName("LedVisionTargetInSight").ignoringDisable(true); // ignore disable true must be
-                                        // here on the composite; on the first command doesn't do anything
+        .withName("LedVisionTargetInSight")
+        .ignoringDisable(true); // ignore disable true must be
+    // here on the composite; on the first command doesn't do anything
   }
 
   /**
-   * 
    * @return status of fake event source for target acquired
    */
   private boolean canSeeTarget() {
-
     return m_OperatorController.getHID().getAButton();
   }
 
   /**
    * Example of how to disallow default command
-   * 
+   *
    * @param def default command
    */
   @Override
   public void setDefaultCommand(Command def) {
-
     throw new IllegalArgumentException("Default Command not allowed");
   }
 
-  /**
-   * Run before commands and triggers
-   */
+  /** Run before commands and triggers */
   public void beforeCommands() {}
 
-  /**
-   * Run after commands and triggers
-   */
+  /** Run after commands and triggers */
   public void afterCommands() {}
 }
