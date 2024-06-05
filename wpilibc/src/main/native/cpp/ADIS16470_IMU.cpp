@@ -695,7 +695,7 @@ void ADIS16470_IMU::Acquire() {
         // Store timestamp for next iteration
         previous_timestamp = buffer[i];
 
-        m_alpha = 1.0 / (1.0 + m_dt);
+        m_alpha = kTau / (kTau + m_dt);
 
         // Run inclinometer calculations
         double accelAngleX = atan2f(
