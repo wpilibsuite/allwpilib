@@ -63,7 +63,6 @@ public class GroupDisjointTest {
   private static GroupDisjointTest single_instance = null;
 
   private GroupDisjointTest() {
-
     configureTestJob(m_UseTriggeredJob);
   }
 
