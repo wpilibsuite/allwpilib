@@ -263,7 +263,8 @@ public final class Units {
 
   // Frequency
   /** The unit of frequency. */
-  public static final Velocity<Dimensionless> Hertz = Value.per(Second);
+  public static final Velocity<Dimensionless> Hertz =
+      derive(Value.per(Second)).named("Hertz").symbol("Hz").make();
 
   // Voltage
   /** The base unit of electric potential. */
