@@ -44,4 +44,9 @@ public class Transform3dProto implements Protobuf<Transform3d, ProtobufTransform
     Translation3d.proto.pack(msg.getMutableTranslation(), value.getTranslation());
     Rotation3d.proto.pack(msg.getMutableRotation(), value.getRotation());
   }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
+  }
 }

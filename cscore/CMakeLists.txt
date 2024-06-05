@@ -84,7 +84,6 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     #find java files, copy them locally
     file(GLOB cscore_jni_src src/main/native/cpp/jni/CameraServerJNI.cpp)
@@ -99,6 +98,7 @@ if(WITH_JAVA)
         OUTPUT_NAME cscore
         GENERATE_NATIVE_HEADERS cscore_jni_headers
     )
+    set_property(TARGET cscore_jar PROPERTY FOLDER "java")
 
     install_jar(cscore_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS cscore_jar FILE cscore_jar.cmake DESTINATION share/cscore)

@@ -64,6 +64,13 @@ PowerDistribution::~PowerDistribution() {
   }
 }
 
+int PowerDistribution::GetNumChannels() const {
+  int32_t status = 0;
+  int32_t size = HAL_GetPowerDistributionNumChannels(m_handle, &status);
+  FRC_ReportError(status, "Module {}", m_module);
+  return size;
+}
+
 double PowerDistribution::GetVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetPowerDistributionVoltage(m_handle, &status);
@@ -85,6 +92,17 @@ double PowerDistribution::GetCurrent(int channel) const {
   FRC_ReportError(status, "Module {} Channel {}", m_module, channel);
 
   return current;
+}
+
+std::vector<double> PowerDistribution::GetAllCurrents() const {
+  int32_t status = 0;
+  int32_t size = GetNumChannels();
+  std::vector<double> currents(size);
+
+  HAL_GetPowerDistributionAllChannelCurrents(m_handle, currents.data(), size,
+                                             &status);
+  FRC_ReportError(status, "Module {}", m_module);
+  return currents;
 }
 
 double PowerDistribution::GetTotalCurrent() const {
@@ -300,9 +318,7 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
 
 void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistribution");
-  int32_t status = 0;
-  int numChannels = HAL_GetPowerDistributionNumChannels(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  int numChannels = GetNumChannels();
   // Use manual reads to avoid printing errors
   for (int i = 0; i < numChannels; ++i) {
     builder.AddDoubleProperty(

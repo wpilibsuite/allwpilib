@@ -5,8 +5,12 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 #include <functional>
 #include <stdexcept>
+
+#include <wpi/Algorithm.h>
+#include <wpi/SmallVector.h>
 
 #include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
@@ -162,6 +166,56 @@ class LinearSystem {
   OutputVector CalculateY(const StateVector& x,
                           const InputVector& clampedU) const {
     return m_C * x + m_D * clampedU;
+  }
+
+  /**
+   * Returns the LinearSystem with the outputs listed in outputIndices.
+   *
+   * <p>This is used by state observers such as the Kalman Filter.
+   *
+   * @param outputIndices the list of output indices to include in the sliced
+   * system.
+   * @return the sliced LinearSystem with outputs set to row vectors of
+   * LinearSystem.
+   * @throws std::domain_error if any outputIndices are outside the range of
+   * system outputs.
+   * @throws std::domain_error if number of outputIndices exceeds the system
+   * outputs.
+   * @throws std::domain_error if duplication exists in outputIndices.
+   */
+  template <std::same_as<int>... OutputIndices>
+  LinearSystem<States, Inputs, sizeof...(OutputIndices)> Slice(
+      OutputIndices... outputIndices) {
+    static_assert(sizeof...(OutputIndices) <= Outputs,
+                  "More outputs requested than available. This is usually due "
+                  "to model implementation errors.");
+
+    wpi::for_each(
+        [](size_t i, const auto& elem) {
+          if (elem < 0 || elem >= Outputs) {
+            throw std::domain_error(
+                "Slice indices out of range. This is usually due to model "
+                "implementation errors.");
+          }
+        },
+        outputIndices...);
+
+    // Sort and deduplicate output indices
+    wpi::SmallVector<int> outputIndicesArray{outputIndices...};
+    std::sort(outputIndicesArray.begin(), outputIndicesArray.end());
+    auto last =
+        std::unique(outputIndicesArray.begin(), outputIndicesArray.end());
+    outputIndicesArray.erase(last, outputIndicesArray.end());
+
+    if (outputIndicesArray.size() != sizeof...(outputIndices)) {
+      throw std::domain_error(
+          "Duplicate indices exist. This is usually due to model "
+          "implementation errors.");
+    }
+
+    return LinearSystem<States, Inputs, sizeof...(OutputIndices)>{
+        m_A, m_B, m_C(outputIndicesArray, Eigen::placeholders::all),
+        m_D(outputIndicesArray, Eigen::placeholders::all)};
   }
 
  private:

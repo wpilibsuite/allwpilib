@@ -168,7 +168,7 @@ inline void NetworkTableInstance::StopClient() {
   ::nt::StopClient(m_handle);
 }
 
-inline void NetworkTableInstance::SetServer(const char* server_name,
+inline void NetworkTableInstance::SetServer(std::string_view server_name,
                                             unsigned int port) {
   ::nt::SetServer(m_handle, server_name, port);
 }

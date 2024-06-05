@@ -11,6 +11,8 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/deprecated.h>
+
 #include "cscore.h"
 
 namespace frc {
@@ -77,13 +79,16 @@ class CameraServer {
    */
   static cs::MjpegServer StartAutomaticCapture(const cs::VideoSource& camera);
 
+  WPI_IGNORE_DEPRECATED
   /**
    * Adds an Axis IP camera.
    *
    * This overload calls AddAxisCamera() with name "Axis Camera".
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @deprecated Call StartAutomaticCapture with a HttpCamera instead.
    */
+  [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(std::string_view host);
 
   /**
@@ -92,7 +97,9 @@ class CameraServer {
    * This overload calls AddAxisCamera() with name "Axis Camera".
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @deprecated Call StartAutomaticCapture with a HttpCamera instead.
    */
+  [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(const char* host);
 
   /**
@@ -101,7 +108,9 @@ class CameraServer {
    * This overload calls AddAxisCamera() with name "Axis Camera".
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @deprecated Call StartAutomaticCapture with a HttpCamera instead.
    */
+  [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(const std::string& host);
 
   /**
@@ -110,7 +119,9 @@ class CameraServer {
    * This overload calls AddAxisCamera() with name "Axis Camera".
    *
    * @param hosts Array of Camera host IPs/DNS names
+   * @deprecated Call StartAutomaticCapture with a HttpCamera instead.
    */
+  [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(std::span<const std::string> hosts);
 
   /**
@@ -119,8 +130,10 @@ class CameraServer {
    * This overload calls AddAxisCamera() with name "Axis Camera".
    *
    * @param hosts Array of Camera host IPs/DNS names
+   * @deprecated Call StartAutomaticCapture with a HttpCamera instead.
    */
   template <typename T>
+  [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(std::initializer_list<T> hosts);
 
   /**
@@ -128,7 +141,9 @@ class CameraServer {
    *
    * @param name The name to give the camera
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @deprecated Call StartAutomaticCapture with a HttpCamera instead.
    */
+  [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(std::string_view name,
                                       std::string_view host);
 
@@ -137,7 +152,9 @@ class CameraServer {
    *
    * @param name The name to give the camera
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @deprecated Call StartAutomaticCapture with a HttpCamera instead.
    */
+  [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(std::string_view name, const char* host);
 
   /**
@@ -145,7 +162,9 @@ class CameraServer {
    *
    * @param name The name to give the camera
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @deprecated Call StartAutomaticCapture with a HttpCamera instead.
    */
+  [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(std::string_view name,
                                       const std::string& host);
 
@@ -154,7 +173,9 @@ class CameraServer {
    *
    * @param name The name to give the camera
    * @param hosts Array of Camera host IPs/DNS names
+   * @deprecated Call StartAutomaticCapture with a HttpCamera instead.
    */
+  [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(std::string_view name,
                                       std::span<const std::string> hosts);
 
@@ -163,10 +184,13 @@ class CameraServer {
    *
    * @param name The name to give the camera
    * @param hosts Array of Camera host IPs/DNS names
+   * @deprecated Call StartAutomaticCapture with a HttpCamera instead.
    */
   template <typename T>
+  [[deprecated("Call StartAutomaticCapture with a HttpCamera instead.")]]
   static cs::AxisCamera AddAxisCamera(std::string_view name,
                                       std::initializer_list<T> hosts);
+  WPI_UNIGNORE_DEPRECATED
 
   /**
    * Adds a virtual camera for switching between two streams.  Unlike the

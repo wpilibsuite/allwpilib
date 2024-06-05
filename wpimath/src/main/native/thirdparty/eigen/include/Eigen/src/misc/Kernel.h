@@ -28,7 +28,7 @@ struct traits<kernel_retval_base<DecompositionType> > {
                                                  // is the number of cols of the original matrix
                                                  // so that the product "matrix * kernel = zero" makes sense
                  Dynamic,                        // we don't know at compile-time the dimension of the kernel
-                 MatrixType::Options,
+                 traits<MatrixType>::Options,
                  MatrixType::MaxColsAtCompileTime,  // see explanation for 2nd template parameter
                  MatrixType::MaxColsAtCompileTime   // the kernel is a subspace of the domain space,
                                                     // whose dimension is the number of columns of the original matrix

@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.armsimulation.subsystems;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -51,7 +50,8 @@ public class Arm implements AutoCloseable {
           Constants.kMaxAngleRads,
           true,
           0,
-          VecBuilder.fill(Constants.kArmEncoderDistPerPulse) // Add noise with a std-dev of 1 tick
+          Constants.kArmEncoderDistPerPulse,
+          0.0 // Add noise with a std-dev of 1 tick
           );
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 

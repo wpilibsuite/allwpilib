@@ -180,6 +180,24 @@ public class Translation2d
   }
 
   /**
+   * Rotates this translation around another translation in 2D space.
+   *
+   * <pre>
+   * [x_new]   [rot.cos, -rot.sin][x - other.x]   [other.x]
+   * [y_new] = [rot.sin,  rot.cos][y - other.y] + [other.y]
+   * </pre>
+   *
+   * @param other The other translation to rotate around.
+   * @param rot The rotation to rotate the translation by.
+   * @return The new rotated translation.
+   */
+  public Translation2d rotateAround(Translation2d other, Rotation2d rot) {
+    return new Translation2d(
+        (m_x - other.getX()) * rot.getCos() - (m_y - other.getY()) * rot.getSin() + other.getX(),
+        (m_x - other.getX()) * rot.getSin() + (m_y - other.getY()) * rot.getCos() + other.getY());
+  }
+
+  /**
    * Returns the sum of two translations in 2D space.
    *
    * <p>For example, Translation3d(1.0, 2.5) + Translation3d(2.0, 5.5) = Translation3d{3.0, 8.0).

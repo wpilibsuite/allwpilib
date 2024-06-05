@@ -11,16 +11,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** WPIMath JNI. */
 public final class WPIMathJNI {
   static boolean libraryLoaded = false;
-  static RuntimeLoader<WPIMathJNI> loader = null;
 
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader =
-            new RuntimeLoader<>(
-                "wpimathjni", RuntimeLoader.getDefaultExtractionRoot(), WPIMathJNI.class);
-        loader.loadLibrary();
-      } catch (IOException ex) {
+        RuntimeLoader.loadLibrary("wpimathjni");
+      } catch (Exception ex) {
         ex.printStackTrace();
         System.exit(1);
       }
@@ -37,10 +33,7 @@ public final class WPIMathJNI {
     if (libraryLoaded) {
       return;
     }
-    loader =
-        new RuntimeLoader<>(
-            "wpimathjni", RuntimeLoader.getDefaultExtractionRoot(), WPIMathJNI.class);
-    loader.loadLibrary();
+    RuntimeLoader.loadLibrary("wpimathjni");
     libraryLoaded = true;
   }
 
@@ -285,6 +278,32 @@ public final class WPIMathJNI {
    */
   public static native void solveFullPivHouseholderQr(
       double[] A, int Arows, int Acols, double[] B, int Brows, int Bcols, double[] dst);
+
+  // Ellipse2d wrappers
+
+  /**
+   * Returns the nearest point that is contained within the ellipse.
+   *
+   * <p>Constructs an Ellipse2d object and runs its FindNearestPoint() method.
+   *
+   * @param centerX The x coordinate of the center of the ellipse in meters.
+   * @param centerY The y coordinate of the center of the ellipse in meters.
+   * @param centerHeading The ellipse's rotation in radians.
+   * @param xSemiAxis The x semi-axis in meters.
+   * @param ySemiAxis The y semi-axis in meters.
+   * @param pointX The x coordinate of the point that this will find the nearest point to.
+   * @param pointY The y coordinate of the point that this will find the nearest point to.
+   * @param nearestPoint Array to store nearest point into.
+   */
+  public static native void ellipse2dFindNearestPoint(
+      double centerX,
+      double centerY,
+      double centerHeading,
+      double xSemiAxis,
+      double ySemiAxis,
+      double pointX,
+      double pointY,
+      double[] nearestPoint);
 
   // Pose3d wrappers
 

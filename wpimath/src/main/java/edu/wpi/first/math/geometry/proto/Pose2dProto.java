@@ -44,4 +44,9 @@ public class Pose2dProto implements Protobuf<Pose2d, ProtobufPose2d> {
     Translation2d.proto.pack(msg.getMutableTranslation(), value.getTranslation());
     Rotation2d.proto.pack(msg.getMutableRotation(), value.getRotation());
   }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
+  }
 }

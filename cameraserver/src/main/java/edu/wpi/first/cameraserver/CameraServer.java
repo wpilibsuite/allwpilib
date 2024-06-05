@@ -633,7 +633,10 @@ public final class CameraServer {
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    * @return The Axis camera capturing images.
+   * @deprecated Call startAutomaticCapture with a HttpCamera instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
+  @SuppressWarnings("removal")
   public static AxisCamera addAxisCamera(String host) {
     return addAxisCamera("Axis Camera", host);
   }
@@ -645,7 +648,10 @@ public final class CameraServer {
    *
    * @param hosts Array of Camera host IPs/DNS names
    * @return The Axis camera capturing images.
+   * @deprecated Call startAutomaticCapture with a HttpCamera instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
+  @SuppressWarnings("removal")
   public static AxisCamera addAxisCamera(String[] hosts) {
     return addAxisCamera("Axis Camera", hosts);
   }
@@ -656,7 +662,10 @@ public final class CameraServer {
    * @param name The name to give the camera
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    * @return The Axis camera capturing images.
+   * @deprecated Call startAutomaticCapture with a HttpCamera instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
+  @SuppressWarnings("removal")
   public static AxisCamera addAxisCamera(String name, String host) {
     AxisCamera camera = new AxisCamera(name, host);
     // Create a passthrough MJPEG server for USB access
@@ -671,7 +680,10 @@ public final class CameraServer {
    * @param name The name to give the camera
    * @param hosts Array of Camera host IPs/DNS names
    * @return The Axis camera capturing images.
+   * @deprecated Call startAutomaticCapture with a HttpCamera instead.
    */
+  @Deprecated(forRemoval = true, since = "2025")
+  @SuppressWarnings("removal")
   public static AxisCamera addAxisCamera(String name, String[] hosts) {
     AxisCamera camera = new AxisCamera(name, hosts);
     // Create a passthrough MJPEG server for USB access

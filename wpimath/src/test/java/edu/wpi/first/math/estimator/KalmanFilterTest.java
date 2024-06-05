@@ -27,7 +27,7 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 class KalmanFilterTest {
-  private static LinearSystem<N2, N1, N1> elevatorPlant;
+  private static LinearSystem<N2, N1, N2> elevatorPlant;
 
   private static final double kDt = 0.00505;
 
@@ -61,11 +61,15 @@ class KalmanFilterTest {
           new Matrix<>(Nat.N3(), Nat.N3())); // D
 
   @Test
+  @SuppressWarnings("unchecked")
   void testElevatorKalmanFilter() {
     var Q = VecBuilder.fill(0.05, 1.0);
     var R = VecBuilder.fill(0.0001);
 
-    assertDoesNotThrow(() -> new KalmanFilter<>(Nat.N2(), Nat.N1(), elevatorPlant, Q, R, kDt));
+    assertDoesNotThrow(
+        () ->
+            new KalmanFilter<>(
+                Nat.N2(), Nat.N1(), (LinearSystem<N2, N1, N1>) elevatorPlant.slice(0), Q, R, kDt));
   }
 
   @Test
