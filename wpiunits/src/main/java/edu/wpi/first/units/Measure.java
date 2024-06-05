@@ -87,30 +87,24 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    */
   @SuppressWarnings("unchecked")
   default <U2 extends Unit<U2>> Measure<?> times(Measure<U2> other) {
-    if (other.unit() instanceof Dimensionless) {
-      // scalar multiplication of this
-      return times(other.baseUnitMagnitude());
-    } else if (unit() instanceof Dimensionless) {
-      // scalar multiplication of other
-      return other.times(baseUnitMagnitude());
-    }
-
+    // First try to eliminate any common units
     if (unit() instanceof Per
         && other.unit().getBaseUnit().equals(((Per<?, ?>) unit()).denominator().getBaseUnit())) {
-      // denominator of the Per cancels out, return with just the units of the numerator
+      // Case 1: denominator of the Per cancels out, return with just the units of the numerator
       Unit<?> numerator = ((Per<?, ?>) unit()).numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     } else if (unit() instanceof Velocity && other.unit().getBaseUnit().equals(Seconds)) {
-      // Multiplying a velocity by a time, return the scalar unit (eg Distance)
+      // Case 2: Multiplying a velocity by a time, return the scalar unit (eg Distance)
       Unit<?> numerator = ((Velocity<?>) unit()).getUnit();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     } else if (other.unit() instanceof Per
         && unit().getBaseUnit().equals(((Per<?, ?>) other.unit()).denominator().getBaseUnit())) {
+      // Same as Case 1, just flipped between this and other
       Unit<?> numerator = ((Per<?, ?>) other.unit()).numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     } else if (other.unit() instanceof Velocity<?> velocity
         && unit().getBaseUnit().equals(Seconds)) {
-      // Multiplying a time by a velocity, return the scalar unit (eg Distance)
+      // Same as Case 2, just flipped between this and other
       Unit<?> numerator = velocity.getUnit();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     } else if (unit() instanceof Per
@@ -126,6 +120,17 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
       // multiplying eg meters per second * milliseconds per foot
       // return a scalar
       return Units.Value.of(baseUnitMagnitude() * other.baseUnitMagnitude());
+    }
+
+    // No common units to eliminate, is one of them dimensionless?
+    // Note that this must come *after* the other cases, otherwise
+    // Per<U, Dimensionless> * Dimensionless will not return a U
+    if (other.unit() instanceof Dimensionless) {
+      // scalar multiplication of this
+      return times(other.baseUnitMagnitude());
+    } else if (unit() instanceof Dimensionless) {
+      // scalar multiplication of other
+      return other.times(baseUnitMagnitude());
     }
 
     // Dimensional analysis fallthrough, do a basic unit multiplication
@@ -154,35 +159,44 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    */
   default <U2 extends Unit<U2>> Measure<?> divide(Measure<U2> other) {
     if (unit().getBaseUnit().equals(other.unit().getBaseUnit())) {
+      // These are the same unit, return a dimensionless
       return Units.Value.ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
     }
     if (other.unit() instanceof Dimensionless) {
+      // Dividing by a dimensionless, do a scalar division
       return divide(other.baseUnitMagnitude());
     }
     if (unit() instanceof Dimensionless) {
+      // Numerator is a dimensionless
       if (other.unit() instanceof Velocity<?> velocity) {
-        return velocity.reciprocal().ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
+        // Dividing by a velocity, return its reciprocal scaled by this
+        return times(velocity.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
       }
       if (other.unit() instanceof Per<?, ?> per) {
         if (per.numerator() instanceof Time time) {
-          return per.denominator()
-              .per(time)
-              .ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
+          // Dividing by a Per<Time, U>, return its reciprocal velocity scaled by this
+          return times(per.denominator().per(time).ofBaseUnits(1 / other.baseUnitMagnitude()));
         }
-        return per.reciprocal().ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
+        // Dividing by a generic Per, return its reciprocal scaled by this
+        return times(per.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
       }
     }
     if (other.unit() instanceof Velocity<?> velocity
         && velocity.getUnit().getBaseUnit().equals(unit().getBaseUnit())) {
+      // Numerator of the Velocity cancels out
       return times(velocity.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
     }
     if (other.unit() instanceof Per<?, ?> per
         && per.numerator().getBaseUnit().equals(unit().getBaseUnit())) {
+      // Numerator of the Per cancels out
       return times(per.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
     }
     if (other.unit() instanceof Time time) {
+      // Dividing by a time, return a Velocity
       return unit().per(time).ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
     }
+
+    // Dimensional analysis fallthrough, do a basic unit division
     return unit().per(other.unit()).ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
   }
 

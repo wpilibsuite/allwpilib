@@ -127,6 +127,22 @@ class MeasureTest {
   }
 
   @Test
+  void testPerUnitlessTimesUnitless() {
+    var measure = Units.Seconds.per(Units.Value).of(2.5);
+    var multiplier = Units.Percent.of(125); // 125% or 1.25x
+    Measure<?> result = measure.times(multiplier);
+    assertSame(result.unit(), Units.Seconds);
+
+    assertEquals(2.5 * 1.25, result.magnitude());
+
+    // the reverse should also be equivalent
+    result = multiplier.times(measure);
+    assertSame(result.unit(), Units.Seconds);
+
+    assertEquals(2.5 * 1.25, result.magnitude());
+  }
+
+  @Test
   void testTimesPerWithDimensionalAnalysis() {
     var measureA = Units.Feet.of(62); // 62 feet
     var measureB = Units.Radians.of(6).per(Units.Inches); // 6 radians per inch
@@ -210,11 +226,18 @@ class MeasureTest {
     assertEquals(result.magnitude(), 2);
     assertEquals(result.unit(), Units.Seconds.per(Units.Meter));
 
-    // Time divide
-    var m5 = Units.Meters.of(10);
-    var m6 = Units.Seconds.of(2);
+    // Dimensionless divided by Velocity<Dimensionless>
+    var m5 = Units.Value.of(10);
+    var m6 = Units.Value.per(Units.Second).of(2);
     result = m5.divide(m6);
     assertEquals(result.magnitude(), 5);
+    assertEquals(result.unit(), Units.Seconds);
+
+    // Time divide
+    var m7 = Units.Meters.of(12);
+    var m8 = Units.Seconds.of(2);
+    result = m7.divide(m8);
+    assertEquals(result.magnitude(), 6);
     assertEquals(result.unit(), Units.Meters.per(Units.Second));
   }
 
@@ -234,11 +257,18 @@ class MeasureTest {
     assertEquals(result.magnitude(), 4);
     assertEquals(result.unit(), Units.Meters.per(Units.Volt));
 
-    // Dimensionless divided by Per<Time, U>
+    // Dimensionless divided by Per<Dimensionless, U>
     var m5 = Units.Value.of(10);
-    var m6 = Units.Milliseconds.per(Units.Meter).of(2);
+    var m6 = Units.Value.per(Units.Meter).of(2);
     result = m5.divide(m6);
     assertEquals(result.magnitude(), 5);
+    assertEquals(result.unit(), Units.Meters);
+
+    // Dimensionless divided by Per<Time, U>
+    var m7 = Units.Value.of(12);
+    var m8 = Units.Milliseconds.per(Units.Meter).of(2);
+    result = m7.divide(m8);
+    assertEquals(result.magnitude(), 6);
     assertEquals(result.unit(), Units.Meters.per(Units.Millisecond));
   }
 
