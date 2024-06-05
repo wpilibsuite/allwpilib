@@ -107,8 +107,6 @@ if(WITH_JAVA)
         NO_DEFAULT_PATH
     )
 
-    file(GLOB cscore_jni_src src/main/native/cpp/jni/CameraServerJNI.cpp)
-
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
@@ -117,7 +115,6 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS cscore_jar wpiutil_jar ${OPENCV_JAR_FILE}
         OUTPUT_NAME cscorecv
-        GENERATE_NATIVE_HEADERS cscore_jni_headers
     )
 
     install_jar(cscorecv_jar DESTINATION ${java_lib_dest})
@@ -144,17 +141,6 @@ if(WITH_JAVA)
         endforeach()
     endif()
 
-    add_library(cscorecvjni ${cscore_jni_src})
-    wpilib_target_warnings(cscorecvjni)
-    target_link_libraries(cscorecvjni PUBLIC cscore wpiutil ${OpenCV_LIBS})
-
-    set_property(TARGET cscorecvjni PROPERTY FOLDER "libraries")
-
-    target_link_libraries(cscorecvjni PRIVATE cscorecv_jni_headers)
-    add_dependencies(cscorecvjni cscorecv_jar)
-
-    install(TARGETS cscorecvjni EXPORT cscorecvjni)
-    export(TARGETS cscorecvjni FILE cscorecvjni.cmake NAMESPACE cscorecvjni::)
 endif()
 
 if(WITH_JAVA_SOURCE)
