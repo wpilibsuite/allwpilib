@@ -668,7 +668,7 @@ void ADIS16448_IMU::Acquire() {
           // Store timestamp for next iteration
           previous_timestamp = buffer[i];
           // Calculate alpha for use with the complementary filter
-          m_alpha = 0.5 / (0.5 + m_dt);
+          m_alpha = kTau / (kTau + m_dt);
           // Run inclinometer calculations
           double accelAngleX = atan2f(
               -accel_x_si,

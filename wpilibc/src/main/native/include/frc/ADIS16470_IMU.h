@@ -490,6 +490,7 @@ class ADIS16470_IMU : public wpi::Sendable,
 
   // Complementary filter variables
   double m_dt, m_alpha = 0.0;
+  static constexpr double kTau = 1.0;
   double m_compAngleX, m_compAngleY, m_accelAngleX, m_accelAngleY = 0.0;
 
   // Complementary filter functions

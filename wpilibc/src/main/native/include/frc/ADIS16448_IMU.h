@@ -383,6 +383,7 @@ class ADIS16448_IMU : public wpi::Sendable,
 
   // Complementary filter variables
   double m_dt, m_alpha = 0.0;
+  static constexpr double kTau = 0.5;
   double m_compAngleX, m_compAngleY, m_accelAngleX, m_accelAngleY = 0.0;
 
   // vector for storing most recent imu values
