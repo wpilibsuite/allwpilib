@@ -7,7 +7,7 @@
 #include <wpi/array.h>
 #include <wpi/jni_util.h>
 
-#include "edu_wpi_first_math_WPIMathJNI.h"
+#include "edu_wpi_first_math_jni_Ellipse2dJNI.h"
 #include "frc/geometry/Ellipse2d.h"
 
 using namespace wpi::java;
@@ -15,12 +15,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    ellipse2dFindNearestPoint
+ * Class:     edu_wpi_first_math_jni_Ellipse2dJNI
+ * Method:    findNearestPoint
  * Signature: (DDDDDDD[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_ellipse2dFindNearestPoint
+Java_edu_wpi_first_math_jni_Ellipse2dJNI_findNearestPoint
   (JNIEnv* env, jclass, jdouble centerX, jdouble centerY, jdouble centerHeading,
    jdouble xSemiAxis, jdouble ySemiAxis, jdouble pointX, jdouble pointY,
    jdoubleArray nearestPoint)

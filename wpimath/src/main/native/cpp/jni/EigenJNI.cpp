@@ -10,19 +10,19 @@
 #include <unsupported/Eigen/MatrixFunctions>
 #include <wpi/jni_util.h>
 
-#include "edu_wpi_first_math_WPIMathJNI.h"
+#include "edu_wpi_first_math_jni_EigenJNI.h"
 
 using namespace wpi::java;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_EigenJNI
  * Method:    exp
  * Signature: ([DI[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_exp
+Java_edu_wpi_first_math_jni_EigenJNI_exp
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdoubleArray dst)
 {
   JSpan<const jdouble> arrayBody{env, src};
@@ -37,12 +37,12 @@ Java_edu_wpi_first_math_WPIMathJNI_exp
 }
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_EigenJNI
  * Method:    pow
  * Signature: ([DID[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_pow
+Java_edu_wpi_first_math_jni_EigenJNI_pow
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdouble exponent,
    jdoubleArray dst)
 {
@@ -58,12 +58,12 @@ Java_edu_wpi_first_math_WPIMathJNI_pow
 }
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_EigenJNI
  * Method:    rankUpdate
  * Signature: ([DI[DDZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_rankUpdate
+Java_edu_wpi_first_math_jni_EigenJNI_rankUpdate
   (JNIEnv* env, jclass, jdoubleArray mat, jint rows, jdoubleArray vec,
    jdouble sigma, jboolean lowerTriangular)
 {
@@ -84,12 +84,12 @@ Java_edu_wpi_first_math_WPIMathJNI_rankUpdate
 }
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_EigenJNI
  * Method:    solveFullPivHouseholderQr
  * Signature: ([DII[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_solveFullPivHouseholderQr
+Java_edu_wpi_first_math_jni_EigenJNI_solveFullPivHouseholderQr
   (JNIEnv* env, jclass, jdoubleArray A, jint Arows, jint Acols, jdoubleArray B,
    jint Brows, jint Bcols, jdoubleArray dst)
 {

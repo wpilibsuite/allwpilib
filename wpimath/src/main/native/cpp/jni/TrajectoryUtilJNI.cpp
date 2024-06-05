@@ -8,8 +8,8 @@
 
 #include <wpi/jni_util.h>
 
-#include "WPIMathJNI_Exceptions.h"
-#include "edu_wpi_first_math_WPIMathJNI.h"
+#include "Exceptions.h"
+#include "edu_wpi_first_math_jni_TrajectoryUtilJNI.h"
 #include "frc/trajectory/TrajectoryUtil.h"
 
 using namespace wpi::java;
@@ -57,12 +57,12 @@ frc::Trajectory CreateTrajectoryFromElements(std::span<const double> elements) {
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_TrajectoryUtilJNI
  * Method:    fromPathweaverJson
  * Signature: (Ljava/lang/String;)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_fromPathweaverJson
+Java_edu_wpi_first_math_jni_TrajectoryUtilJNI_fromPathweaverJson
   (JNIEnv* env, jclass, jstring path)
 {
   try {
@@ -77,12 +77,12 @@ Java_edu_wpi_first_math_WPIMathJNI_fromPathweaverJson
 }
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_TrajectoryUtilJNI
  * Method:    toPathweaverJson
  * Signature: ([DLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_toPathweaverJson
+Java_edu_wpi_first_math_jni_TrajectoryUtilJNI_toPathweaverJson
   (JNIEnv* env, jclass, jdoubleArray elements, jstring path)
 {
   try {
@@ -96,12 +96,12 @@ Java_edu_wpi_first_math_WPIMathJNI_toPathweaverJson
 }
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_TrajectoryUtilJNI
  * Method:    deserializeTrajectory
  * Signature: (Ljava/lang/String;)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_deserializeTrajectory
+Java_edu_wpi_first_math_jni_TrajectoryUtilJNI_deserializeTrajectory
   (JNIEnv* env, jclass, jstring json)
 {
   try {
@@ -116,12 +116,12 @@ Java_edu_wpi_first_math_WPIMathJNI_deserializeTrajectory
 }
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_TrajectoryUtilJNI
  * Method:    serializeTrajectory
  * Signature: ([D)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_serializeTrajectory
+Java_edu_wpi_first_math_jni_TrajectoryUtilJNI_serializeTrajectory
   (JNIEnv* env, jclass, jdoubleArray elements)
 {
   try {
