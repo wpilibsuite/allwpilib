@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public class Robot extends TimedRobot {
@@ -12,7 +14,24 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   @Override
-  public void robotInit() {}
+  @SuppressWarnings("resource")
+  public void robotInit() {
+    // Solenoid sCTRE = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+    // Solenoid sREV = new Solenoid(PneumaticsModuleType.REVPH, 0);
+    // new Compressor(PneumaticsModuleType.CTREPCM);
+    new Compressor(PneumaticsModuleType.REVPH);
+  }
+
+  /*
+   * Good
+   * main.cpp
+   * REVPHSimGui.h
+   * Bad
+   * REVPHSimGui.cpp
+   * PCM.cpp
+   * PCM.h
+   * 
+   */
 
   /** This function is run once each time the robot enters autonomous mode. */
   @Override

@@ -1,0 +1,226 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "REVPHSimGui.h"
+
+#include <glass/hardware/PCM.h>
+#include <glass/other/DeviceTree.h>
+
+#include <cstdio>
+#include <memory>
+#include <vector>
+
+#include <hal/Ports.h>
+#include <hal/Value.h>
+#include <hal/simulation/REVPHData.h>
+
+#include "HALDataSource.h"
+#include "HALSimGui.h"
+#include "SimDeviceGui.h"
+
+using namespace halsimgui;
+
+namespace {
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(REVPHCompressorOn, "Compressor On");
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(REVPHPressureSwitch, "Pressure Switch");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(REVPHCompressorCurrent, "Comp Current");
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED2(REVPHSolenoidOutput, "Solenoid");
+
+class CompressorSimModel : public glass::CompressorModel {
+ public:
+  explicit CompressorSimModel(int32_t index)
+      : m_index{index},
+        m_running{index},
+        m_pressureSwitch{index},
+        m_current{index} {}
+
+  void Update() override {}
+
+  bool Exists() override { return HALSIM_GetREVPHInitialized(m_index); }
+
+  glass::DataSource* GetRunningData() override { return &m_running; }
+  glass::DataSource* GetEnabledData() override { return &m_running; } // bad
+  glass::DataSource* GetPressureSwitchData() override {
+    return &m_pressureSwitch;
+  }
+  glass::DataSource* GetCurrentData() override { return &m_current; }
+
+  void SetRunning(bool val) override {
+    HALSIM_SetREVPHCompressorOn(m_index, val);
+  }
+  void SetEnabled(bool val) override {}
+  void SetPressureSwitch(bool val) override {
+    HALSIM_SetREVPHPressureSwitch(m_index, val);
+  }
+  void SetCurrent(double val) override {
+    HALSIM_SetREVPHCompressorCurrent(m_index, val);
+  }
+
+ private:
+  int32_t m_index;
+  REVPHCompressorOnSource m_running;
+  REVPHPressureSwitchSource m_pressureSwitch;
+  REVPHCompressorCurrentSource m_current;
+};
+
+class SolenoidSimModel : public glass::SolenoidModel {
+ public:
+  SolenoidSimModel(int32_t index, int32_t channel)
+      : m_index{index}, m_channel{channel}, m_output{index, channel} {}
+
+  void Update() override {}
+
+  bool Exists() override { return HALSIM_GetREVPHInitialized(m_index); }
+
+  glass::DataSource* GetOutputData() override { return &m_output; }
+
+  void SetOutput(bool val) override {
+    HALSIM_SetREVPHSolenoidOutput(m_index, m_channel, val);
+  }
+
+ private:
+  int32_t m_index;
+  int32_t m_channel;
+  REVPHSolenoidOutputSource m_output;
+};
+
+class REVPHSimModel : public glass::PHModel {
+ public:
+  explicit REVPHSimModel(int32_t index)
+      : m_index{index},
+        m_compressor{index},
+        m_solenoids(HAL_GetNumCTRESolenoidChannels()) {}
+
+  void Update() override;
+
+  bool Exists() override { return true; }
+
+  CompressorSimModel* GetCompressor() override { return &m_compressor; }
+
+  void ForEachSolenoid(
+      wpi::function_ref<void(glass::SolenoidModel& model, int index)> func)
+      override;
+
+  int GetNumSolenoids() const { return m_solenoidInitCount; }
+
+ private:
+  int32_t m_index;
+  CompressorSimModel m_compressor;
+  std::vector<std::unique_ptr<SolenoidSimModel>> m_solenoids;
+  int m_solenoidInitCount = 0;
+};
+
+class REVPHsSimModel : public glass::PHsModel {
+ public:
+  REVPHsSimModel() : m_models(HAL_GetNumREVPHModules()) {}
+
+  void Update() override;
+
+  bool Exists() override { return true; }
+
+  void ForEachREVPH(wpi::function_ref<void(glass::PHModel& model, int index)>
+                        func) override;
+
+ private:
+  std::vector<std::unique_ptr<REVPHSimModel>> m_models;
+};
+}  // namespace
+
+void REVPHSimModel::Update() {
+  int32_t numChannels = m_solenoids.size();
+  m_solenoidInitCount = 0;
+  for (int32_t i = 0; i < numChannels; ++i) {
+    auto& model = m_solenoids[i];
+    if (HALSIM_GetREVPHInitialized(m_index)) {
+      if (!model) {
+        model = std::make_unique<SolenoidSimModel>(m_index, i);
+      }
+      ++m_solenoidInitCount;
+    } else {
+      model.reset();
+    }
+  }
+}
+
+void REVPHSimModel::ForEachSolenoid(
+    wpi::function_ref<void(glass::SolenoidModel& model, int index)> func) {
+  if (m_solenoidInitCount == 0) {
+    return;
+  }
+  int32_t numSolenoids = m_solenoids.size();
+  for (int32_t i = 0; i < numSolenoids; ++i) {
+    if (auto model = m_solenoids[i].get()) {
+      func(*model, i);
+    }
+  }
+}
+
+void REVPHsSimModel::Update() {
+  for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
+       ++i) {
+    auto& model = m_models[i];
+    if (HALSIM_GetREVPHInitialized(i)) {
+      if (!model) {
+        model = std::make_unique<REVPHSimModel>(i);
+      }
+      model->Update();
+    } else {
+      model.reset();
+    }
+  }
+}
+
+void REVPHsSimModel::ForEachREVPH(
+    wpi::function_ref<void(glass::PHModel& model, int index)> func) {
+  int32_t numREVPHs = m_models.size();
+  for (int32_t i = 0; i < numREVPHs; ++i) {
+    if (auto model = m_models[i].get()) {
+      func(*model, i);
+    }
+  }
+}
+
+static bool REVPHsAnyInitialized() {
+  static const int32_t num = HAL_GetNumREVPHModules();
+  for (int32_t i = 0; i < num; ++i) {
+    if (HALSIM_GetREVPHInitialized(i)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void REVPHSimGui::Initialize() {
+  HALSimGui::halProvider->RegisterModel("REVPHs", REVPHsAnyInitialized, [] {
+    return std::make_unique<REVPHsSimModel>();
+  });
+  HALSimGui::halProvider->RegisterView(
+      "Solenoids", "REVPHs",
+      [](glass::Model* model) {
+        bool any = false;
+        static_cast<REVPHsSimModel*>(model)->ForEachREVPH(
+            [&](glass::PHModel& REVPH, int) {
+              if (static_cast<REVPHSimModel*>(&REVPH)->GetNumSolenoids() > 0) {
+                any = true;
+              }
+            });
+        return any;
+      },
+      [](glass::Window* win, glass::Model* model) {
+        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+        win->SetDefaultPos(290, 20);
+        return glass::MakeFunctionView([=] {
+          glass::DisplayPHsSolenoids(
+              static_cast<REVPHsSimModel*>(model),
+              HALSimGui::halProvider->AreOutputsEnabled());
+        });
+      });
+
+  SimDeviceGui::GetDeviceTree().Add(
+      HALSimGui::halProvider->GetModel("REVPHs"), [](glass::Model* model) {
+        glass::DisplayCompressorsDevice(
+            static_cast<REVPHsSimModel*>(model),
+            HALSimGui::halProvider->AreOutputsEnabled());
+      });
+}

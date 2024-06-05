@@ -48,13 +48,30 @@ class PCMsModel : public Model {
       wpi::function_ref<void(PCMModel& model, int index)> func) = 0;
 };
 
+class PHModel : public Model {
+ public:
+  virtual CompressorModel* GetCompressor() = 0;
+
+  virtual void ForEachSolenoid(
+      wpi::function_ref<void(SolenoidModel& model, int index)> func) = 0;
+};
+
+class PHsModel : public Model {
+ public:
+  virtual void ForEachREVPH(
+      wpi::function_ref<void(PHModel& model, int index)> func) = 0;
+};
+
 bool DisplayPCMSolenoids(PCMModel* model, int index, bool outputsEnabled);
+bool DisplayPHSolenoids(PHModel* model, int index, bool outputsEnabled);
 void DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
                           std::string_view noneMsg = "No solenoids");
+void DisplayPHsSolenoids(PHsModel* model, bool outputsEnabled,
+                            std::string_view noneMsg = "No solenoids");
 
-void DisplayCompressorDevice(PCMModel* model, int index, bool outputsEnabled);
 void DisplayCompressorDevice(CompressorModel* model, int index,
                              bool outputsEnabled);
 void DisplayCompressorsDevice(PCMsModel* model, bool outputsEnabled);
+void DisplayCompressorsDevice(PHsModel* model, bool outputsEnabled);
 
 }  // namespace glass
