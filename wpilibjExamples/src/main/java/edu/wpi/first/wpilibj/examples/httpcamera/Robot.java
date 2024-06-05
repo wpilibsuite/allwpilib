@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.httpcamera;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cameraservercv.CameraServerCv;
-import edu.wpi.first.cscore.AxisCamera;
+import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.cscorecv.CvSink;
 import edu.wpi.first.cscorecv.CvSource;
 import edu.wpi.first.wpilibj.TimedRobot;
