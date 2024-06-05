@@ -93,18 +93,10 @@ class ADIS16448SimTest {
       sim.setGyroAngleZ(4.13);
 
       switch (yawAxis) {
-        case kX:
-          assertEquals(imu.getAngle(), imu.getGyroAngleX());
-          break;
-        case kY:
-          assertEquals(imu.getAngle(), imu.getGyroAngleY());
-          break;
-        case kZ:
-          assertEquals(imu.getAngle(), imu.getGyroAngleZ());
-          break;
-        default:
-          fail("invalid YawAxis!");
-          break;
+        case kX -> assertEquals(imu.getAngle(), imu.getGyroAngleX());
+        case kY -> assertEquals(imu.getAngle(), imu.getGyroAngleY());
+        case kZ -> assertEquals(imu.getAngle(), imu.getGyroAngleZ());
+        default -> fail("invalid YawAxis!");
       }
     }
   }
@@ -122,18 +114,10 @@ class ADIS16448SimTest {
       sim.setGyroRateZ(20.71);
 
       switch (yawAxis) {
-        case kX:
-          assertEquals(imu.getRate(), imu.getGyroRateX());
-          break;
-        case kY:
-          assertEquals(imu.getRate(), imu.getGyroRateY());
-          break;
-        case kZ:
-          assertEquals(imu.getRate(), imu.getGyroRateZ());
-          break;
-        default:
-          fail("invalid YawAxis!");
-          break;
+        case kX -> assertEquals(imu.getRate(), imu.getGyroRateX());
+        case kY -> assertEquals(imu.getRate(), imu.getGyroRateY());
+        case kZ -> assertEquals(imu.getRate(), imu.getGyroRateZ());
+        default -> fail("invalid YawAxis!");
       }
     }
   }

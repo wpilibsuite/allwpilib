@@ -16,7 +16,8 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 /** Common interface for objects that can contain shuffleboard components. */
-public interface ShuffleboardContainer extends ShuffleboardValue {
+public sealed interface ShuffleboardContainer extends ShuffleboardValue
+    permits ShuffleboardLayout, ShuffleboardTab {
   /**
    * Gets the components that are direct children of this container.
    *

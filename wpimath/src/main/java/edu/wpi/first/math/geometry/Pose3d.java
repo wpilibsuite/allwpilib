@@ -303,11 +303,9 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Pose3d) {
-      return ((Pose3d) obj).m_translation.equals(m_translation)
-          && ((Pose3d) obj).m_rotation.equals(m_rotation);
-    }
-    return false;
+    return obj instanceof Pose3d pose
+        && m_translation.equals(pose.m_translation)
+        && m_rotation.equals(pose.m_rotation);
   }
 
   @Override

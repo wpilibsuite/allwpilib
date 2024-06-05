@@ -99,12 +99,8 @@ public class AprilTagDetector implements AutoCloseable {
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof Config)) {
-        return false;
-      }
-
-      Config other = (Config) obj;
-      return numThreads == other.numThreads
+      return obj instanceof Config other
+          && numThreads == other.numThreads
           && quadDecimate == other.quadDecimate
           && quadSigma == other.quadSigma
           && refineEdges == other.refineEdges
@@ -194,12 +190,8 @@ public class AprilTagDetector implements AutoCloseable {
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof QuadThresholdParameters)) {
-        return false;
-      }
-
-      QuadThresholdParameters other = (QuadThresholdParameters) obj;
-      return minClusterPixels == other.minClusterPixels
+      return obj instanceof QuadThresholdParameters other
+          && minClusterPixels == other.minClusterPixels
           && maxNumMaxima == other.maxNumMaxima
           && criticalAngle == other.criticalAngle
           && maxLineFitMSE == other.maxLineFitMSE

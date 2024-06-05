@@ -289,11 +289,10 @@ public class Unit<U extends Unit<U>> {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof Unit)) {
-      return false;
-    }
-    Unit<?> that = (Unit<?>) o;
-    return m_name.equals(that.m_name) && m_symbol.equals(that.m_symbol) && this.equivalent(that);
+    return o instanceof Unit<?> that
+        && m_name.equals(that.m_name)
+        && m_symbol.equals(that.m_symbol)
+        && this.equivalent(that);
   }
 
   @Override
