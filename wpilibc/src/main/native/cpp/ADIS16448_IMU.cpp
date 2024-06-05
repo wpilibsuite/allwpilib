@@ -670,12 +670,10 @@ void ADIS16448_IMU::Acquire() {
           // Calculate alpha for use with the complementary filter
           m_alpha = kTau / (kTau + m_dt);
           // Run inclinometer calculations
-          double accelAngleX = atan2f(
-              -accel_x_si,
-              sqrtf((accel_y_si * accel_y_si) + (-accel_z_si * -accel_z_si)));
-          double accelAngleY = atan2f(
-              accel_y_si,
-              sqrtf((-accel_x_si * -accel_x_si) + (-accel_z_si * -accel_z_si)));
+          double accelAngleX =
+              atan2f(-accel_x_si, std::hypotf(accel_y_si, -accel_z_si));
+          double accelAngleY =
+              atan2f(accel_y_si, std::hypotf(-accel_x_si, -accel_z_si));
           // Calculate complementary filter
           if (m_first_run) {
             compAngleX = accelAngleX;

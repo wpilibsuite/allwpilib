@@ -698,12 +698,10 @@ void ADIS16470_IMU::Acquire() {
         m_alpha = kTau / (kTau + m_dt);
 
         // Run inclinometer calculations
-        double accelAngleX = atan2f(
-            accel_x_si,
-            sqrtf((accel_y_si * accel_y_si) + (accel_z_si * accel_z_si)));
-        double accelAngleY = atan2f(
-            accel_y_si,
-            sqrtf((accel_x_si * accel_x_si) + (accel_z_si * accel_z_si)));
+        double accelAngleX =
+            atan2f(accel_x_si, std::hypotf(accel_y_si, accel_z_si));
+        double accelAngleY =
+            atan2f(accel_y_si, std::hypotf(accel_x_si, accel_z_si));
         if (m_first_run) {
           compAngleX = accelAngleX;
           compAngleY = accelAngleY;
