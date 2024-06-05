@@ -27,7 +27,13 @@ if(WITH_JAVA)
     add_jar(
         cameraservercv_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar cameraserver_jar cscorecv_jar cscore_jar ntcore_jar ${OPENCV_JAR_FILE}
+        INCLUDE_JARS
+            wpiutil_jar
+            cameraserver_jar
+            cscorecv_jar
+            cscore_jar
+            ntcore_jar
+            ${OPENCV_JAR_FILE}
         OUTPUT_NAME cameraservercv
     )
 

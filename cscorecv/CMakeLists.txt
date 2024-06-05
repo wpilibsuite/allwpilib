@@ -140,7 +140,6 @@ if(WITH_JAVA)
             install(FILES ${${cvFile}Loc} DESTINATION "${jni_lib_dest}")
         endforeach()
     endif()
-
 endif()
 
 if(WITH_JAVA_SOURCE)
