@@ -179,8 +179,8 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public {{ t.TypeName }}Topic get{{ t.TypeName }}Topic(String name) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof {{ t.TypeName }}Topic) {
-      return ({{ t.TypeName }}Topic) topic;
+    if (topic instanceof {{ t.TypeName }}Topic t) {
+      return t;
     }
 
     int handle;
@@ -212,8 +212,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   public <T, MessageType extends ProtoMessage<?>>
       ProtobufTopic<T> getProtobufTopic(String name, Protobuf<T, MessageType> proto) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof ProtobufTopic<?>
-        && ((ProtobufTopic<?>) topic).getProto().equals(proto)) {
+    if (topic instanceof ProtobufTopic<?> t && t.getProto().equals(proto)) {
       @SuppressWarnings("unchecked")
       ProtobufTopic<T> wrapTopic = (ProtobufTopic<T>) topic;
       return wrapTopic;
@@ -246,8 +245,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   public <T>
       StructTopic<T> getStructTopic(String name, Struct<T> struct) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof StructTopic<?>
-        && ((StructTopic<?>) topic).getStruct().equals(struct)) {
+    if (topic instanceof StructTopic<?> t && t.getStruct().equals(struct)) {
       @SuppressWarnings("unchecked")
       StructTopic<T> wrapTopic = (StructTopic<T>) topic;
       return wrapTopic;
@@ -280,8 +278,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   public <T>
       StructArrayTopic<T> getStructArrayTopic(String name, Struct<T> struct) {
     Topic topic = m_topics.get(name);
-    if (topic instanceof StructArrayTopic<?>
-        && ((StructArrayTopic<?>) topic).getStruct().equals(struct)) {
+    if (topic instanceof StructArrayTopic<?> t && t.getStruct().equals(struct)) {
       @SuppressWarnings("unchecked")
       StructArrayTopic<T> wrapTopic = (StructArrayTopic<T>) topic;
       return wrapTopic;
@@ -1245,11 +1242,7 @@ public final class NetworkTableInstance implements AutoCloseable {
     if (other == this) {
       return true;
     }
-    if (!(other instanceof NetworkTableInstance)) {
-      return false;
-    }
-
-    return m_handle == ((NetworkTableInstance) other).m_handle;
+    return other instanceof NetworkTableInstance inst && m_handle == inst.m_handle;
   }
 
   @Override
