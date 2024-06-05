@@ -12,7 +12,6 @@
 #include <hal/DriverStation.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
-#include <wpi/deprecated.h>
 
 #include "frc/Errors.h"
 #include "frc/Timer.h"
@@ -20,9 +19,7 @@
 using namespace frc;
 
 void TimedRobot::StartCompetition() {
-  WPI_IGNORE_DEPRECATED
   RobotInit();
-  WPI_UNIGNORE_DEPRECATED
 
   if constexpr (IsSimulation()) {
     SimulationInit();

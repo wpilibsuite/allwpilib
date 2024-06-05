@@ -66,7 +66,6 @@ class IterativeRobotBase : public RobotBase {
    * Note: This method is functionally identical to the class constructor so
    * that should be used instead.
    */
-  [[deprecated("Use the robot class constructor instead.")]]
   virtual void RobotInit();
 
   /**

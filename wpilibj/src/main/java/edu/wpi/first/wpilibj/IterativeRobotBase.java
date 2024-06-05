@@ -99,10 +99,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    *
    * <p>Note: This method is functionally identical to the class constructor so that should be used
    * instead.
-   *
-   * @deprecated Use the robot class constructor instead.
    */
-  @Deprecated(since = "2025", forRemoval = true)
   public void robotInit() {}
 
   /**
