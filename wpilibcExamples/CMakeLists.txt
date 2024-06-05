@@ -18,6 +18,7 @@ foreach(example ${EXAMPLES})
     target_link_libraries(
         ${example}
         apriltag
+        cameraservercv
         wpilibc
         wpilibNewCommands
         romiVendordep
@@ -37,6 +38,7 @@ foreach(example ${EXAMPLES})
         target_link_libraries(
             ${example}_test
             apriltag
+            cameraservercv
             wpilibc
             wpilibNewCommands
             romiVendordep
