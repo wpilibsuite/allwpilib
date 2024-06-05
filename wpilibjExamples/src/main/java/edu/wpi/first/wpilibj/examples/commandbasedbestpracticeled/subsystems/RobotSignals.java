@@ -13,22 +13,23 @@ package frc.robot.subsystems;
  * 
  * It's just a simple example.
  * 
- * Needs a better way of registering LED usage; this is really (too) simple
- * and relies on the user finding it here and remembering to do it.
+ * Needs a better way of registering LED usage; this is really (too) simple and relies on the user
+ * finding it here and remembering to do it.
  */
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.AddressableLED;
 import frc.robot.AddressableLEDBuffer;
 import frc.robot.AddressableLEDBufferView;
 import frc.robot.LEDPattern;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 /*
  * All Commands factories are "public."
  * 
- * All other methods are "private" to prevent other classes from forgetting to
- * add requirements of these resources if creating commands from these methods.
+ * All other methods are "private" to prevent other classes from forgetting to add requirements of
+ * these resources if creating commands from these methods.
  */
 
 public class RobotSignals {
@@ -36,73 +37,83 @@ public class RobotSignals {
   /**
    * Represents a supplier of LEDPattern for creating dynamic LEDPatterns.
    * 
-   * Can't overload methods using generic interfaces parameters like Supplier
-   * so make our own interface to use in overloads
+   * Can't overload methods using generic interfaces parameters like Supplier so make our own
+   * interface to use in overloads
    * 
    */
   @FunctionalInterface
   public interface LEDPatternSupplier {
-      /**
-       * Gets a result.
-       *
-       * @return a result
-       */
-      LEDPattern get();
+    /**
+     * Gets a result.
+     *
+     * @return a result
+     */
+    LEDPattern get();
   }
 
-  private final AddressableLED strip;
+  private final AddressableLED m_Strip;
 
   // Layout by LED number of the single physical buffer into multiple logical
   // views or resources/subsystems.
 
   // simplistic view of segments - assume one starts at 0.
   // first and last LED ids are inclusive of that LED number
- 
-  private final int firstTopLED = 0;
-  private final int lastTopLED = 7;
-  private final int firstMainLED = 8;
-  private final int lastMainLED = 15;
-  private final int firstEnableDisableLED = 16;
-  private final int lastEnableDisableLED = 23;
-  private final int firstHistoryDemoLED = 24;
-  private final int lastHistoryDemoLED = 31;
-  private final int firstAchieveHueGoal = 32;
-  private final int lastAchieveHueGoal = 39;
+
+  private static final int m_FirstTopLED = 0;
+  private static final int m_LastTopLED = 7;
+  private static final int m_FirstMainLED = 8;
+  private static final int m_LastMainLED = 15;
+  private static final int m_FirstEnableDisableLED = 16;
+  private static final int m_LastEnableDisableLED = 23;
+  private static final int m_FirstHistoryDemoLED = 24;
+  private static final int m_LastHistoryDemoLED = 31;
+  private static final int m_FirstAchieveHueGoal = 32;
+  private static final int m_LastAchieveHueGoal = 39;
   // CAUTION CAUTION CAUTION -- Update this length for each view defined.
-  private final int length = Math.max(Math.max(Math.max(Math.max(
-      lastTopLED, lastMainLED), lastEnableDisableLED), lastHistoryDemoLED), lastAchieveHueGoal) + 1;
- 
-  public LEDView Top;
-  public LEDView Main;
-  public LEDView EnableDisable;
-  public LEDView HistoryDemo;
-  public LEDView AchieveHueGoal;
+  private static final int length = Math.max(Math.max(
+      Math.max(Math.max(m_LastTopLED, m_LastMainLED), m_LastEnableDisableLED),
+      m_LastHistoryDemoLED), m_LastAchieveHueGoal) + 1;
+
+  public LEDView m_Top;
+  public LEDView m_Main;
+  public LEDView m_EnableDisable;
+  public LEDView m_HistoryDemo;
+  public LEDView m_AchieveHueGoal;
 
   private final AddressableLEDBuffer bufferLED;
 
   public RobotSignals(int port) {
-  
-    // start updating the physical LED strip 
 
-    strip = new AddressableLED(port);
-    strip.setLength(length);
-    strip.start();
+    // start updating the physical LED strip
+
+    m_Strip = new AddressableLED(port);
+    m_Strip.setLength(length);
+    m_Strip.start();
 
     bufferLED = new AddressableLEDBuffer(length); // buffer for all of the LEDs
 
     // create the resources (subsystems) as views of the LED buffer
-    Top = new LEDView(bufferLED.createView(firstTopLED, lastTopLED));
-    Main = new LEDView(bufferLED.createView(firstMainLED, lastMainLED));
-    EnableDisable = new LEDView(bufferLED.createView(firstEnableDisableLED, lastEnableDisableLED));
-    HistoryDemo = new LEDView(bufferLED.createView(firstHistoryDemoLED, lastHistoryDemoLED));
-    AchieveHueGoal = new LEDView(bufferLED.createView(firstAchieveHueGoal, lastAchieveHueGoal));
+    m_Top = new LEDView(bufferLED.createView(m_FirstTopLED, m_LastTopLED));
+    m_Main = new LEDView(bufferLED.createView(m_FirstMainLED, m_LastMainLED));
+    m_EnableDisable = new LEDView(
+        bufferLED.createView(m_FirstEnableDisableLED, m_LastEnableDisableLED));
+    m_HistoryDemo = new LEDView(
+        bufferLED.createView(m_FirstHistoryDemoLED, m_LastHistoryDemoLED));
+    m_AchieveHueGoal = new LEDView(
+        bufferLED.createView(m_FirstAchieveHueGoal, m_LastAchieveHueGoal));
   }
 
+  /**
+   * Run before commands and triggers
+   */
   public void beforeCommands() {}
 
+  /**
+   * Run after commands and triggers
+   */
   public void afterCommands() {
 
-    strip.setData(bufferLED); // run periodically to send the buffer to the LEDs
+    m_Strip.setData(bufferLED); // run periodically to send the buffer to the LEDs
   }
 
   /**
@@ -110,10 +121,10 @@ public class RobotSignals {
    */
   public class LEDView extends SubsystemBase {
 
-    private final AddressableLEDBufferView view;
+    private final AddressableLEDBufferView m_View;
 
     private LEDView(AddressableLEDBufferView view) {
-      this.view = view;
+      this.m_View = view;
     }
 
     /*
@@ -122,6 +133,8 @@ public class RobotSignals {
 
     /**
      * Example of how to allow one (or none) default command to be set.
+     * 
+     * @param def default command
      */
     @Override
     public void setDefaultCommand(Command def) {
@@ -130,7 +143,7 @@ public class RobotSignals {
         throw new IllegalArgumentException("Default Command already set");
       }
 
-      if(def != null) {
+      if (def != null) {
         super.setDefaultCommand(def);
       }
     }
@@ -143,9 +156,7 @@ public class RobotSignals {
      */
     public Command setSignal(LEDPattern pattern) {
 
-      return
-        run(()->pattern.applyTo(view))
-          .ignoringDisable(true)
+      return run(() -> pattern.applyTo(m_View)).ignoringDisable(true)
           .withName("LedSet");
     }
 
@@ -156,10 +167,8 @@ public class RobotSignals {
      * @return
      */
     public Command setSignal(LEDPatternSupplier pattern) {
-      
-      return
-        run(()->pattern.get().applyTo(view))
-          .ignoringDisable(true)
+
+      return run(() -> pattern.get().applyTo(m_View)).ignoringDisable(true)
           .withName("LedSetS");
     }
   } // End LEDView

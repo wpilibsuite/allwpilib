@@ -5,31 +5,31 @@
 package frc.robot.subsystems;
 
 /*
- * Example of a subsystem composed only of a goal wrapped in its
- * implementer class to achieve that goal.
+ * Example of a subsystem composed only of a goal wrapped in its implementer class to achieve that
+ * goal.
  * 
- * Note that this is a simple contrived example based on a PID controller.
- * There may be better ways to do PID controller entirely within a subsystem.
- * 
- * This example uses the Xbox right trigger (injected from RobotContainer)
- * to set a goal of a position on the color wheel displayed on the LEDs.
- * 
- * The PID is tuned to slowly converge on the requested color.
+ * Note that this is a simple contrived example based on a PID controller. There may be better ways
+ * to do PID controller entirely within a subsystem.
  */
 
-import java.util.function.DoubleSupplier;
+import frc.robot.Color;
+import frc.robot.LEDPattern;
+import frc.robot.subsystems.RobotSignals.LEDView;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Color;
-import frc.robot.LEDPattern;
-import frc.robot.subsystems.RobotSignals.LEDView;
 
+import java.util.function.DoubleSupplier;
+
+/**
+ * PID controller to achieve (slowly by over-damped kP gain) a color hue goal
+ * set by joystick right trigger and display on the LEDs.
+ */
 public class AchieveHueGoal {
-    
+
     // PID initialization.
 
     // It starts running immediately controlling with the initial
@@ -40,21 +40,26 @@ public class AchieveHueGoal {
     // RobotContainer.java and this class shouldn't even know that
     // to be able to comment here on how the setpoint is determined.
 
-    private final double kP = 0.025;
-    private final double kI = 0.0;
-    private final double kD = 0.0;
-    private PIDController HueController = new PIDController(kP, kI, kD);
-    private double minimumHue = 0.;
-    private double maximumHue = 180.;
-    private double hueSetpoint = 0.;
-    private double currentStateHue = 0.;
-    
-    private LEDView robotSignals; // where the output is displayed
+    private final double m_Kp = 0.025;
+    private final double m_Ki = 0.0;
+    private final double m_Kd = 0.0;
+    private final PIDController m_HueController = new PIDController(m_Kp, m_Ki, m_Kd);
+    private final double m_MinimumHue = 0.;
+    private final double m_MaximumHue = 180.;
+    private double m_HueSetpoint = 0.;
+    private double m_CurrentStateHue = 0.;
 
-    public HueGoal hueGoal = new HueGoal(); // subsystem protected goal
+    private LEDView m_RobotSignals; // where the output is displayed
 
+    public HueGoal m_HueGoal = new HueGoal(); // subsystem protected goal
+
+    /**
+     * Constructor
+     * 
+     * @param robotSignals
+     */
     public AchieveHueGoal(LEDView robotSignals) {
-        this.robotSignals = robotSignals;
+        this.m_RobotSignals = robotSignals;
     }
 
     // Example of methods and triggers that the system will require are put here.
@@ -67,46 +72,61 @@ public class AchieveHueGoal {
 
     private boolean isAtHueGoal() {
 
-        return HueController.atSetpoint();
-    }
-
-    public void beforeCommands() {}
-
-    public void afterCommands() {
-        currentStateHue = MathUtil.clamp(currentStateHue + HueController.calculate(currentStateHue, hueSetpoint), minimumHue, maximumHue);
-        LEDPattern persistentPatternDemo = LEDPattern.solid(Color.fromHSV((int)currentStateHue, 200, 200));// display state;
-        robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDS is only by command in this example so do it that way.
+        return m_HueController.atSetpoint();
     }
 
     /**
-     * subsystem to lock the resource if a command is running and provide a default command
-     * Note that the technique of restricting use of the default command is not implemented
-     * in this example. That is insecure and anybody can change it that has access to the
-     * instance. The default command is disabled in this example.
+     * Run before commands and triggers
+     */
+    public void beforeCommands() {}
+
+    /**
+     * Run after commands and triggers
+     */
+    public void afterCommands() {
+        m_CurrentStateHue = MathUtil.clamp(
+                m_CurrentStateHue
+                        + m_HueController.calculate(m_CurrentStateHue, m_HueSetpoint),
+                m_MinimumHue, m_MaximumHue);
+        LEDPattern persistentPatternDemo = LEDPattern
+                .solid(Color.fromHSV((int) m_CurrentStateHue, 200, 200));// display state;
+        m_RobotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDS is only by
+                                                                  // command in this example so do
+                                                                  // it that way.
+    }
+
+    /**
+     * Subsystem to lock the resource if a command is running and provide a default command.
      * 
-     * A decision must be made on how to set the goal. The controller is always running.
+     * <p>A decision must be made on how to set the goal. The controller is always running.
      * Does the goal supplier have to always be running or is it set and forget until a new
-     * goal is needed? The default command could be activated to provide the goal if no
-     * other goal supplier is running. If set once and forget is used then it is inappropriate
-     * to use a default command as that would immediately reset to the default after setting
-     * a goal.
+     * goal is needed?
+     * 
+     * <p>The default command could be activated to provide the goal if no other goal supplier
+     * is running. If set once and forget is used then it is inappropriate to use a default
+     * command as that would immediately reset to the default after setting a goal.
+     * 
+     * <p>This subsystem could run "perpetually" with a pre-determined hue goal but it's
+     * disabled in this example in favor of no default command to prevent assuming there is
+     * one always running.
+     * 
+     * <p>That means the last setpoint is running as no default takes over. For the Xbox
+     * trigger, that goes to 0 when released but again we're not supposed to know that from
+     * RobotContainer.java.
+     * 
+     * <p>Command defaultCommand = Commands.run( () -> m_HueSetpoint = defaultHueGoal , this);
+     * setDefaultCommand(defaultCommand);
      */
     public class HueGoal extends SubsystemBase {
 
-        private HueGoal() {
-
-        // This subsystem could run "perpetually" with a pre-determined hue goal but it's disabled in
-        // this example in favor of no default command to prevent assuming there is one always running.
-        // That means the last setpoint is running as no default takes over. For the Xbox trigger, that
-        // goes to 0 when released but again we're not supposed to know that from RobotContainer.java.
-        // Command defaultCommand = 
-        //         Commands.run( ()-> hueSetpoint = defaultHueGoal , this);
-        // setDefaultCommand(defaultCommand);
-        }
+        private HueGoal() {}
 
         /**
          * Example of how to disallow default command
+         * 
+         * @param def default command
          */
+
         @Override
         public void setDefaultCommand(Command def) {
 
@@ -121,12 +141,12 @@ public class AchieveHueGoal {
          */
         public Command setHueGoal(double goal) {
 
-            return run(()-> hueSetpoint = goal);
+            return run(() -> m_HueSetpoint = goal);
         }
 
         public Command setHueGoal(DoubleSupplier goal) {
 
-            return run(()-> hueSetpoint = goal.getAsDouble());
-        }   
+            return run(() -> m_HueSetpoint = goal.getAsDouble());
+        }
     }
 }
