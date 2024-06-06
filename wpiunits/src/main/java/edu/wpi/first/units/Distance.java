@@ -39,7 +39,7 @@ public class Distance extends Unit<Distance> {
    * @param period the time period of the velocity, such as seconds or milliseconds
    * @return a linear velocity unit corresponding to the rate of change of distance over time
    */
-  public LinearVelocity per2(Time period) {
+  public LinearVelocity per(Time period) {
     return LinearVelocity.combine(this, period);
   }
 }

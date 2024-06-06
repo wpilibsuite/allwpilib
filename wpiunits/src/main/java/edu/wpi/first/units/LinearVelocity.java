@@ -58,7 +58,7 @@ public class LinearVelocity extends Unit<LinearVelocity> {
    * @return a linear acceleration unit corresponding to the rate of change of linear velocity over
    *     time
    */
-  public LinearAcceleration per2(Time period) {
+  public LinearAcceleration per(Time period) {
     return LinearAcceleration.combine(this, period);
   }
 

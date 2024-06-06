@@ -12,10 +12,9 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.AngularVelocity;
+import edu.wpi.first.units.LinearVelocity;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -300,7 +299,7 @@ public class SwerveDriveKinematics
    * @param attainableMaxSpeed The absolute max speed that a module can reach.
    */
   public static void desaturateWheelSpeeds(
-      SwerveModuleState[] moduleStates, Measure<Velocity<Distance>> attainableMaxSpeed) {
+      SwerveModuleState[] moduleStates, Measure<LinearVelocity> attainableMaxSpeed) {
     desaturateWheelSpeeds(moduleStates, attainableMaxSpeed.in(MetersPerSecond));
   }
 
@@ -372,9 +371,9 @@ public class SwerveDriveKinematics
   public static void desaturateWheelSpeeds(
       SwerveModuleState[] moduleStates,
       ChassisSpeeds desiredChassisSpeed,
-      Measure<Velocity<Distance>> attainableMaxModuleSpeed,
-      Measure<Velocity<Distance>> attainableMaxTranslationalSpeed,
-      Measure<Velocity<Angle>> attainableMaxRotationalVelocity) {
+      Measure<LinearVelocity> attainableMaxModuleSpeed,
+      Measure<LinearVelocity> attainableMaxTranslationalSpeed,
+      Measure<AngularVelocity> attainableMaxRotationalVelocity) {
     desaturateWheelSpeeds(
         moduleStates,
         desiredChassisSpeed,

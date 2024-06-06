@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import static edu.wpi.first.units.Units.Seconds;
-
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. Two
  * measures with the same <i>unit</i> and <i>magnitude</i> are effectively equivalent objects.
@@ -90,21 +88,35 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
       // scalar multiplication
       return times(other.baseUnitMagnitude());
     }
-
+    if (this.unit() instanceof LinearVelocity velocity) {
+      return velocity.getDistance().ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
+    }
+    if (this.unit() instanceof AngularVelocity velocity) {
+      return velocity.getAngle().ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
+    }
+    if (this.unit() instanceof LinearAcceleration acceleration) {
+      return acceleration
+          .getLinearVelocity()
+          .ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
+    }
+    if (this.unit() instanceof AngularAcceleration acceleration) {
+      return acceleration
+          .getAngularVelocity()
+          .ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
+    }
     if (unit() instanceof Per<?, ?> per
         && other.unit().getBaseUnit().equals(per.denominator().getBaseUnit())) {
-      // denominator of the Per cancels out, return with just the units of the numerator
+      // denominator of the Per cancels out, return with just the units of the
+      // numerator
       Unit<?> numerator = per.numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (unit() instanceof Velocity<?> v && other.unit().getBaseUnit().equals(Seconds)) {
-      // Multiplying a velocity by a time, return the scalar unit (eg Distance)
-      Unit<?> numerator = v.getUnit();
-      return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (other.unit() instanceof Per<?, ?> per
+    }
+    if (other.unit() instanceof Per<?, ?> per
         && unit().getBaseUnit().equals(per.denominator().getBaseUnit())) {
       Unit<?> numerator = per.numerator();
       return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (unit() instanceof Per<?, ?> per
+    }
+    if (unit() instanceof Per<?, ?> per
         && other.unit() instanceof Per<?, ?> otherPer
         && per.denominator().getBaseUnit().equals(otherPer.numerator().getBaseUnit())
         && per.numerator().getBaseUnit().equals(otherPer.denominator().getBaseUnit())) {
@@ -144,9 +156,17 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     if (other.unit() instanceof Dimensionless) {
       return divide(other.baseUnitMagnitude());
     }
-    if (other.unit() instanceof Velocity<?> velocity
-        && velocity.getUnit().getBaseUnit().equals(unit().getBaseUnit())) {
+    if (other.unit() instanceof LinearVelocity velocity) {
       return times(velocity.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
+    }
+    if (other.unit() instanceof AngularVelocity velocity) {
+      return times(velocity.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
+    }
+    if (other.unit() instanceof LinearAcceleration acceleration) {
+      return times(acceleration.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
+    }
+    if (other.unit() instanceof AngularAcceleration acceleration) {
+      return times(acceleration.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
     }
     if (other.unit() instanceof Per<?, ?> per
         && per.numerator().getBaseUnit().equals(unit().getBaseUnit())) {
@@ -159,13 +179,13 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Creates a velocity measure by dividing this one by a time period measure.
    *
    * <pre>
-   *   Meters.of(1).per(Second) // Measure&lt;Velocity&lt;Distance&gt;&gt;
+   * Meters.of(1).per(Second) // Measure&lt;Velocity&lt;Distance&gt;&gt;
    * </pre>
    *
    * @param period the time period to divide by.
    * @return the velocity result
    */
-  default Measure<Velocity<U>> per(Measure<Time> period) {
+  default Measure<Per<U, Time>> per(Measure<Time> period) {
     var newUnit = unit().per(period.unit());
     return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude() / period.baseUnitMagnitude(), newUnit);
   }
@@ -174,7 +194,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Creates a relational measure equivalent to this one per some other unit.
    *
    * <pre>
-   *   Volts.of(1.05).per(Meter) // V/m, potential PID constant
+   * Volts.of(1.05).per(Meter) // V/m, potential PID constant
    * </pre>
    *
    * @param <U2> the type of the denominator unit
@@ -190,13 +210,13 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Creates a velocity measure equivalent to this one per a unit of time.
    *
    * <pre>
-   *   Radians.of(3.14).per(Second) // Velocity&lt;Angle&gt; equivalent to RadiansPerSecond.of(3.14)
+   * Radians.of(3.14).per(Second) // Velocity&lt;Angle&gt; equivalent to RadiansPerSecond.of(3.14)
    * </pre>
    *
    * @param time the unit of time
    * @return the velocity measure
    */
-  default Measure<Velocity<U>> per(Time time) {
+  default Measure<Per<U, Time>> per(Time time) {
     var newUnit = unit().per(time);
     return newUnit.of(magnitude());
   }

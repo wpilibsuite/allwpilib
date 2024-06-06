@@ -6,9 +6,6 @@ package edu.wpi.first.math.trajectory;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.Velocity;
 import java.util.Objects;
 
 /**
@@ -71,18 +68,6 @@ public class TrapezoidProfile {
       this.maxAcceleration = maxAcceleration;
       MathSharedStore.reportUsage(MathUsageId.kTrajectory_TrapezoidProfile, 1);
     }
-
-    /**
-     * Constructs constraints for a TrapezoidProfile.
-     *
-     * @param <U> Unit type.
-     * @param maxVelocity maximum velocity
-     * @param maxAcceleration maximum acceleration
-     */
-    public <U extends Unit<U>> Constraints(
-        Measure<Velocity<U>> maxVelocity, Measure<Velocity<Velocity<U>>> maxAcceleration) {
-      this(maxVelocity.baseUnitMagnitude(), maxAcceleration.baseUnitMagnitude());
-    }
   }
 
   /** Profile state. */
@@ -105,17 +90,6 @@ public class TrapezoidProfile {
     public State(double position, double velocity) {
       this.position = position;
       this.velocity = velocity;
-    }
-
-    /**
-     * Constructs constraints for a Trapezoid Profile.
-     *
-     * @param <U> Unit type.
-     * @param position The position at this state.
-     * @param velocity The velocity at this state.
-     */
-    public <U extends Unit<U>> State(Measure<U> position, Measure<Velocity<U>> velocity) {
-      this(position.baseUnitMagnitude(), velocity.baseUnitMagnitude());
     }
 
     @Override

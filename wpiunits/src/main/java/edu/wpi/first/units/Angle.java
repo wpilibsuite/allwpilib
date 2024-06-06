@@ -42,7 +42,7 @@ public class Angle extends Unit<Angle> {
    * @param period the time period of the velocity, such as seconds or milliseconds
    * @return a linear velocity unit corresponding to the rate of change of distance over time
    */
-  public AngularVelocity per2(Time period) {
+  public AngularVelocity per(Time period) {
     return AngularVelocity.combine(this, period);
   }
 }

@@ -26,6 +26,24 @@ public class LinearAcceleration extends Unit<LinearAcceleration> {
    */
   private static final LongToObjectHashMap<LinearAcceleration> cache = new LongToObjectHashMap<>();
 
+  LinearAcceleration(
+      LinearAcceleration baseUnit, double baseUnitEquivalent, String name, String symbol) {
+    super(baseUnit, baseUnitEquivalent, name, symbol);
+    m_linearVelocity = baseUnit.getLinearVelocity();
+    m_period = baseUnit.getPeriod();
+  }
+
+  LinearAcceleration(
+      LinearAcceleration baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+    m_linearVelocity = baseUnit.getLinearVelocity();
+    m_period = baseUnit.getPeriod();
+  }
+
   /**
    * Creates a new linear acceleration unit derived from the ratio of an linear velocity unit to a
    * time unit. Consider using {@link #combine} instead of manually calling this constructor.

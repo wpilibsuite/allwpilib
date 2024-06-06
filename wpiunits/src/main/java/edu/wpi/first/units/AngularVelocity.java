@@ -33,7 +33,7 @@ public class AngularVelocity extends Unit<AngularVelocity> {
    * @param angle the angle unit
    * @param period the period for unit time
    */
-  protected AngularVelocity(Angle angle, Time period) {
+  AngularVelocity(Angle angle, Time period) {
     super(
         angle.isBaseUnit() && period.isBaseUnit()
             ? null
@@ -58,7 +58,7 @@ public class AngularVelocity extends Unit<AngularVelocity> {
    * @return an angular velocity unit corresponding to the rate of change of angular velocity over
    *     time
    */
-  public AngularAcceleration per2(Time period) {
+  public AngularAcceleration per(Time period) {
     return AngularAcceleration.combine(this, period);
   }
 

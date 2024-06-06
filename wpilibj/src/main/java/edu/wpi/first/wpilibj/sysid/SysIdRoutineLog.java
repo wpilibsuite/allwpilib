@@ -13,10 +13,13 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.AngularAcceleration;
+import edu.wpi.first.units.AngularVelocity;
 import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.LinearAcceleration;
+import edu.wpi.first.units.LinearVelocity;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
@@ -144,7 +147,7 @@ public class SysIdRoutineLog {
      * @param velocity The linear velocity to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearVelocity(Measure<Velocity<Distance>> velocity) {
+    public MotorLog linearVelocity(Measure<LinearVelocity> velocity) {
       return value("velocity", velocity.in(MetersPerSecond), MetersPerSecond.name());
     }
 
@@ -154,7 +157,7 @@ public class SysIdRoutineLog {
      * @param velocity The angular velocity to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularVelocity(Measure<Velocity<Angle>> velocity) {
+    public MotorLog angularVelocity(Measure<AngularVelocity> velocity) {
       return value("velocity", velocity.in(RotationsPerSecond), RotationsPerSecond.name());
     }
 
@@ -166,7 +169,7 @@ public class SysIdRoutineLog {
      * @param acceleration The linear acceleration to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearAcceleration(Measure<Velocity<Velocity<Distance>>> acceleration) {
+    public MotorLog linearAcceleration(Measure<LinearAcceleration> acceleration) {
       return value(
           "acceleration",
           acceleration.in(MetersPerSecond.per(Second)),
@@ -181,7 +184,7 @@ public class SysIdRoutineLog {
      * @param acceleration The angular acceleration to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularAcceleration(Measure<Velocity<Velocity<Angle>>> acceleration) {
+    public MotorLog angularAcceleration(Measure<AngularAcceleration> acceleration) {
       return value(
           "acceleration",
           acceleration.in(RotationsPerSecond.per(Second)),

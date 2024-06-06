@@ -14,11 +14,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.ChassisSpeedsProto;
 import edu.wpi.first.math.kinematics.struct.ChassisSpeedsStruct;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.AngularVelocity;
+import edu.wpi.first.units.LinearVelocity;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -73,9 +72,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @param omega Angular velocity.
    */
   public ChassisSpeeds(
-      Measure<Velocity<Distance>> vx,
-      Measure<Velocity<Distance>> vy,
-      Measure<Velocity<Angle>> omega) {
+      Measure<LinearVelocity> vx, Measure<LinearVelocity> vy, Measure<AngularVelocity> omega) {
     this(vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond));
   }
 
@@ -148,9 +145,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return Discretized ChassisSpeeds.
    */
   public static ChassisSpeeds discretize(
-      Measure<Velocity<Distance>> vx,
-      Measure<Velocity<Distance>> vy,
-      Measure<Velocity<Angle>> omega,
+      Measure<LinearVelocity> vx,
+      Measure<LinearVelocity> vy,
+      Measure<AngularVelocity> omega,
       Measure<Time> dt) {
     return discretize(
         vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond), dt.in(Seconds));
@@ -219,9 +216,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
    */
   public static ChassisSpeeds fromFieldRelativeSpeeds(
-      Measure<Velocity<Distance>> vx,
-      Measure<Velocity<Distance>> vy,
-      Measure<Velocity<Angle>> omega,
+      Measure<LinearVelocity> vx,
+      Measure<LinearVelocity> vy,
+      Measure<AngularVelocity> omega,
       Rotation2d robotAngle) {
     return fromFieldRelativeSpeeds(
         vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond), robotAngle);
@@ -287,9 +284,9 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return ChassisSpeeds object representing the speeds in the field's frame of reference.
    */
   public static ChassisSpeeds fromRobotRelativeSpeeds(
-      Measure<Velocity<Distance>> vx,
-      Measure<Velocity<Distance>> vy,
-      Measure<Velocity<Angle>> omega,
+      Measure<LinearVelocity> vx,
+      Measure<LinearVelocity> vy,
+      Measure<AngularVelocity> omega,
       Rotation2d robotAngle) {
     return fromRobotRelativeSpeeds(
         vx.in(MetersPerSecond), vy.in(MetersPerSecond), omega.in(RadiansPerSecond), robotAngle);

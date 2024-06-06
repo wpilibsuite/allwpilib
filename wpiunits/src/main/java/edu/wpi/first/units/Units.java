@@ -124,90 +124,86 @@ public final class Units {
    * The standard SI unit of linear velocity, equivalent to travelling at a rate of one {@link
    * #Meters Meter} per {@link #Second}.
    */
-  public static final Velocity<Distance> MetersPerSecond = Meters.per(Second);
+  public static final LinearVelocity MetersPerSecond = Meters.per(Second);
 
   /**
    * A unit of linear velocity equivalent to travelling at a rate one {@link #Feet Foot} per {@link
    * #Second}.
    */
-  public static final Velocity<Distance> FeetPerSecond = Feet.per(Second);
+  public static final LinearVelocity FeetPerSecond = Feet.per(Second);
 
   /**
    * A unit of linear velocity equivalent to travelling at a rate of one {@link #Inches Inch} per
    * {@link #Second}.
    */
-  public static final Velocity<Distance> InchesPerSecond = Inches.per(Second);
+  public static final LinearVelocity InchesPerSecond = Inches.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Revolutions
    * Revolution} per {@link #Second}.
    */
-  public static final Velocity<Angle> RevolutionsPerSecond = Revolutions.per(Second);
+  public static final AngularVelocity RevolutionsPerSecond = Revolutions.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Rotations Rotation}
    * per {@link #Second}.
    */
-  public static final Velocity<Angle> RotationsPerSecond = Rotations.per(Second);
+  public static final AngularVelocity RotationsPerSecond = Rotations.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Rotations Rotation}
    * per {@link #Minute}. Motor spec sheets often list maximum speeds in terms of RPM.
    */
-  public static final Velocity<Angle> RPM = Rotations.per(Minute);
+  public static final AngularVelocity RPM = Rotations.per(Minute);
 
   /**
    * The standard SI unit of angular velocity, equivalent to spinning at a rate of one {@link
    * #Radians Radian} per {@link #Second}.
    */
-  public static final Velocity<Angle> RadiansPerSecond = Radians.per(Second);
+  public static final AngularVelocity RadiansPerSecond = Radians.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Degrees Degree} per
    * {@link #Second}.
    */
-  public static final Velocity<Angle> DegreesPerSecond = Degrees.per(Second);
+  public static final AngularVelocity DegreesPerSecond = Degrees.per(Second);
 
   // Acceleration
   /**
    * The standard SI unit of linear acceleration, equivalent to accelerating at a rate of one {@link
    * #Meters Meter} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Distance>> MetersPerSecondPerSecond =
-      MetersPerSecond.per(Second);
+  public static final LinearAcceleration MetersPerSecondPerSecond = MetersPerSecond.per(Second);
 
   /**
    * A unit of linear acceleration equivalent to accelerating at a rate of one {@link #Foot Foot}
    * per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Distance>> FeetPerSecondPerSecond =
-      FeetPerSecond.per(Second);
+  public static final LinearAcceleration FeetPerSecondPerSecond = FeetPerSecond.per(Second);
 
   /**
    * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Rotations
    * Rotation} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Angle>> RotationsPerSecondPerSecond =
+  public static final AngularAcceleration RotationsPerSecondPerSecond =
       RotationsPerSecond.per(Second);
 
   /**
    * The standard SI unit of angular acceleration, equivalent to accelerating at a rate of one
    * {@link #Radians Radian} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Angle>> RadiansPerSecondPerSecond =
-      RadiansPerSecond.per(Second);
+  public static final AngularAcceleration RadiansPerSecondPerSecond = RadiansPerSecond.per(Second);
 
   /**
    * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Degrees
    * Degree} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Angle>> DegreesPerSecondPerSecond =
-      DegreesPerSecond.per(Second);
+  public static final AngularAcceleration DegreesPerSecondPerSecond = DegreesPerSecond.per(Second);
 
   /**
    * A unit of acceleration equivalent to the pull of gravity on an object at sea level on Earth.
    */
-  public static final Velocity<Velocity<Distance>> Gs =
+  public static final LinearAcceleration Gs =
       derive(MetersPerSecondPerSecond).aggregate(9.80665).named("G").symbol("G").make();
 
   // Mass
@@ -386,28 +382,28 @@ public final class Units {
    * A standard unit for measuring linear mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded linear velocity.
    */
-  public static final Per<Voltage, Velocity<Distance>> VoltsPerMeterPerSecond =
+  public static final Per<Voltage, LinearVelocity> VoltsPerMeterPerSecond =
       Volts.per(MetersPerSecond);
 
   /**
    * A standard unit for measuring linear mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded linear acceleration.
    */
-  public static final Per<Voltage, Velocity<Velocity<Distance>>> VoltsPerMeterPerSecondSquared =
+  public static final Per<Voltage, LinearAcceleration> VoltsPerMeterPerSecondSquared =
       Volts.per(MetersPerSecondPerSecond);
 
   /**
    * A standard unit for measuring angular mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded angular velocity.
    */
-  public static final Per<Voltage, Velocity<Angle>> VoltsPerRadianPerSecond =
+  public static final Per<Voltage, AngularVelocity> VoltsPerRadianPerSecond =
       Volts.per(RadiansPerSecond);
 
   /**
    * A standard unit for measuring angular mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded angular acceleration.
    */
-  public static final Per<Voltage, Velocity<Velocity<Angle>>> VoltsPerRadianPerSecondSquared =
+  public static final Per<Voltage, AngularAcceleration> VoltsPerRadianPerSecondSquared =
       Volts.per(RadiansPerSecond.per(Second));
 
   /**
