@@ -31,7 +31,7 @@ public class LinearVelocity extends Unit<LinearVelocity> {
    * Consider using {@link #combine} instead of manually calling this constructor.
    *
    * @param distance the distance unit
-   * @param time the time unit
+   * @param period the period for unit time
    */
   protected LinearVelocity(Distance distance, Time period) {
     super(

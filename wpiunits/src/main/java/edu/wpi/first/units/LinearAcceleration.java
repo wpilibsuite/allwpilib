@@ -31,7 +31,7 @@ public class LinearAcceleration extends Unit<LinearAcceleration> {
    * time unit. Consider using {@link #combine} instead of manually calling this constructor.
    *
    * @param linearVelocity the linear velocity unit
-   * @param time the time unit
+   * @param period the period for unit time
    */
   protected LinearAcceleration(LinearVelocity linearVelocity, Time period) {
     super(

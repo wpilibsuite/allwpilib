@@ -31,7 +31,7 @@ public class AngularVelocity extends Unit<AngularVelocity> {
    * Consider using {@link #combine} instead of manually calling this constructor.
    *
    * @param angle the angle unit
-   * @param time the time unit
+   * @param period the period for unit time
    */
   protected AngularVelocity(Angle angle, Time period) {
     super(

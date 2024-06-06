@@ -31,7 +31,7 @@ public class AngularAcceleration extends Unit<AngularAcceleration> {
    * time unit. Consider using {@link #combine} instead of manually calling this constructor.
    *
    * @param angularVelocity the angular velocity unit
-   * @param time the time unit
+   * @param period the period for unit time
    */
   protected AngularAcceleration(AngularVelocity angularVelocity, Time period) {
     super(
