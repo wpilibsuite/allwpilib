@@ -685,12 +685,12 @@ void ADIS16470_IMU::Acquire() {
         double accel_z = BuffToShort(&buffer[i + 25]) / 800.0;
 
         // Convert scaled sensor data to SI units
-        double gyro_rate_x_si = gyro_rate_x * deg_to_rad;
-        double gyro_rate_y_si = gyro_rate_y * deg_to_rad;
-        // double gyro_rate_z_si = gyro_rate_z * deg_to_rad;
-        double accel_x_si = accel_x * grav;
-        double accel_y_si = accel_y * grav;
-        double accel_z_si = accel_z * grav;
+        double gyro_rate_x_si = gyro_rate_x * kDegToRad;
+        double gyro_rate_y_si = gyro_rate_y * kDegToRad;
+        // double gyro_rate_z_si = gyro_rate_z * kDegToRad;
+        double accel_x_si = accel_x * kGrav;
+        double accel_y_si = accel_y * kGrav;
+        double accel_z_si = accel_z * kGrav;
 
         // Store timestamp for next iteration
         previous_timestamp = buffer[i];
@@ -734,10 +734,10 @@ void ADIS16470_IMU::Acquire() {
           m_accel_x = accel_x;
           m_accel_y = accel_y;
           m_accel_z = accel_z;
-          m_compAngleX = compAngleX * rad_to_deg;
-          m_compAngleY = compAngleY * rad_to_deg;
-          m_accelAngleX = accelAngleX * rad_to_deg;
-          m_accelAngleY = accelAngleY * rad_to_deg;
+          m_compAngleX = compAngleX * kRadToDeg;
+          m_compAngleY = compAngleY * kRadToDeg;
+          m_accelAngleX = accelAngleX * kRadToDeg;
+          m_accelAngleY = accelAngleY * kRadToDeg;
         }
         m_first_run = false;
       }
