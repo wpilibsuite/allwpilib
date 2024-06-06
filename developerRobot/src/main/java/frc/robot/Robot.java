@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public class Robot extends TimedRobot {
@@ -17,16 +18,16 @@ public class Robot extends TimedRobot {
   @SuppressWarnings("resource")
   public void robotInit() {
     // Solenoid sCTRE = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
-    // Solenoid sREV = new Solenoid(PneumaticsModuleType.REVPH, 0);
-    // new Compressor(PneumaticsModuleType.CTREPCM);
-    new Compressor(PneumaticsModuleType.REVPH);
+    Solenoid sREV = new Solenoid(PneumaticsModuleType.REVPH, 0);
+    // new Compressor(PneumaticsModuleType.CTREPCM);/
+    // new Compressor(PneumaticsModuleType.REVPH);
   }
 
   /*
    * Good
    * main.cpp
    * REVPHSimGui.h
-   * Bad
+   * Getting there, still need to split compressor data
    * REVPHSimGui.cpp
    * PCM.cpp
    * PCM.h

@@ -50,7 +50,7 @@ bool glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model, int i
     wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
                            index);
   } else {
-    wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###header",
+    wpi::format_to_n_c_str(label, sizeof(label), "{}[{}]###header",
                            model->GetName(), index);
   }
 

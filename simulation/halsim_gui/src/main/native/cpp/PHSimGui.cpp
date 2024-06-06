@@ -200,7 +200,7 @@ void PHSimGui::Initialize() {
     return std::make_unique<PHsSimModel>();
   });
   HALSimGui::halProvider->RegisterView(
-      "Solenoids", "REVPHs",
+      "Solenoids2", "REVPHs",
       [](glass::Model* model) {
         bool any = false;
         static_cast<PHsSimModel*>(model)->ForEachPneumaticControl(
