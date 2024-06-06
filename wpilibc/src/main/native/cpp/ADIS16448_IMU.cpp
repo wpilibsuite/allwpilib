@@ -628,10 +628,10 @@ void ADIS16448_IMU::Acquire() {
         for (int k = 5; k < 27; k += 2) {
           // Process LSB
           uint8_t byte = static_cast<uint8_t>(buffer[i + k + 1]);
-          calc_crc = (calc_crc >> 8) ^ m_adiscrc[(calc_crc & 0x00FF) ^ byte];
+          calc_crc = (calc_crc >> 8) ^ m_adiscrc[(calc_crc & 0xFF) ^ byte];
           // Process MSB
           byte = static_cast<uint8_t>(buffer[i + k]);
-          calc_crc = (calc_crc >> 8) ^ m_adiscrc[(calc_crc & 0x00FF) ^ byte];
+          calc_crc = (calc_crc >> 8) ^ m_adiscrc[(calc_crc & 0xFF) ^ byte];
         }
         // Complement
         calc_crc = ~calc_crc;
