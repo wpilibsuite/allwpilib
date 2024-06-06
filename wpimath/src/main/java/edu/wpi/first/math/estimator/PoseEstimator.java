@@ -18,7 +18,6 @@ import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.NavigableMap;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -141,21 +140,20 @@ public class PoseEstimator<T> {
    * @return The pose at the given timestamp (or Optional.empty() if the buffer is empty).
    */
   public Optional<Pose2d> sampleAt(double timestampSeconds) {
-    // Make sure timestamp matches the sample from the odometry pose buffer
-    try {
-      double oldestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().firstKey();
-      double newestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().lastKey();
-      timestampSeconds =
-          MathUtil.clamp(timestampSeconds, oldestOdometryTimestamp, newestOdometryTimestamp);
-    } catch (NoSuchElementException ex) {
+    if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()) {
       // No odometry updates, so nothing to sample
       return Optional.empty();
     }
-    Double floorTimestamp = m_visionUpdates.floorKey(timestampSeconds);
-    if (floorTimestamp == null) {
+    // Make sure timestamp matches the sample from the odometry pose buffer
+    double oldestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().firstKey();
+    double newestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().lastKey();
+    timestampSeconds =
+        MathUtil.clamp(timestampSeconds, oldestOdometryTimestamp, newestOdometryTimestamp);
+    if (m_visionUpdates.isEmpty() || timestampSeconds < m_visionUpdates.firstKey()) {
       // No vision update from before the requested timestamp to apply
       return m_odometryPoseBuffer.getSample(timestampSeconds);
     }
+    double floorTimestamp = m_visionUpdates.floorKey(timestampSeconds);
     var visionUpdate = m_visionUpdates.get(floorTimestamp);
     var odometryEstimate = m_odometryPoseBuffer.getSample(timestampSeconds);
     return odometryEstimate.map(odometryPose -> visionUpdate.compensate(odometryPose));
@@ -163,20 +161,18 @@ public class PoseEstimator<T> {
 
   /** Removes stale vision updates that won't affect sampling. */
   private void cleanUpVisionUpdates() {
-    // Find the oldest timestamp that needs a vision update before or at it
-    double oldestOdometryTimestamp;
-    try {
-      oldestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().firstKey();
-    } catch (NoSuchElementException ex) {
+    if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()) {
       // No odometry updates, so no vision updates as well
       return;
     }
-    // Find the newest vision update timestamp before or at the oldest timestamp
-    Double newestNeededVisionUpdateTimestamp = m_visionUpdates.floorKey(oldestOdometryTimestamp);
-    if (newestNeededVisionUpdateTimestamp == null) {
+    // Find the oldest timestamp that needs a vision update before or at it
+    double oldestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().firstKey();
+    if (m_visionUpdates.isEmpty() || oldestOdometryTimestamp < m_visionUpdates.firstKey()) {
       // No vision updates before the oldest odometry update, so no entries to clear
       return;
     }
+    // Find the newest vision update timestamp before or at the oldest timestamp
+    double newestNeededVisionUpdateTimestamp = m_visionUpdates.floorKey(oldestOdometryTimestamp);
     // Remove all entries strictly before the newest timestamp we need
     m_visionUpdates.headMap(newestNeededVisionUpdateTimestamp, false).clear();
   }
@@ -202,11 +198,9 @@ public class PoseEstimator<T> {
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
-    try {
-      if (m_odometryPoseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
-        return;
-      }
-    } catch (NoSuchElementException ex) {
+    if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()
+        || m_odometryPoseBuffer.getInternalBuffer().lastKey() - kBufferDuration
+            > timestampSeconds) {
       return;
     }
 
