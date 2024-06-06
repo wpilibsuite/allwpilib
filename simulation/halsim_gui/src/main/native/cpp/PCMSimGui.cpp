@@ -90,7 +90,7 @@ class SolenoidSimModel : public glass::SolenoidModel {
   CTREPCMSolenoidOutputSource m_output;
 };
 
-class PCMSimModel : public glass::PCMModel {
+class PCMSimModel : public glass::PneumaticControlModel {
  public:
   explicit PCMSimModel(int32_t index)
       : m_index{index},
@@ -107,6 +107,8 @@ class PCMSimModel : public glass::PCMModel {
       wpi::function_ref<void(glass::SolenoidModel& model, int index)> func)
       override;
 
+  std::string_view GetName() override { return "PH"; }
+
   int GetNumSolenoids() const { return m_solenoidInitCount; }
 
  private:
@@ -116,7 +118,7 @@ class PCMSimModel : public glass::PCMModel {
   int m_solenoidInitCount = 0;
 };
 
-class PCMsSimModel : public glass::PCMsModel {
+class PCMsSimModel : public glass::PneumaticControlsModel {
  public:
   PCMsSimModel() : m_models(HAL_GetNumCTREPCMModules()) {}
 
@@ -124,8 +126,9 @@ class PCMsSimModel : public glass::PCMsModel {
 
   bool Exists() override { return true; }
 
-  void ForEachPCM(
-      wpi::function_ref<void(glass::PCMModel& model, int index)> func) override;
+  void ForEachPneumaticControl(
+      wpi::function_ref<void(glass::PneumaticControlModel& model, int index)>
+          func) override;
 
  private:
   std::vector<std::unique_ptr<PCMSimModel>> m_models;
@@ -176,8 +179,9 @@ void PCMsSimModel::Update() {
   }
 }
 
-void PCMsSimModel::ForEachPCM(
-    wpi::function_ref<void(glass::PCMModel& model, int index)> func) {
+void PCMsSimModel::ForEachPneumaticControl(
+    wpi::function_ref<void(glass::PneumaticControlModel& model, int index)>
+        func) {
   int32_t numCTREPCMs = m_models.size();
   for (int32_t i = 0; i < numCTREPCMs; ++i) {
     if (auto model = m_models[i].get()) {
@@ -204,8 +208,8 @@ void PCMSimGui::Initialize() {
       "Solenoids", "CTREPCMs",
       [](glass::Model* model) {
         bool any = false;
-        static_cast<PCMsSimModel*>(model)->ForEachPCM(
-            [&](glass::PCMModel& CTREPCM, int) {
+        static_cast<PCMsSimModel*>(model)->ForEachPneumaticControl(
+            [&](glass::PneumaticControlModel& CTREPCM, int) {
               if (static_cast<PCMSimModel*>(&CTREPCM)->GetNumSolenoids() > 0) {
                 any = true;
               }
@@ -216,7 +220,7 @@ void PCMSimGui::Initialize() {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(290, 20);
         return glass::MakeFunctionView([=] {
-          glass::DisplayPCMsSolenoids(
+          glass::DisplayPneumaticControlsSolenoids(
               static_cast<PCMsSimModel*>(model),
               HALSimGui::halProvider->AreOutputsEnabled());
         });

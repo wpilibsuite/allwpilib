@@ -34,46 +34,31 @@ class SolenoidModel : public Model {
   virtual void SetOutput(bool val) = 0;
 };
 
-
-class PCMModel : public Model {
+class PneumaticControlModel : public Model {
  public:
   virtual CompressorModel* GetCompressor() = 0;
 
   virtual void ForEachSolenoid(
       wpi::function_ref<void(SolenoidModel& model, int index)> func) = 0;
+  virtual std::string_view GetName() = 0;
 };
 
-class PHModel : public Model {
+class PneumaticControlsModel : public Model {
  public:
-  virtual CompressorModel* GetCompressor() = 0;
-
-  virtual void ForEachSolenoid(
-      wpi::function_ref<void(SolenoidModel& model, int index)> func) = 0;
+  virtual void ForEachPneumaticControl(
+      wpi::function_ref<void(PneumaticControlModel& model, int index)>
+          func) = 0;
 };
 
-class PCMsModel : public Model {
- public:
-  virtual void ForEachPCM(
-      wpi::function_ref<void(PCMModel& model, int index)> func) = 0;
-};
-
-class PHsModel : public Model {
- public:
-  virtual void ForEachPH(
-      wpi::function_ref<void(PHModel& model, int index)> func) = 0;
-};
-
-bool DisplaySolenoids(
-    wpi::function_ref<void(SolenoidModel& model, int index)> forEachSolenoid, int index,
-    bool outputsEnabled, std::string headerLabel);
-void DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
-                          std::string_view noneMsg = "No solenoids");
-void DisplayPHsSolenoids(PHsModel* model, bool outputsEnabled,
-                         std::string_view noneMsg = "No solenoids");
+bool DisplaySolenoids(PneumaticControlModel* model, int index,
+                      bool outputsEnabled);
+void DisplayPneumaticControlsSolenoids(
+    PneumaticControlsModel* model, bool outputsEnabled,
+    std::string_view noneMsg = "No solenoids");
 
 void DisplayCompressorDevice(CompressorModel* model, int index,
                              bool outputsEnabled);
-void DisplayCompressorsDevice(PCMsModel* model, bool outputsEnabled);
-void DisplayCompressorsDevice(PHsModel* model, bool outputsEnabled);
+void DisplayCompressorsDevice(PneumaticControlsModel* model,
+                              bool outputsEnabled);
 
 }  // namespace glass

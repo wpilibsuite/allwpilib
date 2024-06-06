@@ -20,11 +20,10 @@
 
 using namespace glass;
 
-bool glass::DisplaySolenoids(
-    wpi::function_ref<void(SolenoidModel& model, int index)> forEachSolenoid,
-    int index, bool outputsEnabled, std::string headerLabel) {
+bool glass::DisplaySolenoids(PneumaticControlModel* model, int index,
+                             bool outputsEnabled) {
   wpi::SmallVector<int, 16> channels;
-  forEachSolenoid([&](SolenoidModel& solenoid, int j) {
+  model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
     if (auto data = solenoid.GetOutputData()) {
       if (j >= static_cast<int>(channels.size())) {
         channels.resize(j + 1);
@@ -51,8 +50,8 @@ bool glass::DisplaySolenoids(
     wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
                            index);
   } else {
-    wpi::format_to_n_c_str(label, sizeof(label), headerLabel + "[{}]###header",
-                           index);
+    wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###header",
+                           model->GetName(), index);
   }
 
   // header
@@ -70,7 +69,7 @@ bool glass::DisplaySolenoids(
 
   if (open) {
     ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
-    forEachSolenoid([&](SolenoidModel& solenoid, int j) {
+    model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
       if (auto data = solenoid.GetOutputData()) {
         PushID(j);
         char label[64];
@@ -87,31 +86,18 @@ bool glass::DisplaySolenoids(
   return true;
 }
 
-void glass::DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
-                                 std::string_view noneMsg) {
+void glass::DisplayPneumaticControlsSolenoids(PneumaticControlsModel* model,
+                                              bool outputsEnabled,
+                                              std::string_view noneMsg) {
   bool hasAny = false;
-  model->ForEachPCM([&](PCMModel& pcm, int i) {
-    PushID(i);
-    if (DisplaySolenoids([&] { pcm.ForEachSolenoid({}); }, i, outputsEnabled, "PCM")) {
-      hasAny = true;
-    }
-    PopID();
-  });
-  if (!hasAny && !noneMsg.empty()) {
-    ImGui::TextUnformatted(noneMsg.data(), noneMsg.data() + noneMsg.size());
-  }
-}
-
-void glass::DisplayPHsSolenoids(PHsModel* model, bool outputsEnabled,
-                                std::string_view noneMsg) {
-  bool hasAny = false;
-  model->ForEachPH([&](PHModel& ph, int i) {
-    PushID(i);
-    if (DisplaySolenoids(&ph, i, outputsEnabled, "PH")) {
-      hasAny = true;
-    }
-    PopID();
-  });
+  model->ForEachPneumaticControl(
+      [&](PneumaticControlModel& pneumaticControl, int i) {
+        PushID(i);
+        if (DisplaySolenoids(&pneumaticControl, i, outputsEnabled)) {
+          hasAny = true;
+        }
+        PopID();
+      });
   if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.data(), noneMsg.data() + noneMsg.size());
   }
@@ -166,14 +152,11 @@ void glass::DisplayCompressorDevice(CompressorModel* model, int index,
   }
 }
 
-void glass::DisplayCompressorsDevice(PCMsModel* model, bool outputsEnabled) {
-  model->ForEachPCM([&](PCMModel& pcm, int i) {
-    DisplayCompressorDevice(pcm.GetCompressor(), i, outputsEnabled);
-  });
-}
-
-void glass::DisplayCompressorsDevice(PHsModel* model, bool outputsEnabled) {
-  model->ForEachPH([&](PHModel& ph, int i) {
-    DisplayCompressorDevice(ph.GetCompressor(), i, outputsEnabled);
-  });
+void glass::DisplayCompressorsDevice(PneumaticControlsModel* model,
+                                     bool outputsEnabled) {
+  model->ForEachPneumaticControl(
+      [&](PneumaticControlModel& pneumaticControl, int i) {
+        DisplayCompressorDevice(pneumaticControl.GetCompressor(), i,
+                                outputsEnabled);
+      });
 }

@@ -40,7 +40,7 @@ class CompressorSimModel : public glass::CompressorModel {
   bool Exists() override { return HALSIM_GetREVPHInitialized(m_index); }
 
   glass::DataSource* GetRunningData() override { return &m_running; }
-  glass::DataSource* GetEnabledData() override { return &m_running; } // bad
+  glass::DataSource* GetEnabledData() override { return &m_running; }  // bad
   glass::DataSource* GetPressureSwitchData() override {
     return &m_pressureSwitch;
   }
@@ -85,7 +85,7 @@ class SolenoidSimModel : public glass::SolenoidModel {
   REVPHSolenoidOutputSource m_output;
 };
 
-class PHSimModel : public glass::PHModel {
+class PHSimModel : public glass::PneumaticControlModel {
  public:
   explicit PHSimModel(int32_t index)
       : m_index{index},
@@ -102,6 +102,8 @@ class PHSimModel : public glass::PHModel {
       wpi::function_ref<void(glass::SolenoidModel& model, int index)> func)
       override;
 
+  std::string_view GetName() override { return "PH"; }
+
   int GetNumSolenoids() const { return m_solenoidInitCount; }
 
  private:
@@ -111,7 +113,7 @@ class PHSimModel : public glass::PHModel {
   int m_solenoidInitCount = 0;
 };
 
-class PHsSimModel : public glass::PHsModel {
+class PHsSimModel : public glass::PneumaticControlsModel {
  public:
   PHsSimModel() : m_models(HAL_GetNumREVPHModules()) {}
 
@@ -119,8 +121,9 @@ class PHsSimModel : public glass::PHsModel {
 
   bool Exists() override { return true; }
 
-  void ForEachPH(wpi::function_ref<void(glass::PHModel& model, int index)>
-                        func) override;
+  void ForEachPneumaticControl(
+      wpi::function_ref<void(glass::PneumaticControlModel& model, int index)>
+          func) override;
 
  private:
   std::vector<std::unique_ptr<PHSimModel>> m_models;
@@ -171,8 +174,9 @@ void PHsSimModel::Update() {
   }
 }
 
-void PHsSimModel::ForEachPH(
-    wpi::function_ref<void(glass::PHModel& model, int index)> func) {
+void PHsSimModel::ForEachPneumaticControl(
+    wpi::function_ref<void(glass::PneumaticControlModel& model, int index)>
+        func) {
   int32_t numREVPHs = m_models.size();
   for (int32_t i = 0; i < numREVPHs; ++i) {
     if (auto model = m_models[i].get()) {
@@ -199,8 +203,8 @@ void PHSimGui::Initialize() {
       "Solenoids", "REVPHs",
       [](glass::Model* model) {
         bool any = false;
-        static_cast<PHsSimModel*>(model)->ForEachPH(
-            [&](glass::PHModel& REVPH, int) {
+        static_cast<PHsSimModel*>(model)->ForEachPneumaticControl(
+            [&](glass::PneumaticControlModel& REVPH, int) {
               if (static_cast<PHSimModel*>(&REVPH)->GetNumSolenoids() > 0) {
                 any = true;
               }
@@ -211,7 +215,7 @@ void PHSimGui::Initialize() {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(290, 20);
         return glass::MakeFunctionView([=] {
-          glass::DisplayPHsSolenoids(
+          glass::DisplayPneumaticControlsSolenoids(
               static_cast<PHsSimModel*>(model),
               HALSimGui::halProvider->AreOutputsEnabled());
         });
