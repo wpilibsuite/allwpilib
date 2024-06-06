@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public class Robot extends TimedRobot {
@@ -15,28 +12,7 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   @Override
-  @SuppressWarnings("resource")
-  public void robotInit() {
-    // Solenoid sCTRE1 = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
-    // Solenoid sREV1 = new Solenoid(PneumaticsModuleType.REVPH, 0);
-    // Solenoid sREV2 = new Solenoid(PneumaticsModuleType.REVPH, 12);
-    // sCTRE1.set(true);
-    // sREV1.set(true);
-    // sREV2.set(true);
-    // new Compressor(PneumaticsModuleType.CTREPCM);/
-    new Compressor(PneumaticsModuleType.REVPH);
-  }
-
-  /*
-   * Good
-   * main.cpp
-   * PHSimGui.h
-   * Getting there, still need to split compressor data, consolidate solenoid views?
-   * PHSimGui.cpp
-   * Pneumatic.cpp
-   * Pneumatic.h
-   * 
-   */
+  public void robotInit() {}
 
   /** This function is run once each time the robot enters autonomous mode. */
   @Override
