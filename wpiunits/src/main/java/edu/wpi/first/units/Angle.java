@@ -14,8 +14,8 @@ package edu.wpi.first.units;
  * {@link Units} class.
  */
 // technically, angles are unitless dimensions
-// eg Mass * Distance * Velocity<Angle> is equivalent to (Mass * Distance) / Time - otherwise known
-// as Power - in other words, Velocity<Angle> is /actually/ Frequency
+// eg Mass * Distance * AngularVelocity is equivalent to (Mass * Distance) / Time - otherwise known
+// as Power - in other words, AngularVelocity is /actually/ Frequency
 public class Angle extends Unit<Angle> {
   Angle(Angle baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
@@ -28,5 +28,21 @@ public class Angle extends Unit<Angle> {
       String name,
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+  }
+
+  /**
+   * Creates a angular velocity unit derived from this one. Can be chained to denote angular
+   * velocity, angular acceleration, angular jerk, etc.
+   *
+   * <pre>
+   *   Radians.per(Second) // angular velocity
+   *   Degrees.per(Second).per(Second).of(90) // 90 degrees per second
+   * </pre>
+   *
+   * @param period the time period of the velocity, such as seconds or milliseconds
+   * @return a linear velocity unit corresponding to the rate of change of distance over time
+   */
+  public AngularVelocity per2(Time period) {
+    return AngularVelocity.combine(this, period);
   }
 }
