@@ -714,13 +714,13 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
         // Could be multiple data sets in the buffer. Handle each one.
         for (int i = 0; i < data_to_read; i += dataset_len) {
           // Calculate CRC-16 on each data packet
-          int calc_crc = 0x0000FFFF; // Starting word
+          int calc_crc = 0xFFFF; // Starting word
           // Cycle through XYZ GYRO, XYZ ACCEL, XYZ MAG, BARO, TEMP (Ignore Status & CRC)
           for (int k = 5; k < 27; k += 2) {
             // Process LSB
-            calc_crc = (calc_crc >>> 8) ^ m_adiscrc[(calc_crc & 0x000000FF) ^ buffer[i + k + 1]];
+            calc_crc = (calc_crc >>> 8) ^ m_adiscrc[(calc_crc & 0xFF) ^ buffer[i + k + 1]];
             // Process MSB
-            calc_crc = (calc_crc >>> 8) ^ m_adiscrc[(calc_crc & 0x000000FF) ^ buffer[i + k]];
+            calc_crc = (calc_crc >>> 8) ^ m_adiscrc[(calc_crc & 0xFF) ^ buffer[i + k]];
           }
           // Complement
           calc_crc = ~calc_crc & 0xFFFF;
@@ -808,7 +808,6 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
                 m_integ_gyro_angle_y += (gyro_rate_y - m_gyro_rate_offset_y) * m_dt;
                 m_integ_gyro_angle_z += (gyro_rate_z - m_gyro_rate_offset_z) * m_dt;
               }
-              // System.out.println("Good CRC");
             }
             m_first_run = false;
           }
