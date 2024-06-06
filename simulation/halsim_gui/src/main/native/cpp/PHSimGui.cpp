@@ -90,7 +90,7 @@ class PHSimModel : public glass::PneumaticControlModel {
   explicit PHSimModel(int32_t index)
       : m_index{index},
         m_compressor{index},
-        m_solenoids(HAL_GetNumCTRESolenoidChannels()) {}
+        m_solenoids(HAL_GetNumREVPHChannels()) {}
 
   void Update() override;
 

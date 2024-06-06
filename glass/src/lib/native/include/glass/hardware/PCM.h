@@ -40,7 +40,7 @@ class PneumaticControlModel : public Model {
 
   virtual void ForEachSolenoid(
       wpi::function_ref<void(SolenoidModel& model, int index)> func) = 0;
-      
+
   virtual std::string_view GetName() = 0;
 };
 
@@ -52,7 +52,7 @@ class PneumaticControlsModel : public Model {
 };
 
 bool DisplayPneumaticControlSolenoids(PneumaticControlModel* model, int index,
-                      bool outputsEnabled);
+                                      bool outputsEnabled);
 void DisplayPneumaticControlsSolenoids(
     PneumaticControlsModel* model, bool outputsEnabled,
     std::string_view noneMsg = "No solenoids");
