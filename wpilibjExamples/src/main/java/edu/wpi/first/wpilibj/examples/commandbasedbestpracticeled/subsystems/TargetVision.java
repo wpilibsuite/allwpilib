@@ -41,17 +41,16 @@ public class TargetVision extends SubsystemBase {
     LEDPattern targetAcquiredSignal = LEDPattern.solid(Color.kOrange);
     return m_RobotSignals
         .setSignal(targetAcquiredSignal) // this command locks the specific injected m_robotSignals
-                                         // subsystem only
+        // subsystem only
         .andThen(Commands.idle(this).withTimeout(0.)) // command created in this subsystem will
-                                                           // lock this subsystem also
+        // lock this subsystem also
         /* composite */
         .withName("LedVisionTargetInSight")
         .ignoringDisable(true); // ignore disable true must be here on the composite; on the first
-                                // command doesn't do anything
+    // command doesn't do anything
   }
 
   /**
-   * 
    * @return status of fake event source for target acquired
    */
   private boolean canSeeTarget() {
@@ -68,13 +67,9 @@ public class TargetVision extends SubsystemBase {
     throw new IllegalArgumentException("Default Command not allowed");
   }
 
-  /**
-   * Run before commands and triggers
-   */
+  /** Run before commands and triggers */
   public void beforeCommands() {}
 
-  /**
-   * Run after commands and triggers
-   */
+  /** Run after commands and triggers */
   public void afterCommands() {}
 }

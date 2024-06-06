@@ -78,9 +78,9 @@ public final class TriggeredDisjointSequence extends WrapperCommand {
    * Run commands in a sequence with the end of a command triggering the next command.
    *
    * <p>Each command is added to an individual composition group (WrapperCommand) and thus is
-   * restricted but the requirements of each component command are not required for the entire
-   * group process since each wrapped command is run individually by being triggered from the
-   * previous command.
+   * restricted but the requirements of each component command are not required for the entire group
+   * process since each wrapped command is run individually by being triggered from the previous
+   * command.
    *
    * <p>Individual commands can be treated with .asProxy() as needed to break out of the wrapper
    * composition group.

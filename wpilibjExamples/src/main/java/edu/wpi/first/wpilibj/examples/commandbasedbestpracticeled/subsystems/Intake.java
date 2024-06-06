@@ -26,7 +26,6 @@ public class Intake extends SubsystemBase {
   public final Trigger m_gamePieceAcquired = new Trigger(this::hasGamePieceAcquired);
 
   /**
-   * 
    * @param robotSignals Signal Subsystem
    * @param operatorController Source of fake target of game piece acquired event
    */
@@ -37,7 +36,6 @@ public class Intake extends SubsystemBase {
   }
 
   /**
-   * 
    * @return command to set the signal indicating game piece acquired
    */
   public Command gamePieceIsAcquired() {
@@ -50,7 +48,6 @@ public class Intake extends SubsystemBase {
   }
 
   /**
-   * 
    * @return status of fake event source for game piece acquired
    */
   private boolean hasGamePieceAcquired() {
@@ -67,13 +64,9 @@ public class Intake extends SubsystemBase {
     throw new IllegalArgumentException("Default Command not allowed");
   }
 
-  /**
-   * Run before commands and triggers
-   */
+  /** Run before commands and triggers */
   public void beforeCommands() {}
 
-  /**
-   * Run after commands and triggers
-   */
+  /** Run after commands and triggers */
   public void afterCommands() {}
 }

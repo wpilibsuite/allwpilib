@@ -24,16 +24,15 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.Color;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.LEDPattern;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDView;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -89,9 +88,7 @@ public class HistoryFSM extends SubsystemBase {
             );
   }
 
-  /**
-   * Create an initialized list of hues
-   */
+  /** Create an initialized list of hues */
   private void fillInitialTimes() {
     // initially indicate hue hasn't been used in a long time ago so available immediately
     for (int i = 0; i < m_computerColorWheel; i++) {
@@ -99,9 +96,7 @@ public class HistoryFSM extends SubsystemBase {
     }
   }
 
-  /**
-   * Set the time for the trigger of its next periodic run
-   */
+  /** Set the time for the trigger of its next periodic run */
   private void setNextTime() {
     Measure<Time> currentTime = Milliseconds.of(System.currentTimeMillis());
     m_nextTime = currentTime.plus(m_changeColorPeriod);
@@ -154,9 +149,7 @@ public class HistoryFSM extends SubsystemBase {
     m_persistentPatternDemo = LEDPattern.solid(Color.fromHSV(randomHue, 200, 200));
   }
 
-  /**
-   * Example of how to disallow default command
-   */
+  /** Example of how to disallow default command */
   @Override
   public void setDefaultCommand(Command def) {
     throw new IllegalArgumentException("Default Command not allowed");
@@ -172,9 +165,7 @@ public class HistoryFSM extends SubsystemBase {
 
   int m_DebugPrintCounter; // 0; limit testing prints counter
 
-  /**
-   * Run after commands and triggers
-   */
+  /** Run after commands and triggers */
   public void afterCommands() {
     // testing prints
     boolean debugPrint = false;
@@ -196,7 +187,7 @@ public class HistoryFSM extends SubsystemBase {
     // Being done here for illustrative purposes.
 
     m_robotSignals.setSignal(m_persistentPatternDemo).schedule(); // access to the LEDS is only by
-                                                                  // command so do it that way.
+    // command so do it that way.
     // Note that because this method runs in disabled mode, the color persists in Disabled mode
     // even if the command was
     // not to run in disabled mode.

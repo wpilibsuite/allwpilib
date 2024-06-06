@@ -4,14 +4,14 @@
 
 package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
 
-import static edu.wpi.first.units.Units.Seconds;
-
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
 /**
  * General purpose class to create test commands to "disjoint" methods designed to run commands by
  * proxy to allow default commands to run within composed group commands.
  */
+import static edu.wpi.first.units.Units.Seconds;
+
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,14 +48,10 @@ public class GroupDisjoint extends SubsystemBase {
     this.m_resourceID = resourceID;
   }
 
-  /**
-   * Run before commands and triggers
-   */
+  /** Run before commands and triggers */
   public void beforeCommands() {}
 
-  /**
-   * Run after commands and triggers
-   */
+  /** Run after commands and triggers */
   public void afterCommands() {
     // processing in periodic I/O should be kept to a minimum to get the best consistent set
     // of I/O. This example is complicated to minimize the large quantity of output possible.
@@ -109,7 +105,7 @@ public class GroupDisjoint extends SubsystemBase {
 
   /**
    * Example of how to allow one (or none) default command to be set.
-   * 
+   *
    * @param def default command
    */
   @Override
@@ -123,9 +119,7 @@ public class GroupDisjoint extends SubsystemBase {
     }
   }
 
-  /**
-   * Set the default default command
-   */
+  /** Set the default default command */
   public void setDefaultCommand() {
     setDefaultCommand(m_defaultCommand);
   }

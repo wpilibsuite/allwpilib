@@ -13,15 +13,15 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.AchieveHueGoal;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.HistoryFSM;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.Intake;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDPatternSupplier;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.TargetVision;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // runtime options; too rigid - could be made easier to find and change but this is just a
   // "simple" example program
-  
+
   // switch command logging on/off; a lot of output for the command execute methods
   private final boolean m_logCommands = false;
 
@@ -64,9 +64,7 @@ public class RobotContainer {
     }
   }
 
-  /**
-   * configure driver and operator controllers' buttons (if they haven't been defined)
-   */
+  /** configure driver and operator controllers' buttons (if they haven't been defined) */
   private void configureBindings() {
     m_operatorController
         .x()
@@ -77,7 +75,8 @@ public class RobotContainer {
         .onTrue(
             m_achieveHueGoal.m_hueGoal.setHueGoal( // then it's always on
                 () ->
-                    m_operatorController.getRightTriggerAxis() * 180.0 // supplying the current value
+                    m_operatorController.getRightTriggerAxis()
+                        * 180.0 // supplying the current value
                 // scale joystick's 0 to 1 to computer color wheel hue 0 to 180
                 ));
   }
@@ -151,13 +150,14 @@ public class RobotContainer {
     return
     // statements returned are run later when the command is scheduled
     parallel(
-    // interrupting either of the two parallel commands with an external command interrupts the group
+            // interrupting either of the two parallel commands with an external command interrupts
+            // the group
             m_robotSignals
                 .m_top
                 .setSignal(autoTopSignal)
                 .withTimeout(6.0) // example this ends but the group continues and the default
-                                       // command is not activated here with or without the
-                                       // ".andThen" command
+                // command is not activated here with or without the
+                // ".andThen" command
                 .andThen(m_robotSignals.m_top.setSignal(autoTopSignal)),
             m_robotSignals.m_main.setSignal(autoMainSignal))
         .withName("AutoSignal");

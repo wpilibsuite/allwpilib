@@ -12,11 +12,11 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
  * to do PID controller entirely within a subsystem.
  */
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.Color;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.LEDPattern;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDView;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -71,14 +71,10 @@ public class AchieveHueGoal {
     return m_HueController.atSetpoint();
   }
 
-  /**
-   * Run before commands and triggers
-   */
+  /** Run before commands and triggers */
   public void beforeCommands() {}
 
-  /**
-   * Run after commands and triggers
-   */
+  /** Run after commands and triggers */
   public void afterCommands() {
     m_currentStateHue =
         MathUtil.clamp(
@@ -105,9 +101,8 @@ public class AchieveHueGoal {
    * <p>This subsystem could run "perpetually" with a pre-determined hue goal but it's disabled in
    * this example in favor of no default command to prevent assuming there is one always running.
    *
-   * <p>That means the last setpoint is running as no default takes over. For the Xbox trigger,
-   * that goes to 0 when released but again we're not supposed to know that from
-   * RobotContainer.java.
+   * <p>That means the last setpoint is running as no default takes over. For the Xbox trigger, that
+   * goes to 0 when released but again we're not supposed to know that from RobotContainer.java.
    *
    * <p>Command defaultCommand = Commands.run( () -> m_HueSetpoint = defaultHueGoal , this);
    * setDefaultCommand(defaultCommand);

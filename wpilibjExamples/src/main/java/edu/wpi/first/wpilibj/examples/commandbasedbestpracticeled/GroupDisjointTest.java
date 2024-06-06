@@ -20,9 +20,6 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
  */
 
 import static edu.wpi.first.units.Units.Seconds;
-
-import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.GroupDisjoint;
-
 import static edu.wpi.first.wpilibj2.command.Commands.deadline;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.print;
@@ -31,6 +28,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
+import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.GroupDisjoint;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -186,7 +184,8 @@ public class GroupDisjointTest {
 
     final Command testDisjointDeadline =
         disjointDeadline(
-            disjointSequence(m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.1)), waitSeconds(0.2)),
+            disjointSequence(
+                m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.1)), waitSeconds(0.2)),
             disjointSequence(m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.12))),
             disjointSequence(m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.4))));
 
@@ -199,8 +198,10 @@ public class GroupDisjointTest {
     final Command testDisjointRace =
         disjointRace(
             disjointSequence(m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.24))),
-            disjointSequence(m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.12)), waitSeconds(0.3)),
-            disjointSequence(m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.12)), waitSeconds(0.3)));
+            disjointSequence(
+                m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.12)), waitSeconds(0.3)),
+            disjointSequence(
+                m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.12)), waitSeconds(0.3)));
 
     Command[] allTests = {
       // Printing a static message so use the Commands.print. If message contained variables, then

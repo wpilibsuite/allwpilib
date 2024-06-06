@@ -67,10 +67,12 @@ public class RobotSignals {
   private static final int m_lastAchieveHueGoal = 39;
   // CAUTION CAUTION CAUTION -- Update this length for each view defined.
   private static final int length =
-      Math.max(Math.max(Math.max(Math.max(
-        m_lastTopLED, m_lastMainLED), m_lastEnableDisableLED), m_lastHistoryDemoLED),
-        m_lastAchieveHueGoal)
-      + 1;
+      Math.max(
+              Math.max(
+                  Math.max(Math.max(m_lastTopLED, m_lastMainLED), m_lastEnableDisableLED),
+                  m_lastHistoryDemoLED),
+              m_lastAchieveHueGoal)
+          + 1;
 
   public LEDView m_top;
   public LEDView m_main;
@@ -99,21 +101,15 @@ public class RobotSignals {
         new LEDView(bufferLED.createView(m_firstAchieveHueGoal, m_lastAchieveHueGoal));
   }
 
-  /**
-   * Run before commands and triggers
-   */
+  /** Run before commands and triggers */
   public void beforeCommands() {}
 
-  /**
-   * Run after commands and triggers
-   */
+  /** Run after commands and triggers */
   public void afterCommands() {
     m_strip.setData(bufferLED); // run periodically to send the buffer to the LEDs
   }
 
-  /**
-   * LED view resource (subsystem)
-   */
+  /** LED view resource (subsystem) */
   public class LEDView extends SubsystemBase {
     private final AddressableLEDBufferView m_View;
 
@@ -148,8 +144,7 @@ public class RobotSignals {
      * @return
      */
     public Command setSignal(LEDPattern pattern) {
-      return run(() -> pattern.applyTo(m_View)).ignoringDisable(true)
-                       .withName("LedSet");
+      return run(() -> pattern.applyTo(m_View)).ignoringDisable(true).withName("LedSet");
     }
 
     /**
@@ -159,8 +154,7 @@ public class RobotSignals {
      * @return
      */
     public Command setSignal(LEDPatternSupplier pattern) {
-      return run(() -> pattern.get().applyTo(m_View)).ignoringDisable(true)
-                       .withName("LedSetS");
+      return run(() -> pattern.get().applyTo(m_View)).ignoringDisable(true).withName("LedSetS");
     }
   } // End LEDView
 }
