@@ -13,15 +13,15 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.AchieveHueGoal;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.HistoryFSM;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.Intake;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDPatternSupplier;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.TargetVision;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -30,9 +30,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // runtime options; too rigid - could be made easier to find and change but this is just a
   // "simple" example program
-  private final boolean logCommands =
-      false; // switch command logging on/off; a lot of output for the
-  // command execute methods
+  
+  // switch command logging on/off; a lot of output for the command execute methods
+  private final boolean m_logCommands = false;
 
   // define all the subsystems
   private static final int m_operatorControllerPort = 0;
@@ -59,10 +59,14 @@ public class RobotContainer {
 
     configureDefaultCommands();
 
-    if (logCommands) configureLogging();
+    if (m_logCommands) {
+      configureLogging();
+    }
   }
 
-  /** configure driver and operator controllers' buttons (if they haven't been defined) */
+  /**
+   * configure driver and operator controllers' buttons (if they haven't been defined)
+   */
   private void configureBindings() {
     m_operatorController
         .x()
@@ -73,7 +77,7 @@ public class RobotContainer {
         .onTrue(
             m_achieveHueGoal.m_hueGoal.setHueGoal( // then it's always on
                 () ->
-                    m_operatorController.getRightTriggerAxis() * 180. // supplying the current value
+                    m_operatorController.getRightTriggerAxis() * 180.0 // supplying the current value
                 // scale joystick's 0 to 1 to computer color wheel hue 0 to 180
                 ));
   }
@@ -88,7 +92,7 @@ public class RobotContainer {
     return () ->
         LEDPattern.solid(
             Color.fromHSV(
-                (int) (Timer.getFPGATimestamp() % 60. /* seconds of the minute */)
+                (int) (Timer.getFPGATimestamp() % 60.0 /* seconds of the minute */)
                     * 3 /* scale seconds to 180 hues per color wheel */,
                 200,
                 200));
@@ -100,35 +104,35 @@ public class RobotContainer {
    * <p>WARNING - heed the advice in the Robot.java comments about default commands
    */
   private void configureDefaultCommands() {
-    final LEDPattern TopDefaultSignal = LEDPattern.solid(new Color(0., 0., 1.));
-    final LEDPattern MainDefaultSignal = LEDPattern.solid(new Color(0., 1., 1.));
-    final LEDPattern disabled = LEDPattern.solid(Color.kRed).breathe(Seconds.of(2));
-    final LEDPattern enabled = LEDPattern.solid(Color.kGreen).breathe(Seconds.of(2));
-    final LEDPatternSupplier EnableDisableDefaultSignal =
+    final LEDPattern topDefaultSignal = LEDPattern.solid(new Color(0.0, 0.0, 1.0));
+    final LEDPattern mainDefaultSignal = LEDPattern.solid(new Color(0.0, 1.0, 1.0));
+    final LEDPattern disabled = LEDPattern.solid(Color.kRed).breathe(Seconds.of(2.0));
+    final LEDPattern enabled = LEDPattern.solid(Color.kGreen).breathe(Seconds.of(2.0));
+    final LEDPatternSupplier enableDisableDefaultSignal =
         () -> DriverStation.isDisabled() ? disabled : enabled;
 
-    final Command TopDefault =
+    final Command topDefault =
         m_robotSignals
             .m_top
-            .setSignal(TopDefaultSignal)
+            .setSignal(topDefaultSignal)
             .ignoringDisable(true)
             .withName("TopDefault");
-    final Command MainDefault =
+    final Command mainDefault =
         m_robotSignals
             .m_main
-            .setSignal(MainDefaultSignal)
+            .setSignal(mainDefaultSignal)
             .ignoringDisable(true)
             .withName("MainDefault");
-    final Command EnableDisableDefault =
+    final Command enableDisableDefault =
         m_robotSignals
             .m_enableDisable
-            .setSignal(EnableDisableDefaultSignal)
+            .setSignal(enableDisableDefaultSignal)
             .ignoringDisable(true)
             .withName("EnableDisableDefault");
 
-    m_robotSignals.m_top.setDefaultCommand(TopDefault);
-    m_robotSignals.m_main.setDefaultCommand(MainDefault);
-    m_robotSignals.m_enableDisable.setDefaultCommand(EnableDisableDefault);
+    m_robotSignals.m_top.setDefaultCommand(topDefault);
+    m_robotSignals.m_main.setDefaultCommand(mainDefault);
+    m_robotSignals.m_enableDisable.setDefaultCommand(enableDisableDefault);
   }
 
   /**
@@ -142,19 +146,18 @@ public class RobotContainer {
     LEDPattern autoTopSignal =
         LEDPattern.solid(new Color(0.1, 0.2, 0.2))
             .blend(LEDPattern.solid(new Color(0.7, 0.2, 0.2)).blink(Seconds.of(0.1)));
-    LEDPattern autoMainSignal = LEDPattern.solid(new Color(0.3, 1., 0.3));
+    LEDPattern autoMainSignal = LEDPattern.solid(new Color(0.3, 1.0, 0.3));
     // statements before the return are run early at initialization time
     return
     // statements returned are run later when the command is scheduled
-    parallel // interrupting either of the two parallel commands with an external command interrupts
-        // the group
-        (
+    parallel(
+    // interrupting either of the two parallel commands with an external command interrupts the group
             m_robotSignals
                 .m_top
                 .setSignal(autoTopSignal)
-                .withTimeout(6.) // example this ends but the group
-                // continues and the default command is not activated here with or without
-                // the ".andThen" command
+                .withTimeout(6.0) // example this ends but the group continues and the default
+                                       // command is not activated here with or without the
+                                       // ".andThen" command
                 .andThen(m_robotSignals.m_top.setSignal(autoTopSignal)),
             m_robotSignals.m_main.setSignal(autoMainSignal))
         .withName("AutoSignal");

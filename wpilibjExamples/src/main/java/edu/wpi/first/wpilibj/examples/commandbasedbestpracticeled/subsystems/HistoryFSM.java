@@ -24,15 +24,16 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.Color;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.LEDPattern;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDView;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -62,14 +63,14 @@ public class HistoryFSM extends SubsystemBase {
   // rare
   private List<Measure<Time>> m_lastTimeHistoryOfColors = new ArrayList<>(m_computerColorWheel);
 
-  private static final double m_beginningOfTime = 0.;
+  private static final double m_beginningOfTime = 0.0;
   private static final double m_endOfTime = Double.MAX_VALUE;
 
   // time the current color display should end and a new color selected
   // initialize so the time doesn't trigger anything until the "Y" button is pressed
   private Measure<Time> m_nextTime = Milliseconds.of(m_endOfTime);
-  Measure<Time> m_changeColorPeriod = Seconds.of(2.); // display color for this long
-  Measure<Time> m_colorLockoutPeriod = Seconds.of(20.); // try not to reuse a color for this long
+  Measure<Time> m_changeColorPeriod = Seconds.of(2.0); // display color for this long
+  Measure<Time> m_colorLockoutPeriod = Seconds.of(20.0); // try not to reuse a color for this long
   // elapsed timer
   private Trigger m_timeOfNewColor = new Trigger(this::timesUp);
   private static final double m_DebounceTime = 0.04;
@@ -88,7 +89,9 @@ public class HistoryFSM extends SubsystemBase {
             );
   }
 
-  /** Create an initialized list of hues */
+  /**
+   * Create an initialized list of hues
+   */
   private void fillInitialTimes() {
     // initially indicate hue hasn't been used in a long time ago so available immediately
     for (int i = 0; i < m_computerColorWheel; i++) {
@@ -96,7 +99,9 @@ public class HistoryFSM extends SubsystemBase {
     }
   }
 
-  /** Sets the time for the trigger of its next periodic run */
+  /**
+   * Set the time for the trigger of its next periodic run
+   */
   private void setNextTime() {
     Measure<Time> currentTime = Milliseconds.of(System.currentTimeMillis());
     m_nextTime = currentTime.plus(m_changeColorPeriod);
@@ -128,7 +133,7 @@ public class HistoryFSM extends SubsystemBase {
   public void getHSV() {
     Measure<Time> currentTime = Milliseconds.of(System.currentTimeMillis());
     int randomHue; // to be the next color
-    int loopCounter = 1; // count attempts to find a different hue
+    int loopCounter = 0; // count attempts to find a different hue
     int loopCounterLimit = 20; // limit attempts to find a different hue
     // reasonable limit related to:
     // number of colors, how often colors change, how long to lockout a color.
@@ -144,12 +149,14 @@ public class HistoryFSM extends SubsystemBase {
       }
       // hue used recently so loop to get another hue
       // limit attempts - no infinite loops allowed
-    } while (loopCounter++ < loopCounterLimit);
+    } while (++loopCounter < loopCounterLimit);
 
     m_persistentPatternDemo = LEDPattern.solid(Color.fromHSV(randomHue, 200, 200));
   }
 
-  /** Example of how to disallow default command */
+  /**
+   * Example of how to disallow default command
+   */
   @Override
   public void setDefaultCommand(Command def) {
     throw new IllegalArgumentException("Default Command not allowed");
@@ -163,9 +170,11 @@ public class HistoryFSM extends SubsystemBase {
    */
   public void beforeCommands() {}
 
-  int m_DebugPrintCounter = 0; // limit testing prints counter
+  int m_DebugPrintCounter; // 0; limit testing prints counter
 
-  /** Run after commands and triggers */
+  /**
+   * Run after commands and triggers
+   */
   public void afterCommands() {
     // testing prints
     boolean debugPrint = false;
@@ -187,7 +196,7 @@ public class HistoryFSM extends SubsystemBase {
     // Being done here for illustrative purposes.
 
     m_robotSignals.setSignal(m_persistentPatternDemo).schedule(); // access to the LEDS is only by
-    // command so do it that way.
+                                                                  // command so do it that way.
     // Note that because this method runs in disabled mode, the color persists in Disabled mode
     // even if the command was
     // not to run in disabled mode.

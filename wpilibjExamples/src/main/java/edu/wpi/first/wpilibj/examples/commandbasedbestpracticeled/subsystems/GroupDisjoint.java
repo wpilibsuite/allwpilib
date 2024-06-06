@@ -48,10 +48,14 @@ public class GroupDisjoint extends SubsystemBase {
     this.m_resourceID = resourceID;
   }
 
-  /** Run before commands and triggers */
+  /**
+   * Run before commands and triggers
+   */
   public void beforeCommands() {}
 
-  /** Run after commands and triggers */
+  /**
+   * Run after commands and triggers
+   */
   public void afterCommands() {
     // processing in periodic I/O should be kept to a minimum to get the best consistent set
     // of I/O. This example is complicated to minimize the large quantity of output possible.
@@ -103,7 +107,11 @@ public class GroupDisjoint extends SubsystemBase {
    * Public Commands
    */
 
-  /** Example of how to allow one (or none) default command to be set. */
+  /**
+   * Example of how to allow one (or none) default command to be set.
+   * 
+   * @param def default command
+   */
   @Override
   public void setDefaultCommand(Command def) {
     if (getDefaultCommand() != null) {
@@ -115,11 +123,14 @@ public class GroupDisjoint extends SubsystemBase {
     }
   }
 
+  /**
+   * Set the default default command
+   */
   public void setDefaultCommand() {
-    setDefaultCommand(defaultCommand);
+    setDefaultCommand(m_defaultCommand);
   }
 
-  private final Command defaultCommand =
+  private final Command m_defaultCommand =
       run(
           () -> {
             m_output = m_resourceID + "d";

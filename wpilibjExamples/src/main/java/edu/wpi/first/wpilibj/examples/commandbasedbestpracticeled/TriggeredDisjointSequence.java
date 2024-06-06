@@ -47,7 +47,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * <p>The difference with regular group compositions is this sequential group does not require at
  * all time all of the subsystems its components require.
  */
-public class TriggeredDisjointSequence extends WrapperCommand {
+public final class TriggeredDisjointSequence extends WrapperCommand {
   private final InternalButton m_trigger;
 
   private TriggeredDisjointSequence(Command command) {
@@ -78,9 +78,9 @@ public class TriggeredDisjointSequence extends WrapperCommand {
    * Run commands in a sequence with the end of a command triggering the next command.
    *
    * <p>Each command is added to an individual composition group (WrapperCommand) and thus is
-   * restricted but the requirements of each component command are not required for the entire group
-   * process since each wrapped command is run individually by being triggered from the previous
-   * command.
+   * restricted but the requirements of each component command are not required for the entire
+   * group process since each wrapped command is run individually by being triggered from the
+   * previous command.
    *
    * <p>Individual commands can be treated with .asProxy() as needed to break out of the wrapper
    * composition group.
@@ -92,9 +92,13 @@ public class TriggeredDisjointSequence extends WrapperCommand {
    *     triggered.
    */
   public static Command sequence(Command... commands) {
-    if (commands.length == 0) return null;
+    if (commands.length == 0) {
+      return null;
+    }
 
-    if (commands.length == 1) return commands[0];
+    if (commands.length == 1) {
+      return commands[0];
+    }
 
     // all but last command get the new trigger command (augmented) that triggers the next
     // command

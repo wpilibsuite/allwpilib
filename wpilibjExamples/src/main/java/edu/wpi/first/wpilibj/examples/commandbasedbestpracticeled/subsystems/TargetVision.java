@@ -25,8 +25,8 @@ public class TargetVision extends SubsystemBase {
   public final Trigger m_TargetAcquired = new Trigger(this::canSeeTarget);
 
   /**
-   * @param robotSignals
-   * @param operatorController
+   * @param robotSignals Signal Subsystem
+   * @param operatorController Source of fake target acquired event
    */
   public TargetVision(LEDView robotSignals, CommandXboxController operatorController) {
     this.m_RobotSignals = robotSignals;
@@ -40,17 +40,18 @@ public class TargetVision extends SubsystemBase {
   public Command targetIsAcquired() {
     LEDPattern targetAcquiredSignal = LEDPattern.solid(Color.kOrange);
     return m_RobotSignals
-        .setSignal(targetAcquiredSignal) // this command locks the robotSignals.Top
-        // subsystem only
-        .andThen(Commands.idle(this).withTimeout(0.)) // command created in this subsystem will lock
-        // this subsystem also
+        .setSignal(targetAcquiredSignal) // this command locks the specific injected m_robotSignals
+                                         // subsystem only
+        .andThen(Commands.idle(this).withTimeout(0.)) // command created in this subsystem will
+                                                           // lock this subsystem also
         /* composite */
         .withName("LedVisionTargetInSight")
-        .ignoringDisable(true); // ignore disable true must be
-    // here on the composite; on the first command doesn't do anything
+        .ignoringDisable(true); // ignore disable true must be here on the composite; on the first
+                                // command doesn't do anything
   }
 
   /**
+   * 
    * @return status of fake event source for target acquired
    */
   private boolean canSeeTarget() {
@@ -67,9 +68,13 @@ public class TargetVision extends SubsystemBase {
     throw new IllegalArgumentException("Default Command not allowed");
   }
 
-  /** Run before commands and triggers */
+  /**
+   * Run before commands and triggers
+   */
   public void beforeCommands() {}
 
-  /** Run after commands and triggers */
+  /**
+   * Run after commands and triggers
+   */
   public void afterCommands() {}
 }
