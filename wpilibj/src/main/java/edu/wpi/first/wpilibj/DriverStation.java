@@ -37,7 +37,7 @@ public final class DriverStation {
   }
 
   private static class HALJoystickAxes {
-    public float[] m_axes;
+    public final float[] m_axes;
     public int m_count;
 
     HALJoystickAxes(int count) {
@@ -46,7 +46,7 @@ public final class DriverStation {
   }
 
   private static class HALJoystickAxesRaw {
-    public int[] m_axes;
+    public final int[] m_axes;
 
     @SuppressWarnings("unused")
     public int m_count;
@@ -57,7 +57,7 @@ public final class DriverStation {
   }
 
   private static class HALJoystickPOVs {
-    public short[] m_povs;
+    public final short[] m_povs;
     public int m_count;
 
     HALJoystickPOVs(int count) {
@@ -93,14 +93,14 @@ public final class DriverStation {
 
   @SuppressWarnings("MemberName")
   private static class MatchDataSender {
-    StringPublisher gameSpecificMessage;
-    StringPublisher eventName;
-    IntegerPublisher matchNumber;
-    IntegerPublisher replayNumber;
-    IntegerPublisher matchType;
-    BooleanPublisher alliance;
-    IntegerPublisher station;
-    IntegerPublisher controlWord;
+    final StringPublisher gameSpecificMessage;
+    final StringPublisher eventName;
+    final IntegerPublisher matchNumber;
+    final IntegerPublisher replayNumber;
+    final IntegerPublisher matchType;
+    final BooleanPublisher alliance;
+    final IntegerPublisher station;
+    final IntegerPublisher controlWord;
     boolean oldIsRedAlliance = true;
     int oldStationNumber = 1;
     String oldEventName = "";
