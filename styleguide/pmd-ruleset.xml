@@ -56,7 +56,6 @@
     <exclude name="ExcessiveParameterList" />
     <exclude name="ExcessivePublicCount" />
     <exclude name="GodClass" />
-    <exclude name="ImmutableField" />
     <exclude name="LawOfDemeter" />
     <exclude name="LoosePackageCoupling" />
     <exclude name="NPathComplexity" />

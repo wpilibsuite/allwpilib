@@ -54,7 +54,7 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  private int m_port;
+  private final int m_port;
 
   /**
    * Constructor.
