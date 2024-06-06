@@ -181,8 +181,8 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
   }
 
   // Static Constants
-  private static final double delta_angle_sf = 2160.0 / 2147483648.0; // 2160 / (2^31)
-  private static final double grav = 9.81;
+  private static final double kDeltaAngleSf = 2160.0 / 2147483648.0; // 2160 / (2^31)
+  private static final double kGrav = 9.81;
 
   // User-specified axes
   private IMUAxis m_yaw_axis;
@@ -713,15 +713,15 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
           double elapsed_time = m_scaled_sample_rate / (buffer[i] - previous_timestamp);
           double delta_angle_x =
               toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5], buffer[i + 6])
-                  * delta_angle_sf
+                  * kDeltaAngleSf
                   / elapsed_time;
           double delta_angle_y =
               toInt(buffer[i + 7], buffer[i + 8], buffer[i + 9], buffer[i + 10])
-                  * delta_angle_sf
+                  * kDeltaAngleSf
                   / elapsed_time;
           double delta_angle_z =
               toInt(buffer[i + 11], buffer[i + 12], buffer[i + 13], buffer[i + 14])
-                  * delta_angle_sf
+                  * kDeltaAngleSf
                   / elapsed_time;
 
           double gyro_rate_x = toShort(buffer[i + 15], buffer[i + 16]) / 10.0;
@@ -737,9 +737,9 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
           double gyro_rate_x_si = Math.toRadians(gyro_rate_x);
           double gyro_rate_y_si = Math.toRadians(gyro_rate_y);
           // double gyro_rate_z_si = Math.toRadians(gyro_rate_z);
-          double accel_x_si = accel_x * grav;
-          double accel_y_si = accel_y * grav;
-          double accel_z_si = accel_z * grav;
+          double accel_x_si = accel_x * kGrav;
+          double accel_y_si = accel_y * kGrav;
+          double accel_z_si = accel_z * kGrav;
 
           // Store timestamp for next iteration
           previous_timestamp = buffer[i];
@@ -1019,7 +1019,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The acceleration in the X axis in meters per second squared.
    */
   public synchronized double getAccelX() {
-    return m_accel_x * 9.81;
+    return m_accel_x * kGrav;
   }
 
   /**
@@ -1028,7 +1028,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The acceleration in the Y axis in meters per second squared.
    */
   public synchronized double getAccelY() {
-    return m_accel_y * 9.81;
+    return m_accel_y * kGrav;
   }
 
   /**
@@ -1037,7 +1037,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The acceleration in the Z axis in meters per second squared.
    */
   public synchronized double getAccelZ() {
-    return m_accel_z * 9.81;
+    return m_accel_z * kGrav;
   }
 
   /**

@@ -659,12 +659,12 @@ void ADIS16448_IMU::Acquire() {
           double temp = BuffToShort(&buffer[i + 25]) * 0.07386 + 31.0;
 
           // Convert scaled sensor data to SI units
-          double gyro_rate_x_si = gyro_rate_x * deg_to_rad;
-          double gyro_rate_y_si = gyro_rate_y * deg_to_rad;
-          // double gyro_rate_z_si = gyro_rate_z * deg_to_rad;
-          double accel_x_si = accel_x * grav;
-          double accel_y_si = accel_y * grav;
-          double accel_z_si = accel_z * grav;
+          double gyro_rate_x_si = gyro_rate_x * kDegToRad;
+          double gyro_rate_y_si = gyro_rate_y * kDegToRad;
+          // double gyro_rate_z_si = gyro_rate_z * kDegToRad;
+          double accel_x_si = accel_x * kGrav;
+          double accel_y_si = accel_y * kGrav;
+          double accel_z_si = accel_z * kGrav;
           // Store timestamp for next iteration
           previous_timestamp = buffer[i];
           // Calculate alpha for use with the complementary filter
@@ -718,10 +718,10 @@ void ADIS16448_IMU::Acquire() {
               m_mag_z = mag_z;
               m_baro = baro;
               m_temp = temp;
-              m_compAngleX = compAngleX * rad_to_deg;
-              m_compAngleY = compAngleY * rad_to_deg;
-              m_accelAngleX = accelAngleX * rad_to_deg;
-              m_accelAngleY = accelAngleY * rad_to_deg;
+              m_compAngleX = compAngleX * kRadToDeg;
+              m_compAngleY = compAngleY * kRadToDeg;
+              m_accelAngleX = accelAngleX * kRadToDeg;
+              m_accelAngleY = accelAngleY * kRadToDeg;
               // Accumulate gyro for angle integration and publish to global
               // variables
               m_integ_gyro_angle_x +=

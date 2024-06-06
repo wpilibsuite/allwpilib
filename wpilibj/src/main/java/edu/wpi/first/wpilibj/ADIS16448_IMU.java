@@ -118,7 +118,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     kZ
   }
 
-  private static final double grav = 9.81;
+  private static final double kGrav = 9.81;
 
   // User-specified yaw axis
   private IMUAxis m_yaw_axis;
@@ -752,9 +752,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
             double gyro_rate_x_si = Math.toRadians(gyro_rate_x);
             double gyro_rate_y_si = Math.toRadians(gyro_rate_y);
             // double gyro_rate_z_si = Math.toRadians(gyro_rate_z);
-            double accel_x_si = accel_x * grav;
-            double accel_y_si = accel_y * grav;
-            double accel_z_si = accel_z * grav;
+            double accel_x_si = accel_x * kGrav;
+            double accel_y_si = accel_y * kGrav;
+            double accel_z_si = accel_z * kGrav;
             // Store timestamp for next iteration
             previous_timestamp = buffer[i];
             // Calculate alpha for use with the complementary filter
@@ -963,7 +963,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     if (m_simAccelX != null) {
       return m_simAccelX.get();
     }
-    return m_accel_x * 9.81;
+    return m_accel_x * kGrav;
   }
 
   /**
@@ -975,7 +975,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     if (m_simAccelY != null) {
       return m_simAccelY.get();
     }
-    return m_accel_y * 9.81;
+    return m_accel_y * kGrav;
   }
 
   /**
@@ -987,7 +987,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     if (m_simAccelZ != null) {
       return m_simAccelZ.get();
     }
-    return m_accel_z * 9.81;
+    return m_accel_z * kGrav;
   }
 
   /**

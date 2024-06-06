@@ -420,9 +420,9 @@ class ADIS16470_IMU : public wpi::Sendable,
       Y_ACCL_OUT,    FLASH_CNT,     Z_ACCL_OUT,    FLASH_CNT};
 
   static constexpr double delta_angle_sf = 2160.0 / 2147483648.0;
-  static constexpr double rad_to_deg = 57.2957795;
-  static constexpr double deg_to_rad = 0.0174532;
-  static constexpr double grav = 9.81;
+  static constexpr double kRadToDeg = 57.2957795;
+  static constexpr double kDegToRad = 0.0174532;
+  static constexpr double kGrav = 9.81;
 
   // Resources
   DigitalInput* m_reset_in = nullptr;
