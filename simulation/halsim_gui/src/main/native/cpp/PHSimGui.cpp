@@ -4,7 +4,7 @@
 
 #include "PHSimGui.h"
 
-#include <glass/hardware/PCM.h>
+#include <glass/hardware/Pneumatic.h>
 #include <glass/other/DeviceTree.h>
 
 #include <cstdio>
