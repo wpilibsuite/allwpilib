@@ -26,6 +26,23 @@ public class AngularVelocity extends Unit<AngularVelocity> {
    */
   private static final LongToObjectHashMap<AngularVelocity> cache = new LongToObjectHashMap<>();
 
+  AngularVelocity(AngularVelocity baseUnit, double baseUnitEquivalent, String name, String symbol) {
+    super(baseUnit, baseUnitEquivalent, name, symbol);
+    m_angle = baseUnit.getAngle();
+    m_period = baseUnit.getPeriod();
+  }
+
+  AngularVelocity(
+      AngularVelocity baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+    m_angle = baseUnit.getAngle();
+    m_period = baseUnit.getPeriod();
+  }
+
   /**
    * Creates a new angular velocity unit derived from the ratio of an angle unit to a time unit.
    * Consider using {@link #combine} instead of manually calling this constructor.

@@ -26,6 +26,23 @@ public class LinearVelocity extends Unit<LinearVelocity> {
    */
   private static final LongToObjectHashMap<LinearVelocity> cache = new LongToObjectHashMap<>();
 
+  LinearVelocity(LinearVelocity baseUnit, double baseUnitEquivalent, String name, String symbol) {
+    super(baseUnit, baseUnitEquivalent, name, symbol);
+    m_distance = baseUnit.getDistance();
+    m_period = baseUnit.getPeriod();
+  }
+
+  LinearVelocity(
+      LinearVelocity baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+    m_distance = baseUnit.getDistance();
+    m_period = baseUnit.getPeriod();
+  }
+
   /**
    * Creates a new linear velocity unit derived from the ratio of a distance unit to a time unit.
    * Consider using {@link #combine} instead of manually calling this constructor.

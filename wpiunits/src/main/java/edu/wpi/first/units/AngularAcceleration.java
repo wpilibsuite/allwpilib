@@ -26,6 +26,24 @@ public class AngularAcceleration extends Unit<AngularAcceleration> {
    */
   private static final LongToObjectHashMap<AngularAcceleration> cache = new LongToObjectHashMap<>();
 
+  AngularAcceleration(
+      AngularAcceleration baseUnit, double baseUnitEquivalent, String name, String symbol) {
+    super(baseUnit, baseUnitEquivalent, name, symbol);
+    m_angularVelocity = baseUnit.getAngularVelocity();
+    m_period = baseUnit.getPeriod();
+  }
+
+  AngularAcceleration(
+      AngularAcceleration baseUnit,
+      UnaryFunction toBaseConverter,
+      UnaryFunction fromBaseConverter,
+      String name,
+      String symbol) {
+    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+    m_angularVelocity = baseUnit.getAngularVelocity();
+    m_period = baseUnit.getPeriod();
+  }
+
   /**
    * Creates a new angular acceleration unit derived from the ratio of an angular velocity unit to a
    * time unit. Consider using {@link #combine} instead of manually calling this constructor.

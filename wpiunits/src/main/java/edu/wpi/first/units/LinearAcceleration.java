@@ -93,6 +93,21 @@ public class LinearAcceleration extends Unit<LinearAcceleration> {
   }
 
   /**
+   * Creates a force unit derived from this one.
+   *
+   * <pre>
+   *   MetersPerSecondPerSecond.times(Kilograms) // force
+   *   FeetPerSecondPerSecond.times(Grams) // force
+   * </pre>
+   *
+   * @param mass the mass that is being accelerated.
+   * @return a force unit corresponding to mass times linear acceleration
+   */
+  public Force times(Mass mass) {
+    return Force.combine(mass, this);
+  }
+
+  /**
    * Gets the linear velocity unit.
    *
    * @return the linear velocity unit

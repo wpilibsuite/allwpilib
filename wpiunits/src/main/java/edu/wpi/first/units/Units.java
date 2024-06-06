@@ -246,6 +246,21 @@ public final class Units {
   public static final Mult<Mult<Mass, Distance>, Distance> KilogramSquareMeters =
       Kilograms.mult(Meters).mult(Meters);
 
+  // Force
+  /** The base SI unit for force. */
+  public static final Force Newtons =
+      derive(Kilograms.times(MetersPerSecondPerSecond)).named("Newtons").symbol("N").make();
+
+  /** Singular alias for Newtons. */
+  public static final Force Newton = Newtons; // alias;
+
+  /** A unit of force equivalent to 4.448222 {@link #Newtons}. */
+  public static final Force PoundsForce =
+      derive(Newtons).aggregate(4.448222).named("Pounds-Force").symbol("lb.").make();
+
+  /** Singular alias for PoundsForce. */
+  public static final Force PoundForce = PoundsForce; // alias;
+
   // Unitless
   /** A dimensionless unit that performs no scaling whatsoever. */
   public static final Dimensionless Value = BaseUnits.Value;

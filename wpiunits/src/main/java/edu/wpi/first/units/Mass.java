@@ -27,4 +27,19 @@ public class Mass extends Unit<Mass> {
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
+
+  /**
+   * Creates a force unit derived from this one.
+   *
+   * <pre>
+   *   Kilograms.times(MetersPerSecondPerSecond) // force
+   *   Grams.times(FeetPerSecondPerSecond) // force
+   * </pre>
+   *
+   * @param acceleration the linear acceleration acting on the mass
+   * @return a force unit corresponding to mass times linear acceleration
+   */
+  public Force times(LinearAcceleration acceleration) {
+    return Force.combine(this, acceleration);
+  }
 }
