@@ -338,9 +338,9 @@ class ADIS16448_IMU : public wpi::Sendable,
   static constexpr uint8_t SERIAL_NUM = 0x58;  // Lot-specific serial number
 
   /** @brief ADIS16448 Static Constants */
-  static constexpr double rad_to_deg = 57.2957795;
-  static constexpr double deg_to_rad = 0.0174532;
-  static constexpr double grav = 9.81;
+  static constexpr double kRadToDeg = 57.2957795;
+  static constexpr double kDegToRad = 0.0174532;
+  static constexpr double kGrav = 9.81;
 
   /** @brief struct to store offset data */
   struct OffsetData {
