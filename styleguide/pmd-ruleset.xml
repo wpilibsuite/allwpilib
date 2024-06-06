@@ -31,7 +31,6 @@
     <exclude name="SwitchStmtsShouldHaveDefault" />
     <exclude name="SystemPrintln" />
     <exclude name="UseVarargs" />
-    <exclude name="UnusedAssignment" />
   </rule>
   <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod">
     <properties>
