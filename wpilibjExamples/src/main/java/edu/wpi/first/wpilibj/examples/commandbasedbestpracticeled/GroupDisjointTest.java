@@ -19,6 +19,10 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
  * the default commands are not activated until the sequence group ends.
  */
 
+import static edu.wpi.first.units.Units.Seconds;
+
+import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.GroupDisjoint;
+
 import static edu.wpi.first.wpilibj2.command.Commands.deadline;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.print;
@@ -27,7 +31,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
-import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.GroupDisjoint;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -41,7 +44,7 @@ public class GroupDisjointTest {
       true; // select runtime option run tests as Triggered job or run as Commands.sequence
 
   private final GroupDisjoint[]
-      m_GroupDisjoint = // subsystems that provide the requirements for testing
+      m_groupDisjoint = // subsystems that provide the requirements for testing
       {new GroupDisjoint("A"), new GroupDisjoint("B"), new GroupDisjoint("C")};
   private final int m_a = 0; // subsystem id is subscript on the array of groupDisjoint subsystems
   private final int m_b = 1;
@@ -101,105 +104,103 @@ public class GroupDisjointTest {
 
     final Command testSequence =
         sequence(
-            m_GroupDisjoint[m_a].testDuration(1, 0.),
+            m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.)),
             waitSeconds(0.1),
-            m_GroupDisjoint[m_a].testDuration(2, 0.));
+            m_groupDisjoint[m_a].testDuration(2, Seconds.of(0.)));
 
     final Command testDisjointSequence =
         disjointSequence(
-            m_GroupDisjoint[m_a].testDuration(1, 0.),
+            m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.)),
             waitSeconds(0.1),
-            m_GroupDisjoint[m_a].testDuration(2, 0.));
+            m_groupDisjoint[m_a].testDuration(2, Seconds.of(0.)));
 
     final Command testRepeatingSequence =
         sequence(
-                m_GroupDisjoint[m_a].testDuration(1, 0.05),
-                m_GroupDisjoint[m_b].testDuration(1, 0.05),
-                m_GroupDisjoint[m_c].testDuration(1, 0.05))
+                m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.05)),
+                m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.05)),
+                m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.05)))
             .repeatedly()
             .withTimeout(0.5);
 
     final Command testDisjointRepeatingSequence =
         disjointSequence(
-                m_GroupDisjoint[m_a].testDuration(1, 0.05),
-                m_GroupDisjoint[m_b].testDuration(1, 0.05),
-                m_GroupDisjoint[m_c].testDuration(1, 0.05))
+                m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.05)),
+                m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.05)),
+                m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.05)))
             .repeatedly()
             .withTimeout(0.5);
 
     // final Command testDisjointRepeatingSequenceBlocked =
     //   repeatingDisjointSequence(
-    //     groupDisjoint[A].testDuration(1, 0.05),
-    //     groupDisjoint[B].testDuration(1, 0.05),
-    //     groupDisjoint[C].testDuration(1, 0.05)
-    //   )
+    //     m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.05)),
+    //     m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.05)),
+    //     m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.05)))
     //   .withTimeout(0.5);
 
     // Illegal - Multiple commands in a parallel composition cannot require the same subsystems.
     // Throws an error message.
-    // public final Command testParallel =
+    // final Command testParallel =
     //   parallel(
-    //     groupedDisjointTest[A].setTest(1).repeatedly(),
-    //     waitSeconds(0.1).andThen(groupedDisjointTest[A].setTest(2)));
+    //     m_groupDisjoint[m_a].testDuration(1, Seconds.of(10.)).repeatedly(),
+    //     waitSeconds(0.1).andThen(m_groupDisjoint[m_a].testDuration(2, Seconds.of(10.))));
 
     // Use of Proxy hides the error of having two commands running at once for the same subsystem.
     // No error message but erroneous results.
     // final Command testParallel =
-    //   parallel(proxyAll(
-    //     groupDisjoint[A].testDuration(1, 0.1),
-    //     groupDisjoint[A].testDuration(2, 0.1))
-    //   );
+    //   parallel(
+    //     m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.2)).asProxy(),
+    //     m_groupDisjoint[m_a].testDuration(2, Seconds.of(0.2)).asProxy());
 
     final Command testParallel =
         parallel(
             sequence(
-                m_GroupDisjoint[m_b].testDuration(1, 0.74),
+                m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.74)),
                 parallel(
-                    m_GroupDisjoint[m_a].testDuration(1, 0.84),
-                    m_GroupDisjoint[m_b].testDuration(2, 1.))),
-            m_GroupDisjoint[m_c].testDuration(1, 0.6));
+                    m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.84)),
+                    m_groupDisjoint[m_b].testDuration(2, Seconds.of(1.)))),
+            m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.6)));
 
     final Command testDisjointParallel =
         disjointParallel(
             disjointSequence(
-                m_GroupDisjoint[m_b].testDuration(1, 0.74),
+                m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.74)),
                 disjointParallel(
-                    m_GroupDisjoint[m_a].testDuration(1, 0.84),
-                    m_GroupDisjoint[m_b].testDuration(2, 1.))),
-            m_GroupDisjoint[m_c].testDuration(1, 0.6));
+                    m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.84)),
+                    m_groupDisjoint[m_b].testDuration(2, Seconds.of(1.)))),
+            m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.6)));
 
     final Command testManualDisjointParallel =
         parallel(
             sequence(
-                m_GroupDisjoint[m_b].testDuration(1, 0.74).asProxy(),
+                m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.74)).asProxy(),
                 parallel(
-                    m_GroupDisjoint[m_a].testDuration(1, 0.84).asProxy(),
-                    m_GroupDisjoint[m_b].testDuration(2, 1.).asProxy())),
-            m_GroupDisjoint[m_c].testDuration(1, 0.6).asProxy());
+                    m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.84)).asProxy(),
+                    m_groupDisjoint[m_b].testDuration(2, Seconds.of(1.)).asProxy())),
+            m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.6)).asProxy());
 
     final Command testDeadline =
         deadline(
-            sequence(m_GroupDisjoint[m_a].testDuration(1, 0.1), waitSeconds(0.2)),
-            sequence(m_GroupDisjoint[m_b].testDuration(1, 0.12)),
-            sequence(m_GroupDisjoint[m_c].testDuration(1, 0.4)));
+            sequence(m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.1)), waitSeconds(0.2)),
+            sequence(m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.12))),
+            sequence(m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.4))));
 
     final Command testDisjointDeadline =
         disjointDeadline(
-            disjointSequence(m_GroupDisjoint[m_a].testDuration(1, 0.1), waitSeconds(0.2)),
-            disjointSequence(m_GroupDisjoint[m_b].testDuration(1, 0.12)),
-            disjointSequence(m_GroupDisjoint[m_c].testDuration(1, 0.4)));
+            disjointSequence(m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.1)), waitSeconds(0.2)),
+            disjointSequence(m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.12))),
+            disjointSequence(m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.4))));
 
     final Command testRace =
         race(
-            sequence(m_GroupDisjoint[m_a].testDuration(1, 0.24)),
-            sequence(m_GroupDisjoint[m_b].testDuration(1, 0.12), waitSeconds(0.3)),
-            sequence(m_GroupDisjoint[m_c].testDuration(1, 0.12), waitSeconds(0.3)));
+            sequence(m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.24))),
+            sequence(m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.12)), waitSeconds(0.3)),
+            sequence(m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.12)), waitSeconds(0.3)));
 
     final Command testDisjointRace =
         disjointRace(
-            disjointSequence(m_GroupDisjoint[m_a].testDuration(1, 0.24)),
-            disjointSequence(m_GroupDisjoint[m_b].testDuration(1, 0.12), waitSeconds(0.3)),
-            disjointSequence(m_GroupDisjoint[m_c].testDuration(1, 0.12), waitSeconds(0.3)));
+            disjointSequence(m_groupDisjoint[m_a].testDuration(1, Seconds.of(0.24))),
+            disjointSequence(m_groupDisjoint[m_b].testDuration(1, Seconds.of(0.12)), waitSeconds(0.3)),
+            disjointSequence(m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.12)), waitSeconds(0.3)));
 
     Command[] allTests = {
       // Printing a static message so use the Commands.print. If message contained variables, then
@@ -209,9 +210,9 @@ public class GroupDisjointTest {
 
       runOnce(
           () -> {
-            m_GroupDisjoint[m_a].setDefaultCommand();
-            m_GroupDisjoint[m_b].setDefaultCommand();
-            m_GroupDisjoint[m_c].setDefaultCommand();
+            m_groupDisjoint[m_a].setDefaultCommand();
+            m_groupDisjoint[m_b].setDefaultCommand();
+            m_groupDisjoint[m_c].setDefaultCommand();
           }),
       print("\nSTART testSequence"),
       testSequence,
@@ -252,12 +253,12 @@ public class GroupDisjointTest {
       runOnce(
           () -> {
             // stop default commands to stop the output
-            CommandScheduler.getInstance().cancel(m_GroupDisjoint[m_a].getDefaultCommand());
-            CommandScheduler.getInstance().cancel(m_GroupDisjoint[m_b].getDefaultCommand());
-            CommandScheduler.getInstance().cancel(m_GroupDisjoint[m_c].getDefaultCommand());
-            m_GroupDisjoint[m_a].removeDefaultCommand();
-            m_GroupDisjoint[m_b].removeDefaultCommand();
-            m_GroupDisjoint[m_c].removeDefaultCommand();
+            CommandScheduler.getInstance().cancel(m_groupDisjoint[m_a].getDefaultCommand());
+            CommandScheduler.getInstance().cancel(m_groupDisjoint[m_b].getDefaultCommand());
+            CommandScheduler.getInstance().cancel(m_groupDisjoint[m_c].getDefaultCommand());
+            m_groupDisjoint[m_a].removeDefaultCommand();
+            m_groupDisjoint[m_b].removeDefaultCommand();
+            m_groupDisjoint[m_c].removeDefaultCommand();
           })
     };
 
@@ -278,9 +279,9 @@ public class GroupDisjointTest {
    * this example is simplistic - remember to type them in.
    */
   public void beforeCommands() {
-    m_GroupDisjoint[0].afterCommands();
-    m_GroupDisjoint[1].afterCommands();
-    m_GroupDisjoint[2].afterCommands();
+    m_groupDisjoint[m_a].afterCommands();
+    m_groupDisjoint[m_b].afterCommands();
+    m_groupDisjoint[m_c].afterCommands();
   }
 
   /**
@@ -293,18 +294,12 @@ public class GroupDisjointTest {
    * this example isn't it; simplistic - remember to type them in.
    */
   public void afterCommands() {
-    m_GroupDisjoint[0].afterCommands();
-    m_GroupDisjoint[1].afterCommands();
-    m_GroupDisjoint[2].afterCommands();
+    m_groupDisjoint[m_a].afterCommands();
+    m_groupDisjoint[m_b].afterCommands();
+    m_groupDisjoint[m_c].afterCommands();
   }
 
-  /*********************************************************************************************************/
-  /*********************************************************************************************************/
-  /*********************************************************************************************************/
   // The following methods might be included in an upcoming WPILib release
-  /*********************************************************************************************************/
-  /*********************************************************************************************************/
-  /*********************************************************************************************************/
 
   /**
    * Runs individual commands in a series without grouped behavior.
@@ -361,7 +356,9 @@ public class GroupDisjointTest {
    */
   public static Command disjointParallel(Command... commands) {
     new ParallelCommandGroup(commands); // check parallel constraints
-    for (Command cmd : commands) CommandScheduler.getInstance().removeComposedCommand(cmd);
+    for (Command cmd : commands) {
+      CommandScheduler.getInstance().removeComposedCommand(cmd);
+    }
     return parallel(proxyAll(commands));
   }
 
@@ -377,7 +374,9 @@ public class GroupDisjointTest {
    */
   public static Command disjointRace(Command... commands) {
     new ParallelRaceGroup(commands); // check parallel constraints
-    for (Command cmd : commands) CommandScheduler.getInstance().removeComposedCommand(cmd);
+    for (Command cmd : commands) {
+      CommandScheduler.getInstance().removeComposedCommand(cmd);
+    }
     return race(proxyAll(commands));
   }
 

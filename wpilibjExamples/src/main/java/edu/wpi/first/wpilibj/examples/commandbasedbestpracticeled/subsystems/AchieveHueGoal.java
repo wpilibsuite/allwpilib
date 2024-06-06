@@ -37,18 +37,18 @@ public class AchieveHueGoal {
   // RobotContainer.java and this class shouldn't even know that
   // to be able to comment here on how the setpoint is determined.
 
-  private final double m_Kp = 0.025;
-  private final double m_Ki = 0.0;
-  private final double m_Kd = 0.0;
-  private final PIDController m_HueController = new PIDController(m_Kp, m_Ki, m_Kd);
-  private final double m_MinimumHue = 0.;
-  private final double m_MaximumHue = 180.;
-  private double m_HueSetpoint = 0.;
-  private double m_CurrentStateHue = 0.;
+  private final double m_kP = 0.025;
+  private final double m_kI = 0.0;
+  private final double m_kD = 0.0;
+  private final PIDController m_HueController = new PIDController(m_kP, m_kI, m_kD);
+  private final double m_minimumHue = 0.;
+  private final double m_maximumHue = 180.;
+  private double m_hueSetpoint = 0.;
+  private double m_currentStateHue = 0.;
 
-  private LEDView m_RobotSignals; // where the output is displayed
+  private LEDView m_robotSignals; // where the output is displayed
 
-  public HueGoal m_HueGoal = new HueGoal(); // subsystem protected goal
+  public HueGoal m_hueGoal = new HueGoal(); // subsystem protected goal
 
   /**
    * Constructor
@@ -56,7 +56,7 @@ public class AchieveHueGoal {
    * @param robotSignals
    */
   public AchieveHueGoal(LEDView robotSignals) {
-    this.m_RobotSignals = robotSignals;
+    this.m_robotSignals = robotSignals;
   }
 
   // Example of methods and triggers that the system will require are put here.
@@ -76,14 +76,14 @@ public class AchieveHueGoal {
 
   /** Run after commands and triggers */
   public void afterCommands() {
-    m_CurrentStateHue =
+    m_currentStateHue =
         MathUtil.clamp(
-            m_CurrentStateHue + m_HueController.calculate(m_CurrentStateHue, m_HueSetpoint),
-            m_MinimumHue,
-            m_MaximumHue);
+            m_currentStateHue + m_HueController.calculate(m_currentStateHue, m_hueSetpoint),
+            m_minimumHue,
+            m_maximumHue);
     LEDPattern persistentPatternDemo =
-        LEDPattern.solid(Color.fromHSV((int) m_CurrentStateHue, 200, 200)); // display state;
-    m_RobotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDS is only by
+        LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200)); // display state;
+    m_robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDS is only by
     // command in this example so do
     // it that way.
   }
@@ -127,11 +127,11 @@ public class AchieveHueGoal {
      * @return command that can be used to set the goal
      */
     public Command setHueGoal(double goal) {
-      return run(() -> m_HueSetpoint = goal);
+      return run(() -> m_hueSetpoint = goal);
     }
 
     public Command setHueGoal(DoubleSupplier goal) {
-      return run(() -> m_HueSetpoint = goal.getAsDouble());
+      return run(() -> m_hueSetpoint = goal.getAsDouble());
     }
   }
 }

@@ -71,7 +71,7 @@ public class RobotContainer {
 
     new Trigger(m_operatorController.rightTrigger(0.05)) // triggers if past a small threshold
         .onTrue(
-            m_achieveHueGoal.m_HueGoal.setHueGoal( // then it's always on
+            m_achieveHueGoal.m_hueGoal.setHueGoal( // then it's always on
                 () ->
                     m_operatorController.getRightTriggerAxis() * 180. // supplying the current value
                 // scale joystick's 0 to 1 to computer color wheel hue 0 to 180

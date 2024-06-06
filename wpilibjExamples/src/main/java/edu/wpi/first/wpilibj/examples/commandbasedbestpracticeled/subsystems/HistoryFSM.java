@@ -38,12 +38,12 @@ import java.util.List;
 import java.util.Random;
 
 public class HistoryFSM extends SubsystemBase {
-  private final LEDView m_RobotSignals;
-  private Random m_Rand = new Random();
+  private final LEDView m_robotSignals;
+  private Random m_rand = new Random();
 
   // Periodic output variable used for each run of "afterCommands()"
   // this is used before command to set it is run so start with LEDs off
-  private LEDPattern m_PersistentPatternDemo = LEDPattern.solid(Color.kBlack);
+  private LEDPattern m_persistentPatternDemo = LEDPattern.solid(Color.kBlack);
 
   // Add a color [hue number as subscript] and last time used to the history
   // so that color isn't used again during a lockout period.
@@ -57,30 +57,30 @@ public class HistoryFSM extends SubsystemBase {
 
   // Time data is saved for how long a color is to persist in the display.
 
-  private static final int m_ComputerColorWheel = 180; // max count of hues numbered 0 to 179
+  private static final int m_computerColorWheel = 180; // max count of hues numbered 0 to 179
   // list of the last times of all the colors so try not to repeat for a long time so repeats are
   // rare
-  private List<Measure<Time>> lastTimeHistoryOfColors = new ArrayList<>(m_ComputerColorWheel);
+  private List<Measure<Time>> m_lastTimeHistoryOfColors = new ArrayList<>(m_computerColorWheel);
 
-  private static final double m_BeginningOfTime = 0.;
-  private static final double m_EndOfTime = Double.MAX_VALUE;
+  private static final double m_beginningOfTime = 0.;
+  private static final double m_endOfTime = Double.MAX_VALUE;
 
   // time the current color display should end and a new color selected
   // initialize so the time doesn't trigger anything until the "Y" button is pressed
-  private Measure<Time> m_NextTime = Milliseconds.of(m_EndOfTime);
-  Measure<Time> m_ChangeColorPeriod = Seconds.of(2.); // display color for this long
-  Measure<Time> m_ColorLockoutPeriod = Seconds.of(20.); // try not to reuse a color for this long
+  private Measure<Time> m_nextTime = Milliseconds.of(m_endOfTime);
+  Measure<Time> m_changeColorPeriod = Seconds.of(2.); // display color for this long
+  Measure<Time> m_colorLockoutPeriod = Seconds.of(20.); // try not to reuse a color for this long
   // elapsed timer
-  private Trigger m_TimeOfNewColor = new Trigger(this::timesUp);
+  private Trigger m_timeOfNewColor = new Trigger(this::timesUp);
   private static final double m_DebounceTime = 0.04;
 
   public HistoryFSM(LEDView robotSignals, CommandXboxController operatorController) {
-    this.m_RobotSignals = robotSignals;
+    this.m_robotSignals = robotSignals;
 
     fillInitialTimes(); // initialize last time used for all the hues of the color wheel
 
     // Trigger if it's time for a new color or the operator pressed their "Y" button
-    m_TimeOfNewColor
+    m_timeOfNewColor
         .or(operatorController.y().debounce(m_DebounceTime))
         .onTrue(
             runOnce(this::getHSV) // new color
@@ -91,15 +91,15 @@ public class HistoryFSM extends SubsystemBase {
   /** Create an initialized list of hues */
   private void fillInitialTimes() {
     // initially indicate hue hasn't been used in a long time ago so available immediately
-    for (int i = 0; i < m_ComputerColorWheel; i++) {
-      lastTimeHistoryOfColors.add(Seconds.of(m_BeginningOfTime));
+    for (int i = 0; i < m_computerColorWheel; i++) {
+      m_lastTimeHistoryOfColors.add(Seconds.of(m_beginningOfTime));
     }
   }
 
   /** Sets the time for the trigger of its next periodic run */
   private void setNextTime() {
     Measure<Time> currentTime = Milliseconds.of(System.currentTimeMillis());
-    m_NextTime = currentTime.plus(m_ChangeColorPeriod);
+    m_nextTime = currentTime.plus(m_changeColorPeriod);
   }
 
   /**
@@ -108,12 +108,12 @@ public class HistoryFSM extends SubsystemBase {
    * @return has time elapsed
    */
   private boolean timesUp() {
-    if (m_NextTime.lt(Milliseconds.of(System.currentTimeMillis()))) {
+    if (m_nextTime.lt(Milliseconds.of(System.currentTimeMillis()))) {
       // reset; a command may run that will set the correct periodic "nextTime".
       // Otherwise wait for other triggering to restart.
       // This locks-out automatic restarting on disable-to-enable change; other trigger
       // required to get it started again.
-      m_NextTime = Milliseconds.of(m_EndOfTime);
+      m_nextTime = Milliseconds.of(m_endOfTime);
       return true;
     }
     return false; // not time to trigger yet
@@ -135,18 +135,18 @@ public class HistoryFSM extends SubsystemBase {
 
     do {
       // Generate random numbers for hues in range of the computer color wheel
-      randomHue = m_Rand.nextInt(m_ComputerColorWheel);
+      randomHue = m_rand.nextInt(m_computerColorWheel);
       // if hue hasn't been used recently, then use it now and update its history
-      var colorTime = lastTimeHistoryOfColors.get(randomHue); // get the associated time
-      if (colorTime.lt(currentTime.minus(m_ColorLockoutPeriod))) {
-        lastTimeHistoryOfColors.set(randomHue, currentTime);
+      var colorTime = m_lastTimeHistoryOfColors.get(randomHue); // get the associated time
+      if (colorTime.lt(currentTime.minus(m_colorLockoutPeriod))) {
+        m_lastTimeHistoryOfColors.set(randomHue, currentTime);
         break;
       }
       // hue used recently so loop to get another hue
       // limit attempts - no infinite loops allowed
     } while (loopCounter++ < loopCounterLimit);
 
-    m_PersistentPatternDemo = LEDPattern.solid(Color.fromHSV(randomHue, 200, 200));
+    m_persistentPatternDemo = LEDPattern.solid(Color.fromHSV(randomHue, 200, 200));
   }
 
   /** Example of how to disallow default command */
@@ -168,13 +168,13 @@ public class HistoryFSM extends SubsystemBase {
   /** Run after commands and triggers */
   public void afterCommands() {
     // testing prints
-    boolean debugPrint = true;
+    boolean debugPrint = false;
     if (debugPrint) {
       m_DebugPrintCounter++;
       if (m_DebugPrintCounter % 600 == 0) {
         System.out.println("current time " + System.currentTimeMillis());
-        for (int i = 0; i < lastTimeHistoryOfColors.size(); i++) {
-          System.out.println(i + " " + lastTimeHistoryOfColors.get(i).toLongString());
+        for (int i = 0; i < m_lastTimeHistoryOfColors.size(); i++) {
+          System.out.println(i + " " + m_lastTimeHistoryOfColors.get(i).toLongString());
         }
       }
     }
@@ -186,7 +186,7 @@ public class HistoryFSM extends SubsystemBase {
     // or the device that receives the data may keep the last value alive.
     // Being done here for illustrative purposes.
 
-    m_RobotSignals.setSignal(m_PersistentPatternDemo).schedule(); // access to the LEDS is only by
+    m_robotSignals.setSignal(m_persistentPatternDemo).schedule(); // access to the LEDS is only by
     // command so do it that way.
     // Note that because this method runs in disabled mode, the color persists in Disabled mode
     // even if the command was
