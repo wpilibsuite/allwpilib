@@ -4,7 +4,10 @@
 
 #pragma once
 
+#include <map>
 #include <optional>
+#include <utility>
+#include <vector>
 
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
@@ -185,57 +188,44 @@ class WPILIB_DLLEXPORT PoseEstimator {
                         const WheelPositions& wheelPositions);
 
  private:
-  struct InterpolationRecord {
-    // The pose observed given the current sensor inputs and the previous pose.
-    Pose2d pose;
+  /**
+   * Removes stale vision updates that won't affect sampling.
+   */
+  void CleanUpVisionUpdates();
 
-    // The current gyroscope angle.
-    Rotation2d gyroAngle;
+  struct VisionUpdate {
+    // The vision-compensated pose estimate
+    Pose2d visionPose;
 
-    // The distances traveled by the wheels.
-    WheelPositions wheelPositions;
-
-    /**
-     * Checks equality between this InterpolationRecord and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are equal.
-     */
-    bool operator==(const InterpolationRecord& other) const = default;
+    // The pose estimated based solely on odometry
+    Pose2d odometryPose;
 
     /**
-     * Checks inequality between this InterpolationRecord and another object.
+     * Returns the vision-compensated version of the pose. Specifically, changes
+     * the pose from being relative to this record's odometry pose to being
+     * relative to this record's vision pose.
      *
-     * @param other The other object.
-     * @return Whether the two objects are not equal.
+     * @param pose The pose to compensate.
+     * @return The compensated pose.
      */
-    bool operator!=(const InterpolationRecord& other) const = default;
-
-    /**
-     * Interpolates between two InterpolationRecords.
-     *
-     * @param endValue The end value for the interpolation.
-     * @param i The interpolant (fraction).
-     *
-     * @return The interpolated state.
-     */
-    InterpolationRecord Interpolate(
-        Kinematics<WheelSpeeds, WheelPositions>& kinematics,
-        InterpolationRecord endValue, double i) const;
+    Pose2d Compensate(const Pose2d& pose) const {
+      auto delta = pose - odometryPose;
+      return visionPose + delta;
+    }
   };
 
   static constexpr units::second_t kBufferDuration = 1.5_s;
 
-  Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
   Odometry<WheelSpeeds, WheelPositions>& m_odometry;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
-  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
-      kBufferDuration, [this](const InterpolationRecord& start,
-                              const InterpolationRecord& end, double t) {
-        return start.Interpolate(this->m_kinematics, end, t);
-      }};
+  // Maps timestamps to odometry-only pose estimates
+  TimeInterpolatableBuffer<Pose2d> m_odometryPoseBuffer{kBufferDuration};
+  // Maps timestamps to vision updates
+  // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
+  // unless there have been no vision measurements after the last reset
+  std::map<units::second_t, VisionUpdate> m_visionUpdates;
 };
 }  // namespace frc
 
