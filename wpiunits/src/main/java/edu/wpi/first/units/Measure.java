@@ -241,6 +241,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * Returns the inverse of this measure.
    *
    * @return the resulting measure
+   * @throws IllegalArgumentException if the unit is of type {@link Temperature}
    */
   default Measure<?> inverse() {
     // Taking the inverse of a temperature breaks and doesn't make sense
