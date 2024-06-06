@@ -107,7 +107,7 @@ class PCMSimModel : public glass::PneumaticControlModel {
       wpi::function_ref<void(glass::SolenoidModel& model, int index)> func)
       override;
 
-  std::string_view GetName() override { return "PH"; }
+  std::string_view GetName() override { return "PCM"; }
 
   int GetNumSolenoids() const { return m_solenoidInitCount; }
 

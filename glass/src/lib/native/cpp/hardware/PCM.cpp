@@ -20,7 +20,7 @@
 
 using namespace glass;
 
-bool glass::DisplaySolenoids(PneumaticControlModel* model, int index,
+bool glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model, int index,
                              bool outputsEnabled) {
   wpi::SmallVector<int, 16> channels;
   model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
@@ -93,7 +93,7 @@ void glass::DisplayPneumaticControlsSolenoids(PneumaticControlsModel* model,
   model->ForEachPneumaticControl(
       [&](PneumaticControlModel& pneumaticControl, int i) {
         PushID(i);
-        if (DisplaySolenoids(&pneumaticControl, i, outputsEnabled)) {
+        if (DisplayPneumaticControlSolenoids(&pneumaticControl, i, outputsEnabled)) {
           hasAny = true;
         }
         PopID();
