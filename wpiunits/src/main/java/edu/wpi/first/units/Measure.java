@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. Two
  * measures with the same <i>unit</i> and <i>magnitude</i> are effectively equivalent objects.
@@ -88,21 +90,39 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
       // scalar multiplication
       return times(other.baseUnitMagnitude());
     }
-    if (this.unit() instanceof LinearVelocity velocity) {
-      return velocity.getDistance().ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
+    if (unit() instanceof LinearVelocity && other.unit().getBaseUnit().equals(Seconds)) {
+      // Multiplying a velocity by a time, return the scalar unit (eg Distance)
+      Distance numerator = ((LinearVelocity) unit()).getDistance();
+      return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     }
-    if (this.unit() instanceof AngularVelocity velocity) {
-      return velocity.getAngle().ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
+    if (unit() instanceof AngularVelocity && other.unit().getBaseUnit().equals(Seconds)) {
+      Angle numerator = ((AngularVelocity) unit()).getAngle();
+      return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     }
-    if (this.unit() instanceof LinearAcceleration acceleration) {
-      return acceleration
-          .getLinearVelocity()
-          .ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
+    if (unit() instanceof LinearAcceleration && other.unit().getBaseUnit().equals(Seconds)) {
+      LinearVelocity numerator = ((LinearAcceleration) unit()).getLinearVelocity();
+      return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
     }
-    if (this.unit() instanceof AngularAcceleration acceleration) {
-      return acceleration
-          .getAngularVelocity()
-          .ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
+    if (unit() instanceof AngularAcceleration && other.unit().getBaseUnit().equals(Seconds)) {
+      AngularVelocity numerator = ((AngularAcceleration) unit()).getAngularVelocity();
+      return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
+    }
+    // Handles the commutative cases.
+    if (other.unit() instanceof LinearVelocity && unit().getBaseUnit().equals(Seconds)) {
+      Distance numerator = ((LinearVelocity) other.unit()).getDistance();
+      return numerator.ofBaseUnits(baseUnitMagnitude() * baseUnitMagnitude());
+    }
+    if (other.unit() instanceof AngularVelocity && unit().getBaseUnit().equals(Seconds)) {
+      Angle numerator = ((AngularVelocity) other.unit()).getAngle();
+      return numerator.ofBaseUnits(baseUnitMagnitude() * baseUnitMagnitude());
+    }
+    if (other.unit() instanceof LinearAcceleration && unit().getBaseUnit().equals(Seconds)) {
+      LinearVelocity numerator = ((LinearAcceleration) other.unit()).getLinearVelocity();
+      return numerator.ofBaseUnits(baseUnitMagnitude() * baseUnitMagnitude());
+    }
+    if (other.unit() instanceof AngularAcceleration && unit().getBaseUnit().equals(Seconds)) {
+      AngularVelocity numerator = ((AngularAcceleration) other.unit()).getAngularVelocity();
+      return numerator.ofBaseUnits(baseUnitMagnitude() * baseUnitMagnitude());
     }
     if (unit() instanceof Per<?, ?> per
         && other.unit().getBaseUnit().equals(per.denominator().getBaseUnit())) {

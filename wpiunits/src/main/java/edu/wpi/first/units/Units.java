@@ -316,6 +316,17 @@ public final class Units {
    */
   public static final Energy Kilojoule = Kilojoules; // alias
 
+  /** A unit of energy equal to 1.355818 Joules. */
+  public static final Energy FootPounds =
+      derive(Joules).aggregate(1.355818).named("Foot-Pounds").symbol("ft-lb").make();
+
+  /** Singular alias for FootPounds. */
+  public static final Energy FootPound = FootPounds;
+
+  /** A unit of energy equal to 0.1129848 Joules */
+  public static final Energy InchPounds =
+      derive(Joules).aggregate(0.1129848).named("Inch-Pounds").symbol("in-lb").make();
+
   // Power
   /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
   public static final Power Watts = derive(Joules.per(Seconds)).named("Watt").symbol("W").make();
@@ -404,6 +415,31 @@ public final class Units {
           .named("Kilogram-Meters-Squared")
           .symbol("Kg-m²")
           .make();
+
+  // Torque
+  /** The base SI unit for torque. */
+  public static final Torque NewtonMeters =
+      derive(KilogramSquareMeters.times(RadiansPerSecondPerSecond))
+          .named("Newton-Meters")
+          .symbol("Nm")
+          .make();
+
+  /** Singular alias for NewtonMeters. */
+  public static final Torque NewtonMeter = NewtonMeters; // alias;
+
+  /** A unit of torque equivalent to 1.355818 {@link #NewtonMeters}. */
+  public static final Torque PoundFeet =
+      derive(NewtonMeters).aggregate(1.355818).named("Pound-Feet").symbol("lb-ft").make();
+
+  /** Singular alias for PoundFeet. */
+  public static final Torque PoundFoot = PoundFeet;
+
+  /** A unit of torque equivalent to 0.1129848 {@link #NewtonMeters}. */
+  public static final Torque PoundInches =
+      derive(NewtonMeters).aggregate(0.1129848).named("Pound-Inches").symbol("lb-in").make();
+
+  /** Singular alias for PoundInches. */
+  public static final Torque PoundInch = PoundInches;
 
   // Standard feedforward units for kV and kA.
   // kS and kG are just volts, which is already defined earlier

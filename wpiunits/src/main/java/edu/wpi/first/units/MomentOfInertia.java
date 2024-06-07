@@ -92,6 +92,20 @@ public class MomentOfInertia extends Unit<MomentOfInertia> {
   }
 
   /**
+   * Creates a torque unit derived from this one.
+   *
+   * <pre>
+   *   KilogramMetersSquared.times(RadiansPerSecondPerSecond) // torque
+   * </pre>
+   *
+   * @param angularAcceleration the angular acceleration acting on the moment of inertia
+   * @return a torque unit corresponding to moment of inertia times angular acceleration
+   */
+  public Torque times(AngularAcceleration angularAcceleration) {
+    return Torque.combine(this, angularAcceleration);
+  }
+
+  /**
    * Gets the angular momentum unit.
    *
    * @return the angular momentum unit
