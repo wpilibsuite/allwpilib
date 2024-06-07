@@ -108,6 +108,20 @@ public class LinearVelocity extends Unit<LinearVelocity> {
   }
 
   /**
+   * Creates a linear momentum unit derived from this one.
+   *
+   * <pre>
+   *   MetersPerSecond.times(Kilograms) // linear momentum
+   * </pre>
+   *
+   * @param mass the mass acted on by the velocity.
+   * @return a force unit corresponding to mass times linear velocity
+   */
+  public LinearMomentum times(Mass mass) {
+    return LinearMomentum.combine(mass, this);
+  }
+
+  /**
    * Gets the distance unit.
    *
    * @return the distance unit

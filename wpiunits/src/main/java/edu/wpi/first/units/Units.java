@@ -241,11 +241,6 @@ public final class Units {
   /** 1/16 of a {@link #Pound}. */
   public static final Mass Ounce = Ounces; // alias
 
-  // Moment of Inertia
-  /** The base SI unit for moment of inertia. */
-  public static final Mult<Mult<Mass, Distance>, Distance> KilogramSquareMeters =
-      Kilograms.mult(Meters).mult(Meters);
-
   // Force
   /** The base SI unit for force. */
   public static final Force Newtons =
@@ -390,6 +385,24 @@ public final class Units {
           .toOutputRange(32, 212)
           .named("Fahrenheit")
           .symbol("°F")
+          .make();
+
+  // Linear Momentum
+  /** The base unit of linear momentum. */
+  public static final LinearMomentum KilogramMetersPerSecond = Kilogram.times(MetersPerSecond);
+
+  // Angular Momentum
+  /** The base unit of angular momentum. */
+  public static final AngularMomentum KilogramMetersSquaredPerSecond =
+      KilogramMetersPerSecond.times(Meters);
+
+  // Moment of Inertia
+  /** The base SI unit for moment of inertia. */
+  public static final MomentOfInertia KilogramSquareMeters =
+      derive(KilogramMetersSquaredPerSecond.per(RadiansPerSecond))
+          .aggregate(1)
+          .named("Kilogram-Meters-Squared")
+          .symbol("Kg-m²")
           .make();
 
   // Standard feedforward units for kV and kA.

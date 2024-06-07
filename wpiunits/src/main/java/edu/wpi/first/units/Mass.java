@@ -42,4 +42,18 @@ public class Mass extends Unit<Mass> {
   public Force times(LinearAcceleration acceleration) {
     return Force.combine(this, acceleration);
   }
+
+  /**
+   * Creates a linear momentum unit derived from this one.
+   *
+   * <pre>
+   *   Kilograms.times(MetersPerSecond) // linear momentum
+   * </pre>
+   *
+   * @param velocity the linear velocity acting on the mass
+   * @return a linear momentum unit corresponding to mass times linear velocity
+   */
+  public LinearMomentum times(LinearVelocity velocity) {
+    return LinearMomentum.combine(this, velocity);
+  }
 }

@@ -57,4 +57,18 @@ public class Distance extends Unit<Distance> {
   public Energy times(Force force) {
     return Energy.combine(force, this);
   }
+
+  /**
+   * Creates an angular momentum unit derived from this one.
+   *
+   * <pre>
+   *   Meters.times(KilogramMetersPerSecond) // angular momentum
+   * </pre>
+   *
+   * @param linearMomentum the linear momentum acting at this position.
+   * @return an angular momentum unit corresponding to distance times linear momentum.
+   */
+  public AngularMomentum times(LinearMomentum linearMomentum) {
+    return AngularMomentum.combine(this, linearMomentum);
+  }
 }
