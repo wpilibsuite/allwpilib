@@ -367,6 +367,7 @@ class LinearFilter {
       m_outputs.push_front(retVal);
     }
 
+    m_lastValue = retVal;
     return retVal;
   }
 
@@ -375,13 +376,14 @@ class LinearFilter {
    *
    * @return The last value.
    */
-  T LastValue() const { return m_outputs.front(); }
+  T LastValue() const { return m_lastValue; }
 
  private:
   wpi::circular_buffer<T> m_inputs;
   wpi::circular_buffer<T> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
+  T m_lastValue;
 
   /**
    * Factorial of n.
