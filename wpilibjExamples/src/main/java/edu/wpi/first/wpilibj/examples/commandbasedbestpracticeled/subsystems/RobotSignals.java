@@ -76,11 +76,11 @@ public class RobotSignals {
               m_lastAchieveHueGoal)
           + 1;
 
-  public LEDView m_top;
-  public LEDView m_main;
-  public LEDView m_enableDisable;
-  public LEDView m_historyDemo;
-  public LEDView m_achieveHueGoal;
+  public final LEDView m_top;
+  public final LEDView m_main;
+  public final LEDView m_enableDisable;
+  public final LEDView m_historyDemo;
+  public final LEDView m_achieveHueGoal;
 
   private final AddressableLEDBuffer bufferLED;
 
@@ -103,10 +103,14 @@ public class RobotSignals {
         new LEDView(bufferLED.createView(m_firstAchieveHueGoal, m_lastAchieveHueGoal));
   }
 
-  /** Run before commands and triggers */
+  /**
+   * Run before commands and triggers
+   */
   public void beforeCommands() {}
 
-  /** Run after commands and triggers */
+  /**
+   * Run after commands and triggers
+   */
   public void afterCommands() {
     m_strip.setData(bufferLED); // run periodically to send the buffer to the LEDs
   }

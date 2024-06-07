@@ -24,7 +24,7 @@ public class Intake extends SubsystemBase {
   private final LEDView m_robotSignals;
   private final CommandXboxController m_operatorController;
 
-  public final Trigger m_gamePieceAcquired = new Trigger(this::hasGamePieceAcquired);
+  private final Trigger m_gamePieceAcquired = new Trigger(this::hasGamePieceAcquired);
 
   /**
    * @param robotSignals Signal Subsystem
@@ -33,13 +33,15 @@ public class Intake extends SubsystemBase {
   public Intake(LEDView robotSignals, CommandXboxController operatorController) {
     this.m_robotSignals = robotSignals;
     this.m_operatorController = operatorController;
-    m_gamePieceAcquired.whileTrue(gamePieceIsAcquired());
+    m_gamePieceAcquired.whileTrue(gamePieceIsAcquired()); // Trigger's "this" is null until here.
   }
 
   /**
+   * Signals that a game piece has been acquired
+   * 
    * @return command to set the signal indicating game piece acquired
    */
-  public Command gamePieceIsAcquired() {
+  private Command gamePieceIsAcquired() {
     LEDPattern gamePieceAcquiredSignal = LEDPattern.solid(Color.kMagenta).blink(Seconds.of(0.2));
     return m_robotSignals
         .setSignal(gamePieceAcquiredSignal) // this command locks the
@@ -49,6 +51,8 @@ public class Intake extends SubsystemBase {
   }
 
   /**
+   * Determine if a game piece has been acquired.
+   * 
    * @return status of fake event source for game piece acquired
    */
   private boolean hasGamePieceAcquired() {
@@ -65,9 +69,13 @@ public class Intake extends SubsystemBase {
     throw new IllegalArgumentException("Default Command not allowed");
   }
 
-  /** Run before commands and triggers */
+  /**
+   * Run before commands and triggers
+   */
   public void beforeCommands() {}
 
-  /** Run after commands and triggers */
+  /**
+   * Run after commands and triggers
+   */
   public void afterCommands() {}
 }

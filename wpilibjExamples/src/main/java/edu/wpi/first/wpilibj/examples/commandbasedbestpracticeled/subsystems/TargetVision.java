@@ -23,7 +23,7 @@ public class TargetVision extends SubsystemBase {
   private final LEDView m_RobotSignals;
   private final CommandXboxController m_OperatorController;
 
-  public final Trigger m_TargetAcquired = new Trigger(this::canSeeTarget);
+  private final Trigger m_TargetAcquired = new Trigger(this::canSeeTarget);
 
   /**
    * @param robotSignals Signal Subsystem
@@ -32,13 +32,15 @@ public class TargetVision extends SubsystemBase {
   public TargetVision(LEDView robotSignals, CommandXboxController operatorController) {
     this.m_RobotSignals = robotSignals;
     this.m_OperatorController = operatorController;
-    m_TargetAcquired.whileTrue(targetIsAcquired());
+    m_TargetAcquired.whileTrue(targetIsAcquired()); // Trigger's "this" is null until here.
   }
 
   /**
+   * Signals that a target has been acquired.
+   * 
    * @return command to set the signal indicating target acquired
    */
-  public Command targetIsAcquired() {
+  private Command targetIsAcquired() {
     LEDPattern targetAcquiredSignal = LEDPattern.solid(Color.kOrange);
     return m_RobotSignals
         .setSignal(targetAcquiredSignal) // this command locks the specific injected m_robotSignals
@@ -52,6 +54,8 @@ public class TargetVision extends SubsystemBase {
   }
 
   /**
+   * Determine if a target has been acquired.
+   * 
    * @return status of fake event source for target acquired
    */
   private boolean canSeeTarget() {
@@ -68,9 +72,13 @@ public class TargetVision extends SubsystemBase {
     throw new IllegalArgumentException("Default Command not allowed");
   }
 
-  /** Run before commands and triggers */
+  /**
+   * Run before commands and triggers
+   */
   public void beforeCommands() {}
 
-  /** Run after commands and triggers */
+  /**
+   * Run after commands and triggers
+   */
   public void afterCommands() {}
 }

@@ -40,7 +40,7 @@ public class GroupDisjoint extends SubsystemBase {
   private boolean m_outputFresh; // false; periodically checking but sometimes there is no new data
   private String m_outputPrevious = ""; // previous output setting used to suppress duplicates
   private int m_repeatedOutputCount; // 0; number of duplicates
-  private int m_repeatedOutputLimit = 250; // 5 seconds (arbitrary number) at 50 Hz loop frequency
+  private final int m_repeatedOutputLimit = 250; // 5 seconds (arbitrary number) at 50 Hz loop frequency
 
   /**
    * @param resourceID resource (subsystem) ID
@@ -49,10 +49,14 @@ public class GroupDisjoint extends SubsystemBase {
     this.m_resourceID = resourceID;
   }
 
-  /** Run before commands and triggers */
+  /**
+   * Run before commands and triggers
+   */
   public void beforeCommands() {}
 
-  /** Run after commands and triggers */
+  /**
+   * Run after commands and triggers
+   */
   public void afterCommands() {
     // processing in periodic I/O should be kept to a minimum to get the best consistent set
     // of I/O. This example is complicated to minimize the large quantity of output possible.

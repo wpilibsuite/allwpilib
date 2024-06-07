@@ -42,30 +42,44 @@
 /*
  * Example program demonstrating:
  *
- * Splitting a common resource into two separately used resources (LEDs) Configure button trigger
- * Triggers Use of command parameters set at command creation time Use of command parameters set at
- * changeable at runtime (Suppliers) Use of method reference Inject TimedRobot.addPeriodic() into
- * other classes Some commentary on composite commands and mode changes Command logging Configuring
- * an autonomous command Use of Xbox controller to produce fake events Use of Xbox controller to
- * trigger an event Use of public command factories in subsystems Use of private non-Command methods
- * to prevent other classes from forgetting to lock a subsystem Change TimeRobot loop speed Change
- * LED update rate different from the TimedRobot loop speed Overloading method parameter types No
- * commands with the word Command in the name No triggers with the word Trigger in the name Supplier
- * of dynamic LED pattern Static LED pattern Restrict Subsystem Default Command to none until set
- * once at any time and then unchangeable Goal setting subsystem for a resource Triggers available
- * for other systems to use Default commands can either run or not run within a sequential group
- * depending on how the group is defined using Proxy Commands run in sequenced by triggering
- * successive commands Use of Measure<Time>
+ * Splitting a common resource into two separately used resources (LEDs).
+ * Configure button trigger.
+ * Triggers.
+ * Use of command parameters set at command creation time.
+ * Use of command parameters set at changeable at runtime (Suppliers).
+ * Use of method reference.
+ * Inject TimedRobot.addPeriodic() into other classes.
+ * Some commentary on composite commands and mode changes.
+ * Command logging.
+ * Configuring an autonomous command.
+ * Use of Xbox controller to produce fake events.
+ * Use of Xbox controller to trigger an event.
+ * Use of public command factories in subsystems.
+ * Use of private non-Command methods to prevent other classes from forgetting to lock a subsystem.
+ * Change LED update rate different from the TimedRobot loop speed.
+ * Overloading method parameter types.
+ * No commands with the word Command in the name.
+ * No triggers with the word Trigger in the name.
+ * Supplier of dynamic LED pattern.
+ * Static LED pattern.
+ * Restrict Subsystem Default Command to none until set once at any time and then unchangeable.
+ * Goal setting subsystem for a resource.
+ * Triggers available for other systems to use.
+ * Default commands can either run or not run within a sequential group depending on how the group is defined using Proxy.
+ * Commands run in sequenced by triggering successive commands.
+ * Use of Measure<Time>.
  */
 
 /*
  * Default Commands can be useful but they normally do not run within grouped commands even if their
  * associated subsystem is not active at all times within the group.
  *
- * There are several possibilities to accommodate that restriction: 1. do without default commands
- * at any time 2. do without the default command only within the group 3. manually code the function
- * of the default command within a group 4. break groups into smaller groups and use Triggers to
- * sequence multiple groups 5. consider using Proxy branching out of the group restriction
+ * There are several possibilities to accommodate that restriction:
+ *  1. do without default commands at any time.
+ *  2. do without the default command only within the group.
+ *  3. manually code the function of the default command within a group.
+ *  4. break groups into smaller groups and use Triggers to sequence multiple groups.
+ *  5. consider using Proxy branching out of the group restriction.
  *
  * Using Triggers to sequence successive commands may help better organize the command flow and
  * isolate some subsystem requirements so the default command can run. That’s okay and is preferred
@@ -139,7 +153,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
-  private Command m_autonomousCommand;
+  private Command m_autonomousSignal;
   private Command m_disjointedSequenceTests;
 
   @Override
@@ -168,10 +182,10 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     // commands running from another mode haven't been cancelled directly but may be interrupted by
     // this command
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousSignal = m_robotContainer.getAutonomousSignal();
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (m_autonomousSignal != null) {
+      m_autonomousSignal.schedule();
     }
   }
 
@@ -180,8 +194,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousExit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (m_autonomousSignal != null) {
+      m_autonomousSignal.cancel();
     }
   }
 
@@ -189,8 +203,8 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     // commands running from another mode haven't been cancelled directly except the one below
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (m_autonomousSignal != null) {
+      m_autonomousSignal.cancel();
     }
 
     m_disjointedSequenceTests = m_robotContainer.getDisjointedSequenceTest();

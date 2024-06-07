@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
 
+import static edu.wpi.first.units.Units.Milliseconds;
 /**
  * Create subsystems, triggers, and commands; bind buttons to commands and triggers; define command
  * logging;, manage the details of what is periodically processed before and after the command
@@ -21,6 +22,8 @@ import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.Rob
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.TargetVision;
 
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,10 +51,15 @@ public class RobotContainer {
   // container and creator of all the group/disjoint tests
   private final GroupDisjointTest m_groupDisjointTest = new GroupDisjointTest();
 
-  // subsystems
-
+  private static final Measure<Time> m_xButtonDebounceTime = Milliseconds.of(30.0);
+  private static final int m_addressableLedPwmPort = 1;
+  
+  /**
+   * Set the final values
+   */
   public RobotContainer() {
-    m_robotSignals = new RobotSignals(1);
+    // subsystems
+    m_robotSignals = new RobotSignals(m_addressableLedPwmPort);
     m_intake = new Intake(m_robotSignals.m_main, m_operatorController);
     m_targetVision = new TargetVision(m_robotSignals.m_top, m_operatorController);
     m_historyFSM = new HistoryFSM(m_robotSignals.m_historyDemo, m_operatorController);
@@ -66,16 +74,19 @@ public class RobotContainer {
     }
   }
 
-  /** configure driver and operator controllers' buttons (if they haven't been defined) */
+  /**
+   * configure driver and operator controllers' buttons
+   */
   private void configureBindings() {
     m_operatorController
         .x()
-        .debounce(0.03, DebounceType.kBoth)
+        .debounce(m_xButtonDebounceTime.in(Seconds), DebounceType.kBoth)
         .onTrue(m_robotSignals.m_top.setSignal(colorWheel()));
 
-    new Trigger(m_operatorController.rightTrigger(0.05)) // triggers if past a small threshold
+    var triggerHueGoalDeadBand = 0.05; // triggers if past a small threshold (scale of 0 to 1)
+    new Trigger(m_operatorController.rightTrigger(triggerHueGoalDeadBand))
         .onTrue(
-            m_achieveHueGoal.m_hueGoal.setHueGoal( // then it's always on
+            m_achieveHueGoal.m_hueGoal.setHueGoal( // then it's on
                 () ->
                     m_operatorController.getRightTriggerAxis()
                         * 180.0 // supplying the current value
@@ -137,13 +148,13 @@ public class RobotContainer {
   }
 
   /**
-   * Create a command to run in Autonomous
+   * Create a command to signal in Autonomous
    *
    * <p>Example of setting signals by contrived example of composed commands
    *
    * @return
    */
-  public Command getAutonomousCommand() {
+  public Command getAutonomousSignal() {
     LEDPattern autoTopSignal =
         LEDPattern.solid(new Color(0.1, 0.2, 0.2))
             .blend(LEDPattern.solid(new Color(0.7, 0.2, 0.2)).blink(Seconds.of(0.1)));
@@ -224,7 +235,7 @@ public class RobotContainer {
   }
 
   /**
-   * Run before commands and triggers
+   * Run before commands and triggers from the Robot.periodic()
    *
    * <p>Run periodically before commands are run - read sensors, etc. Include all classes that have
    * periodic inputs or other need to run periodically.
@@ -242,7 +253,7 @@ public class RobotContainer {
   }
 
   /**
-   * Run after commands and triggers
+   * Run after commands and triggers from the Robot.periodic()
    *
    * <p>Run periodically after commands are run - write logs, dashboards, indicators Include all
    * classes that have periodic outputs

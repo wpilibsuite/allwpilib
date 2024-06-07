@@ -31,13 +31,13 @@ import java.util.function.DoubleSupplier;
 public class AchieveHueGoal {
   // PID initialization.
 
-  // It starts running immediately controlling with the initial
-  // "currentStateHue" and "hueSetpoint" - choose carefully!
+  // The PID controller is not running initially until a setpoint is set.
 
-  // There is no running command to make new setpoints until
-  // the Xbox right trigger axis is pressed. This is handled in
-  // RobotContainer.java and this class shouldn't even know that
-  // to be able to comment here on how the setpoint is determined.
+  // There is no running command to make new setpoints until the Xbox right trigger axis is
+  // pressed at which time a command runs forever to accept new setpoints.
+  
+  // This is handled in RobotContainer.java and this class shouldn't even know that to be
+  // able to comment here on how the setpoint is determined.
 
   private final double m_kP = 0.025;
   private final double m_kI = 0.0;
@@ -45,12 +45,13 @@ public class AchieveHueGoal {
   private final PIDController m_HueController = new PIDController(m_kP, m_kI, m_kD);
   private final double m_minimumHue = 0.0;
   private final double m_maximumHue = 180.0;
-  private double m_hueSetpoint = 0.0;
-  private double m_currentStateHue = 0.0;
+  // initialize setpoint (goal) such that the controller doesn't start until setpoint is set
+  private double m_hueSetpoint = Double.NaN;
+  private double m_currentStateHue = 0.0; // also considered the initial and previous state
 
-  private LEDView m_robotSignals; // where the output is displayed
+  private final LEDView m_robotSignals; // where the output is displayed
 
-  public HueGoal m_hueGoal = new HueGoal(); // subsystem protected goal
+  public final HueGoal m_hueGoal = new HueGoal(); // subsystem protected goal
 
   /**
    * Constructor
@@ -73,22 +74,32 @@ public class AchieveHueGoal {
     return m_HueController.atSetpoint();
   }
 
-  /** Run before commands and triggers */
+  /**
+   * Run before commands and triggers
+   */
   public void beforeCommands() {}
 
-  /** Run after commands and triggers */
+  /**
+   * Run after commands and triggers
+   */
   public void afterCommands() {
-    m_currentStateHue =
-        MathUtil.clamp(
-            m_currentStateHue + m_HueController.calculate(m_currentStateHue, m_hueSetpoint),
-            m_minimumHue,
-            m_maximumHue);
-    LEDPattern persistentPatternDemo =
-        LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200)); // display state;
-    m_robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDS is only by
-    // command in this example so do
-    // it that way.
-  }
+    if (!Double.isNaN(m_hueSetpoint)) {
+      // setpoint has been set so run controller periodically
+
+      // Note that the WPILib PID controller knows if it has a setpoint and measurement
+      // but that information is private and not accessible. We need to know that here
+      // so the signals stay at their initial state (assumed off) until a setpoint set.
+      m_currentStateHue =
+          MathUtil.clamp(
+              m_currentStateHue + m_HueController.calculate(m_currentStateHue, m_hueSetpoint),
+              m_minimumHue,
+              m_maximumHue);
+      LEDPattern persistentPatternDemo =
+          LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200)); // display state;
+      m_robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDS is only by
+                                                    // command in this example so do it that way. 
+    }
+ }
 
   /**
    * Subsystem to lock the resource if a command is running and provide a default command.
@@ -105,6 +116,8 @@ public class AchieveHueGoal {
    *
    * <p>That means the last setpoint is running as no default takes over. For the Xbox trigger, that
    * goes to 0 when released but again we're not supposed to know that from RobotContainer.java.
+   * 
+   * <p>Note that this implementation does not start the controller until a setpoint as been set.
    *
    * <p>Command defaultCommand = Commands.run( () -> m_HueSetpoint = defaultHueGoal , this);
    * setDefaultCommand(defaultCommand);
@@ -124,14 +137,35 @@ public class AchieveHueGoal {
 
     /**
      * Set the goal.
+     * 
+     * <p>Use this if the goal is known at the time of initialization.
+     * 
+     * <p>May be called repeatedly for different goals.
+     * 
+     * <p>Not used in this example program.
      *
      * @param goal hue 0 to 180
      * @return command that can be used to set the goal
      */
     public Command setHueGoal(double goal) {
-      return run(() -> m_hueSetpoint = goal);
+      return runOnce(() -> m_hueSetpoint = goal);
     }
 
+    /**
+     * Set the goal.
+     *
+     * <p>Use this if the goal is to be supplied dynamically.
+     * 
+     * <p>Runs forever accepting goals dynamically from the Supplier.
+     * 
+     * <p>Generally not needed but may be interrupted by calling it again to change the Supplier
+     * or may need to be "refreshed" if stopped by "disable".
+     * 
+     * <p>Used in this example program.
+     * 
+     * @param goal hue 0 to 180
+     * @return command that can be used to set the goal
+     */
     public Command setHueGoal(DoubleSupplier goal) {
       return run(() -> m_hueSetpoint = goal.getAsDouble());
     }

@@ -75,7 +75,7 @@ public class HistoryFSM extends SubsystemBase {
   Measure<Time> m_colorLockoutPeriod = Seconds.of(20.0); // try not to reuse a color for this long
   // elapsed timer
   private Trigger m_timeOfNewColor = new Trigger(this::timesUp);
-  private static final double m_DebounceTime = 0.04;
+  private static final Measure<Time> m_yButtonDebounceTime = Milliseconds.of(40.0);
 
   public HistoryFSM(LEDView robotSignals, CommandXboxController operatorController) {
     this.m_robotSignals = robotSignals;
@@ -84,7 +84,7 @@ public class HistoryFSM extends SubsystemBase {
 
     // Trigger if it's time for a new color or the operator pressed their "Y" button
     m_timeOfNewColor
-        .or(operatorController.y().debounce(m_DebounceTime))
+        .or(operatorController.y().debounce(m_yButtonDebounceTime.in(Seconds)))
         .onTrue(
             runOnce(this::getHSV) // new color
                 .andThen(runOnce(this::setNextTime)) // next time for new color
@@ -160,15 +160,14 @@ public class HistoryFSM extends SubsystemBase {
 
   /**
    * Run before commands and triggers
-   *
-   * <p>beforeCommands() and afterCommands() run from the Robot.periodic() via RobotContainer and
-   * are run before and after Commands and Triggers are run.
    */
   public void beforeCommands() {}
 
   int m_DebugPrintCounter; // 0; limit testing prints counter
 
-  /** Run after commands and triggers */
+  /**
+   * Run after commands and triggers
+   */
   public void afterCommands() {
     // testing prints
     boolean debugPrint = false;
