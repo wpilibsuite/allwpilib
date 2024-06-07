@@ -272,25 +272,6 @@ public final class Units {
   public static final Dimensionless Percent =
       derive(Value).splitInto(100).named("Percent").symbol("%").make();
 
-  // Voltage
-  /** The base unit of electric potential. */
-  public static final Voltage Volts = BaseUnits.Voltage;
-
-  /** The base unit of electric potential. */
-  public static final Voltage Volt = Volts; // alias
-
-  /**
-   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
-   * or low-power circuits.
-   */
-  public static final Voltage Millivolts = Milli(Volts);
-
-  /**
-   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
-   * or low-power circuits.
-   */
-  public static final Voltage Millivolt = Millivolts; // alias
-
   // Current
   /** The base unit of electrical current. */
   public static final Current Amps = BaseUnits.Current;
@@ -363,6 +344,25 @@ public final class Units {
    */
   public static final Power Horsepower =
       derive(Watts).aggregate(745.7).named("Horsepower").symbol("hp").make();
+
+  // Voltage
+  /** The base unit of electric potential. */
+  public static final Voltage Volts = derive(Watts.per(Amps)).named("Volt").symbol("V").make();
+
+  /** The base unit of electric potential. */
+  public static final Voltage Volt = Volts; // alias
+
+  /**
+   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
+   * or low-power circuits.
+   */
+  public static final Voltage Millivolts = Milli(Volts);
+
+  /**
+   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
+   * or low-power circuits.
+   */
+  public static final Voltage Millivolt = Millivolts; // alias
 
   // Temperature
   /**

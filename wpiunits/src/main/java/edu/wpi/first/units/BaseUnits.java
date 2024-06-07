@@ -25,9 +25,6 @@ public final class BaseUnits {
   /** The standard "unitless" unit. */
   public static final Dimensionless Value = new Dimensionless(null, 1, "<?>", "<?>");
 
-  /** The standard unit of voltage, volts. */
-  public static final Voltage Voltage = new Voltage(null, 1, "Volt", "V");
-
   /** The standard unit of electric current, amperes. */
   public static final Current Current = new Current(null, 1, "Amp", "A");
 

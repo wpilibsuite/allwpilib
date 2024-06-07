@@ -17,7 +17,6 @@ import java.util.Objects;
  * {@link Units} class.
  */
 public class Power extends Unit<Power> {
-
   private final Energy m_energy;
   private final Time m_period;
 
@@ -47,7 +46,7 @@ public class Power extends Unit<Power> {
   /**
    * Creates a power unit derived from the ratio of an energy unit to a time unit.
    *
-   * @param Energy the energy unit
+   * @param energy the energy unit
    * @param period the period for unit time
    */
   Power(Energy energy, Time period) {
@@ -87,6 +86,21 @@ public class Power extends Unit<Power> {
     var newUnit = new Power(energy, time);
     cache.put(key, newUnit);
     return newUnit;
+  }
+
+  /**
+   * Creates a voltage unit derived from this one.
+   *
+   * <pre>
+   *   Watts.per(Amps) // voltage
+   *   Horsepower.per(Milliamps) // voltage
+   * </pre>
+   *
+   * @param current the current.
+   * @return a voltage unit in terms of power per current.
+   */
+  public Voltage per(Current current) {
+    return Voltage.combine(this, current);
   }
 
   /**
