@@ -4,9 +4,9 @@
 
 package edu.wpi.first.math.controller;
 
-import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
+import edu.wpi.first.math.jni.ArmFeedforwardJNI;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -114,7 +114,8 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    */
   public double calculate(
       double currentAngle, double currentVelocity, double nextVelocity, double dt) {
-    return WPIMathJNI.calculate(ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, dt);
+    return ArmFeedforwardJNI.calculate(
+        ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, dt);
   }
 
   // Rearranging the main equation from the calculate() method yields the

@@ -8,8 +8,8 @@
 
 #include <wpi/jni_util.h>
 
-#include "WPIMathJNI_Exceptions.h"
-#include "edu_wpi_first_math_WPIMathJNI.h"
+#include "Exceptions.h"
+#include "edu_wpi_first_math_jni_DAREJNI.h"
 #include "frc/DARE.h"
 
 using namespace wpi::java;
@@ -17,12 +17,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_DAREJNI
  * Method:    dareDetailABQR
  * Signature: ([D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_dareDetailABQR
+Java_edu_wpi_first_math_jni_DAREJNI_dareDetailABQR
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
@@ -54,12 +54,12 @@ Java_edu_wpi_first_math_WPIMathJNI_dareDetailABQR
 }
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_DAREJNI
  * Method:    dareDetailABQRN
  * Signature: ([D[D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_dareDetailABQRN
+Java_edu_wpi_first_math_jni_DAREJNI_dareDetailABQRN
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jdoubleArray N, jint states, jint inputs, jdoubleArray S)
 {
@@ -95,12 +95,12 @@ Java_edu_wpi_first_math_WPIMathJNI_dareDetailABQRN
 }
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_DAREJNI
  * Method:    dareABQR
  * Signature: ([D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_dareABQR
+Java_edu_wpi_first_math_jni_DAREJNI_dareABQR
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
@@ -133,12 +133,12 @@ Java_edu_wpi_first_math_WPIMathJNI_dareABQR
 }
 
 /*
- * Class:     edu_wpi_first_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_jni_DAREJNI
  * Method:    dareABQRN
  * Signature: ([D[D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_dareABQRN
+Java_edu_wpi_first_math_jni_DAREJNI_dareABQRN
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jdoubleArray N, jint states, jint inputs, jdoubleArray S)
 {
