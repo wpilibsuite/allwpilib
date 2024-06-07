@@ -31,9 +31,6 @@ public final class BaseUnits {
   /** The standard unit of electric current, amperes. */
   public static final Current Current = new Current(null, 1, "Amp", "A");
 
-  /** The standard unit of power, watts. */
-  public static final Power Power = new Power(null, 1, "Watt", "W");
-
   /** The standard unit of temperature, kelvin. */
   public static final Temperature Temperature =
       new Temperature(null, x -> x, x -> x, "Kelvin", "K");

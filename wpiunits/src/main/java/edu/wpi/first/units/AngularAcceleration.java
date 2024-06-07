@@ -51,7 +51,7 @@ public class AngularAcceleration extends Unit<AngularAcceleration> {
    * @param angularVelocity the angular velocity unit
    * @param period the period for unit time
    */
-  protected AngularAcceleration(AngularVelocity angularVelocity, Time period) {
+  AngularAcceleration(AngularVelocity angularVelocity, Time period) {
     super(
         angularVelocity.isBaseUnit() && period.isBaseUnit()
             ? null

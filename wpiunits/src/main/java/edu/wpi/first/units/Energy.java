@@ -89,6 +89,21 @@ public class Energy extends Unit<Energy> {
   }
 
   /**
+   * Creates a power unit derived from this one.
+   *
+   * <pre>
+   *   Joules.per(Second) // Power
+   *   Kilojoules.per(Minute) // Power
+   * </pre>
+   *
+   * @param period the time period of the velocity, such as seconds or milliseconds
+   * @return a linear velocity unit corresponding to the rate of change of distance over time
+   */
+  public Power per(Time period) {
+    return Power.combine(this, period);
+  }
+
+  /**
    * Gets the force unit.
    *
    * @return the force unit

@@ -51,7 +51,7 @@ public class LinearAcceleration extends Unit<LinearAcceleration> {
    * @param linearVelocity the linear velocity unit
    * @param period the period for unit time
    */
-  protected LinearAcceleration(LinearVelocity linearVelocity, Time period) {
+  LinearAcceleration(LinearVelocity linearVelocity, Time period) {
     super(
         linearVelocity.isBaseUnit() && period.isBaseUnit()
             ? null

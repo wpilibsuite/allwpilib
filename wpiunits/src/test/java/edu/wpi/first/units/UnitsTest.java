@@ -293,7 +293,7 @@ class UnitsTest {
   void testHorsepower() {
     assertEquals(745.7, Watts.convertFrom(1, Horsepower), thresh);
     assertEquals("Horsepower", Horsepower.name());
-    assertEquals("HP", Horsepower.symbol());
+    assertEquals("hp", Horsepower.symbol());
   }
 
   // Temperature

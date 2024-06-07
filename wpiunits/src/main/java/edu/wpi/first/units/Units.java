@@ -342,7 +342,7 @@ public final class Units {
 
   // Power
   /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
-  public static final Power Watts = BaseUnits.Power;
+  public static final Power Watts = derive(Joules.per(Seconds)).named("Watt").symbol("W").make();
 
   /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
   public static final Power Watt = Watts; // alias
@@ -362,7 +362,7 @@ public final class Units {
    * motors.
    */
   public static final Power Horsepower =
-      derive(Watts).aggregate(745.7).named("Horsepower").symbol("HP").make();
+      derive(Watts).aggregate(745.7).named("Horsepower").symbol("hp").make();
 
   // Temperature
   /**

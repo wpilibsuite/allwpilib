@@ -50,7 +50,7 @@ public class LinearVelocity extends Unit<LinearVelocity> {
    * @param distance the distance unit
    * @param period the period for unit time
    */
-  protected LinearVelocity(Distance distance, Time period) {
+  LinearVelocity(Distance distance, Time period) {
     super(
         distance.isBaseUnit() && period.isBaseUnit()
             ? null
