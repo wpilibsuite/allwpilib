@@ -42,4 +42,19 @@ public class Distance extends Unit<Distance> {
   public LinearVelocity per(Time period) {
     return LinearVelocity.combine(this, period);
   }
+
+  /**
+   * Creates an energy unit derived from this one.
+   *
+   * <pre>
+   *   Meters.times(Newtons) // force
+   *   Centimeters.times(Newtons) // force
+   * </pre>
+   *
+   * @param force the force applied at this distance.
+   * @return an energy unit corresponding to force times distance.
+   */
+  public Energy times(Force force) {
+    return Energy.combine(force, this);
+  }
 }

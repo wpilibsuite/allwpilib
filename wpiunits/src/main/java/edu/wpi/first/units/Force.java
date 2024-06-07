@@ -89,6 +89,21 @@ public class Force extends Unit<Force> {
   }
 
   /**
+   * Creates an energy unit derived from this one.
+   *
+   * <pre>
+   *   Newtons.times(Meters) // force
+   *   Pound.times(Feet) // force
+   * </pre>
+   *
+   * @param distance the distance the force was applied.
+   * @return an energy unit corresponding to force times distance.
+   */
+  public Energy times(Distance distance) {
+    return Energy.combine(this, distance);
+  }
+
+  /**
    * Gets the mass unit.
    *
    * @return the mass unit

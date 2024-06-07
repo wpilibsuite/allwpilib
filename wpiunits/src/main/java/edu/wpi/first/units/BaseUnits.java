@@ -31,9 +31,6 @@ public final class BaseUnits {
   /** The standard unit of electric current, amperes. */
   public static final Current Current = new Current(null, 1, "Amp", "A");
 
-  /** The standard unit of energy, joules. */
-  public static final Energy Energy = new Energy(null, 1, "Joule", "J");
-
   /** The standard unit of power, watts. */
   public static final Power Power = new Power(null, 1, "Watt", "W");
 

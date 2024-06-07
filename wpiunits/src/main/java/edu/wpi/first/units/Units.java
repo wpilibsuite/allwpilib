@@ -249,7 +249,7 @@ public final class Units {
   // Force
   /** The base SI unit for force. */
   public static final Force Newtons =
-      derive(Kilograms.times(MetersPerSecondPerSecond)).named("Newtons").symbol("N").make();
+      derive(Kilograms.times(MetersPerSecondPerSecond)).named("Newton").symbol("N").make();
 
   /** Singular alias for Newtons. */
   public static final Force Newton = Newtons; // alias;
@@ -312,7 +312,8 @@ public final class Units {
 
   // Energy
   /** The base unit of energy. */
-  public static final Energy Joules = BaseUnits.Energy;
+  public static final Energy Joules =
+      derive(Newtons.times(Meters)).named("Joule").symbol("J").make();
 
   /** The base unit of energy. */
   public static final Energy Joule = Joules; // alias
