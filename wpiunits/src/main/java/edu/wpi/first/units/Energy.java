@@ -74,7 +74,7 @@ public class Energy extends Unit<Energy> {
    * @param distance the distance unit
    * @return the energy unit
    */
-  public static Energy combine(Force force, Distance distance) {
+  static Energy combine(Force force, Distance distance) {
     final long key =
         ((long) force.hashCode()) << 32L | (((long) distance.hashCode()) & 0xFFFFFFFFL);
 

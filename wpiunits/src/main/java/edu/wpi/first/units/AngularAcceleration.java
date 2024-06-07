@@ -71,14 +71,11 @@ public class AngularAcceleration extends Unit<AngularAcceleration> {
    * AngularVelocity.combine(Degrees, Minute)
    * </pre>
    *
-   * <p>It's recommended to use the convenience function {@link AngularVelocity#per(Time)} instead
-   * of calling this factory directly.
-   *
    * @param angularVelocity the angular velocity unit
    * @param time the time unit
    * @return the angular acceleration unit
    */
-  public static AngularAcceleration combine(AngularVelocity angularVelocity, Time time) {
+  static AngularAcceleration combine(AngularVelocity angularVelocity, Time time) {
     final long key =
         ((long) angularVelocity.hashCode()) << 32L | (((long) time.hashCode()) & 0xFFFFFFFFL);
 

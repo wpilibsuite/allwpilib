@@ -70,14 +70,11 @@ public class Voltage extends Unit<Voltage> {
    * Power.combine(Joules, Minute)
    * </pre>
    *
-   * <p>It's recommended to use the convenience function {@link Energy#per(Time)} instead of calling
-   * this factory directly.
-   *
    * @param power the energy unit
    * @param current the time unit
    * @return the power unit
    */
-  public static Voltage combine(Power power, Current current) {
+  static Voltage combine(Power power, Current current) {
     final long key = ((long) power.hashCode()) << 32L | (((long) current.hashCode()) & 0xFFFFFFFFL);
 
     var existing = cache.get(key);

@@ -73,7 +73,7 @@ public class LinearMomentum extends Unit<LinearMomentum> {
    * @param velocity the linear velocity unit
    * @return the linear momentum unit
    */
-  public static LinearMomentum combine(Mass mass, LinearVelocity velocity) {
+  static LinearMomentum combine(Mass mass, LinearVelocity velocity) {
     final long key = ((long) mass.hashCode()) << 32L | (((long) velocity.hashCode()) & 0xFFFFFFFFL);
 
     var existing = cache.get(key);

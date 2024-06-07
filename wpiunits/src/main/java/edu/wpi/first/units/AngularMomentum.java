@@ -73,7 +73,7 @@ public class AngularMomentum extends Unit<AngularMomentum> {
    * @param linearMomentum the linear momentum unit
    * @return the angular momentum unit
    */
-  public static AngularMomentum combine(Distance distance, LinearMomentum linearMomentum) {
+  static AngularMomentum combine(Distance distance, LinearMomentum linearMomentum) {
     final long key =
         ((long) distance.hashCode()) << 32L | (((long) linearMomentum.hashCode()) & 0xFFFFFFFFL);
 

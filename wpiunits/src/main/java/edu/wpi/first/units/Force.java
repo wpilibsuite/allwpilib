@@ -74,7 +74,7 @@ public class Force extends Unit<Force> {
    * @param acceleration the linear acceleration unit
    * @return the force unit
    */
-  public static Force combine(Mass mass, LinearAcceleration acceleration) {
+  static Force combine(Mass mass, LinearAcceleration acceleration) {
     final long key =
         ((long) mass.hashCode()) << 32L | (((long) acceleration.hashCode()) & 0xFFFFFFFFL);
 

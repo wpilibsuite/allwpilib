@@ -71,14 +71,11 @@ public class LinearAcceleration extends Unit<LinearAcceleration> {
    * LinearVelocity.combine(Degrees, Minute)
    * </pre>
    *
-   * <p>It's recommended to use the convenience function {@link LinearVelocity#per(Time)} instead of
-   * calling this factory directly.
-   *
    * @param linearVelocity the linear velocity unit
    * @param time the time unit
    * @return the linear acceleration unit
    */
-  public static LinearAcceleration combine(LinearVelocity linearVelocity, Time time) {
+  static LinearAcceleration combine(LinearVelocity linearVelocity, Time time) {
     final long key =
         ((long) linearVelocity.hashCode()) << 32L | (((long) time.hashCode()) & 0xFFFFFFFFL);
 

@@ -68,14 +68,11 @@ public class Power extends Unit<Power> {
    * Power.combine(Joules, Minute)
    * </pre>
    *
-   * <p>It's recommended to use the convenience function {@link Energy#per(Time)} instead of calling
-   * this factory directly.
-   *
    * @param energy the energy unit
    * @param time the time unit
    * @return the power unit
    */
-  public static Power combine(Energy energy, Time time) {
+  static Power combine(Energy energy, Time time) {
     final long key = ((long) energy.hashCode()) << 32L | (((long) time.hashCode()) & 0xFFFFFFFFL);
 
     var existing = cache.get(key);

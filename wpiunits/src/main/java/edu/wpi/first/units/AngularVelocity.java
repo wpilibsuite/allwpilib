@@ -86,14 +86,11 @@ public class AngularVelocity extends Unit<AngularVelocity> {
    * AngularVelocity.combine(Degrees, Minute)
    * </pre>
    *
-   * <p>It's recommended to use the convenience function {@link Angle#per(Time)} instead of calling
-   * this factory directly.
-   *
    * @param angle the angle unit
    * @param time the time unit
    * @return the angular velocity unit
    */
-  public static AngularVelocity combine(Angle angle, Time time) {
+  static AngularVelocity combine(Angle angle, Time time) {
     final long key = ((long) angle.hashCode()) << 32L | (((long) time.hashCode()) & 0xFFFFFFFFL);
 
     var existing = cache.get(key);

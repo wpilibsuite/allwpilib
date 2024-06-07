@@ -63,32 +63,12 @@ public class LinearVelocity extends Unit<LinearVelocity> {
   }
 
   /**
-   * Creates a linear acceleration unit derived from this one. Can be chained to denote velocity,
-   * acceleration, jerk, etc.
-   *
-   * <pre>
-   *   MetersPerSecond.per(Second) // linear acceleration
-   *   Feet.per(Second).per(Second).of(32) // roughly 1G of acceleration
-   * </pre>
-   *
-   * @param period the time period of the acceleration, such as seconds or milliseconds
-   * @return a linear acceleration unit corresponding to the rate of change of linear velocity over
-   *     time
-   */
-  public LinearAcceleration per(Time period) {
-    return LinearAcceleration.combine(this, period);
-  }
-
-  /**
    * Creates a new linear velocity unit derived from a distance numerator and time denominator
    * units.
    *
    * <pre>
    * LinearVelocity.combine(Feet, Minute)
    * </pre>
-   *
-   * <p>It's recommended to use the convenience function {@link Distance#per(Time)} instead of
-   * calling this factory directly.
    *
    * @param distance the distance unit
    * @param time the time unit
@@ -105,6 +85,23 @@ public class LinearVelocity extends Unit<LinearVelocity> {
     var newUnit = new LinearVelocity(distance, time);
     cache.put(key, newUnit);
     return newUnit;
+  }
+
+  /**
+   * Creates a linear acceleration unit derived from this one. Can be chained to denote velocity,
+   * acceleration, jerk, etc.
+   *
+   * <pre>
+   *   MetersPerSecond.per(Second) // linear acceleration
+   *   Feet.per(Second).per(Second).of(32) // roughly 1G of acceleration
+   * </pre>
+   *
+   * @param period the time period of the acceleration, such as seconds or milliseconds
+   * @return a linear acceleration unit corresponding to the rate of change of linear velocity over
+   *     time
+   */
+  public LinearAcceleration per(Time period) {
+    return LinearAcceleration.combine(this, period);
   }
 
   /**

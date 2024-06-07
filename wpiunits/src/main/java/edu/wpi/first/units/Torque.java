@@ -73,8 +73,7 @@ public class Torque extends Unit<Torque> {
    * @param angularAcceleration the angular acceleration unit.
    * @return the torque unit
    */
-  public static Torque combine(
-      MomentOfInertia momentOfInertia, AngularAcceleration angularAcceleration) {
+  static Torque combine(MomentOfInertia momentOfInertia, AngularAcceleration angularAcceleration) {
     final long key =
         ((long) momentOfInertia.hashCode()) << 32L
             | (((long) angularAcceleration.hashCode()) & 0xFFFFFFFFL);

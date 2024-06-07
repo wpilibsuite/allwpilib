@@ -68,15 +68,11 @@ public class MomentOfInertia extends Unit<MomentOfInertia> {
    * MomentOfInertia.combine(KilogramMetersSquaredPerSecond, RadiansPerSecond)
    * </pre>
    *
-   * <p>It's recommended to use the convenience function {@link
-   * AngularMomentum#per(AngularVelocity)} instead of calling this factory directly.
-   *
    * @param angularMomentum the angular momentum unit
    * @param angularVelocity the angular velocity unit
    * @return the moment of inertia unit
    */
-  public static MomentOfInertia combine(
-      AngularMomentum angularMomentum, AngularVelocity angularVelocity) {
+  static MomentOfInertia combine(AngularMomentum angularMomentum, AngularVelocity angularVelocity) {
     final long key =
         ((long) angularMomentum.hashCode()) << 32L
             | (((long) angularVelocity.hashCode()) & 0xFFFFFFFFL);
