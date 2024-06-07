@@ -21,7 +21,7 @@
 #ifndef _gcem_min_HPP
 #define _gcem_min_HPP
 
-#include <cmath>
+#include <algorithm>
 #include <type_traits>
 
 namespace gcem

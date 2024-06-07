@@ -33,7 +33,7 @@ TEST(Pose3dTest, RotateBy) {
 }
 
 TEST(Pose3dTest, TestTransformByRotations) {
-  const double kEpsilon = 1E-9;
+  constexpr double kEpsilon = 1E-9;
 
   const Pose3d initialPose{0_m, 0_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}};
   const Transform3d transform1{Translation3d{0_m, 0_m, 0_m},

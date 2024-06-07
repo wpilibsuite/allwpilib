@@ -56,6 +56,13 @@ components:
             - $ref: "#/components/schemas/relayData"
             - $ref: "#/components/schemas/solenoidData"
             - $ref: "#/components/schemas/roborioData"
+            - $ref: "#/components/schemas/canmotorData"
+            - $ref: "#/components/schemas/canencoderData"
+            - $ref: "#/components/schemas/cangyroData"
+            - $ref: "#/components/schemas/canaccelData"
+            - $ref: "#/components/schemas/canainData"
+            - $ref: "#/components/schemas/candioData"
+            - $ref: "#/components/schemas/candutycycleData"
             - $ref: "#/components/schemas/simdeviceData"
 
   schemas:
@@ -692,11 +699,11 @@ components:
       properties:
         type:
           type: string
-          description: "Dummy type used for SimDevice type with device=CANMotor:*"
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
           const: CANMotor
         device:
           type: string
-          description: "Should have the form CANMotor:ControllerClassName[id]"
+          description: "Should have the form ControllerClassName[id]"
         data:
           type: object
           description: "CANMotor Data"
@@ -738,11 +745,11 @@ components:
       properties:
         type:
           type: string
-          description: "Dummy type used for SimDevice type with device=CANEncoder:*"
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
           const: CANEncoder
         device:
           type: string
-          description: "Should have the form CANEncoder:ControllerClassName[id]"
+          description: "Should have the form EncoderClassName[id]"
         data:
           type: object
           description: "CANEncoder Data"
@@ -757,92 +764,98 @@ components:
               type: number
               description: "Velocity in rotations per second"
 
+    cangyroData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANGyro
+        device:
+          type: string
+          description: "Should have the form GyroClassName[id]"
+        data:
+          $ref: "#/components/schemas/gyroData/properties/data"
+
+    canaccelData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANAccel
+        device:
+          type: string
+          description: "Should have the form AccelClassName[id]"
+        data:
+          $ref: "#/components/schemas/accelData/properties/data"
+
+    canainData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANAIn
+        device:
+          type: string
+          description: "Should have the form AnalogInputClassName[id]"
+        data:
+          $ref: "#/components/schemas/aiData/properties/data"
+
+    candioData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANDIO
+        device:
+          type: string
+          description: "Should have the form DIOClassName[id]"
+        data:
+          $ref: "#/components/schemas/dioData/properties/data"
+
+    candutycycleData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: CANDutyCycle
+        device:
+          type: string
+          description: "Should have the form DutyCycleClassName[id]"
+        data:
+          $ref: "#/components/schemas/dutycycleData/properties/data"
+
     simdeviceData:
       type: object
       required:
       - type
       - device
-      oneOf:
-      - properties:
-          type:
+      properties:
+        type:
+          type: string
+          const: SimDevice
+        device:
+          type: string
+        data:
+          type: object
+          additionalProperties:
             type: string
-            const: SimDevice
-          device:
-            type: string
-            format: "(?!(DutyCycle|CAN(Motor|Encoder|Gyro|Accel|AIn|DIO|DutyCycle)):.+).+"
-          data:
-            type: object
-            additionalProperties:
-              type: string
-      - properties:
-          type:
-            type: string
-            const: SimDevice
-          device:
-            type: string
-            format: "DutyCycle:.+"
-          data:
-            $ref: "#/components/schemas/dutycycleData/properties/data"
-      - properties:
-          type:
-            type: string
-            const: SimDevice
-          device:
-            type: string
-            format: "CANMotor:.+"
-          data:
-            $ref: "#/components/schemas/canmotorData/properties/data"
-      - properties:
-          type:
-            type: string
-            const: SimDevice
-          device:
-            type: string
-            format: "CANEncoder:.+"
-          data:
-            $ref: "#/components/schemas/canencoderData/properties/data"
-      - properties:
-          type:
-            type: string
-            const: SimDevice
-          device:
-            type: string
-            format: "CANGyro:.+"
-          data:
-            $ref: "#/components/schemas/gyroData/properties/data"
-      - properties:
-          type:
-            type: string
-            const: SimDevice
-          device:
-            type: string
-            format: "CANAccel:.+"
-          data:
-            $ref: "#/components/schemas/accelData/properties/data"
-      - properties:
-          type:
-            type: string
-            const: SimDevice
-          device:
-            type: string
-            format: "CANAIn:.+"
-          data:
-            $ref: "#/components/schemas/aiData/properties/data"
-      - properties:
-          type:
-            type: string
-            const: SimDevice
-          device:
-            type: string
-            format: "CANDIO:.+"
-          data:
-            $ref: "#/components/schemas/dioData/properties/data"
-      - properties:
-          type:
-            type: string
-            const: SimDevice
-          device:
-            type: string
-            format: "CANDutyCycle:.+"
-          data:
-            $ref: "#/components/schemas/dutycycleData/properties/data"

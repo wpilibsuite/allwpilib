@@ -22,6 +22,20 @@ public class CallbackStore implements AutoCloseable {
   }
 
   /**
+   * Constructs an empty CallbackStore. This constructor is to allow 3rd party sim providers (eg
+   * vendors) to subclass this class (without needing provide dummy constructing parameters) so that
+   * the register methods of their sim classes can return CallbackStores like the builtin sims.
+   * <b>Note: It should not be called by teams that are just using sims!</b>
+   */
+  protected CallbackStore() {
+    this.m_cancelType = -1;
+    this.m_index = -1;
+    this.m_uid = -1;
+    this.m_cancelCallback = null;
+    this.m_cancelCallbackChannel = null;
+  }
+
+  /**
    * <b>Note: This constructor is for simulation classes only. It should not be called by teams!</b>
    *
    * @param index TODO
@@ -79,21 +93,16 @@ public class CallbackStore implements AutoCloseable {
   @Override
   public void close() {
     switch (m_cancelType) {
-      case kAlreadyCancelled:
+      case kAlreadyCancelled -> {
         // Already cancelled so do nothing so that close() is idempotent.
         return;
-      case kNormalCancel:
-        m_cancelCallback.cancel(m_index, m_uid);
-        break;
-      case kChannelCancel:
-        m_cancelCallbackChannel.cancel(m_index, m_channel, m_uid);
-        break;
-      case kNoIndexCancel:
-        m_cancelCallbackNoIndex.cancel(m_uid);
-        break;
-      default:
+      }
+      case kNormalCancel -> m_cancelCallback.cancel(m_index, m_uid);
+      case kChannelCancel -> m_cancelCallbackChannel.cancel(m_index, m_channel, m_uid);
+      case kNoIndexCancel -> m_cancelCallbackNoIndex.cancel(m_uid);
+      default -> {
         assert false;
-        break;
+      }
     }
     m_cancelType = kAlreadyCancelled;
   }

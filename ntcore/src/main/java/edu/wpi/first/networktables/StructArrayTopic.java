@@ -167,11 +167,9 @@ public final class StructArrayTopic<T> extends Topic {
     if (other == this) {
       return true;
     }
-    if (!(other instanceof StructArrayTopic)) {
-      return false;
-    }
-
-    return super.equals(other) && m_struct == ((StructArrayTopic<?>) other).m_struct;
+    return other instanceof StructArrayTopic<?> topic
+        && super.equals(topic)
+        && m_struct == topic.m_struct;
   }
 
   @Override
