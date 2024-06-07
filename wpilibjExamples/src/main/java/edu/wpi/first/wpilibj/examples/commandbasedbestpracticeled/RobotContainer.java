@@ -13,15 +13,16 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.AchieveHueGoal;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.HistoryFSM;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.Intake;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDPatternSupplier;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.TargetVision;
+
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -42,9 +43,10 @@ public class RobotContainer {
   private final TargetVision m_targetVision;
   private final HistoryFSM m_historyFSM;
   private final AchieveHueGoal m_achieveHueGoal;
-  private final RobotSignals m_robotSignals; // container and creator of all the LEDView subsystems
-  private final GroupDisjointTest m_groupDisjointTest =
-      GroupDisjointTest.getInstance(); // container and creator of all the group/disjoint tests
+  // container and creator of all the LEDView subsystems
+  private final RobotSignals m_robotSignals;
+  // container and creator of all the group/disjoint tests
+  private final GroupDisjointTest m_groupDisjointTest = new GroupDisjointTest();
 
   // subsystems
 
@@ -163,7 +165,18 @@ public class RobotContainer {
         .withName("AutoSignal");
   }
 
-  /** Configure Command logging */
+  /**
+   * Get disjointed sequence test
+   * 
+   * @return Command to be scheduled to run disjointed sequence test
+   */
+  public Command getDisjointedSequenceTest() {
+    return m_groupDisjointTest.m_disjointedSequenceTest;
+  }
+
+  /**
+   * Configure Command logging
+   */
   private void configureLogging() {
     CommandScheduler.getInstance()
         .onCommandInitialize(

@@ -69,7 +69,7 @@
  *
  * Using Triggers to sequence successive commands may help better organize the command flow and
  * isolate some subsystem requirements so the default command can run. That’s okay and is preferred
- * to using proxied commands.
+ * to using proxy commands.
  *
  * Usage of Proxies to hide the subsystem requirements from normal checks and thus allow the default
  * command to activate could be useful but should be used extremely sparingly by an experienced
@@ -97,7 +97,7 @@
  * functions but that helps only if you use those functions correctly and nothing says you have to).
  *
  * repeatedly() doesn’t repeat correctly due to a bug in the WPILib. (The repeat is different than
- * the original proxied command).
+ * the original proxy command).
  *
  * andThen() doesn’t work but that can be circumvented by using sequence().
  */
@@ -140,6 +140,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private Command m_autonomousCommand;
+  private Command m_disjointedSequenceTests;
 
   @Override
   public void robotInit() {
@@ -185,14 +186,18 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() { // commands running from another mode haven't been cancelled directly
-    // except the one below
+  public void teleopInit() {
+    // commands running from another mode haven't been cancelled directly except the one below
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
 
-    GroupDisjointTest.getDisjointedSequenceTestJob().schedule();
+    m_disjointedSequenceTests = m_robotContainer.getDisjointedSequenceTest();
+
+    if (m_disjointedSequenceTests != null) {
+      m_disjointedSequenceTests.schedule();
+    }
   }
 
   @Override

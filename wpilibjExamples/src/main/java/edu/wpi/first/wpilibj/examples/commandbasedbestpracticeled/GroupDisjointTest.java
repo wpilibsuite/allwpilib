@@ -29,6 +29,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.GroupDisjoint;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -36,10 +37,11 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 
 public class GroupDisjointTest {
-  // runtime options; too rigid - could be made easier to find and change but this is just a
+  // runtime option; too rigid - could be made easier to find and change but this is just a
   // "simple" example program
-  private final boolean m_useTriggeredJob =
-      true; // select runtime option run tests as Triggered job or run as Commands.sequence
+
+  // runtime option to run tests as Triggered job or run as Commands.sequence
+  private final boolean m_useTriggeredJob = true;
 
   private final GroupDisjoint[]
       m_groupDisjoint = // subsystems that provide the requirements for testing
@@ -48,46 +50,31 @@ public class GroupDisjointTest {
   private final int m_b = 1;
   private final int m_c = 2;
 
-  // This is "static" so it can be used simply in Robot.java.
-  // That means only one instance of this class should be made since all instances would
-  // use the same variable for the tests. Make this class a singleton to make sure.
-  private static Command disjointedSequenceTestJob;
+  public final Command m_disjointedSequenceTest; // created at ctor so available immediately on demand
 
   /**
-   * @return Command to be scheduled for running test job
+   * Create disjointed sequence test upon ctor.
+   * 
+   * <p>Could create and return test on demand but this way can save some time when demanded.
    */
-  public static Command getDisjointedSequenceTestJob() {
-    return disjointedSequenceTestJob;
-  }
-
-  // singleton class so access to disjointedSequenceTestJob can be static safely
-  private static GroupDisjointTest single_instance = null;
-
-  private GroupDisjointTest() {
-    configureTestJob(m_useTriggeredJob);
-  }
-
-  public static GroupDisjointTest getInstance() {
-    if (single_instance == null) single_instance = new GroupDisjointTest();
-
-    return single_instance;
+  public GroupDisjointTest() {
+    m_disjointedSequenceTest = configureTestJob(m_useTriggeredJob);
   }
 
   /**
-   * Define all tests of the use of Proxy or not to activate or not default commands within command
-   * groups.
+   * Define the test of the use of Proxy or Trigger to activate or not the default commands within command groups.
    *
-   * <p>Create a job that runs all tests.
+   * <p>Create a Command that runs the test.
    *
-   * <p>Option to run all tests as a succession of triggered Commands or as a single
+   * <p>Option to run the test as a succession of triggered Commands or as a single
    * Commands.sequence(). With triggering we may only have to fuss with Proxy within each command as
    * there is no interaction between commands. Normally the results are identical except triggering
    * needs one iteration to start the next command and sequence needs two iterations to start the
    * next command.
    *
-   * @param useTriggeredJob true for Triggered jobs; false for use Commands.sequence()
+   * @param useTriggeredJob true for use Triggered commands; false for use Commands.sequence()
    */
-  private void configureTestJob(boolean useTriggeredJob) {
+  private Command configureTestJob(boolean useTriggeredJob) {
     // Default commands running for subsystems A, B, and C.
     // Observe default commands don't run in groups unless disjointed by use of Proxy
 
@@ -264,9 +251,9 @@ public class GroupDisjointTest {
     };
 
     if (useTriggeredJob) {
-      disjointedSequenceTestJob = TriggeredDisjointSequence.sequence(allTests);
+      return TriggeredDisjointSequence.sequence(allTests);
     } else {
-      disjointedSequenceTestJob = disjointSequence(allTests);
+      return disjointSequence(allTests);
     }
   }
 

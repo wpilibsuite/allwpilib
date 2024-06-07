@@ -21,18 +21,21 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
  * simple scheduling structure, for example, the use of the "beforeCommands()" or "afterCommands()"
  * periodic methods as used for a sub-purpose here is a good way.
  */
+
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.Color;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.LEDPattern;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDView;
+
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

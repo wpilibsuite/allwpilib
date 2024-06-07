@@ -9,32 +9,44 @@ import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import edu.wpi.first.wpilibj2.command.button.InternalButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-// From ChiefDelphi poster @bovlb
+/**
+ * A command group that runs a list of commands in sequence.
+ * 
+ * The end of each command triggers the start of the next command,
+ * thus, each command runs relatively independently of the other commands.
+ * 
+ * Compares to using "proxies" but uses "triggers"
+ * 
+ * 
+ * From ChiefDelphi poster @bovlb
+ */
 
-// Usage:
+/*
 
-// good example with best practice of using command factories
-// Command
-// test = TriggeredDisjointSequence.sequence(
-// mySubsystem.test1(),
-// mySubsystem.test2(),
-// mySubsystem.test3(),
-// mySubsystem.test4(),
-// mySubsystem.test1()); // fresh Command from its factory so it doesn't conflict with other one
-// test.schedule();
+Usage:
 
-// bad example of the pitfall of not using command factories
-// Command
-// test = TriggeredDisjointSequence.sequence(
-// test1,
-// test2,
-// test3,
-// test4,
-// // reusing command test1 (which is NOT a best practice) so it has to be
-// // removed from the WrapperCommand group
-// runOnce(()->CommandScheduler.getInstance().removeComposedCommand(test1)),
-// test1);
-// test.schedule();
+good example with best practice of using command factories
+Command test = TriggeredDisjointSequence.sequence(
+    mySubsystem.test1(),
+    mySubsystem.test2(),
+    mySubsystem.test3(),
+    mySubsystem.test4(),
+    mySubsystem.test1()); // fresh Command from its factory so it doesn't conflict with other one
+test.schedule();
+
+bad example of the pitfall of not using command factories
+Command test = TriggeredDisjointSequence.sequence(
+    test1,
+    test2,
+    test3,
+    test4,
+    // reusing command test1 (which is NOT a best practice) so it has to be
+    // removed from the WrapperCommand group
+    runOnce(()->CommandScheduler.getInstance().removeComposedCommand(test1)),
+    test1);
+test.schedule();
+
+*/
 
 /**
  * A command group that runs a list of commands in sequence.
