@@ -15,7 +15,6 @@ apply from: '../shared/config.gradle'
 
 ext {
     sharedCvConfigs = [crossConnIntegrationTests: []]
-    staticCvConfigs = [:]
     useJava = false
     useCpp = true
     staticGtestConfigs = [crossConnIntegrationTests: []]

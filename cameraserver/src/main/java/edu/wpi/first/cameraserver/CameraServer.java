@@ -6,8 +6,6 @@ package edu.wpi.first.cameraserver;
 
 import edu.wpi.first.cscore.AxisCamera;
 import edu.wpi.first.cscore.CameraServerJNI;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.VideoEvent;
@@ -16,6 +14,7 @@ import edu.wpi.first.cscore.VideoListener;
 import edu.wpi.first.cscore.VideoMode;
 import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.cscore.VideoSource;
+import edu.wpi.first.cscore.raw.RawSource;
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.IntegerEntry;
@@ -675,125 +674,14 @@ public final class CameraServer {
    * @return The MJPEG server serving images from the given camera.
    */
   public static MjpegServer addSwitchedCamera(String name) {
-    // create a dummy CvSource
-    CvSource source = new CvSource(name, PixelFormat.kMJPEG, 160, 120, 30);
+    // create a dummy RawSource
+    RawSource source = new RawSource(name, PixelFormat.kMJPEG, 160, 120, 30);
     MjpegServer server = startAutomaticCapture(source);
     synchronized (CameraServer.class) {
       m_fixedSources.put(server.getHandle(), source.getHandle());
     }
 
     return server;
-  }
-
-  /**
-   * Get OpenCV access to the primary camera feed. This allows you to get images from the camera for
-   * image processing on the roboRIO.
-   *
-   * <p>This is only valid to call after a camera feed has been added with startAutomaticCapture()
-   * or addServer().
-   *
-   * @return OpenCV sink for the primary camera feed
-   */
-  public static CvSink getVideo() {
-    VideoSource source;
-    synchronized (CameraServer.class) {
-      if (m_primarySourceName == null) {
-        throw new VideoException("no camera available");
-      }
-      source = m_sources.get(m_primarySourceName);
-    }
-    if (source == null) {
-      throw new VideoException("no camera available");
-    }
-    return getVideo(source);
-  }
-
-  /**
-   * Get OpenCV access to the specified camera. This allows you to get images from the camera for
-   * image processing on the roboRIO.
-   *
-   * @param camera Camera (e.g. as returned by startAutomaticCapture).
-   * @return OpenCV sink for the specified camera
-   */
-  public static CvSink getVideo(VideoSource camera) {
-    String name = "opencv_" + camera.getName();
-
-    synchronized (CameraServer.class) {
-      VideoSink sink = m_sinks.get(name);
-      if (sink != null) {
-        VideoSink.Kind kind = sink.getKind();
-        if (kind != VideoSink.Kind.kCv) {
-          throw new VideoException("expected OpenCV sink, but got " + kind);
-        }
-        return (CvSink) sink;
-      }
-    }
-
-    CvSink newsink = new CvSink(name);
-    newsink.setSource(camera);
-    addServer(newsink);
-    return newsink;
-  }
-
-  /**
-   * Get OpenCV access to the specified camera. This allows you to get images from the camera for
-   * image processing on the roboRIO.
-   *
-   * @param camera Camera (e.g. as returned by startAutomaticCapture).
-   * @param pixelFormat Desired pixelFormat of the camera
-   * @return OpenCV sink for the specified camera
-   */
-  public static CvSink getVideo(VideoSource camera, PixelFormat pixelFormat) {
-    String name = "opencv_" + camera.getName();
-
-    synchronized (CameraServer.class) {
-      VideoSink sink = m_sinks.get(name);
-      if (sink != null) {
-        VideoSink.Kind kind = sink.getKind();
-        if (kind != VideoSink.Kind.kCv) {
-          throw new VideoException("expected OpenCV sink, but got " + kind);
-        }
-        return (CvSink) sink;
-      }
-    }
-
-    CvSink newsink = new CvSink(name, pixelFormat);
-    newsink.setSource(camera);
-    addServer(newsink);
-    return newsink;
-  }
-
-  /**
-   * Get OpenCV access to the specified camera. This allows you to get images from the camera for
-   * image processing on the roboRIO.
-   *
-   * @param name Camera name
-   * @return OpenCV sink for the specified camera
-   */
-  public static CvSink getVideo(String name) {
-    VideoSource source;
-    synchronized (CameraServer.class) {
-      source = m_sources.get(name);
-      if (source == null) {
-        throw new VideoException("could not find camera " + name);
-      }
-    }
-    return getVideo(source);
-  }
-
-  /**
-   * Create a MJPEG stream with OpenCV input. This can be called to pass custom annotated images to
-   * the dashboard.
-   *
-   * @param name Name to give the stream
-   * @param width Width of the image being sent
-   * @param height Height of the image being sent
-   * @return OpenCV source for the MJPEG stream
-   */
-  public static CvSource putVideo(String name, int width, int height) {
-    CvSource source = new CvSource(name, PixelFormat.kMJPEG, width, height, 30);
-    startAutomaticCapture(source);
-    return source;
   }
 
   /**
@@ -898,6 +786,41 @@ public final class CameraServer {
   public static void removeCamera(String name) {
     synchronized (CameraServer.class) {
       m_sources.remove(name);
+    }
+  }
+
+  public static class Internal {
+    public static VideoSource getInternalPrimarySource() {
+      synchronized (CameraServer.class) {
+        if (m_primarySourceName == null) {
+          throw new VideoException("no camera available");
+        }
+        return m_sources.get(m_primarySourceName);
+      }
+    }
+
+    public static VideoSource getInternalVideoSource(String name) {
+      synchronized (CameraServer.class) {
+        VideoSource source = m_sources.get(name);
+        if (source == null) {
+          throw new VideoException("could not find camera " + name);
+        }
+        return source;
+      }
+    }
+
+    public static VideoSink getInternalCvSink(String name) {
+      synchronized (CameraServer.class) {
+        VideoSink sink = m_sinks.get(name);
+        if (sink != null) {
+          VideoSink.Kind kind = sink.getKind();
+          if (kind != VideoSink.Kind.kCv) {
+            throw new VideoException("expected OpenCV sink, but got " + kind);
+          }
+          return sink;
+        }
+        return null;
+      }
     }
   }
 }

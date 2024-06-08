@@ -29,6 +29,7 @@ repoRootNameOverride {
 includeOtherLibs {
   ^Eigen/
   ^cameraserver/
+  ^cameraservercv/
   ^cscore
   ^fmt/
   ^gtest/
