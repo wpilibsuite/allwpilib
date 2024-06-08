@@ -1,0 +1,116 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Wed, 29 May 2024 16:29:55 -0700
+Subject: [PATCH 3/4] Use fmtlib
+
+---
+ include/.styleguide              |  1 +
+ include/sleipnir/util/Assert.hpp |  5 +++--
+ include/sleipnir/util/Print.hpp  | 27 ++++++++++++++-------------
+ 3 files changed, 18 insertions(+), 15 deletions(-)
+
+diff --git a/include/.styleguide b/include/.styleguide
+index f3b2f0cf9e60b3a86b9654ff2b381f9c48734ff6..8251a490677bcf5fd316d5303195b0fa4e599b75 100644
+--- a/include/.styleguide
++++ b/include/.styleguide
+@@ -8,4 +8,5 @@ cppSrcFileInclude {
+ 
+ includeOtherLibs {
+   ^Eigen/
++  ^fmt/
+ }
+diff --git a/include/sleipnir/util/Assert.hpp b/include/sleipnir/util/Assert.hpp
+index ba381ef8f48446e6d07b6d7973a8271cbda8fec9..9999544278c493f263c819811cb4fbcb407b04f1 100644
+--- a/include/sleipnir/util/Assert.hpp
++++ b/include/sleipnir/util/Assert.hpp
+@@ -3,8 +3,9 @@
+ #pragma once
+ 
+ #ifdef JORMUNGANDR
+-#include <format>
+ #include <stdexcept>
++
++#include <fmt/format.h>
+ /**
+  * Throw an exception in Python.
+  */
+@@ -12,7 +13,7 @@
+   do {                                                                         \
+     if (!(condition)) {                                                        \
+       throw std::invalid_argument(                                             \
+-          std::format("{}:{}: {}: Assertion `{}' failed.", __FILE__, __LINE__, \
++          fmt::format("{}:{}: {}: Assertion `{}' failed.", __FILE__, __LINE__, \
+                       __func__, #condition));                                  \
+     }                                                                          \
+   } while (0);
+diff --git a/include/sleipnir/util/Print.hpp b/include/sleipnir/util/Print.hpp
+index 339320bce6d017ca85025060ba445b2f025bb225..fcf2e69bfb5a081cd915bdded3caa80cd9c38518 100644
+--- a/include/sleipnir/util/Print.hpp
++++ b/include/sleipnir/util/Print.hpp
+@@ -2,52 +2,53 @@
+ 
+ #pragma once
+ 
+-#include <print>
+ #include <system_error>
+ #include <utility>
+ 
++#include <fmt/core.h>
++
+ namespace sleipnir {
+ 
+ /**
+- * Wrapper around std::print() that squelches write failure exceptions.
++ * Wrapper around fmt::print() that squelches write failure exceptions.
+  */
+ template <typename... T>
+-inline void print(std::format_string<T...> fmt, T&&... args) {
++inline void print(fmt::format_string<T...> fmt, T&&... args) {
+   try {
+-    std::print(fmt, std::forward<T>(args)...);
++    fmt::print(fmt, std::forward<T>(args)...);
+   } catch (const std::system_error&) {
+   }
+ }
+ 
+ /**
+- * Wrapper around std::print() that squelches write failure exceptions.
++ * Wrapper around fmt::print() that squelches write failure exceptions.
+  */
+ template <typename... T>
+-inline void print(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
++inline void print(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
+   try {
+-    std::print(f, fmt, std::forward<T>(args)...);
++    fmt::print(f, fmt, std::forward<T>(args)...);
+   } catch (const std::system_error&) {
+   }
+ }
+ 
+ /**
+- * Wrapper around std::println() that squelches write failure exceptions.
++ * Wrapper around fmt::println() that squelches write failure exceptions.
+  */
+ template <typename... T>
+-inline void println(std::format_string<T...> fmt, T&&... args) {
++inline void println(fmt::format_string<T...> fmt, T&&... args) {
+   try {
+-    std::println(fmt, std::forward<T>(args)...);
++    fmt::println(fmt, std::forward<T>(args)...);
+   } catch (const std::system_error&) {
+   }
+ }
+ 
+ /**
+- * Wrapper around std::println() that squelches write failure exceptions.
++ * Wrapper around fmt::println() that squelches write failure exceptions.
+  */
+ template <typename... T>
+-inline void println(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
++inline void println(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
+   try {
+-    std::println(f, fmt, std::forward<T>(args)...);
++    fmt::println(f, fmt, std::forward<T>(args)...);
+   } catch (const std::system_error&) {
+   }
+ }
