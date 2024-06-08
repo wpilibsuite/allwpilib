@@ -145,7 +145,7 @@ public interface Struct<T> {
     }
   }
 
-  /*
+  /**
    * Returns whether or not objects are immutable. Immutable objects must also be comparable using
    * the equals() method. Default implementation returns false.
    *
