@@ -208,22 +208,23 @@ public class Unit<U extends Unit<U>> {
     return m_one;
   }
 
-  /**
-   * Creates a velocity unit derived from this one. Can be chained to denote velocity, acceleration,
-   * jerk, etc.
-   *
-   * <pre>
-   *   Meters.per(Second) // linear velocity
-   *   Kilograms.per(Second) // mass flow
-   *   Feet.per(Second).per(Second).of(32) // roughly 1G of acceleration
-   * </pre>
-   *
-   * @param period the time period of the velocity, such as seconds or milliseconds
-   * @return a velocity unit corresponding to the rate of change of this unit over time
-   */
-  public Velocity<U> per(Time period) {
-    return Velocity.combine(this, period);
-  }
+  // /**
+  //  * Creates a velocity unit derived from this one. Can be chained to denote velocity,
+  // acceleration,
+  //  * jerk, etc.
+  //  *
+  //  * <pre>
+  //  *   Meters.per(Second) // linear velocity
+  //  *   Kilograms.per(Second) // mass flow
+  //  *   Feet.per(Second).per(Second).of(32) // roughly 1G of acceleration
+  //  * </pre>
+  //  *
+  //  * @param period the time period of the velocity, such as seconds or milliseconds
+  //  * @return a velocity unit corresponding to the rate of change of this unit over time
+  //  */
+  // public Velocity<U> per(Time period) {
+  //   return Velocity.combine(this, period);
+  // }
 
   /**
    * Takes this unit and creates a new proportional unit where this unit is the numerator and the

@@ -124,90 +124,86 @@ public final class Units {
    * The standard SI unit of linear velocity, equivalent to travelling at a rate of one {@link
    * #Meters Meter} per {@link #Second}.
    */
-  public static final Velocity<Distance> MetersPerSecond = Meters.per(Second);
+  public static final LinearVelocity MetersPerSecond = Meters.per(Second);
 
   /**
    * A unit of linear velocity equivalent to travelling at a rate one {@link #Feet Foot} per {@link
    * #Second}.
    */
-  public static final Velocity<Distance> FeetPerSecond = Feet.per(Second);
+  public static final LinearVelocity FeetPerSecond = Feet.per(Second);
 
   /**
    * A unit of linear velocity equivalent to travelling at a rate of one {@link #Inches Inch} per
    * {@link #Second}.
    */
-  public static final Velocity<Distance> InchesPerSecond = Inches.per(Second);
+  public static final LinearVelocity InchesPerSecond = Inches.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Revolutions
    * Revolution} per {@link #Second}.
    */
-  public static final Velocity<Angle> RevolutionsPerSecond = Revolutions.per(Second);
+  public static final AngularVelocity RevolutionsPerSecond = Revolutions.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Rotations Rotation}
    * per {@link #Second}.
    */
-  public static final Velocity<Angle> RotationsPerSecond = Rotations.per(Second);
+  public static final AngularVelocity RotationsPerSecond = Rotations.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Rotations Rotation}
    * per {@link #Minute}. Motor spec sheets often list maximum speeds in terms of RPM.
    */
-  public static final Velocity<Angle> RPM = Rotations.per(Minute);
+  public static final AngularVelocity RPM = Rotations.per(Minute);
 
   /**
    * The standard SI unit of angular velocity, equivalent to spinning at a rate of one {@link
    * #Radians Radian} per {@link #Second}.
    */
-  public static final Velocity<Angle> RadiansPerSecond = Radians.per(Second);
+  public static final AngularVelocity RadiansPerSecond = Radians.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Degrees Degree} per
    * {@link #Second}.
    */
-  public static final Velocity<Angle> DegreesPerSecond = Degrees.per(Second);
+  public static final AngularVelocity DegreesPerSecond = Degrees.per(Second);
 
   // Acceleration
   /**
    * The standard SI unit of linear acceleration, equivalent to accelerating at a rate of one {@link
    * #Meters Meter} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Distance>> MetersPerSecondPerSecond =
-      MetersPerSecond.per(Second);
+  public static final LinearAcceleration MetersPerSecondPerSecond = MetersPerSecond.per(Second);
 
   /**
    * A unit of linear acceleration equivalent to accelerating at a rate of one {@link #Foot Foot}
    * per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Distance>> FeetPerSecondPerSecond =
-      FeetPerSecond.per(Second);
+  public static final LinearAcceleration FeetPerSecondPerSecond = FeetPerSecond.per(Second);
 
   /**
    * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Rotations
    * Rotation} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Angle>> RotationsPerSecondPerSecond =
+  public static final AngularAcceleration RotationsPerSecondPerSecond =
       RotationsPerSecond.per(Second);
 
   /**
    * The standard SI unit of angular acceleration, equivalent to accelerating at a rate of one
    * {@link #Radians Radian} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Angle>> RadiansPerSecondPerSecond =
-      RadiansPerSecond.per(Second);
+  public static final AngularAcceleration RadiansPerSecondPerSecond = RadiansPerSecond.per(Second);
 
   /**
    * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Degrees
    * Degree} per {@link #Second} every second.
    */
-  public static final Velocity<Velocity<Angle>> DegreesPerSecondPerSecond =
-      DegreesPerSecond.per(Second);
+  public static final AngularAcceleration DegreesPerSecondPerSecond = DegreesPerSecond.per(Second);
 
   /**
    * A unit of acceleration equivalent to the pull of gravity on an object at sea level on Earth.
    */
-  public static final Velocity<Velocity<Distance>> Gs =
+  public static final LinearAcceleration Gs =
       derive(MetersPerSecondPerSecond).aggregate(9.80665).named("G").symbol("G").make();
 
   // Mass
@@ -245,10 +241,20 @@ public final class Units {
   /** 1/16 of a {@link #Pound}. */
   public static final Mass Ounce = Ounces; // alias
 
-  // Moment of Inertia
-  /** The base SI unit for moment of inertia. */
-  public static final Mult<Mult<Mass, Distance>, Distance> KilogramSquareMeters =
-      Kilograms.mult(Meters).mult(Meters);
+  // Force
+  /** The base SI unit for force. */
+  public static final Force Newtons =
+      derive(Kilograms.times(MetersPerSecondPerSecond)).named("Newton").symbol("N").make();
+
+  /** Singular alias for Newtons. */
+  public static final Force Newton = Newtons; // alias;
+
+  /** A unit of force equivalent to 4.448222 {@link #Newtons}. */
+  public static final Force PoundsForce =
+      derive(Newtons).aggregate(4.448222).named("Pounds-Force").symbol("lb.").make();
+
+  /** Singular alias for PoundsForce. */
+  public static final Force PoundForce = PoundsForce; // alias;
 
   // Unitless
   /** A dimensionless unit that performs no scaling whatsoever. */
@@ -260,25 +266,6 @@ public final class Units {
    */
   public static final Dimensionless Percent =
       derive(Value).splitInto(100).named("Percent").symbol("%").make();
-
-  // Voltage
-  /** The base unit of electric potential. */
-  public static final Voltage Volts = BaseUnits.Voltage;
-
-  /** The base unit of electric potential. */
-  public static final Voltage Volt = Volts; // alias
-
-  /**
-   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
-   * or low-power circuits.
-   */
-  public static final Voltage Millivolts = Milli(Volts);
-
-  /**
-   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
-   * or low-power circuits.
-   */
-  public static final Voltage Millivolt = Millivolts; // alias
 
   // Current
   /** The base unit of electrical current. */
@@ -301,7 +288,8 @@ public final class Units {
 
   // Energy
   /** The base unit of energy. */
-  public static final Energy Joules = BaseUnits.Energy;
+  public static final Energy Joules =
+      derive(Newtons.times(Meters)).named("Joule").symbol("J").make();
 
   /** The base unit of energy. */
   public static final Energy Joule = Joules; // alias
@@ -328,9 +316,20 @@ public final class Units {
    */
   public static final Energy Kilojoule = Kilojoules; // alias
 
+  /** A unit of energy equal to 1.355818 Joules. */
+  public static final Energy FootPounds =
+      derive(Joules).aggregate(1.355818).named("Foot-Pounds").symbol("ft-lb").make();
+
+  /** Singular alias for FootPounds. */
+  public static final Energy FootPound = FootPounds;
+
+  /** A unit of energy equal to 0.1129848 Joules */
+  public static final Energy InchPounds =
+      derive(Joules).aggregate(0.1129848).named("Inch-Pounds").symbol("in-lb").make();
+
   // Power
   /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
-  public static final Power Watts = BaseUnits.Power;
+  public static final Power Watts = derive(Joules.per(Seconds)).named("Watt").symbol("W").make();
 
   /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
   public static final Power Watt = Watts; // alias
@@ -350,7 +349,26 @@ public final class Units {
    * motors.
    */
   public static final Power Horsepower =
-      derive(Watts).aggregate(745.7).named("Horsepower").symbol("HP").make();
+      derive(Watts).aggregate(745.7).named("Horsepower").symbol("hp").make();
+
+  // Voltage
+  /** The base unit of electric potential. */
+  public static final Voltage Volts = derive(Watts.per(Amps)).named("Volt").symbol("V").make();
+
+  /** The base unit of electric potential. */
+  public static final Voltage Volt = Volts; // alias
+
+  /**
+   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
+   * or low-power circuits.
+   */
+  public static final Voltage Millivolts = Milli(Volts);
+
+  /**
+   * 1/1000 of a {@link #Volt}. Useful when dealing with low-voltage applications like LED drivers
+   * or low-power circuits.
+   */
+  public static final Voltage Millivolt = Millivolts; // alias
 
   // Temperature
   /**
@@ -380,34 +398,77 @@ public final class Units {
           .symbol("°F")
           .make();
 
+  // Linear Momentum
+  /** The base unit of linear momentum. */
+  public static final LinearMomentum KilogramMetersPerSecond = Kilogram.times(MetersPerSecond);
+
+  // Angular Momentum
+  /** The base unit of angular momentum. */
+  public static final AngularMomentum KilogramMetersSquaredPerSecond =
+      KilogramMetersPerSecond.times(Meters);
+
+  // Moment of Inertia
+  /** The base SI unit for moment of inertia. */
+  public static final MomentOfInertia KilogramSquareMeters =
+      derive(KilogramMetersSquaredPerSecond.per(RadiansPerSecond))
+          .aggregate(1)
+          .named("Kilogram-Meters-Squared")
+          .symbol("Kg-m²")
+          .make();
+
+  // Torque
+  /** The base SI unit for torque. */
+  public static final Torque NewtonMeters =
+      derive(KilogramSquareMeters.times(RadiansPerSecondPerSecond))
+          .named("Newton-Meters")
+          .symbol("Nm")
+          .make();
+
+  /** Singular alias for NewtonMeters. */
+  public static final Torque NewtonMeter = NewtonMeters; // alias;
+
+  /** A unit of torque equivalent to 1.355818 {@link #NewtonMeters}. */
+  public static final Torque PoundFeet =
+      derive(NewtonMeters).aggregate(1.355818).named("Pound-Feet").symbol("lb-ft").make();
+
+  /** Singular alias for PoundFeet. */
+  public static final Torque PoundFoot = PoundFeet;
+
+  /** A unit of torque equivalent to 0.1129848 {@link #NewtonMeters}. */
+  public static final Torque PoundInches =
+      derive(NewtonMeters).aggregate(0.1129848).named("Pound-Inches").symbol("lb-in").make();
+
+  /** Singular alias for PoundInches. */
+  public static final Torque PoundInch = PoundInches;
+
   // Standard feedforward units for kV and kA.
   // kS and kG are just volts, which is already defined earlier
   /**
    * A standard unit for measuring linear mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded linear velocity.
    */
-  public static final Per<Voltage, Velocity<Distance>> VoltsPerMeterPerSecond =
+  public static final Per<Voltage, LinearVelocity> VoltsPerMeterPerSecond =
       Volts.per(MetersPerSecond);
 
   /**
    * A standard unit for measuring linear mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded linear acceleration.
    */
-  public static final Per<Voltage, Velocity<Velocity<Distance>>> VoltsPerMeterPerSecondSquared =
+  public static final Per<Voltage, LinearAcceleration> VoltsPerMeterPerSecondSquared =
       Volts.per(MetersPerSecondPerSecond);
 
   /**
    * A standard unit for measuring angular mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded angular velocity.
    */
-  public static final Per<Voltage, Velocity<Angle>> VoltsPerRadianPerSecond =
+  public static final Per<Voltage, AngularVelocity> VoltsPerRadianPerSecond =
       Volts.per(RadiansPerSecond);
 
   /**
    * A standard unit for measuring angular mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded angular acceleration.
    */
-  public static final Per<Voltage, Velocity<Velocity<Angle>>> VoltsPerRadianPerSecondSquared =
+  public static final Per<Voltage, AngularAcceleration> VoltsPerRadianPerSecondSquared =
       Volts.per(RadiansPerSecond.per(Second));
 
   /**

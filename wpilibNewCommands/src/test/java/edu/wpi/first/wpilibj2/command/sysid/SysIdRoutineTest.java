@@ -120,7 +120,7 @@ class SysIdRoutineTest {
     runCommand(m_quasistaticReverse);
     orderCheck = inOrder(m_mechanism);
 
-    orderCheck.verify(m_mechanism, atLeastOnce()).drive(Volts.of(-1));
+    orderCheck.verify(m_mechanism, atLeastOnce()).drive(Volts.of(-1).mutableCopy());
     orderCheck.verify(m_mechanism).drive(Volts.of(0));
     orderCheck.verify(m_mechanism, never()).drive(any());
 

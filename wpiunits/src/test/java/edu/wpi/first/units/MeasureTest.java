@@ -94,7 +94,6 @@ class MeasureTest {
     var measure = Units.Kilograms.of(144);
     var result = measure.per(Units.Millisecond);
 
-    assertEquals(Velocity.class, result.unit().getClass());
     assertEquals(144_000.0, result.baseUnitMagnitude(), 1e-5);
     assertEquals(Units.Kilograms.per(Units.Milliseconds), result.unit());
   }
@@ -171,8 +170,8 @@ class MeasureTest {
     assertEquals(m1.divide(m2).magnitude(), 2);
     assertEquals(result.unit(), Units.Meters);
     // Velocity divide
-    var m3 = Units.Meters.of(8);
-    var m4 = Units.Meters.per(Units.Second).of(4);
+    Measure<Distance> m3 = Units.Meters.of(8);
+    Measure<LinearVelocity> m4 = Units.Meters.per(Units.Second).of(4);
     result = m3.divide(m4);
     assertEquals(result.magnitude(), 2);
     assertEquals(result.unit(), Units.Second);

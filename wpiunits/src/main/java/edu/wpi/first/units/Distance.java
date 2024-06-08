@@ -26,4 +26,49 @@ public class Distance extends Unit<Distance> {
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
+
+  /**
+   * Creates a linear velocity unit derived from this one. Can be chained to denote velocity,
+   * acceleration, jerk, etc.
+   *
+   * <pre>
+   *   Meters.per(Second) // linear velocity
+   *   Feet.per(Second).per(Second).of(32) // roughly 1G of acceleration
+   * </pre>
+   *
+   * @param period the time period of the velocity, such as seconds or milliseconds
+   * @return a linear velocity unit corresponding to the rate of change of distance over time
+   */
+  public LinearVelocity per(Time period) {
+    return LinearVelocity.combine(this, period);
+  }
+
+  /**
+   * Creates an energy unit derived from this one.
+   *
+   * <pre>
+   *   Meters.times(Newtons) // force
+   *   Centimeters.times(Newtons) // force
+   * </pre>
+   *
+   * @param force the force applied at this distance.
+   * @return an energy unit corresponding to force times distance.
+   */
+  public Energy times(Force force) {
+    return Energy.combine(force, this);
+  }
+
+  /**
+   * Creates an angular momentum unit derived from this one.
+   *
+   * <pre>
+   *   Meters.times(KilogramMetersPerSecond) // angular momentum
+   * </pre>
+   *
+   * @param linearMomentum the linear momentum acting at this position.
+   * @return an angular momentum unit corresponding to distance times linear momentum.
+   */
+  public AngularMomentum times(LinearMomentum linearMomentum) {
+    return AngularMomentum.combine(this, linearMomentum);
+  }
 }

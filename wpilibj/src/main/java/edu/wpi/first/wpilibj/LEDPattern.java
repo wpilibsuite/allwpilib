@@ -12,9 +12,10 @@ import static edu.wpi.first.units.Units.Value;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.LinearVelocity;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Per;
 import edu.wpi.first.units.Time;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.collections.LongToObjectHashMap;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.util.Color;
@@ -186,7 +187,7 @@ public interface LEDPattern {
    *     scroll along the length of LEDs and return back to the starting position
    * @return the scrolling pattern
    */
-  default LEDPattern scrollAtRelativeSpeed(Measure<Velocity<Dimensionless>> velocity) {
+  default LEDPattern scrollAtRelativeSpeed(Measure<Per<Dimensionless, Time>> velocity) {
     final double periodMicros = 1 / velocity.in(Value.per(Microsecond));
 
     return (reader, writer) -> {
@@ -233,7 +234,7 @@ public interface LEDPattern {
    * @return the scrolling pattern
    */
   default LEDPattern scrollAtAbsoluteSpeed(
-      Measure<Velocity<Distance>> velocity, Measure<Distance> ledSpacing) {
+      Measure<LinearVelocity> velocity, Measure<Distance> ledSpacing) {
     // eg velocity = 10 m/s, spacing = 0.01m
     // meters per micro = 1e-5 m/us
     // micros per LED = 1e-2 m / (1e-5 m/us) = 1e-3 us

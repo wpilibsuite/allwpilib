@@ -125,7 +125,7 @@ class UnitsTest {
     testBaseUnit(MetersPerSecondPerSecond);
     assertEquals("Meter per Second per Second", MetersPerSecondPerSecond.name());
     assertEquals("m/s/s", MetersPerSecondPerSecond.symbol());
-    assertEquals(MetersPerSecond, MetersPerSecondPerSecond.getUnit());
+    assertEquals(MetersPerSecond, MetersPerSecondPerSecond.getLinearVelocity());
     assertEquals(Seconds, MetersPerSecondPerSecond.getPeriod());
   }
 
@@ -135,7 +135,7 @@ class UnitsTest {
     assertEquals(9.80665, Gs.of(1).in(MetersPerSecondPerSecond), thresh);
     assertEquals("G", Gs.name());
     assertEquals("G", Gs.symbol());
-    assertEquals(MetersPerSecond, Gs.getUnit());
+    assertEquals(MetersPerSecond, Gs.getLinearVelocity());
     assertEquals(Seconds, Gs.getPeriod());
   }
 
@@ -293,7 +293,7 @@ class UnitsTest {
   void testHorsepower() {
     assertEquals(745.7, Watts.convertFrom(1, Horsepower), thresh);
     assertEquals("Horsepower", Horsepower.name());
-    assertEquals("HP", Horsepower.symbol());
+    assertEquals("hp", Horsepower.symbol());
   }
 
   // Temperature

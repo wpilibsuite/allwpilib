@@ -12,8 +12,8 @@ import static java.util.Map.entry;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Per;
 import edu.wpi.first.units.Time;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -62,7 +62,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
   /** Hardware-independent configuration for a SysId test routine. */
   public static class Config {
     /** The voltage ramp rate used for quasistatic test routines. */
-    public final Measure<Velocity<Voltage>> m_rampRate;
+    public final Measure<Per<Voltage, Time>> m_rampRate;
 
     /** The step voltage output used for dynamic test routines. */
     public final Measure<Voltage> m_stepVoltage;
@@ -87,7 +87,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     logged in WPILog.
      */
     public Config(
-        Measure<Velocity<Voltage>> rampRate,
+        Measure<Per<Voltage, Time>> rampRate,
         Measure<Voltage> stepVoltage,
         Measure<Time> timeout,
         Consumer<State> recordState) {
@@ -108,7 +108,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     null.
      */
     public Config(
-        Measure<Velocity<Voltage>> rampRate, Measure<Voltage> stepVoltage, Measure<Time> timeout) {
+        Measure<Per<Voltage, Time>> rampRate, Measure<Voltage> stepVoltage, Measure<Time> timeout) {
       this(rampRate, stepVoltage, timeout, null);
     }
 
