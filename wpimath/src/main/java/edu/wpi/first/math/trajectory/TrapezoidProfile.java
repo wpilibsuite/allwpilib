@@ -6,6 +6,11 @@ package edu.wpi.first.math.trajectory;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.units.AngularAcceleration;
+import edu.wpi.first.units.AngularVelocity;
+import edu.wpi.first.units.LinearAcceleration;
+import edu.wpi.first.units.LinearVelocity;
+import edu.wpi.first.units.Measure;
 import java.util.Objects;
 
 /**
@@ -67,6 +72,28 @@ public class TrapezoidProfile {
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
       MathSharedStore.reportUsage(MathUsageId.kTrajectory_TrapezoidProfile, 1);
+    }
+
+    /**
+     * Constructs constraints for a TrapezoidProfile for a linear system.
+     *
+     * @param maxVelocity maximum linear velocity
+     * @param maxAcceleration maximum linear acceleration
+     */
+    public static Constraints createLinearConstraints(
+        Measure<LinearVelocity> maxVelocity, Measure<LinearAcceleration> maxAcceleration) {
+      return new Constraints(maxVelocity.baseUnitMagnitude(), maxAcceleration.baseUnitMagnitude());
+    }
+
+    /**
+     * Constructs constraints for a TrapezoidProfile for a linear system.
+     *
+     * @param maxVelocity maximum linear velocity
+     * @param maxAcceleration maximum linear acceleration
+     */
+    public static Constraints createAngularConstraints(
+        Measure<AngularVelocity> maxVelocity, Measure<AngularAcceleration> maxAcceleration) {
+      return new Constraints(maxVelocity.baseUnitMagnitude(), maxAcceleration.baseUnitMagnitude());
     }
   }
 
