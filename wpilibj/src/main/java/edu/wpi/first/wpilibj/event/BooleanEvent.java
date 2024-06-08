@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.event;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 
@@ -29,9 +28,6 @@ public class BooleanEvent implements BooleanSupplier {
   /** Condition. */
   private final BooleanSupplier m_signal;
 
-  /** The state of the condition in the current loop poll. Nightmare to manage. */
-  private final AtomicBoolean m_state = new AtomicBoolean(false);
-
   /**
    * Creates a new event with the given signal determining whether it is active.
    *
@@ -41,19 +37,16 @@ public class BooleanEvent implements BooleanSupplier {
   public BooleanEvent(EventLoop loop, BooleanSupplier signal) {
     m_loop = requireNonNullParam(loop, "loop", "BooleanEvent");
     m_signal = requireNonNullParam(signal, "signal", "BooleanEvent");
-    m_state.set(m_signal.getAsBoolean());
-    m_loop.bind(() -> m_state.set(m_signal.getAsBoolean()));
   }
 
   /**
-   * Check the state of this signal (high or low) as of the last loop poll.
+   * Check the state of this signal (high or low).
    *
-   * @return true for the high state, false for the low state. If the event was never polled, it
-   *     returns the state at event construction.
+   * @return true for the high state, false for the low state.
    */
   @Override
   public final boolean getAsBoolean() {
-    return m_state.get();
+    return m_signal.getAsBoolean();
   }
 
   /**
@@ -64,14 +57,15 @@ public class BooleanEvent implements BooleanSupplier {
   public final void ifHigh(Runnable action) {
     m_loop.bind(
         () -> {
-          if (m_state.get()) {
+          if (m_signal.getAsBoolean()) {
             action.run();
           }
         });
   }
 
   /**
-   * Get a new event that events only when this one newly changes to true.
+   * Get a new event that triggers only when this one newly changes to true. Binding multiple
+   * actions to the returned event will not trigger all of them, instead, create multiple events.
    *
    * @return a new event representing when this one newly changes to true.
    */
@@ -79,11 +73,11 @@ public class BooleanEvent implements BooleanSupplier {
     return new BooleanEvent(
         m_loop,
         new BooleanSupplier() {
-          private boolean m_previous = m_state.get();
+          private boolean m_previous = m_signal.getAsBoolean();
 
           @Override
           public boolean getAsBoolean() {
-            boolean present = m_state.get();
+            boolean present = m_signal.getAsBoolean();
             boolean ret = !m_previous && present;
             m_previous = present;
             return ret;
@@ -92,7 +86,8 @@ public class BooleanEvent implements BooleanSupplier {
   }
 
   /**
-   * Get a new event that triggers only when this one newly changes to false.
+   * Get a new event that triggers only when this one newly changes to false. Binding multiple
+   * actions to the returned event will not trigger all of them, instead, create multiple events.
    *
    * @return a new event representing when this one newly changes to false.
    */
@@ -100,11 +95,11 @@ public class BooleanEvent implements BooleanSupplier {
     return new BooleanEvent(
         m_loop,
         new BooleanSupplier() {
-          private boolean m_previous = m_state.get();
+          private boolean m_previous = m_signal.getAsBoolean();
 
           @Override
           public boolean getAsBoolean() {
-            boolean present = m_state.get();
+            boolean present = m_signal.getAsBoolean();
             boolean ret = m_previous && !present;
             m_previous = present;
             return ret;
@@ -139,7 +134,7 @@ public class BooleanEvent implements BooleanSupplier {
 
           @Override
           public boolean getAsBoolean() {
-            return m_debouncer.calculate(m_state.get());
+            return m_debouncer.calculate(m_signal.getAsBoolean());
           }
         });
   }
@@ -151,37 +146,35 @@ public class BooleanEvent implements BooleanSupplier {
    * @return the negated event
    */
   public BooleanEvent negate() {
-    return new BooleanEvent(m_loop, () -> !m_state.get());
+    return new BooleanEvent(m_loop, () -> !m_signal.getAsBoolean());
   }
 
   /**
    * Composes this event with another event, returning a new signal that is in the high state when
    * both signals are in the high state.
    *
-   * <p>The events must use the same event loop. If the events use different event loops, the
-   * composed signal won't update until both loops are polled.
+   * <p>The new event will use this event's polling loop.
    *
    * @param other the event to compose with
    * @return the event that is active when both events are active
    */
   public BooleanEvent and(BooleanSupplier other) {
     requireNonNullParam(other, "other", "and");
-    return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean());
+    return new BooleanEvent(m_loop, () -> m_signal.getAsBoolean() && other.getAsBoolean());
   }
 
   /**
    * Composes this event with another event, returning a new signal that is high when either signal
    * is high.
    *
-   * <p>The events must use the same event loop. If the events use different event loops, the
-   * composed signal won't update until both loops are polled.
+   * <p>The new event will use this event's polling loop.
    *
    * @param other the event to compose with
    * @return a signal that is high when either signal is high.
    */
   public BooleanEvent or(BooleanSupplier other) {
     requireNonNullParam(other, "other", "or");
-    return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean());
+    return new BooleanEvent(m_loop, () -> m_signal.getAsBoolean() || other.getAsBoolean());
   }
 
   /**
@@ -194,6 +187,6 @@ public class BooleanEvent implements BooleanSupplier {
    * @return an instance of the subclass.
    */
   public <T extends BooleanSupplier> T castTo(BiFunction<EventLoop, BooleanSupplier, T> ctor) {
-    return ctor.apply(m_loop, m_state::get);
+    return ctor.apply(m_loop, m_signal);
   }
 }
