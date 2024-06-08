@@ -27,43 +27,24 @@ public class Lexer {
     } while (m_current == ' ' || m_current == '\t' || m_current == '\n' || m_current == '\r');
     m_tokenStart = m_pos - 1;
 
-    switch (m_current) {
-      case '[':
-        return TokenKind.kLeftBracket;
-      case ']':
-        return TokenKind.kRightBracket;
-      case '{':
-        return TokenKind.kLeftBrace;
-      case '}':
-        return TokenKind.kRightBrace;
-      case ':':
-        return TokenKind.kColon;
-      case ';':
-        return TokenKind.kSemicolon;
-      case ',':
-        return TokenKind.kComma;
-      case '=':
-        return TokenKind.kEquals;
-      case '-':
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-        return scanInteger();
-      case '\0':
-        return TokenKind.kEndOfInput;
-      default:
+    return switch (m_current) {
+      case '[' -> TokenKind.kLeftBracket;
+      case ']' -> TokenKind.kRightBracket;
+      case '{' -> TokenKind.kLeftBrace;
+      case '}' -> TokenKind.kRightBrace;
+      case ':' -> TokenKind.kColon;
+      case ';' -> TokenKind.kSemicolon;
+      case ',' -> TokenKind.kComma;
+      case '=' -> TokenKind.kEquals;
+      case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> scanInteger();
+      case '\0' -> TokenKind.kEndOfInput;
+      default -> {
         if (Character.isLetter(m_current) || m_current == '_') {
-          return scanIdentifier();
+          yield scanIdentifier();
         }
-        return TokenKind.kUnknown;
-    }
+        yield TokenKind.kUnknown;
+      }
+    };
   }
 
   /**

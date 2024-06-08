@@ -137,34 +137,17 @@ public final class DriverStation {
 
     private void sendMatchData() {
       AllianceStationID allianceID = DriverStationJNI.getAllianceStation();
-      boolean isRedAlliance = false;
-      int stationNumber = 1;
-      switch (allianceID) {
-        case Blue1:
-          isRedAlliance = false;
-          stationNumber = 1;
-          break;
-        case Blue2:
-          isRedAlliance = false;
-          stationNumber = 2;
-          break;
-        case Blue3:
-          isRedAlliance = false;
-          stationNumber = 3;
-          break;
-        case Red1:
-          isRedAlliance = true;
-          stationNumber = 1;
-          break;
-        case Red2:
-          isRedAlliance = true;
-          stationNumber = 2;
-          break;
-        default:
-          isRedAlliance = true;
-          stationNumber = 3;
-          break;
-      }
+      final int stationNumber =
+          switch (allianceID) {
+            case Blue1, Red1 -> 1;
+            case Blue2, Red2 -> 2;
+            case Blue3, Red3, Unknown -> 3;
+          };
+      final boolean isRedAlliance =
+          switch (allianceID) {
+            case Blue1, Blue2, Blue3 -> false;
+            case Red1, Red2, Red3, Unknown -> true;
+          };
 
       String currentEventName;
       String currentGameSpecificMessage;
@@ -1059,16 +1042,12 @@ public final class DriverStation {
     } finally {
       m_cacheDataMutex.unlock();
     }
-    switch (matchType) {
-      case 1:
-        return MatchType.Practice;
-      case 2:
-        return MatchType.Qualification;
-      case 3:
-        return MatchType.Elimination;
-      default:
-        return MatchType.None;
-    }
+    return switch (matchType) {
+      case 1 -> MatchType.Practice;
+      case 2 -> MatchType.Qualification;
+      case 3 -> MatchType.Elimination;
+      default -> MatchType.None;
+    };
   }
 
   /**

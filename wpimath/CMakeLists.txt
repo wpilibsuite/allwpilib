@@ -19,13 +19,14 @@ protobuf_generate_cpp(
 
 file(
     GLOB wpimath_jni_src
-    src/main/native/cpp/jni/WPIMathJNI_ArmFeedforward.cpp
-    src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
-    src/main/native/cpp/jni/WPIMathJNI_Eigen.cpp
-    src/main/native/cpp/jni/WPIMathJNI_Exceptions.cpp
-    src/main/native/cpp/jni/WPIMathJNI_Pose3d.cpp
-    src/main/native/cpp/jni/WPIMathJNI_StateSpaceUtil.cpp
-    src/main/native/cpp/jni/WPIMathJNI_Trajectory.cpp
+    src/main/native/cpp/jni/ArmFeedforwardJNI.cpp
+    src/main/native/cpp/jni/DAREJNI.cpp
+    src/main/native/cpp/jni/EigenJNI.cpp
+    src/main/native/cpp/jni/Ellipse2dJNI.cpp
+    src/main/native/cpp/jni/Exceptions.cpp
+    src/main/native/cpp/jni/Pose3dJNI.cpp
+    src/main/native/cpp/jni/StateSpaceUtilJNI.cpp
+    src/main/native/cpp/jni/TrajectoryUtilJNI.cpp
 )
 
 # Java bindings

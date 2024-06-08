@@ -96,25 +96,23 @@ void DataLogReaderThread::ReadMain() {
     if (data.empty()) {
       continue;
     }
-    if (wpi::starts_with(name, "NT:")) {
-      name = wpi::drop_front(name, 3);
+    if (auto strippedName = wpi::remove_prefix(name, "NT:")) {
+      name = *strippedName;
     }
-    if (wpi::starts_with(name, "/.schema/struct:")) {
-      auto typeStr = wpi::drop_front(name, 16);
+    if (auto typeStr = wpi::remove_prefix(name, "/.schema/struct:")) {
       std::string_view schema{reinterpret_cast<const char*>(data.data()),
                               data.size()};
       std::string err;
-      auto desc = m_structDb.Add(typeStr, schema, &err);
+      auto desc = m_structDb.Add(*typeStr, schema, &err);
       if (!desc) {
         wpi::print("could not decode struct '{}' schema '{}': {}\n", name,
                    schema, err);
       }
-    } else if (wpi::starts_with(name, "/.schema/proto:")) {
+    } else if (auto filename = wpi::remove_prefix(name, "/.schema/proto:")) {
       // protobuf descriptor handling
-      auto filename = wpi::drop_front(name, 15);
-      if (!m_protoDb.Add(filename, data)) {
+      if (!m_protoDb.Add(*filename, data)) {
         wpi::print("could not decode protobuf '{}' filename '{}'\n", name,
-                   filename);
+                   *filename);
       }
     }
   }

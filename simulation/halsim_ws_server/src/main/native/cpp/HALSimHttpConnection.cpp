@@ -169,14 +169,13 @@ void HALSimHttpConnection::ProcessRequest() {
       !wpi::contains(path, "..") && !wpi::contains(path, "//")) {
     // convert to fs native representation
     fs::path nativePath;
-    if (wpi::starts_with(path, "/user/")) {
-      nativePath =
-          fs::path{m_server->GetWebrootSys()} /
-          fs::path{wpi::drop_front(path, 6), fs::path::format::generic_format};
+    if (auto userPath = wpi::remove_prefix(path, "/user/")) {
+      nativePath = fs::path{m_server->GetWebrootSys()} /
+                   fs::path{*userPath, fs::path::format::generic_format};
     } else {
       nativePath =
           fs::path{m_server->GetWebrootSys()} /
-          fs::path{wpi::drop_front(path, 1), fs::path::format::generic_format};
+          fs::path{wpi::drop_front(path), fs::path::format::generic_format};
     }
 
     if (fs::is_directory(nativePath)) {
