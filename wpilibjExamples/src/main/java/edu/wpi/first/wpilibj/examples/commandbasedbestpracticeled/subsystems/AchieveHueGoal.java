@@ -39,12 +39,12 @@ public class AchieveHueGoal {
   // This is handled in RobotContainer.java and this class shouldn't even know that to be
   // able to comment here on how the setpoint is determined.
 
-  private final double m_kP = 0.025;
-  private final double m_kI = 0.0;
-  private final double m_kD = 0.0;
-  private final PIDController m_HueController = new PIDController(m_kP, m_kI, m_kD);
-  private final double m_minimumHue = 0.0;
-  private final double m_maximumHue = 180.0;
+  private static final double m_kP = 0.025;
+  private static final double m_kI = 0.0;
+  private static final double m_kD = 0.0;
+  private final PIDController m_hueController = new PIDController(m_kP, m_kI, m_kD);
+  private static final double m_minimumHue = 0.0;
+  private static final double m_maximumHue = 180.0;
   // initialize setpoint (goal) such that the controller doesn't start until setpoint is set
   private double m_hueSetpoint = Double.NaN;
   private double m_currentStateHue = 0.0; // also considered the initial and previous state
@@ -71,7 +71,7 @@ public class AchieveHueGoal {
   public final Trigger atHueGoal = new Trigger(this::isAtHueGoal);
 
   private boolean isAtHueGoal() {
-    return m_HueController.atSetpoint();
+    return m_hueController.atSetpoint();
   }
 
   /**
@@ -91,12 +91,12 @@ public class AchieveHueGoal {
       // so the signals stay at their initial state (assumed off) until a setpoint set.
       m_currentStateHue =
           MathUtil.clamp(
-              m_currentStateHue + m_HueController.calculate(m_currentStateHue, m_hueSetpoint),
+              m_currentStateHue + m_hueController.calculate(m_currentStateHue, m_hueSetpoint),
               m_minimumHue,
               m_maximumHue);
       LEDPattern persistentPatternDemo =
           LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200)); // display state;
-      m_robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDS is only by
+      m_robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDs is only by
                                                     // command in this example so do it that way. 
     }
  }
@@ -119,7 +119,7 @@ public class AchieveHueGoal {
    * 
    * <p>Note that this implementation does not start the controller until a setpoint as been set.
    *
-   * <p>Command defaultCommand = Commands.run( () -> m_HueSetpoint = defaultHueGoal , this);
+   * <p>Command defaultCommand = Commands.run( () -> m_hueSetpoint = defaultHueGoal , this);
    * setDefaultCommand(defaultCommand);
    */
   public class HueGoal extends SubsystemBase {

@@ -163,7 +163,7 @@ public class HistoryFSM extends SubsystemBase {
    */
   public void beforeCommands() {}
 
-  int m_DebugPrintCounter; // 0; limit testing prints counter
+  int m_debugPrintCounter; // 0; limit testing prints counter
 
   /**
    * Run after commands and triggers
@@ -172,8 +172,8 @@ public class HistoryFSM extends SubsystemBase {
     // testing prints
     boolean debugPrint = false;
     if (debugPrint) {
-      m_DebugPrintCounter++;
-      if (m_DebugPrintCounter % 600 == 0) {
+      m_debugPrintCounter++;
+      if (m_debugPrintCounter % 600 == 0) {
         System.out.println("current time " + System.currentTimeMillis());
         for (int i = 0; i < m_lastTimeHistoryOfColors.size(); i++) {
           System.out.println(i + " " + m_lastTimeHistoryOfColors.get(i).toLongString());

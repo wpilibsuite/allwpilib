@@ -20,19 +20,19 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class TargetVision extends SubsystemBase {
-  private final LEDView m_RobotSignals;
-  private final CommandXboxController m_OperatorController;
+  private final LEDView m_robotSignals;
+  private final CommandXboxController m_operatorController;
 
-  private final Trigger m_TargetAcquired = new Trigger(this::canSeeTarget);
+  private final Trigger m_targetAcquired = new Trigger(this::canSeeTarget);
 
   /**
    * @param robotSignals Signal Subsystem
    * @param operatorController Source of fake target acquired event
    */
   public TargetVision(LEDView robotSignals, CommandXboxController operatorController) {
-    this.m_RobotSignals = robotSignals;
-    this.m_OperatorController = operatorController;
-    m_TargetAcquired.whileTrue(targetIsAcquired()); // Trigger's "this" is null until here.
+    this.m_robotSignals = robotSignals;
+    this.m_operatorController = operatorController;
+    m_targetAcquired.whileTrue(targetIsAcquired()); // Trigger's "this" is null until here.
   }
 
   /**
@@ -42,7 +42,7 @@ public class TargetVision extends SubsystemBase {
    */
   private Command targetIsAcquired() {
     LEDPattern targetAcquiredSignal = LEDPattern.solid(Color.kOrange);
-    return m_RobotSignals
+    return m_robotSignals
         .setSignal(targetAcquiredSignal) // this command locks the specific injected m_robotSignals
         // subsystem only
         .andThen(Commands.idle(this).withTimeout(0.)) // command created in this subsystem will
@@ -59,7 +59,7 @@ public class TargetVision extends SubsystemBase {
    * @return status of fake event source for target acquired
    */
   private boolean canSeeTarget() {
-    return m_OperatorController.getHID().getAButton();
+    return m_operatorController.getHID().getAButton();
   }
 
   /**

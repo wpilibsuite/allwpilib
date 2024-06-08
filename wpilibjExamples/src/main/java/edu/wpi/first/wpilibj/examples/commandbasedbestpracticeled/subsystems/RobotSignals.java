@@ -117,10 +117,10 @@ public class RobotSignals {
 
   /** LED view resource (subsystem) */
   public class LEDView extends SubsystemBase {
-    private final AddressableLEDBufferView m_View;
+    private final AddressableLEDBufferView m_view;
 
     private LEDView(AddressableLEDBufferView view) {
-      this.m_View = view;
+      this.m_view = view;
     }
 
     /*
@@ -150,7 +150,7 @@ public class RobotSignals {
      * @return
      */
     public Command setSignal(LEDPattern pattern) {
-      return run(() -> pattern.applyTo(m_View)).ignoringDisable(true).withName("LedSet");
+      return run(() -> pattern.applyTo(m_view)).ignoringDisable(true).withName("LedSet");
     }
 
     /**
@@ -160,7 +160,7 @@ public class RobotSignals {
      * @return
      */
     public Command setSignal(LEDPatternSupplier pattern) {
-      return run(() -> pattern.get().applyTo(m_View)).ignoringDisable(true).withName("LedSetS");
+      return run(() -> pattern.get().applyTo(m_view)).ignoringDisable(true).withName("LedSetS");
     }
   } // End LEDView
 }

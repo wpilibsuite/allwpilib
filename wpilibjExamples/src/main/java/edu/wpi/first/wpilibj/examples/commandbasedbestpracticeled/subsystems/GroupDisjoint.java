@@ -148,34 +148,34 @@ public class GroupDisjoint extends SubsystemBase {
   }
 
   private class TestDuration extends Command {
-    private final int m_TestNumber;
-    private final Measure<Time> m_TestDuration;
-    Timer m_EndTime = new Timer(); // need a memory of time; put in the narrowest possible scope
+    private final int m_testNumber;
+    private final Measure<Time> m_testDuration;
+    Timer m_endTime = new Timer(); // need a memory of time; put in the narrowest possible scope
 
     // wouldn't have to have quite so large of command template code if time history scope was put
     // in RobotContainer but then it's hard to manage since each subsystem instance would need a
     // manually coded time history variable in RobotContainer while here it's automatic
 
     private TestDuration(int testNumber, Measure<Time> testDuration) {
-      this.m_TestNumber = testNumber;
-      this.m_TestDuration = testDuration;
+      this.m_testNumber = testNumber;
+      this.m_testDuration = testDuration;
       addRequirements(GroupDisjoint.this); // requirements are too easy to forget
     }
 
     @Override
     public void initialize() {
-      m_EndTime.restart();
+      m_endTime.restart();
     }
 
     @Override
     public void execute() {
-      m_output = m_resourceID + m_TestNumber;
+      m_output = m_resourceID + m_testNumber;
       m_outputFresh = true;
     }
 
     @Override
     public boolean isFinished() {
-      return m_EndTime.hasElapsed(m_TestDuration.in(Seconds));
+      return m_endTime.hasElapsed(m_testDuration.in(Seconds));
     }
   }
 }

@@ -36,7 +36,7 @@ public class RobotContainer {
   // "simple" example program
 
   // switch command logging on/off; a lot of output for the command execute methods
-  private final boolean m_logCommands = false;
+  private static final boolean m_logCommands = false;
 
   // define all the subsystems
   private static final int m_operatorControllerPort = 0;
