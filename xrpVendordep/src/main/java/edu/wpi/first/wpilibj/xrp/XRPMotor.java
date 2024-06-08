@@ -92,10 +92,7 @@ public class XRPMotor implements MotorController {
 
   @Override
   public boolean getInverted() {
-    if (m_simInverted != null) {
-      return m_simInverted.get();
-    }
-    return false;
+    return m_simInverted != null && m_simInverted.get();
   }
 
   @Override
