@@ -116,14 +116,14 @@ jobs:
             build/allOutputs/
           retention-days: 7
 
-  Pathweaver:
-    name: "Build - Pathweaver"
+  PathWeaver:
+    name: "Build - PathWeaver"
     needs: [build-artifacts]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: wpilibsuite/Pathweaver
+          repository: wpilibsuite/PathWeaver
           fetch-depth: 0
       - uses: actions/download-artifact@v4
         with:
@@ -138,7 +138,7 @@ jobs:
         run: ./gradlew build
       - uses: actions/upload-artifact@v4
         with:
-          name: Pathweaver Build
+          name: PathWeaver Build
           path: |
             build/allOutputs/
           retention-days: 7
