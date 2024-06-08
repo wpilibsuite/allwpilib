@@ -44,7 +44,9 @@ import org.ejml.simple.SimpleMatrix;
  */
 @SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]>, ProtobufSerializable, StructSerializable {
+    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]>,
+        ProtobufSerializable,
+        StructSerializable {
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
