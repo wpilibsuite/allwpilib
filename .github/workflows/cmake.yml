@@ -91,9 +91,13 @@ jobs:
           vcpkgGitCommitId: 6f1ddd6b6878e7e66fcc35c65ba1d8feec2e01f8 # HEAD on 2024-06-07
 
       - name: configure
+        continue-on-error: true
         run: cmake -S . -B build -G "Ninja" -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release
         env:
           SCCACHE_GHA_ENABLED: "true"
+
+      - name: report
+        run: cat D:/a/allwpilib/vcpkg/buildtrees/opencv4/install-x64-windows-release-rel-out.log
 
       - name: build
         working-directory: build
