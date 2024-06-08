@@ -79,7 +79,7 @@ public class TrapezoidProfile {
      *
      * @param maxVelocity maximum linear velocity
      * @param maxAcceleration maximum linear acceleration
-     * @return linear constraints
+     * @return The linear constraints of the system.
      */
     public static Constraints createLinearConstraints(
         Measure<LinearVelocity> maxVelocity, Measure<LinearAcceleration> maxAcceleration) {
@@ -91,7 +91,7 @@ public class TrapezoidProfile {
      *
      * @param maxVelocity maximum angular velocity
      * @param maxAcceleration maximum angular acceleration
-     * @return angular constraints 
+     * @return The angular constraints of the system. 
      */
     public static Constraints createAngularConstraints(
         Measure<AngularVelocity> maxVelocity, Measure<AngularAcceleration> maxAcceleration) {
