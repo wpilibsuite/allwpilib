@@ -4,6 +4,11 @@
 
 package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
 
+/*
+ * Example subsystem that acquires a target (simulated fake boolean by pressing "A" button). A
+ * signal is displayed to indicate the status of the Target Vision (acquired target or not).
+ */
+
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDView;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
