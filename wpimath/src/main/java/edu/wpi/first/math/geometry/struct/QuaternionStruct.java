@@ -45,4 +45,9 @@ public class QuaternionStruct implements Struct<Quaternion> {
     bb.putDouble(value.getY());
     bb.putDouble(value.getZ());
   }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
+  }
 }

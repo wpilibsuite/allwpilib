@@ -157,7 +157,8 @@ void NetworkTablesProvider::Update() {
       }
 
       auto topicName = nt::GetTopicName(valueData->topic);
-      auto tableName = wpi::drop_back(topicName, 6);
+      auto tableName =
+          wpi::remove_suffix(topicName, "/.type").value_or(topicName);
 
       GetOrCreateView(builderIt->second, nt::Topic{valueData->topic},
                       tableName);
@@ -196,9 +197,8 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
   if (!window) {
     return;
   }
-  if (wpi::starts_with(entry->name, "/SmartDashboard/")) {
-    window->SetDefaultName(
-        fmt::format("{} (SmartDashboard)", wpi::drop_front(entry->name, 16)));
+  if (auto name = wpi::remove_prefix(entry->name, "/SmartDashboard/")) {
+    window->SetDefaultName(fmt::format("{} (SmartDashboard)", *name));
   }
   entry->window = window;
 

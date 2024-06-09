@@ -156,8 +156,8 @@ public abstract class MotorEncoderFixture<T extends MotorController> implements 
   public void teardown() {
     if (!m_tornDown) {
       if (m_motor != null) {
-        if (m_motor instanceof PWM) {
-          ((PWM) m_motor).close();
+        if (m_motor instanceof PWM motor) {
+          motor.close();
         }
         m_motor = null;
       }

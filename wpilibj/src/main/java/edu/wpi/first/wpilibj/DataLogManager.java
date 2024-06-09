@@ -382,21 +382,13 @@ public final class DataLogManager {
           DriverStation.MatchType matchType = DriverStation.getMatchType();
           if (matchType != DriverStation.MatchType.None) {
             // rename per match info
-            char matchTypeChar;
-            switch (matchType) {
-              case Practice:
-                matchTypeChar = 'P';
-                break;
-              case Qualification:
-                matchTypeChar = 'Q';
-                break;
-              case Elimination:
-                matchTypeChar = 'E';
-                break;
-              default:
-                matchTypeChar = '_';
-                break;
-            }
+            char matchTypeChar =
+                switch (matchType) {
+                  case Practice -> 'P';
+                  case Qualification -> 'Q';
+                  case Elimination -> 'E';
+                  default -> '_';
+                };
             m_log.setFilename(
                 "FRC_"
                     + m_timeFormatter.format(LocalDateTime.now(m_utc))

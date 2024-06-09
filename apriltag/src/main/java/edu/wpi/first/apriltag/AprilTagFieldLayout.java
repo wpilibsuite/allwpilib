@@ -148,19 +148,14 @@ public class AprilTagFieldLayout {
    */
   @JsonIgnore
   public final void setOrigin(OriginPosition origin) {
-    switch (origin) {
-      case kBlueAllianceWallRightSide:
-        setOrigin(Pose3d.kZero);
-        break;
-      case kRedAllianceWallRightSide:
-        setOrigin(
-            new Pose3d(
-                new Translation3d(m_fieldDimensions.fieldLength, m_fieldDimensions.fieldWidth, 0),
-                new Rotation3d(0, 0, Math.PI)));
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported enum value");
-    }
+    var pose =
+        switch (origin) {
+          case kBlueAllianceWallRightSide -> Pose3d.kZero;
+          case kRedAllianceWallRightSide -> new Pose3d(
+              new Translation3d(m_fieldDimensions.fieldLength, m_fieldDimensions.fieldWidth, 0),
+              new Rotation3d(0, 0, Math.PI));
+        };
+    setOrigin(pose);
   }
 
   /**
@@ -271,11 +266,9 @@ public class AprilTagFieldLayout {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof AprilTagFieldLayout) {
-      var other = (AprilTagFieldLayout) obj;
-      return m_apriltags.equals(other.m_apriltags) && m_origin.equals(other.m_origin);
-    }
-    return false;
+    return obj instanceof AprilTagFieldLayout layout
+        && m_apriltags.equals(layout.m_apriltags)
+        && m_origin.equals(layout.m_origin);
   }
 
   @Override

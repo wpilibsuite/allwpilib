@@ -36,4 +36,9 @@ public class Translation3dProto implements Protobuf<Translation3d, ProtobufTrans
     msg.setY(value.getY());
     msg.setZ(value.getZ());
   }
+
+  @Override
+  public boolean isImmutable() {
+    return true;
+  }
 }
