@@ -4,13 +4,14 @@
 
 package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
 
-import static edu.wpi.first.units.Units.Milliseconds;
 /**
  * Create subsystems, triggers, and commands; bind buttons to commands and triggers; define command
  * logging;, manage the details of what is periodically processed before and after the command
  * scheduler loop; - everything until it got too big and some logical splits to other classes had to
  * be made.
  */
+
+import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
