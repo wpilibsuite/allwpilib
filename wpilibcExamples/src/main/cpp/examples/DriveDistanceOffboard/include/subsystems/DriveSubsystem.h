@@ -8,6 +8,7 @@
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/trajectory/TrapezoidProfile.h>
+#include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
 
@@ -69,7 +70,29 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void SetMaxOutput(double maxOutput);
 
+  /**
+   * Creates a command to drive forward a specified distance using a motion
+   * profile.
+   *
+   * @param distance The distance to drive forward.
+   * @return A command.
+   */
+  [[nodiscard]]
+  frc2::CommandPtr ProfiledDriveDistance(units::meter_t distance);
+
+  /**
+   * Creates a command to drive forward a specified distance using a motion
+   * profile without resetting the encoders.
+   *
+   * @param distance The distance to drive forward.
+   * @return A command.
+   */
+  [[nodiscard]]
+  frc2::CommandPtr DynamicProfiledDriveDistance(units::meter_t distance);
+
  private:
+  units::meter_t m_initialLeftDistance;
+  units::meter_t m_initialRightDistance;
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 

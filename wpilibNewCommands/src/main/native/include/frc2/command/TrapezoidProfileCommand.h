@@ -6,7 +6,6 @@
 
 #include <functional>
 
-#include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 
 #include "frc2/command/Command.h"
@@ -54,16 +53,17 @@ class TrapezoidProfileCommand
     this->AddRequirements(requirements);
   }
 
-  void Initialize() override { m_timer.Restart(); }
+  void Initialize() override {}
 
   void Execute() override {
-    m_output(m_profile.Calculate(m_timer.Get(), m_currentState(), m_goal()));
+    m_output(
+        m_profile.Calculate(units::second_t{0.02}, m_currentState(), m_goal()));
   }
 
-  void End(bool interrupted) override { m_timer.Stop(); }
+  void End(bool interrupted) override {}
 
   bool IsFinished() override {
-    return m_timer.HasElapsed(m_profile.TotalTime());
+    return m_profile.IsFinished(units::second_t{0});
   }
 
  private:
@@ -71,7 +71,6 @@ class TrapezoidProfileCommand
   std::function<void(State)> m_output;
   std::function<State()> m_goal;
   std::function<State()> m_currentState;
-  frc::Timer m_timer;
 };
 
 }  // namespace frc2
