@@ -28,7 +28,7 @@ public final class Constants {
     public static final double kWheelDiameterInches = 6;
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterInches * Math.PI) / (double) kEncoderCPR;
+        (kWheelDiameterInches * Math.PI) / kEncoderCPR;
   }
 
   public static final class ShooterConstants {
@@ -37,7 +37,7 @@ public final class Constants {
     public static final int kEncoderCPR = 1024;
     public static final double kEncoderDistancePerPulse =
         // Distance units will be rotations
-        1.0 / (double) kEncoderCPR;
+        1.0 / kEncoderCPR;
 
     public static final int kShooterMotorPort = 4;
     public static final int kFeederMotorPort = 5;

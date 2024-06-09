@@ -4,9 +4,9 @@
 
 package edu.wpi.first.math.trajectory;
 
-import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.jni.TrajectoryUtilJNI;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public final class TrajectoryUtil {
    * @throws IOException if reading from the file fails.
    */
   public static Trajectory fromPathweaverJson(Path path) throws IOException {
-    return createTrajectoryFromElements(WPIMathJNI.fromPathweaverJson(path.toString()));
+    return createTrajectoryFromElements(TrajectoryUtilJNI.fromPathweaverJson(path.toString()));
   }
 
   /**
@@ -87,7 +87,7 @@ public final class TrajectoryUtil {
    * @throws IOException if writing to the file fails.
    */
   public static void toPathweaverJson(Trajectory trajectory, Path path) throws IOException {
-    WPIMathJNI.toPathweaverJson(getElementsFromTrajectory(trajectory), path.toString());
+    TrajectoryUtilJNI.toPathweaverJson(getElementsFromTrajectory(trajectory), path.toString());
   }
 
   /**
@@ -98,7 +98,7 @@ public final class TrajectoryUtil {
    * @throws TrajectorySerializationException if deserialization of the string fails.
    */
   public static Trajectory deserializeTrajectory(String json) {
-    return createTrajectoryFromElements(WPIMathJNI.deserializeTrajectory(json));
+    return createTrajectoryFromElements(TrajectoryUtilJNI.deserializeTrajectory(json));
   }
 
   /**
@@ -109,7 +109,7 @@ public final class TrajectoryUtil {
    * @throws TrajectorySerializationException if serialization of the trajectory fails.
    */
   public static String serializeTrajectory(Trajectory trajectory) {
-    return WPIMathJNI.serializeTrajectory(getElementsFromTrajectory(trajectory));
+    return TrajectoryUtilJNI.serializeTrajectory(getElementsFromTrajectory(trajectory));
   }
 
   /** Exception for trajectory serialization failure. */

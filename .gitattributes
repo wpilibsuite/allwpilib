@@ -3,11 +3,10 @@
 *.h text eol=lf
 *.inc text eol=lf
 *.java text eol=lf
+*.jinja text eol=lf
 *.json text eol=lf
 *.md text eol=lf
 *.xml text eol=lf
 
 # Generated files
-hal/src/generated/** linguist-generated
-ntcore/src/generated/** linguist-generated
-wpimath/src/generated/** linguist-generated
+*/src/generated/** linguist-generated

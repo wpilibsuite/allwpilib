@@ -269,8 +269,6 @@ model {
                                 def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
-                                run.environment 'LD_LIBRARY_PATH', filePath
-                                run.environment 'DYLD_LIBRARY_PATH', filePath
 
                                 def installTask = it.tasks.install
 
@@ -296,8 +294,6 @@ model {
 
                                 runTask.doFirst doFirstTask
                                 run.doFirst doFirstTask
-
-                                run.workingDir filePath
 
                                 found = true
                             }
