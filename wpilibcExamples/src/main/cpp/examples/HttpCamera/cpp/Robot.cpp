@@ -15,6 +15,14 @@
  * processing.
  */
 class Robot : public frc::TimedRobot {
+ public:
+  Robot() {
+    // We need to run our vision program in a separate thread. If not, our robot
+    // program will not run.
+    std::thread visionThread(VisionThread);
+    visionThread.detach();
+  }
+
  private:
   static void VisionThread() {
     // Create an HTTP camera. The address will need to be modified to have the
@@ -49,13 +57,6 @@ class Robot : public frc::TimedRobot {
       // Give the output stream a new image to display
       outputStream.PutFrame(mat);
     }
-  }
-
-  Robot() {
-    // We need to run our vision program in a separate thread. If not, our robot
-    // program will not run.
-    std::thread visionThread(VisionThread);
-    visionThread.detach();
   }
 };
 

@@ -10,7 +10,6 @@ class Robot : public frc::TimesliceRobot {
  public:
   Robot();
 
-  Robot();
   void RobotPeriodic() override;
 
   void AutonomousInit() override;

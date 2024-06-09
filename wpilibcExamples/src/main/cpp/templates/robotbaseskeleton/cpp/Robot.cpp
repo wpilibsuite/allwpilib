@@ -22,8 +22,6 @@ void Robot::Teleop() {}
 void Robot::Test() {}
 
 void Robot::StartCompetition() {
-  RobotInit();
-
   frc::internal::DriverStationModeThread modeThread;
 
   wpi::Event event{false, false};
