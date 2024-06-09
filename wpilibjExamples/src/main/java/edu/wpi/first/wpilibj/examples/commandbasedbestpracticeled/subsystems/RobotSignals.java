@@ -4,24 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
 
-/**
- * Manage the addressable LEDs as signaling subsystems.
- *
- * <p>This is the creator and container of the LEDView subsystems.
- *
- * <p>Buffer is not cleared.
- *
- * <p>It's just a simple example.
- *
- * <p>Needs a better way of registering LED usage; this is really (too) simple and relies on the
- * user finding it here and remembering to do it.
- */
-
-import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.AddressableLED;
-import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.AddressableLEDBufferView;
-import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.LEDPattern;
-
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.AddressableLEDBufferView;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 

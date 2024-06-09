@@ -20,11 +20,12 @@ import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.Int
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDPatternSupplier;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.TargetVision;
-
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;

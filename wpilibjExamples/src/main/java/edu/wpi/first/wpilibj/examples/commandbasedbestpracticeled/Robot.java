@@ -42,31 +42,27 @@
 /*
  * Example program demonstrating:
  *
- * Splitting a common resource into two separately used resources (LEDs).
+ * Splitting a common resource (string of LEDs into multiple separately used resources).
  * Configure button trigger.
  * Triggers.
  * Use of command parameters set at command creation time.
- * Use of command parameters set at changeable at runtime (Suppliers).
+ * Use of command parameters set at dynamically at runtime (Suppliers).
  * Use of method reference.
- * Inject TimedRobot.addPeriodic() into other classes.
  * Some commentary on composite commands and mode changes.
  * Command logging.
  * Configuring an autonomous command.
  * Use of Xbox controller to produce fake events.
  * Use of Xbox controller to trigger an event.
  * Use of public command factories in subsystems.
- * Use of private non-Command methods to prevent other classes from forgetting to lock a subsystem.
- * Change LED update rate different from the TimedRobot loop speed.
  * Overloading method parameter types.
  * No commands with the word Command in the name.
  * No triggers with the word Trigger in the name.
  * Supplier of dynamic LED pattern.
  * Static LED pattern.
  * Restrict Subsystem Default Command to none until set once at any time and then unchangeable.
- * Goal setting subsystem for a resource.
- * Triggers available for other systems to use.
+ * Goal as a resource setting for a subsystem.
  * Default commands can either run or not run within a sequential group depending on how the group is defined using Proxy.
- * Commands run in sequenced by triggering successive commands.
+ * Commands run in sequence by triggering successive commands.
  * Use of Measure<Time>.
  */
 
@@ -79,27 +75,27 @@
  *  2. do without the default command only within the group.
  *  3. manually code the function of the default command within a group.
  *  4. break groups into smaller groups and use Triggers to sequence multiple groups.
- *  5. consider using Proxy branching out of the group restriction.
+ *  5. use Proxy branching out of the group restriction.
  *
  * Using Triggers to sequence successive commands may help better organize the command flow and
  * isolate some subsystem requirements so the default command can run. That’s okay and is preferred
  * to using proxy commands.
  *
- * Usage of Proxies to hide the subsystem requirements from normal checks and thus allow the default
- * command to activate could be useful but should be used extremely sparingly by an experienced
- * user.
+ * Usage of Proxies to hide the subsystem requirements from normal checks and thus allow the
+ * default command to activate could be useful but should be used extremely sparingly by an
+ * experienced user.
  *
  * The possibility of unintended consequences is very high if bypassing the normal checks of
- * requirements. Usage should be limited to when you can easily understand what exactly you’re doing
- * by invoking them.
+ * requirements. Usage should be limited to when you can easily understand what exactly you’re
+ * doing by invoking them.
  *
- * Judicious use of asProxy() on a group’s interior commands can often allow default commands to run
- * correctly within groups. Incorrect application of Proxy results in an extremely difficult problem
- * to debug.
+ * Judicious use of asProxy() on a group’s interior commands can often allow default commands to
+ * run correctly within groups. Incorrect application of Proxy results in an extremely difficult
+ * problem to debug.
  *
- * Slapping an asProxy() around a composed command isn’t sufficient. You have to proxy the inner
- * commands, also or instead, and any new library commands to ease the use of Proxy aren’t recursive
- * to inner layers.
+ * Slapping an asProxy() around a composed command isn’t sufficient. You have to use proxy the
+ * inner commands, also or instead, and any new library commands to ease the use of Proxy aren’t
+ * recursive to inner layers.
  *
  * After thoroughly understanding the structure of your groups extremely carefully add asProxy() to
  * as few interior commands as possible to accomplish what you need.
@@ -132,8 +128,6 @@
  */
 
 /*
- * This code anticipates extensions to the WPILib addressable LED class which are included here.
- *
  * This example program runs in real or simulated mode of the 2024 WPILib.
  *
  * This is a refactor and extension of code donated by ChiefDelphi @illinar. It is intended to
