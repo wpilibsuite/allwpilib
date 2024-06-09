@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,7 +24,7 @@ class InterruptTest {
         AsynchronousInterrupt interrupt =
             new AsynchronousInterrupt(
                 di,
-                (a, b) -> {
+                (rising, falling) -> {
                   counter.incrementAndGet();
                   hasFired.set(true);
                 })) {
@@ -54,9 +55,9 @@ class InterruptTest {
         AsynchronousInterrupt interrupt =
             new AsynchronousInterrupt(
                 di,
-                (a, b) -> {
-                  hasFiredFallingEdge.set(b);
-                  hasFiredRisingEdge.set(a);
+                (rising, falling) -> {
+                  hasFiredFallingEdge.set(falling);
+                  hasFiredRisingEdge.set(rising);
                 })) {
       interrupt.setInterruptEdges(true, true);
       DIOSim digitalSim = new DIOSim(di);
@@ -73,8 +74,12 @@ class InterruptTest {
         count++;
         assertTrue(count < 1000);
       }
-      assertFalse(hasFiredFallingEdge.get(), "The interrupt triggered on the falling edge");
-      assertTrue(hasFiredRisingEdge.get(), "The interrupt did not trigger on the rising edge");
+      assertAll(
+          () ->
+              assertFalse(hasFiredFallingEdge.get(), "The interrupt triggered on the falling edge"),
+          () ->
+              assertTrue(
+                  hasFiredRisingEdge.get(), "The interrupt did not trigger on the rising edge"));
     }
   }
 
@@ -87,9 +92,9 @@ class InterruptTest {
         AsynchronousInterrupt interrupt =
             new AsynchronousInterrupt(
                 di,
-                (a, b) -> {
-                  hasFiredFallingEdge.set(b);
-                  hasFiredRisingEdge.set(a);
+                (rising, falling) -> {
+                  hasFiredFallingEdge.set(falling);
+                  hasFiredRisingEdge.set(rising);
                 })) {
       interrupt.setInterruptEdges(true, true);
       DIOSim digitalSim = new DIOSim(di);
@@ -106,8 +111,12 @@ class InterruptTest {
         count++;
         assertTrue(count < 1000);
       }
-      assertTrue(hasFiredFallingEdge.get(), "The interrupt did not trigger on the rising edge");
-      assertFalse(hasFiredRisingEdge.get(), "The interrupt triggered on the rising edge");
+      assertAll(
+          () ->
+              assertTrue(
+                  hasFiredFallingEdge.get(), "The interrupt did not trigger on the rising edge"),
+          () ->
+              assertFalse(hasFiredRisingEdge.get(), "The interrupt triggered on the rising edge"));
     }
   }
 }
