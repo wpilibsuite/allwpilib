@@ -299,7 +299,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @return true if this measure is equivalent, false otherwise
    */
   default boolean isEquivalent(Measure<?> other) {
-    // Check for disjoint units that aren't compatible
+    // Return false for disjoint units that aren't compatible
     return this.unit().getBaseUnit().equals(other.unit().getBaseUnit())
         && Math.abs(baseUnitMagnitude() - other.baseUnitMagnitude()) <= EQUIVALENCE_THRESHOLD;
   }
