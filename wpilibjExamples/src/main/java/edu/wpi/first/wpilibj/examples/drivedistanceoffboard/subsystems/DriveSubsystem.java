@@ -6,10 +6,13 @@ package edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.ExampleSmartMotorController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -113,5 +116,73 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void setMaxOutput(double maxOutput) {
     m_drive.setMaxOutput(maxOutput);
+  }
+
+  /**
+   * Creates a command to drive forward a specified distance using a motion profile.
+   *
+   * @param distance The distance to drive forward.
+   * @return A command.
+   */
+  public Command profiledDriveDistance(double distance) {
+    var profile =
+        new TrapezoidProfile(
+            new TrapezoidProfile.Constraints(
+                DriveConstants.kMaxSpeedMetersPerSecond,
+                DriveConstants.kMaxAccelerationMetersPerSecondSquared));
+    var timer = new Timer();
+    return startRun(
+            () -> {
+              // Restart timer so profile setpoints start at the beginning
+              timer.restart();
+              resetEncoders();
+            },
+            () -> {
+              // Current state never changes, so we need to use a timer to get the setpoints we need
+              // to be at
+              var setpoint = profile.calculate(timer.get(), new State(), new State(3, 0));
+              setDriveStates(setpoint, setpoint);
+            })
+        .until(() -> profile.isFinished(0));
+  }
+
+  private double m_initialLeftDistance;
+  private double m_initialRightDistance;
+
+  /**
+   * Creates a command to drive forward a specified distance using a motion profile without
+   * resetting the encoders.
+   *
+   * @param distance The distance to drive forward.
+   * @return A command.
+   */
+  public Command dynamicProfiledDriveDistance(double distance) {
+    var profile =
+        new TrapezoidProfile(
+            new TrapezoidProfile.Constraints(
+                DriveConstants.kMaxSpeedMetersPerSecond,
+                DriveConstants.kMaxAccelerationMetersPerSecondSquared));
+    return startRun(
+            () -> {
+              // Store distance so we know the target distance for each encoder
+              m_initialLeftDistance = getLeftEncoderDistance();
+              m_initialRightDistance = getRightEncoderDistance();
+            },
+            () -> {
+              // Current state matches the actual state of the bot, so the profile needs to look 20
+              // milliseconds ahead for the next setpoint
+              var leftSetpoint =
+                  profile.calculate(
+                      DriveConstants.kDt,
+                      new State(getLeftEncoderDistance(), m_leftLeader.getEncoderRate()),
+                      new State(m_initialLeftDistance + 3, 0));
+              var rightSetpoint =
+                  profile.calculate(
+                      DriveConstants.kDt,
+                      new State(getRightEncoderDistance(), m_rightLeader.getEncoderRate()),
+                      new State(m_initialRightDistance + 3, 0));
+              setDriveStates(leftSetpoint, rightSetpoint);
+            })
+        .until(() -> profile.isFinished(0));
   }
 }

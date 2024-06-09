@@ -2,7 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+// the WPILib BSD license file in the root directory of this project.
+
 #include "subsystems/DriveSubsystem.h"
+
+#include <frc/Timer.h>
 
 using namespace DriveConstants;
 
@@ -61,4 +65,49 @@ units::meter_t DriveSubsystem::GetRightEncoderDistance() {
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
+}
+
+frc2::CommandPtr DriveSubsystem::ProfiledDriveDistance(
+    units::meter_t distance) {
+  auto profile =
+      frc::TrapezoidProfile<units::meters>{{kMaxSpeed, kMaxAcceleration}};
+  frc::Timer timer{};
+  return StartRun(
+             [&] {
+               timer.Restart();
+               ResetEncoders();
+             },
+             [&] {
+               auto setpoint = profile.Calculate(
+                   timer.Get(), {}, {distance, units::meters_per_second_t{0}});
+               SetDriveStates(setpoint, setpoint);
+             })
+      .Until([&] { return profile.IsFinished(units::second_t{0}); });
+}
+
+frc2::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
+    units::meter_t distance) {
+  auto profile =
+      frc::TrapezoidProfile<units::meters>{{kMaxSpeed, kMaxAcceleration}};
+  return StartRun(
+             [&] {
+               m_initialLeftDistance = GetLeftEncoderDistance();
+               m_initialRightDistance = GetRightEncoderDistance();
+             },
+             [&] {
+               auto leftSetpoint = profile.Calculate(
+                   kDt,
+                   {GetLeftEncoderDistance(),
+                    units::meters_per_second_t{m_leftLeader.GetEncoderRate()}},
+                   {m_initialLeftDistance + distance,
+                    units::meters_per_second_t{0}});
+               auto rightSetpoint = profile.Calculate(
+                   kDt,
+                   {GetLeftEncoderDistance(),
+                    units::meters_per_second_t{m_rightLeader.GetEncoderRate()}},
+                   {m_initialRightDistance + distance,
+                    units::meters_per_second_t{0}});
+               SetDriveStates(leftSetpoint, rightSetpoint);
+             })
+      .Until([&] { return profile.IsFinished(units::second_t{0}); });
 }
