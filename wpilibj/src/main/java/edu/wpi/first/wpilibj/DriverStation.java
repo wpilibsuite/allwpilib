@@ -11,7 +11,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.EventVector;
@@ -32,13 +31,13 @@ public final class DriverStation {
   /** Number of Joystick ports. */
   public static final int kJoystickPorts = 6;
 
-  private static class HALJoystickButtons {
+  private static final class HALJoystickButtons {
     public int m_buttons;
     public byte m_count;
   }
 
   private static class HALJoystickAxes {
-    public float[] m_axes;
+    public final float[] m_axes;
     public int m_count;
 
     HALJoystickAxes(int count) {
@@ -47,7 +46,7 @@ public final class DriverStation {
   }
 
   private static class HALJoystickAxesRaw {
-    public int[] m_axes;
+    public final int[] m_axes;
 
     @SuppressWarnings("unused")
     public int m_count;
@@ -58,7 +57,7 @@ public final class DriverStation {
   }
 
   private static class HALJoystickPOVs {
-    public short[] m_povs;
+    public final short[] m_povs;
     public int m_count;
 
     HALJoystickPOVs(int count) {
@@ -94,16 +93,14 @@ public final class DriverStation {
 
   @SuppressWarnings("MemberName")
   private static class MatchDataSender {
-    NetworkTable table;
-    StringPublisher typeMetadata;
-    StringPublisher gameSpecificMessage;
-    StringPublisher eventName;
-    IntegerPublisher matchNumber;
-    IntegerPublisher replayNumber;
-    IntegerPublisher matchType;
-    BooleanPublisher alliance;
-    IntegerPublisher station;
-    IntegerPublisher controlWord;
+    final StringPublisher gameSpecificMessage;
+    final StringPublisher eventName;
+    final IntegerPublisher matchNumber;
+    final IntegerPublisher replayNumber;
+    final IntegerPublisher matchType;
+    final BooleanPublisher alliance;
+    final IntegerPublisher station;
+    final IntegerPublisher controlWord;
     boolean oldIsRedAlliance = true;
     int oldStationNumber = 1;
     String oldEventName = "";
@@ -114,9 +111,8 @@ public final class DriverStation {
     int oldControlWord;
 
     MatchDataSender() {
-      table = NetworkTableInstance.getDefault().getTable("FMSInfo");
-      typeMetadata = table.getStringTopic(".type").publish();
-      typeMetadata.set("FMSInfo");
+      var table = NetworkTableInstance.getDefault().getTable("FMSInfo");
+      table.getStringTopic(".type").publish().set("FMSInfo");
       gameSpecificMessage = table.getStringTopic("GameSpecificMessage").publish();
       gameSpecificMessage.set("");
       eventName = table.getStringTopic("EventName").publish();

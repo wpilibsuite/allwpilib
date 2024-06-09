@@ -64,7 +64,10 @@ public class VideoListener implements AutoCloseable {
 
   private static final ReentrantLock s_lock = new ReentrantLock();
   private static final Map<Integer, Consumer<VideoEvent>> s_listeners = new HashMap<>();
+
+  @SuppressWarnings("PMD.SingularField")
   private static Thread s_thread;
+
   private static int s_poller;
   private static boolean s_waitQueue;
   private static final Condition s_waitQueueCond = s_lock.newCondition();
