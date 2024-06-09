@@ -93,6 +93,16 @@ void IterativeRobotBase::TeleopExit() {}
 
 void IterativeRobotBase::TestExit() {}
 
+void IterativeRobotBase::PublishLoopTimingsToNetworkTables(
+    std::string_view topicName) {
+  m_watchdog.PublishToNetworkTables(topicName);
+}
+
+void IterativeRobotBase::StartLoopTimingsDataLog(wpi::log::DataLog& dataLog,
+                                                 std::string_view entry) {
+  m_watchdog.StartDataLog(dataLog, entry);
+}
+
 void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }

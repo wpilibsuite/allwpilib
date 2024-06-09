@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.util.datalog.DataLog;
 import java.io.Closeable;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
@@ -57,6 +58,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   @Override
   public void close() {
+    m_tracer.close();
     disable();
   }
 
@@ -76,6 +78,25 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     // Elements with sooner expiration times are sorted as lesser. The head of
     // Java's PriorityQueue is the least element.
     return Double.compare(m_expirationTimeSeconds, rhs.m_expirationTimeSeconds);
+  }
+
+  /**
+   * Starts publishing added epochs to NetworkTables.
+   *
+   * @param topicName The NetworkTables topic to publish to
+   */
+  public void publishToNetworkTables(String topicName) {
+    m_tracer.publishToNetworkTables(topicName);
+  }
+
+  /**
+   * Starts logging added epochs to the data log.
+   *
+   * @param dataLog The data log to log epochs to
+   * @param entry The name of the entry to log to
+   */
+  public void startDataLog(DataLog dataLog, String entry) {
+    m_tracer.startDataLog(dataLog, entry);
   }
 
   /**

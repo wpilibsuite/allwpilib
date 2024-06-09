@@ -9,6 +9,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -249,6 +250,33 @@ public abstract class IterativeRobotBase extends RobotBase {
    * test mode.
    */
   public void testExit() {}
+
+  /**
+   * Starts publishing loop timings to NetworkTables. Subsequent calls will do nothing.
+   *
+   * <p>This will publish the execution time of method calls in the robot loop; methods like robot
+   * periodic and init methods, various NT updates (SmartDashboard.update(),
+   * Shuffleboard.updateValues(), LiveWindow.updateValues()) etc.
+   *
+   * @param topicName The NetworkTables topic to publish to
+   */
+  public void publishLoopTimingsToNetworkTables(String topicName) {
+    m_watchdog.publishToNetworkTables(topicName);
+  }
+
+  /**
+   * Starts logging loop timings to the data log. Subsequent calls will do nothing.
+   *
+   * <p>This will log the execution time of method calls in the robot loop; methods like robot
+   * periodic and init methods, various NT updates (SmartDashboard.update(),
+   * Shuffleboard.updateValues(), LiveWindow.updateValues()) etc.
+   *
+   * @param dataLog The data log to log epochs to
+   * @param entry The name of the entry to log to
+   */
+  public void startLoopTimingsDataLog(DataLog dataLog, String entry) {
+    m_watchdog.startDataLog(dataLog, entry);
+  }
 
   /**
    * Enables or disables flushing NetworkTables every loop iteration. By default, this is enabled.

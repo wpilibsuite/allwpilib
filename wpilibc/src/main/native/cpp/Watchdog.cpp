@@ -164,6 +164,15 @@ Watchdog& Watchdog::operator=(Watchdog&& rhs) {
   return *this;
 }
 
+void Watchdog::PublishToNetworkTables(std::string_view topicName) {
+  m_tracer.PublishToNetworkTables(topicName);
+}
+
+void Watchdog::StartDataLog(wpi::log::DataLog& dataLog,
+                            std::string_view entry) {
+  m_tracer.StartDataLog(dataLog, entry);
+}
+
 units::second_t Watchdog::GetTime() const {
   return Timer::GetFPGATimestamp() - m_startTime;
 }

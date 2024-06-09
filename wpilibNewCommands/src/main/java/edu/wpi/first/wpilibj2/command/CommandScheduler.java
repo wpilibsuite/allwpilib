@@ -9,6 +9,7 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -125,6 +126,31 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     SendableRegistry.remove(this);
     LiveWindow.setEnabledListener(null);
     LiveWindow.setDisabledListener(null);
+  }
+
+  /**
+   * Starts publishing loop timings to NetworkTables. Subsequent calls will do nothing.
+   *
+   * <p>This will publish how long it takes for methods in the command-based framework to execute;
+   * periodic methods in subsystems, execute methods in commands, etc.
+   *
+   * @param topicName The NetworkTables topic to publish to
+   */
+  public void publishLoopTimingsToNetworkTables(String topicName) {
+    m_watchdog.publishToNetworkTables(topicName);
+  }
+
+  /**
+   * Starts logging loop timings to the data log. Subsequent calls will do nothing.
+   *
+   * <p>This will log how long it takes for methods in the command-based framework to execute;
+   * periodic methods in subsystems, execute methods in commands, etc.
+   *
+   * @param dataLog The data log to log loop timings to
+   * @param entry The name of the entry to log to
+   */
+  public void startLoopTimingsDataLog(DataLog dataLog, String entry) {
+    m_watchdog.startDataLog(dataLog, entry);
   }
 
   /**
