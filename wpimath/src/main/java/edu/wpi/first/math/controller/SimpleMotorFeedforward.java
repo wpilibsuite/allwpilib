@@ -10,6 +10,9 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.Velocity;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
 public class SimpleMotorFeedforward {
@@ -92,17 +95,44 @@ public class SimpleMotorFeedforward {
   }
 
   /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param velocity The velocity setpoint.
+   * @param acceleration The acceleration setpoint.
+   * @return The computed feedforward.
+   */
+  @SuppressWarnings("removal")
+  @Deprecated(forRemoval = true, since = "2024")
+  public double calculate(double velocity, double acceleration) {
+    return ks * Math.signum(velocity) + kv * velocity + ka * acceleration;
+  }
+
+  /**
+   * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to be
+   * zero).
+   *
+   * @param velocity The velocity setpoint.
+   * @return The computed feedforward.
+   */
+  @SuppressWarnings("removal")
+  @Deprecated(forRemoval = true, since = "2024")
+  public double calculate(double velocity) {
+    return calculate(velocity, 0);
+  }
+
+  /**
    * Calculates the feedforward from the gains and setpoints assuming discrete control.
    *
+   * @param <U> The velocity parameter either as distance or angle.
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity The next velocity setpoint.
    * @return The computed feedforward.
    */
-  public double calculate(double currentVelocity, double nextVelocity) {
-    r.set(0, 0, currentVelocity);
-    nextR.set(0, 0, nextVelocity);
+  public <U extends Unit<U>> double calculate(Measure<Velocity<U>> currentVelocity, Measure<Velocity<Velocity<U>>> nextVelocity) {
+    r.set(0, 0, currentVelocity.magnitude());
+    nextR.set(0, 0, nextVelocity.magnitude());
 
-    return ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
+    return ks * Math.signum(currentVelocity.magnitude()) + feedforward.calculate(r, nextR).get(0, 0);
   }
 
   /**
