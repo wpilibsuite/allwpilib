@@ -128,7 +128,7 @@ public class SimpleMotorFeedforward {
    * @param nextVelocity The next velocity setpoint.
    * @return The computed feedforward.
    */
-  public <U extends Unit<U>> double calculate(Measure<Velocity<U>> currentVelocity, Measure<Velocity<Velocity<U>>> nextVelocity) {
+  public <U extends Unit<U>> double calculate(Measure<Velocity<U>> currentVelocity, Measure<Velocity<U>> nextVelocity) {
     r.set(0, 0, currentVelocity.magnitude());
     nextR.set(0, 0, nextVelocity.magnitude());
 
