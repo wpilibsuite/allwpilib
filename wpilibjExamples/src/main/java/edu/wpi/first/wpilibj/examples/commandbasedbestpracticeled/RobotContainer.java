@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.His
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.Intake;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDPatternSupplier;
-import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.TargetVision;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.Measure;
@@ -31,7 +30,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
   // runtime options; too rigid - could be made easier to find and change but this is just a
@@ -45,7 +43,6 @@ public class RobotContainer {
   private final CommandXboxController m_operatorController =
       new CommandXboxController(m_operatorControllerPort);
   private final Intake m_intake;
-  private final TargetVision m_targetVision;
   private final HistoryFSM m_historyFSM;
   private final AchieveHueGoal m_achieveHueGoal;
   // container and creator of all the LEDView subsystems
@@ -63,7 +60,6 @@ public class RobotContainer {
     // subsystems
     m_robotSignals = new RobotSignals(m_addressableLedPwmPort);
     m_intake = new Intake(m_robotSignals.m_main, m_operatorController);
-    m_targetVision = new TargetVision(m_robotSignals.m_top, m_operatorController);
     m_historyFSM = new HistoryFSM(m_robotSignals.m_historyDemo, m_operatorController);
     m_achieveHueGoal = new AchieveHueGoal(m_robotSignals.m_achieveHueGoal);
 
@@ -86,7 +82,7 @@ public class RobotContainer {
         .onTrue(m_robotSignals.m_top.setSignal(colorWheel()));
 
     var triggerHueGoalDeadBand = 0.05; // triggers if past a small threshold (scale of 0 to 1)
-    new Trigger(m_operatorController.rightTrigger(triggerHueGoalDeadBand))
+    m_operatorController.rightTrigger(triggerHueGoalDeadBand)
         .onTrue(
             m_achieveHueGoal.m_hueGoal.setHueGoal( // then it's on
                 () ->
@@ -94,6 +90,10 @@ public class RobotContainer {
                         * 180.0 // supplying the current value
                 // scale joystick's 0 to 1 to computer color wheel hue 0 to 180
                 ));
+
+    m_operatorController
+        .a()
+        .onTrue(m_achieveHueGoal.m_hueGoal.reset());
   }
 
   /**
@@ -160,6 +160,7 @@ public class RobotContainer {
     LEDPattern autoTopSignal =
         LEDPattern.solid(new Color(0.1, 0.2, 0.2))
             .blend(LEDPattern.solid(new Color(0.7, 0.2, 0.2)).blink(Seconds.of(0.1)));
+          
     LEDPattern autoMainSignal = LEDPattern.solid(new Color(0.3, 1.0, 0.3));
     // statements before the return are run early at initialization time
     return
@@ -247,7 +248,6 @@ public class RobotContainer {
    */
   public void beforeCommands() {
     m_intake.beforeCommands();
-    m_targetVision.beforeCommands();
     m_robotSignals.beforeCommands();
     m_historyFSM.beforeCommands();
     m_achieveHueGoal.beforeCommands();
@@ -265,7 +265,6 @@ public class RobotContainer {
    */
   public void afterCommands() {
     m_intake.afterCommands();
-    m_targetVision.afterCommands();
     m_robotSignals.afterCommands();
     m_historyFSM.afterCommands();
     m_achieveHueGoal.afterCommands();

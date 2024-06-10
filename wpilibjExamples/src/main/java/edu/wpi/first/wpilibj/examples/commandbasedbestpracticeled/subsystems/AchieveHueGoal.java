@@ -82,6 +82,12 @@ public class AchieveHueGoal {
    * Run after commands and triggers
    */
   public void afterCommands() {
+    // must be public to get this run periodically but don't allow just anyone to run this
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+    StackTraceElement element = stackTrace[2];
+    if ("frc.robot.RobotContainer".equals(element.getClassName()) && "afterCommands".equals(element.getMethodName())) {
+      // running valid from RobotContainer.afterCommands
+      LEDPattern persistentPatternDemo;
     if (!Double.isNaN(m_hueSetpoint)) {
       // setpoint has been set so run controller periodically
 
@@ -93,8 +99,12 @@ public class AchieveHueGoal {
               m_currentStateHue + m_hueController.calculate(m_currentStateHue, m_hueSetpoint),
               m_minimumHue,
               m_maximumHue);
-      LEDPattern persistentPatternDemo =
+        persistentPatternDemo =
           LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200)); // display state;
+      } else {
+        persistentPatternDemo =
+            LEDPattern.solid(Color.fromHSV(0, 0, 0)); // display state off - black;        
+      }
       m_robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDs is only by
                                                     // command in this example so do it that way. 
     }
@@ -117,8 +127,9 @@ public class AchieveHueGoal {
    * goes to 0 when released but again we're not supposed to know that from RobotContainer.java.
    * 
    * <p>Note that this implementation does not start the controller until a setpoint as been set.
+   * The controller stops when the goal is unset (goal = Double.NaN or reset()).
    *
-   * <p>Command defaultCommand = Commands.run( () -> m_hueSetpoint = defaultHueGoal , this);
+   * <p>Command defaultCommand = runOnce(() -> m_hueSetpoint = defaultHueGoal);
    * setDefaultCommand(defaultCommand);
    */
   public class HueGoal extends SubsystemBase {
@@ -167,6 +178,13 @@ public class AchieveHueGoal {
      */
     public Command setHueGoal(DoubleSupplier goal) {
       return run(() -> m_hueSetpoint = goal.getAsDouble());
+    }
+
+    /**
+     * reset or stop the controller
+     */
+    public Command reset() {
+      return runOnce(()-> m_hueSetpoint = Double.NaN);
     }
   }
 }

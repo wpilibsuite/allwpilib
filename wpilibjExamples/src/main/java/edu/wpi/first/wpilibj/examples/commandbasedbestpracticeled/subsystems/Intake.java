@@ -43,8 +43,7 @@ public class Intake extends SubsystemBase {
   private Command gamePieceIsAcquired() {
     LEDPattern gamePieceAcquiredSignal = LEDPattern.solid(Color.kMagenta).blink(Seconds.of(0.2));
     return m_robotSignals
-        .setSignal(gamePieceAcquiredSignal) // this command locks the
-        // robotSignals.Main subsystem only
+        .setSignal(gamePieceAcquiredSignal) // this command locks the robotSignals.Main subsystem
         .ignoringDisable(true)
         .withName("MainGamePieceAcquiredSignal");
   }

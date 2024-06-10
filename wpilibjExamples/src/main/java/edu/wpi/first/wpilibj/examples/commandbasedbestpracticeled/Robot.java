@@ -9,32 +9,32 @@
  * operator input is Xbox controller. The sixth demonstration output is the terminal console
  * "prints."
  *
- * 1. LED set 1 usage Target Vision Acquired subsystem output Top LEDView subsystem (runs disabled,
- * too) default blue target vision acquired orange (simulate target acquired by pressing "A" button)
- * Autonomous mode command dark green (no requirement for Target Vision Acquired) Slowly around the
- * color wheel (initiated by pressing "X" button) (no requirement for Target Vision Acquired)
+ * 1. LED set 1 usage Top LEDView subsystem default blue.
+ *  Autonomous mode command dark green.
+ *  Slowly around the color wheel initiated by pressing "X" button.
  *
- * 2. LED set 2 usage Game Piece Intake Acquired subsystem output Main LEDView subsystem default
- * cyan intake game piece acquired magenta fast blink (simulate game piece intake acquired by
- * pressing "B" button) Autonomous mode command light green (no requirement for Game Piece Intake
- * Acquired)
+ * 2. LED set 2 usage Main LEDView subsystem default cyan.
+ *  Game Piece Intake Acquired subsystem signal intake game piece acquired magenta fast blink
+ *  (simulate game piece intake acquired by pressing "B" button).
+ *  Autonomous mode command light green (no requirement for Game Piece Intake Acquired).
  *
- * 3. LED set 3 usage EnableDisable LEDView subsystem enabled mode green slow blink disabled mode
- * red slow blink
+ * 3. LED set 3 usage EnableDisable LEDView subsystem.
+ *  Enabled mode green slow blink; disabled mode red slow blink.
  *
- * 4. LED set 4 usage HistoryFSM subsystem HistoryDemo LEDView subsystem random colors that don't
- * repeat for awhile (history) (initiated by pressing "Y" button then self perpetuating) (runs in
- * enabled mode)
+ * 4. LED set 4 usage HistoryDemo LEDView subsystem.
+ *  HistoryFSM subsystem random colors that don't repeat for awhile
+ *  (history) (initiated by pressing "Y" button then self perpetuating) (runs in enabled mode).
  *
- * 5. LED set 5 usage AchieveHueGoal subsystem output AchieveHueGoal LEDView subsystem Subsystem
- * based controller runs continuously and responds to a goal setting subsystem. Colors on color
- * wheel position showing PID controller subsystem converging on a color selected by Xbox right
- * trigger axis (press to start)
+ * 5. LED set 5 usage AchieveHueGoal LEDView subsystem.
+ *  AchieveHueGoal class-based controller runs continuously and responds to its goal setting
+ *  subsystem. Colors on color wheel position show PID controller converging on a color selected
+ *  by Xbox right trigger axis (press trigger axis a little to start; press "A" button to stop).
  *
- * 6. Console Terminal usage Disjoint Sequential Group Demo console output initiated by teleop
- * enable mode Show subsystem default command doesn't run within a group command unless the command
- * with the subsystem requirement is disjointed from the group by using a Proxy structure. (runs in
- * teleop mode)
+ * 6. Console Terminal usage GroupDisjoint subsystem.
+ *  Disjoint Sequential Group Demo console output initiated by teleop enable mode.
+ *  Show that subsystem default command doesn't run within a group command unless the command with
+ *  the subsystem requirement is disjointed from the group by using a Proxy structure or separated
+ *  commands structure.
  *
  * All commands are interruptible. Some button presses are debounced.
  */
