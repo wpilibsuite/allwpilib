@@ -5,6 +5,25 @@
 /*
  * Example program that shows a variety of command based and programming "best practices."
  *
+ * Includes five different techniques useful in Command-Based programming. In addition all of the
+ * examples are written in a similar suggested style of handling commands and triggers with
+ * suggested variable naming style and minimal scope.
+ *  1. Goal-Oriented subsystem to feed setpoints to a free-running control calculation. (PID
+ *     example)
+ *  2. Use of historical data in addition to current state and events as input to a Finite State
+ *     Machine. (Random, non-repeating colors)
+ *  3. Example of splitting an apparent single resource into pieces for independent use.
+ *     (Addressable LED strip)
+ *  4. Minimal example of a robot subsystem. (Command triggered by an event)
+ *  5. Use of "proxies" to disjoint composed groups such that a subsystem default command may run
+ *     within a group instead of the normal behavior of being blocked until the group completes.
+ *     (Simple subsystems running commands and default commands concurrently in groups)
+ *
+ * Because all but one demonstration uses an addressable LED strip as output (one has console
+ * output) there is significant overlap and depth in demonstrating style of using the 2025 advanced
+ * addressable LED classes and methods.
+ * 
+ * 
  * Demonstration output is on five sets of eight identical LEDs to show the program is operating;
  * operator input is Xbox controller. The sixth demonstration output is the terminal console
  * "prints."
