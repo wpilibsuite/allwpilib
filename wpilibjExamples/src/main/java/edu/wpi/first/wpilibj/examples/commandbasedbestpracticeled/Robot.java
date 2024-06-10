@@ -10,7 +10,7 @@
  * "prints."
  *
  * 1. LED set 1 usage Top LEDView subsystem default blue.
- *  Autonomous mode command dark green.
+ *  Autonomous mode command brown fast blink.
  *  Non-autonomous display colors slowly around the color wheel initiated by pressing "X" button.
  *
  * 2. LED set 2 usage Main LEDView subsystem default cyan.
@@ -24,7 +24,7 @@
  * 4. LED set 4 usage HistoryDemo LEDView subsystem.
  *  HistoryFSM subsystem displays random colors that don't repeat for awhile (time history).
  *  Periodic color changing initiated by pressing "Y" button then self perpetuating. Colors also
- *  change if the "Y" button is pressed) (runs in enabled mode).
+ *  change if the "Y" button is pressed. Runs in enabled mode.
  *
  * 5. LED set 5 usage AchieveHueGoal LEDView subsystem.
  *  AchieveHueGoal class-based controller runs continuously and responds to its goal setting
@@ -167,7 +167,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {} // commands running from another mode haven't been cancelled
+  public void disabledInit() {} // Commands running from another mode haven't been cancelled.
 
   @Override
   public void disabledPeriodic() {}
@@ -177,8 +177,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // commands running from another mode haven't been cancelled directly but may be interrupted by
-    // this command
+    // Commands running from another mode haven't been cancelled directly but may be interrupted by
+    // this command.
     m_autonomousSignal = m_robotContainer.getAutonomousSignal();
 
     if (m_autonomousSignal != null) {
@@ -198,7 +198,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    // commands running from another mode haven't been cancelled directly except the one below
+    // Commands running from another mode haven't been cancelled directly except the one below.
 
     if (m_autonomousSignal != null) {
       m_autonomousSignal.cancel();
@@ -219,6 +219,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    // Running commands are all cancelled. Default Commands will activate.
     CommandScheduler.getInstance().cancelAll();
   }
 

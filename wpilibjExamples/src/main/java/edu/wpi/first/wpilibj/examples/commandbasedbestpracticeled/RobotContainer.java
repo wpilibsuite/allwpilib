@@ -81,10 +81,12 @@ public class RobotContainer {
         .debounce(m_xButtonDebounceTime.in(Seconds), DebounceType.kBoth)
         .onTrue(m_robotSignals.m_top.setSignal(colorWheel()));
 
+    // Goal setting demo starts by moving the right trigger axis and then it's on until reset by
+    // "A"  button or interrupted. The right trigger axis also provides the goal.
     var triggerHueGoalDeadBand = 0.05; // triggers if past a small threshold (scale of 0 to 1)
     m_operatorController.rightTrigger(triggerHueGoalDeadBand)
         .onTrue(
-            m_achieveHueGoal.m_hueGoal.setHueGoal( // then it's on
+            m_achieveHueGoal.m_hueGoal.setHueGoal( // goal-acceptance command
                 () ->
                     m_operatorController.getRightTriggerAxis()
                         * 180.0 // supplying the current value
@@ -93,7 +95,9 @@ public class RobotContainer {
 
     m_operatorController
         .a()
-        .onTrue(m_achieveHueGoal.m_hueGoal.reset());
+        .onTrue(m_achieveHueGoal.m_hueGoal.reset()); // stops accepting goals by interrupting the
+                                          // goal-acceptance command and halts the under-laying
+                                          // process by sending a message to it.
   }
 
   /**
@@ -152,7 +156,7 @@ public class RobotContainer {
   /**
    * Create a command to signal in Autonomous
    *
-   * <p>Example of setting signals by contrived example of composed commands
+   * <p>Example of setting two signals by contrived example of composed commands
    *
    * @return
    */
@@ -168,12 +172,11 @@ public class RobotContainer {
     parallel(
             // interrupting either of the two parallel commands with an external command interrupts
             // the group
-            m_robotSignals
-                .m_top
-                .setSignal(autoTopSignal)
-                .withTimeout(6.0) // example this ends but the group continues and the default
-                // command is not activated here with or without the
-                // ".andThen" command
+            m_robotSignals.m_top.setSignal(autoTopSignal)
+                .withTimeout(6.0)/*.asProxy()*/ // timeout ends but the group continues and
+            // the default command is not activated here with or without the ".andThen" command.
+            // Use ".asProxy()" to disjoint the group and allow the "m_top" default command to run.
+            // What happened to the ".andThen"? Beware using Proxy can cause surprising behavior!
                 .andThen(m_robotSignals.m_top.setSignal(autoTopSignal)),
             m_robotSignals.m_main.setSignal(autoMainSignal))
         .withName("AutoSignal");
