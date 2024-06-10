@@ -102,7 +102,7 @@ public class SimpleMotorFeedforward {
    * @return The computed feedforward.
    */
   @SuppressWarnings("removal")
-  @Deprecated(forRemoval = true, since = "2024")
+  @Deprecated(forRemoval = true, since = "2025")
   public double calculate(double velocity, double acceleration) {
     return ks * Math.signum(velocity) + kv * velocity + ka * acceleration;
   }
@@ -115,7 +115,7 @@ public class SimpleMotorFeedforward {
    * @return The computed feedforward.
    */
   @SuppressWarnings("removal")
-  @Deprecated(forRemoval = true, since = "2024")
+  @Deprecated(forRemoval = true, since = "2025")
   public double calculate(double velocity) {
     return calculate(velocity, 0);
   }
