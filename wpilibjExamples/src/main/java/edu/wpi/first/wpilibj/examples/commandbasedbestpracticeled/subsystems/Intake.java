@@ -70,10 +70,10 @@ public class Intake extends SubsystemBase {
   /**
    * Run before commands and triggers
    */
-  public void beforeCommands() {}
+  public void runBeforeCommands() {}
 
   /**
    * Run after commands and triggers
    */
-  public void afterCommands() {}
+  public void runAfterCommands() {}
 }

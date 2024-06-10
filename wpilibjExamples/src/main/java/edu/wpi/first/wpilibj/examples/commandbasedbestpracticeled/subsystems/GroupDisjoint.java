@@ -52,12 +52,12 @@ public class GroupDisjoint extends SubsystemBase {
   /**
    * Run before commands and triggers
    */
-  public void beforeCommands() {}
+  public void runBeforeCommands() {}
 
   /**
    * Run after commands and triggers
    */
-  public void afterCommands() {
+  public void runAfterCommands() {
     // processing in periodic I/O should be kept to a minimum to get the best consistent set
     // of I/O. This example is complicated to minimize the large quantity of output possible.
 

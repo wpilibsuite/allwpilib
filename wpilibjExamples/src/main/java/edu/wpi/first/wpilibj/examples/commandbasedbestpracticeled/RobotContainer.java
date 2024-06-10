@@ -238,20 +238,61 @@ public class RobotContainer {
   }
 
   /**
+   * There are a variety of methods to run methods periodically and the example implemented below
+   * is a very simplistic start of a good possibility.
+   * 
+   * It demonstrates running before the scheduler loop to get a consistent set of sensor inputs and
+   * running after the scheduler loop for all periodic outputs.
+   * 
+   * There are clever ways to register classes say using a common "SubsystemTeam" class or
+   * interface with a "register" method so they are automatically included in a list that can
+   * easily be accessed with a loop. But this example is simplistic with no registration and no
+   * loop - remember to type them in here and any class that has multiple subsystems such as the 
+   * example "GroupDisjointTest".
+   * 
+   * There are a variety of ways to implement periodic methods depending on how important it is to
+   * secure the periodic methods from unauthorized use. The example here is all "public" and any
+   * other method with access to a class could run the periodicals of that class.
+   * 
+   * The next level of security would be to create a class say "SubsystemTeam" in a folder with all
+   * other subsystems and have Robot periodic call SubsystemTeam periodicals. Each subsystem could
+   * have "protected" periodicals since they are in the same package as the calling class.
+   * 
+   * Another secure method that works well in all cases but may not be very performant except in
+   * limited cases or in conjunction with using "SubsystemTeam" to manage periodicals is to verify
+   * the caller of the periodic methods. See "AchieveHueGoal" for an example implementation that
+   * would be best applied to only one common periodic manager say the "SubsystemTeam" abstract
+   * class or interface.
+   * 
+   * Another method to run securely periodically is to inject the "Robot.addPeriodic" method into
+   * other classes. "addPeriodic" accurately runs on a "clock" within a time step. It could run
+   * fairly accurately near the beginning of a time step (0 offset) but would not accurately run
+   * "after" the triggers and scheduled commands as it isn't known exactly when they end.
+   * "addPeriodic" is limited to running near the beginning (0 offset) or near the end (say 19 ms
+   * offset) of the schedule loop but not precisely the beginning or end of the loop.
+   * 
+   * in Robot:
+   *   private final RobotContainer robotContainer = new RobotContainer(this::addPeriodic);
+   * in RobotContainer:
+   *   public RobotContainer(BiConsumer<Runnable, Double> addPeriodicMethod) {
+   *   exampleFlywheel = Flywheel(addPeriodicMethod);
+   * in ExampleFlyWheel:
+   *   Similarly get the method through the ctor and use it as "addPeriodic" is documented.
+   */
+
+  /**
    * Run before commands and triggers from the Robot.periodic()
    *
    * <p>Run periodically before commands are run - read sensors, etc. Include all classes that have
    * periodic inputs or other need to run periodically.
    *
-   * <p>There are clever ways to register classes so they are automatically included in a list but
-   * this example is simplistic - remember to type them in.
    */
-  public void beforeCommands() {
-    m_intake.beforeCommands();
-    m_robotSignals.beforeCommands();
-    m_historyFSM.beforeCommands();
-    m_achieveHueGoal.beforeCommands();
-    m_groupDisjointTest.beforeCommands();
+  public void runBeforeCommands() {
+    m_intake.runBeforeCommands();
+    m_robotSignals.runBeforeCommands();
+    m_historyFSM.runBeforeCommands();
+    m_achieveHueGoal.runBeforeCommands();
+    m_groupDisjointTest.runBeforeCommands();
   }
 
   /**
@@ -259,15 +300,12 @@ public class RobotContainer {
    *
    * <p>Run periodically after commands are run - write logs, dashboards, indicators Include all
    * classes that have periodic outputs
-   *
-   * <p>There are clever ways to register classes so they are automatically included in a list but
-   * this example isn't it; simplistic - remember to type them in.
    */
-  public void afterCommands() {
-    m_intake.afterCommands();
-    m_robotSignals.afterCommands();
-    m_historyFSM.afterCommands();
-    m_achieveHueGoal.afterCommands();
-    m_groupDisjointTest.afterCommands();
+  public void runAfterCommands() {
+    m_intake.runAfterCommands();
+    m_robotSignals.runAfterCommands();
+    m_historyFSM.runAfterCommands();
+    m_achieveHueGoal.runAfterCommands();
+    m_groupDisjointTest.runAfterCommands();
   }
 }

@@ -105,12 +105,12 @@ public class RobotSignals {
   /**
    * Run before commands and triggers
    */
-  public void beforeCommands() {}
+  public void runBeforeCommands() {}
 
   /**
    * Run after commands and triggers
    */
-  public void afterCommands() {
+  public void runAfterCommands() {
     m_strip.setData(bufferLED); // run periodically to send the buffer to the LEDs
   }
 

@@ -76,16 +76,16 @@ public class AchieveHueGoal {
   /**
    * Run before commands and triggers
    */
-  public void beforeCommands() {}
+  public void runBeforeCommands() {}
 
   /**
    * Run after commands and triggers
    */
-  public void afterCommands() {
+  public void runAfterCommands() {
     // must be public to get this run periodically but don't allow just anyone to run this
     StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
     StackTraceElement element = stackTrace[2];
-    if ("frc.robot.RobotContainer".equals(element.getClassName()) && "afterCommands".equals(element.getMethodName())) {
+    if ("frc.robot.RobotContainer".equals(element.getClassName()) && "runAfterCommands".equals(element.getMethodName())) {
       // running valid from RobotContainer.afterCommands
       LEDPattern persistentPatternDemo;
     if (!Double.isNaN(m_hueSetpoint)) {

@@ -18,8 +18,8 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
  *
  * <p>Caution - this is a simple, contrived example. This command essentially runs periodically the
  * hard way using memory of a time and a trigger on the time. There may be better ways to do that
- * simple scheduling structure, for example, the use of the "beforeCommands()" or "afterCommands()"
- * periodic methods as used for a sub-purpose here is a good way.
+ * simple scheduling structure, for example, the use of the "runBeforeCommands()" or
+ * "runAfterCommands()" periodic methods as used for a sub-purpose here is a good way.
  */
 
 import static edu.wpi.first.units.Units.Milliseconds;
@@ -160,14 +160,14 @@ public class HistoryFSM extends SubsystemBase {
   /**
    * Run before commands and triggers
    */
-  public void beforeCommands() {}
+  public void runBeforeCommands() {}
 
   int m_debugPrintCounter; // 0; limit testing prints counter
 
   /**
    * Run after commands and triggers
    */
-  public void afterCommands() {
+  public void runAfterCommands() {
     // testing prints
     boolean debugPrint = false;
     if (debugPrint) {

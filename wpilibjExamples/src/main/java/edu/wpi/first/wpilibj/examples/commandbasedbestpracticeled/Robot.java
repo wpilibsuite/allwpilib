@@ -11,7 +11,7 @@
  *
  * 1. LED set 1 usage Top LEDView subsystem default blue.
  *  Autonomous mode command dark green.
- *  Slowly around the color wheel initiated by pressing "X" button.
+ *  Non-autonomous display colors slowly around the color wheel initiated by pressing "X" button.
  *
  * 2. LED set 2 usage Main LEDView subsystem default cyan.
  *  Game Piece Intake Acquired subsystem signal intake game piece acquired magenta fast blink
@@ -22,8 +22,9 @@
  *  Enabled mode green slow blink; disabled mode red slow blink.
  *
  * 4. LED set 4 usage HistoryDemo LEDView subsystem.
- *  HistoryFSM subsystem random colors that don't repeat for awhile
- *  (history) (initiated by pressing "Y" button then self perpetuating) (runs in enabled mode).
+ *  HistoryFSM subsystem displays random colors that don't repeat for awhile (time history).
+ *  Periodic color changing initiated by pressing "Y" button then self perpetuating. Colors also
+ *  change if the "Y" button is pressed) (runs in enabled mode).
  *
  * 5. LED set 5 usage AchieveHueGoal LEDView subsystem.
  *  AchieveHueGoal class-based controller runs continuously and responds to its goal setting
@@ -31,7 +32,7 @@
  *  by Xbox right trigger axis (press trigger axis a little to start; press "A" button to stop).
  *
  * 6. Console Terminal usage GroupDisjoint subsystem.
- *  Disjoint Sequential Group Demo console output initiated by teleop enable mode.
+ *  Disjoint Sequential Group Demo console output initiated by entering teleop enable mode.
  *  Show that subsystem default command doesn't run within a group command unless the command with
  *  the subsystem requirement is disjointed from the group by using a Proxy structure or separated
  *  commands structure.
@@ -157,10 +158,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    m_robotContainer.beforeCommands(); // get a consistent set of all inputs
-    CommandScheduler.getInstance().run(); // check all the triggers and run all the scheduled
-    // commands
-    m_robotContainer.afterCommands(); // write outputs such as logging, dashboards and indicators
+    // get a consistent set of all inputs
+    m_robotContainer.runBeforeCommands();
+    // check all the triggers and run all the scheduled commands
+    CommandScheduler.getInstance().run();
+    // write outputs such as logging, dashboards, indicators, and goal-oriented subsystem periodic
+    m_robotContainer.runAfterCommands();
   }
 
   @Override

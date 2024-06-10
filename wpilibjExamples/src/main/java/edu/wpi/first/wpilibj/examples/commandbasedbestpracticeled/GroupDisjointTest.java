@@ -265,10 +265,10 @@ public class GroupDisjointTest {
    * <p>There are clever ways to register classes so they are automatically included in a list but
    * this example is simplistic - remember to type them in.
    */
-  public void beforeCommands() {
-    m_groupDisjoint[m_a].afterCommands();
-    m_groupDisjoint[m_b].afterCommands();
-    m_groupDisjoint[m_c].afterCommands();
+  public void runBeforeCommands() {
+    m_groupDisjoint[m_a].runBeforeCommands();
+    m_groupDisjoint[m_b].runBeforeCommands();
+    m_groupDisjoint[m_c].runBeforeCommands();
   }
 
   /**
@@ -280,10 +280,10 @@ public class GroupDisjointTest {
    * <p>There are clever ways to register classes so they are automatically included in a list but
    * this example isn't it; simplistic - remember to type them in.
    */
-  public void afterCommands() {
-    m_groupDisjoint[m_a].afterCommands();
-    m_groupDisjoint[m_b].afterCommands();
-    m_groupDisjoint[m_c].afterCommands();
+  public void runAfterCommands() {
+    m_groupDisjoint[m_a].runAfterCommands();
+    m_groupDisjoint[m_b].runAfterCommands();
+    m_groupDisjoint[m_c].runAfterCommands();
   }
 
   // The following methods might be included in an upcoming WPILib release
