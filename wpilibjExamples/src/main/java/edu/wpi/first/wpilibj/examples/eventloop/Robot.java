@@ -4,8 +4,13 @@
 
 package edu.wpi.first.wpilibj.examples.eventloop;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -31,6 +36,11 @@ public class Robot extends TimedRobot {
 
   private final EventLoop m_loop = new EventLoop();
   private final Joystick m_joystick = new Joystick(0);
+
+  private final MutableMeasure<Velocity<Angle>> m_prevSpeedSetpoint =
+      MutableMeasure.zero(RadiansPerSecond);
+  private final MutableMeasure<Velocity<Angle>> m_speedSetpoint =
+      MutableMeasure.zero(RadiansPerSecond);
 
   @Override
   public void robotInit() {
@@ -61,10 +71,14 @@ public class Robot extends TimedRobot {
     shootTrigger
         // accelerate the shooter wheel
         .ifHigh(
-        () ->
-            m_shooter.setVoltage(
-                m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
-                    + m_ff.calculate(SHOT_VELOCITY)));
+        () -> {
+          m_prevSpeedSetpoint.mut_setMagnitude(m_shooterEncoder.getRate());
+          m_speedSetpoint.mut_setMagnitude(SHOT_VELOCITY);
+          m_shooter.setVoltage(
+              m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
+                  + m_ff.calculate(m_prevSpeedSetpoint, m_speedSetpoint));
+        });
+
     // if not, stop
     shootTrigger.negate().ifHigh(m_shooter::stopMotor);
 

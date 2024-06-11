@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.elevatortrapezoidprofile;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -15,7 +15,7 @@ public class Robot extends TimedRobot {
   private final Joystick m_joystick = new Joystick(1);
   private final ExampleSmartMotorController m_motor = new ExampleSmartMotorController(1);
   // Note: These gains are fake, and will have to be tuned for your robot.
-  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 1.5);
+  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(1, 0, 1.5);
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.

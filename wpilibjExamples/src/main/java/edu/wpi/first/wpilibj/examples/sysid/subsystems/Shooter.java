@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.sysid.subsystems;
 
 import static edu.wpi.first.units.MutableMeasure.mutable;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -45,6 +46,11 @@ public class Shooter extends SubsystemBase {
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
   // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
   private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
+
+  private final MutableMeasure<Velocity<Angle>> m_prevSpeedSetpoint =
+      MutableMeasure.zero(RadiansPerSecond);
+  private final MutableMeasure<Velocity<Angle>> m_speedSetpoint =
+      MutableMeasure.zero(RadiansPerSecond);
 
   // Create a new SysId routine for characterizing the shooter.
   private final SysIdRoutine m_sysIdRoutine =
@@ -96,9 +102,11 @@ public class Shooter extends SubsystemBase {
   public Command runShooter(DoubleSupplier shooterSpeed) {
     // Run shooter wheel at the desired speed using a PID controller and feedforward.
     return run(() -> {
+          m_prevSpeedSetpoint.mut_setMagnitude(m_shooterEncoder.getRate());
+          m_speedSetpoint.mut_setMagnitude(shooterSpeed.getAsDouble());
           m_shooterMotor.setVoltage(
               m_shooterFeedback.calculate(m_shooterEncoder.getRate(), shooterSpeed.getAsDouble())
-                  + m_shooterFeedforward.calculate(shooterSpeed.getAsDouble()));
+                  + m_shooterFeedforward.calculate(m_prevSpeedSetpoint, m_speedSetpoint));
           m_feederMotor.set(ShooterConstants.kFeederSpeed);
         })
         .finallyDo(

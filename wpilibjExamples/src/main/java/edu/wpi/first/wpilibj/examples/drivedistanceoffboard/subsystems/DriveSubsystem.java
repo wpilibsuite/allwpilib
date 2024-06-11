@@ -4,8 +4,13 @@
 
 package edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
@@ -37,6 +42,15 @@ public class DriveSubsystem extends SubsystemBase {
   // The robot's drive
   private final DifferentialDrive m_drive =
       new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
+
+  private final MutableMeasure<Velocity<Distance>> m_prevLeftSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
+  private final MutableMeasure<Velocity<Distance>> m_prevRightSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
+  private final MutableMeasure<Velocity<Distance>> m_leftSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
+  private final MutableMeasure<Velocity<Distance>> m_rightSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -72,14 +86,20 @@ public class DriveSubsystem extends SubsystemBase {
    * @param right The right wheel state.
    */
   public void setDriveStates(TrapezoidProfile.State left, TrapezoidProfile.State right) {
+
+    m_prevLeftSpeedSetpoint.mut_setMagnitude(getLeftEncoderDistance());
+    m_prevRightSpeedSetpoint.mut_setMagnitude(getRightEncoderDistance());
+    m_leftSpeedSetpoint.mut_setMagnitude(left.velocity);
+    m_rightSpeedSetpoint.mut_setMagnitude(right.velocity);
+
     m_leftLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         left.position,
-        m_feedforward.calculate(left.velocity));
+        m_feedforward.calculate(m_prevLeftSpeedSetpoint, m_leftSpeedSetpoint));
     m_rightLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         right.position,
-        m_feedforward.calculate(right.velocity));
+        m_feedforward.calculate(m_prevRightSpeedSetpoint, m_rightSpeedSetpoint));
   }
 
   /**

@@ -4,11 +4,15 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -27,6 +31,10 @@ public class Shooter extends SubsystemBase {
       new SimpleMotorFeedforward(
           ShooterConstants.kSVolts, ShooterConstants.kVVoltSecondsPerRotation);
   private final PIDController m_shooterFeedback = new PIDController(ShooterConstants.kP, 0.0, 0.0);
+  private final MutableMeasure<Velocity<Angle>> m_prevSpeedSetpoint =
+      MutableMeasure.zero(RadiansPerSecond);
+  private final MutableMeasure<Velocity<Angle>> m_speedSetpoint =
+      MutableMeasure.zero(RadiansPerSecond);
 
   /** The shooter subsystem for the robot. */
   public Shooter() {
@@ -54,11 +62,15 @@ public class Shooter extends SubsystemBase {
     return parallel(
             // Run the shooter flywheel at the desired setpoint using feedforward and feedback
             run(
-                () ->
-                    m_shooterMotor.set(
-                        m_shooterFeedforward.calculate(setpointRotationsPerSecond)
-                            + m_shooterFeedback.calculate(
-                                m_shooterEncoder.getRate(), setpointRotationsPerSecond))),
+                () -> {
+                  m_prevSpeedSetpoint.mut_setMagnitude(m_shooterEncoder.getRate());
+                  m_speedSetpoint.mut_setMagnitude(setpointRotationsPerSecond);
+                  m_shooterMotor.set(
+                      m_shooterFeedforward.calculate(m_prevSpeedSetpoint, m_speedSetpoint)
+                          + m_shooterFeedback.calculate(
+                              m_shooterEncoder.getRate(), setpointRotationsPerSecond));
+                }),
+
             // Wait until the shooter has reached the setpoint, and then run the feeder
             waitUntil(m_shooterFeedback::atSetpoint).andThen(() -> m_feederMotor.set(1)))
         .withName("Shoot");

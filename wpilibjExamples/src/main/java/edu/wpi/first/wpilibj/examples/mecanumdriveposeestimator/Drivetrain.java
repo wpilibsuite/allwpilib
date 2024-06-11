@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumdriveposeestimator;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -15,6 +17,9 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
@@ -50,6 +55,23 @@ public class Drivetrain {
   private final MecanumDriveKinematics m_kinematics =
       new MecanumDriveKinematics(
           m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
+
+  private final MutableMeasure<Velocity<Distance>> m_prevFrontLeftSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
+  private final MutableMeasure<Velocity<Distance>> m_prevFrontRightSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
+  private final MutableMeasure<Velocity<Distance>> m_prevRearLeftSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
+  private final MutableMeasure<Velocity<Distance>> m_prevRearRightSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
+  private final MutableMeasure<Velocity<Distance>> m_frontLeftSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
+  private final MutableMeasure<Velocity<Distance>> m_frontRightSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
+  private final MutableMeasure<Velocity<Distance>> m_rearLeftSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
+  private final MutableMeasure<Velocity<Distance>> m_rearRightSpeedSetpoint =
+      MutableMeasure.zero(MetersPerSecond);
 
   /* Here we use MecanumDrivePoseEstimator so that we can fuse odometry readings. The numbers used
   below are robot specific, and should be tuned. */
@@ -107,10 +129,23 @@ public class Drivetrain {
    * @param speeds The desired wheel speeds.
    */
   public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
-    final double frontLeftFeedforward = m_feedforward.calculate(speeds.frontLeftMetersPerSecond);
-    final double frontRightFeedforward = m_feedforward.calculate(speeds.frontRightMetersPerSecond);
-    final double backLeftFeedforward = m_feedforward.calculate(speeds.rearLeftMetersPerSecond);
-    final double backRightFeedforward = m_feedforward.calculate(speeds.rearRightMetersPerSecond);
+    m_prevFrontLeftSpeedSetpoint.mut_setMagnitude(m_frontLeftEncoder.getRate());
+    m_prevFrontRightSpeedSetpoint.mut_setMagnitude(m_frontRightEncoder.getRate());
+    m_prevRearLeftSpeedSetpoint.mut_setMagnitude(m_backLeftEncoder.getRate());
+    m_prevRearRightSpeedSetpoint.mut_setMagnitude(m_backRightEncoder.getRate());
+    m_frontLeftSpeedSetpoint.mut_setMagnitude(speeds.frontLeftMetersPerSecond);
+    m_frontRightSpeedSetpoint.mut_setMagnitude(speeds.frontRightMetersPerSecond);
+    m_rearLeftSpeedSetpoint.mut_setMagnitude(speeds.rearLeftMetersPerSecond);
+    m_rearRightSpeedSetpoint.mut_setMagnitude(speeds.rearRightMetersPerSecond);
+
+    final double frontLeftFeedforward =
+        m_feedforward.calculate(m_prevFrontLeftSpeedSetpoint, m_frontLeftSpeedSetpoint);
+    final double frontRightFeedforward =
+        m_feedforward.calculate(m_prevFrontRightSpeedSetpoint, m_frontRightSpeedSetpoint);
+    final double backLeftFeedforward =
+        m_feedforward.calculate(m_prevRearLeftSpeedSetpoint, m_rearLeftSpeedSetpoint);
+    final double backRightFeedforward =
+        m_feedforward.calculate(m_prevRearRightSpeedSetpoint, m_rearRightSpeedSetpoint);
 
     final double frontLeftOutput =
         m_frontLeftPIDController.calculate(

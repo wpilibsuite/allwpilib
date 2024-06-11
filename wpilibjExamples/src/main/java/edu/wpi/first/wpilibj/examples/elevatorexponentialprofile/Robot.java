@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.examples.elevatorexponentialprofile;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.ExponentialProfile;
@@ -49,7 +48,9 @@ public class Robot extends TimedRobot {
     m_motor.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         m_setpoint.position,
-        m_feedforward.calculate(RadiansPerSecond.of(m_setpoint.velocity), RadiansPerSecond.of(next.velocity)) / 12.0);
+        m_feedforward.calculate(
+                RadiansPerSecond.of(m_setpoint.velocity), RadiansPerSecond.of(next.velocity))
+            / 12.0);
 
     m_setpoint = next;
   }
