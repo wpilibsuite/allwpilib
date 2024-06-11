@@ -38,6 +38,7 @@ public class SequentialCommandGroup extends Command {
    *
    * @param commands Commands to add, in order of execution.
    */
+  @SuppressWarnings("PMD.UseArraysAsList")
   public final void addCommands(Command... commands) {
     if (m_currentCommandIndex != -1) {
       throw new IllegalStateException(

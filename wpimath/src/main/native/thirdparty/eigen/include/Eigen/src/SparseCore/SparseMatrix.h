@@ -563,6 +563,8 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
   /** \internal
    * same as insert(Index,Index) except that the indices are given relative to the storage order */
   Scalar& insertByOuterInner(Index j, Index i) {
+    eigen_assert(j >= 0 && j < m_outerSize && "invalid outer index");
+    eigen_assert(i >= 0 && i < m_innerSize && "invalid inner index");
     Index start = m_outerIndex[j];
     Index end = isCompressed() ? m_outerIndex[j + 1] : start + m_innerNonZeros[j];
     Index dst = start == end ? end : m_data.searchLowerIndex(start, end, i);

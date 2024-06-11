@@ -15,7 +15,6 @@ import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.Odometry;
-import edu.wpi.first.math.kinematics.WheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Map;
@@ -38,7 +37,7 @@ import java.util.Optional;
  *
  * @param <T> Wheel positions type.
  */
-public class PoseEstimator<T extends WheelPositions<T>> {
+public class PoseEstimator<T> {
   private final Kinematics<?, T> m_kinematics;
   private final Odometry<T> m_odometry;
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
@@ -150,11 +149,10 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     PoseEstimator#updateWithTime(double,Rotation2d,WheelPositions)} then you must use a
-   *     timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
-   *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you
-   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or
-   *     sync the epochs.
+   *     PoseEstimator#updateWithTime(double,Rotation2d,Object)} then you must use a timestamp with
+   *     an epoch since FPGA startup (i.e., the epoch of this timestamp is the same epoch as {@link
+   *     edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you should use {@link
+   *     edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
@@ -263,7 +261,8 @@ public class PoseEstimator<T extends WheelPositions<T>> {
     m_odometry.update(gyroAngle, wheelPositions);
     m_poseBuffer.addSample(
         currentTimeSeconds,
-        new InterpolationRecord(getEstimatedPosition(), gyroAngle, wheelPositions.copy()));
+        new InterpolationRecord(
+            getEstimatedPosition(), gyroAngle, m_kinematics.copy(wheelPositions)));
 
     return getEstimatedPosition();
   }
@@ -272,7 +271,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    * Represents an odometry record. The record contains the inputs provided as well as the pose that
    * was observed based on these inputs, as well as the previous record and its inputs.
    */
-  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
+  private final class InterpolationRecord implements Interpolatable<InterpolationRecord> {
     // The pose observed given the current sensor inputs and the previous pose.
     private final Pose2d poseMeters;
 
@@ -311,7 +310,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
         return endValue;
       } else {
         // Find the new wheel distances.
-        var wheelLerp = wheelPositions.interpolate(endValue.wheelPositions, t);
+        var wheelLerp = m_kinematics.interpolate(wheelPositions, endValue.wheelPositions, t);
 
         // Find the new gyro angle.
         var gyroLerp = gyroAngle.interpolate(endValue.gyroAngle, t);
@@ -326,16 +325,11 @@ public class PoseEstimator<T extends WheelPositions<T>> {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof PoseEstimator.InterpolationRecord)) {
-        return false;
-      }
-      var record = (PoseEstimator<?>.InterpolationRecord) obj;
-      return Objects.equals(gyroAngle, record.gyroAngle)
-          && Objects.equals(wheelPositions, record.wheelPositions)
-          && Objects.equals(poseMeters, record.poseMeters);
+      return this == obj
+          || obj instanceof PoseEstimator<?>.InterpolationRecord record
+              && Objects.equals(gyroAngle, record.gyroAngle)
+              && Objects.equals(wheelPositions, record.wheelPositions)
+              && Objects.equals(poseMeters, record.poseMeters);
     }
 
     @Override

@@ -175,6 +175,7 @@ class Compressor : public wpi::Sendable,
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;
+  PneumaticsModuleType m_moduleType;
 };
 
 }  // namespace frc

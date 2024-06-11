@@ -62,22 +62,15 @@ public class CvSource extends ImageSource {
 
     try {
       int channels = finalImage.channels();
-      PixelFormat format;
-      if (channels == 1) {
-        // 1 channel is assumed Graysacle
-        format = PixelFormat.kGray;
-      } else if (channels == 2) {
-        // 2 channels is assumed YUYV
-        format = PixelFormat.kYUYV;
-      } else if (channels == 3) {
-        // 3 channels is assumed BGR
-        format = PixelFormat.kBGR;
-      } else if (channels == 4) {
-        // 4 channels is assumed BGRA
-        format = PixelFormat.kBGRA;
-      } else {
-        throw new VideoException("Unable to get pixel format for " + channels + " channels");
-      }
+      PixelFormat format =
+          switch (channels) {
+            case 1 -> PixelFormat.kGray; // 1 channel is assumed Grayscale
+            case 2 -> PixelFormat.kYUYV; // 2 channels is assumed YUYV
+            case 3 -> PixelFormat.kBGR; // 3 channels is assumed BGR
+            case 4 -> PixelFormat.kBGRA; // 4 channels is assumed BGRA
+            default -> throw new VideoException(
+                "Unable to get pixel format for " + channels + " channels");
+          };
 
       putFrame(finalImage, format, true);
     } finally {

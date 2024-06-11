@@ -18,7 +18,6 @@ import java.util.function.Consumer;
 import us.hebi.quickbuf.ProtoMessage;
 
 /** A network table that knows its subtable path. */
-@SuppressWarnings("PMD.CouplingBetweenObjects")
 public final class NetworkTable {
   /** The path separator for sub-tables and keys. */
   public static final char PATH_SEPARATOR = '/';
@@ -608,14 +607,9 @@ public final class NetworkTable {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-    if (!(other instanceof NetworkTable)) {
-      return false;
-    }
-    NetworkTable ntOther = (NetworkTable) other;
-    return m_inst.equals(ntOther.m_inst) && m_path.equals(ntOther.m_path);
+    return other instanceof NetworkTable ntOther
+        && m_inst.equals(ntOther.m_inst)
+        && m_path.equals(ntOther.m_path);
   }
 
   @Override

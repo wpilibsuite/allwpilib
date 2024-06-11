@@ -33,55 +33,18 @@ class DutyCycleEncoderSim {
   explicit DutyCycleEncoderSim(int channel);
 
   /**
-   * Get the position in turns.
+   * Get the position.
    *
    * @return The position.
    */
   double Get();
 
   /**
-   * Set the position in turns.
+   * Set the position.
    *
-   * @param turns The position.
+   * @param value The position.
    */
-  void Set(units::turn_t turns);
-
-  /**
-   * Get the distance.
-   *
-   * @return The distance.
-   */
-
-  double GetDistance();
-
-  /**
-   * Set the distance.
-   *
-   * @param distance The distance.
-   */
-  void SetDistance(double distance);
-
-  /**
-   * Get the absolute position.
-   *
-   * @return The absolute position
-   */
-  double GetAbsolutePosition();
-
-  /**
-   * Set the absolute position.
-   *
-   * @param position The absolute position
-   */
-  void SetAbsolutePosition(double position);
-
-  /**
-   * Get the distance per rotation for this encoder.
-   *
-   * @return The scale factor that will be used to convert rotation to useful
-   * units.
-   */
-  double GetDistancePerRotation();
+  void Set(double value);
 
   /**
    * Get if the encoder is connected.
@@ -99,8 +62,6 @@ class DutyCycleEncoderSim {
 
  private:
   hal::SimDouble m_simPosition;
-  hal::SimDouble m_simDistancePerRotation;
-  hal::SimDouble m_simAbsolutePosition;
   hal::SimBoolean m_simIsConnected;
 };
 

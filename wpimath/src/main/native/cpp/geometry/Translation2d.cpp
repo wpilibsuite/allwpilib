@@ -14,17 +14,8 @@ using namespace frc;
 Translation2d::Translation2d(const Eigen::Vector2d& vector)
     : m_x{units::meter_t{vector.x()}}, m_y{units::meter_t{vector.y()}} {}
 
-units::meter_t Translation2d::Distance(const Translation2d& other) const {
-  return units::math::hypot(other.m_x - m_x, other.m_y - m_y);
-}
-
 units::meter_t Translation2d::Norm() const {
   return units::math::hypot(m_x, m_y);
-}
-
-bool Translation2d::operator==(const Translation2d& other) const {
-  return units::math::abs(m_x - other.m_x) < 1E-9_m &&
-         units::math::abs(m_y - other.m_y) < 1E-9_m;
 }
 
 Translation2d Translation2d::Nearest(

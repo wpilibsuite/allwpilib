@@ -36,7 +36,7 @@ namespace frc {
  * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
  */
-template <typename WheelSpeeds, WheelPositions WheelPositions>
+template <typename WheelSpeeds, typename WheelPositions>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
   /**

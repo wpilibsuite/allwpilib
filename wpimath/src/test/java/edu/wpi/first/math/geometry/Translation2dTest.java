@@ -50,6 +50,17 @@ class Translation2dTest {
   }
 
   @Test
+  void testRotateAround() {
+    var original = new Translation2d(2.0, 1.0);
+    var other = new Translation2d(3.0, 2.0);
+    var rotated = original.rotateAround(other, Rotation2d.fromDegrees(180.0));
+
+    assertAll(
+        () -> assertEquals(4.0, rotated.getX(), kEpsilon),
+        () -> assertEquals(3.0, rotated.getY(), kEpsilon));
+  }
+
+  @Test
   void testMultiplication() {
     var original = new Translation2d(3.0, 5.0);
     var mult = original.times(3);
