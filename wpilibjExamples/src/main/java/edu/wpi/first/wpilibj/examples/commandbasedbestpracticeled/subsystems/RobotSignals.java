@@ -69,11 +69,15 @@ public class RobotSignals {
   // CAUTION CAUTION CAUTION -- Update this length for each view defined.
   private static final int length =
       Math.max(
-              Math.max(
-                  Math.max(Math.max(m_lastTopLED, m_lastMainLED), m_lastEnableDisableLED),
-                  m_lastHistoryDemoLED),
-              m_lastAchieveHueGoal)
-          + 1;
+        Math.max(
+          Math.max(
+            Math.max(
+              m_lastTopLED,
+            m_lastMainLED),
+          m_lastEnableDisableLED),
+        m_lastHistoryDemoLED),
+      m_lastAchieveHueGoal)
+      + 1;
 
   public final LEDView m_top;
   public final LEDView m_main;
@@ -142,24 +146,47 @@ public class RobotSignals {
       }
     }
 
+    // Some uses of setSignal assume the command keeps running so provide that function.
+    // Some uses of setSignal refresh the signal in their own looping so provide a single use, too.
+
     /**
-     * Put an LED Pattern into the view
+     * Put an LED Pattern into the view - keep running
      *
      * @param pattern
-     * @return
+     * @return Command to apply pattern to LEDs
      */
     public Command setSignal(LEDPattern pattern) {
       return run(() -> pattern.applyTo(m_view)).ignoringDisable(true).withName("LedSet");
     }
 
     /**
-     * Put a dynamic LED Pattern into the view
+     * Put a dynamic LED Pattern into the view - keep running
      *
      * @param pattern
-     * @return
+     * @return Command to apply pattern to LEDs
      */
     public Command setSignal(LEDPatternSupplier pattern) {
       return run(() -> pattern.get().applyTo(m_view)).ignoringDisable(true).withName("LedSetS");
+    }
+
+    /**
+     * Put an LED Pattern into the view - once
+     *
+     * @param pattern
+     * @return Command to apply pattern to LEDs
+     */
+    public Command setSignalOnce(LEDPattern pattern) {
+      return runOnce(() -> pattern.applyTo(m_view)).ignoringDisable(true).withName("LedSet");
+    }
+
+    /**
+     * Put a dynamic LED Pattern into the view - once
+     *
+     * @param pattern
+     * @return Command to apply pattern to LEDs
+     */
+    public Command setSignalOnce(LEDPatternSupplier pattern) {
+      return runOnce(() -> pattern.get().applyTo(m_view)).ignoringDisable(true).withName("LedSetS");
     }
   } // End LEDView
 }

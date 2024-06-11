@@ -76,13 +76,22 @@ public class RobotContainer {
    * configure driver and operator controllers' buttons
    */
   private void configureBindings() {
+    /**
+     * Start a color wheel display
+     */
     m_operatorController
         .x()
         .debounce(m_xButtonDebounceTime.in(Seconds), DebounceType.kBoth)
         .onTrue(m_robotSignals.m_top.setSignal(colorWheel()));
 
-    // Goal setting demo starts by moving the right trigger axis and then it's on until reset by
-    // "A"  button or interrupted. The right trigger axis also provides the goal.
+   /**
+    * Goal setting demo
+    *
+    * The PID controller is not running initially until a setpoint is set by moving the Xbox
+    * right trigger axis past the threshold at which time a command runs forever to accept new
+    * setpoints. The reset function on the Xbox A button interrupts the command that accepts new
+    * setpoints and stops the underlying controller process.
+    */
     var triggerHueGoalDeadBand = 0.05; // triggers if past a small threshold (scale of 0 to 1)
     m_operatorController.rightTrigger(triggerHueGoalDeadBand)
         .onTrue(
@@ -96,7 +105,7 @@ public class RobotContainer {
     m_operatorController
         .a()
         .onTrue(m_achieveHueGoal.m_hueGoal.reset()); // stops accepting goals by interrupting the
-                                          // goal-acceptance command and halts the under-laying
+                                          // goal-acceptance command and halts the underlying
                                           // process by sending a message to it.
   }
 
@@ -178,6 +187,7 @@ public class RobotContainer {
             // Use ".asProxy()" to disjoint the group and allow the "m_top" default command to run.
             // What happened to the ".andThen"? Beware using Proxy can cause surprising behavior!
                 .andThen(m_robotSignals.m_top.setSignal(autoTopSignal)),
+
             m_robotSignals.m_main.setSignal(autoMainSignal))
         .withName("AutoSignal");
   }

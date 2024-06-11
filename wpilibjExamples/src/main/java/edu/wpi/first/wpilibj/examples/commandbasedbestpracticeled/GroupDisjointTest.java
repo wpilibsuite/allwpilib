@@ -197,6 +197,14 @@ public class GroupDisjointTest {
 
       runOnce(
           () -> {
+            // cleanup any default commands if a previous aborted run
+            CommandScheduler.getInstance().cancel(m_groupDisjoint[m_a].getDefaultCommand());
+            CommandScheduler.getInstance().cancel(m_groupDisjoint[m_b].getDefaultCommand());
+            CommandScheduler.getInstance().cancel(m_groupDisjoint[m_c].getDefaultCommand());
+            m_groupDisjoint[m_a].removeDefaultCommand();
+            m_groupDisjoint[m_b].removeDefaultCommand();
+            m_groupDisjoint[m_c].removeDefaultCommand();
+            // default commands
             m_groupDisjoint[m_a].setDefaultCommand();
             m_groupDisjoint[m_b].setDefaultCommand();
             m_groupDisjoint[m_c].setDefaultCommand();

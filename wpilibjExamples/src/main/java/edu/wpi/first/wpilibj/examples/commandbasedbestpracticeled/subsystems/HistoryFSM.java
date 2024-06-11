@@ -168,8 +168,8 @@ public class HistoryFSM extends SubsystemBase {
    * Run after commands and triggers
    */
   public void runAfterCommands() {
-    // testing prints
-    boolean debugPrint = false;
+
+    boolean debugPrint = false; // testing prints - not for production
     if (debugPrint) {
       m_debugPrintCounter++;
       if (m_debugPrintCounter % 600 == 0) {
@@ -187,7 +187,7 @@ public class HistoryFSM extends SubsystemBase {
     // or the device that receives the data may keep the last value alive.
     // Being done here for illustrative purposes.
 
-    m_robotSignals.setSignal(m_persistentPatternDemo).schedule(); // access to the LEDS is only by
+    m_robotSignals.setSignalOnce(m_persistentPatternDemo).schedule(); // access to the LEDS is only by
     // command so do it that way.
     // Note that because this method runs in disabled mode, the color persists in Disabled mode
     // even if the command was

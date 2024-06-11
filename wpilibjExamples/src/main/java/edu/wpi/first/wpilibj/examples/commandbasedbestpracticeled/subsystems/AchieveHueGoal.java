@@ -12,6 +12,8 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
  * to do PID controller entirely within a subsystem.
  */
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDView;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -28,22 +30,19 @@ import java.util.function.DoubleSupplier;
  * trigger and display on the LEDs.
  */
 public class AchieveHueGoal {
-  // PID initialization.
-
-  // The PID controller is not running initially until a setpoint is set.
-
-  // There is no running command to make new setpoints until the Xbox right trigger axis is
-  // pressed at which time a command runs forever to accept new setpoints.
-  
-  // This is handled in RobotContainer.java and this class shouldn't even know that to be
-  // able to comment here on how the setpoint is determined.
-
+  /**
+   *  PID initialization.
+   * 
+   *  The PID controller is ready but not running initially until a setpoint is set. When the
+   *  setpoint is set the controller starts and runs forever until the reset function is invoked.
+   */
   private static final double m_kP = 0.025;
   private static final double m_kI = 0.0;
   private static final double m_kD = 0.0;
   private final PIDController m_hueController = new PIDController(m_kP, m_kI, m_kD);
   private static final double m_minimumHue = 0.0;
   private static final double m_maximumHue = 180.0;
+  private static final double m_tolerance = 2.0;
   // initialize setpoint (goal) such that the controller doesn't start until setpoint is set
   private double m_hueSetpoint = Double.NaN;
   private double m_currentStateHue = 0.0; // also considered the initial and previous state
@@ -59,6 +58,7 @@ public class AchieveHueGoal {
    */
   public AchieveHueGoal(LEDView robotSignals) {
     this.m_robotSignals = robotSignals;
+    m_hueController.setTolerance(m_tolerance);
   }
 
   // Example of methods and triggers that the system will require are put here.
@@ -87,25 +87,31 @@ public class AchieveHueGoal {
     StackTraceElement element = stackTrace[2];
     if ("frc.robot.RobotContainer".equals(element.getClassName()) && "runAfterCommands".equals(element.getMethodName())) {
       // running valid from RobotContainer.afterCommands
-      LEDPattern persistentPatternDemo;
-    if (!Double.isNaN(m_hueSetpoint)) {
-      // setpoint has been set so run controller periodically
 
-      // Note that the WPILib PID controller knows if it has a setpoint and measurement
-      // but that information is private and not accessible. We need to know that here
-      // so the signals stay at their initial state (assumed off) until a setpoint set.
-      m_currentStateHue =
-          MathUtil.clamp(
-              m_currentStateHue + m_hueController.calculate(m_currentStateHue, m_hueSetpoint),
-              m_minimumHue,
-              m_maximumHue);
-        persistentPatternDemo =
-          LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200)); // display state;
+      // here's the controller that runs based on the Goal that was set
+      LEDPattern currentStateSignal;
+      if (!Double.isNaN(m_hueSetpoint)) {
+        // setpoint has been set so run controller periodically
+
+        // Note that the WPILib PID controller knows if it has a setpoint and measurement
+        // but that information is private and not accessible. We need to know that here
+        // so the signals stay at their initial state (assumed off) until a setpoint set.
+        m_currentStateHue =
+            MathUtil.clamp(
+                m_currentStateHue + m_hueController.calculate(m_currentStateHue, m_hueSetpoint),
+                m_minimumHue,
+                m_maximumHue);
+          currentStateSignal =
+            LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200)); // display state;
       } else {
-        persistentPatternDemo =
+        currentStateSignal =
             LEDPattern.solid(Color.fromHSV(0, 0, 0)); // display state off - black;        
       }
-      m_robotSignals.setSignal(persistentPatternDemo).schedule(); // access to the LEDs is only by
+
+      if (isAtHueGoal()) {
+        currentStateSignal = currentStateSignal.blink(Seconds.of(0.1)); // blink if made it to the Goal
+      }
+      m_robotSignals.setSignalOnce(currentStateSignal).schedule(); // access to the LEDs is only by
                                                     // command in this example so do it that way. 
     }
  }
@@ -184,6 +190,8 @@ public class AchieveHueGoal {
      * reset or stop the controller
      */
     public Command reset() {
+      // running any command stops the goal-accepting command
+      // setting the hue to NaN flags the controller to stop calculating
       return runOnce(()-> m_hueSetpoint = Double.NaN);
     }
   }

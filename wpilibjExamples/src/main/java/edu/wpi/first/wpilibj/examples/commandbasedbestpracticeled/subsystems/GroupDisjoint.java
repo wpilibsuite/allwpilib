@@ -34,7 +34,7 @@ public class GroupDisjoint extends SubsystemBase {
    * these resources if creating commands from these methods.
    */
 
-  private String m_resourceID = "X";
+  private String m_resourceID;
   // variables used to produce the periodic output
   private String m_output = ""; // set for what to output
   private boolean m_outputFresh; // false; periodically checking but sometimes there is no new data
