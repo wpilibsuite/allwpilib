@@ -38,8 +38,8 @@ public class SimpleMotorFeedforward {
   private Matrix<N1, N1> nextR;
 
   /**
-   * Creates a new SimpleMotorFeedforward with the specified gains and period. Units of the gain values will
-   * dictate units of the computed feedforward.
+   * Creates a new SimpleMotorFeedforward with the specified gains and period. Units of the gain
+   * values will dictate units of the computed feedforward.
    *
    * @param ks The static gain.
    * @param kv The velocity gain.
@@ -59,8 +59,9 @@ public class SimpleMotorFeedforward {
     if (ka < 0.0) {
       throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
     }
-    if (periodSeconds <= 0.0){
-      throw new IllegalArgumentException("period must be a positive number, got " + periodSeconds + "!");
+    if (periodSeconds <= 0.0) {
+      throw new IllegalArgumentException(
+          "period must be a positive number, got " + periodSeconds + "!");
     }
     this.plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
     this.feedforward = new LinearPlantInversionFeedforward<>(plant, periodSeconds);
@@ -70,8 +71,8 @@ public class SimpleMotorFeedforward {
   }
 
   /**
-   * Creates a new SimpleMotorFeedforward with the specified gains and period. The period is defaulted to 20 ms.
-   * Units of the gain values will dictate units of the computed feedforward.
+   * Creates a new SimpleMotorFeedforward with the specified gains and period. The period is
+   * defaulted to 20 ms. Units of the gain values will dictate units of the computed feedforward.
    *
    * @param ks The static gain.
    * @param kv The velocity gain.
@@ -85,7 +86,8 @@ public class SimpleMotorFeedforward {
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains. Acceleration gain is defaulted
-   * to zero. The period is defaulted to 20 ms.  Units of the gain values will dictate units of the computed feedforward.
+   * to zero. The period is defaulted to 20 ms. Units of the gain values will dictate units of the
+   * computed feedforward.
    *
    * @param ks The static gain.
    * @param kv The velocity gain.
@@ -128,11 +130,13 @@ public class SimpleMotorFeedforward {
    * @param nextVelocity The next velocity setpoint.
    * @return The computed feedforward.
    */
-  public <U extends Unit<U>> double calculate(Measure<Velocity<U>> currentVelocity, Measure<Velocity<U>> nextVelocity) {
+  public <U extends Unit<U>> double calculate(
+      Measure<Velocity<U>> currentVelocity, Measure<Velocity<U>> nextVelocity) {
     r.set(0, 0, currentVelocity.magnitude());
     nextR.set(0, 0, nextVelocity.magnitude());
 
-    return ks * Math.signum(currentVelocity.magnitude()) + feedforward.calculate(r, nextR).get(0, 0);
+    return ks * Math.signum(currentVelocity.magnitude())
+        + feedforward.calculate(r, nextR).get(0, 0);
   }
 
   /**

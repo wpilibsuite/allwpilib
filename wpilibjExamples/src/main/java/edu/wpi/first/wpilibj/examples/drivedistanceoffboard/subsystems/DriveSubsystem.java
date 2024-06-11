@@ -86,7 +86,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @param right The right wheel state.
    */
   public void setDriveStates(TrapezoidProfile.State left, TrapezoidProfile.State right) {
-
     m_prevLeftSpeedSetpoint.mut_setMagnitude(getLeftEncoderDistance());
     m_prevRightSpeedSetpoint.mut_setMagnitude(getRightEncoderDistance());
     m_leftSpeedSetpoint.mut_setMagnitude(left.velocity);
