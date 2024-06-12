@@ -141,6 +141,40 @@ public class SimpleMotorFeedforward {
       Measure<Velocity<U>> currentVelocity, Measure<Velocity<U>> nextVelocity) {
     if (ka == 0.0) {
       return ks * Math.signum(nextVelocity.magnitude()) + kv * nextVelocity.magnitude();
+    // Given the following discrete feedforward model
+    //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+
+    // where
+    //   A_d = eᴬᵀ
+    //   B_d = A⁻¹(eᴬᵀ - I)B
+    //   A = −kᵥ/kₐ
+    //   B = 1/kₐ
+
+    // We want the feedforward model when kₐ = 0.    
+    // Simplify A.
+    //   A = −kᵥ/kₐ
+    // As kₐ approaches zero, A approaches -∞.
+    //   A = −∞
+
+    // Simplify A_d.
+    //   A_d = eᴬᵀ
+    //   A_d = exp(−∞)
+    //   A_d = 0
+
+    // Simplify B_d.
+    //   B_d = A⁻¹(eᴬᵀ - I)B
+    //   B_d = A⁻¹((0) - I)B
+    //   B_d = A⁻¹(-I)B
+    //   B_d = -A⁻¹B
+    //   B_d = -(−kᵥ/kₐ)⁻¹(1/kₐ)
+    //   B_d = (kᵥ/kₐ)⁻¹(1/kₐ)
+    //   B_d = kₐ/kᵥ(1/kₐ)
+    //   B_d = 1/kᵥ
+
+    // Substitute these into the feedforward equation.
+    //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+    //   uₖ = (1/kᵥ)⁺(rₖ₊₁ − (0) rₖ)
+    //   uₖ = kᵥrₖ₊₁
     } else {
       r.set(0, 0, currentVelocity.magnitude());
       nextR.set(0, 0, nextVelocity.magnitude());
