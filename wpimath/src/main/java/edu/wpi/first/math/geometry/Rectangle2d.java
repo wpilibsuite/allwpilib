@@ -4,9 +4,13 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.proto.Rectangle2dProto;
 import edu.wpi.first.math.geometry.struct.Rectangle2dStruct;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -34,6 +38,18 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
     m_center = center;
     m_xWidth = xWidth;
     m_yWidth = yWidth;
+  }
+
+  /**
+   * Constructs a rectangle at the specified position with the specified width and height. The X and
+   * Y widths will be converted to and tracked as meters.
+   *
+   * @param center The position (translation and rotation) of the rectangle.
+   * @param xWidth The x size component of the rectangle, in unrotated coordinate frame.
+   * @param yWidth The y size component of the rectangle, in unrotated coordinate frame.
+   */
+  public Rectangle2d(Pose2d center, Measure<Distance> xWidth, Measure<Distance> yWidth) {
+    this(center, xWidth.in(Meters), yWidth.in(Meters));
   }
 
   /**
@@ -84,6 +100,24 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    */
   public double getYWidth() {
     return m_yWidth;
+  }
+
+  /**
+   * Returns the x size component of the rectangle in a measure.
+   *
+   * @return The x size component of the rectangle in a measure.
+   */
+  public Measure<Distance> getMeasureXWidth() {
+    return Meters.of(m_xWidth);
+  }
+
+  /**
+   * Returns the y size component of the rectangle in a measure.
+   *
+   * @return The y size component of the rectangle in a measure.
+   */
+  public Measure<Distance> getMeasureYWidth() {
+    return Meters.of(m_yWidth);
   }
 
   /**
@@ -154,6 +188,16 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    */
   public double getDistance(Translation2d point) {
     return findNearestPoint(point).getDistance(point);
+  }
+
+  /**
+   * Returns the distance between the perimeter of the rectangle and the point in a measure.
+   *
+   * @param point The point to check.
+   * @return The distance (0, if the point is contained by the rectangle) in a measure.
+   */
+  public Measure<Distance> getMeasureDistance(Translation2d point) {
+    return Meters.of(getDistance(point));
   }
 
   /**
