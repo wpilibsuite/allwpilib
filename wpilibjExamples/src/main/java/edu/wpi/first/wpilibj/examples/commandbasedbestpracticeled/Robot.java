@@ -198,7 +198,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     // Commands running from another mode haven't been cancelled directly but may be interrupted by
     // this command.
-    m_autonomousSignal = m_robotContainer.getAutonomousSignal();
+    m_autonomousSignal = m_robotContainer.setAutonomousSignal();
 
     if (m_autonomousSignal != null) {
       m_autonomousSignal.schedule();

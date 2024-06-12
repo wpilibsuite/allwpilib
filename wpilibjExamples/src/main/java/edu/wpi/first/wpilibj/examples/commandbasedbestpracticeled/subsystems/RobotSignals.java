@@ -87,10 +87,10 @@ public class RobotSignals {
 
   private final AddressableLEDBuffer bufferLED;
 
-  public RobotSignals(int port) {
+  public RobotSignals() {
     // start updating the physical LED strip
-
-    m_strip = new AddressableLED(port);
+    final int addressableLedPwmPort = 1;
+    m_strip = new AddressableLED(addressableLedPwmPort);
     m_strip.setLength(length);
     m_strip.start();
 

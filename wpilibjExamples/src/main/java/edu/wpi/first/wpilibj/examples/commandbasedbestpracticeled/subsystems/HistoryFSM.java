@@ -32,8 +32,6 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,22 +70,11 @@ public class HistoryFSM extends SubsystemBase {
   private Measure<Time> m_nextTime = Milliseconds.of(m_endOfTime);
   Measure<Time> m_changeColorPeriod = Seconds.of(2.0); // display color for this long
   Measure<Time> m_colorLockoutPeriod = Seconds.of(20.0); // try not to reuse a color for this long
-  // elapsed timer
-  private Trigger m_timeOfNewColor = new Trigger(this::timesUp);
-  private static final Measure<Time> m_yButtonDebounceTime = Milliseconds.of(40.0);
 
-  public HistoryFSM(LEDView robotSignals, CommandXboxController operatorController) {
+  public HistoryFSM(LEDView robotSignals) {
     this.m_robotSignals = robotSignals;
 
     fillInitialTimes(); // initialize last time used for all the hues of the color wheel
-
-    // Trigger if it's time for a new color or the operator pressed their "Y" button
-    m_timeOfNewColor
-        .or(operatorController.y().debounce(m_yButtonDebounceTime.in(Seconds)))
-        .onTrue(
-            runOnce(this::getHSV) // new color
-                .andThen(runOnce(this::setNextTime)) // next time for new color
-            );
   }
 
   /** Create an initialized list of hues */
@@ -109,7 +96,7 @@ public class HistoryFSM extends SubsystemBase {
    *
    * @return has time elapsed
    */
-  private boolean timesUp() {
+  public boolean timesUp() {
     if (m_nextTime.lt(Milliseconds.of(System.currentTimeMillis()))) {
       // reset; a command may run that will set the correct periodic "nextTime".
       // Otherwise wait for other triggering to restart.
@@ -122,12 +109,22 @@ public class HistoryFSM extends SubsystemBase {
   }
 
   /**
+   * Get the next color and set the timer for the next color change
+   * @return Command to do it
+   */
+  public Command newColor() {
+    return
+      runOnce(this::getHSV) // new color
+      .andThen(runOnce(this::setNextTime)); // next time for new color
+  }
+
+  /**
    * Sets a color and quits immediately assuming the color persists somehow (in
    * "persistentPatternDemo") until the next color is later requested.
    *
    * <p>Set a random color that hasn't been used in the last "colorLockoutPeriod"
    */
-  public void getHSV() {
+  private void getHSV() {
     Measure<Time> currentTime = Milliseconds.of(System.currentTimeMillis());
     int randomHue; // to be the next color
     int loopCounter = 0; // count attempts to find a different hue
@@ -190,14 +187,11 @@ public class HistoryFSM extends SubsystemBase {
     m_robotSignals.setSignalOnce(m_persistentPatternDemo).schedule(); // access to the LEDS is only by
     // command so do it that way.
     // Note that because this method runs in disabled mode, the color persists in Disabled mode
-    // even if the command was
-    // not to run in disabled mode.
+    // even if the command was not to run in disabled mode.
     // Could check here for that and black out if necessary. Or do something in disabledInit().
-
     // Thus, we end up demonstrating how to run a command periodically (as a minor part of the
     // bigger picture).
     // This usage within a subsystem is NOT (maybe) the same as a command directly scheduling
-    // another command;
-    // that technique should be avoided.
+    // another command; that technique should be avoided.
   }
 }

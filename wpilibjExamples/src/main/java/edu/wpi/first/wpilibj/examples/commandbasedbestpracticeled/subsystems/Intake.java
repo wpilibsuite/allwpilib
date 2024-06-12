@@ -18,23 +18,15 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Intake extends SubsystemBase {
   private final LEDView m_robotSignals;
-  private final CommandXboxController m_operatorController;
-
-  private final Trigger m_gamePieceAcquired = new Trigger(this::hasGamePieceAcquired);
 
   /**
    * @param robotSignals Signal Subsystem
-   * @param operatorController Source of fake target of game piece acquired event
    */
-  public Intake(LEDView robotSignals, CommandXboxController operatorController) {
+  public Intake(LEDView robotSignals) {
     this.m_robotSignals = robotSignals;
-    this.m_operatorController = operatorController;
-    m_gamePieceAcquired.whileTrue(gamePieceIsAcquired()); // Trigger's "this" is null until here.
   }
 
   /**
@@ -42,7 +34,7 @@ public class Intake extends SubsystemBase {
    * 
    * @return command to set the signal indicating game piece acquired
    */
-  private Command gamePieceIsAcquired() {
+  public Command gamePieceIsAcquired() {
     LEDPattern gamePieceAcquiredSignal = LEDPattern.solid(Color.kMagenta).blink(Seconds.of(0.2));
     return
       parallel(
@@ -52,15 +44,6 @@ public class Intake extends SubsystemBase {
 
           none() // this command locks the Intake subsystem for the group since there is no asProxy
       );
-  }
-
-  /**
-   * Determine if a game piece has been acquired.
-   * 
-   * @return status of fake event source for game piece acquired
-   */
-  private boolean hasGamePieceAcquired() {
-    return m_operatorController.getHID().getBButton();
   }
 
   /**
