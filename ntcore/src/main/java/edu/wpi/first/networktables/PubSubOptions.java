@@ -15,38 +15,19 @@ public class PubSubOptions {
   public PubSubOptions(PubSubOption... options) {
     for (PubSubOption option : options) {
       switch (option.m_kind) {
-        case periodic:
-          periodic = option.m_dValue;
-          break;
-        case sendAll:
-          sendAll = option.m_bValue;
-          break;
-        case topicsOnly:
-          topicsOnly = option.m_bValue;
-          break;
-        case pollStorage:
-          pollStorage = option.m_iValue;
-          break;
-        case keepDuplicates:
-          keepDuplicates = option.m_bValue;
-          break;
-        case disableRemote:
-          disableRemote = option.m_bValue;
-          break;
-        case disableLocal:
-          disableLocal = option.m_bValue;
-          break;
-        case excludePublisher:
-          excludePublisher = option.m_iValue;
-          break;
-        case excludeSelf:
-          excludeSelf = option.m_bValue;
-          break;
-        case hidden:
-          hidden = option.m_bValue;
-          break;
-        default:
-          break;
+        case periodic -> periodic = option.m_dValue;
+        case sendAll -> sendAll = option.m_bValue;
+        case topicsOnly -> topicsOnly = option.m_bValue;
+        case pollStorage -> pollStorage = option.m_iValue;
+        case keepDuplicates -> keepDuplicates = option.m_bValue;
+        case disableRemote -> disableRemote = option.m_bValue;
+        case disableLocal -> disableLocal = option.m_bValue;
+        case excludePublisher -> excludePublisher = option.m_iValue;
+        case excludeSelf -> excludeSelf = option.m_bValue;
+        case hidden -> hidden = option.m_bValue;
+        default -> {
+          // NOP
+        }
       }
     }
   }

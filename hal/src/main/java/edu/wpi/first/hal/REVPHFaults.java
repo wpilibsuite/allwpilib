@@ -59,42 +59,25 @@ public class REVPHFaults {
    *     the hardware.
    */
   public final boolean getChannelFault(int channel) {
-    switch (channel) {
-      case 0:
-        return Channel0Fault;
-      case 1:
-        return Channel1Fault;
-      case 2:
-        return Channel2Fault;
-      case 3:
-        return Channel3Fault;
-      case 4:
-        return Channel4Fault;
-      case 5:
-        return Channel5Fault;
-      case 6:
-        return Channel6Fault;
-      case 7:
-        return Channel7Fault;
-      case 8:
-        return Channel8Fault;
-      case 9:
-        return Channel9Fault;
-      case 10:
-        return Channel10Fault;
-      case 11:
-        return Channel11Fault;
-      case 12:
-        return Channel12Fault;
-      case 13:
-        return Channel13Fault;
-      case 14:
-        return Channel14Fault;
-      case 15:
-        return Channel15Fault;
-      default:
-        throw new IndexOutOfBoundsException("Pneumatics fault channel out of bounds!");
-    }
+    return switch (channel) {
+      case 0 -> Channel0Fault;
+      case 1 -> Channel1Fault;
+      case 2 -> Channel2Fault;
+      case 3 -> Channel3Fault;
+      case 4 -> Channel4Fault;
+      case 5 -> Channel5Fault;
+      case 6 -> Channel6Fault;
+      case 7 -> Channel7Fault;
+      case 8 -> Channel8Fault;
+      case 9 -> Channel9Fault;
+      case 10 -> Channel10Fault;
+      case 11 -> Channel11Fault;
+      case 12 -> Channel12Fault;
+      case 13 -> Channel13Fault;
+      case 14 -> Channel14Fault;
+      case 15 -> Channel15Fault;
+      default -> throw new IndexOutOfBoundsException("Pneumatics fault channel out of bounds!");
+    };
   }
 
   /**

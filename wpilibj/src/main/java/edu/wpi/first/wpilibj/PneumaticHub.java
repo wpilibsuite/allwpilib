@@ -25,7 +25,7 @@ public class PneumaticHub implements PneumaticsBase {
     private int m_refCount;
     private int m_reservedMask;
     private boolean m_compressorReserved;
-    public int[] m_oneShotDurMs = new int[PortsJNI.getNumREVPHChannels()];
+    public final int[] m_oneShotDurMs = new int[PortsJNI.getNumREVPHChannels()];
     private final Object m_reserveLock = new Object();
 
     DataStore(int module) {

@@ -17,6 +17,7 @@ typedef CwiseUnaryOp<internal::scalar_arg_op<Scalar>, const Derived> CwiseArgRet
 typedef CwiseUnaryOp<internal::scalar_carg_op<Scalar>, const Derived> CwiseCArgReturnType;
 typedef CwiseUnaryOp<internal::scalar_sqrt_op<Scalar>, const Derived> CwiseSqrtReturnType;
 typedef CwiseUnaryOp<internal::scalar_cbrt_op<Scalar>, const Derived> CwiseCbrtReturnType;
+typedef CwiseUnaryOp<internal::scalar_square_op<Scalar>, const Derived> CwiseSquareReturnType;
 typedef CwiseUnaryOp<internal::scalar_sign_op<Scalar>, const Derived> CwiseSignReturnType;
 typedef CwiseUnaryOp<internal::scalar_inverse_op<Scalar>, const Derived> CwiseInverseReturnType;
 
@@ -66,7 +67,15 @@ EIGEN_DOC_UNARY_ADDONS(cwiseCbrt, cube - root)
 ///
 /// \sa cwiseSqrt(), cwiseSquare(), cwisePow()
 ///
-EIGEN_DEVICE_FUNC inline const CwiseCbrtReturnType cwiseCbrt() const { return CwiseSCbrtReturnType(derived()); }
+EIGEN_DEVICE_FUNC inline const CwiseCbrtReturnType cwiseCbrt() const { return CwiseCbrtReturnType(derived()); }
+
+/// \returns an expression of the coefficient-wise square of *this.
+///
+EIGEN_DOC_UNARY_ADDONS(cwiseSquare, square)
+///
+/// \sa cwisePow(), cwiseSqrt(), cwiseCbrt()
+///
+EIGEN_DEVICE_FUNC inline const CwiseSquareReturnType cwiseSquare() const { return CwiseSquareReturnType(derived()); }
 
 /// \returns an expression of the coefficient-wise signum of *this.
 ///

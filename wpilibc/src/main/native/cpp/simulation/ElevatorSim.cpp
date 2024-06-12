@@ -12,11 +12,11 @@
 using namespace frc;
 using namespace frc::sim;
 
-ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 1>& plant,
+ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 2>& plant,
                          const DCMotor& gearbox, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
                          units::meter_t startingHeight,
-                         const std::array<double, 1>& measurementStdDevs)
+                         const std::array<double, 2>& measurementStdDevs)
     : LinearSystemSim(plant, measurementStdDevs),
       m_gearbox(gearbox),
       m_minHeight(minHeight),
@@ -30,7 +30,7 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
                          units::meter_t drumRadius, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
                          units::meter_t startingHeight,
-                         const std::array<double, 1>& measurementStdDevs)
+                         const std::array<double, 2>& measurementStdDevs)
     : ElevatorSim(LinearSystemId::ElevatorSystem(gearbox, carriageMass,
                                                  drumRadius, gearing),
                   gearbox, minHeight, maxHeight, simulateGravity,
@@ -44,7 +44,7 @@ ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          const DCMotor& gearbox, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
                          units::meter_t startingHeight,
-                         const std::array<double, 1>& measurementStdDevs)
+                         const std::array<double, 2>& measurementStdDevs)
     : ElevatorSim(LinearSystemId::IdentifyPositionSystem(kV, kA), gearbox,
                   minHeight, maxHeight, simulateGravity, startingHeight,
                   measurementStdDevs) {}
@@ -98,6 +98,7 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
 
 void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
   SetInput(Vectord<1>{voltage.value()});
+  ClampInput(frc::RobotController::GetBatteryVoltage().value());
 }
 
 Vectord<2> ElevatorSim::UpdateX(const Vectord<2>& currentXhat,

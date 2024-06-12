@@ -9,6 +9,7 @@
 #include <stddef.h>  //NOLINT
 
 #include <wpi/Synchronization.h>
+#include <wpi/string.h>
 
 #include "hal/DriverStationTypes.h"
 #include "hal/Types.h"
@@ -142,21 +143,12 @@ int32_t HAL_GetJoystickType(int32_t joystickNum);
 /**
  * Gets the name of a joystick.
  *
- * The returned array must be freed with HAL_FreeJoystickName.
+ * The returned string must be freed with WPI_FreeString
  *
- * Will be null terminated.
- *
+ * @param name the joystick name string
  * @param joystickNum the joystick number
- * @return the joystick name
  */
-char* HAL_GetJoystickName(int32_t joystickNum);
-
-/**
- * Frees a joystick name received with HAL_GetJoystickName
- *
- * @param name the name storage
- */
-void HAL_FreeJoystickName(char* name);
+void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum);
 
 /**
  * Gets the type of a specific joystick axis.

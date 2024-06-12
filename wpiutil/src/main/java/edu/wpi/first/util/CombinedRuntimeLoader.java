@@ -20,6 +20,21 @@ import java.util.Objects;
 public final class CombinedRuntimeLoader {
   private CombinedRuntimeLoader() {}
 
+  private static boolean skipSetDllDirectory;
+
+  /**
+   * Flag to test not setting DLL directory for loading.
+   *
+   * @param skip Skip setting DLL directory
+   */
+  public static synchronized void setSkipSetDllDirectory(boolean skip) {
+    skipSetDllDirectory = skip;
+  }
+
+  private static synchronized boolean getSkipSetDllDirectory() {
+    return skipSetDllDirectory;
+  }
+
   private static String extractionDirectory;
 
   /**
@@ -35,6 +50,65 @@ public final class CombinedRuntimeLoader {
     extractionDirectory = directory;
   }
 
+  private static String defaultExtractionRoot;
+
+  /**
+   * Gets the default extraction root location (~/.wpilib/nativecache) for use if
+   * setExtractionDirectory is not set.
+   *
+   * @return The default extraction root location.
+   */
+  public static synchronized String getDefaultExtractionRoot() {
+    if (defaultExtractionRoot != null) {
+      return defaultExtractionRoot;
+    }
+    String home = System.getProperty("user.home");
+    defaultExtractionRoot = Paths.get(home, ".wpilib", "nativecache").toString();
+    return defaultExtractionRoot;
+  }
+
+  /**
+   * Returns platform path.
+   *
+   * @return The current platform path.
+   * @throws IllegalStateException Thrown if the operating system is unknown.
+   */
+  public static String getPlatformPath() {
+    String filePath;
+    String arch = System.getProperty("os.arch");
+
+    boolean intel32 = "x86".equals(arch) || "i386".equals(arch);
+    boolean intel64 = "amd64".equals(arch) || "x86_64".equals(arch);
+
+    if (System.getProperty("os.name").startsWith("Windows")) {
+      if (intel32) {
+        filePath = "/windows/x86/";
+      } else {
+        filePath = "/windows/x86-64/";
+      }
+    } else if (System.getProperty("os.name").startsWith("Mac")) {
+      filePath = "/osx/universal/";
+    } else if (System.getProperty("os.name").startsWith("Linux")) {
+      if (intel32) {
+        filePath = "/linux/x86/";
+      } else if (intel64) {
+        filePath = "/linux/x86-64/";
+      } else if (new File("/usr/local/frc/bin/frcRunRobot.sh").exists()) {
+        filePath = "/linux/athena/";
+      } else if ("arm".equals(arch) || "arm32".equals(arch)) {
+        filePath = "/linux/arm32/";
+      } else if ("aarch64".equals(arch) || "arm64".equals(arch)) {
+        filePath = "/linux/arm64/";
+      } else {
+        filePath = "/linux/nativearm/";
+      }
+    } else {
+      throw new IllegalStateException();
+    }
+
+    return filePath;
+  }
+
   /**
    * Sets DLL directory.
    *
@@ -43,15 +117,23 @@ public final class CombinedRuntimeLoader {
    */
   public static native String setDllDirectory(String directory);
 
+  private static String setDllDirectoryShim(String directory) {
+    if (getSkipSetDllDirectory()) {
+      return null;
+    } else {
+      return setDllDirectory(directory);
+    }
+  }
+
   private static String getLoadErrorMessage(String libraryName, UnsatisfiedLinkError ule) {
     StringBuilder msg = new StringBuilder(512);
     msg.append(libraryName)
         .append(" could not be loaded from path\n" + "\tattempted to load for platform ")
-        .append(RuntimeDetector.getPlatformPath())
+        .append(getPlatformPath())
         .append("\nLast Load Error: \n")
         .append(ule.getMessage())
         .append('\n');
-    if (RuntimeDetector.isWindows()) {
+    if (System.getProperty("os.name").startsWith("Windows")) {
       msg.append(
           "A common cause of this error is missing the C++ runtime.\n"
               + "Download the latest at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads\n");
@@ -78,7 +160,7 @@ public final class CombinedRuntimeLoader {
       map = mapper.readValue(stream, typeRef);
     }
 
-    var platformPath = Paths.get(RuntimeDetector.getPlatformPath());
+    var platformPath = Paths.get(getPlatformPath());
     var platform = platformPath.getName(0).toString();
     var arch = platformPath.getName(1).toString();
 
@@ -91,7 +173,7 @@ public final class CombinedRuntimeLoader {
     if (extractionPathString == null) {
       String hash = (String) map.get("hash");
 
-      var defaultExtractionRoot = RuntimeLoader.getDefaultExtractionRoot();
+      var defaultExtractionRoot = getDefaultExtractionRoot();
       var extractionPath = Paths.get(defaultExtractionRoot, platform, arch, hash);
       extractionPathString = extractionPath.toString();
 
@@ -141,9 +223,9 @@ public final class CombinedRuntimeLoader {
     String currentPath = null;
     String oldDllDirectory = null;
     try {
-      if (RuntimeDetector.isWindows()) {
+      if (System.getProperty("os.name").startsWith("Windows")) {
         var extractionPathString = getExtractionDirectory();
-        oldDllDirectory = setDllDirectory(extractionPathString);
+        oldDllDirectory = setDllDirectoryShim(extractionPathString);
       }
       for (var extractedFile : extractedFiles) {
         if (extractedFile.contains(libraryName)) {
@@ -158,7 +240,7 @@ public final class CombinedRuntimeLoader {
       throw new IOException(getLoadErrorMessage(currentPath, ule));
     } finally {
       if (oldDllDirectory != null) {
-        setDllDirectory(oldDllDirectory);
+        setDllDirectoryShim(oldDllDirectory);
       }
     }
   }
@@ -179,15 +261,17 @@ public final class CombinedRuntimeLoader {
 
     String currentPath = "";
 
-    try {
-      if (RuntimeDetector.isWindows()) {
-        var extractionPathString = getExtractionDirectory();
-        // Load windows, set dll directory
-        currentPath = Paths.get(extractionPathString, "WindowsLoaderHelper.dll").toString();
-        System.load(currentPath);
+    if (!getSkipSetDllDirectory()) {
+      try {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+          var extractionPathString = getExtractionDirectory();
+          // Load windows, set dll directory
+          currentPath = Paths.get(extractionPathString, "WindowsLoaderHelper.dll").toString();
+          System.load(currentPath);
+        }
+      } catch (UnsatisfiedLinkError ule) {
+        throw new IOException(getLoadErrorMessage(currentPath, ule));
       }
-    } catch (UnsatisfiedLinkError ule) {
-      throw new IOException(getLoadErrorMessage(currentPath, ule));
     }
 
     for (var library : librariesToLoad) {

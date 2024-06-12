@@ -162,24 +162,16 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetAllianceStation"
    */
   public static AllianceStationID getAllianceStation() {
-    switch (nativeGetAllianceStation()) {
-      case kUnknownAllianceStation:
-        return AllianceStationID.Unknown;
-      case kRed1AllianceStation:
-        return AllianceStationID.Red1;
-      case kRed2AllianceStation:
-        return AllianceStationID.Red2;
-      case kRed3AllianceStation:
-        return AllianceStationID.Red3;
-      case kBlue1AllianceStation:
-        return AllianceStationID.Blue1;
-      case kBlue2AllianceStation:
-        return AllianceStationID.Blue2;
-      case kBlue3AllianceStation:
-        return AllianceStationID.Blue3;
-      default:
-        return null;
-    }
+    return switch (nativeGetAllianceStation()) {
+      case kUnknownAllianceStation -> AllianceStationID.Unknown;
+      case kRed1AllianceStation -> AllianceStationID.Red1;
+      case kRed2AllianceStation -> AllianceStationID.Red2;
+      case kRed3AllianceStation -> AllianceStationID.Red3;
+      case kBlue1AllianceStation -> AllianceStationID.Blue1;
+      case kBlue2AllianceStation -> AllianceStationID.Blue2;
+      case kBlue3AllianceStation -> AllianceStationID.Blue3;
+      default -> null;
+    };
   }
 
   public static final int kMaxJoystickAxes = 12;

@@ -32,7 +32,7 @@ struct StringArrayStorage {
   size_t EstimateSize() const {
     return sizeof(StringArrayStorage) +
            strings.capacity() * sizeof(std::string) +
-           ntStrings.capacity() * sizeof(NT_String) +
+           ntStrings.capacity() * sizeof(WPI_String) +
            std::accumulate(strings.begin(), strings.end(), 0,
                            [](const auto& sum, const auto& val) {
                              return sum + val.capacity();
@@ -40,7 +40,7 @@ struct StringArrayStorage {
   }
 
   std::vector<std::string> strings;
-  std::vector<NT_String> ntStrings;
+  std::vector<WPI_String> ntStrings;
 };
 
 template <typename T>
@@ -58,11 +58,11 @@ inline std::shared_ptr<T[]> AllocateArray(size_t nelem) {
 }  // namespace
 
 void StringArrayStorage::InitNtStrings() {
-  // point NT_String's to the contents in the vector.
+  // point WPI_String's to the contents in the vector.
   ntStrings.reserve(strings.size());
   for (const auto& str : strings) {
     ntStrings.emplace_back(
-        NT_String{const_cast<char*>(str.c_str()), str.size()});
+        WPI_String{const_cast<char*>(str.c_str()), str.size()});
   }
 }
 
@@ -250,8 +250,7 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
     }
     case NT_STRING_ARRAY: {
       auto v = in.GetStringArray();
-      out->data.arr_string.arr = static_cast<NT_String*>(
-          wpi::safe_malloc(v.size() * sizeof(NT_String)));
+      out->data.arr_string.arr = WPI_AllocateStringArray(v.size());
       for (size_t i = 0; i < v.size(); ++i) {
         ConvertToC(std::string_view{v[i]}, &out->data.arr_string.arr[i]);
       }
@@ -263,18 +262,14 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
   }
 }
 
-size_t nt::ConvertToC(std::string_view in, char** out) {
-  *out = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
-  std::memmove(*out, in.data(), in.size());  // NOLINT
-  (*out)[in.size()] = '\0';
-  return in.size();
-}
-
-void nt::ConvertToC(std::string_view in, NT_String* out) {
-  out->len = in.size();
-  out->str = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
-  std::memcpy(out->str, in.data(), in.size());
-  out->str[in.size()] = '\0';
+void nt::ConvertToC(std::string_view in, WPI_String* out) {
+  if (in.empty()) {
+    out->len = 0;
+    out->str = nullptr;
+    return;
+  }
+  auto write = WPI_AllocateString(out, in.size());
+  std::memcpy(write, in.data(), in.size());
 }
 
 Value nt::ConvertFromC(const NT_Value& value) {

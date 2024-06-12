@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/wpilibj/src/generate/hids.schema.json",
+  "title": "A schema for defining HIDs with JSON",
+  "type": "array",
+  "default": [],
+  "items": {
+    "title": "A Schema",
+    "type": "object",
+    "required": [
+      "ConsoleName",
+      "Manufacturer",
+      "SkipReporting",
+      "AxisNameSuffix",
+      "buttons",
+      "sticks"
+    ],
+    "properties": {
+      "ConsoleName": {
+        "description": "The name of the console this controller is associated with",
+        "type": "string"
+      },
+      "Manufacturer": {
+        "description": "The manufacturer of the console",
+        "type": "string"
+      },
+      "SkipReporting": {
+        "description": "Whether or not to skip the usage reporting call",
+        "type": "boolean"
+      },
+      "AxisNameSuffix": {
+        "description": "The suffix of an axis that shouldn't have Axis appended to its name",
+        "type": "string"
+      },
+      "buttons": {
+        "description": "A list of buttons on the controller",
+        "type": "array",
+        "items": {
+          "description": "A description of a button on the controller",
+          "type": "object",
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "description": "The name in lowerCamelCase",
+              "type": "string"
+            },
+            "value": {
+              "description": "The button value",
+              "type": "integer"
+            },
+            "DocName": {
+              "description": "The name of the button to use in docs",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "sticks": {
+        "description": "A list of joysticks on the controller",
+        "type": "array",
+        "items": {
+          "description": "A description of a joystick",
+          "type": "object",
+          "required": [
+            "NameParts",
+            "value"
+          ],
+          "properties": {
+            "NameParts": {
+              "description": "The parts of the joystick name in lowerCamelCase",
+              "type": "array",
+              "items": {
+                "description": "The different components of a joystick name, direction and axis",
+                "type": "string"
+              }
+            },
+            "value": {
+              "description": "The axis value",
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "triggers": {
+        "description": "A list of triggers on the controller",
+        "type": "array",
+        "items": {
+          "description": "A description of a trigger on the controller",
+          "type": "object",
+          "required": [
+            "name",
+            "value",
+            "UseThresholdMethods"
+          ],
+          "properties": {
+            "name": {
+              "description": "The name of the trigger to use in code",
+              "type": "string"
+            },
+            "value": {
+              "description": "The axis value",
+              "type": "integer"
+            },
+            "DocName": {
+              "description": "The name of the trigger for use in docs",
+              "type": "string"
+            },
+            "UseThresholdMethods": {
+              "description": "Whether or not an method is created where an event fires based on the axis value",
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}
