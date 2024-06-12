@@ -6,6 +6,8 @@
 
 #include <cstddef>
 
+#include <wpi/string.h>
+
 #include "hal/LEDs.h"
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
@@ -137,14 +139,14 @@ void HALSIM_SetRoboRioTeamNumber(int32_t teamNumber);
 int32_t HALSIM_RegisterRoboRioSerialNumberCallback(
     HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify);
 void HALSIM_CancelRoboRioSerialNumberCallback(int32_t uid);
-size_t HALSIM_GetRoboRioSerialNumber(char* buffer, size_t size);
-void HALSIM_SetRoboRioSerialNumber(const char* serialNumber, size_t size);
+void HALSIM_GetRoboRioSerialNumber(struct WPI_String* serialNumber);
+void HALSIM_SetRoboRioSerialNumber(const struct WPI_String* serialNumber);
 
 int32_t HALSIM_RegisterRoboRioCommentsCallback(
     HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify);
 void HALSIM_CancelRoboRioCommentsCallback(int32_t uid);
-size_t HALSIM_GetRoboRioComments(char* buffer, size_t size);
-void HALSIM_SetRoboRioComments(const char* comments, size_t size);
+void HALSIM_GetRoboRioComments(struct WPI_String* comments);
+void HALSIM_SetRoboRioComments(const struct WPI_String* comments);
 
 int32_t HALSIM_RegisterRoboRioCPUTempCallback(HAL_NotifyCallback callback,
                                               void* param,

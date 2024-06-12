@@ -1126,13 +1126,6 @@ void BDCSVD<MatrixType, Options>::perturbCol0(const ArrayRef& col0, const ArrayR
                       << "j=" << j << "\n";
           }
 #endif
-          // Avoid index out of bounds.
-          // Will end up setting zhat(k) = 0.
-          if (i >= k && l == 0) {
-            m_info = NumericalIssue;
-            prod = 0;
-            break;
-          }
           Index j = i < k ? i : l > 0 ? perm(l - 1) : i;
 #ifdef EIGEN_BDCSVD_SANITY_CHECKS
           if (!(dk != Literal(0) || diag(i) != Literal(0))) {
@@ -1205,7 +1198,7 @@ void BDCSVD<MatrixType, Options>::computeSingVecs(const ArrayRef& zhat, const Ar
 
 // page 12_13
 // i >= 1, di almost null and zi non null.
-// We use a rotation to zero out zi applied to the left of M
+// We use a rotation to zero out zi applied to the left of M, and set di = 0.
 template <typename MatrixType, int Options>
 void BDCSVD<MatrixType, Options>::deflation43(Index firstCol, Index shift, Index i, Index size) {
   using std::abs;
@@ -1231,9 +1224,8 @@ void BDCSVD<MatrixType, Options>::deflation43(Index firstCol, Index shift, Index
 }  // end deflation 43
 
 // page 13
-// i,j >= 1, i!=j and |di - dj| < epsilon * norm2(M)
-// We apply two rotations to have zj = 0;
-// TODO deflation44 is still broken and not properly tested
+// i,j >= 1, i > j, and |di - dj| < epsilon * norm2(M)
+// We apply two rotations to have zi = 0, and dj = di.
 template <typename MatrixType, int Options>
 void BDCSVD<MatrixType, Options>::deflation44(Index firstColu, Index firstColm, Index firstRowW, Index firstColW,
                                               Index i, Index j, Index size) {
@@ -1241,9 +1233,10 @@ void BDCSVD<MatrixType, Options>::deflation44(Index firstColu, Index firstColm, 
   using std::conj;
   using std::pow;
   using std::sqrt;
-  RealScalar c = m_computed(firstColm + i, firstColm);
-  RealScalar s = m_computed(firstColm + j, firstColm);
-  RealScalar r = sqrt(numext::abs2(c) + numext::abs2(s));
+
+  RealScalar s = m_computed(firstColm + i, firstColm);
+  RealScalar c = m_computed(firstColm + j, firstColm);
+  RealScalar r = numext::hypot(c, s);
 #ifdef EIGEN_BDCSVD_DEBUG_VERBOSE
   std::cout << "deflation 4.4: " << i << "," << j << " -> " << c << " " << s << " " << r << " ; "
             << m_computed(firstColm + i - 1, firstColm) << " " << m_computed(firstColm + i, firstColm) << " "
@@ -1253,21 +1246,21 @@ void BDCSVD<MatrixType, Options>::deflation44(Index firstColu, Index firstColm, 
             << m_computed(firstColm + i + 2, firstColm + i + 2) << "\n";
 #endif
   if (numext::is_exactly_zero(r)) {
-    m_computed(firstColm + i, firstColm + i) = m_computed(firstColm + j, firstColm + j);
+    m_computed(firstColm + j, firstColm + j) = m_computed(firstColm + i, firstColm + i);
     return;
   }
   c /= r;
   s /= r;
-  m_computed(firstColm + i, firstColm) = r;
+  m_computed(firstColm + j, firstColm) = r;
   m_computed(firstColm + j, firstColm + j) = m_computed(firstColm + i, firstColm + i);
-  m_computed(firstColm + j, firstColm) = Literal(0);
+  m_computed(firstColm + i, firstColm) = Literal(0);
 
   JacobiRotation<RealScalar> J(c, -s);
   if (m_compU)
-    m_naiveU.middleRows(firstColu, size + 1).applyOnTheRight(firstColu + i, firstColu + j, J);
+    m_naiveU.middleRows(firstColu, size + 1).applyOnTheRight(firstColu + j, firstColu + i, J);
   else
-    m_naiveU.applyOnTheRight(firstColu + i, firstColu + j, J);
-  if (m_compV) m_naiveV.middleRows(firstRowW, size).applyOnTheRight(firstColW + i, firstColW + j, J);
+    m_naiveU.applyOnTheRight(firstColu + j, firstColu + i, J);
+  if (m_compV) m_naiveV.middleRows(firstRowW, size).applyOnTheRight(firstColW + j, firstColW + i, J);
 }  // end deflation 44
 
 // acts on block from (firstCol+shift, firstCol+shift) to (lastCol+shift, lastCol+shift) [inclusive]
@@ -1350,7 +1343,7 @@ void BDCSVD<MatrixType, Options>::deflation(Index firstCol, Index lastCol, Index
 
       // Move deflated diagonal entries at the end.
       for (Index i = 1; i < length; ++i)
-        if (abs(diag(i)) < considerZero) permutation[p++] = i;
+        if (diag(i) < considerZero) permutation[p++] = i;
 
       Index i = 1, j = k + 1;
       for (; p < length; ++p) {
@@ -1369,7 +1362,7 @@ void BDCSVD<MatrixType, Options>::deflation(Index firstCol, Index lastCol, Index
     if (total_deflation) {
       for (Index i = 1; i < length; ++i) {
         Index pi = permutation[i];
-        if (abs(diag(pi)) < considerZero || diag(0) < diag(pi))
+        if (diag(pi) < considerZero || diag(0) < diag(pi))
           permutation[i - 1] = permutation[i];
         else {
           permutation[i - 1] = 0;
@@ -1424,17 +1417,18 @@ void BDCSVD<MatrixType, Options>::deflation(Index firstCol, Index lastCol, Index
   // condition 4.4
   {
     Index i = length - 1;
-    while (i > 0 && (abs(diag(i)) < considerZero || abs(col0(i)) < considerZero)) --i;
+    // Find last non-deflated entry.
+    while (i > 0 && (diag(i) < considerZero || abs(col0(i)) < considerZero)) --i;
+
     for (; i > 1; --i)
-      if ((diag(i) - diag(i - 1)) < NumTraits<RealScalar>::epsilon() * maxDiag) {
+      if ((diag(i) - diag(i - 1)) < epsilon_strict) {
 #ifdef EIGEN_BDCSVD_DEBUG_VERBOSE
         std::cout << "deflation 4.4 with i = " << i << " because " << diag(i) << " - " << diag(i - 1)
-                  << " == " << (diag(i) - diag(i - 1)) << " < "
-                  << NumTraits<RealScalar>::epsilon() * /*diag(i)*/ maxDiag << "\n";
+                  << " == " << (diag(i) - diag(i - 1)) << " < " << epsilon_strict << "\n";
 #endif
         eigen_internal_assert(abs(diag(i) - diag(i - 1)) < epsilon_coarse &&
                               " diagonal entries are not properly sorted");
-        deflation44(firstCol, firstCol + shift, firstRowW, firstColW, i - 1, i, length);
+        deflation44(firstCol, firstCol + shift, firstRowW, firstColW, i, i - 1, length);
       }
   }
 

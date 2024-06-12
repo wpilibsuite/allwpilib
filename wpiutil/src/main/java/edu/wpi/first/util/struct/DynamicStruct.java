@@ -579,23 +579,14 @@ public final class DynamicStruct {
           "arrIndex (" + arrIndex + ") is larger than array size (" + field.m_arraySize + ")");
     }
 
-    long val;
-    switch (field.m_size) {
-      case 1:
-        val = m_data.get(field.m_offset + arrIndex);
-        break;
-      case 2:
-        val = m_data.getShort(field.m_offset + arrIndex * 2);
-        break;
-      case 4:
-        val = m_data.getInt(field.m_offset + arrIndex * 4);
-        break;
-      case 8:
-        val = m_data.getLong(field.m_offset + arrIndex * 8);
-        break;
-      default:
-        throw new IllegalStateException("invalid field size");
-    }
+    long val =
+        switch (field.m_size) {
+          case 1 -> m_data.get(field.m_offset + arrIndex);
+          case 2 -> m_data.getShort(field.m_offset + arrIndex * 2);
+          case 4 -> m_data.getInt(field.m_offset + arrIndex * 4);
+          case 8 -> m_data.getLong(field.m_offset + arrIndex * 8);
+          default -> throw new IllegalStateException("invalid field size");
+        };
 
     if (field.isUint() || field.getType() == StructFieldType.kBool) {
       // for unsigned fields, we can simply logical shift and mask
@@ -623,60 +614,42 @@ public final class DynamicStruct {
     // common case is no bit shift and no masking
     if (!field.isBitField()) {
       switch (field.m_size) {
-        case 1:
-          m_data.put(field.m_offset + arrIndex, (byte) value);
-          break;
-        case 2:
-          m_data.putShort(field.m_offset + arrIndex * 2, (short) value);
-          break;
-        case 4:
-          m_data.putInt(field.m_offset + arrIndex * 4, (int) value);
-          break;
-        case 8:
-          m_data.putLong(field.m_offset + arrIndex * 8, value);
-          break;
-        default:
-          throw new IllegalStateException("invalid field size");
+        case 1 -> m_data.put(field.m_offset + arrIndex, (byte) value);
+        case 2 -> m_data.putShort(field.m_offset + arrIndex * 2, (short) value);
+        case 4 -> m_data.putInt(field.m_offset + arrIndex * 4, (int) value);
+        case 8 -> m_data.putLong(field.m_offset + arrIndex * 8, value);
+        default -> throw new IllegalStateException("invalid field size");
       }
       return;
     }
 
     // handle bit shifting and masking into current value
     switch (field.m_size) {
-      case 1:
-        {
-          byte val = m_data.get(field.m_offset + arrIndex);
-          val &= (byte) ~(field.getBitMask() << field.m_bitShift);
-          val |= (byte) ((value & field.getBitMask()) << field.m_bitShift);
-          m_data.put(field.m_offset + arrIndex, val);
-          break;
-        }
-      case 2:
-        {
-          short val = m_data.getShort(field.m_offset + arrIndex * 2);
-          val &= (short) ~(field.getBitMask() << field.m_bitShift);
-          val |= (short) ((value & field.getBitMask()) << field.m_bitShift);
-          m_data.putShort(field.m_offset + arrIndex * 2, val);
-          break;
-        }
-      case 4:
-        {
-          int val = m_data.getInt(field.m_offset + arrIndex * 4);
-          val &= (int) ~(field.getBitMask() << field.m_bitShift);
-          val |= (int) ((value & field.getBitMask()) << field.m_bitShift);
-          m_data.putInt(field.m_offset + arrIndex * 4, val);
-          break;
-        }
-      case 8:
-        {
-          long val = m_data.getLong(field.m_offset + arrIndex * 8);
-          val &= ~(field.getBitMask() << field.m_bitShift);
-          val |= (value & field.getBitMask()) << field.m_bitShift;
-          m_data.putLong(field.m_offset + arrIndex * 8, val);
-          break;
-        }
-      default:
-        throw new IllegalStateException("invalid field size");
+      case 1 -> {
+        byte val = m_data.get(field.m_offset + arrIndex);
+        val &= (byte) ~(field.getBitMask() << field.m_bitShift);
+        val |= (byte) ((value & field.getBitMask()) << field.m_bitShift);
+        m_data.put(field.m_offset + arrIndex, val);
+      }
+      case 2 -> {
+        short val = m_data.getShort(field.m_offset + arrIndex * 2);
+        val &= (short) ~(field.getBitMask() << field.m_bitShift);
+        val |= (short) ((value & field.getBitMask()) << field.m_bitShift);
+        m_data.putShort(field.m_offset + arrIndex * 2, val);
+      }
+      case 4 -> {
+        int val = m_data.getInt(field.m_offset + arrIndex * 4);
+        val &= (int) ~(field.getBitMask() << field.m_bitShift);
+        val |= (int) ((value & field.getBitMask()) << field.m_bitShift);
+        m_data.putInt(field.m_offset + arrIndex * 4, val);
+      }
+      case 8 -> {
+        long val = m_data.getLong(field.m_offset + arrIndex * 8);
+        val &= ~(field.getBitMask() << field.m_bitShift);
+        val |= (value & field.getBitMask()) << field.m_bitShift;
+        m_data.putLong(field.m_offset + arrIndex * 8, val);
+      }
+      default -> throw new IllegalStateException("invalid field size");
     }
   }
 

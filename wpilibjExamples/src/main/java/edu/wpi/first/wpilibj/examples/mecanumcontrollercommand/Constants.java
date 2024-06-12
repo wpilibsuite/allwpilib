@@ -50,7 +50,7 @@ public final class Constants {
     public static final double kWheelDiameterMeters = 0.15;
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
+        (kWheelDiameterMeters * Math.PI) / kEncoderCPR;
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically

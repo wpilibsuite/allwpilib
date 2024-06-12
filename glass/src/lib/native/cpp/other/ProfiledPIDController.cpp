@@ -52,14 +52,24 @@ void glass::DisplayProfiledPIDController(ProfiledPIDControllerModel* m) {
       double value = d->GetValue();
       createTuningParameter("D", &value, [=](auto v) { m->SetD(v); });
     }
-    if (auto s = m->GetGoalData()) {
-      double value = s->GetValue();
-      createTuningParameter("Goal", &value, [=](auto v) { m->SetGoal(v); });
-    }
     if (auto s = m->GetIZoneData()) {
       double value = s->GetValue();
       createTuningParameterNoFilter("IZone", &value,
                                     [=](auto v) { m->SetIZone(v); });
+    }
+    if (auto s = m->GetMaxVelocityData()) {
+      double value = s->GetValue();
+      createTuningParameter("Max Velocity", &value,
+                            [=](auto v) { m->SetMaxVelocity(v); });
+    }
+    if (auto s = m->GetMaxAccelerationData()) {
+      double value = s->GetValue();
+      createTuningParameter("Max Acceleration", &value,
+                            [=](auto v) { m->SetMaxAcceleration(v); });
+    }
+    if (auto s = m->GetGoalData()) {
+      double value = s->GetValue();
+      createTuningParameter("Goal", &value, [=](auto v) { m->SetGoal(v); });
     }
   } else {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));

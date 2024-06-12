@@ -168,7 +168,7 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   public long getPeriodNanoSeconds() {
     int fpgaCycles = getPeriodCycles();
 
-    return (long) fpgaCycles * 1000L / (long) (SensorUtil.kSystemClockTicksPerMicrosecond / 4);
+    return fpgaCycles * 1000L / (SensorUtil.kSystemClockTicksPerMicrosecond / 4);
   }
 
   @Override

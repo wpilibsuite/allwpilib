@@ -208,8 +208,15 @@ struct numeric_limits_half_impl {
   static EIGEN_CONSTEXPR const bool has_infinity = true;
   static EIGEN_CONSTEXPR const bool has_quiet_NaN = true;
   static EIGEN_CONSTEXPR const bool has_signaling_NaN = true;
+#if __cplusplus >= 202302L
+  EIGEN_DIAGNOSTICS(push)
+  EIGEN_DISABLE_DEPRECATED_WARNING
+#endif
   static EIGEN_CONSTEXPR const std::float_denorm_style has_denorm = std::denorm_present;
   static EIGEN_CONSTEXPR const bool has_denorm_loss = false;
+#if __cplusplus >= 202302L
+  EIGEN_DIAGNOSTICS(pop)
+#endif
   static EIGEN_CONSTEXPR const std::float_round_style round_style = std::round_to_nearest;
   static EIGEN_CONSTEXPR const bool is_iec559 = true;
   // The C++ standard defines this as "true if the set of values representable
@@ -256,10 +263,17 @@ template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_half_impl<T>::has_quiet_NaN;
 template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_half_impl<T>::has_signaling_NaN;
+#if __cplusplus >= 202302L
+EIGEN_DIAGNOSTICS(push)
+EIGEN_DISABLE_DEPRECATED_WARNING
+#endif
 template <typename T>
 EIGEN_CONSTEXPR const std::float_denorm_style numeric_limits_half_impl<T>::has_denorm;
 template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_half_impl<T>::has_denorm_loss;
+#if __cplusplus >= 202302L
+EIGEN_DIAGNOSTICS(pop)
+#endif
 template <typename T>
 EIGEN_CONSTEXPR const std::float_round_style numeric_limits_half_impl<T>::round_style;
 template <typename T>
@@ -722,6 +736,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half ceil(const half& a) {
 }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half rint(const half& a) { return half(::rintf(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half round(const half& a) { return half(::roundf(float(a))); }
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half trunc(const half& a) { return half(::truncf(float(a))); }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half fmod(const half& a, const half& b) {
   return half(::fmodf(float(a), float(b)));
 }
@@ -762,16 +777,22 @@ EIGEN_ALWAYS_INLINE std::ostream& operator<<(std::ostream& os, const half& v) {
 namespace internal {
 
 template <>
-struct random_default_impl<half, false, false> {
-  static inline half run(const half& x, const half& y) {
-    return x + (y - x) * half(float(std::rand()) / float(RAND_MAX));
-  }
-  static inline half run() { return run(half(-1.f), half(1.f)); }
+struct is_arithmetic<half> {
+  enum { value = true };
 };
 
 template <>
-struct is_arithmetic<half> {
-  enum { value = true };
+struct random_impl<half> {
+  enum : int { MantissaBits = 10 };
+  using Impl = random_impl<float>;
+  static EIGEN_DEVICE_FUNC inline half run(const half& x, const half& y) {
+    float result = Impl::run(x, y, MantissaBits);
+    return half(result);
+  }
+  static EIGEN_DEVICE_FUNC inline half run() {
+    float result = Impl::run(MantissaBits);
+    return half(result);
+  }
 };
 
 }  // end namespace internal

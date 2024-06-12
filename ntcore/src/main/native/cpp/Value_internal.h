@@ -420,8 +420,8 @@ inline void ConvertToC(const T& in, T* out) {
 void ConvertToC(const Value& in, NT_Value* out);
 Value ConvertFromC(const NT_Value& value);
 size_t ConvertToC(std::string_view in, char** out);
-void ConvertToC(std::string_view in, NT_String* out);
-inline std::string_view ConvertFromC(const NT_String& str) {
+void ConvertToC(std::string_view in, WPI_String* out);
+inline std::string_view ConvertFromC(const WPI_String& str) {
   return {str.str, str.len};
 }
 

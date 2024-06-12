@@ -4,9 +4,9 @@
 
 #include "Robot.h"
 
-#include <fmt/core.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <wpi/print.h>
 
 // Run robot periodic() functions for 5 ms, and run controllers every 10 ms
 Robot::Robot() : frc::TimesliceRobot{5_ms, 10_ms} {
@@ -56,7 +56,7 @@ void Robot::AutonomousInit() {
   m_autoSelected = m_chooser.GetSelected();
   // m_autoSelected = SmartDashboard::GetString("Auto Selector",
   //     kAutoNameDefault);
-  fmt::print("Auto selected: {}\n", m_autoSelected);
+  wpi::print("Auto selected: {}\n", m_autoSelected);
 
   if (m_autoSelected == kAutoNameCustom) {
     // Custom Auto goes here

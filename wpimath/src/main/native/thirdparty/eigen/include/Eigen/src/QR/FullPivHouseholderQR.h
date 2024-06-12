@@ -248,6 +248,20 @@ class FullPivHouseholderQR : public SolverBase<FullPivHouseholderQR<MatrixType_,
    */
   typename MatrixType::RealScalar logAbsDeterminant() const;
 
+  /** \returns the sign of the determinant of the matrix of which
+   * *this is the QR decomposition. It has only linear complexity
+   * (that is, O(n) where n is the dimension of the square matrix)
+   * as the QR decomposition has already been computed.
+   *
+   * \note This is only for square matrices.
+   *
+   * \note This method is useful to work around the risk of overflow/underflow that's inherent
+   * to determinant computation.
+   *
+   * \sa determinant(), absDeterminant(), logAbsDeterminant(), MatrixBase::determinant()
+   */
+  typename MatrixType::Scalar signDeterminant() const;
+
   /** \returns the rank of the matrix of which *this is the QR decomposition.
    *
    * \note This method has to determine which pivots should be considered nonzero.
@@ -425,7 +439,7 @@ typename MatrixType::Scalar FullPivHouseholderQR<MatrixType, PermutationIndex>::
   eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
   Scalar detQ;
   internal::householder_determinant<HCoeffsType, Scalar, NumTraits<Scalar>::IsComplex>::run(m_hCoeffs, detQ);
-  return m_qr.diagonal().prod() * detQ * Scalar(m_det_p);
+  return isInjective() ? (detQ * Scalar(m_det_p)) * m_qr.diagonal().prod() : Scalar(0);
 }
 
 template <typename MatrixType, typename PermutationIndex>
@@ -433,14 +447,23 @@ typename MatrixType::RealScalar FullPivHouseholderQR<MatrixType, PermutationInde
   using std::abs;
   eigen_assert(m_isInitialized && "FullPivHouseholderQR is not initialized.");
   eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
-  return abs(m_qr.diagonal().prod());
+  return isInjective() ? abs(m_qr.diagonal().prod()) : RealScalar(0);
 }
 
 template <typename MatrixType, typename PermutationIndex>
 typename MatrixType::RealScalar FullPivHouseholderQR<MatrixType, PermutationIndex>::logAbsDeterminant() const {
   eigen_assert(m_isInitialized && "FullPivHouseholderQR is not initialized.");
   eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
-  return m_qr.diagonal().cwiseAbs().array().log().sum();
+  return isInjective() ? m_qr.diagonal().cwiseAbs().array().log().sum() : -NumTraits<RealScalar>::infinity();
+}
+
+template <typename MatrixType, typename PermutationIndex>
+typename MatrixType::Scalar FullPivHouseholderQR<MatrixType, PermutationIndex>::signDeterminant() const {
+  eigen_assert(m_isInitialized && "FullPivHouseholderQR is not initialized.");
+  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
+  Scalar detQ;
+  internal::householder_determinant<HCoeffsType, Scalar, NumTraits<Scalar>::IsComplex>::run(m_hCoeffs, detQ);
+  return isInjective() ? (detQ * Scalar(m_det_p)) * m_qr.diagonal().array().sign().prod() : Scalar(0);
 }
 
 /** Performs the QR factorization of the given matrix \a matrix. The result of

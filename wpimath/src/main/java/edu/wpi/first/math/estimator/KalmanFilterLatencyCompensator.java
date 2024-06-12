@@ -171,7 +171,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
   }
 
   /** This class contains all the information about our observer at a given time. */
-  public class ObserverSnapshot {
+  public final class ObserverSnapshot {
     /** The state estimate. */
     public final Matrix<S, N1> xHat;
 

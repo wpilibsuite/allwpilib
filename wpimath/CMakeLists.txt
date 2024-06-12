@@ -19,13 +19,14 @@ protobuf_generate_cpp(
 
 file(
     GLOB wpimath_jni_src
-    src/main/native/cpp/jni/WPIMathJNI_ArmFeedforward.cpp
-    src/main/native/cpp/jni/WPIMathJNI_DARE.cpp
-    src/main/native/cpp/jni/WPIMathJNI_Eigen.cpp
-    src/main/native/cpp/jni/WPIMathJNI_Exceptions.cpp
-    src/main/native/cpp/jni/WPIMathJNI_Pose3d.cpp
-    src/main/native/cpp/jni/WPIMathJNI_StateSpaceUtil.cpp
-    src/main/native/cpp/jni/WPIMathJNI_Trajectory.cpp
+    src/main/native/cpp/jni/ArmFeedforwardJNI.cpp
+    src/main/native/cpp/jni/DAREJNI.cpp
+    src/main/native/cpp/jni/EigenJNI.cpp
+    src/main/native/cpp/jni/Ellipse2dJNI.cpp
+    src/main/native/cpp/jni/Exceptions.cpp
+    src/main/native/cpp/jni/Pose3dJNI.cpp
+    src/main/native/cpp/jni/StateSpaceUtilJNI.cpp
+    src/main/native/cpp/jni/TrajectoryUtilJNI.cpp
 )
 
 # Java bindings
@@ -33,7 +34,6 @@ if(WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.43.1.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
@@ -41,25 +41,32 @@ if(WITH_JAVA)
 
         message(STATUS "Downloading EJML jarfiles...")
 
-        download_and_check("${BASE_URL}org/ejml/ejml-cdense/0.43.1/ejml-cdense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-cdense/0.43.1/ejml-cdense-0.43.1.jar"
             "${JAR_ROOT}/ejml-cdense-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-core/0.43.1/ejml-core-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-core/0.43.1/ejml-core-0.43.1.jar"
             "${JAR_ROOT}/ejml-core-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-ddense/0.43.1/ejml-ddense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-ddense/0.43.1/ejml-ddense-0.43.1.jar"
             "${JAR_ROOT}/ejml-ddense-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-dsparse/0.43.1/ejml-dsparse-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-dsparse/0.43.1/ejml-dsparse-0.43.1.jar"
             "${JAR_ROOT}/ejml-dsparse-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-fdense/0.43.1/ejml-fdense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-fdense/0.43.1/ejml-fdense-0.43.1.jar"
             "${JAR_ROOT}/ejml-fdense-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-simple/0.43.1/ejml-simple-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-simple/0.43.1/ejml-simple-0.43.1.jar"
             "${JAR_ROOT}/ejml-simple-0.43.1.jar"
         )
-        download_and_check("${BASE_URL}org/ejml/ejml-zdense/0.43.1/ejml-zdense-0.43.1.jar"
+        download_and_check(
+            "${BASE_URL}org/ejml/ejml-zdense/0.43.1/ejml-zdense-0.43.1.jar"
             "${JAR_ROOT}/ejml-zdense-0.43.1.jar"
         )
 
@@ -83,6 +90,7 @@ if(WITH_JAVA)
         OUTPUT_NAME wpimath
         GENERATE_NATIVE_HEADERS wpimath_jni_headers
     )
+    set_property(TARGET wpimath_jar PROPERTY FOLDER "java")
 
     install_jar(wpimath_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS wpimath_jar FILE wpimath_jar.cmake DESTINATION share/wpimath)
