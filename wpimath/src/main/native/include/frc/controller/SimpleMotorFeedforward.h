@@ -73,6 +73,7 @@ class SimpleMotorFeedforward {
    * @param acceleration The acceleration setpoint, in distance per second².
    * @return The computed feedforward, in volts.
    */
+  [[deprectaed("for removal in 2025 use the Calculate method that takes current and next velocities")]]
   constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
                                     units::unit_t<Acceleration> acceleration =
                                         units::unit_t<Acceleration>(0)) const {
@@ -87,13 +88,14 @@ class SimpleMotorFeedforward {
    * @param nextVelocity    The next velocity setpoint, in distance per second.
    * @return The computed feedforward, in volts.
    */
+  template <typename StateVector>
   units::volt_t Calculate(units::unit_t<Velocity> currentVelocity,
                           units::unit_t<Velocity> nextVelocity) const {
     if (kA.value() == 0.0) {
       return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
     } else {
-      r(0) = currentVelocity.value();
-      nextR(0) = nextVelocity.value();
+      r = {currentVelocity.value()};
+      nextR = {nextVelocity.value()};
       return kS * wpi::sgn(currentVelocity.value()) +
             units::volt_t{feedforward.Calculate(r, nextR)(0)};
     }
@@ -187,9 +189,9 @@ class SimpleMotorFeedforward {
   const frc::LinearPlantInversionFeedforward<1, 1> feedforward;
 
   /** The current reference. */
-  const frc::Vectord<1> r;
+  frc::Vectord<1> r;
 
   /** The next reference. */
-  const frc::Vectord<1> nextR;
+  frc::Vectord<1> nextR;
 };
 }  // namespace frc
