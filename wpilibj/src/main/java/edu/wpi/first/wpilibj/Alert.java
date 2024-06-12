@@ -101,7 +101,7 @@ public class Alert {
     m_text = text;
   }
 
-  private static class SendableAlerts implements Sendable {
+  private static final class SendableAlerts implements Sendable {
     private final Collection<Alert> m_alerts = new HashSet<>();
 
     private String[] getStrings(AlertType type) {
