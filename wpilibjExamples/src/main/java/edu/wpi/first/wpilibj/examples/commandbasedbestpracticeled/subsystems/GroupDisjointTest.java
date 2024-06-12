@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
+package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
 
 /*
  * Sample program to demonstrate loose coupling of Commands in a sequential grouping. (Each leg of
@@ -42,7 +42,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.race;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
-import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.GroupDisjoint;
+import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.TriggeredDisjointSequence;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
