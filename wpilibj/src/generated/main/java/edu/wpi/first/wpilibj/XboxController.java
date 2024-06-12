@@ -175,7 +175,7 @@ public class XboxController extends GenericHID {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent leftTrigger(double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getLeftTriggerAxis() > threshold);
+    return axisGreaterThan(Axis.kLeftTrigger.value, threshold, loop);
   }
 
   /**
@@ -211,7 +211,7 @@ public class XboxController extends GenericHID {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent rightTrigger(double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getRightTriggerAxis() > threshold);
+    return axisGreaterThan(Axis.kRightTrigger.value, threshold, loop);
   }
 
   /**
@@ -261,7 +261,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent a(EventLoop loop) {
-    return new BooleanEvent(loop, this::getAButton);
+    return button(Button.kA.value, loop);
   }
 
   /**
@@ -299,7 +299,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent b(EventLoop loop) {
-    return new BooleanEvent(loop, this::getBButton);
+    return button(Button.kB.value, loop);
   }
 
   /**
@@ -337,7 +337,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent x(EventLoop loop) {
-    return new BooleanEvent(loop, this::getXButton);
+    return button(Button.kX.value, loop);
   }
 
   /**
@@ -375,7 +375,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent y(EventLoop loop) {
-    return new BooleanEvent(loop, this::getYButton);
+    return button(Button.kY.value, loop);
   }
 
   /**
@@ -413,7 +413,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent leftBumper(EventLoop loop) {
-    return new BooleanEvent(loop, this::getLeftBumperButton);
+    return button(Button.kLeftBumper.value, loop);
   }
 
   /**
@@ -451,7 +451,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent rightBumper(EventLoop loop) {
-    return new BooleanEvent(loop, this::getRightBumperButton);
+    return button(Button.kRightBumper.value, loop);
   }
 
   /**
@@ -489,7 +489,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent back(EventLoop loop) {
-    return new BooleanEvent(loop, this::getBackButton);
+    return button(Button.kBack.value, loop);
   }
 
   /**
@@ -527,7 +527,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent start(EventLoop loop) {
-    return new BooleanEvent(loop, this::getStartButton);
+    return button(Button.kStart.value, loop);
   }
 
   /**
@@ -565,7 +565,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
-    return new BooleanEvent(loop, this::getLeftStickButton);
+    return button(Button.kLeftStick.value, loop);
   }
 
   /**
@@ -603,7 +603,7 @@ public class XboxController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
-    return new BooleanEvent(loop, this::getRightStickButton);
+    return button(Button.kRightStick.value, loop);
   }
 
   /**

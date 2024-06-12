@@ -195,7 +195,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent a(EventLoop loop) {
-    return new BooleanEvent(loop, this::getAButton);
+    return button(Button.kA.value, loop);
   }
 
   /**
@@ -233,7 +233,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent b(EventLoop loop) {
-    return new BooleanEvent(loop, this::getBButton);
+    return button(Button.kB.value, loop);
   }
 
   /**
@@ -271,7 +271,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent x(EventLoop loop) {
-    return new BooleanEvent(loop, this::getXButton);
+    return button(Button.kX.value, loop);
   }
 
   /**
@@ -309,7 +309,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent y(EventLoop loop) {
-    return new BooleanEvent(loop, this::getYButton);
+    return button(Button.kY.value, loop);
   }
 
   /**
@@ -347,7 +347,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent leftBumper(EventLoop loop) {
-    return new BooleanEvent(loop, this::getLeftBumperButton);
+    return button(Button.kLeftBumper.value, loop);
   }
 
   /**
@@ -385,7 +385,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent rightBumper(EventLoop loop) {
-    return new BooleanEvent(loop, this::getRightBumperButton);
+    return button(Button.kRightBumper.value, loop);
   }
 
   /**
@@ -423,7 +423,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
-    return new BooleanEvent(loop, this::getLeftStickButton);
+    return button(Button.kLeftStick.value, loop);
   }
 
   /**
@@ -461,7 +461,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
-    return new BooleanEvent(loop, this::getRightStickButton);
+    return button(Button.kRightStick.value, loop);
   }
 
   /**
@@ -499,7 +499,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent ellipses(EventLoop loop) {
-    return new BooleanEvent(loop, this::getEllipsesButton);
+    return button(Button.kEllipses.value, loop);
   }
 
   /**
@@ -537,7 +537,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent hamburger(EventLoop loop) {
-    return new BooleanEvent(loop, this::getHamburgerButton);
+    return button(Button.kHamburger.value, loop);
   }
 
   /**
@@ -575,7 +575,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent stadia(EventLoop loop) {
-    return new BooleanEvent(loop, this::getStadiaButton);
+    return button(Button.kStadia.value, loop);
   }
 
   /**
@@ -613,7 +613,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent rightTrigger(EventLoop loop) {
-    return new BooleanEvent(loop, this::getRightTriggerButton);
+    return button(Button.kRightTrigger.value, loop);
   }
 
   /**
@@ -651,7 +651,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent leftTrigger(EventLoop loop) {
-    return new BooleanEvent(loop, this::getLeftTriggerButton);
+    return button(Button.kLeftTrigger.value, loop);
   }
 
   /**
@@ -689,7 +689,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent google(EventLoop loop) {
-    return new BooleanEvent(loop, this::getGoogleButton);
+    return button(Button.kGoogle.value, loop);
   }
 
   /**
@@ -727,7 +727,7 @@ public class StadiaController extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent frame(EventLoop loop) {
-    return new BooleanEvent(loop, this::getFrameButton);
+    return button(Button.kFrame.value, loop);
   }
 
   /**
