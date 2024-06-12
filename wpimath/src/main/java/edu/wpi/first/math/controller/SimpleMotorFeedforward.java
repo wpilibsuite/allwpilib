@@ -47,7 +47,7 @@ public class SimpleMotorFeedforward {
    * @param periodSeconds The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
-   * @throws IllegalArgumentException for period &le zero.
+   * @throws IllegalArgumentException for period &le; zero.
    */
   public SimpleMotorFeedforward(double ks, double kv, double ka, double periodSeconds) {
     this.ks = ks;
