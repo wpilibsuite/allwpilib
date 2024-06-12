@@ -97,6 +97,9 @@ public class GenericHID {
   private int m_outputs;
   private int m_leftRumble;
   private int m_rightRumble;
+  private final Map<EventLoop, Map<Integer, BooleanEvent>> m_buttonCache = new HashMap<>();
+  private final Map<EventLoop, Map<Double, BooleanEvent>> m_axisCache = new HashMap<>();
+  private final Map<EventLoop, Map<Integer, BooleanEvent>> m_povCache = new HashMap<>();
 
   /**
    * Construct an instance of a device.
@@ -159,7 +162,8 @@ public class GenericHID {
    * @return an event instance representing the button's digital signal attached to the given loop.
    */
   public BooleanEvent button(int button, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getRawButton(button));
+    var cache = m_buttonCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(button, k -> new BooleanEvent(loop, () -> getRawButton(k)));
   }
 
   /**
@@ -223,7 +227,10 @@ public class GenericHID {
    * @return a BooleanEvent instance based around this angle of a POV on the HID.
    */
   public BooleanEvent pov(int pov, int angle, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getPOV(pov) == angle);
+    var cache = m_povCache.computeIfAbsent(loop, k -> new HashMap<>());
+    // angle can be -1, so use 3600 instead of 360
+    return cache.computeIfAbsent(
+        pov * 3600 + angle, k -> new BooleanEvent(loop, () -> getPOV(pov) == angle));
   }
 
   /**
@@ -335,7 +342,9 @@ public class GenericHID {
    * @return an event instance that is true when the axis value is less than the provided threshold.
    */
   public BooleanEvent axisLessThan(int axis, double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getRawAxis(axis) < threshold);
+    var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(
+        axis * 100 - threshold, k -> new BooleanEvent(loop, () -> getRawAxis(axis) < threshold));
   }
 
   /**
@@ -349,7 +358,9 @@ public class GenericHID {
    *     threshold.
    */
   public BooleanEvent axisGreaterThan(int axis, double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getRawAxis(axis) > threshold);
+    var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(
+        axis * 100 + threshold, k -> new BooleanEvent(loop, () -> getRawAxis(axis) > threshold));
   }
 
   /**
