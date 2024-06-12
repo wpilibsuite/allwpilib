@@ -5,9 +5,9 @@
 package edu.wpi.first.math.geometry;
 
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.proto.Ellipse2dProto;
 import edu.wpi.first.math.geometry.struct.Ellipse2dStruct;
+import edu.wpi.first.math.jni.Ellipse2dJNI;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -172,7 +172,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
     // Find nearest point
     var nearestPoint = new double[2];
-    WPIMathJNI.ellipse2dFindNearestPoint(
+    Ellipse2dJNI.findNearestPoint(
         m_center.getX(),
         m_center.getY(),
         m_center.getRotation().getRadians(),

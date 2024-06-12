@@ -308,7 +308,7 @@ public class PoseEstimator<T> {
    * Represents a vision update record. The record contains the vision-compensated pose estimate as
    * well as the corresponding odometry pose estimate.
    */
-  private static class VisionUpdate {
+  private static final class VisionUpdate {
     // The vision-compensated pose estimate.
     private final Pose2d visionPose;
 

@@ -15,7 +15,7 @@ index 32a427d852355a51dc4263d81498554ff4c3cbba..9f3e3f5b0f15518377c9a8283fd58081
  // See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89325
  #pragma GCC diagnostic ignored "-Wattributes"
  #endif
-+#if __GNUC__ >= 11 && __GNUC__ <= 13
++#if __GNUC__ >= 11
 +#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 +#endif
 +#if __GNUC__ >= 12

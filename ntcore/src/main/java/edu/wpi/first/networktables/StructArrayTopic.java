@@ -164,12 +164,10 @@ public final class StructArrayTopic<T> extends Topic {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-    return other instanceof StructArrayTopic<?> topic
-        && super.equals(topic)
-        && m_struct == topic.m_struct;
+    return other == this
+        || other instanceof StructArrayTopic<?> topic
+            && super.equals(topic)
+            && m_struct == topic.m_struct;
   }
 
   @Override

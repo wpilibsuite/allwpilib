@@ -18,7 +18,6 @@ import java.util.function.Consumer;
 import us.hebi.quickbuf.ProtoMessage;
 
 /** A network table that knows its subtable path. */
-@SuppressWarnings("PMD.CouplingBetweenObjects")
 public final class NetworkTable {
   /** The path separator for sub-tables and keys. */
   public static final char PATH_SEPARATOR = '/';

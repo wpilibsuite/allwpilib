@@ -28,7 +28,7 @@ public final class Constants {
     public static final double kWheelDiameterInches = 6;
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterInches * Math.PI) / (double) kEncoderCPR;
+        (kWheelDiameterInches * Math.PI) / kEncoderCPR;
   }
 
   public static final class HatchConstants {
