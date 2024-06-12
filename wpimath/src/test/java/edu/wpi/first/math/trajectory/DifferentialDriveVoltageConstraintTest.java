@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.trajectory;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -14,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.units.MutableMeasure;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
@@ -52,22 +54,42 @@ class DifferentialDriveVoltageConstraintTest {
           () ->
               assertTrue(
                   feedforward.calculate(
-                          wheelSpeeds.leftMetersPerSecond, point.accelerationMetersPerSecondSq)
+                          MutableMeasure.ofBaseUnits(
+                              wheelSpeeds.leftMetersPerSecond, MetersPerSecond),
+                          MutableMeasure.ofBaseUnits(
+                              wheelSpeeds.leftMetersPerSecond
+                                  + dt * point.accelerationMetersPerSecondSq,
+                              MetersPerSecond))
                       <= maxVoltage + 0.05),
           () ->
               assertTrue(
                   feedforward.calculate(
-                          wheelSpeeds.leftMetersPerSecond, point.accelerationMetersPerSecondSq)
+                          MutableMeasure.ofBaseUnits(
+                              wheelSpeeds.leftMetersPerSecond, MetersPerSecond),
+                          MutableMeasure.ofBaseUnits(
+                              wheelSpeeds.leftMetersPerSecond
+                                  + dt * point.accelerationMetersPerSecondSq,
+                              MetersPerSecond))
                       >= -maxVoltage - 0.05),
           () ->
               assertTrue(
                   feedforward.calculate(
-                          wheelSpeeds.rightMetersPerSecond, point.accelerationMetersPerSecondSq)
+                          MutableMeasure.ofBaseUnits(
+                              wheelSpeeds.rightMetersPerSecond, MetersPerSecond),
+                          MutableMeasure.ofBaseUnits(
+                              wheelSpeeds.rightMetersPerSecond
+                                  + dt * point.accelerationMetersPerSecondSq,
+                              MetersPerSecond))
                       <= maxVoltage + 0.05),
           () ->
               assertTrue(
                   feedforward.calculate(
-                          wheelSpeeds.rightMetersPerSecond, point.accelerationMetersPerSecondSq)
+                          MutableMeasure.ofBaseUnits(
+                              wheelSpeeds.rightMetersPerSecond, MetersPerSecond),
+                          MutableMeasure.ofBaseUnits(
+                              wheelSpeeds.rightMetersPerSecond
+                                  + dt * point.accelerationMetersPerSecondSq,
+                              MetersPerSecond))
                       >= -maxVoltage - 0.05));
     }
   }

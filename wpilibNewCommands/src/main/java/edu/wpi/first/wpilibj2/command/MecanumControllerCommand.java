@@ -59,7 +59,6 @@ public class MecanumControllerCommand extends Command {
   private final Supplier<MecanumDriveWheelSpeeds> m_currentWheelSpeeds;
   private final Consumer<MecanumDriveMotorVoltages> m_outputDriveVoltages;
   private final Consumer<MecanumDriveWheelSpeeds> m_outputWheelSpeeds;
-  private MecanumDriveWheelSpeeds m_prevSpeeds;
   private final MutableMeasure<Velocity<Distance>> m_prevFrontLeftSpeedSetpoint =
       MutableMeasure.zero(MetersPerSecond);
   private final MutableMeasure<Velocity<Distance>> m_prevRearLeftSpeedSetpoint =
@@ -350,13 +349,13 @@ public class MecanumControllerCommand extends Command {
     var initialYVelocity =
         initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getSin();
 
-    m_prevSpeeds =
+    MecanumDriveWheelSpeeds prevSpeeds =
         m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
 
-    m_prevFrontLeftSpeedSetpoint.mut_setMagnitude(m_prevSpeeds.frontLeftMetersPerSecond);
-    m_prevRearLeftSpeedSetpoint.mut_setMagnitude(m_prevSpeeds.rearLeftMetersPerSecond);
-    m_prevFrontRightSpeedSetpoint.mut_setMagnitude(m_prevSpeeds.frontRightMetersPerSecond);
-    m_prevRearRightSpeedSetpoint.mut_setMagnitude(m_prevSpeeds.rearRightMetersPerSecond);
+    m_prevFrontLeftSpeedSetpoint.mut_setMagnitude(prevSpeeds.frontLeftMetersPerSecond);
+    m_prevRearLeftSpeedSetpoint.mut_setMagnitude(prevSpeeds.rearLeftMetersPerSecond);
+    m_prevFrontRightSpeedSetpoint.mut_setMagnitude(prevSpeeds.frontRightMetersPerSecond);
+    m_prevRearRightSpeedSetpoint.mut_setMagnitude(prevSpeeds.rearRightMetersPerSecond);
 
     m_timer.restart();
   }
@@ -432,8 +431,6 @@ public class MecanumControllerCommand extends Command {
               m_rearLeftSpeedSetpoint.in(MetersPerSecond),
               m_rearRightSpeedSetpoint.in(MetersPerSecond)));
     }
-
-    m_prevSpeeds = targetWheelSpeeds;
   }
 
   @Override

@@ -4,12 +4,14 @@
 
 package edu.wpi.first.math.controller;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.units.MutableMeasure;
 import org.junit.jupiter.api.Test;
 
 class SimpleMotorFeedforwardTest {
@@ -28,18 +30,21 @@ class SimpleMotorFeedforwardTest {
 
     var r = VecBuilder.fill(2.0);
     var nextR = VecBuilder.fill(3.0);
+    var currentVelocity = MutableMeasure.ofBaseUnits(2.0, RadiansPerSecond);
+    var nextVelocity = MutableMeasure.ofBaseUnits(3.0, RadiansPerSecond);
 
-    assertEquals(37.52499583432516 + 0.5, simpleMotor.calculate(2.0, 3.0, dt), 0.002);
+    assertEquals(
+        37.52499583432516 + 0.5, simpleMotor.calculate(currentVelocity, nextVelocity), 0.002);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
-        simpleMotor.calculate(2.0, 3.0, dt),
+        simpleMotor.calculate(currentVelocity, nextVelocity),
         0.002);
 
     // These won't match exactly. It's just an approximation to make sure they're
     // in the same ballpark.
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
-        simpleMotor.calculate(2.0, 1.0 / dt),
+        simpleMotor.calculate(currentVelocity, nextVelocity),
         2.0);
   }
 }

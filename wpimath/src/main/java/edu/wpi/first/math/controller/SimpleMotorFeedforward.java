@@ -31,10 +31,10 @@ public class SimpleMotorFeedforward {
   /** The feedforward. */
   private final LinearPlantInversionFeedforward<N1, N1, N1> feedforward;
 
-  /** The current reference */
+  /** The current reference. */
   private final Matrix<N1, N1> r;
 
-  /** The next reference */
+  /** The next reference. */
   private Matrix<N1, N1> nextR;
 
   /**
@@ -63,11 +63,18 @@ public class SimpleMotorFeedforward {
       throw new IllegalArgumentException(
           "period must be a positive number, got " + periodSeconds + "!");
     }
-    this.plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
-    this.feedforward = new LinearPlantInversionFeedforward<>(plant, periodSeconds);
+    if (ka != 0.0) {
+      this.plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
+      this.feedforward = new LinearPlantInversionFeedforward<>(plant, periodSeconds);
 
-    this.r = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0);
-    this.nextR = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0);
+      this.r = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0);
+      this.nextR = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0);
+    } else {
+      this.plant = null;
+      this.feedforward = null;
+      this.r = null;
+      this.nextR = null;
+    }
   }
 
   /**
@@ -132,11 +139,15 @@ public class SimpleMotorFeedforward {
    */
   public <U extends Unit<U>> double calculate(
       Measure<Velocity<U>> currentVelocity, Measure<Velocity<U>> nextVelocity) {
-    r.set(0, 0, currentVelocity.magnitude());
-    nextR.set(0, 0, nextVelocity.magnitude());
+    if (ka == 0.0) {
+      return ks * Math.signum(nextVelocity.magnitude()) + kv * nextVelocity.magnitude();
+    } else {
+      r.set(0, 0, currentVelocity.magnitude());
+      nextR.set(0, 0, nextVelocity.magnitude());
 
-    return ks * Math.signum(currentVelocity.magnitude())
-        + feedforward.calculate(r, nextR).get(0, 0);
+      return ks * Math.signum(currentVelocity.magnitude())
+          + feedforward.calculate(r, nextR).get(0, 0);
+    }
   }
 
   /**
