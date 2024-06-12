@@ -26,7 +26,7 @@ class SimpleMotorFeedforwardTest {
     var B = MatBuilder.fill(Nat.N1(), Nat.N1(), 1.0 / Ka);
 
     var plantInversion = new LinearPlantInversionFeedforward<N1, N1, N1>(A, B, dt);
-    var simpleMotor = new SimpleMotorFeedforward(Ks, Kv, Ka);
+    var simpleMotor = new SimpleMotorFeedforward(Ks, Kv, Ka, dt);
 
     var r = VecBuilder.fill(2.0);
     var nextR = VecBuilder.fill(3.0);
@@ -34,17 +34,19 @@ class SimpleMotorFeedforwardTest {
     var nextVelocity = MutableMeasure.ofBaseUnits(3.0, RadiansPerSecond);
 
     assertEquals(
-        37.52499583432516 + 0.5, simpleMotor.calculate(currentVelocity, nextVelocity), 0.002);
+        37.52499583432516 + 0.5,
+        simpleMotor.calculate(currentVelocity, nextVelocity).magnitude(),
+        0.002);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
-        simpleMotor.calculate(currentVelocity, nextVelocity),
+        simpleMotor.calculate(currentVelocity, nextVelocity).magnitude(),
         0.002);
 
     // These won't match exactly. It's just an approximation to make sure they're
     // in the same ballpark.
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
-        simpleMotor.calculate(currentVelocity, nextVelocity),
+        simpleMotor.calculate(currentVelocity, nextVelocity).magnitude(),
         2.0);
   }
 }

@@ -23,8 +23,10 @@ import org.junit.jupiter.api.Test;
 class DifferentialDriveVoltageConstraintTest {
   @Test
   void testDifferentialDriveVoltageConstraint() {
+    var dt = 0.02;
+
     // Pick an unreasonably large kA to ensure the constraint has to do some work
-    var feedforward = new SimpleMotorFeedforward(1, 1, 3);
+    var feedforward = new SimpleMotorFeedforward(1, 1, 3, dt);
     var kinematics = new DifferentialDriveKinematics(0.5);
     double maxVoltage = 10;
     var constraint = new DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage);
@@ -34,63 +36,40 @@ class DifferentialDriveVoltageConstraintTest {
 
     var duration = trajectory.getTotalTimeSeconds();
     var t = 0.0;
-    var dt = 0.02;
 
     while (t < duration) {
-      var point = trajectory.sample(t);
-      var chassisSpeeds =
-          new ChassisSpeeds(
-              point.velocityMetersPerSecond,
-              0,
-              point.velocityMetersPerSecond * point.curvatureRadPerMeter);
-
-      var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
-
+      var currentPoint = trajectory.sample(t);
+      var nextPoint = trajectory.sample(t + dt);
       t += dt;
 
-      // Not really a strictly-correct test as we're using the chassis accel instead of the
-      // wheel accel, but much easier than doing it "properly" and a reasonable check anyway
+      var currentChassisSpeeds =
+          new ChassisSpeeds(
+              currentPoint.velocityMetersPerSecond,
+              0,
+              currentPoint.velocityMetersPerSecond * currentPoint.curvatureRadPerMeter);
+      var currentWheelSpeeds = kinematics.toWheelSpeeds(currentChassisSpeeds);
+
+      var nextChassisSpeeds =
+          new ChassisSpeeds(
+              nextPoint.velocityMetersPerSecond,
+              0,
+              nextPoint.velocityMetersPerSecond * nextPoint.curvatureRadPerMeter);
+      var nextWheelSpeeds = kinematics.toWheelSpeeds(nextChassisSpeeds);
+
+      var leftVoltage =
+          feedforward.calculate(
+              MutableMeasure.ofBaseUnits(currentWheelSpeeds.leftMetersPerSecond, MetersPerSecond),
+              MutableMeasure.ofBaseUnits(nextWheelSpeeds.leftMetersPerSecond, MetersPerSecond));
+      var rightVoltage =
+          feedforward.calculate(
+              MutableMeasure.ofBaseUnits(currentWheelSpeeds.leftMetersPerSecond, MetersPerSecond),
+              MutableMeasure.ofBaseUnits(nextWheelSpeeds.leftMetersPerSecond, MetersPerSecond));
+
       assertAll(
-          () ->
-              assertTrue(
-                  feedforward.calculate(
-                          MutableMeasure.ofBaseUnits(
-                              wheelSpeeds.leftMetersPerSecond, MetersPerSecond),
-                          MutableMeasure.ofBaseUnits(
-                              wheelSpeeds.leftMetersPerSecond
-                                  + dt * point.accelerationMetersPerSecondSq,
-                              MetersPerSecond))
-                      <= maxVoltage + 0.05),
-          () ->
-              assertTrue(
-                  feedforward.calculate(
-                          MutableMeasure.ofBaseUnits(
-                              wheelSpeeds.leftMetersPerSecond, MetersPerSecond),
-                          MutableMeasure.ofBaseUnits(
-                              wheelSpeeds.leftMetersPerSecond
-                                  + dt * point.accelerationMetersPerSecondSq,
-                              MetersPerSecond))
-                      >= -maxVoltage - 0.05),
-          () ->
-              assertTrue(
-                  feedforward.calculate(
-                          MutableMeasure.ofBaseUnits(
-                              wheelSpeeds.rightMetersPerSecond, MetersPerSecond),
-                          MutableMeasure.ofBaseUnits(
-                              wheelSpeeds.rightMetersPerSecond
-                                  + dt * point.accelerationMetersPerSecondSq,
-                              MetersPerSecond))
-                      <= maxVoltage + 0.05),
-          () ->
-              assertTrue(
-                  feedforward.calculate(
-                          MutableMeasure.ofBaseUnits(
-                              wheelSpeeds.rightMetersPerSecond, MetersPerSecond),
-                          MutableMeasure.ofBaseUnits(
-                              wheelSpeeds.rightMetersPerSecond
-                                  + dt * point.accelerationMetersPerSecondSq,
-                              MetersPerSecond))
-                      >= -maxVoltage - 0.05));
+          () -> assertTrue(leftVoltage.magnitude() <= maxVoltage + 0.05),
+          () -> assertTrue(leftVoltage.magnitude() >= -maxVoltage - 0.05),
+          () -> assertTrue(rightVoltage.magnitude() <= maxVoltage + 0.05),
+          () -> assertTrue(rightVoltage.magnitude() >= -maxVoltage - 0.05));
     }
   }
 

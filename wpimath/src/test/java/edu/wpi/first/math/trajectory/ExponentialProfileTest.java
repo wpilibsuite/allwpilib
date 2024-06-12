@@ -49,7 +49,7 @@ class ExponentialProfileTest {
     var nextVelocity = MutableMeasure.ofBaseUnits(next.velocity, RadiansPerSecond);
     var signal = feedforward.calculate(currentVelocity, nextVelocity);
 
-    assertTrue(Math.abs(signal) < constraints.maxInput + 1e-9);
+    assertTrue(Math.abs(signal.magnitude()) < constraints.maxInput + 1e-9);
 
     return next;
   }
