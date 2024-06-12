@@ -18,6 +18,7 @@ import java.util.Map;
 public class CommandGenericHID {
   private final GenericHID m_hid;
   private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
+  private final Map<EventLoop, Map<Double, Trigger>> m_axisCache = new HashMap<>();
   private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
 
   /**
@@ -47,7 +48,7 @@ public class CommandGenericHID {
    * @see #button(int, EventLoop)
    */
   public Trigger button(int button) {
-    return this.button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
+    return button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -220,7 +221,9 @@ public class CommandGenericHID {
    *     threshold.
    */
   public Trigger axisLessThan(int axis, double threshold, EventLoop loop) {
-    return m_hid.axisLessThan(axis, threshold, loop).castTo(Trigger::new);
+    var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(
+        axis * 100 - threshold, k -> new Trigger(loop, () -> getRawAxis(axis) < threshold));
   }
 
   /**
@@ -248,7 +251,9 @@ public class CommandGenericHID {
    *     threshold.
    */
   public Trigger axisGreaterThan(int axis, double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(axis, threshold, loop).castTo(Trigger::new);
+    var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(
+        axis * 100 + threshold, k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
   }
 
   /**

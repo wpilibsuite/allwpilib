@@ -58,7 +58,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger square(EventLoop loop) {
-    return m_hid.square(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kSquare.value, loop);
   }
 
   /**
@@ -80,7 +80,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger cross(EventLoop loop) {
-    return m_hid.cross(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kCross.value, loop);
   }
 
   /**
@@ -102,7 +102,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger circle(EventLoop loop) {
-    return m_hid.circle(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kCircle.value, loop);
   }
 
   /**
@@ -124,7 +124,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger triangle(EventLoop loop) {
-    return m_hid.triangle(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kTriangle.value, loop);
   }
 
   /**
@@ -146,7 +146,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger L1(EventLoop loop) {
-    return m_hid.L1(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kL1.value, loop);
   }
 
   /**
@@ -168,7 +168,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger R1(EventLoop loop) {
-    return m_hid.R1(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kR1.value, loop);
   }
 
   /**
@@ -190,7 +190,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger L2(EventLoop loop) {
-    return m_hid.L2(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kL2.value, loop);
   }
 
   /**
@@ -212,7 +212,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger R2(EventLoop loop) {
-    return m_hid.R2(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kR2.value, loop);
   }
 
   /**
@@ -234,7 +234,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger create(EventLoop loop) {
-    return m_hid.create(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kCreate.value, loop);
   }
 
   /**
@@ -256,7 +256,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger options(EventLoop loop) {
-    return m_hid.options(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kOptions.value, loop);
   }
 
   /**
@@ -278,7 +278,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger L3(EventLoop loop) {
-    return m_hid.L3(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kL3.value, loop);
   }
 
   /**
@@ -300,7 +300,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger R3(EventLoop loop) {
-    return m_hid.R3(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kR3.value, loop);
   }
 
   /**
@@ -322,7 +322,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger PS(EventLoop loop) {
-    return m_hid.PS(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kPS.value, loop);
   }
 
   /**
@@ -344,7 +344,7 @@ public class CommandPS5Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return m_hid.touchpad(loop).castTo(Trigger::new);
+    return button(PS5Controller.Button.kTouchpad.value, loop);
   }
 
   /**
