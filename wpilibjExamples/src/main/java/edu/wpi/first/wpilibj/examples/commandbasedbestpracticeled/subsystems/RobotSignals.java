@@ -67,7 +67,7 @@ public class RobotSignals {
   private static final int m_firstAchieveHueGoal = 32;
   private static final int m_lastAchieveHueGoal = 39;
   // CAUTION CAUTION CAUTION -- Update this length for each view defined.
-  private static final int length =
+  private static final int m_length =
       Math.max(
         Math.max(
           Math.max(
@@ -85,25 +85,26 @@ public class RobotSignals {
   public final LEDView m_historyDemo;
   public final LEDView m_achieveHueGoal;
 
-  private final AddressableLEDBuffer bufferLED;
+  private final AddressableLEDBuffer m_bufferLED;
 
   public RobotSignals() {
     // start updating the physical LED strip
     final int addressableLedPwmPort = 1;
     m_strip = new AddressableLED(addressableLedPwmPort);
-    m_strip.setLength(length);
+    m_strip.setLength(m_length);
     m_strip.start();
 
-    bufferLED = new AddressableLEDBuffer(length); // buffer for all of the LEDs
+    m_bufferLED = new AddressableLEDBuffer(m_length); // buffer for all of the LEDs
 
     // create the resources (subsystems) as views of the LED buffer
-    m_top = new LEDView(bufferLED.createView(m_firstTopLED, m_lastTopLED));
-    m_main = new LEDView(bufferLED.createView(m_firstMainLED, m_lastMainLED));
+    m_top = new LEDView(m_bufferLED.createView(m_firstTopLED, m_lastTopLED));
+    m_main = new LEDView(m_bufferLED.createView(m_firstMainLED, m_lastMainLED));
     m_enableDisable =
-        new LEDView(bufferLED.createView(m_firstEnableDisableLED, m_lastEnableDisableLED));
-    m_historyDemo = new LEDView(bufferLED.createView(m_firstHistoryDemoLED, m_lastHistoryDemoLED));
+        new LEDView(m_bufferLED.createView(m_firstEnableDisableLED, m_lastEnableDisableLED));
+    m_historyDemo =
+        new LEDView(m_bufferLED.createView(m_firstHistoryDemoLED, m_lastHistoryDemoLED));
     m_achieveHueGoal =
-        new LEDView(bufferLED.createView(m_firstAchieveHueGoal, m_lastAchieveHueGoal));
+        new LEDView(m_bufferLED.createView(m_firstAchieveHueGoal, m_lastAchieveHueGoal));
   }
 
   /**
@@ -115,7 +116,7 @@ public class RobotSignals {
    * Run after commands and triggers
    */
   public void runAfterCommands() {
-    m_strip.setData(bufferLED); // run periodically to send the buffer to the LEDs
+    m_strip.setData(m_bufferLED); // run periodically to send the buffer to the LEDs
   }
 
   /** LED view resource (subsystem) */

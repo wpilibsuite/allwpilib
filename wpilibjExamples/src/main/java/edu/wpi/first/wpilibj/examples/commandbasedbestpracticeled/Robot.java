@@ -238,7 +238,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    // Running commands are all cancelled. Default Commands will activate.
+    // Running commands are all cancelled. Default Commands will activate especially the disjoint
+    // test defaults if the disjoint test was prematurely aborted leaving the defaults in place.
+    // That behavior can be changed with more logic if need be - no need for this simple demo.
     CommandScheduler.getInstance().cancelAll();
   }
 

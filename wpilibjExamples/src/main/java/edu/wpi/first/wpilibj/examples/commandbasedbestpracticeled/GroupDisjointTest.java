@@ -5,18 +5,33 @@
 package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
 
 /*
- * Sample program to demonstrate loose coupling of Commands in a sequential grouping.
+ * Sample program to demonstrate loose coupling of Commands in a sequential grouping. (Each leg of
+ * any parallel grouping is also considered a sequence and that is especially obvious if a default
+ * command runs after the primary command ends.)
  *
  * A standard sequence locks all of the requirements of all of the subsystems used in
  * the group for the duration of the sequential execution. Default commands do not run
  * until the entire sequence completes.
  *
- * A loosely connected sequential group demonstrates that each command runs
- * independently and when a command ends its subsystems' default commands run.
+ * A loosely connected sequential group demonstrates that each command runs independently and when
+ * a command ends its subsystems' default commands run.
  *
- * Running the same sequence normally with demonstrates that the subsystems'
- * requirements are maintained for the entire group execution duration and
- * the default commands are not activated until the sequence group ends.
+ * Running the same sequence normally demonstrates that the subsystems' requirements are maintained
+ * for the entire group execution duration and the default commands are not activated until the
+ * sequence group ends.
+ * 
+ * Note that this class probably didn't have to be a subsystem as it contains other subsystems with
+ * their requirements. There are only two places herein that might use a subsystem to protect the
+ * requirements on the two "runOnce" commands. I believe it isn't needed in this special case but
+ * in case I'm wrong I made this a subsystem. Alternatively I could have used a bad practice and
+ * coded the requirements of the contained subsystems on the two "runOnce" commands. In the spirit
+ * of admit things can go wrong that shouldn't and use a good practice instead of a bad practice
+ * this class was made a subsystem just to be "doubly" safe. This being a subsystem does change the
+ * results slightly as there may be one more or less loop iteration between the two different
+ * techniques.
+ * 
+ * (none, run, runOnce, startEnd, runEnd, and defer within a subsystem automatically include
+ * the subsystem as a requirements so you won't forget it.)
  */
 
 import static edu.wpi.first.units.Units.Seconds;
@@ -24,7 +39,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.deadline;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.print;
 import static edu.wpi.first.wpilibj2.command.Commands.race;
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
@@ -34,8 +48,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class GroupDisjointTest {
+public class GroupDisjointTest extends SubsystemBase {
   // runtime option; too rigid - could be made easier to find and change but this is just a
   // "simple" example program
 
@@ -197,20 +212,26 @@ public class GroupDisjointTest {
 
       runOnce(
           () -> {
+            // Cleanup default commands from a previous aborted run.
+            if (m_groupDisjoint[m_a].getDefaultCommand() != null) {
+              CommandScheduler.getInstance().cancel(m_groupDisjoint[m_a].getDefaultCommand());
+              m_groupDisjoint[m_a].removeDefaultCommand();         
+            }
+            if (m_groupDisjoint[m_b].getDefaultCommand() != null) {
+              CommandScheduler.getInstance().cancel(m_groupDisjoint[m_b].getDefaultCommand());
+              m_groupDisjoint[m_b].removeDefaultCommand();     
+            }
             if (m_groupDisjoint[m_c].getDefaultCommand() != null) {
-              // cleanup default commands from a previous aborted run
-            CommandScheduler.getInstance().cancel(m_groupDisjoint[m_a].getDefaultCommand());
-            CommandScheduler.getInstance().cancel(m_groupDisjoint[m_b].getDefaultCommand());
             CommandScheduler.getInstance().cancel(m_groupDisjoint[m_c].getDefaultCommand());
-            m_groupDisjoint[m_a].removeDefaultCommand();
-            m_groupDisjoint[m_b].removeDefaultCommand();
             m_groupDisjoint[m_c].removeDefaultCommand();
             }
-            // default commands
+
+            // set default commands
             m_groupDisjoint[m_a].setDefaultCommand();
             m_groupDisjoint[m_b].setDefaultCommand();
             m_groupDisjoint[m_c].setDefaultCommand();
-          }),
+          }
+      ),
       print("\nSTART testSequence"),
       testSequence,
       print("\nEND testSequence"),
@@ -256,7 +277,8 @@ public class GroupDisjointTest {
             m_groupDisjoint[m_a].removeDefaultCommand();
             m_groupDisjoint[m_b].removeDefaultCommand();
             m_groupDisjoint[m_c].removeDefaultCommand();
-          })
+          }
+      )
     };
 
     if (useTriggeredJob) {
@@ -296,7 +318,8 @@ public class GroupDisjointTest {
     m_groupDisjoint[m_c].runAfterCommands();
   }
 
-  // The following methods might be included in an upcoming WPILib release
+  // The following useful methods might be included in an upcoming WPILib release
+  // Use "proxy" with caution!
 
   /**
    * Runs individual commands in a series without grouped behavior.
@@ -449,7 +472,10 @@ END testDisjointSequence
 AdBdCd
 
 START testRepeatingSequence
-AdBdCdA1A1A1A1B1B1B1C1C1C1A1A1A1A1B1B1B1C1C1C1A1A1A1A1B1B1
+AdBdCd
+A1A1A1A1B1B1B1C1C1C1
+A1A1A1A1B1B1B1C1C1C1
+A1A1A1A1B1B1B1
 END testRepeatingSequence
 
 AdBdCd
@@ -464,25 +490,26 @@ AdBdCd
 
 START testParallel
 AdBdCd
-B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1
-B1C1B1C1B1C1B1C1B1C1B1C1
+B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1
+B1C1B1C1B1C1B1C1B1C1B1C1B1C1
 B1B1B1B1B1B1B1B1
-A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2
-A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2B2B2B2B2B2B2B2B2
+A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2
+A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2
+B2B2B2B2B2B2B2B2
 END testParallel
 
 AdBdCd
 
 START testDisjointParallel
-AdBdCd
-AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
-AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdBdCdAdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdB1C1
 AdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1Cd
 AdBdCd
-A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
-A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
-A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdAdB2Cd
-AdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2Cd
+A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
+A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
+A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
+AdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2Cd
 AdBdCd
 END testDisjointParallel
 
@@ -490,13 +517,13 @@ AdBdCd
 
 START testManualDisjointParallel
 AdBdCd
-AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
-AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
 AdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1Cd
 AdBdCd
-A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
-A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
-A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
+A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
+A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
+A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
 AdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2Cd
 AdBdCd
 END testManualDisjointParallel
@@ -505,7 +532,9 @@ AdBdCd
 
 START testDeadlineParallel
 AdBdCd
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1B1C1C1C1C1C1C1C1C1C1C1
+A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
+B1C1
+C1C1C1C1C1C1C1C1C1
 END testDeadlineParallel
 
 AdBdCd
@@ -513,7 +542,6 @@ AdBdCd
 START testDisjointDeadlineParallel
 AdBdCd
 A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
-AdB1C1
 AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1
 END testDisjointDeadlineParallel
 
@@ -521,7 +549,7 @@ AdBdCd
 
 START testRaceParallel
 AdBdCd
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
+A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
 A1A1A1A1A1A1
 END testRaceParallel
 
@@ -529,10 +557,10 @@ AdBdCd
 
 START testDisjointRaceParallel
 AdBdCd
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
-A1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCd
+A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
+A1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCd
 AdBdCd
 END testDisjointRaceParallel
 
 AdBdCd
-*/
+ */

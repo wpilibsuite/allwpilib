@@ -202,7 +202,7 @@ public class RobotContainer {
   }
 
   /**
-   * Get disjointed sequence test
+   * Get disjointed sequence test from its creator for use by Robot - passing the reference up
    * 
    * @return Command to be scheduled to run disjointed sequence test
    */

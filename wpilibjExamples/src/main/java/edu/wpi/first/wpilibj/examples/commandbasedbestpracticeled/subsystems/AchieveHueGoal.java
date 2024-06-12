@@ -47,7 +47,6 @@ public class AchieveHueGoal {
   private double m_currentStateHue = 0.0; // also considered the initial and previous state
 
   private final LEDView m_robotSignals; // where the output is displayed
-
   public final HueGoal m_hueGoal = new HueGoal(); // subsystem protected goal
 
   /**
@@ -64,10 +63,8 @@ public class AchieveHueGoal {
 
   // Methods that change the system should be "private".
   // Methods and triggers that inquire about the system should be "public".
-
-  private boolean isAtHueGoal() {
-    return m_hueController.atSetpoint();
-  }
+  // To get periodic behavior with Command-Based structure the "before" and "after" must be
+  // "public" so patch on extra protection for them.
 
   /**
    * Run before commands and triggers
@@ -81,7 +78,8 @@ public class AchieveHueGoal {
     // must be public to get this run periodically but don't allow just anyone to run this
     StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
     StackTraceElement element = stackTrace[2];
-    if ("frc.robot.RobotContainer".equals(element.getClassName()) && "runAfterCommands".equals(element.getMethodName())) {
+    if ("frc.robot.RobotContainer".equals(element.getClassName())
+          && "runAfterCommands".equals(element.getMethodName())) {
       // running valid from RobotContainer.afterCommands
 
       // here's the controller that runs based on the Goal that was set
@@ -104,11 +102,13 @@ public class AchieveHueGoal {
             LEDPattern.solid(Color.fromHSV(0, 0, 0)); // display state off - black;        
       }
 
-      if (isAtHueGoal()) {
+      if (m_hueController.atSetpoint()) {
         currentStateSignal = currentStateSignal.blink(Seconds.of(0.1)); // blink if made it to the Goal
       }
       m_robotSignals.setSignalOnce(currentStateSignal).schedule(); // access to the LEDs is only by
                                                     // command in this example so do it that way. 
+    } else {
+      throw new IllegalCallerException("Only callable from RobotContainer.runAfterCommands");
     }
  }
 
