@@ -74,10 +74,8 @@ TEST(ElevatorSimTest, Stability) {
     sim.Update(20_ms);
   }
 
-  frc::LinearSystem<2, 1, 1> system =
-      frc::LinearSystemId::ElevatorSystem(frc::DCMotor::Vex775Pro(4), 4_kg,
-                                          0.5_in, 100)
-          .Slice(0);
+  frc::LinearSystem<2, 1, 1> system = frc::LinearSystemId::ElevatorSystem(
+      frc::DCMotor::Vex775Pro(4), 4_kg, 0.5_in, 100);
   EXPECT_NEAR_UNITS(
       units::meter_t{system.CalculateX(frc::Vectord<2>{0.0, 0.0},
                                        frc::Vectord<1>{12.0}, 20_ms * 50)(0)},

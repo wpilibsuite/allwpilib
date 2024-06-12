@@ -256,7 +256,7 @@ NTMechanism2DModel::~NTMechanism2DModel() = default;
 void NTMechanism2DModel::Update() {
   for (auto&& event : m_poller.ReadQueue()) {
     if (auto info = event.GetTopicInfo()) {
-      auto name = wpi::remove_prefix(info->name, m_path).value_or("");
+      auto name = wpi::drop_front(info->name, m_path.size());
       if (name.empty() || name[0] == '.') {
         continue;
       }
@@ -307,7 +307,7 @@ void NTMechanism2DModel::Update() {
         }
       } else {
         auto fullName = nt::Topic{valueData->topic}.GetName();
-        auto name = wpi::remove_prefix(fullName, m_path).value_or("");
+        auto name = wpi::drop_front(fullName, m_path.size());
         if (name.empty() || name[0] == '.') {
           continue;
         }

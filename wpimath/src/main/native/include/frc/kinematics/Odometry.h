@@ -24,7 +24,7 @@ namespace frc {
  * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
  */
-template <typename WheelSpeeds, typename WheelPositions>
+template <typename WheelSpeeds, WheelPositions WheelPositions>
 class WPILIB_DLLEXPORT Odometry {
  public:
   /**

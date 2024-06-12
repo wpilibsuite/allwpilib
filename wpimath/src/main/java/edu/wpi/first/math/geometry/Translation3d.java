@@ -288,10 +288,12 @@ public class Translation3d
    */
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof Translation3d other
-        && Math.abs(other.m_x - m_x) < 1E-9
-        && Math.abs(other.m_y - m_y) < 1E-9
-        && Math.abs(other.m_z - m_z) < 1E-9;
+    if (obj instanceof Translation3d) {
+      return Math.abs(((Translation3d) obj).m_x - m_x) < 1E-9
+          && Math.abs(((Translation3d) obj).m_y - m_y) < 1E-9
+          && Math.abs(((Translation3d) obj).m_z - m_z) < 1E-9;
+    }
+    return false;
   }
 
   @Override

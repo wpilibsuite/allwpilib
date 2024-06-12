@@ -54,60 +54,65 @@ class VariableAndFixedInt;
 template <int N>
 class FixedInt {
  public:
-  static constexpr int value = N;
-  constexpr operator int() const { return N; }
+  static const int value = N;
+  EIGEN_CONSTEXPR operator int() const { return value; }
 
-  constexpr FixedInt() = default;
-  constexpr FixedInt(std::integral_constant<int, N>) {}
+  EIGEN_CONSTEXPR
+  FixedInt() = default;
 
-  constexpr FixedInt(VariableAndFixedInt<N> other) {
+  EIGEN_CONSTEXPR
+  FixedInt(std::integral_constant<int, N>) {}
+
+  EIGEN_CONSTEXPR
+  FixedInt(VariableAndFixedInt<N> other) {
 #ifndef EIGEN_INTERNAL_DEBUGGING
     EIGEN_UNUSED_VARIABLE(other);
 #endif
     eigen_internal_assert(int(other) == N);
   }
 
-  constexpr FixedInt<-N> operator-() const { return FixedInt<-N>(); }
+  EIGEN_CONSTEXPR
+  FixedInt<-N> operator-() const { return FixedInt<-N>(); }
 
   template <int M>
-  constexpr FixedInt<N + M> operator+(FixedInt<M>) const {
+  EIGEN_CONSTEXPR FixedInt<N + M> operator+(FixedInt<M>) const {
     return FixedInt<N + M>();
   }
 
   template <int M>
-  constexpr FixedInt<N - M> operator-(FixedInt<M>) const {
+  EIGEN_CONSTEXPR FixedInt<N - M> operator-(FixedInt<M>) const {
     return FixedInt<N - M>();
   }
 
   template <int M>
-  constexpr FixedInt<N * M> operator*(FixedInt<M>) const {
+  EIGEN_CONSTEXPR FixedInt<N * M> operator*(FixedInt<M>) const {
     return FixedInt<N * M>();
   }
 
   template <int M>
-  constexpr FixedInt<N / M> operator/(FixedInt<M>) const {
+  EIGEN_CONSTEXPR FixedInt<N / M> operator/(FixedInt<M>) const {
     return FixedInt<N / M>();
   }
 
   template <int M>
-  constexpr FixedInt<N % M> operator%(FixedInt<M>) const {
+  EIGEN_CONSTEXPR FixedInt<N % M> operator%(FixedInt<M>) const {
     return FixedInt<N % M>();
   }
 
   template <int M>
-  constexpr FixedInt<N | M> operator|(FixedInt<M>) const {
+  EIGEN_CONSTEXPR FixedInt<N | M> operator|(FixedInt<M>) const {
     return FixedInt<N | M>();
   }
 
   template <int M>
-  constexpr FixedInt<N & M> operator&(FixedInt<M>) const {
+  EIGEN_CONSTEXPR FixedInt<N & M> operator&(FixedInt<M>) const {
     return FixedInt<N & M>();
   }
 
   // Needed in C++14 to allow fix<N>():
-  constexpr FixedInt operator()() const { return *this; }
+  EIGEN_CONSTEXPR FixedInt operator()() const { return *this; }
 
-  constexpr VariableAndFixedInt<N> operator()(int val) const { return VariableAndFixedInt<N>(val); }
+  VariableAndFixedInt<N> operator()(int val) const { return VariableAndFixedInt<N>(val); }
 };
 
 /** \internal

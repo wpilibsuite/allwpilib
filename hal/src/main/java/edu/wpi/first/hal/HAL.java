@@ -82,7 +82,7 @@ public final class HAL extends JNIWrapper {
 
   private static final List<Runnable> s_simPeriodicBefore = new ArrayList<>();
 
-  public static final class SimPeriodicBeforeCallback implements AutoCloseable {
+  public static class SimPeriodicBeforeCallback implements AutoCloseable {
     private SimPeriodicBeforeCallback(Runnable r) {
       m_run = r;
     }
@@ -128,7 +128,7 @@ public final class HAL extends JNIWrapper {
 
   private static final List<Runnable> s_simPeriodicAfter = new ArrayList<>();
 
-  public static final class SimPeriodicAfterCallback implements AutoCloseable {
+  public static class SimPeriodicAfterCallback implements AutoCloseable {
     private SimPeriodicAfterCallback(Runnable r) {
       m_run = r;
     }

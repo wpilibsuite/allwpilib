@@ -490,11 +490,9 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_HALUtil_getSerialNumber
   (JNIEnv* env, jclass)
 {
-  WPI_String serialNum;
-  HAL_GetSerialNumber(&serialNum);
-  jstring ret = MakeJString(env, wpi::to_string_view(&serialNum));
-  WPI_FreeString(&serialNum);
-  return ret;
+  char serialNum[9];
+  size_t len = HAL_GetSerialNumber(serialNum, sizeof(serialNum));
+  return MakeJString(env, std::string_view(serialNum, len));
 }
 
 /*
@@ -506,11 +504,9 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_HALUtil_getComments
   (JNIEnv* env, jclass)
 {
-  WPI_String comments;
-  HAL_GetComments(&comments);
-  jstring ret = MakeJString(env, wpi::to_string_view(&comments));
-  WPI_FreeString(&comments);
-  return ret;
+  char comments[65];
+  size_t len = HAL_GetComments(comments, sizeof(comments));
+  return MakeJString(env, std::string_view(comments, len));
 }
 
 /*

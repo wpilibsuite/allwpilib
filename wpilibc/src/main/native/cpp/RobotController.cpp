@@ -30,19 +30,16 @@ int64_t RobotController::GetFPGARevision() {
 }
 
 std::string RobotController::GetSerialNumber() {
-  WPI_String serialNum;
-  HAL_GetSerialNumber(&serialNum);
-  std::string ret{wpi::to_string_view(&serialNum)};
-  WPI_FreeString(&serialNum);
-  return ret;
+  // Serial number is 8 characters
+  char serialNum[9];
+  size_t len = HAL_GetSerialNumber(serialNum, sizeof(serialNum));
+  return std::string(serialNum, len);
 }
 
 std::string RobotController::GetComments() {
-  WPI_String comments;
-  HAL_GetComments(&comments);
-  std::string ret{wpi::to_string_view(&comments)};
-  WPI_FreeString(&comments);
-  return ret;
+  char comments[65];
+  size_t len = HAL_GetComments(comments, sizeof(comments));
+  return std::string(comments, len);
 }
 
 int32_t RobotController::GetTeamNumber() {

@@ -6,14 +6,8 @@
 
 using namespace frc2;
 
-CommandGenericHID::CommandGenericHID(int port) : m_hid{port} {}
-
-frc::GenericHID& CommandGenericHID::GetHID() {
-  return m_hid;
-}
-
 Trigger CommandGenericHID::Button(int button, frc::EventLoop* loop) const {
-  return m_hid.Button(button, loop).CastTo<Trigger>();
+  return GenericHID::Button(button, loop).CastTo<Trigger>();
 }
 
 Trigger CommandGenericHID::POV(int angle, frc::EventLoop* loop) const {
@@ -22,7 +16,7 @@ Trigger CommandGenericHID::POV(int angle, frc::EventLoop* loop) const {
 
 Trigger CommandGenericHID::POV(int pov, int angle, frc::EventLoop* loop) const {
   return Trigger(loop,
-                 [this, pov, angle] { return m_hid.GetPOV(pov) == angle; });
+                 [this, pov, angle] { return this->GetPOV(pov) == angle; });
 }
 
 Trigger CommandGenericHID::POVUp(frc::EventLoop* loop) const {
@@ -64,13 +58,13 @@ Trigger CommandGenericHID::POVCenter(frc::EventLoop* loop) const {
 Trigger CommandGenericHID::AxisLessThan(int axis, double threshold,
                                         frc::EventLoop* loop) const {
   return Trigger(loop, [this, axis, threshold]() {
-    return m_hid.GetRawAxis(axis) < threshold;
+    return this->GetRawAxis(axis) < threshold;
   });
 }
 
 Trigger CommandGenericHID::AxisGreaterThan(int axis, double threshold,
                                            frc::EventLoop* loop) const {
   return Trigger(loop, [this, axis, threshold]() {
-    return m_hid.GetRawAxis(axis) > threshold;
+    return this->GetRawAxis(axis) > threshold;
   });
 }

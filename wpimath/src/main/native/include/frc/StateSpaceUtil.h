@@ -34,28 +34,18 @@ namespace frc {
  * @return State excursion or control effort cost matrix.
  */
 template <std::same_as<double>... Ts>
-constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(
-    Ts... tolerances) {
-  Matrixd<sizeof...(Ts), sizeof...(Ts)> result;
-
-  for (int row = 0; row < result.rows(); ++row) {
-    for (int col = 0; col < result.cols(); ++col) {
-      if (row != col) {
-        result.coeffRef(row, col) = 0.0;
-      }
-    }
-  }
-
+Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(Ts... tolerances) {
+  Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
+  auto& diag = result.diagonal();
   wpi::for_each(
       [&](int i, double tolerance) {
         if (tolerance == std::numeric_limits<double>::infinity()) {
-          result.coeffRef(i, i) = 0.0;
+          diag(i) = 0.0;
         } else {
-          result.coeffRef(i, i) = 1.0 / (tolerance * tolerance);
+          diag(i) = 1.0 / std::pow(tolerance, 2);
         }
       },
       tolerances...);
-
   return result;
 }
 
@@ -72,21 +62,11 @@ constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(
  * @return Process noise or measurement noise covariance matrix.
  */
 template <std::same_as<double>... Ts>
-constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
-  Matrixd<sizeof...(Ts), sizeof...(Ts)> result;
-
-  for (int row = 0; row < result.rows(); ++row) {
-    for (int col = 0; col < result.cols(); ++col) {
-      if (row != col) {
-        result.coeffRef(row, col) = 0.0;
-      }
-    }
-  }
-
-  wpi::for_each(
-      [&](int i, double stdDev) { result.coeffRef(i, i) = stdDev * stdDev; },
-      stdDevs...);
-
+Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
+  Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
+  auto& diag = result.diagonal();
+  wpi::for_each([&](int i, double stdDev) { diag(i) = std::pow(stdDev, 2); },
+                stdDevs...);
   return result;
 }
 
@@ -104,23 +84,16 @@ constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
  * @return State excursion or control effort cost matrix.
  */
 template <size_t N>
-constexpr Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
-  Matrixd<N, N> result;
-
-  for (int row = 0; row < result.rows(); ++row) {
-    for (int col = 0; col < result.cols(); ++col) {
-      if (row == col) {
-        if (costs[row] == std::numeric_limits<double>::infinity()) {
-          result.coeffRef(row, col) = 0.0;
-        } else {
-          result.coeffRef(row, col) = 1.0 / (costs[row] * costs[row]);
-        }
-      } else {
-        result.coeffRef(row, col) = 0.0;
-      }
+Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
+  Eigen::DiagonalMatrix<double, N> result;
+  auto& diag = result.diagonal();
+  for (size_t i = 0; i < costs.size(); ++i) {
+    if (costs[i] == std::numeric_limits<double>::infinity()) {
+      diag(i) = 0.0;
+    } else {
+      diag(i) = 1.0 / std::pow(costs[i], 2);
     }
   }
-
   return result;
 }
 
@@ -137,19 +110,12 @@ constexpr Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
  * @return Process noise or measurement noise covariance matrix.
  */
 template <size_t N>
-constexpr Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
-  Matrixd<N, N> result;
-
-  for (int row = 0; row < result.rows(); ++row) {
-    for (int col = 0; col < result.cols(); ++col) {
-      if (row == col) {
-        result.coeffRef(row, col) = stdDevs[row] * stdDevs[row];
-      } else {
-        result.coeffRef(row, col) = 0.0;
-      }
-    }
+Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
+  Eigen::DiagonalMatrix<double, N> result;
+  auto& diag = result.diagonal();
+  for (size_t i = 0; i < N; ++i) {
+    diag(i) = std::pow(stdDevs[i], 2);
   }
-
   return result;
 }
 

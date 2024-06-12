@@ -530,11 +530,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_disabled = false;
   }
 
-  /** Prints list of epochs added so far and their times. */
-  public void printWatchdogEpochs() {
-    m_watchdog.printEpochs();
-  }
-
   /**
    * Adds an action to perform on the initialization of any command by the scheduler.
    *

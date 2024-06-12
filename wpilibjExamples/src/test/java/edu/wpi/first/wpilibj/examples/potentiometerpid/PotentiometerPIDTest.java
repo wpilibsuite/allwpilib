@@ -55,7 +55,8 @@ class PotentiometerPIDTest {
             0.0,
             Robot.kFullHeightMeters,
             true,
-            0);
+            0,
+            null);
     m_analogSim = new AnalogInputSim(Robot.kPotChannel);
     m_motorSim = new PWMSim(Robot.kMotorChannel);
     m_joystickSim = new JoystickSim(Robot.kJoystickChannel);

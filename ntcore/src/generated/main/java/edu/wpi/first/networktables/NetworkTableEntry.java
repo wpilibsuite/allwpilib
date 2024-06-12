@@ -942,7 +942,14 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
 
   @Override
   public boolean equals(Object other) {
-    return other == this || other instanceof NetworkTableEntry entry && m_handle == entry.m_handle;
+    if (other == this) {
+      return true;
+    }
+    if (!(other instanceof NetworkTableEntry)) {
+      return false;
+    }
+
+    return m_handle == ((NetworkTableEntry) other).m_handle;
   }
 
   @Override

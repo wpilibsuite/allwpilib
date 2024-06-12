@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -19,8 +19,7 @@ import java.util.Set;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class ParallelRaceGroup extends Command {
-  // LinkedHashSet guarantees we iterate over commands in the order they were added
-  private final Set<Command> m_commands = new LinkedHashSet<>();
+  private final Set<Command> m_commands = new HashSet<>();
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
@@ -41,7 +40,6 @@ public class ParallelRaceGroup extends Command {
    *
    * @param commands Commands to add to the group.
    */
-  @SuppressWarnings("PMD.UseArraysAsList")
   public final void addCommands(Command... commands) {
     if (!m_finished) {
       throw new IllegalStateException(

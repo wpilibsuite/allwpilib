@@ -105,7 +105,6 @@ public class QuinticHermiteSpline extends Spline {
    *
    * @return The hermite basis matrix for quintic hermite spline interpolation.
    */
-  @SuppressWarnings("PMD.UnnecessaryVarargsArrayCreation")
   private SimpleMatrix makeHermiteBasis() {
     if (hermiteBasis == null) {
       // Given P(i), P'(i), P"(i), P(i+1), P'(i+1), P"(i+1), the control vectors,
@@ -157,7 +156,6 @@ public class QuinticHermiteSpline extends Spline {
    * @param finalVector The control vector for the final point.
    * @return The control vector matrix for a dimension.
    */
-  @SuppressWarnings("PMD.UnnecessaryVarargsArrayCreation")
   private SimpleMatrix getControlVectorFromArrays(double[] initialVector, double[] finalVector) {
     if (initialVector.length != 3 || finalVector.length != 3) {
       throw new IllegalArgumentException("Size of vectors must be 3");

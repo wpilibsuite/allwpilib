@@ -137,8 +137,6 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 
   /**
    * Constructs a VariableMatrix from an Eigen matrix.
-   *
-   * @param values Eigen matrix of values.
    */
   template <typename Derived>
   VariableMatrix(const Eigen::MatrixBase<Derived>& values)  // NOLINT
@@ -154,8 +152,6 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 
   /**
    * Constructs a VariableMatrix from an Eigen diagonal matrix.
-   *
-   * @param values Diagonal matrix of values.
    */
   template <typename Derived>
   VariableMatrix(const Eigen::DiagonalBase<Derived>& values)  // NOLINT
@@ -175,8 +171,6 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 
   /**
    * Assigns an Eigen matrix to a VariableMatrix.
-   *
-   * @param values Eigen matrix of values.
    */
   template <typename Derived>
   VariableMatrix& operator=(const Eigen::MatrixBase<Derived>& values) {
@@ -194,8 +188,6 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 
   /**
    * Sets the VariableMatrix's internal values.
-   *
-   * @param values Eigen matrix of values.
    */
   template <typename Derived>
     requires std::same_as<typename Derived::Scalar, double>
@@ -214,8 +206,6 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 
   /**
    * Constructs a scalar VariableMatrix from a Variable.
-   *
-   * @param variable Variable.
    */
   VariableMatrix(const Variable& variable)  // NOLINT
       : m_rows{1}, m_cols{1} {
@@ -224,8 +214,6 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 
   /**
    * Constructs a scalar VariableMatrix from a Variable.
-   *
-   * @param variable Variable.
    */
   VariableMatrix(Variable&& variable) : m_rows{1}, m_cols{1} {  // NOLINT
     m_storage.emplace_back(std::move(variable));
@@ -233,8 +221,6 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 
   /**
    * Constructs a VariableMatrix from a VariableBlock.
-   *
-   * @param values VariableBlock of values.
    */
   VariableMatrix(const VariableBlock<VariableMatrix>& values)  // NOLINT
       : m_rows{values.Rows()}, m_cols{values.Cols()} {
@@ -247,8 +233,6 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 
   /**
    * Constructs a VariableMatrix from a VariableBlock.
-   *
-   * @param values VariableBlock of values.
    */
   VariableMatrix(const VariableBlock<const VariableMatrix>& values)  // NOLINT
       : m_rows{values.Rows()}, m_cols{values.Cols()} {

@@ -120,9 +120,12 @@ public class TrapezoidProfile {
 
     @Override
     public boolean equals(Object other) {
-      return other instanceof State rhs
-          && this.position == rhs.position
-          && this.velocity == rhs.velocity;
+      if (other instanceof State) {
+        State rhs = (State) other;
+        return this.position == rhs.position && this.velocity == rhs.velocity;
+      } else {
+        return false;
+      }
     }
 
     @Override

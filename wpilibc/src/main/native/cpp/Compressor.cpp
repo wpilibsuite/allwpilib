@@ -4,8 +4,6 @@
 
 #include "frc/Compressor.h"
 
-#include <frc/PneumaticHub.h>
-
 #include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -16,8 +14,7 @@
 using namespace frc;
 
 Compressor::Compressor(int module, PneumaticsModuleType moduleType)
-    : m_module{PneumaticsBase::GetForType(module, moduleType)},
-      m_moduleType{moduleType} {
+    : m_module{PneumaticsBase::GetForType(module, moduleType)} {
   if (!m_module->ReserveCompressor()) {
     throw FRC_MakeError(err::ResourceAlreadyAllocated, "{}", module);
   }
@@ -85,14 +82,4 @@ void Compressor::InitSendable(wpi::SendableBuilder& builder) {
       "Enabled", [this] { return IsEnabled(); }, nullptr);
   builder.AddBooleanProperty(
       "Pressure switch", [this] { return GetPressureSwitchValue(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Current (A)", [this] { return GetCurrent().value(); }, nullptr);
-  // These are not supported by the CTRE PCM
-  if (m_moduleType == PneumaticsModuleType::REVPH) {
-    builder.AddDoubleProperty(
-        "Analog Voltage", [this] { return GetAnalogVoltage().value(); },
-        nullptr);
-    builder.AddDoubleProperty(
-        "Pressure (PSI)", [this] { return GetPressure().value(); }, nullptr);
-  }
 }

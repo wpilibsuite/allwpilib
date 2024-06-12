@@ -8,4 +8,5 @@ cppSrcFileInclude {
 
 includeOtherLibs {
   ^Eigen/
+  ^fmt/
 }

@@ -53,20 +53,25 @@ void RoboRioData::CancelSerialNumberCallback(int32_t uid) {
   m_serialNumberCallbacks.Cancel(uid);
 }
 
-void RoboRioData::GetSerialNumber(struct WPI_String* serialNumber) {
+size_t RoboRioData::GetSerialNumber(char* buffer, size_t size) {
   std::scoped_lock lock(m_serialNumberMutex);
-  auto write = WPI_AllocateString(serialNumber, m_serialNumber.size());
-  m_serialNumber.copy(write, m_serialNumber.size());
+  size_t copied = m_serialNumber.copy(buffer, size);
+  // Null terminate
+  if (copied == size) {
+    copied -= 1;
+  }
+  buffer[copied] = '\0';
+  return copied;
 }
 
-void RoboRioData::SetSerialNumber(std::string_view serialNumber) {
+void RoboRioData::SetSerialNumber(const char* serialNumber, size_t size) {
   // Limit serial number to 8 characters internally- serialnum environment
   // variable is always 8 characters
-  if (serialNumber.size() > 8) {
-    serialNumber = serialNumber.substr(0, 8);
+  if (size > 8) {
+    size = 8;
   }
   std::scoped_lock lock(m_serialNumberMutex);
-  m_serialNumber = std::string(serialNumber);
+  m_serialNumber = std::string(serialNumber, size);
   m_serialNumberCallbacks(m_serialNumber.c_str(), m_serialNumber.size());
 }
 
@@ -85,18 +90,22 @@ void RoboRioData::CancelCommentsCallback(int32_t uid) {
   m_commentsCallbacks.Cancel(uid);
 }
 
-void RoboRioData::GetComments(struct WPI_String* comments) {
+size_t RoboRioData::GetComments(char* buffer, size_t size) {
   std::scoped_lock lock(m_commentsMutex);
-  auto write = WPI_AllocateString(comments, m_comments.size());
-  m_comments.copy(write, m_comments.size());
+  size_t copied = m_comments.copy(buffer, size);
+  // Null terminate if there is room
+  if (copied < size) {
+    buffer[copied] = '\0';
+  }
+  return copied;
 }
 
-void RoboRioData::SetComments(std::string_view comments) {
-  if (comments.size() > 64) {
-    comments = comments.substr(0, 64);
+void RoboRioData::SetComments(const char* comments, size_t size) {
+  if (size > 64) {
+    size = 64;
   }
   std::scoped_lock lock(m_commentsMutex);
-  m_comments = std::string(comments);
+  m_comments = std::string(comments, size);
   m_commentsCallbacks(m_comments.c_str(), m_comments.size());
 }
 
@@ -137,11 +146,11 @@ int32_t HALSIM_RegisterRoboRioSerialNumberCallback(
 void HALSIM_CancelRoboRioSerialNumberCallback(int32_t uid) {
   return SimRoboRioData->CancelSerialNumberCallback(uid);
 }
-void HALSIM_GetRoboRioSerialNumber(struct WPI_String* serialNumber) {
-  SimRoboRioData->GetSerialNumber(serialNumber);
+size_t HALSIM_GetRoboRioSerialNumber(char* buffer, size_t size) {
+  return SimRoboRioData->GetSerialNumber(buffer, size);
 }
-void HALSIM_SetRoboRioSerialNumber(const struct WPI_String* serialNumber) {
-  SimRoboRioData->SetSerialNumber(wpi::to_string_view(serialNumber));
+void HALSIM_SetRoboRioSerialNumber(const char* serialNumber, size_t size) {
+  SimRoboRioData->SetSerialNumber(serialNumber, size);
 }
 
 int32_t HALSIM_RegisterRoboRioCommentsCallback(
@@ -152,11 +161,11 @@ int32_t HALSIM_RegisterRoboRioCommentsCallback(
 void HALSIM_CancelRoboRioCommentsCallback(int32_t uid) {
   SimRoboRioData->CancelCommentsCallback(uid);
 }
-void HALSIM_GetRoboRioComments(struct WPI_String* comments) {
-  SimRoboRioData->GetComments(comments);
+size_t HALSIM_GetRoboRioComments(char* buffer, size_t size) {
+  return SimRoboRioData->GetComments(buffer, size);
 }
-void HALSIM_SetRoboRioComments(const struct WPI_String* comments) {
-  SimRoboRioData->SetComments(wpi::to_string_view(comments));
+void HALSIM_SetRoboRioComments(const char* comments, size_t size) {
+  SimRoboRioData->SetComments(comments, size);
 }
 
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,

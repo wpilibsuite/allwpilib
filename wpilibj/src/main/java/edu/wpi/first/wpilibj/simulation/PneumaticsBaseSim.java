@@ -21,10 +21,14 @@ public abstract class PneumaticsBaseSim {
    * @return the module object.
    */
   public static PneumaticsBaseSim getForType(int module, PneumaticsModuleType type) {
-    return switch (type) {
-      case CTREPCM -> new CTREPCMSim(module);
-      case REVPH -> new REVPHSim(module);
-    };
+    switch (type) {
+      case CTREPCM:
+        return new CTREPCMSim(module);
+      case REVPH:
+        return new REVPHSim(module);
+      default:
+        throw new IllegalArgumentException("Unknown module type");
+    }
   }
 
   /**

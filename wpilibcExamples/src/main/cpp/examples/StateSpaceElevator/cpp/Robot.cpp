@@ -45,8 +45,7 @@ class Robot : public frc::TimedRobot {
   // Outputs (what we can measure): [position], in meters.
   frc::LinearSystem<2, 1, 1> m_elevatorPlant =
       frc::LinearSystemId::ElevatorSystem(frc::DCMotor::NEO(2), kCarriageMass,
-                                          kDrumRadius, kGearRatio)
-          .Slice(0);
+                                          kDrumRadius, kGearRatio);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   frc::KalmanFilter<2, 1, 1> m_observer{
@@ -110,7 +109,7 @@ class Robot : public frc::TimedRobot {
     // Sets the target height of our elevator. This is similar to setting the
     // setpoint of a PID controller.
     frc::TrapezoidProfile<units::meters>::State goal;
-    if (m_joystick.GetRightBumperButton()) {
+    if (m_joystick.GetRightBumper()) {
       // We pressed the bumper, so let's set our next reference
       goal = {kRaisedPosition, 0_fps};
     } else {

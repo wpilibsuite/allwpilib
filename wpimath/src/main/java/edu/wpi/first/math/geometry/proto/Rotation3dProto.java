@@ -40,9 +40,4 @@ public class Rotation3dProto implements Protobuf<Rotation3d, ProtobufRotation3d>
   public void pack(ProtobufRotation3d msg, Rotation3d value) {
     Quaternion.proto.pack(msg.getMutableQ(), value.getQuaternion());
   }
-
-  @Override
-  public boolean isImmutable() {
-    return true;
-  }
 }

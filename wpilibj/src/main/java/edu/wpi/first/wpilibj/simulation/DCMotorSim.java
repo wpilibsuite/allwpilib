@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -11,7 +12,6 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated DC motor mechanism. */
 public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
@@ -25,17 +25,30 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * Creates a simulated DC motor mechanism.
    *
    * @param plant The linear system representing the DC motor. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
+   *     double)}.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
-   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 2 elements. The first element is for position. The
-   *     second element is for velocity.
+   */
+  public DCMotorSim(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double gearing) {
+    super(plant);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+  }
+
+  /**
+   * Creates a simulated DC motor mechanism.
+   *
+   * @param plant The linear system representing the DC motor. This system can be created with
+   * @param gearbox The type of and number of motors in the DC motor gearbox.
+   * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
+   * @param measurementStdDevs The standard deviations of the measurements.
    */
   public DCMotorSim(
       LinearSystem<N2, N1, N2> plant,
       DCMotor gearbox,
       double gearing,
-      double... measurementStdDevs) {
+      Matrix<N2, N1> measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
@@ -47,13 +60,25 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
    * @param jKgMetersSquared The moment of inertia of the DC motor. If this is unknown, use the
-   *     {@link #DCMotorSim(LinearSystem, DCMotor, double, double...)} constructor.
-   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-   *     noise is desired. If present must have 2 elements. The first element is for position. The
-   *     second element is for velocity.
+   *     {@link #DCMotorSim(LinearSystem, DCMotor, double, Matrix)} constructor.
+   */
+  public DCMotorSim(DCMotor gearbox, double gearing, double jKgMetersSquared) {
+    super(LinearSystemId.createDCMotorSystem(gearbox, jKgMetersSquared, gearing));
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+  }
+
+  /**
+   * Creates a simulated DC motor mechanism.
+   *
+   * @param gearbox The type of and number of motors in the DC motor gearbox.
+   * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
+   * @param jKgMetersSquared The moment of inertia of the DC motor. If this is unknown, use the
+   *     {@link #DCMotorSim(LinearSystem, DCMotor, double, Matrix)} constructor.
+   * @param measurementStdDevs The standard deviations of the measurements.
    */
   public DCMotorSim(
-      DCMotor gearbox, double gearing, double jKgMetersSquared, double... measurementStdDevs) {
+      DCMotor gearbox, double gearing, double jKgMetersSquared, Matrix<N2, N1> measurementStdDevs) {
     super(
         LinearSystemId.createDCMotorSystem(gearbox, jKgMetersSquared, gearing), measurementStdDevs);
     m_gearbox = gearbox;
@@ -111,11 +136,12 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @return The DC motor current draw.
    */
+  @Override
   public double getCurrentDrawAmps() {
     // I = V / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
     // 2x faster than the output
-    return m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing, m_u.get(0, 0))
+    return m_gearbox.getCurrent(getAngularVelocityRadPerSec() * m_gearing, m_u.get(0, 0))
         * Math.signum(m_u.get(0, 0));
   }
 
@@ -126,6 +152,5 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    */
   public void setInputVoltage(double volts) {
     setInput(volts);
-    clampInput(RobotController.getBatteryVoltage());
   }
 }

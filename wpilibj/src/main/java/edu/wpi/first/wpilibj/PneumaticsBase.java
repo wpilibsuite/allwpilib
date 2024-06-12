@@ -14,10 +14,12 @@ public interface PneumaticsBase extends AutoCloseable {
    * @return module
    */
   static PneumaticsBase getForType(int module, PneumaticsModuleType type) {
-    return switch (type) {
-      case CTREPCM -> new PneumaticsControlModule(module);
-      case REVPH -> new PneumaticHub(module);
-    };
+    if (type == PneumaticsModuleType.CTREPCM) {
+      return new PneumaticsControlModule(module);
+    } else if (type == PneumaticsModuleType.REVPH) {
+      return new PneumaticHub(module);
+    }
+    throw new IllegalArgumentException("Unknown module type");
   }
 
   /**
@@ -27,10 +29,12 @@ public interface PneumaticsBase extends AutoCloseable {
    * @return module default
    */
   static int getDefaultForType(PneumaticsModuleType type) {
-    return switch (type) {
-      case CTREPCM -> SensorUtil.getDefaultCTREPCMModule();
-      case REVPH -> SensorUtil.getDefaultREVPHModule();
-    };
+    if (type == PneumaticsModuleType.CTREPCM) {
+      return SensorUtil.getDefaultCTREPCMModule();
+    } else if (type == PneumaticsModuleType.REVPH) {
+      return SensorUtil.getDefaultREVPHModule();
+    }
+    throw new IllegalArgumentException("Unknown module type");
   }
 
   /**

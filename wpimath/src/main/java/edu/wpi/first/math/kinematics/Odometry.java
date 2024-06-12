@@ -18,7 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  *
  * @param <T> Wheel positions type.
  */
-public class Odometry<T> {
+public class Odometry<T extends WheelPositions<T>> {
   private final Kinematics<?, T> m_kinematics;
   private Pose2d m_poseMeters;
 
@@ -43,7 +43,7 @@ public class Odometry<T> {
     m_poseMeters = initialPoseMeters;
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = m_poseMeters.getRotation();
-    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
+    m_previousWheelPositions = wheelPositions.copy();
   }
 
   /**
@@ -60,7 +60,7 @@ public class Odometry<T> {
     m_poseMeters = poseMeters;
     m_previousAngle = m_poseMeters.getRotation();
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
-    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
+    m_previousWheelPositions = wheelPositions.copy();
   }
 
   /**
@@ -90,7 +90,7 @@ public class Odometry<T> {
 
     var newPose = m_poseMeters.exp(twist);
 
-    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
+    m_previousWheelPositions = wheelPositions.copy();
     m_previousAngle = angle;
     m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
 

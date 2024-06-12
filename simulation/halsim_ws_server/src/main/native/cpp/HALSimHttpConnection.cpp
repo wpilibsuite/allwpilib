@@ -8,11 +8,11 @@
 
 #include <string_view>
 
+#include <fmt/format.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
-#include <wpi/print.h>
 #include <wpinet/MimeTypes.h>
 #include <wpinet/UrlParser.h>
 #include <wpinet/raw_uv_ostream.h>
@@ -83,7 +83,7 @@ void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
       return;
     }
   } catch (wpi::json::exception& e) {
-    wpi::print(stderr, "Error with message: {}\n", e.what());
+    fmt::print(stderr, "Error with message: {}\n", e.what());
   }
 
   // render json to buffers
@@ -104,7 +104,7 @@ void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
                                   }
 
                                   if (err) {
-                                    wpi::print(stderr, "{}\n", err.str());
+                                    fmt::print(stderr, "{}\n", err.str());
                                     std::fflush(stderr);
                                   }
                                 });
@@ -169,13 +169,14 @@ void HALSimHttpConnection::ProcessRequest() {
       !wpi::contains(path, "..") && !wpi::contains(path, "//")) {
     // convert to fs native representation
     fs::path nativePath;
-    if (auto userPath = wpi::remove_prefix(path, "/user/")) {
-      nativePath = fs::path{m_server->GetWebrootSys()} /
-                   fs::path{*userPath, fs::path::format::generic_format};
+    if (wpi::starts_with(path, "/user/")) {
+      nativePath =
+          fs::path{m_server->GetWebrootSys()} /
+          fs::path{wpi::drop_front(path, 6), fs::path::format::generic_format};
     } else {
       nativePath =
           fs::path{m_server->GetWebrootSys()} /
-          fs::path{wpi::drop_front(path), fs::path::format::generic_format};
+          fs::path{wpi::drop_front(path, 1), fs::path::format::generic_format};
     }
 
     if (fs::is_directory(nativePath)) {
@@ -200,6 +201,6 @@ void HALSimHttpConnection::MySendError(int code, std::string_view message) {
 
 void HALSimHttpConnection::Log(int code) {
   auto method = wpi::http_method_str(m_request.GetMethod());
-  wpi::print(stderr, "{} {} HTTP/{}.{} {}\n", method, m_request.GetUrl(),
+  fmt::print(stderr, "{} {} HTTP/{}.{} {}\n", method, m_request.GetUrl(),
              m_request.GetMajor(), m_request.GetMinor(), code);
 }

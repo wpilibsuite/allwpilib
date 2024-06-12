@@ -218,9 +218,11 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    */
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof Transform3d other
-        && other.m_translation.equals(m_translation)
-        && other.m_rotation.equals(m_rotation);
+    if (obj instanceof Transform3d) {
+      return ((Transform3d) obj).m_translation.equals(m_translation)
+          && ((Transform3d) obj).m_rotation.equals(m_rotation);
+    }
+    return false;
   }
 
   @Override

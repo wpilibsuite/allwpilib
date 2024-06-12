@@ -319,29 +319,23 @@ void RoboRioSim::SetTeamNumber(int32_t teamNumber) {
 }
 
 std::string RoboRioSim::GetSerialNumber() {
-  WPI_String serialNum;
-  HALSIM_GetRoboRioSerialNumber(&serialNum);
-  std::string serial{wpi::to_string_view(&serialNum)};
-  WPI_FreeString(&serialNum);
-  return serial;
+  char serialNum[9];
+  size_t len = HALSIM_GetRoboRioSerialNumber(serialNum, sizeof(serialNum));
+  return std::string(serialNum, len);
 }
 
 void RoboRioSim::SetSerialNumber(std::string_view serialNumber) {
-  auto str = wpi::make_string(serialNumber);
-  HALSIM_SetRoboRioSerialNumber(&str);
+  HALSIM_SetRoboRioSerialNumber(serialNumber.data(), serialNumber.size());
 }
 
 std::string RoboRioSim::GetComments() {
-  WPI_String comments;
-  HALSIM_GetRoboRioComments(&comments);
-  std::string serial{wpi::to_string_view(&comments)};
-  WPI_FreeString(&comments);
-  return serial;
+  char comments[65];
+  size_t len = HALSIM_GetRoboRioComments(comments, sizeof(comments));
+  return std::string(comments, len);
 }
 
 void RoboRioSim::SetComments(std::string_view comments) {
-  auto str = wpi::make_string(comments);
-  HALSIM_SetRoboRioComments(&str);
+  HALSIM_SetRoboRioComments(comments.data(), comments.size());
 }
 
 std::unique_ptr<CallbackStore> RoboRioSim::RegisterRadioLEDStateCallback(

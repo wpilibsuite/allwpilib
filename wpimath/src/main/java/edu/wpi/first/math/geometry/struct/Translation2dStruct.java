@@ -41,9 +41,4 @@ public class Translation2dStruct implements Struct<Translation2d> {
     bb.putDouble(value.getX());
     bb.putDouble(value.getY());
   }
-
-  @Override
-  public boolean isImmutable() {
-    return true;
-  }
 }

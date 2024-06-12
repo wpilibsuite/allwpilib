@@ -336,10 +336,9 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_getJoystickName
   (JNIEnv* env, jclass, jbyte port)
 {
-  WPI_String joystickName;
-  HAL_GetJoystickName(&joystickName, port);
-  jstring str = MakeJString(env, wpi::to_string_view(&joystickName));
-  WPI_FreeString(&joystickName);
+  char* joystickName = HAL_GetJoystickName(port);
+  jstring str = MakeJString(env, joystickName);
+  HAL_FreeJoystickName(joystickName);
   return str;
 }
 

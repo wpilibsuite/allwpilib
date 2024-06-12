@@ -1168,8 +1168,7 @@ void FMSSimModel::UpdateHAL() {
   HALSIM_SetDriverStationTest(m_test.GetValue());
   HALSIM_SetDriverStationAutonomous(m_autonomous.GetValue());
   HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
-  auto str = wpi::make_string(m_gameMessage);
-  HALSIM_SetGameSpecificMessage(&str);
+  HALSIM_SetGameSpecificMessage(m_gameMessage.data(), m_gameMessage.size());
   HALSIM_SetDriverStationDsAttached(m_dsAttached.GetValue());
 }
 

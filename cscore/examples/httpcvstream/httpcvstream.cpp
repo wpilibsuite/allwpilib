@@ -4,8 +4,8 @@
 
 #include <cstdio>
 
+#include <fmt/core.h>
 #include <opencv2/core/core.hpp>
-#include <wpi/print.h>
 
 #include "cscore.h"
 #include "cscore_cv.h"
@@ -24,10 +24,10 @@ int main() {
   for (;;) {
     uint64_t time = cvsink.GrabFrame(test);
     if (time == 0) {
-      wpi::print("error: {}\n", cvsink.GetError());
+      fmt::print("error: {}\n", cvsink.GetError());
       continue;
     }
-    wpi::print("got frame at time {} size ({}, {})\n", time, test.size().width,
+    fmt::print("got frame at time {} size ({}, {})\n", time, test.size().width,
                test.size().height);
     cv::flip(test, flip, 0);
     cvsource.PutFrame(flip);

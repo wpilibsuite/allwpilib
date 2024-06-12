@@ -10,12 +10,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.proto.Pose3dProto;
 import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.math.jni.Pose3dJNI;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -269,7 +269,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   public Pose3d exp(Twist3d twist) {
     var quaternion = this.getRotation().getQuaternion();
     double[] resultArray =
-        Pose3dJNI.exp(
+        WPIMathJNI.expPose3d(
             this.getX(),
             this.getY(),
             this.getZ(),
@@ -302,7 +302,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
     var thisQuaternion = this.getRotation().getQuaternion();
     var endQuaternion = end.getRotation().getQuaternion();
     double[] resultArray =
-        Pose3dJNI.log(
+        WPIMathJNI.logPose3d(
             this.getX(),
             this.getY(),
             this.getZ(),
@@ -348,9 +348,11 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    */
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof Pose3d pose
-        && m_translation.equals(pose.m_translation)
-        && m_rotation.equals(pose.m_rotation);
+    if (obj instanceof Pose3d) {
+      return ((Pose3d) obj).m_translation.equals(m_translation)
+          && ((Pose3d) obj).m_rotation.equals(m_rotation);
+    }
+    return false;
   }
 
   @Override

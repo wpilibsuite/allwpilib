@@ -65,7 +65,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     void accept(T value, long time);
   }
 
-  private static final class Property<P extends Publisher, S extends Subscriber>
+  private static class Property<P extends Publisher, S extends Subscriber>
       implements AutoCloseable {
     @Override
     @SuppressWarnings("PMD.AvoidCatchingGenericException")

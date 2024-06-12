@@ -4,13 +4,13 @@
 
 package edu.wpi.first.cscore;
 
-import edu.wpi.first.util.CombinedRuntimeLoader;
+import edu.wpi.first.util.RuntimeDetector;
 
 public final class DevMain {
   /** Main method. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
-    System.out.println(CombinedRuntimeLoader.getPlatformPath());
+    System.out.println(RuntimeDetector.getPlatformPath());
     System.out.println(CameraServerJNI.getHostname());
   }
 

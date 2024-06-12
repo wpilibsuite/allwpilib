@@ -8,16 +8,16 @@
 
 #include <string_view>
 
+#include <fmt/core.h>
 #include <hal/cpp/fpga_clock.h>
 #include <wpi/Logger.h>
 #include <wpi/SmallVector.h>
-#include <wpi/print.h>
 #include <wpinet/UDPClient.h>
 
 static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {
   if (level == 20) {
-    wpi::print(stderr, "DS: {}\n", msg);
+    fmt::print(stderr, "DS: {}\n", msg);
     return;
   }
 
@@ -31,7 +31,7 @@ static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
   } else {
     return;
   }
-  wpi::print(stderr, "DS: {}: {} ({}:{})\n", levelmsg, msg, file, line);
+  fmt::print(stderr, "DS: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
 static void generateEnabledDsPacket(wpi::SmallVectorImpl<uint8_t>& data,

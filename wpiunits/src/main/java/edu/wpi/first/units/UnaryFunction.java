@@ -15,9 +15,6 @@ import java.util.Objects;
  */
 @FunctionalInterface
 public interface UnaryFunction {
-  /** The identity function that simply returns the input value. */
-  UnaryFunction IDENTITY = x -> x;
-
   /**
    * Applies this function to the input value and returns the result.
    *

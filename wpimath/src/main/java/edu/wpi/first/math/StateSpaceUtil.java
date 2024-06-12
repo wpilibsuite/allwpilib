@@ -5,7 +5,6 @@
 package edu.wpi.first.math;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.jni.StateSpaceUtilJNI;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N4;
@@ -103,8 +102,7 @@ public final class StateSpaceUtil {
    */
   public static <States extends Num, Inputs extends Num> boolean isStabilizable(
       Matrix<States, States> A, Matrix<States, Inputs> B) {
-    return StateSpaceUtilJNI.isStabilizable(
-        A.getNumRows(), B.getNumCols(), A.getData(), B.getData());
+    return WPIMathJNI.isStabilizable(A.getNumRows(), B.getNumCols(), A.getData(), B.getData());
   }
 
   /**
@@ -122,7 +120,7 @@ public final class StateSpaceUtil {
    */
   public static <States extends Num, Outputs extends Num> boolean isDetectable(
       Matrix<States, States> A, Matrix<Outputs, States> C) {
-    return StateSpaceUtilJNI.isStabilizable(
+    return WPIMathJNI.isStabilizable(
         A.getNumRows(), C.getNumRows(), A.transpose().getData(), C.transpose().getData());
   }
 

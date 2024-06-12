@@ -63,15 +63,14 @@ template <> struct is_char<char16_t> : std::true_type {};
 template <> struct is_char<char32_t> : std::true_type {};
 
 template <typename... T>
-constexpr auto make_wformat_args(const T&... args)
-    -> format_arg_store<wformat_context, T...> {
+constexpr format_arg_store<wformat_context, T...> make_wformat_args(
+    const T&... args) {
   return {args...};
 }
 
 inline namespace literals {
 #if FMT_USE_USER_DEFINED_LITERALS && !FMT_USE_NONTYPE_TEMPLATE_ARGS
-constexpr auto operator""_a(const wchar_t* s, size_t)
-    -> detail::udl_arg<wchar_t> {
+constexpr detail::udl_arg<wchar_t> operator"" _a(const wchar_t* s, size_t) {
   return {s};
 }
 #endif
@@ -173,11 +172,11 @@ inline auto vformat_to(
   return detail::get_iterator(buf, out);
 }
 
-template <typename OutputIt, typename Locale, typename S, typename... T,
-          typename Char = char_t<S>,
-          bool enable = detail::is_output_iterator<OutputIt, Char>::value &&
-                        detail::is_locale<Locale>::value &&
-                        detail::is_exotic_char<Char>::value>
+template <
+    typename OutputIt, typename Locale, typename S, typename... T,
+    typename Char = char_t<S>,
+    bool enable = detail::is_output_iterator<OutputIt, Char>::value&&
+        detail::is_locale<Locale>::value&& detail::is_exotic_char<Char>::value>
 inline auto format_to(OutputIt out, const Locale& loc, const S& format_str,
                       T&&... args) ->
     typename std::enable_if<enable, OutputIt>::type {
@@ -221,8 +220,7 @@ inline void vprint(std::FILE* f, wstring_view fmt, wformat_args args) {
   auto buf = wmemory_buffer();
   detail::vformat_to(buf, fmt, args);
   buf.push_back(L'\0');
-  if (std::fputws(buf.data(), f) == -1)
-    FMT_THROW(system_error(errno, FMT_STRING("cannot write to file")));
+  std::fputws(buf.data(), f);
 }
 
 inline void vprint(wstring_view fmt, wformat_args args) {

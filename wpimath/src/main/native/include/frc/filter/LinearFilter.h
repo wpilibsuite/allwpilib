@@ -321,7 +321,8 @@ class LinearFilter {
    * @throws std::runtime_error if size of inputBuffer or outputBuffer does not
    *   match the size of ffGains and fbGains provided in the constructor.
    */
-  void Reset(std::span<const T> inputBuffer, std::span<const T> outputBuffer) {
+  void Reset(std::span<const double> inputBuffer,
+             std::span<const double> outputBuffer) {
     // Clear buffers
     Reset();
 
@@ -367,7 +368,6 @@ class LinearFilter {
       m_outputs.push_front(retVal);
     }
 
-    m_lastOutput = retVal;
     return retVal;
   }
 
@@ -376,14 +376,13 @@ class LinearFilter {
    *
    * @return The last value.
    */
-  T LastValue() const { return m_lastOutput; }
+  T LastValue() const { return m_outputs.front(); }
 
  private:
   wpi::circular_buffer<T> m_inputs;
   wpi::circular_buffer<T> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
-  T m_lastOutput{0.0};
 
   /**
    * Factorial of n.

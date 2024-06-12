@@ -24,8 +24,6 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:4.1.0'
 }
 
-sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
-
 nativeUtils.exportsConfigs {
     wpilibNewCommands {
         x64ExcludeSymbols = [
@@ -45,24 +43,7 @@ nativeUtils.exportsConfigs {
 }
 
 model {
-    components {
-        "${nativeName}Base" {
-            it.sources.cpp {
-                source {
-                    srcDirs 'src/generated/main/native/cpp'
-                    include '**/*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/generated/main/native/include'
-                }
-            }
-        }
-        "${nativeName}" {
-            it.sources.cpp.exportedHeaders {
-                srcDirs 'src/generated/main/native/include'
-            }
-        }
-    }
+    components {}
     binaries {
         all {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {

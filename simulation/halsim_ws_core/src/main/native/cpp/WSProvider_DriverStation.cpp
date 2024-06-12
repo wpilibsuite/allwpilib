@@ -170,8 +170,7 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
   }
   if ((it = json.find(">game_data")) != json.end()) {
     std::string message = it.value().get_ref<const std::string&>();
-    auto str = wpi::make_string(message);
-    HALSIM_SetGameSpecificMessage(&str);
+    HALSIM_SetGameSpecificMessage(message.c_str(), message.length());
   }
 
   // Only notify usercode if we get the new data message

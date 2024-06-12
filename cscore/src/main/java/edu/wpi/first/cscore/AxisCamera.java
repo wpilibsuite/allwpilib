@@ -4,12 +4,7 @@
 
 package edu.wpi.first.cscore;
 
-/**
- * A source that represents an Axis IP camera.
- *
- * @deprecated Use HttpCamera instead.
- */
-@Deprecated(forRemoval = true, since = "2025")
+/** A source that represents an Axis IP camera. */
 public class AxisCamera extends HttpCamera {
   private static String hostToUrl(String host) {
     return "http://" + host + "/mjpg/video.mjpg";

@@ -9,7 +9,6 @@ package edu.wpi.first.hal;
 /**
  * JNI wrapper for library <b>FRC_NetworkCommunication</b><br>.
  */
-@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class FRCNetComm {
   /**
    * Resource type from UsageReporting.

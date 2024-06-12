@@ -278,7 +278,7 @@ bool wpi::detail::ConsumeSignedInteger(
   }
 
   // Get the positive part of the value.
-  std::string_view str2 = wpi::drop_front(str);
+  std::string_view str2 = wpi::drop_front(str, 1);
   if (wpi::detail::ConsumeUnsignedInteger(str2, radix, ullVal) ||
       // Reject values so large they'd overflow as negative signed, but allow
       // "-0".  This negates the unsigned so that the negative isn't undefined

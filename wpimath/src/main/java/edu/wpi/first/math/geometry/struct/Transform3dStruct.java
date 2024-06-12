@@ -48,9 +48,4 @@ public class Transform3dStruct implements Struct<Transform3d> {
     Translation3d.struct.pack(bb, value.getTranslation());
     Rotation3d.struct.pack(bb, value.getRotation());
   }
-
-  @Override
-  public boolean isImmutable() {
-    return true;
-  }
 }

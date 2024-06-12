@@ -15,6 +15,8 @@ import java.util.function.Consumer;
 public class CameraServerJNI {
   static boolean libraryLoaded = false;
 
+  static RuntimeLoader<CameraServerJNI> loader = null;
+
   /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
@@ -44,7 +46,10 @@ public class CameraServerJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        RuntimeLoader.loadLibrary("cscorejni");
+        loader =
+            new RuntimeLoader<>(
+                "cscorejni", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
+        loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);
@@ -62,7 +67,10 @@ public class CameraServerJNI {
     if (libraryLoaded) {
       return;
     }
-    RuntimeLoader.loadLibrary("cscorejni");
+    loader =
+        new RuntimeLoader<>(
+            "cscorejni", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
+    loader.loadLibrary();
     libraryLoaded = true;
   }
 

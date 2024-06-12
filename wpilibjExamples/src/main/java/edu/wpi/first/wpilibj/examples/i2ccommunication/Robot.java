@@ -37,7 +37,6 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  @SuppressWarnings("PMD.ConsecutiveLiteralAppends")
   public void robotPeriodic() {
     // Creates a string to hold current robot state information, including
     // alliance, enabled state, operation mode, and match time. The message

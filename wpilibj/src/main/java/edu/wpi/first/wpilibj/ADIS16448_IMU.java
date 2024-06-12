@@ -840,7 +840,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
 
           if (calc_crc == imu_crc) {
             // Timestamp is at buffer[i]
-            m_dt = (buffer[i] - previous_timestamp) / 1000000.0;
+            m_dt = ((double) buffer[i] - previous_timestamp) / 1000000.0;
 
             // Scale sensor data
             gyro_rate_x = (toShort(buffer[i + 5], buffer[i + 6]) * 0.04);
@@ -1057,11 +1057,16 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    * @return Yaw axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle() {
-    return switch (m_yaw_axis) {
-      case kX -> getGyroAngleX();
-      case kY -> getGyroAngleY();
-      case kZ -> getGyroAngleZ();
-    };
+    switch (m_yaw_axis) {
+      case kX:
+        return getGyroAngleX();
+      case kY:
+        return getGyroAngleY();
+      case kZ:
+        return getGyroAngleZ();
+      default:
+        return 0.0;
+    }
   }
 
   /**
@@ -1070,11 +1075,16 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
    * @return Yaw axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate() {
-    return switch (m_yaw_axis) {
-      case kX -> getGyroRateX();
-      case kY -> getGyroRateY();
-      case kZ -> getGyroRateZ();
-    };
+    switch (m_yaw_axis) {
+      case kX:
+        return getGyroRateX();
+      case kY:
+        return getGyroRateY();
+      case kZ:
+        return getGyroRateZ();
+      default:
+        return 0.0;
+    }
   }
 
   /**

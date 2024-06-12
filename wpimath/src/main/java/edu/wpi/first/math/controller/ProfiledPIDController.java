@@ -284,13 +284,13 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
-   * Sets the minimum and maximum contributions of the integral term.
+   * Sets the minimum and maximum values for the integrator.
    *
-   * <p>The internal integrator is clamped so that the integral term's contribution to the output
-   * stays between minimumIntegral and maximumIntegral. This prevents integral windup.
+   * <p>When the cap is reached, the integrator value is added to the controller output rather than
+   * the integrator value times the integral gain.
    *
-   * @param minimumIntegral The minimum contribution of the integral term.
-   * @param maximumIntegral The maximum contribution of the integral term.
+   * @param minimumIntegral The minimum value of the integrator.
+   * @param maximumIntegral The maximum value of the integrator.
    */
   public void setIntegratorRange(double minimumIntegral, double maximumIntegral) {
     m_controller.setIntegratorRange(minimumIntegral, maximumIntegral);
@@ -444,18 +444,6 @@ public class ProfiledPIDController implements Sendable {
             MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());
           }
         });
-    builder.addDoubleProperty(
-        "maxVelocity",
-        () -> getConstraints().maxVelocity,
-        maxVelocity ->
-            setConstraints(
-                new TrapezoidProfile.Constraints(maxVelocity, getConstraints().maxAcceleration)));
-    builder.addDoubleProperty(
-        "maxAcceleration",
-        () -> getConstraints().maxAcceleration,
-        maxAcceleration ->
-            setConstraints(
-                new TrapezoidProfile.Constraints(getConstraints().maxVelocity, maxAcceleration)));
     builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
   }
 }

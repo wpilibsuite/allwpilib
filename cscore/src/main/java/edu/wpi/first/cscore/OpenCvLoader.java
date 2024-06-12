@@ -14,8 +14,11 @@ public final class OpenCvLoader {
   @SuppressWarnings("PMD.MutableStaticState")
   static boolean libraryLoaded;
 
+  @SuppressWarnings("PMD.MutableStaticState")
+  static RuntimeLoader<Core> loader;
+
   /** Sets whether JNI should be loaded in the static block. */
-  public static final class Helper {
+  public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
 
     /**
@@ -41,9 +44,12 @@ public final class OpenCvLoader {
   }
 
   static {
+    String opencvName = Core.NATIVE_LIBRARY_NAME;
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        loader =
+            new RuntimeLoader<>(opencvName, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
+        loader.loadLibraryHashed();
       } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);
@@ -70,7 +76,10 @@ public final class OpenCvLoader {
     if (libraryLoaded) {
       return;
     }
-    RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    loader =
+        new RuntimeLoader<>(
+            Core.NATIVE_LIBRARY_NAME, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
+    loader.loadLibrary();
     libraryLoaded = true;
   }
 

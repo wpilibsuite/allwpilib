@@ -3,13 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <array>
-#include <memory>
 
 #include <gtest/gtest.h>
 
-#include "wpi/DataLogWriter.h"
-#include "wpi/Logger.h"
-#include "wpi/raw_ostream.h"
+#include "wpi/DataLog.h"
 
 namespace {
 struct ThingA {
@@ -121,22 +118,19 @@ static_assert(wpi::StructSerializable<ThingC>);
 static_assert(wpi::StructSerializable<ThingC, Info1>);
 static_assert(wpi::StructSerializable<ThingC, Info2>);
 
-class DataLogTest : public ::testing::Test {
- public:
-  wpi::Logger msglog;
+TEST(DataLogTest, SimpleInt) {
   std::vector<uint8_t> data;
-  wpi::log::DataLogWriter log{msglog,
-                              std::make_unique<wpi::raw_uvector_ostream>(data)};
-};
-
-TEST_F(DataLogTest, SimpleInt) {
-  int entry = log.Start("test", "int64");
-  log.AppendInteger(entry, 1, 0);
-  log.Flush();
+  {
+    wpi::log::DataLog log{
+        [&](auto out) { data.insert(data.end(), out.begin(), out.end()); }};
+    int entry = log.Start("test", "int64");
+    log.AppendInteger(entry, 1, 0);
+  }
   ASSERT_EQ(data.size(), 66u);
 }
 
-TEST_F(DataLogTest, StructA) {
+TEST(DataLogTest, StructA) {
+  wpi::log::DataLog log{[](auto) {}};
   [[maybe_unused]]
   wpi::log::StructLogEntry<ThingA> entry0;
   wpi::log::StructLogEntry<ThingA> entry{log, "a", 5};
@@ -144,7 +138,8 @@ TEST_F(DataLogTest, StructA) {
   entry.Append(ThingA{}, 7);
 }
 
-TEST_F(DataLogTest, StructArrayA) {
+TEST(DataLogTest, StructArrayA) {
+  wpi::log::DataLog log{[](auto) {}};
   [[maybe_unused]]
   wpi::log::StructArrayLogEntry<ThingA> entry0;
   wpi::log::StructArrayLogEntry<ThingA> entry{log, "a", 5};
@@ -152,7 +147,8 @@ TEST_F(DataLogTest, StructArrayA) {
   entry.Append({{ThingA{}, ThingA{}}}, 7);
 }
 
-TEST_F(DataLogTest, StructFixedArrayA) {
+TEST(DataLogTest, StructFixedArrayA) {
+  wpi::log::DataLog log{[](auto) {}};
   [[maybe_unused]]
   wpi::log::StructArrayLogEntry<std::array<ThingA, 2>> entry0;
   wpi::log::StructLogEntry<std::array<ThingA, 2>> entry{log, "a", 5};
@@ -161,7 +157,8 @@ TEST_F(DataLogTest, StructFixedArrayA) {
   entry.Append(arr, 7);
 }
 
-TEST_F(DataLogTest, StructB) {
+TEST(DataLogTest, StructB) {
+  wpi::log::DataLog log{[](auto) {}};
   Info1 info;
   [[maybe_unused]]
   wpi::log::StructLogEntry<ThingB, Info1> entry0;
@@ -170,7 +167,8 @@ TEST_F(DataLogTest, StructB) {
   entry.Append(ThingB{}, 7);
 }
 
-TEST_F(DataLogTest, StructArrayB) {
+TEST(DataLogTest, StructArrayB) {
+  wpi::log::DataLog log{[](auto) {}};
   Info1 info;
   [[maybe_unused]]
   wpi::log::StructArrayLogEntry<ThingB, Info1> entry0;
@@ -179,7 +177,8 @@ TEST_F(DataLogTest, StructArrayB) {
   entry.Append({{ThingB{}, ThingB{}}}, 7);
 }
 
-TEST_F(DataLogTest, StructFixedArrayB) {
+TEST(DataLogTest, StructFixedArrayB) {
+  wpi::log::DataLog log{[](auto) {}};
   Info1 info;
   wpi::log::StructLogEntry<std::array<ThingB, 2>, Info1> entry{log, "a", info,
                                                                5};
@@ -188,7 +187,8 @@ TEST_F(DataLogTest, StructFixedArrayB) {
   entry.Append(arr, 7);
 }
 
-TEST_F(DataLogTest, StructC) {
+TEST(DataLogTest, StructC) {
+  wpi::log::DataLog log{[](auto) {}};
   {
     wpi::log::StructLogEntry<ThingC> entry{log, "c", 5};
     entry.Append(ThingC{});
@@ -208,7 +208,8 @@ TEST_F(DataLogTest, StructC) {
   }
 }
 
-TEST_F(DataLogTest, StructArrayC) {
+TEST(DataLogTest, StructArrayC) {
+  wpi::log::DataLog log{[](auto) {}};
   {
     wpi::log::StructArrayLogEntry<ThingC> entry{log, "c", 5};
     entry.Append({{ThingC{}, ThingC{}}});
@@ -228,7 +229,8 @@ TEST_F(DataLogTest, StructArrayC) {
   }
 }
 
-TEST_F(DataLogTest, StructFixedArrayC) {
+TEST(DataLogTest, StructFixedArrayC) {
+  wpi::log::DataLog log{[](auto) {}};
   std::array<ThingC, 2> arr;
   {
     wpi::log::StructLogEntry<std::array<ThingC, 2>> entry{log, "c", 5};

@@ -13,7 +13,6 @@
 
 #include "frc/geometry/Rotation2d.h"
 #include "units/length.h"
-#include "units/math.h"
 
 namespace frc {
 
@@ -67,9 +66,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The distance between the two translations.
    */
-  constexpr units::meter_t Distance(const Translation2d& other) const {
-    return units::math::hypot(other.m_x - m_x, other.m_y - m_y);
-  }
+  units::meter_t Distance(const Translation2d& other) const;
 
   /**
    * Returns the X component of the translation.
@@ -125,21 +122,6 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return The new rotated translation.
    */
   constexpr Translation2d RotateBy(const Rotation2d& other) const;
-
-  /**
-   * Rotates this translation around another translation in 2D space.
-   *
-   * <pre>
-   * [x_new]   [rot.cos, -rot.sin][x - other.x]   [other.x]
-   * [y_new] = [rot.sin,  rot.cos][y - other.y] + [other.y]
-   * </pre>
-   *
-   * @param other The other translation to rotate around.
-   * @param rot The rotation to rotate the translation by.
-   * @return The new rotated translation.
-   */
-  constexpr Translation2d RotateAround(const Translation2d& other,
-                                       const Rotation2d& rot) const;
 
   /**
    * Returns the sum of two translations in 2D space.
@@ -202,7 +184,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param other The other object.
    * @return Whether the two objects are equal.
    */
-  constexpr bool operator==(const Translation2d& other) const;
+  bool operator==(const Translation2d& other) const;
 
   /**
    * Returns the nearest Translation2d from a collection of translations

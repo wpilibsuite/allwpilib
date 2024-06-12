@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import static edu.wpi.first.units.Units.Watts;
-
 /**
  * Unit of electic current dimension.
  *
@@ -16,17 +14,13 @@ import static edu.wpi.first.units.Units.Watts;
  * {@link Units} class.
  */
 public class Current extends Unit<Current> {
-  Current(Current baseUnit, double baseUnitEquivalent, String name, String symbol) {
-    super(baseUnit, baseUnitEquivalent, name, symbol);
+  Current(double baseUnitEquivalent, String name, String symbol) {
+    super(Current.class, baseUnitEquivalent, name, symbol);
   }
 
   Current(
-      Current baseUnit,
-      UnaryFunction toBaseConverter,
-      UnaryFunction fromBaseConverter,
-      String name,
-      String symbol) {
-    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+      UnaryFunction toBaseConverter, UnaryFunction fromBaseConverter, String name, String symbol) {
+    super(Current.class, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
   /**
@@ -41,6 +35,6 @@ public class Current extends Unit<Current> {
    * @return the power unit
    */
   public Power times(Unit<Voltage> voltage, String name, String symbol) {
-    return new Power(Watts, this.toBaseUnits(1) * voltage.toBaseUnits(1), name, symbol);
+    return new Power(this.toBaseUnits(1) * voltage.toBaseUnits(1), name, symbol);
   }
 }

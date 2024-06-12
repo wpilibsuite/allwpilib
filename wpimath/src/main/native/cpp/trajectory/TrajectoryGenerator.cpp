@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include <wpi/print.h>
+#include <fmt/format.h>
 
 #include "frc/spline/SplineHelper.h"
 #include "frc/spline/SplineParameterizer.h"
@@ -22,7 +22,7 @@ void TrajectoryGenerator::ReportError(const char* error) {
   if (s_errorFunc) {
     s_errorFunc(error);
   } else {
-    wpi::print(stderr, "TrajectoryGenerator error: {}\n", error);
+    fmt::print(stderr, "TrajectoryGenerator error: {}\n", error);
   }
 }
 

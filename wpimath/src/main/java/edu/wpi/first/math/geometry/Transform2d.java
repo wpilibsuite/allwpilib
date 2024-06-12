@@ -197,9 +197,11 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
    */
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof Transform2d other
-        && other.m_translation.equals(m_translation)
-        && other.m_rotation.equals(m_rotation);
+    if (obj instanceof Transform2d) {
+      return ((Transform2d) obj).m_translation.equals(m_translation)
+          && ((Transform2d) obj).m_rotation.equals(m_rotation);
+    }
+    return false;
   }
 
   @Override

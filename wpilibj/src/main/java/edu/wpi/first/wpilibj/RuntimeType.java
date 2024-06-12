@@ -29,10 +29,11 @@ public enum RuntimeType {
    * @return Matching runtime type
    */
   public static RuntimeType getValue(int type) {
-    return switch (type) {
-      case HALUtil.RUNTIME_ROBORIO -> RuntimeType.kRoboRIO;
-      case HALUtil.RUNTIME_ROBORIO2 -> RuntimeType.kRoboRIO2;
-      default -> RuntimeType.kSimulation;
-    };
+    if (type == HALUtil.RUNTIME_ROBORIO) {
+      return RuntimeType.kRoboRIO;
+    } else if (type == HALUtil.RUNTIME_ROBORIO2) {
+      return RuntimeType.kRoboRIO2;
+    }
+    return RuntimeType.kSimulation;
   }
 }

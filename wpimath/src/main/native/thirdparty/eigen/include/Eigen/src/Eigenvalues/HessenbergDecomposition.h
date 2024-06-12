@@ -66,7 +66,7 @@ class HessenbergDecomposition {
   enum {
     Size = MatrixType::RowsAtCompileTime,
     SizeMinusOne = Size == Dynamic ? Dynamic : Size - 1,
-    Options = internal::traits<MatrixType>::Options,
+    Options = MatrixType::Options,
     MaxSize = MatrixType::MaxRowsAtCompileTime,
     MaxSizeMinusOne = MaxSize == Dynamic ? Dynamic : MaxSize - 1
   };

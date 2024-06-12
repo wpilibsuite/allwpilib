@@ -5,9 +5,9 @@
 #include <cstdlib>
 #include <thread>
 
+#include <fmt/core.h>
 #include <gtest/gtest.h>
 #include <hal/HAL.h>
-#include <wpi/print.h>
 
 #include "frc/DriverStation.h"
 #include "frc/livewindow/LiveWindow.h"
@@ -29,7 +29,7 @@ class TestEnvironment : public testing::Environment {
     m_alreadySetUp = true;
 
     if (!HAL_Initialize(500, 0)) {
-      wpi::print(stderr, "FATAL ERROR: HAL could not be initialized\n");
+      fmt::print(stderr, "FATAL ERROR: HAL could not be initialized\n");
       std::exit(-1);
     }
 
@@ -42,7 +42,7 @@ class TestEnvironment : public testing::Environment {
     HAL_ObserveUserProgramStarting();
     frc::LiveWindow::SetEnabled(false);
 
-    wpi::print("Started coms\n");
+    fmt::print("Started coms\n");
 
     int enableCounter = 0;
     frc::DriverStation::RefreshData();
@@ -50,13 +50,13 @@ class TestEnvironment : public testing::Environment {
       if (enableCounter > 50) {
         // Robot did not enable properly after 5 seconds.
         // Force exit
-        wpi::print(stderr, " Failed to enable. Aborting\n");
+        fmt::print(stderr, " Failed to enable. Aborting\n");
         std::terminate();
       }
 
       std::this_thread::sleep_for(100ms);
 
-      wpi::print("Waiting for enable: {}\n", enableCounter++);
+      fmt::print("Waiting for enable: {}\n", enableCounter++);
       frc::DriverStation::RefreshData();
     }
   }

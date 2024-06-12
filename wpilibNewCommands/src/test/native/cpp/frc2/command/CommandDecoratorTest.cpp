@@ -8,7 +8,6 @@
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/RunCommand.h"
-#include "frc2/command/WaitUntilCommand.h"
 
 using namespace frc2;
 class CommandDecoratorTest : public CommandTestBase {};
@@ -21,14 +20,13 @@ TEST_F(CommandDecoratorTest, WithTimeout) {
   auto command = RunCommand([] {}, {}).WithTimeout(100_ms);
 
   scheduler.Schedule(command);
-  scheduler.Run();
 
+  scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(command));
 
   frc::sim::StepTiming(150_ms);
 
   scheduler.Run();
-
   EXPECT_FALSE(scheduler.IsScheduled(command));
 
   frc::sim::ResumeTiming();
@@ -37,44 +35,19 @@ TEST_F(CommandDecoratorTest, WithTimeout) {
 TEST_F(CommandDecoratorTest, Until) {
   CommandScheduler scheduler = GetScheduler();
 
-  bool finish = false;
+  bool finished = false;
 
-  auto command = RunCommand([] {}, {}).Until([&finish] { return finish; });
+  auto command = RunCommand([] {}, {}).Until([&finished] { return finished; });
 
   scheduler.Schedule(command);
-  scheduler.Run();
 
+  scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(command));
 
-  finish = true;
-  scheduler.Run();
+  finished = true;
 
+  scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(command));
-}
-
-TEST_F(CommandDecoratorTest, UntilOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
-  bool firstHasRun = false;
-  bool firstWasPolled = false;
-
-  auto first = FunctionalCommand([] {}, [&firstHasRun] { firstHasRun = true; },
-                                 [](bool interrupted) {},
-                                 [&firstWasPolled] {
-                                   firstWasPolled = true;
-                                   return true;
-                                 });
-  auto command = std::move(first).Until([&firstHasRun, &firstWasPolled] {
-    EXPECT_TRUE(firstHasRun);
-    EXPECT_TRUE(firstWasPolled);
-    return true;
-  });
-
-  scheduler.Schedule(command);
-  scheduler.Run();
-
-  EXPECT_TRUE(firstHasRun);
-  EXPECT_TRUE(firstWasPolled);
 }
 
 TEST_F(CommandDecoratorTest, OnlyWhile) {
@@ -85,39 +58,14 @@ TEST_F(CommandDecoratorTest, OnlyWhile) {
   auto command = RunCommand([] {}, {}).OnlyWhile([&run] { return run; });
 
   scheduler.Schedule(command);
-  scheduler.Run();
 
+  scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(command));
 
   run = false;
-  scheduler.Run();
 
+  scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(command));
-}
-
-TEST_F(CommandDecoratorTest, OnlyWhileOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
-  bool firstHasRun = false;
-  bool firstWasPolled = false;
-
-  auto first = FunctionalCommand([] {}, [&firstHasRun] { firstHasRun = true; },
-                                 [](bool interrupted) {},
-                                 [&firstWasPolled] {
-                                   firstWasPolled = true;
-                                   return true;
-                                 });
-  auto command = std::move(first).Until([&firstHasRun, &firstWasPolled] {
-    EXPECT_TRUE(firstHasRun);
-    EXPECT_TRUE(firstWasPolled);
-    return false;
-  });
-
-  scheduler.Schedule(command);
-  scheduler.Run();
-
-  EXPECT_TRUE(firstHasRun);
-  EXPECT_TRUE(firstWasPolled);
 }
 
 TEST_F(CommandDecoratorTest, IgnoringDisable) {
@@ -146,15 +94,12 @@ TEST_F(CommandDecoratorTest, BeforeStarting) {
   EXPECT_TRUE(finished);
 
   scheduler.Run();
-
-  EXPECT_TRUE(scheduler.IsScheduled(command));
-
   scheduler.Run();
 
   EXPECT_FALSE(scheduler.IsScheduled(command));
 }
 
-TEST_F(CommandDecoratorTest, AndThenLambda) {
+TEST_F(CommandDecoratorTest, AndThen) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -167,185 +112,28 @@ TEST_F(CommandDecoratorTest, AndThenLambda) {
   EXPECT_FALSE(finished);
 
   scheduler.Run();
-
-  EXPECT_TRUE(finished);
-
   scheduler.Run();
 
   EXPECT_FALSE(scheduler.IsScheduled(command));
-}
-
-TEST_F(CommandDecoratorTest, AndThen) {
-  CommandScheduler scheduler = GetScheduler();
-
-  bool finished = false;
-
-  auto command1 = InstantCommand();
-  auto command2 = InstantCommand([&finished] { finished = true; });
-  auto group = std::move(command1).AndThen(std::move(command2).ToPtr());
-
-  scheduler.Schedule(group);
-
-  EXPECT_FALSE(finished);
-
-  scheduler.Run();
-
   EXPECT_TRUE(finished);
-
-  scheduler.Run();
-
-  EXPECT_FALSE(scheduler.IsScheduled(group));
-}
-
-TEST_F(CommandDecoratorTest, DeadlineFor) {
-  CommandScheduler scheduler = GetScheduler();
-
-  bool finish = false;
-
-  auto dictator = WaitUntilCommand([&finish] { return finish; });
-  auto endsAfter = WaitUntilCommand([] { return false; });
-
-  auto group = std::move(dictator).DeadlineFor(std::move(endsAfter).ToPtr());
-
-  scheduler.Schedule(group);
-  scheduler.Run();
-
-  EXPECT_TRUE(scheduler.IsScheduled(group));
-
-  finish = true;
-  scheduler.Run();
-
-  EXPECT_FALSE(scheduler.IsScheduled(group));
-}
-
-TEST_F(CommandDecoratorTest, AlongWith) {
-  CommandScheduler scheduler = GetScheduler();
-
-  bool finish = false;
-
-  auto command1 = WaitUntilCommand([&finish] { return finish; });
-  auto command2 = InstantCommand();
-
-  auto group = std::move(command1).AlongWith(std::move(command2).ToPtr());
-
-  scheduler.Schedule(group);
-  scheduler.Run();
-
-  EXPECT_TRUE(scheduler.IsScheduled(group));
-
-  finish = true;
-  scheduler.Run();
-
-  EXPECT_FALSE(scheduler.IsScheduled(group));
-}
-
-TEST_F(CommandDecoratorTest, RaceWith) {
-  CommandScheduler scheduler = GetScheduler();
-
-  auto command1 = WaitUntilCommand([] { return false; });
-  auto command2 = InstantCommand();
-
-  auto group = std::move(command1).RaceWith(std::move(command2).ToPtr());
-
-  scheduler.Schedule(group);
-  scheduler.Run();
-
-  EXPECT_FALSE(scheduler.IsScheduled(group));
-}
-
-TEST_F(CommandDecoratorTest, DeadlineForOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
-  bool dictatorHasRun = false;
-  bool dictatorWasPolled = false;
-
-  auto dictator =
-      FunctionalCommand([] {}, [&dictatorHasRun] { dictatorHasRun = true; },
-                        [](bool interrupted) {},
-                        [&dictatorWasPolled] {
-                          dictatorWasPolled = true;
-                          return true;
-                        });
-  auto other = RunCommand([&dictatorHasRun, &dictatorWasPolled] {
-    EXPECT_TRUE(dictatorHasRun);
-    EXPECT_TRUE(dictatorWasPolled);
-  });
-
-  auto group = std::move(dictator).DeadlineFor(std::move(other).ToPtr());
-
-  scheduler.Schedule(group);
-  scheduler.Run();
-
-  EXPECT_TRUE(dictatorHasRun);
-  EXPECT_TRUE(dictatorWasPolled);
-}
-
-TEST_F(CommandDecoratorTest, AlongWithOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
-  bool firstHasRun = false;
-  bool firstWasPolled = false;
-
-  auto command1 = FunctionalCommand(
-      [] {}, [&firstHasRun] { firstHasRun = true; }, [](bool interrupted) {},
-      [&firstWasPolled] {
-        firstWasPolled = true;
-        return true;
-      });
-  auto command2 = RunCommand([&firstHasRun, &firstWasPolled] {
-    EXPECT_TRUE(firstHasRun);
-    EXPECT_TRUE(firstWasPolled);
-  });
-
-  auto group = std::move(command1).AlongWith(std::move(command2).ToPtr());
-
-  scheduler.Schedule(group);
-  scheduler.Run();
-
-  EXPECT_TRUE(firstHasRun);
-  EXPECT_TRUE(firstWasPolled);
-}
-
-TEST_F(CommandDecoratorTest, RaceWithOrder) {
-  CommandScheduler scheduler = GetScheduler();
-
-  bool firstHasRun = false;
-  bool firstWasPolled = false;
-
-  auto command1 = FunctionalCommand(
-      [] {}, [&firstHasRun] { firstHasRun = true; }, [](bool interrupted) {},
-      [&firstWasPolled] {
-        firstWasPolled = true;
-        return true;
-      });
-  auto command2 = RunCommand([&firstHasRun, &firstWasPolled] {
-    EXPECT_TRUE(firstHasRun);
-    EXPECT_TRUE(firstWasPolled);
-  });
-
-  auto group = std::move(command1).RaceWith(std::move(command2).ToPtr());
-
-  scheduler.Schedule(group);
-  scheduler.Run();
-
-  EXPECT_TRUE(firstHasRun);
-  EXPECT_TRUE(firstWasPolled);
 }
 
 TEST_F(CommandDecoratorTest, Unless) {
   CommandScheduler scheduler = GetScheduler();
 
   bool hasRun = false;
-  bool unlessCondition = true;
+  bool unlessBool = true;
 
-  auto command = InstantCommand([&hasRun] { hasRun = true; }, {})
-                     .Unless([&unlessCondition] { return unlessCondition; });
+  auto command =
+      InstantCommand([&hasRun] { hasRun = true; }, {}).Unless([&unlessBool] {
+        return unlessBool;
+      });
 
   scheduler.Schedule(command);
   scheduler.Run();
   EXPECT_FALSE(hasRun);
 
-  unlessCondition = false;
+  unlessBool = false;
   scheduler.Schedule(command);
   scheduler.Run();
   EXPECT_TRUE(hasRun);
@@ -355,16 +143,18 @@ TEST_F(CommandDecoratorTest, OnlyIf) {
   CommandScheduler scheduler = GetScheduler();
 
   bool hasRun = false;
-  bool onlyIfCondition = false;
+  bool onlyIfBool = false;
 
-  auto command = InstantCommand([&hasRun] { hasRun = true; }, {})
-                     .OnlyIf([&onlyIfCondition] { return onlyIfCondition; });
+  auto command =
+      InstantCommand([&hasRun] { hasRun = true; }, {}).OnlyIf([&onlyIfBool] {
+        return onlyIfBool;
+      });
 
   scheduler.Schedule(command);
   scheduler.Run();
   EXPECT_FALSE(hasRun);
 
-  onlyIfCondition = true;
+  onlyIfBool = true;
   scheduler.Schedule(command);
   scheduler.Run();
   EXPECT_TRUE(hasRun);

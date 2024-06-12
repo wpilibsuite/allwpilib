@@ -179,18 +179,15 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_PowerDistributionJNI_getAllCurrents
   (JNIEnv* env, jclass, jint handle, jdoubleArray jarr)
 {
+  double storage[16];
   int32_t status = 0;
-  int32_t size = HAL_GetPowerDistributionNumChannels(handle, &status);
-  wpi::SmallVector<double, 24> storage;
-  storage.resize_for_overwrite(size);
-
-  HAL_GetPowerDistributionAllChannelCurrents(handle, storage.data(), size,
-                                             &status);
+  // TODO fix me
+  HAL_GetPowerDistributionAllChannelCurrents(handle, storage, 16, &status);
   if (!CheckStatus(env, status, false)) {
     return;
   }
 
-  env->SetDoubleArrayRegion(jarr, 0, size, storage.data());
+  env->SetDoubleArrayRegion(jarr, 0, 16, storage);
 }
 
 /*

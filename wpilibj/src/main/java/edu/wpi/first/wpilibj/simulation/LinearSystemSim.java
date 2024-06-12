@@ -9,6 +9,7 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.wpilibj.RobotController;
 import org.ejml.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
 
@@ -43,27 +44,26 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   protected final Matrix<Outputs, N1> m_measurementStdDevs;
 
   /**
+   * Creates a simulated generic linear system.
+   *
+   * @param system The system to simulate.
+   */
+  public LinearSystemSim(LinearSystem<States, Inputs, Outputs> system) {
+    this(system, null);
+  }
+
+  /**
    * Creates a simulated generic linear system with measurement noise.
    *
    * @param system The system being controlled.
-   * @param measurementStdDevs Standard deviations of measurements. Can be empty if no noise is
-   *     desired. If present must have same number of items as Outputs
+   * @param measurementStdDevs Standard deviations of measurements. Can be null if no noise is
+   *     desired.
    */
   public LinearSystemSim(
-      LinearSystem<States, Inputs, Outputs> system, double... measurementStdDevs) {
-    if (measurementStdDevs.length != 0 && measurementStdDevs.length != system.getC().getNumRows()) {
-      throw new MatrixDimensionException(
-          "Malformed measurementStdDevs! Got "
-              + measurementStdDevs.length
-              + " elements instead of "
-              + system.getC().getNumRows());
-    }
+      LinearSystem<States, Inputs, Outputs> system, Matrix<Outputs, N1> measurementStdDevs) {
     this.m_plant = system;
-    if (measurementStdDevs.length == 0) {
-      m_measurementStdDevs = new Matrix<>(new SimpleMatrix(system.getC().getNumRows(), 1));
-    } else {
-      m_measurementStdDevs = new Matrix<>(new SimpleMatrix(measurementStdDevs));
-    }
+    this.m_measurementStdDevs = measurementStdDevs;
+
     m_x = new Matrix<>(new SimpleMatrix(system.getA().getNumRows(), 1));
     m_u = new Matrix<>(new SimpleMatrix(system.getB().getNumCols(), 1));
     m_y = new Matrix<>(new SimpleMatrix(system.getC().getNumRows(), 1));
@@ -112,7 +112,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * @param u The system inputs.
    */
   public void setInput(Matrix<Inputs, N1> u) {
-    this.m_u = u;
+    this.m_u = clampInput(u);
   }
 
   /**
@@ -123,6 +123,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    */
   public void setInput(int row, double value) {
     m_u.set(row, 0, value);
+    m_u = clampInput(m_u);
   }
 
   /**
@@ -136,6 +137,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
           "Malformed input! Got " + u.length + " elements instead of " + m_u.getNumRows());
     }
     m_u = new Matrix<>(new SimpleMatrix(m_u.getNumRows(), 1, true, u));
+    m_u = clampInput(m_u);
   }
 
   /**
@@ -167,6 +169,16 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   }
 
   /**
+   * Returns the current drawn by this simulated system. Override this method to add a custom
+   * current calculation.
+   *
+   * @return The current drawn by this simulated mechanism.
+   */
+  public double getCurrentDrawAmps() {
+    return 0.0;
+  }
+
+  /**
    * Updates the state estimate of the system.
    *
    * @param currentXhat The current state estimate.
@@ -180,12 +192,13 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   }
 
   /**
-   * Clamp the input vector such that no element exceeds the maximum allowed value. If any does, the
+   * Clamp the input vector such that no element exceeds the given voltage. If any does, the
    * relative magnitudes of the input will be maintained.
    *
-   * @param maxInput The maximum magnitude of the input vector after clamping.
+   * @param u The input vector.
+   * @return The normalized input.
    */
-  protected void clampInput(double maxInput) {
-    m_u = StateSpaceUtil.desaturateInputVector(m_u, maxInput);
+  protected Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> u) {
+    return StateSpaceUtil.desaturateInputVector(u, RobotController.getBatteryVoltage());
   }
 }

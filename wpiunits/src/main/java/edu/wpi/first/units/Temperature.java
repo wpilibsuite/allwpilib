@@ -15,11 +15,7 @@ package edu.wpi.first.units;
  */
 public class Temperature extends Unit<Temperature> {
   Temperature(
-      Temperature baseUnit,
-      UnaryFunction toBaseConverter,
-      UnaryFunction fromBaseConverter,
-      String name,
-      String symbol) {
-    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+      UnaryFunction toBaseConverter, UnaryFunction fromBaseConverter, String name, String symbol) {
+    super(Temperature.class, toBaseConverter, fromBaseConverter, name, symbol);
   }
 }

@@ -71,34 +71,58 @@ public class PowerDistributionStickyFaults {
    *     the hardware.
    */
   public final boolean getBreakerFault(int channel) {
-    return switch (channel) {
-      case 0 -> Channel0BreakerFault;
-      case 1 -> Channel1BreakerFault;
-      case 2 -> Channel2BreakerFault;
-      case 3 -> Channel3BreakerFault;
-      case 4 -> Channel4BreakerFault;
-      case 5 -> Channel5BreakerFault;
-      case 6 -> Channel6BreakerFault;
-      case 7 -> Channel7BreakerFault;
-      case 8 -> Channel8BreakerFault;
-      case 9 -> Channel9BreakerFault;
-      case 10 -> Channel10BreakerFault;
-      case 11 -> Channel11BreakerFault;
-      case 12 -> Channel12BreakerFault;
-      case 13 -> Channel13BreakerFault;
-      case 14 -> Channel14BreakerFault;
-      case 15 -> Channel15BreakerFault;
-      case 16 -> Channel16BreakerFault;
-      case 17 -> Channel17BreakerFault;
-      case 18 -> Channel18BreakerFault;
-      case 19 -> Channel19BreakerFault;
-      case 20 -> Channel20BreakerFault;
-      case 21 -> Channel21BreakerFault;
-      case 22 -> Channel22BreakerFault;
-      case 23 -> Channel23BreakerFault;
-      default -> throw new IndexOutOfBoundsException(
-          "Power distribution fault channel out of bounds!");
-    };
+    switch (channel) {
+      case 0:
+        return Channel0BreakerFault;
+      case 1:
+        return Channel1BreakerFault;
+      case 2:
+        return Channel2BreakerFault;
+      case 3:
+        return Channel3BreakerFault;
+      case 4:
+        return Channel4BreakerFault;
+      case 5:
+        return Channel5BreakerFault;
+      case 6:
+        return Channel6BreakerFault;
+      case 7:
+        return Channel7BreakerFault;
+      case 8:
+        return Channel8BreakerFault;
+      case 9:
+        return Channel9BreakerFault;
+      case 10:
+        return Channel10BreakerFault;
+      case 11:
+        return Channel11BreakerFault;
+      case 12:
+        return Channel12BreakerFault;
+      case 13:
+        return Channel13BreakerFault;
+      case 14:
+        return Channel14BreakerFault;
+      case 15:
+        return Channel15BreakerFault;
+      case 16:
+        return Channel16BreakerFault;
+      case 17:
+        return Channel17BreakerFault;
+      case 18:
+        return Channel18BreakerFault;
+      case 19:
+        return Channel19BreakerFault;
+      case 20:
+        return Channel20BreakerFault;
+      case 21:
+        return Channel21BreakerFault;
+      case 22:
+        return Channel22BreakerFault;
+      case 23:
+        return Channel23BreakerFault;
+      default:
+        throw new IndexOutOfBoundsException("Power distribution fault channel out of bounds!");
+    }
   }
 
   /**

@@ -5,16 +5,19 @@
 #ifndef CSCORE_C_UTIL_H_
 #define CSCORE_C_UTIL_H_
 
+#include <cstdlib>
 #include <cstring>
 #include <string_view>
 
-#include <wpi/string.h>
+#include <wpi/MemAlloc.h>
 
 namespace cs {
 
-inline void ConvertToC(struct WPI_String* output, std::string_view str) {
-  char* write = WPI_AllocateString(output, str.size());
-  std::memcpy(write, str.data(), str.size());
+inline char* ConvertToC(std::string_view in) {
+  char* out = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
+  std::memmove(out, in.data(), in.size());
+  out[in.size()] = '\0';
+  return out;
 }
 
 }  // namespace cs

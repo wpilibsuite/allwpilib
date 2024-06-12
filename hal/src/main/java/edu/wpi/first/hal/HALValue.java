@@ -145,13 +145,19 @@ public final class HALValue {
    * @return HAL value
    */
   public static HALValue fromNative(int type, long value1, double value2) {
-    return switch (type) {
-      case kBoolean -> makeBoolean(value1 != 0);
-      case kDouble -> makeDouble(value2);
-      case kEnum -> makeEnum((int) value1);
-      case kInt -> makeInt((int) value1);
-      case kLong -> makeLong(value1);
-      default -> makeUnassigned();
-    };
+    switch (type) {
+      case kBoolean:
+        return makeBoolean(value1 != 0);
+      case kDouble:
+        return makeDouble(value2);
+      case kEnum:
+        return makeEnum((int) value1);
+      case kInt:
+        return makeInt((int) value1);
+      case kLong:
+        return makeLong(value1);
+      default:
+        return makeUnassigned();
+    }
   }
 }

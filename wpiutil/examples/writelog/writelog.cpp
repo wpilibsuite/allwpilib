@@ -8,8 +8,9 @@
 #include <string>
 #include <vector>
 
-#include "wpi/DataLogBackgroundWriter.h"
-#include "wpi/print.h"
+#include <fmt/format.h>
+
+#include "wpi/DataLog.h"
 
 int main(int argc, char** argv) {
   using std::chrono::duration_cast;
@@ -22,7 +23,7 @@ int main(int argc, char** argv) {
     kNumRuns = std::stoi(argv[1]);
   }
 
-  wpi::log::DataLogBackgroundWriter log;
+  wpi::log::DataLog log;
   log.SetFilename("test.wpilog");
 
   auto testVec =
@@ -65,7 +66,7 @@ int main(int argc, char** argv) {
 
   for (const auto& [name, fn] : testVec) {
     auto resVec = std::vector<microseconds::rep>();
-    wpi::print("{}: ", name);
+    fmt::print("{}: ", name);
 
     for (int i = 0; i < kNumRuns; ++i) {
       auto start = high_resolution_clock::now();
@@ -74,7 +75,7 @@ int main(int argc, char** argv) {
       resVec.push_back(duration_cast<microseconds>(stop - start).count());
     }
 
-    wpi::print("{}us\n",
+    fmt::print("{}us\n",
                std::accumulate(resVec.begin(), resVec.end(), 0) / kNumRuns);
   }
 

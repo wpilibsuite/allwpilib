@@ -5,7 +5,6 @@
 #pragma once
 
 #include <functional>
-#include <utility>
 
 #include <Eigen/Cholesky>
 
@@ -24,15 +23,14 @@ ExtendedKalmanFilter<States, Inputs, Outputs>::ExtendedKalmanFilter(
     std::function<OutputVector(const StateVector&, const InputVector&)> h,
     const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
     units::second_t dt)
-    : m_f(std::move(f)), m_h(std::move(h)) {
+    : m_f(f), m_h(h) {
   m_contQ = MakeCovMatrix(stateStdDevs);
   m_contR = MakeCovMatrix(measurementStdDevs);
-  m_residualFuncY = [](const OutputVector& a,
-                       const OutputVector& b) -> OutputVector { return a - b; };
-  m_addFuncX = [](const StateVector& a, const StateVector& b) -> StateVector {
-    return a + b;
-  };
+  m_residualFuncY = [](auto a, auto b) -> OutputVector { return a - b; };
+  m_addFuncX = [](auto a, auto b) -> StateVector { return a + b; };
   m_dt = dt;
+
+  Reset();
 
   StateMatrix contA = NumericalJacobianX<States, States, Inputs>(
       m_f, m_xHat, InputVector::Zero());
@@ -63,13 +61,12 @@ ExtendedKalmanFilter<States, Inputs, Outputs>::ExtendedKalmanFilter(
         residualFuncY,
     std::function<StateVector(const StateVector&, const StateVector&)> addFuncX,
     units::second_t dt)
-    : m_f(std::move(f)),
-      m_h(std::move(h)),
-      m_residualFuncY(std::move(residualFuncY)),
-      m_addFuncX(std::move(addFuncX)) {
+    : m_f(f), m_h(h), m_residualFuncY(residualFuncY), m_addFuncX(addFuncX) {
   m_contQ = MakeCovMatrix(stateStdDevs);
   m_contR = MakeCovMatrix(measurementStdDevs);
   m_dt = dt;
+
+  Reset();
 
   StateMatrix contA = NumericalJacobianX<States, States, Inputs>(
       m_f, m_xHat, InputVector::Zero());
@@ -117,14 +114,9 @@ void ExtendedKalmanFilter<States, Inputs, Outputs>::Correct(
     const InputVector& u, const Vectord<Rows>& y,
     std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
     const Matrixd<Rows, Rows>& R) {
-  auto residualFuncY = [](const Vectord<Rows>& a,
-                          const Vectord<Rows>& b) -> Vectord<Rows> {
-    return a - b;
-  };
-  auto addFuncX = [](const StateVector& a,
-                     const StateVector& b) -> StateVector { return a + b; };
-  Correct<Rows>(u, y, std::move(h), R, std::move(residualFuncY),
-                std::move(addFuncX));
+  auto residualFuncY = [](auto a, auto b) -> Vectord<Rows> { return a - b; };
+  auto addFuncX = [](auto a, auto b) -> StateVector { return a + b; };
+  Correct<Rows>(u, y, h, R, residualFuncY, addFuncX);
 }
 
 template <int States, int Inputs, int Outputs>

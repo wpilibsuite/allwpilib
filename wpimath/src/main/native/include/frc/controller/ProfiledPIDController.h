@@ -257,14 +257,13 @@ class ProfiledPIDController
   void DisableContinuousInput() { m_controller.DisableContinuousInput(); }
 
   /**
-   * Sets the minimum and maximum contributions of the integral term.
+   * Sets the minimum and maximum values for the integrator.
    *
-   * The internal integrator is clamped so that the integral term's contribution
-   * to the output stays between minimumIntegral and maximumIntegral. This
-   * prevents integral windup.
+   * When the cap is reached, the integrator value is added to the controller
+   * output rather than the integrator value times the integral gain.
    *
-   * @param minimumIntegral The minimum contribution of the integral term.
-   * @param maximumIntegral The maximum contribution of the integral term.
+   * @param minimumIntegral The minimum value of the integrator.
+   * @param maximumIntegral The maximum value of the integrator.
    */
   void SetIntegratorRange(double minimumIntegral, double maximumIntegral) {
     m_controller.SetIntegratorRange(minimumIntegral, maximumIntegral);
@@ -405,19 +404,6 @@ class ProfiledPIDController
     builder.AddDoubleProperty(
         "izone", [this] { return GetIZone(); },
         [this](double value) { SetIZone(value); });
-    builder.AddDoubleProperty(
-        "maxVelocity", [this] { return GetConstraints().maxVelocity.value(); },
-        [this](double value) {
-          SetConstraints(
-              Constraints{Velocity_t{value}, GetConstraints().maxAcceleration});
-        });
-    builder.AddDoubleProperty(
-        "maxAcceleration",
-        [this] { return GetConstraints().maxAcceleration.value(); },
-        [this](double value) {
-          SetConstraints(
-              Constraints{GetConstraints().maxVelocity, Acceleration_t{value}});
-        });
     builder.AddDoubleProperty(
         "goal", [this] { return GetGoal().position.value(); },
         [this](double value) { SetGoal(Distance_t{value}); });

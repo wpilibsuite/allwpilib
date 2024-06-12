@@ -18,7 +18,7 @@ namespace frc::sim {
 /**
  * Represents a simulated arm mechanism.
  */
-class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
+class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
  public:
   /**
    * Creates a simulated arm mechanism.
@@ -36,13 +36,12 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param startingAngle      The initial position of the arm.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  SingleJointedArmSim(const LinearSystem<2, 1, 2>& system,
+  SingleJointedArmSim(const LinearSystem<2, 1, 1>& system,
                       const DCMotor& gearbox, double gearing,
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
                       units::radian_t startingAngle,
-                      const std::array<double, 2>& measurementStdDevs = {0.0,
-                                                                         0.0});
+                      const std::array<double, 1>& measurementStdDevs = {0.0});
   /**
    * Creates a simulated arm mechanism.
    *
@@ -63,8 +62,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
                       units::radian_t startingAngle,
-                      const std::array<double, 2>& measurementStdDevs = {0.0,
-                                                                         0.0});
+                      const std::array<double, 1>& measurementStdDevs = {0.0});
 
   using LinearSystemSim::SetState;
 
@@ -126,7 +124,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    *
    * @return The arm current draw.
    */
-  units::ampere_t GetCurrentDraw() const;
+  units::ampere_t GetCurrentDraw() const override;
 
   /**
    * Sets the input voltage for the arm.

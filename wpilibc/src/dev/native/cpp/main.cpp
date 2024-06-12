@@ -4,12 +4,11 @@
 
 #include <fmt/core.h>
 #include <hal/HALBase.h>
-#include <wpi/print.h>
 
 #include "WPILibVersion.h"
 
 int main() {
-  wpi::print("Hello World\n");
-  wpi::print("{}\n", static_cast<int32_t>(HAL_GetRuntimeType()));
-  wpi::print("{}\n", GetWPILibVersion());
+  fmt::print("Hello World\n");
+  fmt::print("{}\n", static_cast<int32_t>(HAL_GetRuntimeType()));
+  fmt::print("{}\n", GetWPILibVersion());
 }

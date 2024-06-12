@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <limits>
 
-#include <wpi/print.h>
+#include <fmt/format.h>
 
 #include "hal/HALBase.h"
 
@@ -20,7 +20,7 @@ fpga_clock::time_point fpga_clock::now() noexcept {
   int32_t status = 0;
   uint64_t currentTime = HAL_GetFPGATime(&status);
   if (status != 0) {
-    wpi::print(
+    fmt::print(
         stderr,
         "Call to HAL_GetFPGATime failed in fpga_clock::now() with status {}. "
         "Initialization might have failed. Time will not be correct\n",

@@ -1,5 +1,5 @@
 color: false
-definitions: [cmake/modules]
+definitions: []
 line_length: 100
 list_expansion: favour-inlining
 quiet: false

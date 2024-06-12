@@ -15,7 +15,6 @@
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/bit.h>
-#include <wpi/print.h>
 #include <wpi/timestamp.h>
 
 #include "wpinet/raw_uv_ostream.h"
@@ -154,7 +153,7 @@ int main(int argc, char* argv[]) {
       useUdp = true;
       broadcastUdp = true;
     } else {
-      wpi::print(stderr, "unrecognized command line option {}\n",
+      fmt::print(stderr, "unrecognized command line option {}\n",
                  argv[programArgc]);
       err = true;
     }
@@ -175,7 +174,7 @@ int main(int argc, char* argv[]) {
 
   auto loop = uv::Loop::Create();
   loop->error.connect(
-      [](uv::Error err) { wpi::print(stderr, "uv ERROR: {}\n", err.str()); });
+      [](uv::Error err) { fmt::print(stderr, "uv ERROR: {}\n", err.str()); });
 
   // create pipes to communicate with child
   auto stdinPipe = uv::Pipe::Create(loop);

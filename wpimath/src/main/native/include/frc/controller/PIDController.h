@@ -179,14 +179,13 @@ class WPILIB_DLLEXPORT PIDController
   bool IsContinuousInputEnabled() const;
 
   /**
-   * Sets the minimum and maximum contributions of the integral term.
+   * Sets the minimum and maximum values for the integrator.
    *
-   * The internal integrator is clamped so that the integral term's contribution
-   * to the output stays between minimumIntegral and maximumIntegral. This
-   * prevents integral windup.
+   * When the cap is reached, the integrator value is added to the controller
+   * output rather than the integrator value times the integral gain.
    *
-   * @param minimumIntegral The minimum contribution of the integral term.
-   * @param maximumIntegral The maximum contribution of the integral term.
+   * @param minimumIntegral The minimum value of the integrator.
+   * @param maximumIntegral The maximum value of the integrator.
    */
   void SetIntegratorRange(double minimumIntegral, double maximumIntegral);
 

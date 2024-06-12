@@ -8,7 +8,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DataLogBackgroundWriter;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import java.io.File;
@@ -41,7 +40,7 @@ import java.util.Random;
  * <p>By default, all NetworkTables value changes are stored to the data log.
  */
 public final class DataLogManager {
-  private static DataLogBackgroundWriter m_log;
+  private static DataLog m_log;
   private static boolean m_stopped;
   private static String m_logDir;
   private static boolean m_filenameOverride;
@@ -114,7 +113,7 @@ public final class DataLogManager {
           }
         }
       }
-      m_log = new DataLogBackgroundWriter(m_logDir, makeLogFilename(filename), period);
+      m_log = new DataLog(m_logDir, makeLogFilename(filename), period);
       m_messageLog = new StringLogEntry(m_log, "messages");
 
       // Log all NT entries and connections
@@ -382,13 +381,21 @@ public final class DataLogManager {
           DriverStation.MatchType matchType = DriverStation.getMatchType();
           if (matchType != DriverStation.MatchType.None) {
             // rename per match info
-            char matchTypeChar =
-                switch (matchType) {
-                  case Practice -> 'P';
-                  case Qualification -> 'Q';
-                  case Elimination -> 'E';
-                  default -> '_';
-                };
+            char matchTypeChar;
+            switch (matchType) {
+              case Practice:
+                matchTypeChar = 'P';
+                break;
+              case Qualification:
+                matchTypeChar = 'Q';
+                break;
+              case Elimination:
+                matchTypeChar = 'E';
+                break;
+              default:
+                matchTypeChar = '_';
+                break;
+            }
             m_log.setFilename(
                 "FRC_"
                     + m_timeFormatter.format(LocalDateTime.now(m_utc))

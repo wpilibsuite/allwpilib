@@ -9,7 +9,6 @@
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/bit.h>
-#include <wpi/print.h>
 #include <wpi/timestamp.h>
 
 #include "wpinet/raw_uv_ostream.h"
@@ -156,7 +155,7 @@ int main(int argc, char* argv[]) {
         port = portValue.value();
       }
     } else {
-      wpi::print(stderr, "unrecognized command line option {}\n", argv[arg]);
+      fmt::print(stderr, "unrecognized command line option {}\n", argv[arg]);
       err = true;
     }
     ++arg;
@@ -175,7 +174,7 @@ int main(int argc, char* argv[]) {
 
   auto loop = uv::Loop::Create();
   loop->error.connect(
-      [](uv::Error err) { wpi::print(stderr, "uv ERROR: {}\n", err.str()); });
+      [](uv::Error err) { fmt::print(stderr, "uv ERROR: {}\n", err.str()); });
 
   // create ttys
   auto stdinTty = uv::Tty::Create(loop, 0, true);

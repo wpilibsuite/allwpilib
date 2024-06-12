@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math;
 
-import edu.wpi.first.math.jni.EigenJNI;
 import edu.wpi.first.math.numbers.N1;
 import java.util.Objects;
 import org.ejml.MatrixDimensionException;
@@ -202,7 +201,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The mean value of this matrix.
    */
   public final double mean() {
-    return this.elementSum() / this.m_storage.getNumElements();
+    return this.elementSum() / (double) this.m_storage.getNumElements();
   }
 
   /**
@@ -361,7 +360,7 @@ public class Matrix<R extends Num, C extends Num> {
   public final <R2 extends Num, C2 extends Num> Matrix<C, C2> solveFullPivHouseholderQr(
       Matrix<R2, C2> other) {
     Matrix<C, C2> solution = new Matrix<>(new SimpleMatrix(this.getNumCols(), other.getNumCols()));
-    EigenJNI.solveFullPivHouseholderQr(
+    WPIMathJNI.solveFullPivHouseholderQr(
         this.getData(),
         this.getNumRows(),
         this.getNumCols(),
@@ -388,7 +387,7 @@ public class Matrix<R extends Num, C extends Num> {
               + this.getNumCols());
     }
     Matrix<R, C> toReturn = new Matrix<>(new SimpleMatrix(this.getNumRows(), this.getNumCols()));
-    EigenJNI.exp(
+    WPIMathJNI.exp(
         this.m_storage.getDDRM().getData(),
         this.getNumRows(),
         toReturn.m_storage.getDDRM().getData());
@@ -412,7 +411,7 @@ public class Matrix<R extends Num, C extends Num> {
               + this.getNumCols());
     }
     Matrix<R, C> toReturn = new Matrix<>(new SimpleMatrix(this.getNumRows(), this.getNumCols()));
-    EigenJNI.pow(
+    WPIMathJNI.pow(
         this.m_storage.getDDRM().getData(),
         this.getNumRows(),
         exponent,
@@ -710,7 +709,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @param lowerTriangular Whether this matrix is lower triangular.
    */
   public void rankUpdate(Matrix<R, N1> v, double sigma, boolean lowerTriangular) {
-    EigenJNI.rankUpdate(this.getData(), this.getNumRows(), v.getData(), sigma, lowerTriangular);
+    WPIMathJNI.rankUpdate(this.getData(), this.getNumRows(), v.getData(), sigma, lowerTriangular);
   }
 
   @Override
@@ -728,10 +727,18 @@ public class Matrix<R extends Num, C extends Num> {
    */
   @Override
   public boolean equals(Object other) {
-    return this == other
-        || other instanceof Matrix<?, ?> matrix
-            && !MatrixFeatures_DDRM.hasUncountable(matrix.m_storage.getDDRM())
-            && MatrixFeatures_DDRM.isEquals(this.m_storage.getDDRM(), matrix.m_storage.getDDRM());
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Matrix)) {
+      return false;
+    }
+
+    Matrix<?, ?> matrix = (Matrix<?, ?>) other;
+    if (MatrixFeatures_DDRM.hasUncountable(matrix.m_storage.getDDRM())) {
+      return false;
+    }
+    return MatrixFeatures_DDRM.isEquals(this.m_storage.getDDRM(), matrix.m_storage.getDDRM());
   }
 
   @Override

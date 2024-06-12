@@ -69,12 +69,12 @@ TEST(DIOSimTest, Output) {
   BooleanCallback valueCallback;
 
   auto cb = sim.RegisterValueCallback(valueCallback.GetCallback(), false);
-  EXPECT_TRUE(output.Get());
-  EXPECT_TRUE(sim.GetValue());
+  EXPECT_FALSE(output.Get());
+  EXPECT_FALSE(sim.GetValue());
 
   EXPECT_FALSE(valueCallback.WasTriggered());
-  output.Set(false);
+  output.Set(true);
   EXPECT_TRUE(valueCallback.WasTriggered());
-  EXPECT_FALSE(valueCallback.GetLastValue());
+  EXPECT_TRUE(valueCallback.GetLastValue());
 }
 }  // namespace frc::sim

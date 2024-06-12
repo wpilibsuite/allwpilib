@@ -197,9 +197,9 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
 }  // namespace cs
 
 extern "C" {
-void CS_NotifySourceError(CS_Source source, const struct WPI_String* msg,
+void CS_NotifySourceError(CS_Source source, const char* msg,
                           CS_Status* status) {
-  return cs::NotifySourceError(source, wpi::to_string_view(msg), status);
+  return cs::NotifySourceError(source, msg, status);
 }
 
 void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
@@ -207,21 +207,17 @@ void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
   return cs::SetSourceConnected(source, connected, status);
 }
 
-void CS_SetSourceDescription(CS_Source source,
-                             const struct WPI_String* description,
+void CS_SetSourceDescription(CS_Source source, const char* description,
                              CS_Status* status) {
-  return cs::SetSourceDescription(source, wpi::to_string_view(description),
-                                  status);
+  return cs::SetSourceDescription(source, description, status);
 }
 
-CS_Property CS_CreateSourceProperty(CS_Source source,
-                                    const struct WPI_String* name,
+CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
                                     enum CS_PropertyKind kind, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value, CS_Status* status) {
-  return cs::CreateSourceProperty(source, wpi::to_string_view(name), kind,
-                                  minimum, maximum, step, defaultValue, value,
-                                  status);
+  return cs::CreateSourceProperty(source, name, kind, minimum, maximum, step,
+                                  defaultValue, value, status);
 }
 
 CS_Property CS_CreateSourcePropertyCallback(
@@ -234,12 +230,12 @@ CS_Property CS_CreateSourcePropertyCallback(
 }
 
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
-                                     const struct WPI_String* choices,
-                                     int count, CS_Status* status) {
+                                     const char** choices, int count,
+                                     CS_Status* status) {
   wpi::SmallVector<std::string, 8> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
-    vec.emplace_back(wpi::to_string_view(&choices[i]));
+    vec.push_back(choices[i]);
   }
   return cs::SetSourceEnumPropertyChoices(source, property, vec, status);
 }

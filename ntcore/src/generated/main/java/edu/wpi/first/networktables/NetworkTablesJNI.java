@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** NetworkTables JNI. */
 public final class NetworkTablesJNI {
   static boolean libraryLoaded = false;
+  static RuntimeLoader<NetworkTablesJNI> loader = null;
 
   /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
@@ -47,7 +48,10 @@ public final class NetworkTablesJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        RuntimeLoader.loadLibrary("ntcorejni");
+        loader =
+            new RuntimeLoader<>(
+                "ntcorejni", RuntimeLoader.getDefaultExtractionRoot(), NetworkTablesJNI.class);
+        loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);
@@ -65,7 +69,10 @@ public final class NetworkTablesJNI {
     if (libraryLoaded) {
       return;
     }
-    RuntimeLoader.loadLibrary("ntcorejni");
+    loader =
+        new RuntimeLoader<>(
+            "ntcorejni", RuntimeLoader.getDefaultExtractionRoot(), NetworkTablesJNI.class);
+    loader.loadLibrary();
     libraryLoaded = true;
   }
 

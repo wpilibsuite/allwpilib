@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** Base class for all JNI wrappers. */
 public class JNIWrapper {
   static boolean libraryLoaded = false;
+  static RuntimeLoader<JNIWrapper> loader = null;
 
   /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
@@ -41,8 +42,11 @@ public class JNIWrapper {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        RuntimeLoader.loadLibrary("wpiHaljni");
-      } catch (Exception ex) {
+        loader =
+            new RuntimeLoader<>(
+                "wpiHaljni", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
+        loader.loadLibrary();
+      } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);
       }
@@ -59,7 +63,10 @@ public class JNIWrapper {
     if (libraryLoaded) {
       return;
     }
-    RuntimeLoader.loadLibrary("wpiHaljni");
+    loader =
+        new RuntimeLoader<>(
+            "wpiHaljni", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
+    loader.loadLibrary();
     libraryLoaded = true;
   }
 

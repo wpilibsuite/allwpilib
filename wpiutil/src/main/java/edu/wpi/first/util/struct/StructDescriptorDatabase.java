@@ -119,7 +119,8 @@ public class StructDescriptorDatabase {
     } else {
       // check for circular reference
       if (!theStruct.checkCircular(stack)) {
-        StringBuilder builder = new StringBuilder("circular struct reference: ");
+        StringBuilder builder = new StringBuilder();
+        builder.append("circular struct reference: ");
         boolean first = true;
         for (StructDescriptor elem : stack) {
           if (!first) {

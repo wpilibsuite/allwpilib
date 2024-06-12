@@ -11,6 +11,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.EventVector;
@@ -31,13 +32,13 @@ public final class DriverStation {
   /** Number of Joystick ports. */
   public static final int kJoystickPorts = 6;
 
-  private static final class HALJoystickButtons {
+  private static class HALJoystickButtons {
     public int m_buttons;
     public byte m_count;
   }
 
   private static class HALJoystickAxes {
-    public final float[] m_axes;
+    public float[] m_axes;
     public int m_count;
 
     HALJoystickAxes(int count) {
@@ -46,7 +47,7 @@ public final class DriverStation {
   }
 
   private static class HALJoystickAxesRaw {
-    public final int[] m_axes;
+    public int[] m_axes;
 
     @SuppressWarnings("unused")
     public int m_count;
@@ -57,7 +58,7 @@ public final class DriverStation {
   }
 
   private static class HALJoystickPOVs {
-    public final short[] m_povs;
+    public short[] m_povs;
     public int m_count;
 
     HALJoystickPOVs(int count) {
@@ -93,14 +94,16 @@ public final class DriverStation {
 
   @SuppressWarnings("MemberName")
   private static class MatchDataSender {
-    final StringPublisher gameSpecificMessage;
-    final StringPublisher eventName;
-    final IntegerPublisher matchNumber;
-    final IntegerPublisher replayNumber;
-    final IntegerPublisher matchType;
-    final BooleanPublisher alliance;
-    final IntegerPublisher station;
-    final IntegerPublisher controlWord;
+    NetworkTable table;
+    StringPublisher typeMetadata;
+    StringPublisher gameSpecificMessage;
+    StringPublisher eventName;
+    IntegerPublisher matchNumber;
+    IntegerPublisher replayNumber;
+    IntegerPublisher matchType;
+    BooleanPublisher alliance;
+    IntegerPublisher station;
+    IntegerPublisher controlWord;
     boolean oldIsRedAlliance = true;
     int oldStationNumber = 1;
     String oldEventName = "";
@@ -111,8 +114,9 @@ public final class DriverStation {
     int oldControlWord;
 
     MatchDataSender() {
-      var table = NetworkTableInstance.getDefault().getTable("FMSInfo");
-      table.getStringTopic(".type").publish().set("FMSInfo");
+      table = NetworkTableInstance.getDefault().getTable("FMSInfo");
+      typeMetadata = table.getStringTopic(".type").publish();
+      typeMetadata.set("FMSInfo");
       gameSpecificMessage = table.getStringTopic("GameSpecificMessage").publish();
       gameSpecificMessage.set("");
       eventName = table.getStringTopic("EventName").publish();
@@ -133,17 +137,34 @@ public final class DriverStation {
 
     private void sendMatchData() {
       AllianceStationID allianceID = DriverStationJNI.getAllianceStation();
-      final int stationNumber =
-          switch (allianceID) {
-            case Blue1, Red1 -> 1;
-            case Blue2, Red2 -> 2;
-            case Blue3, Red3, Unknown -> 3;
-          };
-      final boolean isRedAlliance =
-          switch (allianceID) {
-            case Blue1, Blue2, Blue3 -> false;
-            case Red1, Red2, Red3, Unknown -> true;
-          };
+      boolean isRedAlliance = false;
+      int stationNumber = 1;
+      switch (allianceID) {
+        case Blue1:
+          isRedAlliance = false;
+          stationNumber = 1;
+          break;
+        case Blue2:
+          isRedAlliance = false;
+          stationNumber = 2;
+          break;
+        case Blue3:
+          isRedAlliance = false;
+          stationNumber = 3;
+          break;
+        case Red1:
+          isRedAlliance = true;
+          stationNumber = 1;
+          break;
+        case Red2:
+          isRedAlliance = true;
+          stationNumber = 2;
+          break;
+        default:
+          isRedAlliance = true;
+          stationNumber = 3;
+          break;
+      }
 
       String currentEventName;
       String currentGameSpecificMessage;
@@ -1038,12 +1059,16 @@ public final class DriverStation {
     } finally {
       m_cacheDataMutex.unlock();
     }
-    return switch (matchType) {
-      case 1 -> MatchType.Practice;
-      case 2 -> MatchType.Qualification;
-      case 3 -> MatchType.Elimination;
-      default -> MatchType.None;
-    };
+    switch (matchType) {
+      case 1:
+        return MatchType.Practice;
+      case 2:
+        return MatchType.Qualification;
+      case 3:
+        return MatchType.Elimination;
+      default:
+        return MatchType.None;
+    }
   }
 
   /**

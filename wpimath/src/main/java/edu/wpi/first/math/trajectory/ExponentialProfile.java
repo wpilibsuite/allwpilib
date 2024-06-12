@@ -70,7 +70,7 @@ public class ExponentialProfile {
   }
 
   /** Profile constraints. */
-  public static final class Constraints {
+  public static class Constraints {
     /** Maximum unsigned input voltage. */
     public final double maxInput;
 
@@ -151,9 +151,12 @@ public class ExponentialProfile {
 
     @Override
     public boolean equals(Object other) {
-      return other instanceof State rhs
-          && this.position == rhs.position
-          && this.velocity == rhs.velocity;
+      if (other instanceof State) {
+        State rhs = (State) other;
+        return this.position == rhs.position && this.velocity == rhs.velocity;
+      } else {
+        return false;
+      }
     }
 
     @Override

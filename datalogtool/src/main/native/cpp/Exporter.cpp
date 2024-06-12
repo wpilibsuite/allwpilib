@@ -30,7 +30,6 @@
 #include <wpi/fmt/raw_ostream.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
-#include <wpi/print.h>
 #include <wpi/raw_ostream.h>
 
 #include "App.h"
@@ -458,21 +457,21 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
     int64_t val;
     if (record.GetInteger(&val)) {
       std::time_t timeval = val / 1000000;
-      wpi::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}", *std::localtime(&timeval),
+      fmt::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}", *std::localtime(&timeval),
                  val % 1000000);
       return;
     }
   } else if (entry.type == "double") {
     double val;
     if (record.GetDouble(&val)) {
-      wpi::print(os, "{}", val);
+      fmt::print(os, "{}", val);
       return;
     }
   } else if (entry.type == "int64" || entry.type == "int") {
     // support "int" for compatibility with old NT4 datalogs
     int64_t val;
     if (record.GetInteger(&val)) {
-      wpi::print(os, "{}", val);
+      fmt::print(os, "{}", val);
       return;
     }
   } else if (entry.type == "string" || entry.type == "json") {
@@ -485,31 +484,31 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
   } else if (entry.type == "boolean") {
     bool val;
     if (record.GetBoolean(&val)) {
-      wpi::print(os, "{}", val);
+      fmt::print(os, "{}", val);
       return;
     }
   } else if (entry.type == "boolean[]") {
     std::vector<int> val;
     if (record.GetBooleanArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      fmt::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "double[]") {
     std::vector<double> val;
     if (record.GetDoubleArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      fmt::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "float[]") {
     std::vector<float> val;
     if (record.GetFloatArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      fmt::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "int64[]") {
     std::vector<int64_t> val;
     if (record.GetIntegerArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      fmt::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "string[]") {
@@ -528,7 +527,7 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
       return;
     }
   }
-  wpi::print(os, "<invalid>");
+  fmt::print(os, "<invalid>");
 }
 
 static void ExportCsvFile(InputFile& f, wpi::raw_ostream& os, int style) {
@@ -576,13 +575,13 @@ static void ExportCsvFile(InputFile& f, wpi::raw_ostream& os, int style) {
       Entry* entry = entryIt->second;
 
       if (style == 0) {
-        wpi::print(os, "{},\"", record.GetTimestamp() / 1000000.0);
+        fmt::print(os, "{},\"", record.GetTimestamp() / 1000000.0);
         PrintEscapedCsvString(os, entry->name);
         os << '"' << ',';
         ValueToCsv(os, *entry, record);
         os << '\n';
       } else if (style == 1 && entry->column != -1) {
-        wpi::print(os, "{},", record.GetTimestamp() / 1000000.0);
+        fmt::print(os, "{},", record.GetTimestamp() / 1000000.0);
         for (int i = 0; i < entry->column; ++i) {
           os << ',';
         }

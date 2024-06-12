@@ -6,7 +6,7 @@
 
 #include <cstdio>
 
-#include <wpi/print.h>
+#include <fmt/format.h>
 #include <wpinet/raw_uv_ostream.h>
 
 #include "HALSimWS.h"
@@ -52,7 +52,7 @@ void HALSimWSClientConnection::Initialize() {
     } catch (const wpi::json::parse_error& e) {
       std::string err("JSON parse failed: ");
       err += e.what();
-      wpi::print(stderr, "{}\n", err);
+      fmt::print(stderr, "{}\n", err);
       m_websocket->Fail(1003, err);
       return;
     }
@@ -82,7 +82,7 @@ void HALSimWSClientConnection::OnSimValueChanged(const wpi::json& msg) {
       return;
     }
   } catch (wpi::json::exception& e) {
-    wpi::print(stderr, "Error with message: {}\n", e.what());
+    fmt::print(stderr, "Error with message: {}\n", e.what());
   }
 
   wpi::SmallVector<uv::Buffer, 4> sendBufs;
@@ -103,7 +103,7 @@ void HALSimWSClientConnection::OnSimValueChanged(const wpi::json& msg) {
                                   }
 
                                   if (err) {
-                                    wpi::print(stderr, "{}\n", err.str());
+                                    fmt::print(stderr, "{}\n", err.str());
                                     std::fflush(stderr);
                                   }
                                 });

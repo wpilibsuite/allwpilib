@@ -504,7 +504,6 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   return camera;
 }
 
-WPI_IGNORE_DEPRECATED
 cs::AxisCamera CameraServer::AddAxisCamera(std::string_view host) {
   return AddAxisCamera("Axis Camera", host);
 }
@@ -560,7 +559,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
   csShared->ReportAxisCamera(camera.GetHandle());
   return camera;
 }
-WPI_UNIGNORE_DEPRECATED
+
 cs::MjpegServer CameraServer::AddSwitchedCamera(std::string_view name) {
   auto& inst = ::GetInstance();
   // create a dummy CvSource

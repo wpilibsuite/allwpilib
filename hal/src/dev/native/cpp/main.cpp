@@ -3,11 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <fmt/core.h>
-#include <wpi/print.h>
 
 #include "hal/HAL.h"
 
 int main() {
-  wpi::print("Hello World\n");
-  wpi::print("{}\n", static_cast<int32_t>(HAL_GetRuntimeType()));
+  fmt::print("Hello World\n");
+  fmt::print("{}\n", static_cast<int32_t>(HAL_GetRuntimeType()));
 }

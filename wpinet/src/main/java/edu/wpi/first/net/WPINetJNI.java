@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** WPINet JNI. */
 public class WPINetJNI {
   static boolean libraryLoaded = false;
+  static RuntimeLoader<WPINetJNI> loader = null;
 
   /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
@@ -41,8 +42,11 @@ public class WPINetJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        RuntimeLoader.loadLibrary("wpinetjni");
-      } catch (Exception ex) {
+        loader =
+            new RuntimeLoader<>(
+                "wpinetjni", RuntimeLoader.getDefaultExtractionRoot(), WPINetJNI.class);
+        loader.loadLibrary();
+      } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);
       }
@@ -59,7 +63,9 @@ public class WPINetJNI {
     if (libraryLoaded) {
       return;
     }
-    RuntimeLoader.loadLibrary("wpinetjni");
+    loader =
+        new RuntimeLoader<>("wpinetjni", RuntimeLoader.getDefaultExtractionRoot(), WPINetJNI.class);
+    loader.loadLibrary();
     libraryLoaded = true;
   }
 

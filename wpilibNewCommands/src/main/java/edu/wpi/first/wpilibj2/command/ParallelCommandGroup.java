@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,9 +19,7 @@ import java.util.Map;
  */
 public class ParallelCommandGroup extends Command {
   // maps commands in this composition to whether they are still running
-  // LinkedHashMap guarantees we iterate over commands in the order they were added (Note that
-  // changing the value associated with a command does NOT change the order)
-  private final Map<Command, Boolean> m_commands = new LinkedHashMap<>();
+  private final Map<Command, Boolean> m_commands = new HashMap<>();
   private boolean m_runWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 

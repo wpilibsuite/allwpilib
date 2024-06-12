@@ -9,16 +9,11 @@ class ExampleUnit extends Unit<ExampleUnit> {
     this(baseUnitEquivalent, "Example", "ex");
   }
 
-  ExampleUnit(
-      ExampleUnit baseUnit,
-      UnaryFunction toBase,
-      UnaryFunction fromBase,
-      String name,
-      String symbol) {
-    super(baseUnit, toBase, fromBase, name, symbol);
+  ExampleUnit(UnaryFunction toBase, UnaryFunction fromBase, String name, String symbol) {
+    super(ExampleUnit.class, toBase, fromBase, name, symbol);
   }
 
   ExampleUnit(double baseUnitEquivalent, String name, String symbol) {
-    super(null, baseUnitEquivalent, name, symbol);
+    super(ExampleUnit.class, baseUnitEquivalent, name, symbol);
   }
 }

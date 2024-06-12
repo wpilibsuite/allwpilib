@@ -5,12 +5,7 @@ include(AddTest)
 
 configure_file(src/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 
-file(
-    GLOB_RECURSE wpilibc_native_src
-    src/main/native/cpp/*.cpp
-    src/main/native/cppcs/*.cpp
-    src/generated/main/native/cpp/*.cpp
-)
+file(GLOB_RECURSE wpilibc_native_src src/main/native/cpp/*.cpp src/main/native/cppcs/*.cpp)
 
 add_library(wpilibc ${wpilibc_native_src} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 set_target_properties(wpilibc PROPERTIES DEBUG_POSTFIX "d")
@@ -19,7 +14,6 @@ target_include_directories(
     wpilibc
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/wpilibc>
 )
 wpilib_target_warnings(wpilibc)

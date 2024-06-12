@@ -4,12 +4,12 @@
 
 #include "frc2/command/PrintCommand.h"
 
-#include <wpi/print.h>
+#include <fmt/format.h>
 
 using namespace frc2;
 
 PrintCommand::PrintCommand(std::string_view message)
-    : CommandHelper{[str = std::string(message)] { wpi::print("{}\n", str); },
+    : CommandHelper{[str = std::string(message)] { fmt::print("{}\n", str); },
                     {}} {}
 
 bool PrintCommand::RunsWhenDisabled() const {

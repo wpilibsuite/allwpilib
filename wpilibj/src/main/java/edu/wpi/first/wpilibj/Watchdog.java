@@ -62,8 +62,10 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof Watchdog watchdog
-        && Double.compare(m_expirationTimeSeconds, watchdog.m_expirationTimeSeconds) == 0;
+    if (obj instanceof Watchdog) {
+      return Double.compare(m_expirationTimeSeconds, ((Watchdog) obj).m_expirationTimeSeconds) == 0;
+    }
+    return false;
   }
 
   @Override

@@ -7,6 +7,7 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Revolutions;
 import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Value;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -45,14 +46,14 @@ class EncoderTest {
 
   @Test
   void testAsDistance() {
-    double ticksPerRevolution = 2048;
+    var ticksPerRevolution = Value.of(2048);
 
     var encoder = new Encoder<Distance>();
 
     // distance per rotation = (wheel circumference / gear ratio)
     // distance per tick = distance per rotation / ticks per rotation
     var wheelDiameter = Inches.of(6);
-    double gearRatio = 10; // 10:1 ratio
+    var gearRatio = Value.of(10); // 10:1 ratio
     Measure<Distance> distancePerPulse =
         wheelDiameter.times(Math.PI).divide(gearRatio).divide(ticksPerRevolution);
     encoder.setDistancePerPulse(distancePerPulse);
@@ -73,7 +74,7 @@ class EncoderTest {
 
   @Test
   void testAsRevolutions() {
-    double ticksPerRevolution = 2048;
+    var ticksPerRevolution = Value.of(2048);
 
     var encoder = new Encoder<Angle>();
 

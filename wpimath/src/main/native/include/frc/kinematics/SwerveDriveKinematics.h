@@ -17,12 +17,16 @@
 #include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/Kinematics.h"
+#include "frc/kinematics/SwerveDriveWheelPositions.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
 #include "units/velocity.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
+
+template <size_t NumModules>
+using SwerveDriveWheelSpeeds = wpi::array<SwerveModuleState, NumModules>;
 
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
@@ -48,8 +52,8 @@ namespace frc {
  */
 template <size_t NumModules>
 class SwerveDriveKinematics
-    : public Kinematics<wpi::array<SwerveModuleState, NumModules>,
-                        wpi::array<SwerveModulePosition, NumModules>> {
+    : public Kinematics<SwerveDriveWheelSpeeds<NumModules>,
+                        SwerveDriveWheelPositions<NumModules>> {
  public:
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable
@@ -153,7 +157,7 @@ class SwerveDriveKinematics
       const ChassisSpeeds& chassisSpeeds,
       const Translation2d& centerOfRotation = Translation2d{}) const;
 
-  wpi::array<SwerveModuleState, NumModules> ToWheelSpeeds(
+  SwerveDriveWheelSpeeds<NumModules> ToWheelSpeeds(
       const ChassisSpeeds& chassisSpeeds) const override {
     return ToSwerveModuleStates(chassisSpeeds);
   }
@@ -230,12 +234,14 @@ class SwerveDriveKinematics
       wpi::array<SwerveModulePosition, NumModules> moduleDeltas) const;
 
   Twist2d ToTwist2d(
-      const wpi::array<SwerveModulePosition, NumModules>& start,
-      const wpi::array<SwerveModulePosition, NumModules>& end) const override {
+      const SwerveDriveWheelPositions<NumModules>& start,
+      const SwerveDriveWheelPositions<NumModules>& end) const override {
     auto result =
         wpi::array<SwerveModulePosition, NumModules>(wpi::empty_array);
     for (size_t i = 0; i < NumModules; i++) {
-      result[i] = {end[i].distance - start[i].distance, end[i].angle};
+      auto startModule = start.positions[i];
+      auto endModule = end.positions[i];
+      result[i] = {endModule.distance - startModule.distance, endModule.angle};
     }
     return ToTwist2d(result);
   }
@@ -286,18 +292,6 @@ class SwerveDriveKinematics
       units::meters_per_second_t attainableMaxModuleSpeed,
       units::meters_per_second_t attainableMaxRobotTranslationSpeed,
       units::radians_per_second_t attainableMaxRobotRotationSpeed);
-
-  wpi::array<SwerveModulePosition, NumModules> Interpolate(
-      const wpi::array<SwerveModulePosition, NumModules>& start,
-      const wpi::array<SwerveModulePosition, NumModules>& end,
-      double t) const override {
-    auto result =
-        wpi::array<SwerveModulePosition, NumModules>(wpi::empty_array);
-    for (size_t i = 0; i < NumModules; ++i) {
-      result[i] = start[i].Interpolate(end[i], t);
-    }
-    return {result};
-  }
 
  private:
   mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;

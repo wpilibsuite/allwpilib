@@ -47,8 +47,7 @@ class Robot : public frc::TimedRobot {
   // Outputs (what we can measure): [position], in radians.
   frc::LinearSystem<2, 1, 1> m_armPlant =
       frc::LinearSystemId::SingleJointedArmSystem(frc::DCMotor::NEO(2), kArmMOI,
-                                                  kArmGearing)
-          .Slice(0);
+                                                  kArmGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   frc::KalmanFilter<2, 1, 1> m_observer{
@@ -110,7 +109,7 @@ class Robot : public frc::TimedRobot {
     // Sets the target position of our arm. This is similar to setting the
     // setpoint of a PID controller.
     frc::TrapezoidProfile<units::radians>::State goal;
-    if (m_joystick.GetRightBumperButton()) {
+    if (m_joystick.GetRightBumper()) {
       // We pressed the bumper, so let's set our next reference
       goal = {kRaisedPosition, 0_rad_per_s};
     } else {

@@ -825,7 +825,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
         // Could be multiple data sets in the buffer. Handle each one.
         for (int i = 0; i < data_to_read; i += dataset_len) {
           // Timestamp is at buffer[i]
-          m_dt = (buffer[i] - previous_timestamp) / 1000000.0;
+          m_dt = ((double) buffer[i] - previous_timestamp) / 1000000.0;
 
           /*
            * System.out.println(((toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5],
@@ -1061,21 +1061,30 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @param angle A double in degrees (CCW positive)
    */
   public void setGyroAngle(IMUAxis axis, double angle) {
-    axis =
-        switch (axis) {
-          case kYaw -> m_yaw_axis;
-          case kPitch -> m_pitch_axis;
-          case kRoll -> m_roll_axis;
-          default -> axis;
-        };
+    switch (axis) {
+      case kYaw:
+        axis = m_yaw_axis;
+        break;
+      case kPitch:
+        axis = m_pitch_axis;
+        break;
+      case kRoll:
+        axis = m_roll_axis;
+        break;
+      default:
+    }
 
     switch (axis) {
-      case kX -> setGyroAngleX(angle);
-      case kY -> setGyroAngleY(angle);
-      case kZ -> setGyroAngleZ(angle);
-      default -> {
-        // NOP
-      }
+      case kX:
+        this.setGyroAngleX(angle);
+        break;
+      case kY:
+        this.setGyroAngleY(angle);
+        break;
+      case kZ:
+        this.setGyroAngleZ(angle);
+        break;
+      default:
     }
   }
 
@@ -1122,35 +1131,39 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle(IMUAxis axis) {
-    axis =
-        switch (axis) {
-          case kYaw -> m_yaw_axis;
-          case kPitch -> m_pitch_axis;
-          case kRoll -> m_roll_axis;
-          default -> axis;
-        };
+    switch (axis) {
+      case kYaw:
+        axis = m_yaw_axis;
+        break;
+      case kPitch:
+        axis = m_pitch_axis;
+        break;
+      case kRoll:
+        axis = m_roll_axis;
+        break;
+      default:
+    }
 
-    return switch (axis) {
-      case kX -> {
+    switch (axis) {
+      case kX:
         if (m_simGyroAngleX != null) {
-          yield m_simGyroAngleX.get();
+          return m_simGyroAngleX.get();
         }
-        yield m_integ_angle_x;
-      }
-      case kY -> {
+        return m_integ_angle_x;
+      case kY:
         if (m_simGyroAngleY != null) {
-          yield m_simGyroAngleY.get();
+          return m_simGyroAngleY.get();
         }
-        yield m_integ_angle_y;
-      }
-      case kZ -> {
+        return m_integ_angle_y;
+      case kZ:
         if (m_simGyroAngleZ != null) {
-          yield m_simGyroAngleZ.get();
+          return m_simGyroAngleZ.get();
         }
-        yield m_integ_angle_z;
-      }
-      default -> 0.0;
-    };
+        return m_integ_angle_z;
+      default:
+    }
+
+    return 0.0;
   }
 
   /**
@@ -1159,27 +1172,25 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The Yaw axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle() {
-    return switch (m_yaw_axis) {
-      case kX -> {
+    switch (m_yaw_axis) {
+      case kX:
         if (m_simGyroAngleX != null) {
-          yield m_simGyroAngleX.get();
+          return m_simGyroAngleX.get();
         }
-        yield m_integ_angle_x;
-      }
-      case kY -> {
+        return m_integ_angle_x;
+      case kY:
         if (m_simGyroAngleY != null) {
-          yield m_simGyroAngleY.get();
+          return m_simGyroAngleY.get();
         }
-        yield m_integ_angle_y;
-      }
-      case kZ -> {
+        return m_integ_angle_y;
+      case kZ:
         if (m_simGyroAngleZ != null) {
-          yield m_simGyroAngleZ.get();
+          return m_simGyroAngleZ.get();
         }
-        yield m_integ_angle_z;
-      }
-      default -> 0.0;
-    };
+        return m_integ_angle_z;
+      default:
+    }
+    return 0.0;
   }
 
   /**
@@ -1189,35 +1200,38 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return Axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate(IMUAxis axis) {
-    axis =
-        switch (axis) {
-          case kYaw -> m_yaw_axis;
-          case kPitch -> m_pitch_axis;
-          case kRoll -> m_roll_axis;
-          default -> axis;
-        };
+    switch (axis) {
+      case kYaw:
+        axis = m_yaw_axis;
+        break;
+      case kPitch:
+        axis = m_pitch_axis;
+        break;
+      case kRoll:
+        axis = m_roll_axis;
+        break;
+      default:
+    }
 
-    return switch (axis) {
-      case kX -> {
+    switch (axis) {
+      case kX:
         if (m_simGyroRateX != null) {
-          yield m_simGyroRateX.get();
+          return m_simGyroRateX.get();
         }
-        yield m_gyro_rate_x;
-      }
-      case kY -> {
+        return m_gyro_rate_x;
+      case kY:
         if (m_simGyroRateY != null) {
-          yield m_simGyroRateY.get();
+          return m_simGyroRateY.get();
         }
-        yield m_gyro_rate_y;
-      }
-      case kZ -> {
+        return m_gyro_rate_y;
+      case kZ:
         if (m_simGyroRateZ != null) {
-          yield m_simGyroRateZ.get();
+          return m_simGyroRateZ.get();
         }
-        yield m_gyro_rate_z;
-      }
-      default -> 0.0;
-    };
+        return m_gyro_rate_z;
+      default:
+    }
+    return 0.0;
   }
 
   /**
@@ -1226,27 +1240,25 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return Yaw axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate() {
-    return switch (m_yaw_axis) {
-      case kX -> {
+    switch (m_yaw_axis) {
+      case kX:
         if (m_simGyroRateX != null) {
-          yield m_simGyroRateX.get();
+          return m_simGyroRateX.get();
         }
-        yield m_gyro_rate_x;
-      }
-      case kY -> {
+        return m_gyro_rate_x;
+      case kY:
         if (m_simGyroRateY != null) {
-          yield m_simGyroRateY.get();
+          return m_simGyroRateY.get();
         }
-        yield m_gyro_rate_y;
-      }
-      case kZ -> {
+        return m_gyro_rate_y;
+      case kZ:
         if (m_simGyroRateZ != null) {
-          yield m_simGyroRateZ.get();
+          return m_simGyroRateZ.get();
         }
-        yield m_gyro_rate_z;
-      }
-      default -> 0.0;
-    };
+        return m_gyro_rate_z;
+      default:
+    }
+    return 0.0;
   }
 
   /**

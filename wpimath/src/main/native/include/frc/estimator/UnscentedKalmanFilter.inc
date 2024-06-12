@@ -5,7 +5,6 @@
 #pragma once
 
 #include <functional>
-#include <utility>
 
 #include <Eigen/Cholesky>
 
@@ -24,24 +23,16 @@ UnscentedKalmanFilter<States, Inputs, Outputs>::UnscentedKalmanFilter(
     std::function<OutputVector(const StateVector&, const InputVector&)> h,
     const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
     units::second_t dt)
-    : m_f(std::move(f)), m_h(std::move(h)) {
+    : m_f(f), m_h(h) {
   m_contQ = MakeCovMatrix(stateStdDevs);
   m_contR = MakeCovMatrix(measurementStdDevs);
-  m_meanFuncX = [](const Matrixd<States, 2 * States + 1>& sigmas,
-                   const Vectord<2 * States + 1>& Wm) -> StateVector {
-    return sigmas * Wm;
-  };
-  m_meanFuncY = [](const Matrixd<Outputs, 2 * States + 1>& sigmas,
-                   const Vectord<2 * States + 1>& Wc) -> OutputVector {
+  m_meanFuncX = [](auto sigmas, auto Wm) -> StateVector { return sigmas * Wm; };
+  m_meanFuncY = [](auto sigmas, auto Wc) -> OutputVector {
     return sigmas * Wc;
   };
-  m_residualFuncX = [](const StateVector& a,
-                       const StateVector& b) -> StateVector { return a - b; };
-  m_residualFuncY = [](const OutputVector& a,
-                       const OutputVector& b) -> OutputVector { return a - b; };
-  m_addFuncX = [](const StateVector& a, const StateVector& b) -> StateVector {
-    return a + b;
-  };
+  m_residualFuncX = [](auto a, auto b) -> StateVector { return a - b; };
+  m_residualFuncY = [](auto a, auto b) -> OutputVector { return a - b; };
+  m_addFuncX = [](auto a, auto b) -> StateVector { return a + b; };
   m_dt = dt;
 
   Reset();
@@ -64,13 +55,13 @@ UnscentedKalmanFilter<States, Inputs, Outputs>::UnscentedKalmanFilter(
         residualFuncY,
     std::function<StateVector(const StateVector&, const StateVector&)> addFuncX,
     units::second_t dt)
-    : m_f(std::move(f)),
-      m_h(std::move(h)),
-      m_meanFuncX(std::move(meanFuncX)),
-      m_meanFuncY(std::move(meanFuncY)),
-      m_residualFuncX(std::move(residualFuncX)),
-      m_residualFuncY(std::move(residualFuncY)),
-      m_addFuncX(std::move(addFuncX)) {
+    : m_f(f),
+      m_h(h),
+      m_meanFuncX(meanFuncX),
+      m_meanFuncY(meanFuncY),
+      m_residualFuncX(residualFuncX),
+      m_residualFuncY(residualFuncY),
+      m_addFuncX(addFuncX) {
   m_contQ = MakeCovMatrix(stateStdDevs);
   m_contR = MakeCovMatrix(measurementStdDevs);
   m_dt = dt;
@@ -112,23 +103,13 @@ void UnscentedKalmanFilter<States, Inputs, Outputs>::Correct(
     const InputVector& u, const Vectord<Rows>& y,
     std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
     const Matrixd<Rows, Rows>& R) {
-  auto meanFuncY = [](const Matrixd<Outputs, 2 * States + 1>& sigmas,
-                      const Vectord<2 * States + 1>& Wc) -> Vectord<Rows> {
+  auto meanFuncY = [](auto sigmas, auto Wc) -> Vectord<Rows> {
     return sigmas * Wc;
   };
-  auto residualFuncX = [](const StateVector& a,
-                          const StateVector& b) -> StateVector {
-    return a - b;
-  };
-  auto residualFuncY = [](const Vectord<Rows>& a,
-                          const Vectord<Rows>& b) -> Vectord<Rows> {
-    return a - b;
-  };
-  auto addFuncX = [](const StateVector& a,
-                     const StateVector& b) -> StateVector { return a + b; };
-  Correct<Rows>(u, y, std::move(h), R, std::move(meanFuncY),
-                std::move(residualFuncY), std::move(residualFuncX),
-                std::move(addFuncX));
+  auto residualFuncX = [](auto a, auto b) -> StateVector { return a - b; };
+  auto residualFuncY = [](auto a, auto b) -> Vectord<Rows> { return a - b; };
+  auto addFuncX = [](auto a, auto b) -> StateVector { return a + b; };
+  Correct<Rows>(u, y, h, R, meanFuncY, residualFuncY, residualFuncX, addFuncX);
 }
 
 template <int States, int Inputs, int Outputs>

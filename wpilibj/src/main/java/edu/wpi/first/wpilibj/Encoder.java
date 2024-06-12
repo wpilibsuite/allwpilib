@@ -562,11 +562,16 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * @return decoding scale factor
    */
   public double getDecodingScaleFactor() {
-    return switch (m_encodingType) {
-      case k1X -> 1.0;
-      case k2X -> 0.5;
-      case k4X -> 0.25;
-    };
+    switch (m_encodingType) {
+      case k1X:
+        return 1.0;
+      case k2X:
+        return 0.5;
+      case k4X:
+        return 0.25;
+      default:
+        return 0.0;
+    }
   }
 
   @Override

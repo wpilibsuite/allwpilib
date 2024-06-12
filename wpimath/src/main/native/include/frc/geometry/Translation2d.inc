@@ -6,7 +6,6 @@
 
 #include "frc/geometry/Translation2d.h"
 #include "units/length.h"
-#include "units/math.h"
 
 namespace frc {
 
@@ -30,14 +29,6 @@ constexpr Translation2d Translation2d::RotateBy(const Rotation2d& other) const {
           m_x * other.Sin() + m_y * other.Cos()};
 }
 
-constexpr Translation2d Translation2d::RotateAround(
-    const Translation2d& other, const Rotation2d& rot) const {
-  return {
-      (m_x - other.X()) * rot.Cos() - (m_y - other.Y()) * rot.Sin() + other.X(),
-      (m_x - other.X()) * rot.Sin() + (m_y - other.Y()) * rot.Cos() +
-          other.Y()};
-}
-
 constexpr Translation2d Translation2d::operator+(
     const Translation2d& other) const {
   return {X() + other.X(), Y() + other.Y()};
@@ -58,11 +49,6 @@ constexpr Translation2d Translation2d::operator*(double scalar) const {
 
 constexpr Translation2d Translation2d::operator/(double scalar) const {
   return operator*(1.0 / scalar);
-}
-
-constexpr bool Translation2d::operator==(const Translation2d& other) const {
-  return units::math::abs(m_x - other.m_x) < 1E-9_m &&
-         units::math::abs(m_y - other.m_y) < 1E-9_m;
 }
 
 }  // namespace frc

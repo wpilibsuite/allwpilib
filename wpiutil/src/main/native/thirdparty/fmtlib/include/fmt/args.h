@@ -22,9 +22,8 @@ template <typename T> struct is_reference_wrapper : std::false_type {};
 template <typename T>
 struct is_reference_wrapper<std::reference_wrapper<T>> : std::true_type {};
 
-template <typename T> auto unwrap(const T& v) -> const T& { return v; }
-template <typename T>
-auto unwrap(const std::reference_wrapper<T>& v) -> const T& {
+template <typename T> const T& unwrap(const T& v) { return v; }
+template <typename T> const T& unwrap(const std::reference_wrapper<T>& v) {
   return static_cast<const T&>(v);
 }
 
@@ -51,7 +50,7 @@ class dynamic_arg_list {
   std::unique_ptr<node<>> head_;
 
  public:
-  template <typename T, typename Arg> auto push(const Arg& arg) -> const T& {
+  template <typename T, typename Arg> const T& push(const Arg& arg) {
     auto new_node = std::unique_ptr<typed_node<T>>(new typed_node<T>(arg));
     auto& value = new_node->value;
     new_node->next = std::move(head_);
@@ -111,14 +110,14 @@ class dynamic_format_arg_store
 
   friend class basic_format_args<Context>;
 
-  auto get_types() const -> unsigned long long {
+  unsigned long long get_types() const {
     return detail::is_unpacked_bit | data_.size() |
            (named_info_.empty()
                 ? 0ULL
                 : static_cast<unsigned long long>(detail::has_named_args_bit));
   }
 
-  auto data() const -> const basic_format_arg<Context>* {
+  const basic_format_arg<Context>* data() const {
     return named_info_.empty() ? data_.data() : data_.data() + 1;
   }
 

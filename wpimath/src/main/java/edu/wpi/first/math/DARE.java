@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math;
 
-import edu.wpi.first.math.jni.DAREJNI;
 import org.ejml.simple.SimpleMatrix;
 
 /** DARE solver utility functions. */
@@ -44,7 +43,7 @@ public final class DARE {
       Matrix<States, States> Q,
       Matrix<Inputs, Inputs> R) {
     var S = new Matrix<States, States>(new SimpleMatrix(A.getNumRows(), A.getNumCols()));
-    DAREJNI.dareDetailABQR(
+    WPIMathJNI.dareDetailABQR(
         A.getStorage().getDDRM().getData(),
         B.getStorage().getDDRM().getData(),
         Q.getStorage().getDDRM().getData(),
@@ -122,7 +121,7 @@ public final class DARE {
       Matrix<Inputs, Inputs> R,
       Matrix<States, Inputs> N) {
     var S = new Matrix<States, States>(new SimpleMatrix(A.getNumRows(), A.getNumCols()));
-    DAREJNI.dareDetailABQRN(
+    WPIMathJNI.dareDetailABQRN(
         A.getStorage().getDDRM().getData(),
         B.getStorage().getDDRM().getData(),
         Q.getStorage().getDDRM().getData(),
@@ -157,7 +156,7 @@ public final class DARE {
       Matrix<States, States> Q,
       Matrix<Inputs, Inputs> R) {
     var S = new Matrix<States, States>(new SimpleMatrix(A.getNumRows(), A.getNumCols()));
-    DAREJNI.dareABQR(
+    WPIMathJNI.dareABQR(
         A.getStorage().getDDRM().getData(),
         B.getStorage().getDDRM().getData(),
         Q.getStorage().getDDRM().getData(),
@@ -227,7 +226,7 @@ public final class DARE {
       Matrix<Inputs, Inputs> R,
       Matrix<States, Inputs> N) {
     var S = new Matrix<States, States>(new SimpleMatrix(A.getNumRows(), A.getNumCols()));
-    DAREJNI.dareABQRN(
+    WPIMathJNI.dareABQRN(
         A.getStorage().getDDRM().getData(),
         B.getStorage().getDDRM().getData(),
         Q.getStorage().getDDRM().getData(),

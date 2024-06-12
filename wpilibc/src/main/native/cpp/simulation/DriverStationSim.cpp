@@ -235,8 +235,7 @@ void DriverStationSim::SetJoystickType(int stick, int type) {
 }
 
 void DriverStationSim::SetJoystickName(int stick, std::string_view name) {
-  auto str = wpi::make_string(name);
-  HALSIM_SetJoystickName(stick, &str);
+  HALSIM_SetJoystickName(stick, name.data(), name.size());
 }
 
 void DriverStationSim::SetJoystickAxisType(int stick, int axis, int type) {
@@ -244,13 +243,11 @@ void DriverStationSim::SetJoystickAxisType(int stick, int axis, int type) {
 }
 
 void DriverStationSim::SetGameSpecificMessage(std::string_view message) {
-  auto str = wpi::make_string(message);
-  HALSIM_SetGameSpecificMessage(&str);
+  HALSIM_SetGameSpecificMessage(message.data(), message.size());
 }
 
 void DriverStationSim::SetEventName(std::string_view name) {
-  auto str = wpi::make_string(name);
-  HALSIM_SetEventName(&str);
+  HALSIM_SetEventName(name.data(), name.size());
 }
 
 void DriverStationSim::SetMatchType(DriverStation::MatchType type) {

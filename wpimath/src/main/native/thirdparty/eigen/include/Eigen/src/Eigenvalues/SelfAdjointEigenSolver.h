@@ -85,7 +85,7 @@ class SelfAdjointEigenSolver {
   enum {
     Size = MatrixType::RowsAtCompileTime,
     ColsAtCompileTime = MatrixType::ColsAtCompileTime,
-    Options = internal::traits<MatrixType>::Options,
+    Options = MatrixType::Options,
     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime
   };
 

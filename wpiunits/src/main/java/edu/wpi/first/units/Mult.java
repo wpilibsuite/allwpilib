@@ -26,28 +26,18 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
    * Creates a new product unit. Consider using {@link #combine} instead of manually calling this
    * constructor.
    *
+   * @param baseType the base type representing the unit product
    * @param a the first unit of the product
    * @param b the second unit of the product
    */
-  protected Mult(A a, B b) {
+  protected Mult(Class<? extends Mult<A, B>> baseType, A a, B b) {
     super(
-        a.isBaseUnit() && b.isBaseUnit() ? null : combine(a.getBaseUnit(), b.getBaseUnit()),
+        baseType,
         a.toBaseUnits(1) * b.toBaseUnits(1),
         a.name() + "-" + b.name(),
         a.symbol() + "*" + b.symbol());
     m_unitA = a;
     m_unitB = b;
-  }
-
-  Mult(
-      Mult<A, B> baseUnit,
-      UnaryFunction toBaseConverter,
-      UnaryFunction fromBaseConverter,
-      String name,
-      String symbol) {
-    super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
-    m_unitA = baseUnit.unitA();
-    m_unitB = baseUnit.unitB();
   }
 
   /**
@@ -66,14 +56,14 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
    * @param b the second unit
    * @return the combined unit
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public static <A extends Unit<A>, B extends Unit<B>> Mult<A, B> combine(A a, B b) {
-    final long key = ((long) a.hashCode()) << 32L | (b.hashCode() & 0xFFFFFFFFL);
+    final long key = ((long) a.hashCode()) << 32L | (((long) b.hashCode()) & 0xFFFFFFFFL);
     if (cache.containsKey(key)) {
       return cache.get(key);
     }
 
-    var mult = new Mult<A, B>(a, b);
+    var mult = new Mult<A, B>((Class) Mult.class, a, b);
     cache.put(key, mult);
     return mult;
   }

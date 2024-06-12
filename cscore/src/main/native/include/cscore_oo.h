@@ -692,10 +692,8 @@ class HttpCamera : public VideoCamera {
 
 /**
  * A source that represents an Axis IP camera.
- *
- * @deprecated Use HttpCamera instead.
  */
-class [[deprecated("Use HttpCamera instead.")]] AxisCamera : public HttpCamera {
+class AxisCamera : public HttpCamera {
   static std::string HostToUrl(std::string_view host);
   static std::vector<std::string> HostToUrl(std::span<const std::string> hosts);
   template <typename T>

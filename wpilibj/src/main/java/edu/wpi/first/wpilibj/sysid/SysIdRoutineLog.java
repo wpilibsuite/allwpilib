@@ -72,7 +72,7 @@ public class SysIdRoutineLog {
   }
 
   /** Logs data from a single motor during a SysIdRoutine. */
-  public final class MotorLog {
+  public class MotorLog {
     private final String m_motorName;
 
     /**

@@ -26,8 +26,6 @@ class VariableBlock {
 
   /**
    * Assigns a VariableBlock to the block.
-   *
-   * @param values VariableBlock of values.
    */
   VariableBlock<Mat>& operator=(const VariableBlock<Mat>& values) {
     if (this == &values) {
@@ -58,8 +56,6 @@ class VariableBlock {
 
   /**
    * Assigns a VariableBlock to the block.
-   *
-   * @param values VariableBlock of values.
    */
   VariableBlock<Mat>& operator=(VariableBlock<Mat>&& values) {
     if (this == &values) {
@@ -128,8 +124,6 @@ class VariableBlock {
    * Assigns a double to the block.
    *
    * This only works for blocks with one row and one column.
-   *
-   * @param value Value to assign.
    */
   VariableBlock<Mat>& SetValue(double value) {
     Assert(Rows() == 1 && Cols() == 1);
@@ -141,8 +135,6 @@ class VariableBlock {
 
   /**
    * Assigns an Eigen matrix to the block.
-   *
-   * @param values Eigen matrix of values to assign.
    */
   template <typename Derived>
   VariableBlock<Mat>& operator=(const Eigen::MatrixBase<Derived>& values) {
@@ -160,8 +152,6 @@ class VariableBlock {
 
   /**
    * Sets block's internal values.
-   *
-   * @param values Eigen matrix of values.
    */
   template <typename Derived>
     requires std::same_as<typename Derived::Scalar, double>
@@ -180,8 +170,6 @@ class VariableBlock {
 
   /**
    * Assigns a VariableMatrix to the block.
-   *
-   * @param values VariableMatrix of values.
    */
   VariableBlock<Mat>& operator=(const Mat& values) {
     Assert(Rows() == values.Rows());
@@ -197,8 +185,6 @@ class VariableBlock {
 
   /**
    * Assigns a VariableMatrix to the block.
-   *
-   * @param values VariableMatrix of values.
    */
   VariableBlock<Mat>& operator=(Mat&& values) {
     Assert(Rows() == values.Rows());

@@ -257,9 +257,8 @@ bool InputExpr(const char* label, V* v, const char* format,
 #endif
   }
 
-  ImGui::InputText(label, inputBuffer, kBufferSize, flags);
+  bool changed = ImGui::InputText(label, inputBuffer, kBufferSize, flags);
   bool active = ImGui::IsItemActive();
-  bool changed = ImGui::IsItemDeactivatedAfterEdit();
 
   if (active || changed) {
     InputExprState& state = exprStates[id];

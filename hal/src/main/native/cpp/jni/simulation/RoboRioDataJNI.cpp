@@ -937,11 +937,9 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getSerialNumber
   (JNIEnv* env, jclass)
 {
-  WPI_String str;
-  HALSIM_GetRoboRioSerialNumber(&str);
-  auto jstr = MakeJString(env, wpi::to_string_view(&str));
-  WPI_FreeString(&str);
-  return jstr;
+  char serialNum[9];
+  size_t len = HALSIM_GetRoboRioSerialNumber(serialNum, sizeof(serialNum));
+  return MakeJString(env, std::string_view(serialNum, len));
 }
 
 /*
@@ -954,8 +952,8 @@ Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setSerialNumber
   (JNIEnv* env, jclass, jstring serialNumber)
 {
   JStringRef serialNumberJString{env, serialNumber};
-  auto str = wpi::make_string(serialNumberJString);
-  HALSIM_SetRoboRioSerialNumber(&str);
+  HALSIM_SetRoboRioSerialNumber(serialNumberJString.c_str(),
+                                serialNumberJString.size());
 }
 
 /*
@@ -967,11 +965,9 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getComments
   (JNIEnv* env, jclass)
 {
-  WPI_String str;
-  HALSIM_GetRoboRioComments(&str);
-  auto jstr = MakeJString(env, wpi::to_string_view(&str));
-  WPI_FreeString(&str);
-  return jstr;
+  char comments[65];
+  size_t len = HALSIM_GetRoboRioComments(comments, sizeof(comments));
+  return MakeJString(env, std::string_view(comments, len));
 }
 
 /*
@@ -984,8 +980,7 @@ Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_setComments
   (JNIEnv* env, jclass, jstring comments)
 {
   JStringRef commentsJString{env, comments};
-  auto str = wpi::make_string(commentsJString);
-  HALSIM_SetRoboRioComments(&str);
+  HALSIM_SetRoboRioComments(commentsJString.c_str(), commentsJString.size());
 }
 
 /*

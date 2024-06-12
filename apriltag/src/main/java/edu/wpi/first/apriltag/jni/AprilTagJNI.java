@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class AprilTagJNI {
   static boolean libraryLoaded = false;
 
+  static RuntimeLoader<AprilTagJNI> loader = null;
+
   /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
@@ -46,7 +48,10 @@ public class AprilTagJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        RuntimeLoader.loadLibrary("apriltagjni");
+        loader =
+            new RuntimeLoader<>(
+                "apriltagjni", RuntimeLoader.getDefaultExtractionRoot(), AprilTagJNI.class);
+        loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);

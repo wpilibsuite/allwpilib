@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Test;
 class VelocityTest {
   @Test
   void testBaseUnit() {
-    assertTrue(MetersPerSecond.equivalent(MetersPerSecond));
-    assertTrue(Meters.per(Second).equivalent(MetersPerSecond));
+    assertTrue(MetersPerSecond.equivalent(BaseUnits.Velocity));
+    assertTrue(Meters.per(Second).equivalent(BaseUnits.Velocity));
   }
 
   @Test

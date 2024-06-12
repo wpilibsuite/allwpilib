@@ -55,8 +55,12 @@ public class AprilTagPoseEstimator {
 
     @Override
     public boolean equals(Object obj) {
-      return obj instanceof Config other
-          && tagSize == other.tagSize
+      if (!(obj instanceof Config)) {
+        return false;
+      }
+
+      Config other = (Config) obj;
+      return tagSize == other.tagSize
           && fx == other.fx
           && fy == other.fy
           && cx == other.cx

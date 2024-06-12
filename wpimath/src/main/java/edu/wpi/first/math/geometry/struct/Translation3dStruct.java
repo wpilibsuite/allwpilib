@@ -43,9 +43,4 @@ public class Translation3dStruct implements Struct<Translation3d> {
     bb.putDouble(value.getY());
     bb.putDouble(value.getZ());
   }
-
-  @Override
-  public boolean isImmutable() {
-    return true;
-  }
 }

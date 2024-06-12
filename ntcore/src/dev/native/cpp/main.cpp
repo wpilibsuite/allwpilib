@@ -13,9 +13,7 @@
 #include <thread>
 
 #include <fmt/format.h>
-#include <fmt/ranges.h>
 #include <wpi/Synchronization.h>
-#include <wpi/print.h>
 #include <wpi/timestamp.h>
 
 #include "ntcore.h"
@@ -45,7 +43,7 @@ int main(int argc, char* argv[]) {
 
   nt::SetEntryValue(myValue, nt::Value::MakeString("Hello World"));
 
-  wpi::print("{}\n", nt::GetEntryValue(myValue).GetString());
+  fmt::print("{}\n", nt::GetEntryValue(myValue).GetString());
 }
 
 void PrintTimes(std::vector<int64_t>& times) {
@@ -59,9 +57,9 @@ void PrintTimes(std::vector<int64_t>& times) {
       std::inner_product(times.begin(), times.end(), times.begin(), 0);
   double stdev = std::sqrt(sq_sum / times.size() - mean * mean);
 
-  wpi::print("min: {} max: {}, mean: {}, stdev: {}\n", min, max, mean, stdev);
-  wpi::print("min 10: {}\n", fmt::join(times.begin(), times.begin() + 10, ","));
-  wpi::print("max 10: {}\n", fmt::join(times.end() - 10, times.end(), ","));
+  fmt::print("min: {} max: {}, mean: {}, stdev: {}\n", min, max, mean, stdev);
+  fmt::print("min 10: {}\n", fmt::join(times.begin(), times.begin() + 10, ","));
+  fmt::print("max 10: {}\n", fmt::join(times.end() - 10, times.end(), ","));
 }
 
 // benchmark
@@ -117,11 +115,11 @@ void bench() {
   }
   auto stop = std::chrono::high_resolution_clock::now();
 
-  wpi::print("total time: {}us\n",
+  fmt::print("total time: {}us\n",
              std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
                  .count());
   PrintTimes(times);
-  wpi::print("-- Flush --\n");
+  fmt::print("-- Flush --\n");
   PrintTimes(flushTimes);
 }
 
@@ -190,11 +188,11 @@ void bench2() {
   }
   auto stop = std::chrono::high_resolution_clock::now();
 
-  wpi::print("total time: {}us\n",
+  fmt::print("total time: {}us\n",
              std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
                  .count());
   PrintTimes(times);
-  wpi::print("-- Flush --\n");
+  fmt::print("-- Flush --\n");
   PrintTimes(flushTimes);
 }
 

@@ -42,13 +42,18 @@ public class VideoProperty {
    * @return The kind
    */
   public static Kind getKindFromInt(int kind) {
-    return switch (kind) {
-      case 1 -> Kind.kBoolean;
-      case 2 -> Kind.kInteger;
-      case 4 -> Kind.kString;
-      case 8 -> Kind.kEnum;
-      default -> Kind.kNone;
-    };
+    switch (kind) {
+      case 1:
+        return Kind.kBoolean;
+      case 2:
+        return Kind.kInteger;
+      case 4:
+        return Kind.kString;
+      case 8:
+        return Kind.kEnum;
+      default:
+        return Kind.kNone;
+    }
   }
 
   /**
@@ -212,5 +217,5 @@ public class VideoProperty {
   }
 
   int m_handle;
-  private final Kind m_kind;
+  private Kind m_kind;
 }

@@ -4,9 +4,9 @@
 
 #include "HALSimWeb.h"
 
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/fs.h>
-#include <wpi/print.h>
 #include <wpinet/UrlParser.h>
 #include <wpinet/WebSocketServer.h>
 #include <wpinet/raw_uv_ostream.h>
@@ -25,7 +25,7 @@ HALSimWeb::HALSimWeb(wpi::uv::Loop& loop, ProviderContainer& providers,
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
-    wpi::print(stderr, "HALSim WS Server libuv ERROR: {}\n", err.str());
+    fmt::print(stderr, "HALSim WS Server libuv ERROR: {}\n", err.str());
   });
 
   m_server = uv::Tcp::Create(m_loop);
@@ -70,7 +70,7 @@ bool HALSimWeb::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      wpi::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
+      fmt::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
       return false;
     }
   } else {
@@ -114,17 +114,17 @@ void HALSimWeb::Start() {
 
   // start listening for incoming connections
   m_server->Listen();
-  wpi::print("Listening at http://localhost:{}\n", m_port);
-  wpi::print("WebSocket URI: {}\n", m_uri);
+  fmt::print("Listening at http://localhost:{}\n", m_port);
+  fmt::print("WebSocket URI: {}\n", m_uri);
 
   // Print any filters we are using
   if (m_useMsgFiltering) {
-    wpi::print("WS Message Filters:");
+    fmt::print("WS Message Filters:");
     for (auto filter : m_msgFilters.keys()) {
-      wpi::print("* \"{}\"\n", filter);
+      fmt::print("* \"{}\"\n", filter);
     }
   } else {
-    wpi::print("No WS Message Filters specified");
+    fmt::print("No WS Message Filters specified");
   }
 }
 
@@ -180,7 +180,7 @@ void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
       provider->OnNetValueChanged(msg.at("data"));
     }
   } catch (wpi::json::exception& e) {
-    wpi::print(stderr, "Error with incoming message: {}\n", e.what());
+    fmt::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }
 
