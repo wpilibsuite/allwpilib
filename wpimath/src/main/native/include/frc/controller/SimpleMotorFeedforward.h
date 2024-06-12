@@ -37,34 +37,11 @@ class SimpleMotorFeedforward {
    * @param kA The acceleration gain, in volt seconds² per distance.
    * @param period The period in seconds.
    */
-  constexpr SimpleMotorFeedforward(
+  SimpleMotorFeedforward(
       units::volt_t kS, units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
-      units::second_t periodSeconds = units::second_t(0.020))
-      : kS(kS), kV(kV), kA(kA), r{0.0}, nextR{0.0} {
-    if (kV.value() < 0) {
-      wpi::math::MathSharedStore::ReportError(
-          "kV must be a non-negative number, got {}!", kV.value());
-      kV = units::unit_t<kv_unit>{0};
-      wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
-    }
-    if (kA.value() < 0) {
-      wpi::math::MathSharedStore::ReportError(
-          "kA must be a non-negative number, got {}!", kA.value());
-      kA = units::unit_t<ka_unit>{0};
-      wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
-    }
-    if (periodSeconds.value() < 0) {
-      wpi::math::MathSharedStore::ReportError(
-          "period must be a positive number, got {}!", periodSeconds.value());
-      periodSeconds = units::second_t{0.020};
-      wpi::math::MathSharedStore::ReportWarning("period defaulted to 0.020;");
-    }
-    if (kA.value() != 0.0) {
-      plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
-      feedforward = LinearPlantInversionFeedforward<1, 1>{plant, periodSeconds};
-    }
-  }
+      units::second_t periodSeconds = units::second_t(0.020));
+
 
   /**
    * Calculates the feedforward from the gains and setpoints.
@@ -73,7 +50,6 @@ class SimpleMotorFeedforward {
    * @param acceleration The acceleration setpoint, in distance per second².
    * @return The computed feedforward, in volts.
    */
-  [[deprectaed("for removal in 2025 use the Calculate method that takes current and next velocities")]]
   constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
                                     units::unit_t<Acceleration> acceleration =
                                         units::unit_t<Acceleration>(0)) const {
@@ -88,16 +64,13 @@ class SimpleMotorFeedforward {
    * @param nextVelocity    The next velocity setpoint, in distance per second.
    * @return The computed feedforward, in volts.
    */
-  template <typename StateVector>
   units::volt_t Calculate(units::unit_t<Velocity> currentVelocity,
                           units::unit_t<Velocity> nextVelocity) const {
     if (kA.value() == 0.0) {
       return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
     } else {
-      r = {currentVelocity.value()};
-      nextR = {nextVelocity.value()};
       return kS * wpi::sgn(currentVelocity.value()) +
-            units::volt_t{feedforward.Calculate(r, nextR)(0)};
+            units::volt_t{feedforward.Calculate({currentVelocity.value()}, {nextVelocity.value()})(0)};
     }
 
   }
@@ -188,10 +161,6 @@ class SimpleMotorFeedforward {
   /** The feedforward. */
   const frc::LinearPlantInversionFeedforward<1, 1> feedforward;
 
-  /** The current reference. */
-  frc::Vectord<1> r;
 
-  /** The next reference. */
-  frc::Vectord<1> nextR;
 };
 }  // namespace frc

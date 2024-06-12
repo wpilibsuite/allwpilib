@@ -8,7 +8,6 @@ import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
@@ -24,9 +23,6 @@ public class SimpleMotorFeedforward {
 
   /** The acceleration gain. */
   public final double ka;
-
-  /** The plant. */
-  private final LinearSystem<N1, N1, N1> plant;
 
   /** The feedforward. */
   private final LinearPlantInversionFeedforward<N1, N1, N1> feedforward;
@@ -64,13 +60,12 @@ public class SimpleMotorFeedforward {
           "period must be a positive number, got " + periodSeconds + "!");
     }
     if (ka != 0.0) {
-      this.plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
+      var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
       this.feedforward = new LinearPlantInversionFeedforward<>(plant, periodSeconds);
 
       this.r = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0);
       this.nextR = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0);
     } else {
-      this.plant = null;
       this.feedforward = null;
       this.r = null;
       this.nextR = null;
