@@ -30,7 +30,7 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
  * results slightly as there may be one more or less loop iteration between the two different
  * techniques.
  * 
- * (none, run, runOnce, startEnd, runEnd, and defer within a subsystem automatically include
+ * (run, runOnce, startEnd, runEnd, and defer within a subsystem automatically include
  * the subsystem as a requirements so you won't forget it.)
  */
 

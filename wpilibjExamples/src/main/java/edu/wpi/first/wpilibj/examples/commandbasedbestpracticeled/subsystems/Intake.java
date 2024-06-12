@@ -11,7 +11,6 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
-import static edu.wpi.first.wpilibj2.command.Commands.none;
 
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDView;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -42,7 +41,9 @@ public class Intake extends SubsystemBase {
           .ignoringDisable(true)                            //  robotSignals subsystem
           .withName("MainGamePieceAcquiredSignal"),
 
-          none() // this command locks the Intake subsystem for the group since there is no asProxy
+          runOnce(() -> {}) // for an example this command locks the Intake subsystem for the group
+                            // since there is no asProxy
+                            // the none() command is similar but has no requirements
       );
   }
 
