@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 class ExponentialProfileTest {
   private static final double kDt = 0.01;
   private static final SimpleMotorFeedforward feedforward =
-      new SimpleMotorFeedforward(0, 2.5629, 0.43277);
+      new SimpleMotorFeedforward(0, 2.5629, 0.43277, 0.01);
   private static final ExponentialProfile.Constraints constraints =
       ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
 
