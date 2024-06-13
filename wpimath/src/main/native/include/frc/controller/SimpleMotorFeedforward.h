@@ -36,9 +36,10 @@ class SimpleMotorFeedforward {
    * @param kA The acceleration gain, in volt seconds² per distance.
    * @param dt The period in seconds.
    */
-  SimpleMotorFeedforward(units::volt_t kS, units::unit_t<kv_unit> kV,
-                         units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
-                         units::second_t dt = 20_ms)
+  constexpr SimpleMotorFeedforward(
+      units::volt_t kS, units::unit_t<kv_unit> kV,
+      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
+      units::second_t dt = 20_ms)
       : kS(kS),
         kV([&] {
           if (kV.value() < 0) {
