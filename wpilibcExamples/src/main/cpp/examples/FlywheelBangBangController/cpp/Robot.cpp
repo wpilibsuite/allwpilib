@@ -11,7 +11,6 @@
 #include <frc/simulation/EncoderSim.h>
 #include <frc/simulation/FlywheelSim.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/LinearSystem.h>
 #include <units/moment_of_inertia.h>
 
 /**
@@ -37,7 +36,9 @@ class Robot : public frc::TimedRobot {
     // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
     m_flywheelMotor.SetVoltage(bangOutput +
-                               0.9 * m_feedforward.Calculate(setpoint));
+                               0.9 * m_feedforward.Calculate(
+                                units::radians_per_second_t{m_encoder.GetRate()},
+                                setpoint));
   }
 
   void RobotInit() override {
