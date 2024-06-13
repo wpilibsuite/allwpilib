@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.flywheelbangbangcontroller;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -101,7 +102,7 @@ public class Robot extends TimedRobot {
     // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
     m_flywheelMotor.setVoltage(
-        bangOutput + 0.9 * m_feedforward.calculate(m_prevSpeedSetpoint, m_speedSetpoint));
+        bangOutput + 0.9 * m_feedforward.calculate(m_prevSpeedSetpoint, m_speedSetpoint).in(Volts));
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */

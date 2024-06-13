@@ -84,11 +84,11 @@ void RamseteCommand::Execute() {
       m_controller.Calculate(m_pose(), m_trajectory.Sample(curTime)));
 
   if (m_usePID) {
-    auto leftFeedforward = m_feedforward.Calculate(
-        m_prevSpeeds.left, targetWheelSpeeds.left);
+    auto leftFeedforward =
+        m_feedforward.Calculate(m_prevSpeeds.left, targetWheelSpeeds.left);
 
-    auto rightFeedforward = m_feedforward.Calculate(
-        m_prevSpeeds.right, targetWheelSpeeds.right);
+    auto rightFeedforward =
+        m_feedforward.Calculate(m_prevSpeeds.right, targetWheelSpeeds.right);
 
     auto leftOutput =
         units::volt_t{m_leftController->Calculate(

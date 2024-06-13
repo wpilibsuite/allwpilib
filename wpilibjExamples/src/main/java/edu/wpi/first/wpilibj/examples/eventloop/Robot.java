@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.eventloop;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -76,7 +77,7 @@ public class Robot extends TimedRobot {
           m_speedSetpoint.mut_setMagnitude(SHOT_VELOCITY);
           m_shooter.setVoltage(
               m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
-                  + m_ff.calculate(m_prevSpeedSetpoint, m_speedSetpoint));
+                  + m_ff.calculate(m_prevSpeedSetpoint, m_speedSetpoint).in(Volts));
         });
 
     // if not, stop

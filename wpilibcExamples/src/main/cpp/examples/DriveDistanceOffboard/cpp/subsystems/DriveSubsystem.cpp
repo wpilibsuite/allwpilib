@@ -34,16 +34,18 @@ void DriveSubsystem::Periodic() {
 void DriveSubsystem::SetDriveStates(
     frc::TrapezoidProfile<units::meters>::State left,
     frc::TrapezoidProfile<units::meters>::State right) {
-  m_leftLeader.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                           left.position.value(),
-                           m_feedforward.Calculate(
-                              units::meters_per_second_t{m_leftLeader.GetEncoderRate()}, 
-                              left.velocity) / 12_V);
-  m_rightLeader.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                            right.position.value(),
-                            m_feedforward.Calculate(
-                              units::meters_per_second_t{m_rightLeader.GetEncoderRate()},
-                              right.velocity) / 12_V);
+  m_leftLeader.SetSetpoint(
+      ExampleSmartMotorController::PIDMode::kPosition, left.position.value(),
+      m_feedforward.Calculate(
+          units::meters_per_second_t{m_leftLeader.GetEncoderRate()},
+          left.velocity) /
+          12_V);
+  m_rightLeader.SetSetpoint(
+      ExampleSmartMotorController::PIDMode::kPosition, right.position.value(),
+      m_feedforward.Calculate(
+          units::meters_per_second_t{m_rightLeader.GetEncoderRate()},
+          right.velocity) /
+          12_V);
 }
 
 void DriveSubsystem::ArcadeDrive(double fwd, double rot) {

@@ -391,7 +391,9 @@ public class MecanumControllerCommand extends Command {
           m_feedforward.calculate(m_prevRearLeftSpeedSetpoint, m_rearLeftSpeedSetpoint).in(Volts);
 
       final double frontRightFeedforward =
-          m_feedforward.calculate(m_prevFrontRightSpeedSetpoint, m_frontRightSpeedSetpoint).in(Volts);
+          m_feedforward
+              .calculate(m_prevFrontRightSpeedSetpoint, m_frontRightSpeedSetpoint)
+              .in(Volts);
 
       final double rearRightFeedforward =
           m_feedforward.calculate(m_prevRearRightSpeedSetpoint, m_rearRightSpeedSetpoint).in(Volts);

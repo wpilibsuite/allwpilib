@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.mecanumbot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -126,13 +127,13 @@ public class Drivetrain {
     m_rearLeftSpeedSetpoint.mut_setMagnitude(speeds.rearLeftMetersPerSecond);
     m_rearRightSpeedSetpoint.mut_setMagnitude(speeds.rearRightMetersPerSecond);
     final double frontLeftFeedforward =
-        m_feedforward.calculate(m_prevFrontLeftSpeedSetpoint, m_frontLeftSpeedSetpoint);
+        m_feedforward.calculate(m_prevFrontLeftSpeedSetpoint, m_frontLeftSpeedSetpoint).in(Volts);
     final double frontRightFeedforward =
-        m_feedforward.calculate(m_prevFrontRightSpeedSetpoint, m_frontRightSpeedSetpoint);
+        m_feedforward.calculate(m_prevFrontRightSpeedSetpoint, m_frontRightSpeedSetpoint).in(Volts);
     final double backLeftFeedforward =
-        m_feedforward.calculate(m_prevRearLeftSpeedSetpoint, m_rearLeftSpeedSetpoint);
+        m_feedforward.calculate(m_prevRearLeftSpeedSetpoint, m_rearLeftSpeedSetpoint).in(Volts);
     final double backRightFeedforward =
-        m_feedforward.calculate(m_prevRearRightSpeedSetpoint, m_rearRightSpeedSetpoint);
+        m_feedforward.calculate(m_prevRearRightSpeedSetpoint, m_rearRightSpeedSetpoint).in(Volts);
 
     final double frontLeftOutput =
         m_frontLeftPIDController.calculate(

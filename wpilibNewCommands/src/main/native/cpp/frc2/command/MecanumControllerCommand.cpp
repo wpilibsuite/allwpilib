@@ -174,17 +174,17 @@ void MecanumControllerCommand::Execute() {
   auto rearRightSpeedSetpoint = targetWheelSpeeds.rearRight;
 
   if (m_usePID) {
-    auto frontLeftFeedforward = m_feedforward.Calculate(
-        m_prevSpeeds.frontLeft, frontLeftSpeedSetpoint);
+    auto frontLeftFeedforward =
+        m_feedforward.Calculate(m_prevSpeeds.frontLeft, frontLeftSpeedSetpoint);
 
-    auto rearLeftFeedforward = m_feedforward.Calculate(
-        m_prevSpeeds.rearLeft, rearLeftSpeedSetpoint);
+    auto rearLeftFeedforward =
+        m_feedforward.Calculate(m_prevSpeeds.rearLeft, rearLeftSpeedSetpoint);
 
     auto frontRightFeedforward = m_feedforward.Calculate(
         m_prevSpeeds.frontRight, frontRightSpeedSetpoint);
 
-    auto rearRightFeedforward = m_feedforward.Calculate(
-        m_prevSpeeds.rearRight, rearRightSpeedSetpoint);
+    auto rearRightFeedforward =
+        m_feedforward.Calculate(m_prevSpeeds.rearRight, rearRightSpeedSetpoint);
 
     auto frontLeftOutput = units::volt_t{m_frontLeftController->Calculate(
                                m_currentWheelSpeeds().frontLeft.value(),

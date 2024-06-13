@@ -11,8 +11,8 @@
 #include <frc/simulation/EncoderSim.h>
 #include <frc/simulation/FlywheelSim.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/system/plant/LinearSystemId.h>
 #include <units/moment_of_inertia.h>
-#include "frc/system/plant/LinearSystemId.h"
 
 /**
  * This is a sample program to demonstrate the use of a BangBangController with
@@ -36,10 +36,10 @@ class Robot : public frc::TimedRobot {
     // Controls a motor with the output of the BangBang controller and a
     // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
-    m_flywheelMotor.SetVoltage(bangOutput +
-                               0.9 * m_feedforward.Calculate(
-                                units::radians_per_second_t{m_encoder.GetRate()},
-                                setpoint));
+    m_flywheelMotor.SetVoltage(
+        bangOutput +
+        0.9 * m_feedforward.Calculate(
+                  units::radians_per_second_t{m_encoder.GetRate()}, setpoint));
   }
 
   void RobotInit() override {

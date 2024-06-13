@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -158,9 +159,9 @@ public class Drivetrain {
     m_leftSpeedSetpoint.mut_setMagnitude(speeds.leftMetersPerSecond);
     m_rightSpeedSetpoint.mut_setMagnitude(speeds.rightMetersPerSecond);
     final double leftFeedforward =
-        m_feedforward.calculate(m_prevLeftSpeedSetpoint, m_leftSpeedSetpoint);
+        m_feedforward.calculate(m_prevLeftSpeedSetpoint, m_leftSpeedSetpoint).in(Volts);
     final double rightFeedforward =
-        m_feedforward.calculate(m_prevRightSpeedSetpoint, m_rightSpeedSetpoint);
+        m_feedforward.calculate(m_prevRightSpeedSetpoint, m_rightSpeedSetpoint).in(Volts);
 
     final double leftOutput =
         m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);

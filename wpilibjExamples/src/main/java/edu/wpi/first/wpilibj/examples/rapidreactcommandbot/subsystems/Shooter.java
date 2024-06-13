@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
@@ -66,7 +67,7 @@ public class Shooter extends SubsystemBase {
                   m_prevSpeedSetpoint.mut_setMagnitude(m_shooterEncoder.getRate());
                   m_speedSetpoint.mut_setMagnitude(setpointRotationsPerSecond);
                   m_shooterMotor.set(
-                      m_shooterFeedforward.calculate(m_prevSpeedSetpoint, m_speedSetpoint)
+                      m_shooterFeedforward.calculate(m_prevSpeedSetpoint, m_speedSetpoint).in(Volts)
                           + m_shooterFeedback.calculate(
                               m_shooterEncoder.getRate(), setpointRotationsPerSecond));
                 }),
