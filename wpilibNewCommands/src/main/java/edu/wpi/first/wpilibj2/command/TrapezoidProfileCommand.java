@@ -48,8 +48,7 @@ public class TrapezoidProfileCommand extends Command {
   }
 
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   @Override
   @SuppressWarnings("removal")
@@ -58,8 +57,7 @@ public class TrapezoidProfileCommand extends Command {
   }
 
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 
   @Override
   public boolean isFinished() {
