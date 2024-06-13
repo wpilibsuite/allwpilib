@@ -33,8 +33,12 @@ Drivetrain::Drivetrain() {
 }
 
 void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
-  const auto leftFeedforward = m_feedforward.Calculate(speeds.left);
-  const auto rightFeedforward = m_feedforward.Calculate(speeds.right);
+  const auto leftFeedforward = m_feedforward.Calculate(
+    units::meters_per_second_t{m_leftEncoder.GetRate()},
+    speeds.left);
+  const auto rightFeedforward = m_feedforward.Calculate(
+    units::meters_per_second_t{m_rightEncoder.GetRate()},
+    speeds.right);
   const double leftOutput = m_leftPIDController.Calculate(
       m_leftEncoder.GetRate(), speeds.left.value());
   const double rightOutput = m_rightPIDController.Calculate(

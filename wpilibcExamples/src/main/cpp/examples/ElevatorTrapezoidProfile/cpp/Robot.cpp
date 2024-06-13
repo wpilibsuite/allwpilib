@@ -39,7 +39,9 @@ class Robot : public frc::TimedRobot {
     // Send setpoint to offboard controller PID
     m_motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
                         m_setpoint.position.value(),
-                        m_feedforward.Calculate(m_setpoint.velocity) / 12_V);
+                        m_feedforward.Calculate(
+                          units::meters_per_second_t{m_motor.GetEncoderRate()},
+                          m_setpoint.velocity) / 12_V);
   }
 
  private:

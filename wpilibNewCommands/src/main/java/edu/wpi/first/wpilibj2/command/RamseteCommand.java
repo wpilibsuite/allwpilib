@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -195,10 +196,10 @@ public class RamseteCommand extends Command {
 
     if (m_usePID) {
       double leftFeedforward =
-          m_feedforward.calculate(m_prevLeftSpeedSetpoint, m_leftSpeedSetpoint);
+          m_feedforward.calculate(m_prevLeftSpeedSetpoint, m_leftSpeedSetpoint).in(Volts);
 
       double rightFeedforward =
-          m_feedforward.calculate(m_prevRightSpeedSetpoint, m_rightSpeedSetpoint);
+          m_feedforward.calculate(m_prevRightSpeedSetpoint, m_rightSpeedSetpoint).in(Volts);
 
       leftOutput =
           leftFeedforward

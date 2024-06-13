@@ -159,7 +159,6 @@ void MecanumControllerCommand::Initialize() {
 
 void MecanumControllerCommand::Execute() {
   auto curTime = m_timer.Get();
-  auto dt = curTime - m_prevTime;
 
   auto m_desiredState = m_trajectory.Sample(curTime);
 
@@ -176,20 +175,16 @@ void MecanumControllerCommand::Execute() {
 
   if (m_usePID) {
     auto frontLeftFeedforward = m_feedforward.Calculate(
-        frontLeftSpeedSetpoint,
-        (frontLeftSpeedSetpoint - m_prevSpeeds.frontLeft) / dt);
+        m_prevSpeeds.frontLeft, frontLeftSpeedSetpoint);
 
     auto rearLeftFeedforward = m_feedforward.Calculate(
-        rearLeftSpeedSetpoint,
-        (rearLeftSpeedSetpoint - m_prevSpeeds.rearLeft) / dt);
+        m_prevSpeeds.rearLeft, rearLeftSpeedSetpoint);
 
     auto frontRightFeedforward = m_feedforward.Calculate(
-        frontRightSpeedSetpoint,
-        (frontRightSpeedSetpoint - m_prevSpeeds.frontRight) / dt);
+        m_prevSpeeds.frontRight, frontRightSpeedSetpoint);
 
     auto rearRightFeedforward = m_feedforward.Calculate(
-        rearRightSpeedSetpoint,
-        (rearRightSpeedSetpoint - m_prevSpeeds.rearRight) / dt);
+        m_prevSpeeds.rearRight, rearRightSpeedSetpoint);
 
     auto frontLeftOutput = units::volt_t{m_frontLeftController->Calculate(
                                m_currentWheelSpeeds().frontLeft.value(),

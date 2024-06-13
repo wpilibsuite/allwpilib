@@ -68,7 +68,6 @@ void RamseteCommand::Initialize() {
 
 void RamseteCommand::Execute() {
   auto curTime = m_timer.Get();
-  auto dt = curTime - m_prevTime;
 
   if (m_prevTime < 0_s) {
     if (m_usePID) {
@@ -86,12 +85,10 @@ void RamseteCommand::Execute() {
 
   if (m_usePID) {
     auto leftFeedforward = m_feedforward.Calculate(
-        targetWheelSpeeds.left,
-        (targetWheelSpeeds.left - m_prevSpeeds.left) / dt);
+        m_prevSpeeds.left, targetWheelSpeeds.left);
 
     auto rightFeedforward = m_feedforward.Calculate(
-        targetWheelSpeeds.right,
-        (targetWheelSpeeds.right - m_prevSpeeds.right) / dt);
+        m_prevSpeeds.right, targetWheelSpeeds.right);
 
     auto leftOutput =
         units::volt_t{m_leftController->Calculate(
