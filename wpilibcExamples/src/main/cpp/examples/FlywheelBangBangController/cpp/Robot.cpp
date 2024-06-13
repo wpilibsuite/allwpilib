@@ -11,6 +11,7 @@
 #include <frc/simulation/EncoderSim.h>
 #include <frc/simulation/FlywheelSim.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/LinearSystem.h>
 #include <units/moment_of_inertia.h>
 
 /**
