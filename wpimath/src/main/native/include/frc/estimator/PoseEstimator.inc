@@ -65,28 +65,39 @@ Pose2d PoseEstimator<WheelSpeeds, WheelPositions>::GetEstimatedPosition()
 template <typename WheelSpeeds, typename WheelPositions>
 std::optional<Pose2d> PoseEstimator<WheelSpeeds, WheelPositions>::SampleAt(
     units::second_t timestamp) const {
+  // Step 0: If there are no odometry updates to sample, skip.
   if (m_odometryPoseBuffer.GetInternalBuffer().empty()) {
-    // No odometry updates, so nothing to sample
     return std::nullopt;
   }
-  // Make sure timestamp matches the sample from the odometry pose buffer
+
+  // Step 1: Make sure timestamp matches the sample from the odometry pose
+  // buffer. (When sampling, the buffer will always use a timestamp
+  // between the first and last timestamps)
   units::second_t oldestOdometryTimestamp =
       m_odometryPoseBuffer.GetInternalBuffer().front().first;
   units::second_t newestOdometryTimestamp =
       m_odometryPoseBuffer.GetInternalBuffer().back().first;
   timestamp =
       std::clamp(timestamp, oldestOdometryTimestamp, newestOdometryTimestamp);
+
+  // Step 2: If there are no applicable vision updates, use the odometry-only
+  // information.
   if (m_visionUpdates.empty() || timestamp < m_visionUpdates.begin()->first) {
-    // No vision update from before the requested timestamp to apply
     return m_odometryPoseBuffer.Sample(timestamp);
   }
-  // Find first one past timestamp, then go back one
-  // Note that upper_bound() won't return begin() because we check begin()
-  // earlier
+
+  // Step 3: Get the latest vision update from before or at the timestamp to
+  // sample at.
+  // First, find the iterator past the sample timestamp, then go back one. Note
+  // that upper_bound() won't return begin() because we check begin() earlier.
   auto floorIter = m_visionUpdates.upper_bound(timestamp);
   --floorIter;
   auto visionUpdate = floorIter->second;
+
+  // Step 4: Get the pose measured by odometry at the time of the sample.
   auto odometryEstimate = m_odometryPoseBuffer.Sample(timestamp);
+
+  // Step 5: Apply the vision compensation to the odometry pose.
   // TODO Replace with std::optional::transform() in C++23
   if (odometryEstimate) {
     return visionUpdate.Compensate(*odometryEstimate);
@@ -96,26 +107,31 @@ std::optional<Pose2d> PoseEstimator<WheelSpeeds, WheelPositions>::SampleAt(
 
 template <typename WheelSpeeds, typename WheelPositions>
 void PoseEstimator<WheelSpeeds, WheelPositions>::CleanUpVisionUpdates() {
+  // Step 0: If there are no odometry samples, skip.
   if (m_odometryPoseBuffer.GetInternalBuffer().empty()) {
-    // No odometry updates, so no vision updates as well
     return;
   }
-  // Find the oldest timestamp that needs a vision update before or at it
+
+  // Step 1: Find the oldest timestamp that needs a vision update.
   units::second_t oldestOdometryTimestamp =
       m_odometryPoseBuffer.GetInternalBuffer().front().first;
+
+  // Step 2: If there are no vision updates before that timestamp, skip.
   if (m_visionUpdates.empty() ||
       oldestOdometryTimestamp < m_visionUpdates.begin()->first) {
-    // No vision updates before the oldest odometry update, so no entries to
-    // clear
     return;
   }
-  // Find first one past oldest odometry timestamp, then go back one
-  // Note that upper_bound() won't return begin() because we check begin()
-  // earlier
+
+  // Step 3: Find the newest vision update timestamp before or at the oldest
+  // timestamp.
+  // First, find the iterator past the oldest odometry timestamp, then go
+  // back one. Note that upper_bound() won't return begin() because we check
+  // begin() earlier.
   auto newestNeededVisionUpdate =
       m_visionUpdates.upper_bound(oldestOdometryTimestamp);
   --newestNeededVisionUpdate;
-  // Remove all entries strictly before the newest timestamp we need
+
+  // Step 4: Remove all entries strictly before the newest timestamp we need.
   m_visionUpdates.erase(m_visionUpdates.begin(), newestNeededVisionUpdate);
 }
 

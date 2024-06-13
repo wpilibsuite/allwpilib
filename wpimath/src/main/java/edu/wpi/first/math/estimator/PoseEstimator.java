@@ -140,40 +140,53 @@ public class PoseEstimator<T> {
    * @return The pose at the given timestamp (or Optional.empty() if the buffer is empty).
    */
   public Optional<Pose2d> sampleAt(double timestampSeconds) {
+    // Step 0: If there are no odometry updates to sample, skip.
     if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()) {
-      // No odometry updates, so nothing to sample
       return Optional.empty();
     }
-    // Make sure timestamp matches the sample from the odometry pose buffer
+
+    // Step 1: Make sure timestamp matches the sample from the odometry pose buffer. (When sampling,
+    // the buffer will always use a timestamp between the first and last timestamps)
     double oldestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().firstKey();
     double newestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().lastKey();
     timestampSeconds =
         MathUtil.clamp(timestampSeconds, oldestOdometryTimestamp, newestOdometryTimestamp);
+
+    // Step 2: If there are no applicable vision updates, use the odometry-only information.
     if (m_visionUpdates.isEmpty() || timestampSeconds < m_visionUpdates.firstKey()) {
-      // No vision update from before the requested timestamp to apply
       return m_odometryPoseBuffer.getSample(timestampSeconds);
     }
+
+    // Step 3: Get the latest vision update from before or at the timestamp to sample at.
     double floorTimestamp = m_visionUpdates.floorKey(timestampSeconds);
     var visionUpdate = m_visionUpdates.get(floorTimestamp);
+
+    // Step 4: Get the pose measured by odometry at the time of the sample.
     var odometryEstimate = m_odometryPoseBuffer.getSample(timestampSeconds);
+
+    // Step 5: Apply the vision compensation to the odometry pose.
     return odometryEstimate.map(odometryPose -> visionUpdate.compensate(odometryPose));
   }
 
   /** Removes stale vision updates that won't affect sampling. */
   private void cleanUpVisionUpdates() {
+    // Step 0: If there are no odometry samples, skip.
     if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()) {
-      // No odometry updates, so no vision updates as well
       return;
     }
-    // Find the oldest timestamp that needs a vision update before or at it
+
+    // Step 1: Find the oldest timestamp that needs a vision update.
     double oldestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().firstKey();
+
+    // Step 2: If there are no vision updates before that timestamp, skip.
     if (m_visionUpdates.isEmpty() || oldestOdometryTimestamp < m_visionUpdates.firstKey()) {
-      // No vision updates before the oldest odometry update, so no entries to clear
       return;
     }
-    // Find the newest vision update timestamp before or at the oldest timestamp
+
+    // Step 3: Find the newest vision update timestamp before or at the oldest timestamp.
     double newestNeededVisionUpdateTimestamp = m_visionUpdates.floorKey(oldestOdometryTimestamp);
-    // Remove all entries strictly before the newest timestamp we need
+
+    // Step 4: Remove all entries strictly before the newest timestamp we need.
     m_visionUpdates.headMap(newestNeededVisionUpdateTimestamp, false).clear();
   }
 
