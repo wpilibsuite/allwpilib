@@ -20,18 +20,39 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
  * for the entire group execution duration and the default commands are not activated until the
  * sequence group ends.
  * 
- * Note that this class probably didn't have to be a subsystem as it contains other subsystems with
- * their requirements. There are only two places herein that might use a subsystem to protect the
- * requirements on the two "runOnce" commands. I believe it isn't needed in this special case but
- * in case I'm wrong I made this a subsystem. Alternatively I could have used a bad practice and
- * coded the requirements of the contained subsystems on the two "runOnce" commands. In the spirit
- * of admit things can go wrong that shouldn't and use a good practice instead of a bad practice
- * this class was made a subsystem just to be "doubly" safe. This being a subsystem does change the
- * results slightly as there may be one more or less loop iteration between the two different
- * techniques.
+ * Note that this class didn't have to be a subsystem for correct results under expected
+ * circumstances. In the spirit of "things can go wrong that shouldn't" and "use a good
+ * practice instead of a bad practice" this class was made a subsystem to be safe.
  * 
- * (run, runOnce, startEnd, runEnd, and defer within a subsystem automatically include
- * the subsystem as a requirements so you won't forget it.)
+ * An expectation of these tests is only one test job runs at a time. The scheduler does prevent
+ * the same command from running more than once at the same time. Subsystem usage is not required
+ * for that protection feature.
+ * 
+ * If a command was cloned the two copies could run at the same time since they appear as different
+ * commands. In that case the use of subsystem requirements is needed to prevent simultaneous runs.
+ * 
+ * The three subsystems being used for tests have been disjointed as that is the point of these
+ * tests. Their requirements would not prevent copies of the entire test job from running at the
+ * same time. To treat the entire test job as one transaction a requirement must be made of the
+ * complete command. Using this subsystem as a requirement on the runOnce commands locks in the
+ * entire job as a single entity when it is run as proxy disjoint sequence. If this class isn't a
+ * subsystem, then the runOnce doesn't have the automatically provided requirement. The default is
+ * no requirement and a requirement must be manually provided. That is prone to errors of omission
+ * at the least.
+ * 
+ * The use of a subsystem requirement as described above only works if the sequence of jobs is
+ * disjointed by proxy and not by triggering. Triggered sequence is highly disjointed with
+ * essentially no communication between the individual commands and no group behavior validation.
+ * Putting a requirement on the sequence actually is applied to only the first command and all the
+ * rest of the commands are independent.
+ * 
+ * Using a subsystem or not and using triggered sequencing instead of proxies all give essentially
+ * identical results within one (more or less) loop iteration. The major differences are in the
+ * security provided by subsystems and command group membership.
+ * 
+ * (run(), runOnce(), startEnd(), runEnd(), and defer() within a subsystem automatically include
+ * the subsystem as a requirements so you won't forget it. Usage outside of the subsystem defaults
+ * to no requirements and any requirements must be manually entered.)
  */
 
 import static edu.wpi.first.units.Units.Seconds;
@@ -54,8 +75,8 @@ public class GroupDisjointTest extends SubsystemBase {
   // runtime option; too rigid - could be made easier to find and change but this is just a
   // "simple" example program
 
-  // runtime option to run tests as Triggered job or run as Commands.sequence
-  private final boolean m_useTriggeredJob = true;
+  // runtime option to run tests as Triggered job (true) or run as Commands.sequence (false)
+  private final boolean m_useTriggeredJob = false;
 
   private final GroupDisjoint[]
       m_groupDisjoint = // subsystems that provide the requirements for testing
@@ -210,6 +231,15 @@ public class GroupDisjointTest extends SubsystemBase {
       // ()->System.out.println(supplier variable or field variable). Otherwise the variable would
       // print its value from when the command was made - not when it's run.
 
+      /* runOnce within a subsystem provides the requirement of the subsystem.
+       * If this class isn't a subsystem, then it runs the same but without automatic requirement.
+       * 
+       * The effect and duration of a requirement depends on if the group is disjointed or not and
+       * how it is disjointed. Disjointed by triggered commands is highly disjointed and the
+       * requirements would only be on the first command of the sequence. Disjointed by proxy
+       * (disjointSequence method for example) is mildly disjointed and the group still exists with
+       * the requirement of this subsystem persisting.
+       */
       runOnce(
           () -> {
             // Cleanup default commands from a previous aborted run.
@@ -281,10 +311,18 @@ public class GroupDisjointTest extends SubsystemBase {
       )
     };
 
+    // Triggered disjoint sequence is highly disjointed thus the beforeStarting and finallyDo apply
+    // only to the first command in the sequence which likely is unexpected behavior.
+    // Proxy disjoint sequence still maintains a group and the beforeStarting and finallyDo apply
+    // to the group as a whole which is likely the expected behavior.
     if (useTriggeredJob) {
-      return TriggeredDisjointSequence.sequence(allTests);
+      return TriggeredDisjointSequence.sequence(allTests)
+            .beforeStarting(print("** starting triggered disjoint sequence tests"))
+            .finallyDo(end->System.out.println("** the end of triggered disjoint sequence tests interrupted flag = " + end));
     } else {
-      return disjointSequence(allTests);
+      return disjointSequence(allTests)
+            .beforeStarting(print("** starting disjoint sequence tests"))
+            .finallyDo(end->System.out.println("** the end of disjoint sequence tests interrupted flag = " + end));
     }
   }
 
@@ -452,7 +490,18 @@ public class GroupDisjointTest extends SubsystemBase {
 }
 
 /*
-triggered sequence - default commands running; scrubbed to make pretty
+[triggered sequence - default commands running; scrubbed to make pretty:]
+
+** starting triggered disjoint sequence tests
+** the end of triggered disjoint sequence tests interrupted flag = false
+[First command only has the beforeStarting() and finallyDo() decorations. That makes the ending
+message a lie.
+Other test results  are essentially identical to those below within one iteration]
+
+
+[proxy sequence - default commands running; scrubbed to make pretty:]
+
+** starting disjoint sequence tests
 
 START testSequence
 AdBdCd
@@ -561,6 +610,8 @@ A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
 A1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCd
 AdBdCd
 END testDisjointRaceParallel
+
+** the end of disjoint sequence tests interrupted flag = false
 
 AdBdCd
  */
