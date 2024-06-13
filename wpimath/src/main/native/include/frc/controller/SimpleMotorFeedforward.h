@@ -34,7 +34,7 @@ class SimpleMotorFeedforward {
    * @param kS The static gain, in volts.
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds² per distance.
-   * @param period The period in seconds.
+   * @param dt The period in seconds.
    */
   SimpleMotorFeedforward(units::volt_t kS, units::unit_t<kv_unit> kV,
                          units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
