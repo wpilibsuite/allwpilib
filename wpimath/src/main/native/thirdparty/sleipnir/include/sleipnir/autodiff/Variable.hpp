@@ -224,23 +224,19 @@ class SLEIPNIR_DLLEXPORT Variable {
   /**
    * Returns the value of this variable.
    */
-  double Value() const { return expr->value; }
+  double Value() {
+    // Updates the value of this variable based on the values of its dependent
+    // variables
+    detail::ExpressionGraph{expr}.Update();
+
+    return expr->value;
+  }
 
   /**
    * Returns the type of this expression (constant, linear, quadratic, or
    * nonlinear).
    */
   ExpressionType Type() const { return expr->type; }
-
-  /**
-   * Updates the value of this variable based on the values of its dependent
-   * variables.
-   */
-  void Update() {
-    if (!expr->IsConstant(0.0)) {
-      detail::ExpressionGraph{expr}.Update();
-    }
-  }
 
  private:
   /// The expression node.
