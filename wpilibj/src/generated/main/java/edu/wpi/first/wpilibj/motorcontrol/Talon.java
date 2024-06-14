@@ -31,8 +31,8 @@ public class Talon extends PWMMotorController {
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the Talon is attached to. 0-9 are on-board, 10-19 are on
-   *     the MXP port
+   * @param channel The PWM channel that the Talon is attached to. 0-9 are on-board, 10-19
+   *     are on the MXP port
    */
   @SuppressWarnings("this-escape")
   public Talon(final int channel) {
