@@ -13,8 +13,8 @@ import java.util.HashSet;
 import java.util.Map;
 
 /**
- * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type of {@code ERROR},
- * {@code WARNING}, or {@code INFO} to denote urgency. See {@link
+ * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type of {@code kError},
+ * {@code kWarning}, or {@code kInfo} to denote urgency. See {@link
  * edu.wpi.first.wpilibj.Alert.AlertType AlertType} for suggested usage of each type. Alerts can be
  * displayed on supported dashboards, and are shown in a priority order based on type and recency of
  * activation.
@@ -23,8 +23,8 @@ import java.util.Map;
  * as necessary. {@link #set(boolean)} can be safely called periodically.
  *
  * <pre>
- * class MyClass {
- *   Alert alert = new Alert("Something went wrong", AlertType.WARNING);
+ * class Robot {
+ *   Alert alert = new Alert("Something went wrong", AlertType.kWarning);
  *
  *   periodic() {
  *     alert.set(...);
@@ -36,7 +36,7 @@ import java.util.Map;
  *
  * <pre>
  * public Robot() {
- *   new Alert("Failed to load auto paths", AlertType.ERROR).set(true);
+ *   new Alert("Failed to load auto paths", AlertType.kError).set(true);
  * }
  * </pre>
  */
@@ -115,9 +115,9 @@ public class Alert {
     @Override
     public void initSendable(SendableBuilder builder) {
       builder.setSmartDashboardType("Alerts");
-      builder.addStringArrayProperty("errors", () -> getStrings(AlertType.ERROR), null);
-      builder.addStringArrayProperty("warnings", () -> getStrings(AlertType.WARNING), null);
-      builder.addStringArrayProperty("infos", () -> getStrings(AlertType.INFO), null);
+      builder.addStringArrayProperty("errors", () -> getStrings(AlertType.kError), null);
+      builder.addStringArrayProperty("warnings", () -> getStrings(AlertType.kWarning), null);
+      builder.addStringArrayProperty("infos", () -> getStrings(AlertType.kInfo), null);
     }
   }
 
@@ -128,20 +128,20 @@ public class Alert {
      * for problems which will seriously affect the robot's functionality and thus require immediate
      * attention.
      */
-    ERROR,
+    kError,
 
     /**
      * Medium priority alert - displayed second on the dashboard with a yellow "!" symbol. Use this
      * type for problems which could affect the robot's functionality but do not necessarily require
      * immediate attention.
      */
-    WARNING,
+    kWarning,
 
     /**
      * Low priority alert - displayed last on the dashboard with a green "i" symbol. Use this type
      * for problems which are unlikely to affect the robot's functionality, or any other alerts
-     * which do not fall under ERROR or WARNING.
+     * which do not fall under the other categories.
      */
-    INFO
+    kInfo
   }
 }
