@@ -21,15 +21,17 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
  * sequence group ends.
  * 
  * Note that this class didn't have to be a subsystem for correct results under expected
- * circumstances. In the spirit of "things can go wrong that shouldn't" and "use a good
- * practice instead of a bad practice" this class was made a subsystem to be safe.
+ * circumstances. In the spirit of "things can go wrong that shouldn't" and "use a good practice
+ * instead of a bad practice" this class was made a subsystem to be safe and demonstrate some
+ * pitfalls of disjoint sequences.
  * 
  * An expectation of these tests is only one test job runs at a time. The scheduler does prevent
  * the same command from running more than once at the same time. Subsystem usage is not required
  * for that protection feature.
  * 
- * If a command was cloned the two copies could run at the same time since they appear as different
- * commands. In that case the use of subsystem requirements is needed to prevent simultaneous runs.
+ * If a command was duplicated, the two copies could run at the same time since they appear as
+ * different commands. In that case the use of subsystem requirements is needed to prevent
+ * simultaneous runs.
  * 
  * The three subsystems being used for tests have been disjointed as that is the point of these
  * tests. Their requirements would not prevent copies of the entire test job from running at the
@@ -52,7 +54,7 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
  * 
  * (run(), runOnce(), startEnd(), runEnd(), and defer() within a subsystem automatically include
  * the subsystem as a requirements so you won't forget it. Usage outside of the subsystem defaults
- * to no requirements and any requirements must be manually entered.)
+ * to no requirements and any needed requirements must be manually entered.)
  */
 
 import static edu.wpi.first.units.Units.Seconds;
@@ -66,6 +68,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.TriggeredDisjointSequence;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -97,28 +100,34 @@ public class GroupDisjointTest extends SubsystemBase {
   }
 
   /**
-   * Define the test of the use of Proxy or Trigger to activate or not the default commands within command groups.
+   * Define several tests of the use of Proxy, or not, to activate, or not, the default commands within command groups.
+   *
+   * The several tests run in a sequence optionally continuing to use the Proxy technique to
+   * disjoint the tests or use successively triggered commands method. That is all the disjoint
+   * tests use Proxies at a low level of inner commands and then those commands are additionally
+   * demonstrated   * to be run in sequence by outer level proxies or triggered commands. Triggered
+   * commands could have been used to disjoint all commands even the inner most ones.
    *
    * <p>Create a Command that runs the test.
    *
-   * <p>Option to run the test as a succession of triggered Commands or as a single
+   * <p>Option to run the Proxy tests as a succession of triggered Commands or as a single
    * Commands.sequence(). With triggering we may only have to fuss with Proxy within each command as
-   * there is no interaction between commands. Normally the results are identical except triggering
-   * needs one iteration to start the next command and sequence needs two iterations to start the
-   * next command.
+   * there is no interaction between commands. Normally the results are identical within one loop
+   * iteration.
    *
    * @param useTriggeredJob true for use Triggered commands; false for use Commands.sequence()
    */
   private Command configureTestJob(boolean useTriggeredJob) {
     // Default commands running for subsystems A, B, and C.
-    // Observe default commands don't run in groups unless disjointed by use of Proxy
+    // Observe default commands don't run within groups unless disjointed by use of Proxy or
+    // triggered commands.
 
-    // Can't use decorators .andThen .alongWith on commands of subsystems needing default
-    // within the group - reform as parallel() or sequence().
+    // Can't use decorators .andThen or .alongWith on commands of subsystems needing default
+    // command within the group - reform as parallel() or sequence().
 
     // Bug in WPILib "RepeatCommand" causes incorrect results for repeats.
 
-    // Add .asProxy() to commands of subsystems needing the default to run in the group.
+    // Add .asProxy() to commands of subsystems needing the default command to run in the group.
     // Better to use proxyAll() to help add safely .asProxy() only to commands that have
     // requirements of subsystems needing default command to run in the group.
 
@@ -226,13 +235,16 @@ public class GroupDisjointTest extends SubsystemBase {
                 m_groupDisjoint[m_c].testDuration(1, Seconds.of(0.12)), waitSeconds(0.3)));
 
     Command[] allTests = {
-      // Printing a static message so use the Commands.print. If message contained variables, then
-      // need a "Runnable" as a supplier for the dynamic values such as
-      // ()->System.out.println(supplier variable or field variable). Otherwise the variable would
-      // print its value from when the command was made - not when it's run.
-
-      /* runOnce within a subsystem provides the requirement of the subsystem.
-       * If this class isn't a subsystem, then it runs the same but without automatic requirement.
+      /* runOnce within a subsystem automatically provides the requirement of the subsystem.
+       * If this class isn't a subsystem, then it runs the same but without automatic requirements.
+       * 
+       * There is a conflict of requirements with a command being interrupted by a new command with
+       * the same requirements. If requirements are desired on the entire group and included by
+       * wrapping a group with such as .beforeStarting then there must not be the same requirements
+       * within the group or cancellation occurs.
+       * 
+       * The Commands version of runOnce allows the requirements to be specified and none must be
+       * to avoid the conflict with the group requirements from .beforeStarting.
        * 
        * The effect and duration of a requirement depends on if the group is disjointed or not and
        * how it is disjointed. Disjointed by triggered commands is highly disjointed and the
@@ -240,7 +252,10 @@ public class GroupDisjointTest extends SubsystemBase {
        * (disjointSequence method for example) is mildly disjointed and the group still exists with
        * the requirement of this subsystem persisting.
        */
-      runOnce(
+       Commands.runOnce( // This is the first command to be run in sequence and it is disjointed
+              // the same as all the rest. Any requirements are within the runOnce only and not
+              // applied to the entire sequence. Don't use requirements if the group has
+              // requirements or the command will be interrupted.
           () -> {
             // Cleanup default commands from a previous aborted run.
             if (m_groupDisjoint[m_a].getDefaultCommand() != null) {
@@ -298,7 +313,11 @@ public class GroupDisjointTest extends SubsystemBase {
       print("\nSTART testDisjointRaceParallel"),
       testDisjointRace,
       print("\nEND testDisjointRaceParallel"),
-      runOnce(
+      Commands.runOnce( // This is the last command to be run in sequence and it is disjointed the
+              // same as all the rest. Any requirements are within the runOnce only and not applied
+              // to the entire sequence. As the last command any requirements might be irrelevant
+              // and either version of runOnce may be essentially equivalent. The command is
+              // interrupted but after it apparently has completed. Best not to end by interruption.
           () -> {
             // stop default commands to stop the output
             CommandScheduler.getInstance().cancel(m_groupDisjoint[m_a].getDefaultCommand());
@@ -312,17 +331,33 @@ public class GroupDisjointTest extends SubsystemBase {
     };
 
     // Triggered disjoint sequence is highly disjointed thus the beforeStarting and finallyDo apply
-    // only to the first command in the sequence which likely is unexpected behavior.
+    // only to the first command in the sequence which likely is unexpected behavior. (Read the
+    // javadoc - it says the first command is returned.)
+    
     // Proxy disjoint sequence still maintains a group and the beforeStarting and finallyDo apply
     // to the group as a whole which is likely the expected behavior.
+    // That means that requirements may be added to the proxy group disjointSequence and is done so
+    // below with the beforeStarting runOnce command which is in a wrapper of the entire group.
+
+    // Requirements on the triggered sequence are largely irrelevant since they would only apply to
+    // the first command and not the entire sequence. No requirements created in this example.
     if (useTriggeredJob) {
-      return TriggeredDisjointSequence.sequence(allTests)
+      return TriggeredDisjointSequence.sequence(allTests) // the first command only
+                                                        // the rest of the commands triggered later
             .beforeStarting(print("** starting triggered disjoint sequence tests"))
-            .finallyDo(end->System.out.println("** the end of triggered disjoint sequence tests interrupted flag = " + end));
+            .finallyDo(interrupted->System.out.println(
+                "** the end of triggered disjoint sequence tests interrupted flag = "
+                + interrupted)
+            );
     } else {
-      return disjointSequence(allTests)
-            .beforeStarting(print("** starting disjoint sequence tests"))
-            .finallyDo(end->System.out.println("** the end of disjoint sequence tests interrupted flag = " + end));
+    // Requirements added to the proxy group disjoint sequence are applied to the entire wrapped
+    // sequence. Requirements come from the beforeStarting runOnce within this subsystem.
+      return disjointSequence(allTests) // group wrapper command represents all the commands
+            .beforeStarting(runOnce(()->System.out.println("** starting disjoint sequence tests")))
+            .finallyDo(interrupted->System.out.println(
+                "** the end of disjoint sequence tests interrupted flag = "
+                + interrupted)
+            );
     }
   }
 
@@ -490,21 +525,18 @@ public class GroupDisjointTest extends SubsystemBase {
 }
 
 /*
-[triggered sequence - default commands running; scrubbed to make pretty:]
-
+[triggered disjoint sequence - default commands running; scrubbed to make pretty:
+First command only has the beforeStarting() and finallyDo() decorations. That makes the ending
+message a fib. Other test results are essentially identical to those below within one iteration.]
 ** starting triggered disjoint sequence tests
 ** the end of triggered disjoint sequence tests interrupted flag = false
-[First command only has the beforeStarting() and finallyDo() decorations. That makes the ending
-message a lie.
-Other test results  are essentially identical to those below within one iteration]
 
 
-[proxy sequence - default commands running; scrubbed to make pretty:]
-
+[proxy disjoint sequence - default commands running; scrubbed to make pretty:]
 ** starting disjoint sequence tests
 
 START testSequence
-AdBdCd
+AdBdCdAdBdCd
 A1BdCdBdCdBdCdBdCdBdCdBdCdBdCd
 A2BdCd
 END testSequence
@@ -512,17 +544,16 @@ END testSequence
 AdBdCd
 
 START testDisjointSequence
-AdBdCd
+AdBdCdAdBdCd
 A1BdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCdAdBdCd
 A2BdCd
-AdBdCd
 END testDisjointSequence
 
 AdBdCd
 
 START testRepeatingSequence
-AdBdCd
-A1A1A1A1B1B1B1C1C1C1
+AdBdCdAdBdCd
+A1A1A1B1B1B1C1C1C1
 A1A1A1A1B1B1B1C1C1C1
 A1A1A1A1B1B1B1
 END testRepeatingSequence
@@ -530,88 +561,83 @@ END testRepeatingSequence
 AdBdCd
 
 START testDisjointRepeatingSequence - incorrect results - library bug
-AdBdCd
-A1BdCdA1BdCdA1BdCdA1BdCdAdBdCdAdB1CdAdB1CdAdB1CdAdBdCdAdBdC1AdBdC1AdBdC1AdBdCdAdBdCdA1B1Cd
-A1B1CdA1B1CdAdBdCdAdBdC1AdBdC1AdBdC1AdBdCdAdBdCdA1B1CdA1B1CdA1B1Cd
+AdBdCdAdBdCd
+A1BdCdA1BdCdA1BdCdAdBdCdAdB1CdAdB1CdAdB1CdAdBdCdAdBdC1AdBdC1AdBdC1AdBdCdAdBdCdA1B1CdA1B1Cd
+A1B1CdAdBdCdAdBdC1AdBdC1AdBdC1AdBdCdAdBdCdA1B1CdA1B1CdA1B1Cd
 END testDisjointRepeatingSequence - incorrect results - library bug
 
-AdBdCd
+A1B1Cd
 
 START testParallel
-AdBdCd
+AdBdCdAdBdCd
 B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1B1C1
-B1C1B1C1B1C1B1C1B1C1B1C1B1C1
+B1C1B1C1B1C1B1C1B1C1B1C1
 B1B1B1B1B1B1B1B1
 A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2
-A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2
+A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2A1B2
 B2B2B2B2B2B2B2B2
 END testParallel
 
 AdBdCd
 
 START testDisjointParallel
-AdBdCdAdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdBdCdAdBdCdAdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
 AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
-AdB1C1
 AdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1Cd
 AdBdCd
 A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
 A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
-A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
-AdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2Cd
-AdBdCd
+A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
+AdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2Cd
 END testDisjointParallel
 
 AdBdCd
 
 START testManualDisjointParallel
-AdBdCd
+AdBdCdAdBdCd
 AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
-AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
+AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1AdB1C1
 AdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1CdAdB1Cd
 AdBdCd
 A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
 A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
 A1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2CdA1B2Cd
 AdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2CdAdB2Cd
-AdBdCd
 END testManualDisjointParallel
 
 AdBdCd
 
 START testDeadlineParallel
-AdBdCd
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
-B1C1
-C1C1C1C1C1C1C1C1C1
+AdBdCdAdBdCd
+A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
+C1C1C1C1C1C1C1C1C1C1
 END testDeadlineParallel
 
 AdBdCd
 
 START testDisjointDeadlineParallel
-AdBdCd
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
-AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1
+AdBdCdAdBdCd
+A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
+AdB1C1AdB1C1
+AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1AdBdC1
 END testDisjointDeadlineParallel
 
-AdBdCd
+AdBdC1
 
 START testRaceParallel
-AdBdCd
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
+AdBdCdAdBdCd
+A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
 A1A1A1A1A1A1
 END testRaceParallel
 
 AdBdCd
 
 START testDisjointRaceParallel
-AdBdCd
-A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
+AdBdCdAdBdCd
+A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1A1B1C1
 A1BdCdA1BdCdA1BdCdA1BdCdA1BdCdA1BdCd
-AdBdCd
 END testDisjointRaceParallel
 
+AdBdCdAdBdCd
 ** the end of disjoint sequence tests interrupted flag = false
-
-AdBdCd
  */
