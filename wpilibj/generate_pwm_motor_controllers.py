@@ -11,12 +11,12 @@ import os
 from jinja2 import Environment, FileSystemLoader
 
 
-def render_template(template, output_dir, filename, *kargs):
+def render_template(template, output_dir, filename, controller):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
     with open(os.path.join(output_dir, filename), "w", newline="\n") as f:
-        f.write(template.render(*kargs))
+        f.write(template.render(controller))
 
 
 def generate_pwm_motor_controllers(output_root, template_root):
@@ -34,7 +34,6 @@ def generate_pwm_motor_controllers(output_root, template_root):
 
     for controller in controllers:
         controller_name = os.path.basename(f"{controller['name']}.java")
-        output = template.render(controller)
         render_template(template, rootPath, controller_name, controller)
 
 
