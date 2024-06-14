@@ -96,7 +96,7 @@ void SendableBuilderImpl::ClearProperties() {
 void SendableBuilderImpl::SetSmartDashboardType(std::string_view type) {
   if (!m_typePublisher) {
     m_typePublisher = m_table->GetStringTopic(".type").PublishEx(
-        "string", {{"SmartDashboard", type}});
+        nt::StringTopic::kTypeString, {{"SmartDashboard", type}});
   }
   m_typePublisher.Set(type);
 }
