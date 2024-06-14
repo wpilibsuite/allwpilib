@@ -8,7 +8,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.proto.Transform2dProto;
 import edu.wpi.first.math.geometry.struct.Transform2dStruct;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -75,7 +75,7 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
    * @param y The y component of the translational component of the transform.
    * @param rotation The rotational component of the transform.
    */
-  public Transform2d(Measure<Distance> x, Measure<Distance> y, Rotation2d rotation) {
+  public Transform2d(Measure<DistanceUnit> x, Measure<DistanceUnit> y, Rotation2d rotation) {
     this(x.in(Meters), y.in(Meters), rotation);
   }
 

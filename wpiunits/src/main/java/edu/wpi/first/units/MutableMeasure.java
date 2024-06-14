@@ -247,7 +247,7 @@ public final class MutableMeasure<U extends Unit<U>> implements Measure<U> {
    * @param multiplier the multiplier to scale the measurement by
    * @return this measure
    */
-  public MutableMeasure<U> mut_times(Measure<? extends Dimensionless> multiplier) {
+  public MutableMeasure<U> mut_times(Measure<? extends DimensionlessUnit> multiplier) {
     return mut_times(multiplier.baseUnitMagnitude());
   }
 
@@ -270,7 +270,7 @@ public final class MutableMeasure<U extends Unit<U>> implements Measure<U> {
    * @param divisor the divisor to scale the measurement by
    * @return this measure
    */
-  public MutableMeasure<U> mut_divide(Measure<? extends Dimensionless> divisor) {
+  public MutableMeasure<U> mut_divide(Measure<? extends DimensionlessUnit> divisor) {
     return mut_divide(divisor.baseUnitMagnitude());
   }
 

@@ -16,7 +16,7 @@ class EncoderTest {
     int m_ticks; // = 0
     private Measure<U> m_distancePerPulse;
     private MutableMeasure<U> m_distance;
-    private MutableMeasure<Velocity<U>> m_rate;
+    private MutableMeasure<VelocityUnit<U>> m_rate;
 
     void setDistancePerPulse(Measure<U> distancePerPulse) {
       m_distancePerPulse = distancePerPulse;
@@ -28,7 +28,7 @@ class EncoderTest {
       return m_distance;
     }
 
-    Measure<Velocity<U>> getRate() {
+    Measure<VelocityUnit<U>> getRate() {
       return m_rate;
     }
 
@@ -47,13 +47,13 @@ class EncoderTest {
   void testAsDistance() {
     double ticksPerRevolution = 2048;
 
-    var encoder = new Encoder<Distance>();
+    var encoder = new Encoder<DistanceUnit>();
 
     // distance per rotation = (wheel circumference / gear ratio)
     // distance per tick = distance per rotation / ticks per rotation
     var wheelDiameter = Inches.of(6);
     double gearRatio = 10; // 10:1 ratio
-    Measure<Distance> distancePerPulse =
+    Measure<DistanceUnit> distancePerPulse =
         wheelDiameter.times(Math.PI).divide(gearRatio).divide(ticksPerRevolution);
     encoder.setDistancePerPulse(distancePerPulse);
 
@@ -75,9 +75,9 @@ class EncoderTest {
   void testAsRevolutions() {
     double ticksPerRevolution = 2048;
 
-    var encoder = new Encoder<Angle>();
+    var encoder = new Encoder<AngleUnit>();
 
-    Measure<Angle> distancePerPulse = Revolutions.of(1).divide(ticksPerRevolution);
+    Measure<AngleUnit> distancePerPulse = Revolutions.of(1).divide(ticksPerRevolution);
     encoder.setDistancePerPulse(distancePerPulse);
 
     encoder.m_ticks = 0;

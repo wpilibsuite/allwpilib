@@ -12,9 +12,9 @@ import static java.util.Map.entry;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Time;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -43,7 +43,7 @@ import java.util.function.Consumer;
 public class SysIdRoutine extends SysIdRoutineLog {
   private final Config m_config;
   private final Mechanism m_mechanism;
-  private final MutableMeasure<Voltage> m_outputVolts = mutable(Volts.of(0));
+  private final MutableMeasure<VoltageUnit> m_outputVolts = mutable(Volts.of(0));
   private final Consumer<State> m_recordState;
 
   /**
@@ -62,13 +62,13 @@ public class SysIdRoutine extends SysIdRoutineLog {
   /** Hardware-independent configuration for a SysId test routine. */
   public static class Config {
     /** The voltage ramp rate used for quasistatic test routines. */
-    public final Measure<Velocity<Voltage>> m_rampRate;
+    public final Measure<VelocityUnit<VoltageUnit>> m_rampRate;
 
     /** The step voltage output used for dynamic test routines. */
-    public final Measure<Voltage> m_stepVoltage;
+    public final Measure<VoltageUnit> m_stepVoltage;
 
     /** Safety timeout for the test routine commands. */
-    public final Measure<Time> m_timeout;
+    public final Measure<TimeUnit> m_timeout;
 
     /** Optional handle for recording test state in a third-party logging solution. */
     public final Consumer<State> m_recordState;
@@ -87,9 +87,9 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     logged in WPILog.
      */
     public Config(
-        Measure<Velocity<Voltage>> rampRate,
-        Measure<Voltage> stepVoltage,
-        Measure<Time> timeout,
+        Measure<VelocityUnit<VoltageUnit>> rampRate,
+        Measure<VoltageUnit> stepVoltage,
+        Measure<TimeUnit> timeout,
         Consumer<State> recordState) {
       m_rampRate = rampRate != null ? rampRate : Volts.of(1).per(Seconds.of(1));
       m_stepVoltage = stepVoltage != null ? stepVoltage : Volts.of(7);
@@ -108,7 +108,9 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     null.
      */
     public Config(
-        Measure<Velocity<Voltage>> rampRate, Measure<Voltage> stepVoltage, Measure<Time> timeout) {
+        Measure<VelocityUnit<VoltageUnit>> rampRate,
+        Measure<VoltageUnit> stepVoltage,
+        Measure<TimeUnit> timeout) {
       this(rampRate, stepVoltage, timeout, null);
     }
 
@@ -132,7 +134,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
    */
   public static class Mechanism {
     /** Sends the SysId-specified drive signal to the mechanism motors during test routines. */
-    public final Consumer<Measure<Voltage>> m_drive;
+    public final Consumer<Measure<VoltageUnit>> m_drive;
 
     /**
      * Returns measured data (voltages, positions, velocities) of the mechanism motors during test
@@ -163,7 +165,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     the subsystem if left null.
      */
     public Mechanism(
-        Consumer<Measure<Voltage>> drive,
+        Consumer<Measure<VoltageUnit>> drive,
         Consumer<SysIdRoutineLog> log,
         Subsystem subsystem,
         String name) {
@@ -190,7 +192,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     "sysid-test-state-subsystem".
      */
     public Mechanism(
-        Consumer<Measure<Voltage>> drive, Consumer<SysIdRoutineLog> log, Subsystem subsystem) {
+        Consumer<Measure<VoltageUnit>> drive, Consumer<SysIdRoutineLog> log, Subsystem subsystem) {
       this(drive, log, subsystem, null);
     }
   }

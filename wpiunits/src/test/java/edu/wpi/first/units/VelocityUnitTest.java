@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class VelocityTest {
+class VelocityUnitTest {
   @Test
   void testBaseUnit() {
     assertTrue(MetersPerSecond.equivalent(MetersPerSecond));
@@ -26,7 +26,8 @@ class VelocityTest {
 
   @Test
   void testToAcceleration() {
-    Velocity<Velocity<Distance>> metersPerSecondPerMillisecond = MetersPerSecond.per(Millisecond);
+    VelocityUnit<VelocityUnit<DistanceUnit>> metersPerSecondPerMillisecond =
+        MetersPerSecond.per(Millisecond);
 
     assertEquals(1000, metersPerSecondPerMillisecond.of(1).in(MetersPerSecondPerSecond), 0);
     assertEquals(0, metersPerSecondPerMillisecond.of(0).in(MetersPerSecondPerSecond), 0);

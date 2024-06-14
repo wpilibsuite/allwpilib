@@ -9,11 +9,11 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -50,11 +50,12 @@ public class Drive extends SubsystemBase {
           DriveConstants.kRightEncoderReversed);
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+  private final MutableMeasure<VoltageUnit> m_appliedVoltage = mutable(Volts.of(0));
   // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutableMeasure<Distance> m_distance = mutable(Meters.of(0));
+  private final MutableMeasure<DistanceUnit> m_distance = mutable(Meters.of(0));
   // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutableMeasure<Velocity<Distance>> m_velocity = mutable(MetersPerSecond.of(0));
+  private final MutableMeasure<VelocityUnit<DistanceUnit>> m_velocity =
+      mutable(MetersPerSecond.of(0));
 
   // Create a new SysId routine for characterizing the drive.
   private final SysIdRoutine m_sysIdRoutine =
@@ -63,7 +64,7 @@ public class Drive extends SubsystemBase {
           new SysIdRoutine.Config(),
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motors.
-              (Measure<Voltage> volts) -> {
+              (Measure<VoltageUnit> volts) -> {
                 m_leftMotor.setVoltage(volts.in(Volts));
                 m_rightMotor.setVoltage(volts.in(Volts));
               },

@@ -8,7 +8,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
+import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -179,7 +179,7 @@ public abstract class Command implements Sendable {
    * @param time the timeout duration
    * @return the command with the timeout added
    */
-  public ParallelRaceGroup withTimeout(Measure<Time> time) {
+  public ParallelRaceGroup withTimeout(Measure<TimeUnit> time) {
     return withTimeout(time.in(Second));
   }
 

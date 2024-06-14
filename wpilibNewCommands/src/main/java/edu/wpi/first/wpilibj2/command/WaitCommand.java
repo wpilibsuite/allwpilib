@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.units.Units.Second;
 
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
+import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Timer;
@@ -39,7 +39,7 @@ public class WaitCommand extends Command {
    *
    * @param time the time to wait
    */
-  public WaitCommand(Measure<Time> time) {
+  public WaitCommand(Measure<TimeUnit> time) {
     this(time.in(Second));
   }
 

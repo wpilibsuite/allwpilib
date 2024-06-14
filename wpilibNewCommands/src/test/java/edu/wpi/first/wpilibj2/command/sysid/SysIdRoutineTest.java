@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,7 +28,7 @@ class SysIdRoutineTest {
   interface Mechanism extends Subsystem {
     void recordState(SysIdRoutineLog.State state);
 
-    void drive(Measure<Voltage> voltage);
+    void drive(Measure<VoltageUnit> voltage);
 
     void log(SysIdRoutineLog log);
   }

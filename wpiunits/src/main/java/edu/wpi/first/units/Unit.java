@@ -221,8 +221,8 @@ public class Unit<U extends Unit<U>> {
    * @param period the time period of the velocity, such as seconds or milliseconds
    * @return a velocity unit corresponding to the rate of change of this unit over time
    */
-  public Velocity<U> per(Time period) {
-    return Velocity.combine(this, period);
+  public VelocityUnit<U> per(TimeUnit period) {
+    return VelocityUnit.combine(this, period);
   }
 
   /**

@@ -10,7 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.MecanumDriveWheelPositionsProto;
 import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelPositionsStruct;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -71,10 +71,10 @@ public class MecanumDriveWheelPositions
    * @param rearRight Distance measured by the rear right wheel.
    */
   public MecanumDriveWheelPositions(
-      Measure<Distance> frontLeft,
-      Measure<Distance> frontRight,
-      Measure<Distance> rearLeft,
-      Measure<Distance> rearRight) {
+      Measure<DistanceUnit> frontLeft,
+      Measure<DistanceUnit> frontRight,
+      Measure<DistanceUnit> rearLeft,
+      Measure<DistanceUnit> rearRight) {
     this(frontLeft.in(Meters), frontRight.in(Meters), rearLeft.in(Meters), rearRight.in(Meters));
   }
 

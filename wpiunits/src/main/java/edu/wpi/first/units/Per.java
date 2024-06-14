@@ -11,8 +11,8 @@ import java.util.Objects;
  * Generic combinatory unit type that represents the proportion of one unit to another, such as
  * Meters per Second or Radians per Celsius.
  *
- * <p>Note: {@link Velocity} is used to represent the velocity dimension, rather than {@code
- * Per<Distance, Time>}.
+ * <p>Note: {@link VelocityUnit} is used to represent the velocity dimension, rather than {@code
+ * Per<DistanceUnit, TimeUnit>}.
  *
  * @param <N> the type of the numerator unit
  * @param <D> the type of the denominator unit
@@ -60,7 +60,7 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
 
   /**
    * Creates a new Per unit derived from an arbitrary numerator and time denominator units. Using a
-   * denominator with a unit of time is discouraged; use {@link Velocity} instead.
+   * denominator with a unit of time is discouraged; use {@link VelocityUnit} instead.
    *
    * <pre>
    *   Per.combine(Volts, Meters) // possible PID constant

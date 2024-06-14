@@ -10,18 +10,18 @@ import static edu.wpi.first.units.Units.Watts;
  * Unit of electric current dimension.
  *
  * <p>This is the base type for units of current dimension. It is also used to specify the dimension
- * for {@link Measure}: <code>Measure&lt;Current&gt;</code>.
+ * for {@link Measure}: <code>Measure&lt;CurrentUnit&gt;</code>.
  *
  * <p>Actual units (such as {@link Units#Amps} and {@link Units#Milliamps}) can be found in the
  * {@link Units} class.
  */
-public class Current extends Unit<Current> {
-  Current(Current baseUnit, double baseUnitEquivalent, String name, String symbol) {
+public class CurrentUnit extends Unit<CurrentUnit> {
+  CurrentUnit(CurrentUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
-  Current(
-      Current baseUnit,
+  CurrentUnit(
+      CurrentUnit baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,
@@ -40,7 +40,7 @@ public class Current extends Unit<Current> {
    * @param symbol the symbol used to represent the unit of power
    * @return the power unit
    */
-  public Power times(Unit<Voltage> voltage, String name, String symbol) {
-    return new Power(Watts, this.toBaseUnits(1) * voltage.toBaseUnits(1), name, symbol);
+  public PowerUnit times(Unit<VoltageUnit> voltage, String name, String symbol) {
+    return new PowerUnit(Watts, this.toBaseUnits(1) * voltage.toBaseUnits(1), name, symbol);
   }
 }

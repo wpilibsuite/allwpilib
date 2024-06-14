@@ -8,14 +8,14 @@ package edu.wpi.first.units;
  * Unit of energy dimension.
  *
  * <p>This is the base type for units of energy dimension. It is also used to specify the dimension
- * for {@link Measure}: <code>Measure&lt;Energy&gt;</code>.
+ * for {@link Measure}: <code>Measure&lt;EnergyUnit&gt;</code>.
  *
  * <p>Actual units (such as {@link Units#Joules} and {@link Units#Kilojoules}) can be found in the
  * {@link Units} class.
  */
-public class Energy extends Unit<Energy> {
-  Energy(
-      Energy baseUnit,
+public class EnergyUnit extends Unit<EnergyUnit> {
+  EnergyUnit(
+      EnergyUnit baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,
@@ -23,7 +23,7 @@ public class Energy extends Unit<Energy> {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
-  Energy(Energy baseUnit, double baseUnitEquivalent, String name, String symbol) {
+  EnergyUnit(EnergyUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 }

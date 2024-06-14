@@ -9,9 +9,9 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.proto.SwerveModuleStateProto;
 import edu.wpi.first.math.kinematics.struct.SwerveModuleStateStruct;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.VelocityUnit;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -51,7 +51,7 @@ public class SwerveModuleState
    * @param speed The speed of the wheel of the module.
    * @param angle The angle of the module.
    */
-  public SwerveModuleState(Measure<Velocity<Distance>> speed, Rotation2d angle) {
+  public SwerveModuleState(Measure<VelocityUnit<DistanceUnit>> speed, Rotation2d angle) {
     this(speed.in(MetersPerSecond), angle);
   }
 

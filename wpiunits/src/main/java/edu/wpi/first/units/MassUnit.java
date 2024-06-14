@@ -8,19 +8,19 @@ package edu.wpi.first.units;
  * Unit of mass dimension.
  *
  * <p>This is the base type for units of mass dimension. It is also used to specify the dimension
- * for {@link Measure}: <code>Measure&lt;Mass&gt;</code>.
+ * for {@link Measure}: <code>Measure&lt;MassUnit&gt;</code>.
  *
  * <p>Actual units (such as {@link Units#Grams} and {@link Units#Pounds}) can be found in the {@link
  * Units} class.
  */
-public class Mass extends Unit<Mass> {
+public class MassUnit extends Unit<MassUnit> {
   /** Creates a new unit with the given name and multiplier to the base unit. */
-  Mass(Mass baseUnit, double baseUnitEquivalent, String name, String symbol) {
+  MassUnit(MassUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
-  Mass(
-      Mass baseUnit,
+  MassUnit(
+      MassUnit baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,

@@ -8,16 +8,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class VoltageTest {
+class CurrentUnitTest {
   @Test
-  void testVoltsTimesAmps() {
-    assertTrue(Units.Volts.times(Units.Amps, "", "").equivalent(Units.Watts));
+  void testAmpsTimesVolts() {
+    PowerUnit combined = Units.Amps.times(Units.Volts, "Watt", "w");
+
+    assertTrue(combined.equivalent(Units.Watts));
   }
 
   @Test
-  void testMilliVoltsTimesMilliAmps() {
+  void testMilliAmpsTimesMilliVolts() {
     // results in microwatts
     assertTrue(
-        Units.Millivolts.times(Units.Milliamps, "", "").equivalent(Units.Milli(Units.Milliwatts)));
+        Units.Milliamps.times(Units.Millivolts, "Microwatt", "uW")
+            .equivalent(Units.Milli(Units.Milliwatts)));
   }
 }

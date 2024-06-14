@@ -10,11 +10,11 @@ import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Value;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.Dimensionless;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.DimensionlessUnit;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.VelocityUnit;
 import edu.wpi.first.units.collections.LongToObjectHashMap;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.util.Color;
@@ -186,7 +186,7 @@ public interface LEDPattern {
    *     scroll along the length of LEDs and return back to the starting position
    * @return the scrolling pattern
    */
-  default LEDPattern scrollAtRelativeSpeed(Measure<Velocity<Dimensionless>> velocity) {
+  default LEDPattern scrollAtRelativeSpeed(Measure<VelocityUnit<DimensionlessUnit>> velocity) {
     final double periodMicros = 1 / velocity.in(Value.per(Microsecond));
 
     return (reader, writer) -> {
@@ -217,7 +217,7 @@ public interface LEDPattern {
    *
    * <pre>
    *   // LEDs per meter, a known value taken from the spec sheet of our particular LED strip
-   *   Measure&lt;Distance&gt; LED_SPACING = Meters.of(1.0 / 60);
+   *   Measure&lt;DistanceUnit&gt; LED_SPACING = Meters.of(1.0 / 60);
    *
    *   LEDPattern rainbow = LEDPattern.rainbow();
    *   LEDPattern scrollingRainbow =
@@ -233,7 +233,7 @@ public interface LEDPattern {
    * @return the scrolling pattern
    */
   default LEDPattern scrollAtAbsoluteSpeed(
-      Measure<Velocity<Distance>> velocity, Measure<Distance> ledSpacing) {
+      Measure<VelocityUnit<DistanceUnit>> velocity, Measure<DistanceUnit> ledSpacing) {
     // eg velocity = 10 m/s, spacing = 0.01m
     // meters per micro = 1e-5 m/us
     // micros per LED = 1e-2 m / (1e-5 m/us) = 1e-3 us
@@ -267,7 +267,7 @@ public interface LEDPattern {
    * @param offTime how long the pattern should be turned off for, per cycle
    * @return the blinking pattern
    */
-  default LEDPattern blink(Measure<Time> onTime, Measure<Time> offTime) {
+  default LEDPattern blink(Measure<TimeUnit> onTime, Measure<TimeUnit> offTime) {
     final long totalTimeMicros = (long) (onTime.in(Microseconds) + offTime.in(Microseconds));
     final long onTimeMicros = (long) onTime.in(Microseconds);
 
@@ -287,7 +287,7 @@ public interface LEDPattern {
    * @param onTime how long the pattern should play for (and be turned off for), per cycle
    * @return the blinking pattern
    */
-  default LEDPattern blink(Measure<Time> onTime) {
+  default LEDPattern blink(Measure<TimeUnit> onTime) {
     return blink(onTime, onTime);
   }
 
@@ -316,7 +316,7 @@ public interface LEDPattern {
    * @param period how fast the breathing pattern should complete a single cycle
    * @return the breathing pattern
    */
-  default LEDPattern breathe(Measure<Time> period) {
+  default LEDPattern breathe(Measure<TimeUnit> period) {
     final long periodMicros = (long) period.in(Microseconds);
 
     return (reader, writer) -> {
@@ -444,7 +444,7 @@ public interface LEDPattern {
    * @param relativeBrightness the multiplier to apply to all channels to modify brightness
    * @return the input pattern, displayed at
    */
-  default LEDPattern atBrightness(Measure<Dimensionless> relativeBrightness) {
+  default LEDPattern atBrightness(Measure<DimensionlessUnit> relativeBrightness) {
     double multiplier = relativeBrightness.in(Value);
 
     return (reader, writer) -> {

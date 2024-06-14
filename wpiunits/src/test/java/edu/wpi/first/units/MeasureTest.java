@@ -16,64 +16,64 @@ import org.junit.jupiter.api.Test;
 class MeasureTest {
   @Test
   void testBasics() {
-    Unit<Distance> unit = Units.Feet;
+    Unit<DistanceUnit> unit = Units.Feet;
     double magnitude = 10;
-    Measure<Distance> m = unit.of(magnitude);
+    Measure<DistanceUnit> m = unit.of(magnitude);
     assertEquals(unit, m.unit(), "Wrong units");
     assertEquals(magnitude, m.magnitude(), 0, "Wrong magnitude");
   }
 
   @Test
   void testMultiply() {
-    Measure<Distance> m = Units.Feet.of(1);
-    Measure<Distance> m2 = m.times(10);
+    Measure<DistanceUnit> m = Units.Feet.of(1);
+    Measure<DistanceUnit> m2 = m.times(10);
     assertEquals(10, m2.magnitude(), 1e-12);
     assertNotSame(m2, m); // make sure state wasn't changed
   }
 
   @Test
   void testDivide() {
-    Measure<Distance> m = Units.Meters.of(1);
-    Measure<Distance> m2 = m.divide(10);
+    Measure<DistanceUnit> m = Units.Meters.of(1);
+    Measure<DistanceUnit> m2 = m.divide(10);
     assertEquals(0.1, m2.magnitude(), 0);
     assertNotSame(m2, m);
   }
 
   @Test
   void testAdd() {
-    Measure<Distance> m1 = Units.Feet.of(1);
-    Measure<Distance> m2 = Units.Inches.of(2);
+    Measure<DistanceUnit> m1 = Units.Feet.of(1);
+    Measure<DistanceUnit> m2 = Units.Inches.of(2);
     assertTrue(m1.plus(m2).isEquivalent(Units.Feet.of(1 + 2 / 12d)));
     assertTrue(m2.plus(m1).isEquivalent(Units.Inches.of(14)));
   }
 
   @Test
   void testSubtract() {
-    Measure<Distance> m1 = Units.Feet.of(1);
-    Measure<Distance> m2 = Units.Inches.of(2);
+    Measure<DistanceUnit> m1 = Units.Feet.of(1);
+    Measure<DistanceUnit> m2 = Units.Inches.of(2);
     assertTrue(m1.minus(m2).isEquivalent(Units.Feet.of(1 - 2 / 12d)));
     assertTrue(m2.minus(m1).isEquivalent(Units.Inches.of(-10)));
   }
 
   @Test
   void testNegate() {
-    Measure<Distance> m = Units.Feet.of(123);
-    Measure<Distance> n = m.negate();
+    Measure<DistanceUnit> m = Units.Feet.of(123);
+    Measure<DistanceUnit> n = m.negate();
     assertEquals(-m.magnitude(), n.magnitude(), 1e-12);
     assertEquals(m.unit(), n.unit());
   }
 
   @Test
   void testEquivalency() {
-    Measure<Distance> inches = Units.Inches.of(12);
-    Measure<Distance> feet = Units.Feet.of(1);
+    Measure<DistanceUnit> inches = Units.Inches.of(12);
+    Measure<DistanceUnit> feet = Units.Feet.of(1);
     assertTrue(inches.isEquivalent(feet));
     assertTrue(feet.isEquivalent(inches));
   }
 
   @Test
   void testAs() {
-    Measure<Distance> m = Units.Inches.of(12);
+    Measure<DistanceUnit> m = Units.Inches.of(12);
     assertEquals(1, m.in(Units.Feet), Measure.EQUIVALENCE_THRESHOLD);
   }
 
@@ -94,7 +94,7 @@ class MeasureTest {
     var measure = Units.Kilograms.of(144);
     var result = measure.per(Units.Millisecond);
 
-    assertEquals(Velocity.class, result.unit().getClass());
+    assertEquals(VelocityUnit.class, result.unit().getClass());
     assertEquals(144_000.0, result.baseUnitMagnitude(), 1e-5);
     assertEquals(Units.Kilograms.per(Units.Milliseconds), result.unit());
   }
@@ -164,13 +164,13 @@ class MeasureTest {
 
   @Test
   void testDivideMeasure() {
-    // Dimensionless divide
+    // DimensionlessUnit divide
     var m1 = Units.Meters.of(6);
     var m2 = Units.Value.of(3);
     var result = m1.divide(m2);
     assertEquals(m1.divide(m2).magnitude(), 2);
     assertEquals(result.unit(), Units.Meters);
-    // Velocity divide
+    // VelocityUnit divide
     var m3 = Units.Meters.of(8);
     var m4 = Units.Meters.per(Units.Second).of(4);
     result = m3.divide(m4);

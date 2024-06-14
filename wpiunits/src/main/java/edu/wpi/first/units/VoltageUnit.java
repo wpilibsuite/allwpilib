@@ -10,18 +10,18 @@ import static edu.wpi.first.units.Units.Watts;
  * Unit of electric voltage dimension.
  *
  * <p>This is the base type for units of voltage dimension. It is also used to specify the dimension
- * for {@link Measure}: <code>Measure&lt;Voltage&gt;</code>.
+ * for {@link Measure}: <code>Measure&lt;VoltageUnit&gt;</code>.
  *
  * <p>Actual units (such as {@link Units#Volts} and {@link Units#Millivolts}) can be found in the
  * {@link Units} class.
  */
-public class Voltage extends Unit<Voltage> {
-  Voltage(Voltage baseUnit, double baseUnitEquivalent, String name, String symbol) {
+public class VoltageUnit extends Unit<VoltageUnit> {
+  VoltageUnit(VoltageUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
-  Voltage(
-      Voltage baseUnit,
+  VoltageUnit(
+      VoltageUnit baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,
@@ -40,7 +40,7 @@ public class Voltage extends Unit<Voltage> {
    * @param symbol the symbol used to represent the unit of power
    * @return the power unit
    */
-  public Power times(Unit<Current> current, String name, String symbol) {
-    return new Power(Watts, toBaseUnits(1) * current.toBaseUnits(1), name, symbol);
+  public PowerUnit times(CurrentUnit current, String name, String symbol) {
+    return new PowerUnit(Watts, toBaseUnits(1) * current.toBaseUnits(1), name, symbol);
   }
 }

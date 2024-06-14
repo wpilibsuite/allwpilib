@@ -7,7 +7,7 @@ package edu.wpi.first.units;
 /**
  * A type of unit that corresponds to raw values and not any physical dimension, such as percentage.
  */
-public class Dimensionless extends Unit<Dimensionless> {
+public class DimensionlessUnit extends Unit<DimensionlessUnit> {
   /**
    * Creates a new unit with the given name and multiplier to the base unit.
    *
@@ -15,12 +15,13 @@ public class Dimensionless extends Unit<Dimensionless> {
    * @param name the name of the unit
    * @param symbol the symbol of the unit
    */
-  Dimensionless(Dimensionless baseUnit, double baseUnitEquivalent, String name, String symbol) {
+  DimensionlessUnit(
+      DimensionlessUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
-  Dimensionless(
-      Dimensionless baseUnit,
+  DimensionlessUnit(
+      DimensionlessUnit baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,

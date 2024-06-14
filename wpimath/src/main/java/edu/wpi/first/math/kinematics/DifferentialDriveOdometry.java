@@ -10,7 +10,7 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.Measure;
 
 /**
@@ -55,8 +55,8 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    */
   public DifferentialDriveOdometry(
       Rotation2d gyroAngle,
-      Measure<Distance> leftDistance,
-      Measure<Distance> rightDistance,
+      Measure<DistanceUnit> leftDistance,
+      Measure<DistanceUnit> rightDistance,
       Pose2d initialPoseMeters) {
     this(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), initialPoseMeters);
   }
@@ -81,7 +81,9 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * @param rightDistance The distance traveled by the right encoder.
    */
   public DifferentialDriveOdometry(
-      Rotation2d gyroAngle, Measure<Distance> leftDistance, Measure<Distance> rightDistance) {
+      Rotation2d gyroAngle,
+      Measure<DistanceUnit> leftDistance,
+      Measure<DistanceUnit> rightDistance) {
     this(gyroAngle, leftDistance, rightDistance, Pose2d.kZero);
   }
 
@@ -120,8 +122,8 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    */
   public void resetPosition(
       Rotation2d gyroAngle,
-      Measure<Distance> leftDistance,
-      Measure<Distance> rightDistance,
+      Measure<DistanceUnit> leftDistance,
+      Measure<DistanceUnit> rightDistance,
       Pose2d poseMeters) {
     resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), poseMeters);
   }

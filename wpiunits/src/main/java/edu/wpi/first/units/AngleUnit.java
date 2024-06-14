@@ -8,21 +8,22 @@ package edu.wpi.first.units;
  * Unit of angular dimension.
  *
  * <p>This is the base type for units of angular dimension. It is also used to specify the dimension
- * for {@link Measure}: <code>Measure&lt;Angle&gt;</code>.
+ * for {@link Measure}: <code>Measure&lt;AngleUnit&gt;</code>.
  *
  * <p>Actual units (such as {@link Units#Degrees} and {@link Units#Radians}) can be found in the
  * {@link Units} class.
  */
 // technically, angles are unitless dimensions
-// eg Mass * Distance * Velocity<Angle> is equivalent to (Mass * Distance) / Time - otherwise known
-// as Power - in other words, Velocity<Angle> is /actually/ Frequency
-public class Angle extends Unit<Angle> {
-  Angle(Angle baseUnit, double baseUnitEquivalent, String name, String symbol) {
+// eg MassUnit * DistanceUnit * VelocityUnit<AngleUnit> is equivalent to (MassUnit * DistanceUnit) /
+// TimeUnit - otherwise known
+// as PowerUnit - in other words, VelocityUnit<AngleUnit> is /actually/ Frequency
+public class AngleUnit extends Unit<AngleUnit> {
+  AngleUnit(AngleUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
-  Angle(
-      Angle baseUnit,
+  AngleUnit(
+      AngleUnit baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,

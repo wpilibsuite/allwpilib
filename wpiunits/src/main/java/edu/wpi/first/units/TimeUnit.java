@@ -5,21 +5,21 @@
 package edu.wpi.first.units;
 
 /**
- * Unit of linear dimension.
+ * Unit of time dimension.
  *
- * <p>This is the base type for units of linear dimension. It is also used to specify the dimension
- * for {@link Measure}: <code>Measure&lt;Distance&gt;</code>.
+ * <p>This is the base type for units of time dimension. It is also used to specify the dimension
+ * for {@link Measure}: <code>Measure&lt;TimeUnit&gt;</code>.
  *
- * <p>Actual units (such as {@link Units#Meters} and {@link Units#Inches}) can be found in the
- * {@link Units} class.
+ * <p>Actual units (such as {@link Units#Seconds} and {@link Units#Milliseconds}) can be found in
+ * the {@link Units} class.
  */
-public class Distance extends Unit<Distance> {
-  Distance(Distance baseUnit, double baseUnitEquivalent, String name, String symbol) {
+public class TimeUnit extends Unit<TimeUnit> {
+  TimeUnit(TimeUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
-  Distance(
-      Distance baseUnit,
+  TimeUnit(
+      TimeUnit baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,

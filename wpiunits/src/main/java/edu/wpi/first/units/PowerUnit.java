@@ -5,21 +5,21 @@
 package edu.wpi.first.units;
 
 /**
- * Unit of time dimension.
+ * Unit of power dimension.
  *
- * <p>This is the base type for units of time dimension. It is also used to specify the dimension
- * for {@link Measure}: <code>Measure&lt;Time&gt;</code>.
+ * <p>This is the base type for units of power dimension. It is also used to specify the dimension
+ * for {@link Measure}: <code>Measure&lt;PowerUnit&gt;</code>.
  *
- * <p>Actual units (such as {@link Units#Seconds} and {@link Units#Milliseconds}) can be found in
- * the {@link Units} class.
+ * <p>Actual units (such as {@link Units#Watts} and {@link Units#Horsepower}) can be found in the
+ * {@link Units} class.
  */
-public class Time extends Unit<Time> {
-  Time(Time baseUnit, double baseUnitEquivalent, String name, String symbol) {
+public class PowerUnit extends Unit<PowerUnit> {
+  PowerUnit(PowerUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
 
-  Time(
-      Time baseUnit,
+  PowerUnit(
+      PowerUnit baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,

@@ -13,23 +13,23 @@ import java.util.Objects;
  *
  * <p>This is the base type for units of velocity dimension. It is also used in combination with a
  * distance dimension to specify the dimension for {@link Measure}. For example: <code>
- * Measure&lt;Velocity&lt;Distance&gt;&gt;</code>.
+ * Measure&lt;VelocityUnit&lt;DistanceUnit&gt;&gt;</code>.
  *
  * <p>Actual units (such as {@link Units#MetersPerSecond} and {@link Units#RPM}) can be found in the
  * {@link Units} class.
  *
- * @param <D> the distance unit, such as {@link Angle} or {@link Distance}
+ * @param <D> the distance unit, such as {@link AngleUnit} or {@link DistanceUnit}
  */
-public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
+public class VelocityUnit<D extends Unit<D>> extends Unit<VelocityUnit<D>> {
   private final D m_unit;
-  private final Time m_period;
+  private final TimeUnit m_period;
 
   /**
-   * Stores velocity units that were created ad-hoc using {@link #combine(Unit, Time, String,
+   * Stores velocity units that were created ad-hoc using {@link #combine(Unit, TimeUnit, String,
    * String)}. Does not store objects created directly by constructors.
    */
   @SuppressWarnings("rawtypes")
-  private static final LongToObjectHashMap<Velocity> cache = new LongToObjectHashMap<>();
+  private static final LongToObjectHashMap<VelocityUnit> cache = new LongToObjectHashMap<>();
 
   /** Generates a cache key used for cache lookups. */
   private static long cacheKey(Unit<?> numerator, Unit<?> denominator) {
@@ -43,16 +43,16 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    * the pre-existing units instead of generating new identical ones.
    *
    * <pre>
-   *   Velocity.combine(Kilograms, Second) // mass flow
-   *   Velocity.combine(Feet, Millisecond) // linear speed
-   *   Velocity.combine(Radians, Second) // angular speed
+   *   VelocityUnit.combine(Kilograms, Second) // mass flow
+   *   VelocityUnit.combine(Feet, Millisecond) // linear speed
+   *   VelocityUnit.combine(Radians, Second) // angular speed
    *
-   *   Velocity.combine(Feet.per(Second), Second) // linear acceleration in ft/s/s
-   *   Velocity.combine(Radians.per(Second), Second) // angular acceleration
+   *   VelocityUnit.combine(Feet.per(Second), Second) // linear acceleration in ft/s/s
+   *   VelocityUnit.combine(Radians.per(Second), Second) // angular acceleration
    * </pre>
    *
-   * <p>It's recommended to use the convenience function {@link Unit#per(Time)} instead of calling
-   * this factory directly.
+   * <p>It's recommended to use the convenience function {@link Unit#per(TimeUnit)} instead of
+   * calling this factory directly.
    *
    * @param <D> the type of the numerator unit
    * @param numerator the numerator unit
@@ -62,14 +62,14 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    * @return the new unit
    */
   @SuppressWarnings("unchecked")
-  public static <D extends Unit<D>> Velocity<D> combine(
-      Unit<D> numerator, Time period, String name, String symbol) {
+  public static <D extends Unit<D>> VelocityUnit<D> combine(
+      Unit<D> numerator, TimeUnit period, String name, String symbol) {
     long key = cacheKey(numerator, period);
     if (cache.containsKey(key)) {
       return cache.get(key);
     }
 
-    Velocity<D> velocity = new Velocity<>((D) numerator, period, name, symbol);
+    VelocityUnit<D> velocity = new VelocityUnit<>((D) numerator, period, name, symbol);
     cache.put(key, velocity);
     return velocity;
   }
@@ -83,16 +83,16 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    * <p>This method automatically generates a new name and symbol for the new velocity unit.
    *
    * <pre>
-   *   Velocity.combine(Kilograms, Second) // mass flow
-   *   Velocity.combine(Feet, Millisecond) // linear speed
-   *   Velocity.combine(Radians, Second) // angular speed
+   *   VelocityUnit.combine(Kilograms, Second) // mass flow
+   *   VelocityUnit.combine(Feet, Millisecond) // linear speed
+   *   VelocityUnit.combine(Radians, Second) // angular speed
    *
-   *   Velocity.combine(Feet.per(Second), Second) // linear acceleration in ft/s/s
-   *   Velocity.combine(Radians.per(Second), Second) // angular acceleration
+   *   VelocityUnit.combine(Feet.per(Second), Second) // linear acceleration in ft/s/s
+   *   VelocityUnit.combine(Radians.per(Second), Second) // angular acceleration
    * </pre>
    *
-   * <p>It's recommended to use the convenience function {@link Unit#per(Time)} instead of calling
-   * this factory directly.
+   * <p>It's recommended to use the convenience function {@link Unit#per(TimeUnit)} instead of
+   * calling this factory directly.
    *
    * @param <D> the type of the numerator unit
    * @param numerator the numerator unit
@@ -100,7 +100,7 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    * @return the new unit
    */
   @SuppressWarnings("unchecked")
-  public static <D extends Unit<D>> Velocity<D> combine(Unit<D> numerator, Time period) {
+  public static <D extends Unit<D>> VelocityUnit<D> combine(Unit<D> numerator, TimeUnit period) {
     long key = cacheKey(numerator, period);
     if (cache.containsKey(key)) {
       return cache.get(key);
@@ -109,13 +109,13 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
     var name = numerator.name() + " per " + period.name();
     var symbol = numerator.symbol() + "/" + period.symbol();
 
-    Velocity<D> velocity = new Velocity<>((D) numerator, period, name, symbol);
+    VelocityUnit<D> velocity = new VelocityUnit<>((D) numerator, period, name, symbol);
     cache.put(key, velocity);
     return velocity;
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  Velocity(D unit, Time period, String name, String symbol) {
+  VelocityUnit(D unit, TimeUnit period, String name, String symbol) {
     super(
         unit.isBaseUnit() && period.isBaseUnit()
             ? null
@@ -128,8 +128,8 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  Velocity(
-      Velocity<D> baseUnit,
+  VelocityUnit(
+      VelocityUnit<D> baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,
@@ -153,7 +153,7 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    *
    * @return the period unit
    */
-  public Time getPeriod() {
+  public TimeUnit getPeriod() {
     return m_period;
   }
 
@@ -162,7 +162,7 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    *
    * @return the reciprocal
    */
-  public Per<Time, D> reciprocal() {
+  public Per<TimeUnit, D> reciprocal() {
     return m_period.per(m_unit);
   }
 
@@ -177,7 +177,7 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
     if (!super.equals(o)) {
       return false;
     }
-    Velocity<?> velocity = (Velocity<?>) o;
+    VelocityUnit<?> velocity = (VelocityUnit<?>) o;
     return m_unit.equals(velocity.m_unit) && m_period.equals(velocity.m_period);
   }
 
