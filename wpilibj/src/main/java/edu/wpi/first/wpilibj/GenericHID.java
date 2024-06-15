@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.HashMap;
@@ -98,7 +99,8 @@ public class GenericHID {
   private int m_leftRumble;
   private int m_rightRumble;
   private final Map<EventLoop, Map<Integer, BooleanEvent>> m_buttonCache = new HashMap<>();
-  private final Map<EventLoop, Map<Double, BooleanEvent>> m_axisCache = new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisCache =
+      new HashMap<>();
   private final Map<EventLoop, Map<Integer, BooleanEvent>> m_povCache = new HashMap<>();
 
   /**
@@ -344,7 +346,8 @@ public class GenericHID {
   public BooleanEvent axisLessThan(int axis, double threshold, EventLoop loop) {
     var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
-        axis * 100 - threshold, k -> new BooleanEvent(loop, () -> getRawAxis(axis) < threshold));
+        new Pair<>(axis, -threshold),
+        k -> new BooleanEvent(loop, () -> getRawAxis(axis) < threshold));
   }
 
   /**
@@ -360,7 +363,8 @@ public class GenericHID {
   public BooleanEvent axisGreaterThan(int axis, double threshold, EventLoop loop) {
     var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
-        axis * 100 + threshold, k -> new BooleanEvent(loop, () -> getRawAxis(axis) > threshold));
+        new Pair<>(axis, threshold),
+        k -> new BooleanEvent(loop, () -> getRawAxis(axis) > threshold));
   }
 
   /**

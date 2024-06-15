@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -18,7 +19,7 @@ import java.util.Map;
 public class CommandGenericHID {
   private final GenericHID m_hid;
   private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
-  private final Map<EventLoop, Map<Double, Trigger>> m_axisCache = new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisCache = new HashMap<>();
   private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
 
   /**
@@ -223,7 +224,7 @@ public class CommandGenericHID {
   public Trigger axisLessThan(int axis, double threshold, EventLoop loop) {
     var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
-        axis * 100 - threshold, k -> new Trigger(loop, () -> getRawAxis(axis) < threshold));
+        new Pair<>(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) < threshold));
   }
 
   /**
@@ -253,7 +254,7 @@ public class CommandGenericHID {
   public Trigger axisGreaterThan(int axis, double threshold, EventLoop loop) {
     var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
-        axis * 100 + threshold, k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
+        new Pair<>(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
   }
 
   /**
