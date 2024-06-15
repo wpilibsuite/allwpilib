@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.TimeUnit;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -137,7 +135,7 @@ public final class Commands {
    * @return the command
    * @see WaitCommand
    */
-  public static Command waitTime(Measure<TimeUnit> time) {
+  public static Command waitTime(Time time) {
     return new WaitCommand(time);
   }
 

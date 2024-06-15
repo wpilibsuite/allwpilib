@@ -14,7 +14,7 @@ import java.util.Objects;
  *
  * @param <U> the unit type of the measure
  */
-public class ImmutableMeasure<U extends Unit<U>> implements Measure<U> {
+public class ImmutableMeasure<U extends Unit> implements Measure<U> {
   private final double m_magnitude;
   private final double m_baseUnitMagnitude;
   private final U m_unit;
@@ -26,12 +26,11 @@ public class ImmutableMeasure<U extends Unit<U>> implements Measure<U> {
    * @param magnitude the magnitude of this measure
    * @param unit the unit of this measure.
    */
-  @SuppressWarnings("unchecked")
-  ImmutableMeasure(double magnitude, double baseUnitMagnitude, Unit<U> unit) {
+  ImmutableMeasure(double magnitude, double baseUnitMagnitude, U unit) {
     Objects.requireNonNull(unit, "Unit cannot be null");
     m_magnitude = magnitude;
     m_baseUnitMagnitude = baseUnitMagnitude;
-    m_unit = (U) unit;
+    m_unit = unit;
   }
 
   /**
@@ -42,8 +41,7 @@ public class ImmutableMeasure<U extends Unit<U>> implements Measure<U> {
    * @param unit the unit of measure
    * @return a new measure
    */
-  public static <U extends Unit<U>> ImmutableMeasure<U> ofBaseUnits(
-      double baseUnitMagnitude, Unit<U> unit) {
+  public static <U extends Unit> ImmutableMeasure<U> ofBaseUnits(double baseUnitMagnitude, U unit) {
     return new ImmutableMeasure<>(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
   }
 
@@ -55,8 +53,8 @@ public class ImmutableMeasure<U extends Unit<U>> implements Measure<U> {
    * @param unit the unit of measure
    * @return a new measure
    */
-  public static <U extends Unit<U>> ImmutableMeasure<U> ofRelativeUnits(
-      double relativeMagnitude, Unit<U> unit) {
+  public static <U extends Unit> ImmutableMeasure<U> ofRelativeUnits(
+      double relativeMagnitude, U unit) {
     return new ImmutableMeasure<>(relativeMagnitude, unit.toBaseUnits(relativeMagnitude), unit);
   }
 

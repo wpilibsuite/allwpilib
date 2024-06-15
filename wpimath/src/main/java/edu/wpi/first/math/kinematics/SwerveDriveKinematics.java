@@ -14,10 +14,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.SwerveDriveKinematicsProto;
 import edu.wpi.first.math.kinematics.struct.SwerveDriveKinematicsStruct;
-import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.DistanceUnit;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.AngularVelocity;
+import edu.wpi.first.units.LinearVelocity;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -307,7 +305,7 @@ public class SwerveDriveKinematics
    * @param attainableMaxSpeed The absolute max speed that a module can reach.
    */
   public static void desaturateWheelSpeeds(
-      SwerveModuleState[] moduleStates, Measure<VelocityUnit<DistanceUnit>> attainableMaxSpeed) {
+      SwerveModuleState[] moduleStates, LinearVelocity attainableMaxSpeed) {
     desaturateWheelSpeeds(moduleStates, attainableMaxSpeed.in(MetersPerSecond));
   }
 
@@ -379,9 +377,9 @@ public class SwerveDriveKinematics
   public static void desaturateWheelSpeeds(
       SwerveModuleState[] moduleStates,
       ChassisSpeeds desiredChassisSpeed,
-      Measure<VelocityUnit<DistanceUnit>> attainableMaxModuleSpeed,
-      Measure<VelocityUnit<DistanceUnit>> attainableMaxTranslationalSpeed,
-      Measure<VelocityUnit<AngleUnit>> attainableMaxRotationalVelocity) {
+      LinearVelocity attainableMaxModuleSpeed,
+      LinearVelocity attainableMaxTranslationalSpeed,
+      AngularVelocity attainableMaxRotationalVelocity) {
     desaturateWheelSpeeds(
         moduleStates,
         desiredChassisSpeed,

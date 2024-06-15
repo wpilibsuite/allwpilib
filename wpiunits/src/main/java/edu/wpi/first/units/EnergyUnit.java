@@ -13,7 +13,7 @@ package edu.wpi.first.units;
  * <p>Actual units (such as {@link Units#Joules} and {@link Units#Kilojoules}) can be found in the
  * {@link Units} class.
  */
-public class EnergyUnit extends Unit<EnergyUnit> {
+public class EnergyUnit extends Unit {
   EnergyUnit(
       EnergyUnit baseUnit,
       UnaryFunction toBaseConverter,
@@ -25,5 +25,18 @@ public class EnergyUnit extends Unit<EnergyUnit> {
 
   EnergyUnit(EnergyUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
+  }
+
+  @Override
+  public EnergyUnit getBaseUnit() {
+    return (EnergyUnit) super.getBaseUnit();
+  }
+
+  public PowerUnit per(TimeUnit period) {
+    return PowerUnit.combine(this, period);
+  }
+
+  public Energy of(double magnitude) {
+    return new Energy(magnitude, toBaseUnits(magnitude), this);
   }
 }

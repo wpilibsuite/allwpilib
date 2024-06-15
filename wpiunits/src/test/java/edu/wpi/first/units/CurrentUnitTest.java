@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,11 @@ class CurrentUnitTest {
   @Test
   void testMilliAmpsTimesMilliVolts() {
     // results in microwatts
-    assertTrue(
-        Units.Milliamps.times(Units.Millivolts, "Microwatt", "uW")
-            .equivalent(Units.Milli(Units.Milliwatts)));
+    PowerUnit times = Units.Milliamps.times(Units.Millivolts, "Microwatt", "uW");
+    PowerUnit millimilli = Units.Milli(Units.Milliwatts);
+
+    assertEquals(1, times.convertFrom(1e-6, Units.Watts));
+    assertEquals(1, millimilli.convertFrom(1e-6, Units.Watts));
+    assertTrue(times.equivalent(millimilli));
   }
 }

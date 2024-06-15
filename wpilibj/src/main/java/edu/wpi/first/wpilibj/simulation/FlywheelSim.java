@@ -13,10 +13,8 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.AngularAcceleration;
+import edu.wpi.first.units.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism. */
@@ -31,12 +29,11 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   private final double m_jKgMetersSquared;
 
   // The angular velocity of the system.
-  private final MutableMeasure<VelocityUnit<AngleUnit>> m_angularVelocity =
-      MutableMeasure.zero(RadiansPerSecond);
+  private final AngularVelocity.Mutable m_angularVelocity = RadiansPerSecond.mutable(0);
 
   // The angular acceleration of the system.
-  private final MutableMeasure<VelocityUnit<VelocityUnit<AngleUnit>>> m_angularAcceleration =
-      MutableMeasure.zero(RadiansPerSecondPerSecond);
+  private final AngularAcceleration.Mutable m_angularAcceleration =
+      RadiansPerSecondPerSecond.mutable(0);
 
   /**
    * Creates a simulated flywheel mechanism.
@@ -133,7 +130,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's velocity
    */
-  public Measure<VelocityUnit<AngleUnit>> getAngularVelocity() {
+  public AngularVelocity getAngularVelocity() {
     m_angularVelocity.mut_setMagnitude(getAngularVelocityRadPerSec());
     return m_angularVelocity;
   }
@@ -153,7 +150,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's acceleration.
    */
-  public Measure<VelocityUnit<VelocityUnit<AngleUnit>>> getAngularAcceleration() {
+  public AngularAcceleration getAngularAcceleration() {
     m_angularAcceleration.mut_setMagnitude(getAngularAccelerationRadPerSecSq());
     return m_angularAcceleration;
   }

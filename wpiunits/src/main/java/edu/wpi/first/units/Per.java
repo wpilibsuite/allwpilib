@@ -4,7 +4,6 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 
 /**
@@ -17,7 +16,7 @@ import java.util.Objects;
  * @param <N> the type of the numerator unit
  * @param <D> the type of the denominator unit
  */
-public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
+public class Per<N extends Unit, D extends Unit> extends Unit {
   private final N m_numerator;
   private final D m_denominator;
 
@@ -26,7 +25,8 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
    * after the first.
    */
   @SuppressWarnings("rawtypes")
-  private static final LongToObjectHashMap<Per> cache = new LongToObjectHashMap<>();
+  private static final CombinatoryUnitCache<Unit, Unit, Per> cache =
+      new CombinatoryUnitCache<>(Per::new);
 
   /**
    * Creates a new proportional unit derived from the ratio of one unit to another. Consider using
@@ -54,8 +54,8 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
       String name,
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
-    m_numerator = baseUnit.numerator();
-    m_denominator = baseUnit.denominator();
+    m_numerator = getBaseUnit().numerator();
+    m_denominator = getBaseUnit().denominator();
   }
 
   /**
@@ -66,9 +66,6 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
    *   Per.combine(Volts, Meters) // possible PID constant
    * </pre>
    *
-   * <p>It's recommended to use the convenience function {@link Unit#per(Unit)} instead of calling
-   * this factory directly.
-   *
    * @param <N> the type of the numerator unit
    * @param <D> the type of the denominator unit
    * @param numerator the numerator unit
@@ -76,18 +73,14 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
    * @return the combined unit
    */
   @SuppressWarnings("unchecked")
-  public static <N extends Unit<N>, D extends Unit<D>> Per<N, D> combine(
-      N numerator, D denominator) {
-    final long key = ((long) numerator.hashCode()) << 32L | (denominator.hashCode() & 0xFFFFFFFFL);
+  public static <N extends Unit, D extends Unit> Per<N, D> combine(N numerator, D denominator) {
+    return cache.combine(numerator, denominator);
+  }
 
-    var existing = cache.get(key);
-    if (existing != null) {
-      return existing;
-    }
-
-    var newUnit = new Per<>(numerator, denominator);
-    cache.put(key, newUnit);
-    return newUnit;
+  @Override
+  @SuppressWarnings("unchecked")
+  public Per<N, D> getBaseUnit() {
+    return (Per<N, D>) super.getBaseUnit();
   }
 
   /**
@@ -114,7 +107,28 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
    * @return the reciprocal
    */
   public Per<D, N> reciprocal() {
-    return m_denominator.per(m_numerator);
+    return combine(m_denominator, m_numerator);
+  }
+
+  public N mult(D denom) {
+    if (denom.equivalent(denominator())) {
+      return numerator();
+    }
+
+    return Units.derive(numerator())
+        .toBase(denom.getConverterToBase().div(denominator().getConverterToBase()))
+        .fromBase(denom.getConverterFromBase().div(denominator().getConverterFromBase()))
+        .named(name() + " per " + denom.name())
+        .symbol(symbol() + "/" + denom.symbol())
+        .make();
+  }
+
+  public Measure<? extends Per<N, D>> of(double magnitude) {
+    return ImmutableMeasure.ofRelativeUnits(magnitude, this);
+  }
+
+  public double convertFrom(double magnitude, Per<? extends N, ? extends D> otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
   @Override

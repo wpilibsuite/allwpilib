@@ -34,9 +34,6 @@ public final class BaseUnits {
   /** The standard unit of energy, joules. */
   public static final EnergyUnit EnergyUnit = new EnergyUnit(null, 1, "Joule", "J");
 
-  /** The standard unit of power, watts. */
-  public static final PowerUnit PowerUnit = new PowerUnit(null, 1, "Watt", "W");
-
   /** The standard unit of temperature, kelvin. */
   public static final TemperatureUnit TemperatureUnit =
       new TemperatureUnit(null, x -> x, x -> x, "Kelvin", "K");

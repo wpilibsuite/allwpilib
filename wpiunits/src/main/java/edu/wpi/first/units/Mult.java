@@ -4,7 +4,6 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 
 /**
@@ -15,12 +14,13 @@ import java.util.Objects;
  * @param <A> the type of the first unit in the result
  * @param <B> the type of the second unit in the result
  */
-public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>> {
+public class Mult<A extends Unit, B extends Unit> extends Unit {
   private final A m_unitA;
   private final B m_unitB;
 
   @SuppressWarnings("rawtypes")
-  private static final LongToObjectHashMap<Mult> cache = new LongToObjectHashMap<>();
+  private static final CombinatoryUnitCache<Unit, Unit, Mult> cache =
+      new CombinatoryUnitCache<>(Mult::new);
 
   /**
    * Creates a new product unit. Consider using {@link #combine} instead of manually calling this
@@ -46,8 +46,8 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
       String name,
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
-    m_unitA = baseUnit.unitA();
-    m_unitB = baseUnit.unitB();
+    m_unitA = getBaseUnit().unitA();
+    m_unitB = getBaseUnit().unitB();
   }
 
   /**
@@ -57,9 +57,6 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
    *   Mult.combine(Volts, Meters) // Volt-Meters
    * </pre>
    *
-   * <p>It's recommended to use the convenience function {@link Unit#mult(Unit)} instead of calling
-   * this factory directly.
-   *
    * @param <A> the type of the first unit
    * @param <B> the type of the second unit
    * @param a the first unit
@@ -67,15 +64,14 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
    * @return the combined unit
    */
   @SuppressWarnings("unchecked")
-  public static <A extends Unit<A>, B extends Unit<B>> Mult<A, B> combine(A a, B b) {
-    final long key = ((long) a.hashCode()) << 32L | (b.hashCode() & 0xFFFFFFFFL);
-    if (cache.containsKey(key)) {
-      return cache.get(key);
-    }
+  public static <A extends Unit, B extends Unit> Mult<A, B> combine(A a, B b) {
+    return cache.combine(a, b);
+  }
 
-    var mult = new Mult<A, B>(a, b);
-    cache.put(key, mult);
-    return mult;
+  @Override
+  @SuppressWarnings("unchecked")
+  public Mult<A, B> getBaseUnit() {
+    return (Mult<A, B>) super.getBaseUnit();
   }
 
   /**

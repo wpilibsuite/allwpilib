@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import static edu.wpi.first.units.Units.Watts;
-
 /**
  * Unit of electric voltage dimension.
  *
@@ -15,7 +13,7 @@ import static edu.wpi.first.units.Units.Watts;
  * <p>Actual units (such as {@link Units#Volts} and {@link Units#Millivolts}) can be found in the
  * {@link Units} class.
  */
-public class VoltageUnit extends Unit<VoltageUnit> {
+public class VoltageUnit extends Unit {
   VoltageUnit(VoltageUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
@@ -32,8 +30,8 @@ public class VoltageUnit extends Unit<VoltageUnit> {
   /**
    * Constructs a unit of power equivalent to this unit of voltage multiplied by another unit of
    * electrical current. For example, {@code Volts.times(Amps)} will return a unit of power
-   * equivalent to one Watt; {@code Volts.times(Milliams)} will return a unit of power equivalent to
-   * a milliwatt, and so on.
+   * equivalent to one Watt; {@code Volts.times(Milliamps)} will return a unit of power equivalent
+   * to a milliwatt, and so on.
    *
    * @param current the current unit to multiply by
    * @param name the name of the resulting unit of power
@@ -41,6 +39,26 @@ public class VoltageUnit extends Unit<VoltageUnit> {
    * @return the power unit
    */
   public PowerUnit times(CurrentUnit current, String name, String symbol) {
-    return new PowerUnit(Watts, toBaseUnits(1) * current.toBaseUnits(1), name, symbol);
+    return Units.derive(PowerUnit.combine(this, current)).named(name).symbol(symbol).make();
+  }
+
+  public Voltage of(double magnitude) {
+    return new Voltage(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  public Voltage.Mutable mutable(double magnitude) {
+    return new Voltage.Mutable(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  public <U extends Unit> Per<VoltageUnit, U> per(U other) {
+    return Per.combine(this, other);
+  }
+
+  public VelocityUnit<VoltageUnit> per(TimeUnit period) {
+    return VelocityUnit.combine(this, period);
+  }
+
+  public double convertFrom(double magnitude, VoltageUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 }

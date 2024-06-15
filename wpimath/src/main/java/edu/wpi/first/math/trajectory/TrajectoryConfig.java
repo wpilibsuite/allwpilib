@@ -14,9 +14,8 @@ import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConst
 import edu.wpi.first.math.trajectory.constraint.MecanumDriveKinematicsConstraint;
 import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.math.trajectory.constraint.TrajectoryConstraint;
-import edu.wpi.first.units.DistanceUnit;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.LinearAcceleration;
+import edu.wpi.first.units.LinearVelocity;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,9 +54,7 @@ public class TrajectoryConfig {
    * @param maxVelocity The max velocity for the trajectory.
    * @param maxAcceleration The max acceleration for the trajectory.
    */
-  public TrajectoryConfig(
-      Measure<VelocityUnit<DistanceUnit>> maxVelocity,
-      Measure<VelocityUnit<VelocityUnit<DistanceUnit>>> maxAcceleration) {
+  public TrajectoryConfig(LinearVelocity maxVelocity, LinearAcceleration maxAcceleration) {
     this(maxVelocity.in(MetersPerSecond), maxAcceleration.in(MetersPerSecondPerSecond));
   }
 
@@ -145,7 +142,7 @@ public class TrajectoryConfig {
    * @param startVelocity The start velocity of the trajectory.
    * @return Instance of the current config object.
    */
-  public TrajectoryConfig setStartVelocity(Measure<VelocityUnit<DistanceUnit>> startVelocity) {
+  public TrajectoryConfig setStartVelocity(LinearVelocity startVelocity) {
     return setStartVelocity(startVelocity.in(MetersPerSecond));
   }
 
@@ -175,7 +172,7 @@ public class TrajectoryConfig {
    * @param endVelocity The end velocity of the trajectory.
    * @return Instance of the current config object.
    */
-  public TrajectoryConfig setEndVelocity(Measure<VelocityUnit<DistanceUnit>> endVelocity) {
+  public TrajectoryConfig setEndVelocity(LinearVelocity endVelocity) {
     return setEndVelocity(endVelocity.in(MetersPerSecond));
   }
 

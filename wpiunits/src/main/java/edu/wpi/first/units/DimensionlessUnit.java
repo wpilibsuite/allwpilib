@@ -7,7 +7,7 @@ package edu.wpi.first.units;
 /**
  * A type of unit that corresponds to raw values and not any physical dimension, such as percentage.
  */
-public class DimensionlessUnit extends Unit<DimensionlessUnit> {
+public class DimensionlessUnit extends Unit {
   /**
    * Creates a new unit with the given name and multiplier to the base unit.
    *
@@ -27,5 +27,25 @@ public class DimensionlessUnit extends Unit<DimensionlessUnit> {
       String name,
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+  }
+
+  public Dimensionless of(double magnitude) {
+    return new Dimensionless(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  public <U extends Unit> U mult(U other) {
+    return Units.derive(other)
+        .toBase(other.getConverterToBase().mult(this.getConverterToBase()))
+        .fromBase(other.getConverterFromBase().mult(this.getConverterFromBase()))
+        // TODO: name, symbol
+        .make();
+  }
+
+  public double convertFrom(double magnitude, DimensionlessUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
+  }
+
+  public FrequencyUnit per(TimeUnit period) {
+    return FrequencyUnit.combine(this, period);
   }
 }

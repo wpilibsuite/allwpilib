@@ -17,7 +17,7 @@ package edu.wpi.first.units;
 // eg MassUnit * DistanceUnit * VelocityUnit<AngleUnit> is equivalent to (MassUnit * DistanceUnit) /
 // TimeUnit - otherwise known
 // as PowerUnit - in other words, VelocityUnit<AngleUnit> is /actually/ Frequency
-public class AngleUnit extends Unit<AngleUnit> {
+public class AngleUnit extends Unit {
   AngleUnit(AngleUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
@@ -29,5 +29,21 @@ public class AngleUnit extends Unit<AngleUnit> {
       String name,
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+  }
+
+  public Angle of(double magnitude) {
+    return new Angle(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  public AngularVelocityUnit per(TimeUnit second) {
+    return AngularVelocityUnit.combine(this, second);
+  }
+
+  public double convertFrom(double magnitude, AngleUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
+  }
+
+  public Angle.Mutable mutable(double initialMagnitude) {
+    return new Angle.Mutable(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import static edu.wpi.first.units.Units.Watts;
-
 /**
  * Unit of electric current dimension.
  *
@@ -15,7 +13,7 @@ import static edu.wpi.first.units.Units.Watts;
  * <p>Actual units (such as {@link Units#Amps} and {@link Units#Milliamps}) can be found in the
  * {@link Units} class.
  */
-public class CurrentUnit extends Unit<CurrentUnit> {
+public class CurrentUnit extends Unit {
   CurrentUnit(CurrentUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
@@ -40,7 +38,19 @@ public class CurrentUnit extends Unit<CurrentUnit> {
    * @param symbol the symbol used to represent the unit of power
    * @return the power unit
    */
-  public PowerUnit times(Unit<VoltageUnit> voltage, String name, String symbol) {
-    return new PowerUnit(Watts, this.toBaseUnits(1) * voltage.toBaseUnits(1), name, symbol);
+  public PowerUnit times(VoltageUnit voltage, String name, String symbol) {
+    return Units.derive(PowerUnit.combine(voltage, this)).named(name).symbol(symbol).make();
+  }
+
+  public Current of(double magnitude) {
+    return new Current(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  public Current ofBaseUnits(double baseUnitMagnitude) {
+    return new Current(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  public double convertFrom(double magnitude, CurrentUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 }

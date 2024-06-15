@@ -14,6 +14,17 @@ public final class Units {
 
   // Pseudo-classes describing the more common units of measure.
 
+  // Unitless
+  /** A dimensionless unit that performs no scaling whatsoever. */
+  public static final DimensionlessUnit Value = BaseUnits.Value;
+
+  /**
+   * A dimensionless unit equal to to 1/100th of a {@link #Value}. A measurement of {@code
+   * Percent.of(42)} would be equivalent to {@code Value.of(0.42)}.
+   */
+  public static final DimensionlessUnit Percent =
+      derive(Value).splitInto(100).named("Percent").symbol("%").make();
+
   // DistanceUnit
   /** The base unit of distance. */
   public static final DistanceUnit Meters = BaseUnits.DistanceUnit;
@@ -125,90 +136,93 @@ public final class Units {
    * The standard SI unit of linear velocity, equivalent to travelling at a rate of one {@link
    * #Meters Meter} per {@link #Second}.
    */
-  public static final VelocityUnit<DistanceUnit> MetersPerSecond = Meters.per(Second);
+  public static final LinearVelocityUnit MetersPerSecond = Meters.per(Second);
 
   /**
    * A unit of linear velocity equivalent to travelling at a rate one {@link #Feet Foot} per {@link
    * #Second}.
    */
-  public static final VelocityUnit<DistanceUnit> FeetPerSecond = Feet.per(Second);
+  public static final LinearVelocityUnit FeetPerSecond = Feet.per(Second);
 
   /**
    * A unit of linear velocity equivalent to travelling at a rate of one {@link #Inches Inch} per
    * {@link #Second}.
    */
-  public static final VelocityUnit<DistanceUnit> InchesPerSecond = Inches.per(Second);
+  public static final LinearVelocityUnit InchesPerSecond = Inches.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Revolutions
    * Revolution} per {@link #Second}.
    */
-  public static final VelocityUnit<AngleUnit> RevolutionsPerSecond = Revolutions.per(Second);
+  public static final AngularVelocityUnit RevolutionsPerSecond = Revolutions.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Rotations Rotation}
    * per {@link #Second}.
    */
-  public static final VelocityUnit<AngleUnit> RotationsPerSecond = Rotations.per(Second);
+  public static final AngularVelocityUnit RotationsPerSecond = Rotations.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Rotations Rotation}
    * per {@link #Minute}. Motor spec sheets often list maximum speeds in terms of RPM.
    */
-  public static final VelocityUnit<AngleUnit> RPM = Rotations.per(Minute);
+  public static final AngularVelocityUnit RPM = Rotations.per(Minute);
 
   /**
    * The standard SI unit of angular velocity, equivalent to spinning at a rate of one {@link
    * #Radians Radian} per {@link #Second}.
    */
-  public static final VelocityUnit<AngleUnit> RadiansPerSecond = Radians.per(Second);
+  public static final AngularVelocityUnit RadiansPerSecond = Radians.per(Second);
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Degrees Degree} per
    * {@link #Second}.
    */
-  public static final VelocityUnit<AngleUnit> DegreesPerSecond = Degrees.per(Second);
+  public static final AngularVelocityUnit DegreesPerSecond = Degrees.per(Second);
+
+  public static final FrequencyUnit Hertz =
+      derive(Value.per(Second)).named("Hertz").symbol("hz").make();
+
+  public static final FrequencyUnit Millihertz = Milli(Hertz);
 
   // Acceleration
   /**
    * The standard SI unit of linear acceleration, equivalent to accelerating at a rate of one {@link
    * #Meters Meter} per {@link #Second} every second.
    */
-  public static final VelocityUnit<VelocityUnit<DistanceUnit>> MetersPerSecondPerSecond =
-      MetersPerSecond.per(Second);
+  public static final LinearAccelerationUnit MetersPerSecondPerSecond = MetersPerSecond.per(Second);
 
   /**
    * A unit of linear acceleration equivalent to accelerating at a rate of one {@link #Foot Foot}
    * per {@link #Second} every second.
    */
-  public static final VelocityUnit<VelocityUnit<DistanceUnit>> FeetPerSecondPerSecond =
-      FeetPerSecond.per(Second);
+  public static final LinearAccelerationUnit FeetPerSecondPerSecond = FeetPerSecond.per(Second);
 
   /**
    * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Rotations
    * Rotation} per {@link #Second} every second.
    */
-  public static final VelocityUnit<VelocityUnit<AngleUnit>> RotationsPerSecondPerSecond =
+  public static final AngularAccelerationUnit RotationsPerSecondPerSecond =
       RotationsPerSecond.per(Second);
 
   /**
    * The standard SI unit of angular acceleration, equivalent to accelerating at a rate of one
    * {@link #Radians Radian} per {@link #Second} every second.
    */
-  public static final VelocityUnit<VelocityUnit<AngleUnit>> RadiansPerSecondPerSecond =
+  public static final AngularAccelerationUnit RadiansPerSecondPerSecond =
       RadiansPerSecond.per(Second);
 
   /**
    * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Degrees
    * Degree} per {@link #Second} every second.
    */
-  public static final VelocityUnit<VelocityUnit<AngleUnit>> DegreesPerSecondPerSecond =
+  public static final AngularAccelerationUnit DegreesPerSecondPerSecond =
       DegreesPerSecond.per(Second);
 
   /**
    * A unit of acceleration equivalent to the pull of gravity on an object at sea level on Earth.
    */
-  public static final VelocityUnit<VelocityUnit<DistanceUnit>> Gs =
+  public static final LinearAccelerationUnit Gs =
       derive(MetersPerSecondPerSecond).aggregate(9.80665).named("G").symbol("G").make();
 
   // MassUnit
@@ -246,21 +260,52 @@ public final class Units {
   /** 1/16 of a {@link #Pound}. */
   public static final MassUnit Ounce = Ounces; // alias
 
+  // Force
+
+  public static final ForceUnit Newtons =
+      derive(Kilograms.mult(Gs)).named("Newton").symbol("N").make();
+
+  public static final ForceUnit Newton = Newtons;
+
+  public static final ForceUnit PoundsForce =
+      derive(Pounds.mult(Gs)).named("Pound-force").symbol("lbsf.").make();
+
+  public static final ForceUnit PoundForce = PoundsForce;
+
+  public static final ForceUnit OuncesForce =
+      derive(Ounces.mult(Gs)).named("Ounce-force").symbol("ozf").make();
+
+  public static final ForceUnit OunceForce = OuncesForce;
+
+  // Torque
+
+  public static final TorqueUnit NewtonMeters = Meters.mult(Newtons);
+
+  public static final TorqueUnit NewtonMeter = NewtonMeters;
+
+  public static final TorqueUnit PoundFeet = Feet.mult(PoundsForce);
+  public static final TorqueUnit PoundFoot = PoundFeet;
+
+  public static final TorqueUnit PoundInches = Inches.mult(PoundsForce);
+  public static final TorqueUnit PoundInch = PoundInches;
+
+  public static final TorqueUnit OunceInches = Inches.mult(OuncesForce);
+  public static final TorqueUnit OunceInch = OunceInches;
+
+  // Linear momentum
+
+  public static final LinearMomentumUnit KilogramMetersPerSecond = Kilograms.mult(MetersPerSecond);
+
+  // Angular momentum
+
+  public static final AngularMomentumUnit KilogramMetersSquaredPerSecond =
+      KilogramMetersPerSecond.mult(Meters);
+
   // Moment of Inertia
+
   /** The base SI unit for moment of inertia. */
-  public static final Mult<Mult<MassUnit, DistanceUnit>, DistanceUnit> KilogramSquareMeters =
-      Kilograms.mult(Meters).mult(Meters);
-
-  // Unitless
-  /** A dimensionless unit that performs no scaling whatsoever. */
-  public static final DimensionlessUnit Value = BaseUnits.Value;
-
-  /**
-   * A dimensionless unit equal to to 1/100th of a {@link #Value}. A measurement of {@code
-   * Percent.of(42)} would be equivalent to {@code Value.of(0.42)}.
-   */
-  public static final DimensionlessUnit Percent =
-      derive(Value).splitInto(100).named("Percent").symbol("%").make();
+  public static final MomentOfInertiaUnit KilogramSquareMeters =
+      KilogramMetersSquaredPerSecond.mult(RadiansPerSecond);
 
   // VoltageUnit
   /** The base unit of electric potential. */
@@ -331,7 +376,7 @@ public final class Units {
 
   // PowerUnit
   /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
-  public static final PowerUnit Watts = BaseUnits.PowerUnit;
+  public static final PowerUnit Watts = derive(Joules.per(Second)).named("Watt").symbol("W").make();
 
   /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
   public static final PowerUnit Watt = Watts; // alias
@@ -387,29 +432,29 @@ public final class Units {
    * A standard unit for measuring linear mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded linear velocity.
    */
-  public static final Per<VoltageUnit, VelocityUnit<DistanceUnit>> VoltsPerMeterPerSecond =
+  public static final Per<VoltageUnit, LinearVelocityUnit> VoltsPerMeterPerSecond =
       Volts.per(MetersPerSecond);
 
   /**
    * A standard unit for measuring linear mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded linear acceleration.
    */
-  public static final Per<VoltageUnit, VelocityUnit<VelocityUnit<DistanceUnit>>>
-      VoltsPerMeterPerSecondSquared = Volts.per(MetersPerSecondPerSecond);
+  public static final Per<VoltageUnit, LinearAccelerationUnit> VoltsPerMeterPerSecondSquared =
+      Volts.per(MetersPerSecondPerSecond);
 
   /**
    * A standard unit for measuring angular mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded angular velocity.
    */
-  public static final Per<VoltageUnit, VelocityUnit<AngleUnit>> VoltsPerRadianPerSecond =
+  public static final Per<VoltageUnit, AngularVelocityUnit> VoltsPerRadianPerSecond =
       Volts.per(RadiansPerSecond);
 
   /**
    * A standard unit for measuring angular mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded angular acceleration.
    */
-  public static final Per<VoltageUnit, VelocityUnit<VelocityUnit<AngleUnit>>>
-      VoltsPerRadianPerSecondSquared = Volts.per(RadiansPerSecond.per(Second));
+  public static final Per<VoltageUnit, AngularAccelerationUnit> VoltsPerRadianPerSecondSquared =
+      Volts.per(RadiansPerSecond.per(Second));
 
   /**
    * Creates a unit equal to a thousandth of the base unit, eg Milliseconds = Milli(Units.Seconds).
@@ -421,7 +466,7 @@ public final class Units {
    * @return the milli-unit
    */
   @SuppressWarnings("checkstyle:methodname")
-  public static <U extends Unit<U>> U Milli(Unit<U> baseUnit, String name, String symbol) {
+  public static <U extends Unit> U Milli(U baseUnit, String name, String symbol) {
     return derive(baseUnit).splitInto(1000).named(name).symbol(symbol).make();
   }
 
@@ -433,7 +478,7 @@ public final class Units {
    * @return the milli-unit
    */
   @SuppressWarnings("checkstyle:methodname")
-  public static <U extends Unit<U>> U Milli(Unit<U> baseUnit) {
+  public static <U extends Unit> U Milli(U baseUnit) {
     return Milli(
         baseUnit, "Milli" + baseUnit.name().toLowerCase(Locale.ROOT), "m" + baseUnit.symbol());
   }
@@ -449,7 +494,7 @@ public final class Units {
    * @return the micro-unit
    */
   @SuppressWarnings("checkstyle:methodname")
-  public static <U extends Unit<U>> U Micro(Unit<U> baseUnit, String name, String symbol) {
+  public static <U extends Unit> U Micro(U baseUnit, String name, String symbol) {
     return derive(baseUnit).splitInto(1_000_000).named(name).symbol(symbol).make();
   }
 
@@ -461,7 +506,7 @@ public final class Units {
    * @return the micro-unit
    */
   @SuppressWarnings("checkstyle:methodname")
-  public static <U extends Unit<U>> U Micro(Unit<U> baseUnit) {
+  public static <U extends Unit> U Micro(U baseUnit) {
     return Micro(
         baseUnit, "Micro" + baseUnit.name().toLowerCase(Locale.ROOT), "u" + baseUnit.symbol());
   }
@@ -476,7 +521,7 @@ public final class Units {
    * @return the kilo-unit
    */
   @SuppressWarnings("checkstyle:methodname")
-  public static <U extends Unit<U>> U Kilo(Unit<U> baseUnit, String name, String symbol) {
+  public static <U extends Unit> U Kilo(U baseUnit, String name, String symbol) {
     return derive(baseUnit).aggregate(1000).named(name).symbol(symbol).make();
   }
 
@@ -488,7 +533,7 @@ public final class Units {
    * @return the kilo-unit
    */
   @SuppressWarnings("checkstyle:methodname")
-  public static <U extends Unit<U>> U Kilo(Unit<U> baseUnit) {
+  public static <U extends Unit> U Kilo(U baseUnit) {
     return Kilo(
         baseUnit, "Kilo" + baseUnit.name().toLowerCase(Locale.ROOT), "K" + baseUnit.symbol());
   }
@@ -501,8 +546,7 @@ public final class Units {
    * @param <U> the dimension of the unit to derive
    * @return a builder object
    */
-  @SuppressWarnings("unchecked")
-  public static <U extends Unit<U>> UnitBuilder<U> derive(Unit<U> unit) {
-    return new UnitBuilder<>((U) unit);
+  public static <U extends Unit> UnitBuilder<U> derive(U unit) {
+    return new UnitBuilder<>(unit);
   }
 }

@@ -13,7 +13,7 @@ package edu.wpi.first.units;
  * <p>Actual units (such as {@link Units#Meters} and {@link Units#Inches}) can be found in the
  * {@link Units} class.
  */
-public class DistanceUnit extends Unit<DistanceUnit> {
+public class DistanceUnit extends Unit {
   DistanceUnit(DistanceUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
@@ -25,5 +25,36 @@ public class DistanceUnit extends Unit<DistanceUnit> {
       String name,
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+  }
+
+  @Override
+  public DistanceUnit getBaseUnit() {
+    return (DistanceUnit) super.getBaseUnit();
+  }
+
+  public LinearVelocityUnit per(TimeUnit period) {
+    return LinearVelocityUnit.combine(this, period);
+  }
+
+  public double convertFrom(double magnitude, DistanceUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
+  }
+
+  public Distance of(double magnitude) {
+    return new Distance(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  // distance times force = torque
+  // force times distance = energy
+  public TorqueUnit mult(ForceUnit force) {
+    return TorqueUnit.combine(this, force);
+  }
+
+  public Distance.Mutable mutable(double initialMagnitude) {
+    return new Distance.Mutable(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
+  public Distance zero() {
+    return of(0);
   }
 }

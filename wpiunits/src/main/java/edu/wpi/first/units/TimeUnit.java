@@ -13,7 +13,7 @@ package edu.wpi.first.units;
  * <p>Actual units (such as {@link Units#Seconds} and {@link Units#Milliseconds}) can be found in
  * the {@link Units} class.
  */
-public class TimeUnit extends Unit<TimeUnit> {
+public class TimeUnit extends Unit {
   TimeUnit(TimeUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
@@ -25,5 +25,31 @@ public class TimeUnit extends Unit<TimeUnit> {
       String name,
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+  }
+
+  @Override
+  public TimeUnit getBaseUnit() {
+    return (TimeUnit) super.getBaseUnit();
+  }
+
+  public DimensionlessUnit per(TimeUnit other) {
+    return Units.derive(Units.Value)
+        .toBase(this.getConverterToBase().div(other.getConverterToBase()))
+        .fromBase(other.getConverterFromBase().div(this.getConverterFromBase()))
+        .named(this.name() + " per " + other.name())
+        .symbol(this.symbol() + "/" + other.symbol())
+        .make();
+  }
+
+  public <U extends Unit> Per<TimeUnit, U> per(U other) {
+    return Per.combine(this, other);
+  }
+
+  public double convertFrom(double magnitude, TimeUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
+  }
+
+  public Time of(double magnitude) {
+    return new Time(magnitude, toBaseUnits(magnitude), this);
   }
 }

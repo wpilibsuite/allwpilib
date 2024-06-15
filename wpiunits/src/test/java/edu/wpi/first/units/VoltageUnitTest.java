@@ -18,6 +18,6 @@ class VoltageUnitTest {
   void testMilliVoltsTimesMilliAmps() {
     // results in microwatts
     assertTrue(
-        Units.Millivolts.times(Units.Milliamps, "", "").equivalent(Units.Milli(Units.Milliwatts)));
+        Units.Millivolts.times(Units.Milliamps, "", "").equivalent(Units.Micro(Units.Watts)));
   }
 }

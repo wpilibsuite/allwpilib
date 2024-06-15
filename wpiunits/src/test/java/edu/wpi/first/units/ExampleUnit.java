@@ -4,7 +4,7 @@
 
 package edu.wpi.first.units;
 
-class ExampleUnit extends Unit<ExampleUnit> {
+class ExampleUnit extends Unit {
   ExampleUnit(double baseUnitEquivalent) {
     this(baseUnitEquivalent, "Example", "ex");
   }
@@ -20,5 +20,17 @@ class ExampleUnit extends Unit<ExampleUnit> {
 
   ExampleUnit(double baseUnitEquivalent, String name, String symbol) {
     super(null, baseUnitEquivalent, name, symbol);
+  }
+
+  public double convertFrom(double magnitude, ExampleUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
+  }
+
+  public Measure<ExampleUnit> of(double magnitude) {
+    return ImmutableMeasure.ofRelativeUnits(magnitude, this);
+  }
+
+  public Measure<ExampleUnit> ofBaseUnits(double baseUnitMagnitude) {
+    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, this);
   }
 }

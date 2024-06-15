@@ -13,7 +13,7 @@ package edu.wpi.first.units;
  * <p>Actual units (such as {@link Units#Celsius} and {@link Units#Fahrenheit}) can be found in the
  * {@link Units} class.
  */
-public class TemperatureUnit extends Unit<TemperatureUnit> {
+public class TemperatureUnit extends Unit {
   TemperatureUnit(
       TemperatureUnit baseUnit,
       UnaryFunction toBaseConverter,
@@ -21,5 +21,17 @@ public class TemperatureUnit extends Unit<TemperatureUnit> {
       String name,
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
+  }
+
+  public VelocityUnit<TemperatureUnit> per(TimeUnit period) {
+    return VelocityUnit.combine(this, period);
+  }
+
+  public Temperature of(double magnitude) {
+    return new Temperature(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  public double convertFrom(double magnitude, TemperatureUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 }
