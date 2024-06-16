@@ -3,12 +3,18 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+#include <glass/hardware/Pneumatic.h>
+
+#include <memory>
 
 namespace halsimgui {
 
 class PHSimGui {
  public:
   static void Initialize();
+  static bool PHsAnyInitialized();
+  static bool PHsAnySolenoids(glass::PneumaticControlsModel* model);
+  static std::unique_ptr<glass::PneumaticControlsModel> GetPHsModel();
 };
 
 }  // namespace halsimgui

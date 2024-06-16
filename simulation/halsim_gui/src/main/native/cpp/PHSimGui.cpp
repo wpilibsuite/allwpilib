@@ -185,7 +185,7 @@ void PHsSimModel::ForEachPneumaticControl(
   }
 }
 
-static bool PHsAnyInitialized() {
+bool PHSimGui::PHsAnyInitialized() {
   static const int32_t num = HAL_GetNumREVPHModules();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetREVPHInitialized(i)) {
@@ -195,31 +195,25 @@ static bool PHsAnyInitialized() {
   return false;
 }
 
-void PHSimGui::Initialize() {
-  HALSimGui::halProvider->RegisterModel("REVPHs", PHsAnyInitialized, [] {
-    return std::make_unique<PHsSimModel>();
-  });
-  HALSimGui::halProvider->RegisterView(
-      "Solenoids2", "REVPHs",
-      [](glass::Model* model) {
-        bool any = false;
-        static_cast<PHsSimModel*>(model)->ForEachPneumaticControl(
-            [&](glass::PneumaticControlModel& REVPH, int) {
-              if (static_cast<PHSimModel*>(&REVPH)->GetNumSolenoids() > 0) {
-                any = true;
-              }
-            });
-        return any;
-      },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(290, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayPneumaticControlsSolenoids(
-              static_cast<PHsSimModel*>(model),
-              HALSimGui::halProvider->AreOutputsEnabled());
-        });
+bool PHSimGui::PHsAnySolenoids(glass::PneumaticControlsModel* model) {
+  bool any = false;
+  static_cast<PHsSimModel*>(model)->ForEachPneumaticControl(
+      [&](glass::PneumaticControlModel& REVPH, int) {
+        if (static_cast<PHSimModel*>(&REVPH)->GetNumSolenoids() > 0) {
+          any = true;
+        }
       });
+  return any;
+}
+
+std::unique_ptr<glass::PneumaticControlsModel> PHSimGui::GetPHsModel() {
+  return std::make_unique<PHsSimModel>();
+}
+
+void PHSimGui::Initialize() {
+  HALSimGui::halProvider->RegisterModel(
+      "REVPHs", PHSimGui::PHsAnyInitialized,
+      [] { return std::make_unique<PHsSimModel>(); });
 
   SimDeviceGui::GetDeviceTree().Add(
       HALSimGui::halProvider->GetModel("REVPHs"), [](glass::Model* model) {

@@ -190,7 +190,7 @@ void PCMsSimModel::ForEachPneumaticControl(
   }
 }
 
-static bool PCMsAnyInitialized() {
+bool PCMSimGui::PCMsAnyInitialized() {
   static const int32_t num = HAL_GetNumCTREPCMModules();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetCTREPCMInitialized(i)) {
@@ -200,31 +200,25 @@ static bool PCMsAnyInitialized() {
   return false;
 }
 
-void PCMSimGui::Initialize() {
-  HALSimGui::halProvider->RegisterModel("CTREPCMs", PCMsAnyInitialized, [] {
-    return std::make_unique<PCMsSimModel>();
-  });
-  HALSimGui::halProvider->RegisterView(
-      "Solenoids", "CTREPCMs",
-      [](glass::Model* model) {
-        bool any = false;
-        static_cast<PCMsSimModel*>(model)->ForEachPneumaticControl(
-            [&](glass::PneumaticControlModel& CTREPCM, int) {
-              if (static_cast<PCMSimModel*>(&CTREPCM)->GetNumSolenoids() > 0) {
-                any = true;
-              }
-            });
-        return any;
-      },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(290, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayPneumaticControlsSolenoids(
-              static_cast<PCMsSimModel*>(model),
-              HALSimGui::halProvider->AreOutputsEnabled());
-        });
+bool PCMSimGui::PCMsAnySolenoids(glass::PneumaticControlsModel* model) {
+  bool any = false;
+  static_cast<PCMsSimModel*>(model)->ForEachPneumaticControl(
+      [&](glass::PneumaticControlModel& CTREPCM, int) {
+        if (static_cast<PCMSimModel*>(&CTREPCM)->GetNumSolenoids() > 0) {
+          any = true;
+        }
       });
+  return any;
+}
+
+std::unique_ptr<glass::PneumaticControlsModel> PCMSimGui::GetPCMsModel() {
+  return std::make_unique<PCMsSimModel>();
+}
+
+void PCMSimGui::Initialize() {
+  HALSimGui::halProvider->RegisterModel(
+      "CTREPCMs", PCMSimGui::PCMsAnyInitialized,
+      [] { return std::make_unique<PCMsSimModel>(); });
 
   SimDeviceGui::GetDeviceTree().Add(
       HALSimGui::halProvider->GetModel("CTREPCMs"), [](glass::Model* model) {
