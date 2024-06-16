@@ -24,7 +24,7 @@ using namespace halsimgui;
 namespace {
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(REVPHCompressorOn, "Compressor On");
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(REVPHPressureSwitch, "Pressure Switch");
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(REVPHCompressorCurrent, "Comp Current");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(REVPHCompressorCurrent, "Compressor Current");
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED2(REVPHSolenoidOutput, "Solenoid");
 
 class CompressorSimModel : public glass::CompressorModel {
@@ -40,7 +40,7 @@ class CompressorSimModel : public glass::CompressorModel {
   bool Exists() override { return HALSIM_GetREVPHInitialized(m_index); }
 
   glass::DataSource* GetRunningData() override { return &m_running; }
-  glass::DataSource* GetEnabledData() override { return &m_running; }  // bad
+  glass::DataSource* GetEnabledData() override { return nullptr; }
   glass::DataSource* GetPressureSwitchData() override {
     return &m_pressureSwitch;
   }
