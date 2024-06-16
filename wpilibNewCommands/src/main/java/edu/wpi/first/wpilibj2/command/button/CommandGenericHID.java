@@ -19,7 +19,10 @@ import java.util.Map;
 public class CommandGenericHID {
   private final GenericHID m_hid;
   private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
-  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisCache = new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisLessThanCache =
+      new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisGreaterThanCache =
+      new HashMap<>();
   private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
 
   /**
@@ -222,9 +225,9 @@ public class CommandGenericHID {
    *     threshold.
    */
   public Trigger axisLessThan(int axis, double threshold, EventLoop loop) {
-    var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
+    var cache = m_axisLessThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
-        new Pair<>(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) < threshold));
+        Pair.of(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) < threshold));
   }
 
   /**
@@ -252,9 +255,9 @@ public class CommandGenericHID {
    *     threshold.
    */
   public Trigger axisGreaterThan(int axis, double threshold, EventLoop loop) {
-    var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
+    var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
-        new Pair<>(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
+        Pair.of(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
   }
 
   /**
