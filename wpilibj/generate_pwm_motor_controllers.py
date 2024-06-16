@@ -6,50 +6,56 @@
 import argparse
 import json
 import sys
-import os
+from pathlib import Path
+from typing import Dict, Any
 
 from jinja2 import Environment, FileSystemLoader
+from jinja2.environment import Template
 
 
-def render_template(template, output_dir, filename, controller):
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+def render_template(
+    template: Template, output_dir: Path, filename: str, controller: Dict[str, Any]
+):
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    with open(os.path.join(output_dir, filename), "w", newline="\n") as f:
-        f.write(template.render(controller))
+    output_file = output_dir / filename
+    output_file.write_text(template.render(controller), encoding="utf-8")
 
 
 def generate_pwm_motor_controllers(output_root, template_root):
-    with open(os.path.join(template_root, "pwm_motor_controllers.json")) as f:
+    with (template_root / "pwm_motor_controllers.json").open(encoding="utf-8") as f:
         controllers = json.load(f)
 
     env = Environment(
-        loader=FileSystemLoader(f"{template_root}"),
+        loader=FileSystemLoader(str(template_root)),
         autoescape=False,
         keep_trailing_newline=True,
     )
 
-    rootPath = f"{output_root}/main/java/edu/wpi/first/wpilibj/motorcontrol"
+    root_path = Path(output_root) / "main/java/edu/wpi/first/wpilibj/motorcontrol"
     template = env.get_template("pwm_motor_controller.java.jinja")
 
     for controller in controllers:
-        controller_name = os.path.basename(f"{controller['name']}.java")
-        render_template(template, rootPath, controller_name, controller)
+        controller_name = f"{controller['name']}.java"
+        render_template(template, root_path, controller_name, controller)
 
 
 def main(argv):
-    dirname, _ = os.path.split(os.path.abspath(__file__))
+    script_path = Path(__file__).resolve()
+    dirname = script_path.parent
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--output_directory",
         help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=os.path.join(dirname, "src/generated"),
+        default=dirname / "src/generated",
+        type=Path,
     )
     parser.add_argument(
         "--template_root",
         help="Optional. If set, will use this directory as the root for the jinja templates",
-        default=os.path.join(dirname, "src/generate"),
+        default=dirname / "src/generate",
+        type=Path,
     )
     args = parser.parse_args(argv)
 
