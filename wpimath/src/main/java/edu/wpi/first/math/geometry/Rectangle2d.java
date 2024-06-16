@@ -103,7 +103,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Returns the x size component of the rectangle in a measure.
+   * Returns the X size component of the rectangle in a measure.
    *
    * @return The x size component of the rectangle in a measure.
    */
@@ -112,7 +112,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Returns the y size component of the rectangle in a measure.
+   * Returns the Y size component of the rectangle in a measure.
    *
    * @return The y size component of the rectangle in a measure.
    */

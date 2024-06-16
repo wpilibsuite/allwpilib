@@ -410,7 +410,7 @@ public class Rotation3d
   /**
    * Returns the counterclockwise rotation angle around the X axis (roll) in a measure.
    *
-   * @return The counterclockwise rotation angle around the X axis (roll) in a measure.
+   * @return The counterclockwise rotation angle around the x axis (roll) in a measure.
    */
   public Measure<Angle> getMeasureX() {
     return Radians.of(getX());
@@ -419,7 +419,7 @@ public class Rotation3d
   /**
    * Returns the counterclockwise rotation angle around the Y axis (pitch) in a measure.
    *
-   * @return The counterclockwise rotation angle around the Y axis (pitch) in a measure.
+   * @return The counterclockwise rotation angle around the y axis (pitch) in a measure.
    */
   public Measure<Angle> getMeasureY() {
     return Radians.of(getY());
@@ -428,7 +428,7 @@ public class Rotation3d
   /**
    * Returns the counterclockwise rotation angle around the Z axis (yaw) in a measure.
    *
-   * @return The counterclockwise rotation angle around the Z axis (yaw) in a measure.
+   * @return The counterclockwise rotation angle around the z axis (yaw) in a measure.
    */
   public Measure<Angle> getMeasureZ() {
     return Radians.of(getZ());
