@@ -74,15 +74,18 @@ frc2::CommandPtr DriveSubsystem::ProfiledDriveDistance(
   frc::Timer timer{};
   return StartRun(
              [&] {
+               // Restart timer so profile setpoints start at the beginning
                timer.Restart();
                ResetEncoders();
              },
              [&] {
-               auto setpoint = profile.Calculate(
-                   timer.Get(), {}, {distance, units::meters_per_second_t{0}});
+               // Current state never changes, so we need to use a timer to get
+               // the setpoints we need to be at
+               auto setpoint =
+                   profile.Calculate(timer.Get(), {}, {distance, 0_mps});
                SetDriveStates(setpoint, setpoint);
              })
-      .Until([&] { return profile.IsFinished(units::second_t{0}); });
+      .Until([&] { return profile.IsFinished(0_s); });
 }
 
 frc2::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
@@ -91,23 +94,25 @@ frc2::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
       frc::TrapezoidProfile<units::meters>{{kMaxSpeed, kMaxAcceleration}};
   return StartRun(
              [&] {
+               // Store distance so we know the target distance for each encoder
                m_initialLeftDistance = GetLeftEncoderDistance();
                m_initialRightDistance = GetRightEncoderDistance();
              },
              [&] {
+               // Current state matches the actual state of the bot, so the
+               // profile needs to look 20 milliseconds ahead for the next
+               // setpoint
                auto leftSetpoint = profile.Calculate(
                    kDt,
                    {GetLeftEncoderDistance(),
                     units::meters_per_second_t{m_leftLeader.GetEncoderRate()}},
-                   {m_initialLeftDistance + distance,
-                    units::meters_per_second_t{0}});
+                   {m_initialLeftDistance + distance, 0_mps});
                auto rightSetpoint = profile.Calculate(
                    kDt,
                    {GetLeftEncoderDistance(),
                     units::meters_per_second_t{m_rightLeader.GetEncoderRate()}},
-                   {m_initialRightDistance + distance,
-                    units::meters_per_second_t{0}});
+                   {m_initialRightDistance + distance, 0_mps});
                SetDriveStates(leftSetpoint, rightSetpoint);
              })
-      .Until([&] { return profile.IsFinished(units::second_t{0}); });
+      .Until([&] { return profile.IsFinished(0_s); });
 }
