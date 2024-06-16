@@ -25,7 +25,8 @@ namespace {
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(CTREPCMCompressorOn, "Compressor On");
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(CTREPCMClosedLoopEnabled, "Closed Loop");
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(CTREPCMPressureSwitch, "Pressure Switch");
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(CTREPCMCompressorCurrent, "Compressor Current");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(CTREPCMCompressorCurrent,
+                                    "Compressor Current");
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED2(CTREPCMSolenoidOutput, "Solenoid");
 
 class CompressorSimModel : public glass::CompressorModel {
