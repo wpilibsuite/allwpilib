@@ -99,7 +99,9 @@ public class GenericHID {
   private int m_leftRumble;
   private int m_rightRumble;
   private final Map<EventLoop, Map<Integer, BooleanEvent>> m_buttonCache = new HashMap<>();
-  private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisCache =
+  private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisLessThanCache =
+      new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisGreaterThanCache =
       new HashMap<>();
   private final Map<EventLoop, Map<Integer, BooleanEvent>> m_povCache = new HashMap<>();
 
@@ -344,10 +346,9 @@ public class GenericHID {
    * @return an event instance that is true when the axis value is less than the provided threshold.
    */
   public BooleanEvent axisLessThan(int axis, double threshold, EventLoop loop) {
-    var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
+    var cache = m_axisLessThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
-        new Pair<>(axis, -threshold),
-        k -> new BooleanEvent(loop, () -> getRawAxis(axis) < threshold));
+        Pair.of(axis, threshold), k -> new BooleanEvent(loop, () -> getRawAxis(axis) < threshold));
   }
 
   /**
@@ -361,10 +362,9 @@ public class GenericHID {
    *     threshold.
    */
   public BooleanEvent axisGreaterThan(int axis, double threshold, EventLoop loop) {
-    var cache = m_axisCache.computeIfAbsent(loop, k -> new HashMap<>());
+    var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
-        new Pair<>(axis, threshold),
-        k -> new BooleanEvent(loop, () -> getRawAxis(axis) > threshold));
+        Pair.of(axis, threshold), k -> new BooleanEvent(loop, () -> getRawAxis(axis) > threshold));
   }
 
   /**
