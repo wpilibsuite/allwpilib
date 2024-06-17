@@ -104,12 +104,10 @@ frc2::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
                // profile needs to look 20 milliseconds ahead for the next
                // setpoint
                auto leftSetpoint = profile.Calculate(
-                   timer.Get(),
-                   {m_initialLeftDistance, 0_mps},
+                   timer.Get(), {m_initialLeftDistance, 0_mps},
                    {m_initialLeftDistance + distance, 0_mps});
                auto rightSetpoint = profile.Calculate(
-                   timer.Get(),
-                   {m_initialRightDistance, 0_mps},
+                   timer.Get(), {m_initialRightDistance, 0_mps},
                    {m_initialRightDistance + distance, 0_mps});
                SetDriveStates(leftSetpoint, rightSetpoint);
              })
