@@ -90,8 +90,11 @@ frc2::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
     units::meter_t distance) {
   auto profile =
       frc::TrapezoidProfile<units::meters>{{kMaxSpeed, kMaxAcceleration}};
+  frc::Timer timer{};
   return StartRun(
              [&] {
+               // Restart timer so profile setpoints start at the beginning
+               timer.Restart();
                // Store distance so we know the target distance for each encoder
                m_initialLeftDistance = GetLeftEncoderDistance();
                m_initialRightDistance = GetRightEncoderDistance();
@@ -101,14 +104,12 @@ frc2::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
                // profile needs to look 20 milliseconds ahead for the next
                // setpoint
                auto leftSetpoint = profile.Calculate(
-                   kDt,
-                   {GetLeftEncoderDistance(),
-                    units::meters_per_second_t{m_leftLeader.GetEncoderRate()}},
+                   timer.Get(),
+                   {m_initialLeftDistance, 0_mps},
                    {m_initialLeftDistance + distance, 0_mps});
                auto rightSetpoint = profile.Calculate(
-                   kDt,
-                   {GetLeftEncoderDistance(),
-                    units::meters_per_second_t{m_rightLeader.GetEncoderRate()}},
+                   timer.Get(),
+                   {m_initialRightDistance, 0_mps},
                    {m_initialRightDistance + distance, 0_mps});
                SetDriveStates(leftSetpoint, rightSetpoint);
              })
