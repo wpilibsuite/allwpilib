@@ -165,7 +165,7 @@ public class DriveSubsystem extends SubsystemBase {
             new TrapezoidProfile.Constraints(
                 DriveConstants.kMaxSpeedMetersPerSecond,
                 DriveConstants.kMaxAccelerationMetersPerSecondSquared));
-                    var timer = new Timer();
+    var timer = new Timer();
     return startRun(
             () -> {
               // Restart timer so profile setpoints start at the beginning
