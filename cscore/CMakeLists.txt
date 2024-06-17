@@ -88,7 +88,7 @@ if(WITH_JAVA)
     #find java files, copy them locally
 
     if("${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
-        set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/OpenCV/java/)
+        set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/java/opencv4)
     endif()
 
     find_file(
@@ -98,6 +98,7 @@ if(WITH_JAVA)
             ${OPENCV_JAVA_INSTALL_DIR}
             ${OpenCV_INSTALL_PATH}/bin
             ${OpenCV_INSTALL_PATH}/share/java
+            ${OpenCV_INSTALL_PATH}/share/OpenCV/java
         NO_DEFAULT_PATH
     )
     find_file(
@@ -112,7 +113,10 @@ if(WITH_JAVA)
             ${OpenCV_INSTALL_PATH}/bin/Release
             ${OpenCV_INSTALL_PATH}/bin/Debug
             ${OpenCV_INSTALL_PATH}/lib
+            ${OpenCV_INSTALL_PATH}/lib/Release
+            ${OpenCV_INSTALL_PATH}/lib/Debug
             ${OpenCV_INSTALL_PATH}/lib/jni
+            ${OpenCV_INSTALL_PATH}/share/java/opencv4
         NO_DEFAULT_PATH
     )
 
@@ -142,6 +146,7 @@ if(WITH_JAVA)
                 ${cvFile}Loc
                 NAMES
                     ${cvFile}${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.dll
+                    ${cvFile}${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}d.dll
                 PATHS
                     ${OPENCV_JAVA_INSTALL_DIR}
                     ${OpenCV_INSTALL_PATH}/bin

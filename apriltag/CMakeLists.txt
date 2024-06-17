@@ -42,6 +42,8 @@ if(WITH_JAVA)
             ${OPENCV_JAVA_INSTALL_DIR}
             ${OpenCV_INSTALL_PATH}/bin
             ${OpenCV_INSTALL_PATH}/share/java
+            ${OpenCV_INSTALL_PATH}/share/java/opencv4
+            ${OpenCV_INSTALL_PATH}/share/OpenCV/java
         NO_DEFAULT_PATH
     )
 
