@@ -143,7 +143,7 @@ public class DriveSubsystem extends SubsystemBase {
             () -> {
               // Current state never changes, so we need to use a timer to get the setpoints we need
               // to be at
-              var setpoint = profile.calculate(timer.get(), new State(), new State(3, 0));
+              var setpoint = profile.calculate(timer.get(), new State(), new State(distance, 0));
               setDriveStates(setpoint, setpoint);
             })
         .until(() -> profile.isFinished(0));
@@ -165,25 +165,28 @@ public class DriveSubsystem extends SubsystemBase {
             new TrapezoidProfile.Constraints(
                 DriveConstants.kMaxSpeedMetersPerSecond,
                 DriveConstants.kMaxAccelerationMetersPerSecondSquared));
+                    var timer = new Timer();
     return startRun(
             () -> {
+              // Restart timer so profile setpoints start at the beginning
+              timer.restart();
               // Store distance so we know the target distance for each encoder
               m_initialLeftDistance = getLeftEncoderDistance();
               m_initialRightDistance = getRightEncoderDistance();
             },
             () -> {
-              // Current state matches the actual state of the bot, so the profile needs to look 20
-              // milliseconds ahead for the next setpoint
+              // Current state never changes, so we need to use a timer to get the setpoints we need
+              // to be at
               var leftSetpoint =
                   profile.calculate(
-                      DriveConstants.kDt,
-                      new State(getLeftEncoderDistance(), m_leftLeader.getEncoderRate()),
-                      new State(m_initialLeftDistance + 3, 0));
+                      timer.get(),
+                      new State(m_initialLeftDistance, 0),
+                      new State(m_initialLeftDistance + distance, 0));
               var rightSetpoint =
                   profile.calculate(
-                      DriveConstants.kDt,
-                      new State(getRightEncoderDistance(), m_rightLeader.getEncoderRate()),
-                      new State(m_initialRightDistance + 3, 0));
+                      timer.get(),
+                      new State(m_initialRightDistance, 0),
+                      new State(m_initialRightDistance + distance, 0));
               setDriveStates(leftSetpoint, rightSetpoint);
             })
         .until(() -> profile.isFinished(0));
