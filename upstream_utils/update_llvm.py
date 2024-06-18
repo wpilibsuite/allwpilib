@@ -213,6 +213,7 @@ def main():
         "0033-type_traits.h-Add-is_constexpr.patch",
         "0034-Add-back-removed-raw_string_ostream-write_impl.patch",
         "0035-Remove-auto-conversion-from-raw_ostream.patch",
+        "0036-Add-SmallVector-erase_if.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),
