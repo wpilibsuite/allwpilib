@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
-Subject: [PATCH 21/35] Remove unused functions
+Subject: [PATCH 21/36] Remove unused functions
 
 ---
  llvm/include/llvm/Support/raw_ostream.h |  5 +-
@@ -35,7 +35,7 @@ index d56999186f719f8d91f3a047a19960caf62a066c..9a9a1f688313a5784a58a70f2cb4cc0d
    /// Tie this stream to the specified stream. Replaces any existing tied-to
    /// stream. Specifying a nullptr unties the stream.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 54137a331ca9e752b02c0f16ae996094a6f2fafa..e253d6f7a5ca3aee75823efdb9717dcd93fff5dc 100644
+index 4d992442d153d088f6a7a1fc13e3c84012c45a06..e19a38256ce714359b85076cf49056f379764d8d 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -181,22 +181,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
