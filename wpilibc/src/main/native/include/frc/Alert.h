@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include <networktables/NTSendable.h>
 #include <units/time.h>
 #include <wpi/SmallVector.h>
