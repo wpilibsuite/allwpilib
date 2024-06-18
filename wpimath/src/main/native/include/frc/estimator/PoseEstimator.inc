@@ -14,7 +14,7 @@ PoseEstimator<WheelSpeeds, WheelPositions>::PoseEstimator(
     Odometry<WheelSpeeds, WheelPositions>& odometry,
     const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
-    : m_odometry(odometry) {
+    : m_odometry(odometry), m_poseEstimate(m_odometry.GetPose()) {
   for (size_t i = 0; i < 3; ++i) {
     m_q[i] = stateStdDevs[i] * stateStdDevs[i];
   }
@@ -50,11 +50,13 @@ void PoseEstimator<WheelSpeeds, WheelPositions>::ResetPosition(
   m_odometry.ResetPosition(gyroAngle, wheelPositions, pose);
   m_odometryPoseBuffer.Clear();
   m_visionUpdates.clear();
+  m_poseEstimate = m_odometry.GetPose();
 }
 
 template <typename WheelSpeeds, typename WheelPositions>
 Pose2d PoseEstimator<WheelSpeeds, WheelPositions>::GetEstimatedPosition()
     const {
+  return m_poseEstimate;
   if (m_visionUpdates.empty()) {
     return m_odometry.GetPose();
   }
@@ -188,6 +190,10 @@ void PoseEstimator<WheelSpeeds, WheelPositions>::AddVisionMeasurement(
   // Step 8: Remove later vision measurements. (Matches previous behavior)
   auto firstAfter = m_visionUpdates.upper_bound(timestamp);
   m_visionUpdates.erase(firstAfter, m_visionUpdates.end());
+
+  // Step 9: Update latest pose estimate. Since we cleared all updates after
+  // this vision update, it's guaranteed to be the latest vision update.
+  m_poseEstimate = visionUpdate.Compensate(m_odometry.GetPose());
 }
 
 template <typename WheelSpeeds, typename WheelPositions>
@@ -204,6 +210,13 @@ Pose2d PoseEstimator<WheelSpeeds, WheelPositions>::UpdateWithTime(
   auto odometryEstimate = m_odometry.Update(gyroAngle, wheelPositions);
 
   m_odometryPoseBuffer.AddSample(currentTime, odometryEstimate);
+
+  if (m_visionUpdates.empty()) {
+    m_poseEstimate = odometryEstimate;
+  } else {
+    auto visionUpdate = m_visionUpdates.rbegin()->second;
+    m_poseEstimate = visionUpdate.Compensate(odometryEstimate);
+  }
 
   return GetEstimatedPosition();
 }

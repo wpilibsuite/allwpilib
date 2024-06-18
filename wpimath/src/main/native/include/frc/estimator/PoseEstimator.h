@@ -226,6 +226,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
   // unless there have been no vision measurements after the last reset
   std::map<units::second_t, VisionUpdate> m_visionUpdates;
+
+  Pose2d m_poseEstimate;
 };
 }  // namespace frc
 

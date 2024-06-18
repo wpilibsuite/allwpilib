@@ -50,6 +50,8 @@ public class PoseEstimator<T> {
   // been no vision measurements after the last reset
   private final NavigableMap<Double, VisionUpdate> m_visionUpdates = new TreeMap<>();
 
+  private Pose2d m_poseEstimate;
+
   /**
    * Constructs a PoseEstimator.
    *
@@ -69,6 +71,8 @@ public class PoseEstimator<T> {
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     m_odometry = odometry;
+
+    m_poseEstimate = m_odometry.getPoseMeters();
 
     for (int i = 0; i < 3; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
@@ -118,6 +122,7 @@ public class PoseEstimator<T> {
     m_odometry.resetPosition(gyroAngle, wheelPositions, poseMeters);
     m_odometryPoseBuffer.clear();
     m_visionUpdates.clear();
+    m_poseEstimate = m_odometry.getPoseMeters();
   }
 
   /**
@@ -126,11 +131,7 @@ public class PoseEstimator<T> {
    * @return The estimated robot pose in meters.
    */
   public Pose2d getEstimatedPosition() {
-    if (m_visionUpdates.isEmpty()) {
-      return m_odometry.getPoseMeters();
-    }
-    var visionUpdate = m_visionUpdates.get(m_visionUpdates.lastKey());
-    return visionUpdate.compensate(m_odometry.getPoseMeters());
+    return m_poseEstimate;
   }
 
   /**
@@ -252,6 +253,10 @@ public class PoseEstimator<T> {
 
     // Step 8: Remove later vision measurements. (Matches previous behavior)
     m_visionUpdates.tailMap(timestampSeconds, false).entrySet().clear();
+
+    // Step 9: Update latest pose estimate. Since we cleared all updates after this vision update,
+    // it's guaranteed to be the latest vision update.
+    m_poseEstimate = visionUpdate.compensate(m_odometry.getPoseMeters());
   }
 
   /**
@@ -313,6 +318,13 @@ public class PoseEstimator<T> {
     var odometryEstimate = m_odometry.update(gyroAngle, wheelPositions);
 
     m_odometryPoseBuffer.addSample(currentTimeSeconds, odometryEstimate);
+
+    if (m_visionUpdates.isEmpty()) {
+      m_poseEstimate = odometryEstimate;
+    } else {
+      var visionUpdate = m_visionUpdates.get(m_visionUpdates.lastKey());
+      m_poseEstimate = visionUpdate.compensate(odometryEstimate);
+    }
 
     return getEstimatedPosition();
   }
