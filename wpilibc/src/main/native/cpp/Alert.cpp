@@ -20,7 +20,7 @@ using namespace frc;
 Alert::Alert(std::string_view text, AlertType type)
     : Alert("Alerts", text, type) {}
 
-std::map<std::string_view, Alert::SendableAlerts> Alert::groups;
+wpi::StringMap<Alert::SendableAlerts> Alert::groups;
 
 Alert::Alert(std::string_view group, std::string_view text, AlertType type)
     : m_type(type), m_text(text) {
@@ -45,18 +45,18 @@ void Alert::SetText(std::string_view text) {
 void Alert::SendableAlerts::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Alerts");
   builder.AddStringArrayProperty(
-      "errors", [this]() mutable { return GetStrings(AlertType::kError); },
+      "errors", [this]() { return GetStrings(AlertType::kError); }, nullptr);
+  builder.AddStringArrayProperty(
+      "warnings", [this]() { return GetStrings(AlertType::kWarning); },
       nullptr);
   builder.AddStringArrayProperty(
-      "warnings", [this]() mutable { return GetStrings(AlertType::kWarning); },
-      nullptr);
-  builder.AddStringArrayProperty(
-      "infos", [this]() mutable { return GetStrings(AlertType::kInfo); },
-      nullptr);
+      "infos", [this]() { return GetStrings(AlertType::kInfo); }, nullptr);
 }
 
-std::vector<std::string> Alert::SendableAlerts::GetStrings(AlertType type) {
-  std::vector<std::shared_ptr<Alert>> alerts;
+std::vector<std::string> Alert::SendableAlerts::GetStrings(
+    AlertType type) const {
+  wpi::SmallVector<std::shared_ptr<Alert>> alerts;
+  alerts.reserve(m_alerts.size());
   for (auto alert : m_alerts) {
     if (alert->m_active && alert->m_type == type) {
       alerts.push_back(alert);
@@ -65,10 +65,10 @@ std::vector<std::string> Alert::SendableAlerts::GetStrings(AlertType type) {
   std::sort(alerts.begin(), alerts.end(), [](const auto a, const auto b) {
     return a->m_activeStartTime > b->m_activeStartTime;
   });
-  std::vector<std::string> output;
-  for (auto alert : alerts) {
-    std::string text{alert->m_text};
-    output.push_back(text);
+  std::vector<std::string> output{alerts.size()};
+  for (unsigned int i = 0; i < alerts.size(); ++i) {
+    std::string text{alerts[i]->m_text};
+    output[i] = text;
   }
   return output;
 }

@@ -11,6 +11,8 @@
 
 #include <networktables/NTSendable.h>
 #include <units/time.h>
+#include <wpi/SmallVector.h>
+#include <wpi/StringMap.h>
 #include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
@@ -110,14 +112,14 @@ class Alert {
   class SendableAlerts : public nt::NTSendable,
                          public wpi::SendableHelper<SendableAlerts> {
    public:
-    std::vector<std::shared_ptr<Alert>> m_alerts;
+    wpi::SmallVector<std::shared_ptr<Alert>> m_alerts;
     void InitSendable(nt::NTSendableBuilder& builder) override;
 
    private:
-    std::vector<std::string> GetStrings(AlertType type);
+    std::vector<std::string> GetStrings(AlertType type) const;
   };
 
-  static std::map<std::string_view, SendableAlerts> groups;
+  static wpi::StringMap<SendableAlerts> groups;
 };
 
 }  // namespace frc
