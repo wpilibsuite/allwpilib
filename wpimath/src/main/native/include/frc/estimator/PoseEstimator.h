@@ -15,6 +15,7 @@
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Translation2d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/Kinematics.h"
 #include "frc/kinematics/Odometry.h"
@@ -86,6 +87,27 @@ class WPILIB_DLLEXPORT PoseEstimator {
    */
   void ResetPosition(const Rotation2d& gyroAngle,
                      const WheelPositions& wheelPositions, const Pose2d& pose);
+
+  /**
+   * Resets the robot's pose.
+   *
+   * @param pose The pose to reset to.
+   */
+  void ResetPose(const Pose2d& pose);
+
+  /**
+   * Resets the robot's translation.
+   *
+   * @param translation The pose to translation to.
+   */
+  void ResetTranslation(const Translation2d& translation);
+
+  /**
+   * Resets the robot's rotation.
+   *
+   * @param rotation The rotation to reset to.
+   */
+  void ResetRotation(const Rotation2d& rotation);
 
   /**
    * Gets the estimated robot pose.
