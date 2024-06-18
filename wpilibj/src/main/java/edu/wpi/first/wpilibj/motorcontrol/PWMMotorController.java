@@ -88,12 +88,20 @@ public abstract class PWMMotorController extends MotorSafety
   @Override
   public void disable() {
     m_pwm.setDisabled();
+
+    for (var follower : m_followers) {
+      follower.disable();
+    }
   }
 
   @Override
   public void stopMotor() {
     // Don't use set(0) as that will feed the watch kitty
     m_pwm.setSpeed(0);
+
+    for (var follower : m_followers) {
+      follower.stopMotor();
+    }
   }
 
   @Override
