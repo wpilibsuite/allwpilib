@@ -35,7 +35,7 @@ jobs:
         if: runner.os == 'macOS'
 
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@v0.0.4
+        uses: mozilla-actions/sccache-action@v0.0.5
 
       - uses: actions/checkout@v4
 
@@ -58,13 +58,13 @@ jobs:
     name: "Build - Windows"
     runs-on: windows-2022
     steps:
-      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: ilammy/msvc-dev-cmd@v1.13.0
 
       - name: Install CMake
         uses: lukka/get-cmake@v3.29.3
 
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@v0.0.4
+        uses: mozilla-actions/sccache-action@v0.0.5
 
       - uses: actions/checkout@v4
 
