@@ -170,6 +170,10 @@ double PIDController::GetVelocityError() const {
   return m_velocityError;
 }
 
+double PIDController::GetTotalError() const {
+  return m_totalError;
+}
+
 double PIDController::Calculate(double measurement) {
   m_measurement = measurement;
   m_prevError = m_positionError;
