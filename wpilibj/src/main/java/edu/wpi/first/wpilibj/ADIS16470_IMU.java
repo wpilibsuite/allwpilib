@@ -478,27 +478,15 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
       m_spi.setClockRate(2000000);
       m_spi.setMode(SPI.Mode.kMode3);
       m_spi.setChipSelectActiveLow();
-      readRegister(PROD_ID); // Dummy read
-
-      // Validate the product ID
-      if (readRegister(PROD_ID) != 16982) {
-        DriverStation.reportError("Could not find ADIS16470", false);
-        close();
-        return false;
-      }
-      return true;
-    } else {
-      // Maybe the SPI port is active, but not in auto SPI mode? Try to read the
-      // product ID.
-      readRegister(PROD_ID); // dummy read
-      if (readRegister(PROD_ID) != 16982) {
-        DriverStation.reportError("Could not find an ADIS16470", false);
-        close();
-        return false;
-      } else {
-        return true;
-      }
     }
+    readRegister(PROD_ID); // Dummy read
+    // Validate the product ID
+    if (readRegister(PROD_ID) != 16982) {
+      DriverStation.reportError("Could not find an ADIS16470", false);
+      close();
+      return false;
+    }
+    return true;
   }
 
   /**
