@@ -35,8 +35,7 @@ public class AnalogGyroSim {
    *
    * @param callback the callback that will be called whenever the angle changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerAngleCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AnalogGyroDataJNI.registerAngleCallback(m_index, callback, initialNotify);
@@ -66,8 +65,7 @@ public class AnalogGyroSim {
    *
    * @param callback the callback that will be called whenever the rate changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerRateCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AnalogGyroDataJNI.registerRateCallback(m_index, callback, initialNotify);
@@ -97,8 +95,7 @@ public class AnalogGyroSim {
    *
    * @param callback the callback that will be called whenever the gyro is initialized
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AnalogGyroDataJNI.registerInitializedCallback(m_index, callback, initialNotify);

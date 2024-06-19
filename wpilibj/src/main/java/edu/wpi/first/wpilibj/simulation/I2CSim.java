@@ -27,8 +27,7 @@ public class I2CSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = I2CDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
@@ -57,8 +56,7 @@ public class I2CSim {
    * Register a callback to be run whenever a `read` operation is done.
    *
    * @param callback the callback that is run on `read` operations
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerReadCallback(BufferCallback callback) {
     int uid = I2CDataJNI.registerReadCallback(m_index, callback);
@@ -69,8 +67,7 @@ public class I2CSim {
    * Register a callback to be run whenever a `write` operation is done.
    *
    * @param callback the callback that is run on `write` operations
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerWriteCallback(ConstBufferCallback callback) {
     int uid = I2CDataJNI.registerWriteCallback(m_index, callback);

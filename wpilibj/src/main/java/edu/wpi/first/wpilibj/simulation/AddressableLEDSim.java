@@ -65,8 +65,7 @@ public class AddressableLEDSim {
    *
    * @param callback the callback that will be called whenever the Initialized property is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AddressableLEDDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
@@ -96,8 +95,7 @@ public class AddressableLEDSim {
    *
    * @param callback the callback that will be called whenever the output port is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerOutputPortCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AddressableLEDDataJNI.registerOutputPortCallback(m_index, callback, initialNotify);
@@ -127,8 +125,7 @@ public class AddressableLEDSim {
    *
    * @param callback the callback that will be called whenever the length is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerLengthCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AddressableLEDDataJNI.registerLengthCallback(m_index, callback, initialNotify);
@@ -158,8 +155,7 @@ public class AddressableLEDSim {
    *
    * @param callback the callback that will be called whenever the LED state is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerRunningCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AddressableLEDDataJNI.registerRunningCallback(m_index, callback, initialNotify);
@@ -188,8 +184,7 @@ public class AddressableLEDSim {
    * Register a callback on the LED data.
    *
    * @param callback the callback that will be called whenever the LED data is changed
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerDataCallback(ConstBufferCallback callback) {
     int uid = AddressableLEDDataJNI.registerDataCallback(m_index, callback);

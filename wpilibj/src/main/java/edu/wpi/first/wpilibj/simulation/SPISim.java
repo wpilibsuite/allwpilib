@@ -24,8 +24,7 @@ public class SPISim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = SPIDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
@@ -54,8 +53,7 @@ public class SPISim {
    * Register a callback to be run whenever a `read` operation is executed.
    *
    * @param callback the callback
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerReadCallback(BufferCallback callback) {
     int uid = SPIDataJNI.registerReadCallback(m_index, callback);
@@ -66,8 +64,7 @@ public class SPISim {
    * Register a callback to be run whenever a `write` operation is executed.
    *
    * @param callback the callback
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerWriteCallback(ConstBufferCallback callback) {
     int uid = SPIDataJNI.registerWriteCallback(m_index, callback);
@@ -78,8 +75,7 @@ public class SPISim {
    * Register a callback to be run whenever an auto receive buffer is received.
    *
    * @param callback the callback
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerReadAutoReceiveBufferCallback(
       SpiReadAutoReceiveBufferCallback callback) {

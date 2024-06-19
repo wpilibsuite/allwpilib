@@ -35,8 +35,7 @@ public class RelaySim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerInitializedForwardCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -67,8 +66,7 @@ public class RelaySim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerInitializedReverseCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -99,8 +97,7 @@ public class RelaySim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerForwardCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = RelayDataJNI.registerForwardCallback(m_index, callback, initialNotify);
@@ -130,8 +127,7 @@ public class RelaySim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerReverseCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = RelayDataJNI.registerReverseCallback(m_index, callback, initialNotify);
