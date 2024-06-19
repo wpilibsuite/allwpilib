@@ -86,7 +86,9 @@ class MecanumDrive : public RobotDriveBase,
    * @param rearLeftMotor Rear-left motor.
    * @param frontRightMotor Front-right motor.
    * @param rearRightMotor Rear-right motor.
+   * @deprecated Use MecanumDrive constructor with function arguments.
    */
+  [[deprecated("Use MecanumDrive constructor with function arguments")]]
   MecanumDrive(MotorController& frontLeftMotor, MotorController& rearLeftMotor,
                MotorController& frontRightMotor,
                MotorController& rearRightMotor);

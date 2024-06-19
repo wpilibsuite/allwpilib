@@ -117,7 +117,9 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @param rearLeftMotor The motor on the rear-left corner.
    * @param frontRightMotor The motor on the front-right corner.
    * @param rearRightMotor The motor on the rear-right corner.
+   * @deprecated Use MecanumDrive constructor with function arguments.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   @SuppressWarnings({"removal", "this-escape"})
   public MecanumDrive(
       MotorController frontLeftMotor,
