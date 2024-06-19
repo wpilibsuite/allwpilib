@@ -193,7 +193,9 @@ NO
 !simulation/install_resources/*
 
 # VSCode
-.vscode/
+.vscode/*
+!.vscode/settings.default.json
+!.vscode/extensions.json
 
 #classpaths and projects
 .project
