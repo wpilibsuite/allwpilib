@@ -356,29 +356,16 @@ bool ADIS16470_IMU::SwitchToStandardSPI() {
     m_spi->SetClockRate(2000000);
     m_spi->SetMode(frc::SPI::Mode::kMode3);
     m_spi->SetChipSelectActiveLow();
-    ReadRegister(PROD_ID);  // Dummy read
-
-    // Validate the product ID
-    uint16_t prod_id = ReadRegister(PROD_ID);
-    if (prod_id != 16982 && prod_id != 16470) {
-      REPORT_ERROR("Could not find ADIS16470!");
-      Close();
-      return false;
-    }
-    return true;
-  } else {
-    // Maybe the SPI port is active, but not in auto SPI mode? Try to read the
-    // product ID.
-    ReadRegister(PROD_ID);  // Dummy read
-    uint16_t prod_id = ReadRegister(PROD_ID);
-    if (prod_id != 16982 && prod_id != 16470) {
-      REPORT_ERROR("Could not find ADIS16470!");
-      Close();
-      return false;
-    } else {
-      return true;
-    }
   }
+  ReadRegister(PROD_ID);  // Dummy read
+  // Validate the product ID
+  uint16_t prod_id = ReadRegister(PROD_ID);
+  if (prod_id != 16982 && prod_id != 16470) {
+    REPORT_ERROR("Could not find ADIS16470!");
+    Close();
+    return false;
+  }
+  return true;
 }
 
 /**
