@@ -81,8 +81,7 @@ public class MecanumControllerCommand extends Command {
    * @param frontRightController The front right wheel velocity PID.
    * @param rearRightController The rear right wheel velocity PID.
    * @param currentWheelSpeeds A MecanumDriveWheelSpeeds object containing the current wheel speeds.
-   * @param outputDriveVoltages A MecanumDriveMotorVoltages object containing the output motor
-   *     voltages.
+   * @param outputDriveVoltages A MecanumVoltagesConsumer that consumes voltages of mecanum motors.
    * @param requirements The subsystems to require.
    */
   @SuppressWarnings("this-escape")
@@ -169,8 +168,7 @@ public class MecanumControllerCommand extends Command {
    * @param frontRightController The front right wheel velocity PID.
    * @param rearRightController The rear right wheel velocity PID.
    * @param currentWheelSpeeds A MecanumDriveWheelSpeeds object containing the current wheel speeds.
-   * @param outputDriveVoltages A MecanumDriveMotorVoltages object containing the output motor
-   *     voltages.
+   * @param outputDriveVoltages A MecanumVoltagesConsumer that consumes voltages of mecanum motors.
    * @param requirements The subsystems to require.
    */
   public MecanumControllerCommand(
@@ -426,8 +424,18 @@ public class MecanumControllerCommand extends Command {
     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
   }
 
+  /**
+   * A consumer to represent an operation on the voltages of a mecanum drive.
+   */
   @FunctionalInterface
   public interface MecanumVoltagesConsumer {
+    /**
+     * Accepts the voltages to perform some operation with them.
+     * @param frontLeftVoltage The voltage of the front left motor.
+     * @param frontRightVoltage The voltage of the front right motor.
+     * @param rearLeftVoltage The voltage of the rear left motor.
+     * @param rearRightVoltage The voltage of the rear left motor.
+     */
     void accept(
         double frontLeftVoltage,
         double frontRightVoltage,
