@@ -72,7 +72,7 @@ public class Velocity<D extends Unit> implements Measure<VelocityUnit<D>> {
   }
 
   public static class Mutable<D extends Unit> extends Velocity<D>
-      implements IMutable<VelocityUnit<D>, Velocity<D>, Mutable<D>> {
+      implements MutableMeasure<VelocityUnit<D>, Velocity<D>, Mutable<D>> {
     public Mutable(double magnitude, double baseUnitMagnitude, VelocityUnit<D> unit) {
       super(magnitude, baseUnitMagnitude, unit);
     }

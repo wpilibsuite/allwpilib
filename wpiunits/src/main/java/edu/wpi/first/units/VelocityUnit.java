@@ -66,7 +66,7 @@ public class VelocityUnit<D extends Unit> extends Per<D, TimeUnit> {
     return new Velocity<>(magnitude, toBaseUnits(magnitude), this);
   }
 
-  public IMutable<VelocityUnit<D>, ?, ?> mutable(double initialMagnitude) {
+  public MutableMeasure<VelocityUnit<D>, ?, ?> mutable(double initialMagnitude) {
     return new Velocity.Mutable<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 

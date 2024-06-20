@@ -14,7 +14,7 @@ import java.util.Objects;
  *
  * @param <U> the self type, e.g. {@code class SomeUnit extends Unit<SomeUnit>}
  */
-public class Unit {
+public abstract class Unit {
   private final UnaryFunction m_toBaseConverter;
   private final UnaryFunction m_fromBaseConverter;
 
@@ -59,6 +59,11 @@ public class Unit {
   protected Unit(Unit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     this(baseUnit, x -> x * baseUnitEquivalent, x -> x / baseUnitEquivalent, name, symbol);
   }
+
+  public abstract Measure<?> of(double magnitude);
+  public abstract Measure<?> ofBaseUnits(double baseUnitMagnitude);
+
+  public abstract MutableMeasure<?, ?, ?> mutable(double initialMagnitude);
 
   /**
    * Gets the base unit of measurement that this unit is derived from. If the unit is the base unit,

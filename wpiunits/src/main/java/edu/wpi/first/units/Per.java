@@ -123,8 +123,19 @@ public class Per<N extends Unit, D extends Unit> extends Unit {
         .make();
   }
 
+  @Override
   public Measure<? extends Per<N, D>> of(double magnitude) {
     return ImmutableMeasure.ofRelativeUnits(magnitude, this);
+  }
+
+  @Override
+  public Measure<?> ofBaseUnits(double baseUnitMagnitude) {
+    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutableMeasure<?, ?, ?> mutable(double initialMagnitude) {
+    return null;
   }
 
   public double convertFrom(double magnitude, Per<? extends N, ? extends D> otherUnit) {

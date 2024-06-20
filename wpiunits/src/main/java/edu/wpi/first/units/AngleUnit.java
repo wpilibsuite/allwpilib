@@ -31,8 +31,14 @@ public class AngleUnit extends Unit {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  @Override
   public Angle of(double magnitude) {
     return new Angle(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public Angle ofBaseUnits(double baseUnitMagnitude) {
+    return new Angle(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   public AngularVelocityUnit per(TimeUnit second) {
@@ -43,6 +49,7 @@ public class AngleUnit extends Unit {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
+  @Override
   public Angle.Mutable mutable(double initialMagnitude) {
     return new Angle.Mutable(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

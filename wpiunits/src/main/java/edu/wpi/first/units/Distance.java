@@ -130,7 +130,7 @@ public class Distance implements Measure<DistanceUnit> {
   }
 
   public static class Mutable extends Distance
-      implements IMutable<DistanceUnit, Distance, Mutable> {
+      implements MutableMeasure<DistanceUnit, Distance, Mutable> {
     public Mutable(double magnitude, double baseUnitMagnitude, DistanceUnit unit) {
       super(magnitude, baseUnitMagnitude, unit);
     }

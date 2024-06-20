@@ -53,7 +53,7 @@ public class AngularVelocity extends Velocity<AngleUnit> {
   }
 
   public static class Mutable extends AngularVelocity
-      implements IMutable<VelocityUnit<AngleUnit>, AngularVelocity, Mutable> {
+      implements MutableMeasure<VelocityUnit<AngleUnit>, AngularVelocity, Mutable> {
     public Mutable(double magnitude, double baseUnitMagnitude, AngularVelocityUnit unit) {
       super(magnitude, baseUnitMagnitude, unit);
     }

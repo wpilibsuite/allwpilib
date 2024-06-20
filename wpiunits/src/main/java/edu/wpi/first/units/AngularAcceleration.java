@@ -37,33 +37,8 @@ public class AngularAcceleration extends Acceleration<AngleUnit> {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (obj == this) return true;
-    if (obj == null || obj.getClass() != this.getClass()) return false;
-    var that = (AngularAcceleration) obj;
-    return Double.doubleToLongBits(this.magnitude) == Double.doubleToLongBits(that.magnitude)
-        && Double.doubleToLongBits(this.baseUnitMagnitude)
-            == Double.doubleToLongBits(that.baseUnitMagnitude)
-        && Objects.equals(this.unit, that.unit);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(magnitude, baseUnitMagnitude, unit);
-  }
-
-  @Override
   public String toString() {
-    return "AngularAcceleration["
-        + "magnitude="
-        + magnitude
-        + ", "
-        + "baseUnitMagnitude="
-        + baseUnitMagnitude
-        + ", "
-        + "unit="
-        + unit
-        + ']';
+    return toShortString();
   }
 
   public double in(AngularAccelerationUnit otherUnit) {
@@ -71,7 +46,7 @@ public class AngularAcceleration extends Acceleration<AngleUnit> {
   }
 
   public static class Mutable extends AngularAcceleration
-      implements IMutable<AccelerationUnit<AngleUnit>, AngularAcceleration, Mutable> {
+      implements MutableMeasure<AccelerationUnit<AngleUnit>, AngularAcceleration, Mutable> {
     public Mutable(double magnitude, double baseUnitMagnitude, AngularAccelerationUnit unit) {
       super(magnitude, baseUnitMagnitude, unit);
     }

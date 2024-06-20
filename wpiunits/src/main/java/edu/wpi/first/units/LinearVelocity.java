@@ -48,7 +48,7 @@ public class LinearVelocity extends Velocity<DistanceUnit> {
   }
 
   public static class Mutable extends LinearVelocity
-      implements IMutable<VelocityUnit<DistanceUnit>, LinearVelocity, Mutable> {
+      implements MutableMeasure<VelocityUnit<DistanceUnit>, LinearVelocity, Mutable> {
     public Mutable(double magnitude, double baseUnitMagnitude, LinearVelocityUnit unit) {
       super(magnitude, baseUnitMagnitude, unit);
     }

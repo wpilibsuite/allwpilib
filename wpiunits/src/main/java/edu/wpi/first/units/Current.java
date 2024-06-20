@@ -73,7 +73,7 @@ public class Current implements Measure<CurrentUnit> {
         + ']';
   }
 
-  public static class Mutable extends Current implements IMutable<CurrentUnit, Current, Mutable> {
+  public static class Mutable extends Current implements MutableMeasure<CurrentUnit, Current, Mutable> {
     public Mutable(double magnitude, double baseUnitMagnitude, CurrentUnit unit) {
       super(magnitude, baseUnitMagnitude, unit);
     }

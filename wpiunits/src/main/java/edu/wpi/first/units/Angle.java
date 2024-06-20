@@ -47,6 +47,12 @@ public class Angle implements Measure<AngleUnit> {
     return mathHelper.divide(this, period, RadiansPerSecond::of);
   }
 
+  public <Other extends Unit> Measure<Other> divide(
+      Measure<? extends Per<AngleUnit, ? extends Other>> ratio) {
+    return ImmutableMeasure.ofBaseUnits(
+        baseUnitMagnitude / ratio.baseUnitMagnitude(), ratio.unit().denominator());
+  }
+
   public AngularVelocity per(TimeUnit unit) {
     return mathHelper.divide(this, unit.of(1), RadiansPerSecond::of);
   }
@@ -59,6 +65,12 @@ public class Angle implements Measure<AngleUnit> {
   public <Divisor extends Unit> Measure<? extends Per<AngleUnit, Divisor>> per(Divisor divisor) {
     return Per.combine(this.baseUnit(), (Divisor) divisor.getBaseUnit())
         .of(baseUnitMagnitude / divisor.fromBaseUnits(1));
+  }
+
+  public <Other extends Unit> Measure<Other> times(
+      Measure<? extends Per<? extends Other, AngleUnit>> ratio) {
+    return ImmutableMeasure.ofBaseUnits(
+        baseUnitMagnitude * ratio.baseUnitMagnitude(), ratio.unit().numerator());
   }
 
   @Override
@@ -106,11 +118,12 @@ public class Angle implements Measure<AngleUnit> {
         + ']';
   }
 
-  public static class Mutable extends Angle {
+  public static class Mutable extends Angle implements MutableMeasure<AngleUnit, Angle, Mutable> {
     public Mutable(double magnitude, double baseUnitMagnitude, AngleUnit unit) {
       super(magnitude, baseUnitMagnitude, unit);
     }
 
+    @Override
     public Mutable mut_replace(double value, AngleUnit newUnit) {
       this.unit = newUnit;
       this.magnitude = value;

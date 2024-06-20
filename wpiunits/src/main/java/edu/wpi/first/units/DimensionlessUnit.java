@@ -33,6 +33,16 @@ public class DimensionlessUnit extends Unit {
     return new Dimensionless(magnitude, toBaseUnits(magnitude), this);
   }
 
+  @Override
+  public Measure<?> ofBaseUnits(double baseUnitMagnitude) {
+    return new Dimensionless(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public Dimensionless.Mutable mutable(double initialMagnitude) {
+    return new Dimensionless.Mutable(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
   public <U extends Unit> U mult(U other) {
     return Units.derive(other)
         .toBase(other.getConverterToBase().mult(this.getConverterToBase()))

@@ -4,8 +4,14 @@
 
 package edu.wpi.first.units;
 
-public interface IMutable<
-        U extends Unit, Base extends Measure<U>, MutSelf extends IMutable<U, Base, MutSelf>>
+/**
+ *
+ * @param <U> The dimension of measurement.
+ * @param <Base> The base measure type.
+ * @param <MutSelf> The self type. This MUST inherit from the base measure type.
+ */
+public interface MutableMeasure<
+        U extends Unit, Base extends Measure<U>, MutSelf extends MutableMeasure<U, Base, MutSelf>>
     extends Measure<U> {
   MutSelf mut_replace(double magnitude, U newUnit);
 
