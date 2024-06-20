@@ -70,18 +70,12 @@ void Window::Display() {
     // necessary
     ImVec2 min = {};
     ImVec2 max = ImGui::GetMainViewport()->Size;
-    ImVec2 newSize = window->Size;
-    ImVec2 newPos = window->Pos;
     // Might need to shrink window to fit in viewport
-    if (max.x - window->Size.x < min.x) {
-      newSize.x = max.x;
-    }
-    if (max.y - window->Size.y < min.y) {
-      newSize.y = max.y;
-    }
+    ImVec2 newSize = {std::clamp(window->Size.x, 0.0f, max.x - min.x),
+                      std::clamp(window->Size.y, 0.0f, max.y - min.y)};
     ImGui::SetWindowSize(newSize);
-    newPos.x = std::clamp(window->Pos.x, min.x, max.x - newSize.x);
-    newPos.y = std::clamp(window->Pos.y, min.y, max.y - newSize.y);
+    ImVec2 newPos = {std::clamp(window->Pos.x, min.x, max.x - newSize.x),
+                     std::clamp(window->Pos.y, min.y, max.y - newSize.y)};
     ImGui::SetWindowPos(newPos);
     if (m_renamePopupEnabled || m_view->HasSettings()) {
       bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
