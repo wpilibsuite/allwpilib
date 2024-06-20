@@ -66,13 +66,17 @@ public class RobotSignals {
   private static final int m_lastHistoryDemoLED = 31;
   private static final int m_firstAchieveHueGoal = 32;
   private static final int m_lastAchieveHueGoal = 39;
+  private static final int m_firstKnightRider = 40;
+  private static final int m_lastKnightRider = 47;
   // CAUTION CAUTION CAUTION -- Update this length for each view defined.
   private static final int m_length =
       Math.max(
         Math.max(
           Math.max(
             Math.max(
-              m_lastTopLED,
+              Math.max(
+                m_lastKnightRider,
+              m_lastTopLED),
             m_lastMainLED),
           m_lastEnableDisableLED),
         m_lastHistoryDemoLED),
@@ -84,6 +88,7 @@ public class RobotSignals {
   public final LEDView m_enableDisable;
   public final LEDView m_historyDemo;
   public final LEDView m_achieveHueGoal;
+  public final LEDView m_knightRider;
 
   private final AddressableLEDBuffer m_bufferLED;
 
@@ -105,6 +110,7 @@ public class RobotSignals {
         new LEDView(m_bufferLED.createView(m_firstHistoryDemoLED, m_lastHistoryDemoLED));
     m_achieveHueGoal =
         new LEDView(m_bufferLED.createView(m_firstAchieveHueGoal, m_lastAchieveHueGoal));
+    m_knightRider = new LEDView(m_bufferLED.createView(m_firstKnightRider, m_lastKnightRider));
   }
 
   /**

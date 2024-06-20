@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.Ach
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.GroupDisjointTest;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.HistoryFSM;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.Intake;
+import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.MooreLikeFSM;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals;
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDPatternSupplier;
 import edu.wpi.first.wpilibj.util.Color;
@@ -36,6 +37,7 @@ public class RobotContainer {
   private final Intake m_intake;
   private final HistoryFSM m_historyFSM;
   private final AchieveHueGoal m_achieveHueGoal;
+  private final MooreLikeFSM m_mooreLikeFSM;
   // container and creator of all the LEDView subsystems
   private final RobotSignals m_robotSignals;
   // container and creator of all the group/disjoint tests
@@ -53,7 +55,7 @@ public class RobotContainer {
     m_intake = new Intake(m_robotSignals.m_main);
     m_historyFSM = new HistoryFSM(m_robotSignals.m_historyDemo);
     m_achieveHueGoal = new AchieveHueGoal(m_robotSignals.m_achieveHueGoal);
-
+    m_mooreLikeFSM = new MooreLikeFSM(m_robotSignals.m_knightRider);
     m_groupDisjointTest = new GroupDisjointTest();
 
     configureBindings();
@@ -316,6 +318,7 @@ public class RobotContainer {
     m_historyFSM.runBeforeCommands();
     m_achieveHueGoal.runBeforeCommands();
     m_groupDisjointTest.runBeforeCommands();
+    m_mooreLikeFSM.runBeforeCommands();
   }
 
   /**
@@ -330,5 +333,6 @@ public class RobotContainer {
     m_historyFSM.runAfterCommands();
     m_achieveHueGoal.runAfterCommands();
     m_groupDisjointTest.runAfterCommands();
+    m_mooreLikeFSM.runAfterCommands();
   }
 }

@@ -5,7 +5,7 @@
 /*
  * Example program that shows a variety of command based and programming "best practices."
  *
- * Includes five different techniques useful in Command-Based programming. In addition all of the
+ * Includes six different techniques useful in Command-Based programming. In addition all of the
  * examples are written in a similar suggested style of handling commands and triggers with
  * suggested variable naming style and minimal scope.
  *  1. Goal-Oriented subsystem to feed setpoints to a free-running control calculation. (PID
@@ -18,14 +18,15 @@
  *  5. Use of "proxies" to disjoint composed groups such that a subsystem default command may run
  *     within a group instead of the normal behavior of being blocked until the group completes.
  *     (Simple subsystems running commands and default commands concurrently in groups)
+ *  6. Example of using a Moore-like FSM structure using an input state and a triggering event to
+ *     transition to a new state.
  *
  * Because all but one demonstration uses an addressable LED strip as output (one has console
  * output) there is significant overlap and depth in demonstrating style of using the 2025 advanced
  * addressable LED classes and methods.
  * 
- * 
- * Demonstration output is on five sets of eight identical LEDs to show the program is operating;
- * operator input is Xbox controller. The sixth demonstration output is the terminal console
+ * Demonstration output is on six sets of eight identical LEDs to show the program is operating;
+ * operator input is Xbox controller. The seventh demonstration output is the terminal console
  * "prints."
  *
  * 1. LED set 1 usage Top LEDView subsystem default blue.
@@ -50,7 +51,11 @@
  *  subsystem. Colors on color wheel position show PID controller converging on a color selected
  *  by Xbox right trigger axis (press trigger axis a little to start; press "A" button to stop).
  *
- * 6. Console Terminal usage GroupDisjoint subsystem.
+ * 6. LED set 6 usage MooreLikeFSM LEDView subsystem.
+ *  Moore Like FSM structured subsystem runs continuously in enabled mode to display a KnightRider
+ *  red LED Scanner.
+ *
+ * 7. Console Terminal usage GroupDisjoint subsystem.
  *  Disjoint Sequential Group Demo console output initiated by entering teleop enable mode.
  *  Show that subsystem default command doesn't run within a group command unless the command with
  *  the subsystem requirement is disjointed from the group by using a Proxy structure or separated
@@ -84,6 +89,8 @@
  * Default commands can either run or not run within a sequential group depending on how the group is defined using Proxy.
  * Commands run in sequence by triggering successive commands.
  * Use of Measure<Time>.
+ * Use of sequential and parallel composed command groups to perform tasks.
+ * Use of a Moore Like FSM structure of current state, trigger, new state transitions.
  */
 
 /*
