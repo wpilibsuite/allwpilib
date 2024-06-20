@@ -9,6 +9,7 @@
 #include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <wpi/print.h>
 
 #include "glass/Context.h"
 #include "glass/Storage.h"
@@ -65,10 +66,27 @@ void Window::Display() {
   }
 
   if (Begin(label.c_str(), &m_visible, m_flags)) {
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+    // Constrains the window within the bounds of the viewport, resizing as
+    // necessary
+    ImVec2 min = {};
+    ImVec2 max = ImGui::GetMainViewport()->Size;
+    ImVec2 newSize = window->Size;
+    ImVec2 newPos = window->Pos;
+    // Might need to shrink window to fit in viewport
+    if (max.x - window->Size.x < min.x) {
+      newSize.x = max.x;
+    }
+    if (max.y - window->Size.y < min.y) {
+      newSize.y = max.y;
+    }
+    ImGui::SetWindowSize(newSize);
+    newPos.x = std::clamp(window->Pos.x, min.x, max.x - newSize.x);
+    newPos.y = std::clamp(window->Pos.y, min.y, max.y - newSize.y);
+    ImGui::SetWindowPos(newPos);
     if (m_renamePopupEnabled || m_view->HasSettings()) {
       bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
                         ImGui::IsItemHovered());
-      ImGuiWindow* window = ImGui::GetCurrentWindow();
 
       bool settingsButtonClicked = false;
       // Not docked, and window has just enough for the circles not to be
