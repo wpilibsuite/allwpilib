@@ -79,7 +79,7 @@ public class TimesliceRobot extends TimedRobot {
    * @param controllerPeriod The controller period in seconds. The sum of all scheduler allocations
    *     should be less than or equal to this value.
    */
-  public TimesliceRobot(double robotPeriodicAllocation, double controllerPeriod) {
+  protected TimesliceRobot(double robotPeriodicAllocation, double controllerPeriod) {
     m_nextOffset = robotPeriodicAllocation;
     m_controllerPeriod = controllerPeriod;
   }
@@ -95,7 +95,7 @@ public class TimesliceRobot extends TimedRobot {
    * @param func Function to schedule.
    * @param allocation The function's runtime allocation in seconds out of the controller period.
    */
-  public void schedule(Runnable func, double allocation) {
+  protected void schedule(Runnable func, double allocation) {
     if (m_nextOffset + allocation > m_controllerPeriod) {
       throw new IllegalStateException(
           "Function scheduled at offset "

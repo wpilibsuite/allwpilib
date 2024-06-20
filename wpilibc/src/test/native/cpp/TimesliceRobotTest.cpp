@@ -30,6 +30,10 @@ class MockRobot : public TimesliceRobot {
 
   MockRobot() : TimesliceRobot{2_ms, 5_ms} {}
 
+  void Schedule(std::function<void()> func, units::second_t allocation) {
+    TimesliceRobot::Schedule(std::move(func), allocation);
+  }
+
   void RobotPeriodic() override { m_robotPeriodicCount++; }
 };
 }  // namespace

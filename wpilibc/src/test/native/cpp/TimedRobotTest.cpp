@@ -50,6 +50,11 @@ class MockRobot : public TimedRobot {
 
   MockRobot() : TimedRobot{kPeriod} {}
 
+  void AddPeriodic(std::function<void()> callback, units::second_t period,
+                   units::second_t offset = 0_s) {
+    TimedRobot::AddPeriodic(std::move(callback), period, offset);
+  }
+
   void RobotInit() override { m_robotInitCount++; }
 
   void SimulationInit() override { m_simulationInitCount++; }

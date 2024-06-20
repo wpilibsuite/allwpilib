@@ -18,6 +18,15 @@
 
 using namespace frc;
 
+TimedRobot::~TimedRobot() {
+  int32_t status = 0;
+
+  HAL_StopNotifier(m_notifier, &status);
+  FRC_ReportError(status, "StopNotifier");
+
+  HAL_CleanNotifier(m_notifier, &status);
+}
+
 void TimedRobot::StartCompetition() {
   RobotInit();
 
@@ -81,15 +90,6 @@ TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
 
   HAL_Report(HALUsageReporting::kResourceType_Framework,
              HALUsageReporting::kFramework_Timed);
-}
-
-TimedRobot::~TimedRobot() {
-  int32_t status = 0;
-
-  HAL_StopNotifier(m_notifier, &status);
-  FRC_ReportError(status, "StopNotifier");
-
-  HAL_CleanNotifier(m_notifier, &status);
 }
 
 void TimedRobot::AddPeriodic(std::function<void()> callback,
