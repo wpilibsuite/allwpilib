@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
@@ -53,7 +52,7 @@ public class MecanumControllerCommand extends Command {
   private final PIDController m_frontRightController;
   private final PIDController m_rearRightController;
   private final Supplier<MecanumDriveWheelSpeeds> m_currentWheelSpeeds;
-  private final Consumer<MecanumDriveMotorVoltages> m_outputDriveVoltages;
+  private final MecanumVoltagesConsumer m_outputDriveVoltages;
   private final Consumer<MecanumDriveWheelSpeeds> m_outputWheelSpeeds;
   private MecanumDriveWheelSpeeds m_prevSpeeds;
   private double m_prevTime;
@@ -102,7 +101,7 @@ public class MecanumControllerCommand extends Command {
       PIDController frontRightController,
       PIDController rearRightController,
       Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
-      Consumer<MecanumDriveMotorVoltages> outputDriveVoltages,
+      MecanumVoltagesConsumer outputDriveVoltages,
       Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumControllerCommand");
     m_pose = requireNonNullParam(pose, "pose", "MecanumControllerCommand");
@@ -188,7 +187,7 @@ public class MecanumControllerCommand extends Command {
       PIDController frontRightController,
       PIDController rearRightController,
       Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
-      Consumer<MecanumDriveMotorVoltages> outputDriveVoltages,
+      MecanumVoltagesConsumer outputDriveVoltages,
       Subsystem... requirements) {
     this(
         trajectory,
@@ -402,8 +401,7 @@ public class MecanumControllerCommand extends Command {
                   m_currentWheelSpeeds.get().rearRightMetersPerSecond, rearRightSpeedSetpoint);
 
       m_outputDriveVoltages.accept(
-          new MecanumDriveMotorVoltages(
-              frontLeftOutput, frontRightOutput, rearLeftOutput, rearRightOutput));
+          frontLeftOutput, frontRightOutput, rearLeftOutput, rearRightOutput);
 
     } else {
       m_outputWheelSpeeds.accept(
@@ -426,5 +424,14 @@ public class MecanumControllerCommand extends Command {
   @Override
   public boolean isFinished() {
     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+  }
+
+  @FunctionalInterface
+  public interface MecanumVoltagesConsumer {
+    void accept(
+        double frontLeftVoltage,
+        double frontRightVoltage,
+        double rearLeftVoltage,
+        double rearRightVoltage);
   }
 }
