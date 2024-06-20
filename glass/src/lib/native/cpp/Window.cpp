@@ -9,7 +9,6 @@
 #include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/print.h>
 
 #include "glass/Context.h"
 #include "glass/Storage.h"
