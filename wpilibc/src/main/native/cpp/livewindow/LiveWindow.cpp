@@ -8,6 +8,7 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
+#include <wpi/GlobalState.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -63,11 +64,9 @@ static Instance& GetInstance() {
 }
 
 #ifndef __FRC_ROBORIO__
-namespace frc::impl {
-void ResetLiveWindow() {
-  std::make_unique<Instance>().swap(GetInstanceHolder());
-}
-}  // namespace frc::impl
+static wpi::impl::RegisterGlobalStateResetHelper _(
+    wpi::impl::GSPriorityLiveWindow,
+    []() { std::make_unique<Instance>().swap(GetInstanceHolder()); });
 #endif
 
 std::shared_ptr<Component> Instance::GetOrAdd(wpi::Sendable* sendable) {

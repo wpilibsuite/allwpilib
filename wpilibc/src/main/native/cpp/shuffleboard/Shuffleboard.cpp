@@ -5,6 +5,7 @@
 #include "frc/shuffleboard/Shuffleboard.h"
 
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/GlobalState.h>
 
 #include "frc/shuffleboard/ShuffleboardTab.h"
 
@@ -71,12 +72,11 @@ static std::unique_ptr<detail::ShuffleboardInstance>& GetInstanceHolder() {
 }
 
 #ifndef __FRC_ROBORIO__
-namespace frc::impl {
-void ResetShuffleboardInstance() {
-  GetInstanceHolder() = std::make_unique<detail::ShuffleboardInstance>(
-      nt::NetworkTableInstance::GetDefault());
-}
-}  // namespace frc::impl
+static wpi::impl::RegisterGlobalStateResetHelper _(
+    wpi::impl::GSPriorityShuffleboard, []() {
+      GetInstanceHolder() = std::make_unique<detail::ShuffleboardInstance>(
+          nt::NetworkTableInstance::GetDefault());
+    });
 #endif
 
 detail::ShuffleboardInstance& Shuffleboard::GetInstance() {

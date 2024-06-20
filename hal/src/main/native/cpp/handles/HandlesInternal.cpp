@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include <wpi/GlobalState.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
 
@@ -94,3 +95,6 @@ HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
   return handle;
 }
 }  // namespace hal
+
+static wpi::impl::RegisterGlobalStateResetHelper _(
+    wpi::impl::GSPriorityHalHandles, hal::HandleBase::ResetGlobalHandles);
