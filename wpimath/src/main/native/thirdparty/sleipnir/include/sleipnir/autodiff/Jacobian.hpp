@@ -5,12 +5,12 @@
 #include <utility>
 
 #include <Eigen/SparseCore>
+#include <wpi/SmallVector.h>
 
 #include "sleipnir/autodiff/ExpressionGraph.hpp"
 #include "sleipnir/autodiff/Profiler.hpp"
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableMatrix.hpp"
-#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir {
@@ -81,7 +81,7 @@ class SLEIPNIR_DLLEXPORT Jacobian {
   VariableMatrix Get() const {
     VariableMatrix result{m_variables.Rows(), m_wrt.Rows()};
 
-    small_vector<detail::ExpressionPtr> wrtVec;
+    wpi::SmallVector<detail::ExpressionPtr> wrtVec;
     wrtVec.reserve(m_wrt.size());
     for (auto& elem : m_wrt) {
       wrtVec.emplace_back(elem.expr);
@@ -107,7 +107,9 @@ class SLEIPNIR_DLLEXPORT Jacobian {
 
     m_profiler.StartSolve();
 
-    Update();
+    for (auto& graph : m_graphs) {
+      graph.Update();
+    }
 
     // Copy the cached triplets so triplets added for the nonlinear rows are
     // thrown away at the end of the function
@@ -128,15 +130,6 @@ class SLEIPNIR_DLLEXPORT Jacobian {
   }
 
   /**
-   * Updates the values of the variables.
-   */
-  void Update() {
-    for (auto& graph : m_graphs) {
-      graph.Update();
-    }
-  }
-
-  /**
    * Returns the profiler.
    */
   Profiler& GetProfiler() { return m_profiler; }
@@ -145,16 +138,16 @@ class SLEIPNIR_DLLEXPORT Jacobian {
   VariableMatrix m_variables;
   VariableMatrix m_wrt;
 
-  small_vector<detail::ExpressionGraph> m_graphs;
+  wpi::SmallVector<detail::ExpressionGraph> m_graphs;
 
   Eigen::SparseMatrix<double> m_J{m_variables.Rows(), m_wrt.Rows()};
 
   // Cached triplets for gradients of linear rows
-  small_vector<Eigen::Triplet<double>> m_cachedTriplets;
+  wpi::SmallVector<Eigen::Triplet<double>> m_cachedTriplets;
 
   // List of row indices for nonlinear rows whose graients will be computed in
   // Value()
-  small_vector<int> m_nonlinearRows;
+  wpi::SmallVector<int> m_nonlinearRows;
 
   Profiler m_profiler;
 };
