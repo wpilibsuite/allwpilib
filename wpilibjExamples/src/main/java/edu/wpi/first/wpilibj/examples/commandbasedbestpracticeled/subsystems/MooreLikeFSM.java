@@ -22,7 +22,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class MooreLikeFSM extends SubsystemBase {
 
-  private LEDView m_robotSignals; // LED view where the output is displayed
+  private final LEDView m_robotSignals; // LED view where the output is displayed
+  private double m_periodFactor = 10.; // changeable speed of the scanner
+  private final Color m_color; // changeable color of the scanner
+  private final double m_numberPeriods = 14.0; // number of periods or time bins to generate time-based triggers
 
   /**
    * Eight state FSM for the eight lights in the Knight Rider Kitt Scanner
@@ -34,8 +37,8 @@ public class MooreLikeFSM extends SubsystemBase {
   // because we have to wait for the clock to roll around to the right time and then it
   // triggers the state following the initial state. Too simple to work exactly as you might
   // expect but it's set so fast you might not notice it's not "right".
-  private State initialState = State.MyState1;
-  private State currentState = initialState;
+  private State m_initialState = State.MyState1;
+  private State m_currentState = m_initialState;
 
   /**
    * These commands (factories) define the states.
@@ -58,7 +61,7 @@ public class MooreLikeFSM extends SubsystemBase {
     return
       defineState(State.MyState1,
         ()->{
-        LEDPattern currentStateSignal = oneLEDSmeared(0, Color.kRed, Color.kBlack);
+            LEDPattern currentStateSignal = oneLEDSmeared(0, m_color, Color.kBlack);
         m_robotSignals.setSignal(currentStateSignal).schedule();
       });
   }
@@ -67,7 +70,7 @@ public class MooreLikeFSM extends SubsystemBase {
     return
       defineState(State.MyState2,
         ()->{
-        LEDPattern currentStateSignal = oneLEDSmeared(1, Color.kRed, Color.kBlack);
+            LEDPattern currentStateSignal = oneLEDSmeared(1, m_color, Color.kBlack);
         m_robotSignals.setSignal(currentStateSignal).schedule();
       });
   }
@@ -76,7 +79,7 @@ public class MooreLikeFSM extends SubsystemBase {
     return
       defineState(State.MyState3,      
         ()->{
-        LEDPattern currentStateSignal = oneLEDSmeared(2, Color.kRed, Color.kBlack);
+            LEDPattern currentStateSignal = oneLEDSmeared(2, m_color, Color.kBlack);
         m_robotSignals.setSignal(currentStateSignal).schedule();
       });
   }
@@ -85,7 +88,7 @@ public class MooreLikeFSM extends SubsystemBase {
     return
       defineState(State.MyState4,
         ()->{
-        LEDPattern currentStateSignal = oneLEDSmeared(3, Color.kRed, Color.kBlack);
+            LEDPattern currentStateSignal = oneLEDSmeared(3, m_color, Color.kBlack);
         m_robotSignals.setSignal(currentStateSignal).schedule();
       });
   }
@@ -94,7 +97,7 @@ public class MooreLikeFSM extends SubsystemBase {
     return
       defineState(State.MyState5,
         ()->{
-        LEDPattern currentStateSignal = oneLEDSmeared(4, Color.kRed, Color.kBlack);
+            LEDPattern currentStateSignal = oneLEDSmeared(4, m_color, Color.kBlack);
         m_robotSignals.setSignal(currentStateSignal).schedule();
       });
   }
@@ -103,7 +106,7 @@ public class MooreLikeFSM extends SubsystemBase {
     return
       defineState(State.MyState6,
         ()->{
-        LEDPattern currentStateSignal = oneLEDSmeared(5, Color.kRed, Color.kBlack);
+            LEDPattern currentStateSignal = oneLEDSmeared(5, m_color, Color.kBlack);
         m_robotSignals.setSignal(currentStateSignal).schedule();
       });
     }
@@ -112,7 +115,7 @@ public class MooreLikeFSM extends SubsystemBase {
     return
       defineState(State.MyState7,
         ()->{
-        LEDPattern currentStateSignal = oneLEDSmeared(6, Color.kRed, Color.kBlack);
+            LEDPattern currentStateSignal = oneLEDSmeared(6, m_color, Color.kBlack);
         m_robotSignals.setSignal(currentStateSignal).schedule();
       });
   }
@@ -121,7 +124,7 @@ public class MooreLikeFSM extends SubsystemBase {
     return
       defineState(State.MyState8,
         ()->{
-        LEDPattern currentStateSignal = oneLEDSmeared(7, Color.kRed, Color.kBlack);
+            LEDPattern currentStateSignal = oneLEDSmeared(7, m_color, Color.kBlack);
         m_robotSignals.setSignal(currentStateSignal).schedule();
       });
   }
@@ -141,47 +144,47 @@ public class MooreLikeFSM extends SubsystemBase {
    * transition the check for the current state would not be necessary.
    */
 
-  private final Trigger t1 = new Trigger(
-      ()-> currentState == State.MyState1 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 0);
+  private final Trigger m_exitScanner1Period0 = new Trigger(
+      ()-> m_currentState == State.MyState1 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 0);
 
-  private final Trigger t2 = new Trigger(
-      ()-> currentState == State.MyState2 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 1);
+  private final Trigger m_exitScanner2Period1 = new Trigger(
+      ()-> m_currentState == State.MyState2 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 1);
 
-  private final Trigger t3 = new Trigger(
-      ()-> currentState == State.MyState3 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 2);
+  private final Trigger m_exitScanner3Period2 = new Trigger(
+      ()-> m_currentState == State.MyState3 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 2);
 
-  private final Trigger t4 = new Trigger(
-      ()-> currentState == State.MyState4 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 3);
+  private final Trigger m_exitScanner4Period3 = new Trigger(
+      ()-> m_currentState == State.MyState4 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 3);
 
-  private final Trigger t5 = new Trigger(
-      ()-> currentState == State.MyState5 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 4);
+  private final Trigger m_exitScanner5Period4 = new Trigger(
+      ()-> m_currentState == State.MyState5 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 4);
 
-  private final Trigger t6 = new Trigger(
-      ()-> currentState == State.MyState6 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 5);
+  private final Trigger m_exitScanner6Period5 = new Trigger(
+      ()-> m_currentState == State.MyState6 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 5);
 
-  private final Trigger t7 = new Trigger(
-      ()-> currentState == State.MyState7 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 6);
+  private final Trigger m_exitScanner7Period6 = new Trigger(
+      ()-> m_currentState == State.MyState7 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 6);
 
-  private final Trigger t8 = new Trigger(
-      ()-> currentState == State.MyState8 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 7);
+  private final Trigger m_exitScanner8Period7 = new Trigger(
+      ()-> m_currentState == State.MyState8 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 7);
 
-  private final Trigger t9 = new Trigger(
-      ()-> currentState == State.MyState7 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 8);
+  private final Trigger m_exitScanner7Period8 = new Trigger(
+      ()-> m_currentState == State.MyState7 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 8);
 
-  private final Trigger t10 = new Trigger(
-      ()-> currentState == State.MyState6 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 9);
+  private final Trigger m_exitScanner6Period9 = new Trigger(
+      ()-> m_currentState == State.MyState6 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 9);
 
-  private final Trigger t11 = new Trigger(
-      ()-> currentState == State.MyState5 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 10);
+  private final Trigger m_exitScanner5Period10 = new Trigger(
+      ()-> m_currentState == State.MyState5 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 10);
 
-  private final Trigger t12 = new Trigger(
-      ()-> currentState == State.MyState4 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 11);
+  private final Trigger m_exitScanner4Period11 = new Trigger(
+      ()-> m_currentState == State.MyState4 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 11);
 
-  private final Trigger t13 = new Trigger(
-      ()-> currentState == State.MyState3 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 12);
+  private final Trigger m_exitScanner3Period12 = new Trigger(
+      ()-> m_currentState == State.MyState3 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 12);
 
-  private final Trigger t14 = new Trigger(
-      ()-> currentState == State.MyState2 && (int) (Timer.getFPGATimestamp()*10.0 % 14.0) == 13);
+  private final Trigger m_exitScanner2Period13 = new Trigger(
+      ()-> m_currentState == State.MyState2 && (int) (Timer.getFPGATimestamp()*m_periodFactor % m_numberPeriods) == 13);
 
   /**
    * Activate all Triggers
@@ -192,28 +195,33 @@ public class MooreLikeFSM extends SubsystemBase {
    * The transition is now completely defined as current_state + event => next_state
    */
   private final void bindTriggers() {
-    t1.onTrue(scanner2());
-    t2.onTrue(scanner3());
-    t3.onTrue(scanner4());
-    t4.onTrue(scanner5());
-    t5.onTrue(scanner6());
-    t6.onTrue(scanner7());
-    t7.onTrue(scanner8());
-    t8.onTrue(scanner7());
-    t9.onTrue(scanner6());
-    t10.onTrue(scanner5());
-    t11.onTrue(scanner4());
-    t12.onTrue(scanner3());
-    t13.onTrue(scanner2());
-    t14.onTrue(scanner1());
+    m_exitScanner1Period0.onTrue(scanner2());
+    m_exitScanner2Period1.onTrue(scanner3());
+    m_exitScanner3Period2.onTrue(scanner4());
+    m_exitScanner4Period3.onTrue(scanner5());
+    m_exitScanner5Period4.onTrue(scanner6());
+    m_exitScanner6Period5.onTrue(scanner7());
+    m_exitScanner7Period6.onTrue(scanner8());
+    m_exitScanner8Period7.onTrue(scanner7());
+    m_exitScanner7Period8.onTrue(scanner6());
+    m_exitScanner6Period9.onTrue(scanner5());
+    m_exitScanner5Period10.onTrue(scanner4());
+    m_exitScanner4Period11.onTrue(scanner3());
+    m_exitScanner3Period12.onTrue(scanner2());
+    m_exitScanner2Period13.onTrue(scanner1());
   }
 
   /**
-   * CTOR
+   * A Moore-Like FSM to display lights similar to the Knight Rider Kitt Scanner
    * 
+   * @param the LED View for the Scanner
+   * @param periodFactor Specify the speed of the Scanner (suggest about 10.0)
+   * @param color Specify the color of the Scanner (suggest Color.kRed)
    */
-  public MooreLikeFSM(LEDView robotSignals) {
+  public MooreLikeFSM(LEDView robotSignals, double periodFactor, Color color) {
     this.m_robotSignals = robotSignals;
+    this.m_periodFactor = periodFactor;
+    this.m_color = color;
     bindTriggers();
   }
 
@@ -226,7 +234,7 @@ public class MooreLikeFSM extends SubsystemBase {
    */
   private final Command defineState(State state, Runnable run) {
     return new FunctionalCommand(
-        () -> currentState = state, run, interrupted -> {}, () -> false, this);
+        () -> m_currentState = state, run, interrupted -> {}, () -> false, this);
   }
 
   /**
@@ -242,10 +250,12 @@ public class MooreLikeFSM extends SubsystemBase {
    * @return Pattern to apply to the LED view
    */
   private static final LEDPattern oneLEDSmeared(int index, Color colorForeground, Color colorBackground) {
-    return (reader, writer) -> {
-      int bufLen = reader.getLength();
       final int slightlyDim = 180;
       final int dim = 120;
+
+    return (reader, writer) -> {
+      int bufLen = reader.getLength();
+
       for (int led = 0; led < bufLen; led++) {
         if(led == index) {
           writer.setLED(led, colorForeground);              

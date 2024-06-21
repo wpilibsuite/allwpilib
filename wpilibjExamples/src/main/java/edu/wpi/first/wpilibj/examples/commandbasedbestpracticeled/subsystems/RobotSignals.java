@@ -64,10 +64,13 @@ public class RobotSignals {
   private static final int m_lastEnableDisableLED = 23;
   private static final int m_firstHistoryDemoLED = 24;
   private static final int m_lastHistoryDemoLED = 31;
-  private static final int m_firstAchieveHueGoal = 32;
-  private static final int m_lastAchieveHueGoal = 39;
-  private static final int m_firstKnightRider = 40;
-  private static final int m_lastKnightRider = 47;
+  private static final int m_firstAchieveHueGoalLED = 32;
+  private static final int m_lastAchieveHueGoalLED = 39;
+  private static final int m_firstKnightRiderLED = 40;
+  private static final int m_lastKnightRiderLED = 47;
+  private static final int m_firstImposterLED = 48;
+  private static final int m_lastImposterLED = 55;
+
   // CAUTION CAUTION CAUTION -- Update this length for each view defined.
   private static final int m_length =
       Math.max(
@@ -75,12 +78,14 @@ public class RobotSignals {
           Math.max(
             Math.max(
               Math.max(
-                m_lastKnightRider,
+                Math.max(
+                  m_lastImposterLED,
+                m_lastKnightRiderLED),
               m_lastTopLED),
             m_lastMainLED),
           m_lastEnableDisableLED),
         m_lastHistoryDemoLED),
-      m_lastAchieveHueGoal)
+      m_lastAchieveHueGoalLED)
       + 1;
 
   public final LEDView m_top;
@@ -89,6 +94,7 @@ public class RobotSignals {
   public final LEDView m_historyDemo;
   public final LEDView m_achieveHueGoal;
   public final LEDView m_knightRider;
+  public final LEDView m_imposter;
 
   private final AddressableLEDBuffer m_bufferLED;
 
@@ -102,15 +108,20 @@ public class RobotSignals {
     m_bufferLED = new AddressableLEDBuffer(m_length); // buffer for all of the LEDs
 
     // create the resources (subsystems) as views of the LED buffer
-    m_top = new LEDView(m_bufferLED.createView(m_firstTopLED, m_lastTopLED));
-    m_main = new LEDView(m_bufferLED.createView(m_firstMainLED, m_lastMainLED));
+    m_top =
+        new LEDView(m_bufferLED.createView(m_firstTopLED, m_lastTopLED));
+    m_main =
+        new LEDView(m_bufferLED.createView(m_firstMainLED, m_lastMainLED));
     m_enableDisable =
         new LEDView(m_bufferLED.createView(m_firstEnableDisableLED, m_lastEnableDisableLED));
     m_historyDemo =
         new LEDView(m_bufferLED.createView(m_firstHistoryDemoLED, m_lastHistoryDemoLED));
     m_achieveHueGoal =
-        new LEDView(m_bufferLED.createView(m_firstAchieveHueGoal, m_lastAchieveHueGoal));
-    m_knightRider = new LEDView(m_bufferLED.createView(m_firstKnightRider, m_lastKnightRider));
+        new LEDView(m_bufferLED.createView(m_firstAchieveHueGoalLED, m_lastAchieveHueGoalLED));
+    m_knightRider =
+        new LEDView(m_bufferLED.createView(m_firstKnightRiderLED, m_lastKnightRiderLED));
+    m_imposter =
+        new LEDView(m_bufferLED.createView(m_firstImposterLED, m_lastImposterLED));
   }
 
   /**

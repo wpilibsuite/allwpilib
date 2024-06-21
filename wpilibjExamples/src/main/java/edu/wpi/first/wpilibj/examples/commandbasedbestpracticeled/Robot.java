@@ -55,7 +55,10 @@
  *  Moore Like FSM structured subsystem runs continuously in enabled mode to display a KnightRider
  *  red LED Scanner.
  *
- * 7. Console Terminal usage GroupDisjoint subsystem.
+ * 7. LED set 7 usage MooreLikeFSM LEDView subsystem.
+ *  Second instance of the Moore Like FSM to show it can happen. Uses different speed and color.
+ *
+ * 8. Console Terminal usage GroupDisjoint subsystem.
  *  Disjoint Sequential Group Demo console output initiated by entering teleop enable mode.
  *  Show that subsystem default command doesn't run within a group command unless the command with
  *  the subsystem requirement is disjointed from the group by using a Proxy structure or separated
@@ -90,7 +93,7 @@
  * Commands run in sequence by triggering successive commands.
  * Use of Measure<Time>.
  * Use of sequential and parallel composed command groups to perform tasks.
- * Use of a Moore Like FSM structure of current state, trigger, new state transitions.
+ * Use of a reusable Moore Like FSM structure of current state, trigger, new state transitions.
  */
 
 /*
