@@ -4,12 +4,13 @@
 
 #include "frc/kinematics/proto/SwerveModulePositionProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "kinematics.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::SwerveModulePosition>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufSwerveModulePosition>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufSwerveModulePosition>(arena);
 }
 
 frc::SwerveModulePosition wpi::Protobuf<frc::SwerveModulePosition>::Unpack(

@@ -4,12 +4,13 @@
 
 #include "frc/controller/proto/ArmFeedforwardProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "controller.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::ArmFeedforward>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufArmFeedforward>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufArmFeedforward>(arena);
 }
 
 frc::ArmFeedforward wpi::Protobuf<frc::ArmFeedforward>::Unpack(

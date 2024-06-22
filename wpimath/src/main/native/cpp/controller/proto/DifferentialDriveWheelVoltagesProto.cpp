@@ -4,12 +4,14 @@
 
 #include "frc/controller/proto/DifferentialDriveWheelVoltagesProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "controller.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<
     frc::DifferentialDriveWheelVoltages>::New(google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufDifferentialDriveWheelVoltages>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufDifferentialDriveWheelVoltages>(
+      arena);
 }
 
 frc::DifferentialDriveWheelVoltages

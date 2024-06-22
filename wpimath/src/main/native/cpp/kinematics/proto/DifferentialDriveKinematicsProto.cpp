@@ -4,12 +4,14 @@
 
 #include "frc/kinematics/proto/DifferentialDriveKinematicsProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "kinematics.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::DifferentialDriveKinematics>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufDifferentialDriveKinematics>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufDifferentialDriveKinematics>(
+      arena);
 }
 
 frc::DifferentialDriveKinematics
