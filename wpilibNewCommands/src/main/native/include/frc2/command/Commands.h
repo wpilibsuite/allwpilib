@@ -153,7 +153,7 @@ CommandPtr Select(std::function<Key()> selector,
   ((void)vec.emplace_back(commands.first, std::move(commands.second).Unwrap()),
    ...);
 
-  return SelectCommand(std::move(selector), std::move(vec)).ToPtr();
+  return SelectCommand(std::move(selector), std::move(vec));
 }
 
 /**

@@ -47,7 +47,7 @@ void RobotContainer::ConfigureButtonBindings() {
               },
               // Require the robot drive
               {&m_drive})
-              .ToPtr());
+              );
 
   // Turn to 90 degrees when the 'Cross' button is pressed
   frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kCross)

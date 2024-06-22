@@ -22,7 +22,7 @@ void RobotContainer::ConfigureBindings() {
   // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
   frc2::Trigger([this] {
     return m_subsystem.ExampleCondition();
-  }).OnTrue(ExampleCommand(&m_subsystem).ToPtr());
+  }).OnTrue(ExampleCommand(&m_subsystem));
 
   // Schedule `ExampleMethodCommand` when the Xbox controller's B button is
   // pressed, cancelling on release.
