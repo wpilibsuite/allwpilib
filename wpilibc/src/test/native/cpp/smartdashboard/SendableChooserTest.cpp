@@ -17,7 +17,7 @@ class SendableChooserTest : public ::testing::TestWithParam<int> {};
 
 TEST_P(SendableChooserTest, ReturnsSelected) {
   frc::SendableChooser<int> chooser;
-  frc::sim::SendableChooserSim chooserSim = frc::sim::SendableChooserSim{
+  frc::sim::SendableChooserSim chooserSim{
       fmt::format("/SmartDashboard/ReturnsSelectedChooser{}/", GetParam())};
 
   for (int i = 1; i <= 3; i++) {
@@ -59,8 +59,8 @@ TEST(SendableChooserTest,
 
 TEST(SendableChooserTest, ChangeListener) {
   frc::SendableChooser<int> chooser;
-  frc::sim::SendableChooserSim chooserSim = frc::sim::SendableChooserSim{
-      fmt::format("/SmartDashboard/ChangeListenerChooser/", GetParam())};
+  frc::sim::SendableChooserSim chooserSim{
+      "/SmartDashboard/ChangeListenerChooser/"};
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
