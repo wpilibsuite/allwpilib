@@ -216,7 +216,10 @@ endif()
 
 find_package(LIBSSH 0.7.1)
 
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
+set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
 find_package(Protobuf REQUIRED)
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
 
 set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "find_dependency(cameraserver)")
