@@ -60,7 +60,7 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
    * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dtSeconds Nominal discretization timestep.
-   * @throws IllegalArgumentException If the system is unobservable.
+   * @throws IllegalArgumentException If the system is undetectable.
    */
   public SteadyStateKalmanFilter(
       Nat<States> states,
@@ -86,7 +86,7 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
 
     if (!StateSpaceUtil.isDetectable(discA, C)) {
       var msg =
-          "The system passed to the Kalman filter is unobservable!\n\nA =\n"
+          "The system passed to the Kalman filter is undetectable!\n\nA =\n"
               + discA.getStorage().toString()
               + "\nC =\n"
               + C.getStorage().toString()
