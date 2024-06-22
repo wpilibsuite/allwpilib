@@ -62,8 +62,8 @@ class DifferentialDriveVoltageConstraintTest {
               MutableMeasure.ofBaseUnits(nextWheelSpeeds.leftMetersPerSecond, MetersPerSecond));
       var rightVoltage =
           feedforward.calculate(
-              MutableMeasure.ofBaseUnits(currentWheelSpeeds.leftMetersPerSecond, MetersPerSecond),
-              MutableMeasure.ofBaseUnits(nextWheelSpeeds.leftMetersPerSecond, MetersPerSecond));
+              MutableMeasure.ofBaseUnits(currentWheelSpeeds.rightMetersPerSecond, MetersPerSecond),
+              MutableMeasure.ofBaseUnits(nextWheelSpeeds.rightMetersPerSecond, MetersPerSecond));
 
       assertAll(
           () -> assertTrue(leftVoltage.magnitude() <= maxVoltage + 0.05),
