@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class MooreLikeFSM extends SubsystemBase {
 
   private final LEDView m_robotSignals; // LED view where the output is displayed
-  private double m_periodFactor = 10.; // changeable speed of the scanner
+  private double m_periodFactor = 10.0; // changeable speed of the scanner; Trigger lambda throws uninitialized error if final and not set here.
   private final Color m_color; // changeable color of the scanner
   private final double m_numberPeriods = 14.0; // number of periods or time bins to generate time-based triggers
 
@@ -39,6 +39,20 @@ public class MooreLikeFSM extends SubsystemBase {
   // expect but it's set so fast you might not notice it's not "right".
   private State m_initialState = State.MyState1;
   private State m_currentState = m_initialState;
+
+  /**
+   * A Moore-Like FSM to display lights similar to the Knight Rider Kitt Scanner
+   * 
+   * @param the LED View for the Scanner
+   * @param periodFactor Specify the speed of the Scanner (suggest about 10.0)
+   * @param color Specify the color of the Scanner (suggest Color.kRed)
+   */
+  public MooreLikeFSM(LEDView robotSignals, double periodFactor, Color color) {
+    this.m_robotSignals = robotSignals;
+    this.m_periodFactor = periodFactor;
+    this.m_color = color;
+    bindTriggers();
+  }
 
   /**
    * These commands (factories) define the states.
@@ -209,20 +223,6 @@ public class MooreLikeFSM extends SubsystemBase {
     m_exitScanner4Period11.onTrue(scanner3());
     m_exitScanner3Period12.onTrue(scanner2());
     m_exitScanner2Period13.onTrue(scanner1());
-  }
-
-  /**
-   * A Moore-Like FSM to display lights similar to the Knight Rider Kitt Scanner
-   * 
-   * @param the LED View for the Scanner
-   * @param periodFactor Specify the speed of the Scanner (suggest about 10.0)
-   * @param color Specify the color of the Scanner (suggest Color.kRed)
-   */
-  public MooreLikeFSM(LEDView robotSignals, double periodFactor, Color color) {
-    this.m_robotSignals = robotSignals;
-    this.m_periodFactor = periodFactor;
-    this.m_color = color;
-    bindTriggers();
   }
 
   /**
