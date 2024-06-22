@@ -59,6 +59,8 @@ TEST(SendableChooserTest,
 
 TEST(SendableChooserTest, ChangeListener) {
   frc::SendableChooser<int> chooser;
+  frc::sim::SendableChooserSim chooserSim = frc::sim::SendableChooserSim{
+      fmt::format("/SmartDashboard/ChangeListenerChooser/", GetParam())};
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
@@ -68,7 +70,7 @@ TEST(SendableChooserTest, ChangeListener) {
 
   frc::SmartDashboard::PutData("ChangeListenerChooser", &chooser);
   frc::SmartDashboard::UpdateValues();
-  frc::SmartDashboard::PutString("ChangeListenerChooser/selected", "3");
+  chooserSim.SetSelected("3");
   frc::SmartDashboard::UpdateValues();
 
   EXPECT_EQ(3, currentVal);

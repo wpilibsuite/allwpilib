@@ -70,7 +70,8 @@ class SendableChooserTest {
 
   @Test
   void testChangeListener() {
-    try (var chooser = new SendableChooser<Integer>()) {
+    try (var chooser = new SendableChooser<Integer>();
+        var chooserSim = new SendableChooserSim(m_inst, "/SmartDashboard/changeListenerChooser/")) {
       for (int i = 1; i <= 3; i++) {
         chooser.addOption(String.valueOf(i), i);
       }
@@ -79,28 +80,9 @@ class SendableChooserTest {
 
       SmartDashboard.putData("changeListenerChooser", chooser);
       SmartDashboard.updateValues();
-      SmartDashboard.putString("changeListenerChooser/selected", "3");
+      chooserSim.setSelected("3");
       SmartDashboard.updateValues();
       assertEquals(3, currentVal.get());
-    }
-  }
-
-  @ValueSource(ints = {0, 1, 2, 3})
-  @ParameterizedTest
-  void testSendableChooserSim(int toSelect) {
-    try (var chooser = new SendableChooser<Integer>();
-        var chooserSim =
-            new SendableChooserSim(m_inst, "/SmartDashboard/SendableChooserSim" + toSelect + "/")) {
-      for (int i = 1; i <= 3; i++) {
-        chooser.addOption(String.valueOf(i), i);
-      }
-      chooser.setDefaultOption(String.valueOf(0), 0);
-
-      SmartDashboard.putData("SendableChooserSim" + toSelect, chooser);
-      SmartDashboard.updateValues();
-      chooserSim.setSelected(String.valueOf(toSelect));
-      SmartDashboard.updateValues();
-      assertEquals(toSelect, chooser.getSelected());
     }
   }
 
