@@ -39,9 +39,9 @@ public class DeferredCommand extends Command {
    *     set.
    */
   @SuppressWarnings("this-escape")
-  public DeferredCommand(Supplier<Command> supplier, Set<Subsystem> requirements) {
+  public DeferredCommand(Supplier<Command> supplier, Set<Resource> requirements) {
     m_supplier = requireNonNullParam(supplier, "supplier", "DeferredCommand");
-    addRequirements(requirements.toArray(new Subsystem[0]));
+    addRequirements(requirements.toArray(new Resource[0]));
   }
 
   @Override

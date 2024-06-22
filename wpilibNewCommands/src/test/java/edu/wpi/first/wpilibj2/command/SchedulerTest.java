@@ -71,9 +71,9 @@ class SchedulerTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
 
-      Subsystem subsystem = new Subsystem() {};
-      Command command = subsystem.run(() -> {});
-      Command interruptor = subsystem.runOnce(() -> {});
+      Resource resource = new Resource() {};
+      Command command = resource.run(() -> {});
+      Command interruptor = resource.runOnce(() -> {});
 
       scheduler.onCommandInterrupt(
           (interrupted, cause) -> {
@@ -94,9 +94,9 @@ class SchedulerTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
 
-      Subsystem subsystem = new Subsystem() {};
-      Command command = subsystem.run(() -> {});
-      Command interruptor = subsystem.runOnce(() -> {});
+      Resource resource = new Resource() {};
+      Command command = resource.run(() -> {});
+      Command interruptor = resource.runOnce(() -> {});
       // This command will schedule interruptor in execute() inside the run loop
       Command interruptorScheduler = Commands.runOnce(() -> scheduler.schedule(interruptor));
 
@@ -139,7 +139,7 @@ class SchedulerTest extends CommandTestBase {
   void unregisterSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
-      Subsystem system =
+      SubsystemBase system =
           new SubsystemBase() {
             @Override
             public void periodic() {

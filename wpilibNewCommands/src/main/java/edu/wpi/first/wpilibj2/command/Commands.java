@@ -34,7 +34,7 @@ public final class Commands {
    * @param requirements Subsystems to require
    * @return the command
    */
-  public static Command idle(Subsystem... requirements) {
+  public static Command idle(Resource... requirements) {
     return run(() -> {}, requirements);
   }
 
@@ -48,7 +48,7 @@ public final class Commands {
    * @return the command
    * @see InstantCommand
    */
-  public static Command runOnce(Runnable action, Subsystem... requirements) {
+  public static Command runOnce(Runnable action, Resource... requirements) {
     return new InstantCommand(action, requirements);
   }
 
@@ -60,7 +60,7 @@ public final class Commands {
    * @return the command
    * @see RunCommand
    */
-  public static Command run(Runnable action, Subsystem... requirements) {
+  public static Command run(Runnable action, Resource... requirements) {
     return new RunCommand(action, requirements);
   }
 
@@ -74,7 +74,7 @@ public final class Commands {
    * @return the command
    * @see StartEndCommand
    */
-  public static Command startEnd(Runnable start, Runnable end, Subsystem... requirements) {
+  public static Command startEnd(Runnable start, Runnable end, Resource... requirements) {
     return new StartEndCommand(start, end, requirements);
   }
 
@@ -87,7 +87,7 @@ public final class Commands {
    * @param requirements subsystems the action requires
    * @return the command
    */
-  public static Command runEnd(Runnable run, Runnable end, Subsystem... requirements) {
+  public static Command runEnd(Runnable run, Runnable end, Resource... requirements) {
     requireNonNullParam(end, "end", "Command.runEnd");
     return new FunctionalCommand(
         () -> {}, run, interrupted -> end.run(), () -> false, requirements);
@@ -102,7 +102,7 @@ public final class Commands {
    * @param requirements subsystems the action requires
    * @return the command
    */
-  public static Command startRun(Runnable start, Runnable run, Subsystem... requirements) {
+  public static Command startRun(Runnable start, Runnable run, Resource... requirements) {
     return new FunctionalCommand(start, run, interrupted -> {}, () -> false, requirements);
   }
 
@@ -188,7 +188,7 @@ public final class Commands {
    * @return the command
    * @see DeferredCommand
    */
-  public static Command defer(Supplier<Command> supplier, Set<Subsystem> requirements) {
+  public static Command defer(Supplier<Command> supplier, Set<Resource> requirements) {
     return new DeferredCommand(supplier, requirements);
   }
 

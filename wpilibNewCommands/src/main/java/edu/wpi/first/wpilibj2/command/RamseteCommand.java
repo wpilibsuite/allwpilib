@@ -83,7 +83,7 @@ public class RamseteCommand extends Command {
       PIDController leftController,
       PIDController rightController,
       BiConsumer<Double, Double> outputVolts,
-      Subsystem... requirements) {
+      Resource... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "RamseteCommand");
     m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
     m_follower = requireNonNullParam(controller, "controller", "RamseteCommand");
@@ -121,7 +121,7 @@ public class RamseteCommand extends Command {
       RamseteController follower,
       DifferentialDriveKinematics kinematics,
       BiConsumer<Double, Double> outputMetersPerSecond,
-      Subsystem... requirements) {
+      Resource... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "RamseteCommand");
     m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
     m_follower = requireNonNullParam(follower, "follower", "RamseteCommand");

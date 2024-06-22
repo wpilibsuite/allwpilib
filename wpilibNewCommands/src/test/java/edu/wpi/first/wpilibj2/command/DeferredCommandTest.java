@@ -65,10 +65,10 @@ class DeferredCommandTest extends CommandTestBase {
 
   @Test
   void deferredRequirementsTest() {
-    Subsystem subsystem = new Subsystem() {};
-    DeferredCommand command = new DeferredCommand(Commands::none, Set.of(subsystem));
+    Resource resource = new Resource() {};
+    DeferredCommand command = new DeferredCommand(Commands::none, Set.of(resource));
 
-    assertTrue(command.getRequirements().contains(subsystem));
+    assertTrue(command.getRequirements().contains(resource));
   }
 
   @Test

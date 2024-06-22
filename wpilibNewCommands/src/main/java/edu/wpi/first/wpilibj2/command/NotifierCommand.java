@@ -29,7 +29,7 @@ public class NotifierCommand extends Command {
    * @param requirements the subsystems required by this command
    */
   @SuppressWarnings("this-escape")
-  public NotifierCommand(Runnable toRun, double period, Subsystem... requirements) {
+  public NotifierCommand(Runnable toRun, double period, Resource... requirements) {
     m_notifier = new Notifier(toRun);
     m_period = period;
     addRequirements(requirements);

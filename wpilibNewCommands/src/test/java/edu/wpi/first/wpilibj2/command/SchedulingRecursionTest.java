@@ -26,7 +26,7 @@ class SchedulingRecursionTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new SubsystemBase() {};
+      Resource requirement = new SubsystemBase() {};
       Command selfCancels =
           new Command() {
             {
@@ -70,7 +70,7 @@ class SchedulingRecursionTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new Subsystem() {};
+      Resource requirement = new Resource() {};
       Command selfCancels =
           new Command() {
             {
@@ -110,7 +110,7 @@ class SchedulingRecursionTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new SubsystemBase() {};
+      Resource requirement = new SubsystemBase() {};
       Command selfCancels =
           new Command() {
             {
@@ -328,7 +328,7 @@ class SchedulingRecursionTest extends CommandTestBase {
   void scheduleFromEndCancel() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new SubsystemBase() {};
+      Resource requirement = new SubsystemBase() {};
       InstantCommand other = new InstantCommand(() -> {}, requirement);
       FunctionalCommand selfCancels =
           new FunctionalCommand(
@@ -353,7 +353,7 @@ class SchedulingRecursionTest extends CommandTestBase {
   void scheduleFromEndInterrupt() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new SubsystemBase() {};
+      Resource requirement = new SubsystemBase() {};
       InstantCommand other = new InstantCommand(() -> {}, requirement);
       FunctionalCommand selfCancels =
           new FunctionalCommand(
@@ -379,7 +379,7 @@ class SchedulingRecursionTest extends CommandTestBase {
   void scheduleFromEndInterruptAction() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new Subsystem() {};
+      Resource requirement = new Resource() {};
       InstantCommand other = new InstantCommand(() -> {}, requirement);
       InstantCommand selfCancels = new InstantCommand(() -> {}, requirement);
       scheduler.onCommandInterrupt(
@@ -401,7 +401,7 @@ class SchedulingRecursionTest extends CommandTestBase {
   void scheduleInitializeFromDefaultCommand(InterruptionBehavior interruptionBehavior) {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new SubsystemBase() {};
+      Resource requirement = new SubsystemBase() {};
       Command other =
           new InstantCommand(() -> {}, requirement).withInterruptBehavior(interruptionBehavior);
       FunctionalCommand defaultCommand =
@@ -430,7 +430,7 @@ class SchedulingRecursionTest extends CommandTestBase {
   void cancelDefaultCommandFromEnd() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new Subsystem() {};
+      Resource requirement = new Resource() {};
       Command defaultCommand =
           new FunctionalCommand(
               () -> {},

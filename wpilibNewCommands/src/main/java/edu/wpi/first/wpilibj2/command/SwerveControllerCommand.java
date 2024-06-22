@@ -70,7 +70,7 @@ public class SwerveControllerCommand extends Command {
       ProfiledPIDController thetaController,
       Supplier<Rotation2d> desiredRotation,
       Consumer<SwerveModuleState[]> outputModuleStates,
-      Subsystem... requirements) {
+      Resource... requirements) {
     this(
         trajectory,
         pose,
@@ -115,7 +115,7 @@ public class SwerveControllerCommand extends Command {
       PIDController yController,
       ProfiledPIDController thetaController,
       Consumer<SwerveModuleState[]> outputModuleStates,
-      Subsystem... requirements) {
+      Resource... requirements) {
     this(
         trajectory,
         pose,
@@ -156,7 +156,7 @@ public class SwerveControllerCommand extends Command {
       SwerveDriveKinematics kinematics,
       HolonomicDriveController controller,
       Consumer<SwerveModuleState[]> outputModuleStates,
-      Subsystem... requirements) {
+      Resource... requirements) {
     this(
         trajectory,
         pose,
@@ -194,7 +194,7 @@ public class SwerveControllerCommand extends Command {
       HolonomicDriveController controller,
       Supplier<Rotation2d> desiredRotation,
       Consumer<SwerveModuleState[]> outputModuleStates,
-      Subsystem... requirements) {
+      Resource... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "SwerveControllerCommand");
     m_pose = requireNonNullParam(pose, "pose", "SwerveControllerCommand");
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "SwerveControllerCommand");

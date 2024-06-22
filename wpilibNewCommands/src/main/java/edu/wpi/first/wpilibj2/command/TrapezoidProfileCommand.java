@@ -40,7 +40,7 @@ public class TrapezoidProfileCommand extends Command {
       Consumer<State> output,
       Supplier<State> goal,
       Supplier<State> currentState,
-      Subsystem... requirements) {
+      Resource... requirements) {
     m_profile = requireNonNullParam(profile, "profile", "TrapezoidProfileCommand");
     m_output = requireNonNullParam(output, "output", "TrapezoidProfileCommand");
     m_goal = goal;

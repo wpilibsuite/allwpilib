@@ -25,7 +25,7 @@ public class StartEndCommand extends FunctionalCommand {
    * @param onEnd the Runnable to run on command end
    * @param requirements the subsystems required by this command
    */
-  public StartEndCommand(Runnable onInit, Runnable onEnd, Subsystem... requirements) {
+  public StartEndCommand(Runnable onInit, Runnable onEnd, Resource... requirements) {
     super(
         onInit,
         () -> {},
