@@ -7,7 +7,7 @@
 using namespace frc::sim;
 
 SendableChooserSim::SendableChooserSim(std::string_view path) {
-  if (RobotBase::IsSimulation()) {
+  if constexpr (RobotBase::IsSimulation()) {
     m_publisher = nt::NetworkTableInstance::GetDefault()
                       .GetStringTopic(fmt::format("{}{}", path, "selected"))
                       .Publish();
@@ -15,14 +15,14 @@ SendableChooserSim::SendableChooserSim(std::string_view path) {
 }
 SendableChooserSim::SendableChooserSim(nt::NetworkTableInstance inst,
                                        std::string_view path) {
-  if (RobotBase::IsSimulation()) {
+  if constexpr (RobotBase::IsSimulation()) {
     m_publisher =
         inst.GetStringTopic(fmt::format("{}{}", path, "selected")).Publish();
   }
 }
 
 void SendableChooserSim::SetSelected(std::string_view option) {
-  if (RobotBase::IsSimulation()) {
+  if constexpr (RobotBase::IsSimulation()) {
     m_publisher.Set(option);
   }
 }
