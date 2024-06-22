@@ -96,6 +96,7 @@ if(WITH_JAVA_SOURCE)
     file(GLOB WPIUTIL_CLEANUP_SOURCES src/main/java/edu/wpi/first/util/cleanup/*.java)
     file(GLOB WPIUTIL_CONCURRENT_SOURCES src/main/java/edu/wpi/first/util/concurrent/*.java)
     file(GLOB WPIUTIL_DATALOG_SOURCES src/main/java/edu/wpi/first/util/datalog/*.java)
+    file(GLOB WPIUTIL_DATALOG_SOURCES src/generated/main/java/edu/wpi/first/util/datalog/*.java)
     file(GLOB WPIUTIL_FUNCTION_SOURCES src/main/java/edu/wpi/first/util/function/*.java)
     file(GLOB WPIUTIL_SENDABLE_SOURCES src/main/java/edu/wpi/first/util/sendable/*.java)
     add_jar(
