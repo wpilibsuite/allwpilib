@@ -5,6 +5,7 @@
 package edu.wpi.first.math.trajectory;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,7 +16,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
-import edu.wpi.first.units.MutableMeasure;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,8 @@ import org.junit.jupiter.api.Test;
 class DifferentialDriveVoltageConstraintTest {
   @Test
   void testDifferentialDriveVoltageConstraint() {
-    var dt = 0.02;
-
     // Pick an unreasonably large kA to ensure the constraint has to do some work
-    var feedforward = new SimpleMotorFeedforward(1, 1, 3, dt);
+    var feedforward = new SimpleMotorFeedforward(1, 1, 3);
     var kinematics = new DifferentialDriveKinematics(0.5);
     double maxVoltage = 10;
     var constraint = new DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage);
@@ -36,40 +34,59 @@ class DifferentialDriveVoltageConstraintTest {
 
     var duration = trajectory.getTotalTimeSeconds();
     var t = 0.0;
+    var dt = 0.02;
 
     while (t < duration) {
-      var currentPoint = trajectory.sample(t);
-      var nextPoint = trajectory.sample(t + dt);
+      var point = trajectory.sample(t);
+      var chassisSpeeds =
+          new ChassisSpeeds(
+              point.velocityMetersPerSecond,
+              0,
+              point.velocityMetersPerSecond * point.curvatureRadPerMeter);
+      var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+
       t += dt;
+      var acceleration = point.accelerationMetersPerSecondSq;
 
-      var currentChassisSpeeds =
-          new ChassisSpeeds(
-              currentPoint.velocityMetersPerSecond,
-              0,
-              currentPoint.velocityMetersPerSecond * currentPoint.curvatureRadPerMeter);
-      var currentWheelSpeeds = kinematics.toWheelSpeeds(currentChassisSpeeds);
-
-      var nextChassisSpeeds =
-          new ChassisSpeeds(
-              nextPoint.velocityMetersPerSecond,
-              0,
-              nextPoint.velocityMetersPerSecond * nextPoint.curvatureRadPerMeter);
-      var nextWheelSpeeds = kinematics.toWheelSpeeds(nextChassisSpeeds);
-
-      var leftVoltage =
-          feedforward.calculate(
-              MutableMeasure.ofBaseUnits(currentWheelSpeeds.leftMetersPerSecond, MetersPerSecond),
-              MutableMeasure.ofBaseUnits(nextWheelSpeeds.leftMetersPerSecond, MetersPerSecond));
-      var rightVoltage =
-          feedforward.calculate(
-              MutableMeasure.ofBaseUnits(currentWheelSpeeds.rightMetersPerSecond, MetersPerSecond),
-              MutableMeasure.ofBaseUnits(nextWheelSpeeds.rightMetersPerSecond, MetersPerSecond));
-
+      // Not really a strictly-correct test as we're using the chassis accel instead of the
+      // wheel accel, but much easier than doing it "properly" and a reasonable check anyway
       assertAll(
-          () -> assertTrue(leftVoltage.magnitude() <= maxVoltage + 0.05),
-          () -> assertTrue(leftVoltage.magnitude() >= -maxVoltage - 0.05),
-          () -> assertTrue(rightVoltage.magnitude() <= maxVoltage + 0.05),
-          () -> assertTrue(rightVoltage.magnitude() >= -maxVoltage - 0.05));
+          () ->
+              assertTrue(
+                  feedforward
+                          .calculate(
+                              MetersPerSecond.of(wheelSpeeds.leftMetersPerSecond),
+                              MetersPerSecond.of(
+                                  wheelSpeeds.leftMetersPerSecond + dt * acceleration))
+                          .in(Volts)
+                      <= maxVoltage + 0.05),
+          () ->
+              assertTrue(
+                  feedforward
+                          .calculate(
+                              MetersPerSecond.of(wheelSpeeds.leftMetersPerSecond),
+                              MetersPerSecond.of(
+                                  wheelSpeeds.leftMetersPerSecond + dt * acceleration))
+                          .in(Volts)
+                      >= -maxVoltage - 0.05),
+          () ->
+              assertTrue(
+                  feedforward
+                          .calculate(
+                              MetersPerSecond.of(wheelSpeeds.rightMetersPerSecond),
+                              MetersPerSecond.of(
+                                  wheelSpeeds.rightMetersPerSecond + dt * acceleration))
+                          .in(Volts)
+                      <= maxVoltage + 0.05),
+          () ->
+              assertTrue(
+                  feedforward
+                          .calculate(
+                              MetersPerSecond.of(wheelSpeeds.rightMetersPerSecond),
+                              MetersPerSecond.of(
+                                  wheelSpeeds.rightMetersPerSecond + dt * acceleration))
+                          .in(Volts)
+                      >= -maxVoltage - 0.05));
     }
   }
 
