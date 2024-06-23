@@ -171,8 +171,7 @@ public class MecanumControllerCommand extends Command {
    *     voltages.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("this-escape")
-  @Deprecated(since = "2024", forRemoval = true)
+  @Deprecated(since = "2025", forRemoval = true)
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -308,7 +307,7 @@ public class MecanumControllerCommand extends Command {
    *     voltages.
    * @param requirements The subsystems to require.
    */
-  @Deprecated(since = "2024", forRemoval = true)
+  @Deprecated(since = "2025", forRemoval = true)
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
