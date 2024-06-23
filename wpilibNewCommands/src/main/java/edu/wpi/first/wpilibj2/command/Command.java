@@ -30,7 +30,7 @@ import java.util.function.BooleanSupplier;
  */
 public abstract class Command implements Sendable {
   /** Requirements set. */
-  protected Set<Subsystem> m_requirements = new HashSet<>();
+  private final Set<Subsystem> m_requirements = new HashSet<>();
 
   /** Default constructor. */
   @SuppressWarnings("this-escape")

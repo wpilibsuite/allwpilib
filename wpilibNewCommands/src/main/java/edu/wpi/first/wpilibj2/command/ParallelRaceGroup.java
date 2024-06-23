@@ -51,7 +51,7 @@ public class ParallelRaceGroup extends Command {
     CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
-      if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
+      if (!Collections.disjoint(command.getRequirements(), getRequirements())) {
         throw new IllegalArgumentException(
             "Multiple commands in a parallel composition cannot require the same subsystems");
       }
