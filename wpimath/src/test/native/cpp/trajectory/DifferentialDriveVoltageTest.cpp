@@ -49,22 +49,15 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
     // Not really a strictly-correct test as we're using the chassis accel
     // instead of the wheel accel, but much easier than doing it "properly" and
     // a reasonable check anyway
-    EXPECT_TRUE(feedforward.Calculate(
-        left, 
-        left + acceleration * dt) <
+    EXPECT_TRUE(feedforward.Calculate(left, left + acceleration * dt) <
                 maxVoltage + 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(
-        left, 
-        left + acceleration * dt) >
+    EXPECT_TRUE(feedforward.Calculate(left, left + acceleration * dt) >
                 -maxVoltage - 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(
-        right, 
-        
-        right + acceleration * dt) <
+    EXPECT_TRUE(feedforward.Calculate(right,
+
+                                      right + acceleration * dt) <
                 maxVoltage + 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(
-        right, 
-        right + acceleration * dt) >
+    EXPECT_TRUE(feedforward.Calculate(right, right + acceleration * dt) >
                 -maxVoltage - 0.05_V);
   }
 }
