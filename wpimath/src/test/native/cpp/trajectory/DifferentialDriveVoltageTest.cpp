@@ -21,11 +21,9 @@
 using namespace frc;
 
 TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
-  constexpr units::second_t dt = 20_ms;
-
   // Pick an unreasonably large kA to ensure the constraint has to do some work
   SimpleMotorFeedforward<units::meter> feedforward{1_V, 1_V / 1_mps,
-                                                   3_V / 1_mps_sq, dt};
+                                                   3_V / 1_mps_sq};
   const DifferentialDriveKinematics kinematics{0.5_m};
   const auto maxVoltage = 10_V;
 
@@ -36,38 +34,44 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
   units::second_t time = 0_s;
+  units::second_t dt = 20_ms;
   units::second_t duration = trajectory.TotalTime();
 
   while (time < duration) {
-    const Trajectory::State currentPoint = trajectory.Sample(time);
-    const Trajectory::State nextPoint = trajectory.Sample(time + dt);
+    const Trajectory::State point = trajectory.Sample(time);
     time += dt;
 
-    const ChassisSpeeds currentChassisSpeeds{
-        currentPoint.velocity, 0_mps,
-        currentPoint.velocity * currentPoint.curvature};
-    auto [currentLeft, currentRight] =
-        kinematics.ToWheelSpeeds(currentChassisSpeeds);
+    const ChassisSpeeds chassisSpeeds{point.velocity, 0_mps,
+                                      point.velocity * point.curvature};
 
-    const ChassisSpeeds nextChassisSpeeds{
-        nextPoint.velocity, 0_mps, nextPoint.velocity * nextPoint.curvature};
-    auto [nextLeft, nextRight] = kinematics.ToWheelSpeeds(nextChassisSpeeds);
-
-    auto leftVoltage = feedforward.Calculate(currentLeft, nextLeft);
-    auto rightVoltage = feedforward.Calculate(currentRight, nextRight);
-
-    EXPECT_LT(leftVoltage.value(), (maxVoltage + 0.05_V).value());
-    EXPECT_GT(leftVoltage.value(), (-maxVoltage - 0.05_V).value());
-    EXPECT_LT(rightVoltage.value(), (maxVoltage + 0.05_V).value());
-    EXPECT_GT(rightVoltage.value(), (-maxVoltage - 0.05_V).value());
+    auto [left, right] = kinematics.ToWheelSpeeds(chassisSpeeds);
+    auto acceleration = point.acceleration;
+    // Not really a strictly-correct test as we're using the chassis accel
+    // instead of the wheel accel, but much easier than doing it "properly" and
+    // a reasonable check anyway
+    EXPECT_TRUE(feedforward.Calculate(
+        left, 
+        left + acceleration * dt) <
+                maxVoltage + 0.05_V);
+    EXPECT_TRUE(feedforward.Calculate(
+        left, 
+        left + acceleration * dt) >
+                -maxVoltage - 0.05_V);
+    EXPECT_TRUE(feedforward.Calculate(
+        right, 
+        
+        right + acceleration * dt) <
+                maxVoltage + 0.05_V);
+    EXPECT_TRUE(feedforward.Calculate(
+        right, 
+        right + acceleration * dt) >
+                -maxVoltage - 0.05_V);
   }
 }
 
 TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
-  constexpr units::second_t dt = 20_ms;
-
   SimpleMotorFeedforward<units::meter> feedforward{1_V, 1_V / 1_mps,
-                                                   3_V / 1_mps_sq, dt};
+                                                   3_V / 1_mps_sq};
   // Large trackwidth - need to test with radius of curvature less than half of
   // trackwidth
   const DifferentialDriveKinematics kinematics{3_m};
