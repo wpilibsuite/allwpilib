@@ -19,7 +19,7 @@ import java.util.Objects;
 /** Represents the wheel positions for a mecanum drive drivetrain. */
 public class MecanumDriveWheelPositions
     implements Interpolatable<MecanumDriveWheelPositions>,
-    ProtobufSerializable,
+        ProtobufSerializable,
         StructSerializable {
   /** Distance measured by the front left wheel. */
   public double frontLeftMeters;
