@@ -159,6 +159,24 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     return m_analogInput.getChannel();
   }
 
+  /**
+   * Gets the angle of the encoder in radians.
+   *
+   * @return The radians of the encoder angle.
+   */
+  public double getRadians() {
+    return MathUtil.angleModulus(get() * 2 * Math.PI);
+  }
+
+  /**
+   * Gets the angle of the encoder in degrees.
+   *
+   * @return The degrees of the encoder angle.
+   */
+  public double getDegrees() {
+    return MathUtil.angleModulus(get() * 360);
+  }
+
   @Override
   public void close() {
     if (m_ownsAnalogInput) {

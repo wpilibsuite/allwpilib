@@ -4,6 +4,11 @@
 
 #include "frc/AnalogEncoder.h"
 
+#include <cmath>
+
+#include <units/angle.h>
+#include <units/constants.h>
+#include <units/math.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 
@@ -115,6 +120,10 @@ double AnalogEncoder::MapSensorRange(double pos) const {
   }
   pos = (pos - m_sensorMin) / (m_sensorMax - m_sensorMin);
   return pos;
+}
+
+units::angle_unit auto AnalogEncoder::GetAngle() const {
+  return Get() * 360_deg;
 }
 
 void AnalogEncoder::InitSendable(wpi::SendableBuilder& builder) {

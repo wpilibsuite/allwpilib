@@ -8,6 +8,7 @@
 
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
+#include <units/angle.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -130,6 +131,13 @@ class AnalogEncoder : public wpi::Sendable,
    * @return The channel number.
    */
   int GetChannel() const;
+
+  /**
+   * Gets the angle of the encoder.
+   *
+   * @return The angle of the encoder.
+   */
+  units::angle_unit auto GetAngle() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
