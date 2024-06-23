@@ -139,6 +139,20 @@ class AnalogEncoder : public wpi::Sendable,
    */
   units::angle_unit auto GetAngle() const;
 
+  /**
+   * Gets the angle of the encoder in radians.
+   *
+   * @return The radians of the encoder angle.
+   */
+  units::radian_t GetRadians() const;
+
+  /**
+   * Gets the angle of the encoder in degrees.
+   *
+   * @return The degrees of the encoder angle.
+   */
+  units::degree_t GetDegrees() const;
+
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:

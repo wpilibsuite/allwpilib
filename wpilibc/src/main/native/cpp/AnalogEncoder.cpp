@@ -126,6 +126,14 @@ units::angle_unit auto AnalogEncoder::GetAngle() const {
   return Get() * 360_deg;
 }
 
+units::radian_t AnalogEncoder::GetRadians() const {
+  return GetAngle();
+}
+
+units::degree_t AnalogEncoder::GetDegrees() const {
+  return GetAngle();
+}
+
 void AnalogEncoder::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
   builder.AddDoubleProperty(
