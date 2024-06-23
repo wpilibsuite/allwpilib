@@ -75,7 +75,8 @@ Trigger CommandGenericHID::AxisGreaterThan(int axis, double threshold,
   });
 }
 
-void CommandGenericHID::SetRumble(frc::GenericHID::RumbleType type, double value) {
+void CommandGenericHID::SetRumble(frc::GenericHID::RumbleType type,
+                                  double value) {
   m_hid.SetRumble(type, value);
 }
 
