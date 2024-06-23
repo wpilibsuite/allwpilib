@@ -7,6 +7,7 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.MecanumDriveWheelPositionsProto;
 import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelPositionsStruct;
 import edu.wpi.first.units.Distance;
@@ -17,8 +18,8 @@ import java.util.Objects;
 
 /** Represents the wheel positions for a mecanum drive drivetrain. */
 public class MecanumDriveWheelPositions
-    implements WheelPositions<MecanumDriveWheelPositions>,
-        ProtobufSerializable,
+    implements Interpolatable<MecanumDriveWheelPositions>,
+    ProtobufSerializable,
         StructSerializable {
   /** Distance measured by the front left wheel. */
   public double frontLeftMeters;
@@ -99,7 +100,6 @@ public class MecanumDriveWheelPositions
         frontLeftMeters, frontRightMeters, rearLeftMeters, rearRightMeters);
   }
 
-  @Override
   public MecanumDriveWheelPositions copy() {
     return new MecanumDriveWheelPositions(
         frontLeftMeters, frontRightMeters, rearLeftMeters, rearRightMeters);
