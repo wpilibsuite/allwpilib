@@ -8,7 +8,7 @@
 
 namespace wpi {
 template <typename T>
-T* CreateMessage(google::protobuf::Arena* arena) {
+inline T* CreateMessage(google::protobuf::Arena* arena) {
 #if GOOGLE_PROTOBUF_VERSION < 4000000
   return google::protobuf::Arena::CreateMessage<T>(arena);
 #else
