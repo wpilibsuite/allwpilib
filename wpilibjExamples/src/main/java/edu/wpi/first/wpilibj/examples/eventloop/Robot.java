@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.eventloop;
 
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Encoder;
@@ -61,10 +64,12 @@ public class Robot extends TimedRobot {
     shootTrigger
         // accelerate the shooter wheel
         .ifHigh(
-        () ->
-            m_shooter.setVoltage(
-                m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
-                    + m_ff.calculate(SHOT_VELOCITY)));
+        () -> {
+          m_shooter.setVoltage(
+              m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
+                  + m_ff.calculate(RPM.of(SHOT_VELOCITY)).in(Volts));
+        });
+
     // if not, stop
     shootTrigger.negate().ifHigh(m_shooter::stopMotor);
 

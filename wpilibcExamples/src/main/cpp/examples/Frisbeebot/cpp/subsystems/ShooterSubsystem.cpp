@@ -5,6 +5,7 @@
 #include "subsystems/ShooterSubsystem.h"
 
 #include <frc/controller/PIDController.h>
+#include <units/angular_velocity.h>
 
 #include "Constants.h"
 

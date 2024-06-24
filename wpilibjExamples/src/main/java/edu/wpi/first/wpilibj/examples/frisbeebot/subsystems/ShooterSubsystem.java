@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.frisbeebot.subsystems;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Encoder;
@@ -33,7 +36,11 @@ public class ShooterSubsystem extends PIDSubsystem {
 
   @Override
   public void useOutput(double output, double setpoint) {
-    m_shooterMotor.setVoltage(output + m_shooterFeedforward.calculate(setpoint));
+    m_shooterMotor.setVoltage(
+        output
+            + m_shooterFeedforward
+                .calculate(RadiansPerSecond.of(ShooterConstants.kShooterTargetRPS))
+                .in(Volts));
   }
 
   @Override

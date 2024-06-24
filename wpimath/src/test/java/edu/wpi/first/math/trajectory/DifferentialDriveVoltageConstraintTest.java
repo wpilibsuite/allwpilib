@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.trajectory;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,33 +43,49 @@ class DifferentialDriveVoltageConstraintTest {
               point.velocityMetersPerSecond,
               0,
               point.velocityMetersPerSecond * point.curvatureRadPerMeter);
-
       var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
 
       t += dt;
+      var acceleration = point.accelerationMetersPerSecondSq;
 
       // Not really a strictly-correct test as we're using the chassis accel instead of the
       // wheel accel, but much easier than doing it "properly" and a reasonable check anyway
       assertAll(
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelSpeeds.leftMetersPerSecond, point.accelerationMetersPerSecondSq)
+                  feedforward
+                          .calculate(
+                              MetersPerSecond.of(wheelSpeeds.leftMetersPerSecond),
+                              MetersPerSecond.of(
+                                  wheelSpeeds.leftMetersPerSecond + dt * acceleration))
+                          .in(Volts)
                       <= maxVoltage + 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelSpeeds.leftMetersPerSecond, point.accelerationMetersPerSecondSq)
+                  feedforward
+                          .calculate(
+                              MetersPerSecond.of(wheelSpeeds.leftMetersPerSecond),
+                              MetersPerSecond.of(
+                                  wheelSpeeds.leftMetersPerSecond + dt * acceleration))
+                          .in(Volts)
                       >= -maxVoltage - 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelSpeeds.rightMetersPerSecond, point.accelerationMetersPerSecondSq)
+                  feedforward
+                          .calculate(
+                              MetersPerSecond.of(wheelSpeeds.rightMetersPerSecond),
+                              MetersPerSecond.of(
+                                  wheelSpeeds.rightMetersPerSecond + dt * acceleration))
+                          .in(Volts)
                       <= maxVoltage + 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelSpeeds.rightMetersPerSecond, point.accelerationMetersPerSecondSq)
+                  feedforward
+                          .calculate(
+                              MetersPerSecond.of(wheelSpeeds.rightMetersPerSecond),
+                              MetersPerSecond.of(
+                                  wheelSpeeds.rightMetersPerSecond + dt * acceleration))
+                          .in(Volts)
                       >= -maxVoltage - 0.05));
     }
   }

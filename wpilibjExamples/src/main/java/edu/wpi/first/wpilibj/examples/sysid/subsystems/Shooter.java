@@ -98,7 +98,9 @@ public class Shooter extends SubsystemBase {
     return run(() -> {
           m_shooterMotor.setVoltage(
               m_shooterFeedback.calculate(m_shooterEncoder.getRate(), shooterSpeed.getAsDouble())
-                  + m_shooterFeedforward.calculate(shooterSpeed.getAsDouble()));
+                  + m_shooterFeedforward
+                      .calculate(RotationsPerSecond.of(shooterSpeed.getAsDouble()))
+                      .in(Volts));
           m_feederMotor.set(ShooterConstants.kFeederSpeed);
         })
         .finallyDo(
