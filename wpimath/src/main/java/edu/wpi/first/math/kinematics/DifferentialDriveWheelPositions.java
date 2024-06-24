@@ -70,10 +70,6 @@ public class DifferentialDriveWheelPositions
         "DifferentialDriveWheelPositions(Left: %.2f m, Right: %.2f m", leftMeters, rightMeters);
   }
 
-  public DifferentialDriveWheelPositions copy() {
-    return new DifferentialDriveWheelPositions(leftMeters, rightMeters);
-  }
-
   @Override
   public DifferentialDriveWheelPositions interpolate(
       DifferentialDriveWheelPositions endValue, double t) {

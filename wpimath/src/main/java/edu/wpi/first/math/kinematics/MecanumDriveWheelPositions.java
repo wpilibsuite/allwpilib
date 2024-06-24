@@ -100,11 +100,6 @@ public class MecanumDriveWheelPositions
         frontLeftMeters, frontRightMeters, rearLeftMeters, rearRightMeters);
   }
 
-  public MecanumDriveWheelPositions copy() {
-    return new MecanumDriveWheelPositions(
-        frontLeftMeters, frontRightMeters, rearLeftMeters, rearRightMeters);
-  }
-
   @Override
   public MecanumDriveWheelPositions interpolate(MecanumDriveWheelPositions endValue, double t) {
     return new MecanumDriveWheelPositions(
