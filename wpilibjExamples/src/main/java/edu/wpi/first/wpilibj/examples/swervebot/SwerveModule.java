@@ -145,11 +145,7 @@ public class SwerveModule {
         m_drivePIDController.calculate(m_driveEncoder.getRate(), state.speedMetersPerSecond);
 
     final double driveFeedforward =
-        m_driveFeedforward
-            .calculate(
-                MetersPerSecond.of(state.speedMetersPerSecond),
-                MetersPerSecond.of(state.speedMetersPerSecond))
-            .in(Volts);
+        m_driveFeedforward.calculate(MetersPerSecond.of(state.speedMetersPerSecond)).in(Volts);
 
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput =
@@ -157,9 +153,7 @@ public class SwerveModule {
 
     final double turnFeedforward =
         m_turnFeedforward
-            .calculate(
-                RadiansPerSecond.of(m_turningPIDController.getSetpoint().velocity),
-                RadiansPerSecond.of(m_turningPIDController.getSetpoint().velocity))
+            .calculate(RadiansPerSecond.of(m_turningPIDController.getSetpoint().velocity))
             .in(Volts);
 
     m_driveMotor.setVoltage(driveOutput + driveFeedforward);

@@ -25,7 +25,7 @@ frc2::CommandPtr Shooter::ShootCommand(units::turns_per_second_t setpoint) {
              // feedforward and feedback
              Run([this, setpoint] {
                m_shooterMotor.SetVoltage(
-                   m_shooterFeedforward.Calculate(setpoint, setpoint) +
+                   m_shooterFeedforward.Calculate(setpoint) +
                    units::volt_t(m_shooterFeedback.Calculate(
                        m_shooterEncoder.GetRate(), setpoint.value())));
              }),

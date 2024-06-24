@@ -49,11 +49,6 @@ public class Robot extends TimedRobot {
     m_motor.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         m_setpoint.position,
-        m_feedforward
-                .calculate(
-                    MetersPerSecond.of(m_setpoint.velocity),
-                    MetersPerSecond.of(m_setpoint.velocity))
-                .in(Volts)
-            / 12.0);
+        m_feedforward.calculate(MetersPerSecond.of(m_setpoint.velocity)).in(Volts) / 12.0);
   }
 }

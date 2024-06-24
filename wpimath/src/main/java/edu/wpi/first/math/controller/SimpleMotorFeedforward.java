@@ -109,6 +109,18 @@ public class SimpleMotorFeedforward {
   }
 
   /**
+   * Calculates the feedforward from the gains and setpoints assuming discrete control when the
+   * setpoint does not change.
+   *
+   * @param <U> The velocity parameter either as distance or angle.
+   * @param setpoint The velocity setpoint.
+   * @return The computed feedforward.
+   */
+  public <U extends Unit<U>> Measure<Voltage> calculate(Measure<Velocity<U>> setpoint) {
+    return calculate(setpoint, setpoint);
+  }
+
+  /**
    * Calculates the feedforward from the gains and setpoints assuming discrete control.
    *
    * @param <U> The velocity parameter either as distance or angle.

@@ -21,7 +21,6 @@ frc2::CommandPtr Shooter::RunShooterCommand(
                    units::volt_t{m_shooterFeedback.Calculate(
                        m_shooterEncoder.GetRate(), shooterSpeed())} +
                    m_shooterFeedforward.Calculate(
-                       units::turns_per_second_t{shooterSpeed()},
                        units::turns_per_second_t{shooterSpeed()}));
                m_feederMotor.Set(constants::shooter::kFeederSpeed);
              },

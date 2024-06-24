@@ -111,29 +111,13 @@ public class Drivetrain {
    */
   public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
     final double frontLeftFeedforward =
-        m_feedforward
-            .calculate(
-                MetersPerSecond.of(speeds.frontLeftMetersPerSecond),
-                MetersPerSecond.of(speeds.frontLeftMetersPerSecond))
-            .in(Volts);
+        m_feedforward.calculate(MetersPerSecond.of(speeds.frontLeftMetersPerSecond)).in(Volts);
     final double frontRightFeedforward =
-        m_feedforward
-            .calculate(
-                MetersPerSecond.of(speeds.frontRightMetersPerSecond),
-                MetersPerSecond.of(speeds.frontRightMetersPerSecond))
-            .in(Volts);
+        m_feedforward.calculate(MetersPerSecond.of(speeds.frontRightMetersPerSecond)).in(Volts);
     final double backLeftFeedforward =
-        m_feedforward
-            .calculate(
-                MetersPerSecond.of(speeds.rearLeftMetersPerSecond),
-                MetersPerSecond.of(speeds.rearLeftMetersPerSecond))
-            .in(Volts);
+        m_feedforward.calculate(MetersPerSecond.of(speeds.rearLeftMetersPerSecond)).in(Volts);
     final double backRightFeedforward =
-        m_feedforward
-            .calculate(
-                MetersPerSecond.of(speeds.rearRightMetersPerSecond),
-                MetersPerSecond.of(speeds.rearRightMetersPerSecond))
-            .in(Volts);
+        m_feedforward.calculate(MetersPerSecond.of(speeds.rearRightMetersPerSecond)).in(Volts);
 
     final double frontLeftOutput =
         m_frontLeftPIDController.calculate(

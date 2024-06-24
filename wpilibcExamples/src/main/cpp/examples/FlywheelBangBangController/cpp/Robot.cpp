@@ -36,8 +36,8 @@ class Robot : public frc::TimedRobot {
     // Controls a motor with the output of the BangBang controller and a
     // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
-    m_flywheelMotor.SetVoltage(
-        bangOutput + 0.9 * m_feedforward.Calculate(setpoint, setpoint));
+    m_flywheelMotor.SetVoltage(bangOutput +
+                               0.9 * m_feedforward.Calculate(setpoint));
   }
 
   void RobotInit() override {

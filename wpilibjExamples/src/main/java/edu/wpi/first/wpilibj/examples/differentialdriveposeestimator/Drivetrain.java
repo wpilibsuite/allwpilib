@@ -143,17 +143,9 @@ public class Drivetrain {
    */
   public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
     final double leftFeedforward =
-        m_feedforward
-            .calculate(
-                MetersPerSecond.of(speeds.leftMetersPerSecond),
-                MetersPerSecond.of(speeds.leftMetersPerSecond))
-            .in(Volts);
+        m_feedforward.calculate(MetersPerSecond.of(speeds.leftMetersPerSecond)).in(Volts);
     final double rightFeedforward =
-        m_feedforward
-            .calculate(
-                MetersPerSecond.of(speeds.rightMetersPerSecond),
-                MetersPerSecond.of(speeds.rightMetersPerSecond))
-            .in(Volts);
+        m_feedforward.calculate(MetersPerSecond.of(speeds.rightMetersPerSecond)).in(Volts);
 
     final double leftOutput =
         m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);

@@ -7,8 +7,8 @@
 #include <frc/RobotController.h>
 
 void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
-  auto leftFeedforward = m_feedforward.Calculate(speeds.left, speeds.left);
-  auto rightFeedforward = m_feedforward.Calculate(speeds.right, speeds.right);
+  auto leftFeedforward = m_feedforward.Calculate(speeds.left);
+  auto rightFeedforward = m_feedforward.Calculate(speeds.right);
   double leftOutput = m_leftPIDController.Calculate(m_leftEncoder.GetRate(),
                                                     speeds.left.value());
   double rightOutput = m_rightPIDController.Calculate(m_rightEncoder.GetRate(),

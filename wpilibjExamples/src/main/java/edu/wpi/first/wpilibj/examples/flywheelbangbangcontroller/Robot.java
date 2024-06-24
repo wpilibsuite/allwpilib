@@ -91,11 +91,7 @@ public class Robot extends TimedRobot {
     // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
     m_flywheelMotor.setVoltage(
-        bangOutput
-            + 0.9
-                * m_feedforward
-                    .calculate(RadiansPerSecond.of(setpoint), RadiansPerSecond.of(setpoint))
-                    .in(Volts));
+        bangOutput + 0.9 * m_feedforward.calculate(RadiansPerSecond.of(setpoint)).in(Volts));
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */

@@ -39,9 +39,7 @@ public class ShooterSubsystem extends PIDSubsystem {
     m_shooterMotor.setVoltage(
         output
             + m_shooterFeedforward
-                .calculate(
-                    RadiansPerSecond.of(ShooterConstants.kShooterTargetRPS),
-                    RadiansPerSecond.of(ShooterConstants.kShooterTargetRPS))
+                .calculate(RadiansPerSecond.of(ShooterConstants.kShooterTargetRPS))
                 .in(Volts));
   }
 

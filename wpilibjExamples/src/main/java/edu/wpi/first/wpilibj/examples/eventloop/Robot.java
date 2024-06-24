@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
         () -> {
           m_shooter.setVoltage(
               m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
-                  + m_ff.calculate(RPM.of(SHOT_VELOCITY), RPM.of(SHOT_VELOCITY)).in(Volts));
+                  + m_ff.calculate(RPM.of(SHOT_VELOCITY)).in(Volts));
         });
 
     // if not, stop
