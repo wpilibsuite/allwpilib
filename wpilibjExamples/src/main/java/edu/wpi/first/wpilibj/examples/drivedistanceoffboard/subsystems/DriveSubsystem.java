@@ -75,7 +75,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @param right The right wheel state.
    */
   public void setDriveStates(TrapezoidProfile.State left, TrapezoidProfile.State right) {
-
     m_leftLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         left.position,

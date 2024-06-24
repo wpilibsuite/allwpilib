@@ -57,9 +57,8 @@ class Robot : public frc::TimedRobot {
           shooter.SetVoltage(
               units::volt_t{controller.Calculate(SHOT_VELOCITY.value(),
                                                  SHOT_VELOCITY.value())} +
-              ff.Calculate(
-                  units::radians_per_second_t{SHOT_VELOCITY},
-                  units::radians_per_second_t{SHOT_VELOCITY}));
+              ff.Calculate(units::radians_per_second_t{SHOT_VELOCITY},
+                           units::radians_per_second_t{SHOT_VELOCITY}));
         });
     // if not, stop
     (!shootTrigger).IfHigh([&shooter = m_shooter] { shooter.Set(0.0); });

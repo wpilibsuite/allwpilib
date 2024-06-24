@@ -39,9 +39,8 @@ TEST(StateSpaceSimTest, FlywheelSim) {
   for (int i = 0; i < 100; i++) {
     // RobotPeriodic runs first
     auto voltageOut = controller.Calculate(encoder.GetRate(), 200.0);
-    motor.SetVoltage(
-        units::volt_t{voltageOut} +
-        feedforward.Calculate(200_rad_per_s, 200_rad_per_s));
+    motor.SetVoltage(units::volt_t{voltageOut} +
+                     feedforward.Calculate(200_rad_per_s, 200_rad_per_s));
 
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(

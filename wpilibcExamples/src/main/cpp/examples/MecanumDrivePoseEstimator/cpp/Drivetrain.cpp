@@ -29,8 +29,7 @@ void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
                              units::meters_per_second_t speed,
                              const auto& encoder, auto& controller,
                              auto& motor) {
-        auto feedforward = m_feedforward.Calculate(
-            speed, speed);
+        auto feedforward = m_feedforward.Calculate(speed, speed);
         double output = controller.Calculate(encoder.GetRate(), speed.value());
         motor.SetVoltage(units::volt_t{output} + feedforward);
       };
