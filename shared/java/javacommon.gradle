@@ -113,6 +113,8 @@ tasks.withType(JavaCompile).configureEach {
         "-Xlint:-try",
         // ignore missing serialVersionUID warnings
         "-Xlint:-serial",
+        // ignore unclaimed annotation warning from annotation processing
+        "-Xlint:-processing",
     ]
 }
 

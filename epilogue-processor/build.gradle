@@ -1,0 +1,19 @@
+ext {
+    useJava = true
+    useCpp = false
+    baseId = 'epilogue-processor'
+    groupId = 'edu.wpi.first.epilogue'
+
+    devMain = ''
+}
+
+apply from: "${rootDir}/shared/java/javacommon.gradle"
+
+dependencies {
+    implementation(project(':epilogue-runtime'))
+    api project(':wpilibNewCommands')
+
+    implementation 'com.google.auto.service:auto-service:1.1.1'
+    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
+    testImplementation 'com.google.testing.compile:compile-testing:+'
+}

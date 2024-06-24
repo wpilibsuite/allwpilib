@@ -58,6 +58,8 @@ include 'msvcruntime'
 include 'ntcoreffi'
 include 'apriltag'
 include 'processstarter'
+include 'epilogue-processor'
+include 'epilogue-runtime'
 
 buildCache {
     def cred = {

@@ -1,0 +1,16 @@
+ext {
+    useJava = true
+    useCpp = false
+    baseId = 'epilogue-runtime'
+    groupId = 'edu.wpi.first.epilogue'
+
+    devMain = ''
+}
+
+apply from: "${rootDir}/shared/java/javacommon.gradle"
+
+dependencies {
+    api(project(':ntcore'))
+    api(project(':wpiutil'))
+    api(project(':wpiunits'))
+}
