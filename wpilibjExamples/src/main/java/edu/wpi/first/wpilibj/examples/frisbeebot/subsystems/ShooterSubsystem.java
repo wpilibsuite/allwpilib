@@ -9,9 +9,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -28,10 +25,6 @@ public class ShooterSubsystem extends PIDSubsystem {
   private final SimpleMotorFeedforward m_shooterFeedforward =
       new SimpleMotorFeedforward(
           ShooterConstants.kSVolts, ShooterConstants.kVVoltSecondsPerRotation);
-  private final MutableMeasure<Velocity<Angle>> m_prevSpeedSetpoint =
-      MutableMeasure.zero(RadiansPerSecond);
-  private final MutableMeasure<Velocity<Angle>> m_speedSetpoint =
-      MutableMeasure.zero(RadiansPerSecond);
 
   /** The shooter subsystem for the robot. */
   public ShooterSubsystem() {
@@ -43,10 +36,13 @@ public class ShooterSubsystem extends PIDSubsystem {
 
   @Override
   public void useOutput(double output, double setpoint) {
-    m_prevSpeedSetpoint.mut_setMagnitude(m_shooterEncoder.getRate());
-    m_speedSetpoint.mut_setMagnitude(setpoint);
     m_shooterMotor.setVoltage(
-        output + m_shooterFeedforward.calculate(m_prevSpeedSetpoint, m_speedSetpoint).in(Volts));
+        output
+            + m_shooterFeedforward
+                .calculate(
+                    RadiansPerSecond.of(ShooterConstants.kShooterTargetRPS),
+                    RadiansPerSecond.of(ShooterConstants.kShooterTargetRPS))
+                .in(Volts));
   }
 
   @Override
