@@ -15,10 +15,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
@@ -51,15 +47,6 @@ public class SwerveModule {
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
   private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
-
-  private final MutableMeasure<Velocity<Angle>> m_prevTurnSpeedSetpoint =
-      MutableMeasure.zero(RadiansPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_prevDriveSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Angle>> m_turnSpeedSetpoint =
-      MutableMeasure.zero(RadiansPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_driveSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
 
   /**
    * Constructs a SwerveModule with a drive motor, turning motor, drive encoder and turning encoder.
@@ -136,10 +123,6 @@ public class SwerveModule {
     state.speedMetersPerSecond *= state.angle.minus(encoderRotation).getCos();
 
     // Calculate the drive output from the drive PID controller.
-    m_prevTurnSpeedSetpoint.mut_setMagnitude(m_turningEncoder.getRate());
-    m_prevDriveSpeedSetpoint.mut_setMagnitude(m_driveEncoder.getRate());
-    m_turnSpeedSetpoint.mut_setMagnitude(0.0);
-    m_driveSpeedSetpoint.mut_setMagnitude(state.speedMetersPerSecond);
 
     final double driveOutput =
         m_drivePIDController.calculate(m_driveEncoder.getRate(), state.speedMetersPerSecond);
