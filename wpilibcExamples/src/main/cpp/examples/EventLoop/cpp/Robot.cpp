@@ -52,8 +52,7 @@ class Robot : public frc::TimedRobot {
     // if the trigger is held
     shootTrigger
         // accelerate the shooter wheel
-        .IfHigh([&shooter = m_shooter, &controller = m_controller, &ff = m_ff,
-                 &encoder = m_shooterEncoder] {
+        .IfHigh([&shooter = m_shooter, &controller = m_controller, &ff = m_ff] {
           shooter.SetVoltage(
               units::volt_t{controller.Calculate(SHOT_VELOCITY.value(),
                                                  SHOT_VELOCITY.value())} +
