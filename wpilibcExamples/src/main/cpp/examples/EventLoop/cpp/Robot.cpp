@@ -55,7 +55,7 @@ class Robot : public frc::TimedRobot {
         .IfHigh([&shooter = m_shooter, &controller = m_controller, &ff = m_ff,
                  &encoder = m_shooterEncoder] {
           shooter.SetVoltage(
-              units::volt_t{controller.Calculate(encoder.GetRate(),
+              units::volt_t{controller.Calculate(SHOT_VELOCITY.value(),
                                                  SHOT_VELOCITY.value())} +
               ff.Calculate(
                   units::radians_per_second_t{
