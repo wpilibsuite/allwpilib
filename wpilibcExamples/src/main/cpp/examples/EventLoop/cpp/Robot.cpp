@@ -58,8 +58,7 @@ class Robot : public frc::TimedRobot {
               units::volt_t{controller.Calculate(SHOT_VELOCITY.value(),
                                                  SHOT_VELOCITY.value())} +
               ff.Calculate(
-                  units::radians_per_second_t{
-                      units::revolutions_per_minute_t{encoder.GetRate()}},
+                  units::radians_per_second_t{SHOT_VELOCITY},
                   units::radians_per_second_t{SHOT_VELOCITY}));
         });
     // if not, stop

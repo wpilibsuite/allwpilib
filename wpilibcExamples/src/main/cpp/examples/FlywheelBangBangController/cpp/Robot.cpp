@@ -38,8 +38,7 @@ class Robot : public frc::TimedRobot {
     // the shooter.
     m_flywheelMotor.SetVoltage(
         bangOutput +
-        0.9 * m_feedforward.Calculate(
-                  units::radians_per_second_t{m_encoder.GetRate()}, setpoint));
+        0.9 * m_feedforward.Calculate(setpoint, setpoint));
   }
 
   void RobotInit() override {

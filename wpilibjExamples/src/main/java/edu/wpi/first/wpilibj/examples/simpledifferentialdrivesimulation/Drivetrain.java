@@ -18,9 +18,6 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -64,15 +61,6 @@ public class Drivetrain {
   // robot!
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
 
-  private final MutableMeasure<Velocity<Distance>> m_prevLeftSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_prevRightSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_leftSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_rightSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-
   // Simulation classes help us simulate our robot
   private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
   private final EncoderSim m_leftEncoderSim = new EncoderSim(m_leftEncoder);
@@ -109,14 +97,18 @@ public class Drivetrain {
 
   /** Sets speeds to the drivetrain motors. */
   public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
-    m_prevLeftSpeedSetpoint.mut_setMagnitude(m_leftEncoder.getRate());
-    m_prevRightSpeedSetpoint.mut_setMagnitude(m_leftEncoder.getRate());
-    m_leftSpeedSetpoint.mut_setMagnitude(speeds.leftMetersPerSecond);
-    m_rightSpeedSetpoint.mut_setMagnitude(speeds.rightMetersPerSecond);
     final double leftFeedforward =
-        m_feedforward.calculate(m_prevLeftSpeedSetpoint, m_leftSpeedSetpoint).in(Volts);
+        m_feedforward
+            .calculate(
+                MetersPerSecond.of(speeds.leftMetersPerSecond),
+                MetersPerSecond.of(speeds.leftMetersPerSecond))
+            .in(Volts);
     final double rightFeedforward =
-        m_feedforward.calculate(m_prevRightSpeedSetpoint, m_rightSpeedSetpoint).in(Volts);
+        m_feedforward
+            .calculate(
+                MetersPerSecond.of(speeds.rightMetersPerSecond),
+                MetersPerSecond.of(speeds.rightMetersPerSecond))
+            .in(Volts);
     double leftOutput =
         m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);
     double rightOutput =

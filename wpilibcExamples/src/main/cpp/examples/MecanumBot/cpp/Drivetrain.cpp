@@ -20,16 +20,16 @@ frc::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances() const {
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
   const auto frontLeftFeedforward = m_feedforward.Calculate(
-      units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
+      wheelSpeeds.frontLeft,
       wheelSpeeds.frontLeft);
   const auto frontRightFeedforward = m_feedforward.Calculate(
-      units::meters_per_second_t{m_frontRightEncoder.GetRate()},
+      wheelSpeeds.frontRight,
       wheelSpeeds.frontRight);
   const auto backLeftFeedforward = m_feedforward.Calculate(
-      units::meters_per_second_t{m_backLeftEncoder.GetRate()},
+      wheelSpeeds.rearLeft,
       wheelSpeeds.rearLeft);
   const auto backRightFeedforward = m_feedforward.Calculate(
-      units::meters_per_second_t{m_backRightEncoder.GetRate()},
+      wheelSpeeds.rearRight,
       wheelSpeeds.rearRight);
 
   const double frontLeftOutput = m_frontLeftPIDController.Calculate(

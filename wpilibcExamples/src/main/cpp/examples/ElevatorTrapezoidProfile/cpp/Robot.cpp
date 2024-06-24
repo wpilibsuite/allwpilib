@@ -41,7 +41,7 @@ class Robot : public frc::TimedRobot {
         ExampleSmartMotorController::PIDMode::kPosition,
         m_setpoint.position.value(),
         m_feedforward.Calculate(
-            units::meters_per_second_t{m_motor.GetEncoderRate()},
+            m_setpoint.velocity,
             m_setpoint.velocity) /
             12_V);
   }

@@ -8,9 +8,9 @@
 
 void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
   auto leftFeedforward = m_feedforward.Calculate(
-      units::meters_per_second_t{m_leftEncoder.GetRate()}, speeds.left);
+      speeds.left, speeds.left);
   auto rightFeedforward = m_feedforward.Calculate(
-      units::meters_per_second_t{m_rightEncoder.GetRate()}, speeds.right);
+      speeds.right, speeds.right);
   double leftOutput = m_leftPIDController.Calculate(m_leftEncoder.GetRate(),
                                                     speeds.left.value());
   double rightOutput = m_rightPIDController.Calculate(m_rightEncoder.GetRate(),

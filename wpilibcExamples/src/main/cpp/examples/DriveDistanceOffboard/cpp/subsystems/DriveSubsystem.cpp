@@ -37,13 +37,13 @@ void DriveSubsystem::SetDriveStates(
   m_leftLeader.SetSetpoint(
       ExampleSmartMotorController::PIDMode::kPosition, left.position.value(),
       m_feedforward.Calculate(
-          units::meters_per_second_t{m_leftLeader.GetEncoderRate()},
+          left.velocity,
           left.velocity) /
           12_V);
   m_rightLeader.SetSetpoint(
       ExampleSmartMotorController::PIDMode::kPosition, right.position.value(),
       m_feedforward.Calculate(
-          units::meters_per_second_t{m_rightLeader.GetEncoderRate()},
+          right.velocity,
           right.velocity) /
           12_V);
 }
