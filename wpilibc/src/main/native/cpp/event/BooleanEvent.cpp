@@ -7,11 +7,11 @@
 using namespace frc;
 
 BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
-    : m_loop(loop), m_condition(std::move(condition)) {
-  m_state = std::make_shared<bool>(m_condition());
+    : m_loop(loop), m_signal(std::move(condition)) {
+  m_state = std::make_shared<bool>(m_signal());
   m_loop->Bind(
       // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
-      [condition = m_condition, state = m_state] { *state = condition(); });
+      [condition = m_signal, state = m_state] { *state = condition(); });
 }
 
 BooleanEvent::operator std::function<bool()>() {
