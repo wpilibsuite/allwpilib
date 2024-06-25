@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Fri, 14 Jul 2023 16:40:18 -0700
-Subject: [PATCH 09/10] Add pragmas for missing libraries and set _WIN32_WINNT
- to Windows 10
+Subject: [PATCH 9/9] Add pragmas for missing libraries and set _WIN32_WINNT to
+ Windows 10
 
 This makes GetSystemTimePreciseAsFileTime() available.
 

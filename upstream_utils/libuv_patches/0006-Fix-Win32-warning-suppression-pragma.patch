@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sat, 21 May 2022 22:58:06 -0700
-Subject: [PATCH 06/10] Fix Win32 warning suppression pragma
+Subject: [PATCH 6/9] Fix Win32 warning suppression pragma
 
 ---
  src/win/util.c | 2 +-
