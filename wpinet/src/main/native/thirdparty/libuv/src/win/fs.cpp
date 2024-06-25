@@ -1185,7 +1185,7 @@ void fs__mktemp(uv_fs_t* req, uv__fs_mktemp_func func) {
   size_t len;
   uint64_t v;
   char* path;
-  
+
   path = (char*)req->path;
   len = wcslen(req->file.pathw);
   ep = req->file.pathw + len;
@@ -1658,7 +1658,7 @@ INLINE static int fs__stat_handle(HANDLE handle, uv_stat_t* statbuf,
     statbuf->st_mode |= (_S_IREAD | _S_IWRITE) | ((_S_IREAD | _S_IWRITE) >> 3) |
                         ((_S_IREAD | _S_IWRITE) >> 6);
     statbuf->st_nlink = 1;
-    statbuf->st_blksize = 4096;    
+    statbuf->st_blksize = 4096;
     statbuf->st_rdev = FILE_DEVICE_NULL << 16;
     return 0;
   }
@@ -1704,7 +1704,7 @@ INLINE static int fs__stat_handle(HANDLE handle, uv_stat_t* statbuf,
    * impossible to delete the file afterwards, since read-only files can't be
    * deleted.
    *
-   * IOW it's all just a clusterfuck and we should think of something that
+   * IOW it's all just a trainwreck and we should think of something that
    * makes slightly more sense.
    *
    * And uv_fs_chmod should probably just fail on windows or be a total no-op.
