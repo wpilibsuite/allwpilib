@@ -287,10 +287,6 @@ public class MooreLikeFSM extends SubsystemBase {
     throw new IllegalArgumentException("Default Command not allowed");
   }
 
-  // Unnecessary before and after stubs for this example.
-  // Consider putting security on them if they are actually used.
-  // (See AchieveHueGoal for example implementation of security.)
-
   /**
    * Run before commands and triggers
    */

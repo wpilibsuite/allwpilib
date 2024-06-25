@@ -35,12 +35,6 @@ public class GroupDisjoint extends SubsystemBase {
    */
 
   private String m_resourceID;
-  // variables used to produce the periodic output
-  private String m_output = ""; // set for what to output
-  private boolean m_outputFresh; // false; periodically checking but sometimes there is no new data
-  private String m_outputPrevious = ""; // previous output setting used to suppress duplicates
-  private int m_repeatedOutputCount; // 0; number of duplicates
-  private final int m_repeatedOutputLimit = 250; // 5 seconds (arbitrary number) at 50 Hz loop frequency
 
   /**
    * @param resourceID resource (subsystem) ID
@@ -57,51 +51,9 @@ public class GroupDisjoint extends SubsystemBase {
   /**
    * Run after commands and triggers
    */
-  public void runAfterCommands() {
-    // processing in periodic I/O should be kept to a minimum to get the best consistent set
-    // of I/O. This example is complicated to minimize the large quantity of output possible.
+  public void runAfterCommands() {}
 
-    boolean compressOutput = false; // option selection hiding here: output all or compressed
-
-    if (compressOutput) { // process "output" variable; count and suppress duplicates values; stale,
-      // persistent values are also output
-
-      // Note that using this periodic output scheme - as implemented - causes the last output
-      // value to persist through iterative periods if it hasn't changed. This behavior could be
-      // changed with a check for stale data. It is problem dependent on what should be done -
-      // persist output or no output?
-
-      boolean newOutput = !m_output.equals(m_outputPrevious);
-
-      if (!newOutput) {
-        m_repeatedOutputCount++;
-      }
-
-      if (newOutput || m_repeatedOutputCount >= m_repeatedOutputLimit) {
-        if (m_repeatedOutputCount > 1) {
-          System.out.println(" --- " + m_repeatedOutputCount + " times");
-          m_repeatedOutputCount = 0;
-        } else {
-          System.out.println();
-        }
-        System.out.print(m_output);
-      }
-
-      m_outputPrevious = m_output;
-    } // end output compression
-    else
-    // output - everything but only fresh values
-    // (duplicate values output, too, but only refreshed ones)
-    if (m_outputFresh) {
-      m_outputFresh = false;
-      System.out.print(m_output);
-    }
-  }
-
-  // note that the Commands.print("testing " + testNumber) does not require a subsystem which
-  // is needed for this test so System.out.print() was used more directly.
-
-  // And related note that Command factories cannot be "static" since they require the subsystem
+  // Command factories cannot be "static" since they require the subsystem
   // instance ("this"; implied in this example by the runOnce() command).
 
   /*
@@ -109,7 +61,7 @@ public class GroupDisjoint extends SubsystemBase {
    */
 
   /**
-   * Example of how to allow one (or none) default command to be set.
+   * Example of how to allow a default command to be set no more than once.
    *
    * @param def default command
    */
@@ -129,15 +81,14 @@ public class GroupDisjoint extends SubsystemBase {
     setDefaultCommand(m_defaultCommand);
   }
 
-  private final Command m_defaultCommand =
-      run(
-          () -> {
-            m_output = m_resourceID + "d";
-            m_outputFresh = true;
-          });
+  private final Command m_defaultCommand = run(() -> System.out.print(m_resourceID + "d"));
+  // note that the Commands.print("testing " + testNumber) does not require a subsystem which
+  // is needed for this test so System.out.print() was used more directly.
 
   /**
    * Command Factory for GroupDisjointTest subsystems
+   *
+   * Using this syntax is slightly easier to read than using "new TestDuration()".
    *
    * @param testNumber output this number and the resource (subsystem) ID
    * @param testDuration elapsed time to run execute() to produce output
@@ -169,8 +120,7 @@ public class GroupDisjoint extends SubsystemBase {
 
     @Override
     public void execute() {
-      m_output = m_resourceID + m_testNumber;
-      m_outputFresh = true;
+      System.out.print(m_resourceID + m_testNumber);
     }
 
     @Override

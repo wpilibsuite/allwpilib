@@ -25,8 +25,8 @@
  * output) there is significant overlap and depth in demonstrating style of using the 2025 advanced
  * addressable LED classes and methods.
  * 
- * Demonstration output is on six sets of eight identical LEDs to show the program is operating;
- * operator input is Xbox controller. The seventh demonstration output is the terminal console
+ * Demonstration output is on seven sets of eight identical LEDs to show the program is operating;
+ * operator input is Xbox controller. The eighth demonstration output is the terminal console
  * "prints."
  *
  * 1. LED set 1 usage Top LEDView subsystem default blue.
@@ -93,7 +93,7 @@
  * Commands run in sequence by triggering successive commands.
  * Use of Measure<Time>.
  * Use of sequential and parallel composed command groups to perform tasks.
- * Use of a reusable Moore Like FSM structure of current state, trigger, new state transitions.
+ * Use of a reusable Moore-Like FSM structure of current state, trigger, new state transitions.
  */
 
 /*
@@ -123,7 +123,7 @@
  * run correctly within groups. Incorrect application of Proxy results in an extremely difficult
  * problem to debug.
  *
- * Slapping an asProxy() around a composed command isn’t sufficient. You have to use proxy the
+ * Slapping an asProxy() around a composed command isn’t sufficient. You have to use proxy on the
  * inner commands, also or instead, and any new library commands to ease the use of Proxy aren’t
  * recursive to inner layers.
  *
@@ -187,10 +187,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    // get a consistent set of all inputs
-    m_robotContainer.runBeforeCommands();
-    // check all the triggers and run all the scheduled commands
+    // get a consistent set of all inputs including non-subsystems not in scheduler run
+    m_robotContainer.runBeforeCommands(); // this is essentially similar to running the scheduler
+
+    // check all the triggers and run all the scheduled commands; subsystem periodics are run first
     CommandScheduler.getInstance().run();
+
     // write outputs such as logging, dashboards, indicators, and goal-oriented subsystem periodic
     m_robotContainer.runAfterCommands();
   }

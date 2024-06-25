@@ -112,10 +112,9 @@ public final class TriggeredDisjointSequence extends WrapperCommand {
       return commands[0];
     }
 
-    // all but last command get the new trigger command (augmented) that triggers the next
-    // command
-    // all but first command triggered by the previous command
-    // first doesn't have a previous and last doesn't have a next
+    // All but last command get the new trigger command (augmented) that triggers the next command.
+    // All but first command triggered by the previous command.
+    // First command doesn't have a previous and last command doesn't have a next command.
     Command first = null;
     Trigger previousTrigger = null;
     int i = 0;
@@ -123,7 +122,7 @@ public final class TriggeredDisjointSequence extends WrapperCommand {
     for (Command command : commands) {
       int firstCommandIndex = 0;
       int lastCommandIndex = commands.length - 1;
-      boolean atFirstcommand = i == firstCommandIndex;
+      boolean atFirstCommand = i == firstCommandIndex;
       boolean atLastCommand = i == lastCommandIndex;
 
       TriggeredDisjointSequence augmented = null;
@@ -132,21 +131,19 @@ public final class TriggeredDisjointSequence extends WrapperCommand {
         augmented = new TriggeredDisjointSequence(command); // augment it with a trigger
       }
 
-      if (atFirstcommand) {
-        first = augmented; // first command is triggered externally by the user
-        // thus has no previous trigger to set
+      if (atFirstCommand) {
+        first = augmented; // first command is triggered externally by the user thus has no
+                           // previous trigger to set
       } else if (atLastCommand) {
-        previousTrigger.onTrue(command); // the last command is triggered by the previous
-        // and won't be triggering the next command so no
-        // augmentation
+        previousTrigger.onTrue(command); // the last command is triggered by the previous and won't
+                                         // be triggering the next command so no augmentation
       } else {
         previousTrigger.onTrue(augmented); // not the first command and not the last command
         // the middle commands triggered by their previous command and augmented to trigger
         // the next command
       }
 
-      if (!atLastCommand) { // now there is a previous command and it will trigger this
-        // command
+      if (!atLastCommand) { // now there is a previous command and it will trigger this command
         previousTrigger = augmented.getTrigger();
       }
 

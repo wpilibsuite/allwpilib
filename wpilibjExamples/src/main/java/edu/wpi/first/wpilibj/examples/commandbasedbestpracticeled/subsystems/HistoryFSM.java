@@ -120,9 +120,9 @@ public class HistoryFSM extends SubsystemBase {
 
   /**
    * Sets a color and quits immediately assuming the color persists somehow (in
-   * "persistentPatternDemo") until the next color is later requested.
+   * "m_persistentPatternDemo") until the next color is later requested.
    *
-   * <p>Set a random color that hasn't been used in the last "colorLockoutPeriod"
+   * <p>Set a random color that hasn't been used in the last "m_colorLockoutPeriod"
    */
   private void getHSV() {
     Measure<Time> currentTime = Milliseconds.of(System.currentTimeMillis());
@@ -146,6 +146,16 @@ public class HistoryFSM extends SubsystemBase {
     } while (++loopCounter < loopCounterLimit);
 
     m_persistentPatternDemo = LEDPattern.solid(Color.fromHSV(randomHue, 200, 200));
+
+    // Set and refresh the color could be done many ways.
+    // Here it's set once and assumed to persist by some other means than this method.
+    // Access to the LEDs is only by command.
+    m_robotSignals.setSignalOnce(m_persistentPatternDemo).schedule();
+    // This subsystem wasn't designed to run in disabled mode. Because of the way the LED subsystem
+    // works the last color selected persists in Disabled mode but new colors are not selected.
+    // Could check here for that and black out if necessary. Or do something in disabledInit().
+    // This usage of scheduling a command within a subsystem is not the same as a command directly
+    // scheduling another command; that technique should be avoided.
   }
 
   /** Example of how to disallow default command */
@@ -159,39 +169,23 @@ public class HistoryFSM extends SubsystemBase {
    */
   public void runBeforeCommands() {}
 
-  int m_debugPrintCounter; // 0; limit testing prints counter
+  int m_verificationPrintCounter; // 0; limit verification prints counter
 
   /**
    * Run after commands and triggers
    */
   public void runAfterCommands() {
 
-    boolean debugPrint = false; // testing prints - not for production
-    if (debugPrint) {
-      m_debugPrintCounter++;
-      if (m_debugPrintCounter % 600 == 0) {
+    boolean verificationPrint = false; // verification - not for production
+    if (verificationPrint) {
+      m_verificationPrintCounter++;
+      int verificationPrintLimit = 50 /*hz*/ * 12 /*seconds*/;
+      if (m_verificationPrintCounter % verificationPrintLimit == 0) { // dump every 12 seconds (50hz * 12 = 600)
         System.out.println("current time " + System.currentTimeMillis());
         for (int i = 0; i < m_lastTimeHistoryOfColors.size(); i++) {
           System.out.println(i + " " + m_lastTimeHistoryOfColors.get(i).toLongString());
         }
       }
     }
-
-    // Set and refresh the color could be done many ways:
-    // here which is called periodically through Robot.periodic(),
-    // where the data were created,
-    // the default command,
-    // or the device that receives the data may keep the last value alive.
-    // Being done here for illustrative purposes.
-
-    m_robotSignals.setSignalOnce(m_persistentPatternDemo).schedule(); // access to the LEDS is only by
-    // command so do it that way.
-    // Note that because this method runs in disabled mode, the color persists in Disabled mode
-    // even if the command was not to run in disabled mode.
-    // Could check here for that and black out if necessary. Or do something in disabledInit().
-    // Thus, we end up demonstrating how to run a command periodically (as a minor part of the
-    // bigger picture).
-    // This usage within a subsystem is NOT (maybe) the same as a command directly scheduling
-    // another command; that technique should be avoided.
   }
 }
