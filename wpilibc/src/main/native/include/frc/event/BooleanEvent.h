@@ -17,12 +17,15 @@
 namespace frc {
 
 /**
- * This class provides an easy way to link actions to active high logic signals. Each object
- * represents a digital signal to which callback actions can be bound using {@link #IfHigh(std::function<void()>)}.
+ * This class provides an easy way to link actions to active high logic signals.
+ * Each object represents a digital signal to which callback actions can be
+ * bound using {@link #IfHigh(std::function<void()>)}.
  *
- * <p>BooleanEvents can easily be composed for advanced functionality using {@link #operator&&}, {@link #operator||}, and {@link #operator!}.
+ * <p>BooleanEvents can easily be composed for advanced functionality using
+ * {@link #operator&&}, {@link #operator||}, and {@link #operator!}.
  *
- * <p>To get a new BooleanEvent that triggers when this one changes see {@link #Falling()} and {@link #Rising()}.
+ * <p>To get a new BooleanEvent that triggers when this one changes see {@link
+ * #Falling()} and {@link #Rising()}.
  */
 class BooleanEvent {
  public:
@@ -37,10 +40,12 @@ class BooleanEvent {
   /**
    * Returns the state of this signal (high or low) as of the last loop poll.
    *
-   * @return true for the high state, false for the low state. If the event was never polled, it
-   *     returns the state at event construction.
+   * @return true for the high state, false for the low state. If the event was
+   * never polled, it returns the state at event construction.
    */
   bool GetAsBoolean() const;
+
+  operator std::function<bool()>();  // NOLINT
 
   /**
    * Bind an action to this event.
@@ -48,8 +53,6 @@ class BooleanEvent {
    * @param action the action to run if this event is active.
    */
   void IfHigh(std::function<void()> action);
-
-  operator std::function<bool()>();  // NOLINT
 
   /**
    * A method to "downcast" a BooleanEvent instance to a subclass (for example,

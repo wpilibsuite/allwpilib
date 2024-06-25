@@ -14,12 +14,12 @@ BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
       [condition = m_signal, state = m_state] { *state = condition(); });
 }
 
-BooleanEvent::operator std::function<bool()>() {
-  return [state = m_state] { return *state; };
-}
-
 bool BooleanEvent::GetAsBoolean() const {
   return *m_state;
+}
+
+BooleanEvent::operator std::function<bool()>() {
+  return [state = m_state] { return *state; };
 }
 
 void BooleanEvent::IfHigh(std::function<void()> action) {

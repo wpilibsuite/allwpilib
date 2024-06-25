@@ -68,6 +68,58 @@ public class BooleanEvent implements BooleanSupplier {
   }
 
   /**
+   * A method to "downcast" a BooleanEvent instance to a subclass (for example, to a command-based
+   * version of this class).
+   *
+   * @param ctor a method reference to the constructor of the subclass that accepts the loop as the
+   *     first parameter and the condition/signal as the second.
+   * @param <T> the subclass type
+   * @return an instance of the subclass.
+   */
+  public <T extends BooleanSupplier> T castTo(BiFunction<EventLoop, BooleanSupplier, T> ctor) {
+    return ctor.apply(m_loop, m_state::get);
+  }
+
+  /**
+   * Creates a new event that is active when this event is inactive.
+   *
+   * @return the new event.
+   */
+  public BooleanEvent negate() {
+    return new BooleanEvent(m_loop, () -> !m_state.get());
+  }
+
+  /**
+   * Composes this event with another event, returning a new event that is active when both events
+   * are active.
+   *
+   * <p>The events must use the same event loop. If the events use different event loops, the
+   * composed signal won't update until both loops are polled.
+   *
+   * @param other the event to compose with.
+   * @return the new event.
+   */
+  public BooleanEvent and(BooleanSupplier other) {
+    requireNonNullParam(other, "other", "and");
+    return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean());
+  }
+
+  /**
+   * Composes this event with another event, returning a new event that is active when either event
+   * is active.
+   *
+   * <p>The events must use the same event loop. If the events use different event loops, the
+   * composed signal won't update until both loops are polled.
+   *
+   * @param other the event to compose with.
+   * @return the new event.
+   */
+  public BooleanEvent or(BooleanSupplier other) {
+    requireNonNullParam(other, "other", "or");
+    return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean());
+  }
+
+  /**
    * Creates a new event that triggers when this one changes from false to true.
    *
    * @return the new event.
@@ -139,57 +191,5 @@ public class BooleanEvent implements BooleanSupplier {
             return m_debouncer.calculate(m_state.get());
           }
         });
-  }
-
-  /**
-   * Creates a new event that is active when this event is inactive.
-   *
-   * @return the new event.
-   */
-  public BooleanEvent negate() {
-    return new BooleanEvent(m_loop, () -> !m_state.get());
-  }
-
-  /**
-   * Composes this event with another event, returning a new event that is active when both events
-   * are active.
-   *
-   * <p>The events must use the same event loop. If the events use different event loops, the
-   * composed signal won't update until both loops are polled.
-   *
-   * @param other the event to compose with.
-   * @return the new event.
-   */
-  public BooleanEvent and(BooleanSupplier other) {
-    requireNonNullParam(other, "other", "and");
-    return new BooleanEvent(m_loop, () -> m_state.get() && other.getAsBoolean());
-  }
-
-  /**
-   * Composes this event with another event, returning a new event that is active when either event
-   * is active.
-   *
-   * <p>The events must use the same event loop. If the events use different event loops, the
-   * composed signal won't update until both loops are polled.
-   *
-   * @param other the event to compose with.
-   * @return the new event.
-   */
-  public BooleanEvent or(BooleanSupplier other) {
-    requireNonNullParam(other, "other", "or");
-    return new BooleanEvent(m_loop, () -> m_state.get() || other.getAsBoolean());
-  }
-
- /**
-   * A method to "downcast" a BooleanEvent instance to a subclass (for example, to a command-based
-   * version of this class).
-   *
-   * @param ctor a method reference to the constructor of the subclass that accepts the loop as the
-   *     first parameter and the condition/signal as the second.
-   * @param <T> the subclass type
-   * @return an instance of the subclass.
-   */
-  public <T extends BooleanSupplier> T castTo(BiFunction<EventLoop, BooleanSupplier, T> ctor) {
-    return ctor.apply(m_loop, m_state::get);
   }
 }
