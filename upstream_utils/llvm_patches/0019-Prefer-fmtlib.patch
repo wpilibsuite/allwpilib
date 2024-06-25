@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:46:20 -0400
-Subject: [PATCH 19/35] Prefer fmtlib
+Subject: [PATCH 19/36] Prefer fmtlib
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 20 ++++++--------------
  1 file changed, 6 insertions(+), 14 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 3a88178cfbbcf7062a958c7de820247bc913ab33..54137a331ca9e752b02c0f16ae996094a6f2fafa 100644
+index 3a88178cfbbcf7062a958c7de820247bc913ab33..4d992442d153d088f6a7a1fc13e3c84012c45a06 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -22,7 +22,7 @@

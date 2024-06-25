@@ -15,8 +15,8 @@ from upstream_utils import (
 def main():
     upstream_root = clone_repo(
         "https://github.com/SleipnirGroup/Sleipnir",
-        # main on 2024-06-05
-        "57005c8b740ab163d3f7ef7e0c7c7c8774f4f925",
+        # main on 2024-06-19
+        "d5bf25acc8a28f10d7f9e85ef89b31eb0e916f6b",
         shallow=False,
     )
     wpilib_root = get_repo_root()
@@ -26,9 +26,9 @@ def main():
     os.chdir(upstream_root)
     for f in [
         "0001-Remove-using-enum-declarations.patch",
-        "0002-Add-implicit-typename.patch",
-        "0003-Use-fmtlib.patch",
-        "0004-Remove-unsupported-constexpr.patch",
+        "0002-Use-fmtlib.patch",
+        "0003-Remove-unsupported-constexpr.patch",
+        "0004-Use-wpi-SmallVector.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/sleipnir_patches", f))
 
@@ -48,7 +48,10 @@ def main():
 
     # Copy Sleipnir header files into allwpilib
     include_files = [
-        os.path.join(dp, f) for dp, dn, fn in os.walk("include") for f in fn
+        os.path.join(dp, f)
+        for dp, dn, fn in os.walk("include")
+        for f in fn
+        if not f.endswith("small_vector.hpp")
     ]
     include_files = copy_to(
         include_files, os.path.join(wpimath, "src/main/native/thirdparty/sleipnir")
