@@ -33,7 +33,7 @@ class BooleanEvent {
    * Creates a new event that is active when the condition is true.
    *
    * @param loop the loop that polls this event
-   * @param condition the digital signal represented by this object.
+   * @param signal the digital signal represented by this object.
    */
   BooleanEvent(EventLoop* loop, std::function<bool()> signal);
 
