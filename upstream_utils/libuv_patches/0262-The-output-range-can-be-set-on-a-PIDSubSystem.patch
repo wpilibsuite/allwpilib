@@ -1,0 +1,172 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Tue, 5 Aug 2014 14:02:11 -0400
+Subject: [PATCH 0262/6262] The output range can be set on a PIDSubSystem
+
+Also, mimimum -> minimum in PIDController.h
+
+Change-Id: I0cdfdca6ca2bdf2c2a40ee524cc925281069fcf4
+---
+ .../wpilibC++/include/Commands/PIDSubsystem.h |  8 +++----
+ wpilibc/wpilibC++/include/PIDController.h     |  6 +++---
+ .../wpilibC++/lib/Commands/PIDSubsystem.cpp   | 21 +++++++++++++------
+ .../first/wpilibj/command/PIDSubsystem.java   | 10 +++++++++
+ 4 files changed, 32 insertions(+), 13 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/Commands/PIDSubsystem.h b/wpilibc/wpilibC++/include/Commands/PIDSubsystem.h
+index 6b9d138c08ab228e0b7269569717e9d3e5ac44f3..9def86a80e1e8fba699a94b4ff19ede15ca2237c 100644
+--- a/wpilibc/wpilibC++/include/Commands/PIDSubsystem.h
++++ b/wpilibc/wpilibC++/include/Commands/PIDSubsystem.h
+@@ -14,7 +14,7 @@
+ 
+ /**
+  * This class is designed to handle the case where there is a {@link Subsystem}
+- * which uses a single {@link PIDController} almost constantly (for instance, 
++ * which uses a single {@link PIDController} almost constantly (for instance,
+  * an elevator which attempts to stay at a constant height).
+  *
+  * <p>It provides some convenience methods to run an internal {@link PIDController}.
+@@ -32,7 +32,7 @@ public:
+ 	PIDSubsystem(double p, double i, double d, double f);
+ 	PIDSubsystem(double p, double i, double d, double f, double period);
+ 	virtual ~PIDSubsystem();
+-	
++
+ 	void Enable();
+ 	void Disable();
+ 
+@@ -44,13 +44,14 @@ public:
+ 	void SetSetpoint(double setpoint);
+ 	void SetSetpointRelative(double deltaSetpoint);
+ 	void SetInputRange(float minimumInput, float maximumInput);
++	void SetOutputRange(float minimumOutput, float maximumOutput);
+ 	double GetSetpoint();
+ 	double GetPosition();
+ 
+ 	virtual void SetAbsoluteTolerance(float absValue);
+ 	virtual void SetPercentTolerance(float percent);
+ 	virtual bool OnTarget();
+-	
++
+ protected:
+ 	PIDController *GetPIDController();
+ 
+@@ -67,4 +68,3 @@ public:
+ };
+ 
+ #endif
+-
+diff --git a/wpilibc/wpilibC++/include/PIDController.h b/wpilibc/wpilibC++/include/PIDController.h
+index ea96791dc34e1c28b1271b58cdf75368e8f94a18..cf2cedcaa9a9cbe79fd212449745edabe4218d9b 100644
+--- a/wpilibc/wpilibC++/include/PIDController.h
++++ b/wpilibc/wpilibC++/include/PIDController.h
+@@ -16,7 +16,7 @@ class Notifier;
+ 
+ /**
+  * Class implements a PID Control Loop.
+- * 
++ *
+  * Creates a separate thread which reads the given PIDSource and takes
+  * care of the integral calculations, as well as writing the given
+  * PIDOutput
+@@ -32,7 +32,7 @@ public:
+ 	virtual float Get();
+ 	virtual void SetContinuous(bool continuous = true);
+ 	virtual void SetInputRange(float minimumInput, float maximumInput);
+-	virtual void SetOutputRange(float mimimumOutput, float maximumOutput);
++	virtual void SetOutputRange(float minimumOutput, float maximumOutput);
+ 	virtual void SetPID(float p, float i, float d);
+ 	virtual void SetPID(float p, float i, float d, float f);
+ 	virtual float GetP();
+@@ -86,7 +86,7 @@ private:
+ 
+ 	PIDSource *m_pidInput;
+ 	PIDOutput *m_pidOutput;
+-	
++
+ 	pthread_t m_controlLoop;
+ 	pthread_mutex_t m_mutex;
+ 
+diff --git a/wpilibc/wpilibC++/lib/Commands/PIDSubsystem.cpp b/wpilibc/wpilibC++/lib/Commands/PIDSubsystem.cpp
+index b0937257e4159d980580dcdb57720c56837fd3e4..3a957efeee407811b614149bc9e057aa59c30467 100644
+--- a/wpilibc/wpilibC++/lib/Commands/PIDSubsystem.cpp
++++ b/wpilibc/wpilibC++/lib/Commands/PIDSubsystem.cpp
+@@ -8,8 +8,6 @@
+ #include "PIDController.h"
+ #include "float.h"
+ 
+-// XXX max and min are not used?
+-
+ /**
+  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d values.
+  * @param name the name
+@@ -111,7 +109,7 @@ void PIDSubsystem::Enable()
+ 	m_controller->Enable();
+ }
+ 
+-/** 
++/**
+   * Disables the internal {@link PIDController}
+   */
+ void PIDSubsystem::Disable()
+@@ -165,7 +163,7 @@ double PIDSubsystem::GetSetpoint()
+ 
+ /**
+  * Sets the maximum and minimum values expected from the input.
+- * 
++ *
+  * @param minimumInput the minimum value expected from the input
+  * @param maximumInput the maximum value expected from the output
+  */
+@@ -174,6 +172,17 @@ void PIDSubsystem::SetInputRange(float minimumInput, float maximumInput)
+ 	m_controller->SetInputRange(minimumInput, maximumInput);
+ }
+ 
++/**
++ * Sets the maximum and minimum values to write.
++ *
++ * @param minimumOutput the minimum value to write to the output
++ * @param maximumOutput the maximum value to write to the output
++ */
++void PIDSubsystem::SetOutputRange(float minimumOutput, float maximumOutput)
++{
++	m_controller->SetOutputRange(minimumOutput, maximumOutput);
++}
++
+ /*
+  * Set the absolute error which is considered tolerable for use with
+  * OnTarget.
+@@ -197,10 +206,10 @@ void PIDSubsystem::SetPercentTolerance(float percent) {
+  * determined by SetTolerance. This asssumes that the maximum and minimum input
+  * were set using SetInput. Use OnTarget() in the IsFinished() method of commands
+  * that use this subsystem.
+- * 
++ *
+  * Currently this just reports on target as the actual value passes through the setpoint.
+  * Ideally it should be based on being within the tolerance for some period of time.
+- * 
++ *
+  * @return true if the error is within the percentage tolerance of the input range
+  */
+ bool PIDSubsystem::OnTarget()
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/command/PIDSubsystem.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/command/PIDSubsystem.java
+index fb0384fb4d2c179014f0c69988464980cf52c711..c8baf8bcf9054b2205be003fbace05399fb84bb9 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/command/PIDSubsystem.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/command/PIDSubsystem.java
+@@ -184,6 +184,16 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
+         controller.setInputRange(minimumInput, maximumInput);
+     }
+ 
++    /**
++     * Sets the maximum and minimum values to write.
++     *
++     * @param minimumOutput the minimum value to write to the output
++     * @param maximumOutput the maximum value to write to the output
++     */
++    public void setOutputRange(double minimumOutput, double maximumOutput) {
++        controller.setOutputRange(minimumOutput, maximumOutput);
++    }
++
+     /**
+     * Set the absolute error which is considered tolerable for use with
+     * OnTarget. The value is in the same range as the PIDInput values.

@@ -1,0 +1,169 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dustin Spicuzza <dustin@virtualroadside.com>
+Date: Sat, 15 Nov 2014 20:19:51 -0500
+Subject: [PATCH 0488/6262] Fix CMakeLists.txt to not be platform specific
+
+- Additionally, use the boost macro to properly find its library
+---
+ simulation/frc_gazebo_plugins/clock/CMakeLists.txt           | 5 +++--
+ simulation/frc_gazebo_plugins/dc_motor/CMakeLists.txt        | 5 +++--
+ simulation/frc_gazebo_plugins/encoder/CMakeLists.txt         | 5 +++--
+ simulation/frc_gazebo_plugins/gyro/CMakeLists.txt            | 5 +++--
+ simulation/frc_gazebo_plugins/limit_switch/CMakeLists.txt    | 5 +++--
+ .../frc_gazebo_plugins/pneumatic_piston/CMakeLists.txt       | 5 +++--
+ simulation/frc_gazebo_plugins/potentiometer/CMakeLists.txt   | 5 +++--
+ simulation/frc_gazebo_plugins/rangefinder/CMakeLists.txt     | 5 +++--
+ 8 files changed, 24 insertions(+), 16 deletions(-)
+
+diff --git a/simulation/frc_gazebo_plugins/clock/CMakeLists.txt b/simulation/frc_gazebo_plugins/clock/CMakeLists.txt
+index 4872c99eb453ceda97e0d2d5c712b2fed97e4c37..e20c8345a3d9434f5cdbf8431492846b4ebf6e5b 100644
+--- a/simulation/frc_gazebo_plugins/clock/CMakeLists.txt
++++ b/simulation/frc_gazebo_plugins/clock/CMakeLists.txt
+@@ -7,11 +7,12 @@ if (PKG_CONFIG_FOUND)
+ endif()
+ 
+ find_package(gazebo REQUIRED)
+-find_library(GZ_MSGS libgz_msgs.so ../msgs/build)
++find_package(Boost COMPONENTS system REQUIRED)
++find_library(GZ_MSGS NAMES gz_msgs PATHS ../msgs/build)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(src ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS} ../msgs/src)
+ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+ 
+ link_directories(${GAZEBO_LIBRARY_DIRS} ../msgs/build/)
+-target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES})
++target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+diff --git a/simulation/frc_gazebo_plugins/dc_motor/CMakeLists.txt b/simulation/frc_gazebo_plugins/dc_motor/CMakeLists.txt
+index c985f93fcda9d524d6ffd57c876e21a561ce1216..e8054549e79da5093d1a2a2938670d0a86c0be74 100644
+--- a/simulation/frc_gazebo_plugins/dc_motor/CMakeLists.txt
++++ b/simulation/frc_gazebo_plugins/dc_motor/CMakeLists.txt
+@@ -7,11 +7,12 @@ if (PKG_CONFIG_FOUND)
+ endif()
+ 
+ find_package(gazebo REQUIRED)
+-find_library(GZ_MSGS libgz_msgs.so ../msgs/build)
++find_package(Boost COMPONENTS system REQUIRED)
++find_library(GZ_MSGS NAMES gz_msgs PATHS ../msgs/build)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(src ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS} ../msgs/src)
+ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+ 
+ link_directories(${GAZEBO_LIBRARY_DIRS} ../msgs/build/)
+-target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES})
++target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+diff --git a/simulation/frc_gazebo_plugins/encoder/CMakeLists.txt b/simulation/frc_gazebo_plugins/encoder/CMakeLists.txt
+index 707bb7ce98438b323264bd60ff2653ced4c928fb..3bb34b0888a6765e85306ecad21cbd42fe2b02f3 100644
+--- a/simulation/frc_gazebo_plugins/encoder/CMakeLists.txt
++++ b/simulation/frc_gazebo_plugins/encoder/CMakeLists.txt
+@@ -7,11 +7,12 @@ if (PKG_CONFIG_FOUND)
+ endif()
+ 
+ find_package(gazebo REQUIRED)
+-find_library(GZ_MSGS libgz_msgs.so ../msgs/build)
++find_package(Boost COMPONENTS system REQUIRED)
++find_library(GZ_MSGS NAMES gz_msgs PATHS ../msgs/build)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(src ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS} ../msgs/src)
+ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+ 
+ link_directories(${GAZEBO_LIBRARY_DIRS} ../msgs/build/)
+-target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES})
++target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+diff --git a/simulation/frc_gazebo_plugins/gyro/CMakeLists.txt b/simulation/frc_gazebo_plugins/gyro/CMakeLists.txt
+index 2c3a15e89a0385bd048ee59d720dc4fee6d8bac0..136509ba817b8282036749946b611aa7ac327b85 100644
+--- a/simulation/frc_gazebo_plugins/gyro/CMakeLists.txt
++++ b/simulation/frc_gazebo_plugins/gyro/CMakeLists.txt
+@@ -7,11 +7,12 @@ if (PKG_CONFIG_FOUND)
+ endif()
+ 
+ find_package(gazebo REQUIRED)
+-find_library(GZ_MSGS libgz_msgs.so ../msgs/build)
++find_package(Boost COMPONENTS system REQUIRED)
++find_library(GZ_MSGS NAMES gz_msgs PATHS ../msgs/build)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(src ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS} ../msgs/src)
+ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+ 
+ link_directories(${GAZEBO_LIBRARY_DIRS} ../msgs/build/)
+-target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES})
++target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+diff --git a/simulation/frc_gazebo_plugins/limit_switch/CMakeLists.txt b/simulation/frc_gazebo_plugins/limit_switch/CMakeLists.txt
+index 4935744ee8f710d0a66e54a56fa59ec20db57c0d..ee72cfade6a39d6a6608ebc1b3c3776ab3fa29ef 100644
+--- a/simulation/frc_gazebo_plugins/limit_switch/CMakeLists.txt
++++ b/simulation/frc_gazebo_plugins/limit_switch/CMakeLists.txt
+@@ -7,11 +7,12 @@ if (PKG_CONFIG_FOUND)
+ endif()
+ 
+ find_package(gazebo REQUIRED)
+-find_library(GZ_MSGS libgz_msgs.so ../msgs/build)
++find_package(Boost COMPONENTS system REQUIRED)
++find_library(GZ_MSGS NAMES gz_msgs PATHS ../msgs/build)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(src ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS} ../msgs/src)
+ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+ 
+ link_directories(${GAZEBO_LIBRARY_DIRS} ../msgs/build/)
+-target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES})
++target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+diff --git a/simulation/frc_gazebo_plugins/pneumatic_piston/CMakeLists.txt b/simulation/frc_gazebo_plugins/pneumatic_piston/CMakeLists.txt
+index f4b6206952b7fda41240ab173ef6ba8a9e1e01cc..8b9a050319fea12a6a177edae51d4a295c82d684 100644
+--- a/simulation/frc_gazebo_plugins/pneumatic_piston/CMakeLists.txt
++++ b/simulation/frc_gazebo_plugins/pneumatic_piston/CMakeLists.txt
+@@ -7,11 +7,12 @@ if (PKG_CONFIG_FOUND)
+ endif()
+ 
+ find_package(gazebo REQUIRED)
+-find_library(GZ_MSGS libgz_msgs.so ../msgs/build)
++find_package(Boost COMPONENTS system REQUIRED)
++find_library(GZ_MSGS NAMES gz_msgs PATHS ../msgs/build)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(src ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS} ../msgs/src)
+ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+ 
+ link_directories(${GAZEBO_LIBRARY_DIRS} ../msgs/build/)
+-target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES})
++target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+diff --git a/simulation/frc_gazebo_plugins/potentiometer/CMakeLists.txt b/simulation/frc_gazebo_plugins/potentiometer/CMakeLists.txt
+index a62b006275bb55a0c7f9c89292f9b43d8b1d381d..0d15c62c76efe2528d731fcb0b5c3f95eee2315b 100644
+--- a/simulation/frc_gazebo_plugins/potentiometer/CMakeLists.txt
++++ b/simulation/frc_gazebo_plugins/potentiometer/CMakeLists.txt
+@@ -7,11 +7,12 @@ if (PKG_CONFIG_FOUND)
+ endif()
+ 
+ find_package(gazebo REQUIRED)
+-find_library(GZ_MSGS libgz_msgs.so ../msgs/build)
++find_package(Boost COMPONENTS system REQUIRED)
++find_library(GZ_MSGS NAMES gz_msgs PATHS ../msgs/build)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(src ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS} ../msgs/src)
+ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+ 
+ link_directories(${GAZEBO_LIBRARY_DIRS} ../msgs/build/)
+-target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES})
++target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+diff --git a/simulation/frc_gazebo_plugins/rangefinder/CMakeLists.txt b/simulation/frc_gazebo_plugins/rangefinder/CMakeLists.txt
+index 38b95ad06ecd854ea399f51160e7e1b2ee08f4ec..f198303589a49a0c65e532ded69ffcd2f18d0248 100644
+--- a/simulation/frc_gazebo_plugins/rangefinder/CMakeLists.txt
++++ b/simulation/frc_gazebo_plugins/rangefinder/CMakeLists.txt
+@@ -7,11 +7,12 @@ if (PKG_CONFIG_FOUND)
+ endif()
+ 
+ find_package(gazebo REQUIRED)
+-find_library(GZ_MSGS libgz_msgs.so ../msgs/build)
++find_package(Boost COMPONENTS system REQUIRED)
++find_library(GZ_MSGS NAMES gz_msgs PATHS ../msgs/build)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(src ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS} ../msgs/src)
+ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+ 
+ link_directories(${GAZEBO_LIBRARY_DIRS} ../msgs/build/)
+-target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES})
++target_link_libraries(${PROJECT_NAME} ${GZ_MSGS} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})

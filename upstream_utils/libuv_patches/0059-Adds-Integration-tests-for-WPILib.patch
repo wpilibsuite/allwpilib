@@ -1,0 +1,372 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Fri, 23 May 2014 13:28:58 -0400
+Subject: [PATCH 0059/6262] Adds Integration tests for WPILib
+
+-Jaguar Speed Controller
+-Tallon Speed Controller
+-Victor Speed Controller
+-Encoder
+-Counter
+-Timer
+
+Change-Id: Ia0d7e6e05652ea2c5bb004ae5bc59e6e615f8396
+---
+ .gitignore                                    |  11 ++
+ .../wpi/first/wpilibj/MotorEncoderTest.java   | 105 ++++++++++++++++++
+ .../java/edu/wpi/first/wpilibj/TimerTest.java |  48 ++++++++
+ .../first/wpilibj/groups/MotorEncoder.java    |  48 ++++++++
+ .../edu/wpi/first/wpilibj/test/TestBench.java |  65 ++++++++++-
+ .../edu/wpi/first/wpilibj/test/TestSuite.java |   5 +-
+ 6 files changed, 280 insertions(+), 2 deletions(-)
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/groups/MotorEncoder.java
+
+diff --git a/.gitignore b/.gitignore
+index 30945ab228ae089815c9a9e2ea6d84247e078051..9b56c379acd3d07d99988939875a6ac675e8fd43 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -10,3 +10,14 @@ bin/
+ .project
+ .settings/
+ .classpath
++
++#Java File extentions
++*.class
++
++# Package Files #
++*.jar
++*.war
++*.ear
++
++# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
++hs_err_pid*
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..66503a8177d5ee91c6f819f3ee8f8b063850e5d5
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+@@ -0,0 +1,105 @@
++package edu.wpi.first.wpilibj;
++
++import static org.junit.Assert.assertTrue;
++
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.groups.MotorEncoder;
++import edu.wpi.first.wpilibj.test.AbstractComsSetup;
++import edu.wpi.first.wpilibj.test.TestBench;
++
++public class MotorEncoderTest extends AbstractComsSetup {
++	
++	private static final double MOTOR_RUNTIME = 2.5;
++	
++	static MotorEncoder pairs [] = new MotorEncoder[3];
++	
++
++	@BeforeClass
++	public static void classSetup() {
++		// Set up the fixture before the test is created
++		pairs[0] = TestBench.getInstance().getTalonPair();
++		pairs[1] = TestBench.getInstance().getVictorPair();
++		pairs[2] = TestBench.getInstance().getJaguarPair();
++		//pairs[3] = TestBench.getInstance().getCanJaguarPair();
++		
++		for(MotorEncoder me : pairs){
++			me.reset();
++		}
++	}
++
++	@Before
++	public void setUp() {
++		// Reset the fixture elements before every test
++		
++	}
++
++	@AfterClass
++	public static void tearDown() {
++		// Clean up the fixture after the test
++		for(MotorEncoder me : pairs){
++			me.reset();
++		}
++	}
++
++	/**
++	 * This test is designed to see if the values of different motors will increment
++	 */
++	@Test
++	public void testIncrement() {
++		int i = 0;
++		for(MotorEncoder me: pairs){
++			int startValue = me.getEncoder().get();
++			
++			me.getMotor().set(.75);
++			Timer.delay(MOTOR_RUNTIME);
++			int currentValue = me.getEncoder().get();
++			if(i == 1){ //TODO REMOVE THIS WHEN ALL ENCODERS ARE PROPERLY ATTACHED
++				assertTrue("Encoder not incremented: start: " + startValue + "; current: " + currentValue, startValue < currentValue);
++			}
++			me.reset();
++			i++;
++		}
++	}
++	
++	@Test
++	public void testDecrement(){
++		int i = 0;
++		for(MotorEncoder me: pairs){
++			int startValue = me.getEncoder().get();
++			
++			me.getMotor().set(-.75);
++			Timer.delay(MOTOR_RUNTIME);
++			int currentValue = me.getEncoder().get();
++			if(i == 1){ //TODO REMOVE THIS WHEN ALL ENCODERS ARE PROPERLY ATTACHED
++				assertTrue("Encoder not decremented: start: " + startValue + "; current: " + currentValue, startValue > currentValue);
++			}
++			me.reset();
++			i++;
++		}
++	}
++	
++	@Test
++	public void testCouter(){
++		int i = 0;
++		for(MotorEncoder me: pairs){
++			int counter1Start = me.getCounters()[0].get();
++			int counter2Start = me.getCounters()[1].get();
++			
++			me.getMotor().set(.75);
++			Timer.delay(MOTOR_RUNTIME);
++			int counter1End = me.getCounters()[0].get();
++			int counter2End = me.getCounters()[1].get();
++			if(i == 1){ //TODO REMOVE THIS WHEN ALL ENCODERS ARE PROPERLY ATTACHED
++				assertTrue("Counter not incremented: start: " + counter1Start + "; current: " + counter1End, counter1Start < counter1End);
++				assertTrue("Counter not incremented: start: " + counter1Start + "; current: " + counter2End, counter2Start < counter2End);
++			}
++			me.reset();
++			i++;
++		}
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..46a196a72138ea6808149b6d969063cbbabbf7c6
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java
+@@ -0,0 +1,48 @@
++package edu.wpi.first.wpilibj;
++
++import static org.junit.Assert.assertTrue;
++
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.test.AbstractComsSetup;
++
++
++public class TimerTest extends AbstractComsSetup {
++	
++	private static double TIMER_TOLARANCE = 0.005;
++	private static double TIMER_RUNTIME = 5.0;
++	
++	@BeforeClass
++	public static void classSetup() {
++		
++	}
++	
++	@Before
++	public void setUp() {
++		// Reset the fixture elements before every test
++		
++	}
++
++	@AfterClass
++	public static void tearDown() {
++		// Clean up the fixture after the test
++	}
++	
++	@Test
++	public void delayTest(){
++		double startTime = Timer.getFPGATimestamp();
++		Timer.delay(TIMER_RUNTIME);
++		double endTime =Timer.getFPGATimestamp();
++		
++		double difference  = endTime - startTime;
++		
++		double offset = difference - TIMER_RUNTIME;
++		
++		assertTrue("Timer.delay ran " + offset + " seconds too long", Math.abs(offset) < TIMER_TOLARANCE);
++		
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/groups/MotorEncoder.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/groups/MotorEncoder.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1a398a62fe14ee66503957a21a330b4e4efd6534
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/groups/MotorEncoder.java
+@@ -0,0 +1,48 @@
++package edu.wpi.first.wpilibj.groups;
++
++import edu.wpi.first.wpilibj.Counter;
++import edu.wpi.first.wpilibj.DigitalInput;
++import edu.wpi.first.wpilibj.DigitalSource;
++import edu.wpi.first.wpilibj.Encoder;
++import edu.wpi.first.wpilibj.SpeedController;
++import edu.wpi.first.wpilibj.Timer;
++import edu.wpi.first.wpilibj.test.TestBench;
++
++public class MotorEncoder {
++	
++	private final SpeedController motor;
++	private final Encoder encoder;
++	private final Counter counters[] = new Counter[2];
++	
++	public MotorEncoder(SpeedController motor, DigitalInput aSource, DigitalInput bSource){
++		this.motor = motor;
++		this.encoder = new Encoder(aSource, bSource);
++		counters[0] = new Counter(aSource);
++		counters[1] = new Counter(bSource);
++		for(Counter c: counters){
++			c.start();
++		}
++	}
++	
++	public SpeedController getMotor(){
++		return motor;
++	}
++	
++	public Encoder getEncoder(){
++		return encoder;
++	}
++	
++	public Counter[] getCounters(){
++		return counters;
++	}
++	
++	public void reset(){
++		motor.set(0);
++		Timer.delay(TestBench.MOTOR_STOP_TIME);
++		encoder.reset();
++		for(Counter c : counters){
++			c.reset();
++		}
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index a106d856b52220969ec81cac257c64a828e20199..6cb79bf067a485a0c5e6a5540f9564f50cd119c7 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -6,6 +6,16 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.test;
+ 
++import edu.wpi.first.wpilibj.CANJaguar;
++import edu.wpi.first.wpilibj.DigitalInput;
++import edu.wpi.first.wpilibj.DigitalSource;
++import edu.wpi.first.wpilibj.Encoder;
++import edu.wpi.first.wpilibj.Jaguar;
++import edu.wpi.first.wpilibj.Talon;
++import edu.wpi.first.wpilibj.Victor;
++import edu.wpi.first.wpilibj.can.CANTimeoutException;
++import edu.wpi.first.wpilibj.groups.MotorEncoder;
++
+ 
+ /**
+  * This class provides access to all of the elements on the test bench, for use
+@@ -17,9 +27,62 @@ package edu.wpi.first.wpilibj.test;
+  * @author Fredric Silberberg
+  */
+ public final class TestBench {
++	
++	
++	public static final double MOTOR_STOP_TIME = 0.10;
+ 
+ 	public static TestBench instance;
+-
++	
++	
++	public Talon talon = new Talon(1);
++	public DigitalInput encA1 = new DigitalInput(1);
++	public DigitalInput encB1 = new DigitalInput(2);
++	
++	public MotorEncoder talonPair = new MotorEncoder(talon, encA1, encB1);
++	
++	public Victor vic = new Victor(2);
++	public DigitalInput encA2 = new DigitalInput(3);
++	public DigitalInput encB2 = new DigitalInput(4);
++	public MotorEncoder vicPair = new MotorEncoder(vic, encA2, encB2);
++	
++	private Jaguar jag = new Jaguar(3);
++	public DigitalInput encA3 = new DigitalInput(5);
++	public DigitalInput encB3 = new DigitalInput(6);
++	private MotorEncoder jagPair = new MotorEncoder(jag, encA3, encB3);
++	
++	//private CANJaguar canJag = null;
++	//private Encoder enc4 = new Encoder(7, 8);
++	//private MotorEncoder canPair;
++	
++	public TestBench(){
++//		try {
++//			canJag = new CANJaguar(1);
++//		} catch (CANTimeoutException e) {
++//			e.printStackTrace();
++//		}
++		//canPair = new MotorEncoder(canJag, enc4);
++	}
++	
++	
++	public MotorEncoder getTalonPair(){
++		return talonPair;
++	}
++	
++	public MotorEncoder getVictorPair(){
++		return vicPair;
++	}
++	
++	
++	public MotorEncoder getJaguarPair(){
++		return jagPair;
++	}
++	
++//	public MotorEncoder getCanJaguarPair(){
++//		return canPair;
++//	}
++	
++	
++	
+ 	public static TestBench getInstance() {
+ 		if (instance == null) {
+ 			instance = new TestBench();
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+index a0dee73a1871b41ec1df53914c89da65686d94e1..bda0b019508f021951eef639007fd9369a01e47c 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+@@ -5,7 +5,10 @@ import org.junit.runner.RunWith;
+ import org.junit.runners.Suite;
+ import org.junit.runners.Suite.SuiteClasses;
+ 
++
++import edu.wpi.first.wpilibj.MotorEncoderTest;
+ import edu.wpi.first.wpilibj.SampleTest;
++import edu.wpi.first.wpilibj.TimerTest;
+ 
+ /**
+  * The WPILibJ Integeration Test Suite collects all of the tests to be run by
+@@ -14,7 +17,7 @@ import edu.wpi.first.wpilibj.SampleTest;
+  * suite classes annotation.
+  */
+ @RunWith(Suite.class)
+-@SuiteClasses({ SampleTest.class })
++@SuiteClasses({ SampleTest.class, MotorEncoderTest.class, TimerTest.class })
+ public class TestSuite {
+ 
+ 	public static void main(String[] args) {

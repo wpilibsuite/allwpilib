@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Fri, 12 Dec 2014 14:36:27 -0500
+Subject: [PATCH 0555/6262] Make SetImaqError actually set the error
+
+Change-Id: Ib714a2ff380319c60f42c859454441e4b69736e0
+---
+ wpilibc/wpilibC++/src/ErrorBase.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/src/ErrorBase.cpp b/wpilibc/wpilibC++/src/ErrorBase.cpp
+index f4f26f9d07394eb69c3427a221967f5df3269766..f9151dbd46f35b7f6f1e5a39e24ff858104dabd3 100644
+--- a/wpilibc/wpilibC++/src/ErrorBase.cpp
++++ b/wpilibc/wpilibC++/src/ErrorBase.cpp
+@@ -91,11 +91,11 @@ void ErrorBase::SetImaqError(int success, const char *contextMessage, const char
+ {
+ 	//  If there was an error
+ 	if (success <= 0) {
+-		//TODO: ??? char err[256];
+-		// XXX: sprintf(err, "%s: %s", contextMessage, imaqGetErrorText(imaqGetLastError()));
++		char err[256];
++		sprintf(err, "%i: %s", success, contextMessage);
+ 
+ 		//  Set the current error information for this object.
+-		// XXX: m_error.Set(imaqGetLastError(), err, filename, function, lineNumber, this);
++		m_error.Set(success, err, filename, function, lineNumber, this);
+ 
+ 		// Update the global error if there is not one already set.
+ 		Synchronized mutex(_globalErrorMutex);

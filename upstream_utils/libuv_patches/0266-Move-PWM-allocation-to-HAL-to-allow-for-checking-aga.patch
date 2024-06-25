@@ -1,0 +1,359 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Tue, 5 Aug 2014 17:27:43 -0400
+Subject: [PATCH 0266/6262] Move PWM allocation to HAL to allow for checking
+ against DIO allocation Re-number MXP DIO to match pinout (include SPI and I2C
+ pins) (fixes artf2664) Change PWM MXP mapping to accommodate DIO re-mapping
+ This re-implementation also fixes artf2668 for C++ and Java Change the test
+ bench to reflect this change also
+
+Change-Id: If30bd6a85a9f1f619fbde06a4ecd595a15fd28f7
+---
+ hal/include/HAL/Digital.hpp                   |  2 +
+ hal/lib/Athena/Digital.cpp                    | 49 ++++++++++++++-----
+ wpilibc/wpilibC++/lib/PWM.cpp                 | 16 +++---
+ .../include/TestBench.h                       |  8 +--
+ .../main/java/edu/wpi/first/wpilibj/PWM.java  | 20 ++++----
+ .../edu/wpi/first/wpilibj/hal/PWMJNI.java     |  2 +
+ .../java/edu/wpi/first/wpilibj/PCMTest.java   |  4 +-
+ .../edu/wpi/first/wpilibj/test/TestBench.java |  8 +--
+ wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp          | 37 ++++++++++++++
+ 9 files changed, 105 insertions(+), 41 deletions(-)
+
+diff --git a/hal/include/HAL/Digital.hpp b/hal/include/HAL/Digital.hpp
+index 9defc9ef6c769821f83338c1de14e2a83e8bf4cd..5fab060820972b0664579d973ec909a301459347 100644
+--- a/hal/include/HAL/Digital.hpp
++++ b/hal/include/HAL/Digital.hpp
+@@ -21,6 +21,8 @@ extern "C"
+ 	bool checkRelayChannel(void* digital_port_pointer);
+ 
+ 	void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status);
++	bool allocatePWMChannel(void* digital_port_pointer, int32_t *status);
++	void freePWMChannel(void* digital_port_pointer, int32_t *status);
+ 	unsigned short getPWM(void* digital_port_pointer, int32_t *status);
+ 	void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status);
+ 	void* allocatePWM(int32_t *status);
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index 51ce738ccda2c7f994ba6eea35efdc5c97285c7c..1e6b4adf8ed512043a31a1b3ce5560286a930b2b 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -62,6 +62,7 @@ tRelay* relaySystem = NULL;
+ tPWM* pwmSystem = NULL;
+ Resource *DIOChannels = NULL;
+ Resource *DO_PWMGenerators = NULL;
++Resource *PWMChannels = NULL;
+ 
+ bool digitalSystemsInitialized = false;
+ 
+@@ -99,6 +100,7 @@ void initializeDigital(int32_t *status) {
+ 
+   Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
+   Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
++  Resource::CreateResourceObject(&PWMChannels, tPWM::kNumSystems * kPwmPins);
+   digitalSystem = tDIO::create(status);
+ 
+   // Relay Setup
+@@ -165,15 +167,19 @@ bool checkRelayChannel(void* digital_port_pointer) {
+ }
+ 
+ /**
+- * Map DIO pin numbers from their physical number (10 to 19) to their position
++ * Map DIO pin numbers from their physical number (10 to 26) to their position
+  * in the bit field.
+  */
+ uint32_t remapMXPChannel(uint32_t pin) {
+-  if(pin < 14) {
+-    return pin - 10; // First four digital headers
+-  } else {
+-    return pin - 6; // Last 8 digital headers, not counting the SPI pins
+-  }
++    return pin - 10;
++}
++
++uint32_t remapMXPPWMChannel(uint32_t pin) {
++	if(pin < 14) {
++		return pin - 10;	//first block of 4 pwms (MXP 0-3)
++	} else {
++		return pin - 6;	//block of PWMs after SPI
++	}
+ }
+ 
+ /**
+@@ -191,11 +197,6 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
+     pwmSystem->writeHdr(port->port.pin, value, status);
+   } else {
+     pwmSystem->writeMXP(port->port.pin - tPWM::kNumHdrRegisters, value, status);
+-
+-    // Enable special functions on this pin
+-    uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+-    short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+-    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet, status);
+   }
+ }
+ 
+@@ -426,6 +427,32 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
+   return true;
+ }
+ 
++bool allocatePWMChannel(void* digital_port_pointer, int32_t *status) {
++		DigitalPort* port = (DigitalPort*) digital_port_pointer;
++		char buf[64];
++		snprintf(buf, 64, "PWM %d", port->port.pin);
++		if (PWMChannels->Allocate(port->port.pin, buf) == ~0ul) return false;
++		if (port->port.pin > tPWM::kNumHdrRegisters-1) {
++			snprintf(buf, 64, "PWM %d and DIO %d", port->port.pin, remapMXPPWMChannel(port->port.pin) + 10);
++			if (DIOChannels->Allocate(remapMXPPWMChannel(port->port.pin) + 10, buf) == ~0ul) return false;
++		    uint32_t bitToSet = 1 << remapMXPPWMChannel(port->port.pin);
++		    short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
++		    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet, status);
++		}
++		return true;
++}
++
++void freePWMChannel(void* digital_port_pointer, int32_t *status) {
++    DigitalPort* port = (DigitalPort*) digital_port_pointer;
++    PWMChannels->Free(port->port.pin);
++    if(port->port.pin > tPWM::kNumHdrRegisters-1) {
++        DIOChannels->Free(remapMXPPWMChannel(port->port.pin) + 10);
++        uint32_t bitToUnset = 1 << remapMXPPWMChannel(port->port.pin);
++        short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
++        digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset, status);
++    }
++}
++
+ /**
+  * Free the resource associated with a digital I/O channel.
+  *
+diff --git a/wpilibc/wpilibC++/lib/PWM.cpp b/wpilibc/wpilibC++/lib/PWM.cpp
+index bff05076937ed9bbe853df2e5b1c960a6455785c..a9b0b018c97f494bbb333366b89342b6ea95530e 100644
+--- a/wpilibc/wpilibC++/lib/PWM.cpp
++++ b/wpilibc/wpilibC++/lib/PWM.cpp
+@@ -15,7 +15,6 @@ constexpr float PWM::kDefaultPwmPeriod;
+ constexpr float PWM::kDefaultPwmCenter;
+ const int32_t PWM::kDefaultPwmStepsDown;
+ const int32_t PWM::kPwmDisabled;
+-static Resource *allocated = NULL;
+ 
+ /**
+  * Initialize PWMs given a channel.
+@@ -28,7 +27,6 @@ void PWM::InitPWM(uint32_t channel)
+ {
+ 	m_table = NULL;
+ 	char buf[64];
+-	Resource::CreateResourceObject(&allocated, kPwmChannels);
+ 
+ 	if (!CheckPWMChannel(channel))
+ 	{
+@@ -37,16 +35,12 @@ void PWM::InitPWM(uint32_t channel)
+ 		return;
+ 	}
+ 
+-	snprintf(buf, 64, "PWM %d", channel);
+-	if (allocated->Allocate(channel, buf) == ~0ul)
+-	{
+-		CloneError(allocated);
+-		return;
+-	}
++	int32_t status = 0;
++	allocatePWMChannel(m_pwm_ports[channel], &status);
++	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 
+ 	m_channel = channel;
+ 
+-	int32_t status = 0;
+ 	setPWM(m_pwm_ports[m_channel], kPwmDisabled, &status);
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 
+@@ -73,10 +67,12 @@ PWM::PWM(uint32_t channel)
+ PWM::~PWM()
+ {
+ 	int32_t status = 0;
++
+ 	setPWM(m_pwm_ports[m_channel], kPwmDisabled, &status);
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 
+-	allocated->Free(m_channel);
++	freePWMChannel(m_pwm_ports[m_channel], &status);
++	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ }
+ 
+ /**
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+index 52a929c0241df345a6f62d86b938fc61997f16d9..21d2680c2e87d048074c0e58a1bc839dfaf2acf2 100644
+--- a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
++++ b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+@@ -43,10 +43,10 @@ public:
+ 	static const uint32_t kFakePressureSwitchChannel = 11;
+ 	static const uint32_t kFakeSolenoid1Channel = 12;
+ 	static const uint32_t kFakeSolenoid2Channel = 13;
+-	static const uint32_t kFakeRelayForward = 14;
+-	static const uint32_t kFakeRelayReverse = 15;
+-	static const uint32_t kFakeJaguarForwardLimit = 16;
+-	static const uint32_t kFakeJaguarReverseLimit = 17;
++	static const uint32_t kFakeRelayForward = 18;
++	static const uint32_t kFakeRelayReverse = 19;
++	static const uint32_t kFakeJaguarForwardLimit = 20;
++	static const uint32_t kFakeJaguarReverseLimit = 21;
+ 
+ 	/* Relay channels */
+ 	static const uint32_t kRelayChannel = 0;
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/PWM.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/PWM.java
+index 530d267ca61f3a00b8531752a3301d952be459c9..b2a40cc941ad51da284e929a0f35edb2b2bfdfe1 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/PWM.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/PWM.java
+@@ -37,8 +37,6 @@ import edu.wpi.first.wpilibj.hal.HALUtil;
+  *   0 = disabled (i.e. PWM output is held low)
+  */
+ public class PWM extends SensorBase implements LiveWindowSendable {
+-	private static Resource allocated = new Resource( kPwmChannels);
+-
+ 	/**
+ 	 * Represents the amount to multiply the minimum servo-pulse pwm period by.
+ 	 */
+@@ -113,12 +111,6 @@ public class PWM extends SensorBase implements LiveWindowSendable {
+ 	 */
+ 	private void initPWM(final int channel) {
+ 		checkPWMChannel(channel);
+-		try {
+-			allocated.allocate(channel);
+-		} catch (CheckedAllocationException e) {
+-			throw new AllocationException(
+-				"PWM channel " + channel  + " is already allocated");
+-		}
+ 		m_channel = channel;
+ 
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+@@ -127,6 +119,13 @@ public class PWM extends SensorBase implements LiveWindowSendable {
+ 		m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) m_channel), status.asIntBuffer());
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 
++		if (!PWMJNI.allocatePWMChannel(m_port, status.asIntBuffer()))
++		{
++			throw new AllocationException(
++				"PWM channel " + channel  + " is already allocated");
++		}
++		HALUtil.checkStatus(status.asIntBuffer());
++
+ 		PWMJNI.setPWM(m_port, (short) 0, status.asIntBuffer());
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 
+@@ -156,10 +155,11 @@ public class PWM extends SensorBase implements LiveWindowSendable {
+ 		PWMJNI.setPWM(m_port, (short) 0, status.asIntBuffer());
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 
+-		PWMJNI.freeDIO(m_port, status.asIntBuffer());
++		PWMJNI.freePWMChannel(m_port, status.asIntBuffer());
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 
+-		allocated.free(m_channel);
++		PWMJNI.freeDIO(m_port, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
+ 	}
+ 
+ 	/**
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java
+index fdeeeb7a48f069300fded3d18dc6c6a815c5d920..32ecaa7a857f561ffbef8bc1a2d67647a70b8841 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java
+@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.SensorBase;
+ 
+ 
+ public class PWMJNI extends DIOJNI {
++	public static native boolean allocatePWMChannel(ByteBuffer digital_port_pointer, IntBuffer status);
++	public static native void freePWMChannel(ByteBuffer digital_port_pointer, IntBuffer status);
+ 	public static native void setPWM(ByteBuffer digital_port_pointer, short value, IntBuffer status);
+ 	public static native short getPWM(ByteBuffer digital_port_pointer, IntBuffer status);
+ 	public static native void setPWMPeriodScale(ByteBuffer digital_port_pointer, int squelchMask, IntBuffer status);
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PCMTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PCMTest.java
+index ad4ef2c416fcdfde31a912d5521564e963053b65..c84bfd6d78bef52447845f3b03370416bbabaf50 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PCMTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PCMTest.java
+@@ -54,8 +54,8 @@ public class PCMTest extends AbstractComsSetup {
+ 	    fakePressureSwitch = new DigitalOutput(11);
+ 	    fakeCompressor = new AnalogInput(1);
+ 
+-	    solenoid1 = new Solenoid(0);
+-	    solenoid2 = new Solenoid(1);
++	    solenoid1 = new Solenoid(7);
++	    solenoid2 = new Solenoid(6);
+ 
+ 	    fakeSolenoid1 = new DigitalInput(12);
+ 	    fakeSolenoid2 = new DigitalInput(13);
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index 8ae6196e545dbe32aea50b57c5451b4b7abea8f7..9e89f222d79cb3f7e3563f148f6c88d09a5df131 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -68,8 +68,8 @@ public final class TestBench {
+ 	/* CAN ASSOICATED CHANNELS */
+ 	public static final int kCANRelayPowerCycler = 1;
+ 	public static final int kFakeJaguarPotentiometer = 1;
+-	public static final int kFakeJaguarForwardLimit = 16;
+-	public static final int kFakeJaguarReverseLimit = 17;
++	public static final int kFakeJaguarForwardLimit = 20;
++	public static final int kFakeJaguarReverseLimit = 21;
+ 	public static final int kCANJaguarID = 2;
+ 
+ 	//THESE MUST BE IN INCREMENTING ORDER
+@@ -310,12 +310,12 @@ public final class TestBench {
+ 
+ 			@Override
+ 			protected DigitalInput giveInputTwo() {
+-				return new DigitalInput(14);
++				return new DigitalInput(18);
+ 			}
+ 
+ 			@Override
+ 			protected DigitalInput giveInputOne() {
+-				return new DigitalInput(15);
++				return new DigitalInput(19);
+ 			}
+ 		};
+ 		return relay;
+diff --git a/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp b/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
+index 6c208fa90bfba980b11879b02eec9ac70a1707a1..e5c06d231ea0ddea556877b0285502230c81eb20 100644
+--- a/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
+@@ -14,6 +14,43 @@ TLogLevel pwmJNILogLevel = logWARNING;
+     else Log().Get(level)
+ 
+ 
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
++ * Method:    allocatePWMChannel
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWMChannel
++  (JNIEnv * env, jclass, jobject id, jobject status)
++{
++	PWMJNI_LOG(logDEBUG) << "Calling DIOJNI allocatePWMChannel";
++	void ** javaId = (void**)env->GetDirectBufferAddress(id);
++	PWMJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
++    jbyte returnValue = allocatePWMChannel(*javaId, statusPtr);
++	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
++	PWMJNI_LOG(logDEBUG) << "allocatePWMChannelResult = " << (jint)returnValue;
++    return returnValue;
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
++ * Method:    freePWMChannel
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
++ */
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMChannel
++  (JNIEnv * env, jclass, jobject id, jobject status)
++{
++	PWMJNI_LOG(logDEBUG) << "Calling DIOJNI freePWMChannel";
++	void ** javaId = (void**)env->GetDirectBufferAddress(id);
++	PWMJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
++	freePWMChannel(*javaId, statusPtr);
++	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
++
++}
++
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+  * Method:    setPWM

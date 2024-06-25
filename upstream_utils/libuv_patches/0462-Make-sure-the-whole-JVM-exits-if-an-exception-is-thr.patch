@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Tue, 4 Nov 2014 12:42:03 -0500
+Subject: [PATCH 0462/6262] Make sure the whole JVM exits if an exception is
+ thrown. This prevents the DS thread, NT thread or any additional user thread
+ from keeping the program alive when the main thread exits (fixes artf3743)
+
+Change-Id: Ide89a3abe57171553af0a8c68077391b9a91fd29
+---
+ .../src/main/java/edu/wpi/first/wpilibj/RobotBase.java       | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+index 3882db7782af3cd9776113c6199c35c0df0189e9..3b7a3f5605b9e7401467b7733ace2b4e594962e3 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+@@ -182,9 +182,11 @@ public abstract class RobotBase {
+ 		RobotBase robot;
+ 		try {
+ 			robot = (RobotBase) Class.forName(robotName).newInstance();
+-		} catch (InstantiationException|IllegalAccessException|ClassNotFoundException e) {
++		} catch (Throwable t) {
++			DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " " + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
+ 			System.err.println("WARNING: Robots don't quit!");
+ 			System.err.println("ERROR: Could not instantiate robot "+robotName+"!");
++			System.exit(1);
+ 			return;
+ 		}
+ 
+@@ -202,5 +204,6 @@ public abstract class RobotBase {
+ 				System.err.println("---> Unexpected return from startCompetition() method.");
+ 			}
+ 		}
++		System.exit(1);
+ 	}
+ }

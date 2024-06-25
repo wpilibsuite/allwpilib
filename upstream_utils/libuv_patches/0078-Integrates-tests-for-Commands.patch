@@ -1,0 +1,825 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 5 Jun 2014 16:17:33 -0400
+Subject: [PATCH 0078/6262] Integrates tests for Commands
+
+Change-Id: I972bdba167c9f305532067303b6faf1042940ab3
+---
+ .../wpi/first/wpilibj/MotorEncoderTest.java   |   4 +-
+ .../wpilibj/command/AbstractCommandTest.java  |  26 ++-
+ .../command/CommandParallelGroupTest.java     |   5 +-
+ .../wpilibj/command/CommandScheduleTest.java  |   5 +-
+ .../command/CommandSequentialGroupTest.java   | 142 +++++++++++++++
+ .../wpilibj/command/CommandSupersedeTest.java | 152 ++++++++++++++++
+ .../wpilibj/command/CommandTimeoutTest.java   |  90 ++++++++++
+ .../wpilibj/command/DefaultCommandTest.java   | 166 ++++++++++++++++++
+ .../mockhardware/FakeCounterSource.java       |   2 +-
+ .../mockhardware/FakeEncoderSource.java       |   2 +-
+ .../edu/wpi/first/wpilibj/test/TestBench.java |   2 +-
+ .../edu/wpi/first/wpilibj/test/TestSuite.java |  12 +-
+ .../src/main/java/logging.properties          |  29 ++-
+ 13 files changed, 624 insertions(+), 13 deletions(-)
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSupersedeTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTimeoutTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+index e85ee634941d18301774ea0e71c634c63367d49b..d9fedd2cb3fbedbfc21111f9bd8431f5416cb16c 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+@@ -34,7 +34,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		pairs.add(TestBench.getInstance().getTalonPair());
+ 		pairs.add(TestBench.getInstance().getVictorPair());
+ 		pairs.add(TestBench.getInstance().getJaguarPair());
+-		pairs.add(TestBench.getInstance().getCanJaguarPair());
++		//pairs.add(TestBench.getInstance().getCanJaguarPair());
+ 		
+ 		for(MotorEncoderFixture me : pairs){
+ 			me.reset();
+@@ -47,7 +47,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 	 * @return true if this motor encoder has an encoder attached to it
+ 	 */
+ 	boolean shouldRunTest(MotorEncoderFixture me){
+-		return me.getType().equals(Victor.class.getSimpleName()) || me.getType().equals(Talon.class.getSimpleName());
++		return true;//me.getType().equals(Victor.class.getSimpleName()) || me.getType().equals(Talon.class.getSimpleName());
+ 	}
+ 
+ 	@Before
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/AbstractCommandTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/AbstractCommandTest.java
+index ee67dd09f5e8f3ff5ead22b8be72a9b7c5c38ed9..0d8b3f2531bec6fc3071d89b757ab3789210eae4 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/AbstractCommandTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/AbstractCommandTest.java
+@@ -7,7 +7,10 @@
+ package edu.wpi.first.wpilibj.command;
+ 
+ import static org.junit.Assert.assertEquals;
+-import edu.wpi.first.wpilibj.Timer;
++import static org.junit.Assert.fail;
++
++import org.junit.Before;
++
+ import edu.wpi.first.wpilibj.mocks.MockCommand;
+ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+ 
+@@ -16,8 +19,23 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+  *
+  */
+ public abstract class AbstractCommandTest extends AbstractComsSetup {
++	
++	@Before
++	public void commandSetup(){
++		Scheduler.getInstance().removeAll();
++		Scheduler.getInstance().enable();
++	}
++	
+ 	public class ASubsystem extends Subsystem {
++		Command command;
+         protected void initDefaultCommand(){
++        	if(command != null){
++        		setDefaultCommand(command);
++        	}
++        }
++        
++        public void init(Command command) {
++            this.command = command;
+         }
+     }
+ 	
+@@ -30,6 +48,10 @@ public abstract class AbstractCommandTest extends AbstractComsSetup {
+ 	 }
+ 	
+ 	public void sleep(int time){
+-		Timer.delay(time);
++		try {
++            Thread.sleep(time);
++        } catch (InterruptedException ex) {
++            fail("Sleep Interrupted!?!?!?!?");
++        }
+ 	}
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
+index 19c21204d26e50ff8f0e0c31e6f6a69def5d1233..8fc4d31994675a43cd530bf08762e01a449a6d47 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
+@@ -18,8 +18,9 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
+ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+ 
+ /**
+- * @author jonathanleitschuh
+- * 
++ * Ported from the old CrioTest Classes
++ * @author Mitchell
++ * @author Jonathan Leitschuh
+  */
+ public class CommandParallelGroupTest extends AbstractCommandTest {
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java
+index 872fb189df47320aa49b48f38d77720c1e96cbc1..7efaff6e6388c0c0f860974a10296d074cbac50c 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java
+@@ -17,8 +17,9 @@ import org.junit.Test;
+ import edu.wpi.first.wpilibj.mocks.MockCommand;
+ 
+ /**
+- * @author jonathanleitschuh, mwills
+- *
++ * Ported from the old CrioTest Classes
++ * @author Mitchell
++ * @author Jonathan Leitschuh
+  */
+ public class CommandScheduleTest extends AbstractCommandTest {
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..51c403a8dea219747ba68fac6b0dfde6c2159a14
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java
+@@ -0,0 +1,142 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.command;
++
++import java.util.logging.Logger;
++
++import org.junit.After;
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Ignore;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.mocks.MockCommand;
++
++/**
++ * Ported from the old CrioTest Classes
++ * @author Mitchell
++ * @author Jonathan Leitschuh
++ */
++public class CommandSequentialGroupTest extends AbstractCommandTest {
++	
++	private static final Logger logger = Logger.getLogger(CommandSequentialGroupTest.class.getName());
++	
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@BeforeClass
++	public static void setUpBeforeClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@AfterClass
++	public static void tearDownAfterClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@After
++	public void tearDown() throws Exception {
++	}
++
++	/**
++	 * Simple Command Group With 3 commands that all depend on a subsystem. Some commands have a timeout
++	 */
++	//@Ignore("This currently hangs the tests, needs work")
++	@Test(timeout = 20000)
++	public void testThreeCommandOnSubSystem() {
++		logger.fine("Begining Test");
++		final ASubsystem subsystem = new ASubsystem();
++		
++		logger.finest("Creating Mock Command1");
++        MockCommand command1 = new MockCommand() {
++            {
++                requires(subsystem);
++            }
++       };
++       logger.finest("Creating Mock Command2");
++       MockCommand command2 = new MockCommand() {
++            {
++                requires(subsystem);
++            }
++        };
++        logger.finest("Creating Mock Command3");
++        MockCommand command3 = new MockCommand() {
++            {
++                requires(subsystem);
++            }
++        };
++        
++        logger.finest("Creating Command Group");
++        CommandGroup commandGroup = new CommandGroup();
++        commandGroup.addSequential(command1, 1.0);
++        commandGroup.addSequential(command2, 2.0);
++        commandGroup.addSequential(command3);
++        
++        
++        assertCommandState(command1, 0, 0, 0, 0, 0);
++        assertCommandState(command2, 0, 0, 0, 0, 0);
++        assertCommandState(command3, 0, 0, 0, 0, 0);
++        logger.finest("Starting Command group");
++        commandGroup.start();
++        assertCommandState(command1, 0, 0, 0, 0, 0);
++        assertCommandState(command2, 0, 0, 0, 0, 0);
++        assertCommandState(command3, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(command1, 0, 0, 0, 0, 0);
++        assertCommandState(command2, 0, 0, 0, 0, 0);
++        assertCommandState(command3, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(command1, 1, 1, 1, 0, 0);
++        assertCommandState(command2, 0, 0, 0, 0, 0);
++        assertCommandState(command3, 0, 0, 0, 0, 0);
++        sleep(1000);//command 1 timeout
++        Scheduler.getInstance().run();
++        assertCommandState(command1, 1, 1, 1, 0, 1);
++        assertCommandState(command2, 1, 1, 1, 0, 0);
++        assertCommandState(command3, 0, 0, 0, 0, 0);
++        
++        Scheduler.getInstance().run();
++        assertCommandState(command1, 1, 1, 1, 0, 1);
++        assertCommandState(command2, 1, 2, 2, 0, 0);
++        assertCommandState(command3, 0, 0, 0, 0, 0);
++        sleep(2000);//command 2 timeout
++        Scheduler.getInstance().run();
++        assertCommandState(command1, 1, 1, 1, 0, 1);
++        assertCommandState(command2, 1, 2, 2, 0, 1);
++        assertCommandState(command3, 1, 1 ,1, 0, 0);
++        
++        Scheduler.getInstance().run();
++        assertCommandState(command1, 1, 1, 1, 0, 1);
++        assertCommandState(command2, 1, 2, 2, 0, 1);
++        assertCommandState(command3, 1, 2, 2, 0, 0);
++        command3.setHasFinished(true);
++        assertCommandState(command1, 1, 1, 1, 0, 1);
++        assertCommandState(command2, 1, 2, 2, 0, 1);
++        assertCommandState(command3, 1, 2, 2, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(command1, 1, 1, 1, 0, 1);
++        assertCommandState(command2, 1, 2, 2, 0, 1);
++        assertCommandState(command3, 1, 3, 3, 1, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(command1, 1, 1, 1, 0, 1);
++        assertCommandState(command2, 1, 2, 2, 0, 1);
++        assertCommandState(command3, 1, 3, 3, 1, 0);
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSupersedeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSupersedeTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6b815c4a2cbffa2a642cad23e4a31ab926158422
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSupersedeTest.java
+@@ -0,0 +1,152 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.command;
++
++import org.junit.After;
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.mocks.MockCommand;
++
++/**
++ * Ported from the old CrioTest Classes
++ * 
++ * @author Mitchell
++ * @author Jonathan Leitschuh
++ */
++public class CommandSupersedeTest extends AbstractCommandTest {
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@BeforeClass
++	public static void setUpBeforeClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@AfterClass
++	public static void tearDownAfterClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@After
++	public void tearDown() throws Exception {
++	}
++
++	/**
++	 * Testing one command superseding another because of dependencies
++	 */
++	@Test
++	public void testOneCommandSupersedingAnotherBecauseOfDependencies() {
++		final ASubsystem subsystem = new ASubsystem();
++
++		MockCommand command1 = new MockCommand() {
++			{
++				requires(subsystem);
++			}
++		};
++
++		MockCommand command2 = new MockCommand() {
++			{
++				requires(subsystem);
++			}
++		};
++
++		assertCommandState(command1, 0, 0, 0, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		command1.start();
++		assertCommandState(command1, 0, 0, 0, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 0, 0, 0, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 1, 1, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 2, 2, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 3, 3, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		command2.start();
++		assertCommandState(command1, 1, 3, 3, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 4, 4, 0, 1);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 4, 4, 0, 1);
++		assertCommandState(command2, 1, 1, 1, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 4, 4, 0, 1);
++		assertCommandState(command2, 1, 2, 2, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 4, 4, 0, 1);
++		assertCommandState(command2, 1, 3, 3, 0, 0);
++	}
++
++	/**
++	 * Testing one command failing superseding another because of dependencies
++	 * because the first command cannot be interrupted"
++	 */
++	@Test
++	public void testCommandFailingSupersedingBecauseFirstCanNotBeInterrupted() {
++		final ASubsystem subsystem = new ASubsystem();
++
++		MockCommand command1 = new MockCommand() {
++			{
++				requires(subsystem);
++				setInterruptible(false);
++			}
++		};
++
++		MockCommand command2 = new MockCommand() {
++			{
++				requires(subsystem);
++			}
++		};
++
++		assertCommandState(command1, 0, 0, 0, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		command1.start();
++		assertCommandState(command1, 0, 0, 0, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 0, 0, 0, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 1, 1, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 2, 2, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 3, 3, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		command2.start();
++		assertCommandState(command1, 1, 3, 3, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 4, 4, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTimeoutTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTimeoutTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..f224e811153940fd96f6e948abe413e2fb859f09
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTimeoutTest.java
+@@ -0,0 +1,90 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.command;
++
++import static org.junit.Assert.*;
++
++import org.junit.After;
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.mocks.MockCommand;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class CommandTimeoutTest extends AbstractCommandTest {
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@BeforeClass
++	public static void setUpBeforeClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@AfterClass
++	public static void tearDownAfterClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@After
++	public void tearDown() throws Exception {
++	}
++
++	/**
++	 * Command 2 second Timeout Test
++	 */
++	@Test
++	public void testTwoSecondTimeout() {
++		 final ASubsystem subsystem = new ASubsystem();
++
++
++         MockCommand command = new MockCommand() {
++             {
++                 requires(subsystem);
++                 setTimeout(2);
++             }
++             
++             @Override
++             public boolean isFinished(){
++                 return super.isFinished() || isTimedOut();
++             }
++         };
++         
++         command.start();
++         assertCommandState(command, 0, 0, 0, 0, 0);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 0, 0, 0, 0, 0);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 1, 1, 1, 0, 0);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 1, 2, 2, 0, 0);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 1, 3, 3, 0, 0);
++         sleep(2000);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 1, 4, 4, 1, 0);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 1, 4, 4, 1, 0);
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..129d995980228e23e26d55b350a2bb15c421aac3
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java
+@@ -0,0 +1,166 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.command;
++
++import static org.junit.Assert.*;
++
++import org.junit.After;
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.mocks.MockCommand;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class DefaultCommandTest extends AbstractCommandTest {
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@BeforeClass
++	public static void setUpBeforeClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@AfterClass
++	public static void tearDownAfterClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@After
++	public void tearDown() throws Exception {
++	}
++
++	/**
++	 * Testing of default commands where the interrupting command is ends itself
++	 */
++	@Test
++	public void test() {
++		final ASubsystem subsystem = new ASubsystem();
++
++
++        MockCommand defaultCommand = new MockCommand() {
++            {
++                requires(subsystem);
++            }
++        };
++        
++        MockCommand anotherCommand = new MockCommand() {
++            {
++                requires(subsystem);
++            }
++        };
++        assertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++        subsystem.init(defaultCommand);
++        
++        assertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 1, 1, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 2, 2, 0, 0);
++        
++        anotherCommand.start();
++        assertCommandState(defaultCommand, 1, 2, 2, 0, 0);
++        assertCommandState(anotherCommand, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++        assertCommandState(anotherCommand, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++        assertCommandState(anotherCommand, 1, 1, 1, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++        assertCommandState(anotherCommand, 1, 2, 2, 0, 0);
++        anotherCommand.setHasFinished(true);
++        assertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++        assertCommandState(anotherCommand, 1, 2, 2, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++        assertCommandState(anotherCommand, 1, 3, 3, 1, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 2, 4, 4, 0, 1);
++        assertCommandState(anotherCommand, 1, 3, 3, 1, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 2, 5, 5, 0, 1);
++        assertCommandState(anotherCommand, 1, 3, 3, 1, 0);
++	}
++	
++	
++	/**
++	 * Testing of default commands where the interrupting command is canceled
++	 */
++	@Test
++	public void testDefaultCommandsInterruptingCommandCanceled(){
++		final ASubsystem subsystem = new ASubsystem();
++
++
++		MockCommand defaultCommand = new MockCommand() {
++            {
++                requires(subsystem);
++            }
++        };
++        
++        MockCommand anotherCommand = new MockCommand() {
++            {
++                requires(subsystem);
++            }
++        };
++        assertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++        subsystem.init(defaultCommand);
++        subsystem.initDefaultCommand();
++        assertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 1, 1, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 2, 2, 0, 0);
++        
++        anotherCommand.start();
++        assertCommandState(defaultCommand, 1, 2, 2, 0, 0);
++        assertCommandState(anotherCommand, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++        assertCommandState(anotherCommand, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++        assertCommandState(anotherCommand, 1, 1, 1, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++        assertCommandState(anotherCommand, 1, 2, 2, 0, 0);
++        anotherCommand.cancel();
++        assertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++        assertCommandState(anotherCommand, 1, 2, 2, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++        assertCommandState(anotherCommand, 1, 2, 2, 0, 1);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 2, 4, 4, 0, 1);
++        assertCommandState(anotherCommand, 1, 2, 2, 0, 1);
++        Scheduler.getInstance().run();
++        assertCommandState(defaultCommand, 2, 5, 5, 0, 1);
++        assertCommandState(anotherCommand, 1, 2, 2, 0, 1);
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeCounterSource.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeCounterSource.java
+index 65e4d8a5fcc164034250f842c1f271c3e6a233da..7f934245e11c86b12a97dbcc61d80fd1e810047d 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeCounterSource.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeCounterSource.java
+@@ -131,7 +131,7 @@ public class FakeCounterSource
+         {
+         }
+         m_task = new EncoderThread(this);
+-        Timer.delay(.5);
++        Timer.delay(.1);
+     }
+ 
+     /**
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeEncoderSource.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeEncoderSource.java
+index 5795061a39faea67bfac6ba443f8233403b93701..b5287f456024fccf71b91b7e57fa20379717c27b 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeEncoderSource.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeEncoderSource.java
+@@ -139,7 +139,7 @@ public class FakeEncoderSource
+         {
+         }
+         m_task = new QuadEncoderThread(this);
+-        Timer.delay(.5);
++        Timer.delay(.1);
+     }
+ 
+     /**
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index aa5cb865c01a010bd3e837bf1fdcbf3d37efcf8a..25c1e8525e981749bf10f0ea4c3a74c68232e865 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -40,7 +40,7 @@ public final class TestBench {
+ 	 * The time that it takes to have a motor go from rotating at full speed to
+ 	 * completely stopped
+ 	 */
+-	public static final double MOTOR_STOP_TIME = 0.50;
++	public static final double MOTOR_STOP_TIME = 0.15;
+ 	
+ 	
+ 	//THESE MUST BE IN INCREMENTING ORDER
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+index 4f4d7f2511d953413f1cf1069d7bf86fa83fb88b..3636f5b8d5e3821f1a38a9d5c70a412784a44d00 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+@@ -25,6 +25,10 @@ import edu.wpi.first.wpilibj.TiltPanCameraTest;
+ import edu.wpi.first.wpilibj.TimerTest;
+ import edu.wpi.first.wpilibj.command.CommandParallelGroupTest;
+ import edu.wpi.first.wpilibj.command.CommandScheduleTest;
++import edu.wpi.first.wpilibj.command.CommandSequentialGroupTest;
++import edu.wpi.first.wpilibj.command.CommandSupersedeTest;
++import edu.wpi.first.wpilibj.command.CommandTimeoutTest;
++import edu.wpi.first.wpilibj.command.DefaultCommandTest;
+ 
+ /**
+  * The WPILibJ Integeration Test Suite collects all of the tests to be run by
+@@ -41,6 +45,10 @@ import edu.wpi.first.wpilibj.command.CommandScheduleTest;
+ 				MotorEncoderTest.class,
+ 				CommandParallelGroupTest.class,
+ 				CommandScheduleTest.class,
++				CommandSequentialGroupTest.class,
++				CommandSupersedeTest.class,
++				CommandTimeoutTest.class,
++				DefaultCommandTest.class,
+ 				TimerTest.class
+ 				})
+ //NOTE: THESE ARE EACH LISTED ON SEPERATE LINES TO PREVENT GIT MERGE CONFLICTS!
+@@ -57,11 +65,13 @@ public class TestSuite {
+ 		    Logger.getAnonymousLogger().severe("Could not load default logging.properties file");
+ 		    Logger.getAnonymousLogger().severe(e.getMessage());
+ 		}
++		
+ 		System.out.println("Starting Tests");
+ 	}
++	private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj");
++	private static final Logger WPILIBJ_COMMAND_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj.command");
+ 
+ 	public static void main(String[] args) {
+-		
+ 		JUnitCore.main("edu.wpi.first.wpilibj.test.TestSuite");
+ 	}
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/logging.properties b/wpilibj/wpilibJavaIntegrationTests/src/main/java/logging.properties
+index db605313bdda733878eb7d7dfed772ee5e3653f4..2cc06267449db3e590847cacd0c9d6e37e4a0700 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/logging.properties
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/logging.properties
+@@ -1,5 +1,32 @@
++# "handlers" specifies a comma separated list of log Handler 
++# classes.  These handlers will be installed during VM startup.
++# By default we only configure a ConsoleHandler, which will only
++# show messages at the INFO and above levels.
+ handlers = java.util.logging.ConsoleHandler
++
++
++# Default global logging level.
++# This specifies which kinds of events are logged across
++# all loggers.  For any given facility this global level
++# can be overriden by a facility specific level
++# Note that the ConsoleHandler also has a separate level
++# setting to limit messages printed to the console.
++#.level= INFO
++.level= FINEST
++
++############################################################
++# Handler specific properties.
++# Describes specific configuration info for Handlers.
++############################################################
+ java.util.logging.ConsoleHandler.level=FINER
+ java.util.logging.ConsoleHandler.formatter=java.util.logging.SimpleFormatter
+ 
+-.level=INFO
+\ No newline at end of file
++############################################################
++# Facility specific properties.
++# Provides extra control for each logger.
++############################################################
++edu.wpi.first.wpilibj.level=INFO
++edu.wpi.first.wpilibj.command.level=FINEST
++
++
++

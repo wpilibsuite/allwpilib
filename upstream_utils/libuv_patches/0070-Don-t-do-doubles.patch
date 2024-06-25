@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Fri, 30 May 2014 19:59:19 -0400
+Subject: [PATCH 0070/6262] Don't do doubles
+
+---
+ hal/include/HAL/PDP.hpp | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/hal/include/HAL/PDP.hpp b/hal/include/HAL/PDP.hpp
+index c9a951e8e43ecd8a6a6b476e892e0e9cc168c690..af0b144535d30fffc05377e3b5b6780ffb650b8a 100644
+--- a/hal/include/HAL/PDP.hpp
++++ b/hal/include/HAL/PDP.hpp
+@@ -1,6 +1,4 @@
+ #pragma once
+-#ifndef __HAL_PDP_H__
+-#define __HAL_PDP_H__
+ 
+ #ifdef __vxworks
+ #include <vxWorks.h>
+@@ -14,6 +12,3 @@ extern "C"
+ 	double getPDPVoltage(int32_t *status);
+ 	double getPDPChannelCurrent(uint8_t channel, int32_t *status);
+ }
+-
+-#endif /* __HAL_PDP_H__ */
+-

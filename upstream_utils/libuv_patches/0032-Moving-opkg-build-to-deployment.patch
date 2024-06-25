@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Sat, 5 Apr 2014 19:44:14 -0400
+Subject: [PATCH 0032/6262] Moving opkg build to deployment
+
+---
+ .../src/main/resources/cpp-zip/ant/build.xml  | 65 ++++++++++++++++++-
+ 1 file changed, 62 insertions(+), 3 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+index f4b59f16da3ba68e08f8a780ed902f58ee411547..2c2df68182431c1aaf5750ec4676ac5ef740799c 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+@@ -1,8 +1,10 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ 
+ <project name="athena-project-build" default="deploy">
+-
++  
+   <property file="${wpilib.ant.dir}/../so.properties"/>
++  <property name="opkg.name" value="wpilib" />
++  <property name="opkg.arch" value="armv7a-vfp" />
+   
+   <!-- Load Tasks -->
+   <taskdef resource="net/sf/antcontrib/antlib.xml">
+@@ -46,18 +48,75 @@
+ 	<if>
+ 		<equals arg1="${installedWpilibSo}" arg2="${cpp-sos}" />
+ 		<then>
++		
+ 	<echo>Found version of WPILib: ${installedWpilibSo} (latest)</echo>
+ 		</then>
+ 		<else>
+ 	<echo>Found version of WPILib: ${installedWpilibSo}</echo>
+ 			<echo>Upgrading WPILib to ${cpp-sos}...</echo>
+-		    <scp file="${wpilib.ant.dir}/../wpilib_${cpp-sos}_armv7a-vfp.deb" todir="${username}@${target}:/tmp"
++			<delete>
++			    <fileset dir="${wpilib.ant.dir}">
++			    	<include name="data.tar*" />
++			    	<include name="control*" />
++			    	<include name="post*" />
++			    	<include name="md5sums" />
++			    	<include name="*.deb" />
++			    </fileset>
++			</delete>
++			<tar destfile="${wpilib.ant.dir}/data.tar">
++				<tarfileset dir="${wpilib.ant.dir}/../lib"  username="root" group="admin" uid="0" gid="0"
++							prefix="usr/local/frc/lib">
++					 	<include name="libWPILibAthena.so" />
++					 	<include name="libNetworkTables.so" />
++					 	<include name="libHALAthena.so" />
++				</tarfileset>
++			</tar>
++			<gzip destfile="${wpilib.ant.dir}/data.tar.gz" src="${wpilib.ant.dir}/data.tar"/>
++			<echo file="${wpilib.ant.dir}/debian-binary">2.0</echo>
++			<echo file="${wpilib.ant.dir}/control">Package: ${opkg.name}
++Version: ${cpp-sos}
++Section: devel
++Priority: optional
++Architecture: ${opkg.arch}
++Depends: libc6 (>= 2.11.1-r7), libgcc1 (>= 4.4.1)
++Maintainer: Brad Miller &gt;bamiller@wpi.edu&lt;
++Description: WPILib, NetworkTables and HAL for RoboRIO target
++ .
++ This package contains the shared objects for WPILib, NetworkTables, and HAL for the 2015 target on the RoboRIO
++</echo>
++			<echo file="${wpilib.ant.dir}/postinst">#!/bin/sh
++ldconfig
++</echo>
++			<echo file="${wpilib.ant.dir}/postrm">#!/bin/sh
++ldconfig
++</echo>
++			<checksum property="md5.wpilib" format="MD5SUM" file="${wpilib.ant.dir}/../lib/libWPILibAthena.so" />
++			<checksum property="md5.nwt" format="MD5SUM" file="${wpilib.ant.dir}/../lib/libNetworkTables.so" />
++			<checksum property="md5.hal" format="MD5SUM" file="${wpilib.ant.dir}/../lib/libHALAthena.so" />
++			<echo file="${wpilib.ant.dir}/md5sums">${md5.wpilib} usr/local/frc/lib/libWPILibAthena.so
++${md5.nwt} usr/local/frc/lib/libNetworkTables.so
++${md5.hal} usr/local/frc/lib/libHALAthena.so</echo>
++<tar destfile="${wpilib.ant.dir}/control.tar">
++				<tarfileset dir="${wpilib.ant.dir}" username="root" group="admin" uid="0" gid="0"
++							prefix="">
++					 	<include name="control" />
++					 	<include name="md5sums" />
++				</tarfileset>
++				<tarfileset dir="${wpilib.ant.dir}" filemode="755"  username="root" group="admin" uid="0" gid="0"
++							prefix="">
++					 	<include name="postinst" />
++					 	<include name="postrm" />
++				</tarfileset>
++			</tar>
++			<gzip destfile="${wpilib.ant.dir}/control.tar.gz" src="${wpilib.ant.dir}/control.tar"/>
++			<exec command="arm-linux-gnueabi-ar -r ${opkg.name}_${cpp-sos}_${opkg.arch}.deb debian-binary control.tar.gz data.tar.gz" dir="${wpilib.ant.dir}"/>
++		    <scp file="${wpilib.ant.dir}/${opkg.name}_${cpp-sos}_${opkg.arch}.deb" todir="${username}@${target}:/tmp"
+ 				 password="${password}" trust="true"/>
+ 			<sshexec host="${target}"
+ 				 username="${username}"
+ 				 password="${password}"
+ 				 trust="true"
+-				 command="opkg install /tmp/wpilib_${cpp-sos}_armv7a-vfp.deb; sh -c 'rm -rf /tmp/wpilib*.deb'"/>
++				 command="opkg install /tmp/${opkg.name}_${cpp-sos}_${opkg.arch}.deb; sh -c 'rm -rf /tmp/wpilib*.deb'"/>
+ 		</else>
+ 	</if>
+     <scp file="${wpilib.ant.dir}/runcppprogram" todir="${username}@${target}:${deploy.dir}"

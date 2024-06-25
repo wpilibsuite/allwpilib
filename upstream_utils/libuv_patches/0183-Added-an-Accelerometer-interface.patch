@@ -1,0 +1,1326 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Tue, 22 Jul 2014 18:04:00 -0400
+Subject: [PATCH 0183/6262] Added an Accelerometer interface
+
+ADXL345_I2C, ADXL345_SPI, and BuiltInAccelerometer implement this interface.
+
+The analog accelerometer class Accelerometer was renamed to
+AnalogAccelerometer.
+
+Change-Id: Iaae79d582a24c36c372f5fd4ea6df37be289b9c1
+---
+ wpilibc/wpilibC++/include/ADXL345_I2C.h       |  13 +-
+ wpilibc/wpilibC++/include/ADXL345_SPI.h       |  15 +-
+ ...{Accelerometer.h => AnalogAccelerometer.h} |  10 +-
+ .../wpilibC++/include/BuiltInAccelerometer.h  |  19 +-
+ wpilibc/wpilibC++/include/WPILib.h            |   3 +-
+ .../include/interfaces/Accelerometer.h        |  52 ++++
+ wpilibc/wpilibC++/lib/ADXL345_I2C.cpp         |  28 +-
+ wpilibc/wpilibC++/lib/ADXL345_SPI.cpp         |  39 ++-
+ ...elerometer.cpp => AnalogAccelerometer.cpp} |  30 +-
+ .../wpilibC++/lib/BuiltInAccelerometer.cpp    |  22 +-
+ .../edu/wpi/first/wpilibj/ADXL345_I2C.java    | 244 ++++++++--------
+ .../edu/wpi/first/wpilibj/ADXL345_SPI.java    | 264 ++++++++++--------
+ ...erometer.java => AnalogAccelerometer.java} |   8 +-
+ .../first/wpilibj/BuiltInAccelerometer.java   |  35 ++-
+ .../wpilibj/interfaces/Accelerometer.java     |  48 ++++
+ 15 files changed, 530 insertions(+), 300 deletions(-)
+ rename wpilibc/wpilibC++/include/{Accelerometer.h => AnalogAccelerometer.h} (81%)
+ create mode 100644 wpilibc/wpilibC++/include/interfaces/Accelerometer.h
+ rename wpilibc/wpilibC++/lib/{Accelerometer.cpp => AnalogAccelerometer.cpp} (78%)
+ rename wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/{Accelerometer.java => AnalogAccelerometer.java} (94%)
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/interfaces/Accelerometer.java
+
+diff --git a/wpilibc/wpilibC++/include/ADXL345_I2C.h b/wpilibc/wpilibC++/include/ADXL345_I2C.h
+index 3839c615a2224afe2ad4e26888bf6f021cfe5be5..86fe41c40743ee1633cceec44b3f0f37f77769dd 100644
+--- a/wpilibc/wpilibC++/include/ADXL345_I2C.h
++++ b/wpilibc/wpilibC++/include/ADXL345_I2C.h
+@@ -5,6 +5,7 @@
+ /*----------------------------------------------------------------------------*/
+ #pragma once
+ 
++#include "interfaces/Accelerometer.h"
+ #include "I2C.h"
+ 
+ /**
+@@ -13,7 +14,7 @@
+  * This class allows access to a Analog Devices ADXL345 3-axis accelerometer on an I2C bus.
+  * This class assumes the default (not alternate) sensor address of 0x1D (7-bit address).
+  */
+-class ADXL345_I2C : public I2C
++class ADXL345_I2C : public Accelerometer, public I2C
+ {
+ protected:
+ 	static const uint8_t kAddress = 0x1D;
+@@ -26,7 +27,6 @@ protected:
+ 		kDataFormat_FullRes=0x08, kDataFormat_Justify=0x04};
+ 
+ public:
+-	enum DataFormat_Range {kRange_2G=0x00, kRange_4G=0x01, kRange_8G=0x02, kRange_16G=0x03};
+ 	enum Axes {kAxis_X=0x00, kAxis_Y=0x02, kAxis_Z=0x04};
+ 	struct AllAxes
+ 	{
+@@ -36,8 +36,15 @@ public:
+ 	};
+ 
+ public:
+-	ADXL345_I2C(Port port, DataFormat_Range range=kRange_2G);
++	ADXL345_I2C(Port port, Range range = kRange_2G);
+ 	virtual ~ADXL345_I2C();
++
++	// Accelerometer interface
++	virtual void SetRange(Range range);
++	virtual double GetX();
++	virtual double GetY();
++	virtual double GetZ();
++
+ 	virtual double GetAcceleration(Axes axis);
+ 	virtual AllAxes GetAccelerations();
+ 
+diff --git a/wpilibc/wpilibC++/include/ADXL345_SPI.h b/wpilibc/wpilibC++/include/ADXL345_SPI.h
+index be1e26b2e93701919f126a9d2eeadfbf3cc4f3bb..4cfc64eff0764dc2228d6662f38873c3ac3063a0 100644
+--- a/wpilibc/wpilibC++/include/ADXL345_SPI.h
++++ b/wpilibc/wpilibC++/include/ADXL345_SPI.h
+@@ -5,6 +5,7 @@
+ /*----------------------------------------------------------------------------*/
+ #pragma once
+ 
++#include "interfaces/Accelerometer.h"
+ #include "SensorBase.h"
+ #include "SPI.h"
+ 
+@@ -17,7 +18,7 @@ class DigitalOutput;
+  * This class allows access to an Analog Devices ADXL345 3-axis accelerometer via SPI.
+  * This class assumes the sensor is wired in 4-wire SPI mode.
+  */
+-class ADXL345_SPI : public SensorBase
++class ADXL345_SPI : public Accelerometer, public SensorBase
+ {
+ protected:
+ 	static const uint8_t kPowerCtlRegister = 0x2D;
+@@ -30,7 +31,6 @@ protected:
+ 		kDataFormat_FullRes=0x08, kDataFormat_Justify=0x04};
+ 
+ public:
+-	enum DataFormat_Range {kRange_2G=0x00, kRange_4G=0x01, kRange_8G=0x02, kRange_16G=0x03};
+ 	enum Axes {kAxis_X=0x00, kAxis_Y=0x02, kAxis_Z=0x04};
+ 	struct AllAxes
+ 	{
+@@ -40,13 +40,20 @@ public:
+ 	};
+ 
+ public:
+-	ADXL345_SPI(SPI::Port port, DataFormat_Range range=kRange_2G);
++	ADXL345_SPI(SPI::Port port, Range range=kRange_2G);
+ 	virtual ~ADXL345_SPI();
++
++	// Accelerometer interface
++	virtual void SetRange(Range range);
++	virtual double GetX();
++	virtual double GetY();
++	virtual double GetZ();
++
+ 	virtual double GetAcceleration(Axes axis);
+ 	virtual AllAxes GetAccelerations();
+ 
+ protected:
+-	void Init(DataFormat_Range range);
++	void Init(Range range);
+ 
+ 	SPI* m_spi;
+ 	SPI::Port m_port;
+diff --git a/wpilibc/wpilibC++/include/Accelerometer.h b/wpilibc/wpilibC++/include/AnalogAccelerometer.h
+similarity index 81%
+rename from wpilibc/wpilibC++/include/Accelerometer.h
+rename to wpilibc/wpilibC++/include/AnalogAccelerometer.h
+index dc3b5feba3141c1a837c4a706ac91b6cf374aeb1..4135101aabe58bf7db79ee82d2cc704341cf4e62 100644
+--- a/wpilibc/wpilibC++/include/Accelerometer.h
++++ b/wpilibc/wpilibC++/include/AnalogAccelerometer.h
+@@ -11,16 +11,16 @@
+ #include "LiveWindow/LiveWindowSendable.h"
+ 
+ /**
+- * Handle operation of the accelerometer.
++ * Handle operation of an analog accelerometer.
+  * The accelerometer reads acceleration directly through the sensor. Many sensors have
+  * multiple axis and can be treated as multiple devices. Each is calibrated by finding
+  * the center value over a period of time.
+  */
+-class Accelerometer : public SensorBase, public PIDSource, public LiveWindowSendable {
++class AnalogAccelerometer : public SensorBase, public PIDSource, public LiveWindowSendable {
+ public:
+-	explicit Accelerometer(uint32_t channel);
+-	explicit Accelerometer(AnalogInput *channel);
+-	virtual ~Accelerometer();
++	explicit AnalogAccelerometer(uint32_t channel);
++	explicit AnalogAccelerometer(AnalogInput *channel);
++	virtual ~AnalogAccelerometer();
+ 
+ 	float GetAcceleration();
+ 	void SetSensitivity(float sensitivity);
+diff --git a/wpilibc/wpilibC++/include/BuiltInAccelerometer.h b/wpilibc/wpilibC++/include/BuiltInAccelerometer.h
+index d065e263beb52fb389a0730b8779f2503555f1f5..83780cbabad97f8909e7ae4344fee6578566ca04 100644
+--- a/wpilibc/wpilibC++/include/BuiltInAccelerometer.h
++++ b/wpilibc/wpilibC++/include/BuiltInAccelerometer.h
+@@ -5,6 +5,7 @@
+ /*----------------------------------------------------------------------------*/
+ #pragma once
+ 
++#include "interfaces/Accelerometer.h"
+ #include "SensorBase.h"
+ #include "LiveWindow/LiveWindowSendable.h"
+ 
+@@ -13,20 +14,16 @@
+  *
+  * This class allows access to the RoboRIO's internal accelerometer.
+  */
+-class BuiltInAccelerometer : public SensorBase, public LiveWindowSendable
++class BuiltInAccelerometer : public Accelerometer, public SensorBase, public LiveWindowSendable
+ {
+ public:
+-	enum Range
+-	{
+-		kRange_2G = 0x00,
+-		kRange_4G = 0x01,
+-		kRange_8G = 0x02,
+-	};
+-
+ 	BuiltInAccelerometer(Range range = kRange_8G);
+-	virtual double GetX() const;
+-	virtual double GetY() const;
+-	virtual double GetZ() const;
++
++	// Accelerometer interface
++	virtual void SetRange(Range range);
++	virtual double GetX();
++	virtual double GetY();
++	virtual double GetZ();
+ 
+ 	virtual std::string GetSmartDashboardType();
+ 	virtual void InitTable(ITable *subtable);
+diff --git a/wpilibc/wpilibC++/include/WPILib.h b/wpilibc/wpilibC++/include/WPILib.h
+index bfd4ed9ccdb8894df0bca37aa6761189baf6e5ed..5877fad29cbabc3024e1864e9c34b52dcb2008ff 100644
+--- a/wpilibc/wpilibC++/include/WPILib.h
++++ b/wpilibc/wpilibC++/include/WPILib.h
+@@ -10,9 +10,9 @@
+ #include "string.h"
+ #include <iostream>
+ 
+-#include "Accelerometer.h"
+ #include "ADXL345_I2C.h"
+ #include "ADXL345_SPI.h"
++#include "AnalogAccelerometer.h"
+ #include "AnalogInput.h"
+ #include "AnalogOutput.h"
+ #include "AnalogPotentiometer.h"
+@@ -51,6 +51,7 @@
+ #include "GearTooth.h"
+ #include "GenericHID.h"
+ #include "Gyro.h"
++#include "interfaces/Accelerometer.h"
+ #include "interfaces/Potentiometer.h"
+ #include "I2C.h"
+ #include "IterativeRobot.h"
+diff --git a/wpilibc/wpilibC++/include/interfaces/Accelerometer.h b/wpilibc/wpilibC++/include/interfaces/Accelerometer.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..609e9bcffc22ec18fa0c09c38901563aae7d9524
+--- /dev/null
++++ b/wpilibc/wpilibC++/include/interfaces/Accelerometer.h
+@@ -0,0 +1,52 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++#pragma once
++
++/**
++ * Interface for 3-axis accelerometers
++ */
++class Accelerometer
++{
++public:
++	virtual ~Accelerometer() {};
++
++	enum Range
++	{
++		kRange_2G = 0,
++		kRange_4G = 1,
++		kRange_8G = 2,
++		kRange_16G = 3
++	};
++
++	/**
++	 * Common interface for setting the measuring range of an accelerometer.
++	 *
++	 * @param range The maximum acceleration, positive or negative, that the
++	 * accelerometer will measure.  Not all accelerometers support all ranges.
++	 */
++	virtual void SetRange(Range range) = 0;
++
++	/**
++	 * Common interface for getting the x axis acceleration
++	 *
++	 * @return The acceleration along the x axis in g-forces
++	 */
++	virtual double GetX() = 0;
++
++	/**
++	 * Common interface for getting the y axis acceleration
++	 *
++	 * @return The acceleration along the y axis in g-forces
++	 */
++	virtual double GetY() = 0;
++
++	/**
++	 * Common interface for getting the z axis acceleration
++	 *
++	 * @return The acceleration along the z axis in g-forces
++	 */
++	virtual double GetZ() = 0;
++};
+diff --git a/wpilibc/wpilibC++/lib/ADXL345_I2C.cpp b/wpilibc/wpilibC++/lib/ADXL345_I2C.cpp
+index 4177be63a6db6f92395931b916fdaa9ebb8dde9f..9d6593aed5c3a02ad49ea5d6b1dc470816f61945 100644
+--- a/wpilibc/wpilibC++/lib/ADXL345_I2C.cpp
++++ b/wpilibc/wpilibC++/lib/ADXL345_I2C.cpp
+@@ -19,7 +19,7 @@ constexpr double ADXL345_I2C::kGsPerLSB;
+  *
+  * @param range The range (+ or -) that the accelerometer will measure.
+  */
+-ADXL345_I2C::ADXL345_I2C(Port port, ADXL345_I2C::DataFormat_Range range):
++ADXL345_I2C::ADXL345_I2C(Port port, Range range):
+ 		I2C(port, kAddress)
+ {
+ 		//m_i2c = new I2C((I2C::Port)port, kAddress);
+@@ -27,7 +27,7 @@ ADXL345_I2C::ADXL345_I2C(Port port, ADXL345_I2C::DataFormat_Range range):
+ 		// Turn on the measurements
+ 		Write(kPowerCtlRegister, kPowerCtl_Measure);
+ 		// Specify the data format to read
+-		Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
++		SetRange(range);
+ 
+ 		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_I2C, 0);
+ }
+@@ -41,6 +41,30 @@ ADXL345_I2C::~ADXL345_I2C()
+ 	//m_i2c = NULL;
+ }
+ 
++/** {@inheritdoc} */
++void ADXL345_I2C::SetRange(Range range)
++{
++	Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
++}
++
++/** {@inheritdoc} */
++double ADXL345_I2C::GetX()
++{
++	return GetAcceleration(kAxis_X);
++}
++
++/** {@inheritdoc} */
++double ADXL345_I2C::GetY()
++{
++	return GetAcceleration(kAxis_Y);
++}
++
++/** {@inheritdoc} */
++double ADXL345_I2C::GetZ()
++{
++	return GetAcceleration(kAxis_Z);
++}
++
+ /**
+  * Get the acceleration of one axis in Gs.
+  *
+diff --git a/wpilibc/wpilibC++/lib/ADXL345_SPI.cpp b/wpilibc/wpilibC++/lib/ADXL345_SPI.cpp
+index fe71ff6bd92cb9197f2ee921f2f00c5c274dd7f0..ecc7de610624c379b4dc820531bf0ead6eabb16b 100644
+--- a/wpilibc/wpilibC++/lib/ADXL345_SPI.cpp
++++ b/wpilibc/wpilibC++/lib/ADXL345_SPI.cpp
+@@ -14,7 +14,7 @@ const uint8_t ADXL345_SPI::kDataFormatRegister;
+ const uint8_t ADXL345_SPI::kDataRegister;
+ constexpr double ADXL345_SPI::kGsPerLSB;
+ 
+-ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::DataFormat_Range range)
++ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
+ {
+ 	m_port = port;
+ 	Init(range);
+@@ -23,7 +23,7 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::DataFormat_Range range)
+ /**
+  * Internal common init function.
+  */
+-void ADXL345_SPI::Init(DataFormat_Range range)
++void ADXL345_SPI::Init(Range range)
+ {
+ 		m_spi = new SPI(m_port);
+ 		m_spi->SetClockRate(500000);
+@@ -37,10 +37,8 @@ void ADXL345_SPI::Init(DataFormat_Range range)
+ 		commands[0] = kPowerCtlRegister;
+ 		commands[1] = kPowerCtl_Measure;
+ 		m_spi->Transaction(commands, commands, 2);
+-		// Specify the data format to read
+-		commands[0] = kDataFormatRegister;
+-		commands[1] = kDataFormat_FullRes| (uint8_t)(range & 0x03);
+-		m_spi->Transaction(commands, commands, 2);
++
++		SetRange(range);
+ 
+ 		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_SPI);
+ }
+@@ -54,6 +52,35 @@ ADXL345_SPI::~ADXL345_SPI()
+ 	m_spi = NULL;
+ }
+ 
++/** {@inheritdoc} */
++void ADXL345_SPI::SetRange(Range range)
++{
++	uint8_t commands[2];
++	
++	// Specify the data format to read
++	commands[0] = kDataFormatRegister;
++	commands[1] = kDataFormat_FullRes| (uint8_t)(range & 0x03);
++	m_spi->Transaction(commands, commands, 2);
++}
++
++/** {@inheritdoc} */
++double ADXL345_SPI::GetX()
++{
++	return GetAcceleration(kAxis_X);
++}
++
++/** {@inheritdoc} */
++double ADXL345_SPI::GetY()
++{
++	return GetAcceleration(kAxis_Y);
++}
++
++/** {@inheritdoc} */
++double ADXL345_SPI::GetZ()
++{
++	return GetAcceleration(kAxis_Z);
++}
++
+ /**
+  * Get the acceleration of one axis in Gs.
+  *
+diff --git a/wpilibc/wpilibC++/lib/Accelerometer.cpp b/wpilibc/wpilibC++/lib/AnalogAccelerometer.cpp
+similarity index 78%
+rename from wpilibc/wpilibC++/lib/Accelerometer.cpp
+rename to wpilibc/wpilibC++/lib/AnalogAccelerometer.cpp
+index de82744f7abe28478274b7f8df360e3860294775..ac33ab3034cfca5792d2a39721459101a0d876f0 100644
+--- a/wpilibc/wpilibC++/lib/Accelerometer.cpp
++++ b/wpilibc/wpilibC++/lib/AnalogAccelerometer.cpp
+@@ -4,7 +4,7 @@
+ /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+ /*----------------------------------------------------------------------------*/
+ 
+-#include "Accelerometer.h"
++#include "AnalogAccelerometer.h"
+ //#include "NetworkCommunication/UsageReporting.h"
+ #include "WPIErrors.h"
+ #include "LiveWindow/LiveWindow.h"
+@@ -12,7 +12,7 @@
+ /**
+  * Common function for initializing the accelerometer.
+  */
+-void Accelerometer::InitAccelerometer()
++void AnalogAccelerometer::InitAccelerometer()
+ {
+ 	m_table = NULL;
+ 	m_voltsPerG = 1.0;
+@@ -26,7 +26,7 @@ void Accelerometer::InitAccelerometer()
+  *
+  * The constructor allocates desired analog input.
+  */
+-Accelerometer::Accelerometer(uint32_t channel)
++AnalogAccelerometer::AnalogAccelerometer(uint32_t channel)
+ {
+ 	m_AnalogInput = new AnalogInput(channel);
+ 	m_allocatedChannel = true;
+@@ -39,7 +39,7 @@ Accelerometer::Accelerometer(uint32_t channel)
+  * useful if the port is going to be read as an analog channel as well as through
+  * the Accelerometer class.
+  */
+-Accelerometer::Accelerometer(AnalogInput *channel)
++AnalogAccelerometer::AnalogAccelerometer(AnalogInput *channel)
+ {
+ 	if (channel == NULL)
+ 	{
+@@ -56,7 +56,7 @@ Accelerometer::Accelerometer(AnalogInput *channel)
+ /**
+  * Delete the analog components used for the accelerometer.
+  */
+-Accelerometer::~Accelerometer()
++AnalogAccelerometer::~AnalogAccelerometer()
+ {
+ 	if (m_allocatedChannel)
+ 	{
+@@ -71,7 +71,7 @@ Accelerometer::~Accelerometer()
+  *
+  * @return The current acceleration of the sensor in Gs.
+  */
+-float Accelerometer::GetAcceleration()
++float AnalogAccelerometer::GetAcceleration()
+ {
+ 	return (m_AnalogInput->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
+ }
+@@ -84,7 +84,7 @@ float Accelerometer::GetAcceleration()
+  *
+  * @param sensitivity The sensitivity of accelerometer in Volts per G.
+  */
+-void Accelerometer::SetSensitivity(float sensitivity)
++void AnalogAccelerometer::SetSensitivity(float sensitivity)
+ {
+ 	m_voltsPerG = sensitivity;
+ }
+@@ -96,7 +96,7 @@ void Accelerometer::SetSensitivity(float sensitivity)
+  *
+  * @param zero The zero G voltage.
+  */
+-void Accelerometer::SetZero(float zero)
++void AnalogAccelerometer::SetZero(float zero)
+ {
+ 	m_zeroGVoltage = zero;
+ }
+@@ -106,32 +106,32 @@ void Accelerometer::SetZero(float zero)
+  *
+  * @return The current acceleration in Gs.
+  */
+-double Accelerometer::PIDGet()
++double AnalogAccelerometer::PIDGet()
+ {
+ 	return GetAcceleration();
+ }
+ 
+-void Accelerometer::UpdateTable() {
++void AnalogAccelerometer::UpdateTable() {
+ 	if (m_table != NULL) {
+ 		m_table->PutNumber("Value", GetAcceleration());
+ 	}
+ }
+ 
+-void Accelerometer::StartLiveWindowMode() {
++void AnalogAccelerometer::StartLiveWindowMode() {
+ }
+ 
+-void Accelerometer::StopLiveWindowMode() {
++void AnalogAccelerometer::StopLiveWindowMode() {
+ }
+ 
+-std::string Accelerometer::GetSmartDashboardType() {
++std::string AnalogAccelerometer::GetSmartDashboardType() {
+ 	return "Accelerometer";
+ }
+ 
+-void Accelerometer::InitTable(ITable *subTable) {
++void AnalogAccelerometer::InitTable(ITable *subTable) {
+ 	m_table = subTable;
+ 	UpdateTable();
+ }
+ 
+-ITable * Accelerometer::GetTable() {
++ITable * AnalogAccelerometer::GetTable() {
+ 	return m_table;
+ }
+diff --git a/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp b/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp
+index baa69cbe41d62d1315783629f3640ece00b98d98..3dae5aaf3953410138463410dea164eb23950c61 100644
+--- a/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp
++++ b/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp
+@@ -6,6 +6,7 @@
+ 
+ #include "BuiltInAccelerometer.h"
+ #include "HAL/HAL.hpp"
++#include "WPIErrors.h"
+ 
+ /**
+  * Constructor.
+@@ -14,17 +15,28 @@
+ BuiltInAccelerometer::BuiltInAccelerometer(Range range)
+ 	: m_table(0)
+ {
++	SetRange(range);
++
++	HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
++}
++
++/** {@inheritdoc} */
++void BuiltInAccelerometer::SetRange(Range range)
++{
++	if(range == kRange_16G)
++	{
++		wpi_setWPIErrorWithContext(ParameterOutOfRange, "16G range not supported (use k2G, k4G, or k8G)");
++	}
++
+ 	setAccelerometerActive(false);
+ 	setAccelerometerRange((AccelerometerRange)range);
+ 	setAccelerometerActive(true);
+-
+-	HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
+ }
+ 
+ /**
+  * @return The acceleration of the RoboRIO along the X axis in g-forces
+  */
+-double BuiltInAccelerometer::GetX() const
++double BuiltInAccelerometer::GetX()
+ {
+ 	return getAccelerometerX();
+ }
+@@ -32,7 +44,7 @@ double BuiltInAccelerometer::GetX() const
+ /**
+  * @return The acceleration of the RoboRIO along the Y axis in g-forces
+  */
+-double BuiltInAccelerometer::GetY() const
++double BuiltInAccelerometer::GetY()
+ {
+ 	return getAccelerometerY();
+ }
+@@ -40,7 +52,7 @@ double BuiltInAccelerometer::GetY() const
+ /**
+  * @return The acceleration of the RoboRIO along the Z axis in g-forces
+  */
+-double BuiltInAccelerometer::GetZ() const
++double BuiltInAccelerometer::GetZ()
+ {
+ 	return getAccelerometerZ();
+ }
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_I2C.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_I2C.java
+index 77b645385b7424d260cac1c7e174002e55bd9a1e..a7c8d0c8f86395f8623ffd83bd3f25c8bbbe219f 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_I2C.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_I2C.java
+@@ -9,120 +9,142 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+-
++import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+ 
+ /**
+  *
+  * @author dtjones
+  */
+-public class ADXL345_I2C extends SensorBase {
+-
+-    private static final byte kAddress = 0x1D;
+-    private static final byte kPowerCtlRegister = 0x2D;
+-    private static final byte kDataFormatRegister = 0x31;
+-    private static final byte kDataRegister = 0x32;
+-    private static final double kGsPerLSB = 0.00390625;
+-    private static final byte kPowerCtl_Link = 0x20, kPowerCtl_AutoSleep = 0x10, kPowerCtl_Measure = 0x08, kPowerCtl_Sleep = 0x04;
+-    private static final byte kDataFormat_SelfTest = (byte) 0x80, kDataFormat_SPI = 0x40, kDataFormat_IntInvert = 0x20, kDataFormat_FullRes = 0x08, kDataFormat_Justify = 0x04;
+-
+-    public static class DataFormat_Range {
+-
+-        /**
+-         * The integer value representing this enumeration
+-         */
+-        public final byte value;
+-        static final byte k2G_val = 0x00;
+-        static final byte k4G_val = 0x01;
+-        static final byte k8G_val = 0x02;
+-        static final byte k16G_val = 0x03;
+-        public static final DataFormat_Range k2G = new DataFormat_Range(k2G_val);
+-        public static final DataFormat_Range k4G = new DataFormat_Range(k4G_val);
+-        public static final DataFormat_Range k8G = new DataFormat_Range(k8G_val);
+-        public static final DataFormat_Range k16G = new DataFormat_Range(k16G_val);
+-
+-        private DataFormat_Range(byte value) {
+-            this.value = value;
+-        }
+-    }
+-
+-    public static class Axes {
+-
+-        /**
+-         * The integer value representing this enumeration
+-         */
+-        public final byte value;
+-        static final byte kX_val = 0x00;
+-        static final byte kY_val = 0x02;
+-        static final byte kZ_val = 0x04;
+-        public static final Axes kX = new Axes(kX_val);
+-        public static final Axes kY = new Axes(kY_val);
+-        public static final Axes kZ = new Axes(kZ_val);
+-
+-        private Axes(byte value) {
+-            this.value = value;
+-        }
+-    }
+-
+-    public static class AllAxes {
+-
+-        public double XAxis;
+-        public double YAxis;
+-        public double ZAxis;
+-    }
+-    private I2C m_i2c;
+-
+-    /**
+-     * Constructor.
+-     *
+-     * @param range The range (+ or -) that the accelerometer will measure.
+-     */
+-    public ADXL345_I2C(I2C.Port port, DataFormat_Range range) {
+-        m_i2c = new I2C(port, kAddress);
+-		
+-        // Turn on the measurements
+-        m_i2c.write(kPowerCtlRegister, kPowerCtl_Measure);
+-        // Specify the data format to read
+-        m_i2c.write(kDataFormatRegister, kDataFormat_FullRes | range.value);
+-
+-        UsageReporting.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
+-    }
+-
+-    /**
+-     * Get the acceleration of one axis in Gs.
+-     *
+-     * @param axis The axis to read from.
+-     * @return Acceleration of the ADXL345 in Gs.
+-     */
+-    public double getAcceleration(Axes axis) {
+-        byte[] rawAccel = new byte[2];
+-        m_i2c.read(kDataRegister + axis.value, rawAccel.length, rawAccel);
+-
+-        // Sensor is little endian... swap bytes
+-        return accelFromBytes(rawAccel[0], rawAccel[1]);
+-    }
+-
+-    private double accelFromBytes(byte first, byte second) {
+-        short tempLow = (short) (first & 0xff);
+-        short tempHigh = (short) ((second << 8) & 0xff00);
+-        return (tempLow | tempHigh) * kGsPerLSB;
+-    }
+-
+-    /**
+-     * Get the acceleration of all axes in Gs.
+-     *
+-     * @return Acceleration measured on all axes of the ADXL345 in Gs.
+-     */
+-    public AllAxes getAccelerations() {
+-        AllAxes data = new AllAxes();
+-        byte[] rawData = new byte[6];
+-        m_i2c.read(kDataRegister, rawData.length, rawData);
+-
+-        // Sensor is little endian... swap bytes
+-        data.XAxis = accelFromBytes(rawData[0], rawData[1]);
+-        data.YAxis = accelFromBytes(rawData[2], rawData[3]);
+-        data.ZAxis = accelFromBytes(rawData[4], rawData[5]);
+-        return data;
+-    }
+-
+-    // TODO: Support LiveWindow
++public class ADXL345_I2C extends SensorBase implements Accelerometer {
++
++	private static final byte kAddress = 0x1D;
++	private static final byte kPowerCtlRegister = 0x2D;
++	private static final byte kDataFormatRegister = 0x31;
++	private static final byte kDataRegister = 0x32;
++	private static final double kGsPerLSB = 0.00390625;
++	private static final byte kPowerCtl_Link = 0x20, kPowerCtl_AutoSleep = 0x10, kPowerCtl_Measure = 0x08, kPowerCtl_Sleep = 0x04;
++	private static final byte kDataFormat_SelfTest = (byte) 0x80, kDataFormat_SPI = 0x40, kDataFormat_IntInvert = 0x20, kDataFormat_FullRes = 0x08, kDataFormat_Justify = 0x04;
++
++	public static class Axes {
++
++		/**
++		 * The integer value representing this enumeration
++		 */
++		public final byte value;
++		static final byte kX_val = 0x00;
++		static final byte kY_val = 0x02;
++		static final byte kZ_val = 0x04;
++		public static final Axes kX = new Axes(kX_val);
++		public static final Axes kY = new Axes(kY_val);
++		public static final Axes kZ = new Axes(kZ_val);
++
++		private Axes(byte value) {
++			this.value = value;
++		}
++	}
++
++	public static class AllAxes {
++
++		public double XAxis;
++		public double YAxis;
++		public double ZAxis;
++	}
++	private I2C m_i2c;
++
++	/**
++	 * Constructor.
++	 *
++	 * @param range The range (+ or -) that the accelerometer will measure.
++	 */
++	public ADXL345_I2C(I2C.Port port, Range range) {
++		m_i2c = new I2C(port, kAddress);
++
++		// Turn on the measurements
++		m_i2c.write(kPowerCtlRegister, kPowerCtl_Measure);
++
++		setRange(range);
++
++		UsageReporting.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
++	}
++
++	/** {inheritdoc} */
++	@Override
++	public void setRange(Range range) {
++		byte value = 0;
++
++		switch(range) {
++		case k2G:
++			value = 0;
++			break;
++		case k4G:
++			value = 1;
++			break;
++		case k8G:
++			value = 2;
++			break;
++		case k16G:
++			value = 3;
++			break;
++		}
++
++		// Specify the data format to read
++		m_i2c.write(kDataFormatRegister, kDataFormat_FullRes | value);
++	}
++
++	/** {@inheritdoc} */
++	@Override
++	public double getX() {
++		return getAcceleration(Axes.kX);
++	}
++
++	/** {@inheritdoc} */
++	@Override
++	public double getY() {
++		return getAcceleration(Axes.kY);
++	}
++
++	/** {@inheritdoc} */
++	@Override
++	public double getZ() {
++		return getAcceleration(Axes.kZ);
++	}
++
++	/**
++	 * Get the acceleration of one axis in Gs.
++	 *
++	 * @param axis The axis to read from.
++	 * @return Acceleration of the ADXL345 in Gs.
++	 */
++	public double getAcceleration(Axes axis) {
++		byte[] rawAccel = new byte[2];
++		m_i2c.read(kDataRegister + axis.value, rawAccel.length, rawAccel);
++
++		// Sensor is little endian... swap bytes
++		return accelFromBytes(rawAccel[0], rawAccel[1]);
++	}
++
++	private double accelFromBytes(byte first, byte second) {
++		short tempLow = (short) (first & 0xff);
++		short tempHigh = (short) ((second << 8) & 0xff00);
++		return (tempLow | tempHigh) * kGsPerLSB;
++	}
++
++	/**
++	 * Get the acceleration of all axes in Gs.
++	 *
++	 * @return Acceleration measured on all axes of the ADXL345 in Gs.
++	 */
++	public AllAxes getAccelerations() {
++		AllAxes data = new AllAxes();
++		byte[] rawData = new byte[6];
++		m_i2c.read(kDataRegister, rawData.length, rawData);
++
++		// Sensor is little endian... swap bytes
++		data.XAxis = accelFromBytes(rawData[0], rawData[1]);
++		data.YAxis = accelFromBytes(rawData[2], rawData[3]);
++		data.ZAxis = accelFromBytes(rawData[4], rawData[5]);
++		return data;
++	}
++
++	// TODO: Support LiveWindow
+ }
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java
+index f9e672bb715c7bd2cc3626e8680174bf46b5dc67..ad015e9839670f268f91ca3c982bb4efa6458bd7 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java
+@@ -5,143 +5,167 @@
+ /* the project.                                                               */
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
++import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+ 
+ /**
+  *
+  * @author dtjones
+  * @author mwills
+  */
+-public class ADXL345_SPI extends SensorBase {
+-    private static final int kPowerCtlRegister = 0x2D;
+-    private static final int kDataFormatRegister = 0x31;
+-    private static final int kDataRegister = 0x32;
+-    private static final double kGsPerLSB = 0.00390625;
+-    
+-    private static final int kAddress_Read = 0x80;
+-    private static final int kAddress_MultiByte = 0x40;
+-    
+-    private static final int kPowerCtl_Link=0x20;
+-    private static final int kPowerCtl_AutoSleep=0x10;
+-    private static final int kPowerCtl_Measure=0x08;
+-    private static final int kPowerCtl_Sleep=0x04;
+-    
+-    private static final int kDataFormat_SelfTest=0x80;
+-    private static final int kDataFormat_SPI=0x40;
+-    private static final int kDataFormat_IntInvert=0x20;
+-    private static final int kDataFormat_FullRes=0x08;
+-    private static final int kDataFormat_Justify=0x04;
+-        
+-        
+-    public static class DataFormat_Range {
+-
+-        /**
+-         * The integer value representing this enumeration
+-         */
+-        public final byte value;
+-        static final byte k2G_val = 0x00;
+-        static final byte k4G_val = 0x01;
+-        static final byte k8G_val = 0x02;
+-        static final byte k16G_val = 0x03;
+-        public static final ADXL345_SPI.DataFormat_Range k2G = new ADXL345_SPI.DataFormat_Range(k2G_val);
+-        public static final ADXL345_SPI.DataFormat_Range k4G = new ADXL345_SPI.DataFormat_Range(k4G_val);
+-        public static final ADXL345_SPI.DataFormat_Range k8G = new ADXL345_SPI.DataFormat_Range(k8G_val);
+-        public static final ADXL345_SPI.DataFormat_Range k16G = new ADXL345_SPI.DataFormat_Range(k16G_val);
+-
+-        private DataFormat_Range(byte value) {
+-            this.value = value;
+-        }
+-    }
+-
+-    public static class Axes {
+-
+-        /**
+-         * The integer value representing this enumeration
+-         */
+-        public final byte value;
+-        static final byte kX_val = 0x00;
+-        static final byte kY_val = 0x02;
+-        static final byte kZ_val = 0x04;
+-        public static final ADXL345_SPI.Axes kX = new ADXL345_SPI.Axes(kX_val);
+-        public static final ADXL345_SPI.Axes kY = new ADXL345_SPI.Axes(kY_val);
+-        public static final ADXL345_SPI.Axes kZ = new ADXL345_SPI.Axes(kZ_val);
+-
+-        private Axes(byte value) {
+-            this.value = value;
+-        }
+-    }
+-
+-    public static class AllAxes {
+-
+-        public double XAxis;
+-        public double YAxis;
+-        public double ZAxis;
+-    }
+-    
+-    private SPI m_spi;
+-    
+-    /**
+-     * Constructor. Use this when the device is the first/only device on the bus
+-     *
+-     * @param clk The clock channel
+-     * @param mosi The mosi (output) channel
+-     * @param miso The miso (input) channel
+-     * @param cs The chip select channel
+-     * @param range The range (+ or -) that the accelerometer will measure.
+-     */
+-    public ADXL345_SPI(SPI.Port port, ADXL345_SPI.DataFormat_Range range) {
+-        m_spi = new SPI(port);
+-        init(range);
+-    }
+-    
+-    public void free(){
+-        m_spi.free();
+-    }
+-    
+-    /**
+-     * Set SPI bus parameters, bring device out of sleep and set format
+-     * 
+-     * @param range The range (+ or -) that the accelerometer will measure.
+-     */
+-    private void init(ADXL345_SPI.DataFormat_Range range){
++public class ADXL345_SPI extends SensorBase implements Accelerometer {
++	private static final int kPowerCtlRegister = 0x2D;
++	private static final int kDataFormatRegister = 0x31;
++	private static final int kDataRegister = 0x32;
++	private static final double kGsPerLSB = 0.00390625;
++
++	private static final int kAddress_Read = 0x80;
++	private static final int kAddress_MultiByte = 0x40;
++
++	private static final int kPowerCtl_Link=0x20;
++	private static final int kPowerCtl_AutoSleep=0x10;
++	private static final int kPowerCtl_Measure=0x08;
++	private static final int kPowerCtl_Sleep=0x04;
++
++	private static final int kDataFormat_SelfTest=0x80;
++	private static final int kDataFormat_SPI=0x40;
++	private static final int kDataFormat_IntInvert=0x20;
++	private static final int kDataFormat_FullRes=0x08;
++	private static final int kDataFormat_Justify=0x04;
++
++	public static class Axes {
++
++		/**
++		 * The integer value representing this enumeration
++		 */
++		public final byte value;
++		static final byte kX_val = 0x00;
++		static final byte kY_val = 0x02;
++		static final byte kZ_val = 0x04;
++		public static final ADXL345_SPI.Axes kX = new ADXL345_SPI.Axes(kX_val);
++		public static final ADXL345_SPI.Axes kY = new ADXL345_SPI.Axes(kY_val);
++		public static final ADXL345_SPI.Axes kZ = new ADXL345_SPI.Axes(kZ_val);
++
++		private Axes(byte value) {
++			this.value = value;
++		}
++	}
++
++	public static class AllAxes {
++
++		public double XAxis;
++		public double YAxis;
++		public double ZAxis;
++	}
++
++	private SPI m_spi;
++
++	/**
++	 * Constructor. Use this when the device is the first/only device on the bus
++	 *
++	 * @param clk The clock channel
++	 * @param mosi The mosi (output) channel
++	 * @param miso The miso (input) channel
++	 * @param cs The chip select channel
++	 * @param range The range (+ or -) that the accelerometer will measure.
++	 */
++	public ADXL345_SPI(SPI.Port port, Range range) {
++		m_spi = new SPI(port);
++		init(range);
++	}
++
++	public void free(){
++		m_spi.free();
++	}
++
++	/**
++	 * Set SPI bus parameters, bring device out of sleep and set format
++	 *
++	 * @param range The range (+ or -) that the accelerometer will measure.
++	 */
++	private void init(Range range){
+ 		m_spi.setClockRate(500000);
+-        m_spi.setMSBFirst();
++		m_spi.setMSBFirst();
+ 		m_spi.setSampleDataOnFalling();
+ 		m_spi.setClockActiveLow();
+ 		m_spi.setChipSelectActiveHigh();
+ 
+-        // Turn on the measurements
++		// Turn on the measurements
+ 		byte[] commands = new byte[2];
+ 		commands[0] = kPowerCtlRegister;
+ 		commands[1] = kPowerCtl_Measure;
+-        m_spi.write(commands, 2);
+-        // Specify the data format to read
+-		commands[0] = kDataFormatRegister;
+-		commands[1] = (byte)(kDataFormat_FullRes | range.value);
+-        m_spi.write(commands, 2);
+-    }
+-
+-    /**
+-     * Get the acceleration of one axis in Gs.
+-     *
+-     * @param axis The axis to read from.
+-     * @return Acceleration of the ADXL345 in Gs.
+-     */
+-    public double getAcceleration(ADXL345_SPI.Axes axis) {
++		m_spi.write(commands, 2);
++
++        setRange(range);
++	}
++
++	/** {inheritdoc} */
++	@Override
++	public void setRange(Range range) {
++		byte value = 0;
++
++		switch(range) {
++		case k2G:
++			value = 0;
++			break;
++		case k4G:
++			value = 1;
++			break;
++		case k8G:
++			value = 2;
++			break;
++		case k16G:
++			value = 3;
++			break;
++		}
++
++		// Specify the data format to read
++		byte[] commands = new byte[]{
++			kDataFormatRegister,
++			(byte)(kDataFormat_FullRes | value)
++		};
++		m_spi.write(commands, commands.length);
++	}
++
++	/** {@inheritdoc} */
++	@Override
++	public double getX() {
++		return getAcceleration(Axes.kX);
++	}
++
++	/** {@inheritdoc} */
++	@Override
++	public double getY() {
++		return getAcceleration(Axes.kY);
++	}
++
++	/** {@inheritdoc} */
++	@Override
++	public double getZ() {
++		return getAcceleration(Axes.kZ);
++	}
++
++	/**
++	 * Get the acceleration of one axis in Gs.
++	 *
++	 * @param axis The axis to read from.
++	 * @return Acceleration of the ADXL345 in Gs.
++	 */
++	public double getAcceleration(ADXL345_SPI.Axes axis) {
+ 		byte[] transferBuffer = new byte[3];
+ 		transferBuffer[0] = (byte)((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value);
+-        m_spi.transaction(transferBuffer, transferBuffer, 3);
++		m_spi.transaction(transferBuffer, transferBuffer, 3);
+ 		//Sensor is little endian... swap bytes
+ 		int rawAccel = transferBuffer[2] << 8 | transferBuffer[1];
+ 		return rawAccel * kGsPerLSB;
+-    }
+-
+-    /**
+-     * Get the acceleration of all axes in Gs.
+-     *
+-     * @return Acceleration measured on all axes of the ADXL345 in Gs.
+-     */
+-    public ADXL345_SPI.AllAxes getAccelerations() {
+-        ADXL345_SPI.AllAxes data = new ADXL345_SPI.AllAxes();
++	}
++
++	/**
++	 * Get the acceleration of all axes in Gs.
++	 *
++	 * @return Acceleration measured on all axes of the ADXL345 in Gs.
++	 */
++	public ADXL345_SPI.AllAxes getAccelerations() {
++		ADXL345_SPI.AllAxes data = new ADXL345_SPI.AllAxes();
+ 		byte dataBuffer[] = new byte[7];
+ 		int[] rawData = new int[3];
+ 		if (m_spi != null)
+@@ -161,5 +185,5 @@ public class ADXL345_SPI extends SensorBase {
+ 			data.ZAxis = rawData[2] * kGsPerLSB;
+ 		}
+ 		return data;
+-    }
+-}
+\ No newline at end of file
++	}
++}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Accelerometer.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogAccelerometer.java
+similarity index 94%
+rename from wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Accelerometer.java
+rename to wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogAccelerometer.java
+index 846a1b8cd1ca56347a91a742b3848cc0487f7a79..efe54039bbf45aca1605fbafef53b57dc1947976 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Accelerometer.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogAccelerometer.java
+@@ -16,12 +16,12 @@ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+ 
+ /**
+- * Handle operation of the accelerometer.
++ * Handle operation of an analog accelerometer.
+  * The accelerometer reads acceleration directly through the sensor. Many sensors have
+  * multiple axis and can be treated as multiple devices. Each is calibrated by finding
+  * the center value over a period of time.
+  */
+-public class Accelerometer extends SensorBase implements PIDSource, ISensor, LiveWindowSendable {
++public class AnalogAccelerometer extends SensorBase implements PIDSource, ISensor, LiveWindowSendable {
+ 
+     private AnalogInput m_analogChannel;
+     private double m_voltsPerG = 1.0;
+@@ -42,7 +42,7 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
+      * The constructor allocates desired analog channel.
+      * @param channel the port that the accelerometer is on
+      */
+-    public Accelerometer(final int channel) {
++    public AnalogAccelerometer(final int channel) {
+         m_allocatedChannel = true;
+         m_analogChannel = new AnalogInput(channel);
+         initAccelerometer();
+@@ -55,7 +55,7 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
+      * the Accelerometer class.
+      * @param channel an already initialized analog channel
+      */
+-    public Accelerometer(AnalogInput channel) {
++    public AnalogAccelerometer(AnalogInput channel) {
+         m_allocatedChannel = false;
+         if (channel == null)
+             throw new NullPointerException("Analog Channel given was null");
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java
+index bcc173fb284e6100685c17ad16435b787df82882..1ac056e8d06e5c8e68df3b27bcf8267850c6f2b6 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java
+@@ -4,6 +4,7 @@
+ /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
++import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+ import edu.wpi.first.wpilibj.hal.AccelerometerJNI;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+@@ -17,15 +18,28 @@ import edu.wpi.first.wpilibj.tables.ITable;
+  *
+  * This class allows access to the RoboRIO's internal accelerometer.
+  */
+-public class BuiltInAccelerometer implements ISensor, LiveWindowSendable
++public class BuiltInAccelerometer implements Accelerometer, ISensor, LiveWindowSendable
+ {
+-	public enum Range { k2G, k4G, k8G }
+-
+ 	/**
+ 	 * Constructor.
+ 	 * @param range The range the accelerometer will measure
+ 	 */
+ 	public BuiltInAccelerometer(Range range) {
++		setRange(range);
++		UsageReporting.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
++	}
++
++	/**
++	 * Constructor.
++	 * The accelerometer will measure +/-8 g-forces
++	 */
++	public BuiltInAccelerometer() {
++		this(Range.k8G);
++	}
++
++	/** {inheritdoc} */
++	@Override
++	public void setRange(Range range) {
+ 		AccelerometerJNI.setAccelerometerActive(false);
+ 
+ 		switch(range) {
+@@ -38,24 +52,17 @@ public class BuiltInAccelerometer implements ISensor, LiveWindowSendable
+ 		case k8G:
+ 			AccelerometerJNI.setAccelerometerRange(2);
+ 			break;
++		case k16G:
++			throw new RuntimeException("16G range not supported (use k2G, k4G, or k8G)");
+ 		}
+ 
+ 		AccelerometerJNI.setAccelerometerActive(true);
+-
+-		UsageReporting.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
+-	}
+-
+-	/**
+-	 * Constructor.
+-	 * The accelerometer will measure +/-8 g-forces
+-	 */
+-	public BuiltInAccelerometer() {
+-		this(Range.k8G);
+ 	}
+ 
+ 	/**
+ 	 * @return The acceleration of the RoboRIO along the X axis in g-forces
+ 	 */
++	@Override
+ 	public double getX() {
+ 		return AccelerometerJNI.getAccelerometerX();
+ 	}
+@@ -63,6 +70,7 @@ public class BuiltInAccelerometer implements ISensor, LiveWindowSendable
+ 	/**
+ 	 * @return The acceleration of the RoboRIO along the Y axis in g-forces
+ 	 */
++	@Override
+ 	public double getY() {
+ 		return AccelerometerJNI.getAccelerometerY();
+ 	}
+@@ -70,6 +78,7 @@ public class BuiltInAccelerometer implements ISensor, LiveWindowSendable
+ 	/**
+ 	 * @return The acceleration of the RoboRIO along the Z axis in g-forces
+ 	 */
++	@Override
+ 	public double getZ() {
+ 		return AccelerometerJNI.getAccelerometerZ();
+ 	}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/interfaces/Accelerometer.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/interfaces/Accelerometer.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0eb4c182efddb92e5c7e10159aa1b4910edea3e8
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/interfaces/Accelerometer.java
+@@ -0,0 +1,48 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.interfaces;
++
++/**
++ * Interface for 3-axis accelerometers
++ */
++public interface Accelerometer {
++	public enum Range
++	{
++		k2G,
++		k4G,
++		k8G,
++		k16G
++	}
++
++	/**
++	 * Common interface for setting the measuring range of an accelerometer.
++	 *
++	 * @param range The maximum acceleration, positive or negative, that the
++	 * accelerometer will measure.  Not all accelerometers support all ranges.
++	 */
++	public void setRange(Range range);
++
++	/**
++	 * Common interface for getting the x axis acceleration
++	 *
++	 * @return The acceleration along the x axis in g-forces
++	 */
++	public double getX();
++
++	/**
++	 * Common interface for getting the y axis acceleration
++	 *
++	 * @return The acceleration along the y axis in g-forces
++	 */
++	public double getY();
++
++	/**
++	 * Common interface for getting the z axis acceleration
++	 *
++	 * @return The acceleration along the z axis in g-forces
++	 */
++	public double getZ();
++}

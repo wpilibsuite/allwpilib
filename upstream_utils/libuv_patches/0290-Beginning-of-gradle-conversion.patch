@@ -1,0 +1,158 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Tue, 12 Aug 2014 17:25:10 -0400
+Subject: [PATCH 0290/6262] Beginning of gradle conversion.
+
+Change-Id: Ic9690af60cd53b5237cd8c05d41598a94f6025f1
+---
+ networktables/OutlineViewer/build.gradle     | 24 ++++++++++++
+ networktables/cpp/build.gradle               | 19 ++++++++++
+ networktables/java-table-viewer/build.gradle | 24 ++++++++++++
+ networktables/java/build.gradle              | 39 ++++++++++++++++++++
+ networktables/settings.gradle                |  1 +
+ 5 files changed, 107 insertions(+)
+ create mode 100644 networktables/OutlineViewer/build.gradle
+ create mode 100644 networktables/cpp/build.gradle
+ create mode 100644 networktables/java-table-viewer/build.gradle
+ create mode 100644 networktables/java/build.gradle
+ create mode 100644 networktables/settings.gradle
+
+diff --git a/networktables/OutlineViewer/build.gradle b/networktables/OutlineViewer/build.gradle
+new file mode 100644
+index 0000000000000000000000000000000000000000..dcf951eae254bd068243a3b955b1ddbe4c186446
+--- /dev/null
++++ b/networktables/OutlineViewer/build.gradle
+@@ -0,0 +1,24 @@
++apply plugin: 'java'
++apply plugin: 'maven'
++
++group = "edu.wpi.frc.wpilib"
++version = "2.0"
++
++sourceCompatibility = 1.7
++
++sourceSets {
++	main {
++	     java {
++	     	  srcDirs = ["src"]
++	     }
++	}
++}
++
++repositories {
++       mavenCentral()
++       mavenLocal()
++}
++
++dependencies {
++	     compile project(":java")
++}
+diff --git a/networktables/cpp/build.gradle b/networktables/cpp/build.gradle
+new file mode 100644
+index 0000000000000000000000000000000000000000..4476593660097300d021bf76bf86943d82ee72fb
+--- /dev/null
++++ b/networktables/cpp/build.gradle
+@@ -0,0 +1,19 @@
++apply plugin: 'cpp'
++
++libraries {
++  main {}
++}
++
++sources {
++  main {
++    cpp {
++      source {
++        srcDirs = ["lib/share", "lib/Athena"]
++        // includes = "**/*.cpp"
++      }
++      exportedHeaders {
++        srcDirs = ["include"]
++      }
++    }
++  }
++}
+\ No newline at end of file
+diff --git a/networktables/java-table-viewer/build.gradle b/networktables/java-table-viewer/build.gradle
+new file mode 100644
+index 0000000000000000000000000000000000000000..dcf951eae254bd068243a3b955b1ddbe4c186446
+--- /dev/null
++++ b/networktables/java-table-viewer/build.gradle
+@@ -0,0 +1,24 @@
++apply plugin: 'java'
++apply plugin: 'maven'
++
++group = "edu.wpi.frc.wpilib"
++version = "2.0"
++
++sourceCompatibility = 1.7
++
++sourceSets {
++	main {
++	     java {
++	     	  srcDirs = ["src"]
++	     }
++	}
++}
++
++repositories {
++       mavenCentral()
++       mavenLocal()
++}
++
++dependencies {
++	     compile project(":java")
++}
+diff --git a/networktables/java/build.gradle b/networktables/java/build.gradle
+new file mode 100644
+index 0000000000000000000000000000000000000000..5cacc13e6e2d8f2a5ace5d370cb424a1f0df7b95
+--- /dev/null
++++ b/networktables/java/build.gradle
+@@ -0,0 +1,39 @@
++apply plugin: 'java'
++apply plugin: 'maven'
++
++group = "edu.wpi.frc.wpilib"
++version = "2.0"
++
++sourceSets {
++	main {
++	     java {
++	     	  srcDirs = ["src/main/java", "Athena/src/main/java"]
++	     }
++	}
++	test {
++	     java {
++		  srcDirs = ["Athena/src/test/java"]
++		  excludes = ["edu/wpi/first/wpilibj/networktables2/system/SystemTest.java"]
++	     }
++	}
++}
++
++repositories {
++       mavenCentral()
++       mavenLocal()
++}
++
++dependencies {
++       testCompile group: 'junit', name: 'junit', version: '4.+'
++       testCompile group: 'org.jmock', name: 'jmock-junit4', version: '2.6.0'
++       testCompile group: 'org.jmock', name: 'jmock-legacy', version: '2.6.0'
++}
++
++uploadArchives {
++    repositories {
++        mavenDeployer {
++            repository(url: "file://localhost/tmp/myRepo/")
++            pom.artifactId = 'networktables'
++	}
++    }
++}
+diff --git a/networktables/settings.gradle b/networktables/settings.gradle
+new file mode 100644
+index 0000000000000000000000000000000000000000..9ae3de81001d3a6ffd57d47280d7a073b388592a
+--- /dev/null
++++ b/networktables/settings.gradle
+@@ -0,0 +1 @@
++include "java", "java-table-viewer"
+\ No newline at end of file

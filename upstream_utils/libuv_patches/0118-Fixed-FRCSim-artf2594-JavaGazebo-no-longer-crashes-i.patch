@@ -1,0 +1,355 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Colby Skeggs <skeggsc@catlin.edu>
+Date: Fri, 20 Jun 2014 10:18:42 -0700
+Subject: [PATCH 0118/6262] Fixed FRCSim artf2594 - JavaGazebo no longer
+ crashes if gzserver hasn't started, and cleaned up some code in the area.
+
+Change-Id: I4daae199fb6dda6561c2cb85fc5254e36bcb3066
+---
+ .../src/main/resources/java-zip/ant/build.xml |  4 --
+ .../org/gazebosim/transport/Connection.java   | 35 +++++++---
+ .../java/org/gazebosim/transport/Node.java    | 66 ++++++++-----------
+ .../wpi/first/wpilibj/simulation/ds/Main.java | 22 +++++--
+ .../java/edu/wpi/first/wpilibj/RobotBase.java | 13 +++-
+ .../first/wpilibj/simulation/MainNode.java    | 40 ++++++-----
+ 6 files changed, 103 insertions(+), 77 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+index d9e0878e605f9e09e2d21b55d0c108c7e393fd57..33dd44c169fec529fbc637ce2dc43f4094d5fc77 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+@@ -123,14 +123,12 @@
+ 	    </exec>
+       </sequential>
+       <sequential>
+-        <sleep seconds="5"/>
+ 	    <echo>[simulate] Running DriverStation.</echo>
+ 	    <java jar="${wpilib.sim.tools}/SimDS.jar" fork="true">
+           <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
+         </java>
+       </sequential>
+       <sequential>
+-        <sleep seconds="5"/>
+ 	    <echo>[simulate] Running Code.</echo>
+ 	    <java jar="${simulation.dist.jar}" fork="true">
+           <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
+@@ -148,14 +146,12 @@
+ 	    </exec>
+       </sequential>
+       <sequential>
+-        <sleep seconds="5"/>
+ 	    <echo>[debug-simulate] Running DriverStation.</echo>
+ 	    <java jar="${wpilib.sim.tools}/SimDS.jar" fork="true">
+           <jvmarg value="-Djava.library.path=${wpilib.sim.lib}" />
+         </java>
+       </sequential>
+       <sequential>
+-        <sleep seconds="5"/>
+ 	    <echo>[debug-simulate] Running Code.</echo>
+ 	    <java jar="${simulation.dist.jar}" fork="true">
+           <jvmarg value="-Xdebug" />
+diff --git a/simulation/JavaGazebo/src/main/java/org/gazebosim/transport/Connection.java b/simulation/JavaGazebo/src/main/java/org/gazebosim/transport/Connection.java
+index 45c096e7d575f9ac536df272fe4a6ead726f842d..5ddbfa39b0894252cb1e39e07ebfbb430481d480 100644
+--- a/simulation/JavaGazebo/src/main/java/org/gazebosim/transport/Connection.java
++++ b/simulation/JavaGazebo/src/main/java/org/gazebosim/transport/Connection.java
+@@ -4,12 +4,14 @@ import gazebo.msgs.GzPacket.Packet;
+ import gazebo.msgs.GzTime.Time;
+ 
+ import java.io.IOException;
++import java.net.ConnectException;
+ import java.io.InputStream;
+ import java.io.OutputStream;
+ import java.net.ServerSocket;
+ import java.net.Socket;
+ import java.net.UnknownHostException;
+ import java.util.logging.Logger;
++import java.util.logging.Level;
+ 
+ import com.google.protobuf.ByteString;
+ import com.google.protobuf.Message;
+@@ -34,11 +36,7 @@ public class Connection {
+ 	private OutputStream os;
+ 	
+ 	private static final Logger LOG = Logger.getLogger("Gazebo Transport");
+-	
+-	public Connection() {
+-		
+-	}
+-	
++
+ 	public void connect(String host, int port) throws UnknownHostException, IOException {
+ 		this.host = host;
+ 		this.port = port;
+@@ -47,13 +45,31 @@ public class Connection {
+ 		os = socket.getOutputStream();
+ 	}
+ 
++	public void connectAndWait(String host, int port) throws IOException, InterruptedException {
++		this.host = host;
++		this.port = port;
++		while (true) {
++			try {
++				socket = new Socket(host, port);
++				break;
++			} catch (ConnectException ex) {
++				// Retry.
++				LOG.log(Level.WARNING, "Cannot connect, retrying in five seconds.", ex);
++				Thread.sleep(5000);
++			}
++		}
++		is = socket.getInputStream();
++		os = socket.getOutputStream();
++	}
++
+ 	public void serve(final ServerCallback cb) throws IOException {
+ 		ssocket = new ServerSocket(0);
+ 		host = ssocket.getInetAddress().getHostAddress(); // TODO: get globally addressable name.
+ 		port = ssocket.getLocalPort();
+ 
+-		new Thread(new Runnable() {
+-			@Override public void run() {
++		new Thread("Gazebo Server Thread") {
++			@Override
++			public void run() {
+ 				LOG.config("Listening on "+host+":"+port);
+ 				while (true) {
+ 					Connection conn = new Connection();
+@@ -64,12 +80,11 @@ public class Connection {
+ 						LOG.info("Handling connect from "+conn.socket.getInetAddress());
+ 						cb.handle(conn);
+ 					} catch (IOException e) {
+-						// TODO Auto-generated catch block
+-						e.printStackTrace();
++						LOG.log(Level.WARNING, "Cannot handle client", e);
+ 					}
+ 				}
+ 			}
+-		}).start();
++		}.start();
+ 	}
+ 
+ 	public void close() throws IOException {
+diff --git a/simulation/JavaGazebo/src/main/java/org/gazebosim/transport/Node.java b/simulation/JavaGazebo/src/main/java/org/gazebosim/transport/Node.java
+index c474369a95c2603359906b0bbd0a7f7b89accb45..c9a3b5bd92a5ea1cd32d38b4ea1d61f4c422e039 100644
+--- a/simulation/JavaGazebo/src/main/java/org/gazebosim/transport/Node.java
++++ b/simulation/JavaGazebo/src/main/java/org/gazebosim/transport/Node.java
+@@ -25,50 +25,36 @@ import com.google.protobuf.InvalidProtocolBufferException;
+ import com.google.protobuf.Message;
+ 
+ public class Node implements Runnable, ServerCallback {
+-	private String name;
+-	private Connection master;
+-	private Connection server;
+-	private List<String> namespaces;
+-	private Map<String, PublisherRecord> publishers;
++	private final String name;
++	private final Connection master = new Connection();
++	private final Connection server = new Connection();
++	private final List<String> namespaces = new LinkedList<>();
++	private final Map<String, PublisherRecord> publishers = new HashMap<>();
+ 	@SuppressWarnings("rawtypes")
+-	private Map<String, Subscriber> subscriptions;
++	private final Map<String, Subscriber> subscriptions = new HashMap<>();
+ 	private static final Logger LOG = Logger.getLogger("Gazebo Transport");
++	static {
++		// Get rid of the excess information
++		LOG.setLevel(Level.WARNING);
++		Handler[] handlers = LOG.getParent().getHandlers();
++		if (handlers[0] instanceof ConsoleHandler) {
++			((ConsoleHandler) handlers[0]).setFormatter(new Formatter() {
++				@Override
++				public String format(LogRecord record) {
++					return String.format("%s|%s: %s\n", record.getLevel(), record.getLoggerName(), record.getMessage());
++				}
++			});
++		}
++	}
+ 
+ 	public Node(String name) {
+ 		this.name = name;
+-		namespaces = new LinkedList<>();
+-		publishers = new HashMap<>();
+-		subscriptions = new HashMap<>();
+-		
+-		// Get rid of the excessive information
+-		LOG.setLevel(Level.WARNING);
+-	    Handler[] handlers = LOG.getParent().getHandlers();
+-	    if (handlers[0] instanceof ConsoleHandler) {
+-	    	((ConsoleHandler) handlers[0]).setFormatter(new Formatter() {
+-	    		@Override public String format(LogRecord record) {
+-	    			return String.format("%s|%s: %s\n", record.getLevel(), record.getLoggerName(), record.getMessage());
+-	    		}
+-	    	});
+-	    }
+-		
+-		try {
+-			master = new Connection(); 
+-			master.connect("localhost", 11345);
+-			server = new Connection();
+-			server.serve(this);
+-		
+-			initializeConnection();
+-		} catch (SocketException e ) {
+-			LOG.severe("Socket error: " + e);
+-			return;
+-		} catch (UnknownHostException e ) {
+-			LOG.severe("Invalid Host");
+-			return;
+-		} catch (IOException e ) {
+-			LOG.severe("I/O error: " + e);
+-			LOG.severe(e.getStackTrace().toString());
+-			return;
+-		}
++	}
++
++	public void waitForConnection() throws IOException, InterruptedException {
++		server.serve(this);
++		master.connectAndWait("localhost", 11345);
++		initializeConnection();
+ 		
+ 		new Thread(this).start();
+ 	}
+@@ -120,7 +106,7 @@ public class Node implements Runnable, ServerCallback {
+ 
+ 	@Override
+ 	public void run() {
+-		try	{
++		try {
+ 			while (true) {
+ 				Packet packet = master.read();
+ 				if (packet == null) {
+diff --git a/simulation/SimDS/src/main/java/edu/wpi/first/wpilibj/simulation/ds/Main.java b/simulation/SimDS/src/main/java/edu/wpi/first/wpilibj/simulation/ds/Main.java
+index 8a7d2c1d467508c6bf0d3ba282c864ce7ddbdcc4..5df887ccc36742e96e023069b5066e5979f2d052 100644
+--- a/simulation/SimDS/src/main/java/edu/wpi/first/wpilibj/simulation/ds/Main.java
++++ b/simulation/SimDS/src/main/java/edu/wpi/first/wpilibj/simulation/ds/Main.java
+@@ -3,13 +3,21 @@ package edu.wpi.first.wpilibj.simulation.ds;
+ import org.gazebosim.transport.Node;
+ 
+ public class Main {
+-    public static void main(String args[]) {
+-    	Node node = new Node("frc");
+-    	JoystickProvider provider = new JoystickProvider();
+-        @SuppressWarnings("unused")
++	public static void main(String args[]) {
++		Node node = new Node("frc");
++		try {
++			node.waitForConnection();
++		} catch (Throwable thr) {
++			System.err.println("Could not connect to Gazebo.");
++			thr.printStackTrace();
++			System.exit(1);
++			return;
++		}
++
++		JoystickProvider provider = new JoystickProvider();
+ 		DS ds = new DS(provider);
+-        ds.advertise(node);
+-        
++		ds.advertise(node);
++
+ 		while (true) {
+ 			ds.publish();
+ 			for (int i = 0; i < provider.getJoysticks().size(); i++) {
+@@ -25,5 +33,5 @@ public class Main {
+ 				e.printStackTrace();
+ 			}
+ 		}
+-    }
++	}
+ }
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotBase.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+index 2743bff1082eda29374de6e0ea2a3b138b237d71..9742fd1bdeb11acf421b71e689b180a1d0abaaaa 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+@@ -12,6 +12,8 @@ import java.net.URL;
+ import java.util.Enumeration;
+ import java.util.jar.Manifest;
+ 
++import edu.wpi.first.wpilibj.simulation.MainNode;
++
+ import edu.wpi.first.wpilibj.networktables.NetworkTable;
+ 
+ /**
+@@ -175,9 +177,18 @@ public abstract class RobotBase {
+      * the robot.
+      * @throws javax.microedition.midlet.MIDletStateChangeException
+      */
+-    public static void main(String args[]) { // TODO: expose main to teams?{
++    public static void main(String args[]) { // TODO: expose main to teams?
+         boolean errorOnExit = false;
+ 
++        try {
++            MainNode.openGazeboConnection();
++        } catch (Throwable e) {
++            System.err.println("Could not connect to Gazebo.");
++            e.printStackTrace();
++            System.exit(1);
++            return;
++        }
++
+         ds = DriverStation.getInstance();
+ 
+ 		String robotName = "";
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/simulation/MainNode.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/simulation/MainNode.java
+index 1fba8f9cca589580f2fe10fb323ba148713bd465..0f937d4130b9de84af70274564682ee92ca97278 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/simulation/MainNode.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/simulation/MainNode.java
+@@ -1,5 +1,8 @@
+ package edu.wpi.first.wpilibj.simulation;
+ 
++import java.io.IOException;
++import java.util.logging.Logger;
++
+ import org.gazebosim.transport.Node;
+ import org.gazebosim.transport.Publisher;
+ import org.gazebosim.transport.Subscriber;
+@@ -7,27 +10,34 @@ import org.gazebosim.transport.SubscriberCallback;
+ 
+ import com.google.protobuf.Message;
+ 
+-public class MainNode{
+-	private Node main;
+-	
++public class MainNode {
++
+ 	private MainNode() {
+-		main = new Node("frc");
+ 	}
+-	
+-	private static MainNode instance;
+-	public static MainNode getInstance() {
+-		if (instance == null) {
+-			instance = new MainNode();
++
++	private static final Logger LOG = Logger.getLogger("Simulation MainNode");
++	private static Node mainNode;
++
++	public static synchronized void openGazeboConnection() throws IOException, InterruptedException {
++		if (mainNode != null) {
++			LOG.warning("MainNode.openGazeboConnection() was already called!");
++			return;
+ 		}
+-		return instance;
++		mainNode = new Node("frc");
++		mainNode.waitForConnection();
+ 	}
+-	
++
+ 	public static <T extends Message> Publisher<T> advertise(String topic, T defaultMessage) {
+-		return getInstance().main.advertise(topic, defaultMessage);
++		if (mainNode == null) {
++			throw new IllegalStateException("MainNode.openGazeboConnection() should have already been called by RobotBase.main()!");
++		}
++		return mainNode.advertise(topic, defaultMessage);
+ 	}
+ 
+-	public static <T extends Message> Subscriber<T>
+-			subscribe(String topic, T defaultMessage, SubscriberCallback<T> cb) {
+-		return getInstance().main.subscribe(topic, defaultMessage, cb);
++	public static <T extends Message> Subscriber<T> subscribe(String topic, T defaultMessage, SubscriberCallback<T> cb) {
++		if (mainNode == null) {
++			throw new IllegalStateException("MainNode.openGazeboConnection() should have already been called by RobotBase.main()!");
++		}
++		return mainNode.subscribe(topic, defaultMessage, cb);
+ 	}
+ }

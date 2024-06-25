@@ -1,0 +1,118 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Tue, 11 Nov 2014 09:15:46 -0500
+Subject: [PATCH 0467/6262] Fix all the samples to build with the C++11/14
+ language features (constexpr)
+
+---
+ .../resources/templates/.cproject                         | 1 +
+ .../templates/examples/GearsBot/src/Subsystems/Elevator.h | 2 +-
+ .../templates/examples/GearsBot/src/Subsystems/Wrist.h    | 2 +-
+ .../examples/PacGoat/src/Commands/DriveForward.h          | 4 ++--
+ .../templates/examples/PacGoat/src/Subsystems/Collector.h | 6 +++---
+ .../templates/examples/PacGoat/src/Subsystems/Pivot.h     | 8 ++++----
+ .../examples/PacGoat/src/Subsystems/Pneumatics.h          | 2 +-
+ 7 files changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index 52d91df0f1bc0e4f5fe9f40681f2b29bca247f57..2285430ee3fde688e67da5b5a2b93761016ba883 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -28,6 +28,7 @@
+ 								<option id="gnu.cpp.compiler.option.debugging.level.969129918" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+ 								<option id="gnu.cpp.compiler.option.include.paths.394786621" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+ 									<listOptionValue builtIn="false" value="&quot;${WPILIB}/cpp/current/include&quot;"/>
++									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+ 								</option>
+ 								<option id="gnu.cpp.compiler.option.dialect.std.1060340803" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
+ 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1033680971" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/Elevator.h b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/Elevator.h
+index 449c1586138fa10c12d8ebc8ef447b675738c67a..d079de03b5c9e6f7d629d0b55bd1f8f01456aae1 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/Elevator.h
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/Elevator.h
+@@ -13,7 +13,7 @@ private:
+     SpeedController* motor;
+     Potentiometer* pot;
+ 
+-    static const double kP_real = 4, kI_real = 0.07,
++    static constexpr double kP_real = 4, kI_real = 0.07,
+             			kP_simulation = 18, kI_simulation = 0.2;
+ 
+ public:
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/Wrist.h b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/Wrist.h
+index b8fb28e830eb353b3b7f2396e6737477bbd36a64..e80364e7cd9a8bea052c400e4214d21c924f3180 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/Wrist.h
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/Wrist.h
+@@ -13,7 +13,7 @@ private:
+ 	SpeedController* motor;
+     Potentiometer* pot; // TODO: Make Potentiometer
+ 
+-    static const double kP_real = 1, kP_simulation = 0.05;
++    static constexpr double kP_real = 1, kP_simulation = 0.05;
+ 
+ public:
+     Wrist();
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveForward.h b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveForward.h
+index 267c752ca0a472e526b57417b38bc2bcf35141c0..bf069547d74546c01959f4d8b93a580453f60ed2 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveForward.h
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveForward.h
+@@ -12,8 +12,8 @@ private:
+ 	double driveForwardSpeed;
+ 	double distance;
+ 	double error;
+-	static const double TOLERANCE = .1;
+-	static const double KP = -1.0 / 5.0;
++	static constexpr double TOLERANCE = .1;
++	static constexpr double KP = -1.0 / 5.0;
+ 	void init(double dist, double maxSpeed);
+ public:
+ 	DriveForward();
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Collector.h b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Collector.h
+index b84282422bd6a0ab1f7df70ab3abf6e2f67f92b0..8b0e4c011774bab772d075591e83e83268f72dc9 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Collector.h
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Collector.h
+@@ -13,9 +13,9 @@ class Collector: public Subsystem
+ {
+ public:
+ 	// Constants for some useful speeds
+-	static const double FORWARD = 1;
+-	static const double STOP = 0;
+-	static const double REVERSE = -1;
++	static constexpr double FORWARD = 1;
++	static constexpr double STOP = 0;
++	static constexpr double REVERSE = -1;
+ 
+ private:
+ 	// Subsystem devices
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pivot.h b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pivot.h
+index 177cb373be039ee7fa580a85fc81b756075d27e1..086e7b7f8336b20e79aaf313c7ebd3003d982f23 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pivot.h
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pivot.h
+@@ -12,10 +12,10 @@ class Pivot: public PIDSubsystem
+ {
+ public:
+ 	// Constants for some useful angles
+-	static const double COLLECT = 105;
+-	static const double LOW_GOAL = 90;
+-	static const double SHOOT = 45;
+-	static const double SHOOT_NEAR = 30;
++	static constexpr double COLLECT = 105;
++	static constexpr double LOW_GOAL = 90;
++	static constexpr double SHOOT = 45;
++	static constexpr double SHOOT_NEAR = 30;
+ 
+ private:
+ 	// Subsystem devices
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pneumatics.h b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pneumatics.h
+index bac0c16f21348048d65dd009240ac4fcf859bc53..f66913eed25bc0089d30a8a59ed3c9be8e9ac607 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pneumatics.h
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pneumatics.h
+@@ -17,7 +17,7 @@ private:
+ 		Compressor* compressor;
+ 	#endif
+ 
+-	static const double MAX_PRESSURE = 2.55;
++	static constexpr double MAX_PRESSURE = 2.55;
+ 
+ public:
+ 	Pneumatics();

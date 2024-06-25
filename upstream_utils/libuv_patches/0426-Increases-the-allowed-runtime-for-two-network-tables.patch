@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Tue, 29 Jul 2014 17:52:43 -0400
+Subject: [PATCH 0426/6262] Increases the allowed runtime for two network
+ tables tests
+
+This test has been causing the build system to fail to build occasionally
+Tested 15 times with 0% failure rate
+
+Change-Id: I8d335b368d95060630b1cd47926e5ba0898e78b7
+---
+ .../wpi/first/wpilibj/networktables2/stream/SocketTest.java   | 4 ++--
+ .../networktables2/thread/DefaultThreadManagerTest.java       | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/stream/SocketTest.java b/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/stream/SocketTest.java
+index 36cf2724f4619e7fd5f82a1408d8c94624d0961d..fb02086a72b15718eccec780dbd32b3907d1dced 100644
+--- a/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/stream/SocketTest.java
++++ b/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/stream/SocketTest.java
+@@ -19,9 +19,9 @@ public class SocketTest {
+ 	}};
+ 
+ 
+-	@Test(timeout=1000)
++	@Test(timeout=1500)
+ 	public void testSingleSocketConnection() throws Throwable {
+-		doSocketTest(1, 500, 1000, SocketStreams.newStreamProvider(10111), SocketStreams.newStreamFactory("localhost", 10111));
++		doSocketTest(1, 500, 1500, SocketStreams.newStreamProvider(10111), SocketStreams.newStreamFactory("localhost", 10111));
+ 	}
+ 	@Test(timeout=2500)
+ 	public void testManySocketConnection() throws Throwable {
+diff --git a/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/thread/DefaultThreadManagerTest.java b/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/thread/DefaultThreadManagerTest.java
+index 8a78f178c5fd8e0a59027086dc9978cea02f7d29..0bc3a491ea0ca948ea2b546faebf168e2e8864fb 100644
+--- a/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/thread/DefaultThreadManagerTest.java
++++ b/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/thread/DefaultThreadManagerTest.java
+@@ -10,7 +10,7 @@ import org.junit.*;
+ 
+ public class DefaultThreadManagerTest {
+ 	volatile Throwable exception = null;
+-	@Test(timeout=300)
++	@Test(timeout=400)
+ 	public void testConcurrentThreads() throws Throwable {
+ 		final int numCounts = 10;
+ 		final int numThreads = 10;

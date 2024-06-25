@@ -1,0 +1,94 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Thu, 2 Oct 2014 13:56:15 -0400
+Subject: [PATCH 0384/6262] Add a Motor Controller example java program
+
+Change-Id: I7b0a7622fbf4cbe2ef541088bbe521d4cac9aa22
+---
+ .../org/usfirst/frc/team190/robot/Robot.java  | 45 +++++++++++++++++++
+ .../resources/templates/examples/examples.xml | 20 +++++++++
+ 2 files changed, 65 insertions(+)
+ create mode 100755 eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java
+new file mode 100755
+index 0000000000000000000000000000000000000000..8050216637a306fe644dd92e3c54c61f56bcf800
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java
+@@ -0,0 +1,45 @@
++
++package org.usfirst.frc.team190.robot;
++
++
++import edu.wpi.first.wpilibj.Joystick;
++import edu.wpi.first.wpilibj.SpeedController;
++import edu.wpi.first.wpilibj.Talon;
++import edu.wpi.first.wpilibj.SampleRobot;
++import edu.wpi.first.wpilibj.Timer;
++
++/**
++ * This sample program shows how to control a motor using a joystick. In the operator
++ * control part of the program, the joystick is read and the value is written to the motor.
++ *
++ * Joystick analog values range from -1 to 1 and speed controller inputs also range from -1
++ * to 1 making it easy to work together. The program also delays a short time in the loop
++ * to allow other threads to run. This is generally a good idea, especially since the joystick
++ * values are only transmitted from the Driver Station once every 20ms.
++ */
++public class Robot extends SampleRobot {
++	
++    private SpeedController motor;	// the motor to directly control with a joystick
++    private Joystick stick;
++
++	private final double k_updatePeriod = 0.005; // update every 0.005 seconds/5 milliseconds (200Hz)
++
++    public Robot() {
++        motor = new Talon(0);		// initialize the motor as a Talon on channel 0
++        stick = new Joystick(0);	// initialize the joystick on port 0
++    }
++
++    /**
++     * Runs the motor from a joystick.
++     */
++    public void operatorControl() {
++        while (isOperatorControl()) {
++        	// Set the motor's output.
++        	// This takes a number from -1 (100% speed in reverse) to +1 (100% speed going forward)
++        	motor.set(stick.getY());
++        	
++            Timer.delay(k_updatePeriod);	// wait 5ms to the next update
++        }
++        
++    }
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
+index e6ff145b3a21df370b79e206d5898d8c7ff89a87..18f4a839796e80ea23456142ba31a8636066771d 100755
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
+@@ -116,6 +116,26 @@
+   </files>
+   </example>
+ 
++
++ <example>
++  <name>Motor Controller</name>
++  <description>Demonstrate controlling a single motor with a joystick</description>
++  <tags>
++    <tag>Actuators</tag>
++    <tag>Complete List</tag>
++    <tag>Joystick</tag>
++    <tag>Robot and Motor</tag>
++  </tags>
++  <packages>
++    <package>src/$package-dir</package>
++  </packages>
++  <files>
++    <file source="examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java"
++      destination="src/$package-dir/Robot.java"></file>
++  </files>
++  </example>
++
++
+   <tagDescription>
+     <name>CommandBased Robot</name>
+     <description>Examples for CommandBased robot programs.</description>

@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Sat, 7 Jun 2014 16:03:05 -0400
+Subject: [PATCH 0083/6262] Fixes the Preferences putting the preferences in a
+ file 'file:' and instead puts it in the root directory [artf2566]
+
+Change-Id: If532542f1a746bff6b34c9d92462cd1722b4ff05
+---
+ .../src/main/java/edu/wpi/first/wpilibj/Preferences.java        | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Preferences.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Preferences.java
+index 4893b55a9c11f2640001cef40270c4ec25e76e52..fac58153b80b4237b677b95aa6e3f85b88d91ee3 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Preferences.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Preferences.java
+@@ -53,7 +53,7 @@ public class Preferences {
+     /**
+      * The file to save to
+      */
+-    private static final String FILE_NAME = "file:///wpilib-preferences.ini";
++    private static final String FILE_NAME = "wpilib-preferences.ini";
+     /**
+      * The characters to put between a field and value
+      */

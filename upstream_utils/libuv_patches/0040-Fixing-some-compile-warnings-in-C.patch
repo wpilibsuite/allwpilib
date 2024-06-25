@@ -1,0 +1,160 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Fri, 2 May 2014 17:52:49 -0400
+Subject: [PATCH 0040/6262] Fixing some compile warnings in C++
+
+--HG--
+extra : source : 84601b0b128cb508e13a1ae23fd648acc52990c8
+---
+ arm-toolchain.cmake                   |  2 +-
+ hal/lib/Athena/Digital.cpp            |  2 +-
+ wpilibc/lib/ADXL345_I2C.cpp           |  2 +-
+ wpilibc/lib/ADXL345_SPI.cpp           |  2 +-
+ wpilibc/lib/Commands/PrintCommand.cpp |  2 +-
+ wpilibc/lib/Error.cpp                 |  2 +-
+ wpilibc/lib/SafePWM.cpp               |  2 +-
+ wpilibc/lib/Timer.cpp                 | 12 ------------
+ wpilibc/lib/Utility.cpp               |  8 ++++----
+ 9 files changed, 11 insertions(+), 23 deletions(-)
+
+diff --git a/arm-toolchain.cmake b/arm-toolchain.cmake
+index 6835466c9169c75604faf455b908f0e5f096cc1c..c660be37374436c513490c599e6b2e536ac1587c 100644
+--- a/arm-toolchain.cmake
++++ b/arm-toolchain.cmake
+@@ -4,7 +4,7 @@ set(ARM_PREFIX arm-none-linux-gnueabi)
+ set(CMAKE_SYSTEM_NAME Linux)
+ CMAKE_FORCE_CXX_COMPILER(${ARM_PREFIX}-g++ GNU)
+ CMAKE_FORCE_C_COMPILER(${ARM_PREFIX}-gcc GNU)
+-set(CMAKE_CXX_FLAGS "-march=armv7-a -mcpu=cortex-a9 -mfloat-abi=softfp -Wall" CACHE STRING "" FORCE)
++set(CMAKE_CXX_FLAGS "-march=armv7-a -mcpu=cortex-a9 -mfloat-abi=softfp -Wall -Wno-psabi" CACHE STRING "" FORCE)
+ set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3" CACHE STRING "" FORCE)
+ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g" CACHE STRING "" FORCE) # still want debugging for release?
+ SET(CMAKE_FIND_ROOT_PATH $ENV{USER_HOME}/wpilib/toolchains/arm-none-linux-gnueabi-4.4.1/arm-none-linux-gnueabi/libc)
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index 7c61cdcb0d1ed75e065c614fb11c9cac8d35764f..a6ecdb926abb0227a5c65f59ac1071e9f07d3c88 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -1464,7 +1464,7 @@ bool hadSPIReceiveOverflow(void* spi_pointer, int32_t *status) {
+   return false;
+ }
+ void writeSPI(void* spi_pointer, uint32_t data, int32_t *status) {}
+-uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status) {}
++uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status) {return 0;}
+ void resetSPI(void* spi_pointer, int32_t *status) {}
+ void clearSPIReceivedData(void* spi_pointer, int32_t *status) {}
+ 
+diff --git a/wpilibc/lib/ADXL345_I2C.cpp b/wpilibc/lib/ADXL345_I2C.cpp
+index f0ddb10db2b524891e973debf399589a286121ee..e9c3640cc21baa3400da8244a14a30ab6e725ac6 100644
+--- a/wpilibc/lib/ADXL345_I2C.cpp
++++ b/wpilibc/lib/ADXL345_I2C.cpp
+@@ -73,7 +73,7 @@ double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis)
+  */
+ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations()
+ {
+-	AllAxes data = {0.0};
++	AllAxes data = AllAxes();
+ 	int16_t rawData[3];
+ 	if (m_i2c)
+ 	{
+diff --git a/wpilibc/lib/ADXL345_SPI.cpp b/wpilibc/lib/ADXL345_SPI.cpp
+index 26569f110173a7d44209ebba5cd678da2e457dfd..92d6506dbe4a799d9a20068359e8573fc3eeaf6c 100644
+--- a/wpilibc/lib/ADXL345_SPI.cpp
++++ b/wpilibc/lib/ADXL345_SPI.cpp
+@@ -157,7 +157,7 @@ double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis)
+  */
+ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations()
+ {
+-	AllAxes data = {0.0};
++	AllAxes data = AllAxes();
+ 	int16_t rawData[3];
+ 	if (m_spi)
+ 	{
+diff --git a/wpilibc/lib/Commands/PrintCommand.cpp b/wpilibc/lib/Commands/PrintCommand.cpp
+index 4a84996509bec756b6973b29982bb568d61cfea5..646db72b124675d3d87c5ff7dded26b12bedbe99 100644
+--- a/wpilibc/lib/Commands/PrintCommand.cpp
++++ b/wpilibc/lib/Commands/PrintCommand.cpp
+@@ -16,7 +16,7 @@ PrintCommand::PrintCommand(const char *message) :
+ 
+ void PrintCommand::Initialize()
+ {
+-	printf(m_message.c_str());
++	printf("%s", m_message.c_str());
+ }
+ 
+ void PrintCommand::Execute()
+diff --git a/wpilibc/lib/Error.cpp b/wpilibc/lib/Error.cpp
+index 2b5488e78a3a1d9f54bf79ca6a01574100dd42df..2e9c9ab72329156589d277dd1c5981e368c90106 100644
+--- a/wpilibc/lib/Error.cpp
++++ b/wpilibc/lib/Error.cpp
+@@ -85,7 +85,7 @@ void Error::Report()
+ 		snprintf(error, 256, "%s: status = %d (0x%08X) %s ...in %s() in %s at line %d\n",
+ 				m_code < 0 ? "ERROR" : "WARNING", (int32_t)m_code, (uint32_t)m_code, m_message.c_str(),
+ 				m_function.c_str(), m_filename.c_str(), m_lineNumber);
+-		sprintf(error_with_code,"<Code>%ld %s", (int32_t)m_code, error);
++		sprintf(error_with_code,"<Code>%d %s", (int32_t)m_code, error);
+ 	} else {
+ 		snprintf(error, 256, "ERROR: %s ...in %s() in %s at line %d\n", m_message.c_str(),
+ 				m_function.c_str(), m_filename.c_str(), m_lineNumber);
+diff --git a/wpilibc/lib/SafePWM.cpp b/wpilibc/lib/SafePWM.cpp
+index aedf0b6ba90034ad36e079fbab3102755cc2065a..8cecab654b1ea94df4148941d59c27d46393f74f 100644
+--- a/wpilibc/lib/SafePWM.cpp
++++ b/wpilibc/lib/SafePWM.cpp
+@@ -100,7 +100,7 @@ bool SafePWM::IsSafetyEnabled()
+ 
+ void SafePWM::GetDescription(char *desc)
+ {
+-	sprintf(desc, "PWM %ld on module %ld", GetChannel(), GetModuleNumber());
++	sprintf(desc, "PWM %d on module %d", GetChannel(), GetModuleNumber());
+ }
+ 
+ /**
+diff --git a/wpilibc/lib/Timer.cpp b/wpilibc/lib/Timer.cpp
+index 1a4504e31553f659781cd086ab4e4eb624faa137..fc0b1dd568dd178f353cebf2b49006d94df10430 100644
+--- a/wpilibc/lib/Timer.cpp
++++ b/wpilibc/lib/Timer.cpp
+@@ -188,15 +188,3 @@ extern "C"
+ 	uint32_t niTimestamp32(void);
+ 	uint64_t niTimestamp64(void);
+ }
+-
+-/*
+- * Return the PowerPC timestamp since boot in seconds.
+- * 
+- * This is lower overhead than GetFPGATimestamp() but not synchronized with other FPGA timestamps.
+- * @returns Robot running time in seconds.
+- */
+-double Timer::GetPPCTimestamp()
+-{
+-	// PPC system clock is 33MHz
+-	// XXX: return niTimestamp64() / 33.0e6;
+-}
+diff --git a/wpilibc/lib/Utility.cpp b/wpilibc/lib/Utility.cpp
+index 25f5595c5966d9aa7d5b975cea0ebfc015a49d7c..bcd632f170d3495a2c24c7f95d556f221999a405 100644
+--- a/wpilibc/lib/Utility.cpp
++++ b/wpilibc/lib/Utility.cpp
+@@ -66,10 +66,10 @@ bool wpi_assert_impl(bool conditionValue,
+ 		// If an error message was specified, include it
+ 		// Build error string
+ 		if(message != NULL) {
+-			sprintf(error, "Assertion failed: \"%s\", \"%s\" failed in %s() in %s at line %ld\n", 
++			sprintf(error, "Assertion failed: \"%s\", \"%s\" failed in %s() in %s at line %dd\n", 
+ 							 message, conditionText, funcName, fileName, lineNumber);
+ 		} else {
+-			sprintf(error, "Assertion failed: \"%s\" in %s() in %s at line %ld\n", 
++			sprintf(error, "Assertion failed: \"%s\" in %s() in %s at line %dd\n", 
+ 							 conditionText, funcName, fileName, lineNumber);
+ 		}
+ 		
+@@ -102,10 +102,10 @@ void wpi_assertEqual_common_impl(int valueA,
+ 	// If an error message was specified, include it
+ 	// Build error string
+ 	if(message != NULL) {
+-		sprintf(error, "Assertion failed: \"%s\", \"%d\" %s \"%d\" in %s() in %s at line %ld\n", 
++		sprintf(error, "Assertion failed: \"%s\", \"%d\" %s \"%d\" in %s() in %s at line %d\n", 
+ 						 message, valueA, equalityType, valueB, funcName, fileName, lineNumber);
+ 	} else {
+-		sprintf(error, "Assertion failed: \"%d\" %s \"%d\" in %s() in %s at line %ld\n", 
++		sprintf(error, "Assertion failed: \"%d\" %s \"%d\" in %s() in %s at line %d\n", 
+ 						 valueA, equalityType, valueB, funcName, fileName, lineNumber);
+ 	}
+ 	

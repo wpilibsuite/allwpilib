@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@wpi.edu>
+Date: Sun, 20 Apr 2014 18:43:26 -0400
+Subject: [PATCH 0039/6262] Changed the build.xml files to write the
+ runjavaprogram and runcppprogram Still need to fix the debug c++, it has
+ references to java
+
+Change-Id: I89dce80c9ec9ad522079f7082303e5993a2b60d5
+---
+ .../src/main/resources/cpp-zip/ant/build.xml           |  4 +---
+ .../src/main/resources/java-zip/ant/build.xml          | 10 ++++++----
+ .../src/main/resources/java-zip/ant/runjavaprogram     |  6 ++++++
+ 3 files changed, 13 insertions(+), 7 deletions(-)
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/runjavaprogram
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+index 3627d1784bb74763883106aeacfd79c37936cb25..3a3248fdb6fd9c53266ce666d741de077bf1d563 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+@@ -109,7 +109,7 @@ ${md5.hal} usr/local/frc/lib/libHALAthena.so</echo>
+ 				</tarfileset>
+ 			</tar>
+ 			<gzip destfile="${wpilib.ant.dir}/control.tar.gz" src="${wpilib.ant.dir}/control.tar"/>
+-			<exec command="~\wpilib\toolchains\arm-none-linux-gnueabi-4.4.1\bin\arm-none-linux-gnueabi-ar -r ${opkg.name}_${cpp-sos}_${opkg.arch}.deb debian-binary control.tar.gz data.tar.gz" dir="${wpilib.ant.dir}"/>
++			<exec command="${wpilib.ant.dir}\..\..\..\toolchains\arm-none-linux-gnueabi-4.4.1\bin\arm-none-linux-gnueabi-ar -r ${opkg.name}_${cpp-sos}_${opkg.arch}.deb debian-binary control.tar.gz data.tar.gz" dir="${wpilib.ant.dir}"/>
+ 		    <scp file="${wpilib.ant.dir}/${opkg.name}_${cpp-sos}_${opkg.arch}.deb" todir="${username}@${target}:/tmp"
+ 				 password="${password}" trust="true"/>
+ 			<sshexec host="${target}"
+@@ -121,8 +121,6 @@ ${md5.hal} usr/local/frc/lib/libHALAthena.so</echo>
+ 	</if>
+     <scp file="${wpilib.ant.dir}/runcppprogram" todir="${username}@${target}:${deploy.dir}"
+ 	 password="${password}" trust="true"/>
+-    <scp file="${wpilib.ant.dir}/runjavaprogram" todir="${username}@${target}:${deploy.dir}"
+-	 password="${password}" trust="true"/>
+     <echo>[athena-deploy] Starting program.</echo>
+     <sshexec host="${target}"
+ 	     username="${username}"
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+index 3579f8352d602ea9a807bdffb7914a9cf4e041cd..610292a260a85130086f76a64e16c1e2101983e4 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+@@ -71,12 +71,14 @@
+     <echo>[athena-deploy] Copying code over.</echo>
+     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}"
+ 	 password="${password}" trust="true"/>
++    <scp file="${wpilib.ant.dir}/runjavaprogram" todir="${username}@${target}:${deploy.dir}"
++   password="${password}" trust="true"/>
+     <echo>[athena-deploy] Starting program.</echo>
+     <sshexec host="${target}"
+-	     username="${username}"
+-	     password="${password}"
+-	     trust="true"
+-	     command="${deploy.run.command}"/>
++       username="${username}"
++       password="${password}"
++       trust="true"
++       command="chmod a+x run*program; ${deploy.run.command}"/>
+   </target>
+ 
+   <target name="debug-deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running in debug mode.">
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/runjavaprogram b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/runjavaprogram
+new file mode 100644
+index 0000000000000000000000000000000000000000..272b38cd183cf808a96d69c6fd1aa6e52e7ab869
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/runjavaprogram
+@@ -0,0 +1,6 @@
++#. ./.profile
++killall java
++killall FRCUserProgram
++sleep 1
++nohup /usr/local/frc/JRE/bin/java -jar FRCUserProgram.jar
++#nohup /usr/local/frc/JRE/bin/java -Djna.library.path=$LD_LIBRARY_PATH -Xmx32M -jar FRCUserProgram.jar

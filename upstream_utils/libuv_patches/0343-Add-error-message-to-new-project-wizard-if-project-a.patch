@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Mon, 8 Sep 2014 14:51:37 -0400
+Subject: [PATCH 0343/6262] Add error message to new project wizard if project
+ already exists
+
+Change-Id: Ifeeaf25954261ff2ba1287103f6ca2f8186aeee8
+---
+ .../plugins/core/wizards/ProjectCreationUtils.java     | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectCreationUtils.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectCreationUtils.java
+index 2f0cff61c60fe9835a5150444356363fbd489cbc..a42f801c23ce6f71fa9a464d2ca9f39844826b83 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectCreationUtils.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectCreationUtils.java
+@@ -21,6 +21,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
+ import org.eclipse.core.runtime.CoreException;
+ import org.eclipse.core.runtime.IPath;
+ import org.eclipse.core.runtime.Path;
++import org.eclipse.jface.dialogs.MessageDialog;
++import org.eclipse.swt.widgets.Display;
+ 
+ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+ 
+@@ -79,8 +81,14 @@ public class ProjectCreationUtils {
+ 			} catch (CoreException e) {
+                 WPILibCore.logError("Can't create new project.", e);
+ 			}
++		}else {
++			Display.getDefault().syncExec(new Runnable() {
++				@Override
++				public void run() {
++					MessageDialog.openError(Display.getDefault().getActiveShell(), "Error", "Error! A project of the same name already exists in the Workspace");
++				}
++			});
+ 		}
+-		
+ 		return newProject;
+ 	}
+ 

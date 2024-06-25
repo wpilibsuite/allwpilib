@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Fri, 26 Sep 2014 16:37:11 -0400
+Subject: [PATCH 0372/6262] Fix simulator builds (dh knows how to CMake)
+
+Change-Id: Id78d1d58d160a5f54d63aa91627cd406621d467b
+---
+ simulation/debs/Makefile                           |  9 +++++++--
+ .../frcsim-libwpilibsim-cpp/debian/rules           | 14 ++++++++------
+ 2 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/simulation/debs/Makefile b/simulation/debs/Makefile
+index 1cecab72e0c85e8342e64b864cdc33e8f56c04aa..49b71b767e373b7845d5b0b8371ee7223c3a1a28 100644
+--- a/simulation/debs/Makefile
++++ b/simulation/debs/Makefile
+@@ -133,13 +133,18 @@ frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolch
+ 
+ orig-frcsim-libwpilibsim-cpp: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz
+ pull-libwpilibsim-cpp:
+-	cp -rf -t frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/ $(allwpilib)/wpilibc/wpilibC++Sim/*
+ 	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib
+ 	cp -rf $(allwpilib)/hal frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib
+ 	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/networktables
+ 	cp -rf $(allwpilib)/networktables/cpp frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/networktables
+ 	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibc
+-	cp -r $(allwpilib)/wpilibc/wpilibC++ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibC++ 
++	cp -r $(allwpilib)/wpilibc/wpilibC++ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibc/wpilibC++
++	cp -r $(allwpilib)/wpilibc/wpilibC++Sim frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibc/wpilibC++Sim
++	echo 'cmake_minimum_required(VERSION 2.8)' > frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
++	echo 'project(WPILibSim)' >> frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
++	echo 'add_subdirectory(allwpilib/wpilibc/wpilibC++Sim)' >> frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
++
++	
+ 	echo Increment version?
+ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz: pull-libwpilibsim-cpp
+ 	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && debuild clean
+diff --git a/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/rules b/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/rules
+index f1e8a9d0a24da08941369067d302a8ce8d8413df..16d52217b143515169ed78abff585740ac23198c 100755
+--- a/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/rules
++++ b/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/rules
+@@ -1,11 +1,13 @@
+ #!/usr/bin/make -f
+-%:
+-	dh $@
+ 
+-override_dh_auto_build:
+-	$(MAKE) allwpilib=allwpilib
++# Uncomment this to turn on verbose mode.
++#export DH_VERBOSE=1
++
++export DH_OPTIONS
+ 
+-override_dh_auto_install:
+-	$(MAKE) DESTDIR=$$(pwd)/debian/frcsim-libwpilibsim-cpp allwpilib=allwpilib install
++export DESTDIR=$$(pwd)/debian/frcsim-libwpilibsim-cpp
++
++%:
++	dh $@
+ 
+ override_dh_strip:

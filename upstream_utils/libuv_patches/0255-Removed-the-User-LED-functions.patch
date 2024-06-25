@@ -1,0 +1,424 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Tue, 5 Aug 2014 10:35:00 -0400
+Subject: [PATCH 0255/6262] Removed the User LED functions
+
+There is no "User" LED on the RoboRIO, these functions didn't
+do anything.
+
+Change-Id: I8d2eaf0efde90cc444503a79f26d591ddaaa6322
+---
+ hal/include/HAL/HAL.hpp                       |  3 -
+ hal/lib/Athena/HAL.cpp                        | 21 ------
+ wpilibc/wpilibC++/include/Utility.h           |  6 --
+ wpilibc/wpilibC++/lib/Utility.cpp             | 69 -----------------
+ .../edu/wpi/first/wpilibj/hal/HALLibrary.java | 74 +++++++------------
+ 5 files changed, 25 insertions(+), 148 deletions(-)
+
+diff --git a/hal/include/HAL/HAL.hpp b/hal/include/HAL/HAL.hpp
+index efefe08006698885e0dcef331cf440dd689649c5..cdbd5a10487385116fa83d715a3a29514649ae13 100644
+--- a/hal/include/HAL/HAL.hpp
++++ b/hal/include/HAL/HAL.hpp
+@@ -280,9 +280,6 @@ extern "C"
+ 	uint32_t getFPGARevision(int32_t *status);
+ 	uint32_t getFPGATime(int32_t *status);
+ 
+-	void setFPGALED(uint32_t state, int32_t *status);
+-	int32_t getFPGALED(int32_t *status);
+-
+ 	bool getFPGAButton(int32_t *status);
+ 
+ 	int HALSetErrorData(const char *errors, int errorsLength, int wait_ms);
+diff --git a/hal/lib/Athena/HAL.cpp b/hal/lib/Athena/HAL.cpp
+index 49839a2ef3e5a3d585b32b652592f34323c5577f..63bc412bba3f7b91296138a859b4e7d539b5867f 100644
+--- a/hal/lib/Athena/HAL.cpp
++++ b/hal/lib/Athena/HAL.cpp
+@@ -102,27 +102,6 @@ uint32_t getFPGATime(int32_t *status)
+ 	return global->readLocalTime(status);
+ }
+ 
+-/**
+- * Set the state of the FPGA status LED on the cRIO.
+- */
+-void setFPGALED(uint32_t state, int32_t *status)
+-{
+-	// XXX: Not supported?
+-	// global->writeFPGA_LED(state, status);
+-}
+-
+-/**
+- * Get the current state of the FPGA status LED on the cRIO.
+- * @return The curent state of the FPGA LED.
+- */
+-int32_t getFPGALED(int32_t *status)
+-{
+-	// XXX: Not supported?
+-	// bool ledValue = global->readFPGA_LED(status);
+-	// return ledValue;
+-	return 0; // XXX: Dummy value
+-}
+-
+ /**
+  * Get the state of the "USER" button on the RoboRIO
+  * @return true if the button is currently pressed down
+diff --git a/wpilibc/wpilibC++/include/Utility.h b/wpilibc/wpilibC++/include/Utility.h
+index 115c30a9ceb622c2931606c0c1133f990513f52b..b81feb8639520347d3400533f3599f439318263d 100644
+--- a/wpilibc/wpilibC++/include/Utility.h
++++ b/wpilibc/wpilibC++/include/Utility.h
+@@ -27,10 +27,4 @@ uint16_t GetFPGAVersion();
+ uint32_t GetFPGARevision();
+ uint32_t GetFPGATime();
+ bool GetUserButton();
+-void SetRIOUserLED(uint32_t state);
+-int32_t GetRIOUserLED();
+-int32_t ToggleRIOUserLED();
+-void SetRIO_FPGA_LED(uint32_t state);
+-int32_t GetRIO_FPGA_LED();
+-int32_t ToggleRIO_FPGA_LED();
+ std::string GetStackTrace(uint32_t offset);
+diff --git a/wpilibc/wpilibC++/lib/Utility.cpp b/wpilibc/wpilibC++/lib/Utility.cpp
+index 43973f4764d5ebcd10bc3315e021dc9d8c8c98a8..e533537f69061c42d06ee3cb7483bf1bfde92992 100644
+--- a/wpilibc/wpilibC++/lib/Utility.cpp
++++ b/wpilibc/wpilibC++/lib/Utility.cpp
+@@ -202,14 +202,6 @@ uint32_t GetFPGATime()
+ 	return time;
+ }
+ 
+-// RT hardware access functions exported from ni_emb.out
+-extern "C"
+-{
+-	int32_t UserSwitchInput(int32_t nSwitch);
+-	int32_t LedInput(int32_t led);
+-	int32_t LedOutput(int32_t led, int32_t value);
+-}
+-
+ /**
+  * Get the state of the "USER" button on the RoboRIO
+  * @return true if the button is currently pressed down
+@@ -224,67 +216,6 @@ bool GetUserButton()
+ 	return value;
+ }
+ 
+-/**
+- * Set the state of the USER1 status LED on the cRIO.
+- */
+-void SetRIOUserLED(uint32_t state)
+-{
+-	LedOutput(0, state > 0);
+-}
+-
+-/**
+- * Get the current state of the USER1 status LED on the cRIO.
+- * @return The curent state of the USER1 LED.
+- */
+-int32_t GetRIOUserLED()
+-{
+-	return LedInput(0);
+-}
+-
+-/**
+- * Toggle the state of the USER1 status LED on the cRIO.
+- * @return The new state of the USER1 LED.
+- */
+-int32_t ToggleRIOUserLED()
+-{
+-	int32_t ledState = !GetRIOUserLED();
+-	SetRIOUserLED(ledState);
+-	return ledState;
+-}
+-
+-/**
+- * Set the state of the FPGA status LED on the cRIO.
+- */
+-void SetRIO_FPGA_LED(uint32_t state)
+-{
+-	int32_t status = 0;
+-	setFPGALED(state, &status);
+-	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
+-}
+-
+-/**
+- * Get the current state of the FPGA status LED on the cRIO.
+- * @return The curent state of the FPGA LED.
+- */
+-int32_t GetRIO_FPGA_LED()
+-{
+-	int32_t status = 0;
+-	int32_t state = getFPGALED(&status);
+-	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
+-	return state;
+-}
+-
+-/**
+- * Toggle the state of the FPGA status LED on the cRIO.
+- * @return The new state of the FPGA LED.
+- */
+-int32_t ToggleRIO_FPGA_LED()
+-{
+-	int32_t ledState = !GetRIO_FPGA_LED();
+-	SetRIO_FPGA_LED(ledState);
+-	return ledState;
+-}
+-
+ /**
+  * Demangle a C++ symbol, used for printing stack traces.
+  */
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/HALLibrary.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/HALLibrary.java
+index 84d07289db6d911d1f30cee8a3ae38b1704b2f6d..a030b39c4cb5c7dbff05641e68b1767380409a41 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/HALLibrary.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/HALLibrary.java
+@@ -125,7 +125,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Notifier.h:334</i><br>
+ 	 * @deprecated use the safer methods {@link #initializeNotifier(edu.wpi.first.wpilibj.hal.HALLibrary.initializeNotifier_ProcessQueue_callback, java.nio.IntBuffer)} and {@link #initializeNotifier(edu.wpi.first.wpilibj.hal.HALLibrary.initializeNotifier_ProcessQueue_callback, com.sun.jna.ptr.IntByReference)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native Pointer initializeNotifier(HALLibrary.initializeNotifier_ProcessQueue_callback ProcessQueue, IntByReference status);
+ 	/**
+ 	 * Original signature : <code>void* initializeNotifier(initializeNotifier_ProcessQueue_callback*, int32_t*)</code><br>
+@@ -137,7 +137,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Notifier.h:336</i><br>
+ 	 * @deprecated use the safer methods {@link #cleanNotifier(com.sun.jna.Pointer, java.nio.IntBuffer)} and {@link #cleanNotifier(com.sun.jna.Pointer, com.sun.jna.ptr.IntByReference)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native void cleanNotifier(Pointer notifier_pointer, IntByReference status);
+ 	/**
+ 	 * Original signature : <code>void cleanNotifier(void*, int32_t*)</code><br>
+@@ -149,7 +149,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Notifier.h:338</i><br>
+ 	 * @deprecated use the safer methods {@link #updateNotifierAlarm(com.sun.jna.Pointer, int, java.nio.IntBuffer)} and {@link #updateNotifierAlarm(com.sun.jna.Pointer, int, com.sun.jna.ptr.IntByReference)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native void updateNotifierAlarm(Pointer notifier_pointer, int triggerTime, IntByReference status);
+ 	/**
+ 	 * Original signature : <code>void updateNotifierAlarm(void*, uint32_t, int32_t*)</code><br>
+@@ -181,7 +181,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Semaphore.h:387</i><br>
+ 	 * @deprecated use the safer methods {@link #deleteMutex(edu.wpi.first.wpilibj.hal.HALLibrary.MUTEX_ID)} and {@link #deleteMutex(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native void deleteMutex(Pointer sem);
+ 	/**
+ 	 * Original signature : <code>void deleteMutex(MUTEX_ID)</code><br>
+@@ -193,7 +193,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Semaphore.h:389</i><br>
+ 	 * @deprecated use the safer methods {@link #takeMutex(edu.wpi.first.wpilibj.hal.HALLibrary.MUTEX_ID, int)} and {@link #takeMutex(com.sun.jna.Pointer, int)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native byte takeMutex(Pointer sem, int timeout);
+ 	/**
+ 	 * Original signature : <code>int8_t takeMutex(MUTEX_ID, int32_t)</code><br>
+@@ -205,7 +205,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Semaphore.h:391</i><br>
+ 	 * @deprecated use the safer methods {@link #giveMutex(edu.wpi.first.wpilibj.hal.HALLibrary.MUTEX_ID)} and {@link #giveMutex(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native byte giveMutex(Pointer sem);
+ 	/**
+ 	 * Original signature : <code>int8_t giveMutex(MUTEX_ID)</code><br>
+@@ -222,7 +222,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Semaphore.h:395</i><br>
+ 	 * @deprecated use the safer methods {@link #deleteSemaphore(edu.wpi.first.wpilibj.hal.HALLibrary.SEMAPHORE_ID)} and {@link #deleteSemaphore(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native void deleteSemaphore(Pointer sem);
+ 	/**
+ 	 * Original signature : <code>void deleteSemaphore(SEMAPHORE_ID)</code><br>
+@@ -234,7 +234,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Semaphore.h:397</i><br>
+ 	 * @deprecated use the safer methods {@link #takeSemaphore(edu.wpi.first.wpilibj.hal.HALLibrary.SEMAPHORE_ID, int)} and {@link #takeSemaphore(com.sun.jna.Pointer, int)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native byte takeSemaphore(Pointer sem, int timeout);
+ 	/**
+ 	 * Original signature : <code>int8_t takeSemaphore(SEMAPHORE_ID, int32_t)</code><br>
+@@ -246,7 +246,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Semaphore.h:399</i><br>
+ 	 * @deprecated use the safer methods {@link #giveSemaphore(edu.wpi.first.wpilibj.hal.HALLibrary.SEMAPHORE_ID)} and {@link #giveSemaphore(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native byte giveSemaphore(Pointer sem);
+ 	/**
+ 	 * Original signature : <code>int8_t giveSemaphore(SEMAPHORE_ID)</code><br>
+@@ -263,7 +263,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Semaphore.h:403</i><br>
+ 	 * @deprecated use the safer methods {@link #deleteMultiWait(edu.wpi.first.wpilibj.hal.HALLibrary.MULTIWAIT_ID)} and {@link #deleteMultiWait(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native void deleteMultiWait(Pointer sem);
+ 	/**
+ 	 * Original signature : <code>void deleteMultiWait(MULTIWAIT_ID)</code><br>
+@@ -275,7 +275,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Semaphore.h:405</i><br>
+ 	 * @deprecated use the safer methods {@link #takeMultiWait(edu.wpi.first.wpilibj.hal.HALLibrary.MULTIWAIT_ID, int)} and {@link #takeMultiWait(com.sun.jna.Pointer, int)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native byte takeMultiWait(Pointer sem, int timeout);
+ 	/**
+ 	 * Original signature : <code>int8_t takeMultiWait(MULTIWAIT_ID, int32_t)</code><br>
+@@ -287,7 +287,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Semaphore.h:407</i><br>
+ 	 * @deprecated use the safer methods {@link #giveMultiWait(edu.wpi.first.wpilibj.hal.HALLibrary.MULTIWAIT_ID)} and {@link #giveMultiWait(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native byte giveMultiWait(Pointer sem);
+ 	/**
+ 	 * Original signature : <code>int8_t giveMultiWait(MULTIWAIT_ID)</code><br>
+@@ -299,7 +299,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Task.h:420</i><br>
+ 	 * @deprecated use the safer methods {@link #spawnTask(java.nio.ByteBuffer, int, int, int, edu.wpi.first.wpilibj.hal.HALLibrary.FUNCPTR, int, int, int, int, int, int, int, int, int, int)} and {@link #spawnTask(com.sun.jna.Pointer, int, int, int, edu.wpi.first.wpilibj.hal.HALLibrary.FUNCPTR, int, int, int, int, int, int, int, int, int, int)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native HALLibrary.TASK spawnTask(Pointer name, int priority, int options, int stackSize, HALLibrary.FUNCPTR entryPt, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9);
+ 	/**
+ 	 * Original signature : <code>TASK spawnTask(char*, int, int, int, FUNCPTR, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t)</code><br>
+@@ -311,7 +311,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Task.h:422</i><br>
+ 	 * @deprecated use the safer methods {@link #restartTask(edu.wpi.first.wpilibj.hal.HALLibrary.TASK)} and {@link #restartTask(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int restartTask(Pointer task);
+ 	/**
+ 	 * Original signature : <code>STATUS restartTask(TASK)</code><br>
+@@ -323,7 +323,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Task.h:424</i><br>
+ 	 * @deprecated use the safer methods {@link #deleteTask(edu.wpi.first.wpilibj.hal.HALLibrary.TASK)} and {@link #deleteTask(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int deleteTask(Pointer task);
+ 	/**
+ 	 * Original signature : <code>STATUS deleteTask(TASK)</code><br>
+@@ -335,7 +335,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Task.h:426</i><br>
+ 	 * @deprecated use the safer methods {@link #isTaskReady(edu.wpi.first.wpilibj.hal.HALLibrary.TASK)} and {@link #isTaskReady(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int isTaskReady(Pointer task);
+ 	/**
+ 	 * Original signature : <code>STATUS isTaskReady(TASK)</code><br>
+@@ -347,7 +347,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Task.h:428</i><br>
+ 	 * @deprecated use the safer methods {@link #isTaskSuspended(edu.wpi.first.wpilibj.hal.HALLibrary.TASK)} and {@link #isTaskSuspended(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int isTaskSuspended(Pointer task);
+ 	/**
+ 	 * Original signature : <code>STATUS isTaskSuspended(TASK)</code><br>
+@@ -359,7 +359,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Task.h:430</i><br>
+ 	 * @deprecated use the safer methods {@link #suspendTask(edu.wpi.first.wpilibj.hal.HALLibrary.TASK)} and {@link #suspendTask(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int suspendTask(Pointer task);
+ 	/**
+ 	 * Original signature : <code>STATUS suspendTask(TASK)</code><br>
+@@ -371,7 +371,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Task.h:432</i><br>
+ 	 * @deprecated use the safer methods {@link #resumeTask(edu.wpi.first.wpilibj.hal.HALLibrary.TASK)} and {@link #resumeTask(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int resumeTask(Pointer task);
+ 	/**
+ 	 * Original signature : <code>STATUS resumeTask(TASK)</code><br>
+@@ -383,7 +383,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Task.h:434</i><br>
+ 	 * @deprecated use the safer methods {@link #verifyTaskID(edu.wpi.first.wpilibj.hal.HALLibrary.TASK)} and {@link #verifyTaskID(com.sun.jna.Pointer)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int verifyTaskID(Pointer task);
+ 	/**
+ 	 * Original signature : <code>STATUS verifyTaskID(TASK)</code><br>
+@@ -395,7 +395,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Task.h:436</i><br>
+ 	 * @deprecated use the safer methods {@link #setTaskPriority(edu.wpi.first.wpilibj.hal.HALLibrary.TASK, int)} and {@link #setTaskPriority(com.sun.jna.Pointer, int)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int setTaskPriority(Pointer task, int priority);
+ 	/**
+ 	 * Original signature : <code>STATUS setTaskPriority(TASK, int)</code><br>
+@@ -407,7 +407,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\Task.h:438</i><br>
+ 	 * @deprecated use the safer methods {@link #getTaskPriority(edu.wpi.first.wpilibj.hal.HALLibrary.TASK, java.nio.IntBuffer)} and {@link #getTaskPriority(com.sun.jna.Pointer, com.sun.jna.ptr.IntByReference)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int getTaskPriority(Pointer task, IntByReference priority);
+ 	/**
+ 	 * Original signature : <code>STATUS getTaskPriority(TASK, int*)</code><br>
+@@ -424,7 +424,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\HAL.h:452</i><br>
+ 	 * @deprecated use the safer methods {@link #getFPGAVersion(java.nio.IntBuffer)} and {@link #getFPGAVersion(com.sun.jna.ptr.IntByReference)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native short getFPGAVersion(IntByReference status);
+ 	/**
+ 	 * Original signature : <code>uint16_t getFPGAVersion(int32_t*)</code><br>
+@@ -436,7 +436,7 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\HAL.h:454</i><br>
+ 	 * @deprecated use the safer methods {@link #getFPGARevision(java.nio.IntBuffer)} and {@link #getFPGARevision(com.sun.jna.ptr.IntByReference)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int getFPGARevision(IntByReference status);
+ 	/**
+ 	 * Original signature : <code>uint32_t getFPGARevision(int32_t*)</code><br>
+@@ -448,37 +448,13 @@ public class HALLibrary /* implements Library */ {
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\HAL.h:456</i><br>
+ 	 * @deprecated use the safer methods {@link #getFPGATime(java.nio.IntBuffer)} and {@link #getFPGATime(com.sun.jna.ptr.IntByReference)} instead
+ 	 */
+-	//@Deprecated 
++	//@Deprecated
+ 	//public static native int getFPGATime(IntByReference status);
+ 	/**
+ 	 * Original signature : <code>uint32_t getFPGATime(int32_t*)</code><br>
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\HAL.h:456</i>
+ 	 */
+ 	//public static native int getFPGATime(IntBuffer status);
+-	/**
+-	 * Original signature : <code>void setFPGALED(uint32_t, int32_t*)</code><br>
+-	 * <i>native declaration : AthenaJava\target\native\include\HAL\HAL.h:458</i><br>
+-	 * @deprecated use the safer methods {@link #setFPGALED(int, java.nio.IntBuffer)} and {@link #setFPGALED(int, com.sun.jna.ptr.IntByReference)} instead
+-	 */
+-	//@Deprecated 
+-	//public static native void setFPGALED(int state, IntByReference status);
+-	/**
+-	 * Original signature : <code>void setFPGALED(uint32_t, int32_t*)</code><br>
+-	 * <i>native declaration : AthenaJava\target\native\include\HAL\HAL.h:458</i>
+-	 */
+-	public static native void setFPGALED(int state, IntBuffer status);
+-	/**
+-	 * Original signature : <code>int32_t getFPGALED(int32_t*)</code><br>
+-	 * <i>native declaration : AthenaJava\target\native\include\HAL\HAL.h:460</i><br>
+-	 * @deprecated use the safer methods {@link #getFPGALED(java.nio.IntBuffer)} and {@link #getFPGALED(com.sun.jna.ptr.IntByReference)} instead
+-	 */
+-	//@Deprecated 
+-	//public static native int getFPGALED(IntByReference status);
+-	/**
+-	 * Original signature : <code>int32_t getFPGALED(int32_t*)</code><br>
+-	 * <i>native declaration : AthenaJava\target\native\include\HAL\HAL.h:460</i>
+-	 */
+-	public static native int getFPGALED(IntBuffer status);
+ 	/**
+ 	 * Original signature : <code>double testDouble(double)</code><br>
+ 	 * <i>native declaration : AthenaJava\target\native\include\HAL\HAL.h:462</i>

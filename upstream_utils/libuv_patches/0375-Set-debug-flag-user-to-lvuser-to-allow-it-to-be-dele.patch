@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Mon, 29 Sep 2014 16:05:48 -0400
+Subject: [PATCH 0375/6262] Set debug flag user to lvuser to allow it to be
+ deleted (fixes artf3415)
+
+Change-Id: I8931427f447e2e0b443e4b6c82dddfe9d50ef553
+---
+ .../src/main/resources/java-zip/ant/build.properties         | 1 +
+ .../src/main/resources/java-zip/ant/build.xml                | 5 +++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties
+index defe2a137131a074dc0845907128158bad3035ba..7c0a0717c17d8fe9f3ecf2a9d3a3b8bcbee76f45 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties
+@@ -6,6 +6,7 @@ deploy.kill.command=. /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKill
+ deploy.log.file=/var/local/natinst/log/FRC_UserProgram.log
+ deploy.log.command=tail -F -n 0 ${deploy.log.file}
+ debug.flag.dir=/tmp/
++debug.flag.command=chown lvuser:ni ${debug.flag.dir}frcdebug
+ command.dir=/home/lvuser/
+ version=current
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+index 5a25af19555d472b4748f6b9ac59fa0419f8400e..d7249c3397be539e1f8f4ee46b662ab1ce650be0 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+@@ -92,6 +92,11 @@
+     <scp file="${wpilib.ant.dir}/robotDebugCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
+   	<!-- The frcdebug file is used as a flag for /usr/local/frc/bin/frcRunRobot.sh to run the robot program in debug mode -->
+   	<scp file="${wpilib.ant.dir}/frcdebug" todir="${username}@${target}:${debug.flag.dir}" password="${password}" trust="true"/>
++	<sshexec host="${target}"
++        username="${username}"
++        password="${password}"
++        trust="true"
++        command="${debug.flag.command}"/>
+ 
+     <echo>[athena-deploy] Starting Debug program.</echo>
+     <sshexec host="${target}"

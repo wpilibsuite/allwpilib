@@ -1,0 +1,196 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kacper Puczydlowski <k.puczydlowski@gmail.com>
+Date: Wed, 18 Jun 2014 16:35:00 -0400
+Subject: [PATCH 0111/6262] Changed the AnalogPot.cpp class, added AnalogPot
+ test for CPP
+
+Change-Id: Icd0eb15a8dd2f40f8c72df75ca877690c7659a42
+---
+ .../wpilibC++/include/AnalogPotentiometer.h   | 29 +++---------
+ wpilibc/wpilibC++/lib/AnalogPotentiometer.cpp | 45 +++++++++++++++----
+ .../src/AnalogPotentiometerTest.cpp           | 45 +++++++++++++++++++
+ 3 files changed, 89 insertions(+), 30 deletions(-)
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/AnalogPotentiometerTest.cpp
+
+diff --git a/wpilibc/wpilibC++/include/AnalogPotentiometer.h b/wpilibc/wpilibC++/include/AnalogPotentiometer.h
+index ae75bb0e2745c20b462f328d1005f3ddca6c2089..1a2658be8006f1ff69618045d250d0613b48815f 100644
+--- a/wpilibc/wpilibC++/include/AnalogPotentiometer.h
++++ b/wpilibc/wpilibC++/include/AnalogPotentiometer.h
+@@ -27,29 +27,13 @@ public:
+      * @param scale The scaling to multiply the voltage by to get a meaningful unit.
+      * @param offset The offset to add to the scaled value for controlling the zero value
+      */
+-    AnalogPotentiometer(int channel, double scale, double offset);
++    AnalogPotentiometer(int channel, double scale = 1.0, double offset = 0.0);
+ 
+-    /**
+-     * AnalogPotentiometer constructor.
+-     *
+-     * Use the scaling and offset values so that the output produces
+-     * meaningful values. I.E: you have a 270 degree potentiometer and
+-     * you want the output to be degrees with the halfway point as 0
+-     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
+-     * offset is -135.0 since the halfway point after scaling is 135
+-     * degrees.
+-     *
+-     * @param channel The analog channel this potentiometer is plugged into.
+-     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
+-     */
+-    AnalogPotentiometer(int channel, double scale);
++    AnalogPotentiometer(AnalogInput *input, double scale = 1.0, double offset = 0.0);
+ 
+-    /**
+-     * AnalogPotentiometer constructor.
+-     *
+-     * @param channel The analog channel this potentiometer is plugged into.
+-     */
+-    AnalogPotentiometer(int channel);
++    AnalogPotentiometer(AnalogInput &input, double scale = 1.0, double offset = 0.0);
++
++    virtual ~AnalogPotentiometer();
+ 
+     /**
+      * Get the current reading of the potentiomere.
+@@ -90,9 +74,10 @@ private:
+     double m_scale, m_offset;
+     AnalogInput* m_analog_input;
+     ITable* m_table;
++    bool m_init_analog_input;
+ 
+     /**
+      * Common initialization code called by all constructors.
+      */
+-    void initPot(int channel, double scale, double offset);
++    void initPot(AnalogInput *input, double scale, double offset);
+ };
+diff --git a/wpilibc/wpilibC++/lib/AnalogPotentiometer.cpp b/wpilibc/wpilibC++/lib/AnalogPotentiometer.cpp
+index df0cfdea4700952f812cb118aa4c6afdcaabd868..65e315e6270129a48d3b4e09c2da41994db61c08 100644
+--- a/wpilibc/wpilibC++/lib/AnalogPotentiometer.cpp
++++ b/wpilibc/wpilibC++/lib/AnalogPotentiometer.cpp
+@@ -1,38 +1,67 @@
+ 
+ #include "AnalogPotentiometer.h"
+ 
+-void AnalogPotentiometer::initPot(int channel, double scale, double offset) {
+-    m_channel = channel;
++/**
++ * Common initialization code called by all constructors.
++ */
++void AnalogPotentiometer::initPot(AnalogInput *input, double scale, double offset) {
++//    m_channel = channel;
+     m_scale = scale;
+     m_offset = offset;
+-    m_analog_input = new AnalogInput(channel);
++    m_analog_input = input;
+ }
+ 
+ AnalogPotentiometer::AnalogPotentiometer(int channel, double scale, double offset) {
+-    initPot(channel, scale, offset);
++    m_init_analog_input = true;
++    initPot(new AnalogInput(channel), scale, offset);
+ }
+ 
+-AnalogPotentiometer::AnalogPotentiometer(int channel, double scale) {
+-    initPot(channel, scale, 0);
++AnalogPotentiometer::AnalogPotentiometer(AnalogInput *input, double scale, double offset) {
++    m_init_analog_input = false;
++    initPot(input, scale, offset);
+ }
+ 
+-AnalogPotentiometer::AnalogPotentiometer(int channel) {
+-    initPot(channel, 1, 0);
++AnalogPotentiometer::AnalogPotentiometer(AnalogInput &input, double scale, double offset) {
++    m_init_analog_input = false;
++    initPot(&input, scale, offset);
+ }
+ 
++AnalogPotentiometer::~AnalogPotentiometer() {
++  if(m_init_analog_input){
++    delete m_analog_input;
++    m_init_analog_input = false;
++  }
++}
+ 
++/**
++ * Get the current reading of the potentiomere.
++ *
++ * @return The current position of the potentiometer.
++ */
+ double AnalogPotentiometer::Get() {
+     return m_analog_input->GetVoltage() * m_scale + m_offset;
+ }
+ 
++/**
++ * Implement the PIDSource interface.
++ *
++ * @return The current reading.
++ */
+ double AnalogPotentiometer::PIDGet() {
+     return Get();
+ }
+ 
++
++/**
++ * @return the Smart Dashboard Type
++ */
+ std::string AnalogPotentiometer::GetSmartDashboardType() {
+     return "Analog Input";
+ }
+ 
++/**
++ * Live Window code, only does anything if live window is activated.
++ */
+ void AnalogPotentiometer::InitTable(ITable *subtable) {
+     m_table = subtable;
+     UpdateTable();
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/AnalogPotentiometerTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/AnalogPotentiometerTest.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..063b9b2e1a630958c71b6dbd597d9d620425c4ad
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/AnalogPotentiometerTest.cpp
+@@ -0,0 +1,45 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "WPILib.h"
++#include "AnalogOutput.h"
++#include "TestBench.h"
++#include "gtest/gtest.h"
++
++static const double kScale = 54.0;
++static const double kVoltage = 3.33;
++static const double kAngle = 180.0;
++
++class AnalogPotentiometerTest : public testing::Test {
++protected:
++  AnalogOutput *m_fakePot;
++  AnalogPotentiometer *m_pot;
++
++  virtual void SetUp() {
++    m_fakePot = new AnalogOutput(TestBench::kAnalogOutputChannel);
++    m_pot = new AnalogPotentiometer(TestBench::kFakeAnalogOutputChannel,kScale);
++  }
++
++  virtual void TearDown() {
++    delete m_fakePot;
++    delete m_pot;
++  }
++};
++
++TEST_F(AnalogPotentiometerTest, TestInitialSettings) {
++  m_fakePot->SetVoltage(0.0);
++  Wait(0.1);
++  EXPECT_NEAR(0.0,m_pot->Get(),5.0)
++    <<"The potentiometer did not initialize to 0.";
++}
++
++TEST_F(AnalogPotentiometerTest,TestRangeValues) {
++  m_fakePot->SetVoltage(kVoltage);
++  Wait(0.1);
++  EXPECT_NEAR(kAngle, m_pot->Get(), 1.0)
++    << "The potentiometer did not measure the correct angle.";
++}

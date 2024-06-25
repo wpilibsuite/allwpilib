@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Malmsten <pmalmsten@gmail.com>
+Date: Sun, 23 Feb 2014 13:00:47 -0500
+Subject: [PATCH 0024/6262] Eclipse toolchain installer now preserves
+ executable bit on Linux
+
+Change-Id: I55fec21cf8a972c7e6f216fed0d4cf1287959ca6
+---
+ .../first/wpilib/plugins/core/installer/AbstractInstaller.java | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java
+index ac474b01736fcd785e579a0e705fa700b2f089ba..96fe0422bf355a9200bee680326c9c382aceb62d 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java
+@@ -105,7 +105,8 @@ public abstract class AbstractInstaller {
+ 		}
+ 			
+ 		installLocation.mkdirs();
+-		if (System.getProperty("os.name").startsWith("Mac OS X")) { // MACs are special...
++		final String osName = System.getProperty("os.name");
++		if (osName.startsWith("Mac OS X") || osName.startsWith("Linux")) { // Unix-like OSes must preserve the executable bit; call unzip
+ 			InputStream zip = getInstallResourceStream();
+ 			File tmpFile = File.createTempFile(getFeatureName()+"-", ".zip");
+ 			FileOutputStream fout = new FileOutputStream(tmpFile);

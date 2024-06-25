@@ -1,0 +1,385 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Tue, 12 Aug 2014 14:52:22 -0400
+Subject: [PATCH 0284/6262] Fix the example programs
+
+Remove the test examples that don't do anything helpful
+
+Fix the PacGoat and GearsBot examples to compile
+
+Change-Id: Ic11ca7a97a5b52524fe60dc24fcec6ecfae7ebb7
+---
+ .../GearsBot/src/Subsystems/DriveTrain.cpp    |  3 --
+ .../GearsBot/src/Subsystems/DriveTrain.h      |  1 -
+ .../examples/Network Table Counter/Robot.cpp  | 24 ---------
+ .../PacGoat/src/Commands/CheckForHotGoal.h    |  2 +-
+ .../src/Commands/DriveAndShootAutonomous.cpp  |  1 +
+ .../PacGoat/src/Subsystems/DriveTrain.cpp     |  2 -
+ .../examples/Simple Robot Example/Robot.java  | 17 -------
+ .../resources/templates/examples/examples.xml | 47 +++--------------
+ .../examples/Network Table Counter/Robot.java | 39 --------------
+ .../examples/Simple Robot Example/Robot.java  | 17 -------
+ .../resources/templates/examples/examples.xml | 51 +++----------------
+ 11 files changed, 16 insertions(+), 188 deletions(-)
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Network Table Counter/Robot.cpp
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Simple Robot Example/Robot.java
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/Network Table Counter/Robot.java
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/Simple Robot Example/Robot.java
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/DriveTrain.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/DriveTrain.cpp
+index 635308b72a676be838260c81b6e61879f1bdbfa1..ce6254c47aa006caae667112297ce6f1b2983ec8 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/DriveTrain.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/DriveTrain.cpp
+@@ -26,9 +26,6 @@ DriveTrain::DriveTrain() : Subsystem("DriveTrain") {
+ 		right_encoder->SetDistancePerPulse((double) (4.0/12.0*M_PI) / 360.0);
+ 	#endif
+ 
+-	left_encoder->Start();
+-	right_encoder->Start();
+-
+ 	rangefinder = new AnalogInput(6);
+ 	gyro = new Gyro(1);
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/DriveTrain.h b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/DriveTrain.h
+index 146747164611e08bc3c2b4d6805af55ae9ebf663..19aae19138fad10da3c9296b5984ec8db835519a 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/DriveTrain.h
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/Subsystems/DriveTrain.h
+@@ -1,7 +1,6 @@
+ #ifndef DriveTrain_H
+ #define DriveTrain_H
+ 
+-#include "Commands/Subsystem.h"
+ #include "WPILib.h"
+ 
+ /**
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Network Table Counter/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Network Table Counter/Robot.cpp
+deleted file mode 100644
+index 41a0274a84c47f27787d213a8064bf1d9d3561f9..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Network Table Counter/Robot.cpp	
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#include <networktables/NetworkTable.h>
+-#include <iostream>
+-using namespace std;
+-
+-// This is a simple robot program
+-int main()
+-{
+-	NetworkTable::SetServerMode();
+-	NetworkTable::SetTeam(190);
+-	NetworkTable* table = NetworkTable::GetTable("SmartDashboard");
+-	cout << "Started up" << endl;
+-
+-	long i = 0;
+-	while (true)
+-	{
+-		cout << i << endl;
+-		table->PutNumber("i", i);
+-		i++;
+-
+-		sleep(1);
+-	}
+-
+-	return 0;
+-}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/CheckForHotGoal.h b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/CheckForHotGoal.h
+index 8fbbe08162c4b6586d66f246f5e561f1e36a0573..d069045d4456463f60daf949293b4604abe77e79 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/CheckForHotGoal.h
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/CheckForHotGoal.h
+@@ -9,7 +9,7 @@
+  * points than get none. When called sequentially, this command will block until
+  * the hot goal is detected or until it is timed out.
+  */
+-class CheckForHotGoal : Command {
++class CheckForHotGoal : public Command {
+ public:
+ 	CheckForHotGoal(double time);
+ 	void Initialize();
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveAndShootAutonomous.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveAndShootAutonomous.cpp
+index 01ce83c1cd9db2d0035ccc6348705124cc26cffd..5148bbc9b31bf35b85f77b95d44c53fc9e93a22c 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveAndShootAutonomous.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveAndShootAutonomous.cpp
+@@ -6,6 +6,7 @@
+ #include "Commands/SetPivotSetpoint.h"
+ #include "Commands/DriveForward.h"
+ #include "Commands/Shoot.h"
++#include "Commands/CheckForHotGoal.h"
+ 
+ DriveAndShootAutonomous::DriveAndShootAutonomous() {
+     AddSequential(new CloseClaw());
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/DriveTrain.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/DriveTrain.cpp
+index 36ce60afb3de3f5abda9f82969e3ff479f417d5e..5c8f092b242e947ebc1439aba207d6fdc9a61006 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/DriveTrain.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/DriveTrain.cpp
+@@ -43,8 +43,6 @@ DriveTrain::DriveTrain() :
+ 		leftEncoder->SetDistancePerPulse((4.0/*in*/*M_PI)/(360.0*12.0/*in/ft*/));
+ 	#endif
+ 
+-	rightEncoder->Start();
+-	leftEncoder->Start();
+ 	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Right Encoder", rightEncoder);
+ 	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Left Encoder", leftEncoder);
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Simple Robot Example/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Simple Robot Example/Robot.java
+deleted file mode 100644
+index 045087fe16891d1d2aeb9747571bb9027961da78..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Simple Robot Example/Robot.java	
++++ /dev/null
+@@ -1,17 +0,0 @@
+-package $package;
+-
+-/**
+- * Simplest possible robot program
+- * 
+- * @author Team $team-number
+-  */
+-public class Robot {
+-
+-    /**
+-     * @param args Input....
+-     */
+-    public static void main(String[] args) {
+-    	// Do stuff here!
+-    }
+-
+-}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
+index e5b8fc16875d87f26e9b095d131c7cd975d8f5ec..e373c1f9e45c1d050dfc55baccdf19f407de2f41 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
+@@ -1,5 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <examples>
++  <!-- TODO add back in when there are enough samples to justify tags
+   <tagDescription>
+     <name>Simple Robot</name>
+     <description>Examples for simple robot programs.</description>
+@@ -10,47 +11,14 @@
+     variety of tasks such as sending and receiving values to both
+     dashboards and co-processors.</description>
+   </tagDescription>
+-  <tagDescription>
+-    <name>CommandBased Robot</name>
+-    <description>Examples for CommandBased robot programs.</description>
+-  </tagDescription>
+   <tagDescription>
+     <name>Simulation</name>
+     <description>Examples that can be run in simulation.</description>
++  </tagDescription>-->
++  <tagDescription>
++    <name>CommandBased Robot</name>
++    <description>Examples for CommandBased robot programs.</description>
+   </tagDescription>
+-  
+-  <example>
+-    <name>Simple Robot Example</name>
+-    <description>The simplest possible program that compiles. This
+-    shows the structure of a simple program that does nothing at
+-    all.</description>
+-    <tags>
+-      <tag>Simple Robot</tag>
+-    </tags>
+-    <packages>
+-      <package>src</package>
+-    </packages>
+-    <files>
+-      <file source="examples/Simple Robot Example/Robot.java" destination="src/Robot.cpp" />
+-    </files>
+-  </example>
+-  
+-  <example>
+-    <name>Network Table Counter</name>
+-    <description>A simple program that increments a network table
+-    variable once every second. This shows the structure of a simple
+-    program that only uses network tables.</description>
+-    <tags>
+-      <tag>Simple Robot</tag>
+-      <tag>Network Tables</tag>
+-    </tags>
+-    <packages>
+-      <package>src</package>
+-    </packages>
+-    <files>
+-      <file source="examples/Network Table Counter/Robot.cpp" destination="src/Robot.cpp" />
+-    </files>
+-  </example>
+ 
+   <example>
+     <name>GearsBot</name>
+@@ -59,7 +27,6 @@
+     supports simulation.</description>
+     <tags>
+       <tag>CommandBased Robot</tag>
+-      <tag>Simulation</tag>
+     </tags>
+     <packages>
+       <package>src</package>
+@@ -137,14 +104,12 @@
+             destination="src/Subsystems/Wrist.h"></file>
+     </files>
+   </example>
+-  
++
+   <example>
+     <name>PacGoat</name>
+     <description>A fully functional example CommandBased program for FRC Team 190&#39;s 2014 robot. This code can run on your computer if it supports simulation.</description>
+     <tags>
+       <tag>CommandBased Robot</tag>
+-      <tag>Simulation</tag>
+-      <tag>2014 Season</tag>
+     </tags>
+     <packages>
+       <package>src</package>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/Network Table Counter/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/Network Table Counter/Robot.java
+deleted file mode 100644
+index edf5564b267934e82c070b87ee6b5dc93723c9c9..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/Network Table Counter/Robot.java	
++++ /dev/null
+@@ -1,39 +0,0 @@
+-package $package;
+-
+-import edu.wpi.first.wpilibj.networktables.NetworkTable;
+-
+-/**
+- * An example of a network table counter. 
+- * 
+- * @author Team $team-number
+-  */
+-public class Robot {
+-
+-    private static NetworkTable table;
+-
+-    /**
+-     * @param args
+-     */
+-    public static void main(String[] args) {
+-		NetworkTable.setServerMode();
+-		NetworkTable.setTeam(190);
+-		table = NetworkTable.getTable("SmartDashboard");
+-		System.out.println("Started up");
+-			
+-		long i = 0;
+-		while (true) {
+-		    System.out.println(i);
+-		    table.putNumber("i", i);
+-		    i++;
+-				
+-		    try {
+-		    	Thread.sleep(1000);
+-		    } catch (InterruptedException e) {
+-		    	// TODO Auto-generated catch block
+-		    	e.printStackTrace();
+-		    }
+-		}
+-		
+-    }
+-
+-}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/Simple Robot Example/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/Simple Robot Example/Robot.java
+deleted file mode 100644
+index 045087fe16891d1d2aeb9747571bb9027961da78..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/Simple Robot Example/Robot.java	
++++ /dev/null
+@@ -1,17 +0,0 @@
+-package $package;
+-
+-/**
+- * Simplest possible robot program
+- * 
+- * @author Team $team-number
+-  */
+-public class Robot {
+-
+-    /**
+-     * @param args Input....
+-     */
+-    public static void main(String[] args) {
+-    	// Do stuff here!
+-    }
+-
+-}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
+index e8577ee3731ac159fa64b319f3e601e43a48ea92..9e432d1b085983184d6d6648f0f05710df88808d 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
+@@ -1,63 +1,30 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <examples>
++  <!-- TODO add back in when there are enough samples to justify tags
+   <tagDescription>
+     <name>Simple Robot</name>
+     <description>Examples for simple robot programs.</description>
+   </tagDescription>
+   <tagDescription>
+-    <name>CommandBased Robot</name>
+-    <description>Examples for CommandBased robot programs.</description>
++    <name>Network Tables</name>
++    <description>Examples of how to use Network Tables to accomplish a
++    variety of tasks such as sending and receiving values to both
++    dashboards and co-processors.</description>
+   </tagDescription>
+   <tagDescription>
+     <name>Simulation</name>
+     <description>Examples that can be run in simulation.</description>
+-  </tagDescription>
++  </tagDescription>-->
+   <tagDescription>
+-    <name>Network Tables</name>
+-    <description>Examples of how to use Network Tables to accomplish a
+-    variety of tasks such as sending and receiving values to both
+-    dashboards and co-processors.</description>
++    <name>CommandBased Robot</name>
++    <description>Examples for CommandBased robot programs.</description>
+   </tagDescription>
+-  
+-  <example>
+-    <name>Simple Robot Example</name>
+-    <description>The simplest possible program that compiles. This
+-    shows the structure of a simple program that does nothing at
+-    all.</description>
+-    <tags>
+-      <tag>Simple Robot</tag>
+-    </tags>
+-    <packages>
+-      <package>src/$package-dir</package>
+-    </packages>
+-    <files>
+-      <file source="examples/Simple Robot Example/Robot.java" destination="src/$package-dir/Robot.java" />
+-    </files>
+-  </example>
+-  
+-  <example>
+-    <name>Network Table Counter</name>
+-    <description>A simple program that increments a network table
+-    variable once every second. This shows the structure of a simple
+-    program that only uses network tables.</description>
+-    <tags>
+-      <tag>Simple Robot</tag>
+-      <tag>Network Tables</tag>
+-    </tags>
+-    <packages>
+-      <package>src/$package-dir</package>
+-    </packages>
+-    <files>
+-      <file source="examples/Network Table Counter/Robot.java" destination="src/$package-dir/Robot.java" />
+-    </files>
+-  </example>
+ 
+   <example>
+     <name>GearsBot</name>
+     <description>A fully functional example CommandBased program for WPIs GearsBot robot. This code can run on your computer if it supports simulation.</description>
+     <tags>
+       <tag>CommandBased Robot</tag>
+-      <tag>Simulation</tag>
+     </tags>
+     <packages>
+       <package>src/$package-dir</package>
+@@ -90,8 +57,6 @@
+     <description>A fully functional example CommandBased program for FRC Team 190&#39;s 2014 robot. This code can run on your computer if it supports simulation.</description>
+     <tags>
+       <tag>CommandBased Robot</tag>
+-      <tag>Simulation</tag>
+-      <tag>2014 Season</tag>
+     </tags>
+     <packages>
+       <package>src/$package-dir</package>

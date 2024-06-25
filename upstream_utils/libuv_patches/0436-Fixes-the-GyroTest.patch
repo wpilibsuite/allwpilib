@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Wed, 22 Oct 2014 16:46:39 -0400
+Subject: [PATCH 0436/6262] Fixes the GyroTest
+
+Change-Id: Ia72fcb0533ea4e91b5f7e469e1a0b367eebda3b7
+---
+ .../java/edu/wpi/first/wpilibj/GyroTest.java  | 25 +++++++++++++++----
+ 1 file changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java
+index 2cb032006c46a52a77c0c5200e70f759e51365bd..ed58142a0606104e9ef43e2d0ae3af3a43116afa 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java
+@@ -22,7 +22,7 @@ public class GyroTest extends AbstractComsSetup {
+ 
+ 	private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
+ 
+-	public static final double TEST_ANGLE = 180.0;
++	public static final double TEST_ANGLE = 90.0;
+ 
+ 	private TiltPanCameraFixture tpcam;
+ 
+@@ -56,11 +56,26 @@ public class GyroTest extends AbstractComsSetup {
+ 	 */
+ 	@Test
+ 	public void testGyroAngle() {
+-		for(int i = 0; i < 1800; i++) {
++		//Set angle
++		for(int i = 0; i < 5; i++) {
++			tpcam.getPan().setAngle(45);
++			Timer.delay(.1);
++		}
++		//Reset for setup
++		tpcam.getGyro().reset();
++		
++		//Prevent drift
++		for(int i = 0; i < 10; i++) {
++			tpcam.getPan().setAngle(45);
++			Timer.delay(.1);
++		}
++		
++		//Perform test
++		for(int i = 450; i < 1350; i++) {
+ 			tpcam.getPan().setAngle(i / 10.0);
+-
+-			Timer.delay(0.001);
++			Timer.delay(0.005);
+ 		}
++		Timer.delay(.2);
+ 
+ 		double angle = tpcam.getGyro().getAngle();
+ 
+@@ -68,7 +83,7 @@ public class GyroTest extends AbstractComsSetup {
+ 
+ 		double diff = Math.abs(difference);
+ 
+-		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 8);
++		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 4);
+ 	}
+ 
+ 	@Test

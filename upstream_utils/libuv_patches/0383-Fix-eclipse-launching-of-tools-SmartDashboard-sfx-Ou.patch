@@ -1,0 +1,135 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Thu, 2 Oct 2014 10:38:30 -0400
+Subject: [PATCH 0383/6262] Fix eclipse launching of tools (SmartDashboard,
+ sfx, OutlineViewer, and RobotBuilder)
+
+Change-Id: I8d0fbf2b25d29cd9645ee9e92c67316802a46490
+---
+ .../core/actions/RunOutlineViewerAction.java       | 14 ++++++++++----
+ .../core/actions/RunRobotBuilderAction.java        |  5 ++---
+ .../core/actions/RunSFXDashboardAction.java        | 14 ++++++++++----
+ .../core/actions/RunSmartDashboardAction.java      | 12 +++++++++---
+ 4 files changed, 31 insertions(+), 14 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunOutlineViewerAction.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunOutlineViewerAction.java
+index cee820a3c14c28684d786c3a69a50690bcb7fa51..d44e947312c1586add4b7049095f47fee7f009fb 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunOutlineViewerAction.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunOutlineViewerAction.java
+@@ -1,6 +1,7 @@
+ package edu.wpi.first.wpilib.plugins.core.actions;
+ 
+ import java.io.File;
++import java.io.FilenameFilter;
+ 
+ import org.eclipse.core.runtime.CoreException;
+ import org.eclipse.debug.core.DebugPlugin;
+@@ -33,13 +34,18 @@ public class RunOutlineViewerAction implements IWorkbenchWindowActionDelegate {
+ 	 * @see IWorkbenchWindowActionDelegate#run
+ 	 */
+ 	public void run(IAction action) {
+-		String jarFile = WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools"+File.separator
+-				+WPILibCore.getDefault().getCurrentVersion()+File.separator+"OutlineViewer-with-dependencies.jar";
+-		String[] cmd = {"java", "-jar", jarFile};
++		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools");
++		File[] files = dir.listFiles(new FilenameFilter() {
++			@Override public boolean accept(File dir, String name) {
++				return name.startsWith("OutlineViewer") && name.endsWith(".jar");
++			}
++		});
++		if (files == null || files.length < 1) return;
++		String[] cmd = {"java", "-jar", files[0].getAbsolutePath()};
+ 		try {
+ 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
+ 		} catch (CoreException e) {
+-            WPILibCore.logError("Error running outline viewer.", e);
++            WPILibCore.logError("Error running OutlineViewer.", e);
+ 		}
+ 	}
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunRobotBuilderAction.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunRobotBuilderAction.java
+index f69267cf590add11973a8d2700bff7a3f8da0745..a812f27d650e7293dab510675e8c3f2c4eb6c29c 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunRobotBuilderAction.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunRobotBuilderAction.java
+@@ -34,14 +34,13 @@ public class RunRobotBuilderAction implements IWorkbenchWindowActionDelegate {
+ 	 * @see IWorkbenchWindowActionDelegate#run
+ 	 */
+ 	public void run(IAction action) {
+-		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools"+File.separator
+-				+WPILibCore.getDefault().getCurrentVersion());
++		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools");
+ 		File[] files = dir.listFiles(new FilenameFilter() {
+ 			@Override public boolean accept(File dir, String name) {
+ 				return name.startsWith("RobotBuilder") && name.endsWith(".jar");
+ 			}
+ 		});
+-		if (files.length < 1) return;
++		if (files == null || files.length < 1) return;
+ 		String[] cmd = {"java", "-jar", files[0].getAbsolutePath()};
+ 		try {
+ 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSFXDashboardAction.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSFXDashboardAction.java
+index 517ebbbfaf7eb13e62e3accebc2d132d96c3b975..abe804f6de8c0386fe319b202067e763ea9fc58f 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSFXDashboardAction.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSFXDashboardAction.java
+@@ -1,6 +1,7 @@
+ package edu.wpi.first.wpilib.plugins.core.actions;
+ 
+ import java.io.File;
++import java.io.FilenameFilter;
+ 
+ import org.eclipse.core.runtime.CoreException;
+ import org.eclipse.debug.core.DebugPlugin;
+@@ -33,13 +34,18 @@ public class RunSFXDashboardAction implements IWorkbenchWindowActionDelegate {
+ 	 * @see IWorkbenchWindowActionDelegate#run
+ 	 */
+ 	public void run(IAction action) {
+-		String jarFile = WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools"+File.separator
+-				+WPILibCore.getDefault().getCurrentVersion()+File.separator+"sfx.jar";
+-		String[] cmd = {"java", "-jar", jarFile};
++		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools");
++		File[] files = dir.listFiles(new FilenameFilter() {
++			@Override public boolean accept(File dir, String name) {
++				return name.startsWith("sfx") && name.endsWith(".jar");
++			}
++		});
++		if (files == null || files.length < 1) return;
++		String[] cmd = {"java", "-jar", files[0].getAbsolutePath()};
+ 		try {
+ 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
+ 		} catch (CoreException e) {
+-            WPILibCore.logError("Error running SFXDashboard.", e);
++            WPILibCore.logError("Error running SFX Dashboard.", e);
+ 		}
+ 	}
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSmartDashboardAction.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSmartDashboardAction.java
+index e5175c3e123e8b1dcefa43a6166e2c34e1c89652..94c3a03280b0fa2a7411cc5bbb0da3592421275c 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSmartDashboardAction.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSmartDashboardAction.java
+@@ -1,6 +1,7 @@
+ package edu.wpi.first.wpilib.plugins.core.actions;
+ 
+ import java.io.File;
++import java.io.FilenameFilter;
+ 
+ import org.eclipse.core.runtime.CoreException;
+ import org.eclipse.debug.core.DebugPlugin;
+@@ -33,9 +34,14 @@ public class RunSmartDashboardAction implements IWorkbenchWindowActionDelegate {
+ 	 * @see IWorkbenchWindowActionDelegate#run
+ 	 */
+ 	public void run(IAction action) {
+-		String jarFile = WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools"+File.separator
+-				+WPILibCore.getDefault().getCurrentVersion()+File.separator+"SmartDashboard.jar";
+-		String[] cmd = {"java", "-jar", jarFile};
++		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools");
++		File[] files = dir.listFiles(new FilenameFilter() {
++			@Override public boolean accept(File dir, String name) {
++				return name.startsWith("SmartDashboard") && name.endsWith(".jar");
++			}
++		});
++		if (files == null || files.length < 1) return;
++		String[] cmd = {"java", "-jar", files[0].getAbsolutePath()};
+ 		try {
+ 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
+ 		} catch (CoreException e) {

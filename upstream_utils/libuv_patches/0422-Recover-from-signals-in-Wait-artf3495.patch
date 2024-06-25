@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Mon, 20 Oct 2014 15:01:35 -0400
+Subject: [PATCH 0422/6262] Recover from signals in Wait() [artf3495]
+
+Change-Id: I6e7e404b916d9fc35524998369272bc30131bb7b
+---
+ hal/lib/Athena/Utilities.cpp | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/hal/lib/Athena/Utilities.cpp b/hal/lib/Athena/Utilities.cpp
+index b821e321320b4d79fe9613bb94ae2e76b64b09cd..b34677fead2edf86444cc967e8dde41b11aed80f 100644
+--- a/hal/lib/Athena/Utilities.cpp
++++ b/hal/lib/Athena/Utilities.cpp
+@@ -9,7 +9,12 @@ void delayTicks(int32_t ticks)
+ 	struct timespec test, remaining;
+ 	test.tv_sec = 0;
+ 	test.tv_nsec = ticks * 3;
+-	nanosleep(&test, &remaining);
++
++	/* Sleep until the requested number of ticks has passed, with additional
++		time added if nanosleep is interrupted. */
++	while(nanosleep(&test, &remaining) == -1) {
++		test = remaining;
++	}
+ }
+ 
+ void delayMillis(double ms)
+@@ -17,7 +22,12 @@ void delayMillis(double ms)
+ 	struct timespec test, remaining;
+ 	test.tv_sec = ms / 1000;
+ 	test.tv_nsec = 1000 * (((uint64_t)ms) % 1000000);
+-	nanosleep(&test, &remaining);
++
++	/* Sleep until the requested number of milliseconds has passed, with
++		additional time added if nanosleep is interrupted. */
++	while(nanosleep(&test, &remaining) == -1) {
++		test = remaining;
++	}
+ }
+ 
+ void delaySeconds(double s)
+@@ -25,5 +35,10 @@ void delaySeconds(double s)
+ 	struct timespec test, remaining;
+ 	test.tv_sec = (int)s;
+ 	test.tv_nsec = (s - (int)s) * 1000000000.0;
+-	nanosleep(&test, &remaining);
++
++	/* Sleep until the requested number of seconds has passed, with additional
++		time added if nanosleep is interrupted. */
++	while(nanosleep(&test, &remaining) == -1) {
++		test = remaining;
++	}
+ }

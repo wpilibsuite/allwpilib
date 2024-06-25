@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Sun, 31 Aug 2014 14:30:55 -0400
+Subject: [PATCH 0330/6262] require pthread and rt lib for Itests
+
+Fixing simulation flags
+
+Change-Id: I33dcd07096bf7a4813248bb9dd809144661a78fd
+---
+ wpilibc/wpilibC++/CMakeLists.txt                 | 1 -
+ wpilibc/wpilibC++IntegrationTests/CMakeLists.txt | 4 ++--
+ wpilibc/wpilibC++Sim/CMakeLists.txt              | 2 ++
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/CMakeLists.txt b/wpilibc/wpilibC++/CMakeLists.txt
+index 378f1450c372012e4c5e039d1da03476b3d5ad0f..6be77a1fa6c74107d4cd71afa4f9a5be2e8d47db 100644
+--- a/wpilibc/wpilibC++/CMakeLists.txt
++++ b/wpilibc/wpilibC++/CMakeLists.txt
+@@ -4,7 +4,6 @@ project(WPILibC++)
+ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(include/ ${NWT_API_INCLUDES} ${HAL_API_INCLUDES})
+ add_library(WPILib STATIC ${SRC_FILES})
+-set(CMAKE_CXX_FLAGS "-fPIC")
+ target_link_libraries(WPILib)
+ INSTALL(TARGETS WPILib ARCHIVE DESTINATION lib COMPONENT lib)
+ INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
+diff --git a/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt b/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt
+index e1546396b4a832ccddb0f14bf426f36c7d276dda..98d1c644d8fc99efecbfa9faa3e0194fe62d7c62 100644
+--- a/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt
++++ b/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt
+@@ -3,6 +3,6 @@ project(WPILibC++IntegrationTests)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp src/gtest/src/gtest-all.cc src/gtest/src/gtest_main.cc)
+ include_directories(include/ src/gtest/ src/gtest/include/ ../wpilibC++Devices/include/ ${WPILIB_INCLUDES} ${HAL_API_INCLUDES} ${NWT_API_INCLUDES})
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+ add_executable(FRCUserProgram ${SRC_FILES})
+-target_link_libraries(FRCUserProgram WPILib WPILibAthena WPILib HALAthena NetworkTables ${NI_LIBS})
+-
++target_link_libraries(FRCUserProgram WPILib WPILibAthena WPILib HALAthena NetworkTables ${NI_LIBS} rt)
+diff --git a/wpilibc/wpilibC++Sim/CMakeLists.txt b/wpilibc/wpilibC++Sim/CMakeLists.txt
+index f7d511febf1ab40e28d84077bd5facae55092931..bb2484128548b174d797e1afb3578914be682149 100644
+--- a/wpilibc/wpilibC++Sim/CMakeLists.txt
++++ b/wpilibc/wpilibC++Sim/CMakeLists.txt
+@@ -1,6 +1,8 @@
+ cmake_minimum_required(VERSION 2.8)
+ project(WPILibSim)
+ 
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wall -Wextra -Wno-unused-parameter -fPIC")
++
+ get_filename_component(HAL_API_INCLUDES $ENV{ALLWPILIB}/hal/include REALPATH)
+ get_filename_component(NWT_API_INCLUDES $ENV{ALLWPILIB}/networktables/cpp/include REALPATH)
+ add_subdirectory(build/wpilibC++)

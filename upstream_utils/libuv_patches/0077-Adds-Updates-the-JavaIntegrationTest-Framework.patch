@@ -1,0 +1,2007 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Tue, 3 Jun 2014 10:07:08 -0400
+Subject: [PATCH 0077/6262] Adds/Updates the JavaIntegrationTest Framework
+
+Modifies where the tilt-pan camera gets instantiated so that it can be used for multiple tests
+
+Adds a test for counters
+
+Updates the TestBench and TestSuite to reflect the physical changes to the board
+
+Adds a test on the Digital Cross Connections
+
+Adds a test on the counter to see if they are working properly
+
+Increases the reset time on the TiltPan Fixture to allow it to calibrate correctly
+
+Fixes the wasReset flag being calculated with a bitshift instead of using boolean algebra.
+
+Adds/Updates Integration Tests
+Introduces java.util.logging to the test framework to allow for easier debugging
+Fully tests all DIO/Counter/Encoder features
+Pulls in Command Tests from the old testing framework
+
+Updates the build.xml to run the Ant Compiler with 1.7 if Java 1.8 is installed
+
+Change-Id: I43d85054be393ef448643c1d35558cfa99749c99
+---
+ .../src/main/resources/java-zip/ant/build.xml |   1 +
+ wpilibj/wpilibJavaIntegrationTests/pom.xml    |  18 +-
+ .../runintegrationjavaprogram                 |   5 +
+ .../edu/wpi/first/wpilibj/CounterTest.java    | 115 +++++++++++
+ .../first/wpilibj/DIOCrossConnectTest.java    | 112 +++++++++++
+ .../edu/wpi/first/wpilibj/EncoderTest.java    | 154 ++++++++++++++
+ .../wpi/first/wpilibj/MotorEncoderTest.java   |   2 +-
+ .../wpi/first/wpilibj/TiltPanCameraTest.java  |  23 ++-
+ .../wpilibj/command/AbstractCommandTest.java  |  35 ++++
+ .../command/CommandParallelGroupTest.java     |  98 +++++++++
+ .../wpilibj/command/CommandScheduleTest.java  |  98 +++++++++
+ .../fixtures/DIOCrossConnectFixture.java      |  54 ++++-
+ .../wpilibj/fixtures/FakeCounterFixture.java  | 104 ++++++++++
+ .../wpilibj/fixtures/FakeEncoderFixture.java  | 117 +++++++++++
+ .../wpilibj/fixtures/MotorEncoderFixture.java |   6 +-
+ .../fixtures/TiltPanCameraFixture.java        |   2 +-
+ .../mockhardware/FakeCounterSource.java       |  20 +-
+ .../mockhardware/FakeEncoderSource.java       | 189 ++++++++++++++++++
+ .../wpi/first/wpilibj/mocks/MockCommand.java  | 113 +++++++++++
+ .../wpi/first/wpilibj/test/RepeatRule.java    |  61 ++++++
+ .../edu/wpi/first/wpilibj/test/TestBench.java | 187 +++++++++++++----
+ .../edu/wpi/first/wpilibj/test/TestSuite.java |  37 +++-
+ .../src/main/java/logging.properties          |   5 +
+ 23 files changed, 1494 insertions(+), 62 deletions(-)
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/runintegrationjavaprogram
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/AbstractCommandTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeCounterFixture.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeEncoderFixture.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeEncoderSource.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mocks/MockCommand.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/RepeatRule.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/logging.properties
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+index 610292a260a85130086f76a64e16c1e2101983e4..50818dcd8b9272d2e158f0937d3f421a339193ae 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+@@ -36,6 +36,7 @@
+ 	   classpath="${classpath}"
+ 	   target="1.7"
+ 	   source="1.7"
++     compiler="javac1.7"
+ 	   debug="true">
+     </javac>
+   </target>
+diff --git a/wpilibj/wpilibJavaIntegrationTests/pom.xml b/wpilibj/wpilibJavaIntegrationTests/pom.xml
+index 01425db63419c991d2738e83c9e4a36b3bef53d2..b92a5f47bdfa917defa72d8ed75bb12289e01193 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/pom.xml
++++ b/wpilibj/wpilibJavaIntegrationTests/pom.xml
+@@ -26,11 +26,11 @@
+ 		</dependency>
+ 		<dependency>
+ 			<groupId>org.hamcrest</groupId>
+-			<artifactId>hamcrest-all</artifactId>
++			<artifactId>hamcrest-core</artifactId>
+ 			<version>1.3</version>
+ 		</dependency>
+ 	</dependencies>
+-
++	
+ 	<profiles>
+ 		<profile>
+ 			<id>docline-java8-disable</id>
+@@ -52,7 +52,16 @@
+ 		</profile>
+ 	</profiles>
+ 
+-	<build>
++	<build>  
++		<resources>
++			<!-- Package the logging.properties file with the jar-->
++	        <resource>
++	            <directory>src/main/java</directory>
++	            <includes>
++	                <include>**/*.properties</include>
++	            </includes>
++	        </resource>
++	    </resources>
+ 		<plugins>
+ 			<plugin>
+ 				<groupId>org.apache.maven.plugins</groupId>
+@@ -96,14 +105,13 @@
+ 								</artifactItem>
+ 								<artifactItem>
+ 									<groupId>org.hamcrest</groupId>
+-									<artifactId>hamcrest-all</artifactId>
++									<artifactId>hamcrest-core</artifactId>
+ 									<version>1.3</version>
+ 									<type>jar</type>
+ 								</artifactItem>
+ 							</artifactItems>
+ 							<outputDirectory>${project.build.directory}/classes</outputDirectory>
+ 						</configuration>
+-
+ 					</execution>
+ 				</executions>
+ 			</plugin>
+diff --git a/wpilibj/wpilibJavaIntegrationTests/runintegrationjavaprogram b/wpilibj/wpilibJavaIntegrationTests/runintegrationjavaprogram
+new file mode 100644
+index 0000000000000000000000000000000000000000..ba6dd39ba8c336a52a35c5dff207d2f34fe9b10a
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/runintegrationjavaprogram
+@@ -0,0 +1,5 @@
++#. ./.profile
++killall java
++killall FRCUserProgram
++sleep 1
++/usr/local/frc/JRE/bin/java -jar wpilibJavaIntegrationTests-0.1.0-SNAPSHOT.jar -ea
+\ No newline at end of file
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..19e262c852bf5b8a298b2d769a10db4265cb37c5
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java
+@@ -0,0 +1,115 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj;
++
++import static org.junit.Assert.assertTrue;
++
++import java.util.Collection;
++
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.junit.runners.Parameterized;
++import org.junit.runners.Parameterized.Parameters;
++
++import edu.wpi.first.wpilibj.fixtures.FakeCounterFixture;
++import edu.wpi.first.wpilibj.test.AbstractComsSetup;
++import edu.wpi.first.wpilibj.test.TestBench;
++
++/**
++ * Tests to see if the Counter is working properly
++ * 
++ * @author Jonathan Leitschuh
++ *
++ */
++@RunWith(Parameterized.class)
++public class CounterTest extends AbstractComsSetup {
++	private static FakeCounterFixture counter = null;
++	
++	Integer input;
++	Integer output;
++	
++	/**
++	 * Constructs a Counter Test with the given inputs
++	 * @param input The input Port
++	 * @param output The output Port
++	 */
++	public CounterTest(Integer input, Integer output){
++		assert input != null;
++		assert output != null;
++		
++		this.input = input;
++		this.output = output;
++		//System.out.println("Counter Test: Input: " + input + " Output: " + output);
++		if(counter != null) counter.teardown();
++		counter = new FakeCounterFixture(input, output);
++	}
++	
++	/**
++	 * Test data generator. This method is called the the JUnit
++	 * parameterized test runner and returns a Collection of Arrays. For each
++	 * Array in the Collection, each array element corresponds to a parameter
++	 * in the constructor.
++	 */
++	@Parameters
++	public static Collection<Integer[]> generateData() {
++		// In this example, the parameter generator returns a List of
++		// arrays. Each array has two elements: { Digital input port, Digital output port}.
++		// These data are hard-coded into the class, but they could be
++		// generated or loaded in any way you like.
++		return TestBench.getInstance().getDIOCrossConnectCollection();
++	}
++	
++	
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@BeforeClass
++	public static void setUpBeforeClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@AfterClass
++	public static void tearDownAfterClass() throws Exception {
++		counter.teardown();
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++		counter.setup();
++	}
++	
++	/**
++	 * Tests the default state of the counter immediately after reset
++	 */
++	@Test
++	public void testDefault(){
++		assertTrue("Counter did not reset to 0", counter.getCounter().get() == 0);
++	}
++
++	@Test (timeout = 5000)
++	public void testCount() {
++		int goal = 100;
++		counter.getFakeCounterSource().setCount(goal);
++		counter.getFakeCounterSource().execute();
++		
++		int count = counter.getCounter().get();
++		
++		assertTrue("Fake Counter, Input: " + input + ", Output: " + output +
++				", did not return " + goal + " instead got: " + count,
++				count == goal);
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..dec1933eac44aa4f2f923535e4a1f0f9bfac74b8
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java
+@@ -0,0 +1,112 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj;
++
++import static org.junit.Assert.assertFalse;
++import static org.junit.Assert.assertTrue;
++
++import java.util.Collection;
++
++import org.junit.After;
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Ignore;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.junit.runners.Parameterized;
++import org.junit.runners.Parameterized.Parameters;
++
++import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
++import edu.wpi.first.wpilibj.test.AbstractComsSetup;
++import edu.wpi.first.wpilibj.test.TestBench;
++
++/**
++ * Tests to see if the Digital ports are working properly
++ * @author jonathanleitschuh
++ */
++@RunWith(Parameterized.class)
++public class DIOCrossConnectTest extends AbstractComsSetup {
++
++	private static DIOCrossConnectFixture dio = null;
++
++	/**
++	 * Default constructor for the DIOCrossConnectTest
++	 * This test is parameterized in order to allow it to be tested using a variety of different input/output pairs
++	 * without duplicate code.<br>
++	 * This class takes Integer port values instead of DigitalClasses because it would force them to be instantiated
++	 * at the same time which could (untested) cause port binding errors.
++	 * 
++	 * @param input The port for the input wire
++	 * @param output The port for the output wire
++	 */
++	public DIOCrossConnectTest(Integer input, Integer output) {
++		if(dio != null){
++			dio.teardown();
++		}
++		dio = new DIOCrossConnectFixture(input, output);
++	}
++	
++	
++
++	/**
++	 * Test data generator. This method is called the the JUnit
++	 * parameterized test runner and returns a Collection of Arrays. For each
++	 * Array in the Collection, each array element corresponds to a parameter
++	 * in the constructor.
++	 */
++	@Parameters
++	public static Collection<Integer[]> generateData() {
++		// In this example, the parameter generator returns a List of
++		// arrays. Each array has two elements: { Digital input port, Digital output port}.
++		// These data are hard-coded into the class, but they could be
++		// generated or loaded in any way you like.
++		return TestBench.getInstance().getDIOCrossConnectCollection();
++	}
++
++	@BeforeClass
++	public static void setUpBeforeClass() throws Exception {
++
++	}
++
++	@AfterClass
++	public static void tearDownAfterClass() throws Exception {
++		dio.teardown();
++	}
++
++	@Before
++	public void setUp() throws Exception {
++		dio.reset();
++
++	}
++
++	@After
++	public void tearDown() throws Exception {
++	}
++
++	/**
++	 * Tests to see if the DIO can create and recognize a high value
++	 */
++	@Test
++	public void testSetHigh() {
++		dio.getOutput().set(true);
++		assertTrue("DIO Not High after no delay", dio.getInput().get());
++		Timer.delay(.05);
++		assertTrue("DIO Not High after .05s delay", dio.getInput().get());
++	}
++	
++	/**
++	 * Tests to see if the DIO can create and recognize a low value
++	 */
++	@Test
++	public void testSetLow() {
++		dio.getOutput().set(false);
++		assertFalse("DIO Not Low after no delay", dio.getInput().get());
++		Timer.delay(.05);
++		assertFalse("DIO Not Low after .05s delay", dio.getInput().get());
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..aa7dac8d4071e8e9c35d3dac43f06f2529ab625a
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java
+@@ -0,0 +1,154 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj;
++
++import static org.junit.Assert.*;
++
++import java.util.Collection;
++
++import org.junit.After;
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.junit.runners.Parameterized;
++import org.junit.runners.Parameterized.Parameters;
++
++import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
++import edu.wpi.first.wpilibj.fixtures.FakeEncoderFixture;
++import edu.wpi.first.wpilibj.test.AbstractComsSetup;
++import edu.wpi.first.wpilibj.test.TestBench;
++
++
++/**
++ * Test to see if the FPGA properly recognizes a mock Encoder input
++ * 
++ * @author Jonathan Leitschuh
++ *
++ */
++@RunWith(Parameterized.class)
++public class EncoderTest extends AbstractComsSetup {
++	
++	private static FakeEncoderFixture encoder = null;
++	
++	private final boolean flip; //Does this test need to flip the inputs
++	private final int inputA;
++	private final int inputB;
++	private final int outputA;
++	private final int outputB;
++	
++	/**
++	 * Test data generator. This method is called the the JUnit
++	 * parameterized test runner and returns a Collection of Arrays. For each
++	 * Array in the Collection, each array element corresponds to a parameter
++	 * in the constructor.
++	 */
++	@Parameters
++	public static Collection<Integer[]> generateData() {
++		return TestBench.getInstance().getEncoderDIOCrossConnectCollection();
++	}
++	
++	/**
++	 * Constructs a parameterized Encoder Test
++	 * @param inputA The port number for inputA
++	 * @param outputA The port number for outputA
++	 * @param inputB The port number for inputB
++	 * @param outputB The port number for outputB
++	 * @param flip whether or not these set of values require the encoder to be reversed (0 or 1)
++	 */
++	public EncoderTest(int inputA, int outputA, int inputB, int outputB, int flip){
++		this.inputA = inputA;
++		this.inputB = inputB;
++		this.outputA = outputA;
++		this.outputB = outputB;
++		
++		//If the encoder from a previous test is allocated then we must free its members
++		if(encoder != null) encoder.teardown();
++		this.flip = flip==0;
++		encoder = new FakeEncoderFixture(inputA, outputA, inputB, outputB);
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@BeforeClass
++	public static void setUpBeforeClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@AfterClass
++	public static void tearDownAfterClass() throws Exception {
++		encoder.teardown();
++	}
++
++	/**
++	 * Sets up the test and verifies that the test was reset to the default state
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++		encoder.setup();
++		testDefaultState();
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@After
++	public void tearDown() throws Exception {
++		encoder.reset();
++	}
++	
++	/**
++	 * Tests to see if Encoders initialize to zero
++	 */
++	@Test
++	public void testDefaultState(){
++		int value = encoder.getEncoder().get();
++		assertTrue(errorMessage(0, value), value == 0);
++	}
++
++	/**
++	 * Tests to see if Encoders can count up sucsessfully
++	 */
++	@Test
++	public void testCountUp() {
++		int goal = 100;
++		encoder.getFakeEncoderSource().setCount(goal);
++		encoder.getFakeEncoderSource().setForward(flip);
++		encoder.getFakeEncoderSource().execute();
++		int value = encoder.getEncoder().get();
++		assertTrue(errorMessage(goal, value), value == goal);
++		
++	}
++	/**
++	 * Tests to see if Encoders can count down sucsessfully
++	 */
++	@Test
++	public void testCountDown() {
++		int goal = -100;
++		encoder.getFakeEncoderSource().setCount(goal); //Goal has to be positive
++		encoder.getFakeEncoderSource().setForward(!flip);
++		encoder.getFakeEncoderSource().execute();
++		int value = encoder.getEncoder().get();
++		assertTrue(errorMessage(goal, value), value == goal);
++		
++	}
++	
++	/**
++	 * Creates a simple message with the error that was encounterd for the Encoders
++	 * @param goal The goal that was trying to be reached
++	 * @param trueValue The actual value that was reached by the test
++	 * @return A fully constructed message with data about where and why the the test failed
++	 */
++	private String errorMessage(int goal, int trueValue){
++		return "Encoder ({In,Out}): {" + inputA + ", " + outputA + "},{" + inputB + ", " + outputB + "} Returned: " + trueValue + ", Wanted: " + goal;
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+index 33c479582c85f823bb1c24d4ef52d4be62fe5b7c..e85ee634941d18301774ea0e71c634c63367d49b 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.test.TestBench;
+ 
+ public class MotorEncoderTest extends AbstractComsSetup {
+ 	
+-	private static final double MOTOR_RUNTIME = .5;
++	private static final double MOTOR_RUNTIME = .25;
+ 	
+ 	private static final List<MotorEncoderFixture> pairs = new ArrayList<MotorEncoderFixture>();
+ 	
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java
+index 6a85430a47adfa8be8b40d092a4a97a196eda2a6..19ac8506fdb41354d5cd3113c7704a15777e5163 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java
+@@ -22,25 +22,33 @@ public class TiltPanCameraTest extends AbstractComsSetup {
+ 	
+ 	public static final double TEST_ANGLE = 180.0;
+ 	
+-	private TiltPanCameraFixture tpcam;
++	private static TiltPanCameraFixture tpcam;
+ 
+ 	@BeforeClass
+ 	public static void setUpBeforeClass() throws Exception {
++		tpcam = TestBench.getInstance().getTiltPanCam();
++		
+ 	}
+ 
+ 	@AfterClass
+ 	public static void tearDownAfterClass() throws Exception {
++		tpcam.teardown();
+ 	}
+ 
+ 	@Before
+ 	public void setUp() throws Exception {
+-		tpcam = TestBench.getInstance().getTiltPanCam();
+ 		tpcam.reset();
+ 	}
+ 
+ 	@After
+ 	public void tearDown() throws Exception {
+-		tpcam.teardown();
++		tpcam.reset();
++	}
++	
++	@Test
++	public void testInitial(){
++		double angle = tpcam.getGyro().getAngle();
++		assertTrue(errorMessage(angle, 0), Math.abs(angle) < 0.5); 
+ 	}
+ 
+ 	/**
+@@ -50,6 +58,7 @@ public class TiltPanCameraTest extends AbstractComsSetup {
+ 	public void testGyroAngle() {
+ 		for(double i = 0; i < 1.0; i+=.01){
+ 			//System.out.println("i: " + i);
++			System.out.println("Angle " + tpcam.getGyro().getAngle());
+ 			tpcam.getPan().set(i);
+ 			Timer.delay(.05);
+ 		}
+@@ -61,9 +70,11 @@ public class TiltPanCameraTest extends AbstractComsSetup {
+ 		double diff = Math.abs(difference);
+ 		
+ 		
+-		assertTrue("Gryo angle skewed " + difference + " deg away from target " + TEST_ANGLE, diff < 4.0);
+-		
+-		
++		assertTrue(errorMessage(diff, TEST_ANGLE), diff < 4.0);
++	}
++	
++	private String errorMessage(double difference, double target){
++		return "Gryo angle skewed " + difference + " deg away from target " + target;
+ 	}
+ 
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/AbstractCommandTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/AbstractCommandTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ee67dd09f5e8f3ff5ead22b8be72a9b7c5c38ed9
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/AbstractCommandTest.java
+@@ -0,0 +1,35 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.command;
++
++import static org.junit.Assert.assertEquals;
++import edu.wpi.first.wpilibj.Timer;
++import edu.wpi.first.wpilibj.mocks.MockCommand;
++import edu.wpi.first.wpilibj.test.AbstractComsSetup;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public abstract class AbstractCommandTest extends AbstractComsSetup {
++	public class ASubsystem extends Subsystem {
++        protected void initDefaultCommand(){
++        }
++    }
++	
++	public void assertCommandState(MockCommand command, int initialize, int execute, int isFinished, int end, int interrupted){
++        assertEquals(initialize, command.getInitializeCount());
++        assertEquals(execute, command.getExecuteCount());
++        assertEquals(isFinished, command.getIsFinishedCount());
++        assertEquals(end, command.getEndCount());
++        assertEquals(interrupted, command.getInterruptedCount());
++	 }
++	
++	public void sleep(int time){
++		Timer.delay(time);
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..19c21204d26e50ff8f0e0c31e6f6a69def5d1233
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
+@@ -0,0 +1,98 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.command;
++
++import static org.junit.Assert.*;
++
++import org.junit.After;
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.mocks.MockCommand;
++import edu.wpi.first.wpilibj.test.AbstractComsSetup;
++
++/**
++ * @author jonathanleitschuh
++ * 
++ */
++public class CommandParallelGroupTest extends AbstractCommandTest {
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@BeforeClass
++	public static void setUpBeforeClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@AfterClass
++	public static void tearDownAfterClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@After
++	public void tearDown() throws Exception {
++	}
++
++	@Test
++	public void test() {
++		MockCommand command1 = new MockCommand();
++		MockCommand command2 = new MockCommand();
++
++		CommandGroup commandGroup = new CommandGroup();
++		commandGroup.addParallel(command1);
++		commandGroup.addParallel(command2);
++
++		assertCommandState(command1, 0, 0, 0, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		commandGroup.start();
++		assertCommandState(command1, 0, 0, 0, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 0, 0, 0, 0, 0);
++		assertCommandState(command2, 0, 0, 0, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 1, 1, 0, 0);
++		assertCommandState(command2, 1, 1, 1, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 2, 2, 0, 0);
++		assertCommandState(command2, 1, 2, 2, 0, 0);
++		command1.setHasFinished(true);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 3, 3, 1, 0);
++		assertCommandState(command2, 1, 3, 3, 0, 0);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 3, 3, 1, 0);
++		assertCommandState(command2, 1, 4, 4, 0, 0);
++		command2.setHasFinished(true);
++		Scheduler.getInstance().run();
++		assertCommandState(command1, 1, 3, 3, 1, 0);
++		assertCommandState(command2, 1, 5, 5, 1, 0);
++
++	}
++
++	public void sleep(long time) {
++		try {
++			Thread.sleep(time);
++		} catch (InterruptedException ex) {
++			fail("Sleep Interrupted!?!?!?!?");
++		}
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..872fb189df47320aa49b48f38d77720c1e96cbc1
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java
+@@ -0,0 +1,98 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.command;
++
++import static org.junit.Assert.*;
++
++import org.junit.After;
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.mocks.MockCommand;
++
++/**
++ * @author jonathanleitschuh, mwills
++ *
++ */
++public class CommandScheduleTest extends AbstractCommandTest {
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@BeforeClass
++	public static void setUpBeforeClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@AfterClass
++	public static void tearDownAfterClass() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@After
++	public void tearDown() throws Exception {
++	}
++
++	/**
++	 * Simple scheduling of a command and making sure the command is run and successfully terminates
++	 */
++	@Test
++	public void testRunAndTerminate() {
++		MockCommand command = new MockCommand();
++        command.start();
++        assertCommandState(command, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(command, 0, 0, 0, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(command, 1, 1, 1, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(command, 1, 2, 2, 0, 0);
++        command.setHasFinished(true);
++        assertCommandState(command, 1, 2, 2, 0, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(command, 1, 3, 3, 1, 0);
++        Scheduler.getInstance().run();
++        assertCommandState(command, 1, 3, 3, 1, 0);
++	}
++	
++	/**
++	 * Simple scheduling of a command and making sure the command is run and cancels correctly
++	 */
++	@Test
++	public void testRunAndCancel(){
++		 MockCommand command = new MockCommand();
++         command.start();
++         assertCommandState(command, 0, 0, 0, 0, 0);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 0, 0, 0, 0, 0);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 1, 1, 1, 0, 0);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 1, 2, 2, 0, 0);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 1, 3, 3, 0, 0);
++         command.cancel();
++         assertCommandState(command, 1, 3, 3, 0, 0);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 1, 3, 3, 0, 1);
++         Scheduler.getInstance().run();
++         assertCommandState(command, 1, 3, 3, 0, 1);
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/DIOCrossConnectFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/DIOCrossConnectFixture.java
+index 3690f8aa4e5debcd36420101a59029ce6fb8a139..bf125768316c9c842474ce358103c595336ba50e 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/DIOCrossConnectFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/DIOCrossConnectFixture.java
+@@ -6,24 +6,66 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.fixtures;
+ 
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import edu.wpi.first.wpilibj.DigitalInput;
++import edu.wpi.first.wpilibj.DigitalOutput;
++
+ public class DIOCrossConnectFixture implements ITestFixture {
++	
++	private static final Logger logger = Logger.getLogger(DIOCrossConnectFixture.class.getName());
++	
++	private final DigitalInput input;
++	private final DigitalOutput output;
++	private boolean m_allocated;
++	
++	public DIOCrossConnectFixture(DigitalInput input, DigitalOutput output) {
++		assert input != null;
++		assert output != null;
++		this.input = input;
++		this.output = output;
++		m_allocated = false;
++	}
++	
++	public DIOCrossConnectFixture(Integer input, Integer output){
++		assert input != null;
++		assert output != null;
++		assert !input.equals(output);
++		this.input = new DigitalInput(input);
++		this.output = new DigitalOutput(output);
++		m_allocated = true;
++	}
++	
++	public DigitalInput getInput(){
++		return input;
++	}
++	
++	public DigitalOutput getOutput(){
++		return output;
++	}
+ 
+ 	@Override
+ 	public boolean setup() {
+-		// TODO Auto-generated method stub
+-		return false;
++		return true;
+ 	}
+ 
+ 	@Override
+ 	public boolean reset() {
+-		// TODO Auto-generated method stub
+-		return false;
++		output.set(false);
++		assert input.get();
++		return true;
+ 	}
+ 
+ 	@Override
+ 	public boolean teardown() {
+-		// TODO Auto-generated method stub
+-		return false;
++		logger.log(Level.FINE,"Begining teardown");
++		if(m_allocated){
++			input.free();
++			output.free();
++			m_allocated = false;
++		}
++		return true;
+ 	}
+ 
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeCounterFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeCounterFixture.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1210b07dd73e2ae1c1522e826ed855a7d7a8e757
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeCounterFixture.java
+@@ -0,0 +1,104 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.fixtures;
++
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import edu.wpi.first.wpilibj.Counter;
++import edu.wpi.first.wpilibj.mockhardware.FakeCounterSource;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class FakeCounterFixture implements ITestFixture {
++	private static final Logger logger = Logger.getLogger(FakeEncoderFixture.class.getName());
++	
++	private final DIOCrossConnectFixture dio;
++	private boolean m_allocated;
++	private final FakeCounterSource source;
++	private final Counter counter;
++	
++	/**
++	 * Constructs a FakeCounterFixture.
++	 * @param dio A previously allocated DIOCrossConnectFixture (must be freed outside this class)
++	 */
++	public FakeCounterFixture (DIOCrossConnectFixture dio){
++		this.dio = dio;
++		m_allocated = false;
++		source = new FakeCounterSource(dio.getOutput());
++		counter = new Counter(dio.getInput());
++	}
++	
++	
++	/**
++	 * Constructs a FakeCounterFixture using two port numbers
++	 * @param input the input port 
++	 * @param output the output port
++	 */
++	public FakeCounterFixture(int input, int output){
++		this.dio = new DIOCrossConnectFixture(input, output);
++		m_allocated = true;
++		source = new FakeCounterSource(dio.getOutput());
++		counter = new Counter(dio.getInput());
++	}
++	
++	/**
++	 * Retrieves the FakeCouterSource for use
++	 * @return the FakeCounterSource
++	 */
++	public FakeCounterSource getFakeCounterSource(){
++		return source;
++	}
++	
++	/**
++	 * Gets the Counter for use
++	 * @return the Counter
++	 */
++	public Counter getCounter(){
++		return counter;
++	}
++
++	
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
++	 */
++	@Override
++	public boolean setup() {
++		counter.start();
++		return true;
++		
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
++	 */
++	@Override
++	public boolean reset() {
++		counter.reset();
++		return true;
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
++	 */
++	@Override
++	public boolean teardown() {
++		logger.log(Level.FINE,"Begining teardown");
++		counter.free();
++		source.free();
++		if(m_allocated){ //Only tear down the dio if this class allocated it
++			dio.teardown();
++			m_allocated = false;
++		}
++		return true;
++	}
++	
++	
++	
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeEncoderFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeEncoderFixture.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6daf49ad48f23376b027e83bf7da40e3a3f00edb
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeEncoderFixture.java
+@@ -0,0 +1,117 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.fixtures;
++
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import edu.wpi.first.wpilibj.Encoder;
++import edu.wpi.first.wpilibj.mockhardware.FakeEncoderSource;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class FakeEncoderFixture implements ITestFixture {
++	private static final Logger logger = Logger.getLogger(FakeEncoderFixture.class.getName());
++	
++	private final DIOCrossConnectFixture m_dio1;
++	private final DIOCrossConnectFixture m_dio2;
++	private boolean m_allocated;
++	
++	private final FakeEncoderSource m_source;
++	private int m_sourcePort [] = new int[2];
++	private final Encoder m_encoder;
++	private int m_encoderPort [] = new int[2];
++	
++	/**
++	 * Constructs a FakeEncoderFixture from two DIOCrossConnectFixture
++	 * @param dio1
++	 * @param dio2
++	 */
++	public FakeEncoderFixture(DIOCrossConnectFixture dio1, DIOCrossConnectFixture dio2){
++		assert dio1 != null;
++		assert dio2 != null;
++		this.m_dio1 = dio1;
++		this.m_dio2 = dio2;
++		m_allocated = false;
++		m_source = new FakeEncoderSource(dio1.getOutput(), dio2.getOutput());
++		m_encoder = new Encoder(dio1.getInput(), dio2.getOutput());
++	}
++	
++	/**
++	 * Construcst a FakeEncoderFixture from a set of Digital I/O ports
++	 * @param inputA
++	 * @param outputA
++	 * @param inputB
++	 * @param outputB
++	 */
++	public FakeEncoderFixture(int inputA, int outputA, int inputB,  int outputB){
++		assert outputA != outputB;
++		assert outputA != inputA;
++		assert outputA != inputB;
++		assert outputB != inputA;
++		assert outputB != inputB;
++		assert inputA  != inputB;
++		this.m_dio1 = new DIOCrossConnectFixture(inputA, outputA);
++		this.m_dio2 = new DIOCrossConnectFixture(inputB, outputB);
++		m_allocated = true;
++		m_sourcePort[0] = outputA;
++		m_sourcePort[1] = outputB;
++		m_encoderPort[0] = inputA;
++		m_encoderPort[1] = inputB;
++		m_source = new FakeEncoderSource(m_dio1.getOutput(), m_dio2.getOutput());
++		m_encoder = new Encoder(m_dio1.getInput(), m_dio2.getOutput());
++	}
++	
++	public FakeEncoderSource getFakeEncoderSource(){
++		return m_source;
++	}
++	
++	public Encoder getEncoder(){
++		return m_encoder;
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
++	 */
++	@Override
++	public boolean setup() {
++		m_encoder.start();
++		return true;
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
++	 */
++	@Override
++	public boolean reset() {
++		m_dio1.reset();
++		m_dio2.reset();
++		m_encoder.reset();
++		return true;
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
++	 */
++	@Override
++	public boolean teardown() {
++		logger.fine("Begining teardown");
++		m_source.free();
++		logger.finer("Source freed " + m_sourcePort[0] + ",  " + m_sourcePort[1]);
++		m_encoder.free();
++		logger.finer("Encoder freed " + m_encoderPort[0]  + ", " + m_encoderPort[1]);
++		if(m_allocated){
++			m_dio1.teardown();
++			m_dio2.teardown();
++		}
++		return true;
++	}
++	
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
+index 0923d5dd0f88d787830e4324014c4c7847c76c8b..7f84691045763a6a188904c8aa108368b3003268 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
+@@ -108,10 +108,10 @@ public class MotorEncoderFixture implements ITestFixture {
+ 			c.reset();
+ 		}
+ 		
+-		wasReset &= motor.get() == 0;
+-		wasReset &= encoder.get() == 0;
++		wasReset = wasReset && motor.get() == 0;
++		wasReset = wasReset && encoder.get() == 0;
+ 		for(Counter c : counters){
+-			wasReset &= c.get() == 0;
++			wasReset = wasReset && c.get() == 0;
+ 		}
+ 		
+ 		return wasReset;
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
+index 1d0ca196dbb7c079734de96a6c6eb5d5ed546654..e792c5ef3670d6cbf3385a28505e316d775d3263 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
+@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.Timer;
+  */
+ public class TiltPanCameraFixture implements ITestFixture {
+ 	
+-	public static final double RESET_TIME = 3.0;
++	public static final double RESET_TIME = 3.5;
+ 	
+ 	private final Gyro gyro;
+ 	private final Servo tilt;
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeCounterSource.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeCounterSource.java
+index d597e322c784964ddc001d63dbc4498d9198f9dd..65e4d8a5fcc164034250f842c1f271c3e6a233da 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeCounterSource.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeCounterSource.java
+@@ -21,6 +21,7 @@ public class FakeCounterSource
+     private int m_count;
+     private int m_mSec;
+     private DigitalOutput m_output;
++    private boolean m_allocated;
+ 
+     /**
+      * Thread object that allows emulation of an encoder
+@@ -52,6 +53,17 @@ public class FakeCounterSource
+             }
+         }
+     }
++    
++    /**
++     * Create a fake encoder on a given port
++     * @param output the port to output the given signal to
++     */
++    public FakeCounterSource(DigitalOutput output)
++    {
++        m_output = output;
++        m_allocated = false;
++        initEncoder();
++    }
+ 
+     /**
+      * Create a fake encoder on a given port
+@@ -60,6 +72,7 @@ public class FakeCounterSource
+     public FakeCounterSource(int port)
+     {
+         m_output = new DigitalOutput(port);
++        m_allocated = true;
+         initEncoder();
+     }
+ 
+@@ -71,6 +84,7 @@ public class FakeCounterSource
+     public FakeCounterSource(int slot, int port)
+     {
+         m_output = new DigitalOutput(slot, port);
++        m_allocated = true;
+         initEncoder();
+     }
+ 
+@@ -80,7 +94,11 @@ public class FakeCounterSource
+     public void free()
+     {
+         m_task = null;
+-        m_output.free();
++        if(m_allocated){
++        	m_output.free();
++        	m_output = null;
++        	m_allocated = false;
++        }
+     }
+ 
+     /**
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeEncoderSource.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeEncoderSource.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5795061a39faea67bfac6ba443f8233403b93701
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakeEncoderSource.java
+@@ -0,0 +1,189 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.mockhardware;
++
++import edu.wpi.first.wpilibj.DigitalOutput;
++import edu.wpi.first.wpilibj.Timer;
++
++/**
++ * @file FakeEncoderSource.java
++ * Emulates a quadrature encoder
++ * @author Ryan O'Meara
++ */
++public class FakeEncoderSource
++{
++
++    private Thread m_task;
++    private int m_count;
++    private int m_mSec;
++    private boolean m_forward;
++    private DigitalOutput m_outputA, m_outputB;
++    private final boolean allocatedOutputs;
++
++    /**
++     * Thread object that allows emulation of a quadrature encoder
++     */
++    private class QuadEncoderThread extends Thread
++    {
++
++        FakeEncoderSource m_encoder;
++
++        QuadEncoderThread(FakeEncoderSource encode)
++        {
++            m_encoder = encode;
++        }
++
++        public void run()
++        {
++
++            DigitalOutput lead, lag;
++
++            m_encoder.m_outputA.set(false);
++            m_encoder.m_outputB.set(false);
++
++            if (m_encoder.isForward())
++            {
++                lead = m_encoder.m_outputA;
++                lag = m_encoder.m_outputB;
++            } else
++            {
++                lead = m_encoder.m_outputB;
++                lag = m_encoder.m_outputA;
++            }
++
++            try
++            {
++                for (int i = 0; i < m_encoder.m_count; i++)
++                {
++                    lead.set(true);
++                    Thread.sleep(m_encoder.m_mSec);
++                    lag.set(true);
++                    Thread.sleep(m_encoder.m_mSec);
++                    lead.set(false);
++                    Thread.sleep(m_encoder.m_mSec);
++                    lag.set(false);
++                    Thread.sleep(m_encoder.m_mSec);
++                }
++            } catch (InterruptedException e)
++            {
++            }
++        }
++    }
++
++    public FakeEncoderSource(int slotA, int portA, int slotB, int portB)
++    {
++        m_outputA = new DigitalOutput(slotA, portA);
++        m_outputB = new DigitalOutput(slotB, portB);
++        allocatedOutputs = true;
++        initQuadEncoder();
++    }
++
++    public FakeEncoderSource(int portA, int portB)
++    {
++        m_outputA = new DigitalOutput(portA);
++        m_outputB = new DigitalOutput(portB);
++        allocatedOutputs = true;
++        initQuadEncoder();
++    }
++
++    public FakeEncoderSource(DigitalOutput iA, DigitalOutput iB)
++    {
++        m_outputA = iA;
++        m_outputB = iB;
++        allocatedOutputs = false;
++        initQuadEncoder();
++    }
++
++    public void free()
++    {
++        m_task = null;
++        if (allocatedOutputs) {
++            m_outputA.free();
++            m_outputB.free();
++        }
++    }
++
++    /**
++     * Common initialization code
++     */
++    private final void initQuadEncoder()
++    {
++        m_mSec = 1;
++        m_forward = true;
++        m_task = new QuadEncoderThread(this);
++        m_outputA.set(false);
++        m_outputB.set(false);
++    }
++
++    /**
++     * Starts the thread
++     */
++    public void start()
++    {
++        m_task.start();
++    }
++
++    /**
++     * Waits for thread to end
++     */
++    public void complete()
++    {
++        try
++        {
++            m_task.join();
++        } catch (InterruptedException e)
++        {
++        }
++        m_task = new QuadEncoderThread(this);
++        Timer.delay(.5);
++    }
++
++    /**
++     * Runs and waits for thread to end before returning
++     */
++    public void execute()
++    {
++        start();
++        complete();
++    }
++
++    /**
++     * Rate of pulses to send
++     * @param mSec Pulse Rate
++     */
++    public void setRate(int mSec)
++    {
++        m_mSec = mSec;
++    }
++
++    /**
++     * Set the number of pulses to simulate
++     * @param count Pulse count
++     */
++    public void setCount(int count)
++    {
++        m_count = Math.abs(count);
++    }
++
++    /**
++     * Set which direction the encoder simulates motion in
++     * @param isForward Whether to simulate forward motion
++     */
++    public void setForward(boolean isForward)
++    {
++        m_forward = isForward;
++    }
++
++    /**
++     * Accesses whether the encoder is simulating forward motion
++     * @return Whether the simulated motion is in the forward direction
++     */
++    public boolean isForward()
++    {
++        return m_forward;
++    }
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mocks/MockCommand.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mocks/MockCommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ae2fe9192e9e23899bfd3485b80253cf0c2ec889
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mocks/MockCommand.java
+@@ -0,0 +1,113 @@
++package edu.wpi.first.wpilibj.mocks;
++
++import edu.wpi.first.wpilibj.command.Command;
++
++/**
++ * A class to simulate a simple command
++ * The command keeps track of how many times each method was called
++ *
++ * @author mwills
++ */
++public class MockCommand extends Command{
++    private int initializeCount = 0;
++    private int executeCount = 0;
++    private int isFinishedCount = 0;
++    private boolean hasFinished = false;
++    private int endCount = 0;
++    private int interruptedCount = 0;
++    
++    protected void initialize() {
++        ++initializeCount;
++    }
++
++    protected void execute() {
++        ++executeCount;
++    }
++
++    protected boolean isFinished() {
++        ++isFinishedCount;
++        return isHasFinished();
++    }
++
++    protected void end() {
++        ++endCount;
++    }
++
++    protected void interrupted() {
++        ++interruptedCount;
++    }
++    
++    
++    
++    
++    
++    
++
++    /**
++     * @return how many times the initialize method has been called
++     */
++    public int getInitializeCount() {
++        return initializeCount;
++    }
++    /**
++     * @return if the initialize method has been called at least once
++     */
++    public boolean hasInitialized(){
++        return getInitializeCount()>0;
++    }
++
++    /**
++     * @return how many time the execute method has been called
++     */
++    public int getExecuteCount() {
++        return executeCount;
++    }
++
++    /**
++     * @return how many times the isFinished method has been called
++     */
++    public int getIsFinishedCount() {
++        return isFinishedCount;
++    }
++
++    /**
++     * @return what value the isFinished method will return
++     */
++    public boolean isHasFinished() {
++        return hasFinished;
++    }
++
++    /**
++     * @param set what value the isFinished method will return
++     */
++    public void setHasFinished(boolean hasFinished) {
++        this.hasFinished = hasFinished;
++    }
++
++    /**
++     * @return how many times the end method has been called
++     */
++    public int getEndCount() {
++        return endCount;
++    }
++    /**
++     * @return if the end method has been called at least once
++     */
++    public boolean hasEnd(){
++        return getEndCount()>0;
++    }
++
++    /**
++     * @return how many times the interrupted method has been called
++     */
++    public int getInterruptedCount() {
++        return interruptedCount;
++    }
++    /**
++     * @return if the interrupted method has been called at least once
++     */
++    public boolean hasInterrupted(){
++        return getInterruptedCount()>0;
++    }
++    
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/RepeatRule.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/RepeatRule.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..22295f0f6a84d792b9d0ec642bc09d73ec1f1474
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/RepeatRule.java
+@@ -0,0 +1,61 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.test;
++
++import java.lang.annotation.Retention;
++import java.lang.annotation.RetentionPolicy;
++import java.lang.annotation.Target;
++
++import org.junit.rules.TestRule;
++import org.junit.runner.Description;
++import org.junit.runners.model.Statement;
++
++/**
++ * This JUnit Rule allows you to apply this rule to any test to allow it to run multiple times.
++ * This is important if you have a test that fails only "sometimes" and needs to be rerun to find the issue.
++ * 
++ * This code was originally found here:
++ * <a href="http://www.codeaffine.com/2013/04/10/running-junit-tests-repeatedly-without-loops/">Running JUnit Tests Repeatedly Without Loops<a>
++ * @author Frank Appel
++ */
++public class RepeatRule implements TestRule {
++	@Retention( RetentionPolicy.RUNTIME )
++	@Target({java.lang.annotation.ElementType.METHOD} )
++	public @interface Repeat {
++		public abstract int times();
++	}
++
++	 
++    private static class RepeatStatement extends Statement {
++ 
++    private final int times;
++    private final Statement statement;
++ 
++    private RepeatStatement( int times, Statement statement ) {
++      this.times = times;
++      this.statement = statement;
++    }
++ 
++    @Override
++    public void evaluate() throws Throwable {
++      for( int i = 0; i < times; i++ ) {
++        statement.evaluate();
++      }
++    }
++  }
++ 
++  @Override
++  public Statement apply( Statement statement, Description description ) {
++    Statement result = statement;
++    Repeat repeat = description.getAnnotation( Repeat.class );
++    if( repeat != null ) {
++      int times = repeat.times();
++      result = new RepeatStatement( times, statement );
++    }
++    return result;
++  }
++}
+\ No newline at end of file
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index e7adaa79645e6323a8e27781d3f08b18a7e372f9..aa5cb865c01a010bd3e837bf1fdcbf3d37efcf8a 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -6,18 +6,25 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.test;
+ 
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Collection;
++import java.util.Iterator;
++import java.util.List;
++
+ import edu.wpi.first.wpilibj.CANJaguar;
+ import edu.wpi.first.wpilibj.DigitalInput;
++import edu.wpi.first.wpilibj.DigitalOutput;
+ import edu.wpi.first.wpilibj.Gyro;
+ import edu.wpi.first.wpilibj.Jaguar;
+ import edu.wpi.first.wpilibj.Servo;
+ import edu.wpi.first.wpilibj.Talon;
+ import edu.wpi.first.wpilibj.Victor;
+ import edu.wpi.first.wpilibj.can.CANTimeoutException;
++import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
+ import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+ import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
+ 
+-
+ /**
+  * This class provides access to all of the elements on the test bench, for use
+  * in fixtures. This class is a singleton, you should use {@link #getInstance()}
+@@ -28,78 +35,92 @@ import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
+  * @author Fredric Silberberg
+  */
+ public final class TestBench {
++
++	/**
++	 * The time that it takes to have a motor go from rotating at full speed to
++	 * completely stopped
++	 */
++	public static final double MOTOR_STOP_TIME = 0.50;
+ 	
+ 	
+-	/** The time that it takes to have a motor go from rotating at full speed to completely stopped */
+-	public static final double MOTOR_STOP_TIME = 0.50;
+-
++	//THESE MUST BE IN INCREMENTING ORDER
++	public static final int DIOCrossConnectA1 = 7;
++	public static final int DIOCrossConnectA2 = 8;
++	public static final int DIOCrossConnectB1 = 9;
++	public static final int DIOCrossConnectB2 = 10;
++	
+ 	/** The Singleton instance of the Test Bench */
+ 	private static TestBench instance = null;
+-	
+-	private CANJaguar canJag = null; //This is declared externally because it does not have a free method
+-	
+ 
+-	
++	private CANJaguar canJag = null; // This is declared externally because it
++										// does not have a free method
++
+ 	/**
+-	 * The single constructor for the TestBench.
+-	 * This method is private in order to prevent multiple TestBench objects from being allocated
++	 * The single constructor for the TestBench. This method is private in order
++	 * to prevent multiple TestBench objects from being allocated
+ 	 */
+-	private TestBench(){		
++	private TestBench() {
+ 	}
+-	
+-	
++
+ 	/**
+-	 * Constructs a new set of objects representing a connected set of Talon controlled Motors and an encoder
++	 * Constructs a new set of objects representing a connected set of Talon
++	 * controlled Motors and an encoder
+ 	 * 
+ 	 * @return a freshly allocated Talon, Encoder pair
+ 	 */
+-	public MotorEncoderFixture getTalonPair(){
++	public MotorEncoderFixture getTalonPair() {
+ 		Talon talon = new Talon(1);
+ 		DigitalInput encA1 = new DigitalInput(1);
+ 		DigitalInput encB1 = new DigitalInput(2);
+-		
+-		MotorEncoderFixture talonPair = new MotorEncoderFixture(talon, encA1, encB1);
++
++		MotorEncoderFixture talonPair = new MotorEncoderFixture(talon, encA1,
++				encB1);
+ 		return talonPair;
+ 	}
+-	
++
+ 	/**
+-	 * Constructs a new set of objects representing a connected set of Victor controlled Motors and an encoder
++	 * Constructs a new set of objects representing a connected set of Victor
++	 * controlled Motors and an encoder
+ 	 * 
+ 	 * @return a freshly allocated Victor, Encoder pair
+ 	 */
+-	public MotorEncoderFixture getVictorPair(){
++	public MotorEncoderFixture getVictorPair() {
+ 		Victor vic = new Victor(2);
+ 		DigitalInput encA2 = new DigitalInput(3);
+ 		DigitalInput encB2 = new DigitalInput(4);
+ 		MotorEncoderFixture vicPair = new MotorEncoderFixture(vic, encA2, encB2);
+ 		return vicPair;
+ 	}
+-	
+-	
++
+ 	/**
+-	 * Constructs a new set of objects representing a connected set of Jaguar controlled Motors and an encoder
++	 * Constructs a new set of objects representing a connected set of Jaguar
++	 * controlled Motors and an encoder
+ 	 * 
+ 	 * @return a freshly allocated Jaguar, Encoder pair
+ 	 */
+-	public MotorEncoderFixture getJaguarPair(){
++	public MotorEncoderFixture getJaguarPair() {
+ 		Jaguar jag = new Jaguar(3);
+ 		DigitalInput encA3 = new DigitalInput(5);
+ 		DigitalInput encB3 = new DigitalInput(6);
+ 		MotorEncoderFixture jagPair = new MotorEncoderFixture(jag, encA3, encB3);
+ 		return jagPair;
+ 	}
+-	
++
+ 	/**
+-	 * Constructs a new set of objects representing a connected set of CANJaguar controlled Motors and an encoder<br>
+-	 * Note: The CANJaguar is not freshly allocated because the CANJaguar lacks a free() method
++	 * Constructs a new set of objects representing a connected set of CANJaguar
++	 * controlled Motors and an encoder<br>
++	 * Note: The CANJaguar is not freshly allocated because the CANJaguar lacks
++	 * a free() method
++	 * 
+ 	 * @return an existing CANJaguar and a freshly allocated Encoder
+ 	 */
+-	public MotorEncoderFixture getCanJaguarPair(){
+-		
++	public MotorEncoderFixture getCanJaguarPair() {
++
+ 		DigitalInput encA4 = new DigitalInput(7);
+ 		DigitalInput encB4 = new DigitalInput(8);
+ 		MotorEncoderFixture canPair;
+-		if(canJag == null){		//Again this is because the CanJaguar does not have a free method
++		if (canJag == null) { // Again this is because the CanJaguar does not
++								// have a free method
+ 			try {
+ 				canJag = new CANJaguar(1);
+ 			} catch (CANTimeoutException e) {
+@@ -110,27 +131,117 @@ public final class TestBench {
+ 		assert canPair != null;
+ 		return canPair;
+ 	}
+-	
++
+ 	/**
+ 	 * Constructs a new set of two Servo's and a Gyroscope.
++	 * 
+ 	 * @return a freshly allocated Servo's and a freshly allocated Gyroscope
+ 	 */
+-	public TiltPanCameraFixture getTiltPanCam(){
++	public TiltPanCameraFixture getTiltPanCam() {
+ 		Gyro gyro = new Gyro(1);
+-		gyro.setSensitivity(.007); //If a different gyroscope is used this value will be different
+-		
++		gyro.setSensitivity(.007); // If a different gyroscope is used this
++									// value will be different
++
+ 		Servo tilt = new Servo(10);
+ 		Servo pan = new Servo(9);
+-		
++
+ 		TiltPanCameraFixture tpcam = new TiltPanCameraFixture(tilt, pan, gyro);
+-		
++
+ 		return tpcam;
+ 	}
++
++	public DIOCrossConnectFixture getDIOCrossConnectFixture(int inputPort,
++			int outputPort) {
++		DIOCrossConnectFixture dio = new DIOCrossConnectFixture(inputPort, outputPort);
++		return dio;
++	}
+ 	
++	/**
++	 * Gets two lists of possible DIO pairs for the two pairs
++	 * @return
++	 */
++	private List<List<Integer[]>> getDIOCrossConnect(){
++		List<List<Integer[]>> pairs = new ArrayList<List<Integer[]>>();
++		List<Integer[]> setA = Arrays.asList(new Integer[][] {
++			{ new Integer(DIOCrossConnectA1), new Integer(DIOCrossConnectA2) },
++			{ new Integer(DIOCrossConnectA2), new Integer(DIOCrossConnectA1) }
++		});
++		pairs.add(setA);
++		
++		List<Integer[]> setB = Arrays.asList(new Integer[][] {
++			{ new Integer(DIOCrossConnectB1), new Integer(DIOCrossConnectB2) },
++			{ new Integer(DIOCrossConnectB2), new Integer(DIOCrossConnectB1) }
++		});
++		pairs.add(setB);
++		//NOTE: IF MORE DIOCROSSCONNECT PAIRS ARE ADDED ADD THEM HERE
++		return pairs;
++	}
++
++	/**
++	 * Return a single Collection containing all of the DIOCrossConnectFixtures in all two pair combinations
++	 * @return
++	 */
++	public Collection<Integer[]> getDIOCrossConnectCollection() {
++		Collection<Integer[]> pairs = new ArrayList<Integer[]>();
++		for(Collection<Integer[]> collection : getDIOCrossConnect()){
++			pairs.addAll(collection);
++		}
++		return pairs;
++	}
+ 	
+ 	/**
+-	 * Gets the singleton of the TestBench. If the TestBench is not already allocated in constructs an new instance of it.
+-	 * Otherwise it returns the existing instance.
++	 * Gets an array of pairs for the encoder to use using two different lists
++	 * @param listA
++	 * @param listB
++	 * @param flip whether this encoder needs to be flipped
++	 * @return A list of different inputs to use for the tests
++	 */
++	private Collection<Integer[]> getPairArray(List<Integer[]> listA, List<Integer[]> listB, boolean flip){
++		Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
++		for (Integer[] portPairsA : listA) {
++			ArrayList<Integer[]> construtorInput = new ArrayList<Integer[]>();
++			Integer inputs[] = new Integer[5];
++			inputs[0] = portPairsA[0]; // InputA
++			inputs[1] = portPairsA[1]; // InputB
++
++			for (Integer[] portPairsB : listB) {
++				inputs[2] = portPairsB[0]; 	// OutputA
++				inputs[3] = portPairsB[1]; 	// OutputB
++				inputs [4] = flip? 0 : 1;  	// The flip bit
++			}
++			
++			construtorInput.add(inputs);
++
++			inputs = inputs.clone();
++			for (Integer[] portPairsB : listB) {
++				inputs[2] = portPairsB[1]; 	// OutputA
++				inputs[3] = portPairsB[0]; 	// OutputB
++				inputs [4] = flip? 0 : 1;	//The flip bit
++			}
++			construtorInput.add(inputs);
++			encoderPortPairs.addAll(construtorInput);
++		}
++		return encoderPortPairs;
++	}
++	
++	/**
++	 * Constructs the list of inputs to be used for the encoder test
++	 * @return A collection of different input pairs to use for the encoder
++	 */
++	public Collection<Integer[]> getEncoderDIOCrossConnectCollection() {
++		Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
++		assert getDIOCrossConnect().size() == 2;
++		encoderPortPairs.addAll(getPairArray(getDIOCrossConnect().get(0), getDIOCrossConnect().get(1), false));
++		encoderPortPairs.addAll(getPairArray(getDIOCrossConnect().get(1), getDIOCrossConnect().get(0), false));
++		assert (encoderPortPairs.size() == 8);
++		return encoderPortPairs;
++	}
++
++	/**
++	 * Gets the singleton of the TestBench. If the TestBench is not already
++	 * allocated in constructs an new instance of it. Otherwise it returns the
++	 * existing instance.
++	 * 
+ 	 * @return The Singleton instance of the TestBench
+ 	 */
+ 	public static TestBench getInstance() {
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+index 58faac883362b3be92db796d2d89a01528aa08d1..4f4d7f2511d953413f1cf1069d7bf86fa83fb88b 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+@@ -6,15 +6,25 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.test;
+ 
++import java.io.IOException;
++import java.io.InputStream;
++import java.util.logging.LogManager;
++import java.util.logging.Logger;
++
+ import org.junit.runner.JUnitCore;
+ import org.junit.runner.RunWith;
+ import org.junit.runners.Suite;
+ import org.junit.runners.Suite.SuiteClasses;
+ 
++import edu.wpi.first.wpilibj.CounterTest;
++import edu.wpi.first.wpilibj.DIOCrossConnectTest;
++import edu.wpi.first.wpilibj.EncoderTest;
+ import edu.wpi.first.wpilibj.MotorEncoderTest;
+ import edu.wpi.first.wpilibj.SampleTest;
+ import edu.wpi.first.wpilibj.TiltPanCameraTest;
+ import edu.wpi.first.wpilibj.TimerTest;
++import edu.wpi.first.wpilibj.command.CommandParallelGroupTest;
++import edu.wpi.first.wpilibj.command.CommandScheduleTest;
+ 
+ /**
+  * The WPILibJ Integeration Test Suite collects all of the tests to be run by
+@@ -23,10 +33,35 @@ import edu.wpi.first.wpilibj.TimerTest;
+  * suite classes annotation.
+  */
+ @RunWith(Suite.class)
+-@SuiteClasses({ SampleTest.class, TiltPanCameraTest.class, MotorEncoderTest.class, TimerTest.class })
++@SuiteClasses({ SampleTest.class,
++				DIOCrossConnectTest.class,
++				CounterTest.class,
++				EncoderTest.class,
++				TiltPanCameraTest.class,
++				MotorEncoderTest.class,
++				CommandParallelGroupTest.class,
++				CommandScheduleTest.class,
++				TimerTest.class
++				})
++//NOTE: THESE ARE EACH LISTED ON SEPERATE LINES TO PREVENT GIT MERGE CONFLICTS!
+ public class TestSuite {
++	static{
++		final InputStream inputStream = TestSuite.class.getResourceAsStream("/logging.properties");
++		try
++		{
++		    LogManager.getLogManager().readConfiguration(inputStream);
++		    Logger.getAnonymousLogger().info("Loaded");
++		}
++		catch (final IOException e)
++		{
++		    Logger.getAnonymousLogger().severe("Could not load default logging.properties file");
++		    Logger.getAnonymousLogger().severe(e.getMessage());
++		}
++		System.out.println("Starting Tests");
++	}
+ 
+ 	public static void main(String[] args) {
++		
+ 		JUnitCore.main("edu.wpi.first.wpilibj.test.TestSuite");
+ 	}
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/logging.properties b/wpilibj/wpilibJavaIntegrationTests/src/main/java/logging.properties
+new file mode 100644
+index 0000000000000000000000000000000000000000..db605313bdda733878eb7d7dfed772ee5e3653f4
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/logging.properties
+@@ -0,0 +1,5 @@
++handlers = java.util.logging.ConsoleHandler
++java.util.logging.ConsoleHandler.level=FINER
++java.util.logging.ConsoleHandler.formatter=java.util.logging.SimpleFormatter
++
++.level=INFO
+\ No newline at end of file

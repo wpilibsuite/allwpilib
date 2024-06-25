@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Tue, 18 Nov 2014 16:54:06 -0500
+Subject: [PATCH 0491/6262] Handle cases where no DS is attached (initial
+ m_controlWord, reportError, getAlliance and getLocation) fixes artf3778
+
+Change-Id: I6befa8e31e6762a101cd0a19641e558c955865b9
+---
+ .../java/edu/wpi/first/wpilibj/DriverStation.java | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index ac5aaa697841ec0b7344ed23b1a538d98e6ba708..5cbef1c8b3c80ba4c2d6901b37c901c2e0f774b1 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -54,7 +54,7 @@ public class DriverStation implements RobotState.Interface {
+ 
+     private static DriverStation instance = new DriverStation();
+ 
+-    private HALControlWord m_controlWord;
++    private HALControlWord m_controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+     private HALAllianceStationID m_allianceStationID;
+     private short[][] m_joystickAxes = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickAxes];
+     private short[][] m_joystickPOVs = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs];
+@@ -289,7 +289,7 @@ public class DriverStation implements RobotState.Interface {
+      * @return True if the robot is enabled, false otherwise.
+      */
+     public boolean isEnabled() {
+-        return m_controlWord.getEnabled();
++        return m_controlWord.getEnabled() && isDSAttached();
+     }
+ 
+     /**
+@@ -362,6 +362,9 @@ public class DriverStation implements RobotState.Interface {
+      * @return the current alliance
+      */
+     public Alliance getAlliance() {
++		if(m_allianceStationID == null) {
++			return Alliance.Invalid;
++		}
+         switch (m_allianceStationID) {
+             case Red1:
+             case Red2:
+@@ -384,6 +387,9 @@ public class DriverStation implements RobotState.Interface {
+      * @return the location of the team's driver station controls: 1, 2, or 3
+      */
+     public int getLocation() {
++		if(m_allianceStationID == null) {
++			return 0;
++		}
+         switch (m_allianceStationID) {
+             case Red1:
+             case Blue1:
+@@ -450,7 +456,10 @@ public class DriverStation implements RobotState.Interface {
+ 			}
+ 		}
+ 		System.err.println(errorString);
+-		FRCNetworkCommunicationsLibrary.HALSetErrorData(errorString);
++		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
++		if(controlWord.getDSAttached()) {
++			FRCNetworkCommunicationsLibrary.HALSetErrorData(errorString);
++		}
+ 	}
+ 
+     /** Only to be used to tell the Driver Station what code you claim to be executing

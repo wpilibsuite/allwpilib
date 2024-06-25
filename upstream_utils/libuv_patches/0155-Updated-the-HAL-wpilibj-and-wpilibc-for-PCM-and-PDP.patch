@@ -1,0 +1,394 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Wed, 2 Jul 2014 15:15:56 -0400
+Subject: [PATCH 0155/6262] Updated the HAL, wpilibj, and wpilibc for PCM and
+ PDP
+
+Removed #if 0...#endif from PCM.cpp
+
+Change-Id: I2d117c87a3fa10bddebf83706f79c2e767d22a0d
+
+Update the HAL to the PCM/PDP changes
+
+Change-Id: If554b650e263f174e90864f1e9ffba91daf20f7e
+
+Update C++ to the PCM/PDP changes
+
+Change-Id: Ia3114d4526be1dc5cc2f74fd8f7ab44f204d15f2
+
+Updated PCM/PDP in Java
+
+Change-Id: I8fe03afbcb1739d555e86abc0eaae1e12313d490
+---
+ hal/lib/Athena/Compressor.cpp                 | 13 +++++------
+ hal/lib/Athena/Solenoid.cpp                   | 23 ++++++++-----------
+ hal/lib/Athena/ctre/PCM.cpp                   |  2 --
+ wpilibc/wpilibC++/include/SensorBase.h        |  2 +-
+ .../wpilibC++/lib/PowerDistributionPanel.cpp  |  2 +-
+ wpilibc/wpilibC++/lib/SensorBase.cpp          |  4 ++--
+ wpilibc/wpilibC++/lib/Solenoid.cpp            | 10 ++++----
+ wpilibc/wpilibC++/lib/SolenoidBase.cpp        |  2 +-
+ .../include/TestBench.h                       |  6 ++---
+ .../wpilibC++IntegrationTests/src/PCMTest.cpp |  4 ++--
+ .../first/wpilibj/PowerDistributionPanel.java |  2 +-
+ .../edu/wpi/first/wpilibj/SensorBase.java     |  6 ++---
+ .../java/edu/wpi/first/wpilibj/Solenoid.java  |  2 +-
+ .../edu/wpi/first/wpilibj/SolenoidBase.java   |  2 +-
+ .../java/edu/wpi/first/wpilibj/PCMTest.java   |  4 ++--
+ .../edu/wpi/first/wpilibj/test/TestBench.java |  6 ++---
+ wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp     |  2 +-
+ 17 files changed, 42 insertions(+), 50 deletions(-)
+
+diff --git a/hal/lib/Athena/Compressor.cpp b/hal/lib/Athena/Compressor.cpp
+index 403d5fc675e48381f7f6985a37d7ebdb3e4b87ad..d9ecf7ac8645080d57497436c6750b1f00932c6c 100644
+--- a/hal/lib/Athena/Compressor.cpp
++++ b/hal/lib/Athena/Compressor.cpp
+@@ -2,21 +2,20 @@
+ #include "ctre/PCM.h"
+ #include <iostream>
+ 
+-static const int NUM_PCMS = 2;
+-extern PCM *modules[NUM_PCMS];
+-extern void initializePCM();
++static const int NUM_MODULE_NUMBERS = 63;
++extern PCM *modules[NUM_MODULE_NUMBERS];
++extern void initializePCM(int module);
+ 
+ void *initializeCompressor(uint8_t module) {
+-	initializePCM();
++	initializePCM(module);
+ 	
+-	return modules[module - 1];
++	return modules[module];
+ }
+ 
+ bool checkCompressorModule(uint8_t module) {
+-	return module > 0 and module <= NUM_PCMS;
++	return module < NUM_MODULE_NUMBERS;
+ }
+ 
+-
+ bool getCompressor(void *pcm_pointer, int32_t *status) {
+ 	PCM *module = (PCM *)pcm_pointer;
+ 	bool value;
+diff --git a/hal/lib/Athena/Solenoid.cpp b/hal/lib/Athena/Solenoid.cpp
+index ff33855a779c074d6eb8a9f23e492c8b63c82f87..0ae2f57ba1d71e2527c75b4281d8a5447b08f7f9 100644
+--- a/hal/lib/Athena/Solenoid.cpp
++++ b/hal/lib/Athena/Solenoid.cpp
+@@ -8,39 +8,34 @@
+ #include "NetworkCommunication/LoadOut.h"
+ #include "ctre/PCM.h"
+ 
+-bool pcmModulesInitialized = false;
++static const int NUM_MODULE_NUMBERS = 63;
+ 
+-static const int NUM_PCMS = 2;
+-PCM *modules[NUM_PCMS];
++PCM *modules[NUM_MODULE_NUMBERS] = { NULL };
+ 
+ struct solenoid_port_t {
+ 	PCM *module;
+ 	uint32_t pin;
+ };
+ 
+-void initializePCM() {
+-	if(!pcmModulesInitialized) {
+-		modules[0] = new PCM(50);
+-		modules[1] = new PCM(51);
+-
+-		pcmModulesInitialized = true;
++void initializePCM(int module) {
++	if(!modules[module]) {
++		modules[module] = new PCM(module);
+ 	}
+ }
+ 
+ void* initializeSolenoidPort(void *port_pointer, int32_t *status) {
+-	initializePCM();
+-
+ 	Port* port = (Port*) port_pointer;
+-
++	initializePCM(port->module);
++	
+ 	solenoid_port_t *solenoid_port = new solenoid_port_t;
+-	solenoid_port->module = modules[port->module - 1];
++	solenoid_port->module = modules[port->module];
+ 	solenoid_port->pin = port->pin;
+ 
+ 	return solenoid_port;
+ }
+ 
+ bool checkSolenoidModule(uint8_t module) {
+-	return module > 0 and module <= NUM_PCMS;
++	return module < NUM_MODULE_NUMBERS;
+ }
+ 
+ bool getSolenoid(void* solenoid_port_pointer, int32_t *status) {
+diff --git a/hal/lib/Athena/ctre/PCM.cpp b/hal/lib/Athena/ctre/PCM.cpp
+index ab747bc1c2b25319075c11b39d708495a4c45a90..5ede1198265217a98af2892eaaf9ca694ae8eaac 100644
+--- a/hal/lib/Athena/ctre/PCM.cpp
++++ b/hal/lib/Athena/ctre/PCM.cpp
+@@ -1,4 +1,3 @@
+-#if 0
+ #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+ 
+ #include "PCM.h"
+@@ -453,4 +452,3 @@ extern "C" {
+ 		return retval;
+ 	}
+ }
+-#endif
+diff --git a/wpilibc/wpilibC++/include/SensorBase.h b/wpilibc/wpilibC++/include/SensorBase.h
+index ef4e296ce92e0a02b9ad2a02df30f6159965404f..c64298bc88982583d68c086c399bf54b4c1af0dd 100644
+--- a/wpilibc/wpilibC++/include/SensorBase.h
++++ b/wpilibc/wpilibC++/include/SensorBase.h
+@@ -23,7 +23,7 @@ public:
+ 
+     static uint32_t GetDefaultSolenoidModule()
+ 	{
+-		return 1;
++		return 0;
+ 	}
+ 
+ 	static bool CheckSolenoidModule(uint8_t moduleNumber);
+diff --git a/wpilibc/wpilibC++/lib/PowerDistributionPanel.cpp b/wpilibc/wpilibC++/lib/PowerDistributionPanel.cpp
+index bf2d9e9428376fbdda78e6b30d48336b5dce5e8a..fa434b113005c777a4bbf933a4f841c4d7635a07 100644
+--- a/wpilibc/wpilibC++/lib/PowerDistributionPanel.cpp
++++ b/wpilibc/wpilibC++/lib/PowerDistributionPanel.cpp
+@@ -47,7 +47,7 @@ PowerDistributionPanel::GetTemperature() {
+ }
+ 
+ /**
+- * @return The current of one of the PDP channels (channels 1-16) in Amperes
++ * @return The current of one of the PDP channels (channels 0-15) in Amperes
+  */
+ double
+ PowerDistributionPanel::GetCurrent(uint8_t channel) {
+diff --git a/wpilibc/wpilibC++/lib/SensorBase.cpp b/wpilibc/wpilibC++/lib/SensorBase.cpp
+index 909fcd70fa99d2256bbbda1b628d7d100ebe9018..b4c186dd5e4c1fdf4392bc460ca38acfcc66c0c6 100644
+--- a/wpilibc/wpilibC++/lib/SensorBase.cpp
++++ b/wpilibc/wpilibC++/lib/SensorBase.cpp
+@@ -153,7 +153,7 @@ bool SensorBase::CheckAnalogOutput(uint32_t channel)
+  */
+ bool SensorBase::CheckSolenoidChannel(uint32_t channel)
+ {
+-	if (channel > 0 && channel <= kSolenoidChannels)
++	if (channel < kSolenoidChannels)
+ 		return true;
+ 	return false;
+ }
+@@ -165,7 +165,7 @@ bool SensorBase::CheckSolenoidChannel(uint32_t channel)
+  */
+ bool SensorBase::CheckPDPChannel(uint32_t channel)
+ {
+-	if (channel > 0 && channel <= kPDPChannels)
++	if (channel < kPDPChannels)
+ 		return true;
+ 	return false;
+ }
+diff --git a/wpilibc/wpilibC++/lib/Solenoid.cpp b/wpilibc/wpilibC++/lib/Solenoid.cpp
+index 8c343fc9c88caa0a1bf43122829cb756081bbb53..2c24b9adb2b7c70cabf4edc6145052e31f94d9b7 100644
+--- a/wpilibc/wpilibC++/lib/Solenoid.cpp
++++ b/wpilibc/wpilibC++/lib/Solenoid.cpp
+@@ -31,14 +31,14 @@ void Solenoid::InitSolenoid()
+ 	Resource::CreateResourceObject(&m_allocated, solenoid_kNumDO7_0Elements * kSolenoidChannels);
+ 
+ 	snprintf(buf, 64, "Solenoid %d (Module: %d)", m_channel, m_moduleNumber);
+-	if (m_allocated->Allocate((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1, buf) == ~0ul)
++	if (m_allocated->Allocate(m_moduleNumber * kSolenoidChannels + m_channel, buf) == ~0ul)
+ 	{
+ 		CloneError(m_allocated);
+ 		return;
+ 	}
+ 
+ 	LiveWindow::GetInstance()->AddActuator("Solenoid", m_moduleNumber, m_channel, this);
+-	HALReport(HALUsageReporting::kResourceType_Solenoid, m_channel, m_moduleNumber - 1);
++	HALReport(HALUsageReporting::kResourceType_Solenoid, m_channel, m_moduleNumber);
+ }
+ 
+ /**
+@@ -73,7 +73,7 @@ Solenoid::~Solenoid()
+ {
+ 	if (CheckSolenoidModule(m_moduleNumber))
+ 	{
+-		m_allocated->Free((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1);
++		m_allocated->Free(m_moduleNumber * kSolenoidChannels + m_channel);
+ 	}
+ }
+ 
+@@ -86,7 +86,7 @@ void Solenoid::Set(bool on)
+ {
+ 	if (StatusIsFatal()) return;
+ 	uint8_t value = on ? 0xFF : 0x00;
+-	uint8_t mask = 1 << (m_channel - 1);
++	uint8_t mask = 1 << m_channel;
+ 
+ 	SolenoidBase::Set(value, mask);
+ }
+@@ -99,7 +99,7 @@ void Solenoid::Set(bool on)
+ bool Solenoid::Get()
+ {
+ 	if (StatusIsFatal()) return false;
+-	uint8_t value = GetAll() & ( 1 << (m_channel - 1));
++	uint8_t value = GetAll() & ( 1 << m_channel);
+ 	return (value != 0);
+ }
+ 
+diff --git a/wpilibc/wpilibC++/lib/SolenoidBase.cpp b/wpilibc/wpilibC++/lib/SolenoidBase.cpp
+index 182cd5d09e9cc5b8df33d659e9c643b6e871450c..08dd650d33263bdd37b1cfec8393f66ff96bb9c9 100644
+--- a/wpilibc/wpilibC++/lib/SolenoidBase.cpp
++++ b/wpilibc/wpilibC++/lib/SolenoidBase.cpp
+@@ -19,7 +19,7 @@ SolenoidBase::SolenoidBase(uint8_t moduleNumber)
+ {
+   	for (uint32_t i = 0; i < kSolenoidChannels; i++)
+ 	{
+-	  void* port = getPortWithModule(moduleNumber, i+1);
++	  void* port = getPortWithModule(moduleNumber, i);
+ 	  int32_t status = 0;
+ 	  m_ports[i] = initializeSolenoidPort(port, &status);
+ 	  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+index 3f4cbff589f5486820ccedd55f10e1c28fd55d06..1accf689d8ff35e3690020bc2183991b6828b0cb 100644
+--- a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
++++ b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+@@ -55,7 +55,7 @@ public:
+ 	static const uint32_t kCANJaguarID = 2;
+ 
+ 	/* PDP channels */
+-	static const uint32_t kJaguarPDPChannel = 7;
+-	static const uint32_t kVictorPDPChannel = 11;
+-	static const uint32_t kTalonPDPChannel = 12;
++	static const uint32_t kJaguarPDPChannel = 6;
++	static const uint32_t kVictorPDPChannel = 10;
++	static const uint32_t kTalonPDPChannel = 11;
+ };
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
+index 5ca8d8da05dcebb8929690d71e4ce7a420782cea..8ba30f1c90690f01578988fe085736a0a39c46f3 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
+@@ -37,8 +37,8 @@ protected:
+     m_fakePressureSwitch = new DigitalOutput(TestBench::kFakePressureSwitchChannel);
+     m_fakeCompressor = new AnalogInput(TestBench::kFakeCompressorChannel);
+ 
+-    m_solenoid1 = new Solenoid(1);
+-    m_solenoid2 = new Solenoid(2);
++    m_solenoid1 = new Solenoid(0);
++    m_solenoid2 = new Solenoid(1);
+ 
+     m_fakeSolenoid1 = new DigitalInput(TestBench::kFakeSolenoid1Channel);
+     m_fakeSolenoid2 = new DigitalInput(TestBench::kFakeSolenoid2Channel);
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java
+index 068afde77189d8913c4d2ff2e4113f23a1c0e9bc..bad97aa41ec9767e2c89ea357e201486b830751d 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java
+@@ -47,7 +47,7 @@ public class PowerDistributionPanel extends SensorBase {
+ 	}
+ 
+ 	/**
+-	 * @return The current of one of the PDP channels (channels 1-16) in Amperes
++	 * @return The current of one of the PDP channels (channels 0-15) in Amperes
+ 	 */
+ 	public double getCurrent(int channel) {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index 76016293a748fe712bfbd015c1f006814d3daabf..32a647761151bd0ffd4304f05ebc8b57b98cc670 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -69,7 +69,7 @@ public abstract class SensorBase { // TODO: Refactor
+ 
+     private static int m_defaultAnalogModule = 1;
+     private static int m_defaultDigitalModule = 1;
+-    private static int m_defaultSolenoidModule = 1;
++    private static int m_defaultSolenoidModule = 0;
+ 
+     /**
+      * Creates an instance of the sensor base and gets an FPGA handle
+@@ -242,7 +242,7 @@ public abstract class SensorBase { // TODO: Refactor
+      * @param channel The channel number to check.
+      */
+     protected static void checkSolenoidChannel(final int channel) {
+-        if (channel <= 0 || channel > kSolenoidChannels) {
++        if (channel < 0 || channel >= kSolenoidChannels) {
+             System.err.println("Requested solenoid channel number is out of range.");
+         }
+     }
+@@ -254,7 +254,7 @@ public abstract class SensorBase { // TODO: Refactor
+      * @param channel The channel number to check.
+      */
+     protected static void checkPDPChannel(final int channel) {
+-        if (channel <= 0 || channel > kPDPChannels) {
++        if (channel < 0 || channel >= kPDPChannels) {
+             System.err.println("Requested solenoid channel number is out of range.");
+         }
+     }
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Solenoid.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Solenoid.java
+index f77f623783f0acdcdc18e90f3a242f918d8649a4..fcfb25a1dbc3f3fc702908e0caf32a632525cb93 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Solenoid.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Solenoid.java
+@@ -54,7 +54,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
+         HALUtil.checkStatus(status.asIntBuffer());
+ 
+         LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
+-        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber - 1);
++        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
+     }
+ 
+     /**
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java
+index e332555637f8fbef1d17b4fa3bd7d62b85c26bfe..f8a13bddb346eeed262c8a35a24b944f9908a735 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java
+@@ -30,7 +30,7 @@ public abstract class SolenoidBase extends SensorBase implements IDeviceControll
+      * @param moduleNumber The number of the solenoid module to use.
+      */
+     public SolenoidBase(final int moduleNumber) {
+-//        m_moduleNumber = moduleNumber;
++        m_moduleNumber = moduleNumber;
+ //        m_ports = new ByteBuffer[SensorBase.kSolenoidChannels];
+ //        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
+ //            ByteBuffer port = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) (i+1));
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PCMTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PCMTest.java
+index e869793c06c60645db84959f419d317f93be4abb..ad4ef2c416fcdfde31a912d5521564e963053b65 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PCMTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PCMTest.java
+@@ -54,8 +54,8 @@ public class PCMTest extends AbstractComsSetup {
+ 	    fakePressureSwitch = new DigitalOutput(11);
+ 	    fakeCompressor = new AnalogInput(1);
+ 
+-	    solenoid1 = new Solenoid(1);
+-	    solenoid2 = new Solenoid(2);
++	    solenoid1 = new Solenoid(0);
++	    solenoid2 = new Solenoid(1);
+ 
+ 	    fakeSolenoid1 = new DigitalInput(12);
+ 	    fakeSolenoid2 = new DigitalInput(13);
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index 6bfd2ab1663d5046dcbfa851e8a7eb0bd74cebfe..1d8e260c90f3d78cdeced959df6ae26549e38b61 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -56,9 +56,9 @@ public final class TestBench {
+ 	
+ 
+ 	/* PowerDistributionPanel channels */
+-	public static final int kJaguarPDPChannel = 7;
+-	public static final int kVictorPDPChannel = 11;
+-	public static final int kTalonPDPChannel = 12;
++	public static final int kJaguarPDPChannel = 6;
++	public static final int kVictorPDPChannel = 10;
++	public static final int kTalonPDPChannel = 11;
+ 	
+ 	/* CAN ASSOICATED CHANNELS */
+ 	public static final int kFakeJaguarPotentiometer = 1;
+diff --git a/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp b/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
+index 21469a9c7b4676f8d6420d4c1e9c6d6602b20348..1b16cd8a3a1db23c8699f9ffed8546729122ef36 100644
+--- a/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
+@@ -51,7 +51,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPortWith
+   (JNIEnv *env, jclass, jbyte module, jbyte channel)
+ {
+ 	VoidPointer *port_pointer = new VoidPointer;
+-	*port_pointer = getPortWithModule(module + 1, channel);
++	*port_pointer = getPortWithModule(module, channel);
+ 	
+ 	return env->NewDirectByteBuffer(port_pointer, 4);
+ }

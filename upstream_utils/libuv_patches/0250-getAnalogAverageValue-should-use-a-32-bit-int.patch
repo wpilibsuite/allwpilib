@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Mon, 4 Aug 2014 16:08:58 -0400
+Subject: [PATCH 0250/6262] getAnalogAverageValue should use a 32-bit int
+
+getAnalogAverageValue gets a 32-bit integer and returns it as an int32_t,
+but previously it stored the intermediate value as a 16-bit int.
+
+Change-Id: I0a8b0cd3b3ff9b1ff40ad7942170f633c44c127b
+---
+ hal/lib/Athena/Analog.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hal/lib/Athena/Analog.cpp b/hal/lib/Athena/Analog.cpp
+index 3ff10224027ef7291883b9c7eacdc210c611f11c..6265b8e2f0e892f83581439ba29b76ae81eb23c2 100644
+--- a/hal/lib/Athena/Analog.cpp
++++ b/hal/lib/Athena/Analog.cpp
+@@ -288,7 +288,7 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
+  */
+ int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
+   AnalogPort* port = (AnalogPort*) analog_port_pointer;
+-  int16_t value;
++  int32_t value;
+   checkAnalogInputChannel(port->port.pin);
+ 
+   tAI::tReadSelect readSelect;
+@@ -299,7 +299,7 @@ int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
+     Synchronized sync(analogRegisterWindowSemaphore);
+     analogInputSystem->writeReadSelect(readSelect, status);
+     analogInputSystem->strobeLatchOutput(status);
+-    value = (int16_t) analogInputSystem->readOutput(status);
++    value = (int32_t) analogInputSystem->readOutput(status);
+   }
+ 
+   return value;

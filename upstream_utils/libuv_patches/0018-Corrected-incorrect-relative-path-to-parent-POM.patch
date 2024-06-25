@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Malmsten <pmalmsten@gmail.com>
+Date: Sun, 26 Jan 2014 17:57:35 -0500
+Subject: [PATCH 0018/6262] Corrected incorrect relative path to parent POM
+
+---
+ networktables/cpp/Athena/pom.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/networktables/cpp/Athena/pom.xml b/networktables/cpp/Athena/pom.xml
+index 428a9432f919e27c476a506ddbb050637b26d932..08e685bab126a0c4f271119b683fc49b2858a0b9 100644
+--- a/networktables/cpp/Athena/pom.xml
++++ b/networktables/cpp/Athena/pom.xml
+@@ -10,7 +10,7 @@
+     <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+     <artifactId>static-library</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
+-    <relativePath>../../maven-utilities/athena/static-library/pom.xml</relativePath>
++    <relativePath>../../../maven-utilities/athena/static-library/pom.xml</relativePath>
+   </parent>
+   
+   <dependencies>

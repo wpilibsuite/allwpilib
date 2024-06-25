@@ -1,0 +1,298 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 21 Aug 2014 15:29:17 -0400
+Subject: [PATCH 0312/6262] Integration tests now run with the Ant Junit test
+ framework.
+
+Removes TestNG as it wasn't reporting all of the tests correctly. Adds Ant as a dependency and uses it to run the JUnit tests so that tests are output in a way that Jenkins understands.
+
+Change-Id: Ie98358476cebe94f233e687195a0fced8723a878
+---
+ wpilibj/wpilibJavaIntegrationTests/pom.xml    |  26 ++---
+ .../first/wpilibj/test/AbstractTestSuite.java |  23 ++--
+ .../first/wpilibj/test/AntJunitLanucher.java  | 106 ++++++++++++++++++
+ .../edu/wpi/first/wpilibj/test/TestSuite.java |  24 +++-
+ 4 files changed, 153 insertions(+), 26 deletions(-)
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AntJunitLanucher.java
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/pom.xml b/wpilibj/wpilibJavaIntegrationTests/pom.xml
+index b819d77afb5c06053337f54f8ae6a602a67c57ee..056e37c78c64454638f9f186096f2f4acdb08cab 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/pom.xml
++++ b/wpilibj/wpilibJavaIntegrationTests/pom.xml
+@@ -35,14 +35,14 @@
+ 			<version>2.0</version>
+ 		</dependency>
+ 		<dependency>
+-			<groupId>org.testng</groupId>
+-			<artifactId>testng</artifactId>
+-			<version>6.8.8</version>
++			<groupId>org.apache.ant</groupId>
++			<artifactId>ant</artifactId>
++			<version>1.9.4</version>
+ 		</dependency>
+ 		<dependency>
+-			<groupId>com.beust</groupId>
+-			<artifactId>jcommander</artifactId>
+-			<version>1.35</version>
++			<groupId>org.apache.ant</groupId>
++			<artifactId>ant-junit</artifactId>
++			<version>1.9.4</version>
+ 		</dependency>
+ 	</dependencies>
+ 
+@@ -131,15 +131,15 @@
+ 									<type>jar</type>
+ 								</artifactItem>
+ 								<artifactItem>
+-									<groupId>org.testng</groupId>
+-									<artifactId>testng</artifactId>
+-									<version>6.8.8</version>
++									<groupId>org.apache.ant</groupId>
++									<artifactId>ant</artifactId>
++									<version>1.9.4</version>
+ 									<type>jar</type>
+ 								</artifactItem>
+ 								<artifactItem>
+-									<groupId>com.beust</groupId>
+-									<artifactId>jcommander</artifactId>
+-									<version>1.35</version>
++									<groupId>org.apache.ant</groupId>
++									<artifactId>ant-junit</artifactId>
++									<version>1.9.4</version>
+ 									<type>jar</type>
+ 								</artifactItem>
+ 							</artifactItems>
+@@ -170,7 +170,7 @@
+ 					<archive>
+ 						<manifest>
+ 							<addClasspath>true</addClasspath>
+-							<mainClass>org.testng.TestNG</mainClass>
++							<mainClass>edu.wpi.first.wpilibj.test.AntJunitLanucher</mainClass>
+ 						</manifest>
+ 					</archive>
+ 				</configuration>
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractTestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractTestSuite.java
+index 27e313b767f2356bf813c4aa640f04fb5911c11d..166704d7141ca4a3b038d676fea7549b616496f3 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractTestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractTestSuite.java
+@@ -1,8 +1,8 @@
+ /*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.						*/
+ /* Open Source Software - may be modified and shared by FRC teams. The code   */
+ /* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
++/* the project.															   */
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.test;
+ 
+@@ -27,7 +27,6 @@ import org.junit.runners.model.InitializationError;
+ public abstract class AbstractTestSuite {
+ 	private static final Logger logger = Logger.getLogger(AbstractTestSuite.class.getName());
+ 	
+-	
+ 	/**
+ 	 * Gets all of the classes listed within the SuiteClasses annotation. To use it, annotate a class
+ 	 * with <code>@RunWith(Suite.class)</code> and <code>@SuiteClasses({TestClass1.class, ...})</code>.
+@@ -38,13 +37,13 @@ public abstract class AbstractTestSuite {
+ 	protected List<Class<?>> getAnnotatedTestClasses(){
+ 		SuiteClasses annotation = getClass().getAnnotation(SuiteClasses.class);
+ 		List<Class<?>> classes = new Vector<Class<?>>();
+-        if (annotation == null) {
+-            throw new RuntimeException(String.format("class '%s' must have a SuiteClasses annotation",  getClass().getName()));
+-        }
+-        for(Class<?> c : annotation.value()){
+-        	classes.add(c);
+-        }
+-        return classes;
++		if (annotation == null) {
++			throw new RuntimeException(String.format("class '%s' must have a SuiteClasses annotation",  getClass().getName()));
++		}
++		for(Class<?> c : annotation.value()){
++			classes.add(c);
++		}
++		return classes;
+ 	}
+ 	
+ 	/**
+@@ -135,7 +134,7 @@ public abstract class AbstractTestSuite {
+ 	 * Gets all of the test classes listed in this suite. Does not include any of the test suites. All of these classes contain tests.
+ 	 * @return The list of base test classes.
+ 	 */
+-	protected List<Class<?>> getAllContainedBaseTests(){
++	public List<Class<?>> getAllContainedBaseTests(){
+ 		List<Class<?>> runningBaseTests = new Vector <Class<?>>();
+ 		return getAllContainedBaseTests(runningBaseTests);
+ 	}
+@@ -161,7 +160,7 @@ public abstract class AbstractTestSuite {
+ 	 * @param regex the text pattern to retrieve.
+ 	 * @return The list of classes matching the regex pattern
+ 	 */
+-	protected List<Class<?>> getAllClassMatching(final String regex){
++	public List<Class<?>> getAllClassMatching(final String regex){
+ 		final List<Class<?>> matchingClasses = new Vector<Class<?>>();
+ 		return getAllClassMatching(regex, matchingClasses);
+ 	}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AntJunitLanucher.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AntJunitLanucher.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..31f4f3ada26cda2f1da6533203bd855a4a164e34
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AntJunitLanucher.java
+@@ -0,0 +1,106 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.						*/
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.															   */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.test;
++
++import java.io.File;
++
++import org.apache.tools.ant.BuildLogger;
++import org.apache.tools.ant.DefaultLogger;
++import org.apache.tools.ant.Project;
++import org.apache.tools.ant.taskdefs.optional.junit.FormatterElement;
++import org.apache.tools.ant.taskdefs.optional.junit.JUnitTask;
++import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;
++
++/**
++ * Provides an entry point for tests to run with ANT. This allows ant to output
++ * JUnit XML test results for Jenkins.
++ * 
++ * @author jonathanleitschuh
++ *
++ */
++public class AntJunitLanucher {
++
++	/**
++	 * Deletes the given file recursively
++	 * 
++	 * @param f
++	 *            the file to delete
++	 */
++	static void deleteFile(File f) {
++		if (f.isDirectory()) {
++			for (File c : f.listFiles())
++				deleteFile(c);
++		}
++		f.delete();
++	}
++
++	public static void main(String... args) {
++		if (args.length == 0) {
++			String path = String.format("%s/%s",
++					System.getProperty("user.dir"), "/testResults/AntReports");
++			String pathToReports = path;
++			Project project = new Project();
++
++			try {
++				// Delete the the old test directory if it exists
++				deleteFile(new File(pathToReports));
++
++				// Create the file to store the test output
++				new File(pathToReports).mkdirs();
++				JUnitTask task = new JUnitTask();
++
++				project.setProperty("java.io.tmpdir", pathToReports);
++
++				/* Output to screen */
++				FormatterElement.TypeAttribute typeScreen = new FormatterElement.TypeAttribute();
++				typeScreen.setValue("plain");
++				FormatterElement formatToScreen = new FormatterElement();
++				formatToScreen.setType(typeScreen);
++				formatToScreen.setUseFile(false);
++				formatToScreen.setOutput(System.out);
++				task.addFormatter(formatToScreen);
++
++				// add a build listener to the project
++				BuildLogger logger = new DefaultLogger();
++				logger.setOutputPrintStream(System.out);
++				logger.setErrorPrintStream(System.err);
++				logger.setMessageOutputLevel(Project.MSG_INFO);
++				logger.setEmacsMode(true);
++				project.addBuildListener(logger);
++
++				task.setProject(project);
++
++				// Set the output to the XML file
++				FormatterElement.TypeAttribute type = new FormatterElement.TypeAttribute();
++				type.setValue("xml");
++
++				FormatterElement formater = new FormatterElement();
++				formater.setType(type);
++				task.addFormatter(formater);
++
++				// Create the JUnitTest
++				JUnitTest test = new JUnitTest(TestSuite.class.getName());
++				test.setTodir(new File(pathToReports));
++				task.addTest(test);
++
++				TestBench.out().println("Beginning Test Execution With ANT");
++				task.execute();
++			} catch (Exception e) {
++				e.printStackTrace();
++			}
++		} else {
++			TestBench.out().println(
++					"Run will not output XML for Jenkins because "
++							+ "tests are not being run with ANT");
++			// This should never return as it makes its own call to
++			// System.exit();
++			TestSuite.main(args);
++		}
++		System.exit(0);
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+index 73b03edf3c5b47eeae7ad89027932f128dfc4fe2..42b2f8ab578715c3dad79e6b07ef553a2f9be3cd 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+@@ -16,6 +16,7 @@ import java.util.logging.LogManager;
+ import java.util.logging.Logger;
+ import java.util.regex.Pattern;
+ 
++import junit.framework.JUnit4TestAdapter;
+ import junit.runner.Version;
+ 
+ import org.junit.runner.JUnitCore;
+@@ -73,6 +74,20 @@ public class TestSuite extends AbstractTestSuite {
+ 	private static final String METHOD_REPEAT_FILTER = "--repeat=";
+ 	private static final String CLASS_NAME_FILTER = "--filter=";
+ 	
++	private static TestSuite instance = null;
++	
++	public static TestSuite getInstance(){
++		if(instance == null){
++			instance = new TestSuite();
++		}
++		return instance;
++	}
++
++	/**
++	 * This has to be public so that the JUnit4
++	 */
++	public TestSuite(){}
++
+ 	/**
+ 	 * Displays a help message for the user when they use the --help flag at runtime.
+ 	 */
+@@ -309,9 +324,16 @@ public class TestSuite extends AbstractTestSuite {
+ 		}
+ 		TestBench.out().println();
+ 	}
++
++	/**
++	 * This is used by ant to get the Junit tests. This is required because the tests try to load using a
++	 * JUnit 3 framework. JUnit4 uses annotations to load tests. This method allows JUnit3 to load JUnit4 tests.
++	 */
++	public static junit.framework.Test suite(){
++		return new JUnit4TestAdapter(TestSuite.class);
++	}
+ 	
+ 	
+-
+ 	/**
+ 	 * The method called at runtime
+ 	 * @param args The test suites to run

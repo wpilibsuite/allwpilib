@@ -1,0 +1,750 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Sat, 7 Jun 2014 17:37:51 -0400
+Subject: [PATCH 0079/6262] More C++ tests
+
+Change-Id: I92ce014a8ebe1c3b97f27aa15476fc3101cc1f1c
+---
+ run-cpp-tests.sh => cmake/run-cpp-tests.sh    |   4 +-
+ .../wpilibC++IntegrationTests/CMakeLists.txt  |   2 +-
+ .../include/TestBench.h                       |  23 ++-
+ .../include/fixtures/ITestFixture.h           |  53 ------
+ .../src/DIOLoopTest.cpp                       |  72 ++++++++
+ .../src/MotorEncoderTest.cpp                  | 154 ++++++++++++++++++
+ .../src/TestBench.cpp                         |  18 --
+ .../src/TestEnvironment.cpp                   |  37 +++++
+ .../src/TiltPanCameraTest.cpp                 |  46 ++++--
+ .../TimerTest.cpp}                            |  52 +++---
+ .../src/fixtures/TiltPanCameraFixture.cpp     |  46 ------
+ .../src/gtest/src/gtest_main.cc               |  38 +++++
+ .../wpilibC++IntegrationTests/src/main.cpp    |  34 ----
+ 13 files changed, 386 insertions(+), 193 deletions(-)
+ rename run-cpp-tests.sh => cmake/run-cpp-tests.sh (59%)
+ delete mode 100644 wpilibc/wpilibC++IntegrationTests/include/fixtures/ITestFixture.h
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
+ delete mode 100644 wpilibc/wpilibC++IntegrationTests/src/TestBench.cpp
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/TestEnvironment.cpp
+ rename wpilibc/wpilibC++IntegrationTests/{include/fixtures/TiltPanCameraFixture.h => src/TimerTest.cpp} (50%)
+ delete mode 100644 wpilibc/wpilibC++IntegrationTests/src/fixtures/TiltPanCameraFixture.cpp
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/gtest/src/gtest_main.cc
+ delete mode 100644 wpilibc/wpilibC++IntegrationTests/src/main.cpp
+
+diff --git a/run-cpp-tests.sh b/cmake/run-cpp-tests.sh
+similarity index 59%
+rename from run-cpp-tests.sh
+rename to cmake/run-cpp-tests.sh
+index 1e0729c9528a7cfc222422ce455afb351f42045e..1bf24cf2244b5d27ed455f318dd6ca791bb6b80e 100755
+--- a/run-cpp-tests.sh
++++ b/cmake/run-cpp-tests.sh
+@@ -5,11 +5,11 @@
+ if [ $(which sshpass) ]
+ then
+ 	sshpass -p "" ssh admin@10.1.90.2 killall FRCUserProgram
+-	sshpass -p "" scp cmake/target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin
++	sshpass -p "" scp target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin
+ 	sshpass -p "" ssh admin@10.1.90.2 ./FRCUserProgram 
+ else
+ 	ssh admin@10.1.90.2 killall FRCUserProgram
+-	scp cmake/target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin
++	scp target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin
+ 	ssh admin@10.1.90.2 ./FRCUserProgram 
+ fi
+ 
+diff --git a/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt b/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt
+index 858739490d50adb01dac8339b0c06a0a949f5490..038621b36a5cbf7dea5604ff0b4494d9cccb1bda 100644
+--- a/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt
++++ b/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 2.8)
+ project(WPILibC++IntegrationTests)
+ 
+-file(GLOB_RECURSE SRC_FILES src/*.cpp src/gtest/gtest-all.cc)
++file(GLOB_RECURSE SRC_FILES src/*.cpp src/gtest/src/gtest-all.cc src/gtest/src/gtest_main.cc)
+ include_directories(include/ src/gtest/ src/gtest/include/ ../wpilibC++/include/ ${HAL_API_INCLUDES} ${NWT_API_INCLUDES})
+ add_executable(FRCUserProgram ${SRC_FILES})
+ target_link_libraries(FRCUserProgram WPILibAthena HALAthena NetworkTables ${NI_LIBS})
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+index 0593dadb17ffc40f106b2d7750c1ef2771735800..6a26977d74800bf339b20da64d9b1b16758b8679 100644
+--- a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
++++ b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+@@ -8,10 +8,29 @@
+ #pragma once
+ 
+ #include "WPILib.h"
+-#include "fixtures/TiltPanCameraFixture.h"
+ 
+ class TestBench {
+ public:
+-	static TiltPanCameraFixture *GetTiltPanCamera();
++	/* Analog channels */
++	static const int kCameraGyroChannel = 1;
++	
++	/* DIO channels */
++	static const int kTalonEncoderChannelA = 1;
++	static const int kTalonEncoderChannelB = 2;
++	static const int kVictorEncoderChannelA = 3;
++	static const int kVictorEncoderChannelB = 4;
++	static const int kJaguarEncoderChannelA = 5;
++	static const int kJaguarEncoderChannelB = 6;
++	static const int kLoop1OutputChannel = 7;
++	static const int kLoop1InputChannel = 8;
++	static const int kLoop2OutputChannel = 9;
++	static const int kLoop2InputChannel = 10;
++	
++	/* PWM channels */
++	static const int kTalonChannel = 1;
++	static const int kVictorChannel = 2;
++	static const int kJaguarChannel = 3;
++	static const int kCameraPanChannel = 9;
++	static const int kCameraTiltChannel = 10;
+ };
+ 
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/fixtures/ITestFixture.h b/wpilibc/wpilibC++IntegrationTests/include/fixtures/ITestFixture.h
+deleted file mode 100644
+index 320042fd991c7453dae9f16877c21a2b997ab0e8..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++IntegrationTests/include/fixtures/ITestFixture.h
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-#pragma once
+-
+-/**
+- * Master interface for all test fixtures. This ensures that all test fixtures
+- * have setup and teardown methods, to ensure that the tests run properly.
+- * 
+- * Test fixtures should be modeled around the content of a test, rather than the
+- * actual physical layout of the testing board. They should obtain references to
+- * hardware from the {@link TestBench} class, which is a singleton. Testing
+- * Fixtures are responsible for ensuring that the hardware is in an appropriate
+- * state for the start of a test, and ensuring that future tests will not be
+- * affected by the results of a test.
+- */
+-class ITestFixture {
+-public:
+-	/**
+-	 * Performs any required setup for this fixture, ensuring that all fixture
+-	 * elements are ready for testing.
+-	 * 
+-	 * @return True if the fixture is ready for testing
+-	 */
+-	virtual bool SetUp() = 0;
+-	
+-	
+-	/**
+-	 * Resets the fixture back to test start state. This should be called by the
+-	 * test class in the test setup method to ensure that the hardware is in the
+-	 * default state. This differs from {@link ITestFixture#setup()} as that is
+-	 * called once, before the class is constructed, so it may need to start
+-	 * sensors. This method should not have to start anything, just reset
+-	 * sensors and ensure that motors are stopped.
+-	 * 
+-	 * @return True if the fixture is ready for testing
+-	 */
+-	virtual bool Reset() = 0;
+-	
+-	
+-	/**
+-	 * Performs any required teardown after use of the fixture, ensuring that
+-	 * future tests will not run into conflicts.
+-	 * 
+-	 * @return True if the teardown succeeded
+-	 */
+-	 virtual bool TearDown() = 0;
+-};
+-
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..ad8b2fc209615053612cebb64c36d329d06c0b1a
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
+@@ -0,0 +1,72 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "WPILib.h"
++#include "gtest/gtest.h"
++#include "TestBench.h"
++
++/**
++ * A fixture with a digital input and a digital output physically wired
++ * together.
++ */
++class DIOLoopTest : public testing::Test {
++protected:
++	DigitalInput *m_input;
++	DigitalOutput *m_output;
++	
++	virtual void SetUp() {
++		m_input = new DigitalInput(TestBench::kLoop1InputChannel);
++		m_output = new DigitalOutput(TestBench::kLoop1OutputChannel);
++	}
++	
++	virtual void TearDown() {
++		delete m_input;
++		delete m_output;
++	}
++	
++	void Reset() {
++		m_output->Set(false);
++	}
++};
++
++/**
++ * Test the DigitalInput and DigitalOutput classes by setting the output and
++ * reading the input.
++ */
++TEST_F(DIOLoopTest, Loop) {
++	Reset();
++	
++	m_output->Set(false);
++	EXPECT_FALSE(m_input->Get()) << "The digital output was turned off, but "
++		<< "the digital input is on.";
++	
++	m_output->Set(true);
++	EXPECT_TRUE(m_input->Get()) << "The digital output was turned on, but "
++		<< "the digital input is off.";
++}
++
++/**
++ * Test a fake "counter" that uses the DIO loop as an input to make sure the
++ * Counter class works
++ */
++TEST_F(DIOLoopTest, FakeCounter) {
++	Reset();
++	
++	Counter counter(m_input);
++	counter.Start();
++	
++	EXPECT_EQ(0, counter.Get()) << "Counter did not initialize to 0.";
++	
++	/* Count 100 ticks.  The counter value should be 100 after this loop. */
++	for(int i = 0; i < 100; i++) {
++		m_output->Set(true);
++		m_output->Set(false);
++	}
++	
++	EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
++}
++
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..63825dabec4062bf1489d668d6dff390def08b00
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
+@@ -0,0 +1,154 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "WPILib.h"
++#include "gtest/gtest.h"
++#include "TestBench.h"
++
++enum MotorEncoderTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
++
++std::ostream &operator<<(std::ostream &os, MotorEncoderTestType const &type) {
++	switch(type) {
++	case TEST_VICTOR: os << "Victor"; break;
++	case TEST_JAGUAR: os << "Jaguar"; break;
++	case TEST_TALON: os << "Talon"; break;
++	}
++	
++	return os;
++}
++
++static constexpr double kMotorTime = 0.5;
++
++/**
++ * A fixture that includes a PWM speed controller and an encoder connected to
++ * the same motor.
++ * @author Thomas Clark
++ */
++class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
++protected:
++	SpeedController *m_speedController;
++	Encoder *m_encoder;
++	
++	virtual void SetUp() {
++		switch(GetParam()) {
++		case TEST_VICTOR:
++			m_speedController = new Victor(TestBench::kVictorChannel);
++			m_encoder = new Encoder(TestBench::kVictorEncoderChannelA,
++				TestBench::kVictorEncoderChannelB);
++			break;
++		
++		case TEST_JAGUAR:
++			m_speedController = new Jaguar(TestBench::kJaguarChannel);
++			m_encoder = new Encoder(TestBench::kJaguarEncoderChannelA,
++				TestBench::kJaguarEncoderChannelB);
++			break;
++		
++		case TEST_TALON:
++			m_speedController = new Talon(TestBench::kTalonChannel);
++			m_encoder = new Encoder(TestBench::kTalonEncoderChannelA,
++				TestBench::kTalonEncoderChannelB);
++			break;
++		}
++		
++	}
++	
++	virtual void TearDown() {
++		delete m_speedController;
++		delete m_encoder;
++	}
++	
++	void Reset() {
++		m_speedController->Set(0.0f);
++		m_encoder->Reset();
++		m_encoder->Start();
++	}
++};
++
++
++/**
++ * Test if the encoder value increments after the motor drives forward
++ */
++TEST_P(MotorEncoderTest, Increment) {
++	Reset();
++	
++	/* Drive the speed controller briefly to move the encoder */
++	m_speedController->Set(1.0);
++	Wait(kMotorTime);
++	m_speedController->Set(0.0);
++	
++	/* The encoder should be positive now */
++	EXPECT_GT(m_encoder->Get(), 0)
++		<< "Encoder should have incremented after the motor moved";
++}
++
++
++/**
++ * Test if the encoder value decrements after the motor drives backwards
++ */
++TEST_P(MotorEncoderTest, Decrement) {
++	Reset();
++	
++	/* Drive the speed controller briefly to move the encoder */
++	m_speedController->Set(-1.0f);
++	Wait(kMotorTime);
++	m_speedController->Set(0.0f);
++	
++	/* The encoder should be positive now */
++	EXPECT_LT(m_encoder->Get(), 0.0f)
++		<< "Encoder should have decremented after the motor moved";
++}
++
++/**
++ * Test if motor speeds are clamped to [-1,1]
++ */
++TEST_P(MotorEncoderTest, ClampSpeed) {
++	Reset();
++	
++	m_speedController->Set(2.0f);
++	Wait(kMotorTime);
++	
++	EXPECT_FLOAT_EQ(1.0f, m_speedController->Get());
++	
++	m_speedController->Set(-2.0f);
++	Wait(kMotorTime);
++	
++	EXPECT_FLOAT_EQ(-1.0f, m_speedController->Get());
++}
++
++/**
++ * Test if PID loops work
++ */
++TEST_P(MotorEncoderTest, PIDController) {
++	Reset();
++	
++	PIDController pid(0.003f, 0.001f, 0.0f, m_encoder, m_speedController);
++	pid.SetAbsoluteTolerance(15.0f);
++	pid.SetOutputRange(-0.2f, 0.2f);
++	pid.SetSetpoint(2500);
++	
++	/* 5 seconds should be plenty time to get to the setpoint */
++	pid.Enable();
++	Wait(5.0);
++	pid.Disable();
++	
++	RecordProperty("PID Error", pid.GetError());
++	
++	EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 5 seconds.";
++}
++
++/**
++ * Test resetting encoders
++ */
++TEST_P(MotorEncoderTest, Reset) {
++	Reset();
++	
++	EXPECT_EQ(0, m_encoder->Get()) << "Encoder did not reset to 0";
++}
++
++INSTANTIATE_TEST_CASE_P(Test, MotorEncoderTest,
++	testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));
++
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/TestBench.cpp b/wpilibc/wpilibC++IntegrationTests/src/TestBench.cpp
+deleted file mode 100644
+index 65d4817f0e2e13ef39803061244780caac86260c..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++IntegrationTests/src/TestBench.cpp
++++ /dev/null
+@@ -1,18 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-#include "TestBench.h"
+-
+-TiltPanCameraFixture *TestBench::GetTiltPanCamera() {
+-	Gyro *gyro = new Gyro(1);
+-	gyro->SetSensitivity(0.007);
+-	
+-	Servo *tilt = new Servo(10),
+-		*pan = new Servo(9);
+-	
+-	return new TiltPanCameraFixture(tilt, pan, gyro);
+-}
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/TestEnvironment.cpp b/wpilibc/wpilibC++IntegrationTests/src/TestEnvironment.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..afcd95ce883f0b34341420fb235af72d52561a05
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/TestEnvironment.cpp
+@@ -0,0 +1,37 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "gtest/gtest.h"
++#include "WPILib.h"
++
++class TestEnvironment : public testing::Environment {
++public:
++	virtual void SetUp() {
++		if(!HALInitialize()) {
++			std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl;
++			exit(-1);
++		}
++	
++		/* This sets up the network communications library to enable the driver
++		  station. After starting network coms, it will loop until the driver
++		  station returns that the robot is enabled, to ensure that tests will be
++		  able to run on the hardware. */  
++		HALNetworkCommunicationObserveUserProgramStarting();
++		LiveWindow::GetInstance()->SetEnabled(false);
++	
++		while(!DriverStation::GetInstance()->IsEnabled()) {
++			Wait(0.1);
++			std::cout << "Waiting for enable" << std::endl;
++		}
++	}
++	
++	virtual void TearDown() {
++	}
++};
++
++testing::Environment *const environment = testing::AddGlobalTestEnvironment(new TestEnvironment);
++
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
+index 4f50f93df16c25f86fd1b5955d6a156ab4e7c71f..ad5d74de104ca564ee8924bb594a22fe11b2c3dd 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
+@@ -7,21 +7,39 @@
+ 
+ #include "WPILib.h"
+ #include "gtest/gtest.h"
+-#include "fixtures/TiltPanCameraFixture.h"
+ #include "TestBench.h"
+ 
++static constexpr double kResetTime = 1.0;
++static constexpr double kTestAngle = 180.0;
++	
++/**
++ * A fixture for the camera with two servos and a gyro
++ * @author Thomas Clark
++ */
+ class TiltPanCameraTest : public testing::Test {
+-protected:	
+-	TiltPanCameraFixture *m_fixture;
++protected:
++	Servo *m_tilt, *m_pan;
++	Gyro *m_gyro;
+ 	
+ 	virtual void SetUp() {
+-		m_fixture = TestBench::GetTiltPanCamera();
+-		
+-		m_fixture->SetUp();
++		m_tilt = new Servo(TestBench::kCameraTiltChannel);
++		m_pan = new Servo(TestBench::kCameraPanChannel);
++		m_gyro = new Gyro(TestBench::kCameraGyroChannel);
+ 	}
+ 	
+ 	virtual void TearDown() {
+-		m_fixture->TearDown();
++		delete m_tilt;
++		delete m_pan;
++		delete m_gyro;
++	}
++	
++	void Reset() {
++		m_tilt->Set(0.0);
++		m_pan->Set(0.0);
++
++		Wait(kResetTime);
++
++		m_gyro->Reset();
+ 	}
+ };
+ 
+@@ -30,21 +48,17 @@ protected:
+  * Test if the servo turns 180 degrees and the gyroscope measures this angle
+  */
+ TEST_F(TiltPanCameraTest, GyroAngle) {
+-	const double TEST_ANGLE = 180.0;
+-	
+-	m_fixture->Reset();
++	Reset();
+ 	
+ 	for(int i = 0; i < 100; i++) {
+-		m_fixture->GetPan()->Set(i / 100.0);
++		m_pan->Set(i / 100.0);
+ 		Wait(0.05);
+ 	}
+ 	
+-	double gyroAngle = m_fixture->GetGyro()->GetAngle();
+-	
+-	double error = std::abs(TEST_ANGLE - gyroAngle);
++	double gyroAngle = m_gyro->GetAngle();
+ 	
+-	ASSERT_LE(error, 10.0) << "Gyro measured " << gyroAngle
+-		<< " degrees, servo should have turned " << TEST_ANGLE <<  " degrees"; 
++	EXPECT_NEAR(gyroAngle, kTestAngle, 20.0) << "Gyro measured " << gyroAngle
++		<< " degrees, servo should have turned " << kTestAngle <<  " degrees"; 
+ }
+ 
+ 
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/fixtures/TiltPanCameraFixture.h b/wpilibc/wpilibC++IntegrationTests/src/TimerTest.cpp
+similarity index 50%
+rename from wpilibc/wpilibC++IntegrationTests/include/fixtures/TiltPanCameraFixture.h
+rename to wpilibc/wpilibC++IntegrationTests/src/TimerTest.cpp
+index 46c238880f552b129fd54fe430cfd91ffe9fd03d..636fc4fee0f71731853b68df5b1f75511fbf0591 100644
+--- a/wpilibc/wpilibC++IntegrationTests/include/fixtures/TiltPanCameraFixture.h
++++ b/wpilibc/wpilibC++IntegrationTests/src/TimerTest.cpp
+@@ -5,31 +5,41 @@
+ /* the project.                                                               */
+ /*----------------------------------------------------------------------------*/
+ 
+-#pragma once
+-
+ #include "WPILib.h"
+-#include "ITestFixture.h"
++#include "gtest/gtest.h"
++#include "TestBench.h"
++
++static const double kWaitTime = 0.5;
++
++class TimerTest : public testing::Test {
++protected:
++	Timer *m_timer;
++	
++	virtual void SetUp() {
++		m_timer = new Timer;
++	}
++	
++	virtual void TearDown() {
++		delete m_timer;
++	}
++	
++	void Reset() {
++		m_timer->Reset();
++	}
++};
+ 
+ /**
+- * A class to represent the camera with tilt and pan servos and a gyro
+- * 
+- * @author Thomas Clark
++ * Test if the Wait function works
+  */
+-class TiltPanCameraFixture : public ITestFixture {
+-public:
+-	TiltPanCameraFixture(Servo *tilt, Servo *pan, Gyro *gyro);
++TEST_F(TimerTest, Wait) {
++	Reset();
+ 	
+-	virtual bool SetUp();
+-	virtual bool Reset();
+-	virtual bool TearDown();
++	double initialTime = m_timer->GetFPGATimestamp();
+ 	
+-	Gyro *GetGyro();
+-	Servo *GetTilt();
+-	Servo *GetPan();
+-
+-protected:
+-	static const double RESET_TIME = 1.0;
++	Wait(kWaitTime);
+ 	
+-	Servo *m_tilt, *m_pan;
+-	Gyro *m_gyro;
+-};
++	double finalTime = m_timer->GetFPGATimestamp();
++	
++	EXPECT_NEAR(kWaitTime, finalTime - initialTime, 0.001);
++}
++
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/fixtures/TiltPanCameraFixture.cpp b/wpilibc/wpilibC++IntegrationTests/src/fixtures/TiltPanCameraFixture.cpp
+deleted file mode 100644
+index d0a468ccaa4b23d6159145cccb8bbbe7cbfada15..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++IntegrationTests/src/fixtures/TiltPanCameraFixture.cpp
++++ /dev/null
+@@ -1,46 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-#include "fixtures/TiltPanCameraFixture.h"
+-
+-TiltPanCameraFixture::TiltPanCameraFixture(Servo *tilt, Servo *pan, Gyro *gyro):
+-	m_tilt(tilt),
+-	m_pan(pan),
+-	m_gyro(gyro) {
+-}
+-
+-bool TiltPanCameraFixture::SetUp() {
+-	return Reset();
+-}
+-
+-bool TiltPanCameraFixture::Reset() {
+-	m_tilt->Set(0.0);
+-	m_pan->Set(0.0);
+-	
+-	Wait(RESET_TIME);
+-	
+-	m_gyro->Reset();
+-	
+-	return m_pan->Get() == 0.0 and m_tilt->Get() == 0.0 and m_gyro->GetAngle() == 0.0;
+-}
+-
+-bool TiltPanCameraFixture::TearDown() {
+-	return Reset();
+-}
+-
+-Gyro *TiltPanCameraFixture::GetGyro() {
+-	return m_gyro;
+-}
+-
+-Servo *TiltPanCameraFixture::GetTilt() {
+-	return m_tilt;
+-}
+-
+-Servo *TiltPanCameraFixture::GetPan() {
+-	return m_pan;
+-}
+-
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/gtest/src/gtest_main.cc b/wpilibc/wpilibC++IntegrationTests/src/gtest/src/gtest_main.cc
+new file mode 100644
+index 0000000000000000000000000000000000000000..f3028225523306eb9648f94bcbe9e3a78016bb7e
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/gtest/src/gtest_main.cc
+@@ -0,0 +1,38 @@
++// Copyright 2006, Google Inc.
++// All rights reserved.
++//
++// Redistribution and use in source and binary forms, with or without
++// modification, are permitted provided that the following conditions are
++// met:
++//
++//     * Redistributions of source code must retain the above copyright
++// notice, this list of conditions and the following disclaimer.
++//     * Redistributions in binary form must reproduce the above
++// copyright notice, this list of conditions and the following disclaimer
++// in the documentation and/or other materials provided with the
++// distribution.
++//     * Neither the name of Google Inc. nor the names of its
++// contributors may be used to endorse or promote products derived from
++// this software without specific prior written permission.
++//
++// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++
++#include <stdio.h>
++
++#include "gtest/gtest.h"
++
++GTEST_API_ int main(int argc, char **argv) {
++  printf("Running main() from gtest_main.cc\n");
++  testing::InitGoogleTest(&argc, argv);
++  return RUN_ALL_TESTS();
++}
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/main.cpp b/wpilibc/wpilibC++IntegrationTests/src/main.cpp
+deleted file mode 100644
+index 1ac5db34945e4d191ec87f2e141d0286a8ade7c5..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++IntegrationTests/src/main.cpp
++++ /dev/null
+@@ -1,34 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-#include "gtest/gtest.h"
+-#include "WPILib.h"
+-
+-int main(int argc, char *argv[]) {
+-	testing::InitGoogleTest(&argc, argv);
+-	
+-	if(!HALInitialize()) {
+-		std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl;
+-		return -1;
+-	}
+-	
+-	/* This sets up the network communications library to enable the driver
+-	  station. After starting network coms, it will loop until the driver
+-	  station returns that the robot is enabled, to ensure that tests will be
+-	  able to run on the hardware. */  
+-	HALNetworkCommunicationObserveUserProgramStarting();
+-	LiveWindow::GetInstance()->SetEnabled(false);
+-	
+-	while(!DriverStation::GetInstance()->IsEnabled()) {
+-		Wait(0.1);
+-		std::cout << "Waiting for enable" << std::endl;
+-	}
+-	
+-	std::cout << "Running!" << std::endl;
+-	    
+-	return RUN_ALL_TESTS();
+-}

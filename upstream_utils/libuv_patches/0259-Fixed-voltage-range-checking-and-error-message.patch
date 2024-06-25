@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Tue, 5 Aug 2014 11:07:39 -0400
+Subject: [PATCH 0259/6262] Fixed voltage range checking and error message
+
+Change-Id: I7ba05eb27f3d82bfd37f6b407fe39e0ab9cf5bf0
+---
+ hal/include/HAL/Errors.hpp | 2 +-
+ hal/lib/Athena/Analog.cpp  | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/hal/include/HAL/Errors.hpp b/hal/include/HAL/Errors.hpp
+index 46b5ee3044df8ff415957deaad1d90afb05d1c8c..9428b00801d8842eb8f76892ec792fed42cb6080 100644
+--- a/hal/include/HAL/Errors.hpp
++++ b/hal/include/HAL/Errors.hpp
+@@ -3,7 +3,7 @@
+ #define SAMPLE_RATE_TOO_HIGH 1
+ #define SAMPLE_RATE_TOO_HIGH_MESSAGE "Analog module sample rate is too high"
+ #define VOLTAGE_OUT_OF_RANGE 2
+-#define VOLTAGE_OUT_OF_RANGE_MESSAGE "Voltage to convert to raw value is out of range [-10; 10]"
++#define VOLTAGE_OUT_OF_RANGE_MESSAGE "Voltage to convert to raw value is out of range [0; 5]"
+ #define LOOP_TIMING_ERROR 4
+ #define LOOP_TIMING_ERROR_MESSAGE "Digital module loop timing is not the expected value"
+ #define SPI_WRITE_NO_MOSI 12
+diff --git a/hal/lib/Athena/Analog.cpp b/hal/lib/Athena/Analog.cpp
+index 02a39b97062b74394250f34d08418757823dc627..9461ebbd6f40c55e181888238798fb6e40964af4 100644
+--- a/hal/lib/Athena/Analog.cpp
++++ b/hal/lib/Athena/Analog.cpp
+@@ -353,12 +353,12 @@ float getAnalogAverageVoltage(void* analog_port_pointer, int32_t *status) {
+  * @return The raw value for the channel.
+  */
+ int32_t getAnalogVoltsToValue(void* analog_port_pointer, double voltage, int32_t *status) {
+-  if (voltage > 10.0) {
+-    voltage = 10.0;
++  if (voltage > 5.0) {
++    voltage = 5.0;
+     *status = VOLTAGE_OUT_OF_RANGE;
+   }
+-  if (voltage < -10.0) {
+-    voltage = -10.0;
++  if (voltage < 0.0) {
++    voltage = 0.0;
+     *status = VOLTAGE_OUT_OF_RANGE;
+   }
+   uint32_t LSBWeight = getAnalogLSBWeight(analog_port_pointer, status);

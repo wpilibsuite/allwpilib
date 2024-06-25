@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fredric Silberberg <fredric@fsilberberg.com>
+Date: Fri, 7 Nov 2014 15:16:46 -0500
+Subject: [PATCH 0470/6262] Updated an incorrect voltage constant for the 5V
+ input rail, and added parenthesis to make the order of operations explicit.
+ Fix for artf3728
+
+Change-Id: I2dfbad03980c4154cf253fbb06792b8502fcca02
+---
+ hal/lib/Athena/Power.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hal/lib/Athena/Power.cpp b/hal/lib/Athena/Power.cpp
+index d4edb75dc6a990863ffa04025ed087c447de6b5d..b2f0f15cb39da17a76d2c52d7ce9184cec98aead 100644
+--- a/hal/lib/Athena/Power.cpp
++++ b/hal/lib/Athena/Power.cpp
+@@ -46,7 +46,7 @@ float getUserCurrent6V(int32_t *status) {
+  */
+ float getUserVoltage5V(int32_t *status) {
+ 	initializePower(status);
+-	return power->readUserVoltage5V(status) / 4.096f * 0.004962f - 0.013f;
++	return power->readUserVoltage5V(status) / 4.096f * 0.005962f - 0.013f;
+ }
+ 
+ /**

@@ -1,0 +1,309 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joe Ross <joe@rossesmail.com>
+Date: Fri, 5 Dec 2014 09:19:27 -0800
+Subject: [PATCH 0533/6262] Add classes for VictorSP and TalonSRX PWM control.
+
+Update documentation for existing classes to better describe what
+they control
+
+Change-Id: I1932b39a3f082c2eb57f41edb4ba55c73cce2938
+---
+ wpilibc/wpilibC++Devices/include/CANJaguar.h  |  2 +-
+ wpilibc/wpilibC++Devices/include/CANTalon.h   |  2 +-
+ wpilibc/wpilibC++Devices/include/Jaguar.h     |  2 +-
+ wpilibc/wpilibC++Devices/include/Talon.h      |  2 +-
+ wpilibc/wpilibC++Devices/include/TalonSRX.h   | 18 ++++++++++++++
+ wpilibc/wpilibC++Devices/include/Victor.h     |  5 +++-
+ wpilibc/wpilibC++Devices/include/VictorSP.h   | 17 +++++++++++++
+ wpilibc/wpilibC++Devices/include/WPILib.h     |  2 ++
+ wpilibc/wpilibC++Devices/src/TalonSRX.cpp     | 15 ++++++++++++
+ wpilibc/wpilibC++Devices/src/VictorSP.cpp     | 15 ++++++++++++
+ .../java/edu/wpi/first/wpilibj/Jaguar.java    |  3 ++-
+ .../java/edu/wpi/first/wpilibj/Talon.java     |  2 +-
+ .../java/edu/wpi/first/wpilibj/TalonSRX.java  | 23 ++++++++++++++++++
+ .../java/edu/wpi/first/wpilibj/Victor.java    |  5 +++-
+ .../java/edu/wpi/first/wpilibj/VictorSP.java  | 24 +++++++++++++++++++
+ 15 files changed, 129 insertions(+), 8 deletions(-)
+ create mode 100644 wpilibc/wpilibC++Devices/include/TalonSRX.h
+ create mode 100644 wpilibc/wpilibC++Devices/include/VictorSP.h
+ create mode 100644 wpilibc/wpilibC++Devices/src/TalonSRX.cpp
+ create mode 100644 wpilibc/wpilibC++Devices/src/VictorSP.cpp
+ create mode 100644 wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/TalonSRX.java
+ create mode 100644 wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/VictorSP.java
+
+diff --git a/wpilibc/wpilibC++Devices/include/CANJaguar.h b/wpilibc/wpilibC++Devices/include/CANJaguar.h
+index 6e8e451045ea73868cca6116b45b150efb715d88..186d3b408d0c6378ead27d447e67dd2e969ca37e 100644
+--- a/wpilibc/wpilibC++Devices/include/CANJaguar.h
++++ b/wpilibc/wpilibC++Devices/include/CANJaguar.h
+@@ -20,7 +20,7 @@
+ #include <utility>
+ 
+ /**
+- * Luminary Micro Jaguar Speed Control
++ * Luminary Micro / Vex Robotics Jaguar Speed Control
+  */
+ class CANJaguar : public MotorSafety,
+ 					public CANSpeedController,
+diff --git a/wpilibc/wpilibC++Devices/include/CANTalon.h b/wpilibc/wpilibC++Devices/include/CANTalon.h
+index 89b351c1e0a6584d4f6d878077226b0120b503c3..8dbf32d66f788dbb36d288e19b2b7dbd3cc02c8e 100644
+--- a/wpilibc/wpilibC++Devices/include/CANTalon.h
++++ b/wpilibc/wpilibC++Devices/include/CANTalon.h
+@@ -13,7 +13,7 @@
+ class CanTalonSRX;
+ 
+ /**
+- * CTRE Talon SRX Speed Controller
++ * CTRE Talon SRX Speed Controller with CAN Control
+  */
+ class CANTalon : public MotorSafety,
+                  public CANSpeedController,
+diff --git a/wpilibc/wpilibC++Devices/include/Jaguar.h b/wpilibc/wpilibC++Devices/include/Jaguar.h
+index 51ac4fe8c821c8d3194be32ad4790703232addf2..1cb7b69aa525aab4f9926cdb3631d2ff31d64159 100644
+--- a/wpilibc/wpilibC++Devices/include/Jaguar.h
++++ b/wpilibc/wpilibC++Devices/include/Jaguar.h
+@@ -10,7 +10,7 @@
+ #include "PIDOutput.h"
+ 
+ /**
+- * Luminary Micro Jaguar Speed Control
++ * Luminary Micro / Vex Robotics Jaguar Speed Controller with PWM control
+  */
+ class Jaguar : public SafePWM, public SpeedController
+ {
+diff --git a/wpilibc/wpilibC++Devices/include/Talon.h b/wpilibc/wpilibC++Devices/include/Talon.h
+index d9fb0ef12d3ad5a184eb4b8b041c5da6f35fbd46..6e11ccd46e69a6f7717a07d757b8b6196bd9c3c8 100644
+--- a/wpilibc/wpilibC++Devices/include/Talon.h
++++ b/wpilibc/wpilibC++Devices/include/Talon.h
+@@ -10,7 +10,7 @@
+ #include "PIDOutput.h"
+ 
+ /**
+- * CTRE Talon Speed Controller
++ * Cross the Road Electronics (CTRE) Talon and Talon SR Speed Controller
+  */
+ class Talon : public SafePWM, public SpeedController
+ {
+diff --git a/wpilibc/wpilibC++Devices/include/TalonSRX.h b/wpilibc/wpilibC++Devices/include/TalonSRX.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..9437ae861f669fb6670f0426f7edeb02c9a11cf8
+--- /dev/null
++++ b/wpilibc/wpilibC++Devices/include/TalonSRX.h
+@@ -0,0 +1,18 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++#pragma once
++
++#include "Talon.h"
++
++/**
++ * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control
++ * @see CANTalon for CAN control
++ */
++class TalonSRX: public Talon {
++public:
++	explicit TalonSRX(uint32_t channel);
++	virtual ~TalonSRX();
++};
+diff --git a/wpilibc/wpilibC++Devices/include/Victor.h b/wpilibc/wpilibC++Devices/include/Victor.h
+index fce4139f0544f13f14aa6cd1701619bbc5a09d59..9a8351982073f9ca55f336c6b50ca54b65ac6a2b 100644
+--- a/wpilibc/wpilibC++Devices/include/Victor.h
++++ b/wpilibc/wpilibC++Devices/include/Victor.h
+@@ -10,7 +10,10 @@
+ #include "PIDOutput.h"
+ 
+ /**
+- * IFI Victor Speed Controller
++ * Vex Robotics Victor 888 Speed Controller
++ *
++ * The Vex Robotics Victor 884 Speed Controller can also be used with this
++ * class but may need to be calibrated per the Victor 884 user manual.
+  */
+ class Victor : public SafePWM, public SpeedController
+ {
+diff --git a/wpilibc/wpilibC++Devices/include/VictorSP.h b/wpilibc/wpilibC++Devices/include/VictorSP.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..6ae7ca0c0b20d31e8229c8170410decd2a7b0681
+--- /dev/null
++++ b/wpilibc/wpilibC++Devices/include/VictorSP.h
+@@ -0,0 +1,17 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++#pragma once
++
++#include "Talon.h"
++
++/**
++ * Vex Robotics Victor SP Speed Controller
++ */
++class VictorSP: public Talon {
++public:
++	explicit VictorSP(uint32_t channel);
++	virtual ~VictorSP();
++};
+diff --git a/wpilibc/wpilibC++Devices/include/WPILib.h b/wpilibc/wpilibC++Devices/include/WPILib.h
+index db1b00e60267807ded2a17caa2569c270eb543ea..d02720efad5fb8f5d4916c35a52a37f31a80d428 100644
+--- a/wpilibc/wpilibC++Devices/include/WPILib.h
++++ b/wpilibc/wpilibC++Devices/include/WPILib.h
+@@ -78,10 +78,12 @@
+ #include "SPI.h"
+ #include "HAL/cpp/Synchronized.hpp"
+ #include "Talon.h"
++#include "TalonSRX.h"
+ #include "Task.h"
+ #include "Timer.h"
+ #include "Ultrasonic.h"
+ #include "Utility.h"
+ #include "Victor.h"
++#include "VictorSP.h"
+ // XXX: #include "Vision/AxisCamera.h"
+ #include "WPIErrors.h"
+diff --git a/wpilibc/wpilibC++Devices/src/TalonSRX.cpp b/wpilibc/wpilibC++Devices/src/TalonSRX.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..adda181d1a61fe79f07963e638ebac8452803562
+--- /dev/null
++++ b/wpilibc/wpilibC++Devices/src/TalonSRX.cpp
+@@ -0,0 +1,15 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++
++#include "TalonSRX.h"
++
++TalonSRX::TalonSRX(uint32_t channel) : Talon(channel) {
++
++}
++
++TalonSRX::~TalonSRX() {
++}
++
+diff --git a/wpilibc/wpilibC++Devices/src/VictorSP.cpp b/wpilibc/wpilibC++Devices/src/VictorSP.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..c286998665c494b40030d0c25cdd05b78e8fb761
+--- /dev/null
++++ b/wpilibc/wpilibC++Devices/src/VictorSP.cpp
+@@ -0,0 +1,15 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++
++#include "VictorSP.h"
++
++VictorSP::VictorSP(uint32_t channel) : Talon(channel) {
++
++}
++
++VictorSP::~VictorSP() {
++}
++
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
+index 666bd5b62f866e89cf266334fb14c66284814cb6..315161acf615520cb71c417fc96c803b03dac2ed 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
+@@ -12,7 +12,8 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ 
+ /**
+- * Texas Instruments Jaguar Speed Controller as a PWM device.
++ * Texas Instruments / Vex Robotics Jaguar Speed Controller as a PWM device.
++ * @see CANJaguar CANJaguar for CAN control
+  */
+ public class Jaguar extends SafePWM implements SpeedController {
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
+index 570331764dcfe9b38da9fb606eadec511723f20f..0afa9c698fcaf49dcd543e1ea3b3eeb546a00274 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
+@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ 
+ /**
+- * CTRE Talon Speed Controller
++ * Cross the Road Electronics (CTRE) Talon and Talon SR Speed Controller
+  */
+ public class Talon extends SafePWM implements SpeedController {
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/TalonSRX.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/TalonSRX.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..fb12ddf8f2c642502084da8acdf200caa6627c8b
+--- /dev/null
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/TalonSRX.java
+@@ -0,0 +1,23 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++package edu.wpi.first.wpilibj;
++
++/**
++ * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control
++ * @see CANTalon CANTalon for CAN control of Talon SRX
++ */
++public class TalonSRX extends Talon {
++    /**
++     * Constructor.
++     *
++     * @param channel The PWM channel that the Talon SRX is attached to.
++     */
++    public TalonSRX(final int channel) {
++        super(channel);
++    }
++}
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java
+index 211308c2e3dc6a16ea54b2c84abacd6ade06633c..4745f2b84692e2ffef9d0b1d89dccef83f00b2ec 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java
+@@ -12,7 +12,10 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ 
+ /**
+- * VEX Robotics Victor Speed Controller
++ * VEX Robotics Victor 888 Speed Controller
++ * 
++ * The Vex Robotics Victor 884 Speed Controller can also be used with this
++ * class but may need to be calibrated per the Victor 884 user manual.
+  */
+ public class Victor extends SafePWM implements SpeedController {
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/VictorSP.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/VictorSP.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..106a9738713a29f8297f753d9d5586d51bf23cf5
+--- /dev/null
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/VictorSP.java
+@@ -0,0 +1,24 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++package edu.wpi.first.wpilibj;
++
++/**
++ * Vex Robotics Victor SP Speed Controller
++ */
++public class VictorSP extends Talon {
++	
++    /**
++     * Constructor.
++     *
++     * @param channel The PWM channel that the VictorSP is attached to.
++     */
++    public VictorSP(final int channel) {
++        super(channel);
++    }
++
++}

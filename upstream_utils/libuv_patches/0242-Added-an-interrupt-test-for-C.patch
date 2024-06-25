@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Fri, 1 Aug 2014 18:11:02 -0400
+Subject: [PATCH 0242/6262] Added an interrupt test for C++
+
+Change-Id: Ib2f3c575907848082c5d382144bb0462efa64107
+---
+ .../src/DIOLoopTest.cpp                       | 29 ++++++++++++++++---
+ 1 file changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
+index dbf7458958f9029e0b604e6b0184e930306a0df9..8294a5a38a8062caf65c507ec3a21f96e9d312a7 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
+@@ -43,12 +43,12 @@ TEST_F(DIOLoopTest, Loop) {
+ 	Reset();
+ 
+ 	m_output->Set(false);
+-  Wait(kDelayTime);
++	Wait(kDelayTime);
+ 	EXPECT_FALSE(m_input->Get()) << "The digital output was turned off, but "
+ 		<< "the digital input is on.";
+ 
+ 	m_output->Set(true);
+-  Wait(kDelayTime);
++	Wait(kDelayTime);
+ 	EXPECT_TRUE(m_input->Get()) << "The digital output was turned on, but "
+ 		<< "the digital input is off.";
+ }
+@@ -69,8 +69,29 @@ TEST_F(DIOLoopTest, FakeCounter) {
+ 		m_output->Set(true);
+ 		m_output->Set(false);
+ 	}
+-  
+-  Wait(kDelayTime);
++
++	Wait(kDelayTime);
+ 
+ 	EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
+ }
++
++void InterruptHandler(uint32_t interruptAssertedMask, void *param) {
++	*(int *)param = 12345;
++}
++
++TEST_F(DIOLoopTest, AsynchronusInterruptWorks) {
++	int param = 0;
++
++	// Given an interrupt handler that sets an int to 12345
++	m_input->RequestInterrupts(InterruptHandler, &param);
++	m_input->EnableInterrupts();
++
++	// If the voltage rises
++	m_output->Set(false);
++	m_output->Set(true);
++	m_input->CancelInterrupts();
++
++	// Then the int should be 12345
++	Wait(kDelayTime);
++	EXPECT_EQ(12345, param) << "The interrupt did not run.";
++}

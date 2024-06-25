@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sat, 18 Oct 2014 09:22:58 -0700
+Subject: [PATCH 0415/6262] Fix Java Joystick.getPOV().
+
+It subtracts 1 from pov; this should not be done here as it is done in the
+DriverStation class.
+
+Change-Id: I7fba2c87fc4dcb2f693201346b0d935662a49678
+---
+ .../src/main/java/edu/wpi/first/wpilibj/Joystick.java           | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+index 1a88cfd346a0030025dcb4373ef0b4c2649b511f..ae2a9f61b6bcf9f7571167a419a8772b0a2d5c18 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+@@ -285,7 +285,7 @@ public class Joystick extends GenericHID {
+      * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+      */
+     public int getPOV(int pov) {
+-        return m_ds.getStickPOV(m_port, pov - 1);
++        return m_ds.getStickPOV(m_port, pov);
+     }
+ 
+     /**

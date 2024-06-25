@@ -1,0 +1,2606 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Thu, 29 May 2014 14:25:09 -0400
+Subject: [PATCH 0062/6262] Support for the CAN pneumatics module in C++ and
+ Java
+
+Change-Id: I2ccb1d13d1c5da00a99329c761b75a6c2b3ea56d
+---
+ hal/include/HAL/Compressor.h                  |  30 ++
+ hal/include/HAL/HAL.h                         | 301 +++++++++++
+ hal/lib/Athena/Compressor.cpp                 |  72 +++
+ hal/lib/Athena/HAL.cpp                        |   2 +-
+ hal/lib/Athena/Solenoid.cpp                   | 129 ++---
+ hal/lib/Athena/ctre/PCM.cpp                   | 507 ++++++++++++++++++
+ hal/lib/Athena/ctre/PCM.h                     | 364 +++++++++++++
+ hal/lib/Athena/ctre/PDP.cpp                   | 163 ++++++
+ hal/lib/Athena/ctre/PDP.h                     | 126 +++++
+ hal/lib/Athena/ctre/ctre.h                    |  58 ++
+ wpilibc/include/PCMCompressor.h               |  55 ++
+ wpilibc/lib/PCMCompressor.cpp                 | 176 ++++++
+ .../edu/wpi/first/wpilibj/PCMCompressor.java  | 129 +++++
+ .../java/edu/wpi/first/wpilibj/Solenoid.java  |  45 +-
+ .../wpi/first/wpilibj/hal/CompressorJNI.java  |  18 +
+ .../wpi/first/wpilibj/hal/SolenoidJNI.java    |  10 +
+ wpilibj/wpilibJavaJNI/lib/CompressorJNI.cpp   | 115 ++++
+ wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp     |  91 ++++
+ wpilibj/wpilibJavaJNI/pom.xml                 |   2 +
+ 19 files changed, 2294 insertions(+), 99 deletions(-)
+ create mode 100644 hal/include/HAL/Compressor.h
+ create mode 100644 hal/include/HAL/HAL.h
+ create mode 100644 hal/lib/Athena/Compressor.cpp
+ create mode 100644 hal/lib/Athena/ctre/PCM.cpp
+ create mode 100644 hal/lib/Athena/ctre/PCM.h
+ create mode 100644 hal/lib/Athena/ctre/PDP.cpp
+ create mode 100644 hal/lib/Athena/ctre/PDP.h
+ create mode 100644 hal/lib/Athena/ctre/ctre.h
+ create mode 100644 wpilibc/include/PCMCompressor.h
+ create mode 100644 wpilibc/lib/PCMCompressor.cpp
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PCMCompressor.java
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/CompressorJNI.java
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/SolenoidJNI.java
+ create mode 100644 wpilibj/wpilibJavaJNI/lib/CompressorJNI.cpp
+ create mode 100644 wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
+
+diff --git a/hal/include/HAL/Compressor.h b/hal/include/HAL/Compressor.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..57c38af0503cf39f12ac1e939d34d93015820a5d
+--- /dev/null
++++ b/hal/include/HAL/Compressor.h
+@@ -0,0 +1,30 @@
++/**
++ * Compressor.h
++ * Methods for interacting with a compressor with the CAN PCM device
++ */
++
++#ifdef __vxworks
++#include <vxWorks.h>
++#else
++#include <stdint.h>
++#endif
++
++#ifndef __HAL_COMPRESSOR_H__
++#define __HAL_COMPRESSOR_H__
++
++extern "C" {
++	void *initializeCompressor(uint8_t module);
++	bool checkCompressorModule(uint8_t module);
++	
++	void setCompressor(void *pcm_pointer, bool value, int32_t *status);
++	bool getCompressor(void *pcm_pointer, int32_t *status);
++	
++	void setClosedLoopControl(void *pcm_pointer, bool value, int32_t *status);
++	bool getClosedLoopControl(void *pcm_pointer, int32_t *status);
++	
++	bool getPressureSwitch(void *pcm_pointer, int32_t *status);
++	float getCompressorCurrent(void *pcm_pointer, int32_t *status);
++}
++
++#endif
++
+diff --git a/hal/include/HAL/HAL.h b/hal/include/HAL/HAL.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..7093b768b3eb7910e94dd73826b98483e95cf140
+--- /dev/null
++++ b/hal/include/HAL/HAL.h
+@@ -0,0 +1,301 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2013. All Rights Reserved.  			      */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++
++#ifdef __vxworks
++#include <vxWorks.h>
++#else
++#include <stdint.h>
++#endif
++#include <cmath>
++
++#include "Analog.h"
++#include "Compressor.h"
++#include "Digital.h"
++#include "Solenoid.h"
++#include "Notifier.h"
++#include "Interrupts.h"
++#include "Errors.h"
++
++#include "Utilities.h"
++#include "Semaphore.h"
++#include "Task.h"
++
++#ifndef HAL_H
++#define HAL_H
++
++#define HAL_IO_CONFIG_DATA_SIZE 32
++#define HAL_SYS_STATUS_DATA_SIZE 44
++#define HAL_USER_STATUS_DATA_SIZE (984 - HAL_IO_CONFIG_DATA_SIZE - HAL_SYS_STATUS_DATA_SIZE)
++#define HAL_USER_DS_LCD_DATA_SIZE 128
++
++
++#define HALFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Input 17
++#define HALFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Output 18
++#define HALFRC_NetworkCommunication_DynamicType_Kinect_Header 19
++#define HALFRC_NetworkCommunication_DynamicType_Kinect_Extra1 20
++#define HALFRC_NetworkCommunication_DynamicType_Kinect_Vertices1 21
++#define HALFRC_NetworkCommunication_DynamicType_Kinect_Extra2 22
++#define HALFRC_NetworkCommunication_DynamicType_Kinect_Vertices2 23
++#define HALFRC_NetworkCommunication_DynamicType_Kinect_Joystick 24
++#define HALFRC_NetworkCommunication_DynamicType_Kinect_Custom 25
++
++namespace HALUsageReporting
++{
++    typedef enum
++    {
++        kResourceType_Controller,
++        kResourceType_Module,
++        kResourceType_Language,
++        kResourceType_CANPlugin,
++        kResourceType_Accelerometer,
++        kResourceType_ADXL345,
++        kResourceType_AnalogChannel,
++        kResourceType_AnalogTrigger,
++        kResourceType_AnalogTriggerOutput,
++        kResourceType_CANJaguar,
++        kResourceType_Compressor,
++        kResourceType_Counter,
++        kResourceType_Dashboard,
++        kResourceType_DigitalInput,
++        kResourceType_DigitalOutput,
++        kResourceType_DriverStationCIO,
++        kResourceType_DriverStationEIO,
++        kResourceType_DriverStationLCD,
++        kResourceType_Encoder,
++        kResourceType_GearTooth,
++        kResourceType_Gyro,
++        kResourceType_I2C,
++        kResourceType_Framework,
++        kResourceType_Jaguar,
++        kResourceType_Joystick,
++        kResourceType_Kinect,
++        kResourceType_KinectStick,
++        kResourceType_PIDController,
++        kResourceType_Preferences,
++        kResourceType_PWM,
++        kResourceType_Relay,
++        kResourceType_RobotDrive,
++        kResourceType_SerialPort,
++        kResourceType_Servo,
++        kResourceType_Solenoid,
++        kResourceType_SPI,
++        kResourceType_Task,
++        kResourceType_Ultrasonic,
++        kResourceType_Victor,
++        kResourceType_Button,
++        kResourceType_Command,
++        kResourceType_AxisCamera,
++        kResourceType_PCVideoServer,
++        kResourceType_SmartDashboard,
++        kResourceType_Talon,
++        kResourceType_HiTechnicColorSensor,
++        kResourceType_HiTechnicAccel,
++        kResourceType_HiTechnicCompass,
++		kResourceType_SRF08,
++    } tResourceType;
++
++    typedef enum
++    {
++        kLanguage_LabVIEW = 1,
++        kLanguage_CPlusPlus = 2,
++        kLanguage_Java = 3,
++        kLanguage_Python = 4,
++
++        kCANPlugin_BlackJagBridge = 1,
++        kCANPlugin_2CAN = 2,
++
++        kFramework_Iterative = 1,
++        kFramework_Simple = 2,
++
++        kRobotDrive_ArcadeStandard = 1,
++        kRobotDrive_ArcadeButtonSpin = 2,
++        kRobotDrive_ArcadeRatioCurve = 3,
++        kRobotDrive_Tank = 4,
++        kRobotDrive_MecanumPolar = 5,
++        kRobotDrive_MecanumCartesian = 6,
++
++        kDriverStationCIO_Analog = 1,
++        kDriverStationCIO_DigitalIn = 2,
++        kDriverStationCIO_DigitalOut = 3,
++
++        kDriverStationEIO_Acceleration = 1,
++        kDriverStationEIO_AnalogIn = 2,
++        kDriverStationEIO_AnalogOut = 3,
++        kDriverStationEIO_Button = 4,
++        kDriverStationEIO_LED = 5,
++        kDriverStationEIO_DigitalIn = 6,
++        kDriverStationEIO_DigitalOut = 7,
++        kDriverStationEIO_FixedDigitalOut = 8,
++        kDriverStationEIO_PWM = 9,
++        kDriverStationEIO_Encoder = 10,
++        kDriverStationEIO_TouchSlider = 11,
++
++        kADXL345_SPI = 1,
++        kADXL345_I2C = 2,
++
++        kCommand_Scheduler = 1,
++
++        kSmartDashboard_Instance = 1,
++    } tInstances;
++}
++
++struct HALCommonControlData{
++	uint16_t packetIndex;
++	union {
++		uint8_t control;
++#ifndef __vxworks
++		struct {
++			uint8_t checkVersions :1;
++			uint8_t test :1;
++			uint8_t resync : 1;
++			uint8_t fmsAttached:1;
++			uint8_t autonomous : 1;
++			uint8_t enabled : 1;
++			uint8_t notEStop : 1;
++			uint8_t reset : 1;
++		};
++#else
++		struct {
++			uint8_t reset : 1;
++			uint8_t notEStop : 1;
++			uint8_t enabled : 1;
++			uint8_t autonomous : 1;
++			uint8_t fmsAttached:1;
++			uint8_t resync : 1;
++			uint8_t test :1;
++			uint8_t checkVersions :1;
++		};
++#endif
++	};
++	uint8_t dsDigitalIn;
++	uint16_t teamID;
++
++	char dsID_Alliance;
++	char dsID_Position;
++
++	union {
++		int8_t stick0Axes[6];
++		struct {
++			int8_t stick0Axis1;
++			int8_t stick0Axis2;
++			int8_t stick0Axis3;
++			int8_t stick0Axis4;
++			int8_t stick0Axis5;
++			int8_t stick0Axis6;
++		};
++	};
++	uint16_t stick0Buttons;		// Left-most 4 bits are unused
++
++	union {
++		int8_t stick1Axes[6];
++		struct {
++			int8_t stick1Axis1;
++			int8_t stick1Axis2;
++			int8_t stick1Axis3;
++			int8_t stick1Axis4;
++			int8_t stick1Axis5;
++			int8_t stick1Axis6;
++		};
++	};
++	uint16_t stick1Buttons;		// Left-most 4 bits are unused
++
++	union {
++		int8_t stick2Axes[6];
++		struct {
++			int8_t stick2Axis1;
++			int8_t stick2Axis2;
++			int8_t stick2Axis3;
++			int8_t stick2Axis4;
++			int8_t stick2Axis5;
++			int8_t stick2Axis6;
++		};
++	};
++	uint16_t stick2Buttons;		// Left-most 4 bits are unused
++
++	union {
++		int8_t stick3Axes[6];
++		struct {
++			int8_t stick3Axis1;
++			int8_t stick3Axis2;
++			int8_t stick3Axis3;
++			int8_t stick3Axis4;
++			int8_t stick3Axis5;
++			int8_t stick3Axis6;
++		};
++	};
++	uint16_t stick3Buttons;		// Left-most 4 bits are unused
++
++	//Analog inputs are 10 bit right-justified
++	uint16_t analog1;
++	uint16_t analog2;
++	uint16_t analog3;
++	uint16_t analog4;
++
++	uint64_t cRIOChecksum;
++	uint32_t FPGAChecksum0;
++	uint32_t FPGAChecksum1;
++	uint32_t FPGAChecksum2;
++	uint32_t FPGAChecksum3;
++
++	char versionData[8];
++};
++
++
++inline float intToFloat(int value) {
++  return (float)value;
++}
++
++inline int floatToInt(float value) {
++  return round(value);
++}
++
++extern "C" {
++  extern const uint32_t dio_kNumSystems;
++  extern const uint32_t solenoid_kNumDO7_0Elements;
++  extern const uint32_t interrupt_kNumSystems;
++  extern const uint32_t kSystemClockTicksPerMicrosecond;
++  
++  void* getPort(uint8_t pin);
++  void* getPortWithModule(uint8_t module, uint8_t pin);
++  const char* getHALErrorMessage(int32_t code);
++
++  uint16_t getFPGAVersion(int32_t *status);
++  uint32_t getFPGARevision(int32_t *status);
++  uint32_t getFPGATime(int32_t *status);
++
++  void setFPGALED(uint32_t state, int32_t *status);
++  int32_t getFPGALED(int32_t *status);
++
++  int HALSetErrorData(const char *errors, int errorsLength, int wait_ms);
++  int HALSetUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength, int wait_ms);
++  int HALOverrideIOConfig(const char *ioConfig, int wait_ms);
++  int HALGetDynamicControlData(uint8_t type, char *dynamicData, int32_t maxLength, int wait_ms);
++  int HALGetCommonControlData(HALCommonControlData *data, int wait_ms);
++  void HALSetNewDataSem(pthread_mutex_t *);
++  int HALSetStatusData(float battery, uint8_t dsDigitalOut, uint8_t updateNumber,
++			const char *userDataHigh, int userDataHighLength,
++			const char *userDataLow, int userDataLowLength, int wait_ms);
++
++  void HALNetworkCommunicationReserve();
++  void HALNetworkCommunicationObserveUserProgramStarting(void);
++  void HALNetworkCommunicationObserveUserProgramDisabled(void);
++  void HALNetworkCommunicationObserveUserProgramAutonomous(void);
++  void HALNetworkCommunicationObserveUserProgramTeleop(void);
++  void HALNetworkCommunicationObserveUserProgramTest(void);
++
++  uint32_t HALReport(uint8_t resource, uint8_t instanceNumber, uint8_t context = 0, const char *feature = NULL);
++}
++
++// TODO: HACKS for now...
++extern "C" {
++  //void FRC_NetworkCommunication_Reserve();
++
++  void NumericArrayResize();
++  void RTSetCleanupProc();
++  void EDVR_CreateReference();
++  void Occur();
++}
++#endif
+diff --git a/hal/lib/Athena/Compressor.cpp b/hal/lib/Athena/Compressor.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..f0cf18b1cfdba5be36bdc3d5f971e86ed2a62857
+--- /dev/null
++++ b/hal/lib/Athena/Compressor.cpp
+@@ -0,0 +1,72 @@
++#include "HAL/Compressor.h"
++#include "ctre/PCM.h"
++#include <iostream>
++
++static const int NUM_PCMS = 2;
++extern PCM *modules[NUM_PCMS];
++extern void initializePCM();
++
++void *initializeCompressor(uint8_t module) {
++	initializePCM();
++	
++	return modules[module - 1];
++}
++
++bool checkCompressorModule(uint8_t module) {
++	return module > 0 and module <= NUM_PCMS;
++}
++
++
++void setCompressor(void *pcm_pointer, bool value, int32_t *status) {
++	PCM *module = (PCM *)pcm_pointer;
++	
++	*status = module->SetCompressor(value);
++}
++
++
++bool getCompressor(void *pcm_pointer, int32_t *status) {
++	PCM *module = (PCM *)pcm_pointer;
++	bool value;
++	
++	*status = module->GetCompressor(value);
++	
++	return value;
++}
++
++
++void setClosedLoopControl(void *pcm_pointer, bool value, int32_t *status) {
++	PCM *module = (PCM *)pcm_pointer;
++	
++	*status = module->SetClosedLoopControl(value);
++}
++
++
++bool getClosedLoopControl(void *pcm_pointer, int32_t *status) {
++	PCM *module = (PCM *)pcm_pointer;
++	bool value;
++	
++	*status = module->GetClosedLoopControl(value);
++	
++	return value;
++}
++
++
++bool getPressureSwitch(void *pcm_pointer, int32_t *status) {
++	PCM *module = (PCM *)pcm_pointer;
++	bool value;
++	
++	*status = module->GetPressure(value);
++	
++	return value;
++}
++
++
++float getCompressorCurrent(void *pcm_pointer, int32_t *status) {
++	PCM *module = (PCM *)pcm_pointer;
++	float value;
++	
++	*status = module->GetCompressorCurrent(value);
++	
++	return value;
++}
++
+diff --git a/hal/lib/Athena/HAL.cpp b/hal/lib/Athena/HAL.cpp
+index 3ec4995cdfbcfef152e2aae46bd6b9b416e3cd9e..4f4b636d7f58620275b22a9dc64f95fce55ed07d 100644
+--- a/hal/lib/Athena/HAL.cpp
++++ b/hal/lib/Athena/HAL.cpp
+@@ -11,7 +11,7 @@
+ #include <iostream>
+ #include <unistd.h>
+ #include <signal.h> // linux for kill
+-const uint32_t solenoid_kNumDO7_0Elements = 0;
++const uint32_t solenoid_kNumDO7_0Elements = 8;
+ const uint32_t dio_kNumSystems = tDIO::kNumSystems;
+ const uint32_t interrupt_kNumSystems = tInterrupt::kNumSystems;
+ const uint32_t kSystemClockTicksPerMicrosecond = 40;
+diff --git a/hal/lib/Athena/Solenoid.cpp b/hal/lib/Athena/Solenoid.cpp
+index 42eaa72ad5175d3f199fa109a5b7f4aff1c6ed03..eddcc92958df665b953ad187886743bf21f76f27 100644
+--- a/hal/lib/Athena/Solenoid.cpp
++++ b/hal/lib/Athena/Solenoid.cpp
+@@ -6,81 +6,56 @@
+ #include "ChipObject.h"
+ #include "HAL/cpp/Synchronized.hpp"
+ #include "NetworkCommunication/LoadOut.h"
+-
+-// XXX No solenoid abstraction :(
+-
+-// struct solenoid_port_t {
+-//   Port port;
+-//   tSolenoid *module;
+-//   uint32_t PWMGeneratorID;
+-// };
+-// typedef struct solenoid_port_t SolenoidPort;
+-
+-// static ReentrantSemaphore solenoidSemaphore;
+-// static tSolenoid* solenoidModules[2] = {NULL, NULL};
+-
+-// bool solenoidModulesInitialized = false;
+-
+-// /**
+-//  * Initialize the digital modules.
+-//  */
+-// void initializeSolenoid(int32_t *status) {
+-//   if (solenoidModulesInitialized) return;
+-
+-//   for (unsigned int i = 0; i < (sizeof(solenoidModules)/sizeof(solenoidModules[0])); i++) {
+-// 	Synchronized sync(solenoidSemaphore);
+-// 	solenoidModules[i] = tSolenoid::create(status);
+-//   }
+-//   solenoidModulesInitialized = true;
+-// }
+-
+-// void* initializeSolenoidPort(void* port_pointer, int32_t *status) {
+-//   initializeSolenoid(status);
+-//   Port* port = (Port*) port_pointer;
+-
+-//   // Initialize port structure
+-//   SolenoidPort* solenoid_port = new SolenoidPort();
+-//   solenoid_port->port = *port;
+-//   solenoid_port->module = solenoidModules[solenoid_port->port.module-1];
+-
+-//   return solenoid_port;
+-// }
+-
+-// bool checkSolenoidModule(uint8_t module) {
+-//   if (nLoadOut::getModulePresence(nLoadOut::kModuleType_Solenoid, module - 1))
+-// 	return true;
+-//   return false;
+-// }
+-
+-// bool getSolenoid(void* solenoid_port_pointer, int32_t *status) {
+-//   SolenoidPort* port = (SolenoidPort*) solenoid_port_pointer;
+-//   if (checkSolenoidModule(port->port.module)) {
+-// 	uint8_t mask = 1 << (port->port.pin - 1);
+-// 	return (mask & port->module->readDO7_0(port->port.module - 1, status));
+-//   }
+-//   return false;
+-// }
+-
+-// void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status) {
+-//   SolenoidPort* port = (SolenoidPort*) solenoid_port_pointer;
+-//   if (checkSolenoidModule(port->port.module)) {
+-// 	Synchronized sync(solenoidSemaphore);
+-// 	uint8_t currentValue = port->module->readDO7_0(port->port.module - 1, status);
+-// 	uint8_t mask = 1 << (port->port.pin - 1);
+-// 	if (value) currentValue = currentValue | mask; // Flip the bit on
+-// 	else currentValue = currentValue & ~mask; // Flip the bit off
+-// 	port->module->writeDO7_0(port->port.module - 1, currentValue, status);
+-//   }
+-// }
+-
+-// XXX No solenoid abstraction :(
+-
+-/**
+- * Initialize the digital modules.
+- */
+-void initializeSolenoid(int32_t *status) {}
+-void* initializeSolenoidPort(void* port_pointer, int32_t *status) { return NULL; }
+-bool checkSolenoidModule(uint8_t module) { return false; }
+-bool getSolenoid(void* solenoid_port_pointer, int32_t *status) { return false; }
+-void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status) {}
++#include "ctre/PCM.h"
++#include <iostream>
++
++bool pcmModulesInitialized = false;
++
++static const int NUM_PCMS = 2;
++PCM *modules[NUM_PCMS];
++
++struct solenoid_port_t {
++	PCM *module;
++	uint32_t pin;
++};
++
++void initializePCM() {
++	if(!pcmModulesInitialized) {
++		modules[0] = new PCM(50);
++		modules[1] = new PCM(51);
++	
++		pcmModulesInitialized = true;
++	}
++}
++
++void* initializeSolenoidPort(void *port_pointer, int32_t *status) {
++	initializePCM();
++	
++	Port* port = (Port*) port_pointer;
++	
++	solenoid_port_t *solenoid_port = new solenoid_port_t;
++	solenoid_port->module = modules[port->module - 1];
++	solenoid_port->pin = port->pin;
++	
++	return solenoid_port;
++}
++
++bool checkSolenoidModule(uint8_t module) {
++	return module > 0 and module <= NUM_PCMS;
++}
++
++bool getSolenoid(void* solenoid_port_pointer, int32_t *status) {
++	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
++	bool value;
++	
++	*status = port->module->GetSolenoid(port->pin, value);
++	
++	return value;
++}
++
++void setSolenoid(void* solenoid_port_pointer, bool value, int32_t *status) {
++	solenoid_port_t* port = (solenoid_port_t*) solenoid_port_pointer;
++	
++	*status = port->module->SetSolenoid(port->pin, value);
++}
+ 
+diff --git a/hal/lib/Athena/ctre/PCM.cpp b/hal/lib/Athena/ctre/PCM.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..21ba26730a7ed45f114561e2a4c57c2e357604dc
+--- /dev/null
++++ b/hal/lib/Athena/ctre/PCM.cpp
+@@ -0,0 +1,507 @@
++#include "PCM.h"
++#include "NetworkCommunication/JaguarCANDriver.h"
++#include <string.h> // memset
++#include <unistd.h> // usleep
++/* PCM Constructor - Clears all vars, establishes default settings, starts PCM background process
++ * 
++ * @Return	-	void
++ * 
++ * @Param 	-	deviceNumber	- 	Device ID of PCM to be controlled
++ */
++PCM::PCM(UINT8 deviceNumber)
++{
++    memset(&_PcmDebug, 		0, sizeof(_PcmDebug));
++    memset(&_PcmControl, 	0, sizeof(_PcmControl));
++    memset(&_PcmStatus, 	0, sizeof(_PcmStatus));
++    memset(&_PcmStatusFault,0, sizeof(_PcmStatusFault));
++    /* setup arbids */
++	SetDeviceNumber(deviceNumber);
++	/* clear error info */
++	_timeSinceLastRx = 0;
++	_timeSinceLastTx = 0;
++	_numFailedRxs = 0;
++	_numFailedTxs = 0;
++	/* start thread */
++	_threadIsRunning = 1;
++	_threadErr = pthread_create( &_thread, NULL, ThreadFunc, (void*) this);
++}
++/* PCM D'tor
++ */
++PCM::~PCM() {
++	/* wait for thread to finish */
++	_threadIsRunning = 0;
++	pthread_join( _thread, NULL);
++	_thread = 0;
++}
++/* Set PCM Device Number and according CAN frame IDs
++ *
++ * @Return	-	void
++ *
++ * @Param	-	deviceNumber	-	Device number of PCM to control
++ */
++void PCM::SetDeviceNumber(UINT8 deviceNumber) {
++	PCM_settings.deviceNumber = deviceNumber;
++	PCM_settings.controlFrameID		= 0x9041C00 + (deviceNumber) + (UINT32) (0	* BIT6);
++	PCM_settings.statusFrameID 		= 0x9041400 + (deviceNumber) + (UINT32) (0	* BIT6);
++	PCM_settings.statusFaultFrameID = 0x9041400 + (deviceNumber) + (UINT32) (1	* BIT6);
++	PCM_settings.debugFrameID 		= 0x9041400 + (deviceNumber) + (UINT32) (2 	* BIT6);
++}
++
++/* Set PCM solenoid state
++ *
++ * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
++ *
++ * @Param 	-	idx			- 	ID of solenoid (1-8)
++ * @Param 	-	en			- 	Enable / Disable identified solenoid
++ */
++CTR_Code PCM::SetSolenoid(unsigned char idx, bool en) {
++	idx--; /* make it zero based */
++	if (en)
++		_PcmControl.solenoidBits |= (1ul << (7-idx));
++	else
++		_PcmControl.solenoidBits &= ~(1ul << (7-idx));
++	if (GetTimeSinceLastTx() >= 50)
++		return CTR_TxTimeout;
++	return CTR_OKAY;
++}
++
++/* Clears PCM sticky faults (indicators of past faults
++ *
++ * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
++ *
++ * @Param 	-	clr		- 	Clear / do not clear faults
++ */
++CTR_Code PCM::ClearStickyFaults(bool clr) {
++	_PcmControl.clearStickyFaults = clr;
++	if (GetTimeSinceLastTx() >= 50)
++		return CTR_TxTimeout;
++	return CTR_OKAY;
++}
++
++/* Enables PCM Closed Loop Control of Compressor via pressure switch
++ *
++ * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
++ *
++ * @Param 	-	en		- 	Enable / Disable Closed Loop Control
++ */
++CTR_Code PCM::SetClosedLoopControl(bool en) {
++	_PcmControl.closedLoopEnable = en;
++	if (GetTimeSinceLastTx() >= 50)
++		return CTR_TxTimeout;
++	return CTR_OKAY;
++}
++
++/* Set Compressor state
++ * 
++ * @Return	-	void
++ * 
++ * @Param 	-	en		- 	Enable / Disable compressor
++ */
++CTR_Code PCM::SetCompressor(bool en) {
++	_PcmControl.compressorOn = en;
++	if (GetTimeSinceLastTx() >= 50)
++		return CTR_TxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get solenoid state
++ * 
++ * @Return	-	True/False	-	True if solenoid enabled, false otherwise
++ * 
++ * @Param 	-	idx		- 	ID of solenoid (1-8) to return status of
++ */
++CTR_Code PCM::GetSolenoid(UINT8 idx, bool &status) {
++	idx--;
++	status = (_PcmStatus.SolenoidBits & (1ul<<(7-idx))) ? 1 : 0;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get pressure switch state
++ * 
++ * @Return	-	True/False	-	True if pressure adequate, false if low
++ */
++CTR_Code PCM::GetPressure(bool &status) {
++	status = _PcmStatus.pressureSwitchEn;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get compressor state
++ * 
++ * @Return	-	True/False	-	True if enabled, false if otherwise
++ */
++CTR_Code PCM::GetCompressor(bool &status) {
++	status = _PcmStatus.compressorOn;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get closed loop control state
++ * 
++ * @Return	-	True/False	-	True if closed loop enabled, false if otherwise
++ */
++CTR_Code PCM::GetClosedLoopControl(bool &status) {
++	status = _PcmStatus.isCloseloopEnabled;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get compressor current draw
++ * 
++ * @Return	-	Amperes	-	Compressor current 
++ */
++CTR_Code PCM::GetCompressorCurrent(float &status) {
++	uint8_t bt = _PcmStatus.compressorCurrentTop6;
++	bt <<= 4;
++	bt |=  _PcmStatus.compressorCurrentBtm4;
++	status = 20.1612903225806 * bt;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get suggested compressor state determined by Closed Loop logic
++ * 
++ * @Return	-	True/False	-	True if closed loop suggests enabling compressor, false if otherwise
++ */
++CTR_Code PCM::GetClosedLoopSuggestedOutput(bool &status) {
++	status = _PcmStatus.closedLoopOutput;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get voltage across solenoid rail
++ * 
++ * @Return	-	Volts	-	Voltage across solenoid rail
++ */
++CTR_Code PCM::GetSolenoidVoltage(float &status) {
++	uint32_t raw = _PcmStatus.solenoidVoltageTop8;
++	raw <<= 2;
++	raw |=  _PcmStatus.solenoidVoltageBtm2;
++	status = (double) raw * 24.7800586510264 / 1000;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get hardware fault value
++ * 
++ * @Return	-	True/False	-	True if hardware failure detected, false if otherwise
++ */
++CTR_Code PCM::GetHardwareFault(bool &status) {
++	status = _PcmStatus.faultHardwareFailure;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get compressor fault value
++ * 
++ * @Return	-	True/False	-	True if shorted compressor detected, false if otherwise
++ */
++CTR_Code PCM::GetCompressorFault(bool &status) {
++	status = _PcmStatus.faultCompCurrentTooHigh;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get solenoid fault value
++ * 
++ * @Return	-	True/False	-	True if shorted solenoid detected, false if otherwise
++ */
++CTR_Code PCM::GetSolenoidFault(bool &status) {
++	status = _PcmStatus.faultFuseTripped;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++//			Past Faults
++
++/* Get compressor sticky fault value
++ * 
++ * @Return	-	True/False	-	True if solenoid had previously been shorted
++ * 								(and sticky fault was not cleared), false if otherwise
++ */
++CTR_Code PCM::GetCompressorStickyFault(bool &status) {
++	status = _PcmStatus.stickyFaultCompCurrentTooHigh;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++/* Get solenoid sticky fault value
++ * 
++ * @Return	-	True/False	-	True if compressor had previously been shorted
++ * 								(and sticky fault was not cleared), false if otherwise
++ */
++CTR_Code PCM::GetSolenoidStickyFault(bool &status) { /* fix this */
++	status = _PcmStatus.stickyFaultFuseTripped;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++/* Get battery voltage
++ * 
++ * @Return	-	Volts	-	Voltage across PCM power ports
++ */
++CTR_Code PCM::GetBatteryVoltage(float &status) {
++	status = (float)_PcmStatus.battVoltage * ((59.0420332355816) / 1000.0);;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++/* Get number of total failed PCM Control Frame
++ * 
++ * @Return	-	Failed Control Frames	-	Number of failed control frames (tokenization fails)
++ * 
++ * @WARNING	-	Return only valid if [SeekDebugFrames] is enabled
++ * 				See function SeekDebugFrames
++ * 				See function EnableSeekDebugFrames
++ */
++CTR_Code PCM::GetNumberOfFailedControlFrames(UINT16 &status) {
++	status = _PcmDebug.tokFailsTop8;
++	status <<= 8;
++	status |= _PcmDebug.tokFailsBtm8;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++/* Get raw Solenoid Blacklist
++ * 
++ * @Return	-	BINARY	-	Raw binary breakdown of Solenoid Blacklist
++ * 							BIT7 = Solenoid 1, BIT6 = Solenoid 2, etc.
++ * 
++ * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
++ * 				See function SeekStatusFaultFrames
++ * 				See function EnableSeekStatusFaultFrames
++ */
++CTR_Code PCM::GetSolenoidBlackList(UINT8 &status) {
++	status = _PcmStatusFault.SolenoidBlacklist;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++/* Get solenoid Blacklist status
++ * - Blacklisted solenoids cannot be enabled until PCM is power cycled
++ * 
++ * @Return	-	True/False	-	True if Solenoid is blacklisted, false if otherwise
++ * 
++ * @Param	-	idx			-	ID of solenoid
++ * 
++ * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
++ * 				See function SeekStatusFaultFrames
++ * 				See function EnableSeekStatusFaultFrames
++ */
++CTR_Code PCM::IsSolenoidBlacklisted(UINT8 idx, bool &status) {
++	idx--;
++	if(_PcmStatusFault.SolenoidBlacklist & (1ul<<(7-idx)))
++		status = 1;
++	else
++		status = 0;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++/* Return status of module enable/disable
++ *
++ * @Return	-	bool		-	Returns TRUE if PCM is enabled, FALSE if disabled
++ */
++CTR_Code PCM::isModuleEnabled(bool &status) {
++	status = _PcmStatus.moduleEnabled;
++	if (GetTimeSinceLastRx() >= 50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++void PCM::GetErrorInfo(	uint32_t * timeSinceLastRx,
++						uint32_t * timeSinceLastTx,
++						uint32_t * numFailedRxs,
++						uint32_t * numFailedTxs)
++{
++	if(timeSinceLastRx) 	*timeSinceLastRx = _timeSinceLastRx;
++	if(timeSinceLastTx) 	*timeSinceLastTx = _timeSinceLastTx;
++	if(numFailedRxs) 		*numFailedRxs = _numFailedRxs;
++	if(numFailedTxs) 		*numFailedTxs = _numFailedTxs;
++}
++//------------------ CAN interface and thread --------------------------------------------//
++/* Search for PCM Status Frame on CAN bus */
++void PCM::ReadStatusFrame(void) {
++	PcmStatus_t frame = {0};
++	UINT8 size = 0;
++	INT32 status = 0;
++	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(&PCM_settings.statusFrameID, (uint8_t *)&frame, &size, 0 , &status);
++	if (status == 0) {
++		_timeSinceLastRx = 0;
++		_PcmStatus = frame;
++	} else {
++		++_numFailedRxs;
++	}
++}
++/* Search for PCM Status Fault Frame on CAN bus */
++void PCM::ReadStatusFaultFrame(void) {
++	PcmStatusFault_t frame= {0};
++	UINT8 size = 0;
++	INT32 status = 0;
++	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(&PCM_settings.statusFaultFrameID, (uint8_t *)&frame, &size, 0, &status);
++	if (status == 0) {
++		_timeSinceLastRx = 0;
++		_PcmStatusFault = frame;
++	} else {
++		++_numFailedRxs;
++	}
++}
++/* Search for PCM Debug Frame on CAN bus */
++void PCM::ReadDebugFrame(void) {
++	PcmDebug_t frame= {0};
++	UINT8 size = 0;
++	INT32 status = 0;
++	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(&PCM_settings.debugFrameID, (uint8_t *)&frame, &size, 0, &status);
++	if (status == 0) {
++		_timeSinceLastRx = 0;
++		_PcmDebug = frame;
++	} else {
++		++_numFailedRxs;
++	}
++}
++void * PCM::ThreadFunc()
++{
++	while(_threadIsRunning){
++		int32_t status = 0;
++		FRC_NetworkCommunication_JaguarCANDriver_sendMessage(PCM_settings.controlFrameID, (const uint8_t *)&_PcmControl, sizeof(_PcmControl), &status);
++		if(status == 0){
++			/* success */
++			_timeSinceLastTx = 0;
++		}else {
++			/* something is wrong */
++			++_numFailedTxs;
++		}
++		/* reads */
++		ReadStatusFrame();
++		ReadStatusFaultFrame();
++		ReadDebugFrame();
++		/* yield for 25ms */
++		usleep(25e3);
++		/* incrememnt times since comm without overflow */
++		if(_timeSinceLastTx < 60000)
++			_timeSinceLastTx += 25;
++		if(_timeSinceLastRx < 60000)
++			_timeSinceLastRx += 25;
++	}
++	return 0;
++}
++void * PCM::ThreadFunc( void *ptr )
++{
++	return ((PCM*)ptr)->ThreadFunc();
++}
++//------------------ C interface --------------------------------------------//
++extern "C" {
++	void * c_PCM_Init(void) {
++		return new PCM();
++	}
++	CTR_Code c_SetSolenoid(void * handle, unsigned char idx, INT8 param) {
++		return ((PCM*) handle)->SetSolenoid(idx, param);
++	}
++	CTR_Code c_SetCompressor(void * handle, INT8 param) {
++		return ((PCM*) handle)->SetCompressor(param);
++	}
++	CTR_Code c_SetClosedLoopControl(void * handle, INT8 param) {
++		return ((PCM*) handle)->SetClosedLoopControl(param);
++	}
++	CTR_Code c_ClearStickyFaults(void * handle, INT8 param) {
++		return ((PCM*) handle)->ClearStickyFaults(param);
++	}
++	CTR_Code c_GetSolenoid(void * handle, UINT8 idx, INT8 * status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->GetSolenoid(idx, bstatus);
++		*status = bstatus;
++		return retval;
++	}
++	CTR_Code c_GetPressure(void * handle, INT8 * status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->GetPressure(bstatus);
++		*status = bstatus;
++		return retval;
++	}
++	CTR_Code c_GetCompressor(void * handle, INT8 * status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->GetCompressor(bstatus);
++		*status = bstatus;
++		return retval;
++	}
++	CTR_Code c_GetClosedLoopControl(void * handle, INT8 * status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->GetClosedLoopControl(bstatus);
++		*status = bstatus;
++		return retval;
++	}
++	CTR_Code c_GetCompressorCurrent(void * handle, float * status) {
++		CTR_Code retval = ((PCM*) handle)->GetCompressorCurrent(*status);
++		return retval;
++	}
++	CTR_Code c_GetClosedLoopSuggestedOutput(void * handle, INT8 * status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->GetClosedLoopSuggestedOutput(bstatus);
++		*status = bstatus;
++		return retval;
++	}
++
++	CTR_Code c_GetSolenoidVoltage(void * handle, float*status) {
++		return ((PCM*) handle)->GetSolenoidVoltage(*status);
++	}
++	CTR_Code c_GetHardwareFault(void * handle, INT8*status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->GetHardwareFault(bstatus);
++		*status = bstatus;
++		return retval;
++	}
++	CTR_Code c_GetCompressorFault(void * handle, INT8*status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->GetCompressorFault(bstatus);
++		*status = bstatus;
++		return retval;
++	}
++	CTR_Code c_GetSolenoidFault(void * handle, INT8*status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->GetSolenoidFault(bstatus);
++		*status = bstatus;
++		return retval;
++	}
++	CTR_Code c_GetCompressorStickyFault(void * handle, INT8*status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->GetCompressorStickyFault(bstatus);
++		*status = bstatus;
++		return retval;
++	}
++	CTR_Code c_GetSolenoidStickyFault(void * handle, INT8*status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->GetSolenoidStickyFault(bstatus);
++		*status = bstatus;
++		return retval;
++	}
++	CTR_Code c_GetBatteryVoltage(void * handle, float*status) {
++		CTR_Code retval = ((PCM*) handle)->GetBatteryVoltage(*status);
++		return retval;
++	}
++	void c_SetDeviceNumber_PCM(void * handle, UINT8 deviceNumber) {
++		return ((PCM*) handle)->SetDeviceNumber(deviceNumber);
++	}
++	CTR_Code c_GetNumberOfFailedControlFrames(void * handle, UINT16*status) {
++		return ((PCM*) handle)->GetNumberOfFailedControlFrames(*status);
++	}
++	CTR_Code c_GetSolenoidBlackList(void * handle, UINT8 *status) {
++		return ((PCM*) handle)->GetSolenoidBlackList(*status);
++	}
++	CTR_Code c_IsSolenoidBlacklisted(void * handle, UINT8 idx, INT8*status) {
++		bool bstatus;
++		CTR_Code retval = ((PCM*) handle)->IsSolenoidBlacklisted(idx, bstatus);
++		*status = bstatus;
++		return retval;
++	}
++}
++
+diff --git a/hal/lib/Athena/ctre/PCM.h b/hal/lib/Athena/ctre/PCM.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..0a34eb03fd077d13a402820193eed32a0da532a9
+--- /dev/null
++++ b/hal/lib/Athena/ctre/PCM.h
+@@ -0,0 +1,364 @@
++#ifndef PCM_H_
++#define PCM_H_
++#include "ctre.h"				//BIT Defines + Typedefs
++#include <NetworkCommunication/JaguarCANDriver.h>	//CAN Comm
++#include <pthread.h>
++/* encoder/decoders */
++typedef struct _PcmStatus_t{
++	/* Byte 0 */
++	unsigned SolenoidBits:8;
++	/* Byte 1 */
++	unsigned compressorOn:1;
++	unsigned stickyFaultFuseTripped:1;
++	unsigned stickyFaultCompCurrentTooHigh:1;
++	unsigned faultCompCurrentTooHigh:1;
++	unsigned faultFuseTripped:1;
++	unsigned faultHardwareFailure:1;
++	unsigned isCloseloopEnabled:1;
++	unsigned pressureSwitchEn:1;
++	/* Byte 2*/
++	unsigned battVoltage:8;
++	/* Byte 3 */
++	unsigned solenoidVoltageTop8:8;
++	/* Byte 4 */
++	unsigned compressorCurrentTop6:6;
++	unsigned solenoidVoltageBtm2:2;
++	/* Byte 5 */
++	unsigned reserved:2;
++	unsigned moduleEnabled:1;
++	unsigned closedLoopOutput:1;
++	unsigned compressorCurrentBtm4:4;
++	/* Byte 6 */
++	unsigned tokenSeedTop8:8;
++	/* Byte 7 */
++	unsigned tokenSeedBtm8:8;
++}PcmStatus_t;
++
++typedef struct _PcmControl_t{
++	/* Byte 0 */
++	unsigned tokenTop8:8;
++	/* Byte 1 */
++	unsigned tokenBtm8:8;
++	/* Byte 2 */
++	unsigned solenoidBits:8;
++	/* Byte 3*/
++	unsigned reserved:4;
++	unsigned closeLoopOutput:1;
++	unsigned compressorOn:1;
++	unsigned closedLoopEnable:1;
++	unsigned clearStickyFaults:1;
++}PcmControl_t;
++
++typedef struct _PcmStatusFault_t{
++	/* Byte 0 */
++	unsigned SolenoidBlacklist:8;
++	/* Byte 1 */
++	unsigned reserved1:8;
++	unsigned reserved2:8;
++	unsigned reserved3:8;
++	unsigned reserved4:8;
++	unsigned reserved5:8;
++	unsigned reserved6:8;
++	unsigned reserved7:8;
++}PcmStatusFault_t;
++
++typedef struct _PcmDebug_t{
++	unsigned tokFailsTop8:8;
++	unsigned tokFailsBtm8:8;
++	unsigned lastFailedTokTop8:8;
++	unsigned lastFailedTokBtm8:8;
++	unsigned tokSuccessTop8:8;
++	unsigned tokSuccessBtm8:8;
++}PcmDebug_t;
++
++class PCM
++{
++public:
++    PCM(UINT8 deviceNumber=50);
++    ~PCM();
++    
++    /* Set PCM solenoid state
++     *
++     * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
++     *
++     * @Param 	-	idx			- 	ID of solenoid (1-8)
++     * @Param 	-	en			- 	Enable / Disable identified solenoid
++     */
++    CTR_Code 	SetSolenoid(unsigned char idx, bool en);
++
++    /* Set Compressor state
++     *
++     * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
++     *
++     * @Param 	-	en		- 	Enable / Disable compressor
++     */
++    CTR_Code 	SetCompressor(bool en);
++
++    /* Enables PCM Closed Loop Control of Compressor via pressure switch
++     *
++     * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
++     *
++     * @Param 	-	en		- 	Enable / Disable Closed Loop Control
++     */
++    CTR_Code 	SetClosedLoopControl(bool en);
++
++    /* Clears PCM sticky faults (indicators of past faults
++     *
++     * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
++     *
++     * @Param 	-	clr		- 	Clear / do not clear faults
++     */
++    CTR_Code 	ClearStickyFaults(bool clr);
++    
++    /* Get solenoid state
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param 	-	idx		- 	ID of solenoid (1-8) to return status of
++     *
++     * @Param	-	status	-	True if solenoid enabled, false otherwise
++     */
++    CTR_Code 	GetSolenoid(UINT8 idx, bool &status);
++
++    /* Get pressure switch state
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	True if pressure adequate, false if low
++     */
++    CTR_Code 	GetPressure(bool &status);
++
++    /* Get compressor state
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	True if enabled, false if otherwise
++     */
++    CTR_Code	GetCompressor(bool &status);
++
++    /* Get closed loop control state
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status	-	True if closed loop enabled, false if otherwise
++     */
++    CTR_Code 	GetClosedLoopControl(bool &status);
++
++    /* Get compressor current draw
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	Compressor current returned in Amperes (A)
++     */
++    CTR_Code 	GetCompressorCurrent(float &status);
++
++    /* Get suggested compressor state determined by Closed Loop logic
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	True if closed loop suggests enabling compressor, false if otherwise
++     */
++    CTR_Code 	GetClosedLoopSuggestedOutput(bool &status);
++
++    /* Get voltage across solenoid rail
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	Voltage across solenoid rail in Volts (V)
++     */
++    CTR_Code 	GetSolenoidVoltage(float &status);
++
++    /* Get hardware fault value
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	True if hardware failure detected, false if otherwise
++     */
++    CTR_Code 	GetHardwareFault(bool &status);
++
++    /* Get compressor fault value
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	True if shorted compressor detected, false if otherwise
++     */
++    CTR_Code 	GetCompressorFault(bool &status);
++
++    /* Get solenoid fault value
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	True if shorted solenoid detected, false if otherwise
++     */
++    CTR_Code 	GetSolenoidFault(bool &status);
++
++    /* Get compressor sticky fault value
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	True if solenoid had previously been shorted
++     * 								(and sticky fault was not cleared), false if otherwise
++     */
++    CTR_Code 	GetCompressorStickyFault(bool &status);
++
++    /* Get solenoid sticky fault value
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	True if compressor had previously been shorted
++     * 								(and sticky fault was not cleared), false if otherwise
++     */
++    CTR_Code 	GetSolenoidStickyFault(bool &status);
++
++    /* Get battery voltage
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	Voltage across PCM power ports in Volts (V)
++     */
++    CTR_Code 	GetBatteryVoltage(float &status);
++    
++    /* Set PCM Device Number and according CAN frame IDs
++     * @Return	-	void
++     * @Param	-	deviceNumber	-	Device number of PCM to control
++     */
++    void	SetDeviceNumber(UINT8 deviceNumber);
++
++    /* Seek PCM Status Frames on CAN bus
++     * @Return	-	void
++     * @Param	-	en	-	Enable / Disable seeking of PCM Status Frame
++     * @Notes	-	Status Frames identify
++     */
++    void 	EnableSeekStatusFrames(bool en);
++
++    /* Seek PCM Status Fault Frames on CAN bus
++     * @Return	-	void
++     * @Param	-	en	-	Enable / Disable seeking of PCM Status Fault Frame
++     * @Notes	-	Status Fault Frames identify Blacklisted Solenoids
++     */
++    void 	EnableSeekStatusFaultFrames(bool en);
++
++    /* Seek PCM Debug Frames on CAN bus
++     *
++     * @Return	-	void
++     * @Param	-	en	-	Enable / Disable seeking of PCM Debug Frame
++     * @Notes	-	Debug Frames identify the number of failed tokens (for exclusive, secure control of PCM by RoboRIO)
++     */
++    void 	EnableSeekDebugFrames(bool en);
++    
++    /* Get number of total failed PCM Control Frame
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     * @Param	-	status		-	Number of failed control frames (tokenization fails)
++     * @WARNING	-	Return only valid if [SeekDebugFrames] is enabled
++     * 				See function SeekDebugFrames
++     * 				See function EnableSeekDebugFrames
++     */
++	CTR_Code GetNumberOfFailedControlFrames(UINT16 &status);
++    
++    /* Get raw Solenoid Blacklist
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	Raw binary breakdown of Solenoid Blacklist
++     * 								BIT7 = Solenoid 1, BIT6 = Solenoid 2, etc.
++     *
++     * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
++     * 				See function SeekStatusFaultFrames
++     * 				See function EnableSeekStatusFaultFrames
++     */
++    CTR_Code 	GetSolenoidBlackList(UINT8 &status);
++
++    /* Get solenoid Blacklist status
++     * - Blacklisted solenoids cannot be enabled until PCM is power cycled
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	idx			-	ID of solenoid
++     *
++     * @Param	-	status		-	True if Solenoid is blacklisted, false if otherwise
++     *
++     * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
++     * 				See function SeekStatusFaultFrames
++     * 				See function EnableSeekStatusFaultFrames
++     */
++    CTR_Code 	IsSolenoidBlacklisted(UINT8 idx, bool &status);
++
++    /* Return status of module enable/disable
++     * @Return	-	CTR_Code	-	Error code (if any)
++     * @Param	-	status		-	Returns TRUE if PCM is enabled, FALSE if disabled
++     */
++    CTR_Code	isModuleEnabled(bool &status);
++
++    /* Get time since last sent frame
++	 * @Return	-	int		-	Returns time in milliseconds (ms) since last sent PCM frame
++	 */
++	int GetTimeSinceLastTx(void) { return _timeSinceLastTx;}
++
++	/* Get time since last received frame
++	 * @Return	-	int		-	Returns time in milliseconds (ms) since last received PCM frame
++	 */
++	int GetTimeSinceLastRx(void) { return _timeSinceLastRx;}
++private:
++	/* frames to receive */
++	PcmDebug_t 			_PcmDebug;
++	PcmStatus_t 		_PcmStatus;
++	PcmStatusFault_t 	_PcmStatusFault;
++	/* frames to send */
++	PcmControl_t 		_PcmControl;
++	/* tracking health and error info */
++	uint32_t _timeSinceLastRx;
++	uint32_t _timeSinceLastTx;
++	uint32_t _numFailedRxs;
++	uint32_t _numFailedTxs;
++	/* threading */
++	pthread_t _thread;
++	int _threadErr;
++	int _threadIsRunning;
++	/** arbids */
++    struct PCM_SETTINGS{
++    	UINT8 deviceNumber;
++    	UINT32 controlFrameID;
++    	UINT32 statusFrameID;
++    	UINT32 statusFaultFrameID;
++    	UINT32 debugFrameID;
++    }PCM_settings;
++    void ReadStatusFrame(void);
++    void ReadStatusFaultFrame(void);
++    void ReadDebugFrame(void);
++    void GetErrorInfo(	uint32_t * timeSinceLastRx,
++						uint32_t * timeSinceLastTx,
++						uint32_t * numFailedRxs,
++						uint32_t * numFailedTxs);
++    static void * ThreadFunc(void *);
++    void * ThreadFunc();
++};
++//------------------ C interface --------------------------------------------//
++extern "C" {
++	void * c_PCM_Init(void);
++	CTR_Code c_SetSolenoid(void * handle,unsigned char idx,INT8 param);
++	CTR_Code c_SetCompressor(void * handle,INT8 param);
++	CTR_Code c_SetClosedLoopControl(void * handle,INT8 param);
++	CTR_Code c_ClearStickyFaults(void * handle,INT8 param);
++	CTR_Code c_GetSolenoid(void * handle,UINT8 idx,INT8 * status);
++	CTR_Code c_GetPressure(void * handle,INT8 * status);
++	CTR_Code c_GetCompressor(void * handle,INT8 * status);
++	CTR_Code c_GetClosedLoopControl(void * handle,INT8 * status);
++	CTR_Code c_GetCompressorCurrent(void * handle,float * status);
++	CTR_Code c_GetClosedLoopSuggestedOutput(void * handle,INT8 * status);
++	CTR_Code c_GetSolenoidVoltage(void * handle,float*status);
++	CTR_Code c_GetHardwareFault(void * handle,INT8*status);
++	CTR_Code c_GetCompressorFault(void * handle,INT8*status);
++	CTR_Code c_GetSolenoidFault(void * handle,INT8*status);
++	CTR_Code c_GetCompressorStickyFault(void * handle,INT8*status);
++	CTR_Code c_GetSolenoidStickyFault(void * handle,INT8*status);
++	CTR_Code c_GetBatteryVoltage(void * handle,float*status);
++	void c_SetDeviceNumber_PCM(void * handle,UINT8 deviceNumber);
++	void c_EnableSeekStatusFrames(void * handle,INT8 enable);
++	void c_EnableSeekStatusFaultFrames(void * handle,INT8 enable);
++	void c_EnableSeekDebugFrames(void * handle,INT8 enable);
++	CTR_Code c_GetNumberOfFailedControlFrames(void * handle,UINT16*status);
++	CTR_Code c_GetSolenoidBlackList(void * handle,UINT8 *status);
++	CTR_Code c_IsSolenoidBlacklisted(void * handle,UINT8 idx,INT8*status);
++}
++#endif
+diff --git a/hal/lib/Athena/ctre/PDP.cpp b/hal/lib/Athena/ctre/PDP.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..6bcb629debcadde49a0ea7c783cd04df51036e2c
+--- /dev/null
++++ b/hal/lib/Athena/ctre/PDP.cpp
+@@ -0,0 +1,163 @@
++#include "PDP.h"
++#include "NetworkCommunication/JaguarCANDriver.h"
++#include <string.h> // memset
++#include <unistd.h> // usleep
++PDP::PDP(UINT8 deviceNumber)
++{
++    memset(&_status1, 0, sizeof(_status1));
++    memset(&_status2, 0, sizeof(_status2));
++    memset(&_status3, 0, sizeof(_status3));
++    memset(&PDP_Settings, 0, sizeof PDP_Settings);
++    /* setup arbids */
++	SetDeviceNumber(deviceNumber);
++	/* clear error info */
++	_timeSinceLastRx = 0;
++	_numFailedRxs = 0;
++	/* start thread */
++	_threadIsRunning = 1;
++	_threadErr = pthread_create( &_thread, NULL, ThreadFunc, (void*) this);
++}
++/* PDP D'tor
++ */
++PDP::~PDP() {
++	/* wait for thread to finish */
++	_threadIsRunning = 0;
++	pthread_join( _thread, NULL);
++	_thread = 0;
++}
++CTR_Code PDP::GetChannelCurrent(UINT8 idx, double &current){
++	/* atomically copy out our data */
++    PdpStatus1_t status1 = _status1;
++    PdpStatus2_t status2 = _status2;
++    PdpStatus3_t status3 = _status3;
++	uint32_t raw = 0;
++	if(idx <= 6)
++	{
++		switch(idx)
++		{
++			case 0:	raw = 0; break;
++			case 1:	raw = ((uint32_t)status1.chan1_h8 << 2) | status1.chan1_l2;	break;
++			case 2:	raw = ((uint32_t)status1.chan2_h6 << 4) | status1.chan2_l4;	break;
++			case 3:	raw = ((uint32_t)status1.chan3_h4 << 6) | status1.chan3_l6;	break;
++			case 4:	raw = ((uint32_t)status1.chan4_h2 << 8) | status1.chan4_l8;	break;
++			case 5:	raw = ((uint32_t)status1.chan5_h8 << 2) | status1.chan5_l2;	break;
++			case 6:	raw = ((uint32_t)status1.chan6_h6 << 4) | status1.chan6_l4;	break;
++		}
++	}
++	else if(idx <= 12)
++	{
++		switch(idx)
++		{
++			case  7:	raw = ((uint32_t)status2.chan7_h8  << 2) | status2.chan7_l2;	break;
++			case  8:	raw = ((uint32_t)status2.chan8_h6  << 4) | status2.chan8_l4;	break;
++			case  9:	raw = ((uint32_t)status2.chan9_h4  << 6) | status2.chan9_l6;	break;
++			case 10:	raw = ((uint32_t)status2.chan10_h2 << 8) | status2.chan10_l8;	break;
++			case 11:	raw = ((uint32_t)status2.chan11_h8 << 2) | status2.chan11_l2;	break;
++			case 12:	raw = ((uint32_t)status2.chan12_h6 << 4) | status2.chan12_l4;	break;
++		}
++	}
++	else if(idx <= 16)
++	{
++		switch(idx)
++		{
++			case 13:	raw = ((uint32_t)status3.chan13_h8  << 2) | status3.chan13_l2;	break;
++			case 14:	raw = ((uint32_t)status3.chan14_h6  << 4) | status3.chan14_l4;	break;
++			case 15:	raw = ((uint32_t)status3.chan15_h4  << 6) | status3.chan15_l6;	break;
++			case 16:	raw = ((uint32_t)status3.chan16_h2  << 8) | status3.chan16_l8;	break;
++		}
++	}
++	/* convert to amps */
++	current = 0.06724511900000001*raw + 1.527114967;
++	/* signal caller with success */
++	if(GetTimeSinceLastRx()>=50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++CTR_Code PDP::GetVoltage(double &voltage){
++	uint32_t raw = _status3.busVoltage;
++	voltage = 0.0554413328606877 * raw;
++	if(GetTimeSinceLastRx()>=50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++
++CTR_Code PDP::GetTemperature(double &tempC){
++	uint32_t raw = _status3.temp;
++	tempC =	((double)raw-67.8564500484966)*1.03250836957542;
++	if(GetTimeSinceLastRx()>=50)
++		return CTR_RxTimeout;
++	return CTR_OKAY;
++}
++void PDP::SetDeviceNumber(UINT8 deviceNumber){
++	PDP_Settings.deviceNumber = deviceNumber;
++	PDP_Settings.frameIDs[0] =	0x8041400 + (deviceNumber) + (UINT32) (0 * BIT6);
++	PDP_Settings.frameIDs[1] =	0x8041400 + (deviceNumber) + (UINT32) (1 * BIT6);
++	PDP_Settings.frameIDs[2] =	0x8041400 + (deviceNumber) + (UINT32) (2 * BIT6);
++}
++void PDP::GetErrorInfo(	uint32_t * timeSinceLastRx,
++						uint32_t * numFailedRxs)
++{
++	if(timeSinceLastRx) 	*timeSinceLastRx = _timeSinceLastRx;
++	if(numFailedRxs) 		*numFailedRxs = _numFailedRxs;
++}
++//------------------ CAN interface and thread --------------------------------------------//
++/* Search for PCM Status Frame on CAN bus */
++uint64_t PDP::ReadCurrents(uint8_t api)
++{
++	uint64_t frame = 0;
++	UINT8 size = 0;
++	INT32 status = 0;
++	FRC_NetworkCommunication_JaguarCANDriver_receiveMessage(&PDP_Settings.frameIDs[api], (uint8_t *)&frame, &size, 0 , &status);
++	if (status == 0) {
++		_timeSinceLastRx = 0;
++	} else {
++		++_numFailedRxs;
++	}
++	return frame;
++}
++void * PDP::ThreadFunc()
++{
++	while(_threadIsRunning){
++		/* reads */
++		uint64_t frame1 = ReadCurrents(0);
++		uint64_t frame2 = ReadCurrents(1);
++		uint64_t frame3 = ReadCurrents(2);
++		/* update stats */
++		memcpy(&_status1,&frame1,8);
++		memcpy(&_status2,&frame2,8);
++		memcpy(&_status3,&frame3,8);
++		/* yield for 25ms */
++		usleep(25e3);
++		/* timeouts */
++		if(_timeSinceLastRx < 60000)
++			_timeSinceLastRx += 20;
++	}
++	return 0;
++}
++void * PDP::ThreadFunc( void *ptr )
++{
++	return ((PDP*)ptr)->ThreadFunc();
++}
++//------------------ C interface --------------------------------------------//
++extern "C" {
++	void * c_PDP_Init(void)
++	{
++		return new PDP();
++	}
++	CTR_Code c_GetChannelCurrent(void * handle,UINT8 idx, double *status)
++	{
++		return ((PDP*)handle)-> GetChannelCurrent(idx,*status);
++	}
++	CTR_Code c_GetVoltage(void * handle,double *status)
++	{
++		return ((PDP*)handle)-> GetVoltage(*status);
++	}
++	CTR_Code c_GetTemperature(void * handle,double *status)
++	{
++		return ((PDP*)handle)-> GetTemperature(*status);
++	}
++	void c_SetDeviceNumber_PDP(void * handle,UINT8 deviceNumber)
++	{
++		return ((PDP*)handle)-> SetDeviceNumber(deviceNumber);
++	}
++}
+diff --git a/hal/lib/Athena/ctre/PDP.h b/hal/lib/Athena/ctre/PDP.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..b38424c8e274737e1ad801a9af0acd3d03143d7b
+--- /dev/null
++++ b/hal/lib/Athena/ctre/PDP.h
+@@ -0,0 +1,126 @@
++#ifndef PDP_H_
++#define PDP_H_
++#include "ctre.h"				//BIT Defines + Typedefs
++#include <NetworkCommunication/JaguarCANDriver.h>	//CAN Comm
++#include <pthread.h>
++/* encoder/decoders */
++typedef struct _PdpStatus1_t{
++	unsigned chan1_h8:8;
++	unsigned chan2_h6:6;
++	unsigned chan1_l2:2;
++	unsigned chan3_h4:4;
++	unsigned chan2_l4:4;
++	unsigned chan4_h2:2;
++	unsigned chan3_l6:6;
++	unsigned chan4_l8:8;
++	unsigned chan5_h8:8;
++	unsigned chan6_h6:6;
++	unsigned chan5_l2:2;
++	unsigned reserved4:4;
++	unsigned chan6_l4:4;
++}PdpStatus1_t;
++typedef struct _PdpStatus2_t{
++	unsigned chan7_h8:8;
++	unsigned chan8_h6:6;
++	unsigned chan7_l2:2;
++	unsigned chan9_h4:4;
++	unsigned chan8_l4:4;
++	unsigned chan10_h2:2;
++	unsigned chan9_l6:6;
++	unsigned chan10_l8:8;
++	unsigned chan11_h8:8;
++	unsigned chan12_h6:6;
++	unsigned chan11_l2:2;
++	unsigned reserved4:4;
++	unsigned chan12_l4:4;
++}PdpStatus2_t;
++typedef struct _PdpStatus3_t{
++	unsigned chan13_h8:8;
++	unsigned chan14_h6:6;
++	unsigned chan13_l2:2;
++	unsigned chan15_h4:4;
++	unsigned chan14_l4:4;
++	unsigned chan16_h2:2;
++	unsigned chan15_l6:6;
++	unsigned chan16_l8:8;
++	unsigned internalResBattery_mOhms:8;
++	unsigned busVoltage:8;
++	unsigned temp:8;
++}PdpStatus3_t;
++class PDP
++{
++public:
++    /* Get PDP Channel Current
++     *
++     * @Param	-	deviceNumber	-	Device ID for PDP. Factory default is 60. Function defaults to 60.
++     */
++    PDP(UINT8 deviceNumber=60);
++    ~PDP();
++    /* Get PDP Channel Current
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	idx			-	ID of channel to return current for (channels 1-16)
++     *
++     * @Param	-	status		-	Current of channel 'idx' in Amps (A)
++     */
++    CTR_Code GetChannelCurrent(UINT8 idx, double &status);
++
++    /* Get Bus Voltage of PDP
++     *
++     * @Return	-	CTR_Code	- 	Error code (if any)
++     *
++     * @Param	-	status		- 	Voltage (V) across PDP
++     */
++    CTR_Code GetVoltage(double &status);
++
++    /* Get Temperature of PDP
++     *
++     * @Return	-	CTR_Code	-	Error code (if any)
++     *
++     * @Param	-	status		-	Temperature of PDP in Centigrade / Celcius (C)
++     */
++    CTR_Code GetTemperature(double &status);
++    /* Set PDP Device Number
++     *
++     * @Return	-	void
++     *
++     * @Param	-	deviceNumber	-	Device number of PDP to control
++     */
++    void SetDeviceNumber(UINT8 deviceNumber);
++	/* Get time since last received frame
++	 * @Return	-	int		-	Returns time in milliseconds (ms) since last received PCM frame
++	 */
++	int GetTimeSinceLastRx(void) { return _timeSinceLastRx;}
++private:
++	/* frames to receive */
++    PdpStatus1_t _status1;
++    PdpStatus2_t _status2;
++    PdpStatus3_t _status3;
++	/* tracking health and error info */
++	uint32_t _timeSinceLastRx;
++	uint32_t _timeSinceLastTx;
++	uint32_t _numFailedRxs;
++	uint32_t _numFailedTxs;
++	/* threading */
++	pthread_t _thread;
++	int _threadErr;
++	int _threadIsRunning;
++	/** arbids */
++    struct PDPSettings{
++    	UINT8	deviceNumber;
++    	UINT32	frameIDs[3];
++    }PDP_Settings;
++    uint64_t ReadCurrents(uint8_t api);
++    void GetErrorInfo(	uint32_t * timeSinceLastRx,uint32_t * numFailedRxs);
++    static void * ThreadFunc(void *);
++    void * ThreadFunc();
++};
++extern "C" {
++	void * c_PDP_Init();
++	CTR_Code c_GetChannelCurrent(void * handle,UINT8 idx, double *status);
++	CTR_Code c_GetVoltage(void * handle,double *status);
++	CTR_Code c_GetTemperature(void * handle,double *status);
++	void c_SetDeviceNumber_PDP(void * handle,UINT8 deviceNumber);
++}
++#endif /* PDP_H_ */
+diff --git a/hal/lib/Athena/ctre/ctre.h b/hal/lib/Athena/ctre/ctre.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..5cd5e082ac4d687628cc5171f7784f01f1d273b3
+--- /dev/null
++++ b/hal/lib/Athena/ctre/ctre.h
+@@ -0,0 +1,58 @@
++#ifndef GLOBAL_H
++#define GLOBAL_H
++
++//Bit Defines
++#define BIT0 0x01
++#define BIT1 0x02
++#define BIT2 0x04
++#define BIT3 0x08
++#define BIT4 0x10
++#define BIT5 0x20
++#define BIT6 0x40
++#define BIT7 0x80
++#define BIT8  0x0100
++#define BIT9  0x0200
++#define BIT10 0x0400
++#define BIT11 0x0800
++#define BIT12 0x1000
++#define BIT13 0x2000
++#define BIT14 0x4000
++#define BIT15 0x8000
++
++//Signed
++typedef	signed char	INT8;
++typedef	signed short	INT16;
++typedef	signed int	INT32;
++typedef	signed long long INT64;
++
++//Unsigned
++typedef	unsigned char	UINT8;
++typedef	unsigned short	UINT16;
++typedef	unsigned int	UINT32;
++typedef	unsigned long long UINT64;
++
++//Other
++typedef	unsigned char	UCHAR;
++typedef unsigned short	USHORT;
++typedef	unsigned int	UINT;
++typedef unsigned long	ULONG;
++
++typedef enum {
++		CTR_OKAY,				//No Error - Function executed as expected
++		CTR_RxTimeout,			/*
++								 *	Receive Timeout
++								 *
++								 *		No module-specific CAN frames have been received in
++								 *	the last 50ms. Function returns the latest received data
++								 *	but may be STALE DATA.
++								 */
++		CTR_TxTimeout			/*
++								 *	Transmission Timeout
++								 *
++								 *		No module-specific CAN frames were transmitted in
++								 *	the last 50ms. Parameters passed in by the user are loaded
++								 *	for next transmission but have not sent.
++								 */
++}CTR_Code;
++
++#endif
+diff --git a/wpilibc/include/PCMCompressor.h b/wpilibc/include/PCMCompressor.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..01ca1182965011e2889c8b920888ce31b967f56e
+--- /dev/null
++++ b/wpilibc/include/PCMCompressor.h
+@@ -0,0 +1,55 @@
++/*
++ * PCMCompressor.h
++ */
++
++#ifndef PCMCOMPRESSOR_H_
++#define PCMCOMPRESSOR_H_
++
++#include "HAL/HAL.h"
++#include "SensorBase.h"
++#include "tables/ITableListener.h"
++#include "LiveWindow/LiveWindowSendable.h"
++
++/**
++ * CAN pneumatic control module compressor
++ *
++ *  Created on: May 28, 2014
++ *      Author: Thomas Clark
++ *
++ */
++class PCMCompressor: public SensorBase, public LiveWindowSendable, public ITableListener {
++public:
++	PCMCompressor(uint8_t module);
++	PCMCompressor();
++	~PCMCompressor();
++
++	void Start();
++	void Stop();
++	bool Enabled();
++
++	bool GetPressureSwitchValue();
++	
++	float GetCompressorCurrent();
++
++	void SetClosedLoopControl(bool on);
++	bool GetClosedLoopControl();
++
++	void UpdateTable();
++	void StartLiveWindowMode();
++	void StopLiveWindowMode();
++	std::string GetSmartDashboardType();
++	void InitTable(ITable *subTable);
++	ITable *GetTable();
++	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
++
++protected:
++	void *m_pcm_pointer;
++
++private:
++	void InitCompressor(uint8_t module);
++	void SetCompressor(bool on);
++
++	ITable *m_table;
++};
++
++#endif /* PCMCOMPRESSOR_H_ */
+diff --git a/wpilibc/lib/PCMCompressor.cpp b/wpilibc/lib/PCMCompressor.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..d3fd583e4a2a11d00f81e8bffadd4069e85c8cc2
+--- /dev/null
++++ b/wpilibc/lib/PCMCompressor.cpp
+@@ -0,0 +1,176 @@
++/*
++ * PCMCompressor.cpp
++ */
++
++#include "PCMCompressor.h"
++#include "WPIErrors.h"
++
++void PCMCompressor::InitCompressor(uint8_t module) {
++	m_table = 0;
++	m_pcm_pointer = initializeCompressor(module);
++
++	SetClosedLoopControl(true);
++}
++
++/**
++ * Constructor
++ *
++ * Uses the default solenoid module number
++ */
++PCMCompressor::PCMCompressor() {
++	InitCompressor(GetDefaultSolenoidModule());
++}
++
++/**
++ * Constructor
++ *
++ * @param module The module number to use (1 or 2)
++ */
++PCMCompressor::PCMCompressor(uint8_t module) {
++	InitCompressor(module);
++}
++
++PCMCompressor::~PCMCompressor() {
++
++}
++
++/**
++ *  Starts the compressor and disables automatic closed-loop control
++ */
++void PCMCompressor::Start() {
++	SetClosedLoopControl(false);
++	SetCompressor(true);
++}
++
++/**
++ *  Stops the compressor and disables automatic closed-loop control
++ */
++void PCMCompressor::Stop() {
++	SetClosedLoopControl(false);
++	SetCompressor(false);
++}
++
++void PCMCompressor::SetCompressor(bool on) {
++	int32_t status = 0;
++
++	setCompressor(m_pcm_pointer, on, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
++}
++
++
++/**
++ * @return true if the compressor is on
++ */
++bool PCMCompressor::Enabled() {
++	int32_t status = 0;
++	bool value;
++
++	value = getCompressor(m_pcm_pointer, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
++
++	return value;
++}
++
++/**
++ * @return true if pressure is low
++ */
++bool PCMCompressor::GetPressureSwitchValue() {
++	int32_t status = 0;
++	bool value;
++
++	value = getPressureSwitch(m_pcm_pointer, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
++
++	return value;
++}
++
++
++/**
++ * @return The current through the compressor, in amps
++ */
++float PCMCompressor::GetCompressorCurrent() {
++	int32_t status = 0;
++	float value;
++
++	value = getCompressorCurrent(m_pcm_pointer, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
++
++	return value;
++}
++
++
++/**
++ * Enables or disables automatically turning the compressor on when the
++ * pressure is low.
++ */
++void PCMCompressor::SetClosedLoopControl(bool on) {
++	int32_t status = 0;
++
++	setClosedLoopControl(m_pcm_pointer, on, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
++}
++
++/**
++ * Returns true if the compressor will automatically turn on when the
++ * pressure is low.
++ */
++bool PCMCompressor::GetClosedLoopControl() {
++	int32_t status = 0;
++	bool value;
++
++	value = getClosedLoopControl(m_pcm_pointer, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
++
++	return value;
++}
++
++void PCMCompressor::UpdateTable() {
++	if(m_table) {
++		m_table->PutBoolean("Enabled", Enabled());
++		m_table->PutBoolean("Pressure switch", GetPressureSwitchValue());
++	}
++}
++
++void PCMCompressor::StartLiveWindowMode() {
++}
++
++void PCMCompressor::StopLiveWindowMode() {
++}
++
++std::string PCMCompressor::GetSmartDashboardType() {
++	return "PCMCompressor";
++}
++
++void PCMCompressor::InitTable(ITable *subTable) {
++	m_table = subTable;
++	UpdateTable();
++}
++
++ITable *PCMCompressor::GetTable() {
++	return m_table;
++}
++
++void PCMCompressor::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
++	if(value.b) Start();
++	else Stop();
++
++}
++
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PCMCompressor.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PCMCompressor.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3161e380367d444e61b77a4ba40c9b637aadbca7
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PCMCompressor.java
+@@ -0,0 +1,129 @@
++package edu.wpi.first.wpilibj;
++
++import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
++
++import edu.wpi.first.wpilibj.SensorBase;
++import edu.wpi.first.wpilibj.hal.CompressorJNI;
++import edu.wpi.first.wpilibj.hal.HALUtil;
++import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
++import edu.wpi.first.wpilibj.parsing.IDevice;
++import edu.wpi.first.wpilibj.tables.ITable;
++
++public class PCMCompressor extends SensorBase implements IDevice, LiveWindowSendable {
++	private ByteBuffer m_pcm;
++	
++	public PCMCompressor(int module) {
++		initCompressor(module);
++	}
++	
++	public PCMCompressor() {
++		initCompressor(getDefaultSolenoidModule());
++	}
++	
++	private void initCompressor(int module) {
++		m_table = null;
++		
++		m_pcm = CompressorJNI.initializeCompressor((byte)module);
++	}
++	
++	void start() {
++		setClosedLoopControl(false);
++		setCompressor(true);
++	}
++	
++	void stop() {
++		setClosedLoopControl(false);
++		setCompressor(false);
++	}
++	
++	boolean enabled() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		boolean on = CompressorJNI.getCompressor(m_pcm, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		
++		return on;
++	}
++	
++	boolean getPressureSwitchValue() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		boolean on = CompressorJNI.getPressureSwitch(m_pcm, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		
++		return on;
++	}
++	
++	float getCompressorCurrent() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		float current = CompressorJNI.getCompressorCurrent(m_pcm, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		
++		return current;
++	}
++	
++	void setClosedLoopControl(boolean on) {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		CompressorJNI.setClosedLoopControl(m_pcm, on, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++	}
++	
++	boolean getClosedLoopControl() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		boolean on = CompressorJNI.getClosedLoopControl(m_pcm, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		
++		return on;
++	}
++
++	@Override
++	public void startLiveWindowMode() {
++	}
++
++	@Override
++	public void stopLiveWindowMode() {
++	}
++	
++	private void setCompressor(boolean on) {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		CompressorJNI.setCompressor(m_pcm, on, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++	}
++	
++	@Override
++	public String getSmartDashboardType() {
++		return "Compressor";
++	}
++
++	private ITable m_table;
++
++	@Override
++	public void initTable(ITable subtable) {
++		m_table = subtable;
++		updateTable();
++	}
++	
++	@Override
++	public ITable getTable() {
++		return m_table;
++	}
++
++	@Override
++	public void updateTable() {
++        if (m_table != null) {
++            m_table.putBoolean("Enabled", enabled());
++            m_table.putBoolean("Pressure Switch", getPressureSwitchValue());
++        }
++	}
++}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Solenoid.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Solenoid.java
+index 2a3b4a56b0066d9631ccb27dcb9ef9d4c786ea7f..f77f623783f0acdcdc18e90f3a242f918d8649a4 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Solenoid.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Solenoid.java
+@@ -7,12 +7,13 @@
+ 
+ package edu.wpi.first.wpilibj;
+ 
+-import java.nio.IntBuffer;
+ import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
+ 
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
++import edu.wpi.first.wpilibj.hal.SolenoidJNI;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.tables.ITable;
+@@ -29,30 +30,31 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
+ 
+     private int m_channel; ///< The channel on the module to control.
+-    private ByteBuffer m_port;
++    private ByteBuffer m_solenoid_port;
+ 
+     /**
+      * Common function to implement constructor behavior.
+      */
+     private synchronized void initSolenoid() {
+-//        checkSolenoidModule(m_moduleNumber);
+-//        checkSolenoidChannel(m_channel);
+-//
++        checkSolenoidModule(m_moduleNumber);
++        checkSolenoidChannel(m_channel);
++
+ //        try {
+ //            m_allocated.allocate((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1);
+ //        } catch (CheckedAllocationException e) {
+ //            throw new AllocationException(
+ //                "Solenoid channel " + m_channel + " on module " + m_moduleNumber + " is already allocated");
+ //        }
+-//        
+-//        IntBuffer status = IntBuffer.allocate(1);
+-//        m_port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
+-//        HALUtil.checkStatus(status);
+-//        SolenoidJNI.initializeSolenoidPort(m_port, status);
+-//        HALUtil.checkStatus(status);
+-//
+-//        LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
+-//        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber - 1);
++        
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++        ByteBuffer port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
++        m_solenoid_port = SolenoidJNI.initializeSolenoidPort(port, status.asIntBuffer());
++        HALUtil.checkStatus(status.asIntBuffer());
++
++        LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
++        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber - 1);
+     }
+ 
+     /**
+@@ -91,9 +93,10 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
+      * @param on Turn the solenoid output off or on.
+      */
+     public void set(boolean on) {
+-//    	IntBuffer status = IntBuffer.allocate(1);
+-//    	SolenoidJNI.setSolenoid(m_port, (byte) (on ? 1 : 0), status);
+-//    	HALUtil.checkStatus(status);
++    	ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++    	SolenoidJNI.setSolenoid(m_solenoid_port, (byte) (on ? 1 : 0), status.asIntBuffer());
++    	HALUtil.checkStatus(status.asIntBuffer());
+     }
+ 
+     /**
+@@ -102,10 +105,10 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
+      * @return The current value of the solenoid.
+      */
+     public boolean get() {
+-    	boolean value = false;
+-//    	IntBuffer status = IntBuffer.allocate(1);
+-//    	boolean value = SolenoidJNI.getSolenoid(m_port, status) != 0;
+-//    	HALUtil.checkStatus(status);
++    	ByteBuffer status = ByteBuffer.allocateDirect(4);
++    	status.order(ByteOrder.LITTLE_ENDIAN);
++    	boolean value = SolenoidJNI.getSolenoid(m_solenoid_port, status.asIntBuffer()) != 0;
++    	HALUtil.checkStatus(status.asIntBuffer());
+     	return value;
+     }
+ 
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/CompressorJNI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/CompressorJNI.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..cb4b2b9e14c33748647ddf98d620335733cbbe7a
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/CompressorJNI.java
+@@ -0,0 +1,18 @@
++package edu.wpi.first.wpilibj.hal;
++
++import java.nio.ByteBuffer;
++import java.nio.IntBuffer;
++
++public class CompressorJNI extends JNIWrapper {
++	public static native ByteBuffer initializeCompressor(byte module);
++	public static native boolean checkCompressorModule(byte module);
++	
++	public static native void setCompressor(ByteBuffer pcm_pointer, boolean value, IntBuffer status);
++	public static native boolean getCompressor(ByteBuffer pcm_pointer, IntBuffer status);
++	
++	public static native void setClosedLoopControl(ByteBuffer pcm_pointer, boolean value, IntBuffer status);
++	public static native boolean getClosedLoopControl(ByteBuffer pcm_pointer, IntBuffer status);
++	
++	public static native boolean getPressureSwitch(ByteBuffer pcm_pointer, IntBuffer status);
++	public static native float getCompressorCurrent(ByteBuffer pcm_pointer, IntBuffer status);
++}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/SolenoidJNI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/SolenoidJNI.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d45fff31546c3c7c6843af3e66d07940d3bc7133
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/SolenoidJNI.java
+@@ -0,0 +1,10 @@
++package edu.wpi.first.wpilibj.hal;
++import java.nio.IntBuffer;
++import java.nio.ByteBuffer;
++
++public class SolenoidJNI extends JNIWrapper {
++	public static native ByteBuffer initializeSolenoidPort(ByteBuffer portPointer, IntBuffer status);
++	public static native ByteBuffer getPortWithModule(byte module, byte channel);
++	public static native void setSolenoid(ByteBuffer port, byte on, IntBuffer status);
++	public static native byte getSolenoid(ByteBuffer port, IntBuffer status);
++}
+diff --git a/wpilibj/wpilibJavaJNI/lib/CompressorJNI.cpp b/wpilibj/wpilibJavaJNI/lib/CompressorJNI.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..e84602bcceebc7d74afa3605e3092d2f6b9118c2
+--- /dev/null
++++ b/wpilibj/wpilibJavaJNI/lib/CompressorJNI.cpp
+@@ -0,0 +1,115 @@
++#include "Log.h"
++#include "edu_wpi_first_wpilibj_hal_CompressorJNI.h"
++#include "HAL/HAL.h"
++
++typedef void *VoidPointer;
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
++ * Method:    initializeCompressor
++ * Signature: (B)Ljava/nio/ByteBuffer;
++ */
++JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_initializeCompressor
++  (JNIEnv *env, jclass, jbyte module)
++{
++	VoidPointer *pcm_pointer = new VoidPointer;
++	*pcm_pointer = initializeCompressor(module);
++	
++	return env->NewDirectByteBuffer(pcm_pointer, 4);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
++ * Method:    checkCompressorModule
++ * Signature: (B)Z
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_checkCompressorModule
++  (JNIEnv *env, jclass, jbyte module)
++{
++	return checkCompressorModule(module);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
++ * Method:    setCompressor
++ * Signature: (Ljava/nio/ByteBuffer;ZLjava/nio/IntBuffer;)V
++ */
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_setCompressor
++  (JNIEnv *env, jclass, jobject pcm_pointer_object, jboolean value, jobject status)
++{
++	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
++	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
++	
++	setCompressor(*pcm_pointer, value, status_pointer);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
++ * Method:    getCompressor
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressor
++  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
++{
++	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
++	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
++	
++	return getCompressor(*pcm_pointer, status_pointer);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
++ * Method:    setClosedLoopControl
++ * Signature: (Ljava/nio/ByteBuffer;ZLjava/nio/IntBuffer;)V
++ */
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_setClosedLoopControl
++  (JNIEnv *env, jclass, jobject pcm_pointer_object, jboolean value, jobject status)
++{
++	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
++	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
++	
++	setClosedLoopControl(*pcm_pointer, value, status_pointer);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
++ * Method:    getClosedLoopControl
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getClosedLoopControl
++  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
++{
++	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
++	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
++	
++	return getClosedLoopControl(*pcm_pointer, status_pointer);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
++ * Method:    getPressureSwitch
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Z
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getPressureSwitch
++  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
++{
++	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
++	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
++	
++	return getPressureSwitch(*pcm_pointer, status_pointer);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
++ * Method:    getCompressorCurrent
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)F
++ */
++JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorCurrent
++  (JNIEnv *env, jclass, jobject pcm_pointer_object, jobject status)
++{
++	VoidPointer *pcm_pointer = (VoidPointer *)env->GetDirectBufferAddress(pcm_pointer_object);
++	jint *status_pointer = (jint *)env->GetDirectBufferAddress(status);
++	
++	return getCompressorCurrent(*pcm_pointer, status_pointer);
++}
++
+diff --git a/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp b/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..8789b36854762479c19d2bec4c2cb720a1693628
+--- /dev/null
++++ b/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
+@@ -0,0 +1,91 @@
++#include <jni.h>
++#include "Log.h"
++#include "HAL/HAL.h"
++
++#include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"
++
++TLogLevel solenoidJNILogLevel = logERROR;
++
++#define SOLENOIDJNI_LOG(level) \
++    if (level > solenoidJNILogLevel) ; \
++    else Log().Get(level)
++
++typedef void *VoidPointer;
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
++ * Method:    initializeSolenoidPort
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
++ */
++JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort
++  (JNIEnv *env, jclass, jobject port_pointer, jobject status)
++{
++	SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI initializeSolenoidPort";
++	
++	VoidPointer *port_pointer_pointer = (VoidPointer *)env->GetDirectBufferAddress(port_pointer);
++	SOLENOIDJNI_LOG(logDEBUG) << "Port Ptr = " << *port_pointer_pointer;
++	char *aschars = (char *)(*port_pointer_pointer);
++	SOLENOIDJNI_LOG(logDEBUG) << '\t' << (int)aschars[0] << '\t' << (int)aschars[1] << std::endl;
++	
++	jint *status_pointer = (jint*)env->GetDirectBufferAddress(status);
++	SOLENOIDJNI_LOG(logDEBUG) << "Status Ptr = " << status_pointer;
++	
++	VoidPointer *solenoid_port_pointer = new VoidPointer;
++	*solenoid_port_pointer = initializeSolenoidPort(*port_pointer_pointer, status_pointer);
++	
++	SOLENOIDJNI_LOG(logDEBUG) << "Status = " << *status_pointer;
++	SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Pointer = " << *solenoid_port_pointer;
++	
++	int *asints = (int *)(*solenoid_port_pointer);
++	SOLENOIDJNI_LOG(logDEBUG) << '\t' << asints[0] << '\t' << asints[1] << std::endl;
++	
++	return env->NewDirectByteBuffer(solenoid_port_pointer, 4);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
++ * Method:    getPortWithModule
++ * Signature: (BB)Ljava/nio/ByteBuffer;
++ */
++JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPortWithModule
++  (JNIEnv *env, jclass, jbyte module, jbyte channel)
++{
++	VoidPointer *port_pointer = new VoidPointer;
++	*port_pointer = getPortWithModule(module + 1, channel);
++	
++	return env->NewDirectByteBuffer(port_pointer, 4);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
++ * Method:    setSolenoid
++ * Signature: (Ljava/nio/ByteBuffer;BLjava/nio/IntBuffer;)V
++ */
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_setSolenoid
++  (JNIEnv *env, jclass, jobject solenoid_port, jbyte value, jobject status)
++{
++	SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI SetSolenoid";
++	
++	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
++	SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Pointer = " << *solenoid_port_pointer;
++	
++	jint *status_pointer = (jint*)env->GetDirectBufferAddress(status);
++	SOLENOIDJNI_LOG(logDEBUG) << "Status Ptr = " << status_pointer;
++	
++	setSolenoid(*solenoid_port_pointer, value, status_pointer);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
++ * Method:    getSolenoid
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
++ */
++JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoid
++  (JNIEnv *env, jclass, jobject solenoid_port, jobject status)
++{
++	
++	VoidPointer *solenoid_port_pointer = (VoidPointer *)env->GetDirectBufferAddress(solenoid_port);
++	jint *status_pointer = (jint*)env->GetDirectBufferAddress(status);
++	
++	return getSolenoid(*solenoid_port_pointer, status_pointer);
++}
+diff --git a/wpilibj/wpilibJavaJNI/pom.xml b/wpilibj/wpilibJavaJNI/pom.xml
+index 802cfee3d353296dd29d324230f3aa8f26440510..dcffa7f64209d195aa7847edb3fc9adf193691d5 100644
+--- a/wpilibj/wpilibJavaJNI/pom.xml
++++ b/wpilibj/wpilibJavaJNI/pom.xml
+@@ -122,6 +122,8 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.PWMJNI</javahClassName>
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.RelayJNI</javahClassName>
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.SPIJNI</javahClassName>
++								<javahClassName>edu.wpi.first.wpilibj.hal.SolenoidJNI</javahClassName>
++								<javahClassName>edu.wpi.first.wpilibj.hal.CompressorJNI</javahClassName>
+ 							</javahClassNames>
+ 							<!-- enable additional javah interface in dependencies list -->
+ 							<!-- javahSearchJNIFromDependencies>true</javahSearchJNIFromDependencies -->

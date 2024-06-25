@@ -1,0 +1,337 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Sun, 3 Aug 2014 13:05:14 -0400
+Subject: [PATCH 0249/6262] Update plugin menu text and make template menu
+ options only show for correct language (fixes artf2408)
+
+Change-Id: I13b80ab43aa79bd1aa8d12b7a8331a602a976bd0
+---
+ .../plugin.xml                                | 115 ++++++++++++------
+ .../plugin.xml                                |  80 ++++++++----
+ 2 files changed, 135 insertions(+), 60 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/plugin.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/plugin.xml
+index b3ec0f9c48193ac0b0cdade6edb34fb346cc2881..726a51ceb2ea4d71da491fa94cf577c7c13af211 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/plugin.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/plugin.xml
+@@ -67,12 +67,21 @@
+             type="new"
+             wizardId="edu.wpi.first.wpilib.plugins.cpp.wizards.file_template.CommandWizard">
+          <enablement>
+-   			  <with
+-                    variable="activeWorkbenchWindow.activePerspective">
+-                 <equals
+-                       value="org.eclipse.cdt.ui.CPerspective">
+-                 </equals>
+-              </with>
++               <with
++                     variable="selection">
++                  <iterate>
++                     <and>
++                        <test
++                            value="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
++                            property="org.eclipse.core.resources.projectNature">
++                        </test>
++                        <test
++                            value="org.eclipse.cdt.core.cnature"
++                            property="org.eclipse.core.resources.projectNature">
++                        </test>
++                     </and>
++                  </iterate>
++               </with>
+          </enablement>
+       </commonWizard>
+       <commonWizard
+@@ -80,12 +89,21 @@
+             type="new"
+             wizardId="edu.wpi.first.wpilib.plugins.cpp.wizards.file_template.CommandGroupWizard">
+          <enablement>
+-			  <with
+-	                variable="activeWorkbenchWindow.activePerspective">
+-	             <equals
+-	                   value="org.eclipse.cdt.ui.CPerspective">
+-	             </equals>
+-	          </with>
++               <with
++                     variable="selection">
++                  <iterate>
++                     <and>
++                        <test
++                            value="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
++                            property="org.eclipse.core.resources.projectNature">
++                        </test>
++                        <test
++                            value="org.eclipse.cdt.core.cnature"
++                            property="org.eclipse.core.resources.projectNature">
++                        </test>
++                     </and>
++                  </iterate>
++               </with>
+          </enablement>
+       </commonWizard>
+       <commonWizard
+@@ -93,12 +111,21 @@
+             type="new"
+             wizardId="edu.wpi.first.wpilib.plugins.cpp.wizards.file_template.SubsystemWizard">
+          <enablement>
+-			  <with
+-	                variable="activeWorkbenchWindow.activePerspective">
+-	             <equals
+-	                   value="org.eclipse.cdt.ui.CPerspective">
+-	             </equals>
+-	          </with>
++               <with
++                     variable="selection">
++                  <iterate>
++                     <and>
++                        <test
++                            value="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
++                            property="org.eclipse.core.resources.projectNature">
++                        </test>
++                        <test
++                            value="org.eclipse.cdt.core.cnature"
++                            property="org.eclipse.core.resources.projectNature">
++                        </test>
++                     </and>
++                  </iterate>
++               </with>
+          </enablement>
+       </commonWizard>
+       <commonWizard
+@@ -106,12 +133,21 @@
+             type="new"
+             wizardId="edu.wpi.first.wpilib.plugins.cpp.wizards.file_template.PIDSubsystemWizard">
+          <enablement>
+-			  <with
+-	                variable="activeWorkbenchWindow.activePerspective">
+-	             <equals
+-	                   value="org.eclipse.cdt.ui.CPerspective">
+-	             </equals>
+-	          </with>
++               <with
++                     variable="selection">
++                  <iterate>
++                     <and>
++                        <test
++                            value="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
++                            property="org.eclipse.core.resources.projectNature">
++                        </test>
++                        <test
++                            value="org.eclipse.cdt.core.cnature"
++                            property="org.eclipse.core.resources.projectNature">
++                        </test>
++                     </and>
++                  </iterate>
++               </with>
+          </enablement>
+       </commonWizard>
+       <commonWizard
+@@ -119,12 +155,21 @@
+             type="new"
+             wizardId="edu.wpi.first.wpilib.plugins.cpp.wizards.file_template.TriggerWizard">
+          <enablement>
+-			  <with
+-	                variable="activeWorkbenchWindow.activePerspective">
+-	             <equals
+-	                   value="org.eclipse.cdt.ui.CPerspective">
+-	             </equals>
+-	          </with>
++               <with
++                     variable="selection">
++                  <iterate>
++                     <and>
++                        <test
++                            value="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
++                            property="org.eclipse.core.resources.projectNature">
++                        </test>
++                        <test
++                            value="org.eclipse.cdt.core.cnature"
++                            property="org.eclipse.core.resources.projectNature">
++                        </test>
++                     </and>
++                  </iterate>
++               </with>
+          </enablement>
+       </commonWizard>
+    </extension>
+@@ -147,10 +192,10 @@
+          point="org.eclipse.debug.ui.launchShortcuts">
+       <shortcut
+             class="edu.wpi.first.wpilib.plugins.cpp.launching.DeployLaunchShortcut"
+-            description="Deploy the WPILib project to the athena board."
++            description="Deploy the WPILib project to the roboRIO"
+             icon="resources/icons/wpi.ico"
+             id="edu.wpi.first.wpilib.plugins.cpp.launching.deploy"
+-            label="WPILib Deploy Configure Builder"
++            label="WPILib C++ Deploy"
+             modes="run,debug">
+             <contextualLaunch>
+             <enablement>
+@@ -172,11 +217,11 @@
+             </enablement>
+          </contextualLaunch>
+          <description
+-               description="Deploy the WPILib project to the athena board."
++               description="Deploy the WPILib project to the roboRIO"
+                mode="run">
+          </description>
+          <description
+-               description="Deploy the WPILib project to the athena board and debug it."
++               description="Deploy the WPILib project to the roboRIO"
+                mode="debug">
+          </description>
+       </shortcut>
+@@ -185,7 +230,7 @@
+             description="Test the WPILib project using the Gazebo simulator."
+             icon="resources/icons/wpi.ico"
+             id="edu.wpi.first.wpilib.plugins.cpp.launching.simulate"
+-            label="WPILib Simulate"
++            label="WPILib C++ Simulation"
+             modes="run,debug">
+             <contextualLaunch>
+             <enablement>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/plugin.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/plugin.xml
+index c292e09d7a853d11f82325fbfb501e162dd631fa..d6e694fdc63e7156fdfaa29014ebfedaf6e235c8 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/plugin.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/plugin.xml
+@@ -67,10 +67,16 @@
+             wizardId="edu.wpi.first.wpilib.plugins.java.wizards.file_template.CommandWizard">
+          <enablement>
+       	   <with variable="selection"><iterate>
+-               <test
+-                    args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+-                    property="org.eclipse.jdt.launching.hasProjectNature">
+-                </test>
++               <and>
++                    <test
++                        args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
++                        property="org.eclipse.jdt.launching.hasProjectNature">
++                    </test>
++                    <test
++						args="org.eclipse.jdt.core.javanature"
++                        property="org.eclipse.jdt.launching.hasProjectNature">
++                    </test>
++                </and>
+            </iterate></with>
+          </enablement>
+       </commonWizard>
+@@ -80,10 +86,16 @@
+             wizardId="edu.wpi.first.wpilib.plugins.java.wizards.file_template.CommandGroupWizard">
+          <enablement>
+       	   <with variable="selection"><iterate>
+-               <test
+-                    args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+-                    property="org.eclipse.jdt.launching.hasProjectNature">
+-                </test>
++               <and>
++                    <test
++                        args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
++                        property="org.eclipse.jdt.launching.hasProjectNature">
++                    </test>
++                    <test
++						args="org.eclipse.jdt.core.javanature"
++                        property="org.eclipse.jdt.launching.hasProjectNature">
++                    </test>
++                </and>
+            </iterate></with>
+          </enablement>
+       </commonWizard>
+@@ -93,10 +105,16 @@
+             wizardId="edu.wpi.first.wpilib.plugins.java.wizards.file_template.SubsystemWizard">
+          <enablement>
+       	   <with variable="selection"><iterate>
+-               <test
+-                    args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+-                    property="org.eclipse.jdt.launching.hasProjectNature">
+-                </test>
++               <and>
++                    <test
++                        args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
++                        property="org.eclipse.jdt.launching.hasProjectNature">
++                    </test>
++                    <test
++						args="org.eclipse.jdt.core.javanature"
++                        property="org.eclipse.jdt.launching.hasProjectNature">
++                    </test>
++                </and>
+            </iterate></with>
+          </enablement>
+       </commonWizard>
+@@ -106,10 +124,16 @@
+             wizardId="edu.wpi.first.wpilib.plugins.java.wizards.file_template.PIDSubsystemWizard">
+          <enablement>
+       	   <with variable="selection"><iterate>
+-               <test
+-                    args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+-                    property="org.eclipse.jdt.launching.hasProjectNature">
+-                </test>
++               <and>
++                    <test
++                        args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
++                        property="org.eclipse.jdt.launching.hasProjectNature">
++                    </test>
++                    <test
++						args="org.eclipse.jdt.core.javanature"
++                        property="org.eclipse.jdt.launching.hasProjectNature">
++                    </test>
++                </and>
+            </iterate></with>
+          </enablement>
+       </commonWizard>
+@@ -119,10 +143,16 @@
+             wizardId="edu.wpi.first.wpilib.plugins.java.wizards.file_template.TriggerWizard">
+          <enablement>
+       	   <with variable="selection"><iterate>
+-               <test
+-                    args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
+-                    property="org.eclipse.jdt.launching.hasProjectNature">
+-                </test>
++               <and>
++                    <test
++                        args="edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature"
++                        property="org.eclipse.jdt.launching.hasProjectNature">
++                    </test>
++                    <test
++						args="org.eclipse.jdt.core.javanature"
++                        property="org.eclipse.jdt.launching.hasProjectNature">
++                    </test>
++                </and>
+            </iterate></with>
+          </enablement>
+       </commonWizard>
+@@ -146,10 +176,10 @@
+          point="org.eclipse.debug.ui.launchShortcuts">
+       <shortcut
+             class="edu.wpi.first.wpilib.plugins.java.launching.DeployLaunchShortcut"
+-            description="Deploy the WPILib project to the athena board."
++            description="Deploy the WPILib project to the roboRIO"
+             icon="resources/icons/wpi.ico"
+             id="edu.wpi.first.wpilib.plugins.java.launching.deploy"
+-            label="WPILib Deploy"
++            label="WPILib Java Deploy"
+             modes="run,debug">
+             <contextualLaunch>
+             <enablement>
+@@ -171,11 +201,11 @@
+             </enablement>
+          </contextualLaunch>
+          <description
+-               description="Deploy the WPILib project to the athena board."
++               description="Deploy the WPILib project to the roboRIO board."
+                mode="run">
+          </description>
+          <description
+-               description="Deploy the WPILib project to the athena board and debug it."
++               description="Deploy the WPILib project to the roboRIO board and debug it."
+                mode="debug">
+          </description>
+       </shortcut>
+@@ -184,7 +214,7 @@
+             description="Test your WPILib program with the Gazebo simulator."
+             icon="resources/icons/Gazebo.png"
+             id="edu.wpi.first.wpilib.plugins.java.launching.simulate"
+-            label="WPILib Simulation"
++            label="WPILib Java Simulation"
+             modes="run,debug">
+             <contextualLaunch>
+             <enablement>

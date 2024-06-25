@@ -1,0 +1,255 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Mon, 4 Aug 2014 14:43:31 -0400
+Subject: [PATCH 0246/6262] Fixed a few simple SmartDashboard FIXMEs and TODOs
+
+SmartDashboard does usage reporting now (or will when it's implemented
+in the HAL).
+
+Global errors are raised in C++ when problems happen, since there is
+no SmartDashboard instance.  Previously, no error reporting was done
+at all.
+
+GetData was uncommented.
+
+Change-Id: I3331eb9f09924d1d0028e3fa041f0cf68caa5cf5
+---
+ .../include/SmartDashboard/SmartDashboard.h   | 17 ++++++-----
+ .../lib/SmartDashboard/SmartDashboard.cpp     | 28 +++++++++----------
+ .../wpi/first/wpilibj/HLUsageReporting.java   | 17 +++++++----
+ .../smartdashboard/SmartDashboard.java        | 24 +++++++++-------
+ .../internal/HardwareHLUsageReporting.java    |  5 ++++
+ 5 files changed, 53 insertions(+), 38 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/SmartDashboard/SmartDashboard.h b/wpilibc/wpilibC++/include/SmartDashboard/SmartDashboard.h
+index 3fae9d4517f34040230e0bfecd023ad689127bed..5906c0f76a79dfaa41703abb8aece41e6a55232b 100644
+--- a/wpilibc/wpilibC++/include/SmartDashboard/SmartDashboard.h
++++ b/wpilibc/wpilibC++/include/SmartDashboard/SmartDashboard.h
+@@ -19,21 +19,21 @@ class SmartDashboard : public SensorBase
+ {
+ public:
+ 	static void init();
+-	
++
+ 	static void PutData(std::string key, Sendable *data);
+ 	static void PutData(NamedSendable *value);
+-	//static Sendable* GetData(std::string keyName);
+-	
++	static Sendable* GetData(std::string keyName);
++
+ 	static void PutBoolean(std::string keyName, bool value);
+ 	static bool GetBoolean(std::string keyName);
+-	
++
+ 	static void PutNumber(std::string keyName, double value);
+ 	static double GetNumber(std::string keyName);
+-	
++
+ 	static void PutString(std::string keyName, std::string value);
+ 	static int GetString(std::string keyName, char *value, unsigned int valueLen);
+ 	static std::string GetString(std::string keyName);
+-	
++
+ 	static void PutValue(std::string keyName, ComplexData& value);
+ 	static void RetrieveValue(std::string keyName, ComplexData& value);
+ private:
+@@ -43,8 +43,8 @@ private:
+ 
+ 	/** The {@link NetworkTable} used by {@link SmartDashboard} */
+ 	static ITable* m_table;
+-	
+-	/** 
++
++	/**
+ 	 * A map linking tables in the SmartDashboard to the {@link SmartDashboardData} objects
+ 	 * they came from.
+ 	 */
+@@ -52,4 +52,3 @@ private:
+ };
+ 
+ #endif
+-
+diff --git a/wpilibc/wpilibC++/lib/SmartDashboard/SmartDashboard.cpp b/wpilibc/wpilibC++/lib/SmartDashboard/SmartDashboard.cpp
+index a5b40c582efa4205692ee264f78c93b1f0d2de6d..4c77b83e95e62e97bc4d1fa487f8fb03f2f072ff 100644
+--- a/wpilibc/wpilibC++/lib/SmartDashboard/SmartDashboard.cpp
++++ b/wpilibc/wpilibC++/lib/SmartDashboard/SmartDashboard.cpp
+@@ -16,9 +16,9 @@ std::map<ITable *, Sendable *> SmartDashboard::m_tablesToData;
+ 
+ void SmartDashboard::init(){
+ 	m_table = NetworkTable::GetTable("SmartDashboard");
+-}
+ 
+-//TODO usage reporting
++	HALReport(HALUsageReporting::kResourceType_SmartDashboard, 0);
++}
+ 
+ /**
+  * Maps the specified key to the specified value in this table.
+@@ -31,13 +31,13 @@ void SmartDashboard::PutData(std::string key, Sendable *data)
+ {
+ 	if (data == NULL)
+ 	{
+-		//TODO wpi_setWPIErrorWithContext(NullParameter, "value");
++		wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
+ 		return;
+ 	}
+-    ITable* dataTable = m_table->GetSubTable(key);
+-    dataTable->PutString("~TYPE~", data->GetSmartDashboardType());
+-    data->InitTable(dataTable);
+-    m_tablesToData[dataTable] = data;
++	ITable* dataTable = m_table->GetSubTable(key);
++	dataTable->PutString("~TYPE~", data->GetSmartDashboardType());
++	data->InitTable(dataTable);
++	m_tablesToData[dataTable] = data;
+ }
+ 
+ /**
+@@ -50,7 +50,7 @@ void SmartDashboard::PutData(NamedSendable *value)
+ {
+ 	if (value == NULL)
+ 	{
+-		//TODO wpi_setWPIErrorWithContext(NullParameter, "value");
++		wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
+ 		return;
+ 	}
+ 	PutData(value->GetName(), value);
+@@ -61,17 +61,17 @@ void SmartDashboard::PutData(NamedSendable *value)
+  * @param keyName the key
+  * @return the value
+  */
+-//TODO Sendable *SmartDashboard::GetData(std::string key)
+-/*{
+-	ITable* subtable = m_table->GetSubTable(keyName);
++Sendable *SmartDashboard::GetData(std::string key)
++{
++	ITable* subtable = m_table->GetSubTable(key);
+ 	Sendable *data = m_tablesToData[subtable];
+ 	if (data == NULL)
+ 	{
+-		wpi_setWPIErrorWithContext(SmartDashboardMissingKey, keyName);
++		wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key.c_str());
+ 		return NULL;
+ 	}
+-    return data;
+-}*/
++	return data;
++}
+ 
+ /**
+  * Maps the specified key to the specified complex value (such as an array) in this table.
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HLUsageReporting.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HLUsageReporting.java
+index 74b1e2383638c1b47287f8994ae4a961e2fb7f64..cb022b0d6c99ace6d68c89e92786b753ed33f278 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HLUsageReporting.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HLUsageReporting.java
+@@ -2,7 +2,7 @@ package edu.wpi.first.wpilibj;
+ 
+ /**
+  * Support for high level usage reporting.
+- * 
++ *
+  * @author alex
+  */
+ public class HLUsageReporting {
+@@ -11,21 +11,28 @@ public class HLUsageReporting {
+ 	public static void SetImplementation(Interface i) {
+ 		impl = i;
+ 	}
+-	
++
+ 	public static void reportScheduler() {
+-		if (impl != null) { 
++		if (impl != null) {
+ 			impl.reportScheduler();
+ 		}
+ 	}
+-	
++
+ 	public static void reportPIDController(int num) {
+-		if (impl != null) { 
++		if (impl != null) {
+ 			impl.reportPIDController(num);
+ 		}
+ 	}
+ 
++	public static void reportSmartDashboard() {
++		if(impl != null) {
++			impl.reportSmartDashboard();
++		}
++	}
++
+ 	public interface Interface {
+ 		void reportScheduler();
+ 		void reportPIDController(int num);
++		void reportSmartDashboard();
+ 	}
+ }
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboard.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboard.java
+index 23adfeaad6420b2fc6116b0ba914c902cbd9fdcf..a65f0cbe9a2b36bba5a8cde8944fd48611d7ef57 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboard.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboard.java
+@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
+ import edu.wpi.first.wpilibj.networktables.NetworkTableKeyNotDefined;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.TableKeyNotDefinedException;
++import edu.wpi.first.wpilibj.HLUsageReporting;
+ import java.util.Hashtable;
+ import java.util.NoSuchElementException;
+ 
+@@ -26,7 +27,6 @@ import java.util.NoSuchElementException;
+  * @author Joe Grinstead
+  */
+ public class SmartDashboard {
+-    //TODO usage reporting
+     /** The {@link NetworkTable} used by {@link SmartDashboard} */
+     private static final NetworkTable table = NetworkTable.getTable("SmartDashboard");
+     /**
+@@ -35,6 +35,10 @@ public class SmartDashboard {
+      */
+     private static final Hashtable tablesToData = new Hashtable();
+ 
++    static {
++        HLUsageReporting.reportSmartDashboard();
++    }
++
+     /**
+      * Maps the specified key to the specified value in this table.
+      * The key can not be null.
+@@ -71,15 +75,15 @@ public class SmartDashboard {
+      * @throws IllegalArgumentException if the value mapped to by the key is not a {@link SmartDashboardData}
+      * @throws IllegalArgumentException if the key is null
+      */
+-//TODO    public static SmartDashboardData getData(String key) {
+-//        NetworkTable subtable = table.getSubTable(key);
+-//        Object data = tablesToData.get(subtable);
+-//        if (data == null) {
+-//            throw new IllegalArgumentException("Value at \"" + key + "\" is not a boolean");
+-//        } else {
+-//            return (SmartDashboardData) data;
+-//        }
+-//    }
++    public static Sendable getData(String key) {
++        ITable subtable = table.getSubTable(key);
++        Object data = tablesToData.get(subtable);
++        if (data == null) {
++            throw new IllegalArgumentException("SmartDashboard data does not exist: " + key);
++        } else {
++            return (Sendable) data;
++        }
++    }
+ 
+     /**
+      * Maps the specified key to the specified value in this table.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/internal/HardwareHLUsageReporting.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/internal/HardwareHLUsageReporting.java
+index 09b70000a59e9c32804424bf0388e03ca9081ee3..02eba2c256749a0774e3c97e90bfa2854e9f6268 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/internal/HardwareHLUsageReporting.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/internal/HardwareHLUsageReporting.java
+@@ -15,4 +15,9 @@ public class HardwareHLUsageReporting implements HLUsageReporting.Interface {
+ 	public void reportPIDController(int num) {
+ 		UsageReporting.report(tResourceType.kResourceType_PIDController, num);
+ 	}
++
++	@Override
++	public void reportSmartDashboard() {
++		UsageReporting.report(tResourceType.kResourceType_SmartDashboard, 0);
++	}
+ }

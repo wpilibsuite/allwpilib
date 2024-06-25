@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Fri, 15 Aug 2014 10:29:39 -0400
+Subject: [PATCH 0297/6262] Fixed bug with joystick buttons/axes out of range.
+
+Change-Id: I85f0a9f47dfbb786f850c1f382c0e18a4e4b8254
+---
+ .../main/java/edu/wpi/first/wpilibj/DriverStation.java   | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index fec4bcc1e610093202d0e62cc9d1b0f58277c432..342bca97013f3a10bc6bc69e30b90e68d647ab1a 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -161,12 +161,12 @@ public class DriverStation implements RobotState.Interface {
+      * @return The value of the axis on the joystick.
+      */
+     public double getStickAxis(int stick, int axis) {
+-        if (axis < 1 || axis > kJoystickAxes) {
+-            return 0.0;
+-        }
+         if (stick < 0 || stick >= joysticks.length || joysticks[stick] == null) {
+             return 0.0;
+     	}
++        if (axis < 1 || axis > kJoystickAxes || axis > joysticks[stick].getAxesCount()) {
++            return 0.0;
++        }
+     	return joysticks[stick].getAxes(axis - 1);
+     }
+ 
+@@ -181,6 +181,9 @@ public class DriverStation implements RobotState.Interface {
+     	if (stick < 0 || stick >= joysticks.length || joysticks[stick] == null) {
+             return false;
+     	}
++    	if (button < 1 || button > joysticks[stick].getButtonsCount()) {
++    		return false;
++    	}
+     	return joysticks[stick].getButtons(button - 1);
+     }
+ 

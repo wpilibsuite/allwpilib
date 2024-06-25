@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Wed, 10 Sep 2014 11:47:17 -0400
+Subject: [PATCH 0339/6262] Make all channel errors throw IndexOutOfBounds
+
+Only relay and PWM channels out of range used to throw
+IndexOutOfBoundsExceptions, but Resource would catch the error
+first in most cases.
+
+Change-Id: I8feb0daf378e181f982203d46bf5a10dbde4a02e
+---
+ .../java/edu/wpi/first/wpilibj/SensorBase.java   | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index 644e3c68d97e2383d0c6ddc4a687f853eef452cc..b0765612c84afe6e6a8dd9f4b583e495a8a59bcb 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -94,7 +94,7 @@ public abstract class SensorBase { // TODO: Refactor
+      */
+     protected static void checkDigitalChannel(final int channel) {
+         if (channel < 0 || channel >= kDigitalChannels) {
+-            System.err.println("Requested digital channel number is out of range.");
++            throw new IndexOutOfBoundsException("Requested digital channel number is out of range.");
+         }
+     }
+ 
+@@ -107,7 +107,6 @@ public abstract class SensorBase { // TODO: Refactor
+      */
+     protected static void checkRelayChannel(final int channel) {
+         if (channel < 0 || channel >= kRelayChannels) {
+-            System.err.println("Requested relay channel number is out of range.");
+             throw new IndexOutOfBoundsException("Requested relay channel number is out of range.");
+         }
+     }
+@@ -121,7 +120,6 @@ public abstract class SensorBase { // TODO: Refactor
+      */
+     protected static void checkPWMChannel(final int channel) {
+         if (channel < 0 || channel >= kPwmChannels) {
+-            System.err.println("Requested PWM channel number is out of range.");
+             throw new IndexOutOfBoundsException("Requested PWM channel number is out of range.");
+         }
+     }
+@@ -134,8 +132,8 @@ public abstract class SensorBase { // TODO: Refactor
+      * @param channel The channel number to check.
+      */
+     protected static void checkAnalogInputChannel(final int channel) {
+-        if (channel <= 0 || channel > kAnalogInputChannels) {
+-            System.err.println("Requested analog channel number is out of range.");
++        if (channel < 0 || channel >= kAnalogInputChannels) {
++            throw new IndexOutOfBoundsException("Requested analog input channel number is out of range.");
+         }
+     }
+ 
+@@ -147,8 +145,8 @@ public abstract class SensorBase { // TODO: Refactor
+      * @param channel The channel number to check.
+      */
+     protected static void checkAnalogOutputChannel(final int channel) {
+-        if (channel <= 0 || channel > kAnalogOutputChannels) {
+-            System.err.println("Requested analog channel number is out of range.");
++        if (channel < 0 || channel >= kAnalogOutputChannels) {
++            throw new IndexOutOfBoundsException("Requested analog output channel number is out of range.");
+         }
+     }
+ 
+@@ -160,7 +158,7 @@ public abstract class SensorBase { // TODO: Refactor
+      */
+     protected static void checkSolenoidChannel(final int channel) {
+         if (channel < 0 || channel >= kSolenoidChannels) {
+-            System.err.println("Requested solenoid channel number is out of range.");
++            throw new IndexOutOfBoundsException("Requested solenoid channel number is out of range.");
+         }
+     }
+ 
+@@ -172,7 +170,7 @@ public abstract class SensorBase { // TODO: Refactor
+      */
+     protected static void checkPDPChannel(final int channel) {
+         if (channel < 0 || channel >= kPDPChannels) {
+-            System.err.println("Requested solenoid channel number is out of range.");
++            throw new IndexOutOfBoundsException("Requested PDP channel number is out of range.");
+         }
+     }
+ 

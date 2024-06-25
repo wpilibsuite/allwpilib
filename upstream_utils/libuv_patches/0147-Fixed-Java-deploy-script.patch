@@ -1,0 +1,81 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Mon, 30 Jun 2014 10:26:27 -0400
+Subject: [PATCH 0147/6262] Fixed Java deploy script
+
+Change-Id: If088f709961baa6b78c2b0e7dda65d7f4f0c0539
+---
+ .../resources/java-zip/ant/build.properties   |  3 +--
+ .../src/main/resources/java-zip/ant/build.xml | 21 +++++--------------
+ 2 files changed, 6 insertions(+), 18 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties
+index c135a0efe99a78ce2fd9b9fae179b24d903fbc6a..5a2fd03353637ede3f34693f3e90e0eb78928f21 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties
+@@ -3,8 +3,8 @@ username=admin
+ password=
+ deploy.dir=/home/admin
+ deploy.kill.command=/usr/local/frc/bin/frcKillRobot.sh -t -r
+-deploy.run.command=/usr/local/frc/bin/frcRunRobot.sh
+ deploy.debug.command = /usr/local/frc/JRE/bin/java -XX:+UsePerfData -agentlib:jdwp=transport=dt_socket,address=8348,server=y,suspend=y -jar ${deploy.dir}/FRCUserProgram.jar
++deploy.log.file=/var/local/natinst/log/FRC_UserProgram.log
+ command.dir=/home/lvuser/
+ 
+ # Libraries to use
+@@ -37,4 +37,3 @@ simulation.dist.jar=${dist.dir}/FRCUserProgramSim.jar
+ wpilib.sim=${wpilib}/sim
+ wpilib.sim.lib=${wpilib.sim}/lib
+ wpilib.sim.tools=${wpilib.sim}/tools
+-
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+index 196f57f85f516087b63dbf8968089afa08ec15dc..0f238ff56910293291f1d92e3a32f1b3b7fd2e58 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+@@ -68,36 +68,26 @@
+     </jar>
+   </target>
+ 
+-  <target name="kill" depends="get-target-ip" description="Kill any previously running program.">
+-      <echo>[athena-deploy] Killing current program.</echo>
+-      <sshexec host="${target}"
+-         username="${username}"
+-         password="${password}"
+-         trust="true"
+-         command=". /etc/profile.d/natinst-path.sh; chmod a+x run*program; ${deploy.kill.command}"/>
+-  </target>
+-
+-  <target name="deploy" depends="get-target-ip,jar,kill" description="Deploy the jar and start the program running.">
++  <target name="deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">
+     <echo>[athena-deploy] Copying code over.</echo>
+     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
+     <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>
+ 
++    <echo>[athena-deploy] Starting program.</echo>
+     <sshexec host="${target}"
+        username="${username}"
+        password="${password}"
+        trust="true"
+-       failonerror="false"
+-       command=". /etc/profile.d/natinst-path.sh; rm ${deploy.debug.file}"/>
++       command=". /etc/profile.d/natinst-path.sh; chmod a+x run*program; ${deploy.kill.command};"/>
+ 
+-    <echo>[athena-deploy] Starting program.</echo>
+     <sshexec host="${target}"
+        username="${username}"
+        password="${password}"
+        trust="true"
+-       command=". /etc/profile.d/natinst-path.sh; ${deploy.run.command}"/>
++       command="tail -f -s 0 -n 1 ${deploy.log.file}"/>
+   </target>
+ 
+-  <target name="debug-deploy" depends="get-target-ip,jar,kill" description="Deploy the jar and start the program running.">
++  <target name="debug-deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">
+     <echo>[athena-deploy] Copying code over.</echo>
+     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
+ 
+@@ -178,4 +168,3 @@
+     </parallel>
+   </target>
+ </project>
+-

@@ -1,0 +1,112 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 15 Oct 2014 17:03:04 -0400
+Subject: [PATCH 0410/6262] Add SD methods with default values to match Java
+ (fixes artf3648)
+
+Change-Id: Iee955f987ac1214d773cfd733ed99e3cbd1ac3d0
+---
+ .../include/SmartDashboard/SmartDashboard.h   |  3 ++
+ .../src/SmartDashboard/SmartDashboard.cpp     | 36 +++++++++++++++++--
+ 2 files changed, 36 insertions(+), 3 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/SmartDashboard/SmartDashboard.h b/wpilibc/wpilibC++/include/SmartDashboard/SmartDashboard.h
+index 5906c0f76a79dfaa41703abb8aece41e6a55232b..c4ab91ca0f09e9e2a26a4778979c65e75d6924ad 100644
+--- a/wpilibc/wpilibC++/include/SmartDashboard/SmartDashboard.h
++++ b/wpilibc/wpilibC++/include/SmartDashboard/SmartDashboard.h
+@@ -26,13 +26,16 @@ public:
+ 
+ 	static void PutBoolean(std::string keyName, bool value);
+ 	static bool GetBoolean(std::string keyName);
++	static bool GetBoolean(std::string keyName, bool defaultValue);
+ 
+ 	static void PutNumber(std::string keyName, double value);
+ 	static double GetNumber(std::string keyName);
++	static double GetNumber(std::string keyName, double defaultValue);
+ 
+ 	static void PutString(std::string keyName, std::string value);
+ 	static int GetString(std::string keyName, char *value, unsigned int valueLen);
+ 	static std::string GetString(std::string keyName);
++	static std::string GetString(std::string keyName, std::string defaultValue);
+ 
+ 	static void PutValue(std::string keyName, ComplexData& value);
+ 	static void RetrieveValue(std::string keyName, ComplexData& value);
+diff --git a/wpilibc/wpilibC++/src/SmartDashboard/SmartDashboard.cpp b/wpilibc/wpilibC++/src/SmartDashboard/SmartDashboard.cpp
+index da4a63af0327c032c3ef1c885b104d1ce15843a9..163a8c3959536bc974fcb1afbac1a52ce25c2912 100644
+--- a/wpilibc/wpilibC++/src/SmartDashboard/SmartDashboard.cpp
++++ b/wpilibc/wpilibC++/src/SmartDashboard/SmartDashboard.cpp
+@@ -110,7 +110,7 @@ void SmartDashboard::PutBoolean(std::string keyName, bool value)
+ }
+ 
+ /**
+- * Returns the value at the specified key.
++ * Returns the value at the specified key. Throws an exception if the key is not found in the table
+  * @param keyName the key
+  * @return the value
+  */
+@@ -119,6 +119,16 @@ bool SmartDashboard::GetBoolean(std::string keyName)
+ 	return m_table->GetBoolean(keyName);
+ }
+ 
++/**
++ * Returns the value at the specified key. If the key is not found, returns the default value.
++ * @param keyName the key
++ * @return the value
++ */
++bool SmartDashboard::GetBoolean(std::string keyName, bool defaultValue)
++{
++	return m_table->GetBoolean(keyName, defaultValue);
++}
++
+ /**
+  * Maps the specified key to the specified value in this table.
+  * The key can not be NULL.
+@@ -131,7 +141,7 @@ void SmartDashboard::PutNumber(std::string keyName, double value){
+ }
+ 
+ /**
+- * Returns the value at the specified key.
++ * Returns the value at the specified key. Throws an exception if the key is not found in the table.
+  * @param keyName the key
+  * @return the value
+  */
+@@ -140,6 +150,16 @@ double SmartDashboard::GetNumber(std::string keyName)
+ 	return m_table->GetNumber(keyName);
+ }
+ 
++/**
++ * Returns the value at the specified key. If the key is not found, returns the default value.
++ * @param keyName the key
++ * @return the value
++ */
++double SmartDashboard::GetNumber(std::string keyName, double defaultValue)
++{
++	return m_table->GetNumber(keyName, defaultValue);
++}
++
+ /**
+  * Maps the specified key to the specified value in this table.
+  * Neither the key nor the value can be NULL.
+@@ -170,7 +190,7 @@ int SmartDashboard::GetString(std::string keyName, char *outBuffer, unsigned int
+ 
+ 
+ /**
+- * Returns the value at the specified key.
++ * Returns the value at the specified key. Throws an exception if the key is not found in the table
+  * @param keyName the key
+  * @return the value
+  */
+@@ -178,3 +198,13 @@ std::string SmartDashboard::GetString(std::string keyName)
+ {
+ 	return m_table->GetString(keyName);
+ }
++
++/**
++ * Returns the value at the specified key. If the key is not found, returns the default value.
++ * @param keyName the key
++ * @return the value
++ */
++std::string SmartDashboard::GetString(std::string keyName, std::string defaultValue)
++{
++	return m_table->GetString(keyName, defaultValue);
++}

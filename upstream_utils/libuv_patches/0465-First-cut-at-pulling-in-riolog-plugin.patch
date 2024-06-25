@@ -1,0 +1,700 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Malmsten <pmalmsten@gmail.com>
+Date: Sat, 8 Nov 2014 12:56:45 -0500
+Subject: [PATCH 0465/6262] First cut at pulling in riolog plugin.
+
+Plugin was retrieved from https://github.com/mstoeckl/riolog.git with minimal changes to
+make it compile.
+
+Change-Id: I340d77c69fe7598595deeaba8d4cd9414b971399
+---
+ .../feature.xml                               |   7 +
+ .../META-INF/MANIFEST.MF                      |  11 +
+ .../README                                    |  13 +
+ .../build.properties                          |   7 +
+ .../contexts.xml                              |  13 +
+ .../icons/riolog.png                          | Bin 0 -> 344 bytes
+ .../plugin.xml                                |  34 ++
+ .../pom.xml                                   |  15 +
+ .../src/netconsole2/Activator.java            |  61 +++
+ .../src/netconsole2/views/RiologView.java     | 414 ++++++++++++++++++
+ eclipse-plugins/pom.xml                       |   3 +-
+ 11 files changed, 577 insertions(+), 1 deletion(-)
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/META-INF/MANIFEST.MF
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/README
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/build.properties
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/contexts.xml
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/icons/riolog.png
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/plugin.xml
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/pom.xml
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/Activator.java
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/views/RiologView.java
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core.feature/feature.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core.feature/feature.xml
+index 3dc2c5c0075e8695bbd11a1beb04b4a3a672cc1e..bb6555d64fb0604ff0239a592f7d384ffd370436 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core.feature/feature.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core.feature/feature.xml
+@@ -52,4 +52,11 @@
+          version="0.0.0"
+          unpack="false"/>
+ 
++   <plugin
++         id="edu.wpi.first.wpilib.plugins.riolog"
++         download-size="0"
++         install-size="0"
++         version="0.0.0"
++         unpack="false"/>
++
+ </feature>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/META-INF/MANIFEST.MF b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/META-INF/MANIFEST.MF
+new file mode 100644
+index 0000000000000000000000000000000000000000..4e6a849bd8bf76d6a1bc19aed82942ce7ad27f0f
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/META-INF/MANIFEST.MF
+@@ -0,0 +1,11 @@
++Manifest-Version: 1.0
++Bundle-ManifestVersion: 2
++Bundle-Name: WPILib_Riolog
++Bundle-SymbolicName: edu.wpi.first.wpilib.plugins.riolog;singleton:=true
++Bundle-Version: 0.1.0.qualifier
++Bundle-Activator: netconsole2.Activator
++Require-Bundle: org.eclipse.ui,
++ org.eclipse.core.runtime
++Bundle-RequiredExecutionEnvironment: JavaSE-1.8
++Bundle-ActivationPolicy: lazy
++Bundle-Vendor: WPI & FIRST
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/README b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/README
+new file mode 100644
+index 0000000000000000000000000000000000000000..09ee25990abb135e97fdc76db8a79b33b273eec9
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/README
+@@ -0,0 +1,13 @@
++
++                       Riolog
++
++This is an Eclipse plugin that receives and displays text from UDP port 6666. It
++defines a new view that displays the received text.
++
++To compile, open project in an Eclipse  instance with the appropriate plugin
++development tools, and Export as a deployable plugin/fragment.
++
++To install, copy the resulting jar file into $eclipse/dropins/, and start
++Eclipse (-clean may be necessary).
++
++To enable, go to Window>Show View>Other... and choose General>Riolog.
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/build.properties b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/build.properties
+new file mode 100644
+index 0000000000000000000000000000000000000000..caaec514ba877b82792437cca4694c6742df99ac
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/build.properties
+@@ -0,0 +1,7 @@
++source.. = src/
++output.. = bin/
++bin.includes = plugin.xml,\
++               META-INF/,\
++               .,\
++               icons/,\
++               contexts.xml
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/contexts.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/contexts.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..c3ed6a64740d9ed3ac245dadd32451aa6b67b200
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/contexts.xml
+@@ -0,0 +1,13 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<contexts>
++	<context id="text" title="Riolog">
++		<description>This is the context help for the Riolog It was generated by a PDE template.</description>
++		<topic href="/PLUGINS_ROOT/org.eclipse.platform.doc.isv/guide/ua_help_context.htm" label="Context-sensitive help">
++			<enablement>
++				<with variable="platform">
++	            	<test property="org.eclipse.core.runtime.isBundleInstalled" args="org.eclipse.platform.doc.isv"/>
++	     		</with>
++			</enablement>
++		</topic>
++	</context>
++</contexts>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/icons/riolog.png b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/icons/riolog.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..2d6bb56c0baec6ff3e6632f69e255a649f8638e2
+GIT binary patch
+literal 344
+zcmV-e0jK_nP)<h;3K|Lk000e1NJLTq000mG000mO1^@s6AM^iV00004b3#c}2nYxW
+zd<bNS0003GNkl<ZIE`aqpb#)JFfcGA?aBXt>D^VLG_WzVF?3thGgwQTGr|SUR=NFW
+zU|=8`+pP8c57WznY`WPhH-auW6}F4v*WbTzJ_{BFjOb!$E=2)M1g#_hC^i7a3;!7Y
+zF_^4!!Eh$BJYECNgzcfs1?aJGDr^^n$to8HCN!UhsrWOTV%UYE@jn9t!++#ZcHI;L
+zk9U(*F8|Z_mtgf8&On@L+sk0J)`Nk80phi@uP-n(ob19LK4z=j{-L{ofq{YH-us9D
+zkyEM3DwqHHM`}>iz+8Ye@hAz(GgccHp@hxxXQwc|z{ASTV7AJQfrphF!w`RE4@NI}
+q7Y4IcZVXHeObnJ%X1IJ!9smHGCt^=VeMzwZ0000<MNUMnLSTYUi;m;~
+
+literal 0
+HcmV?d00001
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/plugin.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/plugin.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..57fe851dc47b1cac935a51b89e997f042a9c5672
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/plugin.xml
+@@ -0,0 +1,34 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<?eclipse version="3.4"?>
++<plugin>
++
++   <extension
++         point="org.eclipse.ui.views">
++      <view
++            name="Riolog"
++            icon="icons/riolog.png"
++            category="org.eclipse.ui"
++            class="netconsole2.views.RiologView"
++            id="netconsole2.views.RiologView">
++      </view>
++   </extension>
++   <extension
++         point="org.eclipse.ui.perspectiveExtensions">
++      <perspectiveExtension
++            targetID="org.eclipse.jdt.ui.JavaPerspective">
++         <view
++               ratio="0.5"
++               relative="org.eclipse.ui.views.ProblemView"
++               relationship="right"
++               id="netconsole2.views.RiologView">
++         </view>
++      </perspectiveExtension>
++   </extension>
++   <extension
++         point="org.eclipse.help.contexts">
++      <contexts
++            file="contexts.xml">
++      </contexts>
++   </extension>
++
++</plugin>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/pom.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/pom.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..e246bd30e28aa44aa029845b98a0ce8455f265c0
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/pom.xml
+@@ -0,0 +1,15 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
++    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
++  <modelVersion>4.0.0</modelVersion>
++  <artifactId>edu.wpi.first.wpilib.plugins.riolog</artifactId>
++  <packaging>eclipse-plugin</packaging>
++
++  <parent>
++    <groupId>edu.wpi.first.wpilib.plugins</groupId>
++    <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
++    <version>0.1.0.qualifier</version>
++    <relativePath>..</relativePath>
++  </parent>
++
++</project>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/Activator.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/Activator.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..60d069df71143b50925a683018efd31e7cc42936
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/Activator.java
+@@ -0,0 +1,61 @@
++package netconsole2;
++
++import org.eclipse.jface.resource.ImageDescriptor;
++import org.eclipse.ui.plugin.AbstractUIPlugin;
++import org.osgi.framework.BundleContext;
++
++/**
++ * The activator class controls the plug-in life cycle
++ */
++public class Activator extends AbstractUIPlugin {
++
++	// The plug-in ID
++	public static final String PLUGIN_ID = "riolog"; //$NON-NLS-1$
++
++	// The shared instance
++	private static Activator plugin;
++	
++	/**
++	 * The constructor
++	 */
++	public Activator() {
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
++	 */
++	public void start(BundleContext context) throws Exception {
++		super.start(context);
++		plugin = this;
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
++	 */
++	public void stop(BundleContext context) throws Exception {
++		plugin = null;
++		super.stop(context);
++	}
++
++	/**
++	 * Returns the shared instance
++	 *
++	 * @return the shared instance
++	 */
++	public static Activator getDefault() {
++		return plugin;
++	}
++
++	/**
++	 * Returns an image descriptor for the image file at the given
++	 * plug-in relative path
++	 *
++	 * @param path the path
++	 * @return the image descriptor
++	 */
++	public static ImageDescriptor getImageDescriptor(String path) {
++		return imageDescriptorFromPlugin(PLUGIN_ID, path);
++	}
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/views/RiologView.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/views/RiologView.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..29d36d78299dba10e0bacf77e43f418c3fef5459
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.riolog/src/netconsole2/views/RiologView.java
+@@ -0,0 +1,414 @@
++package netconsole2.views;
++
++import java.io.IOException;
++import java.net.DatagramPacket;
++import java.net.DatagramSocket;
++import java.net.InetSocketAddress;
++import java.net.SocketException;
++import java.util.ArrayList;
++import java.util.concurrent.BlockingQueue;
++import java.util.concurrent.LinkedBlockingQueue;
++
++import org.eclipse.jface.action.Action;
++import org.eclipse.jface.action.IMenuListener;
++import org.eclipse.jface.action.IMenuManager;
++import org.eclipse.jface.action.IToolBarManager;
++import org.eclipse.jface.action.MenuManager;
++import org.eclipse.jface.action.Separator;
++import org.eclipse.swt.SWT;
++import org.eclipse.swt.events.SelectionAdapter;
++import org.eclipse.swt.events.SelectionEvent;
++import org.eclipse.swt.layout.FillLayout;
++import org.eclipse.swt.layout.GridData;
++import org.eclipse.swt.layout.GridLayout;
++import org.eclipse.swt.widgets.Button;
++import org.eclipse.swt.widgets.Composite;
++import org.eclipse.swt.widgets.Display;
++import org.eclipse.swt.widgets.Menu;
++import org.eclipse.swt.widgets.Text;
++import org.eclipse.ui.IActionBars;
++import org.eclipse.ui.ISharedImages;
++import org.eclipse.ui.PlatformUI;
++import org.eclipse.ui.part.ViewPart;
++
++
++public class RiologView extends ViewPart {
++	public static Action confAction(String name, String tooltip, String img,
++			Action e) {
++		e.setText(name);
++		e.setToolTipText(tooltip);
++		e.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
++				.getImageDescriptor(img));
++		return e;
++	}
++
++	public static byte[] getPacket(DatagramSocket socket, DatagramPacket buf) {
++		try {
++			socket.receive(buf);
++		} catch (IOException e) {
++			return null;
++		}
++		byte[] ret = new byte[buf.getLength()];
++		System.arraycopy(buf.getData(), 0, ret, 0, ret.length);
++		return ret;
++	}
++
++	public static DatagramSocket makeRecvSocket() {
++		DatagramSocket socket = null;
++		try {
++			socket = new DatagramSocket(null);
++			socket.setReuseAddress(true);
++			socket.bind(new InetSocketAddress(6666));
++		} catch (SocketException e) {
++			e.printStackTrace();
++			socket.close();
++			return null;
++		}
++		return socket;
++	}
++
++	public static Thread startDaemonThread(Runnable r, String name) {
++		Thread t = new Thread(r, name);
++		t.setDaemon(true);
++		t.start();
++		return t;
++	}
++
++	/**
++	 * The ID of the view as specified by the extension.
++	 */
++	public static final String ID = "netconsole2.views.RiologView";
++
++	Text text;
++	Thread listener;
++	Thread transferer;
++	
++	volatile DatagramSocket socket_hook = null;
++	volatile boolean discard = false;
++	volatile boolean paused = false;
++	volatile boolean cleanup = false;
++	
++	private Action clearAction;
++	private Action pauseAction;
++	private Action discardAction;
++	private Action unpauseAction;
++	private Action undiscardAction;
++	private Button discardButton;
++	private Button pauseButton;
++
++	/**
++	 * The constructor.
++	 */
++	public RiologView() {
++	}
++
++	private void contributeToActionBars() {
++		IActionBars bars = getViewSite().getActionBars();
++		fillLocalPullDown(bars.getMenuManager());
++		fillLocalToolBar(bars.getToolBarManager());
++	}
++
++	/**
++	 * This is a callback that will allow us to create the viewer and initialize
++	 * it.
++	 */
++	public void createPartControl(Composite parent) {
++		GridLayout glayout = new GridLayout();
++		glayout.numColumns = 1;
++		parent.setLayout(glayout);
++
++		text = new Text(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL
++				| SWT.READ_ONLY);
++		{
++			GridData gdata = new GridData();
++			gdata.grabExcessVerticalSpace = true;
++			gdata.grabExcessHorizontalSpace = true;
++			gdata.horizontalAlignment = SWT.FILL;
++			gdata.verticalAlignment = SWT.FILL;
++			text.setLayoutData(gdata);
++		}
++
++		Composite row = new Composite(parent, SWT.NONE);
++
++		row.setLayout(new FillLayout(SWT.HORIZONTAL));
++
++		{
++			GridData gdata = new GridData();
++			gdata.grabExcessVerticalSpace = false;
++			gdata.grabExcessHorizontalSpace = true;
++			gdata.horizontalAlignment = SWT.FILL;
++			gdata.verticalAlignment = SWT.CENTER;
++			row.setLayoutData(gdata);
++		}
++
++
++
++		// Create the help context id for the viewer's control
++		PlatformUI.getWorkbench().getHelpSystem()
++				.setHelp(parent, "netconsole2.text");
++		makeActions();
++		makeButtons(row);
++		hookContextMenu();
++		contributeToActionBars();
++		startListening();
++	}
++
++	public void makeButtons(Composite parent) {
++		pauseButton = new Button(parent, SWT.TOGGLE);
++		pauseButton.setText(pauseAction.getText());
++		pauseButton.addSelectionListener(new SelectionAdapter() {
++			@Override
++			public void widgetSelected(SelectionEvent e) {
++				if (pauseButton.getSelection()) {
++					pauseAction.run();
++				} else {
++					unpauseAction.run();
++				}
++			}
++		});
++		discardButton = new Button(parent, SWT.TOGGLE);
++		discardButton.setText(discardAction.getText());
++		discardButton.addSelectionListener(new SelectionAdapter() {
++			@Override
++			public void widgetSelected(SelectionEvent e) {
++				if (discardButton.getSelection()) {
++					discardAction.run();
++				} else {
++					undiscardAction.run();
++				}
++			}
++		});
++		Button clearButton = new Button(parent, SWT.PUSH);
++		clearButton.setText(clearAction.getText());
++		clearButton.addSelectionListener(new SelectionAdapter() {
++			@Override
++			public void widgetSelected(SelectionEvent e) {
++				clearAction.run();
++			}
++		});
++	}
++	
++	@Override
++	public void dispose() {
++		stopListening();
++		super.dispose();
++	}
++
++	private void fillContextMenu(IMenuManager manager) {
++		manager.add(pauseAction);
++		manager.add(unpauseAction);
++		manager.add(new Separator());
++		manager.add(clearAction);
++		manager.add(new Separator());
++		manager.add(discardAction);
++		manager.add(undiscardAction);
++		manager.add(new Separator());
++		manager.add(confAction("Copy", "Copy selected text",
++				ISharedImages.IMG_TOOL_COPY, new Action() {
++					@Override
++					public void run() {
++						text.copy();
++					}
++				}));
++		manager.add(confAction("Select All", "Select all text", "",
++				new Action() {
++					@Override
++					public void run() {
++						text.selectAll();
++					}
++				}));
++	}
++
++	private void fillLocalPullDown(IMenuManager manager) {
++		manager.add(pauseAction);
++		manager.add(unpauseAction);
++		manager.add(new Separator());
++		manager.add(clearAction);
++		manager.add(new Separator());
++		manager.add(discardAction);
++		manager.add(undiscardAction);
++	}
++
++	private void fillLocalToolBar(IToolBarManager manager) {
++		manager.add(pauseAction);
++		manager.add(unpauseAction);
++		manager.add(new Separator());
++		manager.add(clearAction);
++		manager.add(new Separator());
++		manager.add(discardAction);
++		manager.add(undiscardAction);
++	}
++
++	private void hookContextMenu() {
++		MenuManager menuMgr = new MenuManager("#PopupMenu");
++		menuMgr.setRemoveAllWhenShown(true);
++		menuMgr.addMenuListener(new IMenuListener() {
++			public void menuAboutToShow(IMenuManager manager) {
++				RiologView.this.fillContextMenu(manager);
++			}
++		});
++		Menu menu = menuMgr.createContextMenu(text);
++		text.setMenu(menu);
++	}
++
++	private void makeActions() {
++		clearAction = confAction("Clear Log", "Empty the textbox",
++				ISharedImages.IMG_ETOOL_CLEAR, new Action() {
++					public void run() {
++						text.setText("");
++					}
++				});
++
++		pauseAction = confAction("Pause Display",
++				"Stop adding packets to the textbox",
++				ISharedImages.IMG_ELCL_STOP, new Action() {
++					public void run() {
++						pauseAction.setEnabled(false);
++						unpauseAction.setEnabled(true);
++						pauseButton.setSelection(true);
++						pauseButton.setText("Show 0 Packets");
++						paused = true;
++					}
++				});
++		pauseAction.setEnabled(true);
++		unpauseAction = confAction("Continue Display",
++				"Continue adding packets to the textbox",
++				ISharedImages.IMG_TOOL_FORWARD, new Action() {
++					public void run() {
++						paused = false;
++						transferer.interrupt();
++						pauseAction.setEnabled(true);
++						unpauseAction.setEnabled(false);
++						pauseButton.setSelection(false);
++						pauseButton.setText(pauseAction.getText());
++					}
++				});
++		unpauseAction.setEnabled(false);
++
++		discardAction = confAction("Discard Incoming",
++				"Drop all incoming packets", ISharedImages.IMG_ETOOL_DELETE,
++				new Action() {
++					public void run() {
++						discard = true;
++						discardAction.setEnabled(false);
++						undiscardAction.setEnabled(true);
++						discardButton.setSelection(true);
++						discardButton.setText(undiscardAction.getText());
++					}
++				});
++		discardAction.setEnabled(true);
++		undiscardAction = confAction("Accept Incoming",
++				"Accept all incoming packets", ISharedImages.IMG_OBJ_ADD,
++				new Action() {
++					public void run() {
++						discard = false;
++						discardAction.setEnabled(true);
++						undiscardAction.setEnabled(false);
++						discardButton.setSelection(false);
++						discardButton.setText(discardAction.getText());
++					}
++				});
++		undiscardAction.setEnabled(false);
++	}
++
++	/**
++	 * Passing the focus request to the viewer's control.
++	 */
++	public void setFocus() {
++		text.setFocus();
++	}
++	
++	public static String drainToString(ArrayList<byte[]> arr) {
++		int netlength = 0;
++		for (byte[] b : arr) {
++			netlength += b.length;
++		}
++
++		byte[] sum = new byte[netlength];
++		int mark = 0;
++		for (int i=0;i<arr.size();i++) {
++			byte[] b = arr.get(i);
++			System.arraycopy(b, 0, sum, mark, b.length);
++			arr.set(i, null);
++			mark += b.length;
++		}
++		arr.clear();
++		return new String(sum);
++		
++	}
++
++	void startListening() {
++		final BlockingQueue<byte[]> queue = new LinkedBlockingQueue<>();
++		listener = startDaemonThread(new Runnable() {
++			@Override
++			public void run() {
++				DatagramSocket socket = makeRecvSocket();
++				if (socket == null)
++					return;
++				socket_hook = socket;
++				byte[] buf = new byte[4096];
++				DatagramPacket datagram = new DatagramPacket(buf, buf.length);
++				while (!Thread.interrupted()) {
++					byte[] s = getPacket(socket, datagram);
++					if (s != null && !discard) {
++						try {
++							queue.put(s);
++						} catch (InterruptedException e) {
++							socket.close();
++							return;
++						}
++					}
++				}
++				socket.close();
++			}
++		}, "Riolog-Listener");
++		transferer = startDaemonThread(new Runnable() {
++			@Override
++			public void run() {
++				final ArrayList<byte[]> temp = new ArrayList<>();
++				while (!cleanup) {
++					try {
++						temp.add(queue.take());
++					} catch (InterruptedException e) {
++						if (cleanup) {
++							return;
++						}
++					}
++					queue.drainTo(temp);
++					if (!paused) {
++						Display.getDefault().syncExec(new Runnable() {
++							@Override
++							public void run() {
++								if (text.isDisposed())
++									return;
++								text.append(drainToString(temp));
++							}
++						});
++					} else {
++						Display.getDefault().syncExec(new Runnable() {
++							@Override
++							public void run() {
++								if (paused) {
++									if (temp.size() == 1) {
++										pauseButton.setText("Show 1 Packet\u2002");
++									} else {
++										pauseButton.setText("Show " + String.valueOf(temp.size()) + " Packets");
++									}
++								}
++							}
++						});
++					}
++				}
++			}
++		}, "Riolog-Transfer");
++	}
++
++	void stopListening() {
++		cleanup = true;
++		if (socket_hook != null) {
++			socket_hook.close();
++		}
++		listener.interrupt();
++		transferer.interrupt();
++	}
++}
+\ No newline at end of file
+diff --git a/eclipse-plugins/pom.xml b/eclipse-plugins/pom.xml
+index 34e4c6ba5cef0145355f329ac532f3f6c6c5758a..ddd3a50d8a73350a5b4a01796689807bc5fdbd67 100644
+--- a/eclipse-plugins/pom.xml
++++ b/eclipse-plugins/pom.xml
+@@ -14,12 +14,13 @@
+     <module>edu.wpi.first.wpilib.plugins.cpp.feature</module>
+     <module>edu.wpi.first.wpilib.plugins.java</module>
+     <module>edu.wpi.first.wpilib.plugins.java.feature</module>
++    <module>edu.wpi.first.wpilib.plugins.riolog</module>
+     <module>edu.wpi.first.wpilib.plugins.updatesite</module>
+   </modules>
+   
+   <properties>
+     <!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
+-    <tycho-version>0.18.1</tycho-version>
++    <tycho-version>0.21.0</tycho-version>
+   </properties>
+ 
+   <repositories>

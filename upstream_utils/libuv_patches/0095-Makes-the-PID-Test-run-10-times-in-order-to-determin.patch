@@ -1,0 +1,117 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 12 Jun 2014 18:02:09 -0400
+Subject: [PATCH 0095/6262] Makes the PID Test run 10 times in order to
+ determine how many times it fails out of 10 runs per motor. (Unstable Test!)
+
+Change-Id: I74b62f6b9ff0b932b7118562c38e8c5c9d0960f9
+---
+ .../java/edu/wpi/first/wpilibj/PIDTest.java   | 55 ++++++++++++++-----
+ 1 file changed, 42 insertions(+), 13 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
+index 2751dc559b89fdb255b552dfa5ea8ab4d43dd1a9..f2947d28b01d46f8b2f4f89fea069ca21988e805 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
+@@ -8,6 +8,7 @@ package edu.wpi.first.wpilibj;
+ 
+ import static org.junit.Assert.*;
+ 
++import java.util.ArrayList;
+ import java.util.Arrays;
+ import java.util.Collection;
+ import java.util.logging.Logger;
+@@ -17,7 +18,10 @@ import org.junit.AfterClass;
+ import org.junit.Before;
+ import org.junit.BeforeClass;
+ import org.junit.Ignore;
++import org.junit.Rule;
+ import org.junit.Test;
++import org.junit.rules.TestWatcher;
++import org.junit.runner.Description;
+ import org.junit.runner.RunWith;
+ import org.junit.runners.Parameterized;
+ import org.junit.runners.Parameterized.Parameters;
+@@ -41,21 +45,43 @@ public class PIDTest extends AbstractComsSetup {
+ 	private PIDController controller = null;
+ 	private static MotorEncoderFixture me = null;
+ 	
+-	public PIDTest(MotorEncoderFixture mef){
++	private final Double p;
++	private final Double i;
++	private final Double d;
++	
++	@Rule
++	public TestWatcher testWatcher = new TestWatcher() {
++		protected void failed(Throwable e, Description description) {
++			System.out.println();
++			logger.severe("" + description.getDisplayName() + " failed " + e.getMessage());
++			super.failed(e, description);
++			}
++		};
++
++	
++	public PIDTest(Double p, Double i, Double d, MotorEncoderFixture mef){
+ 		logger.fine("Constructor with: " + mef.getType());
+ 		if(PIDTest.me != null && !PIDTest.me.equals(mef)) PIDTest.me.teardown();
+ 		PIDTest.me = mef;
++		this.p = p;
++		this.i = i;
++		this.d = d;
+ 	}
+ 	
+ 	@Parameters
+-	public static Collection<MotorEncoderFixture[]> generateData(){
++	public static Collection<Object[]> generateData(){
+ 		//logger.fine("Loading the MotorList");
+-		return Arrays.asList(new MotorEncoderFixture[][]{
+-				 {TestBench.getInstance().getTalonPair()},
+-				 {TestBench.getInstance().getVictorPair()},
+-				 {TestBench.getInstance().getJaguarPair()}
+-			//	 TestBench.getInstance().getCanJaguarPair()
+-		});
++		Collection<Object[]> data = new ArrayList<Object[]>();
++		double kp = 0.0035;
++		double ki = 0.001;
++		double kd = 0.0;
++		for(int i = 0; i < 10; i++){
++			data.addAll(Arrays.asList(new Object[][]{
++				 {kp, ki, kd, TestBench.getInstance().getTalonPair()},
++				 {kp, ki, kd, TestBench.getInstance().getVictorPair()},
++				 {kp, ki, kd, TestBench.getInstance().getJaguarPair()}}));
++		}
++		return data;
+ 	}
+ 
+ 	/**
+@@ -81,7 +107,7 @@ public class PIDTest extends AbstractComsSetup {
+ 	public void setUp() throws Exception {
+ 		logger.fine("Setup: " + me.getType());
+ 		me.setup();
+-		controller = new PIDController(0.003, .001, 0, me.getEncoder(), me.getMotor());
++		controller = new PIDController(p, i, d, me.getEncoder(), me.getMotor());
+ 		controller.setAbsoluteTolerance(15);
+ 		controller.setOutputRange(-0.2, 0.2);
+ 	}
+@@ -116,14 +142,17 @@ public class PIDTest extends AbstractComsSetup {
+ 	@Test (timeout = 6000)
+ 	public void testRotateToTarget() {
+ 		double setpoint = 2500.0;
+-		System.out.println("Entering testRotateToTarget");
+-		assertEquals("PID did not start at 0", 0, controller.get(), 0);
++		assertEquals(pidData() + "did not start at 0", 0, controller.get(), 0);
+ 		controller.setSetpoint(setpoint);
+-		assertEquals("PID did not have an error of " + setpoint, setpoint, controller.getError(), 0);
++		assertEquals(pidData() +"did not have an error of " + setpoint, setpoint, controller.getError(), 0);
+ 		controller.enable();
+ 		Timer.delay(5);
+ 		controller.disable();
+-		assertTrue("PID Controller Error: " + controller.getError(), controller.onTarget());
++		assertTrue(pidData() + "Controller Error: " + controller.getError(), controller.onTarget());
++	}
++	
++	private String pidData(){
++		return me.getType() + " PID {P:" +controller.getP() + " I:" + controller.getI() + " D:" + controller.getD() +"} ";
+ 	}
+ 	
+ }

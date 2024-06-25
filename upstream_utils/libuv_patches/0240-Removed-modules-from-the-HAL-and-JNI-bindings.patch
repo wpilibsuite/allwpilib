@@ -1,0 +1,1244 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Fri, 1 Aug 2014 15:00:41 -0400
+Subject: [PATCH 0240/6262] Removed modules from the HAL and JNI bindings
+
+Modules aren't used anymore in wpilibc and wpilibj, so the hal functions
+that references them and and JNI bindings for these functions have been
+pulled out.
+
+Both Counter classes were also modified because they still referenced
+modules.
+
+Change-Id: Ic01feb145a4ed5f08cd55f140867c721f5ee7b10
+---
+ hal/include/HAL/Analog.hpp                    |   7 +-
+ hal/include/HAL/Digital.hpp                   |  19 +-
+ hal/lib/Athena/Analog.cpp                     |  42 ---
+ hal/lib/Athena/Digital.cpp                    | 243 ++++++------------
+ wpilibc/wpilibC++/lib/Counter.cpp             |   8 +-
+ .../java/edu/wpi/first/wpilibj/Counter.java   |   6 +-
+ .../edu/wpi/first/wpilibj/hal/AnalogJNI.java  |   2 -
+ .../edu/wpi/first/wpilibj/hal/CounterJNI.java |   4 +-
+ .../edu/wpi/first/wpilibj/hal/DIOJNI.java     |   5 -
+ .../edu/wpi/first/wpilibj/hal/PWMJNI.java     |   5 -
+ wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp       |  31 ---
+ wpilibj/wpilibJavaJNI/lib/CounterJNI.cpp      |  22 +-
+ wpilibj/wpilibJavaJNI/lib/DIOJNI.cpp          |  39 ---
+ wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp          |  92 -------
+ 14 files changed, 103 insertions(+), 422 deletions(-)
+
+diff --git a/hal/include/HAL/Analog.hpp b/hal/include/HAL/Analog.hpp
+index 82c14df3b0cd2899a5a8ecef5931033339d42829..981aa9e17c17e028cbd372a5c60339f72c88be48 100644
+--- a/hal/include/HAL/Analog.hpp
++++ b/hal/include/HAL/Analog.hpp
+@@ -26,11 +26,9 @@ extern "C"
+ 	void* initializeAnalogInputPort(void* port_pointer, int32_t *status);
+ 	bool checkAnalogModule(uint8_t module);
+ 	bool checkAnalogInputChannel(uint32_t pin);
+-	
++
+ 	void setAnalogSampleRate(double samplesPerSecond, int32_t *status);
+ 	float getAnalogSampleRate(int32_t *status);
+-	void setAnalogSampleRateWithModule(uint8_t module, double samplesPerSecond, int32_t *status);
+-	float getAnalogSampleRateWithModule(uint8_t module, int32_t *status);
+ 	void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits, int32_t *status);
+ 	uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t *status);
+ 	void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits, int32_t *status);
+@@ -71,14 +69,11 @@ extern "C"
+ 	//// Float JNA Hack
+ 	// Float
+ 	int getAnalogSampleRateIntHack(int32_t *status);
+-	int getAnalogSampleRateWithModuleIntHack(uint8_t module, int32_t *status);
+ 	int getAnalogVoltageIntHack(void* analog_port_pointer, int32_t *status);
+ 	int getAnalogAverageVoltageIntHack(void* analog_port_pointer, int32_t *status);
+ 
+ 	// Doubles
+ 	void setAnalogSampleRateIntHack(int samplesPerSecond, int32_t *status);
+-	void setAnalogSampleRateWithModuleIntHack(uint8_t module, int samplesPerSecond,
+-			int32_t *status);
+ 	int32_t getAnalogVoltsToValueIntHack(void* analog_port_pointer, int voltage, int32_t *status);
+ 	void setAnalogTriggerLimitsVoltageIntHack(void* analog_trigger_pointer, int lower, int upper,
+ 			int32_t *status);
+diff --git a/hal/include/HAL/Digital.hpp b/hal/include/HAL/Digital.hpp
+index ac0484e5f3d5ccaa52d9cee66eceec51ff9e5fcf..9defc9ef6c769821f83338c1de14e2a83e8bf4cd 100644
+--- a/hal/include/HAL/Digital.hpp
++++ b/hal/include/HAL/Digital.hpp
+@@ -17,7 +17,6 @@ enum Mode
+ extern "C"
+ {
+ 	void* initializeDigitalPort(void* port_pointer, int32_t *status);
+-	bool checkDigitalModule(uint8_t module);
+ 	bool checkPWMChannel(void* digital_port_pointer);
+ 	bool checkRelayChannel(void* digital_port_pointer);
+ 
+@@ -25,17 +24,10 @@ extern "C"
+ 	unsigned short getPWM(void* digital_port_pointer, int32_t *status);
+ 	void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status);
+ 	void* allocatePWM(int32_t *status);
+-	void* allocatePWMWithModule(uint8_t module, int32_t *status);
+ 	void freePWM(void* pwmGenerator, int32_t *status);
+-	void freePWMWithModule(uint8_t module, void* pwmGenerator, int32_t *status);
+ 	void setPWMRate(double rate, int32_t *status);
+-	void setPWMRateWithModule(uint8_t module, double rate, int32_t *status);
+ 	void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t *status);
+-	void setPWMDutyCycleWithModule(uint8_t module, void* pwmGenerator, double dutyCycle,
+-			int32_t *status);
+ 	void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t *status);
+-	void setPWMOutputChannelWithModule(uint8_t module, void* pwmGenerator, uint32_t pin,
+-			int32_t *status);
+ 
+ 	void setRelayForward(void* digital_port_pointer, bool on, int32_t *status);
+ 	void setRelayReverse(void* digital_port_pointer, bool on, int32_t *status);
+@@ -50,18 +42,15 @@ extern "C"
+ 	void pulse(void* digital_port_pointer, double pulseLength, int32_t *status);
+ 	bool isPulsing(void* digital_port_pointer, int32_t *status);
+ 	bool isAnyPulsing(int32_t *status);
+-	bool isAnyPulsingWithModule(uint8_t module, int32_t *status);
+ 
+ 	void* initializeCounter(Mode mode, uint32_t *index, int32_t *status);
+ 	void freeCounter(void* counter_pointer, int32_t *status);
+ 	void setCounterAverageSize(void* counter_pointer, int32_t size, int32_t *status);
+-	void setCounterUpSourceWithModule(void* counter_pointer, uint8_t module, uint32_t pin,
+-			bool analogTrigger, int32_t *status); // TODO: Without Module
++	void setCounterUpSource(void* counter_pointer, uint32_t pin, bool analogTrigger, int32_t *status);
+ 	void setCounterUpSourceEdge(void* counter_pointer, bool risingEdge, bool fallingEdge,
+ 			int32_t *status);
+ 	void clearCounterUpSource(void* counter_pointer, int32_t *status);
+-	void setCounterDownSourceWithModule(void* counter_pointer, uint8_t module, uint32_t pin,
+-			bool analogTrigger, int32_t *status); // TODO: Without Module
++	void setCounterDownSource(void* counter_pointer, uint32_t pin, bool analogTrigger, int32_t *status);
+ 	void setCounterDownSourceEdge(void* counter_pointer, bool risingEdge, bool fallingEdge,
+ 			int32_t *status);
+ 	void clearCounterDownSource(void* counter_pointer, int32_t *status);
+@@ -100,7 +89,6 @@ extern "C"
+ 	uint32_t getEncoderSamplesToAverage(void* encoder_pointer, int32_t *status);
+ 
+ 	uint16_t getLoopTiming(int32_t *status);
+-	uint16_t getLoopTimingWithModule(uint8_t module, int32_t *status);
+ 
+ 	void spiInitialize(uint8_t port, int32_t *status);
+ 	int32_t spiTransaction(uint8_t port, uint8_t *dataToSend, uint8_t *dataReceived, uint8_t size);
+@@ -126,8 +114,5 @@ extern "C"
+ 	//// Float JNA Hack
+ 	// double
+ 	void setPWMRateIntHack(int rate, int32_t *status);
+-	void setPWMRateWithModuleIntHack(uint8_t module, int32_t rate, int32_t *status);
+ 	void setPWMDutyCycleIntHack(void* pwmGenerator, int32_t dutyCycle, int32_t *status);
+-	void setPWMDutyCycleWithModuleIntHack(uint8_t module, void* pwmGenerator, int32_t dutyCycle,
+-			int32_t *status);
+ }
+diff --git a/hal/lib/Athena/Analog.cpp b/hal/lib/Athena/Analog.cpp
+index f472caeddcd9ad4161d6ef6185a12d9756bac1f2..3ff10224027ef7291883b9c7eacdc210c611f11c 100644
+--- a/hal/lib/Athena/Analog.cpp
++++ b/hal/lib/Athena/Analog.cpp
+@@ -185,40 +185,6 @@ float getAnalogSampleRate(int32_t *status) {
+   return (float)kTimebase / (float)ticksPerSample;
+ }
+ 
+-/**
+- * Set the sample rate on the module.
+- *
+- * This is a global setting for the module and effects all channels.
+- *
+- * @param module The module to use
+- * @param samplesPerSecond The number of samples per channel per second.
+- */
+-void setAnalogSampleRateWithModule(uint8_t module, double samplesPerSecond, int32_t *status) {
+-  if (checkAnalogModule(module)) {
+-	setAnalogSampleRate(samplesPerSecond, status);
+-  } else {
+-	// XXX: Set error status
+-  }
+-}
+-
+-/**
+- * Get the current sample rate on the module.
+- *
+- * This assumes one entry in the scan list.
+- * This is a global setting for the module and effects all channels.
+- *
+- * @param module The module to use
+- * @return Sample rate.
+- */
+-float getAnalogSampleRateWithModule(uint8_t module, int32_t *status) {
+-  if (checkAnalogModule(module)) {
+-	return getAnalogSampleRate(status);
+-  } else {
+-	return -1; // XXX: Set error status
+-  }
+-}
+-
+-
+ /**
+  * Set the number of averaging bits.
+  *
+@@ -736,10 +702,6 @@ int getAnalogSampleRateIntHack(int32_t *status) {
+   return floatToInt(getAnalogSampleRate(status));
+ }
+ 
+-int getAnalogSampleRateWithModuleIntHack(uint8_t module, int32_t *status) {
+-  return floatToInt(getAnalogSampleRateWithModuleIntHack(module, status));
+-}
+-
+ int getAnalogVoltageIntHack(void* analog_port_pointer, int32_t *status) {
+   return floatToInt(getAnalogVoltage(analog_port_pointer, status));
+ }
+@@ -754,10 +716,6 @@ void setAnalogSampleRateIntHack(int samplesPerSecond, int32_t *status) {
+   setAnalogSampleRate(intToFloat(samplesPerSecond), status);
+ }
+ 
+-void setAnalogSampleRateWithModuleIntHack(uint8_t module, int samplesPerSecond, int32_t *status) {
+-  setAnalogSampleRateWithModule(module, intToFloat(samplesPerSecond), status);
+-}
+-
+ int32_t getAnalogVoltsToValueIntHack(void* analog_port_pointer, int voltage, int32_t *status) {
+   return getAnalogVoltsToValue(analog_port_pointer, intToFloat(voltage), status);
+ }
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index 1ad211d08927815d94e814eaabb3839e5d8f8924..90efa7b4e2a87fe4f71c51cc19d0f3bf3611c800 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -80,7 +80,7 @@ MUTEX_ID spiMXPSemaphore = NULL;
+ tSPI *spiSystem;
+ 
+ /**
+- * Initialize the digital modules.
++ * Initialize the digital system.
+  */
+ void initializeDigital(int32_t *status) {
+   if (digitalSystemsInitialized) return;
+@@ -96,21 +96,21 @@ void initializeDigital(int32_t *status) {
+ 
+   digitalI2COnBoardSemaphore = initializeMutexRecursive();
+   digitalI2CMXPSemaphore = initializeMutexRecursive();
+-  
++
+   Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
+   Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
+   digitalSystem = tDIO::create(status);
+ 
+   // Relay Setup
+   relaySystem = tRelay::create(status);
+-    
++
+   // Turn off all relay outputs.
+   relaySystem->writeValue_Forward(0, status);
+   relaySystem->writeValue_Reverse(0, status);
+ 
+   // PWM Setup
+   pwmSystem = tPWM::create(status);
+-      
++
+   // Make sure that the 9403 IONode has had a chance to initialize before continuing.
+   while(pwmSystem->readLoopTiming(status) == 0) delayTicks(1);
+ 
+@@ -122,7 +122,7 @@ void initializeDigital(int32_t *status) {
+ 
+   //Calculate the length, in ms, of one DIO loop
+   double loopTime = pwmSystem->readLoopTiming(status)/(kSystemClockTicksPerMicrosecond*1e3);
+-    
++
+   pwmSystem->writeConfig_Period((uint16_t) (kDefaultPwmPeriod/loopTime + .5), status);
+   uint16_t minHigh = (uint16_t) ((kDefaultPwmCenter-kDefaultPwmStepsDown*loopTime)/loopTime + .5);
+   pwmSystem->writeConfig_MinHigh(minHigh, status);
+@@ -132,23 +132,16 @@ void initializeDigital(int32_t *status) {
+     // Initialize port structure
+     DigitalPort* digital_port = new DigitalPort();
+     digital_port->port.pin = pwm_index;
+-    
++
+     setPWM(digital_port, kPwmDisabled, status);
+     setPWMPeriodScale(digital_port, 3, status); // Set all to 4x by default.
+   }
+-  
++
+   digitalSystemsInitialized = true;
+ }
+ 
+ /**
+- * Create a new instance of an digital module.
+- * Create an instance of the digital module object. Initialize all the parameters
+- * to reasonable values on start.
+- * Setting a global value on an digital module can be done only once unless subsequent
+- * values are set the previously set value.
+- * Digital modules are a singleton, so the constructor is never called outside of this class.
+- *
+- * @param moduleNumber The digital module to create (1 or 2).
++ * Create a new instance of a digital port.
+  */
+ void* initializeDigitalPort(void* port_pointer, int32_t *status) {
+   initializeDigital(status);
+@@ -161,10 +154,6 @@ void* initializeDigitalPort(void* port_pointer, int32_t *status) {
+   return digital_port;
+ }
+ 
+-bool checkDigitalModule(uint8_t module) {
+-  return nLoadOut::getModulePresence(nLoadOut::kModuleType_Digital, module - 1);
+-}
+-
+ bool checkPWMChannel(void* digital_port_pointer) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   return port->port.pin < kPwmPins;
+@@ -190,19 +179,19 @@ uint32_t remapMXPChannel(uint32_t pin) {
+ /**
+  * Set a PWM channel to the desired value. The values range from 0 to 255 and the period is controlled
+  * by the PWM Period and MinHigh registers.
+- * 
++ *
+  * @param channel The PWM channel to set.
+  * @param value The PWM value to set.
+- */  
++ */
+ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   checkPWMChannel(port);
+-  
++
+   if(port->port.pin < tPWM::kNumHdrRegisters) {
+     pwmSystem->writeHdr(port->port.pin, value, status);
+   } else {
+     pwmSystem->writeMXP(port->port.pin - tPWM::kNumHdrRegisters, value, status);
+-    
++
+     // Enable special functions on this pin
+     uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+     short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+@@ -212,14 +201,14 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
+ 
+ /**
+  * Get a value from a PWM channel. The values range from 0 to 255.
+- * 
++ *
+  * @param channel The PWM channel to read from.
+  * @return The raw PWM value.
+  */
+ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   checkPWMChannel(port);
+-  
++
+   if(port->port.pin < tPWM::kNumHdrRegisters) {
+     return pwmSystem->readHdr(port->port.pin, status);
+   } else {
+@@ -229,14 +218,14 @@ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
+ 
+ /**
+  * Set how how often the PWM signal is squelched, thus scaling the period.
+- * 
++ *
+  * @param channel The PWM channel to configure.
+  * @param squelchMask The 2-bit mask of outputs to squelch.
+  */
+ void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   checkPWMChannel(port);
+-  
++
+   if(port->port.pin < tPWM::kNumPeriodScaleHdrElements) {
+     pwmSystem->writePeriodScaleHdr(port->port.pin, squelchMask, status);
+   } else {
+@@ -247,42 +236,19 @@ void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t
+ /**
+  * Allocate a DO PWM Generator.
+  * Allocate PWM generators so that they are not accidently reused.
+- * 
++ *
+  * @return PWM Generator refnum
+  */
+ void* allocatePWM(int32_t *status) {
+-  return allocatePWMWithModule(0, status);
+-}
+-
+-/**
+- * Allocate a DO PWM Generator.
+- * Allocate PWM generators so that they are not accidently reused.
+- * 
+- * @return PWM Generator refnum
+- */
+-void* allocatePWMWithModule(uint8_t module, int32_t *status) {
+-  char buf[64];
+-  snprintf(buf, 64, "DO_PWM (Module: %d)", module);
+-  uint32_t* val = NULL;
+-  *val = DO_PWMGenerators->Allocate(buf);
+-  return val;
++  return (void*)DO_PWMGenerators->Allocate("DO_PWM");
+ }
+ 
+ /**
+  * Free the resource associated with a DO PWM generator.
+- * 
++ *
+  * @param pwmGenerator The pwmGen to free that was allocated with AllocateDO_PWM()
+  */
+ void freePWM(void* pwmGenerator, int32_t *status) {
+-  freePWMWithModule(0, pwmGenerator, status);
+-}
+-
+-/**
+- * Free the resource associated with a DO PWM generator.
+- * 
+- * @param pwmGenerator The pwmGen to free that was allocated with AllocateDO_PWM()
+- */
+-void freePWMWithModule(uint8_t module, void* pwmGenerator, int32_t *status) {
+   uint32_t id = *((uint32_t*) pwmGenerator);
+   if (id == ~0ul) return;
+   DO_PWMGenerators->Free(id);
+@@ -290,46 +256,26 @@ void freePWMWithModule(uint8_t module, void* pwmGenerator, int32_t *status) {
+ 
+ /**
+  * Change the frequency of the DO PWM generator.
+- * 
++ *
+  * The valid range is from 0.6 Hz to 19 kHz.  The frequency resolution is logarithmic.
+- * 
+- * @param rate The frequency to output all digital output PWM signals on this module.
++ *
++ * @param rate The frequency to output all digital output PWM signals.
+  */
+ void setPWMRate(double rate, int32_t *status) {
+-  setPWMRateWithModule(0, rate, status);
+-}
+-
+-/**
+- * Change the frequency of the DO PWM generator.
+- * 
+- * The valid range is from 0.6 Hz to 19 kHz.  The frequency resolution is logarithmic.
+- * 
+- * @param rate The frequency to output all digital output PWM signals on this module.
+- */
+-void setPWMRateWithModule(uint8_t module, double rate, int32_t *status) {
+   // Currently rounding in the log rate domain... heavy weight toward picking a higher freq.
+   // TODO: Round in the linear rate domain.
+   uint8_t pwmPeriodPower = (uint8_t)(log(1.0 / (pwmSystem->readLoopTiming(status) * 0.25E-6 * rate))/log(2.0) + 0.5);
+   digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
+ }
+ 
+-/**
+- * Configure the duty-cycle of the PWM generator
+- * 
+- * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
+- * @param dutyCycle The percent duty cycle to output [0..1].
+- */
+-void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t *status) {
+-  setPWMDutyCycleWithModule(0, pwmGenerator, dutyCycle, status);
+-}
+ 
+ /**
+  * Configure the duty-cycle of the PWM generator
+- * 
++ *
+  * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
+  * @param dutyCycle The percent duty cycle to output [0..1].
+  */
+-void setPWMDutyCycleWithModule(uint8_t module, void* pwmGenerator, double dutyCycle, int32_t *status) {
++void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t *status) {
+   uint32_t id = *((uint32_t*) pwmGenerator);
+   if (id == ~0ul) return;
+   if (dutyCycle > 1.0) dutyCycle = 1.0;
+@@ -350,21 +296,11 @@ void setPWMDutyCycleWithModule(uint8_t module, void* pwmGenerator, double dutyCy
+ 
+ /**
+  * Configure which DO channel the PWM siganl is output on
+- * 
++ *
+  * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
+  * @param channel The Digital Output channel to output on
+  */
+ void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t *status) {
+-  setPWMOutputChannelWithModule(0, pwmGenerator, pin, status);
+-}
+-
+-/**
+- * Configure which DO channel the PWM siganl is output on
+- * 
+- * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
+- * @param channel The Digital Output channel to output on
+- */
+-void setPWMOutputChannelWithModule(uint8_t module, void* pwmGenerator, uint32_t pin, int32_t *status) {
+   uint32_t id = *((uint32_t*) pwmGenerator);
+   if (id == ~0ul) return;
+   switch(id) {
+@@ -449,7 +385,7 @@ bool getRelayReverse(void* digital_port_pointer, int32_t *status) {
+  * Allocate Digital I/O channels.
+  * Allocate channels so that they are not accidently reused. Also the direction is set at the
+  * time of the allocation.
+- * 
++ *
+  * @param channel The Digital I/O channel
+  * @param input If true open as input; if false open as output
+  * @return Was successfully allocated
+@@ -457,13 +393,13 @@ bool getRelayReverse(void* digital_port_pointer, int32_t *status) {
+ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   char buf[64];
+-  snprintf(buf, 64, "DIO %d (Module %d)", port->port.pin, port->port.module);
+-  if (DIOChannels->Allocate(kDigitalPins * (port->port.module - 1) + port->port.pin, buf) == ~0ul) return false;
++  snprintf(buf, 64, "DIO %d", port->port.pin);
++  if (DIOChannels->Allocate(port->port.pin, buf) == ~0ul) return false;
+   {
+     Synchronized sync(digitalDIOSemaphore);
+-    
++
+     tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
+-    
++
+     if(port->port.pin < kNumHeaders) {
+       uint32_t bitToSet = 1 << port->port.pin;
+       if (input) {
+@@ -473,18 +409,18 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
+       }
+     } else {
+       uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+-      
++
+       // Disable special functions on this pin
+       short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+       digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
+-      
++
+       if (input) {
+         outputEnable.MXP = outputEnable.MXP & (~bitToSet); // clear the bit for read
+       } else {
+         outputEnable.MXP = outputEnable.MXP | bitToSet; // set the bit for write
+       }
+     }
+-    
++
+     digitalSystem->writeOutputEnable(outputEnable, status);
+   }
+   return true;
+@@ -492,18 +428,18 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
+ 
+ /**
+  * Free the resource associated with a digital I/O channel.
+- * 
++ *
+  * @param channel The Digital I/O channel to free
+  */
+ void freeDIO(void* digital_port_pointer, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+-  DIOChannels->Free(kDigitalPins * (port->port.module - 1) + port->port.pin);
++  DIOChannels->Free(port->port.pin);
+ }
+ 
+ /**
+  * Write a digital I/O bit to the FPGA.
+  * Set a single value on a digital I/O channel.
+- * 
++ *
+  * @param channel The Digital I/O channel
+  * @param value The state to set the digital channel (if it is configured as an output)
+  */
+@@ -516,7 +452,7 @@ void setDIO(void* digital_port_pointer, short value, int32_t *status) {
+   {
+     Synchronized sync(digitalDIOSemaphore);
+     tDIO::tDO currentDIO = digitalSystem->readDO(status);
+-    
++
+     if(port->port.pin < kNumHeaders) {
+       if(value == 0) {
+         currentDIO.Headers = currentDIO.Headers & ~(1 << port->port.pin);
+@@ -529,11 +465,11 @@ void setDIO(void* digital_port_pointer, short value, int32_t *status) {
+       } else if (value == 1) {
+         currentDIO.MXP = currentDIO.MXP | (1 << remapMXPChannel(port->port.pin));
+       }
+-      
++
+       uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+       short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+       digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
+-    } 
++    }
+     digitalSystem->writeDO(currentDIO, status);
+   }
+ }
+@@ -541,7 +477,7 @@ void setDIO(void* digital_port_pointer, short value, int32_t *status) {
+ /**
+  * Read a digital I/O bit from the FPGA.
+  * Get a single value from a digital I/O channel.
+- * 
++ *
+  * @param channel The digital I/O channel
+  * @return The state of the specified channel
+  */
+@@ -560,7 +496,7 @@ bool getDIO(void* digital_port_pointer, int32_t *status) {
+     uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+     short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
+-    
++
+     return ((currentDIO.MXP >> remapMXPChannel(port->port.pin)) & 1) != 0;
+   }
+ }
+@@ -568,7 +504,7 @@ bool getDIO(void* digital_port_pointer, int32_t *status) {
+ /**
+  * Read the direction of a the Digital I/O lines
+  * A 1 bit means output and a 0 bit means input.
+- * 
++ *
+  * @param channel The digital I/O channel
+  * @return The direction of the specified channel
+  */
+@@ -579,7 +515,7 @@ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
+   //AND it against the currentOutputEnable
+   //if it == 0, then return false
+   //else return true
+-  
++
+   if(port->port.pin < kNumHeaders) {
+     return ((currentOutputEnable.Headers >> port->port.pin) & 1) != 0;
+   } else {
+@@ -590,33 +526,33 @@ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
+ /**
+  * Generate a single pulse.
+  * Write a pulse to the specified digital output channel. There can only be a single pulse going at any time.
+- * 
++ *
+  * @param channel The Digital Output channel that the pulse should be output on
+  * @param pulseLength The active length of the pulse (in seconds)
+  */
+ void pulse(void* digital_port_pointer, double pulseLength, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   tDIO::tPulse pulse;
+-  
++
+   if(port->port.pin < kNumHeaders) {
+     pulse.Headers = 1 << port->port.pin;
+   } else {
+     pulse.MXP = 1 << remapMXPChannel(port->port.pin);
+   }
+-  
++
+   digitalSystem->writePulseLength((uint8_t)(1.0e9 * pulseLength / (pwmSystem->readLoopTiming(status) * 25)), status);
+   digitalSystem->writePulse(pulse, status);
+ }
+ 
+ /**
+  * Check a DIO line to see if it is currently generating a pulse.
+- * 
++ *
+  * @return A pulse is in progress
+  */
+ bool isPulsing(void* digital_port_pointer, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
+-  
++
+   if(port->port.pin < kNumHeaders) {
+     return (pulseRegister.Headers & (1 << port->port.pin)) != 0;
+   } else {
+@@ -626,25 +562,14 @@ bool isPulsing(void* digital_port_pointer, int32_t *status) {
+ 
+ /**
+  * Check if any DIO line is currently generating a pulse.
+- * 
++ *
+  * @return A pulse on some line is in progress
+  */
+ bool isAnyPulsing(int32_t *status) {
+-  return isAnyPulsingWithModule(1, status) || isAnyPulsingWithModule(2, status);
+-}
+-
+-/**
+- * Check if any DIO line is currently generating a pulse.
+- * 
+- * @return A pulse on some line is in progress
+- */
+-bool isAnyPulsingWithModule(uint8_t module, int32_t *status) {
+   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
+   return pulseRegister.Headers != 0 && pulseRegister.MXP != 0;
+ }
+ 
+-
+-
+ struct counter_t {
+   tCounter* counter;
+   uint32_t index;
+@@ -687,19 +612,22 @@ void setCounterAverageSize(void* counter_pointer, int32_t size, int32_t *status)
+  * Set the source object that causes the counter to count up.
+  * Set the up counting DigitalSource.
+  */
+-void setCounterUpSourceWithModule(void* counter_pointer, uint8_t module, uint32_t pin,
+-								  bool analogTrigger, int32_t *status) {
++void setCounterUpSource(void* counter_pointer, uint32_t pin, bool analogTrigger, int32_t *status) {
+   Counter* counter = (Counter*) counter_pointer;
+-  
++
++  uint8_t module;
++
+   if(pin >= kNumHeaders) {
+     pin = remapMXPChannel(pin);
+     module = 1;
++  } else {
++    module = 0;
+   }
+-  
++
+   counter->counter->writeConfig_UpSource_Module(module, status);
+   counter->counter->writeConfig_UpSource_Channel(pin, status);
+   counter->counter->writeConfig_UpSource_AnalogTrigger(analogTrigger, status);
+-	
++
+   if(counter->counter->readConfig_Mode(status) == kTwoPulse ||
+ 	 counter->counter->readConfig_Mode(status) == kExternalDirection) {
+ 	setCounterUpSourceEdge(counter_pointer, true, false, status);
+@@ -736,8 +664,7 @@ void clearCounterUpSource(void* counter_pointer, int32_t *status) {
+  * Set the source object that causes the counter to count down.
+  * Set the down counting DigitalSource.
+  */
+-void setCounterDownSourceWithModule(void* counter_pointer, uint8_t module, uint32_t pin,
+-									bool analogTrigger, int32_t *status) {
++void setCounterDownSource(void* counter_pointer, uint32_t pin, bool analogTrigger, int32_t *status) {
+   Counter* counter = (Counter*) counter_pointer;
+   unsigned char mode = counter->counter->readConfig_Mode(status);
+   if (mode != kTwoPulse && mode != kExternalDirection) {
+@@ -745,16 +672,20 @@ void setCounterDownSourceWithModule(void* counter_pointer, uint8_t module, uint3
+ 	*status = PARAMETER_OUT_OF_RANGE;
+ 	return;
+   }
+-  
++
++  uint8_t module;
++
+   if(pin >= kNumHeaders) {
+     pin = remapMXPChannel(pin);
+     module = 1;
++  } else {
++    module = 0;
+   }
+-  
++
+   counter->counter->writeConfig_DownSource_Module(module, status);
+   counter->counter->writeConfig_DownSource_Channel(pin, status);
+   counter->counter->writeConfig_DownSource_AnalogTrigger(analogTrigger, status);
+-	
++
+   setCounterDownSourceEdge(counter_pointer, true, false, status);
+   counter->counter->strobeReset(status);
+ }
+@@ -805,7 +736,7 @@ void setCounterExternalDirectionMode(void* counter_pointer, int32_t *status) {
+ 
+ /**
+  * Set Semi-period mode on this counter.
+- * Counts up on both rising and falling edges. 
++ * Counts up on both rising and falling edges.
+  */
+ void setCounterSemiPeriodMode(void* counter_pointer, bool highSemiPeriod, int32_t *status) {
+   Counter* counter = (Counter*) counter_pointer;
+@@ -826,8 +757,8 @@ void setCounterPulseLengthMode(void* counter_pointer, double threshold, int32_t
+ }
+ 
+ /**
+- * Get the Samples to Average which specifies the number of samples of the timer to 
+- * average when calculating the period. Perform averaging to account for 
++ * Get the Samples to Average which specifies the number of samples of the timer to
++ * average when calculating the period. Perform averaging to account for
+  * mechanical imperfections or as oversampling to increase resolution.
+  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
+  */
+@@ -837,8 +768,8 @@ int32_t getCounterSamplesToAverage(void* counter_pointer, int32_t *status) {
+ }
+ 
+ /**
+- * Set the Samples to Average which specifies the number of samples of the timer to 
+- * average when calculating the period. Perform averaging to account for 
++ * Set the Samples to Average which specifies the number of samples of the timer to
++ * average when calculating the period. Perform averaging to account for
+  * mechanical imperfections or as oversampling to increase resolution.
+  * @param samplesToAverage The number of samples to average from 1 to 127.
+  */
+@@ -994,7 +925,7 @@ void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin, bool port_a_
+ 
+   // Initialize encoder structure
+   Encoder* encoder = new Encoder();
+-  
++
+   if(port_a_pin >= kNumHeaders) {
+     port_a_pin = remapMXPChannel(port_a_pin);
+     port_a_module = 1;
+@@ -1004,7 +935,7 @@ void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin, bool port_a_
+     port_b_pin = remapMXPChannel(port_b_pin);
+     port_b_module = 1;
+   }
+-  
++
+   Resource::CreateResourceObject(&quadEncoders, tEncoder::kNumSystems);
+   encoder->index = quadEncoders->Allocate("4X Encoder");
+   *index = encoder->index;
+@@ -1070,7 +1001,7 @@ int32_t getEncoder(void* encoder_pointer, int32_t *status) {
+  * Returns the period of the most recent pulse.
+  * Returns the period of the most recent Encoder pulse in seconds.
+  * This method compenstates for the decoding type.
+- * 
++ *
+  * @deprecated Use GetRate() in favor of this method.  This returns unscaled periods and GetRate() scales using value from SetDistancePerPulse().
+  *
+  * @return Period in seconds of the most recent pulse.
+@@ -1097,9 +1028,9 @@ double getEncoderPeriod(void* encoder_pointer, int32_t *status) {
+  * that the attached device is stopped. This timeout allows users to determine if the wheels or
+  * other shaft has stopped rotating.
+  * This method compensates for the decoding type.
+- * 
++ *
+  * @deprecated Use SetMinRate() in favor of this method.  This takes unscaled periods and SetMinRate() scales using value from SetDistancePerPulse().
+- * 
++ *
+  * @param maxPeriod The maximum time between rising and falling edges before the FPGA will
+  * report the device stopped. This is expressed in seconds.
+  */
+@@ -1141,8 +1072,8 @@ void setEncoderReverseDirection(void* encoder_pointer, bool reverseDirection, in
+ }
+ 
+ /**
+- * Set the Samples to Average which specifies the number of samples of the timer to 
+- * average when calculating the period. Perform averaging to account for 
++ * Set the Samples to Average which specifies the number of samples of the timer to
++ * average when calculating the period. Perform averaging to account for
+  * mechanical imperfections or as oversampling to increase resolution.
+  * @param samplesToAverage The number of samples to average from 1 to 127.
+  */
+@@ -1155,8 +1086,8 @@ void setEncoderSamplesToAverage(void* encoder_pointer, uint32_t samplesToAverage
+ }
+ 
+ /**
+- * Get the Samples to Average which specifies the number of samples of the timer to 
+- * average when calculating the period. Perform averaging to account for 
++ * Get the Samples to Average which specifies the number of samples of the timer to
++ * average when calculating the period. Perform averaging to account for
+  * mechanical imperfections or as oversampling to increase resolution.
+  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
+  */
+@@ -1166,24 +1097,14 @@ uint32_t getEncoderSamplesToAverage(void* encoder_pointer, int32_t *status) {
+ }
+ 
+ /**
+- * Get the loop timing of the Digital Module
+- * 
++ * Get the loop timing of the PWM system
++ *
+  * @return The loop time
+- */  
++ */
+ uint16_t getLoopTiming(int32_t *status) {
+-  return getLoopTimingWithModule(1, status);
+-}
+-
+-/**
+- * Get the loop timing of the Digital Module
+- * 
+- * @return The loop time
+- */  
+-uint16_t getLoopTimingWithModule(uint8_t module, int32_t *status) {
+   return pwmSystem->readLoopTiming(status);
+ }
+ 
+-
+ /*
+  * Initialize the spi port. Opens the port if necessary and saves the handle.
+  * If opening the MXP port, also sets up the pin functions appropriately
+diff --git a/wpilibc/wpilibC++/lib/Counter.cpp b/wpilibc/wpilibC++/lib/Counter.cpp
+index 75d4f04278ad88ab2b0a47039bc458fad162d92d..8c71d9e987b7e0214d1c47a397b572cfec1e627d 100644
+--- a/wpilibc/wpilibC++/lib/Counter.cpp
++++ b/wpilibc/wpilibC++/lib/Counter.cpp
+@@ -232,8 +232,8 @@ void Counter::SetUpSource(DigitalSource *source)
+ 	else
+ 	{
+ 		int32_t status = 0;
+-		setCounterUpSourceWithModule(m_counter, source->GetModuleForRouting(), source->GetChannelForRouting(),
+-									 source->GetAnalogTriggerForRouting(), &status);
++		setCounterUpSource(m_counter, source->GetChannelForRouting(),
++		                   source->GetAnalogTriggerForRouting(), &status);
+ 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 	}
+ }
+@@ -333,8 +333,8 @@ void Counter::SetDownSource(DigitalSource *source)
+ 	else
+ 	{
+ 		int32_t status = 0;
+-		setCounterDownSourceWithModule(m_counter, source->GetModuleForRouting(),source->GetChannelForRouting(),
+-									   source->GetAnalogTriggerForRouting(), &status);
++		setCounterDownSource(m_counter, source->GetChannelForRouting(),
++		                     source->GetAnalogTriggerForRouting(), &status);
+ 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 	}
+ }
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
+index 28e01ed3a175aa11205ef6771351815d98ee58a9..3deca9a957259ed9acdf72c02f3aab598f246c8e 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
+@@ -241,8 +241,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 		m_upSource = source;
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+-		CounterJNI.setCounterUpSourceWithModule(m_counter,
+-				(byte) source.getModuleForRouting(),
++		CounterJNI.setCounterUpSource(m_counter,
+ 				source.getChannelForRouting(),
+ 				(byte) (source.getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
+ 		HALUtil.checkStatus(status.asIntBuffer());
+@@ -333,8 +332,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 		}
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+-		CounterJNI.setCounterDownSourceWithModule(m_counter,
+-				(byte) source.getModuleForRouting(),
++		CounterJNI.setCounterDownSource(m_counter,
+ 				source.getChannelForRouting(),
+ 				(byte) (source.getAnalogTriggerForRouting() ? 1 : 0), status.asIntBuffer());
+ 		if (status.asIntBuffer().get(0) == HALUtil.PARAMETER_OUT_OF_RANGE) {
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/AnalogJNI.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/AnalogJNI.java
+index 47dc3a99007344ec95b1f076fb65dee0b2beee15..d241bcc3a6b33470f181f6d890cc08f18020d895 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/AnalogJNI.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/AnalogJNI.java
+@@ -29,8 +29,6 @@ public class AnalogJNI extends JNIWrapper {
+ 	public static native double getAnalogOutput(ByteBuffer port_pointer, IntBuffer status);
+ 	public static native void setAnalogSampleRate(double samplesPerSecond, IntBuffer status);
+ 	public static native double getAnalogSampleRate(IntBuffer status);
+-	public static native void setAnalogSampleRateWithModule(byte module, double samplesPerSecond, IntBuffer status);
+-	public static native double getAnalogSampleRateWithModule(byte module, IntBuffer status);
+ 	public static native void setAnalogAverageBits(ByteBuffer analog_port_pointer, int bits, IntBuffer status);
+ 	public static native int getAnalogAverageBits(ByteBuffer analog_port_pointer, IntBuffer status);
+ 	public static native void setAnalogOversampleBits(ByteBuffer analog_port_pointer, int bits, IntBuffer status);
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/CounterJNI.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/CounterJNI.java
+index fb00f40e2f965ac9af72448b5450ca9f0b85258b..60f0e1706e91c7942d83d5fd162dacdb7c5d0d6f 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/CounterJNI.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/CounterJNI.java
+@@ -7,10 +7,10 @@ public class CounterJNI extends JNIWrapper {
+ 	public static native ByteBuffer initializeCounter(int mode, IntBuffer index, IntBuffer status);
+ 	public static native void freeCounter(ByteBuffer counter_pointer, IntBuffer status);
+ 	public static native void setCounterAverageSize(ByteBuffer counter_pointer, int size, IntBuffer status);
+-	public static native void setCounterUpSourceWithModule(ByteBuffer counter_pointer, byte module, int pin, byte analogTrigger, IntBuffer status);
++	public static native void setCounterUpSource(ByteBuffer counter_pointer, int pin, byte analogTrigger, IntBuffer status);
+ 	public static native void setCounterUpSourceEdge(ByteBuffer counter_pointer, byte risingEdge, byte fallingEdge, IntBuffer status);
+ 	public static native void clearCounterUpSource(ByteBuffer counter_pointer, IntBuffer status);
+-	public static native void setCounterDownSourceWithModule(ByteBuffer counter_pointer, byte module, int pin, byte analogTrigger, IntBuffer status);
++	public static native void setCounterDownSource(ByteBuffer counter_pointer, int pin, byte analogTrigger, IntBuffer status);
+ 	public static native void setCounterDownSourceEdge(ByteBuffer counter_pointer, byte risingEdge, byte fallingEdge, IntBuffer status);
+ 	public static native void clearCounterDownSource(ByteBuffer counter_pointer, IntBuffer status);
+ 	public static native void setCounterUpDownMode(ByteBuffer counter_pointer, IntBuffer status);
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/DIOJNI.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/DIOJNI.java
+index 0f92b97a2de1342bec7d38a0147f1fe838c4efa0..7091e5eb36e138d2eaf4847f066b23cefc272e12 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/DIOJNI.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/DIOJNI.java
+@@ -10,13 +10,8 @@ public class DIOJNI extends JNIWrapper {
+ 	public static native void setDIO(ByteBuffer digital_port_pointer, short value, IntBuffer status);
+ 	public static native byte getDIO(ByteBuffer digital_port_pointer, IntBuffer status);
+ 	public static native byte getDIODirection(ByteBuffer digital_port_pointer, IntBuffer status);
+-	//public static native byte remapDigitalChannel(int pin, IntBuffer status);
+-	//public static native byte unmapDigitalChannel(int pin, IntBuffer status);
+-	public static native byte checkDigitalModule(byte module);
+ 	public static native void pulse(ByteBuffer digital_port_pointer, double pulseLength, IntBuffer status);
+ 	public static native byte isPulsing(ByteBuffer digital_port_pointer, IntBuffer status);
+ 	public static native byte isAnyPulsing(IntBuffer status);
+-	public static native byte isAnyPulsingWithModule(byte module, IntBuffer status);
+ 	public static native short getLoopTiming(IntBuffer status);
+-	public static native short getLoopTimingWithModule(byte module, IntBuffer status);
+ }
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java
+index f09c82e786e85d94dcc40bd54a19213b31bb2f68..fdeeeb7a48f069300fded3d18dc6c6a815c5d920 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java
+@@ -11,13 +11,8 @@ public class PWMJNI extends DIOJNI {
+ 	public static native short getPWM(ByteBuffer digital_port_pointer, IntBuffer status);
+ 	public static native void setPWMPeriodScale(ByteBuffer digital_port_pointer, int squelchMask, IntBuffer status);
+ 	public static native ByteBuffer allocatePWM(IntBuffer status);
+-	public static native ByteBuffer allocatePWMWithModule(byte module, IntBuffer status);
+ 	public static native void freePWM(ByteBuffer pwmGenerator, IntBuffer status);
+-	public static native void freePWMWithModule(byte module, ByteBuffer pwmGenerator, IntBuffer status);
+ 	public static native void setPWMRate(double rate, IntBuffer status);
+-	public static native void setPWMRateWithModule(byte module, double rate, IntBuffer status);
+ 	public static native void setPWMDutyCycle(ByteBuffer pwmGenerator, double dutyCycle, IntBuffer status);
+-	public static native void setPWMDutyCycleWithModule(byte module, ByteBuffer pwmGenerator, double dutyCycle, IntBuffer status);
+ 	public static native void setPWMOutputChannel(ByteBuffer pwmGenerator, int pin, IntBuffer status);
+-	public static native void setPWMOutputChannelWithModule(byte module, ByteBuffer pwmGenerator, int pin, IntBuffer status);
+ }
+diff --git a/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp b/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp
+index b57e450369dda312384b92aac4ae48e7a22178bf..fbb37d4b23d5608a8e2d3475c466d393d8f1cb8e 100644
+--- a/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp
+@@ -148,37 +148,6 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogSamp
+ 	return returnValue;
+ }
+ 
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+- * Method:    setAnalogSampleRateWithModule
+- * Signature: (BDLjava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogSampleRateWithModule
+-  (JNIEnv * env, jclass, jbyte module, jdouble value, jobject status)
+-{
+-	ANALOGJNI_LOG(logDEBUG) << "Module = " << (jint)module;
+-	ANALOGJNI_LOG(logDEBUG) << "SampleRate = " << value;
+-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	setAnalogSampleRateWithModule( module, value, statusPtr );
+-	ANALOGJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+- * Method:    getAnalogSampleRateWithModule
+- * Signature: (BLjava/nio/IntBuffer;)D
+- */
+-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogSampleRateWithModule
+-  (JNIEnv * env, jclass, jbyte module, jobject status)
+-{
+-	ANALOGJNI_LOG(logDEBUG) << "Module = " << (jint)module;
+-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	double returnValue = getAnalogSampleRateWithModule( module, statusPtr );
+-	ANALOGJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+-	ANALOGJNI_LOG(logDEBUG) << "SampleRate = " << returnValue;
+-	return returnValue;
+-}
+-
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+  * Method:    setAnalogAverageBits
+diff --git a/wpilibj/wpilibJavaJNI/lib/CounterJNI.cpp b/wpilibj/wpilibJavaJNI/lib/CounterJNI.cpp
+index 2c743ea83dba383663122de731b23a1a035e758e..34f2dedc4482cf4c4e7f8e6d8b528bbe21b4482b 100644
+--- a/wpilibj/wpilibJavaJNI/lib/CounterJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/CounterJNI.cpp
+@@ -72,21 +72,20 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterAvera
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+- * Method:    setCounterUpSourceWithModule
++ * Method:    setCounterUpSource
+  * Signature: (Ljava/nio/ByteBuffer;BIBLjava/nio/IntBuffer;)V
+  */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSourceWithModule
+-  (JNIEnv * env, jclass, jobject id, jbyte module, jint pin, jbyte analogTrigger, jobject status)
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSource
++  (JNIEnv * env, jclass, jobject id, jint pin, jbyte analogTrigger, jobject status)
+ {
+-	COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterUpSourceWithModule";
++	COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterUpSource";
+ 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+ 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
+-	COUNTERJNI_LOG(logDEBUG) << "Module = " << (jint)module;
+ 	COUNTERJNI_LOG(logDEBUG) << "Pin = " << pin;
+ 	COUNTERJNI_LOG(logDEBUG) << "AnalogTrigger = " << (jint)analogTrigger;
+ 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+ 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+-	setCounterUpSourceWithModule(*javaId, module, pin, analogTrigger, statusPtr);
++	setCounterUpSource(*javaId, pin, analogTrigger, statusPtr);
+ 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ }
+ 
+@@ -128,21 +127,20 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterUpS
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+- * Method:    setCounterDownSourceWithModule
++ * Method:    setCounterDownSource
+  * Signature: (Ljava/nio/ByteBuffer;BIBLjava/nio/IntBuffer;)V
+  */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSourceWithModule
+-  (JNIEnv * env, jclass, jobject id, jbyte module, jint pin, jbyte analogTrigger, jobject status)
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSource
++  (JNIEnv * env, jclass, jobject id, jint pin, jbyte analogTrigger, jobject status)
+ {
+-	COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterDownSourceWithModule";
++	COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterDownSource";
+ 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+ 	COUNTERJNI_LOG(logDEBUG) << "Counter Ptr = " << *javaId;
+-	COUNTERJNI_LOG(logDEBUG) << "Module = " << (jint)module;
+ 	COUNTERJNI_LOG(logDEBUG) << "Pin = " << pin;
+ 	COUNTERJNI_LOG(logDEBUG) << "AnalogTrigger = " << (jint)analogTrigger;
+ 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+ 	COUNTERJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+-	setCounterDownSourceWithModule(*javaId, module, pin, analogTrigger, statusPtr);
++	setCounterDownSource(*javaId, pin, analogTrigger, statusPtr);
+ 	COUNTERJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ }
+ 
+diff --git a/wpilibj/wpilibJavaJNI/lib/DIOJNI.cpp b/wpilibj/wpilibJavaJNI/lib/DIOJNI.cpp
+index dac6a26700704442b64480adbb5010efb284a71a..77b3a67f454936982578c9fc89dfd688f62184b8 100644
+--- a/wpilibj/wpilibJavaJNI/lib/DIOJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/DIOJNI.cpp
+@@ -119,21 +119,6 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIODirection
+ 
+ }
+ 
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+- * Method:    checkDigitalModule
+- * Signature: (B)B
+- */
+-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_checkDigitalModule
+-  (JNIEnv *, jclass, jbyte value)
+-{
+-	DIOJNI_LOG(logDEBUG) << "Calling DIOJNI checkDigitalModule";
+-	DIOJNI_LOG(logDEBUG) << "Module = " << (jint)value;
+-	jbyte returnValue = checkDigitalModule( value );
+-	DIOJNI_LOG(logDEBUG) << "checkDigitalModuleResult = " << (jint)returnValue;
+-	return returnValue;
+-}
+-
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+  * Method:    pulse
+@@ -170,18 +155,6 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isAnyPulsing
+ 
+ }
+ 
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+- * Method:    isAnyPulsingWithModule
+- * Signature: (BLjava/nio/IntBuffer;)B
+- */
+-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_isAnyPulsingWithModule
+-  (JNIEnv *, jclass, jbyte, jobject)
+-{
+-	assert(false);
+-
+-}
+-
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+  * Method:    getLoopTiming
+@@ -198,15 +171,3 @@ JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getLoopTiming
+ 	return returnValue;
+ 
+ }
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+- * Method:    getLoopTimingWithModule
+- * Signature: (BLjava/nio/IntBuffer;)S
+- */
+-JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_getLoopTimingWithModule
+-  (JNIEnv *, jclass, jbyte, jobject)
+-{
+-	assert(false);
+-
+-}
+diff --git a/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp b/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
+index 0df74aa2307cad78a264c4e2ef952f2bdec043a2..6c208fa90bfba980b11879b02eec9ac70a1707a1 100644
+--- a/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
+@@ -82,25 +82,6 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWM
+ 
+ }
+ 
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+- * Method:    allocatePWMWithModule
+- * Signature: (BLjava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
+- */
+-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWMWithModule
+-  (JNIEnv * env, jclass, jbyte module, jobject status)
+-{
+-	PWMJNI_LOG(logDEBUG) << "Calling PWMJNI allocatePWMWithModule";
+-	PWMJNI_LOG(logDEBUG) << "Module = " << (jint)module;
+-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+-	void** pwmPtr = (void**)new unsigned char[4];
+-	*pwmPtr =  allocatePWMWithModule(module, statusPtr);
+-	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+-	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *pwmPtr;
+-	return env->NewDirectByteBuffer( pwmPtr, 4);
+-}
+-
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+  * Method:    freePWM
+@@ -118,24 +99,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWM
+ 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ }
+ 
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+- * Method:    freePWMWithModule
+- * Signature: (BLjava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMWithModule
+-  (JNIEnv * env, jclass, jbyte module, jobject id, jobject status)
+-{
+-	PWMJNI_LOG(logDEBUG) << "Calling PWMJNI freePWMWithModule";
+-	PWMJNI_LOG(logDEBUG) << "Module = " << (jint)module;
+-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+-	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
+-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+-	freePWMWithModule(module, *javaId, statusPtr);
+-	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+-}
+-
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+  * Method:    setPWMRate
+@@ -152,23 +115,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMRate
+ 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ }
+ 
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+- * Method:    setPWMRateWithModule
+- * Signature: (BDLjava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMRateWithModule
+-  (JNIEnv * env, jclass, jbyte module, jdouble value, jobject status)
+-{
+-	PWMJNI_LOG(logDEBUG) << "Calling PWMJNI setPWMRateWithModule";
+-	PWMJNI_LOG(logDEBUG) << "Module = " << (jint)module;
+-	PWMJNI_LOG(logDEBUG) << "Rate= " << value;
+-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+-	setPWMRateWithModule(module, value, statusPtr);
+-	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+-}
+-
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+  * Method:    setPWMDutyCycle
+@@ -187,25 +133,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMDutyCycle
+ 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ }
+ 
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+- * Method:    setPWMDutyCycleWithModule
+- * Signature: (BLjava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMDutyCycleWithModule
+-  (JNIEnv * env, jclass, jbyte module, jobject id, jdouble value, jobject status)
+-{
+-	PWMJNI_LOG(logDEBUG) << "Calling PWMJNI setPWMDutyCycleWithModule";
+-	PWMJNI_LOG(logDEBUG) << "Module = " << (jint)module;
+-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+-	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
+-	PWMJNI_LOG(logDEBUG) << "DutyCycle= " << value;
+-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+-	setPWMDutyCycleWithModule( module, *javaId, value, statusPtr);
+-	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+-}
+-
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+  * Method:    setPWMOutputChannel
+@@ -223,22 +150,3 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMOutputChannel
+ 	setPWMOutputChannel(*javaId, (uint32_t) value, statusPtr);
+ 	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ }
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+- * Method:    setPWMOutputChannelWithModule
+- * Signature: (BLjava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMOutputChannelWithModule
+-  (JNIEnv * env, jclass, jbyte module, jobject id, jint value, jobject status)
+-{
+-	PWMJNI_LOG(logDEBUG) << "Calling PWMJNI setPWMOutputChannelWithModule";
+-	PWMJNI_LOG(logDEBUG) << "Module = " << (jint)module;
+-	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+-	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
+-	PWMJNI_LOG(logDEBUG) << "Pin= " << value;
+-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	PWMJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+-	setPWMOutputChannelWithModule( module, *javaId, (uint32_t) value, statusPtr);
+-	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+-}

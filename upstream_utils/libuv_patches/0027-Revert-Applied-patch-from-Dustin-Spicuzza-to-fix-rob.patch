@@ -1,0 +1,283 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fredric Silberberg <fredric@fsilberberg.com>
+Date: Tue, 4 Mar 2014 21:49:25 -0500
+Subject: [PATCH 0027/6262] Revert "Applied patch from Dustin Spicuzza to fix
+ robot hang"
+
+This reverts commit d3ef8de5e99b03763ef2ddc9c6dd735f8c0a442b.
+---
+ .../networktables2/stream/FDIOStream.cpp      | 44 ++++---------------
+ .../networktables2/stream/FDIOStream.cpp      | 44 ++++---------------
+ .../networktables2/stream/FDIOStream.cpp      | 43 +++---------------
+ .../networktables2/NetworkTableEntry.h        |  1 -
+ .../networktables2/NetworkTableEntry.cpp      | 11 -----
+ .../native/networktables2/WriteManager.cpp    | 30 ++++---------
+ 6 files changed, 31 insertions(+), 142 deletions(-)
+
+diff --git a/networktables/cpp/Athena/src/main/native/networktables2/stream/FDIOStream.cpp b/networktables/cpp/Athena/src/main/native/networktables2/stream/FDIOStream.cpp
+index 107e19593cd1a95cef2917a9121456604c76b339..74fca50736ba78598125f297ac5cb18919815130 100644
+--- a/networktables/cpp/Athena/src/main/native/networktables2/stream/FDIOStream.cpp
++++ b/networktables/cpp/Athena/src/main/native/networktables2/stream/FDIOStream.cpp
+@@ -24,13 +24,6 @@ FDIOStream::FDIOStream(int _fd){
+   //	f = fdopen(_fd, "rbwb");
+   //	if(f==NULL)
+   //		throw IOException("Could not open stream from file descriptor", errno);
+-  // Set the TCP socket to be non-blocking
+-  int flags = fcntl(fd, F_GETFL, 0);
+-  if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0)
+-  {
+-    ::close(fd);
+-    throw IOException("Could not set socket to non-blocking mode");
+-  }
+ }
+ FDIOStream::~FDIOStream(){
+ 	close();
+@@ -73,35 +66,14 @@ int FDIOStream::read(void* ptr, int numbytes){
+ 	return totalRead;
+ }
+ int FDIOStream::write(const void* ptr, int numbytes){
+-	int numWrote = ::write(fd, (char*)ptr, numbytes);
+-	if(numWrote==numbytes)
+-		return numWrote;
+-
+-	if (numWrote == -1 && (errno == EWOULDBLOCK || errno == EAGAIN))
+-	{
+-		// see if write timeout expires
+-		struct timeval timeout;
+-		fd_set fdSet;
+-
+-		FD_ZERO(&fdSet);
+-		FD_SET(fd, &fdSet);
+-		timeout.tv_sec = 1;		// wait 1 second for the other side to connect
+-		timeout.tv_usec = 0;
+-
+-		int select_result = select(FD_SETSIZE, NULL, &fdSet, NULL, &timeout);
+-		if ( select_result < 0)
+-			throw IOException("Select returned an error on write");
+-
+-		if (FD_ISSET(fd, &fdSet)) {
+-			numWrote = ::write(fd, (char*)ptr, numbytes);
+-			if(numWrote==numbytes)
+-				return numWrote;
+-		}
+-	}
+- 	
+-	perror("write error: ");
+-	fflush(stderr);
+-	throw IOException("Could not write all bytes to fd stream");
++  int numWrote = ::write(fd, (char*)ptr, numbytes);//TODO: this is bad
++  //int numWrote = fwrite(ptr, 1, numbytes, f);
++  if(numWrote==numbytes)
++    return numWrote;
++  perror("write error: ");
++  fflush(stderr);
++  throw IOException("Could not write all bytes to fd stream");
++	
+ }
+ void FDIOStream::flush(){
+   //if(fflush(f)==EOF)
+diff --git a/networktables/cpp/Azalea/src/main/native/networktables2/stream/FDIOStream.cpp b/networktables/cpp/Azalea/src/main/native/networktables2/stream/FDIOStream.cpp
+index f62b819b6baa3006d7425174be48193bfac3af36..d0dd657c9bdb8dbcabc5ae5c5a9a2a5e4c5991ac 100644
+--- a/networktables/cpp/Azalea/src/main/native/networktables2/stream/FDIOStream.cpp
++++ b/networktables/cpp/Azalea/src/main/native/networktables2/stream/FDIOStream.cpp
+@@ -22,13 +22,6 @@ FDIOStream::FDIOStream(int _fd){
+   //	f = fdopen(_fd, "rbwb");
+   //	if(f==NULL)
+   //		throw IOException("Could not open stream from file descriptor", errno);
+-  // Set the TCP socket to be non-blocking
+-  int on = 1;
+-  if (ioctl(fd, FIONBIO, (char*)&on) < 0)
+-  {
+-    ::close(fd);
+-    throw IOException("Could not set socket to non-blocking mode");
+-  }
+ }
+ FDIOStream::~FDIOStream(){
+ 	close();
+@@ -71,35 +64,14 @@ int FDIOStream::read(void* ptr, int numbytes){
+ 	return totalRead;
+ }
+ int FDIOStream::write(const void* ptr, int numbytes){
+-	int numWrote = ::write(fd, (char*)ptr, numbytes);
+-	if(numWrote==numbytes)
+-		return numWrote;
+-
+-	if (numWrote == -1 && (errno == EWOULDBLOCK || errno == EAGAIN))
+-	{
+-		// see if write timeout expires
+-		struct timeval timeout;
+-		fd_set fdSet;
+-
+-		FD_ZERO(&fdSet);
+-		FD_SET(fd, &fdSet);
+-		timeout.tv_sec = 1;		// wait 1 second for the other side to connect
+-		timeout.tv_usec = 0;
+-
+-		int select_result = select(FD_SETSIZE, NULL, &fdSet, NULL, &timeout);
+-		if ( select_result < 0)
+-			throw IOException("Select returned an error on write");
+-
+-		if (FD_ISSET(fd, &fdSet)) {
+-			numWrote = ::write(fd, (char*)ptr, numbytes);
+-			if(numWrote==numbytes)
+-				return numWrote;
+-		}
+-	}
+- 	
+-	perror("write error: ");
+-	fflush(stderr);
+-	throw IOException("Could not write all bytes to fd stream");
++  int numWrote = ::write(fd, (char*)ptr, numbytes);//TODO: this is bad
++  //int numWrote = fwrite(ptr, 1, numbytes, f);
++  if(numWrote==numbytes)
++    return numWrote;
++  perror("write error: ");
++  fflush(stderr);
++  throw IOException("Could not write all bytes to fd stream");
++	
+ }
+ void FDIOStream::flush(){
+   //if(fflush(f)==EOF)
+diff --git a/networktables/cpp/Win32/src/main/native/networktables2/stream/FDIOStream.cpp b/networktables/cpp/Win32/src/main/native/networktables2/stream/FDIOStream.cpp
+index 0e8d23cf55e7aa800e278a64a342795807ee541d..f1868ba330643b10841ab113dd8bc2ce25b3a740 100644
+--- a/networktables/cpp/Win32/src/main/native/networktables2/stream/FDIOStream.cpp
++++ b/networktables/cpp/Win32/src/main/native/networktables2/stream/FDIOStream.cpp
+@@ -20,13 +20,6 @@
+ 
+ FDIOStream::FDIOStream(int _fd){
+   fd = _fd;
+-  // Set the TCP socket to be non-blocking
+-  u_long on = 1;
+-  if (ioctlsocket(fd, FIONBIO, &on))
+-  {
+-    ::close(fd);
+-    throw IOException("Could not set socket to non-blocking mode");
+-  }
+ }
+ 
+ FDIOStream::~FDIOStream(){
+@@ -86,35 +79,13 @@ int Send( int sockfd,char* Data, size_t sizeData )
+ 
+ int FDIOStream::write(const void* ptr, int numbytes)
+ {
+-	int numWrote = ::write(fd, (char*)ptr, numbytes);
+-	if(numWrote==numbytes)
+-		return numWrote;
+-
+-	if (numWrote == -1 && (errno == EWOULDBLOCK || errno == EAGAIN))
+-	{
+-		// see if write timeout expires
+-		struct timeval timeout;
+-		fd_set fdSet;
+-
+-		FD_ZERO(&fdSet);
+-		FD_SET(fd, &fdSet);
+-		timeout.tv_sec = 1;		// wait 1 second for the other side to connect
+-		timeout.tv_usec = 0;
+-
+-		int select_result = select(FD_SETSIZE, NULL, &fdSet, NULL, &timeout);
+-		if ( select_result < 0)
+-			throw IOException("Select returned an error on write");
+-
+-		if (FD_ISSET(fd, &fdSet)) {
+-			numWrote = ::write(fd, (char*)ptr, numbytes);
+-			if(numWrote==numbytes)
+-				return numWrote;
+-		}
+-	}
+- 	
+-	perror("write error: ");
+-	fflush(stderr);
+-	throw IOException("Could not write all bytes to fd stream");
++  int numWrote = Send(fd,(char *)ptr,numbytes);
++  if(numWrote==numbytes)
++    return numWrote;
++  perror("write error: ");
++  fflush(stderr);
++  throw IOException("Could not write all bytes to fd stream");
++	
+ }
+ 
+ void FDIOStream::flush(){
+diff --git a/networktables/cpp/include/src/main/include/networktables2/NetworkTableEntry.h b/networktables/cpp/include/src/main/include/networktables2/NetworkTableEntry.h
+index 27223e4c53c1d5e86c192a44221d68fe175076b3..2a2900435e69ca7226818b78ba4d736e5e1066ad 100644
+--- a/networktables/cpp/include/src/main/include/networktables2/NetworkTableEntry.h
++++ b/networktables/cpp/include/src/main/include/networktables2/NetworkTableEntry.h
+@@ -42,7 +42,6 @@ public:
+ 	
+ 	NetworkTableEntry(std::string& name, NetworkTableEntryType* type, EntryValue value);
+ 	NetworkTableEntry(EntryId id, std::string& name, SequenceNumber sequenceNumber, NetworkTableEntryType* type, EntryValue value);
+-	NetworkTableEntry(const NetworkTableEntry &);
+ 	virtual ~NetworkTableEntry();
+ 
+ 	EntryId GetId();
+diff --git a/networktables/cpp/parent/src/main/native/networktables2/NetworkTableEntry.cpp b/networktables/cpp/parent/src/main/native/networktables2/NetworkTableEntry.cpp
+index 658c7c7a8560c4d7569ddd6b403fe101aaf8f511..9538c91df60ae768a653366acd33aa255e3007ac 100644
+--- a/networktables/cpp/parent/src/main/native/networktables2/NetworkTableEntry.cpp
++++ b/networktables/cpp/parent/src/main/native/networktables2/NetworkTableEntry.cpp
+@@ -20,17 +20,6 @@ NetworkTableEntry::NetworkTableEntry(EntryId _id, std::string& _name, SequenceNu
+ 	m_isDirty = false;
+ }
+ 
+-NetworkTableEntry::NetworkTableEntry(const NetworkTableEntry &other) :
+-	name(other.name),
+-	id(other.id),
+-	sequenceNumber(other.sequenceNumber),
+-	type(other.type),
+-	m_isNew(other.m_isNew),
+-	m_isDirty(other.m_isDirty)
+-{
+-	value = type->copyValue(other.value);
+-}
+-
+ NetworkTableEntry::~NetworkTableEntry(){
+   type->deleteValue(value);
+ }
+diff --git a/networktables/cpp/parent/src/main/native/networktables2/WriteManager.cpp b/networktables/cpp/parent/src/main/native/networktables2/WriteManager.cpp
+index c8eb8fee463acf94e22a656076ff6e7be9058a34..bbe08f504d6d5dd64cfd89eb5313137493dfcdd4 100644
+--- a/networktables/cpp/parent/src/main/native/networktables2/WriteManager.cpp
++++ b/networktables/cpp/parent/src/main/native/networktables2/WriteManager.cpp
+@@ -97,17 +97,10 @@ void WriteManager::run() {
+ 		entry = ((std::queue<NetworkTableEntry*>*)outgoingAssignmentQueue)->front();
+ 		((std::queue<NetworkTableEntry*>*)outgoingAssignmentQueue)->pop();
+ 		{
+-			NetworkTableEntry * entryCopy;
+-
+-			{
+-				NTSynchronized sync(entryStore.LOCK);
+-				entry->MakeClean();
+-				wrote = true;
+-				entryCopy = new NetworkTableEntry(*entry);
+-			}
+-
+-			receiver.offerOutgoingAssignment(entryCopy);
+-			delete entryCopy;
++			NTSynchronized sync(entryStore.LOCK);
++			entry->MakeClean();
++			wrote = true;
++			receiver.offerOutgoingAssignment(entry);
+ 		}
+ 	}
+ 	
+@@ -115,17 +108,10 @@ void WriteManager::run() {
+ 		entry = ((std::queue<NetworkTableEntry*>*)outgoingUpdateQueue)->front();
+ 		((std::queue<NetworkTableEntry*>*)outgoingUpdateQueue)->pop();
+ 		{ 
+-			NetworkTableEntry * entryCopy;
+-
+-			{
+-				NTSynchronized sync(entryStore.LOCK);
+-				entry->MakeClean();
+-				wrote = true;
+-				entryCopy = new NetworkTableEntry(*entry);
+-			}
+-
+-			receiver.offerOutgoingUpdate(entryCopy);
+-			delete entryCopy;
++			NTSynchronized sync(entryStore.LOCK);
++			entry->MakeClean();
++			wrote = true;
++			receiver.offerOutgoingUpdate(entry);
+ 		}
+ 	}
+ 	

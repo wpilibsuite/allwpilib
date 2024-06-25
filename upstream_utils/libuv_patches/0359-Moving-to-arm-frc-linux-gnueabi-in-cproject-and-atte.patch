@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Tue, 23 Sep 2014 19:02:16 -0400
+Subject: [PATCH 0359/6262] Moving to arm-frc-linux-gnueabi in cproject and
+ attempting to use gdb (overwritten)
+
+Change-Id: I7dd5017f461bbff82c5ed6f64842880e4f0a44c9
+---
+ .../resources/templates/.cproject                             | 4 ++--
+ .../wpilib/plugins/cpp/launching/DeployLaunchShortcut.java    | 3 ++-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index 34a8c1b7dc8a9a0611cf6486341ab42692f8aacd..07b1eb4c66489e6a8b3bc6a20fa623c5e53bd7e4 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -15,7 +15,7 @@
+ 				<configuration artifactName="FRCUserProgram" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751" name="Debug" parent="cdt.managedbuild.config.gnu.cross.exe.debug">
+ 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751." name="/" resourcePath="">
+ 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.debug.379433867" name="Cross GCC" nonInternalBuilderId="cdt.managedbuild.builder.gnu.cross" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.debug">
+-							<option id="cdt.managedbuild.option.gnu.cross.prefix.541714056" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-none-linux-gnueabi-" valueType="string"/>
++							<option id="cdt.managedbuild.option.gnu.cross.prefix.541714056" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-frc-linux-gnueabi-" valueType="string"/>
+ 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.864368257" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+ 							<builder autoBuildTarget="all" buildPath="${workspace_loc:/$project}/Debug" cleanBuildTarget="clean" id="org.eclipse.cdt.build.core.internal.builder.1308552451" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+ 							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.1261239456" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+@@ -87,7 +87,7 @@
+ 				<configuration artifactName="FRCUserProgram" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.release.300115601" name="Release" parent="cdt.managedbuild.config.gnu.cross.exe.release">
+ 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.release.300115601." name="/" resourcePath="">
+ 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.release.2008160346" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.release">
+-							<option id="cdt.managedbuild.option.gnu.cross.prefix.511797597" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-none-linux-gnueabi-" valueType="string"/>
++							<option id="cdt.managedbuild.option.gnu.cross.prefix.511797597" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-frc-linux-gnueabi-" valueType="string"/>
+ <targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.2130959809" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+ 							<builder buildPath="${workspace_loc:/$project}/Release" id="cdt.managedbuild.builder.gnu.cross.1554116591" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
+ 							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.985086840" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java
+index bf9287888be0ec5acdad899ea7db79b64b4f6319..8d47e1f6bb86c91ceb0110e824673ba7edeb7c94 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java
+@@ -159,7 +159,8 @@ public class DeployLaunchShortcut implements ILaunchShortcut
+ 				exes.size() > 0 ? exes.toArray(new Executable[0])[0].getPath().makeRelativeTo(activeProj.getLocation()).toString():
+ 			 "Debug/FRCUserProgram");
+ 			 
+-			 
++		// This value is being overwritten somewhere
++		config.setAttribute("org.eclipse.cdt.dsf.gdb.DEBUG_NAME", "arm-frc-linux-gnueabi-gdb");
+ 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_PATH, "/home/admin/FRCUserProgram");
+ 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_CONNECTION, remote_connection);
+ 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_SKIP_DOWNLOAD_TO_TARGET, false);

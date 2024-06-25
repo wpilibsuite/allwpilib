@@ -1,0 +1,640 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Mon, 23 Jun 2014 15:12:58 -0400
+Subject: [PATCH 0120/6262] Adds CommandTests to the C++ Integration Test Suite
+ Also adds/updates some comments in the Java Command Tests
+
+Change-Id: I24ae6cce06b8d5251e1cb115cd725f24a871635f
+---
+ .../include/command/MockCommand.h             |  48 ++
+ .../src/command/CommandTest.cpp               | 458 ++++++++++++++++++
+ .../src/command/MockCommand.cpp               |  51 ++
+ .../command/CommandParallelGroupTest.java     |   5 +-
+ .../command/CommandSequentialGroupTest.java   |   1 -
+ .../wpilibj/command/DefaultCommandTest.java   |   4 +-
+ 6 files changed, 563 insertions(+), 4 deletions(-)
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/include/command/MockCommand.h
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/command/CommandTest.cpp
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/command/MockCommand.cpp
+
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/command/MockCommand.h b/wpilibc/wpilibC++IntegrationTests/include/command/MockCommand.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..25d353a07d39ddc268006fec18f7acea390e845a
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/include/command/MockCommand.h
+@@ -0,0 +1,48 @@
++#pragma once
++
++#include "WPILib.h"
++
++class MockCommand : public Command
++{
++private:
++	int m_initializeCount;
++	int m_executeCount;
++	int m_isFinishedCount;
++	bool m_hasFinished;
++	int m_endCount;
++	int m_interruptedCount;
++protected:
++	virtual void Initialize();
++	virtual void Execute();
++	virtual bool IsFinished();
++	virtual void End();
++	virtual void Interrupted();
++public:
++	MockCommand();
++	int GetInitializeCount(){
++		return m_initializeCount;
++	}
++	bool HasInitialized();
++
++	int GetExecuteCount(){
++		return m_executeCount;
++	}
++	int GetIsFinishedCount(){
++		return m_isFinishedCount;
++	}
++	bool IsHasFinished(){
++		return m_hasFinished;
++	}
++	void SetHasFinished(bool hasFinished){
++		m_hasFinished = hasFinished;
++	}
++	int GetEndCount(){
++		return m_endCount;
++	}
++	bool HasEnd();
++
++	int GetInterruptedCount(){
++		return m_interruptedCount;
++	}
++	bool HasInterrupted();
++};
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/command/CommandTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/command/CommandTest.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..2804506c616e4651a9d6b5e4d255af230345f2e9
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/command/CommandTest.cpp
+@@ -0,0 +1,458 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "WPILib.h"
++#include "command/MockCommand.h"
++#include "gtest/gtest.h"
++
++class CommandTest : public testing::Test {
++protected:
++	virtual void SetUp() {
++		Scheduler::GetInstance()->SetEnabled(true);
++	}
++
++	/**
++	 * Tears Down the Scheduler at the end of each test.
++	 * Must be called at the end of each test inside each test in order to prevent them being deallocated
++	 * when they leave the scope of the test (causing a segfault).
++	 * This can not be done within the virtual void Teardown() method because it is called outside of the
++	 * scope of the test.
++	 */
++	void TeardownScheduler(){
++		Scheduler::GetInstance()->RemoveAll();
++	}
++
++	void AssertCommandState(MockCommand &command, int initialize, int execute, int isFinished, int end, int interrupted){
++		EXPECT_EQ(initialize, command.GetInitializeCount());
++		EXPECT_EQ(execute, command.GetExecuteCount());
++		EXPECT_EQ(isFinished, command.GetIsFinishedCount());
++		EXPECT_EQ(end, command.GetEndCount());
++		EXPECT_EQ(interrupted, command.GetInterruptedCount());
++	}
++
++};
++
++class ASubsystem : public Subsystem{
++private:
++	Command *m_command;
++public:
++	ASubsystem(const char *name):
++		Subsystem(name)
++	{
++		m_command = NULL;
++	}
++
++	virtual void InitDefaultCommand(){
++		if(m_command != NULL){
++			SetDefaultCommand(m_command);
++		}
++	}
++
++	void Init(Command *command){
++		m_command = command;
++	}
++
++};
++
++//CommandParallelGroupTest ported from CommandParallelGroupTest.java
++TEST_F(CommandTest, ParallelCommands){
++	MockCommand command1;
++	MockCommand command2;
++	CommandGroup commandGroup;
++
++	commandGroup.AddParallel(&command1);
++	commandGroup.AddParallel(&command2);
++
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++	commandGroup.Start();
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 1, 1, 0, 0);
++	AssertCommandState(command2, 1, 1, 1, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 2, 2, 0, 0);
++	AssertCommandState(command2, 1, 2, 2, 0, 0);
++	command1.SetHasFinished(true);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 3, 3, 1, 0);
++	AssertCommandState(command2, 1, 3, 3, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 3, 3, 1, 0);
++	AssertCommandState(command2, 1, 4, 4, 0, 0);
++	command2.SetHasFinished(true);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 3, 3, 1, 0);
++	AssertCommandState(command2, 1, 5, 5, 1, 0);
++
++	TeardownScheduler();
++}
++//END CommandParallelGroupTest
++
++//CommandScheduleTest ported from CommandScheduleTest.java
++TEST_F(CommandTest, RunAndTerminate){
++	MockCommand command;
++	command.Start();
++	AssertCommandState(command, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 1, 1, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 2, 2, 0, 0);
++	command.SetHasFinished(true);
++	AssertCommandState(command, 1, 2, 2, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 3, 3, 1, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 3, 3, 1, 0);
++
++	TeardownScheduler();
++}
++
++TEST_F(CommandTest, RunAndCancel){
++	MockCommand command;
++	command.Start();
++	AssertCommandState(command, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 1, 1, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 2, 2, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 3, 3, 0, 0);
++	command.Cancel();
++	AssertCommandState(command, 1, 3, 3, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 3, 3, 0, 1);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 3, 3, 0, 1);
++
++	TeardownScheduler();
++}
++//END CommandScheduleTest
++
++//CommandSequentialGroupTest ported from CommandSequentialGroupTest.java
++TEST_F(CommandTest, ThreeCommandOnSubSystem){
++	ASubsystem subsystem("Three Command Test Subsystem");
++	MockCommand command1;
++	command1.Requires(&subsystem);
++	MockCommand command2;
++	command2.Requires(&subsystem);
++	MockCommand command3;
++	command3.Requires(&subsystem);
++
++
++	CommandGroup commandGroup;
++	commandGroup.AddSequential(&command1, 1.0 );
++	commandGroup.AddSequential(&command2, 2.0 );
++	commandGroup.AddSequential(&command3);
++
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++	AssertCommandState(command3, 0, 0, 0, 0, 0);
++
++	commandGroup.Start();
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++	AssertCommandState(command3, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++	AssertCommandState(command3, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 1, 1, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++	AssertCommandState(command3, 0, 0, 0, 0, 0);
++	Wait(1);//command 1 timeout
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 1, 1, 0, 1);
++	AssertCommandState(command2, 1, 1, 1, 0, 0);
++	AssertCommandState(command3, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 1, 1, 0, 1);
++	AssertCommandState(command2, 1, 2, 2, 0, 0);
++	AssertCommandState(command3, 0, 0, 0, 0, 0);
++	Wait(2);//command 2 timeout
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 1, 1, 0, 1);
++	AssertCommandState(command2, 1, 2, 2, 0, 1);
++	AssertCommandState(command3, 1, 1 ,1, 0, 0);
++
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 1, 1, 0, 1);
++	AssertCommandState(command2, 1, 2, 2, 0, 1);
++	AssertCommandState(command3, 1, 2, 2, 0, 0);
++	command3.SetHasFinished(true);
++	AssertCommandState(command1, 1, 1, 1, 0, 1);
++	AssertCommandState(command2, 1, 2, 2, 0, 1);
++	AssertCommandState(command3, 1, 2, 2, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 1, 1, 0, 1);
++	AssertCommandState(command2, 1, 2, 2, 0, 1);
++	AssertCommandState(command3, 1, 3, 3, 1, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 1, 1, 0, 1);
++	AssertCommandState(command2, 1, 2, 2, 0, 1);
++	AssertCommandState(command3, 1, 3, 3, 1, 0);
++
++
++	TeardownScheduler();
++}
++//END CommandSequentialGroupTest
++
++
++//CommandSequentialGroupTest ported from CommandSequentialGroupTest.java
++TEST_F(CommandTest, OneCommandSupersedingAnotherBecauseOfDependencies){
++	ASubsystem subsystem("Command Superseding Test Subsystem");
++	MockCommand command1;
++	command1.Requires(&subsystem);
++	MockCommand command2;
++	command2.Requires(&subsystem);
++
++
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	command1.Start();
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 1, 1, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 2, 2, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 3, 3, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	command2.Start();
++	AssertCommandState(command1, 1, 3, 3, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 4, 4, 0, 1);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 4, 4, 0, 1);
++	AssertCommandState(command2, 1, 1, 1, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 4, 4, 0, 1);
++	AssertCommandState(command2, 1, 2, 2, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 4, 4, 0, 1);
++	AssertCommandState(command2, 1, 3, 3, 0, 0);
++
++
++	TeardownScheduler();
++}
++
++
++TEST_F(CommandTest, OneCommandFailingSupersedingBecauseFirstCanNotBeInterrupted){
++
++	ASubsystem subsystem("Command Superseding Test Subsystem");
++	MockCommand command1;
++
++	command1.Requires(&subsystem);
++
++	command1.SetInterruptible(false);
++	MockCommand command2;
++	command2.Requires(&subsystem);
++
++
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	command1.Start();
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 0, 0, 0, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 1, 1, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 2, 2, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 3, 3, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	command2.Start();
++	AssertCommandState(command1, 1, 3, 3, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command1, 1, 4, 4, 0, 0);
++	AssertCommandState(command2, 0, 0, 0, 0, 0);
++
++	TeardownScheduler();
++}
++
++//END CommandSequentialGroupTest
++
++class ModifiedMockCommand : public MockCommand{
++public:
++	ModifiedMockCommand():
++		MockCommand()
++	{
++		SetTimeout(2.0);
++	}
++	bool IsFinished(){
++		return MockCommand::IsFinished() || IsTimedOut();
++	}
++};
++
++
++TEST_F(CommandTest, TwoSecondTimeout){
++	ASubsystem subsystem("Two Second Timeout Test Subsystem");
++	ModifiedMockCommand command;
++	command.Requires(&subsystem);
++
++	command.Start();
++	AssertCommandState(command, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 1, 1, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 2, 2, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 3, 3, 0, 0);
++	Wait(2);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 4, 4, 1, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(command, 1, 4, 4, 1, 0);
++
++	TeardownScheduler();
++}
++
++
++
++TEST_F(CommandTest, DefaultCommandWhereTheInteruptingCommandEndsItself){
++	ASubsystem subsystem("Default Command Test Subsystem");
++	MockCommand defaultCommand;
++	defaultCommand.Requires(&subsystem);
++	MockCommand anotherCommand;
++	anotherCommand.Requires(&subsystem);
++
++	AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++	subsystem.Init(&defaultCommand);
++
++	AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 1, 1, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 2, 2, 0, 0);
++
++	anotherCommand.Start();
++	AssertCommandState(defaultCommand, 1, 2, 2, 0, 0);
++	AssertCommandState(anotherCommand, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++	AssertCommandState(anotherCommand, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++	AssertCommandState(anotherCommand, 1, 1, 1, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++	AssertCommandState(anotherCommand, 1, 2, 2, 0, 0);
++	anotherCommand.SetHasFinished(true);
++	AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++	AssertCommandState(anotherCommand, 1, 2, 2, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++	AssertCommandState(anotherCommand, 1, 3, 3, 1, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 2, 4, 4, 0, 1);
++	AssertCommandState(anotherCommand, 1, 3, 3, 1, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 2, 5, 5, 0, 1);
++	AssertCommandState(anotherCommand, 1, 3, 3, 1, 0);
++
++	TeardownScheduler();
++}
++
++
++
++TEST_F(CommandTest, DefaultCommandsInterruptingCommandCanceled){
++	ASubsystem subsystem("Default Command Test Subsystem");
++	MockCommand defaultCommand;
++	defaultCommand.Requires(&subsystem);
++	MockCommand anotherCommand;
++	anotherCommand.Requires(&subsystem);
++
++	AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++	subsystem.Init(&defaultCommand);
++	subsystem.InitDefaultCommand();
++	AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 1, 1, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 2, 2, 0, 0);
++
++	anotherCommand.Start();
++	AssertCommandState(defaultCommand, 1, 2, 2, 0, 0);
++	AssertCommandState(anotherCommand, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++	AssertCommandState(anotherCommand, 0, 0, 0, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++	AssertCommandState(anotherCommand, 1, 1, 1, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++	AssertCommandState(anotherCommand, 1, 2, 2, 0, 0);
++	anotherCommand.Cancel();
++	AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++	AssertCommandState(anotherCommand, 1, 2, 2, 0, 0);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 1, 3, 3, 0, 1);
++	AssertCommandState(anotherCommand, 1, 2, 2, 0, 1);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 2, 4, 4, 0, 1);
++	AssertCommandState(anotherCommand, 1, 2, 2, 0, 1);
++	Scheduler::GetInstance()->Run();
++	AssertCommandState(defaultCommand, 2, 5, 5, 0, 1);
++	AssertCommandState(anotherCommand, 1, 2, 2, 0, 1);
++
++	TeardownScheduler();
++}
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/command/MockCommand.cpp b/wpilibc/wpilibC++IntegrationTests/src/command/MockCommand.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..d8dbc8e0b424339810ce35f09c56c73104f1064a
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/command/MockCommand.cpp
+@@ -0,0 +1,51 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "command/MockCommand.h"
++
++MockCommand::MockCommand(){
++	m_initializeCount = 0;
++	m_executeCount = 0;
++	m_isFinishedCount = 0;
++	m_hasFinished = false;
++	m_endCount = 0;
++	m_interruptedCount = 0;
++}
++
++void MockCommand::Initialize(){
++	++m_initializeCount;
++}
++
++void MockCommand::Execute(){
++	++m_executeCount;
++}
++
++bool MockCommand::IsFinished(){
++	++m_isFinishedCount;
++	return IsHasFinished();
++}
++
++void MockCommand::End(){
++	++m_endCount;
++}
++
++void MockCommand::Interrupted(){
++	++m_interruptedCount;
++}
++
++
++bool MockCommand::HasInitialized(){
++	return GetInitializeCount()>0;
++}
++
++bool MockCommand::HasEnd(){
++	return GetEndCount()>0;
++}
++
++bool MockCommand::HasInterrupted(){
++	return GetInterruptedCount()>0;
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
+index 722d4595e36d547071683a40e0ae78bd62770c27..9ce6efad144bfbd297a092c912ce401b08046d78 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
+@@ -59,8 +59,11 @@ public class CommandParallelGroupTest extends AbstractCommandTest {
+ 	public void tearDown() throws Exception {
+ 	}
+ 
++	/**
++	 * Simple Parallel Command Group With 2 commands one command terminates first
++	 */
+ 	@Test
+-	public void test() {
++	public void testParallelCommandGroupWithTwoCommands() {
+ 		MockCommand command1 = new MockCommand();
+ 		MockCommand command2 = new MockCommand();
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java
+index 9bf92a29a3e772439ab09d8bb15d3bbea916ad17..fa5ef2d2436a7f7af8b58d7dbaf6a7741eca4154 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java
+@@ -60,7 +60,6 @@ public class CommandSequentialGroupTest extends AbstractCommandTest {
+ 	/**
+ 	 * Simple Command Group With 3 commands that all depend on a subsystem. Some commands have a timeout
+ 	 */
+-	//@Ignore("This currently hangs the tests, needs work")
+ 	@Test(timeout = 20000)
+ 	public void testThreeCommandOnSubSystem() {
+ 		logger.fine("Begining Test");
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java
+index f15f35e740784edb2a28fee8e4cbc4fa78ace87e..c68dec4f95e31da4159df2c614b3cbbed802d6f2 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java
+@@ -58,10 +58,10 @@ public class DefaultCommandTest extends AbstractCommandTest {
+ 	}
+ 
+ 	/**
+-	 * Testing of default commands where the interrupting command is ends itself
++	 * Testing of default commands where the interrupting command ends itself
+ 	 */
+ 	@Test
+-	public void test() {
++	public void testDefaultCommandWhereTheInteruptingCommandEndsItself() {
+ 		final ASubsystem subsystem = new ASubsystem();
+ 
+ 

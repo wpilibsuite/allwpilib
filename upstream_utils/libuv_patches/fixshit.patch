@@ -1,0 +1,115 @@
+diff --git a/wpimath/src/main/java/edu/wpi/first/math/kinematics/struct/SwerveModuleStateStruct.java b/wpimath/src/main/java/edu/wpi/first/math/kinematics/struct/SwerveModuleStateStruct.java
+index 51dd61f04..a09500831 100644
+--- a/wpimath/src/main/java/edu/wpi/first/math/kinematics/struct/SwerveModuleStateStruct.java
++++ b/wpimath/src/main/java/edu/wpi/first/math/kinematics/struct/SwerveModuleStateStruct.java
+@@ -9,33 +9,66 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
+ import edu.wpi.first.util.struct.Struct;
+ import java.nio.ByteBuffer;
+ 
++/* Struct implementation for SwerveModuleState */
+ public class SwerveModuleStateStruct implements Struct<SwerveModuleState> {
+   @Override
++  /**
++   * Gets the type class for the implemented class.
++   *
++   * @return The type class of the implemented type.
++   */
+   public Class<SwerveModuleState> getTypeClass() {
+     return SwerveModuleState.class;
+   }
+ 
+   @Override
++  /**
++   * Gets the type string for the class.
++   *
++   * @return The type string of the class.
++   */
+   public String getTypeString() {
+     return "struct:SwerveModuleState";
+   }
+ 
+   @Override
++  /**
++   * Gets the size of the struct.
++   *
++   * @return The size of the struct.
++   */
+   public int getSize() {
+     return kSizeDouble + Rotation2d.struct.getSize();
+   }
+ 
+   @Override
++  /**
++   * Returns the type schema of the struct.
++   *
++   * @return The type schema of the struct.
++   */
+   public String getSchema() {
+     return "double speed;Rotation2d angle";
+   }
+ 
+   @Override
++  /**
++   * Returns the nested structs stored by the struct.
++   *
++   * @return An array with the nested structs.
++   */
+   public Struct<?>[] getNested() {
+     return new Struct<?>[] {Rotation2d.struct};
+   }
+ 
+   @Override
++  /**
++   * Gets the stored SwerveModuleState.
++   *
++   * @param bb The ByteBuffer storing the struct.
++   *
++   * @return The SwerveModuleState stored by the struct.
++   */
+   public SwerveModuleState unpack(ByteBuffer bb) {
+     double speed = bb.getDouble();
+     Rotation2d angle = Rotation2d.struct.unpack(bb);
+@@ -43,6 +76,12 @@ public class SwerveModuleStateStruct implements Struct<SwerveModuleState> {
+   }
+ 
+   @Override
++  /**
++   * Packs the given SwerveModuleState into the given buffer.
++   *
++   * @param bb The buffer to fill.
++   * @param value The value to fill the buffer with.
++   */
+   public void pack(ByteBuffer bb, SwerveModuleState value) {
+     bb.putDouble(value.speedMetersPerSecond);
+     Rotation2d.struct.pack(bb, value.angle);
+diff --git a/wpinet/src/main/native/thirdparty/libuv/src/win/fs.cpp b/wpinet/src/main/native/thirdparty/libuv/src/win/fs.cpp
+index 26ba53993..7f3a5f328 100644
+--- a/wpinet/src/main/native/thirdparty/libuv/src/win/fs.cpp
++++ b/wpinet/src/main/native/thirdparty/libuv/src/win/fs.cpp
+@@ -1185,7 +1185,7 @@ void fs__mktemp(uv_fs_t* req, uv__fs_mktemp_func func) {
+   size_t len;
+   uint64_t v;
+   char* path;
+-  
++
+   path = (char*)req->path;
+   len = wcslen(req->file.pathw);
+   ep = req->file.pathw + len;
+@@ -1658,7 +1658,7 @@ INLINE static int fs__stat_handle(HANDLE handle, uv_stat_t* statbuf,
+     statbuf->st_mode |= (_S_IREAD | _S_IWRITE) | ((_S_IREAD | _S_IWRITE) >> 3) |
+                         ((_S_IREAD | _S_IWRITE) >> 6);
+     statbuf->st_nlink = 1;
+-    statbuf->st_blksize = 4096;    
++    statbuf->st_blksize = 4096;
+     statbuf->st_rdev = FILE_DEVICE_NULL << 16;
+     return 0;
+   }
+@@ -1704,7 +1704,7 @@ INLINE static int fs__stat_handle(HANDLE handle, uv_stat_t* statbuf,
+    * impossible to delete the file afterwards, since read-only files can't be
+    * deleted.
+    *
+-   * IOW it's all just a clusterfuck and we should think of something that
++   * IOW it's all just a trainwreck and we should think of something that
+    * makes slightly more sense.
+    *
+    * And uv_fs_chmod should probably just fail on windows or be a total no-op.

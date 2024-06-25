@@ -1,0 +1,362 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kacper Puczydlowski <k.puczydlowski@gmail.com>
+Date: Thu, 19 Jun 2014 14:56:06 -0400
+Subject: [PATCH 0115/6262] Added PDP tests for java and C++, updated
+ TestBench.h
+
+Change-Id: Idd6be8739065d757f5d1471ebb685d48a1c53e59
+---
+ wpilibc/wpilibC++/include/WPILib.h            |   1 +
+ .../include/TestBench.h                       |   5 +
+ .../wpilibC++IntegrationTests/src/PDPTest.cpp |   0
+ .../src/PowerDistributionPanelTest.cpp        | 100 ++++++++++++
+ wpilibj/wpilibJavaIntegrationTests/pom.xml    |   2 +-
+ .../java/edu/wpi/first/wpilibj/PDPTest.java   | 147 ++++++++++++++++++
+ .../wpi/first/wpilibj/WpiLibJTestSuite.java   |   3 +-
+ .../edu/wpi/first/wpilibj/test/TestBench.java |  12 +-
+ 8 files changed, 264 insertions(+), 6 deletions(-)
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/PDPTest.cpp
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/PowerDistributionPanelTest.cpp
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+
+diff --git a/wpilibc/wpilibC++/include/WPILib.h b/wpilibc/wpilibC++/include/WPILib.h
+index 5727f1e43d527fd9c92d087ab08d82ee2075c97d..be87890969353ba75436ef9401c8f60107c3635d 100644
+--- a/wpilibc/wpilibC++/include/WPILib.h
++++ b/wpilibc/wpilibC++/include/WPILib.h
+@@ -67,6 +67,7 @@
+ #include "PIDOutput.h"
+ #include "PIDSource.h"
+ #include "Preferences.h"
++#include "PowerDistributionPanel.h"
+ #include "PWM.h"
+ #include "Relay.h"
+ #include "Resource.h"
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+index 8eb1a8223ee12e9b6d77070ef0bb343341bb73f9..b1e2b8a09b9b4cba613256b4c1b318de4822f881 100644
+--- a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
++++ b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+@@ -50,4 +50,9 @@ public:
+ 
+ 	/* CAN IDs */
+ 	static const uint32_t kCANJaguarID = 1;
++
++	/* PDP channels */
++	static const uint32_t kJaguarPDPChannel = 7;
++	static const uint32_t kVictorPDPChannel = 11;
++	static const uint32_t kTalonPDPChannel = 12;
+ };
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/PDPTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/PDPTest.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/PowerDistributionPanelTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/PowerDistributionPanelTest.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..2630fe04350171cbd555bddc07924487af1325b2
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/PowerDistributionPanelTest.cpp
+@@ -0,0 +1,100 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "WPILib.h"
++#include "gtest/gtest.h"
++#include "TestBench.h"
++
++/* The current returned when the motor is not being driven */
++static const double kLowCurrent =  1.52;
++static const double kCurrentTolerance =  0.1;
++
++class PowerDistributionPanelTest : public testing::Test {
++protected:
++  PowerDistributionPanel *m_pdp;
++  Talon *m_talon;
++  Victor *m_victor;
++  Jaguar *m_jaguar;
++
++  virtual void SetUp() {
++    m_pdp = new PowerDistributionPanel();
++    m_talon = new Talon(TestBench::kTalonChannel);
++    m_victor = new Victor(TestBench::kVictorChannel);
++    m_jaguar = new Jaguar(TestBench::kJaguarChannel);
++  }
++
++  virtual void TearDown() {
++    delete m_pdp;
++    delete m_talon;
++    delete m_victor;
++    delete m_jaguar;
++  }
++
++  void Reset() {
++    /* Reset all speed controllers to 0.0 */
++    m_talon->Set(0.0f);
++    m_victor->Set(0.0f);
++    m_jaguar->Set(0.0f);
++  }
++};
++
++/**
++ * Test if the current changes when the motor is driven using a talon
++ */
++TEST_F(PowerDistributionPanelTest, CheckCurrentTalon) {
++  Reset();
++
++  /* The Current should be kLowCurrent */
++  EXPECT_NEAR(kLowCurrent, m_pdp->GetCurrent(TestBench::kTalonPDPChannel), kCurrentTolerance)
++    << "The low current was not within the expected range.";
++
++  /* Set the motor to full forward */
++  m_talon->Set(1.0);
++  Wait(0.02);
++
++  /* The current should now be greater than the low current */
++  ASSERT_GT(m_pdp->GetCurrent(TestBench::kTalonPDPChannel), kLowCurrent)
++    << "The driven current is not greater than the resting current.";
++}
++
++/**
++ * Test if the current changes when the motor is driven using a victor
++ */
++TEST_F(PowerDistributionPanelTest,CheckCurrentVictor) {
++  Reset();
++
++  /* The Current should be kLowCurrent */
++  EXPECT_NEAR(kLowCurrent, m_pdp->GetCurrent(TestBench::kVictorPDPChannel), kCurrentTolerance)
++    << "The low current was not within the expected range.";
++
++  /* Set the motor to full forward */
++  m_victor->Set(1.0);
++  Wait(0.02);
++
++  /* The current should now be greater than the low current */
++  ASSERT_GT(m_pdp->GetCurrent(TestBench::kVictorPDPChannel), kLowCurrent)
++    << "The driven current is not greater than the resting current.";
++}
++
++/**
++ * Test if the current changes when the motor is driven using a jaguar
++ */
++TEST_F(PowerDistributionPanelTest, CheckCurrentJaguar) {
++  Reset();
++
++  /* The Current should be kLowCurrent */
++  EXPECT_NEAR(kLowCurrent, m_pdp->GetCurrent(TestBench::kJaguarPDPChannel), kCurrentTolerance)
++    << "The low current was not within the expected range.";
++
++  /* Set the motor to full forward */
++  m_jaguar->Set(1.0);
++  Wait(0.02);
++
++  /* The current should now be greater than the low current */
++  ASSERT_GT(m_pdp->GetCurrent(TestBench::kJaguarPDPChannel), kLowCurrent)
++    << "The driven current is not greater than the resting current.";
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/pom.xml b/wpilibj/wpilibJavaIntegrationTests/pom.xml
+index b13f2e5a33a92af8f31c89f5e3dd499c224fb903..788080179d4dd02c4cf3c4947dec9e4794cfc645 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/pom.xml
++++ b/wpilibj/wpilibJavaIntegrationTests/pom.xml
+@@ -26,7 +26,7 @@
+ 		</dependency>
+ 		<dependency>
+ 			<groupId>org.hamcrest</groupId>
+-			<artifactId>hamcrest-core</artifactId>
++			<artifactId>hamcrest-all</artifactId>
+ 			<version>1.3</version>
+ 		</dependency>
+ 		<!--dependency>
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..25866d3645c1859a49ab5a579efc322e08c65836
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+@@ -0,0 +1,147 @@
++package edu.wpi.first.wpilibj;
++
++import static org.junit.Assert.*;
++import static org.hamcrest.Matchers.*;
++
++import java.util.logging.Logger;
++
++import org.junit.After;
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.can.CANTimeoutException;
++import edu.wpi.first.wpilibj.test.AbstractComsSetup;
++import edu.wpi.first.wpilibj.test.TestBench;
++
++public class PDPTest extends AbstractComsSetup {
++	private static final Logger logger = Logger.getLogger(PCMTest.class.getName());
++	/* The current returned when the motor is not being driven */
++	protected static final double  kLowCurrent =  1.52;
++	
++	protected static final double  kCurrentTolerance =  0.1;
++	
++	private static PowerDistributionPanel pdp;
++	private static Talon talon;
++	private static Victor victor;
++	private static Jaguar jaguar;
++	
++	@BeforeClass
++	public static void setUpBeforeClass() throws Exception {
++		pdp = new PowerDistributionPanel();
++		talon = new Talon(TestBench.kTalonPDPChannel);
++		victor = new Victor(TestBench.kVictorPDPChannel);
++		jaguar = new Jaguar(TestBench.kJaguarPDPChannel);
++	}
++
++	@AfterClass
++	public static void tearDownAfterClass() throws Exception {
++		pdp.free();
++		talon.free();
++		victor.free();
++		jaguar.free();
++	}
++
++	@Before
++	public void setUp() throws Exception {
++		/* Reset all speed controllers to 0.0 */
++		talon.set(0.0);
++		victor.set(0.0);
++		jaguar.set(0.0);
++	}
++
++	@After
++	public void tearDown() throws Exception {
++	}
++	
++	/**
++	 * Test if the current changes when the motor is driven using a talon
++	 */
++	@Test
++	public void CheckCurrentTalon() {
++		/* The Current should be kLowCurrent */
++		try {
++			assertEquals("The low current was not within the expected range.", 
++					kLowCurrent, pdp.getCurrent(TestBench.kTalonPDPChannel), kCurrentTolerance);
++		} catch (CANTimeoutException e) {
++			// TODO Auto-generated catch block
++			e.printStackTrace();
++		}
++		Timer.delay(0.02);
++		
++		/* Set the motor to full forward */
++		talon.set(1.0);
++		Timer.delay(0.02);
++		/* The current should now be greater than the low current */
++		try {
++			assertThat("The driven current is not greater than the resting current.", 
++					pdp.getCurrent(TestBench.kTalonPDPChannel), is(greaterThan(kLowCurrent)));
++		} catch (CANTimeoutException e) {
++			// TODO Auto-generated catch block
++			e.printStackTrace();
++		}
++	}
++	
++	/**
++	 * Test if the current changes when the motor is driven using a victor
++	 */
++	@Test
++	public void CheckCurrentVictor() {
++		/* The Current should be kLowCurrent */
++		try {
++			assertEquals("The low current was not within the expected range.", 
++					kLowCurrent, pdp.getCurrent(TestBench.kVictorPDPChannel), kCurrentTolerance);
++		} catch (CANTimeoutException e) {
++			// TODO Auto-generated catch block
++			e.printStackTrace();
++		}
++		Timer.delay(0.02);
++		
++		/* Set the motor to full forward */
++		victor.set(1.0);
++		Timer.delay(0.02);
++		/* The current should now be greater than the low current */
++		try {
++			assertThat("The driven current is not greater than the resting current.", 
++					pdp.getCurrent(TestBench.kVictorPDPChannel), is(greaterThan(kLowCurrent)));
++		} catch (CANTimeoutException e) {
++			// TODO Auto-generated catch block
++			e.printStackTrace();
++		}
++	}
++	
++	/**
++	 * Test if the current changes when the motor is driven using a jaguar
++	 */
++	@Test
++	public void CheckCurrentJaguar() {
++		/* The Current should be kLowCurrent */
++		try {
++			assertEquals("The low current was not within the expected range.", 
++					kLowCurrent, pdp.getCurrent(TestBench.kJaguarPDPChannel), kCurrentTolerance);
++		} catch (CANTimeoutException e) {
++			// TODO Auto-generated catch block
++			e.printStackTrace();
++		}
++		Timer.delay(0.02);
++		
++		/* Set the motor to full forward */
++		jaguar.set(1.0);
++		Timer.delay(0.02);
++		
++		/* The current should now be greater than the low current */
++		try {
++			assertThat("The driven current is not greater than the resting current.", 
++					pdp.getCurrent(TestBench.kJaguarPDPChannel), is(greaterThan(kLowCurrent)));
++		} catch (CANTimeoutException e) {
++			// TODO Auto-generated catch block
++			e.printStackTrace();
++		}
++	}
++
++	@Override
++	protected Logger getClassLogger() {
++		return logger;
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
+index d875bf9f61523a41e89afcbea4b47e4941d22854..23ef4e1a6253a816303649597fb2f00a8f43a39c 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
+@@ -28,7 +28,8 @@ import org.junit.runners.Suite.SuiteClasses;
+ 				RelayCrossConnectTest.class,
+ 				SampleTest.class,
+ 				TiltPanCameraTest.class,
+-				TimerTest.class
++				TimerTest.class,
++				PDPTest.class
+ 				})
+ public class WpiLibJTestSuite {
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index 8ee7e1634ebff0ac3ec60f49c0518c3f8589857a..e39bd54d51e739a3d1a5e431954aaa6e4b7ff228 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -47,13 +47,17 @@ public final class TestBench {
+ 	 * completely stopped
+ 	 */
+ 	public static final double MOTOR_STOP_TIME = 0.20;
+-
++	
++	/* PowerDistributionPanel channels */
++	public static final int kJaguarPDPChannel = 7;
++	public static final int kVictorPDPChannel = 11;
++	public static final int kTalonPDPChannel = 12;
+ 
+ 	//THESE MUST BE IN INCREMENTING ORDER
+-	public static final int DIOCrossConnectA1 = 6;
+-	public static final int DIOCrossConnectA2 = 7;
+-	public static final int DIOCrossConnectB1 = 8;
+ 	public static final int DIOCrossConnectB2 = 9;
++	public static final int DIOCrossConnectB1 = 8;
++	public static final int DIOCrossConnectA2 = 7;
++	public static final int DIOCrossConnectA1 = 6;
+ 
+ 	/** The Singleton instance of the Test Bench */
+ 	private static TestBench instance = null;

@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Wed, 22 Oct 2014 11:23:49 -0400
+Subject: [PATCH 0430/6262] Fixes a bug with the test stand launch script
+
+The Test Stand Serve launch script now runs the correct command.
+
+Change-Id: I790b55fc24284665ec5f32effdd6fbc66c2d334a
+---
+ test-scripts/spawn_driver_station.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test-scripts/spawn_driver_station.sh b/test-scripts/spawn_driver_station.sh
+index eb4557ca7c09f91957b042c1f223d723f569a74d..b48e0a70355b547155baefe5fe6ced54dcd580e5 100755
+--- a/test-scripts/spawn_driver_station.sh
++++ b/test-scripts/spawn_driver_station.sh
+@@ -8,7 +8,7 @@
+ 
+ source config.sh
+ 
+-TESTSTAND_SERVE_COMMAND=".scratch/teststand serve"
++TESTSTAND_SERVE_COMMAND="/usr/local/frc/bin/teststand serve"
+ 
+ #Checks to see if the mutex driver station is running. If it isn't then start it.
+ 

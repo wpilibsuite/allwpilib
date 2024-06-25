@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Tue, 16 Sep 2014 00:50:43 -0400
+Subject: [PATCH 0347/6262] Add missing semi-colon to cproject file
+
+Change-Id: I540730c3a4be32c6a636296ce36aab5b230afc8a
+---
+ .../resources/templates/.cproject                               | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index 15ea0f9cb29d348ac2a4ab6f0a89f579970d2949..a645afb13b09ab9911ba55c655244672c7edadb7 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -57,7 +57,7 @@
+ 									<listOptionValue builtIn="false" value="dl"/>
+ 									<listOptionValue builtIn="false" value="pthread"/>
+ 								</option>
+-								<option id="gnu.cpp.link.option.flags.1747959472" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-Wl,-rpath-link,&quot;$cpp-location/lib&quot" valueType="string"/>
++								<option id="gnu.cpp.link.option.flags.1747959472" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-Wl,-rpath-link,&quot;$cpp-location/lib&quot;" valueType="string"/>
+ 								<option id="gnu.cpp.link.option.other.1891020896" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" valueType="stringList">
+ 									<listOptionValue builtIn="false" value="-export-dynamic"/>
+ 								</option>

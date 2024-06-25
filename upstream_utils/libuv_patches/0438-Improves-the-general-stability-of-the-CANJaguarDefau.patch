@@ -1,0 +1,154 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 23 Oct 2014 13:03:49 -0400
+Subject: [PATCH 0438/6262] Improves the general stability of the
+ CANJaguarDefault tests
+
+Adds a poling wait to all of the tests to accommodate the CANJaguar
+
+Change-Id: I15a64a5fe901cb775bf03ef0b08c2f83429ef9b5
+---
+ .../wpi/first/wpilibj/can/CANDefaultTest.java | 68 +++++++++++++++----
+ 1 file changed, 54 insertions(+), 14 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANDefaultTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANDefaultTest.java
+index 3c9a7064c83fa3b5c6ec85f4afa329a41b34a416..94e2b53ebd0ed508acc1d1e6121bdc7db5ac8450 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANDefaultTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANDefaultTest.java
+@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
+ import java.util.logging.Logger;
+ 
+ import org.junit.Before;
+-import org.junit.Ignore;
+ import org.junit.Test;
+ 
+ import com.googlecode.junittoolbox.PollingWait;
+@@ -32,6 +31,7 @@ import edu.wpi.first.wpilibj.Timer;
+  */
+ public class CANDefaultTest extends AbstractCANTest{
+ 	private static final Logger logger = Logger.getLogger(CANDefaultTest.class.getName());
++	private final PollingWait wait = new PollingWait().timeoutAfter(65, TimeUnit.MILLISECONDS).pollEvery(10, TimeUnit.MILLISECONDS);
+ 
+ 	private static final double kSpikeTime = .5;
+ 
+@@ -48,51 +48,92 @@ public class CANDefaultTest extends AbstractCANTest{
+ 		getME().getMotor().enableControl();
+ 		getME().getMotor().set(0.0f);
+ 		/* The motor might still have momentum from the previous test. */
+-		Timer.delay(kStartupTime);
++		Timer.delay(kStartupTime/2);
+ 	}
+ 
+ 	@Test
+ 	public void testDefaultGet(){
+-		assertEquals("CAN Jaguar did not initilize stopped", 0.0, getME().getMotor().get(), .01f);
++		wait.until(new RunnableAssert("Waiting for CAN Jaguar get to return 0") {
++			@Override
++			public void run() {
++				assertEquals("CAN Jaguar did not initialize stopped", 0.0, getME().getMotor().get(), .01f);
++			}
++		});
+ 	}
+ 
+ 	@Test
+ 	public void testDefaultBusVoltage(){
+-		assertEquals("CAN Jaguar did not start at 14 volts", 14.0f, getME().getMotor().getBusVoltage(), 2.0f);
++		wait.until(new RunnableAssert("Waiting for default bus voltage to be correct") {
++			@Override
++			public void run() {
++				assertEquals("CAN Jaguar did not start at 14 volts", 14.0f, getME().getMotor().getBusVoltage(), 2.0f);
++			}
++		});
+ 	}
+ 
+ 	@Test
+ 	public void testDefaultOutputVoltage(){
+-		assertEquals("CAN Jaguar did not start with an output voltage of 0", 0.0f, getME().getMotor().getOutputVoltage(), 0.3f);
+-
++		wait.until(new RunnableAssert("Waiting for output voltage to be correct") {
++			@Override
++			public void run() {
++				assertEquals("CAN Jaguar did not start with an output voltage of 0", 0.0f, getME().getMotor().getOutputVoltage(), 0.3f);
++			}
++		});
+ 	}
+ 
+ 	@Test
+ 	public void testDefaultOutputCurrent(){
+-		assertEquals("CAN Jaguar did not start with an output current of 0", 0.0f, getME().getMotor().getOutputCurrent(), 0.3f);
++		wait.until(new RunnableAssert("Waiting for output current to be correct") {
++			@Override
++			public void run() {
++				assertEquals("CAN Jaguar did not start with an output current of 0", 0.0f, getME().getMotor().getOutputCurrent(), 0.3f);
++			}
++		});
+ 	}
+ 
+ 	@Test
+ 	public void testDefaultTemperature(){
+-		double room_temp = 18.0f;
+-		assertThat("CAN Jaguar did not start with an initial temperature greater than " + room_temp, getME().getMotor().getTemperature(), is(greaterThan(room_temp)));
++		final double room_temp = 18.0f;
++		wait.until(new RunnableAssert("Waiting for temperature to be correct") {
++			@Override
++			public void run() {
++				assertThat("CAN Jaguar did not start with an initial temperature greater than " + room_temp, getME().getMotor().getTemperature(), is(greaterThan(room_temp)));
++			}
++		});
+ 	}
+ 
+ 	@Test
+ 	public void testDefaultForwardLimit(){
+ 		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
+-		assertTrue("CAN Jaguar did not start with the Forward Limit Switch Off", getME().getMotor().getForwardLimitOK());
++		wait.until(new RunnableAssert("Waiting for forward limit to not be set") {
++			@Override
++			public void run() {
++				getME().getMotor().set(0);
++				assertTrue("CAN Jaguar did not start with the Forward Limit Switch Off", getME().getMotor().getForwardLimitOK());
++			}
++		});
+ 	}
+ 
+ 	@Test
+ 	public void testDefaultReverseLimit(){
+ 		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
+-		assertTrue("CAN Jaguar did not start with the Reverse Limit Switch Off", getME().getMotor().getReverseLimitOK());
++		wait.until(new RunnableAssert("Waiting for reverse limit to not be set") {
++			@Override
++			public void run() {
++				getME().getMotor().set(0);
++				assertTrue("CAN Jaguar did not start with the Reverse Limit Switch Off", getME().getMotor().getReverseLimitOK());
++			}
++		});
+ 	}
+ 
+ 	@Test
+ 	public void testDefaultNoFaults(){
+-		assertEquals("CAN Jaguar initialized with Faults", 0, getME().getMotor().getFaults());
++		wait.until(new RunnableAssert("Waiting for no faults") {
++			@Override
++			public void run() {
++				assertEquals("CAN Jaguar initialized with Faults", 0, getME().getMotor().getFaults());
++			}
++		});
+ 	}
+ 
+ 
+@@ -102,7 +143,6 @@ public class CANDefaultTest extends AbstractCANTest{
+ 		//Given
+ 		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
+ 		getME().getMotor().enableControl();
+-		assertTrue("[TEST SETUP] CANJaguar did not start with the Forward Limit Switch low", getME().getMotor().getForwardLimitOK());
+ 
+ 		//When
+ 		getME().getForwardLimit().set(true);
+@@ -124,7 +164,7 @@ public class CANDefaultTest extends AbstractCANTest{
+ 		//Given
+ 		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
+ 		getME().getMotor().enableControl();
+-		assertTrue("[TEST SETUP] CANJaguar did not start with the Reverse Limit Switch low", getME().getMotor().getReverseLimitOK());
++		
+ 		//When
+ 		getME().getReverseLimit().set(true);
+ 

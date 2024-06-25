@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Tue, 23 Sep 2014 17:35:09 -0400
+Subject: [PATCH 0358/6262] Fix changes where the default value was always
+ being returned for many of the robot state status functions.
+
+Change-Id: I50f11ce6d8ba4cbaa9ab7f44cd2f353e8bba72dd
+---
+ wpilibc/wpilibC++/src/RobotState.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/src/RobotState.cpp b/wpilibc/wpilibC++/src/RobotState.cpp
+index 44b7e4bfb151b7f73bde1bd0a6ab07f5585d0aa4..33e22a15459ae1d9325c37341e110355c41b8984 100644
+--- a/wpilibc/wpilibC++/src/RobotState.cpp
++++ b/wpilibc/wpilibC++/src/RobotState.cpp
+@@ -15,28 +15,28 @@ bool RobotState::IsDisabled() {
+ 
+ bool RobotState::IsEnabled() {
+     if (impl != 0) {
+-        impl->IsEnabled();
++        return impl->IsEnabled();
+     }
+     return false;
+ }
+ 
+ bool RobotState::IsOperatorControl() {
+     if (impl != 0) {
+-        impl->IsOperatorControl();
++        return impl->IsOperatorControl();
+     }
+     return true;
+ }
+ 
+ bool RobotState::IsAutonomous() {
+     if (impl != 0) {
+-        impl->IsAutonomous();
++        return impl->IsAutonomous();
+     }
+     return false;
+ }
+ 
+ bool RobotState::IsTest() {
+     if (impl != 0) {
+-        impl->IsTest();
++        return impl->IsTest();
+     }
+     return false;
+ }

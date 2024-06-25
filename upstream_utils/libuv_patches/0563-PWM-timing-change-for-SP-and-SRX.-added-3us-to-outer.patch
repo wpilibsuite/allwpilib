@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Omar Zrien <OZrien@crosstheroadelectronics.com>
+Date: Sat, 13 Dec 2014 18:06:43 -0500
+Subject: [PATCH 0563/6262] PWM timing change for SP and SRX. added 3us to
+ outer bounds
+
+Change-Id: Idce12f8290b5f5646d0d3b14c2a4414fba3120cd
+---
+ wpilibc/wpilibC++Devices/src/TalonSRX.cpp                       | 2 +-
+ wpilibc/wpilibC++Devices/src/VictorSP.cpp                       | 2 +-
+ .../src/main/java/edu/wpi/first/wpilibj/TalonSRX.java           | 2 +-
+ .../src/main/java/edu/wpi/first/wpilibj/VictorSP.java           | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/src/TalonSRX.cpp b/wpilibc/wpilibC++Devices/src/TalonSRX.cpp
+index 40c0a3d2b13d08cc517046628ff903ad13c88b48..d96b56465b3123b31f25c258f06716282551166e 100644
+--- a/wpilibc/wpilibC++Devices/src/TalonSRX.cpp
++++ b/wpilibc/wpilibC++Devices/src/TalonSRX.cpp
+@@ -19,7 +19,7 @@
+  *
+  */
+ void TalonSRX::InitTalonSRX() {
+-	SetBounds(2.001, 1.52, 1.50, 1.48, .999);
++	SetBounds(2.004, 1.52, 1.50, 1.48, .997);
+ 	SetPeriodMultiplier(kPeriodMultiplier_1X);
+ 	SetRaw(m_centerPwm);
+ 	SetZeroLatch();
+diff --git a/wpilibc/wpilibC++Devices/src/VictorSP.cpp b/wpilibc/wpilibC++Devices/src/VictorSP.cpp
+index d57ab32e4f4686b8de274e0334eb50e41c426adb..cf2dfd7d97f6e18c986cdb6ad2d51a9f490c6e2d 100644
+--- a/wpilibc/wpilibC++Devices/src/VictorSP.cpp
++++ b/wpilibc/wpilibC++Devices/src/VictorSP.cpp
+@@ -19,7 +19,7 @@
+  *
+  */
+ void VictorSP::InitVictorSP() {
+-	SetBounds(2.001, 1.52, 1.50, 1.48, .999);
++	SetBounds(2.004, 1.52, 1.50, 1.48, .997);
+ 	SetPeriodMultiplier(kPeriodMultiplier_1X);
+ 	SetRaw(m_centerPwm);
+ 	SetZeroLatch();
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/TalonSRX.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/TalonSRX.java
+index de3ec0a89816923078b7469098cfcb1ca05ea593..4ad134da8de4e79e60fd37caea4e8335117c344e 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/TalonSRX.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/TalonSRX.java
+@@ -32,7 +32,7 @@ public class TalonSRX extends SafePWM implements SpeedController {
+      *   - .989ms = full "reverse"
+      */
+     protected void initTalonSRX() {
+-        setBounds(2.001, 1.52, 1.50, 1.48, 0.999);
++        setBounds(2.004, 1.52, 1.50, 1.48, .997);
+         setPeriodMultiplier(PeriodMultiplier.k1X);
+         setRaw(m_centerPwm);
+ 		setZeroLatch();
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/VictorSP.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/VictorSP.java
+index b328d0bbc9cd7899f7f5f2ca7fc9fbebecf1c068..a1a70643a21a63634082f16dbfa28e208206b1b7 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/VictorSP.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/VictorSP.java
+@@ -31,7 +31,7 @@ public class VictorSP extends SafePWM implements SpeedController {
+      *   - .989ms = full "reverse"
+      */
+     protected void initVictorSP() {
+-        setBounds(2.001, 1.52, 1.50, 1.48, 0.999);
++        setBounds(2.004, 1.52, 1.50, 1.48, .997);
+         setPeriodMultiplier(PeriodMultiplier.k1X);
+         setRaw(m_centerPwm);
+ 		setZeroLatch();

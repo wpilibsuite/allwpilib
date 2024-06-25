@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Evin Ugur <evinoog96@gmail.com>
+Date: Thu, 9 Oct 2014 19:21:36 -0400
+Subject: [PATCH 0402/6262] Fixed New Project Wizard to have a radio option
+ always selected
+
+---
+ .../plugins/core/wizards/NewProjectMainPage.java    | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
+index db27d8f8d50abc858448a336a568e29a74a6e142..c99af7cb57495585a282b081a664e1a6a8da4351 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
+@@ -98,18 +98,19 @@ public class NewProjectMainPage extends WizardPage {
+ 			groupLayout.numColumns = 1;
+ 			projectTypeGroup.setLayout(groupLayout);
+ 
++			commandRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
++			commandRobot.setText("Command-Based Robot: A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality.");
++			gd = new GridData(GridData.FILL_HORIZONTAL);
++			gd.widthHint = 300;
++			commandRobot.setLayoutData(gd);
++			commandRobot.setSelection(true);
++
+ 			iterativeRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
+ 			iterativeRobot.setText("Iterative Robot: A robot project that allows robots to be implemented in an iterative manner.");
+ 			gd = new GridData(GridData.FILL_HORIZONTAL);
+ 			gd.widthHint = 300;
+ 			iterativeRobot.setLayoutData(gd);
+ 
+-			commandRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
+-			commandRobot.setText("Command-Based Robot: A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality.");
+-			gd = new GridData(GridData.FILL_HORIZONTAL);
+-			gd.widthHint = 300;
+-			commandRobot.setLayoutData(gd);
+-			
+ 			sampleRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
+ 			sampleRobot.setText("Sample Robot: A robot project used for small sample programs or for highly advanced programs with more complete control over program flow");
+ 			gd = new GridData(GridData.FILL_HORIZONTAL);

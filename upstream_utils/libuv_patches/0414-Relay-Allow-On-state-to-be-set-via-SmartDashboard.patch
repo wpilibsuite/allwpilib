@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sat, 18 Oct 2014 08:24:11 -0700
+Subject: [PATCH 0414/6262] Relay: Allow "On" state to be set via
+ SmartDashboard.
+
+Change-Id: I350be338045e6d27aaaea2740695930dcdd202fa
+---
+ wpilibc/wpilibC++Devices/src/Relay.cpp                          | 1 +
+ .../src/main/java/edu/wpi/first/wpilibj/Relay.java              | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/wpilibc/wpilibC++Devices/src/Relay.cpp b/wpilibc/wpilibC++Devices/src/Relay.cpp
+index 6cbe81d5a0cc22301434eb77d5fdc7e1efdde092..a4c65e1ee0502acb78824805b0b0dc1897702326 100644
+--- a/wpilibc/wpilibC++Devices/src/Relay.cpp
++++ b/wpilibc/wpilibC++Devices/src/Relay.cpp
+@@ -215,6 +215,7 @@ Relay::Value Relay::Get() {
+ void Relay::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
+ 	std::string *val = (std::string *) value.ptr;
+ 	if (*val == "Off") Set(kOff);
++        else if (*val == "On") Set(kOn);
+ 	else if (*val == "Forward") Set(kForward);
+ 	else if (*val == "Reverse") Set(kReverse);
+ }
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java
+index cb648155eb75f08e7b7ca8347cb6e9808c525bd2..ea1ef1677498a5b4e8013c93a14b161fad9866be 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java
+@@ -388,6 +388,8 @@ public class Relay extends SensorBase implements LiveWindowSendable {
+ 				String val = ((String) value);
+ 				if (val.equals("Off")) {
+ 					set(Value.kOff);
++				} else if (val.equals("On")) {
++					set(Value.kOn);
+ 				} else if (val.equals("Forward")) {
+ 					set(Value.kForward);
+ 				} else if (val.equals("Reverse")) {

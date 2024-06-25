@@ -1,0 +1,839 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Omar Zrien <OZrien@crosstheroadelectronics.com>
+Date: Fri, 5 Dec 2014 05:08:10 -0500
+Subject: [PATCH 0528/6262] Various getters and setters added to C++. usleep
+ added to the getters that require a little time for solicted response
+ (getPIDF, getIzone, and getFirmwareVers. Tested against the TALON SRX unit
+ test originally written for CanTalonSrx HAL class.
+
+Change-Id: I7e75b8b63ac9ffecb5d48b87cbe0e0ee05bbb5a2
+---
+ hal/lib/Athena/ctre/CanTalonSRX.cpp           |   2 +-
+ .../include/CANSpeedController.h              |   7 +-
+ wpilibc/wpilibC++Devices/include/CANTalon.h   |  18 +-
+ wpilibc/wpilibC++Devices/src/CANTalon.cpp     | 488 ++++++++++++++++--
+ 4 files changed, 471 insertions(+), 44 deletions(-)
+
+diff --git a/hal/lib/Athena/ctre/CanTalonSRX.cpp b/hal/lib/Athena/ctre/CanTalonSRX.cpp
+index 654a4b7d63a6b45907d496e4edb57e6d181022a4..d0852008ac3a8b99cf14ff09cc08113267fab53a 100644
+--- a/hal/lib/Athena/ctre/CanTalonSRX.cpp
++++ b/hal/lib/Athena/ctre/CanTalonSRX.cpp
+@@ -986,7 +986,7 @@ CTR_Code CanTalonSRX::SetRevFeedbackSensor(int param)
+ {
+ 	CtreCanNode::txTask<TALON_Control_1_General_10ms_t> toFill = GetTx<TALON_Control_1_General_10ms_t>(CONTROL_1 | GetDeviceNumber());
+ 	if (toFill.IsEmpty()) return CTR_UnexpectedArbId;
+-	toFill->RevFeedbackSensor = param;
++	toFill->RevFeedbackSensor = param ? 1 : 0;
+ 	FlushTx(toFill);
+ 	return CTR_OKAY;
+ }
+diff --git a/wpilibc/wpilibC++Devices/include/CANSpeedController.h b/wpilibc/wpilibC++Devices/include/CANSpeedController.h
+index a6a025f519576ec8610bd71882d49c103e2d0df2..36c03928e8ff4295208726d8a8979edbd5c19983 100644
+--- a/wpilibc/wpilibC++Devices/include/CANSpeedController.h
++++ b/wpilibc/wpilibC++Devices/include/CANSpeedController.h
+@@ -28,7 +28,12 @@ public:
+ 		kCurrentFault = 1,
+ 		kTemperatureFault = 2,
+ 		kBusVoltageFault = 4,
+-		kGateDriverFault = 8
++		kGateDriverFault = 8,
++		/* SRX extensions */
++		kFwdLimitSwitch = 0x10,
++		kRevLimitSwitch = 0x20,
++		kFwdSoftLimit = 0x40,
++		kRevSoftLimit = 0x80,
+ 	};
+ 
+ 	enum Limits {
+diff --git a/wpilibc/wpilibC++Devices/include/CANTalon.h b/wpilibc/wpilibC++Devices/include/CANTalon.h
+index 41ee85489ccd11fd0c3139ef0c5f3ff13a8405ce..89b351c1e0a6584d4f6d878077226b0120b503c3 100644
+--- a/wpilibc/wpilibC++Devices/include/CANTalon.h
++++ b/wpilibc/wpilibC++Devices/include/CANTalon.h
+@@ -50,14 +50,18 @@ public:
+ 	virtual void SetP(double p) override;
+ 	virtual void SetI(double i) override;
+ 	virtual void SetD(double d) override;
++	void SetF(double f);
+ 	virtual void SetPID(double p, double i, double d) override;
++	void SetPID(double p, double i, double d, double f);
+ 	virtual double GetP() override;
+ 	virtual double GetI() override;
+ 	virtual double GetD() override;
++	double GetF();
+ 	virtual float GetBusVoltage() override;
+ 	virtual float GetOutputVoltage() override;
+ 	virtual float GetOutputCurrent() override;
+ 	virtual float GetTemperature() override;
++	void SetPosition(double pos);
+ 	virtual double GetPosition() override;
+ 	virtual double GetSpeed() override;
+   virtual int GetClosedLoopError();
+@@ -65,9 +69,18 @@ public:
+   virtual int GetAnalogInVel();
+   virtual int GetEncPosition();
+   virtual int GetEncVel();
++	int GetPinStateQuadA();
++	int GetPinStateQuadB();
++	int GetPinStateQuadIdx();
++	int IsFwdLimitSwitchClosed();
++	int IsRevLimitSwitchClosed();
++	int GetNumberOfQuadIdxRises();
++	void SetNumberOfQuadIdxRises(int rises);
+ 	virtual bool GetForwardLimitOK() override;
+ 	virtual bool GetReverseLimitOK() override;
+ 	virtual uint16_t GetFaults() override;
++	uint16_t GetStickyFaults();
++	void ClearStickyFaults();
+ 	virtual void SetVoltageRampRate(double rampRate) override;
+ 	virtual uint32_t GetFirmwareVersion() override;
+ 	virtual void ConfigNeutralMode(NeutralMode mode) override;
+@@ -83,7 +96,10 @@ public:
+ 	virtual void SetControlMode(ControlMode mode);
+   void SetFeedbackDevice(FeedbackDevice device);
+ 	virtual ControlMode GetControlMode();
+-
++	void SetSensorDirection(bool reverseSensor);
++	void SetCloseLoopRampRate(double rampRate);
++	void SelectProfileSlot(int slotIdx);
++	double GetIzone();
+ private:
+   // Values for various modes as is sent in the CAN packets for the Talon.
+   enum TalonControlMode {
+diff --git a/wpilibc/wpilibC++Devices/src/CANTalon.cpp b/wpilibc/wpilibC++Devices/src/CANTalon.cpp
+index 112da2b399b270f8cf38e1cfb634994bda7277cc..6815b5edd9ba7c0528947d9c7a5ca744a50fc785 100644
+--- a/wpilibc/wpilibC++Devices/src/CANTalon.cpp
++++ b/wpilibc/wpilibC++Devices/src/CANTalon.cpp
+@@ -7,13 +7,7 @@
+ #include "CANTalon.h"
+ #include "WPIErrors.h"
+ #include "ctre/CanTalonSRX.h"
+-
+-/**
+- * The CANTalon object is currently incomplete. As of Nov 14 2014, we only know
+- * for sure that sending a throttle and checking basic values (eg current,
+- * temperature) work.
+- */
+-
++#include <unistd.h> // usleep
+ /**
+  * Constructor for the CANTalon device.
+  * @param deviceNumber The CAN ID of the Talon SRX
+@@ -91,6 +85,7 @@ float CANTalon::Get()
+  *   depending on the sensor.
+  *
+  * @param outputValue The setpoint value, as described above.
++ * @see SelectProfileSlot to choose between the two sets of gains.
+  */
+ void CANTalon::Set(float value, uint8_t syncGroup)
+ {
+@@ -150,6 +145,7 @@ void CANTalon::EnableControl() {
+ 
+ /**
+  * @param p Proportional constant to use in PID loop.
++ * @see SelectProfileSlot to choose between the two sets of gains.
+  */
+ void CANTalon::SetP(double p)
+ {
+@@ -161,6 +157,7 @@ void CANTalon::SetP(double p)
+ 
+ /**
+  * TODO documentation (see CANJaguar.cpp)
++ * @see SelectProfileSlot to choose between the two sets of gains.
+  */
+ void CANTalon::SetI(double i)
+ {
+@@ -172,6 +169,7 @@ void CANTalon::SetI(double i)
+ 
+ /**
+  * TODO documentation (see CANJaguar.cpp)
++ * @see SelectProfileSlot to choose between the two sets of gains.
+  */
+ void CANTalon::SetD(double d)
+ {
+@@ -180,9 +178,33 @@ void CANTalon::SetD(double d)
+ 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 	}
+ }
+-
++/**
++ *
++ * @see SelectProfileSlot to choose between the two sets of gains.
++ */
++void CANTalon::SetF(double f)
++{
++  CTR_Code status = m_impl->SetFgain(m_profile, f);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++}
++/**
++ * SRX has two available slots for PID.
++ * @param slotIdx one or zero depending on which slot caller wants.
++ */
++void CANTalon::SelectProfileSlot(int slotIdx)
++{
++	m_profile = (slotIdx == 0) ? 0 : 1; /* only get two slots for now */
++	CTR_Code status = m_impl->SetProfileSlotSelect(m_profile);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++}
+ /**
+  * TODO documentation (see CANJaguar.cpp)
++ * This function does not modify F-gain.  Considerable passing a zero for f using
++ * the four-parameter function.
+  */
+ void CANTalon::SetPID(double p, double i, double d)
+ {
+@@ -190,30 +212,37 @@ void CANTalon::SetPID(double p, double i, double d)
+ 	SetI(i);
+ 	SetD(d);
+ }
+-
++void CANTalon::SetPID(double p, double i, double d, double f)
++{
++	SetP(p);
++	SetI(i);
++	SetD(d);
++	SetF(f);
++}
+ /**
+  * Select the feedback device to use in closed-loop
+  */
+ void CANTalon::SetFeedbackDevice(FeedbackDevice device)
+ {
+-  CTR_Code status = m_impl->SetFeedbackDeviceSelect((int)device);
+-
++	CTR_Code status = m_impl->SetFeedbackDeviceSelect((int)device);
+ 	if(status != CTR_OKAY) {
+ 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-  }
++	}
+ }
+ 
+ /**
+  * TODO documentation (see CANJaguar.cpp)
++ * @see SelectProfileSlot to choose between the two sets of gains.
+  */
+ double CANTalon::GetP()
+ {
++  CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_P : CanTalonSRX::eProfileParamSlot0_P;
+   // Update the info in m_impl.
+-  CTR_Code status = m_impl->RequestParam(CanTalonSRX::eProfileParamSlot0_P);
++  CTR_Code status = m_impl->RequestParam(param);
+ 	if(status != CTR_OKAY) {
+ 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+   }
+-
++  usleep(1000); /* small yield for getting response */
+   double p;
+   status = m_impl->GetPgain(m_profile, p);
+ 	if(status != CTR_OKAY) {
+@@ -224,14 +253,17 @@ double CANTalon::GetP()
+ 
+ /**
+  * TODO documentation (see CANJaguar.cpp)
++ * @see SelectProfileSlot to choose between the two sets of gains.
+  */
+ double CANTalon::GetI()
+ {
++  CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_I : CanTalonSRX::eProfileParamSlot0_I;
+   // Update the info in m_impl.
+-  CTR_Code status = m_impl->RequestParam(CanTalonSRX::eProfileParamSlot0_I);
++  CTR_Code status = m_impl->RequestParam(param);
+ 	if(status != CTR_OKAY) {
+ 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+   }
++	usleep(1000); /* small yield for getting response */
+ 
+   double i;
+   status = m_impl->GetIgain(m_profile, i);
+@@ -243,14 +275,17 @@ double CANTalon::GetI()
+ 
+ /**
+  * TODO documentation (see CANJaguar.cpp)
++ * @see SelectProfileSlot to choose between the two sets of gains.
+  */
+ double CANTalon::GetD()
+ {
++  CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_D : CanTalonSRX::eProfileParamSlot0_D;
+   // Update the info in m_impl.
+-  CTR_Code status = m_impl->RequestParam(CanTalonSRX::eProfileParamSlot0_D);
++  CTR_Code status = m_impl->RequestParam(param);
+ 	if(status != CTR_OKAY) {
+ 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+   }
++	usleep(1000); /* small yield for getting response */
+ 
+   double d;
+   status = m_impl->GetDgain(m_profile, d);
+@@ -259,6 +294,47 @@ double CANTalon::GetD()
+ 	}
+ 	return d;
+ }
++/**
++ *
++ * @see SelectProfileSlot to choose between the two sets of gains.
++ */
++double CANTalon::GetF()
++{
++  CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_F : CanTalonSRX::eProfileParamSlot0_F;
++  // Update the info in m_impl.
++  CTR_Code status = m_impl->RequestParam(param);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++  }
++
++	usleep(1000);  /* small yield for getting response */
++  double f;
++  status = m_impl->GetFgain(m_profile, f);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	return f;
++}
++/**
++ * @see SelectProfileSlot to choose between the two sets of gains.
++ */
++double CANTalon::GetIzone()
++{
++  CanTalonSRX::param_t param = m_profile ? CanTalonSRX::eProfileParamSlot1_IZone: CanTalonSRX::eProfileParamSlot0_IZone;
++ // Update the info in m_impl.
++ CTR_Code status = m_impl->RequestParam(param);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++ }
++	usleep(1000);
++
++ int iz;
++ status = m_impl->GetIzone(m_profile, iz);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	return (double)iz;
++}
+ 
+ /**
+  * Returns the voltage coming in from the battery.
+@@ -318,16 +394,25 @@ float CANTalon::GetTemperature()
+ 	}
+ 	return temp;
+ }
+-
++/**
++ * Set the position value of the selected sensor.  This is useful for zero-ing quadrature encoders.
++ * Continuous sensors (like analog encoderes) can also partially be set (the portion of the postion based on overflows).
++ */
++void CANTalon::SetPosition(double pos)
++{
++	m_impl->SetSensorPosition(pos);
++}
+ /**
+  * TODO documentation (see CANJaguar.cpp)
+  *
+  * @return The position of the sensor currently providing feedback.
++ * 			When using analog sensors, 0 units corresponds to 0V, 1023 units corresponds to 3.3V
++ * 			When using an analog encoder (wrapping around 1023 => 0 is possible) the units are still 3.3V per 1023 units.
++ * 			When using quadrature, each unit is a quadrature edge (4X) mode.
+  */
+ double CANTalon::GetPosition()
+ {
+   int postition;
+-  // TODO convert from int to appropriate units (or at least document it).
+ 
+   CTR_Code status = m_impl->GetSensorPosition(postition);
+ 	if(status != CTR_OKAY) {
+@@ -335,6 +420,18 @@ double CANTalon::GetPosition()
+ 	}
+ 	return (double)postition;
+ }
++/**
++ * If sensor and motor are out of phase, sensor can be inverted 
++ * (position and velocity multiplied by -1).
++ * @see GetPosition and @see GetSpeed.
++ */
++void CANTalon::SetSensorDirection(bool reverseSensor)
++{
++  CTR_Code status = m_impl->SetRevFeedbackSensor(reverseSensor ? 1 : 0);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++}
+ 
+ /**
+  * Returns the current error in the controller.
+@@ -354,6 +451,16 @@ int CANTalon::GetClosedLoopError() {
+  * TODO documentation (see CANJaguar.cpp)
+  *
+  * @returns The speed of the sensor currently providing feedback.
++ *
++ * The speed units will be in the sensor's native ticks per 100ms.
++ *
++ * For analog sensors, 3.3V corresponds to 1023 units.
++ * 		So a speed of 200 equates to ~0.645 dV per 100ms or 6.451 dV per second.
++ * 		If this is an analog encoder, that likely means 1.9548 rotations per sec.
++ * For quadrature encoders, each unit corresponds a quadrature edge (4X).
++ * 		So a 250 count encoder will produce 1000 edge events per rotation.
++ * 		An example speed of 200 would then equate to 20% of a rotation per 100ms,
++ * 		or 10 rotations per second.
+  */
+ double CANTalon::GetSpeed()
+ {
+@@ -430,14 +537,109 @@ int CANTalon::GetEncVel()
+ 	}
+   return vel;
+ }
+-
++/**
++ * @return IO level of QUADA pin.
++ */
++int CANTalon::GetPinStateQuadA()
++{
++	int retval;
++	CTR_Code status = m_impl->GetQuadApin(retval);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	return retval;
++}
++/**
++ * @return IO level of QUADB pin.
++ */
++int CANTalon::GetPinStateQuadB()
++{
++	int retval;
++	CTR_Code status = m_impl->GetQuadBpin(retval);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	return retval;
++}
++/**
++ * @return IO level of QUAD Index pin.
++ */
++int CANTalon::GetPinStateQuadIdx()
++{
++	int retval;
++	CTR_Code status = m_impl->GetQuadIdxpin(retval);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	return retval;
++}
++/**
++ * @return '1' iff forward limit switch is closed, 0 iff switch is open.
++ * This function works regardless if limit switch feature is enabled.
++ */
++int CANTalon::IsFwdLimitSwitchClosed()
++{
++	int retval;
++	CTR_Code status = m_impl->GetLimitSwitchClosedFor(retval); /* rename this func, '1' => open, '0' => closed */
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	return retval ? 0 : 1;
++}
++/**
++ * @return '1' iff reverse limit switch is closed, 0 iff switch is open.
++ * This function works regardless if limit switch feature is enabled.
++ */
++int CANTalon::IsRevLimitSwitchClosed()
++{
++	int retval;
++	CTR_Code status = m_impl->GetLimitSwitchClosedRev(retval); /* rename this func, '1' => open, '0' => closed */
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	return retval ? 0 : 1;
++}
++/*
++ * Simple accessor for tracked rise eventso index pin.
++ * @return number of rising edges on idx pin.
++ */
++int CANTalon::GetNumberOfQuadIdxRises()
++{
++	int rises;
++	CTR_Code status = m_impl->GetEncIndexRiseEvents(rises); /* rename this func, '1' => open, '0' => closed */
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	return rises;
++}
++/*
++ * @param rises integral value to set into index-rises register.  Great way to zero the index count.
++ */
++void CANTalon::SetNumberOfQuadIdxRises(int rises)
++{
++	CTR_Code status = m_impl->SetParam(CanTalonSRX::eEncIndexRiseEvents, rises); /* rename this func, '1' => open, '0' => closed */
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++}
+ /**
+  * TODO documentation (see CANJaguar.cpp)
+  */
+ bool CANTalon::GetForwardLimitOK()
+ {
+-	// TODO
+-	return false;
++	int limSwit=0;
++	int softLim=0;
++	CTR_Code status;
++	status = m_impl->GetFault_ForSoftLim(softLim);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	status = m_impl->GetFault_ForLim(limSwit);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	/* If either fault is asserted, signal caller we are disabled (with false?) */
++	return (softLim | limSwit) ? false : true;
+ }
+ 
+ /**
+@@ -445,8 +647,19 @@ bool CANTalon::GetForwardLimitOK()
+  */
+ bool CANTalon::GetReverseLimitOK()
+ {
+-	// TODO
+-	return false;
++	int limSwit=0;
++	int softLim=0;
++	CTR_Code status;
++	status = m_impl->GetFault_RevSoftLim(softLim);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	status = m_impl->GetFault_RevLim(limSwit);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++	/* If either fault is asserted, signal caller we are disabled (with false?) */
++	return (softLim | limSwit) ? false : true;
+ }
+ 
+ /**
+@@ -454,16 +667,141 @@ bool CANTalon::GetReverseLimitOK()
+  */
+ uint16_t CANTalon::GetFaults()
+ {
+-	// TODO
+-	return 0;
++	uint16_t retval = 0;
++	int val;
++	CTR_Code status;
++
++	/* temperature */
++	val = 0;
++	status = m_impl->GetFault_OverTemp(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kTemperatureFault : 0;
++
++	/* voltage */
++	val = 0;
++	status = m_impl->GetFault_UnderVoltage(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kBusVoltageFault : 0;
++
++	/* fwd-limit-switch */
++	val = 0;
++	status = m_impl->GetFault_ForLim(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kFwdLimitSwitch : 0;
++
++	/* rev-limit-switch */
++	val = 0;
++	status = m_impl->GetFault_RevLim(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kRevLimitSwitch : 0;
++
++	/* fwd-soft-limit */
++	val = 0;
++	status = m_impl->GetFault_ForSoftLim(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kFwdSoftLimit : 0;
++
++	/* rev-soft-limit */
++	val = 0;
++	status = m_impl->GetFault_RevSoftLim(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kRevSoftLimit : 0;
++
++	return retval;
++}
++uint16_t CANTalon::GetStickyFaults()
++{
++	uint16_t retval = 0;
++	int val;
++	CTR_Code status;
++
++	/* temperature */
++	val = 0;
++	status = m_impl->GetStckyFault_OverTemp(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kTemperatureFault : 0;
++
++	/* voltage */
++	val = 0;
++	status = m_impl->GetStckyFault_UnderVoltage(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kBusVoltageFault : 0;
++
++	/* fwd-limit-switch */
++	val = 0;
++	status = m_impl->GetStckyFault_ForLim(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kFwdLimitSwitch : 0;
++
++	/* rev-limit-switch */
++	val = 0;
++	status = m_impl->GetStckyFault_RevLim(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kRevLimitSwitch : 0;
++
++	/* fwd-soft-limit */
++	val = 0;
++	status = m_impl->GetStckyFault_ForSoftLim(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kFwdSoftLimit : 0;
++
++	/* rev-soft-limit */
++	val = 0;
++	status = m_impl->GetStckyFault_RevSoftLim(val);
++	if(status != CTR_OKAY)
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	retval |= (val) ? CANSpeedController::kRevSoftLimit : 0;
++
++	return retval;
++}
++void CANTalon::ClearStickyFaults()
++{
++	CTR_Code status = m_impl->ClearStickyFaults();
++	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ }
+ 
+ /**
+- * TODO documentation (see CANJaguar.cpp)
++ * Set the maximum voltage change rate.  This ramp rate is in affect regardless of which control mode
++ * the TALON is in.
++ *
++ * When in PercentVbus or Voltage output mode, the rate at which the voltage changes can
++ * be limited to reduce current spikes.  Set this to 0.0 to disable rate limiting.
++ *
++ * @param rampRate The maximum rate of voltage change in Percent Voltage mode in V/s.
+  */
+ void CANTalon::SetVoltageRampRate(double rampRate)
+ {
+-	// TODO
++	/* Caller is expressing ramp as Voltage per sec, assuming 12V is full.
++		Talon's throttle ramp is in dThrot/d10ms.  1023 is full fwd, -1023 is full rev. */
++	double rampRatedThrotPer10ms = (rampRate*1023.0/12.0) / 100;
++	CTR_Code status = m_impl->SetRampThrottle((int)rampRatedThrotPer10ms);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++}
++/**
++ * Sets a voltage change rate that applies only when a close loop contorl mode is enabled.
++ * This allows close loop specific ramp behavior.
++ *
++ * @param rampRate The maximum rate of voltage change in Percent Voltage mode in V/s.
++ */
++void CANTalon::SetCloseLoopRampRate(double rampRate)
++{
++	  CTR_Code status = m_impl->SetCloseLoopRampRate(m_profile,rampRate * 1023.0 / 12.0 / 1000.0);
++		if(status != CTR_OKAY) {
++			wpi_setErrorWithContext(status, getHALErrorMessage(status));
++		}
+ }
+ 
+ /**
+@@ -472,12 +810,19 @@ void CANTalon::SetVoltageRampRate(double rampRate)
+ uint32_t CANTalon::GetFirmwareVersion()
+ {
+ 	int firmwareVersion;
+-
+-	CTR_Code status = m_impl->GetFirmVers(firmwareVersion);
++	m_impl->RequestParam(CanTalonSRX::eFirmVers);
++	usleep(1000);
++	CTR_Code status = m_impl->GetParamResponseInt32(CanTalonSRX::eFirmVers,firmwareVersion);
+ 	if(status != CTR_OKAY) {
+ 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 	}
+ 
++	/* only sent once on boot */
++	//CTR_Code status = m_impl->GetFirmVers(firmwareVersion);
++	//if(status != CTR_OKAY) {
++	//	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	//}
++
+ 	return firmwareVersion;
+ }
+ 
+@@ -486,7 +831,22 @@ uint32_t CANTalon::GetFirmwareVersion()
+  */
+ void CANTalon::ConfigNeutralMode(NeutralMode mode)
+ {
+-	// TODO
++	CTR_Code status;
++	switch(mode){
++		default:
++		case kNeutralMode_Jumper: /* use default setting in flash based on webdash/BrakeCal button selection */
++			status = m_impl->SetOverrideBrakeType(CanTalonSRX::kBrakeOverride_UseDefaultsFromFlash);
++			break;
++		case kNeutralMode_Brake:
++			status = m_impl->SetOverrideBrakeType(CanTalonSRX::kBrakeOverride_OverrideBrake);
++			break;
++		case kNeutralMode_Coast:
++			status = m_impl->SetOverrideBrakeType(CanTalonSRX::kBrakeOverride_OverrideCoast);
++			break;
++	}
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
+ }
+ 
+ /**
+@@ -494,7 +854,7 @@ void CANTalon::ConfigNeutralMode(NeutralMode mode)
+  */
+ void CANTalon::ConfigEncoderCodesPerRev(uint16_t codesPerRev)
+ {
+-	// TODO
++	/* TALON SRX does not scale units, they are raw from the sensor.  Unit scaling can be done in API or by caller */
+ }
+ 
+ /**
+@@ -502,7 +862,7 @@ void CANTalon::ConfigEncoderCodesPerRev(uint16_t codesPerRev)
+  */
+ void CANTalon::ConfigPotentiometerTurns(uint16_t turns)
+ {
+-	// TODO
++	/* TALON SRX does not scale units, they are raw from the sensor.  Unit scaling can be done in API or by caller */
+ }
+ 
+ /**
+@@ -510,7 +870,9 @@ void CANTalon::ConfigPotentiometerTurns(uint16_t turns)
+  */
+ void CANTalon::ConfigSoftPositionLimits(double forwardLimitPosition, double reverseLimitPosition)
+ {
+-	// TODO
++	ConfigLimitMode(kLimitMode_SoftPositionLimits);
++	ConfigForwardLimit(forwardLimitPosition);
++	ConfigReverseLimit(reverseLimitPosition);
+ }
+ 
+ /**
+@@ -518,15 +880,51 @@ void CANTalon::ConfigSoftPositionLimits(double forwardLimitPosition, double reve
+  */
+ void CANTalon::DisableSoftPositionLimits()
+ {
+-	// TODO
++	ConfigLimitMode(kLimitMode_SwitchInputsOnly);
+ }
+ 
+ /**
+  * TODO documentation (see CANJaguar.cpp)
++ * Configures the soft limit enable (wear leveled persistent memory).
++ * Also sets the limit switch overrides.
+  */
+ void CANTalon::ConfigLimitMode(LimitMode mode)
+ {
+-	// TODO
++	CTR_Code status;
++	switch(mode){
++		case kLimitMode_SwitchInputsOnly: 	/** Only use switches for limits */
++			/* turn OFF both limits. SRX has individual enables and polarity for each limit switch.*/
++			status = m_impl->SetForwardSoftEnable(false);
++			if(status != CTR_OKAY) {
++				wpi_setErrorWithContext(status, getHALErrorMessage(status));
++			}
++			status = m_impl->SetReverseSoftEnable(false);
++			if(status != CTR_OKAY) {
++				wpi_setErrorWithContext(status, getHALErrorMessage(status));
++			}
++			/* override enable the limit switches, this circumvents the webdash */
++			status = m_impl->SetOverrideLimitSwitchEn(CanTalonSRX::kLimitSwitchOverride_EnableFwd_EnableRev);
++			if(status != CTR_OKAY) {
++				wpi_setErrorWithContext(status, getHALErrorMessage(status));
++			}
++			break;
++		case kLimitMode_SoftPositionLimits: /** Use both switches and soft limits */
++			/* turn on both limits. SRX has individual enables and polarity for each limit switch.*/
++			status = m_impl->SetForwardSoftEnable(true);
++			if(status != CTR_OKAY) {
++				wpi_setErrorWithContext(status, getHALErrorMessage(status));
++			}
++			status = m_impl->SetReverseSoftEnable(true);
++			if(status != CTR_OKAY) {
++				wpi_setErrorWithContext(status, getHALErrorMessage(status));
++			}
++			/* override enable the limit switches, this circumvents the webdash */
++			status = m_impl->SetOverrideLimitSwitchEn(CanTalonSRX::kLimitSwitchOverride_EnableFwd_EnableRev);
++			if(status != CTR_OKAY) {
++				wpi_setErrorWithContext(status, getHALErrorMessage(status));
++			}
++			break;
++	}
+ }
+ 
+ /**
+@@ -534,7 +932,11 @@ void CANTalon::ConfigLimitMode(LimitMode mode)
+  */
+ void CANTalon::ConfigForwardLimit(double forwardLimitPosition)
+ {
+-	// TODO
++	CTR_Code status;
++	status = m_impl->SetForwardSoftLimit(forwardLimitPosition);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
+ }
+ 
+ /**
+@@ -542,25 +944,29 @@ void CANTalon::ConfigForwardLimit(double forwardLimitPosition)
+  */
+ void CANTalon::ConfigReverseLimit(double reverseLimitPosition)
+ {
+-	// TODO
++	CTR_Code status;
++	status = m_impl->SetReverseSoftLimit(reverseLimitPosition);
++	if(status != CTR_OKAY) {
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
+ }
+ 
+ /**
+  * TODO documentation (see CANJaguar.cpp)
+- * Does this exist on the Talon?
+  */
+ void CANTalon::ConfigMaxOutputVoltage(double voltage)
+ {
+-	// TODO
++	/* SRX does not support max output  */
++	wpi_setWPIErrorWithContext(IncompatibleMode, "MaxOutputVoltage not supported.");
+ }
+ 
+ /**
+  * TODO documentation (see CANJaguar.cpp)
+- * Does this exist on the Talon?
+  */
+ void CANTalon::ConfigFaultTime(float faultTime)
+ {
+-	// TODO
++	/* SRX does not have fault time.  SRX motor drive is only disabled for soft limits and limit-switch faults. */
++	wpi_setWPIErrorWithContext(IncompatibleMode, "Fault Time not supported.");
+ }
+ 
+ /**

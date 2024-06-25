@@ -1,0 +1,84 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Thu, 16 Oct 2014 14:17:29 -0400
+Subject: [PATCH 0411/6262] Aggregate javadocs and use JavaFinal docs when
+ building plugins (fixes artf3533)
+
+Change-Id: I4c8ae68daa470bea52b4f9f3fb129f50d5f238e3
+---
+ .../edu.wpi.first.wpilib.plugins.java/pom.xml |  9 +----
+ wpilibj/wpilibJavaFinal/pom.xml               | 34 +++++++++++++++++++
+ 2 files changed, 35 insertions(+), 8 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
+index 1461865dbb33dbe28bdd8e1585a9d380ff3393e4..9f864ac56bddf14a991ac6cd639b0e2202c6a1c4 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
+@@ -102,14 +102,7 @@
+ 				<!-- Javadoc -->
+                 <artifactItem>
+ 				  <groupId>edu.wpi.first.wpilibj</groupId>
+-				  <artifactId>wpilibJavaDevices</artifactId>
+-				  <version>0.1.0-SNAPSHOT</version>
+-				  <type>javadoc</type>
+-				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
+-                </artifactItem>
+-                <artifactItem>
+-				  <groupId>edu.wpi.first.wpilibj</groupId>
+-				  <artifactId>wpilibJava</artifactId>
++				  <artifactId>wpilibJavaFinal</artifactId>
+ 				  <version>0.1.0-SNAPSHOT</version>
+ 				  <type>javadoc</type>
+ 				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
+diff --git a/wpilibj/wpilibJavaFinal/pom.xml b/wpilibj/wpilibJavaFinal/pom.xml
+index be0653c5d0b1b255585b3a82919cd63415611151..00c943ef70efe21b5198dc40a514540952c78a0a 100644
+--- a/wpilibj/wpilibJavaFinal/pom.xml
++++ b/wpilibj/wpilibJavaFinal/pom.xml
+@@ -14,6 +14,27 @@
+     <relativePath>../../maven-utilities/athena/library-jar/pom.xml</relativePath>
+   </parent>
+   
++  <profiles>
++    <profile>
++      <id>docline-java8-disable</id>
++      <activation>
++	    <jdk>[1.8,</jdk>
++      </activation>
++
++      <build>
++	    <plugins>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-javadoc-plugin</artifactId>
++            <configuration>
++              <additionalparam>-Xdoclint:none</additionalparam>
++            </configuration>
++          </plugin>
++	    </plugins>
++      </build>
++    </profile>
++  </profiles>
++  
+   <dependencies>
+ 	<dependency>
+ 	  <groupId>edu.wpi.first.wpilibj</groupId>
+@@ -151,6 +172,19 @@
+           </dependency>
+         </dependencies>
+       </plugin>
++	   <plugin>
++      	<groupId>org.apache.maven.plugins</groupId>
++      	<artifactId>maven-javadoc-plugin</artifactId>
++        <configuration>
++      	  <sourceFileExcludes>
++      	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
++      	  </sourceFileExcludes>
++		   <includeDependencySources>true</includeDependencySources>
++        </configuration>
++      </plugin>
+ 
+ 
+       <plugin>

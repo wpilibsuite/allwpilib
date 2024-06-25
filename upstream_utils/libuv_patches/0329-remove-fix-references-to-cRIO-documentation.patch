@@ -1,0 +1,374 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joe Ross <joe@rossesmail.com>
+Date: Mon, 25 Aug 2014 15:32:49 -0700
+Subject: [PATCH 0329/6262] remove/fix references to cRIO documentation. Edited
+ comments related to sidecar, breakout, 9472. Some references were to unused
+ methods in simulation that were removed.
+
+Change-Id: I99b6fe9e8cb982831ffbf29177f84e2f9f71ef47
+---
+ .../wpilibC++Devices/include/DoubleSolenoid.h |   2 +-
+ wpilibc/wpilibC++Devices/include/Solenoid.h   |   4 +-
+ wpilibc/wpilibC++Sim/include/DoubleSolenoid.h |   2 +-
+ wpilibc/wpilibC++Sim/include/Solenoid.h       |   4 +-
+ wpilibc/wpilibC++Sim/src/DriverStation.cpp    |   5 +-
+ .../edu/wpi/first/wpilibj/DoubleSolenoid.java |   3 +-
+ .../edu/wpi/first/wpilibj/SensorBase.java     |   8 +-
+ .../edu/wpi/first/wpilibj/DoubleSolenoid.java |   3 +-
+ .../edu/wpi/first/wpilibj/DriverStation.java  |   5 +-
+ .../edu/wpi/first/wpilibj/SensorBase.java     | 119 ++----------------
+ .../java/edu/wpi/first/wpilibj/Solenoid.java  |   4 +-
+ 11 files changed, 26 insertions(+), 133 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/include/DoubleSolenoid.h b/wpilibc/wpilibC++Devices/include/DoubleSolenoid.h
+index 9fc2e9deaa313a9cff22ab02cb014a76425a8e90..ebda229240ed94031901a5b227f1dd1b28c4b86a 100644
+--- a/wpilibc/wpilibC++Devices/include/DoubleSolenoid.h
++++ b/wpilibc/wpilibC++Devices/include/DoubleSolenoid.h
+@@ -11,7 +11,7 @@
+ 
+ /**
+  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
+- * (9472 module).
++ * (PCM).
+  *
+  * The DoubleSolenoid class is typically used for pneumatics solenoids that
+  * have two positions controlled by two separate channels.
+diff --git a/wpilibc/wpilibC++Devices/include/Solenoid.h b/wpilibc/wpilibC++Devices/include/Solenoid.h
+index 6a7ebf229bd743a9a0a792940fd8647fbca774b8..e141c32df48a110094a0a52e7aea700939590b67 100644
+--- a/wpilibc/wpilibC++Devices/include/Solenoid.h
++++ b/wpilibc/wpilibC++Devices/include/Solenoid.h
+@@ -10,10 +10,10 @@
+ #include "tables/ITableListener.h"
+ 
+ /**
+- * Solenoid class for running high voltage Digital Output (9472 module).
++ * Solenoid class for running high voltage Digital Output (PCM).
+  * 
+  * The Solenoid class is typically used for pneumatics solenoids, but could be used
+- * for any device within the current spec of the 9472 module.
++ * for any device within the current spec of the PCM.
+  */
+ class Solenoid : public SolenoidBase, public LiveWindowSendable, public ITableListener
+ {
+diff --git a/wpilibc/wpilibC++Sim/include/DoubleSolenoid.h b/wpilibc/wpilibC++Sim/include/DoubleSolenoid.h
+index a99af6dbe40d906f9cf11a6dc66741482e4b86eb..603a6f5537bf49d899889ea352bed7d6bac3e60d 100644
+--- a/wpilibc/wpilibC++Sim/include/DoubleSolenoid.h
++++ b/wpilibc/wpilibC++Sim/include/DoubleSolenoid.h
+@@ -11,7 +11,7 @@
+ 
+ /**
+  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
+- * (9472 module).
++ * (PCM).
+  * 
+  * The DoubleSolenoid class is typically used for pneumatics solenoids that
+  * have two positions controlled by two separate channels.
+diff --git a/wpilibc/wpilibC++Sim/include/Solenoid.h b/wpilibc/wpilibC++Sim/include/Solenoid.h
+index 31df978ef01e893d6c58efc4af2c39b7336822ba..9157f60ae2e6a1d0f23a34534ff5155644c7cde5 100644
+--- a/wpilibc/wpilibC++Sim/include/Solenoid.h
++++ b/wpilibc/wpilibC++Sim/include/Solenoid.h
+@@ -10,10 +10,10 @@
+ #include "tables/ITableListener.h"
+ 
+ /**
+- * Solenoid class for running high voltage Digital Output (9472 module).
++ * Solenoid class for running high voltage Digital Output (PCM).
+  * 
+  * The Solenoid class is typically used for pneumatics solenoids, but could be used
+- * for any device within the current spec of the 9472 module.
++ * for any device within the current spec of the PCM.
+  */
+ class Solenoid : public LiveWindowSendable, public ITableListener
+ {
+diff --git a/wpilibc/wpilibC++Sim/src/DriverStation.cpp b/wpilibc/wpilibC++Sim/src/DriverStation.cpp
+index 71c23e3efe96dfff1ebddd9034cecefe7477c3aa..b959c12730654b019b3df51675e6ea1b74ba3563 100644
+--- a/wpilibc/wpilibC++Sim/src/DriverStation.cpp
++++ b/wpilibc/wpilibC++Sim/src/DriverStation.cpp
+@@ -88,10 +88,7 @@ DriverStation* DriverStation::GetInstance()
+ }
+ 
+ /**
+- * Read the battery voltage from the specified AnalogInput.
+- *
+- * This accessor assumes that the battery voltage is being measured
+- * through the voltage divider on an analog breakout.
++ * Read the battery voltage. Hardcoded to 12 volts for Simulation.
+  *
+  * @return The battery voltage.
+  */
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DoubleSolenoid.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DoubleSolenoid.java
+index f0b155d08013c56e901cd617ea307d5d3a826b9a..330fd18992f824adc9cdbe476a6569cedea9d39f 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DoubleSolenoid.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DoubleSolenoid.java
+@@ -16,8 +16,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
+ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+ 
+ /**
+- * DoubleSolenoid class for running 2 channels of high voltage Digital Output
+- * (9472 module).
++ * DoubleSolenoid class for running 2 channels of high voltage Digital Output.
+  *
+  * The DoubleSolenoid class is typically used for pneumatics solenoids that
+  * have two positions controlled by two separate channels.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index c4442028c0cba4374e7dc45dde5bbb971b3bb09a..644e3c68d97e2383d0c6ddc4a687f853eef452cc 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -24,7 +24,7 @@ public abstract class SensorBase { // TODO: Refactor
+      */
+     public static final int kSystemClockTicksPerMicrosecond = 40;
+     /**
+-     * Number of digital channels per digital sidecar
++     * Number of digital channels per roboRIO
+      */
+     public static final int kDigitalChannels = 26;
+     /**
+@@ -44,11 +44,11 @@ public abstract class SensorBase { // TODO: Refactor
+      */
+     public static final int kSolenoidModules = 2;
+     /**
+-     * Number of PWM channels per sidecar
++     * Number of PWM channels per roboRIO
+      */
+     public static final int kPwmChannels = 20;
+     /**
+-     * Number of relay channels per sidecar
++     * Number of relay channels per roboRIO
+      */
+     public static final int kRelayChannels = 4;
+     /**
+@@ -179,7 +179,7 @@ public abstract class SensorBase { // TODO: Refactor
+     /**
+      * Get the number of the default solenoid module.
+      *
+-     * @return The number of the default analog module.
++     * @return The number of the default solenoid module.
+      */
+     public static int getDefaultSolenoidModule() {
+         return SensorBase.m_defaultSolenoidModule;
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DoubleSolenoid.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DoubleSolenoid.java
+index b34e559b612ceca862a6fbfb31c5fc8bebb03e06..416c79f0a8a3f170ad679ec9286e8dd3b33e496f 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DoubleSolenoid.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DoubleSolenoid.java
+@@ -16,8 +16,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
+ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+ 
+ /**
+- * DoubleSolenoid class for running 2 channels of high voltage Digital Output
+- * (9472 module).
++ * DoubleSolenoid class for running 2 channels of high voltage Digital Output.
+  *
+  * The DoubleSolenoid class is typically used for pneumatics solenoids that
+  * have two positions controlled by two separate channels.
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index 342bca97013f3a10bc6bc69e30b90e68d647ab1a..ccde3af219439e3ea19cfe759bbecab3c70ca443 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -141,10 +141,7 @@ public class DriverStation implements RobotState.Interface {
+     }
+ 
+     /**
+-     * Read the battery voltage from the specified AnalogChannel.
+-     *
+-     * This accessor assumes that the battery voltage is being measured
+-     * through the voltage divider on an analog breakout.
++     * Read the battery voltage.
+      *
+      * @return The battery voltage.
+      */
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index 8dd788458df4f473d21f3f9344f8bbdb789e52fa..5c1180ec012879eac8d940fc1e5e4ff4d137cb15 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -23,40 +23,31 @@ public abstract class SensorBase { // TODO: Refactor
+      */
+     public static final int kSystemClockTicksPerMicrosecond = 40;
+     /**
+-     * Number of digital channels per digital sidecar
++     * Number of digital channels per roboRIO
+      */
+-    public static final int kDigitalChannels = 20;
++    public static final int kDigitalChannels = 26;
+     /**
+-     * Number of digital modules
+-     * XXX: This number is incorrect.  We need to find the correct number.
+-     */
+-    public static final int kDigitalModules = 1;
+-    /**
+-     * Number of analog input channels per module
++     * Number of analog input channels
+      */
+     public static final int kAnalogInputChannels = 8;
+     /**
+-     * Number of analog output channels per module
++     * Number of analog output channels
+      */
+     public static final int kAnalogOutputChannels = 2;
+-    /**
+-     * Number of analog modules
+-     */
+-    public static final int kAnalogModules = 1;
+     /**
+      * Number of solenoid channels per module
+      */
+     public static final int kSolenoidChannels = 8;
+     /**
+-     * Number of analog modules
++     * Number of solenoid modules
+      */
+     public static final int kSolenoidModules = 2;
+     /**
+-     * Number of PWM channels per sidecar
++     * Number of PWM channels per roboRIO
+      */
+     public static final int kPwmChannels = 20;
+     /**
+-     * Number of relay channels per sidecar
++     * Number of relay channels per roboRIO
+      */
+     public static final int kRelayChannels = 4;
+     /**
+@@ -64,8 +55,6 @@ public abstract class SensorBase { // TODO: Refactor
+      */
+     public static final int kPDPChannels = 16;
+ 
+-    private static int m_defaultAnalogModule = 1;
+-    private static int m_defaultDigitalModule = 1;
+     private static int m_defaultSolenoidModule = 1;
+ 
+     /**
+@@ -75,33 +64,7 @@ public abstract class SensorBase { // TODO: Refactor
+     }
+ 
+     /**
+-     * Sets the default Digital Module.
+-     * This sets the default digital module to use for objects that are created without
+-     * specifying the digital module in the constructor. The default module is initialized
+-     * to the first module in the chassis.
+-     *
+-     * @param moduleNumber The number of the digital module to use.
+-     */
+-    public static void setDefaultDigitalModule(final int moduleNumber) {
+-        checkDigitalModule(moduleNumber);
+-        SensorBase.m_defaultDigitalModule = moduleNumber;
+-    }
+-
+-    /**
+-     * Sets the default Analog module.
+-     * This sets the default analog module to use for objects that are created without
+-     * specifying the analog module in the constructor. The default module is initialized
+-     * to the first module in the chassis.
+-     *
+-     * @param moduleNumber The number of the analog module to use.
+-     */
+-    public static void setDefaultAnalogModule(final int moduleNumber) {
+-        checkAnalogModule(moduleNumber);
+-        SensorBase.m_defaultAnalogModule = moduleNumber;
+-    }
+-
+-    /**
+-     * Set the default location for the Solenoid (9472) module.
++     * Set the default location for the Solenoid module.
+      *
+      * @param moduleNumber The number of the solenoid module to use.
+      */
+@@ -110,52 +73,8 @@ public abstract class SensorBase { // TODO: Refactor
+         SensorBase.m_defaultSolenoidModule = moduleNumber;
+     }
+ 
+-    /**
+-     * Check that the digital module number is valid.
+-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
+-     *
+-     * @param moduleNumber The digital module module number to check.
+-     */
+-    protected static void checkDigitalModule(final int moduleNumber) {
+-        if (moduleNumber != 1 && moduleNumber != 2)
+-            System.err.println("Digital module " + moduleNumber + " is not present.");
+-    }
+-
+-    /**
+-     * Check that the digital module number is valid.
+-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
+-     *
+-     * @param moduleNumber The digital module module number to check.
+-     */
+-    protected static void checkRelayModule(final int moduleNumber) {
+-        checkDigitalModule(moduleNumber);
+-    }
+-
+-    /**
+-     * Check that the digital module number is valid.
+-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
+-     *
+-     * @param moduleNumber The digital module module number to check.
+-     */
+-    protected static void checkPWMModule(final int moduleNumber) {
+-        checkDigitalModule(moduleNumber);
+-    }
+-
+-    /**
+-     * Check that the analog module number is valid.
+-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
+-     *
+-     * @param moduleNumber The analog module module number to check.
+-     */
+-    protected static void checkAnalogModule(final int moduleNumber) {
+-        if (moduleNumber != 1 && moduleNumber != 2) {
+-            System.err.println("Analog module " + moduleNumber + " is not present.");
+-        }
+-    }
+-
+     /**
+      * Verify that the solenoid module is correct.
+-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
+      *
+      * @param moduleNumber The solenoid module module number to check.
+      */
+@@ -257,27 +176,9 @@ public abstract class SensorBase { // TODO: Refactor
+     }
+ 
+     /**
+-     * Get the number of the default analog module.
+-     *
+-     * @return The number of the default analog module.
+-     */
+-    public static int getDefaultAnalogModule() {
+-        return SensorBase.m_defaultAnalogModule;
+-    }
+-
+-    /**
+-     * Get the number of the default analog module.
+-     *
+-     * @return The number of the default analog module.
+-     */
+-    public static int getDefaultDigitalModule() {
+-        return SensorBase.m_defaultDigitalModule;
+-    }
+-
+-    /**
+-     * Get the number of the default analog module.
++     * Get the number of the default solenoid module.
+      *
+-     * @return The number of the default analog module.
++     * @return The number of the default solenoid module.
+      */
+     public static int getDefaultSolenoidModule() {
+         return SensorBase.m_defaultSolenoidModule;
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Solenoid.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Solenoid.java
+index aed39ca75d1a3749991971834dccf26f1153140d..1b4efd8f18cfd4cef4f01f22b0ab28c05a97d079 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Solenoid.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Solenoid.java
+@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
+ 
+ /**
+- * Solenoid class for running high voltage Digital Output (9472 module).
++ * Solenoid class for running high voltage Digital Output.
+  *
+  * The Solenoid class is typically used for pneumatics solenoids, but could be used
+- * for any device within the current spec of the 9472 module.
++ * for any device within the current spec of the PCM.
+  */
+ public class Solenoid implements LiveWindowSendable {
+ 

@@ -1,0 +1,180 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Sun, 26 Oct 2014 20:39:52 -0400
+Subject: [PATCH 0448/6262] Fixed building of the frcsim-libwpilibsim-cpp deb.
+
+There is still a bug where the examples have been updated to use 0 based
+joysticks, but the simulation libraries have not been updated. I'll fix
+that as a separate commit focused on fixing the joystick APIs.
+
+Change-Id: I3b358e67b7fa18b30d1fd2b53098659cfefdfd76
+---
+ .../resources/templates/.cproject             |  2 -
+ simulation/debs/.gitignore                    |  1 -
+ simulation/debs/Makefile                      |  3 -
+ .../frcsim-libwpilibsim-cpp/Makefile          | 19 ++++++
+ .../frcsim-libwpilibsim-cpp/pom.xml           | 62 -------------------
+ wpilibc/wpilibC++Sim/src/Timer.cpp            |  8 +++
+ 6 files changed, 27 insertions(+), 68 deletions(-)
+ create mode 100644 simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/Makefile
+ delete mode 100644 simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/pom.xml
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index ade2eb261c2533a44fd8233843d900abd5cac2b1..52d91df0f1bc0e4f5fe9f40681f2b29bca247f57 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -143,9 +143,7 @@
+ 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.66697269" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+ 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.2094820582" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+ 								<option id="gnu.cpp.link.option.libs.1563598353" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+-									<listOptionValue builtIn="false" value="WPILib"/>
+ 									<listOptionValue builtIn="false" value="WPILibSim"/>
+-									<listOptionValue builtIn="false" value="WPILib"/>
+ 									<listOptionValue builtIn="false" value="gazebo"/>
+ 									<listOptionValue builtIn="false" value="gazebo_transport"/>
+ 									<listOptionValue builtIn="false" value="gazebo_msgs"/>
+diff --git a/simulation/debs/.gitignore b/simulation/debs/.gitignore
+index 5659446de5aaac8b192445a0df28778aadfbe054..30236f9391f78525e3a9e6772e32a3b458e48a56 100644
+--- a/simulation/debs/.gitignore
++++ b/simulation/debs/.gitignore
+@@ -47,7 +47,6 @@ frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/frcsim-ec
+ frcsim/frcsim/debian/frcsim/
+ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/frcsim-libwpilibsim-cpp/
+ 
+-frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/Makefile
+ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
+ 
+ # Generated Repository
+diff --git a/simulation/debs/Makefile b/simulation/debs/Makefile
+index 58b22b1289c5d150672d826e1d2085ca36298793..5c294d828ad379d889b29a7109ccdd23536c884e 100644
+--- a/simulation/debs/Makefile
++++ b/simulation/debs/Makefile
+@@ -72,7 +72,6 @@ install:
+ 	sudo dpkg -i frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_amd64.deb \
+ 	frcsim-gazebo-models/frcsim-gazebo-models_$(gazebo-models-package-version)_all.deb \
+ 	frcsim-eclipse-plugins/frcsim-eclipse-plugins_$(eclipse-plugins-package-version)_all.deb \
+-	# frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-package-version)_all.deb \
+ 	frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb \
+ 	frcsim/frcsim_$(frcsim-package-version)_all.deb
+ 
+@@ -143,8 +142,6 @@ pull-libwpilibsim-cpp:
+ 	echo 'cmake_minimum_required(VERSION 2.8)' > frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
+ 	echo 'project(WPILibSim)' >> frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
+ 	echo 'add_subdirectory(allwpilib/wpilibc/wpilibC++Sim)' >> frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/CMakeLists.txt
+-
+-	
+ 	echo Increment version?
+ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz: pull-libwpilibsim-cpp
+ 	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && debuild clean
+diff --git a/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/Makefile b/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/Makefile
+new file mode 100644
+index 0000000000000000000000000000000000000000..588fe4dee1d14ac387119170baa7b0e7b1482704
+--- /dev/null
++++ b/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/Makefile
+@@ -0,0 +1,19 @@
++prefix = /usr
++lib.dir = $(prefix)/lib
++build.dir = build
++allwpilib = ../..
++
++all:
++	mkdir -p $(build.dir)
++	cd build && cmake .. && make
++	# cp -r $(allwpilib)/wpilibc/wpilibC++ build
++	# cd ${build.dir} && ALLWPILIB=$(allwpilib) cmake .. && make
++
++clean:
++	rm -rf $(build.dir)
++
++install: all
++	mkdir -p $(DESTDIR)$(lib.dir)
++	install build/allwpilib/wpilibc/wpilibC++Sim/libWPILibSim.so $(DESTDIR)$(lib.dir)
++	# install $(build.dir)/libWPILibSim.so $(DESTDIR)$(lib.dir)
++	# install $(build.dir)/build/wpilibC++/libWPILib.a $(DESTDIR)$(lib.dir)
+diff --git a/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/pom.xml b/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/pom.xml
+deleted file mode 100644
+index 292aac560e8d254380b9e9bae7d365cf754977fb..0000000000000000000000000000000000000000
+--- a/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/pom.xml
++++ /dev/null
+@@ -1,62 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-  <modelVersion>4.0.0</modelVersion>
+-  <groupId>edu.wpi.first.wpilibc.simulation</groupId>
+-  <artifactId>WPILibCSim</artifactId>
+-  <version>0.1.0</version>
+-  <packaging>pom</packaging>
+-
+-  <build>
+-	<plugins>
+-      <plugin>
+-		<groupId>org.apache.maven.plugins</groupId>
+-		<artifactId>maven-antrun-plugin</artifactId>
+-		<version>1.7</version>
+-		<executions>
+-		  <execution>
+-			<id>zip-cpp-sim-includes</id>
+-			<phase>compile</phase>
+-			<goals>
+-			  <goal>run</goal>
+-			</goals>
+-			<configuration>
+-			  <target>
+-                <mkdir dir="${project.build.directory}/sim-includes/sim/include"/>
+-                <copy todir="${project.build.directory}/sim-includes/sim/include">
+-                  <fileset dir="include"/>
+-                  <fileset dir="../wpilibC++/include"/>
+-                  <fileset dir="../../networktables/cpp/include"/>
+-                  <fileset dir="../../hal/include"/>
+-                </copy>
+-				<zip destfile="${project.build.directory}/${project.build.finalName}.zip"
+-                     basedir="${project.build.directory}/sim-includes" />
+-			  </target>
+-			</configuration>
+-		  </execution>
+-		</executions>
+-	  </plugin>
+-	  <plugin>
+-        <groupId>org.codehaus.mojo</groupId>
+-        <artifactId>build-helper-maven-plugin</artifactId>
+-        <version>1.2</version>
+-        <executions>
+-          <execution>
+-		    <id>zip-cpp-includes</id>
+-		    <phase>package</phase>
+-		    <goals>
+-			  <goal>attach-artifact</goal>
+-			</goals>
+-            <configuration>
+-              <artifacts>
+-                <artifact>
+-                  <file>${project.build.directory}/${project.build.finalName}.zip</file>
+-                  <type>zip</type>
+-                </artifact>
+-              </artifacts>
+-            </configuration>
+-          </execution>
+-        </executions>
+-      </plugin>
+-    </plugins>
+-  </build>
+-</project>
+diff --git a/wpilibc/wpilibC++Sim/src/Timer.cpp b/wpilibc/wpilibC++Sim/src/Timer.cpp
+index 3e221a3f1457015534132d0846a5643750e0ebd1..dacb00ecc527370f5d6b6f5ce4947f1a1e14a238 100644
+--- a/wpilibc/wpilibC++Sim/src/Timer.cpp
++++ b/wpilibc/wpilibC++Sim/src/Timer.cpp
+@@ -182,6 +182,14 @@ double Timer::GetFPGATimestamp()
+ 	return wpilib::internal::simTime;
+ }
+ 
++/*
++ * Not in a match.
++ */
++double Timer::GetMatchTime()
++{
++	return Timer::GetFPGATimestamp();
++}
++
+ // Internal function that reads the PPC timestamp counter.
+ extern "C"
+ {

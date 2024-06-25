@@ -1,0 +1,3050 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Colby Skeggs <skeggsc@catlin.edu>
+Date: Sat, 21 Jun 2014 12:45:07 -0700
+Subject: [PATCH 0119/6262] FRCSim artf2604: Synchronized the codebases of
+ WPILibJ-Simulation and the main WPILibJ.
+
+Change-Id: I9b933b6f21be21cd5e9808b6f8d127a995a742e7
+---
+ .../edu/wpi/first/wpilibj/AnalogInput.java    |   4 +-
+ .../java/edu/wpi/first/wpilibj/RobotBase.java |   2 +-
+ .../java/edu/wpi/first/wpilibj/Talon.java     |   2 +-
+ .../wpilibj/interfaces/Potentiometer.java     |   2 +-
+ .../{AnalogChannel.java => AnalogInput.java}  |  49 +-
+ .../first/wpilibj/AnalogPotentiometer.java    | 168 +++-
+ .../edu/wpi/first/wpilibj/DigitalInput.java   |  43 +-
+ .../edu/wpi/first/wpilibj/DriverStation.java  |  84 +-
+ .../java/edu/wpi/first/wpilibj/Encoder.java   | 834 +++++++-----------
+ .../main/java/edu/wpi/first/wpilibj/Gyro.java |  62 +-
+ .../edu/wpi/first/wpilibj/IterativeRobot.java |   6 +-
+ .../java/edu/wpi/first/wpilibj/Jaguar.java    |  37 +-
+ .../java/edu/wpi/first/wpilibj/Joystick.java  |  11 +-
+ .../wpi/first/wpilibj/MotorSafetyHelper.java  |   6 +-
+ .../edu/wpi/first/wpilibj/PIDController.java  |  40 +-
+ .../java/edu/wpi/first/wpilibj/RobotBase.java |  45 +-
+ .../edu/wpi/first/wpilibj/RobotDrive.java     |  36 +-
+ .../edu/wpi/first/wpilibj/SensorBase.java     | 169 +++-
+ .../edu/wpi/first/wpilibj/SimpleRobot.java    |  37 +-
+ .../java/edu/wpi/first/wpilibj/Talon.java     |  50 +-
+ .../java/edu/wpi/first/wpilibj/Timer.java     |   5 +-
+ .../java/edu/wpi/first/wpilibj/Victor.java    |  47 +-
+ .../wpi/first/wpilibj/command/Command.java    |   7 +-
+ .../wpi/first/wpilibj/command/Scheduler.java  |   1 -
+ .../wpilibj/interfaces/Potentiometer.java     |  10 +
+ .../first/wpilibj/livewindow/LiveWindow.java  |  26 +-
+ .../wpi/first/wpilibj/parsing/IDevice.java    |  15 +
+ .../wpilibj/parsing/IDeviceController.java    |  15 +
+ .../first/wpilibj/parsing/IInputOutput.java   |  16 +
+ .../wpi/first/wpilibj/parsing/IMechanism.java |  17 +
+ .../wpi/first/wpilibj/parsing/ISensor.java    |  17 +
+ .../wpi/first/wpilibj/parsing/IUtility.java   |  17 +
+ 32 files changed, 936 insertions(+), 944 deletions(-)
+ rename wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/{AnalogChannel.java => AnalogInput.java} (74%)
+ create mode 100644 wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IDevice.java
+ create mode 100644 wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IDeviceController.java
+ create mode 100644 wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IInputOutput.java
+ create mode 100644 wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IMechanism.java
+ create mode 100644 wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/ISensor.java
+ create mode 100644 wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IUtility.java
+
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+index 1b58e6bc11e599e2d1ea9b01126ec6a1715daf1e..cb9e96f419fee5aad911124ee9e37635e5815233 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+@@ -446,7 +446,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
+ 	}
+ 
+ 	/**
+-	 * Get the average value for usee with PIDController
++	 * Get the average value for use with PIDController
+ 	 *
+ 	 * @return the average value
+ 	 */
+@@ -454,7 +454,7 @@ public class AnalogInput extends SensorBase implements PIDSource,
+ 		return getAverageValue();
+ 	}
+ 
+-	/*
++	/**
+ 	 * Live Window code, only does anything if live window is activated.
+ 	 */
+ 	public String getSmartDashboardType() {
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/RobotBase.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+index 2b73c67a370f990f27e48fdec398240cafe77032..f209cadcdf90811e652f201603e0c0431f0f57da 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+@@ -156,7 +156,7 @@ public abstract class RobotBase {
+      * the robot.
+      * @throws javax.microedition.midlet.MIDletStateChangeException
+      */
+-    public static void main(String args[]) { // TODO: expose main to teams?{
++    public static void main(String args[]) { // TODO: expose main to teams?
+         boolean errorOnExit = false;
+         
+         // /* JNI Testing */
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Talon.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Talon.java
+index 3538ac49457e682d08e9333f6d630ed3c39b20b7..d32a6458ae6b211423259d84c55f96e7a675e9ba 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Talon.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Talon.java
+@@ -43,7 +43,7 @@ public class Talon extends SafePWM implements SpeedController, IDeviceController
+     /**
+      * Constructor.
+      *
+-     * @param channel The PWM channel that the Victor is attached to.
++     * @param channel The PWM channel that the Talon is attached to.
+      */
+     public Talon(final int channel) {
+         super(channel);
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/interfaces/Potentiometer.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/interfaces/Potentiometer.java
+index d506b0e451d89dd07afba55d4fe6b43a65e25288..b0109a317d423c0900a73fdbbbdb486784a54540 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/interfaces/Potentiometer.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/interfaces/Potentiometer.java
+@@ -13,5 +13,5 @@ import edu.wpi.first.wpilibj.PIDSource;
+  * @author alex
+  */
+ public interface Potentiometer extends PIDSource {
+-    double get();    
++	double get();
+ }
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+similarity index 74%
+rename from wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java
+rename to wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+index 23bc1dbde04565223108bc40c337f0c064e32afc..f80c7a9e08d04ca875fdde168ee2e16115a283d2 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+@@ -13,37 +13,36 @@ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+ /**
+  * Analog channel class.
++ *
++ * Each analog channel is read from hardware as a 12-bit number representing
++ * -10V to 10V.
++ *
++ * Connected to each analog channel is an averaging and oversampling engine.
++ * This engine accumulates the specified ( by setAverageBits() and
++ * setOversampleBits() ) number of samples before returning a new value. This is
++ * not a sliding window average. The only difference between the oversampled
++ * samples and the averaged samples is that the oversampled samples are simply
++ * accumulated effectively increasing the resolution, while the averaged samples
++ * are divided by the number of samples to retain the resolution, but get more
++ * stable values.
+  */
+-public class AnalogChannel extends SensorBase implements PIDSource,
++public class AnalogInput extends SensorBase implements PIDSource,
+ 		LiveWindowSendable {
+ 
+ 	private SimFloatInput m_impl;
+-	private int m_moduleNumber, m_channel;
++	private int m_channel;
+ 
+ 	/**
+-	 * Construct an analog channel on the default module.
++	 * Construct an analog channel.
+ 	 *
+ 	 * @param channel
+ 	 *            The channel number to represent.
+ 	 */
+-	public AnalogChannel(final int channel) {
+-		this(1, channel);
+-	}
+-
+-	/**
+-	 * Construct an analog channel on a specified module.
+-	 *
+-	 * @param moduleNumber
+-	 *            The digital module to use (1 or 2).
+-	 * @param channel
+-	 *            The channel number to represent.
+-	 */
+-	public AnalogChannel(final int moduleNumber, final int channel) {
++	public AnalogInput(final int channel) {
+ 		m_channel = channel;
+-		m_moduleNumber = moduleNumber;
+-		m_impl = new SimFloatInput("simulator/analog/"+moduleNumber+"/"+channel);
++		m_impl = new SimFloatInput("simulator/analog/1/"+channel); // TODO: If module numbers cannot be specified, remove them from the communication system.
+ 
+-		LiveWindow.addSensor("Analog", moduleNumber, channel, this);
++		LiveWindow.addSensor("AnalogInput", channel, this);
+ 	}
+ 
+ 	/**
+@@ -51,7 +50,6 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 */
+ 	public void free() {
+ 		m_channel = 0;
+-		m_moduleNumber = 0;
+ 	}
+ 
+ 	/**
+@@ -90,15 +88,6 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	}
+ 
+ 	/**
+-	 * Gets the number of the analog module this channel is on.
+-	 *
+-	 * @return The module number of the analog module this channel is on.
+-	 */
+-	public int getModuleNumber() {
+-		return m_moduleNumber;
+-	}
+-
+-    /**
+ 	 * Get the average value for use with PIDController
+ 	 *
+ 	 * @return the average value
+@@ -107,7 +96,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 		return getAverageVoltage();
+ 	}
+ 
+-    /**
++	/**
+ 	 * Live Window code, only does anything if live window is activated.
+ 	 */
+ 	public String getSmartDashboardType() {
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogPotentiometer.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogPotentiometer.java
+index 53cdef579dc8fd58e58ef69e87a32acdf13e3c30..6498ff56467469efc2c1587ad336125d2a5c45d7 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogPotentiometer.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogPotentiometer.java
+@@ -1,61 +1,157 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.interfaces.Potentiometer;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.simulation.SimFloatInput;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+ /**
+- * A class for reading analog potentiometers.
+- * 
++ * Class for reading analog potentiometers. Analog potentiometers read
++ * in an analog voltage that corresponds to a position. Usually the
++ * position is either degrees or meters. However, if no conversion is
++ * given it remains volts.
++ *
+  * @author Alex Henning
+  */
+ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
+-	private int module, channel;
+-	private SimFloatInput impl;
++    private double m_scale, m_offset;
++    private AnalogInput m_analog_input;
++    private boolean m_init_analog_input;
+ 
+     /**
+      * Common initialization code called by all constructors.
++     * @param input The {@link AnalogInput} this potentiometer is plugged into.
++     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
++     * @param offset The offset to add to the scaled value for controlling the zero value
+      */
+-    private void initPot(final int slot, final int channel, double scale, double offset) {
+-    	this.module = slot;
+-    	this.channel = channel;
+-    	impl = new SimFloatInput("simulator/analog/"+slot+"/"+channel);
+-    }
+-    
+-    public AnalogPotentiometer(final int slot, final int channel, double scale, double offset) {
+-    	initPot(slot, channel, scale, offset);
++    private void initPot(final AnalogInput input, double scale, double offset) {
++        this.m_scale = scale;
++        this.m_offset = offset;
++        m_analog_input = input;
+     }
+ 
++    /**
++     * AnalogPotentiometer constructor.
++     *
++     * Use the scaling and offset values so that the output produces
++     * meaningful values. I.E: you have a 270 degree potentiometer and
++     * you want the output to be degrees with the halfway point as 0
++     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
++     * offset is -135.0 since the halfway point after scaling is 135
++     * degrees.
++     *
++     * @param channel The analog channel this potentiometer is plugged into.
++     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
++     * @param offset The offset to add to the scaled value for controlling the zero value
++     */
+     public AnalogPotentiometer(final int channel, double scale, double offset) {
+-    	initPot(1, channel, scale, offset);
++    	AnalogInput input = new AnalogInput(channel);
++    	m_init_analog_input = true;
++        initPot(input, scale, offset);
+     }
+-
++    
++    /**
++     * AnalogPotentiometer constructor.
++     *
++     * Use the scaling and offset values so that the output produces
++     * meaningful values. I.E: you have a 270 degree potentiometer and
++     * you want the output to be degrees with the halfway point as 0
++     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
++     * offset is -135.0 since the halfway point after scaling is 135
++     * degrees.
++     *
++     * @param input The {@link AnalogInput} this potentiometer is plugged into.
++     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
++     * @param offset The offset to add to the scaled value for controlling the zero value
++     */
++    public AnalogPotentiometer(final AnalogInput input, double scale, double offset) {
++    	m_init_analog_input = false;
++    	initPot(input, scale, offset);
++    }
++    
++    /**
++     * AnalogPotentiometer constructor.
++     *
++     * Use the scaling and offset values so that the output produces
++     * meaningful values. I.E: you have a 270 degree potentiometer and
++     * you want the output to be degrees with the halfway point as 0
++     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
++     * offset is -135.0 since the halfway point after scaling is 135
++     * degrees.
++     *
++     * @param channel The analog channel this potentiometer is plugged into.
++     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
++     */
+     public AnalogPotentiometer(final int channel, double scale) {
+-    	initPot(1, channel, scale, 0);
++        this(channel, scale, 0);
++    }
++    
++    /**
++     * AnalogPotentiometer constructor.
++     *
++     * Use the scaling and offset values so that the output produces
++     * meaningful values. I.E: you have a 270 degree potentiometer and
++     * you want the output to be degrees with the halfway point as 0
++     * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
++     * offset is -135.0 since the halfway point after scaling is 135
++     * degrees.
++     *
++     * @param input The {@link AnalogInput} this potentiometer is plugged into.
++     * @param scale The scaling to multiply the voltage by to get a meaningful unit.
++     */
++    public AnalogPotentiometer(final AnalogInput input, double scale) {
++        this(input, scale, 0);
+     }
+ 
++    /**
++     * AnalogPotentiometer constructor.
++     *
++     * @param channel The analog channel this potentiometer is plugged into.
++     */
+     public AnalogPotentiometer(final int channel) {
+-    	initPot(1, channel, 1, 0);
++    	this(channel, 1, 0);
+     }
+-
+-	@Override
+-	public double get() {
+-		return impl.get();
+-	}
+-    
+-	@Override
+-	public double pidGet() {
+-		return get();
+-	}
+     
+-    /*
++    /**
++     * AnalogPotentiometer constructor.
++     *
++     * @param input The {@link AnalogInput} this potentiometer is plugged into.
++     */
++    public AnalogPotentiometer(final AnalogInput input) {
++    	this(input, 1, 0);
++    }
++
++    /**
++     * Get the current reading of the potentiomere.
++     *
++     * @return The current position of the potentiometer.
++     */
++    public double get() {
++        return m_analog_input.getVoltage() * m_scale + m_offset;
++    }
++
++    /**
++     * Implement the PIDSource interface.
++     *
++     * @return The current reading.
++     */
++    public double pidGet() {
++        return get();
++    }
++
++
++    /**
+      * Live Window code, only does anything if live window is activated.
+      */
+     public String getSmartDashboardType(){
+         return "Analog Input";
+     }
+     private ITable m_table;
+-    
++
+     /**
+      * {@inheritDoc}
+      */
+@@ -63,7 +159,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
+         m_table = subtable;
+         updateTable();
+     }
+-    
++
+     /**
+      * {@inheritDoc}
+      */
+@@ -72,7 +168,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
+             m_table.putNumber("Value", get());
+         }
+     }
+-    
++
+     /**
+      * {@inheritDoc}
+      */
+@@ -80,12 +176,20 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
+         return m_table;
+     }
+     
++    public void free(){
++    	if(m_init_analog_input){
++    		m_analog_input.free();
++    		m_analog_input = null;
++    		m_init_analog_input = false;
++    	}
++    }
++
+     /**
+      * Analog Channels don't have to do anything special when entering the LiveWindow.
+      * {@inheritDoc}
+      */
+     public void startLiveWindowMode() {}
+-    
++
+     /**
+      * Analog Channels don't have to do anything special when exiting the LiveWindow.
+      * {@inheritDoc}
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
+index b28ee25574bf36d8d119365719c7298037d3bc34..ab51544e67bd4ad66b3175896ab41fc03b5da65b 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
+@@ -1,43 +1,44 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ 
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.simulation.SimDigitalInput;
++import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+-public class DigitalInput implements LiveWindowSendable {
++/**
++ * Class to read a digital input. This class will read digital inputs and return
++ * the current value on the channel. Other devices such as encoders, gear tooth
++ * sensors, etc. that are implemented elsewhere will automatically allocate
++ * digital inputs and outputs as required. This class is only for devices like
++ * switches etc. that aren't implemented anywhere else.
++ */
++public class DigitalInput implements IInputOutput,
++		LiveWindowSendable {
+ 	private SimDigitalInput impl;
+-	private int m_moduleNumber, m_channel;
++	private int m_channel;
+ 
+ 	/**
+ 	 * Create an instance of a Digital Input class. Creates a digital input
+-	 * given a channel and uses the default module.
+-	 * 
++	 * given a channel.
++	 *
+ 	 * @param channel
+ 	 *            the port for the digital input
+ 	 */
+ 	public DigitalInput(int channel) {
+-		this(1, channel);
+-	}
+-
+-	/**
+-	 * Create an instance of a Digital Input class. Creates a digital input
+-	 * given an channel and module.
+-	 * 
+-	 * @param moduleNumber
+-	 *            The number of the digital module to use for this input
+-	 * @param channel
+-	 *            the port for the digital input
+-	 */
+-	public DigitalInput(int moduleNumber, int channel) {
+-		impl = new SimDigitalInput("simulator/dio/"+moduleNumber+"/"+channel);
+-		m_moduleNumber = moduleNumber;
++		impl = new SimDigitalInput("simulator/dio/1/"+channel);
+ 		m_channel = channel;
+ 	}
+ 
+ 	/**
+ 	 * Get the value from a digital input channel. Retrieve the value of a
+ 	 * single digital input channel from the FPGA.
+-	 * 
++	 *
+ 	 * @return the stats of the digital input
+ 	 */
+ 	public boolean get() {
+@@ -46,7 +47,7 @@ public class DigitalInput implements LiveWindowSendable {
+ 
+ 	/**
+ 	 * Get the channel of the digital input
+-	 * 
++	 *
+ 	 * @return The GPIO channel number that this object represents.
+ 	 */
+ 	public int getChannel() {
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index 15b07fd4a4ede2be9fab42cd65e495d4f0431cdd..fb699eebbcd1db45fb11e1fe8e4179187ebc512a 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -12,11 +12,12 @@ import gazebo.msgs.GzDriverStation.DriverStation.State;
+ import gazebo.msgs.GzJoystick.Joystick;
+ 
+ import org.gazebosim.transport.SubscriberCallback;
++import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ 
+ /**
+  * Provide access to the network communication data to / from the Driver Station.
+  */
+-public class DriverStation {
++public class DriverStation implements IInputOutput {
+     /**
+      * Slot for the analog module to read the battery
+      */
+@@ -24,7 +25,7 @@ public class DriverStation {
+     /**
+      * Analog channel to read the battery
+      */
+-    public static final int kBatteryChannel = 8;
++    public static final int kBatteryChannel = 7;
+     /**
+      * Number of Joystick Ports
+      */
+@@ -33,6 +34,10 @@ public class DriverStation {
+      * Number of Joystick Axes
+      */
+     public static final int kJoystickAxes = 6;
++    /**
++     * Convert from raw values to volts
++     */
++    public static final double kDSAnalogInScaling = 5.0 / 1023.0;
+ 
+     /**
+      * The robot alliance that the robot is a part of
+@@ -79,7 +84,7 @@ public class DriverStation {
+         return DriverStation.instance;
+     }
+ 
+-	/**
++    /**
+      * DriverStation constructor.
+      *
+      * The single DriverStation instance is created statically with the
+@@ -155,8 +160,11 @@ public class DriverStation {
+      * @return The value of the axis on the joystick.
+      */
+     public double getStickAxis(int stick, int axis) {
+-        if (axis < 1 || axis > kJoystickAxes || joysticks[stick] == null) {
+-            return 0.0;    		
++        if (axis < 1 || axis > kJoystickAxes) {
++            return 0.0;
++        }
++        if (stick < 0 || stick >= joysticks.length || joysticks[stick] == null) {
++            return 0.0;
+     	}
+     	return joysticks[stick].getAxes(axis - 1);
+     }
+@@ -169,58 +177,12 @@ public class DriverStation {
+      * @return The state of the buttons on the joystick.
+      */
+     public boolean getStickButton(int stick, int button) {
+-    	if (joysticks[stick] == null) {
+-            return false;    		
++    	if (stick < 0 || stick >= joysticks.length || joysticks[stick] == null) {
++            return false;
+     	}
+     	return joysticks[stick].getButtons(button - 1);
+     }
+ 
+-    /**
+-     * Get an analog voltage from the Driver Station.
+-     * The analog values are returned as voltage values for the Driver Station analog inputs.
+-     * These inputs are typically used for advanced operator interfaces consisting of potentiometers
+-     * or resistor networks representing values on a rotary switch.
+-     *
+-     * @param channel The analog input channel on the driver station to read from. Valid range is 1 - 4.
+-     * @return The analog voltage on the input.
+-     */
+-    public double getAnalogIn(final int channel) {
+-    	throw new RuntimeException("The simulated DriverStation doesn't have analog inputs");
+-    }
+-
+-    /**
+-     * Get values from the digital inputs on the Driver Station.
+-     * Return digital values from the Drivers Station. These values are typically used for buttons
+-     * and switches on advanced operator interfaces.
+-     * @param channel The digital input to get. Valid range is 1 - 8.
+-     * @return The value of the digital input
+-     */
+-    public boolean getDigitalIn(final int channel) {
+-    	throw new RuntimeException("The simulated DriverStation doesn't have digital inputs");
+-    }
+-
+-    /**
+-     * Set a value for the digital outputs on the Driver Station.
+-     *
+-     * Control digital outputs on the Drivers Station. These values are typically used for
+-     * giving feedback on a custom operator station such as LEDs.
+-     *
+-     * @param channel The digital output to set. Valid range is 1 - 8.
+-     * @param value The state to set the digital output.
+-     */
+-    public void setDigitalOut(final int channel, final boolean value) {
+-    	throw new RuntimeException("The simulated DriverStation doesn't have digital outputs");
+-    }
+-
+-    /**
+-     * Get a value that was set for the digital outputs on the Driver Station.
+-     * @param channel The digital ouput to monitor. Valid range is 1 through 8.
+-     * @return A digital value being output on the Drivers Station.
+-     */
+-    public boolean getDigitalOut(final int channel) {
+-    	throw new RuntimeException("The simulated DriverStation doesn't have digital outputs");
+-    }
+-
+     /**
+      * Gets a value indicating whether the Driver Station requires the
+      * robot to be enabled.
+@@ -311,7 +273,7 @@ public class DriverStation {
+     public int getTeamNumber() {
+         return 348; // TODO
+     }
+-    
++
+     /**
+      * Is the driver station attached to a Field Management System?
+      * Note: This does not work with the Blue DS.
+@@ -321,20 +283,6 @@ public class DriverStation {
+         return false;
+     }
+ 
+-    /**
+-     * Return the approximate match time
+-     * The FMS does not currently send the official match time to the robots
+-     * This returns the time since the enable signal sent from the Driver Station
+-     * At the beginning of autonomous, the time is reset to 0.0 seconds
+-     * At the beginning of teleop, the time is reset to +15.0 seconds
+-     * If the robot is disabled, this returns 0.0 seconds
+-     * Warning: This is not an official time (so it cannot be used to argue with referees)
+-     * @return Match time in seconds since the beginning of autonomous
+-     */
+-    public double getMatchTime() {
+-    	throw new RuntimeException("The simulated DriverStation doesn't support match times"); // TODO:
+-    }
+-
+     /** Only to be used to tell the Driver Station what code you claim to be executing
+      *   for diagnostic purposes only
+      * @param entering If true, starting disabled code; if false, leaving disabled code */
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+index 6ae78ce1e91e99ce27669c43af7eda8944f796a2..edf7737a056bcba8b0e180420db38e92f06f8bc2 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+@@ -9,533 +9,319 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.simulation.SimEncoder;
++import edu.wpi.first.wpilibj.parsing.ISensor;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
+ 
+ /**
+- * Class to read quad encoders.
+- * Quadrature encoders are devices that count shaft rotation and can sense direction. The output of
+- * the QuadEncoder class is an integer that can count either up or down, and can go negative for
+- * reverse direction counting. When creating QuadEncoders, a direction is supplied that changes the
+- * sense of the output to make code more readable if the encoder is mounted such that forward movement
+- * generates negative values. Quadrature encoders have two digital outputs, an A Channel and a B Channel
+- * that are out of phase with each other to allow the FPGA to do direction sensing.
++ * Class to read quad encoders. Quadrature encoders are devices that count shaft
++ * rotation and can sense direction. The output of the QuadEncoder class is an
++ * integer that can count either up or down, and can go negative for reverse
++ * direction counting. When creating QuadEncoders, a direction is supplied that
++ * changes the sense of the output to make code more readable if the encoder is
++ * mounted such that forward movement generates negative values. Quadrature
++ * encoders have two digital outputs, an A Channel and a B Channel that are out
++ * of phase with each other to allow the FPGA to do direction sensing.
+  */
+-public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
+-    private int m_index;
+-    private double m_distancePerPulse;		// distance of travel for each encoder tick
+-    private EncodingType m_encodingType = EncodingType.k4X;
+-    private boolean m_allocatedA;
+-    private boolean m_allocatedB;
+-    private boolean m_allocatedI;
+-    private PIDSourceParameter m_pidSource;
+-    private SimEncoder impl;
+-
+-    /**
+-     * Common initialization code for Encoders.
+-     * This code allocates resources for Encoders and is common to all constructors.
+-     * @param reverseDirection If true, counts down instead of up (this is all relative)
+-     * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+-     * selected, then an encoder FPGA object is used and the returned counts will be 4x the encoder
+-     * spec'd value since all rising and falling edges are counted. If 1X or 2X are selected then
+-     * a counter object will be used and the returned value will either exactly match the spec'd count
+-     * or be double (2x) the spec'd count.
+-     */
+-    private void initEncoder(int aSlot, int aChannel,
+-            int bSlot, int bChannel, boolean reverseDirection) {
+-
+-    	LiveWindow.addSensor("Encoder", aSlot, aChannel, this);
+-        
+-        if ((bSlot < aSlot) || ((bSlot == aSlot) && (bChannel < aChannel))) { // Swap ports
+-        	int slot = bSlot;
+-        	int channel = bChannel;
+-        	bSlot = aSlot;
+-        	bChannel = aChannel;
+-        	aSlot = slot;
+-        	aChannel = channel;
+-        }
+-    	impl = new SimEncoder("simulator/dio/"+aSlot+"/"+aChannel+"/"+bSlot+"/"+bChannel);
+-    	setDistancePerPulse(1);
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b modules and channels fully specified.
+-     * @param aSlot The a channel digital input module.
+-     * @param aChannel The a channel digital input channel.
+-     * @param bSlot The b channel digital input module.
+-     * @param bChannel The b channel digital input channel.
+-     * @param reverseDirection represents the orientation of the encoder and inverts the output values
+-     * if necessary so forward represents positive values.
+-     */
+-    public Encoder(final int aSlot, final int aChannel,
+-            final int bSlot, final int bChannel,
+-            boolean reverseDirection) {
+-        m_allocatedA = true;
+-        m_allocatedB = true;
+-        m_allocatedI = false;
+-        initEncoder(aSlot, aChannel, bSlot, bChannel, reverseDirection);
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b modules and channels fully specified.
+-     * @param aSlot The a channel digital input module.
+-     * @param aChannel The a channel digital input channel.
+-     * @param bSlot The b channel digital input module.
+-     * @param bChannel The b channel digital input channel.
+-     */
+-    public Encoder(final int aSlot, final int aChannel,
+-            final int bSlot, final int bChannel) {
+-        this(aSlot, aChannel, bSlot, bChannel, false);
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b modules and channels fully specified.
+-     * @param aSlot The a channel digital input module.
+-     * @param aChannel The a channel digital input channel.
+-     * @param bSlot The b channel digital input module.
+-     * @param bChannel The b channel digital input channel.
+-     * @param reverseDirection represents the orientation of the encoder and inverts the output values
+-     * if necessary so forward represents positive values.
+-     * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+-     * selected, then an encoder FPGA object is used and the returned counts will be 4x the encoder
+-     * spec'd value since all rising and falling edges are counted. If 1X or 2X are selected then
+-     * a counter object will be used and the returned value will either exactly match the spec'd count
+-     * or be double (2x) the spec'd count.
+-     */
+-    public Encoder(final int aSlot, final int aChannel,
+-            final int bSlot, final int bChannel,
+-            boolean reverseDirection, final EncodingType encodingType) {
+-        m_allocatedA = true;
+-        m_allocatedB = true;
+-        m_allocatedI = false;
+-        if (encodingType == null)
+-            throw new NullPointerException("Given encoding type was null");
+-        m_encodingType = encodingType;
+-        initEncoder(aSlot, aChannel, bSlot, bChannel, reverseDirection);
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b modules and channels fully specified.
+-     * Using the index pulse forces 4x encoding.
+-     * @param aSlot The a channel digital input module.
+-     * @param aChannel The a channel digital input channel.
+-     * @param bSlot The b channel digital input module.
+-     * @param bChannel The b channel digital input channel.
+-     * @param indexSlot The index channel digital input module.
+-     * @param indexChannel The index channel digital input channel.
+-     * @param reverseDirection represents the orientation of the encoder and inverts the output values
+-     * if necessary so forward represents positive values.
+-     */
+-    public Encoder(final int aSlot, final int aChannel,
+-            final int bSlot, final int bChannel, final int indexSlot,
+-            final int indexChannel,
+-            boolean reverseDirection) {
+-    	throw new UnsupportedOperationException("Simulation doesn't currently support indexed encoders.");
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b modules and channels fully specified.
+-     * Using the index pulse forces 4x encoding.
+-     * @param aSlot The a channel digital input module.
+-     * @param aChannel The a channel digital input channel.
+-     * @param bSlot The b channel digital input module.
+-     * @param bChannel The b channel digital input channel.
+-     * @param indexSlot The index channel digital input module.
+-     * @param indexChannel The index channel digital input channel.
+-     */
+-    public Encoder(final int aSlot, final int aChannel,
+-            final int bSlot, final int bChannel, final int indexSlot,
+-            final int indexChannel) {
+-    	throw new UnsupportedOperationException("Simulation doesn't currently support indexed encoders.");
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b channels assuming the default module.
+-     * @param aChannel The a channel digital input channel.
+-     * @param bChannel The b channel digital input channel.
+-     * @param reverseDirection represents the orientation of the encoder and inverts the output values
+-     * if necessary so forward represents positive values.
+-     */
+-    public Encoder(final int aChannel, final int bChannel, boolean reverseDirection) {
+-        m_allocatedA = true;
+-        m_allocatedB = true;
+-        m_allocatedI = false;
+-        initEncoder(1, aChannel, 1, bChannel, reverseDirection);
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b channels assuming the default module.
+-     * @param aChannel The a channel digital input channel.
+-     * @param bChannel The b channel digital input channel.
+-     */
+-    public Encoder(final int aChannel, final int bChannel) {
+-        this(aChannel, bChannel, false);
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b channels assuming the default module.
+-     * @param aChannel The a channel digital input channel.
+-     * @param bChannel The b channel digital input channel.
+-     * @param reverseDirection represents the orientation of the encoder and inverts the output values
+-     * if necessary so forward represents positive values.
+-     * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+-     * selected, then an encoder FPGA object is used and the returned counts will be 4x the encoder
+-     * spec'd value since all rising and falling edges are counted. If 1X or 2X are selected then
+-     * a counter object will be used and the returned value will either exactly match the spec'd count
+-     * or be double (2x) the spec'd count.
+-     */
+-    public Encoder(final int aChannel, final int bChannel, boolean reverseDirection, final EncodingType encodingType) {
+-        m_allocatedA = true;
+-        m_allocatedB = true;
+-        m_allocatedI = false;
+-        if (encodingType == null)
+-            throw new NullPointerException("Given encoding type was null");
+-        m_encodingType = encodingType;
+-        initEncoder(1, aChannel, 1, bChannel, reverseDirection);
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b channels assuming the default module.
+-     * Using an index pulse forces 4x encoding
+-     * @param aChannel The a channel digital input channel.
+-     * @param bChannel The b channel digital input channel.
+-     * @param indexChannel The index channel digital input channel.
+-     * @param reverseDirection represents the orientation of the encoder and inverts the output values
+-     * if necessary so forward represents positive values.
+-     */
+-    public Encoder(final int aChannel, final int bChannel, final int indexChannel, boolean reverseDirection) {
+-    	throw new UnsupportedOperationException("Simulation doesn't currently support indexed encoders.");
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b channels assuming the default module.
+-     * Using an index pulse forces 4x encoding
+-     * @param aChannel The a channel digital input channel.
+-     * @param bChannel The b channel digital input channel.
+-     * @param indexChannel The index channel digital input channel.
+-     */
+-    public Encoder(final int aChannel, final int bChannel, final int indexChannel) {
+-        this(aChannel, bChannel, indexChannel, false);
+-    }
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b channels as digital inputs. This is used in the case
+-     * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
+-     * and assume that they already are counted.
+-     * @param aSource The source that should be used for the a channel.
+-     * @param bSource the source that should be used for the b channel.
+-     * @param reverseDirection represents the orientation of the encoder and inverts the output values
+-     * if necessary so forward represents positive values.
+-     */
+-    // Not Supported: public Encoder(DigitalSource aSource, DigitalSource bSource, boolean reverseDirection) {
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b channels as digital inputs. This is used in the case
+-     * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
+-     * and assume that they already are counted.
+-     * @param aSource The source that should be used for the a channel.
+-     * @param bSource the source that should be used for the b channel.
+-     */
+-    // Not Supported: public Encoder(DigitalSource aSource, DigitalSource bSource) {
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b channels as digital inputs. This is used in the case
+-     * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
+-     * and assume that they already are counted.
+-     * @param aSource The source that should be used for the a channel.
+-     * @param bSource the source that should be used for the b channel.
+-     * @param reverseDirection represents the orientation of the encoder and inverts the output values
+-     * if necessary so forward represents positive values.
+-     * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+-     * selected, then an encoder FPGA object is used and the returned counts will be 4x the encoder
+-     * spec'd value since all rising and falling edges are counted. If 1X or 2X are selected then
+-     * a counter object will be used and the returned value will either exactly match the spec'd count
+-     * or be double (2x) the spec'd count.
+-     */
+-    // Not Supported: public Encoder(DigitalSource aSource, DigitalSource bSource, boolean reverseDirection, final EncodingType encodingType) {
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b channels as digital inputs. This is used in the case
+-     * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
+-     * and assume that they already are counted.
+-     * @param aSource The source that should be used for the a channel.
+-     * @param bSource the source that should be used for the b channel.
+-     * @param indexSource the source that should be used for the index channel.
+-     * @param reverseDirection represents the orientation of the encoder and inverts the output values
+-     * if necessary so forward represents positive values.
+-     */
+-    // Not Supported: public Encoder(DigitalSource aSource, DigitalSource bSource, DigitalSource indexSource, boolean reverseDirection) {
+-
+-    /**
+-     * Encoder constructor.
+-     * Construct a Encoder given a and b channels as digital inputs. This is used in the case
+-     * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
+-     * and assume that they already are counted.
+-     * @param aSource The source that should be used for the a channel.
+-     * @param bSource the source that should be used for the b channel.
+-     * @param indexSource the source that should be used for the index channel.
+-     */
+-    // Not Supported: public Encoder(DigitalSource aSource, DigitalSource bSource, DigitalSource indexSource) {
+-
+-    public void free() {}
+-
+-    /**
+-     * Start the Encoder.
+-     * Starts counting pulses on the Encoder device.
+-     */
+-    public void start() {
+-    	impl.start();
+-    }
+-
+-    /**
+-     * Stops counting pulses on the Encoder device. The value is not changed.
+-     */
+-    public void stop() {
+-    	impl.stop();
+-    }
+-
+-    /**
+-     * Gets the raw value from the encoder.
+-     * The raw value is the actual count unscaled by the 1x, 2x, or 4x scale
+-     * factor.
+-     * @return Current raw count from the encoder
+-     */
+-    public int getRaw() {
+-    	throw new UnsupportedOperationException("Simulation doesn't currently support raw values.");
+-    }
+-
+-    /**
+-     * Gets the current count.
+-     * Returns the current count on the Encoder.
+-     * This method compensates for the decoding type.
+-     *
+-     * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale factor.
+-     */
+-    public int get() {
+-    	throw new UnsupportedOperationException("Simulation doesn't support ticks.");
+-    }
+-
+-    /**
+-     * Reset the Encoder distance to zero.
+-     * Resets the current count to zero on the encoder.
+-     */
+-    public void reset() {
+-    	impl.reset();
+-    }
+-
+-    /**
+-     * Returns the period of the most recent pulse.
+-     * Returns the period of the most recent Encoder pulse in seconds.
+-     * This method compensates for the decoding type.
+-     *
+-     * @deprecated Use getRate() in favor of this method.  This returns unscaled periods and getRate() scales using value from setDistancePerPulse().
+-     *
+-     * @return Period in seconds of the most recent pulse.
+-     */
+-    public double getPeriod() {
+-    	throw new UnsupportedOperationException("Simulation doesn't currently support deprecated methods.");
+-    }
+-
+-    /**
+-     * Sets the maximum period for stopped detection.
+-     * Sets the value that represents the maximum period of the Encoder before it will assume
+-     * that the attached device is stopped. This timeout allows users to determine if the wheels or
+-     * other shaft has stopped rotating.
+-     * This method compensates for the decoding type.
+-     *
+-     *
+-     * @param maxPeriod The maximum time between rising and falling edges before the FPGA will
+-     * report the device stopped. This is expressed in seconds.
+-     */
+-    public void setMaxPeriod(double maxPeriod) {
+-    	// XXX: not implemented in simulation yet
+-    	throw new UnsupportedOperationException("Simulation doesn't currently support this method.");
+-    }
+-
+-    /**
+-     * Determine if the encoder is stopped.
+-     * Using the MaxPeriod value, a boolean is returned that is true if the encoder is considered
+-     * stopped and false if it is still moving. A stopped encoder is one where the most recent pulse
+-     * width exceeds the MaxPeriod.
+-     * @return True if the encoder is considered stopped.
+-     */
+-    public boolean getStopped() {
+-    	// XXX: not implemented in simulation yet
+-    	throw new UnsupportedOperationException("Simulation doesn't currently support this method.");
+-    }
+-
+-    /**
+-     * The last direction the encoder value changed.
+-     * @return The last direction the encoder value changed.
+-     */
+-    public boolean getDirection() {
+-    	// XXX: not implemented in simulation yet
+-    	throw new UnsupportedOperationException("Simulation doesn't currently support this method.");
+-    }
+-
+-    /**
+-     * Get the distance the robot has driven since the last reset.
+-     *
+-     * @return The distance driven since the last reset as scaled by the value from setDistancePerPulse().
+-     */
+-    public double getDistance() {
+-    	return m_distancePerPulse * impl.getPosition();
+-    }
+-
+-    /**
+-     * Get the current rate of the encoder.
+-     * Units are distance per second as scaled by the value from setDistancePerPulse().
+-     *
+-     * @return The current rate of the encoder.
+-     */
+-    public double getRate() {
+-    	return m_distancePerPulse * impl.getVelocity();
+-    }
+-
+-    /**
+-     * Set the minimum rate of the device before the hardware reports it stopped.
+-     *
+-     * @param minRate The minimum rate.  The units are in distance per second as scaled by the value from setDistancePerPulse().
+-     */
+-    public void setMinRate(double minRate) {
+-    	// XXX: not implemented in simulation yet
+-    	throw new UnsupportedOperationException("Simulation doesn't currently support this method.");
+-    }
+-
+-    /**
+-     * Set the distance per pulse for this encoder.
+-     * This sets the multiplier used to determine the distance driven based on the count value
+-     * from the encoder.
+-     * Do not include the decoding type in this scale.  The library already compensates for the decoding type.
+-     * Set this value based on the encoder's rated Pulses per Revolution and
+-     * factor in gearing reductions following the encoder shaft.
+-     * This distance can be in any units you like, linear or angular.
+-     *
+-     * @param distancePerPulse The scale factor that will be used to convert pulses to useful units.
+-     */
+-    public void setDistancePerPulse(double distancePerPulse) {
+-    	System.err.println("NOTE|WPILibJSim: Encoder.setDistancePerPulse() assumes 360 pulses per revolution in simulation.");
+-    	m_distancePerPulse = distancePerPulse;
+-    }
+-
+-    /**
+-     * Set the direction sensing for this encoder.
+-     * This sets the direction sensing on the encoder so that it could count in the correct
+-     * software direction regardless of the mounting.
+-     * @param reverseDirection true if the encoder direction should be reversed
+-     */
+-    public void setReverseDirection(boolean reverseDirection) {
+-        // XXX: Currently uni-directional
+-    	throw new UnsupportedOperationException("Simulation doesn't support reversing direction.");
+-    }
+-    
+-    /**
+-     * Set the Samples to Average which specifies the number of samples of the timer to 
+-     * average when calculating the period. Perform averaging to account for 
+-     * mechanical imperfections or as oversampling to increase resolution.
+-     * @param samplesToAverage The number of samples to average from 1 to 127.
+-     */
+-    public void setSamplesToAverage(int samplesToAverage) {
+-    	throw new UnsupportedOperationException("Simulation doesn't support averaging samples.");
+-    }
+-    
+-    /**
+-     * Get the Samples to Average which specifies the number of samples of the timer to 
+-     * average when calculating the period. Perform averaging to account for 
+-     * mechanical imperfections or as oversampling to increase resolution.
+-     * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
+-     */
+-    public int getSamplesToAverage() {
+-    	throw new UnsupportedOperationException("Simulation doesn't support averaging samples.");
+-    }
+-
+-    /**
+-     * Set which parameter of the encoder you are using as a process control variable.
+-     * The encoder class supports the rate and distance parameters.
+-     * @param pidSource An enum to select the parameter.
+-     */
+-    public void setPIDSourceParameter(PIDSourceParameter pidSource) {
+-        BoundaryException.assertWithinBounds(pidSource.value, 0, 1);
+-        m_pidSource = pidSource;
+-    }
+-
+-    /**
+-     * Implement the PIDSource interface.
+-     *
+-     * @return The current value of the selected source parameter.
+-     */
+-    public double pidGet() {
+-        switch (m_pidSource.value) {
+-        case PIDSourceParameter.kDistance_val:
+-            return getDistance();
+-        case PIDSourceParameter.kRate_val:
+-            return getRate();
+-        default:
+-            return 0.0;
+-        }
+-    }
+-
+-    /*
+-     * Live Window code, only does anything if live window is activated.
+-     */
+-    public String getSmartDashboardType(){
+-        switch(m_encodingType.value)
+-        {
+-            case EncodingType.k4X_val:
+-                return "Quadrature Encoder";
+-            default:
+-                return "Encoder";
+-        }
+-    }
+-    private ITable m_table;
+-    
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void initTable(ITable subtable) {
+-        m_table = subtable;
+-        updateTable();
+-    }
+-    
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public ITable getTable(){
+-        return m_table;
+-    }
+-    
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void updateTable() {
+-        if (m_table != null) {
+-            m_table.putNumber("Speed", getRate());
+-            m_table.putNumber("Distance", getDistance());
+-            m_table.putNumber("Distance per Tick", m_distancePerPulse);
+-        }
+-    }
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void startLiveWindowMode() {}
+-    
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void stopLiveWindowMode() {}
++public class Encoder extends SensorBase implements CounterBase, PIDSource,
++		ISensor, LiveWindowSendable {
++	private int m_index;
++	private double m_distancePerPulse; // distance of travel for each encoder tick
++	private EncodingType m_encodingType = EncodingType.k4X;
++	private boolean m_allocatedA;
++	private boolean m_allocatedB;
++	private boolean m_allocatedI;
++	private PIDSourceParameter m_pidSource;
++	private SimEncoder impl;
++
++	/**
++	 * Common initialization code for Encoders. This code allocates resources
++	 * for Encoders and is common to all constructors.
++	 * 
++	 * @param reverseDirection
++	 *            If true, counts down instead of up (this is all relative)
++	 * @param encodingType
++	 *            either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If
++	 *            4X is selected, then an encoder FPGA object is used and the
++	 *            returned counts will be 4x the encoder spec'd value since all
++	 *            rising and falling edges are counted. If 1X or 2X are selected
++	 *            then a counter object will be used and the returned value will
++	 *            either exactly match the spec'd count or be double (2x) the
++	 *            spec'd count.
++	 */
++	private void initEncoder(int aChannel, int bChannel, boolean reverseDirection) {
++		m_distancePerPulse = 1.0;
++		m_pidSource = PIDSourceParameter.kDistance;
++
++		LiveWindow.addSensor("Encoder", aChannel, this);
++		
++		if (bChannel < aChannel) { // Swap ports
++			int channel = bChannel;
++			bChannel = aChannel;
++			aChannel = channel;
++		}
++		impl = new SimEncoder("simulator/dio/1/"+aChannel+"/1/"+bChannel);
++		setDistancePerPulse(1);
++
++	}
++
++	/**
++	 * Encoder constructor. Construct a Encoder given a and b channels.
++	 * 
++	 * @param aChannel
++	 *            The a channel digital input channel.
++	 * @param bChannel
++	 *            The b channel digital input channel.
++	 * @param reverseDirection
++	 *            represents the orientation of the encoder and inverts the
++	 *            output values if necessary so forward represents positive
++	 *            values.
++	 */
++	public Encoder(final int aChannel, final int bChannel,
++			boolean reverseDirection) {
++		m_allocatedA = true;
++		m_allocatedB = true;
++		m_allocatedI = false;
++		initEncoder(aChannel, bChannel, reverseDirection);
++	}
++
++	/**
++	 * Encoder constructor. Construct a Encoder given a and b channels.
++	 * 
++	 * @param aChannel
++	 *            The a channel digital input channel.
++	 * @param bChannel
++	 *            The b channel digital input channel.
++	 */
++	public Encoder(final int aChannel, final int bChannel) {
++		this(aChannel, bChannel, false);
++	}
++
++	/**
++	 * Encoder constructor. Construct a Encoder given a and b channels.
++	 * 
++	 * @param aChannel
++	 *            The a channel digital input channel.
++	 * @param bChannel
++	 *            The b channel digital input channel.
++	 * @param reverseDirection
++	 *            represents the orientation of the encoder and inverts the
++	 *            output values if necessary so forward represents positive
++	 *            values.
++	 * @param encodingType
++	 *            either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If
++	 *            4X is selected, then an encoder FPGA object is used and the
++	 *            returned counts will be 4x the encoder spec'd value since all
++	 *            rising and falling edges are counted. If 1X or 2X are selected
++	 *            then a counter object will be used and the returned value will
++	 *            either exactly match the spec'd count or be double (2x) the
++	 *            spec'd count.
++	 */
++	public Encoder(final int aChannel, final int bChannel,
++			boolean reverseDirection, final EncodingType encodingType) {
++		m_allocatedA = true;
++		m_allocatedB = true;
++		m_allocatedI = false;
++		if (encodingType == null)
++			throw new NullPointerException("Given encoding type was null");
++		m_encodingType = encodingType;
++		initEncoder(aChannel, bChannel, reverseDirection);
++	}
++
++	public void free() {}
++
++	/**
++	 * Start the Encoder.
++	 * Starts counting pulses on the Encoder device.
++	 */
++	public void start() {
++		impl.start();
++	}
++
++	/**
++	 * Stops counting pulses on the Encoder device. The value is not changed.
++	 */
++	public void stop() {
++		impl.stop();
++	}
++
++	/**
++	 * Reset the Encoder distance to zero.
++	 * Resets the current count to zero on the encoder.
++	 */
++	public void reset() {
++		impl.reset();
++	}
++
++	// Left this in despite removing other such stubs because this one is needed to compile.
++	public boolean getDirection() {
++		// XXX: not implemented in simulation yet
++		throw new UnsupportedOperationException("Simulation doesn't currently support this method.");
++	}
++
++	/**
++	 * Get the distance the robot has driven since the last reset.
++	 *
++	 * @return The distance driven since the last reset as scaled by the value from setDistancePerPulse().
++	 */
++	public double getDistance() {
++		return m_distancePerPulse * impl.getPosition();
++	}
++
++	/**
++	 * Gets the current count.
++	 * Returns the current count on the Encoder.
++	 * This method compensates for the decoding type.
++	 *
++	 * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x sc
++	 */
++	public int get() {
++		throw new UnsupportedOperationException("Simulation doesn't currently support this method.");
++	}
++
++	/**
++	 * Returns the period of the most recent pulse.
++	 * Returns the period of the most recent Encoder pulse in seconds.
++	 * This method compensates for the decoding type.
++	 *
++	 * @deprecated Use getRate() in favor of this method.  This returns unscale
++	 *
++	 * @return Period in seconds of the most recent pulse.
++	 */
++	public double getPeriod() {
++		throw new UnsupportedOperationException("Simulation doesn't currently support this method.");
++	}
++
++	/**
++	 * Sets the maximum period for stopped detection.
++	 * Sets the value that represents the maximum period of the Encoder before 
++	 * that the attached device is stopped. This timeout allows users to determ
++	 * other shaft has stopped rotating.
++	 * This method compensates for the decoding type.
++	 *
++	 *
++	 * @param maxPeriod The maximum time between rising and falling edges befor
++	 * report the device stopped. This is expressed in seconds.
++	 */
++	public void setMaxPeriod(double maxPeriod) {
++		// XXX: not implemented in simulation yet
++		throw new UnsupportedOperationException("Simulation doesn't currently support this method.");
++	}
++
++	/**
++	 * Determine if the encoder is stopped.
++	 * Using the MaxPeriod value, a boolean is returned that is true if the enc
++	 * stopped and false if it is still moving. A stopped encoder is one where 
++	 * width exceeds the MaxPeriod.
++	 * @return True if the encoder is considered stopped.
++	 */
++	public boolean getStopped() {
++		// XXX: not implemented in simulation yet
++		throw new UnsupportedOperationException("Simulation doesn't currently support this method.");
++	}
++
++	/**
++	 * Get the current rate of the encoder.
++	 * Units are distance per second as scaled by the value from setDistancePerPulse().
++	 *
++	 * @return The current rate of the encoder.
++	 */
++	public double getRate() {
++		return m_distancePerPulse * impl.getVelocity();
++	}
++
++	/**
++	 * Set the distance per pulse for this encoder.
++	 * This sets the multiplier used to determine the distance driven based on the count value
++	 * from the encoder.
++	 * Do not include the decoding type in this scale.  The library already compensates for the decoding type.
++	 * Set this value based on the encoder's rated Pulses per Revolution and
++	 * factor in gearing reductions following the encoder shaft.
++	 * This distance can be in any units you like, linear or angular.
++	 *
++	 * @param distancePerPulse The scale factor that will be used to convert pulses to useful units.
++	 */
++	public void setDistancePerPulse(double distancePerPulse) {
++		System.err.println("NOTE|WPILibJSim: Encoder.setDistancePerPulse() assumes 360 pulses per revolution in simulation.");
++		m_distancePerPulse = distancePerPulse;
++	}
++
++	/**
++	 * Set which parameter of the encoder you are using as a process control
++	 * variable. The encoder class supports the rate and distance parameters.
++	 * 
++	 * @param pidSource
++	 *            An enum to select the parameter.
++	 */
++	public void setPIDSourceParameter(PIDSourceParameter pidSource) {
++		BoundaryException.assertWithinBounds(pidSource.value, 0, 1);
++		m_pidSource = pidSource;
++	}
++
++	/**
++	 * Implement the PIDSource interface.
++	 * 
++	 * @return The current value of the selected source parameter.
++	 */
++	public double pidGet() {
++		switch (m_pidSource.value) {
++		case PIDSourceParameter.kDistance_val:
++			return getDistance();
++		case PIDSourceParameter.kRate_val:
++			return getRate();
++		default:
++			return 0.0;
++		}
++	}
++
++	/*
++	 * Live Window code, only does anything if live window is activated.
++	 */
++	public String getSmartDashboardType() {
++		switch (m_encodingType.value) {
++		case EncodingType.k4X_val:
++			return "Quadrature Encoder";
++		default:
++			return "Encoder";
++		}
++	}
++	private ITable m_table;
++
++	/**
++	 * {@inheritDoc}
++	 */
++	public void initTable(ITable subtable) {
++		m_table = subtable;
++		updateTable();
++	}
++
++	/**
++	 * {@inheritDoc}
++	 */
++	public ITable getTable() {
++		return m_table;
++	}
++
++	/**
++	 * {@inheritDoc}
++	 */
++	public void updateTable() {
++		if (m_table != null) {
++			m_table.putNumber("Speed", getRate());
++			m_table.putNumber("Distance", getDistance());
++			m_table.putNumber("Distance per Tick", m_distancePerPulse);
++		}
++	}
++
++	/**
++	 * {@inheritDoc}
++	 */
++	public void startLiveWindowMode() {
++	}
++
++	/**
++	 * {@inheritDoc}
++	 */
++	public void stopLiveWindowMode() {
++	}
+ }
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Gyro.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+index 94f5dd3b789dc6ee2a4dc8eb7a0772f0e38668b8..08de58112aba43a4acaccba6fbdbff16008dce38 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Gyro.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.simulation.SimGyro;
++import edu.wpi.first.wpilibj.parsing.ISensor;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
+ 
+@@ -21,11 +22,9 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * determine the default offset. This is subtracted from each sample to
+  * determine the heading.
+  */
+-public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
++public class Gyro extends SensorBase implements PIDSource, ISensor,
++		LiveWindowSendable {
+ 
+-	double m_offset;
+-	int m_center;
+-	boolean m_channelAllocated;
+ 	private PIDSourceParameter m_pidSource;
+ 	private SimGyro impl;
+ 
+@@ -37,41 +36,23 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	 * calculations are in progress, this is typically done when the robot is
+ 	 * first turned on while it's sitting at rest before the competition starts.
+ 	 */
+-	private void initGyro(int slot, int channel) {
+-		impl = new SimGyro("simulator/analog/"+slot+"/"+channel);
+-		
++	private void initGyro(int channel) {
++		impl = new SimGyro("simulator/analog/1/"+channel);
++
+ 		reset();
+ 		setPIDSourceParameter(PIDSourceParameter.kAngle);
+ 
+-		//UsageReporting.report(tResourceType.kResourceType_Gyro,
+-		//  m_analog.getChannel(), m_analog.getModuleNumber() - 1);
+-		LiveWindow.addSensor("Gyro", slot, channel, this);
+-	}
+-
+-	/**
+-	 * Gyro constructor given a slot and a channel. .
+-	 * 
+-	 * @param slot
+-	 *            The cRIO slot for the analog module the gyro is connected to.
+-	 * @param channel
+-	 *            The analog channel the gyro is connected to.
+-	 */
+-	public Gyro(int slot, int channel) {
+-		m_channelAllocated = true;
+-		initGyro(slot, channel);
++		LiveWindow.addSensor("Gyro", channel, this);
+ 	}
+ 
+ 	/**
+ 	 * Gyro constructor with only a channel.
+-	 * 
+-	 * Use the default analog module slot.
+-	 * 
++	 *
+ 	 * @param channel
+ 	 *            The analog channel the gyro is connected to.
+ 	 */
+ 	public Gyro(int channel) {
+-		m_channelAllocated = true;
+-		initGyro(1, channel);
++		initGyro(channel);
+ 	}
+ 
+ 	/**
+@@ -102,13 +83,13 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 
+ 	/**
+ 	 * Return the actual angle in degrees that the robot is currently facing.
+-	 * 
++	 *
+ 	 * The angle is based on the current accumulator value corrected by the
+ 	 * oversampling rate, the gyro type and the A/D calibration values. The
+ 	 * angle is continuous, that is can go beyond 360 degrees. This make
+ 	 * algorithms that wouldn't want to see a discontinuity in the gyro output
+ 	 * as it sweeps past 0 on the second time around.
+-	 * 
++	 *
+ 	 * @return the current heading of the robot in degrees. This heading is
+ 	 *         based on integration of the returned rate from the gyro.
+ 	 */
+@@ -118,32 +99,19 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 
+ 	/**
+ 	 * Return the rate of rotation of the gyro
+-	 * 
++	 *
+ 	 * The rate is based on the most recent reading of the gyro analog value
+-	 * 
++	 *
+ 	 * @return the current rate in degrees per second
+ 	 */
+ 	public double getRate() {
+ 		return impl.getVelocity();
+ 	}
+ 
+-	/**
+-	 * Set the gyro type based on the sensitivity. This takes the number of
+-	 * volts/degree/second sensitivity of the gyro and uses it in subsequent
+-	 * calculations to allow the code to work with multiple gyros.
+-	 * 
+-	 * @param voltsPerDegreePerSecond
+-	 *            The type of gyro specified as the voltage that represents one
+-	 *            degree/second.
+-	 */
+-	public void setSensitivity(double voltsPerDegreePerSecond) {
+-		throw new UnsupportedOperationException("Simulation doesn't currently support setting the sensitivity.");
+-	}
+-
+ 	/**
+ 	 * Set which parameter of the encoder you are using as a process control
+ 	 * variable. The Gyro class supports the rate and angle parameters
+-	 * 
++	 *
+ 	 * @param pidSource
+ 	 *            An enum to select the parameter.
+ 	 */
+@@ -154,7 +122,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 
+ 	/**
+ 	 * Get the angle of the gyro for use with PIDControllers
+-	 * 
++	 *
+ 	 * @return the current angle according to the gyro
+ 	 */
+ 	public double pidGet() {
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java
+index 16135ba41b28f201c3766769f7fff71f11fea18c..b31d7346c3599694c383ac2b37ea42ebfe26f43d 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java
+@@ -60,8 +60,6 @@ public class IterativeRobot extends RobotBase {
+      *
+      */
+     public void startCompetition() {
+-        // UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
+-
+         robotInit();
+ 
+         // tracing support:
+@@ -125,7 +123,6 @@ public class IterativeRobot extends RobotBase {
+                     m_disabledInitialized = false;
+                 }
+                 if (nextPeriodReady()) {
+-                    // TODO: getWatchdog().feed();
+                     // TODO: FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramAutonomous();
+                     autonomousPeriodic();
+                     didAutonomousPeriodic = true;
+@@ -142,7 +139,6 @@ public class IterativeRobot extends RobotBase {
+                     m_disabledInitialized = false;
+                 }
+                 if (nextPeriodReady()) {
+-                    // TODO: getWatchdog().feed();
+                     // TODO: FRC_NetworkCommunicationsLibrary.FRC_NetworkCommunication_observeUserProgramTeleop();
+                     teleopPeriodic();
+                     didTeleopPeriodic = true;
+@@ -158,7 +154,7 @@ public class IterativeRobot extends RobotBase {
+     private boolean nextPeriodReady() {
+         // TODO: return m_ds.isNewControlData();
+         try {
+-            Thread.sleep(20);
++            Thread.sleep(20); // TODO: Find a better solution. This one is way too hacky!
+         } catch (InterruptedException ex) {}
+     	return true;
+     }
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Jaguar.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
+index aac932a7b10295f0beeb76c62cdcc95482b07fa0..fdc527a01192822d6b7a139a8eb1113ccccb6b81 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
+@@ -11,47 +11,36 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.simulation.SimSpeedController;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
++import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ 
+ /**
+- * CTRE Talon Speed Controller
++ * VEX Robotics Jaguar Speed Control
+  */
+ public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWindowSendable {
+-	private int module, channel;
++	private int channel;
+ 	private SimSpeedController impl;
+ 
+     /**
+      * Common initialization code called by all constructors.
+      */
+-    private void initTalon(final int slot, final int channel) {
+-    	this.module = slot;
++    private void initJaguar(final int channel) {
+     	this.channel = channel;
+-    	impl = new SimSpeedController("simulator/pwm/"+slot+"/"+channel);
+-    	
++        impl = new SimSpeedController("simulator/pwm/1/"+channel);
++
+         m_safetyHelper = new MotorSafetyHelper(this);
+         m_safetyHelper.setExpiration(0.0);
+         m_safetyHelper.setSafetyEnabled(false);
+-        
+-        // LiveWindow.addActuator("Talon", getModuleNumber(), getChannel(), this);
+-        // UsageReporting.report(tResourceType.kResourceType_Talon, getChannel(), getModuleNumber()-1);
+-    }
+ 
+-    /**
+-     * Constructor that assumes the default digital module.
+-     *
+-     * @param channel The PWM channel on the digital module that the Victor is attached to.
+-     */
+-    public Jaguar(final int channel) {
+-        initTalon(1, channel);
++        LiveWindow.addActuator("Jaguar", channel, this);
+     }
+ 
+     /**
+-     * Constructor that specifies the digital module.
++     * Constructor.
+      *
+-     * @param slot The slot in the chassis that the digital module is plugged into.
+-     * @param channel The PWM channel on the digital module that the Victor is attached to.
++     * @param channel The PWM channel that the Jaguar is attached to.
+      */
+-    public Jaguar(final int slot, final int channel) {
+-        initTalon(slot, channel);
++    public Jaguar(final int channel) {
++        initJaguar(channel);
+     }
+ 
+     /**
+@@ -89,7 +78,7 @@ public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWind
+     public double get() {
+         return impl.get();
+     }
+-	
++
+     /**
+      * Disable the speed controller
+      */
+@@ -141,7 +130,7 @@ public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWind
+ 
+ 	@Override
+ 	public String getDescription() {
+-        return "PWM "+channel+" on module "+module;
++        return "PWM "+channel+" on module 1";
+ 	}
+ 
+ 	//// LiveWindow Methods
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+index 1f972c772208592a4cd7f10236b6f3c0f5f8a554..973640ea29b5decc1193f2cee156754f10cc401e 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+@@ -6,7 +6,7 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ 
+-import edu.wpi.first.wpilibj.GenericHID;
++import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ 
+ /**
+  * Handle input from standard Joysticks connected to the Driver Station.
+@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.GenericHID;
+  * the most recent value is returned. There is a single class instance for each joystick and the mapping
+  * of ports to hardware buttons depends on the code in the driver station.
+  */
+-public class Joystick extends GenericHID {
++public class Joystick extends GenericHID implements IInputOutput {
+ 
+     static final byte kDefaultXAxis = 1;
+     static final byte kDefaultYAxis = 2;
+@@ -98,6 +98,7 @@ public class Joystick extends GenericHID {
+             this.value = value;
+         }
+     }
++    private DriverStation m_ds;
+     private final int m_port;
+     private final byte[] m_axes;
+     private final byte[] m_buttons;
+@@ -120,7 +121,6 @@ public class Joystick extends GenericHID {
+         m_buttons[ButtonType.kTrigger.value] = kDefaultTriggerButton;
+         m_buttons[ButtonType.kTop.value] = kDefaultTopButton;
+ 
+-        //UsageReporting.report(tResourceType.kResourceType_Joystick, port);
+     }
+ 
+     /**
+@@ -134,6 +134,7 @@ public class Joystick extends GenericHID {
+      * @param numButtonTypes The number of button types in the enum.
+      */
+     protected Joystick(int port, int numAxisTypes, int numButtonTypes) {
++        m_ds = DriverStation.getInstance();
+         m_axes = new byte[numAxisTypes];
+         m_buttons = new byte[numButtonTypes];
+         m_port = port;
+@@ -199,7 +200,7 @@ public class Joystick extends GenericHID {
+      * @return The value of the axis.
+      */
+     public double getRawAxis(final int axis) {
+-        return DriverStation.getInstance().getStickAxis(m_port, axis);
++        return m_ds.getStickAxis(m_port, axis);
+     }
+ 
+     /**
+@@ -273,7 +274,7 @@ public class Joystick extends GenericHID {
+      * @return The state of the button.
+      */
+     public boolean getRawButton(final int button) {
+-        return DriverStation.getInstance().getStickButton(m_port, button);
++        return m_ds.getStickButton(m_port, button);
+     }
+ 
+     /**
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/MotorSafetyHelper.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/MotorSafetyHelper.java
+index e7d03ac2f5f04d8cb48e049492eda811b177d429..2a06ef3e2282e7f61a109db31574cc15b919e678 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/MotorSafetyHelper.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/MotorSafetyHelper.java
+@@ -82,9 +82,9 @@ public class MotorSafetyHelper {
+      * updated again.
+      */
+     public void check() {
+-        // TODO: DriverStation ds = DriverStation.getInstance();
+-        // TODO: if (!m_enabled || ds.isDisabled() || ds.isTest())
+-        // TODO:    return;
++        DriverStation ds = DriverStation.getInstance();
++        if (!m_enabled || ds.isDisabled() || ds.isTest())
++            return;
+         if (m_stopTime < Timer.getFPGATimestamp()) {
+             System.err.println(m_safeObject.getDescription() + "... Output not updated often enough.");
+ 
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/PIDController.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/PIDController.java
+index 02c5300c666dc2de9c12f4047d46952277fe9e89..6fdd8a2e1872fc5bb17f9a67aeb777efb2bc3b3a 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/PIDController.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/PIDController.java
+@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
+ import java.util.TimerTask;
+ 
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
++import edu.wpi.first.wpilibj.parsing.IUtility;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
+@@ -20,7 +21,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * care of the integral calculations, as well as writing the given
+  * PIDOutput
+  */
+-public class PIDController implements LiveWindowSendable, Controller {
++public class PIDController implements IUtility, LiveWindowSendable, Controller {
+ 
+     public static final double kDefaultPeriod = .05;
+     private static int instances = 0;
+@@ -44,6 +45,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+     PIDSource m_pidInput;
+     PIDOutput m_pidOutput;
+     java.util.Timer m_controlLoop;
++    private boolean m_freed = false;
+     private boolean m_usingPercentTolerance;
+ 
+     /**
+@@ -99,7 +101,11 @@ public class PIDController implements LiveWindowSendable, Controller {
+         }
+ 
+         public void run() {
+-            m_controller.calculate();
++        	if(!m_freed){
++        		m_controller.calculate();
++        	} else {
++        		cancel();
++        	}
+         }
+     }
+ 
+@@ -140,7 +146,6 @@ public class PIDController implements LiveWindowSendable, Controller {
+         m_controlLoop.schedule(new PIDTask(this), 0L, (long) (m_period * 1000));
+ 
+         instances++;
+-        // UsageReporting.report(tResourceType.kResourceType_PIDController, instances);
+         m_tolerance = new NullTolerance();
+     }
+ 
+@@ -189,7 +194,11 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * Free the PID object
+      */
+     public void free() {
++    	m_freed = true;
++    	if(this.table!=null) table.removeTableListener(listener);
+         m_controlLoop.cancel();
++        m_pidInput = null;
++    	m_pidOutput = null;
+         m_controlLoop = null;
+     }
+ 
+@@ -214,10 +223,12 @@ public class PIDController implements LiveWindowSendable, Controller {
+         }
+ 
+         if (enabled) {
+-            double input = pidInput.pidGet();
++        	double input;
+             double result;
+             PIDOutput pidOutput = null;
+-
++            synchronized (this){
++            	input = pidInput.pidGet();
++            }
+             synchronized (this) {
+                 m_error = m_setpoint - input;
+                 if (m_continuous) {
+@@ -256,7 +267,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+                 pidOutput = m_pidOutput;
+                 result = m_result;
+             }
+-
++            
+             pidOutput.pidWrite(result);
+         }
+     }
+@@ -435,27 +446,16 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * Set the percentage error which is considered tolerable for use with
+      * OnTarget. (Input of 15.0 = 15 percent)
+      * @param percent error which is tolerable
+-     * @deprecated Use setTolerance(Tolerance), i.e. setTolerance(new PIDController.PercentageTolerance(15))
++     * @deprecated Use {@link #setPercentTolerance(double) or {@link #setAbsoluteTolerance(double)} instead.
+      */
+     public synchronized void setTolerance(double percent) {
+         m_tolerance = new PercentageTolerance(percent);
+     }
+ 
+-    /** Set the PID tolerance using a Tolerance object.
+-     * Tolerance can be specified as a percentage of the range or as an absolute
+-     * value. The Tolerance object encapsulates those options in an object. Use it by
+-     * creating the type of tolerance that you want to use: setTolerance(new PIDController.AbsoluteTolerance(0.1))
+-     * @param tolerance a tolerance object of the right type, e.g. PercentTolerance
+-     * or AbsoluteTolerance
+-     */
+-    private void setTolerance(Tolerance tolerance) {
+-        m_tolerance = tolerance;
+-    }
+-
+     /**
+      * Set the absolute error which is considered tolerable for use with
+      * OnTarget.
+-     * @param absolute error which is tolerable in the units of the input object
++     * @param absvalue absolute error which is tolerable in the units of the input object
+      */
+     public synchronized void setAbsoluteTolerance(double absvalue) {
+         m_tolerance = new AbsoluteTolerance(absvalue);
+@@ -464,7 +464,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+     /**
+      * Set the percentage error which is considered tolerable for use with
+      * OnTarget. (Input of 15.0 = 15 percent)
+-     * @param percent error which is tolerable
++     * @param percentage percent error which is tolerable
+      */
+     public synchronized void setPercentTolerance(double percentage) {
+         m_tolerance = new PercentageTolerance(percentage);
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotBase.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+index 9742fd1bdeb11acf421b71e689b180a1d0abaaaa..751aa71b6b4c0fee6026fe8fa8b97ccf287e6d88 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+@@ -13,7 +13,6 @@ import java.util.Enumeration;
+ import java.util.jar.Manifest;
+ 
+ import edu.wpi.first.wpilibj.simulation.MainNode;
+-
+ import edu.wpi.first.wpilibj.networktables.NetworkTable;
+ 
+ /**
+@@ -25,8 +24,6 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
+  * might be spawned as a task, then killed at the end of the Autonomous period.
+  */
+ public abstract class RobotBase {
+-	private static DriverStation ds;
+-	
+     /**
+      * The VxWorks priority that robot code should work at (so Java code should run at)
+      */
+@@ -37,8 +34,7 @@ public abstract class RobotBase {
+      */
+     public final static String ERRORS_TO_DRIVERSTATION_PROP = "first.driverstation.senderrors";
+ 
+-    // TODO: protected final DriverStation m_ds;
+-    // TODO: private final Watchdog m_watchdog = Watchdog.getInstance();
++    protected final DriverStation m_ds;
+ 
+     /**
+      * Constructor for a generic robot program.
+@@ -57,7 +53,7 @@ public abstract class RobotBase {
+ //            Utility.sendErrorStreamToDriverStation(true);
+ //        }
+         NetworkTable.setServerMode();//must be before b
+-        // TODO: m_watchdog.setEnabled(false);
++        m_ds = DriverStation.getInstance();
+         NetworkTable.getTable("");  // forces network tables to initialize
+         NetworkTable.getTable("LiveWindow").getSubTable("~STATUS~").putBoolean("LW Enabled", false);
+     }
+@@ -68,29 +64,6 @@ public abstract class RobotBase {
+     public void free() {
+     }
+ 
+-    /**
+-     * Check on the overall status of the system.
+-     *
+-     * @return Is the system active (i.e. PWM motor outputs, etc. enabled)?
+-     */
+-    public boolean isSystemActive() {
+-        // TODO: return m_watchdog.isSystemActive();
+-        return true;
+-    }
+-
+-    /**
+-     * Return the instance of the Watchdog timer.
+-     * Get the watchdog timer so the user program can either disable it or feed it when
+-     * necessary.
+-     *
+-     * @return The Watchdog timer.
+-     */
+-    // TODO: No watchdog supportr
+-    // public Watchdog getWatchdog() {
+-    //    return m_watchdog;
+-    //}
+-    
+-
+     /**
+      * @return If the robot is running in simulation.
+      */
+@@ -110,7 +83,7 @@ public abstract class RobotBase {
+      * @return True if the Robot is currently disabled by the field controls.
+      */
+     public boolean isDisabled() {
+-    	return ds.isDisabled();
++        return m_ds.isDisabled();
+     }
+ 
+     /**
+@@ -118,7 +91,7 @@ public abstract class RobotBase {
+      * @return True if the Robot is currently enabled by the field controls.
+      */
+     public boolean isEnabled() {
+-    	return ds.isEnabled();
++        return m_ds.isEnabled();
+     }
+ 
+     /**
+@@ -126,7 +99,7 @@ public abstract class RobotBase {
+      * @return True if the robot is currently operating Autonomously as determined by the field controls.
+      */
+     public boolean isAutonomous() {
+-    	return ds.isAutonomous();
++        return m_ds.isAutonomous();
+     }
+ 
+     /**
+@@ -134,7 +107,7 @@ public abstract class RobotBase {
+      * @return True if the robot is currently operating in Test mode as determined by the driver station.
+      */
+     public boolean isTest() {
+-    	return ds.isTest();
++        return m_ds.isTest();
+     }
+ 
+     /**
+@@ -142,7 +115,7 @@ public abstract class RobotBase {
+      * @return True if the robot is currently operating in Tele-Op mode as determined by the field controls.
+      */
+     public boolean isOperatorControl() {
+-    	return ds.isOperatorControl();
++        return m_ds.isOperatorControl();
+     }
+ 
+     /**
+@@ -150,7 +123,7 @@ public abstract class RobotBase {
+      * @return Has new data arrived over the network since the last time this function was called?
+      */
+     public boolean isNewDataAvailable() {
+-    	return ds.isNewControlData();
++        return m_ds.isNewControlData();
+     }
+ 
+     /**
+@@ -189,8 +162,6 @@ public abstract class RobotBase {
+             return;
+         }
+ 
+-        ds = DriverStation.getInstance();
+-
+ 		String robotName = "";
+ 		Enumeration<URL> resources = null;
+ 		try {
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
+index 506305b6a997ce682aa7667b716eb1e766bd183d..2b4064dfec9ee1dd85ad55fe83a0cdcd6aa130c9 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
+@@ -6,6 +6,8 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ 
++import edu.wpi.first.wpilibj.parsing.IUtility;
++
+ /**
+  * Utility class for handling Robot drive based on a definition of the motor configuration.
+  * The robot drive class handles basic driving for a robot. Currently, 2 and 4 motor standard
+@@ -14,7 +16,7 @@ package edu.wpi.first.wpilibj;
+  * used for either the drive function (intended for hand created drive code, such as autonomous)
+  * or with the Tank/Arcade functions intended to be used for Operator Control driving.
+  */
+-public class RobotDrive implements MotorSafety {
++public class RobotDrive implements MotorSafety, IUtility {
+ 
+     protected MotorSafetyHelper m_safetyHelper;
+ 
+@@ -64,7 +66,7 @@ public class RobotDrive implements MotorSafety {
+     protected SpeedController m_rearLeftMotor;
+     protected SpeedController m_rearRightMotor;
+     protected boolean m_allocatedSpeedControllers;
+-    protected boolean m_isCANInitialized = true;
++    protected boolean m_isCANInitialized = false;//TODO: fix can
+     protected static boolean kArcadeRatioCurve_Reported = false;
+     protected static boolean kTank_Reported = false;
+     protected static boolean kArcadeStandard_Reported = false;
+@@ -75,16 +77,16 @@ public class RobotDrive implements MotorSafety {
+      * Set up parameters for a two wheel drive system where the
+      * left and right motor pwm channels are specified in the call.
+      * This call assumes Jaguars for controlling the motors.
+-     * @param leftMotorChannel The PWM channel number on the default digital module that drives the left motor.
+-     * @param rightMotorChannel The PWM channel number on the default digital module that drives the right motor.
++     * @param leftMotorChannel The PWM channel number that drives the left motor.
++     * @param rightMotorChannel The PWM channel number that drives the right motor.
+      */
+     public RobotDrive(final int leftMotorChannel, final int rightMotorChannel) {
+         m_sensitivity = kDefaultSensitivity;
+         m_maxOutput = kDefaultMaxOutput;
+         m_frontLeftMotor = null;
+-        m_rearLeftMotor = new Talon(leftMotorChannel);
++        m_rearLeftMotor = new Jaguar(leftMotorChannel);
+         m_frontRightMotor = null;
+-        m_rearRightMotor = new Talon(rightMotorChannel);
++        m_rearRightMotor = new Jaguar(rightMotorChannel);
+         for (int i = 0; i < kMaxNumberOfMotors; i++) {
+             m_invertedMotors[i] = 1;
+         }
+@@ -98,19 +100,19 @@ public class RobotDrive implements MotorSafety {
+      * Set up parameters for a four wheel drive system where all four motor
+      * pwm channels are specified in the call.
+      * This call assumes Jaguars for controlling the motors.
+-     * @param frontLeftMotor Front left motor channel number on the default digital module
+-     * @param rearLeftMotor Rear Left motor channel number on the default digital module
+-     * @param frontRightMotor Front right motor channel number on the default digital module
+-     * @param rearRightMotor Rear Right motor channel number on the default digital module
++     * @param frontLeftMotor Front left motor channel number
++     * @param rearLeftMotor Rear Left motor channel number
++     * @param frontRightMotor Front right motor channel number
++     * @param rearRightMotor Rear Right motor channel number
+      */
+     public RobotDrive(final int frontLeftMotor, final int rearLeftMotor,
+                       final int frontRightMotor, final int rearRightMotor) {
+         m_sensitivity = kDefaultSensitivity;
+         m_maxOutput = kDefaultMaxOutput;
+-        m_rearLeftMotor = new Talon(rearLeftMotor);
+-        m_rearRightMotor = new Talon(rearRightMotor);
+-        m_frontLeftMotor = new Talon(frontLeftMotor);
+-        m_frontRightMotor = new Talon(frontRightMotor);
++        m_rearLeftMotor = new Jaguar(rearLeftMotor);
++        m_rearRightMotor = new Jaguar(rearRightMotor);
++        m_frontLeftMotor = new Jaguar(frontLeftMotor);
++        m_frontRightMotor = new Jaguar(frontRightMotor);
+         for (int i = 0; i < kMaxNumberOfMotors; i++) {
+             m_invertedMotors[i] = 1;
+         }
+@@ -190,7 +192,6 @@ public class RobotDrive implements MotorSafety {
+         double leftOutput, rightOutput;
+ 
+         if(!kArcadeRatioCurve_Reported) {
+-            // UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_ArcadeRatioCurve);
+             kArcadeRatioCurve_Reported = true;
+         }
+         if (curve < 0) {
+@@ -290,7 +291,6 @@ public class RobotDrive implements MotorSafety {
+     public void tankDrive(double leftValue, double rightValue, boolean squaredInputs) {
+ 
+         if(!kTank_Reported) {
+-            // UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_Tank);
+             kTank_Reported = true;
+         }
+ 
+@@ -391,7 +391,6 @@ public class RobotDrive implements MotorSafety {
+     public void arcadeDrive(double moveValue, double rotateValue, boolean squaredInputs) {
+         // local variables to hold the computed PWM values for the motors
+         if(!kArcadeStandard_Reported) {
+-            // UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_ArcadeStandard);
+             kArcadeStandard_Reported = true;
+         }
+ 
+@@ -464,7 +463,6 @@ public class RobotDrive implements MotorSafety {
+      */
+     public void mecanumDrive_Cartesian(double x, double y, double rotation, double gyroAngle) {
+         if(!kMecanumCartesian_Reported) {
+-            // UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_MecanumCartesian);
+             kMecanumCartesian_Reported = true;
+         }
+         double xIn = x;
+@@ -509,7 +507,6 @@ public class RobotDrive implements MotorSafety {
+      */
+     public void mecanumDrive_Polar(double magnitude, double direction, double rotation) {
+         if(!kMecanumPolar_Reported) {
+-            // UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_MecanumPolar);
+             kMecanumPolar_Reported = true;
+         }
+         double frontLeftSpeed, rearLeftSpeed, frontRightSpeed, rearRightSpeed;
+@@ -657,7 +654,6 @@ public class RobotDrive implements MotorSafety {
+      * Free the speed controllers if they were allocated locally
+      */
+     public void free() {
+-        
+     }
+ 
+     public void setExpiration(double timeout) {
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index 86edcac12398a5c477dec9dbd1983c83a9a50b9c..4c2287d277f3f9afdad6aa5dacab87cb0a34947a 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -12,13 +12,12 @@ package edu.wpi.first.wpilibj;
+  * Stores most recent status information as well as containing utility functions for checking
+  * channels and error processing.
+  *
+- * 
+  * XXX: Wait, there's no exception thrown if we try to allocate a non-existent module?  It that behavior correct?
+  */
+ public abstract class SensorBase { // TODO: Refactor
+ 
+ 	// TODO: Move this to the HAL
+-  
++
+     /**
+      * Ticks per microsecond
+      */
+@@ -26,28 +25,47 @@ public abstract class SensorBase { // TODO: Refactor
+     /**
+      * Number of digital channels per digital sidecar
+      */
+-    public static final int kDigitalChannels = 14;
++    public static final int kDigitalChannels = 20;
++    /**
++     * Number of digital modules
++     * XXX: This number is incorrect.  We need to find the correct number.
++     */
++    public static final int kDigitalModules = 1;
++    /**
++     * Number of analog input channels per module
++     */
++    public static final int kAnalogInputChannels = 8;
+     /**
+-     * Number of analog channels per module
++     * Number of analog output channels per module
+      */
+-    public static final int kAnalogChannels = 8;
++    public static final int kAnalogOutputChannels = 2;
++    /**
++     * Number of analog modules
++     */
++    public static final int kAnalogModules = 1;
+     /**
+      * Number of solenoid channels per module
+      */
+     public static final int kSolenoidChannels = 8;
+     /**
+-     * Number of solenoid modules
++     * Number of analog modules
+      */
+     public static final int kSolenoidModules = 2;
+     /**
+      * Number of PWM channels per sidecar
+      */
+-    public static final int kPwmChannels = 10;
++    public static final int kPwmChannels = 20;
+     /**
+      * Number of relay channels per sidecar
+      */
+-    public static final int kRelayChannels = 8;
++    public static final int kRelayChannels = 4;
++    /**
++     * Number of power distribution channels
++     */
++    public static final int kPDPChannels = 16;
+ 
++    private static int m_defaultAnalogModule = 1;
++    private static int m_defaultDigitalModule = 1;
+     private static int m_defaultSolenoidModule = 1;
+ 
+     /**
+@@ -56,6 +74,32 @@ public abstract class SensorBase { // TODO: Refactor
+     public SensorBase() {
+     }
+ 
++    /**
++     * Sets the default Digital Module.
++     * This sets the default digital module to use for objects that are created without
++     * specifying the digital module in the constructor. The default module is initialized
++     * to the first module in the chassis.
++     *
++     * @param moduleNumber The number of the digital module to use.
++     */
++    public static void setDefaultDigitalModule(final int moduleNumber) {
++        checkDigitalModule(moduleNumber);
++        SensorBase.m_defaultDigitalModule = moduleNumber;
++    }
++
++    /**
++     * Sets the default Analog module.
++     * This sets the default analog module to use for objects that are created without
++     * specifying the analog module in the constructor. The default module is initialized
++     * to the first module in the chassis.
++     *
++     * @param moduleNumber The number of the analog module to use.
++     */
++    public static void setDefaultAnalogModule(final int moduleNumber) {
++        checkAnalogModule(moduleNumber);
++        SensorBase.m_defaultAnalogModule = moduleNumber;
++    }
++
+     /**
+      * Set the default location for the Solenoid (9472) module.
+      *
+@@ -66,6 +110,49 @@ public abstract class SensorBase { // TODO: Refactor
+         SensorBase.m_defaultSolenoidModule = moduleNumber;
+     }
+ 
++    /**
++     * Check that the digital module number is valid.
++     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
++     *
++     * @param moduleNumber The digital module module number to check.
++     */
++    protected static void checkDigitalModule(final int moduleNumber) {
++        if (moduleNumber != 1 && moduleNumber != 2)
++            System.err.println("Digital module " + moduleNumber + " is not present.");
++    }
++
++    /**
++     * Check that the digital module number is valid.
++     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
++     *
++     * @param moduleNumber The digital module module number to check.
++     */
++    protected static void checkRelayModule(final int moduleNumber) {
++        checkDigitalModule(moduleNumber);
++    }
++
++    /**
++     * Check that the digital module number is valid.
++     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
++     *
++     * @param moduleNumber The digital module module number to check.
++     */
++    protected static void checkPWMModule(final int moduleNumber) {
++        checkDigitalModule(moduleNumber);
++    }
++
++    /**
++     * Check that the analog module number is valid.
++     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
++     *
++     * @param moduleNumber The analog module module number to check.
++     */
++    protected static void checkAnalogModule(final int moduleNumber) {
++        if (moduleNumber != 1 && moduleNumber != 2) {
++            System.err.println("Analog module " + moduleNumber + " is not present.");
++        }
++    }
++
+     /**
+      * Verify that the solenoid module is correct.
+      * Module numbers are 1 or 2 (they are no longer real cRIO slots).
+@@ -73,10 +160,9 @@ public abstract class SensorBase { // TODO: Refactor
+      * @param moduleNumber The solenoid module module number to check.
+      */
+     protected static void checkSolenoidModule(final int moduleNumber) {
+-    	// TODO: fix
+-        if(moduleNumber == 1 || moduleNumber == 2) {
+-            System.err.println("Solenoid module " + moduleNumber + " is not present.");
+-        }
++//        if(HALLibrary.checkSolenoidModule((byte) (moduleNumber - 1)) != 0) {
++//            System.err.println("Solenoid module " + moduleNumber + " is not present.");
++//        }
+     }
+ 
+     /**
+@@ -87,7 +173,7 @@ public abstract class SensorBase { // TODO: Refactor
+      * @param channel The channel number to check.
+      */
+     protected static void checkDigitalChannel(final int channel) {
+-        if (channel <= 0 || channel > kDigitalChannels) {
++        if (channel < 0 || channel >= kDigitalChannels) {
+             System.err.println("Requested digital channel number is out of range.");
+         }
+     }
+@@ -100,7 +186,7 @@ public abstract class SensorBase { // TODO: Refactor
+      * @param channel The channel number to check.
+      */
+     protected static void checkRelayChannel(final int channel) {
+-        if (channel <= 0 || channel > kRelayChannels) {
++        if (channel < 0 || channel >= kRelayChannels) {
+             System.err.println("Requested relay channel number is out of range.");
+             throw new IndexOutOfBoundsException("Requested relay channel number is out of range.");
+         }
+@@ -114,21 +200,34 @@ public abstract class SensorBase { // TODO: Refactor
+      * @param channel The channel number to check.
+      */
+     protected static void checkPWMChannel(final int channel) {
+-        if (channel <= 0 || channel > kPwmChannels) {
++        if (channel < 0 || channel >= kPwmChannels) {
+             System.err.println("Requested PWM channel number is out of range.");
+             throw new IndexOutOfBoundsException("Requested PWM channel number is out of range.");
+         }
+     }
+ 
+     /**
+-     * Check that the analog channel number is value.
+-     * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
+-     * are 1-based.
++     * Check that the analog input number is value.
++     * Verify that the analog input number is one of the legal channel numbers. Channel numbers
++     * are 0-based.
+      *
+      * @param channel The channel number to check.
+      */
+-    protected static void checkAnalogChannel(final int channel) {
+-        if (channel <= 0 || channel > kAnalogChannels) {
++    protected static void checkAnalogInputChannel(final int channel) {
++        if (channel <= 0 || channel > kAnalogInputChannels) {
++            System.err.println("Requested analog channel number is out of range.");
++        }
++    }
++
++    /**
++     * Check that the analog input number is value.
++     * Verify that the analog input number is one of the legal channel numbers. Channel numbers
++     * are 0-based.
++     *
++     * @param channel The channel number to check.
++     */
++    protected static void checkAnalogOutputChannel(final int channel) {
++        if (channel <= 0 || channel > kAnalogOutputChannels) {
+             System.err.println("Requested analog channel number is out of range.");
+         }
+     }
+@@ -145,6 +244,36 @@ public abstract class SensorBase { // TODO: Refactor
+         }
+     }
+ 
++    /**
++     * Verify that the power distribution channel number is within limits.
++     * Channel numbers are 1-based.
++     *
++     * @param channel The channel number to check.
++     */
++    protected static void checkPDPChannel(final int channel) {
++        if (channel <= 0 || channel > kPDPChannels) {
++            System.err.println("Requested solenoid channel number is out of range.");
++        }
++    }
++
++    /**
++     * Get the number of the default analog module.
++     *
++     * @return The number of the default analog module.
++     */
++    public static int getDefaultAnalogModule() {
++        return SensorBase.m_defaultAnalogModule;
++    }
++
++    /**
++     * Get the number of the default analog module.
++     *
++     * @return The number of the default analog module.
++     */
++    public static int getDefaultDigitalModule() {
++        return SensorBase.m_defaultDigitalModule;
++    }
++
+     /**
+      * Get the number of the default analog module.
+      *
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SimpleRobot.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SimpleRobot.java
+index 499c86ef83bc259c26b075eca88d8fa7f7347723..4535240d8400d232ac218a56ac06e57185c0df23 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SimpleRobot.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SimpleRobot.java
+@@ -108,8 +108,6 @@ public class SimpleRobot extends RobotBase {
+      * to be enabled again.
+      */
+     public void startCompetition() {
+-        // UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Simple);
+-
+         robotMain();
+         if (!m_robotMainOverridden) {
+             // first and one-time initialization
+@@ -118,42 +116,33 @@ public class SimpleRobot extends RobotBase {
+ 
+             while (true) {
+                 if (isDisabled()) {
+-                    // TODO: m_ds.InDisabled(true);
++                    m_ds.InDisabled(true);
+                     disabled();
+-                    // TODO: m_ds.InDisabled(false);
++                    m_ds.InDisabled(false);
+                     while (isDisabled()) {
+-                    	try {
+-							Thread.sleep(10);
+-						} catch (InterruptedException e) {}
++                        Timer.delay(0.01);
+                     }
+                 } else if (isAutonomous()) {
+-                    // TODO: m_ds.InAutonomous(true);
++                    m_ds.InAutonomous(true);
+                     autonomous();
+-                    // TODO: m_ds.InAutonomous(false);
++                    m_ds.InAutonomous(false);
+                     while (isAutonomous() && !isDisabled()) {
+-                    	try {
+-							Thread.sleep(10);
+-						} catch (InterruptedException e) {}
++                        Timer.delay(0.01);
+                     }
+                 } else if (isTest()) {
+                     LiveWindow.setEnabled(true);
+-                    // TODO: m_ds.InTest(true);
++                    m_ds.InTest(true);
+                     test();
+-                    // TODO: m_ds.InTest(false);
+-                    while (isTest() && isEnabled()) {
+-                    	try {
+-							Thread.sleep(10);
+-						} catch (InterruptedException e) {}
+-                    }
++                    m_ds.InTest(false);
++                    while (isTest() && isEnabled())
++                        Timer.delay(0.01);
+                     LiveWindow.setEnabled(false);
+                 } else {
+-                    // TODO: m_ds.InOperatorControl(true);
++                    m_ds.InOperatorControl(true);
+                     operatorControl();
+-                    // TODO: m_ds.InOperatorControl(false);
++                    m_ds.InOperatorControl(false);
+                     while (isOperatorControl() && !isDisabled()) {
+-                    	try {
+-							Thread.sleep(10);
+-						} catch (InterruptedException e) {}
++                        Timer.delay(0.01);
+                     }
+                 }
+             } /* while loop */
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Talon.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Talon.java
+index fd9dca2de55df7ee9ef8ede04f8821bee0d58630..cb78f9977177be225600c77bef827ed135b0870b 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Talon.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Talon.java
+@@ -11,47 +11,47 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.simulation.SimSpeedController;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
++import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ 
+ /**
+  * CTRE Talon Speed Controller
+  */
+ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindowSendable {
+-	private int module, channel;
++	private int channel;
+ 	private SimSpeedController impl;
+ 
+     /**
+      * Common initialization code called by all constructors.
++     *
++     * Note that the Talon uses the following bounds for PWM values. These values should work reasonably well for
++     * most controllers, but if users experience issues such as asymmetric behavior around
++     * the deadband or inability to saturate the controller in either direction, calibration is recommended.
++     * The calibration procedure can be found in the Talon User Manual available from CTRE.
++     *
++     *   - 2.037ms = full "forward"
++     *   - 1.539ms = the "high end" of the deadband range
++     *   - 1.513ms = center of the deadband range (off)
++     *   - 1.487ms = the "low end" of the deadband range
++     *   - .989ms = full "reverse"
+      */
+-    private void initTalon(final int slot, final int channel) {
+-    	this.module = slot;
++    private void initTalon(final int channel) {
+     	this.channel = channel;
+-    	impl = new SimSpeedController("simulator/pwm/"+slot+"/"+channel);
+-    	
++    	impl = new SimSpeedController("simulator/pwm/1/"+channel);
++
+         m_safetyHelper = new MotorSafetyHelper(this);
+         m_safetyHelper.setExpiration(0.0);
+         m_safetyHelper.setSafetyEnabled(false);
+-        
+-        // LiveWindow.addActuator("Talon", getModuleNumber(), getChannel(), this);
+-        // UsageReporting.report(tResourceType.kResourceType_Talon, getChannel(), getModuleNumber()-1);
+-    }
+ 
+-    /**
+-     * Constructor that assumes the default digital module.
+-     *
+-     * @param channel The PWM channel on the digital module that the Victor is attached to.
+-     */
+-    public Talon(final int channel) {
+-        initTalon(1, channel);
++        LiveWindow.addActuator("Talon", channel, this);
+     }
+ 
+     /**
+-     * Constructor that specifies the digital module.
++     * Constructor.
+      *
+-     * @param slot The slot in the chassis that the digital module is plugged into.
+-     * @param channel The PWM channel on the digital module that the Victor is attached to.
++     * @param channel The PWM channel that the Talon is attached to.
+      */
+-    public Talon(final int slot, final int channel) {
+-        initTalon(slot, channel);
++    public Talon(final int channel) {
++        initTalon(channel);
+     }
+ 
+     /**
+@@ -66,7 +66,7 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
+      * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
+      */
+     public void set(double speed, byte syncGroup) {
+-    	impl.set(speed, syncGroup);
++        impl.set(speed, syncGroup);
+     }
+ 
+     /**
+@@ -78,7 +78,7 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
+      * @param speed The speed value between -1.0 and 1.0 to set.
+      */
+     public void set(double speed) {
+-    	impl.set(speed);
++        impl.set(speed);
+     }
+ 
+     /**
+@@ -89,7 +89,7 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
+     public double get() {
+         return impl.get();
+     }
+-	
++
+     /**
+      * Disable the speed controller
+      */
+@@ -141,7 +141,7 @@ public class Talon implements SpeedController, PIDOutput, MotorSafety, LiveWindo
+ 
+ 	@Override
+ 	public String getDescription() {
+-        return "PWM "+channel+" on module "+module;
++        return "PWM "+channel+" on module 1";
+ 	}
+ 
+ 	//// LiveWindow Methods
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Timer.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Timer.java
+index 3c3fd509afcab1f5d7dab708d902e9b3fa280414..9bb2bdfda8eec28b30944d153e77f22488bd9757 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Timer.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Timer.java
+@@ -7,6 +7,8 @@
+ 
+ package edu.wpi.first.wpilibj;
+ 
++import edu.wpi.first.wpilibj.parsing.IUtility;
++
+ /**
+  * Timer objects measure accumulated time in milliseconds.
+  * The timer object functions like a stopwatch. It can be started, stopped, and cleared. When the
+@@ -14,7 +16,7 @@ package edu.wpi.first.wpilibj;
+  * value. The implementation simply records the time when started and subtracts the current time
+  * whenever the value is requested.
+  */
+-public class Timer {
++public class Timer implements IUtility {
+ 
+     private long m_startTime;
+     private double m_accumulatedTime;
+@@ -44,7 +46,6 @@ public class Timer {
+      * @return Robot running time in microseconds.
+      */
+     public static long getUsClock() {
+-    	
+         return System.nanoTime() / 1000;
+     }
+ 
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Victor.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Victor.java
+index 2faa503614b814daa6626ee6434fcc2be2d46641..22af56ec69af270b59ceb45283adfbf8c57b5b9b 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Victor.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Victor.java
+@@ -11,47 +11,50 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.simulation.SimSpeedController;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
++import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ 
+ /**
+- * CTRE Talon Speed Controller
++ * VEX Robotics Victor Speed Controller
+  */
+ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWindowSendable {
+-	private int module, channel;
++	private int channel;
+ 	private SimSpeedController impl;
+ 
+     /**
+      * Common initialization code called by all constructors.
++     *
++     * Note that the Victor uses the following bounds for PWM values.  These values were determined
++     * empirically and optimized for the Victor 888. These values should work reasonably well for
++     * Victor 884 controllers also but if users experience issues such as asymmetric behavior around
++     * the deadband or inability to saturate the controller in either direction, calibration is recommended.
++     * The calibration procedure can be found in the Victor 884 User Manual available from VEX Robotics:
++     * http://content.vexrobotics.com/docs/ifi-v884-users-manual-9-25-06.pdf
++     *
++     *   - 2.027ms = full "forward"
++     *   - 1.525ms = the "high end" of the deadband range
++     *   - 1.507ms = center of the deadband range (off)
++     *   - 1.49ms = the "low end" of the deadband range
++     *   - 1.026ms = full "reverse"
+      */
+-    private void initTalon(final int slot, final int channel) {
+-    	this.module = slot;
++    private void initVictor(final int channel) {
+     	this.channel = channel;
+-    	impl = new SimSpeedController("simulator/pwm/"+slot+"/"+channel);
++    	impl = new SimSpeedController("simulator/pwm/1/"+channel);
+     	
+         m_safetyHelper = new MotorSafetyHelper(this);
+         m_safetyHelper.setExpiration(0.0);
+         m_safetyHelper.setSafetyEnabled(false);
+         
+-        // LiveWindow.addActuator("Talon", getModuleNumber(), getChannel(), this);
++        LiveWindow.addActuator("Victor", channel, this);
+         // UsageReporting.report(tResourceType.kResourceType_Talon, getChannel(), getModuleNumber()-1);
+     }
+ 
+     /**
+-     * Constructor that assumes the default digital module.
++     * Constructor.
+      *
+-     * @param channel The PWM channel on the digital module that the Victor is attached to.
++     * @param channel The PWM channel that the Victor is attached to.
+      */
+     public Victor(final int channel) {
+-        initTalon(1, channel);
+-    }
+-
+-    /**
+-     * Constructor that specifies the digital module.
+-     *
+-     * @param slot The slot in the chassis that the digital module is plugged into.
+-     * @param channel The PWM channel on the digital module that the Victor is attached to.
+-     */
+-    public Victor(final int slot, final int channel) {
+-        initTalon(slot, channel);
++        initVictor(channel);
+     }
+ 
+     /**
+@@ -66,7 +69,7 @@ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWind
+      * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
+      */
+     public void set(double speed, byte syncGroup) {
+-    	impl.set(speed, syncGroup);
++        impl.set(speed, syncGroup);
+     }
+ 
+     /**
+@@ -78,7 +81,7 @@ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWind
+      * @param speed The speed value between -1.0 and 1.0 to set.
+      */
+     public void set(double speed) {
+-    	impl.set(speed);
++        impl.set(speed);
+     }
+ 
+     /**
+@@ -141,7 +144,7 @@ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWind
+ 
+ 	@Override
+ 	public String getDescription() {
+-        return "PWM "+channel+" on module "+module;
++        return "PWM "+channel+" on module 1";
+ 	}
+ 
+ 	//// LiveWindow Methods
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/command/Command.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/command/Command.java
+index 4f454a3b77e0b3c7860927f412e568d1fc12183a..3cda95b65a38b875b7839f82f90261f12650d8e7 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/command/Command.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/command/Command.java
+@@ -7,6 +7,7 @@
+ 
+ package edu.wpi.first.wpilibj.command;
+ 
++import edu.wpi.first.wpilibj.DriverStation;
+ import edu.wpi.first.wpilibj.NamedSendable;
+ import edu.wpi.first.wpilibj.Timer;
+ import edu.wpi.first.wpilibj.tables.ITable;
+@@ -200,9 +201,9 @@ public abstract class Command implements NamedSendable {
+      * @return whether or not the command should stay within the {@link Scheduler}.
+      */
+     synchronized boolean run() {
+-        // XXX: if (!m_runWhenDisabled && m_parent == null && DriverStation.getInstance().isDisabled()) {
+-    	// XXX:     cancel();
+-        // XXX: }
++        if (!m_runWhenDisabled && m_parent == null && DriverStation.getInstance().isDisabled()) {
++            cancel();
++        }
+         if (isCanceled()) {
+             return false;
+         }
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/command/Scheduler.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/command/Scheduler.java
+index 71babf3394dd3385afda39e1c4422c2f0bfeda59..bba248fe286e81b71a430849c01624b557dd69b7 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/command/Scheduler.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/command/Scheduler.java
+@@ -88,7 +88,6 @@ public class Scheduler implements NamedSendable {
+      * Instantiates a {@link Scheduler}.
+      */
+     private Scheduler() {
+-        // UsageReporting.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
+     }
+ 
+     /**
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/interfaces/Potentiometer.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/interfaces/Potentiometer.java
+index 085855b1adb94be4ee6392aa3137c7028cf3de13..b0109a317d423c0900a73fdbbbdb486784a54540 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/interfaces/Potentiometer.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/interfaces/Potentiometer.java
+@@ -1,7 +1,17 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.interfaces;
+ 
+ import edu.wpi.first.wpilibj.PIDSource;
+ 
++/**
++ *
++ * @author alex
++ */
+ public interface Potentiometer extends PIDSource {
+ 	double get();
+ }
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/livewindow/LiveWindow.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/livewindow/LiveWindow.java
+index 47e5b2dbeaafee7af10e032b02277edca5bc644b..90ed3a8a14db0533f64472dc36aca68436c2316a 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/livewindow/LiveWindow.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/livewindow/LiveWindow.java
+@@ -169,24 +169,38 @@ public class LiveWindow {
+     }
+ 
+     /**
+-     * Add Sensor to LiveWindow. The components are shown with the module type,
+-     * slot and channel like this: Gyro[1, 2] for a gyro object connected to the
+-     * first analog module in channel 2
++     * Add Sensor to LiveWindow. The components are shown with the type and
++     * channel like this: Gyro[1] for a gyro object connected to the first
++     * analog channel.
+      *
+      * @param moduleType A string indicating the type of the module used in the
+      * naming (above)
+-     * @param moduleNumber The number of the particular module type
+      * @param channel The channel number the device is connected to
+      * @param component A reference to the object being added
+      */
+-    public static void addSensor(String moduleType, int moduleNumber, int channel, LiveWindowSendable component) {
+-        addSensor("Ungrouped", moduleType + "[" + moduleNumber + "," + channel + "]", component);
++    public static void addSensor(String moduleType, int channel, LiveWindowSendable component) {
++        addSensor("Ungrouped", moduleType + "[" + channel + "]", component);
+         if (sensors.contains(component)) {
+             sensors.removeElement(component);
+         }
+         sensors.addElement(component);
+     }
+ 
++    /**
++     * Add Actuator to LiveWindow. The components are shown with the module
++     * type, slot and channel like this: Servo[1,2] for a servo object connected
++     * to the first digital module and PWM port 2.
++     *
++     * @param moduleType A string that defines the module name in the label for
++     * the value
++     * @param channel The channel number the device is plugged into (usually
++     * PWM)
++     * @param component The reference to the object being added
++     */
++    public static void addActuator(String moduleType, int channel, LiveWindowSendable component) {
++        addActuator("Ungrouped", moduleType + "[" + channel + "]", component);
++    }
++
+     /**
+      * Add Actuator to LiveWindow. The components are shown with the module
+      * type, slot and channel like this: Servo[1,2] for a servo object connected
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IDevice.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IDevice.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..706f012c8edb2ab8fab49b952d3f4dae1a157b01
+--- /dev/null
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IDevice.java
+@@ -0,0 +1,15 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++package edu.wpi.first.wpilibj.parsing;
++
++/**
++ * An IDevice is any WPILibJ object which can be used in the creation of the
++ * robot program
++ * @author Ryan O'Meara
++ */
++public interface IDevice {}
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IDeviceController.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IDeviceController.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8dfd061c1a3e82fca8f0f2514e3b80c3649f206f
+--- /dev/null
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IDeviceController.java
+@@ -0,0 +1,15 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++package edu.wpi.first.wpilibj.parsing;
++
++/**
++ * IDeviceController is implemented by control elements in the robot.  An
++ * example of this would be a victor
++ * @author Ryan O'Meara
++ */
++public interface IDeviceController extends IDevice {}
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IInputOutput.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IInputOutput.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..49801a9adc1fcdbd4f3d7bd604aaed0a6f1fd94a
+--- /dev/null
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IInputOutput.java
+@@ -0,0 +1,16 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++package edu.wpi.first.wpilibj.parsing;
++
++/**
++ * IInputOutput is implemented by devices which provide the robot with data and
++ * allow it to react to its environment.  An example of an input/output would be
++ * a joystick
++ * @author Ryan O'Meara
++ */
++public interface IInputOutput extends IDevice {}
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IMechanism.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IMechanism.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a9411d018bc778907f42c4e1318ce2f480f38714
+--- /dev/null
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IMechanism.java
+@@ -0,0 +1,17 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++package edu.wpi.first.wpilibj.parsing;
++
++/**
++ * The IMechanism interface is implemented by any class to be classified as a
++ * mechanism.  These are user-defined, and contain other devices (which implement
++ * IDevice).  They are generally over-arching systems, such as the drive train or
++ * arm
++ * @author Ryan O'Meara
++ */
++public interface IMechanism {}
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/ISensor.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/ISensor.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0991fd3b20656e220a59dac21388a9f3cbbcfe24
+--- /dev/null
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/ISensor.java
+@@ -0,0 +1,17 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++package edu.wpi.first.wpilibj.parsing;
++
++/**
++ * ISensor is extended by any WPILibJ class to be categorized as a sensor in the
++ * java program builder.  A sensor is a robot part that provides the robot with
++ * information about its environment.  An example of this is the Ultrasonic
++ * sensor class
++ * @author Ryan O'Meara
++ */
++public interface ISensor extends IDevice {}
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IUtility.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IUtility.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e7567fd6da80dbd5cc62b328c2fce720d8715fa6
+--- /dev/null
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/parsing/IUtility.java
+@@ -0,0 +1,17 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++package edu.wpi.first.wpilibj.parsing;
++
++/**
++ * IUtility is an interface implemented by any WPILibJ class which should appear
++ * in the utility tree of the java program builder.  A utility is generally a
++ * class which is not a specific device, but more of a software tool.  An
++ * example of this would be the Timer class
++ * @author Ryan O'Meara
++ */
++public interface IUtility extends IDevice {}

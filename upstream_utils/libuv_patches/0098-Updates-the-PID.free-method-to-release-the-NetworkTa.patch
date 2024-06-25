@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Fri, 13 Jun 2014 09:41:00 -0400
+Subject: [PATCH 0098/6262] Updates the PID.free() method to release the
+ NetworkTable listener. [artf2571] Documentation update on the Depreciated
+ method. Removes the PID.setTolerance(Tolerance tolerance) method because it
+ was private and never used
+
+Change-Id: I5cddbcc96ed40b5bb0d9f33e2a3586dce91dc532
+---
+ .../edu/wpi/first/wpilibj/PIDController.java   | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
+
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java
+index c705079d3b5700f25124e7c5b08096ba391d9848..15a774c906c0799d69514a8b0c1d72a38c9d4228 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java
+@@ -197,9 +197,8 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
+      * Free the PID object
+      */
+     public void free() {
+-    	synchronized (this) {
+-    		m_freed = true;
+-		}
++    	m_freed = true;
++    	if(this.table!=null) table.removeTableListener(listener);
+         m_controlLoop.cancel();
+         m_pidInput = null;
+     	m_pidOutput = null;
+@@ -450,23 +449,12 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
+      * Set the percentage error which is considered tolerable for use with
+      * OnTarget. (Input of 15.0 = 15 percent)
+      * @param percent error which is tolerable
+-     * @deprecated Use setTolerance(Tolerance), i.e. setTolerance(new PIDController.PercentageTolerance(15))
++     * @deprecated Use {@link #setPercentTolerance(double) or {@link #setAbsoluteTolerance(double)} instead.
+      */
+     public synchronized void setTolerance(double percent) {
+         m_tolerance = new PercentageTolerance(percent);
+     }
+ 
+-    /** Set the PID tolerance using a Tolerance object.
+-     * Tolerance can be specified as a percentage of the range or as an absolute
+-     * value. The Tolerance object encapsulates those options in an object. Use it by
+-     * creating the type of tolerance that you want to use: setTolerance(new PIDController.AbsoluteTolerance(0.1))
+-     * @param tolerance a tolerance object of the right type, e.g. PercentTolerance
+-     * or AbsoluteTolerance
+-     */
+-    private void setTolerance(Tolerance tolerance) {
+-        m_tolerance = tolerance;
+-    }
+-
+     /**
+      * Set the absolute error which is considered tolerable for use with
+      * OnTarget.

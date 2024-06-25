@@ -1,0 +1,310 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Mon, 2 Jun 2014 17:34:10 -0400
+Subject: [PATCH 0072/6262] Tilt pan camera test
+
+Change-Id: I4496c9940a5da0bd78d90f1a5b4a9ebea6597336
+---
+ run-cpp-tests.sh                              |  5 +-
+ .../include/TestBench.h                       | 17 ++++++
+ .../include/fixtures/ITestFixture.h           | 53 +++++++++++++++++++
+ .../include/fixtures/TiltPanCameraFixture.h   | 35 ++++++++++++
+ .../src/TestBench.cpp                         | 18 +++++++
+ .../src/TiltPanCameraTest.cpp                 | 39 ++++----------
+ .../src/fixtures/TiltPanCameraFixture.cpp     | 46 ++++++++++++++++
+ 7 files changed, 181 insertions(+), 32 deletions(-)
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/include/fixtures/ITestFixture.h
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/include/fixtures/TiltPanCameraFixture.h
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/TestBench.cpp
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/fixtures/TiltPanCameraFixture.cpp
+
+diff --git a/run-cpp-tests.sh b/run-cpp-tests.sh
+index d5ce061027ef9e26bab6287e3d4fe20a6bf5ad17..1e0729c9528a7cfc222422ce455afb351f42045e 100755
+--- a/run-cpp-tests.sh
++++ b/run-cpp-tests.sh
+@@ -6,11 +6,12 @@ if [ $(which sshpass) ]
+ then
+ 	sshpass -p "" ssh admin@10.1.90.2 killall FRCUserProgram
+ 	sshpass -p "" scp cmake/target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin
+-	sshpass -p "" ssh admin@10.1.90.2 ./FRCUserProgram
++	sshpass -p "" ssh admin@10.1.90.2 ./FRCUserProgram 
+ else
+ 	ssh admin@10.1.90.2 killall FRCUserProgram
+ 	scp cmake/target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin
+-	ssh admin@10.1.90.2 ./FRCUserProgram
++	ssh admin@10.1.90.2 ./FRCUserProgram 
+ fi
+ 
+ 
++
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..0593dadb17ffc40f106b2d7750c1ef2771735800
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+@@ -0,0 +1,17 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#pragma once
++
++#include "WPILib.h"
++#include "fixtures/TiltPanCameraFixture.h"
++
++class TestBench {
++public:
++	static TiltPanCameraFixture *GetTiltPanCamera();
++};
++
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/fixtures/ITestFixture.h b/wpilibc/wpilibC++IntegrationTests/include/fixtures/ITestFixture.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..320042fd991c7453dae9f16877c21a2b997ab0e8
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/include/fixtures/ITestFixture.h
+@@ -0,0 +1,53 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#pragma once
++
++/**
++ * Master interface for all test fixtures. This ensures that all test fixtures
++ * have setup and teardown methods, to ensure that the tests run properly.
++ * 
++ * Test fixtures should be modeled around the content of a test, rather than the
++ * actual physical layout of the testing board. They should obtain references to
++ * hardware from the {@link TestBench} class, which is a singleton. Testing
++ * Fixtures are responsible for ensuring that the hardware is in an appropriate
++ * state for the start of a test, and ensuring that future tests will not be
++ * affected by the results of a test.
++ */
++class ITestFixture {
++public:
++	/**
++	 * Performs any required setup for this fixture, ensuring that all fixture
++	 * elements are ready for testing.
++	 * 
++	 * @return True if the fixture is ready for testing
++	 */
++	virtual bool SetUp() = 0;
++	
++	
++	/**
++	 * Resets the fixture back to test start state. This should be called by the
++	 * test class in the test setup method to ensure that the hardware is in the
++	 * default state. This differs from {@link ITestFixture#setup()} as that is
++	 * called once, before the class is constructed, so it may need to start
++	 * sensors. This method should not have to start anything, just reset
++	 * sensors and ensure that motors are stopped.
++	 * 
++	 * @return True if the fixture is ready for testing
++	 */
++	virtual bool Reset() = 0;
++	
++	
++	/**
++	 * Performs any required teardown after use of the fixture, ensuring that
++	 * future tests will not run into conflicts.
++	 * 
++	 * @return True if the teardown succeeded
++	 */
++	 virtual bool TearDown() = 0;
++};
++
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/fixtures/TiltPanCameraFixture.h b/wpilibc/wpilibC++IntegrationTests/include/fixtures/TiltPanCameraFixture.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..46c238880f552b129fd54fe430cfd91ffe9fd03d
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/include/fixtures/TiltPanCameraFixture.h
+@@ -0,0 +1,35 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#pragma once
++
++#include "WPILib.h"
++#include "ITestFixture.h"
++
++/**
++ * A class to represent the camera with tilt and pan servos and a gyro
++ * 
++ * @author Thomas Clark
++ */
++class TiltPanCameraFixture : public ITestFixture {
++public:
++	TiltPanCameraFixture(Servo *tilt, Servo *pan, Gyro *gyro);
++	
++	virtual bool SetUp();
++	virtual bool Reset();
++	virtual bool TearDown();
++	
++	Gyro *GetGyro();
++	Servo *GetTilt();
++	Servo *GetPan();
++
++protected:
++	static const double RESET_TIME = 1.0;
++	
++	Servo *m_tilt, *m_pan;
++	Gyro *m_gyro;
++};
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/TestBench.cpp b/wpilibc/wpilibC++IntegrationTests/src/TestBench.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..65d4817f0e2e13ef39803061244780caac86260c
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/TestBench.cpp
+@@ -0,0 +1,18 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "TestBench.h"
++
++TiltPanCameraFixture *TestBench::GetTiltPanCamera() {
++	Gyro *gyro = new Gyro(1);
++	gyro->SetSensitivity(0.007);
++	
++	Servo *tilt = new Servo(10),
++		*pan = new Servo(9);
++	
++	return new TiltPanCameraFixture(tilt, pan, gyro);
++}
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
+index 2a0be24cb6e025620580ad8b2b2961d4588e8322..4f50f93df16c25f86fd1b5955d6a156ab4e7c71f 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
+@@ -7,42 +7,21 @@
+ 
+ #include "WPILib.h"
+ #include "gtest/gtest.h"
++#include "fixtures/TiltPanCameraFixture.h"
++#include "TestBench.h"
+ 
+-/**
+- * A class to represent the camera with tilt and pan servos and a gyro
+- * 
+- * @author Thomas Clark
+- */
+ class TiltPanCameraTest : public testing::Test {
+ protected:	
+-	Servo *m_tilt, *m_pan;
+-	Gyro *m_gyro;
+-	
+-	static const double RESET_TIME = 1.0;
++	TiltPanCameraFixture *m_fixture;
+ 	
+ 	virtual void SetUp() {
+-		m_gyro = new Gyro(1);
+-		m_gyro->SetSensitivity(0.007);
+-		
+-		Wait(RESET_TIME);
++		m_fixture = TestBench::GetTiltPanCamera();
+ 		
+-		m_tilt = new Servo(10);
+-		m_pan = new Servo(9);
++		m_fixture->SetUp();
+ 	}
+ 	
+ 	virtual void TearDown() {
+-		delete m_tilt;
+-		delete m_pan;
+-		delete m_gyro;
+-	}
+-	
+-	void Reset() {
+-		m_tilt->SetAngle(0.0);
+-		m_pan->SetAngle(0.0);
+-		
+-		Wait(RESET_TIME);
+-		
+-		m_gyro->Reset();
++		m_fixture->TearDown();
+ 	}
+ };
+ 
+@@ -53,14 +32,14 @@ protected:
+ TEST_F(TiltPanCameraTest, GyroAngle) {
+ 	const double TEST_ANGLE = 180.0;
+ 	
+-	Reset();
++	m_fixture->Reset();
+ 	
+ 	for(int i = 0; i < 100; i++) {
+-		m_pan->Set(i / 100.0);
++		m_fixture->GetPan()->Set(i / 100.0);
+ 		Wait(0.05);
+ 	}
+ 	
+-	double gyroAngle = m_gyro->GetAngle();
++	double gyroAngle = m_fixture->GetGyro()->GetAngle();
+ 	
+ 	double error = std::abs(TEST_ANGLE - gyroAngle);
+ 	
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/fixtures/TiltPanCameraFixture.cpp b/wpilibc/wpilibC++IntegrationTests/src/fixtures/TiltPanCameraFixture.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..d0a468ccaa4b23d6159145cccb8bbbe7cbfada15
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/fixtures/TiltPanCameraFixture.cpp
+@@ -0,0 +1,46 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "fixtures/TiltPanCameraFixture.h"
++
++TiltPanCameraFixture::TiltPanCameraFixture(Servo *tilt, Servo *pan, Gyro *gyro):
++	m_tilt(tilt),
++	m_pan(pan),
++	m_gyro(gyro) {
++}
++
++bool TiltPanCameraFixture::SetUp() {
++	return Reset();
++}
++
++bool TiltPanCameraFixture::Reset() {
++	m_tilt->Set(0.0);
++	m_pan->Set(0.0);
++	
++	Wait(RESET_TIME);
++	
++	m_gyro->Reset();
++	
++	return m_pan->Get() == 0.0 and m_tilt->Get() == 0.0 and m_gyro->GetAngle() == 0.0;
++}
++
++bool TiltPanCameraFixture::TearDown() {
++	return Reset();
++}
++
++Gyro *TiltPanCameraFixture::GetGyro() {
++	return m_gyro;
++}
++
++Servo *TiltPanCameraFixture::GetTilt() {
++	return m_tilt;
++}
++
++Servo *TiltPanCameraFixture::GetPan() {
++	return m_pan;
++}
++

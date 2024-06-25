@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Omar Zrien <OZrien@crosstheroadelectronics.com>
+Date: Sat, 28 Jun 2014 13:12:00 -0400
+Subject: [PATCH 0146/6262] comment change
+
+Change-Id: I3eba9bca1daec1e1d8499adab286b38c293d9a49
+---
+ hal/lib/Athena/ctre/PDP.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hal/lib/Athena/ctre/PDP.h b/hal/lib/Athena/ctre/PDP.h
+index 46713a02f94558301965f769821add491c2ae798..4cf7f694bdbe05adde5dd33ac01d553effc7aad7 100644
+--- a/hal/lib/Athena/ctre/PDP.h
++++ b/hal/lib/Athena/ctre/PDP.h
+@@ -1,6 +1,6 @@
+ #ifndef PDP_H_
+ #define PDP_H_
+-#include "ctre.h"				//BIT Defines + Typedefs
++#include "ctre.h"				/* BIT Defines + Typedefs */
+ #include <NetworkCommunication/CANSessionMux.h>	//CAN Comm
+ #include <pthread.h>
+ /* encoder/decoders */

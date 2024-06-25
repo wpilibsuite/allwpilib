@@ -1,0 +1,778 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Mon, 23 Jun 2014 11:51:34 -0700
+Subject: [PATCH 0125/6262] Added C++ support for solenoids.
+
+Change-Id: If82c05196d2f4c09d148da64f6bdb0564fe5b4cc
+---
+ wpilibc/wpilibC++Sim/include/DoubleSolenoid.h |  50 +++++++
+ wpilibc/wpilibC++Sim/include/Jaguar.h         |   4 +-
+ wpilibc/wpilibC++Sim/include/Solenoid.h       |  41 ++++++
+ wpilibc/wpilibC++Sim/include/Talon.h          |   4 +-
+ wpilibc/wpilibC++Sim/include/Victor.h         |   4 +-
+ wpilibc/wpilibC++Sim/include/WPILib.h         |  30 +++-
+ .../include/simulation/SimContinuousOutput.h  |  35 +++++
+ .../include/simulation/SimSpeedController.h   |  67 ---------
+ wpilibc/wpilibC++Sim/src/DoubleSolenoid.cpp   | 135 ++++++++++++++++++
+ wpilibc/wpilibC++Sim/src/Jaguar.cpp           |   4 +-
+ wpilibc/wpilibC++Sim/src/Solenoid.cpp         | 108 ++++++++++++++
+ wpilibc/wpilibC++Sim/src/Talon.cpp            |   4 +-
+ wpilibc/wpilibC++Sim/src/Victor.cpp           |   4 +-
+ .../src/simulation/SimContinuousOutput.cpp    |  24 ++++
+ .../src/simulation/SimFloatInput.cpp          |   2 +-
+ .../src/simulation/SimSpeedController.cpp     |  39 -----
+ 16 files changed, 429 insertions(+), 126 deletions(-)
+ create mode 100644 wpilibc/wpilibC++Sim/include/DoubleSolenoid.h
+ create mode 100644 wpilibc/wpilibC++Sim/include/Solenoid.h
+ create mode 100644 wpilibc/wpilibC++Sim/include/simulation/SimContinuousOutput.h
+ delete mode 100644 wpilibc/wpilibC++Sim/include/simulation/SimSpeedController.h
+ create mode 100644 wpilibc/wpilibC++Sim/src/DoubleSolenoid.cpp
+ create mode 100644 wpilibc/wpilibC++Sim/src/Solenoid.cpp
+ create mode 100644 wpilibc/wpilibC++Sim/src/simulation/SimContinuousOutput.cpp
+ delete mode 100644 wpilibc/wpilibC++Sim/src/simulation/SimSpeedController.cpp
+
+diff --git a/wpilibc/wpilibC++Sim/include/DoubleSolenoid.h b/wpilibc/wpilibC++Sim/include/DoubleSolenoid.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..a99af6dbe40d906f9cf11a6dc66741482e4b86eb
+--- /dev/null
++++ b/wpilibc/wpilibC++Sim/include/DoubleSolenoid.h
+@@ -0,0 +1,50 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++#pragma once
++
++#include "simulation/SimContinuousOutput.h"
++#include "LiveWindow/LiveWindowSendable.h"
++#include "tables/ITableListener.h"
++
++/**
++ * DoubleSolenoid class for running 2 channels of high voltage Digital Output
++ * (9472 module).
++ * 
++ * The DoubleSolenoid class is typically used for pneumatics solenoids that
++ * have two positions controlled by two separate channels.
++ */
++class DoubleSolenoid : public LiveWindowSendable, public ITableListener
++{
++public:
++	enum Value
++	{
++		kOff,
++		kForward,
++		kReverse
++	};
++
++	explicit DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel);
++	DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, uint32_t reverseChannel);
++	virtual ~DoubleSolenoid();
++	virtual void Set(Value value);
++	virtual Value Get();
++
++	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
++	void UpdateTable();
++	void StartLiveWindowMode();
++	void StopLiveWindowMode();
++	std::string GetSmartDashboardType();
++	void InitTable(ITable *subTable);
++	ITable * GetTable();
++
++private:
++    void InitSolenoid(int slot, int channel1, int channel2);
++    SimContinuousOutput* m_impl;
++    Value m_value;
++    bool m_reversed;
++
++	ITable *m_table;
++};
+diff --git a/wpilibc/wpilibC++Sim/include/Jaguar.h b/wpilibc/wpilibC++Sim/include/Jaguar.h
+index 9ee3a9cc450b743b32bef999941881c6136ba22d..a0e6c736e8813f0bde428da6e91ae381895e34de 100644
+--- a/wpilibc/wpilibC++Sim/include/Jaguar.h
++++ b/wpilibc/wpilibC++Sim/include/Jaguar.h
+@@ -7,7 +7,7 @@
+ #ifndef JAGUAR_H
+ #define JAGUAR_H
+ 
+-#include "simulation/SimSpeedController.h"
++#include "simulation/SimContinuousOutput.h"
+ #include "SpeedController.h"
+ #include "PIDOutput.h"
+ 
+@@ -28,7 +28,7 @@ public:
+ 
+ private:
+ 	void InitJaguar(int slot, int channel);
+-    SimSpeedController* impl;
++    SimContinuousOutput* impl;
+ };
+ 
+ #endif
+diff --git a/wpilibc/wpilibC++Sim/include/Solenoid.h b/wpilibc/wpilibC++Sim/include/Solenoid.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..31df978ef01e893d6c58efc4af2c39b7336822ba
+--- /dev/null
++++ b/wpilibc/wpilibC++Sim/include/Solenoid.h
+@@ -0,0 +1,41 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++#pragma once
++
++#include "simulation/SimContinuousOutput.h"
++#include "LiveWindow/LiveWindowSendable.h"
++#include "tables/ITableListener.h"
++
++/**
++ * Solenoid class for running high voltage Digital Output (9472 module).
++ * 
++ * The Solenoid class is typically used for pneumatics solenoids, but could be used
++ * for any device within the current spec of the 9472 module.
++ */
++class Solenoid : public LiveWindowSendable, public ITableListener
++{
++public:
++	explicit Solenoid(uint32_t channel);
++	Solenoid(uint8_t moduleNumber, uint32_t channel);
++	virtual ~Solenoid();
++	virtual void Set(bool on);
++	virtual bool Get();
++
++	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
++	void UpdateTable();
++	void StartLiveWindowMode();
++	void StopLiveWindowMode();
++	std::string GetSmartDashboardType();
++	void InitTable(ITable *subTable);
++	ITable * GetTable();
++
++private:
++	void InitSolenoid(int slot, int channel);
++    SimContinuousOutput* m_impl;
++    bool m_on; 
++
++	ITable *m_table;
++};
+diff --git a/wpilibc/wpilibC++Sim/include/Talon.h b/wpilibc/wpilibC++Sim/include/Talon.h
+index bf95152a5e43b6f8f814de1e291ba18e79e8d01d..522adfc7fe7a0c7142de44c938ef9a2c8e925910 100644
+--- a/wpilibc/wpilibC++Sim/include/Talon.h
++++ b/wpilibc/wpilibC++Sim/include/Talon.h
+@@ -7,7 +7,7 @@
+ #ifndef Talon_H
+ #define Talon_H
+ 
+-#include "simulation/SimSpeedController.h"
++#include "simulation/SimContinuousOutput.h"
+ #include "SpeedController.h"
+ #include "PIDOutput.h"
+ 
+@@ -28,7 +28,7 @@ public:
+ 
+ private:
+ 	void InitTalon(int slot, int channel);
+-    SimSpeedController* impl;
++    SimContinuousOutput* impl;
+ };
+ 
+ #endif
+diff --git a/wpilibc/wpilibC++Sim/include/Victor.h b/wpilibc/wpilibC++Sim/include/Victor.h
+index 4a8c6b89ec6d71a13ec03fe2fa875f12f5934db9..486c4f8f961280479b08e1e99c2c2d8c87d3d357 100644
+--- a/wpilibc/wpilibC++Sim/include/Victor.h
++++ b/wpilibc/wpilibC++Sim/include/Victor.h
+@@ -7,7 +7,7 @@
+ #ifndef VICTOR_H
+ #define VICTOR_H
+ 
+-#include "simulation/SimSpeedController.h"
++#include "simulation/SimContinuousOutput.h"
+ #include "SpeedController.h"
+ #include "PIDOutput.h"
+ 
+@@ -28,7 +28,7 @@ public:
+ 
+ private:
+ 	void InitVictor(int slot, int channel);
+-    SimSpeedController* impl;
++    SimContinuousOutput* impl;
+ };
+ 
+ #endif
+diff --git a/wpilibc/wpilibC++Sim/include/WPILib.h b/wpilibc/wpilibC++Sim/include/WPILib.h
+index c42a1c2cf16f6623f27b932fda66904096579c50..318fd55c9127234d7cb4256bc31969119a205f6b 100644
+--- a/wpilibc/wpilibC++Sim/include/WPILib.h
++++ b/wpilibc/wpilibC++Sim/include/WPILib.h
+@@ -10,6 +10,27 @@
+ 
+ #define SIMULATION "gazebo"
+ 
++#include "Buttons/Trigger.h"
++#include "Buttons/Button.h"
++#include "Buttons/InternalButton.h"
++#include "Buttons/JoystickButton.h"
++#include "Buttons/NetworkButton.h"
++
++#include "Commands/Command.h"
++#include "Commands/CommandGroup.h"
++#include "Commands/PIDCommand.h"
++#include "Commands/PIDSubsystem.h"
++#include "Commands/PrintCommand.h"
++#include "Commands/Scheduler.h"
++#include "Commands/StartCommand.h"
++#include "Commands/Subsystem.h"
++#include "Commands/WaitCommand.h"
++#include "Commands/WaitForChildren.h"
++#include "Commands/WaitUntilCommand.h"
++
++#include "SmartDashboard/SendableChooser.h"
++#include "SmartDashboard/SmartDashboard.h"
++
+ #include "RobotBase.h"
+ #include "SimpleRobot.h"
+ #include "IterativeRobot.h"
+@@ -17,6 +38,8 @@
+ #include "Talon.h"
+ #include "Victor.h"
+ #include "Jaguar.h"
++#include "Solenoid.h"
++#include "DoubleSolenoid.h"
+ #include "interfaces/Potentiometer.h"
+ #include "AnalogChannel.h"
+ #include "AnalogPotentiometer.h"
+@@ -28,13 +51,6 @@
+ #include "Joystick.h"
+ #include "PIDController.h"
+ #include "RobotDrive.h"
+-#include "SmartDashboard/SmartDashboard.h"
+ #include "LiveWindow/LiveWindow.h"
+ 
+-#include "Buttons/Trigger.h"
+-#include "Buttons/Button.h"
+-#include "Buttons/InternalButton.h"
+-#include "Buttons/JoystickButton.h"
+-#include "Buttons/NetworkButton.h"
+-
+ #endif /* WPILIB_H_ */
+diff --git a/wpilibc/wpilibC++Sim/include/simulation/SimContinuousOutput.h b/wpilibc/wpilibC++Sim/include/simulation/SimContinuousOutput.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..bf879c533faa79c399825f7d9d4f995ce6d953d9
+--- /dev/null
++++ b/wpilibc/wpilibC++Sim/include/simulation/SimContinuousOutput.h
+@@ -0,0 +1,35 @@
++
++
++#ifndef _SIM_SPEED_CONTROLLER_H
++#define _SIM_SPEED_CONTROLLER_H
++
++#include <gazebo/transport/transport.hh>
++#include "SpeedController.h"
++
++using namespace gazebo;
++
++class SimContinuousOutput {
++private:
++	transport::PublisherPtr pub;
++	float speed;
++
++public:
++	SimContinuousOutput(std::string topic);
++
++	/**
++	 * Set the output value.
++	 *
++	 * The value is set using a range of -1.0 to 1.0, appropriately
++	 * scaling the value.
++	 *
++	 * @param value The value between -1.0 and 1.0 to set.
++	 */
++	void Set(float value);
++
++	/**
++	 * @return The most recently set value.
++	 */
++	float Get();
++};
++
++#endif
+diff --git a/wpilibc/wpilibC++Sim/include/simulation/SimSpeedController.h b/wpilibc/wpilibC++Sim/include/simulation/SimSpeedController.h
+deleted file mode 100644
+index e98d0e1eac0fd553cf17b47de9c6ce6f1383be2b..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Sim/include/simulation/SimSpeedController.h
++++ /dev/null
+@@ -1,67 +0,0 @@
+-
+-
+-#ifndef _SIM_SPEED_CONTROLLER_H
+-#define _SIM_SPEED_CONTROLLER_H
+-
+-#include <gazebo/transport/transport.hh>
+-#include "SpeedController.h"
+-
+-using namespace gazebo;
+-
+-class SimSpeedController : public SpeedController {
+-private:
+-	transport::PublisherPtr pub;
+-	float speed;
+-
+-public:
+-	/**
+-	 * Constructor that assumes the default digital module.
+-	 *
+-	 * @param channel The PWM channel on the digital module that the Victor is attached to.
+-	 */
+-	SimSpeedController(std::string topic);
+-
+-	/**
+-	 * Set the PWM value.
+-	 *
+-	 * @deprecated For compatibility with CANJaguar
+-	 *
+-	 * The PWM value is set using a range of -1.0 to 1.0, appropriately
+-	 * scaling the value for the FPGA.
+-	 *
+-	 * @param speed The speed to set.  Value should be between -1.0 and 1.0.
+-	 * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
+-	 */
+-	void Set(float speed, uint8_t syncGroup);
+-
+-	/**
+-	 * Set the PWM value.
+-	 *
+-	 * The PWM value is set using a range of -1.0 to 1.0, appropriately
+-	 * scaling the value for the FPGA.
+-	 *
+-	 * @param speed The speed value between -1.0 and 1.0 to set.
+-	 */
+-	void Set(float speed);
+-
+-	/**
+-	 * Get the recently set value of the PWM.
+-	 *
+-	 * @return The most recently set value for the PWM between -1.0 and 1.0.
+-	 */
+-	float Get();
+-
+-	/**
+-	 * Disable the speed controller
+-	 */
+-	void Disable();
+-
+-	/**
+-	 * Write out the PID value as seen in the PIDOutput base object.
+-	 *
+-	 * @param output Write out the PWM value as was found in the PIDController
+-	 */
+-	void PIDWrite(float output);
+-};
+-
+-#endif
+diff --git a/wpilibc/wpilibC++Sim/src/DoubleSolenoid.cpp b/wpilibc/wpilibC++Sim/src/DoubleSolenoid.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..322b4575e6a92e49ec75c720631f69769b9029fe
+--- /dev/null
++++ b/wpilibc/wpilibC++Sim/src/DoubleSolenoid.cpp
+@@ -0,0 +1,135 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++
++#include "DoubleSolenoid.h"
++#include "WPIErrors.h"
++#include <string.h>
++#include "LiveWindow/LiveWindow.h"
++
++/**
++ * Common function to implement constructor behavior.
++ */
++void DoubleSolenoid::InitSolenoid(int slot, int forwardChannel, int reverseChannel)
++{
++    m_reversed = false;
++    if (reverseChannel < forwardChannel) { // Swap ports to get the right address
++        int channel = reverseChannel;
++        reverseChannel = forwardChannel;
++        forwardChannel = channel;
++        m_reversed = true;
++    }
++    char buffer[50];
++    int n = sprintf(buffer, "pneumatic/%d/%d/%d/%d", slot, forwardChannel,
++                    slot, reverseChannel);
++    m_impl = new SimContinuousOutput(buffer);  
++  
++	LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", slot, forwardChannel, this);
++}
++
++/**
++ * Constructor.
++ *
++ * @param forwardChannel The forward channel on the module to control.
++ * @param reverseChannel The reverse channel on the module to control.
++ */
++DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
++{
++    InitSolenoid(1, forwardChannel, reverseChannel);
++}
++
++/**
++ * Constructor.
++ *
++ * @param moduleNumber The solenoid module (1 or 2).
++ * @param forwardChannel The forward channel on the module to control.
++ * @param reverseChannel The reverse channel on the module to control.
++ */
++DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel, uint32_t reverseChannel)
++{
++    InitSolenoid(moduleNumber, forwardChannel, reverseChannel);
++}
++
++/**
++ * Destructor.
++ */
++DoubleSolenoid::~DoubleSolenoid()
++{
++}
++
++/**
++ * Set the value of a solenoid.
++ *
++ * @param value Move the solenoid to forward, reverse, or don't move it.
++ */
++void DoubleSolenoid::Set(Value value)
++{
++    m_value = value;
++	switch(value)
++	{
++	case kOff:
++        m_impl->Set(0);
++        break;
++	case kForward:
++        m_impl->Set(m_reversed ? -1 : 1);
++		break;
++	case kReverse:
++        m_impl->Set(m_reversed ? 1 : -1);
++		break;
++	}
++}
++
++/**
++ * Read the current value of the solenoid.
++ *
++ * @return The current value of the solenoid.
++ */
++DoubleSolenoid::Value DoubleSolenoid::Get()
++{
++	return m_value;
++}
++
++void DoubleSolenoid::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
++	Value lvalue = kOff;
++	std::string *val = (std::string *)value.ptr;
++	if (*val == "Forward")
++		lvalue = kForward;
++	else if (*val == "Reverse")
++		lvalue = kReverse;
++	Set(lvalue);
++}
++
++void DoubleSolenoid::UpdateTable() {
++	if (m_table != NULL) {
++		m_table->PutString("Value", (Get() == kForward ? "Forward" : (Get() == kReverse ? "Reverse" : "Off")));
++	}
++}
++
++void DoubleSolenoid::StartLiveWindowMode() {
++	Set(kOff);
++	if (m_table != NULL) {
++		m_table->AddTableListener("Value", this, true);
++	}
++}
++
++void DoubleSolenoid::StopLiveWindowMode() {
++	Set(kOff);
++	if (m_table != NULL) {
++		m_table->RemoveTableListener(this);
++	}
++}
++
++std::string DoubleSolenoid::GetSmartDashboardType() {
++	return "Double Solenoid";
++}
++
++void DoubleSolenoid::InitTable(ITable *subTable) {
++	m_table = subTable;
++	UpdateTable();
++}
++
++ITable * DoubleSolenoid::GetTable() {
++	return m_table;
++}
+diff --git a/wpilibc/wpilibC++Sim/src/Jaguar.cpp b/wpilibc/wpilibC++Sim/src/Jaguar.cpp
+index 60c1b0dd701d426405467c446592760403bcbc97..4e1129ec2e9b4317e33d1e91f6d2de989c0c9afa 100644
+--- a/wpilibc/wpilibC++Sim/src/Jaguar.cpp
++++ b/wpilibc/wpilibC++Sim/src/Jaguar.cpp
+@@ -24,7 +24,7 @@ void Jaguar::InitJaguar(int slot, int channel)
+ 	 */
+     char buffer[50];
+     int n = sprintf(buffer, "pwm/%d/%d", slot, channel);
+-    impl = new SimSpeedController(buffer);
++    impl = new SimContinuousOutput(buffer);
+ 
+ 	// TODO: LiveWindow::GetInstance()->AddActuator("Jaguar", GetModuleNumber(), GetChannel(), this);
+ }
+@@ -83,7 +83,7 @@ float Jaguar::Get()
+  */
+ void Jaguar::Disable()
+ {
+-    impl->Disable();
++    impl->Set(0);
+ }
+ 
+ /**
+diff --git a/wpilibc/wpilibC++Sim/src/Solenoid.cpp b/wpilibc/wpilibC++Sim/src/Solenoid.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..f35ab4de7a8e0831a504f679786057f8d40e2c46
+--- /dev/null
++++ b/wpilibc/wpilibC++Sim/src/Solenoid.cpp
+@@ -0,0 +1,108 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++
++#include "Solenoid.h"
++#include "WPIErrors.h"
++#include "LiveWindow/LiveWindow.h"
++
++/**
++ * Common function to implement constructor behavior.
++ */
++void Solenoid::InitSolenoid(int slot, int channel)
++{
++    char buffer[50];
++    int n = sprintf(buffer, "pneumatic/%d/%d", slot, channel);
++    m_impl = new SimContinuousOutput(buffer);
++  
++	LiveWindow::GetInstance()->AddActuator("Solenoid", slot, channel, this);
++}
++
++/**
++ * Constructor.
++ *
++ * @param channel The channel on the solenoid module to control (1..8).
++ */
++Solenoid::Solenoid(uint32_t channel)
++{
++    InitSolenoid(1, channel);
++}
++
++/**
++ * Constructor.
++ *
++ * @param moduleNumber The solenoid module (1 or 2).
++ * @param channel The channel on the solenoid module to control (1..8).
++ */
++Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
++{
++    InitSolenoid(moduleNumber, channel);
++}
++
++/**
++ * Destructor.
++ */
++Solenoid::~Solenoid()
++{
++}
++
++/**
++ * Set the value of a solenoid.
++ *
++ * @param on Turn the solenoid output off or on.
++ */
++void Solenoid::Set(bool on)
++{
++    m_on = on;
++    m_impl->Set(on ? 1 : -1);
++}
++
++/**
++ * Read the current value of the solenoid.
++ *
++ * @return The current value of the solenoid.
++ */
++bool Solenoid::Get()
++{
++    return m_on;
++}
++
++
++void Solenoid::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
++	Set(value.b);
++}
++
++void Solenoid::UpdateTable() {
++	if (m_table != NULL) {
++		m_table->PutBoolean("Value", Get());
++	}
++}
++
++void Solenoid::StartLiveWindowMode() {
++	Set(false);
++	if (m_table != NULL) {
++		m_table->AddTableListener("Value", this, true);
++	}
++}
++
++void Solenoid::StopLiveWindowMode() {
++	Set(false);
++	if (m_table != NULL) {
++		m_table->RemoveTableListener(this);
++	}
++}
++
++std::string Solenoid::GetSmartDashboardType() {
++	return "Solenoid";
++}
++
++void Solenoid::InitTable(ITable *subTable) {
++	m_table = subTable;
++	UpdateTable();
++}
++
++ITable * Solenoid::GetTable() {
++	return m_table;
++}
+diff --git a/wpilibc/wpilibC++Sim/src/Talon.cpp b/wpilibc/wpilibC++Sim/src/Talon.cpp
+index 4b284292d7f79b58fd6b0f41d0e27b70159e9fb6..c661413e439d427684a9c9900937893f6f5e6831 100644
+--- a/wpilibc/wpilibC++Sim/src/Talon.cpp
++++ b/wpilibc/wpilibC++Sim/src/Talon.cpp
+@@ -25,7 +25,7 @@
+ void Talon::InitTalon(int slot, int channel) {
+     char buffer[50];
+     int n = sprintf(buffer, "pwm/%d/%d", slot, channel);
+-    impl = new SimSpeedController(buffer);
++    impl = new SimContinuousOutput(buffer);
+ 
+ 	// TODO: LiveWindow::GetInstance()->AddActuator("Talon", slot, channel, this);
+ }
+@@ -84,7 +84,7 @@ float Talon::Get()
+  */
+ void Talon::Disable()
+ {
+-    impl->Disable();
++    impl->Set(0);
+ }
+ 
+ /**
+diff --git a/wpilibc/wpilibC++Sim/src/Victor.cpp b/wpilibc/wpilibC++Sim/src/Victor.cpp
+index 6f9911802ea11b3d5200b8135be87af4207142ef..7fbd623ac70dc0819d07e4b7fb984bf9bb65c0f3 100644
+--- a/wpilibc/wpilibC++Sim/src/Victor.cpp
++++ b/wpilibc/wpilibC++Sim/src/Victor.cpp
+@@ -26,7 +26,7 @@
+ void Victor::InitVictor(int slot, int channel) {
+     char buffer[50];
+     int n = sprintf(buffer, "pwm/%d/%d", slot, channel);
+-    impl = new SimSpeedController(buffer);
++    impl = new SimContinuousOutput(buffer);
+     
+ 	// TODO: LiveWindow::GetInstance()->AddActuator("Victor", slot, channel, this);
+ }
+@@ -85,7 +85,7 @@ float Victor::Get()
+  */
+ void Victor::Disable()
+ {
+-    impl->Disable();
++    impl->Set(0);
+ }
+ 
+ /**
+diff --git a/wpilibc/wpilibC++Sim/src/simulation/SimContinuousOutput.cpp b/wpilibc/wpilibC++Sim/src/simulation/SimContinuousOutput.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..39dbf706b4db7f0ee906ccbd35734c71e7512d40
+--- /dev/null
++++ b/wpilibc/wpilibC++Sim/src/simulation/SimContinuousOutput.cpp
+@@ -0,0 +1,24 @@
++/*
++ * SimContinuousOutput.cpp
++ *
++ *  Created on: May 28, 2014
++ *      Author: alex
++ */
++
++#include "simulation/SimContinuousOutput.h"
++#include "simulation/MainNode.h"
++
++SimContinuousOutput::SimContinuousOutput(std::string topic) {
++    pub = MainNode::Advertise<msgs::Float64>("~/simulator/"+topic);
++	std::cout << "Initialized ~/simulator/"+topic << std::endl;
++}
++
++void SimContinuousOutput::Set(float speed) {
++	msgs::Float64 msg;
++	msg.set_data(speed);
++	pub->Publish(msg);
++}
++
++float SimContinuousOutput::Get() {
++	return speed;
++}
+diff --git a/wpilibc/wpilibC++Sim/src/simulation/SimFloatInput.cpp b/wpilibc/wpilibC++Sim/src/simulation/SimFloatInput.cpp
+index c7eb6b6a6edf3b689cf04f5771c962f5622dc0d4..1fa93370f47823481a52b6d222009127a40bc3d9 100644
+--- a/wpilibc/wpilibC++Sim/src/simulation/SimFloatInput.cpp
++++ b/wpilibc/wpilibC++Sim/src/simulation/SimFloatInput.cpp
+@@ -1,5 +1,5 @@
+ /*
+- * SimSpeedController.cpp
++ * SimFloatInput.cpp
+  *
+  *  Created on: May 28, 2014
+  *      Author: alex
+diff --git a/wpilibc/wpilibC++Sim/src/simulation/SimSpeedController.cpp b/wpilibc/wpilibC++Sim/src/simulation/SimSpeedController.cpp
+deleted file mode 100644
+index 746ba15c690b5b43abf58944a10052ecc7df8d4e..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Sim/src/simulation/SimSpeedController.cpp
++++ /dev/null
+@@ -1,39 +0,0 @@
+-/*
+- * SimSpeedController.cpp
+- *
+- *  Created on: May 28, 2014
+- *      Author: alex
+- */
+-
+-#include "simulation/SimSpeedController.h"
+-#include "simulation/MainNode.h"
+-
+-SimSpeedController::SimSpeedController(std::string topic) {
+-    pub = MainNode::Advertise<msgs::Float64>("~/simulator/"+topic);
+-	std::cout << "Initialized ~/simulator/"+topic << std::endl;
+-}
+-
+-void SimSpeedController::Set(float speed, uint8_t syncGroup) {
+-	Set(speed);
+-}
+-
+-void SimSpeedController::Set(float speed) {
+-	msgs::Float64 msg;
+-	msg.set_data(speed);
+-	pub->Publish(msg);
+-}
+-
+-float SimSpeedController::Get() {
+-	return speed;
+-}
+-
+-void SimSpeedController::Disable() {
+-	Set(0);
+-}
+-
+-void SimSpeedController::PIDWrite(float output) {
+-	Set(output);
+-}
+-
+-
+-

@@ -1,0 +1,127 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Fri, 5 Dec 2014 13:53:44 -0500
+Subject: [PATCH 0531/6262] Add USB IP to deploy fallbacks and make fallbacks
+ work.
+
+Change-Id: Iae28b1bc883e65cd6f3a88858405d43815c7323b
+---
+ .../src/main/resources/cpp-zip/ant/build.xml  | 33 ++++++++++++++-----
+ .../src/main/resources/java-zip/ant/build.xml | 33 ++++++++++++++-----
+ 2 files changed, 50 insertions(+), 16 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+index 9e52b0cedad0192b37509bfa3ffbd716a0187847..646fdc0a82ca910d4b2b8e580a190c411f204c44 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+@@ -19,21 +19,37 @@
+   <!-- Targets -->
+ 
+   <target name="get-target-ip">
++    <property name="ant.enable.asserts" value="true"/>
+     <property name="target" value="roboRIO-${team-number}.local" />
+ 	<echo>Trying Target: ${target}</echo>
+ 	 <if>
+-		<isreachable host="${target}"/>
++		<isreachable host="${target}" timeout="5"/>
+ 	  <then>
+ 		<echo>roboRIO found via mDNS</echo>
+ 	  </then>
+ 	  <else>
+-		<math result="ip.upper" operand1="${team-number}" operation="/" operand2="100" datatype="int"/>
+-		<math result="ip.lower" operand1="${team-number}" operation="%" operand2="100" datatype="int"/>
+-		<property name="target" value="10.${ip-upper}.${ip.lower}.2"/>
+-		<echo>roboRIO not found via mDNS, falling back to static address of ${target}</echo>
+-		<assert name="roboRIOFound" message="roboRIO not found, please check that the roboRIO is connected, imaged and that the team number is set properly in Eclipse">
+-			<isreachable host="${target}"/>
+-		</assert>
++		<var name="target" unset="true"/>
++		<echo> roboRIO not found via mDNS, falling back to static USB</echo>
++		<property name="target" value="172.22.11.2"/>
++		<if>
++			<isreachable host="${target}" timeout="5"/>
++		  <then>
++			<echo>roboRIO found via static USB</echo>
++		  </then>
++		  <else>
++			<var name="target" unset="true"/>
++			<math result="ip.upper" operand1="${team-number}" operation="/" operand2="100" datatype="int"/>
++			<math result="ip.lower" operand1="${team-number}" operation="%" operand2="100" datatype="int"/>
++			<property name="target" value="10.${ip.upper}.${ip.lower}.2"/>
++			<echo>roboRIO not found via USB, falling back to static address of ${target}</echo>
++			<assert name="roboRIOFound" message="roboRIO not found, please check that the roboRIO is connected, imaged and that the team number is set properly in Eclipse">
++				<bool>
++					<isreachable host="${target}" timeout="5"/>
++				</bool>
++			</assert>
++			<echo>roboRIO found via Ethernet static</echo>
++		  </else>
++		</if>
+ 	  </else>
+ 	 </if>
+   </target>
+@@ -105,5 +121,6 @@
+ 			<contains string="${roboRIOAllowedImages}" substring="${roboRIOImage}"/>
+ 		</bool>
+ 	</assert>
++	<echo>roboRIO image version validated</echo>
+   </target>
+ </project>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+index 4cea3ee06749227170b0f6231b4110f5f8665a4d..ea6e98af7b8c6004d2e81496e3f77197af4c4a19 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+@@ -19,21 +19,37 @@
+   <!-- Targets -->
+ 
+   <target name="get-target-ip">
++    <property name="ant.enable.asserts" value="true"/>
+     <property name="target" value="roboRIO-${team-number}.local" />
+ 	<echo>Trying Target: ${target}</echo>
+ 	 <if>
+-		<isreachable host="${target}"/>
++		<isreachable host="${target}" timeout="5"/>
+ 	  <then>
+ 		<echo>roboRIO found via mDNS</echo>
+ 	  </then>
+ 	  <else>
+-		<math result="ip.upper" operand1="${team-number}" operation="/" operand2="100" datatype="int"/>
+-		<math result="ip.lower" operand1="${team-number}" operation="%" operand2="100" datatype="int"/>
+-		<property name="target" value="10.${ip-upper}.${ip.lower}.2"/>
+-		<echo>roboRIO not found via mDNS, falling back to static address of ${target}</echo>
+-		<assert name="roboRIOFound" message="roboRIO not found, please check that the roboRIO is connected, imaged and that the team number is set properly in Eclipse">
+-			<isreachable host="${target}"/>
+-		</assert>
++		<var name="target" unset="true"/>
++		<echo> roboRIO not found via mDNS, falling back to static USB</echo>
++		<property name="target" value="172.22.11.2"/>
++		<if>
++			<isreachable host="${target}" timeout="5"/>
++		  <then>
++			<echo>roboRIO found via static USB</echo>
++		  </then>
++		  <else>
++			<var name="target" unset="true"/>
++			<math result="ip.upper" operand1="${team-number}" operation="/" operand2="100" datatype="int"/>
++			<math result="ip.lower" operand1="${team-number}" operation="%" operand2="100" datatype="int"/>
++			<property name="target" value="10.${ip.upper}.${ip.lower}.2"/>
++			<echo>roboRIO not found via USB, falling back to static address of ${target}</echo>
++			<assert name="roboRIOFound" message="roboRIO not found, please check that the roboRIO is connected, imaged and that the team number is set properly in Eclipse">
++				<bool>
++					<isreachable host="${target}" timeout="5"/>
++				</bool>
++			</assert>
++			<echo>roboRIO found via Ethernet static</echo>
++		  </else>
++		</if>
+ 	  </else>
+ 	 </if>
+   </target>
+@@ -204,6 +220,7 @@
+ 			<contains string="${roboRIOAllowedImages}" substring="${roboRIOImage}"/>
+ 		</bool>
+ 	</assert>
++	<echo>roboRIO image version validated</echo>
+ 	<echo>Checking for JRE. If this fails install the JRE using these instructions: http://wpilib.screenstepslive.com/s/4485/m/13809/l/243933-installing-java-8-on-the-roborio-java-only</echo>
+ 	<sshexec host="${target}"
+         username="${username}"

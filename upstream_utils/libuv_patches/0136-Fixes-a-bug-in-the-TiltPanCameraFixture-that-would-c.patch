@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 26 Jun 2014 15:56:37 -0400
+Subject: [PATCH 0136/6262] Fixes a bug in the TiltPanCameraFixture that would
+ cause the test to freeze and never complete instead of failing
+
+Change-Id: Iff14f6cac937952cb015d36b967c4dfc5660d6ce
+---
+ .../edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
+index b5cbcc057c7fd1ba54a53c4a51a292d1ecef2e72..e23161bdb80510ccce8ade69675d64415a71f086 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
+@@ -49,7 +49,7 @@ public class TiltPanCameraFixture implements ITestFixture {
+ 		Timer.delay(RESET_TIME);
+ 		gyro.reset();
+ 		double startTime = Timer.getFPGATimestamp();
+-		while(Math.abs(gyro.getAngle()) > 0.1){
++		for(int i = 0; i < 100 && Math.abs(gyro.getAngle()) > 0.1; i++){
+ 			Timer.delay(.0001);
+ 		}
+ 		double endTime = Timer.getFPGATimestamp();

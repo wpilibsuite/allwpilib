@@ -1,0 +1,476 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Thu, 14 Aug 2014 18:05:45 -0400
+Subject: [PATCH 0466/6262] Added default world files to examples.
+
+This saves a step and prevents one of the biggest user errors with the
+pacgoat example.
+
+Change-Id: Icdceb1da37c4b456f1a34daa815f3bbe2a47e18e
+---
+ .../plugins/core/wizards/ExampleWizard.java   |  6 ++--
+ .../core/wizards/ExampleWizardChoicePage.java | 32 +++++++++++++++++--
+ .../plugins/core/wizards/IExampleProject.java |  6 ++++
+ .../plugins/core/wizards/INewProjectInfo.java | 24 ++++++++++++++
+ .../core/wizards/NewProjectMainPage.java      | 17 ++++++++--
+ .../resources/templates/examples/examples.xml |  4 ++-
+ .../wizards/examples/ExampleCPPProject.java   |  9 ++++--
+ .../wizards/examples/ExampleCPPWizard.java    |  9 +++---
+ .../cpp/wizards/newproject/NewCPPWizard.java  |  3 +-
+ .../resources/templates/examples/examples.xml |  2 ++
+ .../wizards/examples/ExampleJavaProject.java  |  9 ++++--
+ .../wizards/examples/ExampleJavaWizard.java   |  9 +++---
+ .../wizards/newproject/NewJavaWizard.java     |  3 +-
+ 13 files changed, 109 insertions(+), 24 deletions(-)
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/INewProjectInfo.java
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizard.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizard.java
+index 296c9dc3c3d483220f408ad7f2b92d0f65d370d6..ce7bc890ffea99d9bdfadcd9f0441a4490946549 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizard.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizard.java
+@@ -36,10 +36,10 @@ public abstract class ExampleWizard extends Wizard implements INewWizard {
+ 	 */
+ 	protected abstract void doFinish(IExampleProject ex, String teamNumber) throws CoreException;
+ 
+-	protected abstract IWizardPage getDetailsPage();
++	protected abstract IWizardPage getDetailsPage(INewProjectInfo info);
+ 	
+ 	public abstract IExampleProject makeExampleProject(String name, String description,
+-			List<String> tags, List<String> folders, List<IExampleProject.ExportFile> files);
++			List<String> tags, String world, List<String> folders, List<IExampleProject.ExportFile> files);
+ 	
+ 	public abstract URL getResourceURL();
+ 	
+@@ -60,7 +60,7 @@ public abstract class ExampleWizard extends Wizard implements INewWizard {
+ 		}
+ 		page1 = new ExampleWizardChoicePage(this, selection);
+ 		addPage(page1);
+-		page2 = getDetailsPage();
++		page2 = getDetailsPage(page1);
+ 		addPage(page2);
+ 	}
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizardChoicePage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizardChoicePage.java
+index 2b9087f7b0773fd801f79af0b7891eacd23d3763..8bbdd2d106ca0e398f8a8345c0e96a155c1660e8 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizardChoicePage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizardChoicePage.java
+@@ -6,6 +6,7 @@ import java.net.URL;
+ import java.util.ArrayList;
+ import java.util.List;
+ 
++import javax.swing.event.ChangeListener;
+ import javax.xml.parsers.DocumentBuilder;
+ import javax.xml.parsers.DocumentBuilderFactory;
+ import javax.xml.parsers.ParserConfigurationException;
+@@ -36,11 +37,12 @@ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+  * OR with the extension that matches the expected one (mpe).
+  */
+ 
+-public class ExampleWizardChoicePage extends WizardPage {
++public class ExampleWizardChoicePage extends WizardPage implements INewProjectInfo {
+ 	private Tree exampleTree;
+ 	private Browser descriptionText;
+ 	private IExampleProject selectedExample;
+ 	private ExampleWizard parent;
++	private ChangeListener listener;
+ 
+ 	/**
+ 	 * Constructor for SampleNewWizardPage.
+@@ -89,6 +91,20 @@ public class ExampleWizardChoicePage extends WizardPage {
+ 		dialogChanged();
+ 		setControl(container);
+ 	}
++	
++	public String getName() {
++		if (selectedExample != null) {
++			return selectedExample.getName();
++		}
++		return "";
++	}
++	
++	public String getWorld() {
++		if (selectedExample != null) {
++			return selectedExample.getWorld();
++		}
++		return "";
++	}
+ 
+ 	/**
+ 	 * Tests if the current workbench selection is a suitable container to use.
+@@ -137,7 +153,6 @@ public class ExampleWizardChoicePage extends WizardPage {
+ 	/**
+ 	 * Ensures that both text fields are set.
+ 	 */
+-
+ 	private void dialogChanged() {
+ 		if (exampleTree.getSelection().length > 0) {
+ 			Object selectedData = exampleTree.getSelection()[0].getData();
+@@ -157,6 +172,7 @@ public class ExampleWizardChoicePage extends WizardPage {
+ 			return;
+ 		}
+ 		
++		listener.stateChanged(null);
+ 		updateStatus(null);
+ 	}
+ 
+@@ -211,6 +227,11 @@ public class ExampleWizardChoicePage extends WizardPage {
+ 				tags.add(tagElementList.item(i).getTextContent());
+ 			}
+ 		}
++		String world = "";
++		if (element.getElementsByTagName("world") != null &&
++			element.getElementsByTagName("world").item(0) != null) {
++			world = element.getElementsByTagName("world").item(0).getTextContent();
++		}
+ 		List<String> packages = new ArrayList<String>();
+ 		tagsElement = element.getElementsByTagName("packages").item(0);
+ 		if (tagsElement.getNodeType() == Node.ELEMENT_NODE) {
+@@ -231,10 +252,15 @@ public class ExampleWizardChoicePage extends WizardPage {
+ 				}
+ 			}
+ 		}
+-		return parent.makeExampleProject(name, description, tags, packages, files);
++		return parent.makeExampleProject(name, description, tags, world, packages, files);
+ 	}
+ 
+ 	public IExampleProject getExampleProject() {
+ 		return selectedExample;
+ 	}
++
++	@Override
++	public void registerChangeListener(ChangeListener listener) {
++		this.listener = listener;
++	}
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/IExampleProject.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/IExampleProject.java
+index 3b1860cb1b0f3cd71771d0a2df29fb416e924578..11803752dd1fe8679143f038220d08a4b2bc577f 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/IExampleProject.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/IExampleProject.java
+@@ -14,4 +14,10 @@ public interface IExampleProject extends ProjectType {
+ 			this.destination = destination;
+ 		}
+ 	}
++
++	/**
++	 * @return The world file to use for simulation, if empty
++	 *         the default is used.
++	 */
++	String getWorld();
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/INewProjectInfo.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/INewProjectInfo.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..decc95bada76dc23382e47ede7f581a400dbced5
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/INewProjectInfo.java
+@@ -0,0 +1,24 @@
++package edu.wpi.first.wpilib.plugins.core.wizards;
++
++import javax.swing.event.ChangeListener;
++
++public interface INewProjectInfo {
++	String getName();
++	String getWorld();
++	void registerChangeListener(ChangeListener changeListener);
++	
++	public static INewProjectInfo Null = new INewProjectInfo() {
++		@Override
++		public String getWorld() {
++			return "";
++		}
++		
++		@Override
++		public String getName() {
++			return "";
++		}
++
++		@Override
++		public void registerChangeListener(ChangeListener changeListener) {}
++	};
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
+index c99af7cb57495585a282b081a664e1a6a8da4351..53ca46a5a7cbfe11298ef089c12f260746e3bed5 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
+@@ -39,6 +39,7 @@ public class NewProjectMainPage extends WizardPage {
+ 	private boolean showPackage;
+ 	private boolean showProjectTypes;
+ 	private TeamNumberPage teamNumberPage;
++	private INewProjectInfo info;
+ 
+ 	/**
+ 	 * Constructor for SampleNewWizardPage.
+@@ -46,17 +47,20 @@ public class NewProjectMainPage extends WizardPage {
+ 	 *
+ 	 * @param pageName
+ 	 */
+-	public NewProjectMainPage(ISelection selection, TeamNumberPage teamNumberPage) {
++	public NewProjectMainPage(ISelection selection, TeamNumberPage teamNumberPage, INewProjectInfo info) {
+ 		super("wizardPage");
+ 		this.teamNumberPage = teamNumberPage;
+ 		showPackage = true;
+ 		showProjectTypes = false;
++		this.info = info;
+ 	}
+ 
+ 	/**
+ 	 * @see IDialogPage#createControl(Composite)
+ 	 */
+ 	public void createControl(Composite parent) {
++		System.out.println(info.getName() +" -- "+ info.getWorld());
++		
+ 		Composite container = new Composite(parent, SWT.NULL);
+ 		GridLayout layout = new GridLayout();
+ 		container.setLayout(layout);
+@@ -130,7 +134,7 @@ public class NewProjectMainPage extends WizardPage {
+ 		comp.setLayout(groupLayout);
+ 		worldText = new Text(comp, SWT.BORDER | SWT.SINGLE);
+ 		worldText.setLayoutData(gd);
+- 		worldText.setText("/usr/share/frcsim/worlds/GearsBotDemo.world");
++		worldText.setText("/usr/share/frcsim/worlds/GearsBotDemo.world");
+ 		worldText.addModifyListener(new ModifyListener() {
+ 			public void modifyText(ModifyEvent e) {
+ 				dialogChanged();
+@@ -161,11 +165,18 @@ public class NewProjectMainPage extends WizardPage {
+ 					@Override public void stateChanged(ChangeEvent e) {
+ 						String teamNumber = TeamNumberPage.getTeamNumberFromPage(teamNumberPage);
+ 						packageText.setText("org.usfirst.frc.team"+teamNumber+".robot");
+-
+ 					}
+ 				});
+ 			}
+ 		}
++		info.registerChangeListener(new ChangeListener() {
++			@Override public void stateChanged(ChangeEvent e) {
++				projectNameText.setText(info.getName());
++				if (!"".equals(info.getWorld())) {
++					worldText.setText(info.getWorld());
++				}
++			}
++		});
+ 	}
+ 
+ 	/**
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
+index 8d65b407a591af8d87d0059e2f59ca229244f32f..d8c7751f07c8209fa106c5340c1814c2877a90e5 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
+@@ -250,6 +250,7 @@
+       <tag>CommandBased Robot</tag>
+       <tag>Complete List</tag>
+     </tags>
++    <world>/usr/share/frcsim/worlds/GearsBotDemo.world</world>
+     <packages>
+       <package>src</package>
+       <package>src/Commands</package>
+@@ -333,7 +334,8 @@
+     <tags>
+       <tag>CommandBased Robot</tag>
+       <tag>Complete List</tag>
+-   </tags>
++    </tags>
++    <world>/usr/share/frcsim/worlds/PacGoat2014.world</world>
+     <packages>
+       <package>src</package>
+       <package>src/Commands</package>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/examples/ExampleCPPProject.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/examples/ExampleCPPProject.java
+index d0b4eb0275c72dde92f7294136443762c5fb7646..734e6fd5b5db7b4988c9ba9a14e89fe27a385fc2 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/examples/ExampleCPPProject.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/examples/ExampleCPPProject.java
+@@ -7,16 +7,17 @@ import edu.wpi.first.wpilib.plugins.core.wizards.IExampleProject;
+ import edu.wpi.first.wpilib.plugins.cpp.wizards.newproject.CPPProjectType;
+ 
+ public class ExampleCPPProject extends CPPProjectType implements IExampleProject {
+-	private String name, description;
++	private String name, description, world;
+ 	private List<String> tags;
+ 	private List<String> directories;
+ 	private List<ExportFile> files;
+ 	
+ 	public ExampleCPPProject(String name, String description, List<String> tags, 
+-			List<String> directories, List<ExportFile> files) {
++			String world, List<String> directories, List<ExportFile> files) {
+ 		this.name = name;
+ 		this.description = description;
+ 		this.tags = tags;
++		this.world = world;
+ 		this.directories = directories;
+ 		this.files = files;
+ 	}
+@@ -32,6 +33,10 @@ public class ExampleCPPProject extends CPPProjectType implements IExampleProject
+ 	public List<String> getTags() {
+ 		return tags;
+ 	}
++	
++	public String getWorld() {
++		return world;
++	}
+ 
+ 	@Override
+ 	public String[] getFolders(String packageName) {
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/examples/ExampleCPPWizard.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/examples/ExampleCPPWizard.java
+index 9798ce5e535bdbed5a6f006b99282429ecd9e63e..845091d0596991adbb691b100cba9e16e5344fb2 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/examples/ExampleCPPWizard.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/examples/ExampleCPPWizard.java
+@@ -11,6 +11,7 @@ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ExampleWizard;
+ import edu.wpi.first.wpilib.plugins.core.wizards.IExampleProject;
+ import edu.wpi.first.wpilib.plugins.core.wizards.IExampleProject.ExportFile;
++import edu.wpi.first.wpilib.plugins.core.wizards.INewProjectInfo;
+ import edu.wpi.first.wpilib.plugins.core.wizards.NewProjectMainPage;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectCreationUtils;
+ import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
+@@ -38,9 +39,9 @@ public class ExampleCPPWizard extends ExampleWizard {
+ 	}
+ 
+ 	@Override
+-	protected IWizardPage getDetailsPage() {
++	protected IWizardPage getDetailsPage(INewProjectInfo info) {
+ 		if (detailsPage != null) return detailsPage;
+-		detailsPage = new NewProjectMainPage(selection, getTeamNumberPage());
++		detailsPage = new NewProjectMainPage(selection, getTeamNumberPage(), info);
+ 		detailsPage.setTitle("Create Example Robot C++ Project");
+ 		detailsPage.setDescription("This wizard creates a new example project based on your selection.");
+ 		detailsPage.setShowPackage(false);
+@@ -49,8 +50,8 @@ public class ExampleCPPWizard extends ExampleWizard {
+ 
+ 	@Override
+ 	public IExampleProject makeExampleProject(String name, String description,
+-			List<String> tags, List<String> folders, List<ExportFile> files) {
+-		return new ExampleCPPProject(name, description, tags, folders, files);
++			List<String> tags, String world, List<String> folders, List<ExportFile> files) {
++		return new ExampleCPPProject(name, description, tags, world, folders, files);
+ 	}
+ 
+ 	@Override
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/NewCPPWizard.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/NewCPPWizard.java
+index 3c3bc9b0c1f54698213843de87f7f022520f1e98..329149c3012da76e9896737997af134a09e91e6e 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/NewCPPWizard.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/NewCPPWizard.java
+@@ -15,6 +15,7 @@ import org.eclipse.ui.IWorkbench;
+ import org.eclipse.ui.IWorkbenchWizard;
+ 
+ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
++import edu.wpi.first.wpilib.plugins.core.wizards.INewProjectInfo;
+ import edu.wpi.first.wpilib.plugins.core.wizards.NewProjectMainPage;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectCreationUtils;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectType;
+@@ -56,7 +57,7 @@ public class NewCPPWizard extends Wizard implements INewWizard {
+ 			teamNumberPage = new TeamNumberPage(selection);
+ 			addPage(teamNumberPage);
+ 		}
+-		page = new NewProjectMainPage(selection, teamNumberPage);
++		page = new NewProjectMainPage(selection, teamNumberPage, INewProjectInfo.Null);
+ 		page.setTitle("Create New Robot C++ Project");
+ 		page.setDescription("This wizard creates a new Robot C++ Project configured to use WPILib for programming FRC robots.");
+ 		page.setShowPackage(false);
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
+index 2c4af2bc60b6e67483986e46928f71f7fd9efba8..4b6f55e7f54a88833da0e95f4b4d6545ecf92e7c 100755
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
+@@ -166,6 +166,7 @@
+     <tags>
+       <tag>CommandBased Robot</tag>
+     </tags>
++    <world>/usr/share/frcsim/worlds/GearsBotDemo.world</world>
+     <packages>
+       <package>src/$package-dir</package>
+       <package>src/$package-dir/commands</package>
+@@ -198,6 +199,7 @@
+     <tags>
+       <tag>CommandBased Robot</tag>
+     </tags>
++    <world>/usr/share/frcsim/worlds/PacGoat2014.world</world>
+     <packages>
+       <package>src/$package-dir</package>
+       <package>src/$package-dir/commands</package>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/examples/ExampleJavaProject.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/examples/ExampleJavaProject.java
+index 0c7298864b205b9278cb53e8979ec9643cf7b886..2aec019ece1ebfedf20c46849214e823bb122d1b 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/examples/ExampleJavaProject.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/examples/ExampleJavaProject.java
+@@ -7,16 +7,17 @@ import edu.wpi.first.wpilib.plugins.core.wizards.IExampleProject;
+ import edu.wpi.first.wpilib.plugins.java.wizards.newproject.JavaProjectType;
+ 
+ public class ExampleJavaProject extends JavaProjectType implements IExampleProject {
+-	private String name, description;
++	private String name, description, world;
+ 	private List<String> tags;
+ 	private List<String> packages;
+ 	private List<ExportFile> files;
+ 	
+ 	public ExampleJavaProject(String name, String description, List<String> tags, 
+-			List<String> packages, List<ExportFile> files) {
++			String world, List<String> packages, List<ExportFile> files) {
+ 		this.name = name;
+ 		this.description = description;
+ 		this.tags = tags;
++		this.world = world;
+ 		this.packages = packages;
+ 		this.files = files;
+ 	}
+@@ -32,6 +33,10 @@ public class ExampleJavaProject extends JavaProjectType implements IExampleProje
+ 	public List<String> getTags() {
+ 		return tags;
+ 	}
++	
++	public String getWorld() {
++		return world;
++	}
+ 
+ 	@Override
+ 	public String[] getFolders(String packageName) {
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/examples/ExampleJavaWizard.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/examples/ExampleJavaWizard.java
+index d403194e76019071f0099c3218b6cbdbd3b8f86b..eb66e780ff1435e5f6509b6719988ec01a8cb23e 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/examples/ExampleJavaWizard.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/examples/ExampleJavaWizard.java
+@@ -10,6 +10,7 @@ import org.eclipse.jface.wizard.IWizardPage;
+ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ExampleWizard;
+ import edu.wpi.first.wpilib.plugins.core.wizards.IExampleProject;
++import edu.wpi.first.wpilib.plugins.core.wizards.INewProjectInfo;
+ import edu.wpi.first.wpilib.plugins.core.wizards.IExampleProject.ExportFile;
+ import edu.wpi.first.wpilib.plugins.core.wizards.NewProjectMainPage;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectCreationUtils;
+@@ -40,9 +41,9 @@ public class ExampleJavaWizard extends ExampleWizard {
+ 	}
+ 
+ 	@Override
+-	protected IWizardPage getDetailsPage() {
++	protected IWizardPage getDetailsPage(INewProjectInfo info) {
+ 		if (detailsPage != null) return detailsPage;
+-		detailsPage = new NewProjectMainPage(selection, getTeamNumberPage());
++		detailsPage = new NewProjectMainPage(selection, getTeamNumberPage(), info);
+ 		detailsPage.setTitle("Create Example Robot Java Project");
+ 		detailsPage.setDescription("This wizard creates a new example project based on your selection.");
+ 		return detailsPage;
+@@ -50,8 +51,8 @@ public class ExampleJavaWizard extends ExampleWizard {
+ 
+ 	@Override
+ 	public IExampleProject makeExampleProject(String name, String description,
+-			List<String> tags, List<String> folders, List<ExportFile> files) {
+-		return new ExampleJavaProject(name, description, tags, folders, files);
++			List<String> tags, String world, List<String> folders, List<ExportFile> files) {
++		return new ExampleJavaProject(name, description, tags, world, folders, files);
+ 	}
+ 
+ 	@Override
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/newproject/NewJavaWizard.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/newproject/NewJavaWizard.java
+index a7b545909d56cd87a31a994bbf709d82900aa177..d73018698c45ee3a032677c76f3e681131eb3046 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/newproject/NewJavaWizard.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/newproject/NewJavaWizard.java
+@@ -15,6 +15,7 @@ import org.eclipse.ui.IWorkbench;
+ import org.eclipse.ui.IWorkbenchWizard;
+ 
+ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
++import edu.wpi.first.wpilib.plugins.core.wizards.INewProjectInfo;
+ import edu.wpi.first.wpilib.plugins.core.wizards.NewProjectMainPage;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectCreationUtils;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectType;
+@@ -56,7 +57,7 @@ public class NewJavaWizard extends Wizard implements INewWizard {
+ 			teamNumberPage = new TeamNumberPage(selection);
+ 			addPage(teamNumberPage);
+ 		}
+-		page = new NewProjectMainPage(selection, teamNumberPage);
++		page = new NewProjectMainPage(selection, teamNumberPage, INewProjectInfo.Null);
+ 		page.setProjectTypes(JavaProjectType.TYPES);
+ 		page.setTitle("Create New Robot Java Project");
+ 		page.setDescription("This wizard creates a new Robot Java Project configured to use WPILib for programming FRC robots.");

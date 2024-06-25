@@ -1,0 +1,401 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Tue, 5 Aug 2014 11:17:38 -0400
+Subject: [PATCH 0256/6262] Updated some comments that mention the cRIO
+
+Change-Id: Ib5e3c34fa2db83f48ca88153e8f4c834b31291f5
+---
+ wpilibc/wpilibC++/include/Preferences.h       |  4 +-
+ wpilibc/wpilibC++/include/SerialPort.h        |  7 +--
+ wpilibc/wpilibC++/lib/Preferences.cpp         |  4 +-
+ wpilibc/wpilibC++/lib/SerialPort.cpp          | 57 +++++++++----------
+ .../edu/wpi/first/wpilibj/Preferences.java    | 16 +++---
+ .../edu/wpi/first/wpilibj/SensorBase.java     |  1 -
+ .../edu/wpi/first/wpilibj/SerialPort.java     | 10 ++--
+ .../edu/wpi/first/wpilibj/image/NIVision.java |  2 +-
+ 8 files changed, 49 insertions(+), 52 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/Preferences.h b/wpilibc/wpilibC++/include/Preferences.h
+index 858659e7b7a4f3514b5918de9bfae71e6f8a63a8..5a8ea1861d1321fe836ae63cdbc94987c01f1919 100644
+--- a/wpilibc/wpilibC++/include/Preferences.h
++++ b/wpilibc/wpilibC++/include/Preferences.h
+@@ -16,10 +16,10 @@
+ 
+ /**
+  * The preferences class provides a relatively simple way to save important values to
+- * the cRIO to access the next time the cRIO is booted.
++ * the RoboRIO to access the next time the RoboRIO is booted.
+  *
+  * <p>This class loads and saves from a file
+- * inside the cRIO.  The user can not access the file directly, but may modify values at specific
++ * inside the RoboRIO.  The user can not access the file directly, but may modify values at specific
+  * fields which will then be saved to the file when {@link Preferences#Save() Save()} is called.</p>
+  *
+  * <p>This class is thread safe.</p>
+diff --git a/wpilibc/wpilibC++/include/SerialPort.h b/wpilibc/wpilibC++/include/SerialPort.h
+index ee3e91094e15f9da3336997f16b8508045a7bf72..d610eabf2a3ad5b0bc461e6a8068c6e58d9995db 100644
+--- a/wpilibc/wpilibC++/include/SerialPort.h
++++ b/wpilibc/wpilibC++/include/SerialPort.h
+@@ -9,12 +9,12 @@
+ #include "HAL/HAL.hpp"
+ 
+ /**
+- * Driver for the RS-232 serial port on the cRIO.
+- * 
++ * Driver for the RS-232 serial port on the RoboRIO.
++ *
+  * The current implementation uses the VISA formatted I/O mode.  This means that
+  *   all traffic goes through the fomatted buffers.  This allows the intermingled
+  *   use of Printf(), Scanf(), and the raw buffer accessors Read() and Write().
+- * 
++ *
+  * More information can be found in the NI-VISA User Manual here:
+  *   http://www.ni.com/pdf/manuals/370423a.pdf
+  * and the NI-VISA Programmer's Reference Manual here:
+@@ -53,4 +53,3 @@ private:
+ 
+ 	DISALLOW_COPY_AND_ASSIGN(SerialPort);
+ };
+-
+diff --git a/wpilibc/wpilibC++/lib/Preferences.cpp b/wpilibc/wpilibC++/lib/Preferences.cpp
+index 30129122e2c636e0d6dca5638493f3f86efec07e..0b299a2fdc0e330caf5c3a256d591e28bafa8069 100644
+--- a/wpilibc/wpilibC++/lib/Preferences.cpp
++++ b/wpilibc/wpilibC++/lib/Preferences.cpp
+@@ -308,10 +308,10 @@ void Preferences::PutLong(const char *key, int64_t value)
+ }
+ 
+ /**
+- * Saves the preferences to a file on the cRIO.
++ * Saves the preferences to a file on the RoboRIO.
+  *
+  * <p>This should <b>NOT</b> be called often.
+- * Too many writes can damage the cRIO's flash memory.
++ * Too many writes can damage the RoboRIO's flash memory.
+  * While it is ok to save once or twice a match, this should never
+  * be called every run of {@link IterativeRobot#TeleopPeriodic()}, etc.</p>
+  *
+diff --git a/wpilibc/wpilibC++/lib/SerialPort.cpp b/wpilibc/wpilibC++/lib/SerialPort.cpp
+index 037b18c01445f620f2b50e06e8b06099680035bf..9ff5da1592de3e701685aac02bdd65f335f56dd2 100644
+--- a/wpilibc/wpilibC++/lib/SerialPort.cpp
++++ b/wpilibc/wpilibC++/lib/SerialPort.cpp
+@@ -14,8 +14,8 @@
+ 
+ /**
+  * Create an instance of a Serial Port class.
+- * 
+- * @param baudRate The baud rate to configure the serial port.  The cRIO-9074 supports up to 230400 Baud.
++ *
++ * @param baudRate The baud rate to configure the serial port.
+  * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
+  * @param parity Select the type of parity checking to use.
+  * @param stopBits The number of stop bits to use as defined by the enum StopBits.
+@@ -75,7 +75,7 @@ SerialPort::~SerialPort()
+ 
+ /**
+  * Set the type of flow control to enable on this port.
+- * 
++ *
+  * By default, flow control is disabled.
+  */
+ void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl)
+@@ -89,18 +89,18 @@ void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl)
+ 
+ /**
+  * Enable termination and specify the termination character.
+- * 
++ *
+  * Termination is currently only implemented for receive.
+  * When the the terminator is recieved, the Read() or Scanf() will return
+  *   fewer bytes than requested, stopping after the terminator.
+- * 
++ *
+  * @param terminator The character to use for termination.
+  */
+ void SerialPort::EnableTermination(char terminator)
+ {
+ 	if (!m_consoleModeEnabled)
+ 	{
+-		viSetAttribute(m_portHandle, VI_ATTR_TERMCHAR_EN, VI_TRUE); 
++		viSetAttribute(m_portHandle, VI_ATTR_TERMCHAR_EN, VI_TRUE);
+ 		viSetAttribute(m_portHandle, VI_ATTR_TERMCHAR, terminator);
+ 		viSetAttribute(m_portHandle, VI_ATTR_ASRL_END_IN, VI_ASRL_END_TERMCHAR);
+ 	}
+@@ -113,14 +113,14 @@ void SerialPort::DisableTermination()
+ {
+ 	if (!m_consoleModeEnabled)
+ 	{
+-		viSetAttribute(m_portHandle, VI_ATTR_TERMCHAR_EN, VI_FALSE); 
++		viSetAttribute(m_portHandle, VI_ATTR_TERMCHAR_EN, VI_FALSE);
+ 		viSetAttribute(m_portHandle, VI_ATTR_ASRL_END_IN, VI_ASRL_END_NONE);
+ 	}
+ }
+ 
+ /**
+  * Get the number of bytes currently available to read from the serial port.
+- * 
++ *
+  * @return The number of bytes available to read.
+  */
+ int32_t SerialPort::GetBytesReceived()
+@@ -136,9 +136,9 @@ int32_t SerialPort::GetBytesReceived()
+ 
+ /**
+  * Output formatted text to the serial port.
+- * 
++ *
+  * @bug All pointer-based parameters seem to return an error.
+- * 
++ *
+  * @param writeFmt A string that defines the format of the output.
+  */
+ void SerialPort::Printf(const char *writeFmt, ...)
+@@ -155,9 +155,9 @@ void SerialPort::Printf(const char *writeFmt, ...)
+ 
+ /**
+  * Input formatted text from the serial port.
+- * 
++ *
+  * @bug All pointer-based parameters seem to return an error.
+- * 
++ *
+  * @param readFmt A string that defines the format of the input.
+  */
+ void SerialPort::Scanf(const char *readFmt, ...)
+@@ -174,11 +174,11 @@ void SerialPort::Scanf(const char *readFmt, ...)
+ 
+ /**
+  * Read raw bytes out of the buffer.
+- * 
++ *
+  * @param buffer Pointer to the buffer to store the bytes in.
+  * @param count The maximum number of bytes to read.
+  * @return The number of bytes actually read into the buffer.
+- */ 
++ */
+ uint32_t SerialPort::Read(char *buffer, int32_t count)
+ {
+ 	uint32_t retCount = 0;
+@@ -200,11 +200,11 @@ uint32_t SerialPort::Read(char *buffer, int32_t count)
+ 
+ /**
+  * Write raw bytes to the buffer.
+- * 
++ *
+  * @param buffer Pointer to the buffer to read the bytes from.
+  * @param count The maximum number of bytes to write.
+  * @return The number of bytes actually written into the port.
+- */ 
++ */
+ uint32_t SerialPort::Write(const char *buffer, int32_t count)
+ {
+ 	uint32_t retCount = 0;
+@@ -218,10 +218,10 @@ uint32_t SerialPort::Write(const char *buffer, int32_t count)
+ 
+ /**
+  * Configure the timeout of the serial port.
+- * 
++ *
+  * This defines the timeout for transactions with the hardware.
+  * It will affect reads and very large writes.
+- * 
++ *
+  * @param timeout The number of seconds to to wait for I/O.
+  */
+ void SerialPort::SetTimeout(float timeout)
+@@ -235,14 +235,14 @@ void SerialPort::SetTimeout(float timeout)
+ 
+ /**
+  * Specify the size of the input buffer.
+- * 
++ *
+  * Specify the amount of data that can be stored before data
+  * from the device is returned to Read or Scanf.  If you want
+  * data that is recieved to be returned immediately, set this to 1.
+- * 
++ *
+  * It the buffer is not filled before the read timeout expires, all
+  * data that has been received so far will be returned.
+- * 
++ *
+  * @param size The read buffer size.
+  */
+ void SerialPort::SetReadBufferSize(uint32_t size)
+@@ -256,10 +256,10 @@ void SerialPort::SetReadBufferSize(uint32_t size)
+ 
+ /**
+  * Specify the size of the output buffer.
+- * 
++ *
+  * Specify the amount of data that can be stored before being
+  * transmitted to the device.
+- * 
++ *
+  * @param size The write buffer size.
+  */
+ void SerialPort::SetWriteBufferSize(uint32_t size)
+@@ -273,13 +273,13 @@ void SerialPort::SetWriteBufferSize(uint32_t size)
+ 
+ /**
+  * Specify the flushing behavior of the output buffer.
+- * 
++ *
+  * When set to kFlushOnAccess, data is synchronously written to the serial port
+  *   after each call to either Printf() or Write().
+- * 
++ *
+  * When set to kFlushWhenFull, data will only be written to the serial port when
+  *   the buffer is full or when Flush() is called.
+- * 
++ *
+  * @param mode The write buffer mode.
+  */
+ void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode)
+@@ -293,7 +293,7 @@ void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode)
+ 
+ /**
+  * Force the output buffer to be written to the port.
+- * 
++ *
+  * This is used when SetWriteBufferMode() is set to kFlushWhenFull to force a
+  * flush before the buffer is full.
+  */
+@@ -308,7 +308,7 @@ void SerialPort::Flush()
+ 
+ /**
+  * Reset the serial port driver to a known state.
+- * 
++ *
+  * Empty the transmit and receive buffers in the device and formatted I/O.
+  */
+ void SerialPort::Reset()
+@@ -329,4 +329,3 @@ void SerialPort::Reset()
+ //	((SerialPort*) userHandle)->_internalHandler(vi, eventType, event);
+ //	return VI_SUCCESS;
+ //}
+-
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Preferences.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Preferences.java
+index 558662194329b86b9a9e4beb37adb2bad03d165f..f1449e46c687e44045e4454e7523b7ee96d351bd 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Preferences.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Preferences.java
+@@ -23,9 +23,9 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
+ 
+ /**
+  * The preferences class provides a relatively simple way to save important
+- * values to the cRIO to access the next time the cRIO is booted.
++ * values to the RoboRIO to access the next time the RoboRIO is booted.
+  *
+- * <p>This class loads and saves from a file inside the cRIO. The user can not
++ * <p>This class loads and saves from a file inside the RoboRIO. The user can not
+  * access the file directly, but may modify values at specific fields which will
+  * then be saved to the file when {@link Preferences#save() save()} is
+  * called.</p>
+@@ -457,10 +457,10 @@ public class Preferences {
+     }
+ 
+     /**
+-     * Saves the preferences to a file on the cRIO.
++     * Saves the preferences to a file on the RoboRIO.
+      *
+      * <p>This should <b>NOT</b> be called often. Too many writes can damage the
+-     * cRIO's flash memory. While it is ok to save once or twice a match, this
++     * RoboRIO's flash memory. While it is ok to save once or twice a match, this
+      * should never be called every run of
+      * {@link IterativeRobot#teleopPeriodic()}.</p>
+      *
+@@ -499,9 +499,9 @@ public class Preferences {
+ 
+                 if (file.exists())
+                 	file.delete();
+-                
++
+                 file.createNewFile();
+-                
++
+                 output = new FileOutputStream(file);
+ 
+                 for (int i = 0; i < keys.size(); i++) {
+@@ -585,8 +585,8 @@ public class Preferences {
+ 
+             Comment comment = null;
+ 
+-            
+-            
++
++
+             File file = null;
+             FileInputStream input = null;
+             try {
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index 0a2d11b28b9b4ee7e2a1bc93701008a8400f7fcc..c4442028c0cba4374e7dc45dde5bbb971b3bb09a 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -76,7 +76,6 @@ public abstract class SensorBase { // TODO: Refactor
+ 
+     /**
+      * Verify that the solenoid module is correct.
+-     * Module numbers are 1 or 2 (they are no longer real cRIO slots).
+      *
+      * @param moduleNumber The solenoid module module number to check.
+      */
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SerialPort.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SerialPort.java
+index 18b07126d94a150fc25462ba482e967c07f952eb..bf9e0cf9e743ba5f3b7397937de09ca68e73e2bd 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SerialPort.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SerialPort.java
+@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.visa.Visa;
+ import edu.wpi.first.wpilibj.visa.VisaException;
+ 
+ /**
+- * Driver for the RS-232 serial port on the cRIO.
++ * Driver for the RS-232 serial port on the RoboRIO.
+  *
+  * The current implementation uses the VISA formatted I/O mode.  This means that
+  *   all traffic goes through the formatted buffers.  This allows the intermingled
+@@ -161,7 +161,7 @@ public class SerialPort {
+     /**
+      * Create an instance of a Serial Port class.
+      *
+-     * @param baudRate The baud rate to configure the serial port.  The cRIO-9074 supports up to 230400 Baud.
++     * @param baudRate The baud rate to configure the serial port.
+      * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
+      * @param parity Select the type of parity checking to use.
+      * @param stopBits The number of stop bits to use as defined by the enum StopBits.
+@@ -203,7 +203,7 @@ public class SerialPort {
+     /**
+      * Create an instance of a Serial Port class. Defaults to one stop bit.
+      *
+-     * @param baudRate The baud rate to configure the serial port.  The cRIO-9074 supports up to 230400 Baud.
++     * @param baudRate The baud rate to configure the serial port.
+      * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
+      * @param parity Select the type of parity checking to use.
+      */
+@@ -215,7 +215,7 @@ public class SerialPort {
+      * Create an instance of a Serial Port class. Defaults to no parity and one
+      * stop bit.
+      *
+-     * @param baudRate The baud rate to configure the serial port.  The cRIO-9074 supports up to 230400 Baud.
++     * @param baudRate The baud rate to configure the serial port.
+      * @param dataBits The number of data bits per transfer.  Valid values are between 5 and 8 bits.
+      */
+     public SerialPort(final int baudRate, final int dataBits) throws VisaException {
+@@ -226,7 +226,7 @@ public class SerialPort {
+      * Create an instance of a Serial Port class. Defaults to 8 databits,
+      * no parity, and one stop bit.
+      *
+-     * @param baudRate The baud rate to configure the serial port.  The cRIO-9074 supports up to 230400 Baud.
++     * @param baudRate The baud rate to configure the serial port.
+      */
+     public SerialPort(final int baudRate) throws VisaException {
+         this(baudRate, 8, Parity.kNone, StopBits.kOne);
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/image/NIVision.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/image/NIVision.java
+index 214af97a4a019fb2bec03529111830bf7bf14a68..c40464eb1aa14022b57206b66a54841bd0fcecaa 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/image/NIVision.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/image/NIVision.java
+@@ -1153,7 +1153,7 @@ public class NIVision {
+     }
+ 
+     /**
+-     * Set true to be able to create files on cRio
++     * Set true to be able to create files on RoboRIO
+      * @param val true allows files to be created
+      */
+     public static void setWriteFileAllowed(boolean val) {

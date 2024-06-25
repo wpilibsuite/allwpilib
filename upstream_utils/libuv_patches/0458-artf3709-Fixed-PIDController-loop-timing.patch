@@ -1,0 +1,1021 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: James Kuszmaul <jabukuszmaul+collab@gmail.com>
+Date: Fri, 24 Oct 2014 15:30:54 -0400
+Subject: [PATCH 0458/6262] [artf3709] Fixed PIDController loop timing.
+
+For C++: The PIDController loop had been changed to run an infinite loop
+with a Wait(period) rather than using the Notifier class to schedule
+exact runs of the CallCalculate command. Essentially a revert to bb50f4b134e,
+accounting for more recent changes.
+
+For Java: A similar problem had developed; essentially, a TimerTask used
+to be used and at some point was changed to a Runnable. The Runnable had
+an infinite loop with a Wait; TimerTask actually schedules things reasonably
+(although it is not strictly real-time). Also, there were some
+Thread-safety issues which I fixed.
+
+Although Java and C++ had similar issues, they seem to have developed
+these issues independently.
+
+Changes have been tested on the GearsBot in both C++ and Java (and it
+    works).
+
+Change-Id: I478cb8bfd77cd2d031f8e343d0b8193b602dcc2a
+---
+ wpilibc/wpilibC++/include/PIDController.h     |  11 +-
+ .../wpilibC++Devices/src/PIDController.cpp    | 433 +++++++++---------
+ .../edu/wpi/first/wpilibj/PIDController.java  | 105 +++--
+ 3 files changed, 277 insertions(+), 272 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/PIDController.h b/wpilibc/wpilibC++/include/PIDController.h
+index 2a5d0e3c88f17b8a96a835e23aa4bc1552af7208..a703af63522619952a4ddd16c310973ee6f00954 100644
+--- a/wpilibc/wpilibC++/include/PIDController.h
++++ b/wpilibc/wpilibC++/include/PIDController.h
+@@ -8,7 +8,7 @@
+ #include "Base.h"
+ #include "Controller.h"
+ #include "LiveWindow/LiveWindow.h"
+-#include <pthread.h>
++#include "HAL/Semaphore.hpp"
+ 
+ class PIDOutput;
+ class PIDSource;
+@@ -83,18 +83,13 @@ private:
+ 	float m_error;
+ 	float m_result;
+ 	float m_period;
+-	
++
+ 	MUTEX_ID m_semaphore;
+-	
++
+ 	PIDSource *m_pidInput;
+ 	PIDOutput *m_pidOutput;
+ 
+-#ifndef FRC_SIMULATOR
+-	pthread_t m_controlLoop;
+-#else
+ 	Notifier* m_controlLoop;
+-#endif
+-	pthread_mutex_t m_mutex;
+ 
+ 	void Initialize(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
+ 			float period = 0.05);
+diff --git a/wpilibc/wpilibC++Devices/src/PIDController.cpp b/wpilibc/wpilibC++Devices/src/PIDController.cpp
+index e0838afa8a462cadbfdf0a0d653805330d49da17..5933cdedd7ae2c199dea17691adb8ae2efea0557 100644
+--- a/wpilibc/wpilibC++Devices/src/PIDController.cpp
++++ b/wpilibc/wpilibC++Devices/src/PIDController.cpp
+@@ -9,8 +9,8 @@
+ #include "PIDSource.h"
+ #include "PIDOutput.h"
+ #include <math.h>
++#include <vector>
+ #include "HAL/cpp/Synchronized.hpp"
+-#include "Timer.h"
+ #include "HAL/HAL.hpp"
+ 
+ static const char *kP = "p";
+@@ -33,7 +33,8 @@ static const char *kEnabled = "enabled";
+  */
+ PIDController::PIDController(float Kp, float Ki, float Kd,
+ 								PIDSource *source, PIDOutput *output,
+-								float period)
++								float period) :
++	m_semaphore (0)
+ {
+ 	Initialize(Kp, Ki, Kd, 0.0f, source, output, period);
+ }
+@@ -50,30 +51,22 @@ PIDController::PIDController(float Kp, float Ki, float Kd,
+  */
+ PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
+ 								PIDSource *source, PIDOutput *output,
+-								float period)
++								float period) :
++	m_semaphore (0)
+ {
+ 	Initialize(Kp, Ki, Kd, Kf, source, output, period);
+ }
+ 
+-struct CallerInfo
+-{
+-	TimerEventHandler fn;
+-	void* data;
+-};
+-
+-static void* forwardCallCalculate(CallerInfo* rdata)
+-{
+-	CallerInfo data = *rdata;
+-	delete rdata;
+-	data.fn(data.data);
+-	return nullptr;
+-}
+ 
+ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
+ 								PIDSource *source, PIDOutput *output,
+ 								float period)
+ {
+ 	m_table = NULL;
++	
++	m_semaphore = initializeMutexNormal();
++
++	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
+ 
+ 	m_P = Kp;
+ 	m_I = Ki;
+@@ -88,7 +81,6 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
+ 
+ 	m_continuous = false;
+ 	m_enabled = false;
+-	m_destruct = false;
+ 	m_setpoint = 0;
+ 
+ 	m_prevError = 0;
+@@ -101,15 +93,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
+ 	m_pidOutput = output;
+ 	m_period = period;
+ 
+-	pthread_mutexattr_t mutexattr;
+-	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+-	pthread_mutex_init(&m_mutex, &mutexattr);
+-
+-	CallerInfo *ci = new CallerInfo();
+-	ci->fn = &CallCalculate;
+-	ci->data = this;
+-	pthread_create(&m_controlLoop, NULL, (void*(*)(void*))&forwardCallCalculate, ci);
+-	//forwardCallCalculate will delete the obj, no need to delete it ourselves
++	m_controlLoop->StartPeriodic(m_period);
+ 
+ 	static int32_t instances = 0;
+ 	instances++;
+@@ -123,37 +107,22 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
+  */
+ PIDController::~PIDController()
+ {
+-	/* Let the calculation loop end before the std::thread object gets
+-		destructed */
+-	pthread_mutex_lock(&m_mutex);
+-	m_destruct = true;
+-	pthread_mutex_unlock(&m_mutex);
+-
+-	pthread_join(m_controlLoop, NULL);
++	takeMutex(m_semaphore);
++	deleteMutex(m_semaphore);
++	delete m_controlLoop;
+ }
+ 
+ /**
+  * Call the Calculate method as a non-static method. This avoids having to prepend
+  * all local variables in that method with the class pointer. This way the "this"
+  * pointer will be set up and class variables can be called more easily.
+- * This method is static and called by pthreads.
++ * This method is static and called by the Notifier class.
+  * @param controller the address of the PID controller object to use in the background loop
+  */
+-void PIDController::CallCalculate(void *data)
++void PIDController::CallCalculate(void *controller)
+ {
+-	PIDController *controller = (PIDController*) data;
+-	int destruct = 0;
+-
+-	while(!destruct) {
+-		controller->Calculate();
+-
+-		/* End the calculation loop when the PIDController gets destructed */
+-		pthread_mutex_lock(&controller->m_mutex);
+-		destruct = controller->m_destruct;
+-		pthread_mutex_unlock(&controller->m_mutex);
+-
+-		Wait(controller->m_period);
+-	}
++	PIDController *control = (PIDController*) controller;
++	control->Calculate();
+ }
+ 
+  /**
+@@ -165,68 +134,71 @@ void PIDController::Calculate()
+ {
+ 	bool enabled;
+ 	PIDSource *pidInput;
++	PIDOutput *pidOutput;
+ 
+-	if(m_pidInput == 0) return;
+-	if(m_pidOutput == 0) return;
+-
+-	pthread_mutex_lock(&m_mutex);
+-	enabled = m_enabled;
+-	pidInput = m_pidInput;
+-	pthread_mutex_unlock(&m_mutex);
+-
+-	if(enabled)
++	CRITICAL_REGION(m_semaphore)
+ 	{
+-		pthread_mutex_lock(&m_mutex);
+-
+-		float input = pidInput->PIDGet();
++		pidInput = m_pidInput;
++		pidOutput = m_pidOutput;
++		enabled = m_enabled;
++		pidInput = m_pidInput;
++	}
++	END_REGION;
+ 
+-		float result;
+-		PIDOutput *pidOutput;
++	if (pidInput == NULL) return;
++	if (pidOutput == NULL) return;
+ 
+-		m_error = m_setpoint - input;
+-		if (m_continuous)
++	if (enabled)
++	{
+ 		{
+-			if (fabs(m_error) > (m_maximumInput - m_minimumInput) / 2)
++			Synchronized sync(m_semaphore);
++      float input = pidInput->PIDGet();
++      float result;
++      PIDOutput *pidOutput;
++
++			m_error = m_setpoint - input;
++			if (m_continuous)
+ 			{
+-				if (m_error > 0)
+-				{
+-					m_error = m_error - m_maximumInput + m_minimumInput;
+-				}
+-				else
++				if (fabs(m_error) > (m_maximumInput - m_minimumInput) / 2)
+ 				{
+-					m_error = m_error + m_maximumInput - m_minimumInput;
++					if (m_error > 0)
++					{
++						m_error = m_error - m_maximumInput + m_minimumInput;
++					}
++					else
++					{
++						m_error = m_error + m_maximumInput - m_minimumInput;
++					}
+ 				}
+ 			}
+-		}
+ 
+-		if(m_I != 0)
+-		{
+-			double potentialIGain = (m_totalError + m_error) * m_I;
+-			if (potentialIGain < m_maximumOutput)
++			if(m_I != 0)
+ 			{
+-				if (potentialIGain > m_minimumOutput)
+-					m_totalError += m_error;
++				double potentialIGain = (m_totalError + m_error) * m_I;
++				if (potentialIGain < m_maximumOutput)
++				{
++					if (potentialIGain > m_minimumOutput)
++						m_totalError += m_error;
++					else
++						m_totalError = m_minimumOutput / m_I;
++				}
+ 				else
+-					m_totalError = m_minimumOutput / m_I;
+-			}
+-			else
+-			{
+-				m_totalError = m_maximumOutput / m_I;
++				{
++					m_totalError = m_maximumOutput / m_I;
++				}
+ 			}
+-		}
+-
+-		m_result = m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError) + m_setpoint * m_F;
+-		m_prevError = m_error;
+ 
+-		if (m_result > m_maximumOutput) m_result = m_maximumOutput;
+-		else if (m_result < m_minimumOutput) m_result = m_minimumOutput;
++			m_result = m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError) + m_setpoint * m_F;
++			m_prevError = m_error;
+ 
+-		pidOutput = m_pidOutput;
+-		result = m_result;
++			if (m_result > m_maximumOutput) m_result = m_maximumOutput;
++			else if (m_result < m_minimumOutput) m_result = m_minimumOutput;
+ 
+-		pidOutput->PIDWrite(result);
++			pidOutput = m_pidOutput;
++			result = m_result;
+ 
+-		pthread_mutex_unlock(&m_mutex);
++      pidOutput->PIDWrite(result);
++		}
+ 	}
+ }
+ 
+@@ -239,11 +211,13 @@ void PIDController::Calculate()
+  */
+ void PIDController::SetPID(float p, float i, float d)
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	m_P = p;
+-	m_I = i;
+-	m_D = d;
+-	pthread_mutex_unlock(&m_mutex);
++	CRITICAL_REGION(m_semaphore)
++	{
++		m_P = p;
++		m_I = i;
++		m_D = d;
++	}
++	END_REGION;
+ 
+ 	if (m_table != NULL) {
+ 		m_table->PutNumber("p", m_P);
+@@ -262,12 +236,14 @@ void PIDController::SetPID(float p, float i, float d)
+  */
+ void PIDController::SetPID(float p, float i, float d, float f)
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	m_P = p;
+-	m_I = i;
+-	m_D = d;
+-	m_F = f;
+-	pthread_mutex_unlock(&m_mutex);
++	CRITICAL_REGION(m_semaphore)
++	{
++		m_P = p;
++		m_I = i;
++		m_D = d;
++		m_F = f;
++	}
++	END_REGION;
+ 
+ 	if (m_table != NULL) {
+ 		m_table->PutNumber("p", m_P);
+@@ -283,13 +259,11 @@ void PIDController::SetPID(float p, float i, float d, float f)
+  */
+ float PIDController::GetP()
+ {
+-	float temp;
+-
+-	pthread_mutex_lock(&m_mutex);
+-	temp = m_P;
+-	pthread_mutex_unlock(&m_mutex);
+-
+-	return temp;
++	CRITICAL_REGION(m_semaphore)
++	{
++		return m_P;
++	}
++	END_REGION;
+ }
+ 
+ /**
+@@ -298,13 +272,11 @@ float PIDController::GetP()
+  */
+ float PIDController::GetI()
+ {
+-	float temp;
+-
+-	pthread_mutex_lock(&m_mutex);
+-	temp = m_I;
+-	pthread_mutex_unlock(&m_mutex);
+-
+-	return temp;
++	CRITICAL_REGION(m_semaphore)
++	{
++		return m_I;
++	}
++	END_REGION;
+ }
+ 
+ /**
+@@ -313,13 +285,11 @@ float PIDController::GetI()
+  */
+ float PIDController::GetD()
+ {
+-	float temp;
+-
+-	pthread_mutex_lock(&m_mutex);
+-	temp = m_D;
+-	pthread_mutex_unlock(&m_mutex);
+-
+-	return temp;
++	CRITICAL_REGION(m_semaphore)
++	{
++		return m_D;
++	}
++	END_REGION;
+ }
+ 
+ /**
+@@ -328,13 +298,11 @@ float PIDController::GetD()
+  */
+ float PIDController::GetF()
+ {
+-	float temp;
+-
+-	pthread_mutex_lock(&m_mutex);
+-	temp = m_F;
+-	pthread_mutex_unlock(&m_mutex);
+-
+-	return temp;
++	CRITICAL_REGION(m_semaphore)
++	{
++		return m_F;
++	}
++	END_REGION;
+ }
+ 
+ /**
+@@ -344,13 +312,13 @@ float PIDController::GetF()
+  */
+ float PIDController::Get()
+ {
+-	float temp;
+-
+-	pthread_mutex_lock(&m_mutex);
+-	temp = m_result;
+-	pthread_mutex_unlock(&m_mutex);
+-
+-	return temp;
++	float result;
++	CRITICAL_REGION(m_semaphore)
++	{
++		result = m_result;
++	}
++	END_REGION;
++	return result;
+ }
+ 
+ /**
+@@ -362,9 +330,11 @@ float PIDController::Get()
+  */
+ void PIDController::SetContinuous(bool continuous)
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	m_continuous = continuous;
+-	pthread_mutex_unlock(&m_mutex);
++	CRITICAL_REGION(m_semaphore)
++	{
++		m_continuous = continuous;
++	}
++	END_REGION;
+ }
+ 
+ /**
+@@ -375,10 +345,12 @@ void PIDController::SetContinuous(bool continuous)
+  */
+ void PIDController::SetInputRange(float minimumInput, float maximumInput)
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	m_minimumInput = minimumInput;
+-	m_maximumInput = maximumInput;
+-	pthread_mutex_unlock(&m_mutex);
++	CRITICAL_REGION(m_semaphore)
++	{
++		m_minimumInput = minimumInput;
++		m_maximumInput = maximumInput;	
++	}
++	END_REGION;
+ 
+ 	SetSetpoint(m_setpoint);
+ }
+@@ -391,10 +363,12 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput)
+  */
+ void PIDController::SetOutputRange(float minimumOutput, float maximumOutput)
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	m_minimumOutput = minimumOutput;
+-	m_maximumOutput = maximumOutput;
+-	pthread_mutex_unlock(&m_mutex);
++	CRITICAL_REGION(m_semaphore)
++	{
++		m_minimumOutput = minimumOutput;
++		m_maximumOutput = maximumOutput;
++	}
++	END_REGION;
+ }
+ 
+ /**
+@@ -403,22 +377,24 @@ void PIDController::SetOutputRange(float minimumOutput, float maximumOutput)
+  */
+ void PIDController::SetSetpoint(float setpoint)
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	if (m_maximumInput > m_minimumInput)
++	CRITICAL_REGION(m_semaphore)
+ 	{
+-		if (setpoint > m_maximumInput)
+-			m_setpoint = m_maximumInput;
+-		else if (setpoint < m_minimumInput)
+-			m_setpoint = m_minimumInput;
++		if (m_maximumInput > m_minimumInput)
++		{
++			if (setpoint > m_maximumInput)
++				m_setpoint = m_maximumInput;
++			else if (setpoint < m_minimumInput)
++				m_setpoint = m_minimumInput;
++			else
++				m_setpoint = setpoint;
++		}
+ 		else
++		{
+ 			m_setpoint = setpoint;
++		}
+ 	}
+-	else
+-	{
+-		m_setpoint = setpoint;
+-	}
+-	pthread_mutex_unlock(&m_mutex);
+-
++	END_REGION;	
++	
+ 	if (m_table != NULL) {
+ 		m_table->PutNumber("setpoint", m_setpoint);
+ 	}
+@@ -430,13 +406,13 @@ void PIDController::SetSetpoint(float setpoint)
+  */
+ float PIDController::GetSetpoint()
+ {
+-	float temp;
+-
+-	pthread_mutex_lock(&m_mutex);
+-	temp = m_setpoint;
+-	pthread_mutex_unlock(&m_mutex);
+-
+-	return temp;
++	float setpoint;
++	CRITICAL_REGION(m_semaphore)
++	{
++		setpoint = m_setpoint;
++	}
++	END_REGION;
++	return setpoint;
+ }
+ 
+ /**
+@@ -446,11 +422,13 @@ float PIDController::GetSetpoint()
+ float PIDController::GetError()
+ {
+ 	float error;
+-
+-	pthread_mutex_lock(&m_mutex);
+-	error = m_setpoint - m_pidInput->PIDGet();
+-	pthread_mutex_unlock(&m_mutex);
+-
++  double pidInput;
++	CRITICAL_REGION(m_semaphore)
++	{
++    pidInput = m_pidInput->PIDGet();
++	}
++	END_REGION;
++  error = GetSetpoint() - pidInput;
+ 	return error;
+ }
+ 
+@@ -461,10 +439,12 @@ float PIDController::GetError()
+  */
+ void PIDController::SetTolerance(float percent)
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	m_toleranceType = kPercentTolerance;
+-	m_tolerance = percent;
+-	pthread_mutex_unlock(&m_mutex);
++	CRITICAL_REGION(m_semaphore)
++	{
++		m_toleranceType = kPercentTolerance;
++		m_tolerance = percent;
++	}
++	END_REGION;
+ }
+ 
+ /*
+@@ -474,10 +454,12 @@ void PIDController::SetTolerance(float percent)
+  */
+ void PIDController::SetPercentTolerance(float percent)
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	m_toleranceType = kPercentTolerance;
+-	m_tolerance = percent;
+-	pthread_mutex_unlock(&m_mutex);
++	CRITICAL_REGION(m_semaphore)
++	{
++		m_toleranceType = kPercentTolerance;
++		m_tolerance = percent;
++	}
++	END_REGION;
+ }
+ 
+ /*
+@@ -487,10 +469,12 @@ void PIDController::SetPercentTolerance(float percent)
+  */
+ void PIDController::SetAbsoluteTolerance(float absTolerance)
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	m_toleranceType = kAbsoluteTolerance;
+-	m_tolerance = absTolerance;
+-	pthread_mutex_unlock(&m_mutex);
++	CRITICAL_REGION(m_semaphore)
++	{
++		m_toleranceType = kAbsoluteTolerance;
++		m_tolerance = absTolerance;
++	}
++	END_REGION;
+ }
+ 
+ /*
+@@ -503,21 +487,22 @@ void PIDController::SetAbsoluteTolerance(float absTolerance)
+ bool PIDController::OnTarget()
+ {
+ 	bool temp;
+-
+-	pthread_mutex_lock(&m_mutex);
+-	switch (m_toleranceType) {
+-	case kPercentTolerance:
+-		temp = fabs(GetError()) < (m_tolerance / 100 * (m_maximumInput - m_minimumInput));
+-		break;
+-	case kAbsoluteTolerance:
+-		temp = fabs(GetError()) < m_tolerance;
+-		break;
+-	//TODO: this case needs an error
+-	case kNoTolerance:
+-		temp = false;
++  double error = GetError();
++	CRITICAL_REGION(m_semaphore)
++	{
++		switch (m_toleranceType) {
++		case kPercentTolerance:
++			temp = fabs(error) < (m_tolerance / 100 * (m_maximumInput - m_minimumInput));
++			break;
++		case kAbsoluteTolerance:
++			temp = fabs(error) < m_tolerance;
++			break;
++		//TODO: this case needs an error
++		case kNoTolerance:
++			temp = false;
++		}
+ 	}
+-	pthread_mutex_unlock(&m_mutex);
+-
++	END_REGION;
+ 	return temp;
+ }
+ 
+@@ -526,10 +511,12 @@ bool PIDController::OnTarget()
+  */
+ void PIDController::Enable()
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	m_enabled = true;
+-	pthread_mutex_unlock(&m_mutex);
+-
++	CRITICAL_REGION(m_semaphore)
++	{			
++		m_enabled = true;
++	}
++	END_REGION;	
++	
+ 	if (m_table != NULL) {
+ 		m_table->PutBoolean("enabled", true);
+ 	}
+@@ -540,11 +527,13 @@ void PIDController::Enable()
+  */
+ void PIDController::Disable()
+ {
+-	pthread_mutex_lock(&m_mutex);
+-	m_pidOutput->PIDWrite(0);
+-	m_enabled = false;
+-	pthread_mutex_unlock(&m_mutex);
+-
++	CRITICAL_REGION(m_semaphore)
++	{
++		m_pidOutput->PIDWrite(0);
++		m_enabled = false;
++	}
++	END_REGION;
++	
+ 	if (m_table != NULL) {
+ 		m_table->PutBoolean("enabled", false);
+ 	}
+@@ -555,13 +544,13 @@ void PIDController::Disable()
+  */
+ bool PIDController::IsEnabled()
+ {
+-	bool temp;
+-
+-	pthread_mutex_lock(&m_mutex);
+-	temp = m_enabled;
+-	pthread_mutex_unlock(&m_mutex);
+-
+-	return temp;
++	bool enabled;
++	CRITICAL_REGION(m_semaphore)
++	{
++		enabled = m_enabled;
++	}
++	END_REGION;
++	return enabled;
+ }
+ 
+ /**
+@@ -571,11 +560,13 @@ void PIDController::Reset()
+ {
+ 	Disable();
+ 
+-	pthread_mutex_lock(&m_mutex);
+-	m_prevError = 0;
+-	m_totalError = 0;
+-	m_result = 0;
+-	pthread_mutex_unlock(&m_mutex);
++	CRITICAL_REGION(m_semaphore)
++	{
++		m_prevError = 0;
++		m_totalError = 0;
++		m_result = 0;
++	}
++	END_REGION;
+ }
+ 
+ std::string PIDController::GetSmartDashboardType(){
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java
+index 2dcfc1496ba0b824829fab17a61c4f831b7e8959..ff29d948d8644b3675aa37b7a91b7b6bb5b2922d 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java
+@@ -6,6 +6,8 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ 
++import java.util.TimerTask;
++
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
+@@ -22,25 +24,26 @@ public class PIDController implements LiveWindowSendable, Controller {
+ 
+     public static final double kDefaultPeriod = .05;
+     private static int instances = 0;
+-    private double m_P;			// factor for "proportional" control
+-    private double m_I;			// factor for "integral" control
+-    private double m_D;			// factor for "derivative" control
++    private double m_P;     // factor for "proportional" control
++    private double m_I;     // factor for "integral" control
++    private double m_D;     // factor for "derivative" control
+     private double m_F;                 // factor for feedforward term
+-    private double m_maximumOutput = 1.0;	// |maximum output|
+-    private double m_minimumOutput = -1.0;	// |minimum output|
+-    private double m_maximumInput = 0.0;		// maximum input - limit setpoint to this
+-    private double m_minimumInput = 0.0;		// minimum input - limit setpoint to this
+-    private boolean m_continuous = false;	// do the endpoints wrap around? eg. Absolute encoder
+-    private boolean m_enabled = false; 			//is the pid controller enabled
+-    private double m_prevError = 0.0;	// the prior sensor input (used to compute velocity)
++    private double m_maximumOutput = 1.0; // |maximum output|
++    private double m_minimumOutput = -1.0;  // |minimum output|
++    private double m_maximumInput = 0.0;    // maximum input - limit setpoint to this
++    private double m_minimumInput = 0.0;    // minimum input - limit setpoint to this
++    private boolean m_continuous = false; // do the endpoints wrap around? eg. Absolute encoder
++    private boolean m_enabled = false;    //is the pid controller enabled
++    private double m_prevError = 0.0; // the prior sensor input (used to compute velocity)
+     private double m_totalError = 0.0; //the sum of the errors for use in the integral calc
+-    private Tolerance m_tolerance;	//the tolerance object used to check if on target
++    private Tolerance m_tolerance;  //the tolerance object used to check if on target
+     private double m_setpoint = 0.0;
+     private double m_error = 0.0;
+     private double m_result = 0.0;
+     private double m_period = kDefaultPeriod;
+     PIDSource m_pidInput;
+     PIDOutput m_pidOutput;
++    java.util.Timer m_controlLoop;
+     private boolean m_freed = false;
+     private boolean m_usingPercentTolerance;
+ 
+@@ -61,7 +64,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+         }
+ 
+         @Override
+-		public boolean onTarget() {
++    public boolean onTarget() {
+             return (Math.abs(getError()) < percentage / 100
+                     * (m_maximumInput - m_minimumInput));
+         }
+@@ -75,7 +78,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+         }
+ 
+         @Override
+-		public boolean onTarget() {
++    public boolean onTarget() {
+             return Math.abs(getError()) < value;
+         }
+     }
+@@ -83,13 +86,14 @@ public class PIDController implements LiveWindowSendable, Controller {
+     public class NullTolerance implements Tolerance {
+ 
+         @Override
+-		public boolean onTarget() {
++    public boolean onTarget() {
+             throw new RuntimeException("No tolerance value set when using PIDController.onTarget()");
+         }
+     }
+ 
+-    private class PIDTask implements Runnable {
+-        private final PIDController m_controller;
++    private class PIDTask extends TimerTask {
++
++        private PIDController m_controller;
+ 
+         public PIDTask(PIDController controller) {
+             if (controller == null) {
+@@ -99,11 +103,8 @@ public class PIDController implements LiveWindowSendable, Controller {
+         }
+ 
+         @Override
+-		public void run() {
+-        	while (!m_controller.m_freed) {
+-        		m_controller.calculate();
+-        		Timer.delay(m_controller.m_period);
+-        	}
++    public void run() {
++            m_controller.calculate();
+         }
+     }
+ 
+@@ -129,6 +130,9 @@ public class PIDController implements LiveWindowSendable, Controller {
+             throw new NullPointerException("Null PIDOutput was given");
+         }
+ 
++        m_controlLoop = new java.util.Timer();
++
++
+         m_P = Kp;
+         m_I = Ki;
+         m_D = Kd;
+@@ -138,7 +142,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+         m_pidOutput = output;
+         m_period = period;
+ 
+-        new Thread(new PIDTask(this)).start();
++        m_controlLoop.schedule(new PIDTask(this), 0L, (long) (m_period * 1000));
+ 
+         instances++;
+         HLUsageReporting.reportPIDController(instances);
+@@ -192,10 +196,14 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * Free the PID object
+      */
+     public void free() {
+-    	m_freed = true;
+-    	if(this.table!=null) table.removeTableListener(listener);
++      m_controlLoop.cancel();
++      synchronized (this) {
++        m_freed = true;
++        m_pidOutput = null;
+         m_pidInput = null;
+-    	m_pidOutput = null;
++        m_controlLoop = null;
++      }
++      if(this.table!=null) table.removeTableListener(listener);
+     }
+ 
+     /**
+@@ -219,11 +227,11 @@ public class PIDController implements LiveWindowSendable, Controller {
+         }
+ 
+         if (enabled) {
+-        	double input;
++          double input;
+             double result;
+             PIDOutput pidOutput = null;
+             synchronized (this){
+-            	input = pidInput.pidGet();
++              input = pidInput.pidGet();
+             }
+             synchronized (this) {
+                 m_error = m_setpoint - input;
+@@ -313,7 +321,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * Get the Proportional coefficient
+      * @return proportional coefficient
+      */
+-    public double getP() {
++    public synchronized double getP() {
+         return m_P;
+     }
+ 
+@@ -321,7 +329,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * Get the Integral coefficient
+      * @return integral coefficient
+      */
+-    public double getI() {
++    public synchronized double getI() {
+         return m_I;
+     }
+ 
+@@ -445,10 +453,21 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * @deprecated Use {@link #setPercentTolerance(double)} or {@link #setAbsoluteTolerance(double)} instead.
+      */
+     @Deprecated
+-	public synchronized void setTolerance(double percent) {
++  public synchronized void setTolerance(double percent) {
+         m_tolerance = new PercentageTolerance(percent);
+     }
+ 
++    /** Set the PID tolerance using a Tolerance object.
++     * Tolerance can be specified as a percentage of the range or as an absolute
++     * value. The Tolerance object encapsulates those options in an object. Use it by
++     * creating the type of tolerance that you want to use: setTolerance(new PIDController.AbsoluteTolerance(0.1))
++     * @param tolerance a tolerance object of the right type, e.g. PercentTolerance
++     * or AbsoluteTolerance
++     */
++    private synchronized void setTolerance(Tolerance tolerance) {
++        m_tolerance = tolerance;
++    }
++
+     /**
+      * Set the absolute error which is considered tolerable for use with
+      * OnTarget.
+@@ -481,7 +500,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * Begin running the PIDController
+      */
+     @Override
+-	public synchronized void enable() {
++  public synchronized void enable() {
+         m_enabled = true;
+ 
+         if (table != null) {
+@@ -493,7 +512,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * Stop running the PIDController, this sets the output to zero before stopping.
+      */
+     @Override
+-	public synchronized void disable() {
++    public synchronized void disable() {
+         m_pidOutput.pidWrite(0);
+         m_enabled = false;
+ 
+@@ -520,22 +539,22 @@ public class PIDController implements LiveWindowSendable, Controller {
+     }
+ 
+     @Override
+-	public String getSmartDashboardType() {
++  public String getSmartDashboardType() {
+         return "PIDController";
+     }
+ 
+     private final ITableListener listener = new ITableListener() {
+         @Override
+-		public void valueChanged(ITable table, String key, Object value, boolean isNew) {
++    public void valueChanged(ITable table, String key, Object value, boolean isNew) {
+             if (key.equals("p") || key.equals("i") || key.equals("d") || key.equals("f")) {
+-                if (m_P != table.getNumber("p", 0.0) || m_I != table.getNumber("i", 0.0) ||
+-                        m_D != table.getNumber("d", 0.0) || m_F != table.getNumber("f", 0.0))
++                if (getP() != table.getNumber("p", 0.0) || getI() != table.getNumber("i", 0.0) ||
++                        getD() != table.getNumber("d", 0.0) || getF() != table.getNumber("f", 0.0))
+                     setPID(table.getNumber("p", 0.0), table.getNumber("i", 0.0), table.getNumber("d", 0.0), table.getNumber("f", 0.0));
+             } else if (key.equals("setpoint")) {
+-                if (m_setpoint != ((Double) value).doubleValue())
++                if (getSetpoint() != ((Double) value).doubleValue())
+                     setSetpoint(((Double) value).doubleValue());
+             } else if (key.equals("enabled")) {
+-                if (m_enabled != ((Boolean) value).booleanValue()) {
++                if (isEnable() != ((Boolean) value).booleanValue()) {
+                     if (((Boolean) value).booleanValue()) {
+                         enable();
+                     } else {
+@@ -547,7 +566,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+     };
+     private ITable table;
+     @Override
+-	public void initTable(ITable table) {
++  public void initTable(ITable table) {
+         if(this.table!=null)
+             this.table.removeTableListener(listener);
+         this.table = table;
+@@ -566,7 +585,7 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * {@inheritDoc}
+      */
+     @Override
+-	public ITable getTable() {
++  public ITable getTable() {
+         return table;
+     }
+ 
+@@ -574,14 +593,14 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * {@inheritDoc}
+      */
+     @Override
+-	public void updateTable() {
++  public void updateTable() {
+     }
+ 
+     /**
+      * {@inheritDoc}
+      */
+     @Override
+-	public void startLiveWindowMode() {
++  public void startLiveWindowMode() {
+         disable();
+     }
+ 
+@@ -589,6 +608,6 @@ public class PIDController implements LiveWindowSendable, Controller {
+      * {@inheritDoc}
+      */
+     @Override
+-	public void stopLiveWindowMode() {
++  public void stopLiveWindowMode() {
+     }
+ }

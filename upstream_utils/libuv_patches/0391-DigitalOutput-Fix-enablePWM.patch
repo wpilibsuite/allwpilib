@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sun, 5 Oct 2014 20:51:57 -0700
+Subject: [PATCH 0391/6262] DigitalOutput: Fix enablePWM().
+
+Previously enablePWM() wanted m_pwmGenerator to already be non-null on entry.
+This is impossible as the only place m_pwmGenerator is set is later in this
+function.
+
+Also add correct m_pwmGenerator null checks to disablePWM() and
+updateDutyCycle().
+
+Change-Id: Ia5bbfdc62824e1cf4c2f503308313b7ef39ae2fe
+---
+ .../src/main/java/edu/wpi/first/wpilibj/DigitalOutput.java  | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalOutput.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalOutput.java
+index 0d58088162b8f45affb188b3489c78dfbbd94834..988151cf1549efada3c394cdf781a3f9b1b0c499 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalOutput.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalOutput.java
+@@ -162,7 +162,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
+ 	 *            The duty-cycle to start generating. [0..1]
+ 	 */
+ 	public void enablePWM(double initialDutyCycle) {
+-		if (m_pwmGenerator == null)
++		if (m_pwmGenerator != null)
+ 			return;
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		// set the byte order
+@@ -181,6 +181,8 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
+ 	 * Free up one of the 4 DO PWM generator resources that were in use.
+ 	 */
+ 	public void disablePWM() {
++		if (m_pwmGenerator == null)
++			return;
+ 		// Disable the output by routing to a dead bit.
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		// set the byte order
+@@ -201,6 +203,8 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
+ 	 *            The duty-cycle to change to. [0..1]
+ 	 */
+ 	public void updateDutyCycle(double dutyCycle) {
++		if (m_pwmGenerator == null)
++			return;
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		// set the byte order
+ 		status.order(ByteOrder.LITTLE_ENDIAN);

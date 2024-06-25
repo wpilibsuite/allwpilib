@@ -1,0 +1,187 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: James Kuszmaul <jabukuszmaul+collab@gmail.com>
+Date: Sat, 6 Dec 2014 16:06:15 -0500
+Subject: [PATCH 0544/6262] Fixed issue in setting CANTalon values.
+
+Used to be that if you called Set less than ~20 ms after changing the
+mode, potentially unwanted behavior could ensue.
+
+Change-Id: I27cb3603286d8fddd894649787d88c0446b00615
+---
+ wpilibc/wpilibC++Devices/include/CANTalon.h   |  1 +
+ wpilibc/wpilibC++Devices/src/CANTalon.cpp     | 58 ++++++-------------
+ .../java/edu/wpi/first/wpilibj/CANTalon.java  | 20 ++-----
+ 3 files changed, 23 insertions(+), 56 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/include/CANTalon.h b/wpilibc/wpilibC++Devices/include/CANTalon.h
+index 8dbf32d66f788dbb36d288e19b2b7dbd3cc02c8e..1ffa2024c6d59a1a907b64711bf0fdbd3e486f7e 100644
+--- a/wpilibc/wpilibC++Devices/include/CANTalon.h
++++ b/wpilibc/wpilibC++Devices/include/CANTalon.h
+@@ -119,4 +119,5 @@ private:
+ 
+   bool m_controlEnabled;
+   ControlMode m_controlMode;
++  TalonControlMode m_sendMode;
+ };
+diff --git a/wpilibc/wpilibC++Devices/src/CANTalon.cpp b/wpilibc/wpilibC++Devices/src/CANTalon.cpp
+index 6815b5edd9ba7c0528947d9c7a5ca744a50fc785..d8624097a3fa5594b0926f1b9fcdf7552a28b6f1 100644
+--- a/wpilibc/wpilibC++Devices/src/CANTalon.cpp
++++ b/wpilibc/wpilibC++Devices/src/CANTalon.cpp
+@@ -20,9 +20,7 @@ CANTalon::CANTalon(int deviceNumber)
+   , m_controlEnabled(true)
+   , m_controlMode(kPercentVbus)
+ {
+-  // The control mode may already have been set; GetControlMode will reset
+-  // m_controlMode to match the Talon.
+-  GetControlMode();
++  SetControlMode(m_controlMode);
+   m_impl->SetProfileSlotSelect(m_profile);
+ }
+ 
+@@ -91,7 +89,7 @@ void CANTalon::Set(float value, uint8_t syncGroup)
+ {
+   if(m_controlEnabled) {
+     CTR_Code status;
+-    switch(GetControlMode()) {
++    switch(m_controlMode) {
+       case CANSpeedController::kPercentVbus:
+         {
+           m_impl->Set(value);
+@@ -122,6 +120,13 @@ void CANTalon::Set(float value, uint8_t syncGroup)
+     if (status != CTR_OKAY) {
+       wpi_setErrorWithContext(status, getHALErrorMessage(status));
+     }
++
++    status = m_impl->SetModeSelect(m_sendMode);
++
++    if (status != CTR_OKAY) {
++      wpi_setErrorWithContext(status, getHALErrorMessage(status));
++    }
++
+   }
+ }
+ 
+@@ -975,28 +980,28 @@ void CANTalon::ConfigFaultTime(float faultTime)
+ void CANTalon::SetControlMode(CANSpeedController::ControlMode mode)
+ {
+   m_controlMode = mode;
+-  TalonControlMode sendMode;
+   switch (mode) {
+     case kPercentVbus:
+-      sendMode = kThrottle;
++      m_sendMode = kThrottle;
+       break;
+     case kCurrent:
+-      sendMode = kCurrentMode;
++      m_sendMode = kCurrentMode;
+       break;
+     case kSpeed:
+-      sendMode = kSpeedMode;
++      m_sendMode = kSpeedMode;
+       break;
+     case kPosition:
+-      sendMode = kPositionMode;
++      m_sendMode = kPositionMode;
+       break;
+     case kVoltage:
+-      sendMode = kVoltageMode;
++      m_sendMode = kVoltageMode;
+       break;
+     case kFollower:
+-      sendMode = kFollowerMode;
++      m_sendMode = kFollowerMode;
+       break;
+   }
+-  CTR_Code status = m_impl->SetModeSelect((int)sendMode);
++  // Keep the talon disabled until Set() is called.
++  CTR_Code status = m_impl->SetModeSelect((int)kDisabled);
+ 	if(status != CTR_OKAY) {
+ 		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 	}
+@@ -1007,35 +1012,6 @@ void CANTalon::SetControlMode(CANSpeedController::ControlMode mode)
+  */
+ CANSpeedController::ControlMode CANTalon::GetControlMode()
+ {
+-  // Take the opportunity to check that the control mode is what we think it is.
+-  int temp;
+-  CTR_Code status = m_impl->GetModeSelect(temp);
+-	if(status != CTR_OKAY) {
+-		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	}
+-  switch ((TalonControlMode)temp) {
+-    case kThrottle:
+-      m_controlMode = kPercentVbus;
+-      break;
+-    case kCurrentMode:
+-      m_controlMode = kCurrent;
+-      break;
+-    case kSpeedMode:
+-      m_controlMode = kSpeed;
+-      break;
+-    case kPositionMode:
+-      m_controlMode = kPosition;
+-      break;
+-    case kVoltageMode:
+-      m_controlMode = kVoltage;
+-      break;
+-    case kFollowerMode:
+-      m_controlMode = kFollower;
+-      break;
+-    case kDisabled:
+-      m_controlEnabled = false;
+-      break;
+-  }
+   return m_controlMode;
+ }
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
+index a275d2ef8fbe87ef69937ef43924cccf3aeba2ed..4c0c1d34f68ec0dd55847190764af5cfac7f6555 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
+@@ -103,10 +103,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+    * @param outputValue The setpoint value, as described above.
+    */
+   public void set(double outputValue) {
+-    //System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
+-    m_controlMode = ControlMode.PercentVbus;
+     if (m_controlEnabled) {
+-      switch (getControlMode()) {
++      switch (m_controlMode) {
+         case PercentVbus:
+           m_impl.Set(outputValue);
+           break;
+@@ -127,8 +125,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+         default:
+           break;
+       }
++      m_impl.SetModeSelect(m_controlMode.value);
+     }
+-    //System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
+   }
+ 
+   /**
+@@ -316,21 +314,13 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+   }
+ 
+   public ControlMode getControlMode() {
+-    long tempp = CanTalonJNI.new_intp();
+-    m_impl.GetModeSelect(new SWIGTYPE_p_int(tempp, true));
+-    ControlMode mode = ControlMode.valueOf(CanTalonJNI.intp_value(tempp));
+-    if (mode == ControlMode.Disabled) {
+-      m_controlEnabled = false;
+-    }
+-    else {
+-      m_controlMode = mode;
+-    }
+-    return mode;
++    return m_controlMode;
+   }
+ 
+   public void changeControlMode(ControlMode controlMode) {
+     m_controlMode = controlMode;
+-    m_impl.SetModeSelect(controlMode.value);
++    // Disable until set() is called.
++    m_impl.SetModeSelect(ControlMode.Disabled.value);
+   }
+ 
+   public void setFeedbackDevice(FeedbackDevice device) {

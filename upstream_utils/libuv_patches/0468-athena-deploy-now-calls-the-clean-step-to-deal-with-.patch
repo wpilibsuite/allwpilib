@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fredric Silberberg <fredric@fsilberberg.com>
+Date: Tue, 11 Nov 2014 14:13:19 -0500
+Subject: [PATCH 0468/6262] athena-deploy now calls the clean step to deal with
+ a known ant issue where it does not detect changed constants. This addresses
+ art3766.
+
+Change-Id: I0bead9f585c610bb10faef3494c0b3358a79447f
+---
+ .../src/main/resources/java-zip/ant/build.xml               | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+index d7249c3397be539e1f8f4ee46b662ab1ce650be0..47b2fb0ee3bf651571bf6d36613d90f3715f9821 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+@@ -66,7 +66,11 @@
+     </jar>
+   </target>
+ 
+-  <target name="deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">
++    <!-- We're running a clean here to get around a known ant issue where it does not detected changed constant variables.
++     To get around this, we're recompiling the entire project, which is not an issue for most teams. If this is an issue
++     for you, you can remove the clean here, just be sure to do a full rebuild after you've changed any constants.
++     Reference: http://stackoverflow.com/questions/6430001/ant-doesnt-recompile-constants -->
++  <target name="deploy" depends="get-target-ip,clean,jar" description="Deploy the jar and start the program running.">
+     <echo>[athena-deploy] Copying code over.</echo>
+     <scp file="${dist.jar}" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
+     <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:${command.dir}" password="${password}" trust="true"/>

@@ -1,0 +1,233 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Fri, 15 Aug 2014 09:59:26 -0400
+Subject: [PATCH 0298/6262] Adds a Vagrant configuration file and setup script
+
+Vagrant allows developers to install Vagrant and their choice of virtual box in which to develop.
+This provides a consistent environment where anyone can devlop WPIlib without having to go through a lengthy setup process.
+
+Change-Id: Iced863d307f0e6a761441f17c3de377594197c38
+---
+ .gitignore   |  11 ++++-
+ Vagrantfile  | 125 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ bootstrap.sh |  57 +++++++++++++++++++++++
+ 3 files changed, 192 insertions(+), 1 deletion(-)
+ create mode 100644 Vagrantfile
+ create mode 100644 bootstrap.sh
+
+diff --git a/.gitignore b/.gitignore
+index 2afe1bc3701867aca6bbe73942cad4deef981d35..b9f5f3048b7d6acb2f26b8fd5c2067255f70996a 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -13,7 +13,16 @@ bin/
+ .classpath
+ **/dependency-reduced-pom.xml
+ 
+-#Java File extentions
++# Vagrant generated file
++.vagrant/
++
++# Mac generated file
++*.DS_Store
++
++# Added by the users of vagrant
++jdk-7u45-linux-arm-vfp-sflt.gz
++
++# Java File extentions
+ *.class
+ 
+ # Package Files #
+diff --git a/Vagrantfile b/Vagrantfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..45cd7410c73b787f6be1a7734783f2cf95ae82ef
+--- /dev/null
++++ b/Vagrantfile
+@@ -0,0 +1,125 @@
++# -*- mode: ruby -*-
++# vi: set ft=ruby :
++
++# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
++VAGRANTFILE_API_VERSION = "2"
++
++Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
++  # All Vagrant configuration is done here. The most common configuration
++  # options are documented and commented below. For a complete reference,
++  # please see the online documentation at vagrantup.com.
++
++  # Every Vagrant virtual environment requires a box to build off of.
++  config.vm.box = "puphpet/ubuntu1404-x64"
++
++  # Run the bootstrap.sh shell script to setup the enviroment
++  config.vm.provision :shell, path: "bootstrap.sh"
++
++  # Disable automatic box update checking. If you disable this, then
++  # boxes will only be checked for updates when the user runs
++  # `vagrant box outdated`. This is not recommended.
++  # config.vm.box_check_update = false
++
++  # Create a forwarded port mapping which allows access to a specific port
++  # within the machine from a port on the host machine. In the example below,
++  # accessing "localhost:8080" will access port 80 on the guest machine.
++  # config.vm.network "forwarded_port", guest: 80, host: 8080
++
++  # Create a private network, which allows host-only access to the machine
++  # using a specific IP.
++  # config.vm.network "private_network", ip: "192.168.33.10"
++
++  # Create a public network, which generally matched to bridged network.
++  # Bridged networks make the machine appear as another physical device on
++  # your network.
++  # config.vm.network "public_network"
++
++  # If true, then any SSH connections made will enable agent forwarding.
++  # Default value: false
++  config.ssh.forward_agent = true
++
++  # Share an additional folder to the guest VM. The first argument is
++  # the path on the host to the actual folder. The second argument is
++  # the path on the guest to mount the folder. And the optional third
++  # argument is a set of non-required options.
++  # config.vm.synced_folder "../data", "/vagrant_data"
++
++  # Provider-specific configuration so you can fine-tune various
++  # backing providers for Vagrant. These expose provider-specific options.
++  # Example for VirtualBox:
++  #
++  # config.vm.provider "virtualbox" do |vb|
++  #   # Don't boot with headless mode
++  #   vb.gui = true
++  #
++  #   # Use VBoxManage to customize the VM. For example to change memory:
++  #   vb.customize ["modifyvm", :id, "--memory", "1024"]
++  # end
++  #
++  # View the documentation for the provider you're using for more
++  # information on available options.
++
++  # Enable provisioning with CFEngine. CFEngine Community packages are
++  # automatically installed. For example, configure the host as a
++  # policy server and optionally a policy file to run:
++  #
++  # config.vm.provision "cfengine" do |cf|
++  #   cf.am_policy_hub = true
++  #   # cf.run_file = "motd.cf"
++  # end
++  #
++  # You can also configure and bootstrap a client to an existing
++  # policy server:
++  #
++  # config.vm.provision "cfengine" do |cf|
++  #   cf.policy_server_address = "10.0.2.15"
++  # end
++
++  # Enable provisioning with Puppet stand alone.  Puppet manifests
++  # are contained in a directory path relative to this Vagrantfile.
++  # You will need to create the manifests directory and a manifest in
++  # the file default.pp in the manifests_path directory.
++  #
++  # config.vm.provision "puppet" do |puppet|
++  #   puppet.manifests_path = "manifests"
++  #   puppet.manifest_file  = "site.pp"
++  # end
++
++  # Enable provisioning with chef solo, specifying a cookbooks path, roles
++  # path, and data_bags path (all relative to this Vagrantfile), and adding
++  # some recipes and/or roles.
++  #
++  # config.vm.provision "chef_solo" do |chef|
++  #   chef.cookbooks_path = "../my-recipes/cookbooks"
++  #   chef.roles_path = "../my-recipes/roles"
++  #   chef.data_bags_path = "../my-recipes/data_bags"
++  #   chef.add_recipe "mysql"
++  #   chef.add_role "web"
++  #
++  #   # You may also specify custom JSON attributes:
++  #   chef.json = { mysql_password: "foo" }
++  # end
++
++  # Enable provisioning with chef server, specifying the chef server URL,
++  # and the path to the validation key (relative to this Vagrantfile).
++  #
++  # The Opscode Platform uses HTTPS. Substitute your organization for
++  # ORGNAME in the URL and validation key.
++  #
++  # If you have your own Chef Server, use the appropriate URL, which may be
++  # HTTP instead of HTTPS depending on your configuration. Also change the
++  # validation key to validation.pem.
++  #
++  # config.vm.provision "chef_client" do |chef|
++  #   chef.chef_server_url = "https://api.opscode.com/organizations/ORGNAME"
++  #   chef.validation_key_path = "ORGNAME-validator.pem"
++  # end
++  #
++  # If you're using the Opscode platform, your validator client is
++  # ORGNAME-validator, replacing ORGNAME with your organization name.
++  #
++  # If you have your own Chef Server, the default validation client name is
++  # chef-validator, unless you changed the configuration.
++  #
++  #   chef.validation_client_name = "ORGNAME-validator"
++end
+diff --git a/bootstrap.sh b/bootstrap.sh
+new file mode 100644
+index 0000000000000000000000000000000000000000..53fbcbffa3dea2b27a1dbd3af5a83ff611f343cb
+--- /dev/null
++++ b/bootstrap.sh
+@@ -0,0 +1,57 @@
++#!/usr/bin/env bash
++
++# Update the apt-get repository list
++apt-get update
++
++
++# Download and install Java
++apt-get --yes --force-yes install default-jre
++apt-get --yes --force-yes install default-jdk
++
++
++# Install Maven
++apt-get --yes --force-yes install maven
++
++
++# Install git-review
++apt-get --yes --force-yes install python-pip
++apt-get --yes --force-yes install python-setuptools
++easy_install pip
++yes | pip install git-review
++
++
++# Download and install the gcc linux arm-toolchains
++# Get the 32 bit c library
++apt-get --yes --force-yes install libc6-i386
++# Download the tool to unzip .zip files
++apt-get --yes --force-yes install unzip
++# The variables associated with the toolchains
++TOOL_VER="1.0.1"
++TOOL_DIR=~/../home/vagrant/wpilib/toolchains
++# Create the toolchains directory
++mkdir -p $TOOL_DIR
++# Download the toolchains to this directory
++wget -P ${TOOL_DIR}/ http://first.wpi.edu/FRC/c/maven/edu/wpi/first/wpilib/plugins/cpp/toolchains/linux/${TOOL_VER}/linux-${TOOL_VER}.zip
++# Unzip the file
++unzip -q ${TOOL_DIR}/linux-${TOOL_VER}.zip -d ${TOOL_DIR}/
++# Remove the unneeded zip file
++rm ${TOOL_DIR}/linux-${TOOL_VER}.zip
++# Change the name of the directory
++mv -f $TOOL_DIR/linux-${TOOL_VER} ${TOOL_DIR}/arm-none-linux-gnueabi-4.4.1
++chown -R vagrant $TOOL_DIR/arm-none-linux-gnueabi-4.4.1
++# Add the arm toolchains to the path variable
++echo 'PATH=$PATH:/home/vagrant/wpilib/toolchains/arm-none-linux-gnueabi-4.4.1/bin/' >> /home/vagrant/.bashrc
++
++
++# Install the jdk-linux-arm-vfp-sflt
++# Create the target directory for the jdk
++mkdir -p /home/vagrant/jdk-linux-arm-vfp-sflt/
++# Unzip the jdk into this new directory
++tar -xzf /vagrant/jdk-7u45-linux-arm-vfp-sflt.gz -C /home/vagrant/jdk-linux-arm-vfp-sflt/
++
++# Keep this at the end of this file
++printf "\n\n"
++printf "Your virtual enviroment is now nearly set-up.\n"
++printf "You can access your enviroment using 'vagrant ssh'.\n"
++printf "Please run 'cd /vagrant' to navigate to the repository.\n"
++printf "Once you have navigated there please run 'git review -s' to complete the setup of git review.\n"

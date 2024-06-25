@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sun, 27 Jul 2014 23:52:00 -0700
+Subject: [PATCH 0206/6262] BuiltInAccelerometer: Add virtual destructor.
+
+Change-Id: I38e5ca92ba6c5b395366cfd8ea35acd2a08dbdac
+---
+ wpilibc/wpilibC++/include/BuiltInAccelerometer.h | 1 +
+ wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp   | 4 ++++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/wpilibc/wpilibC++/include/BuiltInAccelerometer.h b/wpilibc/wpilibC++/include/BuiltInAccelerometer.h
+index 83780cbabad97f8909e7ae4344fee6578566ca04..288e76e040be41f0b76e70f506fdded15e66fc80 100644
+--- a/wpilibc/wpilibC++/include/BuiltInAccelerometer.h
++++ b/wpilibc/wpilibC++/include/BuiltInAccelerometer.h
+@@ -18,6 +18,7 @@ class BuiltInAccelerometer : public Accelerometer, public SensorBase, public Liv
+ {
+ public:
+ 	BuiltInAccelerometer(Range range = kRange_8G);
++        virtual ~BuiltInAccelerometer();
+ 
+ 	// Accelerometer interface
+ 	virtual void SetRange(Range range);
+diff --git a/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp b/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp
+index 3dae5aaf3953410138463410dea164eb23950c61..de3b55deefd218594aac9f6ab65e8695d0a385c2 100644
+--- a/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp
++++ b/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp
+@@ -20,6 +20,10 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range)
+ 	HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
+ }
+ 
++BuiltInAccelerometer::~BuiltInAccelerometer()
++{
++}
++
+ /** {@inheritdoc} */
+ void BuiltInAccelerometer::SetRange(Range range)
+ {

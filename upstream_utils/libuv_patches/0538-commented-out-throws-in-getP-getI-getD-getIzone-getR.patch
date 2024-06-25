@@ -1,0 +1,93 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Omar Zrien <OZrien@crosstheroadelectronics.com>
+Date: Fri, 5 Dec 2014 18:04:39 -0500
+Subject: [PATCH 0538/6262] commented out throws in getP,getI,getD,getIzone,
+ getRampRate. Getting/setting these should be available all the time.
+
+Change-Id: I8ecc6dc8847c946c63c83081a338c1bd70a656b5
+---
+ .../java/edu/wpi/first/wpilibj/CANTalon.java  | 36 +++++++++----------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
+index d67588ce0e72cb0fcc326d8d64e7766b937137f2..5bbf70c4ab22a9d82beebdbe925bff2ba0d2d20f 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
+@@ -350,9 +350,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+    * @throws IllegalStateException if not in Position of Speed mode.
+    */
+   public double getP() {
+-		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+-			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+-		}
++		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
++		//	throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
++		//}
+ 
+     // Update the information that we have.
+     if (m_profile == 0)
+@@ -369,9 +369,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+   }
+ 
+   public double getI() {
+-		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+-			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+-		}
++		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
++		//	throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
++		//}
+ 
+     // Update the information that we have.
+     if (m_profile == 0)
+@@ -388,9 +388,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+   }
+ 
+   public double getD() {
+-		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+-			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+-		}
++		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
++		//	throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
++		//}
+ 
+     // Update the information that we have.
+     if (m_profile == 0)
+@@ -407,9 +407,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+   }
+ 
+   public double getF() {
+-		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+-			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+-		}
++		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
++		//	throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
++		//}
+ 
+     // Update the information that we have.
+     if (m_profile == 0)
+@@ -426,9 +426,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+   }
+ 
+   public double getIZone() {
+-		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+-			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+-		}
++		//if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
++		//	throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
++		//}
+ 
+     // Update the information that we have.
+     if (m_profile == 0)
+@@ -445,9 +445,9 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+   }
+ 
+   public double getRampRate() {
+-		if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
+-			throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
+-		}
++	//	if(!(m_controlMode.equals(ControlMode.Position) || m_controlMode.equals(ControlMode.Speed))) {
++	//		throw new IllegalStateException("PID mode only applies in Position and Speed modes.");
++	//	}
+ 
+     // Update the information that we have.
+     if (m_profile == 0)

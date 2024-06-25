@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Fri, 28 Nov 2014 11:07:08 -0500
+Subject: [PATCH 0513/6262] Fixed a typo in the SRX sample project to correct a
+ variable name error
+
+Change-Id: I68f9cf33062bf2ef5df88247af8a5ee470a28d77
+---
+ .../resources/templates/examples/CANTalon/src/Robot.cpp         | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANTalon/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANTalon/src/Robot.cpp
+index fe8c51f03699e64c80fb41867236ff52f065f7b4..e175af4460395b7c0edc561f19a32056dc9190b9 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANTalon/src/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANTalon/src/Robot.cpp
+@@ -22,7 +22,7 @@ public:
+ 	 * Runs the motor from the output of a Joystick.
+ 	 */
+ 	void OperatorControl() {
+-    talon.EnableControl();
++    m_motor.EnableControl();
+ 		while (IsOperatorControl() && IsEnabled()) {
+       // Takes a number from -1.0 (full reverse) to +1.0 (full forwards).
+ 			m_motor.Set(0.5);

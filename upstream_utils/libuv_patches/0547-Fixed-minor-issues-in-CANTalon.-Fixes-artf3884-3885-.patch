@@ -1,0 +1,153 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: James Kuszmaul <jabukuszmaul+collab@gmail.com>
+Date: Mon, 8 Dec 2014 15:22:15 -0500
+Subject: [PATCH 0547/6262] Fixed minor issues in CANTalon. Fixes artf3884,
+ 3885, 3887.
+
+Adds isEnabled and getSetpoint functions to CANTalon classes.
+Sets m_controlEnabled=false in Java if changeControlMode(Disabled) is
+called.
+
+Change-Id: I08fd0972df22ad83c5578dd43dd6b3536f3b365b
+---
+ wpilibc/wpilibC++Devices/include/CANTalon.h    |  5 +++++
+ wpilibc/wpilibC++Devices/src/CANTalon.cpp      | 16 ++++++++++++++++
+ .../java/edu/wpi/first/wpilibj/CANTalon.java   | 18 ++++++++++++++++++
+ 3 files changed, 39 insertions(+)
+
+diff --git a/wpilibc/wpilibC++Devices/include/CANTalon.h b/wpilibc/wpilibC++Devices/include/CANTalon.h
+index 0aacae8b8221f76d581b204249838191201d1961..467b758d29daeb9b0ca853da8efae2ef2260bd98 100644
+--- a/wpilibc/wpilibC++Devices/include/CANTalon.h
++++ b/wpilibc/wpilibC++Devices/include/CANTalon.h
+@@ -102,6 +102,9 @@ public:
+ 	double GetIzone();
+ 	int GetIaccum();
+ 	void ClearIaccum();
++
++  bool IsControlEnabled();
++  double GetSetpoint();
+ private:
+   // Values for various modes as is sent in the CAN packets for the Talon.
+   enum TalonControlMode {
+@@ -122,4 +125,6 @@ private:
+   bool m_controlEnabled;
+   ControlMode m_controlMode;
+   TalonControlMode m_sendMode;
++
++  double m_setPoint;
+ };
+diff --git a/wpilibc/wpilibC++Devices/src/CANTalon.cpp b/wpilibc/wpilibC++Devices/src/CANTalon.cpp
+index 4306f17ba6f66a8376c66018b1c501f142b5e28e..cf09f95e690ee64040d0739153372ceadc8b5a92 100644
+--- a/wpilibc/wpilibC++Devices/src/CANTalon.cpp
++++ b/wpilibc/wpilibC++Devices/src/CANTalon.cpp
+@@ -19,6 +19,7 @@ CANTalon::CANTalon(int deviceNumber)
+   , m_profile(0)
+   , m_controlEnabled(true)
+   , m_controlMode(kPercentVbus)
++  , m_setPoint(0)
+ {
+   SetControlMode(m_controlMode);
+   m_impl->SetProfileSlotSelect(m_profile);
+@@ -88,6 +89,7 @@ float CANTalon::Get()
+ void CANTalon::Set(float value, uint8_t syncGroup)
+ {
+   if(m_controlEnabled) {
++    m_setPoint = value;
+     CTR_Code status;
+     switch(m_controlMode) {
+       case CANSpeedController::kPercentVbus:
+@@ -148,6 +150,13 @@ void CANTalon::EnableControl() {
+   m_controlEnabled = true;
+ }
+ 
++/**
++ * @return Whether the Talon is currently enabled.
++ */
++bool CANTalon::IsControlEnabled() {
++  return m_controlEnabled;
++}
++
+ /**
+  * @param p Proportional constant to use in PID loop.
+  * @see SelectProfileSlot to choose between the two sets of gains.
+@@ -341,6 +350,13 @@ double CANTalon::GetIzone()
+ 	return (double)iz;
+ }
+ 
++/**
++ * @return the current setpoint; ie, whatever was last passed to Set().
++ */
++double CANTalon::GetSetpoint() {
++  return m_setPoint;
++}
++
+ /**
+  * Returns the voltage coming in from the battery.
+  *
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
+index 95f13c14608e54754d0f27907a48e1195d2fe7b5..276747dcb93616810ea80517ac383502ba9fc4f4 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
+@@ -64,12 +64,15 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+   boolean m_controlEnabled;
+   int m_profile;
+ 
++  double m_setPoint;
++
+   public CANTalon(int deviceNumber) {
+     m_deviceNumber = deviceNumber;
+     m_impl = new CanTalonSRX(deviceNumber);
+     m_safetyHelper = new MotorSafetyHelper(this);
+     m_controlEnabled = true;
+     m_profile = 0;
++    m_setPoint = 0;
+     setProfile(m_profile);
+     changeControlMode(ControlMode.PercentVbus);
+   }
+@@ -104,6 +107,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+    */
+   public void set(double outputValue) {
+     if (m_controlEnabled) {
++      m_setPoint = outputValue;
+       switch (m_controlMode) {
+         case PercentVbus:
+           m_impl.Set(outputValue);
+@@ -319,6 +323,8 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+ 
+   public void changeControlMode(ControlMode controlMode) {
+     m_controlMode = controlMode;
++    if (controlMode == ControlMode.Disabled)
++      m_controlEnabled = false;
+     // Disable until set() is called.
+     m_impl.SetModeSelect(ControlMode.Disabled.value);
+   }
+@@ -337,6 +343,10 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+ 		m_controlEnabled = false;
+   }
+ 
++  public boolean isControlEnabled() {
++    return m_controlEnabled;
++  }
++
+   /**
+    * Get the current proportional constant.
+    *
+@@ -604,10 +614,18 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+     setIZone(izone);
+     setCloseLoopRampRate(ramprate);
+   }
++
+   public void setPID(double p, double i, double d) {
+     setPID(p, i, d, 0, 0, 0, m_profile);
+   }
+ 
++  /**
++   * @return The latest value set using set().
++   */
++  public double getSetpoint() {
++    return m_setPoint;
++  }
++
+   /**
+    * Select which closed loop profile to use, and uses whatever PIDF gains and
+    * the such that are already there.

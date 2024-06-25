@@ -1,0 +1,989 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Wed, 23 Jul 2014 10:43:42 -0400
+Subject: [PATCH 0185/6262] Updates the TestBench to use parameters to run
+ specific test methods or test/suite classes. Updates the test bench to only
+ print "Waiting for enable" on one line with a counter. Updates all SubSuites
+ to extend the AbstractTestSuite class. Also includes a small set of tests to
+ prove the validity of the base AbstractTestSuite
+
+Change-Id: I447ca2537a08c84ab1d69fa200cb8125b448a589
+---
+ .../wpi/first/wpilibj/WpiLibJTestSuite.java   |   5 +-
+ .../wpi/first/wpilibj/can/CANTestSuite.java   |   4 +-
+ .../wpilibj/command/CommandTestSuite.java     |   4 +-
+ .../SmartDashboardTestSuite.java              |   6 +-
+ .../first/wpilibj/test/AbstractComsSetup.java |   7 +-
+ .../first/wpilibj/test/AbstractTestSuite.java | 246 +++++++++++++
+ .../edu/wpi/first/wpilibj/test/TestBench.java |  22 +-
+ .../edu/wpi/first/wpilibj/test/TestSuite.java | 340 +++++++++++++-----
+ .../wpilibj/test/AbstractTestSuiteTest.java   | 142 ++++++++
+ 9 files changed, 675 insertions(+), 101 deletions(-)
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractTestSuite.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/test/java/edu/wpi/first/wpilibj/test/AbstractTestSuiteTest.java
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
+index 66d2ef7beaf5fc3b0ae23d226be55d1292167bb9..5cd0646f6202dbe147dd90217aefaaad44fc9350 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
+@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
+ import org.junit.runners.Suite;
+ import org.junit.runners.Suite.SuiteClasses;
+ 
++import edu.wpi.first.wpilibj.test.AbstractTestSuite;
++
+ /**
+  * @author jonathanleitschuh
+  * Holds all of the tests in the roor wpilibj directory
+@@ -33,6 +35,5 @@ import org.junit.runners.Suite.SuiteClasses;
+ 				TiltPanCameraTest.class,
+ 				TimerTest.class
+ 				})
+-public class WpiLibJTestSuite {
+-
++public class WpiLibJTestSuite extends AbstractTestSuite {
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANTestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANTestSuite.java
+index df7dec9f8492da5623a4232d2003eeb7338f7238..ce05eee52b8c1b5165ec9c04f009190871f80bc3 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANTestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANTestSuite.java
+@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
+ import org.junit.runners.Suite;
+ import org.junit.runners.Suite.SuiteClasses;
+ 
++import edu.wpi.first.wpilibj.test.AbstractTestSuite;
++
+ /**
+  * @author jonathanleitschuh
+  *
+@@ -21,6 +23,6 @@ import org.junit.runners.Suite.SuiteClasses;
+ 				SpeedQuadEncoderModeTest.class,
+ 				VoltageQuadEncoderModeTest.class
+ 			})
+-public class CANTestSuite {
++public class CANTestSuite extends AbstractTestSuite {
+ 
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTestSuite.java
+index 02fdf091d0293baa2ef822047ce844af6dce2016..a9fae306a69ade84bdd55b53c0ed7bdf5f5303d1 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTestSuite.java
+@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
+ import org.junit.runners.Suite;
+ import org.junit.runners.Suite.SuiteClasses;
+ 
++import edu.wpi.first.wpilibj.test.AbstractTestSuite;
++
+ /**
+  * @author jonathanleitschuh
+  *
+@@ -24,6 +26,6 @@ import org.junit.runners.Suite.SuiteClasses;
+ 				CommandTimeoutTest.class,
+ 				DefaultCommandTest.class
+ 			})
+-public class CommandTestSuite {
++public class CommandTestSuite extends AbstractTestSuite{
+ 
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboardTestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboardTestSuite.java
+index 6d516c0353f961825980056bbc64722f4d1745bc..3eacf12dc86b2d967e38a5683ea674619927f64d 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboardTestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboardTestSuite.java
+@@ -10,9 +10,7 @@ import org.junit.runner.RunWith;
+ import org.junit.runners.Suite;
+ import org.junit.runners.Suite.SuiteClasses;
+ 
+-import junit.framework.Test;
+-import junit.framework.TestCase;
+-import junit.framework.TestSuite;
++import edu.wpi.first.wpilibj.test.AbstractTestSuite;
+ 
+ /**
+  * @author jonathanleitschuh
+@@ -22,5 +20,5 @@ import junit.framework.TestSuite;
+ @SuiteClasses({	
+ 				SmartDashboardTest.class
+ })
+-public class SmartDashboardTestSuite {
++public class SmartDashboardTestSuite extends AbstractTestSuite{
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
+index fd5d4f4e44448814eb45522c41d28d8d205625f1..73f8aff528a76f0f794c2986d58ada2044626783 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
+@@ -46,15 +46,18 @@ public abstract class AbstractComsSetup {
+ 			System.out.println("Started coms");
+ 
+ 			// Wait until the robot is enabled before starting the tests
++			int i = 0;
+ 			while (!DriverStation.getInstance().isEnabled()) {
+ 				try {
+ 					Thread.sleep(100);
+ 				} catch (InterruptedException e) {
+ 					e.printStackTrace();
+ 				}
+-				System.out.println("Waiting for enable");
++				//Prints the message on one line overwriting itself each time
++				System.out.print("\rWaiting for enable: " + i++);
+ 			}
+-
++			System.out.println();
++			
+ 			// Ready to go!
+ 			initialized = true;
+ 			System.out.println("Running!");
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractTestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractTestSuite.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..27e313b767f2356bf813c4aa640f04fb5911c11d
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractTestSuite.java
+@@ -0,0 +1,246 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.test;
++
++import java.lang.reflect.Method;
++import java.util.List;
++import java.util.Vector;
++import java.util.logging.Level;
++import java.util.logging.Logger;
++import java.util.regex.Pattern;
++
++import org.junit.Ignore;
++import org.junit.Test;
++import org.junit.runner.Request;
++import org.junit.runners.Suite.SuiteClasses;
++import org.junit.runners.model.InitializationError;
++
++/**
++ * Allows tests suites and tests to be run selectively from the command line using a regex text pattern.
++ * @author jonathanleitschuh
++ *
++ */
++public abstract class AbstractTestSuite {
++	private static final Logger logger = Logger.getLogger(AbstractTestSuite.class.getName());
++	
++	
++	/**
++	 * Gets all of the classes listed within the SuiteClasses annotation. To use it, annotate a class
++	 * with <code>@RunWith(Suite.class)</code> and <code>@SuiteClasses({TestClass1.class, ...})</code>.
++	 * When you run this class, it will run all the tests in all the suite classes.
++	 * When loading the tests using regex the test list will be generated from this annotation.
++	 * @return the list of classes listed in the <code>@SuiteClasses({TestClass1.class, ...})</code> annotation.
++	 */
++	protected List<Class<?>> getAnnotatedTestClasses(){
++		SuiteClasses annotation = getClass().getAnnotation(SuiteClasses.class);
++		List<Class<?>> classes = new Vector<Class<?>>();
++        if (annotation == null) {
++            throw new RuntimeException(String.format("class '%s' must have a SuiteClasses annotation",  getClass().getName()));
++        }
++        for(Class<?> c : annotation.value()){
++        	classes.add(c);
++        }
++        return classes;
++	}
++	
++	/**
++	 * 
++	 * @param check
++	 * @return
++	 */
++	private boolean areAnySuperClassesOfTypeAbstractTestSuite(Class<?> check){
++		while (check != null) {
++			if(check.equals(AbstractTestSuite.class)){
++				return true;
++			}
++			check = check.getSuperclass();
++		}
++		return false;
++	}
++	
++	/**
++	 * Stores a method name and method class pair. Used when searching for methods matching a given regex text.
++	 * @author jonathanleitschuh
++	 *
++	 */
++	protected class ClassMethodPair{
++		public final Class<?> methodClass;
++		public final String methodName;
++		public ClassMethodPair(Class<?> klass, Method m){
++			this.methodClass = klass;
++			this.methodName = m.getName();
++		}
++		
++		public Request getMethodRunRequest(){
++			return Request.method(methodClass, methodName);
++		}
++	}
++	/**
++	 * @param regex
++	 * @return
++	 */
++	protected List <ClassMethodPair> getMethodMatching(final String regex){
++		List <ClassMethodPair> classMethodPairs = new Vector<ClassMethodPair>();
++		//Get all of the test classes
++		for(Class<?> c : getAllContainedBaseTests()){
++			for(Method m : c.getMethods()){
++				//If this is a test method that is not trying to be ignored and it matches the regex
++				if(m.getAnnotation(Test.class) != null && 
++						m.getAnnotation(Ignore.class) == null &&
++						Pattern.matches(regex, m.getName())){
++					ClassMethodPair pair = new ClassMethodPair(c, m);
++					classMethodPairs.add(pair);
++				}
++			}
++		}
++		return classMethodPairs;
++	}
++	
++	
++	/**
++	 * Gets all of the test classes listed in this suite. Does not include any of the test suites. All of these classes contain tests.
++	 * @param runningList the running list of classes to prevent recursion.
++	 * @return The list of base test classes.
++	 */
++	private List<Class<?>> getAllContainedBaseTests(List<Class<?>> runningList){
++		for(Class<?> c: getAnnotatedTestClasses()){
++			//Check to see if this is a test class or a suite
++			if(areAnySuperClassesOfTypeAbstractTestSuite(c)){
++				//Create a new instance of this class so that we can retrieve its data
++				try {
++					AbstractTestSuite suite = null;
++					Object o = c.newInstance();
++					suite = (AbstractTestSuite) c.newInstance();
++					//Add the tests from this suite that match the regex to the list of tests to run
++					runningList = suite.getAllContainedBaseTests(runningList);
++				} catch (InstantiationException | IllegalAccessException e) {
++					//This shouldn't happen unless the constructor is changed in some way.
++					logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.", e);
++				}
++			} else if(c.getAnnotation(SuiteClasses.class) != null){
++				logger.log(Level.SEVERE, String.format("class '%s' must extend %s to be searchable using regex.",  c.getName()), AbstractTestSuite.class.getName());
++			} else { //This is a class containing tests
++				//so add it to the list
++				runningList.add(c);
++			}
++		}
++		return runningList;
++	}
++	
++	/**
++	 * Gets all of the test classes listed in this suite. Does not include any of the test suites. All of these classes contain tests.
++	 * @return The list of base test classes.
++	 */
++	protected List<Class<?>> getAllContainedBaseTests(){
++		List<Class<?>> runningBaseTests = new Vector <Class<?>>();
++		return getAllContainedBaseTests(runningBaseTests);
++	}
++	
++	
++	/**
++	 * Retrieves all of the classes listed in the <code>@SuiteClasses<code> annotation that match the given regex text.
++	 * @param regex the text pattern to retrieve.
++	 * @param runningList the running list of classes to prevent recursion
++	 * @return The list of classes matching the regex pattern
++	 */
++	private List<Class<?>> getAllClassMatching(final String regex, final List<Class<?>> runningList){
++		for(Class<?> c : getAnnotatedTestClasses()){
++			//Compare the regex against the simple name of the class 
++			if(Pattern.matches(regex, c.getName()) && !runningList.contains(c)){
++				runningList.add(c);
++			}
++		}
++		return runningList;
++	}
++	/**
++	 * Retrieves all of the classes listed in the <code>@SuiteClasses<code> annotation that match the given regex text.
++	 * @param regex the text pattern to retrieve.
++	 * @return The list of classes matching the regex pattern
++	 */
++	protected List<Class<?>> getAllClassMatching(final String regex){
++		final List<Class<?>> matchingClasses = new Vector<Class<?>>();
++		return getAllClassMatching(regex, matchingClasses);
++	}
++	
++	/**
++	 * Searches through all of the suites and tests and loads only the test or test suites matching the regex text.
++	 * This method also prevents a single test from being loaded multiple times by loading the suite first then
++	 * loading tests from all non loaded suites.
++	 * 
++	 * @param regex the regex text to search for
++	 * @return the list of suite and/or test classes matching the regex.
++	 */
++	private List<Class<?>> getSuiteOrTestMatchingRegex(final String regex, List<Class<?>> runningList){
++		//Get any test suites matching the regex using the superclass methods
++		runningList = getAllClassMatching(regex, runningList);
++		
++		
++		//Then search any test suites not retrieved already for test classes matching the regex.
++		List<Class<?>> unCollectedSuites = getAllClasses();
++		//If we already have a test suite then we don't want to load the test twice so remove the suite from the list
++		unCollectedSuites.removeAll(runningList);
++		for(Class<?> c: unCollectedSuites){
++			//Prevents recursively adding tests/suites that have already been added 
++			if(!runningList.contains(c)){
++				try {
++					AbstractTestSuite suite = null;
++					//Check the class to make sure that it is not a test class
++					if(areAnySuperClassesOfTypeAbstractTestSuite(c)){
++						//Create a new instance of this class so that we can retrieve its data.
++						Object o = c.newInstance();
++						suite = (AbstractTestSuite) c.newInstance();
++						//Add the tests from this suite that match the regex to the list of tests to run
++						runningList = suite.getSuiteOrTestMatchingRegex(regex, runningList);
++					}
++					
++				} catch (InstantiationException | IllegalAccessException e) {
++					//This shouldn't happen unless the constructor is changed in some way.
++					logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.", e);
++				}
++			}
++		}
++		return runningList;
++	}
++	
++	/**
++	 * Searches through all of the suites and tests and loads only the test or test suites matching the regex text.
++	 * This method also prevents a single test from being loaded multiple times by loading the suite first then
++	 * loading tests from all non loaded suites.
++	 * 
++	 * @param regex the regex text to search for
++	 * @return the list of suite and/or test classes matching the regex.
++	 */
++	protected List<Class<?>> getSuiteOrTestMatchingRegex(final String regex){
++		final List<Class<?>> matchingClasses = new Vector<Class<?>>();
++		return getSuiteOrTestMatchingRegex(regex, matchingClasses);
++	}
++	
++	
++	
++	/**
++	 * Retrieves all of the classes listed in the <code>@SuiteClasses<code> annotation.
++	 * @return
++	 * @throws InitializationError If the <code>@SuiteClasses<code> annotation is missing.
++	 */
++	public List<Class<?>> getAllClasses(){
++		return getAnnotatedTestClasses();
++	}
++	
++	/**
++	 * Gets the name of all of the classes listed within the <code>@SuiteClasses<code> annotation.
++	 * @return the list of classes.
++	 * @throws InitializationError If the <code>@SuiteClasses<code> annotation is missing.
++	 */
++	public List<String> getAllClassName(){
++		List<String> classNames = new Vector<String>();
++		for(Class<?> c : getAnnotatedTestClasses()){
++			classNames.add(c.getName());
++		}
++		return classNames;
++	}
++}
++
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index 1d8e260c90f3d78cdeced959df6ae26549e38b61..c812221932afdadfcabf30ffa405f29c44969597 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -6,10 +6,10 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.test;
+ 
++import java.io.PrintStream;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+ import java.util.Collection;
+-import java.util.Iterator;
+ import java.util.List;
+ 
+ import edu.wpi.first.wpilibj.AnalogInput;
+@@ -21,10 +21,8 @@ import edu.wpi.first.wpilibj.Gyro;
+ import edu.wpi.first.wpilibj.Jaguar;
+ import edu.wpi.first.wpilibj.Relay;
+ import edu.wpi.first.wpilibj.Servo;
+-import edu.wpi.first.wpilibj.SpeedController;
+ import edu.wpi.first.wpilibj.Talon;
+ import edu.wpi.first.wpilibj.Victor;
+-import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
+ import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
+ import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
+ import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
+@@ -354,4 +352,22 @@ public final class TestBench {
+ 		}
+ 		return instance;
+ 	}
++	
++	/**
++	 * Provides access to the output stream for the test system. This should be used instead of System.out
++	 * This is gives us a way to implement changes to where the output text of this test system is sent.
++	 * @return The test bench global print stream.
++	 */
++	public static PrintStream out(){
++		return System.out;
++	}
++	
++	/**
++	 * Provides access to the error stream for the test system. This should be used instead of System.err
++	 * This is gives us a way to implement changes to where the output text of this test system is sent.
++	 * @return The test bench global print stream.
++	 */
++	public static PrintStream err(){
++		return System.err;
++	}
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+index 3c88f1dcb3f31a218e15d238fc80075bf6b90ba1..73b03edf3c5b47eeae7ad89027932f128dfc4fe2 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+@@ -10,15 +10,20 @@ import java.io.IOException;
+ import java.io.InputStream;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+-import java.util.HashMap;
++import java.util.List;
++import java.util.Vector;
+ import java.util.logging.LogManager;
+ import java.util.logging.Logger;
++import java.util.regex.Pattern;
+ 
+ import junit.runner.Version;
+ 
+ import org.junit.runner.JUnitCore;
+ import org.junit.runner.Result;
++import org.junit.runner.RunWith;
+ import org.junit.runner.notification.Failure;
++import org.junit.runners.Suite;
++import org.junit.runners.Suite.SuiteClasses;
+ 
+ import edu.wpi.first.wpilibj.WpiLibJTestSuite;
+ import edu.wpi.first.wpilibj.can.CANTestSuite;
+@@ -31,8 +36,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
+  * classes below. The tests will be run in the order they are listed in the
+  * suite classes annotation.
+  */
+-public class TestSuite {
++@RunWith(Suite.class)
++//These are listed on separate lines to prevent merge conflicts
++@SuiteClasses({
++	WpiLibJTestSuite.class,
++	CANTestSuite.class,
++	CommandTestSuite.class,
++	SmartDashboardTestSuite.class
++})
++public class TestSuite extends AbstractTestSuite {
+ 	static{
++		//Sets up the logging output
+ 		final InputStream inputStream = TestSuite.class.getResourceAsStream("/logging.properties");
+ 		try
+ 		{
+@@ -46,123 +60,273 @@ public class TestSuite {
+ 		    Logger.getAnonymousLogger().severe(e.getMessage());
+ 		}
+ 
+-		System.out.println("Starting Tests");
++		TestBench.out().println("Starting Tests");
+ 	}
+ 	private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj");
+ 	private static final Logger WPILIBJ_COMMAND_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj.command");
+ 	
+ 	
++	private static final Class<?> QUICK_TEST = QuickTest.class;
++	private static final String QUICK_TEST_FLAG = "--quick";
++	private static final String HELP_FLAG = "--help";
++	private static final String METHOD_NAME_FILTER = "--methodFilter=";
++	private static final String METHOD_REPEAT_FILTER = "--repeat=";
++	private static final String CLASS_NAME_FILTER = "--filter=";
+ 	
+-	//NOTE: THESE ARE EACH LISTED ON SEPERATE LINES TO PREVENT GIT MERGE CONFLICTS!
+-	private static final Class<?>[] testList = {
+-		WpiLibJTestSuite.class,
+-		CANTestSuite.class,
+-		CommandTestSuite.class,
+-		SmartDashboardTestSuite.class
+-	};
++	/**
++	 * Displays a help message for the user when they use the --help flag at runtime.
++	 */
++	protected static void displayHelp(){
++		StringBuilder helpMessage = new StringBuilder("Test Parameters help: \n");	
++		helpMessage.append("\t" + QUICK_TEST_FLAG + " will cause the quick test to be run. Ignores other flags except for " + METHOD_REPEAT_FILTER + "\n");
++		helpMessage.append("\t" + CLASS_NAME_FILTER + " will use the supplied regex text to search for suite/test class names "
++				+ "matching the regex and run them.\n");
++		helpMessage.append("\t" + METHOD_NAME_FILTER + " will use the supplied regex text to search for test methods (excluding methods "
++				+ "with the @Ignore annotation) and run only those methods. Can be paired with " + METHOD_REPEAT_FILTER + " to "
++						+ "repeat the selected tests multiple times.\n");
++		helpMessage.append("\t" + METHOD_REPEAT_FILTER + " will repeat the tests selected with either " + QUICK_TEST_FLAG + " or " + CLASS_NAME_FILTER +
++				" and run them the given number of times.\n");
++		helpMessage.append("[NOTE] All regex uses the syntax defined by java.util.regex.Pattern. This documentation can be found at "
++				+ "http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html\n");
++		helpMessage.append("\n");
++		helpMessage.append("\n");
++		
++		TestBench.out().println(helpMessage);
++	}
+ 	
+ 	/**
+-	 * Constructs a hash map of test suite names and the associated class parameters
++	 * Lets the user know that they used the TestSuite improperly and gives details about how to use it correctly in the future.
+ 	 */
+-	public static HashMap<String, Class<?>> getClassNameHash(){
+-		HashMap<String, Class<?>> classHash = new HashMap<String, Class<?>>();
+-		System.out.print("To select a test suite run with any of the following parameters:" + "\n\t");
+-		for(Class<?> t : testList){
+-			String name = t.getSimpleName().toLowerCase().replace("test", "").replace("suite", "");
+-			System.out.print(name + " ");
+-			classHash.put(name, t);
++	protected static void displayInvalidUsage(String message, String... args){
++		StringBuilder invalidMessage = new StringBuilder("Invalid Usage: " + message + "\n");
++		invalidMessage.append("Params received: ");
++		for(String a : args){
++			invalidMessage.append(a + " ");
+ 		}
+-		System.out.println();
+-		return classHash;
++		invalidMessage.append("\n");
++		invalidMessage.append("For details on proper usage of the runtime flags please run again with the " + HELP_FLAG + " flag.\n\n");
++		
++		TestBench.out().println(invalidMessage);
++		
+ 	}
+-
++	
+ 	/**
+-	 * The method called at runtime
+-	 * @param args The test suites to run
++	 * Prints the loaded tests before they are run.
++	 * @param classes the classes that were loaded.
+ 	 */
+-	public static void main(String[] args) {
+-		System.out.println("JUnit version " + Version.id());
++	protected static void printLoadedTests(final Class<?>... classes){
++		StringBuilder loadedTestsMessage = new StringBuilder("The following tests were loaded:\n");
++		Package p = null;
++		for(Class<?> c : classes){
++			if(c.getPackage().equals(p)){
++				p = c.getPackage();
++				loadedTestsMessage.append(p.getName() + "\n");
++			}
++			loadedTestsMessage.append("\t" + c.getSimpleName() + "\n");
++		}
++		TestBench.out().println(loadedTestsMessage);
++	}
++	
++	
++	/**
++	 * Parses the arguments passed at runtime and runs the appropriate tests based upon these arguments
++	 * @param args the args passed into the program at runtime
++	 * @return the restults of the tests that have run. If no tests were run then null is returned.
++	 */
++	protected static Result parseArgsRunAndGetResult(final String[] args){
++		if(args.length == 0){ //If there are no args passed at runtime then just run all of the tests.
++			printLoadedTests(TestSuite.class);
++			return JUnitCore.runClasses(TestSuite.class);
++		}
+ 		
+-		//Select the test suites to run given the args passed at runtime
+-		ArrayList<Class<?>> runClasses;
+-		if(args.length != 0){ //If args are passed to the test suite
+-			//Display the list of arguments passed
+-			StringBuilder paramList = new StringBuilder("Params received: ");
+-			for(String a : args){
+-				a = a.toLowerCase();
+-				paramList.append(a+", ");
++		//The method filter was passed
++		boolean methodFilter = false;
++		String methodRegex = "";
++		//The class filter was passed
++		boolean classFilter = false;
++		String classRegex = "";
++		boolean repeatFilter = false;
++		int repeatCount = 1;
++		
++		for(String s : args){
++			if(Pattern.matches(METHOD_NAME_FILTER + ".*", s)){
++				methodFilter = true;
++				methodRegex = new String(s).replace(METHOD_NAME_FILTER, "");
+ 			}
+-			paramList.delete(paramList.length()-2, paramList.length());
+-			System.out.println(paramList); //Print the parsed arg list
+-			
+-			ArrayList<String> argsParsed = new ArrayList<String>(Arrays.asList(args));
+-			//The list of loaded classes
+-			HashMap<String, Class<?>> loadedClasses = getClassNameHash();
+-			runClasses = new ArrayList<Class<?>>();
+-			//List the test that will be run
+-			System.out.println("Running the following tests:");
+-			for(String a : argsParsed){
+-				Class<?> load = loadedClasses.get(a);
+-				if(load!=null){
+-					runClasses.add(load);
+-					System.out.println("\t" + a);
++			if(Pattern.matches(METHOD_REPEAT_FILTER + ".*", s)){
++				repeatFilter = true;
++				try{
++					repeatCount = Integer.parseInt(new String(s).replace(METHOD_REPEAT_FILTER, ""));
++				} catch (NumberFormatException e){
++					displayInvalidUsage("The argument passed to the repeat rule was not a valid integer.", args);
+ 				}
+ 			}
+-			if(argsParsed.contains("quick")){//Allows a quick test to be written without the framework overhead test functionality
+-				runClasses.add(QuickTest.class);
+-			}
+-			
+-		} else { //If no args are passed to the test suite then run all of the test suites except for the QuickTest
+-			runClasses = new ArrayList<Class<?>>();
+-			System.out.println("Running the following tests:");
+-			for(Class<?> c : testList){
+-				runClasses.add(c);
+-				System.out.println("\t" + c.getSimpleName());
++			if(Pattern.matches(CLASS_NAME_FILTER + ".*", s)){
++				classFilter = true;
++				classRegex = new String(s).replace(CLASS_NAME_FILTER, "");
+ 			}
+ 		}
+ 		
+-		//Tests are run here
+-		Result result = JUnitCore.runClasses(runClasses.toArray(new Class[0]));
+ 		
+ 		
++		ArrayList<String> argsParsed = new ArrayList<String>(Arrays.asList(args));
++		if(argsParsed.contains(HELP_FLAG)){
++			//If the user inputs the help flag then return the help message and exit without running any tests
++			displayHelp();
++			return null;
++		}
++		if(argsParsed.contains(QUICK_TEST_FLAG)){
++			printLoadedTests(QUICK_TEST);
++			return JUnitCore.runClasses(QUICK_TEST);
++		}
+ 		
++		//If a specific method has been requested
++		if(methodFilter){
++			/**
++			 * Stores the data from multiple {@link Result}s in one class that can be returned to display the results.
++			 */
++			class MultipleResult extends Result{
++				private static final long serialVersionUID = 1L;
++				private final List<Failure> failures = new Vector<Failure>();
++				private int runCount = 0;
++				private int ignoreCount = 0;
++				private long runTime = 0;
++				
++			    @Override
++				public int getRunCount() {
++			        return runCount;
++			    }
++			    @Override
++				public int getFailureCount() {
++			        return failures.size();
++			    }
++			    @Override
++				public long getRunTime() {
++			        return runTime;
++			    }
++			    @Override
++				public List<Failure> getFailures() {
++			        return failures;
++			    }
++			    @Override
++				public int getIgnoreCount() {
++			        return ignoreCount;
++			    }
++				/**
++				 * Adds the given result's data to this result
++				 * @param r the result to add to this result
++				 */
++				void addResult(Result r){
++					failures.addAll(r.getFailures());
++					runCount += r.getRunCount();
++					ignoreCount += r.getIgnoreCount();
++					runTime += r.getRunTime();	
++				}
++			}
++			
++			List<ClassMethodPair> pairs  = (new TestSuite()).getMethodMatching(methodRegex);
++			if(pairs.size() == 0){
++				displayInvalidUsage("None of the arguments passed to the method name filter matched.", args);
++				return null;
++			}
++			//Print out the list of tests before we run them
++			TestBench.out().println("Running the following tests:");
++			Class<?> classListing = null;
++			for(ClassMethodPair p : pairs){
++				if(!p.methodClass.equals(classListing)){
++					//Only display the class name every time it changes
++					classListing = p.methodClass;
++					TestBench.out().println(classListing);
++				}
++				TestBench.out().println("\t" + p.methodName);
++			}
++		
++			
++			//The test results will be saved here
++			MultipleResult results = new MultipleResult();
++			//Runs tests multiple times if the repeat rule is used
++			for(int i = 0; i < repeatCount; i++){
++				//Now run all of the tests
++				for(ClassMethodPair p : pairs){
++					Result result = (new JUnitCore()).run(p.getMethodRunRequest());
++					//Store the given results in one cohesive result
++					results.addResult(result);
++				}
++			}
++			
++			return results;
++		}
+ 		
++		//If a specific class has been requested
++		if(classFilter){
++			List<Class<?>> testClasses = (new TestSuite()).getSuiteOrTestMatchingRegex(classRegex);
++			if(testClasses.size() == 0){
++				displayInvalidUsage("None of the arguments passed to the filter matched.", args);
++				return null;
++			}
++			printLoadedTests(testClasses.toArray(new Class[0]));
++			return JUnitCore.runClasses(testClasses.toArray(new Class[0]));	
++		}
++		
++		displayInvalidUsage("None of the parameters that you passed matched any of the accepted flags.", args);
++		return null;
++	}
++	
++	protected static void displayResults(Result result){
+ 		//Results are collected and displayed here
+-		System.out.println("\n");
++		TestBench.out().println("\n");
+ 		if(!result.wasSuccessful()){
+ 			//Prints out a list of stack traces for the failed tests
+-			System.out.println("Failure List: ");
+-			for(Failure f : result.getFailures()){
+-				System.out.println(f.getDescription());
+-				System.out.println(f.getTrace());
++		TestBench.out().println("Failure List: ");
++		for(Failure f : result.getFailures()){
++			TestBench.out().println(f.getDescription());
++			TestBench.out().println(f.getTrace());
++		}
++		TestBench.out().println();
++		TestBench.out().println("FAILURES!!!");
++		//Print the test statistics
++		TestBench.out().println("Tests run: " + result.getRunCount() +
++				", Failures: " + result.getFailureCount() + 
++				", Ignored: " + result.getIgnoreCount() + 
++				", In " + result.getRunTime() + "ms");
++		
++		//Prints out a list of test that failed
++		TestBench.out().println("Failure List (short):");
++		String failureClass = result.getFailures().get(0).getDescription().getClassName();
++		TestBench.out().println(failureClass);
++		for(Failure f : result.getFailures()){
++			if(!failureClass.equals(f.getDescription().getClassName())){
++				failureClass = f.getDescription().getClassName();
++				TestBench.out().println(failureClass);
+ 			}
+-			System.out.println();
+-			System.out.println("FAILURES!!!");
+-			//Print the test statistics
+-			System.out.println("Tests run: " + result.getRunCount() +
+-					", Failures: " + result.getFailureCount() + 
+-					", Ignored: " + result.getIgnoreCount() + 
+-					", In " + result.getRunTime() + "ms");
+-	
+-			//Prints out a list of test that failed
+-			System.out.println("Failure List (short):");
+-			String failureClass = result.getFailures().get(0).getDescription().getClassName();
+-			System.out.println(failureClass);
+-			for(Failure f : result.getFailures()){
+-				if(!failureClass.equals(f.getDescription().getClassName())){
+-					failureClass = f.getDescription().getClassName();
+-					System.out.println(failureClass);
+-				}
+-				System.err.println("\t" + f.getDescription());
++			TestBench.err().println("\t" + f.getDescription());
+ 			}
+ 		} else {
+-			System.out.println("SUCCESS!");
+-			System.out.println("Tests run: " + result.getRunCount() +
+-					", Ignored: " + result.getIgnoreCount() + 
+-					", In " + result.getRunTime() + "ms");
++			TestBench.out().println("SUCCESS!");
++			TestBench.out().println("Tests run: " + result.getRunCount() +
++				", Ignored: " + result.getIgnoreCount() + 
++				", In " + result.getRunTime() + "ms");
+ 		}
+-		System.out.println();
++		TestBench.out().println();
++	}
++	
++	
++
++	/**
++	 * The method called at runtime
++	 * @param args The test suites to run
++	 */
++	public static void main(String[] args) {
++		TestBench.out().println("JUnit version " + Version.id());
++		
++		//Tests are run here
++		Result result = parseArgsRunAndGetResult(args);
++		if(result != null){
++			//Results are collected and displayed here
++			displayResults(result);
+ 			
+-        System.exit(result.wasSuccessful() ? 0 : 1);
++			System.exit(result.wasSuccessful() ? 0 : 1);
++		}
++		System.exit(1);
+ 	}
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/test/java/edu/wpi/first/wpilibj/test/AbstractTestSuiteTest.java b/wpilibj/wpilibJavaIntegrationTests/src/test/java/edu/wpi/first/wpilibj/test/AbstractTestSuiteTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..9c2684ca97e5cdc9b7d6c04b18549ae132074215
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/test/java/edu/wpi/first/wpilibj/test/AbstractTestSuiteTest.java
+@@ -0,0 +1,142 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.test;
++
++import static org.hamcrest.MatcherAssert.assertThat;
++import static org.hamcrest.Matchers.hasItems;
++import static org.hamcrest.Matchers.not;
++import static org.junit.Assert.assertEquals;
++
++import java.util.List;
++
++import org.junit.Before;
++import org.junit.Ignore;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.junit.runners.Suite;
++import org.junit.runners.Suite.SuiteClasses;
++import org.junit.runners.model.InitializationError;
++
++import edu.wpi.first.wpilibj.test.AbstractTestSuite.ClassMethodPair;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class AbstractTestSuiteTest {
++	
++	@Ignore("Prevents ANT from trying to run these as tests")
++	@RunWith(Suite.class)
++	@SuiteClasses({
++		FirstSampleTest.class,
++		SecondSampleTest.class,
++		ThirdSampleTest.class,
++		FourthSampleTest.class,
++		UnusualTest.class,
++		ExampleSubSuite.class,
++		EmptySuite.class
++	})
++	class TestForAbstractTestSuite extends AbstractTestSuite{		
++	}
++	
++	TestForAbstractTestSuite testSuite;
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++		testSuite = new TestForAbstractTestSuite();
++	}
++
++	@Test
++	public void testGetTestsMatchingAll() throws InitializationError {
++		//when
++		List<Class<?>> collectedTests = testSuite.getAllClassMatching(".*");
++		//then
++		assertEquals(7, collectedTests.size());
++	}
++	
++	@Test
++	public void testGetTestsMatchingSample() throws InitializationError{
++		//when
++		List<Class<?>> collectedTests = testSuite.getAllClassMatching(".*Sample.*");
++		//then
++		assertEquals(4, collectedTests.size());
++	}
++	
++	@Test
++	public void testGetTestsMatchingUnusual() throws InitializationError{
++		//when
++		List<Class<?>> collectedTests = testSuite.getAllClassMatching(".*Unusual.*");
++		//then
++		assertEquals(1, collectedTests.size());
++		assertEquals(UnusualTest.class, collectedTests.get(0));
++	}
++	
++	@Test
++	public void testGetTestsFromSuiteMatchingAll() throws InitializationError {
++		//when
++		List<Class<?>> collectedTests = testSuite.getSuiteOrTestMatchingRegex(".*");
++		//then
++		assertEquals(7, collectedTests.size());
++	}
++	
++	@Test
++	public void testGetTestsFromSuiteMatchingTest() throws InitializationError {
++		//when
++		List<Class<?>> collectedTests = testSuite.getSuiteOrTestMatchingRegex(".*Test.*");
++		//then
++		assertEquals(7, collectedTests.size());
++		assertThat(collectedTests, hasItems(new Class<?>[] {FirstSubSuiteTest.class, SecondSubSuiteTest.class, UnusualTest.class}));
++		assertThat(collectedTests, not(hasItems(new Class<?>[] {ExampleSubSuite.class, EmptySuite.class})));		
++	}
++	
++	@Test
++	public void testGetMethodFromTest(){
++		//when
++		List<ClassMethodPair> pairs = testSuite.getMethodMatching(".*Method.*");
++		//then
++		assertEquals(1, pairs.size());
++		assertEquals(FirstSubSuiteTest.class, pairs.get(0).methodClass);
++		assertEquals(FirstSubSuiteTest.METHODNAME, pairs.get(0).methodName);
++		
++	}
++
++}
++
++
++class FirstSampleTest {}
++class SecondSampleTest {}
++class ThirdSampleTest {}
++class FourthSampleTest {}
++
++class UnusualTest {} //This is a member of both suites
++
++@Ignore("Prevents ANT from trying to run these as tests")
++class FirstSubSuiteTest{
++	public static final String METHODNAME = "aTestMethod";
++	@Test
++	public void aTestMethod(){
++	}
++}
++class SecondSubSuiteTest{}
++
++@RunWith(Suite.class)
++@SuiteClasses({
++	FirstSubSuiteTest.class,
++	SecondSubSuiteTest.class,
++	UnusualTest.class
++})
++@Ignore("Prevents ANT from trying to run these as tests")
++class ExampleSubSuite extends AbstractTestSuite{}
++
++@Ignore("Prevents ANT from trying to run these as tests")
++@RunWith(Suite.class)
++@SuiteClasses({})
++class EmptySuite extends AbstractTestSuite{}
++

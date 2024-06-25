@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Mon, 18 Aug 2014 10:30:50 -0400
+Subject: [PATCH 0303/6262] Uses ${ant.java.version} for javac when compiling
+
+This uses the ant jvm version variable to compile teams robot projects.
+
+Change-Id: I4f5b704e5230c1bd09323abea6c4044c709c3eff
+---
+ .../src/main/resources/java-zip/ant/build.xml               | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+index a515d8fc6b570ba876d1b557528b9fa1fa2f5d34..574a96a05521bdac01b24f54838b7dd31af46101 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+@@ -32,9 +32,9 @@
+      includeAntRuntime="no"
+      includeJavaRuntime="no"
+      classpath="${classpath}"
+-     target="1.7"
+-     source="1.7"
+-     compiler="javac1.7"
++     target="${ant.java.version}"
++     source="${ant.java.version}"
++     compiler="javac${ant.java.version}"
+      debug="true">
+     </javac>
+   </target>

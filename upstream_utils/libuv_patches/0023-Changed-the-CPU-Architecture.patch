@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fredric Silberberg <fredric@fsilberberg.com>
+Date: Sat, 22 Feb 2014 17:59:53 -0500
+Subject: [PATCH 0023/6262] Changed the CPU Architecture
+
+Changed the cpu architecture to armv7-a to get rid of a warning
+about conflicting flags
+
+Change-Id: I42ef441b073199d562062f376334cecea1614060
+---
+ maven-utilities/athena/static-library/pom.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/maven-utilities/athena/static-library/pom.xml b/maven-utilities/athena/static-library/pom.xml
+index 20b7c2dcf5b6fd4bf9b52cab90862d8997682a5c..95417b6e493b90d35c3f860d95bd73836037bdc3 100644
+--- a/maven-utilities/athena/static-library/pom.xml
++++ b/maven-utilities/athena/static-library/pom.xml
+@@ -26,7 +26,7 @@
+ 				 export PATH=$HOME/wpilib/toolchains/arm-none-linux-gnueabi-4.4.1/bin/:$PATH -->
+ 			<compilerExecutable>arm-none-linux-gnueabi-g++</compilerExecutable>
+ 			<compilerStartOptions>
+-              <compilerStartOption>-march=armv7 -mcpu=cortex-a9 -mfloat-abi=softfp -fPIC</compilerStartOption>
++              <compilerStartOption>-march=armv7-a -mcpu=cortex-a9 -mfloat-abi=softfp -fPIC</compilerStartOption>
+ 			</compilerStartOptions>
+ 			<compilerMiddleOptions>
+ 			  <compilerMiddleOption>-O0 -g3 -Wall</compilerMiddleOption>

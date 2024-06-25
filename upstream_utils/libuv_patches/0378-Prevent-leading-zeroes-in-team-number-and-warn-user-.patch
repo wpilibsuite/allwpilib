@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 1 Oct 2014 14:20:03 -0400
+Subject: [PATCH 0378/6262] Prevent leading zeroes in team number and warn user
+ about them (fixes artf3429)
+
+Change-Id: I722351d78dc53a4919bcda0ba31b188caa2d38d8
+---
+ .../wpi/first/wpilib/plugins/core/wizards/TeamNumberPage.java | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/TeamNumberPage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/TeamNumberPage.java
+index 3e3728b3fc50ba67c67930a2e1139fcee7a88079..5345f48a36605b660c23900a22ee3e85f38c6aaf 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/TeamNumberPage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/TeamNumberPage.java
+@@ -77,8 +77,8 @@ public class TeamNumberPage extends WizardPage {
+ 	private void dialogChanged() {
+ 		String teamNumber = getTeamNumber();
+ 		if (listener != null) listener.stateChanged(null); 
+-		if (!teamNumber.matches("^([0-9]+)$")) {
+-			updateStatus("Team number must be a valid integer.");
++		if (!teamNumber.matches("^([1-9][0-9]*)$")) {
++			updateStatus("Team number must be a valid integer without leading zeroes.");
+ 			return;
+ 		}
+ 		updateStatus(null);

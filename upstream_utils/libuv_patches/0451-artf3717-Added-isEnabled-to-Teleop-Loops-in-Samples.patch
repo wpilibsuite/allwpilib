@@ -1,0 +1,196 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: James Kuszmaul <jabukuszmaul+collab@gmail.com>
+Date: Mon, 27 Oct 2014 15:52:37 -0400
+Subject: [PATCH 0451/6262] [artf3717] Added isEnabled to Teleop Loops in
+ Samples.
+
+Anywhere in the sample programs where there was just a
+isOperatorControl() in the while loop for Teleop, added an "&&
+isEnabled()".
+
+Change-Id: Ib81e8bab79923e262c314a073a591855cbf06846
+---
+ .../resources/templates/examples/ArcadeDrive/src/Robot.cpp      | 2 +-
+ .../resources/templates/examples/CANPDP/src/Robot.cpp           | 2 +-
+ .../resources/templates/examples/Encoder/src/Robot.cpp          | 2 +-
+ .../resources/templates/examples/MecanumDrive/src/Robot.cpp     | 2 +-
+ .../resources/templates/examples/MotorControl/src/Robot.cpp     | 2 +-
+ .../templates/examples/MotorControlEncoder/src/Robot.cpp        | 2 +-
+ .../resources/templates/examples/Relay/src/Robot.cpp            | 2 +-
+ .../resources/templates/examples/Solenoid/src/Robot.cpp         | 2 +-
+ .../resources/templates/sample/Robot.cpp                        | 2 +-
+ .../MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java   | 2 +-
+ .../MotorControl/src/org/usfirst/frc/team190/robot/Robot.java   | 2 +-
+ .../TankDrive/src/org/usfirst/frc/team190/robot/Robot.java      | 2 +-
+ .../resources/templates/sample/Robot.java                       | 2 +-
+ 13 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/ArcadeDrive/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/ArcadeDrive/src/Robot.cpp
+index 823e33553d3f8ae11cf0ff12fb023fb16a03f13d..1ac28278685f81ff0ddcf6faea66ee9c24e2a4dc 100755
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/ArcadeDrive/src/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/ArcadeDrive/src/Robot.cpp
+@@ -28,7 +28,7 @@ public:
+ 	 */
+ 	void OperatorControl()
+ 	{
+-		while (IsOperatorControl())
++		while (IsOperatorControl() && IsEnabled())
+ 		{
+ 			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
+ 			Wait(0.005);				// wait for a motor update time
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANPDP/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANPDP/src/Robot.cpp
+index 2e66765e6791e086b43a94733de367c0d7d01aa3..2477ff3cda1cc03a0e346804d9e8fcba4db8671c 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANPDP/src/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANPDP/src/Robot.cpp
+@@ -27,7 +27,7 @@ public:
+ 	 */
+ 	void OperatorControl()
+ 	{
+-		while (IsOperatorControl())
++		while (IsOperatorControl() && IsEnabled())
+ 		{
+ 			// Get the current going through channel 7, in Amperes.
+ 			// The PDP returns the current in increments of 0.125A.
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Encoder/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Encoder/src/Robot.cpp
+index e0fd3020a172649372358a13ce6199f4ee2fcd94..27f3ef86f6fba9e647fe67e1d6c58a0a2a302b6b 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Encoder/src/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Encoder/src/Robot.cpp
+@@ -66,7 +66,7 @@ public:
+ 	 */
+ 	void OperatorControl()
+ 	{
+-		while (IsOperatorControl())
++		while (IsOperatorControl() && IsEnabled())
+ 		{
+ 			// Retrieve the net displacement of the Encoder since the lsat Reset.
+ 			SmartDashboard::PutNumber("Encoder Distance", m_encoder.GetDistance());
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MecanumDrive/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MecanumDrive/src/Robot.cpp
+index c1f9d8a8ffec54119ea84ce21d780389f6f06206..aa3522062b50c6fc80cdbb949cff73396bf4bb45 100755
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MecanumDrive/src/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MecanumDrive/src/Robot.cpp
+@@ -34,7 +34,7 @@ public:
+ 	void OperatorControl()
+ 	{
+ 		robotDrive.SetSafetyEnabled(false);
+-		while (IsOperatorControl())
++		while (IsOperatorControl() && IsEnabled())
+ 		{
+         	// Use the joystick X axis for lateral movement, Y axis for forward movement, and Z axis for rotation.
+         	// This sample does not use field-oriented drive, so the gyro input is set to zero.
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MotorControl/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MotorControl/src/Robot.cpp
+index 2ae77b0205d48c330f9a5bbee221951e44dfeefa..567e71faa68995aa06851f822e77499a3048dd5e 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MotorControl/src/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MotorControl/src/Robot.cpp
+@@ -31,7 +31,7 @@ public:
+ 	 * Runs the motor from the output of a Joystick.
+ 	 */
+ 	void OperatorControl() {
+-		while (IsOperatorControl()) {
++		while (IsOperatorControl() && IsEnabled()) {
+ 			// Set the motor controller's output.
+ 			// This takes a number from -1 (100% speed in reverse) to +1 (100% speed forwards).
+ 			m_motor.Set(m_stick.GetY());
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MotorControlEncoder/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MotorControlEncoder/src/Robot.cpp
+index dce8fc42399a7f2cc452a2b9d161ce1b7aba9263..e9f07518372023e86411dc6ea4960eaebd38e06f 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MotorControlEncoder/src/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/MotorControlEncoder/src/Robot.cpp
+@@ -39,7 +39,7 @@ public:
+ 	 * Simultaneously displays encoder values on the SmartDashboard.
+ 	 */
+ 	void OperatorControl() {
+-		while (IsOperatorControl()) {
++		while (IsOperatorControl() && IsEnabled()) {
+ 			// Set the motor controller's output.
+ 			// This takes a number from -1 (100% speed in reverse) to +1 (100% speed forwards).
+ 			m_motor.Set(m_stick.GetY());
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Relay/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Relay/src/Robot.cpp
+index c7c83ed795e9aef45527bf4a94d63d6d070eab21..8d199b2dc254c14ab6fe239356dd1154bbf175c9 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Relay/src/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Relay/src/Robot.cpp
+@@ -39,7 +39,7 @@ public:
+ 	 */
+ 	void OperatorControl()
+ 	{
+-		while (IsOperatorControl())
++		while (IsOperatorControl() && IsEnabled())
+ 		{
+ 			// Retrieve the button values. GetRawButton will return
+ 			//   true if the button is pressed and false if not.
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Solenoid/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Solenoid/src/Robot.cpp
+index c8f91e7406bafa823e60d6b32870bc217034ed99..54e28d11b56da5af305e3ffcf0526268211ad56e 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Solenoid/src/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/Solenoid/src/Robot.cpp
+@@ -51,7 +51,7 @@ public:
+ 	 */
+ 	void OperatorControl()
+ 	{
+-		while (IsOperatorControl())
++		while (IsOperatorControl() && IsEnabled())
+ 		{
+ 			// The output of GetRawButton is true/false depending on whether
+ 			//   the button is pressed; Set takes a boolean for for whether to
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp
+index eb197047356a8057b7bb9d4fd9811c4294f9826a..627f7f6ba686e5f4f8afaa6f7376cdfc9e80dc19 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp
+@@ -40,7 +40,7 @@ public:
+ 	void OperatorControl()
+ 	{
+ 		myRobot.SetSafetyEnabled(true);
+-		while (IsOperatorControl())
++		while (IsOperatorControl() && IsEnabled())
+ 		{
+ 			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
+ 			Wait(0.005);				// wait for a motor update time
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java
+index c4834bfcc23c652bfdd86901b839268c4b2f49e7..4c8220307672507a4614f50f8d920fb27df76066 100755
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java
+@@ -39,7 +39,7 @@ public class Robot extends SampleRobot {
+      */
+     public void operatorControl() {
+         robotDrive.setSafetyEnabled(true);
+-        while (isOperatorControl()) {
++        while (isOperatorControl() && isEnabled()) {
+         	
+         	// Use the joystick X axis for lateral movement, Y axis for forward movement, and Z axis for rotation.
+         	// This sample does not use field-oriented drive, so the gyro input is set to zero.
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java
+index 7b1bb3da4c2e6adb65129972da5f9321a48de966..3afd18751de231d2d52403a8f23be0047b996a25 100755
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java
+@@ -32,7 +32,7 @@ public class Robot extends SampleRobot {
+      * Runs the motor from a joystick.
+      */
+     public void operatorControl() {
+-        while (isOperatorControl()) {
++        while (isOperatorControl() && isEnabled()) {
+         	// Set the motor's output.
+         	// This takes a number from -1 (100% speed in reverse) to +1 (100% speed going forward)
+         	motor.set(stick.getY());
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/TankDrive/src/org/usfirst/frc/team190/robot/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/TankDrive/src/org/usfirst/frc/team190/robot/Robot.java
+index 3f47e7e8303326cad68bc3cf47a52f3f2b6ef650..3af139b29f536d51cc6e6272e7c4c42d7cd47218 100755
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/TankDrive/src/org/usfirst/frc/team190/robot/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/TankDrive/src/org/usfirst/frc/team190/robot/Robot.java
+@@ -37,7 +37,7 @@ public class Robot extends SampleRobot {
+      */
+     public void operatorControl() {
+         myRobot.setSafetyEnabled(true);
+-        while (isOperatorControl()) {
++        while (isOperatorControl() && isEnabled()) {
+         	myRobot.tankDrive(leftStick, rightStick);
+             Timer.delay(0.005);		// wait for a motor update time
+         }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java
+index 56da2a82afa03683de603da9d5ec0015a2f97da7..9bed59e805b1741cf1c08e1f2160367cf9d1793d 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java
+@@ -48,7 +48,7 @@ public class Robot extends SampleRobot {
+      */
+     public void operatorControl() {
+         myRobot.setSafetyEnabled(true);
+-        while (isOperatorControl()) {
++        while (isOperatorControl() && isEnabled()) {
+             myRobot.arcadeDrive(stick); // drive with arcade style (use right stick)
+             Timer.delay(0.005);		// wait for a motor update time
+         }

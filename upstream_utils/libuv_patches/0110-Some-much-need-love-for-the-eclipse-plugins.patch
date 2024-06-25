@@ -1,0 +1,1579 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Wed, 18 Jun 2014 13:46:22 -0700
+Subject: [PATCH 0110/6262] Some much need love for the eclipse plugins.
+
+Features/bug fixes include:
+- Paul's progress bar for the installers
+- Fix to prevent repeatede installation
+- Right clicking and running Java projects works now
+- Better logging to help find issues (Window > Show View > Other > Error Log)
+
+Change-Id: I2cc791a58752cdeffec27f73880e7afcd1e95771
+---
+ .../first/wpilib/plugins/core/WPILibCore.java |  77 ++++---
+ .../core/actions/RunOutlineViewerAction.java  |   2 +-
+ .../core/actions/RunRobotBuilderAction.java   |   4 +-
+ .../core/actions/RunSFXDashboardAction.java   |   2 +-
+ .../core/actions/RunSmartDashboardAction.java |   4 +-
+ .../plugins/core/ant/AntPropertiesParser.java |   7 +-
+ .../core/installer/AbstractInstaller.java     | 213 ++++++++++++------
+ .../core/installer/ToolsInstaller.java        |   2 +-
+ .../plugins/core/launching/AntLauncher.java   |  12 +-
+ .../preferences/WPILibPreferencePage.java     |   4 +-
+ .../plugins/core/wizards/ExampleWizard.java   |   4 +-
+ .../core/wizards/ExampleWizardChoicePage.java |  16 +-
+ .../core/wizards/NewProjectMainPage.java      |   2 -
+ .../core/wizards/ProjectCreationUtils.java    |  18 +-
+ .../wpilib/plugins/cpp/WPILibCPPPlugin.java   |   9 +
+ .../plugins/cpp/installer/CPPInstaller.java   |   2 +-
+ .../cpp/launching/DeployLaunchShortcut.java   |  52 ++---
+ .../plugins/cpp/launching/RSEUtils.java       |  14 +-
+ .../cpp/launching/SimulateLaunchShortcut.java |  20 +-
+ .../cpp/preferences/CPPPreferencePage.java    |   4 +-
+ .../file_template/FileTemplateWizard.java     |  11 +-
+ .../FileTemplateWizardMainPage.java           |   7 +-
+ .../cpp/wizards/newproject/NewCPPWizard.java  |   5 +-
+ .../newproject/WPIRobotCPPProjectCreator.java |   3 +-
+ .../wpilib/plugins/java/WPILibJavaPlugin.java |  18 +-
+ .../plugins/java/installer/JavaInstaller.java |   2 +-
+ .../java/launching/JavaLaunchShortcut.java    |  49 ++--
+ .../java/preferences/JavaPreferencePage.java  |   4 +-
+ .../file_template/FileTemplateWizard.java     |  11 +-
+ .../FileTemplateWizardMainPage.java           |  10 +-
+ .../wizards/newproject/NewJavaWizard.java     |   5 +-
+ 31 files changed, 340 insertions(+), 253 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/WPILibCore.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/WPILibCore.java
+index ab8eb09325d4941cda7ba8c20cdab3ad843d5d40..43f738855e6f322bd05d59223e4455ef7a0a865a 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/WPILibCore.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/WPILibCore.java
+@@ -11,6 +11,7 @@ import java.util.Properties;
+ 
+ import org.eclipse.core.resources.IProject;
+ import org.eclipse.core.runtime.CoreException;
++import org.eclipse.core.runtime.Status;
+ import org.eclipse.jface.resource.ImageDescriptor;
+ import org.eclipse.ui.plugin.AbstractUIPlugin;
+ import org.osgi.framework.BundleContext;
+@@ -29,7 +30,7 @@ public class WPILibCore extends AbstractUIPlugin {
+ 
+ 	// The shared instance
+ 	private static WPILibCore plugin;
+-	
++
+ 	/**
+ 	 * The constructor
+ 	 */
+@@ -38,18 +39,24 @@ public class WPILibCore extends AbstractUIPlugin {
+ 
+ 	/*
+ 	 * (non-Javadoc)
+-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
++	 * 
++	 * @see
++	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
++	 * )
+ 	 */
+ 	public void start(BundleContext context) throws Exception {
+ 		super.start(context);
+ 		plugin = this;
+-		
++
+ 		new ToolsInstaller(getDefaultVersion()).installIfNecessary();
+ 	}
+ 
+ 	/*
+ 	 * (non-Javadoc)
+-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
++	 * 
++	 * @see
++	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
++	 * )
+ 	 */
+ 	public void stop(BundleContext context) throws Exception {
+ 		plugin = null;
+@@ -58,7 +65,7 @@ public class WPILibCore extends AbstractUIPlugin {
+ 
+ 	/**
+ 	 * Returns the shared instance
+-	 *
++	 * 
+ 	 * @return the shared instance
+ 	 */
+ 	public static WPILibCore getDefault() {
+@@ -66,58 +73,63 @@ public class WPILibCore extends AbstractUIPlugin {
+ 	}
+ 
+ 	/**
+-	 * Returns an image descriptor for the image file at the given
+-	 * plug-in relative path
+-	 *
+-	 * @param path the path
++	 * Returns an image descriptor for the image file at the given plug-in
++	 * relative path
++	 * 
++	 * @param path
++	 *            the path
+ 	 * @return the image descriptor
+ 	 */
+ 	public static ImageDescriptor getImageDescriptor(String path) {
+ 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+ 	}
+-	
++
+ 	public Properties getProjectProperties(IProject project) {
+ 		List<InputStream> streams = new ArrayList<InputStream>();
+ 		try {
+ 			if (project != null) {
+ 				try {
+-					streams.add(project.getFile("build.properties").getContents());
+-				} catch (CoreException e) {} // No properties file
++					streams.add(project.getFile("build.properties")
++							.getContents());
++				} catch (CoreException e) {
++				} // No properties file
+ 			}
+-			File file = new File(getWPILibBaseDir()+"/wpilib.properties");
++			File file = new File(getWPILibBaseDir() + "/wpilib.properties");
+ 			streams.add(new FileInputStream(file));
+ 			return new AntPropertiesParser(streams).getProperties();
+ 		} catch (Exception e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Error loading project properties.", e);
+ 			return new Properties();
+ 		}
+ 	}
+-    
+-    public void saveGlobalProperties(Properties props) {
+-    	try {
+-			props.store(new FileOutputStream(new File(WPILibCore.getDefault().getWPILibBaseDir()+"/wpilib.properties")),
++
++	public void saveGlobalProperties(Properties props) {
++		try {
++			props.store(new FileOutputStream(new File(WPILibCore.getDefault()
++					.getWPILibBaseDir() + "/wpilib.properties")),
+ 					"Don't add new properties, they will be deleted by the eclipse plugin.");
+ 		} catch (IOException e) {
+-			// TODO Auto-generated catch block
+-			e.printStackTrace();
++            WPILibCore.logError("Error saving global properties.", e);
+ 		}
+-    }
+-	
++	}
++
+ 	public int getTeamNumber(IProject project) {
+-		return Integer.parseInt(getProjectProperties(project).getProperty("team-number", "0"));
++		return Integer.parseInt(getProjectProperties(project).getProperty(
++				"team-number", "0"));
+ 	}
+-	
++
+ 	public String getTargetIP(IProject project) {
+ 		String target = getProjectProperties(project).getProperty("target");
+-		if (target != null) return target;
++		if (target != null)
++			return target;
+ 		else {
+ 			int teamNumber = getTeamNumber(project);
+-			return "10."+(teamNumber/100)+"."+(teamNumber%100)+".2";
++			return "10." + (teamNumber / 100) + "." + (teamNumber % 100) + ".2";
+ 		}
+ 	}
+ 
+ 	public String getWPILibBaseDir() {
+-		return System.getProperty("user.home")+"/wpilib";
++		return System.getProperty("user.home") + "/wpilib";
+ 	}
+ 
+ 	public String getDefaultVersion() {
+@@ -125,6 +137,15 @@ public class WPILibCore extends AbstractUIPlugin {
+ 	}
+ 
+ 	public String getCurrentVersion() {
+-		return getPreferenceStore().getString(PreferenceConstants.TOOLS_VERSION);
++		return getPreferenceStore()
++				.getString(PreferenceConstants.TOOLS_VERSION);
++	}
++
++	public static void logInfo(String msg) {
++		getDefault().getLog().log(new Status(Status.INFO, PLUGIN_ID, Status.OK, msg, null));
++	}
++
++	public static void logError(String msg, Exception e) {
++		getDefault().getLog().log(new Status(Status.ERROR, PLUGIN_ID, Status.OK, msg, e));
+ 	}
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunOutlineViewerAction.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunOutlineViewerAction.java
+index ef8f8896f7b551504a2e089c870fe540df232f3b..cee820a3c14c28684d786c3a69a50690bcb7fa51 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunOutlineViewerAction.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunOutlineViewerAction.java
+@@ -39,7 +39,7 @@ public class RunOutlineViewerAction implements IWorkbenchWindowActionDelegate {
+ 		try {
+ 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
+ 		} catch (CoreException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Error running outline viewer.", e);
+ 		}
+ 	}
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunRobotBuilderAction.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunRobotBuilderAction.java
+index 93c8f9ead9ebdf9ec26841d9bfd64f90be98a2ed..f69267cf590add11973a8d2700bff7a3f8da0745 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunRobotBuilderAction.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunRobotBuilderAction.java
+@@ -46,7 +46,7 @@ public class RunRobotBuilderAction implements IWorkbenchWindowActionDelegate {
+ 		try {
+ 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
+ 		} catch (CoreException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Error running RobotBuilder.", e);
+ 		}
+ 	}
+ 
+@@ -75,4 +75,4 @@ public class RunRobotBuilderAction implements IWorkbenchWindowActionDelegate {
+ 	 */
+ 	public void init(IWorkbenchWindow window) {
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSFXDashboardAction.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSFXDashboardAction.java
+index 1d64ad916a54b8c4ab199b2b306eec2faa14d17e..517ebbbfaf7eb13e62e3accebc2d132d96c3b975 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSFXDashboardAction.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSFXDashboardAction.java
+@@ -39,7 +39,7 @@ public class RunSFXDashboardAction implements IWorkbenchWindowActionDelegate {
+ 		try {
+ 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
+ 		} catch (CoreException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Error running SFXDashboard.", e);
+ 		}
+ 	}
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSmartDashboardAction.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSmartDashboardAction.java
+index 3f66b3d6eb852b2c21b85bebaadec0cdae0bf809..e5175c3e123e8b1dcefa43a6166e2c34e1c89652 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSmartDashboardAction.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSmartDashboardAction.java
+@@ -39,7 +39,7 @@ public class RunSmartDashboardAction implements IWorkbenchWindowActionDelegate {
+ 		try {
+ 			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
+ 		} catch (CoreException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Error running SmartDashboard.", e);
+ 		}
+ 	}
+ 
+@@ -68,4 +68,4 @@ public class RunSmartDashboardAction implements IWorkbenchWindowActionDelegate {
+ 	 */
+ 	public void init(IWorkbenchWindow window) {
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/ant/AntPropertiesParser.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/ant/AntPropertiesParser.java
+index 001b0a8d19d849c94644975ae4adcf785b2acb88..6ea0e180f5492d78aeb5989de8f81a36dc01d338 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/ant/AntPropertiesParser.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/ant/AntPropertiesParser.java
+@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
+ import org.eclipse.core.runtime.CoreException;
+ import org.eclipse.core.runtime.Status;
+ 
++import edu.wpi.first.wpilib.plugins.core.WPILibCore;
++
+ public class AntPropertiesParser {
+ 	List<InputStream> files;
+ 
+@@ -44,9 +46,8 @@ public class AntPropertiesParser {
+ 		else props = new Properties(defaults);
+ 		try {
+ 			props.load(resource);
+-		} catch (IOException e1) {
+-			System.out.println("Issue loading file: "+resource);
+-			e1.printStackTrace();
++		} catch (IOException e) {
++            WPILibCore.logError("Error loading property file: "+resource, e);
+ 			return null;
+ 		}
+ 		
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java
+index b7547a6fcc3745046c0919c3bc559ab83f755519..b2ca3ad4ddbb3c8a160d704924ceeb92a6147b80 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java
+@@ -10,7 +10,12 @@ import java.util.zip.ZipInputStream;
+ 
+ import javax.swing.JOptionPane;
+ 
++import org.eclipse.core.resources.ResourcesPlugin;
+ import org.eclipse.core.runtime.CoreException;
++import org.eclipse.core.runtime.IProgressMonitor;
++import org.eclipse.core.runtime.IStatus;
++import org.eclipse.core.runtime.Status;
++import org.eclipse.core.runtime.jobs.Job;
+ import org.eclipse.debug.core.DebugPlugin;
+ 
+ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+@@ -29,130 +34,161 @@ public abstract class AbstractInstaller {
+ 	 * @return The name of the feature being installed.
+ 	 */
+ 	protected abstract String getFeatureName();
+-	
++
+ 	/**
+ 	 * Update the installed version to the latest version.
+ 	 * @param version The latest version installed.
+ 	 */
+ 	protected abstract void updateInstalledVersion(String version);
+-	
++
+ 	/**
+ 	 * @return The input stream to the zip file being installed.
+ 	 */
+ 	protected abstract InputStream getInstallResourceStream();
+ 
+ 	public void installIfNecessary() {
+-		System.out.println("Installing "+getFeatureName()+" if necessary");
+-		try {
+-			System.out.println("Install Location: "
+-					+ installLocation.getCanonicalPath());
+-		} catch (IOException e1) {
+-			// TODO Auto-generated catch block
+-			e1.printStackTrace();
+-		}
++		final Job installJob = new Job("Install " + getFeatureName()) {
++
++			@Override
++			protected IStatus run(IProgressMonitor monitor) {
++				monitor.beginTask(getTaskMessage(), IProgressMonitor.UNKNOWN);
++				WPILibCore.logInfo("Installing "+getFeatureName()+" if necessary");
+ 
++				if (!isInstalled()) {
++					WPILibCore.logInfo("Install necessary");
++					try {
++						install();
++					} catch (InstallException e) {
++                        WPILibCore.logError("Error installing "+getFeatureName(), e);
++						return new Status(IStatus.ERROR, WPILibCore.PLUGIN_ID,
++								getErrorMessage(e));
++					}
++				}
++
++				updateInstalledVersion(version);
++				WPILibCore.logInfo("Installed");
+ 
+-		if (!isInstalled()) {
+-			System.out.println("Install necessary");
+-			try {
+-				install();
+-			} catch (IOException e) {
+-				// TODO Auto-generated catch block
+-				e.printStackTrace();
++				return Status.OK_STATUS;
+ 			}
+-		}
+-		
+-		updateInstalledVersion(version);
+-		System.out.println("Installed");
++
++			private String getErrorMessage(InstallException ex) {
++				String message = "Unable to install " + getFeatureName();
++				if (ex.getCause() != null) {
++					message += ": " + ex.getCause().getMessage();
++				} else if (ex.getMessage() != null) {
++					message += ": " + ex.getMessage();
++				}
++
++				message += ". See console for details.";
++				return message;
++			}
++
++			private String getTaskMessage() {
++				try {
++					return "Extracting to " + installLocation.getCanonicalPath();
++				} catch (IOException ex) {
++                    WPILibCore.logError("installIfNecessary().getTaskMessage()", ex);
++					return "Extracting";
++				}
++			}
++		};
++
++		installJob.setUser(true);
++		installJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
++		installJob.schedule();
+ 	}
+ 
+ 	/**
+ 	 * This function has been updated to guarantee that the wpilib folder date
+ 	 * is older than the jar file being run, which ensures up to date tools.
+-	 * 
++	 *
+ 	 * @return True for is there and newer, false otherwise.
+ 	 */
+-	public boolean isInstalled() {
+-		if(installLocation.exists())
+-		{
+-			File coreJar = new File(AbstractInstaller.class.getProtectionDomain()
+-					.getCodeSource().getLocation().getPath());
+-			if(installLocation.lastModified() <= coreJar.lastModified())
+-			{
+-				return false;
+-			}
+-			else return true;
+-		}
+-		else return false;
++	protected boolean isInstalled() {
++		return installLocation.exists(); 
+ 	}
+ 
+ 	/**
+ 	 * This function will delete an old wpilib subfolder if necessary and then copy
+ 	 * the resource stream to the intended directory.
+-	 * 
+-	 * @throws IOException if bad things happen ...
++	 *
++	 * @throws InstallException if bad things happen ...
+ 	 */
+-	public void install() throws IOException {
++	protected void install() throws InstallException {
+ 		if(installLocation.exists()) {
+ 			if(!removeFileHandler(installLocation, true)) {
+-				JOptionPane.showMessageDialog(null, 
++				JOptionPane.showMessageDialog(null,
+ 					String.format("Could not update the old wpilib folder.%n"
+ 							+ "Please close any WPILib tools and restart Eclipse."));
+ 			}
+ 			else
+ 				removeFileHandler(installLocation, false);
+ 		}
+-			
++
+ 		installLocation.mkdirs();
+ 		final String osName = System.getProperty("os.name");
+-		if (osName.startsWith("Mac OS X") || osName.startsWith("Linux")) { // Unix-like OSes must preserve the executable bit; call unzip
+-			InputStream zip = getInstallResourceStream();
+-			File tmpFile = File.createTempFile(getFeatureName()+"-", ".zip");
+-			FileOutputStream fout = new FileOutputStream(tmpFile);
+-			copyStreams(zip, fout);
+-			zip.close();
+-			fout.close();
+-			String[] cmd = {"unzip", tmpFile.getAbsolutePath(), "-d", installLocation.getAbsolutePath()};
+-			System.out.println("unzip "+tmpFile.getAbsolutePath()+" -d "+installLocation.getAbsolutePath());
+-			try {
+-				InputStream is = DebugPlugin.exec(cmd, installLocation).getInputStream();
+-				copyStreams(is, System.out);
+-			} catch (CoreException e) {
+-				e.printStackTrace();
+-			}
+-		} else {
+-			ZipInputStream zip = new ZipInputStream(getInstallResourceStream());
+-			ZipEntry entry = zip.getNextEntry();
+-			while (entry != null) {
+-				System.out.println("\tZipEntry " + entry + ": " + entry.getSize());
+-				File f = new File(installLocation, entry.getName());
+-				if (entry.isDirectory()) {
+-					f.mkdirs();
+-				} else {
+-					FileOutputStream fo = new FileOutputStream(f);
+-					copyStreams(zip, fo);
+-					fo.close();
++		try {
++			if (osName.startsWith("Mac OS X") || osName.startsWith("Linux")) { // Unix-like OSes must preserve the executable bit; call unzip
++				final File tmpFile = File.createTempFile(getFeatureName()+"-", ".zip");
++				try {
++					// Copy to temporary file
++					try (final InputStream zip = getInstallResourceStream();
++							final FileOutputStream fout = new FileOutputStream(tmpFile)) {
++						copyStreams(zip, fout);
++					}
++
++					// Call 'unzip'
++					final String[] cmd = {"unzip", tmpFile.getAbsolutePath(), "-d", installLocation.getAbsolutePath()};
++					WPILibCore.logInfo("unzip "+tmpFile.getAbsolutePath()+" -d "+installLocation.getAbsolutePath());
++					final Process unzipProcess = DebugPlugin.exec(cmd, installLocation);
++					try (final InputStream is = unzipProcess.getInputStream()) {
++						copyStreams(is, System.out); // Copy output to console
++					}
++
++					// Check result
++					final int exitCode = unzipProcess.waitFor();
++					if (exitCode > 1 || exitCode < 0) { // Exit code 1 indicates success with warnings
++						throw new InstallException("Unzip process failed with code " + exitCode);
++					}
++				} finally {
++					tmpFile.delete();
++				}
++			} else {
++				ZipInputStream zip = new ZipInputStream(getInstallResourceStream());
++				ZipEntry entry = zip.getNextEntry();
++				while (entry != null) {
++					WPILibCore.logInfo("\tZipEntry " + entry + ": " + entry.getSize());
++					File f = new File(installLocation, entry.getName());
++					if (entry.isDirectory()) {
++						f.mkdirs();
++					} else {
++						FileOutputStream fo = new FileOutputStream(f);
++						copyStreams(zip, fo);
++						fo.close();
++					}
++
++					zip.closeEntry();
++					entry = zip.getNextEntry();
+ 				}
+-				
+-				zip.closeEntry();
+-				entry = zip.getNextEntry();
++				zip.close();
+ 			}
+-			zip.close();
++		} catch (IOException | CoreException | InterruptedException ex) {
++			throw new InstallException("Install encountered a problem", ex);
+ 		}
+ 	}
+ 
+ 	private static void copyStreams(InputStream source, OutputStream destination) throws IOException {
+ 		byte[] buffer = new byte[1024];
+ 		int len;
+-		
++
+ 		while((len = source.read(buffer)) >= 0){
+ 			destination.write(buffer,0,len);
+ 		}
+ 	}
+-	
++
+ 	/**
+ 	 * Recursively remove all of the files and folders described by this file handler.
+-	 * 
++	 *
+ 	 * @param file The file to remove
+ 	 * @param testRun True to just test if the files can be deleted
+ 	 * @return True if this and all subFiles were removed, false otherwise.
+@@ -173,6 +209,35 @@ public abstract class AbstractInstaller {
+ 			else return file.delete();
+ 		}
+ 		// I'm not sure what to do if the file is not normal or a directory ...
+-		else return false; 
++		else return false;
++	}
++
++	/**
++	 * Indicates that an attempt to install a resource failed.
++	 */
++	private static class InstallException extends Exception {
++		private static final long serialVersionUID = 4883122446098399588L;
++
++		/**
++		 * @see Exception#Exception()
++		 */
++		@SuppressWarnings("unused")
++		public InstallException() {
++			super();
++		}
++
++		/**
++		 * @see Exception#Exception(String)
++		 */
++		public InstallException(String message) {
++			super(message);
++		}
++
++		/**
++		 * @see Exception#Exception(String, Throwable)
++		 */
++		public InstallException(String message, Throwable cause) {
++			super(message, cause);
++		}
+ 	}
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/ToolsInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/ToolsInstaller.java
+index b36ab8b922971aa7d71b67e7c030c0f51364568b..f1723aa53cda5f2c3be9b26048200e65037a7b9b 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/ToolsInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/ToolsInstaller.java
+@@ -23,7 +23,7 @@ public class ToolsInstaller extends AbstractInstaller {
+ 	protected void updateInstalledVersion(String version) {
+ 		IPreferenceStore prefs = WPILibCore.getDefault().getPreferenceStore();
+ 		if (prefs.getBoolean(PreferenceConstants.UPDATE_TOOLS_VERSION)) {
+-			System.out.println("Forcing library version to "+version);
++			WPILibCore.logInfo("Forcing library version to "+version);
+ 	    	Properties props = WPILibCore.getDefault().getProjectProperties(null);
+ 	    	props.setProperty("version", version);
+ 	    	WPILibCore.getDefault().saveGlobalProperties(props);
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/AntLauncher.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/AntLauncher.java
+index 8f1b363a93b137d77e9282ac2ec02cc5b017a824..c20456767bdd1431a112f2207c7f928d627fbb63 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/AntLauncher.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/AntLauncher.java
+@@ -18,6 +18,8 @@ import org.eclipse.ui.IWorkbenchPage;
+ import org.eclipse.ui.PlatformUI;
+ import org.eclipse.ui.console.IConsoleConstants;
+ 
++import edu.wpi.first.wpilib.plugins.core.WPILibCore;
++
+ /**
+  * Contains functions to launch ant scripts while having the output sent to the
+  * console.  Allows for the use of arguments, the specification of targets, and
+@@ -125,13 +127,15 @@ public class AntLauncher {
+ 		    launcher = workingCopy.doSave();
+ 		    
+ 		   //Launch the modified configuration in the specified mode
+-		   try{ret = launcher.launch(mode, null, true, true);}catch(Exception e){
++		   try {
++			   ret = launcher.launch(mode, null, true, true);
++		   } catch(Exception e) {
+ 			   //Does not need Output, handled and resolved internally
+-			   e.printStackTrace();
++               WPILibCore.logError("Error running launch.", e);
+ 			   return null;
+ 		   }
+-		}catch(Exception e){
+-			e.printStackTrace();
++		} catch(Exception e) {
++            WPILibCore.logError("Error running ant file", e);
+ 			return null;
+ 		}
+ 		
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/preferences/WPILibPreferencePage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/preferences/WPILibPreferencePage.java
+index 63703cd7a5773b3a2bd6d01a1f2fb7295a8dade0..5ad346f1ff52259061f294bdc20ae09005f63f12 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/preferences/WPILibPreferencePage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/preferences/WPILibPreferencePage.java
+@@ -79,7 +79,7 @@ public class WPILibPreferencePage
+ 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+ 	 */
+ 	public void init(IWorkbench workbench) {
+-		System.out.println("Preferences initialized.");
++		WPILibCore.logInfo("Preferences initialized.");
+ 		Properties props = WPILibCore.getDefault().getProjectProperties(null);
+ 		getPreferenceStore().setValue(PreferenceConstants.TEAM_NUMBER,
+ 				Integer.parseInt(props.getProperty("team-number", "0")));
+@@ -95,4 +95,4 @@ public class WPILibPreferencePage
+     	WPILibCore.getDefault().saveGlobalProperties(props);
+ 		return super.performOk();
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizard.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizard.java
+index 90e99ab6eeb9d868516ece628aa80c5185548e21..296c9dc3c3d483220f408ad7f2b92d0f65d370d6 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizard.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizard.java
+@@ -13,6 +13,8 @@ import org.eclipse.ui.INewWizard;
+ import org.eclipse.ui.IWorkbench;
+ import org.eclipse.ui.IWorkbenchWizard;
+ 
++import edu.wpi.first.wpilib.plugins.core.WPILibCore;
++
+ public abstract class ExampleWizard extends Wizard implements INewWizard {
+ 	private ExampleWizardChoicePage page1;
+ 	private IWizardPage page2;
+@@ -71,7 +73,7 @@ public abstract class ExampleWizard extends Wizard implements INewWizard {
+ 		try {
+ 			doFinish(page1.getExampleProject(), TeamNumberPage.getTeamNumberFromPage(teamNumberPage));
+ 		} catch (CoreException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Error finishing example.", e);
+ 			MessageDialog.openError(getShell(), "Error", e.getMessage());
+ 			return false;
+ 		}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizardChoicePage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizardChoicePage.java
+index 91ef974112e3559e0b0ad567248d17798d0745a3..2b9087f7b0773fd801f79af0b7891eacd23d3763 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizardChoicePage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ExampleWizardChoicePage.java
+@@ -28,6 +28,8 @@ import org.w3c.dom.Node;
+ import org.w3c.dom.NodeList;
+ import org.xml.sax.SAXException;
+ 
++import edu.wpi.first.wpilib.plugins.core.WPILibCore;
++
+ /**
+  * The "New" wizard page allows setting the container for the new file as well
+  * as the file name. The page will only accept file name without the extension
+@@ -113,8 +115,8 @@ public class ExampleWizardChoicePage extends WizardPage {
+ 			}
+ 		}
+ 
+-		System.out.println(examples);
+-		System.out.println(tags);
++		WPILibCore.logInfo(examples.toString());
++		WPILibCore.logInfo(tags.toString());
+ 		
+ 		// Generate the tags tree
+ 		for (Tag tag : tags) {
+@@ -169,7 +171,7 @@ public class ExampleWizardChoicePage extends WizardPage {
+ 		try {
+ 			url = new URL(installURL, filename);
+ 		} catch (final MalformedURLException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("loadXMLResource()", e);
+ 			return null;
+ 		}
+ 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+@@ -179,13 +181,13 @@ public class ExampleWizardChoicePage extends WizardPage {
+ 			dBuilder = dbFactory.newDocumentBuilder();
+ 			doc = dBuilder.parse(url.openStream());
+ 		} catch (ParserConfigurationException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Error parsing "+filename, e);
+ 			return null;
+ 		} catch (SAXException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("SAX issue with "+filename, e);
+ 			return null;
+ 		} catch (IOException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Error reading "+filename, e);
+ 			return null;
+ 		}
+ 		doc.getDocumentElement().normalize();
+@@ -235,4 +237,4 @@ public class ExampleWizardChoicePage extends WizardPage {
+ 	public IExampleProject getExampleProject() {
+ 		return selectedExample;
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
+index d2b7235398ba60dcaf17f7191c7f6273cac6904f..354067ab11ab1a2ce7a35a648668e264f5aa0248 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
+@@ -2,7 +2,6 @@ package edu.wpi.first.wpilib.plugins.core.wizards;
+ 
+ import java.util.Map;
+ 
+-import javax.activation.FileDataSource;
+ import javax.swing.event.ChangeEvent;
+ import javax.swing.event.ChangeListener;
+ 
+@@ -14,7 +13,6 @@ import org.eclipse.swt.events.ModifyEvent;
+ import org.eclipse.swt.events.ModifyListener;
+ import org.eclipse.swt.events.SelectionAdapter;
+ import org.eclipse.swt.events.SelectionEvent;
+-import org.eclipse.swt.events.SelectionListener;
+ import org.eclipse.swt.layout.GridData;
+ import org.eclipse.swt.layout.GridLayout;
+ import org.eclipse.swt.widgets.Button;
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectCreationUtils.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectCreationUtils.java
+index 8f7ddc57f6b4fe3e420735ca68be853b4fd9c989..2f0cff61c60fe9835a5150444356363fbd489cbc 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectCreationUtils.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectCreationUtils.java
+@@ -22,6 +22,8 @@ import org.eclipse.core.runtime.CoreException;
+ import org.eclipse.core.runtime.IPath;
+ import org.eclipse.core.runtime.Path;
+ 
++import edu.wpi.first.wpilib.plugins.core.WPILibCore;
++
+ /**
+  * Utilities for creating a new project and files from templates. Uses
+  * IProjectCreator to provide hooks for generating the directory
+@@ -51,7 +53,7 @@ public class ProjectCreationUtils {
+ 			addFilesToProject(project, creator);
+ 			creator.finalize(project);
+ 		} catch (CoreException e) {
+-            e.printStackTrace();
++            WPILibCore.logError("Error creating project "+creator.getName(), e);
+             project = null;
+         }
+ 		
+@@ -75,7 +77,7 @@ public class ProjectCreationUtils {
+ 					newProject.open(null);
+ 				}
+ 			} catch (CoreException e) {
+-	            e.printStackTrace();
++                WPILibCore.logError("Can't create new project.", e);
+ 			}
+ 		}
+ 		
+@@ -121,8 +123,7 @@ public class ProjectCreationUtils {
+ 				URL url = new URL(creator.getProjectType().getBaseURL(), e.getValue());
+ 				createTemplateFile(project, e.getKey(), url, creator.getValues());
+ 			} catch (MalformedURLException e1) {
+-				// TODO Auto-generated catch block
+-				e1.printStackTrace();
++                WPILibCore.logError("Error adding file "+e.toString()+" to project.", e1);
+ 			}
+ 		}
+ 	}
+@@ -150,9 +151,9 @@ public class ProjectCreationUtils {
+ 		try {
+ 			return makeTemplateInputStream(url.openStream(), vals);
+ 		} catch (final MalformedURLException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Malformed URL "+url, e);
+ 		} catch (final IOException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Issue opening input stream.", e);
+ 		}
+ 		return null;
+ 	}
+@@ -163,7 +164,7 @@ public class ProjectCreationUtils {
+ 			str = readInput(stream);
+ 			stream.close();
+ 		} catch (final IOException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Error reading template.", e);
+ 			return null;
+ 		}
+ 		
+@@ -183,11 +184,10 @@ public class ProjectCreationUtils {
+ 			while ((ch = in.read()) > -1) {
+ 				buffer.append((char)ch);
+ 			}
+-			System.out.print("\n");
+ 			in.close();
+ 			return buffer.toString();
+ 		} catch (IOException e) {
+-			e.printStackTrace();
++            WPILibCore.logError("Error reading input.", e);
+ 			return null;
+ 		}
+ 	}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/WPILibCPPPlugin.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/WPILibCPPPlugin.java
+index b7525da52aa6d5005d1a5b572e00e4dc3289c954..f5f6a06c26bd9e118f38006c49e598358c4c9d05 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/WPILibCPPPlugin.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/WPILibCPPPlugin.java
+@@ -4,6 +4,7 @@ import java.io.File;
+ import java.util.Properties;
+ 
+ import org.eclipse.core.runtime.CoreException;
++import org.eclipse.core.runtime.Status;
+ import org.eclipse.ui.IStartup;
+ import org.eclipse.ui.plugin.AbstractUIPlugin;
+ import org.osgi.framework.BundleContext;
+@@ -89,4 +90,12 @@ public class WPILibCPPPlugin extends AbstractUIPlugin implements IStartup {
+ 		new CPPInstaller(getCurrentVersion()).installIfNecessary();
+ 	}
+ 
++
++	public static void logInfo(String msg) {
++		getDefault().getLog().log(new Status(Status.INFO, PLUGIN_ID, Status.OK, msg, null));
++	}
++
++	public static void logError(String msg, Exception e) {
++		getDefault().getLog().log(new Status(Status.ERROR, PLUGIN_ID, Status.OK, msg, e));
++	}
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java
+index 0b699bc875b9e8f98ad37887e53b802da88a4e76..bdc5c262692c6beb3264212e2ad30682e65e8c3a 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java
+@@ -31,7 +31,7 @@ public class CPPInstaller extends AbstractInstaller {
+ 	protected void updateInstalledVersion(String version) {
+ 		IPreferenceStore prefs = WPILibCPPPlugin.getDefault().getPreferenceStore();
+ 		if (prefs.getBoolean(PreferenceConstants.UPDATE_LIBRARY_VERSION)) {
+-			System.out.println("Forcing library version to "+version);
++			WPILibCPPPlugin.logInfo("Forcing library version to "+version);
+ 	    	Properties props = WPILibCore.getDefault().getProjectProperties(null);
+ 	    	props.setProperty("cpp-version", version);
+ 	    	WPILibCore.getDefault().saveGlobalProperties(props);
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java
+index 3026bb09db75269bcd6649965d28a9a1b61c8121..c8eb74ba28f49f6813d98135f818dd83a54fc140 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java
+@@ -1,39 +1,23 @@
+ package edu.wpi.first.wpilib.plugins.cpp.launching;
+ 
+-import java.io.File;
+-import java.lang.reflect.Method;
+ import java.util.ArrayList;
+ import java.util.Collection;
+-import java.util.HashMap;
+ import java.util.List;
+-import java.util.Map;
+-import java.util.Vector;
+ 
+ import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
+ import org.eclipse.cdt.debug.core.executables.Executable;
+ import org.eclipse.cdt.debug.core.executables.ExecutablesManager;
+-import org.eclipse.cdt.debug.mi.core.IGDBServerMILaunchConfigurationConstants;
+-import org.eclipse.cdt.debug.mi.core.IMIConstants;
+ import org.eclipse.cdt.debug.mi.core.IMILaunchConfigurationConstants;
+ import org.eclipse.cdt.launch.remote.IRemoteConnectionConfigurationConstants;
+-import org.eclipse.cdt.launch.remote.IRemoteConnectionHostConstants;
+-import org.eclipse.cdt.ui.ICDTConstants;
+ import org.eclipse.core.internal.resources.Resource;
+ import org.eclipse.core.resources.IFile;
+ import org.eclipse.core.resources.IProject;
+ import org.eclipse.core.runtime.CoreException;
+-import org.eclipse.core.runtime.NullProgressMonitor;
+-import org.eclipse.core.runtime.jobs.Job;
+-import org.eclipse.debug.core.DebugException;
+ import org.eclipse.debug.core.DebugPlugin;
+-import org.eclipse.debug.core.ILaunch;
+ import org.eclipse.debug.core.ILaunchConfigurationType;
+ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+ import org.eclipse.debug.core.ILaunchManager;
+-import org.eclipse.debug.internal.ui.launchConfigurations.LaunchHistory;
+ import org.eclipse.debug.ui.DebugUITools;
+-import org.eclipse.debug.ui.IDebugUIConstants;
+-import org.eclipse.debug.ui.ILaunchGroup;
+ import org.eclipse.debug.ui.ILaunchShortcut;
+ import org.eclipse.jface.viewers.ISelection;
+ import org.eclipse.jface.viewers.StructuredSelection;
+@@ -43,7 +27,6 @@ import org.eclipse.ui.IFileEditorInput;
+ import org.eclipse.ui.PlatformUI;
+ 
+ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+-import edu.wpi.first.wpilib.plugins.core.launching.AntLauncher;
+ import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
+ 
+ /**
+@@ -77,11 +60,10 @@ public class DeployLaunchShortcut implements ILaunchShortcut
+ 		// Extract resource from selection
+ 		StructuredSelection sel = (StructuredSelection) selection;
+ 		IProject activeProject = null;
+-		if (sel.getFirstElement() instanceof IProject)
+-		{
++		if (sel.getFirstElement() instanceof IProject) {
+ 			activeProject = (IProject) sel.getFirstElement();
+-		} else
+-		{
++		} else {
++			WPILibCPPPlugin.logError("Selection isn't a project: "+sel.toString(), null);
+ 			return;
+ 		}
+ 		
+@@ -94,8 +76,7 @@ public class DeployLaunchShortcut implements ILaunchShortcut
+ 	public void launch(IEditorPart editor, String mode)
+ 	{
+ 		// Extract resource from editor
+-		if (editor != null)
+-		{
++		if (editor != null)	{
+ 			IFileEditorInput input = (IFileEditorInput) editor.getEditorInput();
+ 			IFile file = input.getFile();
+ 			IProject activeProject = file.getProject();
+@@ -103,9 +84,8 @@ public class DeployLaunchShortcut implements ILaunchShortcut
+ 			// If editor existed, run config using extracted resource in
+ 			// indicated mode
+ 			runConfig(activeProject, mode, editor.getSite().getWorkbenchWindow().getShell());
+-		} else
+-		{
+-			System.err.println("editor was null");
++		} else {
++			WPILibCPPPlugin.logError("Editor was null.", null);
+ 		}
+ 		
+ 	}
+@@ -118,11 +98,10 @@ public class DeployLaunchShortcut implements ILaunchShortcut
+ 	 *            The mode it will be run in (ILaunchManager.RUN_MODE or
+ 	 *            ILaunchManager.DEBUG_MODE)
+ 	 */
+-	public void runConfig(IProject activeProj, String mode, Shell shell) //TODO: figure out UI issues. tjats why this is undocumented""
+-	{	
++	public void runConfig(IProject activeProj, String mode, Shell shell) {
++        // TODO: figure out UI issues. that's why this is undocumented
+ 		ILaunchConfigurationWorkingCopy config;
+-		try
+-		{
++		try {
+ 			config = getRemoteDebugConfig(activeProj);
+ 			//config.doSave(); // NOTE: For debugging
+ 			//org.eclipse.debug.core.DebugPlugin.getDefault().getLaunchManager().addLaunch(config.launch(mode, null));
+@@ -130,18 +109,13 @@ public class DeployLaunchShortcut implements ILaunchShortcut
+ 			//DebugUITools.openLaunchConfigurationPropertiesDialog(shell, config, "org.eclipse.cdt.launch.launchGroup");
+ 			//config.launch(mode, new NullProgressMonitor(), false, true);
+ 			DebugUITools.launch(config, mode);
+-		} catch (CoreException e)
+-		{
+-			System.err.println("Debug attach failed.");
+-			e.printStackTrace();
++		} catch (CoreException e) {
++			WPILibCPPPlugin.logError("Debug attach failed.", e);
+ 		}
+ 		
+-		try
+-		{
++		try {
+ 			activeProj.refreshLocal(Resource.DEPTH_INFINITE, null);
+-		} catch (Exception e)
+-		{
+-		}
++		} catch (Exception e) {}
+ 	}
+ 	
+ 	private ILaunchConfigurationWorkingCopy getRemoteDebugConfig(IProject activeProj) throws CoreException
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/RSEUtils.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/RSEUtils.java
+index 6a2bc68fb56c7a33e4402ab13902a0f8247c4403..b9891aac35ac9bb659d46e471d96506453f5f3bc 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/RSEUtils.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/RSEUtils.java
+@@ -2,9 +2,6 @@ package edu.wpi.first.wpilib.plugins.cpp.launching;
+ 
+ import java.util.Arrays;
+ 
+-import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
+-import org.eclipse.debug.core.DebugPlugin;
+-import org.eclipse.debug.core.ILaunchConfigurationType;
+ import org.eclipse.rse.core.IRSESystemType;
+ import org.eclipse.rse.core.PasswordPersistenceManager;
+ import org.eclipse.rse.core.RSECorePlugin;
+@@ -13,6 +10,8 @@ import org.eclipse.rse.core.model.ISystemProfile;
+ import org.eclipse.rse.core.model.ISystemRegistry;
+ import org.eclipse.rse.core.model.SystemSignonInformation;
+ 
++import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
++
+ public class RSEUtils {
+ 
+ 	public static IHost getTarget(int teamNumber) {
+@@ -23,14 +22,13 @@ public class RSEUtils {
+         // get the singleton RSE registry
+         try {
+ 			RSECorePlugin.waitForInitCompletion();
+-		} catch (InterruptedException e1) {
+-			// TODO Auto-generated catch block
+-			e1.printStackTrace();
++		} catch (InterruptedException e) {
++            WPILibCPPPlugin.logError("Error initializing RSE", e);
+ 		}
+         ISystemRegistry registry = RSECorePlugin.getDefault().getSystemRegistry();
+    
+         // get the default profile, used to store connections
+-        System.out.println("Profiles: "+Arrays.toString(registry.getActiveSystemProfiles()));
++        WPILibCPPPlugin.logInfo("Profiles: "+Arrays.toString(registry.getActiveSystemProfiles()));
+         ISystemProfile profile = registry.getActiveSystemProfiles()[0];
+    
+         // see if a host object already exists for "build.eclipse.org"
+@@ -48,7 +46,7 @@ public class RSEUtils {
+             			"", systemType);
+     			PasswordPersistenceManager.getInstance().add(info, true, false);
+             } catch (Exception e) {
+-                e.printStackTrace();
++                WPILibCPPPlugin.logError("Error connecting to RoboRIO.", e);
+             }
+         }
+         return host;
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/SimulateLaunchShortcut.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/SimulateLaunchShortcut.java
+index 9e7def44b47c509f3a4f09d5a04dae07e0557b75..fae0eae5ae30d22a7aa74cea3e0dafc6c47caa25 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/SimulateLaunchShortcut.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/SimulateLaunchShortcut.java
+@@ -18,6 +18,7 @@ import org.eclipse.ui.IFileEditorInput;
+ import org.eclipse.ui.PlatformUI;
+ 
+ import edu.wpi.first.wpilib.plugins.core.launching.AntLauncher;
++import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
+ 
+ /**
+  * Launch shortcut base functionality, common for deploying to the robot.
+@@ -95,8 +96,8 @@ public class SimulateLaunchShortcut implements ILaunchShortcut {
+ 		}
+ 		
+ 		if((lastDeploy != null)&&(!lastDeploy.isTerminated())){
+-			System.out.println("Last deploy running");
+-			//Find the server connection thread and kill it
++			WPILibCPPPlugin.logInfo("Last deploy running");
++			// Find the server connection thread and kill it
+ 			Vector<ThreadGroup> threadGroups = new Vector<ThreadGroup>();
+ 	        ThreadGroup root = Thread.currentThread().getThreadGroup().getParent();
+ 	        while (root.getParent() != null) {root = root.getParent();}
+@@ -109,24 +110,25 @@ public class SimulateLaunchShortcut implements ILaunchShortcut {
+             for(Thread current: threads){
+             	if(current != null){
+             		if(current.getName().equals(ANT_SERVER_THREAD_NAME)){
+-            			try{
+-            				//Manually end thread and then try terminating launch
++            			try {
++            				// Manually end thread and then try terminating launch
+             				Method stopMethod = current.getClass().getMethod("stop");
+             				stopMethod.invoke(current);
+             				lastDeploy.terminate();
+             				break;
+-            			}catch(Exception e){e.printStackTrace();}
++            			} catch(Exception e){
++                          WPILibCPPPlugin.logError("Error killing ant thread.", e);
++                        }
+             		}
+             	}
+             }
+             
+-            System.out.println("Waiting");
++            WPILibCPPPlugin.logInfo("Waiting");
+             try{wait(1000);}catch(Exception e){}
+-               
+ 		}
+ 		
+-		System.out.println("Running ant file: " + activeProj.getLocation().toOSString() + File.separator + "build.xml");
+-		System.out.println("Targets: " + targets + ", Mode: " + mode);
++		WPILibCPPPlugin.logInfo("Running ant file: " + activeProj.getLocation().toOSString() + File.separator + "build.xml");
++		WPILibCPPPlugin.logInfo("Targets: " + targets + ", Mode: " + mode);
+ 		lastDeploy = AntLauncher.runAntFile(new File (activeProj.getLocation().toOSString() + File.separator + "build.xml"), targets, null, mode);
+ 		
+ 		try {
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/preferences/CPPPreferencePage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/preferences/CPPPreferencePage.java
+index c9733a0d74663943a6959c0c9c43bc7fe07448f9..4ee009db4f4754946e0ecd1cca23dfe15a56c431 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/preferences/CPPPreferencePage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/preferences/CPPPreferencePage.java
+@@ -99,7 +99,7 @@ public class CPPPreferencePage
+ 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+ 	 */
+ 	public void init(IWorkbench workbench) {
+-		System.out.println("Preferences initialized.");
++		WPILibCPPPlugin.logInfo("Preferences initialized.");
+ 		Properties props = WPILibCore.getDefault().getProjectProperties(null);
+ 		getPreferenceStore().setValue(PreferenceConstants.LIBRARY_VERSION,
+ 				props.getProperty("cpp-version", WPILibCPPPlugin.getDefault().getCurrentVersion()));
+@@ -115,4 +115,4 @@ public class CPPPreferencePage
+     	WPILibCore.getDefault().saveGlobalProperties(props);
+ 		return super.performOk();
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/file_template/FileTemplateWizard.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/file_template/FileTemplateWizard.java
+index bf920eb5dab05e3f0d27cfa6ecba12f9f36b28a1..3094b1aedeedb9292b543fecf2494198861f7ec2 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/file_template/FileTemplateWizard.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/file_template/FileTemplateWizard.java
+@@ -62,7 +62,7 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
+ 		final IProject project = page.getProject();
+ 		final String className = page.getClassName();
+ 		final String folderName = page.getFolder();
+-		System.out.println("Class: "+className+" Folder: "+folderName);
++		WPILibCPPPlugin.logInfo("Class: "+className+" Folder: "+folderName);
+ 		IRunnableWithProgress op = new IRunnableWithProgress() {
+ 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
+ 				try {
+@@ -105,8 +105,7 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
+ 			url = new URL(WPILibCPPPlugin.getDefault().getBundle().getEntry("/resources/templates/"), source+".cpp");
+ 			ProjectCreationUtils.createTemplateFile(project, filepath+".cpp", url, map);
+ 		} catch (MalformedURLException e) {
+-			// TODO Auto-generated catch block
+-			e.printStackTrace();
++            WPILibCPPPlugin.logError("Malforemd URL: "+WPILibCPPPlugin.getDefault().getBundle().getEntry("/resources/templates/")+"/"+source+".h", e);
+ 		}
+ 	}
+ 
+@@ -117,9 +116,9 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
+ 	 */
+ 	public void init(IWorkbench workbench, IStructuredSelection selection) {
+ 		this.selection = selection;
+-		System.out.println(selection);
++		WPILibCPPPlugin.logInfo(selection.toString());
+ 		Object element = ((StructuredSelection) selection).getFirstElement();
+-		System.out.println(element.getClass());
++		WPILibCPPPlugin.logInfo(element.getClass().toString());
+ 		if (element instanceof IResource) {
+ 			project = ((IResource) element).getProject();
+ 		} else if (element instanceof ISourceRoot) {
+@@ -130,6 +129,6 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
+ 			project = ((ISourceRoot) element).getCProject().getProject();
+ 		} else if (element instanceof ICContainer) {
+ 			project = ((ICContainer) element).getCProject().getProject();
+-		} else System.out.println("Element not instance of IResource: "+element.getClass());
++		} else WPILibCPPPlugin.logInfo("Element not instance of IResource: "+element.getClass());
+ 	}
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/file_template/FileTemplateWizardMainPage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/file_template/FileTemplateWizardMainPage.java
+index 02f498aa78d90f6684f732e2a973c5ca1928be0e..b9a71a5e0d0390f43d5469962334747ee82cb730 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/file_template/FileTemplateWizardMainPage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/file_template/FileTemplateWizardMainPage.java
+@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
+ import edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature;
+ import edu.wpi.first.wpilib.plugins.core.wizards.IProjectFilter;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectComboField;
++import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
+ 
+ /**
+  * The "New" wizard page allows setting the container for the new file as well
+@@ -67,7 +68,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
+ 					return project.hasNature(FRCProjectNature.FRC_PROJECT_NATURE)
+ 							&& project.hasNature(CCProjectNature.C_NATURE_ID);
+ 				} catch (CoreException e) {
+-					e.printStackTrace();
++                    WPILibCPPPlugin.logError("Error checking for FRC C++ project.", e);
+ 					return false;
+ 				}
+ 			}
+@@ -173,7 +174,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
+ 	}
+ 	
+ 	public String getDefaultFolder() {
+-		System.out.println("Project: "+project);
++		WPILibCPPPlugin.logInfo("Project: "+project);
+ 		return "src"+File.separator+ending;
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/NewCPPWizard.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/NewCPPWizard.java
+index 011b0d433a50667eaf331fd695835d75df0263d0..3c3bc9b0c1f54698213843de87f7f022520f1e98 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/NewCPPWizard.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/NewCPPWizard.java
+@@ -19,6 +19,7 @@ import edu.wpi.first.wpilib.plugins.core.wizards.NewProjectMainPage;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectCreationUtils;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectType;
+ import edu.wpi.first.wpilib.plugins.core.wizards.TeamNumberPage;
++import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
+ 
+ /**
+  * 
+@@ -73,7 +74,7 @@ public class NewCPPWizard extends Wizard implements INewWizard {
+ 		final String teamNumber = TeamNumberPage.getTeamNumberFromPage(teamNumberPage);
+ 		final ProjectType projectType = page.getProjectType();
+ 		final String worldName = page.getWorld();
+-		System.out.println("Project: "+projectName+" Project Type: "+projectType);
++		WPILibCPPPlugin.logInfo("Project: "+projectName+" Project Type: "+projectType);
+ 		IRunnableWithProgress op = new IRunnableWithProgress() {
+ 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
+ 				try {
+@@ -118,4 +119,4 @@ public class NewCPPWizard extends Wizard implements INewWizard {
+ 	public void init(IWorkbench workbench, IStructuredSelection selection) {
+ 		this.selection = selection;
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/WPIRobotCPPProjectCreator.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/WPIRobotCPPProjectCreator.java
+index dc17b4ed063f172cd7904b4dc9f935b5dba4c508..a2dea99127c5fa665e3df5d74b98b620a5d5a929 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/WPIRobotCPPProjectCreator.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/WPIRobotCPPProjectCreator.java
+@@ -72,8 +72,7 @@ public class WPIRobotCPPProjectCreator implements IProjectCreator {
+ 			CCorePlugin.getDefault().createCDTProject(project.getDescription(), project, null);
+ 			project.open(null);
+ 		} catch (CoreException e) {
+-			// TODO Auto-generated catch block
+-			e.printStackTrace();
++            WPILibCPPPlugin.logError("Error intializing FRC C++ project.", e);
+ 		}
+ 		
+ 		//config.getToolChain().getOptionById("cdt.managedbuild.option.gnu.cross.prefix").setValue(prefix);
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/WPILibJavaPlugin.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/WPILibJavaPlugin.java
+index af2c28cc91c197c1af7d0483ccaf5366aa278bd9..9f3d8e2008d6026271eb9bae8af4d2761d063a2f 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/WPILibJavaPlugin.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/WPILibJavaPlugin.java
+@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
+ import org.eclipse.core.resources.ResourcesPlugin;
+ import org.eclipse.core.runtime.CoreException;
+ import org.eclipse.core.runtime.Path;
++import org.eclipse.core.runtime.Status;
+ import org.eclipse.jdt.core.JavaCore;
+ import org.eclipse.jdt.core.JavaModelException;
+ import org.eclipse.ui.IStartup;
+@@ -73,7 +74,7 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
+ 				return props.getProperty("version");
+ 			}
+ 		} catch (CoreException e) {
+-			e.printStackTrace(System.err);
++            WPILibJavaPlugin.logError("Error getting properties.", e);
+ 			return "DEVELOPMENT";
+ 		}
+ 	}
+@@ -85,7 +86,7 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
+ 			File file = new File(WPILibCore.getDefault().getWPILibBaseDir()+"/java/"+getCurrentVersion()+"/ant/build.properties");
+ 			props = new AntPropertiesParser(new FileInputStream(file)).getProperties(defaults);
+ 		} catch (Exception e) {
+-			e.printStackTrace();
++            WPILibJavaPlugin.logError("Error getting properties.", e);
+ 			props = new Properties(defaults);
+ 		}
+ 		return props;
+@@ -102,7 +103,7 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
+ 	      try {
+ 	    	  updateVariables(project);
+ 	      } catch (CoreException e) {
+-	        e.printStackTrace();
++            WPILibJavaPlugin.logError("Error updating projects.", e);
+ 	      }
+ 	    }
+ 	}
+@@ -116,7 +117,8 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
+ 			JavaCore.setClasspathVariable("networktables", new Path(props.getProperty("networktables.jar")), null);
+ 			JavaCore.setClasspathVariable("networktables.sources", new Path(props.getProperty("networktables.sources")), null);
+ 		} catch (JavaModelException e) {
+-			e.printStackTrace(); // Classpath variables didn't get set
++            // Classpath variables didn't get set
++            WPILibJavaPlugin.logError("Error setting classpath..", e);
+ 		}
+ 	}
+ 
+@@ -124,4 +126,12 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
+ 	public void earlyStartup() {
+ 		new JavaInstaller(getCurrentVersion()).installIfNecessary();
+ 	}
++
++	public static void logInfo(String msg) {
++		getDefault().getLog().log(new Status(Status.INFO, PLUGIN_ID, Status.OK, msg, null));
++	}
++
++	public static void logError(String msg, Exception e) {
++		getDefault().getLog().log(new Status(Status.ERROR, PLUGIN_ID, Status.OK, msg, e));
++	}
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/installer/JavaInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/installer/JavaInstaller.java
+index f32a23008ea5e992f1215a828f2bbdd9faf7ee11..d3e023ddf314d2c54900ad2b5a2bf54e219e73bb 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/installer/JavaInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/installer/JavaInstaller.java
+@@ -31,7 +31,7 @@ public class JavaInstaller extends AbstractInstaller {
+ 	protected void updateInstalledVersion(String version) {
+ 		IPreferenceStore prefs = WPILibJavaPlugin.getDefault().getPreferenceStore();
+ 		if (prefs.getBoolean(PreferenceConstants.UPDATE_LIBRARY_VERSION)) {
+-			System.out.println("Forcing library version to "+version);
++			WPILibJavaPlugin.logInfo("Forcing library version to "+version);
+ 	    	Properties props = WPILibCore.getDefault().getProjectProperties(null);
+ 	    	props.setProperty("version", version);
+ 	    	WPILibCore.getDefault().saveGlobalProperties(props);
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/launching/JavaLaunchShortcut.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/launching/JavaLaunchShortcut.java
+index 9518907175421898fda95f85d88cc1a90924c4e1..c67daa32b3705c5c35fcaa8409fe7df336d6e758 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/launching/JavaLaunchShortcut.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/launching/JavaLaunchShortcut.java
+@@ -20,7 +20,6 @@ import org.eclipse.debug.core.model.IStreamMonitor;
+ import org.eclipse.debug.ui.IDebugUIConstants;
+ import org.eclipse.debug.ui.ILaunchShortcut;
+ import org.eclipse.jdt.core.IJavaElement;
+-import org.eclipse.jdt.core.IJavaProject;
+ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
+ import org.eclipse.jdt.launching.IVMConnector;
+ import org.eclipse.jdt.launching.JavaRuntime;
+@@ -34,6 +33,7 @@ import com.sun.jdi.connect.Connector.Argument;
+ 
+ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+ import edu.wpi.first.wpilib.plugins.core.launching.AntLauncher;
++import edu.wpi.first.wpilib.plugins.java.WPILibJavaPlugin;
+ 
+ @SuppressWarnings("restriction")
+ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
+@@ -54,35 +54,36 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
+ 	public String getLaunchType() {return DEPLOY_TYPE;}
+ 
+ 	public void launch(ISelection selection, String mode) {
+-		//Extract resource from selection
++		// Extract resource from selection
+ 		StructuredSelection sel = (StructuredSelection)selection;
+ 		IProject activeProject = null;
+-		//NOTE:  This caused issues earlier, as the sel return was treated as a workspace, instead of a project
+-		//When it is a valid FIRST project, the selection is always a JavaProject
+-		if(sel.getFirstElement() instanceof IJavaProject){
+-			activeProject = ((IJavaProject)sel.getFirstElement()).getProject();
+-		}else if(sel.getFirstElement() instanceof IJavaElement){
++		// NOTE:  This caused issues earlier, as the sel return was treated as a workspace, instead of a project
++		// When it is a valid FIRST project, the selection is always a JavaProject
++		if(sel.getFirstElement() instanceof IProject) {
++			activeProject = ((IProject)sel.getFirstElement()).getProject();
++		} else if(sel.getFirstElement() instanceof IJavaElement) {
+ 			activeProject = ((IJavaElement)sel.getFirstElement()).getJavaProject().getProject();
+-		}else{
++		} else {
++			WPILibJavaPlugin.logError("Selection isn't a project: "+sel.toString(), null);
+ 			return;
+ 		}
+         
+-        //Run config using project found in extracted resource, with indicated mode
++        // Run config using project found in extracted resource, with indicated mode
+         runConfig(activeProject, mode);
+ 	}
+ 
+ 	@Override
+ 	public void launch(IEditorPart editor, String mode) {
+-		//Extract resource from editor
+-		if(editor  != null){
++		// Extract resource from editor
++		if (editor  != null) {
+ 		    IFileEditorInput input = (IFileEditorInput)editor.getEditorInput();
+ 		    IFile file = input.getFile();
+ 		    IProject activeProject = file.getProject();
+ 		    
+-		    //If editor existed, run config using extracted resource in indicated mode
++		    // If editor existed, run config using extracted resource in indicated mode
+ 		    runConfig(activeProject, mode);
+-		}else{
+-			System.err.println("editor was null");
++		} else {
++			WPILibJavaPlugin.logError("Editor was null.", null);
+ 		}
+ 
+ 	}
+@@ -117,7 +118,7 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
+ 		}
+ 		
+ 		if((lastDeploy != null)&&(!lastDeploy.isTerminated())){
+-			System.out.println("Last deploy running");
++			WPILibJavaPlugin.logInfo("Last deploy running");
+ 			//Find the server connection thread and kill it
+ 			Vector<ThreadGroup> threadGroups = new Vector<ThreadGroup>();
+ 	        ThreadGroup root = Thread.currentThread().getThreadGroup().getParent();
+@@ -137,18 +138,20 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
+             				stopMethod.invoke(current);
+             				lastDeploy.terminate();
+             				break;
+-            			}catch(Exception e){e.printStackTrace();}
++            			}  catch(Exception e) {
++                            WPILibJavaPlugin.logError("Error stopping ant", e);
++                        }
+             		}
+             	}
+             }
+             
+-            System.out.println("Waiting");
++            WPILibJavaPlugin.logInfo("Waiting");
+             try{wait(1000);}catch(Exception e){}
+                
+ 		}
+ 		
+-		System.out.println("Running ant file: " + activeProj.getLocation().toOSString() + File.separator + "build.xml");
+-		System.out.println("Targets: " + targets + ", Mode: " + mode);
++		WPILibJavaPlugin.logInfo("Running ant file: " + activeProj.getLocation().toOSString() + File.separator + "build.xml");
++		WPILibJavaPlugin.logInfo("Targets: " + targets + ", Mode: " + mode);
+ 		lastDeploy = AntLauncher.runAntFile(new File (activeProj.getLocation().toOSString() + File.separator + "build.xml"), targets, null, mode);
+ 		
+ 		if((mode.equals(ILaunchManager.DEBUG_MODE))&&(getLaunchType().equals(DEPLOY_TYPE))) {
+@@ -157,8 +160,7 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
+ 				config = getRemoteDebugConfig(activeProj);
+ 				startDebugConfig(config, lastDeploy);
+ 			} catch (CoreException e) {
+-				System.err.println("Debug attach failed.");
+-				e.printStackTrace();
++                WPILibJavaPlugin.logError("Debug attach failed", e);
+ 			}
+ 		}
+ 		
+@@ -179,7 +181,7 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
+ 		Map<String, String> argMap = new HashMap<String, String>(def.size());
+ 		argMap.put("hostname", getHostname(activeProj));
+ 		argMap.put("port", "8348");
+-		System.out.println(argMap);
++		WPILibJavaPlugin.logInfo(argMap.toString());
+ 		config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_CONNECT_MAP, argMap);
+ 		return config;
+ 	}
+@@ -196,8 +198,7 @@ public abstract class JavaLaunchShortcut implements ILaunchShortcut {
+ 					try {
+ 						config.launch(ILaunchManager.DEBUG_MODE, null);
+ 					} catch (CoreException e) {
+-						// TODO Auto-generated catch block
+-						e.printStackTrace();
++                        WPILibJavaPlugin.logError("Error starting debug config..", e);
+ 					}
+ 					monitor.removeListener(this);
+ 				}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/preferences/JavaPreferencePage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/preferences/JavaPreferencePage.java
+index b01574fbf4dd0ac3fba86ee5a6fdfb54d195980a..b35c926e9078465cd612475188ce005c9f475907 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/preferences/JavaPreferencePage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/preferences/JavaPreferencePage.java
+@@ -76,7 +76,7 @@ public class JavaPreferencePage
+ 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+ 	 */
+ 	public void init(IWorkbench workbench) {
+-		System.out.println("Preferences initialized.");
++		WPILibJavaPlugin.logInfo("Preferences initialized.");
+ 		Properties props = WPILibCore.getDefault().getProjectProperties(null);
+ 		getPreferenceStore().setValue(PreferenceConstants.LIBRARY_VERSION,
+ 				props.getProperty("version", WPILibJavaPlugin.getDefault().getCurrentVersion()));
+@@ -93,4 +93,4 @@ public class JavaPreferencePage
+     	WPILibJavaPlugin.getDefault().updateProjects();
+ 		return super.performOk();
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizard.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizard.java
+index 72ddc74ca8da1d40d5ef338c39513b183957a34a..73a653bca11cb61d5131c950f9819d498adf7d6c 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizard.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizard.java
+@@ -61,7 +61,7 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
+ 		final IProject project = page.getProject();
+ 		final String className = page.getClassName();
+ 		final String packageName = page.getPackage();
+-		System.out.println("Class: "+className+" Package: "+packageName);
++		WPILibJavaPlugin.logInfo("Class: "+className+" Package: "+packageName);
+ 		IRunnableWithProgress op = new IRunnableWithProgress() {
+ 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
+ 				try {
+@@ -99,8 +99,7 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
+ 			URL url = new URL(WPILibJavaPlugin.getDefault().getBundle().getEntry("/resources/templates/"), source);
+ 			ProjectCreationUtils.createTemplateFile(project, filepath, url, map);
+ 		} catch (MalformedURLException e) {
+-			// TODO Auto-generated catch block
+-			e.printStackTrace();
++            WPILibJavaPlugin.logError("Error finishing making file: "+className, e);
+ 		}
+ 	}
+ 
+@@ -111,9 +110,9 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
+ 	 */
+ 	public void init(IWorkbench workbench, IStructuredSelection selection) {
+ 		this.selection = selection;
+-		System.out.println(selection);
++		WPILibJavaPlugin.logInfo(selection.toString());
+ 		Object element = ((StructuredSelection) selection).getFirstElement();
+-		if (element != null) System.out.println(element.getClass());
++		if (element != null) WPILibJavaPlugin.logInfo(element.getClass().toString());
+ 		if (element instanceof IResource) {
+ 			project = ((IResource) element).getProject();
+ 		} else if (element instanceof IPackageFragment) {
+@@ -122,6 +121,6 @@ public class FileTemplateWizard extends Wizard implements INewWizard {
+ 			project = ((IPackageFragmentRoot) element).getJavaProject().getProject();
+ 		} else if (element instanceof ICompilationUnit) {
+ 			project = ((ICompilationUnit) element).getJavaProject().getProject();
+-		} else System.out.println("Element not instance of IResource");
++		} else WPILibJavaPlugin.logInfo("Element not instance of IResource");
+ 	}
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizardMainPage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizardMainPage.java
+index 4bb63be5c1399b1a751fe518ee2b6db1c9a7da65..cd08a3281d10246d49b0da0b8dacff97b0eb7da0 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizardMainPage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizardMainPage.java
+@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Text;
+ import edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature;
+ import edu.wpi.first.wpilib.plugins.core.wizards.IProjectFilter;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectComboField;
++import edu.wpi.first.wpilib.plugins.java.WPILibJavaPlugin;
+ 
+ /**
+  * The "New" wizard page allows setting the container for the new file as well
+@@ -68,7 +69,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
+ 							return project.hasNature(FRCProjectNature.FRC_PROJECT_NATURE)
+ 									&& project.hasNature(JavaCore.NATURE_ID);
+ 						} catch (CoreException e) {
+-							e.printStackTrace();
++                            WPILibJavaPlugin.logError("Error looking for FRCJava project.", e);
+ 							return false;
+ 						}
+ 					}
+@@ -177,7 +178,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
+ 	}
+ 	
+ 	public String getDefaultPackage() {
+-		System.out.println("Project: "+project);
++		WPILibJavaPlugin.logInfo("Project: "+project);
+ 		String defaultPackage = null;
+ 		if (project != null) {
+ 			try {
+@@ -193,11 +194,10 @@ public class FileTemplateWizardMainPage extends WizardPage {
+ 				}
+ 				if (defaultPackage == null) defaultPackage = backupPackage;
+ 			} catch (JavaModelException e) {
+-				// TODO Auto-generated catch block
+-				e.printStackTrace();
++                WPILibJavaPlugin.logError("Error getting default package.", e);
+ 			}
+ 		}
+ 		if (defaultPackage != null) return defaultPackage;
+ 		else return "";
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/newproject/NewJavaWizard.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/newproject/NewJavaWizard.java
+index 348f70542ad3d5eb4ad8ae71d005a6330d27ed32..a7b545909d56cd87a31a994bbf709d82900aa177 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/newproject/NewJavaWizard.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/newproject/NewJavaWizard.java
+@@ -19,6 +19,7 @@ import edu.wpi.first.wpilib.plugins.core.wizards.NewProjectMainPage;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectCreationUtils;
+ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectType;
+ import edu.wpi.first.wpilib.plugins.core.wizards.TeamNumberPage;
++import edu.wpi.first.wpilib.plugins.java.WPILibJavaPlugin;
+ 
+ /**
+  * 
+@@ -73,7 +74,7 @@ public class NewJavaWizard extends Wizard implements INewWizard {
+ 		final String packageName = page.getPackage();
+ 		final ProjectType projectType = page.getProjectType();
+ 		final String worldName = page.getWorld();
+-		System.out.println("Project: "+projectName+" Package: "+packageName+" Project Type: "+projectType);
++		WPILibJavaPlugin.logInfo("Project: "+projectName+" Package: "+packageName+" Project Type: "+projectType);
+ 		IRunnableWithProgress op = new IRunnableWithProgress() {
+ 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
+ 				try {
+@@ -118,4 +119,4 @@ public class NewJavaWizard extends Wizard implements INewWizard {
+ 	public void init(IWorkbench workbench, IStructuredSelection selection) {
+ 		this.selection = selection;
+ 	}
+-}
+\ No newline at end of file
++}

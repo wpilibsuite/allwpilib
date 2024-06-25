@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Wed, 22 Oct 2014 11:55:19 -0400
+Subject: [PATCH 0434/6262] Increases tolerances for the PID tests
+
+The tolerance is now a little bit more loose but still demonstrates that the PID works correctly.
+
+Change-Id: I9ca74e66fd096c49be7de61f218d5651b0ca0586
+---
+ .../src/main/java/edu/wpi/first/wpilibj/PIDTest.java     | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
+index 0cb0d68c8bc60b652d9a59168839c7b38953bb8e..c29896ed289ed49e67f148b00389aa6a8d90dc3f 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
+@@ -44,9 +44,8 @@ public class PIDTest extends AbstractComsSetup {
+ 	private static final Logger logger = Logger.getLogger(PIDTest.class.getName());
+ 	private NetworkTable table;
+ 	
+-	private static final double absoluteTollerance = 20;
+-	private static final double outputRange = 0.19;
+-	
++	private static final double absoluteTollerance = 30;
++	private static final double outputRange = 0.2;	
+ 	
+ 	private PIDController controller = null;
+ 	private static MotorEncoderFixture me = null;
+@@ -173,7 +172,7 @@ public class PIDTest extends AbstractComsSetup {
+ 		controller.disable();
+ 		controller.setSetpoint(setpoint);
+ 		controller.enable();
+-		assertEquals(setpoint, new Double(controller.getSetpoint()));
++		assertEquals("Did not correctly set set-point",setpoint, new Double(controller.getSetpoint()));
+ 	}
+ 
+ 	@Test (timeout = 6000)
+@@ -187,7 +186,7 @@ public class PIDTest extends AbstractComsSetup {
+ 		controller.enable();
+ 		Timer.delay(5);
+ 		controller.disable();
+-		assertTrue(pidData() + "Controller Error: " + controller.getError(), controller.onTarget());
++		assertTrue(pidData() + "Was not on Target. Controller Error: " + controller.getError(), controller.onTarget());
+ 	}
+ 	
+ 	private String pidData(){

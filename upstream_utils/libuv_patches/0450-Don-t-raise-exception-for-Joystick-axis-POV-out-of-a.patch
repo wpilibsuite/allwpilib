@@ -1,0 +1,95 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 24 Oct 2014 23:47:17 -0700
+Subject: [PATCH 0450/6262] Don't raise exception for Joystick axis/POV out of
+ active range. Shorten error message and change to Warning (filtered by DS by
+ default)
+
+Return 0.0 in this case (as it can be commonly caused by
+the joystick not being plugged in).
+
+Still raise exception (Java) / set error (C++) if the asked-for axis/POV
+is higher than kMaxJoystickAxes/kMaxJoystickPOVs.
+
+See artf3673.
+
+Change-Id: I4847c5badb358ed08f01170724ec1446af2e4ab9
+---
+ wpilibc/wpilibC++Devices/src/DriverStation.cpp | 10 ++++++++--
+ .../edu/wpi/first/wpilibj/DriverStation.java   | 18 ++++++++++++++----
+ 2 files changed, 22 insertions(+), 6 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/src/DriverStation.cpp b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+index e1ca182761691f05f4b53eb35a908898637142cc..7a77f115e7ad723de9629484cdfccfe33e1b8657 100644
+--- a/wpilibc/wpilibC++Devices/src/DriverStation.cpp
++++ b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+@@ -194,7 +194,10 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
+ 
+ 	if (axis >= m_joystickAxes[stick].count)
+ 	{
+-		wpi_setWPIError(BadJoystickAxis);
++		if (axis >= kMaxJoystickAxes)
++			wpi_setWPIError(BadJoystickAxis);
++		else
++			ReportError("WARNING: Joystick Axis missing, check if all controllers are plugged in\n");
+ 		return 0.0f;
+ 	}
+ 
+@@ -224,7 +227,10 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
+ 
+ 	if (pov >= m_joystickPOVs[stick].count)
+ 	{
+-		wpi_setWPIError(BadJoystickAxis);
++		if (pov >= kMaxJoystickPOVs)
++			wpi_setWPIError(BadJoystickAxis);
++		else
++			ReportError("WARNING: Joystick POV missing, check if all controllers are plugged in\n");
+ 		return 0;
+ 	}
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index bbabd8d6b3f395e1ef3b2e5562c3371c191319d8..dc4d463a3e6fe123bc46649cfab6bf5e4c3a189b 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -223,13 +223,18 @@ public class DriverStation implements RobotState.Interface {
+      */
+     public double getStickAxis(int stick, int axis) {
+         if(stick < 0 || stick >= kJoystickPorts) {
+-            throw new RuntimeException("Joystick index is out of range, should be 0-3");
++            throw new RuntimeException("Joystick index is out of range, should be 0-5");
+         }
+ 
+-        if (axis < 0 || axis >= m_joystickAxes[stick].length) {
++        if (axis < 0 || axis >= FRCNetworkCommunicationsLibrary.kMaxJoystickAxes) {
+             throw new RuntimeException("Joystick axis is out of range");
+         }
+ 
++        if (axis >= m_joystickAxes[stick].length) {
++			reportError("WARNING: Joystick axis " + axis + " on port " + stick + " not available, check if controller is plugged in\n", false);
++            return 0.0;
++        }
++
+         byte value = (byte)m_joystickAxes[stick][axis];
+ 
+         if(value < 0) {
+@@ -246,13 +251,18 @@ public class DriverStation implements RobotState.Interface {
+      */
+     public int getStickPOV(int stick, int pov) {
+         if(stick < 0 || stick >= kJoystickPorts) {
+-            throw new RuntimeException("Joystick index is out of range, should be 0-3");
++            throw new RuntimeException("Joystick index is out of range, should be 0-5");
+         }
+ 
+-        if (pov < 0 || pov >= m_joystickPOVs[stick].length) {
++        if (pov < 0 || pov >= FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs) {
+             throw new RuntimeException("Joystick POV is out of range");
+         }
+ 
++        if (pov >= m_joystickPOVs[stick].length) {
++			reportError("WARNING: Joystick POV " + pov + " on port " + stick + " not available, check if controller is plugged in\n", false);
++            return 0;
++        }
++
+         return m_joystickPOVs[stick][pov];
+     }
+ 

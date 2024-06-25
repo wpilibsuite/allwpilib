@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Wed, 24 Sep 2014 16:19:17 -0400
+Subject: [PATCH 0362/6262] Change RobotState functions to return actual values
+ (this time with nullptrs) [artf3611]
+
+Change-Id: Icbe8fbf3d936ab696fed7f264bdf49b95d35c0de
+---
+ wpilibc/wpilibC++/src/RobotState.cpp | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/src/RobotState.cpp b/wpilibc/wpilibC++/src/RobotState.cpp
+index 33e22a15459ae1d9325c37341e110355c41b8984..747000aaab2f8d4c3d7d54d1aedb821f7c3d4b7e 100644
+--- a/wpilibc/wpilibC++/src/RobotState.cpp
++++ b/wpilibc/wpilibC++/src/RobotState.cpp
+@@ -7,35 +7,35 @@ void RobotState::SetImplementation(RobotStateInterface* i) {
+ }
+ 
+ bool RobotState::IsDisabled() {
+-    if (impl != 0) {
++    if (impl != nullptr) {
+         return impl->IsDisabled();
+     }
+     return true;
+ }
+ 
+ bool RobotState::IsEnabled() {
+-    if (impl != 0) {
++    if (impl != nullptr) {
+         return impl->IsEnabled();
+     }
+     return false;
+ }
+ 
+ bool RobotState::IsOperatorControl() {
+-    if (impl != 0) {
++    if (impl != nullptr) {
+         return impl->IsOperatorControl();
+     }
+     return true;
+ }
+ 
+ bool RobotState::IsAutonomous() {
+-    if (impl != 0) {
++    if (impl != nullptr) {
+         return impl->IsAutonomous();
+     }
+     return false;
+ }
+ 
+ bool RobotState::IsTest() {
+-    if (impl != 0) {
++    if (impl != nullptr) {
+         return impl->IsTest();
+     }
+     return false;

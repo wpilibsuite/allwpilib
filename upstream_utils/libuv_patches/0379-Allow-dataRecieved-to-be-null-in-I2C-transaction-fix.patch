@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 1 Oct 2014 14:47:16 -0400
+Subject: [PATCH 0379/6262] Allow dataRecieved to be null in I2C transaction
+ (fixes artf3603)
+
+Change-Id: I02fb5ba8c5e0677b710a8bd63e98a4851c52883e
+---
+ .../src/main/java/edu/wpi/first/wpilibj/I2C.java             | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/I2C.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/I2C.java
+index 224921ddcca60a787c813bff2faa53d842c8c60b..516a06bf042b15d7c22a426502ff0ca749cb8531 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/I2C.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/I2C.java
+@@ -107,7 +107,10 @@ public class I2C extends SensorBase {
+ 			}
+ 		}
+ 		HALUtil.checkStatus(status);*/
+-		dataReceivedBuffer.get(dataReceived);
++		if(receiveSize > 0 && dataReceived != null)
++		{
++			dataReceivedBuffer.get(dataReceived);
++		}
+ 		return aborted;
+ 	}
+ 

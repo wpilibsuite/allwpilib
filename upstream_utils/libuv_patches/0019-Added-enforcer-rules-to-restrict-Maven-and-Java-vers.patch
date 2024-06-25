@@ -1,0 +1,82 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Malmsten <pmalmsten@gmail.com>
+Date: Sun, 26 Jan 2014 19:20:27 -0500
+Subject: [PATCH 0019/6262] Added enforcer rules to restrict Maven and Java
+ versions
+
+---
+ maven-utilities/athena/library-jar/pom.xml | 23 ++++++++++++++++++
+ pom.xml                                    | 28 ++++++++++++++++++++++
+ 2 files changed, 51 insertions(+)
+
+diff --git a/maven-utilities/athena/library-jar/pom.xml b/maven-utilities/athena/library-jar/pom.xml
+index 5a828b29bc0c3bc77927538da3353b73e897dee3..7709fd323421f36194cb1f8cd213ddee4d465a87 100644
+--- a/maven-utilities/athena/library-jar/pom.xml
++++ b/maven-utilities/athena/library-jar/pom.xml
+@@ -46,6 +46,29 @@
+ 		</plugin>
+ 	  </plugins>
+     </pluginManagement>
++
++    <plugins>
++      <plugin>
++	<groupId>org.apache.maven.plugins</groupId>
++	<artifactId>maven-enforcer-plugin</artifactId>
++	<version>1.3.1</version>
++	<executions>
++	  <execution>
++	    <id>enforce-maven</id>
++	    <goals>
++	      <goal>enforce</goal>
++	    </goals>
++	    <configuration>
++	      <rules>
++		<requireJavaVersion>
++		  <version>1.7.0</version>
++		</requireJavaVersion>
++	      </rules>    
++	    </configuration>
++	  </execution>
++	</executions>
++      </plugin>
++    </plugins>
+   </build>
+ 
+   <profiles>
+diff --git a/pom.xml b/pom.xml
+index a25b4a22fb7782d5cba666f2e5fe584d5ebbbf3d..bdf9670ab370d9cfe2aa9d3704733f60b2c4b79b 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -16,4 +16,32 @@
+     <module>wpilibc</module>
+     <module>wpilibj</module>
+   </modules>
++  
++  <build>
++    <plugins>
++      <plugin>
++        <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-enforcer-plugin</artifactId>
++        <version>1.3.1</version>
++        <executions>
++          <execution>
++            <id>enforce-maven</id>
++            <goals>
++              <goal>enforce</goal>
++            </goals>
++            <configuration>
++              <rules>
++                <requireMavenVersion>
++                  <!-- Require Maven version > 3.0.0, but exclude
++                  3.1.0 due to http://jira.codehaus.org/browse/MNG-5503
++                  -->
++                  <version>[3.0.0,3.1.0), (3.1.0,)</version>
++                </requireMavenVersion>
++              </rules>    
++            </configuration>
++          </execution>
++        </executions>
++      </plugin>
++    </plugins>
++  </build>
+ </project>

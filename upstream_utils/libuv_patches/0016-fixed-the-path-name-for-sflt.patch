@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: brad <brad@bradhouse.com>
+Date: Sun, 26 Jan 2014 13:56:15 -0500
+Subject: [PATCH 0016/6262] fixed the path name for sflt
+
+---
+ wpilibj/wpilibJavaJNI/pom.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJavaJNI/pom.xml b/wpilibj/wpilibJavaJNI/pom.xml
+index 06434e05f15e9c4399cb362ec0bbe58cf4eadd6d..7a0bb2961b0fb3e0e037349f904d026ba84ab390 100644
+--- a/wpilibj/wpilibJavaJNI/pom.xml
++++ b/wpilibj/wpilibJavaJNI/pom.xml
+@@ -49,7 +49,7 @@
+   </pluginRepositories>
+   
+   <properties>
+-    <embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-slft${file.separator}jdk1.7.0_45</embeddedJDKHome>
++    <embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-sflt${file.separator}jdk1.7.0_45</embeddedJDKHome>
+     <embeddedJDKIncludePath>${embeddedJDKHome}${file.separator}include</embeddedJDKIncludePath>
+   </properties>
+ 

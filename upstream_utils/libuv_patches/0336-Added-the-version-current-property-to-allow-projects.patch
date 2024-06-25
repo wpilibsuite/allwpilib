@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Sat, 6 Sep 2014 23:50:06 +0000
+Subject: [PATCH 0336/6262] Added the "version=current" property to allow
+ projects to correctly reference the updated installation
+
+Change-Id: Ia6f45fab6b1d279e89129d9a0350b8aa7cf8c98a
+---
+ .../src/main/resources/java-zip/ant/build.properties             | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties
+index 5d2c4701bfacd5e9b4ce7742f1c8a75a48b213e6..defe2a137131a074dc0845907128158bad3035ba 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.properties
+@@ -7,6 +7,7 @@ deploy.log.file=/var/local/natinst/log/FRC_UserProgram.log
+ deploy.log.command=tail -F -n 0 ${deploy.log.file}
+ debug.flag.dir=/tmp/
+ command.dir=/home/lvuser/
++version=current
+ 
+ # Libraries to use
+ wpilib=${user.home}/wpilib/java/${version}

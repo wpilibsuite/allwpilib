@@ -1,0 +1,262 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Fri, 26 Sep 2014 17:20:57 -0400
+Subject: [PATCH 0373/6262] Squashed commit of the following:
+
+commit a3ccfab0a42414aa169792356bfc47ee8d0d2d7b
+Author: Kevin O'Connor <koconnor@usfirst.org>
+Date:   Tue Sep 23 13:56:59 2014 -0400
+
+    Implement zero latch (used to reduce brownout latency) in Java
+
+    Change-Id: I3bf4ffbf20cf3d8a42da4fa1755b4306c49ede34
+
+commit 0af37dfcc0d1172974519c44126973c302385d55
+Author: Kevin O'Connor <koconnor@usfirst.org>
+Date:   Tue Sep 23 13:03:07 2014 -0400
+
+    Implement zero latch (used to improve brownout latency) in C++
+
+    Change-Id: I62bedd1af65d367c32e2ab0b5a4fc679776eecb5
+
+Change-Id: Ic27f37a9ab45aad82c1f7154d4edfbccfaa19229
+---
+ hal/include/HAL/Digital.hpp                   |  1 +
+ hal/lib/Athena/Digital.cpp                    |  6 ++++++
+ wpilibc/wpilibC++Devices/include/PWM.h        |  1 +
+ wpilibc/wpilibC++Devices/src/Jaguar.cpp       |  1 +
+ wpilibc/wpilibC++Devices/src/PWM.cpp          | 10 ++++++++++
+ wpilibc/wpilibC++Devices/src/Talon.cpp        |  1 +
+ wpilibc/wpilibC++Devices/src/Victor.cpp       |  1 +
+ .../java/edu/wpi/first/wpilibj/Jaguar.java    |  1 +
+ .../main/java/edu/wpi/first/wpilibj/PWM.java  | 20 +++++++++----------
+ .../java/edu/wpi/first/wpilibj/Talon.java     |  1 +
+ .../java/edu/wpi/first/wpilibj/Victor.java    |  1 +
+ .../edu/wpi/first/wpilibj/hal/PWMJNI.java     |  1 +
+ wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp          | 15 ++++++++++++++
+ 13 files changed, 50 insertions(+), 10 deletions(-)
+
+diff --git a/hal/include/HAL/Digital.hpp b/hal/include/HAL/Digital.hpp
+index 5fab060820972b0664579d973ec909a301459347..1b2d07d7e1c88d465834d87f77c6a3fe07080339 100644
+--- a/hal/include/HAL/Digital.hpp
++++ b/hal/include/HAL/Digital.hpp
+@@ -24,6 +24,7 @@ extern "C"
+ 	bool allocatePWMChannel(void* digital_port_pointer, int32_t *status);
+ 	void freePWMChannel(void* digital_port_pointer, int32_t *status);
+ 	unsigned short getPWM(void* digital_port_pointer, int32_t *status);
++	void latchPWMZero(void* digital_port_pointer, int32_t *status);
+ 	void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status);
+ 	void* allocatePWM(int32_t *status);
+ 	void freePWM(void* pwmGenerator, int32_t *status);
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index 1e6b4adf8ed512043a31a1b3ce5560286a930b2b..b7b4c5b91f335b21818da2a1b9503c355e0c7d2d 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -217,6 +217,12 @@ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
+   }
+ }
+ 
++void latchPWMZero(void* digital_port_pointer, int32_t *status) {
++	DigitalPort* port = (DigitalPort*) digital_port_pointer;
++	pwmSystem->writeZeroLatch(1 << port->port.pin, true, status);
++	pwmSystem->writeZeroLatch(1 << port->port.pin, false, status);
++}
++
+ /**
+  * Set how how often the PWM signal is squelched, thus scaling the period.
+  *
+diff --git a/wpilibc/wpilibC++Devices/include/PWM.h b/wpilibc/wpilibC++Devices/include/PWM.h
+index 4d1a9d38f021fe5bf6e594ac6022d031e891f3b1..e54194e5523a9c46e886ac5f4377e1afc96f4081 100644
+--- a/wpilibc/wpilibC++Devices/include/PWM.h
++++ b/wpilibc/wpilibC++Devices/include/PWM.h
+@@ -40,6 +40,7 @@ public:
+ 	virtual void SetRaw(unsigned short value);
+ 	virtual unsigned short GetRaw();
+ 	void SetPeriodMultiplier(PeriodMultiplier mult);
++	void SetZeroLatch();
+ 	void EnableDeadbandElimination(bool eliminateDeadband);
+ 	void SetBounds(int32_t max, int32_t deadbandMax, int32_t center, int32_t deadbandMin,
+ 			int32_t min);
+diff --git a/wpilibc/wpilibC++Devices/src/Jaguar.cpp b/wpilibc/wpilibC++Devices/src/Jaguar.cpp
+index ced5d23a015576cc80f16b056df4d2b9c24476af..0a03cc1e9411d24008da7ff6c466a78cd0c3181b 100644
+--- a/wpilibc/wpilibC++Devices/src/Jaguar.cpp
++++ b/wpilibc/wpilibC++Devices/src/Jaguar.cpp
+@@ -26,6 +26,7 @@ void Jaguar::InitJaguar()
+ 	SetBounds(2.31, 1.55, 1.507, 1.454, .697);
+ 	SetPeriodMultiplier(kPeriodMultiplier_1X);
+ 	SetRaw(m_centerPwm);
++	SetZeroLatch();
+ 
+ 	HALReport(HALUsageReporting::kResourceType_Jaguar, GetChannel());
+ 	LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
+diff --git a/wpilibc/wpilibC++Devices/src/PWM.cpp b/wpilibc/wpilibC++Devices/src/PWM.cpp
+index 339199045006d65609d761d2a7d7d3530868c167..028dc0feb698ff8288f12f4f7b3ea989753e25c9 100644
+--- a/wpilibc/wpilibC++Devices/src/PWM.cpp
++++ b/wpilibc/wpilibC++Devices/src/PWM.cpp
+@@ -352,6 +352,16 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult)
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ }
+ 
++void PWM::SetZeroLatch()
++{
++	if (StatusIsFatal()) return;
++	
++	int32_t status = 0;
++	
++	latchPWMZero(m_pwm_ports[m_channel], &status);
++	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++}
++
+ 
+ void PWM::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
+ 	SetSpeed(value.f);
+diff --git a/wpilibc/wpilibC++Devices/src/Talon.cpp b/wpilibc/wpilibC++Devices/src/Talon.cpp
+index 39d6bf187b3ab542873a4a5be15fd275660e3438..987f56bc200aff05184f5ebd0c07f1f677c94154 100644
+--- a/wpilibc/wpilibC++Devices/src/Talon.cpp
++++ b/wpilibc/wpilibC++Devices/src/Talon.cpp
+@@ -27,6 +27,7 @@ void Talon::InitTalon() {
+ 	SetBounds(2.037, 1.539, 1.513, 1.487, .989);
+ 	SetPeriodMultiplier(kPeriodMultiplier_2X);
+ 	SetRaw(m_centerPwm);
++	SetZeroLatch();
+ 
+ 	HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());
+ 	LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
+diff --git a/wpilibc/wpilibC++Devices/src/Victor.cpp b/wpilibc/wpilibC++Devices/src/Victor.cpp
+index 173e9c180167c267b9543927dbcf2c740c6eadc4..c5a8e7e62b963fc9325196d3047dd40843ac55e2 100644
+--- a/wpilibc/wpilibC++Devices/src/Victor.cpp
++++ b/wpilibc/wpilibC++Devices/src/Victor.cpp
+@@ -29,6 +29,7 @@ void Victor::InitVictor() {
+ 
+ 	SetPeriodMultiplier(kPeriodMultiplier_2X);
+ 	SetRaw(m_centerPwm);
++	SetZeroLatch();
+ 
+ 	LiveWindow::GetInstance()->AddActuator("Victor", GetChannel(), this);
+ 	HALReport(HALUsageReporting::kResourceType_Victor, GetChannel());
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
+index 51a657b3f47817d09ea378df55df06a1d211dfbd..666bd5b62f866e89cf266334fb14c66284814cb6 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
+@@ -32,6 +32,7 @@ public class Jaguar extends SafePWM implements SpeedController {
+         setBounds(2.31, 1.55, 1.507, 1.454, .697);
+         setPeriodMultiplier(PeriodMultiplier.k1X);
+         setRaw(m_centerPwm);
++		setZeroLatch();
+ 
+         UsageReporting.report(tResourceType.kResourceType_Jaguar, getChannel());
+         LiveWindow.addActuator("Jaguar", getChannel(), this);
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/PWM.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/PWM.java
+index b2a40cc941ad51da284e929a0f35edb2b2bfdfe1..7f3e2fb737bef87f05a6e433ac71ecfa250ff54e 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/PWM.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/PWM.java
+@@ -393,37 +393,37 @@ public class PWM extends SensorBase implements LiveWindowSendable {
+ 
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 	}
++	
++	protected void setZeroLatch()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		PWMJNI.latchPWMZero(m_port, status.asIntBuffer());
++		
++		HALUtil.checkStatus(status.asIntBuffer());
++	}
+ 
+ 	private int getMaxPositivePwm() {
+ 		return m_maxPwm;
+ 	}
+ 
+-	;
+-
+ 	private int getMinPositivePwm() {
+ 		return m_eliminateDeadband ? m_deadbandMaxPwm : m_centerPwm + 1;
+ 	}
+ 
+-	;
+-
+ 	private int getCenterPwm() {
+ 		return m_centerPwm;
+ 	}
+ 
+-	;
+-
+ 	private int getMaxNegativePwm() {
+ 		return m_eliminateDeadband ? m_deadbandMinPwm : m_centerPwm - 1;
+ 	}
+ 
+-	;
+-
+ 	private int getMinNegativePwm() {
+ 		return m_minPwm;
+ 	}
+ 
+-	;
+-
+ 	private int getPositiveScaleFactor() {
+ 		return getMaxPositivePwm() - getMinPositivePwm();
+ 	} ///< The scale for positive speeds.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
+index 03a6cf13246cc85ac67c2ea7fd8cb72865d82fc0..5353f88d9b08a805605446962d988174b96a12fd 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
+@@ -34,6 +34,7 @@ public class Talon extends SafePWM implements SpeedController {
+         setBounds(2.037, 1.539, 1.513, 1.487, .989);
+         setPeriodMultiplier(PeriodMultiplier.k2X);
+         setRaw(m_centerPwm);
++		setZeroLatch();
+ 
+         LiveWindow.addActuator("Talon", getChannel(), this);
+         UsageReporting.report(tResourceType.kResourceType_Talon, getChannel());
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java
+index d30104c8127e5b123ad4f118ca3e9e931cf7a533..211308c2e3dc6a16ea54b2c84abacd6ade06633c 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java
+@@ -36,6 +36,7 @@ public class Victor extends SafePWM implements SpeedController {
+         setBounds(2.027, 1.525, 1.507, 1.49, 1.026);
+         setPeriodMultiplier(PeriodMultiplier.k2X);
+         setRaw(m_centerPwm);
++		setZeroLatch();
+ 
+         LiveWindow.addActuator("Victor", getChannel(), this);
+         UsageReporting.report(tResourceType.kResourceType_Victor, getChannel());
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java
+index 32ecaa7a857f561ffbef8bc1a2d67647a70b8841..a555c6adf1f0c322b36a3f6c236b439b9d42abb5 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PWMJNI.java
+@@ -11,6 +11,7 @@ public class PWMJNI extends DIOJNI {
+ 	public static native void freePWMChannel(ByteBuffer digital_port_pointer, IntBuffer status);
+ 	public static native void setPWM(ByteBuffer digital_port_pointer, short value, IntBuffer status);
+ 	public static native short getPWM(ByteBuffer digital_port_pointer, IntBuffer status);
++	public static native void latchPWMZero(ByteBuffer digital_port_pointer, IntBuffer status);
+ 	public static native void setPWMPeriodScale(ByteBuffer digital_port_pointer, int squelchMask, IntBuffer status);
+ 	public static native ByteBuffer allocatePWM(IntBuffer status);
+ 	public static native void freePWM(ByteBuffer pwmGenerator, IntBuffer status);
+diff --git a/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp b/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
+index e5c06d231ea0ddea556877b0285502230c81eb20..2307155da8e011e49a56b3b452a82648502f910f 100644
+--- a/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
+@@ -84,6 +84,21 @@ JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWM
+ 	return returnValue;
+ }
+ 
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
++ * Method:    latchPWMZero
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
++ */
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_latchPWMZero
++  (JNIEnv * env, jclass, jobject id, jobject status)
++{
++  	void ** javaId = (void**)env->GetDirectBufferAddress(id);
++	PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << *javaId;
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	latchPWMZero( *javaId, statusPtr );
++	PWMJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
++}
++
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+  * Method:    setPWMPeriodScale

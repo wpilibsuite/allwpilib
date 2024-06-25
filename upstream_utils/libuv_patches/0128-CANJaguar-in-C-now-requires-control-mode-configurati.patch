@@ -1,0 +1,717 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Wed, 25 Jun 2014 15:42:16 -0400
+Subject: [PATCH 0128/6262] CANJaguar in C++ now requires control mode
+ configuration data at compile time
+
+For example, it's no longer possible to compile a program that uses position
+control without specifying a position reference, or one that uses an encoder
+as a position reference without specifying a CPR.  This eliminates a lot of
+common CANJaguar mistakes.
+
+Change-Id: I2b5fe1e2884cf3a0f9d5ccd233da4c2c9c1cff4c
+---
+ wpilibc/wpilibC++/include/CANJaguar.h         |  61 +++-
+ wpilibc/wpilibC++/lib/CANJaguar.cpp           | 278 ++++++++++++++++--
+ .../src/CANJaguarTest.cpp                     |  84 ++++--
+ 3 files changed, 366 insertions(+), 57 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/CANJaguar.h b/wpilibc/wpilibC++/include/CANJaguar.h
+index 3dfdc82c652907caf34b7d623351d4a5d3411bc5..87273f65a07e07239cce44c0d2da9e7f951f789c 100644
+--- a/wpilibc/wpilibC++/include/CANJaguar.h
++++ b/wpilibc/wpilibC++/include/CANJaguar.h
+@@ -32,15 +32,18 @@ public:
+ 	static const int32_t kControllerRate = 1000;
+ 	static constexpr double kApproxBusVoltage = 12.0;
+ 
+-	typedef enum {kPercentVbus, kCurrent, kSpeed, kPosition, kVoltage} ControlMode;
++	// Control mode tags
++	static const struct NoneStruct          {} None;
++	static const struct EncoderStruct       {} Encoder;
++	static const struct QuadEncoderStruct   {} QuadEncoder;
++	static const struct PotentiometerStruct {} Potentiometer;
++
+ 	typedef enum {kCurrentFault = 1, kTemperatureFault = 2, kBusVoltageFault = 4, kGateDriverFault = 8} Faults;
+ 	typedef enum {kForwardLimit = 1, kReverseLimit = 2} Limits;
+-	typedef enum {kPosRef_QuadEncoder = 0, kPosRef_Potentiometer = 1, kPosRef_None = 0xFF} PositionReference;
+-	typedef enum {kSpeedRef_Encoder = 0, kSpeedRef_InvEncoder = 2, kSpeedRef_QuadEncoder = 3, kSpeedRef_None = 0xFF} SpeedReference;
+ 	typedef enum {kNeutralMode_Jumper = 0, kNeutralMode_Brake = 1, kNeutralMode_Coast = 2} NeutralMode;
+ 	typedef enum {kLimitMode_SwitchInputsOnly = 0, kLimitMode_SoftPositionLimits = 1} LimitMode;
+ 
+-	explicit CANJaguar(uint8_t deviceNumber, ControlMode controlMode = kPercentVbus);
++	explicit CANJaguar(uint8_t deviceNumber);
+ 	virtual ~CANJaguar();
+ 
+ 	// SpeedController interface
+@@ -51,11 +54,32 @@ public:
+ 	// PIDOutput interface
+ 	virtual void PIDWrite(float output);
+ 
++	// Control mode methods
++	void EnableControl(double encoderInitialPosition = 0.0);
++	void DisableControl();
++
++	void SetPercentMode();
++	void SetPercentMode(EncoderStruct, uint16_t codesPerRev);
++	void SetPercentMode(QuadEncoderStruct, uint16_t codesPerRev);
++	void SetPercentMode(PotentiometerStruct);
++
++	void SetCurrentMode(double p, double i, double d);
++	void SetCurrentMode(EncoderStruct, uint16_t codesPerRev, double p, double i, double d);
++	void SetCurrentMode(QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d);
++	void SetCurrentMode(PotentiometerStruct, double p, double i, double d);
++
++	void SetSpeedMode(EncoderStruct, uint16_t codesPerRev, double p, double i, double d);
++	void SetSpeedMode(QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d);
++
++	void SetPositionMode(QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d);
++	void SetPositionMode(PotentiometerStruct, double p, double i, double d);
++
++	void SetVoltageMode();
++	void SetVoltageMode(EncoderStruct, uint16_t codesPerRev);
++	void SetVoltageMode(QuadEncoderStruct, uint16_t codesPerRev);
++	void SetVoltageMode(PotentiometerStruct);
++
+ 	// Other Accessors
+-	void SetSpeedReference(SpeedReference reference);
+-	SpeedReference GetSpeedReference();
+-	void SetPositionReference(PositionReference reference);
+-	PositionReference GetPositionReference();
+ 	void SetP(double p);
+ 	void SetI(double i);
+ 	void SetD(double d);
+@@ -63,10 +87,6 @@ public:
+ 	double GetP();
+ 	double GetI();
+ 	double GetD();
+-	void EnableControl(double encoderInitialPosition = 0.0);
+-	void DisableControl();
+-	void ChangeControlMode(ControlMode controlMode);
+-	ControlMode GetControlMode();
+ 	float GetBusVoltage();
+ 	float GetOutputVoltage();
+ 	float GetOutputCurrent();
+@@ -101,6 +121,18 @@ public:
+ 	void GetDescription(char *desc);
+ 
+ protected:
++	// Control mode helpers
++	typedef enum {kPercentVbus, kCurrent, kSpeed, kPosition, kVoltage} ControlMode;
++
++	void ChangeControlMode(ControlMode controlMode);
++	ControlMode GetControlMode();
++
++	void SetSpeedReference(uint8_t reference);
++	uint8_t GetSpeedReference();
++
++	void SetPositionReference(uint8_t reference);
++	uint8_t GetPositionReference();
++
+ 	uint8_t packPercentage(uint8_t *buffer, double value);
+ 	uint8_t packFXP8_8(uint8_t *buffer, double value);
+ 	uint8_t packFXP16_16(uint8_t *buffer, double value);
+@@ -112,7 +144,6 @@ protected:
+ 	int16_t unpackint16_t(uint8_t *buffer);
+ 	int32_t unpackint32_t(uint8_t *buffer);
+ 
+-
+ 	void sendMessage(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
+ 	void requestMessage(uint32_t messageID, int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
+ 	bool getMessage(uint32_t messageID, uint32_t mask, uint8_t *data, uint8_t *dataSize);
+@@ -122,8 +153,8 @@ protected:
+ 
+ 	// Parameters/configuration
+ 	ControlMode m_controlMode;
+-	SpeedReference m_speedReference;
+-	PositionReference m_positionReference;
++	uint8_t m_speedReference;
++	uint8_t m_positionReference;
+ 	double m_p;
+ 	double m_i;
+ 	double m_d;
+diff --git a/wpilibc/wpilibC++/lib/CANJaguar.cpp b/wpilibc/wpilibC++/lib/CANJaguar.cpp
+index 29f76f256b112e2a6fd04054da0c7c381fa052a3..7b2dc7b9b70145208cb003c6618daffb71510081 100644
+--- a/wpilibc/wpilibC++/lib/CANJaguar.cpp
++++ b/wpilibc/wpilibC++/lib/CANJaguar.cpp
+@@ -75,8 +75,8 @@ void CANJaguar::InitCANJaguar()
+ 	m_safetyHelper = new MotorSafetyHelper(this);
+ 
+ 	m_value = 0.0f;
+-	m_speedReference = kSpeedRef_None;
+-	m_positionReference = kPosRef_None;
++	m_speedReference = LM_REF_NONE;
++	m_positionReference = LM_REF_NONE;
+ 	m_p = 0.0;
+ 	m_i = 0.0;
+ 	m_d = 0.0;
+@@ -192,14 +192,13 @@ void CANJaguar::InitCANJaguar()
+  *
+  * @param deviceNumber The the address of the Jaguar on the CAN bus.
+  */
+-CANJaguar::CANJaguar(uint8_t deviceNumber, ControlMode controlMode)
++CANJaguar::CANJaguar(uint8_t deviceNumber)
+ 	: m_deviceNumber (deviceNumber)
+-	, m_controlMode (controlMode)
+ 	, m_maxOutputVoltage (kApproxBusVoltage)
+ 	, m_safetyHelper (NULL)
+ {
++	SetPercentMode();
+ 	InitCANJaguar();
+-
+ }
+ 
+ CANJaguar::~CANJaguar()
+@@ -416,8 +415,8 @@ int32_t CANJaguar::unpackint32_t(uint8_t *buffer)
+  * @param messageID The messageID to be used on the CAN bus (device number is added internally)
+  * @param data The up to 8 bytes of data to be sent with the message
+  * @param dataSize Specify how much of the data in "data" to send
+- * @param periodic If true, tell NetworkCommunications to send the package every
+- * 20 ms.
++ * @param periodic If positive, tell Network Communications to send the message
++ * 	every "period" milliseconds.
+  */
+ void CANJaguar::sendMessage(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t period)
+ {
+@@ -433,6 +432,8 @@ void CANJaguar::sendMessage(uint32_t messageID, const uint8_t *data, uint8_t dat
+  * Request a message from the Jaguar, but don't wait for it to arrive.
+  *
+  * @param messageID The message to request
++ * @param periodic If positive, tell Network Communications to send the message
++ * 	every "period" milliseconds.
+  */
+ void CANJaguar::requestMessage(uint32_t messageID, int32_t period)
+ {
+@@ -550,7 +551,7 @@ void CANJaguar::verify()
+ 	{
+ 		if(getMessage(LM_API_SPD_REF, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
+ 		{
+-			SpeedReference speedRef = (SpeedReference)dataBuffer[0];
++			uint8_t speedRef = dataBuffer[0];
+ 
+ 			if(m_speedReference == speedRef)
+ 				m_speedRefVerified = true;
+@@ -569,7 +570,7 @@ void CANJaguar::verify()
+ 	{
+ 		if(getMessage(LM_API_POS_REF, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
+ 		{
+-			PositionReference posRef = (PositionReference)dataBuffer[0];
++			uint8_t posRef = dataBuffer[0];
+ 
+ 			if(m_positionReference == posRef)
+ 				m_posRefVerified = true;
+@@ -859,9 +860,9 @@ void CANJaguar::verify()
+  *
+  * Choose encoder as the source of speed feedback when in speed control mode.
+  *
+- * @param reference Specify a SpeedReference.
++ * @param reference Specify a speed reference.
+  */
+-void CANJaguar::SetSpeedReference(SpeedReference reference)
++void CANJaguar::SetSpeedReference(uint8_t reference)
+ {
+ 	uint8_t dataBuffer[8];
+ 
+@@ -876,9 +877,10 @@ void CANJaguar::SetSpeedReference(SpeedReference reference)
+ /**
+  * Get the reference source device for speed controller mode.
+  *
+- * @return A SpeedReference indicating the currently selected reference device for speed controller mode.
++ * @return A speed reference indicating the currently selected reference device
++ * for speed controller mode.
+  */
+-CANJaguar::SpeedReference CANJaguar::GetSpeedReference()
++uint8_t CANJaguar::GetSpeedReference()
+ {
+ 	return m_speedReference;
+ }
+@@ -891,7 +893,7 @@ CANJaguar::SpeedReference CANJaguar::GetSpeedReference()
+  *
+  * @param reference Specify a PositionReference.
+  */
+-void CANJaguar::SetPositionReference(PositionReference reference)
++void CANJaguar::SetPositionReference(uint8_t reference)
+ {
+ 	uint8_t dataBuffer[8];
+ 
+@@ -908,7 +910,7 @@ void CANJaguar::SetPositionReference(PositionReference reference)
+  *
+  * @return A PositionReference indicating the currently selected reference device for position controller mode.
+  */
+-CANJaguar::PositionReference CANJaguar::GetPositionReference()
++uint8_t CANJaguar::GetPositionReference()
+ {
+ 	return m_positionReference;
+ }
+@@ -1139,12 +1141,252 @@ void CANJaguar::DisableControl()
+ 	case kCurrent:
+ 		sendMessage(LM_API_ICTRL_DIS, dataBuffer, dataSize);
+ 		break;
+-	case kVoltage:
++case kVoltage:
+ 		sendMessage(LM_API_VCOMP_DIS, dataBuffer, dataSize);
+ 		break;
+ 	}
+ }
+ 
++/**
++ * Enable controlling the motor voltage as a percentage of the bus voltage
++ * without any position or speed feedback.
++ */
++void CANJaguar::SetPercentMode()
++{
++	ChangeControlMode(kPercentVbus);
++	SetPositionReference(LM_REF_NONE);
++	SetSpeedReference(LM_REF_NONE);
++}
++
++/**
++ * Enable controlling the motor voltage as a percentage of the bus voltage,
++ * and enable speed sensing from a non-quadrature encoder.
++ *
++ * @param encoder The constant CANJaguar::Encoder
++ * @param codesPerRev The counts per revolution on the encoder
++ */
++void CANJaguar::SetPercentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
++{
++	ChangeControlMode(kPercentVbus);
++	SetPositionReference(LM_REF_NONE);
++	SetSpeedReference(LM_REF_ENCODER);
++	ConfigEncoderCodesPerRev(codesPerRev);
++}
++
++/**
++* Enable controlling the motor voltage as a percentage of the bus voltage,
++* and enable position and speed sensing from a quadrature encoder
++*
++* @param encoder The constant CANJaguar::QuadEncoder
++* @param codesPerRev The counts per revolution on the encoder
++*/
++void CANJaguar::SetPercentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev)
++{
++	ChangeControlMode(kPercentVbus);
++	SetPositionReference(LM_REF_QUAD_ENCODER);
++	SetSpeedReference(LM_REF_QUAD_ENCODER);
++	ConfigEncoderCodesPerRev(codesPerRev);
++}
++
++/**
++* Enable controlling the motor voltage as a percentage of the bus voltage,
++* and enable position sensing from a potentiometer and no speed feedback.
++*
++* @param potentiometer The constant CANJaguar::Potentiometer
++*/
++void CANJaguar::SetPercentMode(CANJaguar::PotentiometerStruct)
++{
++	ChangeControlMode(kPercentVbus);
++	SetPositionReference(LM_REF_POT);
++	SetSpeedReference(LM_REF_NONE);
++	ConfigPotentiometerTurns(1);
++}
++
++/**
++ * Enable controlling the motor current with a PID loop.
++ *
++ * @param p The proportional gain of the Jaguar's PID controller.
++ * @param i The integral gain of the Jaguar's PID controller.
++ * @param d The differential gain of the Jaguar's PID controller.
++ */
++void CANJaguar::SetCurrentMode(double p, double i, double d)
++{
++	ChangeControlMode(kCurrent);
++	SetPositionReference(LM_REF_NONE);
++	SetSpeedReference(LM_REF_NONE);
++	SetPID(p, i, d);
++}
++
++/**
++* Enable controlling the motor current with a PID loop, and enable speed
++* sensing from a non-quadrature encoder.
++*
++* @param encoder The constant CANJaguar::Encoder
++* @param p The proportional gain of the Jaguar's PID controller.
++* @param i The integral gain of the Jaguar's PID controller.
++* @param d The differential gain of the Jaguar's PID controller.
++*/
++void CANJaguar::SetCurrentMode(CANJaguar::EncoderStruct, uint16_t codesPerRev, double p, double i, double d)
++{
++	ChangeControlMode(kCurrent);
++	SetPositionReference(LM_REF_NONE);
++	SetSpeedReference(LM_REF_NONE);
++	ConfigEncoderCodesPerRev(codesPerRev);
++	SetPID(p, i, d);
++}
++
++/**
++* Enable controlling the motor current with a PID loop, and enable speed and
++* position sensing from a quadrature encoder.
++*
++* @param endoer The constant CANJaguar::QuadEncoder
++* @param p The proportional gain of the Jaguar's PID controller.
++* @param i The integral gain of the Jaguar's PID controller.
++* @param d The differential gain of the Jaguar's PID controller.
++*/
++void CANJaguar::SetCurrentMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d)
++{
++	ChangeControlMode(kCurrent);
++	SetPositionReference(LM_REF_QUAD_ENCODER);
++	SetSpeedReference(LM_REF_QUAD_ENCODER);
++	ConfigEncoderCodesPerRev(codesPerRev);
++	SetPID(p, i, d);
++}
++
++/**
++* Enable controlling the motor current with a PID loop, and enable position
++* sensing from a potentiometer.
++*
++* @param potentiometer The constant CANJaguar::Potentiometer
++* @param p The proportional gain of the Jaguar's PID controller.
++* @param i The integral gain of the Jaguar's PID controller.
++* @param d The differential gain of the Jaguar's PID controller.
++*/
++void CANJaguar::SetCurrentMode(CANJaguar::PotentiometerStruct, double p, double i, double d)
++{
++	ChangeControlMode(kCurrent);
++	SetPositionReference(LM_REF_POT);
++	SetSpeedReference(LM_REF_NONE);
++	ConfigPotentiometerTurns(1);
++	SetPID(p, i, d);
++}
++
++/**
++ * Enable controlling the speed with a feedback loop from a non-quadrature
++ * encoder.
++ *
++ * @param encoder The constant CANJaguar::Encoder
++ * @param codesPerRev The counts per revolution on the encoder
++ * @param p The proportional gain of the Jaguar's PID controller.
++ * @param i The integral gain of the Jaguar's PID controller.
++ * @param d The differential gain of the Jaguar's PID controller.
++ */
++void CANJaguar::SetSpeedMode(CANJaguar::EncoderStruct, uint16_t codesPerRev, double p, double i, double d)
++{
++	ChangeControlMode(kSpeed);
++	SetPositionReference(LM_REF_NONE);
++	SetSpeedReference(LM_REF_ENCODER);
++	ConfigEncoderCodesPerRev(codesPerRev);
++	SetPID(p, i, d);
++}
++
++/**
++* Enable controlling the speed with a feedback loop from a quadrature encoder.
++*
++* @param encoder The constant CANJaguar::QuadEncoder
++* @param codesPerRev The counts per revolution on the encoder
++* @param p The proportional gain of the Jaguar's PID controller.
++* @param i The integral gain of the Jaguar's PID controller.
++* @param d The differential gain of the Jaguar's PID controller.
++*/
++void CANJaguar::SetSpeedMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d)
++{
++	ChangeControlMode(kSpeed);
++	SetPositionReference(LM_REF_QUAD_ENCODER);
++	SetSpeedReference(LM_REF_QUAD_ENCODER);
++	ConfigEncoderCodesPerRev(codesPerRev);
++	SetPID(p, i, d);
++}
++
++/**
++ * Enable controlling the position with a feedback loop using an encoder
++ *
++ * @param encoder The constant CANJaguar::QuadEncoder
++ *
++ */
++void CANJaguar::SetPositionMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev, double p, double i, double d)
++{
++	ChangeControlMode(kPosition);
++	SetPositionReference(LM_REF_QUAD_ENCODER);
++	ConfigEncoderCodesPerRev(codesPerRev);
++	SetPID(p, i, d);
++}
++
++/**
++* Enable controlling the position with a feedback loop using a potentiometer
++*/
++void CANJaguar::SetPositionMode(CANJaguar::PotentiometerStruct, double p, double i, double d)
++{
++	ChangeControlMode(kPosition);
++	SetPositionReference(LM_REF_POT);
++	ConfigPotentiometerTurns(1);
++	SetPID(p, i, d);
++}
++
++/**
++* Enable controlling the motor voltage without any position or speed feedback.
++*/
++void CANJaguar::SetVoltageMode()
++{
++	ChangeControlMode(kVoltage);
++	SetPositionReference(LM_REF_NONE);
++	SetSpeedReference(LM_REF_NONE);
++}
++
++/**
++* Enable controlling the motor voltage with speed feedback from a
++* non-quadrature encoder and no position feedback.
++*
++* @param encoder The constant CANJaguar::Encoder
++* @param codesPerRev The counts per revolution on the encoder
++*/
++void CANJaguar::SetVoltageMode(CANJaguar::EncoderStruct, uint16_t codesPerRev)
++{
++	ChangeControlMode(kVoltage);
++	SetPositionReference(LM_REF_NONE);
++	SetSpeedReference(LM_REF_ENCODER);
++	ConfigEncoderCodesPerRev(codesPerRev);
++}
++
++/**
++* Enable controlling the motor voltage with position and speed feedback from a
++* quadrature encoder
++*
++* @param encoder The constant CANJaguar::QuadEncoder
++* @param codesPerRev The counts per revolution on the encoder
++*/
++void CANJaguar::SetVoltageMode(CANJaguar::QuadEncoderStruct, uint16_t codesPerRev)
++{
++	ChangeControlMode(kVoltage);
++	SetPositionReference(LM_REF_QUAD_ENCODER);
++	SetSpeedReference(LM_REF_QUAD_ENCODER);
++	ConfigEncoderCodesPerRev(codesPerRev);
++}
++
++/**
++* Enable controlling the motor voltage with position feedback from a
++* potentiometer and no speed feedback.
++*
++* @param potentiometer The constant CANJaguar::Potentiometer
++*/
++void CANJaguar::SetVoltageMode(CANJaguar::PotentiometerStruct)
++{
++	ChangeControlMode(kVoltage);
++	SetPositionReference(LM_REF_POT);
++	SetSpeedReference(LM_REF_NONE);
++	ConfigPotentiometerTurns(1);
++}
++
+ /**
+  * Change the control mode of this Jaguar object.
+  *
+@@ -1362,9 +1604,6 @@ void CANJaguar::SetVoltageRampRate(double rampRate)
+ 		dataSize = packFXP8_8(dataBuffer, rampRate / kControllerRate);
+ 		message = LM_API_VCOMP_IN_RAMP;
+ 		break;
+-	case kCurrent:
+-	case kSpeed:
+-	case kPosition:
+ 	default:
+ 		wpi_setWPIErrorWithContext(IncompatibleMode, "SetVoltageRampRate only applies in Voltage and Percent mode");
+ 		return;
+@@ -1408,7 +1647,6 @@ void CANJaguar::ConfigNeutralMode(NeutralMode mode)
+ 	uint8_t dataBuffer[8];
+ 
+ 	// Set the neutral mode
+-	dataBuffer[0] = mode;
+ 	sendMessage(LM_API_CFG_BRAKE_COAST, dataBuffer, sizeof(uint8_t));
+ 
+ 	m_neutralMode = mode;
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+index 182f6119a6718620c2576b5a09bff2232eff0bd1..57a84905bbb1f800485d52d20fedcdace935f014 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+@@ -24,13 +24,8 @@ protected:
+     DigitalOutput *m_fakeForwardLimit, *m_fakeReverseLimit;
+     AnalogOutput *m_fakePotentiometer;
+ 
+-    double m_initialPosition;
+-
+     virtual void SetUp() {
+         m_jaguar = new CANJaguar(TestBench::kCANJaguarID);
+-        m_jaguar->ChangeControlMode(CANJaguar::kPercentVbus);
+-        m_jaguar->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+-        m_jaguar->ConfigEncoderCodesPerRev(360);
+ 
+         m_fakeForwardLimit = new DigitalOutput(TestBench::kFakeJaguarForwardLimit);
+         m_fakeForwardLimit->Set(0);
+@@ -42,8 +37,7 @@ protected:
+         m_fakePotentiometer->SetVoltage(0.0f);
+ 
+         /* The motor might still have momentum from the previous test. */
+-        Wait(kEncoderSettlingTime);
+-        m_initialPosition = m_jaguar->GetPosition();
++        //Wait(kEncoderSettlingTime);
+     }
+ 
+     virtual void TearDown() {
+@@ -54,17 +48,36 @@ protected:
+     }
+ };
+ 
++/*TEST_F(CANJaguarTest, QuickTest) {
++    m_jaguar->SetPercentMode(CANJaguar::Encoder, 360);
++
++    while(DriverStation::GetInstance()->IsEnabled()) {
++        std::cout << m_jaguar->GetPosition() << std::endl;
++        std::cout << m_jaguar->GetSpeed() << std::endl;
++        Wait(0.02);
++    }
++}*/
++
+ /**
+  * Test if we can drive the motor in percentage mode and get a position back
+  */
+ TEST_F(CANJaguarTest, PercentForwards) {
++    m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
++    m_jaguar->EnableControl();
++    m_jaguar->Set(0.0f);
++
++    /* The motor might still have momentum from the previous test. */
++    Wait(kEncoderSettlingTime);
++
++    double initialPosition = m_jaguar->GetPosition();
++
+     /* Drive the speed controller briefly to move the encoder */
+     m_jaguar->Set(1.0f);
+     Wait(kMotorTime);
+     m_jaguar->Set(0.0f);
+ 
+     /* The position should have increased */
+-    EXPECT_GT(m_jaguar->GetPosition(), m_initialPosition)
++    EXPECT_GT(m_jaguar->GetPosition(), initialPosition)
+         << "CAN Jaguar position should have increased after the motor moved";
+ }
+ 
+@@ -73,13 +86,22 @@ TEST_F(CANJaguarTest, PercentForwards) {
+  * position back
+  */
+ TEST_F(CANJaguarTest, PercentReverse) {
++    m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
++    m_jaguar->EnableControl();
++    m_jaguar->Set(0.0f);
++
++    /* The motor might still have momentum from the previous test. */
++    Wait(kEncoderSettlingTime);
++
++    double initialPosition = m_jaguar->GetPosition();
++
+     /* Drive the speed controller briefly to move the encoder */
+     m_jaguar->Set(-1.0f);
+     Wait(kMotorTime);
+     m_jaguar->Set(0.0f);
+ 
+     /* The position should have decreased */
+-    EXPECT_LT(m_jaguar->GetPosition(), m_initialPosition)
++    EXPECT_LT(m_jaguar->GetPosition(), initialPosition)
+         << "CAN Jaguar position should have decreased after the motor moved";
+ }
+ 
+@@ -88,15 +110,14 @@ TEST_F(CANJaguarTest, PercentReverse) {
+  * the Jaguar.
+  */
+ TEST_F(CANJaguarTest, EncoderPositionPID) {
+-    m_jaguar->ChangeControlMode(CANJaguar::kPosition);
+-    m_jaguar->SetPID(5.0f, 0.1f, 2.0f);
++    m_jaguar->SetPositionMode(CANJaguar::QuadEncoder, 360, 5.0f, 0.1f, 2.0f);
+     m_jaguar->EnableControl();
+ 
+-    double setpoint = m_initialPosition + 10.0f;
++    double setpoint = m_jaguar->GetPosition() + 10.0f;
+ 
+-    /* It should get to the setpoint within 5 seconds */
++    /* It should get to the setpoint within 10 seconds */
+     m_jaguar->Set(setpoint);
+-    Wait(5.0f);
++    Wait(10.0f);
+ 
+     EXPECT_NEAR(setpoint, m_jaguar->GetPosition(), kEncoderPositionTolerance)
+         << "CAN Jaguar should have reached setpoint with PID control";
+@@ -107,8 +128,7 @@ TEST_F(CANJaguarTest, EncoderPositionPID) {
+  * as a fake potentiometer.
+  */
+ TEST_F(CANJaguarTest, FakePotentiometerPosition) {
+-    m_jaguar->SetPositionReference(CANJaguar::kPosRef_Potentiometer);
+-    m_jaguar->ConfigPotentiometerTurns(1);
++    m_jaguar->SetPercentMode(CANJaguar::Potentiometer);
+     m_jaguar->EnableControl();
+ 
+     m_fakePotentiometer->SetVoltage(0.0f);
+@@ -137,9 +157,20 @@ TEST_F(CANJaguarTest, FakePotentiometerPosition) {
+  * limit switch.
+  */
+ TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
++    m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
+     m_jaguar->ConfigLimitMode(CANJaguar::kLimitMode_SwitchInputsOnly);
+     m_fakeForwardLimit->Set(1);
+     m_fakeReverseLimit->Set(0);
++    m_jaguar->EnableControl();
++
++    m_jaguar->Set(0.0f);
++    Wait(kEncoderSettlingTime);
++
++    /* Make sure we limits are recognized by the Jaguar. */
++    ASSERT_FALSE(m_jaguar->GetForwardLimitOK());
++    ASSERT_TRUE(m_jaguar->GetReverseLimitOK());
++
++    double initialPosition = m_jaguar->GetPosition();
+ 
+     /* Drive the speed controller briefly to move the encoder.  If the limit
+          switch is recognized, it shouldn't actually move. */
+@@ -148,11 +179,9 @@ TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
+     m_jaguar->Set(0.0f);
+ 
+     /* The position should be the same, since the limit switch was on. */
+-    EXPECT_NEAR(m_initialPosition, m_jaguar->GetPosition(), kEncoderPositionTolerance)
++    EXPECT_NEAR(initialPosition, m_jaguar->GetPosition(), kEncoderPositionTolerance)
+         << "CAN Jaguar should not have moved with the limit switch pressed";
+ 
+-    Wait(kEncoderSettlingTime);
+-
+     /* Drive the speed controller in the other direction.  It should actually
+          move, since only the forward switch is activated.*/
+     m_jaguar->Set(-1.0f);
+@@ -160,7 +189,7 @@ TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
+     m_jaguar->Set(0.0f);
+ 
+     /* The position should have decreased */
+-    EXPECT_LT(m_jaguar->GetPosition(), m_initialPosition)
++    EXPECT_LT(m_jaguar->GetPosition(), initialPosition)
+         << "CAN Jaguar should have moved in reverse while the forward limit was on";
+ }
+ 
+@@ -169,9 +198,20 @@ TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
+  * switch.
+  */
+ TEST_F(CANJaguarTest, FakeLimitSwitchReverse) {
++    m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
+     m_jaguar->ConfigLimitMode(CANJaguar::kLimitMode_SwitchInputsOnly);
+     m_fakeForwardLimit->Set(0);
+     m_fakeReverseLimit->Set(1);
++    m_jaguar->EnableControl();
++
++    m_jaguar->Set(0.0f);
++    Wait(kEncoderSettlingTime);
++
++    /* Make sure we limits are recognized by the Jaguar. */
++    ASSERT_TRUE(m_jaguar->GetForwardLimitOK());
++    ASSERT_FALSE(m_jaguar->GetReverseLimitOK());
++
++    double initialPosition = m_jaguar->GetPosition();
+ 
+     /* Drive the speed controller backwards briefly to move the encoder.  If
+          the limit switch is recognized, it shouldn't actually move. */
+@@ -180,7 +220,7 @@ TEST_F(CANJaguarTest, FakeLimitSwitchReverse) {
+     m_jaguar->Set(0.0f);
+ 
+     /* The position should be the same, since the limit switch was on. */
+-    EXPECT_NEAR(m_initialPosition, m_jaguar->GetPosition(), kEncoderPositionTolerance)
++    EXPECT_NEAR(initialPosition, m_jaguar->GetPosition(), kEncoderPositionTolerance)
+         << "CAN Jaguar should not have moved with the limit switch pressed";
+ 
+     Wait(kEncoderSettlingTime);
+@@ -192,6 +232,6 @@ TEST_F(CANJaguarTest, FakeLimitSwitchReverse) {
+     m_jaguar->Set(0.0f);
+ 
+     /* The position should have increased */
+-    EXPECT_GT(m_jaguar->GetPosition(), m_initialPosition)
++    EXPECT_GT(m_jaguar->GetPosition(), initialPosition)
+         << "CAN Jaguar should have moved forwards while the reverse limit was on";
+ }

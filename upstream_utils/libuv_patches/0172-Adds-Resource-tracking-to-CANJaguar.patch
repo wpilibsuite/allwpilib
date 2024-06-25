@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Fri, 18 Jul 2014 15:00:59 -0400
+Subject: [PATCH 0172/6262] Adds Resource tracking to CANJaguar
+
+Change-Id: Ic5da91d378d997f57c65b3bace5fcfd24485dddb
+---
+ .../main/java/edu/wpi/first/wpilibj/CANJaguar.java    | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
+index 84a294cacdbe9ba289ecd028b55a4cbf56dc3924..d905cba1f0658f052e097e1a36730fa91229895e 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
+@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
++import edu.wpi.first.wpilibj.util.AllocationException;
++import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+ 
+ /**
+  * Texas Instruments Jaguar Speed Controller as a CAN device.
+@@ -30,6 +32,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
+ 	public static final double kApproxBusVoltage = 12.0;
+ 
+ 	private MotorSafetyHelper m_safetyHelper;
++	private static final Resource allocated = new Resource(63);
+ 
+ 	private static final int kFullMessageIDMask = CANJNI.CAN_MSGID_API_M | CANJNI.CAN_MSGID_MFR_M | CANJNI.CAN_MSGID_DTYPE_M;
+ 	private static final int kSendMessagePeriod = 20;
+@@ -155,6 +158,13 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
+ 	 * @see CANJaguar#setVoltageMode(QuadEncoderTag, int)
+ 	 */
+ 	public CANJaguar(int deviceNumber) {
++		try {
++			allocated.allocate(deviceNumber-1);
++		} catch (CheckedAllocationException e1) {
++			throw new AllocationException(
++	                "CANJaguar device " + e1.getMessage() + "(increment index by one)");
++		}
++		
+ 		m_deviceNumber = (byte)deviceNumber;
+ 		m_controlMode = ControlMode.PercentVbus;
+ 
+@@ -212,6 +222,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
+ 	* No other methods should be called after this is called.
+ 	*/
+ 	public void free() {
++		allocated.free(m_deviceNumber-1);
+ 		m_safetyHelper = null;
+ 
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);

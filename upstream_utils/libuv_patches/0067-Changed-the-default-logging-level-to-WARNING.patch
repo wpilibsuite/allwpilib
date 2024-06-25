@@ -1,0 +1,364 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Fri, 30 May 2014 10:08:29 -0400
+Subject: [PATCH 0067/6262] Changed the default logging level to WARNING This
+ prevents excessive logging from the HAL. Put it back as needed
+
+Change-Id: I217f8bf20dd092dd6205444b08c98c9a7c3c83de
+---
+ wpilibj/wpilibJavaJNI/lib/CANJNI.cpp          |  2 +-
+ wpilibj/wpilibJavaJNI/lib/CounterJNI.cpp      |  2 +-
+ wpilibj/wpilibJavaJNI/lib/DIOJNI.cpp          |  2 +-
+ wpilibj/wpilibJavaJNI/lib/EncoderJNI.cpp      |  2 +-
+ .../lib/FRCNetworkCommunicationsLibrary.cpp   | 80 ++++++++++---------
+ wpilibj/wpilibJavaJNI/lib/HALUtil.cpp         |  2 +-
+ wpilibj/wpilibJavaJNI/lib/I2CJNI.cpp          |  2 +-
+ wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp          |  2 +-
+ wpilibj/wpilibJavaJNI/lib/RelayJNI.cpp        |  2 +-
+ wpilibj/wpilibJavaJNI/lib/SPIJNI.cpp          |  2 +-
+ wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp     |  2 +-
+ 11 files changed, 54 insertions(+), 46 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaJNI/lib/CANJNI.cpp b/wpilibj/wpilibJavaJNI/lib/CANJNI.cpp
+index 5f98e5dc5781c65386d04f15a67b3d9b6a402022..00a3ae57e425586b873d19c245305a83e9a900ce 100644
+--- a/wpilibj/wpilibJavaJNI/lib/CANJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/CANJNI.cpp
+@@ -8,7 +8,7 @@
+ #include "NetworkCommunication/JaguarCANDriver.h"
+ 
+ // set the logging level
+-TLogLevel canJNILogLevel = logDEBUG;
++TLogLevel canJNILogLevel = logWARNING;
+ 
+ #define CANJNI_LOG(level) \
+     if (level > canJNILogLevel) ; \
+diff --git a/wpilibj/wpilibJavaJNI/lib/CounterJNI.cpp b/wpilibj/wpilibJavaJNI/lib/CounterJNI.cpp
+index 1d99b0bf7488a2d1c96b5e52a769f69055ad874d..2c743ea83dba383663122de731b23a1a035e758e 100644
+--- a/wpilibj/wpilibJavaJNI/lib/CounterJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/CounterJNI.cpp
+@@ -7,7 +7,7 @@
+ #include "HAL/Digital.hpp"
+ 
+ // set the logging level
+-TLogLevel counterJNILogLevel = logDEBUG;
++TLogLevel counterJNILogLevel = logWARNING;
+ 
+ #define COUNTERJNI_LOG(level) \
+     if (level > counterJNILogLevel) ; \
+diff --git a/wpilibj/wpilibJavaJNI/lib/DIOJNI.cpp b/wpilibj/wpilibJavaJNI/lib/DIOJNI.cpp
+index a2209dba289affafd804211a4c05b8f778539357..dac6a26700704442b64480adbb5010efb284a71a 100644
+--- a/wpilibj/wpilibJavaJNI/lib/DIOJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/DIOJNI.cpp
+@@ -7,7 +7,7 @@
+ #include "HAL/Digital.hpp"
+ 
+ // set the logging level
+-TLogLevel dioJNILogLevel = logDEBUG;
++TLogLevel dioJNILogLevel = logWARNING;
+ 
+ #define DIOJNI_LOG(level) \
+     if (level > dioJNILogLevel) ; \
+diff --git a/wpilibj/wpilibJavaJNI/lib/EncoderJNI.cpp b/wpilibj/wpilibJavaJNI/lib/EncoderJNI.cpp
+index b7f60bb59045fb32d6ecd935e93f64535f48db14..4f9e3613e53be20d12f559ccdc5d7066f4093a1d 100644
+--- a/wpilibj/wpilibJavaJNI/lib/EncoderJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/EncoderJNI.cpp
+@@ -7,7 +7,7 @@
+ #include "HAL/Digital.hpp"
+ 
+ // set the logging level
+-TLogLevel encoderJNILogLevel = logDEBUG;
++TLogLevel encoderJNILogLevel = logWARNING;
+ 
+ #define ENCODERJNI_LOG(level) \
+     if (level > encoderJNILogLevel) ; \
+diff --git a/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp b/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
+index 1bf29e9e1cdcc0e104081dacf51b4aaeb993c374..5778cf51bb758a9327f33ac4f4aa255b34fdd569 100644
+--- a/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
+@@ -7,6 +7,14 @@
+ //#include "NetworkCommunication/FRCComm.h"
+ //#include "NetworkCommunication/UsageReporting.h"
+ 
++// set the logging level
++TLogLevel netCommLogLevel = logWARNING;
++
++#define NETCOMM_LOG(level) \
++    if (level > netCommLogLevel) ; \
++    else Log().Get(level)
++
++
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_communication_FRC_NetworkCommunicationsLibrary
+@@ -91,7 +99,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationUsageReportingReport
+   (JNIEnv * paramEnv, jclass, jbyte paramResource, jbyte paramInstanceNumber, jbyte paramContext, jstring paramFeature)
+ {
+-	FILE_LOG(logDEBUG) << "Calling FRCNetworkCommunicationsLibrary report " << "res:"<< (unsigned int)paramResource << " instance:" << (unsigned int)paramInstanceNumber << " context:" << (unsigned int)paramContext << " feature:" << paramFeature;
++	NETCOMM_LOG(logDEBUG) << "Calling FRCNetworkCommunicationsLibrary report " << "res:"<< (unsigned int)paramResource << " instance:" << (unsigned int)paramInstanceNumber << " context:" << (unsigned int)paramContext << " feature:" << paramFeature;
+ 	const char * featureStr = paramEnv->GetStringUTFChars(paramFeature, NULL);
+ 	jint returnValue = HALReport(paramResource, paramInstanceNumber, paramContext, featureStr);
+ 	paramEnv->ReleaseStringUTFChars(paramFeature,featureStr);
+@@ -153,7 +161,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+ 
+ 	int returnValue = HALGetCommonControlData(&controlDataNative, HAL_WAIT_FOREVER);
+ 
+-	//FILE_LOG(logDEBUG) << "PacketIndex: " << (void*)controlDataNative.packetIndex << " Control: " << (void*)controlDataNative.control << " ReturnValue: " << (void*)returnValue;
++	//NETCOMM_LOG(logDEBUG) << "PacketIndex: " << (void*)controlDataNative.packetIndex << " Control: " << (void*)controlDataNative.control << " ReturnValue: " << (void*)returnValue;
+ 
+ 	if(!initializeComplete)
+ 	{
+@@ -212,9 +220,9 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+ 		initializeComplete = true;
+ 	}
+ 
+-	//FILE_LOG(logDEBUG) << "PacketIndex  : " << (short)controlDataNative.packetIndex;
++	//NETCOMM_LOG(logDEBUG) << "PacketIndex  : " << (short)controlDataNative.packetIndex;
+ 	env->SetShortField(controlData,packetIndexFieldID, controlDataNative.packetIndex);
+-	//FILE_LOG(logDEBUG) << "Control  : " << (short)controlDataNative.control;
++	//NETCOMM_LOG(logDEBUG) << "Control  : " << (short)controlDataNative.control;
+ 	env->SetByteField(controlData,controlFieldID, controlDataNative.control);
+ 	env->SetByteField(controlData,dsDigitalInFieldID, controlDataNative.dsDigitalIn);
+ 	env->SetShortField(controlData,teamIDFieldID, controlDataNative.teamID);
+@@ -352,7 +360,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setStatusData
+   (JNIEnv * env, jclass, jfloat paramBattery, jbyte param1, jbyte param2, jstring paramUserDataHigh, jint param4, jstring paramUserDataLow, jint param6)
+ {
+-	//FILE_LOG(logDEBUG) << "Voltage - " << paramBattery;
++	//NETCOMM_LOG(logDEBUG) << "Voltage - " << paramBattery;
+ 	const char * userDataHighStr = env->GetStringUTFChars(paramUserDataHigh, NULL);
+ 	const char * userDataLowStr = env->GetStringUTFChars(paramUserDataLow, NULL);
+ 	jint returnValue = HALSetStatusData(paramBattery, param1, param2, userDataHighStr, param4, userDataLowStr, param6, HAL_WAIT_FOREVER );
+@@ -513,7 +521,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+   (JNIEnv * env, jclass, jobject id )
+ {
+ 	MUTEX_ID* javaId = (MUTEX_ID*)env->GetDirectBufferAddress(id);
+-	FILE_LOG(logDEBUG) << "Mutex Ptr = " << *javaId;
++	NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << *javaId;
+ 	HALSetNewDataSem(*javaId);
+ }
+ 
+@@ -525,14 +533,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueParameterTest
+   (JNIEnv *, jclass, jboolean booleanParam, jbyte byteParam, jchar charParam, jshort shortParam, jint intParam, jlong longParam, jfloat floatParam, jdouble doubleParam)
+ {
+-	FILE_LOG(logDEBUG) << "Boolean: " << booleanParam;
+-	FILE_LOG(logDEBUG) << "Byte   : " << byteParam;
+-	FILE_LOG(logDEBUG) << "Char   : " << charParam;
+-	FILE_LOG(logDEBUG) << "Short  : " << shortParam;
+-	FILE_LOG(logDEBUG) << "Int    : " << intParam;
+-	FILE_LOG(logDEBUG) << "Long   : " << longParam;
+-	FILE_LOG(logDEBUG) << "Float  : " << floatParam;
+-	FILE_LOG(logDEBUG) << "Double : " << doubleParam;
++	NETCOMM_LOG(logDEBUG) << "Boolean: " << booleanParam;
++	NETCOMM_LOG(logDEBUG) << "Byte   : " << byteParam;
++	NETCOMM_LOG(logDEBUG) << "Char   : " << charParam;
++	NETCOMM_LOG(logDEBUG) << "Short  : " << shortParam;
++	NETCOMM_LOG(logDEBUG) << "Int    : " << intParam;
++	NETCOMM_LOG(logDEBUG) << "Long   : " << longParam;
++	NETCOMM_LOG(logDEBUG) << "Float  : " << floatParam;
++	NETCOMM_LOG(logDEBUG) << "Double : " << doubleParam;
+ }
+ 
+ /*
+@@ -543,7 +551,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnBooleanTest
+   (JNIEnv *, jclass, jboolean booleanParam )
+ {
+-	FILE_LOG(logDEBUG) << "Boolean: " << booleanParam;
++	NETCOMM_LOG(logDEBUG) << "Boolean: " << booleanParam;
+ 	return !booleanParam;
+ }
+ 
+@@ -555,7 +563,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCo
+ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnByteTest
+   (JNIEnv *, jclass, jbyte byteParam)
+ {
+-	FILE_LOG(logDEBUG) << "Byte: " << byteParam;
++	NETCOMM_LOG(logDEBUG) << "Byte: " << byteParam;
+ 	return byteParam+1;
+ }
+ 
+@@ -567,7 +575,7 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommu
+ JNIEXPORT jchar JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnCharTest
+   (JNIEnv *, jclass, jchar charParam)
+ {
+-	FILE_LOG(logDEBUG) << "Char: " << charParam;
++	NETCOMM_LOG(logDEBUG) << "Char: " << charParam;
+ 	return charParam+1;
+ }
+ 
+@@ -579,7 +587,7 @@ JNIEXPORT jchar JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommu
+ JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnShortTest
+   (JNIEnv *, jclass, jshort shortParam)
+ {
+-	FILE_LOG(logDEBUG) << "Short: " << shortParam;
++	NETCOMM_LOG(logDEBUG) << "Short: " << shortParam;
+ 	return shortParam+1;
+ }
+ 
+@@ -591,7 +599,7 @@ JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkComm
+ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnIntTest
+   (JNIEnv *, jclass, jint intParam)
+ {
+-	FILE_LOG(logDEBUG) << "Int: " << intParam;
++	NETCOMM_LOG(logDEBUG) << "Int: " << intParam;
+ 	return intParam+1;
+ }
+ 
+@@ -603,7 +611,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnLongTest
+   (JNIEnv *, jclass, jlong longParam)
+ {
+-	FILE_LOG(logDEBUG) << "Long: " << longParam;
++	NETCOMM_LOG(logDEBUG) << "Long: " << longParam;
+ 	return longParam+1;
+ }
+ 
+@@ -615,7 +623,7 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommu
+ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnFloatTest
+   (JNIEnv *, jclass, jfloat floatParam)
+ {
+-	FILE_LOG(logDEBUG) << "Float: " << floatParam;
++	NETCOMM_LOG(logDEBUG) << "Float: " << floatParam;
+ 	return floatParam/100.0f;
+ }
+ 
+@@ -627,7 +635,7 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkComm
+ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_JNIValueReturnDoubleTest
+   (JNIEnv *, jclass, jdouble doubleParam)
+ {
+-	FILE_LOG(logDEBUG) << "Double: " << doubleParam;
++	NETCOMM_LOG(logDEBUG) << "Double: " << doubleParam;
+ 	return doubleParam * 100.0;
+ }
+ 
+@@ -640,7 +648,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
+   (JNIEnv * env, jclass, jstring stringParam)
+ {
+ 	const char * stringParamLocal = env->GetStringUTFChars(stringParam, NULL);
+-	FILE_LOG(logDEBUG) << "String: " << stringParamLocal;
++	NETCOMM_LOG(logDEBUG) << "String: " << stringParamLocal;
+ 	env->ReleaseStringUTFChars(stringParam,stringParamLocal);
+ 
+ 	char returnStringLocal[] = "this is the return string";
+@@ -657,13 +665,13 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
+   (JNIEnv * env, jclass, jobject byteArrayIn )
+ {
+ 	jbyte * byteArray = (jbyte*)env->GetDirectBufferAddress(byteArrayIn);
+-	FILE_LOG(logDEBUG) << "Ptr: " << (long)byteArray;
++	NETCOMM_LOG(logDEBUG) << "Ptr: " << (long)byteArray;
+ 	jlong byteArrayLength = env->GetDirectBufferCapacity(byteArrayIn);
+-	FILE_LOG(logDEBUG) << "Capacity: " << byteArrayLength;
+-	FILE_LOG(logDEBUG) << "Byte0: " << (short)byteArray[0];
+-	FILE_LOG(logDEBUG) << "Byte1: " << (short)byteArray[1];
+-	FILE_LOG(logDEBUG) << "Byte2: " << (short)byteArray[2];
+-	FILE_LOG(logDEBUG) << "Byte3: " << (short)byteArray[3];
++	NETCOMM_LOG(logDEBUG) << "Capacity: " << byteArrayLength;
++	NETCOMM_LOG(logDEBUG) << "Byte0: " << (short)byteArray[0];
++	NETCOMM_LOG(logDEBUG) << "Byte1: " << (short)byteArray[1];
++	NETCOMM_LOG(logDEBUG) << "Byte2: " << (short)byteArray[2];
++	NETCOMM_LOG(logDEBUG) << "Byte3: " << (short)byteArray[3];
+ 
+ 	jbyte * returnByteArray = new jbyte[4];
+ 	returnByteArray[0] = byteArray[0];
+@@ -684,14 +692,14 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
+ {
+ 	jint * intArray = (jint*)env->GetDirectBufferAddress(intArrayIn);
+ 	jbyte * byteArray = (jbyte*)env->GetDirectBufferAddress(intArrayIn);
+-	FILE_LOG(logDEBUG) << "Ptr: " << (long)intArray;
++	NETCOMM_LOG(logDEBUG) << "Ptr: " << (long)intArray;
+ 	jlong byteArrayLength = env->GetDirectBufferCapacity(intArrayIn);
+-	FILE_LOG(logDEBUG) << "Capacity: " << byteArrayLength;
+-	FILE_LOG(logDEBUG) << "Int0: " << intArray[0];
+-	FILE_LOG(logDEBUG) << "Byte0: " << (short)byteArray[0];
+-	FILE_LOG(logDEBUG) << "Byte1: " << (short)byteArray[1];
+-	FILE_LOG(logDEBUG) << "Byte2: " << (short)byteArray[2];
+-	FILE_LOG(logDEBUG) << "Byte3: " << (short)byteArray[3];
++	NETCOMM_LOG(logDEBUG) << "Capacity: " << byteArrayLength;
++	NETCOMM_LOG(logDEBUG) << "Int0: " << intArray[0];
++	NETCOMM_LOG(logDEBUG) << "Byte0: " << (short)byteArray[0];
++	NETCOMM_LOG(logDEBUG) << "Byte1: " << (short)byteArray[1];
++	NETCOMM_LOG(logDEBUG) << "Byte2: " << (short)byteArray[2];
++	NETCOMM_LOG(logDEBUG) << "Byte3: " << (short)byteArray[3];
+ 
+ 	// increment the param
+ 	intArray[0]++;
+diff --git a/wpilibj/wpilibJavaJNI/lib/HALUtil.cpp b/wpilibj/wpilibJavaJNI/lib/HALUtil.cpp
+index 6828a0438c61f8ea0e9f8c0e602e942c59d49c2c..aca83025142ee868dcf0de535f3b1d1d496497a1 100644
+--- a/wpilibj/wpilibJavaJNI/lib/HALUtil.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/HALUtil.cpp
+@@ -5,7 +5,7 @@
+ #include "HAL/HAL.hpp"
+ 
+ // set the logging level
+-TLogLevel halUtilLogLevel = logDEBUG;
++TLogLevel halUtilLogLevel = logWARNING;
+ 
+ #define HALUTIL_LOG(level) \
+     if (level > halUtilLogLevel) ; \
+diff --git a/wpilibj/wpilibJavaJNI/lib/I2CJNI.cpp b/wpilibj/wpilibJavaJNI/lib/I2CJNI.cpp
+index 2eaff318642768bd72d95fd7a3dcefd463d0f5fa..2050b983c6559a8da89cc9ad032d5a578bd6e280 100644
+--- a/wpilibj/wpilibJavaJNI/lib/I2CJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/I2CJNI.cpp
+@@ -6,7 +6,7 @@
+ 
+ 
+ // set the logging level
+-TLogLevel i2cJNILogLevel = logDEBUG;
++TLogLevel i2cJNILogLevel = logWARNING;
+ 
+ #define I2CJNI_LOG(level) \
+     if (level > i2cJNILogLevel) ; \
+diff --git a/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp b/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
+index 7095b318ca32f94fed82ca7cc2eb9610910b0859..0df74aa2307cad78a264c4e2ef952f2bdec043a2 100644
+--- a/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/PWMJNI.cpp
+@@ -7,7 +7,7 @@
+ #include "HAL/Digital.hpp"
+ 
+ // set the logging level
+-TLogLevel pwmJNILogLevel = logERROR;
++TLogLevel pwmJNILogLevel = logWARNING;
+ 
+ #define PWMJNI_LOG(level) \
+     if (level > pwmJNILogLevel) ; \
+diff --git a/wpilibj/wpilibJavaJNI/lib/RelayJNI.cpp b/wpilibj/wpilibJavaJNI/lib/RelayJNI.cpp
+index 244fa31bbae2bd7fda26341d98825f5bd989607d..61aceef5a314d5a00b3fdacb9524b2911123afc3 100644
+--- a/wpilibj/wpilibJavaJNI/lib/RelayJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/RelayJNI.cpp
+@@ -7,7 +7,7 @@
+ #include "HAL/Digital.hpp"
+ 
+ // set the logging level
+-TLogLevel relayJNILogLevel = logDEBUG;
++TLogLevel relayJNILogLevel = logWARNING;
+ 
+ #define RELAYJNI_LOG(level) \
+     if (level > relayJNILogLevel) ; \
+diff --git a/wpilibj/wpilibJavaJNI/lib/SPIJNI.cpp b/wpilibj/wpilibJavaJNI/lib/SPIJNI.cpp
+index 0e5ef6097bd7595f94f513e2013c52acfa810f2b..bbc4d71dcbafff16f7cdbe22ab2ed9fcd3b0374c 100644
+--- a/wpilibj/wpilibJavaJNI/lib/SPIJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/SPIJNI.cpp
+@@ -6,7 +6,7 @@
+ 
+ 
+ // set the logging level
+-TLogLevel spiJNILogLevel = logDEBUG;
++TLogLevel spiJNILogLevel = logWARNING;
+ 
+ #define SPIJNI_LOG(level) \
+     if (level > spiJNILogLevel) ; \
+diff --git a/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp b/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
+index 21469a9c7b4676f8d6420d4c1e9c6d6602b20348..0418f71eff09a82491d81c609abff7260ea710aa 100644
+--- a/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
+@@ -4,7 +4,7 @@
+ 
+ #include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"
+ 
+-TLogLevel solenoidJNILogLevel = logERROR;
++TLogLevel solenoidJNILogLevel = logWARNING;
+ 
+ #define SOLENOIDJNI_LOG(level) \
+     if (level > solenoidJNILogLevel) ; \

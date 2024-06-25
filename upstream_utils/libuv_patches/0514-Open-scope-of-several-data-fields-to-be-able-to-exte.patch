@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joe Ross <joe@rossesmail.com>
+Date: Sat, 20 Sep 2014 16:07:18 -0700
+Subject: [PATCH 0514/6262] Open scope of several data fields to be able to
+ extend CommandGroup
+
+Change-Id: I81ac59dd45aa50ed3d8dc4fdd1d5807899af546b
+---
+ .../main/java/edu/wpi/first/wpilibj/command/CommandGroup.java | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/command/CommandGroup.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/command/CommandGroup.java
+index 55a2203e9206127be9ee86ce4d9879c9affdf8af..cf9c133ab71f02a17f4ffefdf80770352c59fc12 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/command/CommandGroup.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/command/CommandGroup.java
+@@ -34,11 +34,11 @@ import java.util.Vector;
+ public class CommandGroup extends Command {
+ 
+     /** The commands in this group (stored in entries) */
+-    private Vector m_commands = new Vector();
++    Vector m_commands = new Vector();
+     /** The active children in this group (stored in entries) */
+     Vector m_children = new Vector();
+     /** The current command, -1 signifies that none have been run */
+-    private int m_currentCommandIndex = -1;
++    int m_currentCommandIndex = -1;
+ 
+     /**
+      * Creates a new {@link CommandGroup CommandGroup}.

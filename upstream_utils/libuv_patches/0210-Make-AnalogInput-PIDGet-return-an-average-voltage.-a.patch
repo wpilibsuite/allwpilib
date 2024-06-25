@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joe Ross <joe@rossesmail.com>
+Date: Mon, 28 Jul 2014 07:49:47 -0700
+Subject: [PATCH 0210/6262] Make AnalogInput PIDGet return an average voltage.
+ artf2391 for Java. Equivalent to Ia7f06ca2 Previously it returned a raw value
+ instead of a voltage.
+
+Change-Id: I6f1bcf8fdd7f98ae62ed991f29fec35f4ffb4098
+---
+ .../src/main/java/edu/wpi/first/wpilibj/AnalogInput.java    | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+index d252722b849d3c50982a98f3df74f5f788e71244..ab4e43647465de26cdb5cce22d317f28ab002d96 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+@@ -460,12 +460,12 @@ public class AnalogInput extends SensorBase implements PIDSource,
+ 	}
+ 
+ 	/**
+-	 * Get the average value for use with PIDController
++	 * Get the average voltage for use with PIDController
+ 	 *
+-	 * @return the average value
++	 * @return the average voltage
+ 	 */
+ 	public double pidGet() {
+-		return getAverageValue();
++		return getAverageVoltage();
+ 	}
+ 
+ 	/**

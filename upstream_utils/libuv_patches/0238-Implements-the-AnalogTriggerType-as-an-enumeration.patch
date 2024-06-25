@@ -1,0 +1,141 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Wed, 18 Jun 2014 09:41:48 -0400
+Subject: [PATCH 0238/6262] Implements the AnalogTriggerType as an enumeration
+
+Change-Id: I411104a0bec733dc0b3854470c36366f3aec7bd6
+---
+ .../edu/wpi/first/wpilibj/AnalogTrigger.java  |  4 ++-
+ .../first/wpilibj/AnalogTriggerOutput.java    | 27 +++++++++++++++----
+ .../java/edu/wpi/first/wpilibj/Counter.java   |  7 ++---
+ 3 files changed, 29 insertions(+), 9 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
+index e14934f61fb8dba2859e7e34b1adf51e9478158a..1316beb8746c2891f931b6670dea696b276a6b96 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
+@@ -12,6 +12,8 @@ import java.nio.ByteBuffer;
+ 
+ //import com.sun.jna.Pointer;
+ 
++
++import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.hal.AnalogJNI;
+@@ -214,7 +216,7 @@ public class AnalogTrigger {
+ 	 *            An enum of the type of output object to create.
+ 	 * @return A pointer to a new AnalogTriggerOutput object.
+ 	 */
+-	AnalogTriggerOutput createOutput(int type) {
++	AnalogTriggerOutput createOutput(AnalogTriggerType type) {
+ 		return new AnalogTriggerOutput(this, type);
+ 	}
+ }
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java
+index f6f0788c813af5ad87dbb8a8f413c11ade8c904f..43abc713e14350d0de1adf650e68d449bfe5f3bb 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java
+@@ -65,7 +65,7 @@ public class AnalogTriggerOutput extends DigitalSource {
+ 	}
+ 
+ 	private AnalogTrigger m_trigger;
+-	private int m_outputType; // define in HALLibrary.AnalogTriggerType
++	private AnalogTriggerType m_outputType;
+ 
+ 	/**
+ 	 * Create an object that represents one of the four outputs from an analog
+@@ -79,14 +79,14 @@ public class AnalogTriggerOutput extends DigitalSource {
+ 	 * @param outputType
+ 	 *            An enum that specifies the output on the trigger to represent.
+ 	 */
+-	public AnalogTriggerOutput(AnalogTrigger trigger, final int outputType) {
++	public AnalogTriggerOutput(AnalogTrigger trigger, final AnalogTriggerType outputType) {
+ 		if (trigger == null)
+ 			throw new NullPointerException("Analog Trigger given was null");
+ 		m_trigger = trigger;
+ 		m_outputType = outputType;
+ 
+ 		UsageReporting.report(tResourceType.kResourceType_AnalogTriggerOutput,
+-				trigger.getIndex(), outputType);
++				trigger.getIndex(), outputType.value);
+ 	}
+ 
+ 	public void free() {
+@@ -100,13 +100,13 @@ public class AnalogTriggerOutput extends DigitalSource {
+ 	public boolean get() {
+ 		IntBuffer status = IntBuffer.allocate(1);
+ 		byte value = AnalogJNI.getAnalogTriggerOutput(m_trigger.m_port,
+-				m_outputType, status);
++				m_outputType.value, status);
+ 		HALUtil.checkStatus(status);
+ 		return value != 0;
+ 	}
+ 
+ 	public int getChannelForRouting() {
+-		return (m_trigger.m_index << 2) + m_outputType;
++		return (m_trigger.m_index << 2) + m_outputType.value;
+ 	}
+ 
+ 	public int getModuleForRouting() {
+@@ -137,4 +137,21 @@ public class AnalogTriggerOutput extends DigitalSource {
+ 	// public void requestInterrupts() {
+ 	// TODO: throw exception
+ 	// }
++	
++	/**
++	 * Defines the state in which the AnalogTrigger triggers
++	 * @author jonathanleitschuh
++	 */
++	public enum AnalogTriggerType{
++		IN_WINDOW(AnalogJNI.AnalogTriggerType.kInWindow),
++		STATE(AnalogJNI.AnalogTriggerType.kState),
++		RISING_PULSE(AnalogJNI.AnalogTriggerType.kRisingPulse),
++		FALLING_PULSE(AnalogJNI.AnalogTriggerType.kFallingPulse);
++		
++		private final int value;
++		
++		private AnalogTriggerType(int value){
++			this.value = value;
++		}
++	}
+ }
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
+index 26bcf6b2c0def8c15b9b8f368f5be24028d31715..ece858cf99fa18dda4fa00eb9d4e93cc0620e056 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
+@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
+ import java.nio.ByteBuffer;
+ import java.nio.ByteOrder;
+ 
++import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.hal.AnalogJNI;
+@@ -198,7 +199,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 */
+ 	public Counter(AnalogTrigger trigger) {
+ 		initCounter(Mode.kTwoPulse);
+-		setUpSource(trigger.createOutput(AnalogJNI.AnalogTriggerType.kState));
++		setUpSource(trigger.createOutput(AnalogTriggerType.STATE));
+ 	}
+ 
+ 	public void free() {
+@@ -258,7 +259,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 * @param triggerType
+ 	 *            The analog trigger output that will trigger the counter.
+ 	 */
+-	public void setUpSource(AnalogTrigger analogTrigger, int triggerType) {
++	public void setUpSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
+ 		analogTrigger.createOutput(triggerType);
+ 		m_allocatedUpSource = true;
+ 	}
+@@ -345,7 +346,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 * @param triggerType
+ 	 *            The analog trigger output that will trigger the counter.
+ 	 */
+-	public void setDownSource(AnalogTrigger analogTrigger, int triggerType) {
++	public void setDownSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
+ 		setDownSource(analogTrigger.createOutput(triggerType));
+ 		m_allocatedDownSource = true;
+ 	}

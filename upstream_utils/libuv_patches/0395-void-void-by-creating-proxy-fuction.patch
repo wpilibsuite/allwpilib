@@ -1,0 +1,137 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Tue, 7 Oct 2014 17:13:31 -0400
+Subject: [PATCH 0395/6262] void* -> void by creating proxy fuction
+
+Change-Id: I903c3d98f3210d1969b9aed6c84f5ccaa803a9ed
+---
+ wpilibc/wpilibC++/include/Notifier.h          |  2 +-
+ wpilibc/wpilibC++/include/PIDController.h     |  2 +-
+ .../wpilibC++Devices/src/PIDController.cpp    | 25 +++++++++++++++----
+ .../src/NotifierTest.cpp                      |  3 +--
+ wpilibc/wpilibC++Sim/src/PIDController.cpp    |  3 +--
+ 5 files changed, 24 insertions(+), 11 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/Notifier.h b/wpilibc/wpilibC++/include/Notifier.h
+index 13c3e091df1bf547636c074b35d8d4ab041bef06..3cb2fda1c5fa62454c48b3be9a8d5ac42081912d 100644
+--- a/wpilibc/wpilibC++/include/Notifier.h
++++ b/wpilibc/wpilibC++/include/Notifier.h
+@@ -9,7 +9,7 @@
+ #include "Task.h"
+ #include "HAL/cpp/Synchronized.hpp"
+ 
+-typedef void *(*TimerEventHandler)(void *param);
++typedef void (*TimerEventHandler)(void *param);
+ 
+ class Notifier : public ErrorBase
+ {
+diff --git a/wpilibc/wpilibC++/include/PIDController.h b/wpilibc/wpilibC++/include/PIDController.h
+index 0b591dcd366b5310477c33882781d92da727871d..2a5d0e3c88f17b8a96a835e23aa4bc1552af7208 100644
+--- a/wpilibc/wpilibC++/include/PIDController.h
++++ b/wpilibc/wpilibC++/include/PIDController.h
+@@ -98,7 +98,7 @@ private:
+ 
+ 	void Initialize(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
+ 			float period = 0.05);
+-	static void *CallCalculate(void *controller);
++	static void CallCalculate(void *controller);
+ 
+ 	virtual ITable* GetTable();
+ 	virtual std::string GetSmartDashboardType();
+diff --git a/wpilibc/wpilibC++Devices/src/PIDController.cpp b/wpilibc/wpilibC++Devices/src/PIDController.cpp
+index 492adfe76348bfcfe99ff48089a73a13d7d5029e..e0838afa8a462cadbfdf0a0d653805330d49da17 100644
+--- a/wpilibc/wpilibC++Devices/src/PIDController.cpp
++++ b/wpilibc/wpilibC++Devices/src/PIDController.cpp
+@@ -5,7 +5,6 @@
+ /*----------------------------------------------------------------------------*/
+ 
+ #include "PIDController.h"
+-//#include "NetworkCommunication/UsageReporting.h"
+ #include "Notifier.h"
+ #include "PIDSource.h"
+ #include "PIDOutput.h"
+@@ -56,6 +55,20 @@ PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
+ 	Initialize(Kp, Ki, Kd, Kf, source, output, period);
+ }
+ 
++struct CallerInfo
++{
++	TimerEventHandler fn;
++	void* data;
++};
++
++static void* forwardCallCalculate(CallerInfo* rdata)
++{
++	CallerInfo data = *rdata;
++	delete rdata;
++	data.fn(data.data);
++	return nullptr;
++}
++
+ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
+ 								PIDSource *source, PIDOutput *output,
+ 								float period)
+@@ -92,7 +105,11 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
+ 	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+ 	pthread_mutex_init(&m_mutex, &mutexattr);
+ 
+-	pthread_create(&m_controlLoop, NULL, PIDController::CallCalculate, this);
++	CallerInfo *ci = new CallerInfo();
++	ci->fn = &CallCalculate;
++	ci->data = this;
++	pthread_create(&m_controlLoop, NULL, (void*(*)(void*))&forwardCallCalculate, ci);
++	//forwardCallCalculate will delete the obj, no need to delete it ourselves
+ 
+ 	static int32_t instances = 0;
+ 	instances++;
+@@ -122,7 +139,7 @@ PIDController::~PIDController()
+  * This method is static and called by pthreads.
+  * @param controller the address of the PID controller object to use in the background loop
+  */
+-void *PIDController::CallCalculate(void *data)
++void PIDController::CallCalculate(void *data)
+ {
+ 	PIDController *controller = (PIDController*) data;
+ 	int destruct = 0;
+@@ -137,8 +154,6 @@ void *PIDController::CallCalculate(void *data)
+ 
+ 		Wait(controller->m_period);
+ 	}
+-
+-	return NULL;
+ }
+ 
+  /**
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/NotifierTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/NotifierTest.cpp
+index 072a8dc4f1b98e83203bfdedc98282f64030ab64..87cd2a994010b843c0c7f78df487f17935fd705f 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/NotifierTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/NotifierTest.cpp
+@@ -12,10 +12,9 @@
+ 
+ unsigned notifierCounter;
+ 
+-void *notifierHandler(void *)
++void notifierHandler(void *)
+ {
+ 	notifierCounter++;
+-	return nullptr;
+ }
+ 
+ /**
+diff --git a/wpilibc/wpilibC++Sim/src/PIDController.cpp b/wpilibc/wpilibC++Sim/src/PIDController.cpp
+index 6087ce67603d4ba4a70c103351ff284d02884c0c..d55cfdbf0dfc44d2c3008c4225342a9a82c78a20 100644
+--- a/wpilibc/wpilibC++Sim/src/PIDController.cpp
++++ b/wpilibc/wpilibC++Sim/src/PIDController.cpp
+@@ -115,11 +115,10 @@ PIDController::~PIDController()
+  * This method is static and called by the Notifier class.
+  * @param controller the address of the PID controller object to use in the background loop
+  */
+-void *PIDController::CallCalculate(void *controller)
++void PIDController::CallCalculate(void *controller)
+ {
+ 	PIDController *control = (PIDController*) controller;
+ 	control->Calculate();
+-	return nullptr;
+ }
+ 
+  /**

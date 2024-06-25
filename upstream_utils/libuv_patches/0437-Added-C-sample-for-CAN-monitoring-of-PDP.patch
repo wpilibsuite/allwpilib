@@ -1,0 +1,94 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: James Kuszmaul <jabukuszmaul+collab@gmail.com>
+Date: Wed, 22 Oct 2014 12:26:44 -0400
+Subject: [PATCH 0437/6262] Added C++ sample for CAN monitoring of PDP.
+
+Uses CAN to monitor PDP and displays values on the SmartDashboard.
+
+Change-Id: Icb06fec0b65ce02b7c396e7d4e379cee0d959095
+---
+ .../templates/examples/CANPDP/src/Robot.cpp   | 47 +++++++++++++++++++
+ .../resources/templates/examples/examples.xml | 16 +++++++
+ 2 files changed, 63 insertions(+)
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANPDP/src/Robot.cpp
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANPDP/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANPDP/src/Robot.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..2e66765e6791e086b43a94733de367c0d7d01aa3
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/CANPDP/src/Robot.cpp
+@@ -0,0 +1,47 @@
++#include "WPILib.h"
++
++/**
++ * This is a sample program showing how to retrieve information from
++ *   the Power Distribution Panel via CAN.
++ * The information will be displayed under variables through the SmartDashboard.
++ */
++class Robot: public SampleRobot
++{
++
++	// Object for dealing with the Power Distribution Panel (PDP).
++	PowerDistributionPanel m_pdp;
++
++	// Update every 5milliseconds/0.005 seconds.
++	const double kUpdatePeriod = 0.005;
++
++public:
++	Robot() {
++	}
++
++	/**
++	 * Retrieve information from the PDP over CAN and
++	 *   displays it on the SmartDashboard interface.
++	 * SmartDashboard::PutNumber takes a string (for a label) and a double;
++	 * GetCurrent takes a channel number and returns a double for current,
++	 *   in Amperes. Channel numbers are printed on the PDP and range from 0-15.
++	 */
++	void OperatorControl()
++	{
++		while (IsOperatorControl())
++		{
++			// Get the current going through channel 7, in Amperes.
++			// The PDP returns the current in increments of 0.125A.
++			// At low currents the current readings tend to be less accurate. 
++			SmartDashboard::PutNumber("Current Channel 7", m_pdp.GetCurrent(7));
++			// Get the voltage going into the PDP, in Volts.
++			// The PDP returns the voltage in increments of 0.05 Volts.
++			SmartDashboard::PutNumber("Voltage", m_pdp.GetVoltage());
++			// Retrieves the temperature of the PDP, in degrees Celsius.
++			SmartDashboard::PutNumber("Temperature", m_pdp.GetTemperature());
++			Wait(kUpdatePeriod);
++		}
++	}
++
++};
++
++START_ROBOT_CLASS(Robot);
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
+index de77ba9069e852b65da8a30f4d4c741d3fd4cd35..16f15984bdac12b8d7b42994d40b473162302075 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
+@@ -120,6 +120,22 @@
+   </files>
+ </example>
+ 
++<example>
++  <name>PDP CAN Monitoring</name>
++  <description>Demonstrate using CAN to monitor the voltage, current, and temperature in the Power Distribution Panel.</description>
++  <tags>
++    <tag>Complete List</tag>
++    <tag>CAN</tag>
++    <tag>Sensors</tag>
++  </tags>
++  <packages>
++    <package>src</package>
++  </packages>
++  <files>
++    <file source="examples/CANPDP/src/Robot.cpp" destination="src/Robot.cpp"></file>
++  </files>
++</example>
++
+ <example>
+   <name>Solenoids</name>
+   <description>Demonstrate controlling a single and double solenoid from Joystick buttons.</description>

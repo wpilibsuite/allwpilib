@@ -1,0 +1,366 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Mon, 21 Jul 2014 10:07:46 -0400
+Subject: [PATCH 0175/6262] Added BuiltInAccelerometer in Java and updated C++
+
+Change-Id: I5a3360c51334e85da6a15fd640f9420bc3b64dca
+---
+ .../wpilibC++/include/BuiltInAccelerometer.h  |  16 ++-
+ wpilibc/wpilibC++/include/WPILib.h            |   1 +
+ .../wpilibC++/lib/BuiltInAccelerometer.cpp    |  30 +++--
+ .../first/wpilibj/BuiltInAccelerometer.java   | 105 ++++++++++++++++++
+ .../first/wpilibj/hal/AccelerometerJNI.java   |   9 ++
+ .../wpilibJavaJNI/lib/AccelerometerJNI.cpp    |  58 ++++++++++
+ wpilibj/wpilibJavaJNI/pom.xml                 |  11 +-
+ 7 files changed, 214 insertions(+), 16 deletions(-)
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/AccelerometerJNI.java
+ create mode 100644 wpilibj/wpilibJavaJNI/lib/AccelerometerJNI.cpp
+
+diff --git a/wpilibc/wpilibC++/include/BuiltInAccelerometer.h b/wpilibc/wpilibC++/include/BuiltInAccelerometer.h
+index afcd86c53d4227b7ee614da586e8716c6cb1d158..d065e263beb52fb389a0730b8779f2503555f1f5 100644
+--- a/wpilibc/wpilibC++/include/BuiltInAccelerometer.h
++++ b/wpilibc/wpilibC++/include/BuiltInAccelerometer.h
+@@ -6,13 +6,14 @@
+ #pragma once
+ 
+ #include "SensorBase.h"
++#include "LiveWindow/LiveWindowSendable.h"
+ 
+ /**
+  * Built-in accelerometer.
+  *
+  * This class allows access to the RoboRIO's internal accelerometer.
+  */
+-class BuiltInAccelerometer : public SensorBase
++class BuiltInAccelerometer : public SensorBase, public LiveWindowSendable
+ {
+ public:
+ 	enum Range
+@@ -22,9 +23,18 @@ public:
+ 		kRange_8G = 0x02,
+ 	};
+ 
+-	BuiltInAccelerometer(Range range = kRange_2G);
+-	virtual ~BuiltInAccelerometer();
++	BuiltInAccelerometer(Range range = kRange_8G);
+ 	virtual double GetX() const;
+ 	virtual double GetY() const;
+ 	virtual double GetZ() const;
++
++	virtual std::string GetSmartDashboardType();
++	virtual void InitTable(ITable *subtable);
++	virtual void UpdateTable();
++	virtual ITable* GetTable();
++	virtual void StartLiveWindowMode() {}
++	virtual void StopLiveWindowMode() {}
++
++private:
++	ITable *m_table;
+ };
+diff --git a/wpilibc/wpilibC++/include/WPILib.h b/wpilibc/wpilibC++/include/WPILib.h
+index 48e9543b1eeaadcf2b85f9ef63e51c7c277f500e..203156cf0caa8d22ec23efe7855a47424046816e 100644
+--- a/wpilibc/wpilibC++/include/WPILib.h
++++ b/wpilibc/wpilibC++/include/WPILib.h
+@@ -19,6 +19,7 @@
+ #include "AnalogModule.h"
+ #include "AnalogTrigger.h"
+ #include "AnalogTriggerOutput.h"
++#include "BuiltInAccelerometer.h"
+ #include "Buttons/AnalogIOButton.h"
+ #include "Buttons/DigitalIOButton.h"
+ #include "Buttons/InternalButton.h"
+diff --git a/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp b/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp
+index 98690ef7947cda2e96ada732f6931b4d214ccb2b..baa69cbe41d62d1315783629f3640ece00b98d98 100644
+--- a/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp
++++ b/wpilibc/wpilibC++/lib/BuiltInAccelerometer.cpp
+@@ -12,6 +12,7 @@
+  * @param range The range the accelerometer will measure
+  */
+ BuiltInAccelerometer::BuiltInAccelerometer(Range range)
++	: m_table(0)
+ {
+ 	setAccelerometerActive(false);
+ 	setAccelerometerRange((AccelerometerRange)range);
+@@ -20,14 +21,6 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range)
+ 	HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
+ }
+ 
+-/**
+- * Destructor.
+- */
+-BuiltInAccelerometer::~BuiltInAccelerometer()
+-{
+-	setAccelerometerActive(false);
+-}
+-
+ /**
+  * @return The acceleration of the RoboRIO along the X axis in g-forces
+  */
+@@ -51,3 +44,24 @@ double BuiltInAccelerometer::GetZ() const
+ {
+ 	return getAccelerometerZ();
+ }
++
++std::string BuiltInAccelerometer::GetSmartDashboardType() {
++	return "Accelerometer";
++}
++
++void BuiltInAccelerometer::InitTable(ITable *subtable) {
++	m_table = subtable;
++	UpdateTable();
++}
++
++void BuiltInAccelerometer::UpdateTable() {
++	if (m_table != NULL) {
++		m_table->PutNumber("X", GetX());
++		m_table->PutNumber("Y", GetY());
++		m_table->PutNumber("Z", GetZ());
++	}
++}
++
++ITable* BuiltInAccelerometer::GetTable() {
++	return m_table;
++}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..bcc173fb284e6100685c17ad16435b787df82882
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java
+@@ -0,0 +1,105 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj;
++import edu.wpi.first.wpilibj.hal.AccelerometerJNI;
++import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
++import edu.wpi.first.wpilibj.communication.UsageReporting;
++import edu.wpi.first.wpilibj.livewindow.LiveWindow;
++import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
++import edu.wpi.first.wpilibj.parsing.ISensor;
++import edu.wpi.first.wpilibj.tables.ITable;
++
++/**
++ * Built-in accelerometer.
++ *
++ * This class allows access to the RoboRIO's internal accelerometer.
++ */
++public class BuiltInAccelerometer implements ISensor, LiveWindowSendable
++{
++	public enum Range { k2G, k4G, k8G }
++
++	/**
++	 * Constructor.
++	 * @param range The range the accelerometer will measure
++	 */
++	public BuiltInAccelerometer(Range range) {
++		AccelerometerJNI.setAccelerometerActive(false);
++
++		switch(range) {
++		case k2G:
++			AccelerometerJNI.setAccelerometerRange(0);
++			break;
++		case k4G:
++			AccelerometerJNI.setAccelerometerRange(1);
++			break;
++		case k8G:
++			AccelerometerJNI.setAccelerometerRange(2);
++			break;
++		}
++
++		AccelerometerJNI.setAccelerometerActive(true);
++
++		UsageReporting.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
++	}
++
++	/**
++	 * Constructor.
++	 * The accelerometer will measure +/-8 g-forces
++	 */
++	public BuiltInAccelerometer() {
++		this(Range.k8G);
++	}
++
++	/**
++	 * @return The acceleration of the RoboRIO along the X axis in g-forces
++	 */
++	public double getX() {
++		return AccelerometerJNI.getAccelerometerX();
++	}
++
++	/**
++	 * @return The acceleration of the RoboRIO along the Y axis in g-forces
++	 */
++	public double getY() {
++		return AccelerometerJNI.getAccelerometerY();
++	}
++
++	/**
++	 * @return The acceleration of the RoboRIO along the Z axis in g-forces
++	 */
++	public double getZ() {
++		return AccelerometerJNI.getAccelerometerZ();
++	}
++
++	public String getSmartDashboardType(){
++		return "Accelerometer";
++	}
++
++	private ITable m_table;
++
++	/** {@inheritDoc} */
++	public void initTable(ITable subtable) {
++		m_table = subtable;
++		updateTable();
++	}
++
++	/** {@inheritDoc} */
++	public void updateTable() {
++		if (m_table != null) {
++			m_table.putNumber("X", getX());
++			m_table.putNumber("Y", getY());
++			m_table.putNumber("Z", getZ());
++		}
++	}
++
++	/** {@inheritDoc} */
++	public ITable getTable(){
++		return m_table;
++	}
++
++	public void startLiveWindowMode() {}
++	public void stopLiveWindowMode() {}
++};
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/AccelerometerJNI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/AccelerometerJNI.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..bfc8c158247b713b7de752b2aaf01994e00e1d93
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/AccelerometerJNI.java
+@@ -0,0 +1,9 @@
++package edu.wpi.first.wpilibj.hal;
++
++public class AccelerometerJNI extends JNIWrapper {
++	public static native void setAccelerometerActive(boolean active);
++	public static native void setAccelerometerRange(int range);
++	public static native double getAccelerometerX();
++	public static native double getAccelerometerY();
++	public static native double getAccelerometerZ();
++}
+diff --git a/wpilibj/wpilibJavaJNI/lib/AccelerometerJNI.cpp b/wpilibj/wpilibJavaJNI/lib/AccelerometerJNI.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..f9edfe5701a91e5dffe813151d579df0105cd794
+--- /dev/null
++++ b/wpilibj/wpilibJavaJNI/lib/AccelerometerJNI.cpp
+@@ -0,0 +1,58 @@
++#include <jni.h>
++#include "edu_wpi_first_wpilibj_hal_AccelerometerJNI.h"
++#include "HAL/Accelerometer.hpp"
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
++ * Method:    setAccelerometerActive
++ * Signature: (Z)V
++ */
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerActive
++  (JNIEnv *, jclass, jboolean active)
++{
++	setAccelerometerActive(active);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
++ * Method:    setAccelerometerRange
++ * Signature: (I)V
++ */
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerRange
++  (JNIEnv *, jclass, jint range)
++{
++	setAccelerometerRange((AccelerometerRange)range);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
++ * Method:    getAccelerometerX
++ * Signature: ()D
++ */
++JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerX
++  (JNIEnv *, jclass)
++{
++	return getAccelerometerX();
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
++ * Method:    getAccelerometerY
++ * Signature: ()D
++ */
++JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerY
++  (JNIEnv *, jclass)
++{
++	return getAccelerometerY();
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
++ * Method:    getAccelerometerZ
++ * Signature: ()D
++ */
++JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerZ
++  (JNIEnv *, jclass)
++{
++	return getAccelerometerZ();
++}
+diff --git a/wpilibj/wpilibJavaJNI/pom.xml b/wpilibj/wpilibJavaJNI/pom.xml
+index 91895f203211d48923eb6cfba88904e2386f1760..edb4450a7986fc380ba2a39cb3ddf9f1a6a9e8d1 100644
+--- a/wpilibj/wpilibJavaJNI/pom.xml
++++ b/wpilibj/wpilibJavaJNI/pom.xml
+@@ -20,10 +20,10 @@
+ 		</dependency>
+ 	</dependencies>
+ 	<repositories>
+-    
++
+   </repositories>
+ 	<pluginRepositories>
+-    
++
+   </pluginRepositories>
+ 	<properties>
+ 		<embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-sflt${file.separator}jdk1.7.0_45</embeddedJDKHome>
+@@ -83,7 +83,7 @@
+ 										<file>${embeddedJDKIncludePath}</file>
+ 									</files>
+ 									<message>A copy of the 'Linux ARM v6/v7 Soft Float ABI' JDK must be extracted to '${embeddedJDKHome}' and
+-the folder '${embeddedJDKIncludePath}' must exist to build this module. You must use Java 7 u45. This JDK may be downloaded from 
++the folder '${embeddedJDKIncludePath}' must exist to build this module. You must use Java 7 u45. This JDK may be downloaded from
+ http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html#jdk-7u45-oth-JPR. To override
+ this default location, specify a value for the 'embeddedJDKHome' property at the command line, like 'mvn -DembeddedJDKHome=path/to/jdk'</message>
+ 								</requireFilesExist>
+@@ -113,6 +113,7 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
+ 								<javahClassName>edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary</javahClassName>
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.HALUtil</javahClassName>
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.JNIWrapper</javahClassName>
++								<javahClassName>edu.wpi.first.wpilibj.hal.AccelerometerJNI</javahClassName>
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.AnalogJNI</javahClassName>
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.CounterJNI</javahClassName>
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.DIOJNI</javahClassName>
+@@ -128,7 +129,7 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
+ 							</javahClassNames>
+ 							<!-- enable additional javah interface in dependencies list -->
+ 							<!-- javahSearchJNIFromDependencies>true</javahSearchJNIFromDependencies -->
+-							<!-- 
++							<!--
+             			| Add jdk include directories to system include path
+             			| Override ${jkdIncludePath} If your jdk does not conform to Sun JDK layout
+             			-->
+@@ -242,7 +243,7 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
+ 									</then>
+ 									<else>
+ 										<copy todir="${project.build.directory}" >
+-									        <fileset dir="${mvn.cpp-root.zip.path}" />  
++									        <fileset dir="${mvn.cpp-root.zip.path}" />
+ 									 	</copy>
+ 									</else>
+ 								</if>

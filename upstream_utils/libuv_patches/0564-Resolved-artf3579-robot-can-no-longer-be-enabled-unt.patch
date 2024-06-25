@@ -1,0 +1,270 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Colby Skeggs <skeggsc@catlin.edu>
+Date: Tue, 9 Dec 2014 02:30:34 +0000
+Subject: [PATCH 0564/6262] Resolved artf3579: robot can no longer be enabled
+ until robotInit() finishes in IterativeRobot; similar options available by
+ overriding prestart() for other base classes.
+
+Change-Id: I07fde4b1bd2fae0c2e2a04336639b44ec715628a
+---
+ .../wpilibC++Devices/include/IterativeRobot.h |  2 ++
+ wpilibc/wpilibC++Devices/include/RobotBase.h  |  7 ++++--
+ .../wpilibC++Devices/src/IterativeRobot.cpp   | 11 ++++++++
+ wpilibc/wpilibC++Devices/src/RobotBase.cpp    | 13 ++++++++--
+ .../edu/wpi/first/wpilibj/IterativeRobot.java | 25 +++++++++----------
+ .../java/edu/wpi/first/wpilibj/RobotBase.java | 16 +++++++++---
+ .../first/wpilibj/test/AbstractComsSetup.java |  2 ++
+ 7 files changed, 55 insertions(+), 21 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/include/IterativeRobot.h b/wpilibc/wpilibC++Devices/include/IterativeRobot.h
+index 2d82fc14b5dd8dc5057efe5473f12c1e408e062e..76a1cc08aab2e16860db0951d54ce8efd82b5d19 100644
+--- a/wpilibc/wpilibC++Devices/include/IterativeRobot.h
++++ b/wpilibc/wpilibC++Devices/include/IterativeRobot.h
+@@ -60,6 +60,8 @@ public:
+ 	virtual void TestPeriodic();
+ 
+ protected:
++	virtual void Prestart();
++
+ 	virtual ~IterativeRobot();
+ 	IterativeRobot();
+ 
+diff --git a/wpilibc/wpilibC++Devices/include/RobotBase.h b/wpilibc/wpilibC++Devices/include/RobotBase.h
+index 535b78bcd356deed4b9a82169127f03213522e19..e27a137e455ae69a88b789c8c7689aa67cdc2a2d 100644
+--- a/wpilibc/wpilibC++Devices/include/RobotBase.h
++++ b/wpilibc/wpilibC++Devices/include/RobotBase.h
+@@ -14,9 +14,10 @@ class DriverStation;
+ 	int main() \
+ 	{ \
+ 		if (!HALInitialize()){std::cerr<<"FATAL ERROR: HAL could not be initialized"<<std::endl;return -1;}	\
+-		HALNetworkCommunicationObserveUserProgramStarting(); \
+ 		HALReport(HALUsageReporting::kResourceType_Language, HALUsageReporting::kLanguage_CPlusPlus); \
+-		(new _ClassName_())->StartCompetition(); \
++		_ClassName_ *robot = new _ClassName_(); \
++		robot->Prestart();\
++		robot->StartCompetition(); \
+ 		return 0; \
+ 	}
+ 
+@@ -49,6 +50,8 @@ protected:
+ 	virtual ~RobotBase();
+ 	RobotBase();
+ 
++	virtual void Prestart();
++
+ 	Task *m_task;
+ 	DriverStation *m_ds;
+ 
+diff --git a/wpilibc/wpilibC++Devices/src/IterativeRobot.cpp b/wpilibc/wpilibC++Devices/src/IterativeRobot.cpp
+index a24db9e33326f5830fb1c9ef964544f212f4aff5..c086be03fccb5e556fb33ca2511804ddfc5150e0 100644
+--- a/wpilibc/wpilibC++Devices/src/IterativeRobot.cpp
++++ b/wpilibc/wpilibC++Devices/src/IterativeRobot.cpp
+@@ -36,6 +36,11 @@ IterativeRobot::~IterativeRobot()
+ {
+ }
+ 
++void IterativeRobot::Prestart() {
++	// Don't immediately say that the robot's ready to be enabled.
++	// See below.
++}
++
+ /**
+  * Provide an alternate "main loop" via StartCompetition().
+  * 
+@@ -54,6 +59,12 @@ void IterativeRobot::StartCompetition()
+ 	NetworkTable::GetTable("LiveWindow")->GetSubTable("~STATUS~")->PutBoolean("LW Enabled", false);
+ 	RobotInit();
+ 
++    // We call this now (not in Prestart like default) so that the robot
++    // won't enable until the initialization has finished. This is useful
++    // because otherwise it's sometimes possible to enable the robot
++    // before the code is ready.
++	HALNetworkCommunicationObserveUserProgramStarting();
++
+ 	// loop forever, calling the appropriate mode-dependent function
+ 	lw->SetEnabled(false);
+ 	while (true)
+diff --git a/wpilibc/wpilibC++Devices/src/RobotBase.cpp b/wpilibc/wpilibC++Devices/src/RobotBase.cpp
+index ce610139f6b9271464b9d03071094dca091987e5..15440d8f03cf9f17602e035983c027fba9814fce 100644
+--- a/wpilibc/wpilibC++Devices/src/RobotBase.cpp
++++ b/wpilibc/wpilibC++Devices/src/RobotBase.cpp
+@@ -39,7 +39,7 @@ RobotBase &RobotBase::getInstance()
+ 
+ /**
+  * Constructor for a generic robot program.
+- * User code should be placed in the constuctor that runs before the Autonomous or Operator
++ * User code should be placed in the constructor that runs before the Autonomous or Operator
+  * Control period starts. The constructor will run to completion before Autonomous is entered.
+  *
+  * This must be used to ensure that the communications code starts. In the future it would be
+@@ -88,7 +88,7 @@ bool RobotBase::IsDisabled()
+ }
+ 
+ /**
+- * Determine if the robot is currently in Autnomous mode.
++ * Determine if the robot is currently in Autonomous mode.
+  * @return True if the robot is currently operating Autonomously as determined by the field controls.
+  */
+ bool RobotBase::IsAutonomous()
+@@ -114,6 +114,15 @@ bool RobotBase::IsTest()
+     return m_ds->IsTest();
+ }
+ 
++/**
++ * This hook is called right before startCompetition(). By default, tell the DS that the robot is now ready to
++ * be enabled. If you don't want for the robot to be enabled yet, you can override this method to do nothing.
++ */
++void RobotBase::Prestart()
++{
++	HALNetworkCommunicationObserveUserProgramStarting();
++}
++
+ /**
+  * Indicates if new data is available from the driver station.
+  * @return Has new data arrived over the network since the last time this function was called?
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java
+index a9b764e07dfa1af4811e676bc8af207c53c40a2d..5de916fed529d0b2c9949eb2682da6acacaa58a7 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java
+@@ -59,6 +59,12 @@ public class IterativeRobot extends RobotBase {
+         m_teleopInitialized = false;
+         m_testInitialized = false;
+     }
++    
++    @Override
++    protected void prestart() {
++    	// Don't immediately say that the robot's ready to be enabled.
++    	// See below.
++    }
+ 
+     /**
+      * Provide an alternate "main loop" via startCompetition().
+@@ -68,15 +74,12 @@ public class IterativeRobot extends RobotBase {
+         UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
+ 
+         robotInit();
+-
+-        // tracing support:
+-        final int TRACE_LOOP_MAX = 100;
+-        int loopCount = TRACE_LOOP_MAX;
+-        Object marker = null;
+-        boolean didDisabledPeriodic = false;
+-        boolean didAutonomousPeriodic = false;
+-        boolean didTeleopPeriodic = false;
+-        boolean didTestPeriodic = false;
++        
++        // We call this now (not in prestart like default) so that the robot
++        // won't enable until the initialization has finished. This is useful
++        // because otherwise it's sometimes possible to enable the robot
++        // before the code is ready. 
++        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+ 
+         // loop forever, calling the appropriate mode-dependent function
+         LiveWindow.setEnabled(false);
+@@ -97,7 +100,6 @@ public class IterativeRobot extends RobotBase {
+                 if (nextPeriodReady()) {
+                 	FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramDisabled();
+                     disabledPeriodic();
+-                    didDisabledPeriodic = true;
+                 }
+             } else if (isTest()) {
+                 // call TestInit() if we are now just entering test mode from either
+@@ -113,7 +115,6 @@ public class IterativeRobot extends RobotBase {
+                 if (nextPeriodReady()) {
+                 	FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTest();
+                     testPeriodic();
+-                    didTestPeriodic = true;
+                 }
+             } else if (isAutonomous()) {
+                 // call Autonomous_Init() if this is the first time
+@@ -132,7 +133,6 @@ public class IterativeRobot extends RobotBase {
+                 if (nextPeriodReady()) {
+                     FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramAutonomous();
+                     autonomousPeriodic();
+-                    didAutonomousPeriodic = true;
+                 }
+             } else {
+                 // call Teleop_Init() if this is the first time
+@@ -148,7 +148,6 @@ public class IterativeRobot extends RobotBase {
+                 if (nextPeriodReady()) {
+                     FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTeleop();
+                     teleopPeriodic();
+-                    didTeleopPeriodic = true;
+                 }
+             }
+             m_ds.waitForData();
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+index 3b7a3f5605b9e7401467b7733ace2b4e594962e3..d315d35906d7eff1323851a122d93ac99e8f5282 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+@@ -130,6 +130,15 @@ public abstract class RobotBase {
+ 	 */
+ 	public abstract void startCompetition();
+ 
++	/**
++	 * This hook is called right before startCompetition(). By default, tell the
++	 * DS that the robot is now ready to be enabled. If you don't want for the
++	 * robot to be enabled yet, you can override this method to do nothing.
++	 */
++	protected void prestart() {
++		FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
++	}
++
+ 	public static boolean getBooleanProperty(String name, boolean defaultValue) {
+ 		String propVal = System.getProperty(name);
+ 		if (propVal == null) {
+@@ -149,7 +158,6 @@ public abstract class RobotBase {
+ 	 */
+ 	public static void initializeHardwareConfiguration(){
+ 		FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
+-		FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+ 
+ 		// Set some implementations so that the static methods work properly
+ 		Timer.SetImplementation(new HardwareTimer());
+@@ -161,8 +169,6 @@ public abstract class RobotBase {
+ 	 * Starting point for the applications.
+ 	 */
+ 	public static void main(String args[]) {
+-		boolean errorOnExit = false;
+-
+ 		initializeHardwareConfiguration();
+ 
+ 		UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
+@@ -182,14 +188,16 @@ public abstract class RobotBase {
+ 		RobotBase robot;
+ 		try {
+ 			robot = (RobotBase) Class.forName(robotName).newInstance();
++			robot.prestart();
+ 		} catch (Throwable t) {
+ 			DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " " + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
+ 			System.err.println("WARNING: Robots don't quit!");
+-			System.err.println("ERROR: Could not instantiate robot "+robotName+"!");
++			System.err.println("ERROR: Could not instantiate robot " + robotName + "!");
+ 			System.exit(1);
+ 			return;
+ 		}
+ 
++		boolean errorOnExit = false;
+ 		try {
+ 			robot.startCompetition();
+ 		} catch (Throwable t) {
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
+index ea6c4fdca7f01d1cb3b8a97ee752e06d04504a6d..663e9535550c9d18ad45a8a67aa859fc2847649f 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
+@@ -18,6 +18,7 @@ import org.junit.runners.model.MultipleFailureException;
+ import edu.wpi.first.wpilibj.DriverStation;
+ import edu.wpi.first.wpilibj.RobotBase;
+ import edu.wpi.first.wpilibj.Timer;
++import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ 
+ /**
+@@ -44,6 +45,7 @@ public abstract class AbstractComsSetup {
+ 		if (!initialized) {
+ 			// Set some implementations so that the static methods work properly
+ 			RobotBase.initializeHardwareConfiguration();
++			FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+ 			
+ 			LiveWindow.setEnabled(false);
+ 			TestBench.out().println("Started coms");

@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 16 Jul 2014 16:56:23 -0400
+Subject: [PATCH 0167/6262] Update Digital Pin count to reflect full 16 DIO on
+ MXP
+
+Change-Id: I180dee11c2c2a7e0585f153ba4b1832bce2bd6d3
+---
+ hal/lib/Athena/Digital.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index daea335d670e9ab0a3472f41b81b01cdfabd3496..e3edbeaabdbd2e83bb436e70bf05a6a0425807dd 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -13,7 +13,7 @@
+ #include "spilib/spi-lib.h"
+ 
+ static const uint32_t kExpectedLoopTiming = 40;
+-static const uint32_t kDigitalPins = 20;
++static const uint32_t kDigitalPins = 26;
+ static const uint32_t kPwmPins = 20;
+ static const uint32_t kRelayPins = 8;
+ static const uint32_t kNumHeaders = 10; // Number of non-MXP pins

@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Thu, 17 Jul 2014 10:24:45 -0400
+Subject: [PATCH 0168/6262] Add allocation checking for I2C MXP. Update DIO
+ counts in Lib layer until resource checking moves down to HAL
+
+Change-Id: I0abe80bcbe9cbbc81f0887a1cd1a3aa0862df5f1
+---
+ hal/lib/Athena/Digital.cpp                                      | 2 ++
+ wpilibc/wpilibC++/include/SensorBase.h                          | 2 +-
+ .../src/main/java/edu/wpi/first/wpilibj/SensorBase.java         | 2 +-
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index e3edbeaabdbd2e83bb436e70bf05a6a0425807dd..1ad211d08927815d94e814eaabb3839e5d8f8924 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -1453,6 +1453,8 @@ void i2CInitialize(uint8_t port, int32_t *status) {
+ 		} else if(port == 1) {
+ 			i2CMXPObjCount++;
+ 			if (i2CMXPHandle > 0) return;
++			if(!allocateDIO(getPort(24), false, status)) return;
++			if(!allocateDIO(getPort(25), false, status)) return;
+ 			digitalSystem->writeEnableMXPSpecialFunction(digitalSystem->readEnableMXPSpecialFunction(status)|0xC000, status);
+ 			i2CMXPHandle = i2clib_open("/dev/i2c-1");
+ 		}
+diff --git a/wpilibc/wpilibC++/include/SensorBase.h b/wpilibc/wpilibC++/include/SensorBase.h
+index c64298bc88982583d68c086c399bf54b4c1af0dd..7baa9e1e12d2d4635e01071c40b779a800c54528 100644
+--- a/wpilibc/wpilibC++/include/SensorBase.h
++++ b/wpilibc/wpilibC++/include/SensorBase.h
+@@ -35,7 +35,7 @@ public:
+ 	static bool CheckSolenoidChannel(uint32_t channel);
+ 	static bool CheckPDPChannel(uint32_t channel);
+ 
+-	static const uint32_t kDigitalChannels = 20;
++	static const uint32_t kDigitalChannels = 26;
+ 	static const uint32_t kAnalogInputs = 8;
+ 	static const uint32_t kAnalogOutputs = 2;
+ 	static const uint32_t kSolenoidChannels = 8;
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index 32a647761151bd0ffd4304f05ebc8b57b98cc670..9c5772d027b1bf8ba8db6282371913ee003f7fc6 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -28,7 +28,7 @@ public abstract class SensorBase { // TODO: Refactor
+     /**
+      * Number of digital channels per digital sidecar
+      */
+-    public static final int kDigitalChannels = 20;
++    public static final int kDigitalChannels = 26;
+     /**
+      * Number of digital modules
+      * XXX: This number is incorrect.  We need to find the correct number.

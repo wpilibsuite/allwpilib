@@ -1,0 +1,82 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Wed, 8 Oct 2014 15:00:28 -0400
+Subject: [PATCH 0398/6262] Disable CANJaguar current PID test
+
+The hardware setup makes this test basically useless
+
+Change-Id: I40287313a1928dda897c8e35922216d44ab089d2
+---
+ .../wpilibC++IntegrationTests/src/CANJaguarTest.cpp |  2 +-
+ .../wpilibj/can/CANCurrentQuadEncoderModeTest.java  | 13 ++++++++-----
+ 2 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+index 92eacca07ab286765707708213bc4849692913e6..32470ee534a9f2e4aeae3970155dd76d06893c9c 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+@@ -308,7 +308,7 @@ TEST_F(CANJaguarTest, PositionModeWorks) {
+  * Test if we can set a current setpoint with PID control on the Jaguar and get
+  * a corresponding output current
+  */
+-TEST_F(CANJaguarTest, CurrentModeWorks) {
++TEST_F(CANJaguarTest, DISABLED_CurrentModeWorks) {
+ 	m_jaguar->SetCurrentMode(10.0, 4.0, 1.0);
+ 	m_jaguar->EnableControl();
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANCurrentQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANCurrentQuadEncoderModeTest.java
+index 0af2fdf3bb1385f0807be89f92b77965a533a888..61550a3c5bde347cc7118c208cf7f20f9902c8e8 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANCurrentQuadEncoderModeTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANCurrentQuadEncoderModeTest.java
+@@ -12,6 +12,7 @@ import java.util.logging.Logger;
+ 
+ import org.junit.Before;
+ import org.junit.Test;
++import org.junit.Ignore;
+ 
+ import edu.wpi.first.wpilibj.CANJaguar;
+ import edu.wpi.first.wpilibj.Timer;
+@@ -24,7 +25,7 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
+ 	private static Logger logger = Logger.getLogger(CANCurrentQuadEncoderModeTest.class.getName());
+ 	private static final double kStoppedValue = 0;
+ 	private static final double kRunningValue = 3.0;
+-	
++
+ 	/* (non-Javadoc)
+ 	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#stopMotor()
+ 	 */
+@@ -45,12 +46,12 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
+ 	protected void runMotorReverse() {
+ 		getME().getMotor().set(-kRunningValue);
+ 	}
+-	
++
+ 	@Override
+ 	protected Logger getClassLogger() {
+ 		return logger;
+ 	}
+-	
++
+ 	@Before
+ 	public void setUp() throws Exception {
+ 		getME().getMotor().setCurrentMode(CANJaguar.kQuadEncoder, 360, 10.0, 4.0, 1.0);
+@@ -60,7 +61,8 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
+ 		Timer.delay(kStartupTime);
+ 	}
+ 
+-	
++
++	@Ignore
+ 	@Test
+ 	public void testDriveToCurrentPositive() {
+ 		double setpoint =  1.6f;
+@@ -76,7 +78,8 @@ public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
+ 
+ 		assertEquals("The desired output current was not reached",setpoint, getME().getMotor().getOutputCurrent(), kCurrentTolerance);
+ 	}
+-	
++
++	@Ignore
+ 	@Test
+ 	public void testDriveToCurrentNegative() {
+ 		double setpoint =  -1.6f;

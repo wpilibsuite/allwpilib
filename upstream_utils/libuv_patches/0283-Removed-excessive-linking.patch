@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Tue, 12 Aug 2014 12:07:09 -0400
+Subject: [PATCH 0283/6262] Removed excessive linking.
+
+Change-Id: Iffc8517da2a4d6b67612b6076023211c07768714
+---
+ .../resources/templates/.cproject                               | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index b476b133fb999605cdeddee2739c1b4ecaa295e7..a92d5bdd18a8f1186c48e4ffae49e1d045de6558 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -39,9 +39,7 @@
+ 									<listOptionValue builtIn="false" value="$cpp-location/lib"/>
+ 								</option>
+ 								<option id="gnu.cpp.link.option.libs.1072058280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+-									<listOptionValue builtIn="false" value="WPILib"/>
+ 									<listOptionValue builtIn="false" value="WPILibAthena"/>
+-									<listOptionValue builtIn="false" value="WPILib"/>
+ 									<listOptionValue builtIn="false" value="HALAthena"/>
+ 									<listOptionValue builtIn="false" value="NetworkTables"/>
+ 									<listOptionValue builtIn="false" value="FRC_NetworkCommunication"/>

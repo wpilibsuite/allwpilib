@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Malmsten <pmalmsten@gmail.com>
+Date: Sun, 26 Jan 2014 13:17:00 -0500
+Subject: [PATCH 0012/6262] Updated wpilibJavaJNI JDK include path to use
+ default location in user's home directory
+
+---
+ wpilibj/wpilibJavaJNI/pom.xml | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaJNI/pom.xml b/wpilibj/wpilibJavaJNI/pom.xml
+index cd431a14ab236fd3a90207c446187cc34c72469a..63e1eaef4ef9fd1e448a24bbcdef7653570878a3 100644
+--- a/wpilibj/wpilibJavaJNI/pom.xml
++++ b/wpilibj/wpilibJavaJNI/pom.xml
+@@ -47,6 +47,11 @@
+   <pluginRepositories>
+     
+   </pluginRepositories>
++  
++  <properties>
++    <embeddedJDKHome>${user.home}/jdk-linux-arm-vfp-slft/jdk1.7.0_45</embeddedJDKHome>
++    <embeddedJDKIncludePath>${embeddedJDKHome}/include</embeddedJDKIncludePath>
++  </properties>
+ 
+   <build>
+     <plugins>
+@@ -62,13 +67,15 @@
+             </goals>
+             <configuration>
+               <rules>
+-                <requireProperty>
+-                  <property>edu.wpi.first.wpilibj.wpilibJavaJNI.embeddedJDKIncludePath</property>
+-                  <message>Property 'edu.wpi.first.wpilibj.wpilibJavaJNI.embeddedJDKIncludePath' must be set 
+-                    to the /include folder of a jdk-7u45-linux-arm-vfp-sflt JDK. You must use Java 7 u45. 
+-                    This JDK for 'Linux ARM v6/v7 Soft Float ABI' may be downloaded from 
+-                    http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html#jdk-7u45-oth-JPR</message>
+-                </requireProperty>
++		<requireFilesExist>
++                  <files>
++                   <file>${embeddedJDKIncludePath}</file>
++                  </files>
++		  <message>A copy of the 'Linux ARM v6/v7 Soft Float ABI' JDK must be extracted to '${embeddedJDKHome}' and
++the folder '${embeddedJDKIncludePath}' must exist to build this module. You must use Java 7 u45. This JDK may be downloaded from 
++http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html#jdk-7u45-oth-JPR. To override
++this default location, specify a value for the 'embeddedJDKHome' property at the command line, like 'mvn -DembeddedJDKHome=path/to/jdk'</message>
++                </requireFilesExist>
+               </rules>
+               <fail>true</fail>
+             </configuration>
+@@ -82,7 +89,7 @@
+          <extensions>true</extensions>
+          <configuration>
+ 			<javahOS>linux</javahOS>
+-			<jdkIncludePath>${edu.wpi.first.wpilibj.wpilibJavaJNI.embeddedJDKIncludePath}</jdkIncludePath>
++			<jdkIncludePath>${embeddedJDKIncludePath}</jdkIncludePath>
+ 		  <sources>
+ 			<source>
+ 			  <directory>src/main/native</directory>

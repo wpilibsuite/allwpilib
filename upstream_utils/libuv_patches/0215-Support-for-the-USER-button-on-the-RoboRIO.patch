@@ -1,0 +1,202 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Tue, 29 Jul 2014 14:34:52 -0400
+Subject: [PATCH 0215/6262] Support for the "USER" button on the RoboRIO
+
+You can get the state of the USER button with GetUserButton() in
+C++ or Utility.getUserButton() in java.
+
+Change-Id: I923e62cab5e621ef43fed503acab5c0d751264fb
+---
+ hal/include/HAL/HAL.hpp                       |  3 ++-
+ hal/lib/Athena/HAL.cpp                        |  9 +++++++
+ wpilibc/wpilibC++/include/Utility.h           |  2 +-
+ wpilibc/wpilibC++/lib/Utility.cpp             | 14 +++++++----
+ .../java/edu/wpi/first/wpilibj/Utility.java   | 24 +++++++++++++++----
+ .../edu/wpi/first/wpilibj/hal/HALUtil.java    |  3 ++-
+ wpilibj/wpilibJavaJNI/lib/HALUtil.cpp         | 17 +++++++++++++
+ 7 files changed, 59 insertions(+), 13 deletions(-)
+
+diff --git a/hal/include/HAL/HAL.hpp b/hal/include/HAL/HAL.hpp
+index 57063b6be1f727fa9a82a9e64f86615a32eacd1f..efefe08006698885e0dcef331cf440dd689649c5 100644
+--- a/hal/include/HAL/HAL.hpp
++++ b/hal/include/HAL/HAL.hpp
+@@ -283,6 +283,8 @@ extern "C"
+ 	void setFPGALED(uint32_t state, int32_t *status);
+ 	int32_t getFPGALED(int32_t *status);
+ 
++	bool getFPGAButton(int32_t *status);
++
+ 	int HALSetErrorData(const char *errors, int errorsLength, int wait_ms);
+ 	int HALSetUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength, int wait_ms);
+ 	int HALOverrideIOConfig(const char *ioConfig, int wait_ms);
+@@ -313,4 +315,3 @@ extern "C"
+ 	void EDVR_CreateReference();
+ 	void Occur();
+ }
+-
+diff --git a/hal/lib/Athena/HAL.cpp b/hal/lib/Athena/HAL.cpp
+index 3f74b105dec74ce48e34e71c9dd18ba754e98541..49839a2ef3e5a3d585b32b652592f34323c5577f 100644
+--- a/hal/lib/Athena/HAL.cpp
++++ b/hal/lib/Athena/HAL.cpp
+@@ -123,6 +123,15 @@ int32_t getFPGALED(int32_t *status)
+ 	return 0; // XXX: Dummy value
+ }
+ 
++/**
++ * Get the state of the "USER" button on the RoboRIO
++ * @return true if the button is currently pressed down
++ */
++bool getFPGAButton(int32_t *status)
++{
++	return global->readUserButton(status);
++}
++
+ int HALSetErrorData(const char *errors, int errorsLength, int wait_ms)
+ {
+ 	return setErrorData(errors, errorsLength, wait_ms);
+diff --git a/wpilibc/wpilibC++/include/Utility.h b/wpilibc/wpilibC++/include/Utility.h
+index 07b4bc39aacaf92e689d4442da72002f820396a5..115c30a9ceb622c2931606c0c1133f990513f52b 100644
+--- a/wpilibc/wpilibC++/include/Utility.h
++++ b/wpilibc/wpilibC++/include/Utility.h
+@@ -26,7 +26,7 @@ void wpi_suspendOnAssertEnabled(bool enabled);
+ uint16_t GetFPGAVersion();
+ uint32_t GetFPGARevision();
+ uint32_t GetFPGATime();
+-int32_t GetRIOUserSwitch();
++bool GetUserButton();
+ void SetRIOUserLED(uint32_t state);
+ int32_t GetRIOUserLED();
+ int32_t ToggleRIOUserLED();
+diff --git a/wpilibc/wpilibC++/lib/Utility.cpp b/wpilibc/wpilibC++/lib/Utility.cpp
+index 52200248b3d2533994c02caffe0aed62a087b025..43973f4764d5ebcd10bc3315e021dc9d8c8c98a8 100644
+--- a/wpilibc/wpilibC++/lib/Utility.cpp
++++ b/wpilibc/wpilibC++/lib/Utility.cpp
+@@ -211,13 +211,17 @@ extern "C"
+ }
+ 
+ /**
+- * Read the value of the USER1 DIP switch on the cRIO.
++ * Get the state of the "USER" button on the RoboRIO
++ * @return true if the button is currently pressed down
+  */
+-int32_t GetRIOUserSwitch()
++bool GetUserButton()
+ {
+-	int32_t switchValue = UserSwitchInput(0);
+-	wpi_assert(switchValue >= 0);
+-	return switchValue > 0;
++	int32_t status = 0;
++
++	bool value = getFPGAButton(&status);
++	wpi_setGlobalError(status);
++
++	return value;
+ }
+ 
+ /**
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Utility.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Utility.java
+index 5205269f794666fddf2a1784254a8ec339efee6d..245d95826e3fbfcb0694668ea54e366296910f6a 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Utility.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Utility.java
+@@ -25,7 +25,7 @@ public class Utility implements IUtility {
+ 
+ 	/**
+ 	 * Return the FPGA Version number. For now, expect this to be 2009.
+-	 * 
++	 *
+ 	 * @return FPGA Version number.
+ 	 */
+ 	int getFPGAVersion() {
+@@ -41,7 +41,7 @@ public class Utility implements IUtility {
+ 	 * Return the FPGA Revision number. The format of the revision is 3 numbers.
+ 	 * The 12 most significant bits are the Major Revision. the next 8 bits are
+ 	 * the Minor Revision. The 12 least significant bits are the Build Number.
+-	 * 
++	 *
+ 	 * @return FPGA Revision number.
+ 	 */
+ 	long getFPGARevision() {
+@@ -55,23 +55,37 @@ public class Utility implements IUtility {
+ 
+ 	/**
+ 	 * Read the microsecond timer from the FPGA.
+-	 * 
++	 *
+ 	 * @return The current time in microseconds according to the FPGA.
+ 	 */
+ 	public static long getFPGATime() {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		// set the byte order
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+-		
++
+ 		long value = HALUtil.getFPGATime(status.asIntBuffer());
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 		return value;
+ 	}
+ 
++	/**
++	 * Get the state of the "USER" button on the RoboRIO
++	 * @return true if the button is currently pressed down
++	 */
++	public static boolean getUserButton() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		// set the byte order
++		status.order(ByteOrder.LITTLE_ENDIAN);
++
++		boolean value = HALUtil.getFPGAButton(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return value;
++	}
++
+ 	/**
+ 	 * Control whether to send System.err output to the driver station's error
+ 	 * pane.
+-	 * 
++	 *
+ 	 * @param enabled
+ 	 *            if true, send error stream to driver station, otherwise
+ 	 *            disable sending error stream
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/HALUtil.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/HALUtil.java
+index e9821b3c2717e5cdd1a3584d30c26f5e8b766cd6..7cb5bcd46483b12bd3703fca2bcbe5727e5207c4 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/HALUtil.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/HALUtil.java
+@@ -25,7 +25,8 @@ public class HALUtil extends JNIWrapper {
+ 	public static native short getFPGAVersion(IntBuffer status);
+ 	public static native int getFPGARevision(IntBuffer status);
+ 	public static native long getFPGATime(IntBuffer status);
+-	
++	public static native boolean getFPGAButton(IntBuffer status);
++
+ 	public static native String getHALErrorMessage(int code);
+ 
+ 	public static void checkStatus(IntBuffer status)
+diff --git a/wpilibj/wpilibJavaJNI/lib/HALUtil.cpp b/wpilibj/wpilibJavaJNI/lib/HALUtil.cpp
+index aca83025142ee868dcf0de535f3b1d1d496497a1..e1491a37091464a6dc3eda59fd1e978275bbfdb2 100644
+--- a/wpilibj/wpilibJavaJNI/lib/HALUtil.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/HALUtil.cpp
+@@ -116,6 +116,23 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime
+ 
+ }
+ 
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
++ * Method:    getFPGAButton
++ * Signature: (Ljava/nio/IntBuffer;)I
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton
++  (JNIEnv * env, jclass, jobject status)
++{
++	//HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	jboolean returnValue = getFPGAButton( statusPtr );
++	//HALUTIL_LOG(logDEBUG) << "Status = " << *statusPtr;
++	//HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
++	return returnValue;
++
++}
++
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+  * Method:    getHALErrorMessage

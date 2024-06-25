@@ -1,0 +1,394 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Tue, 5 Aug 2014 09:46:02 -0400
+Subject: [PATCH 0254/6262] Gyro deadband defaults to 0
+
+The gyro class no longer attempts to set a default deadband, but it still
+has an optional SetDeadband() method.
+
+The gyro integration tests were modified and still pass consistently.
+
+Change-Id: I08a97b00b98b49b0a3c63306fcc809857523af2b
+---
+ wpilibc/wpilibC++/include/Gyro.h              |  3 +-
+ wpilibc/wpilibC++/lib/Gyro.cpp                | 32 ++++--------------
+ .../src/TiltPanCameraTest.cpp                 | 12 +++----
+ .../main/java/edu/wpi/first/wpilibj/Gyro.java | 31 +++++------------
+ .../java/edu/wpi/first/wpilibj/GyroTest.java  | 33 +++++++++----------
+ .../fixtures/TiltPanCameraFixture.java        |  7 ++--
+ .../edu/wpi/first/wpilibj/test/TestBench.java | 18 +++++-----
+ 7 files changed, 50 insertions(+), 86 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/Gyro.h b/wpilibc/wpilibC++/include/Gyro.h
+index f1260ae266be57e9d3449e6c4636e36ac67feac5..bcf7bb4574331112a1dc632fb9371fb162eea8ad 100644
+--- a/wpilibc/wpilibC++/include/Gyro.h
++++ b/wpilibc/wpilibC++/include/Gyro.h
+@@ -27,8 +27,7 @@ public:
+ 	static const uint32_t kOversampleBits = 10;
+ 	static const uint32_t kAverageBits = 0;
+ 	static constexpr float kSamplesPerSecond = 50.0;
+-	static constexpr float kCalibrationSampleTime = 0.01;
+-	static constexpr int kNumCalibrationSamples = 500;
++	static constexpr float kCalibrationSampleTime = 5.0;
+ 	static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
+ 
+ 	explicit Gyro(uint32_t channel);
+diff --git a/wpilibc/wpilibC++/lib/Gyro.cpp b/wpilibc/wpilibC++/lib/Gyro.cpp
+index 6855d11157aac28b48b6e2a4682b53c80b022b1d..0861b5af2c09f3a4268eb242387b256dd1371f23 100644
+--- a/wpilibc/wpilibC++/lib/Gyro.cpp
++++ b/wpilibc/wpilibC++/lib/Gyro.cpp
+@@ -15,7 +15,6 @@ const uint32_t Gyro::kOversampleBits;
+ const uint32_t Gyro::kAverageBits;
+ constexpr float Gyro::kSamplesPerSecond;
+ constexpr float Gyro::kCalibrationSampleTime;
+-constexpr int Gyro::kNumCalibrationSamples;
+ constexpr float Gyro::kDefaultVoltsPerDegreePerSecond;
+ 
+ /**
+@@ -51,25 +50,7 @@ void Gyro::InitGyro()
+ 
+ 	m_analog->InitAccumulator();
+ 
+-	// Get the lowest and highest value that occur within a large number of
+-	// calibration samples.  These are used to determine an appropriate default
+-	// deadband.
+-	int32_t lowestSample = INT_MAX, highestSample = INT_MIN;
+-	for(int i = 0; i < kNumCalibrationSamples; i++)
+-	{
+-		int32_t sample = m_analog->GetAverageValue();
+-
+-		if(sample < lowestSample)
+-		{
+-			lowestSample = sample;
+-		}
+-		else if(sample > highestSample)
+-		{
+-			highestSample = sample;
+-		}
+-
+-		Wait(kCalibrationSampleTime);
+-	}
++	Wait(kCalibrationSampleTime);
+ 
+ 	int64_t value;
+ 	uint32_t count;
+@@ -78,13 +59,11 @@ void Gyro::InitGyro()
+ 	m_center = (uint32_t)((float)value / (float)count + .5);
+ 
+ 	m_offset = ((float)value / (float)count) - (float)m_center;
+-
+-	int32_t deadband = std::max(highestSample - m_center, m_center - lowestSample);
+-
+ 	m_analog->SetAccumulatorCenter(m_center);
+-	m_analog->SetAccumulatorDeadband(deadband);
+ 	m_analog->ResetAccumulator();
+ 
++	SetDeadband(0.0f);
++
+ 	SetPIDSourceParameter(kAngle);
+ 
+ 	HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
+@@ -203,8 +182,9 @@ void Gyro::SetSensitivity( float voltsPerDegreePerSecond )
+ 
+ /**
+  * Set the size of the neutral zone.  Any voltage from the gyro less than this
+- * amount from the center is considered stationary.  This is set by default
+- * after calibration.
++ * amount from the center is considered stationary.  Setting a deadband will
++ * decrease the amount of drift when the gyro isn't rotating, but will make it
++ * less accurate.
+  *
+  * @param volts The size of the deadband in volts
+  */
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
+index f201dfe00812c81b57af88d9156f19c4641fc138..9e9f2839f9ace3977c4cf38df0e37b258fe0d612 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
+@@ -33,7 +33,7 @@ protected:
+ 		// The gyro object blocks for 5 seconds in the constructor, so only
+ 		// construct it once for the whole test case
+ 		m_gyro = new Gyro(TestBench::kCameraGyroChannel);
+-		m_gyro->SetSensitivity(0.0134897058674);
++		m_gyro->SetSensitivity(0.013);
+ 	}
+ 
+ 	static void TearDownTestCase() {
+@@ -66,22 +66,22 @@ Gyro *TiltPanCameraTest::m_gyro = 0;
+  * Test if the gyro angle defaults to 0 immediately after being reset.
+  */
+ TEST_F(TiltPanCameraTest, DefaultGyroAngle) {
+-	EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 0.01f);
++	EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 1.0f);
+ }
+ 
+ /**
+  * Test if the servo turns 180 degrees and the gyroscope measures this angle
+  */
+ TEST_F(TiltPanCameraTest, GyroAngle) {
+-	for(int i = 0; i < 180; i++) {
+-		m_pan->SetAngle(i);
++	for(int i = 0; i < 1800; i++) {
++		m_pan->SetAngle(i / 10.0);
+ 
+-		Wait(0.05);
++		Wait(0.001);
+ 	}
+ 
+ 	double gyroAngle = m_gyro->GetAngle();
+ 
+-	EXPECT_NEAR(gyroAngle, kTestAngle, 20.0) << "Gyro measured " << gyroAngle
++	EXPECT_NEAR(gyroAngle, kTestAngle, 10.0) << "Gyro measured " << gyroAngle
+ 		<< " degrees, servo should have turned " << kTestAngle <<  " degrees";
+ }
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+index 7f296bc73aea113c697fcd5f38ddcd492f38d32a..b8ccd81509f28f83c34279e5d36ce19791164645 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+@@ -27,8 +27,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	static final int kOversampleBits = 10;
+ 	static final int kAverageBits = 0;
+ 	static final double kSamplesPerSecond = 50.0;
+-	static final double kCalibrationSampleTime = 0.01;
+-	static final int kNumCalibrationSamples = 500;
++	static final double kCalibrationSampleTime = 5.0;
+ 	static final double kDefaultVoltsPerDegreePerSecond = 0.007;
+ 	private AnalogInput m_analog;
+ 	double m_voltsPerDegreePerSecond;
+@@ -57,26 +56,12 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 		double sampleRate = kSamplesPerSecond
+ 				* (1 << (kAverageBits + kOversampleBits));
+ 		AnalogInput.setGlobalSampleRate(sampleRate);
+-
+ 		Timer.delay(1.0);
++
+ 		m_analog.initAccumulator();
+ 		m_analog.resetAccumulator();
+ 
+-		// Get the lowest and highest value that occur within a large number of
+-		// calibration samples.  These are used to determine an appropriate
+-		// default deadband.
+-		int lowestSample = Integer.MAX_VALUE, highestSample = Integer.MIN_VALUE;
+-		for(int i = 0; i < kNumCalibrationSamples; i++) {
+-			int sample = m_analog.getAverageValue();
+-
+-			if(sample < lowestSample) {
+-				lowestSample = sample;
+-			} else if(sample > highestSample) {
+-				highestSample = sample;
+-			}
+-
+-			Timer.delay(kCalibrationSampleTime);
+-		}
++		Timer.delay(kCalibrationSampleTime);
+ 
+ 		m_analog.getAccumulatorOutput(result);
+ 
+@@ -85,12 +70,11 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 		m_offset = ((double) result.value / (double) result.count)
+ 				- m_center;
+ 
+-		int deadband = Math.max(highestSample - m_center, m_center - lowestSample);
+-
+ 		m_analog.setAccumulatorCenter(m_center);
+-		m_analog.setAccumulatorDeadband(deadband);
+ 		m_analog.resetAccumulator();
+ 
++		setDeadband(0.0);
++
+ 		setPIDSourceParameter(PIDSourceParameter.kAngle);
+ 
+ 		UsageReporting.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
+@@ -209,8 +193,9 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 
+ 	/**
+ 	 * Set the size of the neutral zone.  Any voltage from the gyro less than
+-	 * this amount from the center is considered stationary.  This is set by
+-	 * default after calibration.
++	 * this amount from the center is considered stationary.  Setting a
++	 * deadband will decrease the amount of drift when the gyro isn't rotating,
++	 * but will make it less accurate.
+ 	 *
+ 	 * @param volts The size of the deadband in volts
+ 	 */
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java
+index 79d328ccb1b31ce1caabdd55a6af97b1330acacb..2cb032006c46a52a77c0c5200e70f759e51365bd 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java
+@@ -19,19 +19,19 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+ import edu.wpi.first.wpilibj.test.TestBench;
+ 
+ public class GyroTest extends AbstractComsSetup {
+-	
++
+ 	private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
+-	
++
+ 	public static final double TEST_ANGLE = 180.0;
+-	
++
+ 	private TiltPanCameraFixture tpcam;
+ 
+-	
++
+ 	@Override
+ 	protected Logger getClassLogger(){
+ 		return logger;
+ 	}
+-	
++
+ 	@Before
+ 	public void setUp() throws Exception {
+ 		logger.fine("Setup: TiltPan camera");
+@@ -44,7 +44,7 @@ public class GyroTest extends AbstractComsSetup {
+ 		tpcam.reset();
+ 		tpcam.teardown();
+ 	}
+-	
++
+ 	@Test
+ 	public void testInitial(){
+ 		double angle = tpcam.getGyro().getAngle();
+@@ -56,22 +56,21 @@ public class GyroTest extends AbstractComsSetup {
+ 	 */
+ 	@Test
+ 	public void testGyroAngle() {
+-		for(double i = 0; i < 1.0; i+=.005){
+-			//System.out.println("i: " + i);
+-			//System.out.println("Angle " + tpcam.getGyro().getAngle());
+-			tpcam.getPan().set(i);
+-			Timer.delay(.025);
++		for(int i = 0; i < 1800; i++) {
++			tpcam.getPan().setAngle(i / 10.0);
++
++			Timer.delay(0.001);
+ 		}
+-		//Timer.delay(TiltPanCameraFixture.RESET_TIME);
++
+ 		double angle = tpcam.getGyro().getAngle();
+-		
++
+ 		double difference = TEST_ANGLE - angle;
+-		
++
+ 		double diff = Math.abs(difference);
+-		
++
+ 		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 8);
+ 	}
+-	
++
+ 	@Test
+ 	public void testDeviationOverTime(){
+ 		double angle = tpcam.getGyro().getAngle();
+@@ -80,7 +79,7 @@ public class GyroTest extends AbstractComsSetup {
+ 		angle = tpcam.getGyro().getAngle();
+ 		assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 1);
+ 	}
+-	
++
+ 	private String errorMessage(double difference, double target){
+ 		return "Gryo angle skewed " + difference + " deg away from target " + target;
+ 	}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
+index 4b0bef2942d501e8946c23e49674786186f6165a..18677c89bcc059546df5323d81000aa824e323ed 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
+@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
+ /**
+  * A class to represent the a physical Camera with two servos (tilt and pan) designed to test to see if the
+  * gyroscope is operating normally.
+- * 
++ *
+  * @author Jonathan Leitschuh
+  *
+  */
+@@ -48,9 +48,10 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
+ 			pan = givePan();
+ 			pan.set(0);
+ 			Timer.delay(RESET_TIME);
+-			
++
+ 			logger.fine("Initializing the gyro");
+ 			gyro = giveGyro();
++			gyro.reset();
+ 			wasSetup = true;
+ 		}
+ 		return wasSetup;
+@@ -84,5 +85,5 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
+ 		gyro = null;
+ 		return true;
+ 	}
+-	
++
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index 0aa6fdafd886c757cda62df101efcdfc9e786226..8ae6196e545dbe32aea50b57c5451b4b7abea8f7 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -47,24 +47,24 @@ public final class TestBench {
+ 	 * completely stopped
+ 	 */
+ 	public static final double MOTOR_STOP_TIME = 0.20;
+-	
++
+ 	public static final int kTalonChannel = 10;
+ 	public static final int kVictorChannel = 1;
+ 	public static final int kJaguarChannel = 2;
+-	
++
+ 	/*TiltPanCamera Channels */
+ 	public static final int kGyroChannel = 0;
+-	public static final double kGyroSensitivity = 0.0134897058674;
++	public static final double kGyroSensitivity = 0.013;
+ 	public static final int kTiltServoChannel = 9;
+ 	public static final int kPanServoChannel = 8;
+-	
++
+ 
+ 	/* PowerDistributionPanel channels */
+ 	public static final int kJaguarPDPChannel = 6;
+ 	public static final int kVictorPDPChannel = 8;
+ 	public static final int kTalonPDPChannel = 11;
+ 	public static final int kCANJaguarPDPChannel = 5;
+-	
++
+ 	/* CAN ASSOICATED CHANNELS */
+ 	public static final int kCANRelayPowerCycler = 1;
+ 	public static final int kFakeJaguarPotentiometer = 1;
+@@ -177,7 +177,7 @@ public final class TestBench {
+ 		};
+ 		return jagPair;
+ 	}
+-	
++
+ 	public class BaseCANMotorEncoderFixture extends CANMotorEncoderFixture{
+ 		@Override
+ 		protected CANJaguar giveSpeedController() {
+@@ -210,7 +210,7 @@ public final class TestBench {
+ 		protected Relay givePoweCycleRelay() {
+ 			return new Relay(kCANRelayPowerCycler);
+ 		}
+-		
++
+ 		@Override
+ 		public int getPDPChannel() {
+ 			return kCANJaguarPDPChannel;
+@@ -394,7 +394,7 @@ public final class TestBench {
+ 		}
+ 		return instance;
+ 	}
+-	
++
+ 	/**
+ 	 * Provides access to the output stream for the test system. This should be used instead of System.out
+ 	 * This is gives us a way to implement changes to where the output text of this test system is sent.
+@@ -403,7 +403,7 @@ public final class TestBench {
+ 	public static PrintStream out(){
+ 		return System.out;
+ 	}
+-	
++
+ 	/**
+ 	 * Provides access to the error stream for the test system. This should be used instead of System.err
+ 	 * This is gives us a way to implement changes to where the output text of this test system is sent.

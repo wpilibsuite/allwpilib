@@ -1,0 +1,181 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Mon, 11 Aug 2014 12:01:38 -0400
+Subject: [PATCH 0280/6262] Removed Simple Robot template option
+
+Remove the option in Eclipse to make a "Simple Robot" project, since
+there is no more simple robot template and the resulting project isn't
+even generated correctly.
+
+Change-Id: I06a9db8c7f5fb82b7be3eadb1f91813321a36119
+---
+ .../core/wizards/NewProjectMainPage.java      | 39 +++++++------------
+ .../wizards/newproject/CPPProjectType.java    |  8 ----
+ 2 files changed, 15 insertions(+), 32 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
+index f34cd661441f32a65c05c620979239f07e914841..d253820a4955f54cd5a4e37c2d1215f275158913 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/NewProjectMainPage.java
+@@ -35,15 +35,15 @@ public class NewProjectMainPage extends WizardPage {
+ 	private Text worldText;
+ 	private Button worldButton;
+ 
+-	Button simpleRobot, iterativeRobot, commandRobot;
++	Button iterativeRobot, commandRobot;
+ 	private boolean showPackage;
+ 	private boolean showProjectTypes;
+ 	private TeamNumberPage teamNumberPage;
+ 
+ 	/**
+ 	 * Constructor for SampleNewWizardPage.
+-	 * @param teamNumberPage 
+-	 * 
++	 * @param teamNumberPage
++	 *
+ 	 * @param pageName
+ 	 */
+ 	public NewProjectMainPage(ISelection selection, TeamNumberPage teamNumberPage) {
+@@ -77,7 +77,7 @@ public class NewProjectMainPage extends WizardPage {
+ 		if (showPackage) {
+ 			label = new Label(container, SWT.NULL);
+ 			label.setText("&Package:");
+-		
++
+ 			packageText = new Text(container, SWT.BORDER | SWT.SINGLE);
+ 			gd = new GridData(GridData.FILL_HORIZONTAL);
+ 			packageText.setLayoutData(gd);
+@@ -87,7 +87,7 @@ public class NewProjectMainPage extends WizardPage {
+ 				}
+ 			});
+ 		}
+-		
++
+ 		if (showProjectTypes) {
+ 			Group projectTypeGroup = new Group(container, SWT.BORDER);
+ 			projectTypeGroup.setText("Project Type");
+@@ -97,21 +97,13 @@ public class NewProjectMainPage extends WizardPage {
+ 			GridLayout groupLayout = new GridLayout();
+ 			groupLayout.numColumns = 1;
+ 			projectTypeGroup.setLayout(groupLayout);
+-			
+-			simpleRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
+-			//simpleRobot.setData( RWT.MARKUP_ENABLED, Boolean.TRUE );
+-			simpleRobot.setText("Simple Robot: A flexible robot project intended for robots that implement basic functionality. Can also be used as a starting point for teams with a custom framework.");
+-			gd = new GridData(GridData.FILL_HORIZONTAL);
+-			gd.widthHint = 300;
+-			simpleRobot.setLayoutData(gd);
+-			simpleRobot.setSelection(true);
+-			
++
+ 			iterativeRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
+ 			iterativeRobot.setText("Iterative Robot: A robot project that allows robots to be implemented in an iterative manner.");
+ 			gd = new GridData(GridData.FILL_HORIZONTAL);
+ 			gd.widthHint = 300;
+ 			iterativeRobot.setLayoutData(gd);
+-			
++
+ 			commandRobot = new Button(projectTypeGroup, SWT.RADIO | SWT.WRAP);
+ 			commandRobot.setText("Command-Based Robot: A robot project that allows robots to be implemented using the command based model to allow complex functionality to be developed from simpler functionality.");
+ 			gd = new GridData(GridData.FILL_HORIZONTAL);
+@@ -121,7 +113,7 @@ public class NewProjectMainPage extends WizardPage {
+ 
+ 		label = new Label(container, SWT.NULL);
+ 		label.setText("Simulation &World:");
+-		
++
+ 
+ 		Composite comp = new Composite(container, SWT.NULL);
+ 		gd = new GridData(GridData.FILL_HORIZONTAL);
+@@ -144,7 +136,7 @@ public class NewProjectMainPage extends WizardPage {
+ 				browse();
+ 			}
+ 		});
+-		
++
+ 		initialize();
+ 		dialogChanged();
+ 		setControl(container);
+@@ -162,7 +154,7 @@ public class NewProjectMainPage extends WizardPage {
+ 					@Override public void stateChanged(ChangeEvent e) {
+ 						String teamNumber = TeamNumberPage.getTeamNumberFromPage(teamNumberPage);
+ 						packageText.setText("org.usfirst.frc.team"+teamNumber+".robot");
+-						
++
+ 					}
+ 				});
+ 			}
+@@ -174,7 +166,7 @@ public class NewProjectMainPage extends WizardPage {
+ 	 */
+ 	private void dialogChanged() {
+ 		String projectName = getProjectName();
+-		
++
+ 		String packageString = "";
+ 		if (showPackage) packageString = getPackage();
+ 
+@@ -190,7 +182,7 @@ public class NewProjectMainPage extends WizardPage {
+ 			updateStatus("Must be valid java package");
+ 			return;
+ 		}
+-		
++
+ 		updateStatus(null);
+ 	}
+ 
+@@ -203,7 +195,7 @@ public class NewProjectMainPage extends WizardPage {
+ 		String result = dialog.open();
+ 		if (result != null) {
+ 			worldText.setText(result);
+-		}	
++		}
+ 	}
+ 
+ 	private void updateStatus(String message) {
+@@ -218,10 +210,9 @@ public class NewProjectMainPage extends WizardPage {
+ 	public String getPackage() {
+ 		return packageText.getText();
+ 	}
+-	
++
+ 	public ProjectType getProjectType() {
+ 		if (!showProjectTypes) return null;
+-		else if (simpleRobot.getSelection()) return types.get(ProjectType.SIMPLE);
+ 		else if (iterativeRobot.getSelection()) return types.get(ProjectType.ITERATIVE);
+ 		else return types.get(ProjectType.COMMAND_BASED);
+ 	}
+@@ -237,7 +228,7 @@ public class NewProjectMainPage extends WizardPage {
+ 	public void setShowProjectTypes(boolean bool) {
+ 		showProjectTypes = bool;
+ 	}
+-	
++
+ 	public void setProjectTypes(Map<String, ProjectType> types) {
+ 		showProjectTypes = true;
+ 		this.types = types;
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/CPPProjectType.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/CPPProjectType.java
+index d376f19bad621679a6fc61c8e9f6a964a7a62541..61c59fa16635947a0fe42bcd40141e72c2b8561d 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/CPPProjectType.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/wizards/newproject/CPPProjectType.java
+@@ -8,13 +8,6 @@ import edu.wpi.first.wpilib.plugins.core.wizards.ProjectType;
+ import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
+ 
+ public class CPPProjectType implements ProjectType {
+-	static ProjectType SIMPLE = new CPPProjectType() {
+-		@Override public Map<String, String> getFiles(String packageName) {
+-			Map<String, String> files = super.getFiles(packageName);
+-			files.put("src/Robot.cpp", "simple/Robot.cpp");
+-			return files;
+-		}
+-	};
+ 	static ProjectType ITERATIVE = new CPPProjectType() {
+ 		@Override public Map<String, String> getFiles(String packageName) {
+ 			Map<String, String> files = super.getFiles(packageName);
+@@ -47,7 +40,6 @@ public class CPPProjectType implements ProjectType {
+ 	};
+ 	@SuppressWarnings("serial")
+ 	static Map<String, ProjectType> TYPES = new HashMap<String, ProjectType>() {{
+-		put(ProjectType.SIMPLE, SIMPLE);
+ 		put(ProjectType.ITERATIVE, ITERATIVE);
+ 		put(ProjectType.COMMAND_BASED, COMMAND_BASED);
+ 	}};

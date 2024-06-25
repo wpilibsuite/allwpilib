@@ -1,0 +1,164 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 17 Jul 2014 15:51:01 -0400
+Subject: [PATCH 0171/6262] Adds a Unit Test for the Resource object in Java.
+ Fixes a bug in the Resource class caused by allocating a negative resource
+ value.
+
+Change-Id: I3a3b368d429dc5cd00baf94ccd80a676a10cbb48
+---
+ .../java/edu/wpi/first/wpilibj/Resource.java  |   2 +-
+ .../edu/wpi/first/wpilibj/ResourceTest.java   | 131 ++++++++++++++++++
+ 2 files changed, 132 insertions(+), 1 deletion(-)
+ create mode 100644 wpilibj/wpilibJava/src/test/java/edu/wpi/first/wpilibj/ResourceTest.java
+
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Resource.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Resource.java
+index ca94c648f206ddc35fcd9ac573d6027cee00d24e..e6d2204990e5b02ed1893d370ae18529ee14e372 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Resource.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Resource.java
+@@ -86,7 +86,7 @@ public class Resource {
+      * @throws CheckedAllocationException If there are no resources available to be allocated.
+      */
+     public int allocate(final int index) throws CheckedAllocationException {
+-        if (index >= m_size) {
++        if (index >= m_size || index < 0) {
+             throw new CheckedAllocationException("Index " + index + " out of range");
+         }
+         if (m_numAllocated[index] == true) {
+diff --git a/wpilibj/wpilibJava/src/test/java/edu/wpi/first/wpilibj/ResourceTest.java b/wpilibj/wpilibJava/src/test/java/edu/wpi/first/wpilibj/ResourceTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6f4815f781412d4330247622e2b3473d6ae8fc94
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/test/java/edu/wpi/first/wpilibj/ResourceTest.java
+@@ -0,0 +1,131 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj;
++
++import static org.junit.Assert.assertEquals;
++
++import org.junit.After;
++import org.junit.Before;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.util.CheckedAllocationException;
++
++/**
++ * Test covers the possible uses of the resource class.
++ * @author jonathanleitschuh
++ *
++ */
++public class ResourceTest {
++	private Resource testResource;
++	private static final int RESOURCE_MAX_SIZE = 5;
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++		testResource = new Resource(RESOURCE_MAX_SIZE);
++	}
++	
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@After
++	public void tearDown() throws Exception{
++		Resource.restartProgram();
++	}
++
++
++	/**
++	 * Checks that allocating a resource above the range of resources will cause an exception
++	 * @throws CheckedAllocationException
++	 */
++	@Test(expected = CheckedAllocationException.class)
++	public void testAllocateAboveRange() throws CheckedAllocationException {
++		testResource.allocate(RESOURCE_MAX_SIZE);
++	}
++	
++	/**
++	 * Checks that allocating a negative resource value will cause an exception
++	 * @throws CheckedAllocationException
++	 */
++	@Test(expected = CheckedAllocationException.class)
++	public void testAllocateBelowRange() throws CheckedAllocationException {
++		testResource.allocate(-1);
++	}
++	
++	/**
++	 * Checks that allocating the same resource twice causes an exception
++	 * @throws CheckedAllocationException
++	 */
++	@Test(expected = CheckedAllocationException.class)
++	public void testAlocateAlreadyAllocatedResource() throws CheckedAllocationException{
++		testResource.allocate(0);
++		testResource.allocate(0);	
++	}
++	
++	/**
++	 * Checks that all valid resources can be allocated without exception.
++	 * @throws CheckedAllocationException
++	 */
++	@Test
++	public void testAllocateValidResource() throws CheckedAllocationException{
++		for(int i = 0; i < RESOURCE_MAX_SIZE; i++){
++			testResource.allocate(i);
++		}
++		//Should complete without errors
++	}
++	
++	/**
++	 * Checks that freeing an resource that has been allocated allows it to be allocated again.
++	 * @throws CheckedAllocationException
++	 */
++	@Test
++	public void testAllocateFreedResource() throws CheckedAllocationException{
++		for(int i = 0; i < RESOURCE_MAX_SIZE; i++){
++			testResource.allocate(i);
++		}
++		for(int i = 0; i < RESOURCE_MAX_SIZE; i++){
++			testResource.free(i);
++		}
++		for(int i = 0; i < RESOURCE_MAX_SIZE; i++){
++			testResource.allocate(i);
++		}
++		//Should complete without errors
++	}
++	
++	/**
++	 * Checks that asking for the next valid allocated resource will cause it to skip an already allocated resource.
++	 * @throws CheckedAllocationException
++	 */
++	@Test
++	public void testAllocateNextValidResource() throws CheckedAllocationException{
++		testResource.allocate(3);
++		int allocatedValue = testResource.allocate();
++		assertEquals(0, allocatedValue);
++		allocatedValue = testResource.allocate();
++		assertEquals(1, allocatedValue);
++		allocatedValue = testResource.allocate();
++		assertEquals(2, allocatedValue);
++		//Three should be skipped because it is already allocated.
++		allocatedValue = testResource.allocate();
++		assertEquals(4, allocatedValue);
++	}
++	
++	/**
++	 * Attempts to allocate a resource with no remaining resources available.
++	 * @throws CheckedAllocationException
++	 */
++	@Test(expected = CheckedAllocationException.class)
++	public void testAllocateWithNoRemainingResources() throws CheckedAllocationException{
++		for(int i = 0; i < RESOURCE_MAX_SIZE; i++){
++			testResource.allocate(i);
++		}
++		testResource.allocate();
++	}
++
++}

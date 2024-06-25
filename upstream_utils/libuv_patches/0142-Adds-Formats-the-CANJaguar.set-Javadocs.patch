@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Fri, 27 Jun 2014 11:24:51 -0400
+Subject: [PATCH 0142/6262] Adds/Formats the CANJaguar.set() Javadocs
+
+Change-Id: I7e8735d9de336ba906b319b01eff4b2e88fb2a26
+---
+ .../java/edu/wpi/first/wpilibj/CANJaguar.java | 29 ++++++++++++++-----
+ 1 file changed, 21 insertions(+), 8 deletions(-)
+
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
+index 257345b603cf74c6f4197ea5abad034c3f48b550..e623645b0cd90504159b210ac2ca97559324ad3a 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
+@@ -245,15 +245,15 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
+ 	}
+ 
+ 	/**
+-	 * set the output set-point value.
+-	 *
+-	 * The scale and the units depend on the mode the Jaguar is in.
+-	 * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
+-	 * In Voltage Mode, the outputValue is in Volts.
+-	 * In Current Mode, the outputValue is in Amps.
+-	 * In Speed Mode, the outputValue is in Rotations/Minute.
++	 * Sets the output set-point value.
++	 * 
++	 * The scale and the units depend on the mode the Jaguar is in.<br>
++	 * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWMJaguar).<br>
++	 * In Voltage Mode, the outputValue is in Volts. <br>
++	 * In Current Mode, the outputValue is in Amps. In Speed Mode, the outputValue is in 
++	 * Rotations/Minute.<br>
+ 	 * In Position Mode, the outputValue is in Rotations.
+-	 *
++	 * 
+ 	 * @param outputValue The set-point to sent to the motor controller.
+ 	 * @param syncGroup The update group to add this set() to, pending UpdateSyncGroup().  If 0, update immediately.
+ 	 */
+@@ -306,6 +306,19 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
+ 		verify();
+ 	}
+ 
++	/**
++	 * Sets the output set-point value.
++	 * 
++	 * The scale and the units depend on the mode the Jaguar is in.<br>
++	 * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWMJaguar).<br>
++	 * In Voltage Mode, the outputValue is in Volts. <br>
++	 * In Current Mode, the outputValue is in Amps. In Speed Mode, the outputValue is in 
++	 * Rotations/Minute.<br>
++	 * In Position Mode, the outputValue is in Rotations.
++	 * 
++	 * @param value
++	 *            The set-point to sent to the motor controller.
++	 */
+ 	public void set(double value) {
+ 		set(value, (byte)0);
+ 	}

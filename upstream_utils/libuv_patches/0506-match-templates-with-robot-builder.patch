@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joe Ross <joe@rossesmail.com>
+Date: Sun, 23 Nov 2014 18:47:00 -0800
+Subject: [PATCH 0506/6262] match templates with robot builder.
+
+Change-Id: Iedb8b9efc58ca73bc654b119d5d1aed5b4eb5553
+---
+ .../resources/templates/command-based/Robot.cpp             | 6 ++++--
+ .../resources/templates/command-based/Robot.java            | 4 ++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/command-based/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/command-based/Robot.cpp
+index 90d48b3446194b004ab437c9b1f41e57ca3d56fb..9fdbad39aa58de9356efea8922f454a24701fa2a 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/command-based/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/command-based/Robot.cpp
+@@ -23,7 +23,8 @@ private:
+ 
+ 	void AutonomousInit()
+ 	{
+-		autonomousCommand->Start();
++		if (autonomousCommand != NULL)
++			autonomousCommand->Start();
+ 	}
+ 
+ 	void AutonomousPeriodic()
+@@ -37,7 +38,8 @@ private:
+ 		// teleop starts running. If you want the autonomous to 
+ 		// continue until interrupted by another command, remove
+ 		// this line or comment it out.
+-		autonomousCommand->Cancel();
++		if (autonomousCommand != NULL)
++			autonomousCommand->Cancel();
+ 	}
+ 
+ 	void TeleopPeriodic()
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Robot.java
+index a4f7cf664b8df583b1ad0b41534bc2d77704c846..8d0fbe7dbab28c87bc5a85d6589bda553f5be22e 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Robot.java
+@@ -38,7 +38,7 @@ public class Robot extends IterativeRobot {
+ 
+     public void autonomousInit() {
+         // schedule the autonomous command (example)
+-        autonomousCommand.start();
++        if (autonomousCommand != null) autonomousCommand.start();
+     }
+ 
+     /**
+@@ -53,7 +53,7 @@ public class Robot extends IterativeRobot {
+         // teleop starts running. If you want the autonomous to 
+         // continue until interrupted by another command, remove
+         // this line or comment it out.
+-        autonomousCommand.cancel();
++        if (autonomousCommand != null) autonomousCommand.cancel();
+     }
+ 
+     /**

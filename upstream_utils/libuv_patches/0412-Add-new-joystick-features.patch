@@ -1,0 +1,799 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Fri, 17 Oct 2014 14:46:25 -0400
+Subject: [PATCH 0412/6262] Add new joystick features
+
+Axis counts other than six and POVs are both present in C++ and Java now
+
+Add dynamic joystick axis counts, up to 12
+
+Change-Id: Ieade5e61a89df822df8702cb32326e4635558778
+
+Add support for POVs in C++
+
+Change-Id: I12dc0fcaca605a256ddcf990eebde45767229171
+
+Make POVs work in Java
+
+Change-Id: Ie2d98adb416c1930f058bdd21c3e7d26289df503
+---
+ hal/include/HAL/HAL.hpp                       | 16 +++++-
+ hal/lib/Athena/HAL.cpp                        |  9 ++-
+ wpilibc/wpilibC++/include/GenericHID.h        |  2 +
+ wpilibc/wpilibC++/include/WPIErrors.h         |  4 +-
+ .../wpilibC++Devices/include/DriverStation.h  |  3 +-
+ wpilibc/wpilibC++Devices/include/Joystick.h   | 10 ++--
+ .../wpilibC++Devices/src/DriverStation.cpp    | 34 ++++++++++-
+ wpilibc/wpilibC++Devices/src/Joystick.cpp     | 55 ++++++++++--------
+ wpilibc/wpilibC++Sim/include/Joystick.h       | 10 ++--
+ wpilibc/wpilibC++Sim/src/Joystick.cpp         | 57 +++++++++++--------
+ .../edu/wpi/first/wpilibj/GenericHID.java     |  6 ++
+ .../edu/wpi/first/wpilibj/DriverStation.java  | 27 +++++++--
+ .../java/edu/wpi/first/wpilibj/Joystick.java  |  9 +++
+ .../FRCNetworkCommunicationsLibrary.java      |  3 +
+ .../lib/FRCNetworkCommunicationsLibrary.cpp   | 19 ++++++-
+ .../java/edu/wpi/first/wpilibj/Joystick.java  |  9 +++
+ 16 files changed, 199 insertions(+), 74 deletions(-)
+
+diff --git a/hal/include/HAL/HAL.hpp b/hal/include/HAL/HAL.hpp
+index cb8f5f5d698b8446391f1e477e4138e15d8c1fcc..934d6d49d4d27877ab8d3484471558633ddc9f9a 100644
+--- a/hal/include/HAL/HAL.hpp
++++ b/hal/include/HAL/HAL.hpp
+@@ -161,9 +161,20 @@ enum HALAllianceStationID {
+ 	kHALAllianceStationID_blue3,
+ };
+ 
++/* The maximum number of axes that will be stored in a single HALJoystickAxes
++	struct. This is used for allocating buffers, not bounds checking, since
++	there are usually less axes in practice. */
++static constexpr size_t kMaxJoystickAxes = 12;
++static constexpr size_t kMaxJoystickPOVs = 12;
++
+ struct HALJoystickAxes {
+ 	uint16_t count;
+-	int16_t axes[6];
++	int16_t axes[kMaxJoystickAxes];
++};
++
++struct HALJoystickPOVs {
++	uint16_t count;
++	int16_t povs[kMaxJoystickPOVs];
+ };
+ 
+ typedef uint32_t HALJoystickButtons;
+@@ -199,7 +210,8 @@ extern "C"
+ 
+ 	int HALGetControlWord(HALControlWord *data);
+ 	int HALGetAllianceStation(enum HALAllianceStationID *allianceStation);
+-	int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes, uint8_t maxAxes);
++	int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes);
++	int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs);
+ 	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count);
+ 
+ 	void HALSetNewDataSem(pthread_mutex_t *);
+diff --git a/hal/lib/Athena/HAL.cpp b/hal/lib/Athena/HAL.cpp
+index a8664681aee91679950ad7958a6eecb29320ab54..258473cd88c575f17f9d2376a83609a1e689a688 100644
+--- a/hal/lib/Athena/HAL.cpp
++++ b/hal/lib/Athena/HAL.cpp
+@@ -125,9 +125,14 @@ int HALGetAllianceStation(enum HALAllianceStationID *allianceStation)
+ 	return FRC_NetworkCommunication_getAllianceStation((AllianceStationID_t*) allianceStation);
+ }
+ 
+-int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes, uint8_t maxAxes)
++int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes)
+ {
+-	return FRC_NetworkCommunication_getJoystickAxes(joystickNum, (JoystickAxes_t*) axes, maxAxes);
++	return FRC_NetworkCommunication_getJoystickAxes(joystickNum, (JoystickAxes_t*) axes, kMaxJoystickAxes);
++}
++
++int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs)
++{
++	return FRC_NetworkCommunication_getJoystickPOVs(joystickNum, (JoystickPOV_t*) povs, kMaxJoystickPOVs);
+ }
+ 
+ int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count)
+diff --git a/wpilibc/wpilibC++/include/GenericHID.h b/wpilibc/wpilibC++/include/GenericHID.h
+index ac3518942f932e27d9f85a9594296490b798f93b..a9b4efc7b5b3468d753c0ae12ea3857fb51c900c 100644
+--- a/wpilibc/wpilibC++/include/GenericHID.h
++++ b/wpilibc/wpilibC++/include/GenericHID.h
+@@ -33,4 +33,6 @@ public:
+ 	virtual bool GetTop(JoystickHand hand = kRightHand) = 0;
+ 	virtual bool GetBumper(JoystickHand hand = kRightHand) = 0;
+ 	virtual bool GetRawButton(uint32_t button) = 0;
++
++	virtual int GetPOV(uint32_t pov = 1) = 0;
+ };
+diff --git a/wpilibc/wpilibC++/include/WPIErrors.h b/wpilibc/wpilibC++/include/WPIErrors.h
+index d8b3cd264eedd83856341abf59c90887c60a1455..9e37715b5995631b1daf5434767f52deb071afb1 100644
+--- a/wpilibc/wpilibC++/include/WPIErrors.h
++++ b/wpilibc/wpilibC++/include/WPIErrors.h
+@@ -65,8 +65,8 @@ S(CompressorTaskError, 3, "Compressor task won't start");
+ S(LoopTimingError, 4, "Digital module loop timing is not the expected value");
+ S(NonBinaryDigitalValue, 5, "Digital output value is not 0 or 1");
+ S(IncorrectBatteryChannel, 6, "Battery measurement channel is not correct value");
+-S(BadJoystickIndex, 7, "Joystick index is out of range, should be 1-4");
+-S(BadJoystickAxis, 8, "Joystick axis is out of range");
++S(BadJoystickIndex, 7, "Joystick index is out of range, should be 0-3");
++S(BadJoystickAxis, 8, "Joystick axis or POV is out of range");
+ S(InvalidMotorIndex, 9, "Motor index is out of range, should be 0-3");
+ S(DriverStationTaskError, 10, "Driver Station task won't start");
+ S(EnhancedIOPWMPeriodOutOfRange, 11, "Driver Station Enhanced IO PWM Output period out of range.");
+diff --git a/wpilibc/wpilibC++Devices/include/DriverStation.h b/wpilibc/wpilibC++Devices/include/DriverStation.h
+index 9151c8d897b675c5ece0cefeab1e28d0d62620b1..cae65d7527001a11fb804e11b6f1840af680b83e 100644
+--- a/wpilibc/wpilibC++Devices/include/DriverStation.h
++++ b/wpilibc/wpilibC++Devices/include/DriverStation.h
+@@ -30,9 +30,9 @@ public:
+ 	static DriverStation *GetInstance();
+ 
+ 	static const uint32_t kJoystickPorts = 4;
+-	static const uint32_t kJoystickAxes = 6;
+ 
+ 	float GetStickAxis(uint32_t stick, uint32_t axis);
++	int GetStickPOV(uint32_t stick, uint32_t pov);
+ 	short GetStickButtons(uint32_t stick);
+ 
+ 	bool IsEnabled();
+@@ -98,6 +98,7 @@ private:
+ 	HALControlWord m_controlWord;
+ 	HALAllianceStationID m_allianceStationID;
+ 	HALJoystickAxes m_joystickAxes[kJoystickPorts];
++	HALJoystickPOVs m_joystickPOVs[kJoystickPorts];
+ 	HALJoystickButtons m_joystickButtons[kJoystickPorts];
+ 
+ 	MUTEX_ID m_statusDataSemaphore;
+diff --git a/wpilibc/wpilibC++Devices/include/Joystick.h b/wpilibc/wpilibC++Devices/include/Joystick.h
+index e21e070bfa9098b99647af975bb0f2b4566c7bf4..429b499eae134e4edbcae875f8ce0da9c4feb393 100644
+--- a/wpilibc/wpilibC++Devices/include/Joystick.h
++++ b/wpilibc/wpilibC++Devices/include/Joystick.h
+@@ -42,7 +42,7 @@ public:
+ 	virtual ~Joystick();
+ 
+ 	uint32_t GetAxisChannel(AxisType axis);
+-	void SetAxisChannel(AxisType axis, uint32_t channel); 
++	void SetAxisChannel(AxisType axis, uint32_t channel);
+ 
+ 	virtual float GetX(JoystickHand hand = kRightHand);
+ 	virtual float GetY(JoystickHand hand = kRightHand);
+@@ -55,10 +55,11 @@ public:
+ 	virtual bool GetTrigger(JoystickHand hand = kRightHand);
+ 	virtual bool GetTop(JoystickHand hand = kRightHand);
+ 	virtual bool GetBumper(JoystickHand hand = kRightHand);
+-	virtual bool GetButton(ButtonType button);
+-	bool GetRawButton(uint32_t button);
++	virtual bool GetRawButton(uint32_t button);
++	virtual int GetPOV(uint32_t pov = 1);
++	bool GetButton(ButtonType button);
+ 	static Joystick* GetStickForPort(uint32_t port);
+-	
++
+ 	virtual float GetMagnitude();
+ 	virtual float GetDirectionRadians();
+ 	virtual float GetDirectionDegrees();
+@@ -74,4 +75,3 @@ private:
+ };
+ 
+ #endif
+- 
+diff --git a/wpilibc/wpilibC++Devices/src/DriverStation.cpp b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+index 72e34b1805f26399aed1fd2836a84e663c654527..97385ea357f1c16a70721db047684588310c3f54 100644
+--- a/wpilibc/wpilibC++Devices/src/DriverStation.cpp
++++ b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+@@ -24,7 +24,6 @@ TLogLevel dsLogLevel = logDEBUG;
+ 	else Log().Get(level)
+ 
+ const uint32_t DriverStation::kJoystickPorts;
+-const uint32_t DriverStation::kJoystickAxes;
+ DriverStation* DriverStation::m_instance = NULL;
+ 
+ /**
+@@ -46,6 +45,13 @@ DriverStation::DriverStation()
+ {
+ 	memset(&m_controlWord, 0, sizeof(m_controlWord));
+ 
++	// All joysticks should default to having zero axes and povs, so
++	// uninitialized memory doesn't get sent to speed controllers.
++	for(unsigned int i = 0; i < kJoystickPorts; i++) {
++		m_joystickAxes[i].count = 0;
++		m_joystickPOVs[i].count = 0;
++	}
++
+ 	// Create a new semaphore
+ 	m_packetDataAvailableSem = initializeMutexNormal();
+ 	m_newControlData = initializeSemaphore(SEMAPHORE_EMPTY);
+@@ -135,7 +141,8 @@ void DriverStation::GetData()
+ 	for(uint8_t stick = 0; stick < kJoystickPorts; stick++) {
+ 		uint8_t count;
+ 
+-		HALGetJoystickAxes(stick, &m_joystickAxes[stick], kJoystickAxes);
++		HALGetJoystickAxes(stick, &m_joystickAxes[stick]);
++		HALGetJoystickPOVs(stick, &m_joystickPOVs[stick]);
+ 		HALGetJoystickButtons(stick, &m_joystickButtons[stick], &count);
+ 	}
+ 
+@@ -185,7 +192,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
+ 		return 0;
+ 	}
+ 
+-	if (axis < 1 || axis > kJoystickAxes)
++	if (axis < 1 || axis > m_joystickAxes[stick].count)
+ 	{
+ 		wpi_setWPIError(BadJoystickAxis);
+ 		return 0.0f;
+@@ -203,6 +210,27 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
+ 	}
+ }
+ 
++/**
++ * Get the state of a POV on the joystick.
++ *
++ * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
++ */
++int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
++	if (stick >= kJoystickPorts)
++	{
++		wpi_setWPIError(BadJoystickIndex);
++		return 0;
++	}
++
++	if (pov < 1 || pov > m_joystickPOVs[stick].count)
++	{
++		wpi_setWPIError(BadJoystickAxis);
++		return 0;
++	}
++
++	return m_joystickPOVs[stick].povs[pov - 1];
++}
++
+ /**
+  * The state of the buttons on the joystick.
+  * 12 buttons (4 msb are unused) from the joystick.
+diff --git a/wpilibc/wpilibC++Devices/src/Joystick.cpp b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+index 018e78cba8c585ab3a5795026bb67f19a0208eba..977b9e5055bbcff7900887aca98d65b9929fcc77 100644
+--- a/wpilibc/wpilibC++Devices/src/Joystick.cpp
++++ b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+@@ -23,7 +23,7 @@ static bool joySticksInitialized = false;
+ /**
+  * Construct an instance of a joystick.
+  * The joystick index is the usb port on the drivers station.
+- * 
++ *
+  * @param port The port on the driver station that the joystick is plugged into.
+  */
+ Joystick::Joystick(uint32_t port)
+@@ -39,7 +39,7 @@ Joystick::Joystick(uint32_t port)
+ 	m_axes[kZAxis] = kDefaultZAxis;
+ 	m_axes[kTwistAxis] = kDefaultTwistAxis;
+ 	m_axes[kThrottleAxis] = kDefaultThrottleAxis;
+-	
++
+ 	m_buttons[kTriggerButton] = kDefaultTriggerButton;
+ 	m_buttons[kTopButton] = kDefaultTopButton;
+ 
+@@ -48,10 +48,10 @@ Joystick::Joystick(uint32_t port)
+ 
+ /**
+  * Version of the constructor to be called by sub-classes.
+- * 
++ *
+  * This constructor allows the subclass to configure the number of constants
+  * for axes and buttons.
+- * 
++ *
+  * @param port The port on the driver station that the joystick is plugged into.
+  * @param numAxisTypes The number of axis types in the enum.
+  * @param numButtonTypes The number of button types in the enum.
+@@ -148,7 +148,7 @@ float Joystick::GetThrottle()
+ 
+ /**
+  * Get the value of the axis.
+- * 
++ *
+  * @param axis The axis to read [1-6].
+  * @return The value of the axis.
+  */
+@@ -159,10 +159,10 @@ float Joystick::GetRawAxis(uint32_t axis)
+ 
+ /**
+  * For the current joystick, return the axis determined by the argument.
+- * 
++ *
+  * This is for cases where the joystick axis is returned programatically, otherwise one of the
+  * previous functions would be preferable (for example GetX()).
+- * 
++ *
+  * @param axis The axis to read.
+  * @return The value of the axis.
+  */
+@@ -183,9 +183,9 @@ float Joystick::GetAxis(AxisType axis)
+ 
+ /**
+  * Read the state of the trigger on the joystick.
+- * 
++ *
+  * Look up which button has been assigned to the trigger and read its state.
+- * 
++ *
+  * @param hand This parameter is ignored for the Joystick class and is only here to complete the GenericHID interface.
+  * @return The state of the trigger.
+  */
+@@ -196,9 +196,9 @@ bool Joystick::GetTrigger(JoystickHand hand)
+ 
+ /**
+  * Read the state of the top button on the joystick.
+- * 
++ *
+  * Look up which button has been assigned to the top and read its state.
+- * 
++ *
+  * @param hand This parameter is ignored for the Joystick class and is only here to complete the GenericHID interface.
+  * @return The state of the top button.
+  */
+@@ -219,10 +219,10 @@ bool Joystick::GetBumper(JoystickHand hand)
+ 
+ /**
+  * Get the button value for buttons 1 through 12.
+- * 
++ *
+  * The buttons are returned in a single 16 bit value with one bit representing the state
+- * of each button. The appropriate button is returned as a boolean value. 
+- * 
++ * of each button. The appropriate button is returned as a boolean value.
++ *
+  * @param button The button number to be read.
+  * @return The state of the button.
+  **/
+@@ -231,11 +231,20 @@ bool Joystick::GetRawButton(uint32_t button)
+ 	return ((0x1 << (button-1)) & m_ds->GetStickButtons(m_port)) != 0;
+ }
+ 
++/**
++ * Get the state of a POV on the joystick.
++ *
++ * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
++ */
++int Joystick::GetPOV(uint32_t pov) {
++	return m_ds->GetStickPOV(m_port, pov);
++}
++
+ /**
+  * Get buttons based on an enumerated type.
+- * 
++ *
+  * The button type will be looked up in the list of buttons and then read.
+- * 
++ *
+  * @param button The type of button to read.
+  * @return The state of the button.
+  */
+@@ -252,7 +261,7 @@ bool Joystick::GetButton(ButtonType button)
+ 
+ /**
+  * Get the channel currently associated with the specified axis.
+- * 
++ *
+  * @param axis The axis to look up the channel for.
+  * @return The channel fr the axis.
+  */
+@@ -263,7 +272,7 @@ uint32_t Joystick::GetAxisChannel(AxisType axis)
+ 
+ /**
+  * Set the channel associated with a specified axis.
+- * 
++ *
+  * @param axis The axis to set the channel for.
+  * @param channel The channel to set the axis to.
+  */
+@@ -275,7 +284,7 @@ void Joystick::SetAxisChannel(AxisType axis, uint32_t channel)
+ /**
+  * Get the magnitude of the direction vector formed by the joystick's
+  * current position relative to its origin
+- * 
++ *
+  * @return The magnitude of the direction vector
+  */
+ float Joystick::GetMagnitude(){
+@@ -285,7 +294,7 @@ float Joystick::GetMagnitude(){
+ /**
+  * Get the direction of the vector formed by the joystick and its origin
+  * in radians
+- * 
++ *
+  * @return The direction of the vector in radians
+  */
+ float Joystick::GetDirectionRadians(){
+@@ -295,10 +304,10 @@ float Joystick::GetDirectionRadians(){
+ /**
+  * Get the direction of the vector formed by the joystick and its origin
+  * in degrees
+- * 
+- * uses acos(-1) to represent Pi due to absence of readily accessable Pi 
++ *
++ * uses acos(-1) to represent Pi due to absence of readily accessable Pi
+  * constant in C++
+- * 
++ *
+  * @return The direction of the vector in degrees
+  */
+ float Joystick::GetDirectionDegrees(){
+diff --git a/wpilibc/wpilibC++Sim/include/Joystick.h b/wpilibc/wpilibC++Sim/include/Joystick.h
+index e21e070bfa9098b99647af975bb0f2b4566c7bf4..429b499eae134e4edbcae875f8ce0da9c4feb393 100644
+--- a/wpilibc/wpilibC++Sim/include/Joystick.h
++++ b/wpilibc/wpilibC++Sim/include/Joystick.h
+@@ -42,7 +42,7 @@ public:
+ 	virtual ~Joystick();
+ 
+ 	uint32_t GetAxisChannel(AxisType axis);
+-	void SetAxisChannel(AxisType axis, uint32_t channel); 
++	void SetAxisChannel(AxisType axis, uint32_t channel);
+ 
+ 	virtual float GetX(JoystickHand hand = kRightHand);
+ 	virtual float GetY(JoystickHand hand = kRightHand);
+@@ -55,10 +55,11 @@ public:
+ 	virtual bool GetTrigger(JoystickHand hand = kRightHand);
+ 	virtual bool GetTop(JoystickHand hand = kRightHand);
+ 	virtual bool GetBumper(JoystickHand hand = kRightHand);
+-	virtual bool GetButton(ButtonType button);
+-	bool GetRawButton(uint32_t button);
++	virtual bool GetRawButton(uint32_t button);
++	virtual int GetPOV(uint32_t pov = 1);
++	bool GetButton(ButtonType button);
+ 	static Joystick* GetStickForPort(uint32_t port);
+-	
++
+ 	virtual float GetMagnitude();
+ 	virtual float GetDirectionRadians();
+ 	virtual float GetDirectionDegrees();
+@@ -74,4 +75,3 @@ private:
+ };
+ 
+ #endif
+- 
+diff --git a/wpilibc/wpilibC++Sim/src/Joystick.cpp b/wpilibc/wpilibC++Sim/src/Joystick.cpp
+index f091914e131daea8c997ceefac6d4fb4c93a29a7..7de12d78a0ccaa6ccd17924773e2e62133126756 100644
+--- a/wpilibc/wpilibC++Sim/src/Joystick.cpp
++++ b/wpilibc/wpilibC++Sim/src/Joystick.cpp
+@@ -22,7 +22,7 @@ static bool joySticksInitialized = false;
+ /**
+  * Construct an instance of a joystick.
+  * The joystick index is the usb port on the drivers station.
+- * 
++ *
+  * @param port The port on the driver station that the joystick is plugged into.
+  */
+ Joystick::Joystick(uint32_t port)
+@@ -38,17 +38,17 @@ Joystick::Joystick(uint32_t port)
+ 	m_axes[kZAxis] = kDefaultZAxis;
+ 	m_axes[kTwistAxis] = kDefaultTwistAxis;
+ 	m_axes[kThrottleAxis] = kDefaultThrottleAxis;
+-	
++
+ 	m_buttons[kTriggerButton] = kDefaultTriggerButton;
+ 	m_buttons[kTopButton] = kDefaultTopButton;
+ }
+ 
+ /**
+  * Version of the constructor to be called by sub-classes.
+- * 
++ *
+  * This constructor allows the subclass to configure the number of constants
+  * for axes and buttons.
+- * 
++ *
+  * @param port The port on the driver station that the joystick is plugged into.
+  * @param numAxisTypes The number of axis types in the enum.
+  * @param numButtonTypes The number of button types in the enum.
+@@ -71,7 +71,7 @@ void Joystick::InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes)
+ 		joySticksInitialized = true;
+ 	}
+ 	joysticks[m_port - 1] = this;
+-	
++
+ 	m_ds = DriverStation::GetInstance();
+ 	m_axes = new uint32_t[numAxisTypes];
+ 	m_buttons = new uint32_t[numButtonTypes];
+@@ -141,7 +141,7 @@ float Joystick::GetThrottle()
+ 
+ /**
+  * Get the value of the axis.
+- * 
++ *
+  * @param axis The axis to read [1-6].
+  * @return The value of the axis.
+  */
+@@ -152,10 +152,10 @@ float Joystick::GetRawAxis(uint32_t axis)
+ 
+ /**
+  * For the current joystick, return the axis determined by the argument.
+- * 
++ *
+  * This is for cases where the joystick axis is returned programatically, otherwise one of the
+  * previous functions would be preferable (for example GetX()).
+- * 
++ *
+  * @param axis The axis to read.
+  * @return The value of the axis.
+  */
+@@ -176,9 +176,9 @@ float Joystick::GetAxis(AxisType axis)
+ 
+ /**
+  * Read the state of the trigger on the joystick.
+- * 
++ *
+  * Look up which button has been assigned to the trigger and read its state.
+- * 
++ *
+  * @param hand This parameter is ignored for the Joystick class and is only here to complete the GenericHID interface.
+  * @return The state of the trigger.
+  */
+@@ -189,9 +189,9 @@ bool Joystick::GetTrigger(JoystickHand hand)
+ 
+ /**
+  * Read the state of the top button on the joystick.
+- * 
++ *
+  * Look up which button has been assigned to the top and read its state.
+- * 
++ *
+  * @param hand This parameter is ignored for the Joystick class and is only here to complete the GenericHID interface.
+  * @return The state of the top button.
+  */
+@@ -212,10 +212,10 @@ bool Joystick::GetBumper(JoystickHand hand)
+ 
+ /**
+  * Get the button value for buttons 1 through 12.
+- * 
++ *
+  * The buttons are returned in a single 16 bit value with one bit representing the state
+- * of each button. The appropriate button is returned as a boolean value. 
+- * 
++ * of each button. The appropriate button is returned as a boolean value.
++ *
+  * @param button The button number to be read.
+  * @return The state of the button.
+  **/
+@@ -224,11 +224,20 @@ bool Joystick::GetRawButton(uint32_t button)
+     return m_ds->GetStickButton(m_port, button);
+ }
+ 
++/**
++* Get the state of a POV on the joystick.
++*
++* @return the angle of the POV in degrees, or -1 if the POV is not pressed.
++*/
++int Joystick::GetPOV(uint32_t pov) {
++	return 0; // TODO
++}
++
+ /**
+  * Get buttons based on an enumerated type.
+- * 
++ *
+  * The button type will be looked up in the list of buttons and then read.
+- * 
++ *
+  * @param button The type of button to read.
+  * @return The state of the button.
+  */
+@@ -245,7 +254,7 @@ bool Joystick::GetButton(ButtonType button)
+ 
+ /**
+  * Get the channel currently associated with the specified axis.
+- * 
++ *
+  * @param axis The axis to look up the channel for.
+  * @return The channel fr the axis.
+  */
+@@ -256,7 +265,7 @@ uint32_t Joystick::GetAxisChannel(AxisType axis)
+ 
+ /**
+  * Set the channel associated with a specified axis.
+- * 
++ *
+  * @param axis The axis to set the channel for.
+  * @param channel The channel to set the axis to.
+  */
+@@ -268,7 +277,7 @@ void Joystick::SetAxisChannel(AxisType axis, uint32_t channel)
+ /**
+  * Get the magnitude of the direction vector formed by the joystick's
+  * current position relative to its origin
+- * 
++ *
+  * @return The magnitude of the direction vector
+  */
+ float Joystick::GetMagnitude(){
+@@ -278,7 +287,7 @@ float Joystick::GetMagnitude(){
+ /**
+  * Get the direction of the vector formed by the joystick and its origin
+  * in radians
+- * 
++ *
+  * @return The direction of the vector in radians
+  */
+ float Joystick::GetDirectionRadians(){
+@@ -288,10 +297,10 @@ float Joystick::GetDirectionRadians(){
+ /**
+  * Get the direction of the vector formed by the joystick and its origin
+  * in degrees
+- * 
+- * uses acos(-1) to represent Pi due to absence of readily accessable Pi 
++ *
++ * uses acos(-1) to represent Pi due to absence of readily accessable Pi
+  * constant in C++
+- * 
++ *
+  * @return The direction of the vector in degrees
+  */
+ float Joystick::GetDirectionDegrees(){
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/GenericHID.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/GenericHID.java
+index a5f8e7ccac6ee05adb1177b65e1c17a06f40c44a..50116eed52fc599125dca21dcc875518fdef53bb 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/GenericHID.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/GenericHID.java
+@@ -152,4 +152,10 @@ public abstract class GenericHID {
+      * @return true if the button is pressed
+      */
+     public abstract boolean getRawButton(int button);
++
++    public abstract int getPOV(int pov);
++
++    public int getPOV() {
++        return getPOV(1);
++    }
+ }
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index c531c53e6adfde5c157b7febfb2b0aadf1d3bc47..b6c9dfd51c1bbb6236fd2cb7cbf1cc67e9caf6e9 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -30,10 +30,6 @@ public class DriverStation implements RobotState.Interface {
+      * Number of Joystick Ports
+      */
+     public static final int kJoystickPorts = 4;
+-    /**
+-     * Number of Joystick Axes
+-     */
+-    public static final int kJoystickAxes = 6;
+     /**
+      * Convert from raw values to volts
+      */
+@@ -61,7 +57,8 @@ public class DriverStation implements RobotState.Interface {
+ 
+     private HALControlWord m_controlWord;
+     private HALAllianceStationID m_allianceStationID;
+-    private short[][] m_joystickAxes = new short[kJoystickAxes][kJoystickPorts];
++    private short[][] m_joystickAxes = new short[FRCNetworkCommunicationsLibrary.kMaxJoystickAxes][kJoystickPorts];
++    private short[][] m_joystickPOVs = new short[FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs][kJoystickPorts];
+     private int[] m_joystickButtons = new int[kJoystickPorts];
+ 
+     private Thread m_thread;
+@@ -185,6 +182,7 @@ public class DriverStation implements RobotState.Interface {
+         for(byte stick = 0; stick < kJoystickPorts; stick++) {
+             m_joystickButtons[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickButtons(stick);
+             m_joystickAxes[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickAxes(stick);
++            m_joystickPOVs[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs(stick);
+         }
+ 
+         if (!lastEnabled && isEnabled()) {
+@@ -228,7 +226,7 @@ public class DriverStation implements RobotState.Interface {
+             throw new RuntimeException("Joystick index is out of range, should be 0-3");
+         }
+ 
+-        if (axis < 1 || axis > kJoystickAxes) {
++        if (axis < 1 || axis > m_joystickAxes[stick].length) {
+             throw new RuntimeException("Joystick axis is out of range");
+         }
+ 
+@@ -241,6 +239,23 @@ public class DriverStation implements RobotState.Interface {
+         }
+     }
+ 
++    /**
++     * Get the state of a POV on the joystick.
++     *
++     * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
++     */
++    public int getStickPOV(int stick, int pov) {
++        if(stick < 0 || stick >= kJoystickPorts) {
++            throw new RuntimeException("Joystick index is out of range, should be 0-3");
++        }
++
++        if (pov < 1 || pov > m_joystickPOVs[stick].length) {
++            throw new RuntimeException("Joystick POV is out of range");
++        }
++
++        return m_joystickPOVs[stick][pov - 1];
++    }
++
+     /**
+      * The state of the buttons on the joystick.
+      * 12 buttons (4 msb are unused) from the joystick.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+index 969dcdf78989c94ec2b142a9c683d8528253d5c5..1a88cfd346a0030025dcb4373ef0b4c2649b511f 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+@@ -279,6 +279,15 @@ public class Joystick extends GenericHID {
+         return ((0x1 << (button - 1)) & m_ds.getStickButtons(m_port)) != 0;
+     }
+ 
++    /**
++     * Get the state of a POV on the joystick.
++     *
++     * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
++     */
++    public int getPOV(int pov) {
++        return m_ds.getStickPOV(m_port, pov - 1);
++    }
++
+     /**
+      * Get buttons based on an enumerated type.
+      *
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
+index 1d469ec84ff50cd4d5249a03a0fcfb1ea8be1bb9..aacebd37351a2a74fe0d4bbcaa237f5a02fa3057 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
+@@ -463,7 +463,10 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
+ 		}
+ 	}
+ 
++	public static int kMaxJoystickAxes = 12;
++	public static int kMaxJoystickPOVs = 12;
+ 	public static native short[] HALGetJoystickAxes(byte joystickNum);
++	public static native short[] HALGetJoystickPOVs(byte joystickNum);
+ 	public static native int HALGetJoystickButtons(byte joystickNum);
+ 
+ 	/*
+diff --git a/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp b/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
+index e5475b51f8a0c0c5cba85e882940040218dbb9b9..9588265456b7ea15fd598955eb73452a9d1f46ca 100644
+--- a/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
+@@ -293,7 +293,7 @@ JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetwor
+   (JNIEnv * env, jclass, jbyte joystickNum)
+ {
+     HALJoystickAxes axes;
+-    HALGetJoystickAxes(joystickNum, &axes, 6);
++    HALGetJoystickAxes(joystickNum, &axes);
+ 
+     jshortArray axesArray = env->NewShortArray(axes.count);
+     env->SetShortArrayRegion(axesArray, 0, axes.count, axes.axes);
+@@ -301,6 +301,23 @@ JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetwor
+     return axesArray;
+ }
+ 
++/*
++ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
++ * Method:    HALGetJoystickPOVs
++ * Signature: (B)[S
++ */
++JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickPOVs
++  (JNIEnv * env, jclass, jbyte joystickNum)
++{
++    HALJoystickPOVs povs;
++    HALGetJoystickPOVs(joystickNum, &povs);
++
++    jshortArray povsArray = env->NewShortArray(povs.count);
++    env->SetShortArrayRegion(povsArray, 0, povs.count, povs.povs);
++
++    return povsArray;
++}
++
+ /*
+  * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+  * Method:    HALGetJoystickButtons
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+index db59fe2f21c121b491fea01584d24cb10bf422e6..c0ecc36d1123bb02109824e6237d302c1b9453e4 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+@@ -276,6 +276,15 @@ public class Joystick extends GenericHID {
+         return m_ds.getStickButton(m_port, button);
+     }
+ 
++    /**
++     * Get the state of a POV on the joystick.
++     *
++     * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
++     */
++    public int getPOV(int pov) {
++        return 0; // TODO
++    }
++
+     /**
+      * Get buttons based on an enumerated type.
+      *

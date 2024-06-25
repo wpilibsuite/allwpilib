@@ -1,0 +1,181 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Sat, 5 Apr 2014 21:53:58 -0400
+Subject: [PATCH 0035/6262] Fixing packaging
+
+---
+ cmake/pom.xml                                 | 32 +++++++++++++--
+ .../edu.wpi.first.wpilib.plugins.cpp/pom.xml  |  4 +-
+ wpilibj/wpilibJavaFinal/pom.xml               |  4 +-
+ wpilibj/wpilibJavaJNI/pom.xml                 | 40 ++++++++++++-------
+ 4 files changed, 58 insertions(+), 22 deletions(-)
+
+diff --git a/cmake/pom.xml b/cmake/pom.xml
+index fcfe26d985b5cf2011f29c46cb4d8eff46391850..1a5b375a2182821b73e53983c8de6efd4017f982 100644
+--- a/cmake/pom.xml
++++ b/cmake/pom.xml
+@@ -4,7 +4,7 @@
+ 	<groupId>edu.wpi.first.wpilib.cmake</groupId>
+ 	<artifactId>cpp-root</artifactId>
+ 	<version>1.0.0</version>
+-	<packaging>jar</packaging>
++	<packaging>pom</packaging>
+ 	<properties>
+ 		<cmakeGenerator>Unix Makefiles</cmakeGenerator>
+ 	</properties>
+@@ -82,12 +82,38 @@
+ 						<configuration>
+ 							<target>
+ 								<echo file="${project.build.directory}/cmake/target-root/so.properties">cpp-sos=${version-info}</echo>
+-								<zip destfile="${project.build.directory}/cpp-root-1.0.0.jar" basedir="${project.build.directory}/cmake/target-root" />
++								<zip destfile="${project.build.directory}/${project.build.finalName}.zip" basedir="${project.build.directory}/cmake/target-root" />
+ 							</target>
+ 						</configuration>
+ 					</execution>
+ 				</executions>
+ 			</plugin>
+-		</plugins>
++			      <plugin>
++        <groupId>org.codehaus.mojo</groupId>
++        <artifactId>build-helper-maven-plugin</artifactId>
++        <version>1.2</version>
++        <executions>
++        <execution>
++						<id>zip-cpp-includes</id>
++						<phase>package</phase>
++						<goals>
++							<goal>attach-artifact</goal>
++						</goals>
++            <configuration>
++              <artifacts>
++                <artifact>
++                  <file>${project.build.directory}/${project.build.finalName}.zip</file>
++                  <type>zip</type>
++                </artifact>
++                <artifact>
++                  <file>${project.build.directory}/cmake/target-root/lib/libHALAthena.so</file>
++                  <type>so</type>
++                </artifact>
++              </artifacts>
++            </configuration>
++          </execution>
++        </executions>
++      </plugin>
++    </plugins>
+ 	</build>
+ </project>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml
+index 1b4187538c5e27cf4275045699e9bc8454156209..c74a120789bb7ed3a81aa5ec13578e56b3d919b6 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml
+@@ -63,7 +63,7 @@
+ 									<groupId>edu.wpi.first.wpilib.cmake</groupId>
+ 									<artifactId>cpp-root</artifactId>
+ 									<version>1.0.0</version>
+-									<type>jar</type>
++									<type>zip</type>
+ 									<destFileName>cpp-root.jar</destFileName>
+ 								</artifactItem>
+ 							</artifactItems>
+@@ -139,7 +139,7 @@
+ 			<groupId>edu.wpi.first.wpilib.cmake</groupId>
+ 			<artifactId>cpp-root</artifactId>
+ 			<version>1.0.0</version>
+-			<type>jar</type>
++			<type>zip</type>
+ 		</dependency>
+ 	</dependencies>
+ </project>
+diff --git a/wpilibj/wpilibJavaFinal/pom.xml b/wpilibj/wpilibJavaFinal/pom.xml
+index e44991c850b650f97a822526f47eb17c15276efd..b7f02a7a2288bceffcd7387f5ee42c0fe39c7f19 100644
+--- a/wpilibj/wpilibJavaFinal/pom.xml
++++ b/wpilibj/wpilibJavaFinal/pom.xml
+@@ -37,7 +37,7 @@
+ 		<groupId>edu.wpi.first.wpilibj</groupId>
+ 		<artifactId>wpilibJavaJNI</artifactId>
+ 		<version>0.1.0-SNAPSHOT</version>
+-		<type>jar</type>
++		<type>so</type>
+ 	</dependency>
+   </dependencies>
+ 
+@@ -78,7 +78,7 @@
+ 				  <groupId>edu.wpi.first.wpilibj</groupId>
+ 				  <artifactId>wpilibJavaJNI</artifactId>
+ 				  <version>0.1.0-SNAPSHOT</version>
+-				  <type>jar</type>
++				  <type>so</type>
+ 				  <destFileName>libwpilibJavaJNI.so</destFileName>
+ 				  <outputDirectory>${project.build.directory}/classes/linux-arm</outputDirectory>
+                 </artifactItem>
+diff --git a/wpilibj/wpilibJavaJNI/pom.xml b/wpilibj/wpilibJavaJNI/pom.xml
+index 94c829d6129d7ff15695690a21ff42af7a05ffa8..064f5918eb3a8c5a476fe18be624c8fa7bcccb66 100644
+--- a/wpilibj/wpilibJavaJNI/pom.xml
++++ b/wpilibj/wpilibJavaJNI/pom.xml
+@@ -4,12 +4,13 @@
+ 	<artifactId>wpilibJavaJNI</artifactId>
+ 	<groupId>edu.wpi.first.wpilibj</groupId>
+ 	<version>0.1.0-SNAPSHOT</version>
++	<packaging>pom</packaging>
+ 	<dependencies>
+ 		<dependency>
+ 			<groupId>edu.wpi.first.wpilib.cmake</groupId>
+ 			<artifactId>cpp-root</artifactId>
+ 			<version>1.0.0</version>
+-			<type>jar</type>
++			<type>zip</type>
+ 		</dependency>
+ 		<dependency>
+ 			<groupId>edu.wpi.first.wpilibj</groupId>
+@@ -201,28 +202,37 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
+ 								
+ 								<unzip dest="${project.build.directory}">
+ 									<fileset dir="${project.build.directory}">
+-										<include name="cpp-root*.jar"/>
++										<include name="cpp-root*.zip"/>
+ 									</fileset>
+ 								</unzip>
+ 							</target>
+ 							<exportAntProperties>true</exportAntProperties>
+ 						</configuration>
+ 					</execution>
+-					<!-- Unzip the include files for cpp.zip. -->
+-					<execution>
+-						<id>unzip-cpp-includes</id>
+-						<phase>compile</phase>
+-						<goals>
+-							<goal>run</goal>
+-						</goals>
+-						<configuration>
+-							<target>
+-								<zip includes="libwpilibJavaJNI.so" basedir="${project.build.directory}/" destfile="${project.build.directory}/wpilibJavaJNI-0.1.0.SNAPSHOT.jar" />
+-							</target>
+-						</configuration>
+-					</execution>
+ 				</executions>
+ 			</plugin>
++					      <plugin>
++        <groupId>org.codehaus.mojo</groupId>
++        <artifactId>build-helper-maven-plugin</artifactId>
++        <version>1.2</version>
++        <executions>
++        <execution>
++						<id>zip-cpp-includes</id>
++						<phase>package</phase>
++						<goals>
++							<goal>attach-artifact</goal>
++						</goals>
++            <configuration>
++              <artifacts>
++                <artifact>
++                  <file>${project.build.directory}/libwpilibJavaJNI.so</file>
++                  <type>so</type>
++                </artifact>
++              </artifacts>
++            </configuration>
++          </execution>
++        </executions>
++      </plugin>
+ 		</plugins>
+ 	</build>
+ </project>

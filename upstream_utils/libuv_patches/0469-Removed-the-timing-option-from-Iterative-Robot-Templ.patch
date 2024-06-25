@@ -1,0 +1,184 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Tue, 11 Nov 2014 14:49:05 -0500
+Subject: [PATCH 0469/6262] Removed the timing option from Iterative Robot
+ Template since it conflicted with its purpose (artf3751)
+
+---
+ .../wpilibC++Devices/include/IterativeRobot.h |  8 --
+ .../wpilibC++Devices/src/IterativeRobot.cpp   | 95 ++-----------------
+ 2 files changed, 8 insertions(+), 95 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/include/IterativeRobot.h b/wpilibc/wpilibC++Devices/include/IterativeRobot.h
+index b99a0e44b13cb444b4309d88b3fdc9f3b3d423aa..2d82fc14b5dd8dc5057efe5473f12c1e408e062e 100644
+--- a/wpilibc/wpilibC++Devices/include/IterativeRobot.h
++++ b/wpilibc/wpilibC++Devices/include/IterativeRobot.h
+@@ -59,21 +59,13 @@ public:
+ 	virtual void TeleopPeriodic();
+ 	virtual void TestPeriodic();
+ 
+-	void SetPeriod(double period);
+-	double GetPeriod();
+-	double GetLoopsPerSec();
+-
+ protected:
+ 	virtual ~IterativeRobot();
+ 	IterativeRobot();
+ 
+ private:
+-	bool NextPeriodReady();
+-
+ 	bool m_disabledInitialized;
+ 	bool m_autonomousInitialized;
+ 	bool m_teleopInitialized;
+ 	bool m_testInitialized;
+-	double m_period;
+-	Timer m_mainLoopTimer;
+ };
+diff --git a/wpilibc/wpilibC++Devices/src/IterativeRobot.cpp b/wpilibc/wpilibC++Devices/src/IterativeRobot.cpp
+index 699a874cb948a977144910b661b9722459e3d3c8..a24db9e33326f5830fb1c9ef964544f212f4aff5 100644
+--- a/wpilibc/wpilibC++Devices/src/IterativeRobot.cpp
++++ b/wpilibc/wpilibC++Devices/src/IterativeRobot.cpp
+@@ -26,7 +26,6 @@ IterativeRobot::IterativeRobot()
+ 	, m_autonomousInitialized (false)
+ 	, m_teleopInitialized (false)
+ 	, m_testInitialized (false)
+-	, m_period (kDefaultPeriod)
+ {
+ }
+ 
+@@ -37,50 +36,6 @@ IterativeRobot::~IterativeRobot()
+ {
+ }
+ 
+-/**
+- * Set the period for the periodic functions.
+- * 
+- * @param period The period of the periodic function calls.  0.0 means sync to driver station control data.
+- */
+-void IterativeRobot::SetPeriod(double period)
+-{
+-	if (period > 0.0)
+-	{
+-		// Not syncing with the DS, so start the timer for the main loop
+-		m_mainLoopTimer.Reset();
+-		m_mainLoopTimer.Start();
+-	}
+-	else
+-	{
+-		// Syncing with the DS, don't need the timer
+-		m_mainLoopTimer.Stop();
+-	}
+-	m_period = period;
+-}
+-
+-/**
+- * Get the period for the periodic functions.
+- * Returns 0.0 if configured to syncronize with DS control data packets.
+- * @return Period of the periodic function calls
+- */
+-double IterativeRobot::GetPeriod()
+-{
+-	return m_period;
+-}
+-
+-/**
+- * Get the number of loops per second for the IterativeRobot
+- * @return Frequency of the periodic function calls
+- */
+-double IterativeRobot::GetLoopsPerSec()
+-{
+-	// If syncing to the driver station, we don't know the rate,
+-	//   so guess something close.
+-	if (m_period <= 0.0)
+-		return 50.0;
+-	return 1.0 / m_period;
+-}
+-
+ /**
+  * Provide an alternate "main loop" via StartCompetition().
+  * 
+@@ -118,11 +73,8 @@ void IterativeRobot::StartCompetition()
+                 m_teleopInitialized = false;
+                 m_testInitialized = false;
+ 			}
+-			if (NextPeriodReady())
+-			{
+-				HALNetworkCommunicationObserveUserProgramDisabled();
+-				DisabledPeriodic();
+-			}
++			HALNetworkCommunicationObserveUserProgramDisabled();
++			DisabledPeriodic();
+ 		}
+ 		else if (IsAutonomous())
+ 		{
+@@ -138,11 +90,8 @@ void IterativeRobot::StartCompetition()
+                 m_teleopInitialized = false;
+                 m_testInitialized = false;
+ 			}
+-			if (NextPeriodReady())
+-			{
+-				HALNetworkCommunicationObserveUserProgramAutonomous();
+-				AutonomousPeriodic();
+-			}
++			HALNetworkCommunicationObserveUserProgramAutonomous();
++			AutonomousPeriodic();
+ 		}
+         else if (IsTest())
+         {
+@@ -158,11 +107,8 @@ void IterativeRobot::StartCompetition()
+                 m_autonomousInitialized = false;
+                 m_teleopInitialized = false;
+             }
+-            if (NextPeriodReady())
+-            {
+-                HALNetworkCommunicationObserveUserProgramTest();
+-                TestPeriodic();
+-            }
++            HALNetworkCommunicationObserveUserProgramTest();
++            TestPeriodic();
+         }
+ 		else
+ 		{
+@@ -179,39 +125,14 @@ void IterativeRobot::StartCompetition()
+                 m_testInitialized = false;
+                 Scheduler::GetInstance()->SetEnabled(true);
+ 			}
+-			if (NextPeriodReady())
+-			{
+-				HALNetworkCommunicationObserveUserProgramTeleop();
+-				TeleopPeriodic();
+-			}
++			HALNetworkCommunicationObserveUserProgramTeleop();
++			TeleopPeriodic();
+ 		}
+ 		// wait for driver station data so the loop doesn't hog the CPU
+ 		m_ds->WaitForData();
+ 	}	
+ }
+ 
+-/**
+- * Determine if the periodic functions should be called.
+- *
+- * If m_period > 0.0, call the periodic function every m_period as compared
+- * to Timer.Get().  If m_period == 0.0, call the periodic functions whenever
+- * a packet is received from the Driver Station, or about every 20ms.
+- *
+- * @todo Decide what this should do if it slips more than one cycle.
+- */
+-
+-bool IterativeRobot::NextPeriodReady()
+-{
+-	if (m_period > 0.0)
+-	{
+-		return m_mainLoopTimer.HasPeriodPassed(m_period);
+-	}
+-	else
+-	{
+-		return m_ds->IsNewControlData();
+-	}
+-}
+-
+ /**
+  * Robot-wide initialization code should go here.
+  * 

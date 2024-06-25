@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Mon, 2 Jun 2014 10:01:12 -0400
+Subject: [PATCH 0073/6262] Adds .cproject to the .gitignore to remove eclipse
+ files
+
+Change-Id: I0ed347905cd29054f88088d42a63b4559d89446d
+---
+ .gitignore | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/.gitignore b/.gitignore
+index 9b56c379acd3d07d99988939875a6ac675e8fd43..1cdcb433bce6a6eabd9ed3353a10c3b71ad52a64 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -8,6 +8,7 @@ target/
+ dist/
+ bin/
+ .project
++.cproject
+ .settings/
+ .classpath
+ 

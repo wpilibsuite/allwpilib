@@ -1,0 +1,94 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Wed, 12 Nov 2014 09:11:09 -0500
+Subject: [PATCH 0476/6262] Removed release configuration from template (fixes
+ artf3688)
+
+Change-Id: I4e6d1abc68f23f870911b7d871b5a835cc26afef
+---
+ .../resources/templates/.cproject             | 58 -------------------
+ 1 file changed, 58 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index 2285430ee3fde688e67da5b5a2b93761016ba883..483228833474c12cda5e2c2acba9a56e76f6c1bb 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -56,55 +56,6 @@
+ 			</storageModule>
+ 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+ 		</cconfiguration>
+-		<cconfiguration id="cdt.managedbuild.config.gnu.cross.exe.release.300115601">
+-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.exe.release.300115601" moduleId="org.eclipse.cdt.core.settings" name="Release">
+-				<externalSettings/>
+-				<extensions>
+-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+-					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+-					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+-					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+-					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+-				</extensions>
+-			</storageModule>
+-			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+-				<configuration artifactName="FRCUserProgram" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.release.300115601" name="Release" parent="cdt.managedbuild.config.gnu.cross.exe.release">
+-					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.release.300115601." name="/" resourcePath="">
+-						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.release.2008160346" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.release">
+-							<option id="cdt.managedbuild.option.gnu.cross.prefix.511797597" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-frc-linux-gnueabi-" valueType="string"/>
+-<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.2130959809" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+-							<builder buildPath="${workspace_loc:/$project}/Release" id="cdt.managedbuild.builder.gnu.cross.1554116591" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
+-							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.985086840" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+-								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.2030238370" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+-								<option id="gnu.c.compiler.option.debugging.level.188807954" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.884664323" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+-							</tool>
+-							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1342658383" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
+-								<option id="gnu.cpp.compiler.option.optimization.level.1371546365" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+-								<option id="gnu.cpp.compiler.option.debugging.level.1242574722" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1782227077" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+-							</tool>
+-							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1397048702" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
+-							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.716979188" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
+-								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.126686576" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+-								</inputType>
+-							</tool>
+-							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.886832650" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
+-							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.1915412749" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
+-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.671283127" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+-							</tool>
+-						</toolChain>
+-					</folderInfo>
+-					<sourceEntries>
+-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+-					</sourceEntries>
+-				</configuration>
+-			</storageModule>
+-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+-		</cconfiguration>
+ 		<cconfiguration id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325">
+ 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325" moduleId="org.eclipse.cdt.core.settings" name="Simulate">
+ 				<externalSettings/>
+@@ -181,12 +132,6 @@
+ 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751;cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.;cdt.managedbuild.tool.gnu.cross.c.compiler.1261239456;cdt.managedbuild.tool.gnu.c.compiler.input.1793678673">
+ 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+ 		</scannerConfigBuildInfo>
+-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.exe.release.300115601;cdt.managedbuild.config.gnu.cross.exe.release.300115601.;cdt.managedbuild.tool.gnu.cross.c.compiler.985086840;cdt.managedbuild.tool.gnu.c.compiler.input.884664323">
+-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+-		</scannerConfigBuildInfo>
+-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.exe.release.300115601;cdt.managedbuild.config.gnu.cross.exe.release.300115601.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1342658383;cdt.managedbuild.tool.gnu.cpp.compiler.input.1782227077">
+-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+-		</scannerConfigBuildInfo>
+ 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751;cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1505235107;cdt.managedbuild.tool.gnu.cpp.compiler.input.1033680971">
+ 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+ 		</scannerConfigBuildInfo>
+@@ -196,9 +141,6 @@
+ 		<configuration configurationName="Debug">
+ 			<resource resourceType="PROJECT" workspacePath="/$project"/>
+ 		</configuration>
+-		<configuration configurationName="Release">
+-			<resource resourceType="PROJECT" workspacePath="/$project"/>
+-		</configuration>
+ 		<configuration configurationName="Simulate">
+ 			<resource resourceType="PROJECT" workspacePath="/$project"/>
+ 		</configuration>

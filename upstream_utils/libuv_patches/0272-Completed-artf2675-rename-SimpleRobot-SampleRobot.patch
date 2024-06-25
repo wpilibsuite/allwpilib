@@ -1,0 +1,496 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Colby Skeggs <skeggsc@catlin.edu>
+Date: Fri, 8 Aug 2014 10:48:00 -0700
+Subject: [PATCH 0272/6262] Completed artf2675 - rename SimpleRobot ->
+ SampleRobot.
+
+Change-Id: I23fc503f64fa6a715867f4b92f9d03e21f6c5f82
+---
+ .../templates/{simple => sample}/Robot.cpp    | 13 ++--
+ .../resources/templates/sample/Robot.java     | 59 +++++++++++++++++++
+ .../resources/templates/simple/Robot.java     | 35 -----------
+ .../include/{SimpleRobot.h => SampleRobot.h}  |  9 +--
+ wpilibc/wpilibC++/include/WPILib.h            |  2 +-
+ .../lib/{SimpleRobot.cpp => SampleRobot.cpp}  | 18 +++---
+ .../include/{SimpleRobot.h => SampleRobot.h}  |  9 +--
+ wpilibc/wpilibC++Sim/include/WPILib.h         |  2 +-
+ .../src/{SimpleRobot.cpp => SampleRobot.cpp}  | 18 +++---
+ .../{SimpleRobot.java => SampleRobot.java}    |  6 +-
+ wpilibj/wpilibJavaSim/missing.txt             |  2 +-
+ .../{SimpleRobot.java => SampleRobot.java}    |  6 +-
+ 12 files changed, 100 insertions(+), 79 deletions(-)
+ rename eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/{simple => sample}/Robot.cpp (68%)
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/simple/Robot.java
+ rename wpilibc/wpilibC++/include/{SimpleRobot.h => SampleRobot.h} (80%)
+ rename wpilibc/wpilibC++/lib/{SimpleRobot.cpp => SampleRobot.cpp} (94%)
+ rename wpilibc/wpilibC++Sim/include/{SimpleRobot.h => SampleRobot.h} (80%)
+ rename wpilibc/wpilibC++Sim/src/{SimpleRobot.cpp => SampleRobot.cpp} (93%)
+ rename wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/{SimpleRobot.java => SampleRobot.java} (98%)
+ rename wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/{SimpleRobot.java => SampleRobot.java} (98%)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/simple/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp
+similarity index 68%
+rename from eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/simple/Robot.cpp
+rename to eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp
+index 171a27225a46cadd0b03cdbf08297da1d7e46a20..84a279f08673a3faadd456b7c6b566b7d480a346 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/simple/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp
+@@ -1,12 +1,16 @@
+ #include "WPILib.h"
+ 
+ /**
+- * This is a demo program showing the use of the RobotBase class.
+- * The SimpleRobot class is the base of a robot application that will automatically call your
++ * This is a demo program showing the use of the RobotDrive class.
++ * The SampleRobot class is the base of a robot application that will automatically call your
+  * Autonomous and OperatorControl methods at the right time as controlled by the switches on
+  * the driver station or the field controls.
++ *
++ * WARNING: While it may look like a good choice to use for your code if you're inexperienced,
++ * don't. Unless you know what you are doing, complex code will be much more difficult under
++ * this system. Use IterativeRobot or Command-Based instead if you're new.
+  */
+-class Robot: public SimpleRobot
++class Robot: public SampleRobot
+ {
+ 	RobotDrive myRobot; // robot drive system
+ 	Joystick stick; // only joystick
+@@ -31,7 +35,7 @@ public:
+ 	}
+ 
+ 	/**
+-	 * Runs the motors with arcade steering. 
++	 * Runs the motors with arcade steering.
+ 	 */
+ 	void OperatorControl()
+ 	{
+@@ -48,7 +52,6 @@ public:
+ 	 */
+ 	void Test()
+ 	{
+-
+ 	}
+ };
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d67a17ec45a22198173844ec04f6815972e96d17
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java
+@@ -0,0 +1,59 @@
++
++package $package;
++
++
++import edu.wpi.first.wpilibj.SampleRobot;
++
++/**
++ * This is a demo program showing the use of the RobotDrive class.
++ * The SampleRobot class is the base of a robot application that will automatically call your
++ * Autonomous and OperatorControl methods at the right time as controlled by the switches on
++ * the driver station or the field controls.
++ *
++ * The VM is configured to automatically run this class, and to call the
++ * functions corresponding to each mode, as described in the SampleRobot
++ * documentation. If you change the name of this class or the package after
++ * creating this project, you must also update the manifest file in the resource
++ * directory.
++ *
++ * WARNING: While it may look like a good choice to use for your code if you're inexperienced,
++ * don't. Unless you know what you are doing, complex code will be much more difficult under
++ * this system. Use IterativeRobot or Command-Based instead if you're new.
++ */
++public class Robot extends SampleRobot {
++    RobotDrive myRobot;
++    Joystick stick;
++
++    public Robot() {
++        myRobot = new RobotDrive(1, 2);
++        myRobot.setExpiration(0.1);
++        stick = new Joystick(1);
++    }
++
++    /**
++     * Drive left & right motors for 2 seconds then stop
++     */
++    public void autonomous() {
++        myRobot.setSafetyEnabled(false);
++        myRobot.drive(-0.5, 0.0);	// drive forwards half speed
++        Timer.delay(2.0);		//    for 2 seconds
++        myRobot.drive(0.0, 0.0);	// stop robot
++    }
++
++    /**
++     * Runs the motors with arcade steering.
++     */
++    public void operatorControl() {
++        myRobot.setSafetyEnabled(true);
++        while (isOperatorControl()) {
++            myRobot.arcadeDrive(stick); // drive with arcade style (use right stick)
++            Timer.delay(0.005);		// wait for a motor update time
++        }
++    }
++
++    /**
++     * Runs during test mode
++     */
++    public void test() {
++    }
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/simple/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/simple/Robot.java
+deleted file mode 100644
+index efb45cb0d37c88296a0ab4a76780d36a1689d584..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/simple/Robot.java
++++ /dev/null
+@@ -1,35 +0,0 @@
+-
+-package $package;
+-
+-
+-import edu.wpi.first.wpilibj.SimpleRobot;
+-
+-/**
+- * The VM is configured to automatically run this class, and to call the
+- * functions corresponding to each mode, as described in the SimpleRobot
+- * documentation. If you change the name of this class or the package after
+- * creating this project, you must also update the manifest file in the resource
+- * directory.
+- */
+-public class Robot extends SimpleRobot {
+-    /**
+-     * This function is called once each time the robot enters autonomous mode.
+-     */
+-    public void autonomous() {
+-        
+-    }
+-
+-    /**
+-     * This function is called once each time the robot enters operator control.
+-     */
+-    public void operatorControl() {
+-
+-    }
+-    
+-    /**
+-     * This function is called once each time the robot enters test mode.
+-     */
+-    public void test() {
+-    
+-    }
+-}
+diff --git a/wpilibc/wpilibC++/include/SimpleRobot.h b/wpilibc/wpilibC++/include/SampleRobot.h
+similarity index 80%
+rename from wpilibc/wpilibC++/include/SimpleRobot.h
+rename to wpilibc/wpilibC++/include/SampleRobot.h
+index 6b96523cb410475f2e374148b1d3ebceeb1538c5..66842b6cf1d184c7ccfd5509d88db68a4c8104d1 100644
+--- a/wpilibc/wpilibC++/include/SimpleRobot.h
++++ b/wpilibc/wpilibC++/include/SampleRobot.h
+@@ -7,14 +7,11 @@
+ 
+ #include "RobotBase.h"
+ 
+-/**
+- * @todo If this is going to last until release, it needs a better name.
+- */
+-class SimpleRobot : public RobotBase
++class SampleRobot : public RobotBase
+ {
+ public:
+-	SimpleRobot();
+-	virtual ~SimpleRobot() {}
++	SampleRobot();
++	virtual ~SampleRobot() {}
+ 	virtual void RobotInit();
+ 	virtual void Disabled();
+ 	virtual void Autonomous();
+diff --git a/wpilibc/wpilibC++/include/WPILib.h b/wpilibc/wpilibC++/include/WPILib.h
+index 8acf35b2fcece14ad933d4a159e2275dd4ea87e4..f7c7ecea9fed435771adc9f78b30fa46bc9f70f6 100644
+--- a/wpilibc/wpilibC++/include/WPILib.h
++++ b/wpilibc/wpilibC++/include/WPILib.h
+@@ -67,7 +67,7 @@
+ #include "SensorBase.h"
+ #include "SerialPort.h"
+ #include "Servo.h"
+-#include "SimpleRobot.h"
++#include "SampleRobot.h"
+ #include "SmartDashboard/SendableChooser.h"
+ #include "SmartDashboard/SmartDashboard.h"
+ #include "Solenoid.h"
+diff --git a/wpilibc/wpilibC++/lib/SimpleRobot.cpp b/wpilibc/wpilibC++/lib/SampleRobot.cpp
+similarity index 94%
+rename from wpilibc/wpilibC++/lib/SimpleRobot.cpp
+rename to wpilibc/wpilibC++/lib/SampleRobot.cpp
+index 09f59d6b713c853a7e6207386bb709a2a67222f8..3cb0602fedca2f9c2faf005248d54afd7b1d1d53 100644
+--- a/wpilibc/wpilibC++/lib/SimpleRobot.cpp
++++ b/wpilibc/wpilibC++/lib/SampleRobot.cpp
+@@ -4,7 +4,7 @@
+ /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+ /*----------------------------------------------------------------------------*/
+ 
+-#include "SimpleRobot.h"
++#include "SampleRobot.h"
+ 
+ #include "DriverStation.h"
+ //#include "NetworkCommunication/UsageReporting.h"
+@@ -13,7 +13,7 @@
+ #include "LiveWindow/LiveWindow.h"
+ #include "networktables/NetworkTable.h"
+ 
+-SimpleRobot::SimpleRobot()
++SampleRobot::SampleRobot()
+ 	: m_robotMainOverridden (true)
+ {
+ }
+@@ -24,7 +24,7 @@ SimpleRobot::SimpleRobot()
+  * Programmers should override this method for default Robot-wide initialization which will
+  * be called each time the robot enters the disabled state.
+  */
+-void SimpleRobot::RobotInit()
++void SampleRobot::RobotInit()
+ {
+ 	printf("Default %s() method... Override me!\n", __FUNCTION__);
+ }
+@@ -34,7 +34,7 @@ void SimpleRobot::RobotInit()
+  * Programmers should override this method to run code that should run while the field is
+  * disabled.
+  */
+-void SimpleRobot::Disabled()
++void SampleRobot::Disabled()
+ {
+ 	printf("Default %s() method... Override me!\n", __FUNCTION__);
+ }
+@@ -45,7 +45,7 @@ void SimpleRobot::Disabled()
+  * in the autonomous period. This will be called once each time the robot enters the
+  * autonomous state.
+  */
+-void SimpleRobot::Autonomous()
++void SampleRobot::Autonomous()
+ {
+ 	printf("Default %s() method... Override me!\n", __FUNCTION__);
+ }
+@@ -56,7 +56,7 @@ void SimpleRobot::Autonomous()
+  * in the Operator Control (tele-operated) period. This is called once each time the robot
+  * enters the teleop state.
+  */
+-void SimpleRobot::OperatorControl()
++void SampleRobot::OperatorControl()
+ {
+ 	printf("Default %s() method... Override me!\n", __FUNCTION__);
+ }
+@@ -66,7 +66,7 @@ void SimpleRobot::OperatorControl()
+  * Programmers should override this method to run code that executes while the robot is
+  * in test mode. This will be called once whenever the robot enters test mode
+  */
+-void SimpleRobot::Test()
++void SampleRobot::Test()
+ {
+ 	printf("Default %s() method... Override me!\n", __FUNCTION__);
+ }
+@@ -82,7 +82,7 @@ void SimpleRobot::Test()
+  * overridden by a user subclass (i.e. the default version runs), then the Autonomous() and
+  * OperatorControl() methods will be called.
+  */
+-void SimpleRobot::RobotMain()
++void SampleRobot::RobotMain()
+ {
+ 	m_robotMainOverridden = false;
+ }
+@@ -95,7 +95,7 @@ void SimpleRobot::RobotMain()
+  * change, either the other mode starts or the robot is disabled. Then go back and wait for the
+  * robot to be enabled again.
+  */
+-void SimpleRobot::StartCompetition()
++void SampleRobot::StartCompetition()
+ {
+ 	LiveWindow *lw = LiveWindow::GetInstance();
+ 
+diff --git a/wpilibc/wpilibC++Sim/include/SimpleRobot.h b/wpilibc/wpilibC++Sim/include/SampleRobot.h
+similarity index 80%
+rename from wpilibc/wpilibC++Sim/include/SimpleRobot.h
+rename to wpilibc/wpilibC++Sim/include/SampleRobot.h
+index 6b96523cb410475f2e374148b1d3ebceeb1538c5..66842b6cf1d184c7ccfd5509d88db68a4c8104d1 100644
+--- a/wpilibc/wpilibC++Sim/include/SimpleRobot.h
++++ b/wpilibc/wpilibC++Sim/include/SampleRobot.h
+@@ -7,14 +7,11 @@
+ 
+ #include "RobotBase.h"
+ 
+-/**
+- * @todo If this is going to last until release, it needs a better name.
+- */
+-class SimpleRobot : public RobotBase
++class SampleRobot : public RobotBase
+ {
+ public:
+-	SimpleRobot();
+-	virtual ~SimpleRobot() {}
++	SampleRobot();
++	virtual ~SampleRobot() {}
+ 	virtual void RobotInit();
+ 	virtual void Disabled();
+ 	virtual void Autonomous();
+diff --git a/wpilibc/wpilibC++Sim/include/WPILib.h b/wpilibc/wpilibC++Sim/include/WPILib.h
+index 1890ab4af90742c5a8e83975cb1170699d665124..b3477d441fcc309ebd9d6778abf0a71e3407807a 100644
+--- a/wpilibc/wpilibC++Sim/include/WPILib.h
++++ b/wpilibc/wpilibC++Sim/include/WPILib.h
+@@ -33,7 +33,7 @@
+ #include "SmartDashboard/SmartDashboard.h"
+ 
+ #include "RobotBase.h"
+-#include "SimpleRobot.h"
++#include "SampleRobot.h"
+ #include "IterativeRobot.h"
+ #include "SpeedController.h"
+ #include "Talon.h"
+diff --git a/wpilibc/wpilibC++Sim/src/SimpleRobot.cpp b/wpilibc/wpilibC++Sim/src/SampleRobot.cpp
+similarity index 93%
+rename from wpilibc/wpilibC++Sim/src/SimpleRobot.cpp
+rename to wpilibc/wpilibC++Sim/src/SampleRobot.cpp
+index 2667d7db6835b5da177def829a97513c9f8d7966..345617f811dc4a0a2247dcef1c3d2455b0ae2fbf 100644
+--- a/wpilibc/wpilibC++Sim/src/SimpleRobot.cpp
++++ b/wpilibc/wpilibC++Sim/src/SampleRobot.cpp
+@@ -4,7 +4,7 @@
+ /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+ /*----------------------------------------------------------------------------*/
+ 
+-#include "SimpleRobot.h"
++#include "SampleRobot.h"
+ 
+ #include <stdio.h>
+ #include <unistd.h>
+@@ -13,7 +13,7 @@
+ #include "LiveWindow/LiveWindow.h"
+ #include "networktables/NetworkTable.h"
+ 
+-SimpleRobot::SimpleRobot()
++SampleRobot::SampleRobot()
+ 	: m_robotMainOverridden (true)
+ {
+ }
+@@ -24,7 +24,7 @@ SimpleRobot::SimpleRobot()
+  * Programmers should override this method for default Robot-wide initialization which will
+  * be called each time the robot enters the disabled state.
+  */
+-void SimpleRobot::RobotInit()
++void SampleRobot::RobotInit()
+ {
+ 	printf("Default %s() method... Override me!\n", __FUNCTION__);
+ }
+@@ -34,7 +34,7 @@ void SimpleRobot::RobotInit()
+  * Programmers should override this method to run code that should run while the field is
+  * disabled.
+  */
+-void SimpleRobot::Disabled()
++void SampleRobot::Disabled()
+ {
+ 	printf("Default %s() method... Override me!\n", __FUNCTION__);
+ }
+@@ -45,7 +45,7 @@ void SimpleRobot::Disabled()
+  * in the autonomous period. This will be called once each time the robot enters the
+  * autonomous state.
+  */
+-void SimpleRobot::Autonomous()
++void SampleRobot::Autonomous()
+ {
+ 	printf("Default %s() method... Override me!\n", __FUNCTION__);
+ }
+@@ -56,7 +56,7 @@ void SimpleRobot::Autonomous()
+  * in the Operator Control (tele-operated) period. This is called once each time the robot
+  * enters the teleop state.
+  */
+-void SimpleRobot::OperatorControl()
++void SampleRobot::OperatorControl()
+ {
+ 	printf("Default %s() method... Override me!\n", __FUNCTION__);
+ }
+@@ -66,7 +66,7 @@ void SimpleRobot::OperatorControl()
+  * Programmers should override this method to run code that executes while the robot is
+  * in test mode. This will be called once whenever the robot enters test mode
+  */
+-void SimpleRobot::Test()
++void SampleRobot::Test()
+ {
+ 	printf("Default %s() method... Override me!\n", __FUNCTION__);
+ }
+@@ -82,7 +82,7 @@ void SimpleRobot::Test()
+  * overridden by a user subclass (i.e. the default version runs), then the Autonomous() and
+  * OperatorControl() methods will be called.
+  */
+-void SimpleRobot::RobotMain()
++void SampleRobot::RobotMain()
+ {
+ 	m_robotMainOverridden = false;
+ }
+@@ -95,7 +95,7 @@ void SimpleRobot::RobotMain()
+  * change, either the other mode starts or the robot is disabled. Then go back and wait for the
+  * robot to be enabled again.
+  */
+-void SimpleRobot::StartCompetition()
++void SampleRobot::StartCompetition()
+ {
+ 	LiveWindow *lw = LiveWindow::GetInstance();
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SimpleRobot.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SampleRobot.java
+similarity index 98%
+rename from wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SimpleRobot.java
+rename to wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SampleRobot.java
+index 265c0641e156d9d233923039993de23cb39ff7a9..433d8fda8cd4b5dc28a5fc69c8f9d344eb6b2e70 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SimpleRobot.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SampleRobot.java
+@@ -23,14 +23,14 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+  *
+  * Alternatively you can override the robotMain() method and manage all aspects of the robot yourself.
+  */
+-public class SimpleRobot extends RobotBase {
++public class SampleRobot extends RobotBase {
+ 
+     private boolean m_robotMainOverridden;
+ 
+     /**
+-     * Create a new SimpleRobot
++     * Create a new SampleRobot
+      */
+-    public SimpleRobot() {
++    public SampleRobot() {
+         super();
+         m_robotMainOverridden = true;
+     }
+diff --git a/wpilibj/wpilibJavaSim/missing.txt b/wpilibj/wpilibJavaSim/missing.txt
+index 88c798141d536982d0bb7885eed284f928a25e99..74dc1171a20475da1270069c7295d70137cb4a48 100644
+--- a/wpilibj/wpilibJavaSim/missing.txt
++++ b/wpilibj/wpilibJavaSim/missing.txt
+@@ -1,7 +1,7 @@
+ Specific Issues
+ ===============
+ 
+-- SimpleRobot.java (support for telling the DriverStation the current mode)
++- SampleRobot.java (support for telling the DriverStation the current mode)
+ - Iterative.java (support for telling the DriverStation the current mode and nextPeriodReady())
+ - command/WaitUntilCommand.java (Needs DriverStation)
+ - command/Command.java (XXX Issue with DriverStation)
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SimpleRobot.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SampleRobot.java
+similarity index 98%
+rename from wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SimpleRobot.java
+rename to wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SampleRobot.java
+index 6fafbdd32ffc864f364473b39ab8d3814a4cbc90..399a5f42788c318c2cfb7e2d09b2c714570f695a 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SimpleRobot.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SampleRobot.java
+@@ -20,14 +20,14 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+  *
+  * Alternatively you can override the robotMain() method and manage all aspects of the robot yourself.
+  */
+-public class SimpleRobot extends RobotBase {
++public class SampleRobot extends RobotBase {
+ 
+     private boolean m_robotMainOverridden;
+ 
+     /**
+-     * Create a new SimpleRobot
++     * Create a new SampleRobot
+      */
+-    public SimpleRobot() {
++    public SampleRobot() {
+         super();
+         m_robotMainOverridden = true;
+     }

@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Tue, 5 Aug 2014 13:27:12 -0400
+Subject: [PATCH 0260/6262] Added version numbers to maven plugins
+
+The version numbers for several maven plugins were unspecified before, which
+caused a bunch of warnings before.
+
+Change-Id: I7e2e05ccf3e2f10b24010576eb78192e9d891120
+---
+ simulation/JavaGazebo/pom.xml              | 5 +++--
+ simulation/SimDS/pom.xml                   | 3 ++-
+ wpilibj/wpilibJavaIntegrationTests/pom.xml | 7 ++++---
+ 3 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/simulation/JavaGazebo/pom.xml b/simulation/JavaGazebo/pom.xml
+index 60e4f2f687fcc5d62a7f68a2dc0270505fb8ccf3..1d2f3a74f3de535f78b8c48d8fc78d9854489d04 100644
+--- a/simulation/JavaGazebo/pom.xml
++++ b/simulation/JavaGazebo/pom.xml
+@@ -6,7 +6,7 @@
+   <artifactId>JavaGazebo</artifactId>
+   <packaging>jar</packaging>
+   <version>0.1.0-SNAPSHOT</version>
+-  
++
+   <profiles>
+     <profile>
+       <id>docline-java8-disable</id>
+@@ -27,7 +27,7 @@
+       </build>
+     </profile>
+   </profiles>
+-  
++
+   <dependencies>
+     <dependency>
+     	<groupId>com.google.protobuf</groupId>
+@@ -56,6 +56,7 @@
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-source-plugin</artifactId>
++		<version>2.3</version>
+       </plugin>
+     </plugins>
+   </build>
+diff --git a/simulation/SimDS/pom.xml b/simulation/SimDS/pom.xml
+index 65a146fbca1e8b45154f6954c032e0adeb2dacd3..aba62cdda8fa15ef90313d2770f2f41c0a0af80e 100644
+--- a/simulation/SimDS/pom.xml
++++ b/simulation/SimDS/pom.xml
+@@ -27,7 +27,7 @@
+       </build>
+     </profile>
+   </profiles>
+-  
++
+   <dependencies>
+     <dependency>
+       <groupId>net.java.jinput</groupId>
+@@ -61,6 +61,7 @@
+ 	  <plugin>
+ 		<groupId>org.apache.maven.plugins</groupId>
+ 		<artifactId>maven-jar-plugin</artifactId>
++		<version>2.5</version>
+ 		<configuration>
+ 		  <archive>
+ 			<manifest>
+diff --git a/wpilibj/wpilibJavaIntegrationTests/pom.xml b/wpilibj/wpilibJavaIntegrationTests/pom.xml
+index cd57f81310a814b2e9f061c2d3612c57a40d67d2..d4a3dc7c6e89d2e8a828291066aaadea4e21703c 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/pom.xml
++++ b/wpilibj/wpilibJavaIntegrationTests/pom.xml
+@@ -35,7 +35,7 @@
+ 		    <version>1.8</version>
+ 		</dependency-->
+ 	</dependencies>
+-	
++
+ 	<profiles>
+ 		<profile>
+ 			<id>docline-java8-disable</id>
+@@ -57,7 +57,7 @@
+ 		</profile>
+ 	</profiles>
+ 
+-	<build>  
++	<build>
+ 		<resources>
+ 			<!-- Package the logging.properties file with the jar-->
+ 	        <resource>
+@@ -143,6 +143,7 @@
+ 			<plugin>
+ 				<groupId>org.apache.maven.plugins</groupId>
+ 				<artifactId>maven-jar-plugin</artifactId>
++				<version>2.5</version>
+ 				<configuration>
+ 					<archive>
+ 						<manifest>
+@@ -154,4 +155,4 @@
+ 			</plugin>
+ 		</plugins>
+ 	</build>
+-</project>
+\ No newline at end of file
++</project>

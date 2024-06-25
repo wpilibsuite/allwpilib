@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Wed, 16 Jul 2014 15:05:23 -0400
+Subject: [PATCH 0162/6262] Encoders and counters work on the MXP
+
+Change-Id: Ifeb0533dde53a1ccba841b29e2b86f6f4a1bb33f
+---
+ hal/lib/Athena/Digital.cpp | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index 60125ac96dcc55220ddd4ebd96318ad6e8070dcd..1fb52570e4ea5bb7cb6cbc57afb39c89d4893ec5 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -681,6 +681,11 @@ void setCounterUpSourceWithModule(void* counter_pointer, uint8_t module, uint32_
+ 								  bool analogTrigger, int32_t *status) {
+   Counter* counter = (Counter*) counter_pointer;
+   
++  if(pin >= kNumHeaders) {
++    pin = remapMXPChannel(pin);
++    module = 1;
++  }
++  
+   counter->counter->writeConfig_UpSource_Module(module, status);
+   counter->counter->writeConfig_UpSource_Channel(pin, status);
+   counter->counter->writeConfig_UpSource_AnalogTrigger(analogTrigger, status);
+@@ -730,6 +735,12 @@ void setCounterDownSourceWithModule(void* counter_pointer, uint8_t module, uint3
+ 	*status = PARAMETER_OUT_OF_RANGE;
+ 	return;
+   }
++  
++  if(pin >= kNumHeaders) {
++    pin = remapMXPChannel(pin);
++    module = 1;
++  }
++  
+   counter->counter->writeConfig_DownSource_Module(module, status);
+   counter->counter->writeConfig_DownSource_Channel(pin, status);
+   counter->counter->writeConfig_DownSource_AnalogTrigger(analogTrigger, status);
+@@ -974,6 +985,16 @@ void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin, bool port_a_
+   // Initialize encoder structure
+   Encoder* encoder = new Encoder();
+   
++  if(port_a_pin >= kNumHeaders) {
++    port_a_pin = remapMXPChannel(port_a_pin);
++    port_a_module = 1;
++  }
++
++  if(port_b_pin >= kNumHeaders) {
++    port_b_pin = remapMXPChannel(port_b_pin);
++    port_b_module = 1;
++  }
++  
+   Resource::CreateResourceObject(&quadEncoders, tEncoder::kNumSystems);
+   encoder->index = quadEncoders->Allocate("4X Encoder");
+   *index = encoder->index;

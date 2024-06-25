@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Mon, 6 Oct 2014 00:31:46 -0700
+Subject: [PATCH 0392/6262] Relay: In free(), set both forward and reverse to
+ 0.
+
+Also, check status in between the two calls.
+
+Change-Id: I5a6c24aefde3707a953a41cb7c56e8fb372e1ea0
+---
+ .../src/main/java/edu/wpi/first/wpilibj/Relay.java             | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java
+index 19c8d2960ec72e4964a620535d6b71e3e0c15ed2..cb648155eb75f08e7b7ca8347cb6e9808c525bd2 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java
+@@ -188,7 +188,8 @@ public class Relay extends SensorBase implements LiveWindowSendable {
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+ 
+ 		RelayJNI.setRelayForward(m_port, (byte) 0, status.asIntBuffer());
+-		RelayJNI.setRelayForward(m_port, (byte) 0, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		RelayJNI.setRelayReverse(m_port, (byte) 0, status.asIntBuffer());
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 
+ 		DIOJNI.freeDIO(m_port, status.asIntBuffer());

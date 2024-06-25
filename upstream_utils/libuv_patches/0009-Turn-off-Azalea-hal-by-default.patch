@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: brad <brad@bradhouse.com>
+Date: Thu, 23 Jan 2014 17:47:28 -0500
+Subject: [PATCH 0009/6262] Turn off Azalea hal by default
+
+---
+ hal/pom.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hal/pom.xml b/hal/pom.xml
+index 38d62e34422cac91b184d68abe385c383280741b..ebf71721fe476b5132bd4e551a6a1134d13efc6e 100644
+--- a/hal/pom.xml
++++ b/hal/pom.xml
+@@ -33,7 +33,7 @@
+ 	<profile>
+ 	  <id>azalea</id>
+       <activation>
+-		<activeByDefault>true</activeByDefault>
++		<activeByDefault>false</activeByDefault>
+       </activation>
+ 	  <modules>
+ 		<module>Azalea</module>

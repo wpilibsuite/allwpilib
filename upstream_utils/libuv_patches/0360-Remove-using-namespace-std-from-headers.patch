@@ -1,0 +1,494 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <the.thomas.j.clark@gmail.com>
+Date: Wed, 24 Sep 2014 14:09:08 -0400
+Subject: [PATCH 0360/6262] Remove "using namespace std;" from headers
+
+[artf3605]
+
+Change-Id: I0dc6172114608eb5e52d341be8064758faa1c781
+---
+ .../cpp/include/networktables/NetworkTable.h  | 112 +++++++++---------
+ .../networktables/NetworkTableProvider.h      |   8 +-
+ .../NetworkTableSubListenerAdapter.h          |   6 +-
+ .../include/networktables2/util/StringCache.h |  14 +--
+ .../lib/share/networktables/NetworkTable.cpp  |  10 +-
+ 5 files changed, 69 insertions(+), 81 deletions(-)
+
+diff --git a/networktables/cpp/include/networktables/NetworkTable.h b/networktables/cpp/include/networktables/NetworkTable.h
+index 8c49e3f57667a249af2b4948921437783a3e1050..f26df54377b797be089b20a6b5d858d588016263 100644
+--- a/networktables/cpp/include/networktables/NetworkTable.h
++++ b/networktables/cpp/include/networktables/NetworkTable.h
+@@ -19,17 +19,11 @@ class EntryCache;
+ #include "networktables/NetworkTableListenerAdapter.h"
+ #include "tables/IRemoteConnectionListener.h"
+ 
+-
+-
+-using namespace std;
+-
+-
+-
+ class NetworkTableKeyCache: public StringCache{
+ private:
+ 	const std::string path;
+ 
+-public: 
++public:
+ 	NetworkTableKeyCache(std::string path);
+ 	~NetworkTableKeyCache();
+ 
+@@ -39,19 +33,19 @@ public:
+ 
+ class EntryCache {
+ private:
+-	map<std::string, NetworkTableEntry*> cache;
++	std::map<std::string, NetworkTableEntry*> cache;
+ 	std::string& path;
+ public:
+ 	EntryCache(std::string& path);
+ 	~EntryCache();
+-	
++
+ 	NetworkTableEntry* Get(std::string& key);
+ };
+ 
+ 
+ 
+ class NetworkTable : public ITable, IRemote {
+-	
++
+ private:
+ 	static DefaultThreadManager threadManager;
+ 	static NetworkTableProvider* staticProvider;
+@@ -62,37 +56,37 @@ private:
+ 	static int port;
+ 	static std::string ipAddress;
+ 	static NTReentrantSemaphore STATIC_LOCK;
+-	
+-	
+-	
++
++
++
+ 	std::string path;
+ 	EntryCache entryCache;
+ 	NetworkTableKeyCache absoluteKeyCache;
+ 	NetworkTableProvider& provider;
+ 	NetworkTableNode& node;
+ 	NTReentrantSemaphore LOCK;
+-	
+-	
+-	map<IRemoteConnectionListener*, NetworkTableConnectionListenerAdapter*> connectionListenerMap;
+-	multimap<ITableListener*, ITableListener*> listenerMap;
+-	
++
++
++	std::map<IRemoteConnectionListener*, NetworkTableConnectionListenerAdapter*> connectionListenerMap;
++	std::multimap<ITableListener*, ITableListener*> listenerMap;
++
+ 	static void CheckInit();
+-	
++
+ 	NetworkTableEntry* GetEntry(std::string key);
+-	
++
+ public:
+ 
+ 	static const char PATH_SEPARATOR_CHAR;
+ 	/**
+ 	 * The path separator for sub-tables and keys
+-	 * 
++	 *
+ 	 */
+ 	static const std::string PATH_SEPARATOR;
+ 	/**
+ 	 * The default port that network tables operates on
+ 	 */
+ 	static const int DEFAULT_PORT;
+-	
++
+ 	/**
+ 	 * @throws IOException
+ 	 */
+@@ -104,19 +98,19 @@ public:
+ 	 * This must be called before getTable
+ 	 */
+ 	static void SetTableProvider(NetworkTableProvider* provider);
+-	
++
+ 	/**
+ 	 * set that network tables should be a client
+ 	 * This must be called before initalize or GetTable
+ 	 */
+ 	static void SetClientMode();
+-	
++
+ 	/**
+ 	 * set that network tables should be a server
+ 	 * This must be called before initalize or GetTable
+ 	 */
+ 	static void SetServerMode();
+-	
++
+ 	/**
+ 	 * set the team the robot is configured for (this will set the ip address that network tables will connect to in client mode)
+ 	 * This must be called before initalize or GetTable
+@@ -130,47 +124,47 @@ public:
+ 	/**
+ 	 * Gets the table with the specified key. If the table does not exist, a new table will be created.<br>
+ 	 * This will automatically initialize network tables if it has not been already
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key name
+ 	 * @return the network table requested
+ 	 */
+ 	static NetworkTable* GetTable(std::string key);
+-	
++
+ 
+ 	NetworkTable(std::string path, NetworkTableProvider& provider);
+ 	virtual ~NetworkTable();
+-	
++
+ 	bool IsConnected();
+ 
+ 	bool IsServer();
+-	
+-	
+-	
+-	
+-	
+-	
+-	
++
++
++
++
++
++
++
+ 	void AddConnectionListener(IRemoteConnectionListener* listener, bool immediateNotify);
+ 
+ 	void RemoveConnectionListener(IRemoteConnectionListener* listener);
+-	
++
+ 
+ 	void AddTableListener(ITableListener* listener);
+ 
+-	
++
+ 	void AddTableListener(ITableListener* listener, bool immediateNotify);
+ 	void AddTableListener(std::string key, ITableListener* listener, bool immediateNotify);
+ 	void AddSubTableListener(ITableListener* listener);
+ 
+ 	void RemoveTableListener(ITableListener* listener);
+-	
+-	
++
++
+ 
+ 	/**
+ 	 * Returns the table at the specified key. If there is no table at the
+ 	 * specified key, it will create a new table
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key name
+ 	 * @return the networktable to be returned
+@@ -180,19 +174,19 @@ public:
+ 
+ 	/**
+ 	 * Checks the table and tells if it contains the specified key
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key to be checked
+ 	 */
+ 	bool ContainsKey(std::string key);
+-        
++
+ 	bool ContainsSubTable(std::string key);
+ 
+ 	/**
+ 	 * Maps the specified key to the specified value in this table. The key can
+ 	 * not be null. The value can be retrieved by calling the get method with a
+ 	 * key that is equal to the original key.
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key
+ 	 * @param value
+@@ -202,7 +196,7 @@ public:
+ 
+ 	/**
+ 	 * Returns the key that the name maps to.
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key name
+ 	 * @return the key
+@@ -214,7 +208,7 @@ public:
+ 	/**
+ 	 * Returns the key that the name maps to. If the key is null, it will return
+ 	 * the default value
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key name
+ 	 * @param defaultValue
+@@ -227,7 +221,7 @@ public:
+ 	 * Maps the specified key to the specified value in this table. The key can
+ 	 * not be null. The value can be retrieved by calling the get method with a
+ 	 * key that is equal to the original key.
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key
+ 	 * @param value
+@@ -237,7 +231,7 @@ public:
+ 
+ 	/**
+ 	 * Returns the key that the name maps to.
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key name
+ 	 * @return the key
+@@ -249,7 +243,7 @@ public:
+ 	/**
+ 	 * Returns the key that the name maps to. If the key is null, it will return
+ 	 * the default value
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key name
+ 	 * @param defaultValue
+@@ -262,7 +256,7 @@ public:
+ 	 * Maps the specified key to the specified value in this table. The key can
+ 	 * not be null. The value can be retrieved by calling the get method with a
+ 	 * key that is equal to the original key.
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key
+ 	 * @param value
+@@ -272,7 +266,7 @@ public:
+ 
+ 	/**
+ 	 * Returns the key that the name maps to.
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key name
+ 	 * @return the key
+@@ -284,7 +278,7 @@ public:
+ 	/**
+ 	 * Returns the key that the name maps to. If the key is null, it will return
+ 	 * the default value
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key name
+ 	 * @param defaultValue
+@@ -292,28 +286,28 @@ public:
+ 	 * @return the key
+ 	 */
+ 	bool GetBoolean(std::string key, bool defaultValue);
+-	
++
+ 
+ 	void PutValue(std::string key, NetworkTableEntryType* type, EntryValue value);
+-	
++
+ 
+     void RetrieveValue(std::string key, ComplexData& externalValue);
+-        
++
+ 	/**
+ 	 * Maps the specified key to the specified value in this table. The key can
+ 	 * not be null. The value can be retrieved by calling the get method with a
+ 	 * key that is equal to the original key.
+-	 * 
++	 *
+ 	 * @param key the key name
+ 	 * @param value the value to be put
+ 	 */
+ 	void PutValue(std::string key, ComplexData& value);
+-	
++
+ 	/**
+ 	 * Returns the key that the name maps to.
+ 	 * NOTE: If the value is a double, it will return a Double object,
+ 	 * not a primitive.  To get the primitive, use GetDouble
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key name
+ 	 * @return the key
+@@ -321,13 +315,13 @@ public:
+ 	 *             if the specified key is null
+ 	 */
+ 	EntryValue GetValue(std::string key);
+-	
++
+ 	/**
+ 	 * Returns the key that the name maps to. If the key is null, it will return
+ 	 * the default value
+ 	 * NOTE: If the value is a double, it will return a Double object,
+ 	 * not a primitive.  To get the primitive, use GetDouble
+-	 * 
++	 *
+ 	 * @param key
+ 	 *            the key name
+ 	 * @param defaultValue
+diff --git a/networktables/cpp/include/networktables/NetworkTableProvider.h b/networktables/cpp/include/networktables/NetworkTableProvider.h
+index efb5615718ee9fe2e841ec353bfdb715f11371fd..d7675b84d8f24304b19bc5857a4213d4a487e38f 100644
+--- a/networktables/cpp/include/networktables/NetworkTableProvider.h
++++ b/networktables/cpp/include/networktables/NetworkTableProvider.h
+@@ -10,22 +10,20 @@ class NetworkTableProvider;
+ #include "networktables2/NetworkTableNode.h"
+ #include "networktables/NetworkTable.h"
+ 
+-using namespace std;
+-
+ class NetworkTableProvider : public ITableProvider
+ {
+ private:
+ 	NetworkTableNode& node;
+-	map<std::string, NetworkTable*> tables;
++	std::map<std::string, NetworkTable*> tables;
+ 
+ 	/**
+ 	 * Create a new NetworkTableProvider for a given NetworkTableNode
+-	 * @param node the node that handles the actual network table 
++	 * @param node the node that handles the actual network table
+ 	 */
+ public:
+ 	NetworkTableProvider(NetworkTableNode& node);
+ 	virtual ~NetworkTableProvider();
+-	
++
+ 	ITable* GetRootTable();
+ 
+ 	ITable* GetTable(std::string key);
+diff --git a/networktables/cpp/include/networktables/NetworkTableSubListenerAdapter.h b/networktables/cpp/include/networktables/NetworkTableSubListenerAdapter.h
+index 479660627a302b87438d0a683445f380bc15bf98..58d53b5432dadd952296505d326456c79e88643b 100644
+--- a/networktables/cpp/include/networktables/NetworkTableSubListenerAdapter.h
++++ b/networktables/cpp/include/networktables/NetworkTableSubListenerAdapter.h
+@@ -18,19 +18,17 @@ class NetworkTableSubListenerAdapter;
+ #include "networktables/NetworkTable.h"
+ 
+ 
+-using namespace std;
+-
+ class NetworkTableSubListenerAdapter : public ITableListener{
+ private:
+ 	std::string& prefix;
+ 	NetworkTable* targetSource;
+ 	ITableListener* targetListener;
+-	set<std::string> notifiedTables;
++	std::set<std::string> notifiedTables;
+ 
+ public:
+ 	NetworkTableSubListenerAdapter(std::string& prefix, NetworkTable* targetSource, ITableListener* targetListener);
+ 	virtual ~NetworkTableSubListenerAdapter();
+-    void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
++	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+ };
+ 
+ 
+diff --git a/networktables/cpp/include/networktables2/util/StringCache.h b/networktables/cpp/include/networktables2/util/StringCache.h
+index 4406e5dc0a1aac3e2df20c53c9173eaac88d1ff9..0e3945967d52620f1f4dc31fb8e0ee2c1d73e72e 100644
+--- a/networktables/cpp/include/networktables2/util/StringCache.h
++++ b/networktables/cpp/include/networktables2/util/StringCache.h
+@@ -4,19 +4,17 @@
+ #include <map>
+ #include <string>
+ 
+-using namespace std;
+-
+ /**
+  * A simple cache that allows for caching the mapping of one string to another calculated one
+- * 
++ *
+  * @author Mitchell
+  *
+  */
+ class StringCache {
+ private:
+-	map<std::string, std::string> cache;
++	std::map<std::string, std::string> cache;
++
+ 
+-	
+ 	/**
+ 	 * @param input
+ 	 * @return the value for a given input
+@@ -24,10 +22,10 @@ private:
+ public:
+ 	StringCache();
+ 	virtual ~StringCache();
+-	
+-	
++
++
+ 	std::string& Get(const std::string& input);
+-	
++
+ 	/**
+ 	 * Will only be called if a value has not already been calculated
+ 	 * @param input
+diff --git a/networktables/cpp/lib/share/networktables/NetworkTable.cpp b/networktables/cpp/lib/share/networktables/NetworkTable.cpp
+index e9b4c899a3c62376a787df6812cece5ad061e10f..3f56dbcd48108454d970bcd283e62a8b28b91c45 100644
+--- a/networktables/cpp/lib/share/networktables/NetworkTable.cpp
++++ b/networktables/cpp/lib/share/networktables/NetworkTable.cpp
+@@ -16,6 +16,7 @@
+ #include "networktables/NetworkTableListenerAdapter.h"
+ #include "networktables/NetworkTableSubListenerAdapter.h"
+ 
++using namespace std;
+ 
+ const char NetworkTable::PATH_SEPARATOR_CHAR = '/';
+ const std::string NetworkTable::PATH_SEPARATOR("/");
+@@ -53,7 +54,7 @@ void NetworkTable::Initialize() {
+ 	printf("[NT] ...NetworkTable::Initialize().\n");
+ }
+ 
+-void NetworkTable::Shutdown() 
++void NetworkTable::Shutdown()
+ {
+ 	if (staticProvider!=NULL)
+ 	{
+@@ -188,7 +189,7 @@ void NetworkTable::RemoveTableListener(ITableListener* listener) {
+ }
+ 
+ NetworkTableEntry* NetworkTable::GetEntry(std::string key){
+-	{ 
++	{
+ 		NTSynchronized sync(LOCK);
+ 		return entryCache.Get(key);
+ 	}
+@@ -196,7 +197,7 @@ NetworkTableEntry* NetworkTable::GetEntry(std::string key){
+ 
+ 
+ NetworkTable* NetworkTable::GetSubTable(std::string key) {
+-	{ 
++	{
+ 		NTSynchronized sync(LOCK);
+ 		return (NetworkTable*)provider.GetTable(absoluteKeyCache.Get(key));
+ 	}
+@@ -206,7 +207,7 @@ NetworkTable* NetworkTable::GetSubTable(std::string key) {
+ bool NetworkTable::ContainsKey(std::string key) {
+ 	return node.ContainsKey(absoluteKeyCache.Get(key));
+ }
+-	
++
+ bool NetworkTable::ContainsSubTable(std::string key){
+         std::string subtablePrefix(absoluteKeyCache.Get(key));
+         subtablePrefix+=PATH_SEPARATOR;
+@@ -337,4 +338,3 @@ EntryCache::~EntryCache(){}
+ NetworkTableEntry* EntryCache::Get(std::string& key){
+ 	return cache[key];
+ }
+-

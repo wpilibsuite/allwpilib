@@ -1,0 +1,1176 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Colby Skeggs <skeggsc@catlin.edu>
+Date: Tue, 29 Jul 2014 09:58:15 -0700
+Subject: [PATCH 0230/6262] Completed artf2662: removed Start()/Stop() in
+ Encoders and Counters.
+
+Change-Id: I11954bb5f66e54461455637d79013c1071f5d00f
+---
+ wpilibc/wpilibC++/include/Counter.h           |  5 +-
+ wpilibc/wpilibC++/include/CounterBase.h       |  9 +--
+ wpilibc/wpilibC++/include/Encoder.h           |  5 +-
+ wpilibc/wpilibC++/lib/Counter.cpp             | 40 +++++-------
+ wpilibc/wpilibC++/lib/Encoder.cpp             | 52 ++++++---------
+ wpilibc/wpilibC++/lib/Ultrasonic.cpp          |  1 -
+ .../src/CounterTest.cpp                       |  6 --
+ .../src/DIOLoopTest.cpp                       |  1 -
+ .../src/MotorEncoderTest.cpp                  |  1 -
+ wpilibc/wpilibC++Sim/include/Counter.h        |  5 +-
+ wpilibc/wpilibC++Sim/include/CounterBase.h    |  5 +-
+ wpilibc/wpilibC++Sim/include/Encoder.h        |  5 +-
+ wpilibc/wpilibC++Sim/src/Encoder.cpp          | 56 ++++++++---------
+ .../java/edu/wpi/first/wpilibj/Counter.java   | 41 ++++++------
+ .../edu/wpi/first/wpilibj/CounterBase.java    | 13 +---
+ .../java/edu/wpi/first/wpilibj/Encoder.java   | 63 ++++++++++---------
+ .../edu/wpi/first/wpilibj/Ultrasonic.java     |  1 -
+ .../wpi/first/wpilibj/MotorEncoderTest.java   | 30 ++++-----
+ .../wpilibj/fixtures/FakeCounterFixture.java  |  1 -
+ .../wpilibj/fixtures/FakeEncoderFixture.java  |  1 -
+ .../wpilibj/fixtures/MotorEncoderFixture.java |  8 ---
+ .../edu/wpi/first/wpilibj/CounterBase.java    | 13 +---
+ .../java/edu/wpi/first/wpilibj/Encoder.java   | 27 ++++----
+ 23 files changed, 164 insertions(+), 225 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/Counter.h b/wpilibc/wpilibC++/include/Counter.h
+index 5241e30da6edbb33768a3a0192f2e78ee64e3cd4..97d0ecb019bdd5fcc63b97cc0eabc9dd4ddc21f3 100644
+--- a/wpilibc/wpilibC++/include/Counter.h
++++ b/wpilibc/wpilibC++/include/Counter.h
+@@ -16,6 +16,9 @@
+  * This is a general purpose class for counting repetitive events. It can return the number
+  * of counts, the period of the most recent cycle, and detect when the signal being counted
+  * has stopped by supplying a maximum cycle time.
++ *
++ * All counters will immediately start counting - Reset() them if you need them
++ * to be zeroed before use.
+  */
+ class Counter : public SensorBase, public CounterBase, public LiveWindowSendable
+ {
+@@ -55,10 +58,8 @@ public:
+ 	void SetReverseDirection(bool reverseDirection);
+ 
+ 	// CounterBase interface
+-	void Start();
+ 	int32_t Get();
+ 	void Reset();
+-	void Stop();
+ 	double GetPeriod();
+ 	void SetMaxPeriod(double maxPeriod);
+ 	void SetUpdateWhenEmpty(bool enabled);
+diff --git a/wpilibc/wpilibC++/include/CounterBase.h b/wpilibc/wpilibC++/include/CounterBase.h
+index a5fbae318e4b2a67e8a2e43644f01e43af5d94d7..9596829ca042edcc4921ee18e94babd742b128f2 100644
+--- a/wpilibc/wpilibC++/include/CounterBase.h
++++ b/wpilibc/wpilibC++/include/CounterBase.h
+@@ -7,8 +7,11 @@
+ 
+ /**
+  * Interface for counting the number of ticks on a digital input channel.
+- * Encoders, Gear tooth sensors, and counters should all subclass this so it can be used to
+- * build more advanced classes for control and driving.
++ * Encoders, Gear tooth sensors, and counters should all subclass this so it can
++ * be used to build more advanced classes for control and driving.
++ *
++ * All counters will immediately start counting - Reset() them if you need them
++ * to be zeroed before use.
+  */
+ class CounterBase
+ {
+@@ -21,10 +24,8 @@ public:
+ 	};
+ 
+ 	virtual ~CounterBase() {}
+-	virtual void Start() = 0;
+ 	virtual int32_t Get() = 0;
+ 	virtual void Reset() = 0;
+-	virtual void Stop() = 0;
+ 	virtual double GetPeriod() = 0;
+ 	virtual void SetMaxPeriod(double maxPeriod) = 0;
+ 	virtual bool GetStopped() = 0;
+diff --git a/wpilibc/wpilibC++/include/Encoder.h b/wpilibc/wpilibC++/include/Encoder.h
+index a4b6389d95c13312273e8274478161b0f1ec03a9..d18eccf816219ae3aac0dde7f1cf74a4635dea50 100644
+--- a/wpilibc/wpilibC++/include/Encoder.h
++++ b/wpilibc/wpilibC++/include/Encoder.h
+@@ -22,6 +22,9 @@ class DigitalSource;
+  * sense of the output to make code more readable if the encoder is mounted such that forward movement
+  * generates negative values. Quadrature encoders have two digital outputs, an A Channel and a B Channel
+  * that are out of phase with each other to allow the FPGA to do direction sensing.
++ *
++ * All encoders will immediately start counting - Reset() them if you need them
++ * to be zeroed before use.
+  */
+ class Encoder : public SensorBase, public CounterBase, public PIDSource, public LiveWindowSendable
+ {
+@@ -36,11 +39,9 @@ public:
+ 	virtual ~Encoder();
+ 
+ 	// CounterBase interface
+-	void Start();
+ 	int32_t Get();
+ 	int32_t GetRaw();
+ 	void Reset();
+-	void Stop();
+ 	double GetPeriod();
+ 	void SetMaxPeriod(double maxPeriod);
+ 	bool GetStopped();
+diff --git a/wpilibc/wpilibC++/lib/Counter.cpp b/wpilibc/wpilibC++/lib/Counter.cpp
+index 3be1b8f258fc834a73745c6cab14491c7d5ac90e..75d4f04278ad88ab2b0a47039bc458fad162d92d 100644
+--- a/wpilibc/wpilibC++/lib/Counter.cpp
++++ b/wpilibc/wpilibC++/lib/Counter.cpp
+@@ -14,6 +14,8 @@
+ /**
+  * Create an instance of a counter object.
+  * This creates a ChipObject counter and initializes status variables appropriately
++ *
++ * The counter will start counting immediately.
+  */
+ void Counter::InitCounter(Mode mode)
+ {
+@@ -30,12 +32,19 @@ void Counter::InitCounter(Mode mode)
+ 	m_allocatedDownSource = false;
+ 
+ 	HALReport(HALUsageReporting::kResourceType_Counter, index, mode);
++
++	if (StatusIsFatal()) return;
++	status = 0;
++	startCounter(m_counter, &status);
++	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ }
+ 
+ /**
+  * Create an instance of a counter where no sources are selected.
+  * Then they all must be selected by calling functions to specify the upsource and the downsource
+  * independently.
++ *
++ * The counter will start counting immediately.
+  */
+ Counter::Counter() :
+ 	m_upSource(NULL),
+@@ -49,6 +58,8 @@ Counter::Counter() :
+  * Create an instance of a counter from a Digital Input.
+  * This is used if an existing digital input is to be shared by multiple other objects such
+  * as encoders.
++ *
++ * The counter will start counting immediately.
+  */
+ Counter::Counter(DigitalSource *source) :
+ 	m_upSource(NULL),
+@@ -73,6 +84,8 @@ Counter::Counter(DigitalSource &source) :
+ /**
+  * Create an instance of a Counter object.
+  * Create an up-Counter instance given a channel.
++ *
++ * The counter will start counting immediately.
+  */
+ Counter::Counter(uint32_t channel) :
+ 	m_upSource(NULL),
+@@ -88,6 +101,8 @@ Counter::Counter(uint32_t channel) :
+  * Create an instance of a Counter object.
+  * Create an instance of a simple up-Counter given an analog trigger.
+  * Use the trigger state output from the analog trigger.
++ *
++ * The counter will start counting immediately.
+  */
+ Counter::Counter(AnalogTrigger *trigger) :
+ 	m_upSource(NULL),
+@@ -447,19 +462,6 @@ void Counter::SetSamplesToAverage (int samplesToAverage) {
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ }
+ 
+-/**
+- * Start the Counter counting.
+- * This enables the counter and it starts accumulating counts from the associated
+- * input channel. The counter value is not reset on starting, and still has the previous value.
+- */
+-void Counter::Start()
+-{
+-	if (StatusIsFatal()) return;
+-	int32_t status = 0;
+-	startCounter(m_counter, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-}
+-
+ /**
+  * Read the current counter value.
+  * Read the value at this instant. It may still be running, so it reflects the current value. Next
+@@ -487,18 +489,6 @@ void Counter::Reset()
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ }
+ 
+-/**
+- * Stop the Counter.
+- * Stops the counting but doesn't effect the current value.
+- */
+-void Counter::Stop()
+-{
+-	if (StatusIsFatal()) return;
+-	int32_t status = 0;
+-	stopCounter(m_counter, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-}
+-
+ /*
+  * Get the Period of the most recent count.
+  * Returns the time interval of the most recent count. This can be used for velocity calculations
+diff --git a/wpilibc/wpilibC++/lib/Encoder.cpp b/wpilibc/wpilibC++/lib/Encoder.cpp
+index 27c6651aaa89d8485abf44bba56182b63df6b8dc..31f153d8341e21b94ccc164581a9de568669682d 100644
+--- a/wpilibc/wpilibC++/lib/Encoder.cpp
++++ b/wpilibc/wpilibC++/lib/Encoder.cpp
+@@ -14,6 +14,9 @@
+ /**
+  * Common initialization code for Encoders.
+  * This code allocates resources for Encoders and is common to all constructors.
++ *
++ * The counter will start counting immediately.
++ *
+  * @param reverseDirection If true, counts down instead of up (this is all relative)
+  * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+  * selected, then an encoder FPGA object is used and the returned counts will be 4x the encoder
+@@ -64,11 +67,21 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType)
+ 
+ 	HALReport(HALUsageReporting::kResourceType_Encoder, index, encodingType);
+ 	LiveWindow::GetInstance()->AddSensor("Encoder", m_aSource->GetChannelForRouting(), this);
++
++	if (StatusIsFatal()) return;
++	if (!m_counter) {
++		int32_t status = 0;
++		startEncoder(m_encoder, &status);
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
+ }
+ 
+ /**
+  * Encoder constructor.
+  * Construct a Encoder given a and b channels.
++ *
++ * The counter will start counting immediately.
++ *
+  * @param aChannel The a channel digital input channel.
+  * @param bChannel The b channel digital input channel.
+  * @param reverseDirection represents the orientation of the encoder and inverts the output values
+@@ -95,6 +108,9 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, En
+  * Construct a Encoder given a and b channels as digital inputs. This is used in the case
+  * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
+  * and assume that they already are counted.
++ *
++ * The counter will start counting immediately.
++ *
+  * @param aSource The source that should be used for the a channel.
+  * @param bSource the source that should be used for the b channel.
+  * @param reverseDirection represents the orientation of the encoder and inverts the output values
+@@ -124,6 +140,9 @@ Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource, bool reverseDir
+  * Construct a Encoder given a and b channels as digital inputs. This is used in the case
+  * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
+  * and assume that they already are counted.
++ *
++ * The counter will start counting immediately.
++ *
+  * @param aSource The source that should be used for the a channel.
+  * @param bSource the source that should be used for the b channel.
+  * @param reverseDirection represents the orientation of the encoder and inverts the output values
+@@ -165,39 +184,6 @@ Encoder::~Encoder()
+ 	}
+ }
+ 
+-/**
+- * Start the Encoder.
+- * Starts counting pulses on the Encoder device.
+- */
+-void Encoder::Start()
+-{
+-	if (StatusIsFatal()) return;
+-	if (m_counter)
+-		m_counter->Start();
+-	else
+-	{
+-		int32_t status = 0;
+-		startEncoder(m_encoder, &status);
+-		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	}
+-}
+-
+-/**
+- * Stops counting pulses on the Encoder device. The value is not changed.
+- */
+-void Encoder::Stop()
+-{
+-	if (StatusIsFatal()) return;
+-	if (m_counter)
+-		m_counter->Stop();
+-	else
+-	{
+-		int32_t status = 0;
+-		stopEncoder(m_encoder, &status);
+-		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	}
+-}
+-
+ /**
+  * Gets the raw value from the encoder.
+  * The raw value is the actual count unscaled by the 1x, 2x, or 4x scale
+diff --git a/wpilibc/wpilibC++/lib/Ultrasonic.cpp b/wpilibc/wpilibC++/lib/Ultrasonic.cpp
+index 59617822a9e105b079d008602e441b07082b6102..6c540144646838804e80d52b15cf3226fa3078b1 100644
+--- a/wpilibc/wpilibC++/lib/Ultrasonic.cpp
++++ b/wpilibc/wpilibC++/lib/Ultrasonic.cpp
+@@ -71,7 +71,6 @@ void Ultrasonic::Initialize()
+ 	m_counter->SetMaxPeriod(1.0);
+ 	m_counter->SetSemiPeriodMode(true);
+ 	m_counter->Reset();
+-	m_counter->Start();
+ 	m_enabled = true; // make it available for round robin scheduling
+ 	SetAutomaticMode(originalMode);
+ 
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/CounterTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/CounterTest.cpp
+index e4d5c480e5a530adacafd8cc8f0f9ee48c7f96a4..467aefa821714b6ecb395677f0a8a107775aa54f 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/CounterTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/CounterTest.cpp
+@@ -56,7 +56,6 @@ protected:
+  */
+ TEST_F(CounterTest, CountTalon) {
+   Reset();
+-  m_talonCounter->Start();
+   /* Run the motor forward and determine if the counter is counting. */
+   m_talon->Set(1.0f);
+   Wait(0.5);
+@@ -72,7 +71,6 @@ TEST_F(CounterTest, CountTalon) {
+ 
+ TEST_F(CounterTest, CountVictor) {
+   Reset();
+-  m_victorCounter->Start();
+   /* Run the motor forward and determine if the counter is counting. */
+   m_victor->Set(1.0f);
+   Wait(0.5);
+@@ -88,7 +86,6 @@ TEST_F(CounterTest, CountVictor) {
+ 
+ TEST_F(CounterTest, CountJaguar) {
+   Reset();
+-  m_jaguarCounter->Start();
+   /* Run the motor forward and determine if the counter is counting. */
+   m_jaguar->Set(1.0f);
+   Wait(0.5);
+@@ -108,7 +105,6 @@ TEST_F(CounterTest, CountJaguar) {
+  */
+ TEST_F(CounterTest, TalonGetStopped) {
+   Reset();
+-  m_talonCounter->Start();
+   /* Set the Max Period of the counter and run the motor */
+   m_talonCounter->SetMaxPeriod(kMaxPeriod);
+   m_talon->Set(1.0f);
+@@ -124,7 +120,6 @@ TEST_F(CounterTest, TalonGetStopped) {
+ 
+ TEST_F(CounterTest, VictorGetStopped) {
+   Reset();
+-  m_victorCounter->Start();
+   /* Set the Max Period of the counter and run the motor */
+   m_victorCounter->SetMaxPeriod(kMaxPeriod);
+   m_victor->Set(1.0f);
+@@ -140,7 +135,6 @@ TEST_F(CounterTest, VictorGetStopped) {
+ 
+ TEST_F(CounterTest, JaguarGetStopped) {
+   Reset();
+-  m_jaguarCounter->Start();
+   /* Set the Max Period of the counter and run the motor */
+   m_jaguarCounter->SetMaxPeriod(kMaxPeriod);
+   m_jaguar->Set(1.0f);
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
+index 5aac0b2f2041e1f3b73d6e3c09751016f528923b..dbf7458958f9029e0b604e6b0184e930306a0df9 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
+@@ -61,7 +61,6 @@ TEST_F(DIOLoopTest, FakeCounter) {
+ 	Reset();
+ 
+ 	Counter counter(m_input);
+-	counter.Start();
+ 
+ 	EXPECT_EQ(0, counter.Get()) << "Counter did not initialize to 0.";
+ 
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
+index b5edf1975c2ccd656181dca9aa5da7c5712b75f5..994b08dadfcb1f102e67b4706591630fa41d5e31 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
+@@ -64,7 +64,6 @@ protected:
+ 	void Reset() {
+ 		m_speedController->Set(0.0f);
+ 		m_encoder->Reset();
+-		m_encoder->Start();
+ 	}
+ };
+ 
+diff --git a/wpilibc/wpilibC++Sim/include/Counter.h b/wpilibc/wpilibC++Sim/include/Counter.h
+index 545cd789951280037ff81cfe690d99f2e5b71e0d..724232a82134779ed6884f03f2dcd04ad45a25f8 100644
+--- a/wpilibc/wpilibC++Sim/include/Counter.h
++++ b/wpilibc/wpilibC++Sim/include/Counter.h
+@@ -14,6 +14,9 @@
+  * This is a general purpose class for counting repetitive events. It can return the number
+  * of counts, the period of the most recent cycle, and detect when the signal being counted
+  * has stopped by supplying a maximum cycle time.
++ *
++ * All counters will immediately start counting - Reset() them if you need them
++ * to be zeroed before use.
+  */
+ class Counter : public SensorBase, public CounterBase, public LiveWindowSendable
+ {
+@@ -52,10 +55,8 @@ public:
+ 	void SetReverseDirection(bool reverseDirection);
+ 
+ 	// CounterBase interface
+-	void Start();
+ 	int32_t Get();
+ 	void Reset();
+-	void Stop();
+ 	double GetPeriod();
+ 	void SetMaxPeriod(double maxPeriod);
+ 	void SetUpdateWhenEmpty(bool enabled);
+diff --git a/wpilibc/wpilibC++Sim/include/CounterBase.h b/wpilibc/wpilibC++Sim/include/CounterBase.h
+index a5fbae318e4b2a67e8a2e43644f01e43af5d94d7..4a6a7285c688a2f73bf5444de9513b454d2013f6 100644
+--- a/wpilibc/wpilibC++Sim/include/CounterBase.h
++++ b/wpilibc/wpilibC++Sim/include/CounterBase.h
+@@ -9,6 +9,9 @@
+  * Interface for counting the number of ticks on a digital input channel.
+  * Encoders, Gear tooth sensors, and counters should all subclass this so it can be used to
+  * build more advanced classes for control and driving.
++ *
++ * All counters will immediately start counting - Reset() them if you need them
++ * to be zeroed before use.
+  */
+ class CounterBase
+ {
+@@ -21,10 +24,8 @@ public:
+ 	};
+ 
+ 	virtual ~CounterBase() {}
+-	virtual void Start() = 0;
+ 	virtual int32_t Get() = 0;
+ 	virtual void Reset() = 0;
+-	virtual void Stop() = 0;
+ 	virtual double GetPeriod() = 0;
+ 	virtual void SetMaxPeriod(double maxPeriod) = 0;
+ 	virtual bool GetStopped() = 0;
+diff --git a/wpilibc/wpilibC++Sim/include/Encoder.h b/wpilibc/wpilibC++Sim/include/Encoder.h
+index 560d2a37ad122fef3ecb3fc640e932f89b3620e5..4932c801ff06069258d8c14987bd73894fcab47f 100644
+--- a/wpilibc/wpilibC++Sim/include/Encoder.h
++++ b/wpilibc/wpilibC++Sim/include/Encoder.h
+@@ -20,6 +20,9 @@
+  * sense of the output to make code more readable if the encoder is mounted such that forward movement
+  * generates negative values. Quadrature encoders have two digital outputs, an A Channel and a B Channel
+  * that are out of phase with each other to allow the FPGA to do direction sensing.
++ *
++ * All encoders will immediately start counting - Reset() them if you need them
++ * to be zeroed before use.
+  */
+ class Encoder : public SensorBase, public CounterBase, public PIDSource, public LiveWindowSendable
+ {
+@@ -32,11 +35,9 @@ public:
+ 	virtual ~Encoder();
+ 
+ 	// CounterBase interface
+-	void Start();
+ 	int32_t Get();
+ 	int32_t GetRaw();
+ 	void Reset();
+-	void Stop();
+ 	double GetPeriod();
+ 	void SetMaxPeriod(double maxPeriod);
+ 	bool GetStopped();
+diff --git a/wpilibc/wpilibC++Sim/src/Encoder.cpp b/wpilibc/wpilibC++Sim/src/Encoder.cpp
+index e4a6f2ff1a33a933f4f45a3d81139a2acaf187f1..b45adcd518fb73f6c8400df2b8375c89efef2f0f 100644
+--- a/wpilibc/wpilibC++Sim/src/Encoder.cpp
++++ b/wpilibc/wpilibC++Sim/src/Encoder.cpp
+@@ -12,6 +12,9 @@
+ /**
+  * Common initialization code for Encoders.
+  * This code allocates resources for Encoders and is common to all constructors.
++ *
++ * The counter will start counting immediately.
++ *
+  * @param reverseDirection If true, counts down instead of up (this is all relative)
+  * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+  * selected, then an encoder FPGA object is used and the returned counts will be 4x the encoder
+@@ -22,8 +25,8 @@
+ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, EncodingType encodingType)
+ {
+ 	m_table = NULL;
+-    this->channelA = channelA;
+-    this->channelB = channelB;
++	this->channelA = channelA;
++	this->channelB = channelB;
+ 	m_encodingType = encodingType;
+ 
+ 	int32_t index = 0;
+@@ -32,22 +35,26 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection, Enc
+ 
+ 	LiveWindow::GetInstance()->AddSensor("Encoder", channelA, this);
+ 
+-    if (channelB < channelA) { // Swap ports
+-        int channel = channelB;
+-        channelB = channelA;
+-        channelA = channel;
+-        m_reverseDirection = !reverseDirection;
+-    } else {
+-        m_reverseDirection = reverseDirection;
+-    }
+-    char buffer[50];
+-    int n = sprintf(buffer, "dio/%d/%d", channelA, channelB);
+-    impl = new SimEncoder(buffer);
++	if (channelB < channelA) { // Swap ports
++		int channel = channelB;
++		channelB = channelA;
++		channelA = channel;
++		m_reverseDirection = !reverseDirection;
++	} else {
++		m_reverseDirection = reverseDirection;
++	}
++	char buffer[50];
++	int n = sprintf(buffer, "dio/%d/%d", channelA, channelB);
++	impl = new SimEncoder(buffer);
++	impl->Start();
+ }
+ 
+ /**
+  * Encoder constructor.
+  * Construct a Encoder given a and b channels.
++ *
++ * The counter will start counting immediately.
++ *
+  * @param aChannel The a channel digital input channel.
+  * @param bChannel The b channel digital input channel.
+  * @param reverseDirection represents the orientation of the encoder and inverts the output values
+@@ -68,6 +75,9 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, En
+  * Construct a Encoder given a and b channels as digital inputs. This is used in the case
+  * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
+  * and assume that they already are counted.
++ *
++ * The counter will start counting immediately.
++ *
+  * @param aSource The source that should be used for the a channel.
+  * @param bSource the source that should be used for the b channel.
+  * @param reverseDirection represents the orientation of the encoder and inverts the output values
+@@ -97,6 +107,9 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection, En
+  * Construct a Encoder given a and b channels as digital inputs. This is used in the case
+  * where the digital inputs are shared. The Encoder class will not allocate the digital inputs
+  * and assume that they already are counted.
++ *
++ * The counter will start counting immediately.
++ *
+  * @param aSource The source that should be used for the a channel.
+  * @param bSource the source that should be used for the b channel.
+  * @param reverseDirection represents the orientation of the encoder and inverts the output values
+@@ -127,23 +140,6 @@ Encoder::~Encoder()
+ 
+ }
+ 
+-/**
+- * Start the Encoder.
+- * Starts counting pulses on the Encoder device.
+- */
+-void Encoder::Start()
+-{
+-    impl->Start();
+-}
+-
+-/**
+- * Stops counting pulses on the Encoder device. The value is not changed.
+- */
+-void Encoder::Stop()
+-{
+-    impl->Stop();
+-}
+-
+ /**
+  * Reset the Encoder distance to zero.
+  * Resets the current count to zero on the encoder.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
+index 4ddee7657413c1343db0ada7b33485958e54c6f2..26bcf6b2c0def8c15b9b8f368f5be24028d31715 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
+@@ -24,6 +24,9 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * general purpose class for counting repetitive events. It can return the
+  * number of counts, the period of the most recent cycle, and detect when the
+  * signal being counted has stopped by supplying a maximum cycle time.
++ *
++ * All counters will immediately start counting - reset() them if you need them
++ * to be zeroed before use.
+  */
+ public class Counter extends SensorBase implements CounterBase,
+ 		LiveWindowSendable, PIDSource {
+@@ -91,12 +94,19 @@ public class Counter extends SensorBase implements CounterBase,
+ 
+ 		UsageReporting.report(tResourceType.kResourceType_Counter, m_index,
+ 				mode.value);
++
++		status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		CounterJNI.startCounter(m_counter, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
+ 	}
+ 
+ 	/**
+ 	 * Create an instance of a counter where no sources are selected. Then they
+ 	 * all must be selected by calling functions to specify the upsource and the
+ 	 * downsource independently.
++	 *
++	 * The counter will start counting immediately.
+ 	 */
+ 	public Counter() {
+ 		initCounter(Mode.kTwoPulse);
+@@ -107,6 +117,8 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 * existing digital input is to be shared by multiple other objects such as
+ 	 * encoders.
+ 	 *
++	 * The counter will start counting immediately.
++	 *
+ 	 * @param source
+ 	 *            the digital source to count
+ 	 */
+@@ -121,6 +133,8 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 * Create an instance of a Counter object. Create an up-Counter instance
+ 	 * given a channel.
+ 	 *
++	 * The counter will start counting immediately.
++	 *
+ 	 * @param channel
+ 	 *            the digital input channel to count
+ 	 */
+@@ -134,6 +148,8 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 * up-Counter given an analog trigger. Use the trigger state output from the
+ 	 * analog trigger.
+ 	 *
++	 * The counter will start counting immediately.
++	 *
+ 	 * @param encodingType
+ 	 *            which edges to count
+ 	 * @param upSource
+@@ -175,6 +191,8 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 * up-Counter given an analog trigger. Use the trigger state output from the
+ 	 * analog trigger.
+ 	 *
++	 * The counter will start counting immediately.
++	 *
+ 	 * @param trigger
+ 	 *            the analog trigger to count
+ 	 */
+@@ -422,18 +440,6 @@ public class Counter extends SensorBase implements CounterBase,
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 	}
+ 
+-	/**
+-	 * Start the Counter counting. This enables the counter and it starts
+-	 * accumulating counts from the associated input channel. The counter value
+-	 * is not reset on starting, and still has the previous value.
+-	 */
+-	public void start() {
+-		ByteBuffer status = ByteBuffer.allocateDirect(4);
+-		status.order(ByteOrder.LITTLE_ENDIAN);
+-		CounterJNI.startCounter(m_counter, status.asIntBuffer());
+-		HALUtil.checkStatus(status.asIntBuffer());
+-	}
+-
+ 	/**
+ 	 * Read the current counter value. Read the value at this instant. It may
+ 	 * still be running, so it reflects the current value. Next time it is read,
+@@ -469,17 +475,6 @@ public class Counter extends SensorBase implements CounterBase,
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 	}
+ 
+-	/**
+-	 * Stop the Counter. Stops the counting but doesn't effect the current
+-	 * value.
+-	 */
+-	public void stop() {
+-		ByteBuffer status = ByteBuffer.allocateDirect(4);
+-		status.order(ByteOrder.LITTLE_ENDIAN);
+-		CounterJNI.stopCounter(m_counter, status.asIntBuffer());
+-		HALUtil.checkStatus(status.asIntBuffer());
+-	}
+-
+ 	/**
+ 	 * Set the maximum period where the device is still considered "moving".
+ 	 * Sets the maximum period where the device is considered moving. This value
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CounterBase.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CounterBase.java
+index b98de8ad865a7b3acb7e998d156e95f67a5ace30..29216391ba34c34b7ddc02485ef2cf0d6c01e891 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CounterBase.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CounterBase.java
+@@ -11,6 +11,9 @@ package edu.wpi.first.wpilibj;
+  * Interface for counting the number of ticks on a digital input channel.
+  * Encoders, Gear tooth sensors, and counters should all subclass this so it can be used to
+  * build more advanced classes for control and driving.
++ *
++ * All counters will immediately start counting - reset() them if you need them
++ * to be zeroed before use.
+  */
+ public interface CounterBase {
+ 
+@@ -44,11 +47,6 @@ public interface CounterBase {
+         }
+     }
+ 
+-    /**
+-     * Start the counter
+-     */
+-    public void start();
+-
+     /**
+      * Get the count
+      * @return the count
+@@ -60,11 +58,6 @@ public interface CounterBase {
+      */
+     void reset();
+ 
+-    /**
+-     * Stop counting
+-     */
+-    void stop();
+-
+     /**
+      * Get the time between the last two edges counted
+      * @return the time beteween the last two ticks in seconds
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Encoder.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+index 19ee815a000187da30b2b736eb15b6fb94af42e8..fbc3a4864fbabb76373384c3488e5862f99c6ac9 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Encoder.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+@@ -28,6 +28,9 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * mounted such that forward movement generates negative values. Quadrature
+  * encoders have two digital outputs, an A Channel and a B Channel that are out
+  * of phase with each other to allow the FPGA to do direction sensing.
++ *
++ * All encoders will immediately start counting - reset() them if you need them
++ * to be zeroed before use.
+  */
+ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
+ 
+@@ -58,6 +61,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	 * Common initialization code for Encoders. This code allocates resources
+ 	 * for Encoders and is common to all constructors.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param reverseDirection
+ 	 *            If true, counts down instead of up (this is all relative)
+ 	 * @param encodingType
+@@ -102,11 +107,21 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 		UsageReporting.report(tResourceType.kResourceType_Encoder,
+ 				m_index, m_encodingType.value);
+ 		LiveWindow.addSensor("Encoder", m_aSource.getChannelForRouting(), this);
++
++		if (m_counter == null) {
++			ByteBuffer status = ByteBuffer.allocateDirect(4);
++			// set the byte order
++			status.order(ByteOrder.LITTLE_ENDIAN);
++			EncoderJNI.startEncoder(m_encoder, status.asIntBuffer());
++			HALUtil.checkStatus(status.asIntBuffer());
++		}
+ 	}
+ 
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -129,6 +144,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -141,6 +158,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -175,6 +194,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+ 	 * Using an index pulse forces 4x encoding
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -201,6 +222,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+ 	 * Using an index pulse forces 4x encoding
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -219,6 +242,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	 * shared. The Encoder class will not allocate the digital inputs and assume
+ 	 * that they already are counted.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aSource
+ 	 *            The source that should be used for the a channel.
+ 	 * @param bSource
+@@ -248,6 +273,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	 * shared. The Encoder class will not allocate the digital inputs and assume
+ 	 * that they already are counted.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aSource
+ 	 *            The source that should be used for the a channel.
+ 	 * @param bSource
+@@ -263,6 +290,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	 * shared. The Encoder class will not allocate the digital inputs and assume
+ 	 * that they already are counted.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aSource
+ 	 *            The source that should be used for the a channel.
+ 	 * @param bSource
+@@ -304,6 +333,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	 * shared. The Encoder class will not allocate the digital inputs and assume
+ 	 * that they already are counted.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aSource
+ 	 *            The source that should be used for the a channel.
+ 	 * @param bSource
+@@ -337,6 +368,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	 * shared. The Encoder class will not allocate the digital inputs and assume
+ 	 * that they already are counted.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aSource
+ 	 *            The source that should be used for the a channel.
+ 	 * @param bSource
+@@ -378,36 +411,6 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 		}
+ 	}
+ 
+-	/**
+-	 * Start the Encoder. Starts counting pulses on the Encoder device.
+-	 */
+-	public void start() {
+-		if (m_counter != null) {
+-			m_counter.start();
+-		} else {
+-			ByteBuffer status = ByteBuffer.allocateDirect(4);
+-			// set the byte order
+-			status.order(ByteOrder.LITTLE_ENDIAN);
+-			EncoderJNI.startEncoder(m_encoder, status.asIntBuffer());
+-			HALUtil.checkStatus(status.asIntBuffer());
+-		}
+-	}
+-
+-	/**
+-	 * Stops counting pulses on the Encoder device. The value is not changed.
+-	 */
+-	public void stop() {
+-		if (m_counter != null) {
+-			m_counter.stop();
+-		} else {
+-			ByteBuffer status = ByteBuffer.allocateDirect(4);
+-			// set the byte order
+-			status.order(ByteOrder.LITTLE_ENDIAN);
+-			EncoderJNI.stopEncoder(m_encoder, status.asIntBuffer());
+-			HALUtil.checkStatus(status.asIntBuffer());
+-		}
+-	}
+-
+ 	/**
+ 	 * Gets the raw value from the encoder. The raw value is the actual count
+ 	 * unscaled by the 1x, 2x, or 4x scale factor.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Ultrasonic.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Ultrasonic.java
+index c5e15a78809a5bcf3245cc5a38d088f712c63b80..73c5078221cc07d06cfbd7cb5ab3bd7e04f92f40 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Ultrasonic.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Ultrasonic.java
+@@ -125,7 +125,6 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
+ 		m_counter.setMaxPeriod(1.0);
+ 		m_counter.setSemiPeriodMode(true);
+ 		m_counter.reset();
+-		m_counter.start();
+ 		m_enabled = true; // make it available for round robin scheduling
+ 		setAutomaticMode(originalMode);
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+index 4aa98ec6cf646ae0bef408ed63a6e89ccdb162f1..8be6521399fe1abe452d76966cc011bddf7de100 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+@@ -29,23 +29,23 @@ import edu.wpi.first.wpilibj.test.TestBench;
+ @RunWith(Parameterized.class)
+ public class MotorEncoderTest extends AbstractComsSetup {
+ 	private static final Logger logger = Logger.getLogger(MotorEncoderTest.class.getName());
+-	
++
+ 	private static final double MOTOR_RUNTIME = .25;
+-	
++
+ 	//private static final List<MotorEncoderFixture> pairs = new ArrayList<MotorEncoderFixture>();
+ 	private static MotorEncoderFixture<?> me = null;
+-	
++
+ 	@Override
+ 	protected Logger getClassLogger(){
+ 		return logger;
+ 	}
+-	
++
+ 	public MotorEncoderTest(MotorEncoderFixture<?> mef){
+ 		logger.fine("Constructor with: " + mef.getType());
+ 		if(me != null && !me.equals(mef)) me.teardown();
+ 		me = mef;
+ 	}
+-	
++
+ 	@Parameters(name= "{index}: {0}")
+ 	public static Collection<MotorEncoderFixture<?>[]> generateData(){
+ 		//logger.fine("Loading the MotorList");
+@@ -65,7 +65,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		me.setup();
+ 
+ 	}
+-	
++
+ 	@After
+ 	public void tearDown() throws Exception {
+ 		me.reset();
+@@ -76,7 +76,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		// Clean up the fixture after the test
+ 		me.teardown();
+ 	}
+-	
++
+ 	/**
+ 	 * Test to ensure that the isMotorWithinRange method is functioning properly.
+ 	 * Really only needs to run on one MotorEncoderFixture to ensure that it is working correctly.
+@@ -124,7 +124,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		me.reset();
+ 		encodersResetCheck(me);
+ 	}
+-	
++
+ 	/**
+ 	 * This method test if the counters count when the motors rotate
+ 	 */
+@@ -146,7 +146,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		me.reset();
+ 		encodersResetCheck(me);
+ 	}
+-	
++
+ 	/**
+ 	 * Tests to see if you set the speed to something not <= 1.0 if the code appropriately throttles the value
+ 	 */
+@@ -157,7 +157,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 				+ me.getMotor().get(), me.isMotorSpeedWithinRange(1.0, 0.001));
+ 		me.reset();
+ 	}
+-	
++
+ 	/**
+ 	 * Tests to see if you set the speed to something not >= -1.0 if the code appropriately throttles the value
+ 	 */
+@@ -168,8 +168,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 				+ me.getMotor().get(), me.isMotorSpeedWithinRange(-1.0, 0.001));
+ 		me.reset();
+ 	}
+-	
+-	
++
++
+ 	@Test
+ 	public void testPIDController() {
+ 		PIDController pid = new PIDController(0.003, 0.001, 0, me.getEncoder(),
+@@ -188,8 +188,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		pid.free();
+ 		me.reset();
+ 	}
+-	
+-	
++
++
+ 	/**
+ 	 * Checks to see if the encoders and counters are appropriately reset to zero when reset
+ 	 * @param me The MotorEncoderFixture under test
+@@ -205,7 +205,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		assertTrue(me.getType() + " Motor value: " + motorVal + " when it should be 0", motorVal == 0);
+ 		assertTrue(me.getType() + " Counter value " + counterVal[0] + " when is should be 0", counterVal[0] == 0);
+ 		assertTrue(me.getType() + " Counter value " + counterVal[1] + " when is should be 0", counterVal[1] == 0);
+-		Timer.delay(.1);
++		Timer.delay(.2);
+ 		assertTrue(me.getType() + " Encoder.getStopped() returned false", me.getEncoder().getStopped());
+ 	}
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeCounterFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeCounterFixture.java
+index 1210b07dd73e2ae1c1522e826ed855a7d7a8e757..644a22eef5f7ae07d7a51ce622dcc2c8e1ff8fcc 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeCounterFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeCounterFixture.java
+@@ -70,7 +70,6 @@ public class FakeCounterFixture implements ITestFixture {
+ 	 */
+ 	@Override
+ 	public boolean setup() {
+-		counter.start();
+ 		return true;
+ 		
+ 	}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeEncoderFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeEncoderFixture.java
+index 6daf49ad48f23376b027e83bf7da40e3a3f00edb..19171b33ef6e0da9023f0d6c9a27274e74b39c11 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeEncoderFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/FakeEncoderFixture.java
+@@ -81,7 +81,6 @@ public class FakeEncoderFixture implements ITestFixture {
+ 	 */
+ 	@Override
+ 	public boolean setup() {
+-		m_encoder.start();
+ 		return true;
+ 	}
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
+index 756bc6acf1084168ba6d18336ae41767ca550743..8c34c484f5880f148f5a000674d94e4b86cf0357 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
+@@ -76,15 +76,8 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
+ 				encoder = new Encoder(aSource, bSource);
+ 				counters[0] = new Counter(aSource);
+ 				counters[1] = new Counter(bSource);
+-				for(Counter c: counters){
+-					c.start();
+-				}
+ 				logger.fine("Creating the speed controller!");
+ 				motor = giveSpeedController(); //CANJaguar throws an exception if it doesn't get the message
+-				
+-					
+-				
+-				
+ 			}
+ 		}
+ 	}
+@@ -92,7 +85,6 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
+ 	@Override
+ 	public boolean setup() {
+ 		initialize();
+-		encoder.start();
+ 		return true;
+ 	}
+ 
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/CounterBase.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/CounterBase.java
+index b98de8ad865a7b3acb7e998d156e95f67a5ace30..29216391ba34c34b7ddc02485ef2cf0d6c01e891 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/CounterBase.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/CounterBase.java
+@@ -11,6 +11,9 @@ package edu.wpi.first.wpilibj;
+  * Interface for counting the number of ticks on a digital input channel.
+  * Encoders, Gear tooth sensors, and counters should all subclass this so it can be used to
+  * build more advanced classes for control and driving.
++ *
++ * All counters will immediately start counting - reset() them if you need them
++ * to be zeroed before use.
+  */
+ public interface CounterBase {
+ 
+@@ -44,11 +47,6 @@ public interface CounterBase {
+         }
+     }
+ 
+-    /**
+-     * Start the counter
+-     */
+-    public void start();
+-
+     /**
+      * Get the count
+      * @return the count
+@@ -60,11 +58,6 @@ public interface CounterBase {
+      */
+     void reset();
+ 
+-    /**
+-     * Stop counting
+-     */
+-    void stop();
+-
+     /**
+      * Get the time between the last two edges counted
+      * @return the time beteween the last two ticks in seconds
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+index c1f15acb89868cabc3e8c76bbad2796f562be10e..1ed003ed61a27c08bbe2fe4a6c0a7dcf7fc92bfb 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+@@ -21,6 +21,9 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * mounted such that forward movement generates negative values. Quadrature
+  * encoders have two digital outputs, an A Channel and a B Channel that are out
+  * of phase with each other to allow the FPGA to do direction sensing.
++ *
++ * All encoders will immediately start counting - reset() them if you need them
++ * to be zeroed before use.
+  */
+ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
+ 	private int m_index;
+@@ -37,6 +40,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	 * Common initialization code for Encoders. This code allocates resources
+ 	 * for Encoders and is common to all constructors.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param reverseDirection
+ 	 *            If true, counts down instead of up (this is all relative)
+ 	 * @param encodingType
+@@ -65,11 +70,14 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 		impl = new SimEncoder("simulator/dio/"+aChannel+"/"+bChannel);
+ 		setDistancePerPulse(1);
+ 
++		impl.start();
+ 	}
+ 
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -90,6 +98,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -102,6 +112,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+ 	 *
++	 * The encoder will start counting immediately.
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -132,21 +144,6 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
+ 
+ 	public void free() {}
+ 
+-	/**
+-	 * Start the Encoder.
+-	 * Starts counting pulses on the Encoder device.
+-	 */
+-	public void start() {
+-		impl.start();
+-	}
+-
+-	/**
+-	 * Stops counting pulses on the Encoder device. The value is not changed.
+-	 */
+-	public void stop() {
+-		impl.stop();
+-	}
+-
+ 	/**
+ 	 * Reset the Encoder distance to zero.
+ 	 * Resets the current count to zero on the encoder.

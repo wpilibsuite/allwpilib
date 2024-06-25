@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Sun, 3 Aug 2014 13:13:03 -0400
+Subject: [PATCH 0251/6262] Only update FRC Java Projects (fixes artf2627)
+
+Change-Id: I62715ab5ed01d1d6c6ee1a877fad3d12a5c0219b
+---
+ .../wpilib/plugins/java/WPILibJavaPlugin.java      | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/WPILibJavaPlugin.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/WPILibJavaPlugin.java
+index 9f3d8e2008d6026271eb9bae8af4d2761d063a2f..ad5230676b947db987fc65b2ea7bee05b377bc10 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/WPILibJavaPlugin.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/WPILibJavaPlugin.java
+@@ -100,11 +100,15 @@ public class WPILibJavaPlugin extends AbstractUIPlugin implements IStartup {
+ 	    IProject[] projects = root.getProjects();
+ 	    // Loop over all projects
+ 	    for (IProject project : projects) {
+-	      try {
+-	    	  updateVariables(project);
+-	      } catch (CoreException e) {
+-            WPILibJavaPlugin.logError("Error updating projects.", e);
+-	      }
++			  try {
++				  if(project.hasNature("edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature")){
++					WPILibJavaPlugin.logInfo("Updating project");
++					updateVariables(project);
++				  } else {
++				  }
++			  } catch (CoreException e) {
++				WPILibJavaPlugin.logError("Error updating projects.", e);
++			  }
+ 	    }
+ 	}
+ 	

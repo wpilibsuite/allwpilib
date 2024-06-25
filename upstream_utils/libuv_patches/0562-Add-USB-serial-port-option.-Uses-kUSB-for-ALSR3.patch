@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joe Ross <joe@rossesmail.com>
+Date: Fri, 12 Dec 2014 21:19:31 -0800
+Subject: [PATCH 0562/6262] Add USB serial port option. Uses kUSB for ALSR3
+
+Change-Id: Ie43fa14fff6aa2f332d3ebacfba099984f8b4eb7
+---
+ hal/lib/Athena/SerialPort.cpp                                 | 4 +++-
+ wpilibc/wpilibC++Devices/include/SerialPort.h                 | 2 +-
+ .../src/main/java/edu/wpi/first/wpilibj/SerialPort.java       | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/hal/lib/Athena/SerialPort.cpp b/hal/lib/Athena/SerialPort.cpp
+index 6584f991dc1b1aac60f564ac2aef91a187dce8cd..7393e2cfbddaa87ae22003ad3d00d4bf97d78830 100644
+--- a/hal/lib/Athena/SerialPort.cpp
++++ b/hal/lib/Athena/SerialPort.cpp
+@@ -13,8 +13,10 @@ void serialInitializePort(uint8_t port, int32_t *status) {
+ 	
+ 	if(port == 0)
+ 		portName = "ASRL1::INSTR";
+-	else
++	else if (port == 1)
+ 		portName = "ASRL2::INSTR";
++	else
++		portName = "ASRL3::INSTR";
+ 
+ 	*status = viOpen(m_resourceManagerHandle, const_cast<char*>(portName), VI_NULL, VI_NULL, (ViSession*)&m_portHandle[port]);
+ 	if(*status > 0)
+diff --git a/wpilibc/wpilibC++Devices/include/SerialPort.h b/wpilibc/wpilibC++Devices/include/SerialPort.h
+index 18af15897dd708b1a992f00fb6eee16a1f404817..931e361013ae0b3819db0d29767755fbe8529ead 100644
+--- a/wpilibc/wpilibC++Devices/include/SerialPort.h
++++ b/wpilibc/wpilibC++Devices/include/SerialPort.h
+@@ -27,7 +27,7 @@ public:
+ 	enum StopBits {kStopBits_One=10, kStopBits_OnePointFive=15, kStopBits_Two=20};
+ 	enum FlowControl {kFlowControl_None=0, kFlowControl_XonXoff=1, kFlowControl_RtsCts=2, kFlowControl_DtrDsr=4};
+ 	enum WriteBufferMode {kFlushOnAccess=1, kFlushWhenFull=2};
+-	enum Port {kOnboard=0, kMXP=1};
++	enum Port {kOnboard=0, kMXP=1, kUSB=2};
+ 
+ 	SerialPort(uint32_t baudRate, Port port = kOnboard, uint8_t dataBits = 8, Parity parity = kParity_None,
+ 			StopBits stopBits = kStopBits_One);
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SerialPort.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SerialPort.java
+index a88eed61458c67423ead728b1bacab52c72c3b5b..a991f555bf4b1cbccf33ea70f56c459dea120da3 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SerialPort.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SerialPort.java
+@@ -36,7 +36,8 @@ public class SerialPort {
+ 	
+ 	public enum Port {
+ 		kOnboard(0), 
+-		kMXP(1);
++		kMXP(1),
++		kUSB(2);
+ 		
+ 		private int value;
+ 		

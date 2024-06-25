@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Sun, 8 Jun 2014 16:40:54 -0400
+Subject: [PATCH 0080/6262] Disable driver station at C++ program start
+
+Change-Id: I56169344e1ee6e791a078de14655c91463bfafd0
+---
+ wpilibc/wpilibC++/include/RobotBase.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/wpilibc/wpilibC++/include/RobotBase.h b/wpilibc/wpilibC++/include/RobotBase.h
+index 6c837f72eb87bcfac7eef74a85db6f1f5087f9b8..be0711132c6b538b487e913edd3d08a7547c6c26 100644
+--- a/wpilibc/wpilibC++/include/RobotBase.h
++++ b/wpilibc/wpilibC++/include/RobotBase.h
+@@ -31,6 +31,8 @@ class DriverStation;
+ 	int main() \
+ 	{ \
+ 		if (!HALInitialize()){std::cerr<<"FATAL ERROR: HAL could not be initialized"<<std::endl;return -1;}	\
++		HALNetworkCommunicationObserveUserProgramStarting(); \
++		HALReport(HALUsageReporting::kResourceType_Language, HALUsageReporting::kLanguage_CPlusPlus); \
+ 		(new _ClassName_())->StartCompetition(); \
+ 		return 0; \
+ 	}

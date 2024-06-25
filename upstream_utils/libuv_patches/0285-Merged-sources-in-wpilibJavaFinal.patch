@@ -1,0 +1,145 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Tue, 12 Aug 2014 14:47:11 -0400
+Subject: [PATCH 0285/6262] Merged sources in wpilibJavaFinal.
+
+Change-Id: Iab8d079716eae3e5631cf7a62d6e88340e55e03c
+---
+ .../edu.wpi.first.wpilib.plugins.java/pom.xml | 21 +++++++++-
+ wpilibj/wpilibJava/pom.xml                    | 12 ++++++
+ wpilibj/wpilibJavaFinal/pom.xml               | 39 ++++++++++++++++++-
+ 3 files changed, 70 insertions(+), 2 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
+index 9b3d4d79436d5497b583a79e2ae043561df4960f..1461865dbb33dbe28bdd8e1585a9d380ff3393e4 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
+@@ -92,7 +92,7 @@
+                 </artifactItem>
+                 <artifactItem>
+ 				  <groupId>edu.wpi.first.wpilibj</groupId>
+-				  <artifactId>wpilibJavaDevices</artifactId>
++				  <artifactId>wpilibJavaFinal</artifactId>
+ 				  <version>0.1.0-SNAPSHOT</version>
+ 				  <classifier>sources</classifier>
+ 				  <outputDirectory>${java-zip}/lib</outputDirectory>
+@@ -107,6 +107,13 @@
+ 				  <type>javadoc</type>
+ 				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
+                 </artifactItem>
++                <artifactItem>
++				  <groupId>edu.wpi.first.wpilibj</groupId>
++				  <artifactId>wpilibJava</artifactId>
++				  <version>0.1.0-SNAPSHOT</version>
++				  <type>javadoc</type>
++				  <outputDirectory>${java-zip}/javadoc-jar</outputDirectory>
++                </artifactItem>
+               </artifactItems>
+               
+               <overWriteReleases>false</overWriteReleases>
+@@ -329,6 +336,12 @@
+ 			  <version>0.1.0-SNAPSHOT</version>
+ 			  <type>jar</type>
+ 	</dependency>
++	<dependency>
++			  <groupId>edu.wpi.first.wpilibj</groupId>
++			  <artifactId>wpilibJavaFinal</artifactId>
++			  <version>0.1.0-SNAPSHOT</version>
++			  <classifier>sources</classifier>
++	</dependency>
+ 	<!-- dependency>
+ 			  <groupId>net.java.dev.jna</groupId>
+ 			  <artifactId>jna</artifactId>
+@@ -361,6 +374,12 @@
+ 	</dependency>
+ 
+ 	<!-- Javadoc -->
++	<dependency>
++			  <groupId>edu.wpi.first.wpilibj</groupId>
++			  <artifactId>wpilibJava</artifactId>
++			  <version>0.1.0-SNAPSHOT</version>
++			  <type>javadoc</type>
++	</dependency>
+ 	<dependency>
+ 			  <groupId>edu.wpi.first.wpilibj</groupId>
+ 			  <artifactId>wpilibJavaDevices</artifactId>
+diff --git a/wpilibj/wpilibJava/pom.xml b/wpilibj/wpilibJava/pom.xml
+index 3699499472810aefb05fcc65e2696ab681c86793..de8ced712f7ced3b9e4b5b07efdf32da2260ccce 100644
+--- a/wpilibj/wpilibJava/pom.xml
++++ b/wpilibj/wpilibJava/pom.xml
+@@ -63,6 +63,18 @@
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-source-plugin</artifactId>
+       </plugin>
++      <plugin>
++        <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-javadoc-plugin</artifactId>
++        <configuration>
++      	  <sourceFileExcludes>
++      	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
++      	  </sourceFileExcludes>
++        </configuration>
++      </plugin>
+     </plugins>
+   </build>
+ </project>
+diff --git a/wpilibj/wpilibJavaFinal/pom.xml b/wpilibj/wpilibJavaFinal/pom.xml
+index df2d974653ea485de7df4780bd1f234654c0b2c8..be0653c5d0b1b255585b3a82919cd63415611151 100644
+--- a/wpilibj/wpilibJavaFinal/pom.xml
++++ b/wpilibj/wpilibJavaFinal/pom.xml
+@@ -30,7 +30,20 @@
+ 	  <artifactId>wpilibJavaJNI</artifactId>
+ 	  <version>0.1.0-SNAPSHOT</version>
+ 	  <type>so</type>
+-	  </dependency>
++	</dependency>
++    
++	<dependency>
++	  <groupId>edu.wpi.first.wpilibj</groupId>
++	  <artifactId>wpilibJava</artifactId>
++	  <version>0.1.0-SNAPSHOT</version>
++	  <classifier>sources</classifier>
++	</dependency>
++	<dependency>
++	  <groupId>edu.wpi.first.wpilibj</groupId>
++	  <artifactId>wpilibJavaDevices</artifactId>
++	  <version>0.1.0-SNAPSHOT</version>
++	  <classifier>sources</classifier>
++	</dependency>
+   </dependencies>
+ 
+   <build>
+@@ -99,6 +112,30 @@
+               </target>
+             </configuration>
+           </execution>
++          
++          <execution>
++            <id>generate-sources</id>
++            <goals>
++              <goal>run</goal>
++            </goals>
++            <phase>generate-sources</phase>
++            <configuration>
++              <target>
++                <taskdef resource="net/sf/antcontrib/antcontrib.properties"
++                         classpathref="maven.plugin.classpath" />
++                <mkdir dir="${project.build.directory}/sources" />
++
++                <property name="mvn.wpilibJava.sources.path" value="${edu.wpi.first.wpilibj:wpilibJava:jar:sources}"/>
++                <unzip src="${mvn.wpilibJava.sources.path}" dest="${project.build.directory}/sources" />
++
++                <property name="mvn.wpilibJavaDevices.sources.path" value="${edu.wpi.first.wpilibj:wpilibJavaDevices:jar:sources}"/>
++                <unzip src="${mvn.wpilibJavaDevices.sources.path}" dest="${project.build.directory}/sources" />
++
++                <zip basedir="${project.build.directory}/sources" destfile="${project.build.directory}/sources.jar"/>
++                <attachartifact file="${project.build.directory}/sources.jar" classifier="sources" type="jar" />
++              </target>
++            </configuration>
++          </execution>
+         </executions>
+         <dependencies>
+           <dependency>

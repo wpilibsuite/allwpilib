@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Tue, 26 Aug 2014 14:26:11 -0400
+Subject: [PATCH 0319/6262] Cpp tests without color for jenkins. Fixes startDS
+ to not kill the driver station.
+
+Change-Id: I538aae4e2d6d94f0f510203d2d4cb9f40ffa4303
+---
+ test-scripts/jenkins-run-tests-get-results.sh | 2 +-
+ test-scripts/spawn_driver_station.sh          | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/test-scripts/jenkins-run-tests-get-results.sh b/test-scripts/jenkins-run-tests-get-results.sh
+index 059120d536b3eb567877b69896e1ec6d6c39a665..86a4690cfb2d54e9a98405ca418505bc050e8dcd 100755
+--- a/test-scripts/jenkins-run-tests-get-results.sh
++++ b/test-scripts/jenkins-run-tests-get-results.sh
+@@ -28,7 +28,7 @@ fi
+ printf "Running cpp test\n"
+ 
+ # Run the C++ Tests
+-./deploy-and-run-test-on-robot.sh cpp "--gtest_output=xml:${DEFAULT_DESTINATION_CPP_TEST_RESULTS}"
++./deploy-and-run-test-on-robot.sh cpp -A "--gtest_output=xml:${DEFAULT_DESTINATION_CPP_TEST_RESULTS}"
+ 
+ # Retrive the C++ Test Results
+ SCP_GET_CPP_TEST_RESULT="scp ${ROBOT_ADDRESS}:${DEFAULT_DESTINATION_CPP_TEST_RESULTS} ${DEFAULT_LOCAL_CPP_TEST_RESULT}"
+diff --git a/test-scripts/spawn_driver_station.sh b/test-scripts/spawn_driver_station.sh
+index cd2f14b4c7a8c59267ac2e258e1e1ff2dc581ca6..eb4557ca7c09f91957b042c1f223d723f569a74d 100755
+--- a/test-scripts/spawn_driver_station.sh
++++ b/test-scripts/spawn_driver_station.sh
+@@ -39,5 +39,3 @@ function startDS {
+ startDS&
+ 
+ sleep 1
+-
+-exit

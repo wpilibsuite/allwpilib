@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Sun, 8 Jun 2014 16:41:47 -0400
+Subject: [PATCH 0088/6262] Sets the default PIDSourceParameter to be kDistance
+ so there is no null pointer exception
+
+Change-Id: Ice4889ea3f6fd5afe6984f9715758a178222837f
+---
+ .../wpilibJava/src/main/java/edu/wpi/first/wpilibj/Encoder.java  | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Encoder.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+index 9eaf4b6c1703ffddbcb716e91a6bb46353db0e58..433a4dda1f76400503bb269e9027c99daac965d2 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Encoder.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+@@ -99,6 +99,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 			break;
+ 		}
+ 		m_distancePerPulse = 1.0;
++		m_pidSource = PIDSourceParameter.kDistance;
+ 
+ 		UsageReporting.report(tResourceType.kResourceType_Encoder,
+ 				m_index, m_encodingType.value);

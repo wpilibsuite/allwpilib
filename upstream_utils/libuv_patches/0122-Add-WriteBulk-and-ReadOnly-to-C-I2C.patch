@@ -1,0 +1,2331 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 18 Jun 2014 15:38:02 -0400
+Subject: [PATCH 0122/6262] * Add WriteBulk and ReadOnly to C++ I2C
+
+Change-Id: If6082f6b92b4be5e328278ba536d5a7681082c9f (+4 squashed commit)
+
+Squashed commit:
+
+[86b4ae7] * Port I2C to roboRIO in JNI and Java. Left read method as a transaction and added readOnly. Left write as a single byte and added writeBulk. Need to go back to C++ and update to match.
+
+Change-Id: I290d84211a4b7bb942d785730c0e6929449cf69f
+
+[7d37419] * Remove HiTechnic sensors from Java. May be added back later as examples
+
+Change-Id: Ie93e23a70fd953c99c03d50d9529220f86d32e03
+
+[e62bfbf] * I2C ported to roboRIO i2clib in HAL and C++
+
+Change-Id: Idb0e8cee5a1e8c1a0b0733ca94b528f659352915
+
+[1059a48] * Remove HiTechnic sensors (Lego connector) may be added back as examples later
+
+Change-Id: I84b8e1e022db2c69d487ed9ad5b3ec0e7ea57282 (+2 squashed commit)
+
+Squashed commit:
+
+[e62bfbf] * I2C ported to roboRIO i2clib in HAL and C++
+
+Change-Id: Idb0e8cee5a1e8c1a0b0733ca94b528f659352915
+
+[1059a48] * Remove HiTechnic sensors (Lego connector) may be added back as examples later
+
+Change-Id: I84b8e1e022db2c69d487ed9ad5b3ec0e7ea57282
+---
+ hal/include/HAL/Digital.hpp                   |  10 +-
+ hal/lib/Athena/Digital.cpp                    | 214 ++++++----
+ hal/lib/Athena/i2clib/i2c-lib.h               |   9 +
+ wpilibc/wpilibC++/include/ADXL345_I2C.h       |  16 +-
+ wpilibc/wpilibC++/include/DigitalModule.h     |   2 -
+ .../wpilibC++/include/HiTechnicColorSensor.h  |  78 ----
+ wpilibc/wpilibC++/include/HiTechnicCompass.h  |  50 ---
+ wpilibc/wpilibC++/include/I2C.h               |  18 +-
+ wpilibc/wpilibC++/include/WPILib.h            |   2 -
+ wpilibc/wpilibC++/lib/ADXL345_I2C.cpp         |  43 +-
+ wpilibc/wpilibC++/lib/DigitalModule.cpp       |  12 -
+ .../wpilibC++/lib/HiTechnicColorSensor.cpp    | 386 ------------------
+ wpilibc/wpilibC++/lib/HiTechnicCompass.cpp    | 105 -----
+ wpilibc/wpilibC++/lib/I2C.cpp                 | 114 ++++--
+ .../edu/wpi/first/wpilibj/ADXL345_I2C.java    |   9 +-
+ .../edu/wpi/first/wpilibj/DigitalModule.java  |  11 -
+ .../first/wpilibj/HiTechnicColorSensor.java   | 385 -----------------
+ .../wpi/first/wpilibj/HiTechnicCompass.java   | 140 -------
+ .../main/java/edu/wpi/first/wpilibj/I2C.java  | 117 ++++--
+ .../edu/wpi/first/wpilibj/hal/I2CJNI.java     |   7 +-
+ wpilibj/wpilibJavaJNI/lib/I2CJNI.cpp          |  96 ++++-
+ 21 files changed, 431 insertions(+), 1393 deletions(-)
+ delete mode 100644 wpilibc/wpilibC++/include/HiTechnicColorSensor.h
+ delete mode 100644 wpilibc/wpilibC++/include/HiTechnicCompass.h
+ delete mode 100644 wpilibc/wpilibC++/lib/HiTechnicColorSensor.cpp
+ delete mode 100644 wpilibc/wpilibC++/lib/HiTechnicCompass.cpp
+ delete mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HiTechnicColorSensor.java
+ delete mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HiTechnicCompass.java
+
+diff --git a/hal/include/HAL/Digital.hpp b/hal/include/HAL/Digital.hpp
+index 4a53552aae1049728218fa32313f7ffe0abe3c63..91ec4939a728c73c981ced90f32f8613a98ce9fe 100644
+--- a/hal/include/HAL/Digital.hpp
++++ b/hal/include/HAL/Digital.hpp
+@@ -141,11 +141,11 @@ extern "C"
+ 	void resetSPI(void* spi_pointer, int32_t *status);
+ 	void clearSPIReceivedData(void* spi_pointer, int32_t *status);
+ 
+-	bool doI2CTransaction(uint8_t address, bool compatibilityMode, uint8_t *dataToSend,
+-			uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize, int32_t *status);
+-	bool doI2CTransactionWithModule(uint8_t module, uint8_t address, bool compatibilityMode,
+-			uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize,
+-			int32_t *status);
++	void i2CInitialize(uint8_t port, int32_t *status);
++	int i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize);
++	int i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize);
++	int i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count);
++	void i2CClose(uint8_t port);
+ 
+ 	//// Float JNA Hack
+ 	// double
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index 58e2897198b9c89d0d555a9635e7e69051621c34..7bd533aa59260b4e7cc0a7cfd779b995eb1c6ce9 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -9,6 +9,7 @@
+ #include "NetworkCommunication/LoadOut.h"
+ #include <stdio.h>
+ #include <math.h>
++#include "i2clib/i2c-lib.h"
+ 
+ static const uint32_t kExpectedLoopTiming = 40;
+ static const uint32_t kDigitalPins = 20;
+@@ -52,7 +53,9 @@ struct DigitalPort {
+ MUTEX_ID digitalDIOSemaphore = NULL;
+ MUTEX_ID digitalRelaySemaphore = NULL;
+ MUTEX_ID digitalPwmSemaphore = NULL;
+-MUTEX_ID digitalI2CSemaphore = NULL;
++MUTEX_ID digitalI2COnBoardSemaphore = NULL;
++MUTEX_ID digitalI2CMXPSemaphore = NULL;
++
+ tDIO* digitalSystem = NULL;
+ tRelay* relaySystem = NULL;
+ tPWM* pwmSystem = NULL;
+@@ -61,6 +64,11 @@ Resource *DO_PWMGenerators = NULL;
+ 
+ bool digitalSystemsInitialized = false;
+ 
++uint8_t i2COnboardObjCount = 0;
++uint8_t i2CMXPObjCount = 0;
++uint8_t i2COnBoardHandle = 0;
++uint8_t i2CMXPHandle = 0;
++
+ /**
+  * Initialize the digital modules.
+  */
+@@ -76,7 +84,8 @@ void initializeDigital(int32_t *status) {
+   // Create a semaphore to protect changes to the DO PWM config
+   digitalPwmSemaphore = initializeMutexRecursive();
+ 
+-  digitalI2CSemaphore = initializeMutexRecursive();
++  digitalI2COnBoardSemaphore = initializeMutexRecursive();
++  digitalI2CMXPSemaphore = initializeMutexRecursive();
+   
+   Resource::CreateResourceObject(&DIOChannels, tDIO::kNumSystems * kDigitalPins);
+   Resource::CreateResourceObject(&DO_PWMGenerators, tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
+@@ -1539,86 +1548,153 @@ uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status) {return 0;}
+ void resetSPI(void* spi_pointer, int32_t *status) {}
+ void clearSPIReceivedData(void* spi_pointer, int32_t *status) {}
+ 
++/*
++ * Initialize the I2C port. Opens the port if necessary and saves the handle.
++ * If opening the MXP port, also sets up the pin functions appropriately
++ * @param port The port to open, 0 for the on-board, 1 for the MXP.
++ */
++void i2CInitialize(uint8_t port, int32_t *status) {
++	if(port > 1)
++	{
++		//Set port out of range error here
++		return;
++	}
++
++	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
++	{
++		Synchronized sync(lock);
++		if(port == 0) {
++			i2COnboardObjCount++;
++			if (i2COnBoardHandle > 0) return;
++			i2COnBoardHandle = i2clib_open("/dev/i2c-2");
++		} else if(port == 1) {
++			i2CMXPObjCount++;
++			if (i2CMXPHandle > 0) return;
++			initializeDigital(status);
++			digitalSystem->writeEnableMXPSpecialFunction(digitalSystem->readEnableMXPSpecialFunction(status)|0xC000, status);
++			i2CMXPHandle = i2clib_open("/dev/i2c-1");
++		}
++	return;
++	}
++}
++
+ /**
+  * Generic transaction.
+- * 
++ *
+  * This is a lower-level interface to the I2C hardware giving you more control over each transaction.
+- * 
++ *
+  * @param dataToSend Buffer of data to send as part of the transaction.
+  * @param sendSize Number of bytes to send as part of the transaction. [0..6]
+  * @param dataReceived Buffer to read data into.
+- * @param receiveSize Number of byted to read from the device. [0..7]
++ * @param receiveSize Number of bytes to read from the device. [0..7]
+  * @return Transfer Aborted... false for success, true for aborted.
+  */
+-bool doI2CTransaction(uint8_t address, bool compatibilityMode, uint8_t *dataToSend,
+-					  uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize,
+-					  int32_t *status) {
+-  return doI2CTransactionWithModule(1, address, compatibilityMode, dataToSend, sendSize,
+-									dataReceived, receiveSize, status);
++int i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize)
++{
++	if(port > 1) {
++		//Set port out of range error here
++		return -1;
++	}
++	/*if (sendSize > 6) // Optional, provides better error message.	TODO: Are these limits still right? Implement error. Check for null buffer
++	{
++		wpi_setWPIErrorWithContext(ParameterOutOfRange, "sendSize");
++		return true;
++	}
++	if (receiveSize > 7) // Optional, provides better error message.
++	{
++		wpi_setWPIErrorWithContext(ParameterOutOfRange, "receiveSize");
++		return true;
++	}*/
++	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
++	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
++
++	{
++		Synchronized sync(lock);
++		return i2clib_writeread(handle, deviceAddress, (const char*) dataToSend, (int32_t) sendSize, (char*) dataReceived, (int32_t) receiveSize);
++	}
+ }
+ 
+ /**
+- * Generic transaction.
+- * 
+- * This is a lower-level interface to the I2C hardware giving you more control over each transaction.
+- * 
+- * @param dataToSend Buffer of data to send as part of the transaction.
+- * @param sendSize Number of bytes to send as part of the transaction. [0..6]
+- * @param dataReceived Buffer to read data into.
+- * @param receiveSize Number of byted to read from the device. [0..7]
++ * Execute a write transaction with the device.
++ *
++ * Write a single byte to a register on a device and wait until the
++ *   transaction is complete.
++ *
++ * @param registerAddress The address of the register on the device to be written.
++ * @param data The byte to write to the register on the device.
+  * @return Transfer Aborted... false for success, true for aborted.
+  */
+-bool doI2CTransactionWithModule(uint8_t module, uint8_t address, bool compatibilityMode,
+-								uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived,
+-								uint8_t receiveSize, int32_t *status) {
+-  // initializeDigital(status);
+-  // if (sendSize > 6) {
+-  // 	*status = PARAMETER_OUT_OF_RANGE;
+-  // 	// TODO: wpi_setWPIErrorWithContext(ParameterOutOfRange, "sendSize");
+-  // 	return true;
+-  // }
+-  // if (receiveSize > 7) {
+-  // 	*status = PARAMETER_OUT_OF_RANGE;
+-  // 	// TODO: wpi_setWPIErrorWithContext(ParameterOutOfRange, "receiveSize");
+-  // 	return true;
+-  // }
+-
+-  // uint32_t data=0;
+-  // uint32_t dataHigh=0;
+-  // uint32_t i;
+-  // for(i=0; i<sendSize && i<sizeof(data); i++) {
+-  // 	data |= (uint32_t)dataToSend[i] << (8*i);
+-  // }
+-  // for(; i<sendSize; i++) {
+-  // 	dataHigh |= (uint32_t)dataToSend[i] << (8*(i-sizeof(data)));
+-  // }
+-
+-  // bool aborted = true;
+-  // {
+-  // 	Synchronized sync(digitalI2CSemaphore);
+-  // 	digitalModules[module]->writeI2CConfig_Address(address, status);
+-  // 	digitalModules[module]->writeI2CConfig_BytesToWrite(sendSize, status);
+-  // 	digitalModules[module]->writeI2CConfig_BytesToRead(receiveSize, status);
+-  // 	if (sendSize > 0) digitalModules[module]->writeI2CDataToSend(data, status);
+-  // 	if (sendSize > sizeof(data)) digitalModules[module]->writeI2CConfig_DataToSendHigh(dataHigh, status);
+-  // 	digitalModules[module]->writeI2CConfig_BitwiseHandshake(compatibilityMode, status);
+-  // 	uint8_t transaction = digitalModules[module]->readI2CStatus_Transaction(status);
+-  // 	digitalModules[module]->strobeI2CStart(status);
+-  // 	while(transaction == digitalModules[module]->readI2CStatus_Transaction(status)) delayTicks(1);
+-  // 	while(!digitalModules[module]->readI2CStatus_Done(status)) delayTicks(1);
+-  // 	aborted = digitalModules[module]->readI2CStatus_Aborted(status);
+-  // 	if (receiveSize > 0) data = digitalModules[module]->readI2CDataReceived(status);
+-  // 	if (receiveSize > sizeof(data)) dataHigh = digitalModules[module]->readI2CStatus_DataReceivedHigh(status);
+-  // }
+-
+-  // for(i=0; i<receiveSize && i<sizeof(data); i++) {
+-  // 	dataReceived[i] = (data >> (8*i)) & 0xFF;
+-  // }
+-  // for(; i<receiveSize; i++) {
+-  // 	dataReceived[i] = (dataHigh >> (8*(i-sizeof(data)))) & 0xFF;
+-  // }
+-  // return aborted;
+-  return false; // XXX: What happened to I2C?
++int i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8_t sendSize)
++{
++	if(port > 1) {
++		//Set port out of range error here
++		return -1;
++	}
++	/*if (sendSize > 6) // Optional, provides better error message.	TODO: Are these limits still right? Implement error. Check for null buffer
++	{
++		wpi_setWPIErrorWithContext(ParameterOutOfRange, "sendSize");
++		return true;
++	}*/
++	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
++	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
++	{
++		Synchronized sync(lock);
++		return i2clib_write(handle, deviceAddress, (const char*) dataToSend, (int32_t) sendSize);
++	}
++}
++
++/**
++ * Execute a read transaction with the device.
++ *
++ * Read 1 to 7 bytes from a device.
++ * Most I2C devices will auto-increment the register pointer internally
++ *   allowing you to read up to 7 consecutive registers on a device in a
++ *   single transaction.
++ *
++ * @param registerAddress The register to read first in the transaction.
++ * @param count The number of bytes to read in the transaction. [1..7]
++ * @param buffer A pointer to the array of bytes to store the data read from the device.
++ * @return Transfer Aborted... false for success, true for aborted.
++ */
++int i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count)
++{
++	if(port > 1) {
++		//Set port out of range error here
++		return -1;
++	}
++	/*	if (count < 1 || count > 7) Todo: Are these limits still right? Implement error
++		{
++			wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
++			return true;
++		}
++		if (buffer == NULL)
++		{
++			wpi_setWPIErrorWithContext(NullParameter, "buffer");
++			return true;
++		}*/
++	int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
++	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
++	{
++		Synchronized sync(lock);
++		return i2clib_read(handle, deviceAddress, (char*) buffer, (int32_t) count);
++	}
++
++}
++
++void i2CClose(uint8_t port) {
++	if(port > 1) {
++		//Set port out of range error here
++		return;
++	}
++	MUTEX_ID lock = port == 0 ? digitalI2COnBoardSemaphore:digitalI2CMXPSemaphore;
++	{
++		Synchronized sync(lock);
++		if((port == 0 ? i2COnboardObjCount--:i2CMXPObjCount--) == 0) {
++			int32_t handle = port == 0 ? i2COnBoardHandle:i2CMXPHandle;
++			i2clib_close(handle);
++		}
++	}
++	return;
+ }
+ 
+ 
+diff --git a/hal/lib/Athena/i2clib/i2c-lib.h b/hal/lib/Athena/i2clib/i2c-lib.h
+index 123fe7a752cc6f48b2a0fb2792d6b14e546009c5..0a93fe5ea54e337fedaaaa13e851328103fdf477 100644
+--- a/hal/lib/Athena/i2clib/i2c-lib.h
++++ b/hal/lib/Athena/i2clib/i2c-lib.h
+@@ -1,7 +1,16 @@
+ #pragma once
+ 
++#ifdef __cplusplus
++extern "C" {
++#endif
++
+ int i2clib_open(const char *device);
+ void i2clib_close(int handle);
+ int i2clib_read(int handle, uint8_t dev_addr, char *recv_buf, int32_t recv_size);
+ int i2clib_write(int handle, uint8_t dev_addr, const char *send_buf, int32_t send_size);
+ int i2clib_writeread(int handle, uint8_t dev_addr, const char *send_buf, int32_t send_size, char *recv_buf, int32_t recv_size);
++
++#ifdef __cplusplus
++}
++#endif
++
+diff --git a/wpilibc/wpilibC++/include/ADXL345_I2C.h b/wpilibc/wpilibC++/include/ADXL345_I2C.h
+index 4bd20baaa38bb3ce288138dfe56d8c3234df28fc..3839c615a2224afe2ad4e26888bf6f021cfe5be5 100644
+--- a/wpilibc/wpilibC++/include/ADXL345_I2C.h
++++ b/wpilibc/wpilibC++/include/ADXL345_I2C.h
+@@ -5,20 +5,18 @@
+ /*----------------------------------------------------------------------------*/
+ #pragma once
+ 
+-#include "SensorBase.h"
+-
+-class I2C;
++#include "I2C.h"
+ 
+ /**
+  * ADXL345 Accelerometer on I2C.
+  *
+- * This class alows access to a Analog Devices ADXL345 3-axis accelerometer on an I2C bus.
+- * This class assumes the default (not alternate) sensor address of 0x3A (8-bit address).
++ * This class allows access to a Analog Devices ADXL345 3-axis accelerometer on an I2C bus.
++ * This class assumes the default (not alternate) sensor address of 0x1D (7-bit address).
+  */
+-class ADXL345_I2C : public SensorBase
++class ADXL345_I2C : public I2C
+ {
+ protected:
+-	static const uint8_t kAddress = 0x3A;
++	static const uint8_t kAddress = 0x1D;
+ 	static const uint8_t kPowerCtlRegister = 0x2D;
+ 	static const uint8_t kDataFormatRegister = 0x31;
+ 	static const uint8_t kDataRegister = 0x32;
+@@ -38,11 +36,11 @@ public:
+ 	};
+ 
+ public:
+-	explicit ADXL345_I2C(DataFormat_Range range=kRange_2G);
++	ADXL345_I2C(Port port, DataFormat_Range range=kRange_2G);
+ 	virtual ~ADXL345_I2C();
+ 	virtual double GetAcceleration(Axes axis);
+ 	virtual AllAxes GetAccelerations();
+ 
+ protected:
+-	I2C* m_i2c;
++	//I2C* m_i2c;
+ };
+diff --git a/wpilibc/wpilibC++/include/DigitalModule.h b/wpilibc/wpilibC++/include/DigitalModule.h
+index f280fc43bcfc74bb35f2df3b014b30cbc3ba79ae..028a16c2000e011f0a3dff26ecff53e9175f6ffc 100644
+--- a/wpilibc/wpilibC++/include/DigitalModule.h
++++ b/wpilibc/wpilibC++/include/DigitalModule.h
+@@ -48,8 +48,6 @@ public:
+ 	void SetDO_PWMOutputChannel(uint32_t pwmGenerator, uint32_t channel);
+ 	uint16_t GetLoopTiming();
+ 
+-	I2C* GetI2C(uint32_t address);
+-
+ 	static DigitalModule* GetInstance(uint8_t moduleNumber);
+ 	static uint8_t RemapDigitalChannel(uint32_t channel)
+ 	{
+diff --git a/wpilibc/wpilibC++/include/HiTechnicColorSensor.h b/wpilibc/wpilibC++/include/HiTechnicColorSensor.h
+deleted file mode 100644
+index fbcb350ec113162a88917ee834e92f7b18c26d04..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/include/HiTechnicColorSensor.h
++++ /dev/null
+@@ -1,78 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "SensorBase.h"
+-#include "LiveWindow/LiveWindowSendable.h"
+-
+-class I2C;
+-
+-/**
+- * HiTechnic NXT Color Sensor.
+- *
+- * This class allows access to a HiTechnic NXT Color Sensor on an I2C bus.
+- * These sensors do not allow changing addresses so you cannot have more
+- * than one on a single bus.
+- *
+- * Details on the sensor can be found here:
+- *   http://www.hitechnic.com/index.html?lang=en-us&target=d17.html
+- *
+- */
+-class HiTechnicColorSensor : public SensorBase
+-{
+-public:
+-	enum tColorMode
+-	{
+-		kActive = 0,
+-		kPassive = 1,
+-		kRaw = 3
+-	};
+-	struct RGB
+-	{
+-		uint16_t red;
+-		uint16_t blue;
+-		uint16_t green;
+-	};
+-	HiTechnicColorSensor();
+-	virtual ~HiTechnicColorSensor();
+-	uint8_t GetColor();
+-	uint8_t GetRed();
+-	uint8_t GetGreen();
+-	uint8_t GetBlue();
+-	RGB GetRGB();
+-	uint16_t GetRawRed();
+-	uint16_t GetRawGreen();
+-	uint16_t GetRawBlue();
+-	RGB GetRawRGB();
+-	void SetMode(tColorMode mode);
+-
+-	//LiveWindowSendable interface
+-	virtual std::string GetType();
+-	virtual void InitTable(ITable *subtable);
+-	virtual void UpdateTable();
+-	virtual ITable* GetTable();
+-	virtual void StartLiveWindowMode();
+-	virtual void StopLiveWindowMode();
+-
+-private:
+-	static const uint8_t kAddress = 0x02;
+-	static const uint8_t kManufacturerBaseRegister = 0x08;
+-	static const uint8_t kManufacturerSize = 0x08;
+-	static const uint8_t kSensorTypeBaseRegister = 0x10;
+-	static const uint8_t kSensorTypeSize = 0x08;
+-	static const uint8_t kModeRegister = 0x41;
+-	static const uint8_t kColorRegister = 0x42;
+-	static const uint8_t kRedRegister = 0x43;
+-	static const uint8_t kGreenRegister = 0x44;
+-	static const uint8_t kBlueRegister = 0x45;
+-	static const uint8_t kRawRedRegister = 0x43;
+-	static const uint8_t kRawGreenRegister = 0x45;
+-	static const uint8_t kRawBlueRegister = 0x47;
+-
+-	int m_mode;
+-	I2C* m_i2c;
+-	ITable *m_table;
+-};
+diff --git a/wpilibc/wpilibC++/include/HiTechnicCompass.h b/wpilibc/wpilibC++/include/HiTechnicCompass.h
+deleted file mode 100644
+index f0474e4d3d223ab628723acc24de9efd9c4283c3..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/include/HiTechnicCompass.h
++++ /dev/null
+@@ -1,50 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "SensorBase.h"
+-#include "LiveWindow/LiveWindowSendable.h"
+-
+-class I2C;
+-
+-/**
+- * HiTechnic NXT Compass.
+- *
+- * This class alows access to a HiTechnic NXT Compass on an I2C bus.
+- * These sensors to not allow changing addresses so you cannot have more
+- *   than one on a single bus.
+- *
+- * Details on the sensor can be found here:
+- *   http://www.hitechnic.com/index.html?lang=en-us&target=d17.html
+- *
+- * @todo Implement a calibration method for the sensor.
+- */
+-class HiTechnicCompass : public SensorBase, public LiveWindowSendable
+-{
+-public:
+-	HiTechnicCompass();
+-	virtual ~HiTechnicCompass();
+-	float GetAngle();
+-
+-	void UpdateTable();
+-	void StartLiveWindowMode();
+-	void StopLiveWindowMode();
+-	std::string GetSmartDashboardType();
+-	void InitTable(ITable *subTable);
+-	ITable * GetTable();
+-
+-private:
+-	static const uint8_t kAddress = 0x02;
+-	static const uint8_t kManufacturerBaseRegister = 0x08;
+-	static const uint8_t kManufacturerSize = 0x08;
+-	static const uint8_t kSensorTypeBaseRegister = 0x10;
+-	static const uint8_t kSensorTypeSize = 0x08;
+-	static const uint8_t kHeadingRegister = 0x44;
+-
+-	I2C* m_i2c;
+-
+-	ITable *m_table;
+-};
+diff --git a/wpilibc/wpilibC++/include/I2C.h b/wpilibc/wpilibC++/include/I2C.h
+index 0a71d0623c7027edf65150a4a4fb767b68147fab..6b22797a6895d6ed4e3a02ea010d60519b4f1fbd 100644
+--- a/wpilibc/wpilibC++/include/I2C.h
++++ b/wpilibc/wpilibC++/include/I2C.h
+@@ -6,7 +6,6 @@
+ #pragma once
+ 
+ #include "SensorBase.h"
+-#include "HAL/Semaphore.hpp"
+ 
+ class DigitalModule;
+ 
+@@ -16,29 +15,26 @@ class DigitalModule;
+  * This class is intended to be used by sensor (and other I2C device) drivers.
+  * It probably should not be used directly.
+  * 
+- * It is constructed by calling DigitalModule::GetI2C() on a DigitalModule object.
+  */
+ class I2C : SensorBase
+ {
+-	friend class DigitalModule;
+ public:
++	enum Port {kOnboard, kMXP};
++
++	I2C(Port port, uint8_t deviceAddress);
+ 	virtual ~I2C();
++
+ 	bool Transaction(uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived,
+ 			uint8_t receiveSize);
+ 	bool AddressOnly();
+ 	bool Write(uint8_t registerAddress, uint8_t data);
++	bool WriteBulk(uint8_t* data, uint8_t count);
+ 	bool Read(uint8_t registerAddress, uint8_t count, uint8_t *data);
++	bool ReadOnly(uint8_t count, uint8_t *buffer);
+ 	void Broadcast(uint8_t registerAddress, uint8_t data);
+-	void SetCompatibilityMode(bool enable);
+-
+ 	bool VerifySensor(uint8_t registerAddress, uint8_t count, const uint8_t *expected);
+ private:
+-	static MUTEX_ID m_semaphore;
+-	static uint32_t m_objCount;
+-
+-	I2C(DigitalModule *module, uint8_t deviceAddress);
+ 
+-	DigitalModule *m_module;
++	Port m_port;
+ 	uint8_t m_deviceAddress;
+-	bool m_compatibilityMode;
+ };
+diff --git a/wpilibc/wpilibC++/include/WPILib.h b/wpilibc/wpilibC++/include/WPILib.h
+index be87890969353ba75436ef9401c8f60107c3635d..48e9543b1eeaadcf2b85f9ef63e51c7c277f500e 100644
+--- a/wpilibc/wpilibC++/include/WPILib.h
++++ b/wpilibc/wpilibC++/include/WPILib.h
+@@ -52,8 +52,6 @@
+ #include "GearTooth.h"
+ #include "GenericHID.h"
+ #include "Gyro.h"
+-#include "HiTechnicCompass.h"
+-#include "HiTechnicColorSensor.h"
+ #include "interfaces/Potentiometer.h"
+ #include "I2C.h"
+ #include "IterativeRobot.h"
+diff --git a/wpilibc/wpilibC++/lib/ADXL345_I2C.cpp b/wpilibc/wpilibC++/lib/ADXL345_I2C.cpp
+index 7ed3371aaf84493ce9edb90295c875f8ef2ed1b5..1768c0e46e2c30ace380a2bfbfc0cd95b2a47d07 100644
+--- a/wpilibc/wpilibC++/lib/ADXL345_I2C.cpp
++++ b/wpilibc/wpilibC++/lib/ADXL345_I2C.cpp
+@@ -20,21 +20,17 @@ constexpr double ADXL345_I2C::kGsPerLSB;
+  *
+  * @param range The range (+ or -) that the accelerometer will measure.
+  */
+-ADXL345_I2C::ADXL345_I2C(ADXL345_I2C::DataFormat_Range range)
+-	: m_i2c (NULL)
++ADXL345_I2C::ADXL345_I2C(Port port, ADXL345_I2C::DataFormat_Range range):
++		I2C(port, kAddress)
+ {
+-	DigitalModule *module = DigitalModule::GetInstance(1);
+-	if (module)
+-	{
+-		m_i2c = module->GetI2C(kAddress);
++		//m_i2c = new I2C((I2C::Port)port, kAddress);
+ 
+ 		// Turn on the measurements
+-		m_i2c->Write(kPowerCtlRegister, kPowerCtl_Measure);
++		Write(kPowerCtlRegister, kPowerCtl_Measure);
+ 		// Specify the data format to read
+-		m_i2c->Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
++		Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
+ 
+ 		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_I2C, 0);
+-	}
+ }
+ 
+ /**
+@@ -42,8 +38,8 @@ ADXL345_I2C::ADXL345_I2C(ADXL345_I2C::DataFormat_Range range)
+  */
+ ADXL345_I2C::~ADXL345_I2C()
+ {
+-	delete m_i2c;
+-	m_i2c = NULL;
++	//delete m_i2c;
++	//m_i2c = NULL;
+ }
+ 
+ /**
+@@ -55,13 +51,10 @@ ADXL345_I2C::~ADXL345_I2C()
+ double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis)
+ {
+ 	int16_t rawAccel = 0;
+-	if(m_i2c)
+-	{
+-		m_i2c->Read(kDataRegister + (uint8_t)axis, sizeof(rawAccel), (uint8_t *)&rawAccel);
+-
+-		// Sensor is little endian... swap bytes
+-		rawAccel = ((rawAccel >> 8) & 0xFF) | (rawAccel << 8);
+-	}
++	//if(m_i2c)
++	//{
++		Read(kDataRegister + (uint8_t)axis, sizeof(rawAccel), (uint8_t *)&rawAccel);
++	//}
+ 	return rawAccel * kGsPerLSB;
+ }
+ 
+@@ -74,19 +67,13 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations()
+ {
+ 	AllAxes data = AllAxes();
+ 	int16_t rawData[3];
+-	if (m_i2c)
+-	{
+-		m_i2c->Read(kDataRegister, sizeof(rawData), (uint8_t*)rawData);
+-
+-		// Sensor is little endian... swap bytes
+-		for (int32_t i=0; i<3; i++)
+-		{
+-			rawData[i] = ((rawData[i] >> 8) & 0xFF) | (rawData[i] << 8);
+-		}
++	//if (m_i2c)
++	//{
++		Read(kDataRegister, sizeof(rawData), (uint8_t*)rawData);
+ 
+ 		data.XAxis = rawData[0] * kGsPerLSB;
+ 		data.YAxis = rawData[1] * kGsPerLSB;
+ 		data.ZAxis = rawData[2] * kGsPerLSB;
+-	}
++	//}
+ 	return data;
+ }
+diff --git a/wpilibc/wpilibC++/lib/DigitalModule.cpp b/wpilibc/wpilibC++/lib/DigitalModule.cpp
+index 8f91bcde26e1a2de0a9c50166612fc5871a7a8a5..6a0eacdd4203c8b9493dbb49932275fafa210c97 100644
+--- a/wpilibc/wpilibC++/lib/DigitalModule.cpp
++++ b/wpilibc/wpilibC++/lib/DigitalModule.cpp
+@@ -410,16 +410,4 @@ uint16_t DigitalModule::GetLoopTiming()
+ 	return timing;
+ }
+ 
+-/**
+- * Return a pointer to an I2C object for this digital module
+- * The caller is responsible for deleting the pointer.
+- * 
+- * @param address The address of the device on the I2C bus
+- * @return A pointer to an I2C object to talk to the device at address
+- */
+-I2C* DigitalModule::GetI2C(uint32_t address)
+-{
+-	return new I2C(this, address);
+-}
+-
+ 
+diff --git a/wpilibc/wpilibC++/lib/HiTechnicColorSensor.cpp b/wpilibc/wpilibC++/lib/HiTechnicColorSensor.cpp
+deleted file mode 100644
+index c51ca2f007148665eee51fc0246194e1dac0bb57..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/lib/HiTechnicColorSensor.cpp
++++ /dev/null
+@@ -1,386 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-
+-#include "HiTechnicColorSensor.h"
+-#include "DigitalModule.h"
+-#include "I2C.h"
+-//#include "NetworkCommunication/UsageReporting.h"
+-#include "networktables2/type/NumberArray.h"
+-#include "WPIErrors.h"
+-
+-const uint8_t HiTechnicColorSensor::kAddress;
+-const uint8_t HiTechnicColorSensor::kManufacturerBaseRegister;
+-const uint8_t HiTechnicColorSensor::kManufacturerSize;
+-const uint8_t HiTechnicColorSensor::kSensorTypeBaseRegister;
+-const uint8_t HiTechnicColorSensor::kSensorTypeSize;
+-const uint8_t HiTechnicColorSensor::kModeRegister;
+-const uint8_t HiTechnicColorSensor::kColorRegister;
+-const uint8_t HiTechnicColorSensor::kRedRegister;
+-const uint8_t HiTechnicColorSensor::kGreenRegister;
+-const uint8_t HiTechnicColorSensor::kBlueRegister;
+-const uint8_t HiTechnicColorSensor::kRawRedRegister;
+-const uint8_t HiTechnicColorSensor::kRawGreenRegister;
+-const uint8_t HiTechnicColorSensor::kRawBlueRegister;
+-
+-/**
+- * Constructor.
+- */
+-HiTechnicColorSensor::HiTechnicColorSensor()
+-	: m_i2c (NULL)
+-{
+-	m_table = NULL;
+-	DigitalModule *module = DigitalModule::GetInstance(1);
+-	m_mode = kActive;
+-
+-	if (module)
+-	{
+-		m_i2c = module->GetI2C(kAddress);
+-
+-		// Verify Sensor
+-		const uint8_t kExpectedManufacturer[] = "HiTechnc";
+-		const uint8_t kExpectedSensorType[] = "ColorPD ";
+-		if ( ! m_i2c->VerifySensor(kManufacturerBaseRegister, kManufacturerSize, kExpectedManufacturer) )
+-		{
+-			wpi_setWPIError(CompassManufacturerError);
+-			return;
+-		}
+-		if ( ! m_i2c->VerifySensor(kSensorTypeBaseRegister, kSensorTypeSize, kExpectedSensorType) )
+-		{
+-			wpi_setWPIError(CompassTypeError);
+-		}
+-
+-		HALReport(HALUsageReporting::kResourceType_HiTechnicColorSensor, 0);
+-	}
+-}
+-
+-/**
+- * Destructor.
+- */
+-HiTechnicColorSensor::~HiTechnicColorSensor()
+-{
+-	delete m_i2c;
+-	m_i2c = NULL;
+-}
+-
+-/**
+- * Get the estimated color.
+- *
+- * Gets a color estimate from the sensor corresponding to the
+- * table found with the sensor or at the following site:
+- * http://www.hitechnic.com/cgi-bin/commerce.cgi?preadd=action&key=NCO1038
+- *
+- * @return The estimated color.
+- */
+-uint8_t HiTechnicColorSensor::GetColor()
+-{
+-	uint8_t color = 0;
+-
+-	if(m_mode != kActive)
+-	{
+-		SetMode(kActive);
+-	}
+-	if (m_i2c)
+-	{
+-		m_i2c->Read(kColorRegister, sizeof(color), &color);
+-	}
+-	return color;
+-}
+-
+-/**
+- * Get the Red value.
+- *
+- * Gets the (0-255) red value from the sensor.
+- *
+- * The sensor must be in active mode to access the regular RGB data
+- * if the sensor is not in active mode, it will be placed into active
+- * mode by this method.
+- *
+- * @return The Red sensor value.
+- */
+-uint8_t HiTechnicColorSensor::GetRed()
+-{
+-	uint8_t red = 0;
+-
+-	if(m_mode != kActive)
+-	{
+-		SetMode(kActive);
+-	}
+-	if (m_i2c)
+-	{
+-		m_i2c->Read(kRedRegister, sizeof(red), &red);
+-	}
+-	return red;
+-}
+-
+-/**
+- * Get the Green value.
+- *
+- * Gets the(0-255) green value from the sensor.
+- *
+- * The sensor must be in active mode to access the regular RGB data
+- * if the sensor is not in active mode, it will be placed into active
+- * mode by this method.
+- *
+- * @return The Green sensor value.
+- */
+-uint8_t HiTechnicColorSensor::GetGreen()
+-{
+-	uint8_t green = 0;
+-
+-	if(m_mode != kActive)
+-	{
+-		SetMode(kActive);
+-	}
+-	if (m_i2c)
+-	{
+-		m_i2c->Read(kGreenRegister, sizeof(green), &green);
+-	}
+-	return green;
+-}
+-
+-/**
+- * Get the Blue value.
+- *
+- * Gets the raw (0-255) blue value from the sensor.
+- *
+- * The sensor must be in active mode to access the regular RGB data
+- * if the sensor is not in active mode, it will be placed into active
+- * mode by this method.
+- *
+- * @return The Blue sensor value.
+- */
+-uint8_t HiTechnicColorSensor::GetBlue()
+-{
+-	uint8_t blue = 0;
+-
+-	if(m_mode != kActive)
+-	{
+-		SetMode(kActive);
+-	}
+-	if (m_i2c)
+-	{
+-		m_i2c->Read(kBlueRegister, sizeof(blue), &blue);
+-	}
+-	return blue;
+-}
+-
+-/**
+- * Get the value of all three colors from a single sensor reading.
+- * Using this method ensures that all three values come from the
+- * same sensor reading, using the individual color methods provides
+- * no such guarantee.
+- *
+- * The sensor must be in active mode to access the regular RGB data.
+- * If the sensor is not in active mode, it will be placed into active
+- * mode by this method.
+- *
+- * @return RGB object with the three color values
+- */
+-HiTechnicColorSensor::RGB HiTechnicColorSensor::GetRGB()
+-{
+-	uint8_t colors[3] = {0,0,0};
+-	RGB result;
+-
+-	if(m_mode != kActive)
+-	{
+-		SetMode(kActive);
+-	}
+-	if(m_i2c)
+-	{
+-		m_i2c->Read(kRawRedRegister, sizeof(colors), (uint8_t*)&colors);
+-	}
+-
+-	result.red = colors[0];
+-	result.green = colors[1];
+-	result.blue = colors[2];
+-
+-	return result;
+-}
+-
+-/**
+- * Get the Raw Red value.
+- *
+- * Gets the (0-65536) raw red value from the sensor.
+- *
+- * The sensor must be in raw or passive mode to access the regular RGB data
+- * if the sensor is not in raw or passive mode, it will be placed into raw
+- * mode by this method.
+- *
+- * @return The Raw Red sensor value.
+- */
+-uint16_t HiTechnicColorSensor::GetRawRed()
+-{
+-	uint16_t rawRed = 0;
+-
+-	if(m_mode == kActive)
+-	{
+-		SetMode(kRaw);
+-	}
+-	if (m_i2c)
+-	{
+-		m_i2c->Read(kRawRedRegister, sizeof(rawRed), (uint8_t *)&rawRed);
+-	}
+-	return rawRed;
+-}
+-
+-/**
+-   * Get the Raw Green value.
+-   *
+-   * Gets the (0-65536) raw green value from the sensor.
+-   *
+-   * The sensor must be in raw or passive mode to access the regular RGB data
+-   * if the sensor is not in raw or passive mode, it will be placed into raw
+-   * mode by this method.
+-   *
+-   * @return The Raw Green sensor value.
+-   */
+-uint16_t HiTechnicColorSensor::GetRawGreen()
+-{
+-	uint16_t rawGreen = 0;
+-
+-	if(m_mode == kActive)
+-	{
+-		SetMode(kRaw);
+-	}
+-	if (m_i2c)
+-	{
+-		m_i2c->Read(kRawGreenRegister, sizeof(rawGreen), (uint8_t *)&rawGreen);
+-	}
+-	return rawGreen;
+-}
+-
+-/**
+- * Get the Raw Blue value.
+- *
+- * Gets the (0-65536) raw blue value from the sensor.
+- *
+- * The sensor must be in raw or passive mode to access the regular RGB data
+- * if the sensor is not in raw or passive mode, it will be placed into raw
+- * mode by this method.
+- *
+- * @return The Raw Blue sensor value.
+- */
+-uint16_t HiTechnicColorSensor::GetRawBlue()
+-{
+-	uint16_t rawBlue = 0;
+-
+-	if(m_mode == kActive)
+-	{
+-		SetMode(kRaw);
+-	}
+-	if (m_i2c)
+-	{
+-		m_i2c->Read(kRawBlueRegister, sizeof(rawBlue), (uint8_t *)&rawBlue);
+-	}
+-	return rawBlue;
+-}
+-
+-/**
+- * Get the raw value of all three colors from a single sensor reading.
+- * Using this method ensures that all three values come from the
+- * same sensor reading, using the individual color methods provides
+- * no such guarantee.
+- *
+- * Gets the (0-65536) raw color values from the sensor.
+- *
+- * The sensor must be in raw or passive mode to access the regular RGB data
+- * if the sensor is not in raw or passive mode, it will be placed into raw
+- * mode by this method.
+- *
+- * @return An RGB object with the raw sensor values.
+- */
+-HiTechnicColorSensor::RGB HiTechnicColorSensor::GetRawRGB()
+-{
+-	uint8_t colors[6] = {0,0,0,0,0,0};
+-	RGB result;
+-
+-	if(m_mode != kActive)
+-	{
+-		SetMode(kActive);
+-	}
+-	if(m_i2c)
+-	{
+-		m_i2c->Read(kRedRegister, sizeof(colors), (uint8_t*)&colors);
+-	}
+-
+-	result.red = (colors[0]<<8) + colors[1];
+-	result.green = (colors[2]<<8) + colors[3];
+-	result.blue = (colors[4]<<8) + colors[5];
+-
+-	return result;
+-}
+-
+-/**
+- * Set the Mode of the color sensor
+- * This method is used to set the color sensor to one of the three modes,
+- * active, passive or raw. The sensor defaults to active mode which uses the
+- * internal LED and returns an interpreted color value and 3 8-bit RGB channel
+- * values. Raw mode uses the internal LED and returns 3 16-bit RGB channel values.
+- * Passive mode disables the internal LED and returns 3 16-bit RGB channel values.
+- * @param mode The mode to set
+- */
+-void HiTechnicColorSensor::SetMode(tColorMode mode)
+-{
+-	if(m_i2c)
+-	{
+-		m_i2c->Write(kModeRegister, (uint8_t)mode);
+-	}
+-}
+-
+-/*
+- * Live Window code, only does anything if live window is activated.
+- */
+-std::string HiTechnicColorSensor::GetType()
+-{
+-    return "Compass";
+-}
+-
+-/**
+- * {@inheritDoc}
+- */
+-void HiTechnicColorSensor::InitTable(ITable *subtable) {
+-    m_table = subtable;
+-    UpdateTable();
+-}
+-
+-/**
+- * {@inheritDoc}
+- */
+-void HiTechnicColorSensor::UpdateTable() {
+-    if (m_table != NULL) {
+-        m_table->PutNumber("Value", GetColor());
+-		NumberArray* rgb = new NumberArray();
+-		rgb->add(GetRed());
+-		rgb->add(GetGreen());
+-		rgb->add(GetBlue());
+-		m_table->PutValue("RGB", *rgb);
+-		delete rgb;
+-    }
+-}
+-
+-/**
+- * {@inheritDoc}
+- */
+-ITable* HiTechnicColorSensor::GetTable()
+-{
+-    return m_table;
+-}
+-
+-/**
+- * {@inheritDoc}
+- */
+-void HiTechnicColorSensor::StartLiveWindowMode()
+-{
+-
+-}
+-
+-/**
+- * {@inheritDoc}
+- */
+-void HiTechnicColorSensor::StopLiveWindowMode()
+-{
+-
+-}
+diff --git a/wpilibc/wpilibC++/lib/HiTechnicCompass.cpp b/wpilibc/wpilibC++/lib/HiTechnicCompass.cpp
+deleted file mode 100644
+index 4c9e165b7963c771071a5dd056b7aa603a58ce8a..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/lib/HiTechnicCompass.cpp
++++ /dev/null
+@@ -1,105 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-
+-#include "HiTechnicCompass.h"
+-#include "DigitalModule.h"
+-#include "I2C.h"
+-//#include "NetworkCommunication/UsageReporting.h"
+-#include "WPIErrors.h"
+-#include "LiveWindow/LiveWindow.h"
+-
+-const uint8_t HiTechnicCompass::kAddress;
+-const uint8_t HiTechnicCompass::kManufacturerBaseRegister;
+-const uint8_t HiTechnicCompass::kManufacturerSize;
+-const uint8_t HiTechnicCompass::kSensorTypeBaseRegister;
+-const uint8_t HiTechnicCompass::kSensorTypeSize;
+-const uint8_t HiTechnicCompass::kHeadingRegister;
+-
+-/**
+- * Constructor.
+- */
+-HiTechnicCompass::HiTechnicCompass()
+-	: m_i2c (NULL)
+-{
+-	m_table = NULL;
+-	DigitalModule *module = DigitalModule::GetInstance(1);
+-	if (module)
+-	{
+-		m_i2c = module->GetI2C(kAddress);
+-
+-		// Verify Sensor
+-		const uint8_t kExpectedManufacturer[] = "HiTechnc";
+-		const uint8_t kExpectedSensorType[] = "Compass ";
+-		if ( ! m_i2c->VerifySensor(kManufacturerBaseRegister, kManufacturerSize, kExpectedManufacturer) )
+-		{
+-			wpi_setWPIError(CompassManufacturerError);
+-			return;
+-		}
+-		if ( ! m_i2c->VerifySensor(kSensorTypeBaseRegister, kSensorTypeSize, kExpectedSensorType) )
+-		{
+-			wpi_setWPIError(CompassTypeError);
+-		}
+-
+-		HALReport(HALUsageReporting::kResourceType_HiTechnicCompass, 0);
+-		LiveWindow::GetInstance()->AddSensor("HiTechnicCompass", 1, this);
+-	}
+-}
+-
+-/**
+- * Destructor.
+- */
+-HiTechnicCompass::~HiTechnicCompass()
+-{
+-	delete m_i2c;
+-	m_i2c = NULL;
+-}
+-
+-/**
+- * Get the compass angle in degrees.
+- *
+- * The resolution of this reading is 1 degree.
+- *
+- * @return Angle of the compass in degrees.
+- */
+-float HiTechnicCompass::GetAngle()
+-{
+-	uint16_t heading = 0;
+-	if (m_i2c)
+-	{
+-		m_i2c->Read(kHeadingRegister, sizeof(heading), (uint8_t *)&heading);
+-
+-		// Sensor is little endian... swap bytes
+-		heading = (heading >> 8) | (heading << 8);
+-	}
+-	return (float)heading;
+-}
+-
+-void HiTechnicCompass::UpdateTable() {
+-	if (m_table != NULL) {
+-		m_table->PutNumber("Value", GetAngle());
+-	}
+-}
+-
+-void HiTechnicCompass::StartLiveWindowMode() {
+-
+-}
+-
+-void HiTechnicCompass::StopLiveWindowMode() {
+-
+-}
+-
+-std::string HiTechnicCompass::GetSmartDashboardType() {
+-	return "HiTechnicCompass";
+-}
+-
+-void HiTechnicCompass::InitTable(ITable *subTable) {
+-	m_table = subTable;
+-	UpdateTable();
+-}
+-
+-ITable * HiTechnicCompass::GetTable() {
+-	return m_table;
+-}
+diff --git a/wpilibc/wpilibC++/lib/I2C.cpp b/wpilibc/wpilibC++/lib/I2C.cpp
+index be07f9eccb72b005564cc40237b720d93206e413..4a47169a12e3f94638f544468763f3992c31ea14 100644
+--- a/wpilibc/wpilibC++/lib/I2C.cpp
++++ b/wpilibc/wpilibC++/lib/I2C.cpp
+@@ -7,30 +7,24 @@
+ #include "I2C.h"
+ #include "DigitalModule.h"
+ //#include "NetworkCommunication/UsageReporting.h"
+-#include "HAL/cpp/Synchronized.hpp"
++#include "HAL/Digital.hpp"
+ #include "WPIErrors.h"
+ 
+-MUTEX_ID I2C::m_semaphore = NULL;
+-uint32_t I2C::m_objCount = 0;
+-
+ /**
+  * Constructor.
+  * 
+- * @param module The Digital Module to which the device is conneted.
++ * @param Port The I2C port to which the device is connected.
+  * @param deviceAddress The address of the device on the I2C bus.
+  */
+-I2C::I2C(DigitalModule *module, uint8_t deviceAddress)
+-	: m_module (module)
++I2C::I2C(Port port, uint8_t deviceAddress) :
++	m_port (port)
+ 	, m_deviceAddress (deviceAddress)
+-	, m_compatibilityMode (true)
+ {
+-	if (m_semaphore == NULL)
+-	{
+-		m_semaphore = initializeMutexNormal();
+-	}
+-	m_objCount++;
++	int32_t status = 0;
++	i2CInitialize(m_port, &status);
++	//wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 
+-	HALReport(HALUsageReporting::kResourceType_I2C, deviceAddress, module->GetNumber() - 1);
++	HALReport(HALUsageReporting::kResourceType_I2C, deviceAddress);
+ }
+ 
+ /**
+@@ -38,12 +32,7 @@ I2C::I2C(DigitalModule *module, uint8_t deviceAddress)
+  */
+ I2C::~I2C()
+ {
+-	m_objCount--;
+-	if (m_objCount <= 0)
+-	{
+-		deleteMutex(m_semaphore);
+-		m_semaphore = NULL;
+-	}
++	i2CClose(m_port);
+ }
+ 
+ /**
+@@ -54,7 +43,7 @@ I2C::~I2C()
+  * @param dataToSend Buffer of data to send as part of the transaction.
+  * @param sendSize Number of bytes to send as part of the transaction. [0..6]
+  * @param dataReceived Buffer to read data into.
+- * @param receiveSize Number of byted to read from the device. [0..7]
++ * @param receiveSize Number of bytes to read from the device. [0..7]
+  * @return Transfer Aborted... false for success, true for aborted.
+  */
+ bool I2C::Transaction(uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize)
+@@ -71,10 +60,10 @@ bool I2C::Transaction(uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceiv
+ 	}
+ 
+ 	int32_t status = 0;
+-	bool value = doI2CTransactionWithModule(m_module->m_module, m_deviceAddress, m_compatibilityMode,
+-											dataToSend, sendSize, dataReceived, receiveSize, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	return value;
++	status = i2CTransaction(m_port, m_deviceAddress,
++											dataToSend, sendSize, dataReceived, receiveSize);
++	//wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	return status < 0;
+ }
+ 
+ /**
+@@ -87,7 +76,9 @@ bool I2C::Transaction(uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceiv
+  */
+ bool I2C::AddressOnly()
+ {
+-	return Transaction(NULL, 0, NULL, 0);
++	int32_t status = 0;
++	status = Transaction(NULL, 0, NULL, 0);
++	return status < 0;
+ }
+ 
+ /**
+@@ -105,7 +96,26 @@ bool I2C::Write(uint8_t registerAddress, uint8_t data)
+ 	uint8_t buffer[2];
+ 	buffer[0] = registerAddress;
+ 	buffer[1] = data;
+-	return Transaction(buffer, sizeof(buffer), NULL, 0);
++	int32_t status = 0;
++	status = i2CWrite(m_port, m_deviceAddress, buffer, sizeof(buffer));
++	return status < 0;
++}
++
++/**
++ * Execute a bulk write transaction with the device.
++ *
++ * Write multiple bytes to a device and wait until the
++ *   transaction is complete.
++ *
++ * @param data The data to write to the register on the device.
++ * @param count The number of bytes to be written.
++ * @return Transfer Aborted... false for success, true for aborted.
++ */
++bool I2C::WriteBulk(uint8_t* data, uint8_t count)
++{
++	int32_t status = 0;
++	status = i2CWrite(m_port, m_deviceAddress, data, count);
++	return status < 0;
+ }
+ 
+ /**
+@@ -133,8 +143,39 @@ bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t *buffer)
+ 		wpi_setWPIErrorWithContext(NullParameter, "buffer");
+ 		return true;
+ 	}
++	int32_t status = 0;
++	status = Transaction(&registerAddress, sizeof(registerAddress), buffer, count);
++	return status < 0;
++}
+ 
+-	return Transaction(&registerAddress, sizeof(registerAddress), buffer, count);
++/**
++ * Execute a read only transaction with the device.
++ *
++ * Read 1 to 7 bytes from a device. This method does not write any data to prompt
++ * the device.
++ *
++ * @param buffer
++ *            A pointer to the array of bytes to store the data read from
++ *            the device.
++ * @param count
++ *            The number of bytes to read in the transaction. [1..7]
++ * @return Transfer Aborted... false for success, true for aborted.
++ */
++bool I2C::ReadOnly(uint8_t count, uint8_t *buffer)
++{
++	if (count < 1 || count > 7)
++	{
++		wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
++		return true;
++	}
++	if (buffer == NULL)
++	{
++		wpi_setWPIErrorWithContext(NullParameter, "buffer");
++		return true;
++	}
++	int32_t status = 0;
++	status = i2CRead(m_port, m_deviceAddress, buffer, count);
++	return status < 0;
+ }
+ 
+ /**
+@@ -149,23 +190,6 @@ void I2C::Broadcast(uint8_t registerAddress, uint8_t data)
+ {
+ }
+ 
+-/**
+- * SetCompatibilityMode
+- * 
+- * Enables bitwise clock skewing detection.  This will reduce the I2C interface speed,
+- * but will allow you to communicate with devices that skew the clock at abnormal times.
+- * Compatability mode is enabled by default. 
+- * @param enable Enable compatibility mode for this sensor or not.
+- */
+-void I2C::SetCompatibilityMode(bool enable)
+-{
+-	m_compatibilityMode = enable;
+-
+-	const char *cm = NULL;
+-	if (m_compatibilityMode) cm = "C";
+-	HALReport(HALUsageReporting::kResourceType_I2C, m_deviceAddress, m_module->GetNumber() - 1, cm);
+-}
+-
+ /**
+  * Verify that a device's registers contain expected values.
+  * 
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_I2C.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_I2C.java
+index c25089ffc80a52e14b3667712d4ef03c7efba7e3..77b645385b7424d260cac1c7e174002e55bd9a1e 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_I2C.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_I2C.java
+@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
+  */
+ public class ADXL345_I2C extends SensorBase {
+ 
+-    private static final byte kAddress = 0x3A;
++    private static final byte kAddress = 0x1D;
+     private static final byte kPowerCtlRegister = 0x2D;
+     private static final byte kDataFormatRegister = 0x31;
+     private static final byte kDataRegister = 0x32;
+@@ -76,10 +76,9 @@ public class ADXL345_I2C extends SensorBase {
+      *
+      * @param range The range (+ or -) that the accelerometer will measure.
+      */
+-    public ADXL345_I2C(DataFormat_Range range) {
+-        DigitalModule module = DigitalModule.getInstance(1);
+-        m_i2c = module.getI2C(kAddress);
+-
++    public ADXL345_I2C(I2C.Port port, DataFormat_Range range) {
++        m_i2c = new I2C(port, kAddress);
++		
+         // Turn on the measurements
+         m_i2c.write(kPowerCtlRegister, kPowerCtl_Measure);
+         // Specify the data format to read
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/DigitalModule.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/DigitalModule.java
+index 4dfd055cb965be086185021384f0e1c7be8563db..c05b5bfab04a394736aa255b1f72f68e6d9d1729 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/DigitalModule.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/DigitalModule.java
+@@ -526,17 +526,6 @@ public class DigitalModule extends Module {
+         HALUtil.checkStatus(status.asIntBuffer());
+     }
+ 
+-    /**
+-     * Return an I2C object for this digital module
+-     *
+-     * @param address
+-     *            The device address.
+-     * @return The associated I2C object.
+-     */
+-    public I2C getI2C(final int address) {
+-        return new I2C(this, address);
+-    }
+-
+     /**
+      * Get the loop timing of the Digital Module
+      *
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HiTechnicColorSensor.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HiTechnicColorSensor.java
+deleted file mode 100644
+index 57e9f271ff16d8af214f19f6293db294a0d99953..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HiTechnicColorSensor.java
++++ /dev/null
+@@ -1,385 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-package edu.wpi.first.wpilibj;
+-
+-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+-import edu.wpi.first.wpilibj.communication.UsageReporting;
+-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+-import edu.wpi.first.wpilibj.tables.ITable;
+-
+-/**
+- * HiTechnic NXT Color Sensor.
+- *
+- * This class allows access to a HiTechnic NXT Color Sensor on an I2C bus.
+- * These sensors do not allow changing addresses so you cannot have more
+- * than one on a single bus.
+- *
+- * Details on the sensor can be found here:
+- *   http://www.hitechnic.com/index.html?lang=en-us&target=d17.html
+- *
+- */
+-public class HiTechnicColorSensor extends SensorBase implements ISensor, LiveWindowSendable {
+-
+-    /**
+-     * An exception dealing with connecting to and communicating with the
+-     * HiTechnicCompass
+-     */
+-    public class ColorSensorException extends RuntimeException {
+-
+-        /**
+-         * Create a new exception with the given message
+-         * @param message the message to pass with the exception
+-         */
+-        public ColorSensorException(String message) {
+-            super(message);
+-        }
+-
+-    }
+-
+-    /**
+-     * A set of three color values bundled into one object
+-     */
+-    public class RGB {
+-        public double red, green, blue;
+-
+-        public double getRed() {
+-            return red;
+-        }
+-        public double getGreen() {
+-            return green;
+-        }
+-        public double getBlue() {
+-            return blue;
+-        }
+-    }
+-
+-    public static class tColorSensorMode {
+-        public final int value;
+-        static final int kActive_val = 0;
+-        static final int kPassive_val = 1;
+-        static final int kRaw_val = 3;
+-        public static final tColorSensorMode kActive = new tColorSensorMode(kActive_val);
+-        public static final tColorSensorMode kPassive = new tColorSensorMode(kPassive_val);
+-        public static final tColorSensorMode kRaw = new tColorSensorMode(kRaw_val);
+-
+-        private tColorSensorMode(int value) {
+-            this.value = value;
+-        }
+-    }
+-
+-    private static final byte kAddress = 0x02;
+-    private static final byte kManufacturerBaseRegister = 0x08;
+-    private static final byte kManufacturerSize = 0x08;
+-    private static final byte kSensorTypeBaseRegister = 0x10;
+-    private static final byte kSensorTypeSize = 0x08;
+-    private static final byte kModeRegister = 0x41;
+-    private static final byte kColorRegister = 0x42;
+-    private static final byte kRedRegister = 0x43;
+-    private static final byte kGreenRegister = 0x44;
+-    private static final byte kBlueRegister = 0x45;
+-    private static final byte kRawRedRegister = 0x43;
+-    private static final byte kRawGreenRegister = 0x45;
+-    private static final byte kRawBlueRegister = 0x47;
+-    private I2C m_i2c;
+-    private int m_mode = tColorSensorMode.kActive.value;
+-
+-    /**
+-     * Constructor.
+-     *
+-     * @param slot The slot of the digital module that the sensor is plugged into.
+-     */
+-    public HiTechnicColorSensor(int slot) {
+-        DigitalModule module = DigitalModule.getInstance(slot);
+-        m_i2c = module.getI2C(kAddress);
+-
+-        // Verify Sensor
+-        final byte[] kExpectedManufacturer = "HiTechnc".getBytes();
+-        final byte[] kExpectedSensorType = "ColorPD ".getBytes();
+-        if (!m_i2c.verifySensor(kManufacturerBaseRegister, kManufacturerSize, kExpectedManufacturer)) {
+-            throw new ColorSensorException("Invalid Color Sensor Manufacturer");
+-        }
+-        if (!m_i2c.verifySensor(kSensorTypeBaseRegister, kSensorTypeSize, kExpectedSensorType)) {
+-            throw new ColorSensorException("Invalid Sensor type");
+-        }
+-
+-        LiveWindow.addSensor("HiTechnicColorSensor", slot, this);
+-        UsageReporting.report(tResourceType.kResourceType_HiTechnicColorSensor, module.getModuleNumber()-1);
+-    }
+-
+-    /**
+-     * Destructor.
+-     */
+-    public void free() {
+-        if (m_i2c != null) {
+-            m_i2c.free();
+-        }
+-        m_i2c = null;
+-    }
+-
+-    /**
+-     * Get the estimated color.
+-     *
+-     * Gets a color estimate from the sensor corresponding to the
+-     * table found with the sensor or at the following site:
+-     * http://www.hitechnic.com/cgi-bin/commerce.cgi?preadd=action&key=NCO1038
+-     *
+-     * @return The estimated color.
+-     */
+-    public byte getColor() {
+-        byte[] color = new byte[1];
+-        if(m_mode != tColorSensorMode.kActive.value) {
+-            setMode(tColorSensorMode.kActive);
+-        }
+-        m_i2c.read(kColorRegister, (byte) color.length, color);
+-
+-        return color[0];
+-    }
+-
+-    /**
+-     * Get the value of all three colors from a single sensor reading.
+-     * Using this method ensures that all three values come from the
+-     * same sensor reading, using the individual color methods provides
+-     * no such guarantee.
+-     *
+-     * The sensor must be in active mode to access the regular RGB data
+-     * if the sensor is not in active mode, it will be placed into active
+-     * mode by this method.
+-     *
+-     * @return RGB object with the three color values
+-     */
+-    public RGB getRGB() {
+-        byte[] colors = new byte[3];
+-        RGB result = new RGB();
+-        if(m_mode != tColorSensorMode.kActive.value) {
+-            setMode(tColorSensorMode.kActive);
+-        }
+-        m_i2c.read(kRedRegister, (byte) colors.length, colors);
+-
+-        result.red = (colors[0]&0xFFFF);
+-        result.green = (colors[1]&0xFFFF);
+-        result.blue = (colors[2]&0xFFFF);
+-        return result;
+-    }
+-
+-    /**
+-     * Get the Red value.
+-     *
+-     * Gets the (0-255) red value from the sensor.
+-     *
+-     * The sensor must be in active mode to access the regular RGB data
+-     * if the sensor is not in active mode, it will be placed into active
+-     * mode by this method.
+-     *
+-     * @return The Red sensor value.
+-     */
+-    public int getRed() {
+-        byte[] red = new byte[1];
+-        if(m_mode != tColorSensorMode.kActive.value) {
+-            setMode(tColorSensorMode.kActive);
+-        }
+-        m_i2c.read(kRedRegister, (byte) red.length, red);
+-
+-        return (red[0]&0xFF);
+-    }
+-
+-    /**
+-     * Get the Green value.
+-     *
+-     * Gets the(0-255) green value from the sensor.
+-     *
+-     * The sensor must be in active mode to access the regular RGB data
+-     * if the sensor is not in active mode, it will be placed into active
+-     * mode by this method.
+-     *
+-     * @return The Green sensor value.
+-     */
+-    public int getGreen() {
+-        byte[] green = new byte[1];
+-        if(m_mode != tColorSensorMode.kActive.value) {
+-            setMode(tColorSensorMode.kActive);
+-        }
+-        m_i2c.read(kGreenRegister, (byte) green.length, green);
+-
+-        return (green[0]&0xFF);
+-    }
+-
+-    /**
+-     * Get the Blue value.
+-     *
+-     * Gets the raw (0-255) blue value from the sensor.
+-     *
+-     * The sensor must be in active mode to access the regular RGB data
+-     * if the sensor is not in active mode, it will be placed into active
+-     * mode by this method.
+-     *
+-     * @return The Blue sensor value.
+-     */
+-    public int getBlue() {
+-        byte[] blue = new byte[1];
+-        if(m_mode != tColorSensorMode.kActive.value) {
+-            setMode(tColorSensorMode.kActive);
+-        }
+-        m_i2c.read(kBlueRegister, (byte) blue.length, blue);
+-
+-        return (blue[0]&0xFF);
+-    }
+-
+-    /**
+-     * Get the Raw Red value.
+-     *
+-     * Gets the (0-65536) raw red value from the sensor.
+-     *
+-     * The sensor must be in raw or passive mode to access the regular RGB data
+-     * if the sensor is not in raw or passive mode, it will be placed into raw
+-     * mode by this method.
+-     *
+-     * @return The Raw Red sensor value.
+-     */
+-    public double getRawRed() {
+-        byte[] rawRed = new byte[2];
+-        if(m_mode == tColorSensorMode.kActive.value) {
+-            setMode(tColorSensorMode.kRaw);
+-        }
+-        m_i2c.read(kRawRedRegister, (byte) rawRed.length, rawRed);
+-
+-        return (((int)rawRed[0]&0xFF) * (int) (1 << 8) + ((int)rawRed[1]&0xFF));
+-    }
+-
+-    /**
+-     * Get the Raw Green value.
+-     *
+-     * Gets the (0-65536) raw green value from the sensor.
+-     *
+-     * The sensor must be in raw or passive mode to access the regular RGB data
+-     * if the sensor is not in raw or passive mode, it will be placed into raw
+-     * mode by this method.
+-     *
+-     * @return The Raw Green sensor value.
+-     */
+-    public double getRawGreen() {
+-        byte[] rawGreen = new byte[2];
+-        if(m_mode == tColorSensorMode.kActive.value) {
+-            setMode(tColorSensorMode.kRaw);
+-        }
+-        m_i2c.read(kRawGreenRegister, (byte) rawGreen.length, rawGreen);
+-
+-        return (((int)rawGreen[0]&0xFF) * (int) (1 << 8) + ((int)rawGreen[1]&0xFF));
+-    }
+-
+-    /**
+-     * Get the Raw Blue value.
+-     *
+-     * Gets the (0-65536) raw blue value from the sensor.
+-     *
+-     * The sensor must be in raw or passive mode to access the regular RGB data
+-     * if the sensor is not in raw or passive mode, it will be placed into raw
+-     * mode by this method.
+-     *
+-     * @return The Raw Blue sensor value.
+-     */
+-    public double getRawBlue() {
+-        byte[] rawBlue = new byte[2];
+-        if(m_mode == tColorSensorMode.kActive.value) {
+-            setMode(tColorSensorMode.kRaw);
+-        }
+-        m_i2c.read(kRawBlueRegister, (byte) rawBlue.length, rawBlue);
+-
+-        return (((int)rawBlue[0]&0xFF) * (int) (1 << 8) + ((int)rawBlue[1]&0xFF));
+-    }
+-
+-    /**
+-     * Get the raw value of all three colors from a single sensor reading.
+-     * Using this method ensures that all three values come from the
+-     * same sensor reading, using the individual color methods provides
+-     * no such guarantee.
+-     *
+-     * Gets the (0-65536) raw color values from the sensor.
+-     *
+-     * The sensor must be in raw or passive mode to access the regular RGB data
+-     * if the sensor is not in raw or passive mode, it will be placed into raw
+-     * mode by this method.
+-     *
+-     * @return An RGB object with the raw sensor values.
+-     */
+-    public RGB getRawRGB() {
+-        byte[] colors = new byte[6];
+-        RGB result = new RGB();
+-        if(m_mode == tColorSensorMode.kActive.value) {
+-            setMode(tColorSensorMode.kRaw);
+-        }
+-        m_i2c.read(kRawRedRegister, (byte) colors.length, colors);
+-
+-        result.red = (((int)colors[0]&0xFF) * (int) (1 << 8) + ((int)colors[1]&0xFF));
+-        result.green = (((int)colors[2]&0xFF) * (int) (1 << 8) + ((int)colors[3]&0xFF));
+-        result.blue = (((int)colors[4]&0xFF) * (int) (1 << 8) + ((int)colors[5]&0xFF));
+-        return result;
+-    }
+-
+-    /**
+-     * Set the Mode of the color sensor
+-     * This method is used to set the color sensor to one of the three modes,
+-     * active, passive or raw. The sensor defaults to active mode which uses the
+-     * internal LED and returns an interpreted color value and 3 8-bit RGB channel
+-     * values. Raw mode uses the internal LED and returns 3 16-bit RGB channel values.
+-     * Passive mode disables the internal LED and returns 3 16-bit RGB channel values.
+-     * @param mode The mode to set
+-     */
+-    public void setMode(tColorSensorMode mode) {
+-        m_i2c.write(kModeRegister, mode.value);
+-        m_mode = mode.value;
+-    }
+-
+-    /*
+-     * Live Window code, only does anything if live window is activated.
+-     * TODO: Should this have its own type?
+-     */
+-    public String getSmartDashboardType() {
+-        return "Counter";
+-    }
+-    private ITable m_table;
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void initTable(ITable subtable) {
+-        m_table = subtable;
+-        updateTable();
+-    }
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public ITable getTable() {
+-        return m_table;
+-    }
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void updateTable() {
+-        if (m_table != null) {
+-            if(m_mode == tColorSensorMode.kActive.value) {
+-                m_table.putNumber("Color", getColor());
+-            } else {
+-                m_table.putNumber("Color", 99);
+-            }
+-        }
+-    }
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void startLiveWindowMode() {}
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void stopLiveWindowMode() {}
+-}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HiTechnicCompass.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HiTechnicCompass.java
+deleted file mode 100644
+index 6fb4583f383eca163d715c155fb01020b8f4e5c4..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/HiTechnicCompass.java
++++ /dev/null
+@@ -1,140 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-package edu.wpi.first.wpilibj;
+-
+-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+-import edu.wpi.first.wpilibj.communication.UsageReporting;
+-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+-import edu.wpi.first.wpilibj.tables.ITable;
+-
+-/**
+- * HiTechnic NXT Compass.
+- *
+- * This class alows access to a HiTechnic NXT Compass on an I2C bus.
+- * These sensors to not allow changing addresses so you cannot have more
+- *   than one on a single bus.
+- *
+- * Details on the sensor can be found here:
+- *   http://www.hitechnic.com/index.html?lang=en-us&target=d17.html
+- *
+- */
+-public class HiTechnicCompass extends SensorBase implements ISensor, LiveWindowSendable {
+-
+-    /**
+-     * An exception dealing with connecting to and communicating with the
+-     * HiTechnicCompass
+-     */
+-    public class CompassException extends RuntimeException {
+-
+-        /**
+-         * Create a new exception with the given message
+-         * @param message the message to pass with the exception
+-         */
+-        public CompassException(String message) {
+-            super(message);
+-        }
+-
+-    }
+-
+-    private static final byte kAddress = 0x02;
+-    private static final byte kManufacturerBaseRegister = 0x08;
+-    private static final byte kManufacturerSize = 0x08;
+-    private static final byte kSensorTypeBaseRegister = 0x10;
+-    private static final byte kSensorTypeSize = 0x08;
+-    private static final byte kHeadingRegister = 0x44;
+-    private I2C m_i2c;
+-
+-    /**
+-     * Constructor.
+-     */
+-    public HiTechnicCompass() {
+-        DigitalModule module = DigitalModule.getInstance(1);
+-        m_i2c = module.getI2C(kAddress);
+-
+-        // Verify Sensor
+-        final byte[] kExpectedManufacturer = "HiTechnc".getBytes();
+-        final byte[] kExpectedSensorType = "Compass ".getBytes();
+-        if (!m_i2c.verifySensor(kManufacturerBaseRegister, kManufacturerSize, kExpectedManufacturer)) {
+-            throw new CompassException("Invalid Compass Manufacturer");
+-        }
+-        if (!m_i2c.verifySensor(kSensorTypeBaseRegister, kSensorTypeSize, kExpectedSensorType)) {
+-            throw new CompassException("Invalid Sensor type");
+-        }
+-
+-        UsageReporting.report(tResourceType.kResourceType_HiTechnicCompass, 1);
+-        LiveWindow.addSensor("HiTechnicCompass", 1, this);
+-    }
+-
+-    /**
+-     * Destructor.
+-     */
+-    public void free() {
+-        if (m_i2c != null) {
+-            m_i2c.free();
+-        }
+-        m_i2c = null;
+-    }
+-
+-    /**
+-     * Get the compass angle in degrees.
+-     *
+-     * The resolution of this reading is 1 degree.
+-     *
+-     * @return Angle of the compass in degrees.
+-     */
+-    public double getAngle() {
+-        byte[] heading = new byte[2];
+-        m_i2c.read(kHeadingRegister, (byte) heading.length, heading);
+-
+-        return ((int) heading[0] + (int) heading[1] * (int) (1 << 8));
+-    }
+-
+-    /*
+-     * Live Window code, only does anything if live window is activated.
+-     */
+-    public String getSmartDashboardType() {
+-        return "Compass";
+-    }
+-    private ITable m_table;
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void initTable(ITable subtable) {
+-        m_table = subtable;
+-        updateTable();
+-    }
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public ITable getTable() {
+-        return m_table;
+-    }
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void updateTable() {
+-        if (m_table != null) {
+-            m_table.putNumber("Value", getAngle());
+-        }
+-    }
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void startLiveWindowMode() {}
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void stopLiveWindowMode() {}
+-}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/I2C.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/I2C.java
+index 6f9306285110abd0bf9d763c00afb1a3c845126f..8476aa0f112c0895d903fe1b74e2da31900c656c 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/I2C.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/I2C.java
+@@ -6,8 +6,10 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ 
+-import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
+ import java.nio.IntBuffer;
++import java.nio.ByteBuffer;
++
+ 
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+@@ -22,14 +24,22 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * This class is intended to be used by sensor (and other I2C device) drivers.
+  * It probably should not be used directly.
+  *
+- * It is constructed by calling DigitalModule::GetI2C() on a DigitalModule
+- * object.
+  */
+ public class I2C extends SensorBase {
++	public enum Port {kOnboard(0), kMXP(1);
++		private int value;
++		
++		private Port(int value){
++			this.value = value;
++		}
++		
++		public int getValue(){
++			return this.value;
++		}
++	};
+ 
+-	private DigitalModule m_module;
++	private Port m_port;
+ 	private int m_deviceAddress;
+-	private boolean m_compatibilityMode;
+ 
+     /**
+      * Constructor.
+@@ -39,14 +49,16 @@ public class I2C extends SensorBase {
+      * @param deviceAddress
+      *            The address of the device on the I2C bus.
+      */
+-    public I2C(DigitalModule module, int deviceAddress) {
+-        if (module == null) {
+-            throw new NullPointerException("Digital Module given was null");
+-        }
+-        m_module = module;
++    public I2C(Port port, int deviceAddress) {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++	
++        m_port = port;
+         m_deviceAddress = deviceAddress;
+-        m_compatibilityMode = true;
+-
++		
++		I2CJNI.i2CInitialize((byte)m_port.getValue(), status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		
+         UsageReporting.report(tResourceType.kResourceType_I2C, deviceAddress);
+     }
+ 
+@@ -76,16 +88,15 @@ public class I2C extends SensorBase {
+ 			byte[] dataReceived, int receiveSize) {
+ 		boolean aborted = true;
+ 
+-		ByteBuffer dataToSendBuffer = ByteBuffer.wrap(dataToSend);
+-		ByteBuffer dataReceivedBuffer = ByteBuffer.allocate(1);
+-		IntBuffer status = IntBuffer.allocate(1);
++		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(sendSize);
++		dataToSendBuffer.put(dataToSend);
++		ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(receiveSize);
+ 
+ 		aborted = I2CJNI
+-				.doI2CTransactionWithModule((byte) m_module.m_moduleNumber,
+-						(byte) m_deviceAddress, (byte) (m_compatibilityMode ? 1
+-								: 0), dataToSendBuffer, (byte) sendSize,
+-						dataReceivedBuffer, (byte) receiveSize, status) != 0;
+-		if (status.get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
++				.i2CTransaction((byte) m_port.getValue(), (byte) m_deviceAddress, 
++					dataToSendBuffer, (byte) sendSize,
++					dataReceivedBuffer, (byte) receiveSize) != 0;
++		/*if (status.get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
+ 			if (sendSize > 6) {
+ 				throw new BoundaryException(BoundaryException.getMessage(
+ 						sendSize, 0, 6));
+@@ -97,7 +108,7 @@ public class I2C extends SensorBase {
+ 						HALLibrary.PARAMETER_OUT_OF_RANGE_MESSAGE);
+ 			}
+ 		}
+-		HALUtil.checkStatus(status);
++		HALUtil.checkStatus(status);*/
+ 		dataReceivedBuffer.get(dataReceived);
+ 		return aborted;
+ 	}
+@@ -129,7 +140,27 @@ public class I2C extends SensorBase {
+ 		byte[] buffer = new byte[2];
+ 		buffer[0] = (byte) registerAddress;
+ 		buffer[1] = (byte) data;
+-		return transaction(buffer, buffer.length, null, 0);
++		
++		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(2);
++		dataToSendBuffer.put(buffer);
++		
++		return I2CJNI.i2CWrite((byte)m_port.getValue(), (byte) m_deviceAddress, dataToSendBuffer, (byte)buffer.length) < 0;
++	}
++	
++	/**
++	 * Execute a write transaction with the device.
++	 *
++	 * Write multiple bytes to a register on a device and wait until the
++	 * transaction is complete.
++	 *
++	 * @param data
++	 *            The data to write to the device.
++	 */
++	public synchronized boolean writeBulk(byte[] data) {		
++		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(data.length);
++		dataToSendBuffer.put(data);
++		
++		return I2CJNI.i2CWrite((byte)m_port.getValue(), (byte) m_deviceAddress, dataToSendBuffer, (byte)data.length) < 0;
+ 	}
+ 
+ 	/**
+@@ -159,6 +190,32 @@ public class I2C extends SensorBase {
+ 		return transaction(registerAddressArray, registerAddressArray.length,
+ 				buffer, count);
+ 	}
++	
++	/**
++	 * Execute a read only transaction with the device.
++	 *
++	 * Read 1 to 7 bytes from a device. This method does not write any data to prompt
++	 * the device.
++	 *
++	 * @param buffer
++	 *            A pointer to the array of bytes to store the data read from
++	 *            the device.
++	 * @param count
++	 *            The number of bytes to read in the transaction. [1..7]
++	 * @return Transfer Aborted... false for success, true for aborted.
++	 */
++	public boolean readOnly(byte[] buffer, int count) {
++		BoundaryException.assertWithinBounds(count, 1, 7);
++		if (buffer == null) {
++			throw new NullPointerException("Null return buffer was given");
++		}
++		
++		ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
++		
++		int retVal = I2CJNI.i2CRead((byte)m_port.getValue(), (byte) m_deviceAddress, dataReceivedBuffer, (byte)count);
++		dataReceivedBuffer.get(buffer);
++		return retVal < 0;
++	}
+ 
+ 	/**
+ 	 * Send a broadcast write to all devices on the I2C bus.
+@@ -173,22 +230,6 @@ public class I2C extends SensorBase {
+ 	public void broadcast(int registerAddress, int data) {
+ 	}
+ 
+-	/**
+-	 * SetCompatabilityMode
+-	 *
+-	 * Enables bitwise clock skewing detection. This will reduce the I2C
+-	 * interface speed, but will allow you to communicate with devices that skew
+-	 * the clock at abnormal times. Compatability mode is enabled by default.
+-	 *
+-	 * @param enable
+-	 *            Enable compatability mode for this sensor or not.
+-	 */
+-	public void setCompatabilityMode(boolean enable) {
+-		m_compatibilityMode = enable;
+-		UsageReporting.report(tResourceType.kResourceType_I2C,
+-				m_deviceAddress, 1, "C");
+-	}
+-
+ 	/**
+ 	 * Verify that a device's registers contain expected values.
+ 	 *
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/I2CJNI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/I2CJNI.java
+index 36b0e2c7970caecfcb67dd8e978c624b5bd1d3b6..6c646f5577c38d7c9a5c9f7ebbebe48d442886ea 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/I2CJNI.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/I2CJNI.java
+@@ -4,6 +4,9 @@ import java.nio.ByteBuffer;
+ import java.nio.IntBuffer;
+ 
+ public class I2CJNI extends JNIWrapper {
+-	public static native byte doI2CTransaction(byte address, byte compatibilityMode, ByteBuffer dataToSend, byte sendSize, ByteBuffer dataReceived, byte receiveSize, IntBuffer status);
+-	public static native byte doI2CTransactionWithModule(byte module, byte address, byte compatibilityMode, ByteBuffer dataToSend, byte sendSize, ByteBuffer dataReceived, byte receiveSize, IntBuffer status);
++	public static native void i2CInitialize(byte port, IntBuffer status);
++	public static native byte i2CTransaction(byte port, byte address, ByteBuffer dataToSend, byte sendSize, ByteBuffer dataReceived, byte receiveSize);
++	public static native byte i2CWrite(byte port, byte address, ByteBuffer dataToSend, byte sendSize);
++	public static native byte i2CRead(byte port, byte address, ByteBuffer dataRecieved, byte receiveSize);
++	public static native void i2CClose(byte port);
+ }
+diff --git a/wpilibj/wpilibJavaJNI/lib/I2CJNI.cpp b/wpilibj/wpilibJavaJNI/lib/I2CJNI.cpp
+index 2050b983c6559a8da89cc9ad032d5a578bd6e280..c15fa2736de9beb580591ed9a1faa45487c8c6fd 100644
+--- a/wpilibj/wpilibJavaJNI/lib/I2CJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/I2CJNI.cpp
+@@ -4,6 +4,7 @@
+ 
+ #include "edu_wpi_first_wpilibj_hal_I2CJNI.h"
+ 
++#include "HAL/Digital.hpp"
+ 
+ // set the logging level
+ TLogLevel i2cJNILogLevel = logWARNING;
+@@ -14,22 +15,97 @@ TLogLevel i2cJNILogLevel = logWARNING;
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
+- * Method:    doI2CTransaction
+- * Signature: (BBLjava/nio/ByteBuffer;BLjava/nio/ByteBuffer;BLjava/nio/IntBuffer;)B
++ * Method:    i2cInitialize
++ * Signature: (BLjava/nio/IntBuffer;)V
+  */
+-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_doI2CTransaction
+-  (JNIEnv *, jclass, jbyte, jbyte, jobject, jbyte, jobject, jbyte, jobject)
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CInitialize
++  (JNIEnv * env, jclass, jbyte value, jobject status)
+ {
+-	assert(false);
++	I2CJNI_LOG(logDEBUG) << "Calling I2CJNI i2CInititalize";
++	I2CJNI_LOG(logDEBUG) << "Port: " << (jint) value;
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	i2CInitialize(value, statusPtr);
++	I2CJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ }
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
+- * Method:    doI2CTransactionWithModule
+- * Signature: (BBBLjava/nio/ByteBuffer;BLjava/nio/ByteBuffer;BLjava/nio/IntBuffer;)B
++ * Method:    i2CTransaction
++ * Signature: (BBLjava/nio/ByteBuffer;BLjava/nio/ByteBuffer;B)B
+  */
+-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_doI2CTransactionWithModule
+-  (JNIEnv *, jclass, jbyte, jbyte, jbyte, jobject, jbyte, jobject, jbyte, jobject)
++JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CTransaction
++  (JNIEnv * env, jclass, jbyte port, jbyte address, jobject dataToSend, jbyte sendSize, jobject dataReceived, jbyte receiveSize)
+ {
+-	assert(false);
++	I2CJNI_LOG(logDEBUG) << "Calling I2CJNI i2CTransaction";
++	I2CJNI_LOG(logDEBUG) << "Port = " << (jint)port;
++	I2CJNI_LOG(logDEBUG) << "Address = " << (jint)address;
++	jbyte * dataToSendPtr = NULL;
++	jbyte * dataReceivedPtr = NULL;
++	if(dataToSend !=0){
++		dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
++	}
++	I2CJNI_LOG(logDEBUG) << "DataToSendPtr = " << (jint*)dataToSendPtr;
++	I2CJNI_LOG(logDEBUG) << "SendSize = " << (jint)sendSize;
++	dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
++	I2CJNI_LOG(logDEBUG) << "DataReceivedPtr = " << (jint*)dataReceivedPtr;
++	I2CJNI_LOG(logDEBUG) << "ReceiveSize = " << (jint)receiveSize;
++	jbyte returnValue = i2CTransaction(port, address, (uint8_t*)dataToSendPtr, sendSize, (uint8_t*) dataReceivedPtr, receiveSize);
++	I2CJNI_LOG(logDEBUG) << "ReturnValue = " << returnValue;
++	return returnValue;
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
++ * Method:    i2CWrite
++ * Signature: (BBLjava/nio/ByteBuffer;B)B
++ */
++JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CWrite
++  (JNIEnv * env, jclass, jbyte port, jbyte address, jobject dataToSend, jbyte sendSize)
++{
++	
++	I2CJNI_LOG(logDEBUG) << "Calling I2CJNI i2CWrite";
++	I2CJNI_LOG(logDEBUG) << "Port = " << (jint)port;
++	I2CJNI_LOG(logDEBUG) << "Address = " << (jint)address;
++	jbyte * dataToSendPtr = NULL;
++	
++	if(dataToSend !=0){
++		dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
++	}
++	I2CJNI_LOG(logDEBUG) << "DataToSendPtr = " << (jint*)dataToSendPtr;
++	I2CJNI_LOG(logDEBUG) << "SendSize = " << (jint)dataToSend;
++	jbyte returnValue = i2CWrite(port, address, (uint8_t*)dataToSendPtr, sendSize);
++	I2CJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)returnValue;
++	return returnValue;
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
++ * Method:    i2CRead
++ * Signature: (BBLjava/nio/ByteBuffer;B)B
++ */
++JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CRead
++  (JNIEnv * env, jclass, jbyte port, jbyte address, jobject dataReceived, jbyte receiveSize)
++{
++	I2CJNI_LOG(logDEBUG) << "Calling I2CJNI i2CRead";
++	I2CJNI_LOG(logDEBUG) << "Port = " << port;
++	I2CJNI_LOG(logDEBUG) << "Address = " << address;
++	jbyte * dataReceivedPtr = NULL;
++	dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
++	I2CJNI_LOG(logDEBUG) << "DataReceivedPtr = " << (jint*)dataReceivedPtr;
++	I2CJNI_LOG(logDEBUG) << "ReceiveSize = " << receiveSize;
++	jbyte returnValue = i2CRead(port, address, (uint8_t*) dataReceivedPtr, receiveSize);
++	I2CJNI_LOG(logDEBUG) << "ReturnValue = " << returnValue;
++	return returnValue;
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
++ * Method:    i2CClose
++ * Signature: (B)V
++ */
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CClose
++  (JNIEnv *, jclass, jbyte value)
++{
++	I2CJNI_LOG(logDEBUG) << "Calling I2CJNI i2cClose";
++	i2CClose(value);
+ }

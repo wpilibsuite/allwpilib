@@ -1,0 +1,602 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Mon, 10 Nov 2014 13:15:33 -0500
+Subject: [PATCH 0472/6262] Implement user API for roboRIO power methods (fixes
+ artf3728 and artf3537)
+
+Change-Id: I7501a83dcdd81d45b298e044379ea4ac3670c742
+---
+ hal/include/HAL/Power.hpp                     |   6 +
+ hal/lib/Athena/Power.cpp                      |  53 ++++++
+ .../include/ControllerPower.h                 |  30 ++++
+ wpilibc/wpilibC++Devices/include/WPILib.h     |   1 +
+ .../wpilibC++Devices/src/ControllerPower.cpp  | 166 ++++++++++++++++++
+ .../wpi/first/wpilibj/ControllerPower.java    | 144 +++++++++++++++
+ .../edu/wpi/first/wpilibj/hal/PowerJNI.java   |   6 +
+ wpilibj/wpilibJavaJNI/lib/PowerJNI.cpp        |  73 ++++++++
+ 8 files changed, 479 insertions(+)
+ create mode 100644 wpilibc/wpilibC++Devices/include/ControllerPower.h
+ create mode 100644 wpilibc/wpilibC++Devices/src/ControllerPower.cpp
+ create mode 100644 wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/ControllerPower.java
+
+diff --git a/hal/include/HAL/Power.hpp b/hal/include/HAL/Power.hpp
+index 10e9096f3194b17303cd32969f05ef8c4838ae89..b430c1eb84afeb86ab515e71ea539daf4ab9e58d 100644
+--- a/hal/include/HAL/Power.hpp
++++ b/hal/include/HAL/Power.hpp
+@@ -8,8 +8,14 @@ extern "C"
+ 	float getVinCurrent(int32_t *status);
+ 	float getUserVoltage6V(int32_t *status);
+ 	float getUserCurrent6V(int32_t *status);
++	bool getUserActive6V(int32_t *status);
++	int getUserCurrentFaults6V(int32_t *status);
+ 	float getUserVoltage5V(int32_t *status);
+ 	float getUserCurrent5V(int32_t *status);
++	bool getUserActive5V(int32_t *status);
++	int getUserCurrentFaults5V(int32_t *status);
+ 	float getUserVoltage3V3(int32_t *status);
+ 	float getUserCurrent3V3(int32_t *status);
++	bool getUserActive3V3(int32_t *status);
++	int getUserCurrentFaults3V3(int32_t *status);
+ }
+diff --git a/hal/lib/Athena/Power.cpp b/hal/lib/Athena/Power.cpp
+index b2f0f15cb39da17a76d2c52d7ce9184cec98aead..34db0436cd21bea648e54ae27b9f235ff981d002 100644
+--- a/hal/lib/Athena/Power.cpp
++++ b/hal/lib/Athena/Power.cpp
+@@ -41,6 +41,22 @@ float getUserCurrent6V(int32_t *status) {
+ 	return power->readUserCurrent6V(status) / 4.096f * 0.005566f - 0.009f;
+ }
+ 
++/**
++ * Get the active state of the 6V rail
++ */
++bool getUserActive6V(int32_t *status) {
++	initializePower(status);
++	return power->readStatus_User6V(status) == 4;
++}
++
++/**
++ * Get the fault count for the 6V rail
++ */
++int getUserCurrentFaults6V(int32_t *status) {
++	initializePower(status);
++	return (int)power->readOverCurrentFaultCounts_OverCurrentFaultCount6V(status);
++}
++
+ /**
+  * Get the 5V rail voltage
+  */
+@@ -57,6 +73,27 @@ float getUserCurrent5V(int32_t *status) {
+ 	return power->readUserCurrent5V(status) / 4.096f * 0.001996f - 0.002f;
+ }
+ 
++/**
++ * Get the active state of the 5V rail
++ */
++bool getUserActive5V(int32_t *status) {
++	initializePower(status);
++	return power->readStatus_User5V(status) == 4;
++}
++
++/**
++ * Get the fault count for the 5V rail
++ */
++int getUserCurrentFaults5V(int32_t *status) {
++	initializePower(status);
++	return (int)power->readOverCurrentFaultCounts_OverCurrentFaultCount5V(status);
++}
++
++unsigned char getUserStatus5V(int32_t *status) {
++	initializePower(status);
++	return power->readStatus_User5V(status);
++}
++
+ /**
+  * Get the 3.3V rail voltage
+  */
+@@ -72,3 +109,19 @@ float getUserCurrent3V3(int32_t *status) {
+ 	initializePower(status);
+ 	return power->readUserCurrent3V3(status) / 4.096f * 0.002486f - 0.003f;
+ }
++
++/**
++ * Get the active state of the 3.3V rail
++ */
++bool getUserActive3V3(int32_t *status) {
++	initializePower(status);
++	return power->readStatus_User3V3(status) == 4;
++}
++
++/**
++ * Get the fault count for the 3.3V rail
++ */
++int getUserCurrentFaults3V3(int32_t *status) {
++	initializePower(status);
++	return (int)power->readOverCurrentFaultCounts_OverCurrentFaultCount3V3(status);
++}
+diff --git a/wpilibc/wpilibC++Devices/include/ControllerPower.h b/wpilibc/wpilibC++Devices/include/ControllerPower.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..654cfb5035758f3505457f9aab54e162dbc173e2
+--- /dev/null
++++ b/wpilibc/wpilibC++Devices/include/ControllerPower.h
+@@ -0,0 +1,30 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++
++#ifndef __CONTROLLER_POWER_H__
++#define __CONTROLLER_POWER_H__
++
++
++
++class ControllerPower
++{
++	public: 
++		static double GetInputVoltage();
++		static double GetInputCurrent();
++		static double GetVoltage3V3();
++		static double GetCurrent3V3();
++		static bool GetEnabled3V3();
++		static int GetFaultCount3V3();
++		static double GetVoltage5V();
++		static double GetCurrent5V();
++		static bool GetEnabled5V();
++		static int GetFaultCount5V();
++		static double GetVoltage6V();
++		static double GetCurrent6V();
++		static bool GetEnabled6V();
++		static int GetFaultCount6V();
++};
++#endif
+\ No newline at end of file
+diff --git a/wpilibc/wpilibC++Devices/include/WPILib.h b/wpilibc/wpilibC++Devices/include/WPILib.h
+index f7c7ecea9fed435771adc9f78b30fa46bc9f70f6..6f75749d7a62a66cdb6fe443afe562c7b3aa09b7 100644
+--- a/wpilibc/wpilibC++Devices/include/WPILib.h
++++ b/wpilibc/wpilibC++Devices/include/WPILib.h
+@@ -35,6 +35,7 @@
+ #include "Commands/WaitForChildren.h"
+ #include "Commands/WaitUntilCommand.h"
+ #include "Compressor.h"
++#include "ControllerPower.h"
+ #include "Counter.h"
+ #include "DigitalInput.h"
+ #include "DigitalOutput.h"
+diff --git a/wpilibc/wpilibC++Devices/src/ControllerPower.cpp b/wpilibc/wpilibC++Devices/src/ControllerPower.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..97f2616c91c260259fbcbd8fa6aa6889f142b852
+--- /dev/null
++++ b/wpilibc/wpilibC++Devices/src/ControllerPower.cpp
+@@ -0,0 +1,166 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++
++#include "ControllerPower.h"
++
++#include <stdint.h>
++#include <HAL/Power.hpp>
++#include <HAL/HAL.hpp>
++#include "ErrorBase.h"
++
++/**
++ * Get the input voltage to the robot controller
++ * @return The controller input voltage value
++ */
++double ControllerPower::GetInputVoltage() {
++	int32_t status = 0;
++	double retVal = getVinVoltage(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the input current to the robot controller
++ * @return The controller input current value
++ */
++double ControllerPower::GetInputCurrent() {
++	int32_t status = 0;
++	double retVal = getVinCurrent(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the voltage of the 6V rail
++ * @return The controller 6V rail voltage value
++ */
++double ControllerPower::GetVoltage6V() {
++	int32_t status = 0;
++	double retVal = getUserVoltage6V(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the current output of the 6V rail
++ * @return The controller 6V rail output current value
++ */
++double ControllerPower::GetCurrent6V() {
++	int32_t status = 0;
++	double retVal = getUserCurrent6V(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the enabled state of the 6V rail. The rail may be disabled due to a controller
++ * brownout, a short circuit on the rail, or controller over-voltage
++ * @return The controller 6V rail enabled value
++ */
++bool ControllerPower::GetEnabled6V() {
++	int32_t status = 0;
++	bool retVal = getUserActive6V(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the count of the total current faults on the 6V rail since the controller has booted
++ * @return The number of faults
++ */
++int ControllerPower::GetFaultCount6V() {
++	int32_t status = 0;
++	int retVal = getUserCurrentFaults6V(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the voltage of the 5V rail
++ */
++double ControllerPower::GetVoltage5V() {
++	int32_t status = 0;
++	double retVal = getUserVoltage5V(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the current output of the 5V rail
++ */
++double ControllerPower::GetCurrent5V() {
++	int32_t status = 0;
++	double retVal = getUserCurrent5V(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the enabled state of the 5V rail. The rail may be disabled due to a controller
++ * brownout, a short circuit on the rail, or controller over-voltage
++ * @return The controller 5V rail enabled value
++ */
++bool ControllerPower::GetEnabled5V() {
++	int32_t status = 0;
++	bool retVal = getUserActive5V(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the count of the total current faults on the 5V rail since the controller has booted
++ * @return The number of faults
++ */
++int ControllerPower::GetFaultCount5V() {
++	int32_t status = 0;
++	int retVal = getUserCurrentFaults5V(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the voltage of the 3.3V rail
++ */
++double ControllerPower::GetVoltage3V3() {
++	int32_t status = 0;
++	double retVal = getUserVoltage3V3(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the current output of the 3.3V rail
++ */
++double ControllerPower::GetCurrent3V3() {
++	int32_t status = 0;
++	double retVal = getUserCurrent3V3(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++
++/**
++ * Get the enabled state of the 3.3V rail. The rail may be disabled due to a controller
++ * brownout, a short circuit on the rail, or controller over-voltage
++ * @return The controller 3.3V rail enabled value
++ */
++bool ControllerPower::GetEnabled3V3() {
++	int32_t status = 0;
++	bool retVal = getUserActive3V3(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++/**
++ * Get the count of the total current faults on the 3.3V rail since the controller has booted
++ * @return The number of faults
++ */
++int ControllerPower::GetFaultCount3V3() {
++	int32_t status = 0;
++	int retVal = getUserCurrentFaults3V3(&status);
++	wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
+\ No newline at end of file
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/ControllerPower.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/ControllerPower.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ef826edf1ba1852d9c5bee410cdde501d3b16f44
+--- /dev/null
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/ControllerPower.java
+@@ -0,0 +1,144 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++package edu.wpi.first.wpilibj;
++
++import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
++import java.nio.IntBuffer;
++
++import edu.wpi.first.wpilibj.hal.HALUtil;
++import edu.wpi.first.wpilibj.hal.PowerJNI;
++
++public class ControllerPower
++{
++	public static double getInputVoltage()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		double retVal = PowerJNI.getVinVoltage(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static double getInputCurrent()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		double retVal = PowerJNI.getVinCurrent(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static double getVoltage3V3()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		double retVal = PowerJNI.getUserVoltage3V3(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static double getCurrent3V3()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		double retVal = PowerJNI.getUserCurrent3V3(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static boolean getEnabled3V3()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		boolean retVal = PowerJNI.getUserActive3V3(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static int getFaultCount3V3()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		int retVal = PowerJNI.getUserCurrentFaults3V3(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static double getVoltage5V()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		double retVal = PowerJNI.getUserVoltage5V(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static double getCurrent5V()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		double retVal = PowerJNI.getUserCurrent5V(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static boolean getEnabled5V()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		boolean retVal = PowerJNI.getUserActive5V(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}	
++	
++	public static int getFaultCount5V()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		int retVal = PowerJNI.getUserCurrentFaults5V(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static double getVoltage6V()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		double retVal = PowerJNI.getUserVoltage6V(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static double getCurrent6V()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		double retVal = PowerJNI.getUserCurrent6V(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static boolean getEnabled6V()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		boolean retVal = PowerJNI.getUserActive6V(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public static int getFaultCount6V()
++	{
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		int retVal = PowerJNI.getUserCurrentFaults6V(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++}
+\ No newline at end of file
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PowerJNI.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PowerJNI.java
+index faef60ead0cd860de6f7a4576e6bec6066e186a5..061fa18f44d79de7d3f547f30a7f2ddc39d49f08 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PowerJNI.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/hal/PowerJNI.java
+@@ -7,8 +7,14 @@ public class PowerJNI extends JNIWrapper {
+ 	public static native float getVinCurrent(IntBuffer status);
+ 	public static native float getUserVoltage6V(IntBuffer status);
+ 	public static native float getUserCurrent6V(IntBuffer status);
++	public static native boolean getUserActive6V(IntBuffer status);
++	public static native int getUserCurrentFaults6V(IntBuffer status);
+ 	public static native float getUserVoltage5V(IntBuffer status);
+ 	public static native float getUserCurrent5V(IntBuffer status);
++	public static native boolean getUserActive5V(IntBuffer status);
++	public static native int getUserCurrentFaults5V(IntBuffer status);
+ 	public static native float getUserVoltage3V3(IntBuffer status);
+ 	public static native float getUserCurrent3V3(IntBuffer status);
++	public static native boolean getUserActive3V3(IntBuffer status);
++	public static native int getUserCurrentFaults3V3(IntBuffer status);
+ }
+diff --git a/wpilibj/wpilibJavaJNI/lib/PowerJNI.cpp b/wpilibj/wpilibJavaJNI/lib/PowerJNI.cpp
+index 0d5f802c4f1eebd380bbf0f6098d5e27b97ce52c..4a247aee4599a3b49954dbbbf29bfe41e6a43ffc 100644
+--- a/wpilibj/wpilibJavaJNI/lib/PowerJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/PowerJNI.cpp
+@@ -50,6 +50,30 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent6
+ 	return getUserCurrent6V(statusPtr);
+ }
+ 
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
++ * Method:    getUserActive6V
++ * Signature: (Ljava/nio/IntBuffer;)Z
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive6V
++  (JNIEnv * env, jclass, jobject status)
++{
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	return getUserActive6V(statusPtr);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
++ * Method:    getUserCurrentFaults6V
++ * Signature: (Ljava/nio/IntBuffer;)I
++ */
++JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults6V
++  (JNIEnv * env, jclass, jobject status)
++{
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	return getUserCurrentFaults6V(statusPtr);
++}
++
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
+  * Method:    getUserVoltage5V
+@@ -74,6 +98,30 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent5
+ 	return getUserCurrent5V(statusPtr);
+ }
+ 
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
++ * Method:    getUserActive5V
++ * Signature: (Ljava/nio/IntBuffer;)Z
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive5V
++  (JNIEnv * env, jclass, jobject status)
++{
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	return getUserActive5V(statusPtr);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
++ * Method:    getUserCurrentFaults5V
++ * Signature: (Ljava/nio/IntBuffer;)I
++ */
++JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults5V
++  (JNIEnv * env, jclass, jobject status)
++{
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	return getUserCurrentFaults3V3(statusPtr);
++}
++
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
+  * Method:    getUserVoltage3V3
+@@ -97,3 +145,28 @@ JNIEXPORT jfloat JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent3
+ 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+ 	return getUserCurrent3V3(statusPtr);
+ }
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
++ * Method:    getUserActive3V3
++ * Signature: (Ljava/nio/IntBuffer;)Z
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive3V3
++  (JNIEnv * env, jclass, jobject status)
++{
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	return getUserActive3V3(statusPtr);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PowerJNI
++ * Method:    getUserCurrentFaults3V3
++ * Signature: (Ljava/nio/IntBuffer;)I
++ */
++JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults3V3
++  (JNIEnv * env, jclass, jobject status)
++{
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	return getUserCurrentFaults3V3(statusPtr);
++}
++

@@ -1,0 +1,346 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Wed, 16 Jul 2014 14:13:29 -0400
+Subject: [PATCH 0164/6262] More CANJaguar integration tests
+
+Change-Id: I92e6bb7ee0e7d43c1468650e2c69bb8f46a0154d
+---
+ cmake/run-cpp-tests.sh                        |   4 +-
+ .../src/CANJaguarTest.cpp                     | 186 ++++++++++++------
+ 2 files changed, 130 insertions(+), 60 deletions(-)
+
+diff --git a/cmake/run-cpp-tests.sh b/cmake/run-cpp-tests.sh
+index 1cb92b27aa32ecb4545b19018d2ab93cde9a851b..27cfd448861fb51d61c476683adc748b8257e7d5 100755
+--- a/cmake/run-cpp-tests.sh
++++ b/cmake/run-cpp-tests.sh
+@@ -6,11 +6,11 @@ if [ $(which sshpass) ]
+ then
+ 	sshpass -p "" ssh admin@10.1.90.2 killall FRCUserProgram
+ 	sshpass -p "" scp target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin
+-	sshpass -p "" ssh admin@10.1.90.2 ./FRCUserProgram  $*
++	sshpass -p "" ssh admin@10.1.90.2 ./FRCUserProgram --gtest_color=yes $*
+ else
+ 	ssh admin@10.1.90.2 killall FRCUserProgram
+ 	scp target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin
+-	ssh admin@10.1.90.2 ./FRCUserProgram $*
++	ssh admin@10.1.90.2 ./FRCUserProgram --gtest_color=yes $*
+ fi
+ 
+ 
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+index 62553440effa06b783fc31ebf5648427c5cc6c33..b011af0ba4b86570cc3adcc861df37b929616d9a 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+@@ -9,20 +9,22 @@
+ #include "gtest/gtest.h"
+ #include "TestBench.h"
+ 
+-#include "NetworkCommunication/CANSessionMux.h"
+-
+ static constexpr double kExpectedBusVoltage = 14.0;
+ static constexpr double kExpectedTemperature = 25.0;
+ 
+ static constexpr double kMotorTime = 0.5;
+ 
+ static constexpr double kEncoderSettlingTime = 1.0;
+-static constexpr double kEncoderPositionTolerance = 10.0/360.0; // +/-10 degrees
++static constexpr double kEncoderPositionTolerance = 0.1;
++static constexpr double kEncoderSpeedTolerance = 30.0;
++
++static constexpr double kPotentiometerSettlingTime	 = 1.0;
++static constexpr double kPotentiometerPositionTolerance = 0.1;
++
++static constexpr double kCurrentTolerance = 0.1;
+ 
+-static constexpr double kPotentiometerSettlingTime = 1.0;
+-static constexpr double kPotentiometerPositionTolerance = 10.0/360.0; // +/-10 degrees
++static constexpr double kVoltageTolerance = 0.1;
+ 
+-// TODO test coverage for CANJaguar
+ class CANJaguarTest : public testing::Test {
+ protected:
+ 	CANJaguar *m_jaguar;
+@@ -51,6 +53,18 @@ protected:
+ 		delete m_fakeReverseLimit;
+ 		delete m_fakePotentiometer;
+ 	}
++
++	/**
++	 * Calls CANJaguar::Set periodically 50 times to make sure everything is
++	 * verified.  This mimics a real robot program, where Set is presumably
++	 * called in each iteration of the main loop.
++	 */
++	void SetJaguar(float totalTime, float value = 0.0f) {
++		for(int i = 0; i < 50; i++) {
++			m_jaguar->Set(value);
++			Wait(totalTime / 50.0);
++		}
++	}
+ };
+ 
+ /**
+@@ -76,22 +90,36 @@ TEST_F(CANJaguarTest, InitialStatus) {
+ 		<< "Jaguar has one or more fault set.";
+ }
+ 
++/**
++ * Test if we can set arbitrary setpoints and PID values each each applicable
++ * mode and get the same values back.
++ */
++TEST_F(CANJaguarTest, SetGet) {
++	m_jaguar->DisableControl();
++
++	m_jaguar->SetSpeedMode(CANJaguar::QuadEncoder, 360, 1, 2, 3);
++	m_jaguar->Set(4);
++
++	EXPECT_FLOAT_EQ(1, m_jaguar->GetP());
++	EXPECT_FLOAT_EQ(2, m_jaguar->GetI());
++	EXPECT_FLOAT_EQ(3, m_jaguar->GetD());
++	EXPECT_FLOAT_EQ(4, m_jaguar->Get());
++}
++
+ /**
+  * Test if we can drive the motor in percentage mode and get a position back
+  */
+ TEST_F(CANJaguarTest, PercentForwards) {
+ 	m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
+ 	m_jaguar->EnableControl();
+-	m_jaguar->Set(0.0f);
+ 
+ 	/* The motor might still have momentum from the previous test. */
+-	Wait(kEncoderSettlingTime);
++	SetJaguar(kEncoderSettlingTime, 0.0f);
+ 
+ 	double initialPosition = m_jaguar->GetPosition();
+ 
+ 	/* Drive the speed controller briefly to move the encoder */
+-	m_jaguar->Set(1.0f);
+-	Wait(kMotorTime);
++	SetJaguar(kMotorTime, 1.0f);
+ 	m_jaguar->Set(0.0f);
+ 
+ 	/* The position should have increased */
+@@ -106,38 +134,67 @@ TEST_F(CANJaguarTest, PercentForwards) {
+ TEST_F(CANJaguarTest, PercentReverse) {
+ 	m_jaguar->SetPercentMode(CANJaguar::QuadEncoder, 360);
+ 	m_jaguar->EnableControl();
+-	m_jaguar->Set(0.0f);
+ 
+ 	/* The motor might still have momentum from the previous test. */
+-	Wait(kEncoderSettlingTime);
++	SetJaguar(kEncoderSettlingTime, 0.0f);
+ 
+ 	double initialPosition = m_jaguar->GetPosition();
+ 
+ 	/* Drive the speed controller briefly to move the encoder */
+-	m_jaguar->Set(-1.0f);
+-	Wait(kMotorTime);
++	SetJaguar(kMotorTime, -1.0f);
+ 	m_jaguar->Set(0.0f);
+ 
++	float p = m_jaguar->GetPosition();
+ 	/* The position should have decreased */
+-	EXPECT_LT(m_jaguar->GetPosition(), initialPosition)
++	EXPECT_LT(p, initialPosition)
+ 		<< "CAN Jaguar position should have decreased after the motor moved";
+ }
+ 
++/**
++ * Test if we can set an absolute voltage and receive a matching output voltage
++ * status.
++ */
++TEST_F(CANJaguarTest, Voltage) {
++	m_jaguar->SetVoltageMode();
++	m_jaguar->EnableControl();
++
++	SetJaguar(kMotorTime, M_PI);
++	m_jaguar->Set(0.0f);
++	EXPECT_NEAR(M_PI, m_jaguar->GetOutputVoltage(), kVoltageTolerance);
++
++	SetJaguar(kMotorTime, 8.0f);
++	m_jaguar->Set(0.0f);
++	EXPECT_NEAR(8.0f, m_jaguar->GetOutputVoltage(), kVoltageTolerance);
++}
++
++/**
++ * Test if we can set a speed in speed control mode and receive a matching
++ * speed status.
++ */
++TEST_F(CANJaguarTest, SpeedPID) {
++	m_jaguar->SetSpeedMode(CANJaguar::QuadEncoder, 360, 0.1f, 0.003f, 0.01f);
++	m_jaguar->EnableControl();
++
++	constexpr float speed = 200.0f;
++
++	SetJaguar(kMotorTime, speed);
++	EXPECT_NEAR(speed, m_jaguar->GetSpeed(), kEncoderSpeedTolerance);
++}
++
+ /**
+  * Test if we can set a position and reach that position with PID control on
+  * the Jaguar.
+  */
+ TEST_F(CANJaguarTest, EncoderPositionPID) {
+-	m_jaguar->SetPositionMode(CANJaguar::QuadEncoder, 360, 10.0f, 0.4f, 0.2f);
+-	m_jaguar->EnableControl();
++	m_jaguar->SetPositionMode(CANJaguar::QuadEncoder, 360, 10.0f, 0.1f, 0.0f);
+ 
+ 	double setpoint = m_jaguar->GetPosition() + 10.0f;
+ 
++	m_jaguar->EnableControl();
++
+ 	/* It should get to the setpoint within 10 seconds */
+ 	for(int i = 0; i < 10; i++) {
+-		m_jaguar->Set(setpoint);
+-
+-		Wait(1.0f);
++		SetJaguar(1.0f, setpoint);
+ 
+ 		if(std::abs(m_jaguar->GetPosition() - setpoint) <= kEncoderPositionTolerance) {
+ 			return;
+@@ -148,6 +205,41 @@ TEST_F(CANJaguarTest, EncoderPositionPID) {
+ 		<< "CAN Jaguar should have reached setpoint with PID control";
+ }
+ 
++/**
++ * Test if we can set a current setpoint with PID control on the Jaguar and get
++ * a corresponding output current
++ */
++TEST_F(CANJaguarTest, CurrentPID) {
++	m_jaguar->SetCurrentMode(10.0, 4.0, 1.0);
++	m_jaguar->EnableControl();
++
++	float setpoint =  1.6f;
++
++	/* It should get to the setpoint within 10 seconds */
++	for(int i = 0; i < 10; i++) {
++		SetJaguar(1.0, setpoint);
++
++		if(std::abs(m_jaguar->GetOutputCurrent() - setpoint) <= kCurrentTolerance) {
++			break;
++		}
++	}
++
++	EXPECT_NEAR(setpoint, m_jaguar->GetOutputCurrent(), kCurrentTolerance);
++
++	setpoint =  2.0f;
++
++	/* It should get to the setpoint within 10 seconds */
++	for(int i = 0; i < 10; i++) {
++		SetJaguar(1.0, setpoint);
++
++		if(std::abs(m_jaguar->GetOutputCurrent() - setpoint) <= kCurrentTolerance) {
++			break;
++		}
++	}
++
++	EXPECT_NEAR(setpoint, m_jaguar->GetOutputCurrent(), kCurrentTolerance);
++}
++
+ /**
+  * Test if we can get a position in potentiometer mode, using an analog output
+  * as a fake potentiometer.
+@@ -155,27 +247,17 @@ TEST_F(CANJaguarTest, EncoderPositionPID) {
+ TEST_F(CANJaguarTest, FakePotentiometerPosition) {
+ 	m_jaguar->SetPercentMode(CANJaguar::Potentiometer);
+ 	m_jaguar->EnableControl();
+-	m_jaguar->Set(0.0f);
+ 
+-	m_fakePotentiometer->SetVoltage(0.0f);
+-	Wait(kPotentiometerSettlingTime);
+-	EXPECT_NEAR(m_fakePotentiometer->GetVoltage() / 3.0f, m_jaguar->GetPosition(), kPotentiometerPositionTolerance)
+-		<< "CAN Jaguar should have returned the potentiometer position set by the analog output";
+-
+-	m_fakePotentiometer->SetVoltage(1.0f);
+-	Wait(kPotentiometerSettlingTime);
+-	EXPECT_NEAR(m_fakePotentiometer->GetVoltage() / 3.0f, m_jaguar->GetPosition(), kPotentiometerPositionTolerance)
+-		<< "CAN Jaguar should have returned the potentiometer position set by the analog output";
+-
+-	m_fakePotentiometer->SetVoltage(2.0f);
+-	Wait(kPotentiometerSettlingTime);
+-	EXPECT_NEAR(m_fakePotentiometer->GetVoltage() / 3.0f, m_jaguar->GetPosition(), kPotentiometerPositionTolerance)
+-		<< "CAN Jaguar should have returned the potentiometer position set by the analog output";
+-
+-	m_fakePotentiometer->SetVoltage(3.0f);
+-	Wait(kPotentiometerSettlingTime);
+-	EXPECT_NEAR(m_fakePotentiometer->GetVoltage() / 3.0f, m_jaguar->GetPosition(), kPotentiometerPositionTolerance)
+-		<< "CAN Jaguar should have returned the potentiometer position set by the analog output";
++	// Set the analog output to 4 different voltages and check if the Jaguar
++	// returns corresponding positions.
++	for(int i = 0; i <= 3; i++) {
++		m_fakePotentiometer->SetVoltage(static_cast<float>(i));
++
++		SetJaguar(kPotentiometerSettlingTime);
++
++		EXPECT_NEAR(m_fakePotentiometer->GetVoltage() / 3.0f, m_jaguar->GetPosition(), kPotentiometerPositionTolerance)
++			<< "CAN Jaguar should have returned the potentiometer position set by the analog output";
++	}
+ }
+ 
+ /**
+@@ -189,8 +271,7 @@ TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
+ 	m_fakeReverseLimit->Set(0);
+ 	m_jaguar->EnableControl();
+ 
+-	m_jaguar->Set(0.0f);
+-	Wait(kEncoderSettlingTime);
++	SetJaguar(kEncoderSettlingTime);
+ 
+ 	/* Make sure the limits are recognized by the Jaguar. */
+ 	ASSERT_FALSE(m_jaguar->GetForwardLimitOK());
+@@ -200,9 +281,7 @@ TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
+ 
+ 	/* Drive the speed controller briefly to move the encoder.  If the limit
+ 		 switch is recognized, it shouldn't actually move. */
+-	m_jaguar->Set(1.0f);
+-	Wait(kMotorTime);
+-	m_jaguar->Set(0.0f);
++	SetJaguar(kMotorTime, 1.0f);
+ 
+ 	/* The position should be the same, since the limit switch was on. */
+ 	EXPECT_NEAR(initialPosition, m_jaguar->GetPosition(), kEncoderPositionTolerance)
+@@ -210,9 +289,7 @@ TEST_F(CANJaguarTest, FakeLimitSwitchForwards) {
+ 
+ 	/* Drive the speed controller in the other direction.  It should actually
+ 		 move, since only the forward switch is activated.*/
+-	m_jaguar->Set(-1.0f);
+-	Wait(kMotorTime);
+-	m_jaguar->Set(0.0f);
++	SetJaguar(kMotorTime, -1.0f);
+ 
+ 	/* The position should have decreased */
+ 	EXPECT_LT(m_jaguar->GetPosition(), initialPosition)
+@@ -230,8 +307,7 @@ TEST_F(CANJaguarTest, FakeLimitSwitchReverse) {
+ 	m_fakeReverseLimit->Set(1);
+ 	m_jaguar->EnableControl();
+ 
+-	m_jaguar->Set(0.0f);
+-	Wait(kEncoderSettlingTime);
++	SetJaguar(kEncoderSettlingTime);
+ 
+ 	/* Make sure the limits are recognized by the Jaguar. */
+ 	ASSERT_TRUE(m_jaguar->GetForwardLimitOK());
+@@ -241,21 +317,15 @@ TEST_F(CANJaguarTest, FakeLimitSwitchReverse) {
+ 
+ 	/* Drive the speed controller backwards briefly to move the encoder.  If
+ 		 the limit switch is recognized, it shouldn't actually move. */
+-	m_jaguar->Set(-1.0f);
+-	Wait(kMotorTime);
+-	m_jaguar->Set(0.0f);
++	SetJaguar(kMotorTime, -1.0f);
+ 
+ 	/* The position should be the same, since the limit switch was on. */
+ 	EXPECT_NEAR(initialPosition, m_jaguar->GetPosition(), kEncoderPositionTolerance)
+ 		<< "CAN Jaguar should not have moved with the limit switch pressed";
+ 
+-	Wait(kEncoderSettlingTime);
+-
+ 	/* Drive the speed controller in the other direction.  It should actually
+ 		 move, since only the reverse switch is activated.*/
+-	m_jaguar->Set(1.0f);
+-	Wait(kMotorTime);
+-	m_jaguar->Set(0.0f);
++	SetJaguar(kMotorTime, 1.0f);
+ 
+ 	/* The position should have increased */
+ 	EXPECT_GT(m_jaguar->GetPosition(), initialPosition)

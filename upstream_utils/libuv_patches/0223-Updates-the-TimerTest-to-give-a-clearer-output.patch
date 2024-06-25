@@ -1,0 +1,78 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 24 Jul 2014 15:04:25 -0400
+Subject: [PATCH 0223/6262] Updates the TimerTest to give a clearer output.
+
+Change-Id: I4d6685392e4e3cb21b8a24607904d0c888658855
+---
+ .../java/edu/wpi/first/wpilibj/TimerTest.java | 35 +++++--------------
+ 1 file changed, 9 insertions(+), 26 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java
+index 9b3c55eeb2d4efca5acb514c62e30eb5cc83999e..2b1e3321f1de137d62012789a4a179d93890eebc 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java
+@@ -7,13 +7,9 @@
+ package edu.wpi.first.wpilibj;
+ 
+ import static org.junit.Assert.assertEquals;
+-import static org.junit.Assert.assertTrue;
+ 
+ import java.util.logging.Logger;
+ 
+-import org.junit.AfterClass;
+-import org.junit.Before;
+-import org.junit.BeforeClass;
+ import org.junit.Test;
+ 
+ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+@@ -21,40 +17,27 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+ 
+ public class TimerTest extends AbstractComsSetup {
+ 	private static final Logger logger = Logger.getLogger(TimerTest.class.getName());
+-	
+-	private static final long TIMER_TOLARANCE = 5 * 1000;
++	private static final long TIMER_TOLERANCE = (long) (2.5 * 1000);
+ 	private static final long TIMER_RUNTIME = 5 * 1000000;
+-	
++
++	@Override
+ 	protected Logger getClassLogger(){
+ 		return logger;
+ 	}
+-	
+-	@BeforeClass
+-	public static void classSetup() {
+-	}
+-	
+-	@Before
+-	public void setUp() {
+-		// Reset the fixture elements before every test
+-		
+-	}
+ 
+-	@AfterClass
+-	public static void tearDown() {
+-		// Clean up the fixture after the test
+-	}
+-	
+ 	@Test
+ 	public void delayTest(){
++		//Given
+ 		long startTime = Utility.getFPGATime();
++
++		//When
+ 		Timer.delay(TIMER_RUNTIME/1000000);
+ 		long endTime = Utility.getFPGATime();
+-		
+ 		long difference  = endTime - startTime;
+-		
++
++		//Then
+ 		long offset = difference - TIMER_RUNTIME;
+-		
+-		assertEquals("Timer.delay ran " + offset + " seconds too long", 0,  Math.abs(offset), TIMER_TOLARANCE);
++		assertEquals("Timer.delay ran " + offset + " microseconds too long",  TIMER_RUNTIME, difference, TIMER_TOLERANCE);
+ 	}
+ 
+ }

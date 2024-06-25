@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 7 Aug 2014 16:10:11 -0400
+Subject: [PATCH 0268/6262] Removes encoder.start() from the example programs
+
+Change-Id: I26a9901a978481bb37fdb6eac6a2457c2ca990b8
+---
+ .../org/usfirst/frc/team190/robot/subsystems/DriveTrain.java   | 3 ---
+ .../org/usfirst/frc/team190/pacgoat/subsystems/DriveTrain.java | 2 --
+ 2 files changed, 5 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/DriveTrain.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/DriveTrain.java
+index cfb17663dc9bf1e56c4feab5070fbb9f8d7d5082..5770cb3751e10a503ef7e5e18802dd4c0b4a68ca 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/DriveTrain.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/DriveTrain.java
+@@ -51,9 +51,6 @@ public class DriveTrain extends Subsystem {
+ 			left_encoder.setDistancePerPulse((4.0/12.0*Math.PI) / 360.0);
+ 			right_encoder.setDistancePerPulse((4.0/12.0*Math.PI) / 360.0);
+ 		}
+-		
+-		left_encoder.start();
+-		right_encoder.start();
+ 
+ 		rangefinder = new AnalogInput(6);
+ 		gyro = new Gyro(1);
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/DriveTrain.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/DriveTrain.java
+index 850a34a25eaa0c8ae0f29c365773c11ab3b4b4bb..3dc1755dafaa7191cc79c072ab565c107f0d78d6 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/DriveTrain.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/DriveTrain.java
+@@ -63,8 +63,6 @@ public class DriveTrain extends Subsystem {
+ 			leftEncoder.setDistancePerPulse((4.0/*in*/*Math.PI)/(360.0*12.0/*in/ft*/));
+ 		}
+ 
+-		rightEncoder.start();
+-		leftEncoder.start();		
+ 		LiveWindow.addSensor("DriveTrain", "Right Encoder", rightEncoder);
+ 		LiveWindow.addSensor("DriveTrain", "Left Encoder", leftEncoder);
+ 

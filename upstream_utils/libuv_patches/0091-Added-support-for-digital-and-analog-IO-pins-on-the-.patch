@@ -1,0 +1,684 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Thu, 12 Jun 2014 09:08:33 -0400
+Subject: [PATCH 0091/6262] Added support for digital and analog IO pins on the
+ MXP
+
+Change-Id: I3a4e14ceab885d19a615d6cd45f22a2250ad2856
+---
+ hal/include/HAL/Analog.hpp                    |  13 +-
+ hal/include/HAL/Digital.hpp                   |   2 -
+ hal/lib/Athena/Analog.cpp                     |  47 +++--
+ hal/lib/Athena/Digital.cpp                    | 162 +++++++++++++-----
+ wpilibc/wpilibC++/include/SensorBase.h        |   4 +-
+ wpilibc/wpilibC++/lib/AnalogChannel.cpp       |   4 +-
+ wpilibc/wpilibC++/lib/AnalogModule.cpp        |   2 +-
+ .../edu/wpi/first/wpilibj/AnalogChannel.java  |   4 +-
+ .../edu/wpi/first/wpilibj/SensorBase.java     |   4 +-
+ .../edu/wpi/first/wpilibj/hal/AnalogJNI.java  |   8 +-
+ wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp       |  71 +++++++-
+ 11 files changed, 247 insertions(+), 74 deletions(-)
+
+diff --git a/hal/include/HAL/Analog.hpp b/hal/include/HAL/Analog.hpp
+index a88d557cdba64810b48472a3f645edceb3928a00..82c14df3b0cd2899a5a8ecef5931033339d42829 100644
+--- a/hal/include/HAL/Analog.hpp
++++ b/hal/include/HAL/Analog.hpp
+@@ -16,10 +16,17 @@ enum AnalogTriggerType
+ 
+ extern "C"
+ {
+-	void* initializeAnalogPort(void* port_pointer, int32_t *status);
+-	bool checkAnalogModule(uint8_t module);
+-	bool checkAnalogChannel(uint32_t pin);
++	// Analog output functions
++	void* initializeAnalogOutputPort(void* port_pointer, int32_t *status);
++	void setAnalogOutput(void* analog_port_pointer, double voltage, int32_t *status);
++	double getAnalogOutput(void* analog_port_pointer, int32_t *status);
++	bool checkAnalogOutputChannel(uint32_t pin);
+ 
++	// Analog input functions
++	void* initializeAnalogInputPort(void* port_pointer, int32_t *status);
++	bool checkAnalogModule(uint8_t module);
++	bool checkAnalogInputChannel(uint32_t pin);
++	
+ 	void setAnalogSampleRate(double samplesPerSecond, int32_t *status);
+ 	float getAnalogSampleRate(int32_t *status);
+ 	void setAnalogSampleRateWithModule(uint8_t module, double samplesPerSecond, int32_t *status);
+diff --git a/hal/include/HAL/Digital.hpp b/hal/include/HAL/Digital.hpp
+index 774bee83132fe1a01d5a8ec3e88818b0262f27ed..4a53552aae1049728218fa32313f7ffe0abe3c63 100644
+--- a/hal/include/HAL/Digital.hpp
++++ b/hal/include/HAL/Digital.hpp
+@@ -30,8 +30,6 @@ extern "C"
+ 	bool checkDigitalModule(uint8_t module);
+ 	bool checkPWMChannel(void* digital_port_pointer);
+ 	bool checkRelayChannel(void* digital_port_pointer);
+-	uint8_t remapDigitalChannel(uint32_t pin, int32_t *status);
+-	uint8_t unmapDigitalChannel(uint32_t pin, int32_t *status);
+ 
+ 	void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status);
+ 	unsigned short getPWM(void* digital_port_pointer, int32_t *status);
+diff --git a/hal/lib/Athena/Analog.cpp b/hal/lib/Athena/Analog.cpp
+index 0b5de30172f39fae39818403bdab71adc13d6ebf..3e3c65a95b5f58f14cf919f6dcc0204d6618f8f5 100644
+--- a/hal/lib/Athena/Analog.cpp
++++ b/hal/lib/Athena/Analog.cpp
+@@ -14,7 +14,8 @@ static const long kTimebase = 40000000; ///< 40 MHz clock
+ static const long kDefaultOversampleBits = 0;
+ static const long kDefaultAverageBits = 7;
+ static const float kDefaultSampleRate = 50000.0;
+-static const uint32_t kAnalogPins = 8;
++static const uint32_t kAnalogInputPins = 8;
++static const uint32_t kAnalogOutputPins = 2;
+ 
+ static const uint32_t kAccumulatorNumChannels = 2;
+ static const uint32_t kAccumulatorChannels[] = {0, 1};
+@@ -43,15 +44,15 @@ void initializeAnalog(int32_t *status) {
+   if (analogSystemInitialized) return;
+   analogRegisterWindowSemaphore = initializeMutexRecursive();
+   analogSystem = tAI::create(status);
+-  setAnalogNumChannelsToActivate(kAnalogPins);
++  setAnalogNumChannelsToActivate(kAnalogInputPins);
+   setAnalogSampleRate(kDefaultSampleRate, status);
+   analogSystemInitialized = true;
+ }
+   
+ /**
+- * Initialize the analog port using the given port object.
++ * Initialize the analog input port using the given port object.
+  */
+-void* initializeAnalogPort(void* port_pointer, int32_t *status) {
++void* initializeAnalogInputPort(void* port_pointer, int32_t *status) {
+   initializeAnalog(status);
+   Port* port = (Port*) port_pointer;
+ 
+@@ -68,6 +69,19 @@ void* initializeAnalogPort(void* port_pointer, int32_t *status) {
+   setAnalogOversampleBits(analog_port, kDefaultOversampleBits, status);
+   return analog_port;
+ }
++  
++/**
++ * Initialize the analog output port using the given port object.
++ */
++void* initializeAnalogOutputPort(void* port_pointer, int32_t *status) {
++  initializeAnalog(status);
++  Port* port = (Port*) port_pointer;
++
++  // Initialize port structure
++  AnalogPort* analog_port = new AnalogPort();
++  analog_port->port = *port;
++  return analog_port;
++}
+ 
+ 
+ /**
+@@ -80,14 +94,27 @@ bool checkAnalogModule(uint8_t module) {
+ }
+ 
+ /**
+- * Check that the analog channel number is value.
++ * Check that the analog output channel number is value.
++ * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
++ * are 0-based.
++ * 
++ * @return Analog channel is valid
++ */
++bool checkAnalogInputChannel(uint32_t pin) {
++  if (pin >= 0 && pin < kAnalogInputPins)
++    return true;
++  return false;
++}
++
++/**
++ * Check that the analog output channel number is value.
+  * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
+  * are 0-based.
+  * 
+  * @return Analog channel is valid
+  */
+-bool checkAnalogChannel(uint32_t pin) {
+-  if (pin >= 0 && pin < kAnalogPins)
++bool checkAnalogOutputChannel(uint32_t pin) {
++  if (pin >= 0 && pin < kAnalogOutputPins)
+     return true;
+   return false;
+ }
+@@ -245,7 +272,7 @@ uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t *status) {
+ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
+   AnalogPort* port = (AnalogPort*) analog_port_pointer;
+   int16_t value;
+-  checkAnalogChannel(port->port.pin);
++  checkAnalogInputChannel(port->port.pin);
+ 
+   tAI::tReadSelect readSelect;
+   readSelect.Channel = port->port.pin;
+@@ -276,7 +303,7 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
+ int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
+   AnalogPort* port = (AnalogPort*) analog_port_pointer;
+   int16_t value;
+-  checkAnalogChannel(port->port.pin);
++  checkAnalogInputChannel(port->port.pin);
+ 
+   tAI::tReadSelect readSelect;
+   readSelect.Channel = port->port.pin;
+@@ -568,7 +595,7 @@ void* initializeAnalogTrigger(void* port_pointer, uint32_t *index, int32_t *stat
+   Resource::CreateResourceObject(&triggers, tAnalogTrigger::kNumSystems);
+ 
+   AnalogTrigger* trigger = new AnalogTrigger();
+-  trigger->port = (AnalogPort*) initializeAnalogPort(port, status);
++  trigger->port = (AnalogPort*) initializeAnalogInputPort(port, status);
+   trigger->index = triggers->Allocate("Analog Trigger");
+   *index = trigger->index;
+   // TODO: if (index == ~0ul) { CloneError(triggers); return; }
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index 7f168a6cbc0b6b51cb98b9d65be85fa8c6eed804..58e2897198b9c89d0d555a9635e7e69051621c34 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -11,9 +11,11 @@
+ #include <math.h>
+ 
+ static const uint32_t kExpectedLoopTiming = 40;
+-static const uint32_t kDigitalPins = 14;
+-static const uint32_t kPwmPins = 10;
++static const uint32_t kDigitalPins = 20;
++static const uint32_t kPwmPins = 20;
+ static const uint32_t kRelayPins = 8;
++static const uint32_t kNumHeaders = 10; // Number of non-MXP pins
++
+ /**
+  * kDefaultPwmPeriod is in ms
+  *
+@@ -108,12 +110,12 @@ void initializeDigital(int32_t *status) {
+ //  printf("MinHigh: %d\n", minHigh);
+   // Ensure that PWM output values are set to OFF
+   for (uint32_t pwm_index = 0; pwm_index < kPwmPins; pwm_index++) {
+-	// Initialize port structure
+-	DigitalPort* digital_port = new DigitalPort();
+-	digital_port->port.pin = pwm_index;
+-      
+-	setPWM(digital_port, kPwmDisabled, status);
+-	setPWMPeriodScale(digital_port, 3, status); // Set all to 4x by default.
++    // Initialize port structure
++    DigitalPort* digital_port = new DigitalPort();
++    digital_port->port.pin = pwm_index;
++    
++    setPWM(digital_port, kPwmDisabled, status);
++    setPWMPeriodScale(digital_port, 3, status); // Set all to 4x by default.
+   }
+   
+   digitalSystemsInitialized = true;
+@@ -146,20 +148,24 @@ bool checkDigitalModule(uint8_t module) {
+ 
+ bool checkPWMChannel(void* digital_port_pointer) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+-  return (port->port.pin >= 0 && port->port.pin < kPwmPins);
++  return port->port.pin < kPwmPins;
+ }
+ 
+ bool checkRelayChannel(void* digital_port_pointer) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+-  return (port->port.pin >= 0 && port->port.pin < kRelayPins);
++  return port->port.pin < kRelayPins;
+ }
+ 
+-uint8_t remapDigitalChannel(uint32_t pin, int32_t *status) {
+-  return pin; // TODO: No mapping needed anymore
+-}
+-
+-uint8_t unmapDigitalChannel(uint32_t pin, int32_t *status) {
+-  return pin; // TODO: No mapping needed anymore
++/**
++ * Map DIO pin numbers from their physical number (10 to 19) to their position
++ * in the bit field.
++ */
++uint32_t remapMXPChannel(uint32_t pin) {
++  if(pin < 14) {
++    return pin - 10; // First four digital headers
++  } else {
++    return pin - 6; // Last 8 digital headers, not counting the SPI pins
++  }
+ }
+ 
+ /**
+@@ -172,8 +178,17 @@ uint8_t unmapDigitalChannel(uint32_t pin, int32_t *status) {
+ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   checkPWMChannel(port);
+-//  printf("Value:%d\n", value);
+-  pwmSystem->writeHdr(port->port.pin, value, status); // XXX: Support MXP
++  
++  if(port->port.pin < tPWM::kNumHdrRegisters) {
++    pwmSystem->writeHdr(port->port.pin, value, status);
++  } else {
++    pwmSystem->writeMXP(port->port.pin - tPWM::kNumHdrRegisters, value, status);
++    
++    // Enable special functions on this pin
++    uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
++    short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
++    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet, status);
++  }
+ }
+ 
+ /**
+@@ -185,7 +200,12 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t *status) {
+ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   checkPWMChannel(port);
+-  return pwmSystem->readHdr(port->port.pin, status); // XXX: Support MXP
++  
++  if(port->port.pin < tPWM::kNumHdrRegisters) {
++    return pwmSystem->readHdr(port->port.pin, status);
++  } else {
++    return pwmSystem->readMXP(port->port.pin - tPWM::kNumHdrRegisters, status);
++  }
+ }
+ 
+ /**
+@@ -197,7 +217,12 @@ unsigned short getPWM(void* digital_port_pointer, int32_t *status) {
+ void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   checkPWMChannel(port);
+-  pwmSystem->writePeriodScaleHdr(port->port.pin, squelchMask, status); // XXX: Support MXP
++  
++  if(port->port.pin < tPWM::kNumPeriodScaleHdrElements) {
++    pwmSystem->writePeriodScaleHdr(port->port.pin, squelchMask, status);
++  } else {
++    pwmSystem->writePeriodScaleMXP(port->port.pin - tPWM::kNumPeriodScaleHdrElements, squelchMask, status);
++  }
+ }
+ 
+ /**
+@@ -325,22 +350,22 @@ void setPWMOutputChannelWithModule(uint8_t module, void* pwmGenerator, uint32_t
+   if (id == ~0ul) return;
+   switch(id) {
+   case 0:
+-    digitalSystem->writePWMOutputSelect(0, remapDigitalChannel(pin, status), status);
++    digitalSystem->writePWMOutputSelect(0, pin, status);
+     break;
+   case 1:
+-    digitalSystem->writePWMOutputSelect(1, remapDigitalChannel(pin, status), status);
++    digitalSystem->writePWMOutputSelect(1, pin, status);
+     break;
+   case 2:
+-    digitalSystem->writePWMOutputSelect(2, remapDigitalChannel(pin, status), status);
++    digitalSystem->writePWMOutputSelect(2, pin, status);
+     break;
+   case 3:
+-    digitalSystem->writePWMOutputSelect(3, remapDigitalChannel(pin, status), status);
++    digitalSystem->writePWMOutputSelect(3, pin, status);
+     break;
+   case 4:
+-    digitalSystem->writePWMOutputSelect(4, remapDigitalChannel(pin, status), status);
++    digitalSystem->writePWMOutputSelect(4, pin, status);
+     break;
+   case 5:
+-    digitalSystem->writePWMOutputSelect(5, remapDigitalChannel(pin, status), status);
++    digitalSystem->writePWMOutputSelect(5, pin, status);
+     break;
+   }
+ }
+@@ -417,13 +442,30 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t *status) {
+   if (DIOChannels->Allocate(kDigitalPins * (port->port.module - 1) + port->port.pin, buf) == ~0ul) return false;
+   {
+     Synchronized sync(digitalDIOSemaphore);
+-    uint32_t bitToSet = 1 << (remapDigitalChannel(port->port.pin, status));
++    
+     tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
+-    if (input) {
+-      outputEnable.Headers = outputEnable.Headers & (~bitToSet); // clear the bit for read
++    
++    if(port->port.pin < kNumHeaders) {
++      uint32_t bitToSet = 1 << port->port.pin;
++      if (input) {
++        outputEnable.Headers = outputEnable.Headers & (~bitToSet); // clear the bit for read
++      } else {
++        outputEnable.Headers = outputEnable.Headers | bitToSet; // set the bit for write
++      }
+     } else {
+-      outputEnable.Headers = outputEnable.Headers | bitToSet; // set the bit for write
++      uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
++      
++      // Disable special functions on this pin
++      short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
++      digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
++      
++      if (input) {
++        outputEnable.MXP = outputEnable.MXP & (~bitToSet); // clear the bit for read
++      } else {
++        outputEnable.MXP = outputEnable.MXP | bitToSet; // set the bit for write
++      }
+     }
++    
+     digitalSystem->writeOutputEnable(outputEnable, status);
+   }
+   return true;
+@@ -455,10 +497,23 @@ void setDIO(void* digital_port_pointer, short value, int32_t *status) {
+   {
+     Synchronized sync(digitalDIOSemaphore);
+     tDIO::tDO currentDIO = digitalSystem->readDO(status);
+-    if(value == 0) {
+-      currentDIO.Headers = currentDIO.Headers & ~(1 << remapDigitalChannel(port->port.pin, status));
+-    } else if (value == 1) {
+-      currentDIO.Headers = currentDIO.Headers | (1 << remapDigitalChannel(port->port.pin, status));
++    
++    if(port->port.pin < kNumHeaders) {
++      if(value == 0) {
++        currentDIO.Headers = currentDIO.Headers & ~(1 << port->port.pin);
++      } else if (value == 1) {
++        currentDIO.Headers = currentDIO.Headers | (1 << port->port.pin);
++      }
++    } else {
++      if(value == 0) {
++        currentDIO.MXP = currentDIO.MXP & ~(1 << remapMXPChannel(port->port.pin));
++      } else if (value == 1) {
++        currentDIO.MXP = currentDIO.MXP | (1 << remapMXPChannel(port->port.pin));
++      }
++      
++      uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
++      short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
++      digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
+     } 
+     digitalSystem->writeDO(currentDIO, status);
+   }
+@@ -479,7 +534,16 @@ bool getDIO(void* digital_port_pointer, int32_t *status) {
+   //if it == 0, then return false
+   //else return true
+ 
+-  return ((currentDIO.Headers >> remapDigitalChannel(port->port.pin, status)) & 1) != 0;
++  if(port->port.pin < kNumHeaders) {
++    return ((currentDIO.Headers >> port->port.pin) & 1) != 0;
++  } else {
++    // Disable special functions
++    uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
++    short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
++    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet, status);
++    
++    return ((currentDIO.MXP >> remapMXPChannel(port->port.pin)) & 1) != 0;
++  }
+ }
+ 
+ /**
+@@ -492,12 +556,16 @@ bool getDIO(void* digital_port_pointer, int32_t *status) {
+ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   tDIO::tOutputEnable currentOutputEnable = digitalSystem->readOutputEnable(status);
+-	
+-  //Shift 00000001 over port->port.pin-1 places.
++	//Shift 00000001 over port->port.pin-1 places.
+   //AND it against the currentOutputEnable
+   //if it == 0, then return false
+   //else return true
+-  return ((currentOutputEnable.Headers >> remapDigitalChannel(port->port.pin, status)) & 1) != 0;
++  
++  if(port->port.pin < kNumHeaders) {
++    return ((currentOutputEnable.Headers >> port->port.pin) & 1) != 0;
++  } else {
++    return ((currentOutputEnable.MXP >> remapMXPChannel(port->port.pin)) & 1) != 0;
++  }
+ }
+ 
+ /**
+@@ -510,7 +578,13 @@ bool getDIODirection(void* digital_port_pointer, int32_t *status) {
+ void pulse(void* digital_port_pointer, double pulseLength, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+   tDIO::tPulse pulse;
+-  pulse.Headers = 1 << remapDigitalChannel(port->port.pin, status);
++  
++  if(port->port.pin < kNumHeaders) {
++    pulse.Headers = 1 << port->port.pin;
++  } else {
++    pulse.MXP = 1 << remapMXPChannel(port->port.pin);
++  }
++  
+   digitalSystem->writePulseLength((uint8_t)(1.0e9 * pulseLength / (pwmSystem->readLoopTiming(status) * 25)), status);
+   digitalSystem->writePulse(pulse, status);
+ }
+@@ -522,9 +596,13 @@ void pulse(void* digital_port_pointer, double pulseLength, int32_t *status) {
+  */
+ bool isPulsing(void* digital_port_pointer, int32_t *status) {
+   DigitalPort* port = (DigitalPort*) digital_port_pointer;
+-  uint16_t mask = 1 << remapDigitalChannel(port->port.pin, status);
+   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
+-  return (pulseRegister.Headers & mask) != 0;
++  
++  if(port->port.pin < kNumHeaders) {
++    return (pulseRegister.Headers & (1 << port->port.pin)) != 0;
++  } else {
++    return (pulseRegister.MXP & (1 << remapMXPChannel(port->port.pin))) != 0;
++  }
+ }
+ 
+ /**
+@@ -543,7 +621,7 @@ bool isAnyPulsing(int32_t *status) {
+  */
+ bool isAnyPulsingWithModule(uint8_t module, int32_t *status) {
+   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
+-  return pulseRegister.Headers != 0;
++  return pulseRegister.Headers != 0 && pulseRegister.MXP != 0;
+ }
+ 
+ 
+diff --git a/wpilibc/wpilibC++/include/SensorBase.h b/wpilibc/wpilibC++/include/SensorBase.h
+index 07e62fdfae26dad0185a959c7607d89850f8e42a..becfe499a564dcf474b89a6dd06dac2158b5402d 100644
+--- a/wpilibc/wpilibC++/include/SensorBase.h
++++ b/wpilibc/wpilibC++/include/SensorBase.h
+@@ -44,13 +44,13 @@ public:
+ 	static bool CheckSolenoidChannel(uint32_t channel);
+ 	static bool CheckPDPChannel(uint32_t channel);
+ 
+-	static const uint32_t kDigitalChannels = 14;
++	static const uint32_t kDigitalChannels = 20;
+ 	static const uint32_t kAnalogChannels = 8;
+ 	static const uint32_t kAnalogModules = 2;
+ 	static const uint32_t kDigitalModules = 2;
+ 	static const uint32_t kSolenoidChannels = 8;
+ 	static const uint32_t kSolenoidModules = 2;
+-	static const uint32_t kPwmChannels = 10;
++	static const uint32_t kPwmChannels = 20;
+ 	static const uint32_t kRelayChannels = 8;
+ 	static const uint32_t kPDPChannels = 16;
+ 	static const uint32_t kChassisSlots = 8;
+diff --git a/wpilibc/wpilibC++/lib/AnalogChannel.cpp b/wpilibc/wpilibC++/lib/AnalogChannel.cpp
+index 3e166561658acbec4dfa57423abd45e5988a0134..5d6355fb16153528929efe9263f22b515407116e 100644
+--- a/wpilibc/wpilibC++/lib/AnalogChannel.cpp
++++ b/wpilibc/wpilibC++/lib/AnalogChannel.cpp
+@@ -31,7 +31,7 @@ void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
+ 		wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf);
+ 		return;
+ 	}
+-	if (!checkAnalogChannel(channel))
++	if (!checkAnalogInputChannel(channel))
+ 	{
+ 		snprintf(buf, 64, "Analog Channel %d", channel);
+ 		wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+@@ -49,7 +49,7 @@ void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
+ 	
+ 	void* port = getPortWithModule(moduleNumber, channel);
+ 	int32_t status = 0;
+-	m_port = initializeAnalogPort(port, &status);
++	m_port = initializeAnalogInputPort(port, &status);
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 
+ 	LiveWindow::GetInstance()->AddSensor("AnalogChannel",channel, GetModuleNumber(), this);
+diff --git a/wpilibc/wpilibC++/lib/AnalogModule.cpp b/wpilibc/wpilibC++/lib/AnalogModule.cpp
+index fba736738bfd68ab6195bf23e30d5e030e6f7b31..80ceeb47bed8d2d16d031096a46adbe7c09b5345 100644
+--- a/wpilibc/wpilibC++/lib/AnalogModule.cpp
++++ b/wpilibc/wpilibC++/lib/AnalogModule.cpp
+@@ -57,7 +57,7 @@ AnalogModule::AnalogModule(uint8_t moduleNumber)
+ 	{
+ 	  void* port = getPortWithModule(moduleNumber, i);
+ 	  int32_t status = 0;
+-	  m_ports[i] = initializeAnalogPort(port, &status);
++	  m_ports[i] = initializeAnalogInputPort(port, &status);
+ 	  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 	}
+ 
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java
+index 6e19580f57469b61cdabe4912cd84df3c3d7602d..9eef10ddc0ca3f08180e477c8fbbd6a992ffb246 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java
+@@ -76,7 +76,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 					+ " on module " + m_moduleNumber
+ 					+ " cannot be allocated. Module is not present.");
+ 		}
+-		if (AnalogJNI.checkAnalogChannel(channel) == 0) {
++		if (AnalogJNI.checkAnalogInputChannel(channel) == 0) {
+ 			throw new AllocationException("Analog channel " + m_channel
+ 					+ " on module " + m_moduleNumber
+ 					+ " cannot be allocated. Channel is not present.");
+@@ -94,7 +94,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 		// set the byte order
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+ 		// XXX: Uncomment when Analog has been fixed
+-		m_port = AnalogJNI.initializeAnalogPort(port_pointer, status.asIntBuffer());
++		m_port = AnalogJNI.initializeAnalogInputPort(port_pointer, status.asIntBuffer());
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 
+ 		LiveWindow.addSensor("Analog", moduleNumber, channel, this);
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index 0bfe8620ad8c9bb2ab3dc89a8c17ce27f0ecf61b..fb44ce35d88aa774b031aae5681ce7f166f9ed16 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -28,7 +28,7 @@ public abstract class SensorBase { // TODO: Refactor
+     /**
+      * Number of digital channels per digital sidecar
+      */
+-    public static final int kDigitalChannels = 10;
++    public static final int kDigitalChannels = 20;
+     /**
+      * Number of digital modules
+      * XXX: This number is incorrect.  We need to find the correct number.
+@@ -53,7 +53,7 @@ public abstract class SensorBase { // TODO: Refactor
+     /**
+      * Number of PWM channels per sidecar
+      */
+-    public static final int kPwmChannels = 10;
++    public static final int kPwmChannels = 20;
+     /**
+      * Number of relay channels per sidecar
+      */
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/AnalogJNI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/AnalogJNI.java
+index f7ac90f9e55cef89b51b035198a722f93eb91cc3..47dc3a99007344ec95b1f076fb65dee0b2beee15 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/AnalogJNI.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/AnalogJNI.java
+@@ -20,9 +20,13 @@ public class AnalogJNI extends JNIWrapper {
+ 		public static final int kFallingPulse = 3;
+ 	};
+ 
+-	public static native ByteBuffer initializeAnalogPort(ByteBuffer port_pointer, IntBuffer status);
++	public static native ByteBuffer initializeAnalogInputPort(ByteBuffer port_pointer, IntBuffer status);
++	public static native ByteBuffer initializeAnalogOutputPort(ByteBuffer port_pointer, IntBuffer status);
+ 	public static native byte checkAnalogModule(byte module);
+-	public static native byte checkAnalogChannel(int pin);
++	public static native byte checkAnalogInputChannel(int pin);
++	public static native byte checkAnalogOutputChannel(int pin);
++	public static native void setAnalogOutput(ByteBuffer port_pointer, double voltage, IntBuffer status);
++	public static native double getAnalogOutput(ByteBuffer port_pointer, IntBuffer status);
+ 	public static native void setAnalogSampleRate(double samplesPerSecond, IntBuffer status);
+ 	public static native double getAnalogSampleRate(IntBuffer status);
+ 	public static native void setAnalogSampleRateWithModule(byte module, double samplesPerSecond, IntBuffer status);
+diff --git a/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp b/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp
+index c48b27c8e9e74057af0de4437976d78ffb997128..2e68e74fe25dbaa80738ea708beb136125dc7bde 100644
+--- a/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp
+@@ -15,10 +15,10 @@ TLogLevel analogJNILogLevel = logWARNING;
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+- * Method:    initializeAnalogPort
++ * Method:    initializeAnalogInputPort
+  * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
+  */
+-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogPort
++JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort
+   (JNIEnv * env, jclass, jobject id, jobject status)
+ {
+ 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+@@ -26,7 +26,26 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAna
+ 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+ 	ANALOGJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+ 	void** analogPtr = (void**)new unsigned char[4];
+-	*analogPtr = initializeAnalogPort(*javaId, statusPtr);
++	*analogPtr = initializeAnalogInputPort(*javaId, statusPtr);
++	ANALOGJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
++	ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << *analogPtr;
++	return env->NewDirectByteBuffer( analogPtr, 4);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
++ * Method:    initializeAnalogOutputPort
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
++ */
++JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort
++  (JNIEnv * env, jclass, jobject id, jobject status)
++{
++	void ** javaId = (void**)env->GetDirectBufferAddress(id);
++	ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << *javaId;
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	ANALOGJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
++	void** analogPtr = (void**)new unsigned char[4];
++	*analogPtr = initializeAnalogOutputPort(*javaId, statusPtr);
+ 	ANALOGJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ 	ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << *analogPtr;
+ 	return env->NewDirectByteBuffer( analogPtr, 4);
+@@ -48,18 +67,58 @@ JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogModu
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+- * Method:    checkAnalogChannel
++ * Method:    checkAnalogInputChannel
+  * Signature: (I)B
+  */
+-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogChannel
++JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogInputChannel
+   (JNIEnv *, jclass, jint value)
+ {
+ 	//ANALOGJNI_LOG(logDEBUG) << "Channel = " << value;
+-	jbyte returnValue = checkAnalogChannel( value );
++	jbyte returnValue = checkAnalogInputChannel( value );
+ 	//ANALOGJNI_LOG(logDEBUG) << "checkAnalogChannelResult = " << (jint)returnValue;
+ 	return returnValue;
+ }
+ 
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
++ * Method:    checkAnalogOutputChannel
++ * Signature: (I)B
++ */
++JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogOutputChannel
++  (JNIEnv *, jclass, jint value)
++{
++	//ANALOGJNI_LOG(logDEBUG) << "Channel = " << value;
++	jbyte returnValue = checkAnalogOutputChannel( value );
++	//ANALOGJNI_LOG(logDEBUG) << "checkAnalogChannelResult = " << (jint)returnValue;
++	return returnValue;
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
++ * Method:    setAnalogOutput
++ * Signature: (Ljava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
++ */
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOutput
++  (JNIEnv * env, jclass, jobject id, jdouble voltage, jobject status)
++{
++	void ** javaId = (void**)env->GetDirectBufferAddress(id);
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	setAnalogOutput(javaId, voltage, statusPtr);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
++ * Method:    getAnalogOutput
++ * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)D
++ */
++JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOutput
++  (JNIEnv * env, jclass, jobject id, jobject status)
++{
++	void ** javaId = (void**)env->GetDirectBufferAddress(id);
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	return getAnalogOutput(javaId, statusPtr);
++}
++
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+  * Method:    setAnalogSampleRate

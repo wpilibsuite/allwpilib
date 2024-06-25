@@ -1,0 +1,209 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Wed, 22 Oct 2014 16:23:26 -0400
+Subject: [PATCH 0435/6262] Updates the test scripts to prevent a race time
+ condition
+
+The two run scripts now take an extra optional parameter [-m] that overrides the giving and taking of the mutex and lets the user handle it. This is used by the jenkins script to prevent other users from jumping in at any time while the script is running.
+
+Change-Id: Iffcbeb7ce677b173b1e9b7d9953d5a35b2643436
+---
+ test-scripts/deploy-and-run-test-on-robot.sh  | 13 +++++--
+ test-scripts/jenkins-run-tests-get-results.sh | 34 +++++++++++++++++--
+ test-scripts/run-tests-on-robot.sh            | 29 ++++++++++++----
+ 3 files changed, 65 insertions(+), 11 deletions(-)
+
+diff --git a/test-scripts/deploy-and-run-test-on-robot.sh b/test-scripts/deploy-and-run-test-on-robot.sh
+index 3412afa3e7c0b88529561b1904b7ab4362cc58f4..80392ea0cabe67c306c24d8b761f8c896ddcf385 100755
+--- a/test-scripts/deploy-and-run-test-on-robot.sh
++++ b/test-scripts/deploy-and-run-test-on-robot.sh
+@@ -17,11 +17,12 @@ DEFAULT_DESTINATION_CPP_TEST_FILE=${DEFAULT_TEST_SCP_DIR}/${DEFAULT_CPP_TEST_NAM
+ 
+ DEFAULT_DESTINATION_RUN_TEST_SCRIPT=${DEFAULT_DESTINATION_DIR}/${DEFAULT_LOCAL_RUN_TEST_SCRIPT}
+ 
+-usage="$(basename "$0") [-h] (java|cpp) [-A] [arg] [arg]...
++usage="$(basename "$0") [-h] (java|cpp) [-m] [-A] [arg] [arg]...
+ A script designed to run the integration tests.
+ This script should only be run on the roborio.
+ Where:
+     -h    Show this help text.
++    -m    The driver station mutex will be handled manually.
+     -A    Disable language recomended arguments.
+     arg   Additional arguments to be passed to test."
+ 
+@@ -60,14 +61,20 @@ if [[ ! -e ${LOCAL_TEST_FILE} ]]; then
+ 	exit 1
+ fi
+ 
+-TEST_RUN_ARGS="${@:2}"
++MUTEX_OVERRIDE_PARAM_TEXT=""
++if [[ "$2" = "-m" ]]; then
++	MUTEX_OVERRIDE_PARAM_TEXT="-m "
++	TEST_RUN_ARGS="${@:3}"
++else
++	TEST_RUN_ARGS="${@:2}"
++fi
+ 
+ shopt -s huponexit
+ 
+ SCP_TEST_SCRIPT="scp config.sh ${DEFAULT_LOCAL_RUN_TEST_SCRIPT} ${ROBOT_ADDRESS}:/${DEFAULT_DESTINATION_DIR}"
+ SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR="ssh -t ${ROBOT_ADDRESS} chmod a+x ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT}; mkdir ${DEFAULT_TEST_SCP_DIR} 2>/dev/null"
+ SCP_TEST_PROGRAM="scp ${LOCAL_TEST_FILE} ${ROBOT_ADDRESS}:/${DESTINATION_TEST_FILE}"
+-SSH_RUN_TESTS="ssh -t ${ROBOT_ADDRESS} ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT} ${LANGUAGE} $(whoami) -d ${DEFAULT_TEST_SCP_DIR} ${TEST_RUN_ARGS}"
++SSH_RUN_TESTS="ssh -t ${ROBOT_ADDRESS} ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT} ${LANGUAGE} $(whoami) ${MUTEX_OVERRIDE_PARAM_TEXT}-d ${DEFAULT_TEST_SCP_DIR} ${TEST_RUN_ARGS}"
+ 
+ if [ $(which sshpass) ]; then
+ 	sshpass -p "" ${SCP_TEST_SCRIPT}
+diff --git a/test-scripts/jenkins-run-tests-get-results.sh b/test-scripts/jenkins-run-tests-get-results.sh
+index 86a4690cfb2d54e9a98405ca418505bc050e8dcd..dc33797c177dbc6c365f4b5a6254e6427899f3ad 100755
+--- a/test-scripts/jenkins-run-tests-get-results.sh
++++ b/test-scripts/jenkins-run-tests-get-results.sh
+@@ -9,6 +9,34 @@
+ # Configurable variables
+ source config.sh
+ 
++# Setup the mutex release before we grab it
++mutexTaken=false
++# This function should run even if the script exits abnormally
++function finish {
++	if [ "$mutexTaken" == true ]; then
++		SSH_GIVE_MUTEX="ssh -t ${ROBOT_ADDRESS} /usr/local/frc/bin/teststand give --name=$(whoami)"
++		if [ $(which sshpass) ]; then
++			sshpass -p "" ${SSH_GIVE_MUTEX}
++		else
++			printf "WARNING!!! THIS IS HOW THE MUTEX IS RELEASED!\nIF YOU CHOOSE TO 'ctr+c' NOW YOU WILL HAVE TO HAND BACK THE MUTEX MANUALLY ON THE ROBOT.\n"
++			eval ${SSH_GIVE_MUTEX}
++		fi
++		mutexTaken=false
++	fi
++}
++trap finish EXIT SIGINT
++
++
++
++# Take the mutex from the driver station
++mutexTaken=true
++SSH_TAKE_MUTEX="ssh -t ${ROBOT_ADDRESS} /usr/local/frc/bin/teststand take --name=$(whoami)"
++if [ $(which sshpass) ]; then
++	sshpass -p "" ${SSH_TAKE_MUTEX}
++else
++	eval ${SSH_TAKE_MUTEX}
++fi
++
+ # If there are already test results in the repository then remove them
+ if [[ -e ${DEFAULT_LOCAL_TEST_RESULTS_DIR} ]]; then
+ 	rm -R ${DEFAULT_LOCAL_TEST_RESULTS_DIR}
+@@ -28,7 +56,7 @@ fi
+ printf "Running cpp test\n"
+ 
+ # Run the C++ Tests
+-./deploy-and-run-test-on-robot.sh cpp -A "--gtest_output=xml:${DEFAULT_DESTINATION_CPP_TEST_RESULTS}"
++./deploy-and-run-test-on-robot.sh cpp -m -A "--gtest_output=xml:${DEFAULT_DESTINATION_CPP_TEST_RESULTS}"
+ 
+ # Retrive the C++ Test Results
+ SCP_GET_CPP_TEST_RESULT="scp ${ROBOT_ADDRESS}:${DEFAULT_DESTINATION_CPP_TEST_RESULTS} ${DEFAULT_LOCAL_CPP_TEST_RESULT}"
+@@ -39,7 +67,7 @@ else
+ fi
+ 
+ # Run the Java Tests
+-./deploy-and-run-test-on-robot.sh java
++./deploy-and-run-test-on-robot.sh java -m
+ 
+ # Retrive the Java Test Results
+ SCP_GET_JAVA_TEST_RESULT="scp ${ROBOT_ADDRESS}:${DEFAULT_DESTINATION_JAVA_TEST_RESULTS} ${DEFAULT_LOCAL_JAVA_TEST_RESULT}"
+@@ -48,3 +76,5 @@ if [ $(which sshpass) ]; then
+ else
+ 	eval ${SCP_GET_JAVA_TEST_RESULT}
+ fi
++
++# The mutex is released when this program exits
+\ No newline at end of file
+diff --git a/test-scripts/run-tests-on-robot.sh b/test-scripts/run-tests-on-robot.sh
+index 107474bae5e7d3d726de132f7acbf4f526f5b121..fb4447e9e2ab6c76b825c6fc0ee5409e9a412536 100755
+--- a/test-scripts/run-tests-on-robot.sh
++++ b/test-scripts/run-tests-on-robot.sh
+@@ -17,7 +17,7 @@ source config.sh
+ DEFAULT_TEST_DIR=${DEFAULT_DESTINATION_DIR}
+ DEFAULT_PATH_TO_JRE=/usr/local/frc/JRE/bin/java
+ 
+-usage="$(basename "$0") [-h] (java|cpp) name [-d test_dir] [-A] [arg] [arg]...
++usage="$(basename "$0") [-h] (java|cpp) name [-d test_dir] [-m] [-A] [arg] [arg]...
+ A script designed to run the integration tests.
+ This script should only be run on the roborio.
+ Where:
+@@ -29,14 +29,19 @@ Where:
+           This scrip will automatically move the test into the ${DEFAULT_TEST_DIR}
+           directory when the driver station mutex is released.
+           Default: Assumes the test is in the same directory as this scrip.
++    -m    The driver station mutex will be handled manually.
+     -A    Do not use the default arguments for the given language.
+     arg   The arguments to be passed to test."
+ 
+ mutexTaken=false
++driverStationEnabled=false
+ # This function should run even if the script exits abnormally
+ function finish {
+-	if [ "$mutexTaken" == true ]; then
++	if [ "$driverStationEnabled" == true ]; then
+ 		/usr/local/frc/bin/teststand ds --name="${NAME}" disable
++		driverStationEnabled=false
++	fi
++	if [ "$mutexTaken" == true ]; then
+ 		/usr/local/frc/bin/teststand give --name="${NAME}"
+ 		mutexTaken=false
+ 	fi
+@@ -46,6 +51,8 @@ trap finish EXIT SIGINT
+ # This function should be run asynchronysly to enable the tests 10
+ # seconds after they have been run.
+ function enableIn10Seconds {
++	/usr/local/frc/bin/teststand ds --name="${NAME}" disable
++	driverStationEnabled=true
+ 	sleep 10
+ 	/usr/local/frc/bin/teststand ds --name="${NAME}" enable
+ }
+@@ -68,6 +75,7 @@ PARAM_ARGS=${@:3}
+ TEST_RUN_ARGS=${@:3}
+ RUN_WITH_DEFAULT_ARGS=true
+ DEFAULT_ARGS=""
++MUTEX_OVERRIDE=false
+ 
+ # Determine the language that we are attempting to run
+ if [[ "$1" = java ]]; then
+@@ -92,7 +100,7 @@ PARAM_COUNTER=2
+ printf "Param Args ${PARAM_ARGS}\n"
+ 
+ # Check for optional paramaters
+-while  getopts ':hd:A' option $PARAM_ARGS ; do
++while  getopts ':hmd:A' option $PARAM_ARGS ; do
+ 	case "$option" in
+ 	h)
+ 		# Print the help message
+@@ -105,6 +113,10 @@ while  getopts ':hd:A' option $PARAM_ARGS ; do
+ 		RUN_WITH_DEFAULT_ARGS=false
+ 		PARAM_COUNTER=$[$PARAM_COUNTER +1]
+ 		;;
++	m)
++		MUTEX_OVERRIDE=true
++		PARAM_COUNTER=$[$PARAM_COUNTER +1]
++		;;
+ 	d)
+ 		TEST_DIR=$OPTARG
+ 		# Since we are selecting the directory the run args start from the 5th argument
+@@ -130,9 +142,14 @@ if [[ $# -lt $PARAM_COUNTER ]]; then
+ 	exit 1
+ fi
+ 
+-# Attempt to take the mutex for the driver station
+-mutexTaken=true
+-/usr/local/frc/bin/teststand take --name="${NAME}"
++# If the mutex has been retrived a higher level in the tree
++if [ "$MUTEX_OVERRIDE" == false ]; then
++	# Attempt to take the mutex for the driver station
++	mutexTaken=true
++	/usr/local/frc/bin/teststand take --name="${NAME}"
++else
++	printf "Override driver station control enabled.\n"
++fi
+ 
+ # Kill all running robot programs
+ killall java FRCUserProgram

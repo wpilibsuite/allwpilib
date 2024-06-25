@@ -1,0 +1,107 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Fri, 18 Jul 2014 16:06:04 -0400
+Subject: [PATCH 0177/6262] Adds resource tracking to CANJaguar in C++
+
+Change-Id: I0d562af5e9f4f50f79d61db15ff25eaf4dae00d5
+---
+ wpilibc/wpilibC++/include/CANJaguar.h         |  1 +
+ wpilibc/wpilibC++/lib/CANJaguar.cpp           | 14 ++++++++
+ .../src/CANJaguarTest.cpp                     | 33 +++++++++++++++++++
+ 3 files changed, 48 insertions(+)
+
+diff --git a/wpilibc/wpilibC++/include/CANJaguar.h b/wpilibc/wpilibC++/include/CANJaguar.h
+index 7f66e5d686e81d3644da62c27d8fa7a054325ebd..78e20503c7bdb6e8a387e2cd495c07e47276d121 100644
+--- a/wpilibc/wpilibC++/include/CANJaguar.h
++++ b/wpilibc/wpilibC++/include/CANJaguar.h
+@@ -7,6 +7,7 @@
+ 
+ #include "ErrorBase.h"
+ #include "MotorSafety.h"
++#include "Resource.h"
+ #include "MotorSafetyHelper.h"
+ #include "PIDOutput.h"
+ #include "SpeedController.h"
+diff --git a/wpilibc/wpilibC++/lib/CANJaguar.cpp b/wpilibc/wpilibC++/lib/CANJaguar.cpp
+index 98781074bd2383dcaae759f198295cccc471dc13..560fbd5173a664adf3e252bd44c3b28c171d98ac 100644
+--- a/wpilibc/wpilibC++/lib/CANJaguar.cpp
++++ b/wpilibc/wpilibC++/lib/CANJaguar.cpp
+@@ -32,6 +32,8 @@ static const uint32_t kFullMessageIDMask = (CAN_MSGID_API_M | CAN_MSGID_MFR_M |
+ 
+ static const int32_t kReceiveStatusAttempts = 50;
+ 
++static Resource *allocated = NULL;
++
+ static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t period)
+ {
+ 	static const uint32_t kTrustedMessages[] = {
+@@ -236,6 +238,16 @@ CANJaguar::CANJaguar(uint8_t deviceNumber)
+ 	, m_maxOutputVoltage (kApproxBusVoltage)
+ 	, m_safetyHelper (NULL)
+ {
++	char buf[64];
++	snprintf(buf, 64, "CANJaguar device number %d", m_deviceNumber);
++	Resource::CreateResourceObject(&allocated, 63);
++
++	if (allocated->Allocate(m_deviceNumber-1, buf) == ~0ul)
++	{
++		CloneError(allocated);
++		return;
++	}
++
+ 	SetPercentMode();
+ 	InitCANJaguar();
+ 	ConfigMaxOutputVoltage(kApproxBusVoltage);
+@@ -243,6 +255,8 @@ CANJaguar::CANJaguar(uint8_t deviceNumber)
+ 
+ CANJaguar::~CANJaguar()
+ {
++	allocated->Free(m_deviceNumber-1);
++
+ 	int32_t status;
+ 
+ 	// Disable periodic setpoints
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+index b011af0ba4b86570cc3adcc861df37b929616d9a..47a1e4853bcf2ae3b158f7e8986ab02929f64aa4 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+@@ -67,6 +67,39 @@ protected:
+ 	}
+ };
+ 
++/**
++ * Tests that allocating the same CANJaguar port as an already allocated port throws a resource already allocated error code.
++ */
++TEST_F(CANJaguarTest, DuplicateAllocationCausesError) {
++	std::cout<<"The following error is an expected part of the test system"<<std::endl;
++	CANJaguar *m_jaguar = new CANJaguar(TestBench::kCANJaguarID);
++	EXPECT_EQ(wpi_error_value_ResourceAlreadyAllocated, m_jaguar->GetError().GetCode()) << "An error should have been returned";
++	//See WPIErrors.h for error code comparison
++	delete m_jaguar;
++}
++
++/**
++ * Tests that allocating a CANJaguar device beyond the range of devices throws a module index out of range error code.
++ */
++TEST_F(CANJaguarTest, OutOfRangeAllocationCausesError) {
++	std::cout<<"The following error is an expected part of the test system"<<std::endl;
++	CANJaguar *m_jaguar = new CANJaguar(64);
++	EXPECT_EQ( wpi_error_value_ModuleIndexOutOfRange, m_jaguar->GetError().GetCode()) << "An error should have been returned";
++	//See WPIErrors.h for error code comparison
++	delete m_jaguar; //This will also return an error
++}
++
++/**
++ * Tests that allocating a negative CANJaguar device throws a module index out of range error code.
++ */
++TEST_F(CANJaguarTest, OutOfRangeNegativeAllocationCausesError) {
++	std::cout<<"The following error is an expected part of the test system"<<std::endl;
++	CANJaguar *m_jaguar = new CANJaguar(0);
++	EXPECT_EQ(wpi_error_value_ModuleIndexOutOfRange, m_jaguar->GetError().GetCode()) << "An error should have been returned";
++	//See WPIErrors.h for error code comparison
++	delete m_jaguar; //This will also return an error
++}
++
+ /**
+  * Checks the default status data for reasonable values to confirm that we're
+  * really getting status data from the Jaguar.

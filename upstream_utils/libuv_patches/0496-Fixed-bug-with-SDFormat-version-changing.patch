@@ -1,0 +1,108 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <alex@thoriumrobotics.com>
+Date: Thu, 20 Nov 2014 16:07:00 -0500
+Subject: [PATCH 0496/6262] Fixed bug with SDFormat version changing.
+
+Change-Id: Ia2d17fc60763678ad4971d108861988157537fc3
+---
+ .../RunSimulationSmartDashboardAction.java    | 77 +++++++++++++++++++
+ .../resources/templates/.cproject             |  2 +-
+ 2 files changed, 78 insertions(+), 1 deletion(-)
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSimulationSmartDashboardAction.java
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSimulationSmartDashboardAction.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSimulationSmartDashboardAction.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..edbe5d5f4228273cb065c1797d8e64969b40ecca
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/actions/RunSimulationSmartDashboardAction.java
+@@ -0,0 +1,77 @@
++package edu.wpi.first.wpilib.plugins.core.actions;
++
++import java.io.File;
++import java.io.FilenameFilter;
++
++import org.eclipse.core.runtime.CoreException;
++import org.eclipse.debug.core.DebugPlugin;
++import org.eclipse.jface.action.IAction;
++import org.eclipse.jface.viewers.ISelection;
++import org.eclipse.ui.IWorkbenchWindow;
++import org.eclipse.ui.IWorkbenchWindowActionDelegate;
++
++import edu.wpi.first.wpilib.plugins.core.WPILibCore;
++
++/**
++ * Our sample action implements workbench action delegate.
++ * The action proxy will be created by the workbench and
++ * shown in the UI. When the user tries to use the action,
++ * this delegate will be created and execution will be 
++ * delegated to it.
++ * @see IWorkbenchWindowActionDelegate
++ */
++public class RunSimulationSmartDashboardAction implements IWorkbenchWindowActionDelegate {
++	/**
++	 * The constructor.
++	 */
++	public RunSimulationSmartDashboardAction() {
++	}
++
++	/**
++	 * The action has been activated. The argument of the
++	 * method represents the 'real' action sitting
++	 * in the workbench UI.
++	 * @see IWorkbenchWindowActionDelegate#run
++	 */
++	public void run(IAction action) {
++		File dir = new File(WPILibCore.getDefault().getWPILibBaseDir()+File.separator+"tools");
++		File[] files = dir.listFiles(new FilenameFilter() {
++			@Override public boolean accept(File dir, String name) {
++				return name.startsWith("SmartDashboard") && name.endsWith(".jar");
++			}
++		});
++		if (files == null || files.length < 1) return;
++		String[] cmd = {"java", "-jar", files[0].getAbsolutePath(), "-ip", "localhost"};
++		try {
++			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
++		} catch (CoreException e) {
++            WPILibCore.logError("Error running SmartDashboard.", e);
++		}
++	}
++
++	/**
++	 * Selection in the workbench has been changed. We 
++	 * can change the state of the 'real' action here
++	 * if we want, but this can only happen after 
++	 * the delegate has been created.
++	 * @see IWorkbenchWindowActionDelegate#selectionChanged
++	 */
++	public void selectionChanged(IAction action, ISelection selection) {
++	}
++
++	/**
++	 * We can use this method to dispose of any system
++	 * resources we previously allocated.
++	 * @see IWorkbenchWindowActionDelegate#dispose
++	 */
++	public void dispose() {
++	}
++
++	/**
++	 * We will cache window object in order to
++	 * be able to provide parent shell for the message dialog.
++	 * @see IWorkbenchWindowActionDelegate#init
++	 */
++	public void init(IWorkbenchWindow window) {
++	}
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index e50ccd50f152b47ffa2014c349af1ff7d9cb9f88..2ede93409c4850d2ea3944f21734a45ea64621fe 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -82,7 +82,7 @@
+ 									<listOptionValue builtIn="false" value="${WPILIB}/cpp/current/sim/include"/>
+ 									<listOptionValue builtIn="false" value="/usr/include"/>
+ 									<listOptionValue builtIn="false" value="/usr/include/gazebo-3.1"/>
+-									<listOptionValue builtIn="false" value="/usr/include/sdformat-2.0"/>
++									<listOptionValue builtIn="false" value="/usr/include/sdformat-2.2"/>
+ 								</option>
+ 								<option id="gnu.cpp.compiler.option.optimization.level.1648211502" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+ 								<option id="gnu.cpp.compiler.option.debugging.level.937474733" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>

@@ -1,0 +1,90 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Wed, 8 Oct 2014 10:39:06 -0400
+Subject: [PATCH 0396/6262] use WPILIB eclipse var & use luna to build
+
+Change-Id: I5e8560329226fca3c60f337b6b4744c50a09cdc9
+---
+ .../META-INF/MANIFEST.MF                                 | 3 ++-
+ .../edu.wpi.first.wpilib.plugins.core/plugin.xml         | 9 +++++++++
+ .../resources/templates/.cproject                        | 6 +++---
+ eclipse-plugins/pom.xml                                  | 2 +-
+ 4 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/META-INF/MANIFEST.MF b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/META-INF/MANIFEST.MF
+index e79abfe16aee61ba000ca89d35bde0c29ba9d3a4..5cde5cbf6b51c47c72075582ef6b888a536daaee 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/META-INF/MANIFEST.MF
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/META-INF/MANIFEST.MF
+@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.ui,
+  org.eclipse.ui.navigator.resources;bundle-version="3.4.400",
+  org.eclipse.ui.intro,
+  org.eclipse.ui.intro.universal,
+- org.eclipse.core.expressions;bundle-version="3.4.400"
++ org.eclipse.core.expressions;bundle-version="3.4.400",
++ org.eclipse.core.variables;bundle-version="3.2.700"
+ Bundle-ActivationPolicy: lazy
+ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+ Export-Package: edu.wpi.first.wpilib.plugins.core,
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/plugin.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/plugin.xml
+index 5447c8b870118c5d9d43ff77cbca1a6a7f0e28ac..6dfdfa6745d39f78d3473232282270a6f000eb7a 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/plugin.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/plugin.xml
+@@ -83,5 +83,14 @@
+             content="WPILib Intro/sample.xml">
+       </configExtension>
+    </extension>
++   <extension
++         point="org.eclipse.core.variables.valueVariables">
++          <variable
++    name="WPILIB"
++    initialValue="${HOME}/wpilib"
++    description="WPILib Path"
++    >
++   </variable>
++   </extension>
+ 
+ </plugin>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index 401e63f2eb2b3fa9f7ebd81e29a4c82c99979cd4..ade2eb261c2533a44fd8233843d900abd5cac2b1 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -27,7 +27,7 @@
+ 								<option id="gnu.cpp.compiler.option.optimization.level.1204256582" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+ 								<option id="gnu.cpp.compiler.option.debugging.level.969129918" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+ 								<option id="gnu.cpp.compiler.option.include.paths.394786621" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+-									<listOptionValue builtIn="false" value="&quot;$cpp-location/include&quot;"/>
++									<listOptionValue builtIn="false" value="&quot;${WPILIB}/cpp/current/include&quot;"/>
+ 								</option>
+ 								<option id="gnu.cpp.compiler.option.dialect.std.1060340803" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
+ 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1033680971" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+@@ -38,7 +38,7 @@
+ 									<listOptionValue builtIn="false" value="wpi"/>
+ 								</option>
+ 								<option id="gnu.cpp.link.option.paths.1566479969" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+-									<listOptionValue builtIn="false" value="&quot;$cpp-location/lib&quot;"/>
++									<listOptionValue builtIn="false" value="&quot;${WPILIB}/cpp/current/lib&quot;"/>
+ 								</option>
+ 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.132949138" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+ 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+@@ -126,7 +126,7 @@
+ 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.2105416021" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+ 								<option id="gnu.cpp.compiler.option.include.paths.1645322059" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+ 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}/src&quot;"/>
+-									<listOptionValue builtIn="false" value="$cpp-location/sim/include"/>
++									<listOptionValue builtIn="false" value="${WPILIB}/cpp/current/sim/include"/>
+ 									<listOptionValue builtIn="false" value="/usr/include"/>
+ 									<listOptionValue builtIn="false" value="/usr/include/gazebo-3.1"/>
+ 									<listOptionValue builtIn="false" value="/usr/include/sdformat-2.0"/>
+diff --git a/eclipse-plugins/pom.xml b/eclipse-plugins/pom.xml
+index 3cc55eca6ec59f7fb22568f42f7f508d66466f29..34e4c6ba5cef0145355f329ac532f3f6c6c5758a 100644
+--- a/eclipse-plugins/pom.xml
++++ b/eclipse-plugins/pom.xml
+@@ -26,7 +26,7 @@
+     <repository>
+       <id>juno</id>
+       <layout>p2</layout>
+-      <url>http://download.eclipse.org/releases/juno</url>
++      <url>http://download.eclipse.org/releases/luna</url>
+     </repository>
+     <repository>
+       <id>FRC Binaries</id>

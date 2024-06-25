@@ -1,0 +1,91 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Wed, 30 Jul 2014 14:08:21 -0400
+Subject: [PATCH 0228/6262] Removes the dependency-reduced-pom.xml from the
+ repository.
+
+Also adds this file to the .gitignore
+
+Change-Id: I731c58d4f8a96531e61598e281a769e6b13e2e86
+---
+ .gitignore                                  |  1 +
+ simulation/SimDS/dependency-reduced-pom.xml | 58 ---------------------
+ 2 files changed, 1 insertion(+), 58 deletions(-)
+ delete mode 100644 simulation/SimDS/dependency-reduced-pom.xml
+
+diff --git a/.gitignore b/.gitignore
+index 1cdcb433bce6a6eabd9ed3353a10c3b71ad52a64..2afe1bc3701867aca6bbe73942cad4deef981d35 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -11,6 +11,7 @@ bin/
+ .cproject
+ .settings/
+ .classpath
++**/dependency-reduced-pom.xml
+ 
+ #Java File extentions
+ *.class
+diff --git a/simulation/SimDS/dependency-reduced-pom.xml b/simulation/SimDS/dependency-reduced-pom.xml
+deleted file mode 100644
+index 4ea4f89f0bae7fa28bd5f7e0d49d2e423e61e237..0000000000000000000000000000000000000000
+--- a/simulation/SimDS/dependency-reduced-pom.xml
++++ /dev/null
+@@ -1,58 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+-  <modelVersion>4.0.0</modelVersion>
+-  <groupId>edu.wpi.first.wpilibj.simulation</groupId>
+-  <artifactId>SimDS</artifactId>
+-  <version>0.1.0-SNAPSHOT</version>
+-  <build>
+-    <plugins>
+-      <plugin>
+-        <artifactId>maven-compiler-plugin</artifactId>
+-        <version>3.1</version>
+-        <configuration>
+-          <source>1.7</source>
+-          <target>1.7</target>
+-        </configuration>
+-      </plugin>
+-      <plugin>
+-        <artifactId>maven-jar-plugin</artifactId>
+-        <configuration>
+-          <archive>
+-            <manifest>
+-              <mainClass>edu.wpi.first.wpilibj.simulation.ds.Main</mainClass>
+-            </manifest>
+-          </archive>
+-        </configuration>
+-      </plugin>
+-      <plugin>
+-        <artifactId>maven-shade-plugin</artifactId>
+-        <version>2.3</version>
+-        <executions>
+-          <execution>
+-            <phase>package</phase>
+-            <goals>
+-              <goal>shade</goal>
+-            </goals>
+-          </execution>
+-        </executions>
+-        <configuration />
+-      </plugin>
+-    </plugins>
+-  </build>
+-  <profiles>
+-    <profile>
+-      <id>docline-java8-disable</id>
+-      <build>
+-        <plugins>
+-          <plugin>
+-            <artifactId>maven-javadoc-plugin</artifactId>
+-            <configuration>
+-              <additionalparam>-Xdoclint:none</additionalparam>
+-            </configuration>
+-          </plugin>
+-        </plugins>
+-      </build>
+-    </profile>
+-  </profiles>
+-</project>
+-

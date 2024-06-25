@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Mon, 28 Jul 2014 00:01:42 -0700
+Subject: [PATCH 0208/6262] AnalogPotentiometer: Make constructors explicit.
+
+The second and third arguments have default values, so it needs to
+be explicit.
+
+Change-Id: I893a45d750291f96983bef6b753d91f10c44d2ab
+---
+ wpilibc/wpilibC++/include/AnalogPotentiometer.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/AnalogPotentiometer.h b/wpilibc/wpilibC++/include/AnalogPotentiometer.h
+index 274bcf38affc91b700347c27e753055188261c9d..72b968e897eb12ee507548ec8e59274b7d888f76 100644
+--- a/wpilibc/wpilibC++/include/AnalogPotentiometer.h
++++ b/wpilibc/wpilibC++/include/AnalogPotentiometer.h
+@@ -27,11 +27,11 @@ public:
+      * @param scale The scaling to multiply the voltage by to get a meaningful unit.
+      * @param offset The offset to add to the scaled value for controlling the zero value
+      */
+-    AnalogPotentiometer(int channel, double scale = 1.0, double offset = 0.0);
++    explicit AnalogPotentiometer(int channel, double scale = 1.0, double offset = 0.0);
+ 
+-    AnalogPotentiometer(AnalogInput *input, double scale = 1.0, double offset = 0.0);
++    explicit AnalogPotentiometer(AnalogInput *input, double scale = 1.0, double offset = 0.0);
+ 
+-    AnalogPotentiometer(AnalogInput &input, double scale = 1.0, double offset = 0.0);
++    explicit AnalogPotentiometer(AnalogInput &input, double scale = 1.0, double offset = 0.0);
+ 
+     virtual ~AnalogPotentiometer();
+ 

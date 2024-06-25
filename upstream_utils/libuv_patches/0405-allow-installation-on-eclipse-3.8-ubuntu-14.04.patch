@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joe Ross <joe@rossesmail.com>
+Date: Sat, 11 Oct 2014 18:24:51 -0700
+Subject: [PATCH 0405/6262] allow installation on eclipse 3.8 (ubuntu 14.04)
+
+Change-Id: I5d0f6a05724debefecb562f8f0fb0c8acea8e2c2
+---
+ .../edu.wpi.first.wpilib.plugins.core/META-INF/MANIFEST.MF      | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/META-INF/MANIFEST.MF b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/META-INF/MANIFEST.MF
+index 5cde5cbf6b51c47c72075582ef6b888a536daaee..d771de67ce25b80500beb6c895dc1aea48f8e606 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/META-INF/MANIFEST.MF
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/META-INF/MANIFEST.MF
+@@ -23,7 +23,7 @@ Require-Bundle: org.eclipse.ui,
+  org.eclipse.ui.intro,
+  org.eclipse.ui.intro.universal,
+  org.eclipse.core.expressions;bundle-version="3.4.400",
+- org.eclipse.core.variables;bundle-version="3.2.700"
++ org.eclipse.core.variables;bundle-version="3.2.600"
+ Bundle-ActivationPolicy: lazy
+ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+ Export-Package: edu.wpi.first.wpilib.plugins.core,

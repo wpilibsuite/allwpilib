@@ -1,0 +1,224 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Fri, 21 Nov 2014 11:32:08 -0500
+Subject: [PATCH 0500/6262] Check if Joystick Button exists when requested and
+ pass 0 and warn if it doesn't
+
+Change-Id: I2194859ef8b263f1a20aba52ec154fb0a1fc8078
+---
+ hal/include/HAL/HAL.hpp                       |  7 +++++--
+ hal/lib/Athena/HAL.cpp                        |  4 ++--
+ .../wpilibC++Devices/include/DriverStation.h  |  2 +-
+ .../wpilibC++Devices/src/DriverStation.cpp    | 16 +++++++++-------
+ wpilibc/wpilibC++Devices/src/Joystick.cpp     |  2 +-
+ .../edu/wpi/first/wpilibj/DriverStation.java  | 15 +++++++++++----
+ .../java/edu/wpi/first/wpilibj/Joystick.java  |  2 +-
+ .../FRCNetworkCommunicationsLibrary.java      |  2 +-
+ .../lib/FRCNetworkCommunicationsLibrary.cpp   | 19 +++++++++++--------
+ 9 files changed, 42 insertions(+), 27 deletions(-)
+
+diff --git a/hal/include/HAL/HAL.hpp b/hal/include/HAL/HAL.hpp
+index 8fdf7162e0e288acc2f03bdfbe453be6fbc46f86..96c410bf32600c7dbef009c6d6040452a784406f 100644
+--- a/hal/include/HAL/HAL.hpp
++++ b/hal/include/HAL/HAL.hpp
+@@ -178,7 +178,10 @@ struct HALJoystickPOVs {
+ 	int16_t povs[kMaxJoystickPOVs];
+ };
+ 
+-typedef uint32_t HALJoystickButtons;
++struct HALJoystickButtons {
++	uint32_t buttons;
++	uint8_t count;
++};
+ 
+ inline float intToFloat(int value)
+ {
+@@ -213,7 +216,7 @@ extern "C"
+ 	int HALGetAllianceStation(enum HALAllianceStationID *allianceStation);
+ 	int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes *axes);
+ 	int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs);
+-	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count);
++	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons);
+ 	int HALGetMatchTime(float *matchTime);
+ 
+ 	void HALSetNewDataSem(pthread_cond_t *);
+diff --git a/hal/lib/Athena/HAL.cpp b/hal/lib/Athena/HAL.cpp
+index 726edf1fc8a19ae97240f38a5171f585fa64365e..cc4a9d585796e6460f6f437c105836993cade0a9 100644
+--- a/hal/lib/Athena/HAL.cpp
++++ b/hal/lib/Athena/HAL.cpp
+@@ -201,9 +201,9 @@ int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs *povs)
+ 	return FRC_NetworkCommunication_getJoystickPOVs(joystickNum, (JoystickPOV_t*) povs, kMaxJoystickPOVs);
+ }
+ 
+-int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count)
++int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons)
+ {
+-	return FRC_NetworkCommunication_getJoystickButtons(joystickNum, buttons, count);
++	return FRC_NetworkCommunication_getJoystickButtons(joystickNum, &buttons->buttons, &buttons->count);
+ }
+ 
+ int HALGetMatchTime(float *matchTime)
+diff --git a/wpilibc/wpilibC++Devices/include/DriverStation.h b/wpilibc/wpilibC++Devices/include/DriverStation.h
+index b03264bdfb779c10f7d0875b363b25fd24420735..3a8cdfa942ca2b5c8972d8bcabd30da1c42ddb8e 100644
+--- a/wpilibc/wpilibC++Devices/include/DriverStation.h
++++ b/wpilibc/wpilibC++Devices/include/DriverStation.h
+@@ -34,7 +34,7 @@ public:
+ 
+ 	float GetStickAxis(uint32_t stick, uint32_t axis);
+ 	int GetStickPOV(uint32_t stick, uint32_t pov);
+-	short GetStickButtons(uint32_t stick);
++	bool GetStickButton(uint32_t stick, uint8_t button);
+ 
+ 	bool IsEnabled();
+ 	bool IsDisabled();
+diff --git a/wpilibc/wpilibC++Devices/src/DriverStation.cpp b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+index 64c13b6c51303b1f6f1d1695c7c9213840a93b7a..7afde519ef7ac4d9985e48b5010e93f6b0948d5c 100644
+--- a/wpilibc/wpilibC++Devices/src/DriverStation.cpp
++++ b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+@@ -145,11 +145,8 @@ void DriverStation::GetData()
+ 
+ 	// Get the status of all of the joysticks
+ 	for(uint8_t stick = 0; stick < kJoystickPorts; stick++) {
+-		uint8_t count;
+-
+ 		HALGetJoystickAxes(stick, &m_joystickAxes[stick]);
+ 		HALGetJoystickPOVs(stick, &m_joystickPOVs[stick]);
+-		HALGetJoystickButtons(stick, &m_joystickButtons[stick], &count);
+ 	}
+ 
+ 	if (!lastEnabled && IsEnabled())
+@@ -245,20 +242,25 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
+ 
+ /**
+  * The state of the buttons on the joystick.
+- * 12 buttons (4 msb are unused) from the joystick.
+  *
+  * @param stick The joystick to read.
+  * @return The state of the buttons on the joystick.
+  */
+-short DriverStation::GetStickButtons(uint32_t stick)
++bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
+ {
+ 	if (stick >= kJoystickPorts)
+ 	{
+ 		wpi_setWPIError(BadJoystickIndex);
+ 		return 0;
+ 	}
+-
+-	return m_joystickButtons[stick];
++	HALJoystickButtons joystickButtons;
++	HALGetJoystickButtons(stick, &joystickButtons);
++	if(button >= joystickButtons.count)
++	{
++		ReportError("WARNING: Joystick Button missing, check if all controllers are plugged in\n");
++		return false;
++	}
++	return ((0x1 << (button-1)) & joystickButtons.buttons) !=0;
+ }
+ 
+ bool DriverStation::IsEnabled()
+diff --git a/wpilibc/wpilibC++Devices/src/Joystick.cpp b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+index ea3475c84021e6587544ba647d884a41ec80adcc..f7498150533fccfe5bd7095ed7b3c9e7f855fd90 100644
+--- a/wpilibc/wpilibC++Devices/src/Joystick.cpp
++++ b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+@@ -228,7 +228,7 @@ bool Joystick::GetBumper(JoystickHand hand)
+  **/
+ bool Joystick::GetRawButton(uint32_t button)
+ {
+-	return ((0x1 << (button-1)) & m_ds->GetStickButtons(m_port)) != 0;
++	return m_ds->GetStickButton(m_port, button);
+ }
+ 
+ /**
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index 4094110651855bbd99a529e5db88b7ece0a1e0b8..089b5a3b6c79a6936b15fd2265574f716c3a7ffb 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -181,7 +181,6 @@ public class DriverStation implements RobotState.Interface {
+ 
+         // Get the status of all of the joysticks
+         for(byte stick = 0; stick < kJoystickPorts; stick++) {
+-            m_joystickButtons[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickButtons(stick);
+             m_joystickAxes[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickAxes(stick);
+             m_joystickPOVs[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs(stick);
+         }
+@@ -274,12 +273,20 @@ public class DriverStation implements RobotState.Interface {
+      * @param stick The joystick to read.
+      * @return The state of the buttons on the joystick.
+      */
+-    public int getStickButtons(final int stick) {
++    public boolean getStickButton(final int stick, byte button) {
+         if(stick < 0 || stick >= kJoystickPorts) {
+             throw new RuntimeException("Joystick index is out of range, should be 0-3");
+         }
+-
+-        return (int)m_joystickButtons[stick];
++		
++		ByteBuffer countBuffer = ByteBuffer.allocateDirect(1);
++		int buttons = FRCNetworkCommunicationsLibrary.HALGetJoystickButtons((byte)stick, countBuffer);
++		byte count = 0;
++		count = countBuffer.get();
++		if(button >= count) {
++			reportError("WARNING: Joystick Button " + button + " on port " + stick + " not available, check if controller is plugged in\n", false);
++            return false;
++		}
++		return ((0x1 << (button - 1)) & buttons) != 0;
+     }
+ 
+     /**
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+index b8afc95a4494b1f02b24150a5e37887741ea95b8..d80e8cb11ab868f3e8fba8d19922741f3c894cbe 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+@@ -276,7 +276,7 @@ public class Joystick extends GenericHID {
+      * @return The state of the button.
+      */
+     public boolean getRawButton(final int button) {
+-        return ((0x1 << (button - 1)) & m_ds.getStickButtons(m_port)) != 0;
++        return m_ds.getStickButton(m_port, (byte)button);
+     }
+ 
+     /**
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
+index 01d7c069fcdf6fcde99e8c0736a1e4121fb89d03..bdcaf481bfb6132ad491dcb933d5927be450c690 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
+@@ -467,7 +467,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
+ 	public static int kMaxJoystickPOVs = 12;
+ 	public static native short[] HALGetJoystickAxes(byte joystickNum);
+ 	public static native short[] HALGetJoystickPOVs(byte joystickNum);
+-	public static native int HALGetJoystickButtons(byte joystickNum);
++	public static native int HALGetJoystickButtons(byte joystickNum, ByteBuffer count);
+ 	public static native float HALGetMatchTime();
+ 	public static native boolean HALGetSystemActive(IntBuffer status);
+ 	public static native boolean HALGetBrownedOut(IntBuffer status);
+diff --git a/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp b/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
+index 9d15fba780123d2484c0835f2c6909b35c6590af..72d60754f659f886e0216ee070f20318cd48813d 100644
+--- a/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
+@@ -324,14 +324,17 @@ JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetwor
+  * Signature: (B)S
+  */
+ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickButtons
+-  (JNIEnv *, jclass, jbyte joystickNum)
+-{
+-    HALJoystickButtons buttons;
+-    uint8_t count;
+-
+-    HALGetJoystickButtons(joystickNum, &buttons, &count);
+-
+-    return buttons;
++  (JNIEnv * env, jclass, jbyte joystickNum, jobject count)
++{
++	NETCOMM_LOG(logDEBUG) << "Calling HALJoystickButtons";
++    HALJoystickButtons joystickButtons;
++    HALGetJoystickButtons(joystickNum, &joystickButtons);
++	jbyte *countPtr = (jbyte*)env->GetDirectBufferAddress(count);
++	NETCOMM_LOG(logDEBUG) << "Buttons = " << joystickButtons.buttons;
++	NETCOMM_LOG(logDEBUG) << "Count = " << (jint)joystickButtons.count;
++	*countPtr = joystickButtons.count;
++	NETCOMM_LOG(logDEBUG) << "CountBuffer = " << (jint)*countPtr;
++    return joystickButtons.buttons;
+ }
+ 
+ /*

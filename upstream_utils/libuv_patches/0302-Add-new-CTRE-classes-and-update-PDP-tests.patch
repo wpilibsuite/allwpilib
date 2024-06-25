@@ -1,0 +1,304 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Mon, 18 Aug 2014 10:32:26 -0400
+Subject: [PATCH 0302/6262] Add new CTRE classes and update PDP tests
+
+Change-Id: I489091c5b8b0f1f9890e5104bf01e40ae53cf6ce
+---
+ hal/lib/Athena/ctre/PCM.cpp                   |   6 +-
+ hal/lib/Athena/ctre/PDP.cpp                   |   6 +-
+ .../src/PowerDistributionPanelTest.cpp        | 113 ++++++++----------
+ .../java/edu/wpi/first/wpilibj/PDPTest.java   |  27 ++---
+ 4 files changed, 71 insertions(+), 81 deletions(-)
+
+diff --git a/hal/lib/Athena/ctre/PCM.cpp b/hal/lib/Athena/ctre/PCM.cpp
+index 1c47e87656e6f21039522b823b9def6fd8d74ee2..dd21e79adcb1ba91b0c48c90ec99320cf886e40b 100644
+--- a/hal/lib/Athena/ctre/PCM.cpp
++++ b/hal/lib/Athena/ctre/PCM.cpp
+@@ -216,7 +216,7 @@ CTR_Code PCM::GetCompressorCurrent(float &status)
+ 	uint32_t temp =(rx->compressorCurrentTop6);
+ 	temp <<= 4;
+ 	temp |=  rx->compressorCurrentBtm4;
+-	status = 20.1612903225806 * temp;
++	status = temp * 0.03125; /* 5.5 fixed pt value in Amps */
+ 	return rx.err;
+ }
+ 
+@@ -230,7 +230,7 @@ CTR_Code PCM::GetSolenoidVoltage(float &status)
+ 	uint32_t raw =(rx->solenoidVoltageTop8);
+ 	raw <<= 2;
+ 	raw |=  rx->solenoidVoltageBtm2;
+-	status = (double) raw * 24.7800586510264 / 1000;
++	status = (double) raw * 0.03125; /* 5.5 fixed pt value in Volts */
+ 	return rx.err;
+ }
+ 
+@@ -297,7 +297,7 @@ CTR_Code PCM::GetSolenoidStickyFault(bool &status)
+ CTR_Code PCM::GetBatteryVoltage(float &status)
+ {
+ 	GET_PCM_STATUS();
+-	status = (float)rx->battVoltage * ((59.0420332355816) / 1000.0);;
++	status = (float)rx->battVoltage * 0.05 + 4.0; /* 50mV per unit plus 4V. */
+ 	return rx.err;
+ }
+ /* Return status of module enable/disable
+diff --git a/hal/lib/Athena/ctre/PDP.cpp b/hal/lib/Athena/ctre/PDP.cpp
+index 8f0a6a08a4df02cfecccbd0b9c25a10f03fc5211..8c79c1d1cdc8c2a75735ca135857f66bea7170d8 100644
+--- a/hal/lib/Athena/ctre/PDP.cpp
++++ b/hal/lib/Athena/ctre/PDP.cpp
+@@ -110,7 +110,7 @@ CTR_Code PDP::GetChannelCurrent(UINT8 idx, double &current)
+ 		}
+ 	}
+ 	/* convert to amps */
+-	current = 0.06724511900000001*raw + 1.527114967;
++	current = (double)raw * 0.125;  /* 7.3 fixed pt value in Amps */
+ 	/* signal caller with success */
+ 	return retval;
+ }
+@@ -118,14 +118,14 @@ CTR_Code PDP::GetVoltage(double &voltage)
+ {
+ 	GET_STATUS3();
+ 	uint32_t raw = rx->busVoltage;
+-	voltage = 0.0554413328606877 * raw;
++	voltage = (double)raw * 0.05 + 4.0; /* 50mV per unit plus 4V. */;
+ 	return rx.err;
+ }
+ CTR_Code PDP::GetTemperature(double &tempC)
+ {
+ 	GET_STATUS3();
+ 	uint32_t raw = rx->temp;
+-	tempC =	((double)raw-67.8564500484966)*1.03250836957542;
++	tempC =	(double)raw * 1.03250836957542 - 67.8564500484966;
+ 	return rx.err;
+ }
+ //------------------ C interface --------------------------------------------//
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/PowerDistributionPanelTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/PowerDistributionPanelTest.cpp
+index 2630fe04350171cbd555bddc07924487af1325b2..ca7dac036614529a833785620812e088fea0ed8c 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/PowerDistributionPanelTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/PowerDistributionPanelTest.cpp
+@@ -9,92 +9,83 @@
+ #include "gtest/gtest.h"
+ #include "TestBench.h"
+ 
+-/* The current returned when the motor is not being driven */
+-static const double kLowCurrent =  1.52;
+-static const double kCurrentTolerance =  0.1;
++static const double kMotorTime = 0.25;
+ 
+ class PowerDistributionPanelTest : public testing::Test {
+ protected:
+-  PowerDistributionPanel *m_pdp;
+-  Talon *m_talon;
+-  Victor *m_victor;
+-  Jaguar *m_jaguar;
+-
+-  virtual void SetUp() {
+-    m_pdp = new PowerDistributionPanel();
+-    m_talon = new Talon(TestBench::kTalonChannel);
+-    m_victor = new Victor(TestBench::kVictorChannel);
+-    m_jaguar = new Jaguar(TestBench::kJaguarChannel);
+-  }
+-
+-  virtual void TearDown() {
+-    delete m_pdp;
+-    delete m_talon;
+-    delete m_victor;
+-    delete m_jaguar;
+-  }
+-
+-  void Reset() {
+-    /* Reset all speed controllers to 0.0 */
+-    m_talon->Set(0.0f);
+-    m_victor->Set(0.0f);
+-    m_jaguar->Set(0.0f);
+-  }
++	PowerDistributionPanel *m_pdp;
++	Talon *m_talon;
++	Victor *m_victor;
++	Jaguar *m_jaguar;
++
++	virtual void SetUp() {
++		m_pdp = new PowerDistributionPanel();
++		m_talon = new Talon(TestBench::kTalonChannel);
++		m_victor = new Victor(TestBench::kVictorChannel);
++		m_jaguar = new Jaguar(TestBench::kJaguarChannel);
++	}
++
++	virtual void TearDown() {
++		delete m_pdp;
++		delete m_talon;
++		delete m_victor;
++		delete m_jaguar;
++	}
+ };
+ 
+ /**
+  * Test if the current changes when the motor is driven using a talon
+  */
+-TEST_F(PowerDistributionPanelTest, CheckCurrentTalon) {
+-  Reset();
++TEST_F(PowerDistributionPanelTest,  CheckCurrentTalon) {
++	Wait(kMotorTime);
+ 
+-  /* The Current should be kLowCurrent */
+-  EXPECT_NEAR(kLowCurrent, m_pdp->GetCurrent(TestBench::kTalonPDPChannel), kCurrentTolerance)
+-    << "The low current was not within the expected range.";
++	/* The Current should be 0 */
++	EXPECT_FLOAT_EQ(0, m_pdp->GetCurrent(TestBench::kTalonPDPChannel))
++		<< "The Talon current was non-zero";
+ 
+-  /* Set the motor to full forward */
+-  m_talon->Set(1.0);
+-  Wait(0.02);
++	/* Set the motor to full forward */
++	m_talon->Set(1.0);
++	Wait(kMotorTime);
+ 
+-  /* The current should now be greater than the low current */
+-  ASSERT_GT(m_pdp->GetCurrent(TestBench::kTalonPDPChannel), kLowCurrent)
+-    << "The driven current is not greater than the resting current.";
++	/* The current should now be positive */
++	ASSERT_GT(m_pdp->GetCurrent(TestBench::kTalonPDPChannel), 0)
++		<< "The Talon current was not positive";
+ }
+ 
+ /**
+  * Test if the current changes when the motor is driven using a victor
+  */
+-TEST_F(PowerDistributionPanelTest,CheckCurrentVictor) {
+-  Reset();
++TEST_F(PowerDistributionPanelTest, CheckCurrentVictor) {
++	Wait(kMotorTime);
+ 
+-  /* The Current should be kLowCurrent */
+-  EXPECT_NEAR(kLowCurrent, m_pdp->GetCurrent(TestBench::kVictorPDPChannel), kCurrentTolerance)
+-    << "The low current was not within the expected range.";
++	/* The Current should be 0 */
++	EXPECT_FLOAT_EQ(0, m_pdp->GetCurrent(TestBench::kVictorPDPChannel))
++		<< "The Victor current was non-zero";
+ 
+-  /* Set the motor to full forward */
+-  m_victor->Set(1.0);
+-  Wait(0.02);
++	/* Set the motor to full forward */
++	m_victor->Set(1.0);
++	Wait(kMotorTime);
+ 
+-  /* The current should now be greater than the low current */
+-  ASSERT_GT(m_pdp->GetCurrent(TestBench::kVictorPDPChannel), kLowCurrent)
+-    << "The driven current is not greater than the resting current.";
++	/* The current should now be positive */
++	ASSERT_GT(m_pdp->GetCurrent(TestBench::kVictorPDPChannel), 0)
++		<< "The Victor current was not positive";
+ }
+ 
+ /**
+  * Test if the current changes when the motor is driven using a jaguar
+  */
+-TEST_F(PowerDistributionPanelTest, CheckCurrentJaguar) {
+-  Reset();
++TEST_F(PowerDistributionPanelTest,  CheckCurrentJaguar) {
++	Wait(kMotorTime);
+ 
+-  /* The Current should be kLowCurrent */
+-  EXPECT_NEAR(kLowCurrent, m_pdp->GetCurrent(TestBench::kJaguarPDPChannel), kCurrentTolerance)
+-    << "The low current was not within the expected range.";
++	/* The Current should be 0 */
++	EXPECT_FLOAT_EQ(0, m_pdp->GetCurrent(TestBench::kJaguarPDPChannel))
++		<< "The Jaguar current was non-zero";
+ 
+-  /* Set the motor to full forward */
+-  m_jaguar->Set(1.0);
+-  Wait(0.02);
++	/* Set the motor to full forward */
++	m_jaguar->Set(1.0);
++	Wait(kMotorTime);
+ 
+-  /* The current should now be greater than the low current */
+-  ASSERT_GT(m_pdp->GetCurrent(TestBench::kJaguarPDPChannel), kLowCurrent)
+-    << "The driven current is not greater than the resting current.";
++	/* The current should now be positive */
++	ASSERT_GT(m_pdp->GetCurrent(TestBench::kJaguarPDPChannel), 0)
++		<< "The Jaguar current was not positive";
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+index 6a300287c1b60a3cd6ca80db72387b7cd4995ed8..7bb8e12d4c38ffa6b43a3614e9ce5afdefe1b423 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+@@ -25,10 +25,6 @@ import edu.wpi.first.wpilibj.test.TestBench;
+ @RunWith(Parameterized.class)
+ public class PDPTest extends AbstractComsSetup {
+ 	private static final Logger logger = Logger.getLogger(PCMTest.class.getName());
+-	/* The current returned when the motor is not being driven */
+-	protected static final double  kLowCurrent =  1.52;
+-
+-	protected static final double  kCurrentTolerance =  0.1;
+ 
+ 	private static PowerDistributionPanel pdp;
+ 	private static MotorEncoderFixture<?> me;
+@@ -37,21 +33,21 @@ public class PDPTest extends AbstractComsSetup {
+ 	public static void setUpBeforeClass() throws Exception {
+ 		pdp = new PowerDistributionPanel();
+ 	}
+-	
++
+ 	@AfterClass
+ 	public static void tearDownAfterClass() throws Exception {
+ 		pdp.free();
+ 		me.teardown();
+ 	}
+ 
+-	
++
+ 	public PDPTest(MotorEncoderFixture<?> mef){
+ 		logger.fine("Constructor with: " + mef.getType());
+ 		if(me != null && !me.equals(mef)) me.teardown();
+ 		me = mef;
+ 		me.setup();
+ 	}
+-	
++
+ 	@Parameters(name= "{index}: {0}")
+ 	public static Collection<MotorEncoderFixture<?>[]> generateData(){
+ 		//logger.fine("Loading the MotorList");
+@@ -66,19 +62,21 @@ public class PDPTest extends AbstractComsSetup {
+ 	public void tearDown() throws Exception {
+ 		me.reset();
+ 	}
+-	
+-	
++
++
+ 
+ 	/**
+ 	 * Test if the current changes when the motor is driven using a talon
+ 	 */
+ 	@Test
+ 	public void CheckStoppedCurrentForSpeedController() throws CANMessageNotFoundException{
+-		/* The Current should be kLowCurrent */
++		Timer.delay(0.25);
++
++		/* The Current should be 0 */
+ 		assertEquals("The low current was not within the expected range.",
+-				kLowCurrent, pdp.getCurrent(me.getPDPChannel()), kCurrentTolerance);
++				0.0, pdp.getCurrent(me.getPDPChannel()), 0.001);
+ 	}
+-	
++
+ 	/**
+ 	 * Test if the current changes when the motor is driven using a talon
+ 	 */
+@@ -87,10 +85,11 @@ public class PDPTest extends AbstractComsSetup {
+ 
+ 		/* Set the motor to full forward */
+ 		me.getMotor().set(1.0);
+-		Timer.delay(0.02);
++		Timer.delay(0.25);
++
+ 		/* The current should now be greater than the low current */
+ 		assertThat("The driven current is not greater than the resting current.",
+-				pdp.getCurrent(me.getPDPChannel()), is(greaterThan(kLowCurrent)));
++				pdp.getCurrent(me.getPDPChannel()), is(greaterThan(0.0)));
+ 	}
+ 
+ 	@Override

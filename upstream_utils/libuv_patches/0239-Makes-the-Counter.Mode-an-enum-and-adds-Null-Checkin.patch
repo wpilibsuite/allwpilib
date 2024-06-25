@@ -1,0 +1,337 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Fri, 1 Aug 2014 13:41:34 -0400
+Subject: [PATCH 0239/6262] Makes the Counter.Mode an enum and adds Null
+ Checking
+
+Adds null checking to the AnalogTrigger, AnalogTriggerOutput, and Counter classes
+
+Change-Id: I09e962db36dbde0479a73a47c9998de03cd6bbb5
+---
+ .../edu/wpi/first/wpilibj/AnalogTrigger.java  | 11 ++--
+ .../first/wpilibj/AnalogTriggerOutput.java    | 11 +++-
+ .../java/edu/wpi/first/wpilibj/Counter.java   | 64 ++++++++++++++-----
+ 3 files changed, 61 insertions(+), 25 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
+index 1316beb8746c2891f931b6670dea696b276a6b96..b2775e535be20f94bd6c3338a76d5eb4a069cba6 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
+@@ -7,18 +7,16 @@
+ 
+ package edu.wpi.first.wpilibj;
+ 
+-import java.nio.IntBuffer;
+ import java.nio.ByteBuffer;
++import java.nio.IntBuffer;
+ 
+-//import com.sun.jna.Pointer;
+-
+-
+-import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.hal.AnalogJNI;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
++//import com.sun.jna.Pointer;
++import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
+ 
+ /**
+  * Class for creating and configuring Analog Triggers
+@@ -87,6 +85,9 @@ public class AnalogTrigger {
+ 	 *            the AnalogInput to use for the analog trigger
+ 	 */
+ 	public AnalogTrigger(AnalogInput channel) {
++		if(channel == null){
++			throw new NullPointerException("The Analog Input given was null");
++		}
+ 		initTrigger(channel.getChannel());
+ 	}
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java
+index 43abc713e14350d0de1adf650e68d449bfe5f3bb..6c6dcaea8ff241a672e382cc89d58b0b4f78a22d 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java
+@@ -8,7 +8,6 @@
+ package edu.wpi.first.wpilibj;
+ 
+ import java.nio.IntBuffer;
+-import java.nio.ByteBuffer;
+ 
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+@@ -64,8 +63,8 @@ public class AnalogTriggerOutput extends DigitalSource {
+ 
+ 	}
+ 
+-	private AnalogTrigger m_trigger;
+-	private AnalogTriggerType m_outputType;
++	private final AnalogTrigger m_trigger;
++	private final AnalogTriggerType m_outputType;
+ 
+ 	/**
+ 	 * Create an object that represents one of the four outputs from an analog
+@@ -82,6 +81,8 @@ public class AnalogTriggerOutput extends DigitalSource {
+ 	public AnalogTriggerOutput(AnalogTrigger trigger, final AnalogTriggerType outputType) {
+ 		if (trigger == null)
+ 			throw new NullPointerException("Analog Trigger given was null");
++		if (outputType == null)
++			throw new NullPointerException("Analog Trigger Type given was null");
+ 		m_trigger = trigger;
+ 		m_outputType = outputType;
+ 
+@@ -89,6 +90,7 @@ public class AnalogTriggerOutput extends DigitalSource {
+ 				trigger.getIndex(), outputType.value);
+ 	}
+ 
++	@Override
+ 	public void free() {
+ 	}
+ 
+@@ -105,14 +107,17 @@ public class AnalogTriggerOutput extends DigitalSource {
+ 		return value != 0;
+ 	}
+ 
++	@Override
+ 	public int getChannelForRouting() {
+ 		return (m_trigger.m_index << 2) + m_outputType.value;
+ 	}
+ 
++	@Override
+ 	public int getModuleForRouting() {
+ 		return m_trigger.m_index >> 2;
+ 	}
+ 
++	@Override
+ 	public boolean getAnalogTriggerForRouting() {
+ 		return true;
+ 	}
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
+index ece858cf99fa18dda4fa00eb9d4e93cc0620e056..28e01ed3a175aa11205ef6771351815d98ee58a9 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Counter.java
+@@ -13,7 +13,6 @@ import java.nio.ByteOrder;
+ import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+-import edu.wpi.first.wpilibj.hal.AnalogJNI;
+ import edu.wpi.first.wpilibj.hal.CounterJNI;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+@@ -35,34 +34,28 @@ public class Counter extends SensorBase implements CounterBase,
+ 	/**
+ 	 * Mode determines how and what the counter counts
+ 	 */
+-	public static class Mode {
+-
+-		/**
+-		 * The integer value representing this enumeration
+-		 */
+-		public final int value;
+-		static final int kTwoPulse_val = 0;
+-		static final int kSemiperiod_val = 1;
+-		static final int kPulseLength_val = 2;
+-		static final int kExternalDirection_val = 3;
++	public static enum Mode {
+ 		/**
+ 		 * mode: two pulse
+ 		 */
+-		public static final Mode kTwoPulse = new Mode(kTwoPulse_val);
++		kTwoPulse(0),
+ 		/**
+ 		 * mode: semi period
+ 		 */
+-		public static final Mode kSemiperiod = new Mode(kSemiperiod_val);
++		kSemiperiod(1),
+ 		/**
+ 		 * mode: pulse length
+ 		 */
+-		public static final Mode kPulseLength = new Mode(kPulseLength_val);
++		kPulseLength(2),
+ 		/**
+ 		 * mode: external direction
+ 		 */
+-		public static final Mode kExternalDirection = new Mode(
+-				kExternalDirection_val);
++		kExternalDirection(3);
+ 
++		/**
++		 * The integer value representing this enumeration
++		 */
++		public final int value;
+ 		private Mode(int value) {
+ 			this.value = value;
+ 		}
+@@ -125,7 +118,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 */
+ 	public Counter(DigitalSource source) {
+ 		if (source == null)
+-			throw new NullPointerException("Source given was null");
++			throw new NullPointerException("Digital Source given was null");
+ 		initCounter(Mode.kTwoPulse);
+ 		setUpSource(source);
+ 	}
+@@ -198,10 +191,14 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 *            the analog trigger to count
+ 	 */
+ 	public Counter(AnalogTrigger trigger) {
++		if( trigger == null){
++			throw new NullPointerException("The Analog Trigger given was null");
++		}
+ 		initCounter(Mode.kTwoPulse);
+ 		setUpSource(trigger.createOutput(AnalogTriggerType.STATE));
+ 	}
+ 
++	@Override
+ 	public void free() {
+ 		setUpdateWhenEmpty(true);
+ 
+@@ -260,6 +257,12 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 *            The analog trigger output that will trigger the counter.
+ 	 */
+ 	public void setUpSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
++		if (analogTrigger == null){
++			throw new NullPointerException("Analog Trigger given was null");
++		}
++		if (triggerType == null){
++			throw new NullPointerException("Analog Trigger Type given was null");
++		}
+ 		analogTrigger.createOutput(triggerType);
+ 		m_allocatedUpSource = true;
+ 	}
+@@ -320,6 +323,10 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 *            the digital source to count
+ 	 */
+ 	public void setDownSource(DigitalSource source) {
++		if(source == null){
++			throw new NullPointerException("The Digital Source given was null");
++		}
++		
+ 		if (m_downSource != null && m_allocatedDownSource) {
+ 			m_downSource.free();
+ 			m_allocatedDownSource = false;
+@@ -347,6 +354,13 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 *            The analog trigger output that will trigger the counter.
+ 	 */
+ 	public void setDownSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
++		if (analogTrigger == null){
++			throw new NullPointerException("Analog Trigger given was null");
++		}
++		if (triggerType == null){
++			throw new NullPointerException("Analog Trigger Type given was null");
++		}
++		
+ 		setDownSource(analogTrigger.createOutput(triggerType));
+ 		m_allocatedDownSource = true;
+ 	}
+@@ -446,6 +460,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 * still be running, so it reflects the current value. Next time it is read,
+ 	 * it might have a different value.
+ 	 */
++	@Override
+ 	public int get() {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+@@ -469,6 +484,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 * effect the running state of the counter, just sets the current value to
+ 	 * zero.
+ 	 */
++	@Override
+ 	public void reset() {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+@@ -486,6 +502,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 *            The maximum period where the counted device is considered
+ 	 *            moving in seconds.
+ 	 */
++	@Override
+ 	public void setMaxPeriod(double maxPeriod) {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+@@ -527,6 +544,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 * @return Returns true if the most recent counter period exceeds the
+ 	 *         MaxPeriod value set by SetMaxPeriod.
+ 	 */
++	@Override
+ 	public boolean getStopped() {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+@@ -540,6 +558,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 *
+ 	 * @return The last direction the counter value changed.
+ 	 */
++	@Override
+ 	public boolean getDirection() {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+@@ -571,6 +590,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 *
+ 	 * @returns The period of the last two pulses in units of seconds.
+ 	 */
++	@Override
+ 	public double getPeriod() {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+@@ -651,10 +671,14 @@ public class Counter extends SensorBase implements CounterBase,
+ 	 *            An enum to select the parameter.
+ 	 */
+ 	public void setPIDSourceParameter(PIDSourceParameter pidSource) {
++		if(pidSource == null){
++			throw new NullPointerException("PID Source Parameter given was null");
++		}
+ 		BoundaryException.assertWithinBounds(pidSource.value, 0, 1);
+ 		m_pidSource = pidSource;
+ 	}
+ 
++	@Override
+ 	public double pidGet() {
+ 		switch (m_pidSource.value) {
+ 		case PIDSourceParameter.kDistance_val:
+@@ -669,6 +693,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	/**
+ 	 * Live Window code, only does anything if live window is activated.
+ 	 */
++	@Override
+ 	public String getSmartDashboardType() {
+ 		return "Counter";
+ 	}
+@@ -678,6 +703,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	/**
+ 	 * {@inheritDoc}
+ 	 */
++	@Override
+ 	public void initTable(ITable subtable) {
+ 		m_table = subtable;
+ 		updateTable();
+@@ -686,6 +712,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	/**
+ 	 * {@inheritDoc}
+ 	 */
++	@Override
+ 	public ITable getTable() {
+ 		return m_table;
+ 	}
+@@ -693,6 +720,7 @@ public class Counter extends SensorBase implements CounterBase,
+ 	/**
+ 	 * {@inheritDoc}
+ 	 */
++	@Override
+ 	public void updateTable() {
+ 		if (m_table != null) {
+ 			m_table.putNumber("Value", get());
+@@ -702,12 +730,14 @@ public class Counter extends SensorBase implements CounterBase,
+ 	/**
+ 	 * {@inheritDoc}
+ 	 */
++	@Override
+ 	public void startLiveWindowMode() {
+ 	}
+ 
+ 	/**
+ 	 * {@inheritDoc}
+ 	 */
++	@Override
+ 	public void stopLiveWindowMode() {
+ 	}
+ }

@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Wed, 30 Jul 2014 11:19:50 -0400
+Subject: [PATCH 0227/6262] HALInitialize should be the first thing called
+
+Constructing a new HardwareTimer before HALInitialize is called
+causes segfaults sometimes in user programs, since getFPGATime assumes
+that the tGlobal objected was constructed.  This problem did not appear
+in integration tests, where the calls were in the correct order.
+
+Change-Id: I95471e9e8ad7bc5d48a65893856089e35c0b091a
+---
+ .../src/main/java/edu/wpi/first/wpilibj/RobotBase.java    | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+index 94567c9252db7e01ed7988f5c88181a83913999f..ebac725ee4fa0dece410607cfbe01a12be5adaf9 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotBase.java
+@@ -161,15 +161,15 @@ public abstract class RobotBase {
+      */
+     public static void main(String args[]) {
+         boolean errorOnExit = false;
+-        
++
++        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
++        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
++
+         // Set some implementations so that the static methods work properly
+         Timer.SetImplementation(new HardwareTimer());
+         HLUsageReporting.SetImplementation(new HardwareHLUsageReporting());
+         RobotState.SetImplementation(DriverStation.getInstance());
+ 
+-        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
+-        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+-
+         UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
+ 
+ 		String robotName = "";

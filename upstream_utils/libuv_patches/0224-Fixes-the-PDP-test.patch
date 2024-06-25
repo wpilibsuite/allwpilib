@@ -1,0 +1,446 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Tue, 29 Jul 2014 17:57:29 -0400
+Subject: [PATCH 0224/6262] Fixes the PDP test.
+
+Switches the PDP test to use the MotorEncoderFixture.
+Also adds helpful output information when running MotorEncoderTests by displaying the current MotorEncoder under test
+
+Change-Id: I1d14986a6ff0ebfffa87d2fd8077d7dd1eef50e3
+---
+ .../wpi/first/wpilibj/MotorEncoderTest.java   |  59 +++-----
+ .../java/edu/wpi/first/wpilibj/PDPTest.java   | 131 ++++++------------
+ .../wpilibj/fixtures/MotorEncoderFixture.java |  14 ++
+ .../edu/wpi/first/wpilibj/test/TestBench.java |  22 ++-
+ 4 files changed, 97 insertions(+), 129 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+index 6700f54bbfab31c13c6121726a5861e78fe93f35..4aa98ec6cf646ae0bef408ed63a6e89ccdb162f1 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+@@ -33,37 +33,28 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 	private static final double MOTOR_RUNTIME = .25;
+ 	
+ 	//private static final List<MotorEncoderFixture> pairs = new ArrayList<MotorEncoderFixture>();
+-	private static MotorEncoderFixture me = null;
++	private static MotorEncoderFixture<?> me = null;
+ 	
++	@Override
+ 	protected Logger getClassLogger(){
+ 		return logger;
+ 	}
+ 	
+-	public MotorEncoderTest(MotorEncoderFixture mef){
++	public MotorEncoderTest(MotorEncoderFixture<?> mef){
+ 		logger.fine("Constructor with: " + mef.getType());
+ 		if(me != null && !me.equals(mef)) me.teardown();
+ 		me = mef;
+ 	}
+ 	
+-	@Parameters
+-	public static Collection<MotorEncoderFixture[]> generateData(){
++	@Parameters(name= "{index}: {0}")
++	public static Collection<MotorEncoderFixture<?>[]> generateData(){
+ 		//logger.fine("Loading the MotorList");
+-		return Arrays.asList(new MotorEncoderFixture[][]{
++		return Arrays.asList(new MotorEncoderFixture<?>[][]{
+ 				 {TestBench.getInstance().getTalonPair()},
+ 				 {TestBench.getInstance().getVictorPair()},
+ 				 {TestBench.getInstance().getJaguarPair()}
+-			//	 TestBench.getInstance().getCanJaguarPair()
+ 		});
+ 	}
+-	
+-	/**
+-	 * Checks to see if this MotorEncoderFixture is fully configured for encoder testing
+-	 * @param me The motor encoder under test
+-	 * @return true if this motor encoder has an encoder attached to it
+-	 */
+-	boolean shouldRunTest(MotorEncoderFixture me){
+-		return true;//me.getType().equals(Victor.class.getSimpleName()) || me.getType().equals(Talon.class.getSimpleName());
+-	}
+ 
+ 	@Before
+ 	public void setUp() {
+@@ -110,12 +101,9 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		me.getMotor().set(.75);
+ 		Timer.delay(MOTOR_RUNTIME);
+ 		int currentValue = me.getEncoder().get();
+-		if (shouldRunTest(me)) { // TODO REMOVE THIS WHEN ALL ENCODERS ARE
+-									// PROPERLY ATTACHED
+-			assertTrue(me.getType() + " Encoder not incremented: start: "
+-					+ startValue + "; current: " + currentValue,
+-					startValue < currentValue);
+-		}
++		assertTrue(me.getType() + " Encoder not incremented: start: "
++				+ startValue + "; current: " + currentValue,
++				startValue < currentValue);
+ 		me.reset();
+ 		encodersResetCheck(me);
+ 	}
+@@ -130,12 +118,9 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		me.getMotor().set(-.75);
+ 		Timer.delay(MOTOR_RUNTIME);
+ 		int currentValue = me.getEncoder().get();
+-		if (shouldRunTest(me)) { // TODO REMOVE THIS WHEN ALL ENCODERS ARE
+-									// PROPERLY ATTACHED
+-			assertTrue(me.getType() + " Encoder not decremented: start: "
+-					+ startValue + "; current: " + currentValue,
+-					startValue > currentValue);
+-		}
++		assertTrue(me.getType() + " Encoder not decremented: start: "
++				+ startValue + "; current: " + currentValue,
++				startValue > currentValue);
+ 		me.reset();
+ 		encodersResetCheck(me);
+ 	}
+@@ -144,7 +129,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 	 * This method test if the counters count when the motors rotate
+ 	 */
+ 	@Test
+-	public void testCouter(){
++	public void testCounter(){
+ 		int counter1Start = me.getCounters()[0].get();
+ 		int counter2Start = me.getCounters()[1].get();
+ 
+@@ -152,15 +137,12 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		Timer.delay(MOTOR_RUNTIME);
+ 		int counter1End = me.getCounters()[0].get();
+ 		int counter2End = me.getCounters()[1].get();
+-		if (shouldRunTest(me)) { // TODO REMOVE THIS WHEN ALL ENCODERS ARE
+-									// PROPERLY ATTACHED
+-			assertTrue(me.getType() + " Counter not incremented: start: "
+-					+ counter1Start + "; current: " + counter1End,
+-					counter1Start < counter1End);
+-			assertTrue(me.getType() + " Counter not incremented: start: "
+-					+ counter1Start + "; current: " + counter2End,
+-					counter2Start < counter2End);
+-		}
++		assertTrue(me.getType() + " Counter not incremented: start: "
++				+ counter1Start + "; current: " + counter1End,
++				counter1Start < counter1End);
++		assertTrue(me.getType() + " Counter not incremented: start: "
++				+ counter1Start + "; current: " + counter2End,
++				counter2Start < counter2End);
+ 		me.reset();
+ 		encodersResetCheck(me);
+ 	}
+@@ -206,14 +188,13 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 		pid.free();
+ 		me.reset();
+ 	}
+-	 
+ 	
+ 	
+ 	/**
+ 	 * Checks to see if the encoders and counters are appropriately reset to zero when reset
+ 	 * @param me The MotorEncoderFixture under test
+ 	 */
+-	private void encodersResetCheck(MotorEncoderFixture me){
++	private void encodersResetCheck(MotorEncoderFixture<?> me){
+ 		int encoderVal =  me.getEncoder().get();
+ 		int counterVal[] = new int[2];
+ 		for(int i = 0; i < 2; i++){
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+index 1646dc74b06abfcc6135de91b521b5846ccd87ea..6a300287c1b60a3cd6ca80db72387b7cd4995ed8 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+@@ -1,20 +1,28 @@
+ package edu.wpi.first.wpilibj;
+ 
+-import static org.junit.Assert.*;
+-import static org.hamcrest.Matchers.*;
++import static org.hamcrest.Matchers.greaterThan;
++import static org.hamcrest.Matchers.is;
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertThat;
+ 
++import java.util.Arrays;
++import java.util.Collection;
+ import java.util.logging.Logger;
+ 
+ import org.junit.After;
+ import org.junit.AfterClass;
+-import org.junit.Before;
+ import org.junit.BeforeClass;
+ import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.junit.runners.Parameterized;
++import org.junit.runners.Parameterized.Parameters;
+ 
+ import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
++import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+ import edu.wpi.first.wpilibj.test.TestBench;
+ 
++@RunWith(Parameterized.class)
+ public class PDPTest extends AbstractComsSetup {
+ 	private static final Logger logger = Logger.getLogger(PCMTest.class.getName());
+ 	/* The current returned when the motor is not being driven */
+@@ -23,121 +31,66 @@ public class PDPTest extends AbstractComsSetup {
+ 	protected static final double  kCurrentTolerance =  0.1;
+ 
+ 	private static PowerDistributionPanel pdp;
+-	private static Talon talon;
+-	private static Victor victor;
+-	private static Jaguar jaguar;
++	private static MotorEncoderFixture<?> me;
+ 
+ 	@BeforeClass
+ 	public static void setUpBeforeClass() throws Exception {
+ 		pdp = new PowerDistributionPanel();
+-		talon = new Talon(TestBench.kTalonPDPChannel);
+-		victor = new Victor(TestBench.kVictorPDPChannel);
+-		jaguar = new Jaguar(TestBench.kJaguarPDPChannel);
+ 	}
+-
++	
+ 	@AfterClass
+ 	public static void tearDownAfterClass() throws Exception {
+ 		pdp.free();
+-		talon.free();
+-		victor.free();
+-		jaguar.free();
++		me.teardown();
+ 	}
+ 
+-	@Before
+-	public void setUp() throws Exception {
+-		/* Reset all speed controllers to 0.0 */
+-		talon.set(0.0);
+-		victor.set(0.0);
+-		jaguar.set(0.0);
++	
++	public PDPTest(MotorEncoderFixture<?> mef){
++		logger.fine("Constructor with: " + mef.getType());
++		if(me != null && !me.equals(mef)) me.teardown();
++		me = mef;
++		me.setup();
++	}
++	
++	@Parameters(name= "{index}: {0}")
++	public static Collection<MotorEncoderFixture<?>[]> generateData(){
++		//logger.fine("Loading the MotorList");
++		return Arrays.asList(new MotorEncoderFixture<?>[][]{
++				 {TestBench.getInstance().getTalonPair()},
++				 {TestBench.getInstance().getVictorPair()},
++				 {TestBench.getInstance().getJaguarPair()}
++		});
+ 	}
+ 
+ 	@After
+ 	public void tearDown() throws Exception {
++		me.reset();
+ 	}
++	
++	
+ 
+ 	/**
+ 	 * Test if the current changes when the motor is driven using a talon
+ 	 */
+ 	@Test
+-	public void CheckCurrentTalon() {
++	public void CheckStoppedCurrentForSpeedController() throws CANMessageNotFoundException{
+ 		/* The Current should be kLowCurrent */
+-		try {
+-			assertEquals("The low current was not within the expected range.",
+-					kLowCurrent, pdp.getCurrent(TestBench.kTalonPDPChannel), kCurrentTolerance);
+-		} catch (CANMessageNotFoundException e) {
+-			// TODO Auto-generated catch block
+-			e.printStackTrace();
+-		}
+-		Timer.delay(0.02);
+-
+-		/* Set the motor to full forward */
+-		talon.set(1.0);
+-		Timer.delay(0.02);
+-		/* The current should now be greater than the low current */
+-		try {
+-			assertThat("The driven current is not greater than the resting current.",
+-					pdp.getCurrent(TestBench.kTalonPDPChannel), is(greaterThan(kLowCurrent)));
+-		} catch (CANMessageNotFoundException e) {
+-			// TODO Auto-generated catch block
+-			e.printStackTrace();
+-		}
++		assertEquals("The low current was not within the expected range.",
++				kLowCurrent, pdp.getCurrent(me.getPDPChannel()), kCurrentTolerance);
+ 	}
+-
++	
+ 	/**
+-	 * Test if the current changes when the motor is driven using a victor
+-	 */
+-	@Test
+-	public void CheckCurrentVictor() {
+-		/* The Current should be kLowCurrent */
+-		try {
+-			assertEquals("The low current was not within the expected range.",
+-					kLowCurrent, pdp.getCurrent(TestBench.kVictorPDPChannel), kCurrentTolerance);
+-		} catch (CANMessageNotFoundException e) {
+-			// TODO Auto-generated catch block
+-			e.printStackTrace();
+-		}
+-		Timer.delay(0.02);
+-
+-		/* Set the motor to full forward */
+-		victor.set(1.0);
+-		Timer.delay(0.02);
+-		/* The current should now be greater than the low current */
+-		try {
+-			assertThat("The driven current is not greater than the resting current.",
+-					pdp.getCurrent(TestBench.kVictorPDPChannel), is(greaterThan(kLowCurrent)));
+-		} catch (CANMessageNotFoundException e) {
+-			// TODO Auto-generated catch block
+-			e.printStackTrace();
+-		}
+-	}
+-
+-	/**
+-	 * Test if the current changes when the motor is driven using a jaguar
++	 * Test if the current changes when the motor is driven using a talon
+ 	 */
+ 	@Test
+-	public void CheckCurrentJaguar() {
+-		/* The Current should be kLowCurrent */
+-		try {
+-			assertEquals("The low current was not within the expected range.",
+-					kLowCurrent, pdp.getCurrent(TestBench.kJaguarPDPChannel), kCurrentTolerance);
+-		} catch (CANMessageNotFoundException e) {
+-			// TODO Auto-generated catch block
+-			e.printStackTrace();
+-		}
+-		Timer.delay(0.02);
++	public void CheckRunningCurrentForSpeedController() throws CANMessageNotFoundException{
+ 
+ 		/* Set the motor to full forward */
+-		jaguar.set(1.0);
++		me.getMotor().set(1.0);
+ 		Timer.delay(0.02);
+-
+ 		/* The current should now be greater than the low current */
+-		try {
+-			assertThat("The driven current is not greater than the resting current.",
+-					pdp.getCurrent(TestBench.kJaguarPDPChannel), is(greaterThan(kLowCurrent)));
+-		} catch (CANMessageNotFoundException e) {
+-			// TODO Auto-generated catch block
+-			e.printStackTrace();
+-		}
++		assertThat("The driven current is not greater than the resting current.",
++				pdp.getCurrent(me.getPDPChannel()), is(greaterThan(kLowCurrent)));
+ 	}
+ 
+ 	@Override
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
+index 6639fd8a13d5cc34b5a5b9173c4b19bc2a87f996..756bc6acf1084168ba6d18336ae41767ca550743 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
+@@ -6,6 +6,7 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.fixtures;
+ 
++import java.lang.reflect.ParameterizedType;
+ import java.util.logging.Logger;
+ 
+ import edu.wpi.first.wpilibj.Counter;
+@@ -40,6 +41,8 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
+ 	 */
+ 	public MotorEncoderFixture(){
+ 	}
++	
++	abstract public int getPDPChannel();
+ 
+ 	/**
+ 	 * Where the implementer of this class should pass the speed controller
+@@ -210,5 +213,16 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
+ 
+ 		return true;
+ 	}
++	
++	@Override
++	public String toString(){
++		StringBuilder string = new StringBuilder("MotorEncoderFixture<");
++		//Get the generic type as a class
++		@SuppressWarnings("unchecked")
++		Class<T> class1 = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
++		string.append(class1.getSimpleName());
++		string.append(">");
++		return string.toString();
++	}
+ 
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index 0dc7ab45b53b29d4b1674b127459574445bd0155..c15ecab5be4d62d751b3367caa1e6fb7cfae01c2 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Jaguar;
+ import edu.wpi.first.wpilibj.Relay;
+ import edu.wpi.first.wpilibj.Servo;
+ import edu.wpi.first.wpilibj.Talon;
++import edu.wpi.first.wpilibj.Timer;
+ import edu.wpi.first.wpilibj.Victor;
+ import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
+ import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
+@@ -55,8 +56,9 @@ public final class TestBench {
+ 
+ 	/* PowerDistributionPanel channels */
+ 	public static final int kJaguarPDPChannel = 6;
+-	public static final int kVictorPDPChannel = 10;
++	public static final int kVictorPDPChannel = 8;
+ 	public static final int kTalonPDPChannel = 11;
++	public static final int kCANJaguarPDPChannel = 5;
+ 	
+ 	/* CAN ASSOICATED CHANNELS */
+ 	public static final int kCANRelayPowerCycler = 1;
+@@ -102,6 +104,10 @@ public final class TestBench {
+ 			protected DigitalInput giveDigitalInputB() {
+ 				return new DigitalInput(1);
+ 			}
++			@Override
++			public int getPDPChannel() {
++				return kTalonPDPChannel;
++			}
+ 		};
+ 		return talonPair;
+ 	}
+@@ -129,6 +135,10 @@ public final class TestBench {
+ 			protected DigitalInput giveDigitalInputB() {
+ 				return new DigitalInput(3);
+ 			}
++			@Override
++			public int getPDPChannel() {
++				return kVictorPDPChannel;
++			}
+ 		};
+ 		return vicPair;
+ 	}
+@@ -155,6 +165,10 @@ public final class TestBench {
+ 			protected DigitalInput giveDigitalInputB() {
+ 				return new DigitalInput(5);
+ 			}
++			@Override
++			public int getPDPChannel() {
++				return kJaguarPDPChannel;
++			}
+ 		};
+ 		return jagPair;
+ 	}
+@@ -191,6 +205,11 @@ public final class TestBench {
+ 		protected Relay givePoweCycleRelay() {
+ 			return new Relay(kCANRelayPowerCycler);
+ 		}
++		
++		@Override
++		public int getPDPChannel() {
++			return kCANJaguarPDPChannel;
++		}
+ 	}
+ 
+ 	/**
+@@ -215,6 +234,7 @@ public final class TestBench {
+ 		Gyro gyro = new Gyro(0);
+ 		gyro.setSensitivity(.007); // If a different gyroscope is used this
+ 									// value will be different
++		Timer.delay(1);
+ 
+ 		Servo tilt = new Servo(9);
+ 		Servo pan = new Servo(8);

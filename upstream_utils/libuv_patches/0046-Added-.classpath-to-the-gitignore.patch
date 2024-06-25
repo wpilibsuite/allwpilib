@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fredric Silberberg <fredric@fsilberberg.com>
+Date: Mon, 12 May 2014 14:53:16 -0400
+Subject: [PATCH 0046/6262] Added .classpath to the gitignore
+
+Change-Id: I1a6680e6ba0b99fd06649c0a46f02edfc9bf2473
+---
+ .gitignore | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index 0000c36fc2835d34d9241445770267097fae6d40..2ea8b5a751bd8e116c2fb46d28f9e7f1354b613f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -3,7 +3,9 @@ hal/build/
+ networktables/cpp/build/
+ build/
+ networktables/OutlineViewer/nbproject/private
+-*~
+-.*/target(?:/|$)
+-.*/dist(?:/|$)
+-eclipse-plugins/.*/bin(?:/|$)
+\ No newline at end of file
++target/
++dist/
++bin/
++.project
++.settings/
++.classpath

@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Tue, 21 Oct 2014 21:58:35 -0700
+Subject: [PATCH 0444/6262] Java DriverStation.InTest: Set correct flag.
+
+Change-Id: I99aa58f4fa4df13990cc310a0f21e9a9fd817eb0
+---
+ .../src/main/java/edu/wpi/first/wpilibj/DriverStation.java      | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index 7b3bed6ea129103131105d80b503a248fde69214..bbabd8d6b3f395e1ef3b2e5562c3371c191319d8 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -446,6 +446,6 @@ public class DriverStation implements RobotState.Interface {
+      *   for diagnostic purposes only
+      * @param entering If true, starting test code; if false, leaving test code */
+     public void InTest(boolean entering) {
+-        m_userInTeleop = entering;
++        m_userInTest = entering;
+     }
+ }

@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Thu, 26 Jun 2014 10:51:26 -0400
+Subject: [PATCH 0132/6262] Added a C++ CANJaguar test for initial status data
+
+Change-Id: I027d690027f2d80345f3044ff12ee7bc26f3fe95
+---
+ .../src/CANJaguarTest.cpp                     | 29 ++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+index 57a84905bbb1f800485d52d20fedcdace935f014..701569c8bcdd8b3fe3f4028b4c6feeea326d48a0 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+@@ -9,6 +9,9 @@
+ #include "gtest/gtest.h"
+ #include "TestBench.h"
+ 
++static constexpr double kExpectedBusVoltage = 14.0;
++static constexpr double kExpectedTemperature = 25.0;
++
+ static constexpr double kMotorTime = 0.5;
+ 
+ static constexpr double kEncoderSettlingTime = 0.25;
+@@ -49,15 +52,39 @@ protected:
+ };
+ 
+ /*TEST_F(CANJaguarTest, QuickTest) {
+-    m_jaguar->SetPercentMode(CANJaguar::Encoder, 360);
++    m_jaguar->SetSpeedMode(CANJaguar::Encoder, 360, 0.0, 0.0, 0.0);
+ 
+     while(DriverStation::GetInstance()->IsEnabled()) {
+         std::cout << m_jaguar->GetPosition() << std::endl;
+         std::cout << m_jaguar->GetSpeed() << std::endl;
++        std::cout << m_jaguar->GetTemperature() << std::endl;
+         Wait(0.02);
+     }
+ }*/
+ 
++/**
++ * Checks the default status data for reasonable values to confirm that we're
++ * really getting status data from the Jaguar.
++ */
++TEST_F(CANJaguarTest, InitialStatus) {
++    m_jaguar->SetPercentMode();
++
++    EXPECT_NEAR(m_jaguar->GetBusVoltage(), kExpectedBusVoltage, 3.0)
++        << "Bus voltage is not a plausible value.";
++
++    EXPECT_FLOAT_EQ(m_jaguar->GetOutputVoltage(), 0.0)
++        << "Output voltage is non-zero.";
++
++    EXPECT_FLOAT_EQ(m_jaguar->GetOutputCurrent(), 0.0)
++        << "Output current is non-zero.";
++
++    EXPECT_NEAR(m_jaguar->GetTemperature(), kTempe, 5.0)
++        << "Temperature is not a plausible value.";
++
++    EXPECT_EQ(m_jaguar->GetFaults(), 0)
++        << "Jaguar has one or more fault set.";
++}
++
+ /**
+  * Test if we can drive the motor in percentage mode and get a position back
+  */

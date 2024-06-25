@@ -1,0 +1,276 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 3 Jul 2014 15:16:36 -0400
+Subject: [PATCH 0158/6262] Makes the tests take parameters at runtime so that
+ you can selectively run a suite without having to run the entire framework.
+
+Change-Id: I1452cace993a5ea8bdd87797d3125cd353b9218f
+---
+ .../runintegrationjavaprogram                 |   2 +-
+ .../edu/wpi/first/wpilibj/test/QuickTest.java |  37 +++++
+ .../edu/wpi/first/wpilibj/test/TestSuite.java | 153 ++++++++++++++----
+ .../wpi/first/wpilibj/test/package-info.java  |  11 ++
+ 4 files changed, 168 insertions(+), 35 deletions(-)
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/QuickTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/package-info.java
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/runintegrationjavaprogram b/wpilibj/wpilibJavaIntegrationTests/runintegrationjavaprogram
+index ba6dd39ba8c336a52a35c5dff207d2f34fe9b10a..5a4128bf06e470b73b8a0d874f52ac0bdc683871 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/runintegrationjavaprogram
++++ b/wpilibj/wpilibJavaIntegrationTests/runintegrationjavaprogram
+@@ -2,4 +2,4 @@
+ killall java
+ killall FRCUserProgram
+ sleep 1
+-/usr/local/frc/JRE/bin/java -jar wpilibJavaIntegrationTests-0.1.0-SNAPSHOT.jar -ea
+\ No newline at end of file
++/usr/local/frc/JRE/bin/java -ea -jar wpilibJavaIntegrationTests-0.1.0-SNAPSHOT.jar $@
+\ No newline at end of file
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/QuickTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/QuickTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..47ed8ba446e84543987df4156801e9b9b8d1f120
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/QuickTest.java
+@@ -0,0 +1,37 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.test;
++
++import java.util.logging.Logger;
++
++import org.junit.Test;
++
++/**
++ * This class is designated to allow for simple testing of the library without the overlying testing framework.
++ * This test is NOT run as a normal part of the testing process and must be explicitly
++ * selected at runtime by using the 'quick' argument.
++ * 
++ * This test should never be committed with changes to it but can be used during development to aid in feature testing.
++ * 
++ * @author Jonathan Leitschuh
++ */
++public class QuickTest extends AbstractComsSetup {
++	private static final Logger logger = Logger.getLogger(QuickTest.class.getName());
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.test.AbstractComsSetup#getClassLogger()
++	 */
++	@Override
++	protected Logger getClassLogger() {
++		return logger;
++	}
++
++
++	@Test
++	public void test() {
++		
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+index fd53851b299dd587b6308c05e61fd1d6cd2fe0d1..3c88f1dcb3f31a218e15d238fc80075bf6b90ba1 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+@@ -8,37 +8,21 @@ package edu.wpi.first.wpilibj.test;
+ 
+ import java.io.IOException;
+ import java.io.InputStream;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.HashMap;
+ import java.util.logging.LogManager;
+ import java.util.logging.Logger;
+ 
++import junit.runner.Version;
++
+ import org.junit.runner.JUnitCore;
+-import org.junit.runner.RunWith;
+-import org.junit.runners.Suite;
+-import org.junit.runners.Suite.SuiteClasses;
++import org.junit.runner.Result;
++import org.junit.runner.notification.Failure;
+ 
+-import edu.wpi.first.wpilibj.AnalogCrossConnectTest;
+-import edu.wpi.first.wpilibj.CounterTest;
+-import edu.wpi.first.wpilibj.DIOCrossConnectTest;
+-import edu.wpi.first.wpilibj.EncoderTest;
+-import edu.wpi.first.wpilibj.MotorEncoderTest;
+-import edu.wpi.first.wpilibj.PCMTest;
+-import edu.wpi.first.wpilibj.PIDTest;
+-import edu.wpi.first.wpilibj.PrefrencesTest;
+-import edu.wpi.first.wpilibj.RelayCrossConnectTest;
+-import edu.wpi.first.wpilibj.SampleTest;
+-import edu.wpi.first.wpilibj.TiltPanCameraTest;
+-import edu.wpi.first.wpilibj.TimerTest;
+ import edu.wpi.first.wpilibj.WpiLibJTestSuite;
+ import edu.wpi.first.wpilibj.can.CANTestSuite;
+-import edu.wpi.first.wpilibj.command.ButtonTest;
+-import edu.wpi.first.wpilibj.command.CommandParallelGroupTest;
+-import edu.wpi.first.wpilibj.command.CommandScheduleTest;
+-import edu.wpi.first.wpilibj.command.CommandSequentialGroupTest;
+-import edu.wpi.first.wpilibj.command.CommandSupersedeTest;
+ import edu.wpi.first.wpilibj.command.CommandTestSuite;
+-import edu.wpi.first.wpilibj.command.CommandTimeoutTest;
+-import edu.wpi.first.wpilibj.command.DefaultCommandTest;
+-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTest;
+ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
+ 
+ /**
+@@ -47,15 +31,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
+  * classes below. The tests will be run in the order they are listed in the
+  * suite classes annotation.
+  */
+-@RunWith(Suite.class)
+-@SuiteClasses({
+-				WpiLibJTestSuite.class,
+-				CANTestSuite.class,
+-				CommandTestSuite.class,
+-				SmartDashboardTestSuite.class
+-				})
+-//NOTE: THESE ARE EACH LISTED ON SEPERATE LINES TO PREVENT GIT MERGE CONFLICTS!
+-@SuppressWarnings("unused")
+ public class TestSuite {
+ 	static{
+ 		final InputStream inputStream = TestSuite.class.getResourceAsStream("/logging.properties");
+@@ -75,9 +50,119 @@ public class TestSuite {
+ 	}
+ 	private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj");
+ 	private static final Logger WPILIBJ_COMMAND_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj.command");
++	
++	
++	
++	//NOTE: THESE ARE EACH LISTED ON SEPERATE LINES TO PREVENT GIT MERGE CONFLICTS!
++	private static final Class<?>[] testList = {
++		WpiLibJTestSuite.class,
++		CANTestSuite.class,
++		CommandTestSuite.class,
++		SmartDashboardTestSuite.class
++	};
++	
++	/**
++	 * Constructs a hash map of test suite names and the associated class parameters
++	 */
++	public static HashMap<String, Class<?>> getClassNameHash(){
++		HashMap<String, Class<?>> classHash = new HashMap<String, Class<?>>();
++		System.out.print("To select a test suite run with any of the following parameters:" + "\n\t");
++		for(Class<?> t : testList){
++			String name = t.getSimpleName().toLowerCase().replace("test", "").replace("suite", "");
++			System.out.print(name + " ");
++			classHash.put(name, t);
++		}
++		System.out.println();
++		return classHash;
++	}
+ 
++	/**
++	 * The method called at runtime
++	 * @param args The test suites to run
++	 */
+ 	public static void main(String[] args) {
+-		JUnitCore.main("edu.wpi.first.wpilibj.test.TestSuite");
++		System.out.println("JUnit version " + Version.id());
++		
++		//Select the test suites to run given the args passed at runtime
++		ArrayList<Class<?>> runClasses;
++		if(args.length != 0){ //If args are passed to the test suite
++			//Display the list of arguments passed
++			StringBuilder paramList = new StringBuilder("Params received: ");
++			for(String a : args){
++				a = a.toLowerCase();
++				paramList.append(a+", ");
++			}
++			paramList.delete(paramList.length()-2, paramList.length());
++			System.out.println(paramList); //Print the parsed arg list
++			
++			ArrayList<String> argsParsed = new ArrayList<String>(Arrays.asList(args));
++			//The list of loaded classes
++			HashMap<String, Class<?>> loadedClasses = getClassNameHash();
++			runClasses = new ArrayList<Class<?>>();
++			//List the test that will be run
++			System.out.println("Running the following tests:");
++			for(String a : argsParsed){
++				Class<?> load = loadedClasses.get(a);
++				if(load!=null){
++					runClasses.add(load);
++					System.out.println("\t" + a);
++				}
++			}
++			if(argsParsed.contains("quick")){//Allows a quick test to be written without the framework overhead test functionality
++				runClasses.add(QuickTest.class);
++			}
++			
++		} else { //If no args are passed to the test suite then run all of the test suites except for the QuickTest
++			runClasses = new ArrayList<Class<?>>();
++			System.out.println("Running the following tests:");
++			for(Class<?> c : testList){
++				runClasses.add(c);
++				System.out.println("\t" + c.getSimpleName());
++			}
++		}
++		
++		//Tests are run here
++		Result result = JUnitCore.runClasses(runClasses.toArray(new Class[0]));
++		
++		
++		
++		
++		//Results are collected and displayed here
++		System.out.println("\n");
++		if(!result.wasSuccessful()){
++			//Prints out a list of stack traces for the failed tests
++			System.out.println("Failure List: ");
++			for(Failure f : result.getFailures()){
++				System.out.println(f.getDescription());
++				System.out.println(f.getTrace());
++			}
++			System.out.println();
++			System.out.println("FAILURES!!!");
++			//Print the test statistics
++			System.out.println("Tests run: " + result.getRunCount() +
++					", Failures: " + result.getFailureCount() + 
++					", Ignored: " + result.getIgnoreCount() + 
++					", In " + result.getRunTime() + "ms");
++	
++			//Prints out a list of test that failed
++			System.out.println("Failure List (short):");
++			String failureClass = result.getFailures().get(0).getDescription().getClassName();
++			System.out.println(failureClass);
++			for(Failure f : result.getFailures()){
++				if(!failureClass.equals(f.getDescription().getClassName())){
++					failureClass = f.getDescription().getClassName();
++					System.out.println(failureClass);
++				}
++				System.err.println("\t" + f.getDescription());
++			}
++		} else {
++			System.out.println("SUCCESS!");
++			System.out.println("Tests run: " + result.getRunCount() +
++					", Ignored: " + result.getIgnoreCount() + 
++					", In " + result.getRunTime() + "ms");
++		}
++		System.out.println();
++			
++        System.exit(result.wasSuccessful() ? 0 : 1);
+ 	}
+-
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/package-info.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ef0fce79faafea3731c7e4cf139f0f7d8cfb5526
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/package-info.java
+@@ -0,0 +1,11 @@
++/**
++ * This is the starting point for the integration testing framework.
++ * This package should contain classes that are not explicitly for testing the
++ * library but instead provide the framework that the tests can extend from.
++ * Every test should extend from {@link edu.wpi.first.wpilibj.test.AbstractComsSetup}
++ * to ensure that Network Communications is properly instantiated before the test is run.
++ * 
++ * The {@link edu.wpi.first.wpilibj.test.TestBench} should contain the port numbers for all of the hardware and these values should not be explicitly defined
++ * anywhere else in the testing framework.
++ */
++package edu.wpi.first.wpilibj.test;
+\ No newline at end of file

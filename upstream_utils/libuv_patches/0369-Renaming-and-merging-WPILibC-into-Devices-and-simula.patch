@@ -1,0 +1,970 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Thu, 25 Sep 2014 20:36:59 -0400
+Subject: [PATCH 0369/6262] Renaming and merging WPILibC++ into Devices and
+ simulator files
+
+Change-Id: I6f4b94d1f2cbf4196ebcef8bc45799a97bcde1d8
+---
+ CMakeLists.txt                                |   5 +-
+ ni-libraries/libwpi_2015.so                   |   2 +-
+ wpilibc/wpilibC++/CMakeLists.txt              |  10 +-
+ wpilibc/wpilibC++/include/Notifier.h          |   3 +-
+ wpilibc/wpilibC++/include/PIDController.h     |   7 +-
+ wpilibc/wpilibC++Devices/CMakeLists.txt       |   6 +-
+ .../wpilibC++Devices/include/DriverStation.h  |   1 +
+ wpilibc/wpilibC++Devices/include/Notifier.h   |  42 -------
+ .../wpilibC++Devices/include/PIDController.h  | 108 ------------------
+ wpilibc/wpilibC++Devices/include/Task.h       |  52 ---------
+ wpilibc/wpilibC++Devices/include/Timer.h      |  44 -------
+ wpilibc/wpilibC++Devices/src/Notifier.cpp     |   1 +
+ .../wpilibC++Devices/src/PIDController.cpp    |   1 +
+ wpilibc/wpilibC++Devices/src/Preferences.cpp  |   1 +
+ wpilibc/wpilibC++Devices/src/Task.cpp         |   1 +
+ .../wpilibC++IntegrationTests/CMakeLists.txt  |   4 +-
+ .../src/NotifierTest.cpp                      |   3 +-
+ wpilibc/wpilibC++Sim/CMakeLists.txt           |  31 ++---
+ wpilibc/wpilibC++Sim/Makefile                 |   4 +-
+ wpilibc/wpilibC++Sim/include/Notifier.h       |  44 -------
+ wpilibc/wpilibC++Sim/include/PIDController.h  | 107 -----------------
+ wpilibc/wpilibC++Sim/include/Task.h           |  52 ---------
+ wpilibc/wpilibC++Sim/include/Timer.h          |  50 --------
+ wpilibc/wpilibC++Sim/include/Utility.h        |  26 -----
+ .../wpilibC++Sim/include/simulation/simTime.h |   7 ++
+ wpilibc/wpilibC++Sim/src/PIDController.cpp    |   3 +-
+ wpilibc/wpilibC++Sim/src/Solenoid.cpp         |   1 +
+ wpilibc/wpilibC++Sim/src/Timer.cpp            |   1 +
+ wpilibc/wpilibC++Sim/src/Utility.cpp          |   1 +
+ 29 files changed, 56 insertions(+), 562 deletions(-)
+ delete mode 100644 wpilibc/wpilibC++Devices/include/Notifier.h
+ delete mode 100644 wpilibc/wpilibC++Devices/include/PIDController.h
+ delete mode 100644 wpilibc/wpilibC++Devices/include/Task.h
+ delete mode 100644 wpilibc/wpilibC++Devices/include/Timer.h
+ delete mode 100644 wpilibc/wpilibC++Sim/include/Notifier.h
+ delete mode 100644 wpilibc/wpilibC++Sim/include/PIDController.h
+ delete mode 100644 wpilibc/wpilibC++Sim/include/Task.h
+ delete mode 100644 wpilibc/wpilibC++Sim/include/Timer.h
+ delete mode 100644 wpilibc/wpilibC++Sim/include/Utility.h
+ create mode 100644 wpilibc/wpilibC++Sim/include/simulation/simTime.h
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 83533f6c8443994864cba000c171c18adb9126a8..eadd0a44bd14f20ee6787f95e487c53a961e0f00 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,13 +1,16 @@
+ cmake_minimum_required(VERSION 2.8)
+ project(All-WPILib)
+ set(CMAKE_BUILD_TYPE Debug)
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wall -Wextra -Wno-unused-parameter -fPIC")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -fPIC")
+ SET(CMAKE_SKIP_BUILD_RPATH TRUE)
+ 
+ file(GLOB_RECURSE NI_LIBS ni-libraries/*.so*)
++list(REMOVE_ITEM NI_LIBS ${CMAKE_CURRENT_SOURCE_DIR}/ni-libraries/libwpi.so ${CMAKE_CURRENT_SOURCE_DIR}/ni-libraries/libwpi_2015.so)
+ get_filename_component(WPILIB_INCLUDES wpilibc/wpilibC++/include REALPATH)
+ get_filename_component(HAL_API_INCLUDES hal/include REALPATH)
+ get_filename_component(NWT_API_INCLUDES networktables/cpp/include REALPATH)
++file(GLOB_RECURSE COM_SRC_FILES wpilibc/wpilibC++/src/*.cpp)
++
+ add_subdirectory(hal)
+ add_subdirectory(networktables/cpp)
+ add_subdirectory(wpilibc)
+diff --git a/ni-libraries/libwpi_2015.so b/ni-libraries/libwpi_2015.so
+index 8920c0e6e5ed01b84973a78e314d0e9d1b53ccbb..e799af29aaece702ea7d1026b8afe78fd51f919d 100644
+--- a/ni-libraries/libwpi_2015.so
++++ b/ni-libraries/libwpi_2015.so
+@@ -1,3 +1,3 @@
+ /* GNU ld script */
+ OUTPUT_FORMAT(elf32-littlearm)
+-GROUP ( AS_NEEDED ( -lWPILib -lWPILibAthena -lHALAthena -lNetworkTables -lFRC_NetworkCommunication -li2c -lni_emb -lNiFpgaLv -lNiFpga -lnirio_emb_can -lNiRioSrv -lni_rtlog -lRoboRIO_FRC_ChipObject -lspi -lvisa -ldl -lpthread ) )
++GROUP ( AS_NEEDED ( -lwpilib_nonshared -lHALAthena -lNetworkTables -lFRC_NetworkCommunication -li2c -lni_emb -lNiFpgaLv -lNiFpga -lnirio_emb_can -lNiRioSrv -lni_rtlog -lRoboRIO_FRC_ChipObject -lspi -lvisa -ldl -lpthread -lrt ) )
+diff --git a/wpilibc/wpilibC++/CMakeLists.txt b/wpilibc/wpilibC++/CMakeLists.txt
+index 6be77a1fa6c74107d4cd71afa4f9a5be2e8d47db..4af3fc914e59c26f400182a822cb986b867a65e4 100644
+--- a/wpilibc/wpilibC++/CMakeLists.txt
++++ b/wpilibc/wpilibC++/CMakeLists.txt
+@@ -1,13 +1,5 @@
+ cmake_minimum_required(VERSION 2.8)
+ project(WPILibC++)
+ 
+-file(GLOB_RECURSE SRC_FILES src/*.cpp)
+-include_directories(include/ ${NWT_API_INCLUDES} ${HAL_API_INCLUDES})
+-add_library(WPILib STATIC ${SRC_FILES})
+-target_link_libraries(WPILib)
+-INSTALL(TARGETS WPILib ARCHIVE DESTINATION lib COMPONENT lib)
+ INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
+-# lib/ c m gcc_s ld-linux
+-# usr/lib stdc++
+-# ni_emb
+-# HAL NWT
++
+diff --git a/wpilibc/wpilibC++/include/Notifier.h b/wpilibc/wpilibC++/include/Notifier.h
+index 4bd89879f346a43bffefc20b727c47dadef4acb7..13c3e091df1bf547636c074b35d8d4ab041bef06 100644
+--- a/wpilibc/wpilibC++/include/Notifier.h
++++ b/wpilibc/wpilibC++/include/Notifier.h
+@@ -9,7 +9,7 @@
+ #include "Task.h"
+ #include "HAL/cpp/Synchronized.hpp"
+ 
+-typedef void (*TimerEventHandler)(void *param);
++typedef void *(*TimerEventHandler)(void *param);
+ 
+ class Notifier : public ErrorBase
+ {
+@@ -22,6 +22,7 @@ public:
+ private:
+ 	static Notifier *timerQueueHead;
+ 	static ReentrantSemaphore queueSemaphore;
++	static void* m_notifier;
+ 	static int refcount;
+ 
+ 	static void ProcessQueue(uint32_t mask, void *params); // process the timer queue on a timer event
+diff --git a/wpilibc/wpilibC++/include/PIDController.h b/wpilibc/wpilibC++/include/PIDController.h
+index cf7732f475553577addcbee61fc47436679a4df6..0b591dcd366b5310477c33882781d92da727871d 100644
+--- a/wpilibc/wpilibC++/include/PIDController.h
++++ b/wpilibc/wpilibC++/include/PIDController.h
+@@ -69,6 +69,7 @@ private:
+ 	float m_minimumInput;		// minimum input - limit setpoint to this
+ 	bool m_continuous;	// do the endpoints wrap around? eg. Absolute encoder
+ 	bool m_enabled; 			//is the pid controller enabled
++	bool m_destruct; // should the calculate thread stop running
+ 	float m_prevError;	// the prior sensor input (used to compute velocity)
+ 	double m_totalError; //the sum of the errors for use in the integral calc
+ 	enum
+@@ -88,12 +89,16 @@ private:
+ 	PIDSource *m_pidInput;
+ 	PIDOutput *m_pidOutput;
+ 
++#ifndef FRC_SIMULATOR
+ 	pthread_t m_controlLoop;
++#else
++	Notifier* m_controlLoop;
++#endif
+ 	pthread_mutex_t m_mutex;
+ 
+ 	void Initialize(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
+ 			float period = 0.05);
+-	static void CallCalculate(void *controller);
++	static void *CallCalculate(void *controller);
+ 
+ 	virtual ITable* GetTable();
+ 	virtual std::string GetSmartDashboardType();
+diff --git a/wpilibc/wpilibC++Devices/CMakeLists.txt b/wpilibc/wpilibC++Devices/CMakeLists.txt
+index 595b5a2e31db743183fa1d69557e0e6a0fca4709..f73522cc506fd692fc8e8d5928c3f6bfe48c07e9 100644
+--- a/wpilibc/wpilibC++Devices/CMakeLists.txt
++++ b/wpilibc/wpilibC++Devices/CMakeLists.txt
+@@ -3,9 +3,9 @@ project(WPILibC++Devices)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(include/ ${WPILIB_INCLUDES} ${HAL_API_INCLUDES} ${NWT_API_INCLUDES})
+-add_library(WPILibAthena STATIC ${SRC_FILES})
+-target_link_libraries(WPILibAthena WPILib HALAthena NetworkTables ${NI_LIBS})
+-INSTALL(TARGETS WPILibAthena ARCHIVE DESTINATION lib COMPONENT lib)
++add_library(wpilib_nonshared STATIC ${SRC_FILES} ${COM_SRC_FILES})
++target_link_libraries(wpilib_nonshared HALAthena NetworkTables ${NI_LIBS})
++INSTALL(TARGETS wpilib_nonshared ARCHIVE DESTINATION lib COMPONENT lib)
+ INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
+ # lib/ c m gcc_s ld-linux
+ # usr/lib stdc++
+diff --git a/wpilibc/wpilibC++Devices/include/DriverStation.h b/wpilibc/wpilibC++Devices/include/DriverStation.h
+index 6afe4a6f10239f32b88763516845f718617da458..9151c8d897b675c5ece0cefeab1e28d0d62620b1 100644
+--- a/wpilibc/wpilibC++Devices/include/DriverStation.h
++++ b/wpilibc/wpilibC++Devices/include/DriverStation.h
+@@ -8,6 +8,7 @@
+ #include "SensorBase.h"
+ #include "RobotState.h"
+ #include "Task.h"
++#include "HAL/HAL.hpp"
+ 
+ struct HALControlWord;
+ class AnalogInput;
+diff --git a/wpilibc/wpilibC++Devices/include/Notifier.h b/wpilibc/wpilibC++Devices/include/Notifier.h
+deleted file mode 100644
+index ad969360b1fc468476358e7ca34a76a3c406a58f..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Devices/include/Notifier.h
++++ /dev/null
+@@ -1,42 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "HAL/HAL.hpp"
+-#include "ErrorBase.h"
+-#include "HAL/cpp/Synchronized.hpp"
+-
+-typedef void (*TimerEventHandler)(void *param);
+-
+-class Notifier : public ErrorBase
+-{
+-public:
+-	Notifier(TimerEventHandler handler, void *param = NULL);
+-	virtual ~Notifier();
+-	void StartSingle(double delay);
+-	void StartPeriodic(double period);
+-	void Stop();
+-private:
+-	static Notifier *timerQueueHead;
+-	static ReentrantSemaphore queueSemaphore;
+-	static void* m_notifier;
+-	static int refcount;
+-
+-	static void ProcessQueue(uint32_t mask, void *params); // process the timer queue on a timer event
+-	static void UpdateAlarm();			// update the FPGA alarm since the queue has changed
+-	void InsertInQueue(bool reschedule);	// insert this Notifier in the timer queue
+-	void DeleteFromQueue();				// delete this Notifier from the timer queue
+-	TimerEventHandler m_handler;			// address of the handler
+-	void *m_param;							// a parameter to pass to the handler
+-	double m_period;						// the relative time (either periodic or single)
+-	double m_expirationTime;				// absolute expiration time for the current event
+-	Notifier *m_nextEvent;					// next Nofifier event
+-	bool m_periodic;						// true if this is a periodic event
+-	bool m_queued;							// indicates if this entry is queued
+-	SEMAPHORE_ID m_handlerSemaphore;		// held by interrupt manager task while handler call is in progress
+-
+-	DISALLOW_COPY_AND_ASSIGN(Notifier);
+-};
+diff --git a/wpilibc/wpilibC++Devices/include/PIDController.h b/wpilibc/wpilibC++Devices/include/PIDController.h
+deleted file mode 100644
+index ea96791dc34e1c28b1271b58cdf75368e8f94a18..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Devices/include/PIDController.h
++++ /dev/null
+@@ -1,108 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "Base.h"
+-#include "Controller.h"
+-#include "LiveWindow/LiveWindow.h"
+-#include <pthread.h>
+-
+-class PIDOutput;
+-class PIDSource;
+-class Notifier;
+-
+-/**
+- * Class implements a PID Control Loop.
+- * 
+- * Creates a separate thread which reads the given PIDSource and takes
+- * care of the integral calculations, as well as writing the given
+- * PIDOutput
+- */
+-class PIDController : public LiveWindowSendable, public Controller, public ITableListener
+-{
+-public:
+-	PIDController(float p, float i, float d, PIDSource *source, PIDOutput *output, float period =
+-			0.05);
+-	PIDController(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
+-			float period = 0.05);
+-	virtual ~PIDController();
+-	virtual float Get();
+-	virtual void SetContinuous(bool continuous = true);
+-	virtual void SetInputRange(float minimumInput, float maximumInput);
+-	virtual void SetOutputRange(float mimimumOutput, float maximumOutput);
+-	virtual void SetPID(float p, float i, float d);
+-	virtual void SetPID(float p, float i, float d, float f);
+-	virtual float GetP();
+-	virtual float GetI();
+-	virtual float GetD();
+-	virtual float GetF();
+-
+-	virtual void SetSetpoint(float setpoint);
+-	virtual float GetSetpoint();
+-
+-	virtual float GetError();
+-
+-	virtual void SetTolerance(float percent);
+-	virtual void SetAbsoluteTolerance(float absValue);
+-	virtual void SetPercentTolerance(float percentValue);
+-	virtual bool OnTarget();
+-
+-	virtual void Enable();
+-	virtual void Disable();
+-	virtual bool IsEnabled();
+-
+-	virtual void Reset();
+-
+-	virtual void InitTable(ITable* table);
+-
+-private:
+-	float m_P;			// factor for "proportional" control
+-	float m_I;			// factor for "integral" control
+-	float m_D;			// factor for "derivative" control
+-	float m_F;			// factor for "feed forward" control
+-	float m_maximumOutput;	// |maximum output|
+-	float m_minimumOutput;	// |minimum output|
+-	float m_maximumInput;		// maximum input - limit setpoint to this
+-	float m_minimumInput;		// minimum input - limit setpoint to this
+-	bool m_continuous;	// do the endpoints wrap around? eg. Absolute encoder
+-	bool m_enabled; 			//is the pid controller enabled
+-	bool m_destruct; // should the calculate thread stop running
+-	float m_prevError;	// the prior sensor input (used to compute velocity)
+-	double m_totalError; //the sum of the errors for use in the integral calc
+-	enum
+-	{
+-		kAbsoluteTolerance,
+-		kPercentTolerance,
+-		kNoTolerance
+-	} m_toleranceType;
+-	float m_tolerance;	//the percetage or absolute error that is considered on target
+-	float m_setpoint;
+-	float m_error;
+-	float m_result;
+-	float m_period;
+-
+-	PIDSource *m_pidInput;
+-	PIDOutput *m_pidOutput;
+-	
+-	pthread_t m_controlLoop;
+-	pthread_mutex_t m_mutex;
+-
+-	void Initialize(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
+-			float period = 0.05);
+-	static void *CallCalculate(void *controller);
+-
+-	virtual ITable* GetTable();
+-	virtual std::string GetSmartDashboardType();
+-	virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+-	virtual void UpdateTable();
+-	virtual void StartLiveWindowMode();
+-	virtual void StopLiveWindowMode();
+-protected:
+-	ITable* m_table;
+-	void Calculate();
+-
+-	DISALLOW_COPY_AND_ASSIGN(PIDController);
+-};
+diff --git a/wpilibc/wpilibC++Devices/include/Task.h b/wpilibc/wpilibC++Devices/include/Task.h
+deleted file mode 100644
+index 7377c9ecfa5a2a77cb26373137d58422886adcbb..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Devices/include/Task.h
++++ /dev/null
+@@ -1,52 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "ErrorBase.h"
+-#include "HAL/HAL.hpp"
+-
+-/**
+- * WPI task is a wrapper for the native Task object.
+- * All WPILib tasks are managed by a static task manager for simplified cleanup.
+- **/
+-class Task : public ErrorBase
+-{
+-public:
+-	static const uint32_t kDefaultPriority = 101;
+-
+-	Task(const char* name, FUNCPTR function, int32_t priority = kDefaultPriority,
+-			uint32_t stackSize = 20000);
+-	virtual ~Task();
+-
+-	bool Start(uint32_t arg0 = 0, uint32_t arg1 = 0, uint32_t arg2 = 0, uint32_t arg3 = 0,
+-			uint32_t arg4 = 0, uint32_t arg5 = 0, uint32_t arg6 = 0, uint32_t arg7 = 0,
+-			uint32_t arg8 = 0, uint32_t arg9 = 0);
+-	bool Restart();
+-	bool Stop();
+-
+-	bool IsReady();
+-	bool IsSuspended();
+-
+-	bool Suspend();
+-	bool Resume();
+-
+-	bool Verify();
+-
+-	int32_t GetPriority();
+-	bool SetPriority(int32_t priority);
+-	const char* GetName();
+-	TASK GetID();
+-
+-private:
+-	FUNCPTR m_function;
+-	char* m_taskName;
+-	TASK m_taskID;
+-	uint32_t m_stackSize;
+-	int m_priority;
+-	bool HandleError(STATUS results);
+-	DISALLOW_COPY_AND_ASSIGN(Task);
+-};
+-
+diff --git a/wpilibc/wpilibC++Devices/include/Timer.h b/wpilibc/wpilibC++Devices/include/Timer.h
+deleted file mode 100644
+index 67d574f2d397b23996e4135090c883854aceb59c..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Devices/include/Timer.h
++++ /dev/null
+@@ -1,44 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "HAL/Semaphore.hpp"
+-#include "Base.h"
+-
+-typedef void (*TimerInterruptHandler)(void *param);
+-
+-void Wait(double seconds);
+-double GetClock();
+-double GetTime();
+-
+-/**
+- * Timer objects measure accumulated time in seconds.
+- * The timer object functions like a stopwatch. It can be started, stopped, and cleared. When the
+- * timer is running its value counts up in seconds. When stopped, the timer holds the current
+- * value. The implementation simply records the time when started and subtracts the current time
+- * whenever the value is requested.
+- */
+-class Timer
+-{
+-public:
+-	Timer();
+-	virtual ~Timer();
+-	double Get();
+-	void Reset();
+-	void Start();
+-	void Stop();
+-	bool HasPeriodPassed(double period);
+-
+-	static double GetFPGATimestamp();
+-	static double GetPPCTimestamp();
+-
+-private:
+-	double m_startTime;
+-	double m_accumulatedTime;
+-	bool m_running;
+-	MUTEX_ID m_semaphore;
+-	DISALLOW_COPY_AND_ASSIGN(Timer);
+-};
+diff --git a/wpilibc/wpilibC++Devices/src/Notifier.cpp b/wpilibc/wpilibC++Devices/src/Notifier.cpp
+index 667495cc4aeb2d75982d71930a2e0f38c0b765e4..46ac4305358287f5f43a9189979abd8b08f73dd7 100644
+--- a/wpilibc/wpilibC++Devices/src/Notifier.cpp
++++ b/wpilibc/wpilibC++Devices/src/Notifier.cpp
+@@ -8,6 +8,7 @@
+ #include "Timer.h"
+ #include "Utility.h"
+ #include "WPIErrors.h"
++#include "HAL/HAL.hpp"
+ 
+ Notifier *Notifier::timerQueueHead = NULL;
+ ReentrantSemaphore Notifier::queueSemaphore;
+diff --git a/wpilibc/wpilibC++Devices/src/PIDController.cpp b/wpilibc/wpilibC++Devices/src/PIDController.cpp
+index 55f0e58c1a15894d98e24a64be333bfe6b9adddc..492adfe76348bfcfe99ff48089a73a13d7d5029e 100644
+--- a/wpilibc/wpilibC++Devices/src/PIDController.cpp
++++ b/wpilibc/wpilibC++Devices/src/PIDController.cpp
+@@ -12,6 +12,7 @@
+ #include <math.h>
+ #include "HAL/cpp/Synchronized.hpp"
+ #include "Timer.h"
++#include "HAL/HAL.hpp"
+ 
+ static const char *kP = "p";
+ static const char *kI = "i";
+diff --git a/wpilibc/wpilibC++Devices/src/Preferences.cpp b/wpilibc/wpilibC++Devices/src/Preferences.cpp
+index 52901a0c709971a0ac2d679105a3a09fdd703ff9..5ac0c5ee7fb65cc52175d19cc507e7af7e50740e 100644
+--- a/wpilibc/wpilibC++Devices/src/Preferences.cpp
++++ b/wpilibc/wpilibC++Devices/src/Preferences.cpp
+@@ -9,6 +9,7 @@
+ //#include "NetworkCommunication/UsageReporting.h"
+ #include "HAL/cpp/Synchronized.hpp"
+ #include "WPIErrors.h"
++#include "HAL/HAL.hpp"
+ 
+ #include <stdio.h>
+ #include <algorithm>
+diff --git a/wpilibc/wpilibC++Devices/src/Task.cpp b/wpilibc/wpilibC++Devices/src/Task.cpp
+index 2c794e8e7c6d89277f5bfeb6f24528f5205aa915..866566444934d79a5be38b0daeb190af90ef493b 100644
+--- a/wpilibc/wpilibC++Devices/src/Task.cpp
++++ b/wpilibc/wpilibC++Devices/src/Task.cpp
+@@ -11,6 +11,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <stdio.h>
++#include "HAL/HAL.hpp"
+ 
+ const uint32_t Task::kDefaultPriority;
+ 
+diff --git a/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt b/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt
+index 98d1c644d8fc99efecbfa9faa3e0194fe62d7c62..74814c45a92e857cd73856b36e17f0a0ec4ac4f9 100644
+--- a/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt
++++ b/wpilibc/wpilibC++IntegrationTests/CMakeLists.txt
+@@ -3,6 +3,6 @@ project(WPILibC++IntegrationTests)
+ 
+ file(GLOB_RECURSE SRC_FILES src/*.cpp src/gtest/src/gtest-all.cc src/gtest/src/gtest_main.cc)
+ include_directories(include/ src/gtest/ src/gtest/include/ ../wpilibC++Devices/include/ ${WPILIB_INCLUDES} ${HAL_API_INCLUDES} ${NWT_API_INCLUDES})
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Wno-unused-variable")
+ add_executable(FRCUserProgram ${SRC_FILES})
+-target_link_libraries(FRCUserProgram WPILib WPILibAthena WPILib HALAthena NetworkTables ${NI_LIBS} rt)
++target_link_libraries(FRCUserProgram wpilib_nonshared HALAthena NetworkTables ${NI_LIBS})
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/NotifierTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/NotifierTest.cpp
+index 87cd2a994010b843c0c7f78df487f17935fd705f..072a8dc4f1b98e83203bfdedc98282f64030ab64 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/NotifierTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/NotifierTest.cpp
+@@ -12,9 +12,10 @@
+ 
+ unsigned notifierCounter;
+ 
+-void notifierHandler(void *)
++void *notifierHandler(void *)
+ {
+ 	notifierCounter++;
++	return nullptr;
+ }
+ 
+ /**
+diff --git a/wpilibc/wpilibC++Sim/CMakeLists.txt b/wpilibc/wpilibC++Sim/CMakeLists.txt
+index c396adae458c908697bd9e979216f71edc45f3fe..2c6b8394ce4aafa3fadeb97d89f4320bf81303c7 100644
+--- a/wpilibc/wpilibC++Sim/CMakeLists.txt
++++ b/wpilibc/wpilibC++Sim/CMakeLists.txt
+@@ -1,11 +1,11 @@
+ cmake_minimum_required(VERSION 2.8)
+ project(WPILibSim)
+ 
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wall -Wextra -Wno-unused-parameter -fPIC -std=c++1y")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wall -Wextra -Wno-unused-parameter -fPIC -std=c++1y -DFRC_SIMULATOR")
+ 
+-get_filename_component(HAL_API_INCLUDES $ENV{ALLWPILIB}/hal/include REALPATH)
+-get_filename_component(NWT_API_INCLUDES $ENV{ALLWPILIB}/networktables/cpp/include REALPATH)
+-add_subdirectory(build/wpilibC++)
++get_filename_component(HAL_API_INCLUDES ../../hal/include REALPATH)
++get_filename_component(NWT_API_INCLUDES ../../networktables/cpp/include REALPATH)
++add_subdirectory(../wpilibC++ wpilibC++)
+ 
+ include (FindPkgConfig)
+ if (PKG_CONFIG_FOUND)
+@@ -14,17 +14,20 @@ endif()
+ 
+ find_package(gazebo REQUIRED)
+ 
+-file(GLOB_RECURSE SRC_FILES src/*.cpp $ENV{ALLWPILIB}/networktables/cpp/lib/share/*.cpp
+-                                      $ENV{ALLWPILIB}/networktables/cpp/lib/Athena/*.cpp
+-                                      $ENV{ALLWPILIB}/hal/lib/Athena/Task.cpp
+-                                      $ENV{ALLWPILIB}/hal/lib/Athena/Semaphore.cpp
+-                                      $ENV{ALLWPILIB}/hal/lib/Athena/cpp/*.cpp)
+-include_directories(include/ $ENV{ALLWPILIB}/wpilibc/wpilibC++/include
+-                    $ENV{ALLWPILIB}/networktables/cpp/include
+-                    $ENV{ALLWPILIB}/hal/include
++file(GLOB_RECURSE SRC_FILES src/*.cpp ../../networktables/cpp/lib/share/*.cpp
++                                      ../../networktables/cpp/lib/Athena/*.cpp
++                                      ../../hal/lib/Athena/Task.cpp
++                                      ../../hal/lib/Athena/Semaphore.cpp
++                                      ../../hal/lib/Athena/cpp/Synchronized.cpp)
++
++file(GLOB_RECURSE COM_SRC_FILES ../wpilibC++/src/*.cpp)
++
++include_directories(include/ ../../wpilibc/wpilibC++/include
++                    ../../networktables/cpp/include
++                    ../../hal/include
+                     ${Boost_INCLUDE_DIR} ${GAZEBO_INCLUDE_DIRS}) # ${NWT_API_INCLUDES}
+-add_library(WPILibSim SHARED ${SRC_FILES})
+-target_link_libraries(WPILibSim WPILib ${GAZEBO_LIBRARIES}  -fPIC) # NetworkTables
++add_library(WPILibSim SHARED ${SRC_FILES} ${COM_SRC_FILES})
++target_link_libraries(WPILibSim ${GAZEBO_LIBRARIES}  -fPIC) # NetworkTables
+ INSTALL(TARGETS WPILibSim LIBRARY DESTINATION src COMPONENT src)
+ INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
+ # ni_emb
+diff --git a/wpilibc/wpilibC++Sim/Makefile b/wpilibc/wpilibC++Sim/Makefile
+index f698aee0009cc03572626c6ca6e71f56c92495cd..47bf75f1c2195a55fedd2a80b5ac30e8deb04bdb 100644
+--- a/wpilibc/wpilibC++Sim/Makefile
++++ b/wpilibc/wpilibC++Sim/Makefile
+@@ -1,12 +1,10 @@
+ prefix = /usr
+ lib.dir = $(prefix)/lib
+ build.dir = build
+-allwpilib = ../..
+ 
+ all:
+ 	mkdir -p $(build.dir)
+-	cp -r $(allwpilib)/wpilibc/wpilibC++ build
+-	cd ${build.dir} && ALLWPILIB=$(allwpilib) cmake .. && make
++	cd ${build.dir} && cmake .. && make
+ 
+ clean:
+ 	rm -rf $(build.dir)
+diff --git a/wpilibc/wpilibC++Sim/include/Notifier.h b/wpilibc/wpilibC++Sim/include/Notifier.h
+deleted file mode 100644
+index 4bd89879f346a43bffefc20b727c47dadef4acb7..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Sim/include/Notifier.h
++++ /dev/null
+@@ -1,44 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "ErrorBase.h"
+-#include "Task.h"
+-#include "HAL/cpp/Synchronized.hpp"
+-
+-typedef void (*TimerEventHandler)(void *param);
+-
+-class Notifier : public ErrorBase
+-{
+-public:
+-	Notifier(TimerEventHandler handler, void *param = NULL);
+-	virtual ~Notifier();
+-	void StartSingle(double delay);
+-	void StartPeriodic(double period);
+-	void Stop();
+-private:
+-	static Notifier *timerQueueHead;
+-	static ReentrantSemaphore queueSemaphore;
+-	static int refcount;
+-
+-	static void ProcessQueue(uint32_t mask, void *params); // process the timer queue on a timer event
+-	static void UpdateAlarm();			// update the FPGA alarm since the queue has changed
+-	void InsertInQueue(bool reschedule);	// insert this Notifier in the timer queue
+-	void DeleteFromQueue();				// delete this Notifier from the timer queue
+-	TimerEventHandler m_handler;			// address of the handler
+-	void *m_param;							// a parameter to pass to the handler
+-	double m_period;						// the relative time (either periodic or single)
+-	double m_expirationTime;				// absolute expiration time for the current event
+-	Notifier *m_nextEvent;					// next Nofifier event
+-	bool m_periodic;						// true if this is a periodic event
+-	bool m_queued;							// indicates if this entry is queued
+-	SEMAPHORE_ID m_handlerSemaphore;		// held by interrupt manager task while handler call is in progress
+-
+-	DISALLOW_COPY_AND_ASSIGN(Notifier);
+-
+-	static Task *task;
+-	static void Run();
+-};
+diff --git a/wpilibc/wpilibC++Sim/include/PIDController.h b/wpilibc/wpilibC++Sim/include/PIDController.h
+deleted file mode 100644
+index 1790d9b174f50b6ce234b6d180ae2d997c538620..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Sim/include/PIDController.h
++++ /dev/null
+@@ -1,107 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "Base.h"
+-#include "Controller.h"
+-#include "LiveWindow/LiveWindow.h"
+-#include <pthread.h>
+-
+-class PIDOutput;
+-class PIDSource;
+-class Notifier;
+-
+-/**
+- * Class implements a PID Control Loop.
+- * 
+- * Creates a separate thread which reads the given PIDSource and takes
+- * care of the integral calculations, as well as writing the given
+- * PIDOutput
+- */
+-class PIDController : public LiveWindowSendable, public Controller, public ITableListener
+-{
+-public:
+-	PIDController(float p, float i, float d, PIDSource *source, PIDOutput *output, float period =
+-			0.05);
+-	PIDController(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
+-			float period = 0.05);
+-	virtual ~PIDController();
+-	virtual float Get();
+-	virtual void SetContinuous(bool continuous = true);
+-	virtual void SetInputRange(float minimumInput, float maximumInput);
+-	virtual void SetOutputRange(float mimimumOutput, float maximumOutput);
+-	virtual void SetPID(float p, float i, float d);
+-	virtual void SetPID(float p, float i, float d, float f);
+-	virtual float GetP();
+-	virtual float GetI();
+-	virtual float GetD();
+-	virtual float GetF();
+-
+-	virtual void SetSetpoint(float setpoint);
+-	virtual float GetSetpoint();
+-
+-	virtual float GetError();
+-
+-	virtual void SetTolerance(float percent);
+-	virtual void SetAbsoluteTolerance(float absValue);
+-	virtual void SetPercentTolerance(float percentValue);
+-	virtual bool OnTarget();
+-
+-	virtual void Enable();
+-	virtual void Disable();
+-	virtual bool IsEnabled();
+-
+-	virtual void Reset();
+-
+-	virtual void InitTable(ITable* table);
+-
+-private:
+-	float m_P;			// factor for "proportional" control
+-	float m_I;			// factor for "integral" control
+-	float m_D;			// factor for "derivative" control
+-	float m_F;			// factor for "feed forward" control
+-	float m_maximumOutput;	// |maximum output|
+-	float m_minimumOutput;	// |minimum output|
+-	float m_maximumInput;		// maximum input - limit setpoint to this
+-	float m_minimumInput;		// minimum input - limit setpoint to this
+-	bool m_continuous;	// do the endpoints wrap around? eg. Absolute encoder
+-	bool m_enabled; 			//is the pid controller enabled
+-	float m_prevError;	// the prior sensor input (used to compute velocity)
+-	double m_totalError; //the sum of the errors for use in the integral calc
+-	enum
+-	{
+-		kAbsoluteTolerance,
+-		kPercentTolerance,
+-		kNoTolerance
+-	} m_toleranceType;
+-	float m_tolerance;	//the percetage or absolute error that is considered on target
+-	float m_setpoint;
+-	float m_error;
+-	float m_result;
+-	float m_period;
+-	
+-	MUTEX_ID m_semaphore;
+-	
+-	PIDSource *m_pidInput;
+-	PIDOutput *m_pidOutput;
+-	Notifier *m_controlLoop;
+-
+-	void Initialize(float p, float i, float d, float f, PIDSource *source, PIDOutput *output,
+-			float period = 0.05);
+-	static void CallCalculate(void *controller);
+-
+-	virtual ITable* GetTable();
+-	virtual std::string GetSmartDashboardType();
+-	virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+-	virtual void UpdateTable();
+-	virtual void StartLiveWindowMode();
+-	virtual void StopLiveWindowMode();
+-protected:
+-	ITable* m_table;
+-	void Calculate();
+-
+-	DISALLOW_COPY_AND_ASSIGN(PIDController);
+-};
+diff --git a/wpilibc/wpilibC++Sim/include/Task.h b/wpilibc/wpilibC++Sim/include/Task.h
+deleted file mode 100644
+index ca1754a50d0d77d185ff583671cf68d535ecff15..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Sim/include/Task.h
++++ /dev/null
+@@ -1,52 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "ErrorBase.h"
+-#include "HAL/Task.hpp"
+-
+-/**
+- * WPI task is a wrapper for the native Task object.
+- * All WPILib tasks are managed by a static task manager for simplified cleanup.
+- **/
+-class Task : public ErrorBase
+-{
+-public:
+-	static const uint32_t kDefaultPriority = 101;
+-
+-	Task(const char* name, FUNCPTR function, int32_t priority = kDefaultPriority,
+-			uint32_t stackSize = 20000);
+-	virtual ~Task();
+-
+-	bool Start(uint32_t arg0 = 0, uint32_t arg1 = 0, uint32_t arg2 = 0, uint32_t arg3 = 0,
+-			uint32_t arg4 = 0, uint32_t arg5 = 0, uint32_t arg6 = 0, uint32_t arg7 = 0,
+-			uint32_t arg8 = 0, uint32_t arg9 = 0);
+-	bool Restart();
+-	bool Stop();
+-
+-	bool IsReady();
+-	bool IsSuspended();
+-
+-	bool Suspend();
+-	bool Resume();
+-
+-	bool Verify();
+-
+-	int32_t GetPriority();
+-	bool SetPriority(int32_t priority);
+-	const char* GetName();
+-	TASK GetID();
+-
+-private:
+-	FUNCPTR m_function;
+-	char* m_taskName;
+-	TASK m_taskID;
+-	uint32_t m_stackSize;
+-	int m_priority;
+-	bool HandleError(STATUS results);
+-	DISALLOW_COPY_AND_ASSIGN(Task);
+-};
+-
+diff --git a/wpilibc/wpilibC++Sim/include/Timer.h b/wpilibc/wpilibC++Sim/include/Timer.h
+deleted file mode 100644
+index 40a6f65db53d5576bde7c2316b4b3ea87b369248..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Sim/include/Timer.h
++++ /dev/null
+@@ -1,50 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "HAL/Semaphore.hpp"
+-#include "Base.h"
+-
+-typedef void (*TimerInterruptHandler)(void *param);
+-
+-void Wait(double seconds);
+-double GetClock();
+-double GetTime();
+-
+-namespace wpilib { namespace internal {
+-    extern double simTime;
+-	extern MULTIWAIT_ID time_wait;
+-    // transport::SubscriberPtr time_sub;
+-}}
+-
+-/**
+- * Timer objects measure accumulated time in seconds.
+- * The timer object functions like a stopwatch. It can be started, stopped, and cleared. When the
+- * timer is running its value counts up in seconds. When stopped, the timer holds the current
+- * value. The implementation simply records the time when started and subtracts the current time
+- * whenever the value is requested.
+- */
+-class Timer
+-{
+-public:
+-	Timer();
+-	virtual ~Timer();
+-	double Get();
+-	void Reset();
+-	void Start();
+-	void Stop();
+-	bool HasPeriodPassed(double period);
+-
+-	static double GetFPGATimestamp();
+-	static double GetPPCTimestamp();
+-
+-private:
+-	double m_startTime;
+-	double m_accumulatedTime;
+-	bool m_running;
+-	MUTEX_ID m_semaphore;
+-	DISALLOW_COPY_AND_ASSIGN(Timer);
+-};
+diff --git a/wpilibc/wpilibC++Sim/include/Utility.h b/wpilibc/wpilibC++Sim/include/Utility.h
+deleted file mode 100644
+index 25c56e0006125f682d55985108e4aecebf78d494..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Sim/include/Utility.h
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/*---------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							 */
+-/* Open Source Software - may be modified and shared by FRC teams. The code  */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib. */
+-/*---------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include <stdint.h>
+-
+-#define wpi_assert(condition) wpi_assert_impl(condition, #condition, NULL, __FILE__, __LINE__, __FUNCTION__)
+-#define wpi_assertWithMessage(condition, message) wpi_assert_impl(condition, #condition, message, __FILE__, __LINE__, __FUNCTION__)
+-
+-#define wpi_assertEqual(a, b) wpi_assertEqual_impl(a, b, NULL, __FILE__, __LINE__, __FUNCTION__)
+-#define wpi_assertEqualWithMessage(a, b, message) wpi_assertEqual_impl(a, b, message, __FILE__, __LINE__, __FUNCTION__)
+-
+-#define wpi_assertNotEqual(a, b) wpi_assertNotEqual_impl(a, b, NULL, __FILE__, __LINE__, __FUNCTION__)
+-#define wpi_assertNotEqualWithMessage(a, b, message) wpi_assertNotEqual_impl(a, b, message, __FILE__, __LINE__, __FUNCTION__)
+-
+-bool wpi_assert_impl(bool conditionValue, const char *conditionText, const char *message, const char *fileName, uint32_t lineNumber, const char *funcName);
+-bool wpi_assertEqual_impl(int valueA, int valueB, const char *message, const char *fileName,uint32_t lineNumber, const char *funcName);
+-bool wpi_assertNotEqual_impl(int valueA, int valueB, const char *message, const char *fileName,uint32_t lineNumber, const char *funcName);
+-
+-void wpi_suspendOnAssertEnabled(bool enabled);
+-void wpi_stackTraceOnAssertEnable(bool enabled);
+-
+-uint32_t GetFPGATime();
+diff --git a/wpilibc/wpilibC++Sim/include/simulation/simTime.h b/wpilibc/wpilibC++Sim/include/simulation/simTime.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..7b4bf90690f82adb83ecec6af70cc04639a326bc
+--- /dev/null
++++ b/wpilibc/wpilibC++Sim/include/simulation/simTime.h
+@@ -0,0 +1,7 @@
++#pragma once
++
++namespace wpilib { namespace internal {
++    extern double simTime;
++	extern MULTIWAIT_ID time_wait;
++    // transport::SubscriberPtr time_sub;
++}}
+diff --git a/wpilibc/wpilibC++Sim/src/PIDController.cpp b/wpilibc/wpilibC++Sim/src/PIDController.cpp
+index d55cfdbf0dfc44d2c3008c4225342a9a82c78a20..6087ce67603d4ba4a70c103351ff284d02884c0c 100644
+--- a/wpilibc/wpilibC++Sim/src/PIDController.cpp
++++ b/wpilibc/wpilibC++Sim/src/PIDController.cpp
+@@ -115,10 +115,11 @@ PIDController::~PIDController()
+  * This method is static and called by the Notifier class.
+  * @param controller the address of the PID controller object to use in the background loop
+  */
+-void PIDController::CallCalculate(void *controller)
++void *PIDController::CallCalculate(void *controller)
+ {
+ 	PIDController *control = (PIDController*) controller;
+ 	control->Calculate();
++	return nullptr;
+ }
+ 
+  /**
+diff --git a/wpilibc/wpilibC++Sim/src/Solenoid.cpp b/wpilibc/wpilibC++Sim/src/Solenoid.cpp
+index f35ab4de7a8e0831a504f679786057f8d40e2c46..bf29282192399c39bd2ea90927619841f898bc9c 100644
+--- a/wpilibc/wpilibC++Sim/src/Solenoid.cpp
++++ b/wpilibc/wpilibC++Sim/src/Solenoid.cpp
+@@ -7,6 +7,7 @@
+ #include "Solenoid.h"
+ #include "WPIErrors.h"
+ #include "LiveWindow/LiveWindow.h"
++#include "simulation/simTime.h"
+ 
+ /**
+  * Common function to implement constructor behavior.
+diff --git a/wpilibc/wpilibC++Sim/src/Timer.cpp b/wpilibc/wpilibC++Sim/src/Timer.cpp
+index 9c5ff5a86f7a17324ea061de8eef02f686d34a43..3e221a3f1457015534132d0846a5643750e0ebd1 100644
+--- a/wpilibc/wpilibC++Sim/src/Timer.cpp
++++ b/wpilibc/wpilibC++Sim/src/Timer.cpp
+@@ -9,6 +9,7 @@
+ #include <time.h>
+ 
+ #include "HAL/cpp/Synchronized.hpp"
++#include "simulation/simTime.h"
+ #include "Utility.h"
+ 
+ /**
+diff --git a/wpilibc/wpilibC++Sim/src/Utility.cpp b/wpilibc/wpilibC++Sim/src/Utility.cpp
+index c565221bec535e0c18d2cbcf3d84ed8e93691609..e1bf26d554284e838f2fd865a0588dc9854ae958 100644
+--- a/wpilibc/wpilibC++Sim/src/Utility.cpp
++++ b/wpilibc/wpilibC++Sim/src/Utility.cpp
+@@ -8,6 +8,7 @@
+ 
+ #include "Task.h"
+ #include "Timer.h"
++#include "simulation/simTime.h"
+ #include <stdio.h>
+ #include <string.h>
+ 

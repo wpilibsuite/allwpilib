@@ -1,0 +1,386 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Fri, 16 May 2014 13:09:17 -0400
+Subject: [PATCH 0054/6262] Updated POM files to allow use of compile phase.
+
+Note that the eclipse plugins are no longer included in the build by
+default. To clean or build the eclipse plugins, use
+-Dwith-eclipse-plugins. When specifying this property, only phases
+up to or after package may be run.
+---
+ cmake/pom.xml                   |   2 +-
+ pom.xml                         |  17 +++-
+ wpilibj/wpilibJava/pom.xml      |  26 +++---
+ wpilibj/wpilibJavaFinal/pom.xml | 147 +++++++++++++++++++++++---------
+ wpilibj/wpilibJavaJNI/pom.xml   |  59 ++++++++++---
+ 5 files changed, 185 insertions(+), 66 deletions(-)
+
+diff --git a/cmake/pom.xml b/cmake/pom.xml
+index 6931d5747b5fa5141e045553f0701a065271b2e4..c0b480a84e079b98bb3c76294d1e4b713b640652 100644
+--- a/cmake/pom.xml
++++ b/cmake/pom.xml
+@@ -127,7 +127,7 @@
+         <executions>
+         <execution>
+ 						<id>zip-cpp-includes</id>
+-						<phase>package</phase>
++						<phase>compile</phase>
+ 						<goals>
+ 							<goal>attach-artifact</goal>
+ 						</goals>
+diff --git a/pom.xml b/pom.xml
+index bff1e228325ead06e217a24cf7ba23e274c904d5..1c682ddbb11d5bde0c48df79bded07c94362dadc 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -10,9 +10,24 @@
+ 		<module>maven-utilities</module>
+ 		<module>networktables</module>
+ 		<module>wpilibj</module>
+-		<module>eclipse-plugins</module>
+ 		<module>driver-station</module>
+ 	</modules>
++
++
++	<profiles>
++		<profile>
++			<activation>
++		      <property>
++		        <name>with-eclipse-plugins</name>
++		      </property>
++		    </activation>
++		    
++		    <modules>
++		    	<module>eclipse-plugins</module>
++		    </modules>
++		</profile>
++	</profiles>
++
+ 	<build>
+ 		<plugins>
+ 			<plugin>
+diff --git a/wpilibj/wpilibJava/pom.xml b/wpilibj/wpilibJava/pom.xml
+index e6f61ae28e95eca0482911ea9193337cfc1df1a2..f4f3f0e3878c91592ae5dffcb3c0099290dc1b4f 100644
+--- a/wpilibj/wpilibJava/pom.xml
++++ b/wpilibj/wpilibJava/pom.xml
+@@ -129,20 +129,20 @@
+         <artifactId>maven-source-plugin</artifactId>
+       </plugin>
+       <plugin>
+-	<groupId>org.apache.maven.plugins</groupId>
+-	<artifactId>maven-javadoc-plugin</artifactId>
++      	<groupId>org.apache.maven.plugins</groupId>
++      	<artifactId>maven-javadoc-plugin</artifactId>
+         <configuration>
+-	  <sourceFileExcludes>
+-	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
+-	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
+-	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
+-	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
+-	    <exclude>edu/wpi/first/wpilibj/Kinect.java</exclude>
+-	    <exclude>edu/wpi/first/wpilibj/KinectStick.java</exclude>
+-	    <exclude>edu/wpi/first/wpilibj/DriverStationEnhancedIO.java</exclude>
+-	    <exclude>edu/wpi/first/wpilibj/buttons/DigitalIOButton.java</exclude>
+-	    <exclude>edu/wpi/first/wpilibj/buttons/AnalogIOButton.java</exclude>
+-	  </sourceFileExcludes>
++      	  <sourceFileExcludes>
++      	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/Kinect.java</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/KinectStick.java</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/DriverStationEnhancedIO.java</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/buttons/DigitalIOButton.java</exclude>
++      	    <exclude>edu/wpi/first/wpilibj/buttons/AnalogIOButton.java</exclude>
++      	  </sourceFileExcludes>
+         </configuration>
+       </plugin>
+     </plugins>
+diff --git a/wpilibj/wpilibJavaFinal/pom.xml b/wpilibj/wpilibJavaFinal/pom.xml
+index e7a728f1e51d263e1bcb9206c68cad65cd5df90d..eb2af4eb52f16807ff573914da82cdae2f816f59 100644
+--- a/wpilibj/wpilibJavaFinal/pom.xml
++++ b/wpilibj/wpilibJavaFinal/pom.xml
+@@ -43,29 +43,96 @@
+ 
+   <build>
+ 	<plugins>
+-	  <plugin>
++    <plugin>
++        <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-antrun-plugin</artifactId>
++        <version>1.7</version>
++        <executions>
++          <execution>
++            <id>extract-java-jar</id>
++            <goals>
++              <goal>run</goal>
++            </goals>
++            <phase>generate-sources</phase>
++            <configuration>
++              <target>
++                <taskdef resource="net/sf/antcontrib/antcontrib.properties"
++                            classpathref="maven.plugin.classpath" />
++
++                <property name="mvn.wpilibJava.jar.path" value="${edu.wpi.first.wpilibj:wpilibJava:jar}"/>
++
++                <available file="${mvn.wpilibJava.jar.path}" type="file" property="mvn.wpilibJava.jar.isfile" />
++
++                <if>
++                  <isset property="mvn.wpilibJava.jar.isfile" />
++                  <then>
++                    <unzip src="${mvn.wpilibJava.jar.path}" dest="${project.build.directory}/classes" />
++                  </then>
++                  <else>
++                    <copy todir="${project.build.directory}/classes" >
++                          <fileset dir="${mvn.wpilibJava.jar.path}" />  
++                    </copy>
++                  </else>
++                </if>
++              </target>
++            </configuration>
++          </execution>
++
++          <execution>
++            <id>copy-jni-so</id>
++            <goals>
++              <goal>run</goal>
++            </goals>
++            <phase>generate-sources</phase>
++            <configuration>
++              <target>
++                  <copy todir="${project.build.directory}/classes/linux-arm" 
++                        file="${edu.wpi.first.wpilibj:wpilibJavaJNI:so}" />  
++              </target>
++            </configuration>
++          </execution>
++
++          
++        </executions>
++        <dependencies>
++          <dependency>
++                  <groupId>ant-contrib</groupId>
++                  <artifactId>ant-contrib</artifactId>
++                  <version>1.0b3</version>
++                  <exclusions>
++                <exclusion>
++                    <groupId>ant</groupId>
++                    <artifactId>ant</artifactId>
++                  </exclusion>
++              </exclusions>
++              </dependency>
++        </dependencies>
++      </plugin>
++
++
++	  <!-- <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <version>2.8</version>
+         <executions>
+-        <execution>
+-        <id>unpack</id>
+-        <phase>generate-sources</phase>
+-        <goals>
+-        <goal>unpack</goal>
+-        </goals>
+-        <configuration>
+-        <artifactItems>
+-        <artifactItem>
+-				  <groupId>edu.wpi.first.wpilibj</groupId>
+-				  <artifactId>wpilibJava</artifactId>
+-				  <version>0.1.0-SNAPSHOT</version>
+-				  <type>jar</type>
+-        </artifactItem>
+-        </artifactItems>
+-        <outputDirectory>${project.build.directory}/classes</outputDirectory>
+-        </configuration>
+-        </execution>
++          <execution>
++          <id>unpack</id>
++          <phase>generate-sources</phase>
++          <goals>
++            <goal>unpack</goal>
++          </goals>
++          <configuration>
++            <artifactItems>
++              <artifactItem>
++      				  <groupId>edu.wpi.first.wpilibj</groupId>
++      				  <artifactId>wpilibJava</artifactId>
++      				  <version>0.1.0-SNAPSHOT</version>
++      				  <type>jar</type>
++              </artifactItem>
++            </artifactItems>
++            <outputDirectory>${project.build.directory}/classes</outputDirectory>
++          </configuration>
++          </execution>
+          <execution>
+             <id>fetch-dependencies</id>
+             <phase>generate-sources</phase>
+@@ -75,41 +142,41 @@
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+-				  <groupId>edu.wpi.first.wpilibj</groupId>
+-				  <artifactId>wpilibJavaJNI</artifactId>
+-				  <version>0.1.0-SNAPSHOT</version>
+-				  <type>so</type>
+-				  <destFileName>libwpilibJavaJNI.so</destFileName>
+-				  <outputDirectory>${project.build.directory}/classes/linux-arm</outputDirectory>
++        				  <groupId>edu.wpi.first.wpilibj</groupId>
++        				  <artifactId>wpilibJavaJNI</artifactId>
++        				  <version>0.1.0-SNAPSHOT</version>
++        				  <type>so</type>
++        				  <destFileName>libwpilibJavaJNI.so</destFileName>
++        				  <outputDirectory>${project.build.directory}/classes/linux-arm</outputDirectory>
+                 </artifactItem>
+-               <!-- artifactItem>
++               COMMENT BEGIN <artifactItem>
+ 				  <groupId>edu.wpi.first.wpilib.hal</groupId>
+ 				  <artifactId>libHALAthenaJava</artifactId>
+ 				  <version>0.1.0-SNAPSHOT</version>
+ 				  <type>so</type>
+ 				  <destFileName>libHALAthenaJava.so</destFileName>
+ 				  <outputDirectory>${project.build.directory}/classes/linux-arm</outputDirectory>
+-                </artifactItem-->
++                </artifactItem> COMMENT END
+               </artifactItems>
+               <overWriteReleases>false</overWriteReleases>
+               <overWriteSnapshots>true</overWriteSnapshots>
+             </configuration>
+           </execution>
+         </executions>
+-      </plugin>
++      </plugin> -->
+       <plugin>
+-      <groupId>org.apache.maven.plugins</groupId>
+-      <artifactId>maven-install-plugin</artifactId>
+-      <version>2.5.1</version>
+-      <executions>
+-      <execution>
+-      <id>install-jar</id>
+-      <phase>install</phase>
+-      <goals>
+-      <goal>install</goal>
+-      </goals>
+-      </execution>
+-      </executions>
++        <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-install-plugin</artifactId>
++        <version>2.5.1</version>
++        <executions>
++          <execution>
++          <id>install-jar</id>
++          <phase>install</phase>
++          <goals>
++            <goal>install</goal>
++          </goals>
++          </execution>
++        </executions>
+       </plugin>
+ 	</plugins>
+ 	<pluginManagement>
+diff --git a/wpilibj/wpilibJavaJNI/pom.xml b/wpilibj/wpilibJavaJNI/pom.xml
+index e6a189a8c82c19d4a6b23f50473022c0de487905..802cfee3d353296dd29d324230f3aa8f26440510 100644
+--- a/wpilibj/wpilibJavaJNI/pom.xml
++++ b/wpilibj/wpilibJavaJNI/pom.xml
+@@ -182,13 +182,13 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
+ 					<buildType>release</buildType>
+ 				</configuration>
+ 			</plugin>
+-			<plugin>
++			<!-- <plugin>
+ 				<groupId>org.apache.maven.plugins</groupId>
+ 				<artifactId>maven-dependency-plugin</artifactId>
+ 				<version>2.8</version>
+ 				<executions>
+-					<!-- Fetch the dependencies needed to build the cpp.zip file. -->
+-					<execution>
++					 COMMENT ME: Fetch the dependencies needed to build the cpp.zip file.
++					 <execution>
+ 						<id>fetch-cpp-zip-dependencies</id>
+ 						<phase>process-sources</phase>
+ 						<goals>
+@@ -211,12 +211,42 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
+ 						</configuration>
+ 					</execution>
+ 				</executions>
+-			</plugin>
++			</plugin> -->
+ 			<plugin>
+ 				<groupId>org.apache.maven.plugins</groupId>
+ 				<artifactId>maven-antrun-plugin</artifactId>
+ 				<version>1.7</version>
+ 				<executions>
++					<execution>
++						<id>extract-cpp-zip</id>
++						<goals>
++							<goal>run</goal>
++						</goals>
++						<phase>process-sources</phase>
++						<configuration>
++							<target>
++								<taskdef resource="net/sf/antcontrib/antcontrib.properties"
++                  					classpathref="maven.plugin.classpath" />
++
++								<property name="mvn.cpp-root.zip.path" value="${edu.wpi.first.wpilib.cmake:cpp-root:zip}"/>
++
++								<available file="${mvn.cpp-root.zip.path}" type="file" property="mvn.cpp-root.zip.isfile" />
++
++								<if>
++									<isset property="mvn.cpp-root.zip.isfile" />
++									<then>
++										<unzip src="${mvn.cpp-root.zip.path}" dest="${project.build.directory}" />
++									</then>
++									<else>
++										<copy todir="${project.build.directory}" >
++									        <fileset dir="${mvn.cpp-root.zip.path}" />  
++									 	</copy>
++									</else>
++								</if>
++							</target>
++						</configuration>
++					</execution>
++
+ 					<!-- Set time stamp and version properties. -->
+ 					<execution>
+ 						<id>set-version-info</id>
+@@ -233,17 +263,24 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
+ 									<format property="version-info" pattern="yyyy.MM"/>
+ 								</tstamp>
+ 								<property name="version" value="${version-info}.${build-number}"/>
+-								
+-								<unzip dest="${project.build.directory}">
+-									<fileset dir="${project.build.directory}">
+-										<include name="cpp-root*.zip"/>
+-									</fileset>
+-								</unzip>
+ 							</target>
+ 							<exportAntProperties>true</exportAntProperties>
+ 						</configuration>
+ 					</execution>
+ 				</executions>
++				<dependencies>
++					<dependency>
++			            <groupId>ant-contrib</groupId>
++			            <artifactId>ant-contrib</artifactId>
++			            <version>1.0b3</version>
++			            <exclusions>
++					    	<exclusion>
++						        <groupId>ant</groupId>
++						        <artifactId>ant</artifactId>
++					      	</exclusion>
++					    </exclusions>
++			        </dependency>
++				</dependencies>
+ 			</plugin>
+ 					      <plugin>
+         <groupId>org.codehaus.mojo</groupId>
+@@ -252,7 +289,7 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
+         <executions>
+         <execution>
+ 						<id>zip-cpp-includes</id>
+-						<phase>package</phase>
++						<phase>compile</phase>
+ 						<goals>
+ 							<goal>attach-artifact</goal>
+ 						</goals>

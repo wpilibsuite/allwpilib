@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Omar Zrien <OZrien@crosstheroadelectronics.com>
+Date: Sat, 6 Dec 2014 13:39:49 -0500
+Subject: [PATCH 0542/6262] commented out system.out.prints in CANTalon.set()
+
+Change-Id: I85bc50c5f1ee7364395eb28d03e3845fe70649c0
+---
+ .../src/main/java/edu/wpi/first/wpilibj/CANTalon.java         | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
+index 4a20bc7ac3e796327776dfbb4ccd583ced149fbb..a275d2ef8fbe87ef69937ef43924cccf3aeba2ed 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
+@@ -103,7 +103,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+    * @param outputValue The setpoint value, as described above.
+    */
+   public void set(double outputValue) {
+-    System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
++    //System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
+     m_controlMode = ControlMode.PercentVbus;
+     if (m_controlEnabled) {
+       switch (getControlMode()) {
+@@ -128,7 +128,7 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+           break;
+       }
+     }
+-    System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
++    //System.out.println("Enabled: " + m_controlEnabled + " Mode: " + m_controlMode);
+   }
+ 
+   /**

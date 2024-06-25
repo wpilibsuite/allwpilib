@@ -1,0 +1,128 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PetaroMitaro <mitranopeter@gmail.com>
+Date: Fri, 5 Dec 2014 15:40:54 -0500
+Subject: [PATCH 0534/6262] added joystick and driverstation counts for POV,
+ buttons, and axis
+
+---
+ .../edu/wpi/first/wpilibj/DriverStation.java  | 46 +++++++++++++++++++
+ .../java/edu/wpi/first/wpilibj/Joystick.java  | 21 +++++++++
+ 2 files changed, 67 insertions(+)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index 9e8cb7f2406e9b4d5975b46e5e4c03c51057e7a3..f4734d94cea25179cde79ed7d1f6dbdb8fab023d 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -204,6 +204,20 @@ public class DriverStation implements RobotState.Interface {
+         }
+     }
+ 
++    /**
++    *   Returns the number of axis on a given joystick port
++    *
++    * @param stick The joystick port number
++    */
++    public int getStickAxisCount(int stick){
++
++        if(stick < 0 || stick >= kJoystickPorts) {
++            throw new RuntimeException("Joystick index is out of range, should be 0-5");
++        }
++        
++        return FRCNetworkCommunicationsLibrary.HALGetJoystickAxes((byte)stick).length;
++    }
++
+     /**
+      * Get the state of a POV on the joystick.
+      *
+@@ -228,6 +242,20 @@ public class DriverStation implements RobotState.Interface {
+         return joystickPOVs[pov];
+     }
+ 
++    /**
++    * Returns the number of POVs on a given joystick port
++    *
++    * @param stick The joystick port number
++    */
++    public int getStickPOVCount(int stick){
++
++        if(stick < 0 || stick >= kJoystickPorts) {
++            throw new RuntimeException("Joystick index is out of range, should be 0-5");
++        }
++
++        return FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs((byte)stick).length;
++    }
++
+     /**
+      * The state of the buttons on the joystick.
+      * 12 buttons (4 msb are unused) from the joystick.
+@@ -251,6 +279,24 @@ public class DriverStation implements RobotState.Interface {
+ 		return ((0x1 << (button - 1)) & buttons) != 0;
+     }
+ 
++    /**
++    *   Gets the number of buttons on a joystick
++    *
++    *   @param  stick the joystick port number
++    */
++    public int getStickButtonCount(int stick){
++
++        if(stick < 0 || stick >= kJoystickPorts) {
++            throw new RuntimeException("Joystick index is out of range, should be 0-3");
++        }
++        
++        ByteBuffer countBuffer = ByteBuffer.allocateDirect(1);
++
++        int buttons = FRCNetworkCommunicationsLibrary.HALGetJoystickButtons((byte)stick, countBuffer);
++        byte count = countBuffer.get();
++        return count;
++    }
++
+     /**
+      * Gets a value indicating whether the Driver Station requires the
+      * robot to be enabled.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+index 110f8b995ada41836c1eb13d981b0cc96ef0175d..c17e76216a712ae4c8bab8c46718f834f6329b2a 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+@@ -262,6 +262,13 @@ public class Joystick extends GenericHID {
+         }
+     }
+ 
++    /**
++    * For the current joystick, return the number of axis
++    */
++    public int getAxisCount(){
++        return m_ds.getStickAxisCount(m_port);
++    }
++
+     /**
+      * Read the state of the trigger on the joystick.
+      *
+@@ -310,6 +317,13 @@ public class Joystick extends GenericHID {
+         return m_ds.getStickButton(m_port, (byte)button);
+     }
+ 
++    /**
++    * For the current joystick, return the number of buttons
++    */
++    public int getButtonCount(){
++        return m_ds.getStickButtonCount(m_port);
++    }
++
+     /**
+      * Get the state of a POV on the joystick.
+      *
+@@ -319,6 +333,13 @@ public class Joystick extends GenericHID {
+         return m_ds.getStickPOV(m_port, pov);
+     }
+ 
++    /**
++    * For the current joystick, return the number of POVs
++    */
++    public int getPOVCount(){
++        return m_ds.getStickPOVCount(m_port);
++    }
++
+     /**
+      * Get buttons based on an enumerated type.
+      *

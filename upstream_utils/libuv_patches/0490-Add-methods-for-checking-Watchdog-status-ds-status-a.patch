@@ -1,0 +1,213 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Tue, 18 Nov 2014 10:56:25 -0500
+Subject: [PATCH 0490/6262] Add methods for checking Watchdog status, ds
+ status, and brownout status
+
+Change-Id: I723c87d0c50612cbffbb81b0e039efd0ef05fcd0
+---
+ hal/include/HAL/HAL.hpp                       |  3 +++
+ hal/lib/Athena/HAL.cpp                        | 12 ++++++++++
+ .../wpilibC++Devices/include/DriverStation.h  |  3 +++
+ .../wpilibC++Devices/src/DriverStation.cpp    | 23 ++++++++++++++++++
+ .../edu/wpi/first/wpilibj/DriverStation.java  | 22 +++++++++++++++++
+ .../FRCNetworkCommunicationsLibrary.java      |  2 ++
+ .../lib/FRCNetworkCommunicationsLibrary.cpp   | 24 +++++++++++++++++++
+ 7 files changed, 89 insertions(+)
+
+diff --git a/hal/include/HAL/HAL.hpp b/hal/include/HAL/HAL.hpp
+index 1b5b7abd97511c5fb1679e1f2d9bb9a7c7be9880..187703bc883db72a1a33b44f51df16022f2090fb 100644
+--- a/hal/include/HAL/HAL.hpp
++++ b/hal/include/HAL/HAL.hpp
+@@ -216,6 +216,9 @@ extern "C"
+ 	int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons *buttons, uint8_t *count);
+ 
+ 	void HALSetNewDataSem(pthread_cond_t *);
++	
++	bool HALGetSystemActive(int32_t *status);
++	bool HALGetBrownedOut(int32_t *status);
+ 
+ 	int HALInitialize(int mode = 0);
+ 	void HALNetworkCommunicationObserveUserProgramStarting();
+diff --git a/hal/lib/Athena/HAL.cpp b/hal/lib/Athena/HAL.cpp
+index 7812e300c7037b7674413a30d85a559a17603a1d..1526467e1c2d8862414b9eb37310613fb723a178 100644
+--- a/hal/lib/Athena/HAL.cpp
++++ b/hal/lib/Athena/HAL.cpp
+@@ -19,6 +19,7 @@ const uint32_t interrupt_kNumSystems = tInterrupt::kNumSystems;
+ const uint32_t kSystemClockTicksPerMicrosecond = 40;
+ 
+ static tGlobal *global;
++static tSysWatchdog *watchdog;
+ 
+ void* getPort(uint8_t pin)
+ {
+@@ -210,6 +211,16 @@ void HALSetNewDataSem(pthread_cond_t * param)
+ 	setNewDataSem(param);
+ }
+ 
++bool HALGetSystemActive(int32_t *status)
++{
++	return watchdog->readStatus_SystemActive(status);
++}
++	
++bool HALGetBrownedOut(int32_t *status)
++{
++	return !(watchdog->readStatus_PowerAlive(status));
++}
++
+ /**
+  * Call this to start up HAL. This is required for robot programs.
+  */
+@@ -227,6 +238,7 @@ int HALInitialize(int mode)
+ 
+ 	int32_t status;
+ 	global = tGlobal::create(&status);
++	watchdog = tSysWatchdog::create(&status);
+ 
+ 	// Kill any previous robot programs
+ 	std::fstream fs;
+diff --git a/wpilibc/wpilibC++Devices/include/DriverStation.h b/wpilibc/wpilibC++Devices/include/DriverStation.h
+index 927222b2ac97aa510b90f3cba7a57cba6f25b85b..b03264bdfb779c10f7d0875b363b25fd24420735 100644
+--- a/wpilibc/wpilibC++Devices/include/DriverStation.h
++++ b/wpilibc/wpilibC++Devices/include/DriverStation.h
+@@ -41,8 +41,11 @@ public:
+ 	bool IsAutonomous();
+ 	bool IsOperatorControl();
+ 	bool IsTest();
++	bool IsDSAttached();
+ 	bool IsNewControlData();
+ 	bool IsFMSAttached();
++	bool IsSysActive();
++	bool IsSysBrownedOut();
+ 
+ 	Alliance GetAlliance();
+ 	uint32_t GetLocation();
+diff --git a/wpilibc/wpilibC++Devices/src/DriverStation.cpp b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+index c5e5f2cb013e96a6636aa90c09e3eb3c3dd44c93..1de5d825ea6b38361a856e103d67107196c5505b 100644
+--- a/wpilibc/wpilibC++Devices/src/DriverStation.cpp
++++ b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+@@ -286,6 +286,29 @@ bool DriverStation::IsTest()
+ 	return m_controlWord.test;
+ }
+ 
++bool DriverStation::IsDSAttached()
++{
++	HALControlWord controlWord;
++	HALGetControlWord(&controlWord);
++	return controlWord.dsAttached;
++}
++
++bool DriverStation::IsSysActive()
++{
++	int32_t status = 0;
++	bool retVal = HALGetSystemActive(&status);
++	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
++bool DriverStation::IsSysBrownedOut()
++{
++	int32_t status = 0;
++	bool retVal = HALGetBrownedOut(&status);
++	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	return retVal;
++}
++
+ /**
+  * Has a new control packet from the driver station arrived since the last time this function was called?
+  * Warning: If you call this function from more than one place at the same time,
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index 940ca4968b507e7f8c290465e1d534082cedbacc..ac5aaa697841ec0b7344ed23b1a538d98e6ba708 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -8,6 +8,7 @@ package edu.wpi.first.wpilibj;
+ 
+ import java.nio.IntBuffer;
+ import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
+ 
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
+ import edu.wpi.first.wpilibj.communication.HALControlWord;
+@@ -329,6 +330,22 @@ public class DriverStation implements RobotState.Interface {
+     public boolean isOperatorControl() {
+         return !(isAutonomous() || isTest());
+     }
++	
++	public boolean isSysActive() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		boolean retVal = FRCNetworkCommunicationsLibrary.HALGetSystemActive(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
++	
++	public boolean isBrownedOut() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		boolean retVal = FRCNetworkCommunicationsLibrary.HALGetBrownedOut(status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		return retVal;
++	}
+ 
+     /**
+      * Has a new control packet from the driver station arrived since the last time this function was called?
+@@ -393,6 +410,11 @@ public class DriverStation implements RobotState.Interface {
+     public boolean isFMSAttached() {
+         return m_controlWord.getFMSAttached();
+     }
++	
++	public boolean isDSAttached() {
++		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
++		return controlWord.getDSAttached();
++	}
+ 
+     /**
+      * Return the approximate match time
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
+index 67dd54dfa54c7dca10249aaaecf4b7d54a6e1d98..323b3fe22dae90ee1880fe1ec6e9657d35a0bdc4 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
+@@ -468,6 +468,8 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
+ 	public static native short[] HALGetJoystickAxes(byte joystickNum);
+ 	public static native short[] HALGetJoystickPOVs(byte joystickNum);
+ 	public static native int HALGetJoystickButtons(byte joystickNum);
++	public static native boolean HALGetSystemActive(IntBuffer status);
++	public static native boolean HALGetBrownedOut(IntBuffer status);
+ 	
+ 	public static native int HALSetErrorData(String error);
+ }
+diff --git a/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp b/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
+index f517e87c0cf790a72cca6491a8df1878944a9105..aed1299364743f5dab837ce057fd776bd3e469be 100644
+--- a/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
+@@ -535,6 +535,30 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCom
+ 	return env->NewDirectByteBuffer(returnByteArray, 4);
+ }
+ 
++/*
++ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
++ * Method:    HALGetSystemActive
++ * Signature: (Ljava/nio/IntBuffer;)Z
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetSystemActive
++  (JNIEnv * env, jclass, jobject status)
++{
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	return HALGetSystemActive((int32_t*)statusPtr);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
++ * Method:    HALGetBrownedOut
++ * Signature: (Ljava/nio/IntBuffer;)Z
++ */
++JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetBrownedOut
++  (JNIEnv * env, jclass, jobject status)
++{
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	return HALGetBrownedOut((int32_t*)statusPtr);
++}
++
+ /*
+  * Class:     edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
+  * Method:    HALSetErrorData

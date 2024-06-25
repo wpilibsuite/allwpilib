@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Wed, 4 Jun 2014 11:06:37 -0400
+Subject: [PATCH 0074/6262] Fixed C++ PWM values to be 16 bits
+
+---
+ wpilibc/wpilibC++/lib/DigitalModule.cpp | 4 ++--
+ wpilibc/wpilibC++/lib/PWM.cpp           | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/lib/DigitalModule.cpp b/wpilibc/wpilibC++/lib/DigitalModule.cpp
+index 8fcd291403cf53e5be07bf40eab09e5ed8efcb4c..8df0a53c451d56d644db0ae5d1a8a5da7af5da4b 100644
+--- a/wpilibc/wpilibC++/lib/DigitalModule.cpp
++++ b/wpilibc/wpilibC++/lib/DigitalModule.cpp
+@@ -91,7 +91,7 @@ void DigitalModule::SetPWM(uint32_t channel, unsigned short value)
+ }
+ 
+ /**
+- * Get a value from a PWM channel. The values range from 0 to 255.
++ * Get a value from a PWM channel.
+  * 
+  * @param channel The PWM channel to read from.
+  * @return The raw PWM value.
+@@ -99,7 +99,7 @@ void DigitalModule::SetPWM(uint32_t channel, unsigned short value)
+ unsigned short DigitalModule::GetPWM(uint32_t channel)
+ {
+   	int32_t status = 0;
+-	uint8_t value = getPWM(m_pwm_ports[channel-1], &status);
++	uint16_t value = getPWM(m_pwm_ports[channel-1], &status);
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 	return value;
+ }
+diff --git a/wpilibc/wpilibC++/lib/PWM.cpp b/wpilibc/wpilibC++/lib/PWM.cpp
+index cd22f4d4a330b43aa6e020405ae343298a01f38d..615f43b82409bc0f8e5aad363e64bf7419ce41e8 100644
+--- a/wpilibc/wpilibC++/lib/PWM.cpp
++++ b/wpilibc/wpilibC++/lib/PWM.cpp
+@@ -319,7 +319,7 @@ float PWM::GetSpeed()
+  * 
+  * Write a raw value to a PWM channel.
+  * 
+- * @param value Raw PWM value.  Range 0 - 255.
++ * @param value Raw PWM value.
+  */
+ void PWM::SetRaw(unsigned short value)
+ {
+@@ -332,7 +332,7 @@ void PWM::SetRaw(unsigned short value)
+  * 
+  * Read a raw value from a PWM channel.
+  * 
+- * @return Raw PWM control value.  Range: 0 - 255.
++ * @return Raw PWM control value.
+  */
+ unsigned short PWM::GetRaw()
+ {

@@ -1,0 +1,74 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Mon, 21 Jul 2014 11:21:36 -0400
+Subject: [PATCH 0176/6262] Fixes a bug with ErrorBase where the correct error
+ code would not be set when using wpi_setWPIErrorWithContext()
+
+Change-Id: I6ed75428d31df219daf55969e9cd019bf9e0e117
+---
+ wpilibc/wpilibC++/include/ErrorBase.h | 4 ++--
+ wpilibc/wpilibC++/include/WPIErrors.h | 6 ++++--
+ wpilibc/wpilibC++/lib/ErrorBase.cpp   | 4 ++--
+ 3 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/ErrorBase.h b/wpilibc/wpilibC++/include/ErrorBase.h
+index 5eacb987d6138542f724184da67e2b4a39aa9aa0..2d991e47572ae843eefae3971fdd5f731a8f1a40 100644
+--- a/wpilibc/wpilibC++/include/ErrorBase.h
++++ b/wpilibc/wpilibC++/include/ErrorBase.h
+@@ -19,7 +19,7 @@
+ #define wpi_setStaticError(object, code)   (wpi_setStaticErrorWithContext(object, code, ""))
+ #define wpi_setGlobalErrorWithContext(code, context)   (ErrorBase::SetGlobalError((code), (context), __FILE__, __FUNCTION__, __LINE__))
+ #define wpi_setGlobalError(code)   (wpi_setGlobalErrorWithContext(code, ""))
+-#define wpi_setWPIErrorWithContext(error, context)   (this->SetWPIError((wpi_error_s_##error), (context), __FILE__, __FUNCTION__, __LINE__))
++#define wpi_setWPIErrorWithContext(error, context)   (this->SetWPIError((wpi_error_s_##error), (wpi_error_value_##error), (context), __FILE__, __FUNCTION__, __LINE__))
+ #define wpi_setWPIError(error)   (wpi_setWPIErrorWithContext(error, ""))
+ #define wpi_setStaticWPIErrorWithContext(object, error, context)   (object->SetWPIError((wpi_error_s_##error), (context), __FILE__, __FUNCTION__, __LINE__))
+ #define wpi_setStaticWPIError(object, error)   (wpi_setStaticWPIErrorWithContext(object, error, ""))
+@@ -44,7 +44,7 @@ public:
+ 			const char* function, uint32_t lineNumber) const;
+ 	virtual void SetError(Error::Code code, const char *contextMessage, const char* filename,
+ 			const char* function, uint32_t lineNumber) const;
+-	virtual void SetWPIError(const char *errorMessage, const char *contextMessage,
++	virtual void SetWPIError(const char *errorMessage, Error::Code code, const char *contextMessage,
+ 			const char* filename, const char* function, uint32_t lineNumber) const;
+ 	virtual void CloneError(ErrorBase *rhs) const;
+ 	virtual void ClearError() const;
+diff --git a/wpilibc/wpilibC++/include/WPIErrors.h b/wpilibc/wpilibC++/include/WPIErrors.h
+index f1b06265b85e6d07c4f3cbfd7c2fef0ba5cc4449..10a8849eb39600d7b941d28563b6dc2770b06c10 100644
+--- a/wpilibc/wpilibC++/include/WPIErrors.h
++++ b/wpilibc/wpilibC++/include/WPIErrors.h
+@@ -6,9 +6,11 @@
+ #pragma once
+ 
+ #ifdef WPI_ERRORS_DEFINE_STRINGS
+-#define S(label, offset, message) const char *wpi_error_s_##label = message ;
++#define S(label, offset, message) const char *wpi_error_s_##label = message ; \
++	const int32_t wpi_error_value_##label = offset ;
+ #else
+-#define S(label, offset, message) extern const char *wpi_error_s_##label;
++#define S(label, offset, message) extern const char *wpi_error_s_##label ; \
++	const int32_t wpi_error_value_##label = offset ;
+ #endif
+ 
+ /*
+diff --git a/wpilibc/wpilibC++/lib/ErrorBase.cpp b/wpilibc/wpilibC++/lib/ErrorBase.cpp
+index 64bdfc9a0f6c1eb1f504c306deceef60da32a09e..88e8c9dc20c140e64a50c7a4c5348c9d0425eec9 100644
+--- a/wpilibc/wpilibC++/lib/ErrorBase.cpp
++++ b/wpilibc/wpilibC++/lib/ErrorBase.cpp
+@@ -145,14 +145,14 @@ void ErrorBase::SetError(Error::Code code, const char *contextMessage,
+  * @param function Function of the error source
+  * @param lineNumber Line number of the error source
+  */
+-void ErrorBase::SetWPIError(const char *errorMessage, const char *contextMessage,
++void ErrorBase::SetWPIError(const char *errorMessage, Error::Code code , const char *contextMessage,
+ 		const char* filename, const char* function, uint32_t lineNumber) const
+ {
+ 	char err[256];
+ 	sprintf(err, "%s: %s", errorMessage, contextMessage);
+ 
+ 	//  Set the current error information for this object.
+-	m_error.Set(-1, err, filename, function, lineNumber, this);
++	m_error.Set(code, err, filename, function, lineNumber, this);
+ 
+ 	// Update the global error if there is not one already set.
+ 	Synchronized mutex(_globalErrorMutex);

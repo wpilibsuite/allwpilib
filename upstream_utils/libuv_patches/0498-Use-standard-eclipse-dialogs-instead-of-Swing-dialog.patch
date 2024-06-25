@@ -1,0 +1,71 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dustin Spicuzza <dustin@virtualroadside.com>
+Date: Fri, 21 Nov 2014 01:01:17 -0500
+Subject: [PATCH 0498/6262] Use standard eclipse dialogs instead of Swing
+ dialogs
+
+- Swing dialog triggers freeze on Eclipse Luna on OSX 10.10
+
+Change-Id: I9f59e884d19dd397502537286d2730be9eb0fec1
+---
+ .../wpilib/plugins/core/installer/AbstractInstaller.java   | 5 ++---
+ .../plugins/core/launching/SimulationNotification.java     | 7 +++----
+ 2 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java
+index e26bdd262849511578c3384c03d7303cde64f02c..b5daa836c730f942eed897c383ce7133f6f6fb05 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/installer/AbstractInstaller.java
+@@ -8,8 +8,6 @@ import java.io.OutputStream;
+ import java.util.zip.ZipEntry;
+ import java.util.zip.ZipInputStream;
+ 
+-import javax.swing.JOptionPane;
+-
+ import org.eclipse.core.resources.ResourcesPlugin;
+ import org.eclipse.core.runtime.CoreException;
+ import org.eclipse.core.runtime.IProgressMonitor;
+@@ -17,6 +15,7 @@ import org.eclipse.core.runtime.IStatus;
+ import org.eclipse.core.runtime.Status;
+ import org.eclipse.core.runtime.jobs.Job;
+ import org.eclipse.debug.core.DebugPlugin;
++import org.eclipse.jface.dialogs.MessageDialog;
+ 
+ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+ 
+@@ -117,7 +116,7 @@ public abstract class AbstractInstaller {
+ 	protected void install() throws InstallException {
+ 		if(installLocation.exists()) {
+ 			if(!removeFileHandler(installLocation, true)) {
+-				JOptionPane.showMessageDialog(null,
++				MessageDialog.openError(null, "Error",
+ 					String.format("Could not update the old wpilib folder.%n"
+ 							+ "Please close any WPILib tools and restart Eclipse."));
+ 			}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/SimulationNotification.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/SimulationNotification.java
+index 82130655acec1dfb9c4429f4a999100030099f90..50307734a7c3db76a132bddcf4d2a6e661264229 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/SimulationNotification.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/SimulationNotification.java
+@@ -6,10 +6,9 @@ import java.io.IOException;
+ import java.net.URI;
+ import java.net.URISyntaxException;
+ 
+-import javax.swing.JOptionPane;
+-
+ import org.eclipse.core.runtime.CoreException;
+ import org.eclipse.debug.core.DebugPlugin;
++import org.eclipse.jface.dialogs.MessageDialog;
+ 
+ import edu.wpi.first.wpilib.plugins.core.WPILibCore;
+ 
+@@ -21,8 +20,8 @@ public class SimulationNotification {
+ 	
+ 	public static void showUnsupported() {
+ 		String title = "Simulation Unsupported";
+-		String message = SIMULATION_UNSUPPORTED_MSG; 
+-		JOptionPane.showMessageDialog(null, message, title, JOptionPane.OK_OPTION);
++		String message = SIMULATION_UNSUPPORTED_MSG;
++		MessageDialog.openError(null, title, message);
+ 		try {
+ 			Desktop.getDesktop().browse(new URI(URL));
+ 		} catch (IOException e) {

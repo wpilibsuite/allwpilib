@@ -1,0 +1,366 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Fri, 29 Aug 2014 15:54:47 -0400
+Subject: [PATCH 0327/6262] Adds the ability to run test classes with  --repeat
+ rule.
+
+Fixes a bug in several tests where --repeat wouldn't work due to multiple teardown calls.
+
+Change-Id: I26f9350e9c7da6e9b0aefd1ecefb7e8d8975a641
+---
+ .../first/wpilibj/AnalogCrossConnectTest.java |  1 +
+ .../edu/wpi/first/wpilibj/CounterTest.java    |  2 +
+ .../first/wpilibj/DIOCrossConnectTest.java    |  1 +
+ .../edu/wpi/first/wpilibj/EncoderTest.java    | 13 +--
+ .../wpi/first/wpilibj/MotorEncoderTest.java   |  1 +
+ .../java/edu/wpi/first/wpilibj/PDPTest.java   | 23 +++--
+ .../java/edu/wpi/first/wpilibj/PIDTest.java   | 15 +--
+ .../edu/wpi/first/wpilibj/test/TestSuite.java | 93 ++++++++++---------
+ 8 files changed, 80 insertions(+), 69 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/AnalogCrossConnectTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/AnalogCrossConnectTest.java
+index dc99d03024d552dd6d9801c6f7589e41bd15799b..9ad2ae14c1f0736fcaa39e83f92dfb8b562429c2 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/AnalogCrossConnectTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/AnalogCrossConnectTest.java
+@@ -53,6 +53,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
+ 	@AfterClass
+ 	public static void tearDownAfterClass() throws Exception {
+ 		analogIO.teardown();
++		analogIO=null;
+ 	}
+ 
+ 	/**
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java
+index 08ecc6d237ec8fe63ebfb9bbc33c1e0c22180395..4005a9e4d1b8a36c062a2371cd1b8f5f0fc81dfb 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java
+@@ -37,6 +37,7 @@ public class CounterTest extends AbstractComsSetup {
+ 	Integer input;
+ 	Integer output;
+ 	
++	@Override
+ 	protected Logger getClassLogger(){
+ 		return logger;
+ 	}
+@@ -87,6 +88,7 @@ public class CounterTest extends AbstractComsSetup {
+ 	@AfterClass
+ 	public static void tearDownAfterClass() throws Exception {
+ 		counter.teardown();
++		counter=null;
+ 	}
+ 
+ 	/**
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java
+index 3ee5dd475e2fe32f0b841c1fa8c5114a55630653..7db61ca3fe23306f95beec81d0234eecd82aabd0 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java
+@@ -74,6 +74,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
+ 	@AfterClass
+ 	public static void tearDownAfterClass() throws Exception {
+ 		dio.teardown();
++		dio=null;
+ 	}
+ 
+ 	@After
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java
+index bc7e2154670d6a671e671acd76a458808b99006d..242234f674990993a35044a600f9a74bee43d237 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java
+@@ -6,7 +6,7 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ 
+-import static org.junit.Assert.*;
++import static org.junit.Assert.assertTrue;
+ 
+ import java.util.Collection;
+ import java.util.logging.Logger;
+@@ -14,13 +14,11 @@ import java.util.logging.Logger;
+ import org.junit.After;
+ import org.junit.AfterClass;
+ import org.junit.Before;
+-import org.junit.BeforeClass;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ import org.junit.runners.Parameterized;
+ import org.junit.runners.Parameterized.Parameters;
+ 
+-import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
+ import edu.wpi.first.wpilibj.fixtures.FakeEncoderFixture;
+ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+ import edu.wpi.first.wpilibj.test.TestBench;
+@@ -43,6 +41,7 @@ public class EncoderTest extends AbstractComsSetup {
+ 	private final int outputA;
+ 	private final int outputB;
+ 	
++	@Override
+ 	protected Logger getClassLogger(){
+ 		return logger;
+ 	}
+@@ -78,19 +77,13 @@ public class EncoderTest extends AbstractComsSetup {
+ 		encoder = new FakeEncoderFixture(inputA, outputA, inputB, outputB);
+ 	}
+ 
+-	/**
+-	 * @throws java.lang.Exception
+-	 */
+-	@BeforeClass
+-	public static void setUpBeforeClass() throws Exception {
+-	}
+-
+ 	/**
+ 	 * @throws java.lang.Exception
+ 	 */
+ 	@AfterClass
+ 	public static void tearDownAfterClass() throws Exception {
+ 		encoder.teardown();
++		encoder=null;
+ 	}
+ 
+ 	/**
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+index 8be6521399fe1abe452d76966cc011bddf7de100..4ff0d3aca47151e6310e3b7a610d201ac901eb5e 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+@@ -75,6 +75,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 	public static void tearDownAfterClass() {
+ 		// Clean up the fixture after the test
+ 		me.teardown();
++		me=null;
+ 	}
+ 
+ 	/**
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+index 7bb8e12d4c38ffa6b43a3614e9ce5afdefe1b423..d26502544b59b365422159963fa2bf00b1f5f94a 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+@@ -28,6 +28,7 @@ public class PDPTest extends AbstractComsSetup {
+ 
+ 	private static PowerDistributionPanel pdp;
+ 	private static MotorEncoderFixture<?> me;
++	private final double expectedStoppedCurrentDraw; 
+ 
+ 	@BeforeClass
+ 	public static void setUpBeforeClass() throws Exception {
+@@ -37,24 +38,28 @@ public class PDPTest extends AbstractComsSetup {
+ 	@AfterClass
+ 	public static void tearDownAfterClass() throws Exception {
+ 		pdp.free();
++		pdp=null;
+ 		me.teardown();
++		me=null;
+ 	}
+ 
+ 
+-	public PDPTest(MotorEncoderFixture<?> mef){
++	public PDPTest(MotorEncoderFixture<?> mef, Double expectedCurrentDraw){
+ 		logger.fine("Constructor with: " + mef.getType());
+ 		if(me != null && !me.equals(mef)) me.teardown();
+ 		me = mef;
+ 		me.setup();
++		
++		this.expectedStoppedCurrentDraw = expectedCurrentDraw;
+ 	}
+ 
+-	@Parameters(name= "{index}: {0}")
+-	public static Collection<MotorEncoderFixture<?>[]> generateData(){
++	@Parameters(name= "{index}: {0}, Expected Stopped Current Draw: {1}")
++	public static Collection<Object[]> generateData(){
+ 		//logger.fine("Loading the MotorList");
+-		return Arrays.asList(new MotorEncoderFixture<?>[][]{
+-				 {TestBench.getInstance().getTalonPair()},
+-				 {TestBench.getInstance().getVictorPair()},
+-				 {TestBench.getInstance().getJaguarPair()}
++		return Arrays.asList(new Object[][]{
++				 {TestBench.getInstance().getTalonPair(), new Double(0.0)},
++				 {TestBench.getInstance().getVictorPair(), new Double(0.0)},
++				 {TestBench.getInstance().getJaguarPair(), new Double(0.0)}
+ 		});
+ 	}
+ 
+@@ -74,7 +79,7 @@ public class PDPTest extends AbstractComsSetup {
+ 
+ 		/* The Current should be 0 */
+ 		assertEquals("The low current was not within the expected range.",
+-				0.0, pdp.getCurrent(me.getPDPChannel()), 0.001);
++				expectedStoppedCurrentDraw, pdp.getCurrent(me.getPDPChannel()), 0.001);
+ 	}
+ 
+ 	/**
+@@ -89,7 +94,7 @@ public class PDPTest extends AbstractComsSetup {
+ 
+ 		/* The current should now be greater than the low current */
+ 		assertThat("The driven current is not greater than the resting current.",
+-				pdp.getCurrent(me.getPDPChannel()), is(greaterThan(0.0)));
++				pdp.getCurrent(me.getPDPChannel()), is(greaterThan(expectedStoppedCurrentDraw)));
+ 	}
+ 
+ 	@Override
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
+index 4c73652e49893bdee6c0bfb7aa6d77124df2a497..0cb0d68c8bc60b652d9a59168839c7b38953bb8e 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
+@@ -6,8 +6,12 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ 
+-import static org.junit.Assert.*;
+-import static org.hamcrest.CoreMatchers.*;
++import static org.hamcrest.CoreMatchers.is;
++import static org.hamcrest.CoreMatchers.not;
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertFalse;
++import static org.junit.Assert.assertThat;
++import static org.junit.Assert.assertTrue;
+ 
+ import java.util.ArrayList;
+ import java.util.Arrays;
+@@ -18,16 +22,11 @@ import org.junit.After;
+ import org.junit.AfterClass;
+ import org.junit.Before;
+ import org.junit.BeforeClass;
+-import org.junit.Ignore;
+-import org.junit.Rule;
+ import org.junit.Test;
+-import org.junit.rules.TestWatcher;
+-import org.junit.runner.Description;
+ import org.junit.runner.RunWith;
+ import org.junit.runners.Parameterized;
+ import org.junit.runners.Parameterized.Parameters;
+ 
+-import edu.wpi.first.wpilibj.PIDSource.PIDSourceParameter;
+ import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+ import edu.wpi.first.wpilibj.networktables.NetworkTable;
+ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+@@ -54,6 +53,7 @@ public class PIDTest extends AbstractComsSetup {
+ 	
+ 	private final Double k_p, k_i, k_d;
+ 	
++	@Override
+ 	protected Logger getClassLogger(){
+ 		return logger;
+ 	}
+@@ -99,6 +99,7 @@ public class PIDTest extends AbstractComsSetup {
+ 	public static void tearDownAfterClass() throws Exception {
+ 		logger.fine("TearDownAfterClass: " + me.getType());
+ 		me.teardown();
++		me=null;
+ 	}
+ 
+ 	/**
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+index 42b2f8ab578715c3dad79e6b07ef553a2f9be3cd..fbce7c8b1c9a0049ef08783d8a34675aa44ad55d 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+@@ -195,50 +195,50 @@ public class TestSuite extends AbstractTestSuite {
+ 			return JUnitCore.runClasses(QUICK_TEST);
+ 		}
+ 		
+-		//If a specific method has been requested
+-		if(methodFilter){
++		/**
++		 * Stores the data from multiple {@link Result}s in one class that can be returned to display the results.
++		 */
++		class MultipleResult extends Result{
++			private static final long serialVersionUID = 1L;
++			private final List<Failure> failures = new Vector<Failure>();
++			private int runCount = 0;
++			private int ignoreCount = 0;
++			private long runTime = 0;
++			
++		    @Override
++			public int getRunCount() {
++		        return runCount;
++		    }
++		    @Override
++			public int getFailureCount() {
++		        return failures.size();
++		    }
++		    @Override
++			public long getRunTime() {
++		        return runTime;
++		    }
++		    @Override
++			public List<Failure> getFailures() {
++		        return failures;
++		    }
++		    @Override
++			public int getIgnoreCount() {
++		        return ignoreCount;
++		    }
+ 			/**
+-			 * Stores the data from multiple {@link Result}s in one class that can be returned to display the results.
++			 * Adds the given result's data to this result
++			 * @param r the result to add to this result
+ 			 */
+-			class MultipleResult extends Result{
+-				private static final long serialVersionUID = 1L;
+-				private final List<Failure> failures = new Vector<Failure>();
+-				private int runCount = 0;
+-				private int ignoreCount = 0;
+-				private long runTime = 0;
+-				
+-			    @Override
+-				public int getRunCount() {
+-			        return runCount;
+-			    }
+-			    @Override
+-				public int getFailureCount() {
+-			        return failures.size();
+-			    }
+-			    @Override
+-				public long getRunTime() {
+-			        return runTime;
+-			    }
+-			    @Override
+-				public List<Failure> getFailures() {
+-			        return failures;
+-			    }
+-			    @Override
+-				public int getIgnoreCount() {
+-			        return ignoreCount;
+-			    }
+-				/**
+-				 * Adds the given result's data to this result
+-				 * @param r the result to add to this result
+-				 */
+-				void addResult(Result r){
+-					failures.addAll(r.getFailures());
+-					runCount += r.getRunCount();
+-					ignoreCount += r.getIgnoreCount();
+-					runTime += r.getRunTime();	
+-				}
++			void addResult(Result r){
++				failures.addAll(r.getFailures());
++				runCount += r.getRunCount();
++				ignoreCount += r.getIgnoreCount();
++				runTime += r.getRunTime();	
+ 			}
+-			
++		}
++		
++		//If a specific method has been requested
++		if(methodFilter){
+ 			List<ClassMethodPair> pairs  = (new TestSuite()).getMethodMatching(methodRegex);
+ 			if(pairs.size() == 0){
+ 				displayInvalidUsage("None of the arguments passed to the method name filter matched.", args);
+@@ -280,10 +280,17 @@ public class TestSuite extends AbstractTestSuite {
+ 				return null;
+ 			}
+ 			printLoadedTests(testClasses.toArray(new Class[0]));
+-			return JUnitCore.runClasses(testClasses.toArray(new Class[0]));	
++			MultipleResult results = new MultipleResult();
++			//Runs tests multiple times if the repeat rule is used
++			for(int i = 0; i < repeatCount; i++){
++				Result result = (new JUnitCore()).run(testClasses.toArray(new Class[0]));
++				//Store the given results in one cohesive result
++				results.addResult(result);
++			}
++			return results;
+ 		}
+-		
+ 		displayInvalidUsage("None of the parameters that you passed matched any of the accepted flags.", args);
++		
+ 		return null;
+ 	}
+ 	

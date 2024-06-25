@@ -1,0 +1,98 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Wed, 1 Oct 2014 19:58:46 -0400
+Subject: [PATCH 0382/6262] Added a hierarchy of example categories that looks
+ very much like what's in LabVIEW and placed the one project in a bunch of
+ categories as a proof of concept.
+
+Change-Id: If6e1f916ffbe7c0a36a8cccf5be46c36a1e6d6a6
+---
+ .../resources/templates/examples/examples.xml | 68 ++++++++++++++++++-
+ 1 file changed, 66 insertions(+), 2 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
+index e85e2396b3a74228973f5db11fc2532c70665906..e6ff145b3a21df370b79e206d5898d8c7ff89a87 100755
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/examples.xml
+@@ -19,7 +19,67 @@
+ 	<name>Getting Started with Java</name>
+ 	<description>Examples for getting started with FRC Java</description>
+   </tagDescription>
+-  
++
++  <tagDescription>
++    <name>Actuators</name>
++    <description>Example programs that demonstrate the use of various actuators</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Analog</name>
++    <description>Examples programs that show different uses of analog inputs, 
++      outputs and various analog sensors</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>CAN</name>
++    <description>Example programs that demonstrate the use of the CAN components in the control system</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Complete List</name>
++    <description>Complete list of all sample programs across all categories</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Digital</name>
++    <description>Example programs that demonstrate the sensors that use the digital I/O ports</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>I2C</name>
++    <description>Example programs that demonstrate the use of I2C and various sensors that use it</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Joystick</name>
++    <description>Example programs that demonstate different uses of joysticks for robot driving</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Pneumatics</name>
++    <description>Example programs that demonstrate the use of the compressor and solenoids</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Robot and Motor</name>
++    <description>Example programs that demonstrate driving a robot and motors including safety, servos, etc.</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>SPI</name>
++    <description>Example programs that demonstrate the use of the SPI bus and sensors that connect to it</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Safety</name>
++    <description>Example programs that demonstate the motor safety classes and how to use them with your programs</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Sensors</name>
++    <description>Example programs that demonstrate the use of the various commonly used sensors on FRC robots</description>
++  </tagDescription>
+ 
+   <example>
+ 	<name>Getting Started</name>
+@@ -41,7 +101,11 @@
+   <name>Tank Drive</name>
+   <description>Demonstrate the use of the RobotDrive class doing teleop driving with tank steering</description>
+   <tags>
+-    <tag>Getting Started with Java</tag>
++    <tag>Actuators</tag>
++    <tag>Complete List</tag>
++    <tag>Joystick</tag>
++    <tag>Robot and Motor</tag>
++    <tag>Safety</tag>
+   </tags>
+   <packages>
+     <package>src/$package-dir</package>

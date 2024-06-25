@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Fri, 21 Nov 2014 16:39:46 -0500
+Subject: [PATCH 0502/6262] Pipe java program output through NetConsole
+
+Change-Id: Ia012d73236d8e9c73cb53eb011f1b1f9d3c2ce83
+---
+ .../src/main/resources/java-zip/ant/robotCommand                | 2 +-
+ .../src/main/resources/java-zip/ant/robotDebugCommand           | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/robotCommand b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/robotCommand
+index a66e68739e185e96fbf91bc3a936406489deea25..2f72516d7d3cc11e610b4662e03bec5e41ce0bb1 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/robotCommand
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/robotCommand
+@@ -1,2 +1,2 @@
+-/usr/local/frc/JRE/bin/java -jar /home/lvuser/FRCUserProgram.jar
++/usr/local/frc/bin/netconsole-host /usr/local/frc/JRE/bin/java -jar /home/lvuser/FRCUserProgram.jar
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/robotDebugCommand b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/robotDebugCommand
+index a75d754ec26bcbee7ce620a06b163196f9e96aa7..71eb5beb6aa6390f5bb06f04ca465b3bf1ba36b2 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/robotDebugCommand
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/robotDebugCommand
+@@ -1,2 +1,2 @@
+-/usr/local/frc/JRE/bin/java -XX:+UsePerfData -agentlib:jdwp=transport=dt_socket,address=8348,server=y,suspend=y -jar /home/lvuser/FRCUserProgram.jar
++/usr/local/frc/bin/netconsole-host /usr/local/frc/JRE/bin/java -XX:+UsePerfData -agentlib:jdwp=transport=dt_socket,address=8348,server=y,suspend=y -jar /home/lvuser/FRCUserProgram.jar
+ 

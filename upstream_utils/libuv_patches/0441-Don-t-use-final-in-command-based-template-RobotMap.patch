@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 24 Oct 2014 00:07:30 -0700
+Subject: [PATCH 0441/6262] Don't use "final" in command-based template
+ RobotMap.
+
+While final would seem to make sense for RobotMap values (as these values
+should be constant at runtime), RobotMap values are often not truly final
+in the Java sense of the word, as on real robots they often change between
+project builds (e.g. they often can and will be changed by teams as wiring
+changes on the physical robot).
+
+Unfortunately, incremental compilation in Eclipse follows Java rules, and
+doesn't track cross-module dependencies on final variable values, resulting
+in very non-intuitive behavior when a final variable's value is changed:
+other (unchanged) Java modules using the final variable are NOT recompiled
+(as is necessary to pick up the new value), and there is no easy way to
+force recompilation of every Java file in the project.
+
+Change-Id: I75b13aaf4f4a687698f853d5e11eef5f904716ea
+---
+ .../resources/templates/command-based/RobotMap.java       | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/RobotMap.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/RobotMap.java
+index 020b2b2580f3c579918e2c1b916f2a217e49f232..2a08cd36bc03bb01dd3a4c32bc2c3e8e42298019 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/RobotMap.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/RobotMap.java
+@@ -8,11 +8,11 @@ package $package;
+ public class RobotMap {
+     // For example to map the left and right motors, you could define the
+     // following variables to use with your drivetrain subsystem.
+-    // public static final int leftMotor = 1;
+-    // public static final int rightMotor = 2;
++    // public static int leftMotor = 1;
++    // public static int rightMotor = 2;
+     
+     // If you are using multiple modules, make sure to define both the port
+     // number and the module. For example you with a rangefinder:
+-    // public static final int rangefinderPort = 1;
+-    // public static final int rangefinderModule = 1;
++    // public static int rangefinderPort = 1;
++    // public static int rangefinderModule = 1;
+ }

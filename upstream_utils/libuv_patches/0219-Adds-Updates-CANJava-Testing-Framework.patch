@@ -1,0 +1,2335 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 3 Jul 2014 16:21:54 -0400
+Subject: [PATCH 0219/6262] Adds/Updates CANJava Testing Framework.
+
+Change-Id: Iabd80ebd365a05063985fa45ce62849ced17c096
+---
+ .../edu/wpi/first/wpilibj/CANJaguarTest.java  | 238 -------------
+ .../wpi/first/wpilibj/WpiLibJTestSuite.java   |   1 -
+ .../first/wpilibj/can/AbstractCANTest.java    | 113 +++---
+ .../can/CANCurrentQuadEncoderModeTest.java    |  96 +++++
+ .../wpi/first/wpilibj/can/CANDefaultTest.java | 128 +++++++
+ .../can/CANPercentQuadEncoderModeTest.java    | 330 ++++++++++++++++++
+ .../can/CANPositionPotentiometerModeTest.java | 143 ++++++++
+ .../can/CANPositionQuadEncoderModeTest.java   | 110 ++++++
+ .../can/CANSpeedQuadEncoderModeTest.java      |  80 +++++
+ .../wpi/first/wpilibj/can/CANTestSuite.java   |  12 +-
+ .../can/CANVoltageQuadEncoderModeTest.java    | 220 ++++++++++++
+ .../can/CurrentQuadEncoderModeTest.java       |  56 ---
+ .../edu/wpi/first/wpilibj/can/ICANData.java   |  19 -
+ .../can/PercentQuadEncoderModeTest.java       |  69 ----
+ .../can/PositionQuadEncoderModeTest.java      |  58 ---
+ .../wpilibj/can/SpeedQuadEncoderModeTest.java |  70 ----
+ .../can/VoltageQuadEncoderModeTest.java       |  60 ----
+ .../wpi/first/wpilibj/can/package-info.java   |   8 +
+ .../fixtures/CANMotorEncoderFixture.java      | 113 +++++-
+ .../fixtures/DIOCrossConnectFixture.java      |   1 -
+ .../wpilibj/fixtures/MotorEncoderFixture.java |  23 +-
+ .../mockhardware/FakePotentiometerSource.java |  24 +-
+ .../edu/wpi/first/wpilibj/test/TestBench.java |   8 +
+ 23 files changed, 1337 insertions(+), 643 deletions(-)
+ delete mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CANJaguarTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANCurrentQuadEncoderModeTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANDefaultTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPercentQuadEncoderModeTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPositionPotentiometerModeTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPositionQuadEncoderModeTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANSpeedQuadEncoderModeTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANVoltageQuadEncoderModeTest.java
+ delete mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CurrentQuadEncoderModeTest.java
+ delete mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/ICANData.java
+ delete mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/PercentQuadEncoderModeTest.java
+ delete mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/PositionQuadEncoderModeTest.java
+ delete mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/SpeedQuadEncoderModeTest.java
+ delete mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/VoltageQuadEncoderModeTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/package-info.java
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CANJaguarTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CANJaguarTest.java
+deleted file mode 100644
+index f62cb693a26dae400eaf1cab2b1b0aac2b13a87a..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CANJaguarTest.java
++++ /dev/null
+@@ -1,238 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-package edu.wpi.first.wpilibj;
+-
+-import static org.junit.Assert.*;
+-import static org.hamcrest.Matchers.*;
+-
+-import java.util.logging.Logger;
+-
+-import org.junit.After;
+-import org.junit.AfterClass;
+-import org.junit.Before;
+-import org.junit.BeforeClass;
+-import org.junit.Ignore;
+-import org.junit.Test;
+-
+-import edu.wpi.first.wpilibj.can.ICANData;
+-import edu.wpi.first.wpilibj.can.AbstractCANTest;
+-import edu.wpi.first.wpilibj.command.AbstractCommandTest;
+-import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
+-import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+-import edu.wpi.first.wpilibj.test.TestBench;
+-
+-/**
+- * @author jonathanleitschuh
+- *
+- */
+-public class CANJaguarTest extends AbstractComsSetup implements ICANData{
+-	private static final Logger logger = Logger.getLogger(CANJaguarTest.class.getName());
+-	private CANMotorEncoderFixture me;
+-	
+-	@Override
+-	protected Logger getClassLogger() {
+-		return logger;
+-	}
+-	
+-	@Before
+-	public void setUp() {
+-		me = TestBench.getInstance().getCanJaguarPair();
+-		me.setup();
+-		me.getMotor().setPercentMode(CANJaguar.kEncoder, 360);
+-	}
+-	
+-	@After
+-	public void tearDown() {
+-		me.teardown();
+-	}
+-	
+-	
+-	@Test
+-	public void testDefaultSpeedGet(){
+-		assertEquals("CAN Jaguar did not initilize stopped", 0.0, me.getMotor().get(), .01f);
+-	}
+-	
+-	@Test
+-	public void testDefaultBusVoltage(){
+-		assertEquals("CAN Jaguar did not start at 14 volts", 14.0f, me.getMotor().getBusVoltage(), 2.0f);
+-	}
+-	
+-	@Test
+-	public void testDefaultOutputVoltage(){
+-		assertEquals("CAN Jaguar did not start with an output voltage of 0", 0.0f, me.getMotor().getOutputVoltage(), 0.3f);
+-
+-	}
+-	
+-	@Test
+-	public void testDefaultOutputCurrent(){
+-		assertEquals("CAN Jaguar did not start with an output current of 0", 0.0f, me.getMotor().getOutputCurrent(), 0.3f);
+-	}
+-	
+-	@Test
+-	public void testDefaultTemperature(){
+-		double room_temp = 18.0f;
+-		assertThat("CAN Jaguar did not start with an initial temperature greater than " + room_temp, me.getMotor().getTemperature(), is(greaterThan(room_temp)));
+-	}
+-	
+-	@Ignore
+-	@Test
+-	public void testDefaultPosition(){
+-		assertEquals("CAN Jaguar did not start with an initial position of zero", 0.0f, me.getMotor().getPosition(), 0.3f);
+-	}
+-	
+-	@Test
+-	public void testDefaultSpeed(){
+-		assertEquals("CAN Jaguar did not start with an initial speed of zero", 0.0f, me.getMotor().getSpeed(), 0.3f);
+-	}
+-
+-	//TODO Check that attached FPGA encoder is zeroed after a delay
+-	//TODO Check that attached FPGA encoder speed is zero after a delay
+-	
+-	@Test
+-	public void testDefaultForwardLimit(){
+-		assertTrue("CAN Jaguar did not start with the Forward Limit Switch Off", me.getMotor().getForwardLimitOK());
+-	}
+-	
+-	@Test
+-	public void testDefaultReverseLimit(){
+-		assertTrue("CAN Jaguar did not start with the Reverse Limit Switch Off", me.getMotor().getReverseLimitOK());
+-	}
+-	
+-	@Test
+-	public void testDefaultNoFaults(){
+-		assertEquals(0, me.getMotor().getFaults());
+-	}
+-	
+-
+-	/**
+-	 * Test if we can set a position and reach that position with PID control on
+-	 * the Jaguar.
+-	 */
+-	@Test
+-	public void testEncoderPositionPID() {
+-	    me.getMotor().setPositionMode(CANJaguar.kQuadEncoder, 360, 5.0, 0.1, 2.0);
+-	    me.getMotor().enableControl();
+-
+-	    double setpoint = me.getMotor().getPosition() + 10.0f;
+-
+-	    /* It should get to the setpoint within 10 seconds */
+-	    me.getMotor().set(setpoint);
+-	    Timer.delay(10.0f);
+-
+-		assertEquals("CAN Jaguar should have reached setpoint with PID control", setpoint, me.getMotor().getPosition(), kEncoderPositionTolerance);
+-	}
+-
+-	/**
+-	 * Test if we can get a position in potentiometer mode, using an analog output
+-	 * as a fake potentiometer.
+-	 */
+-	@Test
+-	public void testFakePotentiometerPosition() {
+-	    me.getMotor().setPercentMode(CANJaguar.kPotentiometer);
+-	    me.getMotor().enableControl();
+-
+-	    me.getFakePot().setVoltage(0.0f);
+-	    Timer.delay(kPotentiometerSettlingTime);
+-	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", me.getFakePot().getVoltage() / 3.0f, me.getMotor().getPosition(), kPotentiometerPositionTolerance);
+-
+-	    me.getFakePot().setVoltage(1.0f);
+-	    Timer.delay(kPotentiometerSettlingTime);
+-	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", me.getFakePot().getVoltage() / 3.0f, me.getMotor().getPosition(), kPotentiometerPositionTolerance);
+-
+-	    me.getFakePot().setVoltage(2.0f);
+-	    Timer.delay(kPotentiometerSettlingTime);
+-	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", me.getFakePot().getVoltage() / 3.0f, me.getMotor().getPosition(), kPotentiometerPositionTolerance);
+-
+-	    me.getFakePot().setVoltage(3.0f);
+-	    Timer.delay(kPotentiometerSettlingTime);
+-	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", me.getFakePot().getVoltage() / 3.0f, me.getMotor().getPosition(), kPotentiometerPositionTolerance);
+-	}
+-
+-	/**
+-	 * Test if we can limit the Jaguar to only moving in reverse with a fake
+-	 * limit switch.
+-	 */
+-	@Test
+-	public void testFakeLimitSwitchForwards() {
+-	    me.getMotor().setPercentMode(CANJaguar.kQuadEncoder, 360);
+-	    me.getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
+-	    me.getForwardLimit().set(true);
+-	    me.getReverseLimit().set(false);
+-	    me.getMotor().enableControl();
+-
+-	    me.getMotor().set(0.0f);
+-	    Timer.delay(kEncoderSettlingTime);
+-
+-	    /* Make sure we limits are recognized by the Jaguar. */
+-	    assertFalse(me.getMotor().getForwardLimitOK());
+-	    assertTrue(me.getMotor().getReverseLimitOK());
+-
+-	    double initialPosition = me.getMotor().getPosition();
+-
+-	    /* Drive the speed controller briefly to move the encoder.  If the limit
+-	         switch is recognized, it shouldn't actually move. */
+-	    me.getMotor().set(1.0f);
+-	    Timer.delay(kMotorTime);
+-	    me.getMotor().set(0.0f);
+-
+-	    /* The position should be the same, since the limit switch was on. */
+-	    assertEquals("CAN Jaguar should not have moved with the limit switch pressed", initialPosition, me.getMotor().getPosition(), kEncoderPositionTolerance);
+-
+-	    /* Drive the speed controller in the other direction.  It should actually
+-	         move, since only the forward switch is activated.*/
+-	    me.getMotor().set(-1.0f);
+-	    Timer.delay(kMotorTime);
+-	    me.getMotor().set(0.0f);
+-
+-	    /* The position should have decreased */
+-	    assertThat("CAN Jaguar should have moved in reverse while the forward limit was on", me.getMotor().getPosition(), is(lessThan(initialPosition)));
+-	}
+-
+-	/**
+-	 * Test if we can limit the Jaguar to only moving forwards with a fake limit
+-	 * switch.
+-	 */
+-	@Test
+-	public void testFakeLimitSwitchReverse() {
+-	    me.getMotor().setPercentMode(CANJaguar.kQuadEncoder, 360);
+-	    me.getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
+-	    me.getForwardLimit().set(false);
+-	    me.getReverseLimit().set(true);
+-	    me.getMotor().enableControl();
+-
+-	    me.getMotor().set(0.0f);
+-	    Timer.delay(kEncoderSettlingTime);
+-
+-	    /* Make sure we limits are recognized by the Jaguar. */
+-	    assertTrue(me.getMotor().getForwardLimitOK());
+-	    assertFalse(me.getMotor().getReverseLimitOK());
+-
+-	    double initialPosition = me.getMotor().getPosition();
+-
+-	    /* Drive the speed controller backwards briefly to move the encoder.  If
+-	         the limit switch is recognized, it shouldn't actually move. */
+-	    me.getMotor().set(-1.0f);
+-	    Timer.delay(kMotorTime);
+-	    me.getMotor().set(0.0f);
+-
+-	    /* The position should be the same, since the limit switch was on. */
+-	    assertEquals("CAN Jaguar should not have moved with the limit switch pressed", initialPosition, me.getMotor().getPosition(), kEncoderPositionTolerance);
+-
+-	    Timer.delay(kEncoderSettlingTime);
+-
+-	    /* Drive the speed controller in the other direction.  It should actually
+-	         move, since only the reverse switch is activated.*/
+-	    me.getMotor().set(1.0f);
+-	    Timer.delay(kMotorTime);
+-	    me.getMotor().set(0.0f);
+-
+-	    /* The position should have increased */
+-	    assertThat("CAN Jaguar should have moved forwards while the reverse limit was on", me.getMotor().getPosition(), is(greaterThan(initialPosition)));
+-	}
+-	
+-}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
+index 5cd0646f6202dbe147dd90217aefaaad44fc9350..9534c2a8413d5b81eecaf0d960a0eb32408871e9 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
+@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
+ @SuiteClasses({
+ 				AnalogCrossConnectTest.class,
+ 				AnalogPotentiometerTest.class,
+-				CANJaguarTest.class,
+ 				CounterTest.class,
+ 				DIOCrossConnectTest.class,
+ 				EncoderTest.class,
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/AbstractCANTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/AbstractCANTest.java
+index 563027bdb7c140c5af22d69e97aa351a63ef3796..60f26d26654946d8efe4910bd9c163868e8363c2 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/AbstractCANTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/AbstractCANTest.java
+@@ -6,73 +6,92 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.can;
+ 
+-import static org.hamcrest.Matchers.greaterThan;
+-import static org.hamcrest.Matchers.is;
+-import static org.hamcrest.Matchers.lessThan;
+-import static org.junit.Assert.assertThat;
+-
+ import org.junit.After;
++import org.junit.Before;
++import org.junit.rules.TestWatcher;
++import org.junit.runner.Description;
+ 
+ import edu.wpi.first.wpilibj.Timer;
+ import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
+ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
++import edu.wpi.first.wpilibj.test.TestBench;
+ 
+ /**
++ * Provides a base implementation for CAN Tests that forces a test of a particular mode to provide tests of a certain type.
++ * This also allows for a standardized base setup for each test.
+  * @author jonathanleitschuh
+  *
+  */
+-public abstract class AbstractCANTest extends AbstractComsSetup implements ICANData{
+-	protected CANMotorEncoderFixture me;
+-	/**
+-	 * Tests that CAN in a certain mode will rotate forwards. The implementation of this method is left up to the extending class because each will require difrent values.
+-	 * Should call {@link AbstractCANTest#testRotateForward(double, double)}
+-	 */
+-	abstract public void testRotateForward();
++public abstract class AbstractCANTest extends AbstractComsSetup{
++	public static final double kMotorStopTime = 2;
++	public static final double kMotorTime = 3;
++	public static final double kMotorTimeSettling = 10;
++	public static final double kPotentiometerSettlingTime = 10.0;
++	public static final double kEncoderSettlingTime = 0.50;
++	public static final double kEncoderSpeedTolerance = 30.0;
++	public static final double kLimitSettlingTime = 20.0; //timeout in seconds
++	public static final double kStartupTime = 0.50;
++	public static final double kEncoderPositionTolerance = .75;
++	public static final double kPotentiometerPositionTolerance = 10.0/360.0; // +/-10 degrees
++	public static final double kCurrentTolerance = 0.1;
+ 	
++	
++	/** Stores the status value for the previous test. This is set immediately after a failure or success and before the me is torn down. */
++	private String status = "";
+ 	/**
+-	 * Tests that CAN in a certain mode will rotate forwards. The implementation of this method is left up to the extending class because each will require difrent values.
+-	 * Should call {@link AbstractCANTest#testRotateReverse(double, double)}
++	 * Extends the default test watcher in order to provide more information about a tests failure at runtime.
++	 * @author jonathanleitschuh
++	 *
+ 	 */
+-	abstract public void testRotateReverse();
++	public class CANTestWatcher extends DefaultTestWatcher{
++		@Override
++		protected void failed(Throwable e, Description description) {
++			super.failed(e, description, status);
++		}
++	}
++	@Override
++	protected TestWatcher getOverridenTestWatcher(){
++		return new CANTestWatcher();
++	}
+ 	
++	/** The Fixture under test */
++	private CANMotorEncoderFixture me;
+ 	
+-	@After
+-	public final void tearDown() throws Exception {
+-		me.teardown();
++	/**
++	 * Retrieves the CANMotorEncoderFixture
++	 * @return the CANMotorEncoderFixture for this test.
++	 */
++	public CANMotorEncoderFixture getME(){
++		return me;
+ 	}
+ 	
+ 	/**
+-	 * Tests that a CANMotorEncoderFixture can rotate forward.
+-	 * Called by extending TestClasses
+-	 * @param stoppedValue the value where the motor will not be spinning in the current mode
+-	 * @param runningValue the value where the motor will be spinning in the current mode
++	 * This runs BEFORE the setup of the inherited class
+ 	 */
+-	protected void testRotateForward(double stoppedValue, double runningValue){
+-		double initialPosition = me.getMotor().getPosition();
+-	    /* Drive the speed controller briefly to move the encoder */
+-	    me.getMotor().set(runningValue);
+-	    Timer.delay(kMotorTime);
+-	    me.getMotor().set(stoppedValue);
+-
+-	    /* The position should have increased */
+-	    assertThat("CAN Jaguar position should have increased after the motor moved", me.getMotor().getPosition(), is(greaterThan(initialPosition)));
++	@Before
++	public final void preSetup(){
++		status = "";
++		me = TestBench.getInstance().getCanJaguarPair();
++		me.setup();
++		me.getMotor().setSafetyEnabled(false);
+ 	}
+ 	
++	@After
++	public final void tearDown() throws Exception {
++		try{
++			//Stores the status data before tearing it down.
++			//If the test fails unexpectedly then this could cause an exception.
++			status = me.printStatus();
++		} finally{
++			me.teardown();
++		}
++		me = null;
++	}
+ 	
+-	/**
+-	 * Tests that a CANMotorEncoderFixture can rotate in reverse.
+-	 * Called by extending TestClasses
+-	 * @param stoppedValue the value where the motor will not be spinning in the current mode
+-	 * @param runningValue the value where the motor will be spinning in the current mode
+-	 */
+-	protected void testRotateReverse(double stoppedValue, double runningValue){
+-		double initialPosition = me.getMotor().getPosition();
+-	    /* Drive the speed controller briefly to move the encoder */
+-	    me.getMotor().set(runningValue);
+-	    Timer.delay(kMotorTime);
+-	    me.getMotor().set(stoppedValue);
+-
+-	    /* The position should have decreased */
+-	    assertThat( "CAN Jaguar position should have decreased after the motor moved", me.getMotor().getPosition(), is(lessThan(initialPosition)));
++	protected void setCANJaguar(double seconds, double value){
++		for(int i = 0; i < 50; i++) {
++			getME().getMotor().set(value);
++			Timer.delay(seconds / 50.0);
++		}
+ 	}
+-}
++}
+\ No newline at end of file
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANCurrentQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANCurrentQuadEncoderModeTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..2671ce2951fd843764dd193cf42d8b74efa2321a
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANCurrentQuadEncoderModeTest.java
+@@ -0,0 +1,96 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.can;
++
++import static org.junit.Assert.assertEquals;
++
++import java.util.logging.Logger;
++
++import org.junit.Before;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.CANJaguar;
++import edu.wpi.first.wpilibj.Timer;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
++	private static Logger logger = Logger.getLogger(CANCurrentQuadEncoderModeTest.class.getName());
++	private static final double kStoppedValue = 0;
++	private static final double kRunningValue = 3.0;
++	
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#stopMotor()
++	 */
++	protected void stopMotor() {
++		getME().getMotor().set(kStoppedValue);
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorForward()
++	 */
++	protected void runMotorForward() {
++		getME().getMotor().set(kRunningValue);
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorReverse()
++	 */
++	protected void runMotorReverse() {
++		getME().getMotor().set(-kRunningValue);
++	}
++	
++	@Override
++	protected Logger getClassLogger() {
++		return logger;
++	}
++	
++	@Before
++	public void setUp() throws Exception {
++		getME().getMotor().setCurrentMode(CANJaguar.kQuadEncoder, 360, 10.0, 4.0, 1.0);
++		getME().getMotor().enableControl();
++		getME().getMotor().set(0.0f);
++		/* The motor might still have momentum from the previous test. */
++		Timer.delay(kStartupTime);
++	}
++
++	
++	@Test
++	public void testDriveToCurrentPositive() {
++		double setpoint =  1.6f;
++
++		/* It should get to the setpoint within 10 seconds */
++		for(int i = 0; i < 10; i++) {
++			setCANJaguar(1.0, setpoint);
++
++			if(Math.abs(getME().getMotor().getOutputCurrent() - setpoint) <= kCurrentTolerance) {
++				break;
++			}
++		}
++
++		assertEquals(setpoint, getME().getMotor().getOutputCurrent(), kCurrentTolerance);
++	}
++	
++	@Test
++	public void testDriveToCurrentNegative() {
++		double setpoint =  -1.6f;
++
++		/* It should get to the setpoint within 10 seconds */
++		for(int i = 0; i < 10; i++) {
++			setCANJaguar(1.0, setpoint);
++
++			if(Math.abs(getME().getMotor().getOutputCurrent() - Math.abs(setpoint)) <= kCurrentTolerance) {
++				break;
++			}
++		}
++
++		assertEquals(Math.abs(setpoint), getME().getMotor().getOutputCurrent(), kCurrentTolerance);
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANDefaultTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANDefaultTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ef750089d9229cbb4090d8e2ccd4cded44966397
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANDefaultTest.java
+@@ -0,0 +1,128 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.can;
++
++import static org.hamcrest.Matchers.greaterThan;
++import static org.hamcrest.Matchers.is;
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertFalse;
++import static org.junit.Assert.assertThat;
++import static org.junit.Assert.assertTrue;
++
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import org.junit.Before;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.CANJaguar;
++import edu.wpi.first.wpilibj.Timer;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class CANDefaultTest extends AbstractCANTest{
++	private static final Logger logger = Logger.getLogger(CANDefaultTest.class.getName());
++	@Override
++	protected Logger getClassLogger() {
++		return logger;
++	}
++
++	/**
++	 * @throws java.lang.Exception
++	 */
++	@Before
++	public void setUp() throws Exception {
++		getME().getMotor().enableControl();
++		getME().getMotor().set(0.0f);
++		/* The motor might still have momentum from the previous test. */
++		Timer.delay(kStartupTime);
++	}
++	
++	@Test
++	public void testDefaultGet(){
++		assertEquals("CAN Jaguar did not initilize stopped", 0.0, getME().getMotor().get(), .01f);
++	}
++	
++	@Test
++	public void testDefaultBusVoltage(){
++		assertEquals("CAN Jaguar did not start at 14 volts", 14.0f, getME().getMotor().getBusVoltage(), 2.0f);
++	}
++	
++	@Test
++	public void testDefaultOutputVoltage(){
++		assertEquals("CAN Jaguar did not start with an output voltage of 0", 0.0f, getME().getMotor().getOutputVoltage(), 0.3f);
++
++	}
++	
++	@Test
++	public void testDefaultOutputCurrent(){
++		assertEquals("CAN Jaguar did not start with an output current of 0", 0.0f, getME().getMotor().getOutputCurrent(), 0.3f);
++	}
++	
++	@Test
++	public void testDefaultTemperature(){
++		double room_temp = 18.0f;
++		assertThat("CAN Jaguar did not start with an initial temperature greater than " + room_temp, getME().getMotor().getTemperature(), is(greaterThan(room_temp)));
++	}
++	
++	@Test
++	public void testDefaultForwardLimit(){
++		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
++		assertTrue("CAN Jaguar did not start with the Forward Limit Switch Off", getME().getMotor().getForwardLimitOK());
++	}
++	
++	@Test
++	public void testDefaultReverseLimit(){
++		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
++		assertTrue("CAN Jaguar did not start with the Reverse Limit Switch Off", getME().getMotor().getReverseLimitOK());
++	}
++	
++	@Test
++	public void testDefaultNoFaults(){
++		assertEquals("CAN Jaguar initialized with Faults", 0, getME().getMotor().getFaults());
++	}
++	
++	
++	
++	@Test
++	public void testFakeLimitSwitchForwards() {
++		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
++		getME().getMotor().enableControl();
++		assertTrue("CAN Jaguar did not start with the Forward Limit Switch low", getME().getMotor().getForwardLimitOK());
++		getME().getForwardLimit().set(true);
++		
++		delayTillInCorrectStateWithMessage(Level.FINE, kLimitSettlingTime+10, "Forward Limit settling", new BooleanCheck(){@Override
++			public boolean getAsBoolean(){
++				getME().getMotor().set(0);
++				return !getME().getMotor().getForwardLimitOK();
++			}
++		});
++		
++		assertFalse("Setting the forward limit switch high did not cause the forward limit switch to trigger after " + kLimitSettlingTime + " seconds", getME().getMotor().getForwardLimitOK());
++	}
++
++	
++	@Test
++	public void testFakeLimitSwitchReverse() {
++		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
++		getME().getMotor().enableControl();
++		assertTrue("CAN Jaguar did not start with the Reverse Limit Switch low", getME().getMotor().getReverseLimitOK());
++		getME().getReverseLimit().set(true);
++		
++		delayTillInCorrectStateWithMessage(Level.FINE, kLimitSettlingTime+10, "Reverse Limit settling", new BooleanCheck(){@Override
++			public boolean getAsBoolean(){
++				getME().getMotor().set(0);
++				return !getME().getMotor().getReverseLimitOK();
++			}
++		});
++		
++		assertFalse("Setting the reverse limit switch high did not cause the reverse limit switch to trigger after " + kLimitSettlingTime + " seconds", getME().getMotor().getReverseLimitOK());
++	}	
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPercentQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPercentQuadEncoderModeTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..77966e9b21d2dda4f7c087308a653c8c9d3fcf33
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPercentQuadEncoderModeTest.java
+@@ -0,0 +1,330 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.can;
++
++import static org.hamcrest.Matchers.greaterThan;
++import static org.hamcrest.Matchers.is;
++import static org.hamcrest.Matchers.lessThan;
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertThat;
++
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import org.junit.Before;
++import org.junit.Ignore;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.CANJaguar;
++import edu.wpi.first.wpilibj.Timer;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class CANPercentQuadEncoderModeTest extends AbstractCANTest{
++	private static final Logger logger = Logger.getLogger(CANPercentQuadEncoderModeTest.class.getName());
++	private static final double kStoppedValue = 0;
++	private static final double kRunningValue = 1;
++	
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#stopMotor()
++	 */
++	protected void stopMotor() {
++		getME().getMotor().set(kStoppedValue);
++	}
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorForward()
++	 */
++	protected void runMotorForward() {
++		getME().getMotor().set(kRunningValue);
++	}
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorReverse()
++	 */
++	protected void runMotorReverse() {
++		getME().getMotor().set(-kRunningValue);
++	}
++	
++	@Override
++	protected Logger getClassLogger() {
++		return logger;
++	}
++	@Before
++	public void setUp() {
++		getME().getMotor().setPercentMode(CANJaguar.kQuadEncoder, 360);
++		getME().getMotor().enableControl();
++		getME().getMotor().set(0.0f);
++		/* The motor might still have momentum from the previous test. */
++		Timer.delay(kStartupTime);
++	}
++	
++	@Test
++	public void testDisableStopsTheMotor(){
++		//given
++		getME().getMotor().enableControl();
++		setCANJaguar(kMotorTime/2, 1);
++		getME().getMotor().disableControl();
++		//when
++		simpleLog(Level.FINER, "The motor should stop running now");
++		setCANJaguar(kMotorTime/2, 1);
++		final double initialPosition = getME().getMotor().getPosition();
++		setCANJaguar(kMotorTime/2, 1);
++		
++		//then
++		assertEquals("Speed did not go to zero when disabled in percent mode", 0, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
++		assertEquals(initialPosition, getME().getMotor().getPosition(), 10);
++	}
++	
++	@Test
++	public void testRotateForward() {
++		getME().getMotor().enableControl();
++		final double initialPosition = getME().getMotor().getPosition();
++	    /* Drive the speed controller briefly to move the encoder */
++		runMotorForward();
++		BooleanCheck correctState = new BooleanCheck(){@Override
++			public boolean getAsBoolean(){
++				runMotorForward();//Calls set every time before we check the value
++				return initialPosition < getME().getMotor().getPosition();
++			}
++		};
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Position incrementing", correctState);
++	    stopMotor();
++
++	    /* The position should have increased */
++	    assertThat("CAN Jaguar position should have increased after the motor moved", getME().getMotor().getPosition(), is(greaterThan(initialPosition)));
++	}
++	
++	@Test
++	public void testRotateReverse() {
++		getME().getMotor().enableControl();
++		final double initialPosition = getME().getMotor().getPosition();
++	    /* Drive the speed controller briefly to move the encoder */
++	    runMotorReverse();
++	    delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Position decrementing", new BooleanCheck(){@Override
++	    	public boolean getAsBoolean(){
++	    			runMotorReverse();//Calls set every time before we check the value
++	    			return initialPosition > getME().getMotor().getPosition();
++	    		}
++	    });
++	    stopMotor();
++
++	    /* The position should have decreased */
++	    assertThat( "CAN Jaguar position should have decreased after the motor moved", getME().getMotor().getPosition(), is(lessThan(initialPosition)));
++	}
++	
++	/**
++	 * Test if we can limit the Jaguar to not rotate forwards when the fake limit switch is tripped
++	 */
++	@Test
++	public void shouldNotRotateForwards_WhenFakeLimitSwitchForwardsIsTripped() {
++		//Given
++		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
++		getME().getForwardLimit().set(true);
++		getME().getReverseLimit().set(false);
++		getME().getMotor().enableControl();
++
++		stopMotor();
++		Timer.delay(kEncoderSettlingTime);
++		
++		delayTillInCorrectStateWithMessage(Level.FINE, kLimitSettlingTime, "Concurrent Limit settling", new BooleanCheck(){@Override
++			public boolean getAsBoolean(){return !getME().getMotor().getForwardLimitOK() && getME().getMotor().getReverseLimitOK();}});
++		
++		/* Make sure we limits are recognized by the Jaguar. */
++		//assertFalse("The forward limit switch did not settle after " + kLimitSettlingTime + " seconds",getME().getMotor().getForwardLimitOK());
++		//assertTrue("The reverse limit switch did not settle after " + kLimitSettlingTime + " seconds", getME().getMotor().getReverseLimitOK());
++
++		final double initialPosition = getME().getMotor().getPosition();
++		
++		//When
++		/*
++		 * Drive the speed controller briefly to move the encoder. If the limit
++		 * switch is recognized, it shouldn't actually move.
++		 */
++		setCANJaguar(kMotorTime, 1);
++		stopMotor();
++		
++		//Then
++		/* The position should be the same, since the limit switch was on. */
++		assertEquals(
++				"CAN Jaguar should not have moved with the forward limit switch pressed",
++				initialPosition, getME().getMotor().getPosition(),
++				kEncoderPositionTolerance);
++	}
++	
++	
++	/**
++	 * Test if we can rotate in reverse when the limit switch
++	 */
++	@Test
++	public void shouldRotateReverse_WhenFakeLimitSwitchForwardsIsTripped() {
++		//Given
++		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
++		getME().getForwardLimit().set(true);
++		getME().getReverseLimit().set(false);
++		getME().getMotor().enableControl();
++
++		stopMotor();
++		Timer.delay(kEncoderSettlingTime);
++		
++		delayTillInCorrectStateWithMessage(Level.FINE, kLimitSettlingTime, "Concurrent Limit settling", new BooleanCheck(){@Override
++		public boolean getAsBoolean(){
++				stopMotor();
++				return !getME().getMotor().getForwardLimitOK() && getME().getMotor().getReverseLimitOK();
++			}
++		});
++		
++		/* Make sure we limits are still recognized by the Jaguar. */
++		//assertFalse("The forward limit switch did not settle after " + kLimitSettlingTime + " seconds",getME().getMotor().getForwardLimitOK());
++		//assertTrue("The reverse limit switch did not settle after " + kLimitSettlingTime + " seconds", getME().getMotor().getReverseLimitOK());
++		
++		final double initialPosition = getME().getMotor().getPosition();
++		
++		//When
++		/*
++		 * Drive the speed controller in the other direction. It should actually
++		 * move, since only the forward switch is activated.
++		 */
++		setCANJaguar(kMotorTime, -1);
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Encoder drive reverse settling", new BooleanCheck(){@Override
++			public boolean getAsBoolean(){
++				runMotorReverse();
++				return getME().getMotor().getPosition() != initialPosition;
++			}
++		});
++		stopMotor();
++
++		//Then
++		/* The position should have decreased */
++		assertThat(
++				"CAN Jaguar should have moved in reverse while the forward limit was on",
++				getME().getMotor().getPosition(), is(lessThan(initialPosition)));
++	}
++
++	/**
++	 * Test if we can limit the Jaguar to only moving forwards with a fake limit
++	 * switch.
++	 */
++	@Test
++	public void shouldNotRotateReverse_WhenFakeLimitSwitchReversesIsTripped() {
++		//Given
++		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
++		getME().getForwardLimit().set(false);
++		getME().getReverseLimit().set(true);
++		getME().getMotor().enableControl();
++
++		stopMotor();
++		Timer.delay(kEncoderSettlingTime);
++		
++		delayTillInCorrectStateWithMessage(Level.FINE, kLimitSettlingTime, "Concurrent Limit settling", new BooleanCheck(){@Override
++			public boolean getAsBoolean(){
++				stopMotor();
++				return getME().getMotor().getForwardLimitOK() && !getME().getMotor().getReverseLimitOK();
++			}
++		});
++		
++		/* Make sure we limits are recognized by the Jaguar. */
++		//assertTrue("The forward limit switch did not settle after " + kLimitSettlingTime + " seconds", getME().getMotor().getForwardLimitOK());
++		//assertFalse("The reverse limit switch did not settle after " + kLimitSettlingTime + " seconds",getME().getMotor().getReverseLimitOK());
++
++		final double initialPosition = getME().getMotor().getPosition();
++		
++		//When
++		/*
++		 * Drive the speed controller backwards briefly to move the encoder. If
++		 * the limit switch is recognized, it shouldn't actually move.
++		 */
++		setCANJaguar(kMotorTime, -1);
++		stopMotor();
++		
++		//Then
++		/* The position should be the same, since the limit switch was on. */
++		assertEquals(
++				"CAN Jaguar should not have moved with the limit switch pressed",
++				initialPosition, getME().getMotor().getPosition(),
++				kEncoderPositionTolerance);	
++	}
++	
++	/**
++	 * Test if we can limit the Jaguar to only moving forwards with a fake limit
++	 * switch.
++	 */
++	@Test
++	public void shouldRotateForward_WhenFakeLimitSwitchReversesIsTripped() {
++		//Given
++		getME().getMotor().configLimitMode(CANJaguar.LimitMode.SwitchInputsOnly);
++		getME().getForwardLimit().set(false);
++		getME().getReverseLimit().set(true);
++		getME().getMotor().enableControl();
++		
++		delayTillInCorrectStateWithMessage(Level.FINE, kLimitSettlingTime, "Concurrent Limit settling", new BooleanCheck(){@Override
++		public boolean getAsBoolean(){
++			stopMotor();
++			return getME().getMotor().getForwardLimitOK() && !getME().getMotor().getReverseLimitOK();
++			}
++		});
++		final double initialPosition = getME().getMotor().getPosition();
++		
++		/* Make sure we limits are still recognized by the Jaguar. */
++		//assertTrue("The forward limit switch did not settle after " + kLimitSettlingTime + " seconds", getME().getMotor().getForwardLimitOK());
++		//assertFalse("The reverse limit switch did not settle after " + kLimitSettlingTime + " seconds",getME().getMotor().getReverseLimitOK());
++
++		//When
++		/*
++		 * Drive the speed controller in the other direction. It should actually
++		 * move, since only the reverse switch is activated.
++		 */
++		setCANJaguar(kMotorTime, 1);
++		Timer.delay(kMotorTime);
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Encoder drive forward settling", new BooleanCheck(){@Override
++			public boolean getAsBoolean(){
++				runMotorForward();
++				return getME().getMotor().getPosition() != initialPosition;
++			}
++		});
++		stopMotor();
++		
++		//Then
++		/* The position should have increased */
++		assertThat(
++				"CAN Jaguar should have moved forwards while the reverse limit was on",
++				getME().getMotor().getPosition(), is(greaterThan(initialPosition)));
++	}
++	
++	@Ignore("Encoder is not yet wired to the FPGA")
++	@Test
++	public void testRotateForwardEncoderToFPGA(){
++		getME().getMotor().enableControl();
++		final double jagInitialPosition = getME().getMotor().getPosition();
++		final double encoderInitialPosition = getME().getEncoder().get();
++		getME().getMotor().set(1);
++		Timer.delay(kMotorStopTime);
++		getME().getMotor().set(0);
++		
++		delayTillInCorrectStateWithMessage(Level.FINE, kEncoderSettlingTime, "Forward Encodeder settling", new BooleanCheck(){@Override
++			public boolean getAsBoolean(){return Math.abs((getME().getMotor().getPosition()-jagInitialPosition)
++													- (getME().getEncoder().get() - encoderInitialPosition)) < kEncoderPositionTolerance;}});
++		
++		assertEquals( getME().getMotor().getPosition()-jagInitialPosition, getME().getEncoder().get() - encoderInitialPosition, kEncoderPositionTolerance);
++	}
++	
++	@Ignore("Encoder is not yet wired to the FPGA")
++	@Test
++	public void testRotateReverseEncoderToFPGA(){
++		getME().getMotor().enableControl();
++		final double jagInitialPosition = getME().getMotor().getPosition();
++		final double encoderInitialPosition = getME().getEncoder().get();
++		getME().getMotor().set(-1);
++		Timer.delay(kMotorStopTime);
++		getME().getMotor().set(0);
++		
++		delayTillInCorrectStateWithMessage(Level.FINE, kEncoderSettlingTime, "Forward Encodeder settling", new BooleanCheck(){@Override
++			public boolean getAsBoolean(){return Math.abs((getME().getMotor().getPosition()-jagInitialPosition)
++													- (getME().getEncoder().get() - encoderInitialPosition)) < kEncoderPositionTolerance;}});
++		assertEquals( getME().getMotor().getPosition()-jagInitialPosition, getME().getEncoder().get() - encoderInitialPosition, kEncoderPositionTolerance);
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPositionPotentiometerModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPositionPotentiometerModeTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4be54789f7f1f061f626674a2f500968e4a05e5f
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPositionPotentiometerModeTest.java
+@@ -0,0 +1,143 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.can;
++
++import static org.hamcrest.Matchers.greaterThan;
++import static org.hamcrest.Matchers.is;
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertThat;
++
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import org.junit.Before;
++import org.junit.Ignore;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.CANJaguar;
++import edu.wpi.first.wpilibj.Timer;
++import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class CANPositionPotentiometerModeTest extends AbstractCANTest {
++	private static final Logger logger = Logger.getLogger(CANPositionPotentiometerModeTest.class.getName());
++	
++	private static final double kStoppedValue = 0;
++	private static final double kRunningValue = 1;
++	
++	private static final int rotationRange = 360;
++	private static final int defaultPotAngle = 180;
++	private static final double maxPotVoltage = 3.0;
++	
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#stopMotor()
++	 */
++	protected void stopMotor() {
++		getME().getMotor().set(.5);
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorForward()
++	 */
++	protected void runMotorForward() {
++		getME().getMotor().set(1);
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorReverse()
++	 */
++	protected void runMotorReverse() {
++		getME().getMotor().set(0);
++	}
++	
++	@Override
++	protected Logger getClassLogger() {
++		return logger;
++	}
++
++	@Before
++	public void setUp() throws Exception {
++		getME().getMotor().setPositionMode(CANJaguar.kPotentiometer, 5.0, 0.1, 2.0);
++		//getME().getMotor().configPotentiometerTurns(rotationRange);
++		getME().getFakePot().setMaxVoltage(maxPotVoltage);
++		getME().getFakePot().setVoltage(1.5);
++		stopMotor();
++		getME().getMotor().enableControl();
++		/* The motor might still have momentum from the previous test. */
++		Timer.delay(kStartupTime);
++	}
++	
++
++	/**
++	 * NOTICE: This is using the {@link MotorEncoderFixture#getEncoder()} instead of the one built into the CAN Jaguar
++	 */
++	@Ignore("Encoder is not yet wired to the FPGA")
++	@Test
++	public void testRotateForward() {
++		int initialPosition = getME().getEncoder().get();
++	    /* Drive the speed controller briefly to move the encoder */
++		getME().getMotor().set(kStoppedValue);
++	    Timer.delay(kMotorTimeSettling);
++	    getME().getMotor().set(defaultPotAngle);
++
++	    /* The position should have increased */
++	    assertThat("CAN Jaguar position should have increased after the motor moved", getME().getEncoder().get(), is(greaterThan(initialPosition)));
++		
++	}
++	
++	/**
++	 * NOTICE: This is using the {@link MotorEncoderFixture#getEncoder()} instead of the one built into the CAN Jaguar
++	 */
++	@Ignore("Encoder is not yet wired to the FPGA")
++	@Test
++	public void testRotateReverse() {
++		int initialPosition = getME().getEncoder().get();
++	    /* Drive the speed controller briefly to move the encoder */
++		getME().getMotor().set(kStoppedValue);
++	    Timer.delay(kMotorTimeSettling);
++	    getME().getMotor().set(defaultPotAngle);
++
++	    /* The position should have increased */
++	    assertThat("CAN Jaguar position should have increased after the motor moved", getME().getEncoder().get(), is(greaterThan(initialPosition)));
++		
++	}
++	
++	/**
++	 * Test if we can get a position in potentiometer mode, using an analog output
++	 * as a fake potentiometer.
++	 */
++	@Test
++	public void testFakePotentiometerPosition() {
++		//When have we reached the correct state for this test?
++		BooleanCheck correctState = new BooleanCheck(){@Override
++		public boolean getAsBoolean(){
++			getME().getMotor().set(0);
++			return Math.abs(getME().getFakePot().getVoltage() - getME().getMotor().getPosition()*3) < kPotentiometerPositionTolerance*3;
++			}
++		};
++
++	    getME().getFakePot().setVoltage(0.0f);
++	    delayTillInCorrectStateWithMessage(Level.FINE, kPotentiometerSettlingTime, "Potentiometer position settling", correctState);
++	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", getME().getFakePot().getVoltage() , getME().getMotor().getPosition()*3 , kPotentiometerPositionTolerance*3);
++
++	    getME().getFakePot().setVoltage(1.0f);
++	    delayTillInCorrectStateWithMessage(Level.FINE, kPotentiometerSettlingTime, "Potentiometer position settling", correctState);
++	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", getME().getFakePot().getVoltage() , getME().getMotor().getPosition()*3 , kPotentiometerPositionTolerance*3);
++
++	    getME().getFakePot().setVoltage(2.0f);
++	    delayTillInCorrectStateWithMessage(Level.FINE, kPotentiometerSettlingTime, "Potentiometer position settling", correctState);
++	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", getME().getFakePot().getVoltage() , getME().getMotor().getPosition()*3 , kPotentiometerPositionTolerance*3);
++
++	    getME().getFakePot().setVoltage(3.0f);
++	    delayTillInCorrectStateWithMessage(Level.FINE, kPotentiometerSettlingTime, "Potentiometer position settling", correctState);
++	    assertEquals("CAN Jaguar should have returned the potentiometer position set by the analog output", getME().getFakePot().getVoltage() , getME().getMotor().getPosition()*3 , kPotentiometerPositionTolerance*3);
++	}
++	
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPositionQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPositionQuadEncoderModeTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..732061a68fa63977babc5f92cd1c9f1cfad14503
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANPositionQuadEncoderModeTest.java
+@@ -0,0 +1,110 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.can;
++
++import static org.junit.Assert.assertEquals;
++
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import org.junit.Before;
++import org.junit.Ignore;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.CANJaguar;
++import edu.wpi.first.wpilibj.Timer;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class CANPositionQuadEncoderModeTest extends AbstractCANTest {
++	private static final Logger logger = Logger.getLogger(CANPositionQuadEncoderModeTest.class.getName());
++	@Override
++	protected Logger getClassLogger() {
++		return logger;
++	}
++	
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorForward()
++	 */
++	protected void runMotorForward() {
++		double postion = getME().getMotor().getPosition();
++		getME().getMotor().set(postion + 100);
++	}
++
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorReverse()
++	 */
++	protected void runMotorReverse() {
++		double postion = getME().getMotor().getPosition();
++		getME().getMotor().set(postion - 100);
++	}
++	
++	
++	@Before
++	public void setUp() throws Exception {
++		getME().getMotor().setPositionMode(CANJaguar.kQuadEncoder, 360,  10.0f, 0.1f, 0.0f);
++		getME().getMotor().enableControl(0);
++		/* The motor might still have momentum from the previous test. */
++		Timer.delay(kStartupTime);
++	}
++	
++	@Ignore("The encoder initial position is not validated so is sometimes not set properly")
++	@Test
++	public void testSetEncoderInitialPositionWithEnable(){
++		//given
++		final double encoderValue = 4823;
++		//when
++		getME().getMotor().enableControl(encoderValue);
++		getME().getMotor().disableControl();
++		delayTillInCorrectStateWithMessage(Level.FINE, kEncoderSettlingTime, "Encoder value settling", new BooleanCheck(){@Override
++			public boolean getAsBoolean(){
++				getME().getMotor().set(getME().getMotor().getPosition());
++				return  Math.abs(getME().getMotor().getPosition() - encoderValue) < 40;
++			}
++		});
++		//then
++		assertEquals(encoderValue, getME().getMotor().getPosition(), 40);
++	}
++	
++	/**
++	 * Test if we can set a position and reach that position with PID control on
++	 * the Jaguar.
++	 */
++	@Test
++	public void testEncoderPositionPIDForward() {
++		
++	    double setpoint = getME().getMotor().getPosition() + 10.0f;
++
++	    /* It should get to the setpoint within 10 seconds */
++	    getME().getMotor().set(setpoint);
++	    setCANJaguar(kMotorTimeSettling, setpoint);
++
++		assertEquals("CAN Jaguar should have reached setpoint with PID control", setpoint, getME().getMotor().getPosition(), kEncoderPositionTolerance);
++	}
++	
++	/**
++	 * Test if we can set a position and reach that position with PID control on
++	 * the Jaguar.
++	 */
++	@Test
++	public void testEncoderPositionPIDReverse() {
++		
++	    double setpoint = getME().getMotor().getPosition() - 10.0f;
++
++	    /* It should get to the setpoint within 10 seconds */
++	    getME().getMotor().set(setpoint);
++	    setCANJaguar(kMotorTimeSettling, setpoint);
++
++		assertEquals("CAN Jaguar should have reached setpoint with PID control", setpoint, getME().getMotor().getPosition(), kEncoderPositionTolerance);
++	}
++
++	
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANSpeedQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANSpeedQuadEncoderModeTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ca0828952957eaf54a726544591a11577b8f6fc3
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANSpeedQuadEncoderModeTest.java
+@@ -0,0 +1,80 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.can;
++
++import static org.hamcrest.Matchers.greaterThan;
++import static org.hamcrest.Matchers.is;
++import static org.hamcrest.Matchers.lessThan;
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertThat;
++
++import java.util.logging.Logger;
++
++import org.junit.Before;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.CANJaguar;
++import edu.wpi.first.wpilibj.Timer;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class CANSpeedQuadEncoderModeTest extends AbstractCANTest {
++	private static final Logger logger = Logger.getLogger(CANPercentQuadEncoderModeTest.class.getName());
++	/** The stopped value in rev/min */
++	private static final double kStoppedValue = 0;
++	/** The running value in rev/min */
++	private static final double kRunningValue = 2000;
++	
++	@Override
++	protected Logger getClassLogger() {
++		return logger;
++	}
++	
++	@Before
++	public void setUp() throws Exception {
++		getME().getMotor().setSpeedMode(CANJaguar.kQuadEncoder, 360, 0.1f, 0.003f, 0.01f);
++		getME().getMotor().enableControl();
++		getME().getMotor().set(0.0f);
++		/* The motor might still have momentum from the previous test. */
++		Timer.delay(kStartupTime);
++	}
++	
++	@Test
++	public void testDefaultSpeed(){
++		assertEquals("CAN Jaguar did not start with an initial speed of zero", 0.0f, getME().getMotor().getSpeed(), 0.3f);
++	}
++	
++	
++	/**
++	 * Test if we can drive the motor forward in Speed mode and get a
++	 * position back
++	 */
++	@Test
++	public void testRotateForwardSpeed() {
++		double speed = 200.0f;
++		double initialPosition = getME().getMotor().getPosition();
++		setCANJaguar(kMotorTime, speed);
++		assertEquals("The motor did not reach the required speed in speed mode", speed, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
++		assertThat("The motor did not move forward in speed mode", initialPosition, is(lessThan(getME().getMotor().getPosition())));
++	}
++	
++	/**
++	 * Test if we can drive the motor backwards in Speed mode and get a
++	 * position back
++	 */
++	@Test
++	public void testRotateReverseSpeed() {
++		double speed = -200.0f;
++		double initialPosition = getME().getMotor().getPosition();
++		setCANJaguar(kMotorTime, speed);
++		assertEquals("The motor did not reach the required speed in speed mode", speed, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
++		assertThat("The motor did not move in reverse in speed mode", initialPosition, is(greaterThan(getME().getMotor().getPosition())));
++	}
++	
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANTestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANTestSuite.java
+index ce05eee52b8c1b5165ec9c04f009190871f80bc3..852ee054242cd3a3706556e9c3b2b3dd8a526268 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANTestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANTestSuite.java
+@@ -17,11 +17,13 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
+  *
+  */
+ @RunWith(Suite.class)
+-@SuiteClasses({ CurrentQuadEncoderModeTest.class,
+-				PercentQuadEncoderModeTest.class,
+-				PositionQuadEncoderModeTest.class,
+-				SpeedQuadEncoderModeTest.class,
+-				VoltageQuadEncoderModeTest.class
++@SuiteClasses({ CANCurrentQuadEncoderModeTest.class,
++				CANDefaultTest.class,
++				CANPercentQuadEncoderModeTest.class,
++				CANPositionPotentiometerModeTest.class,
++				CANPositionQuadEncoderModeTest.class,
++				CANSpeedQuadEncoderModeTest.class,
++				CANVoltageQuadEncoderModeTest.class
+ 			})
+ public class CANTestSuite extends AbstractTestSuite {
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANVoltageQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANVoltageQuadEncoderModeTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..86485c21b8bdee8dbec36786baa24fc94b50cd47
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CANVoltageQuadEncoderModeTest.java
+@@ -0,0 +1,220 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.can;
++
++import static org.hamcrest.Matchers.greaterThan;
++import static org.hamcrest.Matchers.is;
++import static org.hamcrest.Matchers.lessThan;
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertThat;
++
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import org.junit.Before;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.CANJaguar;
++import edu.wpi.first.wpilibj.Timer;
++
++/**
++ * @author jonathanleitschuh
++ *
++ */
++public class CANVoltageQuadEncoderModeTest extends AbstractCANTest {
++	private static final Logger logger = Logger.getLogger(CANVoltageQuadEncoderModeTest.class.getName());
++	/** The stopped value in volts */
++	private static final double kStoppedValue = 0;
++	/** The running value in volts */
++	private static final double kRunningValue = 14;
++	
++	private static final double kVoltageTolerance = .25;
++	
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#stopMotor()
++	 */
++	protected void stopMotor() {
++		getME().getMotor().set(kStoppedValue);
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorForward()
++	 */
++	protected void runMotorForward() {
++		getME().getMotor().set(kRunningValue);
++	}
++
++	/* (non-Javadoc)
++	 * @see edu.wpi.first.wpilibj.can.AbstractCANTest#runMotorReverse()
++	 */
++	protected void runMotorReverse() {
++		getME().getMotor().set(-kRunningValue);
++	}
++	
++	@Override
++	protected Logger getClassLogger() {
++		return logger;
++	}
++
++	@Before
++	public void setUp() throws Exception {
++		getME().getMotor().setVoltageMode(CANJaguar.kQuadEncoder, 360);
++		getME().getMotor().set(kStoppedValue);
++		getME().getMotor().enableControl();
++		
++		/* The motor might still have momentum from the previous test. */
++		Timer.delay(kStartupTime);
++	}
++
++	@Test
++	public void testRotateForwardToVoltage() {
++		setCANJaguar(kMotorTime, Math.PI);
++		assertEquals("The output voltage did not match the desired voltage set-point", Math.PI, getME().getMotor().getOutputVoltage(), kVoltageTolerance);
++	}
++
++	@Test
++	public void testRotateReverseToVoltage() {
++		setCANJaguar(kMotorTime, -Math.PI);
++		assertEquals("The output voltage did not match the desired voltage set-point", -Math.PI, getME().getMotor().getOutputVoltage(), kVoltageTolerance);
++	}
++	
++	
++	@Test
++	public void testMaxOutputVoltagePositive(){
++		//given
++		double maxVoltage = 5;
++		getME().getMotor().enableControl();
++		runMotorForward(); //Sets the output to be #kRunningValue
++		runMotorForward();
++		setCANJaguar(1, kRunningValue);
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Voltage settling to max", new BooleanCheck(){
++			@Override
++			public boolean getAsBoolean(){
++				runMotorForward();
++				return Math.abs((Math.abs(getME().getMotor().getOutputVoltage()) - kRunningValue)) < 1;
++			}
++		});
++		assertEquals(kRunningValue, getME().getMotor().get(), 0.00000001);
++		final double fastSpeed = getME().getMotor().getSpeed();
++		
++		//when
++		getME().getMotor().configMaxOutputVoltage(maxVoltage);
++		
++		setCANJaguar(1, kRunningValue);
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "SpeedReducing settling to max", new BooleanCheck(){
++			@Override
++			public boolean getAsBoolean(){
++				runMotorForward();
++				return fastSpeed > getME().getMotor().getSpeed();
++			}
++		});
++		//then
++		assertThat("Speed did not reduce when the max output voltage was set", fastSpeed, is(greaterThan(getME().getMotor().getSpeed())));
++	}
++	
++	@Test
++	public void testMaxOutputVoltagePositiveSetToZeroStopsMotor(){
++		//given
++		double maxVoltage = 0;
++		getME().getMotor().enableControl();
++		runMotorForward(); //Sets the output to be #kRunningValue
++		runMotorForward();
++		setCANJaguar(1, kRunningValue);
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Voltage settling to max", new BooleanCheck(){
++			@Override
++			public boolean getAsBoolean(){
++				runMotorForward();
++				return Math.abs((Math.abs(getME().getMotor().getOutputVoltage()) - kRunningValue)) < 1;
++			}
++		});
++		assertEquals(kRunningValue, getME().getMotor().get(), 0.00000001);
++		final double fastSpeed = getME().getMotor().getSpeed();
++		
++		//when
++		getME().getMotor().configMaxOutputVoltage(maxVoltage);
++		
++		setCANJaguar(1, kRunningValue);
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "SpeedReducing settling to max", new BooleanCheck(){
++			@Override
++			public boolean getAsBoolean(){
++				runMotorForward();
++				return getME().getMotor().getSpeed() == 0;
++			}
++		});
++		//then
++		assertEquals("Speed did not go to zero when the max output voltage was set to " + maxVoltage, 0, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
++	}
++	
++	
++	@Test
++	public void testMaxOutputVoltageNegative(){
++		//given
++		double maxVoltage = 5;
++		getME().getMotor().enableControl();
++		runMotorReverse(); //Sets the output to be #kRunningValue
++		
++		setCANJaguar(1, -kRunningValue);
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Voltage settling to max", new BooleanCheck(){
++			@Override
++			public boolean getAsBoolean(){
++				runMotorReverse();
++				return Math.abs((Math.abs(getME().getMotor().getOutputVoltage()) - kRunningValue)) < 1;
++			}
++		});
++		assertEquals(-kRunningValue, getME().getMotor().get(), 0.00000001);
++		final double fastSpeed = getME().getMotor().getSpeed();
++		
++		//when
++		getME().getMotor().configMaxOutputVoltage(maxVoltage);
++		
++		
++		setCANJaguar(1, -kRunningValue);
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "SpeedReducing settling to max", new BooleanCheck(){
++			@Override
++			public boolean getAsBoolean(){
++				runMotorReverse();
++				return fastSpeed < getME().getMotor().getSpeed();
++			}
++		});
++		//then
++		assertThat("Speed did not reduce when the max output voltage was set", fastSpeed, is(lessThan(getME().getMotor().getSpeed())));
++	}
++	
++	@Test
++	public void testMaxOutputVoltageNegativeSetToZeroStopsMotor(){
++		//given
++		double maxVoltage = 0;
++		getME().getMotor().enableControl();
++		runMotorForward(); //Sets the output to be #kRunningValue
++		runMotorForward();
++		setCANJaguar(1, kRunningValue);
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "Voltage settling to max", new BooleanCheck(){
++			@Override
++			public boolean getAsBoolean(){
++				runMotorForward();
++				return Math.abs((Math.abs(getME().getMotor().getOutputVoltage()) - kRunningValue)) < 1;
++			}
++		});
++		assertEquals(kRunningValue, getME().getMotor().get(), 0.00000001);
++		final double fastSpeed = getME().getMotor().getSpeed();
++		
++		//when
++		getME().getMotor().configMaxOutputVoltage(maxVoltage);
++		
++		setCANJaguar(1, kRunningValue);
++		delayTillInCorrectStateWithMessage(Level.FINE, kMotorTimeSettling, "SpeedReducing settling to max", new BooleanCheck(){
++			@Override
++			public boolean getAsBoolean(){
++				runMotorForward();
++				return getME().getMotor().getSpeed() == 0;
++			}
++		});
++		//then
++		assertEquals("Speed did not go to zero when the max output voltage was set to " + maxVoltage, 0, getME().getMotor().getSpeed(), kEncoderSpeedTolerance);
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CurrentQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CurrentQuadEncoderModeTest.java
+deleted file mode 100644
+index 0f6113ca5bb580a9533c79eaf723ad7436b9372b..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/CurrentQuadEncoderModeTest.java
++++ /dev/null
+@@ -1,56 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-package edu.wpi.first.wpilibj.can;
+-
+-import static org.junit.Assert.*;
+-
+-import java.util.logging.Logger;
+-
+-import org.junit.After;
+-import org.junit.Before;
+-import org.junit.Test;
+-
+-import edu.wpi.first.wpilibj.CANJaguar;
+-import edu.wpi.first.wpilibj.Timer;
+-import edu.wpi.first.wpilibj.test.TestBench;
+-
+-/**
+- * @author jonathanleitschuh
+- *
+- */
+-public class CurrentQuadEncoderModeTest extends AbstractCANTest {
+-	private static Logger logger = Logger.getLogger(CurrentQuadEncoderModeTest.class.getName());
+-	@Override
+-	protected Logger getClassLogger() {
+-		return logger;
+-	}
+-	
+-	@Before
+-	public void setUp() throws Exception {
+-		me = TestBench.getInstance().getCanJaguarPair();
+-		me.setup();
+-		me.getMotor().setCurrentMode(CANJaguar.kQuadEncoder, 360, 5.0, 0.1, 2.0);
+-		me.getMotor().enableControl();
+-		me.getMotor().set(0.0f);
+-		/* The motor might still have momentum from the previous test. */
+-		Timer.delay(kEncoderSettlingTime);
+-	}
+-
+-	
+-	@Test
+-	@Override
+-	public void testRotateForward() {
+-		testRotateForward(0, 1.5);
+-	}
+-	
+-	@Test
+-	@Override
+-	public void testRotateReverse() {
+-		testRotateReverse(0, -1.5);
+-	}
+-
+-}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/ICANData.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/ICANData.java
+deleted file mode 100644
+index a1e881469ad6cb491dffa03117bd87736fd43796..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/ICANData.java
++++ /dev/null
+@@ -1,19 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-package edu.wpi.first.wpilibj.can;
+-
+-/**
+- * @author jonathanleitschuh
+- *
+- */
+-public interface ICANData {
+-	static final double kPotentiometerSettlingTime = 0.05;
+-	static final double kMotorTime = 0.5;
+-	static final double kEncoderSettlingTime = 0.25;
+-	static final double kEncoderPositionTolerance = 5.0/360.0; // +/-5 degrees
+-	static final double kPotentiometerPositionTolerance = 10.0/360.0; // +/-10 degrees
+-}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/PercentQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/PercentQuadEncoderModeTest.java
+deleted file mode 100644
+index ac7c57c42f7630e6d22ce1dd9b730d188847ed23..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/PercentQuadEncoderModeTest.java
++++ /dev/null
+@@ -1,69 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-package edu.wpi.first.wpilibj.can;
+-
+-import static org.hamcrest.Matchers.greaterThan;
+-import static org.hamcrest.Matchers.is;
+-import static org.hamcrest.Matchers.lessThan;
+-import static org.junit.Assert.*;
+-
+-import java.util.logging.Logger;
+-
+-import org.junit.After;
+-import org.junit.AfterClass;
+-import org.junit.Before;
+-import org.junit.Test;
+-
+-import edu.wpi.first.wpilibj.CANJaguar;
+-import edu.wpi.first.wpilibj.Timer;
+-import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
+-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+-import edu.wpi.first.wpilibj.test.TestBench;
+-import edu.wpi.first.wpilibj.test.TestBench.BaseCANMotorEncoderFixture;
+-
+-/**
+- * @author jonathanleitschuh
+- *
+- */
+-public class PercentQuadEncoderModeTest extends AbstractCANTest implements ICANData{
+-	private static final Logger logger = Logger.getLogger(PercentQuadEncoderModeTest.class.getName());
+-	
+-	@Override
+-	protected Logger getClassLogger() {
+-		return logger;
+-	}
+-	@Before
+-	public void setUp() {
+-		me = TestBench.getInstance().getCanJaguarPair();
+-		me.setup();
+-		me.getMotor().setPercentMode(CANJaguar.kQuadEncoder, 360);
+-		me.getMotor().enableControl();
+-		me.getMotor().set(0.0f);
+-		/* The motor might still have momentum from the previous test. */
+-		Timer.delay(kEncoderSettlingTime);
+-	}
+-
+-	/**
+-	 * Test if we can drive the motor forwards in percentage mode and get a
+-	 * position back
+-	 */
+-	@Test
+-	@Override
+-	public void testRotateForward() {
+-		testRotateForward(0, 1);
+-	}
+-	
+-	/**
+-	 * Test if we can drive the motor backwards in percentage mode and get a
+-	 * position back
+-	 */
+-	@Test
+-	@Override
+-	public void testRotateReverse() {
+-		testRotateReverse(0, -1);
+-	}
+-}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/PositionQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/PositionQuadEncoderModeTest.java
+deleted file mode 100644
+index 071d07107e9881c41e8912fa2e11c0ae5fff5d7a..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/PositionQuadEncoderModeTest.java
++++ /dev/null
+@@ -1,58 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-package edu.wpi.first.wpilibj.can;
+-
+-import static org.junit.Assert.*;
+-
+-import java.util.logging.Logger;
+-
+-import org.junit.After;
+-import org.junit.Before;
+-import org.junit.Test;
+-
+-import edu.wpi.first.wpilibj.CANJaguar;
+-import edu.wpi.first.wpilibj.Timer;
+-import edu.wpi.first.wpilibj.test.TestBench;
+-
+-/**
+- * @author jonathanleitschuh
+- *
+- */
+-public class PositionQuadEncoderModeTest extends AbstractCANTest {
+-	private static final Logger logger = Logger.getLogger(PositionQuadEncoderModeTest.class.getName());
+-	@Override
+-	protected Logger getClassLogger() {
+-		return logger;
+-	}
+-	
+-	/**
+-	 * @throws java.lang.Exception
+-	 */
+-	@Before
+-	public void setUp() throws Exception {
+-		me = TestBench.getInstance().getCanJaguarPair();
+-		me.setup();
+-		me.getMotor().setPositionMode(CANJaguar.kQuadEncoder, 360, 5.0, 0.1, 2.0);
+-		me.getMotor().enableControl();
+-		/* The motor might still have momentum from the previous test. */
+-		Timer.delay(kEncoderSettlingTime);
+-	}
+-
+-	@Test
+-	@Override
+-	public void testRotateForward() {
+-		double initial = me.getMotor().getPosition();
+-		testRotateForward(initial, initial + 50);
+-	}
+-	
+-	@Test
+-	@Override
+-	public void testRotateReverse() {
+-		double initial = me.getMotor().getPosition();
+-		testRotateReverse(initial, initial - 50);
+-	}
+-}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/SpeedQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/SpeedQuadEncoderModeTest.java
+deleted file mode 100644
+index f58fabc62849344005d5f928d16748b3fe1d34a1..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/SpeedQuadEncoderModeTest.java
++++ /dev/null
+@@ -1,70 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-package edu.wpi.first.wpilibj.can;
+-
+-import static org.hamcrest.Matchers.greaterThan;
+-import static org.hamcrest.Matchers.is;
+-import static org.hamcrest.Matchers.lessThan;
+-import static org.junit.Assert.*;
+-
+-import java.util.logging.Logger;
+-
+-import org.junit.After;
+-import org.junit.Before;
+-import org.junit.Test;
+-
+-import edu.wpi.first.wpilibj.CANJaguar;
+-import edu.wpi.first.wpilibj.Timer;
+-import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
+-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+-import edu.wpi.first.wpilibj.test.TestBench;
+-
+-/**
+- * @author jonathanleitschuh
+- *
+- */
+-public class SpeedQuadEncoderModeTest extends AbstractCANTest implements ICANData {
+-	private static final Logger logger = Logger.getLogger(PercentQuadEncoderModeTest.class.getName());
+-	
+-	@Override
+-	protected Logger getClassLogger() {
+-		return logger;
+-	}
+-	
+-	@Before
+-	public void setUp() throws Exception {
+-		me = TestBench.getInstance().getCanJaguarPair();
+-		me.setup();
+-		me.getMotor().setSpeedMode(CANJaguar.kQuadEncoder, 360, 5.0, 0.1, 2.0);
+-		me.getMotor().enableControl();
+-		me.getMotor().set(0.0f);
+-		/* The motor might still have momentum from the previous test. */
+-		Timer.delay(kEncoderSettlingTime);
+-	}
+-	
+-	/**
+-	 * Test if we can drive the motor forward in Speed mode and get a
+-	 * position back
+-	 */
+-	@Test
+-	public void testRotateForward() {
+-		//Speed is rev/min
+-		testRotateForward(0, 1000);
+-	}
+-	
+-	/**
+-	 * Test if we can drive the motor backwards in Speed mode and get a
+-	 * position back
+-	 */
+-	@Test
+-	public void testRotateReverse() {
+-		//Speed is rev/min
+-		testRotateReverse(0, -1000);
+-	}
+-	
+-	
+-}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/VoltageQuadEncoderModeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/VoltageQuadEncoderModeTest.java
+deleted file mode 100644
+index 998af3ed8763bf947ff8736bdbd773b5e35f3a3c..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/VoltageQuadEncoderModeTest.java
++++ /dev/null
+@@ -1,60 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2014. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-package edu.wpi.first.wpilibj.can;
+-
+-import static org.junit.Assert.*;
+-
+-import java.util.logging.Logger;
+-
+-import org.junit.After;
+-import org.junit.Before;
+-import org.junit.Test;
+-
+-import edu.wpi.first.wpilibj.CANJaguar;
+-import edu.wpi.first.wpilibj.Timer;
+-import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
+-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+-import edu.wpi.first.wpilibj.test.TestBench;
+-
+-/**
+- * @author jonathanleitschuh
+- *
+- */
+-public class VoltageQuadEncoderModeTest extends AbstractCANTest implements ICANData {
+-	private static final Logger logger = Logger.getLogger(VoltageQuadEncoderModeTest.class.getName());
+-	
+-	@Override
+-	protected Logger getClassLogger() {
+-		return logger;
+-	}
+-
+-	@Before
+-	public void setUp() throws Exception {
+-		me = TestBench.getInstance().getCanJaguarPair();
+-		me.setup();
+-		me.getMotor().setPercentMode(CANJaguar.kQuadEncoder, 360);
+-		me.getMotor().enableControl();
+-		me.getMotor().set(0.0f);
+-		/* The motor might still have momentum from the previous test. */
+-		Timer.delay(kEncoderSettlingTime);
+-	}
+-
+-	@Test
+-	@Override
+-	public void testRotateForward() {
+-		testRotateForward(0, 14);
+-	}
+-
+-	@Test
+-	@Override
+-	public void testRotateReverse() {
+-		testRotateReverse(0, -14);
+-	}
+-
+-	
+-
+-}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/package-info.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a4c9687b57caac64959f65334939329f33de9c77
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/can/package-info.java
+@@ -0,0 +1,8 @@
++/**
++ * Provides a suite of tests to cover CANJaguar fully in all different control modes
++ * and with each supported positional input. Different setup parameters are provided in each Test class.
++ * All test classes that want to take advantage of the default test setup frameworks in place should
++ * extend {@link AbstractCANTest}
++ * 
++ */
++package edu.wpi.first.wpilibj.can;
+\ No newline at end of file
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/CANMotorEncoderFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/CANMotorEncoderFixture.java
+index 30c5593fc993c52b52e1486a4654bc75d23478cb..75ed0a12a1dc1e36d2d4c6ab00878949e47387e6 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/CANMotorEncoderFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/CANMotorEncoderFixture.java
+@@ -6,10 +6,14 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.fixtures;
+ 
++import java.util.logging.Logger;
++
+ import edu.wpi.first.wpilibj.CANJaguar;
+-import edu.wpi.first.wpilibj.DigitalInput;
+ import edu.wpi.first.wpilibj.DigitalOutput;
+-import edu.wpi.first.wpilibj.mockhardware.FakeEncoderSource;
++import edu.wpi.first.wpilibj.Relay;
++import edu.wpi.first.wpilibj.Relay.Direction;
++import edu.wpi.first.wpilibj.Relay.Value;
++import edu.wpi.first.wpilibj.Timer;
+ import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
+ 
+ /**
+@@ -17,24 +21,37 @@ import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
+  *
+  */
+ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJaguar> implements ITestFixture {
++	private static final Logger logger = Logger.getLogger(CANMotorEncoderFixture.class.getName());
++	public static final double RELAY_POWER_UP_TIME = .75;
+ 	private FakePotentiometerSource potSource;
+ 	private DigitalOutput forwardLimit;
+ 	private DigitalOutput reverseLimit;
++	private Relay powerCycler;
+ 	private boolean initialized = false;
+ 	
+ 	protected abstract FakePotentiometerSource giveFakePotentiometerSource();
+ 	protected abstract DigitalOutput giveFakeForwardLimit();
+ 	protected abstract DigitalOutput giveFakeReverseLimit();
++	protected abstract Relay givePoweCycleRelay();
+ 	
+-	public CANMotorEncoderFixture(){}
++	public CANMotorEncoderFixture(){
++	}
+ 	
+-	public void initialize(){
++	private void initialize(){
+ 		synchronized(this){
+ 			if(!initialized){
+-				potSource = giveFakePotentiometerSource();
++				initialized = true;//This ensures it is only initialized once
++				
++				powerCycler = givePoweCycleRelay();
++				powerCycler.setDirection(Direction.kForward);
++				logger.fine("Turning on the power!");
++				powerCycler.set(Value.kForward);
+ 				forwardLimit = giveFakeForwardLimit();
+ 				reverseLimit = giveFakeReverseLimit();
+-				initialized = true;
++				forwardLimit.set(false);
++				reverseLimit.set(false);
++				potSource = giveFakePotentiometerSource();
++				Timer.delay(RELAY_POWER_UP_TIME); //Delay so the relay has time to boot up
+ 			}
+ 		}
+ 	}
+@@ -42,7 +59,7 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
+ 
+ 	@Override
+ 	public boolean setup() {
+-		initialize();
++		initialize(); //This initializes the Relay first
+ 		return super.setup();
+ 	}
+ 
+@@ -58,11 +75,41 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
+ 	
+ 	@Override
+ 	public boolean teardown() {
+-		potSource.free();
+-		forwardLimit.free();
+-		reverseLimit.free();
+-		boolean superTornDown = super.teardown();
+-		getMotor().free();
++		boolean wasNull = false;
++		if(potSource != null){
++			potSource.free();
++			potSource = null;
++		} else wasNull = true;
++		if(forwardLimit != null){
++			forwardLimit.set(false);
++			forwardLimit.free();
++			forwardLimit = null;
++		} else wasNull = true;
++		if(reverseLimit != null){
++			reverseLimit.set(false);
++			reverseLimit.free();
++			reverseLimit = null;
++		} else wasNull = true;
++		boolean superTornDown = false;
++		try{
++			superTornDown = super.teardown();
++		} finally {
++			try{
++				if(getMotor() != null){
++					getMotor().disableControl();
++					getMotor().free();
++				} else wasNull = true;
++			} finally {
++				if(powerCycler != null){
++					powerCycler.free();
++					powerCycler = null;
++				} else wasNull = true;
++			}
++		}
++		if(wasNull){
++			throw new RuntimeException("CANMotorEncoderFixture had a null value at teardown");
++		}
++		
+ 		return superTornDown;
+ 	}
+ 	
+@@ -80,5 +127,47 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
+ 		initialize();
+ 		return reverseLimit;
+ 	}
++	
++	public String printStatus(){
++		StringBuilder status = new StringBuilder("CAN Motor Encoder Status: ");
++		if(getMotor() != null){
++			status.append("\t" + getMotor().getDescription() + "\n");
++			status.append("\tFault = " + getMotor().getFaults() + "\n");
++			status.append("\tValue = " + getMotor().get() + "\n");
++			status.append("\tOutputVoltage = " + getMotor().getOutputVoltage() +"\n");
++			status.append("\tPosition = " + getMotor().getPosition() + "\n");
++			status.append("\tForward Limit Ok = " + getMotor().getForwardLimitOK() + "\n");
++			status.append("\tReverse Limit Ok = " + getMotor().getReverseLimitOK() + "\n");
++		} else { 
++			status.append("\t" + "CANJaguar Motor = null" + "\n");
++		}
++		if(forwardLimit != null){
++			status.append("\tForward Limit Output = " + forwardLimit + "\n");
++		} else {
++			status.append("\tForward Limit Output = null" +"\n");
++		}
++		if(reverseLimit != null){
++			status.append("\tReverse Limit Output = " + reverseLimit + "\n");
++		} else {
++			status.append("\tReverse Limit Output = null" +"\n");
++		}
++		
++		return status.toString();
++	}
++	
++	public void brownOut(double seconds){
++		initialize();
++		powerOff();
++		Timer.delay(seconds);
++		powerOn();
++	}
++	public void powerOff(){
++		initialize();
++		powerCycler.set(Value.kOff);
++	}
++	public void powerOn(){
++		initialize();
++		powerCycler.set(Value.kForward);
++	}
+ 
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/DIOCrossConnectFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/DIOCrossConnectFixture.java
+index bf125768316c9c842474ce358103c595336ba50e..5088d2349c974ed5e4c462c7ddee50b2ea3dd41d 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/DIOCrossConnectFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/DIOCrossConnectFixture.java
+@@ -53,7 +53,6 @@ public class DIOCrossConnectFixture implements ITestFixture {
+ 	@Override
+ 	public boolean reset() {
+ 		output.set(false);
+-		assert input.get();
+ 		return true;
+ 	}
+ 
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
+index a3fb56de2afef358c8be83e04cad49ddda8c44bd..6639fd8a13d5cc34b5a5b9173c4b19bc2a87f996 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/MotorEncoderFixture.java
+@@ -6,6 +6,8 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.fixtures;
+ 
++import java.util.logging.Logger;
++
+ import edu.wpi.first.wpilibj.Counter;
+ import edu.wpi.first.wpilibj.DigitalInput;
+ import edu.wpi.first.wpilibj.Encoder;
+@@ -24,11 +26,12 @@ import edu.wpi.first.wpilibj.test.TestBench;
+  *
+  */
+ public abstract class MotorEncoderFixture <T extends SpeedController> implements ITestFixture {
++	private static final Logger logger = Logger.getLogger(MotorEncoderFixture.class.getName());
+ 	private boolean initialized = false;
+ 	private boolean tornDown = false;
+ 	protected T motor;
+ 	private Encoder encoder;
+-	private Counter counters[] = new Counter[2];
++	private final Counter counters[] = new Counter[2];
+ 	protected DigitalInput aSource; //Stored so it can be freed at tear down
+ 	protected DigitalInput bSource;
+ 
+@@ -61,7 +64,7 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
+ 	final private void initialize(){
+ 		synchronized(this){
+ 			if(!initialized){
+-				motor = giveSpeedController();
++				initialized = true; //This ensures it is only initialized once
+ 				
+ 				aSource = giveDigitalInputA();
+ 				bSource = giveDigitalInputB();
+@@ -73,7 +76,12 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
+ 				for(Counter c: counters){
+ 					c.start();
+ 				}
+-				initialized = true;
++				logger.fine("Creating the speed controller!");
++				motor = giveSpeedController(); //CANJaguar throws an exception if it doesn't get the message
++				
++					
++				
++				
+ 			}
+ 		}
+ 	}
+@@ -158,11 +166,14 @@ public abstract class MotorEncoderFixture <T extends SpeedController> implements
+ 	 */
+ 	@Override
+ 	public boolean teardown() {
+-		String type = getType();
++		String type;
++		if(motor != null){
++			type = getType();
++		} else {
++			type = "null";
++		}
+ 		if(!tornDown){
+ 			boolean wasNull = false;
+-			initialize();
+-			reset();
+ 			if(motor instanceof PWM && motor != null){
+ 				((PWM) motor).free();
+ 				motor = null;
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakePotentiometerSource.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakePotentiometerSource.java
+index 356b792d630fb8421a2e79535eb0ff5e8edf6323..99915216a2d9be8db24fb06b8be8ce9bead8a2ca 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakePotentiometerSource.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/mockhardware/FakePotentiometerSource.java
+@@ -16,6 +16,7 @@ public class FakePotentiometerSource {
+ 	private AnalogOutput output;
+ 	private boolean m_init_output;
+ 	private double potMaxAngle;
++	private double potMaxVoltage = 5.0;
+ 	private final double defaultPotMaxAngle;
+ 	public FakePotentiometerSource(AnalogOutput output, double defaultPotMaxAngle){
+ 		this.defaultPotMaxAngle = defaultPotMaxAngle;
+@@ -29,6 +30,14 @@ public class FakePotentiometerSource {
+ 		m_init_output = true;
+ 	}
+ 	
++	/**
++	 * Sets the maximum voltage output. If not the default is 5.0V
++	 * @param voltage The voltage that indicates that the pot is at the max value.
++	 */
++	public void setMaxVoltage(double voltage){
++		potMaxVoltage = voltage;
++	}
++	
+ 	public void setRange(double range){
+ 		potMaxAngle = range;
+ 	}
+@@ -39,7 +48,7 @@ public class FakePotentiometerSource {
+ 	}
+ 	
+ 	public void setAngle(double angle){
+-		output.setVoltage((5.0/potMaxAngle)*angle);
++		output.setVoltage((potMaxVoltage/potMaxAngle)*angle);
+ 	}
+ 	
+ 	public void setVoltage(double voltage){
+@@ -50,9 +59,22 @@ public class FakePotentiometerSource {
+ 		return output.getVoltage();
+ 	}
+ 	
++	/**
++	 * Returns the currently set angle
++	 * @return
++	 */
++	public double getAngle(){
++		double voltage = output.getVoltage();
++		if(voltage == 0){ //Removes divide by zero error
++			return 0;
++		}
++		return voltage * (potMaxAngle/potMaxVoltage);
++	}
++	
+ 	public void free(){
+ 		if(m_init_output){
+ 			output.free();
++			output = null;
+ 			m_init_output = false;
+ 		}
+ 	}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index c812221932afdadfcabf30ffa405f29c44969597..0dc7ab45b53b29d4b1674b127459574445bd0155 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -59,6 +59,7 @@ public final class TestBench {
+ 	public static final int kTalonPDPChannel = 11;
+ 	
+ 	/* CAN ASSOICATED CHANNELS */
++	public static final int kCANRelayPowerCycler = 1;
+ 	public static final int kFakeJaguarPotentiometer = 1;
+ 	public static final int kFakeJaguarForwardLimit = 16;
+ 	public static final int kFakeJaguarReverseLimit = 17;
+@@ -183,6 +184,13 @@ public final class TestBench {
+ 		protected DigitalOutput giveFakeReverseLimit() {
+ 			return new DigitalOutput(kFakeJaguarReverseLimit);
+ 		}
++		/* (non-Javadoc)
++		 * @see edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture#givePoweCycleRelay()
++		 */
++		@Override
++		protected Relay givePoweCycleRelay() {
++			return new Relay(kCANRelayPowerCycler);
++		}
+ 	}
+ 
+ 	/**

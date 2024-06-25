@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joe Ross <joe@rossesmail.com>
+Date: Mon, 8 Dec 2014 20:45:22 -0800
+Subject: [PATCH 0548/6262] Check and coerce rumble inputs to range of 0 - 1.
+
+Change-Id: Ic2ee301549e68e8cc56f91755521f456c8d0b5f7
+---
+ wpilibc/wpilibC++Devices/src/Joystick.cpp                     | 4 ++++
+ .../src/main/java/edu/wpi/first/wpilibj/Joystick.java         | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/wpilibc/wpilibC++Devices/src/Joystick.cpp b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+index 38fa9d87a2777cf0021a6ae565161c6e77a7df9a..739d46dfb43ee353e956596d300e1de1817859ea 100644
+--- a/wpilibc/wpilibC++Devices/src/Joystick.cpp
++++ b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+@@ -355,6 +355,10 @@ float Joystick::GetDirectionDegrees(){
+  * @param value The normalized value (0 to 1) to set the rumble to
+  */
+ void Joystick::SetRumble(RumbleType type, float value) {
++	if (value < 0)
++		value = 0;
++	else if (value > 1)
++		value = 1;
+ 	if (type == kLeftRumble)
+ 		m_leftRumble = value*65535;
+ 	else
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+index c17e76216a712ae4c8bab8c46718f834f6329b2a..a3a0e734422f248a22b1fed6909f09bdd848b2d7 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+@@ -419,6 +419,10 @@ public class Joystick extends GenericHID {
+      * @param value The normalized value (0 to 1) to set the rumble to
+      */
+     public void setRumble(RumbleType type, float value) {
++        if (value < 0)
++            value = 0;
++        else if (value > 1)
++            value = 1;
+         if (type.value == RumbleType.kLeftRumble_val)
+             m_leftRumble = (short)(value*65535);
+         else

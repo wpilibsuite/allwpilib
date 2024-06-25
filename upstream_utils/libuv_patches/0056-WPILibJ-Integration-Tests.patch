@@ -1,0 +1,494 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fredric Silberberg <fredric@fsilberberg.com>
+Date: Tue, 13 May 2014 07:53:00 -0400
+Subject: [PATCH 0056/6262] WPILibJ Integration Tests
+
+This is the first commit to add the WPILibJ integration test framework.
+This creates a project called wpilibJavaIntegrationTests, which is will
+create testing framework when running the maven package target. This
+framework will need to have the TestBench.java file updated to match
+the testing harness set up at WPI. Tests must currently be run manually.
+
+Change-Id: I09fe0278580751e813af591c15b9079360089987
+---
+ wpilibj/pom.xml                               |   1 +
+ wpilibj/wpilibJavaIntegrationTests/pom.xml    | 127 ++++++++++++++++++
+ .../edu/wpi/first/wpilibj/SampleTest.java     |  62 +++++++++
+ .../first/wpilibj/fixtures/ITestFixture.java  |  53 ++++++++
+ .../first/wpilibj/fixtures/SampleFixture.java |  57 ++++++++
+ .../first/wpilibj/test/AbstractComsSetup.java |  57 ++++++++
+ .../edu/wpi/first/wpilibj/test/TestBench.java |  29 ++++
+ .../edu/wpi/first/wpilibj/test/TestSuite.java |  24 ++++
+ 8 files changed, 410 insertions(+)
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/pom.xml
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/SampleTest.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/ITestFixture.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/SampleFixture.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+ create mode 100644 wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+
+diff --git a/wpilibj/pom.xml b/wpilibj/pom.xml
+index 41604c9f73f68ddfe91e66c58882802576f2f751..6165cacc3418cf759da998350c0094b8229e4fed 100644
+--- a/wpilibj/pom.xml
++++ b/wpilibj/pom.xml
+@@ -11,6 +11,7 @@
+     <module>wpilibJava</module>
+     <module>wpilibJavaJNI</module>
+     <module>wpilibJavaFinal</module>
++    <module>wpilibJavaIntegrationTests</module>
+   </modules>
+   
+ </project>
+diff --git a/wpilibj/wpilibJavaIntegrationTests/pom.xml b/wpilibj/wpilibJavaIntegrationTests/pom.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..5c55e1ebc7bbbec0eb65b408488cf88ee913ce8b
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/pom.xml
+@@ -0,0 +1,127 @@
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
++	<modelVersion>4.0.0</modelVersion>
++	<parent>
++		<groupId>edu.wpi.first.wpilibj</groupId>
++		<artifactId>wpilibj</artifactId>
++		<version>0.1.0-SNAPSHOT</version>
++	</parent>
++	<artifactId>wpilibJavaIntegrationTests</artifactId>
++	<groupId>edu.first.wpilibj</groupId>
++	<dependencies>
++		<dependency>
++			<groupId>edu.wpi.first.wpilibj</groupId>
++			<artifactId>wpilibJavaFinal</artifactId>
++			<version>0.1.0-SNAPSHOT</version>
++		</dependency>
++		<dependency>
++			<groupId>junit</groupId>
++			<artifactId>junit</artifactId>
++			<version>4.11</version>
++		</dependency>
++		<dependency>
++			<groupId>org.hamcrest</groupId>
++			<artifactId>hamcrest-all</artifactId>
++			<version>1.3</version>
++		</dependency>
++	</dependencies>
++
++	<profiles>
++		<profile>
++			<id>docline-java8-disable</id>
++			<activation>
++				<jdk>[1.8,</jdk>
++			</activation>
++
++			<build>
++				<plugins>
++					<plugin>
++						<groupId>org.apache.maven.plugins</groupId>
++						<artifactId>maven-javadoc-plugin</artifactId>
++						<configuration>
++							<additionalparam>-Xdoclint:none</additionalparam>
++						</configuration>
++					</plugin>
++				</plugins>
++			</build>
++		</profile>
++	</profiles>
++
++	<build>
++		<plugins>
++			<plugin>
++				<groupId>org.apache.maven.plugins</groupId>
++				<artifactId>maven-compiler-plugin</artifactId>
++				<version>3.1</version>
++				<configuration>
++					<source>1.7</source>
++					<target>1.7</target>
++				</configuration>
++			</plugin>
++			<plugin>
++				<groupId>org.apache.maven.plugins</groupId>
++				<artifactId>maven-dependency-plugin</artifactId>
++				<version>2.8</version>
++				<executions>
++					<execution>
++						<id>unpack</id>
++						<phase>generate-sources</phase>
++						<goals>
++							<goal>unpack</goal>
++						</goals>
++						<configuration>
++							<artifactItems>
++								<artifactItem>
++									<groupId>edu.wpi.first.wpilibj</groupId>
++									<artifactId>wpilibJavaFinal</artifactId>
++									<version>0.1.0-SNAPSHOT</version>
++									<type>jar</type>
++								</artifactItem>
++								<artifactItem>
++									<groupId>junit</groupId>
++									<artifactId>junit</artifactId>
++									<version>4.11</version>
++									<type>jar</type>
++								</artifactItem>
++								<artifactItem>
++									<groupId>org.hamcrest</groupId>
++									<artifactId>hamcrest-all</artifactId>
++									<version>1.3</version>
++									<type>jar</type>
++								</artifactItem>
++							</artifactItems>
++							<outputDirectory>${project.build.directory}/classes</outputDirectory>
++						</configuration>
++
++					</execution>
++				</executions>
++			</plugin>
++			<plugin>
++				<groupId>org.apache.maven.plugins</groupId>
++				<artifactId>maven-install-plugin</artifactId>
++				<version>2.5.1</version>
++				<executions>
++					<execution>
++						<id>install-jar</id>
++						<phase>install</phase>
++						<goals>
++							<goal>install</goal>
++						</goals>
++					</execution>
++				</executions>
++			</plugin>
++			<plugin>
++				<groupId>org.apache.maven.plugins</groupId>
++				<artifactId>maven-jar-plugin</artifactId>
++				<configuration>
++					<archive>
++						<manifest>
++							<addClasspath>true</addClasspath>
++							<mainClass>edu.wpi.first.wpilibj.test.TestSuite</mainClass>
++						</manifest>
++					</archive>
++				</configuration>
++			</plugin>
++		</plugins>
++	</build>
++</project>
+\ No newline at end of file
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/SampleTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/SampleTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..7850e1d449b2dd8b9a54a654865f9d05e965dd46
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/SampleTest.java
+@@ -0,0 +1,62 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj;
++
++import static org.junit.Assert.assertTrue;
++
++import org.junit.AfterClass;
++import org.junit.Before;
++import org.junit.BeforeClass;
++import org.junit.Test;
++
++import edu.wpi.first.wpilibj.fixtures.SampleFixture;
++import edu.wpi.first.wpilibj.test.AbstractComsSetup;
++
++/**
++ * Sample test for a sample PID controller. This demonstrates the general
++ * pattern of how to create a test and use testing fixtures and categories.
++ * 
++ * All tests must extend from {@link AbstractComsSetup} in order to ensure that
++ * Network Communications are set up before the tests are run.
++ * 
++ * @author Fredric Silberberg
++ */
++public class SampleTest extends AbstractComsSetup {
++
++	static SampleFixture fixture = new SampleFixture();
++
++	public SampleTest() {
++	}
++
++	@BeforeClass
++	public static void classSetup() {
++		// Set up the fixture before the test is created
++		fixture.setup();
++	}
++
++	@Before
++	public void setUp() {
++		// Reset the fixture elements before every test
++		fixture.reset();
++	}
++
++	@AfterClass
++	public static void tearDown() {
++		// Clean up the fixture after the test
++		fixture.teardown();
++	}
++
++	/**
++	 * This is just a sample test that asserts true. Any traditional junit code
++	 * can be used, these are ordinary junit tests!
++	 */
++	@Test
++	public void test() {
++		assertTrue(true);
++	}
++
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/ITestFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/ITestFixture.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5a147dfc297c17dc71b5418557389c4e952d1c42
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/ITestFixture.java
+@@ -0,0 +1,53 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.fixtures;
++
++import edu.wpi.first.wpilibj.test.TestBench;
++
++/**
++ * Master interface for all test fixtures. This ensures that all test fixtures
++ * have setup and teardown methods, to ensure that the tests run properly.
++ * 
++ * Test fixtures should be modeled around the content of a test, rather than the
++ * actual physical layout of the testing board. They should obtain references to
++ * hardware from the {@link TestBench} class, which is a singleton. Testing
++ * Fixtures are responsible for ensuring that the hardware is in an appropriate
++ * state for the start of a test, and ensuring that future tests will not be
++ * affected by the results of a test.
++ * 
++ * @author Fredric Silberberg
++ */
++public interface ITestFixture {
++
++	/**
++	 * Performs any required setup for this fixture, ensuring that all fixture
++	 * elements are ready for testing.
++	 * 
++	 * @return True if the fixture is ready for testing
++	 */
++	boolean setup();
++
++	/**
++	 * Resets the fixture back to test start state. This should be called by the
++	 * test class in the test setup method to ensure that the hardware is in the
++	 * default state. This differs from {@link ITestFixture#setup()} as that is
++	 * called once, before the class is constructed, so it may need to start
++	 * sensors. This method should not have to start anything, just reset
++	 * sensors and ensure that motors are stopped.
++	 * 
++	 * @return True if the fixture is ready for testing
++	 */
++	boolean reset();
++
++	/**
++	 * Performs any required teardown after use of the fixture, ensuring that
++	 * future tests will not run into conflicts.
++	 * 
++	 * @return True if the teardown succeeded
++	 */
++	boolean teardown();
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/SampleFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/SampleFixture.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1f6c6cd90a09e64fe1fd26373c733d36088a80d5
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/SampleFixture.java
+@@ -0,0 +1,57 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.fixtures;
++
++
++/**
++ * This is an example of how to use the {@link ITestFixture} interface to create
++ * test fixtures for a test.
++ * 
++ * @author Fredric Silberberg
++ * 
++ */
++public class SampleFixture implements ITestFixture {
++
++	/**
++	 * {@inheritDoc}
++	 */
++	@Override
++	public boolean setup() {
++		/*
++		 * If this fixture actually accessed the hardware, here is where it
++		 * would set up the starting state of the test bench. For example,
++		 * reseting encoders, ensuring motors are stopped, reseting any serial
++		 * communication if necessary, etc.
++		 */
++		return true;
++	}
++
++	@Override
++	public boolean reset() {
++		/*
++		 * This is where the fixture would reset any sensors or motors used by
++		 * the fixture to test default state. This method should not worry about
++		 * whether or not the sensors have been allocated correctly, that is the
++		 * job of the setup function.
++		 */
++		return false;
++	}
++
++	/**
++	 * {@inheritDoc}
++	 */
++	@Override
++	public boolean teardown() {
++		/*
++		 * This is where the fixture would deallocate and reset back to normal
++		 * conditions any necessary hardware. This includes ensuring motors are
++		 * stopped, stoppable sensors are actually stopped, ensuring serial
++		 * communications are ready for the next test, etc.
++		 */
++		return true;
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..79fb47a2155f9adec3d97dca563dcbd745c25e8d
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
+@@ -0,0 +1,57 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.test;
++
++import org.junit.BeforeClass;
++
++import edu.wpi.first.wpilibj.DriverStation;
++import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
++
++/**
++ * This class serves as a superclass for all tests that involve the hardware on
++ * the roboRIO. It uses an {@link BeforeClass} statement to initialize network
++ * communications. Any test that needs to use the hardware <b>MUST</b> extend
++ * from this class, to ensure that all of the hardware will be able to run.
++ * 
++ * @author Fredric Silberberg
++ */
++public abstract class AbstractComsSetup {
++
++	/** Stores whether network coms have been initialized */
++	private static boolean initialized = false;
++
++	/**
++	 * This sets up the network communications library to enable the driver
++	 * station. After starting network coms, it will loop until the driver
++	 * station returns that the robot is enabled, to ensure that tests will be
++	 * able to run on the hardware.
++	 * 
++	 * @throws InterruptedException
++	 *             If we failed to sleep while waiting for the driver station to
++	 *             enable.
++	 */
++	@BeforeClass
++	public static void setupNetworkComs() throws InterruptedException {
++		if (!initialized) {
++			// Start up the network communications
++			FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
++			FRCNetworkCommunicationsLibrary
++					.FRCNetworkCommunicationObserveUserProgramStarting();
++			System.out.println("Started coms");
++
++			// Wait until the robot is enabled before starting the tests
++			while (!DriverStation.getInstance().isEnabled()) {
++				Thread.sleep(100);
++				System.out.println("Waiting for enable");
++			}
++
++			// Ready to go!
++			initialized = true;
++			System.out.println("Running!");
++		}
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a106d856b52220969ec81cac257c64a828e20199
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -0,0 +1,29 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj.test;
++
++
++/**
++ * This class provides access to all of the elements on the test bench, for use
++ * in fixtures. This class is a singleton, you should use {@link #getInstance()}
++ * to obtain a reference to the {@code TestBench}.
++ * 
++ * TODO: This needs to be updated to the most recent test bench setup.
++ * 
++ * @author Fredric Silberberg
++ */
++public final class TestBench {
++
++	public static TestBench instance;
++
++	public static TestBench getInstance() {
++		if (instance == null) {
++			instance = new TestBench();
++		}
++		return instance;
++	}
++}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a0dee73a1871b41ec1df53914c89da65686d94e1
+--- /dev/null
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestSuite.java
+@@ -0,0 +1,24 @@
++package edu.wpi.first.wpilibj.test;
++
++import org.junit.runner.JUnitCore;
++import org.junit.runner.RunWith;
++import org.junit.runners.Suite;
++import org.junit.runners.Suite.SuiteClasses;
++
++import edu.wpi.first.wpilibj.SampleTest;
++
++/**
++ * The WPILibJ Integeration Test Suite collects all of the tests to be run by
++ * junit. In order for a test to be run, it must be added the list of suite
++ * classes below. The tests will be run in the order they are listed in the
++ * suite classes annotation.
++ */
++@RunWith(Suite.class)
++@SuiteClasses({ SampleTest.class })
++public class TestSuite {
++
++	public static void main(String[] args) {
++		JUnitCore.main("edu.wpi.first.wpilibj.test.TestSuite");
++	}
++
++}

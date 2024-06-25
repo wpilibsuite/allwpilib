@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Fri, 14 Nov 2014 16:08:17 -0500
+Subject: [PATCH 0483/6262] Added support for launching a simulation friendly
+ SmartDashboard.
+
+Change-Id: I84176cf522da20a74234f7cfb7b8a6aaca7d9248
+---
+ .../edu.wpi.first.wpilib.plugins.core/plugin.xml          | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/plugin.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/plugin.xml
+index 6dfdfa6745d39f78d3473232282270a6f000eb7a..fc7f9c49c7634a0556728d1d427496ce964823b7 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/plugin.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/plugin.xml
+@@ -33,6 +33,14 @@
+                toolbarPath="WPILib"
+                tooltip="Launch the SmartDashboard to get feedback from the robot.">
+          </action>
++         <action
++               class="edu.wpi.first.wpilib.plugins.core.actions.RunSimulationSmartDashboardAction"
++               icon="icons/smartdashboard16x16.png"
++               id="edu.wpi.first.wpilib.plugins.core.actions.RunSimulationSmartDashboardAction"
++               label="Run S&amp;imulation SmartDashboard"
++               menubarPath="edu.wpi.first.wpilib.plugins.core.menu/edu.wpi.first.wpilib.plugins.core.actions"
++               tooltip="Launch the SmartDashboard to get feedback from a simulated robot.">
++         </action>
+          <action
+                class="edu.wpi.first.wpilib.plugins.core.actions.RunRobotBuilderAction"
+                icon="icons/robotbuilder16x16.png"

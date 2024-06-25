@@ -1,0 +1,97 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Tue, 29 Jul 2014 17:10:36 -0400
+Subject: [PATCH 0244/6262] Change deploys to use MDNS and to retry tail on
+ missing file (fixes artf2663)
+
+Change-Id: I3223868968ae1d55314d76018a5dd98eaac14255
+---
+ .../src/main/resources/cpp-zip/ant/build.xml     | 16 +++++++---------
+ .../src/main/resources/java-zip/ant/build.xml    | 10 ++++------
+ 2 files changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+index 270dea8fea9cf413d689ae92a052c3b0e8d38d1f..eb6f64efdd407c98c4b8ed1cceb2bf96578180b6 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ 
+ <project name="athena-project-build" default="deploy">
+-  
++
+   <!-- Load Tasks -->
+   <taskdef resource="net/sf/antcontrib/antlib.xml">
+     <classpath>
+@@ -19,12 +19,10 @@
+   <!-- Targets -->
+ 
+   <target name="get-target-ip">
+-    <math result="ip.upper" operand1="${team-number}" operation="/" operand2="100" datatype="int"/>
+-    <math result="ip.lower" operand1="${team-number}" operation="%" operand2="100" datatype="int"/>
+-    <property name="target" value="10.${ip.upper}.${ip.lower}.2" />
+-     <echo>Target IP: ${target}</echo>
++    <property name="target" value="roboRIO-${team-number}.local" />
++    <echo>Target: ${target}</echo>
+   </target>
+-  
++
+   <target name="deploy" depends="get-target-ip" description="Deploy the progam and start it running.">
+     <sshexec host="${target}"
+          username="${username}"
+@@ -32,11 +30,11 @@
+          trust="true"
+          failonerror="no"
+          command="rm ${deploy.dir}/FRCUserProgram" />
+-    
++
+     <echo>[athena-deploy] Copying code over.</echo>
+     <scp file="${out.exe}" sftp="true" todir="${username}@${target}:${deploy.dir}" password="${password}" trust="true"/>
+     <scp file="${wpilib.ant.dir}/robotCommand" todir="${username}@${target}:/home/lvuser/" password="${password}" trust="true"/>
+-    
++
+     <echo>[athena-deploy] Starting program.</echo>
+     <sshexec host="${target}"
+        username="${username}"
+@@ -48,7 +46,7 @@
+        username="${username}"
+        password="${password}"
+        trust="true"
+-       command="tail -f -s 0 -n 1 ${deploy.log.file}"/>
++       command="tail -F -s 0 -n 0 ${deploy.log.file}"/>
+   </target>
+ 
+   <target name="debug-deploy" depends="get-target-ip" description="Deploy the jar and start the program running in debug mode.">
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+index 0f238ff56910293291f1d92e3a32f1b3b7fd2e58..a515d8fc6b570ba876d1b557528b9fa1fa2f5d34 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+@@ -19,10 +19,8 @@
+   <!-- Targets -->
+ 
+   <target name="get-target-ip">
+-    <math result="ip.upper" operand1="${team-number}" operation="/" operand2="100" datatype="int"/>
+-    <math result="ip.lower" operand1="${team-number}" operation="%" operand2="100" datatype="int"/>
+-    <property name="target" value="10.${ip.upper}.${ip.lower}.2" />
+-     <echo>Target IP: ${target}</echo>
++    <property name="target" value="roboRIO-${team-number}.local" />
++     <echo>Target: ${target}</echo>
+   </target>
+ 
+   <target name="compile" description="Compile the source code.">
+@@ -78,13 +76,13 @@
+        username="${username}"
+        password="${password}"
+        trust="true"
+-       command=". /etc/profile.d/natinst-path.sh; chmod a+x run*program; ${deploy.kill.command};"/>
++       command=". /etc/profile.d/natinst-path.sh; ${deploy.kill.command};"/>
+ 
+     <sshexec host="${target}"
+        username="${username}"
+        password="${password}"
+        trust="true"
+-       command="tail -f -s 0 -n 1 ${deploy.log.file}"/>
++       command="tail -F -s 0 -n 0 ${deploy.log.file}"/>
+   </target>
+ 
+   <target name="debug-deploy" depends="get-target-ip,jar" description="Deploy the jar and start the program running.">

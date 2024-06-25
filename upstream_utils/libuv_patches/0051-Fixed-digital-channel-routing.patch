@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Thu, 15 May 2014 17:55:21 -0400
+Subject: [PATCH 0051/6262] Fixed digital channel routing
+
+Change-Id: Id670db98c0aaa53a7b126a4fb42b736e25e18c4a
+---
+ wpilibc/include/DigitalModule.h | 4 ++--
+ wpilibc/lib/DigitalInput.cpp    | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/wpilibc/include/DigitalModule.h b/wpilibc/include/DigitalModule.h
+index 1ab4c9bca2aac4df457fe26b2c9097c839d8a740..b6a9206818c1accb25be315505548feb44e0eab8 100644
+--- a/wpilibc/include/DigitalModule.h
++++ b/wpilibc/include/DigitalModule.h
+@@ -53,8 +53,8 @@ public:
+ 	I2C* GetI2C(uint32_t address);
+ 
+ 	static DigitalModule* GetInstance(uint8_t moduleNumber);
+-	static uint8_t RemapDigitalChannel(uint32_t channel) { return channel; }; // TODO: Need channel validation
+-	static uint8_t UnmapDigitalChannel(uint32_t channel) { return channel; }; // TODO: Need channel validation
++	static uint8_t RemapDigitalChannel(uint32_t channel) { return 15 - channel; }; // TODO: Need channel validation
++	static uint8_t UnmapDigitalChannel(uint32_t channel) { return 15 - channel; }; // TODO: Need channel validation
+ 
+ private:
+ 	uint8_t m_module;
+diff --git a/wpilibc/lib/DigitalInput.cpp b/wpilibc/lib/DigitalInput.cpp
+index 9d5be5468227f7979669cd8be66d254ec996a4ad..4de69f70684c08471a9d7ebeb66319b41929e38a 100644
+--- a/wpilibc/lib/DigitalInput.cpp
++++ b/wpilibc/lib/DigitalInput.cpp
+@@ -105,7 +105,7 @@ uint32_t DigitalInput::GetChannel()
+  */
+ uint32_t DigitalInput::GetChannelForRouting()
+ {
+-	return DigitalModule::RemapDigitalChannel(GetChannel() - 1);
++	return GetChannel() - 1;
+ }
+ 
+ /**

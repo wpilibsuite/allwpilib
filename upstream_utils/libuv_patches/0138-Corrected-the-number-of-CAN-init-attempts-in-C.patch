@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Thu, 26 Jun 2014 17:26:56 -0400
+Subject: [PATCH 0138/6262] Corrected the number of CAN init attempts in C++
+
+Change-Id: Ic86e922b977653515593947d2b3b413c83e056ac
+---
+ wpilibc/wpilibC++/lib/CANJaguar.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpilibc/wpilibC++/lib/CANJaguar.cpp b/wpilibc/wpilibC++/lib/CANJaguar.cpp
+index 9c8d01be39f0fe0bc54ed9b2d2511aba53eb5c2a..f5bac93f1a086f2cc26d1f54e34588cc8a679f23 100644
+--- a/wpilibc/wpilibC++/lib/CANJaguar.cpp
++++ b/wpilibc/wpilibC++/lib/CANJaguar.cpp
+@@ -30,7 +30,7 @@ constexpr double CANJaguar::kApproxBusVoltage;
+ static const int32_t kSendMessagePeriod = 20;
+ static const uint32_t kFullMessageIDMask = (CAN_MSGID_API_M | CAN_MSGID_MFR_M | CAN_MSGID_DTYPE_M);
+ 
+-static const int32_t kReceiveStatusAttempts = 5000;
++static const int32_t kReceiveStatusAttempts = 50;
+ 
+ static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data, uint8_t dataSize, int32_t period)
+ {

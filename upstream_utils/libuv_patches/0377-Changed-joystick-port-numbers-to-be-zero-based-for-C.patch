@@ -1,0 +1,234 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Wed, 1 Oct 2014 11:25:51 -0400
+Subject: [PATCH 0377/6262] Changed joystick port numbers to be zero-based for
+ C++ and Java.
+
+Change-Id: Ifd55e8654be3b15abbe7460d2e9e6fff8acd9977
+---
+ .../resources/templates/examples/GearsBot/src/OI.cpp |  2 +-
+ .../templates/examples/GettingStarted/src/Robot.cpp  |  2 +-
+ .../resources/templates/examples/PacGoat/src/OI.cpp  |  2 +-
+ .../resources/templates/sample/Robot.cpp             |  2 +-
+ .../src/org/usfirst/frc/team190/robot/OI.java        |  2 +-
+ .../src/org/usfirst/frc/team190/robot/Robot.java     |  2 +-
+ .../src/org/usfirst/frc/team190/pacgoat/OI.java      |  2 +-
+ .../resources/templates/sample/Robot.java            |  2 +-
+ wpilibc/wpilibC++Devices/src/DriverStation.cpp       |  8 ++++----
+ wpilibc/wpilibC++Devices/src/Joystick.cpp            | 12 ++++++++----
+ .../java/edu/wpi/first/wpilibj/DriverStation.java    | 12 ++++++------
+ 11 files changed, 26 insertions(+), 22 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/OI.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/OI.cpp
+index 458e90927325a06eb658c64f4f8023aca8c0e038..de47c3ae6de7d4544dd77f9c724988de630b93ae 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/OI.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GearsBot/src/OI.cpp
+@@ -19,7 +19,7 @@ OI::OI() {
+ 	SmartDashboard::PutData("Open Claw", new OpenClaw());
+ 	SmartDashboard::PutData("Close Claw", new CloseClaw());
+ 
+-	joy= new Joystick(1);
++	joy= new Joystick(0);
+ 
+ 
+     // Create some buttons
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GettingStarted/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GettingStarted/src/Robot.cpp
+index dcbadc89c6435ebecb031d7e93f527b2a8c809ae..478a43ac3c0240b9f5e938d3a9ca3217f1bfc71c 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GettingStarted/src/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/GettingStarted/src/Robot.cpp
+@@ -11,7 +11,7 @@ class Robot: public IterativeRobot
+ public:
+ 	Robot() :
+ 		myRobot(0, 1),	// these must be initialized in the same order
+-		stick(1),		// as they are declared above.
++		stick(0),		// as they are declared above.
+ 		lw(NULL),
+ 		autoLoopCounter(0)
+ 	{
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/OI.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/OI.cpp
+index 51698dfae24cb4f3d13be1294102c3a736622d4a..93954a13266a03407c25032718d588d0a7fcdb10 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/OI.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/OI.cpp
+@@ -10,7 +10,7 @@
+ #include "Commands/SetCollectionSpeed.h"
+ 
+ OI::OI() {
+-	joystick = new Joystick(1);
++	joystick = new Joystick(0);
+ 
+ 	R1 = new JoystickButton(joystick, 12);
+ 	R1->WhenPressed(new LowGoal());
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp
+index 66ae6a723ed65ff4782fbe583c4503cd661d04ab..eb197047356a8057b7bb9d4fd9811c4294f9826a 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/sample/Robot.cpp
+@@ -18,7 +18,7 @@ class Robot: public SampleRobot
+ public:
+ 	Robot() :
+ 			myRobot(0, 1),	// these must be initialized in the same order
+-			stick(1)		// as they are declared above.
++			stick(0)		// as they are declared above.
+ 	{
+ 		myRobot.SetExpiration(0.1);
+ 	}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GearsBot/src/org/usfirst/frc/team190/robot/OI.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GearsBot/src/org/usfirst/frc/team190/robot/OI.java
+index ec443a0b50b80437c54ce0d4cc524c2991e89847..19b93f17edc09a6f5808ff6bdf5cfc858d18215a 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GearsBot/src/org/usfirst/frc/team190/robot/OI.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GearsBot/src/org/usfirst/frc/team190/robot/OI.java
+@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+  * interface to the commands and command groups that allow control of the robot.
+  */
+ public class OI {
+-    private Joystick joy = new Joystick(1);
++    private Joystick joy = new Joystick(0);
+ 
+     public OI() {
+     	// Put Some buttons on the SmartDashboard
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GettingStarted/src/org/usfirst/frc/team190/robot/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GettingStarted/src/org/usfirst/frc/team190/robot/Robot.java
+index 6d5a5d6d8e024a4fe3aef6692e216b55cc258575..9524c5654792281130dd16c5f54875b0ca0d8c46 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GettingStarted/src/org/usfirst/frc/team190/robot/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/GettingStarted/src/org/usfirst/frc/team190/robot/Robot.java
+@@ -23,7 +23,7 @@ public class Robot extends IterativeRobot {
+      */
+     public void robotInit() {
+     	myRobot = new RobotDrive(0,1);
+-    	stick = new Joystick(1);
++    	stick = new Joystick(0);
+     }
+     
+     /**
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/OI.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/OI.java
+index d9e0049de3c7ac3231676fe712609385444ce63b..cdd515b3f421078cf92077464b06965d66310f3c 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/OI.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/OI.java
+@@ -23,7 +23,7 @@ public class OI {
+ 	public Joystick joystick;
+ 
+ 	public OI() {
+-		joystick = new Joystick(1);
++		joystick = new Joystick(0);
+ 		
+ 		new JoystickButton(joystick, 12).whenPressed(new LowGoal());
+ 		new JoystickButton(joystick, 10).whenPressed(new Collect());
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java
+index d8a47b59633a7b94e498c772d0d3e075b5c02f23..56da2a82afa03683de603da9d5ec0015a2f97da7 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/sample/Robot.java
+@@ -30,7 +30,7 @@ public class Robot extends SampleRobot {
+     public Robot() {
+         myRobot = new RobotDrive(0, 1);
+         myRobot.setExpiration(0.1);
+-        stick = new Joystick(1);
++        stick = new Joystick(0);
+     }
+ 
+     /**
+diff --git a/wpilibc/wpilibC++Devices/src/DriverStation.cpp b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+index 8c35b93ae70b22643633482b60199956b6ed0ec8..72e34b1805f26399aed1fd2836a84e663c654527 100644
+--- a/wpilibc/wpilibC++Devices/src/DriverStation.cpp
++++ b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+@@ -179,7 +179,7 @@ float DriverStation::GetBatteryVoltage()
+  */
+ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
+ {
+-	if (stick < 1 || stick > kJoystickPorts)
++	if (stick >= kJoystickPorts)
+ 	{
+ 		wpi_setWPIError(BadJoystickIndex);
+ 		return 0;
+@@ -191,7 +191,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
+ 		return 0.0f;
+ 	}
+ 
+-	int8_t value = m_joystickAxes[stick - 1].axes[axis - 1];
++	int8_t value = m_joystickAxes[stick].axes[axis - 1];
+ 
+ 	if(value < 0)
+ 	{
+@@ -212,13 +212,13 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
+  */
+ short DriverStation::GetStickButtons(uint32_t stick)
+ {
+-	if (stick < 1 || stick > kJoystickPorts)
++	if (stick >= kJoystickPorts)
+ 	{
+ 		wpi_setWPIError(BadJoystickIndex);
+ 		return 0;
+ 	}
+ 
+-	return m_joystickButtons[stick - 1];
++	return m_joystickButtons[stick];
+ }
+ 
+ bool DriverStation::IsEnabled()
+diff --git a/wpilibc/wpilibC++Devices/src/Joystick.cpp b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+index 426c78b83ba0acde643aaec3ab43493e5e5837e8..018e78cba8c585ab3a5795026bb67f19a0208eba 100644
+--- a/wpilibc/wpilibC++Devices/src/Joystick.cpp
++++ b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+@@ -73,8 +73,12 @@ void Joystick::InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes)
+ 			joysticks[i] = NULL;
+ 		joySticksInitialized = true;
+ 	}
+-	joysticks[m_port - 1] = this;
+-	
++	if (m_port >= DriverStation::kJoystickPorts) {
++		wpi_setWPIError(BadJoystickIndex);
++	} else {
++		joysticks[m_port] = this;
++	}
++
+ 	m_ds = DriverStation::GetInstance();
+ 	m_axes = new uint32_t[numAxisTypes];
+ 	m_buttons = new uint32_t[numButtonTypes];
+@@ -82,11 +86,11 @@ void Joystick::InitJoystick(uint32_t numAxisTypes, uint32_t numButtonTypes)
+ 
+ Joystick * Joystick::GetStickForPort(uint32_t port)
+ {
+-	Joystick *stick = joysticks[port - 1];
++	Joystick *stick = joysticks[port];
+ 	if (stick == NULL)
+ 	{
+ 		stick = new Joystick(port);
+-		joysticks[port - 1] = stick;
++		joysticks[port] = stick;
+ 	}
+ 	return stick;
+ }
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index 0678e303f236ace22782e596e76d9f315b222c2c..c531c53e6adfde5c157b7febfb2b0aadf1d3bc47 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -224,15 +224,15 @@ public class DriverStation implements RobotState.Interface {
+      * @return The value of the axis on the joystick.
+      */
+     public double getStickAxis(int stick, int axis) {
+-        if(stick < 1 || stick > kJoystickPorts) {
+-            throw new RuntimeException("Joystick index is out of range, should be 1-4");
++        if(stick < 0 || stick >= kJoystickPorts) {
++            throw new RuntimeException("Joystick index is out of range, should be 0-3");
+         }
+ 
+         if (axis < 1 || axis > kJoystickAxes) {
+             throw new RuntimeException("Joystick axis is out of range");
+         }
+ 
+-        byte value = (byte)m_joystickAxes[stick - 1][axis - 1];
++        byte value = (byte)m_joystickAxes[stick][axis - 1];
+ 
+         if(value < 0) {
+             return value / 128.0;
+@@ -249,11 +249,11 @@ public class DriverStation implements RobotState.Interface {
+      * @return The state of the buttons on the joystick.
+      */
+     public int getStickButtons(final int stick) {
+-        if(stick < 1 || stick > kJoystickPorts) {
+-            throw new RuntimeException("Joystick index is out of range, should be 1-4");
++        if(stick < 0 || stick >= kJoystickPorts) {
++            throw new RuntimeException("Joystick index is out of range, should be 0-3");
+         }
+ 
+-        return (int)m_joystickButtons[stick - 1];
++        return (int)m_joystickButtons[stick];
+     }
+ 
+     /**

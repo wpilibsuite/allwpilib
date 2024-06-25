@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Tue, 12 Aug 2014 17:15:44 -0400
+Subject: [PATCH 0289/6262] Fixed placement of libWPILibAthena.a
+
+Change-Id: Ie50de30bcf911149d18d96e2b510b34424177e15
+---
+ wpilibc/wpilibC++/CMakeLists.txt        | 2 +-
+ wpilibc/wpilibC++Devices/CMakeLists.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/CMakeLists.txt b/wpilibc/wpilibC++/CMakeLists.txt
+index 67a234f5d417d113e8638f492cf88a1db4d37da7..378f1450c372012e4c5e039d1da03476b3d5ad0f 100644
+--- a/wpilibc/wpilibC++/CMakeLists.txt
++++ b/wpilibc/wpilibC++/CMakeLists.txt
+@@ -6,7 +6,7 @@ include_directories(include/ ${NWT_API_INCLUDES} ${HAL_API_INCLUDES})
+ add_library(WPILib STATIC ${SRC_FILES})
+ set(CMAKE_CXX_FLAGS "-fPIC")
+ target_link_libraries(WPILib)
+-INSTALL(TARGETS WPILib ARCHIVE DESTINATION src COMPONENT src)
++INSTALL(TARGETS WPILib ARCHIVE DESTINATION lib COMPONENT lib)
+ INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
+ # lib/ c m gcc_s ld-linux
+ # usr/lib stdc++
+diff --git a/wpilibc/wpilibC++Devices/CMakeLists.txt b/wpilibc/wpilibC++Devices/CMakeLists.txt
+index c6a510786ead8b7f15cffab097503b0dddcc6b3d..595b5a2e31db743183fa1d69557e0e6a0fca4709 100644
+--- a/wpilibc/wpilibC++Devices/CMakeLists.txt
++++ b/wpilibc/wpilibC++Devices/CMakeLists.txt
+@@ -5,7 +5,7 @@ file(GLOB_RECURSE SRC_FILES src/*.cpp)
+ include_directories(include/ ${WPILIB_INCLUDES} ${HAL_API_INCLUDES} ${NWT_API_INCLUDES})
+ add_library(WPILibAthena STATIC ${SRC_FILES})
+ target_link_libraries(WPILibAthena WPILib HALAthena NetworkTables ${NI_LIBS})
+-INSTALL(TARGETS WPILibAthena ARCHIVE DESTINATION src COMPONENT src)
++INSTALL(TARGETS WPILibAthena ARCHIVE DESTINATION lib COMPONENT lib)
+ INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
+ # lib/ c m gcc_s ld-linux
+ # usr/lib stdc++

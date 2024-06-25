@@ -1,0 +1,629 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Mon, 12 May 2014 16:05:31 -0400
+Subject: [PATCH 0048/6262] Modifies maven files to work with m2e
+
+Change-Id: I3f0cccbdd406f48bcb430af89e77d6b74627918a
+---
+ .../.project                                  | 17 ------
+ .../.classpath                                |  7 ---
+ .../.project                                  | 28 ---------
+ .../.project                                  | 17 ------
+ .../.project                                  | 17 ------
+ .../.classpath                                |  7 ---
+ .../.project                                  | 28 ---------
+ .../.project                                  | 17 ------
+ .../.classpath                                |  7 ---
+ .../.project                                  | 28 ---------
+ .../.project                                  | 17 ------
+ .../.classpath                                |  7 ---
+ .../.project                                  | 28 ---------
+ .../.classpath                                |  7 ---
+ .../edu.wpi.first.wpilib.plugins.cpp/.project | 28 ---------
+ .../edu.wpi.first.wpilib.plugins.cpp/pom.xml  |  2 +
+ .../.project                                  | 17 ------
+ .../.classpath                                |  7 ---
+ .../.project                                  | 34 -----------
+ .../edu.wpi.first.wpilib.plugins.java/pom.xml |  2 +
+ .../.project                                  | 17 ------
+ pom.xml                                       | 60 ++++++++++---------
+ wpilibj/wpilibJavaFinal/pom.xml               |  2 +
+ 23 files changed, 37 insertions(+), 364 deletions(-)
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.core.feature/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.core/.classpath
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.core/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.feature/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/.classpath
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/.classpath
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/.classpath
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/.classpath
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.java.feature/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.java/.classpath
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.java/.project
+ delete mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/.project
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core.feature/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core.feature/.project
+deleted file mode 100644
+index ade1d91b15a3ba2ba62e19ae190f172d9f928e4a..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core.feature/.project
++++ /dev/null
+@@ -1,17 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.core.feature</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.pde.FeatureBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.FeatureNature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/.classpath b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/.classpath
+deleted file mode 100644
+index c0b4c7e1122f042f36cbb1fb30421814da72ce9d..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/.classpath
++++ /dev/null
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<classpath>
+-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+-	<classpathentry kind="src" path="src/main/java"/>
+-	<classpathentry kind="output" path="bin"/>
+-</classpath>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/.project
+deleted file mode 100644
+index 10ca0d4f0395ba2c3ed79978b03e79245edc1e21..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/.project
++++ /dev/null
+@@ -1,28 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.core</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.jdt.core.javabuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.ManifestBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.SchemaBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.PluginNature</nature>
+-		<nature>org.eclipse.jdt.core.javanature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.feature/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.feature/.project
+deleted file mode 100644
+index cb3157daa3bf62ad75dcd93fc9760470b2612e98..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.feature/.project
++++ /dev/null
+@@ -1,17 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.cpp.feature</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.pde.FeatureBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.FeatureNature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature/.project
+deleted file mode 100644
+index d7ffa026d485b0e4c3e474f6bf551bebaeef62d3..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature/.project
++++ /dev/null
+@@ -1,17 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.pde.FeatureBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.FeatureNature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/.classpath b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/.classpath
+deleted file mode 100644
+index 098194ca4b7d8f45177f94e735506ae3a26b5c94..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/.classpath
++++ /dev/null
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<classpath>
+-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+-	<classpathentry kind="src" path="src"/>
+-	<classpathentry kind="output" path="bin"/>
+-</classpath>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/.project
+deleted file mode 100644
+index 8317f12f59f29cc26e74838a574fd80189573968..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/.project
++++ /dev/null
+@@ -1,28 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.cpp.toolchains.linux</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.jdt.core.javabuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.ManifestBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.SchemaBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.PluginNature</nature>
+-		<nature>org.eclipse.jdt.core.javanature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature/.project
+deleted file mode 100644
+index eedadaa4a77fdd5b68d55e4de6a053269a2bb682..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature/.project
++++ /dev/null
+@@ -1,17 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.pde.FeatureBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.FeatureNature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/.classpath b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/.classpath
+deleted file mode 100644
+index 098194ca4b7d8f45177f94e735506ae3a26b5c94..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/.classpath
++++ /dev/null
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<classpath>
+-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+-	<classpathentry kind="src" path="src"/>
+-	<classpathentry kind="output" path="bin"/>
+-</classpath>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/.project
+deleted file mode 100644
+index bb3deccb96c078164a9458755f77964f69d93287..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/.project
++++ /dev/null
+@@ -1,28 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.cpp.toolchains.mac</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.jdt.core.javabuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.ManifestBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.SchemaBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.PluginNature</nature>
+-		<nature>org.eclipse.jdt.core.javanature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature/.project
+deleted file mode 100644
+index d7a19269543449f51225880e4b2f364e3bc6f242..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature/.project
++++ /dev/null
+@@ -1,17 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.pde.FeatureBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.FeatureNature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/.classpath b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/.classpath
+deleted file mode 100644
+index 098194ca4b7d8f45177f94e735506ae3a26b5c94..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/.classpath
++++ /dev/null
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<classpath>
+-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+-	<classpathentry kind="src" path="src"/>
+-	<classpathentry kind="output" path="bin"/>
+-</classpath>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/.project
+deleted file mode 100644
+index 4b17efb32b71535e50911d669b54600b7959c09c..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/.project
++++ /dev/null
+@@ -1,28 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.cpp.toolchains.windows</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.jdt.core.javabuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.ManifestBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.SchemaBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.PluginNature</nature>
+-		<nature>org.eclipse.jdt.core.javanature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/.classpath b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/.classpath
+deleted file mode 100644
+index c0b4c7e1122f042f36cbb1fb30421814da72ce9d..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/.classpath
++++ /dev/null
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<classpath>
+-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+-	<classpathentry kind="src" path="src/main/java"/>
+-	<classpathentry kind="output" path="bin"/>
+-</classpath>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/.project
+deleted file mode 100644
+index 325460c3af26d23f3a76cfe268731ab51aab425d..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/.project
++++ /dev/null
+@@ -1,28 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.cpp</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.jdt.core.javabuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.ManifestBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.SchemaBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.PluginNature</nature>
+-		<nature>org.eclipse.jdt.core.javanature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml
+index c74a120789bb7ed3a81aa5ec13578e56b3d919b6..4f00e6d358402a3993a92429a9bf78e9e0b0d1fe 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml
+@@ -23,6 +23,7 @@
+ 				<filtering>true</filtering>
+ 			</resource>
+ 		</resources>
++		<pluginManagement>
+ 		<plugins>
+ 			<plugin>
+ 				<artifactId>maven-resources-plugin</artifactId>
+@@ -133,6 +134,7 @@
+ 				</executions>
+ 			</plugin>
+ 		</plugins>
++		</pluginManagement>
+ 	</build>
+ 	<dependencies>
+ 		<dependency>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java.feature/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java.feature/.project
+deleted file mode 100644
+index bd4257bb4d70ad4e9df5469bccddf2adb913638c..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java.feature/.project
++++ /dev/null
+@@ -1,17 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.java.feature</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.pde.FeatureBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.FeatureNature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/.classpath b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/.classpath
+deleted file mode 100644
+index c0b4c7e1122f042f36cbb1fb30421814da72ce9d..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/.classpath
++++ /dev/null
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<classpath>
+-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+-	<classpathentry kind="src" path="src/main/java"/>
+-	<classpathentry kind="output" path="bin"/>
+-</classpath>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/.project
+deleted file mode 100644
+index 02b92fbf3402769c73b97569a2b6636cbd5dea4f..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/.project
++++ /dev/null
+@@ -1,34 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.java</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.jdt.core.javabuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.ManifestBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.pde.SchemaBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-		<buildCommand>
+-			<name>org.eclipse.m2e.core.maven2Builder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+-		<nature>org.eclipse.pde.PluginNature</nature>
+-		<nature>org.eclipse.jdt.core.javanature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
+index 148b79fb985391736d87b3fe61779b66d61c7e38..5e668e56c571b672728cb9cbef28a56c98c90069 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
+@@ -40,6 +40,7 @@
+ 		<filtering>true</filtering>
+       </resource>
+ 	</resources>
++	<pluginManagement>
+ 	<plugins>
+ 	  <plugin>
+         <artifactId>maven-resources-plugin</artifactId>
+@@ -206,6 +207,7 @@
+ 		</executions>
+ 	  </plugin>
+     </plugins>
++	</pluginManagement>
+   </build>
+   
+   <dependencies>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/.project b/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/.project
+deleted file mode 100644
+index 0bbfd83d3fb8c91a8cab85b95e5d09918a988084..0000000000000000000000000000000000000000
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/.project
++++ /dev/null
+@@ -1,17 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<projectDescription>
+-	<name>edu.wpi.first.wpilib.plugins.updatesite</name>
+-	<comment></comment>
+-	<projects>
+-	</projects>
+-	<buildSpec>
+-		<buildCommand>
+-			<name>org.eclipse.pde.UpdateSiteBuilder</name>
+-			<arguments>
+-			</arguments>
+-		</buildCommand>
+-	</buildSpec>
+-	<natures>
+-		<nature>org.eclipse.pde.UpdateSiteNature</nature>
+-	</natures>
+-</projectDescription>
+diff --git a/pom.xml b/pom.xml
+index bff1e228325ead06e217a24cf7ba23e274c904d5..ce3bf52c0f4f937c91180f7917a0712bfe453371 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -14,34 +14,36 @@
+ 		<module>driver-station</module>
+ 	</modules>
+ 	<build>
+-		<plugins>
+-			<plugin>
+-				<groupId>org.apache.maven.plugins</groupId>
+-				<artifactId>maven-enforcer-plugin</artifactId>
+-				<version>1.3.1</version>
+-				<executions>
+-					<execution>
+-						<id>enforce-maven</id>
+-						<goals>
+-							<goal>enforce</goal>
+-						</goals>
+-						<configuration>
+-							<rules>
+-								<requireMavenVersion>
+-									<!-- Require Maven version > 3.0.0, but exclude
+-                  3.1.0 due to http://jira.codehaus.org/browse/MNG-5503
+-                  -->
+-									<version>[3.0.0,3.1.0), (3.1.0,)</version>
+-									<message>WPILib has been tested with Maven 3.0.0+. 
+-Note: Maven 3.1.0 is not supported due to Maven bug MNG-5503 (http://jira.codehaus.org/browse/MNG-5503). Please upgrade
+-to Maven 3.1.1 or later.
+-                  </message>
+-								</requireMavenVersion>
+-							</rules>
+-						</configuration>
+-					</execution>
+-				</executions>
+-			</plugin>
+-		</plugins>
++		<pluginManagement>
++			<plugins>
++				<plugin>
++					<groupId>org.apache.maven.plugins</groupId>
++					<artifactId>maven-enforcer-plugin</artifactId>
++					<version>1.3.1</version>
++					<executions>
++						<execution>
++							<id>enforce-maven</id>
++							<goals>
++								<goal>enforce</goal>
++							</goals>
++							<configuration>
++								<rules>
++									<requireMavenVersion>
++										<!-- Require Maven version > 3.0.0, but exclude
++	                  3.1.0 due to http://jira.codehaus.org/browse/MNG-5503
++	                  -->
++										<version>[3.0.0,3.1.0), (3.1.0,)</version>
++										<message>WPILib has been tested with Maven 3.0.0+. 
++	Note: Maven 3.1.0 is not supported due to Maven bug MNG-5503 (http://jira.codehaus.org/browse/MNG-5503). Please upgrade
++	to Maven 3.1.1 or later.
++	                  </message>
++									</requireMavenVersion>
++								</rules>
++							</configuration>
++						</execution>
++					</executions>
++				</plugin>
++			</plugins>
++		</pluginManagement>
+ 	</build>
+ </project>
+diff --git a/wpilibj/wpilibJavaFinal/pom.xml b/wpilibj/wpilibJavaFinal/pom.xml
+index a2bf252b9b2943d62fddc37930a1bfee259e6caf..028de650e7a035753501ddde0fee15c2a0fa942b 100644
+--- a/wpilibj/wpilibJavaFinal/pom.xml
++++ b/wpilibj/wpilibJavaFinal/pom.xml
+@@ -42,6 +42,7 @@
+   </dependencies>
+ 
+   <build>
++  <pluginManagement>
+ 	<plugins>
+ 	  <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+@@ -112,5 +113,6 @@
+       </executions>
+       </plugin>
+ 	</plugins>
++  </pluginManagement>
+   </build>
+ </project>

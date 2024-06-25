@@ -1,0 +1,699 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Wed, 23 Jul 2014 16:55:45 -0400
+Subject: [PATCH 0190/6262] Remove the Kinect code from C++
+
+Change-Id: Ifef909a8948f1d0f881bf394b9a3ba925644306f
+---
+ wpilibc/wpilibC++/include/Kinect.h            |  79 -------
+ wpilibc/wpilibC++/include/KinectStick.h       |  56 -----
+ wpilibc/wpilibC++/include/Skeleton.h          |  81 -------
+ wpilibc/wpilibC++/include/WPILib.h            |   2 -
+ wpilibc/wpilibC++/lib/AnalogTriggerOutput.cpp |   5 +-
+ wpilibc/wpilibC++/lib/Kinect.cpp              | 196 -----------------
+ wpilibc/wpilibC++/lib/KinectStick.cpp         | 201 ------------------
+ 7 files changed, 2 insertions(+), 618 deletions(-)
+ delete mode 100644 wpilibc/wpilibC++/include/Kinect.h
+ delete mode 100644 wpilibc/wpilibC++/include/KinectStick.h
+ delete mode 100644 wpilibc/wpilibC++/include/Skeleton.h
+ delete mode 100644 wpilibc/wpilibC++/lib/Kinect.cpp
+ delete mode 100644 wpilibc/wpilibC++/lib/KinectStick.cpp
+
+diff --git a/wpilibc/wpilibC++/include/Kinect.h b/wpilibc/wpilibC++/include/Kinect.h
+deleted file mode 100644
+index 46501cc67e49a407e11155c975eef4fe99c0af31..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/include/Kinect.h
++++ /dev/null
+@@ -1,79 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "SensorBase.h"
+-#include "Skeleton.h"
+-
+-#include "HAL/Semaphore.hpp"
+-
+-#define kNumSkeletons 1
+-
+-/**
+- * Handles raw data input from the FRC Kinect Server
+- * when used with a Kinect device connected to the Driver Station.
+- * Each time a value is requested the most recent value is returned.
+- * See Getting Started with Microsoft Kinect for FRC and the Kinect
+- * for Windows SDK API reference for more information
+- */
+-class Kinect : public SensorBase
+-{
+-public:
+-	enum SkeletonTrackingState
+-	{
+-		kNotTracked,
+-		kPositionOnly,
+-		kTracked
+-	};
+-	enum SkeletonQuality
+-	{
+-		kClippedRight = 1,
+-		kClippedLeft = 2,
+-		kClippedTop = 4,
+-		kClippedBottom = 8
+-	};
+-	struct Point4
+-	{
+-		float x;
+-		float y;
+-		float z;
+-		float w;
+-	};
+-
+-	int GetNumberOfPlayers();
+-	Point4 GetFloorClipPlane();
+-	Point4 GetGravityNormal();
+-	Skeleton GetSkeleton(int skeletonIndex = 1);
+-	Point4 GetPosition(int skeletonIndex = 1);
+-	uint32_t GetQuality(int skeletonIndex = 1);
+-	SkeletonTrackingState GetTrackingState(int skeletonIndex = 1);
+-
+-	static Kinect *GetInstance();
+-
+-private:
+-	Kinect();
+-	~Kinect();
+-	void UpdateData();
+-
+-	DISALLOW_COPY_AND_ASSIGN(Kinect);
+-
+-	uint32_t m_recentPacketNumber;
+-	MUTEX_ID m_dataLock;
+-	int m_numberOfPlayers;
+-	Point4 m_floorClipPlane;
+-	Point4 m_gravityNormal;
+-	Point4 m_position[kNumSkeletons];
+-	uint32_t m_quality[kNumSkeletons];
+-	SkeletonTrackingState m_trackingState[kNumSkeletons];
+-	Skeleton m_skeletons[kNumSkeletons];
+-
+-	// TODO: Include structs for this data format (would be clearer than 100 magic numbers)
+-	char m_rawHeader[46];
+-	char m_rawSkeletonExtra[42];
+-	char m_rawSkeleton[242];
+-
+-	static Kinect *_instance;
+-};
+diff --git a/wpilibc/wpilibC++/include/KinectStick.h b/wpilibc/wpilibC++/include/KinectStick.h
+deleted file mode 100644
+index 43a598f894ce06828ea32dcffb1129b9f1353684..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/include/KinectStick.h
++++ /dev/null
+@@ -1,56 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-#include "ErrorBase.h"
+-#include "GenericHID.h"
+-
+-/**
+- * Handles input from the Joystick data sent by the FRC Kinect Server
+- * when used with a Kinect device connected to the Driver Station.
+- * Each time a value is requested the most recent value is returned.
+- * Default gestures embedded in the FRC Kinect Server are described
+- * in the document Getting Started with Microsoft Kinect for FRC.
+- */
+-class KinectStick : public GenericHID, public ErrorBase
+-{
+-public:
+-	explicit KinectStick(int id);
+-	virtual float GetX(JoystickHand hand = kRightHand);
+-	virtual float GetY(JoystickHand hand = kRightHand);
+-	virtual float GetZ();
+-	virtual float GetTwist();
+-	virtual float GetThrottle();
+-	virtual float GetRawAxis(uint32_t axis);
+-
+-	virtual bool GetTrigger(JoystickHand hand = kRightHand);
+-	virtual bool GetTop(JoystickHand hand = kRightHand);
+-	virtual bool GetBumper(JoystickHand hand = kRightHand);
+-	virtual bool GetRawButton(uint32_t button);
+-
+-private:
+-	void GetData();
+-	float ConvertRawToFloat(int8_t charValue);
+-
+-	typedef union
+-	{
+-		struct
+-		{
+-			uint8_t size;
+-			uint8_t id;
+-			struct
+-			{
+-				unsigned char axis[6];
+-				unsigned short buttons;
+-			} rawSticks[2];
+-		} formatted;
+-		char data[18];
+-	} KinectStickData;
+-
+-	int m_id;
+-	static uint32_t _recentPacketNumber;
+-	static KinectStickData _sticks;
+-};
+diff --git a/wpilibc/wpilibC++/include/Skeleton.h b/wpilibc/wpilibC++/include/Skeleton.h
+deleted file mode 100644
+index 7e19b9404ea3a7e26618b3d2a52e2a57c6410f27..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/include/Skeleton.h
++++ /dev/null
+@@ -1,81 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
+-
+-/**
+- * Represents Skeleton data from a Kinect device connected to the 
+- * Driver Station. See Getting Started with Microsoft Kinect for 
+- * FRC and the Kinect for Windows SDK API reference for more information
+- */
+-class Skeleton
+-{
+-	friend class Kinect;
+-public:
+-	enum JointTypes
+-	{
+-		HipCenter = 0,
+-		Spine = 1,
+-		ShoulderCenter = 2,
+-		Head = 3,
+-		ShoulderLeft = 4,
+-		ElbowLeft = 5,
+-		WristLeft = 6,
+-		HandLeft = 7,
+-		ShoulderRight = 8,
+-		ElbowRight = 9,
+-		WristRight = 10,
+-		HandRight = 11,
+-		HipLeft = 12,
+-		KneeLeft = 13,
+-		AnkleLeft = 14,
+-		FootLeft = 15,
+-		HipRight = 16,
+-		KneeRight = 17,
+-		AnkleRight = 18,
+-		FootRight = 19,
+-		JointCount = 20
+-	};
+-
+-	enum JointTrackingState
+-	{
+-		kNotTracked,
+-		kInferred,
+-		kTracked
+-	};
+-
+-	struct Joint
+-	{
+-		float x;
+-		float y;
+-		float z;
+-		JointTrackingState trackingState;
+-	};
+-
+-	Joint GetHandRight() { return m_joints[HandRight]; }
+-	Joint GetHandLeft() { return m_joints[HandLeft]; }
+-	Joint GetWristRight() { return m_joints[WristRight]; }
+-	Joint GetWristLeft() { return m_joints[WristLeft]; }
+-	Joint GetElbowLeft() { return m_joints[ElbowLeft]; }
+-	Joint GetElbowRight() { return m_joints[ElbowRight]; }
+-	Joint GetShoulderLeft() { return m_joints[ShoulderLeft]; }
+-	Joint GetShoulderRight() { return m_joints[ShoulderRight]; }
+-	Joint GetShoulderCenter() { return m_joints[ShoulderCenter]; }
+-	Joint GetHead() { return m_joints[Head]; }
+-	Joint GetSpine() { return m_joints[Spine]; }
+-	Joint GetHipCenter() { return m_joints[HipCenter]; }
+-	Joint GetHipRight() { return m_joints[HipRight]; }
+-	Joint GetHipLeft() { return m_joints[HipLeft]; }
+-	Joint GetKneeLeft() { return m_joints[KneeLeft]; }
+-	Joint GetKneeRight() { return m_joints[KneeRight]; }
+-	Joint GetAnkleLeft() { return m_joints[AnkleLeft]; }
+-	Joint GetAnkleRight() { return m_joints[AnkleRight]; }
+-	Joint GetFootLeft() { return m_joints[FootLeft]; }
+-	Joint GetFootRight() { return m_joints[FootRight]; }
+-	Joint GetJointValue(JointTypes index) { return m_joints[index]; }
+-
+-private:
+-	Joint m_joints[20];
+-};
+diff --git a/wpilibc/wpilibC++/include/WPILib.h b/wpilibc/wpilibC++/include/WPILib.h
+index 5877fad29cbabc3024e1864e9c34b52dcb2008ff..02a9899916468672b02756f99abf47202725f671 100644
+--- a/wpilibc/wpilibC++/include/WPILib.h
++++ b/wpilibc/wpilibC++/include/WPILib.h
+@@ -58,8 +58,6 @@
+ #include "InterruptableSensorBase.h"
+ #include "Jaguar.h"
+ #include "Joystick.h"
+-#include "Kinect.h"
+-#include "KinectStick.h"
+ #include "Notifier.h"
+ #include "PIDController.h"
+ #include "PIDOutput.h"
+diff --git a/wpilibc/wpilibC++/lib/AnalogTriggerOutput.cpp b/wpilibc/wpilibC++/lib/AnalogTriggerOutput.cpp
+index 056e09b5367eea6ecb6dc00d323516e25681238f..70ad5a5bd7addae8c875e5bd5fd0cf298ed8381a 100644
+--- a/wpilibc/wpilibC++/lib/AnalogTriggerOutput.cpp
++++ b/wpilibc/wpilibC++/lib/AnalogTriggerOutput.cpp
+@@ -11,10 +11,10 @@
+ 
+ /**
+  * Create an object that represents one of the four outputs from an analog trigger.
+- * 
++ *
+  * Because this class derives from DigitalSource, it can be passed into routing functions
+  * for Counter, Encoder, etc.
+- * 
++ *
+  * @param trigger A pointer to the trigger for which this is an output.
+  * @param outputType An enum that specifies the output on the trigger to represent.
+  */
+@@ -80,4 +80,3 @@ void AnalogTriggerOutput::RequestInterrupts(InterruptHandlerFunction handler, vo
+ void AnalogTriggerOutput::RequestInterrupts()
+ {
+ }
+-
+diff --git a/wpilibc/wpilibC++/lib/Kinect.cpp b/wpilibc/wpilibC++/lib/Kinect.cpp
+deleted file mode 100644
+index 7181faa596d1c63766ca953e9b1b0230a64800f8..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/lib/Kinect.cpp
++++ /dev/null
+@@ -1,196 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-
+-#include "Kinect.h"
+-
+-#include "DriverStation.h"
+-//#include "NetworkCommunication/FRCComm.h"
+-//#include "NetworkCommunication/UsageReporting.h"
+-#include "Skeleton.h"
+-#include "HAL/cpp/Synchronized.hpp"
+-#include "WPIErrors.h"
+-#include <cstring>
+-
+-#define kHeaderBundleID HALFRC_NetworkCommunication_DynamicType_Kinect_Header
+-#define kSkeletonExtraBundleID HALFRC_NetworkCommunication_DynamicType_Kinect_Extra1
+-#define kSkeletonBundleID HALFRC_NetworkCommunication_DynamicType_Kinect_Vertices1
+-
+-Kinect *Kinect::_instance = NULL;
+-
+-Kinect::Kinect() :
+-	m_recentPacketNumber(0),
+-	m_numberOfPlayers(0)
+-{
+-	AddToSingletonList();
+-	m_dataLock = initializeMutexNormal();
+-
+-	HALReport(HALUsageReporting::kResourceType_Kinect, 0);
+-}
+-
+-Kinect::~Kinect()
+-{
+-	takeMutex(m_dataLock);
+-	deleteMutex(m_dataLock);
+-}
+-
+-/**
+- * Get the one and only Kinect object
+- * @returns pointer to a Kinect
+- */
+-Kinect *Kinect::GetInstance()
+-{
+-	if (_instance == NULL)
+-		_instance = new Kinect();
+-	return _instance;
+-}
+-
+-/**
+- * Get the number of tracked players on the Kinect
+- * @return the number of players being actively tracked
+- */
+-int Kinect::GetNumberOfPlayers()
+-{
+-	UpdateData();
+-	return m_numberOfPlayers;
+-}
+-
+-/**
+- * Get the floor clip plane as defined in the Kinect SDK
+- * @return The floor clip plane
+- */
+-Kinect::Point4 Kinect::GetFloorClipPlane()
+-{
+-	UpdateData();
+-	return m_floorClipPlane;
+-}
+-
+-/**
+- * Get the gravity normal from the kinect as defined in the Kinect SDK
+- * @return The gravity normal (w is ignored)
+- */
+-Kinect::Point4 Kinect::GetGravityNormal()
+-{
+-	UpdateData();
+-	return m_gravityNormal;
+-}
+-
+-/**
+- * Get the skeleton data
+- * Returns the detected skeleton data from the kinect as defined in the Kinect SDK
+- * @param skeletonIndex Which of (potentially 2) skeletons to return. This is ignored in this implementation and
+- * only a single skeleton is supported for the FRC release default gesture interpretation.
+- * @return The current version of the skeleton object.
+- */
+-Skeleton Kinect::GetSkeleton(int skeletonIndex)
+-{
+-	if (skeletonIndex <= 0 || skeletonIndex > kNumSkeletons)
+-	{
+-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "Skeleton index must be 1");
+-		return Skeleton();
+-	}
+-	UpdateData();
+-	return m_skeletons[skeletonIndex-1];
+-}
+-
+-/**
+- * Get the current position of the skeleton
+- * @param skeletonIndex the skeleton to read from
+- * @return the current position as defined in the Kinect SDK (w is ignored)
+- */
+-Kinect::Point4 Kinect::GetPosition(int skeletonIndex)
+-{
+-	if (skeletonIndex <= 0 || skeletonIndex > kNumSkeletons)
+-	{
+-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "Skeleton index must be 1");
+-		return Point4();
+-	}
+-	UpdateData();
+-	return m_position[skeletonIndex-1];
+-}
+-
+-/**
+- * Get the quality of the skeleton.
+- * Quality masks are defined in the SkeletonQuality enum
+- * @param skeletonIndex the skeleton to read from
+- * @return the quality value as defined in the Kinect SDK
+- */
+-uint32_t Kinect::GetQuality(int skeletonIndex)
+-{
+-	if (skeletonIndex <= 0 || skeletonIndex > kNumSkeletons)
+-	{
+-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "Skeleton index must be 1");
+-		return kClippedRight | kClippedLeft | kClippedTop | kClippedBottom;
+-	}
+-	UpdateData();
+-	return m_quality[skeletonIndex-1];
+-}
+-
+-/**
+- * Get the TrackingState of the skeleton.
+- * Tracking states are defined in the SkeletonTrackingState enum
+- * @param skeletonIndex the skeleton to read from
+- * @return the tracking state value as defined in the Kinect SDK
+- */
+-Kinect::SkeletonTrackingState Kinect::GetTrackingState(int skeletonIndex)
+-{
+-	if (skeletonIndex <= 0 || skeletonIndex > kNumSkeletons)
+-	{
+-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "Skeleton index must be 1");
+-		return kNotTracked;
+-	}
+-	UpdateData();
+-	return m_trackingState[skeletonIndex-1];
+-}
+-
+-/**
+- * Check for an update of new data from the Driver Station
+- * This will read the new values and update the data structures in this class.
+- */
+-void Kinect::UpdateData()
+-{
+-	Synchronized sync(m_dataLock);
+-	uint32_t packetNumber = DriverStation::GetInstance()->GetPacketNumber();
+-	if (m_recentPacketNumber != packetNumber)
+-	{
+-		m_recentPacketNumber = packetNumber;
+-		int retVal = HALGetDynamicControlData(kHeaderBundleID, m_rawHeader, sizeof(m_rawHeader), 5);
+-		if(retVal == 0)
+-		{
+-			m_numberOfPlayers = (int)m_rawHeader[13];
+-			memcpy(&m_floorClipPlane.x, &m_rawHeader[18], 4);
+-			memcpy(&m_floorClipPlane.y, &m_rawHeader[22], 4);
+-			memcpy(&m_floorClipPlane.z, &m_rawHeader[26], 4);
+-			memcpy(&m_floorClipPlane.w, &m_rawHeader[30], 4);
+-			memcpy(&m_gravityNormal.x, &m_rawHeader[34], 4);
+-			memcpy(&m_gravityNormal.y, &m_rawHeader[38], 4);
+-			memcpy(&m_gravityNormal.z, &m_rawHeader[42], 4);
+-		}
+-
+-		retVal = HALGetDynamicControlData(kSkeletonExtraBundleID, m_rawSkeletonExtra, sizeof(m_rawSkeletonExtra), 5);
+-		if(retVal == 0)
+-		{
+-			memcpy(&m_position[0].x, &m_rawSkeletonExtra[22], 4);
+-			memcpy(&m_position[0].y, &m_rawSkeletonExtra[26], 4);
+-			memcpy(&m_position[0].z, &m_rawSkeletonExtra[30], 4);
+-			memcpy(&m_quality[0], &m_rawSkeletonExtra[34], 4);
+-			memcpy(&m_trackingState[0], &m_rawSkeletonExtra[38], 4);
+-		}
+-
+-		retVal = HALGetDynamicControlData(kSkeletonBundleID, m_rawSkeleton, sizeof(m_rawSkeleton), 5);
+-		if(retVal == 0)
+-		{
+-			for(int i=0; i < Skeleton::JointCount; i++)
+-			{
+-				memcpy(&m_skeletons[0].m_joints[i].x, &m_rawSkeleton[i*12+2], 4);
+-				memcpy(&m_skeletons[0].m_joints[i].y, &m_rawSkeleton[i*12+6], 4);
+-				memcpy(&m_skeletons[0].m_joints[i].z, &m_rawSkeleton[i*12+10], 4);
+-				m_skeletons[0].m_joints[i].trackingState = (Skeleton::JointTrackingState)m_rawSkeletonExtra[i+2];
+-			}
+-		}
+-
+-		// TODO: Read skeleton #2
+-	}
+-}
+diff --git a/wpilibc/wpilibC++/lib/KinectStick.cpp b/wpilibc/wpilibC++/lib/KinectStick.cpp
+deleted file mode 100644
+index 5a956ceb4fe0cc1bdf6fd5b8b2ed1068ef281cc2..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/lib/KinectStick.cpp
++++ /dev/null
+@@ -1,201 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2011. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-
+-#include "KinectStick.h"
+-
+-#include "DriverStation.h"
+-#include "Joystick.h"
+-//#include "NetworkCommunication/FRCComm.h"
+-//#include "NetworkCommunication/UsageReporting.h"
+-#include "Utility.h"
+-#include "WPIErrors.h"
+-
+-uint32_t KinectStick::_recentPacketNumber = 0;
+-KinectStick::KinectStickData KinectStick::_sticks;
+-
+-#define kJoystickBundleID HALFRC_NetworkCommunication_DynamicType_Kinect_Joystick
+-#define kTriggerMask 1
+-#define kTopMask 2
+-
+-/**
+- * Kinect joystick constructor
+- * @param id value is either 1 or 2 for the left or right joystick decoded from
+- * gestures interpreted by the Kinect server on the Driver Station computer.
+- */
+-KinectStick::KinectStick(int id)
+-{
+-	if (id != 1 && id != 2)
+-	{
+-		wpi_setWPIErrorWithContext(ParameterOutOfRange, "KinectStick ID must be 1 or 2");
+-		return;
+-	}
+-	m_id = id;
+-
+-	HALReport(HALUsageReporting::kResourceType_KinectStick, id);
+-}
+-
+-/**
+- * Get the X value of the KinectStick. This axis
+- * is unimplemented in the default gestures but can
+- * be populated by teams editing the Kinect Server.
+- * @param hand Unused
+- * @return The X value of the KinectStick
+- */
+-float KinectStick::GetX(JoystickHand hand)
+-{
+-	return GetRawAxis(Joystick::kDefaultXAxis);
+-}
+-
+-/**
+- * Get the Y value of the KinectStick. This axis
+- * represents arm angle in the default gestures
+- * @param hand Unused
+- * @return The Y value of the KinectStick
+- */
+-float KinectStick::GetY(JoystickHand hand)
+-{
+-	return GetRawAxis(Joystick::kDefaultYAxis);
+-}
+-
+-/**
+- * Get the Z value of the KinectStick. This axis
+- * is unimplemented in the default gestures but can
+- * be populated by teams editing the Kinect Server.
+- * @param hand Unused
+- * @return The Z value of the KinectStick
+- */
+-float KinectStick::GetZ()
+-{
+-	return GetRawAxis(Joystick::kDefaultZAxis);
+-}
+-
+-/**
+- * Get the Twist value of the KinectStick. This axis
+- * is unimplemented in the default gestures but can
+- * be populated by teams editing the Kinect Server.
+- * @return The Twist value of the KinectStick
+- */
+-float KinectStick::GetTwist()
+-{
+-	return GetRawAxis(Joystick::kDefaultTwistAxis);
+-}
+-
+-/**
+- * Get the Throttle value of the KinectStick. This axis
+- * is unimplemented in the default gestures but can
+- * be populated by teams editing the Kinect Server.
+- * @return The Throttle value of the KinectStick
+- */
+-float KinectStick::GetThrottle()
+-{
+-	return GetRawAxis(Joystick::kDefaultThrottleAxis);
+-}
+-
+-/**
+- * Get the value of the KinectStick axis.
+- *
+- * @param axis The axis to read [1-6].
+- * @return The value of the axis
+- */
+-float KinectStick::GetRawAxis(uint32_t axis)
+-{
+-	if (StatusIsFatal()) return 0.0;
+-
+-	GetData();
+-	float value = ConvertRawToFloat(_sticks.formatted.rawSticks[m_id - 1].axis[axis-1]);
+-	return value;
+-}
+-
+-/**
+- * Get the button value for the button set as the default trigger
+- *
+- * @param hand Unused
+- * @return The state of the button.
+- */
+-bool KinectStick::GetTrigger(JoystickHand hand)
+-{
+-	return GetRawButton(kTriggerMask);
+-}
+-
+-/**
+- * Get the button value for the button set as the default top
+- *
+- * @param hand Unused
+- * @return The state of the button.
+- */
+-bool KinectStick::GetTop(JoystickHand hand)
+-{
+-	return GetRawButton(kTopMask);
+-}
+-
+-/**
+- * Get the button value for the button set as the default bumper (button 4)
+- *
+- * @param hand Unused
+- * @return The state of the button.
+- */
+-bool KinectStick::GetBumper(JoystickHand hand)
+-{
+-	// TODO: Should this even be in GenericHID?  Is 4 an appropriate mask value (button 3)?
+-	return GetRawButton(4);
+-}
+-
+-/**
+- * Get the button value for buttons 1 through 12. The default gestures
+- * implement only 9 buttons.
+- *
+- * The appropriate button is returned as a boolean value.
+- *
+- * @param button The button number to be read.
+- * @return The state of the button.
+- */
+-bool KinectStick::GetRawButton(uint32_t button)
+-{
+-	if (StatusIsFatal()) return false;
+-
+-	GetData();
+-	return (_sticks.formatted.rawSticks[m_id - 1].buttons & (1 << button)) != 0;
+-}
+-
+-/**
+- * Get dynamic data from the driver station buffer
+- */
+-void KinectStick::GetData()
+-{
+-	uint32_t packetNumber = DriverStation::GetInstance()->GetPacketNumber();
+-	if (_recentPacketNumber != packetNumber)
+-	{
+-		_recentPacketNumber = packetNumber;
+-		int retVal = HALGetDynamicControlData(kJoystickBundleID, _sticks.data, sizeof(_sticks.data), 5);
+-		if (retVal == 0)
+-		{
+-			wpi_assert(_sticks.formatted.size == sizeof(_sticks.data) - 1);
+-		}
+-	}
+-}
+-
+-/**
+- * Convert an 8 bit joystick value to a floating point (-1,1) value
+- * @param value The 8 bit raw joystick value returned from the driver station
+- */
+-float KinectStick::ConvertRawToFloat(int8_t value)
+-{
+-	float result;
+-
+-	if (value < 0)
+-		result = ((float) value) / 128.0;
+-	else
+-		result = ((float) value) / 127.0;
+-
+-	wpi_assert(result <= 1.0 && result >= -1.0);
+-
+-	if (result > 1.0)
+-		result = 1.0;
+-	else if (result < -1.0)
+-		result = -1.0;
+-
+-	return result;
+-}

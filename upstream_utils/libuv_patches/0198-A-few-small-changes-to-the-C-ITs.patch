@@ -1,0 +1,116 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Thu, 24 Jul 2014 18:19:43 -0400
+Subject: [PATCH 0198/6262] A few small changes to the C++ ITs
+
+A PDP channel number is correct now, the deploy script was changed to
+kill Java programs before running and ignore useless messages,
+the "Waiting for enable" message is only printed once, and the accelerometer
+test is more robust.
+
+Change-Id: I2226140d8c3e44c452e039c27f4f1cf11c952c42
+---
+ cmake/run-cpp-tests.sh                              |  7 ++++---
+ .../wpilibC++IntegrationTests/include/TestBench.h   |  2 +-
+ .../src/AccelerometerTest.cpp                       | 13 ++++++++-----
+ wpilibc/wpilibC++IntegrationTests/src/PDPTest.cpp   |  0
+ .../src/TestEnvironment.cpp                         | 12 ++++++------
+ 5 files changed, 19 insertions(+), 15 deletions(-)
+ delete mode 100644 wpilibc/wpilibC++IntegrationTests/src/PDPTest.cpp
+
+diff --git a/cmake/run-cpp-tests.sh b/cmake/run-cpp-tests.sh
+index 27cfd448861fb51d61c476683adc748b8257e7d5..2032b9a1dcd0bb8aaf16977b1c67fb5763262392 100755
+--- a/cmake/run-cpp-tests.sh
++++ b/cmake/run-cpp-tests.sh
+@@ -4,9 +4,10 @@
+ 
+ if [ $(which sshpass) ]
+ then
+-	sshpass -p "" ssh admin@10.1.90.2 killall FRCUserProgram
+-	sshpass -p "" scp target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin
+-	sshpass -p "" ssh admin@10.1.90.2 ./FRCUserProgram --gtest_color=yes $*
++	# Send stderr to /dev/null - the only thing printed to it is the login prompt
++	sshpass -p "" ssh admin@10.1.90.2 killall FRCUserProgram java 2> /dev/null
++	sshpass -p "" scp target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin 2> /dev/null
++	sshpass -p "" ssh admin@10.1.90.2 ./FRCUserProgram --gtest_color=yes $* 2> /dev/null
+ else
+ 	ssh admin@10.1.90.2 killall FRCUserProgram
+ 	scp target/cmake/wpilibc/wpilibC++IntegrationTests/FRCUserProgram admin@10.1.90.2:/home/admin
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+index 4f4585c9a70c9bfcbb7c4b7a472f091d25187527..09deeb86168e276500df86d6fe1cebc9187c1933 100644
+--- a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
++++ b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+@@ -57,6 +57,6 @@ public:
+ 
+ 	/* PDP channels */
+ 	static const uint32_t kJaguarPDPChannel = 6;
+-	static const uint32_t kVictorPDPChannel = 10;
++	static const uint32_t kVictorPDPChannel = 8;
+ 	static const uint32_t kTalonPDPChannel = 11;
+ };
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/AccelerometerTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/AccelerometerTest.cpp
+index 1d9bd29ceb36edb0aae7bd1dd03a83d6760e2cc9..f53d089b8fa0dfb9e0202372d32c10d20cc62851 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/AccelerometerTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/AccelerometerTest.cpp
+@@ -8,8 +8,7 @@
+ #include "WPILib.h"
+ #include "gtest/gtest.h"
+ 
+-static constexpr double accelerationTolerance = 0.1;
+-
++static constexpr double kAccelerationTolerance = 0.1;
+ /**
+  * There's not much we can automatically test with the on-board accelerometer,
+  * but checking for gravity is probably good enough to tell that it's working.
+@@ -17,7 +16,11 @@ static constexpr double accelerationTolerance = 0.1;
+ TEST(AccelerometerTest, Accelerometer) {
+ 	BuiltInAccelerometer accelerometer;
+ 
+-	ASSERT_NEAR(0.0, accelerometer.GetX(), accelerationTolerance);
+-	ASSERT_NEAR(0.0, accelerometer.GetY(), accelerationTolerance);
+-	ASSERT_NEAR(1.0, accelerometer.GetZ(), accelerationTolerance);
++	/* The testbench sometimes shakes a little from a previous test.  Give it
++		some time. */
++	Wait(1.0);
++
++	ASSERT_NEAR(0.0, accelerometer.GetX(), kAccelerationTolerance);
++	ASSERT_NEAR(0.0, accelerometer.GetY(), kAccelerationTolerance);
++	ASSERT_NEAR(1.0, accelerometer.GetZ(), kAccelerationTolerance);
+ }
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/PDPTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/PDPTest.cpp
+deleted file mode 100644
+index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..0000000000000000000000000000000000000000
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/TestEnvironment.cpp b/wpilibc/wpilibC++IntegrationTests/src/TestEnvironment.cpp
+index afcd95ce883f0b34341420fb235af72d52561a05..94d7a56e4dfff655afb739b0cbb6595d6fa6d846 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/TestEnvironment.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/TestEnvironment.cpp
+@@ -15,23 +15,23 @@ public:
+ 			std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl;
+ 			exit(-1);
+ 		}
+-	
++
+ 		/* This sets up the network communications library to enable the driver
+ 		  station. After starting network coms, it will loop until the driver
+ 		  station returns that the robot is enabled, to ensure that tests will be
+-		  able to run on the hardware. */  
++		  able to run on the hardware. */
+ 		HALNetworkCommunicationObserveUserProgramStarting();
+ 		LiveWindow::GetInstance()->SetEnabled(false);
+-	
++
++		std::cout << "Waiting for enable" << std::endl;
++
+ 		while(!DriverStation::GetInstance()->IsEnabled()) {
+ 			Wait(0.1);
+-			std::cout << "Waiting for enable" << std::endl;
+ 		}
+ 	}
+-	
++
+ 	virtual void TearDown() {
+ 	}
+ };
+ 
+ testing::Environment *const environment = testing::AddGlobalTestEnvironment(new TestEnvironment);
+-

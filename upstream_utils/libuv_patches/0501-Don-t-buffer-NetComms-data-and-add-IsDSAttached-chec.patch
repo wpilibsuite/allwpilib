@@ -1,0 +1,521 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Fri, 21 Nov 2014 13:14:48 -0500
+Subject: [PATCH 0501/6262] Don't buffer NetComms data and add IsDSAttached()
+ check to C++ IsEnabled() method (fixes artf3747)
+
+Change-Id: Idaa7edcd601147c39fb31b7966d9e975869dea87
+---
+ .../wpilibC++Devices/include/DriverStation.h  | 16 ---
+ .../wpilibC++Devices/src/DriverStation.cpp    | 99 +++++++------------
+ .../edu/wpi/first/wpilibj/DriverStation.java  | 92 +++++------------
+ .../lib/FRCNetworkCommunicationsLibrary.cpp   |  4 +
+ 4 files changed, 63 insertions(+), 148 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/include/DriverStation.h b/wpilibc/wpilibC++Devices/include/DriverStation.h
+index 3a8cdfa942ca2b5c8972d8bcabd30da1c42ddb8e..1c01804a43f492f73d4d7f4f27221c06617b8e42 100644
+--- a/wpilibc/wpilibC++Devices/include/DriverStation.h
++++ b/wpilibc/wpilibC++Devices/include/DriverStation.h
+@@ -53,11 +53,6 @@ public:
+ 	double GetMatchTime();
+ 	float GetBatteryVoltage();
+ 
+-	MUTEX_ID GetUserStatusDataSem()
+-	{
+-		return m_statusDataSemaphore;
+-	}
+-
+ 	/** Only to be used to tell the Driver Station what code you claim to be executing
+ 	 *   for diagnostic purposes only
+ 	 * @param entering If true, starting disabled code; if false, leaving disabled code */
+@@ -90,29 +85,18 @@ public:
+ protected:
+ 	DriverStation();
+ 
+-	void GetData();
+-	void SetData();
+-
+ private:
+ 	static void InitTask(DriverStation *ds);
+ 	static DriverStation *m_instance;
+ 
+ 	void Run();
+ 
+-	HALControlWord m_controlWord;
+-	HALAllianceStationID m_allianceStationID;
+-	HALJoystickAxes m_joystickAxes[kJoystickPorts];
+-	HALJoystickPOVs m_joystickPOVs[kJoystickPorts];
+-	HALJoystickButtons m_joystickButtons[kJoystickPorts];
+-
+-	MUTEX_ID m_statusDataSemaphore;
+ 	Task m_task;
+ 	SEMAPHORE_ID m_newControlData;
+ 	MULTIWAIT_ID m_packetDataAvailableMultiWait;
+ 	MUTEX_ID m_packetDataAvailableMutex;
+ 	MULTIWAIT_ID m_waitForDataSem;
+ 	MUTEX_ID m_waitForDataMutex;
+-	double m_approxMatchTimeOffset;
+ 	bool m_userInDisabled;
+ 	bool m_userInAutonomous;
+ 	bool m_userInTeleop;
+diff --git a/wpilibc/wpilibC++Devices/src/DriverStation.cpp b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+index 7afde519ef7ac4d9985e48b5010e93f6b0948d5c..94f5ed864ccfaf43823df250a2bdb5b752da7184 100644
+--- a/wpilibc/wpilibC++Devices/src/DriverStation.cpp
++++ b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+@@ -32,26 +32,15 @@ DriverStation* DriverStation::m_instance = NULL;
+  * This is only called once the first time GetInstance() is called
+  */
+ DriverStation::DriverStation()
+-	: m_statusDataSemaphore (initializeMutexNormal())
+-	, m_task ("DriverStation", (FUNCPTR)DriverStation::InitTask)
++	: m_task ("DriverStation", (FUNCPTR)DriverStation::InitTask)
+ 	, m_newControlData(0)
+ 	, m_packetDataAvailableMultiWait(0)
+ 	, m_waitForDataSem(0)
+-	, m_approxMatchTimeOffset(-1.0)
+ 	, m_userInDisabled(false)
+ 	, m_userInAutonomous(false)
+ 	, m_userInTeleop(false)
+ 	, m_userInTest(false)
+ {
+-	memset(&m_controlWord, 0, sizeof(m_controlWord));
+-
+-	// All joysticks should default to having zero axes and povs, so
+-	// uninitialized memory doesn't get sent to speed controllers.
+-	for(unsigned int i = 0; i < kJoystickPorts; i++) {
+-		m_joystickAxes[i].count = 0;
+-		m_joystickPOVs[i].count = 0;
+-	}
+-
+ 	// Create a new semaphore
+ 	m_packetDataAvailableMultiWait = initializeMultiWait();
+ 	m_newControlData = initializeSemaphore(SEMAPHORE_EMPTY);
+@@ -77,7 +66,6 @@ DriverStation::DriverStation()
+ DriverStation::~DriverStation()
+ {
+ 	m_task.Stop();
+-	deleteMutex(m_statusDataSemaphore);
+ 	m_instance = NULL;
+ 	deleteMultiWait(m_waitForDataSem);
+ 	// Unregister our semaphore.
+@@ -98,8 +86,8 @@ void DriverStation::Run()
+ 	while (true)
+ 	{
+ 		takeMultiWait(m_packetDataAvailableMultiWait, m_packetDataAvailableMutex, 0);  
+-		GetData();
+ 		giveMultiWait(m_waitForDataSem);
++		giveSemaphore(m_newControlData);
+ 		if (++period >= 4)
+ 		{
+ 			MotorSafetyHelper::CheckMotors();
+@@ -128,43 +116,6 @@ DriverStation* DriverStation::GetInstance()
+ 	return m_instance;
+ }
+ 
+-/**
+- * Copy data from the DS task for the user.
+- * If no new data exists, it will just be returned, otherwise
+- * the data will be copied from the DS polling loop.
+- */
+-void DriverStation::GetData()
+-{
+-	static bool lastEnabled = false;
+-
+-	// Get the status data
+-	HALGetControlWord(&m_controlWord);
+-
+-	// Get the location/alliance data
+-	HALGetAllianceStation(&m_allianceStationID);
+-
+-	// Get the status of all of the joysticks
+-	for(uint8_t stick = 0; stick < kJoystickPorts; stick++) {
+-		HALGetJoystickAxes(stick, &m_joystickAxes[stick]);
+-		HALGetJoystickPOVs(stick, &m_joystickPOVs[stick]);
+-	}
+-
+-	if (!lastEnabled && IsEnabled())
+-	{
+-		// If starting teleop, assume that autonomous just took up 15 seconds
+-		if (IsAutonomous())
+-			m_approxMatchTimeOffset = Timer::GetFPGATimestamp();
+-		else
+-			m_approxMatchTimeOffset = Timer::GetFPGATimestamp() - 15.0;
+-	}
+-	else if (lastEnabled && !IsEnabled())
+-	{
+-		m_approxMatchTimeOffset = -1.0;
+-	}
+-	lastEnabled = IsEnabled();
+-	giveSemaphore(m_newControlData);
+-}
+-
+ /**
+  * Read the battery voltage.
+  *
+@@ -195,7 +146,9 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
+ 		return 0;
+ 	}
+ 
+-	if (axis >= m_joystickAxes[stick].count)
++	HALJoystickAxes joystickAxes;
++	HALGetJoystickAxes(stick, &joystickAxes);
++	if (axis >= joystickAxes.count)
+ 	{
+ 		if (axis >= kMaxJoystickAxes)
+ 			wpi_setWPIError(BadJoystickAxis);
+@@ -204,7 +157,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
+ 		return 0.0f;
+ 	}
+ 
+-	int8_t value = m_joystickAxes[stick].axes[axis];
++	int8_t value = joystickAxes.axes[axis];
+ 
+ 	if(value < 0)
+ 	{
+@@ -227,8 +180,10 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
+ 		wpi_setWPIError(BadJoystickIndex);
+ 		return 0;
+ 	}
+-
+-	if (pov >= m_joystickPOVs[stick].count)
++	
++	HALJoystickPOVs joystickPOVs;
++	HALGetJoystickPOVs(stick, &joystickPOVs);
++	if (pov >= joystickPOVs.count)
+ 	{
+ 		if (pov >= kMaxJoystickPOVs)
+ 			wpi_setWPIError(BadJoystickAxis);
+@@ -237,7 +192,7 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
+ 		return 0;
+ 	}
+ 
+-	return m_joystickPOVs[stick].povs[pov];
++	return joystickPOVs.povs[pov];
+ }
+ 
+ /**
+@@ -265,27 +220,37 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button)
+ 
+ bool DriverStation::IsEnabled()
+ {
+-	return m_controlWord.enabled;
++	HALControlWord controlWord;
++	HALGetControlWord(&controlWord);
++	return controlWord.enabled && controlWord.dsAttached;
+ }
+ 
+ bool DriverStation::IsDisabled()
+ {
+-	return !m_controlWord.enabled;
++	HALControlWord controlWord;
++	HALGetControlWord(&controlWord);
++	return !(controlWord.enabled && controlWord.dsAttached);
+ }
+ 
+ bool DriverStation::IsAutonomous()
+ {
+-	return m_controlWord.autonomous;
++	HALControlWord controlWord;
++	HALGetControlWord(&controlWord);
++	return controlWord.autonomous;
+ }
+ 
+ bool DriverStation::IsOperatorControl()
+ {
+-	return !(m_controlWord.autonomous || m_controlWord.test);
++	HALControlWord controlWord;
++	HALGetControlWord(&controlWord);
++	return !(controlWord.autonomous || controlWord.test);
+ }
+ 
+ bool DriverStation::IsTest()
+ {
+-	return m_controlWord.test;
++	HALControlWord controlWord;
++	HALGetControlWord(&controlWord);
++	return controlWord.test;
+ }
+ 
+ bool DriverStation::IsDSAttached()
+@@ -329,7 +294,9 @@ bool DriverStation::IsNewControlData()
+  */
+ bool DriverStation::IsFMSAttached()
+ {
+-	return m_controlWord.fmsAttached;
++	HALControlWord controlWord;
++	HALGetControlWord(&controlWord);
++	return controlWord.fmsAttached;
+ }
+ 
+ /**
+@@ -339,7 +306,9 @@ bool DriverStation::IsFMSAttached()
+  */
+ DriverStation::Alliance DriverStation::GetAlliance()
+ {
+-	switch(m_allianceStationID)
++	HALAllianceStationID allianceStationID;
++	HALGetAllianceStation(&allianceStationID);
++	switch(allianceStationID)
+ 	{
+ 	case kHALAllianceStationID_red1:
+ 	case kHALAllianceStationID_red2:
+@@ -361,7 +330,9 @@ DriverStation::Alliance DriverStation::GetAlliance()
+  */
+ uint32_t DriverStation::GetLocation()
+ {
+-	switch(m_allianceStationID)
++	HALAllianceStationID allianceStationID;
++	HALGetAllianceStation(&allianceStationID);
++	switch(allianceStationID)
+ 	{
+ 	case kHALAllianceStationID_red1:
+ 	case kHALAllianceStationID_blue1:
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index 089b5a3b6c79a6936b15fd2265574f716c3a7ffb..17a536f49f3c03eaa66c897604ef72908723c4c1 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -21,18 +21,10 @@ import edu.wpi.first.wpilibj.hal.PowerJNI;
+  */
+ public class DriverStation implements RobotState.Interface {
+ 
+-    /**
+-     * The size of the user status data
+-     */
+-    public static final int USER_STATUS_DATA_SIZE = FRCNetworkCommunicationsLibrary.USER_STATUS_DATA_SIZE;
+     /**
+      * Number of Joystick Ports
+      */
+     public static final int kJoystickPorts = 6;
+-    /**
+-     * Convert from raw values to volts
+-     */
+-    public static final double kDSAnalogInScaling = 5.0 / 1023.0;
+ 
+     /**
+      * The robot alliance that the robot is a part of
+@@ -54,19 +46,10 @@ public class DriverStation implements RobotState.Interface {
+ 
+     private static DriverStation instance = new DriverStation();
+ 
+-    private HALControlWord m_controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+-    private HALAllianceStationID m_allianceStationID;
+-    private short[][] m_joystickAxes = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickAxes];
+-    private short[][] m_joystickPOVs = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs];
+-    private int[] m_joystickButtons = new int[kJoystickPorts];
+ 
+     private Thread m_thread;
+-    private final Object m_semaphore;
+     private final Object m_dataSem;
+-    private int m_digitalOut;
+     private volatile boolean m_thread_keepalive = true;
+-    private int m_updateNumber = 0;
+-    private double m_approxMatchTimeOffset = -1.0;
+     private boolean m_userInDisabled = false;
+     private boolean m_userInAutonomous = false;
+     private boolean m_userInTeleop = false;
+@@ -91,7 +74,6 @@ public class DriverStation implements RobotState.Interface {
+      * instance static member variable.
+      */
+     protected DriverStation() {
+-        m_semaphore = new Object();
+         m_dataSem = new Object();
+ 
+         m_packetDataAvailableMutex = HALUtil.initializeMutexNormal();
+@@ -118,14 +100,11 @@ public class DriverStation implements RobotState.Interface {
+         int safetyCounter = 0;
+         while (m_thread_keepalive) {
+         	HALUtil.takeMultiWait(m_packetDataAvailableSem, m_packetDataAvailableMutex, 0);
+-        	synchronized (this) {
+-                getData();
+-            }
+             synchronized (m_dataSem) {
+                 m_dataSem.notifyAll();
+             }
++            m_newControlData = true;
+             if (++safetyCounter >= 5) {
+-                //               System.out.println("Checking safety");
+                 MotorSafetyHelper.checkMotors();
+                 safetyCounter = 0;
+             }
+@@ -165,40 +144,6 @@ public class DriverStation implements RobotState.Interface {
+             }
+         }
+     }
+-    private static boolean lastEnabled = false;
+-
+-    /**
+-     * Copy data from the DS task for the user.
+-     * If no new data exists, it will just be returned, otherwise
+-     * the data will be copied from the DS polling loop.
+-     */
+-    protected synchronized void getData() {
+-        // Get the status data
+-        m_controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+-
+-        // Get the location/alliance data
+-        m_allianceStationID = FRCNetworkCommunicationsLibrary.HALGetAllianceStation();
+-
+-        // Get the status of all of the joysticks
+-        for(byte stick = 0; stick < kJoystickPorts; stick++) {
+-            m_joystickAxes[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickAxes(stick);
+-            m_joystickPOVs[stick] = FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs(stick);
+-        }
+-
+-        if (!lastEnabled && isEnabled()) {
+-            // If starting teleop, assume that autonomous just took up 15 seconds
+-            if (isAutonomous()) {
+-                m_approxMatchTimeOffset = Timer.getFPGATimestamp();
+-            } else {
+-                m_approxMatchTimeOffset = Timer.getFPGATimestamp() - 15.0;
+-            }
+-        } else if (lastEnabled && !isEnabled()) {
+-            m_approxMatchTimeOffset = -1.0;
+-        }
+-        lastEnabled = isEnabled();
+-
+-        m_newControlData = true;
+-    }
+ 
+     /**
+      * Read the battery voltage.
+@@ -229,13 +174,15 @@ public class DriverStation implements RobotState.Interface {
+         if (axis < 0 || axis >= FRCNetworkCommunicationsLibrary.kMaxJoystickAxes) {
+             throw new RuntimeException("Joystick axis is out of range");
+         }
++		
++		short[] joystickAxes = FRCNetworkCommunicationsLibrary.HALGetJoystickAxes((byte)stick);
+ 
+-        if (axis >= m_joystickAxes[stick].length) {
++        if (axis >= joystickAxes.length) {
+ 			reportError("WARNING: Joystick axis " + axis + " on port " + stick + " not available, check if controller is plugged in\n", false);
+             return 0.0;
+         }
+ 
+-        byte value = (byte)m_joystickAxes[stick][axis];
++        byte value = (byte)joystickAxes[axis];
+ 
+         if(value < 0) {
+             return value / 128.0;
+@@ -257,13 +204,15 @@ public class DriverStation implements RobotState.Interface {
+         if (pov < 0 || pov >= FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs) {
+             throw new RuntimeException("Joystick POV is out of range");
+         }
++		
++		short[] joystickPOVs = FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs((byte)stick);
+ 
+-        if (pov >= m_joystickPOVs[stick].length) {
++        if (pov >= joystickPOVs.length) {
+ 			reportError("WARNING: Joystick POV " + pov + " on port " + stick + " not available, check if controller is plugged in\n", false);
+             return 0;
+         }
+ 
+-        return m_joystickPOVs[stick][pov];
++        return joystickPOVs[pov];
+     }
+ 
+     /**
+@@ -296,7 +245,8 @@ public class DriverStation implements RobotState.Interface {
+      * @return True if the robot is enabled, false otherwise.
+      */
+     public boolean isEnabled() {
+-        return m_controlWord.getEnabled() && isDSAttached();
++		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
++        return controlWord.getEnabled() && controlWord.getDSAttached();
+     }
+ 
+     /**
+@@ -316,7 +266,8 @@ public class DriverStation implements RobotState.Interface {
+      * @return True if autonomous mode should be enabled, false otherwise.
+      */
+     public boolean isAutonomous() {
+-        return m_controlWord.getAutonomous();
++		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
++        return controlWord.getAutonomous();
+     }
+ 
+     /**
+@@ -325,7 +276,8 @@ public class DriverStation implements RobotState.Interface {
+      * @return True if test mode should be enabled, false otherwise.
+      */
+     public boolean isTest() {
+-        return m_controlWord.getTest();
++		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
++        return controlWord.getTest();
+     }
+ 
+     /**
+@@ -369,10 +321,12 @@ public class DriverStation implements RobotState.Interface {
+      * @return the current alliance
+      */
+     public Alliance getAlliance() {
+-		if(m_allianceStationID == null) {
++		HALAllianceStationID allianceStationID = FRCNetworkCommunicationsLibrary.HALGetAllianceStation();
++		if(allianceStationID == null) {
+ 			return Alliance.Invalid;
+ 		}
+-        switch (m_allianceStationID) {
++		
++        switch (allianceStationID) {
+             case Red1:
+             case Red2:
+             case Red3:
+@@ -394,10 +348,11 @@ public class DriverStation implements RobotState.Interface {
+      * @return the location of the team's driver station controls: 1, 2, or 3
+      */
+     public int getLocation() {
+-		if(m_allianceStationID == null) {
++		HALAllianceStationID allianceStationID = FRCNetworkCommunicationsLibrary.HALGetAllianceStation();
++		if(allianceStationID == null) {
+ 			return 0;
+ 		}
+-        switch (m_allianceStationID) {
++        switch (allianceStationID) {
+             case Red1:
+             case Blue1:
+                 return 1;
+@@ -421,7 +376,8 @@ public class DriverStation implements RobotState.Interface {
+      * @return True if the robot is competing on a field being controlled by a Field Management System
+      */
+     public boolean isFMSAttached() {
+-        return m_controlWord.getFMSAttached();
++		HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
++        return controlWord.getFMSAttached();
+     }
+ 	
+ 	public boolean isDSAttached() {
+diff --git a/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp b/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
+index 72d60754f659f886e0216ee070f20318cd48813d..96e265d9a1495bc3819c76a8aa3fc7be66a577f7 100644
+--- a/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/FRCNetworkCommunicationsLibrary.cpp
+@@ -266,6 +266,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeHALGetControlWord
+   (JNIEnv *, jclass)
+ {
++	NETCOMM_LOG(logDEBUG) << "Calling HAL Control Word";
+     jint controlWord;
+     HALGetControlWord((HALControlWord*)&controlWord);
+     return controlWord;
+@@ -279,6 +280,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeHALGetAllianceStation
+   (JNIEnv *, jclass)
+ {
++	NETCOMM_LOG(logDEBUG) << "Calling HAL Alliance Station";
+     jint allianceStation;
+     HALGetAllianceStation((HALAllianceStationID*)&allianceStation);
+     return allianceStation;
+@@ -292,6 +294,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommun
+ JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxes
+   (JNIEnv * env, jclass, jbyte joystickNum)
+ {
++	NETCOMM_LOG(logDEBUG) << "Calling HALJoystickAxes";
+     HALJoystickAxes axes;
+     HALGetJoystickAxes(joystickNum, &axes);
+ 
+@@ -309,6 +312,7 @@ JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetwor
+ JNIEXPORT jshortArray JNICALL Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickPOVs
+   (JNIEnv * env, jclass, jbyte joystickNum)
+ {
++	NETCOMM_LOG(logDEBUG) << "Calling HALJoystickPOVs";
+     HALJoystickPOVs povs;
+     HALGetJoystickPOVs(joystickNum, &povs);
+ 

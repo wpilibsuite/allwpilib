@@ -1,0 +1,1146 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Mon, 9 Jun 2014 11:12:44 -0400
+Subject: [PATCH 0081/6262] Removed the old compressor code
+
+Change-Id: Ia36724f42254d49238db687c62f339c2172ba582
+---
+ wpilibc/wpilibC++/include/Compressor.h        |  62 ++--
+ wpilibc/wpilibC++/include/PCMCompressor.h     |  55 ---
+ wpilibc/wpilibC++/lib/Compressor.cpp          | 241 ++++++-------
+ wpilibc/wpilibC++/lib/PCMCompressor.cpp       | 176 ---------
+ .../edu/wpi/first/wpilibj/Compressor.java     | 336 ++++++------------
+ .../edu/wpi/first/wpilibj/PCMCompressor.java  | 129 -------
+ 6 files changed, 260 insertions(+), 739 deletions(-)
+ delete mode 100644 wpilibc/wpilibC++/include/PCMCompressor.h
+ delete mode 100644 wpilibc/wpilibC++/lib/PCMCompressor.cpp
+ delete mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PCMCompressor.java
+
+diff --git a/wpilibc/wpilibC++/include/Compressor.h b/wpilibc/wpilibC++/include/Compressor.h
+index c7d781e6033ed2abb4309f6eb1d6b907555a65ad..9a695a139365403ad8801a15de8c29f8f27bc2dd 100644
+--- a/wpilibc/wpilibC++/include/Compressor.h
++++ b/wpilibc/wpilibC++/include/Compressor.h
+@@ -1,55 +1,55 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-#pragma once
++/*
++ * Compressor.h
++ */
+ 
+-#define COMPRESSOR_PRIORITY 90
++#ifndef Compressor_H_
++#define Compressor_H_
+ 
++#include "HAL/HAL.hpp"
+ #include "SensorBase.h"
+-#include "Relay.h"
+-#include "Task.h"
++#include "tables/ITableListener.h"
+ #include "LiveWindow/LiveWindowSendable.h"
+ 
+-class DigitalInput;
+-
+ /**
+- * Compressor object.
+- * The Compressor object is designed to handle the operation of the compressor, pressure sensor and
+- * relay for a FIRST robot pneumatics system. The Compressor object starts a task which runs in the
+- * backround and periodically polls the pressure sensor and operates the relay that controls the
+- * compressor.
++ * CAN pneumatic control module compressor
++ *
++ *  Created on: May 28, 2014
++ *      Author: Thomas Clark
++ *
+  */
+-class Compressor : public SensorBase, public LiveWindowSendable
+-{
++class Compressor: public SensorBase, public LiveWindowSendable, public ITableListener {
+ public:
+-	Compressor(uint32_t pressureSwitchChannel, uint32_t compressorRelayChannel);
+-	Compressor(uint8_t pressureSwitchModuleNumber, uint32_t pressureSwitchChannel,
+-			uint8_t compresssorRelayModuleNumber, uint32_t compressorRelayChannel);
++	Compressor(uint8_t module);
++	Compressor();
+ 	~Compressor();
+ 
+ 	void Start();
+ 	void Stop();
+ 	bool Enabled();
+-	uint32_t GetPressureSwitchValue();
+-	void SetRelayValue(Relay::Value relayValue);
++
++	bool GetPressureSwitchValue();
++	
++	float GetCompressorCurrent();
++
++	void SetClosedLoopControl(bool on);
++	bool GetClosedLoopControl();
+ 
+ 	void UpdateTable();
+ 	void StartLiveWindowMode();
+ 	void StopLiveWindowMode();
+ 	std::string GetSmartDashboardType();
+ 	void InitTable(ITable *subTable);
+-	ITable * GetTable();
++	ITable *GetTable();
++	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+ 
+-private:
+-	void InitCompressor(uint8_t pressureSwitchModuleNumber, uint32_t pressureSwitchChannel,
+-			uint8_t compresssorRelayModuleNumber, uint32_t compressorRelayChannel);
++protected:
++	void *m_pcm_pointer;
+ 
+-	DigitalInput *m_pressureSwitch;
+-	Relay *m_relay;
+-	bool m_enabled;
+-	Task m_task;
++private:
++	void InitCompressor(uint8_t module);
++	void SetCompressor(bool on);
+ 
+ 	ITable *m_table;
+ };
++
++#endif /* Compressor_H_ */
+diff --git a/wpilibc/wpilibC++/include/PCMCompressor.h b/wpilibc/wpilibC++/include/PCMCompressor.h
+deleted file mode 100644
+index 5c4dd33103097f13fd3b851f8fb0bae9296c9e47..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/include/PCMCompressor.h
++++ /dev/null
+@@ -1,55 +0,0 @@
+-/*
+- * PCMCompressor.h
+- */
+-
+-#ifndef PCMCOMPRESSOR_H_
+-#define PCMCOMPRESSOR_H_
+-
+-#include "HAL/HAL.hpp"
+-#include "SensorBase.h"
+-#include "tables/ITableListener.h"
+-#include "LiveWindow/LiveWindowSendable.h"
+-
+-/**
+- * CAN pneumatic control module compressor
+- *
+- *  Created on: May 28, 2014
+- *      Author: Thomas Clark
+- *
+- */
+-class PCMCompressor: public SensorBase, public LiveWindowSendable, public ITableListener {
+-public:
+-	PCMCompressor(uint8_t module);
+-	PCMCompressor();
+-	~PCMCompressor();
+-
+-	void Start();
+-	void Stop();
+-	bool Enabled();
+-
+-	bool GetPressureSwitchValue();
+-	
+-	float GetCompressorCurrent();
+-
+-	void SetClosedLoopControl(bool on);
+-	bool GetClosedLoopControl();
+-
+-	void UpdateTable();
+-	void StartLiveWindowMode();
+-	void StopLiveWindowMode();
+-	std::string GetSmartDashboardType();
+-	void InitTable(ITable *subTable);
+-	ITable *GetTable();
+-	void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+-
+-protected:
+-	void *m_pcm_pointer;
+-
+-private:
+-	void InitCompressor(uint8_t module);
+-	void SetCompressor(bool on);
+-
+-	ITable *m_table;
+-};
+-
+-#endif /* PCMCOMPRESSOR_H_ */
+diff --git a/wpilibc/wpilibC++/lib/Compressor.cpp b/wpilibc/wpilibC++/lib/Compressor.cpp
+index 32d72e11d69d0fadf529ff660d7ebb5a3fe7781a..09c02881e2a488fdcbd5680ebf3b53b5e1f7bfa1 100644
+--- a/wpilibc/wpilibC++/lib/Compressor.cpp
++++ b/wpilibc/wpilibC++/lib/Compressor.cpp
+@@ -1,183 +1,158 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
++/*
++ * Compressor.cpp
++ */
+ 
+ #include "Compressor.h"
+-#include "DigitalInput.h"
+-//#include "NetworkCommunication/UsageReporting.h"
+-#include "Timer.h"
+ #include "WPIErrors.h"
+ 
+-/**
+- * Internal task.
+- * 
+- * Task which checks the compressor pressure switch and operates the relay as necessary
+- * depending on the pressure.
+- * 
+- * Do not call this function directly.
+- */
+-static void CompressorChecker(Compressor *c)
+-{
+-	while (1)
+-	{
+-		if (c->Enabled())
+-		{
+-			c->SetRelayValue( c->GetPressureSwitchValue() == 0 ? Relay::kOn : Relay::kOff );
+-		}
+-		else
+-		{
+-			c->SetRelayValue(Relay::kOff);
+-		}
+-		Wait(0.5);
+-	}
++void Compressor::InitCompressor(uint8_t module) {
++	m_table = 0;
++	m_pcm_pointer = initializeCompressor(module);
++
++	SetClosedLoopControl(true);
+ }
+ 
+ /**
+- * Initialize the Compressor object.
+- * This method is the common initialization code for all the constructors for the Compressor
+- * object. It takes the relay channel and pressure switch channel and spawns a task that polls the
+- * compressor and sensor.
+- * 
+- * You MUST start the compressor by calling the Start() method.
++ * Constructor
++ *
++ * Uses the default solenoid module number
+  */
+-void Compressor::InitCompressor(uint8_t pressureSwitchModuleNumber,
+-		uint32_t pressureSwitchChannel,
+-		uint8_t compresssorRelayModuleNumber,
+-		uint32_t compressorRelayChannel)
+-{
+-	m_table = NULL;
+-	m_enabled = false;
+-	m_pressureSwitch = new DigitalInput(pressureSwitchModuleNumber, pressureSwitchChannel);
+-	m_relay = new Relay(compresssorRelayModuleNumber, compressorRelayChannel, Relay::kForwardOnly);
+-
+-	HALReport(HALUsageReporting::kResourceType_Compressor, 0);
+-
+-	if (!m_task.Start((int32_t)this))
+-	{
+-		wpi_setWPIError(CompressorTaskError);
+-	}
++Compressor::Compressor() {
++	InitCompressor(GetDefaultSolenoidModule());
+ }
+ 
+ /**
+- * Compressor constructor.
+- * Given a fully specified relay channel and pressure switch channel, initialize the Compressor object.
+- * 
+- * You MUST start the compressor by calling the Start() method.
+- * 
+- * @param pressureSwitchModuleNumber The digital module that the pressure switch is attached to.
+- * @param pressureSwitchChannel The GPIO channel that the pressure switch is attached to.
+- * @param compresssorRelayModuleNumber The digital module that the compressor relay is attached to.
+- * @param compressorRelayChannel The relay channel that the compressor relay is attached to.
++ * Constructor
++ *
++ * @param module The module number to use (1 or 2)
+  */
+-Compressor::Compressor(uint8_t pressureSwitchModuleNumber,
+-		uint32_t pressureSwitchChannel,
+-		uint8_t compresssorRelayModuleNumber,
+-		uint32_t compressorRelayChannel)
+-	: m_task ("Compressor", (FUNCPTR)CompressorChecker)
+-{
+-	InitCompressor(pressureSwitchModuleNumber,
+-		pressureSwitchChannel,
+-		compresssorRelayModuleNumber,
+-		compressorRelayChannel);
++Compressor::Compressor(uint8_t module) {
++	InitCompressor(module);
++}
++
++Compressor::~Compressor() {
++
+ }
+ 
+ /**
+- * Compressor constructor.
+- * Given a relay channel and pressure switch channel (both in the default digital module), initialize
+- * the Compressor object.
+- * 
+- * You MUST start the compressor by calling the Start() method.
+- * 
+- * @param pressureSwitchChannel The GPIO channel that the pressure switch is attached to.
+- * @param compressorRelayChannel The relay channel that the compressor relay is attached to.
++ *  Starts the compressor and disables automatic closed-loop control
+  */
+-Compressor::Compressor(uint32_t pressureSwitchChannel, uint32_t compressorRelayChannel)
+-	: m_task ("Compressor", (FUNCPTR)CompressorChecker)
+-{
+-	InitCompressor(GetDefaultDigitalModule(),
+-			pressureSwitchChannel,
+-			GetDefaultDigitalModule(),
+-			compressorRelayChannel);
++void Compressor::Start() {
++	SetClosedLoopControl(false);
++	SetCompressor(true);
+ }
+ 
+ /**
+- * Delete the Compressor object.
+- * Delete the allocated resources for the compressor and kill the compressor task that is polling
+- * the pressure switch.
++ *  Stops the compressor and disables automatic closed-loop control
+  */
+-Compressor::~Compressor()
+-{
+-	delete m_pressureSwitch;
+-	delete m_relay;
++void Compressor::Stop() {
++	SetClosedLoopControl(false);
++	SetCompressor(false);
++}
++
++void Compressor::SetCompressor(bool on) {
++	int32_t status = 0;
++
++	setCompressor(m_pcm_pointer, on, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
+ }
+ 
++
+ /**
+- * Operate the relay for the compressor.
+- * Change the value of the relay output that is connected to the compressor motor.
+- * This is only intended to be called by the internal polling thread.
++ * @return true if the compressor is on
+  */
+-void Compressor::SetRelayValue(Relay::Value relayValue)
+-{
+-	m_relay->Set(relayValue);
++bool Compressor::Enabled() {
++	int32_t status = 0;
++	bool value;
++
++	value = getCompressor(m_pcm_pointer, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
++
++	return value;
+ }
+ 
+ /**
+- * Get the pressure switch value.
+- * Read the pressure switch digital input.
+- * 
+- * @return The current state of the pressure switch.
++ * @return true if pressure is low
+  */
+-uint32_t Compressor::GetPressureSwitchValue()
+-{
+-	return m_pressureSwitch->Get();
++bool Compressor::GetPressureSwitchValue() {
++	int32_t status = 0;
++	bool value;
++
++	value = getPressureSwitch(m_pcm_pointer, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
++
++	return value;
+ }
+ 
++
+ /**
+- * Start the compressor.
+- * This method will allow the polling loop to actually operate the compressor. The
+- * is stopped by default and won't operate until starting it.
++ * @return The current through the compressor, in amps
+  */
+-void Compressor::Start()
+-{
+-	m_enabled = true;
++float Compressor::GetCompressorCurrent() {
++	int32_t status = 0;
++	float value;
++
++	value = getCompressorCurrent(m_pcm_pointer, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
++
++	return value;
+ }
+ 
++
+ /**
+- * Stop the compressor.
+- * This method will stop the compressor from turning on.
++ * Enables or disables automatically turning the compressor on when the
++ * pressure is low.
+  */
+-void Compressor::Stop()
+-{
+-	m_enabled = false;
++void Compressor::SetClosedLoopControl(bool on) {
++	int32_t status = 0;
++
++	setClosedLoopControl(m_pcm_pointer, on, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
+ }
+ 
+ /**
+- * Get the state of the enabled flag.
+- * Return the state of the enabled flag for the compressor and pressure switch
+- * combination.
+- * 
+- * @return The state of the compressor thread's enable flag.
++ * Returns true if the compressor will automatically turn on when the
++ * pressure is low.
+  */
+-bool Compressor::Enabled()
+-{
+-	return m_enabled;
++bool Compressor::GetClosedLoopControl() {
++	int32_t status = 0;
++	bool value;
++
++	value = getClosedLoopControl(m_pcm_pointer, &status);
++
++	if(status) {
++		wpi_setWPIError(Timeout);
++	}
++
++	return value;
+ }
+ 
+ void Compressor::UpdateTable() {
+-	if (m_table != NULL) {
+-		m_table->PutBoolean("Enabled", m_enabled);
++	if(m_table) {
++		m_table->PutBoolean("Enabled", Enabled());
+ 		m_table->PutBoolean("Pressure switch", GetPressureSwitchValue());
+ 	}
+ }
+ 
+ void Compressor::StartLiveWindowMode() {
+-	
+ }
+ 
+ void Compressor::StopLiveWindowMode() {
+-	
+ }
+ 
+ std::string Compressor::GetSmartDashboardType() {
+@@ -189,7 +164,13 @@ void Compressor::InitTable(ITable *subTable) {
+ 	UpdateTable();
+ }
+ 
+-ITable * Compressor::GetTable() {
++ITable *Compressor::GetTable() {
+ 	return m_table;
+ }
+ 
++void Compressor::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
++	if(value.b) Start();
++	else Stop();
++
++}
++
+diff --git a/wpilibc/wpilibC++/lib/PCMCompressor.cpp b/wpilibc/wpilibC++/lib/PCMCompressor.cpp
+deleted file mode 100644
+index d3fd583e4a2a11d00f81e8bffadd4069e85c8cc2..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++/lib/PCMCompressor.cpp
++++ /dev/null
+@@ -1,176 +0,0 @@
+-/*
+- * PCMCompressor.cpp
+- */
+-
+-#include "PCMCompressor.h"
+-#include "WPIErrors.h"
+-
+-void PCMCompressor::InitCompressor(uint8_t module) {
+-	m_table = 0;
+-	m_pcm_pointer = initializeCompressor(module);
+-
+-	SetClosedLoopControl(true);
+-}
+-
+-/**
+- * Constructor
+- *
+- * Uses the default solenoid module number
+- */
+-PCMCompressor::PCMCompressor() {
+-	InitCompressor(GetDefaultSolenoidModule());
+-}
+-
+-/**
+- * Constructor
+- *
+- * @param module The module number to use (1 or 2)
+- */
+-PCMCompressor::PCMCompressor(uint8_t module) {
+-	InitCompressor(module);
+-}
+-
+-PCMCompressor::~PCMCompressor() {
+-
+-}
+-
+-/**
+- *  Starts the compressor and disables automatic closed-loop control
+- */
+-void PCMCompressor::Start() {
+-	SetClosedLoopControl(false);
+-	SetCompressor(true);
+-}
+-
+-/**
+- *  Stops the compressor and disables automatic closed-loop control
+- */
+-void PCMCompressor::Stop() {
+-	SetClosedLoopControl(false);
+-	SetCompressor(false);
+-}
+-
+-void PCMCompressor::SetCompressor(bool on) {
+-	int32_t status = 0;
+-
+-	setCompressor(m_pcm_pointer, on, &status);
+-
+-	if(status) {
+-		wpi_setWPIError(Timeout);
+-	}
+-}
+-
+-
+-/**
+- * @return true if the compressor is on
+- */
+-bool PCMCompressor::Enabled() {
+-	int32_t status = 0;
+-	bool value;
+-
+-	value = getCompressor(m_pcm_pointer, &status);
+-
+-	if(status) {
+-		wpi_setWPIError(Timeout);
+-	}
+-
+-	return value;
+-}
+-
+-/**
+- * @return true if pressure is low
+- */
+-bool PCMCompressor::GetPressureSwitchValue() {
+-	int32_t status = 0;
+-	bool value;
+-
+-	value = getPressureSwitch(m_pcm_pointer, &status);
+-
+-	if(status) {
+-		wpi_setWPIError(Timeout);
+-	}
+-
+-	return value;
+-}
+-
+-
+-/**
+- * @return The current through the compressor, in amps
+- */
+-float PCMCompressor::GetCompressorCurrent() {
+-	int32_t status = 0;
+-	float value;
+-
+-	value = getCompressorCurrent(m_pcm_pointer, &status);
+-
+-	if(status) {
+-		wpi_setWPIError(Timeout);
+-	}
+-
+-	return value;
+-}
+-
+-
+-/**
+- * Enables or disables automatically turning the compressor on when the
+- * pressure is low.
+- */
+-void PCMCompressor::SetClosedLoopControl(bool on) {
+-	int32_t status = 0;
+-
+-	setClosedLoopControl(m_pcm_pointer, on, &status);
+-
+-	if(status) {
+-		wpi_setWPIError(Timeout);
+-	}
+-}
+-
+-/**
+- * Returns true if the compressor will automatically turn on when the
+- * pressure is low.
+- */
+-bool PCMCompressor::GetClosedLoopControl() {
+-	int32_t status = 0;
+-	bool value;
+-
+-	value = getClosedLoopControl(m_pcm_pointer, &status);
+-
+-	if(status) {
+-		wpi_setWPIError(Timeout);
+-	}
+-
+-	return value;
+-}
+-
+-void PCMCompressor::UpdateTable() {
+-	if(m_table) {
+-		m_table->PutBoolean("Enabled", Enabled());
+-		m_table->PutBoolean("Pressure switch", GetPressureSwitchValue());
+-	}
+-}
+-
+-void PCMCompressor::StartLiveWindowMode() {
+-}
+-
+-void PCMCompressor::StopLiveWindowMode() {
+-}
+-
+-std::string PCMCompressor::GetSmartDashboardType() {
+-	return "PCMCompressor";
+-}
+-
+-void PCMCompressor::InitTable(ITable *subTable) {
+-	m_table = subTable;
+-	UpdateTable();
+-}
+-
+-ITable *PCMCompressor::GetTable() {
+-	return m_table;
+-}
+-
+-void PCMCompressor::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
+-	if(value.b) Start();
+-	else Stop();
+-
+-}
+-
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Compressor.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Compressor.java
+index febbed525666da8a134b966831cd4419f2c296bd..5d944039cd054ce07d33cabcc8c0a1b8a2932ac2 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Compressor.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Compressor.java
+@@ -1,229 +1,129 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+ package edu.wpi.first.wpilibj;
+ 
+-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+-import edu.wpi.first.wpilibj.communication.UsageReporting;
++import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
++
++import edu.wpi.first.wpilibj.SensorBase;
++import edu.wpi.first.wpilibj.hal.CompressorJNI;
++import edu.wpi.first.wpilibj.hal.HALUtil;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.parsing.IDevice;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+-/**
+- * Compressor object.
+- * The Compressor object is designed to handle the operation of the compressor, pressure sensor and
+- * relay for a FIRST robot pneumatics system. The Compressor object starts a task which runs in the
+- * backround and periodically polls the pressure sensor and operates the relay that controls the
+- * compressor.
+- */
+ public class Compressor extends SensorBase implements IDevice, LiveWindowSendable {
+-
+-    private DigitalInput m_pressureSwitch;
+-    private Relay m_relay;
+-    private boolean m_enabled;
+-    private Thread m_task;
+-    private boolean m_run = true;
+-
+-    /**
+-     * Internal thread.
+-     *
+-     * Task which checks the compressor pressure switch and operates the relay as necessary
+-     * depending on the pressure.
+-     *
+-     * Do not call this function directly.
+-     */
+-    private class CompressorThread extends Thread {
+-
+-        Compressor m_compressor;
+-
+-        CompressorThread(Compressor comp) {
+-            m_compressor = comp;
+-        }
+-
+-        public void run() {
+-            while (m_run) {
+-                if (m_compressor.enabled()) {
+-                    m_compressor.setRelayValue(!m_compressor.getPressureSwitchValue() ? Relay.Value.kOn : Relay.Value.kOff);
+-                } else {
+-                    m_compressor.setRelayValue(Relay.Value.kOff);
+-                }
+-                try {
+-                    Thread.sleep(500);
+-                } catch (InterruptedException e) {
+-                }
+-            }
+-        }
+-    }
+-
+-    /**
+-     * Initialize the Compressor object.
+-     * This method is the common initialization code for all the constructors for the Compressor
+-     * object. It takes the relay channel and pressure switch channel and spawns a task that polls the
+-     * compressor and sensor.
+-     *
+-     * You MUST start the compressor by calling the start() method.
+-     */
+-    private void initCompressor(final int pressureSwitchSlot,
+-                                final int pressureSwitchChannel,
+-                                final int compresssorRelaySlot,
+-                                final int compressorRelayChannel) {
+-
+-        m_enabled = false;
+-        m_pressureSwitch = new DigitalInput(pressureSwitchSlot, pressureSwitchChannel);
+-        m_relay = new Relay(compresssorRelaySlot, compressorRelayChannel, Relay.Direction.kForward);
+-
+-        UsageReporting.report(tResourceType.kResourceType_Compressor, 0);
+-
+-        m_task = new CompressorThread(this);
+-        m_task.start();
+-    }
+-
+-    /**
+-     * Compressor constructor.
+-     * Given a fully specified relay channel and pressure switch channel, initialize the Compressor object.
+-     *
+-     * You MUST start the compressor by calling the start() method.
+-     *
+-     * @param pressureSwitchSlot The module that the pressure switch is attached to.
+-     * @param pressureSwitchChannel The GPIO channel that the pressure switch is attached to.
+-     * @param compresssorRelaySlot The module that the compressor relay is attached to.
+-     * @param compressorRelayChannel The relay channel that the compressor relay is attached to.
+-     */
+-    public Compressor(final int pressureSwitchSlot,
+-                      final int pressureSwitchChannel,
+-                      final int compresssorRelaySlot,
+-                      final int compressorRelayChannel) {
+-        initCompressor(pressureSwitchSlot,
+-                       pressureSwitchChannel,
+-                       compresssorRelaySlot,
+-                       compressorRelayChannel);
+-    }
+-
+-    /**
+-     * Compressor constructor.
+-     * Given a relay channel and pressure switch channel (both in the default digital module), initialize
+-     * the Compressor object.
+-     *
+-     * You MUST start the compressor by calling the start() method.
+-     *
+-     * @param pressureSwitchChannel The GPIO channel that the pressure switch is attached to.
+-     * @param compressorRelayChannel The relay channel that the compressor relay is attached to.
+-     */
+-    public Compressor(final int pressureSwitchChannel, final int compressorRelayChannel) {
+-        initCompressor(getDefaultDigitalModule(),
+-                       pressureSwitchChannel,
+-                       getDefaultDigitalModule(),
+-                       compressorRelayChannel);
+-    }
+-
+-    /**
+-     * Delete the Compressor object.
+-     * Delete the allocated resources for the compressor and kill the compressor task that is polling
+-     * the pressure switch.
+-     */
+-    public void free() {
+-        m_run = false;
+-        try {
+-            m_task.join();
+-        } catch (InterruptedException e) {}
+-        m_pressureSwitch.free();
+-        m_relay.free();
+-        m_pressureSwitch = null;
+-        m_relay = null;
+-    }
+-
+-    /**
+-     * Operate the relay for the compressor.
+-     * Change the value of the relay output that is connected to the compressor motor.
+-     * This is only intended to be called by the internal polling thread.
+-     * @param relayValue the value to set the relay to
+-     */
+-    public void setRelayValue(Relay.Value relayValue) {
+-        m_relay.set(relayValue);
+-    }
+-
+-    /**
+-     * Get the pressure switch value.
+-     * Read the pressure switch digital input.
+-     *
+-     * @return The current state of the pressure switch.
+-     */
+-    public boolean getPressureSwitchValue() {
+-        return m_pressureSwitch.get();
+-    }
+-
+-    /**
+-     * Start the compressor.
+-     * This method will allow the polling loop to actually operate the compressor. The
+-     * is stopped by default and won't operate until starting it.
+-     */
+-    public void start() {
+-        m_enabled = true;
+-    }
+-
+-    /**
+-     * Stop the compressor.
+-     * This method will stop the compressor from turning on.
+-     */
+-    public void stop() {
+-        m_enabled = false;
+-    }
+-
+-    /**
+-     * Get the state of the enabled flag.
+-     * Return the state of the enabled flag for the compressor and pressure switch
+-     * combination.
+-     *
+-     * @return The state of the compressor thread's enable flag.
+-     */
+-    public boolean enabled() {
+-        return m_enabled;
+-    }
+-
+-    /*
+-     * Live Window code, only does anything if live window is activated.
+-     */
+-    public String getSmartDashboardType() {
+-        return "Compressor";
+-    }
+-    private ITable m_table;
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void initTable(ITable subtable) {
+-        m_table = subtable;
+-        updateTable();
+-    }
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public ITable getTable() {
+-        return m_table;
+-    }
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void updateTable() {
++	private ByteBuffer m_pcm;
++	
++	public Compressor(int module) {
++		initCompressor(module);
++	}
++	
++	public Compressor() {
++		initCompressor(getDefaultSolenoidModule());
++	}
++	
++	private void initCompressor(int module) {
++		m_table = null;
++		
++		m_pcm = CompressorJNI.initializeCompressor((byte)module);
++	}
++	
++	public void start() {
++		setClosedLoopControl(false);
++		setCompressor(true);
++	}
++	
++	public void stop() {
++		setClosedLoopControl(false);
++		setCompressor(false);
++	}
++	
++	public boolean enabled() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		boolean on = CompressorJNI.getCompressor(m_pcm, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		
++		return on;
++	}
++	
++	public boolean getPressureSwitchValue() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		boolean on = CompressorJNI.getPressureSwitch(m_pcm, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		
++		return on;
++	}
++	
++	public float getCompressorCurrent() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		float current = CompressorJNI.getCompressorCurrent(m_pcm, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		
++		return current;
++	}
++	
++	public void setClosedLoopControl(boolean on) {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		CompressorJNI.setClosedLoopControl(m_pcm, on, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++	}
++	
++	public boolean getClosedLoopControl() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		boolean on = CompressorJNI.getClosedLoopControl(m_pcm, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		
++		return on;
++	}
++
++	@Override
++	public void startLiveWindowMode() {
++	}
++
++	@Override
++	public void stopLiveWindowMode() {
++	}
++	
++	private void setCompressor(boolean on) {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		CompressorJNI.setCompressor(m_pcm, on, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++	}
++	
++	@Override
++	public String getSmartDashboardType() {
++		return "Compressor";
++	}
++
++	private ITable m_table;
++
++	@Override
++	public void initTable(ITable subtable) {
++		m_table = subtable;
++		updateTable();
++	}
++	
++	@Override
++	public ITable getTable() {
++		return m_table;
++	}
++
++	@Override
++	public void updateTable() {
+         if (m_table != null) {
+-            m_table.putBoolean("Enabled", m_enabled);
++            m_table.putBoolean("Enabled", enabled());
+             m_table.putBoolean("Pressure Switch", getPressureSwitchValue());
+         }
+-    }
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void startLiveWindowMode() {}
+-
+-    /**
+-     * {@inheritDoc}
+-     */
+-    public void stopLiveWindowMode() {}
++	}
+ }
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PCMCompressor.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PCMCompressor.java
+deleted file mode 100644
+index fce8aaf954b8a14cf2d8144f63dcd805303f5e70..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PCMCompressor.java
++++ /dev/null
+@@ -1,129 +0,0 @@
+-package edu.wpi.first.wpilibj;
+-
+-import java.nio.ByteBuffer;
+-import java.nio.ByteOrder;
+-
+-import edu.wpi.first.wpilibj.SensorBase;
+-import edu.wpi.first.wpilibj.hal.CompressorJNI;
+-import edu.wpi.first.wpilibj.hal.HALUtil;
+-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.IDevice;
+-import edu.wpi.first.wpilibj.tables.ITable;
+-
+-public class PCMCompressor extends SensorBase implements IDevice, LiveWindowSendable {
+-	private ByteBuffer m_pcm;
+-	
+-	public PCMCompressor(int module) {
+-		initCompressor(module);
+-	}
+-	
+-	public PCMCompressor() {
+-		initCompressor(getDefaultSolenoidModule());
+-	}
+-	
+-	private void initCompressor(int module) {
+-		m_table = null;
+-		
+-		m_pcm = CompressorJNI.initializeCompressor((byte)module);
+-	}
+-	
+-	public void start() {
+-		setClosedLoopControl(false);
+-		setCompressor(true);
+-	}
+-	
+-	public void stop() {
+-		setClosedLoopControl(false);
+-		setCompressor(false);
+-	}
+-	
+-	public boolean enabled() {
+-		ByteBuffer status = ByteBuffer.allocateDirect(4);
+-		status.order(ByteOrder.LITTLE_ENDIAN);
+-		
+-		boolean on = CompressorJNI.getCompressor(m_pcm, status.asIntBuffer());
+-		HALUtil.checkStatus(status.asIntBuffer());
+-		
+-		return on;
+-	}
+-	
+-	public boolean getPressureSwitchValue() {
+-		ByteBuffer status = ByteBuffer.allocateDirect(4);
+-		status.order(ByteOrder.LITTLE_ENDIAN);
+-		
+-		boolean on = CompressorJNI.getPressureSwitch(m_pcm, status.asIntBuffer());
+-		HALUtil.checkStatus(status.asIntBuffer());
+-		
+-		return on;
+-	}
+-	
+-	public float getCompressorCurrent() {
+-		ByteBuffer status = ByteBuffer.allocateDirect(4);
+-		status.order(ByteOrder.LITTLE_ENDIAN);
+-		
+-		float current = CompressorJNI.getCompressorCurrent(m_pcm, status.asIntBuffer());
+-		HALUtil.checkStatus(status.asIntBuffer());
+-		
+-		return current;
+-	}
+-	
+-	public void setClosedLoopControl(boolean on) {
+-		ByteBuffer status = ByteBuffer.allocateDirect(4);
+-		status.order(ByteOrder.LITTLE_ENDIAN);
+-		
+-		CompressorJNI.setClosedLoopControl(m_pcm, on, status.asIntBuffer());
+-		HALUtil.checkStatus(status.asIntBuffer());
+-	}
+-	
+-	public boolean getClosedLoopControl() {
+-		ByteBuffer status = ByteBuffer.allocateDirect(4);
+-		status.order(ByteOrder.LITTLE_ENDIAN);
+-		
+-		boolean on = CompressorJNI.getClosedLoopControl(m_pcm, status.asIntBuffer());
+-		HALUtil.checkStatus(status.asIntBuffer());
+-		
+-		return on;
+-	}
+-
+-	@Override
+-	public void startLiveWindowMode() {
+-	}
+-
+-	@Override
+-	public void stopLiveWindowMode() {
+-	}
+-	
+-	private void setCompressor(boolean on) {
+-		ByteBuffer status = ByteBuffer.allocateDirect(4);
+-		status.order(ByteOrder.LITTLE_ENDIAN);
+-		
+-		CompressorJNI.setCompressor(m_pcm, on, status.asIntBuffer());
+-		HALUtil.checkStatus(status.asIntBuffer());
+-	}
+-	
+-	@Override
+-	public String getSmartDashboardType() {
+-		return "Compressor";
+-	}
+-
+-	private ITable m_table;
+-
+-	@Override
+-	public void initTable(ITable subtable) {
+-		m_table = subtable;
+-		updateTable();
+-	}
+-	
+-	@Override
+-	public ITable getTable() {
+-		return m_table;
+-	}
+-
+-	@Override
+-	public void updateTable() {
+-        if (m_table != null) {
+-            m_table.putBoolean("Enabled", enabled());
+-            m_table.putBoolean("Pressure Switch", getPressureSwitchValue());
+-        }
+-	}
+-}

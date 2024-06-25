@@ -1,0 +1,118 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Thu, 14 Aug 2014 11:37:02 -0400
+Subject: [PATCH 0296/6262] Added message to notify when simulation is
+ unsupported.
+
+Also links to screensteps instructions to set it up.
+
+Change-Id: I61bca3ad773d5e08b3a4f8fa6bc0fd2cd1c04c59
+---
+ .../launching/SimulationNotification.java     | 44 +++++++++++++++++++
+ .../cpp/launching/SimulateLaunchShortcut.java |  8 +++-
+ .../launching/SimulateLaunchShortcut.java     |  8 +++-
+ 3 files changed, 58 insertions(+), 2 deletions(-)
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/SimulationNotification.java
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/SimulationNotification.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/SimulationNotification.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..82130655acec1dfb9c4429f4a999100030099f90
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/launching/SimulationNotification.java
+@@ -0,0 +1,44 @@
++package edu.wpi.first.wpilib.plugins.core.launching;
++
++import java.awt.Desktop;
++import java.io.File;
++import java.io.IOException;
++import java.net.URI;
++import java.net.URISyntaxException;
++
++import javax.swing.JOptionPane;
++
++import org.eclipse.core.runtime.CoreException;
++import org.eclipse.debug.core.DebugPlugin;
++
++import edu.wpi.first.wpilib.plugins.core.WPILibCore;
++
++public class SimulationNotification {
++	private static final String URL = "https://wpilib.screenstepslive.com/s/4485/m/23353";
++	private static final String SIMULATION_UNSUPPORTED_MSG =
++			"Simulation is unsupported on your current setup.\n" +
++			"For more information see: " + URL;
++	
++	public static void showUnsupported() {
++		String title = "Simulation Unsupported";
++		String message = SIMULATION_UNSUPPORTED_MSG; 
++		JOptionPane.showMessageDialog(null, message, title, JOptionPane.OK_OPTION);
++		try {
++			Desktop.getDesktop().browse(new URI(URL));
++		} catch (IOException e) {
++			WPILibCore.logError("Can't open "+URL, e);
++		} catch (URISyntaxException e) {
++			WPILibCore.logError("Can't open "+URL, e);
++		}
++	}
++	
++	public static boolean supportsSimulation() {
++		String[] cmd = {"frcsim", "--version"};
++		try {
++			DebugPlugin.exec(cmd, new File(System.getProperty("user.home")));
++			return true;
++		} catch (CoreException e) {
++			return false;
++		}
++	}
++}
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/SimulateLaunchShortcut.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/SimulateLaunchShortcut.java
+index fae0eae5ae30d22a7aa74cea3e0dafc6c47caa25..334c2ed621574b0a349d7b2df1d5b91f04b43575 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/SimulateLaunchShortcut.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/SimulateLaunchShortcut.java
+@@ -18,6 +18,7 @@ import org.eclipse.ui.IFileEditorInput;
+ import org.eclipse.ui.PlatformUI;
+ 
+ import edu.wpi.first.wpilib.plugins.core.launching.AntLauncher;
++import edu.wpi.first.wpilib.plugins.core.launching.SimulationNotification;
+ import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
+ 
+ /**
+@@ -79,7 +80,12 @@ public class SimulateLaunchShortcut implements ILaunchShortcut {
+ 	 * @param activeProj The project that the script will be run on/from
+ 	 * @param mode The mode it will be run in (ILaunchManager.RUN_MODE or ILaunchManager.DEBUG_MODE)
+ 	 */
+-	public void runConfig(IProject activeProj, String mode){
++	public void runConfig(IProject activeProj, String mode) {
++		if (!SimulationNotification.supportsSimulation()) {
++			SimulationNotification.showUnsupported();
++			return;
++		}
++		
+ 		String targets = "simulate";
+ 		    
+ 		if(mode.equals(ILaunchManager.RUN_MODE)){
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/launching/SimulateLaunchShortcut.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/launching/SimulateLaunchShortcut.java
+index 7d5763db0d866f15f595a2cde0a32321aa1af476..cb4fca6ca9e40e023e81bd62aa7b7c89ffca25da 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/launching/SimulateLaunchShortcut.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/launching/SimulateLaunchShortcut.java
+@@ -2,6 +2,8 @@ package edu.wpi.first.wpilib.plugins.java.launching;
+ 
+ import org.eclipse.core.resources.IProject;
+ 
++import edu.wpi.first.wpilib.plugins.core.launching.SimulationNotification;
++
+ public class SimulateLaunchShortcut extends JavaLaunchShortcut {
+ 
+ 
+@@ -11,7 +13,11 @@ public class SimulateLaunchShortcut extends JavaLaunchShortcut {
+ 	 * @param mode The mode it will be run in (ILaunchManager.RUN_MODE or ILaunchManager.DEBUG_MODE)
+ 	 */
+ 	public void runConfig(IProject activeProj, String mode){
+-		runConfigHelper(activeProj, mode, "simulate", "debug-simulate");
++		if (SimulationNotification.supportsSimulation()) {
++			runConfigHelper(activeProj, mode, "simulate", "debug-simulate");
++		} else {
++			SimulationNotification.showUnsupported();
++		}
+ 	}
+ 	
+ 	protected String getHostname(IProject proj) {

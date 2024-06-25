@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Tue, 12 Aug 2014 15:45:15 -0400
+Subject: [PATCH 0288/6262] Fixes for examples and Gazebo 3.1.
+
+Change-Id: Ie41a29b4b8f5cee87357f44adb45f54e03487622
+---
+ .../resources/templates/.cproject                            | 2 +-
+ jenkins/docs/Makefile                                        | 5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index a92d5bdd18a8f1186c48e4ffae49e1d045de6558..53564431d6de32f6a6faf4d9d56bef93d15a68cf 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -153,7 +153,7 @@
+ 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}/src&quot;"/>
+ 									<listOptionValue builtIn="false" value="$cpp-location/sim/include"/>
+ 									<listOptionValue builtIn="false" value="/usr/include"/>
+-									<listOptionValue builtIn="false" value="/usr/include/gazebo-3.0"/>
++									<listOptionValue builtIn="false" value="/usr/include/gazebo-3.1"/>
+ 									<listOptionValue builtIn="false" value="/usr/include/sdformat-2.0"/>
+ 								</option>
+ 								<option id="gnu.cpp.compiler.option.optimization.level.1648211502" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+diff --git a/jenkins/docs/Makefile b/jenkins/docs/Makefile
+index 70988a0051b752691426a6751bacb7940117528d..64600a90ed45ab4a21af052c813bb92e18cc0956 100644
+--- a/jenkins/docs/Makefile
++++ b/jenkins/docs/Makefile
+@@ -1,4 +1,5 @@
+ allwpilib=../..
++version=DEVELOPMENT
+ 
+ all: java cpp site
+ 
+@@ -8,7 +9,7 @@ java:
+ 	cp -r $(allwpilib)/wpilibj/wpilibJava/src/main/java/* build/java/
+ 	cp -r $(allwpilib)/wpilibj/wpilibJavaDevices/src/main/java/* build/java/
+ 	# cp -r $(allwpilib)/networktables/java/src/main/java/* build/java/
+-	doxygen java.doxy
++	( cat java.doxy ; echo "PROJECT_NUMBER=${version}" ) | doxygen -
+ 
+ cpp:
+ 	mkdir -p build/cpp/
+@@ -19,7 +20,7 @@ cpp:
+ 	cp -r $(allwpilib)/wpilibc/wpilibC++Devices/include build/cpp/
+ 	# cp -r $(allwpilib)/networktables/cpp/lib build/cpp/
+ 	# cp -r $(allwpilib)/networktables/cpp/include build/cpp/
+-	doxygen cpp.doxy
++	( cat cpp.doxy ; echo "PROJECT_NUMBER=${version}" ) | doxygen -
+ 
+ # TODO: HAL
+ 

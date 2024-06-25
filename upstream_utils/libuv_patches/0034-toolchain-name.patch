@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Sat, 5 Apr 2014 20:32:17 -0400
+Subject: [PATCH 0034/6262] toolchain name...
+
+---
+ .../src/main/resources/cpp-zip/ant/build.xml                    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+index 2c2df68182431c1aaf5750ec4676ac5ef740799c..166ea15bb80f3ae539c4b3c0cd8c6d7aaacc7fcc 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+@@ -109,7 +109,7 @@ ${md5.hal} usr/local/frc/lib/libHALAthena.so</echo>
+ 				</tarfileset>
+ 			</tar>
+ 			<gzip destfile="${wpilib.ant.dir}/control.tar.gz" src="${wpilib.ant.dir}/control.tar"/>
+-			<exec command="arm-linux-gnueabi-ar -r ${opkg.name}_${cpp-sos}_${opkg.arch}.deb debian-binary control.tar.gz data.tar.gz" dir="${wpilib.ant.dir}"/>
++			<exec command="arm-none-linux-gnueabi-ar -r ${opkg.name}_${cpp-sos}_${opkg.arch}.deb debian-binary control.tar.gz data.tar.gz" dir="${wpilib.ant.dir}"/>
+ 		    <scp file="${wpilib.ant.dir}/${opkg.name}_${cpp-sos}_${opkg.arch}.deb" todir="${username}@${target}:/tmp"
+ 				 password="${password}" trust="true"/>
+ 			<sshexec host="${target}"

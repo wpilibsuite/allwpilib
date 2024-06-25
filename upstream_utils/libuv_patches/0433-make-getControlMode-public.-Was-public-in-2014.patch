@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joe Ross <joe@rossesmail.com>
+Date: Tue, 21 Oct 2014 19:54:42 -0700
+Subject: [PATCH 0433/6262] make getControlMode public. Was public in 2014.
+
+Change-Id: I158f41e66407d47c50e3d632661a040c8cd68d14
+---
+ wpilibc/wpilibC++Devices/include/CANJaguar.h                  | 4 ++--
+ .../src/main/java/edu/wpi/first/wpilibj/CANJaguar.java        | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/include/CANJaguar.h b/wpilibc/wpilibC++Devices/include/CANJaguar.h
+index 53a64af984ce793667a1a2e0bed784f12240b881..289977d61467f9244b8729ed51f2d0185cd21311 100644
+--- a/wpilibc/wpilibC++Devices/include/CANJaguar.h
++++ b/wpilibc/wpilibC++Devices/include/CANJaguar.h
+@@ -41,6 +41,7 @@ public:
+ 	/** Sets a potentiometer as the position reference only. <br> Passed as the "tag" when setting the control mode. */
+ 	static const struct PotentiometerStruct {} Potentiometer;
+ 
++	typedef enum {kPercentVbus, kCurrent, kSpeed, kPosition, kVoltage} ControlMode;
+ 	typedef enum {kCurrentFault = 1, kTemperatureFault = 2, kBusVoltageFault = 4, kGateDriverFault = 8} Faults;
+ 	typedef enum {kForwardLimit = 1, kReverseLimit = 2} Limits;
+ 	typedef enum {
+@@ -133,6 +134,7 @@ public:
+ 	void ConfigReverseLimit(double reverseLimitPosition);
+ 	void ConfigMaxOutputVoltage(double voltage);
+ 	void ConfigFaultTime(float faultTime);
++	ControlMode GetControlMode();
+ 
+ 	static void UpdateSyncGroup(uint8_t syncGroup);
+ 
+@@ -147,10 +149,8 @@ public:
+ 
+ protected:
+ 	// Control mode helpers
+-	typedef enum {kPercentVbus, kCurrent, kSpeed, kPosition, kVoltage} ControlMode;
+ 
+ 	void ChangeControlMode(ControlMode controlMode);
+-	ControlMode GetControlMode();
+ 
+ 	void SetSpeedReference(uint8_t reference);
+ 	uint8_t GetSpeedReference();
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
+index c4e4ed6e84a9db394b4e878ccdbf5b2871f60036..5fd73add47dc79664a05fa64ef9d69dadd5b3e96 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
+@@ -54,7 +54,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
+ 	/**
+ 	* Mode determines how the Jaguar is controlled, used internally.
+ 	*/
+-	private enum ControlMode {
++	public enum ControlMode {
+ 		PercentVbus, Current, Speed, Position, Voltage;
+ 	}
+ 
+@@ -1377,7 +1377,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
+ 	*
+ 	* @return ControlMode that the Jag is in.
+ 	*/
+-	private ControlMode getControlMode() {
++	public ControlMode getControlMode() {
+ 		return m_controlMode;
+ 	}
+ 

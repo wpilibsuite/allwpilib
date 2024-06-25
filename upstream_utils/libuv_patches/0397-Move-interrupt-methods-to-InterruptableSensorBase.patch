@@ -1,0 +1,449 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Wed, 8 Oct 2014 14:52:24 -0400
+Subject: [PATCH 0397/6262] Move interrupt methods to InterruptableSensorBase
+
+Analog interrupts work again now, and RequestInterrupts is no longer
+duplicated three times.
+
+Change-Id: I5244b76262d7620852141cd21b2429d627636793
+---
+ .../include/AnalogTriggerOutput.h             | 10 +--
+ .../wpilibC++Devices/include/DigitalInput.h   |  5 --
+ .../wpilibC++Devices/include/DigitalOutput.h  |  4 -
+ .../wpilibC++Devices/include/DigitalSource.h  |  2 -
+ .../include/InterruptableSensorBase.h         |  8 +-
+ .../src/AnalogTriggerOutput.cpp               | 51 -------------
+ wpilibc/wpilibC++Devices/src/DigitalInput.cpp | 72 ------------------
+ .../wpilibC++Devices/src/DigitalOutput.cpp    | 72 ------------------
+ .../src/InterruptableSensorBase.cpp           | 73 +++++++++++++++++++
+ 9 files changed, 83 insertions(+), 214 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/include/AnalogTriggerOutput.h b/wpilibc/wpilibC++Devices/include/AnalogTriggerOutput.h
+index b693e3d3aaaa8ff9d8e40448e41d3f0f685e9b92..e4d8cd5cda96fd49f40dd057c07283022f006148 100644
+--- a/wpilibc/wpilibC++Devices/include/AnalogTriggerOutput.h
++++ b/wpilibc/wpilibC++Devices/include/AnalogTriggerOutput.h
+@@ -14,15 +14,15 @@ class AnalogTrigger;
+  * This class is used to get the current output value and also as a DigitalSource
+  * to provide routing of an output to digital subsystems on the FPGA such as
+  * Counter, Encoder, and Interrupt.
+- * 
++ *
+  * The TriggerState output indicates the primary output value of the trigger.  If the analog
+  * signal is less than the lower limit, the output is false.  If the analog value is greater
+  * than the upper limit, then the output is true.  If the analog value is in between, then
+  * the trigger output state maintains its most recent value.
+- * 
++ *
+  * The InWindow output indicates whether or not the analog signal is inside the range defined
+  * by the limits.
+- * 
++ *
+  * The RisingPulse and FallingPulse outputs detect an instantaneous transition from above the
+  * upper limit to below the lower limit, and vise versa.  These pulses represent a rollover
+  * condition of a sensor and can be routed to an up / down couter or to interrupts.  Because
+@@ -40,7 +40,7 @@ class AnalogTriggerOutput : public DigitalSource
+ {
+ 	friend class AnalogTrigger;
+ public:
+-	
++
+ 	virtual ~AnalogTriggerOutput();
+ 	bool Get();
+ 
+@@ -48,8 +48,6 @@ public:
+ 	virtual uint32_t GetChannelForRouting();
+ 	virtual uint32_t GetModuleForRouting();
+ 	virtual bool GetAnalogTriggerForRouting();
+-	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param = NULL); ///< Asynchronus handler version.
+-	virtual void RequestInterrupts();		///< Synchronus Wait version.
+ protected:
+ 	AnalogTriggerOutput(AnalogTrigger *trigger, AnalogTriggerType outputType);
+ 
+diff --git a/wpilibc/wpilibC++Devices/include/DigitalInput.h b/wpilibc/wpilibC++Devices/include/DigitalInput.h
+index 030de412f2e637371a816b9a09b928fd74b1dfa2..f7dcba3b69a4c71e1d5b7f5b324dd3349643f7b1 100644
+--- a/wpilibc/wpilibC++Devices/include/DigitalInput.h
++++ b/wpilibc/wpilibC++Devices/include/DigitalInput.h
+@@ -28,11 +28,6 @@ public:
+ 	virtual uint32_t GetModuleForRouting();
+ 	virtual bool GetAnalogTriggerForRouting();
+ 
+-	// Interruptable Interface
+-	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param = NULL); ///< Asynchronus handler version.
+-	virtual void RequestInterrupts();		///< Synchronus Wait version.
+-	void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
+-
+ 	void UpdateTable();
+ 	void StartLiveWindowMode();
+ 	void StopLiveWindowMode();
+diff --git a/wpilibc/wpilibC++Devices/include/DigitalOutput.h b/wpilibc/wpilibC++Devices/include/DigitalOutput.h
+index 015c70e0a18cd5cbe7d015cbd0b5732cbdff9d21..431f4f8e2eccf730826f6e33eb63c3ef71804dc5 100644
+--- a/wpilibc/wpilibC++Devices/include/DigitalOutput.h
++++ b/wpilibc/wpilibC++Devices/include/DigitalOutput.h
+@@ -32,10 +32,6 @@ public:
+ 	virtual uint32_t GetChannelForRouting();
+ 	virtual uint32_t GetModuleForRouting();
+ 	virtual bool GetAnalogTriggerForRouting();
+-	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param);
+-	virtual void RequestInterrupts();
+-
+-	void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
+ 
+ 	virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+ 	void UpdateTable();
+diff --git a/wpilibc/wpilibC++Devices/include/DigitalSource.h b/wpilibc/wpilibC++Devices/include/DigitalSource.h
+index ca139a44eacf22614a66c31d5b2b0b7e7f713d7b..491fa7c39a1f4fb596493c38ba829b4d20f3f8bb 100644
+--- a/wpilibc/wpilibC++Devices/include/DigitalSource.h
++++ b/wpilibc/wpilibC++Devices/include/DigitalSource.h
+@@ -21,6 +21,4 @@ public:
+ 	virtual uint32_t GetChannelForRouting() = 0;
+ 	virtual uint32_t GetModuleForRouting() = 0;
+ 	virtual bool GetAnalogTriggerForRouting() = 0;
+-	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param) = 0;
+-	virtual void RequestInterrupts() = 0;
+ };
+diff --git a/wpilibc/wpilibC++Devices/include/InterruptableSensorBase.h b/wpilibc/wpilibC++Devices/include/InterruptableSensorBase.h
+index f56cfafd609daa3a54c278ce2a6021befc257df0..fb0db4f90205ae0be0856d4ecbe7a6df35103555 100644
+--- a/wpilibc/wpilibC++Devices/include/InterruptableSensorBase.h
++++ b/wpilibc/wpilibC++Devices/include/InterruptableSensorBase.h
+@@ -21,14 +21,18 @@ public:
+ 
+ 	InterruptableSensorBase();
+ 	virtual ~InterruptableSensorBase();
+-	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param) = 0; ///< Asynchronus handler version.
+-	virtual void RequestInterrupts() = 0;		///< Synchronus Wait version.
++	virtual uint32_t GetChannelForRouting() = 0;
++	virtual uint32_t GetModuleForRouting() = 0;
++	virtual bool GetAnalogTriggerForRouting() = 0;
++	virtual void RequestInterrupts(InterruptHandlerFunction handler, void *param); ///< Asynchronus handler version.
++	virtual void RequestInterrupts();		///< Synchronus Wait version.
+ 	virtual void CancelInterrupts();			///< Free up the underlying chipobject functions.
+ 	virtual WaitResult WaitForInterrupt(float timeout, bool ignorePrevious = true); ///< Synchronus version.
+ 	virtual void EnableInterrupts();			///< Enable interrupts - after finishing setup.
+ 	virtual void DisableInterrupts();		///< Disable, but don't deallocate.
+ 	virtual double ReadRisingTimestamp();///< Return the timestamp for the rising interrupt that occurred.
+ 	virtual double ReadFallingTimestamp();///< Return the timestamp for the falling interrupt that occurred.
++	virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
+ protected:
+ 	void* m_interrupt;
+ 	uint32_t m_interruptIndex;
+diff --git a/wpilibc/wpilibC++Devices/src/AnalogTriggerOutput.cpp b/wpilibc/wpilibC++Devices/src/AnalogTriggerOutput.cpp
+index 805cfd88fdd419b08c507d78fbd9005ef7edeeff..65febfa917caafa6cb046fdf3ff9654d0c7ce189 100644
+--- a/wpilibc/wpilibC++Devices/src/AnalogTriggerOutput.cpp
++++ b/wpilibc/wpilibC++Devices/src/AnalogTriggerOutput.cpp
+@@ -72,54 +72,3 @@ bool AnalogTriggerOutput::GetAnalogTriggerForRouting()
+ {
+ 	return true;
+ }
+-
+-/**
+- * Request interrupts asynchronously on this analog trigger output.
+- * @param handler The address of the interrupt handler function of type tInterruptHandler that
+- * will be called whenever there is an interrupt on the digitial input port.
+- * Request interrupts in synchronus mode where the user program interrupt handler will be
+- * called when an interrupt occurs.
+- */
+-void AnalogTriggerOutput::RequestInterrupts(InterruptHandlerFunction handler, void *param)
+-{
+-	if (StatusIsFatal()) return;
+-	uint32_t index = m_interrupts->Allocate("Async Interrupt");
+-	if (index == ~0ul)
+-	{
+-		CloneError(m_interrupts);
+-		return;
+-	}
+-	m_interruptIndex = index;
+-
+-	AllocateInterrupts(false);
+-
+-	int32_t status = 0;
+-	requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
+-	                  GetAnalogTriggerForRouting(), &status);
+-	attachInterruptHandler(m_interrupt, handler, param, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-}
+-
+-/**
+- * Request interrupts synchronously on this analog trigger output.
+- * Request interrupts in asynchronus mode where the user program will have to
+- * explicitly wait for the interrupt to occur.
+- */
+-void AnalogTriggerOutput::RequestInterrupts()
+-{
+-	if (StatusIsFatal()) return;
+-	uint32_t index = m_interrupts->Allocate("Sync Interrupt");
+-	if (index == ~0ul)
+-	{
+-		CloneError(m_interrupts);
+-		return;
+-	}
+-	m_interruptIndex = index;
+-
+-	AllocateInterrupts(true);
+-
+-	int32_t status = 0;
+-	requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
+-					  GetAnalogTriggerForRouting(), &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-}
+diff --git a/wpilibc/wpilibC++Devices/src/DigitalInput.cpp b/wpilibc/wpilibC++Devices/src/DigitalInput.cpp
+index 917062b91868bda49300203d22da0a87a5ea74c4..b4d6a44bd434c682055dbc24c1b58e10f8fc1090 100644
+--- a/wpilibc/wpilibC++Devices/src/DigitalInput.cpp
++++ b/wpilibc/wpilibC++Devices/src/DigitalInput.cpp
+@@ -109,78 +109,6 @@ bool DigitalInput::GetAnalogTriggerForRouting()
+ 	return false;
+ }
+ 
+-/**
+- * Request interrupts asynchronously on this digital input.
+- * @param handler The address of the interrupt handler function of type tInterruptHandler that
+- * will be called whenever there is an interrupt on the digitial input port.
+- * Request interrupts in asynchronus mode where the user program interrupt handler will be
+- * called when an interrupt occurs.
+- * The default is interrupt on rising edges only.
+- */
+-void DigitalInput::RequestInterrupts(InterruptHandlerFunction handler, void *param)
+-{
+-	if (StatusIsFatal()) return;
+-	uint32_t index = m_interrupts->Allocate("Async Interrupt");
+-	if (index == ~0ul)
+-	{
+-		CloneError(m_interrupts);
+-		return;
+-	}
+-	m_interruptIndex = index;
+-
+-	 // Creates a manager too
+-	AllocateInterrupts(false);
+-
+-	int32_t status = 0;
+-	requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
+-					  GetAnalogTriggerForRouting(), &status);
+-	SetUpSourceEdge(true, false);
+-	attachInterruptHandler(m_interrupt, handler, param, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-}
+-
+-/**
+- * Request interrupts synchronously on this digital input.
+- * Request interrupts in synchronus mode where the user program will have to explicitly
+- * wait for the interrupt to occur.
+- * The default is interrupt on rising edges only.
+- */
+-void DigitalInput::RequestInterrupts()
+-{
+-	if (StatusIsFatal()) return;
+-	uint32_t index = m_interrupts->Allocate("Sync Interrupt");
+-	if (index == ~0ul)
+-	{
+-		CloneError(m_interrupts);
+-		return;
+-	}
+-	m_interruptIndex = index;
+-
+-	AllocateInterrupts(true);
+-
+-	int32_t status = 0;
+-	requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
+-					  GetAnalogTriggerForRouting(), &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	SetUpSourceEdge(true, false);
+-}
+-
+-void DigitalInput::SetUpSourceEdge(bool risingEdge, bool fallingEdge)
+-{
+-	if (StatusIsFatal()) return;
+-	if (m_interrupt == NULL)
+-	{
+-		wpi_setWPIErrorWithContext(NullParameter, "You must call RequestInterrupts before SetUpSourceEdge");
+-		return;
+-	}
+-	if (m_interrupt != NULL)
+-	{
+-		int32_t status = 0;
+-		setInterruptUpSourceEdge(m_interrupt, risingEdge, fallingEdge, &status);
+-		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	}
+-}
+-
+ void DigitalInput::UpdateTable() {
+ 	if (m_table != NULL) {
+ 		m_table->PutBoolean("Value", Get());
+diff --git a/wpilibc/wpilibC++Devices/src/DigitalOutput.cpp b/wpilibc/wpilibC++Devices/src/DigitalOutput.cpp
+index ed54b7e4e87ce6227d6f1065ebb1a46c1bba7012..802363f4013bebfbcb868e6d1aadab59938372ad 100644
+--- a/wpilibc/wpilibC++Devices/src/DigitalOutput.cpp
++++ b/wpilibc/wpilibC++Devices/src/DigitalOutput.cpp
+@@ -222,78 +222,6 @@ bool DigitalOutput::GetAnalogTriggerForRouting()
+ 	return false;
+ }
+ 
+-/**
+- * Request interrupts asynchronously on this digital output.
+- * @param handler The address of the interrupt handler function of type tInterruptHandler that
+- * will be called whenever there is an interrupt on the digitial output port.
+- * Request interrupts in synchronus mode where the user program interrupt handler will be
+- * called when an interrupt occurs.
+- * The default is interrupt on rising edges only.
+- */
+-void DigitalOutput::RequestInterrupts(InterruptHandlerFunction handler, void *param)
+-{
+-	if (StatusIsFatal()) return;
+-	uint32_t index = m_interrupts->Allocate("Sync Interrupt");
+-	if (index == ~0ul)
+-	{
+-		CloneError(m_interrupts);
+-		return;
+-	}
+-	m_interruptIndex = index;
+-
+-	// Creates a manager too
+-	AllocateInterrupts(false);
+-
+-	int32_t status = 0;
+-    	requestInterrupts(m_interrupt, 1, GetChannelForRouting(),
+-					  GetAnalogTriggerForRouting(), &status);
+-	SetUpSourceEdge(true, false);
+-	attachInterruptHandler(m_interrupt, handler, param, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-}
+-
+-/**
+- * Request interrupts synchronously on this digital output.
+- * Request interrupts in synchronus mode where the user program will have to explicitly
+- * wait for the interrupt to occur.
+- * The default is interrupt on rising edges only.
+- */
+-void DigitalOutput::RequestInterrupts()
+-{
+-	if (StatusIsFatal()) return;
+-	uint32_t index = m_interrupts->Allocate("Sync Interrupt");
+-	if (index == ~0ul)
+-	{
+-		CloneError(m_interrupts);
+-		return;
+-	}
+-	m_interruptIndex = index;
+-
+-	AllocateInterrupts(true);
+-
+-	int32_t status = 0;
+-	requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
+-					  GetAnalogTriggerForRouting(), &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	SetUpSourceEdge(true, false);
+-}
+-
+-void DigitalOutput::SetUpSourceEdge(bool risingEdge, bool fallingEdge)
+-{
+-	if (StatusIsFatal()) return;
+-	if (m_interrupt == NULL)
+-	{
+-		wpi_setWPIErrorWithContext(NullParameter, "You must call RequestInterrupts before SetUpSourceEdge");
+-		return;
+-	}
+-	if (m_interrupt != NULL)
+-	{
+-		int32_t status = 0;
+-		setInterruptUpSourceEdge(m_interrupt, risingEdge, fallingEdge, &status);
+-		wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	}
+-}
+-
+ void DigitalOutput::ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew) {
+ 	Set(value.b);
+ }
+diff --git a/wpilibc/wpilibC++Devices/src/InterruptableSensorBase.cpp b/wpilibc/wpilibC++Devices/src/InterruptableSensorBase.cpp
+index 73ef6ee7948727deec6a54f39cfeeface4d31caa..509f21f922d8010671e490305cf61b1046ba0b4a 100644
+--- a/wpilibc/wpilibC++Devices/src/InterruptableSensorBase.cpp
++++ b/wpilibc/wpilibC++Devices/src/InterruptableSensorBase.cpp
+@@ -6,6 +6,7 @@
+ 
+ #include "InterruptableSensorBase.h"
+ #include "Utility.h"
++#include "WPIErrors.h"
+ 
+ Resource *InterruptableSensorBase::m_interrupts = NULL;
+ 
+@@ -20,6 +21,54 @@ InterruptableSensorBase::~InterruptableSensorBase()
+ 
+ }
+ 
++void InterruptableSensorBase::RequestInterrupts(InterruptHandlerFunction handler, void *param)
++{
++	if (StatusIsFatal()) return;
++	uint32_t index = m_interrupts->Allocate("Async Interrupt");
++	if (index == ~0ul)
++	{
++		CloneError(m_interrupts);
++		return;
++	}
++	m_interruptIndex = index;
++
++	// Creates a manager too
++	AllocateInterrupts(false);
++
++	int32_t status = 0;
++	requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
++					GetAnalogTriggerForRouting(), &status);
++	SetUpSourceEdge(true, false);
++	attachInterruptHandler(m_interrupt, handler, param, &status);
++	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++}
++
++/**
++* Request interrupts synchronously on this digital input.
++* Request interrupts in synchronus mode where the user program will have to explicitly
++* wait for the interrupt to occur.
++* The default is interrupt on rising edges only.
++*/
++void InterruptableSensorBase::RequestInterrupts()
++{
++	if (StatusIsFatal()) return;
++	uint32_t index = m_interrupts->Allocate("Sync Interrupt");
++	if (index == ~0ul)
++	{
++		CloneError(m_interrupts);
++		return;
++	}
++	m_interruptIndex = index;
++
++	AllocateInterrupts(true);
++
++	int32_t status = 0;
++	requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
++					GetAnalogTriggerForRouting(), &status);
++	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	SetUpSourceEdge(true, false);
++}
++
+ void InterruptableSensorBase::AllocateInterrupts(bool watcher)
+ {
+ 	wpi_assert(m_interrupt == NULL);
+@@ -117,3 +166,27 @@ double InterruptableSensorBase::ReadFallingTimestamp()
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 	return timestamp;
+ }
++
++/**
++ * Set which edge to trigger interrupts on
++ *
++ * @param risingEdge
++ *            true to interrupt on rising edge
++ * @param fallingEdge
++ *            true to interrupt on falling edge
++ */
++void InterruptableSensorBase::SetUpSourceEdge(bool risingEdge, bool fallingEdge)
++{
++	if (StatusIsFatal()) return;
++	if (m_interrupt == NULL)
++	{
++		wpi_setWPIErrorWithContext(NullParameter, "You must call RequestInterrupts before SetUpSourceEdge");
++		return;
++	}
++	if (m_interrupt != NULL)
++	{
++		int32_t status = 0;
++		setInterruptUpSourceEdge(m_interrupt, risingEdge, fallingEdge, &status);
++		wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	}
++}

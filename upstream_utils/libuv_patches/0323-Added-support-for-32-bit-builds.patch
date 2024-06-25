@@ -1,0 +1,125 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Wed, 27 Aug 2014 15:46:41 -0400
+Subject: [PATCH 0323/6262] Added support for 32-bit builds.
+
+Change-Id: I609844b3c72ca9d016a43a7b0e288abb4dc2400e
+Note: Jenkins probably needs to be restarted to get proper sbuild permissions.
+---
+ simulation/debs/Makefile                      | 35 ++++++++++++++++---
+ .../frcsim-gazebo-plugins/debian/rules        |  3 ++
+ .../frcsim-libwpilibsim-cpp/debian/rules      |  6 ++--
+ 3 files changed, 38 insertions(+), 6 deletions(-)
+
+diff --git a/simulation/debs/Makefile b/simulation/debs/Makefile
+index 0b8a09fce693d45d9c946ecbe0ab07aa0a1cc2aa..71502f46271fd49132c5e37e115bf6169843f7ca 100644
+--- a/simulation/debs/Makefile
++++ b/simulation/debs/Makefile
+@@ -34,10 +34,12 @@ debs: debs-frcsim-gazebo-plugins debs-frcsim-gazebo-models debs-frcsim-eclipse-p
+ 
+ update-repository: debs clean-repository 
+ 	cd repository && reprepro includedeb $(codename) ../frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_amd64.deb
++	cd repository && reprepro includedeb $(codename) ../frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_i386.deb
+ 	cd repository && reprepro includedeb $(codename) ../frcsim-gazebo-models/frcsim-gazebo-models_$(gazebo-models-package-version)_all.deb
+ 	cd repository && reprepro includedeb $(codename) ../frcsim-eclipse-plugins/frcsim-eclipse-plugins_$(eclipse-plugins-package-version)_all.deb
+ 	cd repository && reprepro includedeb $(codename) ../frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-package-version)_all.deb
+ 	cd repository && reprepro includedeb $(codename) ../frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb
++	cd repository && reprepro includedeb $(codename) ../frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_i386.deb
+ 	cd repository && reprepro includedeb $(codename) ../frcsim/frcsim_$(frcsim-package-version)_all.deb
+ 	echo Repository Updated
+ 
+@@ -58,10 +60,12 @@ clean:
+ 	-rm frcsim/frcsim_$(frcsim-version).orig.tar.gz
+ 
+ 	-rm frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_amd64.deb
++	-rm frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_i386.deb
+ 	-rm frcsim-gazebo-models/frcsim-gazebo-models_$(gazebo-models-package-version)_all.deb
+ 	-rm frcsim-eclipse-plugins/frcsim-eclipse-plugins_$(eclipse-plugins-package-version)_all.deb
+ 	-rm frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-package-version)_all.deb
+ 	-rm frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb
++	-rm frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_i386.deb
+ 	-rm frcsim/frcsim_$(frcsim-package-version)_all.deb
+ 
+ install:
+@@ -130,6 +134,12 @@ frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolch
+ orig-frcsim-libwpilibsim-cpp: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz
+ pull-libwpilibsim-cpp:
+ 	cp -rf -t frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/ $(allwpilib)/wpilibc/wpilibC++Sim/*
++	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib
++	cp -rf $(allwpilib)/hal frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib
++	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/networktables
++	cp -rf $(allwpilib)/networktables/cpp frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/networktables
++	mkdir -p frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibc
++	cp -r $(allwpilib)/wpilibc/wpilibC++ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/allwpilib/wpilibc 
+ 	echo Increment version?
+ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz: pull-libwpilibsim-cpp
+ 	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && debuild clean
+@@ -148,9 +158,12 @@ frcsim/frcsim_$(frcsim-version).orig.tar.gz:
+ .PHONY: debs-frcsim-gazebo-plugins debs-frcsim-gazebo-models debs-frcsim-eclipse-plugins \
+ 		debs-frcsim-eclipse-toolchain-plugin debs-frcsim-libwpilibsim-cpp debs-frcsim
+ 
+-debs-frcsim-gazebo-plugins: frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_amd64.deb
++debs-frcsim-gazebo-plugins: frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_amd64.deb frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_i386.deb
++frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_i386.deb: frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-version).orig.tar.gz frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_amd64.deb
++	cd frcsim-gazebo-plugins/frcsim-gazebo-plugins && make clean
++	cd frcsim-gazebo-plugins && sbuild --arch=i386 -A -d trusty-i386 frcsim-gazebo-plugins_$(gazebo-plugins-package-version).dsc
+ frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-package-version)_amd64.deb: frcsim-gazebo-plugins/frcsim-gazebo-plugins_$(gazebo-plugins-version).orig.tar.gz
+-	cd frcsim-gazebo-plugins/frcsim-gazebo-plugins && debuild --no-lintian -us -uc -iamd64
++	cd frcsim-gazebo-plugins/frcsim-gazebo-plugins && debuild --no-lintian -us -uc -aamd64
+ 
+ debs-frcsim-gazebo-models: frcsim-gazebo-models/frcsim-gazebo-models_$(gazebo-models-package-version)_all.deb
+ frcsim-gazebo-models/frcsim-gazebo-models_$(gazebo-models-package-version)_all.deb: frcsim-gazebo-models/frcsim-gazebo-models_$(gazebo-models-version).orig.tar.gz
+@@ -164,10 +177,24 @@ debs-frcsim-eclipse-toolchain-plugin: frcsim-eclipse-toolchain-plugin/frcsim-ecl
+ frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-package-version)_all.deb: frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolchain-version).orig.tar.gz
+ 	cd frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin && debuild --no-lintian -us -uc
+ 
+-debs-frcsim-libwpilibsim-cpp: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb
++debs-frcsim-libwpilibsim-cpp: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_i386.deb
++frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_i386.deb: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb
++	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && make clean
++	cd frcsim-libwpilibsim-cpp && sbuild --arch=i386 -A -d trusty-i386 frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version).dsc
+ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz
+-	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && debuild --no-lintian -us -uc
++	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && debuild --no-lintian -us -uc -aamd64
+ 
+ debs-frcsim: frcsim/frcsim_$(frcsim-package-version)_all.deb
+ frcsim/frcsim_$(frcsim-package-version)_all.deb: frcsim/frcsim_$(frcsim-version).orig.tar.gz
+ 	cd frcsim/frcsim && debuild --no-lintian -us -uc
++
++### SBUILD
++#
++# For building 32-bit builds on 64-bit machines
++#
++# $ mk-sbuild --arch i386 --personality=linux32 trusty
++# To CHANGE the golden image: sudo schroot -c source:trusty-i386 -u root
++# To ENTER an image snapshot: schroot -c trusty-i386
++# To BUILD within a snapshot: sbuild -A -d trusty-i386 PACKAGE*.dsc
++# 
++# sbuild --arch=i386 -A -d trusty-i386 frcsim-gazebo-plugins_0.2-1.dsc
+diff --git a/simulation/debs/frcsim-gazebo-plugins/frcsim-gazebo-plugins/debian/rules b/simulation/debs/frcsim-gazebo-plugins/frcsim-gazebo-plugins/debian/rules
+index cbe925d7587131c8ec8761915930894c60c096fd..1b48bf7732059e12336de7a31c877db5f69c8320 100755
+--- a/simulation/debs/frcsim-gazebo-plugins/frcsim-gazebo-plugins/debian/rules
++++ b/simulation/debs/frcsim-gazebo-plugins/frcsim-gazebo-plugins/debian/rules
+@@ -1,3 +1,6 @@
+ #!/usr/bin/make -f
+ %:
+ 	dh $@
++
++override_dh_strip:
++	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/frcsim-gazebo-plugins/usr/lib/frcsim/plugins/libgz_potentiometer.so
+diff --git a/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/rules b/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/rules
+index be0674548d63eee526cf96f334a31ce21aadd202..f1e8a9d0a24da08941369067d302a8ce8d8413df 100755
+--- a/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/rules
++++ b/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/debian/rules
+@@ -3,7 +3,9 @@
+ 	dh $@
+ 
+ override_dh_auto_build:
+-	$(MAKE) allwpilib=../../../..
++	$(MAKE) allwpilib=allwpilib
+ 
+ override_dh_auto_install:
+-	$(MAKE) DESTDIR=$$(pwd)/debian/frcsim-libwpilibsim-cpp allwpilib=../../../.. install
++	$(MAKE) DESTDIR=$$(pwd)/debian/frcsim-libwpilibsim-cpp allwpilib=allwpilib install
++
++override_dh_strip:

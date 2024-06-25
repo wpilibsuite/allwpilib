@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Sun, 14 Sep 2014 14:57:23 -0400
+Subject: [PATCH 0346/6262] Fixed bug where mac toolchains always reinstall on
+ Eclipse start
+
+Change-Id: Id94631162efe5766feedac2979264fe17e09b5eb
+---
+ .../plugins/cpp/toolchains/mac/ToolchainInstaller.java      | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/mac/ToolchainInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/mac/ToolchainInstaller.java
+index 4fd73549620c465a6580c426a3c3138ef8ba0c87..80766e6a053a1ee579fbcd694815f5d4ee5f4bb5 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/mac/ToolchainInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/mac/ToolchainInstaller.java
+@@ -12,7 +12,8 @@ public class ToolchainInstaller extends AbstractInstaller {
+ 
+ 	public ToolchainInstaller(String version) {
+ 		super(version, 
+-				WPILibCPPPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.TOOLCHAIN_INSTALLED), WPILibCPPPlugin.getDefault().getToolchain());
++				WPILibCPPPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.TOOLCHAIN_INSTALLED), 
++				WPILibCPPPlugin.getDefault().getToolchain());
+ 	}
+ 
+ 	@Override
+@@ -22,7 +23,7 @@ public class ToolchainInstaller extends AbstractInstaller {
+ 
+ 	@Override
+ 	protected void updateInstalledVersion(String version) {
+-		WPILibCPPPlugin.getDefault().getPreferenceStore().setDefault(PreferenceConstants.TOOLCHAIN_INSTALLED,
++		WPILibCPPPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.TOOLCHAIN_INSTALLED,
+ 				version);
+ 	}
+ 
+@@ -30,5 +31,4 @@ public class ToolchainInstaller extends AbstractInstaller {
+ 	protected InputStream getInstallResourceStream() {
+ 		return ToolchainInstaller.class.getResourceAsStream("/resources/toolchain.zip");
+ 	}
+-
+ }

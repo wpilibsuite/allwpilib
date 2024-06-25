@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Wed, 10 Sep 2014 11:36:50 -0400
+Subject: [PATCH 0338/6262] Fix status buffer allocation in SolenoidBase
+
+This fixes [artf3488] and [artf3506]
+
+Change-Id: I6e89fc7bfc8d6c38a4bbf364a0fad412ab54e225
+---
+ .../src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java     | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java
+index fbc68de79f85c647dff40dc46e35a95673a45d0c..177b0ae2f681cb0108d4e2b8b3c652274dc92f15 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java
+@@ -46,7 +46,7 @@ public abstract class SolenoidBase extends SensorBase {
+      * @param mask The channels you want to be affected.
+      */
+     protected synchronized void set(int value, int mask) {
+-        IntBuffer status = IntBuffer.allocate(1);
++        IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
+         for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
+             int local_mask = 1 << i;
+             if ((mask & local_mask) != 0)
+@@ -62,7 +62,7 @@ public abstract class SolenoidBase extends SensorBase {
+      */
+     public byte getAll() {
+         byte value = 0;
+-        IntBuffer status = IntBuffer.allocate(1);
++        IntBuffer status = ByteBuffer.allocateDirect(4).asIntBuffer();
+         for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
+             value |= SolenoidJNI.getSolenoid(m_ports[i], status) << i;
+         }

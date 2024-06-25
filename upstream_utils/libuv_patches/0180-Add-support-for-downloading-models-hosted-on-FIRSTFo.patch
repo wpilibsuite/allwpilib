@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Mon, 21 Jul 2014 17:09:29 -0400
+Subject: [PATCH 0180/6262] Add support for downloading models hosted on
+ FIRSTForge.
+
+Change-Id: I191dc2620b5907316fbc38275d68c568656fa863
+Completes: artf2620
+---
+ simulation/debs/Makefile | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/simulation/debs/Makefile b/simulation/debs/Makefile
+index 9e8ecff9c3e41aee7d4b250baa450a3fa1284102..5fd2c8e7d6e921c120424d7a6ae02e58343fd16d 100644
+--- a/simulation/debs/Makefile
++++ b/simulation/debs/Makefile
+@@ -6,6 +6,7 @@ gazebo-plugins-version = 0.2
+ gazebo-plugins-package-version = $(gazebo-plugins-version)-$(package-version)
+ gazebo-models-version = 0.2
+ gazebo-models-package-version = $(gazebo-models-version)-$(package-version)
++gazebo-models-orig-url = https://usfirst.collab.net/sf/frs/do/downloadFile/projects.wpilib/frs.simulation.frcsim_gazebo_models/frs1052?dl=1
+ eclipse-plugins-version = 0.1
+ eclipse-plugins-package-version = $(eclipse-plugins-version)-$(package-version)
+ eclipse-toolchain-version = 0.1
+@@ -108,6 +109,11 @@ pull-libwpilibsim-cpp:
+ 	cp -rf -t frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/ $(allwpilib)/wpilibc/wpilibC++Sim/*
+ 	echo Increment version?
+ 
++download-models:
++	cd frcsim-gazebo-models && \
++	    wget $(gazebo-models-orig-url) -O frcsim-gazebo-models_${gazebo-models-version}.orig.tar.gz && \
++	    tar xvf frcsim-gazebo-models_${gazebo-models-version}.orig.tar.gz
++
+ deploy:
+ 	rsync -r -v -C -p repository/ adhenning@ccc.wpi.edu:public_html/frcsim/
+ 

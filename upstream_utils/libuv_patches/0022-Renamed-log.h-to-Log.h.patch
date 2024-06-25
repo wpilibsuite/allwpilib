@@ -1,0 +1,196 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Malmsten <pmalmsten@gmail.com>
+Date: Mon, 3 Feb 2014 21:43:24 -0500
+Subject: [PATCH 0022/6262] Renamed log.h to Log.h
+
+---
+ hal/include/src/main/include/{log.h => Log.h}                   | 0
+ wpilibj/wpilibJavaJNI/src/main/native/AnalogJNI.cpp             | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/CANJNI.cpp                | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/CounterJNI.cpp            | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/DIOJNI.cpp                | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/EncoderJNI.cpp            | 2 +-
+ .../src/main/native/FRCNetworkCommunicationsLibrary.cpp         | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/HALUtil.cpp               | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/I2CJNI.cpp                | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/InterruptJNI.cpp          | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/JNIWrapper.cpp            | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/PWMJNI.cpp                | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/RelayJNI.cpp              | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/SPIJNI.cpp                | 2 +-
+ wpilibj/wpilibJavaJNI/src/main/native/WatchdogJNI.cpp           | 2 +-
+ 15 files changed, 14 insertions(+), 14 deletions(-)
+ rename hal/include/src/main/include/{log.h => Log.h} (100%)
+
+diff --git a/hal/include/src/main/include/log.h b/hal/include/src/main/include/Log.h
+similarity index 100%
+rename from hal/include/src/main/include/log.h
+rename to hal/include/src/main/include/Log.h
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/AnalogJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/AnalogJNI.cpp
+index ff2fe7361c2fee7b0c8a5aaa8318c8ba5a83d811..74152be115599c1a28a436238858ba2fd2682abc 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/AnalogJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/AnalogJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_AnalogJNI.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/CANJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/CANJNI.cpp
+index 9d619ae1b780b512a2677ef0df8247922ed2981f..197fddd65112bf3ed92eac242ffef17f68ba8907 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/CANJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/CANJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_can_CANJNI.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/CounterJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/CounterJNI.cpp
+index 26ad9430bea52772dc5eaf988b3522324354a48e..939cfef903c405ee08a29cde3cb4b2c7ef844d42 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/CounterJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/CounterJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_CounterJNI.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/DIOJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/DIOJNI.cpp
+index 8aa7ead7c708413e1e88d5f50a6e8d64b69d943d..0a6ef5d61f7310378c45109bd7b47939c36c0f12 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/DIOJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/DIOJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_DIOJNI.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/EncoderJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/EncoderJNI.cpp
+index 0d1bc68914adebbcde3b61f81e414a93c48b5376..28fd2a5ff275075081bbf5f6f5beceda6e587291 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/EncoderJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/EncoderJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_EncoderJNI.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/FRCNetworkCommunicationsLibrary.cpp b/wpilibj/wpilibJavaJNI/src/main/native/FRCNetworkCommunicationsLibrary.cpp
+index 0c818e3b5055e09464bfe31cb0d4bbeedea59c00..246f1e9e20c58d292c6d4e8dfc215796471602e7 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/FRCNetworkCommunicationsLibrary.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/FRCNetworkCommunicationsLibrary.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary.h"
+ #include "HAL/HAL.h"
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/HALUtil.cpp b/wpilibj/wpilibJavaJNI/src/main/native/HALUtil.cpp
+index ef3e8abd5c5d56969cba8ff8e1036bf572762a36..4b5d235b6e12355f469254b5f5668ee42cc89e84 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/HALUtil.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/HALUtil.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
+ #include "HAL/HAL.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/I2CJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/I2CJNI.cpp
+index 2b98dc0e9eff434294b60e4be0adc7b6c7e467d5..a07960f530919e7eeb9518f75e7ecb4e540ab0a6 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/I2CJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/I2CJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_I2CJNI.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/InterruptJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/InterruptJNI.cpp
+index d4af298dd5a4ccff394e266a78d30f76319d1cac..c87783b1f2d933cfcddafa74f1ca6f402109e25f 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/InterruptJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/InterruptJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_InterruptJNI.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/JNIWrapper.cpp b/wpilibj/wpilibJavaJNI/src/main/native/JNIWrapper.cpp
+index 3f7f73c945cd89e8f7729d7262c9ed1ce06f38f5..49b2972edc6f83ec0141e33f82ee6a271ded2a98 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/JNIWrapper.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/JNIWrapper.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_JNIWrapper.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/PWMJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/PWMJNI.cpp
+index 573285d7822de0aafb6e80f70cd5990c4459ea8d..71f9c2a6e8dd75c113412f5b343c82279cdc2a04 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/PWMJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/PWMJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_PWMJNI.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/RelayJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/RelayJNI.cpp
+index 991dbe98604052045f0238a607b86f0421838bd9..b2370aaac57ffd38e9bfc7acb62071e5dcb0d018 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/RelayJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/RelayJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_RelayJNI.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/SPIJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/SPIJNI.cpp
+index df157ed3784d3c628d2c58a0f01e04154a6959df..93894e892232a023c342da8df9c4017757037629 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/SPIJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/SPIJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_SPIJNI.h"
+ 
+diff --git a/wpilibj/wpilibJavaJNI/src/main/native/WatchdogJNI.cpp b/wpilibj/wpilibJavaJNI/src/main/native/WatchdogJNI.cpp
+index 6807813cb40825c7a43376025cb55ff79c4aeeb2..4bc1e46ab2ccdbf8f129c78a9d3c363ba337bff9 100644
+--- a/wpilibj/wpilibJavaJNI/src/main/native/WatchdogJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/src/main/native/WatchdogJNI.cpp
+@@ -1,6 +1,6 @@
+ #include <jni.h>
+ #include <assert.h>
+-#include "log.h"
++#include "Log.h"
+ 
+ #include "edu_wpi_first_wpilibj_hal_WatchdogJNI.h"
+ 

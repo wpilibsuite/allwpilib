@@ -1,0 +1,147 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Fri, 5 Dec 2014 20:13:23 -0500
+Subject: [PATCH 0541/6262] Added C++ versions of the joystick query functions
+
+Change-Id: I4acdb0a54493e633b2a7a9b265c3958a9ba163d1
+---
+ .../wpilibC++Devices/include/DriverStation.h  |  4 ++
+ wpilibc/wpilibC++Devices/include/Joystick.h   |  4 ++
+ .../wpilibC++Devices/src/DriverStation.cpp    | 51 +++++++++++++++++++
+ wpilibc/wpilibC++Devices/src/Joystick.cpp     | 31 +++++++++++
+ 4 files changed, 90 insertions(+)
+
+diff --git a/wpilibc/wpilibC++Devices/include/DriverStation.h b/wpilibc/wpilibC++Devices/include/DriverStation.h
+index 18cf89bffdb85417cd8df0982c5b6425aa5cbbdc..2b1b8075ec23279d9f553be22b38f59b3febea12 100644
+--- a/wpilibc/wpilibC++Devices/include/DriverStation.h
++++ b/wpilibc/wpilibC++Devices/include/DriverStation.h
+@@ -36,6 +36,10 @@ public:
+ 	int GetStickPOV(uint32_t stick, uint32_t pov);
+ 	bool GetStickButton(uint32_t stick, uint8_t button);
+ 
++	int GetStickAxisCount(uint32_t stick);
++	int GetStickPOVCount(uint32_t stick);
++	int GetStickButtonCount(uint32_t stick);
++
+ 	bool IsEnabled();
+ 	bool IsDisabled();
+ 	bool IsAutonomous();
+diff --git a/wpilibc/wpilibC++Devices/include/Joystick.h b/wpilibc/wpilibC++Devices/include/Joystick.h
+index d9bf38923411a78b653a51ab019a169f71be1795..7ee06f6afb0cdee8c1829476b530a1728ba033d2 100644
+--- a/wpilibc/wpilibC++Devices/include/Joystick.h
++++ b/wpilibc/wpilibC++Devices/include/Joystick.h
+@@ -68,6 +68,10 @@ public:
+ 	virtual float GetMagnitude();
+ 	virtual float GetDirectionRadians();
+ 	virtual float GetDirectionDegrees();
++
++	int GetAxisCount();
++	int GetButtonCount();
++	int GetPOVCount();
+ 	
+ 	void SetRumble(RumbleType type, float value);
+ 	void SetOutput(uint8_t outputNumber, bool value);
+diff --git a/wpilibc/wpilibC++Devices/src/DriverStation.cpp b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+index c25ecd80522d79a797074455a77621220aaf3235..b3a62f29b4d21d935abfac267e45708f4a398b70 100644
+--- a/wpilibc/wpilibC++Devices/src/DriverStation.cpp
++++ b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+@@ -144,6 +144,57 @@ void DriverStation::ReportJoystickUnpluggedError(std::string message) {
+ 	}
+ }
+ 
++/**	Returns the number of axis on a given joystick port
++ *
++ * @param stick The joystick port number
++ * @return the number of axis on the indicated joystick
++ */
++int DriverStation::GetStickAxisCount(uint32_t stick)
++{
++    if (stick >= kJoystickPorts)
++    {
++        wpi_setWPIError(BadJoystickIndex);
++        return 0;
++    }
++   	HALJoystickAxes joystickAxes;
++   	HALGetJoystickAxes(stick, &joystickAxes);
++   	return joystickAxes.count;
++}
++
++/**	Returns the number of POVs on a given joystick port
++ *
++ * @param stick The joystick port number
++ * @return thenumber of POVs on the indicated joystick
++ */
++int DriverStation::GetStickPOVCount(uint32_t stick)
++{
++    if (stick >= kJoystickPorts)
++    {
++        wpi_setWPIError(BadJoystickIndex);
++        return 0;
++    }
++	HALJoystickPOVs joystickPOVs;
++	HALGetJoystickPOVs(stick, &joystickPOVs);
++   	return joystickPOVs.count;
++}
++
++/**	Returns the number of buttons on a given joystick port
++ *
++ * @param stick The joystick port number
++ * @return The number of buttons on the indicated joystick
++ */
++int DriverStation::GetStickButtonCount(uint32_t stick)
++{
++    if (stick >= kJoystickPorts)
++    {
++        wpi_setWPIError(BadJoystickIndex);
++        return 0;
++    }
++	HALJoystickButtons joystickButtons;
++	HALGetJoystickButtons(stick, &joystickButtons);
++   	return joystickButtons.count;
++}
++
+ /**
+  * Get the value of the axis on a joystick.
+  * This depends on the mapping of the joystick connected to the specified port.
+diff --git a/wpilibc/wpilibC++Devices/src/Joystick.cpp b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+index 108d45b8e12e5dc5153af91271c58db5aa7e4979..38fa9d87a2777cf0021a6ae565161c6e77a7df9a 100644
+--- a/wpilibc/wpilibC++Devices/src/Joystick.cpp
++++ b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+@@ -262,6 +262,37 @@ bool Joystick::GetButton(ButtonType button)
+ 	}
+ }
+ 
++/**
++ * Get the number of axis for a joystick
++ *
++ * @return the number of axis for the current joystick
++ */
++int Joystick::GetAxisCount()
++{
++    return m_ds->GetStickAxisCount(m_port);
++}
++
++/**
++  * Get the number of axis for a joystick
++  *
++* @return the number of buttons on the current joystick
++ */
++int Joystick::GetButtonCount()
++{
++    return m_ds->GetStickButtonCount(m_port);
++}
++
++/**
++ * Get the number of axis for a joystick
++ *
++ * @return then umber of POVs for the current joystick
++ */
++int Joystick::GetPOVCount()
++{
++    return m_ds->GetStickPOVCount(m_port);
++}
++
++
+ /**
+  * Get the channel currently associated with the specified axis.
+  *

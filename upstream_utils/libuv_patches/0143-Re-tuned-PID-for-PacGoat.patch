@@ -1,0 +1,186 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Thu, 26 Jun 2014 19:35:25 -0700
+Subject: [PATCH 0143/6262] Re-tuned PID for PacGoat.
+
+Change-Id: I0355db7dcfa2c9147845cdcc37322208e5271d98
+---
+ .../PacGoat/src/Commands/DriveAndShootAutonomous.cpp |  4 ++--
+ .../examples/PacGoat/src/Subsystems/DriveTrain.cpp   |  2 +-
+ .../examples/PacGoat/src/Subsystems/Pivot.cpp        |  4 ++--
+ .../src/org/usfirst/frc/team190/pacgoat/Robot.java   |  4 ++--
+ .../pacgoat/commands/DriveAndShootAutonomous.java    |  6 +++---
+ .../frc/team190/pacgoat/commands/DriveForward.java   | 12 ++++++------
+ .../team190/pacgoat/commands/DriveWithJoystick.java  |  2 +-
+ .../frc/team190/pacgoat/subsystems/DriveTrain.java   |  4 ++--
+ .../frc/team190/pacgoat/subsystems/Pivot.java        |  4 ++--
+ 9 files changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveAndShootAutonomous.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveAndShootAutonomous.cpp
+index 802efdc0959701bb0cb43682ef8edd05d35042fa..01ce83c1cd9db2d0035ccc6348705124cc26cffd 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveAndShootAutonomous.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Commands/DriveAndShootAutonomous.cpp
+@@ -8,13 +8,13 @@
+ #include "Commands/Shoot.h"
+ 
+ DriveAndShootAutonomous::DriveAndShootAutonomous() {
++    AddSequential(new CloseClaw());
+     AddSequential(new WaitForPressure(), 2);
+  	#ifdef REAL
+     	// NOTE: Simulation doesn't currently have the concept of hot.
+     	AddSequential(new CheckForHotGoal(2));
+ 	#endif
+-    AddSequential(new CloseClaw());
+     AddSequential(new SetPivotSetpoint(45));
+-    AddSequential(new DriveForward(8, 0.4));
++    AddSequential(new DriveForward(8, 0.3));
+     AddSequential(new Shoot());
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/DriveTrain.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/DriveTrain.cpp
+index 761e0cc92039a87a0ac02582772834a21c7cb734..36ce60afb3de3f5abda9f82969e3ff479f417d5e 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/DriveTrain.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/DriveTrain.cpp
+@@ -29,7 +29,7 @@ DriveTrain::DriveTrain() :
+ 
+ 	// Configure encoders
+ 	rightEncoder = new Encoder(1, 2, true, Encoder::k4X);
+-	leftEncoder = new Encoder(5, 6, false, Encoder::k4X); // TODO: Correct encoder module.
++	leftEncoder = new Encoder(3, 4, false, Encoder::k4X);
+ 	rightEncoder->SetPIDSourceParameter(PIDSource::kDistance);
+ 	leftEncoder->SetPIDSourceParameter(PIDSource::kDistance);
+ 
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pivot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pivot.cpp
+index 90b39fe730bd64d0309b216d27ea1a22c7b2f8e2..6ab3353dd6c488421bc8b30e5658867bfc6b4870 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pivot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/PacGoat/src/Subsystems/Pivot.cpp
+@@ -7,8 +7,8 @@ Pivot::Pivot() :
+ 	GetPIDController()->SetContinuous(false);
+ 	#ifdef SIMULATION
+ 		// PID is different in simulation.
+-		GetPIDController()->SetPID(0.5, 0.00001, 4.5);
+-		SetAbsoluteTolerance(2.5);
++		GetPIDController()->SetPID(0.5, 0.001, 2);
++		SetAbsoluteTolerance(5);
+ 	#endif
+ 
+ 	// Motor to move the pivot.
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/Robot.java
+index 21f079e7be118b4e64aef4c295745d4d31a8dfce..e6df7299441989aefe3ecb68deae4ddb72072ee3 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/Robot.java
+@@ -70,8 +70,8 @@ public class Robot extends IterativeRobot {
+ 	}
+ 
+ 	public void autonomousInit() {
+-		Command auto = (Command) autoChooser.getSelected();
+-		auto.start();
++		autonomousCommand = (Command) autoChooser.getSelected();
++		autonomousCommand.start();
+ 	}
+ 
+ 	// This function is called periodically during autonomous
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveAndShootAutonomous.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveAndShootAutonomous.java
+index ff159818f28eeb9f2ebfde3a547dd7d1659eb706..a93f9fd03379aecc01ecfbecf5ed699aa2e1e3fb 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveAndShootAutonomous.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveAndShootAutonomous.java
+@@ -10,14 +10,14 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
+  */
+ public class DriveAndShootAutonomous extends CommandGroup {
+     public DriveAndShootAutonomous() {
++        addSequential(new CloseClaw());
+         addSequential(new WaitForPressure(), 2);
+         if (Robot.isReal()) {
+         	// NOTE: Simulation doesn't currently have the concept of hot. 
+         	addSequential(new CheckForHotGoal(2));
+-        }	
+-        addSequential(new CloseClaw());
++        }
+         addSequential(new SetPivotSetpoint(45));
+-        addSequential(new DriveForward(8, 0.4));
++        addSequential(new DriveForward(8, 0.3));
+         addSequential(new Shoot());
+     }
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveForward.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveForward.java
+index 57cce4474a96b70997110ea4e43d412a8ddc04a8..7faf22a6a250874542c401679312137a969e075f 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveForward.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveForward.java
+@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj.command.Command;
+ public class DriveForward extends Command {
+ 	private double driveForwardSpeed;
+ 	private double distance;
+-	private final double tolerance = .1; // TODO: Was 5
+ 	private double error;
+-	private final double Kp = -1.0 / 5.0;
++	private final double TOLERANCE = .1;
++	private final double KP = -1.0 / 5.0;
+ 
+ 	public DriveForward() {
+ 		this(10, 0.5);
+@@ -36,16 +36,16 @@ public class DriveForward extends Command {
+ 
+ 	protected void execute() {
+ 		error = (distance - Robot.drivetrain.getRightEncoder().getDistance());
+-		if (driveForwardSpeed * Kp * error >= driveForwardSpeed) {
++		if (driveForwardSpeed * KP * error >= driveForwardSpeed) {
+ 			Robot.drivetrain.tankDrive(driveForwardSpeed, driveForwardSpeed);
+ 		} else {
+-			Robot.drivetrain.tankDrive(driveForwardSpeed * Kp * error,
+-					driveForwardSpeed * Kp * error);
++			Robot.drivetrain.tankDrive(driveForwardSpeed * KP * error,
++					driveForwardSpeed * KP * error);
+ 		}
+ 	}
+ 
+ 	protected boolean isFinished() {
+-		return (Math.abs(error) <= tolerance) || isTimedOut();
++		return (Math.abs(error) <= TOLERANCE) || isTimedOut();
+ 	}
+ 
+ 	protected void end() {
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveWithJoystick.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveWithJoystick.java
+index 5fbaa5b43238aaa443a77bd8256e86cc524f54d6..2d34b8b7881019485c1d6040190e7dcdfc6e8e96 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveWithJoystick.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/commands/DriveWithJoystick.java
+@@ -31,4 +31,4 @@ public class DriveWithJoystick extends Command {
+ 	protected void interrupted() {
+ 		end();
+ 	}
+-}
++}
+\ No newline at end of file
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/DriveTrain.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/DriveTrain.java
+index 1b840a01140b3a810493da242a013fbf02014911..850a34a25eaa0c8ae0f29c365773c11ab3b4b4bb 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/DriveTrain.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/DriveTrain.java
+@@ -51,7 +51,7 @@ public class DriveTrain extends Subsystem {
+ 
+ 		// Configure encoders
+ 		rightEncoder = new Encoder(1, 2, true, EncodingType.k4X);
+-		leftEncoder = new Encoder(5, 6, false, EncodingType.k4X); // XXX: Module 2
++		leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
+ 		rightEncoder.setPIDSourceParameter(PIDSourceParameter.kDistance);
+ 		leftEncoder.setPIDSourceParameter(PIDSourceParameter.kDistance);
+ 
+@@ -126,4 +126,4 @@ public class DriveTrain extends Subsystem {
+ 	public double getAngle() {
+ 		return gyro.getAngle();
+ 	}
+-}
++}
+\ No newline at end of file
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/Pivot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/Pivot.java
+index 728aafe62cdd4533f074774d375ebf6d109af70b..fee1cf5b9400098a3e36ab9d26c26ffa353c6a27 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/Pivot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/PacGoat/src/org/usfirst/frc/team190/pacgoat/subsystems/Pivot.java
+@@ -29,8 +29,8 @@ public class Pivot extends PIDSubsystem {
+ 		setAbsoluteTolerance(0.005);
+ 		getPIDController().setContinuous(false);
+ 		if (Robot.isSimulation()) { // PID is different in simulation.
+-			getPIDController().setPID(0.5, 0.00001, 4.5);
+-			setAbsoluteTolerance(2.5);
++			getPIDController().setPID(0.5, 0.001, 2);
++			setAbsoluteTolerance(5);
+ 		}
+ 		
+ 		// Motor to move the pivot.

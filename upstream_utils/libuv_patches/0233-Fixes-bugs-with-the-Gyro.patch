@@ -1,0 +1,161 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 31 Jul 2014 13:03:04 -0400
+Subject: [PATCH 0233/6262] Fixes bugs with the Gyro
+
+If the gyro was initialized with an analog input the gyro class would not be calibrated properly.
+Removes unnecessary type casting.
+
+Change-Id: I6baa72919019a33cce7d3074f8477104cbe65396
+---
+ .../main/java/edu/wpi/first/wpilibj/Gyro.java | 31 ++++++++++---------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+index a0087a1199abaf19035f0a816e0109a0861fff35..8f06d6373844c273b781d7100186411f741f6a7d 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+@@ -8,7 +8,6 @@ package edu.wpi.first.wpilibj;
+ 
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+-import edu.wpi.first.wpilibj.Timer;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.tables.ITable;
+@@ -30,11 +29,11 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	static final double kSamplesPerSecond = 50.0;
+ 	static final double kCalibrationSampleTime = 5.0;
+ 	static final double kDefaultVoltsPerDegreePerSecond = 0.007;
+-	AnalogInput m_analog;
++	private AnalogInput m_analog;
+ 	double m_voltsPerDegreePerSecond;
+ 	double m_offset;
+ 	int m_center;
+-	boolean m_channelAllocated;
++	boolean m_channelAllocated = false;
+ 	AccumulatorResult result;
+ 	private PIDSourceParameter m_pidSource;
+ 
+@@ -60,6 +59,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 
+ 		Timer.delay(1.0);
+ 		m_analog.initAccumulator();
++		m_analog.resetAccumulator();
+ 
+ 		Timer.delay(kCalibrationSampleTime);
+ 
+@@ -68,7 +68,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 		m_center = (int) ((double) result.value / (double) result.count + .5);
+ 
+ 		m_offset = ((double) result.value / (double) result.count)
+-				- (double) m_center;
++				- m_center;
+ 
+ 		m_analog.setAccumulatorCenter(m_center);
+ 
+@@ -89,15 +89,13 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	 *            The analog channel the gyro is connected to.
+ 	 */
+ 	public Gyro(int channel) {
+-		m_analog = new AnalogInput(channel);
++		this(new AnalogInput(channel));
+ 		m_channelAllocated = true;
+-		initGyro();
+ 	}
+ 
+ 	/**
+ 	 * Gyro constructor with a precreated analog channel object. Use this
+-	 * constructor when the analog channel needs to be shared. There is no
+-	 * reference counting when an AnalogChannel is passed to the gyro.
++	 * constructor when the analog channel needs to be shared.
+ 	 *
+ 	 * @param channel
+ 	 *            The AnalogChannel object that the gyro is connected to.
+@@ -105,12 +103,9 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	public Gyro(AnalogInput channel) {
+ 		m_analog = channel;
+ 		if (m_analog == null) {
+-			System.err
+-					.println("Analog channel supplied to Gyro constructor is null");
+-		} else {
+-			m_channelAllocated = false;
+-			initGyro();
++			throw new NullPointerException("AnalogInput supplied to Gyro constructor is null");
+ 		}
++		initGyro();
+ 	}
+ 
+ 	/**
+@@ -128,6 +123,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	 * Delete (free) the accumulator and the analog components used for the
+ 	 * gyro.
+ 	 */
++	@Override
+ 	public void free() {
+ 		if (m_analog != null && m_channelAllocated) {
+ 			m_analog.free();
+@@ -176,7 +172,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 		if (m_analog == null) {
+ 			return 0.0;
+ 		} else {
+-			return (m_analog.getAverageValue() - ((double) m_center + m_offset))
++			return (m_analog.getAverageValue() - (m_center + m_offset))
+ 					* 1e-9
+ 					* m_analog.getLSBWeight()
+ 					/ ((1 << m_analog.getOversampleBits()) * m_voltsPerDegreePerSecond);
+@@ -213,6 +209,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	 *
+ 	 * @return the current angle according to the gyro
+ 	 */
++	@Override
+ 	public double pidGet() {
+ 		switch (m_pidSource.value) {
+ 		case PIDSourceParameter.kRate_val:
+@@ -227,6 +224,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	/*
+ 	 * Live Window code, only does anything if live window is activated.
+ 	 */
++	@Override
+ 	public String getSmartDashboardType() {
+ 		return "Gyro";
+ 	}
+@@ -236,6 +234,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 */
++	@Override
+ 	public void initTable(ITable subtable) {
+ 		m_table = subtable;
+ 		updateTable();
+@@ -244,6 +243,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 */
++	@Override
+ 	public ITable getTable() {
+ 		return m_table;
+ 	}
+@@ -251,6 +251,7 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 */
++	@Override
+ 	public void updateTable() {
+ 		if (m_table != null) {
+ 			m_table.putNumber("Value", getAngle());
+@@ -260,12 +261,14 @@ public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 */
++	@Override
+ 	public void startLiveWindowMode() {
+ 	}
+ 
+ 	/**
+ 	 * {@inheritDoc}
+ 	 */
++	@Override
+ 	public void stopLiveWindowMode() {
+ 	}
+ }

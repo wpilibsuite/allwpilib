@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Sun, 19 Oct 2014 17:15:29 -0400
+Subject: [PATCH 0420/6262] Adding stdint.h to the Joystick.h makes the indexer
+ work (fixes artf3505)
+
+Change-Id: I6fee6d8ae0089fd4ffc2f043270bc719058f4b2d
+---
+ wpilibc/wpilibC++Devices/include/Joystick.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/wpilibc/wpilibC++Devices/include/Joystick.h b/wpilibc/wpilibC++Devices/include/Joystick.h
+index 429b499eae134e4edbcae875f8ce0da9c4feb393..42ec73a0402432a5ce75f26b7e7f5ae7fefbf402 100644
+--- a/wpilibc/wpilibC++Devices/include/Joystick.h
++++ b/wpilibc/wpilibC++Devices/include/Joystick.h
+@@ -7,6 +7,7 @@
+ #ifndef JOYSTICK_H_
+ #define JOYSTICK_H_
+ 
++#include <cstdint>
+ #include "GenericHID.h"
+ #include "ErrorBase.h"
+ 

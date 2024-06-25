@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fredric Silberberg <fredric@fsilberberg.com>
+Date: Thu, 30 Oct 2014 14:42:51 -0400
+Subject: [PATCH 0455/6262] DigitalInputs are now automatically added the
+ LiveWindow in both C++ and Java
+
+Change-Id: Ic3520737841f2901becfdc99e3900e4e63da8822
+---
+ wpilibc/wpilibC++Devices/src/DigitalInput.cpp                   | 2 ++
+ .../src/main/java/edu/wpi/first/wpilibj/DigitalInput.java       | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/wpilibc/wpilibC++Devices/src/DigitalInput.cpp b/wpilibc/wpilibC++Devices/src/DigitalInput.cpp
+index b4d6a44bd434c682055dbc24c1b58e10f8fc1090..0bade1931e1ed3cdfc58ee6b18437eac783399d7 100644
+--- a/wpilibc/wpilibC++Devices/src/DigitalInput.cpp
++++ b/wpilibc/wpilibC++Devices/src/DigitalInput.cpp
+@@ -8,6 +8,7 @@
+ //#include "NetworkCommunication/UsageReporting.h"
+ #include "Resource.h"
+ #include "WPIErrors.h"
++#include "LiveWindow/LiveWindow.h"
+ 
+ /**
+  * Create an instance of a DigitalInput.
+@@ -31,6 +32,7 @@ void DigitalInput::InitDigitalInput(uint32_t channel)
+ 	allocateDIO(m_digital_ports[channel], true, &status);
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 
++	LiveWindow::GetInstance()->AddSensor("DigitalInput", channel, this);
+ 	HALReport(HALUsageReporting::kResourceType_DigitalInput, channel);
+ }
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
+index f1f610e285e73c8e04ce769cd528487af3cd58e3..0cc3ed3eaf3335a638309cb87c3d760f1fa839dc 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
+@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.hal.DIOJNI;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
++import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+@@ -36,6 +37,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
+ 	public DigitalInput(int channel) {
+         initDigitalPort(channel, true);
+ 
++        LiveWindow.addSensor("DigitalInput", channel, this);
+         UsageReporting.report(tResourceType.kResourceType_DigitalInput, channel);
+ 	}
+ 

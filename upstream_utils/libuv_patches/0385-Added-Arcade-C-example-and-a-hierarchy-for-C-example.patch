@@ -1,0 +1,211 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Thu, 2 Oct 2014 14:42:24 -0400
+Subject: [PATCH 0385/6262] Added Arcade C++ example and a hierarchy for C++
+ examples.
+
+Change-Id: I31094dd4f158345103628aacd7de3cb86f27c483
+---
+ .../examples/ArcadeDrive/src/Robot.cpp        |  40 ++++++
+ .../resources/templates/examples/examples.xml | 118 +++++++++++++++---
+ 2 files changed, 141 insertions(+), 17 deletions(-)
+ create mode 100755 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/ArcadeDrive/src/Robot.cpp
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/ArcadeDrive/src/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/ArcadeDrive/src/Robot.cpp
+new file mode 100755
+index 0000000000000000000000000000000000000000..823e33553d3f8ae11cf0ff12fb023fb16a03f13d
+--- /dev/null
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/ArcadeDrive/src/Robot.cpp
+@@ -0,0 +1,40 @@
++#include "WPILib.h"
++
++/**
++ * This is a demo program showing the use of the RobotDrive class.
++ * The SampleRobot class is the base of a robot application that will automatically call your
++ * Autonomous and OperatorControl methods at the right time as controlled by the switches on
++ * the driver station or the field controls.
++ *
++ * WARNING: While it may look like a good choice to use for your code if you're inexperienced,
++ * don't. Unless you know what you are doing, complex code will be much more difficult under
++ * this system. Use IterativeRobot or Command-Based instead if you're new.
++ */
++class Robot: public SampleRobot
++{
++	RobotDrive myRobot; // robot drive system
++	Joystick stick; // only joystick
++
++public:
++	Robot() :
++			myRobot(0, 1),	// initialize the RobotDrive to use motor controllers on ports 0 and 1
++			stick(0)
++	{
++		myRobot.SetExpiration(0.1);
++	}
++
++	/**
++	 * Runs the motors with arcade steering.
++	 */
++	void OperatorControl()
++	{
++		while (IsOperatorControl())
++		{
++			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
++			Wait(0.005);				// wait for a motor update time
++		}
++	}
++
++};
++
++START_ROBOT_CLASS(Robot);
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
+index cfcbc038d59455e0e444e0603b1f63fa124e79dd..5f88f8cfa6d23cd1f35f49570874e1ed592ef79c 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/examples/examples.xml
+@@ -15,31 +15,113 @@
+     <name>Simulation</name>
+     <description>Examples that can be run in simulation.</description>
+   </tagDescription>-->
++
+   <tagDescription>
+ 	<name>Getting Started with C++</name>
+ 	<description>Examples for getting started with FRC C++</description>
+   </tagDescription>
+-  <example>
+-	<name>Getting Started</name>
+-	<description>An example program which demonstrates the simplest autonomous and
+-	teleoperated routines.</description>
+-	<tags>
+-	  <tag>Getting Started with C++</tag>
+-	</tags>
+-	<packages>
+-	  <package>src</package>
+-	</packages>
+-	<files>
+-	  <file source="examples/GettingStarted/src/Robot.cpp"
+-			destination="src/Robot.cpp"></file>
+-	</files>
+-  </example>
+-	
++
+   <tagDescription>
+     <name>CommandBased Robot</name>
+     <description>Examples for CommandBased robot programs.</description>
+   </tagDescription>
+ 
++  <tagDescription>
++    <name>Actuators</name>
++    <description>Example programs that demonstrate the use of various actuators</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Analog</name>
++    <description>Examples programs that show different uses of analog inputs, 
++      outputs and various analog sensors</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>CAN</name>
++    <description>Example programs that demonstrate the use of the CAN components in the control system</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Complete List</name>
++    <description>Complete list of all sample programs across all categories</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Digital</name>
++    <description>Example programs that demonstrate the sensors that use the digital I/O ports</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>I2C</name>
++    <description>Example programs that demonstrate the use of I2C and various sensors that use it</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Joystick</name>
++    <description>Example programs that demonstate different uses of joysticks for robot driving</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Pneumatics</name>
++    <description>Example programs that demonstrate the use of the compressor and solenoids</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Robot and Motor</name>
++    <description>Example programs that demonstrate driving a robot and motors including safety, servos, etc.</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>SPI</name>
++    <description>Example programs that demonstrate the use of the SPI bus and sensors that connect to it</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Safety</name>
++    <description>Example programs that demonstate the motor safety classes and how to use them with your programs</description>
++  </tagDescription>
++
++  <tagDescription>
++    <name>Sensors</name>
++    <description>Example programs that demonstrate the use of the various commonly used sensors on FRC robots</description>
++  </tagDescription>
++
++<example>
++  <name>Arcade Drive</name>
++  <description>An example program which the use of Arcade Drive with the RobotDrive class</description>
++  <tags>
++    <tag>Getting Started with C++</tag>
++    <tag>Robot and Motor</tag>
++    <tag>Joystick</tag>
++    <tag>Complete List</tag>
++  </tags>
++  <packages>
++    <package>src</package>
++  </packages>
++  <files>
++    <file source="examples/ArcadeDrive/src/Robot.cpp" destination="src/Robot.cpp"></file>
++  </files>
++  </example>
++
++
++  <example>
++  <name>Getting Started</name>
++  <description>An example program which demonstrates the simplest autonomous and
++  teleoperated routines.</description>
++  <tags>
++    <tag>Getting Started with C++</tag>
++    <tag>Complete List</tag>
++  </tags>
++  <packages>
++    <package>src</package>
++  </packages>
++  <files>
++    <file source="examples/GettingStarted/src/Robot.cpp"
++      destination="src/Robot.cpp"></file>
++  </files>
++  </example>
++  
+   <example>
+     <name>GearsBot</name>
+     <description>A fully functional example CommandBased program for
+@@ -47,6 +129,7 @@
+     supports simulation.</description>
+     <tags>
+       <tag>CommandBased Robot</tag>
++      <tag>Complete List</tag>
+     </tags>
+     <packages>
+       <package>src</package>
+@@ -130,7 +213,8 @@
+     <description>A fully functional example CommandBased program for FRC Team 190&#39;s 2014 robot. This code can run on your computer if it supports simulation.</description>
+     <tags>
+       <tag>CommandBased Robot</tag>
+-    </tags>
++      <tag>Complete List</tag>
++   </tags>
+     <packages>
+       <package>src</package>
+       <package>src/Commands</package>

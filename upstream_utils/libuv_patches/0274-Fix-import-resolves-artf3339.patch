@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joe Ross <joe@rossesmail.com>
+Date: Sun, 10 Aug 2014 17:01:31 -0700
+Subject: [PATCH 0274/6262] Fix import, resolves artf3339
+
+Change-Id: I0abed3495ffc35161793f3a6140fb21872004866
+---
+ .../resources/templates/command-based/Trigger.java              | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Trigger.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Trigger.java
+index 768c3870ebdc261ef7806e5943466a3fa90b113e..d399b201fb286c9ad035d64839f436c88cc73b7e 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Trigger.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Trigger.java
+@@ -1,6 +1,6 @@
+ package $package;
+ 
+-import edu.wpi.first.wpilibj.command.Trigger;
++import edu.wpi.first.wpilibj.buttons.Trigger;
+ 
+ /**
+  *

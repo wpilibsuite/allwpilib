@@ -1,0 +1,2482 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 16 Jul 2014 16:24:44 -0400
+Subject: [PATCH 0163/6262] Port SPI to roboRIO. Java SPIDevice renamed to SPI
+ and rewritten to match C++ API.
+
+Change-Id: I9b2c05a05cbe443331a5b6da6a6d7c7be751a5e7
+---
+ hal/include/HAL/Digital.hpp                   |  62 +-
+ hal/lib/Athena/Digital.cpp                    | 654 +++++++-----------
+ hal/lib/Athena/spilib/spi-lib.h               |  14 +-
+ wpilibc/wpilibC++/include/ADXL345_SPI.h       |  19 +-
+ wpilibc/wpilibC++/include/SPI.h               |  38 +-
+ wpilibc/wpilibC++/lib/ADXL345_SPI.cpp         | 153 +---
+ wpilibc/wpilibC++/lib/SPI.cpp                 | 359 ++--------
+ .../edu/wpi/first/wpilibj/ADXL345_SPI.java    | 165 +++++
+ .../main/java/edu/wpi/first/wpilibj/SPI.java  | 215 ++++++
+ .../edu/wpi/first/wpilibj/hal/SPIJNI.java     |  35 +-
+ wpilibj/wpilibJavaJNI/lib/SPIJNI.cpp          | 319 +++------
+ 11 files changed, 883 insertions(+), 1150 deletions(-)
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SPI.java
+
+diff --git a/hal/include/HAL/Digital.hpp b/hal/include/HAL/Digital.hpp
+index 91ec4939a728c73c981ced90f32f8613a98ce9fe..ac0484e5f3d5ccaa52d9cee66eceec51ff9e5fcf 100644
+--- a/hal/include/HAL/Digital.hpp
++++ b/hal/include/HAL/Digital.hpp
+@@ -4,6 +4,7 @@
+ #else
+ #include <stdint.h>
+ #endif
++#include "HAL/cpp/Synchronized.hpp"
+ 
+ enum Mode
+ {
+@@ -12,18 +13,7 @@ enum Mode
+ 	kPulseLength = 2,
+ 	kExternalDirection = 3
+ };
+-enum tSPIConstants
+-{
+-	kReceiveFIFODepth = 512,
+-	kTransmitFIFODepth = 512
+-};
+-enum tFrameMode
+-{
+-	kChipSelect,
+-	kPreLatchPulse,
+-	kPostLatchPulse,
+-	kPreAndPostLatchPulse
+-};
++
+ extern "C"
+ {
+ 	void* initializeDigitalPort(void* port_pointer, int32_t *status);
+@@ -112,39 +102,25 @@ extern "C"
+ 	uint16_t getLoopTiming(int32_t *status);
+ 	uint16_t getLoopTimingWithModule(uint8_t module, int32_t *status);
+ 
+-	void* initializeSPI(uint8_t sclk_routing_module, uint32_t sclk_routing_pin,
+-			uint8_t mosi_routing_module, uint32_t mosi_routing_pin, uint8_t miso_routing_module,
+-			uint32_t miso_routing_pin, int32_t *status);
+-	void cleanSPI(void* spi_pointer, int32_t *status);
+-	void setSPIBitsPerWord(void* spi_pointer, uint32_t bits, int32_t *status);
+-	uint32_t getSPIBitsPerWord(void* spi_pointer, int32_t *status);
+-	void setSPIClockRate(void* spi_pointer, double hz, int32_t *status);
+-	void setSPIMSBFirst(void* spi_pointer, int32_t *status);
+-	void setSPILSBFirst(void* spi_pointer, int32_t *status);
+-	void setSPISampleDataOnFalling(void* spi_pointer, int32_t *status);
+-	void setSPISampleDataOnRising(void* spi_pointer, int32_t *status);
+-	void setSPISlaveSelect(void* spi_pointer, uint8_t ss_routing_module, uint32_t ss_routing_pin,
+-			int32_t *status);
+-	void setSPILatchMode(void* spi_pointer, tFrameMode mode, int32_t *status);
+-	tFrameMode getSPILatchMode(void* spi_pointer, int32_t *status);
+-	void setSPIFramePolarity(void* spi_pointer, bool activeLow, int32_t *status);
+-	bool getSPIFramePolarity(void* spi_pointer, int32_t *status);
+-	void setSPIClockActiveLow(void* spi_pointer, int32_t *status);
+-	void setSPIClockActiveHigh(void* spi_pointer, int32_t *status);
+-	void applySPIConfig(void* spi_pointer, int32_t *status);
+-	uint16_t getSPIOutputFIFOAvailable(void* spi_pointer, int32_t *status);
+-	uint16_t getSPINumReceived(void* spi_pointer, int32_t *status);
+-	bool isSPIDone(void* spi_pointer, int32_t *status);
+-	bool hadSPIReceiveOverflow(void* spi_pointer, int32_t *status);
+-	void writeSPI(void* spi_pointer, uint32_t data, int32_t *status);
+-	uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status);
+-	void resetSPI(void* spi_pointer, int32_t *status);
+-	void clearSPIReceivedData(void* spi_pointer, int32_t *status);
++	void spiInitialize(uint8_t port, int32_t *status);
++	int32_t spiTransaction(uint8_t port, uint8_t *dataToSend, uint8_t *dataReceived, uint8_t size);
++	int32_t spiWrite(uint8_t port, uint8_t* dataToSend, uint8_t sendSize);
++	int32_t spiRead(uint8_t port, uint8_t *buffer, uint8_t count);
++	void spiClose(uint8_t port);
++	void spiSetSpeed(uint8_t port, uint32_t speed);
++	void spiSetBitsPerWord(uint8_t port, uint8_t bpw);
++	void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing, int clk_idle_high);
++	void spiSetChipSelectActiveHigh(uint8_t port, int32_t *status);
++	void spiSetChipSelectActiveLow(uint8_t port, int32_t *status);
++	int32_t spiGetHandle(uint8_t port);
++	void spiSetHandle(uint8_t port, int32_t handle);
++	MUTEX_ID spiGetSemaphore(uint8_t port);
++	void spiSetSemaphore(uint8_t port, MUTEX_ID semaphore);
+ 
+ 	void i2CInitialize(uint8_t port, int32_t *status);
+-	int i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize);
+-	int i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize);
+-	int i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count);
++	int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize);
++	int32_t i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize);
++	int32_t i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count);
+ 	void i2CClose(uint8_t port);
+ 
+ 	//// Float JNA Hack
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index 1fb52570e4ea5bb7cb6cbc57afb39c89d4893ec5..da6f4ddd107b00c3325d00a4bdd4198633112b0e 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -10,6 +10,7 @@
+ #include <stdio.h>
+ #include <math.h>
+ #include "i2clib/i2c-lib.h"
++#include "spilib/spi-lib.h"
+ 
+ static const uint32_t kExpectedLoopTiming = 40;
+ static const uint32_t kDigitalPins = 20;
+@@ -69,6 +70,15 @@ uint8_t i2CMXPObjCount = 0;
+ uint8_t i2COnBoardHandle = 0;
+ uint8_t i2CMXPHandle = 0;
+ 
++int32_t m_spiCS0Handle = 0;
++int32_t m_spiCS1Handle = 0;
++int32_t m_spiCS2Handle = 0;
++int32_t m_spiCS3Handle = 0;
++int32_t m_spiMXPHandle = 0;
++MUTEX_ID spiOnboardSemaphore = NULL;
++MUTEX_ID spiMXPSemaphore = NULL;
++tSPI *spiSystem;
++
+ /**
+  * Initialize the digital modules.
+  */
+@@ -1173,401 +1183,251 @@ uint16_t getLoopTimingWithModule(uint8_t module, int32_t *status) {
+   return pwmSystem->readLoopTiming(status);
+ }
+ 
+-// XXX: What happened to SPI?
+-// struct spi_t {
+-//   tSPI* spi;
+-//   tSPI::tConfig config;
+-//   tSPI::tChannels channels;
+-//   MUTEX_ID semaphore;
+-// };
+-// typedef struct spi_t SPI;
+ 
+-// void* initializeSPI(uint8_t sclk_routing_module, uint32_t sclk_routing_pin,
+-// 					uint8_t mosi_routing_module, uint32_t mosi_routing_pin,
+-// 					uint8_t miso_routing_module, uint32_t miso_routing_pin, int32_t *status) {
+-//   SPI* spi = new SPI();
+-  
+-//   spi->semaphore = initializeMutex(SEMAPHORE_Q_PRIORITY | SEMAPHORE_DELETE_SAFE | SEMAPHORE_INVERSION_SAFE);
+-  
+-//   spi->spi = tSPI::create(status);
+-
+-//   spi->config.BusBitWidth = 8;
+-//   spi->config.ClockHalfPeriodDelay = 0;
+-//   spi->config.MSBfirst = 0;
+-//   spi->config.DataOnFalling = 0;
+-//   spi->config.LatchFirst = 0;
+-//   spi->config.LatchLast = 0;
+-//   spi->config.FramePolarity = 0;
+-//   spi->config.WriteOnly = miso_routing_pin ? 0 : 1;
+-//   spi->config.ClockPolarity = 0;
+-
+-//   spi->channels.SCLK_Channel = sclk_routing_pin;
+-//   spi->channels.SCLK_Module = sclk_routing_module;
+-//   spi->channels.SS_Channel = 0;
+-//   spi->channels.SS_Module = 0;
+-
+-//   if (mosi_routing_pin) {
+-// 	spi->channels.MOSI_Channel = mosi_routing_pin;
+-// 	spi->channels.MOSI_Module = mosi_routing_module;
+-//   } else {
+-// 	spi->channels.MOSI_Channel = 0;
+-// 	spi->channels.MOSI_Module = 0;
+-//   }
+-
+-//   if (miso_routing_pin) {
+-// 	spi->channels.MISO_Channel = miso_routing_pin;
+-// 	spi->channels.MISO_Module = miso_routing_module;
+-//   } else {
+-// 	spi->channels.MISO_Channel = 0;
+-// 	spi->channels.MISO_Module = 0;
+-//   }
+-//   return spi;
+-// }
+-
+-// void cleanSPI(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   delete spi->spi;
+-//   delete spi;
+-// }
+-
+-// /**
+-//  * Configure the number of bits from each word that the slave transmits
+-//  * or receives.
+-//  *
+-//  * @param bits	The number of bits in one frame (1 to 32 bits).
+-//  */
+-// void setSPIBitsPerWord(void* spi_pointer, uint32_t bits, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->config.BusBitWidth = bits;
+-// }
+-
+-// /**
+-//  * Get the number of bits from each word that the slave transmits
+-//  * or receives.
+-//  *
+-//  * @return The number of bits in one frame (1 to 32 bits).
+-//  */
+-// uint32_t getSPIBitsPerWord(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   return spi->config.BusBitWidth;
+-// }
+-
+-// /**
+-//  * Configure the rate of the generated clock signal.
+-//  * The default and maximum value is 76,628.4 Hz.
+-//  *
+-//  * @param hz	The clock rate in Hertz.
+-//  */
+-// void setSPIClockRate(void* spi_pointer, double hz, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   int delay = 0;
+-//   int loopTiming = getLoopTimingWithModule(spi->spi->readChannels_SCLK_Module(status), status);
+-//   double v = (1.0 / hz) / (2 * loopTiming / (kSystemClockTicksPerMicrosecond * 1e6));
+-//   if (v < 1) {
+-// 	// TODO: wpi_setWPIErrorWithContext(ParameterOutOfRange, "SPI Clock too high");
+-//   }
+-//   delay = (int) (v + .5);
+-//   if (delay > 255) {
+-// 	// TODO: wpi_setWPIErrorWithContext(ParameterOutOfRange, "SPI Clock too low");
+-//   }
+-
+-//   spi->config.ClockHalfPeriodDelay = delay;
+-// }
+-
+-// /**
+-//  * Configure the order that bits are sent and received on the wire
+-//  * to be most significant bit first.
+-//  */
+-// void setSPIMSBFirst(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->config.MSBfirst = 1;
+-// }
+-
+-// /**
+-//  * Configure the order that bits are sent and received on the wire
+-//  * to be least significant bit first.
+-//  */
+-// void setSPILSBFirst(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->config.MSBfirst = 0;
+-// }
+-
+-// /**
+-//  * Configure that the data is stable on the falling edge and the data
+-//  * changes on the rising edge.
+-//  */
+-// void setSPISampleDataOnFalling(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->config.DataOnFalling = 1;
+-// }
+-
+-// /**
+-//  * Configure that the data is stable on the rising edge and the data
+-//  * changes on the falling edge.
+-//  */
+-// void setSPISampleDataOnRising(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->config.DataOnFalling = 0;
+-// }
+-
+-// void setSPISlaveSelect(void* spi_pointer, uint8_t ss_routing_module, uint32_t ss_routing_pin,
+-// 					   int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->channels.SS_Channel = ss_routing_pin;
+-//   spi->channels.SS_Module = ss_routing_module;
+-// }
+-
+-// void setSPILatchMode(void* spi_pointer, tFrameMode mode, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   switch (mode) {
+-//   case kChipSelect:
+-// 	spi->config.LatchFirst = 0;
+-// 	spi->config.LatchLast = 0;
+-// 	break;
+-//   case kPreLatchPulse:
+-// 	spi->config.LatchFirst = 1;
+-// 	spi->config.LatchLast = 0;
+-// 	break;
+-//   case kPostLatchPulse:
+-// 	spi->config.LatchFirst = 0;
+-// 	spi->config.LatchLast = 1;
+-// 	break;
+-//   case kPreAndPostLatchPulse:
+-// 	spi->config.LatchFirst = 1;
+-// 	spi->config.LatchLast = 1;
+-// 	break;
+-//   }
+-// }
+-
+-// tFrameMode getSPILatchMode(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   return (tFrameMode) (spi->config.LatchFirst | (spi->config.LatchLast << 1));
+-// }
+-
+-// void setSPIFramePolarity(void* spi_pointer, bool activeLow, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->config.FramePolarity = activeLow ? 1 : 0;
+-// }
+-
+-// bool getSPIFramePolarity(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   return spi->config.FramePolarity != 0;
+-// }
+-
+-// /**
+-//  * Configure the clock output line to be active low.
+-//  * This is sometimes called clock polarity high.
+-//  */
+-// void setSPIClockActiveLow(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->config.ClockPolarity = 1;
+-// }
+-
+-// /**
+-//  * Configure the clock output line to be active high.
+-//  * This is sometimes called clock polarity low.
+-//  */
+-// void setSPIClockActiveHigh(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->config.ClockPolarity = 0;
+-// }
+-
+-
+-// /**
+-//  * Apply configuration settings and reset the SPI logic.
+-//  */
+-// void applySPIConfig(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   Synchronized sync(spi->semaphore);
+-
+-//   spi->spi->writeConfig(spi->config, status);
+-//   spi->spi->writeChannels(spi->channels, status);
+-//   spi->spi->strobeReset(status);
+-// }
+-
+-// /**
+-//  * Get the number of words that can currently be stored before being
+-//  * transmitted to the device.
+-//  *
+-//  * @return The number of words available to be written.
+-//  */
+-// uint16_t getSPIOutputFIFOAvailable(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   uint16_t result = spi->spi->readAvailableToLoad(status);
+-//   return result;
+-// }
+-
+-// /**
+-//  * Get the number of words received and currently available to be read from
+-//  * the receive FIFO.
+-//  *
+-//  * @return The number of words available to read.
+-//  */
+-// uint16_t getSPINumReceived(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   uint16_t result = spi->spi->readReceivedElements(status);
+-//   return result;
+-// }
+-
+-// /**
+-//  * Have all pending transfers completed?
+-//  *
+-//  * @return True if no transfers are pending.
+-//  */
+-// bool isSPIDone(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   bool result = spi->spi->readStatus_Idle(status);
+-//   return result;
+-// }
+-
+-
+-// /**
+-//  * Determine if the receive FIFO was full when attempting to add new data at
+-//  * end of a transfer.
+-//  *
+-//  * @return True if the receive FIFO overflowed.
+-//  */
+-// bool hadSPIReceiveOverflow(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   bool result = spi->spi->readStatus_ReceivedDataOverflow(status);
+-//   return result;
+-// }
+-
+-// /**
+-//  * Write a word to the slave device.  Blocks until there is space in the
+-//  * output FIFO.
+-//  *
+-//  * If not running in output only mode, also saves the data received
+-//  * on the MISO input during the transfer into the receive FIFO.
+-//  */
+-// void writeSPI(void* spi_pointer, uint32_t data, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   if (spi->channels.MOSI_Channel == 0 && spi->channels.MOSI_Module == 0) {
+-// 	*status = SPI_WRITE_NO_MOSI;
+-// 	return;
+-//   }
+-
+-//   Synchronized sync(spi->semaphore);
+-
+-//   while (getSPIOutputFIFOAvailable(spi_pointer, status) == 0)
+-// 	delayTicks(HAL_NO_WAIT);
+-
+-//   spi->spi->writeDataToLoad(data, status);
+-//   spi->spi->strobeLoad(status);
+-// }
+-
+-// /**
+-//  * Read a word from the receive FIFO.
+-//  *
+-//  * Waits for the current transfer to complete if the receive FIFO is empty.
+-//  *
+-//  * If the receive FIFO is empty, there is no active transfer, and initiate
+-//  * is false, errors.
+-//  *
+-//  * @param initiate	If true, this function pushes "0" into the
+-//  *				    transmit buffer and initiates a transfer.
+-//  *				    If false, this function assumes that data is
+-//  *				    already in the receive FIFO from a previous write.
+-//  */
+-// uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   if (spi->channels.MISO_Channel == 0 && spi->channels.MISO_Module == 0) {
+-// 	*status = SPI_READ_NO_MISO;
+-// 	return 0;
+-//   }
+-
+-//   uint32_t data;
+-//   {
+-// 	Synchronized sync(spi->semaphore);
+-
+-// 	if (initiate) {
+-// 	  spi->spi->writeDataToLoad(0, status);
+-// 	  spi->spi->strobeLoad(status);
+-// 	}
+-
+-// 	// Do we have anything ready to read?
+-// 	if (getSPINumReceived(spi_pointer, status) == 0) {
+-// 	  if (!initiate && isSPIDone(spi_pointer, status)
+-// 		  && getSPIOutputFIFOAvailable(spi_pointer, status) == kTransmitFIFODepth) {
+-// 		// Nothing to read: error out
+-// 		*status = SPI_READ_NO_DATA;
+-// 		return 0;
+-// 	  }
+-
+-// 	  // Wait for the transaction to complete
+-// 	  while (getSPINumReceived(spi_pointer, status) == 0)
+-// 		delayTicks(HAL_NO_WAIT);
+-// 	}
+-
+-// 	spi->spi->strobeReadReceivedData(status);
+-// 	data = spi->spi->readReceivedData(status);
+-//   }
+-
+-//   return data;
+-// }
+-
+-// /**
+-//  * Stop any transfer in progress and empty the transmit FIFO.
+-//  */
+-// void resetSPI(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->spi->strobeReset(status);
+-// }
+-
+-// /**
+-//  * Empty the receive FIFO.
+-//  */
+-// void clearSPIReceivedData(void* spi_pointer, int32_t *status) {
+-//   SPI* spi = (SPI*) spi_pointer;
+-//   spi->spi->strobeClearReceivedData(status);
+-// }
+-
+-
+-
+-void* initializeSPI(uint8_t sclk_routing_module, uint32_t sclk_routing_pin,
+-					uint8_t mosi_routing_module, uint32_t mosi_routing_pin,
+-					uint8_t miso_routing_module, uint32_t miso_routing_pin, int32_t *status) {
+-  return NULL;
+-}
+-void cleanSPI(void* spi_pointer, int32_t *status) {}
+-void setSPIBitsPerWord(void* spi_pointer, uint32_t bits, int32_t *status) {}
+-uint32_t getSPIBitsPerWord(void* spi_pointer, int32_t *status) {
+-  return 0;
+-}
+-void setSPIClockRate(void* spi_pointer, double hz, int32_t *status) {}
+-void setSPIMSBFirst(void* spi_pointer, int32_t *status) {}
+-void setSPILSBFirst(void* spi_pointer, int32_t *status) {}
+-void setSPISampleDataOnFalling(void* spi_pointer, int32_t *status) {}
+-void setSPISampleDataOnRising(void* spi_pointer, int32_t *status) {}
+-void setSPISlaveSelect(void* spi_pointer, uint8_t ss_routing_module, uint32_t ss_routing_pin,
+-					   int32_t *status) {}
+-void setSPILatchMode(void* spi_pointer, tFrameMode mode, int32_t *status) {}
+-tFrameMode getSPILatchMode(void* spi_pointer, int32_t *status) {
+-  return (tFrameMode) 0;
+-}
+-void setSPIFramePolarity(void* spi_pointer, bool activeLow, int32_t *status) {}
+-bool getSPIFramePolarity(void* spi_pointer, int32_t *status) {
+-  return false;
+-}
+-void setSPIClockActiveLow(void* spi_pointer, int32_t *status) {}
+-void setSPIClockActiveHigh(void* spi_pointer, int32_t *status) {}
+-void applySPIConfig(void* spi_pointer, int32_t *status) {}
+-uint16_t getSPIOutputFIFOAvailable(void* spi_pointer, int32_t *status) {
+-  return 0;
+-}
+-uint16_t getSPINumReceived(void* spi_pointer, int32_t *status) {
+-  return 0;
+-}
+-bool isSPIDone(void* spi_pointer, int32_t *status) {
+-  return false;
+-}
+-bool hadSPIReceiveOverflow(void* spi_pointer, int32_t *status) {
+-  return false;
+-}
+-void writeSPI(void* spi_pointer, uint32_t data, int32_t *status) {}
+-uint32_t readSPI(void* spi_pointer, bool initiate, int32_t *status) {return 0;}
+-void resetSPI(void* spi_pointer, int32_t *status) {}
+-void clearSPIReceivedData(void* spi_pointer, int32_t *status) {}
++/*
++ * Initialize the spi port. Opens the port if necessary and saves the handle.
++ * If opening the MXP port, also sets up the pin functions appropriately
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ */
++void spiInitialize(uint8_t port, int32_t *status) {
++	if(spiSystem == NULL)
++		spiSystem = tSPI::create(status);
++	if(spiGetSemaphore(port) == NULL)
++		spiSetSemaphore(port, initializeMutexRecursive());
++	if(spiGetHandle(port) !=0 ) return;
++	switch(port){
++	case 0:
++		spiSetHandle(0, spilib_open("/dev/spidev0.0"));
++		break;
++	case 1:
++		spiSetHandle(1, spilib_open("/dev/spidev0.1"));
++		break;
++	case 2:
++		spiSetHandle(2, spilib_open("/dev/spidev0.2"));
++		break;
++	case 3:
++		spiSetHandle(3, spilib_open("/dev/spidev0.3"));
++		break;
++	case 4:
++		initializeDigital(status);
++		if(!allocateDIO(getPort(14), false, status)){printf("Failed to allocate DIO 14\n"); return;}
++		if(!allocateDIO(getPort(15), false, status)) {printf("Failed to allocate DIO 15\n"); return;}
++		if(!allocateDIO(getPort(16), true, status)) {printf("Failed to allocate DIO 16\n"); return;}
++		if(!allocateDIO(getPort(17), false, status)) {printf("Failed to allocate DIO 17\n"); return;}
++		digitalSystem->writeEnableMXPSpecialFunction(digitalSystem->readEnableMXPSpecialFunction(status)|0x00F0, status);
++		spiSetHandle(4, spilib_open("/dev/spidev1.0"));
++		break;
++	default:
++		break;
++	}
++	return;
++}
++
++/**
++ * Generic transaction.
++ *
++ * This is a lower-level interface to the spi hardware giving you more control over each transaction.
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ * @param dataToSend Buffer of data to send as part of the transaction.
++ * @param dataReceived Buffer to read data into.
++ * @param size Number of bytes to transfer. [0..7]
++ * @return Number of bytes transferred, -1 for error
++ */
++int32_t spiTransaction(uint8_t port, uint8_t *dataToSend, uint8_t *dataReceived, uint8_t size)
++{
++	Synchronized sync(spiGetSemaphore(port));
++	return spilib_writeread(spiGetHandle(port), (const char*) dataToSend, (char*) dataReceived, (int32_t) size);
++}
++
++/**
++ * Execute a write transaction with the device.
++ *
++ * Write to a device and wait until the transaction is complete.
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ * @param datToSend The data to write to the register on the device.
++ * @param sendSize The number of bytes to be written
++ * @return The number of bytes written. -1 for an error
++ */
++int32_t spiWrite(uint8_t port, uint8_t* dataToSend, uint8_t sendSize)
++{
++	Synchronized sync(spiGetSemaphore(port));
++	return spilib_write(spiGetHandle(port), (const char*) dataToSend, (int32_t) sendSize);
++}
++
++/**
++ * Execute a read from the device.
++ *
++ *   This methdod does not write any data out to the device
++ *   Most spi devices will require a register address to be written before
++ *   they begin returning data
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ * @param buffer A pointer to the array of bytes to store the data read from the device.
++ * @param count The number of bytes to read in the transaction. [1..7]
++ * @return Number of bytes read. -1 for error.
++ */
++int32_t spiRead(uint8_t port, uint8_t *buffer, uint8_t count)
++{
++	Synchronized sync(spiGetSemaphore(port));
++	return spilib_read(spiGetHandle(port), (char*) buffer, (int32_t) count);
++}
++
++/**
++ * Close the SPI port
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ */
++void spiClose(uint8_t port) {
++	Synchronized sync(spiGetSemaphore(port));
++	spilib_close(spiGetHandle(port));
++	spiSetHandle(port, 0);
++	return;
++}
++
++/**
++ * Set the clock speed for the SPI bus.
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ * @param speed The speed in Hz (0-1MHz)
++ */
++void spiSetSpeed(uint8_t port, uint32_t speed) {
++	Synchronized sync(spiGetSemaphore(port));
++	int retVal = spilib_setspeed(spiGetHandle(port), speed);
++}
++
++/**
++ * Set the SPI options
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ * @param msb_first True to write the MSB first, False for LSB first
++ * @param sample_on_trailing True to sample on the trailing edge, False to sample on the leading edge
++ * @param clk_idle_high True to set the clock to active low, False to set the clock active high
++ */
++void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing, int clk_idle_high) {
++	Synchronized sync(spiGetSemaphore(port));
++	int retVal = spilib_setopts(spiGetHandle(port), msb_first, sample_on_trailing, clk_idle_high);
++}
++
++/**
++ * Set the CS Active high for a SPI port
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ */
++void spiSetChipSelectActiveHigh(uint8_t port, int32_t *status){
++	Synchronized sync(spiGetSemaphore(port));
++	if(port < 4)
++	{
++		spiSystem->writeChipSelectActiveHigh_Hdr(spiSystem->readChipSelectActiveHigh_Hdr(status) | (1<<port), status);
++	}
++	else
++	{
++		spiSystem->writeChipSelectActiveHigh_MXP(1, status);
++	}
++}
++
++/**
++ * Set the CS Active low for a SPI port
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ */
++void spiSetChipSelectActiveLow(uint8_t port, int32_t *status){
++	Synchronized sync(spiGetSemaphore(port));
++	if(port < 4)
++	{
++		spiSystem->writeChipSelectActiveHigh_Hdr(spiSystem->readChipSelectActiveHigh_Hdr(status) & ~(1<<port), status);
++	}
++	else
++	{
++		spiSystem->writeChipSelectActiveHigh_MXP(0, status);
++	}
++}
++
++/**
++ * Get the stored handle for a SPI port
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ * @return The stored handle for the SPI port. 0 represents no stored handle.
++ */
++int32_t spiGetHandle(uint8_t port){
++	Synchronized sync(spiGetSemaphore(port));
++	switch(port){
++	case 0:
++		return m_spiCS0Handle;
++		break;
++	case 1:
++		return m_spiCS1Handle;
++		break;
++	case 2:
++		return m_spiCS2Handle;
++		break;
++	case 3:
++		return m_spiCS3Handle;
++		break;
++	case 4:
++		return m_spiMXPHandle;
++		break;
++	default:
++		return 0;
++		break;
++	}
++}
++
++/**
++ * Set the stored handle for a SPI port
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP.
++ * @param handle The value of the handle for the port.
++ */
++void spiSetHandle(uint8_t port, int32_t handle){
++	Synchronized sync(spiGetSemaphore(port));
++	switch(port){
++	case 0:
++		m_spiCS0Handle = handle;
++		break;
++	case 1:
++		m_spiCS1Handle = handle;
++		break;
++	case 2:
++		m_spiCS2Handle = handle;
++		break;
++	case 3:
++		m_spiCS3Handle = handle;
++		break;
++	case 4:
++		m_spiMXPHandle = handle;
++		break;
++	default:
++		break;
++	}
++}
++
++/**
++ * Get the semaphore for a SPI port
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ * @return The semaphore for the SPI port. NULL represents no stored semaphore.
++ */
++MUTEX_ID spiGetSemaphore(uint8_t port){
++	if(port < 4)
++		return spiOnboardSemaphore;
++	else
++		return spiMXPSemaphore;
++}
++
++/**
++ * Set the semaphore for a SPI port
++ *
++ * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
++ * @param semaphore The semaphore for the SPI port.
++ */
++void spiSetSemaphore(uint8_t port, MUTEX_ID semaphore){
++	if (port < 4)
++		spiOnboardSemaphore = semaphore;
++	else
++		spiMXPSemaphore = semaphore;
++}
+ 
+ /*
+  * Initialize the I2C port. Opens the port if necessary and saves the handle.
+@@ -1611,7 +1471,7 @@ void i2CInitialize(uint8_t port, int32_t *status) {
+  * @param receiveSize Number of bytes to read from the device. [0..7]
+  * @return Transfer Aborted... false for success, true for aborted.
+  */
+-int i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize)
++int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uint8_t sendSize, uint8_t *dataReceived, uint8_t receiveSize)
+ {
+ 	if(port > 1) {
+ 		//Set port out of range error here
+@@ -1646,7 +1506,7 @@ int i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t *dataToSend, uin
+  * @param data The byte to write to the register on the device.
+  * @return Transfer Aborted... false for success, true for aborted.
+  */
+-int i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8_t sendSize)
++int32_t i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8_t sendSize)
+ {
+ 	if(port > 1) {
+ 		//Set port out of range error here
+@@ -1678,7 +1538,7 @@ int i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend, uint8_t s
+  * @param buffer A pointer to the array of bytes to store the data read from the device.
+  * @return Transfer Aborted... false for success, true for aborted.
+  */
+-int i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count)
++int32_t i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t *buffer, uint8_t count)
+ {
+ 	if(port > 1) {
+ 		//Set port out of range error here
+diff --git a/hal/lib/Athena/spilib/spi-lib.h b/hal/lib/Athena/spilib/spi-lib.h
+index 57dc10f50940d43e79cc0634566d5eea7c278129..54cdc938813ee42b4b98246b820ade2f3679d8d5 100644
+--- a/hal/lib/Athena/spilib/spi-lib.h
++++ b/hal/lib/Athena/spilib/spi-lib.h
+@@ -1,6 +1,12 @@
+ #ifndef __SPI_LIB_H__
+ #define __SPI_LIB_H__
+ 
++#pragma once
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
+ int spilib_open(const char *device);
+ void spilib_close(int handle);
+ int spilib_setspeed(int handle, uint32_t speed);
+@@ -10,4 +16,10 @@ int spilib_read(int handle, char *recv_buf, int32_t size);
+ int spilib_write(int handle, const char *send_buf, int32_t size);
+ int spilib_writeread(int handle, const char *send_buf, char *recv_buf, int32_t size);
+ 
+-#endif /* __SPI_LIB_H__ */
+\ No newline at end of file
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __SPI_LIB_H__ */
++
++
+diff --git a/wpilibc/wpilibC++/include/ADXL345_SPI.h b/wpilibc/wpilibC++/include/ADXL345_SPI.h
+index f47f4da3d28f79403d5f63bda6ccb9c89bbf7205..be1e26b2e93701919f126a9d2eeadfbf3cc4f3bb 100644
+--- a/wpilibc/wpilibC++/include/ADXL345_SPI.h
++++ b/wpilibc/wpilibC++/include/ADXL345_SPI.h
+@@ -6,15 +6,15 @@
+ #pragma once
+ 
+ #include "SensorBase.h"
++#include "SPI.h"
+ 
+ class DigitalInput;
+ class DigitalOutput;
+-class SPI;
+ 
+ /**
+  * ADXL345 Accelerometer on SPI.
+  *
+- * This class alows access to an Analog Devices ADXL345 3-axis accelerometer via SPI.
++ * This class allows access to an Analog Devices ADXL345 3-axis accelerometer via SPI.
+  * This class assumes the sensor is wired in 4-wire SPI mode.
+  */
+ class ADXL345_SPI : public SensorBase
+@@ -40,23 +40,14 @@ public:
+ 	};
+ 
+ public:
+-	ADXL345_SPI(DigitalOutput &clk, DigitalOutput &mosi, DigitalInput &miso,
+-		DigitalOutput &cs, DataFormat_Range range=kRange_2G);
+-	ADXL345_SPI(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso,
+-		DigitalOutput *cs, DataFormat_Range range=kRange_2G);
+-	ADXL345_SPI(uint32_t clk, uint32_t mosi, uint32_t miso, uint32_t cs,
+-		DataFormat_Range range=kRange_2G);
++	ADXL345_SPI(SPI::Port port, DataFormat_Range range=kRange_2G);
+ 	virtual ~ADXL345_SPI();
+ 	virtual double GetAcceleration(Axes axis);
+ 	virtual AllAxes GetAccelerations();
+ 
+ protected:
+-	void Init(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso,
+-		DigitalOutput *cs, DataFormat_Range range);
++	void Init(DataFormat_Range range);
+ 
+-	DigitalOutput *m_clk;
+-	DigitalOutput *m_mosi;
+-	DigitalInput *m_miso;
+-	DigitalOutput *m_cs;
+ 	SPI* m_spi;
++	SPI::Port m_port;
+ };
+diff --git a/wpilibc/wpilibC++/include/SPI.h b/wpilibc/wpilibC++/include/SPI.h
+index 42cc5c7260b856360b496a78ef3fad39ff074e53..7c6d61f0adc4325816515cb501a5597fde6efcc7 100644
+--- a/wpilibc/wpilibC++/include/SPI.h
++++ b/wpilibc/wpilibC++/include/SPI.h
+@@ -17,21 +17,14 @@ class DigitalInput;
+  * This class is intended to be used by sensor (and other SPI device) drivers.
+  * It probably should not be used directly.
+  *
+- * The FPGA only supports a single SPI interface.
+  */
+ class SPI : public SensorBase
+ {
+ public:
+-	SPI(DigitalOutput &clk, DigitalOutput &mosi, DigitalInput &miso);
+-	SPI(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso);
+-	SPI(DigitalOutput &clk, DigitalOutput &mosi);
+-	SPI(DigitalOutput *clk, DigitalOutput *mosi);
+-	SPI(DigitalOutput &clk, DigitalInput &miso);
+-	SPI(DigitalOutput *clk, DigitalInput *miso);
++	enum Port {kOnboardCS0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP};
++	SPI(Port SPIport);
+ 	virtual ~SPI();
+ 
+-	void SetBitsPerWord(uint32_t bits);
+-	uint32_t GetBitsPerWord();
+ 	void SetClockRate(double hz);
+ 
+ 	void SetMSBFirst();
+@@ -40,33 +33,26 @@ public:
+ 	void SetSampleDataOnFalling();
+ 	void SetSampleDataOnRising();
+ 
+-	void SetSlaveSelect(DigitalOutput *ss, tFrameMode mode = kChipSelect, bool activeLow = false);
+-	void SetSlaveSelect(DigitalOutput &ss, tFrameMode mode = kChipSelect, bool activeLow = false);
+-	DigitalOutput *GetSlaveSelect(tFrameMode *mode = NULL, bool *activeLow = NULL);
+ 
+ 	void SetClockActiveLow();
+ 	void SetClockActiveHigh();
+ 
+-	virtual void ApplyConfig();
++	void SetChipSelectActiveHigh();
++	void SetChipSelectActiveLow();
+ 
+-	virtual uint16_t GetOutputFIFOAvailable();
+-	virtual uint16_t GetNumReceived();
++	virtual int32_t Write(uint8_t* data, uint8_t size);
++	virtual int32_t Read(bool initiate, uint8_t* dataReceived, uint8_t size);
++	virtual int32_t Transaction(uint8_t* dataToSend, uint8_t* dataReceived, uint8_t size);
+ 
+-	virtual bool IsDone();
+-	bool HadReceiveOverflow();
+-
+-	virtual void Write(uint32_t data);
+-	virtual uint32_t Read(bool initiate = false);
+-
+-	virtual void Reset();
+-	virtual void ClearReceivedData();
+ 
+ protected:
+-	void* m_spi;
+-	DigitalOutput *m_ss;
++	uint8_t m_port;
++	bool m_msbFirst;
++	bool m_sampleOnTrailing;
++	bool m_clk_idle_high;
+ 
+ private:
+-	void Init(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso);
++	void Init();
+ 
+ 	DISALLOW_COPY_AND_ASSIGN(SPI);
+ };
+diff --git a/wpilibc/wpilibC++/lib/ADXL345_SPI.cpp b/wpilibc/wpilibC++/lib/ADXL345_SPI.cpp
+index 5e0e9e8f0d31debd729cf00aec57f3fdfca5c6f3..fe71ff6bd92cb9197f2ee921f2f00c5c274dd7f0 100644
+--- a/wpilibc/wpilibC++/lib/ADXL345_SPI.cpp
++++ b/wpilibc/wpilibC++/lib/ADXL345_SPI.cpp
+@@ -7,7 +7,6 @@
+ #include "ADXL345_SPI.h"
+ #include "DigitalInput.h"
+ #include "DigitalOutput.h"
+-//#include "NetworkCommunication/UsageReporting.h"
+ #include "SPI.h"
+ 
+ const uint8_t ADXL345_SPI::kPowerCtlRegister;
+@@ -15,101 +14,35 @@ const uint8_t ADXL345_SPI::kDataFormatRegister;
+ const uint8_t ADXL345_SPI::kDataRegister;
+ constexpr double ADXL345_SPI::kGsPerLSB;
+ 
+-/**
+- * Constructor.
+- *
+- * @param clk The GPIO the clock signal is wired to.
+- * @param mosi The GPIO the MOSI (Master Out Slave In) signal is wired to.
+- * @param miso The GPIO the MISO (Master In Slave Out) signal is wired to.
+- * @param cs The GPIO the CS (Chip Select) signal is wired to.
+- * @param range The range (+ or -) that the accelerometer will measure.
+- */
+-ADXL345_SPI::ADXL345_SPI(DigitalOutput &clk, DigitalOutput &mosi, DigitalInput &miso,
+-	DigitalOutput &cs, DataFormat_Range range)
+-	: m_clk (NULL)
+-	, m_mosi (NULL)
+-	, m_miso (NULL)
+-	, m_cs (NULL)
+-	, m_spi (NULL)
+-{
+-	Init(&clk, &mosi, &miso, &cs, range);
+-}
+-
+-/**
+- * Constructor.
+- *
+- * @param clk The GPIO the clock signal is wired to.
+- * @param mosi The GPIO the MOSI (Master Out Slave In) signal is wired to.
+- * @param miso The GPIO the MISO (Master In Slave Out) signal is wired to.
+- * @param cs The GPIO the CS (Chip Select) signal is wired to.
+- * @param range The range (+ or -) that the accelerometer will measure.
+- */
+-ADXL345_SPI::ADXL345_SPI(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso,
+-	DigitalOutput *cs, DataFormat_Range range)
+-	: m_clk (NULL)
+-	, m_mosi (NULL)
+-	, m_miso (NULL)
+-	, m_cs (NULL)
+-	, m_spi (NULL)
+-{
+-	Init(clk, mosi, miso, cs, range);
+-}
+-
+-/**
+- * Constructor.
+- *
+- * @param clk The GPIO the clock signal is wired to.
+- * @param mosi The GPIO the MOSI (Master Out Slave In) signal is wired to.
+- * @param miso The GPIO the MISO (Master In Slave Out) signal is wired to.
+- * @param cs The GPIO the CS (Chip Select) signal is wired to.
+- * @param range The range (+ or -) that the accelerometer will measure.
+- */
+-ADXL345_SPI::ADXL345_SPI(uint32_t clk, uint32_t mosi, uint32_t miso,
+-		uint32_t cs, ADXL345_SPI::DataFormat_Range range)
+-	: m_clk (NULL)
+-	, m_mosi (NULL)
+-	, m_miso (NULL)
+-	, m_cs (NULL)
+-	, m_spi (NULL)
++ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::DataFormat_Range range)
+ {
+-	m_clk = new DigitalOutput(clk);
+-	m_mosi = new DigitalOutput(mosi);
+-	m_miso = new DigitalInput(miso);
+-	m_cs = new DigitalOutput(cs);
+-	Init(m_clk, m_mosi, m_miso, m_cs, range);
++	m_port = port;
++	Init(range);
+ }
+ 
+ /**
+  * Internal common init function.
+  */
+-void ADXL345_SPI::Init(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso,
+-	DigitalOutput *cs, DataFormat_Range range)
++void ADXL345_SPI::Init(DataFormat_Range range)
+ {
+-	if (clk != NULL && mosi != NULL && miso != NULL && cs != NULL)
+-	{
+-		m_spi = new SPI(clk, mosi, miso);
++		m_spi = new SPI(m_port);
++		m_spi->SetClockRate(500000);
+ 		m_spi->SetMSBFirst();
+-		m_spi->SetSampleDataOnRising();
+-		m_spi->SetSlaveSelect(cs, kChipSelect, false);
++		m_spi->SetSampleDataOnFalling();
+ 		m_spi->SetClockActiveLow();
+-		// 8-bit address and 8-bit data
+-		m_spi->SetBitsPerWord(16);
+-		m_spi->ApplyConfig();
+-		m_spi->ClearReceivedData();
++		m_spi->SetChipSelectActiveHigh();
+ 
++		uint8_t commands[2];
+ 		// Turn on the measurements
+-		m_spi->Write((kPowerCtlRegister << 8) | kPowerCtl_Measure);
+-		m_spi->Read();
++		commands[0] = kPowerCtlRegister;
++		commands[1] = kPowerCtl_Measure;
++		m_spi->Transaction(commands, commands, 2);
+ 		// Specify the data format to read
+-		m_spi->Write((kDataFormatRegister << 8) | kDataFormat_FullRes | (uint8_t)(range & 0x03));
+-		m_spi->Read();
+-
+-		// 8-bit address and 16-bit data
+-		m_spi->SetBitsPerWord(24);
+-		m_spi->ApplyConfig();
++		commands[0] = kDataFormatRegister;
++		commands[1] = kDataFormat_FullRes| (uint8_t)(range & 0x03);
++		m_spi->Transaction(commands, commands, 2);
+ 
+ 		HALReport(HALUsageReporting::kResourceType_ADXL345, HALUsageReporting::kADXL345_SPI);
+-	}
+ }
+ 
+ /**
+@@ -119,14 +52,6 @@ ADXL345_SPI::~ADXL345_SPI()
+ {
+ 	delete m_spi;
+ 	m_spi = NULL;
+-	delete m_cs;
+-	m_cs = NULL;
+-	delete m_miso;
+-	m_miso = NULL;
+-	delete m_mosi;
+-	m_mosi = NULL;
+-	delete m_clk;
+-	m_clk = NULL;
+ }
+ 
+ /**
+@@ -140,11 +65,13 @@ double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis)
+ 	int16_t rawAccel = 0;
+ 	if(m_spi)
+ 	{
+-		m_spi->Write(((kAddress_Read | kAddress_MultiByte | kDataRegister) + (uint8_t)axis) << 16);
+-		rawAccel = (uint16_t)m_spi->Read();
++		uint8_t buffer[3];
++		uint8_t command[3] = {0,0,0};
++		command[0] = (kAddress_Read | kAddress_MultiByte | kDataRegister) + (uint8_t)axis;
++		m_spi->Transaction(command, buffer, 3);
+ 
+ 		// Sensor is little endian... swap bytes
+-		rawAccel = ((rawAccel >> 8) & 0xFF) | (rawAccel << 8);
++		rawAccel = buffer[2]<<8 | buffer[1];
+ 	}
+ 	return rawAccel * kGsPerLSB;
+ }
+@@ -157,52 +84,20 @@ double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis)
+ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations()
+ {
+ 	AllAxes data = AllAxes();
++	uint8_t dataBuffer[7] = {0,0,0,0,0,0,0};
+ 	int16_t rawData[3];
+ 	if (m_spi)
+ 	{
+-		tFrameMode mode;
+-		bool activeLow;
+-
+-		// Backup original settings.
+-		DigitalOutput *cs = m_spi->GetSlaveSelect(&mode, &activeLow);
+-		uint32_t bitsPerWord = m_spi->GetBitsPerWord();
+-
+-		// Initialize the chip select to inactive.
+-		cs->Set(activeLow);
+-
+-		// Control the chip select manually.
+-		m_spi->SetSlaveSelect(NULL);
+-		// 8-bit address
+-		m_spi->SetBitsPerWord(8);
+-		m_spi->ApplyConfig();
+-
+-		// Assert chip select.
+-		cs->Set(!activeLow);
+-
+ 		// Select the data address.
+-		m_spi->Write(kAddress_Read | kAddress_MultiByte | kDataRegister);
+-		m_spi->Read();
+-
+-		// 16-bits for each axis
+-		m_spi->SetBitsPerWord(16);
+-		m_spi->ApplyConfig();
++		dataBuffer[0] = (kAddress_Read | kAddress_MultiByte | kDataRegister);
++		m_spi->Transaction(dataBuffer, dataBuffer, 7);
+ 
+ 		for (int32_t i=0; i<3; i++)
+ 		{
+-			// SPI Interface can't read enough data in a single transaction to read all axes at once.
+-			rawData[i] = (uint16_t)m_spi->Read(true);
+ 			// Sensor is little endian... swap bytes
+-			rawData[i] = ((rawData[i] >> 8) & 0xFF) | (rawData[i] << 8);
++			rawData[i] = dataBuffer[i*2+2] << 8 | dataBuffer[i*2+1];
+ 		}
+ 
+-		// Deassert chip select.
+-		cs->Set(activeLow);
+-
+-		// Restore original settings.
+-		m_spi->SetSlaveSelect(cs, mode, activeLow);
+-		m_spi->SetBitsPerWord(bitsPerWord);
+-		m_spi->ApplyConfig();
+-
+ 		data.XAxis = rawData[0] * kGsPerLSB;
+ 		data.YAxis = rawData[1] * kGsPerLSB;
+ 		data.ZAxis = rawData[2] * kGsPerLSB;
+diff --git a/wpilibc/wpilibC++/lib/SPI.cpp b/wpilibc/wpilibC++/lib/SPI.cpp
+index 01440486b3df28c543af9556e0deb18ebd20f6e8..2b9d291c8713b18c44da414972841d0fdcb3a94f 100644
+--- a/wpilibc/wpilibC++/lib/SPI.cpp
++++ b/wpilibc/wpilibC++/lib/SPI.cpp
+@@ -6,163 +6,47 @@
+ 
+ #include "SPI.h"
+ 
+-#include "DigitalModule.h"
+-#include "DigitalInput.h"
+-#include "DigitalOutput.h"
+-//#include "NetworkCommunication/UsageReporting.h"
+-#include "HAL/cpp/Synchronized.hpp"
+ #include "WPIErrors.h"
++#include "HAL/Digital.hpp"
+ 
+-#include <math.h>
++#include <string.h>
+ 
+-/**
+- * Constructor for input and output.
+- *
+- * @param clk	The digital output for the clock signal.
+- * @param mosi	The digital output for the written data to the slave
+- *				(master-out slave-in).
+- * @param miso	The digital input for the input data from the slave
+- *				(master-in slave-out).
+- */
+-SPI::SPI(DigitalOutput &clk, DigitalOutput &mosi, DigitalInput &miso)
+-{
+-	Init(&clk, &mosi, &miso);
+-}
+-
+-/**
+- * Constructor for input and output.
+- *
+- * @param clk	The digital output for the clock signal.
+- * @param mosi	The digital output for the written data to the slave
+- *				(master-out slave-in).
+- * @param miso	The digital input for the input data from the slave
+- *				(master-in slave-out).
+- */
+-SPI::SPI(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso)
+-{
+-	Init(clk, mosi, miso);
+-}
+-
+-/**
+- * Constructor for output only.
+- *
+- * @param clk	The digital output for the clock signal.
+- * @param mosi	The digital output for the written data to the slave
+- *				(master-out slave-in).
+- */
+-SPI::SPI(DigitalOutput &clk, DigitalOutput &mosi)
+-{
+-	Init(&clk, &mosi, NULL);
+-}
+-
+-/**
+- * Constructor for output only.
+- *
+- * @param clk	The digital output for the clock signal.
+- * @param mosi	The digital output for the written data to the slave
+- *				(master-out slave-in).
+- */
+-SPI::SPI(DigitalOutput *clk, DigitalOutput *mosi)
+-{
+-	Init(clk, mosi, NULL);
+-}
+-
+-/**
+- * Constructor for input only.
+- *
+- * @param clk	The digital output for the clock signal.
+- * @param miso	The digital input for the input data from the slave
+- *				(master-in slave-out).
+- */
+-SPI::SPI(DigitalOutput &clk, DigitalInput &miso)
+-{
+-	Init(&clk, NULL, &miso);
+-}
+-
+-/**
+- * Constructor for input only.
+- *
+- * @param clk	The digital output for the clock signal.
+- * @param miso	The digital input for the input data from the slave
+- *				(master-in slave-out).
+- */
+-SPI::SPI(DigitalOutput *clk, DigitalInput *miso)
+-{
+-	Init(clk, NULL, miso);
+-}
+ 
+ /**
+- * Destructor.
+- */
+-SPI::~SPI()
+-{
+-	int32_t status = 0;
+-	cleanSPI(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-}
+-
+-/**
+- * Initialize SPI channel configuration.
++ * Constructor
+  *
+- * @param clk	The digital output for the clock signal.
+- * @param mosi	The digital output for the written data to the slave
+- *				(master-out slave-in).
+- * @param miso	The digital input for the input data from the slave
+- *				(master-in slave-out).
++ * @param SPIport the physical SPI port
+  */
+-void SPI::Init(DigitalOutput *clk, DigitalOutput *mosi, DigitalInput *miso)
++SPI::SPI(Port SPIport)
+ {
++	m_port = SPIport;
+   	int32_t status = 0;
+-	m_spi = initializeSPI(clk->GetModuleForRouting(), clk->GetChannelForRouting(),
+-						  mosi->GetModuleForRouting(), mosi->GetChannelForRouting(),
+-						  miso->GetModuleForRouting(), miso->GetChannelForRouting(), &status);
++  	spiInitialize(m_port, &status);
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 
+-	m_ss = NULL;
+-
+ 	static int32_t instances = 0;
+ 	instances++;
+ 	HALReport(HALUsageReporting::kResourceType_SPI, instances);
+ }
+ 
+ /**
+- * Configure the number of bits from each word that the slave transmits
+- * or receives.
+- *
+- * @param bits	The number of bits in one frame (1 to 32 bits).
+- */
+-void SPI::SetBitsPerWord(uint32_t bits)
+-{
+-	int32_t status = 0;
+-	setSPIBitsPerWord(m_spi, bits, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));	
+-}
+-
+-/**
+- * Get the number of bits from each word that the slave transmits
+- * or receives.
+- *
+- * @return The number of bits in one frame (1 to 32 bits).
++ * Destructor.
+  */
+-uint32_t SPI::GetBitsPerWord()
++SPI::~SPI()
+ {
+-	int32_t status = 0;
+-	uint32_t bits = getSPIBitsPerWord(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));	
+-	return bits;
++	spiClose(m_port);
+ }
+ 
+ /**
+  * Configure the rate of the generated clock signal.
+- * The default and maximum value is 76,628.4 Hz.
++ * The default and maximum value is 500,000 Hz.
+  *
+  * @param hz	The clock rate in Hertz.
+  */
+ void SPI::SetClockRate(double hz)
+ {
+-	int32_t status = 0;
+-	setSPIClockRate(m_spi, hz, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	int32_t retVal = 0;
++	spiSetSpeed(m_port, hz);
+ }
+ 
+ /**
+@@ -171,9 +55,9 @@ void SPI::SetClockRate(double hz)
+  */
+ void SPI::SetMSBFirst()
+ {
+-	int32_t status = 0;
+-	setSPIMSBFirst(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	int32_t retVal = 0;
++	m_msbFirst = true;
++	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
+ }
+ 
+ /**
+@@ -182,9 +66,9 @@ void SPI::SetMSBFirst()
+  */
+ void SPI::SetLSBFirst()
+ {
+-	int32_t status = 0;
+-	setSPILSBFirst(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	int32_t retVal = 0;
++	m_msbFirst = false;
++	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
+ }
+ 
+ /**
+@@ -193,9 +77,9 @@ void SPI::SetLSBFirst()
+  */
+ void SPI::SetSampleDataOnFalling()
+ {
+-	int32_t status = 0;
+-	setSPISampleDataOnFalling(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	int32_t retVal = 0;
++	m_sampleOnTrailing = true;
++	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
+ }
+ 
+ /**
+@@ -204,182 +88,66 @@ void SPI::SetSampleDataOnFalling()
+  */
+ void SPI::SetSampleDataOnRising()
+ {
+-	int32_t status = 0;
+-	setSPISampleDataOnRising(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-}
+-
+-/**
+- * Configure the slave select line behavior.
+- *
+- * @param ss slave select digital output.
+- * @param mode Frame mode:
+- *			   kChipSelect: active for the duration of the frame.
+- *			   kPreLatchPulse: pulses before the transfer of each frame.
+- *			   kPostLatchPulse: pulses after the transfer of each frame.
+- *			   kPreAndPostLatchPulse: pulses before and after each frame.
+- * @param activeLow True if slave select line is active low.
+- */
+-void SPI::SetSlaveSelect(DigitalOutput *ss, tFrameMode mode, bool activeLow)
+-{
+-	int32_t status = 0;
+-
+-	if (ss)
+-	{
+-		setSPISlaveSelect(m_spi, ss->GetModuleForRouting(), ss->GetChannelForRouting(), &status);
+-	}
+-	else
+-	{
+-		setSPISlaveSelect(m_spi, 0, 0, &status);
+-	}
+-	m_ss = ss;
+-
+-	setSPILatchMode(m_spi, mode, &status);
+-	setSPIFramePolarity(m_spi, activeLow, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-}
+-
+-/**
+- * Configure the slave select line behavior.
+- *
+- * @param ss slave select digital output.
+- * @param mode Frame mode:
+- *			   kChipSelect: active for the duration of the frame.
+- *			   kPreLatchPulse: pulses before the transfer of each frame.
+- *			   kPostLatchPulse: pulses after the transfer of each frame.
+- *			   kPreAndPostLatchPulse: pulses before and after each frame.
+- * @param activeLow True if slave select line is active low.
+- */
+-void SPI::SetSlaveSelect(DigitalOutput &ss, tFrameMode mode, bool activeLow)
+-{
+-	SetSlaveSelect(&ss, mode, activeLow);
+-}
+-
+-/**
+- * Get the slave select line behavior.
+- *
+- * @param mode Frame mode:
+- *			   kChipSelect: active for the duration of the frame.
+- *			   kPreLatchPulse: pulses before the transfer of each frame.
+- *			   kPostLatchPulse: pulses after the transfer of each frame.
+- *			   kPreAndPostLatchPulse: pulses before and after each frame.
+- * @param activeLow True if slave select line is active low.
+- * @return The slave select digital output.
+- */
+-DigitalOutput *SPI::GetSlaveSelect(tFrameMode *mode, bool *activeLow)
+-{
+-	int32_t status = 0;
+-	if (mode != NULL)
+-	{
+-		*mode = getSPILatchMode(m_spi, &status);
+-	}
+-	if (activeLow != NULL)
+-	{
+-		*activeLow = getSPIFramePolarity(m_spi, &status);
+-	}
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	return m_ss;
++	int32_t retVal = 0;
++	m_sampleOnTrailing = false;
++	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
+ }
+ 
+ /**
+  * Configure the clock output line to be active low.
+- * This is sometimes called clock polarity high.
++ * This is sometimes called clock polarity high or clock idle high.
+  */
+ void SPI::SetClockActiveLow()
+ {
+-	int32_t status = 0;
+-	setSPIClockActiveLow(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	int32_t retVal = 0;
++	m_clk_idle_high = true;
++	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
+ }
+ 
+ /**
+  * Configure the clock output line to be active high.
+- * This is sometimes called clock polarity low.
++ * This is sometimes called clock polarity low or clock idle low.
+  */
+ void SPI::SetClockActiveHigh()
+ {
+-	int32_t status = 0;
+-	setSPIClockActiveHigh(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	int32_t retVal = 0;
++	m_clk_idle_high = false;
++	spiSetOpts(m_port, (int) m_msbFirst, (int) m_sampleOnTrailing, (int) m_clk_idle_high);
+ }
+ 
+ /**
+- * Apply configuration settings and reset the SPI logic.
++ * Configure the chip select line to be active high.
+  */
+-void SPI::ApplyConfig()
++void SPI::SetChipSelectActiveHigh()
+ {
+ 	int32_t status = 0;
+-	applySPIConfig(m_spi, &status);
++	spiSetChipSelectActiveHigh(m_port, &status);
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ }
+ 
+ /**
+- * Get the number of words that can currently be stored before being
+- * transmitted to the device.
+- *
+- * @return The number of words available to be written.
++ * Configure the chip select line to be active low.
+  */
+-uint16_t SPI::GetOutputFIFOAvailable()
++void SPI::SetChipSelectActiveLow()
+ {
+ 	int32_t status = 0;
+-	uint16_t result = getSPIOutputFIFOAvailable(m_spi, &status);
++	spiSetChipSelectActiveLow(m_port, &status);
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	return result;
+ }
+ 
+-/**
+- * Get the number of words received and currently available to be read from
+- * the receive FIFO.
+- *
+- * @return The number of words available to read.
+- */
+-uint16_t SPI::GetNumReceived()
+-{
+-	int32_t status = 0;
+-	uint16_t result = getSPINumReceived(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	return result;
+-}
+-
+-/**
+- * Have all pending transfers completed?
+- *
+- * @return True if no transfers are pending.
+- */
+-bool SPI::IsDone()
+-{
+-	int32_t status = 0;
+-	bool result = isSPIDone(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	return result;
+-}
+-
+-/**
+- * Determine if the receive FIFO was full when attempting to add new data at
+- * end of a transfer.
+- *
+- * @return True if the receive FIFO overflowed.
+- */
+-bool SPI::HadReceiveOverflow()
+-{
+-	int32_t status = 0;
+-	bool result = hadSPIReceiveOverflow(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	return result;
+-}
+ 
+ /**
+- * Write a word to the slave device.  Blocks until there is space in the
++ * Write data to the slave device.  Blocks until there is space in the
+  * output FIFO.
+  *
+  * If not running in output only mode, also saves the data received
+  * on the MISO input during the transfer into the receive FIFO.
+  */
+-void SPI::Write(uint32_t data)
++int32_t SPI::Write(uint8_t* data, uint8_t size)
+ {
+-	int32_t status = 0;
+-	writeSPI(m_spi, data, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++	int32_t retVal = 0;
++	retVal = spiWrite(m_port, data, size);
++	return retVal;
+ }
+ 
+ /**
+@@ -395,30 +163,29 @@ void SPI::Write(uint32_t data)
+  *				    If false, this function assumes that data is
+  *				    already in the receive FIFO from a previous write.
+  */
+-uint32_t SPI::Read(bool initiate)
++int32_t SPI::Read(bool initiate, uint8_t* dataReceived, uint8_t size)
+ {
+-	int32_t status = 0;
+-	uint32_t value = readSPI(m_spi, initiate, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-	return value;
++	int32_t retVal = 0;
++	if(initiate){
++		uint8_t* dataToSend = new uint8_t[size];
++		memset(dataToSend, 0, size);
++		retVal = spiTransaction(m_port, dataToSend, dataReceived, size);
++	}
++	else
++		retVal = spiRead(m_port, dataReceived, size);
++	return retVal;
+ }
+ 
+ /**
+- * Stop any transfer in progress and empty the transmit FIFO.
++ * Perform a simultaneous read/write transaction with the device
++ *
++ * @param dataToSend The data to be written out to the device
++ * @param dataReceived Buffer to receive data from the device
++ * @param size The length of the transaction, in bytes
+  */
+-void SPI::Reset()
+-{
+-	int32_t status = 0;
+-	resetSPI(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++int32_t SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived, uint8_t size){
++	int32_t retVal = 0;
++	retVal = spiTransaction(m_port, dataToSend, dataReceived, size);
++	return retVal;
+ }
+ 
+-/**
+- * Empty the receive FIFO.
+- */
+-void SPI::ClearReceivedData()
+-{
+-	int32_t status = 0;
+-	clearSPIReceivedData(m_spi, &status);
+-	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+-}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..f9e672bb715c7bd2cc3626e8680174bf46b5dc67
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java
+@@ -0,0 +1,165 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj;
++
++/**
++ *
++ * @author dtjones
++ * @author mwills
++ */
++public class ADXL345_SPI extends SensorBase {
++    private static final int kPowerCtlRegister = 0x2D;
++    private static final int kDataFormatRegister = 0x31;
++    private static final int kDataRegister = 0x32;
++    private static final double kGsPerLSB = 0.00390625;
++    
++    private static final int kAddress_Read = 0x80;
++    private static final int kAddress_MultiByte = 0x40;
++    
++    private static final int kPowerCtl_Link=0x20;
++    private static final int kPowerCtl_AutoSleep=0x10;
++    private static final int kPowerCtl_Measure=0x08;
++    private static final int kPowerCtl_Sleep=0x04;
++    
++    private static final int kDataFormat_SelfTest=0x80;
++    private static final int kDataFormat_SPI=0x40;
++    private static final int kDataFormat_IntInvert=0x20;
++    private static final int kDataFormat_FullRes=0x08;
++    private static final int kDataFormat_Justify=0x04;
++        
++        
++    public static class DataFormat_Range {
++
++        /**
++         * The integer value representing this enumeration
++         */
++        public final byte value;
++        static final byte k2G_val = 0x00;
++        static final byte k4G_val = 0x01;
++        static final byte k8G_val = 0x02;
++        static final byte k16G_val = 0x03;
++        public static final ADXL345_SPI.DataFormat_Range k2G = new ADXL345_SPI.DataFormat_Range(k2G_val);
++        public static final ADXL345_SPI.DataFormat_Range k4G = new ADXL345_SPI.DataFormat_Range(k4G_val);
++        public static final ADXL345_SPI.DataFormat_Range k8G = new ADXL345_SPI.DataFormat_Range(k8G_val);
++        public static final ADXL345_SPI.DataFormat_Range k16G = new ADXL345_SPI.DataFormat_Range(k16G_val);
++
++        private DataFormat_Range(byte value) {
++            this.value = value;
++        }
++    }
++
++    public static class Axes {
++
++        /**
++         * The integer value representing this enumeration
++         */
++        public final byte value;
++        static final byte kX_val = 0x00;
++        static final byte kY_val = 0x02;
++        static final byte kZ_val = 0x04;
++        public static final ADXL345_SPI.Axes kX = new ADXL345_SPI.Axes(kX_val);
++        public static final ADXL345_SPI.Axes kY = new ADXL345_SPI.Axes(kY_val);
++        public static final ADXL345_SPI.Axes kZ = new ADXL345_SPI.Axes(kZ_val);
++
++        private Axes(byte value) {
++            this.value = value;
++        }
++    }
++
++    public static class AllAxes {
++
++        public double XAxis;
++        public double YAxis;
++        public double ZAxis;
++    }
++    
++    private SPI m_spi;
++    
++    /**
++     * Constructor. Use this when the device is the first/only device on the bus
++     *
++     * @param clk The clock channel
++     * @param mosi The mosi (output) channel
++     * @param miso The miso (input) channel
++     * @param cs The chip select channel
++     * @param range The range (+ or -) that the accelerometer will measure.
++     */
++    public ADXL345_SPI(SPI.Port port, ADXL345_SPI.DataFormat_Range range) {
++        m_spi = new SPI(port);
++        init(range);
++    }
++    
++    public void free(){
++        m_spi.free();
++    }
++    
++    /**
++     * Set SPI bus parameters, bring device out of sleep and set format
++     * 
++     * @param range The range (+ or -) that the accelerometer will measure.
++     */
++    private void init(ADXL345_SPI.DataFormat_Range range){
++		m_spi.setClockRate(500000);
++        m_spi.setMSBFirst();
++		m_spi.setSampleDataOnFalling();
++		m_spi.setClockActiveLow();
++		m_spi.setChipSelectActiveHigh();
++
++        // Turn on the measurements
++		byte[] commands = new byte[2];
++		commands[0] = kPowerCtlRegister;
++		commands[1] = kPowerCtl_Measure;
++        m_spi.write(commands, 2);
++        // Specify the data format to read
++		commands[0] = kDataFormatRegister;
++		commands[1] = (byte)(kDataFormat_FullRes | range.value);
++        m_spi.write(commands, 2);
++    }
++
++    /**
++     * Get the acceleration of one axis in Gs.
++     *
++     * @param axis The axis to read from.
++     * @return Acceleration of the ADXL345 in Gs.
++     */
++    public double getAcceleration(ADXL345_SPI.Axes axis) {
++		byte[] transferBuffer = new byte[3];
++		transferBuffer[0] = (byte)((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value);
++        m_spi.transaction(transferBuffer, transferBuffer, 3);
++		//Sensor is little endian... swap bytes
++		int rawAccel = transferBuffer[2] << 8 | transferBuffer[1];
++		return rawAccel * kGsPerLSB;
++    }
++
++    /**
++     * Get the acceleration of all axes in Gs.
++     *
++     * @return Acceleration measured on all axes of the ADXL345 in Gs.
++     */
++    public ADXL345_SPI.AllAxes getAccelerations() {
++        ADXL345_SPI.AllAxes data = new ADXL345_SPI.AllAxes();
++		byte dataBuffer[] = new byte[7];
++		int[] rawData = new int[3];
++		if (m_spi != null)
++		{
++			// Select the data address.
++			dataBuffer[0] = (byte)(kAddress_Read | kAddress_MultiByte | kDataRegister);
++			m_spi.transaction(dataBuffer, dataBuffer, 7);
++
++			for (int i=0; i<3; i++)
++			{
++				//Sensor is little endian... swap bytes
++				rawData[i] = dataBuffer[i*2+2] << 8 | dataBuffer[i*2+1];
++			}
++
++			data.XAxis = rawData[0] * kGsPerLSB;
++			data.YAxis = rawData[1] * kGsPerLSB;
++			data.ZAxis = rawData[2] * kGsPerLSB;
++		}
++		return data;
++    }
++}
+\ No newline at end of file
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SPI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SPI.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..46d5e6796bc20a164a43e558d675048d7bc4aed6
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SPI.java
+@@ -0,0 +1,215 @@
++package edu.wpi.first.wpilibj;
++
++import java.nio.ByteOrder;
++import java.nio.IntBuffer;
++import java.nio.ByteBuffer;
++
++import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
++import edu.wpi.first.wpilibj.communication.UsageReporting;
++import edu.wpi.first.wpilibj.hal.HALLibrary;
++import edu.wpi.first.wpilibj.hal.HALUtil;
++import edu.wpi.first.wpilibj.hal.SPIJNI;
++
++/**
++ *
++ * Represents a SPI bus port
++ 
++ * @author koconnor
++ */
++public class SPI extends SensorBase {
++	
++	public enum Port {
++		kOnboardCS0(0), 
++		kOnboardCS1(1), 
++		kOnboardCS2(2), 
++		kOnboardCS3(3), 
++		kMXP(4);
++		
++		private int value;
++		
++		private Port(int value){
++			this.value = value;
++		}
++		
++		public int getValue(){
++			return this.value;
++		}
++	};
++
++	private static int devices = 0;
++	
++	private byte m_port;
++	private int bitOrder;
++	private int clockPolarity;
++	private int dataOnTrailing;
++
++	/**
++	 * Constructor
++	 *
++	 * @param SPIport the physical SPI port
++	 */
++    public SPI(Port port) {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		m_port = (byte)port.getValue();
++		devices++;
++		
++        SPIJNI.spiInitialize(m_port, status.asIntBuffer());
++		HALUtil.checkStatus(status.asIntBuffer());
++		
++		UsageReporting.report(tResourceType.kResourceType_SPI, devices);
++    }  
++        
++    /**
++     * Free the resources used by this object
++     */
++    public void free(){
++		SPIJNI.spiClose(m_port);
++    }
++	
++	/**
++	 * Configure the rate of the generated clock signal.
++	 * The default and maximum value is 500,000 Hz.
++	 *
++	 * @param hz	The clock rate in Hertz.
++	 */
++    public final void setClockRate(int hz) {
++        SPIJNI.spiSetSpeed(m_port, hz);
++    }
++	
++	/**
++	 * Configure the order that bits are sent and received on the wire
++	 * to be most significant bit first.
++	 */
++	public final void setMSBFirst() {
++		this.bitOrder = 1;
++		SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
++	}
++	
++	/**
++	 * Configure the order that bits are sent and received on the wire
++	 * to be least significant bit first.
++	 */
++	public final void setLSBFirst() {
++		this.bitOrder = 0;
++		SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
++	}
++
++	/**
++	 * Configure the clock output line to be active low.
++	 * This is sometimes called clock polarity high or clock idle high.
++	 */
++	public final void setClockActiveLow() {
++		this.clockPolarity = 1;
++		SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
++	}
++	
++	/**
++	 * Configure the clock output line to be active high.
++	 * This is sometimes called clock polarity low or clock idle low.
++	 */
++	public final void setClockActiveHigh() {
++		this.clockPolarity = 0;
++		SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
++	}
++
++	/**
++	 * Configure that the data is stable on the falling edge and the data
++	 * changes on the rising edge.
++	 */
++    public final void setSampleDataOnFalling() {
++        this.dataOnTrailing = 1;
++		SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
++    }
++	
++	/**
++	 * Configure that the data is stable on the rising edge and the data
++	 * changes on the falling edge.
++	 */
++	public final void setSampleDataOnRising() {
++        this.dataOnTrailing = 0;
++		SPIJNI.spiSetOpts(m_port, this.bitOrder, this.dataOnTrailing, this.clockPolarity);
++    }
++	
++	/**
++	 * Configure the chip select line to be active high.
++	 */
++	public final void setChipSelectActiveHigh() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		SPIJNI.spiSetChipSelectActiveHigh(m_port, status.asIntBuffer());
++	
++		HALUtil.checkStatus(status.asIntBuffer());
++	}
++	
++	/**
++	 * Configure the chip select line to be active low.
++	 */
++	public final void setChipSelectActiveLow() {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		SPIJNI.spiSetChipSelectActiveLow(m_port, status.asIntBuffer());
++	
++		HALUtil.checkStatus(status.asIntBuffer());
++	}
++	
++	 /**
++	 * Write data to the slave device.  Blocks until there is space in the
++	 * output FIFO.
++	 *
++	 * If not running in output only mode, also saves the data received
++	 * on the MISO input during the transfer into the receive FIFO.
++	 */
++	public int write(byte[] dataToSend, int size) {
++		int retVal = 0;
++		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
++		dataToSendBuffer.put(dataToSend);
++		retVal = SPIJNI.spiWrite(m_port, dataToSendBuffer, (byte) size);
++		return retVal;
++	}
++	
++	/**
++	 * Read a word from the receive FIFO.
++	 *
++	 * Waits for the current transfer to complete if the receive FIFO is empty.
++	 *
++	 * If the receive FIFO is empty, there is no active transfer, and initiate
++	 * is false, errors.
++	 *
++	 * @param initiate	If true, this function pushes "0" into the
++	 *				    transmit buffer and initiates a transfer.
++	 *				    If false, this function assumes that data is
++	 *				    already in the receive FIFO from a previous write.
++	 */
++	public int read(boolean initiate, byte[] dataReceived, int size) {
++		int retVal = 0;
++		ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(size);
++		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
++		if(initiate)
++			retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, (byte) size);
++		else
++			retVal = SPIJNI.spiRead(m_port, dataReceivedBuffer, (byte) size);
++		dataReceivedBuffer.get(dataReceived);
++		return retVal;
++	}
++
++	/**
++	 * Perform a simultaneous read/write transaction with the device
++	 *
++	 * @param dataToSend The data to be written out to the device
++	 * @param dataReceived Buffer to receive data from the device
++	 * @param size The length of the transaction, in bytes
++	 */
++    public int transaction(byte[] dataToSend, byte[] dataReceived, int size) {
++		int retVal = 0;
++		ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
++		dataToSendBuffer.put(dataToSend);
++		ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(size);
++        retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, (byte) size);
++		dataReceivedBuffer.get(dataReceived);
++        return retVal;
++    }
++}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/SPIJNI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/SPIJNI.java
+index 9544a22a432a96795ec9c077928199eba65b1ebf..db8dc7884ca68acc0fe86e2517390d7c4a9a39dc 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/SPIJNI.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/SPIJNI.java
+@@ -4,29 +4,14 @@ import java.nio.ByteBuffer;
+ import java.nio.IntBuffer;
+ 
+ public class SPIJNI extends JNIWrapper {
+-	public static native ByteBuffer initializeSPI(byte sclk_routing_module, int sclk_routing_pin, byte mosi_routing_module, int mosi_routing_pin, byte miso_routing_module, int miso_routing_pin, IntBuffer status);
+-	public static native void cleanSPI(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void setSPIBitsPerWord(ByteBuffer spi_pointer, int bits, IntBuffer status);
+-	public static native int getSPIBitsPerWord(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void setSPIClockRate(ByteBuffer spi_pointer, double hz, IntBuffer status);
+-	public static native void setSPIMSBFirst(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void setSPILSBFirst(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void setSPISampleDataOnFalling(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void setSPISampleDataOnRising(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void setSPISlaveSelect(ByteBuffer spi_pointer, byte ss_routing_module, int ss_routing_pin, IntBuffer status);
+-	public static native void setSPILatchMode(ByteBuffer spi_pointer, int mode, IntBuffer status);
+-	public static native int getSPILatchMode(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void setSPIFramePolarity(ByteBuffer spi_pointer, byte activeLow, IntBuffer status);
+-	public static native byte getSPIFramePolarity(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void setSPIClockActiveLow(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void setSPIClockActiveHigh(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void applySPIConfig(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native short getSPIOutputFIFOAvailable(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native short getSPINumReceived(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native byte isSPIDone(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native byte hadSPIReceiveOverflow(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void writeSPI(ByteBuffer spi_pointer, int data, IntBuffer status);
+-	public static native int readSPI(ByteBuffer spi_pointer, byte initiate, IntBuffer status);
+-	public static native void resetSPI(ByteBuffer spi_pointer, IntBuffer status);
+-	public static native void clearSPIReceivedData(ByteBuffer spi_pointer, IntBuffer status);
++	public static native void spiInitialize(byte port, IntBuffer status);
++	public static native int spiTransaction(byte port, ByteBuffer dataToSend, ByteBuffer dataReceived, byte size);
++	public static native int spiWrite(byte port, ByteBuffer dataToSend, byte sendSize);
++	public static native int spiRead(byte port, ByteBuffer dataReceived, byte size);
++	public static native void spiClose(byte port);
++	public static native void spiSetSpeed(byte port, int speed);
++	public static native void spiSetBitsPerWord(byte port, byte bpw);
++	public static native void spiSetOpts(byte port, int msb_first, int sample_on_trailing, int clk_idle_high);
++	public static native void spiSetChipSelectActiveHigh(byte port, IntBuffer status);
++	public static native void spiSetChipSelectActiveLow(byte port, IntBuffer status);
+ }
+diff --git a/wpilibj/wpilibJavaJNI/lib/SPIJNI.cpp b/wpilibj/wpilibJavaJNI/lib/SPIJNI.cpp
+index bbc4d71dcbafff16f7cdbe22ab2ed9fcd3b0374c..bb763671991515e273377b0bfecafb4f1568fbd9 100644
+--- a/wpilibj/wpilibJavaJNI/lib/SPIJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/SPIJNI.cpp
+@@ -4,6 +4,8 @@
+ 
+ #include "edu_wpi_first_wpilibj_hal_SPIJNI.h"
+ 
++#include "HAL/Digital.hpp"
++
+ 
+ // set the logging level
+ TLogLevel spiJNILogLevel = logWARNING;
+@@ -14,276 +16,155 @@ TLogLevel spiJNILogLevel = logWARNING;
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    initializeSPI
+- * Signature: (BIBIBILjava/nio/IntBuffer;)Ljava/nio/ByteBuffer;
+- */
+-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_initializeSPI
+-  (JNIEnv *, jclass, jbyte, jint, jbyte, jint, jbyte, jint, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    cleanSPI
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_cleanSPI
+-  (JNIEnv *, jclass, jobject, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPIBitsPerWord
+- * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIBitsPerWord
+-  (JNIEnv *, jclass, jobject, jint, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    getSPIBitsPerWord
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)I
+- */
+-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_getSPIBitsPerWord
+-  (JNIEnv *, jclass, jobject, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPIClockRate
+- * Signature: (Ljava/nio/ByteBuffer;DLjava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIClockRate
+-  (JNIEnv *, jclass, jobject, jdouble, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPIMSBFirst
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIMSBFirst
+-  (JNIEnv *, jclass, jobject, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPILSBFirst
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
++ * Method:    spiInitialize
++ * Signature: (BLjava/nio/IntBuffer;)V
+  */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPILSBFirst
+-  (JNIEnv *, jclass, jobject, jobject)
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitialize
++  (JNIEnv * env, jclass, jbyte port, jobject status)
+ {
+-	assert(false);
++	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiInitialize";
++	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	spiInitialize(port, statusPtr);
++	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ }
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPISampleDataOnFalling
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
++ * Method:    spiTransaction
++ * Signature: (BLjava/nio/ByteBuffer;Ljava/nio/ByteBuffer;B)I
+  */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPISampleDataOnFalling
+-  (JNIEnv *, jclass, jobject, jobject)
++JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransaction
++  (JNIEnv * env, jclass, jbyte port, jobject dataToSend, jobject dataReceived, jbyte size)
+ {
+-	assert(false);
++	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiTransaction";
++	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
++	jbyte * dataToSendPtr = NULL;
++	jbyte * dataReceivedPtr = NULL;
++	if(dataToSend != 0){
++		dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
++	}
++	dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
++	SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
++	SPIJNI_LOG(logDEBUG) << "DataToSendPtr = " << (jint*)dataToSendPtr;
++	SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << (jint*) dataReceivedPtr;
++	jbyte retVal = spiTransaction(port, (uint8_t*)dataToSendPtr, (uint8_t*)dataReceivedPtr, size);
++	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
++	return retVal;
+ }
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPISampleDataOnRising
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
++ * Method:    spiWrite
++ * Signature: (BLjava/nio/ByteBuffer;B)I
+  */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPISampleDataOnRising
+-  (JNIEnv *, jclass, jobject, jobject)
++JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiWrite
++  (JNIEnv * env, jclass, jbyte port, jobject dataToSend, jbyte size)
+ {
+-	assert(false);
++	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiWrite";
++	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
++	jbyte * dataToSendPtr = NULL;
++	if(dataToSend != 0){
++		dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
++	}
++	SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
++	SPIJNI_LOG(logDEBUG) << "DataToSendPtr = " << (jint*)dataToSendPtr;
++	jbyte retVal = spiWrite(port, (uint8_t*)dataToSendPtr, size);
++	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
++	return retVal;
+ }
+ 
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPISlaveSelect
+- * Signature: (Ljava/nio/ByteBuffer;BILjava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPISlaveSelect
+-  (JNIEnv *, jclass, jobject, jbyte, jint, jobject)
+-{
+-	assert(false);
+-}
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPILatchMode
+- * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
++ * Method:    spiRead
++ * Signature: (BLjava/nio/ByteBuffer;B)I
+  */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPILatchMode
+-  (JNIEnv *, jclass, jobject, jint, jobject)
++JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiRead
++  (JNIEnv * env, jclass, jbyte port, jobject dataReceived, jbyte size)
+ {
+-	assert(false);
++	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiRead";
++	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
++	jbyte * dataReceivedPtr = NULL;
++	dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
++	SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
++	SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << (jint*) dataReceivedPtr;
++	jbyte retVal = spiRead(port, (uint8_t*)dataReceivedPtr, size);
++	SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
++	return retVal;
+ }
+ 
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    getSPILatchMode
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)I
+- */
+-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_getSPILatchMode
+-  (JNIEnv *, jclass, jobject, jobject)
+-{
+-	assert(false);
+-}
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPIFramePolarity
+- * Signature: (Ljava/nio/ByteBuffer;BLjava/nio/IntBuffer;)V
++ * Method:    spiClose
++ * Signature: (B)V
+  */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIFramePolarity
+-  (JNIEnv *, jclass, jobject, jbyte, jobject)
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiClose
++  (JNIEnv *, jclass, jbyte port)
+ {
+-	assert(false);
++	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiClose";
++	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
++	spiClose(port);
+ }
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    getSPIFramePolarity
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
++ * Method:    spiSetSpeed
++ * Signature: (BI)V
+  */
+-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_getSPIFramePolarity
+-  (JNIEnv *, jclass, jobject, jobject)
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetSpeed
++  (JNIEnv *, jclass, jbyte port, jint speed)
+ {
+-	assert(false);
++	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetSpeed";
++	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
++	SPIJNI_LOG(logDEBUG) << "Speed = " << (jint) speed;
++	spiSetSpeed(port, speed);
+ }
+ 
+-
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPIClockActiveLow
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
++ * Method:    spiSetOpts
++ * Signature: (BIII)V
+  */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIClockActiveLow
+-  (JNIEnv *, jclass, jobject, jobject)
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetOpts
++  (JNIEnv *, jclass, jbyte port, jint msb_first, jint sample_on_trailing, jint clk_idle_high)
+ {
+-	assert(false);
++	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetOpts";
++	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
++	SPIJNI_LOG(logDEBUG) << "msb_first = " << msb_first;
++	SPIJNI_LOG(logDEBUG) << "sample_on_trailing = " << sample_on_trailing;
++	SPIJNI_LOG(logDEBUG) << "clk_idle_high = " << clk_idle_high;
++	spiSetOpts(port, msb_first, sample_on_trailing, clk_idle_high);
+ }
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    setSPIClockActiveHigh
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
++ * Method:    spiSetChipSelectActiveHigh
++ * Signature: (BLjava/nio/IntBuffer;)V
+  */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_setSPIClockActiveHigh
+-  (JNIEnv *, jclass, jobject, jobject)
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveHigh
++  (JNIEnv * env, jclass, jbyte port, jobject status)
+ {
+-	assert(false);
++	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveHigh";
++	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	spiSetChipSelectActiveHigh(port, statusPtr);
++	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ }
+ 
+ /*
+  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    applySPIConfig
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
++ * Method:    spiSetChipSelectActiveLow
++ * Signature: (BLjava/nio/IntBuffer;)V
+  */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_applySPIConfig
+-  (JNIEnv *, jclass, jobject, jobject)
++JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveLow
++  (JNIEnv * env, jclass, jbyte port, jobject status)
+ {
+-	assert(false);
++	SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveLow";
++	SPIJNI_LOG(logDEBUG) << "Port = " << (jint) port;
++	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
++	spiSetChipSelectActiveLow(port, statusPtr);
++	SPIJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+ }
+ 
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    getSPIOutputFIFOAvailable
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)S
+- */
+-JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_getSPIOutputFIFOAvailable
+-  (JNIEnv *, jclass, jobject, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    getSPINumReceived
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)S
+- */
+-JNIEXPORT jshort JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_getSPINumReceived
+-  (JNIEnv *, jclass, jobject, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    isSPIDone
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
+- */
+-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_isSPIDone
+-  (JNIEnv *, jclass, jobject, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    hadSPIReceiveOverflow
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)B
+- */
+-JNIEXPORT jbyte JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_hadSPIReceiveOverflow
+-  (JNIEnv *, jclass, jobject, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    writeSPI
+- * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_writeSPI
+-  (JNIEnv *, jclass, jobject, jint, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    readSPI
+- * Signature: (Ljava/nio/ByteBuffer;BLjava/nio/IntBuffer;)I
+- */
+-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_readSPI
+-  (JNIEnv *, jclass, jobject, jbyte, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    resetSPI
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_resetSPI
+-  (JNIEnv *, jclass, jobject, jobject)
+-{
+-	assert(false);
+-}
+-
+-/*
+- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+- * Method:    clearSPIReceivedData
+- * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/IntBuffer;)V
+- */
+-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_clearSPIReceivedData
+-  (JNIEnv *, jclass, jobject, jobject)
+-{
+-	assert(false);
+-}

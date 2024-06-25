@@ -1,0 +1,769 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Fri, 13 Jun 2014 15:03:38 -0400
+Subject: [PATCH 0100/6262] Adds several more tests to the PID Test Class Adds
+ Logger output to tests when they fail to allow the rest of the tests to run
+ while you can follow the failure stack trace. This allows you to begin
+ working on fixing the failure before the remainder of the tests have run.
+
+Change-Id: I84adfad0b31b166f027d0bf9797a23856dd02f97
+---
+ .../src/MotorEncoderTest.cpp                  |  2 +-
+ .../edu/wpi/first/wpilibj/CounterTest.java    |  6 ++
+ .../first/wpilibj/DIOCrossConnectTest.java    |  6 ++
+ .../edu/wpi/first/wpilibj/EncoderTest.java    |  7 +-
+ .../wpi/first/wpilibj/MotorEncoderTest.java   |  4 +
+ .../java/edu/wpi/first/wpilibj/PIDTest.java   | 88 ++++++++++++++-----
+ .../edu/wpi/first/wpilibj/PrefrencesTest.java |  6 ++
+ .../edu/wpi/first/wpilibj/SampleTest.java     |  6 +-
+ .../wpi/first/wpilibj/TiltPanCameraTest.java  | 21 ++++-
+ .../java/edu/wpi/first/wpilibj/TimerTest.java |  7 ++
+ .../wpi/first/wpilibj/command/ButtonTest.java |  9 +-
+ .../command/CommandParallelGroupTest.java     |  7 ++
+ .../wpilibj/command/CommandScheduleTest.java  |  7 ++
+ .../command/CommandSequentialGroupTest.java   |  5 +-
+ .../wpilibj/command/CommandSupersedeTest.java |  7 ++
+ .../wpilibj/command/CommandTimeoutTest.java   |  7 ++
+ .../wpilibj/command/DefaultCommandTest.java   |  7 ++
+ .../fixtures/TiltPanCameraFixture.java        | 51 ++++++++---
+ .../smartdashboard/SmartDashboardTest.java    |  7 ++
+ .../first/wpilibj/test/AbstractComsSetup.java | 19 ++++
+ 20 files changed, 237 insertions(+), 42 deletions(-)
+
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
+index 63825dabec4062bf1489d668d6dff390def08b00..b5edf1975c2ccd656181dca9aa5da7c5712b75f5 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
+@@ -126,7 +126,7 @@ TEST_P(MotorEncoderTest, PIDController) {
+ 	Reset();
+ 	
+ 	PIDController pid(0.003f, 0.001f, 0.0f, m_encoder, m_speedController);
+-	pid.SetAbsoluteTolerance(15.0f);
++	pid.SetAbsoluteTolerance(20.0f);
+ 	pid.SetOutputRange(-0.2f, 0.2f);
+ 	pid.SetSetpoint(2500);
+ 	
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java
+index 19e262c852bf5b8a298b2d769a10db4265cb37c5..08ecc6d237ec8fe63ebfb9bbc33c1e0c22180395 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/CounterTest.java
+@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
+ import static org.junit.Assert.assertTrue;
+ 
+ import java.util.Collection;
++import java.util.logging.Logger;
+ 
+ import org.junit.AfterClass;
+ import org.junit.Before;
+@@ -31,10 +32,15 @@ import edu.wpi.first.wpilibj.test.TestBench;
+ @RunWith(Parameterized.class)
+ public class CounterTest extends AbstractComsSetup {
+ 	private static FakeCounterFixture counter = null;
++	private static final Logger logger = Logger.getLogger(CounterTest.class.getName());
+ 	
+ 	Integer input;
+ 	Integer output;
+ 	
++	protected Logger getClassLogger(){
++		return logger;
++	}
++	
+ 	/**
+ 	 * Constructs a Counter Test with the given inputs
+ 	 * @param input The input Port
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java
+index 7403f97f4a8d02a058de0937aba0700c9a4b4da8..ac15b97786ab0bf46768ea047b198c4c45478b2c 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/DIOCrossConnectTest.java
+@@ -10,6 +10,7 @@ import static org.junit.Assert.assertFalse;
+ import static org.junit.Assert.assertTrue;
+ 
+ import java.util.Collection;
++import java.util.logging.Logger;
+ 
+ import org.junit.After;
+ import org.junit.AfterClass;
+@@ -31,8 +32,13 @@ import edu.wpi.first.wpilibj.test.TestBench;
+  */
+ @RunWith(Parameterized.class)
+ public class DIOCrossConnectTest extends AbstractComsSetup {
++	private static final Logger logger = Logger.getLogger(DIOCrossConnectTest.class.getName());
+ 
+ 	private static DIOCrossConnectFixture dio = null;
++	
++	protected Logger getClassLogger(){
++		return logger;
++	}
+ 
+ 	/**
+ 	 * Default constructor for the DIOCrossConnectTest
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java
+index aa7dac8d4071e8e9c35d3dac43f06f2529ab625a..bc7e2154670d6a671e671acd76a458808b99006d 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/EncoderTest.java
+@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
+ import static org.junit.Assert.*;
+ 
+ import java.util.Collection;
++import java.util.logging.Logger;
+ 
+ import org.junit.After;
+ import org.junit.AfterClass;
+@@ -33,7 +34,7 @@ import edu.wpi.first.wpilibj.test.TestBench;
+  */
+ @RunWith(Parameterized.class)
+ public class EncoderTest extends AbstractComsSetup {
+-	
++	private static final Logger logger = Logger.getLogger(EncoderTest.class.getName());
+ 	private static FakeEncoderFixture encoder = null;
+ 	
+ 	private final boolean flip; //Does this test need to flip the inputs
+@@ -42,6 +43,10 @@ public class EncoderTest extends AbstractComsSetup {
+ 	private final int outputA;
+ 	private final int outputB;
+ 	
++	protected Logger getClassLogger(){
++		return logger;
++	}
++	
+ 	/**
+ 	 * Test data generator. This method is called the the JUnit
+ 	 * parameterized test runner and returns a Collection of Arrays. For each
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+index 02af5960f5ffd494f3303d46ca333d9a41af1cf5..6700f54bbfab31c13c6121726a5861e78fe93f35 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/MotorEncoderTest.java
+@@ -35,6 +35,10 @@ public class MotorEncoderTest extends AbstractComsSetup {
+ 	//private static final List<MotorEncoderFixture> pairs = new ArrayList<MotorEncoderFixture>();
+ 	private static MotorEncoderFixture me = null;
+ 	
++	protected Logger getClassLogger(){
++		return logger;
++	}
++	
+ 	public MotorEncoderTest(MotorEncoderFixture mef){
+ 		logger.fine("Constructor with: " + mef.getType());
+ 		if(me != null && !me.equals(mef)) me.teardown();
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
+index f2947d28b01d46f8b2f4f89fea069ca21988e805..41f287159ee216fd01f664500126618a740df756 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PIDTest.java
+@@ -7,6 +7,7 @@
+ package edu.wpi.first.wpilibj;
+ 
+ import static org.junit.Assert.*;
++import static org.hamcrest.CoreMatchers.*;
+ 
+ import java.util.ArrayList;
+ import java.util.Arrays;
+@@ -28,6 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
+ 
+ import edu.wpi.first.wpilibj.PIDSource.PIDSourceParameter;
+ import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
++import edu.wpi.first.wpilibj.networktables.NetworkTable;
+ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+ import edu.wpi.first.wpilibj.test.TestBench;
+ 
+@@ -41,41 +43,40 @@ import edu.wpi.first.wpilibj.test.TestBench;
+ @RunWith(Parameterized.class)
+ public class PIDTest extends AbstractComsSetup {
+ 	private static final Logger logger = Logger.getLogger(PIDTest.class.getName());
++	private NetworkTable table;
++	
++	private static final double absoluteTollerance = 20;
++	private static final double outputRange = 0.19;
++	
+ 	
+ 	private PIDController controller = null;
+ 	private static MotorEncoderFixture me = null;
+ 	
+-	private final Double p;
+-	private final Double i;
+-	private final Double d;
++	private final Double k_p, k_i, k_d;
+ 	
+-	@Rule
+-	public TestWatcher testWatcher = new TestWatcher() {
+-		protected void failed(Throwable e, Description description) {
+-			System.out.println();
+-			logger.severe("" + description.getDisplayName() + " failed " + e.getMessage());
+-			super.failed(e, description);
+-			}
+-		};
++	protected Logger getClassLogger(){
++		return logger;
++	}
+ 
+ 	
+ 	public PIDTest(Double p, Double i, Double d, MotorEncoderFixture mef){
+ 		logger.fine("Constructor with: " + mef.getType());
+ 		if(PIDTest.me != null && !PIDTest.me.equals(mef)) PIDTest.me.teardown();
+ 		PIDTest.me = mef;
+-		this.p = p;
+-		this.i = i;
+-		this.d = d;
++		this.k_p = p;
++		this.k_i = i;
++		this.k_d = d;
+ 	}
+ 	
++	
+ 	@Parameters
+ 	public static Collection<Object[]> generateData(){
+ 		//logger.fine("Loading the MotorList");
+ 		Collection<Object[]> data = new ArrayList<Object[]>();
+-		double kp = 0.0035;
+-		double ki = 0.001;
++		double kp = 0.003;
++		double ki = 0.0015;
+ 		double kd = 0.0;
+-		for(int i = 0; i < 10; i++){
++		for(int i = 0; i < 5; i++){
+ 			data.addAll(Arrays.asList(new Object[][]{
+ 				 {kp, ki, kd, TestBench.getInstance().getTalonPair()},
+ 				 {kp, ki, kd, TestBench.getInstance().getVictorPair()},
+@@ -107,9 +108,9 @@ public class PIDTest extends AbstractComsSetup {
+ 	public void setUp() throws Exception {
+ 		logger.fine("Setup: " + me.getType());
+ 		me.setup();
+-		controller = new PIDController(p, i, d, me.getEncoder(), me.getMotor());
+-		controller.setAbsoluteTolerance(15);
+-		controller.setOutputRange(-0.2, 0.2);
++		table = NetworkTable.getTable("TEST_PID");
++		controller = new PIDController(k_p, k_i, k_d, me.getEncoder(), me.getMotor());
++		controller.initTable(table);
+ 	}
+ 
+ 	/**
+@@ -124,14 +125,49 @@ public class PIDTest extends AbstractComsSetup {
+ 		me.reset();
+ 	}
+ 	
++	private void setupAbsoluteTollerance(){
++		controller.setAbsoluteTolerance(absoluteTollerance);
++	}
++	private void setupOutputRange(){
++		controller.setOutputRange(-outputRange, outputRange);
++	}
++	
+ 	@Test
+ 	public void testInitialSettings(){
+-		controller.disable();
+-		assertTrue("PID did not start at 0", controller.getError() == 0);
++		setupAbsoluteTollerance();
++		setupOutputRange();
++		double setpoint = 2500.0;
++		controller.setSetpoint(setpoint);
++		assertFalse("PID did not begin disabled", controller.isEnable());
++		assertEquals("PID.getError() did not start at " + setpoint, setpoint, controller.getError(), 0);
++		assertEquals(k_p, table.getNumber("p"), 0);
++		assertEquals(k_i, table.getNumber("i"), 0);
++		assertEquals(k_d, table.getNumber("d"), 0);
++		assertEquals(setpoint, table.getNumber("setpoint"), 0);
++		assertFalse(table.getBoolean("enabled"));
++	}
++	
++	@Test
++	public void testRestartAfterEnable(){
++		setupAbsoluteTollerance();
++		setupOutputRange();
++		double setpoint = 2500.0;
++		controller.setSetpoint(setpoint);
++		controller.enable();
++		Timer.delay(.5);
++		assertTrue(table.getBoolean("enabled"));
++		assertTrue(controller.isEnable());
++		assertThat(0.0, is(not(me.getMotor().get())));
++		controller.reset();
++		assertFalse(table.getBoolean("enabled"));
++		assertFalse(controller.isEnable());
++		assertEquals(0, me.getMotor().get(), 0);
+ 	}
+ 	
+ 	@Test
+ 	public void testSetSetpoint(){
++		setupAbsoluteTollerance();
++		setupOutputRange();
+ 		Double setpoint = 2500.0;
+ 		controller.disable();
+ 		controller.setSetpoint(setpoint);
+@@ -141,6 +177,8 @@ public class PIDTest extends AbstractComsSetup {
+ 
+ 	@Test (timeout = 6000)
+ 	public void testRotateToTarget() {
++		setupAbsoluteTollerance();
++		setupOutputRange();
+ 		double setpoint = 2500.0;
+ 		assertEquals(pidData() + "did not start at 0", 0, controller.get(), 0);
+ 		controller.setSetpoint(setpoint);
+@@ -155,4 +193,10 @@ public class PIDTest extends AbstractComsSetup {
+ 		return me.getType() + " PID {P:" +controller.getP() + " I:" + controller.getI() + " D:" + controller.getD() +"} ";
+ 	}
+ 	
++	
++	@Test(expected = RuntimeException.class)
++	public void testOnTargetNoTolleranceSet(){
++		setupOutputRange();
++		controller.onTarget();
++	}
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PrefrencesTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PrefrencesTest.java
+index 9cf3d0a6292b01ae94433e74dbfb5f387b14b637..72d91cef7cda31115f4dcf7b8476e0fab251e0ff 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PrefrencesTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PrefrencesTest.java
+@@ -12,6 +12,7 @@ import java.io.File;
+ import java.io.FileOutputStream;
+ import java.io.IOException;
+ import java.io.OutputStream;
++import java.util.logging.Logger;
+ 
+ import org.junit.After;
+ import org.junit.AfterClass;
+@@ -27,11 +28,16 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
+  *
+  */
+ public class PrefrencesTest extends AbstractCommandTest {
++	private static final Logger logger = Logger.getLogger(PrefrencesTest.class.getName());
+ 	
+ 	private NetworkTable prefTable;
+ 	private Preferences pref;
+ 	private long check;
+ 
++	protected Logger getClassLogger(){
++		return logger;
++	}
++	
+ 	/**
+ 	 * @throws java.lang.Exception
+ 	 */
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/SampleTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/SampleTest.java
+index a65e40d9a6e309c20925d2234abab8d47019510e..21d34e8acb7e58b5be7cd95b3090e51291915e21 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/SampleTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/SampleTest.java
+@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj;
+ 
+ import static org.junit.Assert.assertTrue;
+ 
++import java.util.logging.Logger;
++
+ import org.junit.AfterClass;
+ import org.junit.Before;
+ import org.junit.BeforeClass;
+@@ -26,10 +28,12 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+  * @author Fredric Silberberg
+  */
+ public class SampleTest extends AbstractComsSetup {
++	private static final Logger logger = Logger.getLogger(SampleTest.class.getName());
+ 
+ 	static SampleFixture fixture = new SampleFixture();
+ 
+-	public SampleTest() {
++	protected Logger getClassLogger(){
++		return logger;
+ 	}
+ 
+ 	@BeforeClass
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java
+index 04a07f358b73103a096731829547c8797311f7e4..7e198ad290fa79b9fa8c2abe8b9ca8d0852977f7 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java
+@@ -28,6 +28,11 @@ public class TiltPanCameraTest extends AbstractComsSetup {
+ 	
+ 	private static TiltPanCameraFixture tpcam;
+ 
++	
++	protected Logger getClassLogger(){
++		return logger;
++	}
++	
+ 	@BeforeClass
+ 	public static void setUpBeforeClass() throws Exception {
+ 		logger.fine("Setup: TiltPan camera");
+@@ -42,7 +47,10 @@ public class TiltPanCameraTest extends AbstractComsSetup {
+ 
+ 	@Before
+ 	public void setUp() throws Exception {
+-		tpcam.reset();
++		boolean setupSucsess = tpcam.setup();
++		assertTrue(tpcam.getSetupError(), setupSucsess);
++		double resetTime = tpcam.getLastResetTimeGyro();
++		assertEquals("The Gyroscoe reset time was " + resetTime + " seconds", 0, resetTime, .03);
+ 	}
+ 
+ 	@After
+@@ -53,7 +61,7 @@ public class TiltPanCameraTest extends AbstractComsSetup {
+ 	@Test
+ 	public void testInitial(){
+ 		double angle = tpcam.getGyro().getAngle();
+-		assertEquals(errorMessage(angle, 0), 0, angle, .5); 
++		assertEquals(errorMessage(angle, 0), 0, angle, .5);
+ 	}
+ 
+ 	/**
+@@ -78,6 +86,15 @@ public class TiltPanCameraTest extends AbstractComsSetup {
+ 		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 8);
+ 	}
+ 	
++	@Test
++	public void testDeviationOverTime(){
++		double angle = tpcam.getGyro().getAngle();
++		assertEquals(errorMessage(angle, 0), 0, angle, .5);
++		Timer.delay(5);
++		angle = tpcam.getGyro().getAngle();
++		assertEquals(errorMessage(angle, 0), 0, angle, .5);
++	}
++	
+ 	private String errorMessage(double difference, double target){
+ 		return "Gryo angle skewed " + difference + " deg away from target " + target;
+ 	}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java
+index c499caf3fcf67df752a67720b0cce34a8ac0f4eb..9b3c55eeb2d4efca5acb514c62e30eb5cc83999e 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TimerTest.java
+@@ -9,6 +9,8 @@ package edu.wpi.first.wpilibj;
+ import static org.junit.Assert.assertEquals;
+ import static org.junit.Assert.assertTrue;
+ 
++import java.util.logging.Logger;
++
+ import org.junit.AfterClass;
+ import org.junit.Before;
+ import org.junit.BeforeClass;
+@@ -18,10 +20,15 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+ 
+ 
+ public class TimerTest extends AbstractComsSetup {
++	private static final Logger logger = Logger.getLogger(TimerTest.class.getName());
+ 	
+ 	private static final long TIMER_TOLARANCE = 5 * 1000;
+ 	private static final long TIMER_RUNTIME = 5 * 1000000;
+ 	
++	protected Logger getClassLogger(){
++		return logger;
++	}
++	
+ 	@BeforeClass
+ 	public static void classSetup() {
+ 	}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/ButtonTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/ButtonTest.java
+index 4afd2df7b117638bfee58544a5b014d9d12f2be9..3227fd68144f2395688f92b9b6143031a0452178 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/ButtonTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/ButtonTest.java
+@@ -6,6 +6,8 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.command;
+ 
++import java.util.logging.Logger;
++
+ import org.junit.After;
+ import org.junit.AfterClass;
+ import org.junit.Before;
+@@ -22,10 +24,15 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
+  *
+  */
+ public class ButtonTest extends AbstractCommandTest {
++	private static final Logger logger = Logger.getLogger(ButtonTest.class.getName());
+ 	
+ 	private InternalButton button1;
+     private InternalButton button2;
+-	
++    
++    protected Logger getClassLogger(){
++		return logger;
++	}
++    
+ 	/**
+ 	 * @throws java.lang.Exception
+ 	 */
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
+index 8fc4d31994675a43cd530bf08762e01a449a6d47..722d4595e36d547071683a40e0ae78bd62770c27 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandParallelGroupTest.java
+@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj.command;
+ 
+ import static org.junit.Assert.*;
+ 
++import java.util.logging.Logger;
++
+ import org.junit.After;
+ import org.junit.AfterClass;
+ import org.junit.Before;
+@@ -23,6 +25,11 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+  * @author Jonathan Leitschuh
+  */
+ public class CommandParallelGroupTest extends AbstractCommandTest {
++	private static final Logger logger = Logger.getLogger(CommandParallelGroupTest.class.getName());
++	
++	protected Logger getClassLogger(){
++		return logger;
++	}
+ 
+ 	/**
+ 	 * @throws java.lang.Exception
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java
+index 7efaff6e6388c0c0f860974a10296d074cbac50c..965c8af8edb47a440e85f0c33e22e5d23d2593c9 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandScheduleTest.java
+@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj.command;
+ 
+ import static org.junit.Assert.*;
+ 
++import java.util.logging.Logger;
++
+ import org.junit.After;
+ import org.junit.AfterClass;
+ import org.junit.Before;
+@@ -22,6 +24,11 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
+  * @author Jonathan Leitschuh
+  */
+ public class CommandScheduleTest extends AbstractCommandTest {
++	private static final Logger logger = Logger.getLogger(CommandScheduleTest.class.getName());
++	
++	protected Logger getClassLogger(){
++		return logger;
++	}
+ 
+ 	/**
+ 	 * @throws java.lang.Exception
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java
+index 51c403a8dea219747ba68fac6b0dfde6c2159a14..9bf92a29a3e772439ab09d8bb15d3bbea916ad17 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSequentialGroupTest.java
+@@ -23,9 +23,12 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
+  * @author Jonathan Leitschuh
+  */
+ public class CommandSequentialGroupTest extends AbstractCommandTest {
+-	
+ 	private static final Logger logger = Logger.getLogger(CommandSequentialGroupTest.class.getName());
+ 	
++	protected Logger getClassLogger(){
++		return logger;
++	}
++	
+ 	/**
+ 	 * @throws java.lang.Exception
+ 	 */
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSupersedeTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSupersedeTest.java
+index 6b815c4a2cbffa2a642cad23e4a31ab926158422..690bae1b482d0050514e688b6b34bb1b68fd2696 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSupersedeTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandSupersedeTest.java
+@@ -6,6 +6,8 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.command;
+ 
++import java.util.logging.Logger;
++
+ import org.junit.After;
+ import org.junit.AfterClass;
+ import org.junit.Before;
+@@ -21,6 +23,11 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
+  * @author Jonathan Leitschuh
+  */
+ public class CommandSupersedeTest extends AbstractCommandTest {
++	private static final Logger logger = Logger.getLogger(CommandSupersedeTest.class.getName());
++	
++	protected Logger getClassLogger(){
++		return logger;
++	}
+ 
+ 	/**
+ 	 * @throws java.lang.Exception
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTimeoutTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTimeoutTest.java
+index f224e811153940fd96f6e948abe413e2fb859f09..ca55621283f252d5c4d62b2da69f5ed5cf4caa27 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTimeoutTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/CommandTimeoutTest.java
+@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj.command;
+ 
+ import static org.junit.Assert.*;
+ 
++import java.util.logging.Logger;
++
+ import org.junit.After;
+ import org.junit.AfterClass;
+ import org.junit.Before;
+@@ -21,6 +23,11 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
+  *
+  */
+ public class CommandTimeoutTest extends AbstractCommandTest {
++	private static final Logger logger = Logger.getLogger(CommandTimeoutTest.class.getName());
++	
++	protected Logger getClassLogger(){
++		return logger;
++	}
+ 
+ 	/**
+ 	 * @throws java.lang.Exception
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java
+index 129d995980228e23e26d55b350a2bb15c421aac3..f15f35e740784edb2a28fee8e4cbc4fa78ace87e 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/command/DefaultCommandTest.java
+@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj.command;
+ 
+ import static org.junit.Assert.*;
+ 
++import java.util.logging.Logger;
++
+ import org.junit.After;
+ import org.junit.AfterClass;
+ import org.junit.Before;
+@@ -21,6 +23,11 @@ import edu.wpi.first.wpilibj.mocks.MockCommand;
+  *
+  */
+ public class DefaultCommandTest extends AbstractCommandTest {
++	private static final Logger logger = Logger.getLogger(DefaultCommandTest.class.getName());
++	
++	protected Logger getClassLogger(){
++		return logger;
++	}
+ 
+ 	/**
+ 	 * @throws java.lang.Exception
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
+index e792c5ef3670d6cbf3385a28505e316d775d3263..b5cbcc057c7fd1ba54a53c4a51a292d1ecef2e72 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
+@@ -25,6 +25,8 @@ public class TiltPanCameraFixture implements ITestFixture {
+ 	private final Servo tilt;
+ 	private final Servo pan;
+ 	
++	private double lastResetTimeGyro = 0;
++	
+ 	/**
+ 	 * Constructs the TiltPanCamera
+ 	 * @param tilt
+@@ -37,26 +39,50 @@ public class TiltPanCameraFixture implements ITestFixture {
+ 		this.tilt = tilt;
+ 		this.pan = pan;
+ 		this.gyro = gyro;
+-		
+ 	}
+ 	
+ 	@Override
+ 	public boolean setup() {
+-		return reset();
++		boolean wasSetup = true;
++		pan.set(0.0);
++		tilt.set(0.0);
++		Timer.delay(RESET_TIME);
++		gyro.reset();
++		double startTime = Timer.getFPGATimestamp();
++		while(Math.abs(gyro.getAngle()) > 0.1){
++			Timer.delay(.0001);
++		}
++		double endTime = Timer.getFPGATimestamp();
++		lastResetTimeGyro = endTime - startTime;
++		//System.out.println("Gyro reset in " + lastResetTimeGyro + " seconds");
++		
++		wasSetup = wasSetup && Math.abs(pan.get()) < 0.01;
++		wasSetup = wasSetup && Math.abs(tilt.get()) < 0.01;
++		wasSetup = wasSetup && Math.abs(gyro.getAngle()) < .2;
++		return wasSetup;
++	}
++	
++	/**
++	 * When resetting the gyroscope the reset time is stored as a variable that can be retrieved with this method
++	 * @return The last time that it took to reset the gyroscope
++	 */
++	public double getLastResetTimeGyro() {
++		return lastResetTimeGyro;
++	}
++	
++	public String getSetupError(){
++		StringBuilder error = new StringBuilder("SETUP ERROR: ");
++		if(Math.abs(pan.get()) >= 0.01) error.append("Pan " + pan.get() + ", ");
++		if(Math.abs(tilt.get()) >= 0.01) error.append("Tilt " + tilt.get() + ", ");
++		if(Math.abs(gyro.getAngle()) >= 0.2) error.append("Gyro " + gyro.getAngle() + ", ");
++		error.delete(error.length()-2, error.length());
++		return error.toString();
+ 	}
+ 	
+ 	@Override
+ 	public boolean reset(){
+-		boolean wasReset = true;
+-		pan.setAngle(0);
+-		tilt.set(0);
+-		Timer.delay(RESET_TIME);
+ 		gyro.reset();
+-		
+-		wasReset &= pan.get() == 0;
+-		wasReset &= tilt.get() == 0;
+-		wasReset &= gyro.getAngle() == 0;
+-		return wasReset;
++		return true;
+ 	}
+ 	
+ 	public Servo getTilt() {
+@@ -73,8 +99,7 @@ public class TiltPanCameraFixture implements ITestFixture {
+ 
+ 	@Override
+ 	public boolean teardown() {
+-		reset();
+-		
++		setup();
+ 		tilt.free();
+ 		pan.free();
+ 		gyro.free();
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboardTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboardTest.java
+index 3f4927172034bf92d61bf2a5bc91409a43214cd9..cd361387902633246dc87f482bfddc07248023a0 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboardTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/smartdashboard/SmartDashboardTest.java
+@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj.smartdashboard;
+ 
+ import static org.junit.Assert.assertEquals;
+ 
++import java.util.logging.Logger;
++
+ import org.junit.After;
+ import org.junit.AfterClass;
+ import org.junit.Before;
+@@ -24,8 +26,13 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+  *
+  */
+ public class SmartDashboardTest extends AbstractComsSetup {
++	private static final Logger logger = Logger.getLogger(SmartDashboardTest.class.getName());
+ 	private static final NetworkTable table = NetworkTable.getTable("SmartDashboard");
+ 	
++	protected Logger getClassLogger(){
++		return logger;
++	}
++	
+ 	/**
+ 	 * @throws java.lang.Exception
+ 	 */
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
+index 5aba857847b1db52fe6709c1dba1f40b415e905b..18661238e11876b1d9d08e837c54d0cb31ed0bfb 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/AbstractComsSetup.java
+@@ -6,7 +6,12 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.test;
+ 
++import java.util.logging.Logger;
++
+ import org.junit.BeforeClass;
++import org.junit.Rule;
++import org.junit.rules.TestWatcher;
++import org.junit.runner.Description;
+ 
+ import edu.wpi.first.wpilibj.DriverStation;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
+@@ -55,5 +60,19 @@ public abstract class AbstractComsSetup {
+ 			System.out.println("Running!");
+ 		}
+ 	}
++	
++	
++	protected abstract Logger getClassLogger();
++	
++	/** This causes a stack trace to be printed as the test is running as well as at the end */
++	@Rule
++	public TestWatcher testWatcher = new TestWatcher() {
++		protected void failed(Throwable e, Description description) {
++			System.out.println();
++			getClassLogger().severe("" + description.getDisplayName() + " failed " + e.getMessage());
++			e.printStackTrace();
++			super.failed(e, description);
++		}
++	};
+ 
+ }

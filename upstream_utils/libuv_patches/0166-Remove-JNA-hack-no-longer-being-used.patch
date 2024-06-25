@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 16 Jul 2014 16:55:07 -0400
+Subject: [PATCH 0166/6262] Remove JNA hack no longer being used
+
+Change-Id: If85d24003524af71d47115ac0ef31ebc88b70f42
+---
+ hal/lib/Athena/Digital.cpp | 19 -------------------
+ 1 file changed, 19 deletions(-)
+
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index da6f4ddd107b00c3325d00a4bdd4198633112b0e..daea335d670e9ab0a3472f41b81b01cdfabd3496 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -1578,22 +1578,3 @@ void i2CClose(uint8_t port) {
+ 	}
+ 	return;
+ }
+-
+-
+-//// Float JNA Hack
+-// double
+-void setPWMRateIntHack(int32_t rate, int32_t *status) {
+-  setPWMRate(intToFloat(rate), status);
+-}
+-
+-void setPWMRateWithModuleIntHack(uint8_t module, int32_t rate, int32_t *status) {
+-  setPWMRateWithModule(module, intToFloat(rate), status);
+-}
+-
+-void setPWMDutyCycleIntHack(void* pwmGenerator, int32_t dutyCycle, int32_t *status) {
+-  setPWMDutyCycle(pwmGenerator, intToFloat(dutyCycle), status);
+-}
+-
+-void setPWMDutyCycleWithModuleIntHack(uint8_t module, void* pwmGenerator, int32_t dutyCycle, int32_t *status) {
+-  setPWMDutyCycleWithModule(module, pwmGenerator, dutyCycle, status);
+-}

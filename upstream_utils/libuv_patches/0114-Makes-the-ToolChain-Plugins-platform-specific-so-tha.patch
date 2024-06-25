@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 19 Jun 2014 12:42:05 -0400
+Subject: [PATCH 0114/6262] Makes the ToolChain Plugins platform specific so
+ that you can no longer install multiple versions of the tool chains
+ simultaneously. [artf2558]
+
+Change-Id: If3987e664d0f8a741f3c088b5975fd5e8827f7b9
+---
+ .../feature.xml                                                | 3 ++-
+ .../feature.xml                                                | 3 ++-
+ .../feature.xml                                                | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature/feature.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature/feature.xml
+index 6ee6c4cf6967d7d507028f5f99b958a47455d1ce..36ad2713e4a5b4868a3d437dc0c7121ad9f739e8 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature/feature.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature/feature.xml
+@@ -3,7 +3,8 @@
+       id="edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature"
+       label="Linux Toolchain for Robot C++ Development"
+       version="0.2.0"
+-      provider-name="Worcester Polytechnic Institute">
++      provider-name="Worcester Polytechnic Institute"
++      os="linux">
+ 
+    <description>
+       The C++ toolchain to build Athena programs on Linux.
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature/feature.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature/feature.xml
+index 88d74133f6b2fcb7145fb314cfa6a1a33efee9be..17c65ff9e2e62ac0c4bbe3ed3917c21ebbbc3511 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature/feature.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature/feature.xml
+@@ -3,7 +3,8 @@
+       id="edu.wpi.first.wpilib.plugins.cpp.toolchains.mac.feature"
+       label="Mac Toolchain for Robot C++ Development"
+       version="0.2.0"
+-      provider-name="Worcester Polytechnic Institute">
++      provider-name="Worcester Polytechnic Institute"
++      os="macosx">
+ 
+    <description>
+       The C++ toolchain to build Athena programs on a Mac.
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature/feature.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature/feature.xml
+index 474579b2e82bcd565cc0ac3e14dc463f800797bc..b821128fdbf21f7bce8508e58643a7b6bf92f985 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature/feature.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature/feature.xml
+@@ -3,7 +3,8 @@
+       id="edu.wpi.first.wpilib.plugins.cpp.toolchains.windows.feature"
+       label="Windows Toolchain for Robot C++ Development"
+       version="0.2.0"
+-      provider-name="Worcester Polytechnic Institute">
++      provider-name="Worcester Polytechnic Institute"
++      os="win32">
+ 
+    <description>
+       The C++ toolchain to build Athena programs on Windows.

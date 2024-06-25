@@ -1,0 +1,147 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Wed, 12 Nov 2014 15:27:29 -0500
+Subject: [PATCH 0475/6262] Removed remains of the old toolchain method.
+
+Change-Id: Ib885730acdbb27707ce2caadadc3f9ce86fdd0ca
+---
+ .../frcsim-eclipse-toolchain-plugin/Makefile  | 16 ------------
+ .../debian/changelog                          |  5 ----
+ .../debian/compat                             |  1 -
+ .../debian/control                            | 13 ----------
+ .../debian/copyright                          | 25 -------------------
+ .../debian/rules                              |  3 ---
+ .../debian/source/format                      |  1 -
+ .../genfeatures.sh                            |  8 ------
+ 8 files changed, 72 deletions(-)
+ delete mode 100644 simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/Makefile
+ delete mode 100644 simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/changelog
+ delete mode 100644 simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/compat
+ delete mode 100644 simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/control
+ delete mode 100644 simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/copyright
+ delete mode 100755 simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/rules
+ delete mode 100644 simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/source/format
+ delete mode 100644 simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/genfeatures.sh
+
+diff --git a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/Makefile b/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/Makefile
+deleted file mode 100644
+index 6915b97601f284f99f128533b8c49aad19df4d4c..0000000000000000000000000000000000000000
+--- a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/Makefile
++++ /dev/null
+@@ -1,16 +0,0 @@
+-prefix = /usr
+-eclipsedir = $(prefix)/share/eclipse/dropins/frcsim
+-plugindir = $(eclipsedir)/plugins
+-featuredir = $(eclipsedir)/features
+-
+-all: clean
+-	sh ./genfeatures.sh
+-
+-clean:
+-	rm -rf build
+-
+-install: all
+-	mkdir -p $(DESTDIR)$(plugindir)
+-	mkdir -p $(DESTDIR)$(featuredir)
+-	install plugins/** $(DESTDIR)$(plugindir)
+-	cp -r build/features/** $(DESTDIR)$(featuredir)
+diff --git a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/changelog b/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/changelog
+deleted file mode 100644
+index 51c058148679457ea5eca9cf1e4b97cc80becdb2..0000000000000000000000000000000000000000
+--- a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/changelog
++++ /dev/null
+@@ -1,5 +0,0 @@
+-frcsim-eclipse-toolchain-plugin (0.1-1)  trusty; urgency=low
+-
+-  * Initial release.
+-
+- -- Alex Henning <alex@thoriumrobotics.com>  Wed, 14 May 2014 21:04:27 -0400
+diff --git a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/compat b/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/compat
+deleted file mode 100644
+index ec635144f60048986bc560c5576355344005e6e7..0000000000000000000000000000000000000000
+--- a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/compat
++++ /dev/null
+@@ -1 +0,0 @@
+-9
+diff --git a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/control b/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/control
+deleted file mode 100644
+index 3b0fe7849739bfe83402e659c4f50cff5f679adf..0000000000000000000000000000000000000000
+--- a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/control
++++ /dev/null
+@@ -1,13 +0,0 @@
+-Source: frcsim-eclipse-toolchain-plugin
+-Maintainer: Alex Henning <alex@thoriumrobotics.com>
+-Section: misc
+-Priority: optional
+-Standards-Version: 3.9.4
+-Build-Depends: debhelper (>= 9)
+-
+-Package: frcsim-eclipse-toolchain-plugin
+-Architecture: all
+-Depends: ${shlibs:Depends}, ${misc:Depends}, eclipse, eclipse-jdt, eclipse-cdt
+-Description: FRC plugin for developing code for RoboRIO and WPILibSim.
+- This plugin allows the usage of eclipse for development of WPILib
+- robot code for the RoboRIO and simulation in gazebo.
+\ No newline at end of file
+diff --git a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/copyright b/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/copyright
+deleted file mode 100644
+index d7484bdd8c68c66c0436e396c8b83be1b8b26880..0000000000000000000000000000000000000000
+--- a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/copyright
++++ /dev/null
+@@ -1,25 +0,0 @@
+-Copyright
+-Copyright (c) 2009 FIRST
+-All rights reserved.
+-
+-Redistribution and use in source and binary forms, with or without
+-modification, are permitted provided that the following conditions are met:
+-    * Redistributions of source code must retain the above copyright
+-      notice, this list of conditions and the following disclaimer.
+-    * Redistributions in binary form must reproduce the above copyright
+-      notice, this list of conditions and the following disclaimer in the
+-      documentation and/or other materials provided with the distribution.
+-    * Neither the name of the FIRST nor the
+-      names of its contributors may be used to endorse or promote products
+-      derived from this software without specific prior written permission.
+-      
+-THIS SOFTWARE IS PROVIDED BY FIRST AND CONTRIBUTORS``AS IS'' AND ANY
+-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+-WARRANTIES OF MERCHANTABILITY NONINFRINGEMENT AND FITNESS FOR A PARTICULAR 
+-PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL FIRST OR CONTRIBUTORS BE LIABLE FOR 
+-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+diff --git a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/rules b/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/rules
+deleted file mode 100755
+index cbe925d7587131c8ec8761915930894c60c096fd..0000000000000000000000000000000000000000
+--- a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/rules
++++ /dev/null
+@@ -1,3 +0,0 @@
+-#!/usr/bin/make -f
+-%:
+-	dh $@
+diff --git a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/source/format b/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/source/format
+deleted file mode 100644
+index 46ebe0266599c4440c3cc958b9e769927a55dbd4..0000000000000000000000000000000000000000
+--- a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/debian/source/format
++++ /dev/null
+@@ -1 +0,0 @@
+-3.0 (quilt)
+\ No newline at end of file
+diff --git a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/genfeatures.sh b/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/genfeatures.sh
+deleted file mode 100644
+index 8363a2d0aebe73ac96f83a5e1d8860870c07c78e..0000000000000000000000000000000000000000
+--- a/simulation/debs/frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin/genfeatures.sh
++++ /dev/null
+@@ -1,8 +0,0 @@
+-mkdir -p build/zips/features
+-mkdir -p build/features
+-for i in features/*.jar; do
+-    echo $i
+-	cp $i build/zips/$i.zip;
+-    mkdir build/$i
+-    unzip build/zips/$i.zip -d build/$i
+-done

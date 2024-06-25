@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: brad <brad@bradhouse.com>
+Date: Sun, 19 Jan 2014 20:18:14 -0500
+Subject: [PATCH 0007/6262] Updated <relativePath> references to static-library
+
+---
+ hal/Athena/pom.xml               | 2 +-
+ hal/AthenaXX/pom.xml             | 1 +
+ hal/Azalea/pom.xml               | 2 +-
+ networktables/cpp/Athena/pom.xml | 2 +-
+ networktables/cpp/Azalea/pom.xml | 1 +
+ wpilibc/Athena/pom.xml           | 2 +-
+ wpilibc/Azalea/pom.xml           | 1 +
+ 7 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/hal/Athena/pom.xml b/hal/Athena/pom.xml
+index 51dc45acc59b721a39d246f6db7cba463ee41c17..6ed9ec6260f3acc6366a446114772cb3cb7fe2d8 100644
+--- a/hal/Athena/pom.xml
++++ b/hal/Athena/pom.xml
+@@ -10,7 +10,7 @@
+     <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+     <artifactId>static-library</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
+-    <relativePath>../../maven-utilities/athena/static-library</relativePath>
++    <relativePath>../../maven-utilities/athena/static-library/pom.xml</relativePath>
+   </parent>
+ 
+   <repositories>
+diff --git a/hal/AthenaXX/pom.xml b/hal/AthenaXX/pom.xml
+index ea45821c8c8ef59fb04acf3a0b5e3aa08f6baa3b..6aa8cb159f0c68924a007f1c725d0770f5da293f 100644
+--- a/hal/AthenaXX/pom.xml
++++ b/hal/AthenaXX/pom.xml
+@@ -10,6 +10,7 @@
+     <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+     <artifactId>static-library</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
++    <relativePath>../../maven-utilities/Athena/static-library/pom.xml</relativePath>
+   </parent>
+ 
+   <repositories>
+diff --git a/hal/Azalea/pom.xml b/hal/Azalea/pom.xml
+index aa36af20a3ded31460854ee48ed9ebbea0c9e2ed..8e12998fe1e1c5d814664c8b9a8bebf7c1783c9f 100644
+--- a/hal/Azalea/pom.xml
++++ b/hal/Azalea/pom.xml
+@@ -10,7 +10,7 @@
+     <groupId>edu.wpi.first.wpilib.templates.azalea</groupId>
+     <artifactId>static-library</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
+-    <relativePath>../../maven-utilities/azalea/static-library</relativePath>
++    <relativePath>../../maven-utilities/azalea/static-library/pom.xml</relativePath>
+   </parent>
+ 
+   <repositories>
+diff --git a/networktables/cpp/Athena/pom.xml b/networktables/cpp/Athena/pom.xml
+index b2edaab052390b113cf957d7ca7939d82bd39f09..951687464b72f26d6aa09da7e95e52b0eef0a237 100644
+--- a/networktables/cpp/Athena/pom.xml
++++ b/networktables/cpp/Athena/pom.xml
+@@ -10,7 +10,7 @@
+     <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+     <artifactId>static-library</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
+-    <relativePath>../../maven-utilities/athena/static-library</relativePath>
++    <relativePath>../../maven-utilities/athena/static-library/pom.xml</relativePath>
+   </parent>
+   
+   <repositories>
+diff --git a/networktables/cpp/Azalea/pom.xml b/networktables/cpp/Azalea/pom.xml
+index 814bf4ffa06c0ca0aac54aac57ce4c680ccabfda..b5e90f216d651055ddc49692cfffe3f1db6eca1f 100644
+--- a/networktables/cpp/Azalea/pom.xml
++++ b/networktables/cpp/Azalea/pom.xml
+@@ -10,6 +10,7 @@
+     <groupId>edu.wpi.first.wpilib.templates.azalea</groupId>
+     <artifactId>static-library</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
++    <relativePath>../../../maven-utilities/azalea/static-library/pom.xml</relativePath>
+   </parent>
+   
+   <repositories>
+diff --git a/wpilibc/Athena/pom.xml b/wpilibc/Athena/pom.xml
+index 2a9b3361c69edf64c756ce3024b640a2ff9fe348..61bcb1fbbe5192542c10ab7bb0e77587577c4a21 100644
+--- a/wpilibc/Athena/pom.xml
++++ b/wpilibc/Athena/pom.xml
+@@ -10,7 +10,7 @@
+     <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+     <artifactId>static-library</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
+-    <relativePath>../../maven-utilities/athena/static-library</relativePath>
++    <relativePath>../../maven-utilities/athena/static-library/pom.xml</relativePath>
+   </parent>
+   
+   <repositories>
+diff --git a/wpilibc/Azalea/pom.xml b/wpilibc/Azalea/pom.xml
+index 6adfabcaf4913c0c5a9fc3ccef15d4d5fabce289..ea4e02d33029b55c2b77b5f99702b549876b2c99 100644
+--- a/wpilibc/Azalea/pom.xml
++++ b/wpilibc/Azalea/pom.xml
+@@ -10,6 +10,7 @@
+     <groupId>edu.wpi.first.wpilib.templates.azalea</groupId>
+     <artifactId>static-library</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
++    <relativePath>../../maven-utilities/Azalea/static-library/pom.xml</relativePath>
+   </parent>
+ 
+   <repositories>

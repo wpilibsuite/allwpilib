@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Tue, 11 Nov 2014 11:39:31 -0500
+Subject: [PATCH 0471/6262] Correct off-by-one error in DigOut PWM Gen B HAL
+ code (fixes artf3705 for C++/Java)
+
+Change-Id: I4cd65089690463b69cfe815bd078d744fb21ff0f
+---
+ hal/lib/Athena/Digital.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/hal/lib/Athena/Digital.cpp b/hal/lib/Athena/Digital.cpp
+index 0d3a714a585aa1c48bea2e85b83153257f898e02..5c3027d72bfae7c5d9ffeea970db28bd78042f74 100644
+--- a/hal/lib/Athena/Digital.cpp
++++ b/hal/lib/Athena/Digital.cpp
+@@ -242,7 +242,7 @@ void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask, int32_t
+ 
+ /**
+  * Allocate a DO PWM Generator.
+- * Allocate PWM generators so that they are not accidently reused.
++ * Allocate PWM generators so that they are not accidentally reused.
+  *
+  * @return PWM Generator refnum
+  */
+@@ -299,12 +299,12 @@ void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t *status) {
+ 	if(id < 4)
+ 		digitalSystem->writePWMDutyCycleA(id, (uint8_t)rawDutyCycle, status);
+ 	else 
+-		digitalSystem->writePWMDutyCycleB(id - 3, (uint8_t)rawDutyCycle, status);
++		digitalSystem->writePWMDutyCycleB(id - 4, (uint8_t)rawDutyCycle, status);
+   }
+ }
+ 
+ /**
+- * Configure which DO channel the PWM siganl is output on
++ * Configure which DO channel the PWM signal is output on
+  *
+  * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
+  * @param channel The Digital Output channel to output on

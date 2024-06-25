@@ -1,0 +1,77 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 29 Oct 2014 15:23:55 -0400
+Subject: [PATCH 0453/6262] Update Interrupt Javadocs (fixes artf3492 and
+ artf3602)
+
+Change-Id: Iad66841266a2d5ff606f7e27e90f7c975143245c
+---
+ .../src/InterruptableSensorBase.cpp                 | 13 ++++++++++---
+ .../wpi/first/wpilibj/InterruptableSensorBase.java  | 10 +++++-----
+ 2 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/src/InterruptableSensorBase.cpp b/wpilibc/wpilibC++Devices/src/InterruptableSensorBase.cpp
+index 509f21f922d8010671e490305cf61b1046ba0b4a..08e02432efb4beba14ef209bac78909c886c4158 100644
+--- a/wpilibc/wpilibC++Devices/src/InterruptableSensorBase.cpp
++++ b/wpilibc/wpilibC++Devices/src/InterruptableSensorBase.cpp
+@@ -21,6 +21,13 @@ InterruptableSensorBase::~InterruptableSensorBase()
+ 
+ }
+ 
++/**
++* Request one of the 8 interrupts asynchronously on this digital input.
++* Request interrupts in asynchronous mode where the user's interrupt handler will be
++* called when the interrupt fires. Users that want control over the thread priority
++* should use the synchronous method with their own spawned thread.
++* The default is interrupt on rising edges only.
++*/
+ void InterruptableSensorBase::RequestInterrupts(InterruptHandlerFunction handler, void *param)
+ {
+ 	if (StatusIsFatal()) return;
+@@ -44,9 +51,9 @@ void InterruptableSensorBase::RequestInterrupts(InterruptHandlerFunction handler
+ }
+ 
+ /**
+-* Request interrupts synchronously on this digital input.
+-* Request interrupts in synchronus mode where the user program will have to explicitly
+-* wait for the interrupt to occur.
++* Request one of the 8 interrupts synchronously on this digital input.
++* Request interrupts in synchronous mode where the user program will have to explicitly
++* wait for the interrupt to occur using WaitForInterrupt.
+ * The default is interrupt on rising edges only.
+ */
+ void InterruptableSensorBase::RequestInterrupts()
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/InterruptableSensorBase.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/InterruptableSensorBase.java
+index 7ca88e7045e72cc92da2b15471a9d64388a9a4fc..0fbb221f7a9691660dd8309f0ede605045ed58f5 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/InterruptableSensorBase.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/InterruptableSensorBase.java
+@@ -73,13 +73,13 @@ public abstract class InterruptableSensorBase extends SensorBase {
+ 	abstract byte getModuleForRouting();
+ 
+ 	/**
+-	 * Request interrupts asynchronously on this digital input.
++	 * Request one of the 8 interrupts asynchronously on this digital input.
+ 	 *
+ 	 * @param handler
+ 	 *            The {@link InterruptHandlerFunction} that contains the method
+ 	 *            {@link InterruptHandlerFunction#interruptFired(int, Object)} that
+ 	 *            will be called whenever there is an interrupt on this device.
+-	 *            Request interrupts in synchronus mode where the user program
++	 *            Request interrupts in synchronous mode where the user program
+ 	 *            interrupt handler will be called when an interrupt occurs. The
+ 	 *            default is interrupt on rising edges only.
+ 	 */
+@@ -105,10 +105,10 @@ public abstract class InterruptableSensorBase extends SensorBase {
+ 	}
+ 
+ 	/**
+-	 * Request interrupts synchronously on this digital input. Request
++	 * Request one of the 8 interrupts synchronously on this digital input. Request
+ 	 * interrupts in synchronous mode where the user program will have to
+-	 * explicitly wait for the interrupt to occur. The default is interrupt on
+-	 * rising edges only.
++	 * explicitly wait for the interrupt to occur using {@link waitForInterrupt}. 
++	 * The default is interrupt on rising edges only.
+ 	 */
+ 	public void requestInterrupts() {
+ 		if(m_interrupt != null){

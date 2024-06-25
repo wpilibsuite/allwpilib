@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Tue, 23 Sep 2014 15:20:45 -0400
+Subject: [PATCH 0355/6262] Remove unnecessary config for cproject/Simulate
+ target
+
+Change-Id: I5576959974bede623fb0fe267f0d8b163124c2c9
+---
+ .../resources/templates/.cproject             | 21 ++++++++-----------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index 07c902bca77a230fc87856934b96e364bc98d080..db2c2ab658c2c818543ae3a8d6268ec6d15978ec 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -120,26 +120,26 @@
+ 			</storageModule>
+ 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+ 		</cconfiguration>
+-		<cconfiguration id="cdt.managedbuild.config.gnu.cross.exe.debug.418253318.2017904325">
+-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.exe.debug.418253318.2017904325" moduleId="org.eclipse.cdt.core.settings" name="Simulate">
++		<cconfiguration id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325">
++			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325" moduleId="org.eclipse.cdt.core.settings" name="Simulate">
+ 				<externalSettings/>
+ 				<extensions>
+ 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+ 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+ 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
++					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+ 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+ 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+ 				</extensions>
+ 			</storageModule>
+ 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+-				<configuration artifactName="FRCUserProgram" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.GmakeErrorParser" id="cdt.managedbuild.config.gnu.cross.exe.debug.418253318.2017904325" name="Simulate" parent="cdt.managedbuild.config.gnu.cross.exe.debug" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
+-					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.418253318.2017904325." name="/" resourcePath="">
++				<configuration artifactName="FRCUserProgram" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325" name="Simulate" parent="cdt.managedbuild.config.gnu.cross.exe.debug">
++					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.2017904325." name="/" resourcePath="">
+ 						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.base.1184188597" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+ 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1621111203" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+ 							<builder buildPath="${workspace_loc:/${ProjName}}/Simulate" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.CWDLocator" id="cdt.managedbuild.target.gnu.builder.base.840272037" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+ 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.158466008" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+-							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.2105416021" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
++							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.2105416021" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+ 								<option id="gnu.cpp.compiler.option.include.paths.1645322059" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+ 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}/src&quot;"/>
+ 									<listOptionValue builtIn="false" value="$cpp-location/sim/include"/>
+@@ -151,13 +151,13 @@
+ 								<option id="gnu.cpp.compiler.option.debugging.level.937474733" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+ 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1758810658" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+ 							</tool>
+-							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.base.2039239712" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
++							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.2039239712" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+ 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.2100353684" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+ 								<option id="gnu.c.compiler.option.debugging.level.1900634657" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+ 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1197133064" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+ 							</tool>
+ 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.66697269" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+-							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.base.2094820582" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
++							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.2094820582" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+ 								<option id="gnu.cpp.link.option.libs.1563598353" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+ 									<listOptionValue builtIn="false" value="WPILib"/>
+ 									<listOptionValue builtIn="false" value="WPILibSim"/>
+@@ -180,14 +180,11 @@
+ 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+ 								</inputType>
+ 							</tool>
+-							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.base.2105089872" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
++							<tool id="cdt.managedbuild.tool.gnu.assembler.base.2105089872" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+ 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.254601899" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+ 							</tool>
+ 						</toolChain>
+ 					</folderInfo>
+-					<sourceEntries>
+-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+-					</sourceEntries>
+ 				</configuration>
+ 			</storageModule>
+ 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>

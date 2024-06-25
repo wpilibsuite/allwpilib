@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Thu, 17 Jul 2014 10:57:48 -0400
+Subject: [PATCH 0169/6262] Fix artf2636 Don't consume ByteBuffer when checking
+ class specific status
+
+Change-Id: I94e46bd436cc8fd41c7550f1135287027e8be9c4
+---
+ .../wpilibJava/src/main/java/edu/wpi/first/wpilibj/Encoder.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Encoder.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+index 253d32ec8f58edf1e426fb10fcd270f333a00b4f..4c283beca99f6bea7ed902a5fefa022f3376065a 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Encoder.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+@@ -649,7 +649,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 			status.order(ByteOrder.LITTLE_ENDIAN);
+ 			EncoderJNI.setEncoderSamplesToAverage(m_encoder, samplesToAverage,
+ 					status.asIntBuffer());
+-			if (status.get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
++			if (status.duplicate().get() == HALUtil.PARAMETER_OUT_OF_RANGE) {
+ 				throw new BoundaryException(BoundaryException.getMessage(
+ 						samplesToAverage, 1, 127));
+ 			}

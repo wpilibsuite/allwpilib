@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Evin Ugur <evinoog96@gmail.com>
+Date: Wed, 8 Oct 2014 15:26:07 -0400
+Subject: [PATCH 0401/6262] fixed  template on checkedin java examples
+
+Change-Id: I0a99aefc21e3cc2471f0ad75192c51def8bd5ba8
+---
+ .../MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java  | 3 +--
+ .../MotorControl/src/org/usfirst/frc/team190/robot/Robot.java  | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java
+index 1319d7494f184c51e3bfbbfcdabbd6b87c2fabb7..c4834bfcc23c652bfdd86901b839268c4b2f49e7 100755
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java
+@@ -1,5 +1,4 @@
+-
+-package org.usfirst.frc.team190.robot;
++package $package;
+ 
+ 
+ import edu.wpi.first.wpilibj.Joystick;
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java
+index 8050216637a306fe644dd92e3c54c61f56bcf800..7b1bb3da4c2e6adb65129972da5f9321a48de966 100755
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java
+@@ -1,5 +1,4 @@
+-
+-package org.usfirst.frc.team190.robot;
++package $package;
+ 
+ 
+ import edu.wpi.first.wpilibj.Joystick;

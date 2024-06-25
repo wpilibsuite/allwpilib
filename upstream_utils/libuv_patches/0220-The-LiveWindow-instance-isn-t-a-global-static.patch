@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Tue, 29 Jul 2014 16:12:23 -0400
+Subject: [PATCH 0220/6262] The LiveWindow instance isn't a global static
+
+The LiveWindow singleton instance shouldn't be a global static
+variable, since the order that global statics are constructed is
+undefined, and it's required by other constructors.
+
+Change-Id: I2edccc1f723f0ea41b1347379b3e3778a50afcdc
+---
+ wpilibc/wpilibC++/include/LiveWindow/LiveWindow.h |  3 +--
+ wpilibc/wpilibC++/lib/LiveWindow/LiveWindow.cpp   | 10 +++-------
+ 2 files changed, 4 insertions(+), 9 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/LiveWindow/LiveWindow.h b/wpilibc/wpilibC++/include/LiveWindow/LiveWindow.h
+index 93f9cca4cd8f4fa09803aa7e43312fc9de7a1209..ab78d3c4522a945d3e191947ff5d498b862bbcc9 100644
+--- a/wpilibc/wpilibC++/include/LiveWindow/LiveWindow.h
++++ b/wpilibc/wpilibC++/include/LiveWindow/LiveWindow.h
+@@ -14,7 +14,7 @@ struct LiveWindowComponent
+ 	bool isSensor;
+ 
+ 	LiveWindowComponent()
+-	{}//WTF?
++	{}
+ 	LiveWindowComponent(std::string subsystem, std::string name, bool isSensor)
+ 	{
+ 		this->subsystem = subsystem;
+@@ -54,7 +54,6 @@ private:
+ 	std::vector<LiveWindowSendable *> m_sensors;
+ 	std::map<LiveWindowSendable *, LiveWindowComponent> m_components;
+ 
+-	static LiveWindow *m_instance;
+ 	ITable *m_liveWindowTable;
+ 	ITable *m_statusTable;
+ 
+diff --git a/wpilibc/wpilibC++/lib/LiveWindow/LiveWindow.cpp b/wpilibc/wpilibC++/lib/LiveWindow/LiveWindow.cpp
+index 6d28f0d79aaa723ca845fed045ab6fb480adc310..fa0206d62ddf2feb3210115ab9b7acb343f89988 100644
+--- a/wpilibc/wpilibC++/lib/LiveWindow/LiveWindow.cpp
++++ b/wpilibc/wpilibC++/lib/LiveWindow/LiveWindow.cpp
+@@ -3,8 +3,6 @@
+ #include <algorithm>
+ #include <sstream>
+ 
+-LiveWindow* LiveWindow::m_instance = NULL;
+-
+ /**
+  * Get an instance of the LiveWindow main class
+  * This is a singleton to guarantee that there is only a single instance regardless of
+@@ -12,11 +10,9 @@ LiveWindow* LiveWindow::m_instance = NULL;
+  */
+ LiveWindow * LiveWindow::GetInstance()
+ {
+-	if (m_instance == NULL)
+-	{
+-		m_instance = new LiveWindow();
+-	}
+-	return m_instance;
++	static LiveWindow* instance = new LiveWindow();
++
++	return instance;
+ }
+ 
+ /**

@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Wed, 3 Sep 2014 16:37:33 -0400
+Subject: [PATCH 0332/6262] Set the cpp-version variable per-project
+
+Set cpp-version in the build.properties of each C++ project, instead of
+globally in wpilib.properties.  It's 'current' by default.
+
+Change-Id: I4618131be14390f51763b39aa751aa110f7af56f
+---
+ .../resources/templates/build.properties                       | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/build.properties b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/build.properties
+index 4e945fde058ebbe426b60d28ff5687a984283c80..bd9aa1e25f6d6ff291df0c3dccd23a018430f3aa 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/build.properties
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/build.properties
+@@ -27,3 +27,6 @@ sim.exe=Simulate/${out}
+ wpilib.sim=${wpilib}/sim
+ sim.tools=${wpilib.sim}/tools
+ sim.lib=${wpilib.sim}/lib
++
++# Use the current C++ library by default
++cpp-version=current

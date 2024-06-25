@@ -1,0 +1,342 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fredric Silberberg <fredric@fsilberberg.com>
+Date: Thu, 20 Mar 2014 19:17:16 -0400
+Subject: [PATCH 0029/6262] Java 8 Compilation Fixes
+
+Added in profiles to disable the doclint in Java 8 compilations,
+which will cause the build to error on javadoc issues.
+
+Change-Id: Id9e50ca35034ea086195855f6d1515381213dd2f
+---
+ eclipse-plugins/pom.xml           |  41 +++++--
+ networktables/java/Athena/pom.xml |  21 ++++
+ wpilibj/wpilibJava/pom.xml        | 187 +++++++++++++++++-------------
+ 3 files changed, 155 insertions(+), 94 deletions(-)
+
+diff --git a/eclipse-plugins/pom.xml b/eclipse-plugins/pom.xml
+index 1779a4cc258c8acfd2ee828daf2ff2d3ce2d6f26..e267f6f5d265f4553e1109f453eaca2689a2724f 100644
+--- a/eclipse-plugins/pom.xml
++++ b/eclipse-plugins/pom.xml
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
++	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>edu.wpi.first.wpilib.plugins</groupId>
+   <artifactId>edu.wpi.first.wpilib.plugins</artifactId>
+@@ -24,20 +24,20 @@
+   </modules>
+   
+   <properties>
+-	<!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
++    <!-- local-repository>C:/Users/wpilibj-buildmaster/maven-repository</local-repository-->
+     <tycho-version>0.18.1</tycho-version>
+   </properties>
+ 
+   <repositories>
+-   <repository>
+-     <id>juno</id>
+-     <layout>p2</layout>
+-     <url>http://download.eclipse.org/releases/juno</url>
+-   </repository>
+-   <repository>
+-     <id>FRC Binaries</id>
+-     <url>http://first.wpi.edu/FRC/c/maven/</url>
+-   </repository>
++    <repository>
++      <id>juno</id>
++      <layout>p2</layout>
++      <url>http://download.eclipse.org/releases/juno</url>
++    </repository>
++    <repository>
++      <id>FRC Binaries</id>
++      <url>http://first.wpi.edu/FRC/c/maven/</url>
++    </repository>
+   </repositories>
+   
+   <build>
+@@ -80,5 +80,24 @@
+     <!--         </plugins> -->
+     <!--     </build> -->
+     <!-- </profile> -->
++    <profile>
++      <id>docline-java8-disable</id>
++      <activation>
++	<jdk>[1.8,</jdk>
++      </activation>
++
++      <build>
++	<plugins>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-javadoc-plugin</artifactId>
++            <configuration>
++              <additionalparam>-Xdoclint:none</additionalparam>
++            </configuration>
++          </plugin>
++	</plugins>
++      </build>
++    </profile>
++
+   </profiles>
+ </project>
+diff --git a/networktables/java/Athena/pom.xml b/networktables/java/Athena/pom.xml
+index f64ad240cb0db662b30cd1c203cfe9ff3b28018b..edf532440d3058fabf59ba66b90dac38647046a6 100644
+--- a/networktables/java/Athena/pom.xml
++++ b/networktables/java/Athena/pom.xml
+@@ -34,6 +34,27 @@
+     </dependency>
+   </dependencies>
+   
++  <profiles>
++    <profile>
++      <id>docline-java8-disable</id>
++      <activation>
++	<jdk>[1.8,</jdk>
++      </activation>
++
++      <build>
++	<plugins>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-javadoc-plugin</artifactId>
++            <configuration>
++              <additionalparam>-Xdoclint:none</additionalparam>
++            </configuration>
++          </plugin>
++	</plugins>
++      </build>
++    </profile>
++  </profiles>
++  
+   <build>
+     <plugins>
+       <plugin>
+diff --git a/wpilibj/wpilibJava/pom.xml b/wpilibj/wpilibJava/pom.xml
+index 4a9740deae26150caabb8564db732a4a45f98cbb..383cb772ac48aa6228517bec444fb6417053d68c 100644
+--- a/wpilibj/wpilibJava/pom.xml
++++ b/wpilibj/wpilibJava/pom.xml
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
++	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>edu.wpi.first.wpilibj</groupId>
+   <artifactId>wpilibJava</artifactId>
+@@ -14,42 +14,63 @@
+     <relativePath>../../maven-utilities/athena/library-jar</relativePath>
+   </parent>
+ 
++  <profiles>
++    <profile>
++      <id>docline-java8-disable</id>
++      <activation>
++	<jdk>[1.8,</jdk>
++      </activation>
++
++      <build>
++	<plugins>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-javadoc-plugin</artifactId>
++            <configuration>
++              <additionalparam>-Xdoclint:none</additionalparam>
++            </configuration>
++          </plugin>
++	</plugins>
++      </build>
++    </profile>
++  </profiles>
++
+   <repositories>
+     <!-- repository>
+-      <id>sonatype</id>
+-      <name>Sonatype OSS Snapshots Repository</name>
+-      <url>http://oss.sonatype.org/content/groups/public</url>
+-    </repository -->
++	 <id>sonatype</id>
++	 <name>Sonatype OSS Snapshots Repository</name>
++	 <url>http://oss.sonatype.org/content/groups/public</url>
++	 </repository -->
+     <!-- For old snapshots, please use groupId `com.jnaerator` and the following repo -->
+     <!-- repository>
+-      <id>nativelibs4java-repo</id>
+-      <url>http://nativelibs4java.sourceforge.net/maven</url>
+-    </repository -->
+-	
++	 <id>nativelibs4java-repo</id>
++	 <url>http://nativelibs4java.sourceforge.net/maven</url>
++	 </repository -->
++    
+   </repositories>
+   
+   <dependencies>
+-  	<!-- dependency>
+-	  <groupId>net.java.dev.jna</groupId>
+-	  <artifactId>jna</artifactId>
+-	  <version>4.0.0</version>
+-	</dependency -->
+-	<!-- dependency>
+-      <groupId>com.nativelibs4java</groupId>
+-      <artifactId>jnaerator-runtime</artifactId>
+-      <version>0.12-SNAPSHOT</version>
+-      <scope>compile</scope>
+-    </dependency -->
++    <!-- dependency>
++	 <groupId>net.java.dev.jna</groupId>
++	 <artifactId>jna</artifactId>
++	 <version>4.0.0</version>
++	 </dependency -->
++    <!-- dependency>
++	 <groupId>com.nativelibs4java</groupId>
++	 <artifactId>jnaerator-runtime</artifactId>
++	 <version>0.12-SNAPSHOT</version>
++	 <scope>compile</scope>
++	 </dependency -->
+ 
+-	<dependency>
+-	  <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
+-	  <artifactId>NetworkTables</artifactId>
+-	  <version>0.1.0-SNAPSHOT</version>
+-	</dependency>
++    <dependency>
++      <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
++      <artifactId>NetworkTables</artifactId>
++      <version>0.1.0-SNAPSHOT</version>
++    </dependency>
+   </dependencies>
+ 
+   <build>
+-	<plugins>
++    <plugins>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-compiler-plugin</artifactId>
+@@ -57,68 +78,68 @@
+         <configuration>
+           <source>1.7</source>
+           <target>1.7</target>
+-		  <excludes>
+-			<exclude>edu/wpi/first/wpilibj/image/</exclude>
+-			<exclude>edu/wpi/first/wpilibj/camera/</exclude>
+-			<exclude>edu/wpi/first/wpilibj/visa/</exclude>
+-			<exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
+-			<exclude>edu/wpi/first/wpilibj/Kinect.java</exclude>
+-			<exclude>edu/wpi/first/wpilibj/KinectStick.java</exclude>
+-			<exclude>edu/wpi/first/wpilibj/DriverStationEnhancedIO.java</exclude>
+-			<exclude>edu/wpi/first/wpilibj/buttons/DigitalIOButton.java</exclude>
+-			<exclude>edu/wpi/first/wpilibj/buttons/AnalogIOButton.java</exclude>
+-		  </excludes>
++	  <excludes>
++	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
++	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
++	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
++	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
++	    <exclude>edu/wpi/first/wpilibj/Kinect.java</exclude>
++	    <exclude>edu/wpi/first/wpilibj/KinectStick.java</exclude>
++	    <exclude>edu/wpi/first/wpilibj/DriverStationEnhancedIO.java</exclude>
++	    <exclude>edu/wpi/first/wpilibj/buttons/DigitalIOButton.java</exclude>
++	    <exclude>edu/wpi/first/wpilibj/buttons/AnalogIOButton.java</exclude>
++	  </excludes>
+         </configuration>
+       </plugin>
+-	  <!-- plugin>
+-        <groupId>org.apache.maven.plugins</groupId>
+-        <artifactId>maven-dependency-plugin</artifactId>
+-        <version>2.8</version>
+-        <executions>
+-          <execution>
+-            <id>fetch-dependencies</id>
+-            <phase>compile</phase>
+-            <goals>
+-              <goal>copy</goal>
+-            </goals>
+-            <configuration>
+-              <artifactItems>
+-                <artifactItem>
+-				  <groupId>edu.wpi.first.wpilib.hal</groupId>
+-				  <artifactId>libHALAthenaJava</artifactId>
+-				  <version>0.1.0-SNAPSHOT</version>
+-				  <type>so</type>
+-				  <destFileName>libHALAthenaJava.so</destFileName>
+-				  <outputDirectory>${project.build.directory}/classes/linux-arm</outputDirectory>
+-                </artifactItem>
+-              </artifactItems>
+-              <overWriteReleases>false</overWriteReleases>
+-              <overWriteSnapshots>true</overWriteSnapshots>
+-            </configuration>
+-          </execution>
+-        </executions>
+-      </plugin -->
+-	  <plugin>
++      <!-- plugin>
++           <groupId>org.apache.maven.plugins</groupId>
++           <artifactId>maven-dependency-plugin</artifactId>
++           <version>2.8</version>
++           <executions>
++           <execution>
++           <id>fetch-dependencies</id>
++           <phase>compile</phase>
++           <goals>
++           <goal>copy</goal>
++           </goals>
++           <configuration>
++           <artifactItems>
++           <artifactItem>
++	   <groupId>edu.wpi.first.wpilib.hal</groupId>
++	   <artifactId>libHALAthenaJava</artifactId>
++	   <version>0.1.0-SNAPSHOT</version>
++	   <type>so</type>
++	   <destFileName>libHALAthenaJava.so</destFileName>
++	   <outputDirectory>${project.build.directory}/classes/linux-arm</outputDirectory>
++           </artifactItem>
++           </artifactItems>
++           <overWriteReleases>false</overWriteReleases>
++           <overWriteSnapshots>true</overWriteSnapshots>
++           </configuration>
++           </execution>
++           </executions>
++	   </plugin -->
++      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-source-plugin</artifactId>
+-	  </plugin>
+-	  <plugin>
+-		<groupId>org.apache.maven.plugins</groupId>
+-		<artifactId>maven-javadoc-plugin</artifactId>
++      </plugin>
++      <plugin>
++	<groupId>org.apache.maven.plugins</groupId>
++	<artifactId>maven-javadoc-plugin</artifactId>
+         <configuration>
+-		  <sourceFileExcludes>
+-			<exclude>edu/wpi/first/wpilibj/image/</exclude>
+-			<exclude>edu/wpi/first/wpilibj/camera/</exclude>
+-			<exclude>edu/wpi/first/wpilibj/visa/</exclude>
+-			<exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
+-			<exclude>edu/wpi/first/wpilibj/Kinect.java</exclude>
+-			<exclude>edu/wpi/first/wpilibj/KinectStick.java</exclude>
+-			<exclude>edu/wpi/first/wpilibj/DriverStationEnhancedIO.java</exclude>
+-			<exclude>edu/wpi/first/wpilibj/buttons/DigitalIOButton.java</exclude>
+-			<exclude>edu/wpi/first/wpilibj/buttons/AnalogIOButton.java</exclude>
+-		  </sourceFileExcludes>
++	  <sourceFileExcludes>
++	    <exclude>edu/wpi/first/wpilibj/image/</exclude>
++	    <exclude>edu/wpi/first/wpilibj/camera/</exclude>
++	    <exclude>edu/wpi/first/wpilibj/visa/</exclude>
++	    <exclude>edu/wpi/first/wpilibj/SerialPort.java</exclude>
++	    <exclude>edu/wpi/first/wpilibj/Kinect.java</exclude>
++	    <exclude>edu/wpi/first/wpilibj/KinectStick.java</exclude>
++	    <exclude>edu/wpi/first/wpilibj/DriverStationEnhancedIO.java</exclude>
++	    <exclude>edu/wpi/first/wpilibj/buttons/DigitalIOButton.java</exclude>
++	    <exclude>edu/wpi/first/wpilibj/buttons/AnalogIOButton.java</exclude>
++	  </sourceFileExcludes>
+         </configuration>
+-	  </plugin>
+-	</plugins>
++      </plugin>
++    </plugins>
+   </build>
+ </project>

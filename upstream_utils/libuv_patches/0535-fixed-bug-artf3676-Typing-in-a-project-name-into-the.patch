@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PetaroMitaro <mitranopeter@gmail.com>
+Date: Thu, 4 Dec 2014 20:22:04 -0500
+Subject: [PATCH 0535/6262] fixed bug  artf3676 : Typing in a project name into
+ the create command dialog in eclipse is broken
+
+Change-Id: I591f1950624e280feb8f7cb262bce11783cb3ff1
+---
+ .../plugins/core/wizards/ProjectComboField.java  |  5 +++++
+ .../FileTemplateWizardMainPage.java              | 16 ++++++++++++++--
+ 2 files changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectComboField.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectComboField.java
+index abfd84ecb3c41ac51171d191734c47d188453af3..82d7eafb862d2317fe76a2266af7d0125da5de5d 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectComboField.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/wizards/ProjectComboField.java
+@@ -5,6 +5,7 @@ import java.util.Arrays;
+ import org.eclipse.core.resources.IProject;
+ import org.eclipse.core.resources.ResourcesPlugin;
+ import org.eclipse.swt.events.ModifyListener;
++import org.eclipse.swt.events.SelectionListener;
+ import org.eclipse.swt.layout.GridData;
+ import org.eclipse.swt.widgets.Combo;
+ import org.eclipse.swt.widgets.Composite;
+@@ -48,4 +49,8 @@ public class ProjectComboField {
+ 		combo.addModifyListener(modifyListener);
+ 	}
+ 	
++	public void addSelectionListener(SelectionListener selectionListener) {
++		combo.addSelectionListener(selectionListener);
++	}
++
+ }
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizardMainPage.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizardMainPage.java
+index cd08a3281d10246d49b0da0b8dacff97b0eb7da0..07d43953dc814dacab2e4b5c61caf5014b7a7bf4 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizardMainPage.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/java/edu/wpi/first/wpilib/plugins/java/wizards/file_template/FileTemplateWizardMainPage.java
+@@ -11,7 +11,9 @@ import org.eclipse.jface.viewers.ISelection;
+ import org.eclipse.jface.wizard.WizardPage;
+ import org.eclipse.swt.SWT;
+ import org.eclipse.swt.events.ModifyEvent;
++import org.eclipse.swt.events.SelectionEvent;
+ import org.eclipse.swt.events.ModifyListener;
++import org.eclipse.swt.events.SelectionListener;
+ import org.eclipse.swt.layout.GridData;
+ import org.eclipse.swt.layout.GridLayout;
+ import org.eclipse.swt.widgets.Composite;
+@@ -76,6 +78,15 @@ public class FileTemplateWizardMainPage extends WizardPage {
+ 				});
+ 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+ 		projectsCombo.setLayoutData(gd);
++		projectsCombo.addSelectionListener(new SelectionListener() {
++			public void widgetSelected(SelectionEvent e){
++				if (project == null){
++					project = projectsCombo.getProject();
++				}
++				packageText.setText(getDefaultPackage());
++			}
++			public void widgetDefaultSelected(SelectionEvent e){}
++		});
+ 		projectsCombo.addModifyListener(new ModifyListener() {
+ 			public void modifyText(ModifyEvent e) {
+ 				dialogChanged();
+@@ -116,6 +127,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
+ 	 */
+ 
+ 	private void initialize() {
++		WPILibJavaPlugin.logInfo("initialize");
+ 		projectsCombo.setProject(project);
+ 		packageText.setText(getDefaultPackage());
+ 	}
+@@ -130,7 +142,7 @@ public class FileTemplateWizardMainPage extends WizardPage {
+ 
+ 		// Update the default package if necessary
+ 		if (project == null || !project.equals(projectsCombo.getProject())) {
+-			String oldDefault = getDefaultPackage();
++			String oldDefault = getDefaultPackage();	
+ 			project = projectsCombo.getProject();
+ 			if (packageString.equals(oldDefault)) {
+ 				packageText.setText(getDefaultPackage());
+@@ -200,4 +212,4 @@ public class FileTemplateWizardMainPage extends WizardPage {
+ 		if (defaultPackage != null) return defaultPackage;
+ 		else return "";
+ 	}
+-}
++}
+\ No newline at end of file

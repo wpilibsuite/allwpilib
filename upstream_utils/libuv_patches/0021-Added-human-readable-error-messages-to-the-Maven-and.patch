@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Malmsten <pmalmsten@gmail.com>
+Date: Sun, 26 Jan 2014 20:12:02 -0500
+Subject: [PATCH 0021/6262] Added human-readable error messages to the Maven
+ and Java version enforcer rules
+
+---
+ maven-utilities/athena/library-jar/pom.xml | 1 +
+ pom.xml                                    | 4 ++++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/maven-utilities/athena/library-jar/pom.xml b/maven-utilities/athena/library-jar/pom.xml
+index 7709fd323421f36194cb1f8cd213ddee4d465a87..01f2185e6b3b620dfb596df3b6910a8896831a3e 100644
+--- a/maven-utilities/athena/library-jar/pom.xml
++++ b/maven-utilities/athena/library-jar/pom.xml
+@@ -62,6 +62,7 @@
+ 	      <rules>
+ 		<requireJavaVersion>
+ 		  <version>1.7.0</version>
++		  <message>WPILib has been tested with Java 7 (aka. 1.7.0).</message>
+ 		</requireJavaVersion>
+ 	      </rules>    
+ 	    </configuration>
+diff --git a/pom.xml b/pom.xml
+index bdf9670ab370d9cfe2aa9d3704733f60b2c4b79b..6f3a67f23ee68ec81dc9311889e2beaeed4c8962 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -36,6 +36,10 @@
+                   3.1.0 due to http://jira.codehaus.org/browse/MNG-5503
+                   -->
+                   <version>[3.0.0,3.1.0), (3.1.0,)</version>
++                  <message>WPILib has been tested with Maven 3.0.0+. 
++Note: Maven 3.1.0 is not supported due to Maven bug MNG-5503 (http://jira.codehaus.org/browse/MNG-5503). Please upgrade
++to Maven 3.1.1 or later.
++                  </message>
+                 </requireMavenVersion>
+               </rules>    
+             </configuration>

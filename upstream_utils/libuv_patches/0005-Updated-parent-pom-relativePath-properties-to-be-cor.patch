@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: brad <brad@bradhouse.com>
+Date: Sun, 19 Jan 2014 19:57:48 -0500
+Subject: [PATCH 0005/6262] Updated parent pom <relativePath> properties to be
+ correct
+
+---
+ networktables/cpp/include/pom.xml | 1 +
+ wpilibc/Athena/pom.xml            | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/networktables/cpp/include/pom.xml b/networktables/cpp/include/pom.xml
+index 8a59aa3944b508561e3abb49cff877e2557b8173..f428d045337e300c972c26ed08529ee372d85704 100644
+--- a/networktables/cpp/include/pom.xml
++++ b/networktables/cpp/include/pom.xml
+@@ -10,6 +10,7 @@
+     <groupId>edu.wpi.first.wpilib.templates</groupId>
+     <artifactId>include</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
++    <relativePath>../../../maven-utilities/include</relativePath>
+   </parent>
+   
+   <repositories>
+diff --git a/wpilibc/Athena/pom.xml b/wpilibc/Athena/pom.xml
+index fd2b51d484eb0ddf37151201747696783d3318ef..2a9b3361c69edf64c756ce3024b640a2ff9fe348 100644
+--- a/wpilibc/Athena/pom.xml
++++ b/wpilibc/Athena/pom.xml
+@@ -10,6 +10,7 @@
+     <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+     <artifactId>static-library</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
++    <relativePath>../../maven-utilities/athena/static-library</relativePath>
+   </parent>
+   
+   <repositories>

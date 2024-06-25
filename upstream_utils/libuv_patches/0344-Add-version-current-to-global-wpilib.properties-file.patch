@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Sat, 13 Sep 2014 18:36:02 -0400
+Subject: [PATCH 0344/6262] Add version=current to global wpilib.properties
+ file on any property save
+
+Change-Id: I6dc6eeac27ab97be567450c90f50ace7da6679b7
+---
+ .../main/java/edu/wpi/first/wpilib/plugins/core/WPILibCore.java  | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/WPILibCore.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/WPILibCore.java
+index 111b97af28305201073643b5b8fcdc86441f9bed..d540d142d1d023b3466c69337551846dab4ac17e 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/WPILibCore.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.core/src/main/java/edu/wpi/first/wpilib/plugins/core/WPILibCore.java
+@@ -105,6 +105,7 @@ public class WPILibCore extends AbstractUIPlugin {
+ 
+ 	public void saveGlobalProperties(Properties props) {
+ 		try {
++			props.setProperty("version", "current");
+ 			props.store(new FileOutputStream(new File(WPILibCore.getDefault()
+ 					.getWPILibBaseDir() + "/wpilib.properties")),
+ 					"Don't add new properties, they will be deleted by the eclipse plugin.");

@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Malmsten <pmalmsten@gmail.com>
+Date: Sun, 26 Jan 2014 13:34:56 -0500
+Subject: [PATCH 0015/6262] Replaced hardcoded forward slash with system
+ correct separator
+
+---
+ wpilibj/wpilibJavaJNI/pom.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaJNI/pom.xml b/wpilibj/wpilibJavaJNI/pom.xml
+index ac2206509015d618cab3ee93dc4388069dec8f2c..06434e05f15e9c4399cb362ec0bbe58cf4eadd6d 100644
+--- a/wpilibj/wpilibJavaJNI/pom.xml
++++ b/wpilibj/wpilibJavaJNI/pom.xml
+@@ -49,8 +49,8 @@
+   </pluginRepositories>
+   
+   <properties>
+-    <embeddedJDKHome>${user.home}/jdk-linux-arm-vfp-slft/jdk1.7.0_45</embeddedJDKHome>
+-    <embeddedJDKIncludePath>${embeddedJDKHome}/include</embeddedJDKIncludePath>
++    <embeddedJDKHome>${user.home}${file.separator}jdk-linux-arm-vfp-slft${file.separator}jdk1.7.0_45</embeddedJDKHome>
++    <embeddedJDKIncludePath>${embeddedJDKHome}${file.separator}include</embeddedJDKIncludePath>
+   </properties>
+ 
+   <build>

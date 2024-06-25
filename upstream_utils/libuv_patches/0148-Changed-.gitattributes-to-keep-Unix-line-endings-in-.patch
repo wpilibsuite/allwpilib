@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Mon, 30 Jun 2014 18:13:55 -0400
+Subject: [PATCH 0148/6262] Changed .gitattributes to keep Unix line endings in
+ the robot scripts
+
+Change-Id: Icc20ae4c6eac3725c435208ae2d88ce245a8708f
+---
+ eclipse-plugins/.gitattributes | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/.gitattributes b/eclipse-plugins/.gitattributes
+index 02d56eff39ec28238e9e6703cb62e9ba9c651e4c..ddb7938ff92df4f7553c1951850a2bec43c9ad52 100644
+--- a/eclipse-plugins/.gitattributes
++++ b/eclipse-plugins/.gitattributes
+@@ -1,3 +1,4 @@
+ *runcppprogram text eol=lf
+ *runjavaprogram text eol=lf
+-
++*robotCommand text eol=lf
++*robotDebugCommand text eol=lf

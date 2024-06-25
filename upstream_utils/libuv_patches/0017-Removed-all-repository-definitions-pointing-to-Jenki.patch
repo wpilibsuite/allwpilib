@@ -1,0 +1,381 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Malmsten <pmalmsten@gmail.com>
+Date: Sun, 26 Jan 2014 14:13:15 -0500
+Subject: [PATCH 0017/6262] Removed all repository definitions pointing to
+ Jenkins (aka. frcbuilder)
+
+---
+ eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml  | 7 -------
+ eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml | 5 -----
+ hal/Athena/pom.xml                                        | 7 -------
+ hal/AthenaJava/pom.xml                                    | 6 +-----
+ hal/AthenaXX/pom.xml                                      | 7 -------
+ hal/AthenaXXJava/pom.xml                                  | 5 +----
+ hal/Azalea/pom.xml                                        | 7 -------
+ hal/include/pom.xml                                       | 7 -------
+ networktables/cpp/Athena/pom.xml                          | 7 -------
+ networktables/cpp/Azalea/pom.xml                          | 7 -------
+ networktables/cpp/Desktop/pom.xml                         | 7 -------
+ networktables/cpp/include/pom.xml                         | 7 -------
+ networktables/java/Athena/pom.xml                         | 7 -------
+ networktables/java/Azalea/pom.xml                         | 7 -------
+ networktables/java/dist-old/pom.xml                       | 7 -------
+ wpilibc/Athena/pom.xml                                    | 7 -------
+ wpilibc/Azalea/pom.xml                                    | 7 -------
+ wpilibj/RunTestsProject/pom.xml                           | 7 -------
+ wpilibj/wpilibJava/pom.xml                                | 4 ----
+ wpilibj/wpilibJavaFinal/pom.xml                           | 5 -----
+ 20 files changed, 2 insertions(+), 128 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml
+index fb34e64a6574bcda9088d87a2956418b31cd606c..a481b064e03d60e911d51ce9a7e493b6648a80bb 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/pom.xml
+@@ -12,13 +12,6 @@
+     <relativePath>..</relativePath>
+   </parent>
+ 
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-  
+   <properties>
+ 	<build-number>DEVELOPMENT</build-number>
+ 	<cpp-zip>${project.build.directory}/cpp-zip</cpp-zip>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
+index 3f480ad7edc4da72664e4af2cd4d6b6f81b0474d..148b79fb985391736d87b3fe61779b66d61c7e38 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/pom.xml
+@@ -28,11 +28,6 @@
+       <id>nativelibs4java-repo</id>
+       <url>http://nativelibs4java.sourceforge.net/maven</url>
+     </repository-->
+-	
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+   </repositories>
+ 
+   <build>
+diff --git a/hal/Athena/pom.xml b/hal/Athena/pom.xml
+index 6ed9ec6260f3acc6366a446114772cb3cb7fe2d8..f6c12e38f7295b9877e8cae01e9379ae992e0919 100644
+--- a/hal/Athena/pom.xml
++++ b/hal/Athena/pom.xml
+@@ -13,13 +13,6 @@
+     <relativePath>../../maven-utilities/athena/static-library/pom.xml</relativePath>
+   </parent>
+ 
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-  
+   <dependencies>
+     <dependency>
+ 	  <groupId>edu.wpi.first.wpilib.hal</groupId>
+diff --git a/hal/AthenaJava/pom.xml b/hal/AthenaJava/pom.xml
+index 17b0b4fc818f8e884473665d5bfd05de6d777287..df57994d2024829c61b16b56738a9c784401a912 100644
+--- a/hal/AthenaJava/pom.xml
++++ b/hal/AthenaJava/pom.xml
+@@ -44,12 +44,8 @@
+       <id>nativelibs4java-repo</id>
+       <url>http://nativelibs4java.sourceforge.net/maven</url>
+     </repository>
+-
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+   </repositories>
++
+   <pluginRepositories>
+     <pluginRepository>
+       <id>sonatype</id>
+diff --git a/hal/AthenaXX/pom.xml b/hal/AthenaXX/pom.xml
+index 6aa8cb159f0c68924a007f1c725d0770f5da293f..7b07e2c9d8f6eb6147c9b9061651674b7b343679 100644
+--- a/hal/AthenaXX/pom.xml
++++ b/hal/AthenaXX/pom.xml
+@@ -13,13 +13,6 @@
+     <relativePath>../../maven-utilities/Athena/static-library/pom.xml</relativePath>
+   </parent>
+ 
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-  
+   <dependencies>
+     <dependency>
+ 	  <groupId>edu.wpi.first.wpilib.hal</groupId>
+diff --git a/hal/AthenaXXJava/pom.xml b/hal/AthenaXXJava/pom.xml
+index a16b2af006b487125f9dd90a409a468d236e779c..2baf94b596362762c298e936cb3596a93bfcf1d1 100644
+--- a/hal/AthenaXXJava/pom.xml
++++ b/hal/AthenaXXJava/pom.xml
+@@ -45,11 +45,8 @@
+       <url>http://nativelibs4java.sourceforge.net/maven</url>
+     </repository>
+ 
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+   </repositories>
++
+   <pluginRepositories>
+     <pluginRepository>
+       <id>sonatype</id>
+diff --git a/hal/Azalea/pom.xml b/hal/Azalea/pom.xml
+index 8e12998fe1e1c5d814664c8b9a8bebf7c1783c9f..fdaa025fa7f8d0b985bc9f88e838d5e6f5380ccc 100644
+--- a/hal/Azalea/pom.xml
++++ b/hal/Azalea/pom.xml
+@@ -12,13 +12,6 @@
+     <version>0.1.0-SNAPSHOT</version>
+     <relativePath>../../maven-utilities/azalea/static-library/pom.xml</relativePath>
+   </parent>
+-
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+   
+   <dependencies>
+     <dependency>
+diff --git a/hal/include/pom.xml b/hal/include/pom.xml
+index 4efa2ebdc8eef3cc8b1396abc6960e6dfa688a90..6518e908fae22c7f96b8bc1eaf67eeb3633e4b28 100644
+--- a/hal/include/pom.xml
++++ b/hal/include/pom.xml
+@@ -13,13 +13,6 @@
+     <relativePath>../../maven-utilities/include</relativePath>
+   </parent>
+ 
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-
+   <build>
+     <plugins>
+ 	  <plugin>
+diff --git a/networktables/cpp/Athena/pom.xml b/networktables/cpp/Athena/pom.xml
+index 951687464b72f26d6aa09da7e95e52b0eef0a237..428a9432f919e27c476a506ddbb050637b26d932 100644
+--- a/networktables/cpp/Athena/pom.xml
++++ b/networktables/cpp/Athena/pom.xml
+@@ -13,13 +13,6 @@
+     <relativePath>../../maven-utilities/athena/static-library/pom.xml</relativePath>
+   </parent>
+   
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-  
+   <dependencies>
+     <dependency>
+ 	  <groupId>edu.wpi.first.wpilib.networktables.cpp</groupId>
+diff --git a/networktables/cpp/Azalea/pom.xml b/networktables/cpp/Azalea/pom.xml
+index b5e90f216d651055ddc49692cfffe3f1db6eca1f..9ffc6c43256a285f48a895955fc6df8e92e95ca8 100644
+--- a/networktables/cpp/Azalea/pom.xml
++++ b/networktables/cpp/Azalea/pom.xml
+@@ -13,13 +13,6 @@
+     <relativePath>../../../maven-utilities/azalea/static-library/pom.xml</relativePath>
+   </parent>
+   
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-  
+   <dependencies>
+     <dependency>
+ 	  <groupId>edu.wpi.first.wpilib.networktables.cpp</groupId>
+diff --git a/networktables/cpp/Desktop/pom.xml b/networktables/cpp/Desktop/pom.xml
+index c5073739e62f2a9cf12c40f20e913570e34b8d9c..0c39e7c691cffbd70de5bce36231243a799ffa45 100644
+--- a/networktables/cpp/Desktop/pom.xml
++++ b/networktables/cpp/Desktop/pom.xml
+@@ -12,13 +12,6 @@
+     <relativePath>../parent</relativePath>
+   </parent>
+   
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-  
+   <dependencies>
+     <dependency>
+ 	  <groupId>edu.wpi.first.wpilib.networktables.cpp</groupId>
+diff --git a/networktables/cpp/include/pom.xml b/networktables/cpp/include/pom.xml
+index f428d045337e300c972c26ed08529ee372d85704..01497e4e3a1806a54f9051df519bc379deec7276 100644
+--- a/networktables/cpp/include/pom.xml
++++ b/networktables/cpp/include/pom.xml
+@@ -13,13 +13,6 @@
+     <relativePath>../../../maven-utilities/include</relativePath>
+   </parent>
+   
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-
+   <build>
+     <plugins>
+ 	  <plugin>
+diff --git a/networktables/java/Athena/pom.xml b/networktables/java/Athena/pom.xml
+index ddcea8e55f9e688f03069fd56b7d03e4fbb33708..9d8a05cc90fe68821a426295f4ba07a1b622679f 100644
+--- a/networktables/java/Athena/pom.xml
++++ b/networktables/java/Athena/pom.xml
+@@ -13,13 +13,6 @@
+     <relativePath>../../../maven-utilities/athena/library-jar</relativePath>
+   </parent>
+ 
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-
+   <dependencies>
+ 	<dependency>
+       <groupId>junit</groupId>
+diff --git a/networktables/java/Azalea/pom.xml b/networktables/java/Azalea/pom.xml
+index 33bf65fadf581fa03043c3616a2bc0a3f0198954..fa1c0db862bef0d8d272e08a1d91cdf922af3672 100644
+--- a/networktables/java/Azalea/pom.xml
++++ b/networktables/java/Azalea/pom.xml
+@@ -14,13 +14,6 @@
+     <relativePath>../../../maven-utilities/azalea/library-jar</relativePath>
+   </parent>
+ 
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-
+   <dependencies>
+ 	<dependency>
+ 	  <groupId>com.sun.squawk</groupId>
+diff --git a/networktables/java/dist-old/pom.xml b/networktables/java/dist-old/pom.xml
+index 44b0e4e37e4543e719b7b059de36aef4b98a1c39..f70c9d4436800e18ca754ae33cbd2432c532bd95 100644
+--- a/networktables/java/dist-old/pom.xml
++++ b/networktables/java/dist-old/pom.xml
+@@ -9,13 +9,6 @@
+   <packaging>pom</packaging>
+   <version>0.1.0-SNAPSHOT</version>
+ 
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-  
+   <build>
+ 	<plugins>
+ 	  <plugin>
+diff --git a/wpilibc/Athena/pom.xml b/wpilibc/Athena/pom.xml
+index 61bcb1fbbe5192542c10ab7bb0e77587577c4a21..11c0c993eda3ef51495b482fd05584ba94d2749d 100644
+--- a/wpilibc/Athena/pom.xml
++++ b/wpilibc/Athena/pom.xml
+@@ -13,13 +13,6 @@
+     <relativePath>../../maven-utilities/athena/static-library/pom.xml</relativePath>
+   </parent>
+   
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-  
+   <dependencies>
+     <dependency>
+ 	  <groupId>edu.wpi.first.wpilib.hal</groupId>
+diff --git a/wpilibc/Azalea/pom.xml b/wpilibc/Azalea/pom.xml
+index ea4e02d33029b55c2b77b5f99702b549876b2c99..ed122171ea39fb77f0630e31f4cd809ae92b6557 100644
+--- a/wpilibc/Azalea/pom.xml
++++ b/wpilibc/Azalea/pom.xml
+@@ -13,13 +13,6 @@
+     <relativePath>../../maven-utilities/Azalea/static-library/pom.xml</relativePath>
+   </parent>
+ 
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-  
+   <dependencies>
+     <dependency>
+ 	  <groupId>edu.wpi.first.wpilib.hal</groupId>
+diff --git a/wpilibj/RunTestsProject/pom.xml b/wpilibj/RunTestsProject/pom.xml
+index 9272e74e50335a9b827bfcb69e29bc4aaae1e173..619646891527ce0dc4173c34a797c648f43837b9 100644
+--- a/wpilibj/RunTestsProject/pom.xml
++++ b/wpilibj/RunTestsProject/pom.xml
+@@ -20,13 +20,6 @@
+ 	</dependency>
+   </dependencies>
+ 
+-  <repositories>
+-    <repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository>
+-  </repositories>
+-
+   <build>
+ 	<plugins>
+       <plugin>
+diff --git a/wpilibj/wpilibJava/pom.xml b/wpilibj/wpilibJava/pom.xml
+index 7eeaf4a93a2dd20ae376fb9cefb3cb82ce4a18c4..4a9740deae26150caabb8564db732a4a45f98cbb 100644
+--- a/wpilibj/wpilibJava/pom.xml
++++ b/wpilibj/wpilibJava/pom.xml
+@@ -26,10 +26,6 @@
+       <url>http://nativelibs4java.sourceforge.net/maven</url>
+     </repository -->
+ 	
+-    <!-- repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository-->
+   </repositories>
+   
+   <dependencies>
+diff --git a/wpilibj/wpilibJavaFinal/pom.xml b/wpilibj/wpilibJavaFinal/pom.xml
+index f5f1dae6a5bd474ca4b006be7f54010a284af7b7..b7f02a7a2288bceffcd7387f5ee42c0fe39c7f19 100644
+--- a/wpilibj/wpilibJavaFinal/pom.xml
++++ b/wpilibj/wpilibJavaFinal/pom.xml
+@@ -25,11 +25,6 @@
+       <id>nativelibs4java-repo</id>
+       <url>http://nativelibs4java.sourceforge.net/maven</url>
+     </repository -->
+-	
+-    <!-- repository>
+-      <id>WPILib Repository</id>
+-      <url>http://frcbuilder.wpi.edu:8348/</url>
+-    </repository-->
+   </repositories>
+   
+   <dependencies>

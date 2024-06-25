@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Fri, 26 Sep 2014 17:58:26 -0400
+Subject: [PATCH 0374/6262] Fix simulator builds (and don't clean, dh does that
+ also)
+
+Change-Id: I921c7d6d56e439592b0d94e85f16cb090095caca
+---
+ simulation/debs/Makefile | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/simulation/debs/Makefile b/simulation/debs/Makefile
+index 49b71b767e373b7845d5b0b8371ee7223c3a1a28..58b22b1289c5d150672d826e1d2085ca36298793 100644
+--- a/simulation/debs/Makefile
++++ b/simulation/debs/Makefile
+@@ -184,7 +184,6 @@ frcsim-eclipse-toolchain-plugin/frcsim-eclipse-toolchain-plugin_$(eclipse-toolch
+ 
+ debs-frcsim-libwpilibsim-cpp: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_i386.deb
+ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_i386.deb: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb
+-	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && make clean
+ 	cd frcsim-libwpilibsim-cpp && sbuild --arch=i386 -A -d trusty-i386 frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version).dsc
+ frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-package-version)_amd64.deb: frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp_$(libwpilibsim-version).orig.tar.gz
+ 	cd frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp && debuild --no-lintian -us -uc -aamd64

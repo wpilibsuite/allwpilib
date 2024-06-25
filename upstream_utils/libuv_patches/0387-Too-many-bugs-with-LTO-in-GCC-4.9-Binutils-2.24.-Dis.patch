@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Thu, 2 Oct 2014 23:15:03 -0400
+Subject: [PATCH 0387/6262] Too many bugs with LTO in GCC 4.9 & Binutils 2.24.
+ Disabling. Maybe later.
+
+Change-Id: Id10ebb9768743e5f852275ae1f1d7a80094c99ed
+---
+ .../resources/templates/.cproject                               | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index 8ad1d444aacd8b68c9b693fda7b1745ceb849136..401e63f2eb2b3fa9f7ebd81e29a4c82c99979cd4 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -30,7 +30,6 @@
+ 									<listOptionValue builtIn="false" value="&quot;$cpp-location/include&quot;"/>
+ 								</option>
+ 								<option id="gnu.cpp.compiler.option.dialect.std.1060340803" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
+-								<option id="gnu.cpp.compiler.option.other.other.2032328791" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -pthread -flto" valueType="string"/>
+ 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1033680971" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+ 							</tool>
+ 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.362679811" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
+@@ -41,7 +40,6 @@
+ 								<option id="gnu.cpp.link.option.paths.1566479969" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+ 									<listOptionValue builtIn="false" value="&quot;$cpp-location/lib&quot;"/>
+ 								</option>
+-								<option id="gnu.cpp.link.option.flags.19068217" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-flto" valueType="string"/>
+ 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.132949138" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+ 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+ 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

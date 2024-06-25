@@ -1,0 +1,317 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Fri, 15 Aug 2014 11:22:01 -0400
+Subject: [PATCH 0299/6262] Add delays to make C++ ITs more reliable
+
+Also disable PCM tests until it's actually wired right
+
+Change-Id: I431031f66aaaa87fa201e577fedef5a1952c1bb4
+---
+ .../src/CANJaguarTest.cpp                     |  2 +
+ .../src/DIOLoopTest.cpp                       |  6 ++-
+ .../src/FakeEncoderTest.cpp                   |  6 ++-
+ .../src/MotorEncoderTest.cpp                  | 45 +++++++++----------
+ .../wpilibC++IntegrationTests/src/PCMTest.cpp | 14 +++---
+ .../src/RelayTest.cpp                         |  6 +++
+ 6 files changed, 46 insertions(+), 33 deletions(-)
+
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+index 6efb5c32c63bd51287d905d46d042e5090746f5f..92eacca07ab286765707708213bc4849692913e6 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+@@ -142,6 +142,8 @@ TEST_F(CANJaguarTest, Disable) {
+ 	m_jaguar->EnableControl();
+ 	m_jaguar->DisableControl();
+ 
++	Wait(kEncoderSettlingTime);
++
+ 	double initialPosition = m_jaguar->GetPosition();
+ 
+ 	SetJaguar(kMotorTime, 1.0f);
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
+index aadfeb395ffb174f270dc23e92b9b95083b0c14b..17f9d8e9b2bd6f462f70e9e27c93f5358a6dfa3d 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/DIOLoopTest.cpp
+@@ -9,6 +9,8 @@
+ #include "gtest/gtest.h"
+ #include "TestBench.h"
+ 
++static const double kCounterTime = 0.001;
++
+ static const double kDelayTime = 0.1;
+ 
+ static const double kSynchronousInterruptTime = 2.0;
+@@ -70,11 +72,11 @@ TEST_F(DIOLoopTest, FakeCounter) {
+ 	/* Count 100 ticks.  The counter value should be 100 after this loop. */
+ 	for(int i = 0; i < 100; i++) {
+ 		m_output->Set(true);
++		Wait(kCounterTime);
+ 		m_output->Set(false);
++		Wait(kCounterTime);
+ 	}
+ 
+-	Wait(kDelayTime);
+-
+ 	EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
+ }
+ 
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/FakeEncoderTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/FakeEncoderTest.cpp
+index ac1b70456c059cd259709d815ce902e5b8deecb2..d6c3c4d6a94bbd36bc6257f05833a3250323c152 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/FakeEncoderTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/FakeEncoderTest.cpp
+@@ -9,7 +9,7 @@
+ #include "gtest/gtest.h"
+ #include "TestBench.h"
+ 
+-static const double kDelayTime = 0.001;
++static const double kDelayTime = 0.01;
+ 
+ class FakeEncoderTest : public testing::Test {
+ protected:
+@@ -42,6 +42,10 @@ TEST_F(FakeEncoderTest, TestDefaultState) {
+  * Test the encoder by setting the digital outputs and reading the value.
+  */
+ TEST_F(FakeEncoderTest, TestCountUp) {
++	m_outputA->Set(false);
++	m_outputB->Set(false);
++	m_encoder->Reset();
++
+ 	//Sets the outputs such that the encoder moves in the positive direction
+ 	for(int i = 0; i < 100; i++) {
+ 		m_outputA->Set(true);
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
+index 994b08dadfcb1f102e67b4706591630fa41d5e31..9586df836364231dd01b24d2bf4798e0a458dce7 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/MotorEncoderTest.cpp
+@@ -17,7 +17,7 @@ std::ostream &operator<<(std::ostream &os, MotorEncoderTestType const &type) {
+ 	case TEST_JAGUAR: os << "Jaguar"; break;
+ 	case TEST_TALON: os << "Talon"; break;
+ 	}
+-	
++
+ 	return os;
+ }
+ 
+@@ -32,7 +32,7 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
+ protected:
+ 	SpeedController *m_speedController;
+ 	Encoder *m_encoder;
+-	
++
+ 	virtual void SetUp() {
+ 		switch(GetParam()) {
+ 		case TEST_VICTOR:
+@@ -40,27 +40,27 @@ protected:
+ 			m_encoder = new Encoder(TestBench::kVictorEncoderChannelA,
+ 				TestBench::kVictorEncoderChannelB);
+ 			break;
+-		
++
+ 		case TEST_JAGUAR:
+ 			m_speedController = new Jaguar(TestBench::kJaguarChannel);
+ 			m_encoder = new Encoder(TestBench::kJaguarEncoderChannelA,
+ 				TestBench::kJaguarEncoderChannelB);
+ 			break;
+-		
++
+ 		case TEST_TALON:
+ 			m_speedController = new Talon(TestBench::kTalonChannel);
+ 			m_encoder = new Encoder(TestBench::kTalonEncoderChannelA,
+ 				TestBench::kTalonEncoderChannelB);
+ 			break;
+ 		}
+-		
++
+ 	}
+-	
++
+ 	virtual void TearDown() {
+ 		delete m_speedController;
+ 		delete m_encoder;
+ 	}
+-	
++
+ 	void Reset() {
+ 		m_speedController->Set(0.0f);
+ 		m_encoder->Reset();
+@@ -73,12 +73,12 @@ protected:
+  */
+ TEST_P(MotorEncoderTest, Increment) {
+ 	Reset();
+-	
++
+ 	/* Drive the speed controller briefly to move the encoder */
+ 	m_speedController->Set(1.0);
+ 	Wait(kMotorTime);
+ 	m_speedController->Set(0.0);
+-	
++
+ 	/* The encoder should be positive now */
+ 	EXPECT_GT(m_encoder->Get(), 0)
+ 		<< "Encoder should have incremented after the motor moved";
+@@ -90,12 +90,12 @@ TEST_P(MotorEncoderTest, Increment) {
+  */
+ TEST_P(MotorEncoderTest, Decrement) {
+ 	Reset();
+-	
++
+ 	/* Drive the speed controller briefly to move the encoder */
+ 	m_speedController->Set(-1.0f);
+ 	Wait(kMotorTime);
+ 	m_speedController->Set(0.0f);
+-	
++
+ 	/* The encoder should be positive now */
+ 	EXPECT_LT(m_encoder->Get(), 0.0f)
+ 		<< "Encoder should have decremented after the motor moved";
+@@ -106,15 +106,15 @@ TEST_P(MotorEncoderTest, Decrement) {
+  */
+ TEST_P(MotorEncoderTest, ClampSpeed) {
+ 	Reset();
+-	
++
+ 	m_speedController->Set(2.0f);
+ 	Wait(kMotorTime);
+-	
++
+ 	EXPECT_FLOAT_EQ(1.0f, m_speedController->Get());
+-	
++
+ 	m_speedController->Set(-2.0f);
+ 	Wait(kMotorTime);
+-	
++
+ 	EXPECT_FLOAT_EQ(-1.0f, m_speedController->Get());
+ }
+ 
+@@ -123,19 +123,19 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
+  */
+ TEST_P(MotorEncoderTest, PIDController) {
+ 	Reset();
+-	
++
+ 	PIDController pid(0.003f, 0.001f, 0.0f, m_encoder, m_speedController);
+ 	pid.SetAbsoluteTolerance(20.0f);
+ 	pid.SetOutputRange(-0.2f, 0.2f);
+ 	pid.SetSetpoint(2500);
+-	
+-	/* 5 seconds should be plenty time to get to the setpoint */
++
++	/* 10 seconds should be plenty time to get to the setpoint */
+ 	pid.Enable();
+-	Wait(5.0);
++	Wait(10.0);
+ 	pid.Disable();
+-	
++
+ 	RecordProperty("PID Error", pid.GetError());
+-	
++
+ 	EXPECT_TRUE(pid.OnTarget()) << "PID loop did not converge within 5 seconds.";
+ }
+ 
+@@ -144,10 +144,9 @@ TEST_P(MotorEncoderTest, PIDController) {
+  */
+ TEST_P(MotorEncoderTest, Reset) {
+ 	Reset();
+-	
++
+ 	EXPECT_EQ(0, m_encoder->Get()) << "Encoder did not reset to 0";
+ }
+ 
+ INSTANTIATE_TEST_CASE_P(Test, MotorEncoderTest,
+ 	testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));
+-
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
+index 6b5149816118ae5641149ceceb1cbd49ce8736a4..6d77e6f89040095b344bb68157732c06df9914b5 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
+@@ -9,12 +9,12 @@
+ #include "gtest/gtest.h"
+ #include "TestBench.h"
+ 
+-/* The PCM switches the compressor up to 2 seconds after the pressure switch
+-	changes. */
+-static const double kCompressorDelayTime = 2.0;
++/* The PCM switches the compressor up to a couple seconds after the pressure
++	switch changes. */
++static const double kCompressorDelayTime = 3.0;
+ 
+ /* Solenoids should change much more quickly */
+-static const double kSolenoidDelayTime = 0.1;
++static const double kSolenoidDelayTime = 0.5;
+ 
+ /* The voltage divider on the test bench should bring the compressor output
+ 	to around these values. */
+@@ -56,7 +56,7 @@ protected:
+ /**
+  * Test if the compressor turns on and off when the pressure switch is toggled
+  */
+-TEST_F(PCMTest, PressureSwitch) {
++TEST_F(PCMTest, DISABLED_PressureSwitch) {
+ 	Reset();
+ 
+ 	m_compressor->SetClosedLoopControl(true);
+@@ -77,7 +77,7 @@ TEST_F(PCMTest, PressureSwitch) {
+ /**
+  * Test if the correct solenoids turn on and off when they should
+  */
+-TEST_F(PCMTest, Solenoid) {
++TEST_F(PCMTest, DISABLED_Solenoid) {
+ 	Reset();
+ 	Solenoid solenoid1(TestBench::kSolenoidChannel1);
+ 	Solenoid solenoid2(TestBench::kSolenoidChannel2);
+@@ -115,7 +115,7 @@ TEST_F(PCMTest, Solenoid) {
+  * Test if the correct solenoids turn on and off when they should when used
+  * with the DoubleSolenoid class.
+  */
+-TEST_F(PCMTest, DoubleSolenoid) {
++TEST_F(PCMTest, DISABLED_DoubleSolenoid) {
+ 	DoubleSolenoid solenoid(TestBench::kSolenoidChannel1, TestBench::kSolenoidChannel2);
+ 
+ 	solenoid.Set(DoubleSolenoid::kOff);
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/RelayTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/RelayTest.cpp
+index 86b2a74fa8c06f24e739faa306fd3bad437536a0..8f5260397159aa23d63c251f9524f3e7a23b6008 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/RelayTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/RelayTest.cpp
+@@ -10,6 +10,8 @@
+ #include "TestBench.h"
+ #include "Relay.h"
+ 
++static const double kDelayTime = 0.01;
++
+ class RelayTest : public testing::Test {
+ protected:
+ 	Relay *m_relay;
+@@ -41,6 +43,7 @@ protected:
+ 
+ 		//set the relay to forward
+ 		m_relay->Set(Relay::kForward);
++		Wait(kDelayTime);
+ 		EXPECT_TRUE(m_forward->Get())
+ 		<<"Relay did not set forward";
+ 		EXPECT_FALSE(m_reverse->Get())
+@@ -49,6 +52,7 @@ protected:
+ 
+ 		//set the relay to reverse
+ 		m_relay->Set(Relay::kReverse);
++		Wait(kDelayTime);
+ 		EXPECT_TRUE(m_reverse->Get())
+ 		<<"Relay did not set reverse";
+ 		EXPECT_FALSE(m_forward->Get())
+@@ -56,6 +60,7 @@ protected:
+ 
+ 		//set the relay to off
+ 		m_relay->Set(Relay::kOff);
++		Wait(kDelayTime);
+ 		EXPECT_FALSE(m_forward->Get())
+ 		<<"Relay did not set off";
+ 		EXPECT_FALSE(m_reverse->Get())
+@@ -64,6 +69,7 @@ protected:
+ 
+ 		//set the relay to on
+ 		m_relay->Set(Relay::kOn);
++		Wait(kDelayTime);
+ 		EXPECT_TRUE(m_forward->Get())
+ 		<<"Relay did not set on";
+ 		EXPECT_TRUE(m_reverse->Get())

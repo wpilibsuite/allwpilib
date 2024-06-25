@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 27 Aug 2014 15:27:18 -0400
+Subject: [PATCH 0322/6262] Wrap CPP Lib and Include paths in quotes (fixes
+ artf2390)
+
+Change-Id: Ied08c559140ecb28a41f61d968a37cd772255b8c
+---
+ .../resources/templates/.cproject                             | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index d66d94bcb112f311a0038cce5a05b3a301335985..7a5bd99d058530b2aed2793c379c90f84340c830 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -29,14 +29,14 @@
+ 								<option id="gnu.cpp.compiler.option.debugging.level.1682909384" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+ 							        <option id="gnu.cpp.compiler.option.include.paths.1597382905" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+ 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}/src&quot;"/>
+-								  <listOptionValue builtIn="false" value="$cpp-location/include"/>
++								  <listOptionValue builtIn="false" value="&quot;$cpp-location/include&quot;"/>
+ 							        </option>
+ 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.963785380" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+ 							</tool>
+ 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1367166630" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
+ 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1568604896" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
+ 								<option id="gnu.cpp.link.option.paths.1928585110" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+-									<listOptionValue builtIn="false" value="$cpp-location/lib"/>
++									<listOptionValue builtIn="false" value="&quot;$cpp-location/lib&quot;"/>
+ 								</option>
+ 								<option id="gnu.cpp.link.option.libs.1072058280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+ 									<listOptionValue builtIn="false" value="WPILibAthena"/>

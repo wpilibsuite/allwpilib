@@ -1,0 +1,2435 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Thu, 12 Jun 2014 18:07:45 -0400
+Subject: [PATCH 0096/6262] Changed AnalogChannel to AnalogInput, added
+ AnalogOutput for MXP
+
+Change-Id: I863d89c61ff2cf4a7a3aeeca1296978e728758b6
+---
+ hal/lib/Athena/Analog.cpp                     |  97 ++++++-----
+ wpilibc/wpilibC++/include/Accelerometer.h     |   6 +-
+ .../{AnalogChannel.h => AnalogInput.h}        |  14 +-
+ wpilibc/wpilibC++/include/AnalogModule.h      |   4 +-
+ wpilibc/wpilibC++/include/AnalogOutput.h      |  39 +++++
+ wpilibc/wpilibC++/include/AnalogTrigger.h     |   4 +-
+ wpilibc/wpilibC++/include/DriverStation.h     |   4 +-
+ wpilibc/wpilibC++/include/Gyro.h              |  10 +-
+ .../NetworkCommunication/UsageReporting.h     |   2 +-
+ wpilibc/wpilibC++/include/SensorBase.h        |   6 +-
+ wpilibc/wpilibC++/include/WPILib.h            |   4 +-
+ wpilibc/wpilibC++/lib/Accelerometer.cpp       |  20 +--
+ .../{AnalogChannel.cpp => AnalogInput.cpp}    | 150 +++++++++---------
+ wpilibc/wpilibC++/lib/AnalogModule.cpp        |   2 +-
+ wpilibc/wpilibC++/lib/AnalogOutput.cpp        | 106 +++++++++++++
+ wpilibc/wpilibC++/lib/AnalogTrigger.cpp       |   4 +-
+ wpilibc/wpilibC++/lib/DriverStation.cpp       |   6 +-
+ wpilibc/wpilibC++/lib/Gyro.cpp                |  14 +-
+ wpilibc/wpilibC++/lib/SensorBase.cpp          |  55 ++++---
+ .../include/TestBench.h                       |   6 +-
+ .../src/AnalogLoopTest.cpp                    |  52 ++++++
+ .../wpilibC++IntegrationTests/src/PCMTest.cpp |   4 +-
+ .../edu/wpi/first/wpilibj/Accelerometer.java  |   8 +-
+ .../{AnalogChannel.java => AnalogInput.java}  |  82 +++++-----
+ .../edu/wpi/first/wpilibj/AnalogModule.java   |   2 +-
+ .../edu/wpi/first/wpilibj/AnalogOutput.java   | 140 ++++++++++++++++
+ .../edu/wpi/first/wpilibj/AnalogTrigger.java  |   2 +-
+ .../edu/wpi/first/wpilibj/DriverStation.java  |   2 +-
+ .../main/java/edu/wpi/first/wpilibj/Gyro.java |   8 +-
+ .../edu/wpi/first/wpilibj/SensorBase.java     |  37 +++--
+ .../edu/wpi/first/wpilibj/test/TestBench.java |  32 ++--
+ wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp       |   4 +-
+ 32 files changed, 658 insertions(+), 268 deletions(-)
+ rename wpilibc/wpilibC++/include/{AnalogChannel.h => AnalogInput.h} (85%)
+ create mode 100644 wpilibc/wpilibC++/include/AnalogOutput.h
+ rename wpilibc/wpilibC++/lib/{AnalogChannel.cpp => AnalogInput.cpp} (80%)
+ create mode 100644 wpilibc/wpilibC++/lib/AnalogOutput.cpp
+ create mode 100644 wpilibc/wpilibC++IntegrationTests/src/AnalogLoopTest.cpp
+ rename wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/{AnalogChannel.java => AnalogInput.java} (95%)
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogOutput.java
+
+diff --git a/hal/lib/Athena/Analog.cpp b/hal/lib/Athena/Analog.cpp
+index 3e3c65a95b5f58f14cf919f6dcc0204d6618f8f5..ee439ce579cc94da5c3a7d7521c1a1cfb6b8b92f 100644
+--- a/hal/lib/Athena/Analog.cpp
++++ b/hal/lib/Athena/Analog.cpp
+@@ -27,7 +27,8 @@ struct AnalogPort {
+ 
+ bool analogSampleRateSet = false;
+ MUTEX_ID analogRegisterWindowSemaphore = NULL;
+-tAI* analogSystem = NULL;
++tAI* analogInputSystem = NULL;
++tAO* analogOutputSystem = NULL;
+ uint32_t analogNumChannelsToActivate = 0;
+ 
+ // Utility methods defined below.
+@@ -43,12 +44,13 @@ bool analogSystemInitialized = false;
+ void initializeAnalog(int32_t *status) {
+   if (analogSystemInitialized) return;
+   analogRegisterWindowSemaphore = initializeMutexRecursive();
+-  analogSystem = tAI::create(status);
++  analogInputSystem = tAI::create(status);
++  analogOutputSystem = tAO::create(status);
+   setAnalogNumChannelsToActivate(kAnalogInputPins);
+   setAnalogSampleRate(kDefaultSampleRate, status);
+   analogSystemInitialized = true;
+ }
+-  
++
+ /**
+  * Initialize the analog input port using the given port object.
+  */
+@@ -64,12 +66,12 @@ void* initializeAnalogInputPort(void* port_pointer, int32_t *status) {
+   } else analog_port->accumulator = NULL;
+ 
+   // Set default configuration
+-  analogSystem->writeScanList(port->pin, port->pin, status);
++  analogInputSystem->writeScanList(port->pin, port->pin, status);
+   setAnalogAverageBits(analog_port, kDefaultAverageBits, status);
+   setAnalogOversampleBits(analog_port, kDefaultOversampleBits, status);
+   return analog_port;
+ }
+-  
++
+ /**
+  * Initialize the analog output port using the given port object.
+  */
+@@ -86,7 +88,7 @@ void* initializeAnalogOutputPort(void* port_pointer, int32_t *status) {
+ 
+ /**
+  * Check that the analog module number is valid.
+- * 
++ *
+  * @return Analog module is valid and present
+  */
+ bool checkAnalogModule(uint8_t module) {
+@@ -97,7 +99,7 @@ bool checkAnalogModule(uint8_t module) {
+  * Check that the analog output channel number is value.
+  * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
+  * are 0-based.
+- * 
++ *
+  * @return Analog channel is valid
+  */
+ bool checkAnalogInputChannel(uint32_t pin) {
+@@ -110,7 +112,7 @@ bool checkAnalogInputChannel(uint32_t pin) {
+  * Check that the analog output channel number is value.
+  * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
+  * are 0-based.
+- * 
++ *
+  * @return Analog channel is valid
+  */
+ bool checkAnalogOutputChannel(uint32_t pin) {
+@@ -119,6 +121,25 @@ bool checkAnalogOutputChannel(uint32_t pin) {
+   return false;
+ }
+ 
++void setAnalogOutput(void* analog_port_pointer, double voltage, int32_t *status) {
++  AnalogPort* port = (AnalogPort*) analog_port_pointer;
++
++  uint16_t rawValue = (uint16_t)(voltage / 5.0 * 0x1000);
++
++  if(voltage < 0.0) rawValue = 0;
++  else if(voltage > 5.0) rawValue = 0x1000;
++
++  analogOutputSystem->writeMXP(port->port.pin, rawValue, status);
++}
++
++double getAnalogOutput(void* analog_port_pointer, int32_t *status) {
++  AnalogPort* port = (AnalogPort*) analog_port_pointer;
++
++  uint16_t rawValue = analogOutputSystem->readMXP(port->port.pin, status);
++
++  return rawValue * 5.0 / 0x1000;
++}
++
+ /**
+  * Set the sample rate.
+  *
+@@ -145,7 +166,7 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t *status) {
+   tAI::tConfig config;
+   config.ScanSize = getAnalogNumChannelsToActivate(status);
+   config.ConvertRate = ticksPerConversion;
+-  analogSystem->writeConfig(config, status);
++  analogInputSystem->writeConfig(config, status);
+ 
+   // Indicate that the scan size has been commited to hardware.
+   setAnalogNumChannelsToActivate(0);
+@@ -160,7 +181,7 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t *status) {
+  * @return Sample rate.
+  */
+ float getAnalogSampleRate(int32_t *status) {
+-  uint32_t ticksPerConversion = analogSystem->readLoopTiming(status);
++  uint32_t ticksPerConversion = analogInputSystem->readLoopTiming(status);
+   uint32_t ticksPerSample = ticksPerConversion * getAnalogNumActiveChannels(status);
+   return (float)kTimebase / (float)ticksPerSample;
+ }
+@@ -211,7 +232,7 @@ float getAnalogSampleRateWithModule(uint8_t module, int32_t *status) {
+  */
+ void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits, int32_t *status) {
+   AnalogPort* port = (AnalogPort*) analog_port_pointer;
+-  analogSystem->writeAverageBits(port->port.pin, bits, status);
++  analogInputSystem->writeAverageBits(port->port.pin, bits, status);
+ }
+ 
+ /**
+@@ -225,7 +246,7 @@ void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits, int32_t *sta
+  */
+ uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t *status) {
+   AnalogPort* port = (AnalogPort*) analog_port_pointer;
+-  uint32_t result = analogSystem->readAverageBits(port->port.pin, status);
++  uint32_t result = analogInputSystem->readAverageBits(port->port.pin, status);
+   return result;
+ }
+ 
+@@ -241,7 +262,7 @@ uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t *status) {
+  */
+ void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits, int32_t *status) {
+   AnalogPort* port = (AnalogPort*) analog_port_pointer;
+-  analogSystem->writeOversampleBits(port->port.pin, bits, status);
++  analogInputSystem->writeOversampleBits(port->port.pin, bits, status);
+ }
+ 
+ 
+@@ -256,7 +277,7 @@ void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits, int32_t *
+  */
+ uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t *status) {
+   AnalogPort* port = (AnalogPort*) analog_port_pointer;
+-  uint32_t result = analogSystem->readOversampleBits(port->port.pin, status);
++  uint32_t result = analogInputSystem->readOversampleBits(port->port.pin, status);
+   return result;
+ }
+ 
+@@ -280,9 +301,9 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t *status) {
+ 
+   {
+     Synchronized sync(analogRegisterWindowSemaphore);
+-    analogSystem->writeReadSelect(readSelect, status);
+-    analogSystem->strobeLatchOutput(status);
+-    value = (int16_t) analogSystem->readOutput(status);
++    analogInputSystem->writeReadSelect(readSelect, status);
++    analogInputSystem->strobeLatchOutput(status);
++    value = (int16_t) analogInputSystem->readOutput(status);
+   }
+ 
+   return value;
+@@ -311,9 +332,9 @@ int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t *status) {
+ 
+   {
+     Synchronized sync(analogRegisterWindowSemaphore);
+-    analogSystem->writeReadSelect(readSelect, status);
+-    analogSystem->strobeLatchOutput(status);
+-    value = (int16_t) analogSystem->readOutput(status);
++    analogInputSystem->writeReadSelect(readSelect, status);
++    analogInputSystem->strobeLatchOutput(status);
++    value = (int16_t) analogInputSystem->readOutput(status);
+   }
+ 
+   return value;
+@@ -416,11 +437,11 @@ int32_t getAnalogOffset(void* analog_port_pointer, int32_t *status) {
+ 
+ /**
+  * Return the number of channels on the module in use.
+- * 
++ *
+  * @return Active channels.
+  */
+ uint32_t getAnalogNumActiveChannels(int32_t *status) {
+-  uint32_t scanSize = analogSystem->readConfig_ScanSize(status);
++  uint32_t scanSize = analogInputSystem->readConfig_ScanSize(status);
+   if (scanSize == 0)
+     return 8;
+   return scanSize;
+@@ -428,13 +449,13 @@ uint32_t getAnalogNumActiveChannels(int32_t *status) {
+ 
+ /**
+  * Get the number of active channels.
+- * 
+- * This is an internal function to allow the atomic update of both the 
++ *
++ * This is an internal function to allow the atomic update of both the
+  * number of active channels and the sample rate.
+- * 
++ *
+  * When the number of channels changes, use the new value.  Otherwise,
+  * return the curent value.
+- * 
++ *
+  * @return Value to write to the active channels field.
+  */
+ uint32_t getAnalogNumChannelsToActivate(int32_t *status) {
+@@ -444,10 +465,10 @@ uint32_t getAnalogNumChannelsToActivate(int32_t *status) {
+ 
+ /**
+  * Set the number of active channels.
+- * 
++ *
+  * Store the number of active channels to set.  Don't actually commit to hardware
+  * until SetSampleRate().
+- * 
++ *
+  * @param channels Number of active channels.
+  */
+ void setAnalogNumChannelsToActivate(uint32_t channels) {
+@@ -458,7 +479,7 @@ void setAnalogNumChannelsToActivate(uint32_t channels) {
+ 
+ /**
+  * Is the channel attached to an accumulator.
+- * 
++ *
+  * @return The analog channel is attached to an accumulator.
+  */
+ bool isAccumulatorChannel(void* analog_port_pointer, int32_t *status) {
+@@ -491,11 +512,11 @@ void resetAccumulator(void* analog_port_pointer, int32_t *status) {
+ 
+ /**
+  * Set the center value of the accumulator.
+- * 
++ *
+  * The center value is subtracted from each A/D value before it is added to the accumulator. This
+  * is used for the center value of devices like gyros and accelerometers to make integration work
+  * and to take the device offset into account when integrating.
+- * 
++ *
+  * This center value is based on the output of the oversampled and averaged source from channel 1.
+  * Because of this, any non-zero oversample bits will affect the size of the value for this field.
+  */
+@@ -522,10 +543,10 @@ void setAccumulatorDeadband(void* analog_port_pointer, int32_t deadband, int32_t
+ 
+ /**
+  * Read the accumulated value.
+- * 
++ *
+  * Read the value that has been accumulating on channel 1.
+  * The accumulator is attached after the oversample and average engine.
+- * 
++ *
+  * @return The 64-bit value accumulated since the last Reset().
+  */
+ int64_t getAccumulatorValue(void* analog_port_pointer, int32_t *status) {
+@@ -540,9 +561,9 @@ int64_t getAccumulatorValue(void* analog_port_pointer, int32_t *status) {
+ 
+ /**
+  * Read the number of accumulated values.
+- * 
++ *
+  * Read the count of the accumulated values since the accumulator was last Reset().
+- * 
++ *
+  * @return The number of times samples from the channel were accumulated.
+  */
+ uint32_t getAccumulatorCount(void* analog_port_pointer, int32_t *status) {
+@@ -556,10 +577,10 @@ uint32_t getAccumulatorCount(void* analog_port_pointer, int32_t *status) {
+ 
+ /**
+  * Read the accumulated value and the number of accumulated values atomically.
+- * 
++ *
+  * This function reads the value and count from the FPGA atomically.
+  * This can be used for averaging.
+- * 
++ *
+  * @param value Pointer to the 64-bit accumulated output.
+  * @param count Pointer to the number of accumulation cycles.
+  */
+@@ -728,7 +749,7 @@ int getAnalogAverageVoltageIntHack(void* analog_port_pointer, int32_t *status) {
+   return floatToInt(getAnalogAverageVoltage(analog_port_pointer, status));
+ }
+ 
+-  
++
+ // Doubles
+ void setAnalogSampleRateIntHack(int samplesPerSecond, int32_t *status) {
+   setAnalogSampleRate(intToFloat(samplesPerSecond), status);
+diff --git a/wpilibc/wpilibC++/include/Accelerometer.h b/wpilibc/wpilibC++/include/Accelerometer.h
+index 516bdd03f50bb80e8f3dcb6da341e324e5385061..87bfd0145971318d5177620d9fdd8959c0a1a31f 100644
+--- a/wpilibc/wpilibC++/include/Accelerometer.h
++++ b/wpilibc/wpilibC++/include/Accelerometer.h
+@@ -5,7 +5,7 @@
+ /*----------------------------------------------------------------------------*/
+ #pragma once
+ 
+-#include "AnalogChannel.h"
++#include "AnalogInput.h"
+ #include "SensorBase.h"
+ #include "PIDSource.h"
+ #include "LiveWindow/LiveWindowSendable.h"
+@@ -20,7 +20,7 @@ class Accelerometer : public SensorBase, public PIDSource, public LiveWindowSend
+ public:
+ 	explicit Accelerometer(uint32_t channel);
+ 	Accelerometer(uint8_t moduleNumber, uint32_t channel);
+-	explicit Accelerometer(AnalogChannel *channel);
++	explicit Accelerometer(AnalogInput *channel);
+ 	virtual ~Accelerometer();
+ 
+ 	float GetAcceleration();
+@@ -38,7 +38,7 @@ public:
+ private:
+ 	void InitAccelerometer();
+ 
+-	AnalogChannel *m_analogChannel;
++	AnalogInput *m_AnalogInput;
+ 	float m_voltsPerG;
+ 	float m_zeroGVoltage;
+ 	bool m_allocatedChannel;
+diff --git a/wpilibc/wpilibC++/include/AnalogChannel.h b/wpilibc/wpilibC++/include/AnalogInput.h
+similarity index 85%
+rename from wpilibc/wpilibC++/include/AnalogChannel.h
+rename to wpilibc/wpilibC++/include/AnalogInput.h
+index 7d6d9621a3c9a5c709305be0cbffd069addb8309..cc18272f29ebc6bb4a28f2a008a70b868720013b 100644
+--- a/wpilibc/wpilibC++/include/AnalogChannel.h
++++ b/wpilibc/wpilibC++/include/AnalogInput.h
+@@ -13,9 +13,7 @@
+ class AnalogModule;
+ 
+ /**
+- * Analog channel class.
+- * 
+- * Each analog channel is read from hardware as a 12-bit number representing -10V to 10V.
++ * Analog input class.
+  * 
+  * Connected to each analog channel is an averaging and oversampling engine.  This engine accumulates
+  * the specified ( by SetAverageBits() and SetOversampleBits() ) number of samples before returning a new
+@@ -24,16 +22,16 @@ class AnalogModule;
+  * resolution, while the averaged samples are divided by the number of samples to retain the resolution,
+  * but get more stable values.
+  */
+-class AnalogChannel : public SensorBase, public PIDSource, public LiveWindowSendable
++class AnalogInput : public SensorBase, public PIDSource, public LiveWindowSendable
+ {
+ public:
+ 	static const uint8_t kAccumulatorModuleNumber = 1;
+ 	static const uint32_t kAccumulatorNumChannels = 2;
+ 	static const uint32_t kAccumulatorChannels[kAccumulatorNumChannels];
+ 
+-	AnalogChannel(uint8_t moduleNumber, uint32_t channel);
+-	explicit AnalogChannel(uint32_t channel);
+-	virtual ~AnalogChannel();
++	AnalogInput(uint8_t moduleNumber, uint32_t channel);
++	explicit AnalogInput(uint32_t channel);
++	virtual ~AnalogInput();
+ 
+ 	AnalogModule *GetModule();
+ 
+@@ -74,7 +72,7 @@ public:
+ 	ITable * GetTable();
+ 
+ private:
+-	void InitChannel(uint8_t moduleNumber, uint32_t channel);
++	void InitAnalogInput(uint8_t moduleNumber, uint32_t channel);
+ 	uint32_t m_channel, m_module;
+ 	void* m_port;
+ 	int64_t m_accumulatorOffset;
+diff --git a/wpilibc/wpilibC++/include/AnalogModule.h b/wpilibc/wpilibC++/include/AnalogModule.h
+index 20d4382538bead570615b9a23c10bf22b233f7b9..62f6cbd7a242224f09560f0b0ed6a78eac79d95f 100644
+--- a/wpilibc/wpilibC++/include/AnalogModule.h
++++ b/wpilibc/wpilibC++/include/AnalogModule.h
+@@ -23,7 +23,7 @@ public:
+ 	static const long kTimebase = 40000000; ///< 40 MHz clock
+ 	static const long kDefaultOversampleBits = 0;
+ 	static const long kDefaultAverageBits = 7;
+-	static const uint32_t kAnalogChannels = 8;
++	static const uint32_t kAnalogInputs = 8;
+ 	static constexpr float kDefaultSampleRate = 50000.0;
+ 
+ 	void SetSampleRate(float samplesPerSecond);
+@@ -48,5 +48,5 @@ protected:
+ 
+ private:
+ 	uint8_t m_moduleNumber;
+-	void* m_ports[kAnalogChannels];
++	void* m_ports[kAnalogInputs];
+ };
+diff --git a/wpilibc/wpilibC++/include/AnalogOutput.h b/wpilibc/wpilibC++/include/AnalogOutput.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..563502dc05b78997541babab1df5cdcd6b4bdeb7
+--- /dev/null
++++ b/wpilibc/wpilibC++/include/AnalogOutput.h
+@@ -0,0 +1,39 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#pragma once
++
++#include "HAL/HAL.hpp"
++#include "SensorBase.h"
++#include "LiveWindow/LiveWindowSendable.h"
++
++/**
++ * MXP analog output class.
++ */
++class AnalogOutput : public SensorBase, public LiveWindowSendable
++{
++public:
++    explicit AnalogOutput(uint32_t channel);
++    virtual ~AnalogOutput();
++
++    void SetVoltage(float voltage);
++    float GetVoltage();
++
++    void UpdateTable();
++    void StartLiveWindowMode();
++    void StopLiveWindowMode();
++    std::string GetSmartDashboardType();
++    void InitTable(ITable *subTable);
++    ITable *GetTable();
++
++protected:
++    void InitAnalogOutput(uint32_t channel);
++    uint32_t m_channel;
++    void* m_port;
++
++    ITable *m_table;
++};
+diff --git a/wpilibc/wpilibC++/include/AnalogTrigger.h b/wpilibc/wpilibC++/include/AnalogTrigger.h
+index 31d363fdb042cdbea55788c7f32df30e36bf02a9..2083c40bf012fd48eebda1b9d67d4bc6bc611191 100644
+--- a/wpilibc/wpilibC++/include/AnalogTrigger.h
++++ b/wpilibc/wpilibC++/include/AnalogTrigger.h
+@@ -9,7 +9,7 @@
+ #include "AnalogTriggerOutput.h"
+ #include "SensorBase.h"
+ 
+-class AnalogChannel;
++class AnalogInput;
+ class AnalogModule;
+ 
+ class AnalogTrigger : public SensorBase
+@@ -18,7 +18,7 @@ class AnalogTrigger : public SensorBase
+ public:
+ 	AnalogTrigger(uint8_t moduleNumber, uint32_t channel);
+ 	explicit AnalogTrigger(uint32_t channel);
+-	explicit AnalogTrigger(AnalogChannel *channel);
++	explicit AnalogTrigger(AnalogInput *channel);
+ 	virtual ~AnalogTrigger();
+ 
+ 	void SetLimitsVoltage(float lower, float upper);
+diff --git a/wpilibc/wpilibC++/include/DriverStation.h b/wpilibc/wpilibC++/include/DriverStation.h
+index 9127a980deb1430411cfcf298c7d9799faf53ec9..5e282792abfd441ef0e33c2a9a66306e5dab486a 100644
+--- a/wpilibc/wpilibC++/include/DriverStation.h
++++ b/wpilibc/wpilibC++/include/DriverStation.h
+@@ -11,7 +11,7 @@
+ #include "Task.h"
+ 
+ struct HALCommonControlData;
+-class AnalogChannel;
++class AnalogInput;
+ 
+ /**
+  * Provide access to the network communication data to / from the Driver Station.
+@@ -153,7 +153,7 @@ private:
+ 
+ 	struct HALCommonControlData *m_controlData;
+ 	uint8_t m_digitalOut;
+-	AnalogChannel *m_batteryChannel;
++	AnalogInput *m_batteryChannel;
+ 	MUTEX_ID m_statusDataSemaphore;
+ 	Task m_task;
+ 	Dashboard m_dashboardHigh;  // the default dashboard packers
+diff --git a/wpilibc/wpilibC++/include/Gyro.h b/wpilibc/wpilibC++/include/Gyro.h
+index 7bf665b0d8eef172c46e65e83f36ea67863347b9..0f777bc75053ef4673429db67305c4dcd5b72ad7 100644
+--- a/wpilibc/wpilibC++/include/Gyro.h
++++ b/wpilibc/wpilibC++/include/Gyro.h
+@@ -9,7 +9,7 @@
+ #include "PIDSource.h"
+ #include "LiveWindow/LiveWindowSendable.h"
+ 
+-class AnalogChannel;
++class AnalogInput;
+ class AnalogModule;
+ 
+ /**
+@@ -20,7 +20,7 @@ class AnalogModule;
+  * where it samples the gyro while at rest to determine the default offset. This is
+  * subtracted from each sample to determine the heading. This gyro class must be used 
+  * with a channel that is assigned one of the Analog accumulators from the FPGA. See
+- * AnalogChannel for the current accumulator assignments.
++ * AnalogInput for the current accumulator assignments.
+  */
+ class Gyro : public SensorBase, public PIDSource, public LiveWindowSendable
+ {
+@@ -33,8 +33,8 @@ public:
+ 
+ 	Gyro(uint8_t moduleNumber, uint32_t channel);
+ 	explicit Gyro(uint32_t channel);
+-	explicit Gyro(AnalogChannel *channel);
+-	explicit Gyro(AnalogChannel &channel);
++	explicit Gyro(AnalogInput *channel);
++	explicit Gyro(AnalogInput &channel);
+ 	virtual ~Gyro();
+ 	virtual float GetAngle();
+ 	virtual double GetRate();
+@@ -55,7 +55,7 @@ public:
+ private:
+ 	void InitGyro();
+ 
+-	AnalogChannel *m_analog;
++	AnalogInput *m_analog;
+ 	float m_voltsPerDegreePerSecond;
+ 	float m_offset;
+ 	bool m_channelAllocated;
+diff --git a/wpilibc/wpilibC++/include/NetworkCommunication/UsageReporting.h b/wpilibc/wpilibC++/include/NetworkCommunication/UsageReporting.h
+index 918ac5ae636d694286677f4d1e231c9dd535c813..91d4ceba8617055b3ecf6a11c645ec738ba03721 100644
+--- a/wpilibc/wpilibC++/include/NetworkCommunication/UsageReporting.h
++++ b/wpilibc/wpilibC++/include/NetworkCommunication/UsageReporting.h
+@@ -26,7 +26,7 @@ namespace nUsageReporting
+         kResourceType_CANPlugin,
+         kResourceType_Accelerometer,
+         kResourceType_ADXL345,
+-        kResourceType_AnalogChannel,
++        kResourceType_AnalogInput,
+         kResourceType_AnalogTrigger,
+         kResourceType_AnalogTriggerOutput,
+         kResourceType_CANJaguar,
+diff --git a/wpilibc/wpilibC++/include/SensorBase.h b/wpilibc/wpilibC++/include/SensorBase.h
+index becfe499a564dcf474b89a6dd06dac2158b5402d..29d1de7c9f4f8f51b46571f1eac795197108530f 100644
+--- a/wpilibc/wpilibC++/include/SensorBase.h
++++ b/wpilibc/wpilibC++/include/SensorBase.h
+@@ -40,12 +40,14 @@ public:
+ 	static bool CheckDigitalChannel(uint32_t channel);
+ 	static bool CheckRelayChannel(uint32_t channel);
+ 	static bool CheckPWMChannel(uint32_t channel);
+-	static bool CheckAnalogChannel(uint32_t channel);
++	static bool CheckAnalogInput(uint32_t channel);
++    static bool CheckAnalogOutput(uint32_t channel);
+ 	static bool CheckSolenoidChannel(uint32_t channel);
+ 	static bool CheckPDPChannel(uint32_t channel);
+ 
+ 	static const uint32_t kDigitalChannels = 20;
+-	static const uint32_t kAnalogChannels = 8;
++	static const uint32_t kAnalogInputs = 8;
++    static const uint32_t kAnalogOutputs = 2;
+ 	static const uint32_t kAnalogModules = 2;
+ 	static const uint32_t kDigitalModules = 2;
+ 	static const uint32_t kSolenoidChannels = 8;
+diff --git a/wpilibc/wpilibC++/include/WPILib.h b/wpilibc/wpilibC++/include/WPILib.h
+index eebf678fae1d59cb43808fed3056430ba7d88a80..9d6b64c887898e70c272b0c0d6cb2386351d898b 100644
+--- a/wpilibc/wpilibC++/include/WPILib.h
++++ b/wpilibc/wpilibC++/include/WPILib.h
+@@ -11,7 +11,8 @@
+ #include "Accelerometer.h"
+ #include "ADXL345_I2C.h"
+ #include "ADXL345_SPI.h"
+-#include "AnalogChannel.h"
++#include "AnalogInput.h"
++#include "AnalogOutput.h"
+ #include "AnalogModule.h"
+ #include "AnalogTrigger.h"
+ #include "AnalogTriggerOutput.h"
+@@ -85,4 +86,3 @@
+ #include "Victor.h"
+ // XXX: #include "Vision/AxisCamera.h"
+ #include "WPIErrors.h"
+-
+diff --git a/wpilibc/wpilibC++/lib/Accelerometer.cpp b/wpilibc/wpilibC++/lib/Accelerometer.cpp
+index 2ad1affbcd9fa7f85b8831d2635df4c5c82b04cc..799ca43a337a445980324cd3643c6bfc32ff6cbe 100644
+--- a/wpilibc/wpilibC++/lib/Accelerometer.cpp
++++ b/wpilibc/wpilibC++/lib/Accelerometer.cpp
+@@ -18,8 +18,8 @@ void Accelerometer::InitAccelerometer()
+ 	m_table = NULL;
+ 	m_voltsPerG = 1.0;
+ 	m_zeroGVoltage = 2.5;
+-	HALReport(HALUsageReporting::kResourceType_Accelerometer, m_analogChannel->GetChannel(), m_analogChannel->GetModuleNumber() - 1);
+-	LiveWindow::GetInstance()->AddSensor("Accelerometer", m_analogChannel->GetModuleNumber(), m_analogChannel->GetChannel(), this);
++	HALReport(HALUsageReporting::kResourceType_Accelerometer, m_AnalogInput->GetChannel(), m_AnalogInput->GetModuleNumber() - 1);
++	LiveWindow::GetInstance()->AddSensor("Accelerometer", m_AnalogInput->GetModuleNumber(), m_AnalogInput->GetChannel(), this);
+ }
+ 
+ /**
+@@ -30,7 +30,7 @@ void Accelerometer::InitAccelerometer()
+  */
+ Accelerometer::Accelerometer(uint32_t channel)
+ {
+-	m_analogChannel = new AnalogChannel(channel);
++	m_AnalogInput = new AnalogInput(channel);
+ 	m_allocatedChannel = true;
+ 	InitAccelerometer();
+ }
+@@ -46,18 +46,18 @@ Accelerometer::Accelerometer(uint32_t channel)
+  */
+ Accelerometer::Accelerometer(uint8_t moduleNumber, uint32_t channel)
+ {
+-	m_analogChannel = new AnalogChannel(moduleNumber, channel);
++	m_AnalogInput = new AnalogInput(moduleNumber, channel);
+ 	m_allocatedChannel = true;
+ 	InitAccelerometer();
+ }
+ 
+ /**
+- * Create a new instance of Accelerometer from an existing AnalogChannel.
+- * Make a new instance of accelerometer given an AnalogChannel. This is particularly
++ * Create a new instance of Accelerometer from an existing AnalogInput.
++ * Make a new instance of accelerometer given an AnalogInput. This is particularly
+  * useful if the port is going to be read as an analog channel as well as through
+  * the Accelerometer class.
+  */
+-Accelerometer::Accelerometer(AnalogChannel *channel)
++Accelerometer::Accelerometer(AnalogInput *channel)
+ {
+ 	if (channel == NULL)
+ 	{
+@@ -65,7 +65,7 @@ Accelerometer::Accelerometer(AnalogChannel *channel)
+ 	}
+ 	else
+ 	{
+-		m_analogChannel = channel;
++		m_AnalogInput = channel;
+ 		InitAccelerometer();
+ 	}
+ 	m_allocatedChannel = false;
+@@ -78,7 +78,7 @@ Accelerometer::~Accelerometer()
+ {
+ 	if (m_allocatedChannel)
+ 	{
+-		delete m_analogChannel;
++		delete m_AnalogInput;
+ 	}
+ }
+ 
+@@ -91,7 +91,7 @@ Accelerometer::~Accelerometer()
+  */
+ float Accelerometer::GetAcceleration()
+ {
+-	return (m_analogChannel->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
++	return (m_AnalogInput->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
+ }
+ 
+ /**
+diff --git a/wpilibc/wpilibC++/lib/AnalogChannel.cpp b/wpilibc/wpilibC++/lib/AnalogInput.cpp
+similarity index 80%
+rename from wpilibc/wpilibC++/lib/AnalogChannel.cpp
+rename to wpilibc/wpilibC++/lib/AnalogInput.cpp
+index 5d6355fb16153528929efe9263f22b515407116e..584847136e5a26e4ae493b06674f0048b927acce 100644
+--- a/wpilibc/wpilibC++/lib/AnalogChannel.cpp
++++ b/wpilibc/wpilibC++/lib/AnalogInput.cpp
+@@ -1,30 +1,30 @@
+ /*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
++/* Copyright (c) FIRST 2008. All Rights Reserved.							                */
+ /* Open Source Software - may be modified and shared by FRC teams. The code   */
+ /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+ /*----------------------------------------------------------------------------*/
+ 
+-#include "AnalogChannel.h"
++#include "AnalogInput.h"
+ #include "AnalogModule.h"
+ //#include "NetworkCommunication/UsageReporting.h"
+ #include "Resource.h"
+ #include "WPIErrors.h"
+ #include "LiveWindow/LiveWindow.h"
+ 
+-static Resource *channels = NULL;
++static Resource *inputs = NULL;
+ 
+-const uint8_t AnalogChannel::kAccumulatorModuleNumber;
+-const uint32_t AnalogChannel::kAccumulatorNumChannels;
+-const uint32_t AnalogChannel::kAccumulatorChannels[] = {0, 1};
++const uint8_t AnalogInput::kAccumulatorModuleNumber;
++const uint32_t AnalogInput::kAccumulatorNumChannels;
++const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
+ 
+ /**
+  * Common initialization.
+  */
+-void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
++void AnalogInput::InitAnalogInput(uint8_t moduleNumber, uint32_t channel)
+ {
+ 	m_table = NULL;
+ 	char buf[64];
+-	Resource::CreateResourceObject(&channels, kAnalogModules * kAnalogChannels);
++	Resource::CreateResourceObject(&inputs, kAnalogModules * kAnalogInputs);
+ 	if (!checkAnalogModule(moduleNumber))
+ 	{
+ 		snprintf(buf, 64, "Analog Module %d", moduleNumber);
+@@ -33,63 +33,63 @@ void AnalogChannel::InitChannel(uint8_t moduleNumber, uint32_t channel)
+ 	}
+ 	if (!checkAnalogInputChannel(channel))
+ 	{
+-		snprintf(buf, 64, "Analog Channel %d", channel);
++		snprintf(buf, 64, "analog input %d", channel);
+ 		wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+ 		return;
+ 	}
+ 
+ 	snprintf(buf, 64, "Analog Input %d (Module: %d)", channel, moduleNumber);
+-	if (channels->Allocate((moduleNumber - 1) * kAnalogChannels + channel, buf) == ~0ul)
++	if (inputs->Allocate((moduleNumber - 1) * kAnalogInputs + channel, buf) == ~0ul)
+ 	{
+-		CloneError(channels);
++		CloneError(inputs);
+ 		return;
+ 	}
+ 	m_channel = channel;
+ 	m_module = moduleNumber;
+-	
++
+ 	void* port = getPortWithModule(moduleNumber, channel);
+ 	int32_t status = 0;
+ 	m_port = initializeAnalogInputPort(port, &status);
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
+ 
+-	LiveWindow::GetInstance()->AddSensor("AnalogChannel",channel, GetModuleNumber(), this);
++	LiveWindow::GetInstance()->AddSensor("AnalogInput",channel, GetModuleNumber(), this);
+ 	HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel, GetModuleNumber() - 1);
+ }
+ 
+ /**
+- * Construct an analog channel on a specified module.
+- * 
++ * Construct an analog input on a specified module.
++ *
+  * @param moduleNumber The analog module (1 or 2).
+  * @param channel The channel number to represent.
+  */
+-AnalogChannel::AnalogChannel(uint8_t moduleNumber, uint32_t channel)
++AnalogInput::AnalogInput(uint8_t moduleNumber, uint32_t channel)
+ {
+-	InitChannel(moduleNumber, channel);
++	InitAnalogInput(moduleNumber, channel);
+ }
+ 
+ /**
+- * Construct an analog channel on the default module.
+- * 
++ * Construct an analog input on the default module.
++ *
+  * @param channel The channel number to represent.
+  */
+-AnalogChannel::AnalogChannel(uint32_t channel)
++AnalogInput::AnalogInput(uint32_t channel)
+ {
+-	InitChannel(GetDefaultAnalogModule(), channel);
++	InitAnalogInput(GetDefaultAnalogModule(), channel);
+ }
+ 
+ /**
+  * Channel destructor.
+  */
+-AnalogChannel::~AnalogChannel()
++AnalogInput::~AnalogInput()
+ {
+-	channels->Free((m_module - 1) * kAnalogChannels + m_channel);
++	inputs->Free((m_module - 1) * kAnalogInputs + m_channel);
+ }
+ 
+ /**
+  * Get the analog module that this channel is on.
+  * @return A pointer to the AnalogModule that this channel is on.
+  */
+-AnalogModule *AnalogChannel::GetModule()
++AnalogModule *AnalogInput::GetModule()
+ {
+ 	if (StatusIsFatal()) return NULL;
+ 	return AnalogModule::GetInstance(m_module);
+@@ -101,7 +101,7 @@ AnalogModule *AnalogChannel::GetModule()
+  * The units are in A/D converter codes.  Use GetVoltage() to get the analog value in calibrated units.
+  * @return A sample straight from this channel on the module.
+  */
+-int16_t AnalogChannel::GetValue()
++int16_t AnalogInput::GetValue()
+ {
+ 	if (StatusIsFatal()) return 0;
+ 	int32_t status = 0;
+@@ -119,7 +119,7 @@ int16_t AnalogChannel::GetValue()
+  * Use GetAverageVoltage() to get the analog value in calibrated units.
+  * @return A sample from the oversample and average engine for this channel.
+  */
+-int32_t AnalogChannel::GetAverageValue()
++int32_t AnalogInput::GetAverageValue()
+ {
+ 	if (StatusIsFatal()) return 0;
+ 	int32_t status = 0;
+@@ -133,7 +133,7 @@ int32_t AnalogChannel::GetAverageValue()
+  * The value is scaled to units of Volts using the calibrated scaling data from GetLSBWeight() and GetOffset().
+  * @return A scaled sample straight from this channel on the module.
+  */
+-float AnalogChannel::GetVoltage()
++float AnalogInput::GetVoltage()
+ {
+ 	if (StatusIsFatal()) return 0.0f;
+ 	int32_t status = 0;
+@@ -149,7 +149,7 @@ float AnalogChannel::GetVoltage()
+  * Using averaging will cause this value to be more stable, but it will update more slowly.
+  * @return A scaled sample from the output of the oversample and average engine for this channel.
+  */
+-float AnalogChannel::GetAverageVoltage()
++float AnalogInput::GetAverageVoltage()
+ {
+ 	if (StatusIsFatal()) return 0.0f;
+ 	int32_t status = 0;
+@@ -162,12 +162,12 @@ float AnalogChannel::GetAverageVoltage()
+  * Get the factory scaling least significant bit weight constant.
+  * The least significant bit weight constant for the channel that was calibrated in
+  * manufacturing and stored in an eeprom in the module.
+- * 
++ *
+  * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
+- * 
++ *
+  * @return Least significant bit weight.
+  */
+-uint32_t AnalogChannel::GetLSBWeight()
++uint32_t AnalogInput::GetLSBWeight()
+ {
+ 	if (StatusIsFatal()) return 0;
+ 	int32_t status = 0;
+@@ -180,12 +180,12 @@ uint32_t AnalogChannel::GetLSBWeight()
+  * Get the factory scaling offset constant.
+  * The offset constant for the channel that was calibrated in manufacturing and stored
+  * in an eeprom in the module.
+- * 
++ *
+  * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
+- * 
++ *
+  * @return Offset constant.
+  */
+-int32_t AnalogChannel::GetOffset()
++int32_t AnalogInput::GetOffset()
+ {
+ 	if (StatusIsFatal()) return 0;
+ 	int32_t status = 0;
+@@ -198,7 +198,7 @@ int32_t AnalogChannel::GetOffset()
+  * Get the channel number.
+  * @return The channel number.
+  */
+-uint32_t AnalogChannel::GetChannel()
++uint32_t AnalogInput::GetChannel()
+ {
+ 	if (StatusIsFatal()) return 0;
+ 	return m_channel;
+@@ -208,7 +208,7 @@ uint32_t AnalogChannel::GetChannel()
+  * Get the module number.
+  * @return The module number.
+  */
+-uint8_t AnalogChannel::GetModuleNumber()
++uint8_t AnalogInput::GetModuleNumber()
+ {
+ 	if (StatusIsFatal()) return 0;
+ 	return m_module;
+@@ -219,10 +219,10 @@ uint8_t AnalogChannel::GetModuleNumber()
+  * This sets the number of averaging bits. The actual number of averaged samples is 2**bits.
+  * Use averaging to improve the stability of your measurement at the expense of sampling rate.
+  * The averaging is done automatically in the FPGA.
+- * 
++ *
+  * @param bits Number of bits of averaging.
+  */
+-void AnalogChannel::SetAverageBits(uint32_t bits)
++void AnalogInput::SetAverageBits(uint32_t bits)
+ {
+ 	if (StatusIsFatal()) return;
+ 	int32_t status = 0;
+@@ -234,10 +234,10 @@ void AnalogChannel::SetAverageBits(uint32_t bits)
+  * Get the number of averaging bits previously configured.
+  * This gets the number of averaging bits from the FPGA. The actual number of averaged samples is 2**bits.
+  * The averaging is done automatically in the FPGA.
+- * 
++ *
+  * @return Number of bits of averaging previously configured.
+  */
+-uint32_t AnalogChannel::GetAverageBits()
++uint32_t AnalogInput::GetAverageBits()
+ {
+ 	int32_t status = 0;
+ 	int32_t averageBits = getAnalogAverageBits(m_port, &status);
+@@ -250,10 +250,10 @@ uint32_t AnalogChannel::GetAverageBits()
+  * This sets the number of oversample bits. The actual number of oversampled values is 2**bits.
+  * Use oversampling to improve the resolution of your measurements at the expense of sampling rate.
+  * The oversampling is done automatically in the FPGA.
+- * 
++ *
+  * @param bits Number of bits of oversampling.
+  */
+-void AnalogChannel::SetOversampleBits(uint32_t bits)
++void AnalogInput::SetOversampleBits(uint32_t bits)
+ {
+ 	if (StatusIsFatal()) return;
+ 	int32_t status = 0;
+@@ -265,10 +265,10 @@ void AnalogChannel::SetOversampleBits(uint32_t bits)
+  * Get the number of oversample bits previously configured.
+  * This gets the number of oversample bits from the FPGA. The actual number of oversampled values is
+  * 2**bits. The oversampling is done automatically in the FPGA.
+- * 
++ *
+  * @return Number of bits of oversampling previously configured.
+  */
+-uint32_t AnalogChannel::GetOversampleBits()
++uint32_t AnalogInput::GetOversampleBits()
+ {
+ 	if (StatusIsFatal()) return 0;
+ 	int32_t status = 0;
+@@ -279,10 +279,10 @@ uint32_t AnalogChannel::GetOversampleBits()
+ 
+ /**
+  * Is the channel attached to an accumulator.
+- * 
+- * @return The analog channel is attached to an accumulator.
++ *
++ * @return The analog input is attached to an accumulator.
+  */
+-bool AnalogChannel::IsAccumulatorChannel()
++bool AnalogInput::IsAccumulatorChannel()
+ {
+ 	if (StatusIsFatal()) return false;
+ 	int32_t status = 0;
+@@ -294,7 +294,7 @@ bool AnalogChannel::IsAccumulatorChannel()
+ /**
+  * Initialize the accumulator.
+  */
+-void AnalogChannel::InitAccumulator()
++void AnalogInput::InitAccumulator()
+ {
+ 	if (StatusIsFatal()) return;
+ 	m_accumulatorOffset = 0;
+@@ -306,11 +306,11 @@ void AnalogChannel::InitAccumulator()
+ 
+ /**
+  * Set an inital value for the accumulator.
+- * 
++ *
+  * This will be added to all values returned to the user.
+  * @param initialValue The value that the accumulator should start from when reset.
+  */
+-void AnalogChannel::SetAccumulatorInitialValue(int64_t initialValue)
++void AnalogInput::SetAccumulatorInitialValue(int64_t initialValue)
+ {
+ 	if (StatusIsFatal()) return;
+ 	m_accumulatorOffset = initialValue;
+@@ -319,7 +319,7 @@ void AnalogChannel::SetAccumulatorInitialValue(int64_t initialValue)
+ /**
+  * Resets the accumulator to the initial value.
+  */
+-void AnalogChannel::ResetAccumulator()
++void AnalogInput::ResetAccumulator()
+ {
+ 	if (StatusIsFatal()) return;
+ 	int32_t status = 0;
+@@ -329,15 +329,15 @@ void AnalogChannel::ResetAccumulator()
+ 
+ /**
+  * Set the center value of the accumulator.
+- * 
++ *
+  * The center value is subtracted from each A/D value before it is added to the accumulator. This
+  * is used for the center value of devices like gyros and accelerometers to make integration work
+  * and to take the device offset into account when integrating.
+- * 
++ *
+  * This center value is based on the output of the oversampled and averaged source from channel 1.
+  * Because of this, any non-zero oversample bits will affect the size of the value for this field.
+  */
+-void AnalogChannel::SetAccumulatorCenter(int32_t center)
++void AnalogInput::SetAccumulatorCenter(int32_t center)
+ {
+ 	if (StatusIsFatal()) return;
+ 	int32_t status = 0;
+@@ -348,7 +348,7 @@ void AnalogChannel::SetAccumulatorCenter(int32_t center)
+ /**
+  * Set the accumulator's deadband.
+  */
+-void AnalogChannel::SetAccumulatorDeadband(int32_t deadband)
++void AnalogInput::SetAccumulatorDeadband(int32_t deadband)
+ {
+ 	if (StatusIsFatal()) return;
+ 	int32_t status = 0;
+@@ -358,13 +358,13 @@ void AnalogChannel::SetAccumulatorDeadband(int32_t deadband)
+ 
+ /**
+  * Read the accumulated value.
+- * 
++ *
+  * Read the value that has been accumulating on channel 1.
+  * The accumulator is attached after the oversample and average engine.
+- * 
++ *
+  * @return The 64-bit value accumulated since the last Reset().
+  */
+-int64_t AnalogChannel::GetAccumulatorValue()
++int64_t AnalogInput::GetAccumulatorValue()
+ {
+ 	if (StatusIsFatal()) return 0;
+ 	int32_t status = 0;
+@@ -375,12 +375,12 @@ int64_t AnalogChannel::GetAccumulatorValue()
+ 
+ /**
+  * Read the number of accumulated values.
+- * 
++ *
+  * Read the count of the accumulated values since the accumulator was last Reset().
+- * 
++ *
+  * @return The number of times samples from the channel were accumulated.
+  */
+-uint32_t AnalogChannel::GetAccumulatorCount()
++uint32_t AnalogInput::GetAccumulatorCount()
+ {
+ 	if (StatusIsFatal()) return 0;
+ 	int32_t status = 0;
+@@ -392,14 +392,14 @@ uint32_t AnalogChannel::GetAccumulatorCount()
+ 
+ /**
+  * Read the accumulated value and the number of accumulated values atomically.
+- * 
++ *
+  * This function reads the value and count from the FPGA atomically.
+  * This can be used for averaging.
+- * 
++ *
+  * @param value Pointer to the 64-bit accumulated output.
+  * @param count Pointer to the number of accumulation cycles.
+  */
+-void AnalogChannel::GetAccumulatorOutput(int64_t *value, uint32_t *count)
++void AnalogInput::GetAccumulatorOutput(int64_t *value, uint32_t *count)
+ {
+ 	if (StatusIsFatal()) return;
+ 	int32_t status = 0;
+@@ -410,40 +410,38 @@ void AnalogChannel::GetAccumulatorOutput(int64_t *value, uint32_t *count)
+ 
+ /**
+  * Get the Average value for the PID Source base object.
+- * 
++ *
+  * @return The average voltage.
+  */
+-double AnalogChannel::PIDGet() 
++double AnalogInput::PIDGet()
+ {
+ 	if (StatusIsFatal()) return 0.0;
+ 	return GetAverageValue();
+ }
+ 
+-void AnalogChannel::UpdateTable() {
++void AnalogInput::UpdateTable() {
+ 	if (m_table != NULL) {
+ 		m_table->PutNumber("Value", GetAverageVoltage());
+ 	}
+ }
+ 
+-void AnalogChannel::StartLiveWindowMode() {
+-	
++void AnalogInput::StartLiveWindowMode() {
++
+ }
+ 
+-void AnalogChannel::StopLiveWindowMode() {
+-	
++void AnalogInput::StopLiveWindowMode() {
++
+ }
+ 
+-std::string AnalogChannel::GetSmartDashboardType() {
++std::string AnalogInput::GetSmartDashboardType() {
+ 	return "Analog Input";
+ }
+ 
+-void AnalogChannel::InitTable(ITable *subTable) {
++void AnalogInput::InitTable(ITable *subTable) {
+ 	m_table = subTable;
+ 	UpdateTable();
+ }
+ 
+-ITable * AnalogChannel::GetTable() {
++ITable * AnalogInput::GetTable() {
+ 	return m_table;
+ }
+-
+-
+diff --git a/wpilibc/wpilibC++/lib/AnalogModule.cpp b/wpilibc/wpilibC++/lib/AnalogModule.cpp
+index 80ceeb47bed8d2d16d031096a46adbe7c09b5345..cd26c3a1a65069e2ac397253a3e212eaac0126a8 100644
+--- a/wpilibc/wpilibC++/lib/AnalogModule.cpp
++++ b/wpilibc/wpilibC++/lib/AnalogModule.cpp
+@@ -53,7 +53,7 @@ AnalogModule::AnalogModule(uint8_t moduleNumber)
+ 	, m_moduleNumber(moduleNumber)
+ 	, m_ports()
+ {
+-	for (uint32_t i = 0; i < kAnalogChannels; i++)
++	for (uint32_t i = 0; i < kAnalogInputs; i++)
+ 	{
+ 	  void* port = getPortWithModule(moduleNumber, i);
+ 	  int32_t status = 0;
+diff --git a/wpilibc/wpilibC++/lib/AnalogOutput.cpp b/wpilibc/wpilibC++/lib/AnalogOutput.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..b5ec5fd9cbb81c1208c86338f989a6a36ea41c14
+--- /dev/null
++++ b/wpilibc/wpilibC++/lib/AnalogOutput.cpp
+@@ -0,0 +1,106 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "AnalogOutput.h"
++#include "Resource.h"
++#include "WPIErrors.h"
++#include "LiveWindow/LiveWindow.h"
++
++static Resource *outputs = NULL;
++
++void AnalogOutput::InitAnalogOutput(uint32_t channel) {
++    m_table = NULL;
++
++    Resource::CreateResourceObject(&outputs, kAnalogOutputs);
++
++    char buf[64];
++
++    if(!checkAnalogOutputChannel(channel))
++    {
++        snprintf(buf, 64, "analog input %d", channel);
++        wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
++        return;
++    }
++
++    if(outputs->Allocate(channel, buf) == ~0ul)
++    {
++        CloneError(outputs);
++        return;
++    }
++
++    m_channel = channel;
++
++    void* port = getPort(m_channel);
++    int32_t status = 0;
++    m_port = initializeAnalogOutputPort(port, &status);
++    wpi_setErrorWithContext(status, getHALErrorMessage(status));
++
++    LiveWindow::GetInstance()->AddActuator("AnalogOutput", m_channel, 1, this);
++    HALReport(HALUsageReporting::kResourceType_AnalogChannel, m_channel, 0);
++}
++
++/**
++ * Construct an anlog output on the given channel
++ */
++AnalogOutput::AnalogOutput(uint32_t channel) {
++    InitAnalogOutput(channel);
++}
++
++AnalogOutput::~AnalogOutput() {
++    outputs->Free(m_channel);
++}
++
++/**
++ * Set the value of the analog output
++ *
++ * @param voltage The output value in Volts, from 0.0 to +5.0
++ */
++void AnalogOutput::SetVoltage(float voltage) {
++    int32_t status = 0;
++    setAnalogOutput(m_port, voltage, &status);
++
++    wpi_setErrorWithContext(status, getHALErrorMessage(status));
++}
++
++/**
++ * Get the voltage of the analog output
++ *
++ * @return The value in Volts, from 0.0 to +5.0
++ */
++float AnalogOutput::GetVoltage() {
++    int32_t status = 0;
++    float voltage = getAnalogOutput(m_port, &status);
++
++    wpi_setErrorWithContext(status, getHALErrorMessage(status));
++
++    return voltage;
++}
++
++void AnalogOutput::UpdateTable() {
++    if (m_table != NULL) {
++        m_table->PutNumber("Value", GetVoltage());
++    }
++}
++
++void AnalogOutput::StartLiveWindowMode() {
++}
++
++void AnalogOutput::StopLiveWindowMode() {
++}
++
++std::string AnalogOutput::GetSmartDashboardType() {
++    return "Analog Output";
++}
++
++void AnalogOutput::InitTable(ITable *subTable) {
++    m_table = subTable;
++    UpdateTable();
++}
++
++ITable *AnalogOutput::GetTable() {
++    return m_table;
++}
+diff --git a/wpilibc/wpilibC++/lib/AnalogTrigger.cpp b/wpilibc/wpilibC++/lib/AnalogTrigger.cpp
+index 86034d93d275edaf06141d30af9feb9153908d7d..d2c161f1e2f5153a6b06ef6a025c294d86adf9c6 100644
+--- a/wpilibc/wpilibC++/lib/AnalogTrigger.cpp
++++ b/wpilibc/wpilibC++/lib/AnalogTrigger.cpp
+@@ -6,7 +6,7 @@
+ 
+ #include "AnalogTrigger.h"
+ 
+-#include "AnalogChannel.h"
++#include "AnalogInput.h"
+ #include "AnalogModule.h"
+ //#include "NetworkCommunication/UsageReporting.h"
+ #include "Resource.h"
+@@ -55,7 +55,7 @@ AnalogTrigger::AnalogTrigger(uint8_t moduleNumber, uint32_t channel)
+  * This should be used in the case of sharing an analog channel between the trigger
+  * and an analog input object.
+  */
+-AnalogTrigger::AnalogTrigger(AnalogChannel *channel)
++AnalogTrigger::AnalogTrigger(AnalogInput *channel)
+ {
+ 	InitTrigger(channel->GetModuleNumber(), channel->GetChannel());
+ }
+diff --git a/wpilibc/wpilibC++/lib/DriverStation.cpp b/wpilibc/wpilibC++/lib/DriverStation.cpp
+index f70d55d18b9b35b453967c6b059eac25f434561e..80f151b87deea77e71dab57d4cff5855808c03b9 100644
+--- a/wpilibc/wpilibC++/lib/DriverStation.cpp
++++ b/wpilibc/wpilibC++/lib/DriverStation.cpp
+@@ -5,7 +5,7 @@
+ /*----------------------------------------------------------------------------*/
+ 
+ #include "DriverStation.h"
+-#include "AnalogChannel.h"
++#include "AnalogInput.h"
+ #include "HAL/cpp/Synchronized.hpp"
+ #include "Timer.h"
+ //#include "NetworkCommunication/FRCComm.h"
+@@ -93,7 +93,7 @@ DriverStation::DriverStation()
+ 	m_controlData->analog4 = 0;
+ 	m_controlData->dsDigitalIn = 0;
+ 
+-	m_batteryChannel = new AnalogChannel(kBatteryModuleNumber, kBatteryChannel);
++	m_batteryChannel = new AnalogInput(kBatteryModuleNumber, kBatteryChannel);
+ 
+ 	AddToSingletonList();
+ 
+@@ -208,7 +208,7 @@ void DriverStation::SetData()
+ }
+ 
+ /**
+- * Read the battery voltage from the specified AnalogChannel.
++ * Read the battery voltage from the specified AnalogInput.
+  * 
+  * This accessor assumes that the battery voltage is being measured
+  * through the voltage divider on an analog breakout.
+diff --git a/wpilibc/wpilibC++/lib/Gyro.cpp b/wpilibc/wpilibC++/lib/Gyro.cpp
+index dd6d219726954f85280e087d430d92c2e385abbf..d4a1428767b6b0ce681b36eb78cb57cb4130df47 100644
+--- a/wpilibc/wpilibC++/lib/Gyro.cpp
++++ b/wpilibc/wpilibC++/lib/Gyro.cpp
+@@ -5,7 +5,7 @@
+ /*----------------------------------------------------------------------------*/
+ 
+ #include "Gyro.h"
+-#include "AnalogChannel.h"
++#include "AnalogInput.h"
+ #include "AnalogModule.h"
+ //#include "NetworkCommunication/UsageReporting.h"
+ #include "Timer.h"
+@@ -78,7 +78,7 @@ void Gyro::InitGyro()
+  */
+ Gyro::Gyro(uint8_t moduleNumber, uint32_t channel)
+ {
+-	m_analog = new AnalogChannel(moduleNumber, channel);
++	m_analog = new AnalogInput(moduleNumber, channel);
+ 	m_channelAllocated = true;
+ 	InitGyro();
+ }
+@@ -92,7 +92,7 @@ Gyro::Gyro(uint8_t moduleNumber, uint32_t channel)
+  */
+ Gyro::Gyro(uint32_t channel)
+ {
+-	m_analog = new AnalogChannel(channel);
++	m_analog = new AnalogInput(channel);
+ 	m_channelAllocated = true;
+ 	InitGyro();
+ }
+@@ -100,10 +100,10 @@ Gyro::Gyro(uint32_t channel)
+ /**
+  * Gyro constructor with a precreated analog channel object.
+  * Use this constructor when the analog channel needs to be shared. There
+- * is no reference counting when an AnalogChannel is passed to the gyro.
+- * @param channel The AnalogChannel object that the gyro is connected to.
++ * is no reference counting when an AnalogInput is passed to the gyro.
++ * @param channel The AnalogInput object that the gyro is connected to.
+  */
+-Gyro::Gyro(AnalogChannel *channel)
++Gyro::Gyro(AnalogInput *channel)
+ {
+ 	m_analog = channel;
+ 	m_channelAllocated = false;
+@@ -117,7 +117,7 @@ Gyro::Gyro(AnalogChannel *channel)
+ 	}
+ }
+ 
+-Gyro::Gyro(AnalogChannel &channel)
++Gyro::Gyro(AnalogInput &channel)
+ {
+ 	m_analog = &channel;
+ 	m_channelAllocated = false;
+diff --git a/wpilibc/wpilibC++/lib/SensorBase.cpp b/wpilibc/wpilibC++/lib/SensorBase.cpp
+index ad22f1d87272c2bc9925625d48e93ff82a665551..2af63a99b7f2cc0126bfe146bf31a603f80f0e20 100644
+--- a/wpilibc/wpilibC++/lib/SensorBase.cpp
++++ b/wpilibc/wpilibC++/lib/SensorBase.cpp
+@@ -10,7 +10,7 @@
+ #include "WPIErrors.h"
+ 
+ const uint32_t SensorBase::kDigitalChannels;
+-const uint32_t SensorBase::kAnalogChannels;
++const uint32_t SensorBase::kAnalogInputs;
+ const uint32_t SensorBase::kAnalogModules;
+ const uint32_t SensorBase::kDigitalModules;
+ const uint32_t SensorBase::kSolenoidChannels;
+@@ -68,7 +68,7 @@ void SensorBase::DeleteSingletons()
+ 
+ /**
+  * Check that the analog module number is valid.
+- * 
++ *
+  * @return Analog module is valid and present
+  */
+ bool SensorBase::CheckAnalogModule(uint8_t moduleNumber)
+@@ -80,7 +80,7 @@ bool SensorBase::CheckAnalogModule(uint8_t moduleNumber)
+ 
+ /**
+  * Check that the digital module number is valid.
+- * 
++ *
+  * @return Digital module is valid and present
+  */
+ bool SensorBase::CheckDigitalModule(uint8_t moduleNumber)
+@@ -92,7 +92,7 @@ bool SensorBase::CheckDigitalModule(uint8_t moduleNumber)
+ 
+ /**
+  * Check that the digital module number is valid.
+- * 
++ *
+  * @return Digital module is valid and present
+  */
+ bool SensorBase::CheckPWMModule(uint8_t moduleNumber)
+@@ -102,7 +102,7 @@ bool SensorBase::CheckPWMModule(uint8_t moduleNumber)
+ 
+ /**
+  * Check that the digital module number is valid.
+- * 
++ *
+  * @return Digital module is valid and present
+  */
+ bool SensorBase::CheckRelayModule(uint8_t moduleNumber)
+@@ -112,7 +112,7 @@ bool SensorBase::CheckRelayModule(uint8_t moduleNumber)
+ 
+ /**
+  * Check that the solenoid module number is valid.
+- * 
++ *
+  * @return Solenoid module is valid and present
+  */
+ bool SensorBase::CheckSolenoidModule(uint8_t moduleNumber)
+@@ -126,12 +126,12 @@ bool SensorBase::CheckSolenoidModule(uint8_t moduleNumber)
+  * Check that the digital channel number is valid.
+  * Verify that the channel number is one of the legal channel numbers. Channel numbers are
+  * 1-based.
+- * 
++ *
+  * @return Digital channel is valid
+  */
+ bool SensorBase::CheckDigitalChannel(uint32_t channel)
+ {
+-	if (channel >= 0 && channel < kDigitalChannels)
++	if (channel < kDigitalChannels)
+ 		return true;
+ 	return false;
+ }
+@@ -140,12 +140,12 @@ bool SensorBase::CheckDigitalChannel(uint32_t channel)
+  * Check that the digital channel number is valid.
+  * Verify that the channel number is one of the legal channel numbers. Channel numbers are
+  * 1-based.
+- * 
++ *
+  * @return Relay channel is valid
+  */
+ bool SensorBase::CheckRelayChannel(uint32_t channel)
+ {
+-	if (channel >= 0 && channel < kRelayChannels)
++	if (channel < kRelayChannels)
+ 		return true;
+ 	return false;
+ }
+@@ -154,33 +154,47 @@ bool SensorBase::CheckRelayChannel(uint32_t channel)
+  * Check that the digital channel number is valid.
+  * Verify that the channel number is one of the legal channel numbers. Channel numbers are
+  * 1-based.
+- * 
++ *
+  * @return PWM channel is valid
+  */
+ bool SensorBase::CheckPWMChannel(uint32_t channel)
+ {
+-	if (channel >= 0 && channel < kPwmChannels)
++	if (channel < kPwmChannels)
+ 		return true;
+ 	return false;
+ }
+ 
+ /**
+- * Check that the analog channel number is value.
+- * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
+- * are 1-based.
+- * 
++ * Check that the analog input number is value.
++ * Verify that the analog input number is one of the legal channel numbers. Channel numbers
++ * are 0-based.
++ *
+  * @return Analog channel is valid
+  */
+-bool SensorBase::CheckAnalogChannel(uint32_t channel)
++bool SensorBase::CheckAnalogInput(uint32_t channel)
+ {
+-	if (channel >= 0 && channel < kAnalogChannels)
++	if (channel < kAnalogInputs)
+ 		return true;
+ 	return false;
+ }
+ 
++/**
++ * Check that the analog output number is value.
++ * Verify that the analog output number is one of the legal channel numbers. Channel numbers
++ * are 0-based.
++ *
++ * @return Analog channel is valid
++ */
++bool SensorBase::CheckAnalogOutput(uint32_t channel)
++{
++    if (channel < kAnalogOutputs)
++        return true;
++    return false;
++}
++
+ /**
+  * Verify that the solenoid channel number is within limits.
+- * 
++ *
+  * @return Solenoid channel is valid
+  */
+ bool SensorBase::CheckSolenoidChannel(uint32_t channel)
+@@ -192,7 +206,7 @@ bool SensorBase::CheckSolenoidChannel(uint32_t channel)
+ 
+ /**
+  * Verify that the power distribution channel number is within limits.
+- * 
++ *
+  * @return Solenoid channel is valid
+  */
+ bool SensorBase::CheckPDPChannel(uint32_t channel)
+@@ -201,4 +215,3 @@ bool SensorBase::CheckPDPChannel(uint32_t channel)
+ 		return true;
+ 	return false;
+ }
+-
+diff --git a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+index defd80e31ba4f879b8ddefa020f13d5e334f3d48..d977d355feb1617047c2832f1c9e841abfa2f793 100644
+--- a/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
++++ b/wpilibc/wpilibC++IntegrationTests/include/TestBench.h
+@@ -11,9 +11,13 @@
+ 
+ class TestBench {
+ public:
+-	/* Analog channels */
++	/* Analog input channels */
+ 	static const uint32_t kCameraGyroChannel = 0;
+ 	static const uint32_t kFakeCompressorChannel = 1;
++	static const uint32_t kFakeAnalogOutputChannel = 2;
++
++	/* Analog output channels */
++	static const uint32_t kAnalogOutputChannel = 0;
+ 
+ 	/* DIO channels */
+ 	static const uint32_t kTalonEncoderChannelA = 0;
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/AnalogLoopTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/AnalogLoopTest.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..ed297ec4ff217f687a9bfc364debb7f8dbcae46e
+--- /dev/null
++++ b/wpilibc/wpilibC++IntegrationTests/src/AnalogLoopTest.cpp
+@@ -0,0 +1,52 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++#include "WPILib.h"
++#include "gtest/gtest.h"
++#include "TestBench.h"
++
++static const double kDelayTime = 0.05;
++
++/**
++ * A fixture with an analog input and an analog output wired together
++ */
++class AnalogLoopTest : public testing::Test {
++protected:
++    AnalogInput *m_input;
++    AnalogOutput *m_output;
++
++    virtual void SetUp() {
++        m_input = new AnalogInput(TestBench::kFakeAnalogOutputChannel);
++        m_output = new AnalogOutput(TestBench::kAnalogOutputChannel);
++    }
++
++    virtual void TearDown() {
++        delete m_input;
++        delete m_output;
++    }
++
++    void Reset() {
++        m_output->SetVoltage(0.0f);
++    }
++};
++
++/**
++ * Test analog inputs and outputs by setting one and making sure the other
++ * matches.
++ */
++TEST_F(AnalogLoopTest, Loop) {
++    Reset();
++
++    // Set the output voltage and check if the input measures the same voltage
++    for(int i = 0; i < 50; i++) {
++        m_output->SetVoltage(i / 10.0f);
++
++        Wait(kDelayTime);
++
++        EXPECT_NEAR(m_output->GetVoltage(), m_input->GetVoltage(), 0.01f);
++    }
++}
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
+index ddc86f60fa0a9323715a95a8d387c4c8718bc828..e61450735a43865590a8b376999d4b5d710239d5 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
+@@ -26,7 +26,7 @@ protected:
+   Compressor *m_compressor;
+ 
+   DigitalOutput *m_fakePressureSwitch;
+-  AnalogChannel *m_fakeCompressor;
++  AnalogInput *m_fakeCompressor;
+ 
+   Solenoid *m_solenoid1, *m_solenoid2;
+   DigitalInput *m_fakeSolenoid1, *m_fakeSolenoid2;
+@@ -35,7 +35,7 @@ protected:
+     m_compressor = new Compressor();
+ 
+     m_fakePressureSwitch = new DigitalOutput(TestBench::kFakePressureSwitchChannel);
+-    m_fakeCompressor = new AnalogChannel(TestBench::kFakeCompressorChannel);
++    m_fakeCompressor = new AnalogInput(TestBench::kFakeCompressorChannel);
+ 
+     m_solenoid1 = new Solenoid(1);
+     m_solenoid2 = new Solenoid(2);
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Accelerometer.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Accelerometer.java
+index cbe5b27e78f194fc03c400a8c448d66e8a4db8d2..39a5afb9638d365a779810302b091f1fd213d0c3 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Accelerometer.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Accelerometer.java
+@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
+  */
+ public class Accelerometer extends SensorBase implements PIDSource, ISensor, LiveWindowSendable {
+ 
+-    private AnalogChannel m_analogChannel;
++    private AnalogInput m_analogChannel;
+     private double m_voltsPerG = 1.0;
+     private double m_zeroGVoltage = 2.5;
+     private boolean m_allocatedChannel;
+@@ -45,7 +45,7 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
+      */
+     public Accelerometer(final int channel) {
+         m_allocatedChannel = true;
+-        m_analogChannel = new AnalogChannel(channel);
++        m_analogChannel = new AnalogInput(channel);
+         initAccelerometer();
+     }
+ 
+@@ -59,7 +59,7 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
+      */
+     public Accelerometer(final int slot, final int channel) {
+         m_allocatedChannel = true;
+-        m_analogChannel = new AnalogChannel(slot, channel);
++        m_analogChannel = new AnalogInput(slot, channel);
+         initAccelerometer();
+     }
+ 
+@@ -70,7 +70,7 @@ public class Accelerometer extends SensorBase implements PIDSource, ISensor, Liv
+      * the Accelerometer class.
+      * @param channel an already initialized analog channel
+      */
+-    public Accelerometer(AnalogChannel channel) {
++    public Accelerometer(AnalogInput channel) {
+         m_allocatedChannel = false;
+         if (channel == null)
+             throw new NullPointerException("Analog Channel given was null");
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+similarity index 95%
+rename from wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java
+rename to wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+index 9eef10ddc0ca3f08180e477c8fbbd6a992ffb246..e1515cbc980bae4fde4f3c5957eba104912e547d 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+@@ -26,10 +26,10 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+ 
+ /**
+  * Analog channel class.
+- * 
++ *
+  * Each analog channel is read from hardware as a 12-bit number representing
+  * -10V to 10V.
+- * 
++ *
+  * Connected to each analog channel is an averaging and oversampling engine.
+  * This engine accumulates the specified ( by setAverageBits() and
+  * setOversampleBits() ) number of samples before returning a new value. This is
+@@ -39,12 +39,12 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+  * are divided by the number of samples to retain the resolution, but get more
+  * stable values.
+  */
+-public class AnalogChannel extends SensorBase implements PIDSource,
++public class AnalogInput extends SensorBase implements PIDSource,
+ 		LiveWindowSendable {
+ 
+ 	private static final int kAccumulatorSlot = 1;
+ 	private static Resource channels = new Resource(kAnalogModules
+-			* kAnalogChannels);
++			* kAnalogInputChannels);
+ 	private ByteBuffer m_port;
+ 	private int m_moduleNumber, m_channel;
+ 	private static final int[] kAccumulatorChannels = { 0, 1 };
+@@ -52,39 +52,39 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 
+ 	/**
+ 	 * Construct an analog channel on the default module.
+-	 * 
++	 *
+ 	 * @param channel
+ 	 *            The channel number to represent.
+ 	 */
+-	public AnalogChannel(final int channel) {
++	public AnalogInput(final int channel) {
+ 		this(getDefaultAnalogModule(), channel);
+ 	}
+ 
+ 	/**
+ 	 * Construct an analog channel on a specified module.
+-	 * 
++	 *
+ 	 * @param moduleNumber
+ 	 *            The digital module to use (1 or 2).
+ 	 * @param channel
+ 	 *            The channel number to represent.
+ 	 */
+-	public AnalogChannel(final int moduleNumber, final int channel) {
++	public AnalogInput(final int moduleNumber, final int channel) {
+ 		m_channel = channel;
+ 		m_moduleNumber = moduleNumber;
+ 		if (AnalogJNI.checkAnalogModule((byte)moduleNumber) == 0) {
+-			throw new AllocationException("Analog channel " + m_channel
++			throw new AllocationException("Analog input channel " + m_channel
+ 					+ " on module " + m_moduleNumber
+ 					+ " cannot be allocated. Module is not present.");
+ 		}
+ 		if (AnalogJNI.checkAnalogInputChannel(channel) == 0) {
+-			throw new AllocationException("Analog channel " + m_channel
++			throw new AllocationException("Analog input channel " + m_channel
+ 					+ " on module " + m_moduleNumber
+ 					+ " cannot be allocated. Channel is not present.");
+ 		}
+ 		try {
+-			channels.allocate((moduleNumber - 1) * kAnalogChannels + channel);
++			channels.allocate((moduleNumber - 1) * kAnalogInputChannels + channel);
+ 		} catch (CheckedAllocationException e) {
+-			throw new AllocationException("Analog channel " + m_channel
++			throw new AllocationException("Analog input channel " + m_channel
+ 					+ " on module " + m_moduleNumber + " is already allocated");
+ 		}
+ 
+@@ -97,7 +97,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 		m_port = AnalogJNI.initializeAnalogInputPort(port_pointer, status.asIntBuffer());
+ 		HALUtil.checkStatus(status.asIntBuffer());
+ 
+-		LiveWindow.addSensor("Analog", moduleNumber, channel, this);
++		LiveWindow.addSensor("AnalogInput", moduleNumber, channel, this);
+ 		UsageReporting.report(tResourceType.kResourceType_AnalogChannel,
+ 				channel, moduleNumber - 1);
+ 	}
+@@ -106,7 +106,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * Channel destructor.
+ 	 */
+ 	public void free() {
+-		channels.free(((m_moduleNumber - 1) * kAnalogChannels + m_channel));
++		channels.free(((m_moduleNumber - 1) * kAnalogInputChannels + m_channel));
+ 		m_channel = 0;
+ 		m_moduleNumber = 0;
+ 		m_accumulatorOffset = 0;
+@@ -114,7 +114,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 
+ 	/**
+ 	 * Get the analog module that this channel is on.
+-	 * 
++	 *
+ 	 * @return The AnalogModule that this channel is on.
+ 	 */
+ 	public AnalogModule getModule() {
+@@ -126,7 +126,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * 12-bit value representing the -10V to 10V range of the A/D converter in
+ 	 * the module. The units are in A/D converter codes. Use GetVoltage() to get
+ 	 * the analog value in calibrated units.
+-	 * 
++	 *
+ 	 * @return A sample straight from this channel on the module.
+ 	 */
+ 	public int getValue() {
+@@ -146,7 +146,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * sliding window. The sample will not change until 2**(OversamplBits +
+ 	 * AverageBits) samples have been acquired from the module on this channel.
+ 	 * Use getAverageVoltage() to get the analog value in calibrated units.
+-	 * 
++	 *
+ 	 * @return A sample from the oversample and average engine for this channel.
+ 	 */
+ 	public int getAverageValue() {
+@@ -162,7 +162,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * Get a scaled sample straight from this channel on the module. The value
+ 	 * is scaled to units of Volts using the calibrated scaling data from
+ 	 * getLSBWeight() and getOffset().
+-	 * 
++	 *
+ 	 * @return A scaled sample straight from this channel on the module.
+ 	 */
+ 	public double getVoltage() {
+@@ -181,7 +181,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * oversampling will cause this value to be higher resolution, but it will
+ 	 * update more slowly. Using averaging will cause this value to be more
+ 	 * stable, but it will update more slowly.
+-	 * 
++	 *
+ 	 * @return A scaled sample from the output of the oversample and average
+ 	 *         engine for this channel.
+ 	 */
+@@ -198,9 +198,9 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * Get the factory scaling least significant bit weight constant. The least
+ 	 * significant bit weight constant for the channel that was calibrated in
+ 	 * manufacturing and stored in an eeprom in the module.
+-	 * 
++	 *
+ 	 * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
+-	 * 
++	 *
+ 	 * @return Least significant bit weight.
+ 	 */
+ 	public long getLSBWeight() {
+@@ -216,9 +216,9 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * Get the factory scaling offset constant. The offset constant for the
+ 	 * channel that was calibrated in manufacturing and stored in an eeprom in
+ 	 * the module.
+-	 * 
++	 *
+ 	 * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
+-	 * 
++	 *
+ 	 * @return Offset constant.
+ 	 */
+ 	public int getOffset() {
+@@ -232,7 +232,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 
+ 	/**
+ 	 * Get the channel number.
+-	 * 
++	 *
+ 	 * @return The channel number.
+ 	 */
+ 	public int getChannel() {
+@@ -241,7 +241,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 
+ 	/**
+ 	 * Gets the number of the analog module this channel is on.
+-	 * 
++	 *
+ 	 * @return The module number of the analog module this channel is on.
+ 	 */
+ 	public int getModuleNumber() {
+@@ -252,7 +252,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * Set the number of averaging bits. This sets the number of averaging bits.
+ 	 * The actual number of averaged samples is 2**bits. The averaging is done
+ 	 * automatically in the FPGA.
+-	 * 
++	 *
+ 	 * @param bits
+ 	 *            The number of averaging bits.
+ 	 */
+@@ -268,7 +268,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * Get the number of averaging bits. This gets the number of averaging bits
+ 	 * from the FPGA. The actual number of averaged samples is 2**bits. The
+ 	 * averaging is done automatically in the FPGA.
+-	 * 
++	 *
+ 	 * @return The number of averaging bits.
+ 	 */
+ 	public int getAverageBits() {
+@@ -284,7 +284,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * Set the number of oversample bits. This sets the number of oversample
+ 	 * bits. The actual number of oversampled values is 2**bits. The
+ 	 * oversampling is done automatically in the FPGA.
+-	 * 
++	 *
+ 	 * @param bits
+ 	 *            The number of oversample bits.
+ 	 */
+@@ -300,7 +300,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	 * Get the number of oversample bits. This gets the number of oversample
+ 	 * bits from the FPGA. The actual number of oversampled values is 2**bits.
+ 	 * The oversampling is done automatically in the FPGA.
+-	 * 
++	 *
+ 	 * @return The number of oversample bits.
+ 	 */
+ 	public int getOversampleBits() {
+@@ -333,9 +333,9 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 
+ 	/**
+ 	 * Set an inital value for the accumulator.
+-	 * 
++	 *
+ 	 * This will be added to all values returned to the user.
+-	 * 
++	 *
+ 	 * @param initialValue
+ 	 *            The value that the accumulator should start from when reset.
+ 	 */
+@@ -356,12 +356,12 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 
+ 	/**
+ 	 * Set the center value of the accumulator.
+-	 * 
++	 *
+ 	 * The center value is subtracted from each A/D value before it is added to
+ 	 * the accumulator. This is used for the center value of devices like gyros
+ 	 * and accelerometers to make integration work and to take the device offset
+ 	 * into account when integrating.
+-	 * 
++	 *
+ 	 * This center value is based on the output of the oversampled and averaged
+ 	 * source from channel 1. Because of this, any non-zero oversample bits will
+ 	 * affect the size of the value for this field.
+@@ -387,10 +387,10 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 
+ 	/**
+ 	 * Read the accumulated value.
+-	 * 
++	 *
+ 	 * Read the value that has been accumulating on channel 1. The accumulator
+ 	 * is attached after the oversample and average engine.
+-	 * 
++	 *
+ 	 * @return The 64-bit value accumulated since the last Reset().
+ 	 */
+ 	public long getAccumulatorValue() {
+@@ -404,10 +404,10 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 
+ 	/**
+ 	 * Read the number of accumulated values.
+-	 * 
++	 *
+ 	 * Read the count of the accumulated values since the accumulator was last
+ 	 * Reset().
+-	 * 
++	 *
+ 	 * @return The number of times samples from the channel were accumulated.
+ 	 */
+ 	public long getAccumulatorCount() {
+@@ -422,10 +422,10 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 	/**
+ 	 * Read the accumulated value and the number of accumulated values
+ 	 * atomically.
+-	 * 
++	 *
+ 	 * This function reads the value and count from the FPGA atomically. This
+ 	 * can be used for averaging.
+-	 * 
++	 *
+ 	 * @param result
+ 	 *            AccumulatorResult object to store the results in.
+ 	 */
+@@ -455,7 +455,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 
+ 	/**
+ 	 * Is the channel attached to an accumulator.
+-	 * 
++	 *
+ 	 * @return The analog channel is attached to an accumulator.
+ 	 */
+ 	public boolean isAccumulatorChannel() {
+@@ -482,7 +482,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 
+ 	/**
+ 	 * Get the average value for usee with PIDController
+-	 * 
++	 *
+ 	 * @return the average value
+ 	 */
+ 	public double pidGet() {
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogModule.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogModule.java
+index 7cbfebdc4dae6fbb111904a842663ae491e6a148..edc1ab8900ebdecfca17111b99ae8484b2eb2bf6 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogModule.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogModule.java
+@@ -70,7 +70,7 @@ public class AnalogModule extends Module {
+         super(tModuleType.kModuleType_Analog, moduleNumber);
+ 
+         m_ports = new ByteBuffer[8];
+-        for (int i = 0; i < SensorBase.kAnalogChannels; i++) {
++        for (int i = 0; i < SensorBase.kAnalogInputChannels; i++) {
+             ByteBuffer port_pointer = AnalogJNI.getPortWithModule((byte) moduleNumber, (byte) i);
+             ByteBuffer status = ByteBuffer.allocateDirect(4);
+     		// set the byte order
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogOutput.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogOutput.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a548adf052c1b3c2796047fcb6299420b6ea608c
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogOutput.java
+@@ -0,0 +1,140 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++package edu.wpi.first.wpilibj;
++
++import java.nio.ByteOrder;
++import java.nio.IntBuffer;
++import java.nio.LongBuffer;
++import java.nio.ByteBuffer;
++
++//import com.sun.jna.Pointer;
++
++
++import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
++import edu.wpi.first.wpilibj.communication.UsageReporting;
++import edu.wpi.first.wpilibj.hal.AnalogJNI;
++import edu.wpi.first.wpilibj.hal.HALUtil;
++import edu.wpi.first.wpilibj.livewindow.LiveWindow;
++import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
++import edu.wpi.first.wpilibj.tables.ITable;
++import edu.wpi.first.wpilibj.util.AllocationException;
++import edu.wpi.first.wpilibj.util.CheckedAllocationException;
++
++/**
++ * Analog output class.
++ */
++public class AnalogOutput extends SensorBase implements LiveWindowSendable {
++    private static Resource channels = new Resource(kAnalogOutputChannels);
++    private ByteBuffer m_port;
++    private int m_channel;
++
++    /**
++     * Construct an analog output on a specified MXP channel.
++     *
++     * @param channel
++     *            The channel number to represent.
++     */
++    public AnalogOutput(final int channel) {
++        m_channel = channel;
++
++        if (AnalogJNI.checkAnalogOutputChannel(channel) == 0) {
++            throw new AllocationException("Analog output channel " + m_channel
++                    + " cannot be allocated. Channel is not present.");
++        }
++        try {
++            channels.allocate(channel);
++        } catch (CheckedAllocationException e) {
++            throw new AllocationException("Analog output channel " + m_channel
++                    + " is already allocated");
++        }
++
++        ByteBuffer port_pointer = AnalogJNI.getPortWithModule((byte) 1, (byte) channel);
++        ByteBuffer status = ByteBuffer.allocateDirect(4);
++        // set the byte order
++        status.order(ByteOrder.LITTLE_ENDIAN);
++        m_port = AnalogJNI.initializeAnalogOutputPort(port_pointer, status.asIntBuffer());
++        HALUtil.checkStatus(status.asIntBuffer());
++
++        LiveWindow.addSensor("AnalogOutput", 1, channel, this);
++        UsageReporting.report(tResourceType.kResourceType_AnalogChannel, channel, 1);
++    }
++
++    /**
++     * Channel destructor.
++     */
++    public void free() {
++        channels.free(m_channel);
++        m_channel = 0;
++    }
++
++    public void setVoltage(double voltage) {
++        ByteBuffer status = ByteBuffer.allocateDirect(4);
++        status.order(ByteOrder.LITTLE_ENDIAN);
++
++        AnalogJNI.setAnalogOutput(m_port, voltage, status.asIntBuffer());
++
++        HALUtil.checkStatus(status.asIntBuffer());
++    }
++
++    public double getVoltage() {
++        ByteBuffer status = ByteBuffer.allocateDirect(4);
++        status.order(ByteOrder.LITTLE_ENDIAN);
++
++        double voltage = AnalogJNI.getAnalogOutput(m_port, status.asIntBuffer());
++
++        HALUtil.checkStatus(status.asIntBuffer());
++
++        return voltage;
++    }
++
++    /*
++     * Live Window code, only does anything if live window is activated.
++     */
++    public String getSmartDashboardType() {
++        return "Analog Output";
++    }
++
++    private ITable m_table;
++
++    /**
++     * {@inheritDoc}
++     */
++    public void initTable(ITable subtable) {
++        m_table = subtable;
++        updateTable();
++    }
++
++    /**
++     * {@inheritDoc}
++     */
++    public void updateTable() {
++        if (m_table != null) {
++            m_table.putNumber("Value", getVoltage());
++        }
++    }
++
++    /**
++     * {@inheritDoc}
++     */
++    public ITable getTable() {
++        return m_table;
++    }
++
++    /**
++     * Analog Channels don't have to do anything special when entering the
++     * LiveWindow. {@inheritDoc}
++     */
++    public void startLiveWindowMode() {
++    }
++
++    /**
++     * Analog Channels don't have to do anything special when exiting the
++     * LiveWindow. {@inheritDoc}
++     */
++    public void stopLiveWindowMode() {
++    }
++}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
+index 77204381f81fd354fb16454565276ba73d93e3c9..8380fbdcf5cb004c392223429b463f4164a05fb7 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
+@@ -106,7 +106,7 @@ public class AnalogTrigger implements IInputOutput {
+ 	 * @param channel
+ 	 *            the AnalogChannel to use for the analog trigger
+ 	 */
+-	public AnalogTrigger(AnalogChannel channel) {
++	public AnalogTrigger(AnalogInput channel) {
+ 		initTrigger(channel.getModuleNumber(), channel.getChannel());
+ 	}
+ 
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index 5fc76078ce1d8e5ee792df1c161b3fe3975f0e86..34d746432968f7e068257a250283b7a0f4d2c301 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -86,7 +86,7 @@ public class DriverStation implements IInputOutput {
+ 
+     private static DriverStation instance = new DriverStation();
+     private FRCCommonControlData m_controlData;
+-    private AnalogChannel m_batteryChannel;
++    private AnalogInput m_batteryChannel;
+     private Thread m_thread;
+     private final Object m_semaphore;
+     private final Object m_dataSem;
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Gyro.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+index 82840ab7fbbaf39202001c89dd4c743c91ce49c1..09146da366d1a124133f34a5c62f8e0dced4cc7a 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Gyro.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+@@ -31,7 +31,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
+ 	static final double kSamplesPerSecond = 50.0;
+ 	static final double kCalibrationSampleTime = 5.0;
+ 	static final double kDefaultVoltsPerDegreePerSecond = 0.007;
+-	AnalogChannel m_analog;
++	AnalogInput m_analog;
+ 	double m_voltsPerDegreePerSecond;
+ 	double m_offset;
+ 	int m_center;
+@@ -94,7 +94,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
+ 	 *            The analog channel the gyro is connected to.
+ 	 */
+ 	public Gyro(int slot, int channel) {
+-		m_analog = new AnalogChannel(slot, channel);
++		m_analog = new AnalogInput(slot, channel);
+ 		m_channelAllocated = true;
+ 		initGyro();
+ 	}
+@@ -108,7 +108,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
+ 	 *            The analog channel the gyro is connected to.
+ 	 */
+ 	public Gyro(int channel) {
+-		m_analog = new AnalogChannel(channel);
++		m_analog = new AnalogInput(channel);
+ 		m_channelAllocated = true;
+ 		initGyro();
+ 	}
+@@ -121,7 +121,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
+ 	 * @param channel
+ 	 *            The AnalogChannel object that the gyro is connected to.
+ 	 */
+-	public Gyro(AnalogChannel channel) {
++	public Gyro(AnalogInput channel) {
+ 		m_analog = channel;
+ 		if (m_analog == null) {
+ 			System.err
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index fb44ce35d88aa774b031aae5681ce7f166f9ed16..76016293a748fe712bfbd015c1f006814d3daabf 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -14,13 +14,13 @@ import edu.wpi.first.wpilibj.hal.AnalogJNI;
+  * Base class for all sensors.
+  * Stores most recent status information as well as containing utility functions for checking
+  * channels and error processing.
+- * 
++ *
+  * XXX: Wait, there's no exception thrown if we try to allocate a non-existent module?  It that behavior correct?
+  */
+ public abstract class SensorBase { // TODO: Refactor
+ 
+ 	// TODO: Move this to the HAL
+-	
++
+     /**
+      * Ticks per microsecond
+      */
+@@ -35,9 +35,13 @@ public abstract class SensorBase { // TODO: Refactor
+      */
+     public static final int kDigitalModules = 1;
+     /**
+-     * Number of analog channels per module
++     * Number of analog input channels per module
++     */
++    public static final int kAnalogInputChannels = 8;
++    /**
++     * Number of analog output channels per module
+      */
+-    public static final int kAnalogChannels = 4;
++    public static final int kAnalogOutputChannels = 2;
+     /**
+      * Number of analog modules
+      */
+@@ -206,14 +210,27 @@ public abstract class SensorBase { // TODO: Refactor
+     }
+ 
+     /**
+-     * Check that the analog channel number is value.
+-     * Verify that the analog channel number is one of the legal channel numbers. Channel numbers
+-     * are 1-based.
++     * Check that the analog input number is value.
++     * Verify that the analog input number is one of the legal channel numbers. Channel numbers
++     * are 0-based.
++     *
++     * @param channel The channel number to check.
++     */
++    protected static void checkAnalogInputChannel(final int channel) {
++        if (channel <= 0 || channel > kAnalogInputChannels) {
++            System.err.println("Requested analog channel number is out of range.");
++        }
++    }
++
++    /**
++     * Check that the analog input number is value.
++     * Verify that the analog input number is one of the legal channel numbers. Channel numbers
++     * are 0-based.
+      *
+      * @param channel The channel number to check.
+      */
+-    protected static void checkAnalogChannel(final int channel) {
+-        if (channel <= 0 || channel > kAnalogChannels) {
++    protected static void checkAnalogOutputChannel(final int channel) {
++        if (channel <= 0 || channel > kAnalogOutputChannels) {
+             System.err.println("Requested analog channel number is out of range.");
+         }
+     }
+@@ -231,7 +248,7 @@ public abstract class SensorBase { // TODO: Refactor
+     }
+ 
+     /**
+-     * Verify that the power distribution channel number is within limits. 
++     * Verify that the power distribution channel number is within limits.
+      * Channel numbers are 1-based.
+      *
+      * @param channel The channel number to check.
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index aa6d70a7fc455b3d6b23a2408e6d55fffecc659d..5ecf2d1a31e4172cba1e5d5708bc6b93a575b77e 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -30,9 +30,9 @@ import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
+  * This class provides access to all of the elements on the test bench, for use
+  * in fixtures. This class is a singleton, you should use {@link #getInstance()}
+  * to obtain a reference to the {@code TestBench}.
+- * 
++ *
+  * TODO: This needs to be updated to the most recent test bench setup.
+- * 
++ *
+  * @author Fredric Silberberg
+  */
+ public final class TestBench {
+@@ -42,14 +42,14 @@ public final class TestBench {
+ 	 * completely stopped
+ 	 */
+ 	public static final double MOTOR_STOP_TIME = 0.20;
+-	
+-	
++
++
+ 	//THESE MUST BE IN INCREMENTING ORDER
+ 	public static final int DIOCrossConnectA1 = 6;
+ 	public static final int DIOCrossConnectA2 = 7;
+ 	public static final int DIOCrossConnectB1 = 8;
+ 	public static final int DIOCrossConnectB2 = 9;
+-	
++
+ 	/** The Singleton instance of the Test Bench */
+ 	private static TestBench instance = null;
+ 
+@@ -66,7 +66,7 @@ public final class TestBench {
+ 	/**
+ 	 * Constructs a new set of objects representing a connected set of Talon
+ 	 * controlled Motors and an encoder
+-	 * 
++	 *
+ 	 * @return a freshly allocated Talon, Encoder pair
+ 	 */
+ 	public MotorEncoderFixture getTalonPair() {
+@@ -91,7 +91,7 @@ public final class TestBench {
+ 	/**
+ 	 * Constructs a new set of objects representing a connected set of Victor
+ 	 * controlled Motors and an encoder
+-	 * 
++	 *
+ 	 * @return a freshly allocated Victor, Encoder pair
+ 	 */
+ 	public MotorEncoderFixture getVictorPair() {
+@@ -118,7 +118,7 @@ public final class TestBench {
+ 	/**
+ 	 * Constructs a new set of objects representing a connected set of Jaguar
+ 	 * controlled Motors and an encoder
+-	 * 
++	 *
+ 	 * @return a freshly allocated Jaguar, Encoder pair
+ 	 */
+ 	public MotorEncoderFixture getJaguarPair() {
+@@ -146,7 +146,7 @@ public final class TestBench {
+ 	 * controlled Motors and an encoder<br>
+ 	 * Note: The CANJaguar is not freshly allocated because the CANJaguar lacks
+ 	 * a free() method
+-	 * 
++	 *
+ 	 * @return an existing CANJaguar and a freshly allocated Encoder
+ 	 */
+ 	public MotorEncoderFixture getCanJaguarPair() {
+@@ -179,7 +179,7 @@ public final class TestBench {
+ 
+ 	/**
+ 	 * Constructs a new set of two Servo's and a Gyroscope.
+-	 * 
++	 *
+ 	 * @return a freshly allocated Servo's and a freshly allocated Gyroscope
+ 	 */
+ 	public TiltPanCameraFixture getTiltPanCam() {
+@@ -200,7 +200,7 @@ public final class TestBench {
+ 		DIOCrossConnectFixture dio = new DIOCrossConnectFixture(inputPort, outputPort);
+ 		return dio;
+ 	}
+-	
++
+ 	/**
+ 	 * Gets two lists of possible DIO pairs for the two pairs
+ 	 * @return
+@@ -212,7 +212,7 @@ public final class TestBench {
+ 			{ new Integer(DIOCrossConnectA2), new Integer(DIOCrossConnectA1) }
+ 		});
+ 		pairs.add(setA);
+-		
++
+ 		List<Integer[]> setB = Arrays.asList(new Integer[][] {
+ 			{ new Integer(DIOCrossConnectB1), new Integer(DIOCrossConnectB2) },
+ 			{ new Integer(DIOCrossConnectB2), new Integer(DIOCrossConnectB1) }
+@@ -233,7 +233,7 @@ public final class TestBench {
+ 		}
+ 		return pairs;
+ 	}
+-	
++
+ 	/**
+ 	 * Gets an array of pairs for the encoder to use using two different lists
+ 	 * @param listA
+@@ -254,7 +254,7 @@ public final class TestBench {
+ 				inputs[3] = portPairsB[1]; 	// OutputB
+ 				inputs [4] = flip? 0 : 1;  	// The flip bit
+ 			}
+-			
++
+ 			construtorInput.add(inputs);
+ 
+ 			inputs = inputs.clone();
+@@ -268,7 +268,7 @@ public final class TestBench {
+ 		}
+ 		return encoderPortPairs;
+ 	}
+-	
++
+ 	/**
+ 	 * Constructs the list of inputs to be used for the encoder test
+ 	 * @return A collection of different input pairs to use for the encoder
+@@ -286,7 +286,7 @@ public final class TestBench {
+ 	 * Gets the singleton of the TestBench. If the TestBench is not already
+ 	 * allocated in constructs an new instance of it. Otherwise it returns the
+ 	 * existing instance.
+-	 * 
++	 *
+ 	 * @return The Singleton instance of the TestBench
+ 	 */
+ 	public static TestBench getInstance() {
+diff --git a/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp b/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp
+index 2e68e74fe25dbaa80738ea708beb136125dc7bde..2a35786a90d3472930e9f3281166be807b552f2b 100644
+--- a/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/AnalogJNI.cpp
+@@ -103,7 +103,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOutput
+ {
+ 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+ 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	setAnalogOutput(javaId, voltage, statusPtr);
++	setAnalogOutput(*javaId, voltage, statusPtr);
+ }
+ 
+ /*
+@@ -116,7 +116,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOutp
+ {
+ 	void ** javaId = (void**)env->GetDirectBufferAddress(id);
+ 	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	return getAnalogOutput(javaId, statusPtr);
++	return getAnalogOutput(*javaId, statusPtr);
+ }
+ 
+ /*

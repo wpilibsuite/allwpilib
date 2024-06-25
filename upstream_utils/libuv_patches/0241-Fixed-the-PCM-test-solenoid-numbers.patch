@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Fri, 1 Aug 2014 17:18:46 -0400
+Subject: [PATCH 0241/6262] Fixed the PCM test solenoid numbers
+
+The numbering of the PCM channels is different in the latest firmware
+
+Change-Id: Ib7cb5e69f7b6f076a424358ff61653a4c8ad33af
+---
+ wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
+index 8ba30f1c90690f01578988fe085736a0a39c46f3..293af0aa81f6427ffa333cb32deb6309da14e661 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/PCMTest.cpp
+@@ -37,8 +37,8 @@ protected:
+     m_fakePressureSwitch = new DigitalOutput(TestBench::kFakePressureSwitchChannel);
+     m_fakeCompressor = new AnalogInput(TestBench::kFakeCompressorChannel);
+ 
+-    m_solenoid1 = new Solenoid(0);
+-    m_solenoid2 = new Solenoid(1);
++    m_solenoid1 = new Solenoid(7);
++    m_solenoid2 = new Solenoid(6);
+ 
+     m_fakeSolenoid1 = new DigitalInput(TestBench::kFakeSolenoid1Channel);
+     m_fakeSolenoid2 = new DigitalInput(TestBench::kFakeSolenoid2Channel);

@@ -1,0 +1,68 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sat, 13 Dec 2014 02:12:53 -0800
+Subject: [PATCH 0565/6262] Synchronize access to buffered Joystick data.
+
+Change-Id: Iae453872e89c7b6364d486a6bbc8b210c94defee
+---
+ .../java/edu/wpi/first/wpilibj/DriverStation.java    | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index c81f73a3e55eb7d12c904b393bee3f73d10050b5..870497e0fd0cfeb7f30ebb2d7f08f8a3783a59cc 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -209,7 +209,7 @@ public class DriverStation implements RobotState.Interface {
+      * @param axis The analog axis value to read from the joystick.
+      * @return The value of the axis on the joystick.
+      */
+-    public double getStickAxis(int stick, int axis) {
++    public synchronized double getStickAxis(int stick, int axis) {
+         if(stick < 0 || stick >= kJoystickPorts) {
+             throw new RuntimeException("Joystick index is out of range, should be 0-5");
+         }
+@@ -237,7 +237,7 @@ public class DriverStation implements RobotState.Interface {
+     *
+     * @param stick The joystick port number
+     */
+-    public int getStickAxisCount(int stick){
++    public synchronized int getStickAxisCount(int stick){
+ 
+         if(stick < 0 || stick >= kJoystickPorts) {
+             throw new RuntimeException("Joystick index is out of range, should be 0-5");
+@@ -251,7 +251,7 @@ public class DriverStation implements RobotState.Interface {
+      *
+      * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+      */
+-    public int getStickPOV(int stick, int pov) {
++    public synchronized int getStickPOV(int stick, int pov) {
+         if(stick < 0 || stick >= kJoystickPorts) {
+             throw new RuntimeException("Joystick index is out of range, should be 0-5");
+         }
+@@ -273,7 +273,7 @@ public class DriverStation implements RobotState.Interface {
+     *
+     * @param stick The joystick port number
+     */
+-    public int getStickPOVCount(int stick){
++    public synchronized int getStickPOVCount(int stick){
+ 
+         if(stick < 0 || stick >= kJoystickPorts) {
+             throw new RuntimeException("Joystick index is out of range, should be 0-5");
+@@ -289,7 +289,7 @@ public class DriverStation implements RobotState.Interface {
+      * @param stick The joystick to read.
+      * @return The state of the buttons on the joystick.
+      */
+-    public boolean getStickButton(final int stick, byte button) {
++    public synchronized boolean getStickButton(final int stick, byte button) {
+         if(stick < 0 || stick >= kJoystickPorts) {
+             throw new RuntimeException("Joystick index is out of range, should be 0-3");
+         }
+@@ -312,7 +312,7 @@ public class DriverStation implements RobotState.Interface {
+     *
+     *   @param  stick the joystick port number
+     */
+-    public int getStickButtonCount(int stick){
++    public synchronized int getStickButtonCount(int stick){
+ 
+         if(stick < 0 || stick >= kJoystickPorts) {
+             throw new RuntimeException("Joystick index is out of range, should be 0-3");

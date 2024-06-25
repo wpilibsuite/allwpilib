@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Malmsten <pmalmsten@gmail.com>
+Date: Sun, 26 Jan 2014 13:24:49 -0500
+Subject: [PATCH 0013/6262] Corrected <relativePath> that pointed to directory
+ instead of pom.xml
+
+---
+ wpilibj/wpilibJavaFinal/pom.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJavaFinal/pom.xml b/wpilibj/wpilibJavaFinal/pom.xml
+index aa31593aa4b49adfb2dd9c89cca7a938c9af7ded..f5f1dae6a5bd474ca4b006be7f54010a284af7b7 100644
+--- a/wpilibj/wpilibJavaFinal/pom.xml
++++ b/wpilibj/wpilibJavaFinal/pom.xml
+@@ -11,7 +11,7 @@
+     <groupId>edu.wpi.first.wpilib.templates.athena</groupId>
+     <artifactId>library-jar</artifactId>
+     <version>0.1.0-SNAPSHOT</version>
+-    <relativePath>../../maven-utilities/athena/library-jar</relativePath>
++    <relativePath>../../maven-utilities/athena/library-jar/pom.xml</relativePath>
+   </parent>
+ 
+   <repositories>

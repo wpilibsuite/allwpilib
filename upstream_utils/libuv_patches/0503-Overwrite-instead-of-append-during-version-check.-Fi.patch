@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Sat, 22 Nov 2014 14:32:13 -0500
+Subject: [PATCH 0503/6262] Overwrite instead of append during version check.
+ Fixes artf3818
+
+Change-Id: I05bde0997e13318c113a7f7ee228fa1c007bfd2f
+---
+ .../src/main/resources/cpp-zip/ant/build.xml                    | 2 +-
+ .../src/main/resources/java-zip/ant/build.xml                   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+index 1f2b051f0dacf02878407c0e9af94534b1b17ce7..9e52b0cedad0192b37509bfa3ffbd716a0187847 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/resources/cpp-zip/ant/build.xml
+@@ -93,7 +93,7 @@
+   
+   <target name="dependencies" depends="get-target-ip">
+     <property name="ant.enable.asserts" value="true"/>
+-	<post to="http://${target}/nisysapi/server" logfile="sysProps.xml" verbose="false" encoding="UTF-16LE">
++	<post to="http://${target}/nisysapi/server" logfile="sysProps.xml" verbose="false" encoding="UTF-16LE" append="false">
+ 		<prop name="Function" value="GetPropertiesOfItem"/>
+ 		<prop name="Plugins" value="nisyscfg"/>
+ 		<prop name="Items" value="system"/>
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+index 7d2bc6d202f6c0600b847612a1d2de0225149e86..4cea3ee06749227170b0f6231b4110f5f8665a4d 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/src/main/resources/java-zip/ant/build.xml
+@@ -192,7 +192,7 @@
+   
+   <target name="dependencies" depends="get-target-ip">
+     <property name="ant.enable.asserts" value="true"/>
+-	<post to="http://${target}/nisysapi/server" logfile="sysProps.xml" verbose="false" encoding="UTF-16LE">
++	<post to="http://${target}/nisysapi/server" logfile="sysProps.xml" verbose="false" encoding="UTF-16LE" append="false">
+ 		<prop name="Function" value="GetPropertiesOfItem"/>
+ 		<prop name="Plugins" value="nisyscfg"/>
+ 		<prop name="Items" value="system"/>

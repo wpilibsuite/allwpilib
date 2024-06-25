@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Tue, 30 Sep 2014 18:56:43 -0400
+Subject: [PATCH 0376/6262] Figured out the madness: not launching properly (no
+ copy)
+
+Change-Id: I8127a9ae4cce5109d2373edfdb60ba212dfb70cb
+---
+ .../cpp/launching/DeployLaunchShortcut.java        | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java
+index 8d47e1f6bb86c91ceb0110e824673ba7edeb7c94..8be8dedfa41c679d52e0af719422bd61547bc6cb 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/launching/DeployLaunchShortcut.java
+@@ -120,12 +120,7 @@ public class DeployLaunchShortcut implements ILaunchShortcut
+ 			ILaunchConfigurationWorkingCopy config;
+ 			try {
+ 				config = getRemoteDebugConfig(activeProj);
+-				//config.doSave(); // NOTE: For debugging
+-				//org.eclipse.debug.core.DebugPlugin.getDefault().getLaunchManager().addLaunch(config.launch(mode, null));
+-				//THIS IS MADDENING! we want to add to the recent history, but I can't seem to find a public api to do so, so lets just launch the config dialog
+-				//DebugUITools.openLaunchConfigurationPropertiesDialog(shell, config, "org.eclipse.cdt.launch.launchGroup");
+-				//config.launch(mode, new NullProgressMonitor(), false, true);
+-				DebugUITools.launch(config, mode);
++				DebugUITools.launch(config.doSave(), mode);
+ 			} catch (CoreException e) {
+ 				WPILibCPPPlugin.logError("Debug attach failed.", e);
+ 			}
+@@ -150,16 +145,14 @@ public class DeployLaunchShortcut implements ILaunchShortcut
+ 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_ID, "org.eclipse.rse.remotecdt.RemoteGDBDebugger");
+ 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_REGISTER_GROUPS, "");
+ 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE, "run");
+-		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_STOP_AT_MAIN, true);
+-		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_STOP_AT_MAIN_SYMBOL, "main");
++		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_STOP_AT_MAIN, false);
+ 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_USE_TERMINAL, true);
+ 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, activeProj.getName());
+ 		Collection<Executable> exes = ExecutablesManager.getExecutablesManager().getExecutablesForProject(activeProj);
+ 		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,
+ 				exes.size() > 0 ? exes.toArray(new Executable[0])[0].getPath().makeRelativeTo(activeProj.getLocation()).toString():
+ 			 "Debug/FRCUserProgram");
+-			 
+-		// This value is being overwritten somewhere
++		
+ 		config.setAttribute("org.eclipse.cdt.dsf.gdb.DEBUG_NAME", "arm-frc-linux-gnueabi-gdb");
+ 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_PATH, "/home/admin/FRCUserProgram");
+ 		config.setAttribute(IRemoteConnectionConfigurationConstants.ATTR_REMOTE_CONNECTION, remote_connection);
+@@ -172,7 +165,6 @@ public class DeployLaunchShortcut implements ILaunchShortcut
+ 		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUGGER_SOLIB_PATH, solibs);
+ 		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUGGER_AUTO_SOLIB, true);
+ 		config.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUGGER_STOP_ON_SOLIB_EVENTS, false);
+-		config.doSave();
+ 		return config;
+ 	}
+ }

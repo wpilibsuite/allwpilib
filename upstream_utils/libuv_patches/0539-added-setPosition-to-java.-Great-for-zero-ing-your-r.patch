@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Omar Zrien <OZrien@crosstheroadelectronics.com>
+Date: Fri, 5 Dec 2014 18:47:21 -0500
+Subject: [PATCH 0539/6262] added setPosition to java. Great for zero-ing your
+ relative sensors, also exists in cpp and LV.
+
+Change-Id: Idfd8c0d2c568306cb6853803315a99b92992b388
+---
+ .../src/main/java/edu/wpi/first/wpilibj/CANTalon.java         | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
+index 5bbf70c4ab22a9d82beebdbe925bff2ba0d2d20f..b095348d6128266114cde1bc5f2d3ecc7c42d78c 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/CANTalon.java
+@@ -305,6 +305,10 @@ public class CANTalon implements MotorSafety, PIDOutput, SpeedController {
+     return CanTalonJNI.intp_value(positionp);
+   }
+ 
++  public void setPosition(double pos) {
++    m_impl.SetSensorPosition((int)pos);
++  }
++
+   public double getSpeed() {
+     long speedp = CanTalonJNI.new_intp();
+     m_impl.GetSensorVelocity(new SWIGTYPE_p_int(speedp, true));

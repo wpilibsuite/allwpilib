@@ -1,0 +1,372 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Mon, 11 Aug 2014 19:52:43 -0400
+Subject: [PATCH 0282/6262] Fixed a few bugs with C++ due to the merge.
+
+Change-Id: I6c5120ff502b40ecba0884f5a3631fa91822cfd4
+---
+ .../plugin.xml                                |   2 +-
+ .../resources/icons/Gazebo.png                | Bin 0 -> 780 bytes
+ .../resources/templates/.cproject             |   5 +
+ simulation/debs/Makefile                      |   4 +-
+ .../frcsim-gazebo-models/debian/changelog     |   6 +
+ .../frcsim-libwpilibsim-cpp/pom.xml           |   1 +
+ wpilibc/wpilibC++Sim/Makefile                 |   1 +
+ wpilibc/wpilibC++Sim/pom.xml                  |   1 +
+ wpilibc/wpilibC++Sim/src/Error.cpp            | 115 ------------------
+ wpilibc/wpilibC++Sim/src/Utility.cpp          |  62 ++++++++++
+ .../wpilibC++Sim/src/simulation/SimGyro.cpp   |   8 +-
+ 11 files changed, 84 insertions(+), 121 deletions(-)
+ create mode 100644 eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/icons/Gazebo.png
+ delete mode 100644 wpilibc/wpilibC++Sim/src/Error.cpp
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/plugin.xml b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/plugin.xml
+index 726a51ceb2ea4d71da491fa94cf577c7c13af211..6fe3ebc8068a902b0710168845aa53da304641fa 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/plugin.xml
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/plugin.xml
+@@ -228,7 +228,7 @@
+       <shortcut
+             class="edu.wpi.first.wpilib.plugins.cpp.launching.SimulateLaunchShortcut"
+             description="Test the WPILib project using the Gazebo simulator."
+-            icon="resources/icons/wpi.ico"
++            icon="resources/icons/Gazebo.png"
+             id="edu.wpi.first.wpilib.plugins.cpp.launching.simulate"
+             label="WPILib C++ Simulation"
+             modes="run,debug">
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/icons/Gazebo.png b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/icons/Gazebo.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..3ad1d7444079c0069e95e0e7eb966281d7811db4
+GIT binary patch
+literal 780
+zcmV+n1M~ceP)<h;3K|Lk000e1NJLTq000mG000mO1^@s6AM^iV00004b3#c}2nYxW
+zd<bNS00009a7bBm0002J0002J0UcV#`Tzg`8FWQhbW?9;ba!ELWdL_~cP?peYja~^
+zaAhuUa%Y?FJQ@H10*OgPK~y-6b&_95Q*ji>&u{nc&ZbM+q|D9T-`(zTb}6KS{+P)v
+zBJx3PDfCb;YV=YGh4f-+^$<NtkJe@{DOeOle?W-@BP$wM&Z+2y>ujqRHO*mp-R|k3
+zTu!#{<2m2+Js%E-AR=Uw*Xb+*0GODW`IgON$W)Yx%!<_2;;<6MVI_)4T`e+^*-T!t
+zkwE16a+8sCHtf`-#$6f!00c%j=n8S+l~p{iL?Z7p29!D+HjU-(?AxAbxOVV2;q&#h
+z;K-r@ZVlz&$M0+xm(Z?`N27D806`E68N^WYUaeqlYc>T&IJg_+W|M??R8?It000;P
+z3az#R<HO1PrJgYk^bB{^5uj&`gTNOqN(gCERdpflhytZQ-@Ff6!dvT?&c4Xi$LE;T
+z@c0}9XP%q&+aF9FiN(CqDOG)zY9b<dC@rh=`KIxoMnfSyCRZ-ERTW`dRS}j5d{E^1
+z-G~T?2rj4ds3b`oBK{{p9h2*kEt|J&S`_PGBDZ{&HJL3*gMsx@Du`5gnVXmQT8qcs
+zX#~FNnyGj^jyK!e(N|N8;nC4GApAT$j8chLJ94;k<?Y}gHea}iqSGm*5yWCKtFO8S
+zc%H)Jr%zyqBmn?G@KX>jUus@%JlAA=)!)Y*s;B?}fF#2(DFRAqp+|5nTyJfS;X3vA
+z_2H@7le(fPh={1`IzH;{#XV(Zvw|ROL&U!UhzMT0-R7aL2j%+@Oou|DUx<i-`+n@{
+z?nXq!smVz^U0<)ec){<r+ih!enP1tI<3C<?!s2$j?PjwX=I4Ka|6XT!RnxM+@_NZc
+zW}|fa3d6ANKu9vNnz&IM;X4L!AhFS#F(5@Fip2l`ilThY=J^AdworfsFhUUk0000<
+KMNUMnLSTZPW@Nko
+
+literal 0
+HcmV?d00001
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index a09f3aa1418e8ce54fccc59bc90a5872cb90ba4a..b476b133fb999605cdeddee2739c1b4ecaa295e7 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -28,6 +28,7 @@
+ 								<option id="gnu.cpp.compiler.option.optimization.level.549514425" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+ 								<option id="gnu.cpp.compiler.option.debugging.level.1682909384" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+ 							        <option id="gnu.cpp.compiler.option.include.paths.1597382905" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
++									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}/src&quot;"/>
+ 								  <listOptionValue builtIn="false" value="$cpp-location/include"/>
+ 							        </option>
+ 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.963785380" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+@@ -38,7 +39,9 @@
+ 									<listOptionValue builtIn="false" value="$cpp-location/lib"/>
+ 								</option>
+ 								<option id="gnu.cpp.link.option.libs.1072058280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
++									<listOptionValue builtIn="false" value="WPILib"/>
+ 									<listOptionValue builtIn="false" value="WPILibAthena"/>
++									<listOptionValue builtIn="false" value="WPILib"/>
+ 									<listOptionValue builtIn="false" value="HALAthena"/>
+ 									<listOptionValue builtIn="false" value="NetworkTables"/>
+ 									<listOptionValue builtIn="false" value="FRC_NetworkCommunication"/>
+@@ -167,7 +170,9 @@
+ 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.66697269" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+ 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.base.2094820582" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+ 								<option id="gnu.cpp.link.option.libs.1563598353" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
++									<listOptionValue builtIn="false" value="WPILib"/>
+ 									<listOptionValue builtIn="false" value="WPILibSim"/>
++									<listOptionValue builtIn="false" value="WPILib"/>
+ 									<listOptionValue builtIn="false" value="gazebo"/>
+ 									<listOptionValue builtIn="false" value="gazebo_transport"/>
+ 									<listOptionValue builtIn="false" value="gazebo_msgs"/>
+diff --git a/simulation/debs/Makefile b/simulation/debs/Makefile
+index 0ee5f02d994c6746366b5ecd0b7921ca93efbaa3..e526d7bf145b1233d14c6ff91de55c87526ba0f8 100644
+--- a/simulation/debs/Makefile
++++ b/simulation/debs/Makefile
+@@ -4,9 +4,9 @@ allwpilib=../..
+ package-version = 1
+ gazebo-plugins-version = 0.2
+ gazebo-plugins-package-version = $(gazebo-plugins-version)-$(package-version)
+-gazebo-models-version = 0.2
++gazebo-models-version = 0.3
+ gazebo-models-package-version = $(gazebo-models-version)-$(package-version)
+-gazebo-models-orig-url = https://usfirst.collab.net/sf/frs/do/downloadFile/projects.wpilib/frs.simulation.frcsim_gazebo_models/frs1052?dl=1
++gazebo-models-orig-url = https://usfirst.collab.net/sf/frs/do/downloadFile/projects.wpilib/frs.simulation.frcsim_gazebo_models/frs1070?dl=1
+ eclipse-plugins-version = 0.1
+ eclipse-plugins-package-version = $(eclipse-plugins-version)-$(package-version)
+ eclipse-toolchain-version = 0.1
+diff --git a/simulation/debs/frcsim-gazebo-models/frcsim-gazebo-models/debian/changelog b/simulation/debs/frcsim-gazebo-models/frcsim-gazebo-models/debian/changelog
+index c9e00400546a74829bec4d68e377aaf6aa326dac..618ea8000687128f057335d5b93e73ffda135b6a 100644
+--- a/simulation/debs/frcsim-gazebo-models/frcsim-gazebo-models/debian/changelog
++++ b/simulation/debs/frcsim-gazebo-models/frcsim-gazebo-models/debian/changelog
+@@ -1,3 +1,9 @@
++frcsim-gazebo-models (0.3-1) trusty; urgency=medium
++
++  * Fixed GearsBot gyro
++
++ -- Alex Henning <alex@thoriumrobotics.com>  Tue, 12 Aug 2014 09:32:27 -0400
++
+ frcsim-gazebo-models (0.2-1) trusty; urgency=medium
+ 
+   * New models using the smaller plugins
+diff --git a/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/pom.xml b/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/pom.xml
+index d7b0c220f313354bd6fcc0e585fd79fb07295541..292aac560e8d254380b9e9bae7d365cf754977fb 100644
+--- a/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/pom.xml
++++ b/simulation/debs/frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/pom.xml
+@@ -24,6 +24,7 @@
+                 <mkdir dir="${project.build.directory}/sim-includes/sim/include"/>
+                 <copy todir="${project.build.directory}/sim-includes/sim/include">
+                   <fileset dir="include"/>
++                  <fileset dir="../wpilibC++/include"/>
+                   <fileset dir="../../networktables/cpp/include"/>
+                   <fileset dir="../../hal/include"/>
+                 </copy>
+diff --git a/wpilibc/wpilibC++Sim/Makefile b/wpilibc/wpilibC++Sim/Makefile
+index 34200d408d1162dba2a5eafb882cf9561bfd0efb..f698aee0009cc03572626c6ca6e71f56c92495cd 100644
+--- a/wpilibc/wpilibC++Sim/Makefile
++++ b/wpilibc/wpilibC++Sim/Makefile
+@@ -14,3 +14,4 @@ clean:
+ install: all
+ 	mkdir -p $(DESTDIR)$(lib.dir)
+ 	install $(build.dir)/libWPILibSim.so $(DESTDIR)$(lib.dir)
++	install $(build.dir)/build/wpilibC++/libWPILib.a $(DESTDIR)$(lib.dir)
+diff --git a/wpilibc/wpilibC++Sim/pom.xml b/wpilibc/wpilibC++Sim/pom.xml
+index d7b0c220f313354bd6fcc0e585fd79fb07295541..292aac560e8d254380b9e9bae7d365cf754977fb 100644
+--- a/wpilibc/wpilibC++Sim/pom.xml
++++ b/wpilibc/wpilibC++Sim/pom.xml
+@@ -24,6 +24,7 @@
+                 <mkdir dir="${project.build.directory}/sim-includes/sim/include"/>
+                 <copy todir="${project.build.directory}/sim-includes/sim/include">
+                   <fileset dir="include"/>
++                  <fileset dir="../wpilibC++/include"/>
+                   <fileset dir="../../networktables/cpp/include"/>
+                   <fileset dir="../../hal/include"/>
+                 </copy>
+diff --git a/wpilibc/wpilibC++Sim/src/Error.cpp b/wpilibc/wpilibC++Sim/src/Error.cpp
+deleted file mode 100644
+index cf05a89f152328235990f419b401ebd8e6159788..0000000000000000000000000000000000000000
+--- a/wpilibc/wpilibC++Sim/src/Error.cpp
++++ /dev/null
+@@ -1,115 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008. All Rights Reserved.							  */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
+-/*----------------------------------------------------------------------------*/
+-
+-#include "Error.h"
+-
+-#include <cstdio>
+-#include <cstring>
+-
+-#include "Timer.h"
+-#include "Utility.h"
+-
+-bool Error::m_suspendOnErrorEnabled = false;
+-
+-Error::Error()
+-	: m_code(0)
+-	, m_lineNumber(0)
+-	, m_originatingObject(NULL)
+-	, m_timestamp (0.0)
+-{}
+-
+-Error::~Error()
+-{}
+-
+-void Error::Clone(Error &error)
+-{
+-	m_code = error.m_code;
+-	m_message = error.m_message;
+-	m_filename = error.m_filename;
+-	m_function = error.m_function;
+-	m_lineNumber = error.m_lineNumber;
+-	m_originatingObject = error.m_originatingObject;
+-	m_timestamp = error.m_timestamp;
+-}
+-
+-Error::Code Error::GetCode() const
+-{	return m_code;  }
+-
+-const char * Error::GetMessage() const
+-{	return m_message.c_str();  }
+-
+-const char * Error::GetFilename() const
+-{	return m_filename.c_str();  }
+-
+-const char * Error::GetFunction() const
+-{	return m_function.c_str();  }
+-
+-uint32_t Error::GetLineNumber() const
+-{	return m_lineNumber;  }
+-
+-const ErrorBase* Error::GetOriginatingObject() const
+-{	return m_originatingObject;  }
+-
+-double Error::GetTime() const
+-{	return m_timestamp;  }
+-
+-void Error::Set(Code code, const char* contextMessage, const char* filename, const char* function, uint32_t lineNumber, const ErrorBase* originatingObject)
+-{
+-	m_code = code;
+-	m_message = contextMessage;
+-	m_filename = filename;
+-	m_function = function;
+-	m_lineNumber = lineNumber;
+-	m_originatingObject = originatingObject;
+-	m_timestamp = GetTime();
+-
+-	Report();
+-
+-	// XXX: BROKEN! if (m_suspendOnErrorEnabled) suspendTask(0);
+-}
+-
+-void Error::Report()
+-{
+-	// Error string buffers
+-	char *error = new char[256];
+-	char *error_with_code = new char[256];
+-
+-	// Build error strings
+-	if (m_code != -1)
+-	{
+-		snprintf(error, 256, "%s: status = %d (0x%08X) %s ...in %s() in %s at line %d\n",
+-				m_code < 0 ? "ERROR" : "WARNING", (int32_t)m_code, (uint32_t)m_code, m_message.c_str(),
+-				m_function.c_str(), m_filename.c_str(), m_lineNumber);
+-		sprintf(error_with_code,"<Code>%d %s", (int32_t)m_code, error);
+-	} else {
+-		snprintf(error, 256, "ERROR: %s ...in %s() in %s at line %d\n", m_message.c_str(),
+-				m_function.c_str(), m_filename.c_str(), m_lineNumber);
+-		strcpy(error_with_code, error);
+-	}
+-	// TODO: Add logging to disk
+-
+-	delete [] error_with_code;
+-
+-	// Print to console
+-	printf("\n\n>>>>%s", error);
+-
+-	delete [] error;
+-
+-    // printf("-----------<Stack Trace>----------------\n");
+-    // printCurrentStackTrace();
+-}
+-
+-void Error::Clear()
+-{
+-	m_code = 0;
+-	m_message = "";
+-	m_filename = "";
+-	m_function = "";
+-	m_lineNumber = 0;
+-	m_originatingObject = NULL;
+-	m_timestamp = 0.0;
+-}
+-
+diff --git a/wpilibc/wpilibC++Sim/src/Utility.cpp b/wpilibc/wpilibC++Sim/src/Utility.cpp
+index b881de1622a38221e3e9f9508460bd83392d7491..c565221bec535e0c18d2cbcf3d84ed8e93691609 100644
+--- a/wpilibc/wpilibC++Sim/src/Utility.cpp
++++ b/wpilibc/wpilibC++Sim/src/Utility.cpp
+@@ -11,6 +11,14 @@
+ #include <stdio.h>
+ #include <string.h>
+ 
++#include <iostream>
++#include <sstream>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
++#include <execinfo.h>
++#include <cxxabi.h>
++
+ static bool stackTraceEnabled = false;
+ static bool suspendOnAssertEnabled = false;
+ 
+@@ -162,3 +170,57 @@ uint32_t GetFPGATime()
+ 	return wpilib::internal::simTime * 1e6;
+ }
+ 
++
++/**
++ * Demangle a C++ symbol, used for printing stack traces.
++ */
++static std::string demangle(char const *mangledSymbol)
++{
++	char buffer[256];
++	size_t length;
++	int status;
++
++	if(sscanf(mangledSymbol, "%*[^(]%*[^_]%255[^)+]", buffer))
++	{
++		char *symbol = abi::__cxa_demangle(buffer, NULL, &length, &status);
++
++		if(status == 0)
++		{
++			return symbol;
++		}
++		else
++		{
++			// If the symbol couldn't be demangled, it's probably a C function,
++			// so just return it as-is.
++			return buffer;
++		}
++	}
++
++	// If everything else failed, just return the mangled symbol
++	return mangledSymbol;
++}
++
++/**
++ * Get a stack trace, ignoring the first "offset" symbols.
++ */
++std::string GetStackTrace(uint32_t offset)
++{
++	void *stackTrace[128];
++	int stackSize = backtrace(stackTrace, 128);
++	char **mangledSymbols = backtrace_symbols(stackTrace, stackSize);
++	std::stringstream trace;
++
++	for(int i = offset; i < stackSize; i++)
++	{
++		// Only print recursive functions once in a row.
++		if(i == 0 ||stackTrace[i] != stackTrace[i - 1])
++		{
++			trace << "\tat " << demangle(mangledSymbols[i]) << std::endl;
++		}
++	}
++
++	free(mangledSymbols);
++
++	return trace.str();
++}
++
+diff --git a/wpilibc/wpilibC++Sim/src/simulation/SimGyro.cpp b/wpilibc/wpilibC++Sim/src/simulation/SimGyro.cpp
+index e6d125a620441a0a38f3b27432907c54bf539d9b..c173c05b35be6ce4d4b77a9588d64229e0d18900 100644
+--- a/wpilibc/wpilibC++Sim/src/simulation/SimGyro.cpp
++++ b/wpilibc/wpilibC++Sim/src/simulation/SimGyro.cpp
+@@ -10,9 +10,11 @@ SimGyro::SimGyro(std::string topic) {
+     velSub = MainNode::Subscribe("~/simulator/"+topic+"/velocity",
+                                  &SimGyro::velocityCallback, this);
+ 
+-    commandPub->WaitForConnection();
+-    
+-    std::cout << "Initialized ~/simulator/"+topic << std::endl;
++    if (commandPub->WaitForConnection(gazebo::common::Time(5.0))) { // Wait up to five seconds.
++		std::cout << "Initialized ~/simulator/" + topic << std::endl;
++	} else {
++		std::cerr << "Failed to initialize ~/simulator/" + topic + ": does the gyro exist?" << std::endl;
++	}
+ }
+ 
+ void SimGyro::Reset() {

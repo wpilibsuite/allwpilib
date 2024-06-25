@@ -1,0 +1,130 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Tue, 17 Jun 2014 14:09:58 -0700
+Subject: [PATCH 0106/6262] Fixes for rebasing.
+
+Change-Id: I765d2f2fc044fb30caef3cda8ff6bd03fef6b4e0
+---
+ wpilibc/wpilibC++/include/AnalogPotentiometer.h              | 5 +++--
+ wpilibc/wpilibC++/lib/AnalogPotentiometer.cpp                | 4 ++--
+ .../main/java/edu/wpi/first/wpilibj/AnalogPotentiometer.java | 4 ++--
+ .../src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java   | 4 ++--
+ .../src/main/java/edu/wpi/first/wpilibj/SensorBase.java      | 3 ++-
+ 5 files changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/AnalogPotentiometer.h b/wpilibc/wpilibC++/include/AnalogPotentiometer.h
+index dbdf91c8033cd3db6b524c6d1969def683a756ea..ae75bb0e2745c20b462f328d1005f3ddca6c2089 100644
+--- a/wpilibc/wpilibC++/include/AnalogPotentiometer.h
++++ b/wpilibc/wpilibC++/include/AnalogPotentiometer.h
+@@ -66,6 +66,7 @@ public:
+      */
+     virtual double PIDGet();
+ 
++
+     /*
+      * Live Window code, only does anything if live window is activated.
+      */
+@@ -85,9 +86,9 @@ public:
+     virtual void StopLiveWindowMode() {}
+ 
+ private:
+-    int m_channel;
++    int m_module, m_channel;
+     double m_scale, m_offset;
+-    AnalogInput* m_analog_channel;
++    AnalogInput* m_analog_input;
+     ITable* m_table;
+ 
+     /**
+diff --git a/wpilibc/wpilibC++/lib/AnalogPotentiometer.cpp b/wpilibc/wpilibC++/lib/AnalogPotentiometer.cpp
+index 1e682e5a35452ada0d9c91af98413bbe68aefe22..df0cfdea4700952f812cb118aa4c6afdcaabd868 100644
+--- a/wpilibc/wpilibC++/lib/AnalogPotentiometer.cpp
++++ b/wpilibc/wpilibC++/lib/AnalogPotentiometer.cpp
+@@ -5,7 +5,7 @@ void AnalogPotentiometer::initPot(int channel, double scale, double offset) {
+     m_channel = channel;
+     m_scale = scale;
+     m_offset = offset;
+-    m_analog_channel = new AnalogInput(channel);
++    m_analog_input = new AnalogInput(channel);
+ }
+ 
+ AnalogPotentiometer::AnalogPotentiometer(int channel, double scale, double offset) {
+@@ -22,7 +22,7 @@ AnalogPotentiometer::AnalogPotentiometer(int channel) {
+ 
+ 
+ double AnalogPotentiometer::Get() {
+-    return m_analog_channel->GetVoltage() * m_scale + m_offset;
++    return m_analog_input->GetVoltage() * m_scale + m_offset;
+ }
+ 
+ double AnalogPotentiometer::PIDGet() {
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogPotentiometer.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogPotentiometer.java
+index db242189dfba1183a8926e257598636af685d37c..511313d052ade6d2a76f21ef42f26bc2c16037ff 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogPotentiometer.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/AnalogPotentiometer.java
+@@ -43,7 +43,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
+     public AnalogPotentiometer(final int channel, double scale, double offset) {
+         initPot(channel, scale, offset);
+     }
+-
++    
+     /**
+      * AnalogPotentiometer constructor.
+      *
+@@ -79,7 +79,6 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
+         return m_analog_input.getVoltage() * m_scale + m_offset;
+     }
+ 
+-
+     /**
+      * Implement the PIDSource interface.
+      *
+@@ -89,6 +88,7 @@ public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
+         return get();
+     }
+ 
++
+     /*
+      * Live Window code, only does anything if live window is activated.
+      */
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java
+index de019a30f32c4e3bdf0f640559f0d2720a4d6294..23bc1dbde04565223108bc40c337f0c064e32afc 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/AnalogChannel.java
+@@ -98,7 +98,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 		return m_moduleNumber;
+ 	}
+ 
+-	/*
++    /**
+ 	 * Get the average value for use with PIDController
+ 	 *
+ 	 * @return the average value
+@@ -107,7 +107,7 @@ public class AnalogChannel extends SensorBase implements PIDSource,
+ 		return getAverageVoltage();
+ 	}
+ 
+-	/*
++    /**
+ 	 * Live Window code, only does anything if live window is activated.
+ 	 */
+ 	public String getSmartDashboardType() {
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index 23909c0a534b5952d0b86a4101ccb3b4080e619b..86edcac12398a5c477dec9dbd1983c83a9a50b9c 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -12,12 +12,13 @@ package edu.wpi.first.wpilibj;
+  * Stores most recent status information as well as containing utility functions for checking
+  * channels and error processing.
+  *
++ * 
+  * XXX: Wait, there's no exception thrown if we try to allocate a non-existent module?  It that behavior correct?
+  */
+ public abstract class SensorBase { // TODO: Refactor
+ 
+ 	// TODO: Move this to the HAL
+-
++  
+     /**
+      * Ticks per microsecond
+      */

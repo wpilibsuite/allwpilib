@@ -1,0 +1,3622 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Tue, 24 Jun 2014 11:50:10 -0400
+Subject: [PATCH 0124/6262] Java CANJaguar changes
+
+Change-Id: Icb15b1b140816e44caec36cda2466a64e5cabf1d
+
+Change-Id: Idd6aebefe03acff5ab211a5e3e73a29563601515
+---
+ wpilibc/wpilibC++/lib/CANJaguar.cpp           |    2 +
+ .../src/CANJaguarTest.cpp                     |    1 +
+ .../java/edu/wpi/first/wpilibj/CANJaguar.java | 2843 +++++++++--------
+ .../first/wpilibj/PowerDistributionPanel.java |   37 +-
+ .../edu/wpi/first/wpilibj/RobotDrive.java     |    7 +-
+ .../wpilibj/can/CANExceptionFactory.java      |   27 +-
+ .../edu/wpi/first/wpilibj/can/CANJNI.java     |   13 +-
+ ....java => CANMessageNotFoundException.java} |   14 +-
+ .../java/edu/wpi/first/wpilibj/PDPTest.java   |   46 +-
+ .../edu/wpi/first/wpilibj/test/TestBench.java |   18 +-
+ wpilibj/wpilibJavaJNI/lib/CANJNI.cpp          |  132 +-
+ 11 files changed, 1667 insertions(+), 1473 deletions(-)
+ rename wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/{CANTimeoutException.java => CANMessageNotFoundException.java} (65%)
+
+diff --git a/wpilibc/wpilibC++/lib/CANJaguar.cpp b/wpilibc/wpilibC++/lib/CANJaguar.cpp
+index b8c23b2c745072cb882775e78e3cf7d7bdb755d1..29f76f256b112e2a6fd04054da0c7c381fa052a3 100644
+--- a/wpilibc/wpilibC++/lib/CANJaguar.cpp
++++ b/wpilibc/wpilibC++/lib/CANJaguar.cpp
+@@ -135,6 +135,8 @@ void CANJaguar::InitCANJaguar()
+ 	requestMessage(CAN_IS_FRAME_REMOTE | CAN_MSGID_API_FIRMVER);
+ 	requestMessage(LM_API_HWVER);
+ 
++	Wait(0.003);
++
+ 	if(getMessage(CAN_MSGID_API_FIRMVER, CAN_MSGID_FULL_M, dataBuffer, &dataSize))
+ 		m_firmwareVersion = unpackint32_t(dataBuffer);
+ 	else
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+index 30dcd4ef303743708d03c50a216bb6c6fb706fcb..182f6119a6718620c2576b5a09bff2232eff0bd1 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/CANJaguarTest.cpp
+@@ -109,6 +109,7 @@ TEST_F(CANJaguarTest, EncoderPositionPID) {
+ TEST_F(CANJaguarTest, FakePotentiometerPosition) {
+     m_jaguar->SetPositionReference(CANJaguar::kPosRef_Potentiometer);
+     m_jaguar->ConfigPotentiometerTurns(1);
++    m_jaguar->EnableControl();
+ 
+     m_fakePotentiometer->SetVoltage(0.0f);
+     Wait(kPotentiometerSettlingTime);
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
+index 2776c195f89444addc8b5170b739b8106eda0681..65850f0c12a9203476b06d5129b2148d112fa612 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/CANJaguar.java
+@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
+ import edu.wpi.first.wpilibj.SpeedController;
+ import edu.wpi.first.wpilibj.can.CANExceptionFactory;
+ import edu.wpi.first.wpilibj.can.CANJaguarVersionException;
++import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
+ import edu.wpi.first.wpilibj.can.CANJNI;
+-import edu.wpi.first.wpilibj.can.CANTimeoutException;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.hal.HALLibrary;
+@@ -36,1415 +36,1630 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
+     public static final int kControllerRate = 1000;
+     public static final double kApproxBusVoltage = 12.0;
+ 
++	private MotorSafetyHelper m_safetyHelper;
++
++	private static final int kFullMessageIDMask = CANJNI.CAN_MSGID_API_M | CANJNI.CAN_MSGID_MFR_M | CANJNI.CAN_MSGID_DTYPE_M;
++	private static final int kSendMessagePeriod = 20;
++
+     /**
+      * Mode determines how the Jaguar is controlled
+      */
+-    public static class ControlMode {
+-
+-        public final int value;
+-        static final int kPercentVbus_val = 0;
+-        static final int kCurrent_val = 1;
+-        static final int kSpeed_val = 2;
+-        static final int kPosition_val = 3;
+-        static final int kVoltage_val = 4;
+-        public static final ControlMode kPercentVbus = new ControlMode(kPercentVbus_val);
+-        public static final ControlMode kCurrent = new ControlMode(kCurrent_val);
+-        public static final ControlMode kSpeed = new ControlMode(kSpeed_val);
+-        public static final ControlMode kPosition = new ControlMode(kPosition_val);
+-        public static final ControlMode kVoltage = new ControlMode(kVoltage_val);
+-
+-        private ControlMode(int value) {
+-            this.value = value;
+-        }
+-    }
++    public enum ControlMode {
++		PercentVbus, Current, Speed, Position, Voltage;
++	}
+ 
+     /**
+      * Faults reported by the Jaguar
+      */
+-    public static class Faults {
+-
+-        public final int value;
+-        static final int kCurrentFault_val = 1;
+-        static final int kTemperatureFault_val = 2;
+-        static final int kBusVoltageFault_val = 4;
+-        static final int kGateDriverFault_val = 8;
+-        public static final Faults kCurrentFault = new Faults(kCurrentFault_val);
+-        public static final Faults kTemperatureFault = new Faults(kTemperatureFault_val);
+-        public static final Faults kBusVoltageFault = new Faults(kBusVoltageFault_val);
+-        public static final Faults kGateDriverFault = new Faults(kGateDriverFault_val);
+-
+-        private Faults(int value) {
+-            this.value = value;
+-        }
+-    }
++	public static final int kCurrentFault = 1;
++	public static final int kTemperatureFault = 2;
++	public static final int kBusVoltageFault = 4;
++	public static final int kGateDriverFault = 8;
+ 
+     /**
+      * Limit switch masks
+      */
+-    public static class Limits {
+-
+-        public final int value;
+-        static final int kForwardLimit_val = 1;
+-        static final int kReverseLimit_val = 2;
+-        public static final Limits kForwardLimit = new Limits(kForwardLimit_val);
+-        public static final Limits kReverseLimit = new Limits(kReverseLimit_val);
+-
+-        private Limits(int value) {
+-            this.value = value;
+-        }
+-    }
++	public static final int kForwardLimit = 1;
++	public static final int kReverseLimit = 2;
+ 
+     /**
+      * Determines which sensor to use for position reference.
+      */
+-    public static class PositionReference {
+-
+-        public final byte value;
+-        static final byte kQuadEncoder_val = 0;
+-        static final byte kPotentiometer_val = 1;
+-        static final byte kNone_val = (byte)0xFF;
+-        public static final PositionReference kQuadEncoder = new PositionReference(kQuadEncoder_val);
+-        public static final PositionReference kPotentiometer = new PositionReference(kPotentiometer_val);
+-        public static final PositionReference kNone = new PositionReference(kNone_val);
+-
+-        private PositionReference(byte value) {
+-            this.value = value;
+-        }
+-    }
++    public enum PositionReference {
++		QuadEncoder((byte)0), Potentiometer((byte)1), None((byte)0xff);
+ 
+-    /**
+-     * Determines which sensor to use for speed reference.
+-     */
+-    public static class SpeedReference {
+-
+-        public final byte value;
+-        static final byte kEncoder_val = 0;
+-        static final byte kInvEncoder_val = 2;
+-        static final byte kQuadEncoder_val = 3;
+-        static final byte kNone_val = (byte)0xFF;
+-        public static final SpeedReference kEncoder = new SpeedReference(kEncoder_val);
+-        public static final SpeedReference kInvEncoder = new SpeedReference(kInvEncoder_val);
+-        public static final SpeedReference kQuadEncoder = new SpeedReference(kQuadEncoder_val);
+-        public static final SpeedReference kNone = new SpeedReference(kNone_val);
+-
+-        private SpeedReference(byte value) {
+-            this.value = value;
+-        }
+-    }
+-
+-    /**
+-     * Determines how the Jaguar behaves when sending a zero signal.
+-     */
+-    public static class NeutralMode {
+-
+-        public final byte value;
+-        static final byte kJumper_val = 0;
+-        static final byte kBrake_val = 1;
+-        static final byte kCoast_val = 2;
+-        public static final NeutralMode kJumper = new NeutralMode(kJumper_val);
+-        public static final NeutralMode kBrake = new NeutralMode(kBrake_val);
+-        public static final NeutralMode kCoast = new NeutralMode(kCoast_val);
+-
+-        private NeutralMode(byte value) {
+-            this.value = value;
+-        }
+-    }
+-
+-    /**
+-     * Determines which sensor to use for position reference.
+-     */
+-    public static class LimitMode {
++		public byte value;
+ 
+-        public final byte value;
+-        static final byte kSwitchInputsOnly_val = 0;
+-        static final byte kSoftPositionLimit_val = 1;
+-        public static final LimitMode kSwitchInputsOnly = new LimitMode(kSwitchInputsOnly_val);
+-        public static final LimitMode kSoftPostionLimits = new LimitMode(kSoftPositionLimit_val);
+-
+-        private LimitMode(byte value) {
+-            this.value = value;
+-        }
+-    }
+-
+-    private final Object m_transactionMutex = new Object();
+-    private byte m_deviceNumber;
+-    private ControlMode m_controlMode;
+-    private double m_maxOutputVoltage;
+-    //private Semaphore m_receiveSemaphore;
+-    private MotorSafetyHelper m_safetyHelper;
+-    private static final byte[] kNoData = new byte[0];
+-
+-    private final static void swap16(int x, byte[] buffer) {
+-    	buffer[0] = (byte)(x & 0xff);
+-    	buffer[1] = (byte)((x>>8) & 0xff);
+-    }
+-
+-    private final static void swap32(long x, byte[] buffer) {
+-    	buffer[0] = (byte)(x & 0xff);
+-    	buffer[1] = (byte)((x>>8) & 0xff);
+-    	buffer[2] = (byte)((x>>16) & 0xff);
+-    	buffer[3] = (byte)((x>>24) & 0xff);
+-    }
+-
+-    /**
+-     * Unpack 16-bit data from a buffer in little-endian byte order
+-     * @param buffer The buffer to unpack from
+-     * @param offset The offset into he buffer to unpack
+-     * @return The data that was unpacked
+-     */
+-    private static final short unpack16(byte[] buffer, int offset) {
+-        return (short) (((int) buffer[offset] & 0xFF) | (short) ((buffer[offset + 1] << 8)) & 0xFF00);
+-    }
+-
+-    /**
+-     * Unpack 32-bit data from a buffer in little-endian byte order
+-     * @param buffer The buffer to unpack from
+-     * @param offset The offset into he buffer to unpack
+-     * @return The data that was unpacked
+-     */
+-    private static final int unpack32(byte[] buffer, int offset) {
+-        return ((int) buffer[offset] & 0xFF) | ((buffer[offset + 1] << 8) & 0xFF00) |
+-               ((buffer[offset + 2] << 16) & 0xFF0000) | ((buffer[offset + 3] << 24) & 0xFF000000);
+-    }
+-    private static final int kFullMessageIDMask = 0x1FFFFFC0;
+-
+-    /**
+-     * Common initialization code called by all constructors.
+-     */
+-    private void initCANJaguar() throws CANTimeoutException {
+-        if (m_deviceNumber < 1 || m_deviceNumber > 63) {
+-            throw new RuntimeException("Invalid CAN device number \"" +
+-                                       m_deviceNumber + "\" - must be between 1 and 63.");
+-        }
+-
+-        // VxWorks semaphore for calling async CAN receive API.
+-        //Semaphore.Options options = new Semaphore.Options();
+-        //options.setPrioritySorted(true);
+-        //m_receiveSemaphore = new Semaphore(options, false);
+-
+-        int fwVer = getFirmwareVersion();
+-        if (fwVer >= CANJaguarVersionException.kMinRDKFirmwareVersion ||
+-                fwVer < CANJaguarVersionException.kMinLegalFIRSTFirmwareVersion) {
+-            throw new CANJaguarVersionException(m_deviceNumber, fwVer);
+-        }
+-
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-        case ControlMode.kVoltage_val:
+-            enableControl();
+-            break;
+-        default:
+-            break;
+-        }
+-        m_safetyHelper = new MotorSafetyHelper(this);
+-
+-        UsageReporting.report(tResourceType.kResourceType_CANJaguar, m_deviceNumber, m_controlMode.value);
+-        LiveWindow.addActuator("CANJaguar", m_deviceNumber, 0, this);
+-    }
++		public static PositionReference valueOf(byte value) {
++			for(PositionReference posRef : values()) {
++				if(posRef.value == value) {
++					return posRef;
++				}
++			}
+ 
+-    /**
+-     * Constructor
+-     * Default to percent Vbus control mode.
+-     * @param deviceNumber The address of the Jaguar on the CAN bus.
+-     */
+-    public CANJaguar(int deviceNumber) throws CANTimeoutException {
+-        m_deviceNumber = (byte) deviceNumber;
+-        m_controlMode = ControlMode.kPercentVbus;
+-        m_maxOutputVoltage = kApproxBusVoltage;
+-        initCANJaguar();
+-    }
+-
+-    /**
+-     * Constructor
+-     * @param deviceNumber The address of the Jaguar on the CAN bus.
+-     * @param controlMode The control mode that the Jaguar will run in.
+-     */
+-    public CANJaguar(int deviceNumber, ControlMode controlMode) throws CANTimeoutException {
+-        m_deviceNumber = (byte) deviceNumber;
+-        m_controlMode = controlMode;
+-        m_maxOutputVoltage = kApproxBusVoltage;
+-        initCANJaguar();
+-    }
++			return null;
++		}
+ 
+-    /**
+-     * Set the output set-point value.
+-     *
+-     * The scale and the units depend on the mode the Jaguar is in.
+-     * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
+-     * In Voltage Mode, the outputValue is in Volts.
+-     * In Current Mode, the outputValue is in Amps.
+-     * In Speed Mode, the outputValue is in Rotations/Minute.
+-     * In Position Mode, the outputValue is in Rotations.
+-     *
+-     * @param outputValue The set-point to sent to the motor controller.
+-     */
+-    public void setX(double outputValue) throws CANTimeoutException {
+-        setX(outputValue, (byte) 0);
++		private PositionReference(byte value) {
++			this.value = value;
++		}
+     }
+ 
+     /**
+-     * Set the output set-point value.
+-     *
+-     * Needed by the SpeedControl interface (swallows CANTimeoutExceptions).
+-     *
+-     * @deprecated Use setX instead.
+-     * @param outputValue The set-point to sent to the motor controller.
++     * Determines which sensor to use for speed reference.
+      */
+-    public void set(double outputValue) {
+-        set(outputValue, (byte) 0);
+-    }
++    public enum SpeedReference {
++		Encoder((byte)0), InvEncoder((byte)2), QuadEncoder((byte)3), None((byte)0xff);
+ 
+-    /**
+-     * Set the output set-point value.
+-     *
+-     * The scale and the units depend on the mode the Jaguar is in.
+-     * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
+-     * In Voltage Mode, the outputValue is in Volts.
+-     * In Current Mode, the outputValue is in Amps.
+-     * In Speed Mode, the outputValue is in Rotations/Minute.
+-     * In Position Mode, the outputValue is in Rotations.
+-     *
+-     * @param outputValue The set-point to sent to the motor controller.
+-     * @param syncGroup The update group to add this set() to, pending updateSyncGroup().  If 0, update immediately.
+-     */
+-    public void setX(double outputValue, byte syncGroup) throws CANTimeoutException {
+-        int messageID = 0;
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
++		public byte value;
+ 
+-        if (!m_safetyHelper.isAlive()) {
+-            enableControl();
+-        }
++		public static SpeedReference valueOf(byte value) {
++			for(SpeedReference speedRef : values()) {
++				if(speedRef.value == value) {
++					return speedRef;
++				}
++			}
+ 
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-            messageID = CANJNI.LM_API_VOLT_T_SET;
+-            if (outputValue > 1.0) outputValue = 1.0;
+-            if (outputValue < -1.0) outputValue = -1.0;
+-            packPercentage(dataBuffer, outputValue);
+-            dataSize = 2;
+-            break;
+-        case ControlMode.kSpeed_val: {
+-            messageID = CANJNI.LM_API_SPD_T_SET;
+-            dataSize = packFXP16_16(dataBuffer, outputValue);
+-        }
+-        break;
+-        case ControlMode.kPosition_val: {
+-            messageID = CANJNI.LM_API_POS_T_SET;
+-            dataSize = packFXP16_16(dataBuffer, outputValue);
+-        }
+-        break;
+-        case ControlMode.kCurrent_val: {
+-            messageID = CANJNI.LM_API_ICTRL_T_SET;
+-            dataSize = packFXP8_8(dataBuffer, outputValue);
+-        }
+-        break;
+-        case ControlMode.kVoltage_val: {
+-            messageID = CANJNI.LM_API_VCOMP_T_SET;
+-            dataSize = packFXP8_8(dataBuffer, outputValue);
+-        }
+-        break;
+-        default:
+-            return;
+-        }
+-        if (syncGroup != 0) {
+-            dataBuffer[dataSize] = syncGroup;
+-            dataSize++;
+-        }
+-        setTransaction(messageID, dataBuffer, dataSize);
+-        m_safetyHelper.feed();
+-    }
++			return null;
++		}
+ 
+-    /**
+-     * Set the output set-point value.
+-     *
+-     * Needed by the SpeedControl interface (swallows CANTimeoutExceptions).
+-     *
+-     * @deprecated Use setX instead.
+-     * @param outputValue The set-point to sent to the motor controller.
+-     * @param syncGroup The update group to add this set() to, pending updateSyncGroup().  If 0, update immediately.
+-     */
+-    public void set(double outputValue, byte syncGroup) {
+-        try {
+-            setX(outputValue, syncGroup);
+-        } catch (CANTimeoutException e) {}
++		private SpeedReference(byte value) {
++			this.value = value;
++		}
+     }
+ 
+     /**
+-     * Get the recently set outputValue setpoint.
+-     *
+-     * The scale and the units depend on the mode the Jaguar is in.
+-     * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
+-     * In Voltage Mode, the outputValue is in Volts.
+-     * In Current Mode, the outputValue is in Amps.
+-     * In Speed Mode, the outputValue is in Rotations/Minute.
+-     * In Position Mode, the outputValue is in Rotations.
+-     *
+-     * @return The most recently set outputValue setpoint.
++     * Determines how the Jaguar behaves when sending a zero signal.
+      */
+-    public double getX() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-            dataSize = getTransaction(CANJNI.LM_API_VOLT_SET, dataBuffer);
+-            if (dataSize == 2) {
+-                return unpackPercentage(dataBuffer);
+-            }
+-            break;
+-        case ControlMode.kSpeed_val:
+-            dataSize = getTransaction(CANJNI.LM_API_SPD_SET, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        case ControlMode.kPosition_val:
+-            dataSize = getTransaction(CANJNI.LM_API_POS_SET, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        case ControlMode.kCurrent_val:
+-            dataSize = getTransaction(CANJNI.LM_API_ICTRL_SET, dataBuffer);
+-            if (dataSize == 2) {
+-                return unpackFXP8_8(dataBuffer);
+-            }
+-            break;
+-        case ControlMode.kVoltage_val:
+-            dataSize = getTransaction(CANJNI.LM_API_VCOMP_SET, dataBuffer);
+-            if (dataSize == 2) {
+-                return unpackFXP8_8(dataBuffer);
+-            }
+-            break;
+-        }
+-        return 0.0;
++    public enum NeutralMode {
++		Jumper((byte)0), Brake((byte)1), Coast((byte)2);
+ 
+-    }
++		public byte value;
+ 
+-    public void setNoAck(float value, byte syncGroup) throws CANTimeoutException {
+-    	int messageID;
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
++		public static NeutralMode valueOf(byte value) {
++			for(NeutralMode mode : values()) {
++				if(mode.value == value) {
++					return mode;
++				}
++			}
+ 
+-        if (!m_safetyHelper.isAlive()) {
+-            enableControl();
+-        }
+-
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-            messageID = CANJNI.LM_API_VOLT_T_SET_NO_ACK;
+-            if (value > 1.0) value = 1.0f;
+-            if (value < -1.0) value = -1.0f;
+-            packPercentage(dataBuffer, value);
+-            dataSize = 2;
+-            break;
+-        case ControlMode.kSpeed_val: {
+-            messageID = CANJNI.LM_API_SPD_T_SET;
+-            dataSize = packFXP16_16(dataBuffer, value);
+-        }
+-        break;
+-        case ControlMode.kPosition_val: {
+-            messageID = CANJNI.LM_API_POS_T_SET;
+-            dataSize = packFXP16_16(dataBuffer, value);
+-        }
+-        break;
+-        case ControlMode.kCurrent_val: {
+-            messageID = CANJNI.LM_API_ICTRL_T_SET;
+-            dataSize = packFXP8_8(dataBuffer, value);
+-        }
+-        break;
+-        case ControlMode.kVoltage_val: {
+-            messageID = CANJNI.LM_API_VCOMP_T_SET_NO_ACK;
+-            dataSize = packFXP8_8(dataBuffer, value);
+-        }
+-        break;
+-        default:
+-            return;
+-        }
+-
+-        if (syncGroup != 0) {
+-            dataBuffer[dataSize] = syncGroup;
+-            dataSize++;
+-        }
+-
+-        synchronized(m_transactionMutex) {
+-        	sendMessage(messageID | m_deviceNumber, dataBuffer, dataSize);
+-        }
+-
+-        m_safetyHelper.feed();
+-    }
+-
+-    /**
+-     * Get the recently set outputValue setpoint.
+-     *
+-     * Needed by the SpeedControl interface (swallows CANTimeoutExceptions).
+-     *
+-     * @deprecated Use getX instead.
+-     * @return The most recently set outputValue setpoint.
+-     */
+-    public double get() {
+-        try {
+-            return getX();
+-        } catch (CANTimeoutException e) {
+-            return 0.0;
+-        }
+-    }
++			return null;
++		}
+ 
+-    /**
+-     * Common interface for disabling a motor.
+-     *
+-     * Needed by the SpeedControl interface (swallows CANTimeoutExceptions).
+-     *
+-     * @deprecated Use disableControl instead.
+-     */
+-    public void disable() {
+-        try {
+-            disableControl();
+-        } catch (CANTimeoutException e) {}
++		private NeutralMode(byte value) {
++			this.value = value;
++		}
+     }
+ 
+     /**
+-     * Write out the PID value as seen in the PIDOutput base object.
+-     *
+-     * @deprecated Use setX instead.
+-     * @param output Write out the percentage voltage value as was computed by the PIDController
++     * Determines which sensor to use for position reference.
+      */
+-    public void pidWrite(double output) {
+-        if (m_controlMode == ControlMode.kPercentVbus) {
+-            set(output);
+-        } else {
+-            // TODO: Error... only percent vbus mode supported for PID API
+-        }
+-    }
+-
+-    byte packPercentage(byte[] buffer, double value) {
+-        short intValue = (short) (value * 32767.0);
+-        swap16(intValue, buffer);
+-        return 2;
+-    }
++    public enum LimitMode {
++		SwitchInputsOnly((byte)0), SoftPositionLimits((byte)1);
+ 
+-    byte packFXP8_8(byte[] buffer, double value) {
+-        short intValue = (short) (value * 256.0);
+-        swap16(intValue, buffer);
+-        return 2;
+-    }
+-
+-    byte packFXP16_16(byte[] buffer, double value) {
+-        int intValue = (int) (value * 65536.0);
+-        swap32(intValue, buffer);
+-        return 4;
+-    }
++		public byte value;
+ 
+-    byte packINT16(byte[] buffer, short value) {
+-        swap16(value, buffer);
+-        return 2;
+-    }
++		public static LimitMode valueOf(byte value) {
++			for(LimitMode mode : values()) {
++				if(mode.value == value) {
++					return mode;
++				}
++			}
+ 
+-    byte packINT32(byte[] buffer, int value) {
+-        swap32(value, buffer);
+-        return 4;
+-    }
+-
+-    double unpackPercentage(byte[] buffer) {
+-        return unpack16(buffer,0) / 32767.0;
+-    }
+-
+-    double unpackFXP8_8(byte[] buffer) {
+-        return unpack16(buffer,0) / 256.0;
+-    }
+-
+-    double unpackFXP16_16(byte[] buffer) {
+-        return unpack32(buffer,0) / 65536.0;
+-    }
+-
+-    int unpackINT16(byte[] buffer) {
+-        return unpack16(buffer,0);
+-    }
++			return null;
++		}
+ 
+-    long unpackINT32(byte[] buffer) {
+-        return unpack32(buffer,0);
++		private LimitMode(byte value) {
++			this.value = value;
++		}
+     }
+-    private static final ByteBuffer sendTrustedDataBuffer = ByteBuffer.allocateDirect(kMaxMessageDataSize);
+ 
+-    /**
+-     * Send a message on the CAN bus through the CAN driver in FRC_NetworkCommunication
+-     *
+-     * Trusted messages require a 2-byte token at the beginning of the data payload.
+-     * If the message being sent is trusted, make space for the token.
+-     *
+-     * @param messageID The messageID to be used on the CAN bus
+-     * @param data The up to 8 bytes of data to be sent with the message
+-     * @param dataSize Specify how much of the data in "data" to send
+-     */
+-    protected static void sendMessage(int messageID, byte[] data, int dataSize) throws CANTimeoutException {
+-        final int[] kTrustedMessages = {
+-        		CANJNI.LM_API_VOLT_T_EN, CANJNI.LM_API_VOLT_T_SET,
+-        		CANJNI.LM_API_SPD_T_EN, CANJNI.LM_API_SPD_T_SET,
+-        		CANJNI.LM_API_VCOMP_T_EN, CANJNI.LM_API_VCOMP_T_SET,
+-        		CANJNI.LM_API_POS_T_EN, CANJNI.LM_API_POS_T_SET,
+-        		CANJNI.LM_API_ICTRL_T_EN, CANJNI.LM_API_ICTRL_T_SET
+-        };
++	public CANJaguar(int deviceNumber, ControlMode controlMode) throws CANMessageNotFoundException {
++		m_deviceNumber = (byte)deviceNumber;
++		m_controlMode = controlMode;
+ 
+-        byte i;
+-        for (i = 0; i < kTrustedMessages.length; i++) {
+-            if ((kFullMessageIDMask & messageID) == kTrustedMessages[i])
+-            {
+-                // Make sure the data will still fit after adjusting for the token.
+-                if (dataSize > kMaxMessageDataSize - 2) {
+-                    throw new RuntimeException("CAN message has too much data.");
+-                }
++		m_safetyHelper = new MotorSafetyHelper(this);
+ 
+-                ByteBuffer trustedBuffer = ByteBuffer.allocateDirect(dataSize+2);
+-                trustedBuffer.put(0, (byte)0);
+-                trustedBuffer.put(1, (byte)0);
++		byte[] data = new byte[8];
+ 
+-                byte j;
+-                for (j = 0; j < dataSize; j++) {
+-                    trustedBuffer.put(j+2, data[j]);
+-                }
++		// Request all status data periodically
++		requestMessage(CANJNI.LM_API_STATUS_VOLTBUS, kSendMessagePeriod);
++		requestMessage(CANJNI.LM_API_STATUS_VOUT, kSendMessagePeriod);
++		requestMessage(CANJNI.LM_API_STATUS_CURRENT, kSendMessagePeriod);
++		requestMessage(CANJNI.LM_API_STATUS_TEMP, kSendMessagePeriod);
++		requestMessage(CANJNI.LM_API_STATUS_POS, kSendMessagePeriod);
++		requestMessage(CANJNI.LM_API_STATUS_SPD, kSendMessagePeriod);
++		requestMessage(CANJNI.LM_API_STATUS_LIMIT, kSendMessagePeriod);
++		requestMessage(CANJNI.LM_API_STATUS_FAULT, kSendMessagePeriod);
++		requestMessage(CANJNI.LM_API_STATUS_POWER, kSendMessagePeriod);
+ 
++		// Request firmware and hardware version only once
++		requestMessage(CANJNI.CAN_IS_FRAME_REMOTE | CANJNI.CAN_MSGID_API_FIRMVER);
++		requestMessage(CANJNI.LM_API_HWVER);
+ 
+-        		ByteBuffer status = ByteBuffer.allocateDirect(4);
+-        		// set the byte order
+-        		status.order(ByteOrder.LITTLE_ENDIAN);
+-        		status.asIntBuffer().put(0,dataSize+2);
++		Timer.delay(0.003);
+ 
++		// Don't catch the CANMessageNotFoundException - we need to know the
++		// firmware version to continue.
++		getMessage(CANJNI.CAN_MSGID_API_FIRMVER, CANJNI.CAN_MSGID_FULL_M, data);
++		m_firmwareVersion = unpackINT32(data);
+ 
+-        		CANJNI.FRCNetworkCommunicationCANSessionMuxSendMessage(messageID, trustedBuffer, 0, status.asIntBuffer());
+-                return;
+-            }
+-        }
+-
+-        ByteBuffer status = ByteBuffer.allocateDirect(4);
+-		// set the byte order
+-		status.order(ByteOrder.LITTLE_ENDIAN);
+-		status.asIntBuffer().put(0,dataSize);
+-		
+-		ByteBuffer timeStamp = ByteBuffer.allocateDirect(4);
+-		// set the byte order
+-		timeStamp.order(ByteOrder.LITTLE_ENDIAN);
+-		
+-		ByteBuffer messageIDBuffer = ByteBuffer.allocate(4);
+-		//set the byte order
+-		messageIDBuffer.order(ByteOrder.LITTLE_ENDIAN);
+-		messageIDBuffer.asIntBuffer().put(messageID);
+-		
+-
+-		ByteBuffer dataBuffer = null;
+-		if( dataSize > 0)
+-		{
+-			dataBuffer = ByteBuffer.allocateDirect(dataSize);
+-			dataBuffer.put(data);
++		try {
++			getMessage(CANJNI.LM_API_HWVER, CANJNI.CAN_MSGID_FULL_M, data);
++			m_hardwareVersion = data[0];
++		} catch(CANMessageNotFoundException e) {
++			// Not all Jaguar firmware reports a hardware version.
++			m_hardwareVersion = 0;
+ 		}
+-		
+-		int messageIDmask = 0x1fffffff;
+-		
+-		dataBuffer = CANJNI.FRCNetworkCommunicationCANSessionMuxReceiveMessage(messageIDBuffer.asIntBuffer(), messageIDmask, timeStamp, status.asIntBuffer());
++	}
+ 
+-		CANExceptionFactory.checkStatus(status.asIntBuffer().get(0), messageID);
+-    }
++	public CANJaguar(int deviceNumber) {
++		this(deviceNumber, ControlMode.PercentVbus);
++	}
++
++	/**
++	 * Cancel periodic messages to the Jaguar, effectively disabling it.
++	 * No other methods should be called after this is called.
++	 */
++	public void free() {
++		m_safetyHelper = null;
+ 
+-    /**
+-     * Receive a message from the CAN bus through the CAN driver in FRC_NetworkCommunication
+-     *
+-     * @param messageID The messageID to read from the CAN bus
+-     * @param data The up to 8 bytes of data that was received with the message
+-     * @param timeout Specify how long to wait for a message (in seconds)
+-     */
+-    protected static byte receiveMessage(int messageID, byte[] data, double timeout) throws CANTimeoutException {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+-		// set the byte order
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
++		status.asIntBuffer().put(0, 0);
+ 
+-		ByteBuffer messageIDBuffer = ByteBuffer.allocateDirect(4);
+-		messageIDBuffer.order(ByteOrder.LITTLE_ENDIAN);
+-		messageIDBuffer.asIntBuffer().put(0,messageID);
+-		
+-		
+-		ByteBuffer dataBuffer = null; /*CANJNI.FRCNetworkCommunicationJaguarCANDriverReceiveMessage(
+-				messageIDBuffer.asIntBuffer(), (int) (timeout*1000), status.asIntBuffer());
+-				*/
+-		CANExceptionFactory.checkStatus(status.asIntBuffer().get(0), messageID);
+-
+-        byte returnValue = 0;
+-
+-        if( dataBuffer != null )
+-        {
+-        	returnValue = (byte)dataBuffer.capacity();
+-        	for(int index = 0; index < returnValue; index++)
+-        	{
+-        		data[index] = dataBuffer.get(index);
+-        	}
+-        }
+-
+-        return returnValue;
+-    }
+-
+-    protected static byte receiveMessage(int messageID, byte[] data) throws CANTimeoutException {
+-        //return receiveMessage(messageID, data, 0.01);
+-        return receiveMessage(messageID, data, 0.1);
+-    }
+-
+-    /**
+-     * Execute a transaction with a Jaguar that sets some property.
+-     *
+-     * Jaguar always acks when it receives a message.  If we don't wait for an ack,
+-     * the message object in the Jaguar could get overwritten before it is handled.
+-     *
+-     * @param messageID The messageID to be used on the CAN bus (device number is added internally)
+-     * @param data The up to 8 bytes of data to be sent with the message
+-     * @param dataSize Specify how much of the data in "data" to send
+-     */
+-    protected byte setTransaction(int messageID, byte[] data, byte dataSize) throws CANTimeoutException {
+-        int ackMessageID = CANJNI.LM_API_ACK | m_deviceNumber;
+-
+-        // Make sure we don't have more than one transaction with the same Jaguar outstanding.
+-        synchronized (m_transactionMutex) {
+-            // Throw away any stale acks.
+-            try {
+-                receiveMessage(ackMessageID, kNoData, 0.0);
+-            } catch(CANTimeoutException e) {}
+-            // Send the message with the data.
+-            sendMessage(messageID | m_deviceNumber, data, dataSize);
+-            // Wait for an ack.
+-            dataSize = receiveMessage(ackMessageID, kNoData);
+-        }
+-        return dataSize;
+-    }
+-
+-    /**
+-     * Execute a transaction with a Jaguar that gets some property.
+-     *
+-     * Jaguar always generates a message with the same message ID when replying.
+-     *
+-     * @param messageID The messageID to read from the CAN bus (device number is added internally)
+-     * @param data The up to 8 bytes of data that was received with the message
+-     * @return Indicates how much data was received
+-     */
+-    protected byte getTransaction(int messageID, byte[] data) throws CANTimeoutException {
+-        int targetedMessageID = messageID | m_deviceNumber;
+-        byte dataSize = 0;
+-        // Make sure we don't have more than one transaction with the same Jaguar outstanding.
+-        synchronized (m_transactionMutex) {
+-            // Send the message requesting data.
+-            sendMessage(targetedMessageID, kNoData, 0);
+-            // Caller may have set bit31 for remote frame transmission so clear invalid bits[31-29]
+-            targetedMessageID &= 0x1FFFFFFF;
+-            // Wait for the data.
+-            dataSize = receiveMessage(targetedMessageID, data);
+-        }
+-        return dataSize;
+-    }
+-
+-    /**
+-     * Set the reference source device for speed controller mode.
+-     *
+-     * Choose encoder as the source of speed feedback when in speed control mode.
+-     *
+-     * @param reference Specify a SpeedReference.
+-     */
+-    public void setSpeedReference(SpeedReference reference) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-
+-        dataBuffer[0] = reference.value;
+-        setTransaction(CANJNI.LM_API_SPD_REF, dataBuffer, (byte) 1);
+-    }
+-
+-    /**
+-     * Get the reference source device for speed controller mode.
+-     *
+-     * @return A SpeedReference indicating the currently selected reference device for speed controller mode.
+-     */
+-    public SpeedReference getSpeedReference() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        dataSize = getTransaction(CANJNI.LM_API_SPD_REF, dataBuffer);
+-        if (dataSize == 1) {
+-            switch (dataBuffer[0]) {
+-            case SpeedReference.kEncoder_val:
+-                return SpeedReference.kEncoder;
+-            case SpeedReference.kInvEncoder_val:
+-                return SpeedReference.kInvEncoder;
+-            case SpeedReference.kQuadEncoder_val:
+-                return SpeedReference.kQuadEncoder;
+-            case SpeedReference.kNone_val:
+-                return SpeedReference.kNone;
+-            }
+-        }
+-        return SpeedReference.kNone;
+-    }
+-
+-    /**
+-     * Set the reference source device for position controller mode.
+-     *
+-     * Choose between using and encoder and using a potentiometer
+-     * as the source of position feedback when in position control mode.
+-     *
+-     * @param reference Specify a PositionReference.
+-     */
+-    public void setPositionReference(PositionReference reference) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-
+-        dataBuffer[0] = reference.value;
+-        setTransaction(CANJNI.LM_API_POS_REF, dataBuffer, (byte) 1);
+-    }
+-
+-    /**
+-     * Get the reference source device for position controller mode.
+-     *
+-     * @return A PositionReference indicating the currently selected reference device for position controller mode.
+-     */
+-    public PositionReference getPositionReference() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        dataSize = getTransaction(CANJNI.LM_API_POS_REF, dataBuffer);
+-        if (dataSize == 1) {
+-            switch (dataBuffer[0]) {
+-            case PositionReference.kPotentiometer_val:
+-                return PositionReference.kPotentiometer;
+-            case PositionReference.kQuadEncoder_val:
+-                return PositionReference.kQuadEncoder;
+-            case PositionReference.kNone_val:
+-                return PositionReference.kNone;
+-            }
+-        }
+-        return PositionReference.kNone;
+-    }
+-
+-    /**
+-     * Set the P, I, and D constants for the closed loop modes.
+-     *
+-     * @param p The proportional gain of the Jaguar's PID controller.
+-     * @param i The integral gain of the Jaguar's PID controller.
+-     * @param d The differential gain of the Jaguar's PID controller.
+-     */
+-    public void setPID(double p, double i, double d) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
+-
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-        case ControlMode.kVoltage_val:
+-            // TODO: Error, Not Valid
+-            break;
+-        case ControlMode.kSpeed_val:
+-            dataSize = packFXP16_16(dataBuffer, p);
+-            setTransaction(CANJNI.LM_API_SPD_PC, dataBuffer, dataSize);
+-            dataSize = packFXP16_16(dataBuffer, i);
+-            setTransaction(CANJNI.LM_API_SPD_IC, dataBuffer, dataSize);
+-            dataSize = packFXP16_16(dataBuffer, d);
+-            setTransaction(CANJNI.LM_API_SPD_DC, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kPosition_val:
+-            dataSize = packFXP16_16(dataBuffer, p);
+-            setTransaction(CANJNI.LM_API_POS_PC, dataBuffer, dataSize);
+-            dataSize = packFXP16_16(dataBuffer, i);
+-            setTransaction(CANJNI.LM_API_POS_IC, dataBuffer, dataSize);
+-            dataSize = packFXP16_16(dataBuffer, d);
+-            setTransaction(CANJNI.LM_API_POS_DC, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kCurrent_val:
+-            dataSize = packFXP16_16(dataBuffer, p);
+-            setTransaction(CANJNI.LM_API_ICTRL_PC, dataBuffer, dataSize);
+-            dataSize = packFXP16_16(dataBuffer, i);
+-            setTransaction(CANJNI.LM_API_ICTRL_IC, dataBuffer, dataSize);
+-            dataSize = packFXP16_16(dataBuffer, d);
+-            setTransaction(CANJNI.LM_API_ICTRL_DC, dataBuffer, dataSize);
+-            break;
+-        }
+-    }
++		int messageID ;
+ 
+-    /**
+-     * Get the Proportional gain of the controller.
+-     *
+-     * @return The proportional gain.
+-     */
+-    public double getP() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-        case ControlMode.kVoltage_val:
+-            // TODO: Error, Not Valid
+-            break;
+-        case ControlMode.kSpeed_val:
+-            dataSize = getTransaction(CANJNI.LM_API_SPD_PC, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        case ControlMode.kPosition_val:
+-            dataSize = getTransaction(CANJNI.LM_API_POS_PC, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        case ControlMode.kCurrent_val:
+-            dataSize = getTransaction(CANJNI.LM_API_ICTRL_PC, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        }
+-        return 0.0;
+-    }
++		// Disable periodic setpoints
++		switch(m_controlMode) {
++		case PercentVbus:
++			messageID = m_deviceNumber | CANJNI.LM_API_VOLT_T_SET;
++			break;
+ 
+-    /**
+-     * Get the Intregral gain of the controller.
+-     *
+-     * @return The integral gain.
+-     */
+-    public double getI() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-        case ControlMode.kVoltage_val:
+-            // TODO: Error, Not Valid
+-            break;
+-        case ControlMode.kSpeed_val:
+-            dataSize = getTransaction(CANJNI.LM_API_SPD_IC, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        case ControlMode.kPosition_val:
+-            dataSize = getTransaction(CANJNI.LM_API_POS_IC, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        case ControlMode.kCurrent_val:
+-            dataSize = getTransaction(CANJNI.LM_API_ICTRL_IC, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        }
+-        return 0.0;
+-    }
++		case Speed:
++			messageID = m_deviceNumber | CANJNI.LM_API_SPD_T_SET;
++			break;
+ 
+-    /**
+-     * Get the Differential gain of the controller.
+-     *
+-     * @return The differential gain.
+-     */
+-    public double getD() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-        case ControlMode.kVoltage_val:
+-            // TODO: Error, Not Valid
+-            break;
+-        case ControlMode.kSpeed_val:
+-            dataSize = getTransaction(CANJNI.LM_API_SPD_DC, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        case ControlMode.kPosition_val:
+-            dataSize = getTransaction(CANJNI.LM_API_POS_DC, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        case ControlMode.kCurrent_val:
+-            dataSize = getTransaction(CANJNI.LM_API_ICTRL_DC, dataBuffer);
+-            if (dataSize == 4) {
+-                return unpackFXP16_16(dataBuffer);
+-            }
+-            break;
+-        }
+-        return 0.0;
+-    }
+-
+-    /**
+-     * Enable the closed loop controller.
+-     *
+-     * Start actually controlling the output based on the feedback.
+-     */
+-    public void enableControl() throws CANTimeoutException {
+-        enableControl(0.0);
+-    }
+-
+-    /**
+-     * Enable the closed loop controller.
+-     *
+-     * Start actually controlling the output based on the feedback.
+-     * If starting a position controller with an encoder reference,
+-     * use the encoderInitialPosition parameter to initialize the
+-     * encoder state.
+-     * @param encoderInitialPosition Encoder position to set if position with encoder reference.  Ignored otherwise.
+-     */
+-    public void enableControl(double encoderInitialPosition) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-            setTransaction(CANJNI.LM_API_VOLT_T_EN, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kSpeed_val:
+-            setTransaction(CANJNI.LM_API_SPD_T_EN, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kPosition_val:
+-            dataSize = packFXP16_16(dataBuffer, encoderInitialPosition);
+-            setTransaction(CANJNI.LM_API_POS_T_EN, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kCurrent_val:
+-            setTransaction(CANJNI.LM_API_ICTRL_T_EN, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kVoltage_val:
+-            setTransaction(CANJNI.LM_API_VCOMP_T_EN, dataBuffer, dataSize);
+-            break;
+-        }
+-    }
++		case Position:
++			messageID = m_deviceNumber | CANJNI.LM_API_POS_T_SET;
++			break;
+ 
+-    /**
+-     * Disable the closed loop controller.
+-     *
+-     * Stop driving the output based on the feedback.
+-     */
+-    public void disableControl() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-            setTransaction(CANJNI.LM_API_VOLT_DIS, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kSpeed_val:
+-            setTransaction(CANJNI.LM_API_SPD_DIS, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kPosition_val:
+-            setTransaction(CANJNI.LM_API_POS_DIS, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kCurrent_val:
+-            setTransaction(CANJNI.LM_API_ICTRL_DIS, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kVoltage_val:
+-            setTransaction(CANJNI.LM_API_VCOMP_DIS, dataBuffer, dataSize);
+-            break;
+-        }
+-    }
++		case Current:
++			messageID = m_deviceNumber | CANJNI.LM_API_ICTRL_T_SET;
++			break;
+ 
+-    /**
+-     * Change the control mode of this Jaguar object.
+-     *
+-     * After changing modes, configure any PID constants or other settings needed
+-     * and then enableControl() to actually change the mode on the Jaguar.
+-     *
+-     * @param controlMode The new mode.
+-     */
+-    public void changeControlMode(ControlMode controlMode) throws CANTimeoutException {
+-        // Disable the previous mode
+-        disableControl();
+-
+-        // Update the local mode
+-        m_controlMode = controlMode;
+-
+-		// XXX: Resource Reporting Fixes
+-//        UsageReporting.report(UsageReporting.kResourceType_CANJaguar, m_deviceNumber, m_controlMode.value);
+-    }
++		case Voltage:
++			messageID = m_deviceNumber | CANJNI.LM_API_VCOMP_T_SET;
++			break;
+ 
+-    /**
+-     * Get the active control mode from the Jaguar.
+-     *
+-     * Ask the Jag what mode it is in.
+-     *
+-     * @return ControlMode that the Jag is in.
+-     */
+-    public ControlMode getControlMode() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_CMODE, dataBuffer);
+-        if (dataSize == 1) {
+-            switch (dataBuffer[0]) {
+-            case ControlMode.kPercentVbus_val:
+-                return ControlMode.kPercentVbus;
+-            case ControlMode.kCurrent_val:
+-                return ControlMode.kCurrent;
+-            case ControlMode.kSpeed_val:
+-                return ControlMode.kSpeed;
+-            case ControlMode.kPosition_val:
+-                return ControlMode.kPosition;
+-            case ControlMode.kVoltage_val:
+-                return ControlMode.kVoltage;
+-            }
+-        }
+-        return ControlMode.kPercentVbus;
+-    }
+-
+-    /**
+-     * Get the voltage at the battery input terminals of the Jaguar.
+-     *
+-     * @return The bus voltage in Volts.
+-     */
+-    public double getBusVoltage() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_VOLTBUS, dataBuffer);
+-        if (dataSize == 2) {
+-            return unpackFXP8_8(dataBuffer);
+-        }
+-        return 0.0;
+-    }
+-
+-    /**
+-     * Get the voltage being output from the motor terminals of the Jaguar.
+-     *
+-     * @return The output voltage in Volts.
+-     */
+-    public double getOutputVoltage() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize = 0;
+-
+-        // Read the volt out which is in Volts units.
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_VOUT, dataBuffer);
+-        if (dataSize == 2) {
+-            return unpackFXP8_8(dataBuffer);
+-        }
+-        return 0.0;
+-    }
+-
+-    /**
+-     * Get the current through the motor terminals of the Jaguar.
+-     *
+-     * @return The output current in Amps.
+-     */
+-    public double getOutputCurrent() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
+-
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_CURRENT, dataBuffer);
+-        if (dataSize == 2) {
+-            return unpackFXP8_8(dataBuffer);
+-        }
+-        return 0.0;
+-
+-    }
+-
+-    /**
+-     * Get the internal temperature of the Jaguar.
+-     *
+-     * @return The temperature of the Jaguar in degrees Celsius.
+-     */
+-    public double getTemperature() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
+-
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_TEMP, dataBuffer);
+-        if (dataSize == 2) {
+-            return unpackFXP8_8(dataBuffer);
+-        }
+-        return 0.0;
+-    }
+-
+-    /**
+-     * Get the position of the encoder or potentiometer.
+-     *
+-     * @return The position of the motor based on the configured feedback.
+-     */
+-    public double getPosition() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
++		default:
++			return;
++		}
+ 
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_POS, dataBuffer);
+-        if (dataSize == 4) {
+-            return unpackFXP16_16(dataBuffer);
+-        }
+-        return 0.0;
+-    }
++		CANJNI.FRCNetworkCommunicationCANSessionMuxSendMessage(messageID, null,
++			CANJNI.CAN_SEND_PERIOD_STOP_REPEATING, status.asIntBuffer());
++	}
++
++	/**
++	 * Get the recently set outputValue setpoint.
++	 *
++	 * The scale and the units depend on the mode the Jaguar is in.
++	 * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
++	 * In Voltage Mode, the outputValue is in Volts.
++	 * In Current Mode, the outputValue is in Amps.
++	 * In Speed Mode, the outputValue is in Rotations/Minute.
++	 * In Position Mode, the outputValue is in Rotations.
++	 *
++	 * @return The most recently set outputValue setpoint.
++	 */
++	public double get() {
++		return m_value;
++	}
++
++	/**
++	 * Set the output set-point value.
++	 *
++	 * The scale and the units depend on the mode the Jaguar is in.
++	 * In PercentVbus Mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
++	 * In Voltage Mode, the outputValue is in Volts.
++	 * In Current Mode, the outputValue is in Amps.
++	 * In Speed Mode, the outputValue is in Rotations/Minute.
++	 * In Position Mode, the outputValue is in Rotations.
++	 *
++	 * @param outputValue The set-point to sent to the motor controller.
++	 * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0, update immediately.
++	 */
++	public void set(double outputValue, byte syncGroup) {
++		int messageID;
++		byte[] data = new byte[8];
++		byte dataSize;
++
++		switch(m_controlMode) {
++		case PercentVbus:
++			messageID = CANJNI.LM_API_VOLT_T_SET;
++			dataSize = packPercentage(data, outputValue);
++			break;
++
++		case Speed:
++			messageID = CANJNI.LM_API_SPD_T_SET;
++			dataSize = packFXP16_16(data, outputValue);
++			break;
++
++		case Position:
++			messageID = CANJNI.LM_API_POS_T_SET;
++			dataSize = packFXP16_16(data, outputValue);
++			break;
++
++		case Current:
++			messageID = CANJNI.LM_API_ICTRL_T_SET;
++			dataSize = packFXP8_8(data, outputValue);
++			break;
++
++
++		case Voltage:
++			messageID = CANJNI.LM_API_VCOMP_T_SET;
++			dataSize = packFXP8_8(data, outputValue);
++			break;
++
++		default:
++			return;
++		}
+ 
+-    /**
+-     * Get the speed of the encoder.
+-     *
+-     * @return The speed of the motor in RPM based on the configured feedback.
+-     */
+-    public double getSpeed() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
++		if(syncGroup != 0) {
++			data[dataSize++] = syncGroup;
++		}
+ 
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_SPD, dataBuffer);
+-        if (dataSize == 4) {
+-            return unpackFXP16_16(dataBuffer);
+-        }
+-        return 0.0;
+-    }
++		sendMessage(messageID, data, dataSize, kSendMessagePeriod);
++
++		if(m_safetyHelper != null) m_safetyHelper.feed();
++
++		m_value = outputValue;
++
++		verify();
++	}
++
++	public void set(double value) {
++		set(value, (byte)0);
++	}
++
++	/**
++	 * Check all unverified params and make sure they're equal to their local
++	 * cached versions. If a value isn't available, it gets requested.  If a value
++	 * doesn't match up, it gets set again.
++	 */
++	protected void verify() {
++		byte[] data = new byte[8];
++
++		// If the Jaguar lost power, everything should be considered unverified
++		try {
++			getMessage(CANJNI.LM_API_STATUS_POWER, CANJNI.CAN_MSGID_FULL_M, data);
++			boolean powerCycled = data[0] != 0;
++
++			if(powerCycled) {
++				// Clear the power cycled bit
++				data[0] = 1;
++				sendMessage(CANJNI.LM_API_STATUS_POWER, data, 1);
++
++				// Set all configuration data again.  This will resend it to
++				// Jaguar and mark everything as unverified.
++				enableControl();
++				setSpeedReference(m_speedReference);
++				setPositionReference(m_positionReference);
++				configNeutralMode(m_neutralMode);
++				configEncoderCodesPerRev(m_encoderCodesPerRev);
++				configPotentiometerTurns(m_potentiometerTurns);
++
++				switch(m_controlMode) {
++
++				}
++
++				if(m_controlMode == ControlMode.Current ||
++						m_controlMode == ControlMode.Speed ||
++						m_controlMode == ControlMode.Position) {
++					setPID(m_p, m_i, m_d);
++				}
++
++				if(m_limitMode == LimitMode.SoftPositionLimits) {
++					configSoftPositionLimits(m_forwardLimit, m_reverseLimit);
++				}
++
++				configMaxOutputVoltage(m_maxOutputVoltage);
++
++				if(m_controlMode == ControlMode.Voltage ||
++						m_controlMode == ControlMode.PercentVbus) {
++					setVoltageRampRate(m_voltageRampRate);
++				}
++
++				requestMessage(CANJNI.LM_API_STATUS_VOLTBUS, kSendMessagePeriod);
++				requestMessage(CANJNI.LM_API_STATUS_VOUT, kSendMessagePeriod);
++				requestMessage(CANJNI.LM_API_STATUS_CURRENT, kSendMessagePeriod);
++				requestMessage(CANJNI.LM_API_STATUS_TEMP, kSendMessagePeriod);
++				requestMessage(CANJNI.LM_API_STATUS_POS, kSendMessagePeriod);
++				requestMessage(CANJNI.LM_API_STATUS_SPD, kSendMessagePeriod);
++				requestMessage(CANJNI.LM_API_STATUS_LIMIT, kSendMessagePeriod);
++				requestMessage(CANJNI.LM_API_STATUS_FAULT, kSendMessagePeriod);
++				requestMessage(CANJNI.LM_API_STATUS_POWER, kSendMessagePeriod);
++			}
++		} catch(CANMessageNotFoundException e) {}
++
++
++		// Verify that any recently set parameters are correct
++		if(!m_controlModeVerified) {
++			try {
++				getMessage(CANJNI.LM_API_STATUS_CMODE, CANJNI.CAN_MSGID_FULL_M, data);
++
++				ControlMode mode = ControlMode.values()[data[0]];
++
++				if(m_controlMode == mode) {
++					m_controlModeVerified = true;
++				} else {
++					// Enable control again to resend the control mode
++					enableControl();
++				}
++			} catch(CANMessageNotFoundException e) {
++				// Verification is needed but not available - request it again.
++				requestMessage(CANJNI.LM_API_STATUS_CMODE);
++			}
++		}
+ 
+-    /**
+-     * Get the status of the forward limit switch.
+-     *
+-     * @return The motor is allowed to turn in the forward direction when true.
+-     */
+-    public boolean getForwardLimitOK() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
++		if(!m_speedRefVerified) {
++			try {
++				getMessage(CANJNI.LM_API_SPD_REF, CANJNI.CAN_MSGID_FULL_M, data);
++
++				SpeedReference speedRef = SpeedReference.valueOf(data[0]);
++
++				if(m_speedReference == speedRef) {
++					m_speedRefVerified = true;
++				} else {
++					// It's wrong - set it again
++					setSpeedReference(m_speedReference);
++				}
++			} catch(CANMessageNotFoundException e) {
++					// Verification is needed but not available - request it again.
++					requestMessage(CANJNI.LM_API_SPD_REF);
++			}
++		}
+ 
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_LIMIT, dataBuffer);
+-        if (dataSize == 1) {
+-            return (dataBuffer[0] & Limits.kForwardLimit_val) != 0;
+-        }
+-        return false;
+-    }
++		if(!m_posRefVerified) {
++			try {
++				getMessage(CANJNI.LM_API_POS_REF, CANJNI.CAN_MSGID_FULL_M, data);
++
++				PositionReference posRef = PositionReference.valueOf(data[0]);
++
++				if(m_positionReference == posRef) {
++					m_posRefVerified = true;
++				} else {
++					// It's wrong - set it again
++					setPositionReference(m_positionReference);
++				}
++			} catch(CANMessageNotFoundException e) {
++					// Verification is needed but not available - request it again.
++					requestMessage(CANJNI.LM_API_POS_REF);
++			}
++		}
+ 
+-    /**
+-     * Get the status of the reverse limit switch.
+-     *
+-     * @return The motor is allowed to turn in the reverse direction when true.
+-     */
+-    public boolean getReverseLimitOK() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
++		if(!m_pVerified) {
++			int message = 0;
++
++			switch(m_controlMode) {
++				case Speed:
++					message = CANJNI.LM_API_SPD_PC;
++					break;
++
++				case Position:
++					message = CANJNI.LM_API_POS_PC;
++					break;
++
++				case Current:
++					message = CANJNI.LM_API_ICTRL_PC;
++					break;
++
++				default:
++					break;
++			}
++
++			try {
++				getMessage(message, CANJNI.CAN_MSGID_FULL_M, data);
++
++				double p = unpackFXP16_16(data);
++
++				if(FXP16_EQ(m_p, p)) {
++					m_pVerified = true;
++				} else {
++					// It's wrong - set it again
++					setP(m_p);
++				}
++			} catch(CANMessageNotFoundException e) {
++					// Verification is needed but not available - request it again.
++					requestMessage(message);
++			}
++		}
+ 
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_LIMIT, dataBuffer);
+-        if (dataSize == 1) {
+-            return (dataBuffer[0] & Limits.kReverseLimit_val) != 0;
+-        }
+-        return false;
+-    }
++		if(!m_iVerified) {
++			int message = 0;
++
++			switch(m_controlMode) {
++				case Speed:
++					message = CANJNI.LM_API_SPD_IC;
++					break;
++
++				case Position:
++					message = CANJNI.LM_API_POS_IC;
++					break;
++
++				case Current:
++					message = CANJNI.LM_API_ICTRL_IC;
++					break;
++
++				default:
++					break;
++			}
++
++			try {
++				getMessage(message, CANJNI.CAN_MSGID_FULL_M, data);
++
++				double i = unpackFXP16_16(data);
++
++				if(FXP16_EQ(m_i, i)) {
++					m_iVerified = true;
++				} else {
++					// It's wrong - set it again
++					setI(m_p);
++				}
++			} catch(CANMessageNotFoundException e) {
++					// Verification is needed but not available - request it again.
++					requestMessage(message);
++			}
++		}
+ 
+-    /**
+-     * Get the status of any faults the Jaguar has detected.
+-     *
+-     * @return A bit-mask of faults defined by the "Faults" enum class.
+-     */
+-    public short getFaults() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
++		if(!m_dVerified) {
++			int message = 0;
++
++			switch(m_controlMode) {
++				case Speed:
++					message = CANJNI.LM_API_SPD_DC;
++					break;
++
++				case Position:
++					message = CANJNI.LM_API_POS_DC;
++					break;
++
++				case Current:
++					message = CANJNI.LM_API_ICTRL_DC;
++					break;
++
++				default:
++					break;
++			}
++
++			try {
++				getMessage(message, CANJNI.CAN_MSGID_FULL_M, data);
++
++				double d = unpackFXP16_16(data);
++
++				if(FXP16_EQ(m_d, d)) {
++					m_dVerified = true;
++				} else {
++					// It's wrong - set it again
++					setD(m_d);
++				}
++			} catch(CANMessageNotFoundException e) {
++					// Verification is needed but not available - request it again.
++					requestMessage(message);
++			}
++		}
+ 
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_FAULT, dataBuffer);
+-        if (dataSize == 2) {
+-            return (short)unpackINT16(dataBuffer);
+-        }
+-        return 0;
+-    }
++		if(!m_neutralModeVerified) {
++			try {
++				getMessage(CANJNI.LM_API_CFG_BRAKE_COAST, CANJNI.CAN_MSGID_FULL_M, data);
++
++				NeutralMode mode = NeutralMode.valueOf(data[0]);
++
++				if(mode == m_neutralMode) {
++					m_neutralModeVerified = true;
++				} else {
++					//It's wrong - set it again
++					configNeutralMode(m_neutralMode);
++				}
++			} catch(CANMessageNotFoundException e) {
++				// Verification is needed but not available - request it again.
++				requestMessage(CANJNI.LM_API_CFG_BRAKE_COAST);
++			}
++		}
+ 
+-    /**
+-     * Check if the Jaguar's power has been cycled since this was last called.
+-     *
+-     * This should return true the first time called after a Jaguar power up,
+-     * and false after that.
+-     *
+-     * @return The Jaguar was power cycled since the last call to this function.
+-     */
+-    public boolean getPowerCycled() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
+-
+-        dataSize = getTransaction(CANJNI.LM_API_STATUS_POWER, dataBuffer);
+-        if (dataSize == 1) {
+-            boolean powerCycled = dataBuffer[0] != 0;
+-
+-            // Clear the power cycled bit now that we've accessed it
+-            if (powerCycled) {
+-                dataBuffer[0] = 1;
+-                setTransaction(CANJNI.LM_API_STATUS_POWER, dataBuffer, (byte) 1);
+-            }
++		if(!m_encoderCodesPerRevVerified) {
++			try {
++				getMessage(CANJNI.LM_API_CFG_ENC_LINES, CANJNI.CAN_MSGID_FULL_M, data);
++
++				short codes = unpackINT16(data);
++
++				if(codes == m_encoderCodesPerRev) {
++					m_encoderCodesPerRevVerified = true;
++				} else {
++					//It's wrong - set it again
++					configEncoderCodesPerRev(m_encoderCodesPerRev);
++				}
++			} catch(CANMessageNotFoundException e) {
++				// Verification is needed but not available - request it again.
++				requestMessage(CANJNI.LM_API_CFG_ENC_LINES);
++			}
++		}
+ 
+-            return powerCycled;
+-        }
+-        return false;
+-    }
++		if(!m_potentiometerTurnsVerified) {
++			try {
++				getMessage(CANJNI.LM_API_CFG_POT_TURNS, CANJNI.CAN_MSGID_FULL_M, data);
++
++				short turns = unpackINT16(data);
++
++				if(turns == m_potentiometerTurns) {
++					m_potentiometerTurnsVerified = true;
++				} else {
++					//It's wrong - set it again
++					configPotentiometerTurns(m_potentiometerTurns);
++				}
++			} catch(CANMessageNotFoundException e) {
++				// Verification is needed but not available - request it again.
++				requestMessage(CANJNI.LM_API_CFG_POT_TURNS);
++			}
++		}
+ 
+-    /**
+-     * Set the maximum voltage change rate.
+-     *
+-     * When in percent voltage output mode, the rate at which the voltage changes can
+-     * be limited to reduce current spikes.  Set this to 0.0 to disable rate limiting.
+-     *
+-     * @param rampRate The maximum rate of voltage change in Percent Voltage mode in V/s.
+-     */
+-    public void setVoltageRampRate(double rampRate) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
+-
+-        switch (m_controlMode.value) {
+-        case ControlMode.kPercentVbus_val:
+-            dataSize = packPercentage(dataBuffer, rampRate / (m_maxOutputVoltage * kControllerRate));
+-            setTransaction(CANJNI.LM_API_VOLT_SET_RAMP, dataBuffer, dataSize);
+-            break;
+-        case ControlMode.kVoltage_val:
+-            dataSize = packFXP8_8(dataBuffer, rampRate / kControllerRate);
+-            setTransaction(CANJNI.LM_API_VCOMP_IN_RAMP, dataBuffer, dataSize);
+-            break;
+-        default:
+-            return;
+-        }
+-    }
++		if(!m_limitModeVerified) {
++			try {
++				getMessage(CANJNI.LM_API_CFG_LIMIT_MODE, CANJNI.CAN_MSGID_FULL_M, data);
++
++				LimitMode mode = LimitMode.valueOf(data[0]);
++
++				if(mode == m_limitMode) {
++					m_limitModeVerified = true;
++				} else {
++					//It's wrong - set it again
++					configLimitMode(m_limitMode);
++				}
++			} catch(CANMessageNotFoundException e) {
++				// Verification is needed but not available - request it again.
++				requestMessage(CANJNI.LM_API_CFG_LIMIT_MODE);
++			}
++		}
+ 
+-    /**
+-     * Get the version of the firmware running on the Jaguar.
+-     *
+-     * @return The firmware version.  0 if the device did not respond.
+-     */
+-    public int getFirmwareVersion() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
+-
+-        // Set the MSB to tell the 2CAN that this is a remote message.
+-        dataSize = getTransaction(0x80000000 | CANJNI.CAN_MSGID_API_FIRMVER, dataBuffer);
+-        if (dataSize == 4) {
+-            return (int)unpackINT32(dataBuffer);
+-        }
+-        return 0;
+-    }
++		if(!m_forwardLimitVerified) {
++			try {
++				getMessage(CANJNI.LM_API_CFG_LIMIT_FWD, CANJNI.CAN_MSGID_FULL_M, data);
++
++				double limit = unpackFXP16_16(data);
++
++				if(FXP16_EQ(limit, m_forwardLimit)) {
++					m_forwardLimitVerified = true;
++				} else {
++					//It's wrong - set it again
++					configForwardLimit(m_forwardLimit);
++				}
++			} catch(CANMessageNotFoundException e) {
++				// Verification is needed but not available - request it again.
++				requestMessage(CANJNI.LM_API_CFG_LIMIT_FWD);
++			}
++		}
+ 
+-    /**
+-     * Get the version of the Jaguar hardware.
+-     *
+-     * @return The hardware version. 1: Jaguar,  2: Black Jaguar
+-     */
+-    public byte getHardwareVersion() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
+-
+-        dataSize = getTransaction(CANJNI.LM_API_HWVER, dataBuffer);
+-        if (dataSize == 1 + 1) {
+-            if (dataBuffer[0] == m_deviceNumber) {
+-                return dataBuffer[1];
+-            }
+-        }
+-        // Assume Gray Jag if there is no response
+-        return CANJNI.LM_HWVER_JAG_1_0;
+-    }
++		if(!m_reverseLimitVerified) {
++			try {
++				getMessage(CANJNI.LM_API_CFG_LIMIT_REV, CANJNI.CAN_MSGID_FULL_M, data);
++
++				double limit = unpackFXP16_16(data);
++
++				if(FXP16_EQ(limit, m_reverseLimit)) {
++					m_reverseLimitVerified = true;
++				} else {
++					//It's wrong - set it again
++					configReverseLimit(m_reverseLimit);
++				}
++			} catch(CANMessageNotFoundException e) {
++				// Verification is needed but not available - request it again.
++				requestMessage(CANJNI.LM_API_CFG_LIMIT_REV);
++			}
++		}
+ 
+-    /**
+-     * Configure what the controller does to the H-Bridge when neutral (not driving the output).
+-     *
+-     * This allows you to override the jumper configuration for brake or coast.
+-     *
+-     * @param mode Select to use the jumper setting or to override it to coast or brake.
+-     */
+-    public void configNeutralMode(NeutralMode mode) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
++		if(!m_maxOutputVoltageVerified) {
++			try {
++				getMessage(CANJNI.LM_API_CFG_MAX_VOUT, CANJNI.CAN_MSGID_FULL_M, data);
+ 
+-        dataBuffer[0] = mode.value;
+-        setTransaction(CANJNI.LM_API_CFG_BRAKE_COAST, dataBuffer, (byte) 1);
+-    }
++				double voltage = unpackFXP8_8(data);
+ 
+-    /**
+-     * Configure how many codes per revolution are generated by your encoder.
+-     *
+-     * @param codesPerRev The number of counts per revolution in 1X mode.
+-     */
+-    public void configEncoderCodesPerRev(int codesPerRev) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
++				if(FXP8_EQ(voltage, m_maxOutputVoltage)) {
++					m_maxOutputVoltageVerified = true;
++				} else {
++					// It's wrong - set it again
++					configMaxOutputVoltage(m_maxOutputVoltage);
++				}
+ 
+-        dataSize = packINT16(dataBuffer, (short)codesPerRev);
+-        setTransaction(CANJNI.LM_API_CFG_ENC_LINES, dataBuffer, dataSize);
+-    }
++			} catch(CANMessageNotFoundException e) {
++				// Verification is needed but not available - request it again.
++				requestMessage(CANJNI.LM_API_CFG_MAX_VOUT);
++			}
++		}
+ 
+-    /**
+-     * Configure the number of turns on the potentiometer.
+-     *
+-     * There is no special support for continuous turn potentiometers.
+-     * Only integer numbers of turns are supported.
+-     *
+-     * @param turns The number of turns of the potentiometer
+-     */
+-    public void configPotentiometerTurns(int turns) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
++		if(!m_voltageRampRateVerified) {
++			if(m_controlMode == ControlMode.PercentVbus) {
++				try {
++					getMessage(CANJNI.LM_API_VOLT_SET_RAMP, CANJNI.CAN_MSGID_FULL_M, data);
++
++					double rate = unpackPercentage(data);
++
++					if(FXP16_EQ(rate, m_voltageRampRate)) {
++						m_voltageRampRateVerified = true;
++					} else {
++						// It's wrong - set it again
++						setVoltageRampRate(m_voltageRampRate);
++					}
++
++				} catch(CANMessageNotFoundException e) {
++					// Verification is needed but not available - request it again.
++					requestMessage(CANJNI.LM_API_VOLT_SET_RAMP);
++				}
++			}
++		} else if(m_controlMode == ControlMode.Voltage) {
++			try {
++				getMessage(CANJNI.LM_API_VCOMP_IN_RAMP, CANJNI.CAN_MSGID_FULL_M, data);
++
++				double rate = unpackFXP8_8(data);
++
++				if(FXP8_EQ(rate, m_voltageRampRate)) {
++					m_voltageRampRateVerified = true;
++				} else {
++					// It's wrong - set it again
++					setVoltageRampRate(m_voltageRampRate);
++				}
++
++			} catch(CANMessageNotFoundException e) {
++				// Verification is needed but not available - request it again.
++				requestMessage(CANJNI.LM_API_VCOMP_IN_RAMP);
++			}
++		}
++	}
++
++	/**
++	 * Common interface for disabling a motor.
++	 *
++	 * @deprecated Call DisableControl instead.
++	 */
++	@Override
++	public void disable() {
++		disableControl();
++	}
++
++	// PIDOutput interface
++	public void pidWrite(double output) {
++		if (m_controlMode == ControlMode.PercentVbus) {
++			set(output);
++		} else {
++			throw new IllegalStateException("PID only supported in PercentVbus mode");
++		}
++	}
++
++	/**
++	 * Set the reference source device for speed controller mode.
++	 *
++	 * Choose encoder as the source of speed feedback when in speed control mode.
++	 *
++	 * @param reference Specify a SpeedReference.
++	 */
++	public void setSpeedReference(SpeedReference reference) {
++		sendMessage(CANJNI.LM_API_SPD_REF, new byte[] { reference.value }, 1);
++
++		m_speedReference = reference;
++		m_speedRefVerified = false;
++	}
++
++	/**
++	 * Get the reference source device for speed controller mode.
++	 *
++	 * @return A SpeedReference indicating the currently selected reference
++	 * device for speed controller mode.
++	 */
++	public SpeedReference getSpeedReference() {
++		return m_speedReference;
++	}
++
++	/**
++	 * Set the reference source device for position controller mode.
++	 *
++	 * Choose between using and encoder and using a potentiometer
++	 * as the source of position feedback when in position control mode.
++	 *
++	 * @param reference Specify a PositionReference.
++	 */
++	public void setPositionReference(PositionReference reference) {
++		sendMessage(CANJNI.LM_API_POS_REF, new byte[] { reference.value }, 1);
++
++		m_positionReference = reference;
++		m_posRefVerified = false;
++	}
++
++	/**
++	 * Get the reference source device for position controller mode.
++	 *
++	 * @return A PositionReference indicating the currently selected reference
++	 * device for position controller mode.
++	 */
++	public PositionReference getPositionReference() {
++		return m_positionReference;
++	}
++
++	/**
++	 * Set the P constant for the closed loop modes.
++	 *
++	 * @param p The proportional gain of the Jaguar's PID controller.
++	 */
++	public void setP(double p) {
++		byte[] data = new byte[8];
++		byte dataSize = packFXP16_16(data, p);
++
++		switch(m_controlMode) {
++		case Speed:
++			sendMessage(CANJNI.LM_API_SPD_PC, data, dataSize);
++			break;
++
++		case Position:
++			sendMessage(CANJNI.LM_API_POS_PC, data, dataSize);
++			break;
++
++		case Current:
++			sendMessage(CANJNI.LM_API_ICTRL_PC, data, dataSize);
++			break;
++
++		default:
++			throw new IllegalStateException("PID constants only apply in Speed, Position, and Current mode");
++		}
+ 
+-        dataSize = packINT16(dataBuffer, (short)turns);
+-        setTransaction(CANJNI.LM_API_CFG_POT_TURNS, dataBuffer, dataSize);
+-    }
++		m_p = p;
++		m_pVerified = false;
++	}
++
++	/**
++	 * Set the I constant for the closed loop modes.
++	 *
++	 * @param i The integral gain of the Jaguar's PID controller.
++	 */
++	public void setI(double i) {
++		byte[] data = new byte[8];
++		byte dataSize = packFXP16_16(data, i);
++
++		switch(m_controlMode) {
++		case Speed:
++			sendMessage(CANJNI.LM_API_SPD_IC, data, dataSize);
++			break;
++
++		case Position:
++			sendMessage(CANJNI.LM_API_POS_IC, data, dataSize);
++			break;
++
++		case Current:
++			sendMessage(CANJNI.LM_API_ICTRL_IC, data, dataSize);
++			break;
++
++		default:
++			throw new IllegalStateException("PID constants only apply in Speed, Position, and Current mode");
++		}
+ 
+-    /**
+-     * Configure Soft Position Limits when in Position Controller mode.
+-     *
+-     * When controlling position, you can add additional limits on top of the limit switch inputs
+-     * that are based on the position feedback.  If the position limit is reached or the
+-     * switch is opened, that direction will be disabled.
+-     *
+-     * @param forwardLimitPosition The position that if exceeded will disable the forward direction.
+-     * @param reverseLimitPosition The position that if exceeded will disable the reverse direction.
+-     */
+-    public void configSoftPositionLimits(double forwardLimitPosition, double reverseLimitPosition) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
++		m_i = i;
++		m_iVerified = false;
++	}
++
++	/**
++	 * Set the D constant for the closed loop modes.
++	 *
++	 * @param d The derivative gain of the Jaguar's PID controller.
++	 */
++	public void setD(double d) {
++		byte[] data = new byte[8];
++		byte dataSize = packFXP16_16(data, d);
++
++		switch(m_controlMode) {
++		case Speed:
++			sendMessage(CANJNI.LM_API_SPD_DC, data, dataSize);
++			break;
++
++		case Position:
++			sendMessage(CANJNI.LM_API_POS_DC, data, dataSize);
++			break;
++
++		case Current:
++			sendMessage(CANJNI.LM_API_ICTRL_DC, data, dataSize);
++			break;
++
++		default:
++			throw new IllegalStateException("PID constants only apply in Speed, Position, and Current mode");
++		}
+ 
+-        dataSize = packFXP16_16(dataBuffer, forwardLimitPosition);
+-        dataBuffer[dataSize++] = (forwardLimitPosition > reverseLimitPosition) ? (byte) 1 : (byte) 0;
+-        setTransaction(CANJNI.LM_API_CFG_LIMIT_FWD, dataBuffer, dataSize);
++		m_d = d;
++		m_dVerified = false;
++	}
++
++	/**
++	 * Set the P, I, and D constants for the closed loop modes.
++	 *
++	 * @param p The proportional gain of the Jaguar's PID controller.
++	 * @param i The integral gain of the Jaguar's PID controller.
++	 * @param d The differential gain of the Jaguar's PID controller.
++	 */
++	public void setPID(double p, double i, double d) {
++		setP(p);
++		setI(i);
++		setD(d);
++	}
++
++	/**
++	 * Get the Proportional gain of the controller.
++	 *
++	 * @return The proportional gain.
++	 */
++	public double getP() {
++		return m_p;
++	}
++
++	/**
++	 * Get the Integral gain of the controller.
++	 *
++	 * @return The integral gain.
++	 */
++	public double getI() {
++		return m_i;
++	}
++
++	/**
++	 * Get the Derivative gain of the controller.
++	 *
++	 * @return The derivative gain.
++	 */
++	public double getD() {
++		return m_d;
++	}
++
++	/**
++	 * Enable the closed loop controller.
++	 *
++	 * Start actually controlling the output based on the feedback.
++	 * If starting a position controller with an encoder reference,
++	 * use the encoderInitialPosition parameter to initialize the
++	 * encoder state.
++	 *
++	 * @param encoderInitialPosition Encoder position to set if position with encoder reference.  Ignored otherwise.
++	 */
++	public void enableControl(double encoderInitialPosition) {
++		switch(m_controlMode) {
++		case PercentVbus:
++			sendMessage(CANJNI.LM_API_VOLT_T_EN, new byte[0], 0);
++			break;
++
++		case Speed:
++			sendMessage(CANJNI.LM_API_SPD_T_EN, new byte[0], 0);
++			break;
++
++		case Position:
++			byte[] data = new byte[8];
++			int dataSize = packFXP16_16(data, encoderInitialPosition);
++			sendMessage(CANJNI.LM_API_POS_T_EN, data, dataSize);
++			break;
++
++		case Current:
++			sendMessage(CANJNI.LM_API_ICTRL_T_EN, new byte[0], 0);
++			break;
++
++		case Voltage:
++			sendMessage(CANJNI.LM_API_VCOMP_T_EN, new byte[0], 0);
++			break;
++		}
++	}
++
++	/**
++	 * Enable the closed loop controller.
++	 *
++	 * Start actually controlling the output based on the feedback.
++	 */
++	public void enableControl() {
++		enableControl(0.0);
++	}
++
++	/**
++	 * Disable the closed loop controller.
++	 *
++	 * Stop driving the output based on the feedback.
++	 */
++	public void disableControl() {
++		switch(m_controlMode) {
++		case PercentVbus:
++			sendMessage(CANJNI.LM_API_VOLT_DIS, new byte[0], 0);
++			break;
++
++		case Speed:
++			sendMessage(CANJNI.LM_API_SPD_DIS, new byte[0], 0);
++			break;
++
++		case Position:
++			sendMessage(CANJNI.LM_API_POS_DIS, new byte[0], 0);
++			break;
++
++		case Current:
++			sendMessage(CANJNI.LM_API_ICTRL_DIS, new byte[0], 0);
++			break;
++
++		case Voltage:
++			sendMessage(CANJNI.LM_API_VCOMP_DIS, new byte[0], 0);
++			break;
++		}
++	}
++
++	/**
++	 * Change the control mode of this Jaguar object.
++	 *
++	 * After changing modes, configure any PID constants or other settings needed
++	 * and then EnableControl() to actually change the mode on the Jaguar.
++	 *
++	 * @param controlMode The new mode.
++	 */
++	public void changeControlMode(ControlMode controlMode) {
++		// Disable the previous mode
++		disableControl();
++
++		// Update the local mode
++		m_controlMode = controlMode;
++	}
++
++	/**
++	 * Get the active control mode from the Jaguar.
++	 *
++	 * Ask the Jag what mode it is in.
++	 *
++	 * @return ControlMode that the Jag is in.
++	 */
++	public ControlMode getControlMode() {
++		return m_controlMode;
++	}
++
++	/**
++	 * Get the voltage at the battery input terminals of the Jaguar.
++	 *
++	 * @return The bus voltage in Volts.
++	 */
++	public double getBusVoltage() {
++		byte[] data = new byte[8];
++
++		try {
++			getMessage(CANJNI.LM_API_STATUS_VOLTBUS, CANJNI.CAN_MSGID_FULL_M, data);
++			m_busVoltage = unpackFXP8_8(data);
++		} catch(CANMessageNotFoundException e) {}
++
++		return m_busVoltage;
++	}
++
++	/**
++	 * Get the voltage being output from the motor terminals of the Jaguar.
++	 *
++	 * @return The output voltage in Volts.
++	 */
++	public double getOutputVoltage() {
++		byte[] data = new byte[8];
++
++		try {
++			getMessage(CANJNI.LM_API_STATUS_VOUT, CANJNI.CAN_MSGID_FULL_M, data);
++			m_outputVoltage = unpackFXP8_8(data);
++		} catch(CANMessageNotFoundException e) {}
++
++		return m_outputVoltage;
++	}
++
++	/**
++	 * Get the current through the motor terminals of the Jaguar.
++	 *
++	 * @return The output current in Amps.
++	 */
++	public double getOutputCurrent() {
++		byte[] data = new byte[8];
++
++		try {
++			getMessage(CANJNI.LM_API_STATUS_CURRENT, CANJNI.CAN_MSGID_FULL_M, data);
++			m_outputCurrent = unpackFXP8_8(data);
++		} catch(CANMessageNotFoundException e) {}
++
++		return m_outputCurrent;
++	}
++
++	/**
++	 * Get the internal temperature of the Jaguar.
++	 *
++	 * @return The temperature of the Jaguar in degrees Celsius.
++	 */
++	public double getTemperature() {
++		byte[] data = new byte[8];
++
++		try {
++			getMessage(CANJNI.LM_API_STATUS_TEMP, CANJNI.CAN_MSGID_FULL_M, data);
++			m_temperature = unpackFXP8_8(data);
++		} catch(CANMessageNotFoundException e) {}
++
++		return m_temperature;
++	}
++
++	/**
++	 * Get the position of the encoder or potentiometer.
++	 *
++	 * @return The position of the motor in rotations based on the configured feedback.
++	 */
++	public double getPosition() {
++		byte[] data = new byte[8];
++
++		try {
++			getMessage(CANJNI.LM_API_STATUS_POS, CANJNI.CAN_MSGID_FULL_M, data);
++			m_position = unpackFXP16_16(data);
++		} catch(CANMessageNotFoundException e) {}
++
++		return m_position;
++	}
++
++	/**
++	 * Get the speed of the encoder.
++	 *
++	 * @return The speed of the motor in RPM based on the configured feedback.
++	 */
++	public double getSpeed() {
++		byte[] data = new byte[8];
++
++		try {
++			getMessage(CANJNI.LM_API_STATUS_SPD, CANJNI.CAN_MSGID_FULL_M, data);
++			m_speed = unpackFXP16_16(data);
++		} catch(CANMessageNotFoundException e) {}
++
++		return m_speed;
++	}
++
++	/**
++	 * Get the status of the forward limit switch.
++	 *
++	 * @return The motor is allowed to turn in the forward direction when true.
++	 */
++	public boolean getForwardLimitOK() {
++		byte[] data = new byte[8];
++
++		try {
++			getMessage(CANJNI.LM_API_STATUS_LIMIT, CANJNI.CAN_MSGID_FULL_M, data);
++			m_limits = data[0];
++		} catch(CANMessageNotFoundException e) {}
++
++		return (m_limits & kForwardLimit) != 0;
++	}
++
++	/**
++	 * Get the status of the reverse limit switch.
++	 *
++	 * @return The motor is allowed to turn in the reverse direction when true.
++	 */
++	public boolean getReverseLimitOK() {
++		byte[] data = new byte[8];
++
++		try {
++			getMessage(CANJNI.LM_API_STATUS_LIMIT, CANJNI.CAN_MSGID_FULL_M, data);
++			m_limits = data[0];
++		} catch(CANMessageNotFoundException e) {}
++
++		return (m_limits & kReverseLimit) != 0;
++	}
++
++	/**
++	 * Get the status of any faults the Jaguar has detected.
++	 *
++	 * @return A bit-mask of faults defined by the "Faults" constants.
++	 * @see kCurrentFault
++	 * @see kBusVoltageFault
++	 * @see kTemperatureFault
++	 * @see kGateDriverFault
++	 */
++	public short getFaults() {
++		byte[] data = new byte[8];
++
++		try {
++			getMessage(CANJNI.LM_API_STATUS_FAULT, CANJNI.CAN_MSGID_FULL_M, data);
++			m_faults = unpackINT16(data);
++		} catch(CANMessageNotFoundException e) {}
++
++		return m_faults;
++	}
++
++	/**
++	 * Set the maximum voltage change rate.
++	 *
++	 * When in PercentVbus or Voltage output mode, the rate at which the voltage changes can
++	 * be limited to reduce current spikes.  Set this to 0.0 to disable rate limiting.
++	 *
++	 * @param rampRate The maximum rate of voltage change in Percent Voltage mode in V/s.
++	 */
++	public void setVoltageRampRate(double rampRate) {
++		byte[] data = new byte[8];
++		int dataSize;
++		int message;
++
++		switch(m_controlMode) {
++		case PercentVbus:
++			dataSize = packPercentage(data, rampRate / (m_maxOutputVoltage * kControllerRate));
++			message = CANJNI.LM_API_VOLT_SET_RAMP;
++			break;
++		case Voltage:
++			dataSize = packFXP8_8(data, rampRate / kControllerRate);
++			message = CANJNI.LM_API_VCOMP_IN_RAMP;
++			break;
++		default:
++			throw new IllegalStateException("Voltage ramp rate only applies in Percentage and Voltage modes");
++		}
+ 
+-        dataSize = packFXP16_16(dataBuffer, reverseLimitPosition);
+-        dataBuffer[dataSize++] = forwardLimitPosition <= reverseLimitPosition ? (byte) 1 : (byte) 0;
+-        setTransaction(CANJNI.LM_API_CFG_LIMIT_REV, dataBuffer, dataSize);
++		sendMessage(message, data, dataSize);
++	}
++
++	/**
++	 * Get the version of the firmware running on the Jaguar.
++	 *
++	 * @return The firmware version.  0 if the device did not respond.
++	 */
++	public int getFirmwareVersion() {
++		return m_firmwareVersion;
++	}
++
++	/**
++	 * Get the version of the Jaguar hardware.
++	 *
++	 * @return The hardware version. 1: Jaguar,  2: Black Jaguar
++	 */
++	public byte getHardwareVersion() {
++		return m_hardwareVersion;
++	}
++
++	/**
++	 * Configure what the controller does to the H-Bridge when neutral (not driving the output).
++	 *
++	 * This allows you to override the jumper configuration for brake or coast.
++	 *
++	 * @param mode Select to use the jumper setting or to override it to coast or brake.
++	 */
++	public void configNeutralMode(NeutralMode mode) {
++		sendMessage(CANJNI.LM_API_CFG_BRAKE_COAST, new byte[] { mode.value }, 1);
++
++		m_neutralMode = mode;
++		m_neutralModeVerified = false;
++	}
++
++	/**
++	 * Configure how many codes per revolution are generated by your encoder.
++	 *
++	 * @param codesPerRev The number of counts per revolution in 1X mode.
++	 */
++	public void configEncoderCodesPerRev(int codesPerRev) {
++		byte[] data = new byte[8];
++
++		int dataSize = packINT16(data, (short)codesPerRev);
++		sendMessage(CANJNI.LM_API_CFG_ENC_LINES, data, dataSize);
++
++		m_encoderCodesPerRev = (short)codesPerRev;
++		m_encoderCodesPerRevVerified = false;
++	}
++
++	/**
++	 * Configure the number of turns on the potentiometer.
++	 *
++	 * There is no special support for continuous turn potentiometers.
++	 * Only integer numbers of turns are supported.
++	 *
++	 * @param turns The number of turns of the potentiometer
++	 */
++	public void configPotentiometerTurns(int turns) {
++		byte[] data = new byte[8];
++
++		int dataSize = packINT16(data, (short)turns);
++		sendMessage(CANJNI.LM_API_CFG_POT_TURNS, data, dataSize);
++
++		m_potentiometerTurns = (short)turns;
++		m_potentiometerTurnsVerified = false;
++	}
++
++	/**
++	 * Configure Soft Position Limits when in Position Controller mode.
++	 *
++	 * When controlling position, you can add additional limits on top of the limit switch inputs
++	 * that are based on the position feedback.  If the position limit is reached or the
++	 * switch is opened, that direction will be disabled.
++	 *
++
++	 * @param forwardLimitPosition The position that if exceeded will disable the forward direction.
++	 * @param reverseLimitPosition The position that if exceeded will disable the reverse direction.
++	 */
++	public void configSoftPositionLimits(double forwardLimitPosition, double reverseLimitPosition) {
++		configLimitMode(LimitMode.SoftPositionLimits);
++		configForwardLimit(forwardLimitPosition);
++		configReverseLimit(reverseLimitPosition);
++	}
++
++	/**
++	 * Disable Soft Position Limits if previously enabled.
++	 *
++	 * Soft Position Limits are disabled by default.
++	 */
++	public void disableSoftPositionLimits() {
++		configLimitMode(LimitMode.SwitchInputsOnly);
++	}
++
++	/**
++	 * Set the limit mode for position control mode.
++	 *
++	 * Use ConfigSoftPositionLimits or DisableSoftPositionLimits to set this
++	 * automatically.
++	 */
++	public void configLimitMode(LimitMode mode) {
++		sendMessage(CANJNI.LM_API_CFG_LIMIT_MODE, new byte[] { mode.value }, 1);
++	}
++
++	/**
++	 * Set the position that if exceeded will disable the forward direction.
++	 *
++	 * Use ConfigSoftPositionLimits to set this and the limit mode automatically.
++	 */
++	public void configForwardLimit(double forwardLimitPosition) {
++		byte[] data = new byte[8];
++
++		int dataSize = packFXP16_16(data, forwardLimitPosition);
++		data[dataSize++] = 1;
++		sendMessage(CANJNI.LM_API_CFG_LIMIT_FWD, data, dataSize);
++
++		m_forwardLimit = forwardLimitPosition;
++		m_forwardLimitVerified = false;
++	}
++
++	/**
++	 * Set the position that if exceeded will disable the reverse direction.
++	 *
++	 * Use ConfigSoftPositionLimits to set this and the limit mode automatically.
++	 */
++	public void configReverseLimit(double reverseLimitPosition) {
++		byte[] data = new byte[8];
++
++		int dataSize = packFXP16_16(data, reverseLimitPosition);
++		data[dataSize++] = 1;
++		sendMessage(CANJNI.LM_API_CFG_LIMIT_REV, data, dataSize);
++
++		m_reverseLimit = reverseLimitPosition;
++		m_reverseLimitVerified = false;
++	}
++
++	/**
++	 * Configure the maximum voltage that the Jaguar will ever output.
++	 *
++	 * This can be used to limit the maximum output voltage in all modes so that
++	 * motors which cannot withstand full bus voltage can be used safely.
++	 *
++	 * @param voltage The maximum voltage output by the Jaguar.
++	 */
++	public void configMaxOutputVoltage(double voltage) {
++		byte[] data = new byte[8];
++
++		int dataSize = packFXP8_8(data, voltage);
++		sendMessage(CANJNI.LM_API_CFG_MAX_VOUT, data, dataSize);
++
++		m_maxOutputVoltage = voltage;
++		m_maxOutputVoltageVerified = false;
++	}
++
++	/**
++	 * Configure how long the Jaguar waits in the case of a fault before resuming operation.
++	 *
++	 * Faults include over temerature, over current, and bus under voltage.
++	 * The default is 3.0 seconds, but can be reduced to as low as 0.5 seconds.
++	 *
++	 * @param faultTime The time to wait before resuming operation, in seconds.
++	 */
++	public void configFaultTime(float faultTime) {
++		byte[] data = new byte[8];
++
++		int dataSize = packINT16(data, (short)(faultTime * 1000.0));
++		sendMessage(CANJNI.LM_API_CFG_FAULT_TIME, data, dataSize);
++
++		m_faultTime = faultTime;
++		m_faultTimeVerified = false;
++	}
++
++	byte m_deviceNumber;
++	double m_value = 0.0f;
++
++	// Parameters/configuration
++	ControlMode m_controlMode;
++	SpeedReference m_speedReference = SpeedReference.None;
++	PositionReference m_positionReference = PositionReference.None;
++	double m_p = 0.0;
++	double m_i = 0.0;
++	double m_d = 0.0;
++	NeutralMode m_neutralMode = NeutralMode.Jumper;
++	short m_encoderCodesPerRev = 0;
++	short m_potentiometerTurns = 0;
++	LimitMode m_limitMode = LimitMode.SwitchInputsOnly;
++	double m_forwardLimit = 0.0;
++	double m_reverseLimit = 0.0;
++	double m_maxOutputVoltage = 30.0;
++	double m_voltageRampRate = 0.0;
++	float m_faultTime = 0.0f;
++
++	// Which parameters have been verified since they were last set?
++	boolean m_controlModeVerified = true;
++	boolean m_speedRefVerified = true;
++	boolean m_posRefVerified = true;
++	boolean m_pVerified = true;
++	boolean m_iVerified = true;
++	boolean m_dVerified = true;
++	boolean m_neutralModeVerified = true;
++	boolean m_encoderCodesPerRevVerified = true;
++	boolean m_potentiometerTurnsVerified = true;
++	boolean m_forwardLimitVerified = true;
++	boolean m_reverseLimitVerified = true;
++	boolean m_limitModeVerified = true;
++	boolean m_maxOutputVoltageVerified = true;
++	boolean m_voltageRampRateVerified = true;
++	boolean m_faultTimeVerified = true;
++
++	// Status data
++	double m_busVoltage = 0.0f;
++	double m_outputVoltage = 0.0f;
++	double m_outputCurrent = 0.0f;
++	double m_temperature = 0.0f;
++	double m_position = 0.0;
++	double m_speed = 0.0;
++	byte m_limits = (byte)0;
++	short m_faults = (short)0;
++	int m_firmwareVersion = 0;
++	byte m_hardwareVersion = (byte)0;
++
++	static void sendMessageHelper(int messageID, byte[] data, int dataSize, int period) throws CANMessageNotFoundException {
++		final int[] kTrustedMessages = {
++				CANJNI.LM_API_VOLT_T_EN, CANJNI.LM_API_VOLT_T_SET, CANJNI.LM_API_SPD_T_EN, CANJNI.LM_API_SPD_T_SET,
++				CANJNI.LM_API_VCOMP_T_EN, CANJNI.LM_API_VCOMP_T_SET, CANJNI.LM_API_POS_T_EN, CANJNI.LM_API_POS_T_SET,
++				CANJNI.LM_API_ICTRL_T_EN, CANJNI.LM_API_ICTRL_T_SET
++		};
+ 
+-        dataBuffer[0] = LimitMode.kSoftPositionLimit_val;
+-        setTransaction(CANJNI.LM_API_CFG_LIMIT_MODE, dataBuffer, (byte) 1);
+-    }
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		status.asIntBuffer().put(0, 0);
++
++		for(byte i = 0; i < kTrustedMessages.length; i++) {
++			if((kFullMessageIDMask & messageID) == kTrustedMessages[i])
++			{
++				// Make sure the data will still fit after adjusting for the token.
++				if (dataSize > kMaxMessageDataSize - 2) {
++					throw new RuntimeException("CAN message has too much data.");
++				}
++
++				ByteBuffer trustedBuffer = ByteBuffer.allocateDirect(dataSize+2);
++				trustedBuffer.put(0, (byte)0);
++				trustedBuffer.put(1, (byte)0);
++
++				for(byte j = 0; j < dataSize; j++) {
++					trustedBuffer.put(j+2, data[j]);
++				}
++
++				CANJNI.FRCNetworkCommunicationCANSessionMuxSendMessage(messageID, trustedBuffer, period, status.asIntBuffer());
++				int statusCode = status.asIntBuffer().get(0);
++				if(statusCode < 0) {
++					CANExceptionFactory.checkStatus(statusCode, messageID);
++				}
++
++				return;
++			}
++		}
+ 
+-    /**
+-     * Disable Soft Position Limits if previously enabled.
+-     *
+-     * Soft Position Limits are disabled by default.
+-     */
+-    public void disableSoftPositionLimits() throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
++		// Use a null pointer for the data buffer if the given array is null
++		ByteBuffer buffer;
++		if(data != null) {
++			buffer = ByteBuffer.allocateDirect(dataSize);
++			for(byte i = 0; i < dataSize; i++) {
++				buffer.put(i, data[i]);
++			}
++		} else {
++			buffer = null;
++		}
+ 
+-        dataBuffer[0] = LimitMode.kSwitchInputsOnly_val;
+-        setTransaction(CANJNI.LM_API_CFG_LIMIT_MODE, dataBuffer, (byte) 1);
+-    }
++		CANJNI.FRCNetworkCommunicationCANSessionMuxSendMessage(messageID, buffer, period, status.asIntBuffer());
+ 
+-    /**
+-     * Configure the maximum voltage that the Jaguar will ever output.
+-     *
+-     * This can be used to limit the maximum output voltage in all modes so that
+-     * motors which cannot withstand full bus voltage can be used safely.
+-     *
+-     * @param voltage The maximum voltage output by the Jaguar.
+-     */
+-    public void configMaxOutputVoltage(double voltage) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
++		int statusCode = status.asIntBuffer().get(0);
++		if(statusCode < 0) {
++			CANExceptionFactory.checkStatus(statusCode, messageID);
++		}
++	}
++
++	/**
++	* Send a message to the Jaguar.
++	*
++	* @param messageID The messageID to be used on the CAN bus (device number
++	* 	is added internally)
++	* @param data The up to 8 bytes of data to be sent with the message
++	* @param dataSize Specify how much of the data in "data" to send
++	* @param periodic If positive, tell Network Communications to send the
++	* 	message every "period" milliseconds.
++	*/
++	protected void sendMessage(int messageID, byte[] data, int dataSize, int period) {
++		sendMessageHelper(messageID | m_deviceNumber, data, dataSize, period);
++	}
++
++	/**
++	* Send a message to the Jaguar, non-periodly
++	*
++	* @param messageID The messageID to be used on the CAN bus (device number
++	* 	is added internally)
++	* @param data The up to 8 bytes of data to be sent with the message
++	* @param dataSize Specify how much of the data in "data" to send
++	*/
++	protected void sendMessage(int messageID, byte[] data, int dataSize) {
++		sendMessage(messageID, data, dataSize, CANJNI.CAN_SEND_PERIOD_NO_REPEAT);
++	}
++
++	/**
++	* Request a message from the Jaguar, but don't wait for it to arrive.
++	*
++	* @param messageID The message to request
++	* @param periodic If positive, tell Network Communications to request the
++	* 	message every "period" milliseconds.
++	*/
++	protected void requestMessage(int messageID, int period) {
++		sendMessageHelper(messageID | m_deviceNumber, null, 0, period);
++	}
++
++	/**
++	* Request a message from the Jaguar, but don't wait for it to arrive.
++	*
++	* @param messageID The message to request
++	*/
++	protected void requestMessage(int messageID) {
++		requestMessage(messageID, CANJNI.CAN_SEND_PERIOD_NO_REPEAT);
++	}
++
++	/**
++	* Get a previously requested message.
++	*
++	* Jaguar always generates a message with the same message ID when replying.
++	*
++	* @param messageID The messageID to read from the CAN bus (device number is added internally)
++	* @param data The up to 8 bytes of data that was received with the message
++	*
++	* @throw CANMessageNotFoundException if there's not new message available
++	*/
++	protected void getMessage(int messageID, int messageMask, byte[] data) throws CANMessageNotFoundException {
++		messageID |= m_deviceNumber;
++		messageID &= CANJNI.CAN_MSGID_FULL_M;
++
++		ByteBuffer targetedMessageID = ByteBuffer.allocateDirect(4);
++		targetedMessageID.order(ByteOrder.LITTLE_ENDIAN);
++		targetedMessageID.asIntBuffer().put(0, messageID);
+ 
+-        m_maxOutputVoltage = voltage;
+-        dataSize = packFXP8_8(dataBuffer, voltage);
+-        setTransaction(CANJNI.LM_API_CFG_MAX_VOUT, dataBuffer, dataSize);
+-    }
++		ByteBuffer timeStamp = ByteBuffer.allocateDirect(4);
+ 
+-    /**
+-     * Configure how long the Jaguar waits in the case of a fault before resuming operation.
+-     *
+-     * Faults include over temerature, over current, and bus under voltage.
+-     * The default is 3.0 seconds, but can be reduced to as low as 0.5 seconds.
+-     *
+-     * @param faultTime The time to wait before resuming operation, in seconds.
+-     */
+-    public void configFaultTime(double faultTime) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-        byte dataSize;
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		status.asIntBuffer().put(0, 0);
++
++		// Get the data.
++		ByteBuffer dataBuffer = CANJNI.FRCNetworkCommunicationCANSessionMuxReceiveMessage(
++			targetedMessageID.asIntBuffer(),
++			messageMask,
++			timeStamp,
++			status.asIntBuffer());
++
++		if(data != null) {
++			for(int i = 0; i < dataBuffer.capacity(); i++) {
++				data[i] = dataBuffer.get(i);
++			}
++		}
+ 
+-        // Message takes ms
+-        dataSize = packINT16(dataBuffer, (short) (faultTime * 1000.0));
+-        setTransaction(CANJNI.LM_API_CFG_FAULT_TIME, dataBuffer, dataSize);
+-    }
++		int statusCode = status.asIntBuffer().get(0);
++		if(statusCode < 0) {
++			CANExceptionFactory.checkStatus(statusCode, messageID);
++		}
++	}
+ 
+     /**
+      * Update all the motors that have pending sets in the syncGroup.
+      *
+      * @param syncGroup A bitmask of groups to generate synchronous output.
+      */
+-    public static void updateSyncGroup(byte syncGroup) throws CANTimeoutException {
+-        byte[] dataBuffer = new byte[8];
+-
+-        dataBuffer[0] = syncGroup;
+-        sendMessage(CANJNI.CAN_MSGID_API_SYNC, dataBuffer, 1);
+-    }
+-
++    public static void updateSyncGroup(byte syncGroup) {
++        byte[] data = new byte[8];
++
++        data[0] = syncGroup;
++
++		sendMessageHelper(CANJNI.CAN_MSGID_API_SYNC, data, 1, CANJNI.CAN_SEND_PERIOD_NO_REPEAT);
++    }
++
++	/* we are on ARM-LE now, not Freescale so no need to swap */
++	private final static void swap16(int x, byte[] buffer) {
++		buffer[0] = (byte)(x & 0xff);
++		buffer[1] = (byte)((x>>8) & 0xff);
++	}
++
++	private final static void swap32(int x, byte[] buffer) {
++		buffer[0] = (byte)(x & 0xff);
++		buffer[1] = (byte)((x>>8) & 0xff);
++		buffer[2] = (byte)((x>>16) & 0xff);
++		buffer[3] = (byte)((x>>24) & 0xff);
++	}
++
++	private static final byte packPercentage(byte[] buffer, double value) {
++		if(value < -1.0) value = -1.0;
++		if(value > 1.0) value = 1.0;
++		short intValue = (short) (value * 32767.0);
++		swap16(intValue, buffer);
++		return 2;
++	}
++
++	private static final byte packFXP8_8(byte[] buffer, double value) {
++		short intValue = (short) (value * 256.0);
++		swap16(intValue, buffer);
++		return 2;
++	}
++
++	private static final byte packFXP16_16(byte[] buffer, double value) {
++		int intValue = (int) (value * 65536.0);
++		swap32(intValue, buffer);
++		return 4;
++	}
++
++	private static final byte packINT16(byte[] buffer, short value) {
++		swap16(value, buffer);
++		return 2;
++	}
++
++	private static final byte packINT32(byte[] buffer, int value) {
++		swap32(value, buffer);
++		return 4;
++	}
++
++	/**
++	* Unpack 16-bit data from a buffer in little-endian byte order
++	* @param buffer The buffer to unpack from
++	* @param offset The offset into he buffer to unpack
++	* @return The data that was unpacked
++	*/
++	private static final short unpack16(byte[] buffer, int offset) {
++		return (short) (((int) buffer[offset] & 0xFF) | (short) ((buffer[offset + 1] << 8)) & 0xFF00);
++	}
++
++	/**
++	* Unpack 32-bit data from a buffer in little-endian byte order
++	* @param buffer The buffer to unpack from
++	* @param offset The offset into he buffer to unpack
++	* @return The data that was unpacked
++	*/
++	private static final int unpack32(byte[] buffer, int offset) {
++		return ((int) buffer[offset] & 0xFF) | ((buffer[offset + 1] << 8) & 0xFF00) |
++			((buffer[offset + 2] << 16) & 0xFF0000) | ((buffer[offset + 3] << 24) & 0xFF000000);
++	}
++
++	private static final double unpackPercentage(byte[] buffer) {
++		return unpack16(buffer,0) / 32767.0;
++	}
++
++	private static final double unpackFXP8_8(byte[] buffer) {
++		return unpack16(buffer,0) / 256.0;
++	}
++
++	private static final double unpackFXP16_16(byte[] buffer) {
++		return unpack32(buffer,0) / 65536.0;
++	}
++
++	private static final short unpackINT16(byte[] buffer) {
++		return unpack16(buffer,0);
++	}
++
++	private static final int unpackINT32(byte[] buffer) {
++		return unpack32(buffer,0);
++	}
++
++	/* Compare floats for equality as fixed point numbers */
++	public boolean FXP8_EQ(double a, double b) {
++		return (int)(a * 256.0) == (int)(b * 256.0);
++	}
++
++	/* Compare floats for equality as fixed point numbers */
++	public boolean FXP16_EQ(double a, double b) {
++		return (int)(a * 65536.0) == (int)(b * 65536.0);
++	}
+ 
+     public void setExpiration(double timeout) {
+         m_safetyHelper.setExpiration(timeout);
+@@ -1476,9 +1691,7 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
+      * @deprecated Use disableControl instead.
+      */
+     public void stopMotor() {
+-        try {
+-            disableControl();
+-        } catch (CANTimeoutException e) {}
++        disableControl();
+     }
+ 
+     /*
+@@ -1487,8 +1700,8 @@ public class CANJaguar implements MotorSafety, PIDOutput, SpeedController, LiveW
+     public String getSmartDashboardType() {
+         return "Speed Controller";
+     }
+-    private ITable m_table;
+-    private ITableListener m_table_listener;
++    private ITable m_table = null;
++    private ITableListener m_table_listener = null;
+ 
+     /**
+      * {@inheritDoc}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java
+index f4d2a95d0acc61dc556f1d8e63b3620744f4aee2..068afde77189d8913c4d2ff2e4113f23a1c0e9bc 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java
+@@ -13,7 +13,6 @@ import java.nio.ByteOrder;
+ import edu.wpi.first.wpilibj.hal.PDPJNI;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.can.CANTimeoutException;
+ 
+ /**
+  * Class for getting voltage, current, and temperature from the CAN PDP
+@@ -22,54 +21,42 @@ import edu.wpi.first.wpilibj.can.CANTimeoutException;
+ public class PowerDistributionPanel extends SensorBase {
+ 	public PowerDistributionPanel() {
+ 	}
+-	
++
+ 	/**
+ 	 * @return The voltage of the PDP
+ 	 */
+-	public double getVoltage() throws CANTimeoutException {
++	public double getVoltage() {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+-		
++
+ 		double voltage = PDPJNI.getPDPVoltage(status.asIntBuffer());
+-		
+-		if(status.asIntBuffer().get(0) != 0) {
+-			throw new CANTimeoutException();
+-		}
+-		
++
+ 		return voltage;
+ 	}
+ 
+ 	/**
+ 	 * @return The temperature of the PDP in degrees Celsius
+ 	 */
+-	public double getTemperature() throws CANTimeoutException {
++	public double getTemperature() {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+-		
++
+ 		double temperature = PDPJNI.getPDPTemperature(status.asIntBuffer());
+-		
+-		if(status.asIntBuffer().get(0) != 0) {
+-			throw new CANTimeoutException();
+-		}
+-		
++
+ 		return temperature;
+ 	}
+-	
++
+ 	/**
+ 	 * @return The current of one of the PDP channels (channels 1-16) in Amperes
+ 	 */
+-	public double getCurrent(int channel) throws CANTimeoutException {
++	public double getCurrent(int channel) {
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+-		
++
+ 		double current = PDPJNI.getPDPChannelCurrent((byte)channel, status.asIntBuffer());
+-		
++
+ 		checkPDPChannel(channel);
+-		
+-		if(status.asIntBuffer().get(0) != 0) {
+-			throw new CANTimeoutException();
+-		}
+-		
++
+ 		return current;
+ 	}
+ }
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
+index f12343cc3697bcf7caac3580c29ae95ec60eee25..d756d9732153090ebaedb2ee5a698cebfdc6f56d 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
+@@ -7,7 +7,6 @@
+ package edu.wpi.first.wpilibj;
+ 
+ import edu.wpi.first.wpilibj.can.CANNotInitializedException;
+-import edu.wpi.first.wpilibj.can.CANTimeoutException;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+@@ -503,7 +502,7 @@ public class RobotDrive implements MotorSafety, IUtility {
+                 CANJaguar.updateSyncGroup(syncGroup);
+             } catch (CANNotInitializedException e) {
+                 m_isCANInitialized = false;
+-            } catch (CANTimeoutException e) {}
++            }
+         }
+ 
+         if (m_safetyHelper != null) m_safetyHelper.feed();
+@@ -555,7 +554,7 @@ public class RobotDrive implements MotorSafety, IUtility {
+                 CANJaguar.updateSyncGroup(syncGroup);
+             } catch (CANNotInitializedException e) {
+                 m_isCANInitialized = false;
+-            } catch (CANTimeoutException e) {}
++            }
+         }
+ 
+         if (m_safetyHelper != null) m_safetyHelper.feed();
+@@ -605,7 +604,7 @@ public class RobotDrive implements MotorSafety, IUtility {
+                 CANJaguar.updateSyncGroup(syncGroup);
+             } catch (CANNotInitializedException e) {
+                 m_isCANInitialized = false;
+-            } catch (CANTimeoutException e) {}
++            }
+         }
+ 
+         if (m_safetyHelper != null) m_safetyHelper.feed();
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANExceptionFactory.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANExceptionFactory.java
+index c0b381c56a0ca668b78220bd5e0f1af5ee92d217..e8e94f3de3ba12219954c95df81c28e2132211e0 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANExceptionFactory.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANExceptionFactory.java
+@@ -10,35 +10,30 @@ package edu.wpi.first.wpilibj.can;
+ import edu.wpi.first.wpilibj.communication.NIRioStatus;
+ import edu.wpi.first.wpilibj.util.UncleanStatusException;
+ 
+-/**
+- * Exception indicating that the Jaguar CAN Driver layer refused to send a
+- * restricted message ID to the CAN bus.
+- */
+ public class CANExceptionFactory {
+     // FRC Error codes
+-    static final int ERR_JaguarCANDriver_InvalidBuffer	=	-44086;
+-    static final int ERR_JaguarCANDriver_TimedOut	=	-44087;
+-    static final int ERR_JaguarCANDriver_NotAllowed	=	-44088;
+-    static final int ERR_JaguarCANDriver_NotInitialized	=	-44089;
++    static final int ERR_CANSessionMux_InvalidBuffer = -44086;
++    static final int ERR_CANSessionMux_MessageNotFound = -44087;
++    static final int ERR_CANSessionMux_NotAllowed = -44088;
++    static final int ERR_CANSessionMux_NotInitialized = -44089;
+ 
+     public static void checkStatus(int status, int messageID) throws
+-        CANInvalidBufferException, CANTimeoutException,
+-        CANMessageNotAllowedException, CANNotInitializedException,
+-        UncleanStatusException {
++        CANInvalidBufferException, CANMessageNotAllowedException,
++        CANNotInitializedException, UncleanStatusException {
+         switch (status) {
+         case NIRioStatus.kRioStatusSuccess:
+             // Everything is ok... don't throw.
+             return;
+-        case ERR_JaguarCANDriver_InvalidBuffer:
++        case ERR_CANSessionMux_InvalidBuffer:
+         case NIRioStatus.kRIOStatusBufferInvalidSize:
+             throw new CANInvalidBufferException();
+-        case ERR_JaguarCANDriver_TimedOut:
++        case ERR_CANSessionMux_MessageNotFound:
+         case NIRioStatus.kRIOStatusOperationTimedOut:
+-            throw new CANTimeoutException();
+-        case ERR_JaguarCANDriver_NotAllowed:
++            throw new CANMessageNotFoundException();
++        case ERR_CANSessionMux_NotAllowed:
+         case NIRioStatus.kRIOStatusFeatureNotSupported:
+             throw new CANMessageNotAllowedException("MessageID = " + Integer.toString(messageID));
+-        case ERR_JaguarCANDriver_NotInitialized:
++        case ERR_CANSessionMux_NotInitialized:
+         case NIRioStatus.kRIOStatusResourceNotInitialized:
+             throw new CANNotInitializedException();
+         default:
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANJNI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANJNI.java
+index c1e430b0bfc2df1c0749e6b5b5bd12342534a4b5..bd05cd807657f1e3225dee1dbc94f0511e1e1323 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANJNI.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANJNI.java
+@@ -16,12 +16,6 @@ import java.nio.IntBuffer;
+  * For help, please visit <a href="http://nativelibs4java.googlecode.com/">NativeLibs4Java</a> , <a href="http://rococoa.dev.java.net/">Rococoa</a>, or <a href="http://jna.dev.java.net/">JNA</a>.
+  */
+ public class CANJNI extends JNIWrapper{
+-	//public static final String JNA_LIBRARY_NAME = LibraryExtractor.getLibraryPath("CAN", true, CANLibrary.class);
+-	//public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(CANLibrary.JNA_LIBRARY_NAME, MangledFunctionMapper.DEFAULT_OPTIONS);
+-	//static {
+-	//	System.loadLibrary("JNIWrappers");
+-		//Native.register(CANLibrary.class, CANLibrary.JNA_NATIVE_LIB);
+-	//}
+ 	/** <i>native declaration : src\main\include\CAN\can_proto.h</i> */
+ 	public static final int LM_STATUS_LIMIT_REV = 0x02;
+ 	/** <i>native declaration : src\main\include\CAN\can_proto.h</i> */
+@@ -452,6 +446,13 @@ public class CANJNI extends JNIWrapper{
+ 	public static final int LM_API_VCOMP_T_EN = ((0x00020000 | 0x02000000 | 0x00000800) | (5 << 6));
+ 	/** <i>native declaration : src\main\include\CAN\can_proto.h</i> */
+ 	public static final int LM_STATUS_LIMIT_STKY_SFWD = 0x40;
++	
++	public static final int CAN_SEND_PERIOD_NO_REPEAT = 0;
++	public static final int CAN_SEND_PERIOD_STOP_REPEATING = -1;
++
++	/* Flags in the upper bits of the messageID */
++	public static final int CAN_IS_FRAME_REMOTE = 0x80000000;
++	public static final int CAN_IS_FRAME_11BIT = 0x40000000;
+ 
+ 	public static native void FRCNetworkCommunicationCANSessionMuxSendMessage(int messageID, ByteBuffer data, int periodMs, IntBuffer status);
+ 	public static native ByteBuffer FRCNetworkCommunicationCANSessionMuxReceiveMessage(IntBuffer messageID, int messageIDMask, ByteBuffer timeStamp, IntBuffer status);
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANTimeoutException.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANMessageNotFoundException.java
+similarity index 65%
+rename from wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANTimeoutException.java
+rename to wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANMessageNotFoundException.java
+index c6a605430cc26b98b4eadf733881e3edc1e1403d..f2483de901a6e3e38191f9fecb51d884a5b13a92 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANTimeoutException.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/can/CANMessageNotFoundException.java
+@@ -7,17 +7,13 @@
+ 
+ package edu.wpi.first.wpilibj.can;
+ 
+-import java.io.IOException;
+-
+ /**
+- * Exception indicating that the CAN device did not respond
+- * within the timeout period specified.
++ * Exception indicating that a can message is not available from Network
++ * Communications.  This usually just means we already have the most recent
++ * value cached locally.
+  */
+-public class CANTimeoutException extends IOException {
+-    public CANTimeoutException() {
++public class CANMessageNotFoundException extends RuntimeException {
++    public CANMessageNotFoundException() {
+         super();
+     }
+-    public CANTimeoutException(String message) {
+-        super(message);
+-    }
+ }
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+index 25866d3645c1859a49ab5a579efc322e08c65836..1646dc74b06abfcc6135de91b521b5846ccd87ea 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/PDPTest.java
+@@ -11,7 +11,7 @@ import org.junit.Before;
+ import org.junit.BeforeClass;
+ import org.junit.Test;
+ 
+-import edu.wpi.first.wpilibj.can.CANTimeoutException;
++import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
+ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+ import edu.wpi.first.wpilibj.test.TestBench;
+ 
+@@ -19,14 +19,14 @@ public class PDPTest extends AbstractComsSetup {
+ 	private static final Logger logger = Logger.getLogger(PCMTest.class.getName());
+ 	/* The current returned when the motor is not being driven */
+ 	protected static final double  kLowCurrent =  1.52;
+-	
++
+ 	protected static final double  kCurrentTolerance =  0.1;
+-	
++
+ 	private static PowerDistributionPanel pdp;
+ 	private static Talon talon;
+ 	private static Victor victor;
+ 	private static Jaguar jaguar;
+-	
++
+ 	@BeforeClass
+ 	public static void setUpBeforeClass() throws Exception {
+ 		pdp = new PowerDistributionPanel();
+@@ -54,7 +54,7 @@ public class PDPTest extends AbstractComsSetup {
+ 	@After
+ 	public void tearDown() throws Exception {
+ 	}
+-	
++
+ 	/**
+ 	 * Test if the current changes when the motor is driven using a talon
+ 	 */
+@@ -62,27 +62,27 @@ public class PDPTest extends AbstractComsSetup {
+ 	public void CheckCurrentTalon() {
+ 		/* The Current should be kLowCurrent */
+ 		try {
+-			assertEquals("The low current was not within the expected range.", 
++			assertEquals("The low current was not within the expected range.",
+ 					kLowCurrent, pdp.getCurrent(TestBench.kTalonPDPChannel), kCurrentTolerance);
+-		} catch (CANTimeoutException e) {
++		} catch (CANMessageNotFoundException e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
+ 		Timer.delay(0.02);
+-		
++
+ 		/* Set the motor to full forward */
+ 		talon.set(1.0);
+ 		Timer.delay(0.02);
+ 		/* The current should now be greater than the low current */
+ 		try {
+-			assertThat("The driven current is not greater than the resting current.", 
++			assertThat("The driven current is not greater than the resting current.",
+ 					pdp.getCurrent(TestBench.kTalonPDPChannel), is(greaterThan(kLowCurrent)));
+-		} catch (CANTimeoutException e) {
++		} catch (CANMessageNotFoundException e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
+ 	}
+-	
++
+ 	/**
+ 	 * Test if the current changes when the motor is driven using a victor
+ 	 */
+@@ -90,27 +90,27 @@ public class PDPTest extends AbstractComsSetup {
+ 	public void CheckCurrentVictor() {
+ 		/* The Current should be kLowCurrent */
+ 		try {
+-			assertEquals("The low current was not within the expected range.", 
++			assertEquals("The low current was not within the expected range.",
+ 					kLowCurrent, pdp.getCurrent(TestBench.kVictorPDPChannel), kCurrentTolerance);
+-		} catch (CANTimeoutException e) {
++		} catch (CANMessageNotFoundException e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
+ 		Timer.delay(0.02);
+-		
++
+ 		/* Set the motor to full forward */
+ 		victor.set(1.0);
+ 		Timer.delay(0.02);
+ 		/* The current should now be greater than the low current */
+ 		try {
+-			assertThat("The driven current is not greater than the resting current.", 
++			assertThat("The driven current is not greater than the resting current.",
+ 					pdp.getCurrent(TestBench.kVictorPDPChannel), is(greaterThan(kLowCurrent)));
+-		} catch (CANTimeoutException e) {
++		} catch (CANMessageNotFoundException e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
+ 	}
+-	
++
+ 	/**
+ 	 * Test if the current changes when the motor is driven using a jaguar
+ 	 */
+@@ -118,23 +118,23 @@ public class PDPTest extends AbstractComsSetup {
+ 	public void CheckCurrentJaguar() {
+ 		/* The Current should be kLowCurrent */
+ 		try {
+-			assertEquals("The low current was not within the expected range.", 
++			assertEquals("The low current was not within the expected range.",
+ 					kLowCurrent, pdp.getCurrent(TestBench.kJaguarPDPChannel), kCurrentTolerance);
+-		} catch (CANTimeoutException e) {
++		} catch (CANMessageNotFoundException e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
+ 		Timer.delay(0.02);
+-		
++
+ 		/* Set the motor to full forward */
+ 		jaguar.set(1.0);
+ 		Timer.delay(0.02);
+-		
++
+ 		/* The current should now be greater than the low current */
+ 		try {
+-			assertThat("The driven current is not greater than the resting current.", 
++			assertThat("The driven current is not greater than the resting current.",
+ 					pdp.getCurrent(TestBench.kJaguarPDPChannel), is(greaterThan(kLowCurrent)));
+-		} catch (CANTimeoutException e) {
++		} catch (CANMessageNotFoundException e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index e39bd54d51e739a3d1a5e431954aaa6e4b7ff228..795e504bb521437416325355997f56002fe7bf86 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.Servo;
+ import edu.wpi.first.wpilibj.SpeedController;
+ import edu.wpi.first.wpilibj.Talon;
+ import edu.wpi.first.wpilibj.Victor;
+-import edu.wpi.first.wpilibj.can.CANTimeoutException;
++import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
+ import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
+ import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
+ import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+@@ -47,7 +47,7 @@ public final class TestBench {
+ 	 * completely stopped
+ 	 */
+ 	public static final double MOTOR_STOP_TIME = 0.20;
+-	
++
+ 	/* PowerDistributionPanel channels */
+ 	public static final int kJaguarPDPChannel = 7;
+ 	public static final int kVictorPDPChannel = 11;
+@@ -164,7 +164,7 @@ public final class TestBench {
+ 								// have a free method
+ 			try {
+ 				canJag = new CANJaguar(1);
+-			} catch (CANTimeoutException e) {
++			} catch (CANMessageNotFoundException e) {
+ 				e.printStackTrace();
+ 			}
+ 		}
+@@ -230,14 +230,14 @@ public final class TestBench {
+ 		//NOTE: IF MORE DIOCROSSCONNECT PAIRS ARE ADDED ADD THEM HERE
+ 		return pairs;
+ 	}
+-	
++
+ 	public static AnalogCrossConnectFixture getAnalogCrossConnectFixture(){
+ 		AnalogCrossConnectFixture analogIO = new AnalogCrossConnectFixture() {
+ 			@Override
+ 			protected AnalogOutput giveAnalogOutput() {
+ 				return new AnalogOutput(0);
+ 			}
+-			
++
+ 			@Override
+ 			protected AnalogInput giveAnalogInput() {
+ 				return new AnalogInput(2);
+@@ -245,20 +245,20 @@ public final class TestBench {
+ 		};
+ 		return analogIO;
+ 	}
+-	
++
+ 	public static RelayCrossConnectFxiture getRelayCrossConnectFixture(){
+ 		RelayCrossConnectFxiture relay = new RelayCrossConnectFxiture() {
+-			
++
+ 			@Override
+ 			protected Relay giveRelay() {
+ 				return new Relay(0);
+ 			}
+-			
++
+ 			@Override
+ 			protected DigitalInput giveInputTwo() {
+ 				return new DigitalInput(14);
+ 			}
+-			
++
+ 			@Override
+ 			protected DigitalInput giveInputOne() {
+ 				return new DigitalInput(15);
+diff --git a/wpilibj/wpilibJavaJNI/lib/CANJNI.cpp b/wpilibj/wpilibJavaJNI/lib/CANJNI.cpp
+index 8aef2b59dfa83e8d2d9992171d8f87369c1440fb..34ee4c1f6200b98be06f2e863f3167045e6e8d51 100644
+--- a/wpilibj/wpilibJavaJNI/lib/CANJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/CANJNI.cpp
+@@ -8,7 +8,8 @@
+ #include "NetworkCommunication/CANSessionMux.h"
+ 
+ // set the logging level
+-TLogLevel canJNILogLevel = logDEBUG;
++//TLogLevel canJNILogLevel = logDEBUG;
++TLogLevel canJNILogLevel = logERROR;
+ 
+ #define CANJNI_LOG(level) \
+     if (level > canJNILogLevel) ; \
+@@ -20,34 +21,44 @@ TLogLevel canJNILogLevel = logDEBUG;
+  * Signature: (ILjava/nio/ByteBuffer;ILjava/nio/IntBuffer;)V
+  */
+ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetworkCommunicationCANSessionMuxSendMessage
+-  (JNIEnv * env, jclass, jint messageID, jobject data, jint periodMs, jobject status){
+-	CANJNI_LOG(logDEBUG) << "Calling CANJNI JaguarCANDriverSendMessage";
+-	CANJNI_LOG(logDEBUG) << "MessageID = " << std::hex << messageID;
+-	jbyte * dataPtr = NULL;
+-	jlong dataCapacity = 0;
+-
+-	if(data != 0){
+-		dataPtr = (jbyte*)env->GetDirectBufferAddress(data);
+-		dataCapacity = env->GetDirectBufferCapacity(data);
+-	}
+-	CANJNI_LOG(logDEBUG) << "MessageSize = " << dataCapacity;
+-
+-	if( logDEBUG <= canJNILogLevel )
+-	{
+-		std::ostringstream str;
+-		str << std::setfill('0') << std::hex;
+-		for( int dataIndex = 0; dataIndex < dataCapacity; dataIndex++)
+-		{
+-			str << std::setw(2) << static_cast<unsigned int>(dataPtr[dataIndex]) << " ";
+-		}
+-		Log().Get(logDEBUG) << "MSG: " << str.str();
+-	}
+-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	//CANJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+-	FRC_NetworkCommunication_CANSessionMux_sendMessage((uint32_t) messageID, (const uint8_t*)dataPtr, periodMs, (uint8_t)dataCapacity, statusPtr);
+-	CANJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
++  (JNIEnv * env, jclass, jint messageID, jobject data, jint periodMs, jobject status)
++{
++    CANJNI_LOG(logDEBUG) << "Calling CANJNI FRCNetworkCommunicationCANSessionMuxSendMessage";
++
++    uint8_t *dataBuffer = (uint8_t *)(data? env->GetDirectBufferAddress(data) : 0);
++    uint8_t dataSize = (uint8_t)(data? env->GetDirectBufferCapacity(data) : 0);
++    int32_t *statusPtr = (int32_t *)env->GetDirectBufferAddress(status);
++
++    CANJNI_LOG(logDEBUG) << "Message ID " << std::hex << messageID;
++
++    if(logDEBUG <= canJNILogLevel)
++    {
++        if(dataBuffer)
++        {
++            std::ostringstream str;
++            str << std::setfill('0') << std::hex;
++            for(int i = 0; i < dataSize; i++)
++            {
++                str << std::setw(2) << (int)dataBuffer[i] << ' ';
++            }
++
++            Log().Get(logDEBUG) << "Data: " << str.str();
++        }
++        else
++        {
++            CANJNI_LOG(logDEBUG) << "Data: null";
++        }
++    }
++
++    CANJNI_LOG(logDEBUG) << "Period: " << periodMs;
++
++    FRC_NetworkCommunication_CANSessionMux_sendMessage(messageID, dataBuffer, dataSize, periodMs, statusPtr);
++
++    CANJNI_LOG(logDEBUG) << "Status: " << *statusPtr;
+ }
+ 
++static uint8_t buffer[8];
++
+ /*
+  * Class:     edu_wpi_first_wpilibj_can_CANJNI
+  * Method:    FRCNetworkCommunicationCANSessionMuxReceiveMessage
+@@ -56,43 +67,32 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetworkCommunica
+ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetworkCommunicationCANSessionMuxReceiveMessage
+ 	(JNIEnv * env, jclass, jobject messageID, jint messageIDMask, jobject timeStamp, jobject status)
+ {
+-	CANJNI_LOG(logDEBUG) << "Calling CANJNI JaguarCANDriverReceiveMessage";
+-	jint * messageIDPtr = (jint*)env->GetDirectBufferAddress(messageID);
+-	CANJNI_LOG(logDEBUG) << "MessageID In = " << std::hex << *messageIDPtr;
+-	jbyte * timeStampPtr = (jbyte*) env->GetDirectBufferAddress(timeStamp);
+-	CANJNI_LOG(logDEBUG) << "TimeStamp In = " <<  *timeStampPtr;
+-	jint * statusPtr = (jint*)env->GetDirectBufferAddress(status);
+-	//CANJNI_LOG(logDEBUG) << "Status Ptr = " << statusPtr;
+-	uint8_t dataSize = 8;
+-	jbyte* dataPtr = new jbyte[8];
+-	//CANJNI_LOG(logDEBUG) << "Original MessageSize = " << (jint)dataSize;
+-	//CANJNI_LOG(logDEBUG) << "Original MessagePtr = " << (jint*)dataPtr;
+-	FRC_NetworkCommunication_CANSessionMux_receiveMessage((uint32_t*)messageIDPtr, (uint32_t)messageIDMask,(uint8_t*)dataPtr, &dataSize,  (uint32_t*)timeStampPtr, statusPtr);
+-
+-	//CANJNI_LOG(logDEBUG) << "MessageID Out = " << std::hex << *messageIDPtr;
+-	CANJNI_LOG(logDEBUG) << "MessageSize = " << (jint)dataSize;
+-	CANJNI_LOG(logDEBUG) << "MessagePtr = " << (jint*)dataPtr;
+-
+-	if( logDEBUG <= canJNILogLevel )
+-	{
+-		std::ostringstream str;
+-		str << std::setfill('0') << std::hex;
+-		for( int dataIndex = 0; dataIndex < dataSize; dataIndex++)
+-		{
+-			str << std::setw(2) << static_cast<unsigned int>(dataPtr[dataIndex]) << " ";
+-		}
+-		Log().Get(logDEBUG) << "MSG: " << str.str();
+-	}
+-
+-	CANJNI_LOG(logDEBUG) << "Status = " << *statusPtr;
+-
+-	if( dataSize > 0 )
+-	{
+-		return env->NewDirectByteBuffer( dataPtr, dataSize);
+-	}
+-	else
+-	{
+-		return 0;
+-	}
+-}
++    CANJNI_LOG(logDEBUG) << "Calling CANJNI FRCNetworkCommunicationCANSessionMuxReceiveMessage";
++
++    uint32_t *messageIDPtr = (uint32_t *)env->GetDirectBufferAddress(messageID);
++    uint32_t *timeStampPtr = (uint32_t *)env->GetDirectBufferAddress(timeStamp);
++    int32_t *statusPtr = (int32_t *)env->GetDirectBufferAddress(status);
++
++    uint8_t dataSize = 0;
++
++    FRC_NetworkCommunication_CANSessionMux_receiveMessage(messageIDPtr, messageIDMask, buffer, &dataSize, timeStampPtr, statusPtr);
++
++    CANJNI_LOG(logDEBUG) << "Message ID " << std::hex << *messageIDPtr;
+ 
++    if(logDEBUG <= canJNILogLevel)
++    {
++        std::ostringstream str;
++        str << std::setfill('0') << std::hex;
++        for(int i = 0; i < dataSize; i++)
++        {
++            str << std::setw(2) << (int)buffer[i] << ' ';
++        }
++
++        Log().Get(logDEBUG) << "Data: " << str.str();
++    }
++
++    CANJNI_LOG(logDEBUG) << "Timestamp: " << *timeStampPtr;
++    CANJNI_LOG(logDEBUG) << "Status: " << *statusPtr;
++
++    return env->NewDirectByteBuffer(buffer, dataSize);
++}

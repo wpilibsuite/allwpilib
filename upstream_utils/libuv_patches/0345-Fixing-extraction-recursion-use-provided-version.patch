@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Thu, 11 Sep 2014 14:30:30 -0400
+Subject: [PATCH 0345/6262] Fixing extraction recursion: use provided version
+
+Change-Id: I0aa0a66eae85a43df308b4c0dafbe6b953ffad5c
+---
+ .../wpilib/plugins/cpp/toolchains/linux/ToolchainInstaller.java | 2 +-
+ .../wpilib/plugins/cpp/toolchains/mac/ToolchainInstaller.java   | 2 +-
+ .../plugins/cpp/toolchains/windows/ToolchainInstaller.java      | 2 +-
+ .../wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java    | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/linux/ToolchainInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/linux/ToolchainInstaller.java
+index bb24443a0f9964ee9fc1c9935267496b322325c2..24340b20c80cbb77e55e71efb44da78d3de6db29 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/linux/ToolchainInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/linux/ToolchainInstaller.java
+@@ -23,7 +23,7 @@ public class ToolchainInstaller extends AbstractInstaller {
+ 	@Override
+ 	protected void updateInstalledVersion(String version) {
+ 		WPILibCPPPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.TOOLCHAIN_INSTALLED,
+-				WPILibCPPPlugin.getDefault().getCurrentVersion());
++				version);
+ 	}
+ 
+ 	@Override
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/mac/ToolchainInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/mac/ToolchainInstaller.java
+index 733578a8f3d1c44880abc0c3b4f0c767adc3a929..4fd73549620c465a6580c426a3c3138ef8ba0c87 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/mac/ToolchainInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.mac/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/mac/ToolchainInstaller.java
+@@ -23,7 +23,7 @@ public class ToolchainInstaller extends AbstractInstaller {
+ 	@Override
+ 	protected void updateInstalledVersion(String version) {
+ 		WPILibCPPPlugin.getDefault().getPreferenceStore().setDefault(PreferenceConstants.TOOLCHAIN_INSTALLED,
+-				WPILibCPPPlugin.getDefault().getCurrentVersion());
++				version);
+ 	}
+ 
+ 	@Override
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/windows/ToolchainInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/windows/ToolchainInstaller.java
+index 175a6e3abc8f286ff4d97bf80924f2029da672e3..f63e3292d183c8d16bbc0d15d65b2f7a0a774c0c 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/windows/ToolchainInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.windows/src/edu/wpi/first/wpilib/plugins/cpp/toolchains/windows/ToolchainInstaller.java
+@@ -23,7 +23,7 @@ public class ToolchainInstaller extends AbstractInstaller {
+ 	@Override
+ 	protected void updateInstalledVersion(String version) {
+ 		WPILibCPPPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.TOOLCHAIN_INSTALLED,
+-				WPILibCPPPlugin.getDefault().getCurrentVersion());
++				version);
+ 	}
+ 
+ 	@Override
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java
+index 4702a30a5a9ce3452a41734fb5d450173b98958d..bebf9230ffa91dca99efcef07cb0c6731cd16621 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java
+@@ -20,7 +20,7 @@ public class CPPInstaller extends AbstractInstaller {
+ 	@Override
+ 	protected void updateInstalledVersion(String version) {
+ 		WPILibCPPPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.LIBRARY_INSTALLED,
+-				WPILibCPPPlugin.getDefault().getCurrentVersion());
++				version);
+ 	}
+ 	
+ 	@Override

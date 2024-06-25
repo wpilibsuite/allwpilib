@@ -1,0 +1,197 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Wed, 22 Oct 2014 11:16:39 -0400
+Subject: [PATCH 0431/6262] Fix joystick issues [artf3707]
+
+Make axes and POVs 0-based like they are on the DS
+
+Correct default joystick axis numbers to be 0-based
+
+Fix array dimensions for joystick axis values
+
+Increase the number of joystick ports to the maximum 6 that the DS supports
+
+Change-Id: I16d0e6e636188cbdd9cd7bfa0453a62466a55093
+---
+ wpilibc/wpilibC++/include/GenericHID.h               |  2 +-
+ wpilibc/wpilibC++Devices/include/Joystick.h          | 10 +++++-----
+ wpilibc/wpilibC++Devices/src/DriverStation.cpp       |  8 ++++----
+ wpilibc/wpilibC++Devices/src/Joystick.cpp            |  2 +-
+ .../main/java/edu/wpi/first/wpilibj/GenericHID.java  |  2 +-
+ .../java/edu/wpi/first/wpilibj/DriverStation.java    | 12 ++++++------
+ .../main/java/edu/wpi/first/wpilibj/Joystick.java    | 12 ++++++------
+ 7 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/include/GenericHID.h b/wpilibc/wpilibC++/include/GenericHID.h
+index a9b4efc7b5b3468d753c0ae12ea3857fb51c900c..cb8dfde411a67fe70c51393bf18bf5b23d46ae30 100644
+--- a/wpilibc/wpilibC++/include/GenericHID.h
++++ b/wpilibc/wpilibC++/include/GenericHID.h
+@@ -34,5 +34,5 @@ public:
+ 	virtual bool GetBumper(JoystickHand hand = kRightHand) = 0;
+ 	virtual bool GetRawButton(uint32_t button) = 0;
+ 
+-	virtual int GetPOV(uint32_t pov = 1) = 0;
++	virtual int GetPOV(uint32_t pov = 0) = 0;
+ };
+diff --git a/wpilibc/wpilibC++Devices/include/Joystick.h b/wpilibc/wpilibC++Devices/include/Joystick.h
+index 42ec73a0402432a5ce75f26b7e7f5ae7fefbf402..4405a75b301c830a586f7cb6b39488cbd7da66b3 100644
+--- a/wpilibc/wpilibC++Devices/include/Joystick.h
++++ b/wpilibc/wpilibC++Devices/include/Joystick.h
+@@ -22,10 +22,10 @@ class DriverStation;
+ class Joystick : public GenericHID, public ErrorBase
+ {
+ public:
+-	static const uint32_t kDefaultXAxis = 1;
+-	static const uint32_t kDefaultYAxis = 2;
+-	static const uint32_t kDefaultZAxis = 3;
+-	static const uint32_t kDefaultTwistAxis = 4;
++	static const uint32_t kDefaultXAxis = 0;
++	static const uint32_t kDefaultYAxis = 1;
++	static const uint32_t kDefaultZAxis = 2;
++	static const uint32_t kDefaultTwistAxis = 2;
+ 	static const uint32_t kDefaultThrottleAxis = 3;
+ 	typedef enum
+ 	{
+@@ -57,7 +57,7 @@ public:
+ 	virtual bool GetTop(JoystickHand hand = kRightHand);
+ 	virtual bool GetBumper(JoystickHand hand = kRightHand);
+ 	virtual bool GetRawButton(uint32_t button);
+-	virtual int GetPOV(uint32_t pov = 1);
++	virtual int GetPOV(uint32_t pov = 0);
+ 	bool GetButton(ButtonType button);
+ 	static Joystick* GetStickForPort(uint32_t port);
+ 
+diff --git a/wpilibc/wpilibC++Devices/src/DriverStation.cpp b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+index 97385ea357f1c16a70721db047684588310c3f54..403732537a7011089022d2e5796bec30ff59c1dc 100644
+--- a/wpilibc/wpilibC++Devices/src/DriverStation.cpp
++++ b/wpilibc/wpilibC++Devices/src/DriverStation.cpp
+@@ -192,13 +192,13 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis)
+ 		return 0;
+ 	}
+ 
+-	if (axis < 1 || axis > m_joystickAxes[stick].count)
++	if (axis >= m_joystickAxes[stick].count)
+ 	{
+ 		wpi_setWPIError(BadJoystickAxis);
+ 		return 0.0f;
+ 	}
+ 
+-	int8_t value = m_joystickAxes[stick].axes[axis - 1];
++	int8_t value = m_joystickAxes[stick].axes[axis];
+ 
+ 	if(value < 0)
+ 	{
+@@ -222,13 +222,13 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
+ 		return 0;
+ 	}
+ 
+-	if (pov < 1 || pov > m_joystickPOVs[stick].count)
++	if (pov >= m_joystickPOVs[stick].count)
+ 	{
+ 		wpi_setWPIError(BadJoystickAxis);
+ 		return 0;
+ 	}
+ 
+-	return m_joystickPOVs[stick].povs[pov - 1];
++	return m_joystickPOVs[stick].povs[pov];
+ }
+ 
+ /**
+diff --git a/wpilibc/wpilibC++Devices/src/Joystick.cpp b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+index 977b9e5055bbcff7900887aca98d65b9929fcc77..ea3475c84021e6587544ba647d884a41ec80adcc 100644
+--- a/wpilibc/wpilibC++Devices/src/Joystick.cpp
++++ b/wpilibc/wpilibC++Devices/src/Joystick.cpp
+@@ -149,7 +149,7 @@ float Joystick::GetThrottle()
+ /**
+  * Get the value of the axis.
+  *
+- * @param axis The axis to read [1-6].
++ * @param axis The axis to read, starting at 0.
+  * @return The value of the axis.
+  */
+ float Joystick::GetRawAxis(uint32_t axis)
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/GenericHID.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/GenericHID.java
+index 50116eed52fc599125dca21dcc875518fdef53bb..5d929dc3771b2a167a09e65e7d238db365b96988 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/GenericHID.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/GenericHID.java
+@@ -156,6 +156,6 @@ public abstract class GenericHID {
+     public abstract int getPOV(int pov);
+ 
+     public int getPOV() {
+-        return getPOV(1);
++        return getPOV(0);
+     }
+ }
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index b6c9dfd51c1bbb6236fd2cb7cbf1cc67e9caf6e9..0ec655e8dbc25a91b43edccc42979fe3bf3c88d8 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -57,8 +57,8 @@ public class DriverStation implements RobotState.Interface {
+ 
+     private HALControlWord m_controlWord;
+     private HALAllianceStationID m_allianceStationID;
+-    private short[][] m_joystickAxes = new short[FRCNetworkCommunicationsLibrary.kMaxJoystickAxes][kJoystickPorts];
+-    private short[][] m_joystickPOVs = new short[FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs][kJoystickPorts];
++    private short[][] m_joystickAxes = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickAxes];
++    private short[][] m_joystickPOVs = new short[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs];
+     private int[] m_joystickButtons = new int[kJoystickPorts];
+ 
+     private Thread m_thread;
+@@ -226,11 +226,11 @@ public class DriverStation implements RobotState.Interface {
+             throw new RuntimeException("Joystick index is out of range, should be 0-3");
+         }
+ 
+-        if (axis < 1 || axis > m_joystickAxes[stick].length) {
++        if (axis < 0 || axis >= m_joystickAxes[stick].length) {
+             throw new RuntimeException("Joystick axis is out of range");
+         }
+ 
+-        byte value = (byte)m_joystickAxes[stick][axis - 1];
++        byte value = (byte)m_joystickAxes[stick][axis];
+ 
+         if(value < 0) {
+             return value / 128.0;
+@@ -249,11 +249,11 @@ public class DriverStation implements RobotState.Interface {
+             throw new RuntimeException("Joystick index is out of range, should be 0-3");
+         }
+ 
+-        if (pov < 1 || pov > m_joystickPOVs[stick].length) {
++        if (pov < 0 || pov >= m_joystickPOVs[stick].length) {
+             throw new RuntimeException("Joystick POV is out of range");
+         }
+ 
+-        return m_joystickPOVs[stick][pov - 1];
++        return m_joystickPOVs[stick][pov];
+     }
+ 
+     /**
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+index ae2a9f61b6bcf9f7571167a419a8772b0a2d5c18..b8afc95a4494b1f02b24150a5e37887741ea95b8 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+@@ -17,11 +17,11 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
+  */
+ public class Joystick extends GenericHID {
+ 
+-    static final byte kDefaultXAxis = 1;
+-    static final byte kDefaultYAxis = 2;
+-    static final byte kDefaultZAxis = 3;
+-    static final byte kDefaultTwistAxis = 3;
+-    static final byte kDefaultThrottleAxis = 4;
++    static final byte kDefaultXAxis = 0;
++    static final byte kDefaultYAxis = 1;
++    static final byte kDefaultZAxis = 2;
++    static final byte kDefaultTwistAxis = 2;
++    static final byte kDefaultThrottleAxis = 3;
+     static final int kDefaultTriggerButton = 1;
+     static final int kDefaultTopButton = 2;
+ 
+@@ -198,7 +198,7 @@ public class Joystick extends GenericHID {
+     /**
+      * Get the value of the axis.
+      *
+-     * @param axis The axis to read [1-6].
++     * @param axis The axis to read, starting at 0.
+      * @return The value of the axis.
+      */
+     public double getRawAxis(final int axis) {

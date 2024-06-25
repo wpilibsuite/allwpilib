@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sun, 12 Oct 2014 14:38:02 -0700
+Subject: [PATCH 0406/6262] ADXL345_SPI: Report usage.
+
+Change-Id: I369a3aecf36fc9071b10cbacc1ebac5f98c1dd39
+---
+ .../src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java    | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java
+index ad015e9839670f268f91ca3c982bb4efa6458bd7..80f9dda3f2cb365e391a7297faa08f54c8396413 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/ADXL345_SPI.java
+@@ -5,6 +5,10 @@
+ /* the project.                                                               */
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
++
++import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
++import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
++import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+ 
+ /**
+@@ -96,6 +100,8 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer {
+ 		m_spi.write(commands, 2);
+ 
+         setRange(range);
++
++		UsageReporting.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_SPI);
+ 	}
+ 
+ 	/** {inheritdoc} */

@@ -1,0 +1,69 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Wed, 8 Oct 2014 17:15:51 -0400
+Subject: [PATCH 0399/6262] Create HOME on windows
+
+Change-Id: Id16278b5280e25e383e474faf4b511c47e5d0751
+---
+ .../META-INF/MANIFEST.MF                      |  3 ++-
+ .../plugins/cpp/installer/CPPInstaller.java   | 26 +++++++++++++++++++
+ 2 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/META-INF/MANIFEST.MF b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/META-INF/MANIFEST.MF
+index 343ba0b42a844ca987d8941d407b916604d51e90..7cff0305a8099a66c725a59b3f8c54006f62611b 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/META-INF/MANIFEST.MF
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/META-INF/MANIFEST.MF
+@@ -25,7 +25,8 @@ Require-Bundle: org.eclipse.ui,
+  org.eclipse.cdt.debug.ui;bundle-version="7.2.0",
+  org.eclipse.cdt.launch;bundle-version="7.1.0",
+  org.eclipse.cdt.launch.remote;bundle-version="2.4.0",
+- org.eclipse.cdt.debug.mi.core;bundle-version="7.2.0"
++ org.eclipse.cdt.debug.mi.core;bundle-version="7.2.0",
++ org.eclipse.core.variables
+ Bundle-ActivationPolicy: lazy
+ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+ Export-Package: edu.wpi.first.wpilib.plugins.cpp,
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java
+index bebf9230ffa91dca99efcef07cb0c6731cd16621..d4c487681ac27a85447d013d1e2b85f1d359518e 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/src/main/java/edu/wpi/first/wpilib/plugins/cpp/installer/CPPInstaller.java
+@@ -1,6 +1,12 @@
+ package edu.wpi.first.wpilib.plugins.cpp.installer;
+ 
+ import java.io.InputStream;
++
++import org.eclipse.core.runtime.CoreException;
++import org.eclipse.core.variables.IStringVariableManager;
++import org.eclipse.core.variables.IValueVariable;
++import org.eclipse.core.variables.VariablesPlugin;
++
+ import edu.wpi.first.wpilib.plugins.core.installer.AbstractInstaller;
+ import edu.wpi.first.wpilib.plugins.cpp.WPILibCPPPlugin;
+ import edu.wpi.first.wpilib.plugins.cpp.preferences.PreferenceConstants;
+@@ -21,6 +27,26 @@ public class CPPInstaller extends AbstractInstaller {
+ 	protected void updateInstalledVersion(String version) {
+ 		WPILibCPPPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.LIBRARY_INSTALLED,
+ 				version);
++		
++		IStringVariableManager vm = VariablesPlugin.getDefault().getStringVariableManager();
++		try
++		{
++			if (System.getProperty("os.name").startsWith("Windows"))
++			{
++				IValueVariable vv = vm.getValueVariable("HOME");
++				if (vv == null)
++					vm.addVariables(new IValueVariable[]{vm.newValueVariable("HOME", "user.home directory", false,System.getProperty("user.home"))});
++				else
++				{
++					if (!System.getProperty("user.home").equals(vm.performStringSubstitution("${HOME}")))
++						vv.setValue(System.getProperty("user.home"));
++				}
++			}
++		} catch (CoreException e) {
++			// TODO Auto-generated catch block
++			e.printStackTrace();
++			throw new RuntimeException(e);
++		}
+ 	}
+ 	
+ 	@Override

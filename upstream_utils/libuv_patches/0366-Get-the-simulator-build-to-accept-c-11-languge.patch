@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Thu, 25 Sep 2014 15:31:41 -0400
+Subject: [PATCH 0366/6262] Get the simulator build to accept c++11 languge
+
+Change-Id: I7406cc3815f0086e66c8a8973062d8fb7b2030f2
+---
+ wpilibc/wpilibC++Sim/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpilibc/wpilibC++Sim/CMakeLists.txt b/wpilibc/wpilibC++Sim/CMakeLists.txt
+index bb2484128548b174d797e1afb3578914be682149..c396adae458c908697bd9e979216f71edc45f3fe 100644
+--- a/wpilibc/wpilibC++Sim/CMakeLists.txt
++++ b/wpilibc/wpilibC++Sim/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 2.8)
+ project(WPILibSim)
+ 
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wall -Wextra -Wno-unused-parameter -fPIC")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2 -Wall -Wextra -Wno-unused-parameter -fPIC -std=c++1y")
+ 
+ get_filename_component(HAL_API_INCLUDES $ENV{ALLWPILIB}/hal/include REALPATH)
+ get_filename_component(NWT_API_INCLUDES $ENV{ALLWPILIB}/networktables/cpp/include REALPATH)

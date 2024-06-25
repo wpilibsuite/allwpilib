@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Tue, 5 Aug 2014 11:54:15 -0400
+Subject: [PATCH 0258/6262] Added support for building debs on jenkins.
+
+Change-Id: Iec732b3a0d036e53e02e377b830f8af6b8eaf731
+---
+ simulation/debs/Makefile | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/simulation/debs/Makefile b/simulation/debs/Makefile
+index 5fd2c8e7d6e921c120424d7a6ae02e58343fd16d..cf9712f58a9aa86ad289ed1edc6751bf7f1c02a8 100644
+--- a/simulation/debs/Makefile
++++ b/simulation/debs/Makefile
+@@ -18,6 +18,8 @@ frcsim-package-version = $(frcsim-version)-$(package-version)
+ 
+ all: debs update-repository
+ 
++jenkins: download-models pull-eclipse-toolchain pull all
++
+ allwpilib:
+ 	cd $(allwpilib) && mvn -T 8 clean package -Dwith-eclipse-plugins -DskipTests -DskipIT
+ 
+@@ -105,6 +107,15 @@ pull-eclipse-plugins:
+ 	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/features/edu.wpi.first.wpilib.plugins.core.feature_* frcsim-eclipse-plugins/frcsim-eclipse-plugins/features
+ 	echo Increment version?
+ 
++pull-eclipse-toolchain:
++	rm -rf frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/plugins
++	rm -rf frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/features
++	mkdir -p frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/plugins
++	mkdir -p frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/features
++	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/plugins/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux_* frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/plugins
++	cp $(allwpilib)/eclipse-plugins/edu.wpi.first.wpilib.plugins.updatesite/target/site/features/edu.wpi.first.wpilib.plugins.cpp.toolchains.linux.feature_* frcsim-eclipse-plugins/frcsim-eclipse-toolchain-plugins/features
++	echo Increment version?
++
+ pull-libwpilibsim-cpp:
+ 	cp -rf -t frcsim-libwpilibsim-cpp/frcsim-libwpilibsim-cpp/ $(allwpilib)/wpilibc/wpilibC++Sim/*
+ 	echo Increment version?

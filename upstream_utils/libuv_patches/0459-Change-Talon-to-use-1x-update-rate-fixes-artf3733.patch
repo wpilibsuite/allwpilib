@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Fri, 31 Oct 2014 18:52:28 -0400
+Subject: [PATCH 0459/6262] Change Talon to use 1x update rate (fixes artf3733)
+
+Change-Id: I592147100058504c919bdd2f31d56580503f5bc2
+---
+ wpilibc/wpilibC++Devices/src/Talon.cpp                          | 2 +-
+ .../src/main/java/edu/wpi/first/wpilibj/Talon.java              | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wpilibc/wpilibC++Devices/src/Talon.cpp b/wpilibc/wpilibC++Devices/src/Talon.cpp
+index 987f56bc200aff05184f5ebd0c07f1f677c94154..5d19bfc0165d9c9d15c1e55ac61751fa9b3edce0 100644
+--- a/wpilibc/wpilibC++Devices/src/Talon.cpp
++++ b/wpilibc/wpilibC++Devices/src/Talon.cpp
+@@ -25,7 +25,7 @@
+  */
+ void Talon::InitTalon() {
+ 	SetBounds(2.037, 1.539, 1.513, 1.487, .989);
+-	SetPeriodMultiplier(kPeriodMultiplier_2X);
++	SetPeriodMultiplier(kPeriodMultiplier_1X);
+ 	SetRaw(m_centerPwm);
+ 	SetZeroLatch();
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
+index 5353f88d9b08a805605446962d988174b96a12fd..570331764dcfe9b38da9fb606eadec511723f20f 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
+@@ -32,7 +32,7 @@ public class Talon extends SafePWM implements SpeedController {
+      */
+     private void initTalon() {
+         setBounds(2.037, 1.539, 1.513, 1.487, .989);
+-        setPeriodMultiplier(PeriodMultiplier.k2X);
++        setPeriodMultiplier(PeriodMultiplier.k1X);
+         setRaw(m_centerPwm);
+ 		setZeroLatch();
+ 

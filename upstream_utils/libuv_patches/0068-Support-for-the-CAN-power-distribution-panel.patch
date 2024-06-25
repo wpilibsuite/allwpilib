@@ -1,0 +1,462 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thomasclark <tjclark@wpi.edu>
+Date: Fri, 30 May 2014 14:04:05 -0400
+Subject: [PATCH 0068/6262] Support for the CAN power distribution panel
+
+Change-Id: If4f8f7f050bf1095221cf16f030a6a8a67532656
+---
+ hal/include/HAL/HAL.hpp                       |  1 +
+ hal/include/HAL/PDP.hpp                       | 19 +++++
+ hal/lib/Athena/PDP.cpp                        | 28 +++++++
+ wpilibc/include/PowerDistributionPanel.h      | 27 +++++++
+ wpilibc/include/SensorBase.h                  |  2 +
+ wpilibc/lib/PowerDistributionPanel.cpp        | 71 ++++++++++++++++++
+ wpilibc/lib/SensorBase.cpp                    | 13 ++++
+ .../first/wpilibj/PowerDistributionPanel.java | 75 +++++++++++++++++++
+ .../edu/wpi/first/wpilibj/SensorBase.java     | 16 ++++
+ .../edu/wpi/first/wpilibj/hal/PDPJNI.java     | 10 +++
+ wpilibj/wpilibJavaJNI/lib/PDPJNI.cpp          | 42 +++++++++++
+ wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp     |  2 +-
+ wpilibj/wpilibJavaJNI/pom.xml                 |  1 +
+ 13 files changed, 306 insertions(+), 1 deletion(-)
+ create mode 100644 hal/include/HAL/PDP.hpp
+ create mode 100644 hal/lib/Athena/PDP.cpp
+ create mode 100644 wpilibc/include/PowerDistributionPanel.h
+ create mode 100644 wpilibc/lib/PowerDistributionPanel.cpp
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java
+ create mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/PDPJNI.java
+ create mode 100644 wpilibj/wpilibJavaJNI/lib/PDPJNI.cpp
+
+diff --git a/hal/include/HAL/HAL.hpp b/hal/include/HAL/HAL.hpp
+index 697d7a38878902d7bf66a75a4f3938cb13ae1b10..53179bfa07641f96f9d308d5975c2e1bbfd65e1a 100644
+--- a/hal/include/HAL/HAL.hpp
++++ b/hal/include/HAL/HAL.hpp
+@@ -19,6 +19,7 @@
+ #include "Notifier.hpp"
+ #include "Interrupts.hpp"
+ #include "Errors.hpp"
++#include "PDP.hpp"
+ 
+ #include "Utilities.hpp"
+ #include "Semaphore.hpp"
+diff --git a/hal/include/HAL/PDP.hpp b/hal/include/HAL/PDP.hpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..c9a951e8e43ecd8a6a6b476e892e0e9cc168c690
+--- /dev/null
++++ b/hal/include/HAL/PDP.hpp
+@@ -0,0 +1,19 @@
++#pragma once
++#ifndef __HAL_PDP_H__
++#define __HAL_PDP_H__
++
++#ifdef __vxworks
++#include <vxWorks.h>
++#else
++#include <stdint.h>
++#endif
++
++extern "C"
++{
++	double getPDPTemperature(int32_t *status);
++	double getPDPVoltage(int32_t *status);
++	double getPDPChannelCurrent(uint8_t channel, int32_t *status);
++}
++
++#endif /* __HAL_PDP_H__ */
++
+diff --git a/hal/lib/Athena/PDP.cpp b/hal/lib/Athena/PDP.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..8b66e0063b1ca4595ccdc76bf3bcb17df76311dd
+--- /dev/null
++++ b/hal/lib/Athena/PDP.cpp
+@@ -0,0 +1,28 @@
++#include "HAL/PDP.hpp"
++#include "ctre/PDP.h"
++static PDP pdp;
++
++double getPDPTemperature(int32_t *status) {
++	double temperature;
++	
++	*status = pdp.GetTemperature(temperature);
++	
++	return temperature;
++}
++
++double getPDPVoltage(int32_t *status) {
++	double voltage;
++	
++	*status = pdp.GetVoltage(voltage);
++	
++	return voltage;
++}
++
++double getPDPChannelCurrent(uint8_t channel, int32_t *status) {
++	double current;
++	
++	*status = pdp.GetChannelCurrent(channel, current);
++	
++	return current;
++}
++
+diff --git a/wpilibc/include/PowerDistributionPanel.h b/wpilibc/include/PowerDistributionPanel.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..e94d3d784b0ac37b31317eb0bf246eaf9c0a724d
+--- /dev/null
++++ b/wpilibc/include/PowerDistributionPanel.h
+@@ -0,0 +1,27 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++
++#pragma once
++#ifndef __WPILIB_POWER_DISTRIBUTION_PANEL_H__
++#define __WPILIB_POWER_DISTRIBUTION_PANEL_H__
++
++#include "SensorBase.h"
++
++/**
++ * Class for getting voltage, current, and temperature from the CAN PDP
++ * @author Thomas Clark
++ */
++class PowerDistributionPanel : public SensorBase {
++	public:
++		PowerDistributionPanel();
++		
++		double GetVoltage();
++		double GetTemperature();
++		double GetCurrent(uint8_t channel);
++};
++
++#endif /* __WPILIB_POWER_DISTRIBUTION_PANEL_H__ */
++
+diff --git a/wpilibc/include/SensorBase.h b/wpilibc/include/SensorBase.h
+index 820cad2c75b2f69cff6a54ddc05ba3ff09359221..07e62fdfae26dad0185a959c7607d89850f8e42a 100644
+--- a/wpilibc/include/SensorBase.h
++++ b/wpilibc/include/SensorBase.h
+@@ -42,6 +42,7 @@ public:
+ 	static bool CheckPWMChannel(uint32_t channel);
+ 	static bool CheckAnalogChannel(uint32_t channel);
+ 	static bool CheckSolenoidChannel(uint32_t channel);
++	static bool CheckPDPChannel(uint32_t channel);
+ 
+ 	static const uint32_t kDigitalChannels = 14;
+ 	static const uint32_t kAnalogChannels = 8;
+@@ -51,6 +52,7 @@ public:
+ 	static const uint32_t kSolenoidModules = 2;
+ 	static const uint32_t kPwmChannels = 10;
+ 	static const uint32_t kRelayChannels = 8;
++	static const uint32_t kPDPChannels = 16;
+ 	static const uint32_t kChassisSlots = 8;
+ protected:
+ 	void AddToSingletonList();
+diff --git a/wpilibc/lib/PowerDistributionPanel.cpp b/wpilibc/lib/PowerDistributionPanel.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..bf2d9e9428376fbdda78e6b30d48336b5dce5e8a
+--- /dev/null
++++ b/wpilibc/lib/PowerDistributionPanel.cpp
+@@ -0,0 +1,71 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.							  */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
++/*----------------------------------------------------------------------------*/
++
++#include "PowerDistributionPanel.h"
++#include "WPIErrors.h"
++#include "HAL/PDP.hpp"
++
++/**
++ * Initialize the PDP.
++ */
++PowerDistributionPanel::PowerDistributionPanel() {
++}
++
++/**
++ * @return The voltage of the PDP
++ */
++double
++PowerDistributionPanel::GetVoltage() {
++	int32_t status = 0;
++	
++	double voltage = getPDPVoltage(&status);
++	
++	if(status) {
++		wpi_setWPIErrorWithContext(Timeout, "");
++	}
++	
++	return voltage;
++}
++
++/**
++ * @return The temperature of the PDP in degrees Celsius
++ */
++double
++PowerDistributionPanel::GetTemperature() {
++	int32_t status = 0;
++	
++	double temperature = getPDPTemperature(&status);
++	
++	if(status) {
++		wpi_setWPIErrorWithContext(Timeout, "");
++	}
++	
++	return temperature;
++}
++
++/**
++ * @return The current of one of the PDP channels (channels 1-16) in Amperes
++ */
++double
++PowerDistributionPanel::GetCurrent(uint8_t channel) {
++	int32_t status = 0;
++	
++	if(!CheckPDPChannel(channel))
++	{
++		char buf[64];
++		snprintf(buf, 64, "PDP Channel %d", channel);
++		wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
++	}
++	
++	double current = getPDPChannelCurrent(channel, &status);
++	
++	if(status) {
++		wpi_setWPIErrorWithContext(Timeout, "");
++	}
++	
++	return current;
++}
++
+diff --git a/wpilibc/lib/SensorBase.cpp b/wpilibc/lib/SensorBase.cpp
+index eadb2e00d1e3ee95e581c166cd9bdd8374671f5f..00c5a5dd8282f297b5424a762465cf25ab4508b8 100644
+--- a/wpilibc/lib/SensorBase.cpp
++++ b/wpilibc/lib/SensorBase.cpp
+@@ -17,6 +17,7 @@ const uint32_t SensorBase::kSolenoidChannels;
+ const uint32_t SensorBase::kSolenoidModules;
+ const uint32_t SensorBase::kPwmChannels;
+ const uint32_t SensorBase::kRelayChannels;
++const uint32_t SensorBase::kPDPChannels;
+ const uint32_t SensorBase::kChassisSlots;
+ SensorBase *SensorBase::m_singletonList = NULL;
+ 
+@@ -189,3 +190,15 @@ bool SensorBase::CheckSolenoidChannel(uint32_t channel)
+ 	return false;
+ }
+ 
++/**
++ * Verify that the power distribution channel number is within limits.
++ * 
++ * @return Solenoid channel is valid
++ */
++bool SensorBase::CheckPDPChannel(uint32_t channel)
++{
++	if (channel > 0 && channel <= kPDPChannels)
++		return true;
++	return false;
++}
++
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..f4d2a95d0acc61dc556f1d8e63b3620744f4aee2
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PowerDistributionPanel.java
+@@ -0,0 +1,75 @@
++/*----------------------------------------------------------------------------*/
++/* Copyright (c) FIRST 2014. All Rights Reserved.                             */
++/* Open Source Software - may be modified and shared by FRC teams. The code   */
++/* must be accompanied by the FIRST BSD license file in the root directory of */
++/* the project.                                                               */
++/*----------------------------------------------------------------------------*/
++
++package edu.wpi.first.wpilibj;
++
++import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
++
++import edu.wpi.first.wpilibj.hal.PDPJNI;
++import edu.wpi.first.wpilibj.hal.HALUtil;
++import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
++import edu.wpi.first.wpilibj.can.CANTimeoutException;
++
++/**
++ * Class for getting voltage, current, and temperature from the CAN PDP
++ * @author Thomas Clark
++ */
++public class PowerDistributionPanel extends SensorBase {
++	public PowerDistributionPanel() {
++	}
++	
++	/**
++	 * @return The voltage of the PDP
++	 */
++	public double getVoltage() throws CANTimeoutException {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		double voltage = PDPJNI.getPDPVoltage(status.asIntBuffer());
++		
++		if(status.asIntBuffer().get(0) != 0) {
++			throw new CANTimeoutException();
++		}
++		
++		return voltage;
++	}
++
++	/**
++	 * @return The temperature of the PDP in degrees Celsius
++	 */
++	public double getTemperature() throws CANTimeoutException {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		double temperature = PDPJNI.getPDPTemperature(status.asIntBuffer());
++		
++		if(status.asIntBuffer().get(0) != 0) {
++			throw new CANTimeoutException();
++		}
++		
++		return temperature;
++	}
++	
++	/**
++	 * @return The current of one of the PDP channels (channels 1-16) in Amperes
++	 */
++	public double getCurrent(int channel) throws CANTimeoutException {
++		ByteBuffer status = ByteBuffer.allocateDirect(4);
++		status.order(ByteOrder.LITTLE_ENDIAN);
++		
++		double current = PDPJNI.getPDPChannelCurrent((byte)channel, status.asIntBuffer());
++		
++		checkPDPChannel(channel);
++		
++		if(status.asIntBuffer().get(0) != 0) {
++			throw new CANTimeoutException();
++		}
++		
++		return current;
++	}
++}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+index 2948cc9267002a6e9b1f267404f28e30857a7b0c..5a3028842401f45c0f302beeada8ac269091376b 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/SensorBase.java
+@@ -58,6 +58,10 @@ public abstract class SensorBase { // TODO: Refactor
+      * Number of relay channels per sidecar
+      */
+     public static final int kRelayChannels = 4;
++    /**
++     * Number of power distribution channels
++     */
++    public static final int kPDPChannels = 16;
+ 
+     private static int m_defaultAnalogModule = 1;
+     private static int m_defaultDigitalModule = 1;
+@@ -226,6 +230,18 @@ public abstract class SensorBase { // TODO: Refactor
+         }
+     }
+ 
++    /**
++     * Verify that the power distribution channel number is within limits. 
++     * Channel numbers are 1-based.
++     *
++     * @param channel The channel number to check.
++     */
++    protected static void checkPDPChannel(final int channel) {
++        if (channel <= 0 || channel > kPDPChannels) {
++            System.err.println("Requested solenoid channel number is out of range.");
++        }
++    }
++
+     /**
+      * Get the number of the default analog module.
+      *
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/PDPJNI.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/PDPJNI.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c11d99e786703b2bd9f8ce7f11cdec23ba93c1eb
+--- /dev/null
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/hal/PDPJNI.java
+@@ -0,0 +1,10 @@
++package edu.wpi.first.wpilibj.hal;
++
++import java.nio.ByteBuffer;
++import java.nio.IntBuffer;
++
++public class PDPJNI extends JNIWrapper {
++	public static native double getPDPTemperature(IntBuffer status);
++	public static native double getPDPVoltage(IntBuffer status);
++	public static native double getPDPChannelCurrent(byte channel, IntBuffer status);
++}
+diff --git a/wpilibj/wpilibJavaJNI/lib/PDPJNI.cpp b/wpilibj/wpilibJavaJNI/lib/PDPJNI.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..a35fa0ce3f0bca0a91b6a53118283464b45cd422
+--- /dev/null
++++ b/wpilibj/wpilibJavaJNI/lib/PDPJNI.cpp
+@@ -0,0 +1,42 @@
++#include "edu_wpi_first_wpilibj_hal_PDPJNI.h"
++#include "HAL/PDP.hpp"
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
++ * Method:    getPDPTemperature
++ * Signature: (Ljava/nio/IntBuffer;)D
++ */
++JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTemperature
++  (JNIEnv *env, jclass, jobject status)
++{
++	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
++	
++	return getPDPTemperature(status_ptr);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
++ * Method:    getPDPVoltage
++ * Signature: (Ljava/nio/IntBuffer;)D
++ */
++JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPVoltage
++  (JNIEnv *env, jclass, jobject status)
++{
++	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
++	
++	return getPDPVoltage(status_ptr);
++}
++
++/*
++ * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
++ * Method:    getPDPChannelCurrent
++ * Signature: (BLjava/nio/IntBuffer;)D
++ */
++JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPChannelCurrent
++  (JNIEnv *env, jclass, jbyte channel, jobject status)
++{
++	jint *status_ptr = (jint *)env->GetDirectBufferAddress(status);
++	
++	return getPDPChannelCurrent(channel, status_ptr);
++}
++
+diff --git a/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp b/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
+index 0418f71eff09a82491d81c609abff7260ea710aa..21469a9c7b4676f8d6420d4c1e9c6d6602b20348 100644
+--- a/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
++++ b/wpilibj/wpilibJavaJNI/lib/SolenoidJNI.cpp
+@@ -4,7 +4,7 @@
+ 
+ #include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"
+ 
+-TLogLevel solenoidJNILogLevel = logWARNING;
++TLogLevel solenoidJNILogLevel = logERROR;
+ 
+ #define SOLENOIDJNI_LOG(level) \
+     if (level > solenoidJNILogLevel) ; \
+diff --git a/wpilibj/wpilibJavaJNI/pom.xml b/wpilibj/wpilibJavaJNI/pom.xml
+index dcffa7f64209d195aa7847edb3fc9adf193691d5..91895f203211d48923eb6cfba88904e2386f1760 100644
+--- a/wpilibj/wpilibJavaJNI/pom.xml
++++ b/wpilibj/wpilibJavaJNI/pom.xml
+@@ -124,6 +124,7 @@ this default location, specify a value for the 'embeddedJDKHome' property at the
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.SPIJNI</javahClassName>
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.SolenoidJNI</javahClassName>
+ 								<javahClassName>edu.wpi.first.wpilibj.hal.CompressorJNI</javahClassName>
++								<javahClassName>edu.wpi.first.wpilibj.hal.PDPJNI</javahClassName>
+ 							</javahClassNames>
+ 							<!-- enable additional javah interface in dependencies list -->
+ 							<!-- javahSearchJNIFromDependencies>true</javahSearchJNIFromDependencies -->

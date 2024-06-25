@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 27 Aug 2014 15:22:20 -0400
+Subject: [PATCH 0321/6262] Fix artf3447 Java only runs teleop - Correct off by
+ one error in Control Word compares
+
+Change-Id: I5965008ac75a9c3cc3a3473fa775729421b8957c
+---
+ .../communication/FRCNetworkCommunicationsLibrary.java        | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
+index ddab320c7acd73aeea34d648a080f96300b2380e..1d469ec84ff50cd4d5249a03a0fcfb1ea8be1bb9 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/communication/FRCNetworkCommunicationsLibrary.java
+@@ -435,11 +435,11 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
+ 		int word = NativeHALGetControlWord();
+ 		return new HALControlWord(
+ 			(word & 1) != 0,
++			((word >> 1) & 1) != 0,
+ 			((word >> 2) & 1) != 0,
+ 			((word >> 3) & 1) != 0,
+ 			((word >> 4) & 1) != 0,
+-			((word >> 5) & 1) != 0,
+-			((word >> 6) & 1) != 0
++			((word >> 5) & 1) != 0
+ 		);
+ 	}
+ 

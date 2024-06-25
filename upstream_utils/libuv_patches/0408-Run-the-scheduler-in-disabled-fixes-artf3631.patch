@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 15 Oct 2014 15:32:38 -0400
+Subject: [PATCH 0408/6262] Run the scheduler in disabled (fixes artf3631)
+
+Change-Id: Ib1614e2c96b4cda580110ea427398bcfe2ff6fbe
+---
+ .../resources/templates/command-based/Robot.cpp              | 5 +++++
+ .../resources/templates/command-based/Robot.java             | 4 ++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/command-based/Robot.cpp b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/command-based/Robot.cpp
+index 6abddda7d53239bcfb8492098211315386820b08..90d48b3446194b004ab437c9b1f41e57ca3d56fb 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/command-based/Robot.cpp
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/command-based/Robot.cpp
+@@ -15,6 +15,11 @@ private:
+ 		autonomousCommand = new ExampleCommand();
+ 		lw = LiveWindow::GetInstance();
+ 	}
++	
++	void DisabledPeriodic()
++	{
++		Scheduler::GetInstance()->Run();
++	}
+ 
+ 	void AutonomousInit()
+ 	{
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Robot.java b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Robot.java
+index 511c4ad5466e58856da050d6bccc843142c6508c..a4f7cf664b8df583b1ad0b41534bc2d77704c846 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Robot.java
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/templates/command-based/Robot.java
+@@ -31,6 +31,10 @@ public class Robot extends IterativeRobot {
+         // instantiate the command used for the autonomous period
+         autonomousCommand = new ExampleCommand();
+     }
++	
++	public void disabledPeriodic() {
++		Scheduler.getInstance().run();
++	}
+ 
+     public void autonomousInit() {
+         // schedule the autonomous command (example)

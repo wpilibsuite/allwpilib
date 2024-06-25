@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alex Henning <elcron@gmail.com>
+Date: Thu, 24 Jul 2014 12:02:50 -0400
+Subject: [PATCH 0193/6262] Added missing call to m_ds.waitForData()
+
+It was accidentally deleted in a previous commit[1] and none of our
+tests caught it. As a result iterative robot loops run too fast (using
+extra CPU).
+
+[1] https://usfirst.collab.net/gerrit/gitweb?p=wpilibj.git;a=blobdiff;f=WPILibJ/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java;h=0e936de8ec86a76e0a63ddbfc65ec2b88bc71725;hp=d4c5d38a14e29c926389ba1ae84fcbd09ee51f19;hb=HEAD;hpb=726ac3a3d272310b367b25f3c7e15ba6d07b957d;tflink=projects.wpilib/scm.WPILibJ
+
+Change-Id: I663f8619406f26b7fa6fc12bce4444657b829d9f
+---
+ .../src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java      | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java
+index 36fb122ab8b630cbff175f693d656b7107ff3d6e..a9b764e07dfa1af4811e676bc8af207c53c40a2d 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/IterativeRobot.java
+@@ -151,6 +151,7 @@ public class IterativeRobot extends RobotBase {
+                     didTeleopPeriodic = true;
+                 }
+             }
++            m_ds.waitForData();
+         }
+     }
+ 

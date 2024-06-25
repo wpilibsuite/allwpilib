@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brad Miller <brad@bradhouse.com>
+Date: Thu, 13 Nov 2014 09:49:30 -0500
+Subject: [PATCH 0478/6262] Increase timeout on network table test
+
+Change-Id: I362209954a0abf09c1cd9a0421c2e67a15a58dc6
+---
+ .../wpi/first/wpilibj/networktables2/stream/SocketTest.java | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/stream/SocketTest.java b/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/stream/SocketTest.java
+index fb02086a72b15718eccec780dbd32b3907d1dced..8d7a7d05c9e043f5fe19887320aa8dc347eeec84 100644
+--- a/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/stream/SocketTest.java
++++ b/networktables/java/src/test/java/edu/wpi/first/wpilibj/networktables2/stream/SocketTest.java
+@@ -19,13 +19,13 @@ public class SocketTest {
+ 	}};
+ 
+ 
+-	@Test(timeout=1500)
++	@Test(timeout=2500)
+ 	public void testSingleSocketConnection() throws Throwable {
+-		doSocketTest(1, 500, 1500, SocketStreams.newStreamProvider(10111), SocketStreams.newStreamFactory("localhost", 10111));
++		doSocketTest(1, 500, 2500, SocketStreams.newStreamProvider(10111), SocketStreams.newStreamFactory("localhost", 10111));
+ 	}
+ 	@Test(timeout=2500)
+ 	public void testManySocketConnection() throws Throwable {
+-		doSocketTest(10, 500, 2000, SocketStreams.newStreamProvider(10112), SocketStreams.newStreamFactory("localhost", 10112));
++		doSocketTest(10, 500, 2500, SocketStreams.newStreamProvider(10112), SocketStreams.newStreamFactory("localhost", 10112));
+ 	}
+ 
+ 	private void doSocketTest(final int count, long threadTimeout, long testTimeout, final IOStreamProvider streamProvider, final IOStreamFactory factory) throws Throwable {

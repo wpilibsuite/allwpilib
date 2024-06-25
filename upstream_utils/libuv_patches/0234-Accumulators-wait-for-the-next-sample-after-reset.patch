@@ -1,0 +1,121 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Thu, 31 Jul 2014 15:46:14 -0400
+Subject: [PATCH 0234/6262] Accumulators wait for the next sample after reset
+
+Analog accumulators now wait for the amount of time a full sample
+(including oversampling and averaging) lasts after
+AnalogInput::ResetAccumulator() is called, so they don't return
+old values after being reset.
+
+This delay should be microseconds long and will only happen
+when an accumulator is reset.
+
+A new test is is the C++ TiltPanCameraTest that tests this behavior
+with the Gyro class.
+
+Change-Id: I1b3ffdeec187959f95c5e637a6d428c9a4bc2cf4
+---
+ wpilibc/wpilibC++/lib/AnalogInput.cpp         | 11 ++++++++++
+ .../src/TiltPanCameraTest.cpp                 | 21 +++++++++++++------
+ .../edu/wpi/first/wpilibj/AnalogInput.java    |  8 +++++++
+ 3 files changed, 34 insertions(+), 6 deletions(-)
+
+diff --git a/wpilibc/wpilibC++/lib/AnalogInput.cpp b/wpilibc/wpilibC++/lib/AnalogInput.cpp
+index 800dc7858244537561e2b669b5afecf27a07f149..77d1a047a47906907bfbae0757b54784543f037a 100644
+--- a/wpilibc/wpilibC++/lib/AnalogInput.cpp
++++ b/wpilibc/wpilibC++/lib/AnalogInput.cpp
+@@ -7,6 +7,7 @@
+ #include "AnalogInput.h"
+ //#include "NetworkCommunication/UsageReporting.h"
+ #include "Resource.h"
++#include "Timer.h"
+ #include "WPIErrors.h"
+ #include "LiveWindow/LiveWindow.h"
+ 
+@@ -284,6 +285,16 @@ void AnalogInput::ResetAccumulator()
+ 	int32_t status = 0;
+ 	resetAccumulator(m_port, &status);
+ 	wpi_setErrorWithContext(status, getHALErrorMessage(status));
++
++	if(!StatusIsFatal())
++	{
++		// Wait until the next sample, so the next call to GetAccumulator*()
++		// won't have old values.
++		const float sampleTime = 1.0f / GetSampleRate();
++		const float overSamples = 1 << GetOversampleBits();
++		const float averageSamples = 1 << GetAverageBits();
++		Wait(sampleTime * overSamples * averageSamples);
++	}
+ }
+ 
+ /**
+diff --git a/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp b/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
+index 27d4d82560aa8890cb49fdaf97548ec0adff4305..f201dfe00812c81b57af88d9156f19c4641fc138 100644
+--- a/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
++++ b/wpilibc/wpilibC++IntegrationTests/src/TiltPanCameraTest.cpp
+@@ -9,7 +9,7 @@
+ #include "gtest/gtest.h"
+ #include "TestBench.h"
+ 
+-static constexpr double kServoResetTime = 1.0;
++static constexpr double kServoResetTime = 2.0;
+ 
+ static constexpr double kTestAngle = 180.0;
+ 
+@@ -44,6 +44,13 @@ protected:
+ 		m_tilt = new Servo(TestBench::kCameraTiltChannel);
+ 		m_pan = new Servo(TestBench::kCameraPanChannel);
+ 		m_spiAccel = new ADXL345_SPI(SPI::kOnboardCS0);
++
++		m_tilt->SetAngle(90.0f);
++		m_pan->SetAngle(0.0f);
++
++		Wait(kServoResetTime);
++
++		m_gyro->Reset();
+ 	}
+ 
+ 	virtual void TearDown() {
+@@ -55,15 +62,17 @@ protected:
+ 
+ Gyro *TiltPanCameraTest::m_gyro = 0;
+ 
++/**
++ * Test if the gyro angle defaults to 0 immediately after being reset.
++ */
++TEST_F(TiltPanCameraTest, DefaultGyroAngle) {
++	EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 0.01f);
++}
++
+ /**
+  * Test if the servo turns 180 degrees and the gyroscope measures this angle
+  */
+ TEST_F(TiltPanCameraTest, GyroAngle) {
+-	m_pan->Set(0.0f);
+-	Wait(kServoResetTime);
+-
+-	m_gyro->Reset();
+-
+ 	for(int i = 0; i < 180; i++) {
+ 		m_pan->SetAngle(i);
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+index ab4e43647465de26cdb5cce22d317f28ab002d96..fffc37483c26db823d3e345825fc0c11ac00d3e5 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogInput.java
+@@ -310,6 +310,14 @@ public class AnalogInput extends SensorBase implements PIDSource,
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+ 		AnalogJNI.resetAccumulator(m_port, status.asIntBuffer());
+ 		HALUtil.checkStatus(status.asIntBuffer());
++
++		// Wait until the next sample, so the next call to getAccumulator*()
++		// won't have old values.
++		final double sampleTime = 1.0 / getGlobalSampleRate();
++		final double overSamples = 1 << getOversampleBits();
++		final double averageSamples = 1 << getAverageBits();
++		Timer.delay(sampleTime * overSamples * averageSamples);
++
+ 	}
+ 
+ 	/**

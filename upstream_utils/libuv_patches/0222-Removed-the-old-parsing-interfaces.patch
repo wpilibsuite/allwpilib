@@ -1,0 +1,1429 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Tue, 29 Jul 2014 17:34:39 -0400
+Subject: [PATCH 0222/6262] Removed the old "parsing" interfaces
+
+Change-Id: I94ff79f36d5b61f90c2f242fa06816bf3a3b7ac2
+---
+ .../edu/wpi/first/wpilibj/PIDController.java  |  5 +-
+ .../wpi/first/wpilibj/parsing/IDevice.java    | 15 -----
+ .../wpilibj/parsing/IDeviceController.java    | 15 -----
+ .../first/wpilibj/parsing/IInputOutput.java   | 16 -----
+ .../wpi/first/wpilibj/parsing/IMechanism.java | 17 -----
+ .../wpi/first/wpilibj/parsing/ISensor.java    | 17 -----
+ .../first/wpilibj/AnalogAccelerometer.java    |  3 +-
+ .../edu/wpi/first/wpilibj/AnalogTrigger.java  |  3 +-
+ .../first/wpilibj/AnalogTriggerOutput.java    | 19 +++---
+ .../first/wpilibj/BuiltInAccelerometer.java   |  3 +-
+ .../edu/wpi/first/wpilibj/Compressor.java     |  3 +-
+ .../java/edu/wpi/first/wpilibj/Dashboard.java |  3 +-
+ .../edu/wpi/first/wpilibj/DigitalInput.java   |  4 +-
+ .../edu/wpi/first/wpilibj/DigitalOutput.java  |  4 +-
+ .../edu/wpi/first/wpilibj/DriverStation.java  |  7 +--
+ .../wpi/first/wpilibj/DriverStationLCD.java   |  3 +-
+ .../java/edu/wpi/first/wpilibj/Encoder.java   | 62 +++++++++----------
+ .../java/edu/wpi/first/wpilibj/GearTooth.java |  3 +-
+ .../main/java/edu/wpi/first/wpilibj/Gyro.java |  4 +-
+ .../java/edu/wpi/first/wpilibj/Jaguar.java    |  3 +-
+ .../java/edu/wpi/first/wpilibj/Joystick.java  |  3 +-
+ .../java/edu/wpi/first/wpilibj/Relay.java     | 16 +++--
+ .../edu/wpi/first/wpilibj/RobotDrive.java     |  3 +-
+ .../java/edu/wpi/first/wpilibj/Servo.java     |  3 +-
+ .../edu/wpi/first/wpilibj/SolenoidBase.java   |  3 +-
+ .../java/edu/wpi/first/wpilibj/Talon.java     |  3 +-
+ .../edu/wpi/first/wpilibj/Ultrasonic.java     |  4 +-
+ .../java/edu/wpi/first/wpilibj/Utility.java   |  3 +-
+ .../java/edu/wpi/first/wpilibj/Victor.java    |  3 +-
+ .../wpi/first/wpilibj/camera/AxisCamera.java  |  3 +-
+ .../first/wpilibj/internal/HardwareTimer.java | 15 +++--
+ .../edu/wpi/first/wpilibj/DigitalInput.java   |  4 +-
+ .../edu/wpi/first/wpilibj/DriverStation.java  |  5 +-
+ .../java/edu/wpi/first/wpilibj/Encoder.java   | 22 +++----
+ .../main/java/edu/wpi/first/wpilibj/Gyro.java |  6 +-
+ .../java/edu/wpi/first/wpilibj/Joystick.java  |  3 +-
+ .../java/edu/wpi/first/wpilibj/Relay.java     |  6 +-
+ .../edu/wpi/first/wpilibj/RobotDrive.java     |  3 +-
+ .../wpi/first/wpilibj/internal/SimTimer.java  | 13 ++--
+ 39 files changed, 103 insertions(+), 227 deletions(-)
+ delete mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IDevice.java
+ delete mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IDeviceController.java
+ delete mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IInputOutput.java
+ delete mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IMechanism.java
+ delete mode 100644 wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/ISensor.java
+
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java
+index 23483b54dfb28e7dd653c4c7ba62fe02b879e965..fd3838e2f7cd44d93cc4f0a6ef088dd103e850f3 100644
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java
++++ b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/PIDController.java
+@@ -7,7 +7,6 @@
+ package edu.wpi.first.wpilibj;
+ 
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.IUtility;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
+@@ -19,7 +18,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * care of the integral calculations, as well as writing the given
+  * PIDOutput
+  */
+-public class PIDController implements IUtility, LiveWindowSendable, Controller {
++public class PIDController implements LiveWindowSendable, Controller {
+ 
+     public static final double kDefaultPeriod = .05;
+     private static int instances = 0;
+@@ -264,7 +263,7 @@ public class PIDController implements IUtility, LiveWindowSendable, Controller {
+                 pidOutput = m_pidOutput;
+                 result = m_result;
+             }
+-            
++
+             pidOutput.pidWrite(result);
+         }
+     }
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IDevice.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IDevice.java
+deleted file mode 100644
+index 706f012c8edb2ab8fab49b952d3f4dae1a157b01..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IDevice.java
++++ /dev/null
+@@ -1,15 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-package edu.wpi.first.wpilibj.parsing;
+-
+-/**
+- * An IDevice is any WPILibJ object which can be used in the creation of the
+- * robot program
+- * @author Ryan O'Meara
+- */
+-public interface IDevice {}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IDeviceController.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IDeviceController.java
+deleted file mode 100644
+index 8dfd061c1a3e82fca8f0f2514e3b80c3649f206f..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IDeviceController.java
++++ /dev/null
+@@ -1,15 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-package edu.wpi.first.wpilibj.parsing;
+-
+-/**
+- * IDeviceController is implemented by control elements in the robot.  An
+- * example of this would be a victor
+- * @author Ryan O'Meara
+- */
+-public interface IDeviceController extends IDevice {}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IInputOutput.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IInputOutput.java
+deleted file mode 100644
+index 49801a9adc1fcdbd4f3d7bd604aaed0a6f1fd94a..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IInputOutput.java
++++ /dev/null
+@@ -1,16 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-package edu.wpi.first.wpilibj.parsing;
+-
+-/**
+- * IInputOutput is implemented by devices which provide the robot with data and
+- * allow it to react to its environment.  An example of an input/output would be
+- * a joystick
+- * @author Ryan O'Meara
+- */
+-public interface IInputOutput extends IDevice {}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IMechanism.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IMechanism.java
+deleted file mode 100644
+index a9411d018bc778907f42c4e1318ce2f480f38714..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/IMechanism.java
++++ /dev/null
+@@ -1,17 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-package edu.wpi.first.wpilibj.parsing;
+-
+-/**
+- * The IMechanism interface is implemented by any class to be classified as a
+- * mechanism.  These are user-defined, and contain other devices (which implement
+- * IDevice).  They are generally over-arching systems, such as the drive train or
+- * arm
+- * @author Ryan O'Meara
+- */
+-public interface IMechanism {}
+diff --git a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/ISensor.java b/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/ISensor.java
+deleted file mode 100644
+index 0991fd3b20656e220a59dac21388a9f3cbbcfe24..0000000000000000000000000000000000000000
+--- a/wpilibj/wpilibJava/src/main/java/edu/wpi/first/wpilibj/parsing/ISensor.java
++++ /dev/null
+@@ -1,17 +0,0 @@
+-/*----------------------------------------------------------------------------*/
+-/* Copyright (c) FIRST 2008-2012. All Rights Reserved.                        */
+-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+-/* must be accompanied by the FIRST BSD license file in the root directory of */
+-/* the project.                                                               */
+-/*----------------------------------------------------------------------------*/
+-
+-package edu.wpi.first.wpilibj.parsing;
+-
+-/**
+- * ISensor is extended by any WPILibJ class to be categorized as a sensor in the
+- * java program builder.  A sensor is a robot part that provides the robot with
+- * information about its environment.  An example of this is the Ultrasonic
+- * sensor class
+- * @author Ryan O'Meara
+- */
+-public interface ISensor extends IDevice {}
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogAccelerometer.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogAccelerometer.java
+index efe54039bbf45aca1605fbafef53b57dc1947976..ecdcc188104bb68fce468507b33dddf4b1a0ae2e 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogAccelerometer.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogAccelerometer.java
+@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+ 
+@@ -21,7 +20,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
+  * multiple axis and can be treated as multiple devices. Each is calibrated by finding
+  * the center value over a period of time.
+  */
+-public class AnalogAccelerometer extends SensorBase implements PIDSource, ISensor, LiveWindowSendable {
++public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWindowSendable {
+ 
+     private AnalogInput m_analogChannel;
+     private double m_voltsPerG = 1.0;
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
+index b28f31f05bfbcad7cc355f98b3b7f0d368f30138..adca097d5d8867b9f9da37a86d9ef65a99ff133d 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTrigger.java
+@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.hal.AnalogJNI;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
+ 
+ /**
+@@ -24,7 +23,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  *
+  * @author dtjones
+  */
+-public class AnalogTrigger implements IInputOutput {
++public class AnalogTrigger {
+ 
+ 	/**
+ 	 * Exceptions dealing with improper operation of the Analog trigger
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java
+index 6e4a30e5b42d0e4f2cfd949a8ce07af3af2ac313..f6f0788c813af5ad87dbb8a8f413c11ade8c904f 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/AnalogTriggerOutput.java
+@@ -14,23 +14,22 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.hal.AnalogJNI;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ 
+ /**
+  * Class to represent a specific output from an analog trigger. This class is
+  * used to get the current output value and also as a DigitalSource to provide
+  * routing of an output to digital subsystems on the FPGA such as Counter,
+  * Encoder, and Interrupt.
+- * 
++ *
+  * The TriggerState output indicates the primary output value of the trigger. If
+  * the analog signal is less than the lower limit, the output is false. If the
+  * analog value is greater than the upper limit, then the output is true. If the
+  * analog value is in between, then the trigger output state maintains its most
+  * recent value.
+- * 
++ *
+  * The InWindow output indicates whether or not the analog signal is inside the
+  * range defined by the limits.
+- * 
++ *
+  * The RisingPulse and FallingPulse outputs detect an instantaneous transition
+  * from above the upper limit to below the lower limit, and vise versa. These
+  * pulses represent a rollover condition of a sensor and can be routed to an up
+@@ -46,7 +45,7 @@ import edu.wpi.first.wpilibj.parsing.IInputOutput;
+  * rollover transition is not sharp / clean enough. Using the averaging engine
+  * may help with this, but rotational speeds of the sensor will then be limited.
+  */
+-public class AnalogTriggerOutput extends DigitalSource implements IInputOutput {
++public class AnalogTriggerOutput extends DigitalSource {
+ 
+ 	/**
+ 	 * Exceptions dealing with improper operation of the Analog trigger output
+@@ -55,7 +54,7 @@ public class AnalogTriggerOutput extends DigitalSource implements IInputOutput {
+ 
+ 		/**
+ 		 * Create a new exception with the given message
+-		 * 
++		 *
+ 		 * @param message
+ 		 *            the message to pass with the exception
+ 		 */
+@@ -71,10 +70,10 @@ public class AnalogTriggerOutput extends DigitalSource implements IInputOutput {
+ 	/**
+ 	 * Create an object that represents one of the four outputs from an analog
+ 	 * trigger.
+-	 * 
++	 *
+ 	 * Because this class derives from DigitalSource, it can be passed into
+ 	 * routing functions for Counter, Encoder, etc.
+-	 * 
++	 *
+ 	 * @param trigger
+ 	 *            The trigger for which this is an output.
+ 	 * @param outputType
+@@ -95,7 +94,7 @@ public class AnalogTriggerOutput extends DigitalSource implements IInputOutput {
+ 
+ 	/**
+ 	 * Get the state of the analog trigger output.
+-	 * 
++	 *
+ 	 * @return The state of the analog trigger output.
+ 	 */
+ 	public boolean get() {
+@@ -120,7 +119,7 @@ public class AnalogTriggerOutput extends DigitalSource implements IInputOutput {
+ 
+ 	/**
+ 	 * Request interrupts asynchronously on this digital input.
+-	 * 
++	 *
+ 	 * @param handler
+ 	 *            the interrupt service routine
+ 	 * @param param
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java
+index 1ac056e8d06e5c8e68df3b27bcf8267850c6f2b6..78b76a126f7a0191ff32c72f740d62b3e923c0cc 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/BuiltInAccelerometer.java
+@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tReso
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+ /**
+@@ -18,7 +17,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
+  *
+  * This class allows access to the RoboRIO's internal accelerometer.
+  */
+-public class BuiltInAccelerometer implements Accelerometer, ISensor, LiveWindowSendable
++public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable
+ {
+ 	/**
+ 	 * Constructor.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Compressor.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Compressor.java
+index 089e8d911002a0a27ba6c77a0ce1c825ffcf0f7d..ceb2543379b8373f3a310cf3f5dd5f84a886709d 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Compressor.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Compressor.java
+@@ -7,10 +7,9 @@ import edu.wpi.first.wpilibj.SensorBase;
+ import edu.wpi.first.wpilibj.hal.CompressorJNI;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.IDevice;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+-public class Compressor extends SensorBase implements IDevice, LiveWindowSendable {
++public class Compressor extends SensorBase implements LiveWindowSendable {
+ 	private ByteBuffer m_pcm;
+ 
+ 	public Compressor(int pcmId) {
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Dashboard.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Dashboard.java
+index 268269fa34b11c3c9bd6874ed4a4d07216a1d2b5..6831bee18597ffd8ad7f9c03b6b6b06f62785f21 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Dashboard.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Dashboard.java
+@@ -10,13 +10,12 @@ import java.util.Stack;
+ 
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ 
+ /**
+  * Pack data into the "user data" field that gets sent to the dashboard laptop
+  * via the driver station.
+  */
+-public class Dashboard  implements IDashboard, IInputOutput {
++public class Dashboard  implements IDashboard {
+ 
+     protected class MemAccess {
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
+index f6bf75944e7cb28fa1867612a51c6b35fdb1c4ee..1a2d8ebd7f5051e1e74d6f8ef644587a4540cbd2 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
+@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.hal.DIOJNI;
+ import edu.wpi.first.wpilibj.hal.InterruptJNI.InterruptHandlerFunction;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.util.AllocationException;
+ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+@@ -29,8 +28,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+  * digital inputs and outputs as required. This class is only for devices like
+  * switches etc. that aren't implemented anywhere else.
+  */
+-public class DigitalInput extends DigitalSource implements IInputOutput,
+-		LiveWindowSendable {
++public class DigitalInput extends DigitalSource implements LiveWindowSendable {
+ 
+ 	/**
+ 	 * Create an instance of a Digital Input class. Creates a digital input
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalOutput.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalOutput.java
+index 1036e29a24a35f5551afbd914309ea6543e8a181..7365648da9f953a90ad54344572fa3b33044ab62 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalOutput.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DigitalOutput.java
+@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.hal.DIOJNI;
+ import edu.wpi.first.wpilibj.hal.PWMJNI;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
+ 
+@@ -29,8 +28,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
+  * devices that are implemented elsewhere will automatically allocate digital
+  * inputs and outputs as required.
+  */
+-public class DigitalOutput extends DigitalSource implements IInputOutput,
+-		LiveWindowSendable {
++public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
+ 
+ 	private ByteBuffer m_pwmGenerator;
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index a1488d4f23a63ef40dda64eb188ed6c81ab00f4a..eaa3e32862725f52a358fe5a98f7daba3aebe243 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -14,12 +14,11 @@ import edu.wpi.first.wpilibj.communication.FRCCommonControlData;
+ import edu.wpi.first.wpilibj.communication.FRCCommonControlMasks;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+ import edu.wpi.first.wpilibj.Timer;
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ 
+ /**
+  * Provide access to the network communication data to / from the Driver Station.
+  */
+-public class DriverStation implements IInputOutput, RobotState.Interface {
++public class DriverStation implements RobotState.Interface {
+ 
+     /**
+      * The size of the user status data
+@@ -135,10 +134,10 @@ public class DriverStation implements IInputOutput, RobotState.Interface {
+         //m_batteryChannel = new AnalogChannel(kBatterySlot, kBatteryChannel);
+ 
+         m_packetDataAvailableSem = HALUtil.initializeMutexNormal();
+-        
++
+         // set the byte order
+         m_packetDataAvailableSem.order(ByteOrder.LITTLE_ENDIAN);
+-        
++
+         FRCNetworkCommunicationsLibrary.setNewDataSem(m_packetDataAvailableSem);
+ 
+         m_thread = new Thread(new DriverStationTask(this), "FRCDriverStation");
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStationLCD.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStationLCD.java
+index 973da9d0f34c0acbd2eeeb41b82a757ccea18939..531c85554e5b7645ce9377420e12623a732ab581 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStationLCD.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/DriverStationLCD.java
+@@ -13,7 +13,6 @@ import java.nio.IntBuffer;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ 
+ /**
+  * Provide access to "LCD" on the Driver Station.
+@@ -22,7 +21,7 @@ import edu.wpi.first.wpilibj.parsing.IInputOutput;
+  * Buffer the printed data locally and then send it
+  * when UpdateLCD is called.
+  */
+-public class DriverStationLCD extends SensorBase implements IInputOutput {
++public class DriverStationLCD extends SensorBase {
+ 
+     private static DriverStationLCD m_instance;
+     /**
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Encoder.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+index 4c283beca99f6bea7ed902a5fefa022f3376065a..19ee815a000187da30b2b736eb15b6fb94af42e8 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Encoder.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.hal.EncoderJNI;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
+ 
+@@ -30,8 +29,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * encoders have two digital outputs, an A Channel and a B Channel that are out
+  * of phase with each other to allow the FPGA to do direction sensing.
+  */
+-public class Encoder extends SensorBase implements CounterBase, PIDSource,
+-		ISensor, LiveWindowSendable {
++public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
+ 
+ 	/**
+ 	 * The a source
+@@ -59,7 +57,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Common initialization code for Encoders. This code allocates resources
+ 	 * for Encoders and is common to all constructors.
+-	 * 
++	 *
+ 	 * @param reverseDirection
+ 	 *            If true, counts down instead of up (this is all relative)
+ 	 * @param encodingType
+@@ -108,7 +106,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+-	 * 
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -130,7 +128,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+-	 * 
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -142,7 +140,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+-	 * 
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -176,7 +174,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+ 	 * Using an index pulse forces 4x encoding
+-	 * 
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -202,7 +200,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+ 	 * Using an index pulse forces 4x encoding
+-	 * 
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -220,7 +218,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * digital inputs. This is used in the case where the digital inputs are
+ 	 * shared. The Encoder class will not allocate the digital inputs and assume
+ 	 * that they already are counted.
+-	 * 
++	 *
+ 	 * @param aSource
+ 	 *            The source that should be used for the a channel.
+ 	 * @param bSource
+@@ -249,7 +247,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * digital inputs. This is used in the case where the digital inputs are
+ 	 * shared. The Encoder class will not allocate the digital inputs and assume
+ 	 * that they already are counted.
+-	 * 
++	 *
+ 	 * @param aSource
+ 	 *            The source that should be used for the a channel.
+ 	 * @param bSource
+@@ -264,7 +262,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * digital inputs. This is used in the case where the digital inputs are
+ 	 * shared. The Encoder class will not allocate the digital inputs and assume
+ 	 * that they already are counted.
+-	 * 
++	 *
+ 	 * @param aSource
+ 	 *            The source that should be used for the a channel.
+ 	 * @param bSource
+@@ -305,7 +303,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * digital inputs. This is used in the case where the digital inputs are
+ 	 * shared. The Encoder class will not allocate the digital inputs and assume
+ 	 * that they already are counted.
+-	 * 
++	 *
+ 	 * @param aSource
+ 	 *            The source that should be used for the a channel.
+ 	 * @param bSource
+@@ -338,7 +336,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * digital inputs. This is used in the case where the digital inputs are
+ 	 * shared. The Encoder class will not allocate the digital inputs and assume
+ 	 * that they already are counted.
+-	 * 
++	 *
+ 	 * @param aSource
+ 	 *            The source that should be used for the a channel.
+ 	 * @param bSource
+@@ -413,7 +411,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Gets the raw value from the encoder. The raw value is the actual count
+ 	 * unscaled by the 1x, 2x, or 4x scale factor.
+-	 * 
++	 *
+ 	 * @return Current raw count from the encoder
+ 	 */
+ 	public int getRaw() {
+@@ -433,7 +431,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Gets the current count. Returns the current count on the Encoder. This
+ 	 * method compensates for the decoding type.
+-	 * 
++	 *
+ 	 * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x
+ 	 *         scale factor.
+ 	 */
+@@ -461,11 +459,11 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * Returns the period of the most recent pulse. Returns the period of the
+ 	 * most recent Encoder pulse in seconds. This method compensates for the
+ 	 * decoding type.
+-	 * 
++	 *
+ 	 * @deprecated Use getRate() in favor of this method. This returns unscaled
+ 	 *             periods and getRate() scales using value from
+ 	 *             setDistancePerPulse().
+-	 * 
++	 *
+ 	 * @return Period in seconds of the most recent pulse.
+ 	 */
+ 	public double getPeriod() {
+@@ -488,8 +486,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * the attached device is stopped. This timeout allows users to determine if
+ 	 * the wheels or other shaft has stopped rotating. This method compensates
+ 	 * for the decoding type.
+-	 * 
+-	 * 
++	 *
++	 *
+ 	 * @param maxPeriod
+ 	 *            The maximum time between rising and falling edges before the
+ 	 *            FPGA will report the device stopped. This is expressed in
+@@ -512,7 +510,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * is returned that is true if the encoder is considered stopped and false
+ 	 * if it is still moving. A stopped encoder is one where the most recent
+ 	 * pulse width exceeds the MaxPeriod.
+-	 * 
++	 *
+ 	 * @return True if the encoder is considered stopped.
+ 	 */
+ 	public boolean getStopped() {
+@@ -530,7 +528,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * The last direction the encoder value changed.
+-	 * 
++	 *
+ 	 * @return The last direction the encoder value changed.
+ 	 */
+ 	public boolean getDirection() {
+@@ -566,7 +564,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * Get the distance the robot has driven since the last reset.
+-	 * 
++	 *
+ 	 * @return The distance driven since the last reset as scaled by the value
+ 	 *         from setDistancePerPulse().
+ 	 */
+@@ -577,7 +575,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Get the current rate of the encoder. Units are distance per second as
+ 	 * scaled by the value from setDistancePerPulse().
+-	 * 
++	 *
+ 	 * @return The current rate of the encoder.
+ 	 */
+ 	public double getRate() {
+@@ -587,7 +585,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Set the minimum rate of the device before the hardware reports it
+ 	 * stopped.
+-	 * 
++	 *
+ 	 * @param minRate
+ 	 *            The minimum rate. The units are in distance per second as
+ 	 *            scaled by the value from setDistancePerPulse().
+@@ -604,7 +602,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * encoder's rated Pulses per Revolution and factor in gearing reductions
+ 	 * following the encoder shaft. This distance can be in any units you like,
+ 	 * linear or angular.
+-	 * 
++	 *
+ 	 * @param distancePerPulse
+ 	 *            The scale factor that will be used to convert pulses to useful
+ 	 *            units.
+@@ -617,7 +615,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * Set the direction sensing for this encoder. This sets the direction
+ 	 * sensing on the encoder so that it could count in the correct software
+ 	 * direction regardless of the mounting.
+-	 * 
++	 *
+ 	 * @param reverseDirection
+ 	 *            true if the encoder direction should be reversed
+ 	 */
+@@ -634,10 +632,10 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * timer to average when calculating the period. Perform averaging to
+ 	 * account for mechanical imperfections or as oversampling to increase
+ 	 * resolution.
+-	 * 
++	 *
+ 	 * TODO: Should this throw a checked exception, so that the user has to deal
+ 	 * with giving an incorrect value?
+-	 * 
++	 *
+ 	 * @param samplesToAverage
+ 	 *            The number of samples to average from 1 to 127.
+ 	 */
+@@ -666,7 +664,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	 * timer to average when calculating the period. Perform averaging to
+ 	 * account for mechanical imperfections or as oversampling to increase
+ 	 * resolution.
+-	 * 
++	 *
+ 	 * @return SamplesToAverage The number of samples being averaged (from 1 to
+ 	 *         127)
+ 	 */
+@@ -689,7 +687,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Set which parameter of the encoder you are using as a process control
+ 	 * variable. The encoder class supports the rate and distance parameters.
+-	 * 
++	 *
+ 	 * @param pidSource
+ 	 *            An enum to select the parameter.
+ 	 */
+@@ -700,7 +698,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * Implement the PIDSource interface.
+-	 * 
++	 *
+ 	 * @return The current value of the selected source parameter.
+ 	 */
+ 	public double pidGet() {
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/GearTooth.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/GearTooth.java
+index 645b698d7885e35387a5f2bb64aa494a0e6ea0ee..61a8665b05a4bf97d9f4fb61c4a0e9bb67dafde3 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/GearTooth.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/GearTooth.java
+@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+ 
+ /**
+  * Alias for counter class.
+@@ -18,7 +17,7 @@ import edu.wpi.first.wpilibj.parsing.ISensor;
+  * the gear tooth sensor, but in future versions we might implement the necessary timing in the
+  * FPGA to sense direction.
+  */
+-public class GearTooth extends Counter implements ISensor {
++public class GearTooth extends Counter {
+ 
+     private static final double kGearToothThreshold = 55e-6;
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+index 63bf87d0b58cd32a53c6d4474a9fa9fe167dfc9b..a0087a1199abaf19035f0a816e0109a0861fff35 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.Timer;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
+ 
+@@ -24,8 +23,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * determine the default offset. This is subtracted from each sample to
+  * determine the heading.
+  */
+-public class Gyro extends SensorBase implements PIDSource, ISensor,
+-		LiveWindowSendable {
++public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 
+ 	static final int kOversampleBits = 10;
+ 	static final int kAverageBits = 0;
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
+index 5bfc1e0afdc2244b131075cb69eac7dda5397f84..51a657b3f47817d09ea378df55df06a1d211dfbd 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Jaguar.java
+@@ -10,12 +10,11 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+-import edu.wpi.first.wpilibj.parsing.IDeviceController;
+ 
+ /**
+  * Texas Instruments Jaguar Speed Controller as a PWM device.
+  */
+-public class Jaguar extends SafePWM implements SpeedController, IDeviceController {
++public class Jaguar extends SafePWM implements SpeedController {
+ 
+     /**
+      * Common initialization code called by all constructors.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+index 8864e9d79dcbfc1fd56ea2ca979d60162786b466..969dcdf78989c94ec2b142a9c683d8528253d5c5 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+@@ -8,7 +8,6 @@ package edu.wpi.first.wpilibj;
+ 
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ 
+ /**
+  * Handle input from standard Joysticks connected to the Driver Station.
+@@ -16,7 +15,7 @@ import edu.wpi.first.wpilibj.parsing.IInputOutput;
+  * the most recent value is returned. There is a single class instance for each joystick and the mapping
+  * of ports to hardware buttons depends on the code in the driver station.
+  */
+-public class Joystick extends GenericHID implements IInputOutput {
++public class Joystick extends GenericHID {
+ 
+     static final byte kDefaultXAxis = 1;
+     static final byte kDefaultYAxis = 2;
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java
+index 32e3a7c638eda79f502c5b07753d9fca711ea785..19c8d2960ec72e4964a620535d6b71e3e0c15ed2 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Relay.java
+@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.hal.HALUtil;
+ import edu.wpi.first.wpilibj.hal.RelayJNI;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.IDeviceController;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
+ import edu.wpi.first.wpilibj.util.AllocationException;
+@@ -33,9 +32,8 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+  * allows the two channels (forward and reverse) to be used independently for
+  * something that does not care about voltage polarity (like a solenoid).
+  */
+-public class Relay extends SensorBase implements IDeviceController,
+-		LiveWindowSendable {
+-	
++public class Relay extends SensorBase implements LiveWindowSendable {
++
+ 	/**
+ 	 * This class represents errors in trying to set relay values contradictory
+ 	 * to the direction to which the relay is set.
+@@ -73,12 +71,12 @@ public class Relay extends SensorBase implements IDeviceController,
+ 		 * value: reverse
+ 		 */
+ 		kReverse(3);
+-		
++
+ 		/**
+ 		 * The integer value representing this enumeration
+ 		 */
+ 		public final int value;
+-		
++
+ 		private Value(int value) {
+ 			this.value = value;
+ 		}
+@@ -106,11 +104,11 @@ public class Relay extends SensorBase implements IDeviceController,
+ 		 * The integer value representing this enumeration
+ 		 */
+ 		public final int value;
+-		
++
+ 		private Direction(int value) {
+ 			this.value = value;
+ 		}
+-		
++
+ 	}
+ 
+ 	private final int m_channel;
+@@ -185,7 +183,7 @@ public class Relay extends SensorBase implements IDeviceController,
+ 		if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
+ 			relayChannels.free(m_channel*2 + 1);
+ 		}
+-		
++
+ 		ByteBuffer status = ByteBuffer.allocateDirect(4);
+ 		status.order(ByteOrder.LITTLE_ENDIAN);
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
+index d756d9732153090ebaedb2ee5a698cebfdc6f56d..b1db46bb6bf53b804546a334f3d6be23594ea145 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
+@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.can.CANNotInitializedException;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+-import edu.wpi.first.wpilibj.parsing.IUtility;
+ 
+ /**
+  * Utility class for handling Robot drive based on a definition of the motor configuration.
+@@ -20,7 +19,7 @@ import edu.wpi.first.wpilibj.parsing.IUtility;
+  * used for either the drive function (intended for hand created drive code, such as autonomous)
+  * or with the Tank/Arcade functions intended to be used for Operator Control driving.
+  */
+-public class RobotDrive implements MotorSafety, IUtility {
++public class RobotDrive implements MotorSafety {
+ 
+     protected MotorSafetyHelper m_safetyHelper;
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Servo.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Servo.java
+index ed3b22ad4160c1c55cc1b6ec78829e24b7c062e5..49c3fd8e2977d88b5db2d267de626d9aa8a619ce 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Servo.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Servo.java
+@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+-import edu.wpi.first.wpilibj.parsing.IDevice;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
+ 
+@@ -20,7 +19,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
+  * The range parameters default to the appropriate values for the Hitec HS-322HD servo provided
+  * in the FIRST Kit of Parts in 2008.
+  */
+-public class Servo extends PWM implements IDevice {
++public class Servo extends PWM {
+ 
+     private static final double kMaxServoAngle = 180.0;
+     private static final double kMinServoAngle = 0.0;
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java
+index f8a13bddb346eeed262c8a35a24b944f9908a735..a7c0284cec3e58a808f08f5b7342ef7a3e59f5f7 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/SolenoidBase.java
+@@ -11,13 +11,12 @@ import java.nio.IntBuffer;
+ import java.nio.ByteBuffer;
+ 
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+-import edu.wpi.first.wpilibj.parsing.IDeviceController;
+ 
+ /**
+  * SolenoidBase class is the common base class for the Solenoid and
+  * DoubleSolenoid classes.
+  */
+-public abstract class SolenoidBase extends SensorBase implements IDeviceController {
++public abstract class SolenoidBase extends SensorBase {
+ 
+     private ByteBuffer[] m_ports;
+     protected int m_moduleNumber; ///< The number of the solenoid module being used.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
+index d32a6458ae6b211423259d84c55f96e7a675e9ba..03a6cf13246cc85ac67c2ea7fd8cb72865d82fc0 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Talon.java
+@@ -10,12 +10,11 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+-import edu.wpi.first.wpilibj.parsing.IDeviceController;
+ 
+ /**
+  * CTRE Talon Speed Controller
+  */
+-public class Talon extends SafePWM implements SpeedController, IDeviceController {
++public class Talon extends SafePWM implements SpeedController {
+ 
+     /**
+      * Common initialization code called by all constructors.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Ultrasonic.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Ultrasonic.java
+index 07331926f7fe1152528ee4d5bf57031a9f498ddf..c5e15a78809a5bcf3245cc5a38d088f712c63b80 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Ultrasonic.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Ultrasonic.java
+@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.Timer;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+ /**
+@@ -25,8 +24,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
+  * and goes low when the echo is received. The time that the line is high
+  * determines the round trip distance (time of flight).
+  */
+-public class Ultrasonic extends SensorBase implements PIDSource, ISensor,
+-		LiveWindowSendable {
++public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSendable {
+ 
+ 	/**
+ 	 * The units to return when PIDGet is called
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Utility.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Utility.java
+index 245d95826e3fbfcb0694668ea54e366296910f6a..3122b0c70c44abde97d54fc159414bba79e09b00 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Utility.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Utility.java
+@@ -13,12 +13,11 @@ import java.nio.IntBuffer;
+ 
+ import edu.wpi.first.wpilibj.hal.HALLibrary;
+ import edu.wpi.first.wpilibj.hal.HALUtil;
+-import edu.wpi.first.wpilibj.parsing.IUtility;
+ 
+ /**
+  * Contains global utility functions
+  */
+-public class Utility implements IUtility {
++public class Utility {
+ 
+ 	private Utility() {
+ 	}
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java
+index 9d3fcc51e7d4f643fc0087a99fb4845dedaaa189..d30104c8127e5b123ad4f118ca3e9e931cf7a533 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Victor.java
+@@ -10,12 +10,11 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
+ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+-import edu.wpi.first.wpilibj.parsing.IDeviceController;
+ 
+ /**
+  * VEX Robotics Victor Speed Controller
+  */
+-public class Victor extends SafePWM implements SpeedController, IDeviceController {
++public class Victor extends SafePWM implements SpeedController {
+ 
+     /**
+      * Common initialization code called by all constructors.
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/camera/AxisCamera.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/camera/AxisCamera.java
+index 460634342bfa7d069eb07f62c7dc19c79661f225..d4d414ceede927882ece2259ad43d3dacc1af2e2 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/camera/AxisCamera.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/camera/AxisCamera.java
+@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
+ import edu.wpi.first.wpilibj.image.ColorImage;
+ import edu.wpi.first.wpilibj.image.HSLImage;
+ import edu.wpi.first.wpilibj.image.NIVisionException;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
+ 
+ //TODO figure out where to use finally to free resources
+@@ -30,7 +29,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * This class is a singleton used to configure and get images from the axis camera.
+  * @author dtjones
+  */
+-public class AxisCamera implements ISensor {
++public class AxisCamera {
+ 
+     private static AxisCamera m_instance = null;
+ 
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/internal/HardwareTimer.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/internal/HardwareTimer.java
+index f86ea1379c8290dcb4731b94b1f5b22f3b3f8889..b5a301a057ce72f712b8d972b598a8922bdba375 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/internal/HardwareTimer.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/internal/HardwareTimer.java
+@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj.internal;
+ import edu.wpi.first.wpilibj.DriverStation;
+ import edu.wpi.first.wpilibj.Timer;
+ import edu.wpi.first.wpilibj.Utility;
+-import edu.wpi.first.wpilibj.parsing.IUtility;
+ 
+ /**
+  * Timer objects measure accumulated time in milliseconds.
+@@ -19,7 +18,7 @@ import edu.wpi.first.wpilibj.parsing.IUtility;
+  * value. The implementation simply records the time when started and subtracts the current time
+  * whenever the value is requested.
+  */
+-public class HardwareTimer implements IUtility, Timer.StaticInterface {
++public class HardwareTimer implements Timer.StaticInterface {
+     /**
+      * Pause the thread for a specified time. Pause the execution of the
+      * thread for a specified period of time given in seconds. Motors will
+@@ -62,7 +61,7 @@ public class HardwareTimer implements IUtility, Timer.StaticInterface {
+         private long m_startTime;
+         private double m_accumulatedTime;
+         private boolean m_running;
+-        
++
+ 	    /**
+ 	     * Create a new timer object.
+ 	     * Create a new timer object and reset the time to zero. The timer is initially not running and
+@@ -71,11 +70,11 @@ public class HardwareTimer implements IUtility, Timer.StaticInterface {
+ 	    public TimerImpl() {
+ 	        reset();
+ 	    }
+-	    
++
+ 	    private long getMsClock() {
+ 	    	return Utility.getFPGATime() / 1000;
+ 	    }
+-	
++
+ 	    /**
+ 	     * Get the current time from the timer. If the clock is running it is derived from
+ 	     * the current system clock the start time stored in the timer class. If the clock
+@@ -90,7 +89,7 @@ public class HardwareTimer implements IUtility, Timer.StaticInterface {
+ 	            return m_accumulatedTime;
+ 	        }
+ 	    }
+-	
++
+ 	    /**
+ 	     * Reset the timer by setting the time to 0.
+ 	     * Make the timer startTime the current time so new requests will be relative now
+@@ -99,7 +98,7 @@ public class HardwareTimer implements IUtility, Timer.StaticInterface {
+ 	        m_accumulatedTime = 0;
+ 	        m_startTime = getMsClock();
+ 	    }
+-	
++
+ 	    /**
+ 	     * Start the timer running.
+ 	     * Just set the running flag to true indicating that all time requests should be
+@@ -109,7 +108,7 @@ public class HardwareTimer implements IUtility, Timer.StaticInterface {
+ 	        m_startTime = getMsClock();
+ 	        m_running = true;
+ 	    }
+-	
++
+ 	    /**
+ 	     * Stop the timer.
+ 	     * This computes the time as of now and clears the running flag, causing all
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
+index 04daa8003f80e90f8ae30e991586d70abb994d19..07c0cd4f9f70667dedc57758109d795954304b58 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DigitalInput.java
+@@ -8,7 +8,6 @@ package edu.wpi.first.wpilibj;
+ 
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.simulation.SimDigitalInput;
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ 
+ /**
+@@ -18,8 +17,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
+  * digital inputs and outputs as required. This class is only for devices like
+  * switches etc. that aren't implemented anywhere else.
+  */
+-public class DigitalInput implements IInputOutput,
+-		LiveWindowSendable {
++public class DigitalInput implements LiveWindowSendable {
+ 	private SimDigitalInput impl;
+ 	private int m_channel;
+ 
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+index 8e59460c502c98a0a43cc9da5f91ac25d7befeb1..fec4bcc1e610093202d0e62cc9d1b0f58277c432 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/DriverStation.java
+@@ -12,12 +12,11 @@ import gazebo.msgs.GzDriverStation.DriverStation.State;
+ import gazebo.msgs.GzJoystick.Joystick;
+ 
+ import org.gazebosim.transport.SubscriberCallback;
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ 
+ /**
+  * Provide access to the network communication data to / from the Driver Station.
+  */
+-public class DriverStation implements IInputOutput, RobotState.Interface {
++public class DriverStation implements RobotState.Interface {
+     /**
+      * Slot for the analog module to read the battery
+      */
+@@ -104,7 +103,7 @@ public class DriverStation implements IInputOutput, RobotState.Interface {
+ 				}
+ 			}
+         );
+-        
++
+         for (int i = 1; i <= 4; i++) {
+         	final int j = i;
+         	MainNode.subscribe("ds/joysticks/"+i, Joystick.getDefaultInstance(),
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+index 5e251eded00ca6bd4e3d03dc2e8dad46c5d5bd72..c1f15acb89868cabc3e8c76bbad2796f562be10e 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Encoder.java
+@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.simulation.SimEncoder;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
+ 
+@@ -23,8 +22,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * encoders have two digital outputs, an A Channel and a B Channel that are out
+  * of phase with each other to allow the FPGA to do direction sensing.
+  */
+-public class Encoder extends SensorBase implements CounterBase, PIDSource,
+-		ISensor, LiveWindowSendable {
++public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
+ 	private int m_index;
+ 	private double m_distancePerPulse; // distance of travel for each encoder tick
+ 	private EncodingType m_encodingType = EncodingType.k4X;
+@@ -38,7 +36,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Common initialization code for Encoders. This code allocates resources
+ 	 * for Encoders and is common to all constructors.
+-	 * 
++	 *
+ 	 * @param reverseDirection
+ 	 *            If true, counts down instead of up (this is all relative)
+ 	 * @param encodingType
+@@ -55,7 +53,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 		m_pidSource = PIDSourceParameter.kDistance;
+ 
+ 		LiveWindow.addSensor("Encoder", aChannel, this);
+-		
++
+ 		if (bChannel < aChannel) { // Swap ports
+ 			int channel = bChannel;
+ 			bChannel = aChannel;
+@@ -71,7 +69,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+-	 * 
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -91,7 +89,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+-	 * 
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -103,7 +101,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * Encoder constructor. Construct a Encoder given a and b channels.
+-	 * 
++	 *
+ 	 * @param aChannel
+ 	 *            The a channel digital input channel.
+ 	 * @param bChannel
+@@ -198,7 +196,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * Sets the maximum period for stopped detection.
+-	 * Sets the value that represents the maximum period of the Encoder before 
++	 * Sets the value that represents the maximum period of the Encoder before
+ 	 * that the attached device is stopped. This timeout allows users to determ
+ 	 * other shaft has stopped rotating.
+ 	 * This method compensates for the decoding type.
+@@ -215,7 +213,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Determine if the encoder is stopped.
+ 	 * Using the MaxPeriod value, a boolean is returned that is true if the enc
+-	 * stopped and false if it is still moving. A stopped encoder is one where 
++	 * stopped and false if it is still moving. A stopped encoder is one where
+ 	 * width exceeds the MaxPeriod.
+ 	 * @return True if the encoder is considered stopped.
+ 	 */
+@@ -257,7 +255,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 	/**
+ 	 * Set which parameter of the encoder you are using as a process control
+ 	 * variable. The encoder class supports the rate and distance parameters.
+-	 * 
++	 *
+ 	 * @param pidSource
+ 	 *            An enum to select the parameter.
+ 	 */
+@@ -268,7 +266,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource,
+ 
+ 	/**
+ 	 * Implement the PIDSource interface.
+-	 * 
++	 *
+ 	 * @return The current value of the selected source parameter.
+ 	 */
+ 	public double pidGet() {
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Gyro.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+index 97e218520f1004d905ee323fcab213f8d9321d29..7deb144363f5cce47c7f1651fd39ef3157f1d697 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Gyro.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Gyro.java
+@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.simulation.SimGyro;
+-import edu.wpi.first.wpilibj.parsing.ISensor;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.util.BoundaryException;
+ 
+@@ -22,8 +21,7 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
+  * determine the default offset. This is subtracted from each sample to
+  * determine the heading.
+  */
+-public class Gyro extends SensorBase implements PIDSource, ISensor,
+-		LiveWindowSendable {
++public class Gyro extends SensorBase implements PIDSource, LiveWindowSendable {
+ 
+ 	private PIDSourceParameter m_pidSource;
+ 	private SimGyro impl;
+@@ -59,7 +57,7 @@ public class Gyro extends SensorBase implements PIDSource, ISensor,
+ 	 * Gyro constructor with a precreated analog channel object. Use this
+ 	 * constructor when the analog channel needs to be shared. There is no
+ 	 * reference counting when an AnalogChannel is passed to the gyro.
+-	 * 
++	 *
+ 	 * @param channel
+ 	 *            The AnalogChannel object that the gyro is connected to.
+ 	 */
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+index 973640ea29b5decc1193f2cee156754f10cc401e..db59fe2f21c121b491fea01584d24cb10bf422e6 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Joystick.java
+@@ -6,7 +6,6 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ 
+-import edu.wpi.first.wpilibj.parsing.IInputOutput;
+ 
+ /**
+  * Handle input from standard Joysticks connected to the Driver Station.
+@@ -14,7 +13,7 @@ import edu.wpi.first.wpilibj.parsing.IInputOutput;
+  * the most recent value is returned. There is a single class instance for each joystick and the mapping
+  * of ports to hardware buttons depends on the code in the driver station.
+  */
+-public class Joystick extends GenericHID implements IInputOutput {
++public class Joystick extends GenericHID {
+ 
+     static final byte kDefaultXAxis = 1;
+     static final byte kDefaultYAxis = 2;
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Relay.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Relay.java
+index fcc327a4bc68b015ae5b32446dbc660a65e7c716..72c0165ec14fd303f3010cc5f69c812475860e7f 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Relay.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/Relay.java
+@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+ import edu.wpi.first.wpilibj.simulation.SimSpeedController;
+-import edu.wpi.first.wpilibj.parsing.IDeviceController;
+ import edu.wpi.first.wpilibj.tables.ITable;
+ import edu.wpi.first.wpilibj.tables.ITableListener;
+ 
+@@ -24,8 +23,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
+  * allows the two channels (forward and reverse) to be used independently for
+  * something that does not care about voltage polarity (like a solenoid).
+  */
+-public class Relay extends SensorBase implements IDeviceController,
+-		LiveWindowSendable {
++public class Relay extends SensorBase implements LiveWindowSendable {
+ 	/**
+ 	 * This class represents errors in trying to set relay values contradictory
+ 	 * to the direction to which the relay is set.
+@@ -200,7 +198,7 @@ public class Relay extends SensorBase implements IDeviceController,
+ 						"A relay configured for reverse cannot be set to forward");
+ 			if (m_direction == Direction.kBoth
+ 					|| m_direction == Direction.kForward) {
+-				
++
+ 				go_pos = true;
+ 			}
+ 			if (m_direction == Direction.kBoth) {
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
+index 2b4064dfec9ee1dd85ad55fe83a0cdcd6aa130c9..0c6a44f4ec60fb00fb1a1e57ece223989686cba9 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/RobotDrive.java
+@@ -6,7 +6,6 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ 
+-import edu.wpi.first.wpilibj.parsing.IUtility;
+ 
+ /**
+  * Utility class for handling Robot drive based on a definition of the motor configuration.
+@@ -16,7 +15,7 @@ import edu.wpi.first.wpilibj.parsing.IUtility;
+  * used for either the drive function (intended for hand created drive code, such as autonomous)
+  * or with the Tank/Arcade functions intended to be used for Operator Control driving.
+  */
+-public class RobotDrive implements MotorSafety, IUtility {
++public class RobotDrive implements MotorSafety {
+ 
+     protected MotorSafetyHelper m_safetyHelper;
+ 
+diff --git a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/internal/SimTimer.java b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/internal/SimTimer.java
+index c7d0afdfe01bd2988967c732f73ee2204ae8925a..8314a3ffbe2593700a5d31d8a79d1047f8e483ed 100644
+--- a/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/internal/SimTimer.java
++++ b/wpilibj/wpilibJavaSim/src/main/java/edu/wpi/first/wpilibj/internal/SimTimer.java
+@@ -11,7 +11,6 @@ import org.gazebosim.transport.Msgs;
+ import org.gazebosim.transport.SubscriberCallback;
+ 
+ import edu.wpi.first.wpilibj.Timer;
+-import edu.wpi.first.wpilibj.parsing.IUtility;
+ import edu.wpi.first.wpilibj.simulation.MainNode;
+ import gazebo.msgs.GzFloat64.Float64;
+ 
+@@ -22,7 +21,7 @@ import gazebo.msgs.GzFloat64.Float64;
+  * value. The implementation simply records the time when started and subtracts the current time
+  * whenever the value is requested.
+  */
+-public class SimTimer implements IUtility, Timer.StaticInterface {
++public class SimTimer implements Timer.StaticInterface {
+ 
+     private long m_startTime;
+     private double m_accumulatedTime;
+@@ -52,7 +51,7 @@ public class SimTimer implements IUtility, Timer.StaticInterface {
+      */
+     public void delay(final double seconds) {
+     	final double start = simTime;
+-    	
++
+     	while ((simTime - start) < seconds) {
+     		synchronized(time_notifier) {
+     			try {
+@@ -104,7 +103,7 @@ public class SimTimer implements IUtility, Timer.StaticInterface {
+ 	    private long getMsClock() {
+ 	        return (long) (simTime * 1e3);
+ 	    }
+-	
++
+ 	    /**
+ 	     * Get the current time from the timer. If the clock is running it is derived from
+ 	     * the current system clock the start time stored in the timer class. If the clock
+@@ -119,7 +118,7 @@ public class SimTimer implements IUtility, Timer.StaticInterface {
+ 	            return m_accumulatedTime;
+ 	        }
+ 	    }
+-	
++
+ 	    /**
+ 	     * Reset the timer by setting the time to 0.
+ 	     * Make the timer startTime the current time so new requests will be relative now
+@@ -128,7 +127,7 @@ public class SimTimer implements IUtility, Timer.StaticInterface {
+ 	        m_accumulatedTime = 0;
+ 	        m_startTime = getMsClock();
+ 	    }
+-	
++
+ 	    /**
+ 	     * Start the timer running.
+ 	     * Just set the running flag to true indicating that all time requests should be
+@@ -138,7 +137,7 @@ public class SimTimer implements IUtility, Timer.StaticInterface {
+ 	        m_startTime = getMsClock();
+ 	        m_running = true;
+ 	    }
+-	
++
+ 	    /**
+ 	     * Stop the timer.
+ 	     * This computes the time as of now and clears the running flag, causing all

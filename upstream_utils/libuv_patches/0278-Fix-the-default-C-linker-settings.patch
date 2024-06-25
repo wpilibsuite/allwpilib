@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Clark <tjclark@wpi.edu>
+Date: Mon, 11 Aug 2014 11:27:48 -0400
+Subject: [PATCH 0278/6262] Fix the default C++ linker settings
+
+Change-Id: I839b67fa6e9798f980db05f5a4ff9c8f47c32424
+---
+ .../resources/templates/.cproject                                | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+index d53ded629bea253298e108b73dfb71ad568e0e2e..a09f3aa1418e8ce54fccc59bc90a5872cb90ba4a 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.cpp/resources/templates/.cproject
+@@ -41,7 +41,6 @@
+ 									<listOptionValue builtIn="false" value="WPILibAthena"/>
+ 									<listOptionValue builtIn="false" value="HALAthena"/>
+ 									<listOptionValue builtIn="false" value="NetworkTables"/>
+-									<listOptionValue builtIn="false" value="FRC_FPGA_ChipObject"/>
+ 									<listOptionValue builtIn="false" value="FRC_NetworkCommunication"/>
+ 									<listOptionValue builtIn="false" value="i2c"/>
+ 									<listOptionValue builtIn="false" value="ni_emb"/>

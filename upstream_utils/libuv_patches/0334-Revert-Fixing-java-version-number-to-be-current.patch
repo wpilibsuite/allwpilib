@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Patrick Plenefisch <simonpatp@gmail.com>
+Date: Sat, 6 Sep 2014 18:19:25 -0400
+Subject: [PATCH 0334/6262] Revert "Fixing java version number to be current"
+
+This reverts commit 410b739c23060e8110c410d04830efc0baee09ba.
+---
+ .../resources/configuration.properties                          | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/configuration.properties b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/configuration.properties
+index 489e90f2b466a384e189cc2fd3f1356ff04bbe83..cbfaca2ede8190af3959715cffaaffe1169a2285 100644
+--- a/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/configuration.properties
++++ b/eclipse-plugins/edu.wpi.first.wpilib.plugins.java/resources/configuration.properties
+@@ -1,2 +1,2 @@
+ timestamp=${timestamp}
+-version=current
++version=${version}

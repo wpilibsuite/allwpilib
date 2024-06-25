@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kevin O'Connor <koconnor@usfirst.org>
+Date: Wed, 15 Oct 2014 14:37:25 -0400
+Subject: [PATCH 0407/6262] Make Java ignore section headers in Preferences
+ file and start file with [Preferences] to match C++ (fixes artf3629)
+
+Change-Id: Ia56cca061851727eee25d3996314a01022378a07
+---
+ .../src/main/java/edu/wpi/first/wpilibj/Preferences.java  | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Preferences.java b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Preferences.java
+index 26430a2aa0ac30029bd34623b4cb0ec68a60c73c..4c615eb7e7a1ecf89311ec795311de5cb330b8d5 100644
+--- a/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Preferences.java
++++ b/wpilibj/wpilibJavaDevices/src/main/java/edu/wpi/first/wpilibj/Preferences.java
+@@ -503,6 +503,8 @@ public class Preferences {
+                 file.createNewFile();
+ 
+                 output = new FileOutputStream(file);
++				
++				output.write("[Preferences]\n".getBytes());
+ 
+                 for (int i = 0; i < keys.size(); i++) {
+                     String key = (String) keys.elementAt(i);
+@@ -616,7 +618,11 @@ public class Preferences {
+                                 buffer.append('\n');
+                                 comment.addBytes(buffer.toString().getBytes());
+                             }
+-                        } else {
++                        } else if (value == '[') {
++							// Find the end of the section and the new line after it and throw it away
++							while (reader.read() !=']');
++							while (reader.read() != '\n');
++						} else {
+                             buffer = new StringBuffer(30);
+                             for (; value != '='; value = reader.readWithoutWhitespace()) {
+                                 buffer.append(value);

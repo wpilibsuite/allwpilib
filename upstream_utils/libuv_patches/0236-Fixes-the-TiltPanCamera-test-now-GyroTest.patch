@@ -1,0 +1,330 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Leitschuh <jlleitschuh@wpi.edu>
+Date: Thu, 31 Jul 2014 16:08:14 -0400
+Subject: [PATCH 0236/6262] Fixes the TiltPanCamera test (now GyroTest)
+
+Change-Id: I3e954e60162ce84372a2dea39803437589aaaf00
+---
+ .../{TiltPanCameraTest.java => GyroTest.java} | 40 +++-----
+ .../wpi/first/wpilibj/WpiLibJTestSuite.java   |  2 +-
+ .../fixtures/TiltPanCameraFixture.java        | 95 ++++++++-----------
+ .../edu/wpi/first/wpilibj/test/TestBench.java | 30 ++++--
+ 4 files changed, 73 insertions(+), 94 deletions(-)
+ rename wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/{TiltPanCameraTest.java => GyroTest.java} (71%)
+
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java
+similarity index 71%
+rename from wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java
+rename to wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java
+index 7e198ad290fa79b9fa8c2abe8b9ca8d0852977f7..79d328ccb1b31ce1caabdd55a6af97b1330acacb 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/TiltPanCameraTest.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/GyroTest.java
+@@ -6,56 +6,43 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj;
+ 
+-import static org.junit.Assert.*;
++import static org.junit.Assert.assertEquals;
+ 
+ import java.util.logging.Logger;
+ 
+ import org.junit.After;
+-import org.junit.AfterClass;
+ import org.junit.Before;
+-import org.junit.BeforeClass;
+ import org.junit.Test;
+ 
+ import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
+ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+ import edu.wpi.first.wpilibj.test.TestBench;
+ 
+-public class TiltPanCameraTest extends AbstractComsSetup {
++public class GyroTest extends AbstractComsSetup {
+ 	
+-	private static final Logger logger = Logger.getLogger(TiltPanCameraTest.class.getName());
++	private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
+ 	
+-	public static final double TEST_ANGLE = 185.0;
++	public static final double TEST_ANGLE = 180.0;
+ 	
+-	private static TiltPanCameraFixture tpcam;
++	private TiltPanCameraFixture tpcam;
+ 
+ 	
++	@Override
+ 	protected Logger getClassLogger(){
+ 		return logger;
+ 	}
+ 	
+-	@BeforeClass
+-	public static void setUpBeforeClass() throws Exception {
+-		logger.fine("Setup: TiltPan camera");
+-		tpcam = TestBench.getInstance().getTiltPanCam();
+-		
+-	}
+-
+-	@AfterClass
+-	public static void tearDownAfterClass() throws Exception {
+-		tpcam.teardown();
+-	}
+-
+ 	@Before
+ 	public void setUp() throws Exception {
+-		boolean setupSucsess = tpcam.setup();
+-		assertTrue(tpcam.getSetupError(), setupSucsess);
+-		double resetTime = tpcam.getLastResetTimeGyro();
+-		assertEquals("The Gyroscoe reset time was " + resetTime + " seconds", 0, resetTime, .03);
++		logger.fine("Setup: TiltPan camera");
++		tpcam = TestBench.getInstance().getTiltPanCam();
++		tpcam.setup();
+ 	}
+ 
+ 	@After
+ 	public void tearDown() throws Exception {
+ 		tpcam.reset();
++		tpcam.teardown();
+ 	}
+ 	
+ 	@Test
+@@ -69,11 +56,11 @@ public class TiltPanCameraTest extends AbstractComsSetup {
+ 	 */
+ 	@Test
+ 	public void testGyroAngle() {
+-		for(double i = 0; i < 1.0; i+=.01){
++		for(double i = 0; i < 1.0; i+=.005){
+ 			//System.out.println("i: " + i);
+ 			//System.out.println("Angle " + tpcam.getGyro().getAngle());
+ 			tpcam.getPan().set(i);
+-			Timer.delay(.05);
++			Timer.delay(.025);
+ 		}
+ 		//Timer.delay(TiltPanCameraFixture.RESET_TIME);
+ 		double angle = tpcam.getGyro().getAngle();
+@@ -82,7 +69,6 @@ public class TiltPanCameraTest extends AbstractComsSetup {
+ 		
+ 		double diff = Math.abs(difference);
+ 		
+-		
+ 		assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 8);
+ 	}
+ 	
+@@ -92,7 +78,7 @@ public class TiltPanCameraTest extends AbstractComsSetup {
+ 		assertEquals(errorMessage(angle, 0), 0, angle, .5);
+ 		Timer.delay(5);
+ 		angle = tpcam.getGyro().getAngle();
+-		assertEquals(errorMessage(angle, 0), 0, angle, .5);
++		assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 1);
+ 	}
+ 	
+ 	private String errorMessage(double difference, double target){
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
+index 513075cda9e0d413c12be568e4a973a5f573090d..650d39dd9360d603e79d4b01e02a18c19ec58cdd 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/WpiLibJTestSuite.java
+@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
+ 				PrefrencesTest.class,
+ 				RelayCrossConnectTest.class,
+ 				SampleTest.class,
+-				TiltPanCameraTest.class,
++				GyroTest.class,
+ 				TimerTest.class
+ 				})
+ public class WpiLibJTestSuite extends AbstractTestSuite {
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
+index e23161bdb80510ccce8ade69675d64415a71f086..4b0bef2942d501e8946c23e49674786186f6165a 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/fixtures/TiltPanCameraFixture.java
+@@ -6,6 +6,8 @@
+ /*----------------------------------------------------------------------------*/
+ package edu.wpi.first.wpilibj.fixtures;
+ 
++import java.util.logging.Logger;
++
+ import edu.wpi.first.wpilibj.Gyro;
+ import edu.wpi.first.wpilibj.Servo;
+ import edu.wpi.first.wpilibj.Timer;
+@@ -17,92 +19,69 @@ import edu.wpi.first.wpilibj.Timer;
+  * @author Jonathan Leitschuh
+  *
+  */
+-public class TiltPanCameraFixture implements ITestFixture {
+-	
+-	public static final double RESET_TIME = 3.5;
+-	
+-	private final Gyro gyro;
+-	private final Servo tilt;
+-	private final Servo pan;
+-	
+-	private double lastResetTimeGyro = 0;
+-	
++public abstract class TiltPanCameraFixture implements ITestFixture {
++	public static final Logger logger = Logger.getLogger(TiltPanCameraFixture.class.getName());
++
++	public static final double RESET_TIME = 2.0;
++	private Gyro gyro;
++	private Servo tilt;
++	private Servo pan;
++	private boolean initialized = false;
++
++
++	protected abstract Gyro giveGyro();
++	protected abstract Servo giveTilt();
++	protected abstract Servo givePan();
++
+ 	/**
+ 	 * Constructs the TiltPanCamera
+-	 * @param tilt
+-	 * 		The servo to tilt the camera
+-	 * @param pan
+-	 * 		The servo to pan the camera
+-	 * @param gyro
+ 	 */
+-	public TiltPanCameraFixture (Servo tilt, Servo pan, Gyro gyro){
+-		this.tilt = tilt;
+-		this.pan = pan;
+-		this.gyro = gyro;
+-	}
+-	
++	public TiltPanCameraFixture (){}
++
+ 	@Override
+ 	public boolean setup() {
+-		boolean wasSetup = true;
+-		pan.set(0.0);
+-		tilt.set(0.0);
+-		Timer.delay(RESET_TIME);
+-		gyro.reset();
+-		double startTime = Timer.getFPGATimestamp();
+-		for(int i = 0; i < 100 && Math.abs(gyro.getAngle()) > 0.1; i++){
+-			Timer.delay(.0001);
++		boolean wasSetup = false;
++		if(!initialized){
++			initialized = true;
++			tilt = giveTilt();
++			tilt.set(0);
++			pan = givePan();
++			pan.set(0);
++			Timer.delay(RESET_TIME);
++			
++			logger.fine("Initializing the gyro");
++			gyro = giveGyro();
++			wasSetup = true;
+ 		}
+-		double endTime = Timer.getFPGATimestamp();
+-		lastResetTimeGyro = endTime - startTime;
+-		//System.out.println("Gyro reset in " + lastResetTimeGyro + " seconds");
+-		
+-		wasSetup = wasSetup && Math.abs(pan.get()) < 0.01;
+-		wasSetup = wasSetup && Math.abs(tilt.get()) < 0.01;
+-		wasSetup = wasSetup && Math.abs(gyro.getAngle()) < .2;
+ 		return wasSetup;
+ 	}
+-	
+-	/**
+-	 * When resetting the gyroscope the reset time is stored as a variable that can be retrieved with this method
+-	 * @return The last time that it took to reset the gyroscope
+-	 */
+-	public double getLastResetTimeGyro() {
+-		return lastResetTimeGyro;
+-	}
+-	
+-	public String getSetupError(){
+-		StringBuilder error = new StringBuilder("SETUP ERROR: ");
+-		if(Math.abs(pan.get()) >= 0.01) error.append("Pan " + pan.get() + ", ");
+-		if(Math.abs(tilt.get()) >= 0.01) error.append("Tilt " + tilt.get() + ", ");
+-		if(Math.abs(gyro.getAngle()) >= 0.2) error.append("Gyro " + gyro.getAngle() + ", ");
+-		error.delete(error.length()-2, error.length());
+-		return error.toString();
+-	}
+-	
++
+ 	@Override
+ 	public boolean reset(){
+ 		gyro.reset();
+ 		return true;
+ 	}
+-	
++
+ 	public Servo getTilt() {
+ 		return tilt;
+ 	}
+-	
++
+ 	public Servo getPan() {
+ 		return pan;
+ 	}
+-	
++
+ 	public Gyro getGyro() {
+ 		return gyro;
+ 	}
+ 
+ 	@Override
+ 	public boolean teardown() {
+-		setup();
+ 		tilt.free();
++		tilt = null;
+ 		pan.free();
++		pan = null;
+ 		gyro.free();
++		gyro = null;
+ 		return true;
+ 	}
+ 	
+diff --git a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+index c15ecab5be4d62d751b3367caa1e6fb7cfae01c2..0aa6fdafd886c757cda62df101efcdfc9e786226 100644
+--- a/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
++++ b/wpilibj/wpilibJavaIntegrationTests/src/main/java/edu/wpi/first/wpilibj/test/TestBench.java
+@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.Jaguar;
+ import edu.wpi.first.wpilibj.Relay;
+ import edu.wpi.first.wpilibj.Servo;
+ import edu.wpi.first.wpilibj.Talon;
+-import edu.wpi.first.wpilibj.Timer;
+ import edu.wpi.first.wpilibj.Victor;
+ import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
+ import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
+@@ -53,6 +52,12 @@ public final class TestBench {
+ 	public static final int kVictorChannel = 1;
+ 	public static final int kJaguarChannel = 2;
+ 	
++	/*TiltPanCamera Channels */
++	public static final int kGyroChannel = 0;
++	public static final double kGyroSensitivity = 0.0134897058674;
++	public static final int kTiltServoChannel = 9;
++	public static final int kPanServoChannel = 8;
++	
+ 
+ 	/* PowerDistributionPanel channels */
+ 	public static final int kJaguarPDPChannel = 6;
+@@ -231,15 +236,24 @@ public final class TestBench {
+ 	 * @return a freshly allocated Servo's and a freshly allocated Gyroscope
+ 	 */
+ 	public TiltPanCameraFixture getTiltPanCam() {
+-		Gyro gyro = new Gyro(0);
+-		gyro.setSensitivity(.007); // If a different gyroscope is used this
+-									// value will be different
+-		Timer.delay(1);
++		TiltPanCameraFixture tpcam = new TiltPanCameraFixture(){
++			@Override
++			protected Gyro giveGyro() {
++				Gyro gyro = new Gyro(kGyroChannel);
++				gyro.setSensitivity(kGyroSensitivity);
++				return gyro;
++			}
+ 
+-		Servo tilt = new Servo(9);
+-		Servo pan = new Servo(8);
++			@Override
++			protected Servo giveTilt() {
++				return new Servo(kTiltServoChannel);
++			}
+ 
+-		TiltPanCameraFixture tpcam = new TiltPanCameraFixture(tilt, pan, gyro);
++			@Override
++			protected Servo givePan() {
++				return new Servo(kPanServoChannel);
++			}
++		};
+ 
+ 		return tpcam;
+ 	}
