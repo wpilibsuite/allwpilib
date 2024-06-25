@@ -4,7 +4,7 @@
 
 package edu.wpi.first.units;
 
-public class MomentOfInertiaUnit extends Per<AngularMomentumUnit, AngularVelocityUnit> {
+public class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, AngularVelocityUnit> {
   private static final CombinatoryUnitCache<
           AngularMomentumUnit, AngularVelocityUnit, MomentOfInertiaUnit>
       cache = new CombinatoryUnitCache<>(MomentOfInertiaUnit::new);
@@ -14,7 +14,7 @@ public class MomentOfInertiaUnit extends Per<AngularMomentumUnit, AngularVelocit
   }
 
   MomentOfInertiaUnit(
-      Per<AngularMomentumUnit, AngularVelocityUnit> baseUnit,
+      PerUnit<AngularMomentumUnit, AngularVelocityUnit> baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,
@@ -25,5 +25,15 @@ public class MomentOfInertiaUnit extends Per<AngularMomentumUnit, AngularVelocit
   public static MomentOfInertiaUnit combine(
       AngularMomentumUnit momentumUnit, AngularVelocityUnit velocityUnit) {
     return cache.combine(momentumUnit, velocityUnit);
+  }
+
+  @Override
+  public MomentOfInertia of(double magnitude) {
+    return new MomentOfInertia(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public MomentOfInertia ofBaseUnits(double baseUnitMagnitude) {
+    return new MomentOfInertia(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 }

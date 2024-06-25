@@ -4,8 +4,11 @@
 
 package edu.wpi.first.units;
 
-public record LinearMomentum(double magnitude, double baseUnitMagnitude, LinearMomentumUnit unit)
-    implements Measure<LinearMomentumUnit> {
+public class LinearMomentum extends MeasureBase<LinearMomentumUnit> {
+  public LinearMomentum(double magnitude, double baseUnitMagnitude, LinearMomentumUnit unit) {
+    super(magnitude, baseUnitMagnitude, unit);
+  }
+
   @Override
   public LinearMomentum copy() {
     return this;

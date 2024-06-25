@@ -8,9 +8,12 @@ import static edu.wpi.first.units.Units.Joules;
 import static edu.wpi.first.units.Units.Newtons;
 import static edu.wpi.first.units.Units.Seconds;
 
-public record Force(double magnitude, double baseUnitMagnitude, ForceUnit unit)
-    implements Measure<ForceUnit> {
+public class Force extends MeasureBase<ForceUnit> {
   private static final MathHelper<ForceUnit, Force> mathHelper = new MathHelper<>(Newtons::of);
+
+  public Force(double magnitude, double baseUnitMagnitude, ForceUnit unit) {
+    super(magnitude, baseUnitMagnitude, unit);
+  }
 
   @Override
   public Force copy() {

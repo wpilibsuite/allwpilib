@@ -15,6 +15,8 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngularAcceleration;
 import edu.wpi.first.units.AngularVelocity;
+import edu.wpi.first.units.mutable.MutAngularAcceleration;
+import edu.wpi.first.units.mutable.MutAngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism. */
@@ -29,10 +31,10 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   private final double m_jKgMetersSquared;
 
   // The angular velocity of the system.
-  private final AngularVelocity.Mutable m_angularVelocity = RadiansPerSecond.mutable(0);
+  private final MutAngularVelocity m_angularVelocity = RadiansPerSecond.mutable(0);
 
   // The angular acceleration of the system.
-  private final AngularAcceleration.Mutable m_angularAcceleration =
+  private final MutAngularAcceleration m_angularAcceleration =
       RadiansPerSecondPerSecond.mutable(0);
 
   /**

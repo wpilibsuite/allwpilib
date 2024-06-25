@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.mutable.MutDimensionless;
+
 /**
  * A type of unit that corresponds to raw values and not any physical dimension, such as percentage.
  */
@@ -39,8 +41,8 @@ public class DimensionlessUnit extends Unit {
   }
 
   @Override
-  public Dimensionless.Mutable mutable(double initialMagnitude) {
-    return new Dimensionless.Mutable(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  public MutDimensionless mutable(double initialMagnitude) {
+    return new MutDimensionless(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public <U extends Unit> U mult(U other) {

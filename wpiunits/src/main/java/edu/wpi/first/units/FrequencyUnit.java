@@ -6,7 +6,7 @@ package edu.wpi.first.units;
 
 import static edu.wpi.first.units.Units.Value;
 
-public class FrequencyUnit extends Per<DimensionlessUnit, TimeUnit> {
+public class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
   private static final CombinatoryUnitCache<DimensionlessUnit, TimeUnit, FrequencyUnit> cache =
       new CombinatoryUnitCache<>(FrequencyUnit::new);
 

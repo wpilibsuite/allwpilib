@@ -432,28 +432,28 @@ public final class Units {
    * A standard unit for measuring linear mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded linear velocity.
    */
-  public static final Per<VoltageUnit, LinearVelocityUnit> VoltsPerMeterPerSecond =
+  public static final PerUnit<VoltageUnit, LinearVelocityUnit> VoltsPerMeterPerSecond =
       Volts.per(MetersPerSecond);
 
   /**
    * A standard unit for measuring linear mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded linear acceleration.
    */
-  public static final Per<VoltageUnit, LinearAccelerationUnit> VoltsPerMeterPerSecondSquared =
+  public static final PerUnit<VoltageUnit, LinearAccelerationUnit> VoltsPerMeterPerSecondSquared =
       Volts.per(MetersPerSecondPerSecond);
 
   /**
    * A standard unit for measuring angular mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded angular velocity.
    */
-  public static final Per<VoltageUnit, AngularVelocityUnit> VoltsPerRadianPerSecond =
+  public static final PerUnit<VoltageUnit, AngularVelocityUnit> VoltsPerRadianPerSecond =
       Volts.per(RadiansPerSecond);
 
   /**
    * A standard unit for measuring angular mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded angular acceleration.
    */
-  public static final Per<VoltageUnit, AngularAccelerationUnit> VoltsPerRadianPerSecondSquared =
+  public static final PerUnit<VoltageUnit, AngularAccelerationUnit> VoltsPerRadianPerSecondSquared =
       Volts.per(RadiansPerSecond.per(Second));
 
   /**

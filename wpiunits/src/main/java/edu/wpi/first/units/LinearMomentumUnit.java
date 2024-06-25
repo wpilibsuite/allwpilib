@@ -4,7 +4,7 @@
 
 package edu.wpi.first.units;
 
-public class LinearMomentumUnit extends Mult<MassUnit, LinearVelocityUnit> {
+public class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {
   private static final CombinatoryUnitCache<MassUnit, LinearVelocityUnit, LinearMomentumUnit>
       cache = new CombinatoryUnitCache<>(LinearMomentumUnit::new);
 
@@ -13,7 +13,7 @@ public class LinearMomentumUnit extends Mult<MassUnit, LinearVelocityUnit> {
   }
 
   LinearMomentumUnit(
-      Mult<MassUnit, LinearVelocityUnit> baseUnit,
+      MultUnit<MassUnit, LinearVelocityUnit> baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,

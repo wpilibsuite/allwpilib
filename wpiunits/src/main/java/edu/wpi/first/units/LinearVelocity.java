@@ -24,42 +24,11 @@ public class LinearVelocity extends Velocity<DistanceUnit> {
   }
 
   public Distance times(Time period) {
-    // TODO
-    throw new UnsupportedOperationException();
+    return mathHelper.multiply(this, period, unit().numerator()::ofBaseUnits);
   }
 
   @Override
   public LinearVelocityUnit unit() {
     return (LinearVelocityUnit) unit;
-  }
-
-  @Override
-  public String toString() {
-    return "LinearVelocity["
-        + "magnitude="
-        + magnitude
-        + ", "
-        + "baseUnitMagnitude="
-        + baseUnitMagnitude
-        + ", "
-        + "unit="
-        + unit
-        + ']';
-  }
-
-  public static class Mutable extends LinearVelocity
-      implements MutableMeasure<VelocityUnit<DistanceUnit>, LinearVelocity, Mutable> {
-    public Mutable(double magnitude, double baseUnitMagnitude, LinearVelocityUnit unit) {
-      super(magnitude, baseUnitMagnitude, unit);
-    }
-
-    @Override
-    public LinearVelocity.Mutable mut_replace(
-        double magnitude, VelocityUnit<DistanceUnit> newUnit) {
-      this.unit = newUnit;
-      this.magnitude = magnitude;
-      this.baseUnitMagnitude = newUnit.toBaseUnits(magnitude);
-      return this;
-    }
   }
 }

@@ -7,10 +7,13 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Seconds;
 
-public record Frequency(double magnitude, double baseUnitMagnitude, FrequencyUnit unit)
-    implements Measure<FrequencyUnit> {
+public class Frequency extends MeasureBase<FrequencyUnit> {
   private static final MathHelper<FrequencyUnit, Frequency> mathHelper =
       new MathHelper<>(Hertz::of);
+
+  public Frequency(double magnitude, double baseUnitMagnitude, FrequencyUnit unit) {
+    super(magnitude, baseUnitMagnitude, unit);
+  }
 
   @Override
   public Frequency copy() {

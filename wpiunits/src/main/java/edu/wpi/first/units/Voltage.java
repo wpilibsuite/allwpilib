@@ -48,21 +48,8 @@ public class Voltage implements Measure<VoltageUnit> {
     return unit;
   }
 
-  public <U extends Unit> Measure<U> divide(Measure<? extends Per<VoltageUnit, U>> m) {
+  public <U extends Unit> Measure<U> divide(Measure<? extends PerUnit<VoltageUnit, U>> m) {
     return ImmutableMeasure.ofBaseUnits(
         baseUnitMagnitude / m.baseUnitMagnitude(), m.unit().denominator());
-  }
-
-  public static class Mutable extends Voltage {
-    public Mutable(double magnitude, double baseUnitMagnitude, VoltageUnit unit) {
-      super(magnitude, baseUnitMagnitude, unit);
-    }
-
-    public Mutable mut_replace(double value, VoltageUnit newUnit) {
-      this.unit = newUnit;
-      this.magnitude = value;
-      this.baseUnitMagnitude = unit.toBaseUnits(value);
-      return this;
-    }
   }
 }

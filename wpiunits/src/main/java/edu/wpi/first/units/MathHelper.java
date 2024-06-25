@@ -11,6 +11,12 @@ import java.util.function.DoubleFunction;
 public class MathHelper<U extends Unit, M extends Measure<U>> {
   private final DoubleFunction<M> constructor;
 
+  /**
+   * Creates a new unit math helper object.
+   *
+   * @param constructor the function to use to create new instances of the measure type. This should
+   *     accept values in terms of base units.
+   */
   public MathHelper(DoubleFunction<M> constructor) {
     this.constructor = constructor;
   }

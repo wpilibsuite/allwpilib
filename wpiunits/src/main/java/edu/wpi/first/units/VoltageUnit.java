@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.mutable.MutVoltage;
+
 /**
  * Unit of electric voltage dimension.
  *
@@ -46,12 +48,12 @@ public class VoltageUnit extends Unit {
     return new Voltage(magnitude, toBaseUnits(magnitude), this);
   }
 
-  public Voltage.Mutable mutable(double magnitude) {
-    return new Voltage.Mutable(magnitude, toBaseUnits(magnitude), this);
+  public MutVoltage mutable(double magnitude) {
+    return new MutVoltage(magnitude, toBaseUnits(magnitude), this);
   }
 
-  public <U extends Unit> Per<VoltageUnit, U> per(U other) {
-    return Per.combine(this, other);
+  public <U extends Unit> PerUnit<VoltageUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
   }
 
   public VelocityUnit<VoltageUnit> per(TimeUnit period) {

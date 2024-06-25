@@ -13,6 +13,7 @@ import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.mutable.MutVoltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,7 +42,7 @@ import java.util.function.Consumer;
 public class SysIdRoutine extends SysIdRoutineLog {
   private final Config m_config;
   private final Mechanism m_mechanism;
-  private final Voltage.Mutable m_outputVolts = Volts.mutable(0);
+  private final MutVoltage m_outputVolts = Volts.mutable(0);
   private final Consumer<State> m_recordState;
 
   /**

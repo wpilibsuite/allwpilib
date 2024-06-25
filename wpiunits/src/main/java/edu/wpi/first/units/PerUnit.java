@@ -10,13 +10,10 @@ import java.util.Objects;
  * Generic combinatory unit type that represents the proportion of one unit to another, such as
  * Meters per Second or Radians per Celsius.
  *
- * <p>Note: {@link VelocityUnit} is used to represent the velocity dimension, rather than {@code
- * Per<DistanceUnit, TimeUnit>}.
- *
  * @param <N> the type of the numerator unit
  * @param <D> the type of the denominator unit
  */
-public class Per<N extends Unit, D extends Unit> extends Unit {
+public class PerUnit<N extends Unit, D extends Unit> extends Unit {
   private final N m_numerator;
   private final D m_denominator;
 
@@ -25,8 +22,8 @@ public class Per<N extends Unit, D extends Unit> extends Unit {
    * after the first.
    */
   @SuppressWarnings("rawtypes")
-  private static final CombinatoryUnitCache<Unit, Unit, Per> cache =
-      new CombinatoryUnitCache<>(Per::new);
+  private static final CombinatoryUnitCache<Unit, Unit, PerUnit> cache =
+      new CombinatoryUnitCache<>(PerUnit::new);
 
   /**
    * Creates a new proportional unit derived from the ratio of one unit to another. Consider using
@@ -35,7 +32,7 @@ public class Per<N extends Unit, D extends Unit> extends Unit {
    * @param numerator the numerator unit
    * @param denominator the denominator unit
    */
-  protected Per(N numerator, D denominator) {
+  protected PerUnit(N numerator, D denominator) {
     super(
         numerator.isBaseUnit() && denominator.isBaseUnit()
             ? null
@@ -47,8 +44,8 @@ public class Per<N extends Unit, D extends Unit> extends Unit {
     m_denominator = denominator;
   }
 
-  Per(
-      Per<N, D> baseUnit,
+  PerUnit(
+      PerUnit<N, D> baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,
@@ -59,11 +56,10 @@ public class Per<N extends Unit, D extends Unit> extends Unit {
   }
 
   /**
-   * Creates a new Per unit derived from an arbitrary numerator and time denominator units. Using a
-   * denominator with a unit of time is discouraged; use {@link VelocityUnit} instead.
+   * Creates a new PerUnit unit derived from an arbitrary numerator and time denominator units.
    *
    * <pre>
-   *   Per.combine(Volts, Meters) // possible PID constant
+   *   PerUnit.combine(Volts, Meters) // possible PID constant
    * </pre>
    *
    * @param <N> the type of the numerator unit
@@ -73,18 +69,18 @@ public class Per<N extends Unit, D extends Unit> extends Unit {
    * @return the combined unit
    */
   @SuppressWarnings("unchecked")
-  public static <N extends Unit, D extends Unit> Per<N, D> combine(N numerator, D denominator) {
+  public static <N extends Unit, D extends Unit> PerUnit<N, D> combine(N numerator, D denominator) {
     return cache.combine(numerator, denominator);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public Per<N, D> getBaseUnit() {
-    return (Per<N, D>) super.getBaseUnit();
+  public PerUnit<N, D> getBaseUnit() {
+    return (PerUnit<N, D>) super.getBaseUnit();
   }
 
   /**
-   * Gets the numerator unit. For a {@code Per<A, B>}, this will return the {@code A} unit.
+   * Gets the numerator unit. For a {@code PerUnit<A, B>}, this will return the {@code A} unit.
    *
    * @return the numerator unit
    */
@@ -93,7 +89,7 @@ public class Per<N extends Unit, D extends Unit> extends Unit {
   }
 
   /**
-   * Gets the denominator unit. For a {@code Per<A, B>}, this will return the {@code B} unit.
+   * Gets the denominator unit. For a {@code PerUnit<A, B>}, this will return the {@code B} unit.
    *
    * @return the denominator unit
    */
@@ -102,11 +98,11 @@ public class Per<N extends Unit, D extends Unit> extends Unit {
   }
 
   /**
-   * Returns the reciprocal of this Per.
+   * Returns the reciprocal of this PerUnit.
    *
    * @return the reciprocal
    */
-  public Per<D, N> reciprocal() {
+  public PerUnit<D, N> reciprocal() {
     return combine(m_denominator, m_numerator);
   }
 
@@ -124,21 +120,21 @@ public class Per<N extends Unit, D extends Unit> extends Unit {
   }
 
   @Override
-  public Measure<? extends Per<N, D>> of(double magnitude) {
+  public Measure<? extends PerUnit<N, D>> of(double magnitude) {
     return ImmutableMeasure.ofRelativeUnits(magnitude, this);
   }
 
   @Override
-  public Measure<?> ofBaseUnits(double baseUnitMagnitude) {
+  public Measure<? extends PerUnit<N, D>> ofBaseUnits(double baseUnitMagnitude) {
     return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, this);
   }
 
   @Override
-  public MutableMeasure<?, ?, ?> mutable(double initialMagnitude) {
+  public MutableMeasure<? extends PerUnit<N, D>, ?, ?> mutable(double initialMagnitude) {
     return null;
   }
 
-  public double convertFrom(double magnitude, Per<? extends N, ? extends D> otherUnit) {
+  public double convertFrom(double magnitude, PerUnit<? extends N, ? extends D> otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
@@ -153,9 +149,9 @@ public class Per<N extends Unit, D extends Unit> extends Unit {
     if (!super.equals(o)) {
       return false;
     }
-    Per<?, ?> per = (Per<?, ?>) o;
-    return Objects.equals(m_numerator, per.m_numerator)
-        && Objects.equals(m_denominator, per.m_denominator);
+    PerUnit<?, ?> perUnit = (PerUnit<?, ?>) o;
+    return Objects.equals(m_numerator, perUnit.m_numerator)
+        && Objects.equals(m_denominator, perUnit.m_denominator);
   }
 
   @Override

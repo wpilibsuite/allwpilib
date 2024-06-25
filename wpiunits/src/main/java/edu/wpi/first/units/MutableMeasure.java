@@ -5,7 +5,6 @@
 package edu.wpi.first.units;
 
 /**
- *
  * @param <U> The dimension of measurement.
  * @param <Base> The base measure type.
  * @param <MutSelf> The self type. This MUST inherit from the base measure type.

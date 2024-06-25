@@ -4,7 +4,7 @@
 
 package edu.wpi.first.units;
 
-public class AccelerationUnit<D extends Unit> extends Per<VelocityUnit<D>, TimeUnit> {
+public class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit<D>, TimeUnit> {
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static final CombinatoryUnitCache<VelocityUnit, TimeUnit, AccelerationUnit> cache =
       new CombinatoryUnitCache<>(AccelerationUnit::new);

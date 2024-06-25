@@ -12,9 +12,9 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.AngularVelocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.mutable.MutAngle;
+import edu.wpi.first.units.mutable.MutAngularVelocity;
+import edu.wpi.first.units.mutable.MutVoltage;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.examples.sysid.Constants.ShooterConstants;
@@ -39,11 +39,11 @@ public class Shooter extends SubsystemBase {
           ShooterConstants.kEncoderReversed);
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final Voltage.Mutable m_appliedVoltage = Volts.mutable(0);
+  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
   // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final Angle.Mutable m_angle = Radians.mutable(0);
+  private final MutAngle m_angle = Radians.mutable(0);
   // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final AngularVelocity.Mutable m_velocity = RadiansPerSecond.mutable(0);
+  private final MutAngularVelocity m_velocity = RadiansPerSecond.mutable(0);
 
   // Create a new SysId routine for characterizing the shooter.
   private final SysIdRoutine m_sysIdRoutine =

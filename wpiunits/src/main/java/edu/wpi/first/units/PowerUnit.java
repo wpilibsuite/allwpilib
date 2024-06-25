@@ -16,7 +16,7 @@ import static edu.wpi.first.units.Units.Seconds;
  * <p>Actual units (such as {@link Units#Watts} and {@link Units#Horsepower}) can be found in the
  * {@link Units} class.
  */
-public class PowerUnit extends Per<EnergyUnit, TimeUnit> {
+public class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
   private static final CombinatoryUnitCache<EnergyUnit, TimeUnit, PowerUnit> cache =
       new CombinatoryUnitCache<>(PowerUnit::new);
 

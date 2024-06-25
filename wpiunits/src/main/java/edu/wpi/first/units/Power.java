@@ -4,14 +4,17 @@
 
 package edu.wpi.first.units;
 
-public record Power(double magnitude, double baseUnitMagnitude, PowerUnit unit)
-    implements Measure<PowerUnit> {
+public class Power extends MeasureBase<PowerUnit> {
+  public Power(double magnitude, double baseUnitMagnitude, PowerUnit unit) {
+    super(magnitude, baseUnitMagnitude, unit);
+  }
+
   @Override
   public Power copy() {
     return this;
   }
 
-  public double in(Per<EnergyUnit, TimeUnit> otherUnit) {
+  public double in(PerUnit<EnergyUnit, TimeUnit> otherUnit) {
     return otherUnit.fromBaseUnits(baseUnitMagnitude);
   }
 }

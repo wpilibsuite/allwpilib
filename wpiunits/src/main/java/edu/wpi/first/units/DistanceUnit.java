@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.mutable.MutDistance;
+
 /**
  * Unit of linear dimension.
  *
@@ -44,14 +46,19 @@ public class DistanceUnit extends Unit {
     return new Distance(magnitude, toBaseUnits(magnitude), this);
   }
 
+  @Override
+  public Distance ofBaseUnits(double baseUnitMagnitude) {
+    return new Distance(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
   // distance times force = torque
   // force times distance = energy
   public TorqueUnit mult(ForceUnit force) {
     return TorqueUnit.combine(this, force);
   }
 
-  public Distance.Mutable mutable(double initialMagnitude) {
-    return new Distance.Mutable(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  public MutDistance mutable(double initialMagnitude) {
+    return new MutDistance(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public Distance zero() {

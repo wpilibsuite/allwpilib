@@ -8,9 +8,9 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.LinearVelocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.mutable.MutLinearVelocity;
+import edu.wpi.first.units.mutable.MutDistance;
+import edu.wpi.first.units.mutable.MutVoltage;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -47,11 +47,11 @@ public class Drive extends SubsystemBase {
           DriveConstants.kRightEncoderReversed);
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final Voltage.Mutable m_appliedVoltage = Volts.mutable(0);
+  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
   // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final Distance.Mutable m_distance = Meters.mutable(0);
+  private final MutDistance m_distance = Meters.mutable(0);
   // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final LinearVelocity.Mutable m_velocity = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
 
   // Create a new SysId routine for characterizing the drive.
   private final SysIdRoutine m_sysIdRoutine =

@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.mutable.MutEnergy;
+
 /**
  * Unit of energy dimension.
  *
@@ -36,7 +38,18 @@ public class EnergyUnit extends Unit {
     return PowerUnit.combine(this, period);
   }
 
+  @Override
   public Energy of(double magnitude) {
     return new Energy(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public Energy ofBaseUnits(double baseUnitMagnitude) {
+    return new Energy(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutEnergy mutable(double initialMagnitude) {
+    return new MutEnergy(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

@@ -4,7 +4,9 @@
 
 package edu.wpi.first.units;
 
-public class ForceUnit extends Mult<MassUnit, LinearAccelerationUnit> {
+import edu.wpi.first.units.mutable.MutForce;
+
+public class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {
   private static final CombinatoryUnitCache<MassUnit, LinearAccelerationUnit, ForceUnit> cache =
       new CombinatoryUnitCache<>(ForceUnit::new);
 
@@ -44,7 +46,18 @@ public class ForceUnit extends Mult<MassUnit, LinearAccelerationUnit> {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public Force of(double magnitude) {
     return new Force(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public Force ofBaseUnits(double baseUnitMagnitude) {
+    return new Force(toBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutForce mutable(double initialMagnitude) {
+    return new MutForce(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

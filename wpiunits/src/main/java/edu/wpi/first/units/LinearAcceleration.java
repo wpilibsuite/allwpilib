@@ -28,18 +28,4 @@ public class LinearAcceleration extends Acceleration<DistanceUnit> {
   public LinearAccelerationUnit unit() {
     return (LinearAccelerationUnit) unit;
   }
-
-  @Override
-  public String toString() {
-    return "LinearAcceleration["
-        + "magnitude="
-        + magnitude
-        + ", "
-        + "baseUnitMagnitude="
-        + baseUnitMagnitude
-        + ", "
-        + "unit="
-        + unit
-        + ']';
-  }
 }

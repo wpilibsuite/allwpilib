@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.mutable.MutVelocity;
+
 /**
  * Unit of velocity dimension that is a combination of a distance unit (numerator) and a time unit
  * (denominator).
@@ -17,7 +19,7 @@ package edu.wpi.first.units;
  *
  * @param <D> the distance unit, such as {@link AngleUnit} or {@link DistanceUnit}
  */
-public class VelocityUnit<D extends Unit> extends Per<D, TimeUnit> {
+public class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
   @SuppressWarnings("rawtypes")
   private static final CombinatoryUnitCache<Unit, TimeUnit, VelocityUnit> cache =
       new CombinatoryUnitCache<>(VelocityUnit::new);
@@ -67,7 +69,7 @@ public class VelocityUnit<D extends Unit> extends Per<D, TimeUnit> {
   }
 
   public MutableMeasure<VelocityUnit<D>, ?, ?> mutable(double initialMagnitude) {
-    return new Velocity.Mutable<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
+    return new MutVelocity<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public double convertFrom(double magnitude, VelocityUnit<? extends D> otherUnit) {

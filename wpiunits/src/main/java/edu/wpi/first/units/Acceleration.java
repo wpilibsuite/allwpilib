@@ -4,17 +4,12 @@
 
 package edu.wpi.first.units;
 
-import java.util.Objects;
-
-public class Acceleration<D extends Unit> implements Measure<AccelerationUnit<D>> {
-  protected double magnitude;
-  protected double baseUnitMagnitude;
-  protected AccelerationUnit<D> unit;
+public class Acceleration<D extends Unit> extends MeasureBase<AccelerationUnit<D>> {
+  private final MathHelper<AccelerationUnit<D>, Acceleration<D>> mathHelper =
+      new MathHelper<>(baseUnit()::of);
 
   public Acceleration(double magnitude, double baseUnitMagnitude, AccelerationUnit<D> unit) {
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = baseUnitMagnitude;
-    this.unit = unit;
+    super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
@@ -22,48 +17,39 @@ public class Acceleration<D extends Unit> implements Measure<AccelerationUnit<D>
     return this;
   }
 
-  @Override
-  public double magnitude() {
-    return magnitude;
+  public Acceleration<D> zero() {
+    return mathHelper.zero();
   }
 
-  @Override
-  public double baseUnitMagnitude() {
-    return baseUnitMagnitude;
+  public Acceleration<D> plus(Acceleration<D> other) {
+    return mathHelper.add(this, other);
   }
 
-  @Override
-  public AccelerationUnit<D> unit() {
-    return unit;
+  public Acceleration<D> minus(Acceleration<D> other) {
+    return mathHelper.minus(this, other);
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) return true;
-    if (obj == null || obj.getClass() != this.getClass()) return false;
-    var that = (Acceleration<?>) obj;
-    return Double.doubleToLongBits(this.magnitude) == Double.doubleToLongBits(that.magnitude)
-        && Double.doubleToLongBits(this.baseUnitMagnitude)
-            == Double.doubleToLongBits(that.baseUnitMagnitude)
-        && Objects.equals(this.unit, that.unit);
+  public Dimensionless divide(Acceleration<D> divisor) {
+    return mathHelper.divide(this, divisor);
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(magnitude, baseUnitMagnitude, unit);
+  public Acceleration<D> divide(double divisor) {
+    return mathHelper.divide(this, divisor);
   }
 
-  @Override
-  public String toString() {
-    return "Acceleration["
-        + "magnitude="
-        + magnitude
-        + ", "
-        + "baseUnitMagnitude="
-        + baseUnitMagnitude
-        + ", "
-        + "unit="
-        + unit
-        + ']';
+  public Acceleration<D> divide(Dimensionless divisor) {
+    return mathHelper.divide(this, divisor);
+  }
+
+  public Acceleration<D> times(double multiplier) {
+    return mathHelper.multiply(this, multiplier);
+  }
+
+  public Acceleration<D> times(Dimensionless multiplier) {
+    return mathHelper.multiply(this, multiplier);
+  }
+
+  public Velocity<D> times(Time time) {
+    return mathHelper.multiply(this, time, baseUnit().numerator()::of);
   }
 }

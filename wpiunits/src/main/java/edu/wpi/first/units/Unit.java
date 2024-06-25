@@ -61,6 +61,7 @@ public abstract class Unit {
   }
 
   public abstract Measure<?> of(double magnitude);
+
   public abstract Measure<?> ofBaseUnits(double baseUnitMagnitude);
 
   public abstract MutableMeasure<?, ?, ?> mutable(double initialMagnitude);

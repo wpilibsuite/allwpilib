@@ -4,7 +4,9 @@
 
 package edu.wpi.first.units;
 
-public class AngularMomentumUnit extends Mult<LinearMomentumUnit, DistanceUnit> {
+import edu.wpi.first.units.mutable.MutAngularMomentum;
+
+public class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, DistanceUnit> {
   private static final CombinatoryUnitCache<LinearMomentumUnit, DistanceUnit, AngularMomentumUnit>
       cache = new CombinatoryUnitCache<>(AngularMomentumUnit::new);
 
@@ -25,8 +27,14 @@ public class AngularMomentumUnit extends Mult<LinearMomentumUnit, DistanceUnit> 
     return cache.combine(linear, distance);
   }
 
+  @Override
   public AngularMomentum of(double magnitude) {
     return new AngularMomentum(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public MutAngularMomentum mutable(double magnitude) {
+    return new MutAngularMomentum(magnitude, toBaseUnits(magnitude), this);
   }
 
   public MomentOfInertiaUnit mult(AngularVelocityUnit omega) {

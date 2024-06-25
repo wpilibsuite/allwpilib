@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.mutable.MutAngle;
+
 /**
  * Unit of angular dimension.
  *
@@ -50,7 +52,7 @@ public class AngleUnit extends Unit {
   }
 
   @Override
-  public Angle.Mutable mutable(double initialMagnitude) {
-    return new Angle.Mutable(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  public MutAngle mutable(double initialMagnitude) {
+    return new MutAngle(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

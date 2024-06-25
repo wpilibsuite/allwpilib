@@ -4,8 +4,11 @@
 
 package edu.wpi.first.units;
 
-public record Mass(double magnitude, double baseUnitMagnitude, MassUnit unit)
-    implements Measure<MassUnit> {
+public class Mass extends MeasureBase<MassUnit> {
+  public Mass(double magnitude, double baseUnitMagnitude, MassUnit unit) {
+    super(magnitude, baseUnitMagnitude, unit);
+  }
+
   @Override
   public Mass copy() {
     return this;
@@ -23,5 +26,10 @@ public record Mass(double magnitude, double baseUnitMagnitude, MassUnit unit)
         magnitude / period.fromBaseUnits(1),
         baseUnitMagnitude / period.toBaseUnits(1),
         unit.per(period));
+  }
+
+  @Override
+  public MassUnit unit() {
+    return unit;
   }
 }

@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.mutable.MutAngularVelocity;
+
 public class AngularVelocityUnit extends VelocityUnit<AngleUnit> {
   private static final CombinatoryUnitCache<AngleUnit, TimeUnit, AngularVelocityUnit> cache =
       new CombinatoryUnitCache<>(AngularVelocityUnit::new);
@@ -31,12 +33,17 @@ public class AngularVelocityUnit extends VelocityUnit<AngleUnit> {
   }
 
   @Override
-  public AngularAccelerationUnit per(TimeUnit period) {
-    return AngularAccelerationUnit.combine(this, period);
+  public AngularVelocity ofBaseUnits(double baseUnitMagnitude) {
+    return new AngularVelocity(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
-  public AngularVelocity.Mutable mutable(double initialMagnitude) {
-    return new AngularVelocity.Mutable(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  public MutAngularVelocity mutable(double initialMagnitude) {
+    return new MutAngularVelocity(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
+  @Override
+  public AngularAccelerationUnit per(TimeUnit period) {
+    return AngularAccelerationUnit.combine(this, period);
   }
 }

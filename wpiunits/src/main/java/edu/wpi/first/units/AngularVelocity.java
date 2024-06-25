@@ -25,6 +25,10 @@ public class AngularVelocity extends Velocity<AngleUnit> {
     return otherUnit.fromBaseUnits(baseUnitMagnitude);
   }
 
+  public Angle times(Time period) {
+    return baseUnit().getUnit().ofBaseUnits(baseUnitMagnitude * period.baseUnitMagnitude());
+  }
+
   public AngularAcceleration divide(Time period) {
     return mathHelper.divide(this, period, RadiansPerSecondPerSecond::of);
   }
@@ -36,34 +40,5 @@ public class AngularVelocity extends Velocity<AngleUnit> {
   @Override
   public AngularVelocityUnit unit() {
     return (AngularVelocityUnit) unit;
-  }
-
-  @Override
-  public String toString() {
-    return "AngularVelocity["
-        + "magnitude="
-        + magnitude
-        + ", "
-        + "baseUnitMagnitude="
-        + baseUnitMagnitude
-        + ", "
-        + "unit="
-        + unit
-        + ']';
-  }
-
-  public static class Mutable extends AngularVelocity
-      implements MutableMeasure<VelocityUnit<AngleUnit>, AngularVelocity, Mutable> {
-    public Mutable(double magnitude, double baseUnitMagnitude, AngularVelocityUnit unit) {
-      super(magnitude, baseUnitMagnitude, unit);
-    }
-
-    @Override
-    public AngularVelocity.Mutable mut_replace(double magnitude, VelocityUnit<AngleUnit> newUnit) {
-      this.unit = newUnit;
-      this.magnitude = magnitude;
-      this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-      return null;
-    }
   }
 }

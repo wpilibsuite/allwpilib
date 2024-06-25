@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import java.util.Objects;
-
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. An
  * immutable measure is <i>immutable</i> and <i>type safe</i>, making it easy to use in concurrent
@@ -14,23 +12,9 @@ import java.util.Objects;
  *
  * @param <U> the unit type of the measure
  */
-public class ImmutableMeasure<U extends Unit> implements Measure<U> {
-  private final double m_magnitude;
-  private final double m_baseUnitMagnitude;
-  private final U m_unit;
-
-  /**
-   * Creates a new immutable measure instance. This shouldn't be used directly; prefer one of the
-   * factory methods instead.
-   *
-   * @param magnitude the magnitude of this measure
-   * @param unit the unit of this measure.
-   */
+public final class ImmutableMeasure<U extends Unit> extends MeasureBase<U> {
   ImmutableMeasure(double magnitude, double baseUnitMagnitude, U unit) {
-    Objects.requireNonNull(unit, "Unit cannot be null");
-    m_magnitude = magnitude;
-    m_baseUnitMagnitude = baseUnitMagnitude;
-    m_unit = unit;
+    super(magnitude, baseUnitMagnitude, unit);
   }
 
   /**
@@ -58,46 +42,8 @@ public class ImmutableMeasure<U extends Unit> implements Measure<U> {
     return new ImmutableMeasure<>(relativeMagnitude, unit.toBaseUnits(relativeMagnitude), unit);
   }
 
-  /** Gets the unitless magnitude of this measure. */
-  @Override
-  public double magnitude() {
-    return m_magnitude;
-  }
-
-  @Override
-  public double baseUnitMagnitude() {
-    return m_baseUnitMagnitude;
-  }
-
-  /** Gets the units of this measure. */
-  @Override
-  public U unit() {
-    return m_unit;
-  }
-
-  /**
-   * Checks for <i>object equality</i>. To check if two measures are <i>equivalent</i>, use {@link
-   * #isEquivalent(Measure) isEquivalent}.
-   */
-  @Override
-  public boolean equals(Object o) {
-    return o instanceof Measure<?> that
-        && Objects.equals(m_unit, that.unit())
-        && m_baseUnitMagnitude == that.baseUnitMagnitude();
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(m_magnitude, m_unit);
-  }
-
   @Override
   public Measure<U> copy() {
     return this; // already immutable, no need to allocate a new object
-  }
-
-  @Override
-  public String toString() {
-    return toShortString();
   }
 }

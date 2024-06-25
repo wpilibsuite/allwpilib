@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.mutable.MutLinearVelocity;
+
 public class LinearVelocityUnit extends VelocityUnit<DistanceUnit> {
   private static final CombinatoryUnitCache<DistanceUnit, TimeUnit, LinearVelocityUnit> cache =
       new CombinatoryUnitCache<>(LinearVelocityUnit::new);
@@ -36,7 +38,7 @@ public class LinearVelocityUnit extends VelocityUnit<DistanceUnit> {
   }
 
   @Override
-  public LinearVelocity.Mutable mutable(double value) {
-    return new LinearVelocity.Mutable(value, toBaseUnits(value), this);
+  public MutLinearVelocity mutable(double value) {
+    return new MutLinearVelocity(value, toBaseUnits(value), this);
   }
 }

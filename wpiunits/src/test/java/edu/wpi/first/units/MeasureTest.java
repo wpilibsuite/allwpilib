@@ -113,7 +113,7 @@ class MeasureTest {
     var time = m3.divide(m4);
     assertEquals(time.magnitude(), 2);
     assertEquals(time.unit(), Units.Second);
-    // Per divide
+    // PerUnit divide
     var m5 = Units.Volts.of(6);
     var m6 = Units.Volts.per(Units.Meter).of(2);
     var dist = m5.divide(m6);

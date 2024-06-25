@@ -4,8 +4,11 @@
 
 package edu.wpi.first.units;
 
-public record Torque(double magnitude, double baseUnitMagnitude, TorqueUnit unit)
-    implements Measure<TorqueUnit> {
+public class Torque extends MeasureBase<TorqueUnit> {
+  public Torque(double magnitude, double baseUnitMagnitude, TorqueUnit unit) {
+    super(magnitude, baseUnitMagnitude, unit);
+  }
+
   @Override
   public Torque copy() {
     return this;

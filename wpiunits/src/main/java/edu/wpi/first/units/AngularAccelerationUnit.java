@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.mutable.MutAngularAcceleration;
+
 public class AngularAccelerationUnit extends AccelerationUnit<AngleUnit> {
   private static final CombinatoryUnitCache<
           VelocityUnit<AngleUnit>, TimeUnit, AngularAccelerationUnit>
@@ -26,11 +28,13 @@ public class AngularAccelerationUnit extends AccelerationUnit<AngleUnit> {
     return cache.combine(velocity, period);
   }
 
+  @Override
   public AngularAcceleration of(double magnitude) {
     return new AngularAcceleration(magnitude, toBaseUnits(magnitude), this);
   }
 
-  public AngularAcceleration.Mutable mutable(double initialMagnitude) {
-    return new AngularAcceleration.Mutable(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  @Override
+  public MutAngularAcceleration mutable(double initialMagnitude) {
+    return new MutAngularAcceleration(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

@@ -4,8 +4,11 @@
 
 package edu.wpi.first.units;
 
-public record Temperature(double magnitude, double baseUnitMagnitude, TemperatureUnit unit)
-    implements Measure<TemperatureUnit> {
+public class Temperature extends MeasureBase<TemperatureUnit> {
+  public Temperature(double magnitude, double baseUnitMagnitude, TemperatureUnit unit) {
+    super(magnitude, baseUnitMagnitude, unit);
+  }
+
   @Override
   public Temperature copy() {
     return this;

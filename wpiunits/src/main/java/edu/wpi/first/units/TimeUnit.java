@@ -41,8 +41,8 @@ public class TimeUnit extends Unit {
         .make();
   }
 
-  public <U extends Unit> Per<TimeUnit, U> per(U other) {
-    return Per.combine(this, other);
+  public <U extends Unit> PerUnit<TimeUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
   }
 
   public double convertFrom(double magnitude, TimeUnit otherUnit) {

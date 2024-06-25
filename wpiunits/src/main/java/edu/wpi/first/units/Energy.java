@@ -7,9 +7,12 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Joules;
 import static edu.wpi.first.units.Units.Watts;
 
-public record Energy(double magnitude, double baseUnitMagnitude, EnergyUnit unit)
-    implements Measure<EnergyUnit> {
+public class Energy extends MeasureBase<EnergyUnit> {
   private static final MathHelper<EnergyUnit, Energy> mathHelper = new MathHelper<>(Joules::of);
+
+  public Energy(double magnitude, double baseUnitMagnitude, EnergyUnit unit) {
+    super(magnitude, baseUnitMagnitude, unit);
+  }
 
   @Override
   public Energy copy() {

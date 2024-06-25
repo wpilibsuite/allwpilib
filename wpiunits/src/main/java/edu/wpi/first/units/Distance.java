@@ -8,19 +8,11 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.Objects;
-
-public class Distance implements Measure<DistanceUnit> {
+public class Distance extends MeasureBase<DistanceUnit> {
   private static final MathHelper<DistanceUnit, Distance> mathHelper = new MathHelper<>(Meters::of);
 
-  protected double magnitude;
-  protected double baseUnitMagnitude;
-  protected DistanceUnit unit;
-
   public Distance(double magnitude, double baseUnitMagnitude, DistanceUnit unit) {
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = baseUnitMagnitude;
-    this.unit = unit;
+    super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
@@ -43,16 +35,6 @@ public class Distance implements Measure<DistanceUnit> {
   }
 
   @Override
-  public double magnitude() {
-    return magnitude;
-  }
-
-  @Override
-  public double baseUnitMagnitude() {
-    return baseUnitMagnitude;
-  }
-
-  @Override
   public DistanceUnit unit() {
     return unit;
   }
@@ -65,41 +47,11 @@ public class Distance implements Measure<DistanceUnit> {
     return mathHelper.minus(this, other);
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) return true;
-    if (obj == null || obj.getClass() != this.getClass()) return false;
-    var that = (Distance) obj;
-    return Double.doubleToLongBits(this.magnitude) == Double.doubleToLongBits(that.magnitude)
-        && Double.doubleToLongBits(this.baseUnitMagnitude)
-            == Double.doubleToLongBits(that.baseUnitMagnitude)
-        && Objects.equals(this.unit, that.unit);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(magnitude, baseUnitMagnitude, unit);
-  }
-
-  @Override
-  public String toString() {
-    return "Distance["
-        + "magnitude="
-        + magnitude
-        + ", "
-        + "baseUnitMagnitude="
-        + baseUnitMagnitude
-        + ", "
-        + "unit="
-        + unit
-        + ']';
-  }
-
   public Distance times(double scalar) {
     return mathHelper.multiply(this, scalar);
   }
 
-  public <U extends Unit> Measure<U> times(Measure<? extends Per<U, DistanceUnit>> term) {
+  public <U extends Unit> Measure<U> times(Measure<? extends PerUnit<U, DistanceUnit>> term) {
     return mathHelper.multiply(
         this,
         term,
@@ -127,20 +79,5 @@ public class Distance implements Measure<DistanceUnit> {
 
   public Time divide(LinearVelocity velocity) {
     return mathHelper.divide(this, velocity, Seconds::of);
-  }
-
-  public static class Mutable extends Distance
-      implements MutableMeasure<DistanceUnit, Distance, Mutable> {
-    public Mutable(double magnitude, double baseUnitMagnitude, DistanceUnit unit) {
-      super(magnitude, baseUnitMagnitude, unit);
-    }
-
-    @Override
-    public Mutable mut_replace(double magnitude, DistanceUnit newUnit) {
-      this.unit = newUnit;
-      this.magnitude = magnitude;
-      this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-      return this;
-    }
   }
 }

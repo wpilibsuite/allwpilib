@@ -7,9 +7,12 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Seconds;
 
-public record Time(double magnitude, double baseUnitMagnitude, TimeUnit unit)
-    implements Measure<TimeUnit> {
+public class Time extends MeasureBase<TimeUnit> {
   private static final MathHelper<TimeUnit, Time> mathHelper = new MathHelper<>(Seconds::of);
+
+  public Time(double magnitude, double baseUnitMagnitude, TimeUnit unit) {
+    super(magnitude, baseUnitMagnitude, unit);
+  }
 
   @Override
   public Time copy() {

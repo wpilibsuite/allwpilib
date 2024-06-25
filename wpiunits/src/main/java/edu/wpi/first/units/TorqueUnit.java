@@ -4,7 +4,7 @@
 
 package edu.wpi.first.units;
 
-public class TorqueUnit extends Mult<DistanceUnit, ForceUnit> {
+public class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   private static final CombinatoryUnitCache<DistanceUnit, ForceUnit, TorqueUnit> cache =
       new CombinatoryUnitCache<>(TorqueUnit::new);
 
@@ -13,7 +13,7 @@ public class TorqueUnit extends Mult<DistanceUnit, ForceUnit> {
   }
 
   TorqueUnit(
-      Mult<DistanceUnit, ForceUnit> baseUnit,
+      MultUnit<DistanceUnit, ForceUnit> baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,
