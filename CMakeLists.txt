@@ -180,6 +180,16 @@ FATAL: Cannot build wpilib without wpimath.
     )
 endif()
 
+if(NOT WITH_WPIMATH AND WITH_GUI)
+    message(
+        FATAL_ERROR
+        "
+FATAL: Cannot build GUI modules without wpimath.
+       Enable wpimath by setting WITH_WPIMATH=ON
+"
+    )
+endif()
+
 if(NOT WITH_WPIUNITS AND WITH_WPIMATH AND WITH_JAVA)
     message(
         FATAL_ERROR
