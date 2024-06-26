@@ -34,27 +34,32 @@ class SolenoidModel : public Model {
   virtual void SetOutput(bool val) = 0;
 };
 
-class PCMModel : public Model {
+class PneumaticControlModel : public Model {
  public:
   virtual CompressorModel* GetCompressor() = 0;
 
   virtual void ForEachSolenoid(
       wpi::function_ref<void(SolenoidModel& model, int index)> func) = 0;
+
+  virtual std::string_view GetName() = 0;
 };
 
-class PCMsModel : public Model {
+class PneumaticControlsModel : public Model {
  public:
-  virtual void ForEachPCM(
-      wpi::function_ref<void(PCMModel& model, int index)> func) = 0;
+  virtual void ForEachPneumaticControl(
+      wpi::function_ref<void(PneumaticControlModel& model, int index)>
+          func) = 0;
 };
 
-bool DisplayPCMSolenoids(PCMModel* model, int index, bool outputsEnabled);
-void DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
-                          std::string_view noneMsg = "No solenoids");
+bool DisplayPneumaticControlSolenoids(PneumaticControlModel* model, int index,
+                                      bool outputsEnabled);
+void DisplayPneumaticControlsSolenoids(
+    PneumaticControlsModel* model, bool outputsEnabled,
+    std::string_view noneMsg = "No solenoids");
 
-void DisplayCompressorDevice(PCMModel* model, int index, bool outputsEnabled);
 void DisplayCompressorDevice(CompressorModel* model, int index,
                              bool outputsEnabled);
-void DisplayCompressorsDevice(PCMsModel* model, bool outputsEnabled);
+void DisplayCompressorsDevice(PneumaticControlsModel* model,
+                              bool outputsEnabled);
 
 }  // namespace glass

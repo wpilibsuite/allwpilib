@@ -9,12 +9,12 @@
 
 namespace halsimgui {
 
-class PCMSimGui {
+class PHSimGui {
  public:
   static void Initialize();
-  static bool PCMsAnyInitialized();
-  static bool PCMsAnySolenoids(glass::PneumaticControlsModel* model);
-  static std::unique_ptr<glass::PneumaticControlsModel> GetPCMsModel();
+  static bool PHsAnyInitialized();
+  static bool PHsAnySolenoids(glass::PneumaticControlsModel* model);
+  static std::unique_ptr<glass::PneumaticControlsModel> GetPHsModel();
 };
 
 }  // namespace halsimgui

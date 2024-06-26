@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/PCM.h"
+#include "glass/hardware/Pneumatic.h"
 
 #include <cstdio>
 #include <cstring>
@@ -20,8 +20,8 @@
 
 using namespace glass;
 
-bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
-                                bool outputsEnabled) {
+bool glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
+                                             int index, bool outputsEnabled) {
   wpi::SmallVector<int, 16> channels;
   model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
     if (auto data = solenoid.GetOutputData()) {
@@ -50,7 +50,8 @@ bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
     wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
                            index);
   } else {
-    wpi::format_to_n_c_str(label, sizeof(label), "PCM[{}]###header", index);
+    wpi::format_to_n_c_str(label, sizeof(label), "{}[{}]###header",
+                           model->GetName(), index);
   }
 
   // header
@@ -85,32 +86,29 @@ bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
   return true;
 }
 
-void glass::DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
-                                 std::string_view noneMsg) {
+void glass::DisplayPneumaticControlsSolenoids(PneumaticControlsModel* model,
+                                              bool outputsEnabled,
+                                              std::string_view noneMsg) {
   bool hasAny = false;
-  model->ForEachPCM([&](PCMModel& pcm, int i) {
-    PushID(i);
-    if (DisplayPCMSolenoids(&pcm, i, outputsEnabled)) {
-      hasAny = true;
-    }
-    PopID();
-  });
+  model->ForEachPneumaticControl(
+      [&](PneumaticControlModel& pneumaticControl, int i) {
+        PushID(i);
+        if (DisplayPneumaticControlSolenoids(&pneumaticControl, i,
+                                             outputsEnabled)) {
+          hasAny = true;
+        }
+        PopID();
+      });
   if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.data(), noneMsg.data() + noneMsg.size());
   }
 }
 
-void glass::DisplayCompressorDevice(PCMModel* model, int index,
-                                    bool outputsEnabled) {
-  auto compressor = model->GetCompressor();
-  if (!compressor || !compressor->Exists()) {
-    return;
-  }
-  DisplayCompressorDevice(compressor, index, outputsEnabled);
-}
-
 void glass::DisplayCompressorDevice(CompressorModel* model, int index,
                                     bool outputsEnabled) {
+  if (!model || !model->Exists()) {
+    return;
+  }
   char name[32];
   wpi::format_to_n_c_str(name, sizeof(name), "Compressor[{}]", index);
 
@@ -155,8 +153,11 @@ void glass::DisplayCompressorDevice(CompressorModel* model, int index,
   }
 }
 
-void glass::DisplayCompressorsDevice(PCMsModel* model, bool outputsEnabled) {
-  model->ForEachPCM([&](PCMModel& pcm, int i) {
-    DisplayCompressorDevice(&pcm, i, outputsEnabled);
-  });
+void glass::DisplayCompressorsDevice(PneumaticControlsModel* model,
+                                     bool outputsEnabled) {
+  model->ForEachPneumaticControl(
+      [&](PneumaticControlModel& pneumaticControl, int i) {
+        DisplayCompressorDevice(pneumaticControl.GetCompressor(), i,
+                                outputsEnabled);
+      });
 }
