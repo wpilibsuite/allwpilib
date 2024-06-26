@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableAcceleration;
+import edu.wpi.first.units.measure.Acceleration;
 import edu.wpi.first.units.mutable.MutAcceleration;
 
 public class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit<D>, TimeUnit> {

@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Energy;
 import edu.wpi.first.units.EnergyUnit;
+import edu.wpi.first.units.measure.Energy;
 
 public record ImmutableEnergy(double magnitude, double baseUnitMagnitude, EnergyUnit unit)
     implements Energy {

@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Power;
 import edu.wpi.first.units.PowerUnit;
 import edu.wpi.first.units.immutable.ImmutablePower;
+import edu.wpi.first.units.measure.Power;
 
 public final class MutPower extends MutableMeasureBase<PowerUnit, Power, MutPower>
     implements Power {

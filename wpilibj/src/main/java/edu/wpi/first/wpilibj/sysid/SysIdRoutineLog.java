@@ -16,7 +16,7 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.AngularAcceleration;
 import edu.wpi.first.units.AngularVelocity;
 import edu.wpi.first.units.Current;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.LinearAcceleration;
 import edu.wpi.first.units.LinearVelocity;
 import edu.wpi.first.units.Voltage;

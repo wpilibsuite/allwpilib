@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 class DistanceUnitTest {
   @Test
   void testBaseUnitDistancePerTime() {
-    VelocityUnit<DistanceUnit> anonBaseUnit =
+    LinearVelocityUnit anonBaseUnit =
         new DistanceUnit(null, 1, "D", "d").per(new TimeUnit(null, 1, "T", "t"));
 
     assertTrue(Units.MetersPerSecond.equivalent(anonBaseUnit));
@@ -20,7 +20,7 @@ class DistanceUnitTest {
 
   @Test
   void testFeetPerSecond() {
-    VelocityUnit<DistanceUnit> feetPerMillisecond = Units.Feet.per(Units.Milliseconds);
+    LinearVelocityUnit feetPerMillisecond = Units.Feet.per(Units.Milliseconds);
 
     // one foot per millisecond
     // = (1 / 3.28084) meters per (1 / 1000) seconds

@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.TemperatureUnit;
 import edu.wpi.first.units.immutable.ImmutableTemperature;
+import edu.wpi.first.units.measure.Temperature;
 
 public final class MutTemperature
     extends MutableMeasureBase<TemperatureUnit, Temperature, MutTemperature>

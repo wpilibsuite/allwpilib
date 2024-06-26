@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.LinearAcceleration;
 import edu.wpi.first.units.LinearAccelerationUnit;
+import edu.wpi.first.units.measure.LinearAcceleration;
 
 public record ImmutableLinearAcceleration(
     double magnitude, double baseUnitMagnitude, LinearAccelerationUnit unit)

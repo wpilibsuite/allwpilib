@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableDimensionless;
+import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.units.mutable.MutDimensionless;
 
 /**
@@ -32,6 +33,7 @@ public class DimensionlessUnit extends Unit {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  @Override
   public Dimensionless of(double magnitude) {
     return new ImmutableDimensionless(magnitude, toBaseUnits(magnitude), this);
   }

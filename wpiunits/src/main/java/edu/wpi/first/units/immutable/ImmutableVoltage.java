@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Voltage;
 import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.Voltage;
 
 public record ImmutableVoltage(double magnitude, double baseUnitMagnitude, VoltageUnit unit)
     implements Voltage {

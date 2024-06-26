@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableMass;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.mutable.MutMass;
 
 /**
@@ -36,12 +37,13 @@ public class MassUnit extends Unit {
     return (MassUnit) super.getBaseUnit();
   }
 
+  @Override
   public Mass of(double magnitude) {
     return new ImmutableMass(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
-  public Measure<?> ofBaseUnits(double baseUnitMagnitude) {
+  public Mass ofBaseUnits(double baseUnitMagnitude) {
     return new ImmutableMass(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 

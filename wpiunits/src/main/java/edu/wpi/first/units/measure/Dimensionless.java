@@ -2,10 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package edu.wpi.first.units.measure;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Value;
+
+import edu.wpi.first.units.DimensionlessUnit;
+import edu.wpi.first.units.MathHelper;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 
 public interface Dimensionless extends Measure<DimensionlessUnit> {
   MathHelper<DimensionlessUnit, Dimensionless> mathHelper = new MathHelper<>(Value::of);

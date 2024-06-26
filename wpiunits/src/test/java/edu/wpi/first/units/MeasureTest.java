@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.units.measure.Distance;
 import org.junit.jupiter.api.Test;
 
 class MeasureTest {

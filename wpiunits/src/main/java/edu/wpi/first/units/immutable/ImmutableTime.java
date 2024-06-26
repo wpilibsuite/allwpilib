@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Time;
 import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.measure.Time;
 
 public record ImmutableTime(double magnitude, double baseUnitMagnitude, TimeUnit unit)
     implements Time {

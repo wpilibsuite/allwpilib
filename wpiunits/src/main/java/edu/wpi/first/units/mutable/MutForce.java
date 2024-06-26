@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Force;
 import edu.wpi.first.units.ForceUnit;
 import edu.wpi.first.units.immutable.ImmutableForce;
+import edu.wpi.first.units.measure.Force;
 
 public final class MutForce extends MutableMeasureBase<ForceUnit, Force, MutForce>
     implements Force {

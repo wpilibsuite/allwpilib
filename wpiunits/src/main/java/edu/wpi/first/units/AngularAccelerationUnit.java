@@ -5,19 +5,19 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableAngularAcceleration;
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.mutable.MutAngularAcceleration;
 
-public class AngularAccelerationUnit extends AccelerationUnit<AngleUnit> {
-  private static final CombinatoryUnitCache<
-          VelocityUnit<AngleUnit>, TimeUnit, AngularAccelerationUnit>
+public class AngularAccelerationUnit extends PerUnit<AngularVelocityUnit, TimeUnit> {
+  private static final CombinatoryUnitCache<AngularVelocityUnit, TimeUnit, AngularAccelerationUnit>
       cache = new CombinatoryUnitCache<>(AngularAccelerationUnit::new);
 
-  protected AngularAccelerationUnit(VelocityUnit<AngleUnit> velocity, TimeUnit period) {
+  protected AngularAccelerationUnit(AngularVelocityUnit velocity, TimeUnit period) {
     super(velocity, period);
   }
 
   protected AngularAccelerationUnit(
-      AccelerationUnit<AngleUnit> baseUnit,
+      AngularAccelerationUnit baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,

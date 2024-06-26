@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.AngularAcceleration;
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.immutable.ImmutableAngularAcceleration;
+import edu.wpi.first.units.measure.AngularAcceleration;
 
 public final class MutAngularAcceleration
     extends MutableMeasureBase<AngularAccelerationUnit, AngularAcceleration, MutAngularAcceleration>

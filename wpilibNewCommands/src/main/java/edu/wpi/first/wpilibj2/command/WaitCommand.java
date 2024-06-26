@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.units.Units.Seconds;
 
-import edu.wpi.first.units.Time;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Timer;

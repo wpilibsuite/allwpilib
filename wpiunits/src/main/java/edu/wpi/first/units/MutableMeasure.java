@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
 /**

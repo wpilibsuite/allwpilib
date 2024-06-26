@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.AngularMomentum;
 import edu.wpi.first.units.AngularMomentumUnit;
+import edu.wpi.first.units.measure.AngularMomentum;
 
 public record ImmutableAngularMomentum(
     double magnitude, double baseUnitMagnitude, AngularMomentumUnit unit)

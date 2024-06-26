@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Force;
 import edu.wpi.first.units.ForceUnit;
+import edu.wpi.first.units.measure.Force;
 
 public record ImmutableForce(double magnitude, double baseUnitMagnitude, ForceUnit unit)
     implements Force {

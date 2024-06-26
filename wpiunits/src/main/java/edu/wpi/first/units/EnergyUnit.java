@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableEnergy;
+import edu.wpi.first.units.measure.Energy;
 import edu.wpi.first.units.mutable.MutEnergy;
 
 /**

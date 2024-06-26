@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Current;
 import edu.wpi.first.units.CurrentUnit;
+import edu.wpi.first.units.measure.Current;
 
 public record ImmutableCurrent(double magnitude, double baseUnitMagnitude, CurrentUnit unit)
     implements Current {

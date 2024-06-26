@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.LinearAcceleration;
 import edu.wpi.first.units.LinearAccelerationUnit;
 import edu.wpi.first.units.immutable.ImmutableLinearAcceleration;
+import edu.wpi.first.units.measure.LinearAcceleration;
 
 public final class MutLinearAcceleration
     extends MutableMeasureBase<LinearAccelerationUnit, LinearAcceleration, MutLinearAcceleration>

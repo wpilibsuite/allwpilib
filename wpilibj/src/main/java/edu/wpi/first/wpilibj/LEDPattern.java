@@ -10,13 +10,13 @@ import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Value;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.Dimensionless;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Frequency;
-import edu.wpi.first.units.LinearVelocity;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
 import edu.wpi.first.units.collections.LongToObjectHashMap;
+import edu.wpi.first.units.measure.Dimensionless;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.util.Color;
 import java.util.Map;
@@ -100,8 +100,8 @@ public interface LEDPattern {
    *
    * <p>This method is intentionally designed to use separate objects for reading and writing data.
    * By splitting them up, we can easily modify the behavior of some base pattern to make it {@link
-   * #scrollAtRelativeSpeed(Frequency) scroll}, {@link #blink(Measure, Measure) blink}, or {@link
-   * #breathe(Measure) breathe} by intercepting the data writes to transform their behavior to
+   * #scrollAtRelativeSpeed(Frequency) scroll}, {@link #blink(Time, Time) blink}, or {@link
+   * #breathe(Time) breathe} by intercepting the data writes to transform their behavior to
    * whatever we like.
    *
    * @param reader data reader for accessing buffer length and current colors
@@ -188,7 +188,7 @@ public interface LEDPattern {
    * @return the scrolling pattern
    */
   default LEDPattern scrollAtRelativeSpeed(Frequency velocity) {
-    final double periodMicros = 1 / velocity.in(Value.per(Microsecond));
+    final double periodMicros = velocity.asPeriod().in(Microseconds);
 
     return (reader, writer) -> {
       int bufLen = reader.getLength();
@@ -281,7 +281,7 @@ public interface LEDPattern {
   }
 
   /**
-   * Like {@link #blink(Measure, Measure) blink(onTime, offTime)}, but where the "off" time is
+   * Like {@link #blink(Time, Time) blink(onTime, offTime)}, but where the "off" time is
    * exactly equal to the "on" time.
    *
    * @param onTime how long the pattern should play for (and be turned off for), per cycle

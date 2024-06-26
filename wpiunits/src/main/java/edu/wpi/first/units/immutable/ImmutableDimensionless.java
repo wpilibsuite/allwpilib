@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.DimensionlessUnit;
+import edu.wpi.first.units.measure.Dimensionless;
 
 public record ImmutableDimensionless(
     double magnitude, double baseUnitMagnitude, DimensionlessUnit unit) implements Dimensionless {

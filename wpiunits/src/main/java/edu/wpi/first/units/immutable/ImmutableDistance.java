@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.measure.Distance;
 
 public record ImmutableDistance(double magnitude, double baseUnitMagnitude, DistanceUnit unit)
     implements Distance {

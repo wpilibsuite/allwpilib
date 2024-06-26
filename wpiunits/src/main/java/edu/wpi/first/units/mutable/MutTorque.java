@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Torque;
 import edu.wpi.first.units.TorqueUnit;
 import edu.wpi.first.units.immutable.ImmutableTorque;
+import edu.wpi.first.units.measure.Torque;
 
 public final class MutTorque extends MutableMeasureBase<TorqueUnit, Torque, MutTorque>
     implements Torque {

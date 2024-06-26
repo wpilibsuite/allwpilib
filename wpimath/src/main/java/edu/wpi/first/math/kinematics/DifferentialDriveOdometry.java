@@ -10,7 +10,7 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.measure.Distance;
 
 /**
  * Class for differential drive odometry. Odometry allows you to track the robot's position on the

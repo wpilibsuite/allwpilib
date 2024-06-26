@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Energy;
 import edu.wpi.first.units.EnergyUnit;
 import edu.wpi.first.units.immutable.ImmutableEnergy;
+import edu.wpi.first.units.measure.Energy;
 
 public final class MutEnergy extends MutableMeasureBase<EnergyUnit, Energy, MutEnergy>
     implements Energy {

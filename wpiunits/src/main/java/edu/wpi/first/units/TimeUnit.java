@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableTime;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.mutable.MutTime;
 
 /**

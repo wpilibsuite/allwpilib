@@ -2,13 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package edu.wpi.first.units.measure;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-public interface LinearVelocity extends Velocity<DistanceUnit> {
-  MathHelper<VelocityUnit<DistanceUnit>, LinearVelocity> mathHelper =
-      new MathHelper<>(MetersPerSecond::of);
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.LinearVelocityUnit;
+import edu.wpi.first.units.MathHelper;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.VelocityUnit;
+
+public interface LinearVelocity extends Measure<LinearVelocityUnit> {
+  MathHelper<LinearVelocityUnit, LinearVelocity> mathHelper = new MathHelper<>(MetersPerSecond::of);
 
   @Override
   LinearVelocityUnit unit();
@@ -16,7 +21,7 @@ public interface LinearVelocity extends Velocity<DistanceUnit> {
   @Override
   LinearVelocity copy();
 
-  default double in(LinearVelocityUnit otherUnit) {
+  default double in(VelocityUnit<DistanceUnit> otherUnit) {
     return otherUnit.fromBaseUnits(baseUnitMagnitude());
   }
 

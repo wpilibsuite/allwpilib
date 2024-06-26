@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.immutable.ImmutableDistance;
+import edu.wpi.first.units.measure.Distance;
 
 public final class MutDistance extends MutableMeasureBase<DistanceUnit, Distance, MutDistance>
     implements Distance {

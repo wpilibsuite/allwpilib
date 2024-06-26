@@ -11,7 +11,7 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveKinematicsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveKinematicsStruct;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 

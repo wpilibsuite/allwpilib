@@ -5,9 +5,9 @@
 package edu.wpi.first.units.immutable;
 
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Mult;
 import edu.wpi.first.units.MultUnit;
 import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.measure.Mult;
 
 public record ImmutableMult<A extends Unit, B extends Unit>(
     double magnitude, double baseUnitMagnitude, MultUnit<A, B> unit) implements Mult<A, B> {

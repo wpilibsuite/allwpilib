@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.AngularAcceleration;
 import edu.wpi.first.units.AngularAccelerationUnit;
+import edu.wpi.first.units.measure.AngularAcceleration;
 
 public record ImmutableAngularAcceleration(
     double magnitude, double baseUnitMagnitude, AngularAccelerationUnit unit)

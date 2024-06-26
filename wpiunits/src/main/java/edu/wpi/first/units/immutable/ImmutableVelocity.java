@@ -5,8 +5,8 @@
 package edu.wpi.first.units.immutable;
 
 import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.measure.Velocity;
 
 public record ImmutableVelocity<D extends Unit>(
     double magnitude, double baseUnitMagnitude, VelocityUnit<D> unit) implements Velocity<D> {

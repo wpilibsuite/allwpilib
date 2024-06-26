@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableVoltage;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.mutable.MutVoltage;
 
 /**
@@ -51,7 +52,7 @@ public class VoltageUnit extends Unit {
   }
 
   @Override
-  public Measure<?> ofBaseUnits(double baseUnitMagnitude) {
+  public Voltage ofBaseUnits(double baseUnitMagnitude) {
     return new ImmutableVoltage(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 

@@ -5,8 +5,8 @@
 package edu.wpi.first.units.immutable;
 
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MomentOfInertia;
 import edu.wpi.first.units.MomentOfInertiaUnit;
+import edu.wpi.first.units.measure.MomentOfInertia;
 
 public record ImmutableMomentOfInertia(
     double magnitude, double baseUnitMagnitude, MomentOfInertiaUnit unit)

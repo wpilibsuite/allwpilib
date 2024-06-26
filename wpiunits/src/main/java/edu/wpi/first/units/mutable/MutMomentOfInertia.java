@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.MomentOfInertia;
 import edu.wpi.first.units.MomentOfInertiaUnit;
 import edu.wpi.first.units.immutable.ImmutableMomentOfInertia;
+import edu.wpi.first.units.measure.MomentOfInertia;
 
 public final class MutMomentOfInertia
     extends MutableMeasureBase<MomentOfInertiaUnit, MomentOfInertia, MutMomentOfInertia>

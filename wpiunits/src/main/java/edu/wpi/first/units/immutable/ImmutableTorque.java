@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Torque;
 import edu.wpi.first.units.TorqueUnit;
+import edu.wpi.first.units.measure.Torque;
 
 public record ImmutableTorque(double magnitude, double baseUnitMagnitude, TorqueUnit unit)
     implements Torque {

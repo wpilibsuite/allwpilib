@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableAngularMomentum;
+import edu.wpi.first.units.measure.AngularMomentum;
 import edu.wpi.first.units.mutable.MutAngularMomentum;
 
 public class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, DistanceUnit> {

@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Mass;
 import edu.wpi.first.units.MassUnit;
 import edu.wpi.first.units.immutable.ImmutableMass;
+import edu.wpi.first.units.measure.Mass;
 
 public final class MutMass extends MutableMeasureBase<MassUnit, Mass, MutMass> implements Mass {
   public MutMass(double magnitude, double baseUnitMagnitude, MassUnit unit) {

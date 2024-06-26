@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Frequency;
 import edu.wpi.first.units.FrequencyUnit;
+import edu.wpi.first.units.measure.Frequency;
 
 public record ImmutableFrequency(double magnitude, double baseUnitMagnitude, FrequencyUnit unit)
     implements Frequency {

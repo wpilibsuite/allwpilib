@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.LinearMomentum;
 import edu.wpi.first.units.LinearMomentumUnit;
+import edu.wpi.first.units.measure.LinearMomentum;
 
 public record ImmutableLinearMomentum(
     double magnitude, double baseUnitMagnitude, LinearMomentumUnit unit) implements LinearMomentum {

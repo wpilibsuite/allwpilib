@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Joules;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.immutable.ImmutablePower;
+import edu.wpi.first.units.measure.Power;
 import edu.wpi.first.units.mutable.MutPower;
 
 /**

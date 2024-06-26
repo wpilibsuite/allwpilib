@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableAngle;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.mutable.MutAngle;
 
 /**

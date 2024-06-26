@@ -4,10 +4,10 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Mult;
 import edu.wpi.first.units.MultUnit;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.immutable.ImmutableMult;
+import edu.wpi.first.units.measure.Mult;
 
 public final class MutMult<A extends Unit, B extends Unit>
     extends MutableMeasureBase<MultUnit<A, B>, Mult<A, B>, MutMult<A, B>> implements Mult<A, B> {

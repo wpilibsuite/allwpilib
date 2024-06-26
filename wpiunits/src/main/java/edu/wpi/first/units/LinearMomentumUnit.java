@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableLinearMomentum;
+import edu.wpi.first.units.measure.LinearMomentum;
 import edu.wpi.first.units.mutable.MutLinearMomentum;
 
 public class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {

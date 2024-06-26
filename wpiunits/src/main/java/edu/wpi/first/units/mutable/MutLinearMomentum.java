@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.LinearMomentum;
 import edu.wpi.first.units.LinearMomentumUnit;
 import edu.wpi.first.units.immutable.ImmutableLinearMomentum;
+import edu.wpi.first.units.measure.LinearMomentum;
 
 public final class MutLinearMomentum
     extends MutableMeasureBase<LinearMomentumUnit, LinearMomentum, MutLinearMomentum>

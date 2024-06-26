@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.AngularMomentum;
 import edu.wpi.first.units.AngularMomentumUnit;
 import edu.wpi.first.units.immutable.ImmutableAngularMomentum;
+import edu.wpi.first.units.measure.AngularMomentum;
 
 public final class MutAngularMomentum
     extends MutableMeasureBase<AngularMomentumUnit, AngularMomentum, MutAngularMomentum>

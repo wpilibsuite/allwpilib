@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Frequency;
 import edu.wpi.first.units.FrequencyUnit;
 import edu.wpi.first.units.immutable.ImmutableFrequency;
+import edu.wpi.first.units.measure.Frequency;
 
 public final class MutFrequency extends MutableMeasureBase<FrequencyUnit, Frequency, MutFrequency>
     implements Frequency {

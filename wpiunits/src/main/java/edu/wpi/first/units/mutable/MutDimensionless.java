@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.DimensionlessUnit;
 import edu.wpi.first.units.immutable.ImmutableDimensionless;
+import edu.wpi.first.units.measure.Dimensionless;
 
 public final class MutDimensionless
     extends MutableMeasureBase<DimensionlessUnit, Dimensionless, MutDimensionless>

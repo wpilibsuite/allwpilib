@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Current;
 import edu.wpi.first.units.CurrentUnit;
 import edu.wpi.first.units.immutable.ImmutableCurrent;
+import edu.wpi.first.units.measure.Current;
 
 public final class MutCurrent extends MutableMeasureBase<CurrentUnit, Current, MutCurrent>
     implements Current {

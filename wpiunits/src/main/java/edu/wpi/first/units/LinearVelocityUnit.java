@@ -4,9 +4,11 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableLinearVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.mutable.MutLinearVelocity;
 
-public class LinearVelocityUnit extends VelocityUnit<DistanceUnit> {
+public class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
   private static final CombinatoryUnitCache<DistanceUnit, TimeUnit, LinearVelocityUnit> cache =
       new CombinatoryUnitCache<>(LinearVelocityUnit::new);
 
@@ -15,7 +17,7 @@ public class LinearVelocityUnit extends VelocityUnit<DistanceUnit> {
   }
 
   LinearVelocityUnit(
-      VelocityUnit<DistanceUnit> baseUnit,
+      PerUnit<DistanceUnit, TimeUnit> baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
       String name,
@@ -33,12 +35,16 @@ public class LinearVelocityUnit extends VelocityUnit<DistanceUnit> {
   }
 
   @Override
-  public LinearAccelerationUnit per(TimeUnit period) {
-    return LinearAccelerationUnit.combine(this, period);
+  public LinearVelocity ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableLinearVelocity(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
   public MutLinearVelocity mutable(double value) {
     return new MutLinearVelocity(value, toBaseUnits(value), this);
+  }
+
+  public LinearAccelerationUnit per(TimeUnit period) {
+    return LinearAccelerationUnit.combine(this, period);
   }
 }

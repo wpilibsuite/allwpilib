@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Power;
 import edu.wpi.first.units.PowerUnit;
+import edu.wpi.first.units.measure.Power;
 
 public record ImmutablePower(double magnitude, double baseUnitMagnitude, PowerUnit unit)
     implements Power {

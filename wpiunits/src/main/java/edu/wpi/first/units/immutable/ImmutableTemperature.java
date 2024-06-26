@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.TemperatureUnit;
+import edu.wpi.first.units.measure.Temperature;
 
 public record ImmutableTemperature(double magnitude, double baseUnitMagnitude, TemperatureUnit unit)
     implements Temperature {

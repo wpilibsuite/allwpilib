@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableDistance;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.mutable.MutDistance;
 
 /**
@@ -43,6 +44,7 @@ public class DistanceUnit extends Unit {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
+  @Override
   public Distance of(double magnitude) {
     return new ImmutableDistance(magnitude, toBaseUnits(magnitude), this);
   }
@@ -52,14 +54,15 @@ public class DistanceUnit extends Unit {
     return new ImmutableDistance(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
+  @Override
+  public MutDistance mutable(double initialMagnitude) {
+    return new MutDistance(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
   // distance times force = torque
   // force times distance = energy
   public TorqueUnit mult(ForceUnit force) {
     return TorqueUnit.combine(this, force);
-  }
-
-  public MutDistance mutable(double initialMagnitude) {
-    return new MutDistance(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public Distance zero() {

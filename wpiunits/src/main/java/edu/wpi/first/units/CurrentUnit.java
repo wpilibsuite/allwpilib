@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableCurrent;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.mutable.MutCurrent;
 
 /**

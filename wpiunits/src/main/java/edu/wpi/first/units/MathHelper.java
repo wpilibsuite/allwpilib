@@ -6,6 +6,9 @@ package edu.wpi.first.units;
 
 import static edu.wpi.first.units.Units.Value;
 
+import edu.wpi.first.units.measure.Dimensionless;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Velocity;
 import java.util.function.DoubleFunction;
 
 public class MathHelper<U extends Unit, M extends Measure<U>> {

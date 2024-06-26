@@ -10,7 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelPositionsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelPositionsStruct;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.measure.Distance;
 import java.util.Objects;
 
 /** Represents the wheel positions for a differential drive drivetrain. */

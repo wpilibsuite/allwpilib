@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Time;
 import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.units.immutable.ImmutableTime;
+import edu.wpi.first.units.measure.Time;
 
 public final class MutTime extends MutableMeasureBase<TimeUnit, Time, MutTime> implements Time {
   public MutTime(double magnitude, double baseUnitMagnitude, TimeUnit unit) {

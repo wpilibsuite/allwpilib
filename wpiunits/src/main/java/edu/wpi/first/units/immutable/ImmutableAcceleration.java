@@ -4,14 +4,10 @@
 
 package edu.wpi.first.units.immutable;
 
-import edu.wpi.first.units.Acceleration;
 import edu.wpi.first.units.AccelerationUnit;
-import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.MathHelper;
-import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.Velocity;
-import java.util.Objects;
+import edu.wpi.first.units.measure.Acceleration;
 
 public final class ImmutableAcceleration<D extends Unit> implements Acceleration<D> {
   private final MathHelper<AccelerationUnit<D>, Acceleration<D>> mathHelper =
@@ -26,6 +22,10 @@ public final class ImmutableAcceleration<D extends Unit> implements Acceleration
     this.magnitude = magnitude;
     this.baseUnitMagnitude = baseUnitMagnitude;
     this.unit = unit;
+  }
+
+  public MathHelper<AccelerationUnit<D>, Acceleration<D>> getMathHelper() {
+    return mathHelper;
   }
 
   @Override
@@ -49,61 +49,7 @@ public final class ImmutableAcceleration<D extends Unit> implements Acceleration
   }
 
   @Override
-  public Acceleration<D> plus(Acceleration<D> other) {
-    return mathHelper.add(this, other);
-  }
-
-  @Override
-  public Acceleration<D> minus(Acceleration<D> other) {
-    return mathHelper.minus(this, other);
-  }
-
-  @Override
-  public Dimensionless divide(Acceleration<D> divisor) {
-    return mathHelper.divide(this, divisor);
-  }
-
-  @Override
-  public Acceleration<D> divide(double divisor) {
-    return mathHelper.divide(this, divisor);
-  }
-
-  @Override
-  public Acceleration<D> divide(Dimensionless divisor) {
-    return mathHelper.divide(this, divisor);
-  }
-
-  @Override
-  public Acceleration<D> times(double multiplier) {
-    return mathHelper.multiply(this, multiplier);
-  }
-
-  @Override
-  public Acceleration<D> times(Dimensionless multiplier) {
-    return mathHelper.multiply(this, multiplier);
-  }
-
-  @Override
-  public Velocity<D> times(Time time) {
-    return mathHelper.multiply(this, time, baseUnit().numerator()::of);
-  }
-
-  @Override
   public String toString() {
     return toShortString();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof ImmutableAcceleration<?> that)) return false;
-    return Double.compare(magnitude, that.magnitude) == 0
-        && Double.compare(baseUnitMagnitude, that.baseUnitMagnitude) == 0
-        && Objects.equals(unit, that.unit);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(magnitude, baseUnitMagnitude, unit);
   }
 }

@@ -7,6 +7,7 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Value;
 
 import edu.wpi.first.units.immutable.ImmutableFrequency;
+import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.mutable.MutFrequency;
 
 public class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {

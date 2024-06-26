@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableVelocity;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.mutable.MutVelocity;
 
 /**

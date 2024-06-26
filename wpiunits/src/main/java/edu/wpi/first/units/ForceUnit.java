@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.immutable.ImmutableForce;
+import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.mutable.MutForce;
 
 public class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {

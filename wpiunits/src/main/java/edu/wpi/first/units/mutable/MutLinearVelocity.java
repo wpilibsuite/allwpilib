@@ -4,22 +4,15 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.DistanceUnit;
-import edu.wpi.first.units.ImmutableLinearVelocity;
-import edu.wpi.first.units.LinearVelocity;
 import edu.wpi.first.units.LinearVelocityUnit;
-import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.immutable.ImmutableLinearVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 
 public final class MutLinearVelocity
-    extends MutableMeasureBase<VelocityUnit<DistanceUnit>, LinearVelocity, MutLinearVelocity>
+    extends MutableMeasureBase<LinearVelocityUnit, LinearVelocity, MutLinearVelocity>
     implements LinearVelocity {
   public MutLinearVelocity(double magnitude, double baseUnitMagnitude, LinearVelocityUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
-  }
-
-  @Override
-  public LinearVelocityUnit unit() {
-    return (LinearVelocityUnit) super.unit();
   }
 
   @Override

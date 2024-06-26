@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.Voltage;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.immutable.ImmutableVoltage;
+import edu.wpi.first.units.measure.Voltage;
 
 public final class MutVoltage extends MutableMeasureBase<VoltageUnit, Voltage, MutVoltage>
     implements Voltage {
