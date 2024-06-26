@@ -24,11 +24,8 @@ if(WITH_JAVA)
         NAMESPACE "edu/wpi/first/fields" ${JAVA_RESOURCES}
         OUTPUT_NAME fieldImages
     )
-
-    get_property(FIELD_IMAGES_JAR_FILE TARGET field_images_jar PROPERTY JAR_FILE)
-    install(FILES ${FIELD_IMAGES_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET field_images_jar PROPERTY FOLDER "java")
+    install_jar(field_images_jar DESTINATION ${java_lib_dest})
 endif()
 
 generate_resources(
