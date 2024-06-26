@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableMult;
 import edu.wpi.first.units.mutable.MutMult;
 import java.util.Objects;
 
@@ -71,12 +72,12 @@ public class MultUnit<A extends Unit, B extends Unit> extends Unit {
 
   @Override
   public Measure<? extends MultUnit<A, B>> of(double magnitude) {
-    return new Mult<>(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableMult<>(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Measure<? extends MultUnit<A, B>> ofBaseUnits(double baseUnitMagnitude) {
-    return new Mult<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new ImmutableMult<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override

@@ -6,25 +6,17 @@ package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.DimensionlessUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.immutable.ImmutableDimensionless;
 
-public class MutDimensionless extends Dimensionless
-    implements MutableMeasure<DimensionlessUnit, Dimensionless, MutDimensionless> {
+public final class MutDimensionless
+    extends MutableMeasureBase<DimensionlessUnit, Dimensionless, MutDimensionless>
+    implements Dimensionless {
   public MutDimensionless(double magnitude, double baseUnitMagnitude, DimensionlessUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutDimensionless mut_replace(double magnitude, DimensionlessUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-
-    return this;
-  }
-
-  @Override
   public Dimensionless copy() {
-    return new Dimensionless(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableDimensionless(magnitude, baseUnitMagnitude, unit);
   }
 }

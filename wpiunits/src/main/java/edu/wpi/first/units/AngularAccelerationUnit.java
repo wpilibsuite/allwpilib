@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableAngularAcceleration;
 import edu.wpi.first.units.mutable.MutAngularAcceleration;
 
 public class AngularAccelerationUnit extends AccelerationUnit<AngleUnit> {
@@ -30,7 +31,13 @@ public class AngularAccelerationUnit extends AccelerationUnit<AngleUnit> {
 
   @Override
   public AngularAcceleration of(double magnitude) {
-    return new AngularAcceleration(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableAngularAcceleration(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public AngularAcceleration ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableAngularAcceleration(
+        fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override

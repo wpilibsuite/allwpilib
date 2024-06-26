@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableDistance;
 import edu.wpi.first.units.mutable.MutDistance;
 
 /**
@@ -43,12 +44,12 @@ public class DistanceUnit extends Unit {
   }
 
   public Distance of(double magnitude) {
-    return new Distance(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableDistance(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Distance ofBaseUnits(double baseUnitMagnitude) {
-    return new Distance(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new ImmutableDistance(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   // distance times force = torque

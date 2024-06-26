@@ -4,13 +4,14 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.immutable.ImmutableVelocity;
 
-public class MutVelocity<D extends Unit> extends Velocity<D>
-    implements MutableMeasure<VelocityUnit<D>, Velocity<D>, MutVelocity<D>> {
+public class MutVelocity<D extends Unit>
+    extends MutableMeasureBase<VelocityUnit<D>, Velocity<D>, MutVelocity<D>>
+    implements Velocity<D> {
   public MutVelocity(double magnitude, double baseUnitMagnitude, VelocityUnit<D> unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
@@ -25,6 +26,6 @@ public class MutVelocity<D extends Unit> extends Velocity<D>
 
   @Override
   public Velocity<D> copy() {
-    return new Velocity<>(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableVelocity<>(magnitude, baseUnitMagnitude, unit);
   }
 }

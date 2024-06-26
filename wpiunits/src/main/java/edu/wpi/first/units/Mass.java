@@ -4,32 +4,20 @@
 
 package edu.wpi.first.units;
 
-public class Mass extends MeasureBase<MassUnit> {
-  public Mass(double magnitude, double baseUnitMagnitude, MassUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+import static edu.wpi.first.units.Units.Kilograms;
+
+public interface Mass extends Measure<MassUnit> {
+  MathHelper<MassUnit, Mass> mathHelper = new MathHelper<>(Kilograms::of);
 
   @Override
-  public Mass copy() {
-    return this;
+  Mass copy();
+
+  default Velocity<MassUnit> per(Time period) {
+    return mathHelper.divide(
+        this, period, VelocityUnit.combine(unit(), period.unit())::ofBaseUnits);
   }
 
-  public Velocity<MassUnit> per(Time period) {
-    return new Velocity<>(
-        magnitude / period.magnitude(),
-        baseUnitMagnitude / period.baseUnitMagnitude(),
-        unit.per(period.unit()));
-  }
-
-  public Velocity<MassUnit> per(TimeUnit period) {
-    return new Velocity<>(
-        magnitude / period.fromBaseUnits(1),
-        baseUnitMagnitude / period.toBaseUnits(1),
-        unit.per(period));
-  }
-
-  @Override
-  public MassUnit unit() {
-    return unit;
+  default Velocity<MassUnit> per(TimeUnit period) {
+    return VelocityUnit.combine(unit(), period).of(magnitude());
   }
 }

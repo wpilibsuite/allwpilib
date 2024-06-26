@@ -4,13 +4,7 @@
 
 package edu.wpi.first.units;
 
-public class MomentOfInertia extends MeasureBase<MomentOfInertiaUnit> {
-  protected MomentOfInertia(double magnitude, double baseUnitMagnitude, MomentOfInertiaUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
-
+public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
-  public Measure<MomentOfInertiaUnit> copy() {
-    return this;
-  }
+  Measure<MomentOfInertiaUnit> copy();
 }

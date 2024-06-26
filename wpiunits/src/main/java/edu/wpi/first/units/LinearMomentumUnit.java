@@ -4,6 +4,9 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableLinearMomentum;
+import edu.wpi.first.units.mutable.MutLinearMomentum;
+
 public class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {
   private static final CombinatoryUnitCache<MassUnit, LinearVelocityUnit, LinearMomentumUnit>
       cache = new CombinatoryUnitCache<>(LinearMomentumUnit::new);
@@ -25,8 +28,19 @@ public class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {
     return cache.combine(mass, velocity);
   }
 
+  @Override
   public LinearMomentum of(double magnitude) {
-    return new LinearMomentum(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableLinearMomentum(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public LinearMomentum ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableLinearMomentum(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutLinearMomentum mutable(double initialMagnitude) {
+    return new MutLinearMomentum(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public AngularMomentumUnit mult(DistanceUnit distance) {

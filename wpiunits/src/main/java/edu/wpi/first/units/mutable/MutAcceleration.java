@@ -6,26 +6,80 @@ package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.Acceleration;
 import edu.wpi.first.units.AccelerationUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Dimensionless;
+import edu.wpi.first.units.MathHelper;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.immutable.ImmutableAcceleration;
 
-public class MutAcceleration<D extends Unit> extends Acceleration<D>
-    implements MutableMeasure<AccelerationUnit<D>, Acceleration<D>, MutAcceleration<D>> {
-  protected MutAcceleration(double magnitude, double baseUnitMagnitude, AccelerationUnit<D> unit) {
+public class MutAcceleration<D extends Unit>
+    extends MutableMeasureBase<AccelerationUnit<D>, Acceleration<D>, MutAcceleration<D>>
+    implements Acceleration<D> {
+  private final MathHelper<AccelerationUnit<D>, Acceleration<D>> mathHelper =
+      new MathHelper<>(baseUnit()::of);
+
+  public MutAcceleration(double magnitude, double baseUnitMagnitude, AccelerationUnit<D> unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutAcceleration<D> mut_replace(double magnitude, AccelerationUnit<D> newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
+  public double magnitude() {
+    return magnitude;
+  }
 
-    return this;
+  @Override
+  public double baseUnitMagnitude() {
+    return baseUnitMagnitude;
+  }
+
+  @Override
+  public AccelerationUnit<D> unit() {
+    return unit;
   }
 
   @Override
   public Acceleration<D> copy() {
-    return new Acceleration<>(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableAcceleration<>(magnitude(), baseUnitMagnitude(), unit());
+  }
+
+  @Override
+  public Acceleration<D> plus(Acceleration<D> other) {
+    return mathHelper.add(this, other);
+  }
+
+  @Override
+  public Acceleration<D> minus(Acceleration<D> other) {
+    return mathHelper.minus(this, other);
+  }
+
+  @Override
+  public Dimensionless divide(Acceleration<D> divisor) {
+    return mathHelper.divide(this, divisor);
+  }
+
+  @Override
+  public Acceleration<D> divide(double divisor) {
+    return mathHelper.divide(this, divisor);
+  }
+
+  @Override
+  public Acceleration<D> divide(Dimensionless divisor) {
+    return mathHelper.divide(this, divisor);
+  }
+
+  @Override
+  public Acceleration<D> times(double multiplier) {
+    return mathHelper.multiply(this, multiplier);
+  }
+
+  @Override
+  public Acceleration<D> times(Dimensionless multiplier) {
+    return mathHelper.multiply(this, multiplier);
+  }
+
+  @Override
+  public Velocity<D> times(Time time) {
+    return mathHelper.multiply(this, time, baseUnit().numerator()::of);
   }
 }

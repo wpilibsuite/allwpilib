@@ -6,6 +6,9 @@ package edu.wpi.first.units;
 
 import static edu.wpi.first.units.Units.Value;
 
+import edu.wpi.first.units.immutable.ImmutableFrequency;
+import edu.wpi.first.units.mutable.MutFrequency;
+
 public class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
   private static final CombinatoryUnitCache<DimensionlessUnit, TimeUnit, FrequencyUnit> cache =
       new CombinatoryUnitCache<>(FrequencyUnit::new);
@@ -33,6 +36,16 @@ public class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
 
   @Override
   public Frequency of(double magnitude) {
-    return new Frequency(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableFrequency(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public Frequency ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableFrequency(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutFrequency mutable(double initialMagnitude) {
+    return new MutFrequency(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

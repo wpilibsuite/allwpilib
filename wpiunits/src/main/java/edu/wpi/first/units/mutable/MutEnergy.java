@@ -6,24 +6,16 @@ package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.Energy;
 import edu.wpi.first.units.EnergyUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.immutable.ImmutableEnergy;
 
-public class MutEnergy extends Energy implements MutableMeasure<EnergyUnit, Energy, MutEnergy> {
+public final class MutEnergy extends MutableMeasureBase<EnergyUnit, Energy, MutEnergy>
+    implements Energy {
   public MutEnergy(double magnitude, double baseUnitMagnitude, EnergyUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutEnergy mut_replace(double magnitude, EnergyUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-
-    return this;
-  }
-
-  @Override
   public Energy copy() {
-    return new Energy(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableEnergy(magnitude, baseUnitMagnitude, unit);
   }
 }

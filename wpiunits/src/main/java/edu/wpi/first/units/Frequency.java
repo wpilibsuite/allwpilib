@@ -7,24 +7,17 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Seconds;
 
-public class Frequency extends MeasureBase<FrequencyUnit> {
-  private static final MathHelper<FrequencyUnit, Frequency> mathHelper =
-      new MathHelper<>(Hertz::of);
-
-  public Frequency(double magnitude, double baseUnitMagnitude, FrequencyUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+public interface Frequency extends Measure<FrequencyUnit> {
+  MathHelper<FrequencyUnit, Frequency> mathHelper = new MathHelper<>(Hertz::of);
 
   @Override
-  public Frequency copy() {
-    return this;
-  }
+  Frequency copy();
 
-  public Dimensionless divide(Frequency other) {
+  default Dimensionless divide(Frequency other) {
     return mathHelper.divide(this, other);
   }
 
-  public Time inverse() {
-    return Seconds.of(1 / baseUnitMagnitude);
+  default Time inverse() {
+    return Seconds.of(1 / baseUnitMagnitude());
   }
 }

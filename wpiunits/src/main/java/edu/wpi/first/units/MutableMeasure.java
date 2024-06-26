@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.mutable.MutableMeasureBase;
+
 /**
  * @param <U> The dimension of measurement.
  * @param <Base> The base measure type.
@@ -66,5 +68,14 @@ public interface MutableMeasure<
 
   default MutSelf mut_divide(Dimensionless divisor) {
     return mut_divide(divisor.baseUnitMagnitude());
+  }
+
+  static <U extends Unit> MutableMeasure<U, ?, ?> ofRelativeUnits(double initialValue, U unit) {
+    return new MutableMeasureBase(initialValue, unit.toBaseUnits(initialValue), unit) {
+      @Override
+      public Measure copy() {
+        return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, unit);
+      }
+    };
   }
 }

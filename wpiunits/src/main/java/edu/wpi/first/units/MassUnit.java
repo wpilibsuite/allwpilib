@@ -4,6 +4,9 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableMass;
+import edu.wpi.first.units.mutable.MutMass;
+
 /**
  * Unit of mass dimension.
  *
@@ -34,7 +37,17 @@ public class MassUnit extends Unit {
   }
 
   public Mass of(double magnitude) {
-    return new Mass(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableMass(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public Measure<?> ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableMass(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutMass mutable(double initialMagnitude) {
+    return new MutMass(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public VelocityUnit<MassUnit> per(TimeUnit period) {

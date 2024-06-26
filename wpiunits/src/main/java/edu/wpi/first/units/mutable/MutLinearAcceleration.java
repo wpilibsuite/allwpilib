@@ -4,32 +4,20 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.AccelerationUnit;
-import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.LinearAcceleration;
 import edu.wpi.first.units.LinearAccelerationUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.immutable.ImmutableLinearAcceleration;
 
-public class MutLinearAcceleration extends LinearAcceleration
-    implements MutableMeasure<
-        AccelerationUnit<DistanceUnit>, LinearAcceleration, MutLinearAcceleration> {
+public final class MutLinearAcceleration
+    extends MutableMeasureBase<LinearAccelerationUnit, LinearAcceleration, MutLinearAcceleration>
+    implements LinearAcceleration {
   public MutLinearAcceleration(
       double magnitude, double baseUnitMagnitude, LinearAccelerationUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutLinearAcceleration mut_replace(
-      double magnitude, AccelerationUnit<DistanceUnit> newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-
-    return this;
-  }
-
-  @Override
   public LinearAcceleration copy() {
-    return new LinearAcceleration(magnitude, baseUnitMagnitude, unit());
+    return new ImmutableLinearAcceleration(magnitude, baseUnitMagnitude, unit());
   }
 }

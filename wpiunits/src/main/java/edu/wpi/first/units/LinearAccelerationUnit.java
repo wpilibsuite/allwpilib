@@ -4,6 +4,9 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableLinearAcceleration;
+import edu.wpi.first.units.mutable.MutLinearAcceleration;
+
 public class LinearAccelerationUnit extends AccelerationUnit<DistanceUnit> {
   private static final CombinatoryUnitCache<LinearVelocityUnit, TimeUnit, LinearAccelerationUnit>
       cache = new CombinatoryUnitCache<>(LinearAccelerationUnit::new);
@@ -32,7 +35,18 @@ public class LinearAccelerationUnit extends AccelerationUnit<DistanceUnit> {
 
   @Override
   public LinearAcceleration of(double magnitude) {
-    return new LinearAcceleration(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableLinearAcceleration(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public LinearAcceleration ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableLinearAcceleration(
+        fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutLinearAcceleration mutable(double initialMagnitude) {
+    return new MutLinearAcceleration(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public LinearVelocityUnit getUnit() {

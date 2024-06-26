@@ -6,17 +6,11 @@ package edu.wpi.first.units;
 
 import static edu.wpi.first.units.Units.Watts;
 
-public class Current extends MeasureBase<CurrentUnit> {
-  public Current(double magnitude, double baseUnitMagnitude, CurrentUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
-
+public interface Current extends Measure<CurrentUnit> {
   @Override
-  public Current copy() {
-    return this;
-  }
+  Current copy();
 
-  public Power times(Voltage voltage) {
-    return Watts.of(this.baseUnitMagnitude * voltage.baseUnitMagnitude());
+  default Power times(Voltage voltage) {
+    return Watts.ofBaseUnits(baseUnitMagnitude() * voltage.baseUnitMagnitude());
   }
 }

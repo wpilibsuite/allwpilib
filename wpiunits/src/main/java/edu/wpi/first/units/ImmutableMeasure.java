@@ -12,11 +12,8 @@ package edu.wpi.first.units;
  *
  * @param <U> the unit type of the measure
  */
-public final class ImmutableMeasure<U extends Unit> extends MeasureBase<U> {
-  ImmutableMeasure(double magnitude, double baseUnitMagnitude, U unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
-
+public record ImmutableMeasure<U extends Unit>(double magnitude, double baseUnitMagnitude, U unit)
+    implements Measure<U> {
   /**
    * Creates a new measure in the given unit with a magnitude equal to the given one in base units.
    *

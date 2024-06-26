@@ -7,25 +7,19 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Value;
 
-public class Dimensionless extends MeasureBase<DimensionlessUnit> {
-  private static final MathHelper<DimensionlessUnit, Dimensionless> mathHelper =
-      new MathHelper<>(Value::of);
-
-  public Dimensionless(double magnitude, double baseUnitMagnitude, DimensionlessUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+public interface Dimensionless extends Measure<DimensionlessUnit> {
+  MathHelper<DimensionlessUnit, Dimensionless> mathHelper = new MathHelper<>(Value::of);
 
   @Override
-  public Dimensionless copy() {
-    return this;
-  }
+  Dimensionless copy();
 
-  public <U extends Unit> Measure<U> times(Measure<U> other) {
+  @SuppressWarnings("unchecked")
+  default <U extends Unit> Measure<U> times(Measure<U> other) {
     return (Measure<U>)
-        other.unit().ofBaseUnits(other.baseUnitMagnitude() * this.baseUnitMagnitude);
+        other.unit().ofBaseUnits(other.baseUnitMagnitude() * this.baseUnitMagnitude());
   }
 
-  public Frequency divide(Time time) {
-    return Hertz.of(baseUnitMagnitude / time.baseUnitMagnitude());
+  default Frequency divide(Time time) {
+    return Hertz.of(baseUnitMagnitude() / time.baseUnitMagnitude());
   }
 }

@@ -7,49 +7,22 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-public class Voltage implements Measure<VoltageUnit> {
-  private static final MathHelper<VoltageUnit, Voltage> mathHelper = new MathHelper<>(Volts::of);
-
-  protected double magnitude;
-  protected double baseUnitMagnitude;
-  protected VoltageUnit unit;
-
-  public Voltage(double magnitude, double baseUnitMagnitude, VoltageUnit unit) {
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = baseUnitMagnitude;
-    this.unit = unit;
-  }
+public interface Voltage extends Measure<VoltageUnit> {
+  MathHelper<VoltageUnit, Voltage> mathHelper = new MathHelper<>(Volts::of);
 
   @Override
-  public Voltage copy() {
-    return this;
-  }
+  Voltage copy();
 
-  public Velocity<VoltageUnit> divide(Time period) {
+  default Velocity<VoltageUnit> divide(Time period) {
     return mathHelper.divide(this, period, Volts.per(Second)::of);
   }
 
-  public Velocity<VoltageUnit> per(TimeUnit period) {
-    return divide(period.of(1));
+  default Velocity<VoltageUnit> per(TimeUnit period) {
+    return mathHelper.divide(this, period);
   }
 
-  @Override
-  public double magnitude() {
-    return magnitude;
-  }
-
-  @Override
-  public double baseUnitMagnitude() {
-    return baseUnitMagnitude;
-  }
-
-  @Override
-  public VoltageUnit unit() {
-    return unit;
-  }
-
-  public <U extends Unit> Measure<U> divide(Measure<? extends PerUnit<VoltageUnit, U>> m) {
-    return ImmutableMeasure.ofBaseUnits(
-        baseUnitMagnitude / m.baseUnitMagnitude(), m.unit().denominator());
+  @SuppressWarnings("unchecked")
+  default <U extends Unit> Measure<U> divide(Measure<? extends PerUnit<VoltageUnit, U>> m) {
+    return (Measure<U>) mathHelper.divide(this, m, m.unit().denominator()::ofBaseUnits);
   }
 }

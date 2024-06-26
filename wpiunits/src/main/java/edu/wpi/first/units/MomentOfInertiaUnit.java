@@ -4,6 +4,9 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableMomentOfInertia;
+import edu.wpi.first.units.mutable.MutMomentOfInertia;
+
 public class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, AngularVelocityUnit> {
   private static final CombinatoryUnitCache<
           AngularMomentumUnit, AngularVelocityUnit, MomentOfInertiaUnit>
@@ -29,11 +32,16 @@ public class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, AngularVel
 
   @Override
   public MomentOfInertia of(double magnitude) {
-    return new MomentOfInertia(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableMomentOfInertia(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public MomentOfInertia ofBaseUnits(double baseUnitMagnitude) {
-    return new MomentOfInertia(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new ImmutableMomentOfInertia(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutMomentOfInertia mutable(double initialMagnitude) {
+    return new MutMomentOfInertia(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

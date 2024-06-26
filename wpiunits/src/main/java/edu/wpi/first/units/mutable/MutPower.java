@@ -4,26 +4,18 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Power;
 import edu.wpi.first.units.PowerUnit;
+import edu.wpi.first.units.immutable.ImmutablePower;
 
-public class MutPower extends Power implements MutableMeasure<PowerUnit, Power, MutPower> {
-  protected MutPower(double magnitude, double baseUnitMagnitude, PowerUnit unit) {
+public final class MutPower extends MutableMeasureBase<PowerUnit, Power, MutPower>
+    implements Power {
+  public MutPower(double magnitude, double baseUnitMagnitude, PowerUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutPower mut_replace(double magnitude, PowerUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-
-    return this;
-  }
-
-  @Override
   public Power copy() {
-    return new Power(magnitude, baseUnitMagnitude, unit);
+    return new ImmutablePower(magnitude, baseUnitMagnitude, unit);
   }
 }

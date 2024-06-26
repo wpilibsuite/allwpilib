@@ -4,28 +4,60 @@
 
 package edu.wpi.first.units;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 
-public class LinearAcceleration extends Acceleration<DistanceUnit> {
-  private static final MathHelper<AccelerationUnit<DistanceUnit>, LinearAcceleration> mathHelper =
+public interface LinearAcceleration extends Acceleration<DistanceUnit> {
+  MathHelper<AccelerationUnit<DistanceUnit>, LinearAcceleration> mathHelper =
       new MathHelper<>(MetersPerSecondPerSecond::of);
 
-  public LinearAcceleration(
-      double magnitude, double baseUnitMagnitude, LinearAccelerationUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
+  @Override
+  LinearAcceleration copy();
+
+  @Override
+  LinearAccelerationUnit unit();
+
+  default double in(LinearAccelerationUnit otherUnit) {
+    return otherUnit.fromBaseUnits(baseUnitMagnitude());
   }
 
   @Override
-  public LinearAcceleration copy() {
-    return this;
-  }
-
-  public double in(LinearAccelerationUnit otherUnit) {
-    return otherUnit.fromBaseUnits(baseUnitMagnitude);
+  default LinearVelocity times(Time time) {
+    return mathHelper.multiply(this, time, MetersPerSecond::of);
   }
 
   @Override
-  public LinearAccelerationUnit unit() {
-    return (LinearAccelerationUnit) unit;
+  default LinearAcceleration times(Dimensionless multiplier) {
+    return mathHelper.multiply(this, multiplier);
+  }
+
+  @Override
+  default LinearAcceleration times(double multiplier) {
+    return mathHelper.multiply(this, multiplier);
+  }
+
+  @Override
+  default LinearAcceleration divide(Dimensionless divisor) {
+    return mathHelper.divide(this, divisor);
+  }
+
+  @Override
+  default LinearAcceleration divide(double divisor) {
+    return mathHelper.divide(this, divisor);
+  }
+
+  @Override
+  default Dimensionless divide(Acceleration<DistanceUnit> divisor) {
+    return mathHelper.divide(this, divisor);
+  }
+
+  @Override
+  default Acceleration<DistanceUnit> minus(Acceleration<DistanceUnit> other) {
+    return mathHelper.minus(this, other);
+  }
+
+  @Override
+  default Acceleration<DistanceUnit> plus(Acceleration<DistanceUnit> other) {
+    return mathHelper.add(this, other);
   }
 }

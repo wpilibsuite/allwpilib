@@ -8,50 +8,39 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
-public class Distance extends MeasureBase<DistanceUnit> {
-  private static final MathHelper<DistanceUnit, Distance> mathHelper = new MathHelper<>(Meters::of);
-
-  public Distance(double magnitude, double baseUnitMagnitude, DistanceUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+public interface Distance extends Measure<DistanceUnit> {
+  MathHelper<DistanceUnit, Distance> mathHelper = new MathHelper<>(Meters::of);
 
   @Override
-  public Distance copy() {
-    return this;
+  Distance copy();
+
+  default LinearVelocity per(Time period) {
+    return new ImmutableLinearVelocity(
+        magnitude() / period.magnitude(),
+        baseUnitMagnitude() / period.baseUnitMagnitude(),
+        this.unit().per(period.unit()));
   }
 
-  public LinearVelocity per(Time period) {
-    return new LinearVelocity(
-        magnitude / period.magnitude(),
-        baseUnitMagnitude / period.baseUnitMagnitude(),
-        this.unit.per(period.unit()));
+  default LinearVelocity per(TimeUnit period) {
+    return new ImmutableLinearVelocity(
+        magnitude() / period.fromBaseUnits(1),
+        baseUnitMagnitude() / period.toBaseUnits(1),
+        this.unit().per(period));
   }
 
-  public LinearVelocity per(TimeUnit period) {
-    return new LinearVelocity(
-        magnitude / period.fromBaseUnits(1),
-        baseUnitMagnitude / period.toBaseUnits(1),
-        this.unit.per(period));
-  }
-
-  @Override
-  public DistanceUnit unit() {
-    return unit;
-  }
-
-  public Distance plus(Distance other) {
+  default Distance plus(Distance other) {
     return mathHelper.add(this, other);
   }
 
-  public Distance minus(Distance other) {
+  default Distance minus(Distance other) {
     return mathHelper.minus(this, other);
   }
 
-  public Distance times(double scalar) {
+  default Distance times(double scalar) {
     return mathHelper.multiply(this, scalar);
   }
 
-  public <U extends Unit> Measure<U> times(Measure<? extends PerUnit<U, DistanceUnit>> term) {
+  default <U extends Unit> Measure<U> times(Measure<? extends PerUnit<U, DistanceUnit>> term) {
     return mathHelper.multiply(
         this,
         term,
@@ -61,23 +50,23 @@ public class Distance extends MeasureBase<DistanceUnit> {
         });
   }
 
-  public LinearVelocity times(Frequency frequency) {
+  default LinearVelocity times(Frequency frequency) {
     return mathHelper.multiply(this, frequency, MetersPerSecond::of);
   }
 
-  public Distance divide(double divisor) {
+  default Distance divide(double divisor) {
     return mathHelper.divide(this, divisor);
   }
 
-  public Distance negate() {
+  default Distance negate() {
     return mathHelper.negate(this);
   }
 
-  public Distance divide(Dimensionless divisor) {
+  default Distance divide(Dimensionless divisor) {
     return mathHelper.divide(this, divisor);
   }
 
-  public Time divide(LinearVelocity velocity) {
+  default Time divide(LinearVelocity velocity) {
     return mathHelper.divide(this, velocity, Seconds::of);
   }
 }

@@ -11,8 +11,6 @@ import java.util.Objects;
  *
  * <p>This is the base class for units. Actual units (such as {@link Units#Grams} and {@link
  * Units#Meters}) can be found in the {@link Units} class.
- *
- * @param <U> the self type, e.g. {@code class SomeUnit extends Unit<SomeUnit>}
  */
 public abstract class Unit {
   private final UnaryFunction m_toBaseConverter;

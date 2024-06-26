@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableCurrent;
+
 /**
  * Unit of electric current dimension.
  *
@@ -43,11 +45,11 @@ public class CurrentUnit extends Unit {
   }
 
   public Current of(double magnitude) {
-    return new Current(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableCurrent(magnitude, toBaseUnits(magnitude), this);
   }
 
   public Current ofBaseUnits(double baseUnitMagnitude) {
-    return new Current(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new ImmutableCurrent(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   public double convertFrom(double magnitude, CurrentUnit otherUnit) {

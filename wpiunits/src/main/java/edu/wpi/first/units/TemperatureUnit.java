@@ -4,6 +4,9 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableTemperature;
+import edu.wpi.first.units.mutable.MutTemperature;
+
 /**
  * Unit of temperature dimension.
  *
@@ -28,7 +31,17 @@ public class TemperatureUnit extends Unit {
   }
 
   public Temperature of(double magnitude) {
-    return new Temperature(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableTemperature(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public Temperature ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableTemperature(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutTemperature mutable(double initialMagnitude) {
+    return new MutTemperature(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public double convertFrom(double magnitude, TemperatureUnit otherUnit) {

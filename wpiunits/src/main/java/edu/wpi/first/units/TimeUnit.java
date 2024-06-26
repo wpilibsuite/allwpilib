@@ -4,6 +4,9 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableTime;
+import edu.wpi.first.units.mutable.MutTime;
+
 /**
  * Unit of time dimension.
  *
@@ -49,7 +52,18 @@ public class TimeUnit extends Unit {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
+  @Override
   public Time of(double magnitude) {
-    return new Time(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableTime(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public Time ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableTime(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutTime mutable(double initialMagnitude) {
+    return new MutTime(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

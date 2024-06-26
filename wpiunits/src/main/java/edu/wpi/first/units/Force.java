@@ -8,43 +8,37 @@ import static edu.wpi.first.units.Units.Joules;
 import static edu.wpi.first.units.Units.Newtons;
 import static edu.wpi.first.units.Units.Seconds;
 
-public class Force extends MeasureBase<ForceUnit> {
-  private static final MathHelper<ForceUnit, Force> mathHelper = new MathHelper<>(Newtons::of);
-
-  public Force(double magnitude, double baseUnitMagnitude, ForceUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+public interface Force extends Measure<ForceUnit> {
+  MathHelper<ForceUnit, Force> mathHelper = new MathHelper<>(Newtons::of);
 
   @Override
-  public Force copy() {
-    return this;
-  }
+  Force copy();
 
-  public Force plus(Force other) {
+  default Force plus(Force other) {
     return mathHelper.add(this, other);
   }
 
-  public Force minus(Force other) {
+  default Force minus(Force other) {
     return mathHelper.minus(this, other);
   }
 
-  public Dimensionless divide(Force other) {
+  default Dimensionless divide(Force other) {
     return mathHelper.divide(this, other);
   }
 
-  public Velocity<ForceUnit> divide(Time time) {
+  default Velocity<ForceUnit> divide(Time time) {
     return mathHelper.divide(this, time, VelocityUnit.combine(baseUnit(), Seconds)::of);
   }
 
-  public Velocity<ForceUnit> per(TimeUnit time) {
+  default Velocity<ForceUnit> per(TimeUnit time) {
     return divide(time.of(1));
   }
 
-  public Energy mult(Distance distance) {
+  default Energy mult(Distance distance) {
     return mathHelper.multiply(this, distance, Joules::of);
   }
 
-  public Energy mult(DistanceUnit distance) {
+  default Energy mult(DistanceUnit distance) {
     return mult(distance.of(1));
   }
 }

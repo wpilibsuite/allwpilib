@@ -4,17 +4,11 @@
 
 package edu.wpi.first.units;
 
-public class Velocity<D extends Unit> extends MeasureBase<VelocityUnit<D>> {
-  public Velocity(double magnitude, double baseUnitMagnitude, VelocityUnit<D> unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
-
+public interface Velocity<D extends Unit> extends Measure<VelocityUnit<D>> {
   @Override
-  public Velocity<D> copy() {
-    return this;
-  }
+  Velocity<D> copy();
 
-  public double in(VelocityUnit<? extends D> otherUnit) {
-    return otherUnit.fromBaseUnits(baseUnitMagnitude);
+  default double in(VelocityUnit<? extends D> otherUnit) {
+    return otherUnit.fromBaseUnits(baseUnitMagnitude());
   }
 }

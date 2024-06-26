@@ -29,7 +29,7 @@ public class LinearVelocityUnit extends VelocityUnit<DistanceUnit> {
 
   @Override
   public LinearVelocity of(double magnitude) {
-    return new LinearVelocity(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableLinearVelocity(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override

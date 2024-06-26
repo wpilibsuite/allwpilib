@@ -9,7 +9,7 @@ import edu.wpi.first.units.MultUnit;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Unit;
 
-public class MutMult<A extends Unit, B extends Unit> extends Mult<A, B>
+public final class MutMult<A extends Unit, B extends Unit> extends Mult<A, B>
     implements MutableMeasure<MultUnit<A, B>, Mult<A, B>, MutMult<A, B>> {
   public MutMult(double magnitude, double baseUnitMagnitude, MultUnit<A, B> unit) {
     super(magnitude, baseUnitMagnitude, unit);

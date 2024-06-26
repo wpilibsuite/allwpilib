@@ -6,25 +6,17 @@ package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.LinearMomentum;
 import edu.wpi.first.units.LinearMomentumUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.immutable.ImmutableLinearMomentum;
 
-public class MutLinearMomentum extends LinearMomentum
-    implements MutableMeasure<LinearMomentumUnit, LinearMomentum, MutLinearMomentum> {
-  protected MutLinearMomentum(double magnitude, double baseUnitMagnitude, LinearMomentumUnit unit) {
+public final class MutLinearMomentum
+    extends MutableMeasureBase<LinearMomentumUnit, LinearMomentum, MutLinearMomentum>
+    implements LinearMomentum {
+  public MutLinearMomentum(double magnitude, double baseUnitMagnitude, LinearMomentumUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutLinearMomentum mut_replace(double magnitude, LinearMomentumUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-
-    return this;
-  }
-
-  @Override
   public LinearMomentum copy() {
-    return new LinearMomentum(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableLinearMomentum(magnitude, baseUnitMagnitude, unit);
   }
 }

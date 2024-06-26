@@ -7,35 +7,57 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
-public class AngularAcceleration extends Acceleration<AngleUnit> {
-  private static final MathHelper<AccelerationUnit<AngleUnit>, AngularAcceleration> mathHelper =
+public interface AngularAcceleration extends Acceleration<AngleUnit> {
+  MathHelper<AccelerationUnit<AngleUnit>, AngularAcceleration> mathHelper =
       new MathHelper<>(RadiansPerSecondPerSecond::of);
 
-  public AngularAcceleration(
-      double magnitude, double baseUnitMagnitude, AngularAccelerationUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
+  @Override
+  AngularAcceleration copy();
+
+  @Override
+  AngularAccelerationUnit unit();
+
+  default double in(AngularAccelerationUnit otherUnit) {
+    return otherUnit.fromBaseUnits(baseUnitMagnitude());
   }
 
   @Override
-  public AngularAcceleration copy() {
-    return this;
-  }
-
-  public Dimensionless divide(AngularAcceleration other) {
-    return mathHelper.divide(this, other);
+  default AngularAcceleration plus(Acceleration<AngleUnit> other) {
+    return mathHelper.add(this, other);
   }
 
   @Override
-  public AngularVelocity times(Time period) {
-    return mathHelper.multiply(this, period, RadiansPerSecond::of);
+  default AngularAcceleration minus(Acceleration<AngleUnit> other) {
+    return mathHelper.minus(this, other);
   }
 
   @Override
-  public AngularAccelerationUnit unit() {
-    return (AngularAccelerationUnit) unit;
+  default Dimensionless divide(Acceleration<AngleUnit> divisor) {
+    return mathHelper.divide(this, divisor);
   }
 
-  public double in(AngularAccelerationUnit otherUnit) {
-    return otherUnit.fromBaseUnits(baseUnitMagnitude);
+  @Override
+  default AngularAcceleration divide(double divisor) {
+    return mathHelper.divide(this, divisor);
+  }
+
+  @Override
+  default AngularAcceleration divide(Dimensionless divisor) {
+    return mathHelper.divide(this, divisor);
+  }
+
+  @Override
+  default AngularAcceleration times(double multiplier) {
+    return mathHelper.multiply(this, multiplier);
+  }
+
+  @Override
+  default AngularAcceleration times(Dimensionless multiplier) {
+    return mathHelper.multiply(this, multiplier);
+  }
+
+  @Override
+  default AngularVelocity times(Time time) {
+    return mathHelper.multiply(this, time, RadiansPerSecond::of);
   }
 }

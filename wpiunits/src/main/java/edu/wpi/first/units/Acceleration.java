@@ -4,52 +4,23 @@
 
 package edu.wpi.first.units;
 
-public class Acceleration<D extends Unit> extends MeasureBase<AccelerationUnit<D>> {
-  private final MathHelper<AccelerationUnit<D>, Acceleration<D>> mathHelper =
-      new MathHelper<>(baseUnit()::of);
-
-  public Acceleration(double magnitude, double baseUnitMagnitude, AccelerationUnit<D> unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
-
+public interface Acceleration<D extends Unit> extends Measure<AccelerationUnit<D>> {
   @Override
-  public Acceleration<D> copy() {
-    return this;
-  }
+  Acceleration<D> copy();
 
-  public Acceleration<D> zero() {
-    return mathHelper.zero();
-  }
+  Acceleration<D> plus(Acceleration<D> other);
 
-  public Acceleration<D> plus(Acceleration<D> other) {
-    return mathHelper.add(this, other);
-  }
+  Acceleration<D> minus(Acceleration<D> other);
 
-  public Acceleration<D> minus(Acceleration<D> other) {
-    return mathHelper.minus(this, other);
-  }
+  Dimensionless divide(Acceleration<D> divisor);
 
-  public Dimensionless divide(Acceleration<D> divisor) {
-    return mathHelper.divide(this, divisor);
-  }
+  Acceleration<D> divide(double divisor);
 
-  public Acceleration<D> divide(double divisor) {
-    return mathHelper.divide(this, divisor);
-  }
+  Acceleration<D> divide(Dimensionless divisor);
 
-  public Acceleration<D> divide(Dimensionless divisor) {
-    return mathHelper.divide(this, divisor);
-  }
+  Acceleration<D> times(double multiplier);
 
-  public Acceleration<D> times(double multiplier) {
-    return mathHelper.multiply(this, multiplier);
-  }
+  Acceleration<D> times(Dimensionless multiplier);
 
-  public Acceleration<D> times(Dimensionless multiplier) {
-    return mathHelper.multiply(this, multiplier);
-  }
-
-  public Velocity<D> times(Time time) {
-    return mathHelper.multiply(this, time, baseUnit().numerator()::of);
-  }
+  Velocity<D> times(Time time);
 }

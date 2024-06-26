@@ -7,31 +7,25 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Seconds;
 
-public class Time extends MeasureBase<TimeUnit> {
-  private static final MathHelper<TimeUnit, Time> mathHelper = new MathHelper<>(Seconds::of);
-
-  public Time(double magnitude, double baseUnitMagnitude, TimeUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+public interface Time extends Measure<TimeUnit> {
+  MathHelper<TimeUnit, Time> mathHelper = new MathHelper<>(Seconds::of);
 
   @Override
-  public Time copy() {
-    return this;
+  Time copy();
+
+  default Frequency inverse() {
+    return Hertz.of(1 / baseUnitMagnitude());
   }
 
-  public Frequency inverse() {
-    return Hertz.of(1 / baseUnitMagnitude);
-  }
-
-  public Dimensionless divide(Time other) {
+  default Dimensionless divide(Time other) {
     return mathHelper.divide(this, other);
   }
 
-  public Time plus(Time other) {
+  default Time plus(Time other) {
     return mathHelper.add(this, other);
   }
 
-  public Time minus(Time other) {
+  default Time minus(Time other) {
     return mathHelper.minus(this, other);
   }
 }

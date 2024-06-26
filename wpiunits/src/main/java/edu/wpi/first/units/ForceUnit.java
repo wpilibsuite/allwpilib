@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableForce;
 import edu.wpi.first.units.mutable.MutForce;
 
 public class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {
@@ -48,12 +49,12 @@ public class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {
 
   @Override
   public Force of(double magnitude) {
-    return new Force(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableForce(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Force ofBaseUnits(double baseUnitMagnitude) {
-    return new Force(toBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new ImmutableForce(toBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override

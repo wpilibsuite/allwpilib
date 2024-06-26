@@ -4,6 +4,9 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableTorque;
+import edu.wpi.first.units.mutable.MutTorque;
+
 public class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   private static final CombinatoryUnitCache<DistanceUnit, ForceUnit, TorqueUnit> cache =
       new CombinatoryUnitCache<>(TorqueUnit::new);
@@ -25,7 +28,18 @@ public class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
     return cache.combine(distance, force);
   }
 
+  @Override
   public Torque of(double magnitude) {
-    return new Torque(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableTorque(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public Torque ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableTorque(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutTorque mutable(double initialMagnitude) {
+    return new MutTorque(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

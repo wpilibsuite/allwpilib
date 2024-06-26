@@ -4,28 +4,21 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularVelocity;
 import edu.wpi.first.units.AngularVelocityUnit;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.immutable.ImmutableAngularVelocity;
 
-public class MutAngularVelocity extends AngularVelocity
-    implements MutableMeasure<VelocityUnit<AngleUnit>, AngularVelocity, MutAngularVelocity> {
+public final class MutAngularVelocity
+    extends MutableMeasureBase<
+        AngularVelocityUnit, Measure<AngularVelocityUnit>, MutAngularVelocity>
+    implements AngularVelocity {
   public MutAngularVelocity(double magnitude, double baseUnitMagnitude, AngularVelocityUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutAngularVelocity mut_replace(double magnitude, VelocityUnit<AngleUnit> newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-    return null;
-  }
-
-  @Override
   public AngularVelocity copy() {
-    return new AngularVelocity(magnitude, baseUnitMagnitude, unit());
+    return new ImmutableAngularVelocity(magnitude, baseUnitMagnitude, unit());
   }
 }

@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableEnergy;
 import edu.wpi.first.units.mutable.MutEnergy;
 
 /**
@@ -40,12 +41,12 @@ public class EnergyUnit extends Unit {
 
   @Override
   public Energy of(double magnitude) {
-    return new Energy(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableEnergy(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Energy ofBaseUnits(double baseUnitMagnitude) {
-    return new Energy(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new ImmutableEnergy(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override

@@ -7,6 +7,9 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Joules;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.units.immutable.ImmutablePower;
+import edu.wpi.first.units.mutable.MutPower;
+
 /**
  * Unit of power dimension.
  *
@@ -70,7 +73,17 @@ public class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
 
   @Override
   public Power of(double magnitude) {
-    return new Power(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutablePower(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public Power ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutablePower(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutPower mutable(double initialMagnitude) {
+    return new MutPower(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public double convertFrom(double magnitude, PowerUnit otherUnit) {

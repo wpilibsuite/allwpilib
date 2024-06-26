@@ -6,29 +6,21 @@ package edu.wpi.first.units;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-public class LinearVelocity extends Velocity<DistanceUnit> {
-  private static final MathHelper<VelocityUnit<DistanceUnit>, LinearVelocity> mathHelper =
+public interface LinearVelocity extends Velocity<DistanceUnit> {
+  MathHelper<VelocityUnit<DistanceUnit>, LinearVelocity> mathHelper =
       new MathHelper<>(MetersPerSecond::of);
 
-  public LinearVelocity(double magnitude, double baseUnitMagnitude, LinearVelocityUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+  @Override
+  LinearVelocityUnit unit();
 
   @Override
-  public LinearVelocity copy() {
-    return this;
+  LinearVelocity copy();
+
+  default double in(LinearVelocityUnit otherUnit) {
+    return otherUnit.fromBaseUnits(baseUnitMagnitude());
   }
 
-  public double in(LinearVelocityUnit otherUnit) {
-    return otherUnit.fromBaseUnits(baseUnitMagnitude);
-  }
-
-  public Distance times(Time period) {
+  default Distance times(Time period) {
     return mathHelper.multiply(this, period, unit().numerator()::ofBaseUnits);
-  }
-
-  @Override
-  public LinearVelocityUnit unit() {
-    return (LinearVelocityUnit) unit;
   }
 }

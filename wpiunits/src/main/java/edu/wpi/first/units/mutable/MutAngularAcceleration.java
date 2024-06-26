@@ -4,30 +4,20 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.AccelerationUnit;
-import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularAcceleration;
 import edu.wpi.first.units.AngularAccelerationUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.immutable.ImmutableAngularAcceleration;
 
-public class MutAngularAcceleration extends AngularAcceleration
-    implements MutableMeasure<
-        AccelerationUnit<AngleUnit>, AngularAcceleration, MutAngularAcceleration> {
+public final class MutAngularAcceleration
+    extends MutableMeasureBase<AngularAccelerationUnit, AngularAcceleration, MutAngularAcceleration>
+    implements AngularAcceleration {
   public MutAngularAcceleration(
       double magnitude, double baseUnitMagnitude, AngularAccelerationUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutAngularAcceleration mut_replace(double magnitude, AccelerationUnit<AngleUnit> newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = newUnit.toBaseUnits(magnitude);
-    return this;
-  }
-
-  @Override
   public AngularAcceleration copy() {
-    return new AngularAcceleration(magnitude, baseUnitMagnitude, unit());
+    return new ImmutableAngularAcceleration(magnitude(), baseUnitMagnitude(), unit());
   }
 }

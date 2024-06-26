@@ -30,11 +30,11 @@ public class MathHelper<U extends Unit, M extends Measure<U>> {
     return constructor.apply(0 - measure.baseUnitMagnitude());
   }
 
-  public M add(M first, M second) {
+  public M add(M first, Measure<? extends U> second) {
     return constructor.apply(first.baseUnitMagnitude() + second.baseUnitMagnitude());
   }
 
-  public M minus(M first, M second) {
+  public M minus(M first, Measure<? extends U> second) {
     return constructor.apply(first.baseUnitMagnitude() - second.baseUnitMagnitude());
   }
 
@@ -46,13 +46,18 @@ public class MathHelper<U extends Unit, M extends Measure<U>> {
     return constructor.apply(measure.baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
-  public Dimensionless divide(M dividend, M divisor) {
+  public Dimensionless divide(M dividend, Measure<? extends U> divisor) {
     return divide(dividend, divisor, Value::of);
   }
 
   public <VU extends Unit, VM extends Measure<VU>> VM divide(
       M dividend, Time divisor, DoubleFunction<? extends VM> ctor) {
     return ctor.apply(dividend.baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  public <VU extends Unit, VM extends Measure<VU>> Velocity<U> divide(
+      M dividend, TimeUnit divisor) {
+    return VelocityUnit.combine(dividend.unit(), divisor).ofBaseUnits(dividend.baseUnitMagnitude());
   }
 
   public <ResultUnit extends Unit, Result extends Measure<ResultUnit>> Result divide(

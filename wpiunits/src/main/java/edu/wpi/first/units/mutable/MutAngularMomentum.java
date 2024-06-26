@@ -6,24 +6,17 @@ package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.AngularMomentum;
 import edu.wpi.first.units.AngularMomentumUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.immutable.ImmutableAngularMomentum;
 
-public class MutAngularMomentum extends AngularMomentum
-    implements MutableMeasure<AngularMomentumUnit, AngularMomentum, MutAngularMomentum> {
+public final class MutAngularMomentum
+    extends MutableMeasureBase<AngularMomentumUnit, AngularMomentum, MutAngularMomentum>
+    implements AngularMomentum {
   public MutAngularMomentum(double magnitude, double baseUnitMagnitude, AngularMomentumUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutAngularMomentum mut_replace(double magnitude, AngularMomentumUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-    return this;
-  }
-
-  @Override
   public AngularMomentum copy() {
-    return new AngularMomentum(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableAngularMomentum(magnitude, baseUnitMagnitude, unit);
   }
 }

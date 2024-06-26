@@ -4,18 +4,10 @@
 
 package edu.wpi.first.units;
 
-public class AngularMomentum extends MeasureBase<AngularMomentumUnit> {
-  public AngularMomentum(double magnitude, double baseUnitMagnitude, AngularMomentumUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+public interface AngularMomentum extends Measure<AngularMomentumUnit> {
+  @Override
+  AngularMomentum copy();
 
   @Override
-  public AngularMomentum copy() {
-    return this;
-  }
-
-  @Override
-  public AngularMomentumUnit unit() {
-    return unit;
-  }
+  AngularMomentumUnit unit();
 }

@@ -4,25 +4,18 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.immutable.ImmutableVoltage;
 
-public class MutVoltage extends Voltage
-    implements MutableMeasure<VoltageUnit, Voltage, MutVoltage> {
+public final class MutVoltage extends MutableMeasureBase<VoltageUnit, Voltage, MutVoltage>
+    implements Voltage {
   public MutVoltage(double magnitude, double baseUnitMagnitude, VoltageUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
-  public MutVoltage mut_replace(double value, VoltageUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = value;
-    this.baseUnitMagnitude = unit.toBaseUnits(value);
-    return this;
-  }
-
   @Override
   public Voltage copy() {
-    return new Voltage(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableVoltage(magnitude, baseUnitMagnitude, unit);
   }
 }

@@ -7,31 +7,25 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Joules;
 import static edu.wpi.first.units.Units.Watts;
 
-public class Energy extends MeasureBase<EnergyUnit> {
-  private static final MathHelper<EnergyUnit, Energy> mathHelper = new MathHelper<>(Joules::of);
-
-  public Energy(double magnitude, double baseUnitMagnitude, EnergyUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+public interface Energy extends Measure<EnergyUnit> {
+  MathHelper<EnergyUnit, Energy> mathHelper = new MathHelper<>(Joules::of);
 
   @Override
-  public Energy copy() {
-    return this;
-  }
+  Energy copy();
 
-  public Energy plus(Energy other) {
+  default Energy plus(Energy other) {
     return mathHelper.add(this, other);
   }
 
-  public Energy minus(Energy other) {
+  default Energy minus(Energy other) {
     return mathHelper.minus(this, other);
   }
 
-  public Dimensionless divide(Energy other) {
+  default Dimensionless divide(Energy other) {
     return mathHelper.divide(this, other);
   }
 
-  public Power divide(Time period) {
+  default Power divide(Time period) {
     return mathHelper.divide(this, period, Watts::of);
   }
 }

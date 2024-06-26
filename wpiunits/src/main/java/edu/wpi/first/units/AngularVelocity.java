@@ -5,40 +5,33 @@
 package edu.wpi.first.units;
 
 import static edu.wpi.first.units.Units.Hertz;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
-public class AngularVelocity extends Velocity<AngleUnit> {
-  private static final MathHelper<VelocityUnit<AngleUnit>, AngularVelocity> mathHelper =
+public interface AngularVelocity extends Velocity<AngleUnit> {
+  MathHelper<VelocityUnit<AngleUnit>, AngularVelocity> mathHelper =
       new MathHelper<>(RadiansPerSecond::of);
 
-  public AngularVelocity(double magnitude, double baseUnitMagnitude, AngularVelocityUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
-
   @Override
-  public AngularVelocity copy() {
-    return this;
+  AngularVelocity copy();
+
+  default double in(AngularVelocityUnit otherUnit) {
+    return otherUnit.fromBaseUnits(baseUnitMagnitude());
   }
 
-  public double in(AngularVelocityUnit otherUnit) {
-    return otherUnit.fromBaseUnits(baseUnitMagnitude);
+  default Angle times(Time period) {
+    return mathHelper.multiply(this, period, Radians::of);
   }
 
-  public Angle times(Time period) {
-    return baseUnit().getUnit().ofBaseUnits(baseUnitMagnitude * period.baseUnitMagnitude());
-  }
-
-  public AngularAcceleration divide(Time period) {
+  default AngularAcceleration divide(Time period) {
     return mathHelper.divide(this, period, RadiansPerSecondPerSecond::of);
   }
 
-  public Frequency asFrequency() {
-    return Hertz.of(baseUnitMagnitude);
+  default Frequency asFrequency() {
+    return Hertz.of(baseUnitMagnitude());
   }
 
   @Override
-  public AngularVelocityUnit unit() {
-    return (AngularVelocityUnit) unit;
-  }
+  AngularVelocityUnit unit();
 }

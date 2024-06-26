@@ -6,25 +6,16 @@ package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.Current;
 import edu.wpi.first.units.CurrentUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.immutable.ImmutableCurrent;
 
-public class MutCurrent extends Current
-    implements MutableMeasure<CurrentUnit, Current, MutCurrent> {
+public final class MutCurrent extends MutableMeasureBase<CurrentUnit, Current, MutCurrent>
+    implements Current {
   public MutCurrent(double magnitude, double baseUnitMagnitude, CurrentUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutCurrent mut_replace(double magnitude, CurrentUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-
-    return this;
-  }
-
-  @Override
   public Current copy() {
-    return new Current(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableCurrent(magnitude, baseUnitMagnitude, unit);
   }
 }

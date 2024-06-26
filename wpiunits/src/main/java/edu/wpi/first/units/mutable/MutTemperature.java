@@ -4,27 +4,19 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.TemperatureUnit;
+import edu.wpi.first.units.immutable.ImmutableTemperature;
 
-public class MutTemperature extends Temperature
-    implements MutableMeasure<TemperatureUnit, Temperature, MutTemperature> {
-  protected MutTemperature(double magnitude, double baseUnitMagnitude, TemperatureUnit unit) {
+public final class MutTemperature
+    extends MutableMeasureBase<TemperatureUnit, Temperature, MutTemperature>
+    implements Temperature {
+  public MutTemperature(double magnitude, double baseUnitMagnitude, TemperatureUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutTemperature mut_replace(double magnitude, TemperatureUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-
-    return this;
-  }
-
-  @Override
   public Temperature copy() {
-    return new Temperature(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableTemperature(magnitude, baseUnitMagnitude, unit);
   }
 }

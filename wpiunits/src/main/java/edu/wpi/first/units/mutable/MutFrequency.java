@@ -6,25 +6,16 @@ package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.Frequency;
 import edu.wpi.first.units.FrequencyUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.immutable.ImmutableFrequency;
 
-public class MutFrequency extends Frequency
-    implements MutableMeasure<FrequencyUnit, Frequency, MutFrequency> {
-  protected MutFrequency(double magnitude, double baseUnitMagnitude, FrequencyUnit unit) {
+public final class MutFrequency extends MutableMeasureBase<FrequencyUnit, Frequency, MutFrequency>
+    implements Frequency {
+  public MutFrequency(double magnitude, double baseUnitMagnitude, FrequencyUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutFrequency mut_replace(double magnitude, FrequencyUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-
-    return this;
-  }
-
-  @Override
   public Frequency copy() {
-    return new Frequency(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableFrequency(magnitude, baseUnitMagnitude, unit);
   }
 }

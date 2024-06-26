@@ -131,7 +131,7 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
 
   @Override
   public MutableMeasure<? extends PerUnit<N, D>, ?, ?> mutable(double initialMagnitude) {
-    return null;
+    return MutableMeasure.ofRelativeUnits(initialMagnitude, this);
   }
 
   public double convertFrom(double magnitude, PerUnit<? extends N, ? extends D> otherUnit) {

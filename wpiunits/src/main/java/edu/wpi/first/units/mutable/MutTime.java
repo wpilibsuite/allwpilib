@@ -4,26 +4,17 @@
 
 package edu.wpi.first.units.mutable;
 
-import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.immutable.ImmutableTime;
 
-public class MutTime extends Time implements MutableMeasure<TimeUnit, Time, MutTime> {
-  protected MutTime(double magnitude, double baseUnitMagnitude, TimeUnit unit) {
+public final class MutTime extends MutableMeasureBase<TimeUnit, Time, MutTime> implements Time {
+  public MutTime(double magnitude, double baseUnitMagnitude, TimeUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutTime mut_replace(double magnitude, TimeUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-
-    return this;
-  }
-
-  @Override
   public Time copy() {
-    return new Time(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableTime(magnitude, baseUnitMagnitude, unit);
   }
 }

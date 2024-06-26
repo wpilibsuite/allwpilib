@@ -4,66 +4,26 @@
 
 package edu.wpi.first.units;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Value;
+public interface Angle extends Measure<AngleUnit> {
+  Dimensionless divide(Angle other);
 
-public class Angle extends MeasureBase<AngleUnit> {
-  private static final MathHelper<AngleUnit, Angle> mathHelper = new MathHelper<>(Radians::of);
+  Angle plus(Angle other);
 
-  public Angle(double magnitude, double baseUnitMagnitude, AngleUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+  Angle minus(Angle other);
 
-  @Override
-  public Angle copy() {
-    return this;
-  }
+  Angle divide(double divisor);
 
-  public Dimensionless divide(Angle other) {
-    return mathHelper.divide(this, other);
-  }
+  AngularVelocity divide(Time period);
 
-  public Angle plus(Angle other) {
-    return mathHelper.add(this, other);
-  }
+  <Other extends Unit> Measure<Other> divide(
+      Measure<? extends PerUnit<AngleUnit, ? extends Other>> ratio);
 
-  public Angle minus(Angle other) {
-    return mathHelper.minus(this, other);
-  }
+  AngularVelocity per(TimeUnit unit);
 
-  public Angle divide(double divisor) {
-    return mathHelper.divide(this, divisor);
-  }
+  Dimensionless per(AngleUnit unit);
 
-  public AngularVelocity divide(Time period) {
-    return mathHelper.divide(this, period, RadiansPerSecond::of);
-  }
+  <Divisor extends Unit> Measure<? extends PerUnit<AngleUnit, Divisor>> per(Divisor divisor);
 
-  public <Other extends Unit> Measure<Other> divide(
-      Measure<? extends PerUnit<AngleUnit, ? extends Other>> ratio) {
-    return ImmutableMeasure.ofBaseUnits(
-        baseUnitMagnitude / ratio.baseUnitMagnitude(), ratio.unit().denominator());
-  }
-
-  public AngularVelocity per(TimeUnit unit) {
-    return mathHelper.divide(this, unit.of(1), RadiansPerSecond::of);
-  }
-
-  public Dimensionless per(AngleUnit unit) {
-    return mathHelper.divide(this, unit.of(1), Value::of);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <Divisor extends Unit> Measure<? extends PerUnit<AngleUnit, Divisor>> per(
-      Divisor divisor) {
-    return PerUnit.combine(this.baseUnit(), (Divisor) divisor.getBaseUnit())
-        .of(baseUnitMagnitude / divisor.fromBaseUnits(1));
-  }
-
-  public <Other extends Unit> Measure<Other> times(
-      Measure<? extends PerUnit<? extends Other, AngleUnit>> ratio) {
-    return ImmutableMeasure.ofBaseUnits(
-        baseUnitMagnitude * ratio.baseUnitMagnitude(), ratio.unit().numerator());
-  }
+  <Other extends Unit> Measure<Other> times(
+      Measure<? extends PerUnit<? extends Other, AngleUnit>> ratio);
 }

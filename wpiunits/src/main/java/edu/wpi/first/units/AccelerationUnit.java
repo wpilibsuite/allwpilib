@@ -4,6 +4,9 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableAcceleration;
+import edu.wpi.first.units.mutable.MutAcceleration;
+
 public class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit<D>, TimeUnit> {
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static final CombinatoryUnitCache<VelocityUnit, TimeUnit, AccelerationUnit> cache =
@@ -23,7 +26,17 @@ public class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit<D>, T
   }
 
   public Acceleration<D> of(double magnitude) {
-    return new Acceleration<>(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableAcceleration<>(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public Acceleration<D> ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableAcceleration<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutAcceleration<D> mutable(double initialMagnitude) {
+    return new MutAcceleration<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @SuppressWarnings("unchecked")

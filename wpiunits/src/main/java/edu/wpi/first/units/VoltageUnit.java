@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableVoltage;
 import edu.wpi.first.units.mutable.MutVoltage;
 
 /**
@@ -44,10 +45,17 @@ public class VoltageUnit extends Unit {
     return Units.derive(PowerUnit.combine(this, current)).named(name).symbol(symbol).make();
   }
 
+  @Override
   public Voltage of(double magnitude) {
-    return new Voltage(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableVoltage(magnitude, toBaseUnits(magnitude), this);
   }
 
+  @Override
+  public Measure<?> ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableVoltage(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+  }
+
+  @Override
   public MutVoltage mutable(double magnitude) {
     return new MutVoltage(magnitude, toBaseUnits(magnitude), this);
   }

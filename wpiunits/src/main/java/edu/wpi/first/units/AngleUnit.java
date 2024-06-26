@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableAngle;
 import edu.wpi.first.units.mutable.MutAngle;
 
 /**
@@ -35,12 +36,12 @@ public class AngleUnit extends Unit {
 
   @Override
   public Angle of(double magnitude) {
-    return new Angle(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableAngle(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Angle ofBaseUnits(double baseUnitMagnitude) {
-    return new Angle(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new ImmutableAngle(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   public AngularVelocityUnit per(TimeUnit second) {

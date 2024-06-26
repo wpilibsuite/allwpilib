@@ -4,21 +4,20 @@
 
 package edu.wpi.first.units;
 
-public class Temperature extends MeasureBase<TemperatureUnit> {
-  public Temperature(double magnitude, double baseUnitMagnitude, TemperatureUnit unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
+import static edu.wpi.first.units.Units.Kelvin;
+
+public interface Temperature extends Measure<TemperatureUnit> {
+  MathHelper<TemperatureUnit, Temperature> mathHelper = new MathHelper<>(Kelvin::of);
 
   @Override
-  public Temperature copy() {
-    return this;
+  Temperature copy();
+
+  default Velocity<TemperatureUnit> per(Time period) {
+    return mathHelper.divide(
+        this, period, VelocityUnit.combine(unit(), period.unit())::ofBaseUnits);
   }
 
-  public Velocity<TemperatureUnit> per(Time period) {
-    return unit.per(period.unit()).of(this.magnitude / period.magnitude());
-  }
-
-  public Velocity<TemperatureUnit> per(TimeUnit period) {
-    return unit.per(period).of(this.magnitude / period.fromBaseUnits(1));
+  default Velocity<TemperatureUnit> per(TimeUnit period) {
+    return mathHelper.divide(this, period);
   }
 }

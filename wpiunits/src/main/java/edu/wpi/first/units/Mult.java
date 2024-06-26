@@ -4,13 +4,7 @@
 
 package edu.wpi.first.units;
 
-public class Mult<A extends Unit, B extends Unit> extends MeasureBase<MultUnit<A, B>> {
-  public Mult(double magnitude, double baseUnitMagnitude, MultUnit<A, B> unit) {
-    super(magnitude, baseUnitMagnitude, unit);
-  }
-
+public interface Mult<A extends Unit, B extends Unit> extends Measure<MultUnit<A, B>> {
   @Override
-  public Measure<MultUnit<A, B>> copy() {
-    return this;
-  }
+  Measure<MultUnit<A, B>> copy();
 }

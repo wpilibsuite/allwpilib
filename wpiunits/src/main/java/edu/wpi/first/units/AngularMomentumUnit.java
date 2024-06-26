@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableAngularMomentum;
 import edu.wpi.first.units.mutable.MutAngularMomentum;
 
 public class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, DistanceUnit> {
@@ -29,7 +30,12 @@ public class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, DistanceUn
 
   @Override
   public AngularMomentum of(double magnitude) {
-    return new AngularMomentum(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutableAngularMomentum(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  @Override
+  public AngularMomentum ofBaseUnits(double baseUnitMagnitude) {
+    return new ImmutableAngularMomentum(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override

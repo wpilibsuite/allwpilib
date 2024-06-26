@@ -6,23 +6,16 @@ package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.Force;
 import edu.wpi.first.units.ForceUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.immutable.ImmutableForce;
 
-public class MutForce extends Force implements MutableMeasure<ForceUnit, Force, MutForce> {
+public final class MutForce extends MutableMeasureBase<ForceUnit, Force, MutForce>
+    implements Force {
   public MutForce(double magnitude, double baseUnitMagnitude, ForceUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutForce mut_replace(double magnitude, ForceUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-    return this;
-  }
-
-  @Override
   public Force copy() {
-    return new Force(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableForce(magnitude, baseUnitMagnitude, unit);
   }
 }

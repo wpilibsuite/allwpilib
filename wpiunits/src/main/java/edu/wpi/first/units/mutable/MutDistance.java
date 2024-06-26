@@ -6,24 +6,16 @@ package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.DistanceUnit;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.immutable.ImmutableDistance;
 
-public class MutDistance extends Distance
-    implements MutableMeasure<DistanceUnit, Distance, MutDistance> {
+public final class MutDistance extends MutableMeasureBase<DistanceUnit, Distance, MutDistance>
+    implements Distance {
   public MutDistance(double magnitude, double baseUnitMagnitude, DistanceUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutDistance mut_replace(double magnitude, DistanceUnit newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-    return this;
-  }
-
-  @Override
   public Distance copy() {
-    return new Distance(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableDistance(magnitude, baseUnitMagnitude, unit);
   }
 }
