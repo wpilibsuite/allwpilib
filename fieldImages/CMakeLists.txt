@@ -22,6 +22,7 @@ if(WITH_JAVA)
         SOURCES ${JAVA_SOURCES}
         RESOURCES
         NAMESPACE "edu/wpi/first/fields" ${JAVA_RESOURCES}
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         OUTPUT_NAME fieldImages
     )
     set_property(TARGET field_images_jar PROPERTY FOLDER "java")

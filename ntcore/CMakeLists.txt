@@ -55,6 +55,7 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS wpiutil_jar
         OUTPUT_NAME ntcore
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS ntcore_jni_headers
     )
     set_property(TARGET ntcore_jar PROPERTY FOLDER "java")
@@ -87,6 +88,7 @@ if(WITH_JAVA_SOURCE)
         RESOURCES
         NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES}
         OUTPUT_NAME ntcore-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(NTCORE_SRC_JAR_FILE TARGET ntcore_src_jar PROPERTY JAR_FILE)

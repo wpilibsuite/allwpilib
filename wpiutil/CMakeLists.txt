@@ -45,10 +45,9 @@ if(WITH_JAVA)
         set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf")
 
         message(STATUS "Downloading Quickbuf jarfile...")
-        file(
-            DOWNLOAD
-                "${BASE_URL}us/hebi/quickbuf/quickbuf-runtime/1.3.3/quickbuf-runtime-1.3.3.jar"
-                "${JAR_ROOT}/quickbuf-runtime-1.3.3.jar"
+        download_and_check(
+            "${BASE_URL}us/hebi/quickbuf/quickbuf-runtime/1.3.3/quickbuf-runtime-1.3.3.jar"
+            "${JAR_ROOT}/quickbuf-runtime-1.3.3.jar"
         )
 
         message(STATUS "Downloaded.")
@@ -67,6 +66,7 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS ${JACKSON_JARS} ${QUICKBUF_JAR}
         OUTPUT_NAME wpiutil
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS wpiutil_jni_headers
     )
     set_property(TARGET wpiutil_jar PROPERTY FOLDER "java")
@@ -105,6 +105,7 @@ if(WITH_JAVA_SOURCE)
         NAMESPACE "edu/wpi/first/util/function" ${WPIUTIL_FUNCTION_SOURCES}
         NAMESPACE "edu/wpi/first/util/sendable" ${WPIUTIL_SENDABLE_SOURCES}
         OUTPUT_NAME wpiutil-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(WPIUTIL_SRC_JAR_FILE TARGET wpiutil_src_jar PROPERTY JAR_FILE)

@@ -60,6 +60,7 @@ if(WITH_JAVA)
         NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES}
         INCLUDE_JARS wpimath_jar wpiunits_jar ${EJML_JARS} wpiutil_jar ${OPENCV_JAR_FILE}
         OUTPUT_NAME apriltag
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS apriltag_jni_headers
     )
     set_property(TARGET apriltag_jar PROPERTY FOLDER "java")
@@ -91,6 +92,7 @@ if(WITH_JAVA_SOURCE)
             "edu/wpi/first/apriltag/jni"
             src/main/java/edu/wpi/first/apriltag/jni/AprilTagJNI.java
         OUTPUT_NAME apriltag-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(APRILTAG_SRC_JAR_FILE TARGET apriltag_src_jar PROPERTY JAR_FILE)

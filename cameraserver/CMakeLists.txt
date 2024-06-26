@@ -30,6 +30,7 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS wpiutil_jar cscore_jar ntcore_jar ${OPENCV_JAR_FILE}
         OUTPUT_NAME cameraserver
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
     set_property(TARGET cameraserver_jar PROPERTY FOLDER "java")
 
@@ -51,6 +52,7 @@ if(WITH_JAVA_SOURCE)
         NAMESPACE "edu/wpi/first/cameraserver" ${CAMERASERVER_SOURCES}
         NAMESPACE "edu/wpi/first/vision" ${VISION_SOURCES}
         OUTPUT_NAME cameraserver-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(CAMERASERVER_SRC_JAR_FILE TARGET cameraserver_src_jar PROPERTY JAR_FILE)

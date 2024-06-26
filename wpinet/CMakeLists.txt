@@ -20,6 +20,7 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS wpiutil_jar
         OUTPUT_NAME wpinet
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS wpinet_jni_headers
     )
     set_property(TARGET wpinet_jar PROPERTY FOLDER "java")
@@ -48,6 +49,7 @@ if(WITH_JAVA_SOURCE)
         RESOURCES
         NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES}
         OUTPUT_NAME wpinet-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(WPINET_SRC_JAR_FILE TARGET wpinet_src_jar PROPERTY JAR_FILE)

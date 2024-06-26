@@ -107,6 +107,7 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS wpiutil_jar ${OPENCV_JAR_FILE}
         OUTPUT_NAME cscore
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS cscore_jni_headers
     )
     set_property(TARGET cscore_jar PROPERTY FOLDER "java")
@@ -138,6 +139,7 @@ if(WITH_JAVA_SOURCE)
         NAMESPACE "edu/wpi/first/cscore" ${CSCORE_SOURCES}
         NAMESPACE "edu/wpi/first/cscore/raw" ${CSCORE_RAW_SOURCES}
         OUTPUT_NAME cscore-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(CSCORE_SRC_JAR_FILE TARGET cscore_src_jar PROPERTY JAR_FILE)

@@ -86,6 +86,7 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS ${EJML_JARS} wpiutil_jar wpiunits_jar
         OUTPUT_NAME wpimath
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS wpimath_jni_headers
     )
     set_property(TARGET wpimath_jar PROPERTY FOLDER "java")
@@ -147,6 +148,7 @@ if(WITH_JAVA_SOURCE)
             ${WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES}
         NAMESPACE "edu/wpi/first/math/util" src/main/java/edu/wpi/first/math/util/Units.java
         OUTPUT_NAME wpimath-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(WPIMATH_SRC_JAR_FILE TARGET wpimath_src_jar PROPERTY JAR_FILE)

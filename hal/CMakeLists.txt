@@ -55,6 +55,7 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS wpiutil_jar
         OUTPUT_NAME wpiHal
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS hal_jni_headers
     )
     set_property(TARGET hal_jar PROPERTY FOLDER "java")
@@ -94,6 +95,7 @@ if(WITH_JAVA_SOURCE)
         NAMESPACE "edu/wpi/first/hal/simulation" ${HAL_SIMULATION_SOURCES}
         NAMESPACE "edu/wpi/first/hal/util" ${HAL_UTIL_SOURCES}
         OUTPUT_NAME wpiHal-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(HAL_SRC_JAR_FILE TARGET hal_src_jar PROPERTY JAR_FILE)
