@@ -64,7 +64,7 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/romiVendordep>
 )
 
-install(TARGETS romiVendordep EXPORT romivendordep DESTINATION "${main_lib_dest}")
+install(TARGETS romiVendordep EXPORT romivendordep)
 export(TARGETS romiVendordep FILE romivendordep.cmake NAMESPACE romivendordep::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/romiVendordep")
 

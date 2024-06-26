@@ -64,7 +64,7 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/xrpVendordep>
 )
 
-install(TARGETS xrpVendordep EXPORT xrpvendordep DESTINATION "${main_lib_dest}")
+install(TARGETS xrpVendordep EXPORT xrpvendordep)
 export(TARGETS xrpVendordep FILE xrpvendordep.cmake NAMESPACE xrpvendordep::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 
