@@ -26,11 +26,18 @@ class ExampleUnit extends Unit {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
+  @Override
   public Measure<ExampleUnit> of(double magnitude) {
     return ImmutableMeasure.ofRelativeUnits(magnitude, this);
   }
 
+  @Override
   public Measure<ExampleUnit> ofBaseUnits(double baseUnitMagnitude) {
     return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutableMeasure<ExampleUnit, ?, ?> mutable(double initialMagnitude) {
+    return MutableMeasure.ofRelativeUnits(initialMagnitude, this);
   }
 }

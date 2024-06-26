@@ -14,9 +14,4 @@ public record ImmutableAngularVelocity(
   public AngularVelocity copy() {
     return this;
   }
-
-  @Override
-  public AngularVelocityUnit unit() {
-    return (AngularVelocityUnit) unit;
-  }
 }

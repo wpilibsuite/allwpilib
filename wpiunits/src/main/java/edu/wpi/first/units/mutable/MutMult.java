@@ -6,26 +6,17 @@ package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.Mult;
 import edu.wpi.first.units.MultUnit;
-import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.immutable.ImmutableMult;
 
-public final class MutMult<A extends Unit, B extends Unit> extends Mult<A, B>
-    implements MutableMeasure<MultUnit<A, B>, Mult<A, B>, MutMult<A, B>> {
+public final class MutMult<A extends Unit, B extends Unit>
+    extends MutableMeasureBase<MultUnit<A, B>, Mult<A, B>, MutMult<A, B>> implements Mult<A, B> {
   public MutMult(double magnitude, double baseUnitMagnitude, MultUnit<A, B> unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
-  public MutMult<A, B> mut_replace(double magnitude, MultUnit<A, B> newUnit) {
-    this.unit = newUnit;
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
-
-    return this;
-  }
-
-  @Override
   public Mult<A, B> copy() {
-    return new Mult<>(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableMult<>(magnitude, baseUnitMagnitude, unit);
   }
 }

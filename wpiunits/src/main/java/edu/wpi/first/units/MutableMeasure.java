@@ -70,11 +70,18 @@ public interface MutableMeasure<
     return mut_divide(divisor.baseUnitMagnitude());
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   static <U extends Unit> MutableMeasure<U, ?, ?> ofRelativeUnits(double initialValue, U unit) {
     return new MutableMeasureBase(initialValue, unit.toBaseUnits(initialValue), unit) {
       @Override
+      @SuppressWarnings("rawtypes")
       public Measure copy() {
         return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, unit);
+      }
+
+      @Override
+      public int compareTo(Object o) {
+        return super.compareTo((Measure<U>) o);
       }
     };
   }
