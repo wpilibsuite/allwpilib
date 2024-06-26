@@ -13,4 +13,9 @@ public record ImmutableCurrent(double magnitude, double baseUnitMagnitude, Curre
   public Current copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

@@ -13,4 +13,9 @@ public record ImmutableEnergy(double magnitude, double baseUnitMagnitude, Energy
   public Energy copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

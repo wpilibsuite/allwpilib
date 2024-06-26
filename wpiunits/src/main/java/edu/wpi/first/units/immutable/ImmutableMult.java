@@ -15,4 +15,9 @@ public record ImmutableMult<A extends Unit, B extends Unit>(
   public Measure<MultUnit<A, B>> copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

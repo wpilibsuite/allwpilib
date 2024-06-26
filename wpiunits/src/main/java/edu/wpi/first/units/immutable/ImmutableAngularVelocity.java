@@ -14,4 +14,9 @@ public record ImmutableAngularVelocity(
   public AngularVelocity copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

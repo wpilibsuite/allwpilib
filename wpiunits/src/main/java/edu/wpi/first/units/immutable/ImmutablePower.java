@@ -13,4 +13,9 @@ public record ImmutablePower(double magnitude, double baseUnitMagnitude, PowerUn
   public Power copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

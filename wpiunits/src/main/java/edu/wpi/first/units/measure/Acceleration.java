@@ -12,7 +12,7 @@ import edu.wpi.first.units.Unit;
 public interface Acceleration<D extends Unit> extends Measure<AccelerationUnit<D>> {
   @Override
   Acceleration<D> copy();
-  
+
   MathHelper<AccelerationUnit<D>, Acceleration<D>> getMathHelper();
 
   default Acceleration<D> plus(Acceleration<D> other) {

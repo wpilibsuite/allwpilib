@@ -13,4 +13,9 @@ public record ImmutableDimensionless(
   public Dimensionless copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

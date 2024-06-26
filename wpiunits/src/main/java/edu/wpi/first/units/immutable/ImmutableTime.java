@@ -13,4 +13,9 @@ public record ImmutableTime(double magnitude, double baseUnitMagnitude, TimeUnit
   public Time copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

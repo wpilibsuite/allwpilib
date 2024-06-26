@@ -13,4 +13,9 @@ public record ImmutableTorque(double magnitude, double baseUnitMagnitude, Torque
   public Torque copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

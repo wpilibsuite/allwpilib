@@ -14,4 +14,9 @@ public record ImmutableLinearAcceleration(
   public LinearAcceleration copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

@@ -13,4 +13,9 @@ public record ImmutableDistance(double magnitude, double baseUnitMagnitude, Dist
   public Distance copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

@@ -13,4 +13,9 @@ public record ImmutableMass(double magnitude, double baseUnitMagnitude, MassUnit
   public Mass copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

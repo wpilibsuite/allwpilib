@@ -13,4 +13,9 @@ public record ImmutableLinearVelocity(
   public LinearVelocity copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

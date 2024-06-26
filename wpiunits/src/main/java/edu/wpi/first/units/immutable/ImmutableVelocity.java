@@ -14,4 +14,9 @@ public record ImmutableVelocity<D extends Unit>(
   public Velocity<D> copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

@@ -19,4 +19,9 @@ public record ImmutableAngularAcceleration(
   public AngularAccelerationUnit unit() {
     return unit;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

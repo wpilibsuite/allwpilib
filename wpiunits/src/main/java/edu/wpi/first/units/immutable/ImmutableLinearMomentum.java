@@ -13,4 +13,9 @@ public record ImmutableLinearMomentum(
   public LinearMomentum copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

@@ -14,4 +14,9 @@ public record ImmutableAngularMomentum(
   public AngularMomentum copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

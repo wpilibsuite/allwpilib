@@ -15,4 +15,8 @@ public record ImmutableAngle(double magnitude, double baseUnitMagnitude, AngleUn
     return this;
   }
 
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

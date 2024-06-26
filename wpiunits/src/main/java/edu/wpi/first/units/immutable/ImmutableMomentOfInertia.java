@@ -15,4 +15,9 @@ public record ImmutableMomentOfInertia(
   public Measure<MomentOfInertiaUnit> copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

@@ -13,4 +13,9 @@ public record ImmutableFrequency(double magnitude, double baseUnitMagnitude, Fre
   public Frequency copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

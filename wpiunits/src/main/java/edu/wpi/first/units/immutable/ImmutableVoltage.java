@@ -13,4 +13,9 @@ public record ImmutableVoltage(double magnitude, double baseUnitMagnitude, Volta
   public Voltage copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

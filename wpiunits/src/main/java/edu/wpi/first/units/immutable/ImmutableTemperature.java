@@ -13,4 +13,9 @@ public record ImmutableTemperature(double magnitude, double baseUnitMagnitude, T
   public Temperature copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }

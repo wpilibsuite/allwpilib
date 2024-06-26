@@ -13,4 +13,9 @@ public record ImmutableForce(double magnitude, double baseUnitMagnitude, ForceUn
   public Force copy() {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return toShortString();
+  }
 }
