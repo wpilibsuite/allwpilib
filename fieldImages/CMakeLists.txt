@@ -4,7 +4,6 @@ include(CompileWarnings)
 include(GenResources)
 
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
 
     file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")

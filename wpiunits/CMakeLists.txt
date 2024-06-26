@@ -2,7 +2,6 @@ project(wpiunits)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)

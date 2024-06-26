@@ -31,8 +31,6 @@ file(
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.43.1.jar")
@@ -109,7 +107,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(
         GLOB WPIMATH_SOURCES

@@ -7,7 +7,6 @@ find_package(OpenCV REQUIRED)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
 
     #find java files, copy them locally
@@ -44,7 +43,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB CAMERASERVER_SOURCES src/main/java/edu/wpi/first/cameraserver/*.java)
     file(GLOB VISION_SOURCES src/main/java/edu/wpi/first/vision/*.java)

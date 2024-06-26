@@ -9,8 +9,6 @@ file(GLOB wpinet_jni_src src/main/native/cpp/jni/WPINetJNI.cpp)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     set(CMAKE_JNI_TARGET true)
@@ -43,7 +41,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB WPINET_SOURCES src/main/java/edu/wpi/first/net/*.java)
     add_jar(

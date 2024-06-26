@@ -14,8 +14,6 @@ file(
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.15.2.jar")
@@ -90,7 +88,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB WPIUTIL_SOURCES src/main/java/edu/wpi/first/util/*.java)
     file(GLOB WPIUTIL_CLEANUP_SOURCES src/main/java/edu/wpi/first/util/cleanup/*.java)

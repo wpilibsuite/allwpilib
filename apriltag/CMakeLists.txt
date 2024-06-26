@@ -27,8 +27,6 @@ set(APRILTAGLIB_SRCS
 file(GLOB apriltag_jni_src src/main/native/cpp/jni/AprilTagJNI.cpp)
 
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     set(CMAKE_JNI_TARGET true)
@@ -83,7 +81,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB APRILTAG_SOURCES src/main/java/edu/wpi/first/apriltag/*.java)
     add_jar(

@@ -3,7 +3,6 @@ project(wpilibj)
 # Java bindings
 if(WITH_JAVA)
     find_package(OpenCV REQUIRED)
-    find_package(Java REQUIRED)
     include(UseJava)
 
     set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/java/opencv4)
@@ -51,7 +50,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(
         GLOB WPILIBJ_SOURCES

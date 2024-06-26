@@ -39,8 +39,6 @@ install(EXPORT ntcore DESTINATION share/ntcore)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
@@ -82,7 +80,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(
         GLOB NTCORE_SOURCES

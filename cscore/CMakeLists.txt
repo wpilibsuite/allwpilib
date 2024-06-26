@@ -81,8 +81,6 @@ endforeach()
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     #find java files, copy them locally
@@ -173,7 +171,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB CSCORE_SOURCES src/main/java/edu/wpi/first/cscore/*.java)
     file(GLOB CSCORE_RAW_SOURCES src/main/java/edu/wpi/first/cscore/raw/*.java)

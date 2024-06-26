@@ -43,8 +43,6 @@ install(EXPORT hal DESTINATION share/hal)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     file(GLOB_RECURSE hal_shared_jni_src src/main/native/cpp/jni/*.cpp)
@@ -80,7 +78,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB HAL_SOURCES src/main/java/edu/wpi/first/hal/*.java src/generated/main/java/*.java)
     file(GLOB HAL_CAN_SOURCES src/main/java/edu/wpi/first/hal/can/*.java)

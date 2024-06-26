@@ -5,7 +5,6 @@ include(CompileWarnings)
 include(AddTest)
 
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
@@ -36,7 +35,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB WPILIBNEWCOMMANDS_SOURCES src/main/java/edu/wpi/first/wpilibj2/command/*.java)
     file(
