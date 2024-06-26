@@ -1,4 +1,5 @@
 include(FetchContent)
+include(LinkMacOSGUI)
 
 fetchcontent_declare(
     glfw3
@@ -84,7 +85,7 @@ if(MSVC)
     target_sources(imgui PRIVATE ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp)
 elseif(APPLE)
     target_compile_options(imgui PRIVATE -fobjc-arc)
-    set_target_properties(imgui PROPERTIES LINK_FLAGS "-framework Metal -framework QuartzCore")
+    wpilib_link_macos_gui(imgui)
     target_sources(imgui PRIVATE ${imgui_SOURCE_DIR}/backends/imgui_impl_metal.mm)
 else()
     #target_sources(imgui PRIVATE ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp)
