@@ -9,8 +9,7 @@ find_package(OpenCV REQUIRED)
 if(WITH_JAVA)
     include(UseJava)
 
-    #find java files, copy them locally
-
+    #find JAR file, copy it locally
     set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/java/opencv4)
 
     find_file(

@@ -193,7 +193,6 @@ endif()
 
 set(include_dest include)
 set(java_lib_dest java)
-set(jni_lib_dest jni)
 if(WITH_JAVA OR WITH_JAVA_SOURCE)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
     find_package(Java REQUIRED COMPONENTS Development)

@@ -68,10 +68,6 @@ if(WITH_JAVA)
 
     set_property(TARGET ntcorejni PROPERTY FOLDER "libraries")
 
-    if(MSVC)
-        install(TARGETS ntcorejni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-    endif()
-
     target_link_libraries(ntcorejni PRIVATE ntcore_jni_headers)
     add_dependencies(ntcorejni ntcore_jar)
 
