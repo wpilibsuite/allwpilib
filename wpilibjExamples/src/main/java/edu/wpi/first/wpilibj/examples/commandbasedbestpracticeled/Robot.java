@@ -8,7 +8,7 @@
  * Includes six different techniques useful in Command-Based programming. In addition all of the
  * examples are written in a similar suggested style of handling commands and triggers with
  * suggested variable naming style and minimal scope.
- *  1. Goal-Oriented subsystem to feed setpoints to a free-running control calculation. (PID
+ *  1. Goal-Oriented subsystem to feed setpoints to a command-scheduled control calculation. (PID
  *     example)
  *  2. Use of historical data in addition to current state and events as input to a Finite State
  *     Machine. (Random, non-repeating colors)
@@ -47,9 +47,10 @@
  *  change if the "Y" button is pressed. Runs in enabled mode.
  *
  * 5. LED set 5 usage AchieveHueGoal LEDView subsystem.
- *  AchieveHueGoal class-based controller runs continuously and responds to its goal setting
- *  subsystem. Colors on color wheel position show PID controller converging on a color selected
- *  by Xbox right trigger axis (press trigger axis a little to start; press "A" button to stop).
+ *  AchieveHueGoal subsystem controller runs periodically by command to achieve the goal set by
+ *  the initiating command. Colors on color wheel position show PID controller converging on a
+ *  color selected by Xbox right trigger axis (press trigger axis a little to start; press "A"
+ *  button to stop).
  *
  * 6. LED set 6 usage MooreLikeFSM LEDView subsystem.
  *  Moore Like FSM structured subsystem runs continuously in enabled mode to display a KnightRider
@@ -88,7 +89,7 @@
  * Supplier of dynamic LED pattern.
  * Static LED pattern.
  * Restrict Subsystem Default Command to none until set once at any time and then unchangeable.
- * Goal as a resource setting for a subsystem.
+ * Controller subsystem scheduled by a command to reach a Goal.
  * Default commands can either run or not run within a sequential group depending on how the group is defined using Proxy.
  * Commands run in sequence by triggering successive commands.
  * Use of Measure<Time>.
@@ -161,7 +162,7 @@
  * This example program runs in real or simulated mode of the 2024 WPILib.
  *
  * This is a refactor and extension of code donated by ChiefDelphi @illinar. It is intended to
- * demonstrate good programming based on @Oblarg's rules.
+ * demonstrate good programming based on @Oblarg's rules and comments by @Amicus1.
  *
  * The use of the InternalTrigger to sequence command runs was donated by ChiefDelphi @bovlb
  *

@@ -5,14 +5,23 @@
 package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
 
 /*
- * Example of a subsystem composed only of a goal wrapped in its implementer class to achieve that
- * goal.
+ * Example of a subsystem that is a (PID) controller to achieve a goal (setpoint).
  *
- * Note that this is a simple contrived example based on a PID controller. There may be better ways
- * to do PID controller with Commands.
+ * WHAT THIS IS NOT:
+ * Some teams use the structure of a (perpetually, possibly) running system (class) that is
+ * self-contained and periodically updated within itself. No commands are used to calculate or
+ * schedule calculations. It responds to commands only to accept the goal (setpoint).
+ * 
+ * That scheme might not be fully in the spirit of command-based so this example is not encouraging
+ * that usage.
+ * 
+ * A suggestion by CD @Amicus1 for those against using commands except to set the goal:
+ * If this is a verbosity of code issue, I suggest writing the logic as a private subsystem method
+ * and exposing it as a command factory.
  */
 
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDView;
 import edu.wpi.first.math.MathUtil;
@@ -26,15 +35,15 @@ import java.util.function.DoubleSupplier;
 
 /**
  * PID controller to achieve (slowly by over-damped kP gain) a color hue goal set by joystick right
- * trigger and display progress toward goal on the LEDs.
+ * trigger axis and display progress toward goal on the LEDs.
  */
-public class AchieveHueGoal {
+public class AchieveHueGoal extends SubsystemBase {
 
   private final PIDController m_hueController;
   double m_hueSetpoint;
   double m_currentStateHue;
+  LEDPattern m_currentStateSignal; // what to display
   private final LEDView m_robotSignals; // where the output is displayed
-  public final HueGoal m_hueGoal = new HueGoal(); // subsystem protected goal
 
   /**
    * Constructor
@@ -45,62 +54,70 @@ public class AchieveHueGoal {
     this.m_robotSignals = robotSignals;
     /**
      *  PID initialization.
-     * 
-     *  The PID controller is ready but not running initially until a setpoint is set. When the
-     *  setpoint is set the controller starts and runs forever until the reset function is invoked.
+     *  The PID controller is ready but not running initially until a command is issued
+     *  with a setpoint.
      */
-    m_hueSetpoint = Double.NaN; // initialize setpoint (goal) such that the controller doesn't
-                                // start until setpoint is set
     m_currentStateHue = 0.0; // also considered the initial and previous state
     final double kP = 0.025;
     final double kI = 0.0;
     final double kD = 0.0;
     m_hueController = new PIDController(kP, kI, kD);
-    final double tolerance = 2.0;
+    final double tolerance = 2.0; // hue range is 0 to 180
     m_hueController.setTolerance(tolerance);
   }
 
-  // Example of methods and triggers that the system will require are put here.
-
   // Methods that change the subsystem should be private.
-  // Methods and triggers that inquire about the system must be public.
-  // To get periodic behavior with Command-Based structure the "before" and "after" must be public.
-  // There are other methods to get periodic execution. The Robot.addPeriodic could be injected.
-  // Subsystem periodic could be used under past threats of deprecation. EventLoop might be of use.
+  // Methods that inquire about the system must be public.
+  // Triggers bound within should be private.
 
   /**
-   * Update Hue Controller Calculation
+   * Set the Goal and Move Toward The Goal.
    * 
-   * <p>Must be run periodically based on the Goal that was set.
+   * <p>Runs until the goal has been achieved within the tolerance at which time the end is
+   * indicated and the controller/command stops.
+   * 
+   * @param goal dynamically supplied hue 0 to 180 (computer version of a color wheel)
+   * @return command used to set and achieve the goal
    */
-  private void updateHueController() {
+  public Command displayHue(DoubleSupplier hueSetpoint) {
     final double minimumHue = 0.0;
     final double maximumHue = 180.0;
-      LEDPattern currentStateSignal;
+    return
+      sequence(
 
-      if (!Double.isNaN(m_hueSetpoint)) {
-        // setpoint has been set so run controller periodically
+        runOnce(()->{ // be sure of a fresh start
+          m_hueController.reset();
+          m_currentStateHue = 0; // also considered the initial and previous state
+          m_currentStateSignal = LEDPattern.kOff; // initialize pattern since the deadline below
+                                                  // has a race to use it
+          }
+          ),
 
-        // Note that the WPILib PID controller knows if it has a setpoint and measurement
-        // but that information is private and not accessible. We need to know that here
-      // so the signals stay at their initial state (assumed off) until a setpoint is set.
-        m_currentStateHue =
+        run(() -> { // run to the setpoint displaying state progress as it runs
+                m_currentStateHue = // compute the current state
             MathUtil.clamp(
-                m_currentStateHue + m_hueController.calculate(m_currentStateHue, m_hueSetpoint),
+                        m_currentStateHue
+                         + m_hueController.calculate(m_currentStateHue, hueSetpoint.getAsDouble()),
               minimumHue,
               maximumHue);
-          currentStateSignal =
-            LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200)); // display state;
-      } else {
-        currentStateSignal =
-            LEDPattern.solid(Color.fromHSV(0, 0, 0)); // display state off - black;        
+                m_currentStateSignal = // color for the current state
+                    LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200));
       }
+            ).until(m_hueController::atSetpoint)
+        .deadlineFor( // display the color of the current state as it's continually recalculated above
+        m_robotSignals.setSignal(()->m_currentStateSignal)),
 
-      if (m_hueController.atSetpoint()) {
-        currentStateSignal = currentStateSignal.blink(Seconds.of(0.1)); // blink if made it to the Goal
+        m_robotSignals.setSignal(()->m_currentStateSignal.blink(Seconds.of(0.1)))
+          .withTimeout(3.),
+
+        runOnce(()->{ // be neat; stop other devices as needed
+          m_hueController.reset();
+          m_currentStateHue = 0; // also considered the initial and previous state
       }
-    // changing the state of LED subsystem is by command as it should be for (almost) all subsystems
-    m_robotSignals.setSignalOnce(currentStateSignal).schedule();
+          ),
+
+        m_robotSignals.setSignalOnce(LEDPattern.solid(Color.fromHSV(100, 100, 100))) // off signal
+      );
     }
 
   /**
@@ -111,36 +128,7 @@ public class AchieveHueGoal {
   /**
    * Run after commands and triggers
    */
-  public void runAfterCommands() {
-    updateHueController(); // periodic update of the system (it's not a subsystem - the goal is)
- }
-
-  /**
-   * Subsystem to lock the resource if a command is running and provide a default command.
-   *
-   * <p>A decision must be made on how to set the goal. The controller is always running. Does the
-   * goal supplier have to always be running or is it set and forget until a new goal is needed?
-   *
-   * <p>The default command could be activated to provide the goal if no other goal supplier is
-   * running. If set once and forget is used then it is inappropriate to use a default command as
-   * that would immediately reset to the default after setting a goal.
-   *
-   * <p>This subsystem could run "perpetually" with a pre-determined hue goal but it's disabled in
-   * this example in favor of no default command to prevent assuming there is one always running.
-   *
-   * <p>That means the last setpoint is running as no default takes over. For the Xbox trigger, that
-   * goes to 0 when released but again we're not supposed to know that from RobotContainer.java.
-   * 
-   * <p>Note that this implementation does not start the controller until a setpoint as been set.
-   * The controller stops when the goal is unset (goal = Double.NaN or reset()).
-   *
-   * <p>Possible:<pre>
-   * Command defaultCommand = runOnce(() -> m_hueSetpoint = defaultHueGoal);
-   * setDefaultCommand(defaultCommand);
-   * </pre>
-   */
-  public class HueGoal extends SubsystemBase {
-    private HueGoal() {}
+  public void runAfterCommands() {}
 
     /**
      * Example of how to disallow default command
@@ -150,51 +138,5 @@ public class AchieveHueGoal {
     @Override
     public void setDefaultCommand(Command def) {
       throw new IllegalArgumentException("Default Command not allowed");
-    }
-
-    /**
-     * Set the goal.
-     * 
-     * <p>Use this if the goal is known at the time of initialization.
-     * 
-     * <p>May be called repeatedly for different goals.
-     * 
-     * <p>Not used in this example program.
-     *
-     * @param goal hue 0 to 180
-     * @return command that can be used to set the goal
-     */
-    public Command setHueGoal(double goal) {
-      return runOnce(() -> m_hueSetpoint = goal);
-    }
-
-    /**
-     * Set the goal.
-     *
-     * <p>Use this if the goal is to be supplied dynamically.
-     * 
-     * <p>Runs forever accepting goals dynamically from the Supplier.
-     * 
-     * <p>May be interrupted by calling it again to change the Supplier, may cancel by "disable",
-     * or may be interrupted by the "reset" command. In those cases this command must be restarted
-     * to accept goals.
-     * 
-     * <p>Used in this example program.
-     * 
-     * @param goal hue 0 to 180
-     * @return command that can be used to set the goal
-     */
-    public Command setHueGoal(DoubleSupplier goal) {
-      return run(() -> m_hueSetpoint = goal.getAsDouble());
-    }
-
-    /**
-     * reset or stop the controller
-     */
-    public Command reset() {
-      // running any command stops the goal-accepting command
-      // setting the hue to NaN flags the controller to stop calculating
-      return runOnce(()-> m_hueSetpoint = Double.NaN);
-    }
   }
 }

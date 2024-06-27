@@ -100,24 +100,15 @@ public class RobotContainer {
       *
       * The PID controller is not running initially until a setpoint is set by moving the operator
       * right trigger axis past the threshold at which time a command runs "forever" to accept new
-      * setpoints. The operator "A" button interrupts the command that accepts new setpoints and
-      * stops the underlying controller process as does disabled mode.
+      * setpoints.
       */
     var triggerHueGoalDeadBand = 0.05; // triggers if past a small threshold (scale of 0 to 1)
     m_operatorController.rightTrigger(triggerHueGoalDeadBand)
         .onTrue(
-            m_achieveHueGoal.m_hueGoal.setHueGoal( // goal-acceptance command
-                () ->
-                    m_operatorController.getRightTriggerAxis()
-                        * 180.0 // supplying the current value
+            m_achieveHueGoal.displayHue( // goal-acceptance command
+                () -> m_operatorController.getRightTriggerAxis()*180.0 // supplying the setpoint
                 // scale joystick's 0 to 1 to computer color wheel hue 0 to 180
                 ));
-
-    m_operatorController
-        .a()
-        .onTrue(m_achieveHueGoal.m_hueGoal.reset()); // stops accepting goals by interrupting the
-                                          // goal-acceptance command and halts the underlying
-                                          // process by sending a message to it.
   }
 
   /**

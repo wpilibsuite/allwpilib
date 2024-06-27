@@ -138,6 +138,7 @@ public class RobotSignals {
 
   /** LED view resource (subsystem) */
   public class LEDView extends SubsystemBase {
+
     private final AddressableLEDBufferView m_view;
 
     private LEDView(AddressableLEDBufferView view) {
