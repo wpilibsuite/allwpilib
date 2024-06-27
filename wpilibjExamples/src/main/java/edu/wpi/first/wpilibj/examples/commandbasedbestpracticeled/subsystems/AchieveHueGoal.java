@@ -15,6 +15,10 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
  * That scheme might not be fully in the spirit of command-based so this example is not encouraging
  * that usage.
  * 
+ * BUT BUT BUT
+ * The default command for the LED subsystem is used exactly as described above. The default
+ * command is running continuously displaying whatever is currently set as the pattern to display.
+ * 
  * A suggestion by CD @Amicus1 for those against using commands except to set the goal:
  * If this is a verbosity of code issue, I suggest writing the logic as a private subsystem method
  * and exposing it as a command factory.
@@ -22,6 +26,7 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
 import edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems.RobotSignals.LEDView;
 import edu.wpi.first.math.MathUtil;
@@ -40,9 +45,9 @@ import java.util.function.DoubleSupplier;
 public class AchieveHueGoal extends SubsystemBase {
 
   private final PIDController m_hueController;
-  double m_hueSetpoint;
-  double m_currentStateHue;
-  LEDPattern m_currentStateSignal; // what to display
+  private double m_currentStateHue;
+  private LEDPattern m_notRunningSignal = LEDPattern.solid(Color.kGray);
+  private LEDPattern m_currentStateSignal = m_notRunningSignal; // initially then what to display on LEDs
   private final LEDView m_robotSignals; // where the output is displayed
 
   /**
@@ -54,9 +59,11 @@ public class AchieveHueGoal extends SubsystemBase {
     this.m_robotSignals = robotSignals;
     /**
      *  PID initialization.
-     *  The PID controller is ready but not running initially until a command is issued
-     *  with a setpoint.
+     *  The PID controller is ready but not running initially until a command is issued with a
+     *  setpoint.
+     *  LED default command will display continuously in the "background" as patterns change.
      */
+    robotSignals.setDefaultCommand(m_robotSignals.setSignal(()-> m_currentStateSignal));
     m_currentStateHue = 0.0; // also considered the initial and previous state
     final double kP = 0.025;
     final double kI = 0.0;
@@ -66,17 +73,13 @@ public class AchieveHueGoal extends SubsystemBase {
     m_hueController.setTolerance(tolerance);
   }
 
-  // Methods that change the subsystem should be private.
-  // Methods that inquire about the system must be public.
-  // Triggers bound within should be private.
-
   /**
    * Set the Goal and Move Toward The Goal.
    * 
    * <p>Runs until the goal has been achieved within the tolerance at which time the end is
    * indicated and the controller/command stops.
    * 
-   * @param goal dynamically supplied hue 0 to 180 (computer version of a color wheel)
+   * @param hueSetpoint the goal is dynamically supplied hue 0 to 180 (computer version of a color wheel)
    * @return command used to set and achieve the goal
    */
   public Command displayHue(DoubleSupplier hueSetpoint) {
@@ -85,13 +88,7 @@ public class AchieveHueGoal extends SubsystemBase {
     return
       sequence(
 
-        runOnce(()->{ // be sure of a fresh start
-          m_hueController.reset();
-          m_currentStateHue = 0; // also considered the initial and previous state
-          m_currentStateSignal = LEDPattern.kOff; // initialize pattern since the deadline below
-                                                  // has a race to use it
-          }
-          ),
+        runOnce(this::reset),
 
         run(() -> { // run to the setpoint displaying state progress as it runs
                 m_currentStateHue = // compute the current state
@@ -103,21 +100,40 @@ public class AchieveHueGoal extends SubsystemBase {
                 m_currentStateSignal = // color for the current state
                     LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200));
       }
-            ).until(m_hueController::atSetpoint)
-        .deadlineFor( // display the color of the current state as it's continually recalculated above
-        m_robotSignals.setSignal(()->m_currentStateSignal)),
+            )
 
-        m_robotSignals.setSignal(()->m_currentStateSignal.blink(Seconds.of(0.1)))
-          .withTimeout(3.),
+          .until(m_hueController::atSetpoint), // controller stops; momentum stable or not
 
-        runOnce(()->{ // be neat; stop other devices as needed
+        // set to blink for a while to show at setpoint
+        runOnce(()-> m_currentStateSignal = m_currentStateSignal.blink(Seconds.of(0.1))),
+        waitSeconds(2.0) // let the LEDs blink by the default command in the "background"
+      )
+      .finallyDo(this::reset); // cleanup the controller but it was stopped or interrupted above
+  }
+
+  /**
+   * Reset or stop the controller
+   * 
+   * <p>Used first to initialize and in finallyDo() at the end of a controller command to assure stopping
+   */
+  public void reset() {
+    // also stop other devices as needed but not needed in this example
           m_hueController.reset();
           m_currentStateHue = 0; // also considered the initial and previous state
+    m_currentStateSignal = m_notRunningSignal;
       }
-          ),
 
-        m_robotSignals.setSignalOnce(LEDPattern.solid(Color.fromHSV(100, 100, 100))) // off signal
-      );
+  /**
+   * Immediately interrupt the controller command.
+   * 
+   * <p>Null command works merely by its existence; assuming the underlying controller command allows interrupts
+   * and cleanly handles interrupts with "finallyDo()".
+   * 
+   * @return Command normally used to interrupt and stop the controller while it's running as a command
+   */
+  public Command interrupt() {
+    return
+      runOnce(() -> {});
     }
 
   /**

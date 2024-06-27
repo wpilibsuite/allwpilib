@@ -71,22 +71,10 @@ public class RobotSignals {
   private static final int m_firstImposterLED = 48;
   private static final int m_lastImposterLED = 55;
 
-  // CAUTION CAUTION CAUTION -- Update this length for each view defined.
-  private static final int m_length =
-      Math.max(
-        Math.max(
-          Math.max(
-            Math.max(
-              Math.max(
-                Math.max(
-                  m_lastImposterLED,
-                m_lastKnightRiderLED),
-              m_lastTopLED),
-            m_lastMainLED),
-          m_lastEnableDisableLED),
-        m_lastHistoryDemoLED),
-      m_lastAchieveHueGoalLED)
-      + 1;
+  // CAUTION CAUTION CAUTION CAUTION CAUTION CAUTION CAUTION CAUTION CAUTION 
+  // Update the length below for the total of all views defined.
+
+  private static final int m_length = m_lastImposterLED + 1;
 
   public final LEDView m_top;
   public final LEDView m_main;

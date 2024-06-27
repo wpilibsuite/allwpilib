@@ -47,10 +47,10 @@
  *  change if the "Y" button is pressed. Runs in enabled mode.
  *
  * 5. LED set 5 usage AchieveHueGoal LEDView subsystem.
- *  AchieveHueGoal subsystem controller runs periodically by command to achieve the goal set by
- *  the initiating command. Colors on color wheel position show PID controller converging on a
- *  color selected by Xbox right trigger axis (press trigger axis a little to start; press "A"
- *  button to stop).
+ *  AchieveHueGoal subsystem controller command to achieve the goal set by the goal supplier.
+ *  Colors on color wheel position show PID controller converging on a color selected by Xbox right
+ *  trigger axis. Press trigger axis a little to start and modulate to select hue goal. Press "A"
+ *  button to interrupt controller before the goal has been achieved.
  *
  * 6. LED set 6 usage MooreLikeFSM LEDView subsystem.
  *  Moore Like FSM structured subsystem runs continuously in enabled mode to display a KnightRider
