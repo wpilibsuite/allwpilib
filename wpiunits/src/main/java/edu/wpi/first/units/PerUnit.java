@@ -4,6 +4,8 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.immutable.ImmutableRatio;
+import edu.wpi.first.units.mutable.MutRatio;
 import java.util.Objects;
 
 /**
@@ -121,17 +123,17 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
 
   @Override
   public Measure<? extends PerUnit<N, D>> of(double magnitude) {
-    return ImmutableMeasure.ofRelativeUnits(magnitude, this);
+    return new ImmutableRatio<>(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Measure<? extends PerUnit<N, D>> ofBaseUnits(double baseUnitMagnitude) {
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, this);
+    return new ImmutableRatio<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
   public MutableMeasure<? extends PerUnit<N, D>, ?, ?> mutable(double initialMagnitude) {
-    return MutableMeasure.ofRelativeUnits(initialMagnitude, this);
+    return new MutRatio<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public double convertFrom(double magnitude, PerUnit<? extends N, ? extends D> otherUnit) {
