@@ -7,12 +7,9 @@ package edu.wpi.first.math.trajectory;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.PerUnit;
+import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.measure.Acceleration;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Velocity;
 import java.util.Objects;
 
@@ -84,15 +81,10 @@ public class TrapezoidProfile {
      * @param maxVelocity maximum velocity
      * @param maxAcceleration maximum acceleration
      */
-    public <U extends Unit> Constraints(Velocity<U> maxVelocity, Acceleration<U> maxAcceleration) {
-      this(maxVelocity.baseUnitMagnitude(), maxAcceleration.baseUnitMagnitude());
-    }
-
-    public Constraints(AngularVelocity maxVelocity, AngularAcceleration maxAcceleration) {
-      this(maxVelocity.baseUnitMagnitude(), maxAcceleration.baseUnitMagnitude());
-    }
-
-    public Constraints(LinearVelocity maxVelocity, LinearAcceleration maxAcceleration) {
+    public <U extends Unit> Constraints(
+        Measure<? extends PerUnit<? extends U, TimeUnit>> maxVelocity,
+        Measure<? extends PerUnit<? extends PerUnit<? extends U, TimeUnit>, TimeUnit>>
+            maxAcceleration) {
       this(maxVelocity.baseUnitMagnitude(), maxAcceleration.baseUnitMagnitude());
     }
   }

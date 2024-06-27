@@ -9,7 +9,6 @@ import edu.wpi.first.units.measure.Angle;
 
 public record ImmutableAngle(double magnitude, double baseUnitMagnitude, AngleUnit unit)
     implements Angle {
-
   @Override
   public Angle copy() {
     return this;
