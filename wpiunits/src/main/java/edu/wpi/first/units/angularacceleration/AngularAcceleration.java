@@ -2,22 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units.angularvelocity;
+package edu.wpi.first.units.angularacceleration;
 
-import static edu.wpi.first.units.angle.AngleUnit.Degrees;
-import static edu.wpi.first.units.angle.AngleUnit.Radians;
-import static edu.wpi.first.units.angle.AngleUnit.Revolutions;
-import static edu.wpi.first.units.time.TimeUnit.Minute;
 import static edu.wpi.first.units.time.TimeUnit.Seconds;
-import static edu.wpi.first.units.angularvelocity.AngularVelocityUnit.RPM;
+import static edu.wpi.first.units.angularacceleration.AngularAccelerationUnit.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.angularacceleration.AngularAccelerationUnit.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.angularvelocity.AngularVelocityUnit.DegreesPerSecond;
 import static edu.wpi.first.units.angularvelocity.AngularVelocityUnit.RadiansPerSecond;
-import static edu.wpi.first.units.angularvelocity.AngularVelocityUnit.RevolutionsPerSecond;
+import static edu.wpi.first.units.angularvelocity.AngularVelocityUnit.RotationsPerSecond;
+import static edu.wpi.first.units.angularacceleration.AngularAccelerationUnit.DegreesPerSecondPerSecond;
 
 import java.util.Objects;
 
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.angle.Angle;
-import edu.wpi.first.units.angularacceleration.AngularAcceleration;
+import edu.wpi.first.units.angularvelocity.AngularVelocity;
 import edu.wpi.first.units.time.Time;
 
 /**
@@ -30,7 +28,7 @@ import edu.wpi.first.units.time.Time;
  * <i>magnitude</i> are effectively equivalent objects.
  *
  */
-public class AngularVelocity implements Comparable<AngularVelocity> {
+public class AngularAcceleration implements Comparable<AngularAcceleration> {
 
   /**
    * The threshold for two measures to be considered equivalent if converted to
@@ -41,7 +39,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
 
   protected double m_magnitude;
   protected double m_baseUnitMagnitude;
-  protected AngularVelocityUnit m_unit;
+  protected AngularAccelerationUnit m_unit;
 
   /**
    * Creates a new immutable Dimensionless measure instance. This shouldn't be
@@ -52,7 +50,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @param magnitude the magnitude of this measure
    * @param unit      the unit of this measure.
    */
-  AngularVelocity(double magnitude, double baseUnitMagnitude, AngularVelocityUnit unit) {
+  AngularAcceleration(double magnitude, double baseUnitMagnitude, AngularAccelerationUnit unit) {
     Objects.requireNonNull(unit, "Unit cannot be null");
     m_magnitude = magnitude;
     m_baseUnitMagnitude = baseUnitMagnitude;
@@ -85,7 +83,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    *
    * @return the unit
    */
-  public AngularVelocityUnit unit() {
+  public AngularAccelerationUnit unit() {
     return m_unit;
   }
 
@@ -103,7 +101,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @param unit the unit to convert this measure to
    * @return the value of this measure in the given unit
    */
-  public double in(AngularVelocityUnit unit) {
+  public double in(AngularAccelerationUnit unit) {
     if (this.unit().equals(unit)) {
       return magnitude();
     } else {
@@ -123,8 +121,8 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @param multiplier the constant to multiply by
    * @return the resulting measure
    */
-  public AngularVelocity times(double multiplier) {
-    return AngularVelocity.ofBaseUnits(baseUnitMagnitude() * multiplier, unit());
+  public AngularAcceleration times(double multiplier) {
+    return AngularAcceleration.ofBaseUnits(baseUnitMagnitude() * multiplier, unit());
   }
 
   /**
@@ -136,7 +134,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @return the resulting measure
    * @see #times(double)
    */
-  public AngularVelocity divide(double divisor) {
+  public AngularAcceleration divide(double divisor) {
     return times(1 / divisor);
   }
 
@@ -147,7 +145,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @param other the measure to add to this one
    * @return a new measure containing the result
    */
-  public AngularVelocity plus(AngularVelocity other) {
+  public AngularAcceleration plus(AngularAcceleration other) {
     return unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
 
@@ -158,7 +156,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @param other the measure to subtract from this one
    * @return a new measure containing the result
    */
-  public AngularVelocity minus(AngularVelocity other) {
+  public AngularAcceleration minus(AngularAcceleration other) {
     return unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
 
@@ -167,7 +165,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    *
    * @return the resulting measure
    */
-  public AngularVelocity negate() {
+  public AngularAcceleration negate() {
     return times(-1);
   }
 
@@ -178,8 +176,8 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    *
    * @return the copied measure
    */
-  public AngularVelocity copy() {
-    return new AngularVelocity(m_magnitude, m_baseUnitMagnitude, m_unit);
+  public AngularAcceleration copy() {
+    return new AngularAcceleration(m_magnitude, m_baseUnitMagnitude, m_unit);
   }
 
   /**
@@ -187,8 +185,8 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    *
    * @return a mutable measure initialized to be identical to this measure
    */
-  public MutableAngularVelocity mutableCopy() {
-    return MutableAngularVelocity.mutable(this);
+  public MutableAngularAcceleration mutableCopy() {
+    return MutableAngularAcceleration.mutable(this);
   }
 
   /**
@@ -210,7 +208,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    *                          0.01 should be passed, and so on.
    * @return true if this unit is near the other measure, otherwise false
    */
-  public boolean isNear(AngularVelocity other, double varianceThreshold) {
+  public boolean isNear(AngularAcceleration other, double varianceThreshold) {
     // abs so negative inputs are calculated correctly
     var tolerance = Math.abs(other.baseUnitMagnitude() * varianceThreshold);
 
@@ -233,14 +231,14 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    *                  other.
    * @return true if this unit is near the other measure, otherwise false.
    */
-  public boolean isNear(AngularVelocity other, AngularVelocity tolerance) {
+  public boolean isNear(AngularAcceleration other, AngularAcceleration tolerance) {
     return Math.abs(this.baseUnitMagnitude() - other.baseUnitMagnitude()) <= Math
         .abs(tolerance.baseUnitMagnitude());
   }
 
   /** {@inheritDoc} */
   @Override
-  public int compareTo(AngularVelocity o) {
+  public int compareTo(AngularAcceleration o) {
     return Double.compare(this.baseUnitMagnitude(), o.baseUnitMagnitude());
   }
 
@@ -251,7 +249,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @return true if this measure has a greater equivalent magnitude, false
    *         otherwise
    */
-  public boolean gt(AngularVelocity o) {
+  public boolean gt(AngularAcceleration o) {
     return compareTo(o) > 0;
   }
 
@@ -263,7 +261,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @return true if this measure has an equal or greater magnitude,
    *         false otherwise
    */
-  public boolean gte(AngularVelocity o) {
+  public boolean gte(AngularAcceleration o) {
     return compareTo(o) > 0 || equals(o);
   }
 
@@ -274,7 +272,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @return true if this measure has a lesser equivalent magnitude, false
    *         otherwise
    */
-  public boolean lt(AngularVelocity o) {
+  public boolean lt(AngularAcceleration o) {
     return compareTo(o) < 0;
   }
 
@@ -286,7 +284,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @return true if this measure has an equal or lesser equivalent magnitude,
    *         false otherwise
    */
-  public boolean lte(AngularVelocity o) {
+  public boolean lte(AngularAcceleration o) {
     return compareTo(o) < 0 || equals(o);
   }
 
@@ -300,23 +298,21 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @return the angular velocity measurement
    */
 
-  public static AngularVelocity combine(Angle angle, Time time) {
-    AngularVelocityUnit angularVelocityUnit = null;
-    if (angle.unit().equals(Radians) && time.unit().equals(Seconds)) {
-      angularVelocityUnit = RadiansPerSecond;
-    } else if (angle.unit().equals(Revolutions) && time.unit().equals(Seconds)) {
-      angularVelocityUnit = RevolutionsPerSecond;
-    } else if (angle.unit().equals(Degrees) && time.unit().equals(Seconds)) {
-      angularVelocityUnit = RevolutionsPerSecond;
-    } else if (angle.unit().equals(Revolutions) && time.unit().equals(Minute)) {
-      angularVelocityUnit = RPM;
+  public static AngularAcceleration combine(AngularVelocity angle, Time time) {
+    AngularAccelerationUnit unit = null;
+    if (angle.unit().equals(RadiansPerSecond) && time.unit().equals(Seconds)) {
+      unit = RadiansPerSecondPerSecond;
+    } else if (angle.unit().equals(DegreesPerSecond) && time.unit().equals(Seconds)) {
+      unit = DegreesPerSecondPerSecond;
+    } else if (angle.unit().equals(RotationsPerSecond) && time.unit().equals(Seconds)) {
+      unit = RotationsPerSecondPerSecond;
     } else {
-      angularVelocityUnit = angle.unit().per(time.unit());
+      unit = angle.unit().per(time.unit());
     }
-    return new AngularVelocity(
+    return new AngularAcceleration(
         angle.magnitude() / time.magnitude(),
         angle.baseUnitMagnitude() / time.baseUnitMagnitude(),
-        angularVelocityUnit);
+        unit);
   }
 
   /**
@@ -327,13 +323,13 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @return the measure with the greatest positive magnitude, or null if no
    *         measures were provided
    */
-  static AngularVelocity max(AngularVelocity... measures) {
+  static AngularAcceleration max(AngularAcceleration... measures) {
     if (measures.length == 0) {
       return null; // nothing to compare
     }
 
-    AngularVelocity max = null;
-    for (AngularVelocity measure : measures) {
+    AngularAcceleration max = null;
+    for (AngularAcceleration measure : measures) {
       if (max == null || measure.gt(max)) {
         max = measure;
       }
@@ -349,13 +345,13 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @param measures the set of measures to compare
    * @return the measure with the greatest negative magnitude
    */
-  static AngularVelocity min(AngularVelocity... measures) {
+  static AngularAcceleration min(AngularAcceleration... measures) {
     if (measures.length == 0) {
       return null; // nothing to compare
     }
 
-    AngularVelocity max = null;
-    for (AngularVelocity measure : measures) {
+    AngularAcceleration max = null;
+    for (AngularAcceleration measure : measures) {
       if (max == null || measure.lt(max)) {
         max = measure;
       }
@@ -403,9 +399,9 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @param unit              the unit of measure
    * @return a new measure
    */
-  public static AngularVelocity ofBaseUnits(
-      double baseUnitMagnitude, AngularVelocityUnit unit) {
-    return new AngularVelocity(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
+  public static AngularAcceleration ofBaseUnits(
+      double baseUnitMagnitude, AngularAccelerationUnit unit) {
+    return new AngularAcceleration(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
   }
 
   /**
@@ -417,9 +413,9 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    * @param unit              the unit of measure
    * @return a new measure
    */
-  public static AngularVelocity ofRelativeUnits(
-      double relativeMagnitude, AngularVelocityUnit unit) {
-    return new AngularVelocity(relativeMagnitude, unit.toBaseUnits(relativeMagnitude), unit);
+  public static AngularAcceleration ofRelativeUnits(
+      double relativeMagnitude, AngularAccelerationUnit unit) {
+    return new AngularAcceleration(relativeMagnitude, unit.toBaseUnits(relativeMagnitude), unit);
   }
 
   /**
@@ -429,7 +425,7 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
    */
   @Override
   public boolean equals(Object o) {
-    return o instanceof AngularVelocity other
+    return o instanceof AngularAcceleration other
         && Objects.equals(m_unit, other.unit())
         && Math.abs(baseUnitMagnitude() - other.baseUnitMagnitude()) <= EQUIVALENCE_THRESHOLD;
   }
@@ -442,10 +438,6 @@ public class AngularVelocity implements Comparable<AngularVelocity> {
   @Override
   public String toString() {
     return toShortString();
-  }
-
-  public AngularAcceleration divide(Time time) {
-    return AngularAcceleration.combine(this, time);
   }
 
 }

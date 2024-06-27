@@ -1,12 +1,12 @@
-package edu.wpi.first.units.angularvelocity;
+package edu.wpi.first.units.angularacceleration;
 
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.angularacceleration.AngularAcceleration;
-import edu.wpi.first.units.angularacceleration.MutableAngularAcceleration;
+import edu.wpi.first.units.angularvelocity.AngularVelocity;
+import edu.wpi.first.units.angularvelocity.MutableAngularVelocity;
 import edu.wpi.first.units.dimensionless.Dimensionless;
 import edu.wpi.first.units.time.Time;
 
-public class MutableAngularVelocity extends AngularVelocity {
+public class MutableAngularAcceleration extends AngularAcceleration {
 
   /**
    * Creates a new mutable measure that is a copy of the given one.
@@ -15,8 +15,8 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @return a new mutable measure with an initial state equal to the given
    *         measure
    */
-  public static MutableAngularVelocity mutable(AngularVelocity measure) {
-    return new MutableAngularVelocity(measure.magnitude(), measure.baseUnitMagnitude(),
+  public static MutableAngularAcceleration mutable(AngularAcceleration measure) {
+    return new MutableAngularAcceleration(measure.magnitude(), measure.baseUnitMagnitude(),
         measure.unit());
   }
 
@@ -26,7 +26,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param unit the unit of measure
    * @return a new mutable measure
    */
-  public static MutableAngularVelocity zero(AngularVelocityUnit unit) {
+  public static MutableAngularAcceleration zero(AngularAccelerationUnit unit) {
     return mutable(unit.zero());
   }
 
@@ -41,8 +41,8 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param unit              the unit of measure
    * @return a new mutable measure
    */
-  public static MutableAngularVelocity ofBaseUnits(double baseUnitMagnitude, AngularVelocityUnit unit) {
-    return new MutableAngularVelocity(unit.fromBaseUnits(baseUnitMagnitude),
+  public static MutableAngularAcceleration ofBaseUnits(double baseUnitMagnitude, AngularAccelerationUnit unit) {
+    return new MutableAngularAcceleration(unit.fromBaseUnits(baseUnitMagnitude),
         baseUnitMagnitude, unit);
   }
 
@@ -56,11 +56,11 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param unit              the unit of measure
    * @return a new mutable measure
    */
-  public static MutableAngularVelocity ofRelativeUnits(double relativeMagnitude, AngularVelocityUnit unit) {
-    return new MutableAngularVelocity(relativeMagnitude, unit.toBaseUnits(relativeMagnitude), unit);
+  public static MutableAngularAcceleration ofRelativeUnits(double relativeMagnitude, AngularAccelerationUnit unit) {
+    return new MutableAngularAcceleration(relativeMagnitude, unit.toBaseUnits(relativeMagnitude), unit);
   }
 
-  private MutableAngularVelocity(double initialMagnitude, double baseUnitMagnitude, AngularVelocityUnit unit) {
+  private MutableAngularAcceleration(double initialMagnitude, double baseUnitMagnitude, AngularAccelerationUnit unit) {
     super(initialMagnitude, baseUnitMagnitude, unit);
   }
 
@@ -99,7 +99,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param other the other measure to copy values from
    * @return this measure
    */
-  public MutableAngularVelocity mut_replace(AngularVelocity other) {
+  public MutableAngularAcceleration mut_replace(AngularAcceleration other) {
     m_magnitude = other.magnitude();
     m_baseUnitMagnitude = other.baseUnitMagnitude();
     m_unit = other.unit();
@@ -113,7 +113,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param unit      the new unit
    * @return this measure
    */
-  public MutableAngularVelocity mut_replace(double magnitude, AngularVelocityUnit unit) {
+  public MutableAngularAcceleration mut_replace(double magnitude, AngularAccelerationUnit unit) {
     this.m_magnitude = magnitude;
     this.m_baseUnitMagnitude = unit.toBaseUnits(magnitude);
     this.m_unit = unit;
@@ -129,7 +129,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param raw the raw value to increment by
    * @return the measure
    */
-  public MutableAngularVelocity mut_increment(double raw) {
+  public MutableAngularAcceleration mut_increment(double raw) {
     this.m_magnitude += raw;
     this.m_baseUnitMagnitude += m_unit.toBaseUnits(raw);
     return this;
@@ -142,7 +142,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param other the measure whose value should be added to this one
    * @return the measure
    */
-  public MutableAngularVelocity mut_increment(AngularVelocity other) {
+  public MutableAngularAcceleration mut_increment(AngularAcceleration other) {
     m_baseUnitMagnitude += other.baseUnitMagnitude();
     // can't naively use m_magnitude += other.in(m_unit) because the units may
     // not
@@ -162,7 +162,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param other the measurement to add
    * @return this measure
    */
-  public MutableAngularVelocity mut_plus(AngularVelocity other) {
+  public MutableAngularAcceleration mut_plus(AngularAcceleration other) {
     return mut_plus(other.magnitude(), other.unit());
   }
 
@@ -180,7 +180,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param unit      the unit of the other measurement
    * @return this measure
    */
-  public MutableAngularVelocity mut_plus(double magnitude, AngularVelocityUnit unit) {
+  public MutableAngularAcceleration mut_plus(double magnitude, AngularAccelerationUnit unit) {
     mut_setBaseUnitMagnitude(m_baseUnitMagnitude + unit.toBaseUnits(magnitude));
     return this;
   }
@@ -193,7 +193,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param other the measurement to add
    * @return this measure
    */
-  public MutableAngularVelocity mut_minus(AngularVelocity other) {
+  public MutableAngularAcceleration mut_minus(AngularAcceleration other) {
     return mut_minus(other.magnitude(), other.unit());
   }
 
@@ -210,7 +210,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param unit      the unit of the other measurement
    * @return this measure
    */
-  public MutableAngularVelocity mut_minus(double magnitude, AngularVelocityUnit unit) {
+  public MutableAngularAcceleration mut_minus(double magnitude, AngularAccelerationUnit unit) {
     return mut_plus(-magnitude, unit);
   }
 
@@ -222,7 +222,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param multiplier the multiplier to scale the measurement by
    * @return this measure
    */
-  public MutableAngularVelocity mut_times(double multiplier) {
+  public MutableAngularAcceleration mut_times(double multiplier) {
     mut_setBaseUnitMagnitude(m_baseUnitMagnitude * multiplier);
     return this;
   }
@@ -235,7 +235,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param multiplier the multiplier to scale the measurement by
    * @return this measure
    */
-  public MutableAngularVelocity mut_times(Dimensionless multiplier) {
+  public MutableAngularAcceleration mut_times(Dimensionless multiplier) {
     return mut_times(multiplier.baseUnitMagnitude());
   }
 
@@ -248,7 +248,7 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param divisor the divisor to scale the measurement by
    * @return this measure
    */
-  public MutableAngularVelocity mut_divide(double divisor) {
+  public MutableAngularAcceleration mut_divide(double divisor) {
     mut_setBaseUnitMagnitude(m_baseUnitMagnitude / divisor);
     return this;
   }
@@ -262,12 +262,10 @@ public class MutableAngularVelocity extends AngularVelocity {
    * @param divisor the divisor to scale the measurement by
    * @return this measure
    */
-  public MutableAngularVelocity mut_divide(Dimensionless divisor) {
+  public MutableAngularAcceleration mut_divide(Dimensionless divisor) {
     return mut_divide(divisor.baseUnitMagnitude());
   }
 
-  @Override
-  public MutableAngularAcceleration divide(Time time) {
-    return AngularAcceleration.combine(this, time).mutableCopy();
-  }  
+ 
+
 }

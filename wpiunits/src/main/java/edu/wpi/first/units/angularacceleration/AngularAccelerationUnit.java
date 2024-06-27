@@ -2,21 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units.angularvelocity;
+package edu.wpi.first.units.angularacceleration;
 
-import static edu.wpi.first.units.time.TimeUnit.Minute;
 import static edu.wpi.first.units.time.TimeUnit.Second;
-import static edu.wpi.first.units.angle.AngleUnit.Degrees;
-import static edu.wpi.first.units.angle.AngleUnit.Revolutions;
-import static edu.wpi.first.units.angle.AngleUnit.Rotations;
+import static edu.wpi.first.units.angularvelocity.AngularVelocityUnit.RotationsPerSecond;
+import static edu.wpi.first.units.angularvelocity.AngularVelocityUnit.DegreesPerSecond;
 
 import java.util.Objects;
 import java.util.Optional;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.UnaryFunction;
-import edu.wpi.first.units.angle.AngleUnit;
-import edu.wpi.first.units.angularacceleration.AngularAccelerationUnit;
+import edu.wpi.first.units.angularvelocity.AngularVelocityUnit;
 import edu.wpi.first.units.time.TimeUnit;
 
 /**
@@ -24,25 +21,21 @@ import edu.wpi.first.units.time.TimeUnit;
  * degrees.
  *
  */
-public class AngularVelocityUnit {
+public class AngularAccelerationUnit {
 
-  public static final AngularVelocityUnit RadiansPerSecond = new AngularVelocityUnit();
+  public static final AngularAccelerationUnit RadiansPerSecondPerSecond = new AngularAccelerationUnit();
 
-  public static final AngularVelocityUnit RevolutionsPerSecond = Revolutions.per(Second);
+  public static final AngularAccelerationUnit RotationsPerSecondPerSecond = RotationsPerSecond.per(Second);
 
-  public static final AngularVelocityUnit RotationsPerSecond = Rotations.per(Second);
-
-  public static final AngularVelocityUnit DegreesPerSecond = Degrees.per(Second);
-
-  public static final AngularVelocityUnit RPM = Revolutions.per(Minute);
+  public static final AngularAccelerationUnit DegreesPerSecondPerSecond = DegreesPerSecond.per(Second);
 
   private final UnaryFunction m_toBaseConverter;
   private final UnaryFunction m_fromBaseConverter;
 
-  private final Optional<AngularVelocityUnit> m_baseUnit;
+  private final Optional<AngularAccelerationUnit> m_baseUnit;
 
-  private AngularVelocity m_zero;
-  private AngularVelocity m_one;
+  private AngularAcceleration m_zero;
+  private AngularAcceleration m_one;
 
   private final String m_name;
   private final String m_symbol;
@@ -53,15 +46,15 @@ public class AngularVelocityUnit {
    * @param angleUnit the angle unit.
    * @param timeUnit  the time unit.
    */
-  public AngularVelocityUnit(
-      AngleUnit angleUnit,
+  public AngularAccelerationUnit(
+      AngularVelocityUnit angleUnit,
       TimeUnit timeUnit) {
     var angleUnitToBaseConverter = Objects.requireNonNull(angleUnit).getConverterToBase();
     var angleUnitFromBaseConverter = Objects.requireNonNull(angleUnit).getConverterFromBase();
     var timeUnitToBaseConverter = Objects.requireNonNull(timeUnit).getConverterToBase();
     var timeUnitFromBaseConverter = Objects.requireNonNull(timeUnit).getConverterFromBase();
 
-    m_baseUnit = Optional.of(RadiansPerSecond);
+    m_baseUnit = Optional.of(RadiansPerSecondPerSecond);
     m_toBaseConverter = x -> angleUnitToBaseConverter.apply(x) / timeUnitToBaseConverter.apply(x);
     m_fromBaseConverter = x -> angleUnitFromBaseConverter.apply(x) / timeUnitFromBaseConverter.apply(x);
     m_name = angleUnit.name() + " per " + timeUnit.name();
@@ -80,11 +73,11 @@ public class AngularVelocityUnit {
    * @param symbol the short symbol for the unit, such as "rad" for
    *               Radians or "rev" for Revolutions.
    */
-  public AngularVelocityUnit(
-      AngularVelocityUnit other,
+  public AngularAccelerationUnit(
+      AngularAccelerationUnit other,
       String name,
       String symbol) {
-    m_baseUnit = Optional.of(RadiansPerSecond);
+    m_baseUnit = Optional.of(RadiansPerSecondPerSecond);
     m_toBaseConverter = other.m_toBaseConverter;
     m_fromBaseConverter = other.m_fromBaseConverter;
     m_name = name;
@@ -95,7 +88,7 @@ public class AngularVelocityUnit {
    * Instantiates the base unit for angles (i.e. Radians). Only used once by the
    * static field Radians.
    */
-  private AngularVelocityUnit() {
+  private AngularAccelerationUnit() {
     m_baseUnit = Optional.empty();
     m_fromBaseConverter = x -> x;
     m_toBaseConverter = x -> x;
@@ -120,7 +113,7 @@ public class AngularVelocityUnit {
    *
    * @return the base unit
    */
-  public Optional<AngularVelocityUnit> getBaseUnit() {
+  public Optional<AngularAccelerationUnit> getBaseUnit() {
     return m_baseUnit;
   }
 
@@ -143,16 +136,16 @@ public class AngularVelocityUnit {
    * @param other the unit to compare to.
    * @return true if both units are equivalent, false if not
    */
-  public boolean equivalent(AngularVelocityUnit other) {
+  public boolean equivalent(AngularAccelerationUnit other) {
 
     double arbitrary = 16_777.214; // 2^24 / 1e3
 
     return Math.abs(
         this.m_fromBaseConverter.apply(arbitrary)
-            - other.m_fromBaseConverter.apply(arbitrary)) <= AngularVelocity.EQUIVALENCE_THRESHOLD
+            - other.m_fromBaseConverter.apply(arbitrary)) <= AngularAcceleration.EQUIVALENCE_THRESHOLD
         && Math.abs(
             this.m_toBaseConverter.apply(arbitrary)
-                - other.m_toBaseConverter.apply(arbitrary)) <= AngularVelocity.EQUIVALENCE_THRESHOLD;
+                - other.m_toBaseConverter.apply(arbitrary)) <= AngularAcceleration.EQUIVALENCE_THRESHOLD;
   }
 
   /**
@@ -189,7 +182,7 @@ public class AngularVelocityUnit {
    * @param otherUnit the unit to convert the magnitude to
    * @return the corresponding value in terms of this unit.
    */
-  public double convertFrom(double magnitude, AngularVelocityUnit otherUnit) {
+  public double convertFrom(double magnitude, AngularAccelerationUnit otherUnit) {
     if (this.equivalent(otherUnit.getBaseUnit().get())) {
       // same unit, don't bother converting
       return magnitude;
@@ -229,7 +222,7 @@ public class AngularVelocityUnit {
    * @param magnitude the magnitude of the measure to create
    * @return the measure
    */
-  public AngularVelocity of(double magnitude) {
+  public AngularAcceleration of(double magnitude) {
     if (magnitude == 0) {
       // reuse static object
       return zero();
@@ -238,7 +231,7 @@ public class AngularVelocityUnit {
       // reuse static object
       return one();
     }
-    return AngularVelocity.ofRelativeUnits(magnitude, this);
+    return AngularAcceleration.ofRelativeUnits(magnitude, this);
   }
 
   /**
@@ -250,8 +243,8 @@ public class AngularVelocityUnit {
    *                          unit
    * @return the measure
    */
-  public AngularVelocity ofBaseUnits(double baseUnitMagnitude) {
-    return AngularVelocity.ofBaseUnits(baseUnitMagnitude, this);
+  public AngularAcceleration ofBaseUnits(double baseUnitMagnitude) {
+    return AngularAcceleration.ofBaseUnits(baseUnitMagnitude, this);
   }
 
   /**
@@ -259,10 +252,10 @@ public class AngularVelocityUnit {
    *
    * @return the zero-valued measure
    */
-  public AngularVelocity zero() {
+  public AngularAcceleration zero() {
     // lazy init because 'this' is null in object initialization
     if (m_zero == null) {
-      m_zero = AngularVelocity.ofRelativeUnits(0, this);
+      m_zero = AngularAcceleration.ofRelativeUnits(0, this);
     }
     return m_zero;
   }
@@ -272,10 +265,10 @@ public class AngularVelocityUnit {
    *
    * @return the 1-valued measure
    */
-  public AngularVelocity one() {
+  public AngularAcceleration one() {
     // lazy init because 'this' is null in object initialization
     if (m_one == null) {
-      m_one = AngularVelocity.ofRelativeUnits(1, this);
+      m_one = AngularAcceleration.ofRelativeUnits(1, this);
     }
     return m_one;
   }
@@ -283,7 +276,7 @@ public class AngularVelocityUnit {
   @Override
   public boolean equals(Object o) {
     return this == o
-        || o instanceof AngularVelocityUnit that
+        || o instanceof AngularAccelerationUnit that
             && m_name.equals(that.m_name)
             && m_symbol.equals(that.m_symbol)
             && this.equivalent(that);
@@ -315,9 +308,5 @@ public class AngularVelocityUnit {
   @Override
   public String toString() {
     return name();
-  }
-
-  public AngularAccelerationUnit per(TimeUnit timeUnit) {
-    return new AngularAccelerationUnit(this, timeUnit);
   }
 }

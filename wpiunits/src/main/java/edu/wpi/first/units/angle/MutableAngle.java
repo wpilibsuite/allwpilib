@@ -1,6 +1,10 @@
 package edu.wpi.first.units.angle;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.angularvelocity.AngularVelocity;
+import edu.wpi.first.units.angularvelocity.MutableAngularVelocity;
 import edu.wpi.first.units.dimensionless.Dimensionless;
+import edu.wpi.first.units.time.Time;
 
 public class MutableAngle extends Angle {
 
@@ -261,4 +265,10 @@ public class MutableAngle extends Angle {
   public MutableAngle mut_divide(Dimensionless divisor) {
     return mut_divide(divisor.baseUnitMagnitude());
   }
+
+  @Override
+  public MutableAngularVelocity divide(Time time) {
+    return AngularVelocity.combine(this, time).mutableCopy();
+  }   
+
 }
