@@ -165,6 +165,7 @@ public class RobotContainer {
     m_robotSignals.m_top.setDefaultCommand(topDefault);
     m_robotSignals.m_main.setDefaultCommand(mainDefault);
     m_robotSignals.m_enableDisable.setDefaultCommand(enableDisableDefault);
+    // could put default for m_robotSignals.m_achieveHueGoal here but need a getter so don't bother
   }
 
   /**

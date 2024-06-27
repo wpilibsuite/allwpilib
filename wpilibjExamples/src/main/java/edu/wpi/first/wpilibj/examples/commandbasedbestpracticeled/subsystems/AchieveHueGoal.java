@@ -15,13 +15,13 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
  * That scheme might not be fully in the spirit of command-based so this example is not encouraging
  * that usage.
  * 
- * BUT BUT BUT
+ * BUT BUT BUT BUT
  * The default command for the LED subsystem is used exactly as described above. The default
  * command is running continuously displaying whatever is currently set as the pattern to display.
  * 
  * A suggestion by CD @Amicus1 for those against using commands except to set the goal:
- * If this is a verbosity of code issue, I suggest writing the logic as a private subsystem method
- * and exposing it as a command factory.
+ * "If this is a verbosity of code issue, I suggest writing the logic as a private subsystem method
+ * and exposing it as a command factory."
  */
 
 import static edu.wpi.first.units.Units.Seconds;
@@ -45,7 +45,7 @@ import java.util.function.DoubleSupplier;
 public class AchieveHueGoal extends SubsystemBase {
 
   private final PIDController m_hueController;
-  private double m_currentStateHue;
+  private double m_currentStateHue; // both the input and output of the controller
   private LEDPattern m_notRunningSignal = LEDPattern.solid(Color.kGray);
   private LEDPattern m_currentStateSignal = m_notRunningSignal; // initially then what to display on LEDs
   private final LEDView m_robotSignals; // where the output is displayed
@@ -53,18 +53,25 @@ public class AchieveHueGoal extends SubsystemBase {
   /**
    * Constructor
    *
-   * @param robotSignals
+   * @param robotSignals LED subsystem used as output by this subsystem
    */
   public AchieveHueGoal(LEDView robotSignals) {
-    this.m_robotSignals = robotSignals;
+    m_robotSignals = robotSignals;
     /**
      *  PID initialization.
+     * 
      *  The PID controller is ready but not running initially until a command is issued with a
      *  setpoint.
-     *  LED default command will display continuously in the "background" as patterns change.
+     * 
+     *  LED subsystem default command will display continuously in the "background" as patterns
+     *  change. Won't need regular display command in command groups but if it was, then asProxy()
+     *  needed in group use if default command needs to run in a group, too.
+     * 
+     *  Considered flipping and using a regular command so there wasn't this perversion of the
+     *  default command but I like the default command's ability to restart no matter what happens.
      */
-    robotSignals.setDefaultCommand(m_robotSignals.setSignal(()-> m_currentStateSignal));
-    m_currentStateHue = 0.0; // also considered the initial and previous state
+    m_robotSignals.setDefaultCommand(m_robotSignals.setSignal(()-> m_currentStateSignal));
+    m_currentStateHue = 0.0; // as input both the initial and previous state
     final double kP = 0.025;
     final double kI = 0.0;
     final double kD = 0.0;
@@ -91,35 +98,37 @@ public class AchieveHueGoal extends SubsystemBase {
         runOnce(this::reset),
 
         run(() -> { // run to the setpoint displaying state progress as it runs
-                m_currentStateHue = // compute the current state
+                m_currentStateHue = // compute the new current state
             MathUtil.clamp(
                         m_currentStateHue
                          + m_hueController.calculate(m_currentStateHue, hueSetpoint.getAsDouble()),
-              minimumHue,
-              maximumHue);
-                m_currentStateSignal = // color for the current state
+                        minimumHue, maximumHue);
+                m_currentStateSignal = // LED color for the current state; default command displays
                     LEDPattern.solid(Color.fromHSV((int) m_currentStateHue, 200, 200));
       }
             )
 
           .until(m_hueController::atSetpoint), // controller stops; momentum stable or not
+          // if the controller needs to keep running, put it in parallel and check atSetpoint to
+          // trigger subsequent commands
 
-        // set to blink for a while to show at setpoint
+        // set LED pattern to blink to show controller stopped at setpoint
         runOnce(()-> m_currentStateSignal = m_currentStateSignal.blink(Seconds.of(0.1))),
-        waitSeconds(2.0) // let the LEDs blink by the default command in the "background"
+
+        waitSeconds(2.0) // let the LEDs blink awhile by the default command in the "background"
       )
-      .finallyDo(this::reset); // cleanup the controller but it was stopped or interrupted above
+      .finallyDo(this::reset); // cleanup the controller it was mostly stopped or interrupted above
   }
 
   /**
    * Reset or stop the controller
    * 
-   * <p>Used first to initialize and in finallyDo() at the end of a controller command to assure stopping
+   * <p>Used initially to assure known stopped state. Used finally to stop anything that needs to.
    */
   public void reset() {
     // also stop other devices as needed but not needed in this example
           m_hueController.reset();
-          m_currentStateHue = 0; // also considered the initial and previous state
+    m_currentStateHue = 0.0; // also considered the initial and previous state
     m_currentStateSignal = m_notRunningSignal;
       }
 
@@ -129,7 +138,7 @@ public class AchieveHueGoal extends SubsystemBase {
    * <p>Null command works merely by its existence; assuming the underlying controller command allows interrupts
    * and cleanly handles interrupts with "finallyDo()".
    * 
-   * @return Command normally used to interrupt and stop the controller while it's running as a command
+   * @return Command to interrupt and stop the controller while it's running as a command
    */
   public Command interrupt() {
     return
@@ -147,7 +156,7 @@ public class AchieveHueGoal extends SubsystemBase {
   public void runAfterCommands() {}
 
     /**
-     * Example of how to disallow default command
+   * Example of how to disallow default command for this subsystem
      *
      * @param def default command
      */
@@ -156,3 +165,40 @@ public class AchieveHueGoal extends SubsystemBase {
       throw new IllegalArgumentException("Default Command not allowed");
   }
 }
+
+/** @Oblarg post on Chief Delphi:
+
+// Example of two ways to create a PID controller Command as factory in a subsystem
+// (Don't use the WPILib PIDControllerCommand; create your own with a factory)
+
+// in subsystem scope
+// we need a motor and sensor for feedback
+private final MotorController motor = new FooMotor();
+private final Encoder encoder = new Encoder(...);
+
+// Example 1 we could have a PIDController as a field in the subsystem itself...
+private final PIDController controller = new PIDController(...);
+// this command captures the subsystem's PIDController, like PIDSubsystem
+public Command moveToPosition(double position) {
+  return runOnce(controller::reset)
+        .andThen(run(() -> {
+                  motor.set(controller.calculate(
+                  encoder.getPosition(),
+                  position
+                  ));
+        }).finallyDo(motor::stop);
+}
+
+// Example 2 if we don't want to persist the controller in the subsystem after the command ends...
+// this command captures its *own* controller, like PIDCommand
+public Command moveToPosition(double position) {
+  PIDController controller = new PIDController(...);
+  // we don't have to reset a fresh controller
+  return run(() -> {
+                  motor.set(controller.calculate(
+                  encoder.getPosition(),
+                  position
+                  ));
+        }).finallyDo(motor::stop);
+}
+ */
