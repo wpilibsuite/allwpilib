@@ -54,8 +54,7 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  private int m_port;
-  private int m_mode;
+  private final int m_port;
 
   /**
    * Constructor.
@@ -67,8 +66,7 @@ public class SPI implements AutoCloseable {
 
     SPIJNI.spiInitialize(m_port);
 
-    m_mode = 0;
-    SPIJNI.spiSetMode(m_port, m_mode);
+    SPIJNI.spiSetMode(m_port, 0);
 
     HAL.report(tResourceType.kResourceType_SPI, port.value + 1);
   }
@@ -115,8 +113,7 @@ public class SPI implements AutoCloseable {
    * @param mode The mode to set.
    */
   public final void setMode(Mode mode) {
-    m_mode = mode.value & 0x3;
-    SPIJNI.spiSetMode(m_port, m_mode);
+    SPIJNI.spiSetMode(m_port, mode.value & 0x3);
   }
 
   /** Configure the chip select line to be active high. */

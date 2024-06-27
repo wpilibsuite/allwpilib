@@ -43,7 +43,6 @@ import us.hebi.quickbuf.ProtoMessage;
  * kept to the NetworkTableInstance returned by this function to keep it from being garbage
  * collected.
  */
-@SuppressWarnings("PMD.CouplingBetweenObjects")
 public final class NetworkTableInstance implements AutoCloseable {
   /** Client/server mode flag values (as returned by {@link #getNetworkMode()}). */
   public enum NetworkMode {
@@ -773,7 +772,10 @@ public final class NetworkTableInstance implements AutoCloseable {
   private static class ListenerStorage implements AutoCloseable {
     private final ReentrantLock m_lock = new ReentrantLock();
     private final Map<Integer, Consumer<NetworkTableEvent>> m_listeners = new HashMap<>();
+
+    @SuppressWarnings("PMD.SingularField")
     private Thread m_thread;
+
     private int m_poller;
     private boolean m_waitQueue;
     private final Event m_waitQueueEvent = new Event();
@@ -1519,10 +1521,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-    return other instanceof NetworkTableInstance inst && m_handle == inst.m_handle;
+    return other == this || other instanceof NetworkTableInstance inst && m_handle == inst.m_handle;
   }
 
   @Override

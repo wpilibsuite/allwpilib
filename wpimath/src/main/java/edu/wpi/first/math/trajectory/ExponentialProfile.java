@@ -70,7 +70,7 @@ public class ExponentialProfile {
   }
 
   /** Profile constraints. */
-  public static class Constraints {
+  public static final class Constraints {
     /** Maximum unsigned input voltage. */
     public final double maxInput;
 

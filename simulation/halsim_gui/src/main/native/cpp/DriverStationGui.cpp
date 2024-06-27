@@ -1131,7 +1131,7 @@ static void DriverStationExecute() {
   }
 
   // Update HAL
-  if (isAttached) {
+  if (isAttached && !isAuto) {
     for (int i = 0, end = gRobotJoysticks.size();
          i < end && i < HAL_kMaxJoysticks; ++i) {
       gRobotJoysticks[i].SetHAL(i);

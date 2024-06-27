@@ -74,14 +74,12 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
         double trial_x = x + α * p_x;
 
         xAD.SetValue(trial_x);
-        cost.Update();
 
         while (cost.Value() > oldCost) {
           α *= 0.5;
           trial_x = x + α * p_x;
 
           xAD.SetValue(trial_x);
-          cost.Update();
         }
 
         x = trial_x;

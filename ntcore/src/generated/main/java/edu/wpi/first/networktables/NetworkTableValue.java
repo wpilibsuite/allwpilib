@@ -646,12 +646,10 @@ public final class NetworkTableValue {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-    return other instanceof NetworkTableValue ntOther
-        && m_type == ntOther.m_type
-        && m_value.equals(ntOther.m_value);
+    return other == this
+        || other instanceof NetworkTableValue ntOther
+            && m_type == ntOther.m_type
+            && m_value.equals(ntOther.m_value);
   }
 
   @Override

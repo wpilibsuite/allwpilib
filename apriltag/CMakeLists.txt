@@ -7,7 +7,7 @@ include(FetchContent)
 fetchcontent_declare(
     apriltaglib
     GIT_REPOSITORY https://github.com/wpilibsuite/apriltag.git
-    GIT_TAG 64be6ab26abf5e995321997fd0752c609a7e30f4
+    GIT_TAG da208cc38c1b78fe89861616d44c0692e76b6b8b
 )
 
 # Don't use apriltag's CMakeLists.txt due to conflicting naming and JNI
@@ -42,6 +42,8 @@ if(WITH_JAVA)
             ${OPENCV_JAVA_INSTALL_DIR}
             ${OpenCV_INSTALL_PATH}/bin
             ${OpenCV_INSTALL_PATH}/share/java
+            ${OpenCV_INSTALL_PATH}/share/java/opencv4
+            ${OpenCV_INSTALL_PATH}/share/OpenCV/java
         NO_DEFAULT_PATH
     )
 

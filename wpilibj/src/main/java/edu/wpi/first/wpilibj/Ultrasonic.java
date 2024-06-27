@@ -44,7 +44,9 @@ public class Ultrasonic implements Sendable, AutoCloseable {
   private static Thread m_task;
   private static int m_instances;
 
+  @SuppressWarnings("PMD.SingularField")
   private SimDevice m_simDevice;
+
   private SimBoolean m_simRangeValid;
   private SimDouble m_simRange;
 
@@ -57,7 +59,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
    * certainly break. Make sure to disable automatic mode before changing anything with the
    * sensors!!
    */
-  private static class UltrasonicChecker extends Thread {
+  private static final class UltrasonicChecker extends Thread {
     @Override
     public synchronized void run() {
       while (m_automaticEnabled) {

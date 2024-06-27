@@ -325,26 +325,33 @@ class SLEIPNIR_DLLEXPORT OCPSolver : public OptimizationProblem {
 
     Variable time = 0.0;
 
+    // Derivation at https://mec560sbu.github.io/2016/09/30/direct_collocation/
     for (int i = 0; i < m_numSteps; ++i) {
+      Variable h = DT()(0, i);
+
+      auto& f = m_dynamicsFunction;
+
+      auto t_begin = time;
+      auto t_end = t_begin + h;
+
       auto x_begin = X().Col(i);
       auto x_end = X().Col(i + 1);
+
       auto u_begin = U().Col(i);
-      Variable dt = DT()(0, i);
-      auto t_begin = time;
-      auto t_end = time + dt;
-      auto t_c = t_begin + dt / 2.0;
+      auto u_end = U().Col(i + 1);
 
-      time += dt;
+      auto xdot_begin = f(t_begin, x_begin, u_begin, h);
+      auto xdot_end = f(t_end, x_end, u_end, h);
+      auto xdot_c =
+          -3 / (2 * h) * (x_begin - x_end) - 0.25 * (xdot_begin + xdot_end);
 
-      // Use u_begin on the end point as well because we are approaching a
-      // discontinuity from the left
-      auto f_begin = m_dynamicsFunction(t_begin, x_begin, u_begin, dt);
-      auto f_end = m_dynamicsFunction(t_end, x_end, u_begin, dt);
-      auto x_c = (x_begin + x_end) / 2.0 + (f_begin - f_end) * (dt / 8.0);
-      auto xprime_c =
-          (x_begin - x_end) * (-3.0 / (2.0 * dt)) - (f_begin + f_end) / 4.0;
-      auto f_c = m_dynamicsFunction(t_c, x_c, u_begin, dt);
-      SubjectTo(f_c == xprime_c);
+      auto t_c = t_begin + 0.5 * h;
+      auto x_c = 0.5 * (x_begin + x_end) + h / 8 * (xdot_begin - xdot_end);
+      auto u_c = 0.5 * (u_begin + u_end);
+
+      SubjectTo(xdot_c == f(t_c, x_c, u_c, h));
+
+      time += h;
     }
   }
 

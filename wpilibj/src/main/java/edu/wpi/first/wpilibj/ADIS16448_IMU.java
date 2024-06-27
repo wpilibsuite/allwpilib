@@ -840,7 +840,7 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
 
           if (calc_crc == imu_crc) {
             // Timestamp is at buffer[i]
-            m_dt = ((double) buffer[i] - previous_timestamp) / 1000000.0;
+            m_dt = (buffer[i] - previous_timestamp) / 1000000.0;
 
             // Scale sensor data
             gyro_rate_x = (toShort(buffer[i + 5], buffer[i + 6]) * 0.04);

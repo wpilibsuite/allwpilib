@@ -202,7 +202,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @return The mean value of this matrix.
    */
   public final double mean() {
-    return this.elementSum() / (double) this.m_storage.getNumElements();
+    return this.elementSum() / this.m_storage.getNumElements();
   }
 
   /**
@@ -728,12 +728,10 @@ public class Matrix<R extends Num, C extends Num> {
    */
   @Override
   public boolean equals(Object other) {
-    if (this == other) {
-      return true;
-    }
-    return other instanceof Matrix<?, ?> matrix
-        && !MatrixFeatures_DDRM.hasUncountable(matrix.m_storage.getDDRM())
-        && MatrixFeatures_DDRM.isEquals(this.m_storage.getDDRM(), matrix.m_storage.getDDRM());
+    return this == other
+        || other instanceof Matrix<?, ?> matrix
+            && !MatrixFeatures_DDRM.hasUncountable(matrix.m_storage.getDDRM())
+            && MatrixFeatures_DDRM.isEquals(this.m_storage.getDDRM(), matrix.m_storage.getDDRM());
   }
 
   @Override

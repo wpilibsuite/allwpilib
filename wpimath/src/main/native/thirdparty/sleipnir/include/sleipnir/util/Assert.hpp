@@ -3,9 +3,8 @@
 #pragma once
 
 #ifdef JORMUNGANDR
+#include <format>
 #include <stdexcept>
-
-#include <fmt/format.h>
 /**
  * Throw an exception in Python.
  */
@@ -13,7 +12,7 @@
   do {                                                                         \
     if (!(condition)) {                                                        \
       throw std::invalid_argument(                                             \
-          fmt::format("{}:{}: {}: Assertion `{}' failed.", __FILE__, __LINE__, \
+          std::format("{}:{}: {}: Assertion `{}' failed.", __FILE__, __LINE__, \
                       __func__, #condition));                                  \
     }                                                                          \
   } while (0);

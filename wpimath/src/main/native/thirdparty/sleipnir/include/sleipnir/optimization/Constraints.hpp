@@ -4,11 +4,13 @@
 
 #include <algorithm>
 #include <concepts>
+#include <type_traits>
+
+#include <wpi/SmallVector.h>
 
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/util/Assert.hpp"
 #include "sleipnir/util/Concepts.hpp"
-#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir {
@@ -25,18 +27,21 @@ namespace sleipnir {
  * @param rhs Right-hand side.
  */
 template <typename LHS, typename RHS>
-  requires(ScalarLike<LHS> || MatrixLike<LHS>) &&
-          (ScalarLike<RHS> || MatrixLike<RHS>) &&
-          (!std::same_as<LHS, double> || !std::same_as<RHS, double>)
-small_vector<Variable> MakeConstraints(const LHS& lhs, const RHS& rhs) {
-  small_vector<Variable> constraints;
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+wpi::SmallVector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
+  wpi::SmallVector<Variable> constraints;
 
-  if constexpr (ScalarLike<LHS> && ScalarLike<RHS>) {
+  if constexpr (ScalarLike<std::decay_t<LHS>> &&
+                ScalarLike<std::decay_t<RHS>>) {
     constraints.emplace_back(lhs - rhs);
-  } else if constexpr (ScalarLike<LHS> && MatrixLike<RHS>) {
+  } else if constexpr (ScalarLike<std::decay_t<LHS>> &&
+                       MatrixLike<std::decay_t<RHS>>) {
     int rows;
     int cols;
-    if constexpr (EigenMatrixLike<RHS>) {
+    if constexpr (EigenMatrixLike<std::decay_t<RHS>>) {
       rows = rhs.rows();
       cols = rhs.cols();
     } else {
@@ -52,10 +57,11 @@ small_vector<Variable> MakeConstraints(const LHS& lhs, const RHS& rhs) {
         constraints.emplace_back(lhs - rhs(row, col));
       }
     }
-  } else if constexpr (MatrixLike<LHS> && ScalarLike<RHS>) {
+  } else if constexpr (MatrixLike<std::decay_t<LHS>> &&
+                       ScalarLike<std::decay_t<RHS>>) {
     int rows;
     int cols;
-    if constexpr (EigenMatrixLike<LHS>) {
+    if constexpr (EigenMatrixLike<std::decay_t<LHS>>) {
       rows = lhs.rows();
       cols = lhs.cols();
     } else {
@@ -71,10 +77,11 @@ small_vector<Variable> MakeConstraints(const LHS& lhs, const RHS& rhs) {
         constraints.emplace_back(lhs(row, col) - rhs);
       }
     }
-  } else if constexpr (MatrixLike<LHS> && MatrixLike<RHS>) {
+  } else if constexpr (MatrixLike<std::decay_t<LHS>> &&
+                       MatrixLike<std::decay_t<RHS>>) {
     int lhsRows;
     int lhsCols;
-    if constexpr (EigenMatrixLike<LHS>) {
+    if constexpr (EigenMatrixLike<std::decay_t<LHS>>) {
       lhsRows = lhs.rows();
       lhsCols = lhs.cols();
     } else {
@@ -86,7 +93,7 @@ small_vector<Variable> MakeConstraints(const LHS& lhs, const RHS& rhs) {
     int rhsRows;
     [[maybe_unused]]
     int rhsCols;
-    if constexpr (EigenMatrixLike<RHS>) {
+    if constexpr (EigenMatrixLike<std::decay_t<RHS>>) {
       rhsRows = rhs.rows();
       rhsCols = rhs.cols();
     } else {
@@ -113,7 +120,7 @@ small_vector<Variable> MakeConstraints(const LHS& lhs, const RHS& rhs) {
  */
 struct SLEIPNIR_DLLEXPORT EqualityConstraints {
   /// A vector of scalar equality constraints.
-  small_vector<Variable> constraints;
+  wpi::SmallVector<Variable> constraints;
 
   /**
    * Constructs an equality constraint from a left and right side.
@@ -125,19 +132,20 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
    * @param rhs Right-hand side.
    */
   template <typename LHS, typename RHS>
-    requires(ScalarLike<LHS> || MatrixLike<LHS>) &&
-            (ScalarLike<RHS> || MatrixLike<RHS>) &&
-            (!std::same_as<LHS, double> || !std::same_as<RHS, double>)
-  EqualityConstraints(const LHS& lhs, const RHS& rhs)
+    requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+            (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+            (!std::same_as<std::decay_t<LHS>, double> ||
+             !std::same_as<std::decay_t<RHS>, double>)
+  EqualityConstraints(LHS&& lhs, RHS&& rhs)
       : constraints{MakeConstraints(lhs, rhs)} {}
 
   /**
    * Implicit conversion operator to bool.
    */
-  operator bool() const {  // NOLINT
+  operator bool() {  // NOLINT
     return std::all_of(
         constraints.begin(), constraints.end(),
-        [](const auto& constraint) { return constraint.Value() == 0.0; });
+        [](auto& constraint) { return constraint.Value() == 0.0; });
   }
 };
 
@@ -146,7 +154,7 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
  */
 struct SLEIPNIR_DLLEXPORT InequalityConstraints {
   /// A vector of scalar inequality constraints.
-  small_vector<Variable> constraints;
+  wpi::SmallVector<Variable> constraints;
 
   /**
    * Constructs an inequality constraint from a left and right side.
@@ -158,19 +166,20 @@ struct SLEIPNIR_DLLEXPORT InequalityConstraints {
    * @param rhs Right-hand side.
    */
   template <typename LHS, typename RHS>
-    requires(ScalarLike<LHS> || MatrixLike<LHS>) &&
-            (ScalarLike<RHS> || MatrixLike<RHS>) &&
-            (!std::same_as<LHS, double> || !std::same_as<RHS, double>)
-  InequalityConstraints(const LHS& lhs, const RHS& rhs)
+    requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+            (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+            (!std::same_as<std::decay_t<LHS>, double> ||
+             !std::same_as<std::decay_t<RHS>, double>)
+  InequalityConstraints(LHS&& lhs, RHS&& rhs)
       : constraints{MakeConstraints(lhs, rhs)} {}
 
   /**
    * Implicit conversion operator to bool.
    */
-  operator bool() const {  // NOLINT
+  operator bool() {  // NOLINT
     return std::all_of(
         constraints.begin(), constraints.end(),
-        [](const auto& constraint) { return constraint.Value() >= 0.0; });
+        [](auto& constraint) { return constraint.Value() >= 0.0; });
   }
 };
 
@@ -181,10 +190,11 @@ struct SLEIPNIR_DLLEXPORT InequalityConstraints {
  * @param rhs Left-hand side.
  */
 template <typename LHS, typename RHS>
-  requires(ScalarLike<LHS> || MatrixLike<LHS>) &&
-          (ScalarLike<RHS> || MatrixLike<RHS>) &&
-          (!std::same_as<LHS, double> || !std::same_as<RHS, double>)
-EqualityConstraints operator==(const LHS& lhs, const RHS& rhs) {
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+EqualityConstraints operator==(LHS&& lhs, RHS&& rhs) {
   return EqualityConstraints{lhs, rhs};
 }
 
@@ -196,10 +206,11 @@ EqualityConstraints operator==(const LHS& lhs, const RHS& rhs) {
  * @param rhs Left-hand side.
  */
 template <typename LHS, typename RHS>
-  requires(ScalarLike<LHS> || MatrixLike<LHS>) &&
-          (ScalarLike<RHS> || MatrixLike<RHS>) &&
-          (!std::same_as<LHS, double> || !std::same_as<RHS, double>)
-InequalityConstraints operator<(const LHS& lhs, const RHS& rhs) {
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+InequalityConstraints operator<(LHS&& lhs, RHS&& rhs) {
   return rhs >= lhs;
 }
 
@@ -211,10 +222,11 @@ InequalityConstraints operator<(const LHS& lhs, const RHS& rhs) {
  * @param rhs Left-hand side.
  */
 template <typename LHS, typename RHS>
-  requires(ScalarLike<LHS> || MatrixLike<LHS>) &&
-          (ScalarLike<RHS> || MatrixLike<RHS>) &&
-          (!std::same_as<LHS, double> || !std::same_as<RHS, double>)
-InequalityConstraints operator<=(const LHS& lhs, const RHS& rhs) {
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+InequalityConstraints operator<=(LHS&& lhs, RHS&& rhs) {
   return rhs >= lhs;
 }
 
@@ -226,10 +238,11 @@ InequalityConstraints operator<=(const LHS& lhs, const RHS& rhs) {
  * @param rhs Left-hand side.
  */
 template <typename LHS, typename RHS>
-  requires(ScalarLike<LHS> || MatrixLike<LHS>) &&
-          (ScalarLike<RHS> || MatrixLike<RHS>) &&
-          (!std::same_as<LHS, double> || !std::same_as<RHS, double>)
-InequalityConstraints operator>(const LHS& lhs, const RHS& rhs) {
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+InequalityConstraints operator>(LHS&& lhs, RHS&& rhs) {
   return lhs >= rhs;
 }
 
@@ -241,10 +254,11 @@ InequalityConstraints operator>(const LHS& lhs, const RHS& rhs) {
  * @param rhs Left-hand side.
  */
 template <typename LHS, typename RHS>
-  requires(ScalarLike<LHS> || MatrixLike<LHS>) &&
-          (ScalarLike<RHS> || MatrixLike<RHS>) &&
-          (!std::same_as<LHS, double> || !std::same_as<RHS, double>)
-InequalityConstraints operator>=(const LHS& lhs, const RHS& rhs) {
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+InequalityConstraints operator>=(LHS&& lhs, RHS&& rhs) {
   return InequalityConstraints{lhs, rhs};
 }
 

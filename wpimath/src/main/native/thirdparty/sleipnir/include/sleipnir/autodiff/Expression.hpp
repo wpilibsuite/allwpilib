@@ -11,10 +11,11 @@
 #include <numbers>
 #include <utility>
 
+#include <wpi/SmallVector.h>
+
 #include "sleipnir/autodiff/ExpressionType.hpp"
 #include "sleipnir/util/IntrusiveSharedPtr.hpp"
 #include "sleipnir/util/Pool.hpp"
-#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir::detail {
@@ -423,7 +424,7 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
   // Expression destructor when expr's refcount reaches zero can cause a stack
   // overflow. Instead, we iterate over its children to decrement their
   // refcounts and deallocate them.
-  small_vector<Expression*> stack;
+  wpi::SmallVector<Expression*> stack;
   stack.emplace_back(expr);
 
   while (!stack.empty()) {
