@@ -40,10 +40,6 @@ static inline int16_t BuffToShort(const uint32_t* buf) {
   return (static_cast<int16_t>(buf[0]) << 8) | buf[1];
 }
 
-static inline uint16_t ToUShort(const uint8_t* buf) {
-  return (static_cast<uint16_t>(buf[0]) << 8) | buf[1];
-}
-
 using namespace frc;
 
 namespace {
@@ -485,13 +481,6 @@ void ADIS16448_IMU::Calibrate() {
   m_integ_gyro_angle_z = 0.0;
 }
 
-/**
- * This function reads the contents of an 8-bit register location by
- *transmitting the register location byte along with a null (0x00) byte using
- *the standard WPILib API. The response (two bytes) is read back using the
- *WPILib API and joined using a helper function. This function assumes the
- *controller is set to standard SPI mode.
- **/
 uint16_t ADIS16448_IMU::ReadRegister(uint8_t reg) {
   uint8_t buf[2];
   buf[0] = reg & 0x7f;
@@ -500,7 +489,7 @@ uint16_t ADIS16448_IMU::ReadRegister(uint8_t reg) {
   m_spi->Write(buf, 2);
   m_spi->Read(false, buf, 2);
 
-  return ToUShort(buf);
+  return (static_cast<uint16_t>(buf[0]) << 8) | buf[1];
 }
 
 /**
@@ -520,10 +509,6 @@ void ADIS16448_IMU::WriteRegister(uint8_t reg, uint16_t val) {
   m_spi->Write(buf, 2);
 }
 
-/**
- * This function resets (zeros) the accumulated (integrated) angle estimates for
- *the xgyro, ygyro, and zgyro outputs.
- **/
 void ADIS16448_IMU::Reset() {
   std::scoped_lock sync(m_mutex);
   m_integ_gyro_angle_x = 0.0;

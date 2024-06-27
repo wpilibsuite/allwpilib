@@ -56,9 +56,6 @@ inline void ADISReportError(int32_t status, const char* file, int line,
 #define REPORT_ERROR(msg) \
   ADISReportError(err::Error, __FILE__, __LINE__, __FUNCTION__, msg)
 
-/**
- * Constructor.
- */
 ADIS16470_IMU::ADIS16470_IMU()
     : ADIS16470_IMU(kZ, kY, kX, SPI::Port::kOnboardCS0, CalibrationTime::_1s) {}
 
@@ -490,20 +487,6 @@ void ADIS16470_IMU::Calibrate() {
   }
 }
 
-/**
- * @brief Reads the contents of a specified register location over SPI.
- *
- * @param reg An unsigned, 8-bit register location.
- *
- * @return An unsigned, 16-bit number representing the contents of the requested
- *register location.
- *
- * This function reads the contents of an 8-bit register location by
- *transmitting the register location byte along with a null (0x00) byte using
- *the standard WPILib API. The response (two bytes) is read back using the
- *WPILib API and joined using a helper function. This function assumes the
- *controller is set to standard SPI mode.
- **/
 uint16_t ADIS16470_IMU::ReadRegister(uint8_t reg) {
   uint8_t buf[2];
   buf[0] = reg & 0x7f;
@@ -540,12 +523,6 @@ void ADIS16470_IMU::WriteRegister(uint8_t reg, uint16_t val) {
   m_spi->Write(buf, 2);
 }
 
-/**
- * @brief Resets (zeros) the xgyro, ygyro, and zgyro angle integrations.
- *
- * This function resets (zeros) the accumulated (integrated) angle estimates for
- *the xgyro, ygyro, and zgyro outputs.
- **/
 void ADIS16470_IMU::Reset() {
   std::scoped_lock sync(m_mutex);
   m_integ_angle_x = 0.0;
