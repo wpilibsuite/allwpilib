@@ -23,6 +23,7 @@ import java.util.function.BooleanSupplier;
  * {@link #rising()}.
  */
 public class BooleanEvent implements BooleanSupplier {
+  /** Poller loop. */
   protected final EventLoop m_loop;
   private final BooleanSupplier m_signal;
 
