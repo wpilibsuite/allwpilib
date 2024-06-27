@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Value;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.collections.LongToObjectHashMap;
 import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.units.measure.Distance;
@@ -101,8 +100,8 @@ public interface LEDPattern {
    * <p>This method is intentionally designed to use separate objects for reading and writing data.
    * By splitting them up, we can easily modify the behavior of some base pattern to make it {@link
    * #scrollAtRelativeSpeed(Frequency) scroll}, {@link #blink(Time, Time) blink}, or {@link
-   * #breathe(Time) breathe} by intercepting the data writes to transform their behavior to
-   * whatever we like.
+   * #breathe(Time) breathe} by intercepting the data writes to transform their behavior to whatever
+   * we like.
    *
    * @param reader data reader for accessing buffer length and current colors
    * @param writer data writer for setting new LED colors on the buffer
@@ -281,8 +280,8 @@ public interface LEDPattern {
   }
 
   /**
-   * Like {@link #blink(Time, Time) blink(onTime, offTime)}, but where the "off" time is
-   * exactly equal to the "on" time.
+   * Like {@link #blink(Time, Time) blink(onTime, offTime)}, but where the "off" time is exactly
+   * equal to the "on" time.
    *
    * @param onTime how long the pattern should play for (and be turned off for), per cycle
    * @return the blinking pattern

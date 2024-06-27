@@ -26,6 +26,7 @@ public class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit<D>, T
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  @Override
   public Acceleration<D> of(double magnitude) {
     return new ImmutableAcceleration<>(magnitude, toBaseUnits(magnitude), this);
   }
