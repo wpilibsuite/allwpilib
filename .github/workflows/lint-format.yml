@@ -98,6 +98,19 @@ jobs:
       - name: Generate diff
         run: git diff HEAD > javaformat-fixes.patch
         if: ${{ failure() }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: javaformat fixes
+          path: javaformat-fixes.patch
+        if: ${{ failure() }}
+      - name: Write to job summary
+        run: |
+          echo '```diff' >> $GITHUB_STEP_SUMMARY
+          cat javaformat-fixes.patch >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        if: ${{ failure() }}
+
   documentation:
     name: "Documentation"
     runs-on: ubuntu-22.04
