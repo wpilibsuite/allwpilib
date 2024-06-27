@@ -167,38 +167,39 @@ public class AchieveHueGoal extends SubsystemBase {
 }
 
 /** @Oblarg post on Chief Delphi:
-
-// Example of two ways to create a PID controller Command as factory in a subsystem
-// (Don't use the WPILib PIDControllerCommand; create your own with a factory)
-
-// in subsystem scope
-// we need a motor and sensor for feedback
-private final MotorController motor = new FooMotor();
-private final Encoder encoder = new Encoder(...);
-
-// Example 1 we could have a PIDController as a field in the subsystem itself...
-private final PIDController controller = new PIDController(...);
-// this command captures the subsystem's PIDController, like PIDSubsystem
-public Command moveToPosition(double position) {
-  return runOnce(controller::reset)
-        .andThen(run(() -> {
-                  motor.set(controller.calculate(
-                  encoder.getPosition(),
-                  position
-                  ));
-        }).finallyDo(motor::stop);
-}
-
-// Example 2 if we don't want to persist the controller in the subsystem after the command ends...
-// this command captures its *own* controller, like PIDCommand
-public Command moveToPosition(double position) {
-  PIDController controller = new PIDController(...);
-  // we don't have to reset a fresh controller
-  return run(() -> {
-                  motor.set(controller.calculate(
-                  encoder.getPosition(),
-                  position
-                  ));
-        }).finallyDo(motor::stop);
-}
+ * <pre><code>
+ * // Example of two ways to create a PID controller Command as factory in a subsystem
+ * // (Don't use the WPILib PIDControllerCommand; create your own with a factory)
+ *
+ * // in subsystem scope
+ * // we need a motor and sensor for feedback
+ * private final MotorController motor = new FooMotor();
+ * private final Encoder encoder = new Encoder(...);
+ *
+ * // Example 1 we could have a PIDController as a field in the subsystem itself...
+ * private final PIDController controller = new PIDController(...);
+ * // this command captures the subsystem's PIDController, like PIDSubsystem
+ * public Command moveToPosition(double position) {
+ *   return runOnce(controller::reset)
+ *         .andThen(run(() -> {
+ *                   motor.set(controller.calculate(
+ *                   encoder.getPosition(),
+ *                   position
+ *                   ));
+ *         }).finallyDo(motor::stop);
+ * }
+ *
+ * // Example 2 if we don't want to persist the controller in the subsystem after the command ends...
+ * // this command captures its *own* controller, like PIDCommand
+ * public Command moveToPosition(double position) {
+ *   PIDController controller = new PIDController(...);
+ *  // we don't have to reset a fresh controller
+ *   return run(() -> {
+ *                   motor.set(controller.calculate(
+ *                   encoder.getPosition(),
+ *                   position
+ *                   ));
+ *         }).finallyDo(motor::stop);
+ * }
+ * </code></pre>
  */
