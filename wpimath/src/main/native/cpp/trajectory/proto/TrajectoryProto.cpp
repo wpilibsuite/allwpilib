@@ -4,12 +4,13 @@
 
 #include "frc/trajectory/proto/TrajectoryProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "trajectory.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Trajectory>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufTrajectory>(
-      arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufTrajectory>(arena);
 }
 
 frc::Trajectory wpi::Protobuf<frc::Trajectory>::Unpack(

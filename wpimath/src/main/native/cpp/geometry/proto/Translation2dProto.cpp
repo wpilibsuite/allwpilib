@@ -4,12 +4,13 @@
 
 #include "frc/geometry/proto/Translation2dProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "geometry2d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Translation2d>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufTranslation2d>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufTranslation2d>(arena);
 }
 
 frc::Translation2d wpi::Protobuf<frc::Translation2d>::Unpack(
