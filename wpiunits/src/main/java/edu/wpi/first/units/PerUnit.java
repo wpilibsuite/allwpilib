@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableRatio;
-import edu.wpi.first.units.mutable.MutRatio;
+import edu.wpi.first.units.measure.ImmutablePer;
+import edu.wpi.first.units.measure.MutPer;
 import java.util.Objects;
 
 /**
@@ -104,8 +104,15 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    *
    * @return the reciprocal
    */
+  @SuppressWarnings("unchecked")
   public PerUnit<D, N> reciprocal() {
-    return combine(m_denominator, m_numerator);
+    if (m_numerator instanceof TimeUnit t) {
+      // Dividing by time, return a velocity
+      return (PerUnit<D, N>) VelocityUnit.combine(m_denominator, t);
+    } else {
+      // Generic case
+      return combine(m_denominator, m_numerator);
+    }
   }
 
   public N mult(D denom) {
@@ -121,19 +128,40 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
         .make();
   }
 
+  /**
+   * Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
+   * method will always return a {@link edu.wpi.first.units.measure.Per} instance.
+   *
+   * @param magnitude the magnitude of the measure
+   * @return the ratio measure
+   */
   @Override
   public Measure<? extends PerUnit<N, D>> of(double magnitude) {
-    return new ImmutableRatio<>(magnitude, toBaseUnits(magnitude), this);
+    return new ImmutablePer<>(magnitude, toBaseUnits(magnitude), this);
   }
 
+  /**
+   * Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
+   * method will always return a {@link edu.wpi.first.units.measure.Per} instance.
+   *
+   * @param baseUnitMagnitude the magnitude of the measure in terms of its base units.
+   * @return the ratio measure
+   */
   @Override
   public Measure<? extends PerUnit<N, D>> ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableRatio<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new ImmutablePer<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
+  /**
+   * Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
+   * method will always return a {@link edu.wpi.first.units.measure.MutPer} instance.
+   *
+   * @param initialMagnitude the starting magnitude of the measure
+   * @return the ratio measure
+   */
   @Override
   public MutableMeasure<? extends PerUnit<N, D>, ?, ?> mutable(double initialMagnitude) {
-    return new MutRatio<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
+    return new MutPer<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public double convertFrom(double magnitude, PerUnit<? extends N, ? extends D> otherUnit) {

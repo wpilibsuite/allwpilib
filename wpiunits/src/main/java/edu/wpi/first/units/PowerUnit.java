@@ -7,9 +7,9 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Joules;
 import static edu.wpi.first.units.Units.Seconds;
 
-import edu.wpi.first.units.immutable.ImmutablePower;
+import edu.wpi.first.units.measure.ImmutablePower;
+import edu.wpi.first.units.measure.MutPower;
 import edu.wpi.first.units.measure.Power;
-import edu.wpi.first.units.mutable.MutPower;
 
 /**
  * Unit of power dimension.

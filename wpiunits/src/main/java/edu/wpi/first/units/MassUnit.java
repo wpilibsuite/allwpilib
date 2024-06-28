@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableMass;
+import edu.wpi.first.units.measure.ImmutableMass;
 import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.units.mutable.MutMass;
+import edu.wpi.first.units.measure.MutMass;
 
 /**
  * Unit of mass dimension.

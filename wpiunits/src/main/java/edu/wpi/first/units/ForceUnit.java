@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableForce;
 import edu.wpi.first.units.measure.Force;
-import edu.wpi.first.units.mutable.MutForce;
+import edu.wpi.first.units.measure.ImmutableForce;
+import edu.wpi.first.units.measure.MutForce;
 
 public class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {
   private static final CombinatoryUnitCache<MassUnit, LinearAccelerationUnit, ForceUnit> cache =

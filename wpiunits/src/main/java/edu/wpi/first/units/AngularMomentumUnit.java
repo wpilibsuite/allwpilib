@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableAngularMomentum;
 import edu.wpi.first.units.measure.AngularMomentum;
-import edu.wpi.first.units.mutable.MutAngularMomentum;
+import edu.wpi.first.units.measure.ImmutableAngularMomentum;
+import edu.wpi.first.units.measure.MutAngularMomentum;
 
 public class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, DistanceUnit> {
   private static final CombinatoryUnitCache<LinearMomentumUnit, DistanceUnit, AngularMomentumUnit>

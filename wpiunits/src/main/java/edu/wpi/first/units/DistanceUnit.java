@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableDistance;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.mutable.MutDistance;
+import edu.wpi.first.units.measure.ImmutableDistance;
+import edu.wpi.first.units.measure.MutDistance;
 
 /**
  * Unit of linear dimension.

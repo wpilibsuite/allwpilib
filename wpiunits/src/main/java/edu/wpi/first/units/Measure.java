@@ -4,6 +4,33 @@
 
 package edu.wpi.first.units;
 
+import static edu.wpi.first.units.Units.Value;
+
+import edu.wpi.first.units.measure.Acceleration;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularMomentum;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Dimensionless;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Energy;
+import edu.wpi.first.units.measure.Force;
+import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearMomentum;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Mult;
+import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Power;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Torque;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
+
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. Two
  * measures with the same <i>unit</i> and <i>magnitude</i> are effectively equivalent objects.
@@ -71,6 +98,454 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @return the copied measure
    */
   Measure<U> copy();
+
+  MutableMeasure<U, ?, ?> mutableCopy();
+
+  Measure<U> unaryMinus();
+
+  Measure<U> plus(Measure<? extends U> other);
+
+  Measure<U> minus(Measure<? extends U> other);
+
+  Measure<U> times(double multiplier);
+
+  Measure<U> times(Dimensionless multiplier);
+
+  default Measure<?> times(Measure<?> multiplier) {
+    final double baseUnitResult = baseUnitMagnitude() * multiplier.baseUnitMagnitude();
+
+    // First try to eliminate any common units
+    if (unit() instanceof PerUnit<?, ?> ratio
+        && multiplier.baseUnit().equals(ratio.denominator().getBaseUnit())) {
+      // Per<N, D> * D -> yield N
+      // Case 1: denominator of the Per cancels out, return with just the units of the numerator
+      return ratio.numerator().ofBaseUnits(baseUnitResult);
+    } else if (multiplier.baseUnit() instanceof PerUnit<?, ?> ratio
+        && baseUnit().equals(ratio.denominator().getBaseUnit())) {
+      // D * Per<N, D) -> yield N
+      // Case 2: Same as Case 1, just flipped between this and the multiplier
+      return ratio.numerator().ofBaseUnits(baseUnitResult);
+    } else if (unit() instanceof PerUnit<?, ?> per
+        && multiplier.unit() instanceof PerUnit<?, ?> otherPer
+        && per.denominator().getBaseUnit().equals(otherPer.numerator().getBaseUnit())
+        && per.numerator().getBaseUnit().equals(otherPer.denominator().getBaseUnit())) {
+      // multiplying eg meters per second * milliseconds per foot
+      // return a scalar
+      return Value.of(baseUnitResult);
+    }
+
+    // No common units to eliminate, is one of them dimensionless?
+    // Note that this must come *after* the multiplier cases, otherwise
+    // Per<U, Dimensionless> * Dimensionless will not return a U
+    if (multiplier.unit() instanceof DimensionlessUnit) {
+      // scalar multiplication of this
+      return times(multiplier.baseUnitMagnitude());
+    } else if (unit() instanceof DimensionlessUnit) {
+      // scalar multiplication of multiplier
+      return multiplier.times(baseUnitMagnitude());
+    }
+
+    if (multiplier instanceof Acceleration<?> acceleration) {
+      return times(acceleration);
+    } else if (multiplier instanceof Angle angle) {
+      return times(angle);
+    } else if (multiplier instanceof AngularAcceleration angularAcceleration) {
+      return times(angularAcceleration);
+    } else if (multiplier instanceof AngularMomentum angularMomentum) {
+      return times(angularMomentum);
+    } else if (multiplier instanceof AngularVelocity angularVelocity) {
+      return times(angularVelocity);
+    } else if (multiplier instanceof Current current) {
+      return times(current);
+    } else if (multiplier instanceof Dimensionless dimensionless) {
+      // n.b. this case should already be covered
+      return times(dimensionless);
+    } else if (multiplier instanceof Distance distance) {
+      return times(distance);
+    } else if (multiplier instanceof Energy energy) {
+      return times(energy);
+    } else if (multiplier instanceof Force force) {
+      return times(force);
+    } else if (multiplier instanceof Frequency frequency) {
+      return times(frequency);
+    } else if (multiplier instanceof LinearAcceleration linearAcceleration) {
+      return times(linearAcceleration);
+    } else if (multiplier instanceof LinearVelocity linearVelocity) {
+      return times(linearVelocity);
+    } else if (multiplier instanceof Mass mass) {
+      return times(mass);
+    } else if (multiplier instanceof MomentOfInertia momentOfInertia) {
+      return times(momentOfInertia);
+    } else if (multiplier instanceof Mult<?, ?> mult) {
+      return times(mult);
+    } else if (multiplier instanceof Per<?, ?> per) {
+      return times(per);
+    } else if (multiplier instanceof Power power) {
+      return times(power);
+    } else if (multiplier instanceof Temperature temperature) {
+      return times(temperature);
+    } else if (multiplier instanceof Time time) {
+      return times(time);
+    } else if (multiplier instanceof Torque torque) {
+      return times(torque);
+    } else if (multiplier instanceof Velocity<?> velocity) {
+      return times(velocity);
+    } else if (multiplier instanceof Voltage voltage) {
+      return times(voltage);
+    } else {
+      // Dimensional analysis fallthrough or a generic input measure type
+      // Do a basic unit multiplication
+      return MultUnit.combine(unit(), multiplier.unit()).ofBaseUnits(baseUnitResult);
+    }
+  }
+
+  default Measure<?> times(Acceleration<?> multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Angle multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(AngularAcceleration multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(AngularMomentum multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(AngularVelocity multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Current multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Distance multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Energy multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Force multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Frequency multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(LinearAcceleration multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(LinearMomentum multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(LinearVelocity multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Mass multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(MomentOfInertia multiplier) {
+    return null;
+  }
+
+  default Measure<?> times(Mult<?, ?> multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Power multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Per<?, ?> multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Temperature multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Time multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Torque multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Velocity<?> multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Measure<?> times(Voltage multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default Dimensionless timesInverse(
+      Measure<? extends PerUnit<DimensionlessUnit, ? extends U>> multiplier) {
+    return Value.ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  default <Other extends Unit> Measure<Other> timesRatio(
+      Measure<? extends PerUnit<? extends Other, U>> ratio) {
+    return ImmutableMeasure.ofBaseUnits(
+        baseUnitMagnitude() * ratio.baseUnitMagnitude(), ratio.unit().numerator());
+  }
+
+  Measure<U> divide(double divisor);
+
+  Measure<U> divide(Dimensionless divisor);
+
+  default Measure<?> divide(Measure<?> divisor) {
+    final double baseUnitResult = baseUnitMagnitude() / divisor.baseUnitMagnitude();
+
+    if (unit().getBaseUnit().equals(divisor.unit().getBaseUnit())) {
+      // These are the same unit, return a dimensionless
+      return Value.ofBaseUnits(baseUnitResult);
+    }
+
+    if (divisor instanceof Dimensionless) {
+      // Dividing by a dimensionless, do a scalar division
+      return unit().ofBaseUnits(baseUnitResult);
+    }
+
+    if (unit() instanceof DimensionlessUnit) {
+      // Numerator is a dimensionless
+      if (divisor.unit() instanceof PerUnit<?, ?> ratio) {
+        // Dividing by a ratio, return its reciprocal scaled by this
+        return ratio.reciprocal().ofBaseUnits(baseUnitResult);
+      }
+      if (divisor.unit() instanceof PerUnit<?, ?> ratio) {
+        // Dividing by a Per<Time, U>, return its reciprocal velocity scaled by this
+        // Note: Per<Time, U>.reciprocal() is coded to return a Velocity<U>
+        return ratio.reciprocal().ofBaseUnits(baseUnitResult);
+      }
+    }
+
+    if (divisor.unit() instanceof PerUnit<?, ?> ratio
+        && ratio.numerator().getBaseUnit().equals(baseUnit())) {
+      // Numerator of the ratio cancels out
+      // N / (N / D) -> N * D / N -> D
+      // Note: all Velocity and Acceleration units inherit from PerUnit
+      return ratio.denominator().ofBaseUnits(baseUnitResult);
+    }
+
+    if (divisor.unit() instanceof TimeUnit time) {
+      // Dividing by a time, return a Velocity
+      return VelocityUnit.combine(unit(), time).ofBaseUnits(baseUnitResult);
+    }
+
+    if (divisor instanceof Acceleration<?> acceleration) {
+      return divide(acceleration);
+    } else if (divisor instanceof Angle angle) {
+      return divide(angle);
+    } else if (divisor instanceof AngularAcceleration angularAcceleration) {
+      return divide(angularAcceleration);
+    } else if (divisor instanceof AngularMomentum angularMomentum) {
+      return divide(angularMomentum);
+    } else if (divisor instanceof AngularVelocity angularVelocity) {
+      return divide(angularVelocity);
+    } else if (divisor instanceof Current current) {
+      return divide(current);
+    } else if (divisor instanceof Dimensionless dimensionless) {
+      // n.b. this case should already be covered
+      return divide(dimensionless);
+    } else if (divisor instanceof Distance distance) {
+      return divide(distance);
+    } else if (divisor instanceof Energy energy) {
+      return divide(energy);
+    } else if (divisor instanceof Force force) {
+      return divide(force);
+    } else if (divisor instanceof Frequency frequency) {
+      return divide(frequency);
+    } else if (divisor instanceof LinearAcceleration linearAcceleration) {
+      return divide(linearAcceleration);
+    } else if (divisor instanceof LinearVelocity linearVelocity) {
+      return divide(linearVelocity);
+    } else if (divisor instanceof Mass mass) {
+      return divide(mass);
+    } else if (divisor instanceof MomentOfInertia momentOfInertia) {
+      return divide(momentOfInertia);
+    } else if (divisor instanceof Mult<?, ?> mult) {
+      return divide(mult);
+    } else if (divisor instanceof Per<?, ?> per) {
+      return divide(per);
+    } else if (divisor instanceof Power power) {
+      return divide(power);
+    } else if (divisor instanceof Temperature temperature) {
+      return divide(temperature);
+    } else if (divisor instanceof Time time) {
+      return divide(time);
+    } else if (divisor instanceof Torque torque) {
+      return divide(torque);
+    } else if (divisor instanceof Velocity<?> velocity) {
+      return divide(velocity);
+    } else if (divisor instanceof Voltage voltage) {
+      return divide(voltage);
+    } else {
+      // Dimensional analysis fallthrough or a generic input measure type
+      // Do a basic unit multiplication
+      return PerUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitResult);
+    }
+  }
+
+  // eg Dimensionless / (Dimensionless / Time) -> Time
+  default <Other extends Unit> Measure<Other> divideRatio(
+      Measure<? extends PerUnit<? extends U, Other>> divisor) {
+    return ImmutableMeasure.ofBaseUnits(
+        baseUnitMagnitude() / divisor.baseUnitMagnitude(), divisor.unit().denominator());
+  }
+
+  default Measure<?> per(TimeUnit period) {
+    return divide(period.of(1));
+  }
+
+  default Measure<?> divide(Acceleration<?> divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Angle divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(AngularAcceleration divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(AngularMomentum divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(AngularVelocity divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Current divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Distance divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Energy divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Force divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Frequency divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(LinearAcceleration divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(LinearMomentum divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(LinearVelocity divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Mass divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(MomentOfInertia divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Mult<?, ?> divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Power divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Per<?, ?> divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Temperature divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Time divisor) {
+    return VelocityUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Torque divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Velocity<?> divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  default Measure<?> divide(Voltage divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
 
   /**
    * Checks if this measure is near another measure of the same unit. Provide a variance threshold

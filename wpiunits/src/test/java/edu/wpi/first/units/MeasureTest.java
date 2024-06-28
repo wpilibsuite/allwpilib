@@ -57,11 +57,11 @@ class MeasureTest {
   }
 
   @Test
-  void testNegate() {
+  void testUnaryMinus() {
     Distance m = Units.Feet.of(123);
-    Distance n = m.negate();
-    assertEquals(-m.in(Units.Feet), n.in(Units.Feet), 1e-12);
-    assertEquals(m.baseUnit(), n.baseUnit());
+    Distance negated = m.unaryMinus();
+    assertEquals(-123, negated.in(Units.Feet), 1e-12);
+    assertEquals(Units.Feet, negated.unit());
   }
 
   @Test
@@ -85,7 +85,7 @@ class MeasureTest {
 
     // 144 Kg / (53 ms) = (1000 / 53) * 144 Kg/s = (144,000 / 53) Kg/s
 
-    var result = measure.per(dt);
+    var result = measure.divide(dt);
     assertEquals(144_000.0 / 53, result.baseUnitMagnitude(), 1e-5);
     assertEquals(Units.Kilograms.per(Units.Milliseconds), result.unit());
   }
@@ -106,20 +106,22 @@ class MeasureTest {
     var m1 = Units.Meters.of(6);
     var m2 = Units.Value.of(3);
     var result = m1.divide(m2);
-    assertEquals(m1.divide(m2).magnitude(), 2);
-    assertEquals(result.unit(), Units.Meters);
+    assertEquals(2, m1.divide(m2).magnitude());
+    assertEquals(Units.Meters, result.unit());
     // Velocity divide
     var m3 = Units.Meters.of(8);
     var m4 = Units.Meters.per(Units.Second).of(4);
     var time = m3.divide(m4);
-    assertEquals(time.magnitude(), 2);
-    assertEquals(time.unit(), Units.Second);
+    assertEquals(2, time.magnitude());
+    assertEquals(Units.Second, time.unit());
     // PerUnit divide
     var m5 = Units.Volts.of(6);
     var m6 = Units.Volts.per(Units.Meter).of(2);
+
+    // Voltage/(Voltage/Distance) -> Voltage * Distance/Voltage -> Distance
     var dist = m5.divide(m6);
-    assertEquals(dist.magnitude(), 3);
-    assertEquals(dist.unit(), Units.Meter);
+    assertEquals(3, dist.magnitude());
+    assertEquals(Units.Meter, dist.unit());
   }
 
   @Test
@@ -263,29 +265,29 @@ class MeasureTest {
     assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(300)));
     assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(10)));
 
-    measureCompared = measureCompared.negate();
-    measureComparing = measureComparing.negate();
+    measureCompared = measureCompared.unaryMinus();
+    measureComparing = measureComparing.unaryMinus();
 
     // Negative value with positive tolerance
     assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(300)));
     assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(10)));
 
-    measureCompared = measureCompared.negate();
-    measureComparing = measureComparing.negate();
+    measureCompared = measureCompared.unaryMinus();
+    measureComparing = measureComparing.unaryMinus();
 
     // Positive value with negative tolerance
     assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(-300)));
     assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(-10)));
 
-    measureCompared = measureCompared.negate();
-    measureComparing = measureComparing.negate();
+    measureCompared = measureCompared.unaryMinus();
+    measureComparing = measureComparing.unaryMinus();
 
     // Negative value with negative tolerance.
     assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(-300)));
     assertFalse(measureCompared.isNear(measureComparing, Units.Centimeters.of(-10)));
 
-    measureCompared = measureCompared.negate();
-    measureComparing = measureComparing.negate();
+    measureCompared = measureCompared.unaryMinus();
+    measureComparing = measureComparing.unaryMinus();
 
     // Tolerance exact difference between measures.
     assertTrue(measureCompared.isNear(measureComparing, Units.Millimeters.of(200)));

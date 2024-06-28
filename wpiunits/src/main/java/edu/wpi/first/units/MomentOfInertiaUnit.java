@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableMomentOfInertia;
+import edu.wpi.first.units.measure.ImmutableMomentOfInertia;
 import edu.wpi.first.units.measure.MomentOfInertia;
-import edu.wpi.first.units.mutable.MutMomentOfInertia;
+import edu.wpi.first.units.measure.MutMomentOfInertia;
 
 public class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, AngularVelocityUnit> {
   private static final CombinatoryUnitCache<

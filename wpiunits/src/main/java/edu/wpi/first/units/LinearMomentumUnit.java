@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableLinearMomentum;
+import edu.wpi.first.units.measure.ImmutableLinearMomentum;
 import edu.wpi.first.units.measure.LinearMomentum;
-import edu.wpi.first.units.mutable.MutLinearMomentum;
+import edu.wpi.first.units.measure.MutLinearMomentum;
 
 public class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {
   private static final CombinatoryUnitCache<MassUnit, LinearVelocityUnit, LinearMomentumUnit>

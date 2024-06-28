@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableTemperature;
+import edu.wpi.first.units.measure.ImmutableTemperature;
+import edu.wpi.first.units.measure.MutTemperature;
 import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.mutable.MutTemperature;
 
 /**
  * Unit of temperature dimension.

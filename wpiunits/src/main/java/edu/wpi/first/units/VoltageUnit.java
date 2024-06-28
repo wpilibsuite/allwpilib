@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableVoltage;
+import edu.wpi.first.units.measure.ImmutableVoltage;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.units.mutable.MutVoltage;
 
 /**
  * Unit of electric voltage dimension.

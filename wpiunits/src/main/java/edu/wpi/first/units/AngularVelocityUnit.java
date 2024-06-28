@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableAngularVelocity;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.mutable.MutAngularVelocity;
+import edu.wpi.first.units.measure.ImmutableAngularVelocity;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 
 public class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
   private static final CombinatoryUnitCache<AngleUnit, TimeUnit, AngularVelocityUnit> cache =

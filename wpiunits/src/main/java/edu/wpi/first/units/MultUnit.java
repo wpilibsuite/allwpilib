@@ -4,8 +4,8 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableMult;
-import edu.wpi.first.units.mutable.MutMult;
+import edu.wpi.first.units.measure.ImmutableMult;
+import edu.wpi.first.units.measure.MutMult;
 import java.util.Objects;
 
 /**

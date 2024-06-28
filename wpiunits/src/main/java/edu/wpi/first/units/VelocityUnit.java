@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableVelocity;
+import edu.wpi.first.units.measure.ImmutableVelocity;
+import edu.wpi.first.units.measure.MutVelocity;
 import edu.wpi.first.units.measure.Velocity;
-import edu.wpi.first.units.mutable.MutVelocity;
 
 /**
  * Unit of velocity dimension that is a combination of a distance unit (numerator) and a time unit

@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableDimensionless;
 import edu.wpi.first.units.measure.Dimensionless;
-import edu.wpi.first.units.mutable.MutDimensionless;
+import edu.wpi.first.units.measure.ImmutableDimensionless;
+import edu.wpi.first.units.measure.MutDimensionless;
 
 /**
  * A type of unit that corresponds to raw values and not any physical dimension, such as percentage.

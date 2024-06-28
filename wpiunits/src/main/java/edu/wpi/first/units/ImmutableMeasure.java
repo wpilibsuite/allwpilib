@@ -4,6 +4,9 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.measure.Dimensionless;
+import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
+
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. An
  * immutable measure is <i>immutable</i> and <i>type safe</i>, making it easy to use in concurrent
@@ -42,5 +45,45 @@ public record ImmutableMeasure<U extends Unit>(double magnitude, double baseUnit
   @Override
   public Measure<U> copy() {
     return this; // already immutable, no need to allocate a new object
+  }
+
+  @Override
+  public MutableMeasure<U, ?, ?> mutableCopy() {
+    return new GenericMutableMeasureImpl<>(magnitude, baseUnitMagnitude, unit);
+  }
+
+  @Override
+  public Measure<U> unaryMinus() {
+    return ofBaseUnits(0 - baseUnitMagnitude, unit);
+  }
+
+  @Override
+  public Measure<U> plus(Measure<? extends U> other) {
+    return ofBaseUnits(baseUnitMagnitude + other.baseUnitMagnitude(), unit);
+  }
+
+  @Override
+  public Measure<U> minus(Measure<? extends U> other) {
+    return ofBaseUnits(baseUnitMagnitude - other.baseUnitMagnitude(), unit);
+  }
+
+  @Override
+  public Measure<U> times(double multiplier) {
+    return ofBaseUnits(baseUnitMagnitude * multiplier, unit);
+  }
+
+  @Override
+  public Measure<U> times(Dimensionless multiplier) {
+    return ofBaseUnits(baseUnitMagnitude * multiplier.baseUnitMagnitude(), unit);
+  }
+
+  @Override
+  public Measure<U> divide(double divisor) {
+    return ofBaseUnits(baseUnitMagnitude / divisor, unit);
+  }
+
+  @Override
+  public Measure<U> divide(Dimensionless divisor) {
+    return ofBaseUnits(baseUnitMagnitude / divisor.baseUnitMagnitude(), unit);
   }
 }

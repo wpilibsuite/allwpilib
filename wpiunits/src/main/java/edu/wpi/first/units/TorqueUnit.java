@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableTorque;
+import edu.wpi.first.units.measure.ImmutableTorque;
+import edu.wpi.first.units.measure.MutTorque;
 import edu.wpi.first.units.measure.Torque;
-import edu.wpi.first.units.mutable.MutTorque;
 
 public class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   private static final CombinatoryUnitCache<DistanceUnit, ForceUnit, TorqueUnit> cache =

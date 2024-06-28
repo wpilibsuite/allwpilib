@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableAcceleration;
 import edu.wpi.first.units.measure.Acceleration;
-import edu.wpi.first.units.mutable.MutAcceleration;
+import edu.wpi.first.units.measure.ImmutableAcceleration;
+import edu.wpi.first.units.measure.MutAcceleration;
 
 public class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit<D>, TimeUnit> {
   @SuppressWarnings({"rawtypes", "unchecked"})

@@ -4,9 +4,8 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableAngle;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.mutable.MutAngle;
+import edu.wpi.first.units.measure.MutAngle;
 
 /**
  * Unit of angular dimension.
@@ -37,12 +36,17 @@ public class AngleUnit extends Unit {
 
   @Override
   public Angle of(double magnitude) {
-    return new ImmutableAngle(magnitude, toBaseUnits(magnitude), this);
+    return Angle.ofRelativeUnits(magnitude, this);
   }
 
   @Override
   public Angle ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableAngle(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return Angle.ofBaseUnits(baseUnitMagnitude, this);
+  }
+
+  @Override
+  public MutAngle mutable(double initialMagnitude) {
+    return new MutAngle(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   public AngularVelocityUnit per(TimeUnit second) {
@@ -51,10 +55,5 @@ public class AngleUnit extends Unit {
 
   public double convertFrom(double magnitude, AngleUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
-  }
-
-  @Override
-  public MutAngle mutable(double initialMagnitude) {
-    return new MutAngle(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

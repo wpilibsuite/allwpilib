@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableLinearVelocity;
+import edu.wpi.first.units.measure.ImmutableLinearVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.mutable.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutLinearVelocity;
 
 public class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
   private static final CombinatoryUnitCache<DistanceUnit, TimeUnit, LinearVelocityUnit> cache =

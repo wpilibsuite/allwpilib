@@ -4,9 +4,9 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.immutable.ImmutableTime;
+import edu.wpi.first.units.measure.ImmutableTime;
+import edu.wpi.first.units.measure.MutTime;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.mutable.MutTime;
 
 /**
  * Unit of time dimension.
