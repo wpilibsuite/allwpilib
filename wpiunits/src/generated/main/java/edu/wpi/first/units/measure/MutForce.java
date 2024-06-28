@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutForce
   extends MutableMeasureBase<ForceUnit, Force, MutForce>
   implements Force {
-
   public MutForce(double magnitude, double baseUnitMagnitude, ForceUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public Force copy() {
-    return new ImmutableForce(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableForce(magnitude(), baseUnitMagnitude(), unit());
   }
 }

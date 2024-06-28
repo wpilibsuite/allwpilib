@@ -29,8 +29,8 @@ public class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
         energy.isBaseUnit() && time.isBaseUnit()
             ? null
             : combine(energy.getBaseUnit(), time.getBaseUnit()),
-        (x) -> x * energy.toBaseUnits(1) / time.toBaseUnits(1),
-        (x) -> x * time.toBaseUnits(1) / energy.toBaseUnits(1),
+        x -> x * energy.toBaseUnits(1) / time.toBaseUnits(1),
+        x -> x * time.toBaseUnits(1) / energy.toBaseUnits(1),
         energy.name() + " per " + time.name(),
         energy.symbol() + "/" + time.symbol());
   }
@@ -48,6 +48,13 @@ public class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
     return cache.combine(energy, period);
   }
 
+  /**
+   * Combines voltage and current into power.
+   *
+   * @param voltage the unit of voltage
+   * @param current the unit of current
+   * @return the combined unit of power
+   */
   public static PowerUnit combine(VoltageUnit voltage, CurrentUnit current) {
     return combine(
         new EnergyUnit(
@@ -58,16 +65,37 @@ public class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
         Seconds);
   }
 
+  /**
+   * Combines voltage and current into power.
+   *
+   * @param current the unit of current
+   * @param voltage the unit of voltage
+   * @return the combined unit of power
+   */
   public static PowerUnit combine(CurrentUnit current, VoltageUnit voltage) {
     return combine(voltage, current);
   }
 
+  /**
+   * Combines angular velocity and torque into power. Useful when dealing with motors and flywheels.
+   *
+   * @param angularVelocity the unit of angular velocity
+   * @param torque the unit of torque
+   * @return the combined unit of power
+   */
   public static PowerUnit combine(AngularVelocityUnit angularVelocity, TorqueUnit torque) {
     return combine(
         new EnergyUnit(Joules, angularVelocity.toBaseUnits(1) * torque.toBaseUnits(1), "", ""),
         Seconds);
   }
 
+  /**
+   * Combines angular velocity and torque into power. Useful when dealing with motors and flywheels.
+   *
+   * @param torque the unit of torque
+   * @param angularVelocity the unit of angular velocity
+   * @return the combined unit of power
+   */
   public static PowerUnit combine(TorqueUnit torque, AngularVelocityUnit angularVelocity) {
     return combine(angularVelocity, torque);
   }

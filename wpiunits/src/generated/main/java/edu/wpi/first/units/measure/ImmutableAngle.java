@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public record ImmutableAngle(double magnitude, double baseUnitMagnitude, AngleUnit unit) implements Angle {
   @Override
   public Angle copy() {

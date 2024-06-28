@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface LinearMomentum extends Measure<LinearMomentumUnit> {
   static  LinearMomentum ofRelativeUnits(double magnitude, LinearMomentumUnit unit) {
     return new ImmutableLinearMomentum(magnitude, unit.toBaseUnits(magnitude), unit);

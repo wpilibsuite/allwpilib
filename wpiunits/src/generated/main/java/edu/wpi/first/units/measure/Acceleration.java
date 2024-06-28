@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Acceleration<D extends Unit> extends Measure<AccelerationUnit<D>> {
   static <D extends Unit> Acceleration<D> ofRelativeUnits(double magnitude, AccelerationUnit<D> unit) {
     return new ImmutableAcceleration<D>(magnitude, unit.toBaseUnits(magnitude), unit);

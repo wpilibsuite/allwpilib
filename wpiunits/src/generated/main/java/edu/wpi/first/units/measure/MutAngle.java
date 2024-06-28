@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutAngle
   extends MutableMeasureBase<AngleUnit, Angle, MutAngle>
   implements Angle {
-
   public MutAngle(double magnitude, double baseUnitMagnitude, AngleUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public Angle copy() {
-    return new ImmutableAngle(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableAngle(magnitude(), baseUnitMagnitude(), unit());
   }
 }

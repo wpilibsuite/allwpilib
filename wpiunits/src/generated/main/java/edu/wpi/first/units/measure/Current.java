@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Current extends Measure<CurrentUnit> {
   static  Current ofRelativeUnits(double magnitude, CurrentUnit unit) {
     return new ImmutableCurrent(magnitude, unit.toBaseUnits(magnitude), unit);

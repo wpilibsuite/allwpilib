@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutTorque
   extends MutableMeasureBase<TorqueUnit, Torque, MutTorque>
   implements Torque {
-
   public MutTorque(double magnitude, double baseUnitMagnitude, TorqueUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public Torque copy() {
-    return new ImmutableTorque(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableTorque(magnitude(), baseUnitMagnitude(), unit());
   }
 }

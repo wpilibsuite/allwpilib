@@ -8,6 +8,10 @@ import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
 
 /**
+ * A mutable measurement can be used to keep a single object allocation and reference whose state is
+ * mutated or changed as it is used. This is helpful for optimizing memory usage to keep garbage
+ * collection time - and its associated loop overruns - to a minimum.
+ *
  * @param <U> The dimension of measurement.
  * @param <Base> The base measure type.
  * @param <MutSelf> The self type. This MUST inherit from the base measure type.
@@ -15,8 +19,17 @@ import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
 public interface MutableMeasure<
         U extends Unit, Base extends Measure<U>, MutSelf extends MutableMeasure<U, Base, MutSelf>>
     extends Measure<U> {
+  static <U extends Unit> MutableMeasure<U, ?, ?> ofRelativeUnits(double initialValue, U unit) {
+    return new GenericMutableMeasureImpl<>(initialValue, unit);
+  }
+
   MutSelf mut_replace(double magnitude, U newUnit);
 
+  default MutSelf mut_replace(Base other) {
+    return mut_replace(other.magnitude(), other.unit());
+  }
+
+  @Override
   Base copy();
 
   default MutSelf mut_setMagnitude(double magnitude) {
@@ -25,10 +38,6 @@ public interface MutableMeasure<
 
   default MutSelf mut_setBaseUnitMagnitude(double baseUnitMagnitude) {
     return mut_replace(unit().fromBaseUnits(baseUnitMagnitude), unit());
-  }
-
-  default MutSelf mut_replace(Base other) {
-    return mut_replace(other.magnitude(), other.unit());
   }
 
   default MutSelf mut_acc(double raw) {
@@ -69,9 +78,5 @@ public interface MutableMeasure<
 
   default MutSelf mut_divide(Dimensionless divisor) {
     return mut_divide(divisor.baseUnitMagnitude());
-  }
-
-  static <U extends Unit> MutableMeasure<U, ?, ?> ofRelativeUnits(double initialValue, U unit) {
-    return new GenericMutableMeasureImpl<>(initialValue, unit);
   }
 }

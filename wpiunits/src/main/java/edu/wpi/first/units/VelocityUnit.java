@@ -66,6 +66,7 @@ public class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
     return AccelerationUnit.combine(this, period);
   }
 
+  @Override
   public Velocity<D> of(double magnitude) {
     return new ImmutableVelocity<>(magnitude, toBaseUnits(magnitude), this);
   }
@@ -75,6 +76,7 @@ public class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
     return new ImmutableVelocity<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
+  @Override
   public MutableMeasure<VelocityUnit<D>, ?, ?> mutable(double initialMagnitude) {
     return new MutVelocity<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

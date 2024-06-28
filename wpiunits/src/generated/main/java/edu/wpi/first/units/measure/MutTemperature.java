@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutTemperature
   extends MutableMeasureBase<TemperatureUnit, Temperature, MutTemperature>
   implements Temperature {
-
   public MutTemperature(double magnitude, double baseUnitMagnitude, TemperatureUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public Temperature copy() {
-    return new ImmutableTemperature(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableTemperature(magnitude(), baseUnitMagnitude(), unit());
   }
 }

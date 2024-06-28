@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public record ImmutableAngularMomentum(double magnitude, double baseUnitMagnitude, AngularMomentumUnit unit) implements AngularMomentum {
   @Override
   public AngularMomentum copy() {

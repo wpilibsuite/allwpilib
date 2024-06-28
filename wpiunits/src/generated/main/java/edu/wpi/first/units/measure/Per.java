@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Per<Dividend extends Unit, Divisor extends Unit> extends Measure<PerUnit<Dividend, Divisor>> {
   static <Dividend extends Unit, Divisor extends Unit> Per<Dividend, Divisor> ofRelativeUnits(double magnitude, PerUnit<Dividend, Divisor> unit) {
     return new ImmutablePer<Dividend, Divisor>(magnitude, unit.toBaseUnits(magnitude), unit);

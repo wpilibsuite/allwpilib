@@ -52,68 +52,43 @@ MATH_OPERATION_UNITS = [
     "Time",
     "Torque",
     "Velocity<?>",
-    "Voltage"
+    "Voltage",
 ]
 
 # Configurations for all generated units
 UNIT_CONFIGURATIONS = {
     "Acceleration": {
         "base_unit": "unit()",
-        "generics": {
-            "D": {
-                "extends": "Unit"
-            }
-        },
-        "multiply": {
-        },
-        "divide": {
-        }
+        "generics": {"D": {"extends": "Unit"}},
+        "multiply": {},
+        "divide": {},
     },
     "Angle": {
         "base_unit": "Radians",
-        "multiply": {
-            "Frequency": "AngularVelocity"
-        },
-        "divide": {
-            "Time": "AngularVelocity"
-        }
+        "multiply": {"Frequency": "AngularVelocity"},
+        "divide": {"Time": "AngularVelocity"},
     },
     "AngularAcceleration": {
         "base_unit": "RadiansPerSecondPerSecond",
-        "multiply": {
-            "Time": "AngularVelocity"
-        },
-        "divide": {
-            "Frequency": "AngularVelocity"
-        }
+        "multiply": {"Time": "AngularVelocity"},
+        "divide": {"Frequency": "AngularVelocity"},
     },
     "AngularMomentum": {
         "base_unit": "KilogramMetersSquaredPerSecond",
         "multiply": {},
-        "divide": {
-            "AngularVelocity": "MomentOfInertia"
-        }
+        "divide": {"AngularVelocity": "MomentOfInertia"},
     },
     "AngularVelocity": {
         "base_unit": "RadiansPerSecond",
-        "multiply": {
-            "Time": "Angle",
-            "Frequency": "AngularAcceleration"
-        },
-        "divide": {
-            "Time": "AngularAcceleration"
-        },
-        "extra": inspect.cleandoc("""
+        "multiply": {"Time": "Angle", "Frequency": "AngularAcceleration"},
+        "divide": {"Time": "AngularAcceleration"},
+        "extra": inspect.cleandoc(
+            """
           default Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
-        """)
+        """
+        ),
     },
-    "Current": {
-        "base_unit": "Amps",
-        "multiply": {
-            "Voltage": "Power"
-        },
-        "divide": {}
-    },
+    "Current": {"base_unit": "Amps", "multiply": {"Voltage": "Power"}, "divide": {}},
     "Dimensionless": {
         "base_unit": "Value",
         "multiply": {
@@ -148,7 +123,7 @@ UNIT_CONFIGURATIONS = {
             # "Velocity<?>": "Per<TimeUnit, ?>",
             # "Acceleration<?>": "Per<TimeUnit, VelocityUnit<?>>
             # "Per<N, D>": "Per<D, N>"
-        }
+        },
     },
     "Distance": {
         "base_unit": "Meters",
@@ -156,21 +131,14 @@ UNIT_CONFIGURATIONS = {
             "Frequency": "LinearVelocity",
             # Distance x Force = Torque
             # Force x Distance = Energy
-            "Force": "Torque"
+            "Force": "Torque",
         },
-        "divide": {
-            "Time": "LinearVelocity",
-            "LinearVelocity": "Time"
-        }
+        "divide": {"Time": "LinearVelocity", "LinearVelocity": "Time"},
     },
     "Energy": {
         "base_unit": "Joules",
-        "multiply": {
-            "Frequency": "Power"
-        },
-        "divide": {
-            "Time": "Power"
-        }
+        "multiply": {"Frequency": "Power"},
+        "divide": {"Time": "Power"},
     },
     "Force": {
         "base_unit": "Newtons",
@@ -179,10 +147,7 @@ UNIT_CONFIGURATIONS = {
             # Force x Distance = Energy
             "Distance": "Energy"
         },
-        "divide": {
-            "Mass": "LinearAcceleration",
-            "LinearAcceleration": "Mass"
-        }
+        "divide": {"Mass": "LinearAcceleration", "LinearAcceleration": "Mass"},
     },
     "Frequency": {
         "base_unit": "Hertz",
@@ -191,92 +156,61 @@ UNIT_CONFIGURATIONS = {
             "Distance": "LinearVelocity",
             "LinearVelocity": "LinearAcceleration",
             "Angle": "AngularVelocity",
-            "AngularVelocity": "AngularAcceleration"
+            "AngularVelocity": "AngularAcceleration",
         },
         "divide": {},
-        "extra": inspect.cleandoc("""
+        "extra": inspect.cleandoc(
+            """
           /** Converts this frequency to the time period between cycles. */
           default Time asPeriod() { return Seconds.of(1 / baseUnitMagnitude()); }
-        """)
+        """
+        ),
     },
     "LinearAcceleration": {
         "base_unit": "MetersPerSecondPerSecond",
-        "multiply": {
-            "Time": "LinearVelocity"
-        },
-        "divide": {
-            "Frequency": "LinearVelocity"
-        }
+        "multiply": {"Time": "LinearVelocity"},
+        "divide": {"Frequency": "LinearVelocity"},
     },
     "LinearMomentum": {
         "base_unit": "KilogramMetersPerSecond",
-        "multiply": {
-            "Frequency": "Force"
-        },
-        "divide": {
-            "Mass": "LinearVelocity",
-            "LinearVelocity": "Mass",
-            "Time": "Force"
-        }
+        "multiply": {"Frequency": "Force"},
+        "divide": {"Mass": "LinearVelocity", "LinearVelocity": "Mass", "Time": "Force"},
     },
     "LinearVelocity": {
         "base_unit": "MetersPerSecond",
-        "multiply": {
-            "Time": "Distance",
-            "Frequency": "LinearAcceleration"
-        },
-        "divide": {
-            "Time": "LinearAcceleration"
-        }
+        "multiply": {"Time": "Distance", "Frequency": "LinearAcceleration"},
+        "divide": {"Time": "LinearAcceleration"},
     },
     "Mass": {
         "base_unit": "Kilograms",
-        "multiply": {
-            "LinearAcceleration": "Force"
-        },
-        "divide": {}
+        "multiply": {"LinearAcceleration": "Force"},
+        "divide": {},
     },
     "MomentOfInertia": {
         "base_unit": "KilogramSquareMeters",
-        "multiply": {
-            "AngularVelocity": "AngularMomentum"
-        },
-        "divide": {}
+        "multiply": {"AngularVelocity": "AngularMomentum"},
+        "divide": {},
     },
     "Mult": {
         "base_unit": "unit()",
-        "generics": {
-            "A": { "extends": "Unit" },
-            "B": { "extends": "Unit" }
-        },
+        "generics": {"A": {"extends": "Unit"}, "B": {"extends": "Unit"}},
         "multiply": {},
-        "divide": {}
+        "divide": {},
     },
     "Per": {
         "base_unit": "unit()",
-        "generics": {
-            "Dividend": { "extends": "Unit" },
-            "Divisor": { "extends": "Unit" }
-        },
+        "generics": {"Dividend": {"extends": "Unit"}, "Divisor": {"extends": "Unit"}},
         "multiply": {},
-        "divide": {}
+        "divide": {},
     },
     "Power": {
         "base_unit": "Watts",
         "multiply": {
             "Time": "Energy",
         },
-        "divide": {
-            "Voltage": "Current",
-            "Current": "Voltage",
-            "Energy": "Frequency"
-        }
+        "divide": {"Voltage": "Current", "Current": "Voltage", "Energy": "Frequency"},
     },
-    "Temperature": {
-        "base_unit": "Kelvin",
-        "multiply": {},
-        "divide": {}
-    },
+    "Temperature": {"base_unit": "Kelvin", "multiply": {}, "divide": {}},
     "Time": {
         "base_unit": "Seconds",
         "multiply": {
@@ -284,7 +218,7 @@ UNIT_CONFIGURATIONS = {
             "AngularVelocity": "Angle",
             "AngularAcceleration": "AngularVelocity",
             "LinearVelocity": "Distance",
-            "LinearAcceleration": "LinearVelocity"
+            "LinearAcceleration": "LinearVelocity",
             # TODO:
             # "Acceleration<D>": "Velocity<D>"
             # "Velocity<D>": "Measure<D>"
@@ -295,34 +229,26 @@ UNIT_CONFIGURATIONS = {
             # `Velocity<TimeUnit>` (i.e. a time per unit time ratio)
             "Time": "Dimensionless"
         },
-        "extra": inspect.cleandoc("""
+        "extra": inspect.cleandoc(
+            """
           default Frequency asFrequency() { return Hertz.of(1 / baseUnitMagnitude()); }
-        """)
+        """
+        ),
     },
     "Torque": {
         "base_unit": "NewtonMeters",
         "multiply": {},
-        "divide": {
-            "Distance": "Force",
-            "Force": "Distance"
-        }
+        "divide": {"Distance": "Force", "Force": "Distance"},
     },
     "Velocity": {
         "base_unit": "unit()",
-        "generics": {
-            "D": { "extends": "Unit" }
-        },
+        "generics": {"D": {"extends": "Unit"}},
         "multiply": {},
-        "divide": {}
+        "divide": {},
     },
-    "Voltage": {
-        "base_unit": "Volts",
-        "multiply": {
-            "Current": "Power"
-        },
-        "divide": {}
-    }
+    "Voltage": {"base_unit": "Volts", "multiply": {"Current": "Power"}, "divide": {}},
 }
+
 
 def generics_list(measure_name):
     if "generics" in UNIT_CONFIGURATIONS[measure_name]:
@@ -338,7 +264,6 @@ def generics_list(measure_name):
         return "<{}>".format(", ".join(args))
     else:
         return ""
-
 
 
 def generics_usage(measure_name):
@@ -360,7 +285,10 @@ def type_usage(measure_name):
 
 # measure-to-unit
 def mtou(measure_name):
-    if measure_name in UNIT_CONFIGURATIONS and "generics" in UNIT_CONFIGURATIONS[measure_name]:
+    if (
+        measure_name in UNIT_CONFIGURATIONS
+        and "generics" in UNIT_CONFIGURATIONS[measure_name]
+    ):
         return "{}Unit{}".format(measure_name, generics_usage(measure_name))
     else:
         regex = re.compile(r"^(.*?)(<.*>)?$")
@@ -387,13 +315,28 @@ def main():
         "type_usage": type_usage,
         "generics_list": generics_list,
         "generics_usage": generics_usage,
-        "mtou": mtou
+        "mtou": mtou,
     }
 
     for unit_name in UNIT_CONFIGURATIONS:
-        interfaceContents = interfaceTemplate.render(name=unit_name, math_units=MATH_OPERATION_UNITS, config=UNIT_CONFIGURATIONS, helpers=helpers)
-        immutableContents = immutableTemplate.render(name=unit_name, units=MATH_OPERATION_UNITS, config=UNIT_CONFIGURATIONS, helpers=helpers)
-        mutableContents = mutableTemplate.render(name=unit_name, units=MATH_OPERATION_UNITS, config=UNIT_CONFIGURATIONS, helpers=helpers)
+        interfaceContents = interfaceTemplate.render(
+            name=unit_name,
+            math_units=MATH_OPERATION_UNITS,
+            config=UNIT_CONFIGURATIONS,
+            helpers=helpers,
+        )
+        immutableContents = immutableTemplate.render(
+            name=unit_name,
+            units=MATH_OPERATION_UNITS,
+            config=UNIT_CONFIGURATIONS,
+            helpers=helpers,
+        )
+        mutableContents = mutableTemplate.render(
+            name=unit_name,
+            units=MATH_OPERATION_UNITS,
+            config=UNIT_CONFIGURATIONS,
+            helpers=helpers,
+        )
 
         output(f"{rootPath}/measure", f"{unit_name}.java", interfaceContents)
         output(f"{rootPath}/measure", f"Immutable{unit_name}.java", immutableContents)

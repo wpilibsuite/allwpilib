@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutVoltage
   extends MutableMeasureBase<VoltageUnit, Voltage, MutVoltage>
   implements Voltage {
-
   public MutVoltage(double magnitude, double baseUnitMagnitude, VoltageUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public Voltage copy() {
-    return new ImmutableVoltage(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableVoltage(magnitude(), baseUnitMagnitude(), unit());
   }
 }

@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutAngularMomentum
   extends MutableMeasureBase<AngularMomentumUnit, AngularMomentum, MutAngularMomentum>
   implements AngularMomentum {
-
   public MutAngularMomentum(double magnitude, double baseUnitMagnitude, AngularMomentumUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public AngularMomentum copy() {
-    return new ImmutableAngularMomentum(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableAngularMomentum(magnitude(), baseUnitMagnitude(), unit());
   }
 }

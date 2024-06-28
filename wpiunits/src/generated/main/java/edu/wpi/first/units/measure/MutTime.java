@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutTime
   extends MutableMeasureBase<TimeUnit, Time, MutTime>
   implements Time {
-
   public MutTime(double magnitude, double baseUnitMagnitude, TimeUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public Time copy() {
-    return new ImmutableTime(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableTime(magnitude(), baseUnitMagnitude(), unit());
   }
 }

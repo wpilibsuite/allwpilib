@@ -31,6 +31,7 @@ public class TemperatureUnit extends Unit {
     return VelocityUnit.combine(this, period);
   }
 
+  @Override
   public Temperature of(double magnitude) {
     return new ImmutableTemperature(magnitude, toBaseUnits(magnitude), this);
   }

@@ -12,29 +12,38 @@ import java.util.Objects;
 public abstract class MutableMeasureBase<
         U extends Unit, Base extends Measure<U>, MutSelf extends MutableMeasure<U, Base, MutSelf>>
     implements Measure<U>, MutableMeasure<U, Base, MutSelf> {
-  protected double magnitude;
-  protected double baseUnitMagnitude;
-  protected U unit;
+  protected double m_magnitude;
+  protected double m_baseUnitMagnitude;
+  protected U m_unit;
 
-  public MutableMeasureBase(double magnitude, double baseUnitMagnitude, U unit) {
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = baseUnitMagnitude;
-    this.unit = Objects.requireNonNull(unit, "Unit cannot be null");
+  /**
+   * Initializes the mutable measure with initial conditions. Both relative and base unit magnitudes
+   * are required to avoid unnecessary calculations. It is up to the caller to ensure they are
+   * correct.
+   *
+   * @param magnitude the initial magnitude of the measure, in terms of the unit
+   * @param baseUnitMagnitude the initial magnitude of the measure, in terms of the base unit
+   * @param unit the initial unit of measure
+   */
+  protected MutableMeasureBase(double magnitude, double baseUnitMagnitude, U unit) {
+    this.m_magnitude = magnitude;
+    this.m_baseUnitMagnitude = baseUnitMagnitude;
+    this.m_unit = Objects.requireNonNull(unit, "Unit cannot be null");
   }
 
   @Override
   public double magnitude() {
-    return magnitude;
+    return m_magnitude;
   }
 
   @Override
   public double baseUnitMagnitude() {
-    return baseUnitMagnitude;
+    return m_baseUnitMagnitude;
   }
 
   @Override
   public U unit() {
-    return unit;
+    return m_unit;
   }
 
   @Override
@@ -44,24 +53,28 @@ public abstract class MutableMeasureBase<
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof MutableMeasureBase<?, ?, ?> that)) return false;
-    return Double.compare(magnitude, that.magnitude) == 0
-        && Double.compare(baseUnitMagnitude, that.baseUnitMagnitude) == 0
-        && Objects.equals(unit, that.unit);
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof MutableMeasureBase<?, ?, ?> that)) {
+      return false;
+    }
+    return Double.compare(m_magnitude, that.m_magnitude) == 0
+        && Double.compare(m_baseUnitMagnitude, that.m_baseUnitMagnitude) == 0
+        && Objects.equals(m_unit, that.m_unit);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(magnitude, baseUnitMagnitude, unit);
+    return Objects.hash(m_magnitude, m_baseUnitMagnitude, m_unit);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("unchecked")
   public MutSelf mut_replace(double magnitude, U newUnit) {
-    this.unit = Objects.requireNonNull(newUnit, "New unit cannot be null");
-    this.magnitude = magnitude;
-    this.baseUnitMagnitude = unit.toBaseUnits(magnitude);
+    this.m_unit = Objects.requireNonNull(newUnit, "New unit cannot be null");
+    this.m_magnitude = magnitude;
+    this.m_baseUnitMagnitude = m_unit.toBaseUnits(magnitude);
 
     return (MutSelf) this;
   }

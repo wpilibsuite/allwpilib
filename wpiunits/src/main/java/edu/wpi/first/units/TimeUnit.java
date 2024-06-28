@@ -36,6 +36,13 @@ public class TimeUnit extends Unit {
     return (TimeUnit) super.getBaseUnit();
   }
 
+  /**
+   * Creates a dimensionless unit corresponding to the scale factor between this and another unit of
+   * time.
+   *
+   * @param other the other unit of time
+   * @return the result
+   */
   public DimensionlessUnit per(TimeUnit other) {
     return Units.derive(Units.Value)
         .toBase(this.getConverterToBase().div(other.getConverterToBase()))

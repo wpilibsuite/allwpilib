@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutMomentOfInertia
   extends MutableMeasureBase<MomentOfInertiaUnit, MomentOfInertia, MutMomentOfInertia>
   implements MomentOfInertia {
-
   public MutMomentOfInertia(double magnitude, double baseUnitMagnitude, MomentOfInertiaUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public MomentOfInertia copy() {
-    return new ImmutableMomentOfInertia(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableMomentOfInertia(magnitude(), baseUnitMagnitude(), unit());
   }
 }

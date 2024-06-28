@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Angle extends Measure<AngleUnit> {
   static  Angle ofRelativeUnits(double magnitude, AngleUnit unit) {
     return new ImmutableAngle(magnitude, unit.toBaseUnits(magnitude), unit);

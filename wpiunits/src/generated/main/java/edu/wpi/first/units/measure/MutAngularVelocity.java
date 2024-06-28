@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutAngularVelocity
   extends MutableMeasureBase<AngularVelocityUnit, AngularVelocity, MutAngularVelocity>
   implements AngularVelocity {
-
   public MutAngularVelocity(double magnitude, double baseUnitMagnitude, AngularVelocityUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public AngularVelocity copy() {
-    return new ImmutableAngularVelocity(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableAngularVelocity(magnitude(), baseUnitMagnitude(), unit());
   }
 }

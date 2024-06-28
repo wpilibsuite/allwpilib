@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class Mut{{ helpers['type_decl'](name) }}
   extends MutableMeasureBase<{{ helpers['mtou'](name) }}, {{ helpers['type_usage'](name) }}, Mut{{ helpers['type_usage'](name) }}>
   implements {{ helpers['type_usage'](name) }} {
-
   public Mut{{ name }}(double magnitude, double baseUnitMagnitude, {{ helpers['mtou'](name) }} unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public {{ helpers['type_usage'](name) }} copy() {
-    return new Immutable{{ helpers['type_usage'](name) }}(magnitude, baseUnitMagnitude, unit);
+    return new Immutable{{ helpers['type_usage'](name) }}(magnitude(), baseUnitMagnitude(), unit());
   }
 }

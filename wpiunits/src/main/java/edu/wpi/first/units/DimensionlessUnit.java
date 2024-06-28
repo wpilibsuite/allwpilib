@@ -48,14 +48,6 @@ public class DimensionlessUnit extends Unit {
     return new MutDimensionless(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
-  public <U extends Unit> U mult(U other) {
-    return Units.derive(other)
-        .toBase(other.getConverterToBase().mult(this.getConverterToBase()))
-        .fromBase(other.getConverterFromBase().mult(this.getConverterFromBase()))
-        // TODO: name, symbol
-        .make();
-  }
-
   public double convertFrom(double magnitude, DimensionlessUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }

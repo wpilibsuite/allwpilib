@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutMass
   extends MutableMeasureBase<MassUnit, Mass, MutMass>
   implements Mass {
-
   public MutMass(double magnitude, double baseUnitMagnitude, MassUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public Mass copy() {
-    return new ImmutableMass(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableMass(magnitude(), baseUnitMagnitude(), unit());
   }
 }

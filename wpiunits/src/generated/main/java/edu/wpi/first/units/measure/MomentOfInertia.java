@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   static  MomentOfInertia ofRelativeUnits(double magnitude, MomentOfInertiaUnit unit) {
     return new ImmutableMomentOfInertia(magnitude, unit.toBaseUnits(magnitude), unit);

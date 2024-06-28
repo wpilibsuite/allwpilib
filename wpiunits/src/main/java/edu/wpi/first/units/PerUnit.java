@@ -115,6 +115,12 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
     }
   }
 
+  /**
+   * Multiplies this unit by a unit of its denominator.
+   *
+   * @param denom the denominator-typed unit to multiply by
+   * @return the result
+   */
   public N mult(D denom) {
     if (denom.equivalent(denominator())) {
       return numerator();

@@ -57,7 +57,7 @@ class VelocityUnitTest {
     var baseUnit = new ExampleUnit(92);
     var vel = VelocityUnit.combine(baseUnit, Millisecond);
     var mult = vel.mult(Minute);
-    assertEquals(1 / 92000., mult.fromBaseUnits(1), 1e-5);
+    assertEquals(1 / 92000.0, mult.fromBaseUnits(1), 1e-5);
     assertEquals(5_520_000, mult.toBaseUnits(1), 1e-5);
   }
 }

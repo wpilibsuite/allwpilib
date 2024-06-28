@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Dimensionless extends Measure<DimensionlessUnit> {
   static  Dimensionless ofRelativeUnits(double magnitude, DimensionlessUnit unit) {
     return new ImmutableDimensionless(magnitude, unit.toBaseUnits(magnitude), unit);

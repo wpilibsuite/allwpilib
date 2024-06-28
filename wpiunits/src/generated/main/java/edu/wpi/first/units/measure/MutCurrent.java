@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutCurrent
   extends MutableMeasureBase<CurrentUnit, Current, MutCurrent>
   implements Current {
-
   public MutCurrent(double magnitude, double baseUnitMagnitude, CurrentUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public Current copy() {
-    return new ImmutableCurrent(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableCurrent(magnitude(), baseUnitMagnitude(), unit());
   }
 }

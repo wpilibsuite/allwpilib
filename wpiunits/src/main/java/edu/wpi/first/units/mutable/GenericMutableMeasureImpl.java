@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.units.mutable;
 
 import edu.wpi.first.units.ImmutableMeasure;
@@ -18,46 +22,47 @@ public final class GenericMutableMeasureImpl<U extends Unit>
 
   @Override
   public Measure<U> copy() {
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, unit);
+    return ImmutableMeasure.ofBaseUnits(m_baseUnitMagnitude, m_unit);
   }
 
   @Override
   public MutableMeasure<U, ?, ?> mutableCopy() {
-    return new GenericMutableMeasureImpl<>(magnitude, baseUnitMagnitude, unit);
+    return new GenericMutableMeasureImpl<>(m_magnitude, m_baseUnitMagnitude, m_unit);
   }
 
   @Override
   public Measure<U> unaryMinus() {
-    return ImmutableMeasure.ofBaseUnits(0 - baseUnitMagnitude, unit);
+    return ImmutableMeasure.ofBaseUnits(0 - m_baseUnitMagnitude, m_unit);
   }
 
   @Override
   public Measure<U> plus(Measure<? extends U> other) {
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude + other.baseUnitMagnitude(), unit);
+    return ImmutableMeasure.ofBaseUnits(m_baseUnitMagnitude + other.baseUnitMagnitude(), m_unit);
   }
 
   @Override
   public Measure<U> minus(Measure<? extends U> other) {
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude - other.baseUnitMagnitude(), unit);
+    return ImmutableMeasure.ofBaseUnits(m_baseUnitMagnitude - other.baseUnitMagnitude(), m_unit);
   }
 
   @Override
   public Measure<U> times(double multiplier) {
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude * multiplier, unit);
+    return ImmutableMeasure.ofBaseUnits(m_baseUnitMagnitude * multiplier, m_unit);
   }
 
   @Override
   public Measure<U> times(Dimensionless multiplier) {
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude * multiplier.baseUnitMagnitude(), unit);
+    return ImmutableMeasure.ofBaseUnits(
+        m_baseUnitMagnitude * multiplier.baseUnitMagnitude(), m_unit);
   }
 
   @Override
   public Measure<U> divide(double divisor) {
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude / divisor, unit);
+    return ImmutableMeasure.ofBaseUnits(m_baseUnitMagnitude / divisor, m_unit);
   }
 
   @Override
   public Measure<U> divide(Dimensionless divisor) {
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude / divisor.baseUnitMagnitude(), unit);
+    return ImmutableMeasure.ofBaseUnits(m_baseUnitMagnitude / divisor.baseUnitMagnitude(), m_unit);
   }
 }

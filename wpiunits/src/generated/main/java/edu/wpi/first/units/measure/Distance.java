@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Distance extends Measure<DistanceUnit> {
   static  Distance ofRelativeUnits(double magnitude, DistanceUnit unit) {
     return new ImmutableDistance(magnitude, unit.toBaseUnits(magnitude), unit);

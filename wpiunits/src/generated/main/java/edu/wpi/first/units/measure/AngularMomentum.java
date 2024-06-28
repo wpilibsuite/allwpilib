@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface AngularMomentum extends Measure<AngularMomentumUnit> {
   static  AngularMomentum ofRelativeUnits(double magnitude, AngularMomentumUnit unit) {
     return new ImmutableAngularMomentum(magnitude, unit.toBaseUnits(magnitude), unit);

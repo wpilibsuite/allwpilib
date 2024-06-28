@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   static  LinearVelocity ofRelativeUnits(double magnitude, LinearVelocityUnit unit) {
     return new ImmutableLinearVelocity(magnitude, unit.toBaseUnits(magnitude), unit);

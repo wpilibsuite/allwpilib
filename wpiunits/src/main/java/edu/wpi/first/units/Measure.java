@@ -111,6 +111,16 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
 
   Measure<U> times(Dimensionless multiplier);
 
+  /**
+   * Generates a new measure that is equal to this measure multiplied by another. Some dimensional
+   * analysis is performed to reduce the units down somewhat; for example, multiplying a {@code
+   * Measure<Time>} by a {@code Measure<Velocity<Distance>>} will return just a {@code
+   * Measure<Distance>} instead of the naive {@code Measure<Mult<Time, Velocity<Distance>>}. This is
+   * not guaranteed to perform perfect dimensional analysis.
+   *
+   * @param multiplier the unit to multiply by
+   * @return the multiplicative unit
+   */
   default Measure<?> times(Measure<?> multiplier) {
     final double baseUnitResult = baseUnitMagnitude() * multiplier.baseUnitMagnitude();
 
@@ -328,6 +338,13 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
 
   Measure<U> divide(Dimensionless divisor);
 
+  /**
+   * Divides this measurement by another measure and performs some dimensional analysis to reduce
+   * the units.
+   *
+   * @param divisor the unit to divide by
+   * @return the resulting measure
+   */
   default Measure<?> divide(Measure<?> divisor) {
     final double baseUnitResult = baseUnitMagnitude() / divisor.baseUnitMagnitude();
 
@@ -419,17 +436,6 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       // Do a basic unit multiplication
       return PerUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitResult);
     }
-  }
-
-  // eg Dimensionless / (Dimensionless / Time) -> Time
-  default <Other extends Unit> Measure<Other> divideRatio(
-      Measure<? extends PerUnit<? extends U, Other>> divisor) {
-    return ImmutableMeasure.ofBaseUnits(
-        baseUnitMagnitude() / divisor.baseUnitMagnitude(), divisor.unit().denominator());
-  }
-
-  default Measure<?> per(TimeUnit period) {
-    return divide(period.of(1));
   }
 
   default Measure<?> divide(Acceleration<?> divisor) {
@@ -545,6 +551,17 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   default Measure<?> divide(Voltage divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  // eg Dimensionless / (Dimensionless / Time) -> Time
+  default <Other extends Unit> Measure<Other> divideRatio(
+      Measure<? extends PerUnit<? extends U, Other>> divisor) {
+    return ImmutableMeasure.ofBaseUnits(
+        baseUnitMagnitude() / divisor.baseUnitMagnitude(), divisor.unit().denominator());
+  }
+
+  default Measure<?> per(TimeUnit period) {
+    return divide(period.of(1));
   }
 
   /**

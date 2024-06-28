@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Temperature extends Measure<TemperatureUnit> {
   static  Temperature ofRelativeUnits(double magnitude, TemperatureUnit unit) {
     return new ImmutableTemperature(magnitude, unit.toBaseUnits(magnitude), unit);

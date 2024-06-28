@@ -10,17 +10,16 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public final class MutLinearMomentum
   extends MutableMeasureBase<LinearMomentumUnit, LinearMomentum, MutLinearMomentum>
   implements LinearMomentum {
-
   public MutLinearMomentum(double magnitude, double baseUnitMagnitude, LinearMomentumUnit unit) {
     super(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override
   public LinearMomentum copy() {
-    return new ImmutableLinearMomentum(magnitude, baseUnitMagnitude, unit);
+    return new ImmutableLinearMomentum(magnitude(), baseUnitMagnitude(), unit());
   }
 }

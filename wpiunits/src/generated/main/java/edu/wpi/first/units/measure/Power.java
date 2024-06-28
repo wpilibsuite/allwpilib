@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Power extends Measure<PowerUnit> {
   static  Power ofRelativeUnits(double magnitude, PowerUnit unit) {
     return new ImmutablePower(magnitude, unit.toBaseUnits(magnitude), unit);

@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Mult<A extends Unit, B extends Unit> extends Measure<MultUnit<A, B>> {
   static <A extends Unit, B extends Unit> Mult<A, B> ofRelativeUnits(double magnitude, MultUnit<A, B> unit) {
     return new ImmutableMult<A, B>(magnitude, unit.toBaseUnits(magnitude), unit);

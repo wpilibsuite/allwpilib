@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Mass extends Measure<MassUnit> {
   static  Mass ofRelativeUnits(double magnitude, MassUnit unit) {
     return new ImmutableMass(magnitude, unit.toBaseUnits(magnitude), unit);

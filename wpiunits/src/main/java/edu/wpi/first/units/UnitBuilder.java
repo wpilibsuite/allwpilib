@@ -243,7 +243,6 @@ public final class UnitBuilder<U extends Unit> {
    * @throws RuntimeException if the base unit does not define a constructor accepting the
    *     conversion functions, unit name, and unit symbol - in that order
    */
-  @SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "unchecked"})
   public U make() {
     return make(
         (baseUnit, toBaseUnits, fromBaseUnits, name, symbol) -> {
@@ -252,7 +251,7 @@ public final class UnitBuilder<U extends Unit> {
           try {
             var ctor = getConstructor(baseUnit);
 
-            return (U) ctor.newInstance(baseUnit, toBaseUnits, fromBaseUnits, name, symbol);
+            return ctor.newInstance(baseUnit, toBaseUnits, fromBaseUnits, name, symbol);
           } catch (InstantiationException e) {
             throw new RuntimeException("Could not instantiate class " + baseClass.getName(), e);
           } catch (IllegalAccessException e) {

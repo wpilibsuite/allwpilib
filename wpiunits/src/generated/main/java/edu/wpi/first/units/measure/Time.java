@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
 public interface Time extends Measure<TimeUnit> {
   static  Time ofRelativeUnits(double magnitude, TimeUnit unit) {
     return new ImmutableTime(magnitude, unit.toBaseUnits(magnitude), unit);
