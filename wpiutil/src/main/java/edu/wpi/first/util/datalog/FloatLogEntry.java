@@ -71,4 +71,39 @@ public class FloatLogEntry extends DataLogEntry {
   public void append(float value) {
     m_log.appendFloat(m_entry, value, 0);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
+  public synchronized void update(float value, long timestamp) {
+    if (!m_hasLastValue || m_lastValue != value) {
+      m_lastValue = value;
+      m_hasLastValue = true;
+      append(value, timestamp);
+    }
+  }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @param value Value to record
+   */
+  public void update(float value) {
+    update(value, 0);
+  }
+
+  /**
+   * Gets the last value.
+   *
+   * @return Last value, or 0 if none.
+   */
+  public synchronized float getLastValue() {
+    return m_lastValue;
+  }
+
+  boolean m_hasLastValue;
+  float m_lastValue;
 }
