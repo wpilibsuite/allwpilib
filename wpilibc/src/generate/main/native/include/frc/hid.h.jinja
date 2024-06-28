@@ -8,6 +8,9 @@
 {%- endmacro %}
 #pragma once
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/GenericHID.h"
 
 namespace frc {
@@ -24,7 +27,9 @@ namespace frc {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class {{ ConsoleName }}Controller : public GenericHID {
+class {{ ConsoleName }}Controller : public GenericHID,
+                                    public wpi::Sendable,
+                                    public wpi::SendableHelper<{{ ConsoleName }}Controller> {
  public:
   /**
    * Construct an instance of a controller.
@@ -203,6 +208,8 @@ class {{ ConsoleName }}Controller : public GenericHID {
     static constexpr int k{{ capitalize_first(trigger.name) }} = {{ trigger.value }};
 {%- endfor %}
   };
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc
