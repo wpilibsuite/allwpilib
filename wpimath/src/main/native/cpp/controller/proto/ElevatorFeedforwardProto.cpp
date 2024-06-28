@@ -4,12 +4,13 @@
 
 #include "frc/controller/proto/ElevatorFeedforwardProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "controller.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::ElevatorFeedforward>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufElevatorFeedforward>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufElevatorFeedforward>(arena);
 }
 
 frc::ElevatorFeedforward wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(

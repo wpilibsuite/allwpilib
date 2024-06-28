@@ -4,12 +4,13 @@
 
 #include "frc/geometry/proto/Pose3dProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "geometry3d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Pose3d>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufPose3d>(
-      arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufPose3d>(arena);
 }
 
 frc::Pose3d wpi::Protobuf<frc::Pose3d>::Unpack(
