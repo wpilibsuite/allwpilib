@@ -25,6 +25,7 @@ import java.util.function.BooleanSupplier;
 public class BooleanEvent implements BooleanSupplier {
   /** Poller loop. */
   protected final EventLoop m_loop;
+
   private final BooleanSupplier m_signal;
 
   /** The state of the condition in the current loop poll. Nightmare to manage. */
