@@ -8,11 +8,12 @@ import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.ImmutableForce;
 import edu.wpi.first.units.measure.MutForce;
 
-public class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {
+/** A unit of force like {@link Units#Newtons}. */
+public final class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {
   private static final CombinatoryUnitCache<MassUnit, LinearAccelerationUnit, ForceUnit> cache =
       new CombinatoryUnitCache<>(ForceUnit::new);
 
-  protected ForceUnit(MassUnit mass, LinearAccelerationUnit acceleration) {
+  ForceUnit(MassUnit mass, LinearAccelerationUnit acceleration) {
     this(
         mass.isBaseUnit() && acceleration.isBaseUnit()
             ? null
@@ -32,6 +33,13 @@ public class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines a mass and (linear) acceleration to form a unit of force.
+   *
+   * @param mass the unit of mass
+   * @param acceleration the unit of acceleration
+   * @return the combined unit of force
+   */
   public static ForceUnit combine(MassUnit mass, LinearAccelerationUnit acceleration) {
     return cache.combine(mass, acceleration);
   }
@@ -41,8 +49,16 @@ public class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {
     return (ForceUnit) super.getBaseUnit();
   }
 
-  // force times distance = energy
-  // distance times force = torque
+  /**
+   * Multiplies this force unit by a unit of distance to create a unit of energy.
+   *
+   * <p>Note: because torque and energy have the same dimensions (force multiplied by distance), we
+   * cannot define methods with the same name for both. Instead, use {@link
+   * DistanceUnit#mult(ForceUnit)} if you want a unit of torque.
+   *
+   * @param distance the unit of distance
+   * @return the combined energy unit
+   */
   public EnergyUnit mult(DistanceUnit distance) {
     // TODO
     throw new UnsupportedOperationException();
@@ -61,5 +77,10 @@ public class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {
   @Override
   public MutForce mutable(double initialMagnitude) {
     return new MutForce(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
+  @Override
+  public VelocityUnit<ForceUnit> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
   }
 }

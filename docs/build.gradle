@@ -240,7 +240,10 @@ task generateJavaDocs(type: Javadoc) {
             "-edu.wpi.first.math.system.struct," +
             "-edu.wpi.first.math.system.plant.proto," +
             "-edu.wpi.first.math.system.plant.struct," +
-            "-edu.wpi.first.math.trajectory.proto", true)
+            "-edu.wpi.first.math.trajectory.proto," +
+            // The .measure package contains generated source files for which automatic javadoc
+            // generation is very difficult to do meaningfully.
+            "-edu.wpi.first.units.measure", true)
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)

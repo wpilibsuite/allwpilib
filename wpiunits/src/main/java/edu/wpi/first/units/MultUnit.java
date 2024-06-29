@@ -86,6 +86,11 @@ public class MultUnit<A extends Unit, B extends Unit> extends Unit {
   }
 
   @Override
+  public Unit per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public MultUnit<A, B> getBaseUnit() {
     return (MultUnit<A, B>) super.getBaseUnit();

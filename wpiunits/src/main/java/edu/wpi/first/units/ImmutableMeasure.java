@@ -13,6 +13,9 @@ import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
  * situations and gives compile-time safety. Two measures with the same <i>unit</i> and
  * <i>magnitude</i> are effectively equivalent objects.
  *
+ * @param magnitude the magnitude of the measure in terms of its unit
+ * @param baseUnitMagnitude the magnitude of the measure in terms of its base unit
+ * @param unit the unit of the measurement
  * @param <U> the unit type of the measure
  */
 public record ImmutableMeasure<U extends Unit>(double magnitude, double baseUnitMagnitude, U unit)

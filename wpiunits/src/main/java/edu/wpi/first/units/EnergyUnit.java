@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.MutEnergy;
  * <p>Actual units (such as {@link Units#Joules} and {@link Units#Kilojoules}) can be found in the
  * {@link Units} class.
  */
-public class EnergyUnit extends Unit {
+public final class EnergyUnit extends Unit {
   EnergyUnit(
       EnergyUnit baseUnit,
       UnaryFunction toBaseConverter,
@@ -36,6 +36,13 @@ public class EnergyUnit extends Unit {
     return (EnergyUnit) super.getBaseUnit();
   }
 
+  /**
+   * Combines this unit of energy with a unit of time to create a unit of power.
+   *
+   * @param period the period of the change in energy
+   * @return the combined unit of power
+   */
+  @Override
   public PowerUnit per(TimeUnit period) {
     return PowerUnit.combine(this, period);
   }

@@ -20,7 +20,7 @@ import edu.wpi.first.units.measure.MutAngle;
 // eg MassUnit * DistanceUnit * VelocityUnit<AngleUnit> is equivalent to (MassUnit * DistanceUnit) /
 // TimeUnit - otherwise known
 // as PowerUnit - in other words, VelocityUnit<AngleUnit> is /actually/ Frequency
-public class AngleUnit extends Unit {
+public final class AngleUnit extends Unit {
   AngleUnit(AngleUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
@@ -49,10 +49,18 @@ public class AngleUnit extends Unit {
     return new MutAngle(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
-  public AngularVelocityUnit per(TimeUnit second) {
-    return AngularVelocityUnit.combine(this, second);
+  @Override
+  public AngularVelocityUnit per(TimeUnit period) {
+    return AngularVelocityUnit.combine(this, period);
   }
 
+  /**
+   * Converts a measurement value in terms of another angle unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other angle unit
+   * @param otherUnit the other angle unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, AngleUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }

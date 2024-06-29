@@ -40,4 +40,9 @@ class ExampleUnit extends Unit {
   public MutableMeasure<ExampleUnit, ?, ?> mutable(double initialMagnitude) {
     return MutableMeasure.ofRelativeUnits(initialMagnitude, this);
   }
+
+  @Override
+  public VelocityUnit<ExampleUnit> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
+  }
 }

@@ -12,16 +12,13 @@ import edu.wpi.first.units.measure.Velocity;
  * Unit of velocity dimension that is a combination of a distance unit (numerator) and a time unit
  * (denominator).
  *
- * <p>This is the base type for units of velocity dimension. It is also used in combination with a
- * distance dimension to specify the dimension for {@link Measure}. For example: <code>
- * Measure&lt;VelocityUnit&lt;DistanceUnit&gt;&gt;</code>.
+ * <p>This is a generic velocity type for units that do not have discrete velocity units (eg {@link
+ * DistanceUnit} has {@link LinearVelocityUnit}, and so would not use this class).
  *
- * <p>Actual units (such as {@link Units#MetersPerSecond} and {@link Units#RPM}) can be found in the
- * {@link Units} class.
- *
- * @param <D> the distance unit, such as {@link AngleUnit} or {@link DistanceUnit}
+ * @param <D> the unit of the changing quantity, such as {@link VoltageUnit} or {@link
+ *     TemperatureUnit}
  */
-public class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
+public final class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
   @SuppressWarnings("rawtypes")
   private static final CombinatoryUnitCache<Unit, TimeUnit, VelocityUnit> cache =
       new CombinatoryUnitCache<>(VelocityUnit::new);
@@ -39,6 +36,14 @@ public class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines a dimension unit and a unit of the period of change to create a unit of velocity.
+   *
+   * @param unit the unit of the changing dimension
+   * @param period the unit of the period of change in the velocity
+   * @param <D> the unit of the changing dimension
+   * @return the combined velocity unit
+   */
   @SuppressWarnings("unchecked")
   public static <D extends Unit> VelocityUnit<D> combine(D unit, TimeUnit period) {
     return cache.combine(unit, period);
@@ -62,10 +67,6 @@ public class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
     return denominator();
   }
 
-  public AccelerationUnit<D> per(TimeUnit period) {
-    return AccelerationUnit.combine(this, period);
-  }
-
   @Override
   public Velocity<D> of(double magnitude) {
     return new ImmutableVelocity<>(magnitude, toBaseUnits(magnitude), this);
@@ -81,6 +82,24 @@ public class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
     return new MutVelocity<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  /**
+   * Combines this velocity unit with a unit of a period of change to create an acceleration unit.
+   *
+   * @param period the unit of the period of change
+   * @return the acceleration unit
+   */
+  @Override
+  public AccelerationUnit<D> per(TimeUnit period) {
+    return AccelerationUnit.combine(this, period);
+  }
+
+  /**
+   * Converts a measurement value in terms of another velocity unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other velocity unit
+   * @param otherUnit the other velocity unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, VelocityUnit<? extends D> otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }

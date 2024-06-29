@@ -10,14 +10,25 @@ import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.measure.Dimensionless;
 
+/**
+ * A generic implementation of a mutable measure. This is used in scenarios no unit-specific mutable
+ * implementation can be determined.
+ *
+ * @param <U> the unit of measure
+ */
 public final class GenericMutableMeasureImpl<U extends Unit>
     extends MutableMeasureBase<U, Measure<U>, GenericMutableMeasureImpl<U>> {
+  /**
+   * Initializes the mutable measure with initial conditions. Both relative and base unit magnitudes
+   * are required to avoid unnecessary calculations. It is up to the caller to ensure they are
+   * correct.
+   *
+   * @param initialValue the initial magnitude of the measure, in terms of the unit
+   * @param baseUnitMagnitude the initial magnitude of the measure, in terms of the base unit
+   * @param unit the initial unit of measure
+   */
   public GenericMutableMeasureImpl(double initialValue, double baseUnitMagnitude, U unit) {
     super(initialValue, baseUnitMagnitude, unit);
-  }
-
-  public GenericMutableMeasureImpl(double initialValue, U unit) {
-    this(initialValue, unit.toBaseUnits(initialValue), unit);
   }
 
   @Override

@@ -60,9 +60,9 @@ public class Drive extends SubsystemBase {
           new SysIdRoutine.Config(),
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motors.
-              (voltage) -> {
-                m_leftMotor.setVoltage(voltage.in(Volts));
-                m_rightMotor.setVoltage(voltage.in(Volts));
+              voltage -> {
+                m_leftMotor.setVoltage(voltage);
+                m_rightMotor.setVoltage(voltage);
               },
               // Tell SysId how to record a frame of data for each motor on the mechanism being
               // characterized.

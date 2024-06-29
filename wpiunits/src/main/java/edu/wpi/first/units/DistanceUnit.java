@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.MutDistance;
  * <p>Actual units (such as {@link Units#Meters} and {@link Units#Inches}) can be found in the
  * {@link Units} class.
  */
-public class DistanceUnit extends Unit {
+public final class DistanceUnit extends Unit {
   DistanceUnit(DistanceUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
@@ -36,10 +36,18 @@ public class DistanceUnit extends Unit {
     return (DistanceUnit) super.getBaseUnit();
   }
 
+  @Override
   public LinearVelocityUnit per(TimeUnit period) {
     return LinearVelocityUnit.combine(this, period);
   }
 
+  /**
+   * Converts a measurement value in terms of another distance unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other distance unit
+   * @param otherUnit the other distance unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, DistanceUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
@@ -59,12 +67,25 @@ public class DistanceUnit extends Unit {
     return new MutDistance(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
-  // distance times force = torque
-  // force times distance = energy
+  /**
+   * Multiplies this distance unit by a unit of force to create a unit of torque.
+   *
+   * <p>Note: because torque and energy have the same dimensions (force multiplied by distance), we
+   * cannot define methods with the same name for both. Instead, use {@link
+   * ForceUnit#mult(DistanceUnit)} if you want a unit of energy.
+   *
+   * @param force the unit of force
+   * @return the combined torque unit
+   */
   public TorqueUnit mult(ForceUnit force) {
     return TorqueUnit.combine(this, force);
   }
 
+  /**
+   * Creates a measurement of zero magnitude in terms of this unit.
+   *
+   * @return the zero-valued measure
+   */
   public Distance zero() {
     return of(0);
   }

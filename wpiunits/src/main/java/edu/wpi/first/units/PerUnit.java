@@ -46,6 +46,7 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
     m_denominator = denominator;
   }
 
+  /** {@inheritDoc} */
   PerUnit(
       PerUnit<N, D> baseUnit,
       UnaryFunction toBaseConverter,
@@ -170,6 +171,18 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
     return new MutPer<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  @Override
+  public Unit per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Converts a measurement value in terms of another unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, PerUnit<? extends N, ? extends D> otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }

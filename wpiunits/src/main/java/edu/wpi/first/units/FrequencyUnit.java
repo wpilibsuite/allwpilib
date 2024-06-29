@@ -10,11 +10,12 @@ import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.ImmutableFrequency;
 import edu.wpi.first.units.measure.MutFrequency;
 
-public class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
+/** A unit of frequency like {@link edu.wpi.first.units.Units#Hertz}. */
+public final class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
   private static final CombinatoryUnitCache<DimensionlessUnit, TimeUnit, FrequencyUnit> cache =
       new CombinatoryUnitCache<>(FrequencyUnit::new);
 
-  protected FrequencyUnit(DimensionlessUnit numerator, TimeUnit denominator) {
+  FrequencyUnit(DimensionlessUnit numerator, TimeUnit denominator) {
     super(numerator, denominator);
   }
 
@@ -27,10 +28,24 @@ public class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
-  public static FrequencyUnit combine(DimensionlessUnit dim, TimeUnit time) {
-    return cache.combine(dim, time);
+  /**
+   * Combines a dimensionless unit and a cycle period to create a frequency.
+   *
+   * @param dim the dimensionless unit
+   * @param period the unit of time
+   * @return the combined unit of frequency
+   */
+  public static FrequencyUnit combine(DimensionlessUnit dim, TimeUnit period) {
+    return cache.combine(dim, period);
   }
 
+  /**
+   * Inverts a unit of time to get its corresponding frequency (as if the unit of time is the period
+   * of the frequency).
+   *
+   * @param time period of the associated frequency
+   * @return the frequency associated with the period
+   */
   public static FrequencyUnit inverse(TimeUnit time) {
     return combine(Value, time);
   }
@@ -48,5 +63,10 @@ public class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
   @Override
   public MutFrequency mutable(double initialMagnitude) {
     return new MutFrequency(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
+  @Override
+  public VelocityUnit<FrequencyUnit> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
   }
 }

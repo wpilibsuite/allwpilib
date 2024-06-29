@@ -8,12 +8,17 @@ import edu.wpi.first.units.measure.ImmutableMomentOfInertia;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.MutMomentOfInertia;
 
-public class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, AngularVelocityUnit> {
+/**
+ * A unit of moment of inertia, like {@link edu.wpi.first.units.Units#KilogramSquareMeters}. Moments
+ * of inertia describe how much an object resists being rotated, analogous to mass's resistance to
+ * being accelerated along a line.
+ */
+public final class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, AngularVelocityUnit> {
   private static final CombinatoryUnitCache<
           AngularMomentumUnit, AngularVelocityUnit, MomentOfInertiaUnit>
       cache = new CombinatoryUnitCache<>(MomentOfInertiaUnit::new);
 
-  protected MomentOfInertiaUnit(AngularMomentumUnit numerator, AngularVelocityUnit denominator) {
+  MomentOfInertiaUnit(AngularMomentumUnit numerator, AngularVelocityUnit denominator) {
     super(numerator, denominator);
   }
 
@@ -26,6 +31,13 @@ public class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, AngularVel
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines an angular momentum and angular velocity unit to form a moment of inertia unit.
+   *
+   * @param momentumUnit the unit of angular momentum
+   * @param velocityUnit the unit of angular velocity
+   * @return the combined moment of inertia unit
+   */
   public static MomentOfInertiaUnit combine(
       AngularMomentumUnit momentumUnit, AngularVelocityUnit velocityUnit) {
     return cache.combine(momentumUnit, velocityUnit);
@@ -44,5 +56,10 @@ public class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, AngularVel
   @Override
   public MutMomentOfInertia mutable(double initialMagnitude) {
     return new MutMomentOfInertia(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
+  @Override
+  public VelocityUnit<MomentOfInertiaUnit> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
   }
 }

@@ -9,11 +9,24 @@ import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Unit;
 import java.util.Objects;
 
+/**
+ * A partial implementation of {@link MutableMeasure} to handle most of the state and Java object-
+ * related implementations.
+ *
+ * @param <U> The dimension of measurement.
+ * @param <Base> The base measure type.
+ * @param <MutSelf> The self type. This MUST inherit from the base measure type.
+ */
 public abstract class MutableMeasureBase<
         U extends Unit, Base extends Measure<U>, MutSelf extends MutableMeasure<U, Base, MutSelf>>
     implements Measure<U>, MutableMeasure<U, Base, MutSelf> {
+  /** The magnitude of the measurement, in terms of {@link #m_unit}. */
   protected double m_magnitude;
+
+  /** The magnitude of the measurement, in terms of {@link #m_unit}'s base unit. */
   protected double m_baseUnitMagnitude;
+
+  /** The unit of measurement. */
   protected U m_unit;
 
   /**

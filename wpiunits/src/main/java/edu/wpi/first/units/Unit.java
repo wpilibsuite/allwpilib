@@ -58,11 +58,44 @@ public abstract class Unit {
     this(baseUnit, x -> x * baseUnitEquivalent, x -> x / baseUnitEquivalent, name, symbol);
   }
 
+  /**
+   * Creates a new immutable measurement of the given magnitude in terms of this unit.
+   * Implementations are <strong>strongly</strong> recommended to sharpen the return type to a
+   * unit-specific measurement implementation.
+   *
+   * @param magnitude the magnitude of the measurement.
+   * @return the measurement object
+   */
   public abstract Measure<?> of(double magnitude);
 
+  /**
+   * Creates a new immutable measurement of the given magnitude in terms of this unit's base unit.
+   * Implementations are <strong>strongly</strong> recommended to sharpen the return type to a
+   * unit-specific measurement implementation.
+   *
+   * @param baseUnitMagnitude the magnitude in terms of the base unit
+   * @return the measurement object
+   */
   public abstract Measure<?> ofBaseUnits(double baseUnitMagnitude);
 
+  /**
+   * Creates a new mutable measurement that is initialized to the given magnitude in terms of this
+   * unit. Implementations are <strong>strongly</strong> recommended to sharpen the return type to a
+   * unit-specific measurement implementation.
+   *
+   * @param initialMagnitude the initial magnitude of the mutable measurement
+   * @return the mutable measurement object
+   */
   public abstract MutableMeasure<?, ?, ?> mutable(double initialMagnitude);
+
+  /**
+   * Combines this unit with a unit of time. This often - but not always - results in a velocity.
+   * Subclasses should sharpen the return type to be unit-specific.
+   *
+   * @param time the unit of time
+   * @return the combined unit
+   */
+  public abstract Unit per(TimeUnit time);
 
   /**
    * Gets the base unit of measurement that this unit is derived from. If the unit is the base unit,

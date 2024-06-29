@@ -8,11 +8,12 @@ import edu.wpi.first.units.measure.ImmutableTorque;
 import edu.wpi.first.units.measure.MutTorque;
 import edu.wpi.first.units.measure.Torque;
 
-public class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
+/** A unit of torque like {@link edu.wpi.first.units.Units#NewtonMeters}. */
+public final class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   private static final CombinatoryUnitCache<DistanceUnit, ForceUnit, TorqueUnit> cache =
       new CombinatoryUnitCache<>(TorqueUnit::new);
 
-  protected TorqueUnit(DistanceUnit distanceUnit, ForceUnit forceUnit) {
+  TorqueUnit(DistanceUnit distanceUnit, ForceUnit forceUnit) {
     super(distanceUnit, forceUnit);
   }
 
@@ -25,6 +26,13 @@ public class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines a unit of distance and force to create a unit of torque.
+   *
+   * @param distance the distance unit
+   * @param force the force unit
+   * @return the combined torque unit
+   */
   public static TorqueUnit combine(DistanceUnit distance, ForceUnit force) {
     return cache.combine(distance, force);
   }
@@ -42,5 +50,10 @@ public class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   @Override
   public MutTorque mutable(double initialMagnitude) {
     return new MutTorque(initialMagnitude, toBaseUnits(initialMagnitude), this);
+  }
+
+  @Override
+  public VelocityUnit<TorqueUnit> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
   }
 }

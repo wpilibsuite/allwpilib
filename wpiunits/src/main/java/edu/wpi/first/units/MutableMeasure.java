@@ -19,12 +19,36 @@ import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
 public interface MutableMeasure<
         U extends Unit, Base extends Measure<U>, MutSelf extends MutableMeasure<U, Base, MutSelf>>
     extends Measure<U> {
+  /**
+   * Creates a new mutable measure starting with the given initial magnitude and unit.
+   *
+   * @param initialValue the initial magnitude of the measure, in terms of the initial unit
+   * @param unit the initial unit of the measurement
+   * @param <U> the unit of measurement
+   * @return a new mutable measure
+   */
   static <U extends Unit> MutableMeasure<U, ?, ?> ofRelativeUnits(double initialValue, U unit) {
-    return new GenericMutableMeasureImpl<>(initialValue, unit);
+    return new GenericMutableMeasureImpl<>(initialValue, unit.toBaseUnits(initialValue), unit);
   }
 
+  /**
+   * Overwrites the state of this measure with new values.
+   *
+   * @param magnitude the new magnitude in terms of the new unit
+   * @param newUnit the new unit
+   * @return this measure
+   */
   MutSelf mut_replace(double magnitude, U newUnit);
 
+  /**
+   * Overwrites the state of this measure and replaces it completely with values from the given one.
+   * The magnitude, base unit magnitude, and unit will all be copied. This is functionally the same
+   * as calling {@code other.mutableCopy()}, but copying to a pre-existing mutable measure instead
+   * of instantiating a new one.
+   *
+   * @param other the other measure to copy values from
+   * @return this measure
+   */
   default MutSelf mut_replace(Base other) {
     return mut_replace(other.magnitude(), other.unit());
   }
@@ -32,50 +56,137 @@ public interface MutableMeasure<
   @Override
   Base copy();
 
+  /**
+   * Sets the new magnitude of the measurement. The magnitude must be in terms of the {@link
+   * #unit()}.
+   *
+   * @param magnitude the new magnitude of the measurement
+   * @return this mutable measure
+   */
   default MutSelf mut_setMagnitude(double magnitude) {
     return mut_replace(magnitude, unit());
   }
 
+  /**
+   * Sets the new magnitude of the measurement. The magnitude must be in terms of the base unit of
+   * the current unit.
+   *
+   * @param baseUnitMagnitude the new magnitude of the measurement
+   * @return this mutable measure
+   */
   default MutSelf mut_setBaseUnitMagnitude(double baseUnitMagnitude) {
     return mut_replace(unit().fromBaseUnits(baseUnitMagnitude), unit());
   }
 
+  /**
+   * Increments the current magnitude of the measure by the given value. The value must be in terms
+   * of the current {@link #unit() unit}.
+   *
+   * @param raw the raw value to accumulate by
+   * @return the measure
+   */
   default MutSelf mut_acc(double raw) {
     return mut_setBaseUnitMagnitude(magnitude() + raw);
   }
 
+  /**
+   * Increments the current magnitude of the measure by the amount of the given measure.
+   *
+   * @param other the measure whose value should be added to this one
+   * @return this measure
+   */
   default MutSelf mut_acc(Base other) {
     return mut_setMagnitude(magnitude() + unit().fromBaseUnits(other.baseUnitMagnitude()));
   }
 
+  /**
+   * Adds another measurement to this one. This will mutate the object instead of generating a new
+   * measurement object.
+   *
+   * @param other the measurement to add
+   * @return this measure
+   */
   default MutSelf mut_plus(Base other) {
     return mut_acc(other);
   }
 
+  /**
+   * Adds another measurement to this one. This will mutate the object instead of generating a new
+   * measurement object. This is a denormalized version of {@link #mut_plus(Measure)} to avoid
+   * having to wrap raw numbers in a {@code Measure} object and pay for an object allocation.
+   *
+   * @param magnitude the magnitude of the other measurement.
+   * @param otherUnit the unit of the other measurement
+   * @return this measure
+   */
   default MutSelf mut_plus(double magnitude, U otherUnit) {
     return mut_setBaseUnitMagnitude(magnitude() + otherUnit.toBaseUnits(magnitude));
   }
 
+  /**
+   * Subtracts another measurement to this one. This will mutate the object instead of generating a
+   * new measurement object.
+   *
+   * @param other the measurement to subtract from this one
+   * @return this measure
+   */
   default MutSelf mut_minus(Base other) {
     return mut_setBaseUnitMagnitude(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
 
+  /**
+   * Subtracts another measurement from this one. This will mutate the object instead of generating
+   * a new measurement object. This is a denormalized version of {@link #mut_minus(Measure)} to
+   * avoid having to wrap raw numbers in a {@code Measure} object and pay for an object allocation.
+   *
+   * @param magnitude the magnitude of the other measurement.
+   * @param otherUnit the unit of the other measurement
+   * @return this measure
+   */
   default MutSelf mut_minus(double magnitude, U otherUnit) {
     return mut_setBaseUnitMagnitude(baseUnitMagnitude() - otherUnit.toBaseUnits(magnitude));
   }
 
+  /**
+   * Multiplies this measurement by some constant value. This will mutate the object instead of
+   * generating a new measurement object.
+   *
+   * @param multiplier the multiplier to scale the measurement by
+   * @return this measure
+   */
   default MutSelf mut_times(double multiplier) {
     return mut_setBaseUnitMagnitude(baseUnitMagnitude() * multiplier);
   }
 
-  default MutSelf mut_times(Dimensionless scalar) {
-    return mut_times(scalar.baseUnitMagnitude());
+  /**
+   * Multiplies this measurement by some constant value. This will mutate the object instead of
+   * generating a new measurement object.
+   *
+   * @param multiplier the multiplier to scale the measurement by
+   * @return this measure
+   */
+  default MutSelf mut_times(Dimensionless multiplier) {
+    return mut_times(multiplier.baseUnitMagnitude());
   }
 
+  /**
+   * Divides this measurement by some constant value. This will mutate the object instead of
+   * generating a new measurement object.
+   *
+   * @param divisor the divisor to scale the measurement by
+   * @return this measure
+   */
   default MutSelf mut_divide(double divisor) {
     return mut_times(1 / divisor);
   }
 
+  /**
+   * Divides this measurement by some constant value. This will mutate the object instead of
+   * generating a new measurement object.
+   *
+   * @param divisor the divisor to scale the measurement by
+   * @return this measure
+   */
   default MutSelf mut_divide(Dimensionless divisor) {
     return mut_divide(divisor.baseUnitMagnitude());
   }

@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Voltage;
  * <p>Actual units (such as {@link Units#Volts} and {@link Units#Millivolts}) can be found in the
  * {@link Units} class.
  */
-public class VoltageUnit extends Unit {
+public final class VoltageUnit extends Unit {
   VoltageUnit(VoltageUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
@@ -61,14 +61,29 @@ public class VoltageUnit extends Unit {
     return new MutVoltage(magnitude, toBaseUnits(magnitude), this);
   }
 
-  public <U extends Unit> PerUnit<VoltageUnit, U> per(U other) {
-    return PerUnit.combine(this, other);
-  }
-
+  @Override
   public VelocityUnit<VoltageUnit> per(TimeUnit period) {
     return VelocityUnit.combine(this, period);
   }
 
+  /**
+   * Creates a generic ratio unit of this voltage to a different unit type.
+   *
+   * @param other the other unit type
+   * @param <U> the type of the other unit
+   * @return the combined ratio type
+   */
+  public <U extends Unit> PerUnit<VoltageUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
+  }
+
+  /**
+   * Converts a measurement value in terms of another voltage unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other voltage unit
+   * @param otherUnit the other voltage unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, VoltageUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }

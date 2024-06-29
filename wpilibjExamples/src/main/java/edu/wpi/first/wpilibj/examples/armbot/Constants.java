@@ -49,7 +49,8 @@ public final class Constants {
     public static final double kAVoltSecondSquaredPerRad = 0.1;
 
     public static final AngularVelocity kMaxVelocityRadPerSecond = RadiansPerSecond.of(3);
-    public static final AngularAcceleration kMaxAccelerationRadPerSecSquared = RadiansPerSecondPerSecond.of(10);
+    public static final AngularAcceleration kMaxAccelerationRadPerSecSquared =
+        RadiansPerSecondPerSecond.of(10);
 
     public static final int[] kEncoderPorts = new int[] {4, 5};
     public static final int kEncoderPPR = 256;

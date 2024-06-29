@@ -8,11 +8,12 @@ import edu.wpi.first.units.measure.ImmutableLinearMomentum;
 import edu.wpi.first.units.measure.LinearMomentum;
 import edu.wpi.first.units.measure.MutLinearMomentum;
 
-public class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {
+/** A unit of linear momentum like {@link edu.wpi.first.units.Units#KilogramMetersPerSecond}. */
+public final class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {
   private static final CombinatoryUnitCache<MassUnit, LinearVelocityUnit, LinearMomentumUnit>
       cache = new CombinatoryUnitCache<>(LinearMomentumUnit::new);
 
-  protected LinearMomentumUnit(MassUnit unit, LinearVelocityUnit linearVelocityUnit) {
+  LinearMomentumUnit(MassUnit unit, LinearVelocityUnit linearVelocityUnit) {
     super(unit, linearVelocityUnit);
   }
 
@@ -25,6 +26,13 @@ public class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines a mass and linear velocity unit to form a combined linear momentum unit.
+   *
+   * @param mass the unit of mass
+   * @param velocity the unit of velocity
+   * @return the combined unit of momentum
+   */
   public static LinearMomentumUnit combine(MassUnit mass, LinearVelocityUnit velocity) {
     return cache.combine(mass, velocity);
   }
@@ -44,6 +52,17 @@ public class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {
     return new MutLinearMomentum(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  @Override
+  public VelocityUnit<LinearMomentumUnit> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Multiplies this unit by distance to form a unit of angular momentum.
+   *
+   * @param distance the unit of distance
+   * @return the combined unit of angular momentum
+   */
   public AngularMomentumUnit mult(DistanceUnit distance) {
     return AngularMomentumUnit.combine(this, distance);
   }

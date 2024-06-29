@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.MutCurrent;
  * <p>Actual units (such as {@link Units#Amps} and {@link Units#Milliamps}) can be found in the
  * {@link Units} class.
  */
-public class CurrentUnit extends Unit {
+public final class CurrentUnit extends Unit {
   CurrentUnit(CurrentUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
@@ -61,6 +61,18 @@ public class CurrentUnit extends Unit {
     return new MutCurrent(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  @Override
+  public VelocityUnit<CurrentUnit> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Converts a measurement value in terms of another current unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other current unit
+   * @param otherUnit the other current unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, CurrentUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }

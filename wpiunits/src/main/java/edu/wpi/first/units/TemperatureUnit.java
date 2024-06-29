@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Temperature;
  * <p>Actual units (such as {@link Units#Celsius} and {@link Units#Fahrenheit}) can be found in the
  * {@link Units} class.
  */
-public class TemperatureUnit extends Unit {
+public final class TemperatureUnit extends Unit {
   TemperatureUnit(
       TemperatureUnit baseUnit,
       UnaryFunction toBaseConverter,
@@ -25,10 +25,6 @@ public class TemperatureUnit extends Unit {
       String name,
       String symbol) {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
-  }
-
-  public VelocityUnit<TemperatureUnit> per(TimeUnit period) {
-    return VelocityUnit.combine(this, period);
   }
 
   @Override
@@ -46,6 +42,18 @@ public class TemperatureUnit extends Unit {
     return new MutTemperature(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  @Override
+  public VelocityUnit<TemperatureUnit> per(TimeUnit period) {
+    return VelocityUnit.combine(this, period);
+  }
+
+  /**
+   * Converts a measurement value in terms of another temperature unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other temperature unit
+   * @param otherUnit the other temperature unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, TemperatureUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }

@@ -12,12 +12,12 @@ import edu.wpi.first.units.measure.MutMass;
  * Unit of mass dimension.
  *
  * <p>This is the base type for units of mass dimension. It is also used to specify the dimension
- * for {@link Measure}: <code>Measure&lt;MassUnit&gt;</code>.
+ * for the mass-specific {@link Mass} measurement type.
  *
  * <p>Actual units (such as {@link Units#Grams} and {@link Units#Pounds}) can be found in the {@link
  * Units} class.
  */
-public class MassUnit extends Unit {
+public final class MassUnit extends Unit {
   /** Creates a new unit with the given name and multiplier to the base unit. */
   MassUnit(MassUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
@@ -52,18 +52,39 @@ public class MassUnit extends Unit {
     return new MutMass(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  @Override
   public VelocityUnit<MassUnit> per(TimeUnit period) {
     return VelocityUnit.combine(this, period);
   }
 
+  /**
+   * Converts a measurement value in terms of another mass unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other mass unit
+   * @param otherUnit the other mass unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, MassUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
+  /**
+   * Multiplies this mass unit by a unit of linear velocity to form a combined unit of linear
+   * momentum.
+   *
+   * @param velocity the unit of velocity
+   * @return the combined unit of momentum
+   */
   public LinearMomentumUnit mult(LinearVelocityUnit velocity) {
     return LinearMomentumUnit.combine(this, velocity);
   }
 
+  /**
+   * Multiplies this mass unit by a unit of linear acceleration to form a combined unit of force.
+   *
+   * @param acceleration the unit of acceleration
+   * @return the combined unit of force
+   */
   public ForceUnit mult(LinearAccelerationUnit acceleration) {
     return ForceUnit.combine(this, acceleration);
   }

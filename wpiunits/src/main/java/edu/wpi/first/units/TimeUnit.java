@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Time;
  * <p>Actual units (such as {@link Units#Seconds} and {@link Units#Milliseconds}) can be found in
  * the {@link Units} class.
  */
-public class TimeUnit extends Unit {
+public final class TimeUnit extends Unit {
   TimeUnit(TimeUnit baseUnit, double baseUnitEquivalent, String name, String symbol) {
     super(baseUnit, baseUnitEquivalent, name, symbol);
   }
@@ -43,6 +43,7 @@ public class TimeUnit extends Unit {
    * @param other the other unit of time
    * @return the result
    */
+  @Override
   public DimensionlessUnit per(TimeUnit other) {
     return Units.derive(Units.Value)
         .toBase(this.getConverterToBase().div(other.getConverterToBase()))
@@ -52,10 +53,24 @@ public class TimeUnit extends Unit {
         .make();
   }
 
+  /**
+   * Creates a ratio unit between this unit of time an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
   public <U extends Unit> PerUnit<TimeUnit, U> per(U other) {
     return PerUnit.combine(this, other);
   }
 
+  /**
+   * Converts a measurement value in terms of another time unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other time unit
+   * @param otherUnit the other time unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, TimeUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }

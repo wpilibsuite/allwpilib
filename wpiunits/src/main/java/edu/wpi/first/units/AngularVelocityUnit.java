@@ -8,11 +8,12 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.ImmutableAngularVelocity;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 
-public class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
+/** A unit of angular velocity like {@link Units#RadiansPerSecond}. */
+public final class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
   private static final CombinatoryUnitCache<AngleUnit, TimeUnit, AngularVelocityUnit> cache =
       new CombinatoryUnitCache<>(AngularVelocityUnit::new);
 
-  protected AngularVelocityUnit(AngleUnit numerator, TimeUnit denominator) {
+  AngularVelocityUnit(AngleUnit numerator, TimeUnit denominator) {
     super(numerator, denominator);
   }
 
@@ -25,6 +26,13 @@ public class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines an angle unit and a period of time into a unit of angular velocity.
+   *
+   * @param angle the unit of the changing angle
+   * @param time the period of the changing angle
+   * @return the combined angular velocity unit
+   */
   public static AngularVelocityUnit combine(AngleUnit angle, TimeUnit time) {
     return cache.combine(angle, time);
   }
@@ -44,6 +52,7 @@ public class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
     return new MutAngularVelocity(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  @Override
   public AngularAccelerationUnit per(TimeUnit period) {
     return AngularAccelerationUnit.combine(this, period);
   }

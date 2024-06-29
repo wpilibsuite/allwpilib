@@ -8,7 +8,8 @@ import edu.wpi.first.units.measure.ImmutableLinearVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 
-public class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
+/** A unit of linear velocity like {@link edu.wpi.first.units.Units#MetersPerSecond}. */
+public final class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
   private static final CombinatoryUnitCache<DistanceUnit, TimeUnit, LinearVelocityUnit> cache =
       new CombinatoryUnitCache<>(LinearVelocityUnit::new);
 
@@ -25,6 +26,13 @@ public class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines a distance and time unit for form a combined unit of velocity.
+   *
+   * @param distance the unit of distance
+   * @param period the unit of time
+   * @return the combined velocity unit
+   */
   public static LinearVelocityUnit combine(DistanceUnit distance, TimeUnit period) {
     return cache.combine(distance, period);
   }
@@ -44,6 +52,13 @@ public class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
     return new MutLinearVelocity(value, toBaseUnits(value), this);
   }
 
+  /**
+   * Combines this velocity with a time period of change to form a unit of acceleration.
+   *
+   * @param period the period of change in the velocity
+   * @return the combined acceleration unit
+   */
+  @Override
   public LinearAccelerationUnit per(TimeUnit period) {
     return LinearAccelerationUnit.combine(this, period);
   }

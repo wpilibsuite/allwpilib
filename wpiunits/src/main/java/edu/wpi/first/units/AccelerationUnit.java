@@ -8,16 +8,28 @@ import edu.wpi.first.units.measure.Acceleration;
 import edu.wpi.first.units.measure.ImmutableAcceleration;
 import edu.wpi.first.units.measure.MutAcceleration;
 
-public class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit<D>, TimeUnit> {
+/**
+ * A generic unit of acceleration.
+ *
+ * <p><strong>NOTE:</strong> This type is not compatible with unit-specific accelerations like
+ * {@link edu.wpi.first.units.measure.LinearAcceleration}. Authors of APIs that need to interact
+ * with all types should consider using a generic {@code Measure<? extends PerUnit<? extends
+ * PerUnit<[dimension>], TimeUnit>, TimeUnit>}. Bounded wildcards are necessary in order to
+ * interoperate with <i>any</i> subclass of the {@link edu.wpi.first.units.measure.Per} measurement
+ * type.
+ *
+ * @param <D> the unit of the accelerating quantity
+ */
+public final class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit<D>, TimeUnit> {
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static final CombinatoryUnitCache<VelocityUnit, TimeUnit, AccelerationUnit> cache =
       new CombinatoryUnitCache<>(AccelerationUnit::new);
 
-  protected AccelerationUnit(VelocityUnit<D> velocity, TimeUnit period) {
+  AccelerationUnit(VelocityUnit<D> velocity, TimeUnit period) {
     super(velocity, period);
   }
 
-  protected AccelerationUnit(
+  AccelerationUnit(
       AccelerationUnit<D> baseUnit,
       UnaryFunction toBaseConverter,
       UnaryFunction fromBaseConverter,
@@ -41,6 +53,19 @@ public class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit<D>, T
     return new MutAcceleration<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  @Override
+  public VelocityUnit<AccelerationUnit<D>> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Combines a generic velocity and time period into a unit of acceleration.
+   *
+   * @param velocity the unit of velocity
+   * @param period the unit of the time period of acceleration
+   * @param <D> the unit of the accelerating quantity
+   * @return the combined acceleration unit
+   */
   @SuppressWarnings("unchecked")
   public static <D extends Unit> AccelerationUnit<D> combine(
       VelocityUnit<D> velocity, TimeUnit period) {

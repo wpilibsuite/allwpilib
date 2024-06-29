@@ -8,11 +8,15 @@ import edu.wpi.first.units.measure.AngularMomentum;
 import edu.wpi.first.units.measure.ImmutableAngularMomentum;
 import edu.wpi.first.units.measure.MutAngularMomentum;
 
-public class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, DistanceUnit> {
+/**
+ * A unit of angular momentum, modeled as linear momentum of an object rotating some distance away
+ * from the axis of rotation.
+ */
+public final class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, DistanceUnit> {
   private static final CombinatoryUnitCache<LinearMomentumUnit, DistanceUnit, AngularMomentumUnit>
       cache = new CombinatoryUnitCache<>(AngularMomentumUnit::new);
 
-  protected AngularMomentumUnit(LinearMomentumUnit momentumUnit, DistanceUnit distanceUnit) {
+  AngularMomentumUnit(LinearMomentumUnit momentumUnit, DistanceUnit distanceUnit) {
     super(momentumUnit, distanceUnit);
   }
 
@@ -25,6 +29,13 @@ public class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, DistanceUn
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines a linear momentum and distance to create a unit of angular momentum.
+   *
+   * @param linear the linear momentum unit
+   * @param distance the unit of distance from the axis of rotation
+   * @return the combined angular momentum unit
+   */
   public static AngularMomentumUnit combine(LinearMomentumUnit linear, DistanceUnit distance) {
     return cache.combine(linear, distance);
   }
@@ -44,6 +55,17 @@ public class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, DistanceUn
     return new MutAngularMomentum(magnitude, toBaseUnits(magnitude), this);
   }
 
+  @Override
+  public VelocityUnit<AngularMomentumUnit> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Multiplies this angular momentum by an angular velocity to yield a unit of moment of inertia.
+   *
+   * @param omega the unit of angular velocity
+   * @return the moment of inertia unit
+   */
   public MomentOfInertiaUnit mult(AngularVelocityUnit omega) {
     return MomentOfInertiaUnit.combine(this, omega);
   }

@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.MutDimensionless;
 /**
  * A type of unit that corresponds to raw values and not any physical dimension, such as percentage.
  */
-public class DimensionlessUnit extends Unit {
+public final class DimensionlessUnit extends Unit {
   /**
    * Creates a new unit with the given name and multiplier to the base unit.
    *
@@ -48,10 +48,25 @@ public class DimensionlessUnit extends Unit {
     return new MutDimensionless(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  /**
+   * Converts a measurement value in terms of another dimensionless unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other dimensionless unit
+   * @param otherUnit the other dimensionless unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, DimensionlessUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
+  /**
+   * Creates a frequency unit as the ratio of this dimensionless unit to the period of time in which
+   * a single cycle is made.
+   *
+   * @param period the cycle period
+   * @return the combined frequency unit
+   */
+  @Override
   public FrequencyUnit per(TimeUnit period) {
     return FrequencyUnit.combine(this, period);
   }

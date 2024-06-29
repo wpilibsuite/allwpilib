@@ -20,11 +20,11 @@ import edu.wpi.first.units.measure.Power;
  * <p>Actual units (such as {@link Units#Watts} and {@link Units#Horsepower}) can be found in the
  * {@link Units} class.
  */
-public class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
+public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
   private static final CombinatoryUnitCache<EnergyUnit, TimeUnit, PowerUnit> cache =
       new CombinatoryUnitCache<>(PowerUnit::new);
 
-  protected PowerUnit(EnergyUnit energy, TimeUnit time) {
+  PowerUnit(EnergyUnit energy, TimeUnit time) {
     this(
         energy.isBaseUnit() && time.isBaseUnit()
             ? null
@@ -44,6 +44,13 @@ public class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines an energy and a time unit to form a unit of power.
+   *
+   * @param energy the unit of energy
+   * @param period the unit of time
+   * @return the combined unit of power
+   */
   public static PowerUnit combine(EnergyUnit energy, TimeUnit period) {
     return cache.combine(energy, period);
   }
@@ -115,6 +122,18 @@ public class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
     return new MutPower(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  @Override
+  public VelocityUnit<PowerUnit> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Converts a measurement value in terms of another power unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other power unit
+   * @param otherUnit the other power unit
+   * @return the value of the measurement in terms of this unit
+   */
   public double convertFrom(double magnitude, PowerUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }

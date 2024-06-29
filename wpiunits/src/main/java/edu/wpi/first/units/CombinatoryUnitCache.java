@@ -8,6 +8,14 @@ import edu.wpi.first.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
+/**
+ * A helper class for creating and caching combined unit objects. This helps to reduce unnecessary
+ * object allocation by reusing already-created units.
+ *
+ * @param <A> the type of the first unit to be combined
+ * @param <B> the type of the second unit to be combined
+ * @param <Out> the type of the combinatorial unit
+ */
 public final class CombinatoryUnitCache<A extends Unit, B extends Unit, Out extends Unit> {
   /**
    * Keep a cache of created instances so expressions like Volts.per(Meter) don't do any allocations
@@ -17,6 +25,12 @@ public final class CombinatoryUnitCache<A extends Unit, B extends Unit, Out exte
 
   private final BiFunction<? super A, ? super B, ? extends Out> m_constructor;
 
+  /**
+   * Creates a new combinatory unit cache. The cache is initially empty and is not shared across
+   * instances.
+   *
+   * @param constructor the constructor function to use to create new combined units
+   */
   public CombinatoryUnitCache(BiFunction<? super A, ? super B, ? extends Out> constructor) {
     this.m_constructor =
         Objects.requireNonNull(constructor, "Cache unit constructor must be provided");

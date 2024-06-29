@@ -8,11 +8,14 @@ import edu.wpi.first.units.measure.ImmutableLinearAcceleration;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.MutLinearAcceleration;
 
-public class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, TimeUnit> {
+/**
+ * A unit of linear acceleration like {@link edu.wpi.first.units.Units#MetersPerSecondPerSecond}.
+ */
+public final class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, TimeUnit> {
   private static final CombinatoryUnitCache<LinearVelocityUnit, TimeUnit, LinearAccelerationUnit>
       cache = new CombinatoryUnitCache<>(LinearAccelerationUnit::new);
 
-  protected LinearAccelerationUnit(LinearVelocityUnit numerator, TimeUnit denominator) {
+  LinearAccelerationUnit(LinearVelocityUnit numerator, TimeUnit denominator) {
     super(numerator, denominator);
   }
 
@@ -25,6 +28,13 @@ public class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, TimeUnit
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  /**
+   * Combines a linear velocity and time unit to form a unit of linear acceleration.
+   *
+   * @param velocity the unit of linear velocity
+   * @param period the unit of time
+   * @return the combined unit of linear acceleration
+   */
   public static LinearAccelerationUnit combine(LinearVelocityUnit velocity, TimeUnit period) {
     return cache.combine(velocity, period);
   }
@@ -50,10 +60,28 @@ public class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, TimeUnit
     return new MutLinearAcceleration(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
+  @Override
+  public VelocityUnit<LinearAccelerationUnit> per(TimeUnit time) {
+    return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Gets the unit of the changing velocity. This is equivalent to {@link #numerator()} and is left
+   * for historical purposes.
+   *
+   * @return the unit of the changing velocity
+   */
   public LinearVelocityUnit getUnit() {
     return numerator();
   }
 
+  /**
+   * Gets the unit of the acceleration period (how long it takes for a measured velocity to change
+   * by one unit of velocity). This is equivalent to {@link #numerator()} and is left for historical
+   * purposes.
+   *
+   * @return the unit of the acceleration period
+   */
   public TimeUnit getPeriod() {
     return denominator();
   }

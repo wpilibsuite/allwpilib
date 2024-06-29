@@ -87,13 +87,13 @@ public final class Units {
 
   // AngleUnit
   /**
-   * The base SI unit of angle, represented by the distance that the radius of a unit circle can
+   * The standard SI unit of angle, represented by the distance that the radius of a unit circle can
    * wrap around its circumference.
    */
   public static final AngleUnit Radians = BaseUnits.AngleUnit;
 
   /**
-   * The base SI unit of angle, represented by the distance that the radius of a unit circle can
+   * The standard SI unit of angle, represented by the distance that the radius of a unit circle can
    * wrap around its circumference.
    */
   public static final AngleUnit Radian = Radians; // alias
@@ -180,9 +180,14 @@ public final class Units {
    */
   public static final AngularVelocityUnit DegreesPerSecond = Degrees.per(Second);
 
+  /**
+   * The standard SI unit of frequency, equivalent to a periodic signal repeating once every {@link
+   * #Second}.
+   */
   public static final FrequencyUnit Hertz =
       derive(Value.per(Second)).named("Hertz").symbol("hz").make();
 
+  /** 1/1000th of a {@link #Hertz}. */
   public static final FrequencyUnit Millihertz = Milli(Hertz);
 
   // Acceleration
@@ -226,10 +231,10 @@ public final class Units {
       derive(MetersPerSecondPerSecond).aggregate(9.80665).named("G").symbol("G").make();
 
   // MassUnit
-  /** The base SI unit of mass. */
+  /** The standard SI unit of mass. */
   public static final MassUnit Kilograms = BaseUnits.MassUnit;
 
-  /** The base SI unit of mass. */
+  /** The standard SI unit of mass. */
   public static final MassUnit Kilogram = Kilograms; // alias
 
   /** 1/1000 of a {@link #Kilogram}. */
@@ -242,6 +247,8 @@ public final class Units {
    * A unit of mass equivalent to approximately 453 {@link #Grams}. This is <i>not</i> equivalent to
    * pounds-force, which is the amount of force required to accelerate an object with one pound of
    * mass at a rate of one {@link #Gs G}.
+   *
+   * @see #PoundsForce
    */
   public static final MassUnit Pounds =
       derive(Grams).aggregate(453.592).named("Pound").symbol("lb.").make();
@@ -250,6 +257,8 @@ public final class Units {
    * A unit of mass equivalent to approximately 453 {@link #Grams}. This is <i>not</i> equivalent to
    * pounds-force, which is the amount of force required to accelerate an object with one pound of
    * mass at a rate of one {@link #Gs G}.
+   *
+   * @see #PoundForce
    */
   public static final MassUnit Pound = Pounds; // alias
 
@@ -262,48 +271,106 @@ public final class Units {
 
   // Force
 
+  /**
+   * The standard unit of force, equivalent to the standard force of gravity applied to a one {@link
+   * #Kilogram} mass.
+   */
   public static final ForceUnit Newtons =
       derive(Kilograms.mult(Gs)).named("Newton").symbol("N").make();
 
+  /**
+   * The standard unit of force, equivalent to the standard force of gravity applied to a one {@link
+   * #Kilogram} mass.
+   */
   public static final ForceUnit Newton = Newtons;
 
+  /**
+   * The standard Imperial unit of force, equivalent to the standard force of gravity applied to a
+   * one {@link #Pound} mass.
+   */
   public static final ForceUnit PoundsForce =
       derive(Pounds.mult(Gs)).named("Pound-force").symbol("lbsf.").make();
 
+  /**
+   * The standard Imperial unit of force, equivalent to the standard force of gravity applied to a
+   * one {@link #Pound} mass.
+   */
   public static final ForceUnit PoundForce = PoundsForce;
 
+  /**
+   * 1/16th of {@link #PoundsForce}, equivalent to the standard force of gravity applied to a one
+   * {@link #Ounce} mass.
+   */
   public static final ForceUnit OuncesForce =
       derive(Ounces.mult(Gs)).named("Ounce-force").symbol("ozf").make();
 
+  /**
+   * 1/16th of {@link #PoundsForce}, equivalent to the standard force of gravity applied to a one
+   * {@link #Ounce} mass.
+   */
   public static final ForceUnit OunceForce = OuncesForce;
 
   // Torque
 
+  /** The standard SI unit for torque. */
   public static final TorqueUnit NewtonMeters = Meters.mult(Newtons);
 
+  /** The standard SI unit for torque. */
   public static final TorqueUnit NewtonMeter = NewtonMeters;
 
+  /**
+   * The equivalent of one {@link #PoundsForce pound of force} applied to an object one {@link
+   * #Foot} away from its center of rotation.
+   */
   public static final TorqueUnit PoundFeet = Feet.mult(PoundsForce);
+
+  /**
+   * The equivalent of one {@link #PoundsForce pound of force} applied to an object one {@link
+   * #Foot} away from its center of rotation.
+   */
   public static final TorqueUnit PoundFoot = PoundFeet;
 
+  /**
+   * The equivalent of one {@link #PoundsForce pound of force} applied to an object one {@link
+   * #Inch} away from its center of rotation.
+   */
   public static final TorqueUnit PoundInches = Inches.mult(PoundsForce);
+
+  /**
+   * The equivalent of one {@link #PoundsForce pound of force} applied to an object one {@link
+   * #Inch} away from its center of rotation.
+   */
   public static final TorqueUnit PoundInch = PoundInches;
 
+  /**
+   * The equivalent of one {@link #OunceForce ounce of force} applied to an object one {@link #Inch}
+   * away from its center of rotation.
+   */
   public static final TorqueUnit OunceInches = Inches.mult(OuncesForce);
+
+  /**
+   * The equivalent of one {@link #OunceForce ounce of force} applied to an object one {@link #Inch}
+   * away from its center of rotation.
+   */
   public static final TorqueUnit OunceInch = OunceInches;
 
   // Linear momentum
 
+  /**
+   * The standard SI unit for linear momentum, equivalent to a one {@link #Kilogram} mass moving at
+   * one {@link #MetersPerSecond}.
+   */
   public static final LinearMomentumUnit KilogramMetersPerSecond = Kilograms.mult(MetersPerSecond);
 
   // Angular momentum
 
+  /** The standard SI unit for angular momentum. */
   public static final AngularMomentumUnit KilogramMetersSquaredPerSecond =
       KilogramMetersPerSecond.mult(Meters);
 
   // Moment of Inertia
 
-  /** The base SI unit for moment of inertia. */
+  /** The standard SI unit for moment of inertia. */
   public static final MomentOfInertiaUnit KilogramSquareMeters =
       KilogramMetersSquaredPerSecond.mult(RadiansPerSecond);
 
@@ -407,8 +474,8 @@ public final class Units {
   public static final TemperatureUnit Kelvin = BaseUnits.TemperatureUnit;
 
   /**
-   * The base SI unit of temperature, where a value of 0 roughly corresponds to the freezing point
-   * of water and a value of 100 corresponds to the boiling point. Electronics tend to exhibit
+   * The standard SI unit of temperature, where a value of 0 roughly corresponds to the freezing
+   * point of water and a value of 100 corresponds to the boiling point. Electronics tend to exhibit
    * degraded performance or damage above 90 degrees Celsius.
    */
   public static final TemperatureUnit Celsius =
