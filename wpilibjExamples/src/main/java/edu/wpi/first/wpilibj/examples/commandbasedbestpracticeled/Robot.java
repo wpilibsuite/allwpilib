@@ -31,7 +31,7 @@
  *
  * 1. LED set 1 usage Top LEDView subsystem default blue.
  *  Autonomous mode command brown fast blink.
- *  Non-autonomous display colors slowly around the color wheel initiated by pressing "X" button.
+ *  Non-autonomous displays colors slowly around the color wheel initiated by pressing "X" button.
  *
  * 2. LED set 2 usage Main LEDView subsystem default cyan.
  *  Game Piece Intake Acquired subsystem signal intake game piece acquired magenta fast blink
@@ -50,14 +50,18 @@
  *  AchieveHueGoal subsystem controller command to achieve the goal set by the goal supplier.
  *  Colors on color wheel position show PID controller converging on a color selected by Xbox right
  *  trigger axis. Press trigger axis a little to start and modulate to select hue goal. Press "A"
- *  button to interrupt controller before the goal has been achieved.
+ *  button to interrupt controller before the goal has been achieved. The selected color blinks
+ *  shortly at the end to indicate the controller is off and then gray. Fast blink white default
+ *  command indicates the LED display command has malfunctioned and is not running even if the
+ *  controller runs.
  *
  * 6. LED set 6 usage MooreLikeFSM LEDView subsystem.
- *  Moore Like FSM structured subsystem runs continuously in enabled mode to display a KnightRider
- *  red LED Scanner.
+ *  First instance of the Moore Like FSM structured subsystem runs continuously in enabled mode to
+ *  display a KnightRider Kitt red LED Scanner.
  *
  * 7. LED set 7 usage MooreLikeFSM LEDView subsystem.
- *  Second instance of the Moore Like FSM to show it can happen. Uses different speed and color.
+ *  Second instance of the Moore Like FSM to show it can be instantiated multiple times. Uses a
+ *  faster speed and orange color for this Kitt imposter.
  *
  * 8. Console Terminal usage GroupDisjoint subsystem.
  *  Disjoint Sequential Group Demo console output initiated by entering teleop enable mode.
@@ -95,6 +99,7 @@
  * Use of Measure<Time>.
  * Use of sequential and parallel composed command groups to perform tasks.
  * Use of a reusable Moore-Like FSM structure of current state, trigger, new state transitions.
+ * Use of a perpetually running command to accept "goals".
  */
 
 /*
@@ -166,10 +171,15 @@
  *
  * The use of the InternalTrigger to sequence command runs was donated by ChiefDelphi @bovlb
  *
- * Any errors or confusions are the fault and responsibility of ChiefDelphi @SLAB-Mr.Thomas; github
- * tom131313.
+ * Errors and confusions are the fault of ChiefDelphi @SLAB-Mr.Thomas; github tom131313.
  */
 
+/*
+ * Warning:
+ * 
+ * WPILib examples often have a cancelAll() for commands. This program uses a perpetually running
+ * command for one example and cancelling that command is fatal for that controller example.
+ */
 package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -191,10 +201,10 @@ public class Robot extends TimedRobot {
     // get a consistent set of all inputs including non-subsystems not in scheduler run
     m_robotContainer.runBeforeCommands(); // this is essentially similar to running the scheduler
 
-    // check all the triggers and run all the scheduled commands; subsystem periodics are run first
+    // check all triggers and run all scheduled commands; all Subsystem.periodic() are run first
     CommandScheduler.getInstance().run();
 
-    // write outputs such as logging, dashboards, indicators, and goal-oriented subsystem periodic
+    // write outputs like logging, dashboards, indicators, meh - goal-oriented subsystem periodic
     m_robotContainer.runAfterCommands();
   }
 
@@ -250,12 +260,7 @@ public class Robot extends TimedRobot {
   public void teleopExit() {}
 
   @Override
-  public void testInit() {
-    // Running commands are all cancelled. Default Commands will activate especially the disjoint
-    // test defaults if the disjoint test was prematurely aborted leaving the defaults in place.
-    // That behavior can be changed with more logic if need be - no need for this simple demo.
-    CommandScheduler.getInstance().cancelAll();
-  }
+  public void testInit() {}
 
   @Override
   public void testPeriodic() {}

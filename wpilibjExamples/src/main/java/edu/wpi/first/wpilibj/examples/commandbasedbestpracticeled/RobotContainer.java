@@ -104,7 +104,7 @@ public class RobotContainer {
     var triggerHueGoalDeadBand = 0.05; // triggers if past a small threshold (scale of 0 to 1)
     m_operatorController.rightTrigger(triggerHueGoalDeadBand)
         .onTrue(
-            m_achieveHueGoal.displayHue( // goal-acceptance command
+            m_achieveHueGoal.achieveHue( // goal-acceptance command
                 () -> m_operatorController.getRightTriggerAxis()*180.0 // supplying the setpoint
                 // scale joystick's 0 to 1 to computer color wheel hue 0 to 180
                 ));
@@ -142,6 +142,10 @@ public class RobotContainer {
     final LEDPattern enabled = LEDPattern.solid(Color.kGreen).breathe(Seconds.of(2.0));
     final LEDPatternSupplier enableDisableDefaultSignal =
         () -> DriverStation.isDisabled() ? disabled : enabled;
+    // Intended that hue controller display always be ON so make it noticeable that it's OFF
+    // since this default command should never run
+    final LEDPattern hueControllerDisplayOffSignal = LEDPattern.solid(Color.kWhiteSmoke)
+        .blink(Seconds.of(0.09));
 
     final Command topDefault =
         m_robotSignals
@@ -161,11 +165,22 @@ public class RobotContainer {
             .setSignal(enableDisableDefaultSignal)
             .ignoringDisable(true)
             .withName("EnableDisableDefault");
+    final Command hueControllerDisplayDefault =
+        m_robotSignals
+            .m_achieveHueGoal
+            .setSignal(hueControllerDisplayOffSignal)
+            .ignoringDisable(true)
+            .withName("HueControllerDisplayOff");
 
     m_robotSignals.m_top.setDefaultCommand(topDefault);
     m_robotSignals.m_main.setDefaultCommand(mainDefault);
     m_robotSignals.m_enableDisable.setDefaultCommand(enableDisableDefault);
-    // could put default for m_robotSignals.m_achieveHueGoal here but need a getter so don't bother
+    m_robotSignals.m_achieveHueGoal.setDefaultCommand(hueControllerDisplayDefault);
+    
+    m_achieveHueGoal.achieveHueDisplay().schedule(); // Not strictly the default but it should
+    // always be running and we never see the default. Using the default command for the perpetual
+    // command may be more robust as it restarts if cancelled for any reason but that wasn't used
+    // in this example. cancelAll() will kill this so don't! (It wouldn't kill a default command.)
   }
 
   /**
@@ -214,45 +229,37 @@ public class RobotContainer {
     CommandScheduler.getInstance()
         .onCommandInitialize(
             command -> {
-              if (!"LedSet".equals(command.getName())) {
                 System.out.println(
                     /* command.getClass() + " " + */ command.getName()
                         + " initialized "
                         + command.getRequirements());
-              }
             });
 
     CommandScheduler.getInstance()
         .onCommandInterrupt(
             command -> {
-              if (!"LedSet".equals(command.getName())) {
                 System.out.println(
                     /* command.getClass() + " " + */ command.getName()
                         + " interrupted "
                         + command.getRequirements());
-              }
             });
 
     CommandScheduler.getInstance()
         .onCommandFinish(
             command -> {
-              if (!"LedSet".equals(command.getName())) {
                 System.out.println(
                     /* command.getClass() + " " + */ command.getName()
                         + " finished "
                         + command.getRequirements());
-              }
             });
 
     CommandScheduler.getInstance()
         .onCommandExecute( // this can generate a lot of events
             command -> {
-              if (!"LedSet".equals(command.getName())) {
                 System.out.println(
                     /* command.getClass() + " " + */ command.getName()
                         + " executed "
                         + command.getRequirements());
-              }
             });
   }
 
