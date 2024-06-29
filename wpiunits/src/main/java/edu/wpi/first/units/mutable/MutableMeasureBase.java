@@ -66,15 +66,7 @@ public abstract class MutableMeasureBase<
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof MutableMeasureBase<?, ?, ?> that)) {
-      return false;
-    }
-    return Double.compare(m_magnitude, that.m_magnitude) == 0
-        && Double.compare(m_baseUnitMagnitude, that.m_baseUnitMagnitude) == 0
-        && Objects.equals(m_unit, that.m_unit);
+    return this == o || (o instanceof Measure<?> m && isEquivalent(m));
   }
 
   @Override

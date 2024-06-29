@@ -20,4 +20,9 @@ public record ImmutableCurrent(double magnitude, double baseUnitMagnitude, Curre
   public String toString() {
     return toShortString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof Measure<?> m && isEquivalent(m);
+  }
 }

@@ -20,4 +20,9 @@ public record ImmutableTorque(double magnitude, double baseUnitMagnitude, Torque
   public String toString() {
     return toShortString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof Measure<?> m && isEquivalent(m);
+  }
 }

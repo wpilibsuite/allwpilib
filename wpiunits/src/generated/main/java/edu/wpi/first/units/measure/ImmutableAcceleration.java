@@ -20,4 +20,9 @@ public record ImmutableAcceleration<D extends Unit>(double magnitude, double bas
   public String toString() {
     return toShortString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof Measure<?> m && isEquivalent(m);
+  }
 }

@@ -20,4 +20,9 @@ public record ImmutablePower(double magnitude, double baseUnitMagnitude, PowerUn
   public String toString() {
     return toShortString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof Measure<?> m && isEquivalent(m);
+  }
 }

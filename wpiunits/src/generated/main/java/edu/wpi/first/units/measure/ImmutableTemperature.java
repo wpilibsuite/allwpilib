@@ -20,4 +20,9 @@ public record ImmutableTemperature(double magnitude, double baseUnitMagnitude, T
   public String toString() {
     return toShortString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof Measure<?> m && isEquivalent(m);
+  }
 }

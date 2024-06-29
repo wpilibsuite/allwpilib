@@ -20,4 +20,9 @@ public record ImmutableEnergy(double magnitude, double baseUnitMagnitude, Energy
   public String toString() {
     return toShortString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof Measure<?> m && isEquivalent(m);
+  }
 }

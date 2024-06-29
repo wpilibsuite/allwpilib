@@ -20,4 +20,9 @@ public record ImmutablePer<Dividend extends Unit, Divisor extends Unit>(double m
   public String toString() {
     return toShortString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof Measure<?> m && isEquivalent(m);
+  }
 }

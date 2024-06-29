@@ -20,4 +20,9 @@ public record ImmutableMult<A extends Unit, B extends Unit>(double magnitude, do
   public String toString() {
     return toShortString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof Measure<?> m && isEquivalent(m);
+  }
 }
