@@ -255,6 +255,9 @@ jobs:
   dispatch:
     name: dispatch
     needs: [combine]
+    strategy:
+      matrix:
+        repo: ['SmartDashboard', 'PathWeaver', 'Shuffleboard']
     runs-on: ubuntu-22.04
     steps:
       - uses: peter-evans/repository-dispatch@v3
@@ -263,6 +266,6 @@ jobs:
           startsWith(github.ref, 'refs/tags/v')
         with:
           token: ${{ secrets.TOOL_REPO_ACCESS_TOKEN }}
-          repository: wpilibsuite/smartdashboard
+          repository: wpilibsuite/${{ matrix.repo }}
           event-type: tag
           client-payload: '{"package_name": "allwpilib", "package_version": "${{ github.ref_name }}"}'
