@@ -6,6 +6,9 @@ package edu.wpi.first.math;
 
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.proto.VectorProto;
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
 
@@ -16,7 +19,7 @@ import org.ejml.simple.SimpleMatrix;
  *
  * @param <R> The number of rows in this matrix.
  */
-public class Vector<R extends Num> extends Matrix<R, N1> {
+public class Vector<R extends Num> extends Matrix<R, N1> implements ProtobufSerializable {
   /**
    * Constructs an empty zero vector of the given dimensions.
    *
@@ -150,5 +153,16 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
         a.get(1) * b.get(2) - a.get(2) * b.get(1),
         a.get(2) * b.get(0) - a.get(0) * b.get(2),
         a.get(0) * b.get(1) - a.get(1) * b.get(0));
+  }
+
+  /**
+   * Creates an implementation of the {@link Protobuf} interface for vectors.
+   *
+   * @param <R> The number of rows of the vectors this serializer processes.
+   * @param rows The number of rows of the vectors this serializer processes.
+   * @return The protobuf implementation.
+   */
+  public static final <R extends Num> VectorProto<R> getProto(Nat<R> rows) {
+    return new VectorProto<>(rows);
   }
 }

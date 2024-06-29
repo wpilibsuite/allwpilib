@@ -299,10 +299,14 @@ class SwerveDriveKinematics
     return {result};
   }
 
+  const wpi::array<Translation2d, NumModules> GetModules() const {
+    return m_modules;
+  }
+
  private:
+  wpi::array<Translation2d, NumModules> m_modules;
   mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>> m_forwardKinematics;
-  wpi::array<Translation2d, NumModules> m_modules;
   mutable wpi::array<Rotation2d, NumModules> m_moduleHeadings;
 
   mutable Translation2d m_previousCoR;

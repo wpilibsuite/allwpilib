@@ -12,10 +12,13 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.proto.SwerveDriveKinematicsProto;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -41,7 +44,9 @@ import org.ejml.simple.SimpleMatrix;
  */
 @SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]> {
+    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]>,
+        ProtobufSerializable,
+        StructSerializable {
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
@@ -404,4 +409,18 @@ public class SwerveDriveKinematics
     }
     return newPositions;
   }
+
+  /**
+   * Gets the locations of the modules relative to the center of rotation.
+   *
+   * @return The locations of the modules relative to the center of rotation. This array should not
+   *     be modified.
+   */
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
+  public Translation2d[] getModules() {
+    return m_modules;
+  }
+
+  /** SwerveDriveKinematics protobuf for serialization. */
+  public static final SwerveDriveKinematicsProto proto = new SwerveDriveKinematicsProto();
 }

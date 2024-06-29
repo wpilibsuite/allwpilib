@@ -1,0 +1,42 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include "controller.pb.h"
+#include "frc/controller/proto/SimpleMotorFeedforwardProto.h"
+
+template <class Distance>
+google::protobuf::Message*
+wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>>::New(
+    google::protobuf::Arena* arena) {
+  return google::protobuf::Arena::CreateMessage<
+      wpi::proto::ProtobufSimpleMotorFeedforward>(arena);
+}
+
+template <class Distance>
+frc::SimpleMotorFeedforward<Distance>
+wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>>::Unpack(
+    const google::protobuf::Message& msg) {
+  auto m = static_cast<const wpi::proto::ProtobufSimpleMotorFeedforward*>(&msg);
+  return {units::volt_t{m->ks()},
+          units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
+              m->kv()},
+          units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
+              m->ka()}};
+}
+
+template <class Distance>
+void wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>>::Pack(
+    google::protobuf::Message* msg,
+    const frc::SimpleMotorFeedforward<Distance>& value) {
+  auto m = static_cast<wpi::proto::ProtobufSimpleMotorFeedforward*>(msg);
+  m->set_ks(value.kS.value());
+  m->set_kv(units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
+      value.kV}
+                .value());
+  m->set_ka(units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
+      value.kA}
+                .value());
+}

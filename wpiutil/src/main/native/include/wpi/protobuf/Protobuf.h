@@ -14,11 +14,16 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/array.h"
 #include "wpi/function_ref.h"
 
 namespace google::protobuf {
 class Arena;
 class Message;
+template <typename T>
+class RepeatedPtrField;
+template <typename T>
+class RepeatedField;
 }  // namespace google::protobuf
 
 namespace wpi {
@@ -103,6 +108,50 @@ inline T UnpackProtobuf(const google::protobuf::Message& msg) {
 }
 
 /**
+ * Unpack a serialized protobuf array message.
+ *
+ * @tparam Proto element type of the protobuf array
+ * @tparam T object type
+ * @tparam N number of objects
+ * @param msg protobuf array message
+ * @return Deserialized array
+ */
+template <std::derived_from<google::protobuf::Message> Proto,
+          ProtobufSerializable T, size_t N>
+wpi::array<T, N> UnpackProtobufArray(
+    const google::protobuf::RepeatedPtrField<Proto>& msg) {
+  if (N != std::dynamic_extent && msg.size() != N) {
+    // TODO
+  }
+  wpi::array<T, N> arr(wpi::empty_array);
+  for (size_t i = 0; i < N; i++) {
+    arr[i] = wpi::UnpackProtobuf<T>(msg.Get(i));
+  }
+  return arr;
+}
+
+/**
+ * Unpack a serialized protobuf array message.
+ *
+ * @tparam T element type of the protobuf array
+ * @tparam N number of objects
+ * @param msg protobuf array message
+ * @return Deserialized array
+ */
+template <typename T, size_t N>
+wpi::array<T, N> UnpackProtobufArray(
+    const google::protobuf::RepeatedField<T>& msg) {
+  if (N != std::dynamic_extent && msg.size() != N) {
+    // TODO
+  }
+  wpi::array<T, N> arr(wpi::empty_array);
+  for (size_t i = 0; i < N; i++) {
+    arr[i] = msg.Get(i);
+  }
+  return arr;
+}
+
+/**
  * Pack a serialized protobuf message.
  *
  * @param msg protobuf message (mutable, output)
@@ -111,6 +160,42 @@ inline T UnpackProtobuf(const google::protobuf::Message& msg) {
 template <ProtobufSerializable T>
 inline void PackProtobuf(google::protobuf::Message* msg, const T& value) {
   Protobuf<typename std::remove_cvref_t<T>>::Pack(msg, value);
+}
+
+/**
+ * Pack a serialized protobuf array message.
+ *
+ * @tparam Proto element type of the protobuf array
+ * @tparam T object type
+ * @tparam N number of objects
+ * @param msg protobuf message (mutable, output)
+ * @param arr array of objects
+ */
+template <std::derived_from<google::protobuf::Message> Proto,
+          ProtobufSerializable T, size_t N>
+void PackProtobufArray(google::protobuf::RepeatedPtrField<Proto>* msg,
+                       const wpi::array<T, N>& arr) {
+  msg->Clear();
+  msg->Reserve(N);
+  for (const auto& obj : arr) {
+    PackProtobuf(msg->Add(), obj);
+  }
+}
+
+/**
+ * Pack a serialized protobuf array message.
+ *
+ * @tparam T object type
+ * @tparam N number of objects
+ * @param msg protobuf message (mutable, output)
+ * @param arr array of objects
+ */
+template <typename T, size_t N>
+void PackProtobufArray(google::protobuf::RepeatedField<T>* msg,
+                       const wpi::array<T, N>& arr) {
+  msg->Clear();
+  msg->Reserve(N);
+  msg->Add(arr.begin(), arr.end());
 }
 
 /**

@@ -4,12 +4,29 @@
 
 package edu.wpi.first.math.spline;
 
+import edu.wpi.first.math.spline.proto.QuinticHermiteSplineProto;
+import edu.wpi.first.math.spline.struct.QuinticHermiteSplineStruct;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 import org.ejml.simple.SimpleMatrix;
 
 /** Represents a hermite spline of degree 5. */
-public class QuinticHermiteSpline extends Spline {
+public class QuinticHermiteSpline extends Spline
+    implements ProtobufSerializable, StructSerializable {
   private static SimpleMatrix hermiteBasis;
   private final SimpleMatrix m_coefficients;
+
+  /** The control vector for the initial point in the x dimension. DO NOT MODIFY THIS ARRAY! */
+  public final double[] xInitialControlVector;
+
+  /** The control vector for the final point in the x dimension. DO NOT MODIFY THIS ARRAY! */
+  public final double[] xFinalControlVector;
+
+  /** The control vector for the initial point in the y dimension. DO NOT MODIFY THIS ARRAY! */
+  public final double[] yInitialControlVector;
+
+  /** The control vector for the final point in the y dimension. DO NOT MODIFY THIS ARRAY! */
+  public final double[] yFinalControlVector;
 
   private final ControlVector m_initialControlVector;
   private final ControlVector m_finalControlVector;
@@ -23,12 +40,17 @@ public class QuinticHermiteSpline extends Spline {
    * @param yInitialControlVector The control vector for the initial point in the y dimension.
    * @param yFinalControlVector The control vector for the final point in the y dimension.
    */
+  @SuppressWarnings("PMD.ArrayIsStoredDirectly")
   public QuinticHermiteSpline(
       double[] xInitialControlVector,
       double[] xFinalControlVector,
       double[] yInitialControlVector,
       double[] yFinalControlVector) {
     super(5);
+    this.xInitialControlVector = xInitialControlVector;
+    this.yInitialControlVector = yInitialControlVector;
+    this.xFinalControlVector = xFinalControlVector;
+    this.yFinalControlVector = yFinalControlVector;
 
     // Populate the coefficients for the actual spline equations.
     // Row 0 is x coefficients
@@ -171,4 +193,10 @@ public class QuinticHermiteSpline extends Spline {
           finalVector[0], finalVector[1], finalVector[2]
         });
   }
+
+  /** QuinticHermiteSpline struct for serialization. */
+  public static final QuinticHermiteSplineProto proto = new QuinticHermiteSplineProto();
+
+  /** QuinticHermiteSpline protobuf for serialization. */
+  public static final QuinticHermiteSplineStruct struct = new QuinticHermiteSplineStruct();
 }
