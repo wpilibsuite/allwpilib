@@ -29,6 +29,7 @@ def main():
         "0007-Use-C-atomics.patch",
         "0008-Remove-static-from-array-indices.patch",
         "0009-Add-pragmas-for-missing-libraries-and-set-_WIN32_WIN.patch",
+        "0010-Remove-swearing.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/libuv_patches", f))
 
