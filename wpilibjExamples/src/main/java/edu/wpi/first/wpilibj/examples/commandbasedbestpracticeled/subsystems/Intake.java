@@ -44,7 +44,7 @@ public class Intake extends SubsystemBase {
           runOnce(() -> {}) // for an example this command locks the Intake subsystem for the group
                             // since there is no asProxy
                             // the none() command is similar but has no requirements
-      );
+      ).withName("Game Piece Acquired Parallel");
   }
 
   /**

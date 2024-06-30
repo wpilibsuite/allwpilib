@@ -233,7 +233,7 @@ public class RobotContainer {
   public void configLog()
   {
       final boolean useConsole = false;
-      final boolean useDataLog = true;
+      final boolean useDataLog = false;
       final boolean useShuffleBoardLog = true;
 
       if (useConsole || useDataLog || useShuffleBoardLog) {

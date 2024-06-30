@@ -161,8 +161,8 @@ public class AchieveHueGoal extends SubsystemBase {
         runOnce(()-> m_currentStateSignal = m_currentStateSignal.blink(Seconds.of(0.1))),
 
         waitSeconds(2.0) // let the LEDs blink awhile by the LED display command in the background
-      )
-      .finallyDo(this::reset); // the controller was mostly stopped or interrupted above
+      ) // the controller was mostly stopped or interrupted above
+      .finallyDo(this::reset).withName("Achieve Hue Sequence");
   }
 
   /**
@@ -187,7 +187,7 @@ public class AchieveHueGoal extends SubsystemBase {
    */
   public final Command interrupt() {
     return
-      runOnce(() -> {});
+      runOnce(() -> {}).withName("Interrupt Achieve Hue");
     }
 
   /**
@@ -197,7 +197,7 @@ public class AchieveHueGoal extends SubsystemBase {
    */
   public final Command achieveHueDisplay() {
     return
-      m_robotSignals.setSignal(()-> m_currentStateSignal);
+      m_robotSignals.setSignal(()-> m_currentStateSignal).withName("Achieve Hue Display");
   }
 
   /**

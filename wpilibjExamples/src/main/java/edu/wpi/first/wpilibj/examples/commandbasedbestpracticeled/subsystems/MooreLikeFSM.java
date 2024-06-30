@@ -234,7 +234,8 @@ public class MooreLikeFSM extends SubsystemBase {
    */
   private final Command defineState(State state, Runnable run) {
     return new FunctionalCommand(
-        () -> m_currentState = state, run, interrupted -> {}, () -> false, this);
+        () -> m_currentState = state, run, interrupted -> {}, () -> false, this)
+        .withName("Moore-Like " + state);
   }
 
   /**
