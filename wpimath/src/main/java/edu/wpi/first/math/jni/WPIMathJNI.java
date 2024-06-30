@@ -8,7 +8,7 @@ import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/** Base class for all WPI Math JNI wrappers. */
+/** Base class for all WPIMath JNI wrappers. */
 public class WPIMathJNI {
   static boolean libraryLoaded = false;
 
@@ -62,8 +62,6 @@ public class WPIMathJNI {
     RuntimeLoader.loadLibrary("wpimathjni");
     libraryLoaded = true;
   }
-
-  public static void suppressUnused(Object object) {}
 
   /** Utility class. */
   protected WPIMathJNI() {}
