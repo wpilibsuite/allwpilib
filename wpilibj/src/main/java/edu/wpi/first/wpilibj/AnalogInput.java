@@ -10,9 +10,9 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.util.AllocationException;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.util.sendable2.Sendable;
+import edu.wpi.first.util.sendable2.SendableSerializable;
+import edu.wpi.first.util.sendable2.SendableTable;
 
 /**
  * Analog channel class.
@@ -26,7 +26,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * accumulated effectively increasing the resolution, while the averaged samples are divided by the
  * number of samples to retain the resolution, but get more stable values.
  */
-public class AnalogInput implements Sendable, AutoCloseable {
+public class AnalogInput implements SendableSerializable, AutoCloseable {
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
@@ -47,12 +47,10 @@ public class AnalogInput implements Sendable, AutoCloseable {
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
 
     HAL.report(tResourceType.kResourceType_AnalogChannel, channel + 1);
-    SendableRegistry.addLW(this, "AnalogInput", channel);
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;
     m_channel = 0;
@@ -334,9 +332,28 @@ public class AnalogInput implements Sendable, AutoCloseable {
     AnalogJNI.setAnalogInputSimDevice(m_port, device.getNativeHandle());
   }
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Analog Input");
-    builder.addDoubleProperty("Value", this::getAverageVoltage, null);
+  public static class AnalogInputSendable implements Sendable<AnalogInput> {
+    @Override
+    public Class<AnalogInput> getTypeClass() {
+      return AnalogInput.class;
+    }
+
+    @Override
+    public String getTypeString() {
+      return "Analog Input";
+    }
+
+    @Override
+    public boolean isClosed(AnalogInput obj) {
+      return obj.m_port == 0;
+    }
+
+    @Override
+    public void initSendable(AnalogInput obj, SendableTable table) {
+      table.publishDouble("Value", obj::getAverageVoltage);
+    }
   }
+
+  /** Sendable for serialization. */
+  public static final AnalogInputSendable sendable = new AnalogInputSendable();
 }
