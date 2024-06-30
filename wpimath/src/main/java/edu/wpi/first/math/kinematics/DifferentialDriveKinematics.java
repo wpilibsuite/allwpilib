@@ -121,6 +121,14 @@ public class DifferentialDriveKinematics
   }
 
   @Override
+  public DifferentialDriveWheelPositions copyInto(
+      DifferentialDriveWheelPositions positions, DifferentialDriveWheelPositions buffer) {
+    buffer.leftMeters = positions.leftMeters;
+    buffer.rightMeters = positions.rightMeters;
+    return buffer;
+  }
+
+  @Override
   public DifferentialDriveWheelPositions interpolate(
       DifferentialDriveWheelPositions startValue,
       DifferentialDriveWheelPositions endValue,

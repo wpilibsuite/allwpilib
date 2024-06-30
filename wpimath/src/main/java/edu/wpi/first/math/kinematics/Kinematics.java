@@ -49,8 +49,43 @@ public interface Kinematics<S, P> extends Interpolator<P> {
   /**
    * Returns a copy of the wheel positions object.
    *
+   * <p>Implementation note:
+   *
+   * <ul>
+   *   <li>If {@code P} is (deeply) immutable, this should return {@code positions}.
+   *   <li>Otherwise, a new copy should be created and returned.
+   * </ul>
+   *
    * @param positions The wheel positions object to copy.
    * @return A copy.
    */
   P copy(P positions);
+
+  /**
+   * Returns a copy of the wheel positions object, possibly reusing storage in the buffer.
+   *
+   * <p>This is meant to be used like this:
+   *
+   * <pre>
+   * m_buffer = m_kinematics.copyInto(positions, m_buffer);
+   * </pre>
+   *
+   * <p>Implementation note:
+   *
+   * <ul>
+   *   <li>If {@code P} is (deeply) immutable, then like {@link #copy}, this should return {@code
+   *       positions}.
+   *   <li>If {@code P} is completely mutable, then this should copy into {@code buffer} and return
+   *       it.
+   *   <li>Otherwise (some members are immutable and some are mutable), a new copy should be created
+   *       and returned.
+   * </ul>
+   *
+   * @param positions The wheel positions object to copy. Must not be modified.
+   * @param buffer A buffer available for overwriting. The state after the call is undefined.
+   * @return The copy. Identity is undefined.
+   */
+  default P copyInto(P positions, P buffer) {
+    return copy(positions);
+  }
 }
