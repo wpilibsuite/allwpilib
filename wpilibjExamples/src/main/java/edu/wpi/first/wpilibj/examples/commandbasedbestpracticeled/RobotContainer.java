@@ -42,6 +42,7 @@ public class RobotContainer {
   private final MooreLikeFSM m_mooreLikeFSMbottom;
   private final GroupDisjointTest m_groupDisjointTest; // container and creator of all the
                                                        // group/disjoint tests
+  private CommandSchedulerLog schedulerLog;
 
   /**
    * Constructor creates most of the subsystems and operator controller bindings
@@ -62,11 +63,15 @@ public class RobotContainer {
 
     configureDefaultCommands();
 
-    // switch command logging on/off; a lot of output for the command execute methods
-    final boolean logCommands = false;
-    if (logCommands) {
+    /* There are 10's of thousands of ways to do logging.
+     * Here are a few.
+     */
+
+    // logging device example 1 - 1 way with option in the method
       configureLogging();
-    }
+
+    // logging device example 2 - 3 ways with options in the method
+    configLog();
   }
 
   /**
@@ -223,14 +228,36 @@ public class RobotContainer {
   }
 
   /**
-   * Configure Command logging
+   * Configure Command logging to Console/Terminal, DataLog, or ShuffleBoard
+   */
+  public void configLog()
+  {
+      final boolean useConsole = false;
+      final boolean useDataLog = true;
+      final boolean useShuffleBoardLog = true;
+
+      if (useConsole || useDataLog || useShuffleBoardLog) {
+        schedulerLog = new CommandSchedulerLog(useConsole, useDataLog, useShuffleBoardLog);
+        schedulerLog.logCommandInitialize();
+        schedulerLog.logCommandInterrupt();
+        schedulerLog.logCommandFinish();
+        schedulerLog.logCommandExecute();  // Generates a lot of output        
+      }
+  }
+
+  /**
+   * Configure Command logging to the Console/Terminal
    */
   private void configureLogging() {
+
+    final boolean useConsole = false;
+    if (!useConsole) return;
+
     CommandScheduler.getInstance()
         .onCommandInitialize(
             command -> {
                 System.out.println(
-                    /* command.getClass() + " " + */ command.getName()
+                    command.getClass().getSimpleName() + " " + command.getName()
                         + " initialized "
                         + command.getRequirements());
             });
@@ -239,7 +266,7 @@ public class RobotContainer {
         .onCommandInterrupt(
             command -> {
                 System.out.println(
-                    /* command.getClass() + " " + */ command.getName()
+                    command.getClass().getSimpleName() + " " + command.getName()
                         + " interrupted "
                         + command.getRequirements());
             });
@@ -248,7 +275,7 @@ public class RobotContainer {
         .onCommandFinish(
             command -> {
                 System.out.println(
-                    /* command.getClass() + " " + */ command.getName()
+                    command.getClass().getSimpleName() + " " + command.getName()
                         + " finished "
                         + command.getRequirements());
             });
@@ -257,21 +284,21 @@ public class RobotContainer {
         .onCommandExecute( // this can generate a lot of events
             command -> {
                 System.out.println(
-                    /* command.getClass() + " " + */ command.getName()
+                    command.getClass().getSimpleName() + " " + command.getName()
                         + " executed "
                         + command.getRequirements());
             });
   }
 
   /**
-   * There are a variety of techniques to run methods periodically and the example implemented in
-   * this code is a very simplistic start of a good possibility.
+   * There are a variety of techniques to run I/O methods periodically and the example implemented
+   * below in this code is a very simplistic start of a good possibility.
    * 
    * It demonstrates running before the scheduler loop to get a consistent set of sensor inputs.
-   * After the scheduler loop completes all periodic outputs that were not put out by commands are
-   * run such as logging, dashboards, and output of goal-oriented subsystems that don't use output
-   * from commands. (If enabled, the scheduler runs its registered subsystem.periodic() first but
-   * only for subsystems.)
+   * After the scheduler loop completes all periodic outputs from subsystems are run such as data
+   * logging and dashboards. (When enabled, the command scheduler runs its registered
+   * subsystem.periodic() first but only for subsystems. Its use was threatened to be deprecated.)
+   * (There is additional related discussion of periodic running in AchieveHueGoal.)
    * 
    * There are clever ways to register classes say using a common "SubsystemTeam" class or
    * interface with a "register" method so they are automatically included in a list that can

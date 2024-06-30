@@ -51,15 +51,16 @@ package edu.wpi.first.wpilibj.examples.commandbasedbestpracticeled.subsystems;
  * in its own class. The example of using a PID controller in this example subsystem works like
  * that. The WPILib PIDController is an essentially independent class with all the PID logic. It is
  * used by a command that accepts a setpoint and calls the appropriate calculation and setpoint
- * methods. The command and thus the calculations run continuously as they are needed.
- * displaying whatever is currently set as the pattern to display.
+ * methods. The command and thus the calculations run continuously to the goal as they are needed.
  * 
- * This example of PID controller to reach a goal of a selected color is actually a combination of
- * two of the above command-based schemes.
+ * In this example another command runs perpetually to display on LEDs the continuous output LED
+ * pattern from the PID controller.
  * 
- * First, a WPILib PID controller class is used on demand
- * of a command to converge to the selected color. The iterative command loop paces the
- * calculations.
+ * Thus, this example of PID controller to reach a goal of a selected color is actually a
+ * combination of two of the above command-based periodic schemes.
+ * 
+ * First, a WPILib PID controller class is used on demand of a command to converge to the selected
+ * color. The iterative command loop paces the calculations.
  * 
  * Second, the display of the progress of the PID controller calculations to achieve
  * the selected color is by a continuously running command that was scheduled when the robot code
