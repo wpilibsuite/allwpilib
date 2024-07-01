@@ -130,7 +130,7 @@ public class RobotSignals {
     private final AddressableLEDBufferView m_view;
 
     private LEDView(AddressableLEDBufferView view) {
-      this.m_view = view;
+      m_view = view;
     }
 
     /*

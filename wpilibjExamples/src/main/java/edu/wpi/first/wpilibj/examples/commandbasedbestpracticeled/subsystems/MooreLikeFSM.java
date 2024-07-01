@@ -48,9 +48,9 @@ public class MooreLikeFSM extends SubsystemBase {
    * @param color Specify the color of the Scanner (suggest Color.kRed)
    */
   public MooreLikeFSM(LEDView robotSignals, double periodFactor, Color color) {
-    this.m_robotSignals = robotSignals;
-    this.m_periodFactor = periodFactor;
-    this.m_color = color;
+    m_robotSignals = robotSignals;
+    m_periodFactor = periodFactor;
+    m_color = color;
     bindTriggers();
   }
 

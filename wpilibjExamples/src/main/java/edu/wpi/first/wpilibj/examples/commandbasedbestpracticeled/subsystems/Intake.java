@@ -25,7 +25,7 @@ public class Intake extends SubsystemBase {
    * @param robotSignals Signal Subsystem
    */
   public Intake(LEDView robotSignals) {
-    this.m_robotSignals = robotSignals;
+    m_robotSignals = robotSignals;
   }
 
   /**

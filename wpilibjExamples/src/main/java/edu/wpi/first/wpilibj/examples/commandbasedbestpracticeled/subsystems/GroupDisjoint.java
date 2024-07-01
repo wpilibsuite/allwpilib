@@ -40,7 +40,7 @@ public class GroupDisjoint extends SubsystemBase {
    * @param resourceID resource (subsystem) ID
    */
   public GroupDisjoint(String resourceID) {
-    this.m_resourceID = resourceID;
+    m_resourceID = resourceID;
   }
 
   /**
@@ -108,8 +108,8 @@ public class GroupDisjoint extends SubsystemBase {
     // manually coded time history variable in RobotContainer while here it's automatic
 
     private TestDuration(int testNumber, Measure<Time> testDuration) {
-      this.m_testNumber = testNumber;
-      this.m_testDuration = testDuration;
+      m_testNumber = testNumber;
+      m_testDuration = testDuration;
       addRequirements(GroupDisjoint.this); // requirements are too easy to forget
     }
 

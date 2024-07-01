@@ -72,7 +72,7 @@ public class HistoryFSM extends SubsystemBase {
   Measure<Time> m_colorLockoutPeriod = Seconds.of(20.0); // try not to reuse a color for this long
 
   public HistoryFSM(LEDView robotSignals) {
-    this.m_robotSignals = robotSignals;
+    m_robotSignals = robotSignals;
 
     fillInitialTimes(); // initialize last time used for all the hues of the color wheel
   }
