@@ -393,6 +393,19 @@ public class SwerveDriveKinematics
   }
 
   @Override
+  public SwerveModulePosition[] copyInto(
+      SwerveModulePosition[] positions, SwerveModulePosition[] buffer) {
+    if (positions.length != buffer.length) {
+      return copy(positions);
+    }
+    for (int i = 0; i < positions.length; ++i) {
+      buffer[i].distanceMeters = positions[i].distanceMeters;
+      buffer[i].angle = positions[i].angle;
+    }
+    return buffer;
+  }
+
+  @Override
   public SwerveModulePosition[] interpolate(
       SwerveModulePosition[] startValue, SwerveModulePosition[] endValue, double t) {
     if (endValue.length != startValue.length) {

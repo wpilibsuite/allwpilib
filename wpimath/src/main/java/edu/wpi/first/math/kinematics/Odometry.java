@@ -60,7 +60,7 @@ public class Odometry<T> {
     m_poseMeters = poseMeters;
     m_previousAngle = m_poseMeters.getRotation();
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
-    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
+    m_previousWheelPositions = m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
   }
 
   /**
@@ -90,7 +90,7 @@ public class Odometry<T> {
 
     var newPose = m_poseMeters.exp(twist);
 
-    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
+    m_previousWheelPositions = m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
     m_previousAngle = angle;
     m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
 
