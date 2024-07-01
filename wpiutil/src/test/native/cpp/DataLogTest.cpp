@@ -136,6 +136,168 @@ TEST_F(DataLogTest, SimpleInt) {
   ASSERT_EQ(data.size(), 66u);
 }
 
+TEST_F(DataLogTest, BooleanAppend) {
+  wpi::log::BooleanLogEntry entry{log, "a", 5};
+  entry.Append(false, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 46u);
+}
+
+TEST_F(DataLogTest, BooleanUpdate) {
+  wpi::log::BooleanLogEntry entry{log, "a", 5};
+  ASSERT_FALSE(entry.GetLastValue().has_value());
+  entry.Update(false, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 46u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), false);
+  entry.Update(false, 8);
+  log.Flush();
+  ASSERT_EQ(data.size(), 46u);
+  entry.Update(true, 9);
+  log.Flush();
+  ASSERT_EQ(data.size(), 51u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), true);
+}
+
+TEST_F(DataLogTest, IntegerAppend) {
+  wpi::log::IntegerLogEntry entry{log, "a", 5};
+  entry.Append(5, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 51u);
+}
+
+TEST_F(DataLogTest, IntegerUpdate) {
+  wpi::log::IntegerLogEntry entry{log, "a", 5};
+  ASSERT_FALSE(entry.GetLastValue().has_value());
+  entry.Update(0, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 51u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), 0);
+  entry.Update(0, 8);
+  log.Flush();
+  ASSERT_EQ(data.size(), 51u);
+  entry.Update(2, 9);
+  log.Flush();
+  ASSERT_EQ(data.size(), 63u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), 2);
+}
+
+TEST_F(DataLogTest, FloatAppend) {
+  wpi::log::FloatLogEntry entry{log, "a", 5};
+  entry.Append(5.0, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 47u);
+}
+
+TEST_F(DataLogTest, FloatUpdate) {
+  wpi::log::FloatLogEntry entry{log, "a", 5};
+  ASSERT_FALSE(entry.GetLastValue().has_value());
+  entry.Update(0.0, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 47u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), 0.0);
+  entry.Update(0.0, 8);
+  log.Flush();
+  ASSERT_EQ(data.size(), 47u);
+  entry.Update(0.1, 9);
+  log.Flush();
+  ASSERT_EQ(data.size(), 55u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), 0.1f);
+}
+
+TEST_F(DataLogTest, DoubleAppend) {
+  wpi::log::DoubleLogEntry entry{log, "a", 5};
+  entry.Append(5.0, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 52u);
+}
+
+TEST_F(DataLogTest, DoubleUpdate) {
+  wpi::log::DoubleLogEntry entry{log, "a", 5};
+  ASSERT_FALSE(entry.GetLastValue().has_value());
+  entry.Update(0.0, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 52u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), 0.0);
+  entry.Update(0.0, 8);
+  log.Flush();
+  ASSERT_EQ(data.size(), 52u);
+  entry.Update(0.1, 9);
+  log.Flush();
+  ASSERT_EQ(data.size(), 64u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), 0.1);
+}
+
+TEST_F(DataLogTest, StringAppend) {
+  wpi::log::StringLogEntry entry{log, "a", 5};
+  entry.Append("x", 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 45u);
+}
+
+TEST_F(DataLogTest, StringUpdate) {
+  wpi::log::StringLogEntry entry{log, "a", 5};
+  ASSERT_FALSE(entry.GetLastValue().has_value());
+  entry.Update("x", 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 45u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), "x");
+  entry.Update("x", 8);
+  log.Flush();
+  ASSERT_EQ(data.size(), 45u);
+  entry.Update("y", 9);
+  log.Flush();
+  ASSERT_EQ(data.size(), 50u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), "y");
+}
+
+TEST_F(DataLogTest, BooleanArrayAppendEmpty) {
+  wpi::log::BooleanArrayLogEntry entry{log, "a", 5};
+  entry.Append(std::span<const bool>{}, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 47u);
+}
+
+TEST_F(DataLogTest, BooleanArrayAppend) {
+  wpi::log::BooleanArrayLogEntry entry{log, "a", 5};
+  entry.Append({false}, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 48u);
+}
+
+TEST_F(DataLogTest, BooleanArrayUpdate) {
+  wpi::log::BooleanArrayLogEntry entry{log, "a", 5};
+  ASSERT_FALSE(entry.GetLastValue().has_value());
+  entry.Update({false}, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 48u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), std::vector<int>{false});
+  entry.Update({false}, 8);
+  log.Flush();
+  ASSERT_EQ(data.size(), 48u);
+  entry.Update({true}, 9);
+  log.Flush();
+  ASSERT_EQ(data.size(), 53u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), std::vector<int>{true});
+  entry.Update(std::span<const bool>{}, 10);
+  log.Flush();
+  ASSERT_EQ(data.size(), 57u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), std::vector<int>{});
+}
+
 TEST_F(DataLogTest, StructA) {
   [[maybe_unused]]
   wpi::log::StructLogEntry<ThingA> entry0;
