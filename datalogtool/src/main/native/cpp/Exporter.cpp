@@ -16,6 +16,7 @@
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <glass/Storage.h>
 #include <glass/support/DataLogReaderThread.h>
 #include <imgui.h>
