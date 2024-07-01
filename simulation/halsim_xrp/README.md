@@ -111,10 +111,12 @@ IDs:
 
 #### Encoder
 
-| Order | Data Type | Description |
-|-------|-----------|-------------|
-| 0     | _uint8_t_ | ID          |
-| 1     | _int32_t_ | Value       |
+| Order | Data Type  |     Description    |
+|-------|------------|--------------------|
+| 0     | _uint8_t_  | ID                 |
+| 1     | _int32_t_  | Count              |
+| 2     | _uint32_t_ | Period Numerator   |
+| 3     | _uint32_t_ | Period Denominator |
 
 IDs:
 | ID | Description         |
