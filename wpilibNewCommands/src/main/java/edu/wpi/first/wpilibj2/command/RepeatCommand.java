@@ -33,7 +33,7 @@ public class RepeatCommand extends Command {
   public RepeatCommand(Command command) {
     m_command = requireNonNullParam(command, "command", "RepeatCommand");
     CommandScheduler.getInstance().registerComposedCommands(command);
-    m_requirements.addAll(command.getRequirements());
+    addRequirements(command.getRequirements());
     setName("Repeat(" + command.getName() + ")");
   }
 

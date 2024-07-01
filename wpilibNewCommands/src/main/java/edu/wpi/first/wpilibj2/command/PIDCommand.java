@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.PIDController;
-import java.util.Set;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
@@ -55,7 +54,7 @@ public class PIDCommand extends Command {
     m_useOutput = useOutput;
     m_measurement = measurementSource;
     m_setpoint = setpointSource;
-    m_requirements.addAll(Set.of(requirements));
+    addRequirements(requirements);
   }
 
   /**
