@@ -18,14 +18,16 @@ frc::{{ ConsoleName }}Controller& Command{{ ConsoleName }}Controller::GetHID() {
 }
 {% for button in buttons %}
 Trigger Command{{ ConsoleName }}Controller::{{ capitalize_first(button.name) }}(frc::EventLoop* loop) const {
-  return m_hid.{{ capitalize_first(button.name) }}(loop).CastTo<Trigger>();
+  return Button(frc::{{ ConsoleName }}Controller::Button::k{{ capitalize_first(button.name) }}, loop);
 }
 {% endfor -%}
 {% for trigger in triggers -%}
 {% if trigger.UseThresholdMethods %}
 Trigger Command{{ ConsoleName }}Controller::{{ capitalize_first(trigger.name) }}(double threshold,
                                            frc::EventLoop* loop) const {
-  return m_hid.{{ capitalize_first(trigger.name) }}(threshold, loop).CastTo<Trigger>();
+  return Trigger(loop, [this, threshold] {
+    return m_hid.Get{{ capitalize_first(trigger.name) }}Axis() > threshold;
+  });
 }
 {% endif -%}
 {% endfor -%}

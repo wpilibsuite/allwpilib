@@ -16,53 +16,57 @@ frc::XboxController& CommandXboxController::GetHID() {
 }
 
 Trigger CommandXboxController::A(frc::EventLoop* loop) const {
-  return m_hid.A(loop).CastTo<Trigger>();
+  return Button(frc::XboxController::Button::kA, loop);
 }
 
 Trigger CommandXboxController::B(frc::EventLoop* loop) const {
-  return m_hid.B(loop).CastTo<Trigger>();
+  return Button(frc::XboxController::Button::kB, loop);
 }
 
 Trigger CommandXboxController::X(frc::EventLoop* loop) const {
-  return m_hid.X(loop).CastTo<Trigger>();
+  return Button(frc::XboxController::Button::kX, loop);
 }
 
 Trigger CommandXboxController::Y(frc::EventLoop* loop) const {
-  return m_hid.Y(loop).CastTo<Trigger>();
+  return Button(frc::XboxController::Button::kY, loop);
 }
 
 Trigger CommandXboxController::LeftBumper(frc::EventLoop* loop) const {
-  return m_hid.LeftBumper(loop).CastTo<Trigger>();
+  return Button(frc::XboxController::Button::kLeftBumper, loop);
 }
 
 Trigger CommandXboxController::RightBumper(frc::EventLoop* loop) const {
-  return m_hid.RightBumper(loop).CastTo<Trigger>();
+  return Button(frc::XboxController::Button::kRightBumper, loop);
 }
 
 Trigger CommandXboxController::Back(frc::EventLoop* loop) const {
-  return m_hid.Back(loop).CastTo<Trigger>();
+  return Button(frc::XboxController::Button::kBack, loop);
 }
 
 Trigger CommandXboxController::Start(frc::EventLoop* loop) const {
-  return m_hid.Start(loop).CastTo<Trigger>();
+  return Button(frc::XboxController::Button::kStart, loop);
 }
 
 Trigger CommandXboxController::LeftStick(frc::EventLoop* loop) const {
-  return m_hid.LeftStick(loop).CastTo<Trigger>();
+  return Button(frc::XboxController::Button::kLeftStick, loop);
 }
 
 Trigger CommandXboxController::RightStick(frc::EventLoop* loop) const {
-  return m_hid.RightStick(loop).CastTo<Trigger>();
+  return Button(frc::XboxController::Button::kRightStick, loop);
 }
 
 Trigger CommandXboxController::LeftTrigger(double threshold,
                                            frc::EventLoop* loop) const {
-  return m_hid.LeftTrigger(threshold, loop).CastTo<Trigger>();
+  return Trigger(loop, [this, threshold] {
+    return m_hid.GetLeftTriggerAxis() > threshold;
+  });
 }
 
 Trigger CommandXboxController::RightTrigger(double threshold,
                                            frc::EventLoop* loop) const {
-  return m_hid.RightTrigger(threshold, loop).CastTo<Trigger>();
+  return Trigger(loop, [this, threshold] {
+    return m_hid.GetRightTriggerAxis() > threshold;
+  });
 }
 
 double CommandXboxController::GetLeftX() const {
