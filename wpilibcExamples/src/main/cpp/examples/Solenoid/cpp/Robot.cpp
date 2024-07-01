@@ -7,7 +7,7 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <units/pressure.h>
 
-void Robot::RobotInit() {
+Robot::Robot() {
   // Publish elements to shuffleboard.
   frc::ShuffleboardTab& tab = frc::Shuffleboard::GetTab("Pneumatics");
   tab.Add("Single Solenoid", m_solenoid);

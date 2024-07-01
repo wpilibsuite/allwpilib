@@ -15,22 +15,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** This is a sample program showing how to to use DMA to read a sensor. */
 public class Robot extends TimedRobot {
-  private DMA m_dma;
-  private DMASample m_dmaSample;
+  private final DMA m_dma;
+  private final DMASample m_dmaSample;
 
   // DMA needs a trigger, can use an output as trigger.
   // 8 Triggers exist per DMA object, can be triggered on any
   // DigitalSource.
-  private DigitalOutput m_dmaTrigger;
+  private final DigitalOutput m_dmaTrigger;
 
   // Analog input to read with DMA
-  private AnalogInput m_analogInput;
+  private final AnalogInput m_analogInput;
 
   // Encoder to read with DMA
-  private Encoder m_encoder;
+  private final Encoder m_encoder;
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     m_dma = new DMA();
     m_dmaSample = new DMASample();
     m_dmaTrigger = new DigitalOutput(2);

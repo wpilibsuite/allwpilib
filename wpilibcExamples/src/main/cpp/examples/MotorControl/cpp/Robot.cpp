@@ -33,7 +33,7 @@ class Robot : public frc::TimedRobot {
     frc::SmartDashboard::PutNumber("Encoder", m_encoder.GetDistance());
   }
 
-  void RobotInit() override {
+  Robot() {
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
     m_encoder.SetDistancePerPulse((std::numbers::pi * 6) / 360.0);

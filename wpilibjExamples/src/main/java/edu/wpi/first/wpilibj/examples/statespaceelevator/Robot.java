@@ -109,8 +109,7 @@ public class Robot extends TimedRobot {
   // A joystick to read the trigger from.
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Circumference = pi * d, so distance per click = pi * d / counts
     m_encoder.setDistancePerPulse(Math.PI * 2 * kDrumRadius / 4096.0);
   }

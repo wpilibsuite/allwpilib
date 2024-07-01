@@ -30,6 +30,12 @@
  *      private double angleToTote = 0;
  *      private double distanceToTote = 0;
  *
+ *      public Robot() {
+ *          usbCamera = CameraServer.startAutomaticCapture(0);
+ *          findTotePipeline = new MyFindTotePipeline();
+ *          findToteThread = new VisionThread(usbCamera, findTotePipeline, this);
+ *      }
+ *
  *     {@literal @}Override
  *      public void {@link edu.wpi.first.vision.VisionRunner.Listener#copyPipelineOutputs
  *          copyPipelineOutputs(MyFindTotePipeline pipeline)} {
@@ -40,13 +46,6 @@
  *              this.angleToTote = pipeline.getAngleToTote();
  *              this.distanceToTote = pipeline.getDistanceToTote();
  *          }
- *      }
- *
- *     {@literal @}Override
- *      public void robotInit() {
- *          usbCamera = CameraServer.startAutomaticCapture(0);
- *          findTotePipeline = new MyFindTotePipeline();
- *          findToteThread = new VisionThread(usbCamera, findTotePipeline, this);
  *      }
  *
  *     {@literal @}Override

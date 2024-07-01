@@ -36,8 +36,7 @@ public class Robot extends TimedRobot {
       new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
   private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV);
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);
   }
 

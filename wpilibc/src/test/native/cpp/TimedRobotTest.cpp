@@ -48,9 +48,7 @@ class MockRobot : public TimedRobot {
   std::atomic<uint32_t> m_teleopPeriodicCount{0};
   std::atomic<uint32_t> m_testPeriodicCount{0};
 
-  MockRobot() : TimedRobot{kPeriod} {}
-
-  void RobotInit() override { m_robotInitCount++; }
+  MockRobot() : TimedRobot{kPeriod} { m_robotInitCount++; }
 
   void SimulationInit() override { m_simulationInitCount++; }
 

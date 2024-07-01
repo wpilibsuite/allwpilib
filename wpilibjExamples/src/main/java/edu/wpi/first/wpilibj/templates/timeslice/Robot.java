@@ -38,14 +38,7 @@ public class Robot extends TimesliceRobot {
 
     // Total usage: 5 ms (robot) + 2 ms (controller 1) + 2 ms (controller 2)
     // = 9 ms -> 90% allocated
-  }
 
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  @Override
-  public void robotInit() {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);

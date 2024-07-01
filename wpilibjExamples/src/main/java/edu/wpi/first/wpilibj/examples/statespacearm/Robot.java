@@ -101,8 +101,7 @@ public class Robot extends TimedRobot {
   // A joystick to read the trigger from.
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     // We go 2 pi radians in 1 rotation, or 4096 counts.
     m_encoder.setDistancePerPulse(Math.PI * 2 / 4096.0);
   }

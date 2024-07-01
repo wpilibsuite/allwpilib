@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public class Robot extends TimedRobot {
-  private AddressableLED m_led;
-  private AddressableLEDBuffer m_ledBuffer;
+  private final AddressableLED m_led;
+  private final AddressableLEDBuffer m_ledBuffer;
 
   // Create an LED pattern that will display a rainbow across
   // all hues at maximum saturation and half brightness
@@ -30,8 +30,8 @@ public class Robot extends TimedRobot {
   private final LEDPattern m_scrollingRainbow =
       m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     // PWM port 9
     // Must be a PWM header, not MXP or DIO
     m_led = new AddressableLED(9);

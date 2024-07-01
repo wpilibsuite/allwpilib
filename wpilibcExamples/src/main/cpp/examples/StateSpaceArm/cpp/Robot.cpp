@@ -93,7 +93,7 @@ class Robot : public frc::TimedRobot {
   frc::TrapezoidProfile<units::radians>::State m_lastProfiledReference;
 
  public:
-  void RobotInit() override {
+  Robot() {
     // We go 2 pi radians per 4096 clicks.
     m_encoder.SetDistancePerPulse(2.0 * std::numbers::pi / 4096.0);
   }

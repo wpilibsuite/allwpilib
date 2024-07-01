@@ -27,7 +27,7 @@ class RapidReactCommandBot {
    * Use this method to define bindings between conditions and commands. These
    * are useful for automating robot behaviors based on button and sensor input.
    *
-   * <p>Should be called during Robot::RobotInit().
+   * <p>Should be called in the robot class constructor.
    *
    * <p>Event binding methods are available on the frc2::Trigger class.
    */

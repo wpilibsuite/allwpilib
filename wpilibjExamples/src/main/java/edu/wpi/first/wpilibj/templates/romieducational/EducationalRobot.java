@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
 
 /** Educational robot base class. */
 public class EducationalRobot extends RobotBase {
-  public void robotInit() {}
+  public EducationalRobot() {}
 
   public void disabled() {}
 
@@ -34,8 +34,6 @@ public class EducationalRobot extends RobotBase {
 
   @Override
   public void startCompetition() {
-    robotInit();
-
     DriverStationModeThread modeThread = new DriverStationModeThread();
 
     int event = WPIUtilJNI.createEvent(false, false);

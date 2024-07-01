@@ -20,7 +20,7 @@ class Robot : public frc::TimedRobot {
   frc::DutyCycleEncoder m_dutyCycleEncoder{0, fullRange, expectedZero};
 
  public:
-  void RobotInit() override {
+  Robot() {
     // If you know the frequency of your sensor, uncomment the following
     // method, and set the method to the frequency of your sensor.
     // This will result in more stable readings from the sensor.

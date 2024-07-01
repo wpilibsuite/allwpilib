@@ -36,13 +36,11 @@ public class Robot extends TimedRobot {
   private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
+  /** Called once at the beginning of the robot program. */
   public Robot() {
     SendableRegistry.addChild(m_robotDrive, m_leftDrive);
     SendableRegistry.addChild(m_robotDrive, m_rightDrive);
-  }
 
-  @Override
-  public void robotInit() {
     m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's

@@ -18,16 +18,14 @@
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
-    wpi::SendableRegistry::AddChild(&m_drive, &m_left);
-    wpi::SendableRegistry::AddChild(&m_drive, &m_right);
-  }
-
-  void RobotInit() override {
     m_gyro.SetSensitivity(kVoltsPerDegreePerSecond);
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
     m_right.SetInverted(true);
+
+    wpi::SendableRegistry::AddChild(&m_drive, &m_left);
+    wpi::SendableRegistry::AddChild(&m_drive, &m_right);
   }
 
   /**

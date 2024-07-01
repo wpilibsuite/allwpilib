@@ -92,7 +92,7 @@ class Robot : public frc::TimedRobot {
   frc::TrapezoidProfile<units::meters>::State m_lastProfiledReference;
 
  public:
-  void RobotInit() override {
+  Robot() {
     // Circumference = pi * d, so distance per click = pi * d / counts
     m_encoder.SetDistancePerPulse(2.0 * std::numbers::pi * kDrumRadius.value() /
                                   4096.0);

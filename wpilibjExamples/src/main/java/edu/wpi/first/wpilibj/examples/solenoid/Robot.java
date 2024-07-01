@@ -44,8 +44,8 @@ public class Robot extends TimedRobot {
   static final int kDoubleSolenoidReverseButton = 3;
   static final int kCompressorButton = 4;
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     // Publish elements to shuffleboard.
     ShuffleboardTab tab = Shuffleboard.getTab("Pneumatics");
     tab.add("Single Solenoid", m_solenoid);

@@ -45,10 +45,7 @@ class TimedRobotTest {
 
     MockRobot() {
       super(kPeriod);
-    }
 
-    @Override
-    public void robotInit() {
       m_robotInitCount.addAndGet(1);
     }
 

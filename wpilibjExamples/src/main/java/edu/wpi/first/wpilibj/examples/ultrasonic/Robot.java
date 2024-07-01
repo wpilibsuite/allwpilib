@@ -17,8 +17,8 @@ public class Robot extends TimedRobot {
   // Creates a ping-response Ultrasonic object on DIO 1 and 2.
   Ultrasonic m_rangeFinder = new Ultrasonic(1, 2);
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     // Add the ultrasonic on the "Sensors" tab of the dashboard
     // Data will update automatically
     Shuffleboard.getTab("Sensors").add(m_rangeFinder);
