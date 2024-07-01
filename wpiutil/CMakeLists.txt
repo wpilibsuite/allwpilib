@@ -55,8 +55,6 @@ if(WITH_JAVA)
 
     file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
 
-    set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${JACKSON_JARS} ${QUICKBUF_JAR})
-
     set(CMAKE_JNI_TARGET true)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)

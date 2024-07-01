@@ -45,8 +45,6 @@ if(WITH_JAVA)
         NO_DEFAULT_PATH
     )
 
-    set(CMAKE_JAVA_INCLUDE_PATH apriltag.jar ${EJML_JARS} ${JACKSON_JARS})
-
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     file(
         GLOB_RECURSE JAVA_RESOURCES
@@ -58,7 +56,13 @@ if(WITH_JAVA)
         SOURCES ${JAVA_SOURCES}
         RESOURCES
         NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES}
-        INCLUDE_JARS wpimath_jar wpiunits_jar ${EJML_JARS} wpiutil_jar ${OPENCV_JAR_FILE}
+        INCLUDE_JARS
+            wpimath_jar
+            wpiunits_jar
+            wpiutil_jar
+            ${EJML_JARS}
+            ${OPENCV_JAR_FILE}
+            ${JACKSON_JARS}
         OUTPUT_NAME apriltag
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS apriltag_jni_headers

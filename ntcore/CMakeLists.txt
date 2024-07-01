@@ -43,8 +43,6 @@ if(WITH_JAVA)
 
     file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
 
-    set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${QUICKBUF_JAR})
-
     file(GLOB ntcore_jni_src src/main/native/cpp/jni/*.cpp src/generated/main/native/cpp/jni/*.cpp)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
@@ -53,7 +51,7 @@ if(WITH_JAVA)
     add_jar(
         ntcore_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar
+        INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR}
         OUTPUT_NAME ntcore
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS ntcore_jni_headers

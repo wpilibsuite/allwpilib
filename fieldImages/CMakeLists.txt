@@ -7,7 +7,6 @@ if(WITH_JAVA)
     include(UseJava)
 
     file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
-    set(CMAKE_JAVA_INCLUDE_PATH fieldImages.jar ${JACKSON_JARS})
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     file(
@@ -22,6 +21,7 @@ if(WITH_JAVA)
         SOURCES ${JAVA_SOURCES}
         RESOURCES
         NAMESPACE "edu/wpi/first/fields" ${JAVA_RESOURCES}
+        INCLUDE_JARS ${JACKSON_JARS}
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         OUTPUT_NAME fieldImages
     )
