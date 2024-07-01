@@ -15,7 +15,7 @@
 namespace nt {
 
 inline FloatArraySubscriber::FloatArraySubscriber(
-    NT_Subscriber handle, std::span<const float> defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue.begin(), defaultValue.end()} {}
 
@@ -24,7 +24,7 @@ inline std::vector<float> FloatArraySubscriber::Get() const {
 }
 
 inline std::vector<float> FloatArraySubscriber::Get(
-    std::span<const float> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetFloatArray(m_subHandle, defaultValue);
 }
 
@@ -32,7 +32,7 @@ inline std::span<float> FloatArraySubscriber::Get(wpi::SmallVectorImpl<float>& b
   return Get(buf, m_defaultValue);
 }
 
-inline std::span<float> FloatArraySubscriber::Get(wpi::SmallVectorImpl<float>& buf, std::span<const float> defaultValue) const {
+inline std::span<float> FloatArraySubscriber::Get(wpi::SmallVectorImpl<float>& buf, ParamType defaultValue) const {
   return nt::GetFloatArray(m_subHandle, buf, defaultValue);
 }
 
@@ -41,7 +41,7 @@ inline TimestampedFloatArray FloatArraySubscriber::GetAtomic() const {
 }
 
 inline TimestampedFloatArray FloatArraySubscriber::GetAtomic(
-    std::span<const float> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicFloatArray(m_subHandle, defaultValue);
 }
 
@@ -49,7 +49,7 @@ inline TimestampedFloatArrayView FloatArraySubscriber::GetAtomic(wpi::SmallVecto
   return GetAtomic(buf, m_defaultValue);
 }
 
-inline TimestampedFloatArrayView FloatArraySubscriber::GetAtomic(wpi::SmallVectorImpl<float>& buf, std::span<const float> defaultValue) const {
+inline TimestampedFloatArrayView FloatArraySubscriber::GetAtomic(wpi::SmallVectorImpl<float>& buf, ParamType defaultValue) const {
   return nt::GetAtomicFloatArray(m_subHandle, buf, defaultValue);
 }
 
@@ -65,12 +65,12 @@ inline FloatArrayTopic FloatArraySubscriber::GetTopic() const {
 inline FloatArrayPublisher::FloatArrayPublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void FloatArrayPublisher::Set(std::span<const float> value,
+inline void FloatArrayPublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetFloatArray(m_pubHandle, value, time);
 }
 
-inline void FloatArrayPublisher::SetDefault(std::span<const float> value) {
+inline void FloatArrayPublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultFloatArray(m_pubHandle, value);
 }
 
@@ -79,7 +79,7 @@ inline FloatArrayTopic FloatArrayPublisher::GetTopic() const {
 }
 
 inline FloatArrayEntry::FloatArrayEntry(
-    NT_Entry handle, std::span<const float> defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : FloatArraySubscriber{handle, defaultValue},
       FloatArrayPublisher{handle} {}
 

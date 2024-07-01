@@ -285,6 +285,7 @@ class Trigger {
 
   /**
    * Returns the current state of this trigger.
+   *
    * @return A bool representing the current state of the trigger.
    */
   bool Get() const;
