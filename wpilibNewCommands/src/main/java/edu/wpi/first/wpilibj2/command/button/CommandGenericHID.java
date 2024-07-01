@@ -252,4 +252,24 @@ public class CommandGenericHID {
   public double getRawAxis(int axis) {
     return m_hid.getRawAxis(axis);
   }
+
+  /**
+   * Set the rumble output for the HID. The DS currently supports 2 rumble values, left rumble and
+   * right rumble.
+   *
+   * @param type Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  public void setRumble(GenericHID.RumbleType type, double value) {
+    m_hid.setRumble(type, value);
+  }
+
+  /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  public boolean isConnected() {
+    return m_hid.isConnected();
+  }
 }

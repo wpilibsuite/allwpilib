@@ -74,3 +74,12 @@ Trigger CommandGenericHID::AxisGreaterThan(int axis, double threshold,
     return m_hid.GetRawAxis(axis) > threshold;
   });
 }
+
+void CommandGenericHID::SetRumble(frc::GenericHID::RumbleType type,
+                                  double value) {
+  m_hid.SetRumble(type, value);
+}
+
+bool CommandGenericHID::IsConnected() const {
+  return m_hid.IsConnected();
+}
