@@ -48,6 +48,11 @@ public class RobotContainer {
    * Constructor creates most of the subsystems and operator controller bindings
    */
   public RobotContainer() {
+    /* There are 10's of thousands of ways to do logging.
+     * Here are 3 ways with options within the method.
+     */
+    configureCommandLogs(); // do early on otherwise log not ready for first commands
+
     final int operatorControllerPort = 0;
     m_operatorController = new CommandXboxController(operatorControllerPort);
     // subsystems
@@ -62,16 +67,6 @@ public class RobotContainer {
     configureBindings();
 
     configureDefaultCommands();
-
-    /* There are 10's of thousands of ways to do logging.
-     * Here are a few.
-     */
-
-    // logging device example 1 - 1 way with option in the method
-      configureLogging();
-
-    // logging device example 2 - 3 ways with options in the method
-    configLog();
   }
 
   /**
@@ -230,64 +225,19 @@ public class RobotContainer {
   /**
    * Configure Command logging to Console/Terminal, DataLog, or ShuffleBoard
    */
-  public void configLog()
+  public void configureCommandLogs()
   {
       final boolean useConsole = false;
-      final boolean useDataLog = false;
-      final boolean useShuffleBoardLog = true;
+      final boolean useDataLog = true;
+      final boolean useShuffleBoardLog = false;
 
       if (useConsole || useDataLog || useShuffleBoardLog) {
         schedulerLog = new CommandSchedulerLog(useConsole, useDataLog, useShuffleBoardLog);
         schedulerLog.logCommandInitialize();
         schedulerLog.logCommandInterrupt();
         schedulerLog.logCommandFinish();
-        schedulerLog.logCommandExecute();  // Generates a lot of output        
+        schedulerLog.logCommandExecute();  // Can (optionally) generate a lot of output        
       }
-  }
-
-  /**
-   * Configure Command logging to the Console/Terminal
-   */
-  private void configureLogging() {
-
-    final boolean useConsole = false;
-    if (!useConsole) return;
-
-    CommandScheduler.getInstance()
-        .onCommandInitialize(
-            command -> {
-                System.out.println(
-                    command.getClass().getSimpleName() + " " + command.getName()
-                        + " initialized "
-                        + command.getRequirements());
-            });
-
-    CommandScheduler.getInstance()
-        .onCommandInterrupt(
-            command -> {
-                System.out.println(
-                    command.getClass().getSimpleName() + " " + command.getName()
-                        + " interrupted "
-                        + command.getRequirements());
-            });
-
-    CommandScheduler.getInstance()
-        .onCommandFinish(
-            command -> {
-                System.out.println(
-                    command.getClass().getSimpleName() + " " + command.getName()
-                        + " finished "
-                        + command.getRequirements());
-            });
-
-    CommandScheduler.getInstance()
-        .onCommandExecute( // this can generate a lot of events
-            command -> {
-                System.out.println(
-                    command.getClass().getSimpleName() + " " + command.getName()
-                        + " executed "
-                        + command.getRequirements());
-            });
   }
 
   /**
