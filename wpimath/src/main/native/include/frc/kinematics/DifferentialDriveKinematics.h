@@ -91,8 +91,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   DifferentialDriveWheelPositions Interpolate(
       const DifferentialDriveWheelPositions& start,
       const DifferentialDriveWheelPositions& end, double t) const override {
-    return {wpi::Lerp(start.left, end.left, t),
-            wpi::Lerp(start.right, end.right, t)};
+    return start.Interpolate(end, t);
   }
 
   /// Differential drive trackwidth.
