@@ -44,7 +44,7 @@ struct Interrupt {
   HAL_AnalogTriggerType trigType;
   int64_t risingTimestamp;
   int64_t fallingTimestamp;
-  bool previousState;
+  bool currentState;
   bool fireOnUp;
   bool fireOnDown;
   int32_t callbackId;
@@ -121,8 +121,8 @@ static void ProcessInterruptDigitalSynchronous(const char* name, void* param,
     return;
   }
   bool retVal = value->data.v_boolean;
-  auto previousState = interrupt->previousState;
-  interrupt->previousState = retVal;
+  auto previousState = interrupt->currentState;
+  interrupt->currentState = retVal;
   // If no change in interrupt, return;
   if (retVal == previousState) {
     return;
@@ -176,8 +176,8 @@ static void ProcessInterruptAnalogSynchronous(const char* name, void* param,
     // Pulse interrupt
     interruptData->waitCond.notify_all();
   }
-  auto previousState = interrupt->previousState;
-  interrupt->previousState = retVal;
+  auto previousState = interrupt->currentState;
+  interrupt->currentState = retVal;
   // If no change in interrupt, return;
   if (retVal == previousState) {
     return;
@@ -220,7 +220,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
     return WaitResult::Timeout;
   }
 
-  interrupt->previousState = SimDIOData[digitalIndex].value;
+  interrupt->currentState = SimDIOData[digitalIndex].value;
 
   int32_t uid = SimDIOData[digitalIndex].value.RegisterCallback(
       &ProcessInterruptDigitalSynchronous,
@@ -252,14 +252,16 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
   if (timedOut) {
     return WaitResult::Timeout;
   }
-  // True => false, Falling
-  if (interrupt->previousState) {
+  // We know the value has changed because we would've timed out otherwise.
+  // If the current state is true, the previous state was false, so this is a
+  // rising edge. Otherwise, it's a falling edge.
+  if (interrupt->currentState) {
     // Set our return value and our timestamps
-    interrupt->fallingTimestamp = hal::GetFPGATime();
-    return 1 << (8 + interrupt->index);
-  } else {
     interrupt->risingTimestamp = hal::GetFPGATime();
     return 1 << (interrupt->index);
+  } else {
+    interrupt->fallingTimestamp = hal::GetFPGATime();
+    return 1 << (8 + interrupt->index);
   }
 }
 
@@ -278,8 +280,8 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
   data->interruptHandle = handle;
 
   int32_t status = 0;
-  interrupt->previousState = GetAnalogTriggerValue(
-      interrupt->portHandle, interrupt->trigType, &status);
+  interrupt->currentState = GetAnalogTriggerValue(interrupt->portHandle,
+                                                  interrupt->trigType, &status);
 
   if (status != 0) {
     return WaitResult::Timeout;
@@ -322,14 +324,16 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
   if (timedOut) {
     return WaitResult::Timeout;
   }
-  // True => false, Falling
-  if (interrupt->previousState) {
+  // We know the value has changed because we would've timed out otherwise.
+  // If the current state is true, the previous state was false, so this is a
+  // rising edge. Otherwise, it's a falling edge.
+  if (interrupt->currentState) {
     // Set our return value and our timestamps
-    interrupt->fallingTimestamp = hal::GetFPGATime();
-    return 1 << (8 + interrupt->index);
-  } else {
     interrupt->risingTimestamp = hal::GetFPGATime();
     return 1 << (interrupt->index);
+  } else {
+    interrupt->fallingTimestamp = hal::GetFPGATime();
+    return 1 << (8 + interrupt->index);
   }
 }
 
