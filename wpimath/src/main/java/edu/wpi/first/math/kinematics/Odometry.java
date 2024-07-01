@@ -6,6 +6,7 @@ package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * Class for odometry. Robot code should not use this directly- Instead, use the particular type for
@@ -61,6 +62,37 @@ public class Odometry<T> {
     m_previousAngle = m_poseMeters.getRotation();
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     m_previousWheelPositions = m_kinematics.copy(wheelPositions);
+  }
+
+  /**
+   * Resets the pose.
+   *
+   * @param poseMeters The pose to reset to.
+   */
+  public void resetPose(Pose2d poseMeters) {
+    m_gyroOffset = m_gyroOffset.plus(poseMeters.getRotation().minus(m_poseMeters.getRotation()));
+    m_poseMeters = poseMeters;
+    m_previousAngle = m_poseMeters.getRotation();
+  }
+
+  /**
+   * Resets the translation of the pose.
+   *
+   * @param translation The translation to reset to.
+   */
+  public void resetTranslation(Translation2d translation) {
+    m_poseMeters = new Pose2d(translation, m_poseMeters.getRotation());
+  }
+
+  /**
+   * Resets the rotation of the pose.
+   *
+   * @param rotation The rotation to reset to.
+   */
+  public void resetRotation(Rotation2d rotation) {
+    m_gyroOffset = m_gyroOffset.plus(rotation.minus(m_poseMeters.getRotation()));
+    m_poseMeters = new Pose2d(m_poseMeters.getTranslation(), rotation);
+    m_previousAngle = m_poseMeters.getRotation();
   }
 
   /**
