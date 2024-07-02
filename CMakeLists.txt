@@ -70,10 +70,6 @@ option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 
-# Options for external HAL.
-option(WITH_EXTERNAL_HAL "Use a separately built HAL" OFF)
-set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
-
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
 option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
 option(USE_SYSTEM_LIBUV "Use system libuv" OFF)

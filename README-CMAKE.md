@@ -67,10 +67,6 @@ The following build options are available:
   * This option will build the wpimath library. This option must be on to build wpilib.
 * `WITH_WPIUNITS` (ON Default)
   * This option will build the wpiunits library. This option must be on to build the Java wpimath library and requires `WITH_JAVA` to also be on.
-* `WITH_EXTERNAL_HAL` (OFF Default)
-  * This option will build wpilib with an externally built HAL.
-* `EXTERNAL_HAL_FILE`
-  * Set this option to the CMake File of the externally built HAL. NOTE: set it to the file itself, not the folder the file is located in!
 * `OPENCV_JAVA_INSTALL_DIR`
   * Set this option to the location of the archive of the OpenCV Java bindings (it should be called opencv-xxx.jar, with the x'es being version numbers). NOTE: set it to the LOCATION of the file, not the file itself!
 * `NO_WERROR` (OFF Default)
