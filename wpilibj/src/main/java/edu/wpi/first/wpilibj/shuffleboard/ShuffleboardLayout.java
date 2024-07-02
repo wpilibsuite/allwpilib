@@ -130,7 +130,10 @@ public final class ShuffleboardLayout extends ShuffleboardComponent<Shuffleboard
     buildMetadata(metaTable);
     NetworkTable table = parentTable.getSubTable(getTitle());
     table.getEntry(".type").setString(kSmartDashboardType);
-    table.getEntry(".type").getTopic().setProperty("SmartDashboard", "\"" + kSmartDashboardType + "\"");
+    table
+        .getEntry(".type")
+        .getTopic()
+        .setProperty("SmartDashboard", "\"" + kSmartDashboardType + "\"");
     for (ShuffleboardComponent<?> component : getComponents()) {
       component.buildInto(table, metaTable.getSubTable(component.getTitle()));
     }

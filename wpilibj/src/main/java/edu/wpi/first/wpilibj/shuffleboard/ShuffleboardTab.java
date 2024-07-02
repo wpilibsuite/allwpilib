@@ -143,7 +143,10 @@ public final class ShuffleboardTab implements ShuffleboardContainer {
   public void buildInto(NetworkTable parentTable, NetworkTable metaTable) {
     NetworkTable tabTable = parentTable.getSubTable(m_title);
     tabTable.getEntry(".type").setString(kSmartDashboardType);
-    tabTable.getEntry(".type").getTopic().setProperty("SmartDashboard", "\"" + kSmartDashboardType + "\"");
+    tabTable
+        .getEntry(".type")
+        .getTopic()
+        .setProperty("SmartDashboard", "\"" + kSmartDashboardType + "\"");
     for (ShuffleboardComponent<?> component : m_helper.getComponents()) {
       component.buildInto(tabTable, metaTable.getSubTable(component.getTitle()));
     }
