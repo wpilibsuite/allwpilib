@@ -18,6 +18,8 @@ import java.util.function.Supplier;
 /** A layout in a Shuffleboard tab. Layouts can contain widgets and other layouts. */
 public final class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout>
     implements ShuffleboardContainer {
+  private static final String kSmartDashboardType = "ShuffleboardLayout";
+
   private final ContainerHelper m_helper = new ContainerHelper(this);
 
   ShuffleboardLayout(ShuffleboardContainer parent, String title, String type) {
@@ -127,7 +129,8 @@ public final class ShuffleboardLayout extends ShuffleboardComponent<Shuffleboard
   public void buildInto(NetworkTable parentTable, NetworkTable metaTable) {
     buildMetadata(metaTable);
     NetworkTable table = parentTable.getSubTable(getTitle());
-    table.getEntry(".type").setString("ShuffleboardLayout");
+    table.getEntry(".type").setString(kSmartDashboardType);
+    table.getEntry(".type").getTopic().setProperty("SmartDashboard", "\"" + kSmartDashboardType + "\"");
     for (ShuffleboardComponent<?> component : getComponents()) {
       component.buildInto(table, metaTable.getSubTable(component.getTitle()));
     }

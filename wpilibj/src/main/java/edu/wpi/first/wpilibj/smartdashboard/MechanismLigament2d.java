@@ -9,6 +9,7 @@ import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.StringEntry;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
@@ -27,6 +28,8 @@ public class MechanismLigament2d extends MechanismObject2d {
   private DoubleEntry m_lengthEntry;
   private double m_weight;
   private DoubleEntry m_weightEntry;
+
+  private static String kSmartDashboardType = "line";
 
   /**
    * Create a new ligament.
@@ -201,8 +204,12 @@ public class MechanismLigament2d extends MechanismObject2d {
     if (m_typePub != null) {
       m_typePub.close();
     }
-    m_typePub = table.getStringTopic(".type").publish();
-    m_typePub.set("line");
+    m_typePub =
+        table
+            .getStringTopic(".type")
+            .publishEx(
+                StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
+    m_typePub.set(kSmartDashboardType);
 
     if (m_angleEntry != null) {
       m_angleEntry.close();
