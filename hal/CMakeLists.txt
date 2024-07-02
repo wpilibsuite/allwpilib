@@ -6,15 +6,10 @@ include(AddTest)
 file(
     GLOB hal_shared_native_src
     src/main/native/cpp/*.cpp
-    hal_shared_native_src
     src/main/native/cpp/cpp/*.cpp
-    hal_shared_native_src
     src/main/native/cpp/handles/*.cpp
-    hal_sim_native_src
-    src/main/native/sim/*.cpp
-    hal_sim_native_src
-    src/main/native/sim/mockdata/*.cpp
 )
+file(GLOB_RECURSE hal_sim_native_src src/main/native/sim/*.cpp)
 add_library(hal ${hal_shared_native_src} ${hal_sim_native_src})
 wpilib_target_warnings(hal)
 set_target_properties(hal PROPERTIES DEBUG_POSTFIX "d")
