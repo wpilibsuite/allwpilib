@@ -6,11 +6,10 @@
 
 #include <algorithm>
 #include <exception>
-#include <filesystem>
 #include <numbers>
 #include <thread>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <glass/Context.h>
 #include <glass/Storage.h>
 #include <imgui.h>

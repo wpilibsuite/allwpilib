@@ -4,7 +4,7 @@
 
 #include "frc2/command/ProxyCommand.h"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <wpi/deprecated.h>
 #include <wpi/sendable/SendableBuilder.h>
 
