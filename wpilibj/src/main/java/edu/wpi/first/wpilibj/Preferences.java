@@ -15,6 +15,7 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableListener;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.networktables.Topic;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -34,7 +35,9 @@ import java.util.EnumSet;
  */
 public final class Preferences {
   /** The Preferences table name. */
-  private static final String TABLE_NAME = "Preferences";
+  private static final String kTableName = "Preferences";
+
+  private static final String kSmartDashboardType = "RobotPreferences";
 
   /** The network table. */
   private static NetworkTable m_table;
@@ -57,12 +60,16 @@ public final class Preferences {
    * @param inst NetworkTable instance
    */
   public static synchronized void setNetworkTableInstance(NetworkTableInstance inst) {
-    m_table = inst.getTable(TABLE_NAME);
+    m_table = inst.getTable(kTableName);
     if (m_typePublisher != null) {
       m_typePublisher.close();
     }
-    m_typePublisher = m_table.getStringTopic(".type").publish();
-    m_typePublisher.set("RobotPreferences");
+    m_typePublisher =
+        m_table
+            .getStringTopic(".type")
+            .publishEx(
+                StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
+    m_typePublisher.set(kSmartDashboardType);
 
     // Subscribe to all Preferences; this ensures we get the latest values
     // ahead of a getter call.

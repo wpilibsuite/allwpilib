@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.util.EventVector;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.datalog.BooleanArrayLogEntry;
@@ -93,6 +94,8 @@ public final class DriverStation {
 
   @SuppressWarnings("MemberName")
   private static class MatchDataSender {
+    private static final String kSmartDashboardType = "FMSInfo";
+
     final StringPublisher gameSpecificMessage;
     final StringPublisher eventName;
     final IntegerPublisher matchNumber;
@@ -112,7 +115,11 @@ public final class DriverStation {
 
     MatchDataSender() {
       var table = NetworkTableInstance.getDefault().getTable("FMSInfo");
-      table.getStringTopic(".type").publish().set("FMSInfo");
+      table
+          .getStringTopic(".type")
+          .publishEx(
+              StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}")
+          .set(kSmartDashboardType);
       gameSpecificMessage = table.getStringTopic("GameSpecificMessage").publish();
       gameSpecificMessage.set("");
       eventName = table.getStringTopic("EventName").publish();

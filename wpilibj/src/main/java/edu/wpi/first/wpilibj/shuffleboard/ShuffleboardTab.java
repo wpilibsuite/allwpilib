@@ -20,6 +20,8 @@ import java.util.function.Supplier;
  * arbitrarily deep (note that too many levels may make deeper components unusable).
  */
 public final class ShuffleboardTab implements ShuffleboardContainer {
+  private static final String kSmartDashboardType = "ShuffleboardTab";
+
   private final ContainerHelper m_helper = new ContainerHelper(this);
   private final ShuffleboardRoot m_root;
   private final String m_title;
@@ -140,7 +142,11 @@ public final class ShuffleboardTab implements ShuffleboardContainer {
   @Override
   public void buildInto(NetworkTable parentTable, NetworkTable metaTable) {
     NetworkTable tabTable = parentTable.getSubTable(m_title);
-    tabTable.getEntry(".type").setString("ShuffleboardTab");
+    tabTable.getEntry(".type").setString(kSmartDashboardType);
+    tabTable
+        .getEntry(".type")
+        .getTopic()
+        .setProperty("SmartDashboard", "\"" + kSmartDashboardType + "\"");
     for (ShuffleboardComponent<?> component : m_helper.getComponents()) {
       component.buildInto(tabTable, metaTable.getSubTable(component.getTitle()));
     }
