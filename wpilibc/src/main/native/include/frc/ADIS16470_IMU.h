@@ -162,8 +162,10 @@ class ADIS16470_IMU : public wpi::Sendable,
   void Calibrate();
 
   /**
-   * @brief Switches the active SPI port to standard SPI mode, writes a new
-   * value to the NULL_CNFG register in the IMU, and re-enables auto SPI.
+   * Configures calibration time.
+   *
+   * @param new_cal_time New calibration time
+   * @return 0 if success, 1 if no change, 2 if error.
    */
   int ConfigCalTime(CalibrationTime new_cal_time);
 
@@ -418,11 +420,11 @@ class ADIS16470_IMU : public wpi::Sendable,
       Y_ACCL_OUT,    FLASH_CNT,     Z_ACCL_OUT,    FLASH_CNT};
 
   static constexpr double delta_angle_sf = 2160.0 / 2147483648.0;
-  static constexpr double rad_to_deg = 57.2957795;
-  static constexpr double deg_to_rad = 0.0174532;
-  static constexpr double grav = 9.81;
+  static constexpr double kRadToDeg = 57.2957795;
+  static constexpr double kDegToRad = 0.0174532;
+  static constexpr double kGrav = 9.81;
 
-  /** @brief Resources **/
+  // Resources
   DigitalInput* m_reset_in = nullptr;
   DigitalOutput* m_status_led = nullptr;
 
@@ -487,14 +489,12 @@ class ADIS16470_IMU : public wpi::Sendable,
   double m_accel_z = 0.0;
 
   // Complementary filter variables
-  double m_tau = 1.0;
   double m_dt, m_alpha = 0.0;
+  static constexpr double kTau = 1.0;
   double m_compAngleX, m_compAngleY, m_accelAngleX, m_accelAngleY = 0.0;
 
   // Complementary filter functions
   double FormatFastConverge(double compAngle, double accAngle);
-
-  double FormatRange0to2PI(double compAngle);
 
   double FormatAccelRange(double accelAngle, double accelZ);
 
