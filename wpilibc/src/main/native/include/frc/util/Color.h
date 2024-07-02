@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <gcem.hpp>
 #include <wpi/StringExtras.h>
 #include <wpi/ct_string.h>

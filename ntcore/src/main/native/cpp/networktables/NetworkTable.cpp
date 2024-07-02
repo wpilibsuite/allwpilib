@@ -6,7 +6,6 @@
 
 #include <algorithm>
 
-#include <fmt/core.h>
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>

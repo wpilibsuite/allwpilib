@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <cstring>
 
+#include <fmt/format.h>
 #include <wpi/mutex.h>
 #include <wpi/print.h>
 

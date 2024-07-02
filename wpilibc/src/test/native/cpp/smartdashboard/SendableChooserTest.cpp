@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>

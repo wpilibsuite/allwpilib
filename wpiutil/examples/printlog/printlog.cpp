@@ -6,6 +6,7 @@
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 
 #include "wpi/DataLogReader.h"
 #include "wpi/DenseMap.h"

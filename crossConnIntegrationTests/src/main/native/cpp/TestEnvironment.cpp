@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdlib>
+#include <cstring>
 #include <thread>
 
-#include <fmt/core.h>
 #include <gtest/gtest.h>
 #include <hal/HAL.h>
 #include <wpi/print.h>

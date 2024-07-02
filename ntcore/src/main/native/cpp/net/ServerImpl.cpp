@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#include <fmt/ranges.h>
 #include <wpi/Base64.h>
 #include <wpi/MessagePack.h>
 #include <wpi/SmallVector.h>

@@ -18,7 +18,6 @@
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <FRC_NetworkCommunication/UsageReporting.h>
-#include <fmt/format.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
@@ -582,7 +581,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   });
 
   if (!SetupNowRio()) {
-    fmt::print(stderr,
+    wpi::print(stderr,
                "Failed to run SetupNowRio(). This is a fatal error. The "
                "process is being terminated.\n");
     std::fflush(stderr);

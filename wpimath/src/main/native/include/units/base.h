@@ -184,9 +184,10 @@ namespace units
 	struct fmt::formatter<units::namespaceName::nameSingular ## _t> \
 		: fmt::formatter<double> \
 	{\
-		template <typename FormatContext>\
-		auto format(const units::namespaceName::nameSingular ## _t& obj,\
-								FormatContext& ctx) -> decltype(ctx.out()) \
+		template <typename FmtContext>\
+		auto format(\
+				const units::namespaceName::nameSingular ## _t& obj,\
+				FmtContext& ctx) const\
 		{\
 			auto out = ctx.out();\
 			out = fmt::formatter<double>::format(obj(), ctx);\
@@ -2881,9 +2882,10 @@ namespace units
 template <>
 struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 {
-	template <typename FormatContext>
-	auto format(const units::dimensionless::dB_t& obj,
-							FormatContext& ctx) -> decltype(ctx.out())
+	template <typename FmtContext>
+	auto format(
+			const units::dimensionless::dB_t& obj,
+			FmtContext& ctx) const
 	{
 		auto out = ctx.out();
 		out = fmt::formatter<double>::format(obj(), ctx);
