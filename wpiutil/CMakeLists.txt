@@ -172,7 +172,6 @@ if(NOT USE_SYSTEM_FMTLIB)
         wpiutil
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/fmtlib/include>
-            $<INSTALL_INTERFACE:${include_dest}/wpiutil>
     )
 else()
     find_package(fmt CONFIG REQUIRED)
@@ -204,49 +203,36 @@ install(
 target_include_directories(
     wpiutil
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )
 install(DIRECTORY src/main/native/thirdparty/memory/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
 )
 
 install(DIRECTORY src/main/native/thirdparty/json/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
 )
 
 install(DIRECTORY src/main/native/thirdparty/llvm/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
 )
 
 install(DIRECTORY src/main/native/thirdparty/mpack/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
 )
 
 install(DIRECTORY src/main/native/thirdparty/sigslot/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(
     wpiutil
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>
 )
 
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpiutil")

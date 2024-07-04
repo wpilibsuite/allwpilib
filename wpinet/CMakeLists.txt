@@ -144,7 +144,6 @@ if(NOT USE_SYSTEM_LIBUV)
         wpinet
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/libuv/include>
-            $<INSTALL_INTERFACE:${include_dest}/wpinet>
     )
     if(NOT MSVC)
         target_sources(wpinet PRIVATE ${uv_unix_src})
@@ -184,7 +183,6 @@ target_include_directories(
     wpinet
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpinet>
 )
 
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpinet")
