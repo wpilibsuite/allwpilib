@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Base class for all WPIMath JNI wrappers. */
 public class WPIMathJNI {
-  static boolean libraryLoaded = false;
+  private static boolean libraryLoaded = false;
 
   /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
