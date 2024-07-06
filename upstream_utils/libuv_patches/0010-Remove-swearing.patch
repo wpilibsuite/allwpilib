@@ -9,7 +9,7 @@ Subject: [PATCH 10/10] Remove swearing
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/win/fs.c b/src/win/fs.c
-index 26ba539936786902af5830c2811594292815d2d7..3c73d6294e14e665c1669728495afe6bd91782f2 100644
+index 05488e5d67101adba611f882ded4f6dc5a462d9a..d6b2b3f1d08d846fa941942f4bb33ae2fa30e320 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -1704,7 +1704,7 @@ INLINE static int fs__stat_handle(HANDLE handle, uv_stat_t* statbuf,
@@ -22,7 +22,7 @@ index 26ba539936786902af5830c2811594292815d2d7..3c73d6294e14e665c1669728495afe6b
     *
     * And uv_fs_chmod should probably just fail on windows or be a total no-op.
 diff --git a/src/win/tty.c b/src/win/tty.c
-index 7adf3cd3ba81a9c41064f4ef2af01667092f27d1..c0461ae56d16165ce0c1d47fb42b7a85a85d7255 100644
+index 7294f311e17d5d02e5873e60f8f0cdd551f6d34d..f7d5ef6c29f97a979fb1df993b66e31830af55c4 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -1055,7 +1055,7 @@ int uv__tty_read_stop(uv_tty_t* handle) {
