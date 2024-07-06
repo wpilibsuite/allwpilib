@@ -6,25 +6,13 @@ include(AddTest)
 file(
     GLOB hal_shared_native_src
     src/main/native/cpp/*.cpp
-    hal_shared_native_src
     src/main/native/cpp/cpp/*.cpp
-    hal_shared_native_src
     src/main/native/cpp/handles/*.cpp
-    hal_sim_native_src
-    src/main/native/sim/*.cpp
-    hal_sim_native_src
-    src/main/native/sim/mockdata/*.cpp
 )
-add_library(hal ${hal_shared_native_src})
+file(GLOB_RECURSE hal_sim_native_src src/main/native/sim/*.cpp)
+add_library(hal ${hal_shared_native_src} ${hal_sim_native_src})
 wpilib_target_warnings(hal)
 set_target_properties(hal PROPERTIES DEBUG_POSTFIX "d")
-
-if(USE_EXTERNAL_HAL)
-    include(${EXTERNAL_HAL_FILE})
-else()
-    target_sources(hal PRIVATE ${hal_sim_native_src})
-endif()
-
 set_target_properties(hal PROPERTIES OUTPUT_NAME "wpiHal")
 
 target_include_directories(
@@ -77,11 +65,6 @@ if(WITH_JAVA)
     install_jar_exports(TARGETS hal_jar FILE hal_jar.cmake DESTINATION share/hal)
 
     add_library(haljni ${hal_shared_jni_src})
-
-    if(USE_EXTERNAL_HAL)
-        include(${EXTERNAL_HAL_FILE})
-    endif()
-
     set_target_properties(haljni PROPERTIES OUTPUT_NAME "wpiHaljni")
 
     wpilib_target_warnings(haljni)
