@@ -8,7 +8,7 @@ Subject: [PATCH 1/4] Remove version from namespace
  1 file changed, 3 insertions(+), 42 deletions(-)
 
 diff --git a/include/nlohmann/detail/abi_macros.hpp b/include/nlohmann/detail/abi_macros.hpp
-index 0d3108d166602886d41b5f0fec1e56dd3dbe7e3c..ce9291306cdd9a9baeb8fbb77ca1dc33959e0d36 100644
+index f48b9eb1d5f0ec15fb47072084a4452f5c39fdde..f333173d73f099b64a60ca7131a0cff7fb6b4521 100644
 --- a/include/nlohmann/detail/abi_macros.hpp
 +++ b/include/nlohmann/detail/abi_macros.hpp
 @@ -42,40 +42,6 @@

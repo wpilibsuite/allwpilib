@@ -12,7 +12,7 @@ from upstream_utils import (
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/nlohmann/json", "v3.11.2")
+    upstream_root = clone_repo("https://github.com/nlohmann/json", "v3.11.3")
     wpilib_root = get_repo_root()
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 
