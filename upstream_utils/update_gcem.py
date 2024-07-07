@@ -13,7 +13,7 @@ from upstream_utils import (
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/kthohr/gcem.git", "v1.17.0")
+    upstream_root = clone_repo("https://github.com/kthohr/gcem.git", "v1.18.0")
     wpilib_root = get_repo_root()
     wpimath = os.path.join(wpilib_root, "wpimath")
 

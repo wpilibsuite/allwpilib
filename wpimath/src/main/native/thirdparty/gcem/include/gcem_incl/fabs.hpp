@@ -18,58 +18,26 @@
   ##
   ################################################################################*/
 
-/*
- * compile-time hyperbolic sine function
- */
-
-#ifndef _gcem_sinh_HPP
-#define _gcem_sinh_HPP
-
-#include <cmath>
-#include <type_traits>
+#ifndef _gcem_fabs_HPP
+#define _gcem_fabs_HPP
 
 namespace gcem
 {
 
-namespace internal
-{
-
-template<typename T>
-constexpr
-T
-sinh_check(const T x)
-noexcept
-{
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            // indistinguishable from zero
-            GCLIM<T>::min() > abs(x) ? \
-                T(0) :
-            // else
-                (exp(x) - exp(-x))/T(2) );
-}
-
-}
-
 /**
- * Compile-time hyperbolic sine function
+ * Compile-time floating-point absolute value function
  *
  * @param x a real-valued input.
- * @return the hyperbolic sine function using \f[ \sinh(x) = \frac{\exp(x) - \exp(-x)}{2} \f]
+ * @return the absolute value of \c x, \f$ |x| \f$, where the return type is a floating point number (float, double, or long double).
  */
 
 template<typename T>
 constexpr
 return_t<T>
-sinh(const T x)
+fabs(const T x)
 noexcept
 {
-  if (std::is_constant_evaluated()) {
-    return internal::sinh_check( static_cast<return_t<T>>(x) );
-  } else {
-    return std::sinh(x);
-  }
+    return gcem::abs( static_cast<return_t<T>>(x) );
 }
 
 }
