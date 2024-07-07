@@ -132,12 +132,12 @@ Add a `main.cpp` file to contain your code, and create a build folder. Move into
 cmake /path/to/folder/containing/CMakeLists
 ```
 
-After that, run `cmake --build .`. That will create your executable. Then you should be able to run `./my_vision_app` to run your application.
+After that, run `cmake --build .`. That will create your executable. Then you should be able to run `./my_vision_app` to run your application. Note that on Windows, the directories where the libraries are located __must__ be available on PATH or copied to the directory where the executable is located. Otherwise, the executable will fail to run.
 
 
 ## Using the installed libraries for Java
 
-Using the built JARs is move involved than using the C++ libraries, but mostly consists of adding the correct directories to PATH.
+Using the built JARs is more involved than using the C++ libraries, but mostly consists of adding the correct directories to PATH.
 
 Add the directory where the JARs are located (e.g, `/usr/local/java`) to PATH. If you are on Windows, you also need to add the `lib`, `bin`, and `share` directories to PATH. Then, create a new folder to contain your project. Add the following code below to a `CMakeLists.txt` file in that directory.
 
