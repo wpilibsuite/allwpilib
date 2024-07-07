@@ -193,7 +193,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
    * @param func A function that takes two arguments: an int for the gradient
    *   row, and a double for the adjoint (gradient value).
    */
-  void ComputeAdjoints(function_ref<void(int, double)> func) {
+  void ComputeAdjoints(function_ref<void(int row, double adjoint)> func) {
     // Zero adjoints. The root node's adjoint is 1.0 as df/df is always 1.
     m_adjointList[0]->adjoint = 1.0;
     for (auto it = m_adjointList.begin() + 1; it != m_adjointList.end(); ++it) {

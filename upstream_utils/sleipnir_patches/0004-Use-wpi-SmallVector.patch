@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 16 Jun 2024 12:08:49 -0700
-Subject: [PATCH 4/4] Use wpi::SmallVector
+Subject: [PATCH 4/5] Use wpi::SmallVector
 
 ---
  include/.styleguide                               |  1 +
@@ -32,7 +32,7 @@ index 6a7f8ed28f9cb037c9746a7e0ef5e110481d9825..efa36cee1fb593ae810032340c64f185
 +  ^wpi/
  }
 diff --git a/include/sleipnir/autodiff/Expression.hpp b/include/sleipnir/autodiff/Expression.hpp
-index 758433270a1cbe1b33f8b41d3e971b58de711e18..f9be904cf289ad5f5538d9c91b7f2e96ea7d3ab2 100644
+index e65b689559d01324fc4218c26144521832719025..2be666e7c87731d2633576d4a066efba4906502d 100644
 --- a/include/sleipnir/autodiff/Expression.hpp
 +++ b/include/sleipnir/autodiff/Expression.hpp
 @@ -11,11 +11,12 @@
@@ -49,7 +49,7 @@ index 758433270a1cbe1b33f8b41d3e971b58de711e18..f9be904cf289ad5f5538d9c91b7f2e96
  
  namespace sleipnir::detail {
  
-@@ -423,7 +424,7 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
+@@ -415,7 +416,7 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
    // Expression destructor when expr's refcount reaches zero can cause a stack
    // overflow. Instead, we iterate over its children to decrement their
    // refcounts and deallocate them.
@@ -59,7 +59,7 @@ index 758433270a1cbe1b33f8b41d3e971b58de711e18..f9be904cf289ad5f5538d9c91b7f2e96
  
    while (!stack.empty()) {
 diff --git a/include/sleipnir/autodiff/ExpressionGraph.hpp b/include/sleipnir/autodiff/ExpressionGraph.hpp
-index 56fe6bd5734ce2eec43f3c4c3e70c2ed41b32a21..4683089037271df7bcf0894f5a158c6c4607fe87 100644
+index c614195d82ad022dfd0c3f6f8240b042c0056c2f..714bcbb82907e754138347334c7fca8a7ccf055d 100644
 --- a/include/sleipnir/autodiff/ExpressionGraph.hpp
 +++ b/include/sleipnir/autodiff/ExpressionGraph.hpp
 @@ -4,10 +4,11 @@
@@ -197,7 +197,7 @@ index ac00c11ef8c947cbe95c58081bdbfb42bf901051..0c660156c80f94539383b8f0d01d7853
    Profiler m_profiler;
  };
 diff --git a/include/sleipnir/autodiff/VariableMatrix.hpp b/include/sleipnir/autodiff/VariableMatrix.hpp
-index f080a877a482d8a45a56ff38a0b969ef81b5809d..e691e209afed43d9384c2828243972d41e59ed59 100644
+index a7e89e5d7a24fb1295eb3ff04d8f22824c0884f1..bac9fe4f5ecf08bb4c0e3dfa8822125bcf854803 100644
 --- a/include/sleipnir/autodiff/VariableMatrix.hpp
 +++ b/include/sleipnir/autodiff/VariableMatrix.hpp
 @@ -11,13 +11,13 @@
@@ -225,12 +225,12 @@ index f080a877a482d8a45a56ff38a0b969ef81b5809d..e691e209afed43d9384c2828243972d4
    int m_cols = 0;
  };
 diff --git a/include/sleipnir/optimization/Constraints.hpp b/include/sleipnir/optimization/Constraints.hpp
-index 3b7315a851eff59dabc9a11334d09ef0b7337881..a33039b8996ded92014fa96dfacc9c80fd612c79 100644
+index 80da66bfef55bfc54cfdcd0478432658f60f7610..b940fcc4deb76c282b27564332db5e5935fbfbc6 100644
 --- a/include/sleipnir/optimization/Constraints.hpp
 +++ b/include/sleipnir/optimization/Constraints.hpp
-@@ -6,11 +6,12 @@
- #include <concepts>
+@@ -8,11 +8,12 @@
  #include <type_traits>
+ #include <vector>
  
 +#include <wpi/SmallVector.h>
 +
@@ -242,7 +242,7 @@ index 3b7315a851eff59dabc9a11334d09ef0b7337881..a33039b8996ded92014fa96dfacc9c80
  
  namespace sleipnir {
  
-@@ -30,8 +31,8 @@ template <typename LHS, typename RHS>
+@@ -32,8 +33,8 @@ template <typename LHS, typename RHS>
            (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
            (!std::same_as<std::decay_t<LHS>, double> ||
             !std::same_as<std::decay_t<RHS>, double>)
@@ -253,7 +253,7 @@ index 3b7315a851eff59dabc9a11334d09ef0b7337881..a33039b8996ded92014fa96dfacc9c80
  
    if constexpr (ScalarLike<std::decay_t<LHS>> &&
                  ScalarLike<std::decay_t<RHS>>) {
-@@ -119,7 +120,7 @@ small_vector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
+@@ -121,7 +122,7 @@ small_vector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
   */
  struct SLEIPNIR_DLLEXPORT EqualityConstraints {
    /// A vector of scalar equality constraints.
@@ -261,8 +261,8 @@ index 3b7315a851eff59dabc9a11334d09ef0b7337881..a33039b8996ded92014fa96dfacc9c80
 +  wpi::SmallVector<Variable> constraints;
  
    /**
-    * Constructs an equality constraint from a left and right side.
-@@ -153,7 +154,7 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
+    * Concatenates multiple equality constraints.
+@@ -183,7 +184,7 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
   */
  struct SLEIPNIR_DLLEXPORT InequalityConstraints {
    /// A vector of scalar inequality constraints.
@@ -270,9 +270,9 @@ index 3b7315a851eff59dabc9a11334d09ef0b7337881..a33039b8996ded92014fa96dfacc9c80
 +  wpi::SmallVector<Variable> constraints;
  
    /**
-    * Constructs an inequality constraint from a left and right side.
+    * Concatenates multiple inequality constraints.
 diff --git a/include/sleipnir/optimization/Multistart.hpp b/include/sleipnir/optimization/Multistart.hpp
-index d905cafd5fce57dc53665caf50997ada00db4ebe..6935590a75db6eb3f1ecbd35c805cb7849bc3d9c 100644
+index 8055713a2492a9c8473f047a2fb9fe7ca57753c3..09b1b2f3bf33c35ae0aeddb9b5d47c0d80c68cec 100644
 --- a/include/sleipnir/optimization/Multistart.hpp
 +++ b/include/sleipnir/optimization/Multistart.hpp
 @@ -6,9 +6,10 @@
@@ -287,8 +287,8 @@ index d905cafd5fce57dc53665caf50997ada00db4ebe..6935590a75db6eb3f1ecbd35c805cb78
  
  namespace sleipnir {
  
-@@ -43,14 +44,14 @@ MultistartResult<DecisionVariables> Multistart(
-     function_ref<MultistartResult<DecisionVariables>(const DecisionVariables&)>
+@@ -44,14 +45,14 @@ MultistartResult<DecisionVariables> Multistart(
+         const DecisionVariables& initialGuess)>
          solve,
      std::span<const DecisionVariables> initialGuesses) {
 -  small_vector<std::future<MultistartResult<DecisionVariables>>> futures;
@@ -305,10 +305,10 @@ index d905cafd5fce57dc53665caf50997ada00db4ebe..6935590a75db6eb3f1ecbd35c805cb78
  
    for (auto& future : futures) {
 diff --git a/include/sleipnir/optimization/OptimizationProblem.hpp b/include/sleipnir/optimization/OptimizationProblem.hpp
-index 32ef0bf6fb0cbcba84c82031644e935a44815ed2..7dc4c50b035b1848b9b0177d10a4445a021a744e 100644
+index 7d387e02af386a3cbfaf0294d5be78e73fb05628..b78b3761898088235cf335bf5cc111f4cafbe29a 100644
 --- a/include/sleipnir/optimization/OptimizationProblem.hpp
 +++ b/include/sleipnir/optimization/OptimizationProblem.hpp
-@@ -12,6 +12,7 @@
+@@ -11,6 +11,7 @@
  #include <utility>
  
  #include <Eigen/Core>
@@ -316,7 +316,7 @@ index 32ef0bf6fb0cbcba84c82031644e935a44815ed2..7dc4c50b035b1848b9b0177d10a4445a
  
  #include "sleipnir/autodiff/Variable.hpp"
  #include "sleipnir/autodiff/VariableMatrix.hpp"
-@@ -23,7 +24,6 @@
+@@ -22,7 +23,6 @@
  #include "sleipnir/optimization/solver/InteriorPoint.hpp"
  #include "sleipnir/util/Print.hpp"
  #include "sleipnir/util/SymbolExports.hpp"
@@ -324,7 +324,7 @@ index 32ef0bf6fb0cbcba84c82031644e935a44815ed2..7dc4c50b035b1848b9b0177d10a4445a
  
  namespace sleipnir {
  
-@@ -360,16 +360,16 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
+@@ -359,16 +359,16 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
   private:
    // The list of decision variables, which are the root of the problem's
    // expression tree
@@ -343,9 +343,9 @@ index 32ef0bf6fb0cbcba84c82031644e935a44815ed2..7dc4c50b035b1848b9b0177d10a4445a
 +  wpi::SmallVector<Variable> m_inequalityConstraints;
  
    // The user callback
-   std::function<bool(const SolverIterationInfo&)> m_callback =
+   std::function<bool(const SolverIterationInfo& info)> m_callback =
 diff --git a/include/sleipnir/util/Pool.hpp b/include/sleipnir/util/Pool.hpp
-index 02d8e190178973a1e2edc94225754fb6e2199bf4..95b4d2e97e05b5983720e4abd87f1dbb973dd7f4 100644
+index 441fa701d4972bc14973c6269d56d4a124deaee5..1951bd1ee8f3bee8d4a3c044c99354b0fd10031d 100644
 --- a/include/sleipnir/util/Pool.hpp
 +++ b/include/sleipnir/util/Pool.hpp
 @@ -5,8 +5,9 @@
@@ -359,7 +359,7 @@ index 02d8e190178973a1e2edc94225754fb6e2199bf4..95b4d2e97e05b5983720e4abd87f1dbb
  
  namespace sleipnir {
  
-@@ -76,8 +77,8 @@ class SLEIPNIR_DLLEXPORT PoolResource {
+@@ -78,8 +79,8 @@ class SLEIPNIR_DLLEXPORT PoolResource {
    }
  
   private:
@@ -405,7 +405,7 @@ index f3b2f0cf9e60b3a86b9654ff2b381f9c48734ff6..ad739cea6dce6f6cb586f538d1d30b92
 +  ^wpi/
  }
 diff --git a/src/optimization/solver/InteriorPoint.cpp b/src/optimization/solver/InteriorPoint.cpp
-index 0d3c8fa23b113a8ae42ae17dc3a8daa5b017cfb2..06187b7260182f02860b1419727b2ca71ff48c9a 100644
+index 817e3d1dcb808c36192ea5b483eee1a08dbb5e2f..1470eb235bfdac363557c207ac0eaedb6c73d295 100644
 --- a/src/optimization/solver/InteriorPoint.cpp
 +++ b/src/optimization/solver/InteriorPoint.cpp
 @@ -9,6 +9,7 @@
@@ -434,7 +434,7 @@ index 0d3c8fa23b113a8ae42ae17dc3a8daa5b017cfb2..06187b7260182f02860b1419727b2ca7
    RegularizedLDLT solver;
  
 diff --git a/src/optimization/solver/util/FeasibilityRestoration.hpp b/src/optimization/solver/util/FeasibilityRestoration.hpp
-index 37adf64ea483b1acd4a4d5db8697e1b2fc701e72..76af452517d75ae67e0511584c89f99c552989af 100644
+index c324ef093cc7dc8ce93af2cba337042a65b28475..0f13676aea0e80549ef1ef43e4972d5498acaa18 100644
 --- a/src/optimization/solver/util/FeasibilityRestoration.hpp
 +++ b/src/optimization/solver/util/FeasibilityRestoration.hpp
 @@ -8,6 +8,7 @@
@@ -453,7 +453,7 @@ index 37adf64ea483b1acd4a4d5db8697e1b2fc701e72..76af452517d75ae67e0511584c89f99c
  
  namespace sleipnir {
  
-@@ -66,7 +66,7 @@ inline void FeasibilityRestoration(
+@@ -65,7 +65,7 @@ inline void FeasibilityRestoration(
  
    constexpr double ρ = 1000.0;
  
@@ -462,7 +462,7 @@ index 37adf64ea483b1acd4a4d5db8697e1b2fc701e72..76af452517d75ae67e0511584c89f99c
    fr_decisionVariables.reserve(decisionVariables.size() +
                                 2 * equalityConstraints.size() +
                                 2 * inequalityConstraints.size());
-@@ -82,7 +82,7 @@ inline void FeasibilityRestoration(
+@@ -81,7 +81,7 @@ inline void FeasibilityRestoration(
      fr_decisionVariables.emplace_back();
    }
  
@@ -471,7 +471,7 @@ index 37adf64ea483b1acd4a4d5db8697e1b2fc701e72..76af452517d75ae67e0511584c89f99c
  
    VariableMatrix xAD{std::span{it, it + decisionVariables.size()}};
    it += decisionVariables.size();
-@@ -158,7 +158,7 @@ inline void FeasibilityRestoration(
+@@ -157,7 +157,7 @@ inline void FeasibilityRestoration(
    }
  
    // cₑ(x) - pₑ + nₑ = 0
@@ -480,7 +480,7 @@ index 37adf64ea483b1acd4a4d5db8697e1b2fc701e72..76af452517d75ae67e0511584c89f99c
    fr_equalityConstraints.assign(equalityConstraints.begin(),
                                  equalityConstraints.end());
    for (size_t row = 0; row < fr_equalityConstraints.size(); ++row) {
-@@ -167,7 +167,7 @@ inline void FeasibilityRestoration(
+@@ -166,7 +166,7 @@ inline void FeasibilityRestoration(
    }
  
    // cᵢ(x) - s - pᵢ + nᵢ = 0

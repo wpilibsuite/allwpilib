@@ -37,7 +37,7 @@ namespace sleipnir {
 void InteriorPoint(std::span<Variable> decisionVariables,
                    std::span<Variable> equalityConstraints,
                    std::span<Variable> inequalityConstraints, Variable& f,
-                   function_ref<bool(const SolverIterationInfo&)> callback,
+                   function_ref<bool(const SolverIterationInfo& info)> callback,
                    const SolverConfig& config, bool feasibilityRestoration,
                    Eigen::VectorXd& x, Eigen::VectorXd& s,
                    SolverStatus* status) {
@@ -354,7 +354,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
         decisionVariables.size() + equalityConstraints.size(),
         decisionVariables.size() + equalityConstraints.size());
     lhs.setFromSortedTriplets(triplets.begin(), triplets.end(),
-                              [](const auto& a, const auto& b) { return b; });
+                              [](const auto&, const auto& b) { return b; });
 
     const Eigen::VectorXd e = Eigen::VectorXd::Ones(s.rows());
 
@@ -582,7 +582,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
         Eigen::VectorXd fr_s = s;
         SolverStatus fr_status;
         FeasibilityRestoration(
-            decisionVariables, equalityConstraints, inequalityConstraints, f, μ,
+            decisionVariables, equalityConstraints, inequalityConstraints, μ,
             [&](const SolverIterationInfo& info) {
               Eigen::VectorXd trial_x =
                   info.x.segment(0, decisionVariables.size());
@@ -656,7 +656,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
                                              A_e.cols() + s.rows()};
             Ahat.setFromSortedTriplets(
                 triplets.begin(), triplets.end(),
-                [](const auto& a, const auto& b) { return b; });
+                [](const auto&, const auto& b) { return b; });
 
             // lhs = ÂÂᵀ
             Eigen::SparseMatrix<double> lhs = Ahat * Ahat.transpose();
