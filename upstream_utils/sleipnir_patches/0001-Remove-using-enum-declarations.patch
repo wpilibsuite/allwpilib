@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 24 Apr 2024 15:56:06 -0700
-Subject: [PATCH 1/4] Remove "using enum" declarations
+Subject: [PATCH 1/5] Remove "using enum" declarations
 
 ---
  include/sleipnir/autodiff/Expression.hpp      | 161 +++++++-----------
@@ -9,7 +9,7 @@ Subject: [PATCH 1/4] Remove "using enum" declarations
  2 files changed, 73 insertions(+), 110 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/Expression.hpp b/include/sleipnir/autodiff/Expression.hpp
-index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999f035efad 100644
+index 6c4ae6269f13b7d1b5c9b0281de1a4b0dc890baf..065b28e790db32234042bcc94d9a1dac597dee86 100644
 --- a/include/sleipnir/autodiff/Expression.hpp
 +++ b/include/sleipnir/autodiff/Expression.hpp
 @@ -191,8 +191,6 @@ struct SLEIPNIR_DLLEXPORT Expression {
@@ -99,7 +99,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        return MakeExpressionPtr(lhs->value + rhs->value);
      }
  
-@@ -332,8 +330,6 @@ struct SLEIPNIR_DLLEXPORT Expression {
+@@ -328,8 +326,6 @@ struct SLEIPNIR_DLLEXPORT Expression {
     */
    friend SLEIPNIR_DLLEXPORT ExpressionPtr operator-(const ExpressionPtr& lhs,
                                                      const ExpressionPtr& rhs) {
@@ -108,7 +108,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
      // Prune expression
      if (lhs->IsConstant(0.0)) {
        if (rhs->IsConstant(0.0)) {
-@@ -347,7 +343,8 @@ struct SLEIPNIR_DLLEXPORT Expression {
+@@ -343,7 +339,8 @@ struct SLEIPNIR_DLLEXPORT Expression {
      }
  
      // Evaluate constant
@@ -118,7 +118,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        return MakeExpressionPtr(lhs->value - rhs->value);
      }
  
-@@ -373,8 +370,6 @@ struct SLEIPNIR_DLLEXPORT Expression {
+@@ -365,8 +362,6 @@ struct SLEIPNIR_DLLEXPORT Expression {
     * @param lhs Operand of unary minus.
     */
    friend SLEIPNIR_DLLEXPORT ExpressionPtr operator-(const ExpressionPtr& lhs) {
@@ -127,7 +127,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
      // Prune expression
      if (lhs->IsConstant(0.0)) {
        // Return zero
-@@ -382,7 +377,7 @@ struct SLEIPNIR_DLLEXPORT Expression {
+@@ -374,7 +369,7 @@ struct SLEIPNIR_DLLEXPORT Expression {
      }
  
      // Evaluate constant
@@ -136,7 +136,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        return MakeExpressionPtr(-lhs->value);
      }
  
-@@ -463,8 +458,6 @@ inline constexpr void IntrusiveSharedPtrDecRefCount(Expression* expr) {
+@@ -455,8 +450,6 @@ inline constexpr void IntrusiveSharedPtrDecRefCount(Expression* expr) {
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr abs(  // NOLINT
      const ExpressionPtr& x) {
@@ -145,7 +145,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      // Return zero
-@@ -472,12 +465,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr abs(  // NOLINT
+@@ -464,12 +457,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr abs(  // NOLINT
    }
  
    // Evaluate constant
@@ -160,7 +160,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          if (x < 0.0) {
            return -parentAdjoint;
-@@ -508,20 +501,18 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr abs(  // NOLINT
+@@ -500,20 +493,18 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr abs(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr acos(  // NOLINT
      const ExpressionPtr& x) {
@@ -183,7 +183,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return -parentAdjoint / std::sqrt(1.0 - x * x);
        },
-@@ -540,8 +531,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr acos(  // NOLINT
+@@ -532,8 +523,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr acos(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr asin(  // NOLINT
      const ExpressionPtr& x) {
@@ -192,7 +192,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      // Return zero
-@@ -549,12 +538,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr asin(  // NOLINT
+@@ -541,12 +530,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr asin(  // NOLINT
    }
  
    // Evaluate constant
@@ -207,7 +207,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return parentAdjoint / std::sqrt(1.0 - x * x);
        },
-@@ -573,8 +562,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr asin(  // NOLINT
+@@ -565,8 +554,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr asin(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr atan(  // NOLINT
      const ExpressionPtr& x) {
@@ -216,7 +216,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      // Return zero
-@@ -582,12 +569,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan(  // NOLINT
+@@ -574,12 +561,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan(  // NOLINT
    }
  
    // Evaluate constant
@@ -231,7 +231,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return parentAdjoint / (1.0 + x * x);
        },
-@@ -606,8 +593,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan(  // NOLINT
+@@ -598,8 +585,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr atan2(  // NOLINT
      const ExpressionPtr& y, const ExpressionPtr& x) {
@@ -240,7 +240,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (y->IsConstant(0.0)) {
      // Return zero
-@@ -617,12 +602,14 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan2(  // NOLINT
+@@ -609,12 +594,14 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan2(  // NOLINT
    }
  
    // Evaluate constant
@@ -257,7 +257,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double y, double x, double parentAdjoint) {
          return parentAdjoint * x / (y * y + x * x);
        },
-@@ -647,20 +634,18 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan2(  // NOLINT
+@@ -639,20 +626,18 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr atan2(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr cos(  // NOLINT
      const ExpressionPtr& x) {
@@ -280,7 +280,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return -parentAdjoint * std::sin(x);
        },
-@@ -678,20 +663,18 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr cos(  // NOLINT
+@@ -670,20 +655,18 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr cos(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr cosh(  // NOLINT
      const ExpressionPtr& x) {
@@ -303,7 +303,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return parentAdjoint * std::sinh(x);
        },
-@@ -709,8 +692,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr cosh(  // NOLINT
+@@ -701,8 +684,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr cosh(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr erf(  // NOLINT
      const ExpressionPtr& x) {
@@ -312,7 +312,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      // Return zero
-@@ -718,12 +699,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr erf(  // NOLINT
+@@ -710,12 +691,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr erf(  // NOLINT
    }
  
    // Evaluate constant
@@ -327,7 +327,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return parentAdjoint * 2.0 * std::numbers::inv_sqrtpi *
                 std::exp(-x * x);
-@@ -744,20 +725,18 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr erf(  // NOLINT
+@@ -736,20 +717,18 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr erf(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr exp(  // NOLINT
      const ExpressionPtr& x) {
@@ -350,7 +350,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return parentAdjoint * std::exp(x);
        },
-@@ -776,8 +755,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr exp(  // NOLINT
+@@ -768,8 +747,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr exp(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr hypot(  // NOLINT
      const ExpressionPtr& x, const ExpressionPtr& y) {
@@ -359,7 +359,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      return y;
-@@ -786,12 +763,14 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr hypot(  // NOLINT
+@@ -778,12 +755,14 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr hypot(  // NOLINT
    }
  
    // Evaluate constant
@@ -376,7 +376,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double y, double parentAdjoint) {
          return parentAdjoint * x / std::hypot(x, y);
        },
-@@ -816,8 +795,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr hypot(  // NOLINT
+@@ -808,8 +787,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr hypot(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr log(  // NOLINT
      const ExpressionPtr& x) {
@@ -385,7 +385,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      // Return zero
-@@ -825,12 +802,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log(  // NOLINT
+@@ -817,12 +794,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log(  // NOLINT
    }
  
    // Evaluate constant
@@ -400,7 +400,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) { return parentAdjoint / x; },
        [](const ExpressionPtr& x, const ExpressionPtr&,
           const ExpressionPtr& parentAdjoint) { return parentAdjoint / x; },
-@@ -844,8 +821,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log(  // NOLINT
+@@ -836,8 +813,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr log10(  // NOLINT
      const ExpressionPtr& x) {
@@ -409,7 +409,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      // Return zero
-@@ -853,12 +828,13 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log10(  // NOLINT
+@@ -845,12 +820,13 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log10(  // NOLINT
    }
  
    // Evaluate constant
@@ -425,7 +425,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return parentAdjoint / (std::numbers::ln10 * x);
        },
-@@ -877,8 +853,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log10(  // NOLINT
+@@ -869,8 +845,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr log10(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr pow(  // NOLINT
      const ExpressionPtr& base, const ExpressionPtr& power) {
@@ -434,7 +434,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (base->IsConstant(0.0)) {
      // Return zero
-@@ -893,12 +867,15 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr pow(  // NOLINT
+@@ -885,12 +859,15 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr pow(  // NOLINT
    }
  
    // Evaluate constant
@@ -452,7 +452,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double base, double power) { return std::pow(base, power); },
        [](double base, double power, double parentAdjoint) {
          return parentAdjoint * std::pow(base, power - 1) * power;
-@@ -939,10 +916,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr pow(  // NOLINT
+@@ -931,10 +908,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr pow(  // NOLINT
   * @param x The argument.
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr sign(const ExpressionPtr& x) {
@@ -464,7 +464,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
      if (x->value < 0.0) {
        return MakeExpressionPtr(-1.0);
      } else if (x->value == 0.0) {
-@@ -954,7 +929,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sign(const ExpressionPtr& x) {
+@@ -946,7 +921,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sign(const ExpressionPtr& x) {
    }
  
    return MakeExpressionPtr(
@@ -473,7 +473,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double) {
          if (x < 0.0) {
            return -1.0;
-@@ -980,8 +955,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sign(const ExpressionPtr& x) {
+@@ -971,8 +946,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sign(const ExpressionPtr& x) {
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr sin(  // NOLINT
      const ExpressionPtr& x) {
@@ -482,7 +482,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      // Return zero
-@@ -989,12 +962,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sin(  // NOLINT
+@@ -980,12 +953,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sin(  // NOLINT
    }
  
    // Evaluate constant
@@ -497,7 +497,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return parentAdjoint * std::cos(x);
        },
-@@ -1011,8 +984,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sin(  // NOLINT
+@@ -1002,8 +975,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sin(  // NOLINT
   * @param x The argument.
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr sinh(const ExpressionPtr& x) {
@@ -506,7 +506,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      // Return zero
-@@ -1020,12 +991,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sinh(const ExpressionPtr& x) {
+@@ -1011,12 +982,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sinh(const ExpressionPtr& x) {
    }
  
    // Evaluate constant
@@ -521,7 +521,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return parentAdjoint * std::cosh(x);
        },
-@@ -1043,10 +1014,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sinh(const ExpressionPtr& x) {
+@@ -1034,10 +1005,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sinh(const ExpressionPtr& x) {
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(  // NOLINT
      const ExpressionPtr& x) {
@@ -533,7 +533,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
      if (x->value == 0.0) {
        // Return zero
        return x;
-@@ -1058,7 +1027,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(  // NOLINT
+@@ -1049,7 +1018,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(  // NOLINT
    }
  
    return MakeExpressionPtr(
@@ -542,7 +542,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return parentAdjoint / (2.0 * std::sqrt(x));
        },
-@@ -1077,8 +1046,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(  // NOLINT
+@@ -1068,8 +1037,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(  // NOLINT
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr tan(  // NOLINT
      const ExpressionPtr& x) {
@@ -551,7 +551,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      // Return zero
-@@ -1086,12 +1053,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr tan(  // NOLINT
+@@ -1077,12 +1044,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr tan(  // NOLINT
    }
  
    // Evaluate constant
@@ -566,7 +566,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
        [](double x, double, double parentAdjoint) {
          return parentAdjoint / (std::cos(x) * std::cos(x));
        },
-@@ -1109,8 +1076,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr tan(  // NOLINT
+@@ -1100,8 +1067,6 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr tan(  // NOLINT
   * @param x The argument.
   */
  SLEIPNIR_DLLEXPORT inline ExpressionPtr tanh(const ExpressionPtr& x) {
@@ -575,7 +575,7 @@ index 5b8dc5dca9bd685e6647e79f5fd4699bb9909853..802a8602a125251058cfe22447911999
    // Prune expression
    if (x->IsConstant(0.0)) {
      // Return zero
-@@ -1118,12 +1083,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr tanh(const ExpressionPtr& x) {
+@@ -1109,12 +1074,12 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr tanh(const ExpressionPtr& x) {
    }
  
    // Evaluate constant

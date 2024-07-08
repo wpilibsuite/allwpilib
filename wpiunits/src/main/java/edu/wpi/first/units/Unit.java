@@ -286,13 +286,11 @@ public class Unit<U extends Unit<U>> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    return o instanceof Unit<?> that
-        && m_name.equals(that.m_name)
-        && m_symbol.equals(that.m_symbol)
-        && this.equivalent(that);
+    return this == o
+        || o instanceof Unit<?> that
+            && m_name.equals(that.m_name)
+            && m_symbol.equals(that.m_symbol)
+            && this.equivalent(that);
   }
 
   @Override

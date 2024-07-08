@@ -51,7 +51,7 @@ class SwerveControllerCommandTest {
         new SwerveModuleState(0, Rotation2d.kZero)
       };
 
-  private SwerveModulePosition[] m_modulePositions =
+  private final SwerveModulePosition[] m_modulePositions =
       new SwerveModulePosition[] {
         new SwerveModulePosition(0, Rotation2d.kZero),
         new SwerveModulePosition(0, Rotation2d.kZero),

@@ -70,10 +70,6 @@ option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 
-# Options for external HAL.
-option(WITH_EXTERNAL_HAL "Use a separately built HAL" OFF)
-set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
-
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
 option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
 option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
@@ -202,37 +198,13 @@ if(WITH_JAVA)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 endif()
 
-if(USE_SYSTEM_LIBUV)
-    set(LIBUV_SYSTEM_REPLACE
-        "
-find_dependency(libuv CONFIG)
-"
-    )
-endif()
-
-if(USE_SYSTEM_EIGEN)
-    set(EIGEN_SYSTEM_REPLACE "find_package(Eigen3 CONFIG)")
-endif()
-
 find_package(LIBSSH 0.7.1)
 
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
+set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
 find_package(Protobuf REQUIRED)
-
-set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
-set(CAMERASERVER_DEP_REPLACE_IMPL "find_dependency(cameraserver)")
-set(CSCORE_DEP_REPLACE_IMPL "find_dependency(cscore)")
-set(HAL_DEP_REPLACE_IMPL "find_dependency(hal)")
-set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
-set(WPILIBC_DEP_REPLACE_IMPL "find_dependency(wpilibc)")
-set(WPILIBJ_DEP_REPLACE "find_dependency(wpilibj)")
-set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(wpilibNewCommands)")
-set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
-set(WPINET_DEP_REPLACE "find_dependency(wpinet)")
-set(WPIUNITS_DEP_REPLACE "find_dependency(wpiunits)")
-set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
-
-set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
-set(SELF_DIR "$\{SELF_DIR\}")
+find_program(PROTOC_COMPILER protoc REQUIRED)
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
@@ -353,22 +325,39 @@ if(WITH_TESTS)
     include(GoogleTest)
 endif()
 
+if(USE_SYSTEM_LIBUV)
+    set(LIBUV_SYSTEM_REPLACE "find_dependency(libuv CONFIG)")
+endif()
+
+if(USE_SYSTEM_EIGEN)
+    set(EIGEN_SYSTEM_REPLACE "find_package(Eigen3 CONFIG)")
+endif()
+
+set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
+set(SELF_DIR "$\{SELF_DIR\}")
+set(WPIUNITS_DEP_REPLACE_IMPL "find_dependency(wpiunits)")
+set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 add_subdirectory(wpiutil)
 
 if(WITH_NTCORE)
+    set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
+    set(WPINET_DEP_REPLACE "find_dependency(wpinet)")
     add_subdirectory(wpinet)
     add_subdirectory(ntcore)
 endif()
 
 if(WITH_WPIMATH)
     if(WITH_JAVA)
+        set(WPIUNITS_DEP_REPLACE ${WPIUNITS_DEP_REPLACE_IMPL})
         add_subdirectory(wpiunits)
     endif()
+    set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
     add_subdirectory(wpimath)
 endif()
 
 if(WITH_WPIUNITS AND NOT WITH_WPIMATH)
     # In case of building wpiunits standalone
+    set(WPIUNITS_DEP_REPLACE ${WPIUNITS_DEP_REPLACE_IMPL})
     add_subdirectory(wpiunits)
 endif()
 
@@ -386,19 +375,22 @@ if(WITH_GUI)
 endif()
 
 if(WITH_WPILIB OR WITH_SIMULATION_MODULES)
-    set(HAL_DEP_REPLACE ${HAL_DEP_REPLACE_IMPL})
+    set(HAL_DEP_REPLACE "find_dependency(hal)")
     add_subdirectory(hal)
 endif()
 
 if(WITH_CSCORE)
-    set(CSCORE_DEP_REPLACE ${CSCORE_DEP_REPLACE_IMPL})
-    set(CAMERASERVER_DEP_REPLACE ${CAMERASERVER_DEP_REPLACE_IMPL})
+    set(CAMERASERVER_DEP_REPLACE "find_dependency(cameraserver)")
+    set(CSCORE_DEP_REPLACE "find_dependency(cscore)")
     add_subdirectory(cscore)
     add_subdirectory(cameraserver)
 endif()
 
 if(WITH_WPILIB)
-    set(WPILIBC_DEP_REPLACE ${WPILIBC_DEP_REPLACE_IMPL})
+    set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
+    set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
+    set(WPILIBJ_DEP_REPLACE "find_dependency(wpilibj)")
+    set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(wpilibNewCommands)")
     add_subdirectory(apriltag)
     add_subdirectory(wpilibj)
     add_subdirectory(wpilibc)

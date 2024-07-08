@@ -69,7 +69,7 @@ public final class UnitBuilder<U extends Unit<U>> {
   }
 
   /** Helper class used for safely chaining mapping builder calls. */
-  public class MappingBuilder {
+  public final class MappingBuilder {
     private final double m_minInput;
     private final double m_maxInput;
 
@@ -271,7 +271,7 @@ public final class UnitBuilder<U extends Unit<U>> {
         });
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
   private static <U extends Unit<U>> Constructor<? extends Unit<U>> getConstructor(U baseUnit)
       throws NoSuchMethodException {
     var baseClass = baseUnit.getClass();

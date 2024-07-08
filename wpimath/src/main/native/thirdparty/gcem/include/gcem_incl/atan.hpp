@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2023 Keith O'Hara
+  ##   Copyright (C) 2016-2024 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -43,12 +43,44 @@ namespace internal
 template<typename T>
 constexpr
 T
-atan_series_order_calc(const T x, const T x_pow, const uint_t order)
+atan_series_order_calc(const T xx, const T x_pow, const uint_t order)
 noexcept
 {
     return( T(1)/( T((order-1)*4 - 1) * x_pow ) \
-              - T(1)/( T((order-1)*4 + 1) * x_pow*x) );
+              - T(1)/( T((order-1)*4 + 1) * x_pow * xx) );
 }
+
+#if __cplusplus >= 201402L // C++14 version
+
+template<typename T>
+constexpr
+T
+atan_series_order(const T x, const T x_pow, const uint_t order_begin, const uint_t max_order)
+noexcept
+{
+    // run in reverse order to sum smallest numbers first
+
+    if (max_order == 1) {
+        return GCEM_HALF_PI - T(1)/x_pow; // use x_pow to avoid a warning
+    }
+
+    T xx = x*x;
+    T res = atan_series_order_calc(xx, pow(x,4*max_order-5), max_order);
+
+    uint_t depth = max_order - 1;
+
+    while (depth > order_begin) {
+        res += atan_series_order_calc(xx, pow(x,4*depth-5), depth);
+
+        --depth;
+    }
+
+    res += GCEM_HALF_PI - T(1)/x;
+
+    return res;
+}
+
+#else // C++11 version
 
 template<typename T>
 constexpr
@@ -56,8 +88,10 @@ T
 atan_series_order(const T x, const T x_pow, const uint_t order, const uint_t max_order)
 noexcept
 {
-    return( order == 1 ? \
-                GCEM_HALF_PI - T(1)/x + atan_series_order(x*x,pow(x,3),order+1,max_order) :
+    return( max_order == 1 ? \
+                T(GCEM_HALF_PI) - T(1)/x :
+            order == 1 ? \
+                T(GCEM_HALF_PI) - T(1)/x + atan_series_order(x*x,pow(x,3),order+1,max_order) :
             // NOTE: x changes to x*x for order > 1
             order < max_order ? \
                 atan_series_order_calc(x,x_pow,order) \
@@ -65,6 +99,8 @@ noexcept
             // order == max_order
                 atan_series_order_calc(x,x_pow,order) );
 }
+
+#endif
 
 template<typename T>
 constexpr
@@ -85,6 +121,28 @@ noexcept
 
 // CF
 
+#if __cplusplus >= 201402L // C++14 version
+
+template<typename T>
+constexpr
+T
+atan_cf_recur(const T xx, const uint_t depth_begin, const uint_t max_depth)
+noexcept
+{
+    uint_t depth = max_depth - 1;
+    T res = T(2*(depth+1) - 1);
+
+    while (depth > depth_begin - 1) {
+        res = T(2*depth - 1) + T(depth*depth) * xx / res;
+
+        --depth;
+    }
+
+    return res;
+}
+
+#else // C++11 version
+
 template<typename T>
 constexpr
 T
@@ -93,10 +151,12 @@ noexcept
 {
     return( depth < max_depth ? \
             // if
-                T(2*depth - 1) + depth*depth*xx/atan_cf_recur(xx,depth+1,max_depth) :
+                T(2*depth - 1) + T(depth*depth) * xx / atan_cf_recur(xx,depth+1,max_depth) :
             // else
                 T(2*depth - 1) );
 }
+
+#endif
 
 template<typename T>
 constexpr
@@ -104,14 +164,14 @@ T
 atan_cf_main(const T x)
 noexcept
 {
-    return( x < T(0.5) ? x/atan_cf_recur(x*x,1U, 15U ) : 
-            x < T(1)   ? x/atan_cf_recur(x*x,1U, 25U ) : 
-            x < T(1.5) ? x/atan_cf_recur(x*x,1U, 35U ) : 
-            x < T(2)   ? x/atan_cf_recur(x*x,1U, 45U ) : 
-                         x/atan_cf_recur(x*x,1U, 52U ) );
+    return( x < T(0.5) ? x/atan_cf_recur(x*x, 1U, 15U ) : 
+            x < T(1)   ? x/atan_cf_recur(x*x, 1U, 25U ) : 
+            x < T(1.5) ? x/atan_cf_recur(x*x, 1U, 35U ) : 
+            x < T(2)   ? x/atan_cf_recur(x*x, 1U, 45U ) : 
+                         x/atan_cf_recur(x*x, 1U, 52U ) );
 }
 
-//
+// choose between series expansion and continued fraction
 
 template<typename T>
 constexpr
@@ -121,6 +181,8 @@ noexcept
 {
     return( x > T(2.5) ? atan_series_main(x) : atan_cf_main(x) );
 }
+
+// check input
 
 template<typename T>
 constexpr

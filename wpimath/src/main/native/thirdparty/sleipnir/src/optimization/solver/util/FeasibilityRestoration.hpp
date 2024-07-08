@@ -8,6 +8,7 @@
 #include <span>
 
 #include <Eigen/Core>
+#include <wpi/SmallVector.h>
 
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableMatrix.hpp"
@@ -16,7 +17,6 @@
 #include "sleipnir/optimization/SolverStatus.hpp"
 #include "sleipnir/optimization/solver/InteriorPoint.hpp"
 #include "sleipnir/util/FunctionRef.hpp"
-#include "sleipnir/util/SmallVector.hpp"
 
 namespace sleipnir {
 
@@ -28,7 +28,6 @@ namespace sleipnir {
  * @param[in] decisionVariables The list of decision variables.
  * @param[in] equalityConstraints The list of equality constraints.
  * @param[in] inequalityConstraints The list of inequality constraints.
- * @param[in] f The cost function.
  * @param[in] μ Barrier parameter.
  * @param[in] callback The user callback.
  * @param[in] config Configuration options for the solver.
@@ -40,8 +39,8 @@ namespace sleipnir {
 inline void FeasibilityRestoration(
     std::span<Variable> decisionVariables,
     std::span<Variable> equalityConstraints,
-    std::span<Variable> inequalityConstraints, Variable& f, double μ,
-    function_ref<bool(const SolverIterationInfo&)> callback,
+    std::span<Variable> inequalityConstraints, double μ,
+    function_ref<bool(const SolverIterationInfo& info)> callback,
     const SolverConfig& config, Eigen::VectorXd& x, Eigen::VectorXd& s,
     SolverStatus* status) {
   // Feasibility restoration
@@ -66,7 +65,7 @@ inline void FeasibilityRestoration(
 
   constexpr double ρ = 1000.0;
 
-  small_vector<Variable> fr_decisionVariables;
+  wpi::SmallVector<Variable> fr_decisionVariables;
   fr_decisionVariables.reserve(decisionVariables.size() +
                                2 * equalityConstraints.size() +
                                2 * inequalityConstraints.size());
@@ -82,7 +81,7 @@ inline void FeasibilityRestoration(
     fr_decisionVariables.emplace_back();
   }
 
-  auto it = fr_decisionVariables.cbegin();
+  auto it = fr_decisionVariables.begin();
 
   VariableMatrix xAD{std::span{it, it + decisionVariables.size()}};
   it += decisionVariables.size();
@@ -158,7 +157,7 @@ inline void FeasibilityRestoration(
   }
 
   // cₑ(x) - pₑ + nₑ = 0
-  small_vector<Variable> fr_equalityConstraints;
+  wpi::SmallVector<Variable> fr_equalityConstraints;
   fr_equalityConstraints.assign(equalityConstraints.begin(),
                                 equalityConstraints.end());
   for (size_t row = 0; row < fr_equalityConstraints.size(); ++row) {
@@ -167,7 +166,7 @@ inline void FeasibilityRestoration(
   }
 
   // cᵢ(x) - s - pᵢ + nᵢ = 0
-  small_vector<Variable> fr_inequalityConstraints;
+  wpi::SmallVector<Variable> fr_inequalityConstraints;
   fr_inequalityConstraints.assign(inequalityConstraints.begin(),
                                   inequalityConstraints.end());
   for (size_t row = 0; row < fr_inequalityConstraints.size(); ++row) {

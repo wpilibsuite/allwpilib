@@ -33,13 +33,6 @@ class SLEIPNIR_DLLEXPORT Variable {
   Variable(double value) : expr{detail::MakeExpressionPtr(value)} {}  // NOLINT
 
   /**
-   * Constructs a Variable from an int.
-   *
-   * @param value The value of the Variable.
-   */
-  Variable(int value) : expr{detail::MakeExpressionPtr(value)} {}  // NOLINT
-
-  /**
    * Constructs a Variable pointing to the specified expression.
    *
    * @param expr The autodiff variable.
@@ -65,22 +58,11 @@ class SLEIPNIR_DLLEXPORT Variable {
   }
 
   /**
-   * Assignment operator for int.
-   *
-   * @param value The value of the Variable.
-   */
-  Variable& operator=(int value) {
-    expr = detail::MakeExpressionPtr(value);
-
-    return *this;
-  }
-
-  /**
    * Sets Variable's internal value.
    *
    * @param value The value of the Variable.
    */
-  Variable& SetValue(double value) {
+  void SetValue(double value) {
     if (expr->IsConstant(0.0)) {
       expr = detail::MakeExpressionPtr(value);
     } else {
@@ -94,29 +76,6 @@ class SLEIPNIR_DLLEXPORT Variable {
       }
       expr->value = value;
     }
-    return *this;
-  }
-
-  /**
-   * Sets Variable's internal value.
-   *
-   * @param value The value of the Variable.
-   */
-  Variable& SetValue(int value) {
-    if (expr->IsConstant(0.0)) {
-      expr = detail::MakeExpressionPtr(value);
-    } else {
-      // We only need to check the first argument since unary and binary
-      // operators both use it
-      if (expr->args[0] != nullptr && !expr->args[0]->IsConstant(0.0)) {
-        sleipnir::println(
-            stderr,
-            "WARNING: {}:{}: Modified the value of a dependent variable",
-            __FILE__, __LINE__);
-      }
-      expr->value = value;
-    }
-    return *this;
   }
 
   /**
@@ -224,23 +183,19 @@ class SLEIPNIR_DLLEXPORT Variable {
   /**
    * Returns the value of this variable.
    */
-  double Value() const { return expr->value; }
+  double Value() {
+    // Updates the value of this variable based on the values of its dependent
+    // variables
+    detail::ExpressionGraph{expr}.Update();
+
+    return expr->value;
+  }
 
   /**
    * Returns the type of this expression (constant, linear, quadratic, or
    * nonlinear).
    */
   ExpressionType Type() const { return expr->type; }
-
-  /**
-   * Updates the value of this variable based on the values of its dependent
-   * variables.
-   */
-  void Update() {
-    if (!expr->IsConstant(0.0)) {
-      detail::ExpressionGraph{expr}.Update();
-    }
-  }
 
  private:
   /// The expression node.

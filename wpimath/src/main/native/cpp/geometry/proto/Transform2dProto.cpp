@@ -4,12 +4,13 @@
 
 #include "frc/geometry/proto/Transform2dProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "geometry2d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Transform2d>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufTransform2d>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufTransform2d>(arena);
 }
 
 frc::Transform2d wpi::Protobuf<frc::Transform2d>::Unpack(

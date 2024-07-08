@@ -171,7 +171,7 @@ def overwrite_tests(wpiutil_root, llvm_root):
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/llvm/llvm-project", "llvmorg-18.1.7")
+    upstream_root = clone_repo("https://github.com/llvm/llvm-project", "llvmorg-18.1.8")
     wpilib_root = get_repo_root()
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 
@@ -213,6 +213,7 @@ def main():
         "0033-type_traits.h-Add-is_constexpr.patch",
         "0034-Add-back-removed-raw_string_ostream-write_impl.patch",
         "0035-Remove-auto-conversion-from-raw_ostream.patch",
+        "0036-Add-SmallVector-erase_if.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),

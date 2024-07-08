@@ -1,6 +1,3 @@
-import com.hubspot.jinjava.Jinjava;
-import com.hubspot.jinjava.JinjavaConfig;
-
 ext {
     useJava = true
     useCpp = true

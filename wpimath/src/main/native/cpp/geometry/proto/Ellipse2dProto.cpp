@@ -4,12 +4,13 @@
 
 #include "frc/geometry/proto/Ellipse2dProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "geometry2d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Ellipse2d>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufEllipse2d>(
-      arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufEllipse2d>(arena);
 }
 
 frc::Ellipse2d wpi::Protobuf<frc::Ellipse2d>::Unpack(

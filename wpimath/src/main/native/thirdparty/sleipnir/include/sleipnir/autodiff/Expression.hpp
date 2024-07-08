@@ -11,10 +11,11 @@
 #include <numbers>
 #include <utility>
 
+#include <wpi/SmallVector.h>
+
 #include "sleipnir/autodiff/ExpressionType.hpp"
 #include "sleipnir/util/IntrusiveSharedPtr.hpp"
 #include "sleipnir/util/Pool.hpp"
-#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir::detail {
@@ -225,15 +226,15 @@ struct SLEIPNIR_DLLEXPORT Expression {
 
     return MakeExpressionPtr(
         type, [](double lhs, double rhs) { return lhs * rhs; },
-        [](double lhs, double rhs, double parentAdjoint) {
+        [](double, double rhs, double parentAdjoint) {
           return parentAdjoint * rhs;
         },
-        [](double lhs, double rhs, double parentAdjoint) {
+        [](double lhs, double, double parentAdjoint) {
           return parentAdjoint * lhs;
         },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](const ExpressionPtr&, const ExpressionPtr& rhs,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint * rhs; },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](const ExpressionPtr& lhs, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint * lhs; },
         lhs, rhs);
   }
@@ -270,13 +271,13 @@ struct SLEIPNIR_DLLEXPORT Expression {
 
     return MakeExpressionPtr(
         type, [](double lhs, double rhs) { return lhs / rhs; },
-        [](double lhs, double rhs, double parentAdjoint) {
+        [](double, double rhs, double parentAdjoint) {
           return parentAdjoint / rhs;
         },
         [](double lhs, double rhs, double parentAdjoint) {
           return parentAdjoint * -lhs / (rhs * rhs);
         },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](const ExpressionPtr&, const ExpressionPtr& rhs,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint / rhs; },
         [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
            const ExpressionPtr& parentAdjoint) {
@@ -309,15 +310,11 @@ struct SLEIPNIR_DLLEXPORT Expression {
     return MakeExpressionPtr(
         std::max(lhs->type, rhs->type),
         [](double lhs, double rhs) { return lhs + rhs; },
-        [](double lhs, double rhs, double parentAdjoint) {
-          return parentAdjoint;
-        },
-        [](double lhs, double rhs, double parentAdjoint) {
-          return parentAdjoint;
-        },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](double, double, double parentAdjoint) { return parentAdjoint; },
+        [](double, double, double parentAdjoint) { return parentAdjoint; },
+        [](const ExpressionPtr&, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint; },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](const ExpressionPtr&, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint; },
         lhs, rhs);
   }
@@ -351,15 +348,11 @@ struct SLEIPNIR_DLLEXPORT Expression {
     return MakeExpressionPtr(
         std::max(lhs->type, rhs->type),
         [](double lhs, double rhs) { return lhs - rhs; },
-        [](double lhs, double rhs, double parentAdjoint) {
-          return parentAdjoint;
-        },
-        [](double lhs, double rhs, double parentAdjoint) {
-          return -parentAdjoint;
-        },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](double, double, double parentAdjoint) { return parentAdjoint; },
+        [](double, double, double parentAdjoint) { return -parentAdjoint; },
+        [](const ExpressionPtr&, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint; },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](const ExpressionPtr&, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return -parentAdjoint; },
         lhs, rhs);
   }
@@ -383,8 +376,8 @@ struct SLEIPNIR_DLLEXPORT Expression {
 
     return MakeExpressionPtr(
         lhs->type, [](double lhs, double) { return -lhs; },
-        [](double lhs, double, double parentAdjoint) { return -parentAdjoint; },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](double, double, double parentAdjoint) { return -parentAdjoint; },
+        [](const ExpressionPtr&, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return -parentAdjoint; },
         lhs);
   }
@@ -423,7 +416,7 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
   // Expression destructor when expr's refcount reaches zero can cause a stack
   // overflow. Instead, we iterate over its children to decrement their
   // refcounts and deallocate them.
-  small_vector<Expression*> stack;
+  wpi::SmallVector<Expression*> stack;
   stack.emplace_back(expr);
 
   while (!stack.empty()) {
@@ -939,9 +932,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sign(const ExpressionPtr& x) {
           return 1.0;
         }
       },
-      [](double x, double, double parentAdjoint) { return 0.0; },
-      [](const ExpressionPtr& x, const ExpressionPtr&,
-         const ExpressionPtr& parentAdjoint) {
+      [](double, double, double) { return 0.0; },
+      [](const ExpressionPtr&, const ExpressionPtr&, const ExpressionPtr&) {
         // Return zero
         return MakeExpressionPtr();
       },

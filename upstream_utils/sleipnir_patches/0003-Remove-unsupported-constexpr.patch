@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Mon, 20 May 2024 09:01:54 -0700
+Subject: [PATCH 3/5] Remove unsupported constexpr
+
+---
+ include/sleipnir/autodiff/Expression.hpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/sleipnir/autodiff/Expression.hpp b/include/sleipnir/autodiff/Expression.hpp
+index 065b28e790db32234042bcc94d9a1dac597dee86..e65b689559d01324fc4218c26144521832719025 100644
+--- a/include/sleipnir/autodiff/Expression.hpp
++++ b/include/sleipnir/autodiff/Expression.hpp
+@@ -21,8 +21,8 @@ namespace sleipnir::detail {
+ 
+ struct SLEIPNIR_DLLEXPORT Expression;
+ 
+-inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr);
+-inline constexpr void IntrusiveSharedPtrDecRefCount(Expression* expr);
++inline void IntrusiveSharedPtrIncRefCount(Expression* expr);
++inline void IntrusiveSharedPtrDecRefCount(Expression* expr);
+ 
+ /**
+  * Typedef for intrusive shared pointer to Expression.
+@@ -401,7 +401,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(const ExpressionPtr& x);
+  *
+  * @param expr The shared pointer's managed object.
+  */
+-inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr) {
++inline void IntrusiveSharedPtrIncRefCount(Expression* expr) {
+   ++expr->refCount;
+ }
+ 
+@@ -410,7 +410,7 @@ inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr) {
+  *
+  * @param expr The shared pointer's managed object.
+  */
+-inline constexpr void IntrusiveSharedPtrDecRefCount(Expression* expr) {
++inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
+   // If a deeply nested tree is being deallocated all at once, calling the
+   // Expression destructor when expr's refcount reaches zero can cause a stack
+   // overflow. Instead, we iterate over its children to decrement their

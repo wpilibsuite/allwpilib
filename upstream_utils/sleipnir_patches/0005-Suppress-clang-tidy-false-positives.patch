@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Wed, 26 Jun 2024 12:13:33 -0700
+Subject: [PATCH 5/5] Suppress clang-tidy false positives
+
+---
+ include/sleipnir/optimization/Constraints.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/sleipnir/optimization/Constraints.hpp b/include/sleipnir/optimization/Constraints.hpp
+index b940fcc4deb76c282b27564332db5e5935fbfbc6..f3eb8a276ded38cd3918c18810ddaa61590625c9 100644
+--- a/include/sleipnir/optimization/Constraints.hpp
++++ b/include/sleipnir/optimization/Constraints.hpp
+@@ -129,7 +129,7 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
+    *
+    * @param equalityConstraints The list of EqualityConstraints to concatenate.
+    */
+-  EqualityConstraints(
++  EqualityConstraints(  // NOLINT
+       std::initializer_list<EqualityConstraints> equalityConstraints) {
+     for (const auto& elem : equalityConstraints) {
+       constraints.insert(constraints.end(), elem.constraints.begin(),
+@@ -192,7 +192,7 @@ struct SLEIPNIR_DLLEXPORT InequalityConstraints {
+    * @param inequalityConstraints The list of InequalityConstraints to
+    * concatenate.
+    */
+-  InequalityConstraints(
++  InequalityConstraints(  // NOLINT
+       std::initializer_list<InequalityConstraints> inequalityConstraints) {
+     for (const auto& elem : inequalityConstraints) {
+       constraints.insert(constraints.end(), elem.constraints.begin(),

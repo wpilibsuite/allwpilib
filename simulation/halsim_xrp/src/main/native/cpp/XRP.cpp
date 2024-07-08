@@ -342,13 +342,17 @@ void XRP::ReadDIOTag(std::span<const uint8_t> packet) {
 
 void XRP::ReadEncoderTag(std::span<const uint8_t> packet) {
   if (packet.size() < 7) {
-    return;  // size(1) + tag(1) + id(1) + value(4)
+    return;  // size(1) + tag(1) + id(1) + count(4)
   }
+
+  // size(1) + tag(1) + id(1) + count(4) + period_numerator(4) +
+  // period_denominator(4)
+  bool containsPeriod = packet.size() >= 15;
 
   uint8_t encoderId = packet[2];
 
   packet = packet.subspan(3);  // Skip past the size and tag and ID
-  int32_t value =
+  int32_t count =
       static_cast<int32_t>(wpi::support::endian::read32be(&packet[0]));
 
   // Look up the registered encoders
@@ -361,7 +365,34 @@ void XRP::ReadEncoderTag(std::span<const uint8_t> packet) {
   wpi::json encJson;
   encJson["type"] = "Encoder";
   encJson["device"] = std::to_string(wpilibEncoderChannel);
-  encJson["data"] = {{">count", value}};
+  encJson["data"] = {{">count", count}};
+
+  if (containsPeriod) {
+    // Older versions of XRP firmware do not provide Encoder Period.
+    // Only calculate period if the Encoder packet contains the period data.
+
+    // The period is a fraction consisting of two integers: a numerator and
+    // denominator. The least significant bit of the numerator specifies the
+    // direction: 1 -> forward, 0 -> reverse.  The direction bit must be removed
+    // to calculate the magnitude of the period.
+
+    size_t i = sizeof(count);
+    uint32_t period_numerator =
+        static_cast<uint32_t>(wpi::support::endian::read32be(&packet[i]));
+
+    i += sizeof(period_numerator);
+    uint32_t period_denominator =
+        static_cast<uint32_t>(wpi::support::endian::read32be(&packet[i]));
+
+    double period =
+        static_cast<double>(period_numerator >> 1) / period_denominator;
+
+    // If direction is not forward, return negative value for period.
+    if (!(period_numerator & 1))
+      period = -period;
+
+    encJson["data"].push_back({wpi::json(">period"), wpi::json(period)});
+  }
 
   m_wpilib_update_func(encJson);
 }

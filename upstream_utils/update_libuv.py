@@ -13,7 +13,7 @@ from upstream_utils import (
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/libuv/libuv", "v1.47.0")
+    upstream_root = clone_repo("https://github.com/libuv/libuv", "v1.48.0")
     wpilib_root = get_repo_root()
     wpinet = os.path.join(wpilib_root, "wpinet")
 
@@ -29,6 +29,7 @@ def main():
         "0007-Use-C-atomics.patch",
         "0008-Remove-static-from-array-indices.patch",
         "0009-Add-pragmas-for-missing-libraries-and-set-_WIN32_WIN.patch",
+        "0010-Remove-swearing.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/libuv_patches", f))
 
