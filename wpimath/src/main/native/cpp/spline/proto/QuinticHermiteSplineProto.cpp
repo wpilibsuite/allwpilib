@@ -4,12 +4,13 @@
 
 #include "frc/spline/proto/QuinticHermiteSplineProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "spline.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::QuinticHermiteSpline>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufQuinticHermiteSpline>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufQuinticHermiteSpline>(arena);
 }
 
 frc::QuinticHermiteSpline wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(

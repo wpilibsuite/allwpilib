@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/ProtoHelper.h>
+
 #include "controller.pb.h"
 #include "frc/controller/proto/SimpleMotorFeedforwardProto.h"
 
@@ -11,8 +13,7 @@ template <class Distance>
 google::protobuf::Message*
 wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufSimpleMotorFeedforward>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufSimpleMotorFeedforward>(arena);
 }
 
 template <class Distance>

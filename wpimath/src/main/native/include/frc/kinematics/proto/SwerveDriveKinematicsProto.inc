@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/ProtoHelper.h>
+
 #include "frc/kinematics/proto/SwerveDriveKinematicsProto.h"
 #include "kinematics.pb.h"
 
@@ -11,8 +13,7 @@ template <size_t NumModules>
 google::protobuf::Message*
 wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufSwerveDriveKinematics>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufSwerveDriveKinematics>(arena);
 }
 
 template <size_t NumModules>

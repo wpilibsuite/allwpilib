@@ -4,12 +4,14 @@
 
 #include "frc/controller/proto/DifferentialDriveFeedforwardProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "controller.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<
     frc::DifferentialDriveFeedforward>::New(google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufDifferentialDriveFeedforward>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufDifferentialDriveFeedforward>(
+      arena);
 }
 
 frc::DifferentialDriveFeedforward

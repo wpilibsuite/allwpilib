@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/ProtoHelper.h>
+
 #include "frc/system/proto/LinearSystemProto.h"
 #include "system.pb.h"
 
@@ -11,8 +13,7 @@ template <int States, int Inputs, int Outputs>
 google::protobuf::Message*
 wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufLinearSystem>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufLinearSystem>(arena);
 }
 
 template <int States, int Inputs, int Outputs>

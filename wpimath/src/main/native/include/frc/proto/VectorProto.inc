@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/ProtoHelper.h>
+
 #include "frc/proto/VectorProto.h"
 #include "wpimath.pb.h"
 
@@ -11,8 +13,7 @@ template <int Size, int Options, int MaxRows, int MaxCols>
 google::protobuf::Message*
 wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufVector>(
-      arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufVector>(arena);
 }
 
 template <int Size, int Options, int MaxRows, int MaxCols>
