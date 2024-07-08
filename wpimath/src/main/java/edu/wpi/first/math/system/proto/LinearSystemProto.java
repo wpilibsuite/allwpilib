@@ -59,12 +59,9 @@ public final class LinearSystemProto<States extends Num, Inputs extends Num, Out
 
   @Override
   public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {
-      Matrix.getProto(m_states, m_states),
-      Matrix.getProto(m_states, m_inputs),
-      Matrix.getProto(m_outputs, m_states),
-      Matrix.getProto(m_outputs, m_inputs)
-    };
+    // We just need to make sure the protobuf definition gets published, so the actual parameters
+    // don't matter
+    return new Protobuf<?, ?>[] {Matrix.getProto(Nat.N1(), Nat.N1())};
   }
 
   @Override
