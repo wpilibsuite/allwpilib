@@ -23,11 +23,6 @@ public final class SwerveDriveKinematicsProto
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Translation2d.proto};
-  }
-
-  @Override
   public ProtobufSwerveDriveKinematics createMessage() {
     return ProtobufSwerveDriveKinematics.newInstance();
   }
