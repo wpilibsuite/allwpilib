@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/controller/SimpleMotorFeedforward.h"
@@ -13,7 +12,7 @@
 // frc::SimpleMotorFeedforward<units::meters>
 
 template <class Distance>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {
+struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {
   static google::protobuf::Message* New(google::protobuf::Arena* arena);
   static frc::SimpleMotorFeedforward<Distance> Unpack(
       const google::protobuf::Message& msg);

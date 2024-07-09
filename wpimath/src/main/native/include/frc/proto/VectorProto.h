@@ -4,14 +4,12 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/EigenCore.h"
 
 template <int Size, int Options, int MaxRows, int MaxCols>
-struct WPILIB_DLLEXPORT
-    wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
+struct wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
   static google::protobuf::Message* New(google::protobuf::Arena* arena);
   static frc::Matrixd<Size, 1, Options, MaxRows, MaxCols> Unpack(
       const google::protobuf::Message& msg);

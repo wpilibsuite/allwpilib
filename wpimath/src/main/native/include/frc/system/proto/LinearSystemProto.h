@@ -4,15 +4,13 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/proto/MatrixProto.h"
 #include "frc/system/LinearSystem.h"
 
 template <int States, int Inputs, int Outputs>
-struct WPILIB_DLLEXPORT
-    wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>> {
+struct wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>> {
   static google::protobuf::Message* New(google::protobuf::Arena* arena);
   static frc::LinearSystem<States, Inputs, Outputs> Unpack(
       const google::protobuf::Message& msg);

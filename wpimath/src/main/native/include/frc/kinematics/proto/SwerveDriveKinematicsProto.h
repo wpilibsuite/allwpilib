@@ -4,13 +4,12 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/kinematics/SwerveDriveKinematics.h"
 
 template <size_t NumModules>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>> {
+struct wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>> {
   static google::protobuf::Message* New(google::protobuf::Arena* arena);
   static frc::SwerveDriveKinematics<NumModules> Unpack(
       const google::protobuf::Message& msg);
