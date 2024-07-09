@@ -7,6 +7,7 @@
 #include <ctime>
 
 #include <wpi/DenseMap.h>
+#include <wpi/mutex.h>
 
 #include "HALInitializer.h"
 #include "hal/CAN.h"
