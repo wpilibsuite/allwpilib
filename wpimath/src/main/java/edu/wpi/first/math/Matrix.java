@@ -10,6 +10,7 @@ import edu.wpi.first.math.proto.MatrixProto;
 import edu.wpi.first.math.struct.MatrixStruct;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.Struct;
 import java.util.Objects;
 import org.ejml.MatrixDimensionException;
 import org.ejml.data.DMatrixRMaj;

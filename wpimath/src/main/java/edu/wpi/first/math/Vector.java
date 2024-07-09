@@ -10,6 +10,7 @@ import edu.wpi.first.math.proto.VectorProto;
 import edu.wpi.first.math.struct.VectorStruct;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.Struct;
 import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
 
