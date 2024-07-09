@@ -1,0 +1,164 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 10 Jan 2023 18:36:36 -0800
+Subject: [PATCH 04/10] Make orthogonal_iteration() exit early upon convergence
+ (#1)
+
+The current approach wastes iterations doing no work. Exiting early can
+give lower latencies and higher FPS.
+
+Co-authored-by: Matt <matthew.morley.ca@gmail.com>
+---
+ apriltag_pose.c         | 20 +++++++++++++++-----
+ apriltag_pose.h         |  3 ++-
+ common/pjpeg.c          |  2 +-
+ common/zhash.c          |  1 +
+ example/apriltag_demo.c | 22 ++++++++++++++++++++++
+ 5 files changed, 41 insertions(+), 7 deletions(-)
+
+diff --git a/apriltag_pose.c b/apriltag_pose.c
+index f0003a2d187df13236992026ee6ff7f9d6f7aff9..fc090c5ebb47ccf442edbbfeca2f5cc244206696 100644
+--- a/apriltag_pose.c
++++ b/apriltag_pose.c
+@@ -35,12 +35,13 @@ double matd_to_double(matd_t *a)
+  * @param R In/Outparam. Should be set to initial guess at R. Will be modified to be the optimal translation.
+  * @param n_points Number of points.
+  * @param n_steps Number of iterations.
++ * @param min_improvement_per_iteration Min object-space error improvement; if less than this, solver will exit early
+  *
+  * @return Object-space error after iteration.
+  *
+  * Implementation of Orthogonal Iteration from Lu, 2000.
+  */
+-double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int n_points, int n_steps) {
++double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int n_points, int n_steps, double min_improvement_per_iteration) {
+     matd_t* p_mean = matd_create(3, 1);
+     for (int i = 0; i < n_points; i++) {
+         matd_add_inplace(p_mean, p[i]);
+@@ -123,6 +124,12 @@ double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int
+         prev_error = error;
+ 
+         free(q);
++
++        // Return early if the iterations converged
++        if (fabs(error - prev_error) < min_improvement_per_iteration) {
++          prev_error = error;
++          break;
++        }
+     }
+ 
+     matd_destroy(I3);
+@@ -493,7 +500,8 @@ void estimate_tag_pose_orthogonal_iteration(
+         apriltag_pose_t* solution1,
+         double* err2,
+         apriltag_pose_t* solution2,
+-        int nIters) {
++        int nIters,
++        double min_improvement_per_iteration) {
+     double scale = info->tagsize/2.0;
+     matd_t* p[4] = {
+         matd_create_data(3, 1, (double[]) {-scale, scale, 0}),
+@@ -507,11 +515,11 @@ void estimate_tag_pose_orthogonal_iteration(
+     }
+ 
+     estimate_pose_for_tag_homography(info, solution1);
+-    *err1 = orthogonal_iteration(v, p, &solution1->t, &solution1->R, 4, nIters);
++    *err1 = orthogonal_iteration(v, p, &solution1->t, &solution1->R, 4, nIters, min_improvement_per_iteration);
+     solution2->R = fix_pose_ambiguities(v, p, solution1->t, solution1->R, 4);
+     if (solution2->R) {
+         solution2->t = matd_create(3, 1);
+-        *err2 = orthogonal_iteration(v, p, &solution2->t, &solution2->R, 4, nIters);
++        *err2 = orthogonal_iteration(v, p, &solution2->t, &solution2->R, 4, nIters, min_improvement_per_iteration);
+     } else {
+         solution2->t = NULL;
+         *err2 = HUGE_VAL;
+@@ -529,7 +537,9 @@ void estimate_tag_pose_orthogonal_iteration(
+ double estimate_tag_pose(apriltag_detection_info_t* info, apriltag_pose_t* pose) {
+     double err1, err2;
+     apriltag_pose_t pose1, pose2;
+-    estimate_tag_pose_orthogonal_iteration(info, &err1, &pose1, &err2, &pose2, 50);
++    // 50 iterations is a good sensible default
++    // 1e-7 improvement per iteration is also pretty sane
++    estimate_tag_pose_orthogonal_iteration(info, &err1, &pose1, &err2, &pose2, 50, 1e-7);
+     if (err1 <= err2) {
+         pose->R = pose1.R;
+         pose->t = pose1.t;
+diff --git a/apriltag_pose.h b/apriltag_pose.h
+index 07ee37b2cb4185bcbdb46d1c9ccec306f0f2e96d..72993f11514199754c452369bad32157b6d64eb1 100644
+--- a/apriltag_pose.h
++++ b/apriltag_pose.h
+@@ -63,7 +63,8 @@ void estimate_tag_pose_orthogonal_iteration(
+         apriltag_pose_t* pose1,
+         double* err2,
+         apriltag_pose_t* pose2,
+-        int nIters);
++        int nIters, 
++        double min_improvement_per_iteration);
+ 
+ /**
+  * Estimate tag pose.
+diff --git a/common/pjpeg.c b/common/pjpeg.c
+index 4a5dd028ee8a3d79fbe7a5abed30886cc6e40dae..8f573a0fd27ef454ca5653be99f7c7df6085ea78 100644
+--- a/common/pjpeg.c
++++ b/common/pjpeg.c
+@@ -96,7 +96,7 @@ static uint8_t mjpeg_dht[] = { // header
+     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,
+ 
+     /////////////////////////////////////////////////////////////
+-    // chrominance DC coefficients
++    // chrominance DC coefficents
+     // DC table 1
+     0x01,
+     // code lengths
+diff --git a/common/zhash.c b/common/zhash.c
+index faf52233ed92f64b87ddbab255121c8202b13019..914f530eca8742ed39fc814ab6587a4514c966b5 100644
+--- a/common/zhash.c
++++ b/common/zhash.c
+@@ -84,6 +84,7 @@ zhash_t *zhash_create_capacity(size_t keysz, size_t valuesz,
+     zh->entrysz = 1 + zh->keysz + zh->valuesz;
+ 
+     zh->entries = calloc(zh->nentries, zh->entrysz);
++    zh->nentries = nentries;
+ 
+     return zh;
+ }
+diff --git a/example/apriltag_demo.c b/example/apriltag_demo.c
+index 6de90540fe2f22f5160f725bce03d50bb3967c74..841d7788756011b0c7237e989242d87de76b14ef 100644
+--- a/example/apriltag_demo.c
++++ b/example/apriltag_demo.c
+@@ -42,6 +42,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ #endif
+ 
+ #include "apriltag.h"
++#include "apriltag_pose.h"
+ #include "tag36h11.h"
+ #include "tag25h9.h"
+ #include "tag16h5.h"
+@@ -218,6 +219,27 @@ int main(int argc, char *argv[])
+ 
+                 hamm_hist[det->hamming]++;
+                 total_hamm_hist[det->hamming]++;
++
++                apriltag_detection_info_t info = { det, 0.15, 1000, 1000, 1280/2, 720/2 };
++                double err1 = HUGE_VAL; //Should get overwritten if pose estimation is happening
++                double err2 = HUGE_VAL;
++                apriltag_pose_t pose1 = { 0 };
++                apriltag_pose_t pose2 = { 0 };
++                int nIters = 200;
++                estimate_tag_pose_orthogonal_iteration(&info, &err1, &pose1, &err2, &pose2, nIters, 1e-7);
++
++                printf("Primary translation %f %f %f\nerror: %f\n", 
++                    pose1.t->data[0],
++                    pose1.t->data[1],
++                    pose1.t->data[2],
++                    err1
++                );
++                printf("Alt translation %f %f %f\nerror: %f\n", 
++                    pose2.t->data[0],
++                    pose2.t->data[1],
++                    pose2.t->data[2],
++                    err2
++                );
+             }
+ 
+             apriltag_detections_destroy(detections);

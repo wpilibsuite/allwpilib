@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 13 Jun 2023 11:38:26 -0700
+Subject: [PATCH 05/10] Fix early exit (#3)
+
+---
+ apriltag_pose.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/apriltag_pose.c b/apriltag_pose.c
+index fc090c5ebb47ccf442edbbfeca2f5cc244206696..782729225c3555edcfebb7d8a21f847aad0e328f 100644
+--- a/apriltag_pose.c
++++ b/apriltag_pose.c
+@@ -121,7 +121,6 @@ double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int
+             error += matd_to_double(matd_op("M'M", err_vec, err_vec));
+             matd_destroy(err_vec);
+         }
+-        prev_error = error;
+ 
+         free(q);
+ 
+@@ -130,6 +129,8 @@ double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int
+           prev_error = error;
+           break;
+         }
++
++        prev_error = error;
+     }
+ 
+     matd_destroy(I3);

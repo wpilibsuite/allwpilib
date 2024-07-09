@@ -20,6 +20,7 @@ generatedFileExclude {
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
   fieldImages/src/main/native/resources/
   apriltag/src/test/resources/
+  apriltag/src/main/native/thirdparty/
   wpilibc/src/generated/
 }
 

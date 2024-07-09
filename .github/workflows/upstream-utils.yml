@@ -30,6 +30,10 @@ jobs:
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
+      - name: Run update_apriltag.py
+        run: |
+          cd upstream_utils
+          ./update_apriltag.py
       - name: Run update_eigen.py
         run: |
           cd upstream_utils
