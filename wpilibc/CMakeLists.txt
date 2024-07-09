@@ -25,7 +25,6 @@ target_include_directories(
 wpilib_target_warnings(wpilibc)
 
 if(WITH_CSCORE)
-    find_package(OpenCV)
     target_link_libraries(wpilibc PUBLIC cameraserver cscore ${OpenCV_LIBS})
 else()
     target_compile_definitions(wpilibc PRIVATE DYNAMIC_CAMERA_SERVER)

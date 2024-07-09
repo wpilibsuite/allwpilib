@@ -3,8 +3,6 @@ project(cameraserver)
 include(CompileWarnings)
 include(AddTest)
 
-find_package(OpenCV REQUIRED)
-
 # Java bindings
 if(WITH_JAVA)
     include(UseJava)

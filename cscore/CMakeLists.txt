@@ -5,8 +5,6 @@ include(CompileWarnings)
 include(AddTest)
 include(LinkMacOSGUI)
 
-find_package(OpenCV REQUIRED)
-
 file(GLOB cscore_native_src src/main/native/cpp/*.cpp)
 file(GLOB cscore_linux_src src/main/native/linux/*.cpp)
 file(GLOB cscore_osx_src src/main/native/osx/*.cpp)

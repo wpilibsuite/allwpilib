@@ -2,7 +2,6 @@ project(wpilibj)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(OpenCV REQUIRED)
     include(UseJava)
 
     set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/java/opencv4)
