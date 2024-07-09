@@ -58,6 +58,7 @@ include 'msvcruntime'
 include 'ntcoreffi'
 include 'apriltag'
 include 'processstarter'
+include 'third_party:googletest'
 
 buildCache {
     def cred = {

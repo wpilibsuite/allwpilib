@@ -162,7 +162,8 @@ model {
                         it.linker.args << '-lGL'
                     }
                 }
-                nativeUtils.useRequiredLibrary(it, "googletest_static")
+
+                lib project: ':third_party:googletest', library: 'googletest', linkage: 'static'
                 it.cppCompiler.define("RUNNING_SYSID_TESTS")
             }
         }
