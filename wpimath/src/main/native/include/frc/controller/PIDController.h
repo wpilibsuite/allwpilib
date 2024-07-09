@@ -137,7 +137,7 @@ class WPILIB_DLLEXPORT PIDController
 
   /**
    * Gets the accumulated error used in the integral calculation of this controller.
-   * 
+   *
    * @return The accumulated error of this controller.
    */
   double GetAccumulatedError() const;
