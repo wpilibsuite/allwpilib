@@ -11,6 +11,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.Kinematics;
@@ -123,6 +124,36 @@ public class PoseEstimator<T> {
     m_odometryPoseBuffer.clear();
     m_visionUpdates.clear();
     m_poseEstimate = m_odometry.getPoseMeters();
+  }
+
+  /**
+   * Resets the robot's pose.
+   *
+   * @param pose The pose to reset to.
+   */
+  public void resetPose(Pose2d pose) {
+    m_odometry.resetPose(pose);
+    m_odometryPoseBuffer.clear();
+  }
+
+  /**
+   * Resets the robot's translation.
+   *
+   * @param translation The pose to translation to.
+   */
+  public void resetTranslation(Translation2d translation) {
+    m_odometry.resetTranslation(translation);
+    m_odometryPoseBuffer.clear();
+  }
+
+  /**
+   * Resets the robot's rotation.
+   *
+   * @param rotation The rotation to reset to.
+   */
+  public void resetRotation(Rotation2d rotation) {
+    m_odometry.resetRotation(rotation);
+    m_odometryPoseBuffer.clear();
   }
 
   /**
