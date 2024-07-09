@@ -15,6 +15,7 @@ if(WITH_JAVA)
         INCLUDE_JARS
             hal_jar
             ntcore_jar
+            ${JACKSON_JARS}
             cscore_jar
             cameraserver_jar
             wpimath_jar
