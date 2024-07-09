@@ -7,6 +7,7 @@ package edu.wpi.first.math;
 import edu.wpi.first.math.jni.EigenJNI;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.proto.MatrixProto;
+import edu.wpi.first.math.struct.MatrixStruct;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import java.util.Objects;
@@ -754,5 +755,19 @@ public class Matrix<R extends Num, C extends Num> implements ProtobufSerializabl
   public static <R extends Num, C extends Num> MatrixProto<R, C> getProto(
       Nat<R> rows, Nat<C> cols) {
     return new MatrixProto<>(rows, cols);
+  }
+
+  /**
+   * Creates an implementation of the {@link Struct} interfaces for matrices.
+   *
+   * @param <R> The number of rows of the matrices this serializer processes.
+   * @param <C> The number of cols of the matrices this serializer processes.
+   * @param rows The number of rows of the matrices this serializer processes.
+   * @param cols The number of cols of the matrices this serializer processes.
+   * @return The struct implementation.
+   */
+  public static <R extends Num, C extends Num> MatrixStruct<R, C> getStruct(
+      Nat<R> rows, Nat<C> cols) {
+    return new MatrixStruct<>(rows, cols);
   }
 }
