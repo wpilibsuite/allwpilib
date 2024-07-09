@@ -26,8 +26,9 @@ struct CANStorage {
   HAL_CANManufacturer manufacturer;
   HAL_CANDeviceType deviceType;
   uint8_t deviceId;
-  wpi::mutex mapMutex;
+  wpi::mutex periodicSendsMutex;
   wpi::SmallDenseMap<int32_t, int32_t> periodicSends;
+  wpi::mutex receivesMutex;
   wpi::SmallDenseMap<int32_t, Receives> receives;
 };
 }  // namespace
@@ -89,7 +90,7 @@ void HAL_CleanCAN(HAL_CANHandle handle) {
     return;
   }
 
-  std::scoped_lock lock(data->mapMutex);
+  std::scoped_lock lock(data->periodicSendsMutex);
 
   for (auto&& i : data->periodicSends) {
     int32_t s = 0;
@@ -108,12 +109,12 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, const uint8_t* data,
   }
   auto id = CreateCANId(can.get(), apiId);
 
+  std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
 
   if (*status != 0) {
     return;
   }
-  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = -1;
 }
 
@@ -127,12 +128,12 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
   }
   auto id = CreateCANId(can.get(), apiId);
 
+  std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, data, length, repeatMs, status);
 
   if (*status != 0) {
     return;
   }
-  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = repeatMs;
 }
 
@@ -148,12 +149,12 @@ void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
   uint8_t data[8];
   std::memset(data, 0, sizeof(data));
 
+  std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
 
   if (*status != 0) {
     return;
   }
-  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = -1;
 }
 
@@ -166,13 +167,13 @@ void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
   }
   auto id = CreateCANId(can.get(), apiId);
 
+  std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, nullptr, 0, HAL_CAN_SEND_PERIOD_STOP_REPEATING,
                       status);
 
   if (*status != 0) {
     return;
   }
-  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = -1;
 }
 
@@ -191,7 +192,7 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
   if (*status == 0) {
-    std::scoped_lock lock(can->mapMutex);
+    std::scoped_lock lock(can->receivesMutex);
     auto& msg = can->receives[messageId];
     msg.length = dataSize;
     msg.lastTimeStamp = ts;
@@ -216,7 +217,7 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  std::scoped_lock lock(can->mapMutex);
+  std::scoped_lock lock(can->receivesMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[messageId];
@@ -253,7 +254,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  std::scoped_lock lock(can->mapMutex);
+  std::scoped_lock lock(can->receivesMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[messageId];
