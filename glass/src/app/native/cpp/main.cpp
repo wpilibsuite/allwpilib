@@ -240,6 +240,9 @@ int main(int argc, char** argv) {
 
   gMainMenu.AddMainMenu([] {
     if (ImGui::BeginMenu("View")) {
+      ImGui::MenuItem(
+          "Bounds Checking", nullptr,
+          &glass::GetStorageRoot().GetBool("bounds_checking", true));
       if (ImGui::MenuItem("Set Enter Key")) {
         gSetEnterKey = true;
       }

@@ -70,7 +70,9 @@ void Window::Display() {
     // necessary
     ImVec2 min = {};
     ImVec2 max = ImGui::GetMainViewport()->Size;
-    if (max.x > 0 && max.y > 0) {  // Make sure the window isn't minimized
+    // Make sure the window isn't minimized and bounds checking is enabled
+    if (max.x > 0 && max.y > 0 &&
+        glass::GetStorageRoot().GetBool("bounds_checking", true)) {
       // Might need to shrink window to fit in viewport
       ImVec2 newSize = {std::clamp(window->Size.x, 0.0f, max.x - min.x),
                         std::clamp(window->Size.y, 0.0f, max.y - min.y)};
