@@ -142,10 +142,16 @@ def update_glfw():
 
         return False
 
-    files = walk_cwd_and_copy_if(
+    src_files = walk_cwd_and_copy_if(
         src_filter,
         os.path.join(glfw),
     )
+
+    # The upstream library automatically changes the files from .c -> .cpp. We want to keep it .c
+    for f in src_files:
+        print(f)
+        if f.endswith(".cpp"):
+            shutil.move(f, f[:-2])
 
 
 def update_stb():
@@ -206,20 +212,20 @@ def update_gl3w():
 def main():
     original_dir = os.getcwd()
 
-    update_imgui()
-    os.chdir(original_dir)
+    # update_imgui()
+    # os.chdir(original_dir)
 
     update_glfw()
     os.chdir(original_dir)
 
-    update_implot()
-    os.chdir(original_dir)
+    # update_implot()
+    # os.chdir(original_dir)
 
-    update_stb()
-    os.chdir(original_dir)
+    # update_stb()
+    # os.chdir(original_dir)
 
-    update_gl3w()
-    os.chdir(original_dir)
+    # update_gl3w()
+    # os.chdir(original_dir)
 
 
 if __name__ == "__main__":

@@ -41,7 +41,7 @@ model {
                 c {
                     source {
                         srcDirs 'generated/gl3w/src', 'glfw/src'
-                        include 'gl3w.c', 'context.cpp', 'init.cpp', 'input.cpp', 'monitor.cpp', 'platform.cpp', 'vulkan.cpp', 'window.cpp', 'egl_context.cpp', 'osmesa_context.cpp', 'null_init.cpp', 'null_monitor.cpp', 'null_window.cpp', 'null_joystick.cpp'
+                        include 'gl3w.c', 'context.c', 'init.c', 'input.c', 'monitor.c', 'platform.c', 'vulkan.c', 'window.c', 'egl_context.c', 'osmesa_context.c', 'null_init.c', 'null_monitor.c', 'null_window.c', 'null_joystick.c'
                     }
                     exportedHeaders {
                         srcDirs 'generated/gl3w/include', 'glfw/include'
@@ -79,14 +79,14 @@ model {
                             source {
                                 srcDirs 'glfw/src'
                                 includes = [
-                                    'win32_init.cpp',
-                                    'win32_joystick.cpp',
-                                    'win32_module.cpp',
-                                    'win32_monitor.cpp',
-                                    'win32_time.cpp',
-                                    'win32_thread.cpp',
-                                    'win32_window.cpp',
-                                    'wgl_context.cpp',
+                                    'win32_init.c',
+                                    'win32_joystick.c',
+                                    'win32_module.c',
+                                    'win32_monitor.c',
+                                    'win32_time.c',
+                                    'win32_thread.c',
+                                    'win32_window.c',
+                                    'wgl_context.c',
                                 ]
                             }
                         }
@@ -112,9 +112,9 @@ model {
                             source {
                                 srcDirs 'glfw/src'
                                 includes = [
-                                    'cocoa_time.cpp',
-                                    'posix_module.cpp',
-                                    'posix_thread.cpp',
+                                    'cocoa_time.c',
+                                    'posix_module.c',
+                                    'posix_thread.c',
                                 ]
                             }
                         }
@@ -139,16 +139,16 @@ model {
                             source {
                                 srcDirs 'glfw/src'
                                 includes = [
-                                    'x11_init.cpp',
-                                    'x11_monitor.cpp',
-                                    'x11_window.cpp',
-                                    'xkb_unicode.cpp',
-                                    'posix_module.cpp',
-                                    'posix_poll.cpp',
-                                    'posix_time.cpp',
-                                    'posix_thread.cpp',
-                                    'glx_context.cpp',
-                                    'linux_joystick.cpp',
+                                    'x11_init.c',
+                                    'x11_monitor.c',
+                                    'x11_window.c',
+                                    'xkb_unicode.c',
+                                    'posix_module.c',
+                                    'posix_poll.c',
+                                    'posix_time.c',
+                                    'posix_thread.c',
+                                    'glx_context.c',
+                                    'linux_joystick.c',
                                 ]
                             }
                         }
