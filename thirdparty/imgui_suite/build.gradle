@@ -1,5 +1,9 @@
 import org.gradle.internal.os.OperatingSystem
 
+if (project.hasProperty('onlylinuxathena')) {
+    return;
+}
+
 apply plugin: 'c'
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'

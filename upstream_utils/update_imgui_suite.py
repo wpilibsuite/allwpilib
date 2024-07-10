@@ -81,7 +81,14 @@ def update_implot():
     wpilib_root = get_repo_root()
     implot = os.path.join(wpilib_root, "thirdparty", "imgui_suite", "implot")
 
+    # Apply patches to upstream Git repo
     os.chdir(upstream_root)
+    for f in [
+        "0001-Supress-compiler-warnings.patch",
+    ]:
+        git_am(
+            os.path.join(wpilib_root, "upstream_utils/imgui_suite_patches/implot", f)
+        )
 
     # Delete old install
     for d in ["include", "cpp"]:
@@ -106,7 +113,12 @@ def update_glfw():
     wpilib_root = get_repo_root()
     glfw = os.path.join(wpilib_root, "thirdparty", "imgui_suite", "glfw")
 
+    # Apply patches to upstream Git repo
     os.chdir(upstream_root)
+    for f in [
+        "0001-Suppress-Compiler-Warnings.patch",
+    ]:
+        git_am(os.path.join(wpilib_root, "upstream_utils/imgui_suite_patches/glfw", f))
 
     # Delete old install
     for d in ["include", "src"]:
@@ -164,9 +176,10 @@ def update_stb():
             """#define STBI_WINDOWS_UTF8
 #define STB_IMAGE_IMPLEMENTATION
 
-
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
 #include "stb_image.h"
 """
