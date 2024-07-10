@@ -42,6 +42,10 @@ jobs:
         run: |
           cd upstream_utils
           ./update_gcem.py
+      - name: Run update_imgui_suite.py
+        run: |
+          cd upstream_utils
+          ./update_imgui_suite.py
       - name: Run update_json.py
         run: |
           cd upstream_utils
