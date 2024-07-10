@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Double",
+    "DataType": "double",
+    "AppendType": "double"
+  },
+  {
+    "name": "DoubleArray",
+    "DataType": "double[]",
+    "AppendType": "double[]"
+  },
+  {
+    "name": "Float",
+    "DataType": "float",
+    "AppendType": "float"
+  },
+  {
+    "name": "FloatArray",
+    "DataType": "float[]",
+    "AppendType": "float[]"
+  },
+  {
+    "name": "Integer",
+    "DataType": "int64",
+    "AppendType": "long"
+  },
+  {
+    "name": "IntegerArray",
+    "DataType": "int64[]",
+    "AppendType": "long[]"
+  },
+  {
+    "name": "Boolean",
+    "DataType": "boolean",
+    "AppendType": "boolean"
+  },
+  {
+    "name": "BooleanArray",
+    "DataType": "boolean[]",
+    "AppendType": "boolean[]"
+  },
+  {
+    "name": "String",
+    "DataType": "String",
+    "AppendType": "String"
+  },
+  {
+    "name": "StringArray",
+    "DataType": "string[]",
+    "AppendType": "String[]"
+  }
+]
