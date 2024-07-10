@@ -44,7 +44,7 @@ def main():
         shallow=False,
     )
     wpilib_root = get_repo_root()
-    third_party_root = os.path.join(wpilib_root, "third_party/googletest")
+    third_party_root = os.path.join(wpilib_root, "thirdparty/googletest")
 
     # Delete old install
     for d in [
