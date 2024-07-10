@@ -11,9 +11,9 @@ cppSrcFileInclude {
 
 modifiableFileExclude {
   cmake/toolchains/
+  thirdparty/
   \.patch$
   gradlew
-  third_party/
 }
 
 generatedFileExclude {

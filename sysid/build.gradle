@@ -163,7 +163,7 @@ model {
                     }
                 }
 
-                lib project: ':third_party:googletest', library: 'googletest', linkage: 'static'
+                lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
                 it.cppCompiler.define("RUNNING_SYSID_TESTS")
             }
         }
