@@ -38,8 +38,10 @@
 #error Must include implot.h before implot_internal.h
 #endif
 
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
 
 // Support for pre-1.84 versions. ImPool's GetSize() -> GetBufSize()
 #if (IMGUI_VERSION_NUM < 18303)
@@ -1668,4 +1670,6 @@ void Locator_SymLog(ImPlotTicker& ticker, const ImPlotRange& range, float pixels
 
 } // namespace ImPlot
 
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif

@@ -26,7 +26,9 @@
 #include "implot.h"
 #include "implot_internal.h"
 
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
 
 //-----------------------------------------------------------------------------
 // [SECTION] Macros and Defines

@@ -58,8 +58,10 @@
 //
 // 3. This notice may not be removed or altered from any source distribution.
 
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
+#endif
 
 const char* _glfwDefaultMappings[] =
 {
@@ -1002,4 +1004,6 @@ const char* _glfwDefaultMappings[] =
 #endif // GLFW_BUILD_LINUX_MAPPINGS
 };
 
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif

@@ -62,10 +62,10 @@ model {
                         imguiWindowsCpp(CppSourceSet) {
                             source {
                                 srcDirs 'imgui'
-                                include 'backends/imgui_impl_dx11.cpp'
+                                include 'cpp/backends/imgui_impl_dx11.cpp'
                             }
                             exportedHeaders {
-                                srcDirs 'imgui'
+                                srcDirs 'imgui/include', 'imgui/include/backends'
                                 include '*.h', 'backends/imgui_impl_dx11.h'
                             }
                         }
@@ -95,10 +95,10 @@ model {
                         imguiMacObjectiveCpp(ObjectiveCppSourceSet) {
                             source {
                                 srcDirs 'imgui'
-                                include 'backends/imgui_impl_metal.mm'
+                                include 'cpp/backends/imgui_impl_metal.mm'
                             }
                             exportedHeaders {
-                                srcDirs 'imgui'
+                                srcDirs 'imgui/include', 'imgui/include/backends'
                                 include '*.h', 'backends/imgui_impl_metal.h'
                             }
                         }
