@@ -15,8 +15,8 @@ from upstream_utils import (
 def main():
     upstream_root = clone_repo(
         "https://github.com/SleipnirGroup/Sleipnir",
-        # main on 2024-07-05
-        "b90f89d343379dd8dc88f22e0462eb7b59006b2c",
+        # main on 2024-07-09
+        "b6ffa2d4fdb99cab1bf79491f715a6a9a86633b5",
         shallow=False,
     )
     wpilib_root = get_repo_root()

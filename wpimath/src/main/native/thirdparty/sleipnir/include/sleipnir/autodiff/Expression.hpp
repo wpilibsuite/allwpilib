@@ -20,6 +20,14 @@
 
 namespace sleipnir::detail {
 
+// The global pool allocator uses a thread-local static pool resource, which
+// isn't guaranteed to be initialized properly across DLL boundaries on Windows
+#ifdef _WIN32
+inline constexpr bool kUsePoolAllocator = false;
+#else
+inline constexpr bool kUsePoolAllocator = true;
+#endif
+
 struct SLEIPNIR_DLLEXPORT Expression;
 
 inline void IntrusiveSharedPtrIncRefCount(Expression* expr);
@@ -38,8 +46,12 @@ using ExpressionPtr = IntrusiveSharedPtr<Expression>;
  */
 template <typename... Args>
 static ExpressionPtr MakeExpressionPtr(Args&&... args) {
-  return AllocateIntrusiveShared<Expression>(GlobalPoolAllocator<Expression>(),
-                                             std::forward<Args>(args)...);
+  if constexpr (kUsePoolAllocator) {
+    return AllocateIntrusiveShared<Expression>(
+        GlobalPoolAllocator<Expression>(), std::forward<Args>(args)...);
+  } else {
+    return MakeIntrusiveShared<Expression>(std::forward<Args>(args)...);
+  }
 }
 
 /**
@@ -437,9 +449,11 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
 
       // Not calling the destructor here is safe because it only decrements
       // refcounts, which was already done above.
-      auto alloc = GlobalPoolAllocator<Expression>();
-      std::allocator_traits<decltype(alloc)>::deallocate(alloc, elem,
-                                                         sizeof(Expression));
+      if constexpr (kUsePoolAllocator) {
+        auto alloc = GlobalPoolAllocator<Expression>();
+        std::allocator_traits<decltype(alloc)>::deallocate(alloc, elem,
+                                                           sizeof(Expression));
+      }
     }
   }
 }
