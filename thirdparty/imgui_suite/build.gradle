@@ -14,12 +14,14 @@ if (OperatingSystem.current().isMacOsX()) {
     apply plugin: 'objective-cpp'
 }
 
-ext {
-    nativeName = 'imgui_suite'
-}
-
 apply from: "${rootDir}/shared/config.gradle"
 
+nativeUtils.platformConfigs.named('osxuniversal') {
+    it.objcCompiler.args.remove('-fobjc-weak')
+    it.objcCompiler.args.remove('-fobjc-arc')
+    it.objcppCompiler.args.remove('-fobjc-weak')
+    it.objcppCompiler.args.remove('-fobjc-arc')
+}
 
 model {
 
