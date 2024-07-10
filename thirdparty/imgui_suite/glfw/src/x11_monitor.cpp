@@ -34,6 +34,7 @@
 #include <string.h>
 #include <math.h>
 
+#pragma GCC diagnostic ignored "-Wsign-compare"
 
 // Check whether the display mode should be included in enumeration
 //

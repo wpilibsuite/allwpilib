@@ -36,6 +36,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+
 // Internal key state used for sticky keys
 #define _GLFW_STICK 3
 

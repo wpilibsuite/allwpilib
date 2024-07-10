@@ -39,6 +39,7 @@
 #include <errno.h>
 #include <assert.h>
 
+#pragma GCC diagnostic ignored "-Wsign-compare"
 
 // Translate the X11 KeySyms for a key to a GLFW key code
 // NOTE: This is only used as a fallback, in case the XKB method fails

@@ -31,6 +31,8 @@
 
 #include <stdlib.h>
 
+#pragma GCC diagnostic ignored "-Wsign-compare"
+
 static void applySizeLimits(_GLFWwindow* window, int* width, int* height)
 {
     if (window->numer != GLFW_DONT_CARE && window->denom != GLFW_DONT_CARE)
