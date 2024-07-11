@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include <memory>
 #include <string_view>
+#include <utility>
 
 #include <wpi/function_ref.h>
 
@@ -49,6 +51,19 @@ class PneumaticControlsModel : public Model {
   virtual void ForEachPneumaticControl(
       wpi::function_ref<void(PneumaticControlModel& model, int index)>
           func) = 0;
+};
+
+struct AllPneumaticControlsModel : public Model {
+  AllPneumaticControlsModel(std::unique_ptr<PneumaticControlsModel> pcms,
+                            std::unique_ptr<PneumaticControlsModel> phs)
+      : pcms{std::move(pcms)}, phs{std::move(phs)} {};
+  std::unique_ptr<PneumaticControlsModel> pcms;
+  std::unique_ptr<PneumaticControlsModel> phs;
+  void Update() override {
+    pcms->Update();
+    phs->Update();
+  };
+  bool Exists() override { return true; }
 };
 
 bool DisplayPneumaticControlSolenoids(PneumaticControlModel* model, int index,

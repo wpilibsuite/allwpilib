@@ -41,19 +41,6 @@ namespace gui = wpi::gui;
 
 static std::unique_ptr<glass::PlotProvider> gPlotProvider;
 
-struct PneumaticControls : glass::Model {
-  PneumaticControls(std::unique_ptr<glass::PneumaticControlsModel> pcms,
-                    std::unique_ptr<glass::PneumaticControlsModel> phs)
-      : pcms{std::move(pcms)}, phs{std::move(phs)} {};
-  std::unique_ptr<glass::PneumaticControlsModel> pcms;
-  std::unique_ptr<glass::PneumaticControlsModel> phs;
-  void Update() override {
-    pcms->Update();
-    phs->Update();
-  };
-  bool Exists() override { return true; }
-};
-
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
 __declspec(dllexport)
@@ -105,19 +92,20 @@ __declspec(dllexport)
   TimingGui::Initialize();
 
   HALSimGui::halProvider->RegisterModel(
-      "PneumaticControls",
+      "AllPneumaticControls",
       [] {
         return PCMSimGui::PCMsAnyInitialized() || PHSimGui::PHsAnyInitialized();
       },
       [] {
-        return std::make_unique<PneumaticControls>(PCMSimGui::GetPCMsModel(),
-                                                   PHSimGui::GetPHsModel());
+        return std::make_unique<glass::AllPneumaticControlsModel>(
+            PCMSimGui::GetPCMsModel(), PHSimGui::GetPHsModel());
       });
 
   HALSimGui::halProvider->RegisterView(
-      "Solenoids", "PneumaticControls",
+      "Solenoids", "AllPneumaticControls",
       [](glass::Model* model) {
-        auto pneumaticModel = static_cast<PneumaticControls*>(model);
+        auto pneumaticModel =
+            static_cast<glass::AllPneumaticControlsModel*>(model);
         return PCMSimGui::PCMsAnySolenoids(pneumaticModel->pcms.get()) ||
                PHSimGui::PHsAnySolenoids(pneumaticModel->phs.get());
       },
@@ -125,7 +113,8 @@ __declspec(dllexport)
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(290, 20);
         return glass::MakeFunctionView([=] {
-          auto pneumaticModel = static_cast<PneumaticControls*>(model);
+          auto pneumaticModel =
+              static_cast<glass::AllPneumaticControlsModel*>(model);
           glass::DisplayPneumaticControlsSolenoids(
               pneumaticModel->pcms.get(),
               HALSimGui::halProvider->AreOutputsEnabled());
