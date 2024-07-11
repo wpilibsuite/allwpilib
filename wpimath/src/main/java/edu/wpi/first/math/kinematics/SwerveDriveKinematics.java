@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.SwerveDriveKinematicsProto;
+import edu.wpi.first.math.kinematics.struct.SwerveDriveKinematicsStruct;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -423,4 +424,14 @@ public class SwerveDriveKinematics
 
   /** SwerveDriveKinematics protobuf for serialization. */
   public static final SwerveDriveKinematicsProto proto = new SwerveDriveKinematicsProto();
+
+  /**
+   * Creates an implementation of the {@link Struct} interface for swerve drive kinematics objects.
+   *
+   * @param numModules The number of modules of the kinematics objects this serializer processes.
+   * @return The struct implementation.
+   */
+  public static final SwerveDriveKinematicsStruct getStruct(int numModules) {
+    return new SwerveDriveKinematicsStruct(numModules);
+  }
 }
