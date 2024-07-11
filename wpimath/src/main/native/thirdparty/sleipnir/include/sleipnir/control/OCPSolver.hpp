@@ -308,21 +308,21 @@ class SLEIPNIR_DLLEXPORT OCPSolver : public OptimizationProblem {
   }
 
   /**
-   * Convenience function to set an upper bound on the timestep.
-   *
-   * @param maxTimestep The maximum timestep.
-   */
-  void SetMaxTimestep(std::chrono::duration<double> maxTimestep) {
-    SubjectTo(DT() <= maxTimestep.count());
-  }
-
-  /**
    * Convenience function to set a lower bound on the timestep.
    *
    * @param minTimestep The minimum timestep.
    */
   void SetMinTimestep(std::chrono::duration<double> minTimestep) {
     SubjectTo(DT() >= minTimestep.count());
+  }
+
+  /**
+   * Convenience function to set an upper bound on the timestep.
+   *
+   * @param maxTimestep The maximum timestep.
+   */
+  void SetMaxTimestep(std::chrono::duration<double> maxTimestep) {
+    SubjectTo(DT() <= maxTimestep.count());
   }
 
   /**
