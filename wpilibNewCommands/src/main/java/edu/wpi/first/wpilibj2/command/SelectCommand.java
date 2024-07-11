@@ -47,7 +47,7 @@ public class SelectCommand<K> extends Command {
         .registerComposedCommands(commands.values().toArray(new Command[] {}));
 
     for (Command command : m_commands.values()) {
-      m_requirements.addAll(command.getRequirements());
+      addRequirements(command.getRequirements());
       m_runsWhenDisabled &= command.runsWhenDisabled();
       if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
         m_interruptBehavior = InterruptionBehavior.kCancelSelf;
