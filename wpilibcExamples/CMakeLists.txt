@@ -41,7 +41,7 @@ foreach(example ${EXAMPLES})
             wpilibNewCommands
             romiVendordep
             xrpVendordep
-            gmock_main
+            googletest
         )
     endif()
 endforeach()

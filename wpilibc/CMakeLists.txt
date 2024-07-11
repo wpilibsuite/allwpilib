@@ -51,7 +51,7 @@ install(EXPORT wpilibc DESTINATION share/wpilibc)
 if(WITH_TESTS)
     wpilib_add_test(wpilibc src/test/native/cpp)
     target_include_directories(wpilibc_test PRIVATE src/test/native/include)
-    target_link_libraries(wpilibc_test wpilibc gmock_main)
+    target_link_libraries(wpilibc_test wpilibc googletest)
     if(NOT WITH_CSCORE)
         target_compile_definitions(wpilibc_test PRIVATE DYNAMIC_CAMERA_SERVER)
         # Add just the camera server include directory

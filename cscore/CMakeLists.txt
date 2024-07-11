@@ -193,5 +193,5 @@ endif()
 
 if(WITH_TESTS)
     wpilib_add_test(cscore src/test/native/cpp)
-    target_link_libraries(cscore_test cscore gmock)
+    target_link_libraries(cscore_test cscore googletest)
 endif()

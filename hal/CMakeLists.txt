@@ -107,5 +107,5 @@ endif()
 
 if(WITH_TESTS)
     wpilib_add_test(hal src/test/native/cpp)
-    target_link_libraries(hal_test hal gtest)
+    target_link_libraries(hal_test hal googletest)
 endif()
