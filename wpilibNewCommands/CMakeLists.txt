@@ -5,7 +5,6 @@ include(CompileWarnings)
 include(AddTest)
 
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
@@ -24,6 +23,7 @@ if(WITH_JAVA)
             wpiutil_jar
             wpilibj_jar
         OUTPUT_NAME wpilibNewCommands
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
     set_property(TARGET wpilibNewCommands_jar PROPERTY FOLDER "java")
 
@@ -36,7 +36,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB WPILIBNEWCOMMANDS_SOURCES src/main/java/edu/wpi/first/wpilibj2/command/*.java)
     file(
@@ -50,6 +49,7 @@ if(WITH_JAVA_SOURCE)
         NAMESPACE "edu/wpi/first/wpilibj2/command" ${WPILIBNEWCOMMANDS_SOURCES}
         NAMESPACE "edu/wpi/first/wpilibj2/command/button" ${WPILIBNEWCOMMANDS_BUTTON_SOURCES}
         OUTPUT_NAME wpilibNewCommands-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(WPILIBNEWCOMMANDS_SRC_JAR_FILE TARGET wpilibNewCommands_src_jar PROPERTY JAR_FILE)
@@ -82,6 +82,10 @@ target_include_directories(
 install(TARGETS wpilibNewCommands EXPORT wpilibnewcommands)
 export(TARGETS wpilibNewCommands FILE wpilibnewcommands.cmake NAMESPACE wpilibnewcommands::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibNewCommands")
+install(
+    DIRECTORY src/generated/main/native/include/
+    DESTINATION "${include_dest}/wpilibNewCommands"
+)
 
 configure_file(
     wpilibnewcommands-config.cmake.in

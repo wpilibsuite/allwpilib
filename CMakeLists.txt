@@ -12,6 +12,7 @@ endif()
 if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
     set(CMAKE_SYSTEM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
     set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
+    message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
 endif()
 
 cmake_minimum_required(VERSION 3.11)
@@ -23,11 +24,10 @@ if(POLICY CMP0135)
     cmake_policy(SET CMP0135 NEW)
 endif()
 
-message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
-
 set(WPILIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 include(CPack)
+include(OptionValidation)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -35,7 +35,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/bin)
-set(CMAKE_JAVA_TARGET_OUTPUT_DIR ${WPILIB_BINARY_DIR}/jar)
 
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -87,28 +86,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
 endif()
 
-if(WITH_JAVA AND NOT BUILD_SHARED_LIBS)
-    message(
-        FATAL_ERROR
-        "
-FATAL: Cannot build static libs with Java enabled.
-       Static libs requires both BUILD_SHARED_LIBS=OFF and
-       WITH_JAVA=OFF
-"
-    )
-endif()
-
-if(WITH_SIMULATION_MODULES AND NOT BUILD_SHARED_LIBS)
-    message(
-        FATAL_ERROR
-        "
-FATAL: Cannot build static libs with simulation modules enabled.
-       Static libs requires both BUILD_SHARED_LIBS=OFF and
-       WITH_SIMULATION_MODULES=OFF
-"
-    )
-endif()
-
 if(NOT WITH_JAVA OR NOT WITH_CSCORE)
     if(NOT "${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
         message(
@@ -121,81 +98,24 @@ It will be ignored.
     endif()
 endif()
 
-if(NOT WITH_WPILIB AND WITH_SIMULATION_MODULES)
-    message(
-        FATAL_ERROR
-        "
-FATAL: Cannot build simulation modules with wpilib disabled.
-       Enable wpilib by setting WITH_WPILIB=ON
-"
-    )
-endif()
+wpilib_config(OPTIONS WITH_JAVA REQUIRES BUILD_SHARED_LIBS)
 
-if(NOT WITH_NTCORE AND WITH_CSCORE)
-    message(
-        FATAL_ERROR
-        "
-FATAL: Cannot build cameraserver without ntcore.
-       Enable ntcore by setting WITH_NTCORE=ON
-"
-    )
-endif()
+wpilib_config(OPTIONS WITH_SIMULATION_MODULES REQUIRES BUILD_SHARED_LIBS WITH_WPILIB WITH_NTCORE)
 
-if(NOT WITH_NTCORE AND WITH_GUI)
-    message(
-        FATAL_ERROR
-        "
-FATAL: Cannot build GUI modules without ntcore.
-       Enable ntcore by setting WITH_NTCORE=ON
-"
-    )
-endif()
+wpilib_config(OPTIONS WITH_CSCORE REQUIRES WITH_NTCORE)
 
-if(NOT WITH_NTCORE AND WITH_SIMULATION_MODULES)
-    message(
-        FATAL_ERROR
-        "
-FATAL: Cannot build simulation modules without ntcore.
-       Enable ntcore by setting WITH_NTCORE=ON
-"
-    )
-endif()
+wpilib_config(OPTIONS WITH_GUI REQUIRES WITH_NTCORE WITH_WPIMATH)
 
-if(NOT WITH_NTCORE AND WITH_WPILIB)
-    message(
-        FATAL_ERROR
-        "
-FATAL: Cannot build wpilib without ntcore.
-       Enable ntcore by setting WITH_NTCORE=ON
-"
-    )
-endif()
+wpilib_config(OPTIONS WITH_WPILIB REQUIRES WITH_NTCORE WITH_WPIMATH)
 
-if(NOT WITH_WPIMATH AND WITH_WPILIB)
-    message(
-        FATAL_ERROR
-        "
-FATAL: Cannot build wpilib without wpimath.
-       Enable wpimath by setting WITH_WPIMATH=ON
-"
-    )
-endif()
-
-if(NOT WITH_WPIUNITS AND WITH_WPIMATH AND WITH_JAVA)
-    message(
-        FATAL_ERROR
-        "
-FATAL: Cannot build Java wpimath without wpiunits.
-       Enable wpiunits by setting WITH_WPIUNITS=ON or disable the Java build by setting WITH_JAVA=OFF
-"
-    )
-endif()
+wpilib_config(OPTIONS WITH_WPIMATH WITH_JAVA REQUIRES WITH_WPIUNITS)
 
 set(include_dest include)
 set(java_lib_dest java)
-set(jni_lib_dest jni)
-if(WITH_JAVA)
+if(WITH_JAVA OR WITH_JAVA_SOURCE)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
+    find_package(Java REQUIRED COMPONENTS Development)
+    find_package(JNI REQUIRED COMPONENTS JVM)
 endif()
 
 find_package(LIBSSH 0.7.1)
@@ -382,6 +302,7 @@ endif()
 if(WITH_CSCORE)
     set(CAMERASERVER_DEP_REPLACE "find_dependency(cameraserver)")
     set(CSCORE_DEP_REPLACE "find_dependency(cscore)")
+    find_package(OpenCV REQUIRED)
     add_subdirectory(cscore)
     add_subdirectory(cameraserver)
 endif()
