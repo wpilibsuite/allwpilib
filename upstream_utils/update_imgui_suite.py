@@ -121,7 +121,7 @@ def update_glfw():
         git_am(os.path.join(wpilib_root, "upstream_utils/imgui_suite_patches/glfw", f))
 
     # Delete old install
-    for d in ["include", "src"]:
+    for d in ["include", "src", "CMake"]:
         shutil.rmtree(os.path.join(glfw, d), ignore_errors=True)
 
     hdr_allow_list = [
@@ -132,8 +132,6 @@ def update_glfw():
     walk_and_copy_if_matches(hdr_allow_list, glfw)
 
     def src_filter(dp, f):
-        if f.endswith(".in"):
-            return False
         if f.endswith("CMakeLists.txt"):
             return False
 
@@ -149,9 +147,24 @@ def update_glfw():
 
     # The upstream library automatically changes the files from .c -> .cpp. We want to keep it .c
     for f in src_files:
-        print(f)
         if f.endswith(".cpp"):
             shutil.move(f, f[:-2])
+
+    def cmake_filter(dp, f):
+        if dp.startswith("./CMake"):
+            return True
+
+        path = os.path.join(dp, f)
+        if path in ["./src/CMakeLists.txt", "./CMakeLists.txt"]:
+            return True
+
+        return False
+
+    # Copy CMAKE files
+    walk_cwd_and_copy_if(
+        cmake_filter,
+        os.path.join(glfw),
+    )
 
 
 def update_stb():
@@ -212,20 +225,20 @@ def update_gl3w():
 def main():
     original_dir = os.getcwd()
 
-    # update_imgui()
-    # os.chdir(original_dir)
+    update_imgui()
+    os.chdir(original_dir)
 
     update_glfw()
     os.chdir(original_dir)
 
-    # update_implot()
-    # os.chdir(original_dir)
+    update_implot()
+    os.chdir(original_dir)
 
-    # update_stb()
-    # os.chdir(original_dir)
+    update_stb()
+    os.chdir(original_dir)
 
-    # update_gl3w()
-    # os.chdir(original_dir)
+    update_gl3w()
+    os.chdir(original_dir)
 
 
 if __name__ == "__main__":
