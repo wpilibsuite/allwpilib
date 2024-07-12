@@ -71,6 +71,8 @@ The following build options are available:
   * Set this option to the location of the archive of the OpenCV Java bindings (it should be called opencv-xxx.jar, with the x'es being version numbers). NOTE: set it to the LOCATION of the file, not the file itself!
 * `NO_WERROR` (OFF Default)
   * This option will disable the `-Werror` compilation flag for non-MSVC builds.
+* `WPILIB_TARGET_WARNINGS`
+  * Add compiler flags to this option to customize compiler options like warnings
 
 ## Build Setup
 
