@@ -6,7 +6,6 @@ macro(wpilib_target_warnings target)
             -Wextra
             -Wno-unused-parameter
             -Wformat=2
-            ${ARGN}
             ${WPILIB_TARGET_WARNINGS}
         )
         if(NOT NO_WERROR)
@@ -24,7 +23,6 @@ macro(wpilib_target_warnings target)
                 /wd4267
                 /WX
                 /D_CRT_SECURE_NO_WARNINGS
-                ${ARGN}
                 ${WPILIB_TARGET_WARNINGS}
         )
     endif()

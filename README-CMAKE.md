@@ -72,7 +72,7 @@ The following build options are available:
 * `NO_WERROR` (OFF Default)
   * This option will disable the `-Werror` compilation flag for non-MSVC builds.
 * `WPILIB_TARGET_WARNINGS`
-  * Add compiler flags to this option to customize compiler options like warnings
+  * Add compiler flags to this option to customize compiler options like warnings.
 
 ## Build Setup
 
