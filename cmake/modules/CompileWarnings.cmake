@@ -5,7 +5,7 @@ macro(wpilib_target_warnings target)
             -pedantic
             -Wextra
             -Wno-unused-parameter
-            ${WPILIB_TARGET_WARNINGS}
+            -Wformat=2
         )
         if(NOT NO_WERROR)
             set(WARNING_FLAGS ${WARNING_FLAGS} -Werror)
@@ -15,14 +15,7 @@ macro(wpilib_target_warnings target)
     else()
         target_compile_options(
             ${target}
-            PRIVATE
-                /wd4146
-                /wd4244
-                /wd4251
-                /wd4267
-                /WX
-                /D_CRT_SECURE_NO_WARNINGS
-                ${WPILIB_TARGET_WARNINGS}
+            PRIVATE /wd4146 /wd4244 /wd4251 /wd4267 /WX /D_CRT_SECURE_NO_WARNINGS
         )
     endif()
 
