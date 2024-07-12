@@ -151,7 +151,7 @@ target_compile_features(wpiutil PUBLIC cxx_std_20)
 if(MSVC)
     target_compile_options(
         wpiutil
-        PUBLIC /permissive- /Zc:preprocessor /Zc:throwingNew /MP /bigobj /utf-8
+        PUBLIC /permissive- /Zc:preprocessor /Zc:__cplusplus /Zc:throwingNew /MP /bigobj /utf-8
     )
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()

@@ -31,6 +31,9 @@ include(OptionValidation)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+if(MSVC)
+    add_compile_options(/Zc:__cplusplus)
+endif()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/lib)
