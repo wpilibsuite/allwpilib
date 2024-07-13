@@ -43,8 +43,6 @@ install(EXPORT hal DESTINATION share/hal)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     file(GLOB_RECURSE hal_shared_jni_src src/main/native/cpp/jni/*.cpp)
@@ -57,6 +55,7 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS wpiutil_jar
         OUTPUT_NAME wpiHal
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS hal_jni_headers
     )
     set_property(TARGET hal_jar PROPERTY FOLDER "java")
@@ -80,7 +79,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB HAL_SOURCES src/main/java/edu/wpi/first/hal/*.java src/generated/main/java/*.java)
     file(GLOB HAL_CAN_SOURCES src/main/java/edu/wpi/first/hal/can/*.java)
@@ -97,6 +95,7 @@ if(WITH_JAVA_SOURCE)
         NAMESPACE "edu/wpi/first/hal/simulation" ${HAL_SIMULATION_SOURCES}
         NAMESPACE "edu/wpi/first/hal/util" ${HAL_UTIL_SOURCES}
         OUTPUT_NAME wpiHal-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(HAL_SRC_JAR_FILE TARGET hal_src_jar PROPERTY JAR_FILE)

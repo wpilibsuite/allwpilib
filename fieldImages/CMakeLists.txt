@@ -4,11 +4,9 @@ include(CompileWarnings)
 include(GenResources)
 
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
 
     file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
-    set(CMAKE_JAVA_INCLUDE_PATH fieldImages.jar ${JACKSON_JARS})
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     file(
@@ -23,13 +21,12 @@ if(WITH_JAVA)
         SOURCES ${JAVA_SOURCES}
         RESOURCES
         NAMESPACE "edu/wpi/first/fields" ${JAVA_RESOURCES}
+        INCLUDE_JARS ${JACKSON_JARS}
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         OUTPUT_NAME fieldImages
     )
-
-    get_property(FIELD_IMAGES_JAR_FILE TARGET field_images_jar PROPERTY JAR_FILE)
-    install(FILES ${FIELD_IMAGES_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET field_images_jar PROPERTY FOLDER "java")
+    install_jar(field_images_jar DESTINATION ${java_lib_dest})
 endif()
 
 generate_resources(

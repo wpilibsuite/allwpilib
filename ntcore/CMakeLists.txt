@@ -39,13 +39,9 @@ install(EXPORT ntcore DESTINATION share/ntcore)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
-
-    set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${QUICKBUF_JAR})
 
     file(GLOB ntcore_jni_src src/main/native/cpp/jni/*.cpp src/generated/main/native/cpp/jni/*.cpp)
 
@@ -55,8 +51,9 @@ if(WITH_JAVA)
     add_jar(
         ntcore_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar
+        INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR}
         OUTPUT_NAME ntcore
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS ntcore_jni_headers
     )
     set_property(TARGET ntcore_jar PROPERTY FOLDER "java")
@@ -70,10 +67,6 @@ if(WITH_JAVA)
 
     set_property(TARGET ntcorejni PROPERTY FOLDER "libraries")
 
-    if(MSVC)
-        install(TARGETS ntcorejni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-    endif()
-
     target_link_libraries(ntcorejni PRIVATE ntcore_jni_headers)
     add_dependencies(ntcorejni ntcore_jar)
 
@@ -82,7 +75,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(
         GLOB NTCORE_SOURCES
@@ -94,6 +86,7 @@ if(WITH_JAVA_SOURCE)
         RESOURCES
         NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES}
         OUTPUT_NAME ntcore-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(NTCORE_SRC_JAR_FILE TARGET ntcore_src_jar PROPERTY JAR_FILE)
