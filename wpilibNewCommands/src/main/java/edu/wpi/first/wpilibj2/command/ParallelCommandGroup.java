@@ -32,6 +32,7 @@ public class ParallelCommandGroup extends Command {
    *
    * @param commands the commands to include in this composition.
    */
+  @SuppressWarnings("this-escape")
   public ParallelCommandGroup(Command... commands) {
     addCommands(commands);
   }
