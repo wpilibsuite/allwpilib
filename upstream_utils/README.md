@@ -50,6 +50,12 @@ Start in the `upstream_utils` folder. Make sure a clone of the upstream repo exi
 ./<lib>.py clone
 ```
 
+Update the clone of the upstream repo.
+```bash
+./<lib>.py rebase 2.0
+```
+where `2.0` is replaced with the version specified in `<lib>.py`.
+
 Navigate to the repo. If you can't find it, the directory of the clone is printed at the start of the `clone` command.
 ```bash
 cd /tmp/<lib>
