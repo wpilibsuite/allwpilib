@@ -137,7 +137,7 @@ set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
-target_compile_features(wpiutil PUBLIC cxx_std_20)
+target_compile_features(wpiutil PUBLIC cxx_std_23)
 if(MSVC)
     target_compile_options(
         wpiutil
