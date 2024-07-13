@@ -52,7 +52,7 @@ add_library(romiVendordep ${romiVendordep_native_src})
 set_target_properties(romiVendordep PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET romiVendordep PROPERTY FOLDER "libraries")
 
-target_compile_features(romiVendordep PUBLIC cxx_std_20)
+target_compile_features(romiVendordep PUBLIC cxx_std_23)
 wpilib_target_warnings(romiVendordep)
 target_link_libraries(romiVendordep wpilibc)
 
