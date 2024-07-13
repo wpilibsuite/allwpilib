@@ -7,7 +7,7 @@
 common:linux --repo_env=BAZEL_COPTS="-Wall:-Wextra:-Werror:-gz=zlib"
 
 # C++ only
-common:linux --repo_env=BAZEL_CXXOPTS="-std=c++20:-Wformat=2:-pedantic:-Wno-psabi:-Wno-unused-parameter:-fPIC:-pthread:-Wno-deprecated-enum-enum-conversion"
+common:linux --repo_env=BAZEL_CXXOPTS="-std=c++23:-Wformat=2:-pedantic:-Wno-psabi:-Wno-unused-parameter:-fPIC:-pthread:-Wno-deprecated-enum-enum-conversion"
 
 # C Only
 common:linux --repo_env=BAZEL_CONLYOPTS="-Wformat=2:-pedantic:-Wno-psabi:-Wno-unused-parameter:-fPIC:-pthread"

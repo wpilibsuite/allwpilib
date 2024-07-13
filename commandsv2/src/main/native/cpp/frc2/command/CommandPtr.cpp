@@ -21,6 +21,7 @@
 #include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/commands2/WrapperCommand.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/util/StackTrace.hpp"
 
 using namespace wpi::cmd;
 

@@ -12,7 +12,7 @@ add_library(googletest ${googletest_src})
 set_target_properties(googletest PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET googletest PROPERTY FOLDER "libraries")
-target_compile_features(googletest PUBLIC cxx_std_20)
+target_compile_features(googletest PUBLIC cxx_std_23)
 
 include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}/include"

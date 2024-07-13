@@ -58,7 +58,7 @@ public:
         list l(src.size());
         size_t index = 0;
         for (auto &&value : src) {
-            auto value_ = reinterpret_steal<object>(value_conv::cast(forward_like<T>(value), policy, parent));
+            auto value_ = reinterpret_steal<object>(value_conv::cast(detail::forward_like<T>(value), policy, parent));
             if (!value_)
                 return handle();
             PyList_SET_ITEM(l.ptr(), (ssize_t) index++, value_.release().ptr()); // steals a reference
