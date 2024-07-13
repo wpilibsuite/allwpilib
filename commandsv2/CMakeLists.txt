@@ -62,7 +62,7 @@ add_library(commandsv2 ${commandsv2_native_src})
 set_target_properties(commandsv2 PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET commandsv2 PROPERTY FOLDER "libraries")
 
-target_compile_features(commandsv2 PUBLIC cxx_std_20)
+target_compile_features(commandsv2 PUBLIC cxx_std_23)
 wpilib_target_warnings(commandsv2)
 target_link_libraries(commandsv2 wpilibc)
 
