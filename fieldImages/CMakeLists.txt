@@ -46,9 +46,11 @@ add_library(fieldImages ${field_images_resources_src} src/main/native/cpp/fields
 set_target_properties(fieldImages PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET fieldImages PROPERTY FOLDER "libraries")
-target_compile_features(fieldImages PUBLIC cxx_std_20)
 if(MSVC)
     target_compile_options(fieldImages PUBLIC /bigobj)
+    target_compile_features(fieldImages PUBLIC cxx_std_23)
+else()
+    target_compile_features(fieldImages PUBLIC cxx_std_20)
 endif()
 wpilib_target_warnings(fieldImages)
 

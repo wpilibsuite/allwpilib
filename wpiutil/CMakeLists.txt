@@ -141,13 +141,15 @@ set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
-target_compile_features(wpiutil PUBLIC cxx_std_20)
 if(MSVC)
     target_compile_options(
         wpiutil
         PUBLIC /permissive- /Zc:preprocessor /Zc:__cplusplus /Zc:throwingNew /MP /bigobj /utf-8
     )
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+    target_compile_features(wpiutil PUBLIC cxx_std_23)
+else()
+    target_compile_features(wpiutil PUBLIC cxx_std_20)
 endif()
 wpilib_target_warnings(wpiutil)
 if(WITH_PROTOBUF)
