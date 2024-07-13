@@ -134,7 +134,11 @@ if(MSVC)
 else()
     target_compile_options(
         apriltag
-        PRIVATE -Wno-sign-compare -Wno-gnu-zero-variadic-macro-arguments -Wno-type-limits
+        PRIVATE
+            -Wno-sign-compare
+            -Wno-gnu-zero-variadic-macro-arguments
+            -Wno-type-limits
+            -Wno-format-nonliteral
     )
 endif()
 
