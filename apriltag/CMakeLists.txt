@@ -27,8 +27,6 @@ set(APRILTAGLIB_SRCS
 file(GLOB apriltag_jni_src src/main/native/cpp/jni/AprilTagJNI.cpp)
 
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     set(CMAKE_JNI_TARGET true)
@@ -47,8 +45,6 @@ if(WITH_JAVA)
         NO_DEFAULT_PATH
     )
 
-    set(CMAKE_JAVA_INCLUDE_PATH apriltag.jar ${EJML_JARS} ${JACKSON_JARS})
-
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     file(
         GLOB_RECURSE JAVA_RESOURCES
@@ -60,8 +56,15 @@ if(WITH_JAVA)
         SOURCES ${JAVA_SOURCES}
         RESOURCES
         NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES}
-        INCLUDE_JARS wpimath_jar wpiunits_jar ${EJML_JARS} wpiutil_jar ${OPENCV_JAR_FILE}
+        INCLUDE_JARS
+            wpimath_jar
+            wpiunits_jar
+            wpiutil_jar
+            ${EJML_JARS}
+            ${OPENCV_JAR_FILE}
+            ${JACKSON_JARS}
         OUTPUT_NAME apriltag
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS apriltag_jni_headers
     )
     set_property(TARGET apriltag_jar PROPERTY FOLDER "java")
@@ -83,7 +86,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB APRILTAG_SOURCES src/main/java/edu/wpi/first/apriltag/*.java)
     add_jar(
@@ -94,6 +96,7 @@ if(WITH_JAVA_SOURCE)
             "edu/wpi/first/apriltag/jni"
             src/main/java/edu/wpi/first/apriltag/jni/AprilTagJNI.java
         OUTPUT_NAME apriltag-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(APRILTAG_SRC_JAR_FILE TARGET apriltag_src_jar PROPERTY JAR_FILE)
@@ -131,7 +134,11 @@ if(MSVC)
 else()
     target_compile_options(
         apriltag
-        PRIVATE -Wno-sign-compare -Wno-gnu-zero-variadic-macro-arguments -Wno-type-limits
+        PRIVATE
+            -Wno-sign-compare
+            -Wno-gnu-zero-variadic-macro-arguments
+            -Wno-type-limits
+            -Wno-format-nonliteral
     )
 endif()
 

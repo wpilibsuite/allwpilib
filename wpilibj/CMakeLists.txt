@@ -2,8 +2,6 @@ project(wpilibj)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(OpenCV REQUIRED)
-    find_package(Java REQUIRED)
     include(UseJava)
 
     set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/java/opencv4)
@@ -41,6 +39,7 @@ if(WITH_JAVA)
             wpiunits_jar
             wpiutil_jar
         OUTPUT_NAME wpilibj
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
     set_property(TARGET wpilibj_jar PROPERTY FOLDER "java")
 
@@ -51,7 +50,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(
         GLOB WPILIBJ_SOURCES
@@ -95,6 +93,7 @@ if(WITH_JAVA_SOURCE)
         NAMESPACE "edu/wpi/first/wpilibj/smartdashboard" ${WPILIBJ_SMARTDASHBOARD_SOURCES}
         NAMESPACE "edu/wpi/first/wpilibj/util" ${WPILIBJ_UTIL_SOURCES}
         OUTPUT_NAME wpilibj-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(WPILIBJ_SRC_JAR_FILE TARGET wpilibj_src_jar PROPERTY JAR_FILE)

@@ -5,6 +5,7 @@ macro(wpilib_target_warnings target)
             -pedantic
             -Wextra
             -Wno-unused-parameter
+            -Wformat=2
             ${WPILIB_TARGET_WARNINGS}
         )
         if(NOT NO_WERROR)

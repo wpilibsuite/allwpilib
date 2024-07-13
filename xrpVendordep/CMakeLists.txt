@@ -5,7 +5,6 @@ include(CompileWarnings)
 include(AddTest)
 
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
@@ -22,6 +21,7 @@ if(WITH_JAVA)
             wpiutil_jar
             wpilibj_jar
         OUTPUT_NAME xrpVendordep
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
     set_property(TARGET xrpVendordep_jar PROPERTY FOLDER "java")
 
@@ -34,7 +34,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(GLOB XRPVENDORDEP_SOURCES src/main/java/edu/wpi/first/wpilibj/xrp/*.java)
     add_jar(
@@ -42,6 +41,7 @@ if(WITH_JAVA_SOURCE)
         RESOURCES
         NAMESPACE "edu/wpi/first/wpilibj/xrp" ${XRPVENDORDEP_SOURCES}
         OUTPUT_NAME xrpVendordep-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(xrpVendordep_src_JAR_FILE TARGET xrpVendordep_src_jar PROPERTY JAR_FILE)
@@ -66,7 +66,7 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/xrpVendordep>
 )
 
-install(TARGETS xrpVendordep EXPORT xrpvendordep DESTINATION "${main_lib_dest}")
+install(TARGETS xrpVendordep EXPORT xrpvendordep)
 export(TARGETS xrpVendordep FILE xrpvendordep.cmake NAMESPACE xrpvendordep::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 

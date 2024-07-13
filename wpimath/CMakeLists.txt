@@ -31,8 +31,6 @@ file(
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.43.1.jar")
@@ -77,8 +75,6 @@ if(WITH_JAVA)
     file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
     file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
 
-    set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS} ${JACKSON_JARS} ${QUICKBUF_JAR})
-
     set(CMAKE_JNI_TARGET true)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
@@ -86,8 +82,9 @@ if(WITH_JAVA)
     add_jar(
         wpimath_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS ${EJML_JARS} wpiutil_jar wpiunits_jar
+        INCLUDE_JARS wpiutil_jar wpiunits_jar ${EJML_JARS} ${JACKSON_JARS} ${QUICKBUF_JAR}
         OUTPUT_NAME wpimath
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS wpimath_jni_headers
     )
     set_property(TARGET wpimath_jar PROPERTY FOLDER "java")
@@ -109,7 +106,6 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
     file(
         GLOB WPIMATH_SOURCES
@@ -150,6 +146,7 @@ if(WITH_JAVA_SOURCE)
             ${WPIMATH_TRAJECTORY_CONSTRAINT_SOURCES}
         NAMESPACE "edu/wpi/first/math/util" src/main/java/edu/wpi/first/math/util/Units.java
         OUTPUT_NAME wpimath-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     get_property(WPIMATH_SRC_JAR_FILE TARGET wpimath_src_jar PROPERTY JAR_FILE)

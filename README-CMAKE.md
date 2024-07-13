@@ -71,6 +71,8 @@ The following build options are available:
   * Set this option to the location of the archive of the OpenCV Java bindings (it should be called opencv-xxx.jar, with the x'es being version numbers). NOTE: set it to the LOCATION of the file, not the file itself!
 * `NO_WERROR` (OFF Default)
   * This option will disable the `-Werror` compilation flag for non-MSVC builds.
+* `WPILIB_TARGET_WARNINGS`
+  * Add compiler flags to this option to customize compiler options like warnings.
 
 ## Build Setup
 
@@ -108,6 +110,12 @@ After build, the easiest way to use the libraries is to install them. Run the fo
 sudo cmake --build . --target install
 ```
 
+## Preparing to use the installed libraries
+
+On Windows, make sure the directories for the libraries you built are on PATH. For wpilib, the default install location is `C:\Program Files (x86)\allwpilib`. If you built other libraries like OpenCV and protobuf from source, install them, and add the install directories to PATH. This ensures CMake can locate the libraries.
+
+You will also want to add the directories where the DLLs are located (usually the `bin` subdirectory of the install directory) to PATH so they can be loaded by your program. If you are using OpenCV and Java, the `opencv_java` DLL is located in either the `lib` subdirectory if you built but didn't install OpenCV, or the `java` subdirectory if you did install OpenCV.
+
 ## Using the installed libraries for C++.
 
 Using the libraries from C++ is the easiest way to use the built libraries.
@@ -134,12 +142,11 @@ cmake /path/to/folder/containing/CMakeLists
 
 After that, run `cmake --build .`. That will create your executable. Then you should be able to run `./my_vision_app` to run your application.
 
-
 ## Using the installed libraries for Java
 
-Using the built JARs is move involved than using the C++ libraries, but mostly consists of adding the correct directories to PATH.
+Using the built JARs is more involved than using the C++ libraries, but the additional work involves providing the paths to various libraries and JARs when needed.
 
-Add the directory where the JARs are located (e.g, `/usr/local/java`) to PATH. If you are on Windows, you also need to add the `lib`, `bin`, and `share` directories to PATH. Then, create a new folder to contain your project. Add the following code below to a `CMakeLists.txt` file in that directory.
+Create a new folder to contain your project. Add the following code below to a `CMakeLists.txt` file in that directory.
 
 ```cmake
 cmake_minimum_required(VERSION 3.11)
