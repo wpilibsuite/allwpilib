@@ -121,11 +121,10 @@ public class DifferentialDriveKinematics
   }
 
   @Override
-  public DifferentialDriveWheelPositions copyInto(
-      DifferentialDriveWheelPositions positions, DifferentialDriveWheelPositions buffer) {
-    buffer.leftMeters = positions.leftMeters;
-    buffer.rightMeters = positions.rightMeters;
-    return buffer;
+  public void copyInto(
+      DifferentialDriveWheelPositions positions, DifferentialDriveWheelPositions output) {
+    output.leftMeters = positions.leftMeters;
+    output.rightMeters = positions.rightMeters;
   }
 
   @Override

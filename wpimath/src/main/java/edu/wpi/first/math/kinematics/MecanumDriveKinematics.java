@@ -267,13 +267,11 @@ public class MecanumDriveKinematics
   }
 
   @Override
-  public MecanumDriveWheelPositions copyInto(
-      MecanumDriveWheelPositions positions, MecanumDriveWheelPositions buffer) {
-    buffer.frontLeftMeters = positions.frontLeftMeters;
-    buffer.frontRightMeters = positions.frontRightMeters;
-    buffer.rearLeftMeters = positions.rearLeftMeters;
-    buffer.rearRightMeters = positions.rearRightMeters;
-    return buffer;
+  public void copyInto(MecanumDriveWheelPositions positions, MecanumDriveWheelPositions output) {
+    output.frontLeftMeters = positions.frontLeftMeters;
+    output.frontRightMeters = positions.frontRightMeters;
+    output.rearLeftMeters = positions.rearLeftMeters;
+    output.rearRightMeters = positions.rearRightMeters;
   }
 
   @Override

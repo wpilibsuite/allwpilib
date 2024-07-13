@@ -393,16 +393,14 @@ public class SwerveDriveKinematics
   }
 
   @Override
-  public SwerveModulePosition[] copyInto(
-      SwerveModulePosition[] positions, SwerveModulePosition[] buffer) {
-    if (positions.length != buffer.length) {
-      return copy(positions);
+  public void copyInto(SwerveModulePosition[] positions, SwerveModulePosition[] output) {
+    if (positions.length != output.length) {
+      throw new IllegalArgumentException("Inconsistent number of modules!");
     }
     for (int i = 0; i < positions.length; ++i) {
-      buffer[i].distanceMeters = positions[i].distanceMeters;
-      buffer[i].angle = positions[i].angle;
+      output[i].distanceMeters = positions[i].distanceMeters;
+      output[i].angle = positions[i].angle;
     }
-    return buffer;
   }
 
   @Override
