@@ -38,6 +38,7 @@ public class SelectCommand<K> extends Command {
    * @param commands the map of commands to choose from
    * @param selector the selector to determine which command to run
    */
+  @SuppressWarnings("this-escape")
   public SelectCommand(Map<K, Command> commands, Supplier<? extends K> selector) {
     m_commands = requireNonNullParam(commands, "commands", "SelectCommand");
     m_selector = requireNonNullParam(selector, "selector", "SelectCommand");

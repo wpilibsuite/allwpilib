@@ -29,6 +29,7 @@ public class SequentialCommandGroup extends Command {
    *
    * @param commands the commands to include in this composition.
    */
+  @SuppressWarnings("this-escape")
   public SequentialCommandGroup(Command... commands) {
     addCommands(commands);
   }

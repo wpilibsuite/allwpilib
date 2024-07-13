@@ -42,6 +42,7 @@ public class ProfiledPIDCommand extends Command {
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
    */
+  @SuppressWarnings("this-escape")
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
       DoubleSupplier measurementSource,
@@ -70,6 +71,7 @@ public class ProfiledPIDCommand extends Command {
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
    */
+  @SuppressWarnings("this-escape")
   public ProfiledPIDCommand(
       ProfiledPIDController controller,
       DoubleSupplier measurementSource,

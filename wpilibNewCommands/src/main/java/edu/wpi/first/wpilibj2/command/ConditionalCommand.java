@@ -32,6 +32,7 @@ public class ConditionalCommand extends Command {
    * @param onFalse the command to run if the condition is false
    * @param condition the condition to determine which command to run
    */
+  @SuppressWarnings("this-escape")
   public ConditionalCommand(Command onTrue, Command onFalse, BooleanSupplier condition) {
     m_onTrue = requireNonNullParam(onTrue, "onTrue", "ConditionalCommand");
     m_onFalse = requireNonNullParam(onFalse, "onFalse", "ConditionalCommand");
