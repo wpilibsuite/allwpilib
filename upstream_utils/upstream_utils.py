@@ -251,8 +251,8 @@ class Lib:
         with open(path, "r") as file:
             lines = file.readlines()
 
-        previous_text = f"tag = '{self.old_tag}'"
-        new_text = f"tag = '{tag}'"
+        previous_text = f"tag = \"{self.old_tag}\""
+        new_text = f"tag = \"{tag}\""
         for i in range(len(lines)):
             lines[i] = lines[i].replace(previous_text, new_text)
 
@@ -266,7 +266,7 @@ class Lib:
 
     def rebase(self, new_tag):
         self.open_repo(
-            err_msg_if_absent='There\'s nothing to rebase. Run the "clone" command first.'
+            err_msg_if_absent="There's nothing to rebase. Run the \"clone\" command first."
         )
 
         subprocess.run(["git", "fetch", "origin", new_tag])
@@ -295,7 +295,7 @@ class Lib:
 
     def format_patch(self, tag):
         self.open_repo(
-            err_msg_if_absent='There\'s nothing to run format-patch on. Run the "clone" and "rebase" commands first.'
+            err_msg_if_absent="There's nothing to run format-patch on. Run the \"clone\" and \"rebase\" commands first."
         )
 
         if self.pre_patch_commits > 0:
@@ -334,7 +334,7 @@ class Lib:
 
     def copy_upstream_to_thirdparty(self):
         self.open_repo(
-            err_msg_if_absent='There\'s no repository to copy from. Run the "clone" command first.'
+            err_msg_if_absent="There's no repository to copy from. Run the \"clone\" command first."
         )
 
         subprocess.run(["git", "switch", "--detach", self.old_tag])
