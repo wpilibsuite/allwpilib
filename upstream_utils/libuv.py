@@ -9,29 +9,12 @@ from upstream_utils import (
     comment_out_invalid_includes,
     walk_cwd_and_copy_if,
     git_am,
+    Lib,
 )
 
 
-def main():
-    upstream_root = clone_repo("https://github.com/libuv/libuv", "v1.48.0")
-    wpilib_root = get_repo_root()
+def copy_upstream_src(wpilib_root):
     wpinet = os.path.join(wpilib_root, "wpinet")
-
-    # Apply patches to upstream Git repo
-    os.chdir(upstream_root)
-    for f in [
-        "0001-Revert-win-process-write-minidumps-when-sending-SIGQ.patch",
-        "0002-Fix-missing-casts.patch",
-        "0003-Fix-warnings.patch",
-        "0004-Preprocessor-cleanup.patch",
-        "0005-Cleanup-problematic-language.patch",
-        "0006-Fix-Win32-warning-suppression-pragma.patch",
-        "0007-Use-C-atomics.patch",
-        "0008-Remove-static-from-array-indices.patch",
-        "0009-Add-pragmas-for-missing-libraries-and-set-_WIN32_WIN.patch",
-        "0010-Remove-swearing.patch",
-    ]:
-        git_am(os.path.join(wpilib_root, "upstream_utils/libuv_patches", f))
 
     # Delete old install
     for d in ["src/main/native/thirdparty/libuv"]:
@@ -69,6 +52,28 @@ def main():
         lambda dp, f: dp.startswith("./src") and f not in src_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
     )
+
+
+def main():
+    name = "libuv"
+    url = "https://github.com/libuv/libuv"
+    tag = "v1.48.0"
+
+    patch_list = [
+        "0001-Revert-win-process-write-minidumps-when-sending-SIGQ.patch",
+        "0002-Fix-missing-casts.patch",
+        "0003-Fix-warnings.patch",
+        "0004-Preprocessor-cleanup.patch",
+        "0005-Cleanup-problematic-language.patch",
+        "0006-Fix-Win32-warning-suppression-pragma.patch",
+        "0007-Use-C-atomics.patch",
+        "0008-Remove-static-from-array-indices.patch",
+        "0009-Add-pragmas-for-missing-libraries-and-set-_WIN32_WIN.patch",
+        "0010-Remove-swearing.patch",
+    ]
+
+    libuv = Lib(name, url, tag, patch_list, copy_upstream_src)
+    libuv.main()
 
 
 if __name__ == "__main__":

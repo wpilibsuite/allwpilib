@@ -9,6 +9,7 @@ from upstream_utils import (
     comment_out_invalid_includes,
     walk_cwd_and_copy_if,
     git_am,
+    Lib,
 )
 
 
@@ -170,14 +171,20 @@ def overwrite_tests(wpiutil_root, llvm_root):
     run_global_replacements(wpi_files)
 
 
-def main():
-    upstream_root = clone_repo("https://github.com/llvm/llvm-project", "llvmorg-18.1.8")
-    wpilib_root = get_repo_root()
+def copy_upstream_src(wpilib_root):
+    upstream_root = os.path.abspath(".")
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 
-    # Apply patches to upstream Git repo
-    os.chdir(upstream_root)
-    for f in [
+    overwrite_source(wpiutil, upstream_root)
+    overwrite_tests(wpiutil, upstream_root)
+
+
+def main():
+    name = "llvm"
+    url = "https://github.com/llvm/llvm-project"
+    tag = "llvmorg-18.1.8"
+
+    patch_list = [
         "0001-Remove-StringRef-ArrayRef-and-Optional.patch",
         "0002-Wrap-std-min-max-calls-in-parens-for-Windows-warning.patch",
         "0003-Change-unique_function-storage-size.patch",
@@ -214,14 +221,13 @@ def main():
         "0034-Add-back-removed-raw_string_ostream-write_impl.patch",
         "0035-Remove-auto-conversion-from-raw_ostream.patch",
         "0036-Add-SmallVector-erase_if.patch",
-    ]:
-        git_am(
-            os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),
-            use_threeway=True,
-        )
+    ]
+    patch_options = {
+        "use_threeway": True,
+    }
 
-    overwrite_source(wpiutil, upstream_root)
-    overwrite_tests(wpiutil, upstream_root)
+    llvm = Lib(name, url, tag, patch_list, copy_upstream_src, patch_options)
+    llvm.main()
 
 
 if __name__ == "__main__":

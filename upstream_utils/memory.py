@@ -9,6 +9,7 @@ from upstream_utils import (
     comment_out_invalid_includes,
     walk_if,
     copy_to,
+    Lib,
 )
 
 
@@ -58,9 +59,7 @@ def run_global_replacements(memory_files):
             f.write(content)
 
 
-def main():
-    upstream_root = clone_repo("https://github.com/foonathan/memory", "v0.7-3")
-    wpilib_root = get_repo_root()
+def copy_upstream_src(wpilib_root):
     wpiutil = os.path.join(wpilib_root, "wpiutil")
 
     # Delete old install
@@ -71,7 +70,6 @@ def main():
         shutil.rmtree(os.path.join(wpiutil, d), ignore_errors=True)
 
     # Copy sources
-    os.chdir(upstream_root)
     src_files = walk_if("src", lambda dp, f: f.endswith(".cpp") or f.endswith(".hpp"))
     src_files = copy_to(
         src_files, os.path.join(wpiutil, "src/main/native/thirdparty/memory")
@@ -80,7 +78,7 @@ def main():
     run_source_replacements(src_files)
 
     # Copy headers
-    os.chdir(os.path.join(upstream_root, "include", "foonathan"))
+    os.chdir(os.path.join("include", "foonathan"))
     include_files = walk_if(".", lambda dp, f: f.endswith(".hpp"))
     include_files = copy_to(
         include_files,
@@ -98,6 +96,15 @@ def main():
             "src/main/native/thirdparty/memory/include/wpi/memory/config_impl.hpp",
         ),
     )
+
+
+def main():
+    name = "memory"
+    url = "https://github.com/foonathan/memory"
+    tag = "v0.7-3"
+
+    memory = Lib(name, url, tag, [], copy_upstream_src)
+    memory.main()
 
 
 if __name__ == "__main__":

@@ -9,21 +9,12 @@ from upstream_utils import (
     comment_out_invalid_includes,
     walk_cwd_and_copy_if,
     git_am,
+    Lib,
 )
 
 
-def main():
-    upstream_root = clone_repo("https://github.com/kthohr/gcem.git", "v1.18.0")
-    wpilib_root = get_repo_root()
+def copy_upstream_src(wpilib_root):
     wpimath = os.path.join(wpilib_root, "wpimath")
-
-    # Apply patches to upstream Git repo
-    os.chdir(upstream_root)
-    for f in [
-        "0001-Call-std-functions-if-not-constant-evaluated.patch",
-        "0002-Add-hypot-x-y-z.patch",
-    ]:
-        git_am(os.path.join(wpilib_root, "upstream_utils/gcem_patches", f))
 
     # Delete old install
     for d in [
@@ -41,6 +32,20 @@ def main():
         comment_out_invalid_includes(
             f, [os.path.join(wpimath, "src/main/native/thirdparty/gcem/include")]
         )
+
+
+def main():
+    name = "gcem"
+    url = "https://github.com/kthohr/gcem.git"
+    tag = "v1.18.0"
+
+    patch_list = [
+        "0001-Call-std-functions-if-not-constant-evaluated.patch",
+        "0002-Add-hypot-x-y-z.patch",
+    ]
+
+    gcem = Lib(name, url, tag, patch_list, copy_upstream_src)
+    gcem.main()
 
 
 if __name__ == "__main__":

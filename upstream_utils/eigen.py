@@ -5,11 +5,9 @@ import re
 import shutil
 
 from upstream_utils import (
-    get_repo_root,
-    clone_repo,
     comment_out_invalid_includes,
     walk_cwd_and_copy_if,
-    git_am,
+    Lib,
 )
 
 
@@ -94,23 +92,8 @@ def unsupported_inclusions(dp, f):
     return "MatrixFunctions" in abspath
 
 
-def main():
-    upstream_root = clone_repo(
-        "https://gitlab.com/libeigen/eigen.git",
-        # master on 2024-05-22
-        "c4d84dfddc9f9edef0fdbe7cf9966d2f4a303198",
-        shallow=False,
-    )
-    wpilib_root = get_repo_root()
+def copy_upstream_src(wpilib_root):
     wpimath = os.path.join(wpilib_root, "wpimath")
-
-    # Apply patches to upstream Git repo
-    os.chdir(upstream_root)
-    for f in [
-        "0001-Disable-warnings.patch",
-        "0002-Intellisense-fix.patch",
-    ]:
-        git_am(os.path.join(wpilib_root, "upstream_utils/eigen_patches", f))
 
     # Delete old install
     for d in ["src/main/native/thirdparty/eigen/include"]:
@@ -138,9 +121,22 @@ def main():
         )
 
     shutil.copyfile(
-        os.path.join(upstream_root, ".clang-format"),
+        ".clang-format",
         os.path.join(wpimath, "src/main/native/thirdparty/eigen/include/.clang-format"),
     )
+
+
+def main():
+    name = "eigen"
+    url = "https://gitlab.com/libeigen/eigen.git"
+    tag = "c4d84dfddc9f9edef0fdbe7cf9966d2f4a303198"
+    patch_list = [
+        "0001-Disable-warnings.patch",
+        "0002-Intellisense-fix.patch",
+    ]
+
+    eigen = Lib(name, url, tag, patch_list, copy_upstream_src)
+    eigen.main()
 
 
 if __name__ == "__main__":

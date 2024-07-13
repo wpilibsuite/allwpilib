@@ -10,11 +10,12 @@ from upstream_utils import (
     comment_out_invalid_includes,
     walk_cwd_and_copy_if,
     git_am,
+    Lib,
 )
 
 
-def crlf_to_lf(stackwalker_dir):
-    for root, _, files in os.walk(stackwalker_dir):
+def crlf_to_lf():
+    for root, _, files in os.walk("."):
         if ".git" in root:
             continue
 
@@ -28,34 +29,12 @@ def crlf_to_lf(stackwalker_dir):
                 with open(filename, "wb") as f:
                     f.write(content)
 
-    cwd = os.getcwd()
-    os.chdir(stackwalker_dir)
     subprocess.check_call(["git", "add", "-A"])
     subprocess.check_call(["git", "commit", "-m", "Fix line endings"])
-    os.chdir(cwd)
 
 
-def main():
-    upstream_root = clone_repo(
-        "https://github.com/JochenKalmbach/StackWalker",
-        "5b0df7a4db8896f6b6dc45d36e383c52577e3c6b",
-        shallow=False,
-    )
-    wpilib_root = get_repo_root()
+def copy_upstream_src(wpilib_root):
     wpiutil = os.path.join(wpilib_root, "wpiutil")
-
-    # Run CRLF -> LF before trying any patches
-    crlf_to_lf(upstream_root)
-
-    # Apply patches to upstream Git repo
-    os.chdir(upstream_root)
-    for f in [
-        "0001-Add-advapi-pragma.patch",
-    ]:
-        git_am(
-            os.path.join(wpilib_root, "upstream_utils/stack_walker_patches", f),
-            ignore_whitespace=True,
-        )
 
     shutil.copy(
         os.path.join("Main", "StackWalker", "StackWalker.h"),
@@ -66,6 +45,31 @@ def main():
         os.path.join("Main", "StackWalker", "StackWalker.cpp"),
         os.path.join(wpiutil, "src/main/native/windows/StackWalker.cpp"),
     )
+
+
+def main():
+    name = "stack_walker"
+    url = "https://github.com/JochenKalmbach/StackWalker"
+    tag = "5b0df7a4db8896f6b6dc45d36e383c52577e3c6b"
+
+    patch_list = [
+        "0001-Add-advapi-pragma.patch",
+    ]
+    patch_options = {
+        "ignore_whitespace": True,
+    }
+
+    stack_walker = Lib(
+        name,
+        url,
+        tag,
+        patch_list,
+        copy_upstream_src,
+        patch_options,
+        pre_patch_hook=crlf_to_lf,
+        pre_patch_commits=1,
+    )
+    stack_walker.main()
 
 
 if __name__ == "__main__":

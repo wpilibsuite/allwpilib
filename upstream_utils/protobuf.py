@@ -11,6 +11,7 @@ from upstream_utils import (
     walk_cwd_and_copy_if,
     walk_if,
     git_am,
+    Lib,
 )
 
 protobuf_lite_sources = set(
@@ -255,30 +256,9 @@ def matches(dp, f, files):
     return p in files
 
 
-def main():
-    upstream_root = clone_repo(
-        "https://github.com/protocolbuffers/protobuf", "v3.21.12"
-    )
-    wpilib_root = get_repo_root()
+def copy_upstream_src(wpilib_root):
+    upstream_root = os.path.abspath(".")
     wpiutil = os.path.join(wpilib_root, "wpiutil")
-
-    # Apply patches to upstream Git repo
-    os.chdir(upstream_root)
-    for f in [
-        "0001-Fix-sign-compare-warnings.patch",
-        "0002-Remove-redundant-move.patch",
-        "0003-Fix-maybe-uninitialized-warnings.patch",
-        "0004-Fix-coded_stream-WriteRaw.patch",
-        "0005-Suppress-enum-enum-conversion-warning.patch",
-        "0006-Fix-noreturn-function-returning.patch",
-        "0007-Work-around-GCC-12-restrict-warning-compiler-bug.patch",
-        "0008-Disable-MSVC-switch-warning.patch",
-        "0009-Disable-unused-function-warning.patch",
-        "0010-Disable-pedantic-warning.patch",
-        "0011-Avoid-use-of-sprintf.patch",
-        "0012-Suppress-stringop-overflow-warning-false-positives.patch",
-    ]:
-        git_am(os.path.join(wpilib_root, "upstream_utils/protobuf_patches", f))
 
     # Delete old install
     for d in [
@@ -302,6 +282,30 @@ def main():
         include_files,
         os.path.join(wpiutil, "src/main/native/thirdparty/protobuf/include"),
     )
+
+
+def main():
+    name = "protobuf"
+    url = "https://github.com/protocolbuffers/protobuf"
+    tag = "v3.21.12"
+
+    patch_list = [
+        "0001-Fix-sign-compare-warnings.patch",
+        "0002-Remove-redundant-move.patch",
+        "0003-Fix-maybe-uninitialized-warnings.patch",
+        "0004-Fix-coded_stream-WriteRaw.patch",
+        "0005-Suppress-enum-enum-conversion-warning.patch",
+        "0006-Fix-noreturn-function-returning.patch",
+        "0007-Work-around-GCC-12-restrict-warning-compiler-bug.patch",
+        "0008-Disable-MSVC-switch-warning.patch",
+        "0009-Disable-unused-function-warning.patch",
+        "0010-Disable-pedantic-warning.patch",
+        "0011-Avoid-use-of-sprintf.patch",
+        "0012-Suppress-stringop-overflow-warning-false-positives.patch",
+    ]
+
+    protobuf = Lib(name, url, tag, patch_list, copy_upstream_src)
+    protobuf.main()
 
 
 if __name__ == "__main__":
