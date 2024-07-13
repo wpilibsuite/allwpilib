@@ -136,13 +136,15 @@ set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
 target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
 
-target_compile_features(wpimath PUBLIC cxx_std_20)
 if(MSVC)
+    target_compile_features(wpimath PUBLIC cxx_std_23)
     target_compile_options(wpimath PUBLIC /utf-8 /bigobj)
     target_link_options(
         wpimath
         PRIVATE /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/exports.def>
     )
+else()
+    target_compile_features(wpimath PUBLIC cxx_std_20)
 endif()
 wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)

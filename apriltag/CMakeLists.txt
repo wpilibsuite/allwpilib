@@ -120,7 +120,11 @@ add_library(apriltag ${apriltag_native_src} ${apriltag_resources_src} ${apriltag
 set_target_properties(apriltag PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET apriltag PROPERTY FOLDER "libraries")
-target_compile_features(apriltag PUBLIC cxx_std_20)
+if(MSVC)
+    target_compile_features(apriltag PUBLIC cxx_std_23)
+else()
+    target_compile_features(apriltag PUBLIC cxx_std_20)
+endif()
 wpilib_target_warnings(apriltag)
 
 target_link_libraries(apriltag wpimath)
