@@ -28,6 +28,7 @@ import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.numbers.N8;
 import edu.wpi.first.math.numbers.N9;
 import edu.wpi.first.math.system.proto.LinearSystemProto;
+import edu.wpi.first.math.system.struct.LinearSystemStruct;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import java.util.Arrays;
@@ -382,5 +383,22 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
       LinearSystemProto<States, Inputs, Outputs> getProto(
           Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs) {
     return new LinearSystemProto<>(states, inputs, outputs);
+  }
+
+  /**
+   * Creates an implementation of the {@link Struct} interface for linear systems.
+   *
+   * @param <States> The number of states of the linear systems this serializer processes.
+   * @param <Inputs> The number of inputs of the linear systems this serializer processes.
+   * @param <Outputs> The number of outputs of the linear systems this serializer processes.
+   * @param states The number of states of the linear systems this serializer processes.
+   * @param inputs The number of inputs of the linear systems this serializer processes.
+   * @param outputs The number of outputs of the linear systems this serializer processes.
+   * @return The struct implementation.
+   */
+  public static <States extends Num, Inputs extends Num, Outputs extends Num>
+      LinearSystemStruct<States, Inputs, Outputs> getStruct(
+          Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs) {
+    return new LinearSystemStruct<>(states, inputs, outputs);
   }
 }
