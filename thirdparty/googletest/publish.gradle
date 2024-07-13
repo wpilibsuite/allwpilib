@@ -15,7 +15,7 @@ task cppSourcesZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/native/cpp') {
+    from('src') {
         into '/'
     }
 }
@@ -29,7 +29,7 @@ task cppHeadersZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/native/include') {
+    from('include') {
         into '/'
     }
 }
