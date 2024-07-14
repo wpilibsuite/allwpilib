@@ -5,7 +5,9 @@ on:
     types:
       - opened
     paths:
-      - 'wpilibNewCommands/**'
+      - 'wpilibNewCommands/**.java'
+      - 'wpilibNewCommands/**.h'
+      - 'wpilibNewCommands/**.cpp'
 
 jobs:
   comment:
