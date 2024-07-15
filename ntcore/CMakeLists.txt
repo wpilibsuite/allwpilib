@@ -76,23 +76,18 @@ endif()
 
 if(WITH_JAVA_SOURCE)
     include(UseJava)
-    file(
-        GLOB NTCORE_SOURCES
-        src/main/java/edu/wpi/first/networktables/*.java
-        src/generated/main/java/*.java
-    )
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         ntcore_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/networktables" ${NTCORE_SOURCES}
+        BASE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
         OUTPUT_NAME ntcore-sources
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(NTCORE_SRC_JAR_FILE TARGET ntcore_src_jar PROPERTY JAR_FILE)
-    install(FILES ${NTCORE_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET ntcore_src_jar PROPERTY FOLDER "java")
+
+    install_jar(ntcore_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 add_executable(ntcoredev src/dev/native/cpp/main.cpp)

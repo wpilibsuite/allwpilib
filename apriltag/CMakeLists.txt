@@ -87,22 +87,16 @@ endif()
 
 if(WITH_JAVA_SOURCE)
     include(UseJava)
-    file(GLOB APRILTAG_SOURCES src/main/java/edu/wpi/first/apriltag/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         apriltag_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/apriltag" ${APRILTAG_SOURCES}
-        NAMESPACE
-            "edu/wpi/first/apriltag/jni"
-            src/main/java/edu/wpi/first/apriltag/jni/AprilTagJNI.java
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME apriltag-sources
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(APRILTAG_SRC_JAR_FILE TARGET apriltag_src_jar PROPERTY JAR_FILE)
-    install(FILES ${APRILTAG_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET apriltag_src_jar PROPERTY FOLDER "java")
+
+    install_jar(apriltag_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 generate_resources(
