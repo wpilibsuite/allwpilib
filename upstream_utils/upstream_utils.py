@@ -230,11 +230,47 @@ class Lib:
         self.pre_patch_commits = pre_patch_commits
         self.wpilib_root = get_repo_root()
 
-    def open_repo(self, *, err_msg_if_absent):
-        os.chdir(tempfile.gettempdir())
+    def check_patches(self):
+        patch_directory_patches = set()
+        patch_directory = os.path.join(
+            self.wpilib_root, f"upstream_utils/{self.name}_patches"
+        )
+        if os.path.exists(patch_directory):
+            for f in os.listdir(patch_directory):
+                if f.endswith(".patch"):
+                    patch_directory_patches.add(f)
+        patches = set(self.patch_list)
+        patch_directory_only = sorted(patch_directory_patches - patches)
+        patch_list_only = sorted(patches - patch_directory_patches)
+        common_patches = sorted(patch_directory_patches & patches)
+        warning = False
+        if patch_directory_only:
+            print(
+                f"WARNING: The patch directory has patches {patch_directory_only} not in the patch list"
+            )
+            warning = True
+        if patch_list_only:
+            print(
+                f"WARNING: The patch list has patches {patch_list_only} not in the patch directory"
+            )
+            warning = True
+        if warning and common_patches:
+            print(
+                f"  Note: The patch directory and the patch list both have patches {common_patches}"
+            )
 
+    def get_repo_path(self, tempdir=None):
+        if tempdir is None:
+            tempdir = tempfile.gettempdir()
         repo = os.path.basename(self.url)
-        dest = os.path.join(os.getcwd(), repo).removesuffix(".git")
+        dest = os.path.join(tempdir, repo)
+        dest = dest.removesuffix(".git")
+        return dest
+
+    def open_repo(self, *, err_msg_if_absent):
+        os.chdir(tempfile.gettempdir()
+
+        dest = self.get_repo_path(os.getcwd())
 
         print(f"INFO: Opening repository at {dest}")
 
@@ -246,33 +282,7 @@ class Lib:
                 exit(1)
         os.chdir(dest)
 
-    def replace_tag(self, tag):
-        path = os.path.join(self.wpilib_root, f"upstream_utils/{self.name}.py")
-        with open(path, "r") as file:
-            lines = file.readlines()
-
-        previous_text = f'tag = "{self.old_tag}"'
-        new_text = f'tag = "{tag}"'
-        for i in range(len(lines)):
-            lines[i] = lines[i].replace(previous_text, new_text)
-
-        with open(path, "w") as file:
-            file.writelines(lines)
-
-    def clone(self):
-        self.open_repo(err_msg_if_absent=None)
-
-        subprocess.run(["git", "switch", "--detach", self.old_tag])
-
-    def rebase(self, new_tag):
-        self.open_repo(
-            err_msg_if_absent='There\'s nothing to rebase. Run the "clone" command first.'
-        )
-
-        subprocess.run(["git", "fetch", "origin", new_tag])
-
-        subprocess.run(["git", "switch", "--detach", self.old_tag])
-
+    def apply_patches(self):
         if self.pre_patch_hook is not None:
             self.pre_patch_hook()
 
@@ -284,6 +294,60 @@ class Lib:
                 **self.patch_options,
             )
 
+    def replace_tag(self, tag):
+        path = os.path.join(self.wpilib_root, f"upstream_utils/{self.name}.py")
+        with open(path, "r") as file:
+            lines = file.readlines()
+
+        previous_text = f'tag = "{self.old_tag}"'
+        new_text = f'tag = "{tag}"'
+        for i in range(len(lines)):
+            if previous_text in lines[i]:
+                if i - 1 >= 0 and "#" in lines[i - 1]:
+                    print(
+                        f"WARNING: Automatically updating tag in line {i + 1} with a comment above it that may need updating.",
+                        file=sys.stderr,
+                    )
+                lines[i] = lines[i].replace(previous_text, new_text)
+
+        with open(path, "w") as file:
+            file.writelines(lines)
+
+    def info(self):
+        print(f"Repository name: {self.name}")
+        print(f"Upstream URL: {self.url}")
+        print(f"Upstream tag: {self.old_tag}")
+        print(f"Path to upstream clone: {self.get_repo_path()}")
+        print(f"Patches to apply: {self.patch_list}")
+        print(f"Patch options: {self.patch_options}")
+        print(f"Pre patch commits: {self.pre_patch_commits}")
+        print(f"WPILib root: {self.wpilib_root}")
+
+    def clone(self):
+        self.open_repo(err_msg_if_absent=None)
+
+        subprocess.run(["git", "switch", "--detach", self.old_tag])
+
+    def reset(self):
+        self.open_repo(
+            err_msg_if_absent='There\'s nothing to reset. Run the "clone" command first.'
+        )
+
+        subprocess.run(["git", "switch", "--detach", self.old_tag])
+
+        self.apply_patches()
+
+    def rebase(self, new_tag):
+        self.open_repo(
+            err_msg_if_absent='There\'s nothing to rebase. Run the "clone" command first.'
+        )
+
+        subprocess.run(["git", "fetch", "origin", new_tag])
+
+        subprocess.run(["git", "switch", "--detach", self.old_tag])
+
+        self.apply_patches()
+
         subprocess.run(["git", "rebase", "--onto", new_tag, self.old_tag])
 
         # Detect merge conflict by detecting if we stopped in the middle of a rebase
@@ -293,7 +357,10 @@ class Lib:
                 file=sys.stderr,
             )
 
-    def format_patch(self, tag):
+    def format_patch(self, tag=None):
+        if tag is None:
+            tag = self.old_tag
+
         self.open_repo(
             err_msg_if_absent='There\'s nothing to run format-patch on. Run the "clone" and "rebase" commands first.'
         )
@@ -339,16 +406,7 @@ class Lib:
 
         subprocess.run(["git", "switch", "--detach", self.old_tag])
 
-        if self.pre_patch_hook is not None:
-            self.pre_patch_hook()
-
-        for f in self.patch_list:
-            git_am(
-                os.path.join(
-                    self.wpilib_root, f"upstream_utils/{self.name}_patches", f
-                ),
-                **self.patch_options,
-            )
+        self.apply_patches()
 
         self.copy_upstream_src(self.wpilib_root)
 
@@ -359,7 +417,16 @@ class Lib:
         subparsers = parser.add_subparsers(dest="subcommand", required=True)
 
         subparsers.add_parser(
+            "info", help="Displays information about the upstream library"
+        )
+
+        subparsers.add_parser(
             "clone", help="Clones the upstream repository in a local tempdir"
+        )
+
+        subparsers.add_parser(
+            "reset",
+            help="Resets the clone of the upstream repository to the tag and applies patches",
         )
 
         parser_rebase = subparsers.add_parser(
@@ -372,7 +439,10 @@ class Lib:
             help="Generates patch files for the upstream repository and moves them into the upstream_utils patch directory",
         )
         parser_format_patch.add_argument(
-            "new_tag", help="The tag for the commit before the patches"
+            "new_tag",
+            nargs="?",
+            default=self.old_tag,
+            help="The tag for the commit before the patches",
         )
 
         subparsers.add_parser(
@@ -383,11 +453,17 @@ class Lib:
         args = parser.parse_args(argv)
 
         self.wpilib_root = get_repo_root()
-        if args.subcommand == "clone":
+        if args.subcommand == "info":
+            self.info()
+        elif args.subcommand == "clone":
             self.clone()
+        elif args.subcommand == "reset":
+            self.reset()
         elif args.subcommand == "rebase":
             self.rebase(args.new_tag)
         elif args.subcommand == "format-patch":
             self.format_patch(args.new_tag)
         elif args.subcommand == "copy-upstream-to-thirdparty":
             self.copy_upstream_to_thirdparty()
+
+        self.check_patches()
