@@ -268,7 +268,7 @@ class Lib:
         return dest
 
     def open_repo(self, *, err_msg_if_absent):
-        os.chdir(tempfile.gettempdir()
+        os.chdir(tempfile.gettempdir())
 
         dest = self.get_repo_path(os.getcwd())
 
@@ -365,19 +365,20 @@ class Lib:
             err_msg_if_absent='There\'s nothing to run format-patch on. Run the "clone" and "rebase" commands first.'
         )
 
+        start_commit = tag
         if self.pre_patch_commits > 0:
             commits_since_tag_output = subprocess.run(
                 ["git", "log", "--format=format:%h", f"{tag}..HEAD"],
                 capture_output=True,
             ).stdout
             commits_since_tag = commits_since_tag_output.count(b"\n") + 1
-            tag = f"HEAD~{commits_since_tag - self.pre_patch_commits}"
+            start_commit = f"HEAD~{commits_since_tag - self.pre_patch_commits}"
 
         subprocess.run(
             [
                 "git",
                 "format-patch",
-                f"{tag}..HEAD",
+                f"{start_commit}..HEAD",
                 "--abbrev=40",
                 "--zero-commit",
                 "--no-signature",
