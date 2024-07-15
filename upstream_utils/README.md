@@ -52,9 +52,8 @@ Start in the `upstream_utils` folder. Make sure a clone of the upstream repo exi
 
 Update the clone of the upstream repo.
 ```bash
-./<lib>.py rebase 2.0
+./<lib>.py reset
 ```
-where `2.0` is replaced with the version specified in `<lib>.py`.
 
 Navigate to the repo. If you can't find it, the directory of the clone is printed at the start of the `clone` command.
 ```bash
@@ -67,15 +66,14 @@ git add ...
 git commit -m "..."
 ```
 
-Update the `upstream_utils` patch files.
-```bash
-allwpilib/upstream_utils/<lib>.py format-patch 2.0
-```
-where `2.0` is replaced with the version specified in `<lib>.py`.
-
 Navigate back to `upstream_utils`.
 ```bash
 cd allwpilib/upstream_utils
+```
+
+Update the `upstream_utils` patch files.
+```bash
+./<lib>.py format-patch
 ```
 
 Update the list of patch files in `<lib>.py`, then rerun `<lib>.py` to reimport the thirdparty files.
