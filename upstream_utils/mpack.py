@@ -54,7 +54,7 @@ def main():
         "0004-Group-doxygen-into-MPack-module.patch",
     ]
 
-    mpack = Lib(name, url, tag, [], copy_upstream_src)
+    mpack = Lib(name, url, tag, patch_list, copy_upstream_src)
     mpack.main()
 
 
