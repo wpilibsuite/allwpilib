@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import org.ejml.simple.SimpleMatrix;
 
 public final class VectorStruct<R extends Num> implements Struct<Vector<R>> {
-  private final Nat<R> m_rows;
+  private final int m_rows;
 
   /**
    * Constructs the {@link Struct} implementation.
@@ -20,7 +20,7 @@ public final class VectorStruct<R extends Num> implements Struct<Vector<R>> {
    * @param rows The number of rows of the vectors this serializer processes.
    */
   public VectorStruct(Nat<R> rows) {
-    m_rows = rows;
+    m_rows = rows.getNum();
   }
 
   @Override
@@ -32,22 +32,22 @@ public final class VectorStruct<R extends Num> implements Struct<Vector<R>> {
 
   @Override
   public String getTypeString() {
-    return "struct:Vector__" + m_rows.getNum();
+    return "struct:Vector__" + m_rows;
   }
 
   @Override
   public int getSize() {
-    return kSizeDouble * m_rows.getNum();
+    return kSizeDouble * m_rows;
   }
 
   @Override
   public String getSchema() {
-    return "double data[" + m_rows.getNum() + "]";
+    return "double data[" + m_rows + "]";
   }
 
   @Override
   public Vector<R> unpack(ByteBuffer bb) {
-    var storage = new SimpleMatrix(Struct.unpackDoubleArray(bb, m_rows.getNum()));
+    var storage = new SimpleMatrix(Struct.unpackDoubleArray(bb, m_rows));
     return new Vector<R>(storage);
   }
 

@@ -14,9 +14,9 @@ import java.nio.ByteBuffer;
 
 public final class LinearSystemStruct<States extends Num, Inputs extends Num, Outputs extends Num>
     implements Struct<LinearSystem<States, Inputs, Outputs>> {
-  private final Nat<States> m_states;
-  private final Nat<Inputs> m_inputs;
-  private final Nat<Outputs> m_outputs;
+  private final int m_states;
+  private final int m_inputs;
+  private final int m_outputs;
   private final MatrixStruct<States, States> m_AStruct;
   private final MatrixStruct<States, Inputs> m_BStruct;
   private final MatrixStruct<Outputs, States> m_CStruct;
@@ -30,9 +30,9 @@ public final class LinearSystemStruct<States extends Num, Inputs extends Num, Ou
    * @param outputs The number of outputs of the linear systems this serializer processes.
    */
   public LinearSystemStruct(Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs) {
-    m_states = states;
-    m_inputs = inputs;
-    m_outputs = outputs;
+    m_states = states.getNum();
+    m_inputs = inputs.getNum();
+    m_outputs = outputs.getNum();
     m_AStruct = Matrix.getStruct(states, states);
     m_BStruct = Matrix.getStruct(states, inputs);
     m_CStruct = Matrix.getStruct(outputs, states);
@@ -48,12 +48,7 @@ public final class LinearSystemStruct<States extends Num, Inputs extends Num, Ou
 
   @Override
   public String getTypeString() {
-    return "struct:LinearSystem__"
-        + m_states.getNum()
-        + "_"
-        + m_inputs.getNum()
-        + "_"
-        + m_outputs.getNum();
+    return "struct:LinearSystem__" + m_states + "_" + m_inputs + "_" + m_outputs;
   }
 
   @Override
