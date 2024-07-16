@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <stdexcept>
+
+#include <fmt/format.h>
 #include <wpi/ProtoHelper.h>
 
 #include "frc/proto/VectorProto.h"
@@ -22,7 +25,10 @@ wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufVector*>(&msg);
   if (m->rows_size() != Size) {
-    // TODO Error
+    throw std::invalid_argument(
+        fmt::format("Tried to unpack message with {} elements in rows into "
+                    "Vector with {} rows",
+                    m->rows_size(), Size));
   }
   frc::Matrixd<Size, 1, Options, MaxRows, MaxCols> vec;
   for (int i = 0; i < Size; i++) {

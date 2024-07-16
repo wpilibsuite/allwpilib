@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <stdexcept>
+
+#include <fmt/format.h>
 #include <wpi/ProtoHelper.h>
 
 #include "frc/proto/MatrixProto.h"
@@ -24,10 +27,16 @@ wpi::Protobuf<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufMatrix*>(&msg);
   if (m->num_rows() != Rows || m->num_cols() != Cols) {
-    // TODO Error
+    throw std::invalid_argument(
+        fmt::format("Tried to unpack message with {} rows and {} columns into "
+                    "Matrix with {} rows and {} columns",
+                    m->num_rows(), m->num_cols(), Rows, Cols));
   }
   if (m->data_size() != Rows * Cols) {
-    // TODO Error
+    throw std::invalid_argument(
+        fmt::format("Tried to unpack message with {} elements in data into "
+                    "Matrix with {} elements",
+                    m->data_size(), Rows * Cols));
   }
   frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> mat;
   for (int i = 0; i < Rows * Cols; i++) {

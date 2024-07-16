@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <stdexcept>
+
+#include <fmt/format.h>
 #include <wpi/ProtoHelper.h>
 
 #include "frc/kinematics/proto/SwerveDriveKinematicsProto.h"
@@ -21,6 +24,12 @@ frc::SwerveDriveKinematics<NumModules>
 wpi::Protobuf<frc::SwerveDriveKinematics<NumModules>>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufSwerveDriveKinematics*>(&msg);
+  if (m->modules_size() != NumModules) {
+    throw std::invalid_argument(
+        fmt::format("Tried to unpack message with {} elements in modules into "
+                    "SwerveDriveKinematics with {} modules",
+                    m->modules_size(), NumModules));
+  }
   return frc::SwerveDriveKinematics<NumModules>{
       wpi::UnpackProtobufArray<wpi::proto::ProtobufTranslation2d,
                                frc::Translation2d, NumModules>(m->modules())};
