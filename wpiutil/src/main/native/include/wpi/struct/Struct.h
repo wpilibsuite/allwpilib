@@ -479,9 +479,7 @@ struct Struct<int8_t> {
   static constexpr size_t GetSize() { return 1; }
   static constexpr std::string_view GetSchema() { return "int8 value"; }
   static int8_t Unpack(std::span<const uint8_t> data) { return data[0]; }
-  static void Pack(std::span<uint8_t> data, int8_t value) {
-    data[0] = value;
-  }
+  static void Pack(std::span<uint8_t> data, int8_t value) { data[0] = value; }
 };
 
 /**
