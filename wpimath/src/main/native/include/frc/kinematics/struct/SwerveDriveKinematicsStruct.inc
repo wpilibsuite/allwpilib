@@ -6,14 +6,11 @@
 
 #include "frc/kinematics/struct/SwerveDriveKinematicsStruct.h"
 
-namespace {
-constexpr size_t kModulesOff = 0;
-}  // namespace
-
 template <size_t NumModules>
 frc::SwerveDriveKinematics<NumModules>
 wpi::Struct<frc::SwerveDriveKinematics<NumModules>>::Unpack(
     std::span<const uint8_t> data) {
+  constexpr size_t kModulesOff = 0;
   return frc::SwerveDriveKinematics<NumModules>{
       wpi::UnpackStructArray<frc::Translation2d, kModulesOff, NumModules>(
           data)};
@@ -23,5 +20,6 @@ template <size_t NumModules>
 void wpi::Struct<frc::SwerveDriveKinematics<NumModules>>::Pack(
     std::span<uint8_t> data,
     const frc::SwerveDriveKinematics<NumModules>& value) {
+  constexpr size_t kModulesOff = 0;
   wpi::PackStructArray<kModulesOff, NumModules>(data, value.GetModules());
 }

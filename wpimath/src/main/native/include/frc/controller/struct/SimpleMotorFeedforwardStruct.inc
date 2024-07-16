@@ -6,16 +6,13 @@
 
 #include "frc/controller/struct/SimpleMotorFeedforwardStruct.h"
 
-namespace {
-constexpr size_t kKsOff = 0;
-constexpr size_t kKvOff = kKsOff + 8;
-constexpr size_t kKaOff = kKvOff + 8;
-}  // namespace
-
 template <class Distance>
 frc::SimpleMotorFeedforward<Distance>
 wpi::Struct<frc::SimpleMotorFeedforward<Distance>>::Unpack(
     std::span<const uint8_t> data) {
+  constexpr size_t kKsOff = 0;
+  constexpr size_t kKvOff = kKsOff + 8;
+  constexpr size_t kKaOff = kKvOff + 8;
   return {units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
           units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
               wpi::UnpackStruct<double, kKvOff>(data)},
@@ -27,6 +24,9 @@ template <class Distance>
 void wpi::Struct<frc::SimpleMotorFeedforward<Distance>>::Pack(
     std::span<uint8_t> data,
     const frc::SimpleMotorFeedforward<Distance>& value) {
+  constexpr size_t kKsOff = 0;
+  constexpr size_t kKvOff = kKsOff + 8;
+  constexpr size_t kKaOff = kKvOff + 8;
   wpi::PackStruct<kKsOff>(data, value.kS.value());
   wpi::PackStruct<kKvOff>(
       data,
