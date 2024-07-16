@@ -32,7 +32,7 @@ Rebase the clone of the upstream repo.
 
 Update the `upstream_utils` patch files and the tag in the script.
 ```bash
-./<lib>.py format-patch 2.0
+./<lib>.py format-patch
 ```
 
 Copy the updated upstream files into the thirdparty files within allwpilib.
