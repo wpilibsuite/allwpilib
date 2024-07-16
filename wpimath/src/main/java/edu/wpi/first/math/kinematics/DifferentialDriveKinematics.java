@@ -121,6 +121,13 @@ public class DifferentialDriveKinematics
   }
 
   @Override
+  public void copyInto(
+      DifferentialDriveWheelPositions positions, DifferentialDriveWheelPositions output) {
+    output.leftMeters = positions.leftMeters;
+    output.rightMeters = positions.rightMeters;
+  }
+
+  @Override
   public DifferentialDriveWheelPositions interpolate(
       DifferentialDriveWheelPositions startValue,
       DifferentialDriveWheelPositions endValue,

@@ -9,8 +9,6 @@ file(GLOB wpinet_jni_src src/main/native/cpp/jni/WPINetJNI.cpp)
 
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
-    find_package(JNI REQUIRED)
     include(UseJava)
 
     set(CMAKE_JNI_TARGET true)
@@ -22,6 +20,7 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS wpiutil_jar
         OUTPUT_NAME wpinet
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS wpinet_jni_headers
     )
     set_property(TARGET wpinet_jar PROPERTY FOLDER "java")
@@ -43,20 +42,17 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB WPINET_SOURCES src/main/java/edu/wpi/first/net/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         wpinet_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES}
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME wpinet-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(WPINET_SRC_JAR_FILE TARGET wpinet_src_jar PROPERTY JAR_FILE)
-    install(FILES ${WPINET_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET wpinet_src_jar PROPERTY FOLDER "java")
+
+    install_jar(wpinet_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -145,7 +141,6 @@ if(NOT USE_SYSTEM_LIBUV)
         wpinet
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/libuv/include>
-            $<INSTALL_INTERFACE:${include_dest}/wpinet>
     )
     if(NOT MSVC)
         target_sources(wpinet PRIVATE ${uv_unix_src})
@@ -185,7 +180,6 @@ target_include_directories(
     wpinet
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpinet>
 )
 
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpinet")

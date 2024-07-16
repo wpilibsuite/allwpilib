@@ -267,6 +267,14 @@ public class MecanumDriveKinematics
   }
 
   @Override
+  public void copyInto(MecanumDriveWheelPositions positions, MecanumDriveWheelPositions output) {
+    output.frontLeftMeters = positions.frontLeftMeters;
+    output.frontRightMeters = positions.frontRightMeters;
+    output.rearLeftMeters = positions.rearLeftMeters;
+    output.rearRightMeters = positions.rearRightMeters;
+  }
+
+  @Override
   public MecanumDriveWheelPositions interpolate(
       MecanumDriveWheelPositions startValue, MecanumDriveWheelPositions endValue, double t) {
     return new MecanumDriveWheelPositions(

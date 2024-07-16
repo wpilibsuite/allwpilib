@@ -246,7 +246,7 @@ public final class TrajectoryGenerator {
     var splinePoints = new ArrayList<PoseWithCurvature>();
 
     // Add the first point to the vector.
-    splinePoints.add(splines[0].getPoint(0.0));
+    splinePoints.add(splines[0].getPoint(0.0).get());
 
     // Iterate through the vector and parameterize each spline, adding the
     // parameterized points to the final vector.
