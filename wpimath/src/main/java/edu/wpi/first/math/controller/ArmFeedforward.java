@@ -70,13 +70,14 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
+   * Calculates the feedforward from the gains and references.
    *
-   * @param positionRadians The position (angle) setpoint. This angle should be measured from the
-   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
-   *     your encoder does not follow this convention, an offset should be added.
-   * @param velocityRadPerSec The velocity setpoint.
-   * @param accelRadPerSecSquared The acceleration setpoint.
+   * @param positionRadians The position reference as an angle. This defines the "target position" the 
+   *     controller will aim for. This angle should be measured from the horizontal (i.e. if the provided 
+   *     angle is 0, the arm should be parallel with the floor). If your encoder does not follow this
+   *     convention, an offset should be added.
+   * @param velocityRadPerSec The velocity reference.
+   * @param accelRadPerSecSquared The acceleration reference.
    * @return The computed feedforward.
    */
   public double calculate(
@@ -88,13 +89,14 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to be
+   * Calculates the feedforward from the gains and velocity reference (acceleration is assumed to be
    * zero).
    *
-   * @param positionRadians The position (angle) setpoint. This angle should be measured from the
-   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
-   *     your encoder does not follow this convention, an offset should be added.
-   * @param velocity The velocity setpoint.
+   * @param positionRadians The position reference as an angle. This defines the "target position" the 
+   *     controller will aim for. This angle should be measured from the horizontal (i.e. if the provided 
+   *     angle is 0, the arm should be parallel with the floor). If your encoder does not follow this
+   *     convention, an offset should be added.
+   * @param velocity The velocity reference.
    * @return The computed feedforward.
    */
   public double calculate(double positionRadians, double velocity) {
@@ -102,14 +104,14 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
+   * Calculates the feedforward from the gains and references.
    *
    * @param currentAngle The current angle in radians. This angle should be measured from the
    *     horizontal (i.e. if the provided angle is 0, the arm should be parallel to the floor). If
    *     your encoder does not follow this convention, an offset should be added.
-   * @param currentVelocity The current velocity setpoint in radians per second.
-   * @param nextVelocity The next velocity setpoint in radians per second.
-   * @param dt Time between velocity setpoints in seconds.
+   * @param currentVelocity The current velocity reference in radians per second.
+   * @param nextVelocity The next velocity reference in radians per second.
+   * @param dt Time between velocity references in seconds.
    * @return The computed feedforward in volts.
    */
   public double calculate(
