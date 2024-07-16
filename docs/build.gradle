@@ -228,6 +228,7 @@ task generateJavaDocs(type: Javadoc) {
             "-edu.wpi.first.math.spline.proto," +
             "-edu.wpi.first.math.spline.struct," +
             "-edu.wpi.first.math.system.proto," +
+            "-edu.wpi.first.math.system.struct," +
             "-edu.wpi.first.math.system.plant.proto," +
             "-edu.wpi.first.math.system.plant.struct," +
             "-edu.wpi.first.math.trajectory.proto", true)

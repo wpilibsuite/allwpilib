@@ -120,6 +120,7 @@ public interface Struct<T> {
    * position. Will increment the ByteBuffer position by size * struct.size() bytes. Will not
    * otherwise modify the ByteBuffer (e.g. byte order will not be changed).
    *
+   * @param <T> Object type
    * @param bb ByteBuffer
    * @param size Size of the array
    * @param struct Struct implementation
@@ -157,6 +158,7 @@ public interface Struct<T> {
    * ByteBuffer position by size * struct.size() bytes. Will not otherwise modify the ByteBuffer (e.g.
    * byte order will not be changed).
    *
+   * @param <T> Object type
    * @param bb ByteBuffer
    * @param arr Array to serialize
    * @param struct Struct implementation

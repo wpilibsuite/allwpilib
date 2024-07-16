@@ -31,6 +31,7 @@ import edu.wpi.first.math.system.proto.LinearSystemProto;
 import edu.wpi.first.math.system.struct.LinearSystemStruct;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.Struct;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
