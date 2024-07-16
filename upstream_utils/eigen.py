@@ -133,6 +133,7 @@ def main():
     patch_list = [
         "0001-Disable-warnings.patch",
         "0002-Intellisense-fix.patch",
+        "0003-Suppress-has_denorm-and-has_denorm_loss-deprecation-.patch",
     ]
 
     eigen = Lib(name, url, tag, patch_list, copy_upstream_src)

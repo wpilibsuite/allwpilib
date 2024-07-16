@@ -37,25 +37,18 @@ endif()
 
 if(WITH_JAVA_SOURCE)
     include(UseJava)
-    file(GLOB WPILIBNEWCOMMANDS_SOURCES src/main/java/edu/wpi/first/wpilibj2/command/*.java)
-    file(
-        GLOB WPILIBNEWCOMMANDS_BUTTON_SOURCES
-        src/main/java/edu/wpi/first/wpilibj2/command/button/*.java
-        src/generated/main/java/edu/wpi/first/wpilibj2/command/button/*.java
-    )
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         wpilibNewCommands_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/wpilibj2/command" ${WPILIBNEWCOMMANDS_SOURCES}
-        NAMESPACE "edu/wpi/first/wpilibj2/command/button" ${WPILIBNEWCOMMANDS_BUTTON_SOURCES}
+        BASE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
         OUTPUT_NAME wpilibNewCommands-sources
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(WPILIBNEWCOMMANDS_SRC_JAR_FILE TARGET wpilibNewCommands_src_jar PROPERTY JAR_FILE)
-    install(FILES ${WPILIBNEWCOMMANDS_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET wpilibNewCommands_src_jar PROPERTY FOLDER "java")
+
+    install_jar(wpilibNewCommands_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 file(

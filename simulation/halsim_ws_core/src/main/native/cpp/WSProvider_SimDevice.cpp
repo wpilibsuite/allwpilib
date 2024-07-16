@@ -188,7 +188,8 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
   if (ws) {
     switch (value->type) {
       case HAL_BOOLEAN:
-        ProcessHalCallback({{valueData->key, value->data.v_boolean}});
+        ProcessHalCallback(
+            {{valueData->key, static_cast<bool>(value->data.v_boolean)}});
         break;
       case HAL_DOUBLE:
         ProcessHalCallback(

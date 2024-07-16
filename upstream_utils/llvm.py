@@ -221,6 +221,7 @@ def main():
         "0034-Add-back-removed-raw_string_ostream-write_impl.patch",
         "0035-Remove-auto-conversion-from-raw_ostream.patch",
         "0036-Add-SmallVector-erase_if.patch",
+        "0037-Fix-AlignedCharArrayUnion-for-C-23.patch",
     ]
     patch_options = {
         "use_threeway": True,

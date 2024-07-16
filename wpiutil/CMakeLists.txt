@@ -87,29 +87,16 @@ endif()
 
 if(WITH_JAVA_SOURCE)
     include(UseJava)
-    file(GLOB WPIUTIL_SOURCES src/main/java/edu/wpi/first/util/*.java)
-    file(GLOB WPIUTIL_CLEANUP_SOURCES src/main/java/edu/wpi/first/util/cleanup/*.java)
-    file(GLOB WPIUTIL_CONCURRENT_SOURCES src/main/java/edu/wpi/first/util/concurrent/*.java)
-    file(GLOB WPIUTIL_DATALOG_SOURCES src/main/java/edu/wpi/first/util/datalog/*.java)
-    file(GLOB WPIUTIL_FUNCTION_SOURCES src/main/java/edu/wpi/first/util/function/*.java)
-    file(GLOB WPIUTIL_SENDABLE_SOURCES src/main/java/edu/wpi/first/util/sendable/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         wpiutil_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/util" ${WPIUTIL_SOURCES}
-        NAMESPACE "edu/wpi/first/util/cleanup" ${WPIUTIL_CLEANUP_SOURCES}
-        NAMESPACE "edu/wpi/first/util/concurrent" ${WPIUTIL_CONCURRENT_SOURCES}
-        NAMESPACE "edu/wpi/first/util/datalog" ${WPIUTIL_DATALOG_SOURCES}
-        NAMESPACE "edu/wpi/first/util/function" ${WPIUTIL_FUNCTION_SOURCES}
-        NAMESPACE "edu/wpi/first/util/sendable" ${WPIUTIL_SENDABLE_SOURCES}
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME wpiutil-sources
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(WPIUTIL_SRC_JAR_FILE TARGET wpiutil_src_jar PROPERTY JAR_FILE)
-    install(FILES ${WPIUTIL_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET wpiutil_src_jar PROPERTY FOLDER "java")
+
+    install_jar(wpiutil_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
