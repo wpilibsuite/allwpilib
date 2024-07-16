@@ -485,29 +485,21 @@ class Lib:
                 file=sys.stderr,
             )
 
-    def format_patch(self, tag=None):
+    def format_patch(self):
         """Generates patch files for the upstream repository and moves them into
         the patch directory.
-
-        Keyword argument:
-        tag -- The tag of the commit of the upstream repository the patch
-        commits were applied onto. If None (the default), the root tag will be
-        used.
         """
         self.open_repo(
             err_msg_if_absent='There\'s nothing to run format-patch on. Run the "clone" and "rebase" commands first.'
         )
 
-        if tag is None:
-            tag = self.get_root_tag()
-            script_tag = tag.removeprefix("upstream_utils_root-")
-        else:
-            script_tag = tag
+        root_tag = self.get_root_tag()
+        script_tag = root_tag.removeprefix("upstream_utils_root-")
 
-        start_commit = tag
+        start_commit = root_tag
         if self.pre_patch_commits > 0:
             commits_since_tag_output = subprocess.run(
-                ["git", "log", "--format=format:%h", f"{tag}..HEAD"],
+                ["git", "log", "--format=format:%h", f"{start_commit}..HEAD"],
                 capture_output=True,
             ).stdout
             commits_since_tag = commits_since_tag_output.count(b"\n") + 1
@@ -593,12 +585,6 @@ class Lib:
             "format-patch",
             help="Generates patch files for the upstream repository and moves them into the upstream_utils patch directory",
         )
-        parser_format_patch.add_argument(
-            "new_tag",
-            nargs="?",
-            default=None,
-            help="The tag for the commit before the patches",
-        )
 
         subparsers.add_parser(
             "copy-upstream-to-thirdparty",
@@ -617,7 +603,7 @@ class Lib:
         elif args.subcommand == "rebase":
             self.rebase(args.new_tag)
         elif args.subcommand == "format-patch":
-            self.format_patch(args.new_tag)
+            self.format_patch()
         elif args.subcommand == "copy-upstream-to-thirdparty":
             self.copy_upstream_to_thirdparty()
 
