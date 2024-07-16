@@ -282,6 +282,41 @@ class Lib:
                 exit(1)
         os.chdir(dest)
 
+    def get_root_tags(self):
+        root_tag_output = subprocess.run(
+            ["git", "tag", "--list", "upstream_utils_root-*"],
+            capture_output=True,
+            text=True,
+        ).stdout
+        return root_tag_output.splitlines()
+
+    def get_root_tag(self):
+        root_tags = self.get_root_tags()
+        if len(root_tags) == 0:
+            print(
+                "ERROR: Could not determine root tag: No tags match 'upstream_utils_root-*'",
+                file=sys.stderr,
+            )
+            exit(1)
+        if len(root_tags) > 1:
+            print(
+                f"ERROR: Could not determine root tag: Multiple candidates: {root_tags}",
+                file=sys.stderr,
+            )
+            exit(1)
+        return root_tags[0]
+
+    def set_root_tag(self, tag):
+        root_tags = self.get_root_tags()
+
+        if len(root_tags) > 1:
+            print(f"WARNING: Deleting multiple root tags {root_tags}", file=sys.stderr)
+
+        for root_tag in root_tags:
+            subprocess.run(["git", "tag", "-d", root_tag])
+
+        subprocess.run(["git", "tag", f"upstream_utils_root-{tag}", tag])
+
     def apply_patches(self):
         if self.pre_patch_hook is not None:
             self.pre_patch_hook()
@@ -328,6 +363,8 @@ class Lib:
 
         subprocess.run(["git", "switch", "--detach", self.old_tag])
 
+        self.set_root_tag(self.old_tag)
+
     def reset(self):
         self.open_repo(
             err_msg_if_absent='There\'s nothing to reset. Run the "clone" command first.'
@@ -348,6 +385,8 @@ class Lib:
 
         self.apply_patches()
 
+        self.set_root_tag(new_tag)
+
         subprocess.run(["git", "rebase", "--onto", new_tag, self.old_tag])
 
         # Detect merge conflict by detecting if we stopped in the middle of a rebase
@@ -358,12 +397,15 @@ class Lib:
             )
 
     def format_patch(self, tag=None):
-        if tag is None:
-            tag = self.old_tag
-
         self.open_repo(
             err_msg_if_absent='There\'s nothing to run format-patch on. Run the "clone" and "rebase" commands first.'
         )
+
+        if tag is None:
+            tag = self.get_root_tag()
+            script_tag = tag.removeprefix("upstream_utils_root-")
+        else:
+            script_tag = tag
 
         start_commit = tag
         if self.pre_patch_commits > 0:
@@ -404,7 +446,7 @@ class Lib:
                     is_first = False
                 shutil.move(f, patch_dest)
 
-        self.replace_tag(tag)
+        self.replace_tag(script_tag)
 
     def copy_upstream_to_thirdparty(self):
         self.open_repo(
@@ -448,7 +490,7 @@ class Lib:
         parser_format_patch.add_argument(
             "new_tag",
             nargs="?",
-            default=self.old_tag,
+            default=None,
             help="The tag for the commit before the patches",
         )
 
