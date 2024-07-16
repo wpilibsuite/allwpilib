@@ -203,7 +203,8 @@ def git_am(patch, use_threeway=False, ignore_whitespace=False):
 
 
 def has_git_rev(rev):
-    """Checks whether the Git repository in the current directory has the given revision.
+    """Checks whether the Git repository in the current directory has the given
+    revision.
 
     Keyword arguments:
     rev -- The revision to check
@@ -233,13 +234,20 @@ class Lib:
         Keyword arguments:
         name -- The name of the library.
         url -- The URL of the upstream repository.
-        tag -- The tag in the upstream repository to use. Can be any <commit-ish> (e.g., commit hash or tag).
+        tag -- The tag in the upstream repository to use. Can be any
+               <commit-ish> (e.g., commit hash or tag).
         patch_list -- The list of patches in the patch directory to apply.
-        copy_upstream_src -- A callable that takes the path to the wpilib root and copies the files from the clone of the upstream into the appropriate thirdparty directory. Will only be called when the current directory is the upstream clone.
-        patch_options -- The dictionary of options to use when applying patches. Corresponds to the parameters of git_am.
+        copy_upstream_src -- A callable that takes the path to the wpilib root
+                             and copies the files from the clone of the upstream
+                             into the appropriate thirdparty directory. Will
+                             only be called when the current directory is the
+                             upstream clone.
+        patch_options -- The dictionary of options to use when applying patches.
+                         Corresponds to the parameters of git_am.
 
         Keyword-only arguments:
-        pre_patch_hook -- Optional callable taking no parameters that will be called before applying patches.
+        pre_patch_hook -- Optional callable taking no parameters that will be
+                          called before applying patches.
         pre_patch_commits -- Number of commits added by pre_patch_hook.
         """
         self.name = name
@@ -253,7 +261,9 @@ class Lib:
         self.wpilib_root = get_repo_root()
 
     def check_patches(self):
-        """Checks the patch list supplied to the constructor against the patches in the patch directory."""
+        """Checks that the patch list supplied to the constructor matches the
+        patches in the patch directory.
+        """
         patch_directory_patches = set()
         patch_directory = os.path.join(
             self.wpilib_root, f"upstream_utils/{self.name}_patches"
@@ -286,10 +296,12 @@ class Lib:
         """Returns the path to the clone of the upstream repository.
 
         Keyword argument:
-        tempdir -- The path to the temporary directory to use. If None (the default), uses tempfile.gettempdir().
+        tempdir -- The path to the temporary directory to use. If None (the
+                   default), uses tempfile.gettempdir().
 
         Returns:
-        The path to the clone of the upstream repository. Will be absolute if tempdir is absolute.
+        The path to the clone of the upstream repository. Will be absolute if
+        tempdir is absolute.
         """
         if tempdir is None:
             tempdir = tempfile.gettempdir()
@@ -299,10 +311,14 @@ class Lib:
         return dest
 
     def open_repo(self, *, err_msg_if_absent):
-        """Changes the current working directory to the upstream repository. If err_msg_if_absent is not None and the upstream repository does not exist, the program exits with return code 1.
+        """Changes the current working directory to the upstream repository. If
+        err_msg_if_absent is not None and the upstream repository does not
+        exist, the program exits with return code 1.
 
         Keyword-only argument:
-        err_msg_if_absent -- The error message to print to stderr if the upstream repository does not exist. If None, the upstream repository will be cloned without emitting any warnings.
+        err_msg_if_absent -- The error message to print to stderr if the
+        upstream repository does not exist. If None, the upstream repository
+        will be cloned without emitting any warnings.
         """
         os.chdir(tempfile.gettempdir())
 
@@ -332,7 +348,9 @@ class Lib:
         return root_tag_output.splitlines()
 
     def get_root_tag(self):
-        """Returns the root tag (the default tag to apply the patches relative to). If there are multiple candidates, prints an error to stderr and the program exits with return code 1.
+        """Returns the root tag (the default tag to apply the patches relative
+        to). If there are multiple candidates, prints an error to stderr and the
+        program exits with return code 1.
 
         Returns:
         The root tag.
@@ -369,7 +387,9 @@ class Lib:
         subprocess.run(["git", "tag", f"upstream_utils_root-{tag}", tag])
 
     def apply_patches(self):
-        """Applies the patches listed in the patch list to the current directory."""
+        """Applies the patches listed in the patch list to the current
+        directory.
+        """
         if self.pre_patch_hook is not None:
             self.pre_patch_hook()
 
@@ -425,7 +445,9 @@ class Lib:
         self.set_root_tag(self.old_tag)
 
     def reset(self):
-        """Resets the clone of the upstream repository to the state specified by the script and patches."""
+        """Resets the clone of the upstream repository to the state specified by
+        the script and patches.
+        """
         self.open_repo(
             err_msg_if_absent='There\'s nothing to reset. Run the "clone" command first.'
         )
@@ -464,10 +486,13 @@ class Lib:
             )
 
     def format_patch(self, tag=None):
-        """Generates patch files for the upstream repository and moves them into the patch directory.
+        """Generates patch files for the upstream repository and moves them into
+        the patch directory.
 
         Keyword argument:
-        tag -- The tag of the commit of the upstream repository the patch commit were applied onto. If None (the default), the root tag will be used.
+        tag -- The tag of the commit of the upstream repository the patch
+        commits were applied onto. If None (the default), the root tag will be
+        used.
         """
         self.open_repo(
             err_msg_if_absent='There\'s nothing to run format-patch on. Run the "clone" and "rebase" commands first.'
@@ -521,7 +546,9 @@ class Lib:
         self.replace_tag(script_tag)
 
     def copy_upstream_to_thirdparty(self):
-        """Copies files from the upstream repository into the thirdparty directory."""
+        """Copies files from the upstream repository into the thirdparty
+        directory.
+        """
         self.open_repo(
             err_msg_if_absent='There\'s no repository to copy from. Run the "clone" command first.'
         )
@@ -536,7 +563,8 @@ class Lib:
         """Processes the given arguments.
 
         Keyword argument:
-        argv -- The arguments to process. Defaults to the arguments passed to the program.
+        argv -- The arguments to process. Defaults to the arguments passed to
+        the program.
         """
         parser = argparse.ArgumentParser(
             description=f"CLI manager of the {self.name} upstream library"
