@@ -372,6 +372,8 @@ class Lib:
 
         subprocess.run(["git", "switch", "--detach", self.old_tag])
 
+        self.set_root_tag(self.old_tag)
+
         self.apply_patches()
 
     def rebase(self, new_tag):
