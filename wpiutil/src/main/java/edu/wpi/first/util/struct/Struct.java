@@ -116,9 +116,9 @@ public interface Struct<T> {
   }
 
   /**
-   * Deserializes an array from a raw struct serialized ByteBuffer starting at the current
-   * position. Will increment the ByteBuffer position by size * struct.size() bytes. Will not
-   * otherwise modify the ByteBuffer (e.g. byte order will not be changed).
+   * Deserializes an array from a raw struct serialized ByteBuffer starting at the current position.
+   * Will increment the ByteBuffer position by size * struct.size() bytes. Will not otherwise modify
+   * the ByteBuffer (e.g. byte order will not be changed).
    *
    * @param <T> Object type
    * @param bb ByteBuffer
@@ -134,7 +134,6 @@ public interface Struct<T> {
     }
     return arr;
   }
-
 
   /**
    * Deserializes a double array from a raw struct serialized ByteBuffer starting at the current
@@ -155,8 +154,8 @@ public interface Struct<T> {
 
   /**
    * Puts array contents to a ByteBuffer starting at the current position. Will increment the
-   * ByteBuffer position by size * struct.size() bytes. Will not otherwise modify the ByteBuffer (e.g.
-   * byte order will not be changed).
+   * ByteBuffer position by size * struct.size() bytes. Will not otherwise modify the ByteBuffer
+   * (e.g. byte order will not be changed).
    *
    * @param <T> Object type
    * @param bb ByteBuffer
