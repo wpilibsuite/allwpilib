@@ -393,10 +393,16 @@ class Lib:
             print(
                 f"WARNING: Patch directory {patch_dest} does not exist", file=sys.stderr
             )
+        else:
+            shutil.rmtree(patch_dest)
 
+        is_first = True
         for f in os.listdir():
             if f.endswith(".patch"):
-                os.rename(f, os.path.join(patch_dest, f))
+                if is_first:
+                    os.mkdir(patch_dest)
+                    is_first = False
+                shutil.move(f, patch_dest)
 
         self.replace_tag(tag)
 
