@@ -32,6 +32,7 @@ import edu.wpi.first.math.system.struct.LinearSystemStruct;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +52,7 @@ import org.ejml.simple.SimpleMatrix;
  * @param <Outputs> Number of outputs.
  */
 public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num>
-    implements ProtobufSerializable {
+    implements ProtobufSerializable, StructSerializable {
   /** Continuous system matrix. */
   private final Matrix<States, States> m_A;
 

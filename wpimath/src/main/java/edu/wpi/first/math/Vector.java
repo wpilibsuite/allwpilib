@@ -11,6 +11,7 @@ import edu.wpi.first.math.struct.VectorStruct;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
 
@@ -21,7 +22,8 @@ import org.ejml.simple.SimpleMatrix;
  *
  * @param <R> The number of rows in this matrix.
  */
-public class Vector<R extends Num> extends Matrix<R, N1> implements ProtobufSerializable {
+public class Vector<R extends Num> extends Matrix<R, N1>
+    implements ProtobufSerializable, StructSerializable {
   /**
    * Constructs an empty zero vector of the given dimensions.
    *
