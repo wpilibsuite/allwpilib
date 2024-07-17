@@ -11,6 +11,7 @@
 #include <frc/simulation/EncoderSim.h>
 #include <frc/simulation/FlywheelSim.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/system/plant/LinearSystemId.h>
 #include <units/moment_of_inertia.h>
 
 /**
@@ -39,7 +40,7 @@ class Robot : public frc::TimedRobot {
                                0.9 * m_feedforward.Calculate(setpoint));
   }
 
-  void RobotInit() override {
+  Robot() {
     // Add bang-bang controler to SmartDashboard and networktables.
     frc::SmartDashboard::PutData("BangBangControler", &m_bangBangControler);
   }

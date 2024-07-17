@@ -35,19 +35,16 @@ endif()
 
 if(WITH_JAVA_SOURCE)
     include(UseJava)
-    file(GLOB XRPVENDORDEP_SOURCES src/main/java/edu/wpi/first/wpilibj/xrp/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         xrpVendordep_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/wpilibj/xrp" ${XRPVENDORDEP_SOURCES}
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME xrpVendordep-sources
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(xrpVendordep_src_JAR_FILE TARGET xrpVendordep_src_jar PROPERTY JAR_FILE)
-    install(FILES ${xrpVendordep_src_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET xrpVendordep_src_jar PROPERTY FOLDER "java")
+
+    install_jar(xrpVendordep_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 file(GLOB_RECURSE xrpVendordep_native_src src/main/native/cpp/*.cpp)

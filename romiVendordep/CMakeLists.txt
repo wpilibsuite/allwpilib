@@ -35,19 +35,16 @@ endif()
 
 if(WITH_JAVA_SOURCE)
     include(UseJava)
-    file(GLOB_RECURSE ROMIVENDORDEP_SOURCES src/main/java/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         romiVendordep_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/wpilibj/romi" ${ROMIVENDORDEP_SOURCES}
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME romiVendordep-sources
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(ROMIVENDORDEP_SRC_JAR_FILE TARGET romiVendordep_src_jar PROPERTY JAR_FILE)
-    install(FILES ${ROMIVENDORDEP_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET romiVendordep_src_jar PROPERTY FOLDER "java")
+
+    install_jar(romiVendordep_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 file(GLOB_RECURSE romiVendordep_native_src src/main/native/cpp/*.cpp)

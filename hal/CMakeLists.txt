@@ -80,28 +80,18 @@ endif()
 
 if(WITH_JAVA_SOURCE)
     include(UseJava)
-    file(GLOB HAL_SOURCES src/main/java/edu/wpi/first/hal/*.java src/generated/main/java/*.java)
-    file(GLOB HAL_CAN_SOURCES src/main/java/edu/wpi/first/hal/can/*.java)
-    file(GLOB HAL_SIMULATION_SOURCES src/main/java/edu/wpi/first/hal/simulation/*.java)
-    file(GLOB HAL_UTIL_SOURCES src/main/java/edu/wpi/first/hal/util/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         hal_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/hal" ${HAL_SOURCES}
-        NAMESPACE "edu/wpi/first/hal/can" ${HAL_CAN_SOURCES}
-        NAMESPACE
-            "edu/wpi/first/hal/communication"
-            src/main/java/edu/wpi/first/hal/communication/NIRioStatus.java
-        NAMESPACE "edu/wpi/first/hal/simulation" ${HAL_SIMULATION_SOURCES}
-        NAMESPACE "edu/wpi/first/hal/util" ${HAL_UTIL_SOURCES}
+        BASE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
         OUTPUT_NAME wpiHal-sources
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(HAL_SRC_JAR_FILE TARGET hal_src_jar PROPERTY JAR_FILE)
-    install(FILES ${HAL_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET hal_src_jar PROPERTY FOLDER "java")
+
+    install_jar(hal_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 if(WITH_TESTS)

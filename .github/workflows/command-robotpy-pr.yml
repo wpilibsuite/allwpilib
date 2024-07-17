@@ -5,7 +5,7 @@ on:
     types:
       - opened
     paths:
-      - 'wpilibNewCommands/**'
+      - 'wpilibNewCommands/src/**/*.java'
 
 jobs:
   comment:

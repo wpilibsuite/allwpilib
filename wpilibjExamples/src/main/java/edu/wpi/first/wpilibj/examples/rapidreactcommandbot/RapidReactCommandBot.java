@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.examples.rapidreactcommandbot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterConstants;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
+@Logged(name = "Rapid React Command Robot Container")
 public class RapidReactCommandBot {
   // The robot's subsystems
   private final Drive m_drive = new Drive();
@@ -40,7 +42,7 @@ public class RapidReactCommandBot {
    * Use this method to define bindings between conditions and commands. These are useful for
    * automating robot behaviors based on button and sensor input.
    *
-   * <p>Should be called during {@link Robot#robotInit()}.
+   * <p>Should be called in the robot class constructor.
    *
    * <p>Event binding methods are available on the {@link Trigger} class.
    */

@@ -19,7 +19,6 @@
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/Kinematics.h"
 #include "frc/kinematics/Odometry.h"
-#include "frc/kinematics/WheelPositions.h"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
