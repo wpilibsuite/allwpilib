@@ -8,26 +8,12 @@ from upstream_utils import (
     clone_repo,
     walk_if,
     git_am,
+    Lib,
 )
 
 
-def main():
-    upstream_root = clone_repo("https://github.com/nlohmann/json", "v3.11.3")
-    wpilib_root = get_repo_root()
+def copy_upstream_src(wpilib_root):
     wpiutil = os.path.join(wpilib_root, "wpiutil")
-
-    # Apply patches to upstream Git repo
-    os.chdir(upstream_root)
-    for f in [
-        "0001-Remove-version-from-namespace.patch",
-        "0002-Make-serializer-public.patch",
-        "0003-Make-dump_escaped-take-std-string_view.patch",
-        "0004-Add-llvm-stream-support.patch",
-    ]:
-        git_am(
-            os.path.join(wpilib_root, "upstream_utils/json_patches", f),
-            use_threeway=True,
-        )
 
     # Delete old install
     for d in [
@@ -36,11 +22,9 @@ def main():
         shutil.rmtree(os.path.join(wpiutil, d), ignore_errors=True)
 
     # Create lists of source and destination files
-    os.chdir(os.path.join(upstream_root, "include/nlohmann"))
+    os.chdir("include/nlohmann")
     files = walk_if(".", lambda dp, f: True)
-    src_include_files = [
-        os.path.join(os.path.join(upstream_root, "include/nlohmann"), f) for f in files
-    ]
+    src_include_files = [os.path.abspath(f) for f in files]
     wpiutil_json_root = os.path.join(
         wpiutil, "src/main/native/thirdparty/json/include/wpi"
     )
@@ -72,6 +56,25 @@ def main():
 
         with open(include_file, "w") as f:
             f.write(content)
+
+
+def main():
+    name = "json"
+    url = "https://github.com/nlohmann/json"
+    tag = "v3.11.3"
+
+    patch_list = [
+        "0001-Remove-version-from-namespace.patch",
+        "0002-Make-serializer-public.patch",
+        "0003-Make-dump_escaped-take-std-string_view.patch",
+        "0004-Add-llvm-stream-support.patch",
+    ]
+    patch_options = {
+        "use_threeway": True,
+    }
+
+    json = Lib(name, url, tag, patch_list, copy_upstream_src, patch_options)
+    json.main()
 
 
 if __name__ == "__main__":
