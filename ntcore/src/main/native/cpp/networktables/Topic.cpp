@@ -11,6 +11,10 @@
 
 using namespace nt;
 
+Topic::~Topic() {
+  GetInstance().Flush();
+}
+
 NetworkTableInstance Topic::GetInstance() const {
   return NetworkTableInstance{GetInstanceFromHandle(m_handle)};
 }

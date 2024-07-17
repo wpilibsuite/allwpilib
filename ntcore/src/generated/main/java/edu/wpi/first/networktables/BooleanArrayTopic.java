@@ -7,7 +7,7 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables BooleanArray topic. */
-public final class BooleanArrayTopic extends Topic {
+public final class BooleanArrayTopic extends Topic implements AutoCloseable {
   /** The default type string for this topic type. */
   public static final String kTypeString = "boolean[]";
 
@@ -203,4 +203,10 @@ public final class BooleanArrayTopic extends Topic {
         defaultValue);
   }
 
+
+  @Override
+  public void close() {
+    m_inst.flush();
+    m_inst.close();
+  }
 }

@@ -7,7 +7,7 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables FloatArray topic. */
-public final class FloatArrayTopic extends Topic {
+public final class FloatArrayTopic extends Topic implements AutoCloseable {
   /** The default type string for this topic type. */
   public static final String kTypeString = "float[]";
 
@@ -203,4 +203,10 @@ public final class FloatArrayTopic extends Topic {
         defaultValue);
   }
 
+
+  @Override
+  public void close() {
+    m_inst.flush();
+    m_inst.close();
+  }
 }

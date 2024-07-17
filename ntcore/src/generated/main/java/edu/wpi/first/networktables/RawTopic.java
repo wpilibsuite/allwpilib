@@ -7,7 +7,7 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Raw topic. */
-public final class RawTopic extends Topic {
+public final class RawTopic extends Topic implements AutoCloseable {
   /**
    * Construct from a generic topic.
    *
@@ -151,4 +151,10 @@ public final class RawTopic extends Topic {
         defaultValue);
   }
 
+
+  @Override
+  public void close() {
+    m_inst.flush();
+    m_inst.close();
+  }
 }

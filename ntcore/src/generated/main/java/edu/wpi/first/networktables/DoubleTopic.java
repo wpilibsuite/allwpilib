@@ -7,7 +7,7 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Double topic. */
-public final class DoubleTopic extends Topic {
+public final class DoubleTopic extends Topic implements AutoCloseable {
   /** The default type string for this topic type. */
   public static final String kTypeString = "double";
 
@@ -203,4 +203,10 @@ public final class DoubleTopic extends Topic {
         defaultValue);
   }
 
+
+  @Override
+  public void close() {
+    m_inst.flush();
+    m_inst.close();
+  }
 }

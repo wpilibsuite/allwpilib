@@ -29,6 +29,7 @@ class Topic {
  public:
   Topic() = default;
   explicit Topic(NT_Topic handle) : m_handle{handle} {}
+  ~Topic();
 
   /**
    * Determines if the native handle is valid.
