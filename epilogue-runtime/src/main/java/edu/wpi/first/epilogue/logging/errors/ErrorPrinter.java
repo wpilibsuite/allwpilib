@@ -8,6 +8,9 @@ import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
 
 /** An error handler implementation that prints error information to the console. */
 public class ErrorPrinter implements ErrorHandler {
+  /** Default constructor. */
+  public ErrorPrinter() {}
+
   @Override
   public void handle(Throwable exception, ClassSpecificLogger<?> logger) {
     System.err.println(

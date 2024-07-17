@@ -40,4 +40,7 @@ public class EpilogueConfiguration {
    * string.
    */
   public String root = "Robot";
+
+  /** Default constructor. */
+  public EpilogueConfiguration() {}
 }

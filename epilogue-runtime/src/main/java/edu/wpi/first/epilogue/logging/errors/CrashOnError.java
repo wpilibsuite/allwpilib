@@ -12,6 +12,9 @@ import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
  * code.
  */
 public class CrashOnError implements ErrorHandler {
+  /** Default constructor. */
+  public CrashOnError() {}
+
   @Override
   public void handle(Throwable exception, ClassSpecificLogger<?> logger) {
     throw new RuntimeException(
