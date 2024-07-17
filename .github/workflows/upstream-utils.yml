@@ -45,7 +45,7 @@ jobs:
           cd upstream_utils
           ./gcem.py clone
           ./gcem.py copy-upstream-to-thirdparty
-      - name: Run update_googletest.py
+      - name: Run googletest.py
         run: |
           cd upstream_utils
           ./googletest.py clone
