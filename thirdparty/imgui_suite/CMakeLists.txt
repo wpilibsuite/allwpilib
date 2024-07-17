@@ -1,14 +1,14 @@
 
-if(NOT glfw3_POPULATED)
-#     fetchcontent_populate(glfw3)
-    set(SAVE_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-    set(BUILD_SHARED_LIBS OFF)
-    set(GLFW_INSTALL OFF)
-    add_subdirectory("glfw")
-    set_property(TARGET glfw PROPERTY POSITION_INDEPENDENT_CODE ON)
-    set(BUILD_SHARED_LIBS ${SAVE_BUILD_SHARED_LIBS})
-    export(TARGETS glfw FILE glfw.cmake NAMESPACE glfw::)
-endif()
+
+include(LinkMacOSGUI)
+
+set(SAVE_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+set(BUILD_SHARED_LIBS OFF)
+set(GLFW_INSTALL OFF)
+add_subdirectory("glfw")
+set_property(TARGET glfw PROPERTY POSITION_INDEPENDENT_CODE ON)
+set(BUILD_SHARED_LIBS ${SAVE_BUILD_SHARED_LIBS})
+export(TARGETS glfw FILE glfw.cmake NAMESPACE glfw::)
 
 # Add imgui directly to our build.
 file(GLOB imgui_sources imgui/cpp/*.cpp imgui/cpp/misc/cpp/*.cpp)
@@ -53,6 +53,8 @@ target_include_directories(
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/stb/include>"
     PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
 )
+
+wpilib_link_macos_gui(imgui)
 
 set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_features(imgui PUBLIC cxx_std_20)
