@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 
 import os
-import re
 import shutil
 
 from upstream_utils import (
-    get_repo_root,
-    clone_repo,
-    comment_out_invalid_includes,
     walk_cwd_and_copy_if,
-    git_am,
     walk_if,
     Lib,
 )
@@ -72,11 +67,11 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "googletest"
     url = "https://github.com/google/googletest.git"
-    commitish = "v1.14.0"
+    tag = "v1.14.0"
 
     patch_list = []
 
-    googletest = Lib(name, url, commitish, patch_list, copy_upstream_src)
+    googletest = Lib(name, url, tag, patch_list, copy_upstream_src)
     googletest.main()
 
 
