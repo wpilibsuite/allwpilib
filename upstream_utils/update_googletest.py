@@ -11,6 +11,7 @@ from upstream_utils import (
     walk_cwd_and_copy_if,
     git_am,
     walk_if,
+    Lib,
 )
 
 EXCLUDED_FILES = [
@@ -37,13 +38,7 @@ def walk_and_remap_copy(third_party_root, include_prefix):
         shutil.copyfile(f, dst_file)
 
 
-def main():
-    upstream_root = clone_repo(
-        "https://github.com/google/googletest.git",
-        "f8d7d77c06936315286eb55f8de22cd23c188571",
-        shallow=False,
-    )
-    wpilib_root = get_repo_root()
+def copy_upstream_src(wpilib_root):
     third_party_root = os.path.join(wpilib_root, "thirdparty/googletest")
 
     # Delete old install
@@ -52,9 +47,6 @@ def main():
         "src",
     ]:
         shutil.rmtree(os.path.join(third_party_root, d), ignore_errors=True)
-
-    # Apply patches to upstream Git repo
-    os.chdir(upstream_root)
 
     walk_cwd_and_copy_if(
         lambda dp, f: "googlemock/src" in dp and f not in EXCLUDED_FILES,
@@ -75,6 +67,17 @@ def main():
         third_party_root,
         "./googletest/include",
     )
+
+
+def main():
+    name = "googletest"
+    url = "https://github.com/google/googletest.git"
+    commitish = "v1.14.0"
+
+    patch_list = []
+
+    googletest = Lib(name, url, commitish, patch_list, copy_upstream_src)
+    googletest.main()
 
 
 if __name__ == "__main__":
