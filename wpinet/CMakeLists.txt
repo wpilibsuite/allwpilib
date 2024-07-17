@@ -43,19 +43,16 @@ endif()
 
 if(WITH_JAVA_SOURCE)
     include(UseJava)
-    file(GLOB WPINET_SOURCES src/main/java/edu/wpi/first/net/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         wpinet_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/net" ${WPINET_SOURCES}
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME wpinet-sources
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(WPINET_SRC_JAR_FILE TARGET wpinet_src_jar PROPERTY JAR_FILE)
-    install(FILES ${WPINET_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET wpinet_src_jar PROPERTY FOLDER "java")
+
+    install_jar(wpinet_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)

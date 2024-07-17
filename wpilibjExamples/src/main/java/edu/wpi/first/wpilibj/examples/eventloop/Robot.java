@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.eventloop;
 
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Encoder;
@@ -32,8 +35,8 @@ public class Robot extends TimedRobot {
   private final EventLoop m_loop = new EventLoop();
   private final Joystick m_joystick = new Joystick(0);
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     m_controller.setTolerance(TOLERANCE);
 
     BooleanEvent isBallAtKicker =
@@ -61,10 +64,12 @@ public class Robot extends TimedRobot {
     shootTrigger
         // accelerate the shooter wheel
         .ifHigh(
-        () ->
-            m_shooter.setVoltage(
-                m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
-                    + m_ff.calculate(SHOT_VELOCITY)));
+        () -> {
+          m_shooter.setVoltage(
+              m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
+                  + m_ff.calculate(RPM.of(SHOT_VELOCITY)).in(Volts));
+        });
+
     // if not, stop
     shootTrigger.negate().ifHigh(m_shooter::stopMotor);
 

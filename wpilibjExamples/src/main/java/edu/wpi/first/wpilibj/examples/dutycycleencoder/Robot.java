@@ -11,12 +11,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** This example shows how to use a duty cycle encoder for devices such as an arm or elevator. */
 public class Robot extends TimedRobot {
-  private DutyCycleEncoder m_dutyCycleEncoder;
+  private final DutyCycleEncoder m_dutyCycleEncoder;
   private static final double m_fullRange = 1.3;
   private static final double m_expectedZero = 0;
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     // 2nd parameter is the range of values. This sensor will output between
     // 0 and the passed in value.
     // 3rd parameter is the the physical value where you want "0" to be. How

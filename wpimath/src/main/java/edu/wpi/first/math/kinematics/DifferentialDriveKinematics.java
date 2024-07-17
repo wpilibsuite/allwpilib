@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveKinematicsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveKinematicsStruct;
@@ -121,12 +120,17 @@ public class DifferentialDriveKinematics
   }
 
   @Override
+  public void copyInto(
+      DifferentialDriveWheelPositions positions, DifferentialDriveWheelPositions output) {
+    output.leftMeters = positions.leftMeters;
+    output.rightMeters = positions.rightMeters;
+  }
+
+  @Override
   public DifferentialDriveWheelPositions interpolate(
       DifferentialDriveWheelPositions startValue,
       DifferentialDriveWheelPositions endValue,
       double t) {
-    return new DifferentialDriveWheelPositions(
-        MathUtil.interpolate(startValue.leftMeters, endValue.leftMeters, t),
-        MathUtil.interpolate(startValue.rightMeters, endValue.rightMeters, t));
+    return startValue.interpolate(endValue, t);
   }
 }
