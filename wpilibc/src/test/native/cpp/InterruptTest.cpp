@@ -30,7 +30,7 @@ TEST(InterruptTest, AsynchronousInterrupt) {
   frc::Wait(0.5_s);
   DIOSim digitalSim{di};
   digitalSim.SetValue(false);
-  frc::Wait(20_ms);
+  frc::Wait(10_ms);
   digitalSim.SetValue(true);
   frc::Wait(10_ms);
 
@@ -41,5 +41,65 @@ TEST(InterruptTest, AsynchronousInterrupt) {
     ASSERT_TRUE(count < 1000);
   }
   ASSERT_EQ(1, counter.load());
+}
+
+TEST(InterruptTest, RisingEdge) {
+  HAL_Initialize(500, 0);
+
+  std::atomic_bool hasFiredFallingEdge{false};
+  std::atomic_bool hasFiredRisingEdge{false};
+
+  DigitalInput di{0};
+  AsynchronousInterrupt interrupt{di, [&](bool rising, bool falling) {
+                                    hasFiredFallingEdge = falling;
+                                    hasFiredRisingEdge = rising;
+                                  }};
+  interrupt.SetInterruptEdges(true, true);
+  DIOSim digitalSim{di};
+  digitalSim.SetValue(false);
+  frc::Wait(0.5_s);
+  interrupt.Enable();
+  frc::Wait(10_ms);
+  digitalSim.SetValue(true);
+  frc::Wait(10_ms);
+
+  int count = 0;
+  while (!hasFiredRisingEdge) {
+    frc::Wait(5_ms);
+    count++;
+    ASSERT_TRUE(count < 1000);
+  }
+  EXPECT_FALSE(hasFiredFallingEdge);
+  EXPECT_TRUE(hasFiredRisingEdge);
+}
+
+TEST(InterruptTest, FallingEdge) {
+  HAL_Initialize(500, 0);
+
+  std::atomic_bool hasFiredFallingEdge{false};
+  std::atomic_bool hasFiredRisingEdge{false};
+
+  DigitalInput di{0};
+  AsynchronousInterrupt interrupt{di, [&](bool rising, bool falling) {
+                                    hasFiredFallingEdge = falling;
+                                    hasFiredRisingEdge = rising;
+                                  }};
+  interrupt.SetInterruptEdges(true, true);
+  DIOSim digitalSim{di};
+  digitalSim.SetValue(true);
+  frc::Wait(0.5_s);
+  interrupt.Enable();
+  frc::Wait(10_ms);
+  digitalSim.SetValue(false);
+  frc::Wait(10_ms);
+
+  int count = 0;
+  while (!hasFiredFallingEdge) {
+    frc::Wait(5_ms);
+    count++;
+    ASSERT_TRUE(count < 1000);
+  }
+  EXPECT_TRUE(hasFiredFallingEdge);
+  EXPECT_FALSE(hasFiredRisingEdge);
 }
 }  // namespace frc
