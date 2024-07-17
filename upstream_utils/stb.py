@@ -42,11 +42,11 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "stb"
     url = "https://github.com/nothings/stb.git"
-    committish = "c9064e317699d2e495f36ba4f9ac037e88ee371a"
+    tag = "c9064e317699d2e495f36ba4f9ac037e88ee371a"
 
     patch_list = []
 
-    stb = Lib(name, url, committish, patch_list, copy_upstream_src)
+    stb = Lib(name, url, tag, patch_list, copy_upstream_src)
     stb.main()
 
 

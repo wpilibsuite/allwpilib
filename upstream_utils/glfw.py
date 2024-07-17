@@ -74,13 +74,13 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "glfw"
     url = "https://github.com/glfw/glfw.git"
-    committish = "6b57e08bb0078c9834889eab871bac2368198c15"
+    tag = "6b57e08bb0078c9834889eab871bac2368198c15"
 
     patch_list = [
         "0001-Suppress-Compiler-Warnings.patch",
     ]
 
-    glfw = Lib(name, url, committish, patch_list, copy_upstream_src)
+    glfw = Lib(name, url, tag, patch_list, copy_upstream_src)
     glfw.main()
 
 
