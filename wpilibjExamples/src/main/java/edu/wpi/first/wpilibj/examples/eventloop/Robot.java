@@ -35,8 +35,8 @@ public class Robot extends TimedRobot {
   private final EventLoop m_loop = new EventLoop();
   private final Joystick m_joystick = new Joystick(0);
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     m_controller.setTolerance(TOLERANCE);
 
     BooleanEvent isBallAtKicker =

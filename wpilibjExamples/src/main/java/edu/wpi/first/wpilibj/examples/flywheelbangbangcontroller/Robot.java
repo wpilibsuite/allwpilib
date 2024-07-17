@@ -68,8 +68,7 @@ public class Robot extends TimedRobot {
   private final FlywheelSim m_flywheelSim = new FlywheelSim(m_plant, m_gearbox);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Add bang-bang controler to SmartDashboard and networktables.
     SmartDashboard.putData(m_bangBangControler);
   }

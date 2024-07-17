@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
  * package after creating this project, you must also update the build.gradle file in the project.
  */
 public class Robot extends RobotBase {
-  public void robotInit() {}
+  public Robot() {}
 
   public void disabled() {}
 
@@ -29,8 +29,6 @@ public class Robot extends RobotBase {
 
   @Override
   public void startCompetition() {
-    robotInit();
-
     DriverStationModeThread modeThread = new DriverStationModeThread();
 
     int event = WPIUtilJNI.createEvent(false, false);

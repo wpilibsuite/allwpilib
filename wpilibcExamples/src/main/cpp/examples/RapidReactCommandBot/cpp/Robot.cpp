@@ -4,7 +4,7 @@
 
 #include "Robot.h"
 
-void Robot::RobotInit() {
+Robot::Robot() {
   // Configure default commands and condition bindings on robot startup
   m_robot.ConfigureBindings();
 }

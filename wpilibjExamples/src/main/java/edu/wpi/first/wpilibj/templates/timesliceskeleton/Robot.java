@@ -34,13 +34,6 @@ public class Robot extends TimesliceRobot {
     // 9 ms / 10 ms -> 90% allocated
   }
 
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  @Override
-  public void robotInit() {}
-
   @Override
   public void robotPeriodic() {}
 

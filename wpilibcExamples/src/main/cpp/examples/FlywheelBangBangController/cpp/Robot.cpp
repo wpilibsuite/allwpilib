@@ -40,7 +40,7 @@ class Robot : public frc::TimedRobot {
                                0.9 * m_feedforward.Calculate(setpoint));
   }
 
-  void RobotInit() override {
+  Robot() {
     // Add bang-bang controler to SmartDashboard and networktables.
     frc::SmartDashboard::PutData("BangBangControler", &m_bangBangControler);
   }
