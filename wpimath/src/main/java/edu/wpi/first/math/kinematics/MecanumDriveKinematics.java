@@ -6,7 +6,6 @@ package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.MecanumDriveKinematicsProto;
@@ -277,10 +276,6 @@ public class MecanumDriveKinematics
   @Override
   public MecanumDriveWheelPositions interpolate(
       MecanumDriveWheelPositions startValue, MecanumDriveWheelPositions endValue, double t) {
-    return new MecanumDriveWheelPositions(
-        MathUtil.interpolate(startValue.frontLeftMeters, endValue.frontLeftMeters, t),
-        MathUtil.interpolate(startValue.frontRightMeters, endValue.frontRightMeters, t),
-        MathUtil.interpolate(startValue.rearLeftMeters, endValue.rearLeftMeters, t),
-        MathUtil.interpolate(startValue.rearRightMeters, endValue.rearRightMeters, t));
+    return startValue.interpolate(endValue, t);
   }
 }

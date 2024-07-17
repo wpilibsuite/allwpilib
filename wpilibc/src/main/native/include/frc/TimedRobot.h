@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <functional>
 #include <utility>
 #include <vector>
@@ -14,7 +15,7 @@
 #include <wpi/priority_queue.h>
 
 #include "frc/IterativeRobotBase.h"
-#include "frc/Timer.h"
+#include "frc/RobotController.h"
 
 namespace frc {
 
@@ -73,8 +74,8 @@ class TimedRobot : public IterativeRobotBase {
   class Callback {
    public:
     std::function<void()> func;
-    units::second_t period;
-    units::second_t expirationTime;
+    std::chrono::microseconds period;
+    std::chrono::microseconds expirationTime;
 
     /**
      * Construct a callback container.
@@ -84,15 +85,15 @@ class TimedRobot : public IterativeRobotBase {
      * @param period    The period at which to run the callback.
      * @param offset    The offset from the common starting time.
      */
-    Callback(std::function<void()> func, units::second_t startTime,
-             units::second_t period, units::second_t offset)
+    Callback(std::function<void()> func, std::chrono::microseconds startTime,
+             std::chrono::microseconds period, std::chrono::microseconds offset)
         : func{std::move(func)},
           period{period},
-          expirationTime{startTime + offset +
-                         units::math::floor(
-                             (Timer::GetFPGATimestamp() - startTime) / period) *
-                             period +
-                         period} {}
+          expirationTime(
+              startTime + offset + period +
+              (std::chrono::microseconds{frc::RobotController::GetFPGATime()} -
+               startTime) /
+                  period * period) {}
 
     bool operator>(const Callback& rhs) const {
       return expirationTime > rhs.expirationTime;
@@ -100,7 +101,7 @@ class TimedRobot : public IterativeRobotBase {
   };
 
   hal::Handle<HAL_NotifierHandle> m_notifier;
-  units::second_t m_startTime;
+  std::chrono::microseconds m_startTime;
 
   wpi::priority_queue<Callback, std::vector<Callback>, std::greater<Callback>>
       m_callbacks;

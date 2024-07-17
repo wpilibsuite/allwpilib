@@ -22,8 +22,8 @@ import org.opencv.imgproc.Imgproc;
 public class Robot extends TimedRobot {
   Thread m_visionThread;
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     m_visionThread =
         new Thread(
             () -> {

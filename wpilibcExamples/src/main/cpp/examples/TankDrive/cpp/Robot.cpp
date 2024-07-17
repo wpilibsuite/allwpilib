@@ -21,7 +21,7 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_rightStick{1};
 
  public:
-  void RobotInit() override {
+  Robot() {
     wpi::SendableRegistry::AddChild(&m_robotDrive, &m_leftMotor);
     wpi::SendableRegistry::AddChild(&m_robotDrive, &m_rightMotor);
 

@@ -4,9 +4,12 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Encoder;
@@ -15,6 +18,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+@Logged
 public class Shooter extends SubsystemBase {
   private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
   private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
@@ -54,11 +58,15 @@ public class Shooter extends SubsystemBase {
     return parallel(
             // Run the shooter flywheel at the desired setpoint using feedforward and feedback
             run(
-                () ->
-                    m_shooterMotor.set(
-                        m_shooterFeedforward.calculate(setpointRotationsPerSecond)
-                            + m_shooterFeedback.calculate(
-                                m_shooterEncoder.getRate(), setpointRotationsPerSecond))),
+                () -> {
+                  m_shooterMotor.set(
+                      m_shooterFeedforward
+                              .calculate(RotationsPerSecond.of(setpointRotationsPerSecond))
+                              .in(Volts)
+                          + m_shooterFeedback.calculate(
+                              m_shooterEncoder.getRate(), setpointRotationsPerSecond));
+                }),
+
             // Wait until the shooter has reached the setpoint, and then run the feeder
             waitUntil(m_shooterFeedback::atSetpoint).andThen(() -> m_feederMotor.set(1)))
         .withName("Shoot");

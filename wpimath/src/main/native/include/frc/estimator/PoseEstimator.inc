@@ -7,7 +7,6 @@
 #include "frc/estimator/PoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Translation2d.h"
-#include "frc/kinematics/WheelPositions.h"
 
 namespace frc {
 

@@ -30,7 +30,7 @@ class Robot : public frc::TimedRobot {
   static constexpr double kElevatorMinimumLength = 0.5;
 
  public:
-  void RobotInit() override {
+  Robot() {
     m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
 
     // publish to dashboard

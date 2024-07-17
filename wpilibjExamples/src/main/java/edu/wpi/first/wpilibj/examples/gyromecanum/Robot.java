@@ -27,21 +27,16 @@ public class Robot extends TimedRobot {
   private static final int kGyroPort = 0;
   private static final int kJoystickPort = 0;
 
-  private MecanumDrive m_robotDrive;
+  private final MecanumDrive m_robotDrive;
   private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     PWMSparkMax frontLeft = new PWMSparkMax(kFrontLeftChannel);
     PWMSparkMax rearLeft = new PWMSparkMax(kRearLeftChannel);
     PWMSparkMax frontRight = new PWMSparkMax(kFrontRightChannel);
     PWMSparkMax rearRight = new PWMSparkMax(kRearRightChannel);
-
-    SendableRegistry.addChild(m_robotDrive, frontLeft);
-    SendableRegistry.addChild(m_robotDrive, rearLeft);
-    SendableRegistry.addChild(m_robotDrive, frontRight);
-    SendableRegistry.addChild(m_robotDrive, rearRight);
 
     // Invert the right side motors.
     // You may need to change or remove this to match your robot.
@@ -51,6 +46,11 @@ public class Robot extends TimedRobot {
     m_robotDrive = new MecanumDrive(frontLeft::set, rearLeft::set, frontRight::set, rearRight::set);
 
     m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
+
+    SendableRegistry.addChild(m_robotDrive, frontLeft);
+    SendableRegistry.addChild(m_robotDrive, rearLeft);
+    SendableRegistry.addChild(m_robotDrive, frontRight);
+    SendableRegistry.addChild(m_robotDrive, rearRight);
   }
 
   /** Mecanum drive is used with the gyro angle as an input. */

@@ -14,7 +14,7 @@
  */
 class Robot : public frc::TimedRobot {
  public:
-  void RobotInit() override {}
+  Robot() {}
   void SimulationPeriodic() override;
   void TeleopInit() override;
   void TeleopPeriodic() override;
