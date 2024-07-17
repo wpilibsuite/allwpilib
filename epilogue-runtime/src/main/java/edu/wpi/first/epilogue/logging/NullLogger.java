@@ -8,6 +8,9 @@ import edu.wpi.first.util.struct.Struct;
 
 /** Null data logger implementation that logs nothing. */
 public class NullLogger implements DataLogger {
+  /** Default constructor. */
+  public NullLogger() {}
+
   @Override
   public DataLogger getSubLogger(String path) {
     // Since a sublogger would still log nothing and has no state, we can just return the same
