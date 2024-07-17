@@ -494,10 +494,10 @@ uint16_t ADIS16448_IMU::ReadRegister(uint8_t reg) {
 
 /**
  * This function writes an unsigned, 16-bit value into adjacent 8-bit addresses
- *via SPI. The upper and lower bytes that make up the 16-bit value are split
- *into two unsigned, 8-bit values and written to the upper and lower addresses
- *of the specified register value. Only the lower (base) address must be
- *specified. This function assumes the controller is set to standard SPI mode.
+ * via SPI. The upper and lower bytes that make up the 16-bit value are split
+ * into two unsigned, 8-bit values and written to the upper and lower addresses
+ * of the specified register value. Only the lower (base) address must be
+ * specified. This function assumes the controller is set to standard SPI mode.
  **/
 void ADIS16448_IMU::WriteRegister(uint8_t reg, uint16_t val) {
   uint8_t buf[2];
