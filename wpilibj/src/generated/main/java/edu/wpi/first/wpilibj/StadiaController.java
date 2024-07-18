@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj;
 
 // import edu.wpi.first.hal.FRCNetComm.tResourceType;
 // import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
@@ -22,7 +24,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class StadiaController extends GenericHID {
+public class StadiaController extends GenericHID implements Sendable {
   /** Represents a digital button on a StadiaController. */
   public enum Button {
     /** A button. */
@@ -794,5 +796,30 @@ public class StadiaController extends GenericHID {
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperReleased() {
     return getRawButtonReleased(Button.kRightBumper.value);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("HID");
+    builder.publishConstString("ControllerType", "Stadia");
+    builder.addDoubleProperty("LeftX", this::getLeftX, null);
+    builder.addDoubleProperty("RightX", this::getRightX, null);
+    builder.addDoubleProperty("LeftY", this::getLeftY, null);
+    builder.addDoubleProperty("RightY", this::getRightY, null);
+    builder.addBooleanProperty("A", this::getAButton, null);
+    builder.addBooleanProperty("B", this::getBButton, null);
+    builder.addBooleanProperty("X", this::getXButton, null);
+    builder.addBooleanProperty("Y", this::getYButton, null);
+    builder.addBooleanProperty("LeftBumper", this::getLeftBumperButton, null);
+    builder.addBooleanProperty("RightBumper", this::getRightBumperButton, null);
+    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
+    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
+    builder.addBooleanProperty("Ellipses", this::getEllipsesButton, null);
+    builder.addBooleanProperty("Hamburger", this::getHamburgerButton, null);
+    builder.addBooleanProperty("Stadia", this::getStadiaButton, null);
+    builder.addBooleanProperty("RightTrigger", this::getRightTriggerButton, null);
+    builder.addBooleanProperty("LeftTrigger", this::getLeftTriggerButton, null);
+    builder.addBooleanProperty("Google", this::getGoogleButton, null);
+    builder.addBooleanProperty("Frame", this::getFrameButton, null);
   }
 }

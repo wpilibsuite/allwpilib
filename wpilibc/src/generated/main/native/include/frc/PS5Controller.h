@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/GenericHID.h"
 
 namespace frc {
@@ -22,7 +25,9 @@ namespace frc {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class PS5Controller : public GenericHID {
+class PS5Controller : public GenericHID,
+                                    public wpi::Sendable,
+                                    public wpi::SendableHelper<PS5Controller> {
  public:
   /**
    * Construct an instance of a controller.
@@ -587,6 +592,8 @@ class PS5Controller : public GenericHID {
     /// Right trigger 2.
     static constexpr int kR2 = 4;
   };
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc
