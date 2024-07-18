@@ -271,7 +271,7 @@ class SimpleMotorFeedforward {
    *
    * @return The period.
    */
-  units::volt_t getDt() const { return m_dt; }
+  units::second_t getDt() const { return m_dt; }
 
  private:
   /** The static gain. */
