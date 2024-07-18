@@ -7,6 +7,7 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/controller/SimpleMotorFeedforward.h"
+#include "units/length.h"
 
 // Everything is converted into units for
 // frc::SimpleMotorFeedforward<units::meters>

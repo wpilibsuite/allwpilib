@@ -7,6 +7,8 @@
 #include "../../ProtoTestBase.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/controller/proto/SimpleMotorFeedforwardProto.h"
+#include "units/acceleration.h"
+#include "units/velocity.h"
 
 using namespace frc;
 
