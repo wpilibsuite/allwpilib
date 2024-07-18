@@ -24,6 +24,9 @@ out/
 # Fleet
 .fleet
 
+# jdtls
+.factorypath
+
 # Created by http://www.gitignore.io
 
 ### Linux ###
