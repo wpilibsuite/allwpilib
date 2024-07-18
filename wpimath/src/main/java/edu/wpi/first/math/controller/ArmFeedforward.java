@@ -16,16 +16,16 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class ArmFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain, in volts. */
-  public final double ks;
+  private final double ks;
 
   /** The gravity gain, in volts. */
-  public final double kg;
+  private final double kg;
 
   /** The velocity gain, in volt seconds per radian. */
-  public final double kv;
+  private final double kv;
 
   /** The acceleration gain, in volt seconds² per radian. */
-  public final double ka;
+  private final double ka;
 
   /** Arm feedforward protobuf for serialization. */
   public static final ArmFeedforwardProto proto = new ArmFeedforwardProto();
@@ -67,6 +67,42 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    */
   public ArmFeedforward(double ks, double kg, double kv) {
     this(ks, kg, kv, 0);
+  }
+
+  /**
+   * Returns the static gain.
+   *
+   * @return The static gain, in volts.
+   */
+  public double getKs() {
+    return ks;
+  }
+
+  /**
+   * Returns the gravity gain.
+   *
+   * @return The gravity gain, in volts.
+   */
+  public double getKg() {
+    return kg;
+  }
+
+  /**
+   * Returns the velocity gain.
+   *
+   * @return The velocity gain, in volt seconds per radian.
+   */
+  public double getKv() {
+    return kv;
+  }
+
+  /**
+   * Returns the acceleration gain.
+   *
+   * @return The acceleration gain, in volts seconds² per radian.
+   */
+  public double getKa() {
+    return ka;
   }
 
   /**

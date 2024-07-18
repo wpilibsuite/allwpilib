@@ -26,8 +26,8 @@ TEST(ArmFeedforwardProtoTest, Roundtrip) {
   ProtoType::Pack(proto, kExpectedData);
 
   ArmFeedforward unpacked_data = ProtoType::Unpack(*proto);
-  EXPECT_EQ(kExpectedData.kS.value(), unpacked_data.kS.value());
-  EXPECT_EQ(kExpectedData.kG.value(), unpacked_data.kG.value());
-  EXPECT_EQ(kExpectedData.kV.value(), unpacked_data.kV.value());
-  EXPECT_EQ(kExpectedData.kA.value(), unpacked_data.kA.value());
+  EXPECT_EQ(kExpectedData.getKs().value(), unpacked_data.getKs().value());
+  EXPECT_EQ(kExpectedData.getKg().value(), unpacked_data.getKg().value());
+  EXPECT_EQ(kExpectedData.getKv().value(), unpacked_data.getKv().value());
+  EXPECT_EQ(kExpectedData.getKa().value(), unpacked_data.getKa().value());
 }

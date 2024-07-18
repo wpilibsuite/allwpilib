@@ -27,8 +27,8 @@ frc::ElevatorFeedforward wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(
 void wpi::Protobuf<frc::ElevatorFeedforward>::Pack(
     google::protobuf::Message* msg, const frc::ElevatorFeedforward& value) {
   auto m = static_cast<wpi::proto::ProtobufElevatorFeedforward*>(msg);
-  m->set_ks(value.kS());
-  m->set_kg(value.kG());
-  m->set_kv(value.kV());
-  m->set_ka(value.kA());
+  m->set_ks(value.getKs().value());
+  m->set_kg(value.getKg().value());
+  m->set_kv(value.getKv().value());
+  m->set_ka(value.getKa().value());
 }

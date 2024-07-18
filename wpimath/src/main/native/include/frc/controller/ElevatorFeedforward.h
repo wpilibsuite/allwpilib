@@ -182,17 +182,46 @@ class ElevatorFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 
+  /**
+   * Returns the static gain.
+   *
+   * @return The static gain.
+   */
+  units::volt_t getKs() const { return kS; }
+
+  /**
+   * Returns the gravity gain.
+   *
+   * @return The gravity gain.
+   */
+  units::volt_t getKg() const { return kG; }
+
+  /**
+   * Returns the velocity gain.
+   *
+   * @return The velocity gain.
+   */
+  units::unit_t<kv_unit> getKv() const { return kV; }
+
+  /**
+   * Returns the acceleration gain.
+   *
+   * @return The acceleration gain.
+   */
+  units::unit_t<ka_unit> getKa() const { return kA; }
+
+ private:
   /// The static gain.
-  const units::volt_t kS;
+  units::volt_t kS;
 
   /// The gravity gain.
-  const units::volt_t kG;
+  units::volt_t kG;
 
   /// The velocity gain.
-  const units::unit_t<kv_unit> kV;
+  units::unit_t<kv_unit> kV;
 
   /// The acceleration gain.
-  const units::unit_t<ka_unit> kA;
+  units::unit_t<ka_unit> kA;
 };
 }  // namespace frc
 
