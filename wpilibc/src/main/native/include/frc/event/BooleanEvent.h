@@ -17,35 +17,35 @@
 namespace frc {
 
 /**
- * This class provides an easy way to link actions to inputs. Each object
- * represents a boolean condition to which callback actions can be bound using
- * {@link #IfHigh(std::function<void()>)}.
+ * This class provides an easy way to link actions to active high logic signals.
+ * Each object represents a digital signal to which callback actions can be
+ * bound using {@link #IfHigh(std::function<void()>)}.
  *
- * <p>These events can easily be composed using factories such as {@link
- * #operator!},
- * {@link #operator||}, {@link #operator&&} etc.
+ * <p>BooleanEvents can easily be composed for advanced functionality using
+ * {@link #operator&&}, {@link #operator||}, and {@link #operator!}.
  *
- * <p>To get an event that activates only when this one changes, see {@link
+ * <p>To get a new BooleanEvent that triggers when this one changes see {@link
  * #Falling()} and {@link #Rising()}.
  */
 class BooleanEvent {
  public:
   /**
-   * Creates a new event with the given condition determining whether it is
-   * active.
+   * Creates a new event that is active when the condition is true.
    *
    * @param loop the loop that polls this event
-   * @param condition returns whether or not the event should be active
+   * @param signal the digital signal represented by this object.
    */
-  BooleanEvent(EventLoop* loop, std::function<bool()> condition);
+  BooleanEvent(EventLoop* loop, std::function<bool()> signal);
 
   /**
-   * Check whether this event is active or not as of the last loop poll.
+   * Returns the state of this signal (high or low) as of the last loop poll.
    *
-   * @return true if active, false if not active. If the event was never polled,
-   * it returns the state at event construction.
+   * @return true for the high state, false for the low state. If the event was
+   * never polled, it returns the state at event construction.
    */
   bool GetAsBoolean() const;
+
+  operator std::function<bool()>();  // NOLINT
 
   /**
    * Bind an action to this event.
@@ -53,8 +53,6 @@ class BooleanEvent {
    * @param action the action to run if this event is active.
    */
   void IfHigh(std::function<void()> action);
-
-  operator std::function<bool()>();  // NOLINT
 
   /**
    * A method to "downcast" a BooleanEvent instance to a subclass (for example,
@@ -74,8 +72,7 @@ class BooleanEvent {
   }
 
   /**
-   * Creates a new event that is active when this event is inactive, i.e. that
-   * acts as the negation of this event.
+   * Creates a new event that is active when this event is inactive.
    *
    * @return the negated event
    */
@@ -106,16 +103,16 @@ class BooleanEvent {
   BooleanEvent operator||(std::function<bool()> rhs);
 
   /**
-   * Get a new event that events only when this one newly changes to true.
+   * Creates a new event that triggers when this one changes from false to true.
    *
-   * @return a new event representing when this one newly changes to true.
+   * @return the new event.
    */
   BooleanEvent Rising();
 
   /**
-   * Get a new event that triggers only when this one newly changes to false.
+   * Creates a new event that triggers when this one changes from true to false.
    *
-   * @return a new event representing when this one newly changes to false.
+   * @return the event.
    */
   BooleanEvent Falling();
 
@@ -133,7 +130,7 @@ class BooleanEvent {
 
  private:
   EventLoop* m_loop;
-  std::function<bool()> m_condition;
+  std::function<bool()> m_signal;
   std::shared_ptr<bool> m_state;  // A programmer's worst nightmare.
 };
 }  // namespace frc
