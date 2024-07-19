@@ -17,7 +17,6 @@ nativeUtils {
             googleTestYear = "frc2024"
             niLibVersion = "2024.2.1"
             opencvVersion = "4.8.0-4"
-            googleTestVersion = "1.14.0-1"
         }
     }
 }
