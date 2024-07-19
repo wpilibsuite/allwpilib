@@ -73,7 +73,6 @@ def main():
         "0002-zmaxheapify-Avoid-return-of-void-expression.patch",
         "0003-Avoid-unused-variable-warnings-in-release-builds.patch",
         "0004-Make-orthogonal_iteration-exit-early-upon-convergenc.patch",
-        "0005-Fix-early-exit-3.patch",
     ]
 
     apriltag = Lib(name, url, tag, patch_list, copy_upstream_src)

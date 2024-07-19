@@ -1,23 +1,22 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 10 Jan 2023 18:36:36 -0800
-Subject: [PATCH 4/5] Make orthogonal_iteration() exit early upon convergence
- (#1)
+Subject: [PATCH 4/4] Make orthogonal_iteration() exit early upon convergence
 
 The current approach wastes iterations doing no work. Exiting early can
 give lower latencies and higher FPS.
 
 Co-authored-by: Matt <matthew.morley.ca@gmail.com>
 ---
- apriltag_pose.c         | 20 +++++++++++++++-----
+ apriltag_pose.c         | 23 +++++++++++++++++------
  apriltag_pose.h         |  3 ++-
  common/pjpeg.c          |  2 +-
  common/zhash.c          |  1 +
  example/apriltag_demo.c | 22 ++++++++++++++++++++++
- 5 files changed, 41 insertions(+), 7 deletions(-)
+ 5 files changed, 43 insertions(+), 8 deletions(-)
 
 diff --git a/apriltag_pose.c b/apriltag_pose.c
-index f0003a2d187df13236992026ee6ff7f9d6f7aff9..fc090c5ebb47ccf442edbbfeca2f5cc244206696 100644
+index f0003a2d187df13236992026ee6ff7f9d6f7aff9..782729225c3555edcfebb7d8a21f847aad0e328f 100644
 --- a/apriltag_pose.c
 +++ b/apriltag_pose.c
 @@ -35,12 +35,13 @@ double matd_to_double(matd_t *a)
@@ -35,8 +34,11 @@ index f0003a2d187df13236992026ee6ff7f9d6f7aff9..fc090c5ebb47ccf442edbbfeca2f5cc2
      matd_t* p_mean = matd_create(3, 1);
      for (int i = 0; i < n_points; i++) {
          matd_add_inplace(p_mean, p[i]);
-@@ -123,6 +124,12 @@ double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int
-         prev_error = error;
+@@ -120,9 +121,16 @@ double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int
+             error += matd_to_double(matd_op("M'M", err_vec, err_vec));
+             matd_destroy(err_vec);
+         }
+-        prev_error = error;
  
          free(q);
 +
@@ -45,10 +47,12 @@ index f0003a2d187df13236992026ee6ff7f9d6f7aff9..fc090c5ebb47ccf442edbbfeca2f5cc2
 +          prev_error = error;
 +          break;
 +        }
++
++        prev_error = error;
      }
  
      matd_destroy(I3);
-@@ -493,7 +500,8 @@ void estimate_tag_pose_orthogonal_iteration(
+@@ -493,7 +501,8 @@ void estimate_tag_pose_orthogonal_iteration(
          apriltag_pose_t* solution1,
          double* err2,
          apriltag_pose_t* solution2,
@@ -58,7 +62,7 @@ index f0003a2d187df13236992026ee6ff7f9d6f7aff9..fc090c5ebb47ccf442edbbfeca2f5cc2
      double scale = info->tagsize/2.0;
      matd_t* p[4] = {
          matd_create_data(3, 1, (double[]) {-scale, scale, 0}),
-@@ -507,11 +515,11 @@ void estimate_tag_pose_orthogonal_iteration(
+@@ -507,11 +516,11 @@ void estimate_tag_pose_orthogonal_iteration(
      }
  
      estimate_pose_for_tag_homography(info, solution1);
@@ -72,7 +76,7 @@ index f0003a2d187df13236992026ee6ff7f9d6f7aff9..fc090c5ebb47ccf442edbbfeca2f5cc2
      } else {
          solution2->t = NULL;
          *err2 = HUGE_VAL;
-@@ -529,7 +537,9 @@ void estimate_tag_pose_orthogonal_iteration(
+@@ -529,7 +538,9 @@ void estimate_tag_pose_orthogonal_iteration(
  double estimate_tag_pose(apriltag_detection_info_t* info, apriltag_pose_t* pose) {
      double err1, err2;
      apriltag_pose_t pose1, pose2;
