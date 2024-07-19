@@ -30,7 +30,7 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include <string.h>
 #include <assert.h>
 
-// #include "zhash.h"
+#include "zhash.h"
 
 // force a rehash when our capacity is less than this many times the size
 #define ZHASH_FACTOR_CRITICAL 2

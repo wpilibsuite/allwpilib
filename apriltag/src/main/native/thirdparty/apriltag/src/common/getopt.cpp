@@ -32,9 +32,9 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include <ctype.h>
 #include <errno.h>
 
-// #include "zhash.h"
-// #include "zarray.h"
-// #include "getopt.h"
+#include "zhash.h"
+#include "zarray.h"
+#include "getopt.h"
 #include "common/math_util.h"
 
 #define GOO_BOOL_TYPE 1

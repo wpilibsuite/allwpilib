@@ -31,11 +31,11 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include <stdint.h>
 #include <string.h>
 
-// #include "pjpeg.h"
+#include "pjpeg.h"
 
-// #include "image_u8.h"
-// #include "image_u8x3.h"
-// #include "debug_print.h"
+#include "image_u8.h"
+#include "image_u8x3.h"
+#include "debug_print.h"
 
 // https://www.w3.org/Graphics/JPEG/itu-t81.pdf
 

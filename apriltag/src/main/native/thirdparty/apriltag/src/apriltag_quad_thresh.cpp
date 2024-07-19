@@ -40,7 +40,7 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include "common/unionfind.h"
 #include "common/timeprofile.h"
 #include "common/zmaxheap.h"
-// #include "common/postscript_utils.h"
+#include "common/postscript_utils.h"
 #include "common/math_util.h"
 
 #ifdef _WIN32

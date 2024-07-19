@@ -38,8 +38,8 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include <unistd.h>
 #endif
 
-// #include "workerpool.h"
-// #include "debug_print.h"
+#include "workerpool.h"
+#include "debug_print.h"
 
 struct workerpool {
     int nthreads;

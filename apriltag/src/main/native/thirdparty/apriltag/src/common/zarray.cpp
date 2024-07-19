@@ -28,7 +28,7 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include <string.h>
 #include <assert.h>
 
-// #include "zarray.h"
+#include "zarray.h"
 
 int zstrcmp(const void * a_pp, const void * b_pp)
 {

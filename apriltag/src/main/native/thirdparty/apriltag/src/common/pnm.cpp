@@ -29,7 +29,7 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include <stdio.h>
 #include <stdlib.h>
 
-// #include "pnm.h"
+#include "pnm.h"
 
 pnm_t *pnm_create_from_file(const char *path)
 {

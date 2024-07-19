@@ -42,7 +42,7 @@ def copy_upstream_src(wpilib_root):
         and not f == "getopt.cpp"
         and not "py" in f
         and not remove_tag(f),
-        os.path.join(apriltag, "src/main/native/thirdparty/apriltag"),
+        os.path.join(apriltag, "src/main/native/thirdparty/apriltag/src"),
     )
 
     # Copy apriltag header files into allwpilib
@@ -51,17 +51,8 @@ def copy_upstream_src(wpilib_root):
         and not f == "getopt.h"
         and not f == "postscript_utils.h"
         and not remove_tag(f),
-        os.path.join(apriltag, "src/main/include/thirdparty/apriltag"),
+        os.path.join(apriltag, "src/main/native/thirdparty/apriltag/include"),
     )
-
-    for f in src_files:
-        comment_out_invalid_includes(
-            f, [os.path.join(apriltag, "src/main/include/thirdparty/apriltag")]
-        )
-    for f in include_files:
-        comment_out_invalid_includes(
-            f, [os.path.join(apriltag, "src/main/include/thirdparty/apriltag")]
-        )
 
 
 def main():

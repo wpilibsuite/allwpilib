@@ -30,7 +30,7 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include <stdio.h>
 #include <string.h>
 
-// #include "g2d.h"
+#include "g2d.h"
 #include "common/math_util.h"
 
 #ifdef _WIN32
@@ -725,7 +725,7 @@ int g2d_polygon_rasterize(const zarray_t *poly, double y, double *x)
 */
 #if 0
 
-// #include "timeprofile.h"
+#include "timeprofile.h"
 
 int main(int argc, char *argv[])
 {

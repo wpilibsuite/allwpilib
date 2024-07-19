@@ -30,7 +30,7 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include <stdlib.h>
 #include <assert.h>
 
-// #include "pam.h"
+#include "pam.h"
 
 pam_t *pam_create_from_file(const char *inpath)
 {
