@@ -201,6 +201,7 @@ public class AprilTagDetector implements AutoCloseable {
   }
 
   /** Constructs an AprilTagDetector. */
+  @SuppressWarnings("this-escape")
   public AprilTagDetector() {
     m_native = AprilTagJNI.createDetector();
     setQuadThresholdParameters(new QuadThresholdParameters());
