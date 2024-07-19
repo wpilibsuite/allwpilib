@@ -8,7 +8,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <units/length.h>
 
-void Robot::RobotInit() {
+Robot::Robot() {
   // Add the ultrasonic on the "Sensors" tab of the dashboard
   // Data will update automatically
   frc::Shuffleboard::GetTab("Sensors").Add(m_rangeFinder);

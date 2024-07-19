@@ -10,10 +10,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
-  private DutyCycle m_dutyCycle;
+  private final DutyCycle m_dutyCycle;
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     m_dutyCycle = new DutyCycle(new DigitalInput(0));
   }
 

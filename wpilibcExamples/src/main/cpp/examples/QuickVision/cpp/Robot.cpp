@@ -11,11 +11,11 @@
  * Uses the CameraServer class to automatically capture video from a USB webcam
  * and send it to the FRC dashboard without doing any vision processing. This is
  * the easiest way to get camera images to the dashboard. Just add this to the
- * RobotInit() method in your program.
+ * robot class constructor.
  */
 class Robot : public frc::TimedRobot {
  public:
-  void RobotInit() override {
+  Robot() {
 #if defined(__linux__) || defined(_WIN32)
     frc::CameraServer::StartAutomaticCapture();
 #else

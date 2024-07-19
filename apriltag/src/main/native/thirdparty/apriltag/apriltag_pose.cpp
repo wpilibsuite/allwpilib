@@ -35,12 +35,13 @@ double matd_to_double(matd_t *a)
  * @param R In/Outparam. Should be set to initial guess at R. Will be modified to be the optimal translation.
  * @param n_points Number of points.
  * @param n_steps Number of iterations.
+ * @param min_improvement_per_iteration Min object-space error improvement; if less than this, solver will exit early
  *
  * @return Object-space error after iteration.
  *
  * Implementation of Orthogonal Iteration from Lu, 2000.
  */
-double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int n_points, int n_steps) {
+double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int n_points, int n_steps, double min_improvement_per_iteration) {
     matd_t* p_mean = matd_create(3, 1);
     for (int i = 0; i < n_points; i++) {
         matd_add_inplace(p_mean, p[i]);
@@ -120,9 +121,16 @@ double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int 
             error += matd_to_double(matd_op("M'M", err_vec, err_vec));
             matd_destroy(err_vec);
         }
-        prev_error = error;
 
         free(q);
+
+        // Return early if the iterations converged
+        if (fabs(error - prev_error) < min_improvement_per_iteration) {
+          prev_error = error;
+          break;
+        }
+
+        prev_error = error;
     }
 
     matd_destroy(I3);
@@ -493,7 +501,8 @@ void estimate_tag_pose_orthogonal_iteration(
         apriltag_pose_t* solution1,
         double* err2,
         apriltag_pose_t* solution2,
-        int nIters) {
+        int nIters,
+        double min_improvement_per_iteration) {
     double scale = info->tagsize/2.0;
     matd_t* p[4] = {
         matd_create_data(3, 1, (double[]) {-scale, scale, 0}),
@@ -507,12 +516,13 @@ void estimate_tag_pose_orthogonal_iteration(
     }
 
     estimate_pose_for_tag_homography(info, solution1);
-    *err1 = orthogonal_iteration(v, p, &solution1->t, &solution1->R, 4, nIters);
+    *err1 = orthogonal_iteration(v, p, &solution1->t, &solution1->R, 4, nIters, min_improvement_per_iteration);
     solution2->R = fix_pose_ambiguities(v, p, solution1->t, solution1->R, 4);
     if (solution2->R) {
         solution2->t = matd_create(3, 1);
-        *err2 = orthogonal_iteration(v, p, &solution2->t, &solution2->R, 4, nIters);
+        *err2 = orthogonal_iteration(v, p, &solution2->t, &solution2->R, 4, nIters, min_improvement_per_iteration);
     } else {
+        solution2->t = NULL;
         *err2 = HUGE_VAL;
     }
 
@@ -528,7 +538,9 @@ void estimate_tag_pose_orthogonal_iteration(
 double estimate_tag_pose(apriltag_detection_info_t* info, apriltag_pose_t* pose) {
     double err1, err2;
     apriltag_pose_t pose1, pose2;
-    estimate_tag_pose_orthogonal_iteration(info, &err1, &pose1, &err2, &pose2, 50);
+    // 50 iterations is a good sensible default
+    // 1e-7 improvement per iteration is also pretty sane
+    estimate_tag_pose_orthogonal_iteration(info, &err1, &pose1, &err2, &pose2, 50, 1e-7);
     if (err1 <= err2) {
         pose->R = pose1.R;
         pose->t = pose1.t;

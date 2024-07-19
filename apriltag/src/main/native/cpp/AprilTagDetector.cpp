@@ -40,7 +40,9 @@ void AprilTagDetector::Results::Destroy() {
   }
 }
 
-AprilTagDetector::AprilTagDetector() : m_impl{apriltag_detector_create()} {}
+AprilTagDetector::AprilTagDetector() : m_impl{apriltag_detector_create()} {
+  SetQuadThresholdParameters({});
+}
 
 AprilTagDetector& AprilTagDetector::operator=(AprilTagDetector&& rhs) {
   Destroy();

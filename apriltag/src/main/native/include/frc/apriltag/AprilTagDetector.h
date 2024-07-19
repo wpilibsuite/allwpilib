@@ -83,10 +83,10 @@ class WPILIB_DLLEXPORT AprilTagDetector {
     bool operator==(const QuadThresholdParameters&) const = default;
 
     /**
-     * Threshold used to reject quads containing too few pixels. Default is 5
+     * Threshold used to reject quads containing too few pixels. Default is 300
      * pixels.
      */
-    int minClusterPixels = 5;
+    int minClusterPixels = 300;
 
     /**
      * How many corner candidates to consider when segmenting a group of pixels
@@ -97,9 +97,9 @@ class WPILIB_DLLEXPORT AprilTagDetector {
     /**
      * Critical angle. The detector will reject quads where pairs of edges have
      * angles that are close to straight or close to 180 degrees. Zero means
-     * that no quads are rejected. Default is 10 degrees.
+     * that no quads are rejected. Default is 45 degrees.
      */
-    units::radian_t criticalAngle = 10_deg;
+    units::radian_t criticalAngle = 45_deg;
 
     /**
      * When fitting lines to the contours, the maximum mean squared error

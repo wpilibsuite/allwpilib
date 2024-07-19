@@ -5,6 +5,7 @@ macro(wpilib_target_warnings target)
             -pedantic
             -Wextra
             -Wno-unused-parameter
+            -Wformat=2
             ${WPILIB_TARGET_WARNINGS}
         )
         if(NOT NO_WERROR)
@@ -52,5 +53,10 @@ macro(wpilib_target_warnings target)
         AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"
     )
         target_compile_options(${target} PRIVATE -gz=zlib)
+    endif()
+
+    # Disable std::mutex constexpr constructor on MSVC
+    if(MSVC)
+        target_compile_options(${target} PRIVATE /D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
     endif()
 endmacro()

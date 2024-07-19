@@ -7,6 +7,7 @@
 #include "frc/PS4Controller.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/event/BooleanEvent.h"
 
@@ -274,4 +275,29 @@ bool PS4Controller::GetTouchpadPressed() {
 
 bool PS4Controller::GetTouchpadReleased() {
   return GetRawButtonReleased(Button::kTouchpad);
+}
+
+void PS4Controller::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("HID");
+  builder.PublishConstString("ControllerType", "PS4");
+  builder.AddDoubleProperty("L2", [this] { return GetL2Axis(); }, nullptr);
+  builder.AddDoubleProperty("R2", [this] { return GetR2Axis(); }, nullptr);
+  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
+  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
+  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
+  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
+  builder.AddBooleanProperty("Square", [this] { return GetSquareButton(); }, nullptr);
+  builder.AddBooleanProperty("Cross", [this] { return GetCrossButton(); }, nullptr);
+  builder.AddBooleanProperty("Circle", [this] { return GetCircleButton(); }, nullptr);
+  builder.AddBooleanProperty("Triangle", [this] { return GetTriangleButton(); }, nullptr);
+  builder.AddBooleanProperty("L1", [this] { return GetL1Button(); }, nullptr);
+  builder.AddBooleanProperty("R1", [this] { return GetR1Button(); }, nullptr);
+  builder.AddBooleanProperty("L2", [this] { return GetL2Button(); }, nullptr);
+  builder.AddBooleanProperty("R2", [this] { return GetR2Button(); }, nullptr);
+  builder.AddBooleanProperty("Share", [this] { return GetShareButton(); }, nullptr);
+  builder.AddBooleanProperty("Options", [this] { return GetOptionsButton(); }, nullptr);
+  builder.AddBooleanProperty("L3", [this] { return GetL3Button(); }, nullptr);
+  builder.AddBooleanProperty("R3", [this] { return GetR3Button(); }, nullptr);
+  builder.AddBooleanProperty("PS", [this] { return GetPSButton(); }, nullptr);
+  builder.AddBooleanProperty("Touchpad", [this] { return GetTouchpadButton(); }, nullptr);
 }

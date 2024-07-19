@@ -484,6 +484,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  protected:
   Command();
 
+ private:
   /// Requirements set.
   wpi::SmallSet<Subsystem*, 4> m_requirements;
 

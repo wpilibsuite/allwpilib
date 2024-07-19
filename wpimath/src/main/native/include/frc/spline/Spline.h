@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include <optional>
 #include <utility>
-#include <vector>
 
 #include <wpi/array.h>
 
@@ -57,7 +57,7 @@ class Spline {
    * @param t The point t
    * @return The pose and curvature at that point.
    */
-  PoseWithCurvature GetPoint(double t) const {
+  std::optional<PoseWithCurvature> GetPoint(double t) const {
     Vectord<Degree + 1> polynomialBases;
 
     // Populate the polynomial bases
@@ -88,11 +88,15 @@ class Spline {
       ddy = combined(5) / t / t;
     }
 
+    if (std::hypot(dx, dy) < 1e-6) {
+      return std::nullopt;
+    }
+
     // Find the curvature.
     const auto curvature =
         (dx * ddy - ddx * dy) / ((dx * dx + dy * dy) * std::hypot(dx, dy));
 
-    return {
+    return PoseWithCurvature{
         {FromVector(combined.template block<2, 1>(0, 0)), Rotation2d{dx, dy}},
         units::curvature_t{curvature}};
   }

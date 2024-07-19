@@ -14,8 +14,7 @@ public class Robot extends EducationalRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  @Override
-  public void robotInit() {}
+  public Robot() {}
 
   /** This function is run when the robot is enabled. */
   @Override
