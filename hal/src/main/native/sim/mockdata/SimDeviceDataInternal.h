@@ -69,6 +69,7 @@ class SimUnnamedCallbackRegistry {
           lock.unlock();
           reinterpret_cast<CallbackFunction>(callback)(name, param,
                                                        std::forward<U>(u)...);
+          lock.lock();
         }
       }
     }
