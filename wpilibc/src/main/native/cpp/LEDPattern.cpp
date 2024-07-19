@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <unordered_map>
+#include <vector>
 
 #include <wpi/MathExtras.h>
 #include <wpi/timestamp.h>
