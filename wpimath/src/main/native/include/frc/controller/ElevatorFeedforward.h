@@ -187,28 +187,28 @@ class ElevatorFeedforward {
    *
    * @return The static gain.
    */
-  units::volt_t getKs() const { return kS; }
+  units::volt_t GetKs() const { return kS; }
 
   /**
    * Returns the gravity gain.
    *
    * @return The gravity gain.
    */
-  units::volt_t getKg() const { return kG; }
+  units::volt_t GetKg() const { return kG; }
 
   /**
    * Returns the velocity gain.
    *
    * @return The velocity gain.
    */
-  units::unit_t<kv_unit> getKv() const { return kV; }
+  units::unit_t<kv_unit> GetKv() const { return kV; }
 
   /**
    * Returns the acceleration gain.
    *
    * @return The acceleration gain.
    */
-  units::unit_t<ka_unit> getKa() const { return kA; }
+  units::unit_t<ka_unit> GetKa() const { return kA; }
 
  private:
   /// The static gain.

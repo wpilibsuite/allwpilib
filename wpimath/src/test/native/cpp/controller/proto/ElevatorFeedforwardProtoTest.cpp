@@ -27,8 +27,8 @@ TEST(ElevatorFeedforwardProtoTest, Roundtrip) {
   ProtoType::Pack(proto, kExpectedData);
 
   ElevatorFeedforward unpacked_data = ProtoType::Unpack(*proto);
-  EXPECT_EQ(kExpectedData.getKs().value(), unpacked_data.getKs().value());
-  EXPECT_EQ(kExpectedData.getKg().value(), unpacked_data.getKg().value());
-  EXPECT_EQ(kExpectedData.getKv().value(), unpacked_data.getKv().value());
-  EXPECT_EQ(kExpectedData.getKa().value(), unpacked_data.getKa().value());
+  EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data.GetKs().value());
+  EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data.GetKg().value());
+  EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data.GetKv().value());
+  EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data.GetKa().value());
 }

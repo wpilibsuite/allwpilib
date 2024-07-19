@@ -26,8 +26,8 @@ frc::ElevatorFeedforward StructType::Unpack(std::span<const uint8_t> data) {
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::ElevatorFeedforward& value) {
-  wpi::PackStruct<kKsOff>(data, value.getKs().value());
-  wpi::PackStruct<kKgOff>(data, value.getKg().value());
-  wpi::PackStruct<kKvOff>(data, value.getKv().value());
-  wpi::PackStruct<kKaOff>(data, value.getKa().value());
+  wpi::PackStruct<kKsOff>(data, value.GetKs().value());
+  wpi::PackStruct<kKgOff>(data, value.GetKg().value());
+  wpi::PackStruct<kKvOff>(data, value.GetKv().value());
+  wpi::PackStruct<kKaOff>(data, value.GetKa().value());
 }
