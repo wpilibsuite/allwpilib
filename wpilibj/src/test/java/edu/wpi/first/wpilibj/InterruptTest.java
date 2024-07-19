@@ -32,9 +32,9 @@ class InterruptTest {
       Timer.delay(0.5);
       DIOSim digitalSim = new DIOSim(di);
       digitalSim.setValue(false);
-      Timer.delay(0.01);
+      Timer.delay(0.02);
       digitalSim.setValue(true);
-      Timer.delay(0.01);
+      Timer.delay(0.02);
 
       int count = 0;
       while (!hasFired.get()) {
@@ -64,9 +64,9 @@ class InterruptTest {
       digitalSim.setValue(false);
       Timer.delay(0.5);
       interrupt.enable();
-      Timer.delay(0.01);
+      Timer.delay(0.02);
       digitalSim.setValue(true);
-      Timer.delay(0.01);
+      Timer.delay(0.02);
 
       int count = 0;
       while (!hasFiredRisingEdge.get()) {
@@ -101,9 +101,9 @@ class InterruptTest {
       digitalSim.setValue(true);
       Timer.delay(0.5);
       interrupt.enable();
-      Timer.delay(0.01);
+      Timer.delay(0.02);
       digitalSim.setValue(false);
-      Timer.delay(0.01);
+      Timer.delay(0.02);
 
       int count = 0;
       while (!hasFiredFallingEdge.get()) {

@@ -34,7 +34,7 @@ if(MSVC)
 else()
     if(APPLE)
         target_compile_options(imgui PRIVATE -fobjc-arc)
-        set_target_properties(imgui PROPERTIES LINK_FLAGS "-framework Metal -framework QuartzCore")
+        wpilib_link_macos_gui(imgui)
         target_sources(imgui PRIVATE imgui/cpp/backends/imgui_impl_metal.mm)
     else()
         #target_sources(imgui PRIVATE imgui/cpp/backends/imgui_impl_opengl3.cpp)
@@ -53,8 +53,6 @@ target_include_directories(
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/stb/include>"
     PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
 )
-
-wpilib_link_macos_gui(imgui)
 
 set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_features(imgui PUBLIC cxx_std_20)

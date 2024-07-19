@@ -245,7 +245,7 @@ set(CMAKE_SHARED_LINKER_FLAGS_UBSAN
 
 if(WITH_TESTS)
     enable_testing()
-    add_subdirectory(googletest)
+    add_subdirectory(thirdparty/googletest)
     include(GoogleTest)
 endif()
 

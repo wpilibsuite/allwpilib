@@ -45,16 +45,21 @@ jobs:
           cd upstream_utils
           ./gcem.py clone
           ./gcem.py copy-upstream-to-thirdparty
-      - name: Run glfw.py
-        run: |
-          cd upstream_utils
-          ./glfw.py clone
-          ./glfw.py copy-upstream-to-thirdparty
       - name: Run gl3w.py
         run: |
           cd upstream_utils
           ./gl3w.py clone
           ./gl3w.py copy-upstream-to-thirdparty
+      - name: Run glfw.py
+        run: |
+          cd upstream_utils
+          ./glfw.py clone
+          ./glfw.py copy-upstream-to-thirdparty
+      - name: Run googletest.py
+        run: |
+          cd upstream_utils
+          ./googletest.py clone
+          ./googletest.py copy-upstream-to-thirdparty
       - name: Run imgui.py
         run: |
           cd upstream_utils
