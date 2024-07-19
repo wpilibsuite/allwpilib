@@ -19,6 +19,7 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
+#include "hal/roborio/HMB.h"
 #include "HALInitializer.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
@@ -518,7 +519,12 @@ static void newDataOccur(uint32_t refNum) {
   }
 }
 
+static HAL_HMBData HmbData;
+
 HAL_Bool HAL_RefreshDSData(void) {
+  asm("dmb");
+  const HAL_HMBData* buf = const_cast<const HAL_HMBData*>(HAL_GetHMBBuffer());
+  HmbData = *buf;
   HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(controlWord));
   FRC_NetworkCommunication_getControlWord(
@@ -565,6 +571,10 @@ HAL_Bool HAL_RefreshDSData(void) {
     tcpCache.CloneTo(&tcpCurrent);
   }
   return prev != nullptr;
+}
+
+const HAL_HMBData* GetData() {
+  return &HmbData;
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
