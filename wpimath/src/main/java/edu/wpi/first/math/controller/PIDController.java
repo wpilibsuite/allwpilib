@@ -242,7 +242,7 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sets the setpoint for the PIDController.
+   * Sets the setpoint, known formally as the reference, for the PIDController.
    *
    * @param setpoint The desired setpoint.
    */
