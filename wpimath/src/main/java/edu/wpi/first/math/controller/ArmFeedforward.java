@@ -21,10 +21,10 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   /** The gravity gain, in volts. */
   private final double kg;
 
-  /** The velocity gain, in volt seconds per radian. */
+  /** The velocity gain, in V/(rad/s). */
   private final double kv;
 
-  /** The acceleration gain, in volt seconds² per radian. */
+  /** The acceleration gain, in V/(rad/s²). */
   private final double ka;
 
   /** Arm feedforward protobuf for serialization. */
@@ -90,7 +90,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   /**
    * Returns the velocity gain.
    *
-   * @return The velocity gain, in volt seconds per radian.
+   * @return The velocity gain, in V/(rad/s).
    */
   public double getKv() {
     return kv;
@@ -99,7 +99,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   /**
    * Returns the acceleration gain.
    *
-   * @return The acceleration gain, in volts seconds² per radian.
+   * @return The acceleration gain, in V/(rad/s²).
    */
   public double getKa() {
     return ka;

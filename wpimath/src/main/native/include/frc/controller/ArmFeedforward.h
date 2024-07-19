@@ -227,10 +227,10 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   /// The gravity gain, in volts.
   units::volt_t kG;
 
-  /// The velocity gain, in volt seconds per radian.
+  /// The velocity gain, in V/(rad/s)volt seconds per radian.
   units::unit_t<kv_unit> kV;
 
-  /// The acceleration gain, in volt seconds² per radian.
+  /// The acceleration gain, in V/(rad/s²).
   units::unit_t<ka_unit> kA;
 };
 }  // namespace frc
