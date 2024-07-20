@@ -49,11 +49,6 @@ def copy_upstream_src(wpilib_root):
         os.path.join(glfw),
     )
 
-    # The upstream library automatically changes the files from .c -> .cpp. We want to keep it .c
-    for f in src_files:
-        if f.endswith(".cpp"):
-            shutil.move(f, f[:-2])
-
     def cmake_filter(dp, f):
         if dp.startswith("./CMake"):
             return True
