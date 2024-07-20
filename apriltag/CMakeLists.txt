@@ -131,6 +131,16 @@ if(MSVC)
         apriltag
         PRIVATE /wd2220 /wd4005 /wd4018 /wd4244 /wd4267 /wd4996
     )
+elseif(MACOS)
+    target_compile_options(
+        apriltag
+        PRIVATE
+            -Wno-format-nonliteral
+            -Wno-gnu-zero-variadic-macro-arguments
+            -Wno-uninitialized
+            -Wno-sign-compare
+            -Wno-type-limits
+    )
 else()
     target_compile_options(
         apriltag

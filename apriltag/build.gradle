@@ -73,6 +73,12 @@ nativeUtils.platformConfigs.each {
         it.cCompiler.args.add("/wd4244")
         it.cCompiler.args.add("/wd4267")
         it.cCompiler.args.add("/wd4996")
+    } else if (it.name.contains('osx')) {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.add("-Wno-gnu-zero-variadic-macro-arguments")
+        it.cCompiler.args.add("-Wno-uninitialized")
+        it.cCompiler.args.add("-Wno-sign-compare")
+        it.cCompiler.args.add("-Wno-type-limits")
     } else {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cCompiler.args.add("-Wno-gnu-zero-variadic-macro-arguments")
