@@ -127,15 +127,11 @@ target_compile_features(apriltag PUBLIC cxx_std_20)
 wpilib_target_warnings(apriltag)
 # disable warnings that apriltaglib can't handle
 if(MSVC)
-    target_compile_options(apriltag PRIVATE /wd4018 /wd4005 /wd4996)
+    target_compile_options(apriltag PRIVATE /wd2220)
 else()
     target_compile_options(
         apriltag
-        PRIVATE
-            -Wno-format-nonliteral
-            -Wno-gnu-zero-variadic-macro-arguments
-            -Wno-sign-compare
-            -Wno-type-limits
+        PRIVATE -Wno-format-nonliteral -Wno-sign-compare -Wno-type-limits
     )
 endif()
 

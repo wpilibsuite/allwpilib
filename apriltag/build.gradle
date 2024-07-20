@@ -66,7 +66,13 @@ cppHeadersZip {
 
 // Suppress sign-compare warnings
 nativeUtils.platformConfigs.each {
-    if (it.name.contains('linux') || it.name.contains('macos')) {
+    if (it.name.contains('windows')) {
+        it.cCompiler.args.add("/wd2220")
+        it.cCompiler.args.add("/wd4005")
+        it.cCompiler.args.add("/wd4018")
+        it.cCompiler.args.add("/wd4244")
+        it.cCompiler.args.add("/wd4996")
+    } else if (it.name.contains('linux') || it.name.contains('macos')) {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cCompiler.args.add("-Wno-maybe-uninitialized")
         it.cCompiler.args.add("-Wno-sign-compare")
