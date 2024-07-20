@@ -3,7 +3,11 @@ project(apriltag)
 include(CompileWarnings)
 include(GenResources)
 
-file(GLOB_RECURSE apriltaglib_src src/main/native/thirdparty/apriltag/src/*.c)
+file(
+    GLOB_RECURSE apriltaglib_src
+    src/main/native/thirdparty/apriltag/src/*.c
+    src/main/native/thirdparty/apriltag/src/*.cpp
+)
 
 # Disable apriltag C library warnings
 if(MSVC)

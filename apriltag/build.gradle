@@ -28,7 +28,7 @@ ext {
             apriltagC(CSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/apriltag/src'
-                    include '**/*.c'
+                    include '**/*.c', '**/*.cpp'
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/apriltag/include',
