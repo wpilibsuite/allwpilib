@@ -10,10 +10,8 @@ Co-authored-by: Matt <matthew.morley.ca@gmail.com>
 ---
  apriltag_pose.c         | 23 +++++++++++++++++------
  apriltag_pose.h         |  3 ++-
- common/pjpeg.c          |  2 +-
- common/zhash.c          |  1 +
  example/apriltag_demo.c | 22 ++++++++++++++++++++++
- 5 files changed, 43 insertions(+), 8 deletions(-)
+ 3 files changed, 41 insertions(+), 7 deletions(-)
 
 diff --git a/apriltag_pose.c b/apriltag_pose.c
 index f0003a2d187df13236992026ee6ff7f9d6f7aff9..782729225c3555edcfebb7d8a21f847aad0e328f 100644
@@ -101,31 +99,6 @@ index 07ee37b2cb4185bcbdb46d1c9ccec306f0f2e96d..72993f11514199754c452369bad32157
  
  /**
   * Estimate tag pose.
-diff --git a/common/pjpeg.c b/common/pjpeg.c
-index 4a5dd028ee8a3d79fbe7a5abed30886cc6e40dae..8f573a0fd27ef454ca5653be99f7c7df6085ea78 100644
---- a/common/pjpeg.c
-+++ b/common/pjpeg.c
-@@ -96,7 +96,7 @@ static uint8_t mjpeg_dht[] = { // header
-     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,
- 
-     /////////////////////////////////////////////////////////////
--    // chrominance DC coefficients
-+    // chrominance DC coefficents
-     // DC table 1
-     0x01,
-     // code lengths
-diff --git a/common/zhash.c b/common/zhash.c
-index faf52233ed92f64b87ddbab255121c8202b13019..914f530eca8742ed39fc814ab6587a4514c966b5 100644
---- a/common/zhash.c
-+++ b/common/zhash.c
-@@ -84,6 +84,7 @@ zhash_t *zhash_create_capacity(size_t keysz, size_t valuesz,
-     zh->entrysz = 1 + zh->keysz + zh->valuesz;
- 
-     zh->entries = calloc(zh->nentries, zh->entrysz);
-+    zh->nentries = nentries;
- 
-     return zh;
- }
 diff --git a/example/apriltag_demo.c b/example/apriltag_demo.c
 index 6de90540fe2f22f5160f725bce03d50bb3967c74..841d7788756011b0c7237e989242d87de76b14ef 100644
 --- a/example/apriltag_demo.c

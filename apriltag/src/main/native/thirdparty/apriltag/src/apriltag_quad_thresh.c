@@ -40,7 +40,6 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include "common/unionfind.h"
 #include "common/timeprofile.h"
 #include "common/zmaxheap.h"
-// #include "common/postscript_utils.h"
 #include "common/math_util.h"
 
 #ifdef _WIN32
@@ -1978,8 +1977,6 @@ zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
         fprintf(f, "%.15f %.15f scale\n", scale, scale);
         fprintf(f, "0 %d translate\n", im2->height);
         fprintf(f, "1 -1 scale\n");
-
-        // postscript_image(f, im2);
 
         image_u8_destroy(im2);
 

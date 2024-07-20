@@ -1,5 +1,7 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
+apply plugin: 'c'
+
 ext {
     nativeName = 'apriltag'
     devMain = 'edu.wpi.first.apriltag.DevMain'
@@ -23,7 +25,7 @@ ext {
                     include '*.cpp'
                 }
             }
-            apriltagCpp(CppSourceSet) {
+            apriltagC(CSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/apriltag/src'
                     include '**/*.c'

@@ -51,8 +51,6 @@ either expressed or implied, of the Regents of The University of Michigan.
 
 #include "apriltag_math.h"
 
-// #include "common/postscript_utils.h"
-
 #ifndef M_PI
 # define M_PI 3.141592653589793238462643383279502884196
 #endif
@@ -1282,7 +1280,6 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
         fprintf(f, "%f %f scale\n", scale, scale);
         fprintf(f, "0 %d translate\n", darker->height);
         fprintf(f, "1 -1 scale\n");
-        // postscript_image(f, darker);
 
         image_u8_destroy(darker);
 
@@ -1364,8 +1361,6 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
         fprintf(f, "%f %f scale\n", scale, scale);
         fprintf(f, "0 %d translate\n", darker->height);
         fprintf(f, "1 -1 scale\n");
-
-        // postscript_image(f, darker);
 
         image_u8_destroy(darker);
 

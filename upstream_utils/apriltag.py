@@ -76,10 +76,10 @@ def main():
         "0002-zmaxheapify-Avoid-return-of-void-expression.patch",
         "0003-Avoid-unused-variable-warnings-in-release-builds.patch",
         "0004-Make-orthogonal_iteration-exit-early-upon-convergenc.patch",
-        "0005-Fix-calloc-argument-order.patch",
-        "0006-Remove-calls-to-postscript_image.patch",
-        "0007-Remove-GNU-macros.patch",
-        "0008-Fix-left-shift-of-negative-value-warning.patch",
+        "0005-Fix-signed-left-shift-warning.patch",
+        "0006-Avoid-incompatible-pointer-warning.patch",
+        "0007-Fix-GCC-14-calloc-warning.patch",
+        "0008-Remove-calls-to-postscript_image.patch",
     ]
 
     apriltag = Lib(name, url, tag, patch_list, copy_upstream_src)
