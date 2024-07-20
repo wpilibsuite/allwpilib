@@ -39,6 +39,7 @@ def copy_upstream_src(wpilib_root):
     walk_cwd_and_copy_if(
         lambda dp, f: f.endswith(".c"),
         os.path.join(wpiutil, "src/main/native/thirdparty/mpack/src"),
+        rename_c_to_cpp=True,
     )
 
 

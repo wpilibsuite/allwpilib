@@ -51,6 +51,7 @@ def copy_upstream_src(wpilib_root):
     src_files = walk_cwd_and_copy_if(
         lambda dp, f: dp.startswith("./src") and f not in src_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
+        rename_c_to_cpp=True,
     )
 
 
