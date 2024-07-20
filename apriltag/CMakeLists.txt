@@ -2,7 +2,6 @@ project(apriltag)
 
 include(CompileWarnings)
 include(GenResources)
-include(FetchContent)
 
 fetchcontent_declare(
     apriltaglib
@@ -107,7 +106,11 @@ generate_resources(
     apriltag_resources_src
 )
 
-file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)
+file(
+    GLOB_RECURSE apriltag_native_src
+    src/main/native/cpp/*.cpp
+    src/main/native/thirdparty/apriltag/src/*.cpp
+)
 
 add_library(
     apriltag
@@ -144,6 +147,18 @@ target_include_directories(
         $<BUILD_INTERFACE:${apriltaglib_SOURCE_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/apriltag>
+)
+
+install(
+    DIRECTORY src/main/native/thirdparty/apriltag/include/
+    DESTINATION "${include_dest}/apriltag"
+)
+target_include_directories(
+    apriltag
+    SYSTEM
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/src>
 )
 
 install(TARGETS apriltag EXPORT apriltag)

@@ -23,6 +23,16 @@ ext {
                     include '*.cpp'
                 }
             }
+            apriltagCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/apriltag/src'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/apriltag/include',
+                            'src/main/native/thirdparty/apriltag/src'
+                }
+            }
         }
     }
 }
@@ -45,8 +55,23 @@ sourceSets {
     }
 }
 
+cppHeadersZip {
+    from('src/main/native/thirdparty/apriltag/include') {
+        into '/'
+    }
+}
+
 model {
-    components {}
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/main/native/include',
+                            'src/main/native/thirdparty/apriltag/include'
+                }
+            }
+        }
+    }
     binaries {
         all {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
