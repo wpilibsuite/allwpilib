@@ -131,7 +131,7 @@ if(MSVC)
         apriltag
         PRIVATE /wd2220 /wd4005 /wd4018 /wd4244 /wd4267 /wd4996
     )
-elseif(APPLE)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(
         apriltag
         PRIVATE
