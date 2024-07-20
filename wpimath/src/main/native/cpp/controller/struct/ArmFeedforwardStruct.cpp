@@ -26,8 +26,8 @@ frc::ArmFeedforward StructType::Unpack(std::span<const uint8_t> data) {
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::ArmFeedforward& value) {
-  wpi::PackStruct<kKsOff>(data, value.kS());
-  wpi::PackStruct<kKgOff>(data, value.kG());
-  wpi::PackStruct<kKvOff>(data, value.kV());
-  wpi::PackStruct<kKaOff>(data, value.kA());
+  wpi::PackStruct<kKsOff>(data, value.GetKs().value());
+  wpi::PackStruct<kKgOff>(data, value.GetKg().value());
+  wpi::PackStruct<kKvOff>(data, value.GetKv().value());
+  wpi::PackStruct<kKaOff>(data, value.GetKa().value());
 }
