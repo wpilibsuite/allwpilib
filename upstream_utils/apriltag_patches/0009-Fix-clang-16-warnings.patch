@@ -4,46 +4,47 @@ Date: Thu, 29 Jun 2023 22:14:05 -0700
 Subject: [PATCH 9/9] Fix clang 16 warnings
 
 ---
- apriltag.c              | 2 +-
- apriltag.h              | 2 +-
- common/g2d.c            | 2 +-
- common/g2d.h            | 2 +-
- common/getopt.c         | 2 +-
- common/getopt.h         | 2 +-
- common/math_util.h      | 4 ++--
- common/pthreads_cross.h | 2 +-
- common/string_util.c    | 2 +-
- common/string_util.h    | 2 +-
- common/time_util.c      | 4 ++--
- common/time_util.h      | 4 ++--
- common/timeprofile.h    | 2 +-
- common/workerpool.c     | 8 ++++----
- common/workerpool.h     | 2 +-
- common/zarray.c         | 2 +-
- common/zarray.h         | 2 +-
- common/zhash.c          | 8 ++++----
- common/zhash.h          | 8 ++++----
- common/zmaxheap.c       | 4 ++--
- common/zmaxheap.h       | 2 +-
- tag16h5.c               | 2 +-
- tag16h5.h               | 2 +-
- tag25h9.c               | 2 +-
- tag25h9.h               | 2 +-
- tag36h10.c              | 2 +-
- tag36h10.h              | 2 +-
- tag36h11.c              | 2 +-
- tag36h11.h              | 2 +-
- tagCircle21h7.c         | 2 +-
- tagCircle21h7.h         | 2 +-
- tagCircle49h12.c        | 2 +-
- tagCircle49h12.h        | 2 +-
- tagCustom48h12.c        | 2 +-
- tagCustom48h12.h        | 2 +-
- tagStandard41h12.c      | 2 +-
- tagStandard41h12.h      | 2 +-
- tagStandard52h13.c      | 2 +-
- tagStandard52h13.h      | 2 +-
- 39 files changed, 52 insertions(+), 52 deletions(-)
+ apriltag.c                | 2 +-
+ apriltag.h                | 2 +-
+ common/g2d.c              | 2 +-
+ common/g2d.h              | 2 +-
+ common/getopt.c           | 2 +-
+ common/getopt.h           | 2 +-
+ common/math_util.h        | 4 ++--
+ common/pthreads_cross.cpp | 6 +++---
+ common/pthreads_cross.h   | 2 +-
+ common/string_util.c      | 2 +-
+ common/string_util.h      | 2 +-
+ common/time_util.c        | 4 ++--
+ common/time_util.h        | 4 ++--
+ common/timeprofile.h      | 2 +-
+ common/workerpool.c       | 8 ++++----
+ common/workerpool.h       | 2 +-
+ common/zarray.c           | 2 +-
+ common/zarray.h           | 2 +-
+ common/zhash.c            | 8 ++++----
+ common/zhash.h            | 8 ++++----
+ common/zmaxheap.c         | 4 ++--
+ common/zmaxheap.h         | 2 +-
+ tag16h5.c                 | 2 +-
+ tag16h5.h                 | 2 +-
+ tag25h9.c                 | 2 +-
+ tag25h9.h                 | 2 +-
+ tag36h10.c                | 2 +-
+ tag36h10.h                | 2 +-
+ tag36h11.c                | 2 +-
+ tag36h11.h                | 2 +-
+ tagCircle21h7.c           | 2 +-
+ tagCircle21h7.h           | 2 +-
+ tagCircle49h12.c          | 2 +-
+ tagCircle49h12.h          | 2 +-
+ tagCustom48h12.c          | 2 +-
+ tagCustom48h12.h          | 2 +-
+ tagStandard41h12.c        | 2 +-
+ tagStandard41h12.h        | 2 +-
+ tagStandard52h13.c        | 2 +-
+ tagStandard52h13.h        | 2 +-
+ 40 files changed, 55 insertions(+), 55 deletions(-)
 
 diff --git a/apriltag.c b/apriltag.c
 index b514d974971827e6a4f4f0a4fa12e6b0392d7282..bfff1ea9d502b8ef08d00e61d4c75a967c06462b 100644
@@ -142,6 +143,37 @@ index 9271a01834501a311f28525ca460f61117524eab..5434355a512c1a6225bbfbf335caa279
 +static inline float signed_randf(void)
  {
      return randf()*2 - 1;
+ }
+diff --git a/common/pthreads_cross.cpp b/common/pthreads_cross.cpp
+index f7721912f9088bf84224943aa836a69356949f18..09d6ce6e97074f4ffbcef1ef6e06fd53ee22ff0f 100644
+--- a/common/pthreads_cross.cpp
++++ b/common/pthreads_cross.cpp
+@@ -216,7 +216,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
+     return 0;
+ }
+ 
+-int sched_yield() {
++int sched_yield(void) {
+     return (int)SwitchToThread();
+ }
+ 
+@@ -241,7 +241,7 @@ unsigned int timespec_to_ms(const struct timespec *abstime)
+     return t;
+ }
+ 
+-unsigned int pcthread_get_num_procs()
++unsigned int pcthread_get_num_procs(void)
+ {
+     SYSTEM_INFO sysinfo;
+ 
+@@ -252,7 +252,7 @@ unsigned int pcthread_get_num_procs()
+ #else
+ 
+ #include <unistd.h>
+-unsigned int pcthread_get_num_procs()
++unsigned int pcthread_get_num_procs(void)
+ {
+     return (unsigned int)sysconf(_SC_NPROCESSORS_ONLN);
  }
 diff --git a/common/pthreads_cross.h b/common/pthreads_cross.h
 index 897a333573e88263b6ba58ec3d31031304c50e54..209c28f855efcbdf41424f11a302ba2794836796 100644

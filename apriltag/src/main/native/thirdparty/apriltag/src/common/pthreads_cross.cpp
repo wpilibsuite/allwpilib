@@ -216,7 +216,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
     return 0;
 }
 
-int sched_yield() {
+int sched_yield(void) {
     return (int)SwitchToThread();
 }
 
@@ -241,7 +241,7 @@ unsigned int timespec_to_ms(const struct timespec *abstime)
     return t;
 }
 
-unsigned int pcthread_get_num_procs()
+unsigned int pcthread_get_num_procs(void)
 {
     SYSTEM_INFO sysinfo;
 
@@ -252,7 +252,7 @@ unsigned int pcthread_get_num_procs()
 #else
 
 #include <unistd.h>
-unsigned int pcthread_get_num_procs()
+unsigned int pcthread_get_num_procs(void)
 {
     return (unsigned int)sysconf(_SC_NPROCESSORS_ONLN);
 }
