@@ -352,7 +352,7 @@ void apriltag_detector_clear_families(apriltag_detector_t *td)
     zarray_clear(td->tag_families);
 }
 
-apriltag_detector_t *apriltag_detector_create()
+apriltag_detector_t *apriltag_detector_create(void)
 {
     apriltag_detector_t *td = (apriltag_detector_t*) calloc(1, sizeof(apriltag_detector_t));
 

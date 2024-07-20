@@ -46,4 +46,4 @@ void workerpool_run_single(workerpool_t *wp);
 
 int workerpool_get_nthreads(workerpool_t *wp);
 
-int workerpool_get_nprocs();
+int workerpool_get_nprocs(void);

@@ -96,7 +96,7 @@ zarray_t *g2d_polygon_create_data(double v[][2], int sz);
 
 zarray_t *g2d_polygon_create_zeros(int sz);
 
-zarray_t *g2d_polygon_create_empty();
+zarray_t *g2d_polygon_create_empty(void);
 
 void g2d_polygon_add(zarray_t *poly, double v[2]);
 

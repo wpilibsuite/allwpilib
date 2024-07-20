@@ -51,7 +51,7 @@ struct timeprofile
     zarray_t *stamps;
 };
 
-static inline timeprofile_t *timeprofile_create()
+static inline timeprofile_t *timeprofile_create(void)
 {
     timeprofile_t *tp = (timeprofile_t*) calloc(1, sizeof(timeprofile_t));
     tp->stamps = zarray_create(sizeof(struct timeprofile_entry));

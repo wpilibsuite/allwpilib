@@ -45,7 +45,7 @@ double g2d_distance(const double a[2], const double b[2])
     return sqrtf(sq(a[0]-b[0]) + sq(a[1]-b[1]));
 }
 
-zarray_t *g2d_polygon_create_empty()
+zarray_t *g2d_polygon_create_empty(void)
 {
     return zarray_create(sizeof(double[2]));
 }

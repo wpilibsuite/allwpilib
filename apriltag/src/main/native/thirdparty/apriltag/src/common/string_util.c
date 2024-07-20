@@ -314,7 +314,7 @@ char *str_touppercase(char *s)
     return s;
 }
 
-string_buffer_t* string_buffer_create()
+string_buffer_t* string_buffer_create(void)
 {
     string_buffer_t *sb = (string_buffer_t*) calloc(1, sizeof(string_buffer_t));
     assert(sb != NULL);

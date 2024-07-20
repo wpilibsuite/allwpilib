@@ -167,7 +167,7 @@ void zmaxheap_add(zmaxheap_t *heap, void *p, float v)
     }
 }
 
-void zmaxheap_vmap(zmaxheap_t *heap, void (*f)())
+void zmaxheap_vmap(zmaxheap_t *heap, void (*f)(void*))
 {
     assert(heap != NULL);
     assert(f != NULL);
@@ -358,7 +358,7 @@ void zmaxheap_iterator_finish(zmaxheap_iterator_t *it)
         maxheapify(heap, i);
 }
 
-void zmaxheap_test()
+void zmaxheap_test(void)
 {
     int cap = 10000;
     int sz = 0;

@@ -80,9 +80,13 @@ def main():
         "0006-Avoid-incompatible-pointer-warning.patch",
         "0007-Fix-GCC-14-calloc-warning.patch",
         "0008-Remove-calls-to-postscript_image.patch",
+        "0009-Fix-clang-16-warnings.patch",
     ]
+    patch_options = {
+        "ignore_whitespace": True,
+    }
 
-    apriltag = Lib(name, url, tag, patch_list, copy_upstream_src)
+    apriltag = Lib(name, url, tag, patch_list, copy_upstream_src, patch_options)
     apriltag.main()
 
 

@@ -56,10 +56,10 @@ extern "C" {
 #endif
 
 typedef struct timeutil_rest timeutil_rest_t;
-timeutil_rest_t *timeutil_rest_create();
+timeutil_rest_t *timeutil_rest_create(void);
 void timeutil_rest_destroy(timeutil_rest_t * rest);
 
-int64_t utime_now(); // blacklist-ignore
+int64_t utime_now(void); // blacklist-ignore
 int64_t utime_get_seconds(int64_t v);
 int64_t utime_get_useconds(int64_t v);
 void    utime_to_timeval(int64_t v, struct timeval *tv);

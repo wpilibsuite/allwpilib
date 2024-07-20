@@ -70,7 +70,7 @@ int sched_yield(void);
 #ifdef __cplusplus
 extern "C" {
 #endif
-unsigned int pcthread_get_num_procs();
+unsigned int pcthread_get_num_procs(void);
 
 void ms_to_timespec(struct timespec *ts, unsigned int ms);
 unsigned int timespec_to_ms(const struct timespec *abstime);

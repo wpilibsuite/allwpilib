@@ -231,7 +231,7 @@ struct apriltag_detection
 };
 
 // don't forget to add a family!
-apriltag_detector_t *apriltag_detector_create();
+apriltag_detector_t *apriltag_detector_create(void);
 
 // add a family to the apriltag detector. caller still "owns" the family.
 // a single instance should only be provided to one apriltag detector instance.

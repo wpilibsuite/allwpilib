@@ -35,7 +35,7 @@ struct timeutil_rest
     int64_t start_time;
 };
 
-timeutil_rest_t *timeutil_rest_create()
+timeutil_rest_t *timeutil_rest_create(void)
 {
     timeutil_rest_t *rest = calloc(1, sizeof(timeutil_rest_t));
     return rest;
@@ -46,7 +46,7 @@ void timeutil_rest_destroy(timeutil_rest_t *rest)
     free(rest);
 }
 
-int64_t utime_now() // blacklist-ignore
+int64_t utime_now(void) // blacklist-ignore
 {
     struct timeval tv;
     gettimeofday (&tv, NULL); // blacklist-ignore

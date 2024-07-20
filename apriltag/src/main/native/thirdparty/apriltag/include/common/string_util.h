@@ -262,7 +262,7 @@ char *str_replace(const char *haystack, const char *needle, const char *replacem
  * It is the caller's responsibility to free the string buffer resources with
  * a call to string_buffer_destroy() when it is no longer needed.
  */
-string_buffer_t *string_buffer_create();
+string_buffer_t *string_buffer_create(void);
 
 /**
  * Frees the resources associated with a string buffer object, including space

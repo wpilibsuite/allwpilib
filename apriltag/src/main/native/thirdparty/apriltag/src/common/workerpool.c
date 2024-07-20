@@ -66,7 +66,7 @@ void *worker_thread(void *p)
 {
     workerpool_t *wp = (workerpool_t*) p;
 
-    int cnt = 0;
+//    int cnt = 0;
 
     while (1) {
         struct task *task;
@@ -77,13 +77,13 @@ void *worker_thread(void *p)
 //          printf("%"PRId64" thread %d did %d\n", utime_now(), pthread_self(), cnt);
             pthread_cond_broadcast(&wp->endcond);
             pthread_cond_wait(&wp->startcond, &wp->mutex);
-            cnt = 0;
+//            cnt = 0;
 //            printf("%"PRId64" thread %d awake\n", utime_now(), pthread_self());
         }
 
         zarray_get_volatile(wp->tasks, wp->taskspos, &task);
         wp->taskspos++;
-        cnt++;
+//        cnt++;
         pthread_mutex_unlock(&wp->mutex);
 //        pthread_yield();
         sched_yield();
@@ -203,7 +203,7 @@ void workerpool_run(workerpool_t *wp)
     }
 }
 
-int workerpool_get_nprocs()
+int workerpool_get_nprocs(void)
 {
 #ifdef WIN32
     SYSTEM_INFO sysinfo;
