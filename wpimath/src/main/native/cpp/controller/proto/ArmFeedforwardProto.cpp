@@ -27,8 +27,8 @@ frc::ArmFeedforward wpi::Protobuf<frc::ArmFeedforward>::Unpack(
 void wpi::Protobuf<frc::ArmFeedforward>::Pack(
     google::protobuf::Message* msg, const frc::ArmFeedforward& value) {
   auto m = static_cast<wpi::proto::ProtobufArmFeedforward*>(msg);
-  m->set_ks(value.kS.value());
-  m->set_kg(value.kG.value());
-  m->set_kv(value.kV.value());
-  m->set_ka(value.kA.value());
+  m->set_ks(value.GetKs().value());
+  m->set_kg(value.GetKg().value());
+  m->set_kv(value.GetKv().value());
+  m->set_ka(value.GetKa().value());
 }
