@@ -4,11 +4,7 @@ import os
 import shutil
 
 from upstream_utils import (
-    get_repo_root,
-    clone_repo,
-    comment_out_invalid_includes,
     walk_cwd_and_copy_if,
-    git_am,
     Lib,
 )
 
@@ -23,15 +19,10 @@ def copy_upstream_src(wpilib_root):
         shutil.rmtree(os.path.join(wpimath, d), ignore_errors=True)
 
     # Copy gcem include files into allwpilib
-    include_files = walk_cwd_and_copy_if(
+    walk_cwd_and_copy_if(
         lambda dp, f: dp.startswith("./include"),
         os.path.join(wpimath, "src/main/native/thirdparty/gcem"),
     )
-
-    for f in include_files:
-        comment_out_invalid_includes(
-            f, [os.path.join(wpimath, "src/main/native/thirdparty/gcem/include")]
-        )
 
 
 def main():

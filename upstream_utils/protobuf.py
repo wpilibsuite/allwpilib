@@ -4,13 +4,8 @@ import os
 import shutil
 
 from upstream_utils import (
-    get_repo_root,
-    clone_repo,
-    comment_out_invalid_includes,
     copy_to,
-    walk_cwd_and_copy_if,
     walk_if,
-    git_am,
     Lib,
 )
 

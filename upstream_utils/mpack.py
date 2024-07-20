@@ -5,10 +5,7 @@ import shutil
 import subprocess
 
 from upstream_utils import (
-    get_repo_root,
-    clone_repo,
     walk_cwd_and_copy_if,
-    git_am,
     Lib,
 )
 

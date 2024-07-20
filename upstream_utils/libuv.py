@@ -4,11 +4,7 @@ import os
 import shutil
 
 from upstream_utils import (
-    get_repo_root,
-    clone_repo,
-    comment_out_invalid_includes,
     walk_cwd_and_copy_if,
-    git_am,
     Lib,
 )
 
@@ -27,7 +23,7 @@ def copy_upstream_src(wpilib_root):
         "sunos.h",
     ]
 
-    include_files = walk_cwd_and_copy_if(
+    walk_cwd_and_copy_if(
         lambda dp, f: dp.startswith("./include") and f not in include_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
     )
@@ -48,7 +44,7 @@ def copy_upstream_src(wpilib_root):
         "sysinfo-loadavg.c",
         "sysinfo-memory.c",
     ]
-    src_files = walk_cwd_and_copy_if(
+    walk_cwd_and_copy_if(
         lambda dp, f: dp.startswith("./src") and f not in src_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
         rename_c_to_cpp=True,

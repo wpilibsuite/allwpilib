@@ -3,14 +3,7 @@
 import os
 import shutil
 
-from upstream_utils import (
-    get_repo_root,
-    clone_repo,
-    comment_out_invalid_includes,
-    walk_cwd_and_copy_if,
-    git_am,
-    Lib,
-)
+from upstream_utils import Lib
 
 
 def run_global_replacements(wpiutil_llvm_files):

@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
 
 import os
-import re
 import shutil
 
-from upstream_utils import (
-    get_repo_root,
-    clone_repo,
-    comment_out_invalid_includes,
-    walk_cwd_and_copy_if,
-    git_am,
-    Lib,
-)
+from upstream_utils import Lib
 
 
 def copy_upstream_src(wpilib_root):
