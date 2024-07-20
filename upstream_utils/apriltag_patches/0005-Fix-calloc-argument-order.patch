@@ -1,22 +1,22 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Fri, 19 Jul 2024 19:06:00 -0700
-Subject: [PATCH 6/7] Fix calloc() argument order
+Subject: [PATCH 5/8] Fix calloc() argument order
 
 ---
  common/zmaxheap.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/common/zmaxheap.c b/common/zmaxheap.c
-index c5ac32e7b1e4a01366cc1f96aaa45beeee1ca4e9..c6f23f1069ffb4bffa4f388dd075f8da4fbe3843 100644
+index 2c671236bf07ed4c43e15c02f4bf10df76880cb9..ed271420d229a98b56c7027f47d9830a78a97db1 100644
 --- a/common/zmaxheap.c
 +++ b/common/zmaxheap.c
 @@ -362,7 +362,7 @@ void zmaxheap_test()
  {
      int cap = 10000;
      int sz = 0;
--    int32_t *vals = (int32_t *) calloc(sizeof(int32_t), cap);
-+    int32_t *vals = (int32_t *) calloc(cap, sizeof(int32_t));
+-    int32_t *vals = calloc(sizeof(int32_t), cap);
++    int32_t *vals = calloc(cap, sizeof(int32_t));
  
      zmaxheap_t *heap = zmaxheap_create(sizeof(int32_t));
  

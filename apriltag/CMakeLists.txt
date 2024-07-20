@@ -109,7 +109,7 @@ generate_resources(
 file(
     GLOB_RECURSE apriltag_native_src
     src/main/native/cpp/*.cpp
-    src/main/native/thirdparty/apriltag/src/*.cpp
+    src/main/native/thirdparty/apriltag/src/*.c
 )
 
 add_library(

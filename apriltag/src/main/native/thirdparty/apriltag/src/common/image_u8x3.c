@@ -31,7 +31,6 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include <string.h>
 #include <math.h>
 
-#include "image_types.h"
 #include "math_util.h"
 #include "pnm.h"
 
@@ -53,25 +52,25 @@ image_u8x3_t *image_u8x3_create_alignment(unsigned int width, unsigned int heigh
     if ((stride % alignment) != 0)
         stride += alignment - (stride % alignment);
 
-    uint8_t *buf = (uint8_t *) calloc(height*stride, sizeof(uint8_t));
+    uint8_t *buf = calloc(height*stride, sizeof(uint8_t));
 
     // const initializer
     image_u8x3_t tmp = { .width = width, .height = height, .stride = stride, .buf = buf };
 
-    image_u8x3_t *im = (image_u8x3_t *) calloc(1, sizeof(image_u8x3_t));
+    image_u8x3_t *im = calloc(1, sizeof(image_u8x3_t));
     memcpy(im, &tmp, sizeof(image_u8x3_t));
     return im;
 }
 
 image_u8x3_t *image_u8x3_copy(const image_u8x3_t *in)
 {
-    uint8_t *buf = (uint8_t *) malloc(in->height*in->stride*sizeof(uint8_t));
+    uint8_t *buf = malloc(in->height*in->stride*sizeof(uint8_t));
     memcpy(buf, in->buf, in->height*in->stride*sizeof(uint8_t));
 
     // const initializer
     image_u8x3_t tmp = { .width = in->width, .height = in->height, .stride = in->stride, .buf = buf };
 
-    image_u8x3_t *copy = (image_u8x3_t *) calloc(1, sizeof(image_u8x3_t));
+    image_u8x3_t *copy = calloc(1, sizeof(image_u8x3_t));
     memcpy(copy, &tmp, sizeof(image_u8x3_t));
     return copy;
 }
@@ -211,7 +210,7 @@ void image_u8x3_gaussian_blur(image_u8x3_t *im, double sigma, int ksz)
     assert((ksz & 1) == 1); // ksz must be odd.
 
     // build the kernel.
-    double *dk = (double *) malloc(sizeof(double)*ksz);
+    double *dk = malloc(sizeof(double)*ksz);
 
     // for kernel of length 5:
     // dk[0] = f(-2), dk[1] = f(-1), dk[2] = f(0), dk[3] = f(1), dk[4] = f(2)
@@ -229,7 +228,7 @@ void image_u8x3_gaussian_blur(image_u8x3_t *im, double sigma, int ksz)
     for (int i = 0; i < ksz; i++)
         dk[i] /= acc;
 
-    uint8_t *k = (uint8_t *) malloc(sizeof(uint8_t)*ksz);
+    uint8_t *k = malloc(sizeof(uint8_t)*ksz);
     for (int i = 0; i < ksz; i++)
         k[i] = dk[i]*255;
 
@@ -242,8 +241,8 @@ void image_u8x3_gaussian_blur(image_u8x3_t *im, double sigma, int ksz)
     for (int c = 0; c < 3; c++) {
         for (int y = 0; y < im->height; y++) {
 
-            uint8_t *in = (uint8_t *) malloc(sizeof(uint8_t)*im->stride);
-            uint8_t *out = (uint8_t *) malloc(sizeof(uint8_t)*im->stride);
+            uint8_t *in = malloc(sizeof(uint8_t)*im->stride);
+            uint8_t *out = malloc(sizeof(uint8_t)*im->stride);
 
             for (int x = 0; x < im->width; x++)
                 in[x] = im->buf[y*im->stride + 3 * x + c];
@@ -257,8 +256,8 @@ void image_u8x3_gaussian_blur(image_u8x3_t *im, double sigma, int ksz)
         }
 
         for (int x = 0; x < im->width; x++) {
-            uint8_t *in = (uint8_t *) malloc(sizeof(uint8_t)*im->height);
-            uint8_t *out = (uint8_t *) malloc(sizeof(uint8_t)*im->height);
+            uint8_t *in = malloc(sizeof(uint8_t)*im->height);
+            uint8_t *out = malloc(sizeof(uint8_t)*im->height);
 
             for (int y = 0; y < im->height; y++)
                 in[y] = im->buf[y*im->stride + 3*x + c];

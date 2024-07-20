@@ -73,7 +73,7 @@ static inline void swap_default(zmaxheap_t *heap, int a, int b)
     heap->values[a] = heap->values[b];
     heap->values[b] = t;
 
-    char *tmp = (char *) malloc(sizeof(char)*heap->el_sz);
+    char *tmp = malloc(sizeof(char)*heap->el_sz);
     memcpy(tmp, &heap->data[a*heap->el_sz], heap->el_sz);
     memcpy(&heap->data[a*heap->el_sz], &heap->data[b*heap->el_sz], heap->el_sz);
     memcpy(&heap->data[b*heap->el_sz], tmp, heap->el_sz);
@@ -95,7 +95,7 @@ static inline void swap_pointer(zmaxheap_t *heap, int a, int b)
 
 zmaxheap_t *zmaxheap_create(size_t el_sz)
 {
-    zmaxheap_t *heap = (zmaxheap_t *) calloc(1, sizeof(zmaxheap_t));
+    zmaxheap_t *heap = calloc(1, sizeof(zmaxheap_t));
     heap->el_sz = el_sz;
 
     heap->swap = swap_default;
@@ -135,8 +135,8 @@ void zmaxheap_ensure_capacity(zmaxheap_t *heap, int capacity)
         newcap *= 2;
     }
 
-    heap->values = (float *) realloc(heap->values, newcap * sizeof(float));
-    heap->data = (char *) realloc(heap->data, newcap * heap->el_sz);
+    heap->values = realloc(heap->values, newcap * sizeof(float));
+    heap->data = realloc(heap->data, newcap * heap->el_sz);
     heap->alloc = newcap;
 }
 
@@ -362,7 +362,7 @@ void zmaxheap_test()
 {
     int cap = 10000;
     int sz = 0;
-    int32_t *vals = (int32_t *) calloc(cap, sizeof(int32_t));
+    int32_t *vals = calloc(cap, sizeof(int32_t));
 
     zmaxheap_t *heap = zmaxheap_create(sizeof(int32_t));
 

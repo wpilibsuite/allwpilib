@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 19 Jul 2024 20:37:55 -0700
+Subject: [PATCH 8/8] Fix left shift of negative value warning
+
+---
+ common/pjpeg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/common/pjpeg.c b/common/pjpeg.c
+index 8f573a0fd27ef454ca5653be99f7c7df6085ea78..b6a86dbc08ba6c7f7d2bb125fb5f4b52a6103f1a 100644
+--- a/common/pjpeg.c
++++ b/common/pjpeg.c
+@@ -594,7 +594,7 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
+ 
+                                         // if high bit is clear, it's negative
+                                         if ((value & (1 << (ssss-1))) == 0)
+-                                            value += ((-1) << ssss) + 1;
++                                            value += (int32_t)(UINT32_MAX << ssss) + 1;
+ 
+                                         dcpred[nsidx] += value;
+                                         block[0] = dcpred[nsidx] * pjd->qtab[qtabidx][0];
+@@ -620,7 +620,7 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
+ 
+                                             // if high bit is clear, it's negative
+                                             if ((value & (1 << (ssss-1))) == 0)
+-                                                value += ((-1) << ssss) + 1;
++                                                value += (int32_t)(UINT32_MAX << ssss) + 1;
+ 
+                                             coeff += rrrr;
+ 

@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 19 Jul 2024 20:27:39 -0700
+Subject: [PATCH 7/8] Remove GNU macros
+
+---
+ common/workerpool.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/common/workerpool.c b/common/workerpool.c
+index a0170ef87978cb4cd2d3d8a198ffea471b6e40b2..e796d2e7dd5cfbef5a9e83ce2e10a7c877a0a088 100644
+--- a/common/workerpool.c
++++ b/common/workerpool.c
+@@ -26,8 +26,6 @@ either expressed or implied, of the Regents of The University of Michigan.
+ */
+ #include <errno.h>
+ 
+-#define _GNU_SOURCE  // Possible fix for 16.04
+-#define __USE_GNU
+ #include "common/pthreads_cross.h"
+ #include <assert.h>
+ #include <stdio.h>

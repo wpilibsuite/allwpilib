@@ -30,7 +30,6 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include <stdlib.h>
 #include <string.h>
 
-#include "image_types.h"
 #include "pam.h"
 #include "pnm.h"
 #include "image_u8x4.h"
@@ -51,25 +50,25 @@ image_u8x4_t *image_u8x4_create_alignment(unsigned int width, unsigned int heigh
     if ((stride % alignment) != 0)
         stride += alignment - (stride % alignment);
 
-    uint8_t *buf = (uint8_t *) calloc(height*stride, sizeof(uint8_t));
+    uint8_t *buf = calloc(height*stride, sizeof(uint8_t));
 
     // const initializer
     image_u8x4_t tmp = { .width = width, .height = height, .stride = stride, .buf = buf };
 
-    image_u8x4_t *im = (image_u8x4_t *) calloc(1, sizeof(image_u8x4_t));
+    image_u8x4_t *im = calloc(1, sizeof(image_u8x4_t));
     memcpy(im, &tmp, sizeof(image_u8x4_t));
     return im;
 }
 
 image_u8x4_t *image_u8x4_copy(const image_u8x4_t *in)
 {
-    uint8_t *buf = (uint8_t *) malloc(in->height*in->stride*sizeof(uint8_t));
+    uint8_t *buf = malloc(in->height*in->stride*sizeof(uint8_t));
     memcpy(buf, in->buf, in->height*in->stride*sizeof(uint8_t));
 
     // const initializer
     image_u8x4_t tmp = { .width = in->width, .height = in->height, .stride = in->stride, .buf = buf };
 
-    image_u8x4_t *copy = (image_u8x4_t *) calloc(1, sizeof(image_u8x4_t));
+    image_u8x4_t *copy = calloc(1, sizeof(image_u8x4_t));
     memcpy(copy, &tmp, sizeof(image_u8x4_t));
     return copy;
 }

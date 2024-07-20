@@ -83,7 +83,7 @@ zhash_t *zhash_create_capacity(size_t keysz, size_t valuesz,
 
     zh->entrysz = 1 + zh->keysz + zh->valuesz;
 
-    zh->entries = (char *) calloc(zh->nentries, zh->entrysz);
+    zh->entries = calloc(zh->nentries, zh->entrysz);
     zh->nentries = nentries;
 
     return zh;
@@ -225,7 +225,7 @@ int zhash_remove(zhash_t *zh, const void *key, void *old_key, void *old_value)
 
                 if (zh->entries[entry_idx * zh->entrysz]) {
                     // completely remove this entry
-                    char *tmp = (char *) malloc(sizeof(char)*zh->entrysz);
+                    char *tmp = malloc(sizeof(char)*zh->entrysz);
                     memcpy(tmp, &zh->entries[entry_idx * zh->entrysz], zh->entrysz);
                     zh->entries[entry_idx * zh->entrysz] = 0;
                     zh->size--;
@@ -337,7 +337,7 @@ void zhash_iterator_remove(zhash_iterator_t *zit)
     int entry_idx = (zit->last_entry + 1) & (zh->nentries - 1);
     while (zh->entries[entry_idx *zh->entrysz]) {
         // completely remove this entry
-        char *tmp = (char *) malloc(sizeof(char)*zh->entrysz);
+        char *tmp = malloc(sizeof(char)*zh->entrysz);
         memcpy(tmp, &zh->entries[entry_idx * zh->entrysz], zh->entrysz);
         zh->entries[entry_idx * zh->entrysz] = 0;
         zh->size--;

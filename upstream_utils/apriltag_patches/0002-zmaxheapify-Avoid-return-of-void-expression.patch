@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sun, 4 Dec 2022 11:25:12 -0800
-Subject: [PATCH 2/7] zmaxheapify: Avoid return of void expression
+Subject: [PATCH 2/8] zmaxheapify: Avoid return of void expression
 
 ---
  common/zmaxheap.c | 3 ++-

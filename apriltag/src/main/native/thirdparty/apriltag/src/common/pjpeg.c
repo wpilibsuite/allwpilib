@@ -345,7 +345,7 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
                     return PJPEG_ERR_SOF;
 
                 pjd->ncomponents = nf;
-                pjd->components = (pjpeg_component_t *) calloc(nf, sizeof(struct pjpeg_component));
+                pjd->components = calloc(nf, sizeof(struct pjpeg_component));
 
                 for (int i = 0; i < nf; i++) {
                     // comp. identifier
@@ -450,7 +450,7 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
                 uint8_t ns = bd_consume_bits(&bd, 8);
 
                 // for each component, what is the index into our pjd->components[] array?
-                uint8_t *comp_idx = (uint8_t *) calloc(ns, sizeof(uint8_t));
+                uint8_t *comp_idx = calloc(ns, sizeof(uint8_t));
 
                 for (int i = 0; i < ns; i++) {
                     // component name
@@ -513,12 +513,12 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
                     if ((comp->stride % alignment) != 0)
                         comp->stride += alignment - (comp->stride % alignment);
 
-                    comp->data = (uint8_t *) calloc(comp->height * comp->stride, 1);
+                    comp->data = calloc(comp->height * comp->stride, 1);
                 }
 
 
                 // each component has its own DC prediction
-                int32_t *dcpred = (int32_t *) calloc(ns, sizeof(int32_t));
+                int32_t *dcpred = calloc(ns, sizeof(int32_t));
 
                 pjd->reset_count = 0;
 
@@ -594,7 +594,7 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
 
                                         // if high bit is clear, it's negative
                                         if ((value & (1 << (ssss-1))) == 0)
-                                            value += ((-1) << ssss) + 1;
+                                            value += (int32_t)(UINT32_MAX << ssss) + 1;
 
                                         dcpred[nsidx] += value;
                                         block[0] = dcpred[nsidx] * pjd->qtab[qtabidx][0];
@@ -620,7 +620,7 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
 
                                             // if high bit is clear, it's negative
                                             if ((value & (1 << (ssss-1))) == 0)
-                                                value += ((-1) << ssss) + 1;
+                                                value += (int32_t)(UINT32_MAX << ssss) + 1;
 
                                             coeff += rrrr;
 
@@ -831,7 +831,7 @@ pjpeg_t *pjpeg_create_from_file(const char *path, uint32_t flags, int *error)
     fseek(f, 0, SEEK_END);
     long buflen = ftell(f);
 
-    uint8_t *buf = (uint8_t *) malloc(buflen);
+    uint8_t *buf = malloc(buflen);
     fseek(f, 0, SEEK_SET);
     int res = fread(buf, 1, buflen, f);
 
@@ -883,7 +883,7 @@ pjpeg_t *pjpeg_create_from_buffer(uint8_t *buf, int buflen, uint32_t flags, int 
         return NULL;
     }
 
-    pjpeg_t *pj = (pjpeg_t *) calloc(1, sizeof(pjpeg_t));
+    pjpeg_t *pj = calloc(1, sizeof(pjpeg_t));
 
     pj->width = pjd.width;
     pj->height = pjd.height;

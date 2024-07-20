@@ -35,8 +35,8 @@ int zstrcmp(const void * a_pp, const void * b_pp)
     assert(a_pp != NULL);
     assert(b_pp != NULL);
 
-    char * a = static_cast<char*>(*(void**)a_pp);
-    char * b = static_cast<char*>(*(void**)b_pp);
+    char * a = *(void**)a_pp;
+    char * b = *(void**)b_pp;
 
     return strcmp(a,b);
 }

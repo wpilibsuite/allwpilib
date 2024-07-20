@@ -87,7 +87,7 @@ def walk_if(top, pred):
     ]
 
 
-def copy_to(files, root):
+def copy_to(files, root, rename_c_to_cpp=False):
     """Copies list of files to root by appending the relative paths of the files
     to root.
 
@@ -96,6 +96,7 @@ def copy_to(files, root):
     Keyword arguments:
     files -- list of files to copy
     root -- destination
+    rename_c_to_cpp -- whether to rename .c files to .cpp (default: False)
 
     Returns:
     The list of files in their destination.
@@ -110,7 +111,7 @@ def copy_to(files, root):
         # Rename .cc file to .cpp
         if dest_file.endswith(".cc"):
             dest_file = os.path.splitext(dest_file)[0] + ".cpp"
-        if dest_file.endswith(".c"):
+        if rename_c_to_cpp and dest_file.endswith(".c"):
             dest_file = os.path.splitext(dest_file)[0] + ".cpp"
 
         # Make leading directory
@@ -123,7 +124,7 @@ def copy_to(files, root):
     return dest_files
 
 
-def walk_cwd_and_copy_if(pred, root):
+def walk_cwd_and_copy_if(pred, root, rename_c_to_cpp=False):
     """Walks the current directory, generates a list of files for which the
     given predicate is true, then copies that list to root by appending the
     relative paths of the files to root.
@@ -134,12 +135,13 @@ def walk_cwd_and_copy_if(pred, root):
     pred -- a function that takes a directory path and a filename, then returns
             True if the file should be included in the output list
     root -- destination
+    rename_c_to_cpp -- whether to rename .c files to .cpp (default: False)
 
     Returns:
     The list of files in their destination.
     """
     files = walk_if(".", pred)
-    files = copy_to(files, root)
+    files = copy_to(files, root, rename_c_to_cpp)
     return files
 
 
