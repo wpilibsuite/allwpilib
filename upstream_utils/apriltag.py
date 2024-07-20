@@ -39,17 +39,17 @@ def copy_upstream_src(wpilib_root):
     src_files = walk_cwd_and_copy_if(
         lambda dp, f: (f.endswith(".c") or f.endswith(".cpp"))
         and not dp.startswith("./example")
-        and not f == "getopt.cpp"
+        and not f.endswith("getopt.cpp")
         and not "py" in f
         and not remove_tag(f),
         os.path.join(apriltag, "src/main/native/thirdparty/apriltag/src"),
     )
 
     # Copy apriltag header files into allwpilib
-    include_files = walk_cwd_and_copy_if(
+    walk_cwd_and_copy_if(
         lambda dp, f: f.endswith(".h")
-        and not f == "getopt.h"
-        and not f == "postscript_utils.h"
+        and not f.endswith("getopt.h")
+        and not f.endswith("postscript_utils.h")
         and not remove_tag(f),
         os.path.join(apriltag, "src/main/native/thirdparty/apriltag/include"),
     )
@@ -63,10 +63,6 @@ def copy_upstream_src(wpilib_root):
                     apriltag, "src/main/native/thirdparty/apriltag/include/common"
                 ),
             ],
-        )
-    for f in include_files:
-        comment_out_invalid_includes(
-            f, [os.path.join(apriltag, "src/main/native/thirdparty/apriltag/include")]
         )
 
 
