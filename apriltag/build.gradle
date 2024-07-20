@@ -74,6 +74,7 @@ nativeUtils.platformConfigs.each {
         it.cCompiler.args.add("/wd4996")
     } else if (it.name.contains('linux') || it.name.contains('macos')) {
         it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.add("-Wno-gnu-zero-variadic-macro-arguments")
         it.cCompiler.args.add("-Wno-maybe-uninitialized")
         it.cCompiler.args.add("-Wno-sign-compare")
         it.cCompiler.args.add("-Wno-type-limits")
