@@ -129,7 +129,7 @@ wpilib_target_warnings(apriltag)
 if(MSVC)
     target_compile_options(
         apriltag
-        PRIVATE /wd2220 /wd4005 /wd4018 /wd4244 /wd4996
+        PRIVATE /wd2220 /wd4005 /wd4018 /wd4244 /wd4267 /wd4996
     )
 else()
     target_compile_options(
@@ -137,6 +137,7 @@ else()
         PRIVATE
             -Wno-format-nonliteral
             -Wno-gnu-zero-variadic-macro-arguments
+            -Wno-maybe-uninitialized
             -Wno-sign-compare
             -Wno-type-limits
     )

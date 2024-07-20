@@ -71,8 +71,9 @@ nativeUtils.platformConfigs.each {
         it.cCompiler.args.add("/wd4005")
         it.cCompiler.args.add("/wd4018")
         it.cCompiler.args.add("/wd4244")
+        it.cCompiler.args.add("/wd4267")
         it.cCompiler.args.add("/wd4996")
-    } else if (it.name.contains('linux') || it.name.contains('macos')) {
+    } else {
         it.cCompiler.args.add("-Wno-format-nonliteral")
         it.cCompiler.args.add("-Wno-gnu-zero-variadic-macro-arguments")
         it.cCompiler.args.add("-Wno-maybe-uninitialized")
