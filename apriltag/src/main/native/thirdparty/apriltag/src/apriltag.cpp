@@ -162,7 +162,7 @@ static void quad_destroy(struct quad *quad)
 
 static struct quad *quad_copy(struct quad *quad)
 {
-    struct quad *q = calloc(1, sizeof(struct quad));
+    struct quad *q = (struct quad *) calloc(1, sizeof(struct quad));
     memcpy(q, quad, sizeof(struct quad));
     if (quad->H)
         q->H = matd_copy(quad->H);
@@ -200,7 +200,7 @@ static void quick_decode_init(apriltag_family_t *family, int maxhamming)
     assert(family->impl == NULL);
     assert(family->ncodes < 65536);
 
-    struct quick_decode *qd = calloc(1, sizeof(struct quick_decode));
+    struct quick_decode *qd = (struct quick_decode *) calloc(1, sizeof(struct quick_decode));
     int capacity = family->ncodes;
 
     int nbits = family->nbits;
@@ -219,7 +219,7 @@ static void quick_decode_init(apriltag_family_t *family, int maxhamming)
 //    debug_print("capacity %d, size: %.0f kB\n",
 //           capacity, qd->nentries * sizeof(struct quick_decode_entry) / 1024.0);
 
-    qd->entries = calloc(qd->nentries, sizeof(struct quick_decode_entry));
+    qd->entries = (quick_decode_entry *) calloc(qd->nentries, sizeof(struct quick_decode_entry));
     if (qd->entries == NULL) {
         debug_print("Failed to allocate hamming decode table\n");
         // errno already set to ENOMEM (Error No MEMory) by calloc() failure
@@ -533,7 +533,7 @@ static double value_for_pixel(image_u8_t *im, double px, double py) {
 }
 
 static void sharpen(apriltag_detector_t* td, double* values, int size) {
-    double *sharpened = malloc(sizeof(double)*size*size);
+    double *sharpened = (double *) malloc(sizeof(double)*size*size);
     double kernel[9] = {
         0, -1, 0,
         -1, 4, -1,
@@ -682,7 +682,7 @@ static float quad_decode(apriltag_detector_t* td, apriltag_family_t *family, ima
     float black_score = 0, white_score = 0;
     float black_score_count = 1, white_score_count = 1;
 
-    double *values = calloc(family->total_width*family->total_width, sizeof(double));
+    double *values = (double *) calloc(family->total_width*family->total_width, sizeof(double));
 
     int min_coord = (family->width_at_border - family->total_width)/2;
     for (int i = 0; i < family->nbits; i++) {
@@ -926,7 +926,7 @@ static void quad_decode_task(void *_u)
             float decision_margin = quad_decode(td, family, im, quad, &entry, task->im_samples);
 
             if (decision_margin >= 0 && entry.hamming < 255) {
-                apriltag_detection_t *det = calloc(1, sizeof(apriltag_detection_t));
+                apriltag_detection_t *det = (apriltag_detection_t *) calloc(1, sizeof(apriltag_detection_t));
 
                 det->family = family;
                 det->id = entry.id;
@@ -1140,7 +1140,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
 
         int chunksize = 1 + zarray_size(quads) / (APRILTAG_TASKS_PER_THREAD_TARGET * td->nthreads);
 
-        struct quad_decode_task *tasks = malloc(sizeof(struct quad_decode_task)*(zarray_size(quads) / chunksize + 1));
+        struct quad_decode_task *tasks = (struct quad_decode_task *) malloc(sizeof(struct quad_decode_task)*(zarray_size(quads) / chunksize + 1));
 
         int ntasks = 0;
         for (int i = 0; i < zarray_size(quads); i+= chunksize) {
@@ -1282,7 +1282,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
         fprintf(f, "%f %f scale\n", scale, scale);
         fprintf(f, "0 %d translate\n", darker->height);
         fprintf(f, "1 -1 scale\n");
-        postscript_image(f, darker);
+        // postscript_image(f, darker);
 
         image_u8_destroy(darker);
 
@@ -1365,7 +1365,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
         fprintf(f, "0 %d translate\n", darker->height);
         fprintf(f, "1 -1 scale\n");
 
-        postscript_image(f, darker);
+        // postscript_image(f, darker);
 
         image_u8_destroy(darker);
 

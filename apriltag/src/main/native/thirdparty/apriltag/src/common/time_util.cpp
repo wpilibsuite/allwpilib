@@ -37,7 +37,7 @@ struct timeutil_rest
 
 timeutil_rest_t *timeutil_rest_create()
 {
-    timeutil_rest_t *rest = calloc(1, sizeof(timeutil_rest_t));
+    timeutil_rest_t *rest = (timeutil_rest_t *) calloc(1, sizeof(timeutil_rest_t));
     return rest;
 }
 

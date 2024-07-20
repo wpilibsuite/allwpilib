@@ -51,7 +51,7 @@ matd_t *matd_create(int rows, int cols)
     if (rows == 0 || cols == 0)
         return matd_create_scalar(0);
 
-    matd_t *m = calloc(1, sizeof(matd_t) + (rows*cols*sizeof(double)));
+    matd_t *m = (matd_t *) calloc(1, sizeof(matd_t) + (rows*cols*sizeof(double)));
     m->nrows = rows;
     m->ncols = cols;
 
@@ -60,7 +60,7 @@ matd_t *matd_create(int rows, int cols)
 
 matd_t *matd_create_scalar(TYPE v)
 {
-    matd_t *m = calloc(1, sizeof(matd_t) + sizeof(double));
+    matd_t *m = (matd_t *) calloc(1, sizeof(matd_t) + sizeof(double));
     m->nrows = 0;
     m->ncols = 0;
     m->data[0] = v;
@@ -812,7 +812,7 @@ matd_t *matd_op(const char *expr, ...)
     va_list ap;
     va_start(ap, expr);
 
-    matd_t **args = malloc(sizeof(matd_t*)*nargs);
+    matd_t **args = (matd_t **) malloc(sizeof(matd_t*)*nargs);
     for (int i = 0; i < nargs; i++) {
         args[i] = va_arg(ap, matd_t*);
         // XXX: sanity check argument; emit warning/error if args[i]
@@ -827,7 +827,7 @@ matd_t *matd_op(const char *expr, ...)
 
     // can't create more than 2 new result per character
     // one result, and possibly one argument to free
-    matd_t **garb = malloc(sizeof(matd_t*)*2*exprlen);
+    matd_t **garb = (matd_t **) malloc(sizeof(matd_t*)*2*exprlen);
 
     matd_t *res = matd_op_recurse(expr, &pos, NULL, args, &argpos, garb, &garbpos, 0);
     free(args);
@@ -1027,7 +1027,7 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
             //
             int vlen = A->nrows - hhidx;
 
-            double *v = malloc(sizeof(double)*vlen);
+            double *v = (double *) malloc(sizeof(double)*vlen);
 
             double mag2 = 0;
             for (int i = 0; i < vlen; i++) {
@@ -1088,7 +1088,7 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
         if (hhidx+2 < A->ncols) {
             int vlen = A->ncols - hhidx - 1;
 
-            double *v = malloc(sizeof(double)*vlen);
+            double *v = (double *) malloc(sizeof(double)*vlen);
 
             double mag2 = 0;
             for (int i = 0; i < vlen; i++) {
@@ -1161,7 +1161,7 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
 
     // for each of the first B->ncols rows, which index has the
     // maximum absolute value? (used by method 1)
-    int *maxrowidx = malloc(sizeof(int)*B->ncols);
+    int *maxrowidx = (int *) malloc(sizeof(int)*B->ncols);
     int lastmaxi, lastmaxj;
 
     if (find_max_method == 1) {
@@ -1386,8 +1386,8 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
 
     // them all positive by flipping the corresponding columns of
     // U/LS.
-    int *idxs = malloc(sizeof(int)*A->ncols);
-    double *vals = malloc(sizeof(double)*A->ncols);
+    int *idxs = (int *) malloc(sizeof(int)*A->ncols);
+    double *vals = (double *) malloc(sizeof(double)*A->ncols);
     for (int i = 0; i < A->ncols; i++) {
         idxs[i] = i;
         vals[i] = MATD_EL(B, i, i);
@@ -1513,14 +1513,14 @@ matd_svd_t matd_svd_flags(matd_t *A, int flags)
 
 matd_plu_t *matd_plu(const matd_t *a)
 {
-    unsigned int *piv = calloc(a->nrows, sizeof(unsigned int));
+    unsigned int *piv = (unsigned int *) calloc(a->nrows, sizeof(unsigned int));
     int pivsign = 1;
     matd_t *lu = matd_copy(a);
 
     // only for square matrices.
     assert(a->nrows == a->ncols);
 
-    matd_plu_t *mlu = calloc(1, sizeof(matd_plu_t));
+    matd_plu_t *mlu = (matd_plu_t *) calloc(1, sizeof(matd_plu_t));
 
     for (int i = 0; i < a->nrows; i++)
         piv[i] = i;
@@ -1549,7 +1549,7 @@ matd_plu_t *matd_plu(const matd_t *a)
 
         // swap rows p and j?
         if (p != j) {
-            TYPE *tmp = malloc(sizeof(TYPE)*lu->ncols);
+            TYPE *tmp = (TYPE *) malloc(sizeof(TYPE)*lu->ncols);
             memcpy(tmp, &MATD_EL(lu, p, 0), sizeof(TYPE) * lu->ncols);
             memcpy(&MATD_EL(lu, p, 0), &MATD_EL(lu, j, 0), sizeof(TYPE) * lu->ncols);
             memcpy(&MATD_EL(lu, j, 0), tmp, sizeof(TYPE) * lu->ncols);
@@ -1892,7 +1892,7 @@ MATD_EL(U, i, j) = 0;
         }
     }
 
-    matd_chol_t *chol = calloc(1, sizeof(matd_chol_t));
+    matd_chol_t *chol = (matd_chol_t *) calloc(1, sizeof(matd_chol_t));
     chol->is_spd = is_spd;
     chol->u = U;
     return chol;

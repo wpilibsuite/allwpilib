@@ -39,7 +39,7 @@ def copy_upstream_src(wpilib_root):
     src_files = walk_cwd_and_copy_if(
         lambda dp, f: (f.endswith(".c") or f.endswith(".cpp"))
         and not dp.startswith("./example")
-        and not f.endswith("getopt.cpp")
+        and not f.endswith("getopt.c")
         and not "py" in f
         and not remove_tag(f),
         os.path.join(apriltag, "src/main/native/thirdparty/apriltag/src"),
@@ -76,6 +76,9 @@ def main():
         "0002-zmaxheapify-Avoid-return-of-void-expression.patch",
         "0003-Avoid-unused-variable-warnings-in-release-builds.patch",
         "0004-Make-orthogonal_iteration-exit-early-upon-convergenc.patch",
+        "0005-Add-missing-casts.patch",
+        "0006-Fix-calloc-argument-order.patch",
+        "0007-Remove-calls-to-postscript_image.patch",
     ]
 
     apriltag = Lib(name, url, tag, patch_list, copy_upstream_src)

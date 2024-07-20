@@ -41,12 +41,12 @@ either expressed or implied, of the Regents of The University of Michigan.
 
 image_u8_t *image_u8_create_stride(unsigned int width, unsigned int height, unsigned int stride)
 {
-    uint8_t *buf = calloc(height*stride, sizeof(uint8_t));
+    uint8_t *buf = (uint8_t *) calloc(height*stride, sizeof(uint8_t));
 
     // const initializer
     image_u8_t tmp = { .width = width, .height = height, .stride = stride, .buf = buf };
 
-    image_u8_t *im = calloc(1, sizeof(image_u8_t));
+    image_u8_t *im = (image_u8_t *) calloc(1, sizeof(image_u8_t));
     memcpy(im, &tmp, sizeof(image_u8_t));
     return im;
 }
@@ -68,13 +68,13 @@ image_u8_t *image_u8_create_alignment(unsigned int width, unsigned int height, u
 
 image_u8_t *image_u8_copy(const image_u8_t *in)
 {
-    uint8_t *buf = malloc(in->height*in->stride*sizeof(uint8_t));
+    uint8_t *buf = (uint8_t *) malloc(in->height*in->stride*sizeof(uint8_t));
     memcpy(buf, in->buf, in->height*in->stride*sizeof(uint8_t));
 
     // const initializer
     image_u8_t tmp = { .width = in->width, .height = in->height, .stride = in->stride, .buf = buf };
 
-    image_u8_t *copy = calloc(1, sizeof(image_u8_t));
+    image_u8_t *copy = (image_u8_t *) calloc(1, sizeof(image_u8_t));
     memcpy(copy, &tmp, sizeof(image_u8_t));
     return copy;
 }
@@ -320,7 +320,7 @@ void image_u8_convolve_2D(image_u8_t *im, const uint8_t *k, int ksz)
 
     for (int y = 0; y < im->height; y++) {
 
-        uint8_t *x = malloc(sizeof(uint8_t)*im->stride);
+        uint8_t *x = (uint8_t *) malloc(sizeof(uint8_t)*im->stride);
         memcpy(x, &im->buf[y*im->stride], im->stride);
 
         convolve(x, &im->buf[y*im->stride], im->width, k, ksz);
@@ -328,8 +328,8 @@ void image_u8_convolve_2D(image_u8_t *im, const uint8_t *k, int ksz)
     }
 
     for (int x = 0; x < im->width; x++) {
-        uint8_t *xb = malloc(sizeof(uint8_t)*im->height);
-        uint8_t *yb = malloc(sizeof(uint8_t)*im->height);
+        uint8_t *xb = (uint8_t *) malloc(sizeof(uint8_t)*im->height);
+        uint8_t *yb = (uint8_t *) malloc(sizeof(uint8_t)*im->height);
 
         for (int y = 0; y < im->height; y++)
             xb[y] = im->buf[y*im->stride + x];
@@ -351,7 +351,7 @@ void image_u8_gaussian_blur(image_u8_t *im, double sigma, int ksz)
     assert((ksz & 1) == 1); // ksz must be odd.
 
     // build the kernel.
-    double *dk = malloc(sizeof(double)*ksz);
+    double *dk = (double *) malloc(sizeof(double)*ksz);
 
     // for kernel of length 5:
     // dk[0] = f(-2), dk[1] = f(-1), dk[2] = f(0), dk[3] = f(1), dk[4] = f(2)
@@ -369,7 +369,7 @@ void image_u8_gaussian_blur(image_u8_t *im, double sigma, int ksz)
     for (int i = 0; i < ksz; i++)
         dk[i] /= acc;
 
-    uint8_t *k = malloc(sizeof(uint8_t)*ksz);
+    uint8_t *k = (uint8_t *) malloc(sizeof(uint8_t)*ksz);
     for (int i = 0; i < ksz; i++)
         k[i] = dk[i]*255;
 

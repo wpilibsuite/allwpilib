@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 19 Jul 2024 19:08:44 -0700
+Subject: [PATCH 7/7] Remove calls to postscript_image()
+
+---
+ apriltag.c             | 4 ++--
+ apriltag_quad_thresh.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/apriltag.c b/apriltag.c
+index 3ef7ae5880bf633917175aeef9e80f639f2f1846..ce3279c5e54219877cc0608ed68464307af77f25 100644
+--- a/apriltag.c
++++ b/apriltag.c
+@@ -1282,7 +1282,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
+         fprintf(f, "%f %f scale\n", scale, scale);
+         fprintf(f, "0 %d translate\n", darker->height);
+         fprintf(f, "1 -1 scale\n");
+-        postscript_image(f, darker);
++        // postscript_image(f, darker);
+ 
+         image_u8_destroy(darker);
+ 
+@@ -1365,7 +1365,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
+         fprintf(f, "0 %d translate\n", darker->height);
+         fprintf(f, "1 -1 scale\n");
+ 
+-        postscript_image(f, darker);
++        // postscript_image(f, darker);
+ 
+         image_u8_destroy(darker);
+ 
+diff --git a/apriltag_quad_thresh.c b/apriltag_quad_thresh.c
+index 00f5496f7870f5eda98275af9da88f685b3dcaf5..699a90bb8f03e760a76eed9ae8d2508e4fa25fd9 100644
+--- a/apriltag_quad_thresh.c
++++ b/apriltag_quad_thresh.c
+@@ -1979,7 +1979,7 @@ zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
+         fprintf(f, "0 %d translate\n", im2->height);
+         fprintf(f, "1 -1 scale\n");
+ 
+-        postscript_image(f, im2);
++        // postscript_image(f, im2);
+ 
+         image_u8_destroy(im2);
+ 

@@ -62,7 +62,7 @@ char *vsprintf_alloc(const char *fmt, va_list orig_args)
     assert(fmt != NULL);
 
     int size = MIN_PRINTF_ALLOC;
-    char *buf = malloc(size * sizeof(char));
+    char *buf = (char *) malloc(size * sizeof(char));
 
     int returnsize;
     va_list args;
@@ -79,7 +79,7 @@ char *vsprintf_alloc(const char *fmt, va_list orig_args)
     // otherwise, we should try again
     free(buf);
     size = returnsize + 1;
-    buf = malloc(size * sizeof(char));
+    buf = (char *) malloc(size * sizeof(char));
 
     va_copy(args, orig_args);
     returnsize = vsnprintf(buf, size, fmt, args);
@@ -106,7 +106,7 @@ char *_str_concat_private(const char *first, ...)
     }
 
     // write the string
-    char *str = malloc(len*sizeof(char) + 1);
+    char *str = (char *) malloc(len*sizeof(char) + 1);
     char *ptr = str;
     {
         va_list args;
@@ -202,7 +202,7 @@ zarray_t *str_split_spaces(const char *str)
       size_t off1 = pos;
 
       size_t len_off = off1 - off0;
-      char *tok = malloc(len_off + 1);
+      char *tok = (char *) malloc(len_off + 1);
       memcpy(tok, &str[off0], len_off);
       tok[len_off] = 0;
       zarray_add(parts, &tok);
@@ -217,7 +217,7 @@ void str_split_destroy(zarray_t *za)
     if (!za)
         return;
 
-    zarray_vmap(za, free);
+    zarray_vmap(za, (void(*)()) free);
     zarray_destroy(za);
 }
 
@@ -319,7 +319,7 @@ string_buffer_t* string_buffer_create()
     string_buffer_t *sb = (string_buffer_t*) calloc(1, sizeof(string_buffer_t));
     assert(sb != NULL);
     sb->alloc = 32;
-    sb->s = calloc(sb->alloc, 1);
+    sb->s = (char *) calloc(sb->alloc, 1);
     return sb;
 }
 
@@ -341,7 +341,7 @@ void string_buffer_append(string_buffer_t *sb, char c)
 
     if (sb->size+2 >= sb->alloc) {
         sb->alloc *= 2;
-        sb->s = realloc(sb->s, sb->alloc);
+        sb->s = (char *) realloc(sb->s, sb->alloc);
     }
 
     sb->s[sb->size++] = c;
@@ -364,7 +364,7 @@ void string_buffer_appendf(string_buffer_t *sb, const char *fmt, ...)
     assert(fmt != NULL);
 
     int size = MIN_PRINTF_ALLOC;
-    char *buf = malloc(size * sizeof(char));
+    char *buf = (char *) malloc(size * sizeof(char));
 
     int returnsize;
     va_list args;
@@ -377,7 +377,7 @@ void string_buffer_appendf(string_buffer_t *sb, const char *fmt, ...)
         // otherwise, we should try again
         free(buf);
         size = returnsize + 1;
-        buf = malloc(size * sizeof(char));
+        buf = (char *) malloc(size * sizeof(char));
 
         va_start(args, fmt);
         returnsize = vsnprintf(buf, size, fmt, args);
@@ -399,7 +399,7 @@ void string_buffer_append_string(string_buffer_t *sb, const char *str)
 
     while (sb->size+len + 1 >= sb->alloc) {
         sb->alloc *= 2;
-        sb->s = realloc(sb->s, sb->alloc);
+        sb->s = (char *) realloc(sb->s, sb->alloc);
     }
 
     memcpy(&sb->s[sb->size], str, len);
@@ -505,7 +505,7 @@ char *string_feeder_next_length(string_feeder_t *sf, size_t length)
     if (sf->pos + length > sf->len)
         length = sf->len - sf->pos;
 
-    char *substr = calloc(length+1, sizeof(char));
+    char *substr = (char *) calloc(length+1, sizeof(char));
     for (int i = 0 ; i < length ; i++)
         substr[i] = string_feeder_next(sf);
     return substr;
@@ -528,7 +528,7 @@ char *string_feeder_peek_length(string_feeder_t *sf, size_t length)
     if (sf->pos + length > sf->len)
         length = sf->len - sf->pos;
 
-    char *substr = calloc(length+1, sizeof(char));
+    char *substr = (char *) calloc(length+1, sizeof(char));
     memcpy(substr, &sf->s[sf->pos], length*sizeof(char));
     return substr;
 }
@@ -632,7 +632,7 @@ char *str_substring(const char *str, size_t startidx, long endidx)
         endidx = (long) strlen(str);
 
     size_t blen = endidx - startidx; // not counting \0
-    char *b = malloc(blen + 1);
+    char *b = (char *) malloc(blen + 1);
     memcpy(b, &str[startidx], blen);
     b[blen] = 0;
     return b;
@@ -695,20 +695,20 @@ static void buffer_appendf(char **_buf, int *bufpos, void *fmt, ...)
     va_list ap;
 
     int salloc = 128;
-    char *s = malloc(salloc);
+    char *s = (char *) malloc(salloc);
 
     va_start(ap, fmt);
-    int slen = vsnprintf(s, salloc, fmt, ap);
+    int slen = vsnprintf(s, salloc, (const char*) fmt, ap);
     va_end(ap);
 
     if (slen >= salloc) {
-        s = realloc(s, slen + 1);
+        s = (char *) realloc(s, slen + 1);
         va_start(ap, fmt);
-        vsprintf((char*) s, fmt, ap);
+        vsprintf((char*) s, (const char *) fmt, ap);
         va_end(ap);
     }
 
-    buf = realloc(buf, *bufpos + slen + 1);
+    buf = (char *) realloc(buf, *bufpos + slen + 1);
     *_buf = buf;
 
     memcpy(&buf[*bufpos], s, slen + 1); // get trailing \0
@@ -745,7 +745,7 @@ char *str_expand_envs(const char *in)
     while (inpos < inlen) {
 
         if (in[inpos] != '$') {
-            buffer_appendf(&out, &outpos, "%c", in[inpos]);
+            buffer_appendf(&out, &outpos, const_cast<char*>("%c"), in[inpos]);
             inpos++;
             continue;
 
@@ -756,13 +756,13 @@ char *str_expand_envs(const char *in)
             int  varnamepos = 0;
 
             while (inpos < inlen && is_variable_character(in[inpos])) {
-                buffer_appendf(&varname, &varnamepos, "%c", in[inpos]);
+                buffer_appendf(&varname, &varnamepos, const_cast<char*>("%c"), in[inpos]);
                 inpos++;
             }
 
             char *env = getenv(varname);
             if (env)
-                buffer_appendf(&out, &outpos, "%s", env);
+                buffer_appendf(&out, &outpos, const_cast<char*>("%s"), env);
 
             free(varname);
         }

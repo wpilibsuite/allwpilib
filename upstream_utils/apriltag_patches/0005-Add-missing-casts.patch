@@ -1,0 +1,1175 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 19 Jul 2024 18:13:07 -0700
+Subject: [PATCH 5/7] Add missing casts
+
+---
+ apriltag.c             | 14 +++++-----
+ apriltag_pose.c        | 16 +++++------
+ apriltag_quad_thresh.c | 60 +++++++++++++++++++++---------------------
+ common/image_u8.c      | 18 ++++++-------
+ common/image_u8x3.c    | 21 ++++++++-------
+ common/image_u8x4.c    |  9 ++++---
+ common/matd.c          | 26 +++++++++---------
+ common/pam.c           | 12 ++++-----
+ common/pjpeg.c         | 12 ++++-----
+ common/pnm.c           |  8 +++---
+ common/string_util.c   | 42 ++++++++++++++---------------
+ common/time_util.c     |  2 +-
+ common/workerpool.c    |  4 +--
+ common/zarray.c        |  4 +--
+ common/zhash.c         |  6 ++---
+ common/zmaxheap.c      | 10 +++----
+ tag16h5.c              |  7 ++---
+ tag36h11.c             |  7 ++---
+ 18 files changed, 141 insertions(+), 137 deletions(-)
+
+diff --git a/apriltag.c b/apriltag.c
+index 3086228868281eaad5cc5382d305227757d4a5cf..3ef7ae5880bf633917175aeef9e80f639f2f1846 100644
+--- a/apriltag.c
++++ b/apriltag.c
+@@ -162,7 +162,7 @@ static void quad_destroy(struct quad *quad)
+ 
+ static struct quad *quad_copy(struct quad *quad)
+ {
+-    struct quad *q = calloc(1, sizeof(struct quad));
++    struct quad *q = (struct quad *) calloc(1, sizeof(struct quad));
+     memcpy(q, quad, sizeof(struct quad));
+     if (quad->H)
+         q->H = matd_copy(quad->H);
+@@ -200,7 +200,7 @@ static void quick_decode_init(apriltag_family_t *family, int maxhamming)
+     assert(family->impl == NULL);
+     assert(family->ncodes < 65536);
+ 
+-    struct quick_decode *qd = calloc(1, sizeof(struct quick_decode));
++    struct quick_decode *qd = (struct quick_decode *) calloc(1, sizeof(struct quick_decode));
+     int capacity = family->ncodes;
+ 
+     int nbits = family->nbits;
+@@ -219,7 +219,7 @@ static void quick_decode_init(apriltag_family_t *family, int maxhamming)
+ //    debug_print("capacity %d, size: %.0f kB\n",
+ //           capacity, qd->nentries * sizeof(struct quick_decode_entry) / 1024.0);
+ 
+-    qd->entries = calloc(qd->nentries, sizeof(struct quick_decode_entry));
++    qd->entries = (quick_decode_entry *) calloc(qd->nentries, sizeof(struct quick_decode_entry));
+     if (qd->entries == NULL) {
+         debug_print("Failed to allocate hamming decode table\n");
+         // errno already set to ENOMEM (Error No MEMory) by calloc() failure
+@@ -533,7 +533,7 @@ static double value_for_pixel(image_u8_t *im, double px, double py) {
+ }
+ 
+ static void sharpen(apriltag_detector_t* td, double* values, int size) {
+-    double *sharpened = malloc(sizeof(double)*size*size);
++    double *sharpened = (double *) malloc(sizeof(double)*size*size);
+     double kernel[9] = {
+         0, -1, 0,
+         -1, 4, -1,
+@@ -682,7 +682,7 @@ static float quad_decode(apriltag_detector_t* td, apriltag_family_t *family, ima
+     float black_score = 0, white_score = 0;
+     float black_score_count = 1, white_score_count = 1;
+ 
+-    double *values = calloc(family->total_width*family->total_width, sizeof(double));
++    double *values = (double *) calloc(family->total_width*family->total_width, sizeof(double));
+ 
+     int min_coord = (family->width_at_border - family->total_width)/2;
+     for (int i = 0; i < family->nbits; i++) {
+@@ -926,7 +926,7 @@ static void quad_decode_task(void *_u)
+             float decision_margin = quad_decode(td, family, im, quad, &entry, task->im_samples);
+ 
+             if (decision_margin >= 0 && entry.hamming < 255) {
+-                apriltag_detection_t *det = calloc(1, sizeof(apriltag_detection_t));
++                apriltag_detection_t *det = (apriltag_detection_t *) calloc(1, sizeof(apriltag_detection_t));
+ 
+                 det->family = family;
+                 det->id = entry.id;
+@@ -1140,7 +1140,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
+ 
+         int chunksize = 1 + zarray_size(quads) / (APRILTAG_TASKS_PER_THREAD_TARGET * td->nthreads);
+ 
+-        struct quad_decode_task *tasks = malloc(sizeof(struct quad_decode_task)*(zarray_size(quads) / chunksize + 1));
++        struct quad_decode_task *tasks = (struct quad_decode_task *) malloc(sizeof(struct quad_decode_task)*(zarray_size(quads) / chunksize + 1));
+ 
+         int ntasks = 0;
+         for (int i = 0; i < zarray_size(quads); i+= chunksize) {
+diff --git a/apriltag_pose.c b/apriltag_pose.c
+index 782729225c3555edcfebb7d8a21f847aad0e328f..4dcbc884af15e68cfb03a8dac733baf871c18045 100644
+--- a/apriltag_pose.c
++++ b/apriltag_pose.c
+@@ -48,13 +48,13 @@ double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int
+     }
+     matd_scale_inplace(p_mean, 1.0/n_points);
+ 
+-    matd_t** p_res = malloc(sizeof(matd_t *)*n_points);
++    matd_t** p_res = (matd_t **) malloc(sizeof(matd_t *)*n_points);
+     for (int i = 0; i < n_points; i++) {
+         p_res[i] = matd_op("M-M", p[i], p_mean);
+     }
+ 
+     // Compute M1_inv.
+-    matd_t** F = malloc(sizeof(matd_t *)*n_points);
++    matd_t** F = (matd_t **) malloc(sizeof(matd_t *)*n_points);
+     matd_t *avg_F = matd_create(3, 3);
+     for (int i = 0; i < n_points; i++) {
+         F[i] = calculate_F(v[i]);
+@@ -83,7 +83,7 @@ double orthogonal_iteration(matd_t** v, matd_t** p, matd_t** t, matd_t** R, int
+         matd_destroy(M2);
+ 
+         // Calculate rotation.
+-        matd_t** q = malloc(sizeof(matd_t *)*n_points);
++        matd_t** q = (matd_t **) malloc(sizeof(matd_t *)*n_points);
+         matd_t* q_mean = matd_create(3, 1);
+         for (int j = 0; j < n_points; j++) {
+             q[j] = matd_op("M*(M*M+M)", F[j], *R, p[j], *t);
+@@ -178,12 +178,12 @@ void solve_poly_approx(double* p, int degree, double* roots, int* n_roots) {
+     }
+ 
+     // Calculate roots of derivative.
+-    double *p_der = malloc(sizeof(double)*degree);
++    double *p_der = (double *) malloc(sizeof(double)*degree);
+     for (int i = 0; i < degree; i++) {
+         p_der[i] = (i + 1) * p[i+1];
+     }
+ 
+-    double *der_roots = malloc(sizeof(double)*(degree - 1));
++    double *der_roots = (double *) malloc(sizeof(double)*(degree - 1));
+     int n_der_roots;
+     solve_poly_approx(p_der, degree - 1, der_roots, &n_der_roots);
+ 
+@@ -316,9 +316,9 @@ matd_t* fix_pose_ambiguities(matd_t** v, matd_t** p, matd_t* t, matd_t* R, int n
+     double t_initial = atan2(sin_beta, cos_beta);
+     matd_destroy(R_trans);
+ 
+-    matd_t** v_trans = malloc(sizeof(matd_t *)*n_points);
+-    matd_t** p_trans = malloc(sizeof(matd_t *)*n_points);
+-    matd_t** F_trans = malloc(sizeof(matd_t *)*n_points);
++    matd_t** v_trans = (matd_t **) malloc(sizeof(matd_t *)*n_points);
++    matd_t** p_trans = (matd_t **) malloc(sizeof(matd_t *)*n_points);
++    matd_t** F_trans = (matd_t **) malloc(sizeof(matd_t *)*n_points);
+     matd_t* avg_F_trans = matd_create(3, 3);
+     for (int i = 0; i < n_points; i++) {
+         p_trans[i] = matd_op("M'*M", R_z, p[i]);
+diff --git a/apriltag_quad_thresh.c b/apriltag_quad_thresh.c
+index 735520c6b1dd7387c837e8922d2ecd68130b9b5c..00f5496f7870f5eda98275af9da88f685b3dcaf5 100644
+--- a/apriltag_quad_thresh.c
++++ b/apriltag_quad_thresh.c
+@@ -296,8 +296,8 @@ float pt_compare_angle(struct pt *a, struct pt *b) {
+ 
+ int err_compare_descending(const void *_a, const void *_b)
+ {
+-    const double *a =  _a;
+-    const double *b =  _b;
++    const double *a =  (const double *) _a;
++    const double *b =  (const double *) _b;
+ 
+     return ((*a) < (*b)) ? 1 : -1;
+ }
+@@ -339,7 +339,7 @@ int quad_segment_maxima(apriltag_detector_t *td, zarray_t *cluster, struct line_
+     if (ksz < 2)
+         return 0;
+ 
+-    double *errs = malloc(sizeof(double)*sz);
++    double *errs = (double *) malloc(sizeof(double)*sz);
+ 
+     for (int i = 0; i < sz; i++) {
+         fit_line(lfps, sz, (i + sz - ksz) % sz, (i + ksz) % sz, NULL, &errs[i], NULL);
+@@ -347,7 +347,7 @@ int quad_segment_maxima(apriltag_detector_t *td, zarray_t *cluster, struct line_
+ 
+     // apply a low-pass filter to errs
+     if (1) {
+-        double *y = malloc(sizeof(double)*sz);
++        double *y = (double *) malloc(sizeof(double)*sz);
+ 
+         // how much filter to apply?
+ 
+@@ -369,7 +369,7 @@ int quad_segment_maxima(apriltag_detector_t *td, zarray_t *cluster, struct line_
+ 
+         // For default values of cutoff = 0.05, sigma = 3,
+         // we have fsz = 17.
+-        float *f = malloc(sizeof(float)*fsz);
++        float *f = (float *) malloc(sizeof(float)*fsz);
+ 
+         for (int i = 0; i < fsz; i++) {
+             int j = i - fsz / 2;
+@@ -390,8 +390,8 @@ int quad_segment_maxima(apriltag_detector_t *td, zarray_t *cluster, struct line_
+         free(f);
+     }
+ 
+-    int *maxima = malloc(sizeof(int)*sz);
+-    double *maxima_errs = malloc(sizeof(double)*sz);
++    int *maxima = (int *) malloc(sizeof(int)*sz);
++    double *maxima_errs = (double *) malloc(sizeof(double)*sz);
+     int nmaxima = 0;
+ 
+     for (int i = 0; i < sz; i++) {
+@@ -414,7 +414,7 @@ int quad_segment_maxima(apriltag_detector_t *td, zarray_t *cluster, struct line_
+     int max_nmaxima = td->qtp.max_nmaxima;
+ 
+     if (nmaxima > max_nmaxima) {
+-        double *maxima_errs_copy = malloc(sizeof(double)*nmaxima);
++        double *maxima_errs_copy = (double *) malloc(sizeof(double)*nmaxima);
+         memcpy(maxima_errs_copy, maxima_errs, sizeof(double)*nmaxima);
+ 
+         // throw out all but the best handful of maxima. Sorts descending.
+@@ -516,9 +516,9 @@ int quad_segment_agg(apriltag_detector_t *td, zarray_t *cluster, struct line_fit
+ 
+     int rvalloc_pos = 0;
+     int rvalloc_size = 3*sz;
+-    struct remove_vertex *rvalloc = calloc(rvalloc_size, sizeof(struct remove_vertex));
++    struct remove_vertex *rvalloc = (struct remove_vertex *) calloc(rvalloc_size, sizeof(struct remove_vertex));
+ 
+-    struct segment *segs = calloc(sz, sizeof(struct segment));
++    struct segment *segs = (struct segment *) calloc(sz, sizeof(struct segment));
+ 
+     // populate with initial entries
+     for (int i = 0; i < sz; i++) {
+@@ -617,7 +617,7 @@ int quad_segment_agg(apriltag_detector_t *td, zarray_t *cluster, struct line_fit
+  * efficiently computed for any contiguous range of indices.
+  */
+ struct line_fit_pt* compute_lfps(int sz, zarray_t* cluster, image_u8_t* im) {
+-    struct line_fit_pt *lfps = calloc(sz, sizeof(struct line_fit_pt));
++    struct line_fit_pt *lfps = (struct line_fit_pt *) calloc(sz, sizeof(struct line_fit_pt));
+ 
+     for (int i = 0; i < sz; i++) {
+         struct pt *p;
+@@ -713,7 +713,7 @@ static inline void ptsort(struct pt *pts, int sz)
+ 
+     // a merge sort with temp storage.
+ 
+-    struct pt *tmp = malloc(sizeof(struct pt) * sz);
++    struct pt *tmp = (struct pt *) malloc(sizeof(struct pt) * sz);
+ 
+     memcpy(tmp, pts, sizeof(struct pt) * sz);
+ 
+@@ -1272,10 +1272,10 @@ image_u8_t *threshold(apriltag_detector_t *td, image_u8_t *im)
+     int tw = w / tilesz;
+     int th = h / tilesz;
+ 
+-    uint8_t *im_max = calloc(tw*th, sizeof(uint8_t));
+-    uint8_t *im_min = calloc(tw*th, sizeof(uint8_t));
++    uint8_t *im_max = (uint8_t *) calloc(tw*th, sizeof(uint8_t));
++    uint8_t *im_min = (uint8_t *) calloc(tw*th, sizeof(uint8_t));
+ 
+-    struct minmax_task *minmax_tasks = malloc(sizeof(struct minmax_task)*th);
++    struct minmax_task *minmax_tasks = (struct minmax_task *) malloc(sizeof(struct minmax_task)*th);
+     // first, collect min/max statistics for each tile
+     for (int ty = 0; ty < th; ty++) {
+         minmax_tasks[ty].im = im;
+@@ -1292,10 +1292,10 @@ image_u8_t *threshold(apriltag_detector_t *td, image_u8_t *im)
+     // over larger areas. This reduces artifacts due to abrupt changes
+     // in the threshold value.
+     if (1) {
+-        uint8_t *im_max_tmp = calloc(tw*th, sizeof(uint8_t));
+-        uint8_t *im_min_tmp = calloc(tw*th, sizeof(uint8_t));
++        uint8_t *im_max_tmp = (uint8_t *) calloc(tw*th, sizeof(uint8_t));
++        uint8_t *im_min_tmp = (uint8_t *) calloc(tw*th, sizeof(uint8_t));
+ 
+-        struct blur_task *blur_tasks = malloc(sizeof(struct blur_task)*th);
++        struct blur_task *blur_tasks = (struct blur_task *) malloc(sizeof(struct blur_task)*th);
+         for (int ty = 0; ty < th; ty++) {
+             blur_tasks[ty].im = im;
+             blur_tasks[ty].im_max = im_max;
+@@ -1314,7 +1314,7 @@ image_u8_t *threshold(apriltag_detector_t *td, image_u8_t *im)
+         im_min = im_min_tmp;
+     }
+ 
+-    struct threshold_task *threshold_tasks = malloc(sizeof(struct threshold_task)*th);
++    struct threshold_task *threshold_tasks = (struct threshold_task *) malloc(sizeof(struct threshold_task)*th);
+     for (int ty = 0; ty < th; ty++) {
+         threshold_tasks[ty].im = im;
+         threshold_tasks[ty].threshim = threshim;
+@@ -1427,8 +1427,8 @@ image_u8_t *threshold_bayer(apriltag_detector_t *td, image_u8_t *im)
+ 
+     uint8_t *im_max[4], *im_min[4];
+     for (int i = 0; i < 4; i++) {
+-        im_max[i] = calloc(tw*th, sizeof(uint8_t));
+-        im_min[i] = calloc(tw*th, sizeof(uint8_t));
++        im_max[i] = (uint8_t *) calloc(tw*th, sizeof(uint8_t));
++        im_min[i] = (uint8_t *) calloc(tw*th, sizeof(uint8_t));
+     }
+ 
+     for (int ty = 0; ty < th; ty++) {
+@@ -1541,7 +1541,7 @@ unionfind_t* connected_components(apriltag_detector_t *td, image_u8_t* threshim,
+ 
+         int sz = h;
+         int chunksize = 1 + sz / (APRILTAG_TASKS_PER_THREAD_TARGET * td->nthreads);
+-        struct unionfind_task *tasks = malloc(sizeof(struct unionfind_task)*(sz / chunksize + 1));
++        struct unionfind_task *tasks = (struct unionfind_task *) malloc(sizeof(struct unionfind_task)*(sz / chunksize + 1));
+ 
+         int ntasks = 0;
+ 
+@@ -1576,13 +1576,13 @@ unionfind_t* connected_components(apriltag_detector_t *td, image_u8_t* threshim,
+ }
+ 
+ zarray_t* do_gradient_clusters(image_u8_t* threshim, int ts, int y0, int y1, int w, int nclustermap, unionfind_t* uf, zarray_t* clusters) {
+-    struct uint64_zarray_entry **clustermap = calloc(nclustermap, sizeof(struct uint64_zarray_entry*));
++    struct uint64_zarray_entry **clustermap = (struct uint64_zarray_entry **) calloc(nclustermap, sizeof(struct uint64_zarray_entry*));
+ 
+     int mem_chunk_size = 2048;
+-    struct uint64_zarray_entry** mem_pools = malloc(sizeof(struct uint64_zarray_entry *)*(1 + 2 * nclustermap / mem_chunk_size)); // SmodeTech: avoid memory corruption when nclustermap < mem_chunk_size
++    struct uint64_zarray_entry** mem_pools = (struct uint64_zarray_entry **) malloc(sizeof(struct uint64_zarray_entry *)*(1 + 2 * nclustermap / mem_chunk_size)); // SmodeTech: avoid memory corruption when nclustermap < mem_chunk_size
+     int mem_pool_idx = 0;
+     int mem_pool_loc = 0;
+-    mem_pools[mem_pool_idx] = calloc(mem_chunk_size, sizeof(struct uint64_zarray_entry));
++    mem_pools[mem_pool_idx] = (uint64_zarray_entry *) calloc(mem_chunk_size, sizeof(struct uint64_zarray_entry));
+ 
+     for (int y = y0; y < y1; y++) {
+         for (int x = 1; x < w-1; x++) {
+@@ -1641,7 +1641,7 @@ zarray_t* do_gradient_clusters(image_u8_t* threshim, int ts, int y0, int y1, int
+                             if (mem_pool_loc == mem_chunk_size) {           \
+                                 mem_pool_loc = 0;                           \
+                                 mem_pool_idx++;                             \
+-                                mem_pools[mem_pool_idx] = calloc(mem_chunk_size, sizeof(struct uint64_zarray_entry)); \
++                                mem_pools[mem_pool_idx] = (uint64_zarray_entry *) calloc(mem_chunk_size, sizeof(struct uint64_zarray_entry)); \
+                             }                                               \
+                             entry = mem_pools[mem_pool_idx] + mem_pool_loc; \
+                             mem_pool_loc++;                                 \
+@@ -1672,7 +1672,7 @@ zarray_t* do_gradient_clusters(image_u8_t* threshim, int ts, int y0, int y1, int
+     for (int i = 0; i < nclustermap; i++) {
+         int start = zarray_size(clusters);
+         for (struct uint64_zarray_entry *entry = clustermap[i]; entry; entry = entry->next) {
+-            struct cluster_hash* cluster_hash = malloc(sizeof(struct cluster_hash));
++            struct cluster_hash* cluster_hash = (struct cluster_hash *) malloc(sizeof(struct cluster_hash));
+             cluster_hash->hash = u64hash_2(entry->id) % nclustermap;
+             cluster_hash->id = entry->id;
+             cluster_hash->data = entry->cluster;
+@@ -1758,7 +1758,7 @@ zarray_t* gradient_clusters(apriltag_detector_t *td, image_u8_t* threshim, int w
+ 
+     int sz = h - 1;
+     int chunksize = 1 + sz / (APRILTAG_TASKS_PER_THREAD_TARGET * td->nthreads);
+-    struct cluster_task *tasks = malloc(sizeof(struct cluster_task)*(sz / chunksize + 1));
++    struct cluster_task *tasks = (struct cluster_task *) malloc(sizeof(struct cluster_task)*(sz / chunksize + 1));
+ 
+     int ntasks = 0;
+ 
+@@ -1780,7 +1780,7 @@ zarray_t* gradient_clusters(apriltag_detector_t *td, image_u8_t* threshim, int w
+ 
+     workerpool_run(td->wp);
+ 
+-    zarray_t** clusters_list = malloc(sizeof(zarray_t *)*ntasks);
++    zarray_t** clusters_list = (zarray_t **) malloc(sizeof(zarray_t *)*ntasks);
+     for (int i = 0; i < ntasks; i++) {
+         clusters_list[i] = tasks[i].clusters;
+     }
+@@ -1836,7 +1836,7 @@ zarray_t* fit_quads(apriltag_detector_t *td, int w, int h, zarray_t* clusters, i
+ 
+     int sz = zarray_size(clusters);
+     int chunksize = 1 + sz / (APRILTAG_TASKS_PER_THREAD_TARGET * td->nthreads);
+-    struct quad_task *tasks = malloc(sizeof(struct quad_task)*(sz / chunksize + 1));
++    struct quad_task *tasks = (struct quad_task *) malloc(sizeof(struct quad_task)*(sz / chunksize + 1));
+ 
+     int ntasks = 0;
+     for (int i = 0; i < sz; i += chunksize) {
+diff --git a/common/image_u8.c b/common/image_u8.c
+index eef6c046eab87ed46465df74ef39c70a2912517f..e40cd99a89f8fa5452316df71238c8be1b6c6d03 100644
+--- a/common/image_u8.c
++++ b/common/image_u8.c
+@@ -41,12 +41,12 @@ either expressed or implied, of the Regents of The University of Michigan.
+ 
+ image_u8_t *image_u8_create_stride(unsigned int width, unsigned int height, unsigned int stride)
+ {
+-    uint8_t *buf = calloc(height*stride, sizeof(uint8_t));
++    uint8_t *buf = (uint8_t *) calloc(height*stride, sizeof(uint8_t));
+ 
+     // const initializer
+     image_u8_t tmp = { .width = width, .height = height, .stride = stride, .buf = buf };
+ 
+-    image_u8_t *im = calloc(1, sizeof(image_u8_t));
++    image_u8_t *im = (image_u8_t *) calloc(1, sizeof(image_u8_t));
+     memcpy(im, &tmp, sizeof(image_u8_t));
+     return im;
+ }
+@@ -68,13 +68,13 @@ image_u8_t *image_u8_create_alignment(unsigned int width, unsigned int height, u
+ 
+ image_u8_t *image_u8_copy(const image_u8_t *in)
+ {
+-    uint8_t *buf = malloc(in->height*in->stride*sizeof(uint8_t));
++    uint8_t *buf = (uint8_t *) malloc(in->height*in->stride*sizeof(uint8_t));
+     memcpy(buf, in->buf, in->height*in->stride*sizeof(uint8_t));
+ 
+     // const initializer
+     image_u8_t tmp = { .width = in->width, .height = in->height, .stride = in->stride, .buf = buf };
+ 
+-    image_u8_t *copy = calloc(1, sizeof(image_u8_t));
++    image_u8_t *copy = (image_u8_t *) calloc(1, sizeof(image_u8_t));
+     memcpy(copy, &tmp, sizeof(image_u8_t));
+     return copy;
+ }
+@@ -320,7 +320,7 @@ void image_u8_convolve_2D(image_u8_t *im, const uint8_t *k, int ksz)
+ 
+     for (int y = 0; y < im->height; y++) {
+ 
+-        uint8_t *x = malloc(sizeof(uint8_t)*im->stride);
++        uint8_t *x = (uint8_t *) malloc(sizeof(uint8_t)*im->stride);
+         memcpy(x, &im->buf[y*im->stride], im->stride);
+ 
+         convolve(x, &im->buf[y*im->stride], im->width, k, ksz);
+@@ -328,8 +328,8 @@ void image_u8_convolve_2D(image_u8_t *im, const uint8_t *k, int ksz)
+     }
+ 
+     for (int x = 0; x < im->width; x++) {
+-        uint8_t *xb = malloc(sizeof(uint8_t)*im->height);
+-        uint8_t *yb = malloc(sizeof(uint8_t)*im->height);
++        uint8_t *xb = (uint8_t *) malloc(sizeof(uint8_t)*im->height);
++        uint8_t *yb = (uint8_t *) malloc(sizeof(uint8_t)*im->height);
+ 
+         for (int y = 0; y < im->height; y++)
+             xb[y] = im->buf[y*im->stride + x];
+@@ -351,7 +351,7 @@ void image_u8_gaussian_blur(image_u8_t *im, double sigma, int ksz)
+     assert((ksz & 1) == 1); // ksz must be odd.
+ 
+     // build the kernel.
+-    double *dk = malloc(sizeof(double)*ksz);
++    double *dk = (double *) malloc(sizeof(double)*ksz);
+ 
+     // for kernel of length 5:
+     // dk[0] = f(-2), dk[1] = f(-1), dk[2] = f(0), dk[3] = f(1), dk[4] = f(2)
+@@ -369,7 +369,7 @@ void image_u8_gaussian_blur(image_u8_t *im, double sigma, int ksz)
+     for (int i = 0; i < ksz; i++)
+         dk[i] /= acc;
+ 
+-    uint8_t *k = malloc(sizeof(uint8_t)*ksz);
++    uint8_t *k = (uint8_t *) malloc(sizeof(uint8_t)*ksz);
+     for (int i = 0; i < ksz; i++)
+         k[i] = dk[i]*255;
+ 
+diff --git a/common/image_u8x3.c b/common/image_u8x3.c
+index 1463e5f1a757c283eac2867f86247befac528dbe..686e48cbb32bc085256959d4cb41a0c3b9db94f2 100644
+--- a/common/image_u8x3.c
++++ b/common/image_u8x3.c
+@@ -31,6 +31,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ #include <string.h>
+ #include <math.h>
+ 
++#include "image_types.h"
+ #include "math_util.h"
+ #include "pnm.h"
+ 
+@@ -52,25 +53,25 @@ image_u8x3_t *image_u8x3_create_alignment(unsigned int width, unsigned int heigh
+     if ((stride % alignment) != 0)
+         stride += alignment - (stride % alignment);
+ 
+-    uint8_t *buf = calloc(height*stride, sizeof(uint8_t));
++    uint8_t *buf = (uint8_t *) calloc(height*stride, sizeof(uint8_t));
+ 
+     // const initializer
+     image_u8x3_t tmp = { .width = width, .height = height, .stride = stride, .buf = buf };
+ 
+-    image_u8x3_t *im = calloc(1, sizeof(image_u8x3_t));
++    image_u8x3_t *im = (image_u8x3_t *) calloc(1, sizeof(image_u8x3_t));
+     memcpy(im, &tmp, sizeof(image_u8x3_t));
+     return im;
+ }
+ 
+ image_u8x3_t *image_u8x3_copy(const image_u8x3_t *in)
+ {
+-    uint8_t *buf = malloc(in->height*in->stride*sizeof(uint8_t));
++    uint8_t *buf = (uint8_t *) malloc(in->height*in->stride*sizeof(uint8_t));
+     memcpy(buf, in->buf, in->height*in->stride*sizeof(uint8_t));
+ 
+     // const initializer
+     image_u8x3_t tmp = { .width = in->width, .height = in->height, .stride = in->stride, .buf = buf };
+ 
+-    image_u8x3_t *copy = calloc(1, sizeof(image_u8x3_t));
++    image_u8x3_t *copy = (image_u8x3_t *) calloc(1, sizeof(image_u8x3_t));
+     memcpy(copy, &tmp, sizeof(image_u8x3_t));
+     return copy;
+ }
+@@ -210,7 +211,7 @@ void image_u8x3_gaussian_blur(image_u8x3_t *im, double sigma, int ksz)
+     assert((ksz & 1) == 1); // ksz must be odd.
+ 
+     // build the kernel.
+-    double *dk = malloc(sizeof(double)*ksz);
++    double *dk = (double *) malloc(sizeof(double)*ksz);
+ 
+     // for kernel of length 5:
+     // dk[0] = f(-2), dk[1] = f(-1), dk[2] = f(0), dk[3] = f(1), dk[4] = f(2)
+@@ -228,7 +229,7 @@ void image_u8x3_gaussian_blur(image_u8x3_t *im, double sigma, int ksz)
+     for (int i = 0; i < ksz; i++)
+         dk[i] /= acc;
+ 
+-    uint8_t *k = malloc(sizeof(uint8_t)*ksz);
++    uint8_t *k = (uint8_t *) malloc(sizeof(uint8_t)*ksz);
+     for (int i = 0; i < ksz; i++)
+         k[i] = dk[i]*255;
+ 
+@@ -241,8 +242,8 @@ void image_u8x3_gaussian_blur(image_u8x3_t *im, double sigma, int ksz)
+     for (int c = 0; c < 3; c++) {
+         for (int y = 0; y < im->height; y++) {
+ 
+-            uint8_t *in = malloc(sizeof(uint8_t)*im->stride);
+-            uint8_t *out = malloc(sizeof(uint8_t)*im->stride);
++            uint8_t *in = (uint8_t *) malloc(sizeof(uint8_t)*im->stride);
++            uint8_t *out = (uint8_t *) malloc(sizeof(uint8_t)*im->stride);
+ 
+             for (int x = 0; x < im->width; x++)
+                 in[x] = im->buf[y*im->stride + 3 * x + c];
+@@ -256,8 +257,8 @@ void image_u8x3_gaussian_blur(image_u8x3_t *im, double sigma, int ksz)
+         }
+ 
+         for (int x = 0; x < im->width; x++) {
+-            uint8_t *in = malloc(sizeof(uint8_t)*im->height);
+-            uint8_t *out = malloc(sizeof(uint8_t)*im->height);
++            uint8_t *in = (uint8_t *) malloc(sizeof(uint8_t)*im->height);
++            uint8_t *out = (uint8_t *) malloc(sizeof(uint8_t)*im->height);
+ 
+             for (int y = 0; y < im->height; y++)
+                 in[y] = im->buf[y*im->stride + 3*x + c];
+diff --git a/common/image_u8x4.c b/common/image_u8x4.c
+index 352053744734e4bf129d6a6f9003e6e429f3481f..10b2c6760959e5fb636c034d096bc21951218007 100644
+--- a/common/image_u8x4.c
++++ b/common/image_u8x4.c
+@@ -30,6 +30,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ #include <stdlib.h>
+ #include <string.h>
+ 
++#include "image_types.h"
+ #include "pam.h"
+ #include "pnm.h"
+ #include "image_u8x4.h"
+@@ -50,25 +51,25 @@ image_u8x4_t *image_u8x4_create_alignment(unsigned int width, unsigned int heigh
+     if ((stride % alignment) != 0)
+         stride += alignment - (stride % alignment);
+ 
+-    uint8_t *buf = calloc(height*stride, sizeof(uint8_t));
++    uint8_t *buf = (uint8_t *) calloc(height*stride, sizeof(uint8_t));
+ 
+     // const initializer
+     image_u8x4_t tmp = { .width = width, .height = height, .stride = stride, .buf = buf };
+ 
+-    image_u8x4_t *im = calloc(1, sizeof(image_u8x4_t));
++    image_u8x4_t *im = (image_u8x4_t *) calloc(1, sizeof(image_u8x4_t));
+     memcpy(im, &tmp, sizeof(image_u8x4_t));
+     return im;
+ }
+ 
+ image_u8x4_t *image_u8x4_copy(const image_u8x4_t *in)
+ {
+-    uint8_t *buf = malloc(in->height*in->stride*sizeof(uint8_t));
++    uint8_t *buf = (uint8_t *) malloc(in->height*in->stride*sizeof(uint8_t));
+     memcpy(buf, in->buf, in->height*in->stride*sizeof(uint8_t));
+ 
+     // const initializer
+     image_u8x4_t tmp = { .width = in->width, .height = in->height, .stride = in->stride, .buf = buf };
+ 
+-    image_u8x4_t *copy = calloc(1, sizeof(image_u8x4_t));
++    image_u8x4_t *copy = (image_u8x4_t *) calloc(1, sizeof(image_u8x4_t));
+     memcpy(copy, &tmp, sizeof(image_u8x4_t));
+     return copy;
+ }
+diff --git a/common/matd.c b/common/matd.c
+index f426890416dd021d7392b78bd19959c70f44247b..fac5ebb1edddfeb122222dbb1c216a80bba0d672 100644
+--- a/common/matd.c
++++ b/common/matd.c
+@@ -51,7 +51,7 @@ matd_t *matd_create(int rows, int cols)
+     if (rows == 0 || cols == 0)
+         return matd_create_scalar(0);
+ 
+-    matd_t *m = calloc(1, sizeof(matd_t) + (rows*cols*sizeof(double)));
++    matd_t *m = (matd_t *) calloc(1, sizeof(matd_t) + (rows*cols*sizeof(double)));
+     m->nrows = rows;
+     m->ncols = cols;
+ 
+@@ -60,7 +60,7 @@ matd_t *matd_create(int rows, int cols)
+ 
+ matd_t *matd_create_scalar(TYPE v)
+ {
+-    matd_t *m = calloc(1, sizeof(matd_t) + sizeof(double));
++    matd_t *m = (matd_t *) calloc(1, sizeof(matd_t) + sizeof(double));
+     m->nrows = 0;
+     m->ncols = 0;
+     m->data[0] = v;
+@@ -812,7 +812,7 @@ matd_t *matd_op(const char *expr, ...)
+     va_list ap;
+     va_start(ap, expr);
+ 
+-    matd_t **args = malloc(sizeof(matd_t*)*nargs);
++    matd_t **args = (matd_t **) malloc(sizeof(matd_t*)*nargs);
+     for (int i = 0; i < nargs; i++) {
+         args[i] = va_arg(ap, matd_t*);
+         // XXX: sanity check argument; emit warning/error if args[i]
+@@ -827,7 +827,7 @@ matd_t *matd_op(const char *expr, ...)
+ 
+     // can't create more than 2 new result per character
+     // one result, and possibly one argument to free
+-    matd_t **garb = malloc(sizeof(matd_t*)*2*exprlen);
++    matd_t **garb = (matd_t **) malloc(sizeof(matd_t*)*2*exprlen);
+ 
+     matd_t *res = matd_op_recurse(expr, &pos, NULL, args, &argpos, garb, &garbpos, 0);
+     free(args);
+@@ -1027,7 +1027,7 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
+             //
+             int vlen = A->nrows - hhidx;
+ 
+-            double *v = malloc(sizeof(double)*vlen);
++            double *v = (double *) malloc(sizeof(double)*vlen);
+ 
+             double mag2 = 0;
+             for (int i = 0; i < vlen; i++) {
+@@ -1088,7 +1088,7 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
+         if (hhidx+2 < A->ncols) {
+             int vlen = A->ncols - hhidx - 1;
+ 
+-            double *v = malloc(sizeof(double)*vlen);
++            double *v = (double *) malloc(sizeof(double)*vlen);
+ 
+             double mag2 = 0;
+             for (int i = 0; i < vlen; i++) {
+@@ -1161,7 +1161,7 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
+ 
+     // for each of the first B->ncols rows, which index has the
+     // maximum absolute value? (used by method 1)
+-    int *maxrowidx = malloc(sizeof(int)*B->ncols);
++    int *maxrowidx = (int *) malloc(sizeof(int)*B->ncols);
+     int lastmaxi, lastmaxj;
+ 
+     if (find_max_method == 1) {
+@@ -1386,8 +1386,8 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
+ 
+     // them all positive by flipping the corresponding columns of
+     // U/LS.
+-    int *idxs = malloc(sizeof(int)*A->ncols);
+-    double *vals = malloc(sizeof(double)*A->ncols);
++    int *idxs = (int *) malloc(sizeof(int)*A->ncols);
++    double *vals = (double *) malloc(sizeof(double)*A->ncols);
+     for (int i = 0; i < A->ncols; i++) {
+         idxs[i] = i;
+         vals[i] = MATD_EL(B, i, i);
+@@ -1513,14 +1513,14 @@ matd_svd_t matd_svd_flags(matd_t *A, int flags)
+ 
+ matd_plu_t *matd_plu(const matd_t *a)
+ {
+-    unsigned int *piv = calloc(a->nrows, sizeof(unsigned int));
++    unsigned int *piv = (unsigned int *) calloc(a->nrows, sizeof(unsigned int));
+     int pivsign = 1;
+     matd_t *lu = matd_copy(a);
+ 
+     // only for square matrices.
+     assert(a->nrows == a->ncols);
+ 
+-    matd_plu_t *mlu = calloc(1, sizeof(matd_plu_t));
++    matd_plu_t *mlu = (matd_plu_t *) calloc(1, sizeof(matd_plu_t));
+ 
+     for (int i = 0; i < a->nrows; i++)
+         piv[i] = i;
+@@ -1549,7 +1549,7 @@ matd_plu_t *matd_plu(const matd_t *a)
+ 
+         // swap rows p and j?
+         if (p != j) {
+-            TYPE *tmp = malloc(sizeof(TYPE)*lu->ncols);
++            TYPE *tmp = (TYPE *) malloc(sizeof(TYPE)*lu->ncols);
+             memcpy(tmp, &MATD_EL(lu, p, 0), sizeof(TYPE) * lu->ncols);
+             memcpy(&MATD_EL(lu, p, 0), &MATD_EL(lu, j, 0), sizeof(TYPE) * lu->ncols);
+             memcpy(&MATD_EL(lu, j, 0), tmp, sizeof(TYPE) * lu->ncols);
+@@ -1892,7 +1892,7 @@ MATD_EL(U, i, j) = 0;
+         }
+     }
+ 
+-    matd_chol_t *chol = calloc(1, sizeof(matd_chol_t));
++    matd_chol_t *chol = (matd_chol_t *) calloc(1, sizeof(matd_chol_t));
+     chol->is_spd = is_spd;
+     chol->u = U;
+     return chol;
+diff --git a/common/pam.c b/common/pam.c
+index a86b3fe26a0a6ac7aa41784121ff428dd0a29816..3afa4fd584cfd347069b4a4c667c1dcd9d3047a2 100644
+--- a/common/pam.c
++++ b/common/pam.c
+@@ -40,7 +40,7 @@ pam_t *pam_create_from_file(const char *inpath)
+         return NULL;
+     }
+ 
+-    pam_t *pam = calloc(1, sizeof(pam_t));
++    pam_t *pam = (pam_t *) calloc(1, sizeof(pam_t));
+     pam->width = -1;
+     pam->height = -1;
+     pam->depth = -1;
+@@ -140,7 +140,7 @@ pam_t *pam_create_from_file(const char *inpath)
+     assert(pam->maxval == 255);
+ 
+     pam->datalen = pam->width * pam->height * pam->depth;
+-    pam->data = malloc(pam->datalen);
++    pam->data = (uint8_t *) malloc(pam->datalen);
+     if (pam->datalen != fread(pam->data, 1, pam->datalen, infile)) {
+         printf("pam.c: couldn't read body\n");
+         goto fail;
+@@ -203,7 +203,7 @@ void pam_destroy(pam_t *pam)
+ 
+ pam_t *pam_copy(pam_t *pam)
+ {
+-    pam_t *copy = calloc(1, sizeof(pam_t));
++    pam_t *copy = (pam_t *) calloc(1, sizeof(pam_t));
+     copy->width = pam->width;
+     copy->height = pam->height;
+     copy->depth = pam->depth;
+@@ -211,7 +211,7 @@ pam_t *pam_copy(pam_t *pam)
+     copy->type = pam->type;
+ 
+     copy->datalen = pam->datalen;
+-    copy->data = malloc(pam->datalen);
++    copy->data = (uint8_t *) malloc(pam->datalen);
+     memcpy(copy->data, pam->data, pam->datalen);
+ 
+     return copy;
+@@ -228,14 +228,14 @@ pam_t *pam_convert(pam_t *in, int type)
+     int w = in->width;
+     int h = in->height;
+ 
+-    pam_t *out = calloc(1, sizeof(pam_t));
++    pam_t *out = (pam_t *) calloc(1, sizeof(pam_t));
+     out->type = type;
+     out->width = w;
+     out->height = h;
+     out->maxval = in->maxval;
+     out->depth = 4;
+     out->datalen = 4 * w * h;
+-    out->data = malloc(out->datalen);
++    out->data = (uint8_t *) malloc(out->datalen);
+ 
+     if (in->type == PAM_RGB) {
+         assert(in->depth == 3);
+diff --git a/common/pjpeg.c b/common/pjpeg.c
+index 8f573a0fd27ef454ca5653be99f7c7df6085ea78..1336b4b6c01a8c0e002a6882f96f3f7dc4133f37 100644
+--- a/common/pjpeg.c
++++ b/common/pjpeg.c
+@@ -345,7 +345,7 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
+                     return PJPEG_ERR_SOF;
+ 
+                 pjd->ncomponents = nf;
+-                pjd->components = calloc(nf, sizeof(struct pjpeg_component));
++                pjd->components = (pjpeg_component_t *) calloc(nf, sizeof(struct pjpeg_component));
+ 
+                 for (int i = 0; i < nf; i++) {
+                     // comp. identifier
+@@ -450,7 +450,7 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
+                 uint8_t ns = bd_consume_bits(&bd, 8);
+ 
+                 // for each component, what is the index into our pjd->components[] array?
+-                uint8_t *comp_idx = calloc(ns, sizeof(uint8_t));
++                uint8_t *comp_idx = (uint8_t *) calloc(ns, sizeof(uint8_t));
+ 
+                 for (int i = 0; i < ns; i++) {
+                     // component name
+@@ -513,12 +513,12 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
+                     if ((comp->stride % alignment) != 0)
+                         comp->stride += alignment - (comp->stride % alignment);
+ 
+-                    comp->data = calloc(comp->height * comp->stride, 1);
++                    comp->data = (uint8_t *) calloc(comp->height * comp->stride, 1);
+                 }
+ 
+ 
+                 // each component has its own DC prediction
+-                int32_t *dcpred = calloc(ns, sizeof(int32_t));
++                int32_t *dcpred = (int32_t *) calloc(ns, sizeof(int32_t));
+ 
+                 pjd->reset_count = 0;
+ 
+@@ -831,7 +831,7 @@ pjpeg_t *pjpeg_create_from_file(const char *path, uint32_t flags, int *error)
+     fseek(f, 0, SEEK_END);
+     long buflen = ftell(f);
+ 
+-    uint8_t *buf = malloc(buflen);
++    uint8_t *buf = (uint8_t *) malloc(buflen);
+     fseek(f, 0, SEEK_SET);
+     int res = fread(buf, 1, buflen, f);
+ 
+@@ -883,7 +883,7 @@ pjpeg_t *pjpeg_create_from_buffer(uint8_t *buf, int buflen, uint32_t flags, int
+         return NULL;
+     }
+ 
+-    pjpeg_t *pj = calloc(1, sizeof(pjpeg_t));
++    pjpeg_t *pj = (pjpeg_t *) calloc(1, sizeof(pjpeg_t));
+ 
+     pj->width = pjd.width;
+     pj->height = pjd.height;
+diff --git a/common/pnm.c b/common/pnm.c
+index fe77dde6d937447688b44ada4981563bf4c39782..801b88296a385417e0e33d8c3e35d40a3016ad3b 100644
+--- a/common/pnm.c
++++ b/common/pnm.c
+@@ -37,7 +37,7 @@ pnm_t *pnm_create_from_file(const char *path)
+     if (f == NULL)
+         return NULL;
+ 
+-    pnm_t *pnm = calloc(1, sizeof(pnm_t));
++    pnm_t *pnm = (pnm_t *) calloc(1, sizeof(pnm_t));
+     pnm->format = -1;
+ 
+     char tmp[1024];
+@@ -90,7 +90,7 @@ pnm_t *pnm_create_from_file(const char *path)
+             pnm->max = 1;
+ 
+             pnm->buflen = pnm->height * ((pnm->width + 7)  / 8);
+-            pnm->buf = malloc(pnm->buflen);
++            pnm->buf = (uint8_t *) malloc(pnm->buflen);
+             size_t len = fread(pnm->buf, 1, pnm->buflen, f);
+             if (len != pnm->buflen)
+                 goto error;
+@@ -107,7 +107,7 @@ pnm_t *pnm_create_from_file(const char *path)
+             else
+                 assert(0);
+ 
+-            pnm->buf = malloc(pnm->buflen);
++            pnm->buf = (uint8_t *) malloc(pnm->buflen);
+             size_t len = fread(pnm->buf, 1, pnm->buflen, f);
+             if (len != pnm->buflen)
+                 goto error;
+@@ -124,7 +124,7 @@ pnm_t *pnm_create_from_file(const char *path)
+             else
+                 assert(0);
+ 
+-            pnm->buf = malloc(pnm->buflen);
++            pnm->buf = (uint8_t *) malloc(pnm->buflen);
+             size_t len = fread(pnm->buf, 1, pnm->buflen, f);
+             if (len != pnm->buflen)
+                 goto error;
+diff --git a/common/string_util.c b/common/string_util.c
+index 3d86eb2f2d602a5b00c29952808368dc73c0b0cd..a7ec50686a9eac70fde52273f58fa77768f69f7b 100644
+--- a/common/string_util.c
++++ b/common/string_util.c
+@@ -62,7 +62,7 @@ char *vsprintf_alloc(const char *fmt, va_list orig_args)
+     assert(fmt != NULL);
+ 
+     int size = MIN_PRINTF_ALLOC;
+-    char *buf = malloc(size * sizeof(char));
++    char *buf = (char *) malloc(size * sizeof(char));
+ 
+     int returnsize;
+     va_list args;
+@@ -79,7 +79,7 @@ char *vsprintf_alloc(const char *fmt, va_list orig_args)
+     // otherwise, we should try again
+     free(buf);
+     size = returnsize + 1;
+-    buf = malloc(size * sizeof(char));
++    buf = (char *) malloc(size * sizeof(char));
+ 
+     va_copy(args, orig_args);
+     returnsize = vsnprintf(buf, size, fmt, args);
+@@ -106,7 +106,7 @@ char *_str_concat_private(const char *first, ...)
+     }
+ 
+     // write the string
+-    char *str = malloc(len*sizeof(char) + 1);
++    char *str = (char *) malloc(len*sizeof(char) + 1);
+     char *ptr = str;
+     {
+         va_list args;
+@@ -202,7 +202,7 @@ zarray_t *str_split_spaces(const char *str)
+       size_t off1 = pos;
+ 
+       size_t len_off = off1 - off0;
+-      char *tok = malloc(len_off + 1);
++      char *tok = (char *) malloc(len_off + 1);
+       memcpy(tok, &str[off0], len_off);
+       tok[len_off] = 0;
+       zarray_add(parts, &tok);
+@@ -217,7 +217,7 @@ void str_split_destroy(zarray_t *za)
+     if (!za)
+         return;
+ 
+-    zarray_vmap(za, free);
++    zarray_vmap(za, (void(*)()) free);
+     zarray_destroy(za);
+ }
+ 
+@@ -319,7 +319,7 @@ string_buffer_t* string_buffer_create()
+     string_buffer_t *sb = (string_buffer_t*) calloc(1, sizeof(string_buffer_t));
+     assert(sb != NULL);
+     sb->alloc = 32;
+-    sb->s = calloc(sb->alloc, 1);
++    sb->s = (char *) calloc(sb->alloc, 1);
+     return sb;
+ }
+ 
+@@ -341,7 +341,7 @@ void string_buffer_append(string_buffer_t *sb, char c)
+ 
+     if (sb->size+2 >= sb->alloc) {
+         sb->alloc *= 2;
+-        sb->s = realloc(sb->s, sb->alloc);
++        sb->s = (char *) realloc(sb->s, sb->alloc);
+     }
+ 
+     sb->s[sb->size++] = c;
+@@ -364,7 +364,7 @@ void string_buffer_appendf(string_buffer_t *sb, const char *fmt, ...)
+     assert(fmt != NULL);
+ 
+     int size = MIN_PRINTF_ALLOC;
+-    char *buf = malloc(size * sizeof(char));
++    char *buf = (char *) malloc(size * sizeof(char));
+ 
+     int returnsize;
+     va_list args;
+@@ -377,7 +377,7 @@ void string_buffer_appendf(string_buffer_t *sb, const char *fmt, ...)
+         // otherwise, we should try again
+         free(buf);
+         size = returnsize + 1;
+-        buf = malloc(size * sizeof(char));
++        buf = (char *) malloc(size * sizeof(char));
+ 
+         va_start(args, fmt);
+         returnsize = vsnprintf(buf, size, fmt, args);
+@@ -399,7 +399,7 @@ void string_buffer_append_string(string_buffer_t *sb, const char *str)
+ 
+     while (sb->size+len + 1 >= sb->alloc) {
+         sb->alloc *= 2;
+-        sb->s = realloc(sb->s, sb->alloc);
++        sb->s = (char *) realloc(sb->s, sb->alloc);
+     }
+ 
+     memcpy(&sb->s[sb->size], str, len);
+@@ -505,7 +505,7 @@ char *string_feeder_next_length(string_feeder_t *sf, size_t length)
+     if (sf->pos + length > sf->len)
+         length = sf->len - sf->pos;
+ 
+-    char *substr = calloc(length+1, sizeof(char));
++    char *substr = (char *) calloc(length+1, sizeof(char));
+     for (int i = 0 ; i < length ; i++)
+         substr[i] = string_feeder_next(sf);
+     return substr;
+@@ -528,7 +528,7 @@ char *string_feeder_peek_length(string_feeder_t *sf, size_t length)
+     if (sf->pos + length > sf->len)
+         length = sf->len - sf->pos;
+ 
+-    char *substr = calloc(length+1, sizeof(char));
++    char *substr = (char *) calloc(length+1, sizeof(char));
+     memcpy(substr, &sf->s[sf->pos], length*sizeof(char));
+     return substr;
+ }
+@@ -632,7 +632,7 @@ char *str_substring(const char *str, size_t startidx, long endidx)
+         endidx = (long) strlen(str);
+ 
+     size_t blen = endidx - startidx; // not counting \0
+-    char *b = malloc(blen + 1);
++    char *b = (char *) malloc(blen + 1);
+     memcpy(b, &str[startidx], blen);
+     b[blen] = 0;
+     return b;
+@@ -695,20 +695,20 @@ static void buffer_appendf(char **_buf, int *bufpos, void *fmt, ...)
+     va_list ap;
+ 
+     int salloc = 128;
+-    char *s = malloc(salloc);
++    char *s = (char *) malloc(salloc);
+ 
+     va_start(ap, fmt);
+-    int slen = vsnprintf(s, salloc, fmt, ap);
++    int slen = vsnprintf(s, salloc, (const char*) fmt, ap);
+     va_end(ap);
+ 
+     if (slen >= salloc) {
+-        s = realloc(s, slen + 1);
++        s = (char *) realloc(s, slen + 1);
+         va_start(ap, fmt);
+-        vsprintf((char*) s, fmt, ap);
++        vsprintf((char*) s, (const char *) fmt, ap);
+         va_end(ap);
+     }
+ 
+-    buf = realloc(buf, *bufpos + slen + 1);
++    buf = (char *) realloc(buf, *bufpos + slen + 1);
+     *_buf = buf;
+ 
+     memcpy(&buf[*bufpos], s, slen + 1); // get trailing \0
+@@ -745,7 +745,7 @@ char *str_expand_envs(const char *in)
+     while (inpos < inlen) {
+ 
+         if (in[inpos] != '$') {
+-            buffer_appendf(&out, &outpos, "%c", in[inpos]);
++            buffer_appendf(&out, &outpos, const_cast<char*>("%c"), in[inpos]);
+             inpos++;
+             continue;
+ 
+@@ -756,13 +756,13 @@ char *str_expand_envs(const char *in)
+             int  varnamepos = 0;
+ 
+             while (inpos < inlen && is_variable_character(in[inpos])) {
+-                buffer_appendf(&varname, &varnamepos, "%c", in[inpos]);
++                buffer_appendf(&varname, &varnamepos, const_cast<char*>("%c"), in[inpos]);
+                 inpos++;
+             }
+ 
+             char *env = getenv(varname);
+             if (env)
+-                buffer_appendf(&out, &outpos, "%s", env);
++                buffer_appendf(&out, &outpos, const_cast<char*>("%s"), env);
+ 
+             free(varname);
+         }
+diff --git a/common/time_util.c b/common/time_util.c
+index 7a25f424068d798a8c65c69c6c17dd05b2e2b950..5060ce2b82e3e2564628bb6caf1f006f16c3e38f 100644
+--- a/common/time_util.c
++++ b/common/time_util.c
+@@ -37,7 +37,7 @@ struct timeutil_rest
+ 
+ timeutil_rest_t *timeutil_rest_create()
+ {
+-    timeutil_rest_t *rest = calloc(1, sizeof(timeutil_rest_t));
++    timeutil_rest_t *rest = (timeutil_rest_t *) calloc(1, sizeof(timeutil_rest_t));
+     return rest;
+ }
+ 
+diff --git a/common/workerpool.c b/common/workerpool.c
+index a0170ef87978cb4cd2d3d8a198ffea471b6e40b2..08636c4fc0313d0fa690c07767b057e1ae70698d 100644
+--- a/common/workerpool.c
++++ b/common/workerpool.c
+@@ -102,12 +102,12 @@ workerpool_t *workerpool_create(int nthreads)
+ {
+     assert(nthreads > 0);
+ 
+-    workerpool_t *wp = calloc(1, sizeof(workerpool_t));
++    workerpool_t *wp = (workerpool_t *) calloc(1, sizeof(workerpool_t));
+     wp->nthreads = nthreads;
+     wp->tasks = zarray_create(sizeof(struct task));
+ 
+     if (nthreads > 1) {
+-        wp->threads = calloc(wp->nthreads, sizeof(pthread_t));
++        wp->threads = (pthread_t *) calloc(wp->nthreads, sizeof(pthread_t));
+ 
+         pthread_mutex_init(&wp->mutex, NULL);
+         pthread_cond_init(&wp->startcond, NULL);
+diff --git a/common/zarray.c b/common/zarray.c
+index 43e6a7e0c6fb6d06414d6910e511d362ccc35354..b2617e74f28041eaa2bb0bb65d5be94e2d117d48 100644
+--- a/common/zarray.c
++++ b/common/zarray.c
+@@ -35,8 +35,8 @@ int zstrcmp(const void * a_pp, const void * b_pp)
+     assert(a_pp != NULL);
+     assert(b_pp != NULL);
+ 
+-    char * a = *(void**)a_pp;
+-    char * b = *(void**)b_pp;
++    char * a = static_cast<char*>(*(void**)a_pp);
++    char * b = static_cast<char*>(*(void**)b_pp);
+ 
+     return strcmp(a,b);
+ }
+diff --git a/common/zhash.c b/common/zhash.c
+index 914f530eca8742ed39fc814ab6587a4514c966b5..1f25cc5f22c5c9f4ef486a957fd2a45ff891151f 100644
+--- a/common/zhash.c
++++ b/common/zhash.c
+@@ -83,7 +83,7 @@ zhash_t *zhash_create_capacity(size_t keysz, size_t valuesz,
+ 
+     zh->entrysz = 1 + zh->keysz + zh->valuesz;
+ 
+-    zh->entries = calloc(zh->nentries, zh->entrysz);
++    zh->entries = (char *) calloc(zh->nentries, zh->entrysz);
+     zh->nentries = nentries;
+ 
+     return zh;
+@@ -225,7 +225,7 @@ int zhash_remove(zhash_t *zh, const void *key, void *old_key, void *old_value)
+ 
+                 if (zh->entries[entry_idx * zh->entrysz]) {
+                     // completely remove this entry
+-                    char *tmp = malloc(sizeof(char)*zh->entrysz);
++                    char *tmp = (char *) malloc(sizeof(char)*zh->entrysz);
+                     memcpy(tmp, &zh->entries[entry_idx * zh->entrysz], zh->entrysz);
+                     zh->entries[entry_idx * zh->entrysz] = 0;
+                     zh->size--;
+@@ -337,7 +337,7 @@ void zhash_iterator_remove(zhash_iterator_t *zit)
+     int entry_idx = (zit->last_entry + 1) & (zh->nentries - 1);
+     while (zh->entries[entry_idx *zh->entrysz]) {
+         // completely remove this entry
+-        char *tmp = malloc(sizeof(char)*zh->entrysz);
++        char *tmp = (char *) malloc(sizeof(char)*zh->entrysz);
+         memcpy(tmp, &zh->entries[entry_idx * zh->entrysz], zh->entrysz);
+         zh->entries[entry_idx * zh->entrysz] = 0;
+         zh->size--;
+diff --git a/common/zmaxheap.c b/common/zmaxheap.c
+index 2c671236bf07ed4c43e15c02f4bf10df76880cb9..c5ac32e7b1e4a01366cc1f96aaa45beeee1ca4e9 100644
+--- a/common/zmaxheap.c
++++ b/common/zmaxheap.c
+@@ -73,7 +73,7 @@ static inline void swap_default(zmaxheap_t *heap, int a, int b)
+     heap->values[a] = heap->values[b];
+     heap->values[b] = t;
+ 
+-    char *tmp = malloc(sizeof(char)*heap->el_sz);
++    char *tmp = (char *) malloc(sizeof(char)*heap->el_sz);
+     memcpy(tmp, &heap->data[a*heap->el_sz], heap->el_sz);
+     memcpy(&heap->data[a*heap->el_sz], &heap->data[b*heap->el_sz], heap->el_sz);
+     memcpy(&heap->data[b*heap->el_sz], tmp, heap->el_sz);
+@@ -95,7 +95,7 @@ static inline void swap_pointer(zmaxheap_t *heap, int a, int b)
+ 
+ zmaxheap_t *zmaxheap_create(size_t el_sz)
+ {
+-    zmaxheap_t *heap = calloc(1, sizeof(zmaxheap_t));
++    zmaxheap_t *heap = (zmaxheap_t *) calloc(1, sizeof(zmaxheap_t));
+     heap->el_sz = el_sz;
+ 
+     heap->swap = swap_default;
+@@ -135,8 +135,8 @@ void zmaxheap_ensure_capacity(zmaxheap_t *heap, int capacity)
+         newcap *= 2;
+     }
+ 
+-    heap->values = realloc(heap->values, newcap * sizeof(float));
+-    heap->data = realloc(heap->data, newcap * heap->el_sz);
++    heap->values = (float *) realloc(heap->values, newcap * sizeof(float));
++    heap->data = (char *) realloc(heap->data, newcap * heap->el_sz);
+     heap->alloc = newcap;
+ }
+ 
+@@ -362,7 +362,7 @@ void zmaxheap_test()
+ {
+     int cap = 10000;
+     int sz = 0;
+-    int32_t *vals = calloc(sizeof(int32_t), cap);
++    int32_t *vals = (int32_t *) calloc(sizeof(int32_t), cap);
+ 
+     zmaxheap_t *heap = zmaxheap_create(sizeof(int32_t));
+ 
+diff --git a/tag16h5.c b/tag16h5.c
+index 775f33c7e2d91af83e4a62949cadebdce34e3eb9..dbad88503c5faa7f9b4bf71342573592de1dfed4 100644
+--- a/tag16h5.c
++++ b/tag16h5.c
+@@ -27,6 +27,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ 
+ #include <stdlib.h>
+ #include "tag16h5.h"
++#include "apriltag.h"
+ 
+ static uint64_t codedata[30] = {
+    0x00000000000027c8UL,
+@@ -62,14 +63,14 @@ static uint64_t codedata[30] = {
+ };
+ apriltag_family_t *tag16h5_create()
+ {
+-   apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
++   apriltag_family_t *tf = (apriltag_family_t *) calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tag16h5");
+    tf->h = 5;
+    tf->ncodes = 30;
+    tf->codes = codedata;
+    tf->nbits = 16;
+-   tf->bit_x = calloc(16, sizeof(uint32_t));
+-   tf->bit_y = calloc(16, sizeof(uint32_t));
++   tf->bit_x = (uint32_t *) calloc(16, sizeof(uint32_t));
++   tf->bit_y = (uint32_t *) calloc(16, sizeof(uint32_t));
+    tf->bit_x[0] = 1;
+    tf->bit_y[0] = 1;
+    tf->bit_x[1] = 2;
+diff --git a/tag36h11.c b/tag36h11.c
+index 94acacaaa473d5b1bc530dee625eb7ea388f4928..f30c31ee5d7f41249e03e30543f072db11d2e6fc 100644
+--- a/tag36h11.c
++++ b/tag36h11.c
+@@ -27,6 +27,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ 
+ #include <stdlib.h>
+ #include "tag36h11.h"
++#include "apriltag.h"
+ 
+ static uint64_t codedata[587] = {
+    0x0000000d7e00984bUL,
+@@ -619,14 +620,14 @@ static uint64_t codedata[587] = {
+ };
+ apriltag_family_t *tag36h11_create()
+ {
+-   apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
++   apriltag_family_t *tf = (apriltag_family_t *) calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tag36h11");
+    tf->h = 11;
+    tf->ncodes = 587;
+    tf->codes = codedata;
+    tf->nbits = 36;
+-   tf->bit_x = calloc(36, sizeof(uint32_t));
+-   tf->bit_y = calloc(36, sizeof(uint32_t));
++   tf->bit_x = (uint32_t *) calloc(36, sizeof(uint32_t));
++   tf->bit_y = (uint32_t *) calloc(36, sizeof(uint32_t));
+    tf->bit_x[0] = 1;
+    tf->bit_y[0] = 1;
+    tf->bit_x[1] = 2;

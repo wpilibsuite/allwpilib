@@ -27,6 +27,7 @@ either expressed or implied, of the Regents of The University of Michigan.
 
 #include <stdlib.h>
 #include "tag36h11.h"
+#include "apriltag.h"
 
 static uint64_t codedata[587] = {
    0x0000000d7e00984bUL,
@@ -619,14 +620,14 @@ static uint64_t codedata[587] = {
 };
 apriltag_family_t *tag36h11_create()
 {
-   apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
+   apriltag_family_t *tf = (apriltag_family_t *) calloc(1, sizeof(apriltag_family_t));
    tf->name = strdup("tag36h11");
    tf->h = 11;
    tf->ncodes = 587;
    tf->codes = codedata;
    tf->nbits = 36;
-   tf->bit_x = calloc(36, sizeof(uint32_t));
-   tf->bit_y = calloc(36, sizeof(uint32_t));
+   tf->bit_x = (uint32_t *) calloc(36, sizeof(uint32_t));
+   tf->bit_y = (uint32_t *) calloc(36, sizeof(uint32_t));
    tf->bit_x[0] = 1;
    tf->bit_y[0] = 1;
    tf->bit_x[1] = 2;
