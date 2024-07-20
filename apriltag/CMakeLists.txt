@@ -132,10 +132,10 @@ else()
     target_compile_options(
         apriltag
         PRIVATE
-            -Wno-sign-compare
-            -Wno-gnu-zero-variadic-macro-arguments
-            -Wno-type-limits
             -Wno-format-nonliteral
+            -Wno-gnu-zero-variadic-macro-arguments
+            -Wno-sign-compare
+            -Wno-type-limits
     )
 endif()
 
