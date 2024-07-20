@@ -34,7 +34,7 @@ either expressed or implied, of the Regents of The University of Michigan.
 
 #include "zhash.h"
 #include "zarray.h"
-#include "getopt.h"
+// #include "getopt.h"
 #include "common/math_util.h"
 
 #define GOO_BOOL_TYPE 1

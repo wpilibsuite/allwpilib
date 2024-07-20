@@ -4,6 +4,7 @@ import os
 import shutil
 
 from upstream_utils import (
+    comment_out_invalid_includes,
     walk_cwd_and_copy_if,
     Lib,
 )
@@ -35,7 +36,7 @@ def copy_upstream_src(wpilib_root):
     )
 
     # Copy apriltag source files into allwpilib
-    walk_cwd_and_copy_if(
+    src_files = walk_cwd_and_copy_if(
         lambda dp, f: (f.endswith(".c") or f.endswith(".cpp"))
         and not dp.startswith("./example")
         and not f == "getopt.cpp"
@@ -45,13 +46,28 @@ def copy_upstream_src(wpilib_root):
     )
 
     # Copy apriltag header files into allwpilib
-    walk_cwd_and_copy_if(
+    include_files = walk_cwd_and_copy_if(
         lambda dp, f: f.endswith(".h")
         and not f == "getopt.h"
         and not f == "postscript_utils.h"
         and not remove_tag(f),
         os.path.join(apriltag, "src/main/native/thirdparty/apriltag/include"),
     )
+
+    for f in src_files:
+        comment_out_invalid_includes(
+            f,
+            [
+                os.path.join(apriltag, "src/main/native/thirdparty/apriltag/include"),
+                os.path.join(
+                    apriltag, "src/main/native/thirdparty/apriltag/include/common"
+                ),
+            ],
+        )
+    for f in include_files:
+        comment_out_invalid_includes(
+            f, [os.path.join(apriltag, "src/main/native/thirdparty/apriltag/include")]
+        )
 
 
 def main():
