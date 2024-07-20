@@ -58,6 +58,7 @@ def main():
     name = "apriltag"
     url = "https://github.com/AprilRobotics/apriltag.git"
     tag = "ebdb2017e04b8e36f7d8a12ce60060416a905e12"
+
     patch_list = [
         "0001-apriltag_pose.c-Set-NULL-when-second-solution-could-.patch",
         "0002-zmaxheapify-Avoid-return-of-void-expression.patch",
