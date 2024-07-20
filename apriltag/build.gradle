@@ -43,7 +43,6 @@ ext {
 evaluationDependsOn(':wpimath')
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
-apply from: "${rootDir}/shared/apriltaglib.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
@@ -114,8 +113,6 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
-
-            nativeUtils.useRequiredLibrary(it, 'apriltaglib')
         }
     }
     tasks {

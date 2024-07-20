@@ -3,24 +3,13 @@ project(apriltag)
 include(CompileWarnings)
 include(GenResources)
 
-fetchcontent_declare(
-    apriltaglib
-    GIT_REPOSITORY https://github.com/wpilibsuite/apriltag.git
-    GIT_TAG da208cc38c1b78fe89861616d44c0692e76b6b8b
-)
-
-# Don't use apriltag's CMakeLists.txt due to conflicting naming and JNI
-fetchcontent_getproperties(apriltaglib)
-if(NOT apriltaglib_POPULATED)
-    fetchcontent_populate(apriltaglib)
-endif()
-
+set(apriltaglib_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag)
 aux_source_directory(${apriltaglib_SOURCE_DIR}/common APRILTAGLIB_COMMON_SRC)
-file(GLOB TAG_FILES ${apriltaglib_SOURCE_DIR}/tag*.c)
+file(GLOB TAG_FILES ${apriltaglib_SOURCE_DIR}/src/tag*.c)
 set(APRILTAGLIB_SRCS
-    ${apriltaglib_SOURCE_DIR}/apriltag.c
-    ${apriltaglib_SOURCE_DIR}/apriltag_pose.c
-    ${apriltaglib_SOURCE_DIR}/apriltag_quad_thresh.c
+    ${apriltaglib_SOURCE_DIR}/src/apriltag.c
+    ${apriltaglib_SOURCE_DIR}/src/apriltag_pose.c
+    ${apriltaglib_SOURCE_DIR}/src/apriltag_quad_thresh.c
 )
 
 file(GLOB apriltag_jni_src src/main/native/cpp/jni/AprilTagJNI.cpp)
