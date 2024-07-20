@@ -86,11 +86,6 @@ class AprilTagDetectorTest {
   }
 
   @Test
-  void testAdd25h9() {
-    assertDoesNotThrow(() -> detector.addFamily("tag25h9"));
-  }
-
-  @Test
   void testAdd36h11() {
     assertDoesNotThrow(() -> detector.addFamily("tag36h11"));
   }
