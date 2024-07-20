@@ -130,6 +130,7 @@ def main():
     name = "eigen"
     url = "https://gitlab.com/libeigen/eigen.git"
     tag = "c4d84dfddc9f9edef0fdbe7cf9966d2f4a303198"
+
     patch_list = [
         "0001-Disable-warnings.patch",
         "0002-Intellisense-fix.patch",
