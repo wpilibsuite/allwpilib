@@ -28,9 +28,15 @@ struct wpi::Struct<frc::SwerveDriveKinematics<NumModules>> {
       std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
                    const frc::SwerveDriveKinematics<NumModules>& value);
+  static void ForEachNested(
+      std::invocable<std::string_view, std::string_view> auto fn) {
+    wpi::ForEachStructSchema<frc::Translation2d>(fn);
+  }
 };
 
 static_assert(wpi::StructSerializable<frc::SwerveDriveKinematics<4>>);
+static_assert(wpi::HasNestedStruct<frc::SwerveDriveKinematics<4>>);
 static_assert(wpi::StructSerializable<frc::SwerveDriveKinematics<3>>);
+static_assert(wpi::HasNestedStruct<frc::SwerveDriveKinematics<3>>);
 
 #include "frc/kinematics/struct/SwerveDriveKinematicsStruct.inc"

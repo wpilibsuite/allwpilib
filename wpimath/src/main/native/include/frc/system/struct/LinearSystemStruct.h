@@ -35,9 +35,18 @@ struct wpi::Struct<frc::LinearSystem<States, Inputs, Outputs>> {
       std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
                    const frc::LinearSystem<States, Inputs, Outputs>& value);
+  static void ForEachNested(
+      std::invocable<std::string_view, std::string_view> auto fn) {
+    wpi::ForEachStructSchema<frc::Matrixd<States, States>>(fn);
+    wpi::ForEachStructSchema<frc::Matrixd<States, Inputs>>(fn);
+    wpi::ForEachStructSchema<frc::Matrixd<Outputs, States>>(fn);
+    wpi::ForEachStructSchema<frc::Matrixd<Outputs, Inputs>>(fn);
+  }
 };
 
 static_assert(wpi::StructSerializable<frc::LinearSystem<4, 3, 2>>);
+static_assert(wpi::HasNestedStruct<frc::LinearSystem<4, 3, 2>>);
 static_assert(wpi::StructSerializable<frc::LinearSystem<2, 3, 4>>);
+static_assert(wpi::HasNestedStruct<frc::LinearSystem<2, 3, 4>>);
 
 #include "frc/system/struct/LinearSystemStruct.inc"
