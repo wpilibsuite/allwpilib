@@ -19,6 +19,18 @@
 using namespace wpi::java;
 using namespace wpi::log;
 
+namespace {
+class buf_ostream : public wpi::raw_uvector_ostream {
+ private:
+  std::vector<uint8_t> data;
+
+ public:
+  buf_ostream() : raw_uvector_ostream{data} {}
+
+  void clear() { data.clear(); }
+};
+}  // namespace
+
 extern "C" {
 
 /*
@@ -96,17 +108,6 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_fgCreate
   }
   return reinterpret_cast<jlong>(writer);
 }
-
-namespace {
-class buf_ostream : public wpi::raw_uvector_ostream {
- private:
-  std::vector<uint8_t> data;
- public:
-  buf_ostream() : raw_uvector_ostream{data} {}
-
-  void clear() { data.clear(); }
-};
-}  // namespace
 
 /*
  * Class:     edu_wpi_first_util_datalog_DataLogJNI
