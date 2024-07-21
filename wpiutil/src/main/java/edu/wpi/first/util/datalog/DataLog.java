@@ -269,6 +269,12 @@ public class DataLog implements AutoCloseable {
     setMetadata(entry, metadata, 0);
   }
 
+  @Override
+  public void close() {
+    DataLogJNI.close(m_impl);
+    m_impl = 0;
+  }
+
   /**
    * Appends a raw record to the log.
    *
@@ -316,12 +322,6 @@ public class DataLog implements AutoCloseable {
    */
   public void appendRaw(int entry, ByteBuffer data, int start, int len, long timestamp) {
     DataLogJNI.appendRaw(m_impl, entry, data, start, len, timestamp);
-  }
-
-  @Override
-  public void close() {
-    DataLogJNI.close(m_impl);
-    m_impl = 0;
   }
 
   /**

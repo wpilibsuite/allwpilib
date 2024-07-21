@@ -6,8 +6,10 @@
 
 #include <stdint.h>
 
+#include <algorithm>
 #include <concepts>
 #include <initializer_list>
+#include <optional>
 #include <ranges>
 #include <span>
 #include <string>
@@ -575,10 +577,60 @@ class DataLogEntry {
   int m_entry = 0;
 };
 
+template <typename T>
+class DataLogValueEntryImpl : public DataLogEntry {
+ protected:
+  DataLogValueEntryImpl() = default;
+  DataLogValueEntryImpl(DataLog& log, std::string_view name,
+                        std::string_view type, std::string_view metadata = {},
+                        int64_t timestamp = 0)
+      : DataLogEntry{log, name, type, metadata, timestamp} {}
+
+ public:
+  DataLogValueEntryImpl(DataLogValueEntryImpl&& rhs)
+      : DataLogEntry{std::move(rhs)} {
+    std::scoped_lock lock{rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+  }
+  DataLogValueEntryImpl& operator=(DataLogValueEntryImpl&& rhs) {
+    DataLogEntry::operator=(std::move(rhs));
+    std::scoped_lock lock{m_mutex, rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+    return *this;
+  }
+
+  /**
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return m_lastValue.has_value(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return Last value (empty if no last value)
+   */
+  std::optional<T> GetLastValue() const {
+    std::scoped_lock lock{m_mutex};
+    return m_lastValue;
+  }
+
+ protected:
+  mutable wpi::mutex m_mutex;
+  std::optional<T> m_lastValue;
+};
+
 /**
  * Log arbitrary byte data.
  */
-class RawLogEntry : public DataLogEntry {
+class RawLogEntry : public DataLogValueEntryImpl<std::vector<uint8_t>> {
  public:
   static constexpr std::string_view kDataType = "raw";
 
@@ -590,7 +642,7 @@ class RawLogEntry : public DataLogEntry {
       : RawLogEntry{log, name, metadata, kDataType, timestamp} {}
   RawLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
               std::string_view type, int64_t timestamp = 0)
-      : DataLogEntry{log, name, type, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, type, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -601,12 +653,24 @@ class RawLogEntry : public DataLogEntry {
   void Append(std::span<const uint8_t> data, int64_t timestamp = 0) {
     m_log->AppendRaw(m_entry, data, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const uint8_t> data, int64_t timestamp = 0);
 };
 
 /**
  * Log boolean values.
  */
-class BooleanLogEntry : public DataLogEntry {
+class BooleanLogEntry : public DataLogValueEntryImpl<bool> {
  public:
   static constexpr std::string_view kDataType = "boolean";
 
@@ -615,7 +679,7 @@ class BooleanLogEntry : public DataLogEntry {
       : BooleanLogEntry{log, name, {}, timestamp} {}
   BooleanLogEntry(DataLog& log, std::string_view name,
                   std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -626,12 +690,30 @@ class BooleanLogEntry : public DataLogEntry {
   void Append(bool value, int64_t timestamp = 0) {
     m_log->AppendBoolean(m_entry, value, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(bool value, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue != value) {
+      m_lastValue = value;
+      Append(value, timestamp);
+    }
+  }
 };
 
 /**
  * Log integer values.
  */
-class IntegerLogEntry : public DataLogEntry {
+class IntegerLogEntry : public DataLogValueEntryImpl<int64_t> {
  public:
   static constexpr std::string_view kDataType = "int64";
 
@@ -640,7 +722,7 @@ class IntegerLogEntry : public DataLogEntry {
       : IntegerLogEntry{log, name, {}, timestamp} {}
   IntegerLogEntry(DataLog& log, std::string_view name,
                   std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -651,12 +733,30 @@ class IntegerLogEntry : public DataLogEntry {
   void Append(int64_t value, int64_t timestamp = 0) {
     m_log->AppendInteger(m_entry, value, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(int64_t value, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue != value) {
+      m_lastValue = value;
+      Append(value, timestamp);
+    }
+  }
 };
 
 /**
  * Log float values.
  */
-class FloatLogEntry : public DataLogEntry {
+class FloatLogEntry : public DataLogValueEntryImpl<float> {
  public:
   static constexpr std::string_view kDataType = "float";
 
@@ -665,7 +765,7 @@ class FloatLogEntry : public DataLogEntry {
       : FloatLogEntry{log, name, {}, timestamp} {}
   FloatLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                 int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -676,12 +776,30 @@ class FloatLogEntry : public DataLogEntry {
   void Append(float value, int64_t timestamp = 0) {
     m_log->AppendFloat(m_entry, value, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(float value, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue != value) {
+      m_lastValue = value;
+      Append(value, timestamp);
+    }
+  }
 };
 
 /**
  * Log double values.
  */
-class DoubleLogEntry : public DataLogEntry {
+class DoubleLogEntry : public DataLogValueEntryImpl<double> {
  public:
   static constexpr std::string_view kDataType = "double";
 
@@ -690,7 +808,7 @@ class DoubleLogEntry : public DataLogEntry {
       : DoubleLogEntry{log, name, {}, timestamp} {}
   DoubleLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                  int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -701,12 +819,30 @@ class DoubleLogEntry : public DataLogEntry {
   void Append(double value, int64_t timestamp = 0) {
     m_log->AppendDouble(m_entry, value, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(double value, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue != value) {
+      m_lastValue = value;
+      Append(value, timestamp);
+    }
+  }
 };
 
 /**
  * Log string values.
  */
-class StringLogEntry : public DataLogEntry {
+class StringLogEntry : public DataLogValueEntryImpl<std::string> {
  public:
   static constexpr const char* kDataType = "string";
 
@@ -718,7 +854,7 @@ class StringLogEntry : public DataLogEntry {
       : StringLogEntry{log, name, metadata, kDataType, timestamp} {}
   StringLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                  std::string_view type, int64_t timestamp = 0)
-      : DataLogEntry{log, name, type, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, type, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -729,12 +865,30 @@ class StringLogEntry : public DataLogEntry {
   void Append(std::string_view value, int64_t timestamp = 0) {
     m_log->AppendString(m_entry, value, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param value Value to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::string value, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue != value) {
+      m_lastValue = value;
+      Append(value, timestamp);
+    }
+  }
 };
 
 /**
  * Log array of boolean values.
  */
-class BooleanArrayLogEntry : public DataLogEntry {
+class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
  public:
   static constexpr const char* kDataType = "boolean[]";
 
@@ -744,7 +898,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
       : BooleanArrayLogEntry{log, name, {}, timestamp} {}
   BooleanArrayLogEntry(DataLog& log, std::string_view name,
                        std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.  For find functions to work, timestamp
@@ -796,12 +950,77 @@ class BooleanArrayLogEntry : public DataLogEntry {
   void Append(std::span<const uint8_t> arr, int64_t timestamp = 0) {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const bool> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<bool> arr, int64_t timestamp = 0) {
+    Update(std::span{arr.begin(), arr.end()}, timestamp);
+  }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const int> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<int> arr, int64_t timestamp = 0) {
+    Update(std::span{arr.begin(), arr.end()}, timestamp);
+  }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const uint8_t> arr, int64_t timestamp = 0);
 };
 
 /**
  * Log array of integer values.
  */
-class IntegerArrayLogEntry : public DataLogEntry {
+class IntegerArrayLogEntry
+    : public DataLogValueEntryImpl<std::vector<int64_t>> {
  public:
   static constexpr const char* kDataType = "int64[]";
 
@@ -811,7 +1030,7 @@ class IntegerArrayLogEntry : public DataLogEntry {
       : IntegerArrayLogEntry{log, name, {}, timestamp} {}
   IntegerArrayLogEntry(DataLog& log, std::string_view name,
                        std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -832,12 +1051,38 @@ class IntegerArrayLogEntry : public DataLogEntry {
   void Append(std::initializer_list<int64_t> arr, int64_t timestamp = 0) {
     Append({arr.begin(), arr.end()}, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const int64_t> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<int64_t> arr, int64_t timestamp = 0) {
+    Update({arr.begin(), arr.end()}, timestamp);
+  }
 };
 
 /**
  * Log array of float values.
  */
-class FloatArrayLogEntry : public DataLogEntry {
+class FloatArrayLogEntry : public DataLogValueEntryImpl<std::vector<float>> {
  public:
   static constexpr const char* kDataType = "float[]";
 
@@ -846,7 +1091,7 @@ class FloatArrayLogEntry : public DataLogEntry {
       : FloatArrayLogEntry{log, name, {}, timestamp} {}
   FloatArrayLogEntry(DataLog& log, std::string_view name,
                      std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -867,12 +1112,38 @@ class FloatArrayLogEntry : public DataLogEntry {
   void Append(std::initializer_list<float> arr, int64_t timestamp = 0) {
     Append({arr.begin(), arr.end()}, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const float> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<float> arr, int64_t timestamp = 0) {
+    Update({arr.begin(), arr.end()}, timestamp);
+  }
 };
 
 /**
  * Log array of double values.
  */
-class DoubleArrayLogEntry : public DataLogEntry {
+class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
  public:
   static constexpr const char* kDataType = "double[]";
 
@@ -882,7 +1153,7 @@ class DoubleArrayLogEntry : public DataLogEntry {
       : DoubleArrayLogEntry{log, name, {}, timestamp} {}
   DoubleArrayLogEntry(DataLog& log, std::string_view name,
                       std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -903,12 +1174,39 @@ class DoubleArrayLogEntry : public DataLogEntry {
   void Append(std::initializer_list<double> arr, int64_t timestamp = 0) {
     Append({arr.begin(), arr.end()}, timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const double> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<double> arr, int64_t timestamp = 0) {
+    Update({arr.begin(), arr.end()}, timestamp);
+  }
 };
 
 /**
  * Log array of string values.
  */
-class StringArrayLogEntry : public DataLogEntry {
+class StringArrayLogEntry
+    : public DataLogValueEntryImpl<std::vector<std::string>> {
  public:
   static constexpr const char* kDataType = "string[]";
 
@@ -918,7 +1216,7 @@ class StringArrayLogEntry : public DataLogEntry {
       : StringArrayLogEntry{log, name, {}, timestamp} {}
   StringArrayLogEntry(DataLog& log, std::string_view name,
                       std::string_view metadata, int64_t timestamp = 0)
-      : DataLogEntry{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -951,6 +1249,46 @@ class StringArrayLogEntry : public DataLogEntry {
     Append(std::span<const std::string_view>{arr.begin(), arr.end()},
            timestamp);
   }
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const std::string> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const std::string_view> arr, int64_t timestamp = 0);
+
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param arr Values to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::initializer_list<std::string_view> arr,
+              int64_t timestamp = 0) {
+    Update(std::span<const std::string_view>{arr.begin(), arr.end()},
+           timestamp);
+  }
 };
 
 /**
@@ -974,6 +1312,19 @@ class StructLogEntry : public DataLogEntry {
     m_entry = log.Start(name, S::GetTypeString(info...), metadata, timestamp);
   }
 
+  StructLogEntry(StructLogEntry&& rhs)
+      : DataLogEntry{std::move(rhs)}, m_info{std::move(rhs.m_info)} {
+    std::scoped_lock lock{rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+  }
+  StructLogEntry& operator=(StructLogEntry&& rhs) {
+    DataLogEntry::operator=(std::move(rhs));
+    m_info = std::move(rhs.m_info);
+    std::scoped_lock lock{m_mutex, rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+    return *this;
+  }
+
   /**
    * Appends a record to the log.
    *
@@ -995,7 +1346,74 @@ class StructLogEntry : public DataLogEntry {
     m_log->AppendRaw(m_entry, buf, timestamp);
   }
 
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(const T& data, int64_t timestamp = 0) {
+    if constexpr (sizeof...(I) == 0) {
+      if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+        uint8_t buf[S::GetSize()];
+        S::Pack(buf, data);
+        std::scoped_lock lock{m_mutex};
+        if (m_lastValue.empty() ||
+            !std::equal(buf, buf + S::GetSize(), m_lastValue.begin(),
+                        m_lastValue.end())) {
+          m_lastValue.assign(buf, buf + S::GetSize());
+          m_log->AppendRaw(m_entry, buf, timestamp);
+        }
+        return;
+      }
+    }
+    wpi::SmallVector<uint8_t, 128> buf;
+    buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
+    std::apply([&](const I&... info) { S::Pack(buf, data, info...); }, m_info);
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue.empty() ||
+        !std::equal(buf.begin(), buf.end(), m_lastValue.begin(),
+                    m_lastValue.end())) {
+      m_lastValue.assign(buf.begin(), buf.end());
+      m_log->AppendRaw(m_entry, buf, timestamp);
+    }
+  }
+
+  /**
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return !m_lastValue.empty(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return Last value (empty if no last value)
+   */
+  std::optional<T> GetLastValue() const {
+    std::scoped_lock lock{m_mutex};
+    if (m_lastValue.empty()) {
+      return std::nullopt;
+    }
+    return std::apply(
+        [&](const I&... info) { return S::Unpack(m_lastValue, info...); },
+        m_info);
+  }
+
  private:
+  mutable wpi::mutex m_mutex;
+  std::vector<uint8_t> m_lastValue;
   [[no_unique_address]]
   std::tuple<I...> m_info;
 };
@@ -1022,6 +1440,22 @@ class StructArrayLogEntry : public DataLogEntry {
     m_entry = log.Start(
         name, MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
         metadata, timestamp);
+  }
+
+  StructArrayLogEntry(StructArrayLogEntry&& rhs)
+      : DataLogEntry{std::move(rhs)},
+        m_buf{std::move(rhs.m_buf)},
+        m_info{std::move(rhs.m_info)} {
+    std::scoped_lock lock{rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+  }
+  StructArrayLogEntry& operator=(StructArrayLogEntry&& rhs) {
+    DataLogEntry::operator=(std::move(rhs));
+    m_buf = std::move(rhs.m_buf);
+    m_info = std::move(rhs.m_info);
+    std::scoped_lock lock{m_mutex, rhs.m_mutex};
+    m_lastValue = std::move(rhs.m_lastValue);
+    return *this;
   }
 
   /**
@@ -1063,8 +1497,81 @@ class StructArrayLogEntry : public DataLogEntry {
         m_info);
   }
 
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(std::span<const T> data, int64_t timestamp = 0) {
+    std::apply(
+        [&](const I&... info) {
+          m_buf.Write(
+              data,
+              [&](auto bytes) {
+                std::scoped_lock lock{m_mutex};
+                if (!m_lastValue.has_value()) {
+                  m_lastValue = std::vector(bytes.begin(), bytes.end());
+                  m_log->AppendRaw(m_entry, bytes, timestamp);
+                } else if (!std::equal(bytes.begin(), bytes.end(),
+                                       m_lastValue->begin(),
+                                       m_lastValue->end())) {
+                  m_lastValue->assign(bytes.begin(), bytes.end());
+                  m_log->AppendRaw(m_entry, bytes, timestamp);
+                }
+              },
+              info...);
+        },
+        m_info);
+  }
+
+  /**
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return m_lastValue.has_value(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return Last value (empty if no last value)
+   */
+  std::optional<std::vector<T>> GetLastValue() const {
+    std::scoped_lock lock{m_mutex};
+    if (!m_lastValue.has_value()) {
+      return std::nullopt;
+    }
+    auto& lastValue = m_lastValue.value();
+    size_t size = std::apply(S::GetSize, m_info);
+    std::vector<T> rv;
+    rv.reserve(lastValue.size() / size);
+    for (auto in = lastValue.begin(), end = lastValue.end(); in < end;
+         in += size) {
+      std::apply(
+          [&](const I&... info) {
+            rv.emplace_back(S::Unpack(
+                std::span<const uint8_t>{std::to_address(in), size}, info...));
+          },
+          m_info);
+    }
+    return rv;
+  }
+
  private:
+  mutable wpi::mutex m_mutex;
   StructArrayBuffer<T, I...> m_buf;
+  std::optional<std::vector<uint8_t>> m_lastValue;
   [[no_unique_address]]
   std::tuple<I...> m_info;
 };
@@ -1102,9 +1609,60 @@ class ProtobufLogEntry : public DataLogEntry {
     m_log->AppendRaw(m_entry, buf, timestamp);
   }
 
+  /**
+   * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
+   * @param data Data to record
+   * @param timestamp Time stamp (may be 0 to indicate now)
+   */
+  void Update(const T& data, int64_t timestamp = 0) {
+    std::scoped_lock lock{m_mutex};
+    wpi::SmallVector<uint8_t, 128> buf;
+    m_msg.Pack(buf, data);
+    if (!m_lastValue.has_value()) {
+      m_lastValue = std::vector(buf.begin(), buf.end());
+      m_log->AppendRaw(m_entry, buf, timestamp);
+    } else if (!std::equal(buf.begin(), buf.end(), m_lastValue->begin(),
+                           m_lastValue->end())) {
+      m_lastValue->assign(buf.begin(), buf.end());
+      m_log->AppendRaw(m_entry, buf, timestamp);
+    }
+  }
+
+  /**
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return m_lastValue.has_value(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return Last value (empty if no last value)
+   */
+  std::optional<T> GetLastValue() const {
+    std::scoped_lock lock{m_mutex};
+    if (!m_lastValue.has_value()) {
+      return std::nullopt;
+    }
+    return m_msg.Unpack(m_lastValue);
+  }
+
  private:
-  wpi::mutex m_mutex;
+  mutable wpi::mutex m_mutex;
   ProtobufMessage<T> m_msg;
+  std::optional<std::vector<uint8_t>> m_lastValue;
 };
 
 }  // namespace wpi::log
