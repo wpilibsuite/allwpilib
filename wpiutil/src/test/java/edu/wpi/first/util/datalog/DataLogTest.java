@@ -347,19 +347,76 @@ class DataLogTest {
   void testStringUpdate() {
     StringLogEntry entry = new StringLogEntry(log, "a", 5);
     assertFalse(entry.hasLastValue());
+
     entry.update("x", 7);
     log.flush();
     assertEquals(45, data.size());
     assertTrue(entry.hasLastValue());
     assertEquals("x", entry.getLastValue());
+
     entry.update("x", 8);
     log.flush();
     assertEquals(45, data.size());
+
     entry.update("y", 9);
     log.flush();
     assertEquals(50, data.size());
     assertTrue(entry.hasLastValue());
     assertEquals("y", entry.getLastValue());
+
+    entry.update("yy", 10);
+    log.flush();
+    assertEquals(56, data.size());
+    assertTrue(entry.hasLastValue());
+    assertEquals("yy", entry.getLastValue());
+
+    entry.update("", 11);
+    log.flush();
+    assertEquals(60, data.size());
+    assertTrue(entry.hasLastValue());
+    assertEquals("", entry.getLastValue());
+  }
+
+  @Test
+  void testRawAppend() {
+    RawLogEntry entry = new RawLogEntry(log, "a", 5);
+    entry.append(new byte[] {5}, 7);
+    log.flush();
+    assertEquals(42, data.size());
+  }
+
+  @Test
+  void testRawUpdate() {
+    RawLogEntry entry = new RawLogEntry(log, "a", 5);
+    assertFalse(entry.hasLastValue());
+
+    entry.update(new byte[] {5}, 7);
+    log.flush();
+    assertEquals(42, data.size());
+    assertTrue(entry.hasLastValue());
+    assertArrayEquals(new byte[] {5}, entry.getLastValue());
+
+    entry.update(new byte[] {5}, 8);
+    log.flush();
+    assertEquals(42, data.size());
+
+    entry.update(new byte[] {6}, 9);
+    log.flush();
+    assertEquals(47, data.size());
+    assertTrue(entry.hasLastValue());
+    assertArrayEquals(new byte[] {6}, entry.getLastValue());
+
+    entry.update(new byte[] {6, 6}, 10);
+    log.flush();
+    assertEquals(53, data.size());
+    assertTrue(entry.hasLastValue());
+    assertArrayEquals(new byte[] {6, 6}, entry.getLastValue());
+
+    entry.update(new byte[] {}, 11);
+    log.flush();
+    assertEquals(57, data.size());
+    assertTrue(entry.hasLastValue());
+    assertArrayEquals(new byte[] {}, entry.getLastValue());
   }
 
   @Test

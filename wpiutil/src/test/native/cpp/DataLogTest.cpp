@@ -249,20 +249,75 @@ TEST_F(DataLogTest, StringAppend) {
 
 TEST_F(DataLogTest, StringUpdate) {
   wpi::log::StringLogEntry entry{log, "a", 5};
-  ASSERT_FALSE(entry.GetLastValue().has_value());
+  ASSERT_FALSE(entry.HasLastValue());
+
   entry.Update("x", 7);
   log.Flush();
   ASSERT_EQ(data.size(), 45u);
   ASSERT_TRUE(entry.GetLastValue().has_value());
   ASSERT_EQ(entry.GetLastValue().value(), "x");
+
   entry.Update("x", 8);
   log.Flush();
   ASSERT_EQ(data.size(), 45u);
+
   entry.Update("y", 9);
   log.Flush();
   ASSERT_EQ(data.size(), 50u);
   ASSERT_TRUE(entry.GetLastValue().has_value());
   ASSERT_EQ(entry.GetLastValue().value(), "y");
+
+  entry.Update("yy", 10);
+  log.Flush();
+  ASSERT_EQ(data.size(), 56u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), "yy");
+
+  entry.Update("", 11);
+  log.Flush();
+  ASSERT_EQ(data.size(), 60u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), "");
+}
+
+TEST_F(DataLogTest, RawAppend) {
+  wpi::log::RawLogEntry entry{log, "a", 5};
+  entry.Append({{5}}, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 42u);
+}
+
+TEST_F(DataLogTest, RawUpdate) {
+  wpi::log::RawLogEntry entry{log, "a", 5};
+  ASSERT_FALSE(entry.HasLastValue());
+
+  entry.Update({{5}}, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 42u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), std::vector<uint8_t>{5});
+
+  entry.Update({{5}}, 8);
+  log.Flush();
+  ASSERT_EQ(data.size(), 42u);
+
+  entry.Update({{6}}, 9);
+  log.Flush();
+  ASSERT_EQ(data.size(), 47u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), std::vector<uint8_t>{6});
+
+  entry.Update({{6, 6}}, 9);
+  log.Flush();
+  ASSERT_EQ(data.size(), 53u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), (std::vector<uint8_t>{6, 6}));
+
+  entry.Update(std::span<const uint8_t>{}, 10);
+  log.Flush();
+  ASSERT_EQ(data.size(), 57u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), std::vector<uint8_t>{});
 }
 
 TEST_F(DataLogTest, BooleanArrayAppendEmpty) {
