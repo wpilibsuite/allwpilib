@@ -25,7 +25,8 @@ wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>>::Unpack(
           units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
               m->kv()},
           units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
-              m->ka()}};
+              m->ka()},
+          units::second_t{m->dt()}};
 }
 
 template <class Distance>
@@ -40,4 +41,5 @@ void wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>>::Pack(
   m->set_ka(units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
       value.GetKa()}
                 .value());
+  m->set_dt(units::second_t{value.GetDt()}.value());
 }

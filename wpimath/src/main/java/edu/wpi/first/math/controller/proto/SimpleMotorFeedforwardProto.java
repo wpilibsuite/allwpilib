@@ -28,11 +28,11 @@ public final class SimpleMotorFeedforwardProto
 
   @Override
   public SimpleMotorFeedforward unpack(ProtobufSimpleMotorFeedforward msg) {
-    return new SimpleMotorFeedforward(msg.getKs(), msg.getKv(), msg.getKa());
+    return new SimpleMotorFeedforward(msg.getKs(), msg.getKv(), msg.getKa(), msg.getDt());
   }
 
   @Override
   public void pack(ProtobufSimpleMotorFeedforward msg, SimpleMotorFeedforward value) {
-    msg.setKs(value.getKs()).setKv(value.getKv()).setKa(value.getKa());
+    msg.setKs(value.getKs()).setKv(value.getKv()).setKa(value.getKa()).setDt(value.getDt());
   }
 }

@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.ProtoTestBase;
 class SimpleMotorFeedforwardProtoTest
     extends ProtoTestBase<SimpleMotorFeedforward, ProtobufSimpleMotorFeedforward> {
   SimpleMotorFeedforwardProtoTest() {
-    super(new SimpleMotorFeedforward(0.4, 4.0, 0.7), SimpleMotorFeedforward.proto);
+    super(new SimpleMotorFeedforward(0.4, 4.0, 0.7, 0.025), SimpleMotorFeedforward.proto);
   }
 
   @Override
@@ -22,5 +22,6 @@ class SimpleMotorFeedforwardProtoTest
     assertEquals(testData.getKs(), data.getKs());
     assertEquals(testData.getKv(), data.getKv());
     assertEquals(testData.getKa(), data.getKa());
+    assertEquals(testData.getDt(), data.getDt());
   }
 }

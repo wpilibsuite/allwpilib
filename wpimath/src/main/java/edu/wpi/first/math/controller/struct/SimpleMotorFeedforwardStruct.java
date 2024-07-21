@@ -21,12 +21,12 @@ public final class SimpleMotorFeedforwardStruct implements Struct<SimpleMotorFee
 
   @Override
   public int getSize() {
-    return kSizeDouble * 3;
+    return kSizeDouble * 4;
   }
 
   @Override
   public String getSchema() {
-    return "double ks;double kv;double ka";
+    return "double ks;double kv;double ka;double dt";
   }
 
   @Override
@@ -34,7 +34,8 @@ public final class SimpleMotorFeedforwardStruct implements Struct<SimpleMotorFee
     double ks = bb.getDouble();
     double kv = bb.getDouble();
     double ka = bb.getDouble();
-    return new SimpleMotorFeedforward(ks, kv, ka);
+    double dt = bb.getDouble();
+    return new SimpleMotorFeedforward(ks, kv, ka, dt);
   }
 
   @Override
@@ -42,5 +43,6 @@ public final class SimpleMotorFeedforwardStruct implements Struct<SimpleMotorFee
     bb.putDouble(value.getKs());
     bb.putDouble(value.getKv());
     bb.putDouble(value.getKa());
+    bb.putDouble(value.getDt());
   }
 }

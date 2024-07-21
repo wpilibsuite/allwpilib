@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.StructTestBase;
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class SimpleMotorFeedforwardStructTest extends StructTestBase<SimpleMotorFeedforward> {
   SimpleMotorFeedforwardStructTest() {
-    super(new SimpleMotorFeedforward(0.4, 4.0, 0.7), SimpleMotorFeedforward.struct);
+    super(new SimpleMotorFeedforward(0.4, 4.0, 0.7, 0.025), SimpleMotorFeedforward.struct);
   }
 
   @Override
@@ -20,5 +20,6 @@ class SimpleMotorFeedforwardStructTest extends StructTestBase<SimpleMotorFeedfor
     assertEquals(testData.getKs(), data.getKs());
     assertEquals(testData.getKv(), data.getKv());
     assertEquals(testData.getKa(), data.getKa());
+    assertEquals(testData.getDt(), data.getDt());
   }
 }

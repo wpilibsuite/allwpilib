@@ -17,9 +17,9 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
   static constexpr std::string_view GetTypeString() {
     return "struct:SimpleMotorFeedforward";
   }
-  static constexpr size_t GetSize() { return 24; }
+  static constexpr size_t GetSize() { return 32; }
   static constexpr std::string_view GetSchema() {
-    return "double ks;double kv;double ka";
+    return "double ks;double kv;double ka;double dt";
   }
 
   static frc::SimpleMotorFeedforward<Distance> Unpack(
