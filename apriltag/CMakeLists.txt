@@ -2,27 +2,34 @@ project(apriltag)
 
 include(CompileWarnings)
 include(GenResources)
-include(FetchContent)
 
-fetchcontent_declare(
-    apriltaglib
-    GIT_REPOSITORY https://github.com/wpilibsuite/apriltag.git
-    GIT_TAG da208cc38c1b78fe89861616d44c0692e76b6b8b
+file(
+    GLOB_RECURSE apriltaglib_src
+    src/main/native/thirdparty/apriltag/src/*.c
+    src/main/native/thirdparty/apriltag/src/*.cpp
 )
 
-# Don't use apriltag's CMakeLists.txt due to conflicting naming and JNI
-fetchcontent_getproperties(apriltaglib)
-if(NOT apriltaglib_POPULATED)
-    fetchcontent_populate(apriltaglib)
+# Disable apriltag C library warnings
+if(MSVC)
+    set_source_files_properties(
+        ${apriltaglib_src}
+        PROPERTIES COMPILE_FLAGS "/wd2220 /wd4005 /wd4018 /wd4244 /wd4267 /wd4996"
+    )
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set_source_files_properties(
+        ${apriltaglib_src}
+        PROPERTIES
+            COMPILE_FLAGS
+                "-Wno-format-nonliteral -Wno-gnu-zero-variadic-macro-arguments -Wno-uninitialized -Wno-sign-compare -Wno-type-limits"
+    )
+else()
+    set_source_files_properties(
+        ${apriltaglib_src}
+        PROPERTIES
+            COMPILE_FLAGS
+                "-Wno-format-nonliteral -Wno-gnu-zero-variadic-macro-arguments -Wno-maybe-uninitialized -Wno-sign-compare -Wno-type-limits"
+    )
 endif()
-
-aux_source_directory(${apriltaglib_SOURCE_DIR}/common APRILTAGLIB_COMMON_SRC)
-file(GLOB TAG_FILES ${apriltaglib_SOURCE_DIR}/tag*.c)
-set(APRILTAGLIB_SRCS
-    ${apriltaglib_SOURCE_DIR}/apriltag.c
-    ${apriltaglib_SOURCE_DIR}/apriltag_pose.c
-    ${apriltaglib_SOURCE_DIR}/apriltag_quad_thresh.c
-)
 
 file(GLOB apriltag_jni_src src/main/native/cpp/jni/AprilTagJNI.cpp)
 
@@ -72,7 +79,7 @@ if(WITH_JAVA)
     install_jar(apriltag_jar DESTINATION ${java_lib_dest})
     install_jar_exports(TARGETS apriltag_jar FILE apriltag_jar.cmake DESTINATION share/apriltag)
 
-    add_library(apriltagjni ${apriltag_jni_src})
+    add_library(apriltagjni ${apriltag_jni_src} ${apriltaglib_src})
     wpilib_target_warnings(apriltagjni)
     target_link_libraries(apriltagjni PUBLIC apriltag)
 
@@ -109,32 +116,12 @@ generate_resources(
 
 file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)
 
-add_library(
-    apriltag
-    ${apriltag_native_src}
-    ${apriltag_resources_src}
-    ${APRILTAGLIB_SRCS}
-    ${APRILTAGLIB_COMMON_SRC}
-    ${TAG_FILES}
-)
+add_library(apriltag ${apriltag_native_src} ${apriltag_resources_src} ${apriltaglib_src})
 set_target_properties(apriltag PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET apriltag PROPERTY FOLDER "libraries")
 target_compile_features(apriltag PUBLIC cxx_std_20)
 wpilib_target_warnings(apriltag)
-# disable warnings that apriltaglib can't handle
-if(MSVC)
-    target_compile_options(apriltag PRIVATE /wd4018 /wd4005 /wd4996)
-else()
-    target_compile_options(
-        apriltag
-        PRIVATE
-            -Wno-sign-compare
-            -Wno-gnu-zero-variadic-macro-arguments
-            -Wno-type-limits
-            -Wno-format-nonliteral
-    )
-endif()
 
 target_link_libraries(apriltag wpimath)
 
@@ -144,6 +131,19 @@ target_include_directories(
         $<BUILD_INTERFACE:${apriltaglib_SOURCE_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/apriltag>
+)
+
+install(
+    DIRECTORY src/main/native/thirdparty/apriltag/include/
+    DESTINATION "${include_dest}/apriltag"
+)
+target_include_directories(
+    apriltag
+    SYSTEM
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include/common>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/src>
 )
 
 install(TARGETS apriltag EXPORT apriltag)

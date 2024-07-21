@@ -30,6 +30,11 @@ jobs:
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
+      - name: Run apriltag.py
+        run: |
+          cd upstream_utils
+          ./apriltag.py clone
+          ./apriltag.py copy-upstream-to-thirdparty
       - name: Run eigen.py
         run: |
           cd upstream_utils
