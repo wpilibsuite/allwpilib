@@ -15,18 +15,17 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class automatically runs the {@link CommandScheduler} for you. If you change the name of this class or the package after creating this project, you must also update the Main.java file in the project.
-*/
+ */
 public class Robot extends CommandRobot {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController = new CommandXboxController(
-      OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController m_driverController =
+      new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /**
-   * This function is run when the robot is first started up and should be used
-   * for any
+   * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
@@ -39,7 +38,8 @@ public class Robot extends CommandRobot {
     // cancelling on release.
     m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
 
-    m_autoChooser.setDefaultOption("Example Auto", Autos.exampleAuto(m_exampleSubsystem)); // An example command will be
-                                                                                           // run in autonomous
+    m_autoChooser.setDefaultOption(
+        "Example Auto", Autos.exampleAuto(m_exampleSubsystem)); // An example command will be
+    // run in autonomous
   }
 }
