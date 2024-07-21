@@ -245,16 +245,44 @@ class SimpleMotorFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 
-  /** The static gain. */
-  const units::volt_t kS;
+  /**
+   * Returns the static gain.
+   *
+   * @return The static gain.
+   */
+  units::volt_t GetKs() const { return kS; }
 
-  /** The velocity gain. */
-  const units::unit_t<kv_unit> kV;
+  /**
+   * Returns the velocity gain.
+   *
+   * @return The velocity gain.
+   */
+  units::unit_t<kv_unit> GetKv() const { return kV; }
 
-  /** The acceleration gain. */
-  const units::unit_t<ka_unit> kA;
+  /**
+   * Returns the acceleration gain.
+   *
+   * @return The acceleration gain.
+   */
+  units::unit_t<ka_unit> GetKa() const { return kA; }
+
+  /**
+   * Returns the period.
+   *
+   * @return The period.
+   */
+  units::second_t GetDt() const { return m_dt; }
 
  private:
+  /** The static gain. */
+  units::volt_t kS;
+
+  /** The velocity gain. */
+  units::unit_t<kv_unit> kV;
+
+  /** The acceleration gain. */
+  units::unit_t<ka_unit> kA;
+
   /** The period. */
   units::second_t m_dt;
 };

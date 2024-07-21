@@ -39,8 +39,8 @@ public final class SimpleMotorFeedforwardStruct implements Struct<SimpleMotorFee
 
   @Override
   public void pack(ByteBuffer bb, SimpleMotorFeedforward value) {
-    bb.putDouble(value.ks);
-    bb.putDouble(value.kv);
-    bb.putDouble(value.ka);
+    bb.putDouble(value.getKs());
+    bb.putDouble(value.getKv());
+    bb.putDouble(value.getKa());
   }
 }

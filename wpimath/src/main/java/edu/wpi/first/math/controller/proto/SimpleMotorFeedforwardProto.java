@@ -33,6 +33,6 @@ public final class SimpleMotorFeedforwardProto
 
   @Override
   public void pack(ProtobufSimpleMotorFeedforward msg, SimpleMotorFeedforward value) {
-    msg.setKs(value.ks).setKv(value.kv).setKa(value.ka);
+    msg.setKs(value.getKs()).setKv(value.getKv()).setKa(value.getKa());
   }
 }

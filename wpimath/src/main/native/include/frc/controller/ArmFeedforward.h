@@ -192,17 +192,46 @@ class WPILIB_DLLEXPORT ArmFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, angle, velocity);
   }
 
+  /**
+   * Returns the static gain.
+   *
+   * @return The static gain.
+   */
+  units::volt_t GetKs() const { return kS; }
+
+  /**
+   * Returns the gravity gain.
+   *
+   * @return The gravity gain.
+   */
+  units::volt_t GetKg() const { return kG; }
+
+  /**
+   * Returns the velocity gain.
+   *
+   * @return The velocity gain.
+   */
+  units::unit_t<kv_unit> GetKv() const { return kV; }
+
+  /**
+   * Returns the acceleration gain.
+   *
+   * @return The acceleration gain.
+   */
+  units::unit_t<ka_unit> GetKa() const { return kA; }
+
+ private:
   /// The static gain, in volts.
-  const units::volt_t kS;
+  units::volt_t kS;
 
   /// The gravity gain, in volts.
-  const units::volt_t kG;
+  units::volt_t kG;
 
-  /// The velocity gain, in volt seconds per radian.
-  const units::unit_t<kv_unit> kV;
+  /// The velocity gain, in V/(rad/s)volt seconds per radian.
+  units::unit_t<kv_unit> kV;
 
-  /// The acceleration gain, in volt seconds² per radian.
-  const units::unit_t<ka_unit> kA;
+  /// The acceleration gain, in V/(rad/s²).
+  units::unit_t<ka_unit> kA;
 };
 }  // namespace frc
 

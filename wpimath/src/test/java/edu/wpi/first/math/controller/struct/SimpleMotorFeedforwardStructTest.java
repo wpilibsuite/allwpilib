@@ -17,8 +17,8 @@ class SimpleMotorFeedforwardStructTest extends StructTestBase<SimpleMotorFeedfor
 
   @Override
   public void checkEquals(SimpleMotorFeedforward testData, SimpleMotorFeedforward data) {
-    assertEquals(testData.ks, data.ks);
-    assertEquals(testData.kv, data.kv);
-    assertEquals(testData.ka, data.ka);
+    assertEquals(testData.getKs(), data.getKs());
+    assertEquals(testData.getKv(), data.getKv());
+    assertEquals(testData.getKa(), data.getKa());
   }
 }

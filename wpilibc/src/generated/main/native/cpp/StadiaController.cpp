@@ -7,6 +7,7 @@
 #include "frc/StadiaController.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/event/BooleanEvent.h"
 
@@ -294,4 +295,28 @@ bool StadiaController::GetLeftBumperReleased() {
 
 bool StadiaController::GetRightBumperReleased() {
   return GetRawButtonReleased(Button::kRightBumper);
+}
+
+void StadiaController::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("HID");
+  builder.PublishConstString("ControllerType", "Stadia");
+  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
+  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
+  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
+  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
+  builder.AddBooleanProperty("A", [this] { return GetAButton(); }, nullptr);
+  builder.AddBooleanProperty("B", [this] { return GetBButton(); }, nullptr);
+  builder.AddBooleanProperty("X", [this] { return GetXButton(); }, nullptr);
+  builder.AddBooleanProperty("Y", [this] { return GetYButton(); }, nullptr);
+  builder.AddBooleanProperty("LeftBumper", [this] { return GetLeftBumperButton(); }, nullptr);
+  builder.AddBooleanProperty("RightBumper", [this] { return GetRightBumperButton(); }, nullptr);
+  builder.AddBooleanProperty("LeftStick", [this] { return GetLeftStickButton(); }, nullptr);
+  builder.AddBooleanProperty("RightStick", [this] { return GetRightStickButton(); }, nullptr);
+  builder.AddBooleanProperty("Ellipses", [this] { return GetEllipsesButton(); }, nullptr);
+  builder.AddBooleanProperty("Hamburger", [this] { return GetHamburgerButton(); }, nullptr);
+  builder.AddBooleanProperty("Stadia", [this] { return GetStadiaButton(); }, nullptr);
+  builder.AddBooleanProperty("RightTrigger", [this] { return GetRightTriggerButton(); }, nullptr);
+  builder.AddBooleanProperty("LeftTrigger", [this] { return GetLeftTriggerButton(); }, nullptr);
+  builder.AddBooleanProperty("Google", [this] { return GetGoogleButton(); }, nullptr);
+  builder.AddBooleanProperty("Frame", [this] { return GetFrameButton(); }, nullptr);
 }

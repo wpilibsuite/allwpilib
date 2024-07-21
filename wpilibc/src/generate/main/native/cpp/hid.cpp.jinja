@@ -9,6 +9,7 @@
 #include "frc/{{ ConsoleName }}Controller.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/event/BooleanEvent.h"
 
@@ -77,7 +78,7 @@ bool {{ ConsoleName }}Controller::GetLeftBumperReleased() {
 bool {{ ConsoleName }}Controller::GetRightBumperReleased() {
   return GetRawButtonReleased(Button::kRightBumper);
 }
-{% elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
+{%- elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
 bool {{ ConsoleName }}Controller::GetTouchpad() const {
   return GetRawButton(Button::kTouchpad);
 }
@@ -89,4 +90,18 @@ bool {{ ConsoleName }}Controller::GetTouchpadPressed() {
 bool {{ ConsoleName }}Controller::GetTouchpadReleased() {
   return GetRawButtonReleased(Button::kTouchpad);
 }
-{% endif %}
+{%- endif %}
+
+void {{ ConsoleName }}Controller::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("HID");
+  builder.PublishConstString("ControllerType", "{{ ConsoleName }}");
+{%- for trigger in triggers %}
+  builder.AddDoubleProperty("{{ capitalize_first(trigger.name) }}", [this] { return Get{{ capitalize_first(trigger.name) }}Axis(); }, nullptr);
+{%- endfor -%}
+{% for stick in sticks %}
+  builder.AddDoubleProperty("{{ stick.NameParts|map("capitalize")|join }}", [this] { return Get{{ stick.NameParts|map("capitalize")|join }}(); }, nullptr);
+{%- endfor -%}
+{% for button in buttons %}
+  builder.AddBooleanProperty("{{ capitalize_first(button.name) }}", [this] { return Get{{ capitalize_first(button.name) }}Button(); }, nullptr);
+{%- endfor %}
+}

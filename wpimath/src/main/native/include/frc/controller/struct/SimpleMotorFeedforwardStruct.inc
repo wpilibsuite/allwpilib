@@ -27,15 +27,15 @@ void wpi::Struct<frc::SimpleMotorFeedforward<Distance>>::Pack(
   constexpr size_t kKsOff = 0;
   constexpr size_t kKvOff = kKsOff + 8;
   constexpr size_t kKaOff = kKvOff + 8;
-  wpi::PackStruct<kKsOff>(data, value.kS.value());
+  wpi::PackStruct<kKsOff>(data, value.GetKs().value());
   wpi::PackStruct<kKvOff>(
       data,
       units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
-          value.kV}
+          value.GetKv()}
           .value());
   wpi::PackStruct<kKaOff>(
       data,
       units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
-          value.kA}
+          value.GetKa()}
           .value());
 }

@@ -30,9 +30,9 @@ TEST(InterruptTest, AsynchronousInterrupt) {
   frc::Wait(0.5_s);
   DIOSim digitalSim{di};
   digitalSim.SetValue(false);
-  frc::Wait(10_ms);
+  frc::Wait(20_ms);
   digitalSim.SetValue(true);
-  frc::Wait(10_ms);
+  frc::Wait(20_ms);
 
   int count = 0;
   while (!hasFired) {
@@ -59,9 +59,9 @@ TEST(InterruptTest, RisingEdge) {
   digitalSim.SetValue(false);
   frc::Wait(0.5_s);
   interrupt.Enable();
-  frc::Wait(10_ms);
+  frc::Wait(20_ms);
   digitalSim.SetValue(true);
-  frc::Wait(10_ms);
+  frc::Wait(20_ms);
 
   int count = 0;
   while (!hasFiredRisingEdge) {
@@ -89,9 +89,9 @@ TEST(InterruptTest, FallingEdge) {
   digitalSim.SetValue(true);
   frc::Wait(0.5_s);
   interrupt.Enable();
-  frc::Wait(10_ms);
+  frc::Wait(20_ms);
   digitalSim.SetValue(false);
-  frc::Wait(10_ms);
+  frc::Wait(20_ms);
 
   int count = 0;
   while (!hasFiredFallingEdge) {

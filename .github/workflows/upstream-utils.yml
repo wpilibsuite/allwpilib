@@ -45,6 +45,11 @@ jobs:
           cd upstream_utils
           ./gcem.py clone
           ./gcem.py copy-upstream-to-thirdparty
+      - name: Run googletest.py
+        run: |
+          cd upstream_utils
+          ./googletest.py clone
+          ./googletest.py copy-upstream-to-thirdparty
       - name: Run json.py
         run: |
           cd upstream_utils

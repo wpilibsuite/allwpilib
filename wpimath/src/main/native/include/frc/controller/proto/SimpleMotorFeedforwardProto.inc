@@ -33,11 +33,11 @@ void wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>>::Pack(
     google::protobuf::Message* msg,
     const frc::SimpleMotorFeedforward<Distance>& value) {
   auto m = static_cast<wpi::proto::ProtobufSimpleMotorFeedforward*>(msg);
-  m->set_ks(value.kS.value());
+  m->set_ks(value.GetKs().value());
   m->set_kv(units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
-      value.kV}
+      value.GetKv()}
                 .value());
   m->set_ka(units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
-      value.kA}
+      value.GetKa()}
                 .value());
 }

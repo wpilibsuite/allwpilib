@@ -20,9 +20,9 @@ struct SimpleMotorFeedforwardStructTestData {
                                         units::volt_t{0.7} / 1_mps_sq};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.kS.value(), data.kS.value());
-    EXPECT_EQ(testData.kV.value(), data.kV.value());
-    EXPECT_EQ(testData.kA.value(), data.kA.value());
+    EXPECT_EQ(testData.GetKs().value(), data.GetKs().value());
+    EXPECT_EQ(testData.GetKv().value(), data.GetKv().value());
+    EXPECT_EQ(testData.GetKa().value(), data.GetKa().value());
   }
 };
 
