@@ -200,15 +200,15 @@ TEST_F(DataLogTest, FloatAppend) {
 TEST_F(DataLogTest, FloatUpdate) {
   wpi::log::FloatLogEntry entry{log, "a", 5};
   ASSERT_FALSE(entry.GetLastValue().has_value());
-  entry.Update(0.0, 7);
+  entry.Update(0.0f, 7);
   log.Flush();
   ASSERT_EQ(data.size(), 47u);
   ASSERT_TRUE(entry.GetLastValue().has_value());
-  ASSERT_EQ(entry.GetLastValue().value(), 0.0);
-  entry.Update(0.0, 8);
+  ASSERT_EQ(entry.GetLastValue().value(), 0.0f);
+  entry.Update(0.0f, 8);
   log.Flush();
   ASSERT_EQ(data.size(), 47u);
-  entry.Update(0.1, 9);
+  entry.Update(0.1f, 9);
   log.Flush();
   ASSERT_EQ(data.size(), 55u);
   ASSERT_TRUE(entry.GetLastValue().has_value());
@@ -385,7 +385,7 @@ TEST_F(DataLogTest, FloatArrayAppendEmpty) {
 
 TEST_F(DataLogTest, FloatArrayAppend) {
   wpi::log::FloatArrayLogEntry entry{log, "a", 5};
-  entry.Append({1.0}, 7);
+  entry.Append({1.0f}, 7);
   log.Flush();
   ASSERT_EQ(data.size(), 49u);
 }
@@ -393,19 +393,19 @@ TEST_F(DataLogTest, FloatArrayAppend) {
 TEST_F(DataLogTest, FloatArrayUpdate) {
   wpi::log::FloatArrayLogEntry entry{log, "a", 5};
   ASSERT_FALSE(entry.GetLastValue().has_value());
-  entry.Update({1.0}, 7);
+  entry.Update({1.0f}, 7);
   log.Flush();
   ASSERT_EQ(data.size(), 49u);
   ASSERT_TRUE(entry.GetLastValue().has_value());
-  ASSERT_EQ(entry.GetLastValue().value(), std::vector<float>{1.0});
-  entry.Update({1.0}, 8);
+  ASSERT_EQ(entry.GetLastValue().value(), std::vector<float>{1.0f});
+  entry.Update({1.0f}, 8);
   log.Flush();
   ASSERT_EQ(data.size(), 49u);
-  entry.Update({2.0}, 9);
+  entry.Update({2.0f}, 9);
   log.Flush();
   ASSERT_EQ(data.size(), 57u);
   ASSERT_TRUE(entry.GetLastValue().has_value());
-  ASSERT_EQ(entry.GetLastValue().value(), std::vector<float>{2.0});
+  ASSERT_EQ(entry.GetLastValue().value(), std::vector<float>{2.0f});
   entry.Update(std::span<const float>{}, 10);
   log.Flush();
   ASSERT_EQ(data.size(), 61u);
