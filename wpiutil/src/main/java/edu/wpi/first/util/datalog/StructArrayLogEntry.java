@@ -211,6 +211,22 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
   }
 
   /**
+   * Gets whether there is a last value.
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  public boolean hasLastValue() {
+    synchronized (m_buf) {
+      if (m_immutable) {
+        return m_lastValue != null;
+      } else if (m_cloneable && m_lastValue != null) {
+        return true;
+      }
+      return m_lastValueBuf != null;
+    }
+  }
+
+  /**
    * Gets the last value.
    *
    * @return Last value, or null if none.
@@ -218,18 +234,16 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
   @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
   public T[] getLastValue() {
     synchronized (m_buf) {
-      if (m_immutable || m_cloneable) {
+      if (m_immutable) {
         if (m_lastValue == null) {
           return null;
         }
-        if (m_immutable) {
-          return Arrays.copyOf(m_lastValue, m_lastValueLen);
-        } else {
-          try {
-            return cloneArray(m_lastValue);
-          } catch (CloneNotSupportedException e) {
-            // fall through
-          }
+        return Arrays.copyOf(m_lastValue, m_lastValueLen);
+      } else if (m_cloneable && m_lastValue != null) {
+        try {
+          return cloneArray(m_lastValue, m_lastValueLen);
+        } catch (CloneNotSupportedException e) {
+          // fall through
         }
       }
       if (m_lastValueBuf == null) {
@@ -276,11 +290,11 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
     return true;
   }
 
-  private T[] cloneArray(T[] in) throws CloneNotSupportedException {
+  private T[] cloneArray(T[] in, int len) throws CloneNotSupportedException {
     Struct<T> s = m_buf.getStruct();
     @SuppressWarnings("unchecked")
-    T[] arr = (T[]) Array.newInstance(s.getTypeClass(), in.length);
-    for (int i = 0; i < in.length; i++) {
+    T[] arr = (T[]) Array.newInstance(s.getTypeClass(), len);
+    for (int i = 0; i < len; i++) {
       arr[i] = s.clone(in[i]);
     }
     return arr;
@@ -302,7 +316,7 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
       if (m_immutable) {
         m_lastValue = Arrays.copyOf(value, value.length);
       } else {
-        m_lastValue = cloneArray(value);
+        m_lastValue = cloneArray(value, value.length);
       }
     } else {
       if (m_immutable) {

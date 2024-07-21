@@ -55,6 +55,7 @@ public class DataLogWriter extends DataLog {
   }
 
   /** Explicitly flushes the log data to disk. */
+  @Override
   public void flush() {
     DataLogJNI.flush(m_impl);
     if (m_os == null) {
@@ -62,7 +63,7 @@ public class DataLogWriter extends DataLog {
     }
     try {
       int pos = 0;
-      for (;;) {
+      for (; ; ) {
         int qty = DataLogJNI.copyWriteBuffer(m_impl, m_buf, pos);
         if (qty == 0) {
           break;

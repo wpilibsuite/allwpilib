@@ -97,6 +97,15 @@ public class StringArrayLogEntry extends DataLogEntry {
   }
 
   /**
+   * Gets whether there is a last value.
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  public synchronized boolean hasLastValue() {
+    return m_lastValue != null;
+  }
+
+  /**
    * Gets the last value.
    *
    * @return Last value, or false if none.

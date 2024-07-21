@@ -16,6 +16,10 @@ struct ThingA {
   int x = 0;
 };
 
+inline bool operator==(const ThingA& a, const ThingA& b) {
+  return a.x == b.x;
+}
+
 struct ThingB {
   int x = 0;
 };
@@ -130,10 +134,10 @@ class DataLogTest : public ::testing::Test {
 };
 
 TEST_F(DataLogTest, SimpleInt) {
-  int entry = log.Start("test", "int64");
-  log.AppendInteger(entry, 1, 0);
+  int entry = log.Start("test", "int64", "", 1);
+  log.AppendInteger(entry, 1, 2);
   log.Flush();
-  ASSERT_EQ(data.size(), 66u);
+  ASSERT_EQ(data.size(), 54u);
 }
 
 TEST_F(DataLogTest, BooleanAppend) {
@@ -455,12 +459,62 @@ TEST_F(DataLogTest, StructA) {
   entry.Append(ThingA{}, 7);
 }
 
+TEST_F(DataLogTest, StructUpdate) {
+  wpi::log::StructLogEntry<ThingA> entry{log, "a", 5};
+  ASSERT_FALSE(entry.GetLastValue().has_value());
+
+  entry.Update(ThingA{}, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 122u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), ThingA{});
+
+  entry.Update(ThingA{}, 8);
+  log.Flush();
+  ASSERT_EQ(data.size(), 122u);
+
+  entry.Update(ThingA{.x = 1}, 9);
+  log.Flush();
+  ASSERT_EQ(data.size(), 127u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), ThingA{.x = 1});
+}
+
 TEST_F(DataLogTest, StructArrayA) {
   [[maybe_unused]]
   wpi::log::StructArrayLogEntry<ThingA> entry0;
   wpi::log::StructArrayLogEntry<ThingA> entry{log, "a", 5};
   entry.Append({{ThingA{}, ThingA{}}});
   entry.Append({{ThingA{}, ThingA{}}}, 7);
+}
+
+TEST_F(DataLogTest, StructArrayUpdate) {
+  wpi::log::StructArrayLogEntry<ThingA> entry{log, "a", 5};
+  ASSERT_FALSE(entry.GetLastValue().has_value());
+
+  entry.Update({{ThingA{}, ThingA{.x = 1}}}, 7);
+  log.Flush();
+  ASSERT_EQ(data.size(), 125u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(),
+            (std::vector<ThingA>{ThingA{}, ThingA{.x = 1}}));
+
+  entry.Update({{ThingA{}, ThingA{.x = 1}}}, 8);
+  log.Flush();
+  ASSERT_EQ(data.size(), 125u);
+
+  entry.Update({{ThingA{}, ThingA{.x = 2}}}, 9);
+  log.Flush();
+  ASSERT_EQ(data.size(), 131u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(),
+            (std::vector<ThingA>{ThingA{}, ThingA{.x = 2}}));
+
+  entry.Update(std::span<const ThingA>{}, 10);
+  log.Flush();
+  ASSERT_EQ(data.size(), 135u);
+  ASSERT_TRUE(entry.GetLastValue().has_value());
+  ASSERT_EQ(entry.GetLastValue().value(), std::vector<ThingA>{});
 }
 
 TEST_F(DataLogTest, StructFixedArrayA) {

@@ -264,6 +264,15 @@ public class RawLogEntry extends DataLogEntry {
   }
 
   /**
+   * Gets whether there is a last value.
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  public synchronized boolean hasLastValue() {
+    return m_lastValue != null;
+  }
+
+  /**
    * Gets the last value.
    *
    * @return Last value, or null if none.
@@ -283,6 +292,7 @@ public class RawLogEntry extends DataLogEntry {
     return Arrays.equals(m_lastValue.array(), 0, len, value, start, start + len);
   }
 
+  @SuppressWarnings("PMD.SimplifyBooleanReturns")
   private boolean equalsLast(ByteBuffer value) {
     if (m_lastValue == null) {
       return false;

@@ -1299,7 +1299,8 @@ class StructLogEntry : public DataLogEntry {
       return std::nullopt;
     }
     return std::apply(
-        [&](const I&... info) { S::Unpack(m_lastValue, info...); }, m_info);
+        [&](const I&... info) { return S::Unpack(m_lastValue, info...); },
+        m_info);
   }
 
  private:
@@ -1401,10 +1402,13 @@ class StructArrayLogEntry : public DataLogEntry {
               data,
               [&](auto bytes) {
                 std::scoped_lock lock{m_mutex};
-                if (m_lastValue.empty() ||
-                    !std::equal(bytes.begin(), bytes.end(), m_lastValue.begin(),
-                                m_lastValue.end())) {
-                  m_lastValue.assign(bytes.begin(), bytes.end());
+                if (!m_lastValue.has_value()) {
+                  m_lastValue = std::vector(bytes.begin(), bytes.end());
+                  m_log->AppendRaw(m_entry, bytes, timestamp);
+                } else if (!std::equal(bytes.begin(), bytes.end(),
+                                       m_lastValue->begin(),
+                                       m_lastValue->end())) {
+                  m_lastValue->assign(bytes.begin(), bytes.end());
                   m_log->AppendRaw(m_entry, bytes, timestamp);
                 }
               },
@@ -1421,17 +1425,18 @@ class StructArrayLogEntry : public DataLogEntry {
    */
   std::optional<std::vector<T>> GetLastValue() const {
     std::scoped_lock lock{m_mutex};
-    if (m_lastValue.empty()) {
+    if (!m_lastValue.has_value()) {
       return std::nullopt;
     }
+    auto& lastValue = m_lastValue.value();
     size_t size = std::apply(S::GetSize, m_info);
     std::vector<T> rv;
-    rv.value.reserve(m_lastValue.size() / size);
-    for (auto in = m_lastValue.begin(), end = m_lastValue.end(); in < end;
+    rv.reserve(lastValue.size() / size);
+    for (auto in = lastValue.begin(), end = lastValue.end(); in < end;
          in += size) {
       std::apply(
           [&](const I&... info) {
-            rv.value.emplace_back(S::Unpack(
+            rv.emplace_back(S::Unpack(
                 std::span<const uint8_t>{std::to_address(in), size}, info...));
           },
           m_info);
@@ -1442,7 +1447,7 @@ class StructArrayLogEntry : public DataLogEntry {
  private:
   mutable wpi::mutex m_mutex;
   StructArrayBuffer<T, I...> m_buf;
-  std::vector<uint8_t> m_lastValue;
+  std::optional<std::vector<uint8_t>> m_lastValue;
   [[no_unique_address]]
   std::tuple<I...> m_info;
 };
@@ -1490,10 +1495,12 @@ class ProtobufLogEntry : public DataLogEntry {
     std::scoped_lock lock{m_mutex};
     wpi::SmallVector<uint8_t, 128> buf;
     m_msg.Pack(buf, data);
-    if (m_lastValue.empty() ||
-        !std::equal(buf.begin(), buf.end(), m_lastValue.begin(),
-                    m_lastValue.end())) {
-      m_lastValue.assign(buf.begin(), buf.end());
+    if (!m_lastValue.has_value()) {
+      m_lastValue = std::vector(buf.begin(), buf.end());
+      m_log->AppendRaw(m_entry, buf, timestamp);
+    } else if (!std::equal(buf.begin(), buf.end(), m_lastValue->begin(),
+                           m_lastValue->end())) {
+      m_lastValue->assign(buf.begin(), buf.end());
       m_log->AppendRaw(m_entry, buf, timestamp);
     }
   }
@@ -1506,7 +1513,7 @@ class ProtobufLogEntry : public DataLogEntry {
    */
   std::optional<T> GetLastValue() const {
     std::scoped_lock lock{m_mutex};
-    if (m_lastValue.empty()) {
+    if (!m_lastValue.has_value()) {
       return std::nullopt;
     }
     return m_msg.Unpack(m_lastValue);
@@ -1515,7 +1522,7 @@ class ProtobufLogEntry : public DataLogEntry {
  private:
   mutable wpi::mutex m_mutex;
   ProtobufMessage<T> m_msg;
-  std::vector<uint8_t> m_lastValue;
+  std::optional<std::vector<uint8_t>> m_lastValue;
 };
 
 }  // namespace wpi::log

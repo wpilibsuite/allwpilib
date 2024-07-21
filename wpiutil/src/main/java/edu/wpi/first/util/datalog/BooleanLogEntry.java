@@ -96,6 +96,15 @@ public class BooleanLogEntry extends DataLogEntry {
   }
 
   /**
+   * Gets whether there is a last value.
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  public synchronized boolean hasLastValue() {
+    return m_hasLastValue;
+  }
+
+  /**
    * Gets the last value.
    *
    * @return Last value, or false if none.

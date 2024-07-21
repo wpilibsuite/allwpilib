@@ -143,6 +143,22 @@ public final class StructLogEntry<T> extends DataLogEntry {
   }
 
   /**
+   * Gets whether there is a last value.
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  public boolean hasLastValue() {
+    synchronized (m_buf) {
+      if (m_immutable) {
+        return m_lastValue != null;
+      } else if (m_cloneable && m_lastValue != null) {
+        return true;
+      }
+      return m_lastValueBuf != null;
+    }
+  }
+
+  /**
    * Gets the last value.
    *
    * @return Last value, or null if none.
@@ -151,11 +167,7 @@ public final class StructLogEntry<T> extends DataLogEntry {
     synchronized (m_buf) {
       if (m_immutable) {
         return m_lastValue;
-      }
-      if (m_cloneable) {
-        if (m_lastValue == null) {
-          return null;
-        }
+      } else if (m_cloneable && m_lastValue != null) {
         try {
           return m_buf.getStruct().clone(m_lastValue);
         } catch (CloneNotSupportedException e) {
