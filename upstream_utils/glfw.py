@@ -73,6 +73,7 @@ def main():
 
     patch_list = [
         "0001-Suppress-Compiler-Warnings.patch",
+        "0002-Disable-docs-build-by-default.patch",
     ]
 
     glfw = Lib(name, url, tag, patch_list, copy_upstream_src)
