@@ -75,6 +75,9 @@ public class BooleanLogEntry extends DataLogEntry {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * <p>Note: the last value is local to this class instance; using update() with two instances
+   * pointing to the same underlying log entry name will likely result in unexpected results.
+   *
    * @param value Value to record
    * @param timestamp Time stamp (0 to indicate now)
    */
@@ -89,6 +92,9 @@ public class BooleanLogEntry extends DataLogEntry {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * <p>Note: the last value is local to this class instance; using update() with two instances
+   * pointing to the same underlying log entry name will likely result in unexpected results.
+   *
    * @param value Value to record
    */
   public void update(boolean value) {
@@ -98,6 +104,9 @@ public class BooleanLogEntry extends DataLogEntry {
   /**
    * Gets whether there is a last value.
    *
+   * <p>Note: the last value is local to this class instance and updated only with update(), not
+   * append().
+   *
    * @return True if last value exists, false otherwise.
    */
   public synchronized boolean hasLastValue() {
@@ -106,6 +115,9 @@ public class BooleanLogEntry extends DataLogEntry {
 
   /**
    * Gets the last value.
+   *
+   * <p>Note: the last value is local to this class instance and updated only with update(), not
+   * append().
    *
    * @return Last value, or false if none.
    */

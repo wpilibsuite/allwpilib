@@ -600,8 +600,20 @@ class DataLogValueEntryImpl : public DataLogEntry {
   }
 
   /**
-   * Gets the last value.  Note that Append() calls do not update the last
-   * value.
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return m_lastValue.has_value(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
    *
    * @return Last value (empty if no last value)
    */
@@ -645,6 +657,10 @@ class RawLogEntry : public DataLogValueEntryImpl<std::vector<uint8_t>> {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param data Data to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -677,6 +693,10 @@ class BooleanLogEntry : public DataLogValueEntryImpl<bool> {
 
   /**
    * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
    *
    * @param value Value to record
    * @param timestamp Time stamp (may be 0 to indicate now)
@@ -717,6 +737,10 @@ class IntegerLogEntry : public DataLogValueEntryImpl<int64_t> {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param value Value to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -756,6 +780,10 @@ class FloatLogEntry : public DataLogValueEntryImpl<float> {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param value Value to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -794,6 +822,10 @@ class DoubleLogEntry : public DataLogValueEntryImpl<double> {
 
   /**
    * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
    *
    * @param value Value to record
    * @param timestamp Time stamp (may be 0 to indicate now)
@@ -836,6 +868,10 @@ class StringLogEntry : public DataLogValueEntryImpl<std::string> {
 
   /**
    * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
    *
    * @param value Value to record
    * @param timestamp Time stamp (may be 0 to indicate now)
@@ -918,6 +954,10 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -925,6 +965,10 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
 
   /**
    * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
    *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
@@ -936,6 +980,10 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -943,6 +991,10 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
 
   /**
    * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
    *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
@@ -953,6 +1005,10 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
 
   /**
    * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
    *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
@@ -999,6 +1055,10 @@ class IntegerArrayLogEntry
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -1006,6 +1066,10 @@ class IntegerArrayLogEntry
 
   /**
    * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
    *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
@@ -1052,6 +1116,10 @@ class FloatArrayLogEntry : public DataLogValueEntryImpl<std::vector<float>> {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -1059,6 +1127,10 @@ class FloatArrayLogEntry : public DataLogValueEntryImpl<std::vector<float>> {
 
   /**
    * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
    *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
@@ -1106,6 +1178,10 @@ class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -1113,6 +1189,10 @@ class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
 
   /**
    * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
    *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
@@ -1173,6 +1253,10 @@ class StringArrayLogEntry
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -1181,6 +1265,10 @@ class StringArrayLogEntry
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -1188,6 +1276,10 @@ class StringArrayLogEntry
 
   /**
    * Updates the last value and appends a record to the log if it has changed.
+   *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
    *
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
@@ -1257,6 +1349,10 @@ class StructLogEntry : public DataLogEntry {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param data Data to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -1288,8 +1384,20 @@ class StructLogEntry : public DataLogEntry {
   }
 
   /**
-   * Gets the last value.  Note that Append() calls do not update the last
-   * value.
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return !m_lastValue.empty(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
    *
    * @return Last value (empty if no last value)
    */
@@ -1392,6 +1500,10 @@ class StructArrayLogEntry : public DataLogEntry {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param data Data to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -1418,8 +1530,20 @@ class StructArrayLogEntry : public DataLogEntry {
   }
 
   /**
-   * Gets the last value.  Note that Append() calls do not update the last
-   * value.
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return m_lastValue.has_value(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
    *
    * @return Last value (empty if no last value)
    */
@@ -1488,6 +1612,10 @@ class ProtobufLogEntry : public DataLogEntry {
   /**
    * Updates the last value and appends a record to the log if it has changed.
    *
+   * @note The last value is local to this class instance; using Update() with
+   * two instances pointing to the same underlying log entry name will likely
+   * result in unexpected results.
+   *
    * @param data Data to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
@@ -1506,8 +1634,20 @@ class ProtobufLogEntry : public DataLogEntry {
   }
 
   /**
-   * Gets the last value.  Note that Append() calls do not update the last
-   * value.
+   * Gets whether there is a last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
+   *
+   * @return True if last value exists, false otherwise.
+   */
+  bool HasLastValue() const { return m_lastValue.has_value(); }
+
+  /**
+   * Gets the last value.
+   *
+   * @note The last value is local to this class instance and updated only with
+   * Update(), not Append().
    *
    * @return Last value (empty if no last value)
    */
