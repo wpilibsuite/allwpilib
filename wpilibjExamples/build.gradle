@@ -70,8 +70,6 @@ ext {
     templateFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/templates.json")
     exampleDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/")
     exampleFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/examples.json")
-    commandDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/")
-    commandFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/commands.json")
 }
 
 apply plugin: 'cpp'

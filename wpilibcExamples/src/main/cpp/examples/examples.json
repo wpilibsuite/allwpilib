@@ -320,24 +320,6 @@
     "commandversion": 2
   },
   {
-    "name": "GearsBot",
-    "description": "A fully functional Command-Based program for WPI's GearsBot robot.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Elevator",
-      "Arm",
-      "Analog",
-      "Digital Input",
-      "SmartDashboard",
-      "XboxController"
-    ],
-    "foldername": "GearsBot",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "HAL",
     "description": "Use the low-level HAL C functions. This example is for advanced users.",
     "tags": [
@@ -364,42 +346,6 @@
     "commandversion": 2
   },
   {
-    "name": "'Traditional' Hatchbot",
-    "description": "A fully-functional command-based hatchbot for the 2019 game, written in the 'traditional' style, i.e. commands are given their own classes.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Encoder",
-      "Shuffleboard",
-      "Sendable",
-      "DataLog",
-      "Pneumatics",
-      "XboxController"
-    ],
-    "foldername": "HatchbotTraditional",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "'Inlined' Hatchbot",
-    "description": "A fully-functional command-based hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Encoder",
-      "Shuffleboard",
-      "Sendable",
-      "DataLog",
-      "Pneumatics",
-      "PS4Controller"
-    ],
-    "foldername": "HatchbotInlined",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "Rapid React Command Bot",
     "description": "A fully-functional command-based fender bot for the 2022 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
     "tags": [
@@ -415,48 +361,6 @@
       "XboxController"
     ],
     "foldername": "RapidReactCommandBot",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "Select Command Example",
-    "description": "Use SelectCommand to select an autonomous routine.",
-    "tags": [
-      "Command-based"
-    ],
-    "foldername": "SelectCommand",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "Frisbeebot",
-    "description": "A simple frisbee shooter for the 2013 game, demonstrating use of PIDSubsystem.",
-    "tags": [
-      "Complete Robot",
-      "Command-based",
-      "Differential Drive",
-      "Flywheel",
-      "Encoder",
-      "XboxController",
-      "PID"
-    ],
-    "foldername": "Frisbeebot",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "Gyro Drive Commands",
-    "description": "Control a robot's angle with PID and a gyro, in command-based.",
-    "tags": [
-      "Command-based",
-      "Differential Drive",
-      "Encoder",
-      "PS4Controller",
-      "PID",
-      "Profiled PID",
-      "Gyro"
-    ],
-    "foldername": "GyroDriveCommands",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -576,80 +480,17 @@
     "commandversion": 2
   },
   {
-    "name": "MecanumControllerCommand",
-    "description": "Follow a pre-generated trajectory with a mecanum drive using MecanumControllerCommand.",
+    "name": "ArmSimulation",
+    "description": "Simulate a single-jointed arm.",
     "tags": [
-      "Command-based",
-      "Mecanum Drive",
-      "Gyro",
-      "Encoder",
-      "Odometry",
-      "Trajectory",
-      "Path Following",
-      "XboxController"
-    ],
-    "foldername": "MecanumControllerCommand",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "SwerveControllerCommand",
-    "description": "Follow a pre-generated trajectory with a swerve drive using SwerveControllerCommand.",
-    "tags": [
-      "Command-based",
-      "Swerve Drive",
-      "Gyro",
-      "Encoder",
-      "Odometry",
-      "Trajectory",
-      "Path Following",
-      "XboxController"
-    ],
-    "foldername": "SwerveControllerCommand",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "ArmBot",
-    "description": "Control an arm with ProfiledPIDSubsystem.",
-    "tags": [
-      "Command-based",
+      "Basic Robot",
       "Arm",
-      "Encoder",
-      "Profiled PID",
-      "XboxController",
-      "Differential Drive"
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "Preferences"
     ],
-    "foldername": "ArmBot",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "ArmBotOffboard",
-    "description": "Control an arm with TrapezoidProfileSubsystem and smart motor controller PID.",
-    "tags": [
-      "Command-based",
-      "Arm",
-      "Smart Motor Controller",
-      "Trapezoid Profile",
-      "XboxController",
-      "Differential Drive"
-    ],
-    "foldername": "ArmBotOffboard",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "DriveDistanceOffboard",
-    "description": "Drive a differential drivetrain a set distance using TrapezoidProfileCommand and smart motor controller PID.",
-    "tags": [
-      "Command-based",
-      "Differential Drive",
-      "Trapezoid Profile",
-      "Smart Motor Controller",
-      "XboxController"
-    ],
-    "foldername": "DriveDistanceOffboard",
+    "foldername": "ArmSimulation",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -805,21 +646,6 @@
       "XboxController"
     ],
     "foldername": "MecanumDrivePoseEstimator",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "ArmSimulation",
-    "description": "Simulate a single-jointed arm.",
-    "tags": [
-      "Basic Robot",
-      "Arm",
-      "State-Space",
-      "Simulation",
-      "Mechanism2d",
-      "Preferences"
-    ],
-    "foldername": "ArmSimulation",
     "gradlebase": "cpp",
     "commandversion": 2
   },

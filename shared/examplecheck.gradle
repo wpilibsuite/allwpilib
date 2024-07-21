@@ -103,27 +103,5 @@ task checkExamples(type: Task) {
     }
 }
 
-task checkCommands(type: Task) {
-    doLast {
-        def parsedJson = new groovy.json.JsonSlurper().parseText(commandFile.text)
-        fileCheck(parsedJson, commandDirectory)
-        parsedJson.each {
-            assert it.name != null
-            assert it.description != null
-            assert it.tags != null
-            assert it.foldername != null
-            assert it.replacename != null
-            assert it.commandversion != null
-            if (project.isCppCommands) {
-                assert it.headers != null
-                assert !it.headers.isEmpty()
-                assert it.source != null
-                assert !it.source.isEmpty()
-            }
-        }
-    }
-}
-
 check.dependsOn checkTemplates
 check.dependsOn checkExamples
-check.dependsOn checkCommands
