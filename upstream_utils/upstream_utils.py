@@ -262,38 +262,6 @@ class Lib:
         self.pre_patch_commits = pre_patch_commits
         self.wpilib_root = get_repo_root()
 
-    def check_patches(self):
-        """Checks that the patch list supplied to the constructor matches the
-        patches in the patch directory.
-        """
-        patch_directory_patches = set()
-        patch_directory = os.path.join(
-            self.wpilib_root, f"upstream_utils/{self.name}_patches"
-        )
-        if os.path.exists(patch_directory):
-            for f in os.listdir(patch_directory):
-                if f.endswith(".patch"):
-                    patch_directory_patches.add(f)
-        patches = set(self.patch_list)
-        patch_directory_only = sorted(patch_directory_patches - patches)
-        patch_list_only = sorted(patches - patch_directory_patches)
-        common_patches = sorted(patch_directory_patches & patches)
-        warning = False
-        if patch_directory_only:
-            print(
-                f"WARNING: The patch directory has patches {patch_directory_only} not in the patch list"
-            )
-            warning = True
-        if patch_list_only:
-            print(
-                f"WARNING: The patch list has patches {patch_list_only} not in the patch directory"
-            )
-            warning = True
-        if warning and common_patches:
-            print(
-                f"  Note: The patch directory and the patch list both have patches {common_patches}"
-            )
-
     def get_repo_path(self, tempdir=None):
         """Returns the path to the clone of the upstream repository.
 
@@ -654,5 +622,3 @@ class Lib:
             self.format_patch()
         elif args.subcommand == "copy-upstream-to-thirdparty":
             self.copy_upstream_to_thirdparty()
-
-        self.check_patches()
