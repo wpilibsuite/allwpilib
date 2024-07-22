@@ -427,6 +427,48 @@ class Lib:
         with open(path, "w") as file:
             file.writelines(lines)
 
+    def replace_patch_list(self, patch_list):
+        """Replaces the patch list in the script.
+
+        Keyword argument:
+        patch_list -- The list of patch file names to replace the script patch list with.
+        """
+        path = os.path.join(self.wpilib_root, f"upstream_utils/{self.name}.py")
+        with open(path, "r") as file:
+            lines = file.readlines()
+
+        for i in range(len(lines) - 1, -1, -1):
+            if "patch_list = " in lines[i]:
+                # Exclusive end of the range of lines defining the list
+                end_i = None
+                for j in range(i, len(lines)):
+                    if "]" in lines[j]:
+                        end_i = j + 1
+                        break
+                if end_i is None:
+                    print(
+                        f'ERROR: Expected "]" after "patch_list = " at line {i}',
+                        file=sys.stderr,
+                    )
+                    exit(1)
+
+                chars_after_indent = len(lines[i].lstrip())
+                indent = lines[i][:-chars_after_indent]
+
+                if patch_list:
+                    replacement_lines = [f"{indent}patch_list = [\n"]
+                    replacement_lines.extend(
+                        f'{indent}    "{patch}",\n' for patch in patch_list
+                    )
+                    replacement_lines.append(f"{indent}]\n")
+                else:
+                    replacement_lines = [f"{indent}patch_list = []\n"]
+
+                lines[i:end_i] = replacement_lines
+
+        with open(path, "w") as file:
+            file.writelines(lines)
+
     def info(self):
         """Prints info about the library to stdout."""
         print(f"Repository name: {self.name}")
@@ -529,6 +571,7 @@ class Lib:
         else:
             shutil.rmtree(patch_dest)
 
+        new_patch_list = []
         is_first = True
         for f in os.listdir():
             if f.endswith(".patch"):
@@ -536,8 +579,11 @@ class Lib:
                     os.mkdir(patch_dest)
                     is_first = False
                 shutil.move(f, patch_dest)
+                new_patch_list.append(f)
 
         self.replace_tag(script_tag)
+
+        self.replace_patch_list(new_patch_list)
 
     def copy_upstream_to_thirdparty(self):
         """Copies files from the upstream repository into the thirdparty
