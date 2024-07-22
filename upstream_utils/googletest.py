@@ -69,7 +69,9 @@ def main():
     url = "https://github.com/google/googletest.git"
     tag = "v1.14.0"
 
-    googletest = Lib(name, url, tag, [], copy_upstream_src)
+    patch_list = []
+
+    googletest = Lib(name, url, tag, patch_list, copy_upstream_src)
     googletest.main()
 
 
