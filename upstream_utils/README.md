@@ -71,7 +71,7 @@ Navigate back to `upstream_utils`.
 cd allwpilib/upstream_utils
 ```
 
-Update the `upstream_utils` patch files and the patch list in the script.
+Update the `upstream_utils` patch files.
 ```bash
 ./<lib>.py format-patch
 ```
