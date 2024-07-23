@@ -353,18 +353,25 @@ class Lib:
 
         subprocess.run(["git", "tag", f"upstream_utils_root-{tag}", tag])
 
+    def get_patch_directory(self):
+        """Returns the path to the directory containing the patch files.
+
+        Returns:
+        The absolute path to the directory containing the patch files.
+        """
+        return os.path.join(self.wpilib_root, f"upstream_utils/{self.name}_patches")
+
     def get_patch_list(self):
         """Returns a list of the filenames of the patches to apply.
 
         Returns:
         A list of the filenames of the patches to apply, sorted in lexicographic
         order by the Unicode code points."""
-        patch_directory = os.path.join(
-            self.wpilib_root, f"upstream_utils/{self.name}_patches"
-        )
-        if not os.path.exists(patch_directory):
+        if not os.path.exists(self.get_patch_directory()):
             return []
-        return sorted(f for f in os.listdir(patch_directory) if f.endswith(".patch"))
+        return sorted(
+            f for f in os.listdir(self.get_patch_directory()) if f.endswith(".patch")
+        )
 
     def apply_patches(self):
         """Applies the patches listed in the patch list to the current
@@ -375,9 +382,7 @@ class Lib:
 
         for f in self.get_patch_list():
             git_am(
-                os.path.join(
-                    self.wpilib_root, f"upstream_utils/{self.name}_patches", f
-                ),
+                os.path.join(self.get_patch_directory(), f),
                 **self.patch_options,
             )
 
@@ -496,24 +501,21 @@ class Lib:
             ]
         )
 
-        patch_dest = os.path.join(
-            self.wpilib_root, f"upstream_utils/{self.name}_patches"
-        )
-
-        if not os.path.exists(patch_dest):
+        if not os.path.exists(self.get_patch_directory()):
             print(
-                f"WARNING: Patch directory {patch_dest} does not exist", file=sys.stderr
+                f"WARNING: Patch directory {self.get_patch_directory()} does not exist",
+                file=sys.stderr,
             )
         else:
-            shutil.rmtree(patch_dest)
+            shutil.rmtree(self.get_patch_directory())
 
         is_first = True
         for f in os.listdir():
             if f.endswith(".patch"):
                 if is_first:
-                    os.mkdir(patch_dest)
+                    os.mkdir(self.get_patch_directory())
                     is_first = False
-                shutil.move(f, patch_dest)
+                shutil.move(f, self.get_patch_directory())
 
         self.replace_tag(script_tag)
 
