@@ -24,7 +24,6 @@ nativeUtils.platformConfigs.named('osxuniversal') {
 }
 
 model {
-
     components {
         imgui(NativeLibrarySpec) {
             sources {
@@ -50,6 +49,10 @@ model {
                 }
             }
             binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    it.buildable = false
+                    return
+                }
                 if (toolChain in VisualCpp) {
                     cppCompiler.args '-D_UNICODE', '-DUNICODE', '-DWIN32', '-D_WIN32', '-DSTRICT', '-DWIN32_LEAN_AND_MEAN', '-D_HAS_EXCEPTIONS=1'
                 } else {
