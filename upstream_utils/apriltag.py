@@ -71,22 +71,11 @@ def main():
     url = "https://github.com/AprilRobotics/apriltag.git"
     tag = "ebdb2017e04b8e36f7d8a12ce60060416a905e12"
 
-    patch_list = [
-        "0001-apriltag_pose.c-Set-NULL-when-second-solution-could-.patch",
-        "0002-zmaxheapify-Avoid-return-of-void-expression.patch",
-        "0003-Avoid-unused-variable-warnings-in-release-builds.patch",
-        "0004-Make-orthogonal_iteration-exit-early-upon-convergenc.patch",
-        "0005-Fix-signed-left-shift-warning.patch",
-        "0006-Avoid-incompatible-pointer-warning.patch",
-        "0007-Fix-GCC-14-calloc-warning.patch",
-        "0008-Remove-calls-to-postscript_image.patch",
-        "0009-Fix-clang-16-warnings.patch",
-    ]
     patch_options = {
         "ignore_whitespace": True,
     }
 
-    apriltag = Lib(name, url, tag, patch_list, copy_upstream_src, patch_options)
+    apriltag = Lib(name, url, tag, copy_upstream_src, patch_options)
     apriltag.main()
 
 

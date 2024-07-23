@@ -100,7 +100,7 @@ def main():
     url = "https://github.com/foonathan/memory"
     tag = "v0.7-3"
 
-    memory = Lib(name, url, tag, [], copy_upstream_src)
+    memory = Lib(name, url, tag, copy_upstream_src)
     memory.main()
 
 

@@ -30,12 +30,7 @@ def main():
     url = "https://github.com/kthohr/gcem.git"
     tag = "v1.18.0"
 
-    patch_list = [
-        "0001-Call-std-functions-if-not-constant-evaluated.patch",
-        "0002-Add-hypot-x-y-z.patch",
-    ]
-
-    gcem = Lib(name, url, tag, patch_list, copy_upstream_src)
+    gcem = Lib(name, url, tag, copy_upstream_src)
     gcem.main()
 
 

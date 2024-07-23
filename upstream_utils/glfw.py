@@ -71,12 +71,7 @@ def main():
     url = "https://github.com/glfw/glfw.git"
     tag = "6b57e08bb0078c9834889eab871bac2368198c15"
 
-    patch_list = [
-        "0001-Suppress-Compiler-Warnings.patch",
-        "0002-Disable-docs-build-by-default.patch",
-    ]
-
-    glfw = Lib(name, url, tag, patch_list, copy_upstream_src)
+    glfw = Lib(name, url, tag, copy_upstream_src)
     glfw.main()
 
 

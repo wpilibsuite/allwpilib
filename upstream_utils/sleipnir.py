@@ -54,15 +54,7 @@ def main():
     # main on 2024-07-09
     tag = "b6ffa2d4fdb99cab1bf79491f715a6a9a86633b5"
 
-    patch_list = [
-        "0001-Remove-using-enum-declarations.patch",
-        "0002-Use-fmtlib.patch",
-        "0003-Remove-unsupported-constexpr.patch",
-        "0004-Use-wpi-SmallVector.patch",
-        "0005-Suppress-clang-tidy-false-positives.patch",
-    ]
-
-    sleipnir = Lib(name, url, tag, patch_list, copy_upstream_src)
+    sleipnir = Lib(name, url, tag, copy_upstream_src)
     sleipnir.main()
 
 

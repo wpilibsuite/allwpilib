@@ -224,7 +224,6 @@ class Lib:
         name,
         url,
         tag,
-        patch_list,
         copy_upstream_src,
         patch_options={},
         *,
@@ -238,7 +237,6 @@ class Lib:
         url -- The URL of the upstream repository.
         tag -- The tag in the upstream repository to use. Can be any
                <commit-ish> (e.g., commit hash or tag).
-        patch_list -- The list of patches in the patch directory to apply.
         copy_upstream_src -- A callable that takes the path to the wpilib root
                              and copies the files from the clone of the upstream
                              into the appropriate thirdparty directory. Will
@@ -255,44 +253,11 @@ class Lib:
         self.name = name
         self.url = url
         self.old_tag = tag
-        self.patch_list = patch_list
         self.copy_upstream_src = copy_upstream_src
         self.patch_options = patch_options
         self.pre_patch_hook = pre_patch_hook
         self.pre_patch_commits = pre_patch_commits
         self.wpilib_root = get_repo_root()
-
-    def check_patches(self):
-        """Checks that the patch list supplied to the constructor matches the
-        patches in the patch directory.
-        """
-        patch_directory_patches = set()
-        patch_directory = os.path.join(
-            self.wpilib_root, f"upstream_utils/{self.name}_patches"
-        )
-        if os.path.exists(patch_directory):
-            for f in os.listdir(patch_directory):
-                if f.endswith(".patch"):
-                    patch_directory_patches.add(f)
-        patches = set(self.patch_list)
-        patch_directory_only = sorted(patch_directory_patches - patches)
-        patch_list_only = sorted(patches - patch_directory_patches)
-        common_patches = sorted(patch_directory_patches & patches)
-        warning = False
-        if patch_directory_only:
-            print(
-                f"WARNING: The patch directory has patches {patch_directory_only} not in the patch list"
-            )
-            warning = True
-        if patch_list_only:
-            print(
-                f"WARNING: The patch list has patches {patch_list_only} not in the patch directory"
-            )
-            warning = True
-        if warning and common_patches:
-            print(
-                f"  Note: The patch directory and the patch list both have patches {common_patches}"
-            )
 
     def get_repo_path(self, tempdir=None):
         """Returns the path to the clone of the upstream repository.
@@ -388,6 +353,26 @@ class Lib:
 
         subprocess.run(["git", "tag", f"upstream_utils_root-{tag}", tag])
 
+    def get_patch_directory(self):
+        """Returns the path to the directory containing the patch files.
+
+        Returns:
+        The absolute path to the directory containing the patch files.
+        """
+        return os.path.join(self.wpilib_root, f"upstream_utils/{self.name}_patches")
+
+    def get_patch_list(self):
+        """Returns a list of the filenames of the patches to apply.
+
+        Returns:
+        A list of the filenames of the patches to apply, sorted in lexicographic
+        order by the Unicode code points."""
+        if not os.path.exists(self.get_patch_directory()):
+            return []
+        return sorted(
+            f for f in os.listdir(self.get_patch_directory()) if f.endswith(".patch")
+        )
+
     def apply_patches(self):
         """Applies the patches listed in the patch list to the current
         directory.
@@ -395,11 +380,9 @@ class Lib:
         if self.pre_patch_hook is not None:
             self.pre_patch_hook()
 
-        for f in self.patch_list:
+        for f in self.get_patch_list():
             git_am(
-                os.path.join(
-                    self.wpilib_root, f"upstream_utils/{self.name}_patches", f
-                ),
+                os.path.join(self.get_patch_directory(), f),
                 **self.patch_options,
             )
 
@@ -433,7 +416,7 @@ class Lib:
         print(f"Upstream URL: {self.url}")
         print(f"Upstream tag: {self.old_tag}")
         print(f"Path to upstream clone: {self.get_repo_path()}")
-        print(f"Patches to apply: {self.patch_list}")
+        print(f"Patches to apply: {self.get_patch_list()}")
         print(f"Patch options: {self.patch_options}")
         print(f"Pre patch commits: {self.pre_patch_commits}")
         print(f"WPILib root: {self.wpilib_root}")
@@ -518,24 +501,16 @@ class Lib:
             ]
         )
 
-        patch_dest = os.path.join(
-            self.wpilib_root, f"upstream_utils/{self.name}_patches"
-        )
-
-        if not os.path.exists(patch_dest):
-            print(
-                f"WARNING: Patch directory {patch_dest} does not exist", file=sys.stderr
-            )
-        else:
-            shutil.rmtree(patch_dest)
+        if os.path.exists(self.get_patch_directory()):
+            shutil.rmtree(self.get_patch_directory())
 
         is_first = True
         for f in os.listdir():
             if f.endswith(".patch"):
                 if is_first:
-                    os.mkdir(patch_dest)
+                    os.mkdir(self.get_patch_directory())
                     is_first = False
-                shutil.move(f, patch_dest)
+                shutil.move(f, self.get_patch_directory())
 
         self.replace_tag(script_tag)
 
@@ -608,5 +583,3 @@ class Lib:
             self.format_patch()
         elif args.subcommand == "copy-upstream-to-thirdparty":
             self.copy_upstream_to_thirdparty()
-
-        self.check_patches()

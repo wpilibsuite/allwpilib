@@ -22,9 +22,7 @@ def main():
     url = "https://github.com/skaslev/gl3w"
     tag = "5f8d7fd191ba22ff2b60c1106d7135bb9a335533"
 
-    patch_list = []
-
-    gl3w = Lib(name, url, tag, patch_list, copy_upstream_src)
+    gl3w = Lib(name, url, tag, copy_upstream_src)
     gl3w.main()
 
 
