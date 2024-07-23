@@ -501,12 +501,7 @@ class Lib:
             ]
         )
 
-        if not os.path.exists(self.get_patch_directory()):
-            print(
-                f"WARNING: Patch directory {self.get_patch_directory()} does not exist",
-                file=sys.stderr,
-            )
-        else:
+        if os.path.exists(self.get_patch_directory()):
             shutil.rmtree(self.get_patch_directory())
 
         is_first = True
