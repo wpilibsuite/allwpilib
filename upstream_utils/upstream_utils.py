@@ -224,7 +224,6 @@ class Lib:
         name,
         url,
         tag,
-        patch_list,
         copy_upstream_src,
         patch_options={},
         *,
@@ -238,7 +237,6 @@ class Lib:
         url -- The URL of the upstream repository.
         tag -- The tag in the upstream repository to use. Can be any
                <commit-ish> (e.g., commit hash or tag).
-        patch_list -- The list of patches in the patch directory to apply.
         copy_upstream_src -- A callable that takes the path to the wpilib root
                              and copies the files from the clone of the upstream
                              into the appropriate thirdparty directory. Will
@@ -255,7 +253,6 @@ class Lib:
         self.name = name
         self.url = url
         self.old_tag = tag
-        self.patch_list = patch_list
         self.copy_upstream_src = copy_upstream_src
         self.patch_options = patch_options
         self.pre_patch_hook = pre_patch_hook
@@ -356,6 +353,19 @@ class Lib:
 
         subprocess.run(["git", "tag", f"upstream_utils_root-{tag}", tag])
 
+    def get_patch_list(self):
+        """Returns a list of the filenames of the patches to apply.
+
+        Returns:
+        A list of the filenames of the patches to apply, sorted in lexicographic
+        order by the Unicode code points."""
+        patch_directory = os.path.join(
+            self.wpilib_root, f"upstream_utils/{self.name}_patches"
+        )
+        if not os.path.exists(patch_directory):
+            return []
+        return sorted(f for f in os.listdir(patch_directory) if f.endswith(".patch"))
+
     def apply_patches(self):
         """Applies the patches listed in the patch list to the current
         directory.
@@ -363,7 +373,7 @@ class Lib:
         if self.pre_patch_hook is not None:
             self.pre_patch_hook()
 
-        for f in self.patch_list:
+        for f in self.get_patch_list():
             git_am(
                 os.path.join(
                     self.wpilib_root, f"upstream_utils/{self.name}_patches", f
@@ -401,7 +411,7 @@ class Lib:
         print(f"Upstream URL: {self.url}")
         print(f"Upstream tag: {self.old_tag}")
         print(f"Path to upstream clone: {self.get_repo_path()}")
-        print(f"Patches to apply: {self.patch_list}")
+        print(f"Patches to apply: {self.get_patch_list()}")
         print(f"Patch options: {self.patch_options}")
         print(f"Pre patch commits: {self.pre_patch_commits}")
         print(f"WPILib root: {self.wpilib_root}")

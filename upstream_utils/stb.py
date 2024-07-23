@@ -44,9 +44,7 @@ def main():
     url = "https://github.com/nothings/stb.git"
     tag = "c9064e317699d2e495f36ba4f9ac037e88ee371a"
 
-    patch_list = []
-
-    stb = Lib(name, url, tag, patch_list, copy_upstream_src)
+    stb = Lib(name, url, tag, copy_upstream_src)
     stb.main()
 
 

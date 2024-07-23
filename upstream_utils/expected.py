@@ -31,9 +31,7 @@ def main():
     # master on 2024-01-25
     tag = "3f0ca7b19253129700a073abfa6d8638d9f7c80c"
 
-    patch_list = []
-
-    expected = Lib(name, url, tag, patch_list, copy_upstream_src)
+    expected = Lib(name, url, tag, copy_upstream_src)
     expected.main()
 
 

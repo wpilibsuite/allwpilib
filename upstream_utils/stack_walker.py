@@ -45,9 +45,6 @@ def main():
     url = "https://github.com/JochenKalmbach/StackWalker"
     tag = "5b0df7a4db8896f6b6dc45d36e383c52577e3c6b"
 
-    patch_list = [
-        "0001-Add-advapi-pragma.patch",
-    ]
     patch_options = {
         "ignore_whitespace": True,
     }
@@ -56,7 +53,6 @@ def main():
         name,
         url,
         tag,
-        patch_list,
         copy_upstream_src,
         patch_options,
         pre_patch_hook=crlf_to_lf,

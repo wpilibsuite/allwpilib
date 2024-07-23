@@ -43,9 +43,7 @@ def main():
     url = "https://github.com/epezent/implot.git"
     tag = "18c72431f8265e2b0b5378a3a73d8a883b2175ff"
 
-    patch_list = ["0001-Supress-compiler-warnings.patch"]
-
-    implot = Lib(name, url, tag, patch_list, copy_upstream_src)
+    implot = Lib(name, url, tag, copy_upstream_src)
     implot.main()
 
 

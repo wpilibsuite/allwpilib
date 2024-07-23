@@ -37,9 +37,7 @@ def main():
     url = "https://github.com/fmtlib/fmt"
     tag = "11.0.1"
 
-    patch_list = ["0001-Suppress-warnings-we-can-t-fix.patch"]
-
-    fmt = Lib(name, url, tag, patch_list, copy_upstream_src)
+    fmt = Lib(name, url, tag, copy_upstream_src)
     fmt.main()
 
 

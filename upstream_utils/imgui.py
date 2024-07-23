@@ -66,9 +66,7 @@ def main():
     url = "https://github.com/ocornut/imgui.git"
     tag = "64b1e448d20c9be9275af731c34b4c7bf14a8e95"
 
-    patch_list = []
-
-    imgui = Lib(name, url, tag, patch_list, copy_upstream_src)
+    imgui = Lib(name, url, tag, copy_upstream_src)
     imgui.main()
 
 

@@ -131,13 +131,7 @@ def main():
     url = "https://gitlab.com/libeigen/eigen.git"
     tag = "c4d84dfddc9f9edef0fdbe7cf9966d2f4a303198"
 
-    patch_list = [
-        "0001-Disable-warnings.patch",
-        "0002-Intellisense-fix.patch",
-        "0003-Suppress-has_denorm-and-has_denorm_loss-deprecation-.patch",
-    ]
-
-    eigen = Lib(name, url, tag, patch_list, copy_upstream_src)
+    eigen = Lib(name, url, tag, copy_upstream_src)
     eigen.main()
 
 

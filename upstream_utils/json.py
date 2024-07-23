@@ -60,17 +60,11 @@ def main():
     url = "https://github.com/nlohmann/json"
     tag = "v3.11.3"
 
-    patch_list = [
-        "0001-Remove-version-from-namespace.patch",
-        "0002-Make-serializer-public.patch",
-        "0003-Make-dump_escaped-take-std-string_view.patch",
-        "0004-Add-llvm-stream-support.patch",
-    ]
     patch_options = {
         "use_threeway": True,
     }
 
-    json = Lib(name, url, tag, patch_list, copy_upstream_src, patch_options)
+    json = Lib(name, url, tag, copy_upstream_src, patch_options)
     json.main()
 
 
