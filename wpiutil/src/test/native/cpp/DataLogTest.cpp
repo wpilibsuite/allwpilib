@@ -39,7 +39,7 @@ struct Info2 {
 
 template <>
 struct wpi::Struct<ThingA> {
-  static constexpr std::string_view GetTypeString() { return "struct:ThingA"; }
+  static constexpr std::string_view GetTypeName() { return "ThingA"; }
   static constexpr size_t GetSize() { return 1; }
   static constexpr std::string_view GetSchema() { return "uint8 value"; }
   static ThingA Unpack(std::span<const uint8_t> data) {
@@ -52,8 +52,8 @@ struct wpi::Struct<ThingA> {
 
 template <>
 struct wpi::Struct<ThingB, Info1> {
-  static constexpr std::string_view GetTypeString(const Info1&) {
-    return "struct:ThingB";
+  static constexpr std::string_view GetTypeName(const Info1&) {
+    return "ThingB";
   }
   static constexpr size_t GetSize(const Info1&) { return 1; }
   static constexpr std::string_view GetSchema(const Info1&) {
@@ -69,7 +69,7 @@ struct wpi::Struct<ThingB, Info1> {
 
 template <>
 struct wpi::Struct<ThingC> {
-  static constexpr std::string_view GetTypeString() { return "struct:ThingC"; }
+  static constexpr std::string_view GetTypeName() { return "ThingC"; }
   static constexpr size_t GetSize() { return 1; }
   static constexpr std::string_view GetSchema() { return "uint8 value"; }
   static ThingC Unpack(std::span<const uint8_t> data) {
@@ -82,8 +82,8 @@ struct wpi::Struct<ThingC> {
 
 template <>
 struct wpi::Struct<ThingC, Info1> {
-  static constexpr std::string_view GetTypeString(const Info1&) {
-    return "struct:ThingC";
+  static constexpr std::string_view GetTypeName(const Info1&) {
+    return "ThingC";
   }
   static constexpr size_t GetSize(const Info1&) { return 1; }
   static constexpr std::string_view GetSchema(const Info1&) {
@@ -99,8 +99,8 @@ struct wpi::Struct<ThingC, Info1> {
 
 template <>
 struct wpi::Struct<ThingC, Info2> {
-  static constexpr std::string_view GetTypeString(const Info2&) {
-    return "struct:ThingC";
+  static constexpr std::string_view GetTypeName(const Info2&) {
+    return "ThingC";
   }
   static constexpr size_t GetSize(const Info2&) { return 1; }
   static constexpr std::string_view GetSchema(const Info2&) {

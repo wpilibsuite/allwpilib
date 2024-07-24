@@ -1309,7 +1309,8 @@ class StructLogEntry : public DataLogEntry {
       : m_info{std::move(info)...} {
     m_log = &log;
     log.AddStructSchema<T, I...>(info..., timestamp);
-    m_entry = log.Start(name, S::GetTypeString(info...), metadata, timestamp);
+    m_entry =
+        log.Start(name, GetStructTypeString<T>(info...), metadata, timestamp);
   }
 
   StructLogEntry(StructLogEntry&& rhs)

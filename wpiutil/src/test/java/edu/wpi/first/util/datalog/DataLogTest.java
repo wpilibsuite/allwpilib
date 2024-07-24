@@ -27,8 +27,8 @@ class DataLogTest {
     }
 
     @Override
-    public String getTypeString() {
-      return "struct:Thing";
+    public String getTypeName() {
+      return "Thing";
     }
 
     @Override
@@ -84,8 +84,8 @@ class DataLogTest {
     }
 
     @Override
-    public String getTypeString() {
-      return "struct:Thing";
+    public String getTypeName() {
+      return "Thing";
     }
 
     @Override
@@ -156,8 +156,8 @@ class DataLogTest {
     }
 
     @Override
-    public String getTypeString() {
-      return "struct:Thing";
+    public String getTypeName() {
+      return "Thing";
     }
 
     @Override

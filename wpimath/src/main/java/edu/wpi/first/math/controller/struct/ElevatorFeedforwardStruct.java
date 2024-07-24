@@ -15,8 +15,8 @@ public class ElevatorFeedforwardStruct implements Struct<ElevatorFeedforward> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:ElevatorFeedforward";
+  public String getTypeName() {
+    return "ElevatorFeedforward";
   }
 
   @Override

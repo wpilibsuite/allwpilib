@@ -15,8 +15,8 @@ public class Translation3dStruct implements Struct<Translation3d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Translation3d";
+  public String getTypeName() {
+    return "Translation3d";
   }
 
   @Override

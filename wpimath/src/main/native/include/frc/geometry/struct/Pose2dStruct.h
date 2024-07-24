@@ -11,7 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Pose2d> {
-  static constexpr std::string_view GetTypeString() { return "struct:Pose2d"; }
+  static constexpr std::string_view GetTypeName() { return "Pose2d"; }
   static constexpr size_t GetSize() {
     return wpi::GetStructSize<frc::Translation2d>() +
            wpi::GetStructSize<frc::Rotation2d>();
