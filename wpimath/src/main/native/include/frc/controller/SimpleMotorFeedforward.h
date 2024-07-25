@@ -40,34 +40,24 @@ class SimpleMotorFeedforward {
       units::volt_t kS, units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
       units::second_t dt = 20_ms)
-      : kS(kS),
-        kV([&] {
-          if (kV.value() < 0) {
-            wpi::math::MathSharedStore::ReportError(
-                "kV must be a non-negative number, got {}!", kV.value());
-            wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
-            return units::unit_t<kv_unit>{0};
-          } else {
-            return kV;
-          }
-        }()),
-        kA([&] {
-          if (kA.value() < 0) {
-            wpi::math::MathSharedStore::ReportError(
-                "kA must be a non-negative number, got {}!", kA.value());
-            wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0.");
-            return units::unit_t<ka_unit>{0};
-          } else {
-            return kA;
-          }
-        }()) {
+      : kS(kS), kV(kV), kA(kA), m_dt(dt) {
+    if (kV.value() < 0) {
+      wpi::math::MathSharedStore::ReportError(
+          "kV must be a non-negative number, got {}!", kV.value());
+      this->kV = units::unit_t<kv_unit>{0};
+      wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
+    }
+    if (kA.value() < 0) {
+      wpi::math::MathSharedStore::ReportError(
+          "kA must be a non-negative number, got {}!", kA.value());
+      this->kA = units::unit_t<ka_unit>{0};
+      wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0.");
+    }
     if (dt <= 0_ms) {
       wpi::math::MathSharedStore::ReportError(
           "period must be a positive number, got {}!", dt.value());
-      m_dt = 20_ms;
+      this->m_dt = 20_ms;
       wpi::math::MathSharedStore::ReportWarning("period defaulted to 20 ms.");
-    } else {
-      m_dt = dt;
     }
   }
 
