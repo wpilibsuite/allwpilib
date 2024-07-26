@@ -143,14 +143,14 @@ namespace warn {
   } while (0)
 
 /**
- * Reports an error to the driver station (using HAL_SendError).
+ * Reports a warning to the driver station (using HAL_SendError).
  *
  * @param[in]  format error message format
  */
-#define FRC_ReportWarning(format, ...)                                   \
-  do {                                                                   \
-    ::frc::ReportError(warn::Warnings, __FILE__, __LINE__, __FUNCTION__, \
-                       FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__);   \
+#define FRC_ReportWarning(format, ...)                                  \
+  do {                                                                  \
+    ::frc::ReportError(warn::Warning, __FILE__, __LINE__, __FUNCTION__, \
+                       FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__);  \
   } while (0)
 
 /**
