@@ -27,6 +27,7 @@ if(WITH_JAVA)
     )
     set_property(TARGET field_images_jar PROPERTY FOLDER "java")
     install_jar(field_images_jar DESTINATION ${java_lib_dest})
+    install_jar_exports(TARGETS field_images_jar FILE fieldImages_jar.cmake DESTINATION share/fieldImages)
 endif()
 
 generate_resources(
@@ -47,12 +48,17 @@ if(MSVC)
 endif()
 wpilib_target_warnings(fieldImages)
 
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/fieldImages")
 target_include_directories(
     fieldImages
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/fields>
+        $<INSTALL_INTERFACE:${include_dest}/fieldImages>
 )
 
 install(TARGETS fieldImages EXPORT fieldimages)
 export(TARGETS fieldImages FILE fieldimages.cmake NAMESPACE fieldimages::)
+
+configure_file(fieldimages-config.cmake.in ${WPILIB_BINARY_DIR}/fieldimages-config.cmake)
+install(FILES ${WPILIB_BINARY_DIR}/fieldimages-config.cmake DESTINATION share/fieldImages)
+install(EXPORT fieldimages DESTINATION share/fieldImages)

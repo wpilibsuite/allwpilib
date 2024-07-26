@@ -6,6 +6,7 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 * apriltag
 * cameraserver
 * cscore
+* fieldImages
 * hal (simulation HAL only)
 * ntcore
 * romiVendordep
