@@ -73,9 +73,12 @@ jobs:
               content: "rocket",
             });
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}
+      - name: Checkout PR
+        run: |
+          gh pr checkout $NUMBER
+        env:
+          GITHUB_TOKEN: "${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}"
+          NUMBER: ${{ github.event.issue.number }}
       - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
