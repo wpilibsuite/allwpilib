@@ -74,6 +74,8 @@ jobs:
             });
       - uses: actions/checkout@v4
       - name: Checkout PR
+        with:
+          token: ${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}
         run: |
           gh pr checkout $NUMBER
         env:
