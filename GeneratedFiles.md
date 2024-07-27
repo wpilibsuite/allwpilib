@@ -2,7 +2,7 @@
 WPILib extensively uses [metaprogramming](https://en.wikipedia.org/wiki/Metaprogramming#Code_generation) to maintain code that would otherwise be tedious and error-prone to maintain. We use [Jinja](https://jinja.palletsprojects.com), a templating engine with a Python API, alongside JSON files that contain data to generate code. This document explains how to maintain these generated files and create new ones.
 
 ## File hierarchy
-There's a certain file hierarchy to generated files. The Python script used to generate a subproject's files will always be located in the subproject's directory, e.g. wpilibc. It will always be called `generate_<thing>.py` where `<thing>` is the name for what you're generating.
+The Python script used to generate a subproject's files will always be located in the subproject's directory, e.g. wpilibc. It will always be called `generate_<thing>.py` where `<thing>` is the name for what you're generating.
 
 The templates will be located under `subproject/src/generate/main`, and generated files will be located under `subproject/src/generated/main`.
 
