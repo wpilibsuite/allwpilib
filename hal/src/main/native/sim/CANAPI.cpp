@@ -64,7 +64,7 @@ static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
   return createdId;
 }
 extern "C" {
-uint32_t HAL_GetCANPacketBaseTime() {
+uint32_t HAL_GetCANPacketBaseTime(void) {
   int status = 0;
   auto basetime = HAL_GetFPGATime(&status);
   // us to ms
@@ -289,4 +289,4 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     }
   }
 }
-} // extern "C"
+}  // extern "C"
