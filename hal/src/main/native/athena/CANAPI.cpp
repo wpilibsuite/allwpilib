@@ -112,10 +112,6 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, const uint8_t* data,
 
   std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
-
-  if (*status != 0) {
-    return;
-  }
   can->periodicSends[apiId] = -1;
 }
 
@@ -131,10 +127,6 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
 
   std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, data, length, repeatMs, status);
-
-  if (*status != 0) {
-    return;
-  }
   can->periodicSends[apiId] = repeatMs;
 }
 
@@ -152,10 +144,6 @@ void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
 
   std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
-
-  if (*status != 0) {
-    return;
-  }
   can->periodicSends[apiId] = -1;
 }
 
@@ -171,10 +159,6 @@ void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
   std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, nullptr, 0, HAL_CAN_SEND_PERIOD_STOP_REPEATING,
                       status);
-
-  if (*status != 0) {
-    return;
-  }
   can->periodicSends[apiId] = -1;
 }
 
