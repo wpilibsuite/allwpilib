@@ -5,7 +5,9 @@
 package edu.wpi.first.math.controller;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
@@ -48,5 +50,24 @@ class SimpleMotorFeedforwardTest {
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
         simpleMotor.calculate(currentVelocity, nextVelocity).magnitude(),
         2.0);
+  }
+
+  @Test
+  void testNegativeGains() {
+    double Ks = 0.5;
+    double Kv = 3.5;
+    double Ka = 3.5;
+    double dt = 0.02;
+
+    assertAll(
+        () ->
+            assertThrows(
+                IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, -Kv, Ka, dt)),
+        () ->
+            assertThrows(
+                IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, Kv, -Ka, dt)),
+        () ->
+            assertThrows(
+                IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, Kv, Ka, 0)));
   }
 }
