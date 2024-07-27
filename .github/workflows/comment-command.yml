@@ -99,6 +99,10 @@ jobs:
         run: ./wpilibj/generate_hids.py && ./wpilibc/generate_hids.py && ./wpilibNewCommands/generate_hids.py
       - name: Run PWM Controllers
         run: ./wpilibj/generate_pwm_motor_controllers.py && ./wpilibc/generate_pwm_motor_controllers.py
+      - name: Run imgui gl3w
+        run: ./thirdparty/imgui_suite/generate_gl3w.py
+      - name: Run imgui fonts
+        run: ./thirdparty/imgui_suite/generate_fonts.sh
       - name: Commit
         run: |
           # Set credentials
