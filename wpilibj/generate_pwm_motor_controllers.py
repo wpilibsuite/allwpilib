@@ -27,7 +27,7 @@ def generate_pwm_motor_controllers(output_root, template_root):
         controllers = json.load(f)
 
     env = Environment(
-        loader=FileSystemLoader(str(template_root)),
+        loader=FileSystemLoader(str(template_root /"main/java")),
         autoescape=False,
         keep_trailing_newline=True,
     )
