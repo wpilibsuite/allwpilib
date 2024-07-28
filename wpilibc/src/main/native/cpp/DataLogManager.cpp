@@ -73,9 +73,9 @@ static std::string MakeLogDir(std::string_view dir) {
     return "/u/logs";
   }
   if (RobotBase::GetRuntimeType() == kRoboRIO) {
-    FRC_ReportError(warn::Warning,
-                    "DataLogManager: Logging to RoboRIO 1 internal storage is "
-                    "not recommended! Plug in a FAT32 formatted flash drive!");
+    FRC_ReportWarning(
+        "DataLogManager: Logging to RoboRIO 1 internal storage is "
+        "not recommended! Plug in a FAT32 formatted flash drive!");
   }
   fs::create_directory("/home/lvuser/logs", ec);
   return "/home/lvuser/logs";
@@ -151,8 +151,8 @@ void Thread::Main() {
         }
         auto size = entry.file_size();
         if (fs::remove(entry.path(), ec)) {
-          FRC_ReportError(warn::Warning, "DataLogManager: Deleted {}",
-                          entry.path().string());
+          FRC_ReportWarning("DataLogManager: Deleted {}",
+                            entry.path().string());
           freeSpace += size;
           if (freeSpace >= kFreeSpaceThreshold) {
             break;

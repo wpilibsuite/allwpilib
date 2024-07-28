@@ -18,7 +18,6 @@
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
-#include <wpi/timestamp.h>
 
 #ifdef __FRC_ROBORIO__
 #include <FRC_NetworkCommunication/FRCComm.h>

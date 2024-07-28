@@ -113,8 +113,8 @@ void Watchdog::Impl::Main() {
     if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
-        FRC_ReportError(warn::Warning, "Watchdog not fed within {:.6f}s",
-                        watchdog->m_timeout.value());
+        FRC_ReportWarning("Watchdog not fed within {:.6f}s",
+                          watchdog->m_timeout.value());
       }
     }
 
