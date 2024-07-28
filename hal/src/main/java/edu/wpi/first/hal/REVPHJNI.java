@@ -169,7 +169,7 @@ public class REVPHJNI extends JNIWrapper {
    * Gets a bitmask of solenoid values.
    *
    * @param handle the PH handle
-   * @return solenoid values
+   * @return Bitmask containing the state of the solenoids. The LSB represents solenoid 0.
    * @see "HAL_GetREVPHSolenoids"
    */
   public static native int getSolenoids(int handle);
@@ -178,8 +178,9 @@ public class REVPHJNI extends JNIWrapper {
    * Sets solenoids on a PH.
    *
    * @param handle the PH handle
-   * @param mask bitmask to set
-   * @param values solenoid values
+   * @param mask Bitmask indicating which solenoids to set. The LSB represents solenoid 0.
+   * @param values Bitmask indicating the desired states of the solenoids. The LSB represents
+   *     solenoid 0.
    * @see "HAL_SetREVPHSolenoids"
    */
   public static native void setSolenoids(int handle, int mask, int values);
