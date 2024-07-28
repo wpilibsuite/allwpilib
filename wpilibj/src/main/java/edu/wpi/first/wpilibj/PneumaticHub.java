@@ -249,8 +249,7 @@ public class PneumaticHub implements PneumaticsBase {
 
   @Override
   public int getSolenoidDisabledList() {
-    int raw = REVPHJNI.getStickyFaultsNative(m_handle);
-    return raw & 0xFFFF;
+    return REVPHJNI.getSolenoidDisabledList(m_handle);
   }
 
   /**

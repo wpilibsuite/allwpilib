@@ -279,6 +279,15 @@ public class REVPHJNI extends JNIWrapper {
   }
 
   /**
+   * Get a bitmask of disabled solenoids.
+   *
+   * @param handle the PH handle
+   * @return Bitmask indicating disabled solenoids. The LSB represents solenoid 0.
+   * @see "HAL_GetREVPHSolenoidDisabledList"
+   */
+  public static native int getSolenoidDisabledList(int handle);
+
+  /**
    * Returns the hardware and firmware versions of the PH.
    *
    * @param handle the PH handle
