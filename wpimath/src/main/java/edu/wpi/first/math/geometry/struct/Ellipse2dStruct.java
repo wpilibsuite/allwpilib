@@ -16,8 +16,8 @@ public class Ellipse2dStruct implements Struct<Ellipse2d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Ellipse2d";
+  public String getTypeName() {
+    return "Ellipse2d";
   }
 
   @Override

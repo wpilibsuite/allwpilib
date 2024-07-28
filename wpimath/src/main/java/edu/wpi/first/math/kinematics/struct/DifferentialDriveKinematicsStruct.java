@@ -15,8 +15,8 @@ public class DifferentialDriveKinematicsStruct implements Struct<DifferentialDri
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:DifferentialDriveKinematics";
+  public String getTypeName() {
+    return "DifferentialDriveKinematics";
   }
 
   @Override
