@@ -1,0 +1,5 @@
+@FILENAME_DEP_REPLACE@
+include(${SELF_DIR}/fieldimages.cmake)
+if(@WITH_JAVA@)
+    include(${SELF_DIR}/fieldImages_jar.cmake)
+endif()
