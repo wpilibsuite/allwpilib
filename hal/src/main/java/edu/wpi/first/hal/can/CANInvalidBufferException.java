@@ -11,10 +11,16 @@ package edu.wpi.first.hal.can;
 public class CANInvalidBufferException extends RuntimeException {
   private static final long serialVersionUID = -7993785672956997939L;
 
+  /** Constructs a new CANInvalidBufferException with no message. */
   public CANInvalidBufferException() {
     super();
   }
 
+  /**
+   * Constructs a new CANInvalidBufferException with {@code msg} as its detail message.
+   *
+   * @param msg the message
+   */
   public CANInvalidBufferException(String msg) {
     super(msg);
   }

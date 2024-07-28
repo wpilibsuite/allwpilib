@@ -218,7 +218,6 @@ task generateJavaDocs(type: Javadoc) {
     options.addBooleanOption("Xdoclint/package:" +
             // TODO: v Document these, then remove them from the list
             "-edu.wpi.first.hal," +
-            "-edu.wpi.first.hal.can," +
             "-edu.wpi.first.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
             "-edu.wpi.first.math.proto," +
