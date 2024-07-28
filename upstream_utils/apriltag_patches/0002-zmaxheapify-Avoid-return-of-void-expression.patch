@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sun, 4 Dec 2022 11:25:12 -0800
+Subject: [PATCH 2/9] zmaxheapify: Avoid return of void expression
+
+---
+ common/zmaxheap.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/common/zmaxheap.c b/common/zmaxheap.c
+index e04d03efa8a79163293eb306e9f4beab6e4a27df..e410664fd57dfa5ebd30e0680d77b008bb41801c 100644
+--- a/common/zmaxheap.c
++++ b/common/zmaxheap.c
+@@ -320,7 +320,8 @@ static void maxheapify(zmaxheap_t *heap, int parent)
+ 
+     if (betterchild != parent) {
+         heap->swap(heap, parent, betterchild);
+-        return maxheapify(heap, betterchild);
++        maxheapify(heap, betterchild);
++        return;
+     }
+ }
+ 

@@ -4,10 +4,15 @@
 
 #pragma once
 
+#include <string>
+#include <type_traits>
+
 #include <gcem.hpp>
+#include <wpi/StackTrace.h>
 
 #include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -24,6 +29,11 @@ constexpr Rotation2d::Rotation2d(double x, double y) {
   } else {
     m_sin = 0.0;
     m_cos = 1.0;
+    if (!std::is_constant_evaluated()) {
+      wpi::math::MathSharedStore::ReportError(
+          "x and y components of Rotation2d are zero\n{}",
+          wpi::GetStackTrace(1));
+    }
   }
   m_value = units::radian_t{gcem::atan2(m_sin, m_cos)};
 }

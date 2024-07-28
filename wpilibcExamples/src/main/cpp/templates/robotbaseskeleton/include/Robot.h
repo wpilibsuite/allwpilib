@@ -10,7 +10,7 @@
 
 class Robot : public frc::RobotBase {
  public:
-  void RobotInit();
+  Robot();
   void Disabled();
   void Autonomous();
   void Teleop();

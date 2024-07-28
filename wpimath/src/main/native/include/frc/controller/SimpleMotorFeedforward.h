@@ -4,16 +4,15 @@
 
 #pragma once
 
+#include <gcem.hpp>
 #include <wpi/MathExtras.h>
 
-#include "frc/EigenCore.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/system/plant/LinearSystemId.h"
 #include "units/time.h"
 #include "units/voltage.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
+
 /**
  * A helper class that computes feedforward voltages for a simple
  * permanent-magnet DC motor.
@@ -35,22 +34,30 @@ class SimpleMotorFeedforward {
    * @param kS The static gain, in volts.
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds² per distance.
+   * @param dt The period in seconds.
    */
   constexpr SimpleMotorFeedforward(
       units::volt_t kS, units::unit_t<kv_unit> kV,
-      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : kS(kS), kV(kV), kA(kA) {
+      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
+      units::second_t dt = 20_ms)
+      : kS(kS), kV(kV), kA(kA), m_dt(dt) {
     if (kV.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kV must be a non-negative number, got {}!", kV.value());
-      kV = units::unit_t<kv_unit>{0};
+      this->kV = units::unit_t<kv_unit>{0};
       wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
     }
     if (kA.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kA must be a non-negative number, got {}!", kA.value());
-      kA = units::unit_t<ka_unit>{0};
-      wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
+      this->kA = units::unit_t<ka_unit>{0};
+      wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0.");
+    }
+    if (dt <= 0_ms) {
+      wpi::math::MathSharedStore::ReportError(
+          "period must be a positive number, got {}!", dt.value());
+      this->m_dt = 20_ms;
+      wpi::math::MathSharedStore::ReportWarning("period defaulted to 20 ms.");
     }
   }
 
@@ -60,11 +67,25 @@ class SimpleMotorFeedforward {
    * @param velocity     The velocity setpoint, in distance per second.
    * @param acceleration The acceleration setpoint, in distance per second².
    * @return The computed feedforward, in volts.
+   * @deprecated Use the current/next velocity overload instead.
    */
-  constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
-                                    units::unit_t<Acceleration> acceleration =
-                                        units::unit_t<Acceleration>(0)) const {
+  [[deprecated("Use the current/next velocity overload instead.")]]
+  constexpr units::volt_t Calculate(
+      units::unit_t<Velocity> velocity,
+      units::unit_t<Acceleration> acceleration) const {
     return kS * wpi::sgn(velocity) + kV * velocity + kA * acceleration;
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoint.
+   * Use this method when the setpoint does not change.
+   *
+   * @param setpoint The velocity setpoint, in distance per
+   *                        second.
+   * @return The computed feedforward, in volts.
+   */
+  constexpr units::volt_t Calculate(units::unit_t<Velocity> setpoint) const {
+    return Calculate(setpoint, setpoint);
   }
 
   /**
@@ -73,20 +94,74 @@ class SimpleMotorFeedforward {
    * @param currentVelocity The current velocity setpoint, in distance per
    *                        second.
    * @param nextVelocity    The next velocity setpoint, in distance per second.
-   * @param dt              Time between velocity setpoints in seconds.
    * @return The computed feedforward, in volts.
    */
-  units::volt_t Calculate(units::unit_t<Velocity> currentVelocity,
-                          units::unit_t<Velocity> nextVelocity,
-                          units::second_t dt) const {
-    auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
-    LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
-
-    Vectord<1> r{currentVelocity.value()};
-    Vectord<1> nextR{nextVelocity.value()};
-
-    return kS * wpi::sgn(currentVelocity.value()) +
-           units::volt_t{feedforward.Calculate(r, nextR)(0)};
+  constexpr units::volt_t Calculate(
+      units::unit_t<Velocity> currentVelocity,
+      units::unit_t<Velocity> nextVelocity) const {
+    if (kA == decltype(kA)(0)) {
+      // Given the following discrete feedforward model
+      //
+      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      //
+      // where
+      //
+      //   A_d = eᴬᵀ
+      //   B_d = A⁻¹(eᴬᵀ - I)B
+      //   A = −kᵥ/kₐ
+      //   B = 1/kₐ
+      //
+      // We want the feedforward model when kₐ = 0.
+      //
+      // Simplify A.
+      //
+      //   A = −kᵥ/kₐ
+      //
+      // As kₐ approaches zero, A approaches -∞.
+      //
+      //   A = −∞
+      //
+      // Simplify A_d.
+      //
+      //   A_d = eᴬᵀ
+      //   A_d = std::exp(−∞)
+      //   A_d = 0
+      //
+      // Simplify B_d.
+      //
+      //   B_d = A⁻¹(eᴬᵀ - I)B
+      //   B_d = A⁻¹((0) - I)B
+      //   B_d = A⁻¹(-I)B
+      //   B_d = -A⁻¹B
+      //   B_d = -(−kᵥ/kₐ)⁻¹(1/kₐ)
+      //   B_d = (kᵥ/kₐ)⁻¹(1/kₐ)
+      //   B_d = kₐ/kᵥ(1/kₐ)
+      //   B_d = 1/kᵥ
+      //
+      // Substitute these into the feedforward equation.
+      //
+      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      //   uₖ = (1/kᵥ)⁺(rₖ₊₁ − (0) rₖ)
+      //   uₖ = kᵥrₖ₊₁
+      return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
+    } else {
+      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      //
+      // where
+      //
+      //   A_d = eᴬᵀ
+      //   B_d = A⁻¹(eᴬᵀ - I)B
+      //   A = −kᵥ/kₐ
+      //   B = 1/kₐ
+      double A = -kV.value() / kA.value();
+      double B = 1.0 / kA.value();
+      double A_d = gcem::exp(A * m_dt.value());
+      double B_d = 1.0 / A * (A_d - 1.0) * B;
+      return kS * wpi::sgn(currentVelocity) +
+             units::volt_t{
+                 1.0 / B_d *
+                 (nextVelocity.value() - A_d * currentVelocity.value())};
+    }
   }
 
   // Rearranging the main equation from the calculate() method yields the
@@ -160,13 +235,46 @@ class SimpleMotorFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 
+  /**
+   * Returns the static gain.
+   *
+   * @return The static gain.
+   */
+  units::volt_t GetKs() const { return kS; }
+
+  /**
+   * Returns the velocity gain.
+   *
+   * @return The velocity gain.
+   */
+  units::unit_t<kv_unit> GetKv() const { return kV; }
+
+  /**
+   * Returns the acceleration gain.
+   *
+   * @return The acceleration gain.
+   */
+  units::unit_t<ka_unit> GetKa() const { return kA; }
+
+  /**
+   * Returns the period.
+   *
+   * @return The period.
+   */
+  units::second_t GetDt() const { return m_dt; }
+
+ private:
   /** The static gain. */
-  const units::volt_t kS;
+  units::volt_t kS;
 
   /** The velocity gain. */
-  const units::unit_t<kv_unit> kV;
+  units::unit_t<kv_unit> kV;
 
   /** The acceleration gain. */
-  const units::unit_t<ka_unit> kA;
+  units::unit_t<ka_unit> kA;
+
+  /** The period. */
+  units::second_t m_dt;
 };
+
 }  // namespace frc

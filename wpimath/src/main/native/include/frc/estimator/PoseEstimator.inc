@@ -5,6 +5,8 @@
 #pragma once
 
 #include "frc/estimator/PoseEstimator.h"
+#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Translation2d.h"
 
 namespace frc {
 
@@ -51,6 +53,26 @@ void PoseEstimator<WheelSpeeds, WheelPositions>::ResetPosition(
   m_odometryPoseBuffer.Clear();
   m_visionUpdates.clear();
   m_poseEstimate = m_odometry.GetPose();
+}
+
+template <typename WheelSpeeds, typename WheelPositions>
+void PoseEstimator<WheelSpeeds, WheelPositions>::ResetPose(const Pose2d& pose) {
+  m_odometry.ResetPose(pose);
+  m_odometryPoseBuffer.Clear();
+}
+
+template <typename WheelSpeeds, typename WheelPositions>
+void PoseEstimator<WheelSpeeds, WheelPositions>::ResetTranslation(
+    const Translation2d& translation) {
+  m_odometry.ResetTranslation(translation);
+  m_odometryPoseBuffer.Clear();
+}
+
+template <typename WheelSpeeds, typename WheelPositions>
+void PoseEstimator<WheelSpeeds, WheelPositions>::ResetRotation(
+    const Rotation2d& rotation) {
+  m_odometry.ResetTranslation(rotation);
+  m_odometryPoseBuffer.Clear();
 }
 
 template <typename WheelSpeeds, typename WheelPositions>

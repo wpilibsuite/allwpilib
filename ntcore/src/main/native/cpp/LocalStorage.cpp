@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include <fmt/ranges.h>
 #include <wpi/DataLog.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>

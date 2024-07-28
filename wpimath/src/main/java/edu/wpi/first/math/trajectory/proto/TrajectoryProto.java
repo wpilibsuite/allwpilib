@@ -23,11 +23,6 @@ public class TrajectoryProto implements Protobuf<Trajectory, ProtobufTrajectory>
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Trajectory.State.proto};
-  }
-
-  @Override
   public ProtobufTrajectory createMessage() {
     return ProtobufTrajectory.newInstance();
   }

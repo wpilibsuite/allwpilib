@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.flywheelbangbangcontroller;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.numbers.N1;
@@ -65,8 +68,7 @@ public class Robot extends TimedRobot {
   private final FlywheelSim m_flywheelSim = new FlywheelSim(m_plant, m_gearbox);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Add bang-bang controler to SmartDashboard and networktables.
     SmartDashboard.putData(m_bangBangControler);
   }
@@ -87,7 +89,8 @@ public class Robot extends TimedRobot {
     // Controls a motor with the output of the BangBang controller and a
     // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
-    m_flywheelMotor.setVoltage(bangOutput + 0.9 * m_feedforward.calculate(setpoint));
+    m_flywheelMotor.setVoltage(
+        bangOutput + 0.9 * m_feedforward.calculate(RadiansPerSecond.of(setpoint)).in(Volts));
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */

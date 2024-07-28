@@ -4,6 +4,7 @@
 
 #include "wpi/DataLog.h"
 
+#include <algorithm>
 #include <bit>
 #include <cstdio>
 #include <cstdlib>
@@ -615,6 +616,107 @@ void DataLog::AppendStringArray(int entry,
   wpi::support::endian::write32le(buf, arr.size());
   for (auto&& sv : arr) {
     AppendStringImpl(sv.str);
+  }
+}
+
+template <typename V1, typename V2>
+inline bool UpdateImpl(std::optional<std::vector<V1>>& lastValue,
+                       std::span<const V2> data) {
+  if (!lastValue || !std::equal(data.begin(), data.end(), lastValue->begin(),
+                                lastValue->end())) {
+    if (lastValue) {
+      lastValue->assign(data.begin(), data.end());
+    } else {
+      lastValue = std::vector<V1>{data.begin(), data.end()};
+    }
+    return true;
+  }
+  return false;
+}
+
+template <typename V1>
+inline bool UpdateImpl(std::optional<std::vector<V1>>& lastValue,
+                       std::span<const bool> data) {
+  if (!lastValue || !std::equal(data.begin(), data.end(), lastValue->begin(),
+                                lastValue->end(), [](auto a, auto b) {
+                                  return a == static_cast<bool>(b);
+                                })) {
+    if (lastValue) {
+      lastValue->assign(data.begin(), data.end());
+    } else {
+      lastValue = std::vector<V1>{data.begin(), data.end()};
+    }
+    return true;
+  }
+  return false;
+}
+
+void RawLogEntry::Update(std::span<const uint8_t> data, int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, data)) {
+    Append(data, timestamp);
+  }
+}
+
+void BooleanArrayLogEntry::Update(std::span<const bool> arr,
+                                  int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void BooleanArrayLogEntry::Update(std::span<const int> arr, int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void BooleanArrayLogEntry::Update(std::span<const uint8_t> arr,
+                                  int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void IntegerArrayLogEntry::Update(std::span<const int64_t> arr,
+                                  int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void FloatArrayLogEntry::Update(std::span<const float> arr, int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void DoubleArrayLogEntry::Update(std::span<const double> arr,
+                                 int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void StringArrayLogEntry::Update(std::span<const std::string> arr,
+                                 int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
+  }
+}
+
+void StringArrayLogEntry::Update(std::span<const std::string_view> arr,
+                                 int64_t timestamp) {
+  std::scoped_lock lock{m_mutex};
+  if (UpdateImpl(m_lastValue, arr)) {
+    Append(arr, timestamp);
   }
 }
 

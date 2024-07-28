@@ -143,6 +143,10 @@ The Java code quality tools Checkstyle, PMD, and Spotless can be run via `./grad
 
 If you only want to run the Java autoformatter, run `./gradlew spotlessApply`.
 
+### Generated files
+
+Several files within WPILib are generated using Jinja. If a PR is opened that modifies these templates then the files can be generated through CI by commenting `/pregen` on the PR. A new commit will be pushed with the regenerated files.
+
 ### CMake
 
 CMake is also supported for building. See [README-CMAKE.md](README-CMAKE.md).

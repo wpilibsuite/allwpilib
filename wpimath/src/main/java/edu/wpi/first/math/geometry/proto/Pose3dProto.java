@@ -23,11 +23,6 @@ public class Pose3dProto implements Protobuf<Pose3d, ProtobufPose3d> {
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Translation3d.proto, Rotation3d.proto};
-  }
-
-  @Override
   public ProtobufPose3d createMessage() {
     return ProtobufPose3d.newInstance();
   }

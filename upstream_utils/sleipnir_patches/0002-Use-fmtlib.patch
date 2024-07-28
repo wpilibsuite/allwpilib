@@ -1,12 +1,12 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 29 May 2024 16:29:55 -0700
-Subject: [PATCH 2/4] Use fmtlib
+Subject: [PATCH 2/5] Use fmtlib
 
 ---
  include/.styleguide             |  1 +
- include/sleipnir/util/Print.hpp | 27 ++++++++++++++-------------
- 2 files changed, 15 insertions(+), 13 deletions(-)
+ include/sleipnir/util/Print.hpp | 31 ++++++++++++++++++-------------
+ 2 files changed, 19 insertions(+), 13 deletions(-)
 
 diff --git a/include/.styleguide b/include/.styleguide
 index 8fb61fdf9cc5ceff633d3126f0579eef25a1326f..6a7f8ed28f9cb037c9746a7e0ef5e110481d9825 100644
@@ -19,10 +19,10 @@ index 8fb61fdf9cc5ceff633d3126f0579eef25a1326f..6a7f8ed28f9cb037c9746a7e0ef5e110
 +  ^fmt/
  }
 diff --git a/include/sleipnir/util/Print.hpp b/include/sleipnir/util/Print.hpp
-index 339320bce6d017ca85025060ba445b2f025bb225..fcf2e69bfb5a081cd915bdded3caa80cd9c38518 100644
+index 339320bce6d017ca85025060ba445b2f025bb225..a9220cdaadcb9b88862542935bc72781d8389239 100644
 --- a/include/sleipnir/util/Print.hpp
 +++ b/include/sleipnir/util/Print.hpp
-@@ -2,52 +2,53 @@
+@@ -2,52 +2,57 @@
  
  #pragma once
  
@@ -30,7 +30,11 @@ index 339320bce6d017ca85025060ba445b2f025bb225..fcf2e69bfb5a081cd915bdded3caa80c
  #include <system_error>
  #include <utility>
  
++#if __has_include(<fmt/base.h>)
++#include <fmt/base.h>
++#else
 +#include <fmt/core.h>
++#endif
 +
  namespace sleipnir {
  

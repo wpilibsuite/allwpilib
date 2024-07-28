@@ -13,7 +13,7 @@
  */
 class Robot : public frc::TimedRobot {
  public:
-  void RobotInit() override {
+  Robot() {
     // Put the PDP itself to the dashboard
     frc::SmartDashboard::PutData("PDP", &m_pdp);
   }

@@ -28,7 +28,6 @@ namespace sleipnir {
  * @param[in] decisionVariables The list of decision variables.
  * @param[in] equalityConstraints The list of equality constraints.
  * @param[in] inequalityConstraints The list of inequality constraints.
- * @param[in] f The cost function.
  * @param[in] μ Barrier parameter.
  * @param[in] callback The user callback.
  * @param[in] config Configuration options for the solver.
@@ -40,8 +39,8 @@ namespace sleipnir {
 inline void FeasibilityRestoration(
     std::span<Variable> decisionVariables,
     std::span<Variable> equalityConstraints,
-    std::span<Variable> inequalityConstraints, Variable& f, double μ,
-    function_ref<bool(const SolverIterationInfo&)> callback,
+    std::span<Variable> inequalityConstraints, double μ,
+    function_ref<bool(const SolverIterationInfo& info)> callback,
     const SolverConfig& config, Eigen::VectorXd& x, Eigen::VectorXd& s,
     SolverStatus* status) {
   // Feasibility restoration

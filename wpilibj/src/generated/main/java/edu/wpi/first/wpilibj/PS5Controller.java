@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj;
 
 // import edu.wpi.first.hal.FRCNetComm.tResourceType;
 // import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
@@ -22,7 +24,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class PS5Controller extends GenericHID {
+public class PS5Controller extends GenericHID implements Sendable {
   /** Represents a digital button on a PS5Controller. */
   public enum Button {
     /** Square button. */
@@ -745,5 +747,31 @@ public class PS5Controller extends GenericHID {
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getTouchpadReleased() {
     return getRawButtonReleased(Button.kTouchpad.value);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("HID");
+    builder.publishConstString("ControllerType", "PS5");
+    builder.addDoubleProperty("L2", this::getL2Axis, null);
+    builder.addDoubleProperty("R2", this::getR2Axis, null);
+    builder.addDoubleProperty("LeftX", this::getLeftX, null);
+    builder.addDoubleProperty("LeftY", this::getLeftY, null);
+    builder.addDoubleProperty("RightX", this::getRightX, null);
+    builder.addDoubleProperty("RightY", this::getRightY, null);
+    builder.addBooleanProperty("Square", this::getSquareButton, null);
+    builder.addBooleanProperty("Cross", this::getCrossButton, null);
+    builder.addBooleanProperty("Circle", this::getCircleButton, null);
+    builder.addBooleanProperty("Triangle", this::getTriangleButton, null);
+    builder.addBooleanProperty("L1", this::getL1Button, null);
+    builder.addBooleanProperty("R1", this::getR1Button, null);
+    builder.addBooleanProperty("L2", this::getL2Button, null);
+    builder.addBooleanProperty("R2", this::getR2Button, null);
+    builder.addBooleanProperty("Create", this::getCreateButton, null);
+    builder.addBooleanProperty("Options", this::getOptionsButton, null);
+    builder.addBooleanProperty("L3", this::getL3Button, null);
+    builder.addBooleanProperty("R3", this::getR3Button, null);
+    builder.addBooleanProperty("PS", this::getPSButton, null);
+    builder.addBooleanProperty("Touchpad", this::getTouchpadButton, null);
   }
 }

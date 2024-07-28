@@ -33,11 +33,11 @@ public class Robot extends TimedRobot {
   private final Encoder m_elevatorEncoder = new Encoder(0, 1);
   private final Joystick m_joystick = new Joystick(0);
 
-  private MechanismLigament2d m_elevator;
-  private MechanismLigament2d m_wrist;
+  private final MechanismLigament2d m_elevator;
+  private final MechanismLigament2d m_wrist;
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     m_elevatorEncoder.setDistancePerPulse(kMetersPerPulse);
 
     // the main mechanism object

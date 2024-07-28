@@ -15,8 +15,8 @@ public class ElevatorFeedforwardStruct implements Struct<ElevatorFeedforward> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:ElevatorFeedforward";
+  public String getTypeName() {
+    return "ElevatorFeedforward";
   }
 
   @Override
@@ -40,9 +40,9 @@ public class ElevatorFeedforwardStruct implements Struct<ElevatorFeedforward> {
 
   @Override
   public void pack(ByteBuffer bb, ElevatorFeedforward value) {
-    bb.putDouble(value.ks);
-    bb.putDouble(value.kg);
-    bb.putDouble(value.kv);
-    bb.putDouble(value.ka);
+    bb.putDouble(value.getKs());
+    bb.putDouble(value.getKg());
+    bb.putDouble(value.getKv());
+    bb.putDouble(value.getKa());
   }
 }

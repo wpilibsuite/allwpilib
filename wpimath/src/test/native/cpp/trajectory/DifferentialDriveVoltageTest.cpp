@@ -45,17 +45,19 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
                                       point.velocity * point.curvature};
 
     auto [left, right] = kinematics.ToWheelSpeeds(chassisSpeeds);
-
+    auto acceleration = point.acceleration;
     // Not really a strictly-correct test as we're using the chassis accel
     // instead of the wheel accel, but much easier than doing it "properly" and
     // a reasonable check anyway
-    EXPECT_TRUE(feedforward.Calculate(left, point.acceleration) <
+    EXPECT_TRUE(feedforward.Calculate(left, left + acceleration * dt) <
                 maxVoltage + 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(left, point.acceleration) >
+    EXPECT_TRUE(feedforward.Calculate(left, left + acceleration * dt) >
                 -maxVoltage - 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(right, point.acceleration) <
+    EXPECT_TRUE(feedforward.Calculate(right,
+
+                                      right + acceleration * dt) <
                 maxVoltage + 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(right, point.acceleration) >
+    EXPECT_TRUE(feedforward.Calculate(right, right + acceleration * dt) >
                 -maxVoltage - 0.05_V);
   }
 }

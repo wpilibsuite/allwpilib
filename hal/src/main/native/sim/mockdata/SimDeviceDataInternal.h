@@ -58,12 +58,19 @@ class SimUnnamedCallbackRegistry {
            1;
   }
 
-  template <typename... U>
-  void Invoke(const char* name, U&&... u) const {
+  template <typename Mutex, typename... U>
+  void Invoke(std::unique_lock<Mutex>& lock, const char* name, U&&... u) const {
     if (m_callbacks) {
-      for (auto&& cb : *m_callbacks) {
-        reinterpret_cast<CallbackFunction>(cb.callback)(name, cb.param,
-                                                        std::forward<U>(u)...);
+      for (size_t i = 0; i < m_callbacks->size(); ++i) {
+        auto& cb = (*m_callbacks)[i];
+        if (cb.callback) {
+          auto callback = cb.callback;
+          auto param = cb.param;
+          lock.unlock();
+          reinterpret_cast<CallbackFunction>(callback)(name, param,
+                                                       std::forward<U>(u)...);
+          lock.lock();
+        }
       }
     }
   }
@@ -115,12 +122,17 @@ class SimPrefixCallbackRegistry {
     return m_callbacks->emplace_back(prefix, param, callback) + 1;
   }
 
-  template <typename... U>
-  void Invoke(const char* name, U&&... u) const {
+  template <typename Mutex, typename... U>
+  void Invoke(std::unique_lock<Mutex>& lock, const char* name, U&&... u) const {
     if (m_callbacks) {
-      for (auto&& cb : *m_callbacks) {
-        if (wpi::starts_with(name, cb.prefix)) {
-          cb.callback(name, cb.param, std::forward<U>(u)...);
+      for (size_t i = 0; i < m_callbacks->size(); ++i) {
+        auto& cb = (*m_callbacks)[i];
+        if (cb.callback && wpi::starts_with(name, cb.prefix)) {
+          auto callback = cb.callback;
+          auto param = cb.param;
+          lock.unlock();
+          callback(name, param, std::forward<U>(u)...);
+          lock.lock();
         }
       }
     }

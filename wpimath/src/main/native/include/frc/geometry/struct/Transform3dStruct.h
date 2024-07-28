@@ -11,9 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Transform3d> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:Transform3d";
-  }
+  static constexpr std::string_view GetTypeName() { return "Transform3d"; }
   static constexpr size_t GetSize() {
     return wpi::GetStructSize<frc::Translation3d>() +
            wpi::GetStructSize<frc::Rotation3d>();

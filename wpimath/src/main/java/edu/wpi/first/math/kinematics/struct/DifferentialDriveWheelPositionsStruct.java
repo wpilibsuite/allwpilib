@@ -16,8 +16,8 @@ public class DifferentialDriveWheelPositionsStruct
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:DifferentialDriveWheelPositions";
+  public String getTypeName() {
+    return "DifferentialDriveWheelPositions";
   }
 
   @Override

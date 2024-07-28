@@ -41,7 +41,8 @@ struct MultistartResult {
  */
 template <typename DecisionVariables>
 MultistartResult<DecisionVariables> Multistart(
-    function_ref<MultistartResult<DecisionVariables>(const DecisionVariables&)>
+    function_ref<MultistartResult<DecisionVariables>(
+        const DecisionVariables& initialGuess)>
         solve,
     std::span<const DecisionVariables> initialGuesses) {
   wpi::SmallVector<std::future<MultistartResult<DecisionVariables>>> futures;

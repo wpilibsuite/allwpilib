@@ -36,7 +36,7 @@ void Tracer::PrintEpochs() {
   wpi::raw_svector_ostream os(buf);
   PrintEpochs(os);
   if (!buf.empty()) {
-    FRC_ReportError(warn::Warning, "{}", buf.c_str());
+    FRC_ReportWarning("{}", buf.c_str());
   }
 }
 

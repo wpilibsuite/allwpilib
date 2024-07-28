@@ -11,9 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Rotation2d> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:Rotation2d";
-  }
+  static constexpr std::string_view GetTypeName() { return "Rotation2d"; }
   static constexpr size_t GetSize() { return 8; }
   static constexpr std::string_view GetSchema() { return "double value"; }
 

@@ -21,7 +21,6 @@ import json
 import os
 
 from wpimath import geometry, units
-import numpy as np
 
 
 def main():

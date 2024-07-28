@@ -4,7 +4,9 @@
 
 package edu.wpi.first.math.controller;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
@@ -52,5 +54,16 @@ class ElevatorFeedforwardTest {
     assertEquals(7.25, m_elevatorFF.maxAchievableAcceleration(12, -2), 0.002);
     assertEquals(-8.25, m_elevatorFF.minAchievableAcceleration(12, 2), 0.002);
     assertEquals(-4.75, m_elevatorFF.minAchievableAcceleration(12, -2), 0.002);
+  }
+
+  @Test
+  void testNegativeGains() {
+    assertAll(
+        () ->
+            assertThrows(
+                IllegalArgumentException.class, () -> new ElevatorFeedforward(ks, kg, -kv, ka)),
+        () ->
+            assertThrows(
+                IllegalArgumentException.class, () -> new ElevatorFeedforward(ks, kg, kv, -ka)));
   }
 }

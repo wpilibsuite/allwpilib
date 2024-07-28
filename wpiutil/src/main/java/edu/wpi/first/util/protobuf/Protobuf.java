@@ -49,15 +49,6 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
   Descriptor getDescriptor();
 
   /**
-   * Gets the list of protobuf types referenced by this protobuf.
-   *
-   * @return list of protobuf types
-   */
-  default Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {};
-  }
-
-  /**
    * Creates protobuf message.
    *
    * @return protobuf message

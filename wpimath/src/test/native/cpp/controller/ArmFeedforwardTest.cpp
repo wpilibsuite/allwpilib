@@ -139,3 +139,9 @@ TEST(ArmFeedforwardTest, AchievableAcceleration) {
                   .value(),
               -5.25, 0.002);
 }
+
+TEST(ArmFeedforwardTest, NegativeGains) {
+  frc::ArmFeedforward armFF{Ks, Kg, -Kv, -Ka};
+  EXPECT_EQ(armFF.GetKv().value(), 0);
+  EXPECT_EQ(armFF.GetKa().value(), 0);
+}

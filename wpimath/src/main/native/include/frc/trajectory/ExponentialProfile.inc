@@ -6,8 +6,6 @@
 
 #include <algorithm>
 
-#include <fmt/core.h>
-
 #include "frc/trajectory/ExponentialProfile.h"
 #include "units/math.h"
 

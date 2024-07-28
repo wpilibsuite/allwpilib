@@ -1,8 +1,0 @@
-cppHeaderFileInclude {
-  \.h$
-  \.inc$
-}
-
-cppSrcFileInclude {
-  \.cpp$
-}
