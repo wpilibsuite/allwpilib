@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "DigitalPWMDataInternal.h"
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDigitalPWMData() {
   static DigitalPWMData sdpd[kNumDigitalPWMOutputs];
   ::hal::SimDigitalPWMData = sdpd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 DigitalPWMData* hal::SimDigitalPWMData;
 void DigitalPWMData::ResetData() {
@@ -27,6 +22,16 @@ void DigitalPWMData::ResetData() {
 }
 
 extern "C" {
+int32_t HALSIM_FindDigitalPWMForChannel(int32_t channel) {
+  for (int i = 0; i < kNumDigitalPWMOutputs; ++i) {
+    if (SimDigitalPWMData[i].initialized &&
+        SimDigitalPWMData[i].pin == channel) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 void HALSIM_ResetDigitalPWMData(int32_t index) {
   SimDigitalPWMData[index].ResetData();
 }

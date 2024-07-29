@@ -1,60 +1,66 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/Timer.h>
+#include <frc/XboxController.h>
 #include <frc/drive/DifferentialDrive.h>
-#include <frc/livewindow/LiveWindow.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
-    m_robotDrive.SetExpiration(0.1);
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_left);
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_right);
+
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+    m_right.SetInverted(true);
+    m_robotDrive.SetExpiration(100_ms);
     m_timer.Start();
   }
 
-  void AutonomousInit() override {
-    m_timer.Reset();
-    m_timer.Start();
-  }
+  void AutonomousInit() override { m_timer.Restart(); }
 
   void AutonomousPeriodic() override {
     // Drive for 2 seconds
-    if (m_timer.Get() < 2.0) {
-      // Drive forwards half speed
-      m_robotDrive.ArcadeDrive(-0.5, 0.0);
+    if (m_timer.Get() < 2_s) {
+      // Drive forwards half speed, make sure to turn input squaring off
+      m_robotDrive.ArcadeDrive(0.5, 0.0, false);
     } else {
       // Stop robot
-      m_robotDrive.ArcadeDrive(0.0, 0.0);
+      m_robotDrive.ArcadeDrive(0.0, 0.0, false);
     }
   }
 
   void TeleopInit() override {}
 
   void TeleopPeriodic() override {
-    // Drive with arcade style (use right stick)
-    m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());
+    // Drive with arcade style (use right stick to steer)
+    m_robotDrive.ArcadeDrive(-m_controller.GetLeftY(),
+                             m_controller.GetRightX());
   }
+
+  void TestInit() override {}
 
   void TestPeriodic() override {}
 
  private:
   // Robot drive system
-  frc::PWMVictorSPX m_left{0};
-  frc::PWMVictorSPX m_right{1};
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc::PWMSparkMax m_left{0};
+  frc::PWMSparkMax m_right{1};
+  frc::DifferentialDrive m_robotDrive{
+      [&](double output) { m_left.Set(output); },
+      [&](double output) { m_right.Set(output); }};
 
-  frc::Joystick m_stick{0};
-  frc::LiveWindow& m_lw = *frc::LiveWindow::GetInstance();
+  frc::XboxController m_controller{0};
   frc::Timer m_timer;
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

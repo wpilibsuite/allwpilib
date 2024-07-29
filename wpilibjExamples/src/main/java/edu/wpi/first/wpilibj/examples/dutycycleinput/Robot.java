@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.dutycycleinput;
 
@@ -12,15 +9,11 @@ import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-@SuppressWarnings({"PMD.SingularField"})
 public class Robot extends TimedRobot {
-  private DigitalInput m_input;
-  private DutyCycle m_dutyCycle;
+  private final DutyCycle m_dutyCycle;
 
-  @Override
-  public void robotInit() {
-    m_input = new DigitalInput(0);
-    m_dutyCycle = new DutyCycle(m_input);
+  public Robot() {
+    m_dutyCycle = new DutyCycle(new DigitalInput(0));
   }
 
   @Override
@@ -35,5 +28,4 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Frequency", frequency);
     SmartDashboard.putNumber("Duty Cycle", output);
   }
-
 }

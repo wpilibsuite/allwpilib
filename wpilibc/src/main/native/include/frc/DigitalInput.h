@@ -1,20 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/DigitalSource.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalGlitchFilter;
-class SendableBuilder;
 
 /**
  * Class to read a digital input.
@@ -26,8 +23,8 @@ class SendableBuilder;
  * implemented anywhere else.
  */
 class DigitalInput : public DigitalSource,
-                     public Sendable,
-                     public SendableHelper<DigitalInput> {
+                     public wpi::Sendable,
+                     public wpi::SendableHelper<DigitalInput> {
  public:
   /**
    * Create an instance of a Digital Input class.
@@ -78,7 +75,7 @@ class DigitalInput : public DigitalSource,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int m_channel;

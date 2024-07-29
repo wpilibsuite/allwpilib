@@ -1,45 +1,43 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/DutyCycle.h"
 
 #include <hal/DutyCycle.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/DigitalSource.h"
-#include "frc/WPIErrors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
 DutyCycle::DutyCycle(DigitalSource* source)
-    : m_source{source, NullDeleter<DigitalSource>()} {
-  if (m_source == nullptr) {
-    wpi_setWPIError(NullParameter);
-  } else {
-    InitDutyCycle();
+    : m_source{source, wpi::NullDeleter<DigitalSource>()} {
+  if (!m_source) {
+    throw FRC_MakeError(err::NullParameter, "source");
   }
+  InitDutyCycle();
 }
 
 DutyCycle::DutyCycle(DigitalSource& source)
-    : m_source{&source, NullDeleter<DigitalSource>()} {
+    : m_source{&source, wpi::NullDeleter<DigitalSource>()} {
   InitDutyCycle();
 }
 
 DutyCycle::DutyCycle(std::shared_ptr<DigitalSource> source)
     : m_source{std::move(source)} {
-  if (m_source == nullptr) {
-    wpi_setWPIError(NullParameter);
-  } else {
-    InitDutyCycle();
+  if (!m_source) {
+    throw FRC_MakeError(err::NullParameter, "source");
   }
+  InitDutyCycle();
 }
 
-DutyCycle::~DutyCycle() { HAL_FreeDutyCycle(m_handle); }
+DutyCycle::~DutyCycle() {
+  HAL_FreeDutyCycle(m_handle);
+}
 
 void DutyCycle::InitDutyCycle() {
   int32_t status = 0;
@@ -48,53 +46,55 @@ void DutyCycle::InitDutyCycle() {
                               static_cast<HAL_AnalogTriggerType>(
                                   m_source->GetAnalogTriggerTypeForRouting()),
                               &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   int index = GetFPGAIndex();
   HAL_Report(HALUsageReporting::kResourceType_DutyCycle, index + 1);
-  SendableRegistry::GetInstance().AddLW(this, "Duty Cycle", index);
+  wpi::SendableRegistry::AddLW(this, "Duty Cycle", index);
 }
 
 int DutyCycle::GetFPGAIndex() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleFPGAIndex(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return retVal;
 }
 
 int DutyCycle::GetFrequency() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleFrequency(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return retVal;
 }
 
 double DutyCycle::GetOutput() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleOutput(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return retVal;
 }
 
-unsigned int DutyCycle::GetOutputRaw() const {
+units::second_t DutyCycle::GetHighTime() const {
   int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleOutputRaw(m_handle, &status);
-  wpi_setHALError(status);
-  return retVal;
+  auto retVal = HAL_GetDutyCycleHighTime(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
+  return units::nanosecond_t{static_cast<double>(retVal)};
 }
 
 unsigned int DutyCycle::GetOutputScaleFactor() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleOutputScaleFactor(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return retVal;
 }
 
-int DutyCycle::GetSourceChannel() const { return m_source->GetChannel(); }
+int DutyCycle::GetSourceChannel() const {
+  return m_source->GetChannel();
+}
 
-void DutyCycle::InitSendable(SendableBuilder& builder) {
+void DutyCycle::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Duty Cycle");
-  builder.AddDoubleProperty("Frequency",
-                            [this] { return this->GetFrequency(); }, nullptr);
-  builder.AddDoubleProperty("Output", [this] { return this->GetOutput(); },
-                            nullptr);
+  builder.AddDoubleProperty(
+      "Frequency", [this] { return this->GetFrequency(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Output", [this] { return this->GetOutput(); }, nullptr);
 }

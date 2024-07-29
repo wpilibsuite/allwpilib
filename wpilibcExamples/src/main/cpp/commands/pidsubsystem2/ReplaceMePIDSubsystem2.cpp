@@ -1,16 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "ReplaceMePIDSubsystem2.h"
 
 ReplaceMePIDSubsystem2::ReplaceMePIDSubsystem2()
-    : PIDSubsystem(
-          // The PIDController used by the subsystem
-          frc2::PIDController(0, 0, 0)) {}
+    // The PIDController used by the subsystem
+    : PIDSubsystem{frc::PIDController{0, 0, 0}} {}
 
 void ReplaceMePIDSubsystem2::UseOutput(double output, double setpoint) {
   // Use the output here

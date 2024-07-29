@@ -1,17 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <stdint.h>
 
 #include <hal/I2CTypes.h>
-
-#include "frc/ErrorBase.h"
 
 namespace frc {
 
@@ -20,10 +15,22 @@ namespace frc {
  *
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
+ *
+ * The Onboard I2C port is subject to system lockups. See <a
+ * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
+ * WPILib Known Issues</a> page for details.
  */
-class I2C : public ErrorBase {
+class I2C {
  public:
-  enum Port { kOnboard = 0, kMXP };
+  /**
+   * I2C connection ports.
+   */
+  enum Port {
+    /// Onboard I2C port.
+    kOnboard = 0,
+    /// MXP (roboRIO MXP) I2C port.
+    kMXP
+  };
 
   /**
    * Constructor.
@@ -33,10 +40,24 @@ class I2C : public ErrorBase {
    */
   I2C(Port port, int deviceAddress);
 
-  ~I2C() override;
+  ~I2C();
 
   I2C(I2C&&) = default;
   I2C& operator=(I2C&&) = default;
+
+  /**
+   * Returns I2C port.
+   *
+   * @return I2C port.
+   */
+  Port GetPort() const;
+
+  /**
+   * Returns I2C device address.
+   *
+   * @return I2C device address.
+   */
+  int GetDeviceAddress() const;
 
   /**
    * Generic transaction.
@@ -100,7 +121,7 @@ class I2C : public ErrorBase {
    *
    * @param registerAddress The register to read first in the transaction.
    * @param count           The number of bytes to read in the transaction.
-   * @param buffer          A pointer to the array of bytes to store the data
+   * @param data            A pointer to the array of bytes to store the data
    *                        read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */

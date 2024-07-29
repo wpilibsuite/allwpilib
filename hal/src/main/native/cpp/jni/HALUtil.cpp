@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "HALUtil.h"
 
@@ -15,9 +12,8 @@
 #include <cstring>
 #include <string>
 
-#include <wpi/SmallString.h>
+#include <fmt/format.h>
 #include <wpi/jni_util.h>
-#include <wpi/raw_ostream.h>
 
 #include "edu_wpi_first_hal_HALUtil.h"
 #include "hal/CAN.h"
@@ -34,6 +30,12 @@ using namespace wpi::java;
 #define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
 #define kRIOStatusResourceNotInitialized -52010
 
+static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO == HAL_Runtime_RoboRIO);
+static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO2 ==
+              HAL_Runtime_RoboRIO2);
+static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_SIMULATION ==
+              HAL_Runtime_Simulation);
+
 static JavaVM* jvm = nullptr;
 static JException illegalArgExCls;
 static JException boundaryExCls;
@@ -44,20 +46,33 @@ static JException canMessageNotFoundExCls;
 static JException canMessageNotAllowedExCls;
 static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
+static JException nullPointerEx;
+static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
 static JClass matchInfoDataCls;
 static JClass accumulatorResultCls;
 static JClass canDataCls;
+static JClass canStreamMessageCls;
 static JClass halValueCls;
+static JClass baseStoreCls;
+static JClass revPHVersionCls;
+static JClass canStreamOverflowExCls;
 
 static const JClassInit classes[] = {
+    {"edu/wpi/first/hal/PowerDistributionVersion",
+     &powerDistributionVersionCls},
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
     {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
     {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
     {"edu/wpi/first/hal/CANData", &canDataCls},
-    {"edu/wpi/first/hal/HALValue", &halValueCls}};
+    {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
+    {"edu/wpi/first/hal/HALValue", &halValueCls},
+    {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
+    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
+    {"edu/wpi/first/hal/can/CANStreamOverflowException",
+     &canStreamOverflowExCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -71,11 +86,12 @@ static const JExceptionInit exceptions[] = {
      &canMessageNotAllowedExCls},
     {"edu/wpi/first/hal/can/CANNotInitializedException",
      &canNotInitializedExCls},
-    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls}};
+    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls},
+    {"java/lang/NullPointerException", &nullPointerEx}};
 
-namespace frc {
+namespace hal {
 
-void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
+void ThrowUncleanStatusException(JNIEnv* env, std::string_view msg,
                                  int32_t status) {
   static jmethodID func =
       env->GetMethodID(uncleanStatusExCls, "<init>", "(ILjava/lang/String;)V");
@@ -86,63 +102,64 @@ void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
   env->Throw(static_cast<jthrowable>(exception));
 }
 
-void ThrowAllocationException(JNIEnv* env, int32_t minRange, int32_t maxRange,
-                              int32_t requestedValue, int32_t status) {
-  const char* message = HAL_GetErrorMessage(status);
-  wpi::SmallString<1024> buf;
-  wpi::raw_svector_ostream oss(buf);
-  oss << " Code: " << status << ". " << message
-      << ", Minimum Value: " << minRange << ", Maximum Value: " << maxRange
-      << ", Requested Value: " << requestedValue;
-  env->ThrowNew(allocationExCls, buf.c_str());
-  allocationExCls.Throw(env, buf.c_str());
+void ThrowAllocationException(JNIEnv* env, const char* lastError,
+                              int32_t status) {
+  allocationExCls.Throw(env,
+                        fmt::format("Code: {}\n{}", status, lastError).c_str());
 }
 
 void ThrowHalHandleException(JNIEnv* env, int32_t status) {
-  const char* message = HAL_GetErrorMessage(status);
-  wpi::SmallString<1024> buf;
-  wpi::raw_svector_ostream oss(buf);
-  oss << " Code: " << status << ". " << message;
-  halHandleExCls.Throw(env, buf.c_str());
+  const char* message = HAL_GetLastError(&status);
+  halHandleExCls.Throw(env,
+                       fmt::format(" Code: {}. {}", status, message).c_str());
 }
 
 void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
-  if (status == 0) return;
+  if (status == 0) {
+    return;
+  }
+  const char* message = HAL_GetLastError(&status);
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
+    return;
   }
-  const char* message = HAL_GetErrorMessage(status);
   if (doThrow && status < 0) {
-    wpi::SmallString<1024> buf;
-    wpi::raw_svector_ostream oss(buf);
-    oss << " Code: " << status << ". " << message;
-    ThrowUncleanStatusException(env, buf.c_str(), status);
+    ThrowUncleanStatusException(
+        env, fmt::format(" Code: {}. {}", status, message).c_str(), status);
   } else {
     std::string func;
     auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first");
-    HAL_SendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
+    // Make a copy of message for safety, calling back into the HAL might
+    // invalidate the string.
+    std::string lastMessage{message};
+    HAL_SendError(1, status, 0, lastMessage.c_str(), func.c_str(),
+                  stack.c_str(), 1);
   }
 }
 
 void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
                 int32_t requestedValue) {
-  if (status == 0) return;
+  if (status == 0) {
+    return;
+  }
+  const char* lastError = HAL_GetLastError(&status);
   if (status == NO_AVAILABLE_RESOURCES || status == RESOURCE_IS_ALLOCATED ||
       status == RESOURCE_OUT_OF_RANGE) {
-    ThrowAllocationException(env, minRange, maxRange, requestedValue, status);
+    ThrowAllocationException(env, lastError, status);
+    return;
   }
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
+    return;
   }
-  const char* message = HAL_GetErrorMessage(status);
-  wpi::SmallString<1024> buf;
-  wpi::raw_svector_ostream oss(buf);
-  oss << " Code: " << status << ". " << message;
-  ThrowUncleanStatusException(env, buf.c_str(), status);
+  ThrowUncleanStatusException(
+      env, fmt::format(" Code: {}. {}", status, lastError).c_str(), status);
 }
 
 void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
-  if (status >= 0) return;
+  if (status >= 0) {
+    return;
+  }
   switch (status) {
     case kRioStatusSuccess:
       // Everything is ok... don't throw.
@@ -150,9 +167,10 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
     case HAL_ERR_CANSessionMux_InvalidBuffer:
     case kRIOStatusBufferInvalidSize: {
       static jmethodID invalidBufConstruct = nullptr;
-      if (!invalidBufConstruct)
+      if (!invalidBufConstruct) {
         invalidBufConstruct =
             env->GetMethodID(canInvalidBufferExCls, "<init>", "()V");
+      }
       jobject exception =
           env->NewObject(canInvalidBufferExCls, invalidBufConstruct);
       env->Throw(static_cast<jthrowable>(exception));
@@ -161,9 +179,10 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
     case HAL_ERR_CANSessionMux_MessageNotFound:
     case kRIOStatusOperationTimedOut: {
       static jmethodID messageNotFoundConstruct = nullptr;
-      if (!messageNotFoundConstruct)
+      if (!messageNotFoundConstruct) {
         messageNotFoundConstruct =
             env->GetMethodID(canMessageNotFoundExCls, "<init>", "()V");
+      }
       jobject exception =
           env->NewObject(canMessageNotFoundExCls, messageNotFoundConstruct);
       env->Throw(static_cast<jthrowable>(exception));
@@ -171,48 +190,61 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
     }
     case HAL_ERR_CANSessionMux_NotAllowed:
     case kRIOStatusFeatureNotSupported: {
-      wpi::SmallString<100> buf;
-      wpi::raw_svector_ostream oss(buf);
-      oss << "MessageID = " << message_id;
-      canMessageNotAllowedExCls.Throw(env, buf.c_str());
+      canMessageNotAllowedExCls.Throw(
+          env, fmt::format("MessageID = {}", message_id).c_str());
       break;
     }
     case HAL_ERR_CANSessionMux_NotInitialized:
     case kRIOStatusResourceNotInitialized: {
       static jmethodID notInitConstruct = nullptr;
-      if (!notInitConstruct)
+      if (!notInitConstruct) {
         notInitConstruct =
             env->GetMethodID(canNotInitializedExCls, "<init>", "()V");
+      }
       jobject exception =
           env->NewObject(canNotInitializedExCls, notInitConstruct);
       env->Throw(static_cast<jthrowable>(exception));
       break;
     }
     default: {
-      wpi::SmallString<100> buf;
-      wpi::raw_svector_ostream oss(buf);
-      oss << "Fatal status code detected: " << status;
-      uncleanStatusExCls.Throw(env, buf.c_str());
+      uncleanStatusExCls.Throw(
+          env, fmt::format("Fatal status code detected: {}", status).c_str());
       break;
     }
   }
 }
 
-void ThrowIllegalArgumentException(JNIEnv* env, wpi::StringRef msg) {
+void ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
+  nullPointerEx.Throw(env, msg);
+}
+
+void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
+                                     jint length) {
+  static jmethodID constructor =
+      env->GetMethodID(canStreamOverflowExCls, "<init>",
+                       "([Ledu/wpi/first/hal/CANStreamMessage;I)V");
+  jobject exception =
+      env->NewObject(canStreamOverflowExCls, constructor, messages, length);
+  env->Throw(static_cast<jthrowable>(exception));
+}
+
+void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
   illegalArgExCls.Throw(env, msg);
 }
 
 void ThrowBoundaryException(JNIEnv* env, double value, double lower,
                             double upper) {
   static jmethodID getMessage = nullptr;
-  if (!getMessage)
+  if (!getMessage) {
     getMessage = env->GetStaticMethodID(boundaryExCls, "getMessage",
                                         "(DDD)Ljava/lang/String;");
+  }
 
   static jmethodID constructor = nullptr;
-  if (!constructor)
+  if (!constructor) {
     constructor =
         env->GetMethodID(boundaryExCls, "<init>", "(Ljava/lang/String;)V");
+  }
 
   jobject msg = env->CallStaticObjectMethod(
       boundaryExCls, getMessage, static_cast<jdouble>(value),
@@ -226,9 +258,23 @@ jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
                                   int32_t deadbandMinPwm, int32_t minPwm) {
   static jmethodID constructor =
       env->GetMethodID(pwmConfigDataResultCls, "<init>", "(IIIII)V");
-  return env->NewObject(pwmConfigDataResultCls, constructor, (jint)maxPwm,
-                        (jint)deadbandMaxPwm, (jint)centerPwm,
-                        (jint)deadbandMinPwm, (jint)minPwm);
+  return env->NewObject(
+      pwmConfigDataResultCls, constructor, static_cast<jint>(maxPwm),
+      static_cast<jint>(deadbandMaxPwm), static_cast<jint>(centerPwm),
+      static_cast<jint>(deadbandMinPwm), static_cast<jint>(minPwm));
+}
+
+jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,
+                           uint32_t firmwareMinor, uint32_t firmwareFix,
+                           uint32_t hardwareMinor, uint32_t hardwareMajor,
+                           uint32_t uniqueId) {
+  static jmethodID constructor =
+      env->GetMethodID(revPHVersionCls, "<init>", "(IIIIII)V");
+  return env->NewObject(
+      revPHVersionCls, constructor, static_cast<jint>(firmwareMajor),
+      static_cast<jint>(firmwareMinor), static_cast<jint>(firmwareFix),
+      static_cast<jint>(hardwareMinor), static_cast<jint>(hardwareMajor),
+      static_cast<jint>(uniqueId));
 }
 
 void SetCanStatusObject(JNIEnv* env, jobject canStatus,
@@ -237,9 +283,11 @@ void SetCanStatusObject(JNIEnv* env, jobject canStatus,
                         uint32_t transmitErrorCount) {
   static jmethodID func =
       env->GetMethodID(canStatusCls, "setStatus", "(DIIII)V");
-  env->CallVoidMethod(canStatus, func, (jdouble)percentBusUtilization,
-                      (jint)busOffCount, (jint)txFullCount,
-                      (jint)receiveErrorCount, (jint)transmitErrorCount);
+  env->CallVoidMethod(
+      canStatus, func, static_cast<jdouble>(percentBusUtilization),
+      static_cast<jint>(busOffCount), static_cast<jint>(txFullCount),
+      static_cast<jint>(receiveErrorCount),
+      static_cast<jint>(transmitErrorCount));
 }
 
 void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
@@ -250,11 +298,12 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
 
   env->CallVoidMethod(
       matchStatus, func, MakeJString(env, matchInfo.eventName),
-      MakeJString(env, wpi::StringRef{reinterpret_cast<const char*>(
-                                          matchInfo.gameSpecificMessage),
-                                      matchInfo.gameSpecificMessageSize}),
-      (jint)matchInfo.matchNumber, (jint)matchInfo.replayNumber,
-      (jint)matchInfo.matchType);
+      MakeJString(env,
+                  {reinterpret_cast<const char*>(matchInfo.gameSpecificMessage),
+                   matchInfo.gameSpecificMessageSize}),
+      static_cast<jint>(matchInfo.matchNumber),
+      static_cast<jint>(matchInfo.replayNumber),
+      static_cast<jint>(matchInfo.matchType));
 }
 
 void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
@@ -262,15 +311,28 @@ void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
   static jmethodID func =
       env->GetMethodID(accumulatorResultCls, "set", "(JJ)V");
 
-  env->CallVoidMethod(accumulatorResult, func, (jlong)value, (jlong)count);
+  env->CallVoidMethod(accumulatorResult, func, static_cast<jlong>(value),
+                      static_cast<jlong>(count));
 }
 
 jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
                             uint64_t timestamp) {
   static jmethodID func = env->GetMethodID(canDataCls, "setData", "(IJ)[B");
 
-  jbyteArray retVal = static_cast<jbyteArray>(
-      env->CallObjectMethod(canData, func, (jint)length, (jlong)timestamp));
+  jbyteArray retVal = static_cast<jbyteArray>(env->CallObjectMethod(
+      canData, func, static_cast<jint>(length), static_cast<jlong>(timestamp)));
+  return retVal;
+}
+
+jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
+                              int32_t length, uint32_t messageID,
+                              uint64_t timestamp) {
+  static jmethodID func =
+      env->GetMethodID(canStreamMessageCls, "setStreamData", "(IIJ)[B");
+
+  jbyteArray retVal = static_cast<jbyteArray>(env->CallObjectMethod(
+      canStreamData, func, static_cast<jint>(length),
+      static_cast<jint>(messageID), static_cast<jlong>(timestamp)));
   return retVal;
 }
 
@@ -298,20 +360,48 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
     default:
       break;
   }
-  return env->CallStaticObjectMethod(halValueCls, fromNative, (jint)value.type,
-                                     value1, value2);
+  return env->CallStaticObjectMethod(
+      halValueCls, fromNative, static_cast<jint>(value.type), value1, value2);
 }
 
-JavaVM* GetJVM() { return jvm; }
+jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index) {
+  static jmethodID ctor = env->GetMethodID(baseStoreCls, "<init>", "(II)V");
+  return env->NewObject(baseStoreCls, ctor, valueType, index);
+}
 
-}  // namespace frc
+jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
+                                       uint32_t firmwareMinor,
+                                       uint32_t firmwareFix,
+                                       uint32_t hardwareMinor,
+                                       uint32_t hardwareMajor,
+                                       uint32_t uniqueId) {
+  static jmethodID constructor =
+      env->GetMethodID(powerDistributionVersionCls, "<init>", "(IIIIII)V");
+  return env->NewObject(
+      powerDistributionVersionCls, constructor,
+      static_cast<jint>(firmwareMajor), static_cast<jint>(firmwareMinor),
+      static_cast<jint>(firmwareFix), static_cast<jint>(hardwareMinor),
+      static_cast<jint>(hardwareMajor), static_cast<jint>(uniqueId));
+}
+
+jobject CreateCANStreamMessage(JNIEnv* env) {
+  static jmethodID constructor =
+      env->GetMethodID(canStreamMessageCls, "<init>", "()V");
+  return env->NewObject(canStreamMessageCls, constructor);
+}
+
+JavaVM* GetJVM() {
+  return jvm;
+}
 
 namespace sim {
 jint SimOnLoad(JavaVM* vm, void* reserved);
 void SimOnUnload(JavaVM* vm, void* reserved);
 }  // namespace sim
 
-using namespace frc;
+}  // namespace hal
+
+using namespace hal;
 
 extern "C" {
 
@@ -322,17 +412,22 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
+  }
 
   for (auto& c : classes) {
     *c.cls = JClass(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   for (auto& c : exceptions) {
     *c.cls = JException(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   return sim::SimOnLoad(vm, reserved);
@@ -342,8 +437,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   sim::SimOnUnload(vm, reserved);
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
+  }
   // Delete global references
 
   for (auto& c : classes) {
@@ -383,6 +479,50 @@ Java_edu_wpi_first_hal_HALUtil_getFPGARevision
   jint returnValue = HAL_GetFPGARevision(&status);
   CheckStatus(env, status);
   return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    getSerialNumber
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_HALUtil_getSerialNumber
+  (JNIEnv* env, jclass)
+{
+  WPI_String serialNum;
+  HAL_GetSerialNumber(&serialNum);
+  jstring ret = MakeJString(env, wpi::to_string_view(&serialNum));
+  WPI_FreeString(&serialNum);
+  return ret;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    getComments
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_HALUtil_getComments
+  (JNIEnv* env, jclass)
+{
+  WPI_String comments;
+  HAL_GetComments(&comments);
+  jstring ret = MakeJString(env, wpi::to_string_view(&comments));
+  WPI_FreeString(&comments);
+  return ret;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    getTeamNumber
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_HALUtil_getTeamNumber
+  (JNIEnv* env, jclass)
+{
+  return HAL_GetTeamNumber();
 }
 
 /*

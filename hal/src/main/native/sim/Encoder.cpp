@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Encoder.h"
 
 #include "CounterInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/Counter.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
@@ -21,6 +18,8 @@ using namespace hal;
 namespace {
 struct Encoder {
   HAL_Handle nativeHandle;
+  HAL_FPGAEncoderHandle fpgaHandle;
+  HAL_CounterHandle counterHandle;
   HAL_EncoderEncodingType encodingType;
   double distancePerPulse;
   uint8_t index;
@@ -35,8 +34,7 @@ static LimitedHandleResource<HAL_EncoderHandle, Encoder,
 static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
                              HAL_HandleEnum::FPGAEncoder>* fpgaEncoderHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeEncoder() {
   static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
                                HAL_HandleEnum::FPGAEncoder>
@@ -48,7 +46,21 @@ void InitializeEncoder() {
       eH;
   encoderHandles = &eH;
 }
-}  // namespace init
+}  // namespace hal::init
+
+namespace hal {
+bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
+                          HAL_FPGAEncoderHandle* fpgaHandle,
+                          HAL_CounterHandle* counterHandle) {
+  auto encoder = encoderHandles->Get(handle);
+  if (!encoder) {
+    return false;
+  }
+
+  *fpgaHandle = encoder->fpgaHandle;
+  *counterHandle = encoder->counterHandle;
+  return true;
+}
 }  // namespace hal
 
 extern "C" {
@@ -91,13 +103,22 @@ HAL_EncoderHandle HAL_InitializeEncoder(
   encoder->nativeHandle = nativeHandle;
   encoder->encodingType = encodingType;
   encoder->distancePerPulse = 1.0;
+  if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
+    encoder->fpgaHandle = nativeHandle;
+    encoder->counterHandle = HAL_kInvalidHandle;
+  } else {
+    encoder->fpgaHandle = HAL_kInvalidHandle;
+    encoder->counterHandle = nativeHandle;
+  }
   return handle;
 }
 
 void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);
   encoderHandles->Free(encoderHandle);
-  if (encoder == nullptr) return;
+  if (encoder == nullptr) {
+    return;
+  }
   if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::FPGAEncoder)) {
     fpgaEncoderHandles->Free(encoder->nativeHandle);
   } else if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::Counter)) {
@@ -109,7 +130,9 @@ void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
 void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
                              HAL_SimDeviceHandle device) {
   auto encoder = encoderHandles->Get(handle);
-  if (encoder == nullptr) return;
+  if (encoder == nullptr) {
+    return;
+  }
   SimEncoderData[encoder->index].simDevice = device;
 }
 
@@ -175,9 +198,9 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
     return;
   }
 
+  SimEncoderData[encoder->index].reset = true;
   SimEncoderData[encoder->index].count = 0;
   SimEncoderData[encoder->index].period = std::numeric_limits<double>::max();
-  SimEncoderData[encoder->index].reset = true;
 }
 double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);
@@ -248,6 +271,7 @@ void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
 
   if (minRate == 0.0) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "minRate must not be 0");
     return;
   }
 
@@ -264,6 +288,7 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
 
   if (distancePerPulse == 0.0) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "distancePerPulse must not be 0");
     return;
   }
   encoder->distancePerPulse = distancePerPulse;
@@ -338,7 +363,7 @@ double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
     return 0.0;
   }
 
-  return encoder->distancePerPulse;
+  return SimEncoderData[encoder->index].distancePerPulse;
 }
 
 HAL_EncoderEncodingType HAL_GetEncoderEncodingType(

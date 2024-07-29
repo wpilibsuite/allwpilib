@@ -1,48 +1,46 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "Instance.h"
 
-#include <wpi/Path.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringRef.h>
-#include <wpi/raw_ostream.h>
+#include <string_view>
+
+#include <fmt/format.h>
+#include <wpi/fs.h>
+#include <wpi/print.h>
 
 using namespace cs;
 
 static void def_log_func(unsigned int level, const char* file,
                          unsigned int line, const char* msg) {
-  wpi::SmallString<128> buf;
-  wpi::raw_svector_ostream oss(buf);
   if (level == 20) {
-    oss << "CS: " << msg << '\n';
-    wpi::errs() << oss.str();
+    wpi::print(stderr, "CS: {}\n", msg);
     return;
   }
 
-  wpi::StringRef levelmsg;
-  if (level >= 50)
-    levelmsg = "CRITICAL: ";
-  else if (level >= 40)
-    levelmsg = "ERROR: ";
-  else if (level >= 30)
-    levelmsg = "WARNING: ";
-  else
+  std::string_view levelmsg;
+  if (level >= 50) {
+    levelmsg = "CRITICAL";
+  } else if (level >= 40) {
+    levelmsg = "ERROR";
+  } else if (level >= 30) {
+    levelmsg = "WARNING";
+  } else {
     return;
-  oss << "CS: " << levelmsg << msg << " (" << wpi::sys::path::filename(file)
-      << ':' << line << ")\n";
-  wpi::errs() << oss.str();
+  }
+  wpi::print(stderr, "CS: {}: {} ({}:{})\n", levelmsg, msg,
+             fs::path{file}.filename().string(), line);
 }
 
-Instance::Instance() : telemetry(notifier), networkListener(logger, notifier) {
+Instance::Instance()
+    : telemetry(notifier),
+      networkListener(logger, notifier),
+      usbCameraListener(logger, notifier) {
   SetDefaultLogger();
 }
 
-Instance::~Instance() {}
+Instance::~Instance() = default;
 
 Instance& Instance::GetInstance() {
   static Instance* inst = new Instance;
@@ -54,11 +52,14 @@ void Instance::Shutdown() {
   m_sinks.FreeAll();
   m_sources.FreeAll();
   networkListener.Stop();
+  usbCameraListener.Stop();
   telemetry.Stop();
   notifier.Stop();
 }
 
-void Instance::SetDefaultLogger() { logger.SetLogger(def_log_func); }
+void Instance::SetDefaultLogger() {
+  logger.SetLogger(def_log_func);
+}
 
 std::pair<CS_Source, std::shared_ptr<SourceData>> Instance::FindSource(
     const SourceImpl& source) {
@@ -87,11 +88,13 @@ CS_Sink Instance::CreateSink(CS_SinkKind kind, std::shared_ptr<SinkImpl> sink) {
 }
 
 void Instance::DestroySource(CS_Source handle) {
-  if (auto data = m_sources.Free(handle))
+  if (auto data = m_sources.Free(handle)) {
     notifier.NotifySource(data->source->GetName(), handle, CS_SOURCE_DESTROYED);
+  }
 }
 
 void Instance::DestroySink(CS_Sink handle) {
-  if (auto data = m_sinks.Free(handle))
+  if (auto data = m_sinks.Free(handle)) {
     notifier.NotifySink(data->sink->GetName(), handle, CS_SINK_DESTROYED);
+  }
 }

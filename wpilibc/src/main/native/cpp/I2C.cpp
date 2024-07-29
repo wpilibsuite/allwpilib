@@ -1,42 +1,59 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/I2C.h"
 
+#include <algorithm>
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
 #include <hal/I2C.h>
 
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
 I2C::I2C(Port port, int deviceAddress)
     : m_port(static_cast<HAL_I2CPort>(port)), m_deviceAddress(deviceAddress) {
   int32_t status = 0;
+
+  if (port == I2C::Port::kOnboard) {
+    FRC_ReportWarning(
+        "Onboard I2C port is subject to system lockups. See Known "
+        "Issues page for "
+        "details");
+  }
+
   HAL_InitializeI2C(m_port, &status);
-  // wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
 
   HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
 }
 
-I2C::~I2C() { HAL_CloseI2C(m_port); }
+I2C::~I2C() {
+  HAL_CloseI2C(m_port);
+}
+
+I2C::Port I2C::GetPort() const {
+  return static_cast<Port>(static_cast<int>(m_port));
+}
+
+int I2C::GetDeviceAddress() const {
+  return m_deviceAddress;
+}
 
 bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
                       int receiveSize) {
   int32_t status = 0;
   status = HAL_TransactionI2C(m_port, m_deviceAddress, dataToSend, sendSize,
                               dataReceived, receiveSize);
-  // wpi_setHALError(status);
   return status < 0;
 }
 
-bool I2C::AddressOnly() { return Transaction(nullptr, 0, nullptr, 0); }
+bool I2C::AddressOnly() {
+  return Transaction(nullptr, 0, nullptr, 0);
+}
 
 bool I2C::Write(int registerAddress, uint8_t data) {
   uint8_t buffer[2];
@@ -55,12 +72,10 @@ bool I2C::WriteBulk(uint8_t* data, int count) {
 
 bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
   if (count < 1) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
-    return true;
+    throw FRC_MakeError(err::ParameterOutOfRange, "count {}", count);
   }
-  if (buffer == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "buffer");
-    return true;
+  if (!buffer) {
+    throw FRC_MakeError(err::NullParameter, "buffer");
   }
   uint8_t regAddr = registerAddress;
   return Transaction(&regAddr, sizeof(regAddr), buffer, count);
@@ -68,12 +83,10 @@ bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
 
 bool I2C::ReadOnly(int count, uint8_t* buffer) {
   if (count < 1) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
-    return true;
+    throw FRC_MakeError(err::ParameterOutOfRange, "count {}", count);
   }
-  if (buffer == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "buffer");
-    return true;
+  if (!buffer) {
+    throw FRC_MakeError(err::NullParameter, "buffer");
   }
   return HAL_ReadI2C(m_port, m_deviceAddress, buffer, count) < 0;
 }
@@ -84,12 +97,16 @@ bool I2C::VerifySensor(int registerAddress, int count,
   uint8_t deviceData[4];
   for (int i = 0, curRegisterAddress = registerAddress; i < count;
        i += 4, curRegisterAddress += 4) {
-    int toRead = count - i < 4 ? count - i : 4;
+    int toRead = std::min(count - i, 4);
     // Read the chunk of data.  Return false if the sensor does not respond.
-    if (Read(curRegisterAddress, toRead, deviceData)) return false;
+    if (Read(curRegisterAddress, toRead, deviceData)) {
+      return false;
+    }
 
     for (int j = 0; j < toRead; j++) {
-      if (deviceData[j] != expected[i + j]) return false;
+      if (deviceData[j] != expected[i + j]) {
+        return false;
+      }
     }
   }
   return true;

@@ -1,45 +1,39 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
-
-import java.util.Set;
-
-import org.junit.jupiter.api.BeforeEach;
-
-import edu.wpi.first.hal.sim.DriverStationSim;
-import edu.wpi.first.wpilibj.DriverStation;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Basic setup for all {@link Command tests}."
- */
-@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
-abstract class CommandTestBase {
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+
+/** Basic setup for all {@link Command tests}. */
+public class CommandTestBase {
+  protected CommandTestBase() {}
+
   @BeforeEach
   void commandSetup() {
     CommandScheduler.getInstance().cancelAll();
     CommandScheduler.getInstance().enable();
-    CommandScheduler.getInstance().clearButtons();
-    CommandGroupBase.clearGroupedCommands();
+    CommandScheduler.getInstance().getActiveButtonLoop().clear();
+    CommandScheduler.getInstance().clearComposedCommands();
+    CommandScheduler.getInstance().unregisterAllSubsystems();
 
     setDSEnabled(true);
   }
 
-  void setDSEnabled(boolean enabled) {
-    DriverStationSim sim = new DriverStationSim();
-    sim.setDsAttached(true);
+  public void setDSEnabled(boolean enabled) {
+    DriverStationSim.setDsAttached(true);
 
-    sim.setEnabled(enabled);
-    sim.notifyNewData();
-    DriverStation.getInstance().isNewControlData();
-    while (DriverStation.getInstance().isEnabled() != enabled) {
+    DriverStationSim.setEnabled(enabled);
+    DriverStationSim.notifyNewData();
+    while (DriverStation.isEnabled() != enabled) {
       try {
         Thread.sleep(1);
       } catch (InterruptedException exception) {
@@ -48,45 +42,22 @@ abstract class CommandTestBase {
     }
   }
 
-  class TestSubsystem extends SubsystemBase {
-  }
-
-  protected class MockCommandHolder {
+  public static class MockCommandHolder {
     private final Command m_mockCommand = mock(Command.class);
 
-    MockCommandHolder(boolean runWhenDisabled, Subsystem... requirements) {
+    public MockCommandHolder(boolean runWhenDisabled, Subsystem... requirements) {
       when(m_mockCommand.getRequirements()).thenReturn(Set.of(requirements));
       when(m_mockCommand.isFinished()).thenReturn(false);
       when(m_mockCommand.runsWhenDisabled()).thenReturn(runWhenDisabled);
+      when(m_mockCommand.getInterruptionBehavior()).thenReturn(InterruptionBehavior.kCancelSelf);
     }
 
-    Command getMock() {
+    public Command getMock() {
       return m_mockCommand;
     }
 
-    void setFinished(boolean finished) {
+    public void setFinished(boolean finished) {
       when(m_mockCommand.isFinished()).thenReturn(finished);
-    }
-
-  }
-
-  protected class Counter {
-    int m_counter;
-
-    void increment() {
-      m_counter++;
-    }
-  }
-
-  protected class ConditionHolder {
-    private boolean m_condition;
-
-    void setCondition(boolean condition) {
-      m_condition = condition;
-    }
-
-    boolean getCondition() {
-      return m_condition;
     }
   }
 }

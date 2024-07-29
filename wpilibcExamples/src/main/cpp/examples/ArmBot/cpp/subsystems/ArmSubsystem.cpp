@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/ArmSubsystem.h"
 
@@ -18,8 +15,8 @@ ArmSubsystem::ArmSubsystem()
               kP, 0, 0, {kMaxVelocity, kMaxAcceleration})),
       m_motor(kMotorPort),
       m_encoder(kEncoderPorts[0], kEncoderPorts[1]),
-      m_feedforward(kS, kCos, kV, kA) {
-  m_encoder.SetDistancePerPulse(kEncoderDistancePerPulse.to<double>());
+      m_feedforward(kS, kG, kV, kA) {
+  m_encoder.SetDistancePerPulse(kEncoderDistancePerPulse.value());
   // Start arm in neutral position
   SetGoal(State{kArmOffset, 0_rad_per_s});
 }
@@ -29,9 +26,9 @@ void ArmSubsystem::UseOutput(double output, State setpoint) {
   units::volt_t feedforward =
       m_feedforward.Calculate(setpoint.position, setpoint.velocity);
   // Add the feedforward to the PID output to get the motor output
-  m_motor.SetVoltage(units::volt_t(output) + feedforward);
+  m_motor.SetVoltage(units::volt_t{output} + feedforward);
 }
 
 units::radian_t ArmSubsystem::GetMeasurement() {
-  return units::radian_t(m_encoder.GetDistance()) + kArmOffset;
+  return units::radian_t{m_encoder.GetDistance()} + kArmOffset;
 }

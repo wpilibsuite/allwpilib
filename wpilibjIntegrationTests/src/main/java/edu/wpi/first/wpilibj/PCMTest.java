@@ -1,29 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
-
-import java.util.logging.Logger;
-
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Test that covers the {@link Compressor}.
- */
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import java.util.logging.Logger;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
+/** Test that covers the {@link Compressor}. */
 public class PCMTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(PCMTest.class.getName());
   /*
@@ -42,7 +34,7 @@ public class PCMTest extends AbstractComsSetup {
   protected static final double kCompressorOnVoltage = 5.00;
   protected static final double kCompressorOffVoltage = 1.68;
 
-  private static Compressor compressor;
+  private static PneumaticsControlModule pcm;
 
   private static DigitalOutput fakePressureSwitch;
   private static AnalogInput fakeCompressor;
@@ -52,7 +44,7 @@ public class PCMTest extends AbstractComsSetup {
 
   @BeforeClass
   public static void setUpBeforeClass() {
-    compressor = new Compressor();
+    pcm = new PneumaticsControlModule();
 
     fakePressureSwitch = new DigitalOutput(11);
     fakeCompressor = new AnalogInput(1);
@@ -72,41 +64,43 @@ public class PCMTest extends AbstractComsSetup {
 
   @Before
   public void reset() {
-    compressor.stop();
+    pcm.disableCompressor();
     fakePressureSwitch.set(false);
   }
 
-  /**
-   * Test if the compressor turns on and off when the pressure switch is toggled.
-   */
+  /** Test if the compressor turns on and off when the pressure switch is toggled. */
   @Test
-  public void testPressureSwitch() throws Exception {
+  public void testPressureSwitch() {
     final double range = 0.5;
     reset();
-    compressor.setClosedLoopControl(true);
+    pcm.enableCompressorDigital();
 
     // Turn on the compressor
     fakePressureSwitch.set(true);
     Timer.delay(kCompressorDelayTime);
-    assertEquals("Compressor did not turn on when the pressure switch turned on.",
-        kCompressorOnVoltage, fakeCompressor.getVoltage(), range);
+    assertEquals(
+        "Compressor did not turn on when the pressure switch turned on.",
+        kCompressorOnVoltage,
+        fakeCompressor.getVoltage(),
+        range);
 
     // Turn off the compressor
     fakePressureSwitch.set(false);
     Timer.delay(kCompressorDelayTime);
-    assertEquals("Compressor did not turn off when the pressure switch turned off.",
-        kCompressorOffVoltage, fakeCompressor.getVoltage(), range);
+    assertEquals(
+        "Compressor did not turn off when the pressure switch turned off.",
+        kCompressorOffVoltage,
+        fakeCompressor.getVoltage(),
+        range);
   }
 
-  /**
-   * Test if the correct solenoids turn on and off when they should.
-   */
+  /** Test if the correct solenoids turn on and off when they should. */
   @Test
-  public void testSolenoid() throws Exception {
+  public void testSolenoid() {
     reset();
 
-    Solenoid solenoid1 = new Solenoid(0);
-    Solenoid solenoid2 = new Solenoid(1);
+    Solenoid solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+    Solenoid solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
 
     solenoid1.set(false);
     solenoid2.set(false);
@@ -153,7 +147,7 @@ public class PCMTest extends AbstractComsSetup {
    */
   @Test
   public void doubleSolenoid() {
-    DoubleSolenoid solenoid = new DoubleSolenoid(0, 1);
+    DoubleSolenoid solenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 1);
 
     solenoid.set(DoubleSolenoid.Value.kOff);
     Timer.delay(kSolenoidDelayTime);
@@ -165,28 +159,26 @@ public class PCMTest extends AbstractComsSetup {
     Timer.delay(kSolenoidDelayTime);
     assertFalse("Solenoid #1 did not turn on", fakeSolenoid1.get());
     assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
-    assertTrue("DoubleSolenoid did not report Forward", solenoid.get() == DoubleSolenoid.Value
-        .kForward);
+    assertTrue(
+        "DoubleSolenoid did not report Forward", solenoid.get() == DoubleSolenoid.Value.kForward);
 
     solenoid.set(DoubleSolenoid.Value.kReverse);
     Timer.delay(kSolenoidDelayTime);
     assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
     assertFalse("Solenoid #2 did not turn on", fakeSolenoid2.get());
-    assertTrue("DoubleSolenoid did not report Reverse", solenoid.get() == DoubleSolenoid.Value
-        .kReverse);
+    assertTrue(
+        "DoubleSolenoid did not report Reverse", solenoid.get() == DoubleSolenoid.Value.kReverse);
 
     solenoid.close();
   }
 
-  /**
-   * Test if the correct solenoids turn on and off when they should.
-   */
+  /** Test if the correct solenoids turn on and off when they should. */
   @Test
-  public void testOneShot() throws Exception {
+  public void testOneShot() {
     reset();
 
-    Solenoid solenoid1 = new Solenoid(0);
-    Solenoid solenoid2 = new Solenoid(1);
+    Solenoid solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+    Solenoid solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
 
     solenoid1.set(false);
     solenoid2.set(false);

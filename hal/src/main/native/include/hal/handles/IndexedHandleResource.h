@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -42,7 +39,11 @@ class IndexedHandleResource : public HandleBase {
   IndexedHandleResource(const IndexedHandleResource&) = delete;
   IndexedHandleResource& operator=(const IndexedHandleResource&) = delete;
 
-  THandle Allocate(int16_t index, int32_t* status);
+  std::shared_ptr<TStruct> Allocate(int16_t index, THandle* handle,
+                                    int32_t* status);
+  int16_t GetIndex(THandle handle) {
+    return getHandleTypedIndex(handle, enumValue, m_version);
+  }
   std::shared_ptr<TStruct> Get(THandle handle);
   void Free(THandle handle);
   void ResetHandles() override;
@@ -54,21 +55,27 @@ class IndexedHandleResource : public HandleBase {
 
 template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
-THandle IndexedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
-    int16_t index, int32_t* status) {
-  // don't aquire the lock if we can fail early.
+std::shared_ptr<TStruct>
+IndexedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
+    int16_t index, THandle* handle, int32_t* status) {
+  // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
     *status = RESOURCE_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
+    *handle = HAL_kInvalidHandle;
+    return nullptr;
   }
   std::scoped_lock lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
     *status = RESOURCE_IS_ALLOCATED;
-    return HAL_kInvalidHandle;
+    *handle = HAL_kInvalidHandle;
+    return m_structures[index];
   }
   m_structures[index] = std::make_shared<TStruct>();
-  return static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
+  *handle =
+      static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
+  *status = HAL_SUCCESS;
+  return m_structures[index];
 }
 
 template <typename THandle, typename TStruct, int16_t size,
@@ -76,12 +83,12 @@ template <typename THandle, typename TStruct, int16_t size,
 std::shared_ptr<TStruct>
 IndexedHandleResource<THandle, TStruct, size, enumValue>::Get(THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
-  int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
+  int16_t index = GetIndex(handle);
   if (index < 0 || index >= size) {
     return nullptr;
   }
   std::scoped_lock lock(m_handleMutexes[index]);
-  // return structure. Null will propogate correctly, so no need to manually
+  // return structure. Null will propagate correctly, so no need to manually
   // check.
   return m_structures[index];
 }
@@ -91,8 +98,10 @@ template <typename THandle, typename TStruct, int16_t size,
 void IndexedHandleResource<THandle, TStruct, size, enumValue>::Free(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
-  int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
-  if (index < 0 || index >= size) return;
+  int16_t index = GetIndex(handle);
+  if (index < 0 || index >= size) {
+    return;
+  }
   // lock and deallocated handle
   std::scoped_lock lock(m_handleMutexes[index]);
   m_structures[index].reset();

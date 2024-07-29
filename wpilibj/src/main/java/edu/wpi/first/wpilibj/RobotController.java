@@ -1,33 +1,27 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.hal.LEDJNI;
 import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
 
-/**
- * Contains functions for roboRIO functionality.
- */
+/** Contains functions for roboRIO functionality. */
 public final class RobotController {
   private RobotController() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
   /**
-   * Return the FPGA Version number. For now, expect this to be the current
-   * year.
+   * Return the FPGA Version number. For now, expect this to be the current year.
    *
    * @return FPGA Version number.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static int getFPGAVersion() {
     return HALUtil.getFPGAVersion();
   }
@@ -39,9 +33,38 @@ public final class RobotController {
    *
    * @return FPGA Revision number.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static long getFPGARevision() {
-    return (long) HALUtil.getFPGARevision();
+    return HALUtil.getFPGARevision();
+  }
+
+  /**
+   * Return the serial number of the roboRIO.
+   *
+   * @return The serial number of the roboRIO.
+   */
+  public static String getSerialNumber() {
+    return HALUtil.getSerialNumber();
+  }
+
+  /**
+   * Return the comments from the roboRIO web interface.
+   *
+   * <p>The comments string is cached after the first call to this function on the RoboRIO - restart
+   * the robot code to reload the comments string after changing it in the web interface.
+   *
+   * @return the comments from the roboRIO web interface.
+   */
+  public static String getComments() {
+    return HALUtil.getComments();
+  }
+
+  /**
+   * Returns the team number configured for the robot controller.
+   *
+   * @return team number, or 0 if not found.
+   */
+  public static int getTeamNumber() {
+    return HALUtil.getTeamNumber();
   }
 
   /**
@@ -55,6 +78,10 @@ public final class RobotController {
 
   /**
    * Get the state of the "USER" button on the roboRIO.
+   *
+   * <p>Warning: the User Button is used to stop user programs from automatically loading if it is
+   * held for more then 5 seconds. Because of this, it's not recommended to be used by teams for any
+   * other purpose.
    *
    * @return true if the button is currently pressed down
    */
@@ -91,6 +118,24 @@ public final class RobotController {
   }
 
   /**
+   * Gets the current state of the Robot Signal Light (RSL).
+   *
+   * @return The current state of the RSL- true if on, false if off
+   */
+  public static boolean getRSLState() {
+    return HAL.getRSLState();
+  }
+
+  /**
+   * Gets if the system time is valid.
+   *
+   * @return True if the system time is valid, false otherwise
+   */
+  public static boolean isSystemTimeValid() {
+    return HAL.getSystemTimeValid();
+  }
+
+  /**
    * Get the input voltage to the robot controller.
    *
    * @return The controller input voltage value in Volts
@@ -120,10 +165,19 @@ public final class RobotController {
   /**
    * Get the current output of the 3.3V rail.
    *
-   * @return The controller 3.3V rail output current value in Volts
+   * @return The controller 3.3V rail output current value in Amps
    */
   public static double getCurrent3V3() {
     return PowerJNI.getUserCurrent3V3();
+  }
+
+  /**
+   * Enables or disables the 3.3V rail.
+   *
+   * @param enabled whether to enable the 3.3V rail.
+   */
+  public static void setEnabled3V3(boolean enabled) {
+    PowerJNI.setUserEnabled3V3(enabled);
   }
 
   /**
@@ -164,6 +218,15 @@ public final class RobotController {
   }
 
   /**
+   * Enables or disables the 5V rail.
+   *
+   * @param enabled whether to enable the 5V rail.
+   */
+  public static void setEnabled5V(boolean enabled) {
+    PowerJNI.setUserEnabled5V(enabled);
+  }
+
+  /**
    * Get the enabled state of the 5V rail. The rail may be disabled due to a controller brownout, a
    * short circuit on the rail, or controller over-voltage.
    *
@@ -201,6 +264,15 @@ public final class RobotController {
   }
 
   /**
+   * Enables or disables the 6V rail.
+   *
+   * @param enabled whether to enable the 6V rail.
+   */
+  public static void setEnabled6V(boolean enabled) {
+    PowerJNI.setUserEnabled6V(enabled);
+  }
+
+  /**
    * Get the enabled state of the 6V rail. The rail may be disabled due to a controller brownout, a
    * short circuit on the rail, or controller over-voltage.
    *
@@ -220,13 +292,97 @@ public final class RobotController {
   }
 
   /**
+   * Get the current brownout voltage setting.
+   *
+   * @return The brownout voltage
+   */
+  public static double getBrownoutVoltage() {
+    return PowerJNI.getBrownoutVoltage();
+  }
+
+  /**
+   * Set the voltage the roboRIO will brownout and disable all outputs.
+   *
+   * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
+   *
+   * @param brownoutVoltage The brownout voltage
+   */
+  public static void setBrownoutVoltage(double brownoutVoltage) {
+    PowerJNI.setBrownoutVoltage(brownoutVoltage);
+  }
+
+  /**
+   * Get the current CPU temperature in degrees Celsius.
+   *
+   * @return current CPU temperature in degrees Celsius
+   */
+  public static double getCPUTemp() {
+    return PowerJNI.getCPUTemp();
+  }
+
+  /** State for the radio led. */
+  public enum RadioLEDState {
+    /** Off. */
+    kOff(LEDJNI.RADIO_LED_STATE_OFF),
+    /** Green. */
+    kGreen(LEDJNI.RADIO_LED_STATE_GREEN),
+    /** Red. */
+    kRed(LEDJNI.RADIO_LED_STATE_RED),
+    /** Orange. */
+    kOrange(LEDJNI.RADIO_LED_STATE_ORANGE);
+
+    /** The native value for this state. */
+    public final int value;
+
+    RadioLEDState(int value) {
+      this.value = value;
+    }
+
+    /**
+     * Gets a state from an int value.
+     *
+     * @param value int value
+     * @return state
+     */
+    public static RadioLEDState fromValue(int value) {
+      return switch (value) {
+        case LEDJNI.RADIO_LED_STATE_OFF -> RadioLEDState.kOff;
+        case LEDJNI.RADIO_LED_STATE_GREEN -> RadioLEDState.kGreen;
+        case LEDJNI.RADIO_LED_STATE_RED -> RadioLEDState.kRed;
+        case LEDJNI.RADIO_LED_STATE_ORANGE -> RadioLEDState.kOrange;
+        default -> RadioLEDState.kOff;
+      };
+    }
+  }
+
+  /**
+   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so this function should
+   * not be called multiple times per loop cycle to avoid overruns.
+   *
+   * @param state The state to set the LED to.
+   */
+  public static void setRadioLEDState(RadioLEDState state) {
+    LEDJNI.setRadioLEDState(state.value);
+  }
+
+  /**
+   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so this function
+   * should not be called multiple times per loop cycle to avoid overruns.
+   *
+   * @return The state of the LED.
+   */
+  public static RadioLEDState getRadioLEDState() {
+    return RadioLEDState.fromValue(LEDJNI.getRadioLEDState());
+  }
+
+  /**
    * Get the current status of the CAN bus.
    *
    * @return The status of the CAN bus
    */
   public static CANStatus getCANStatus() {
     CANStatus status = new CANStatus();
-    CANJNI.GetCANStatus(status);
+    CANJNI.getCANStatus(status);
     return status;
   }
 }

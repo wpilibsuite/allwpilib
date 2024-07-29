@@ -1,31 +1,32 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <memory>
+#include <initializer_list>
+#include <span>
 
 #include <hal/AddressableLEDTypes.h>
 #include <hal/Types.h>
-#include <units/units.h>
-#include <wpi/ArrayRef.h>
+#include <units/time.h>
 
-#include "frc/ErrorBase.h"
 #include "util/Color.h"
 #include "util/Color8Bit.h"
 
 namespace frc {
 
 /**
- * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
+ * A class for driving addressable LEDs, such as WS2812Bs and NeoPixels.
  *
- * <p>Only 1 LED driver is currently supported by the roboRIO.
+ * By default, the timing supports WS2812B LEDs, but is configurable using
+ * SetBitTiming()
+ *
+ * <p>Only 1 LED driver is currently supported by the roboRIO. However,
+ * multiple LED strips can be connected in series and controlled from the
+ * single driver.
  */
-class AddressableLED : public ErrorBase {
+class AddressableLED {
  public:
   class LEDData : public HAL_AddressableLEDData {
    public:
@@ -89,7 +90,7 @@ class AddressableLED : public ErrorBase {
    */
   explicit AddressableLED(int port);
 
-  ~AddressableLED() override;
+  ~AddressableLED();
 
   /**
    * Sets the length of the LED strip.
@@ -111,7 +112,7 @@ class AddressableLED : public ErrorBase {
    *
    * @param ledData the buffer to write
    */
-  void SetData(wpi::ArrayRef<LEDData> ledData);
+  void SetData(std::span<const LEDData> ledData);
 
   /**
    * Sets the led output data.
@@ -126,32 +127,32 @@ class AddressableLED : public ErrorBase {
   /**
    * Sets the bit timing.
    *
-   * <p>By default, the driver is set up to drive WS2812s, so nothing needs to
+   * <p>By default, the driver is set up to drive WS2812Bs, so nothing needs to
    * be set for those.
    *
-   * @param lowTime0 low time for 0 bit
-   * @param highTime0 high time for 0 bit
-   * @param lowTime1 low time for 1 bit
-   * @param highTime1 high time for 1 bit
+   * @param highTime0 high time for 0 bit (default 400ns)
+   * @param lowTime0 low time for 0 bit (default 900ns)
+   * @param highTime1 high time for 1 bit (default 900ns)
+   * @param lowTime1 low time for 1 bit (default 600ns)
    */
-  void SetBitTiming(units::nanosecond_t lowTime0, units::nanosecond_t highTime0,
-                    units::nanosecond_t lowTime1,
-                    units::nanosecond_t highTime1);
+  void SetBitTiming(units::nanosecond_t highTime0, units::nanosecond_t lowTime0,
+                    units::nanosecond_t highTime1,
+                    units::nanosecond_t lowTime1);
 
   /**
    * Sets the sync time.
    *
    * <p>The sync time is the time to hold output so LEDs enable. Default set for
-   * WS2812.
+   * WS2812B.
    *
-   * @param syncTimeMicroSeconds the sync time
+   * @param syncTime the sync time (default 280us)
    */
   void SetSyncTime(units::microsecond_t syncTime);
 
   /**
    * Starts the output.
    *
-   * <p>The output writes continously.
+   * <p>The output writes continuously.
    */
   void Start();
 
@@ -163,5 +164,6 @@ class AddressableLED : public ErrorBase {
  private:
   hal::Handle<HAL_DigitalHandle> m_pwmHandle;
   hal::Handle<HAL_AddressableLEDHandle> m_handle;
+  int m_port;
 };
 }  // namespace frc

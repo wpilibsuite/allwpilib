@@ -1,24 +1,22 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <algorithm>
 
+#include <gtest/gtest.h>
+#include <units/time.h>
+#include <wpi/deprecated.h>
+
 #include "TestBench.h"
 #include "frc/Encoder.h"
-#include "frc/Jaguar.h"
-#include "frc/LinearFilter.h"
 #include "frc/Notifier.h"
-#include "frc/Talon.h"
 #include "frc/Timer.h"
-#include "frc/Victor.h"
 #include "frc/controller/PIDController.h"
-#include "gtest/gtest.h"
-
-using namespace frc;
+#include "frc/filter/LinearFilter.h"
+#include "frc/motorcontrol/Jaguar.h"
+#include "frc/motorcontrol/Talon.h"
+#include "frc/motorcontrol/Victor.h"
 
 enum MotorEncoderTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 
@@ -38,50 +36,52 @@ std::ostream& operator<<(std::ostream& os, MotorEncoderTestType const& type) {
   return os;
 }
 
-static constexpr double kMotorTime = 0.5;
+static constexpr auto kMotorTime = 0.5_s;
+
+WPI_IGNORE_DEPRECATED
 
 /**
- * A fixture that includes a PWM speed controller and an encoder connected to
+ * A fixture that includes a PWM motor controller and an encoder connected to
  * the same motor.
  */
 class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
  protected:
-  SpeedController* m_speedController;
-  Encoder* m_encoder;
-  LinearFilter<double>* m_filter;
+  frc::MotorController* m_motorController;
+  frc::Encoder* m_encoder;
+  frc::LinearFilter<double>* m_filter;
 
-  void SetUp() override {
+  MotorEncoderTest() {
     switch (GetParam()) {
       case TEST_VICTOR:
-        m_speedController = new Victor(TestBench::kVictorChannel);
-        m_encoder = new Encoder(TestBench::kVictorEncoderChannelA,
-                                TestBench::kVictorEncoderChannelB);
+        m_motorController = new frc::Victor(TestBench::kVictorChannel);
+        m_encoder = new frc::Encoder(TestBench::kVictorEncoderChannelA,
+                                     TestBench::kVictorEncoderChannelB);
         break;
 
       case TEST_JAGUAR:
-        m_speedController = new Jaguar(TestBench::kJaguarChannel);
-        m_encoder = new Encoder(TestBench::kJaguarEncoderChannelA,
-                                TestBench::kJaguarEncoderChannelB);
+        m_motorController = new frc::Jaguar(TestBench::kJaguarChannel);
+        m_encoder = new frc::Encoder(TestBench::kJaguarEncoderChannelA,
+                                     TestBench::kJaguarEncoderChannelB);
         break;
 
       case TEST_TALON:
-        m_speedController = new Talon(TestBench::kTalonChannel);
-        m_encoder = new Encoder(TestBench::kTalonEncoderChannelA,
-                                TestBench::kTalonEncoderChannelB);
+        m_motorController = new frc::Talon(TestBench::kTalonChannel);
+        m_encoder = new frc::Encoder(TestBench::kTalonEncoderChannelA,
+                                     TestBench::kTalonEncoderChannelB);
         break;
     }
-    m_filter =
-        new LinearFilter<double>(LinearFilter<double>::MovingAverage(50));
+    m_filter = new frc::LinearFilter<double>(
+        frc::LinearFilter<double>::MovingAverage(50));
   }
 
-  void TearDown() override {
-    delete m_speedController;
-    delete m_encoder;
+  ~MotorEncoderTest() {
     delete m_filter;
+    delete m_encoder;
+    delete m_motorController;
   }
 
   void Reset() {
-    m_speedController->Set(0.0);
+    m_motorController->Set(0.0);
     m_encoder->Reset();
     m_filter->Reset();
   }
@@ -93,10 +93,10 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
 TEST_P(MotorEncoderTest, Increment) {
   Reset();
 
-  /* Drive the speed controller briefly to move the encoder */
-  m_speedController->Set(0.2f);
-  Wait(kMotorTime);
-  m_speedController->Set(0.0);
+  /* Drive the motor controller briefly to move the encoder */
+  m_motorController->Set(0.2f);
+  frc::Wait(kMotorTime);
+  m_motorController->Set(0.0);
 
   /* The encoder should be positive now */
   EXPECT_GT(m_encoder->Get(), 0)
@@ -109,10 +109,10 @@ TEST_P(MotorEncoderTest, Increment) {
 TEST_P(MotorEncoderTest, Decrement) {
   Reset();
 
-  /* Drive the speed controller briefly to move the encoder */
-  m_speedController->Set(-0.2);
-  Wait(kMotorTime);
-  m_speedController->Set(0.0);
+  /* Drive the motor controller briefly to move the encoder */
+  m_motorController->Set(-0.2);
+  frc::Wait(kMotorTime);
+  m_motorController->Set(0.0);
 
   /* The encoder should be positive now */
   EXPECT_LT(m_encoder->Get(), 0.0)
@@ -125,15 +125,15 @@ TEST_P(MotorEncoderTest, Decrement) {
 TEST_P(MotorEncoderTest, ClampSpeed) {
   Reset();
 
-  m_speedController->Set(2.0);
-  Wait(kMotorTime);
+  m_motorController->Set(2.0);
+  frc::Wait(kMotorTime);
 
-  EXPECT_FLOAT_EQ(1.0, m_speedController->Get());
+  EXPECT_FLOAT_EQ(1.0, m_motorController->Get());
 
-  m_speedController->Set(-2.0);
-  Wait(kMotorTime);
+  m_motorController->Set(-2.0);
+  frc::Wait(kMotorTime);
 
-  EXPECT_FLOAT_EQ(-1.0, m_speedController->Get());
+  EXPECT_FLOAT_EQ(-1.0, m_motorController->Get());
 }
 
 /**
@@ -142,7 +142,7 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
 TEST_P(MotorEncoderTest, PositionPIDController) {
   Reset();
   double goal = 1000;
-  frc2::PIDController pidController(0.001, 0.01, 0.0);
+  frc::PIDController pidController(0.001, 0.01, 0.0);
   pidController.SetTolerance(50.0);
   pidController.SetIntegratorRange(-0.2, 0.2);
   pidController.SetSetpoint(goal);
@@ -150,10 +150,10 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
   /* 10 seconds should be plenty time to get to the reference */
   frc::Notifier pidRunner{[this, &pidController] {
     auto speed = pidController.Calculate(m_encoder->GetDistance());
-    m_speedController->Set(std::clamp(speed, -0.2, 0.2));
+    m_motorController->Set(std::clamp(speed, -0.2, 0.2));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
-  Wait(10.0);
+  frc::Wait(10_s);
   pidRunner.Stop();
 
   RecordProperty("PIDError", pidController.GetPositionError());
@@ -169,7 +169,7 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
 TEST_P(MotorEncoderTest, VelocityPIDController) {
   Reset();
 
-  frc2::PIDController pidController(1e-5, 0.0, 0.0006);
+  frc::PIDController pidController(1e-5, 0.0, 0.0006);
   pidController.SetTolerance(200.0);
   pidController.SetSetpoint(600);
 
@@ -177,10 +177,10 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   frc::Notifier pidRunner{[this, &pidController] {
     auto speed =
         pidController.Calculate(m_filter->Calculate(m_encoder->GetRate()));
-    m_speedController->Set(std::clamp(speed, -0.3, 0.3));
+    m_motorController->Set(std::clamp(speed, -0.3, 0.3));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
-  Wait(10.0);
+  frc::Wait(10_s);
   pidRunner.Stop();
   RecordProperty("PIDError", pidController.GetPositionError());
 
@@ -198,5 +198,7 @@ TEST_P(MotorEncoderTest, Reset) {
   EXPECT_EQ(0, m_encoder->Get()) << "Encoder did not reset to 0";
 }
 
-INSTANTIATE_TEST_SUITE_P(Test, MotorEncoderTest,
+INSTANTIATE_TEST_SUITE_P(Tests, MotorEncoderTest,
                          testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));
+
+WPI_UNIGNORE_DEPRECATED

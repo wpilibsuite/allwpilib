@@ -1,23 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <frc/XboxController.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/ParallelRaceGroup.h>
-#include <frc2/command/RunCommand.h>
-#include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/StartEndCommand.h>
+#include <frc2/command/Commands.h>
+#include <frc2/command/button/CommandPS4Controller.h>
 
 #include "Constants.h"
-#include "commands/ComplexAuto.h"
+#include "commands/Autos.h"
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/HatchSubsystem.h"
 
@@ -38,7 +31,8 @@ class RobotContainer {
 
  private:
   // The driver's controller
-  frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
+  frc2::CommandPS4Controller m_driverController{
+      OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
 
@@ -46,27 +40,11 @@ class RobotContainer {
   DriveSubsystem m_drive;
   HatchSubsystem m_hatch;
 
+  // Commands owned by RobotContainer
+
   // The autonomous routines
-  frc2::ParallelRaceGroup m_simpleAuto =
-      frc2::StartEndCommand(
-          [this] { m_drive.ArcadeDrive(ac::kAutoDriveSpeed, 0); },
-          [this] { m_drive.ArcadeDrive(0, 0); }, {&m_drive})
-          .BeforeStarting([this] { m_drive.ResetEncoders(); })
-          .WithInterrupt([this] {
-            return m_drive.GetAverageEncoderDistance() >=
-                   ac::kAutoDriveDistanceInches;
-          });
-  ComplexAuto m_complexAuto{&m_drive, &m_hatch};
-
-  // Assorted commands to be bound to buttons
-
-  frc2::InstantCommand m_grabHatch{[this] { m_hatch.GrabHatch(); }, {&m_hatch}};
-  frc2::InstantCommand m_releaseHatch{[this] { m_hatch.ReleaseHatch(); },
-                                      {&m_hatch}};
-  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
-                                        {}};
-  frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
-                                        {}};
+  frc2::CommandPtr m_simpleAuto = autos::SimpleAuto(&m_drive);
+  frc2::CommandPtr m_complexAuto = autos::ComplexAuto(&m_drive, &m_hatch);
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;

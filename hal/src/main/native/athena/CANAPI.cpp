@@ -1,21 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/CANAPI.h"
 
-#include <atomic>
 #include <ctime>
 
 #include <wpi/DenseMap.h>
+#include <wpi/mutex.h>
 
 #include "HALInitializer.h"
 #include "hal/CAN.h"
 #include "hal/Errors.h"
-#include "hal/HAL.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 
 using namespace hal;
@@ -31,8 +27,9 @@ struct CANStorage {
   HAL_CANManufacturer manufacturer;
   HAL_CANDeviceType deviceType;
   uint8_t deviceId;
-  wpi::mutex mapMutex;
+  wpi::mutex periodicSendsMutex;
   wpi::SmallDenseMap<int32_t, int32_t> periodicSends;
+  wpi::mutex receivesMutex;
   wpi::SmallDenseMap<int32_t, Receives> receives;
 };
 }  // namespace
@@ -40,24 +37,13 @@ struct CANStorage {
 static UnlimitedHandleResource<HAL_CANHandle, CANStorage, HAL_HandleEnum::CAN>*
     canHandles;
 
-static uint32_t GetPacketBaseTime() {
-  timespec t;
-  clock_gettime(CLOCK_MONOTONIC, &t);
-
-  // Convert t to milliseconds
-  uint64_t ms = t.tv_sec * 1000ull + t.tv_nsec / 1000000ull;
-  return ms & 0xFFFFFFFF;
-}
-
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeCANAPI() {
   static UnlimitedHandleResource<HAL_CANHandle, CANStorage, HAL_HandleEnum::CAN>
       cH;
   canHandles = &cH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
   int32_t createdId = 0;
@@ -69,6 +55,15 @@ static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
 }
 
 extern "C" {
+
+uint32_t HAL_GetCANPacketBaseTime(void) {
+  timespec t;
+  clock_gettime(CLOCK_MONOTONIC, &t);
+
+  // Convert t to milliseconds
+  uint64_t ms = t.tv_sec * 1000ull + t.tv_nsec / 1000000ull;
+  return ms & 0xFFFFFFFF;
+}
 
 HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
                                 int32_t deviceId, HAL_CANDeviceType deviceType,
@@ -92,8 +87,11 @@ HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
 
 void HAL_CleanCAN(HAL_CANHandle handle) {
   auto data = canHandles->Free(handle);
+  if (data == nullptr) {
+    return;
+  }
 
-  std::scoped_lock lock(data->mapMutex);
+  std::scoped_lock lock(data->periodicSendsMutex);
 
   for (auto&& i : data->periodicSends) {
     int32_t s = 0;
@@ -112,12 +110,8 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, const uint8_t* data,
   }
   auto id = CreateCANId(can.get(), apiId);
 
+  std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
-
-  if (*status != 0) {
-    return;
-  }
-  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = -1;
 }
 
@@ -131,12 +125,8 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
   }
   auto id = CreateCANId(can.get(), apiId);
 
+  std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, data, length, repeatMs, status);
-
-  if (*status != 0) {
-    return;
-  }
-  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = repeatMs;
 }
 
@@ -152,12 +142,8 @@ void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
   uint8_t data[8];
   std::memset(data, 0, sizeof(data));
 
+  std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
-
-  if (*status != 0) {
-    return;
-  }
-  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = -1;
 }
 
@@ -170,13 +156,9 @@ void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
   }
   auto id = CreateCANId(can.get(), apiId);
 
+  std::scoped_lock lock(can->periodicSendsMutex);
   HAL_CAN_SendMessage(id, nullptr, 0, HAL_CAN_SEND_PERIOD_STOP_REPEATING,
                       status);
-
-  if (*status != 0) {
-    return;
-  }
-  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = -1;
 }
 
@@ -195,7 +177,7 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
   if (*status == 0) {
-    std::scoped_lock lock(can->mapMutex);
+    std::scoped_lock lock(can->receivesMutex);
     auto& msg = can->receives[messageId];
     msg.length = dataSize;
     msg.lastTimeStamp = ts;
@@ -220,7 +202,7 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  std::scoped_lock lock(can->mapMutex);
+  std::scoped_lock lock(can->receivesMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[messageId];
@@ -257,7 +239,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  std::scoped_lock lock(can->mapMutex);
+  std::scoped_lock lock(can->receivesMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[messageId];
@@ -271,7 +253,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint32_t now = GetPacketBaseTime();
+      uint32_t now = HAL_GetCANPacketBaseTime();
       if (now - i->second.lastTimeStamp > static_cast<uint32_t>(timeoutMs)) {
         // Timeout, return bad status
         *status = HAL_CAN_TIMEOUT;
@@ -284,5 +266,20 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
       *status = 0;
     }
   }
+}
+
+uint32_t HAL_StartCANStream(HAL_CANHandle handle, int32_t apiId, int32_t depth,
+                            int32_t* status) {
+  auto can = canHandles->Get(handle);
+  if (!can) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  uint32_t messageId = CreateCANId(can.get(), apiId);
+
+  uint32_t session = 0;
+  HAL_CAN_OpenStreamSession(&session, messageId, 0x1FFFFFFF, depth, status);
+  return session;
 }
 }  // extern "C"

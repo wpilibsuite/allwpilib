@@ -1,31 +1,25 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.function.BooleanSupplier;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
-
 /**
- * Runs one of two commands, depending on the value of the given condition when this command is
- * initialized.  Does not actually schedule the selected command - rather, the command is run
- * through this command; this ensures that the command will behave as expected if used as part of a
- * CommandGroup.  Requires the requirements of both commands, again to ensure proper functioning
- * when used in a CommandGroup.  If this is undesired, consider using {@link ScheduleCommand}.
+ * A command composition that runs one of two commands, depending on the value of the given
+ * condition when this command is initialized.
  *
- * <p>As this command contains multiple component commands within it, it is technically a command
- * group; the command instances that are passed to it cannot be added to any other groups, or
- * scheduled individually.
+ * <p>The rules for command compositions apply: command instances that are passed to it cannot be
+ * added to any other composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ * <p>This class is provided by the NewCommands VendorDep
  */
-public class ConditionalCommand extends CommandBase {
+public class ConditionalCommand extends Command {
   private final Command m_onTrue;
   private final Command m_onFalse;
   private final BooleanSupplier m_condition;
@@ -34,20 +28,20 @@ public class ConditionalCommand extends CommandBase {
   /**
    * Creates a new ConditionalCommand.
    *
-   * @param onTrue    the command to run if the condition is true
-   * @param onFalse   the command to run if the condition is false
+   * @param onTrue the command to run if the condition is true
+   * @param onFalse the command to run if the condition is false
    * @param condition the condition to determine which command to run
    */
+  @SuppressWarnings("this-escape")
   public ConditionalCommand(Command onTrue, Command onFalse, BooleanSupplier condition) {
-    requireUngrouped(onTrue, onFalse);
-
-    CommandGroupBase.registerGroupedCommands(onTrue, onFalse);
-
-    m_onTrue = onTrue;
-    m_onFalse = onFalse;
+    m_onTrue = requireNonNullParam(onTrue, "onTrue", "ConditionalCommand");
+    m_onFalse = requireNonNullParam(onFalse, "onFalse", "ConditionalCommand");
     m_condition = requireNonNullParam(condition, "condition", "ConditionalCommand");
-    m_requirements.addAll(m_onTrue.getRequirements());
-    m_requirements.addAll(m_onFalse.getRequirements());
+
+    CommandScheduler.getInstance().registerComposedCommands(onTrue, onFalse);
+
+    addRequirements(m_onTrue.getRequirements());
+    addRequirements(m_onFalse.getRequirements());
   }
 
   @Override
@@ -78,5 +72,32 @@ public class ConditionalCommand extends CommandBase {
   @Override
   public boolean runsWhenDisabled() {
     return m_onTrue.runsWhenDisabled() && m_onFalse.runsWhenDisabled();
+  }
+
+  @Override
+  public InterruptionBehavior getInterruptionBehavior() {
+    if (m_onTrue.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf
+        || m_onFalse.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
+      return InterruptionBehavior.kCancelSelf;
+    } else {
+      return InterruptionBehavior.kCancelIncoming;
+    }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addStringProperty("onTrue", m_onTrue::getName, null);
+    builder.addStringProperty("onFalse", m_onFalse::getName, null);
+    builder.addStringProperty(
+        "selected",
+        () -> {
+          if (m_selectedCommand == null) {
+            return "null";
+          } else {
+            return m_selectedCommand.getName();
+          }
+        },
+        null);
   }
 }

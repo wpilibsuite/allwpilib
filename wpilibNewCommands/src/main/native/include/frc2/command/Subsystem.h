@@ -1,19 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <type_traits>
+#include <concepts>
+#include <functional>
+#include <string>
 #include <utility>
+
+#include <wpi/FunctionExtras.h>
 
 #include "frc2/command/CommandScheduler.h"
 
 namespace frc2 {
 class Command;
+class CommandPtr;
 /**
  * A robot subsystem.  Subsystems are the basic unit of robot organization in
  * the Command-based framework; they encapsulate low-level hardware objects
@@ -32,13 +34,15 @@ class Command;
  * SubsystemBase class offers a simple base for user implementations
  * that handles this.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see Command
  * @see CommandScheduler
  * @see SubsystemBase
  */
 class Subsystem {
  public:
-  ~Subsystem();
+  virtual ~Subsystem();
   /**
    * This method is called periodically by the CommandScheduler.  Useful for
    * updating subsystem-specific state that you don't want to offload to a
@@ -49,6 +53,21 @@ class Subsystem {
   virtual void Periodic();
 
   /**
+   * This method is called periodically by the CommandScheduler.  Useful for
+   * updating subsystem-specific state that needs to be maintained for
+   * simulations, such as for updating simulation classes and setting simulated
+   * sensor readings.
+   */
+  virtual void SimulationPeriodic();
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  virtual std::string GetName() const;
+
+  /**
    * Sets the default Command of the subsystem.  The default command will be
    * automatically scheduled when no other commands are scheduled that require
    * the subsystem. Default commands should generally not end on their own, i.e.
@@ -57,12 +76,28 @@ class Subsystem {
    *
    * @param defaultCommand the default command to associate with this subsystem
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   void SetDefaultCommand(T&& defaultCommand) {
     CommandScheduler::GetInstance().SetDefaultCommand(
         this, std::forward<T>(defaultCommand));
   }
+
+  /**
+   * Sets the default Command of the subsystem.  The default command will be
+   * automatically scheduled when no other commands are scheduled that require
+   * the subsystem. Default commands should generally not end on their own, i.e.
+   * their IsFinished() method should always return false.  Will automatically
+   * register this subsystem with the CommandScheduler.
+   *
+   * @param defaultCommand the default command to associate with this subsystem
+   */
+  void SetDefaultCommand(CommandPtr&& defaultCommand);
+
+  /**
+   * Removes the default command for the subsystem.  This will not cancel the
+   * default command if it is currently running.
+   */
+  void RemoveDefaultCommand();
 
   /**
    * Gets the default command for this subsystem.  Returns null if no default
@@ -85,5 +120,63 @@ class Subsystem {
    * Periodic() method to be called when the scheduler runs.
    */
   void Register();
+
+  /**
+   * Constructs a command that runs an action once and finishes. Requires this
+   * subsystem.
+   *
+   * @param action the action to run
+   */
+  [[nodiscard]]
+  CommandPtr RunOnce(std::function<void()> action);
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted.
+   * Requires this subsystem.
+   *
+   * @param action the action to run
+   */
+  [[nodiscard]]
+  CommandPtr Run(std::function<void()> action);
+
+  /**
+   * Constructs a command that runs an action once and another action when the
+   * command is interrupted. Requires this subsystem.
+   *
+   * @param start the action to run on start
+   * @param end the action to run on interrupt
+   */
+  [[nodiscard]]
+  CommandPtr StartEnd(std::function<void()> start, std::function<void()> end);
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted,
+   * and then runs a second action. Requires this subsystem.
+   *
+   * @param run the action to run every iteration
+   * @param end the action to run on interrupt
+   */
+  [[nodiscard]]
+  CommandPtr RunEnd(std::function<void()> run, std::function<void()> end);
+
+  /**
+   * Constructs a command that runs an action once, and then runs an action
+   * every iteration until interrupted. Requires this subsystem.
+   *
+   * @param start the action to run on start
+   * @param run the action to run every iteration
+   */
+  [[nodiscard]]
+  CommandPtr StartRun(std::function<void()> start, std::function<void()> run);
+
+  /**
+   * Constructs a DeferredCommand with the provided supplier. This subsystem is
+   * added as a requirement.
+   *
+   * @param supplier the command supplier.
+   * @return the command.
+   */
+  [[nodiscard]]
+  CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
 };
 }  // namespace frc2

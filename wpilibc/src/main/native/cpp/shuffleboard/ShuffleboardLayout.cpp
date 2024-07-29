@@ -1,20 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 
+#include <wpi/json.h>
+
 using namespace frc;
 
+static constexpr std::string_view kSmartDashboardType = "ShuffleboardLayout";
+
 ShuffleboardLayout::ShuffleboardLayout(ShuffleboardContainer& parent,
-                                       const wpi::Twine& name,
-                                       const wpi::Twine& type)
-    : ShuffleboardValue(type),
-      ShuffleboardComponent(parent, type, name),
-      ShuffleboardContainer(name) {
+                                       std::string_view title,
+                                       std::string_view type)
+    : ShuffleboardValue(title),
+      ShuffleboardComponent(parent, title, type),
+      ShuffleboardContainer(title) {
   m_isLayout = true;
 }
 
@@ -23,7 +24,9 @@ void ShuffleboardLayout::BuildInto(
     std::shared_ptr<nt::NetworkTable> metaTable) {
   BuildMetadata(metaTable);
   auto table = parentTable->GetSubTable(GetTitle());
-  table->GetEntry(".type").SetString("ShuffleboardLayout");
+  table->GetEntry(".type").SetString(kSmartDashboardType);
+  table->GetEntry(".type").GetTopic().SetProperty("SmartDashboard",
+                                                  kSmartDashboardType);
   for (auto& component : GetComponents()) {
     component->BuildInto(table, metaTable->GetSubTable(component->GetTitle()));
   }

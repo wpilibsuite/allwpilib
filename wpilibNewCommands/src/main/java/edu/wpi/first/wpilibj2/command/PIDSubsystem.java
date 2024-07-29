@@ -1,25 +1,25 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import edu.wpi.first.math.controller.PIDController;
 
 /**
- * A subsystem that uses a {@link PIDController} to control an output.  The controller is run
+ * A subsystem that uses a {@link PIDController} to control an output. The controller is run
  * synchronously from the subsystem's periodic() method.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class PIDSubsystem extends SubsystemBase {
+  /** PID controller. */
   protected final PIDController m_controller;
-  protected boolean m_enabled;
 
-  private double m_setpoint;
+  /** Whether PID controller output is enabled. */
+  protected boolean m_enabled;
 
   /**
    * Creates a new PIDSubsystem.
@@ -27,13 +27,15 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * @param controller the PIDController to use
    * @param initialPosition the initial setpoint of the subsystem
    */
+  @SuppressWarnings("this-escape")
   public PIDSubsystem(PIDController controller, double initialPosition) {
-    setSetpoint(initialPosition);
     m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
+    setSetpoint(initialPosition);
+    addChild("PID Controller", m_controller);
   }
 
   /**
-   * Creates a new PIDSubsystem.  Initial setpoint is zero.
+   * Creates a new PIDSubsystem. Initial setpoint is zero.
    *
    * @param controller the PIDController to use
    */
@@ -44,10 +46,15 @@ public abstract class PIDSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (m_enabled) {
-      useOutput(m_controller.calculate(getMeasurement(), m_setpoint), m_setpoint);
+      useOutput(m_controller.calculate(getMeasurement()), getSetpoint());
     }
   }
 
+  /**
+   * Returns the PIDController.
+   *
+   * @return The controller.
+   */
   public PIDController getController() {
     return m_controller;
   }
@@ -57,8 +64,17 @@ public abstract class PIDSubsystem extends SubsystemBase {
    *
    * @param setpoint the setpoint for the subsystem
    */
-  public void setSetpoint(double setpoint) {
-    m_setpoint = setpoint;
+  public final void setSetpoint(double setpoint) {
+    m_controller.setSetpoint(setpoint);
+  }
+
+  /**
+   * Returns the current setpoint of the subsystem.
+   *
+   * @return The current setpoint
+   */
+  public double getSetpoint() {
+    return m_controller.getSetpoint();
   }
 
   /**
@@ -76,17 +92,13 @@ public abstract class PIDSubsystem extends SubsystemBase {
    */
   protected abstract double getMeasurement();
 
-  /**
-   * Enables the PID control.  Resets the controller.
-   */
+  /** Enables the PID control. Resets the controller. */
   public void enable() {
     m_enabled = true;
     m_controller.reset();
   }
 
-  /**
-   * Disables the PID control.  Sets output to zero.
-   */
+  /** Disables the PID control. Sets output to zero. */
   public void disable() {
     m_enabled = false;
     useOutput(0, 0);

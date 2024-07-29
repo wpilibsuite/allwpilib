@@ -1,15 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <stdint.h>
 
 #include <memory>
+#include <string>
 
 #include <wpi/mutex.h>
 
@@ -40,7 +38,7 @@ constexpr int32_t kExpectedLoopTiming = 40;
  *   reliably down to 10.0 ms; starting at about 8.5ms, the servo sometimes hums
  *   and get hot; by 5.0ms the hum is nearly continuous
  * - 10ms periods work well for Victor 884
- * - 5ms periods allows higher update rates for Luminary Micro Jaguar speed
+ * - 5ms periods allows higher update rates for Luminary Micro Jaguar motor
  *   controllers. Due to the shipping firmware on the Jaguar, we can't run the
  *   update period less than 5.05 ms.
  *
@@ -49,15 +47,8 @@ constexpr int32_t kExpectedLoopTiming = 40;
  * devices.
  */
 constexpr double kDefaultPwmPeriod = 5.05;
-/**
- * kDefaultPwmCenter is the PWM range center in ms
- */
-constexpr double kDefaultPwmCenter = 1.5;
-/**
- * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
- */
-constexpr int32_t kDefaultPwmStepsDown = 1000;
 constexpr int32_t kPwmDisabled = 0;
+constexpr int32_t kPwmAlwaysHigh = 0xFFFF;
 
 extern std::unique_ptr<tDIO> digitalSystem;
 extern std::unique_ptr<tRelay> relaySystem;
@@ -73,6 +64,7 @@ struct DigitalPort {
   int32_t centerPwm = 0;
   int32_t deadbandMinPwm = 0;
   int32_t minPwm = 0;
+  std::string previousAllocation;
 };
 
 extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
@@ -101,13 +93,15 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
  */
 constexpr int32_t remapDigitalChannelToBitfieldChannel(int32_t channel) {
   // First 10 are headers
-  if (channel < kNumDigitalHeaders) return channel;
-  // 2nd group of 16 are mxp. So if mxp port, add 6, since they start at 10
-  else if (channel < kNumDigitalMXPChannels)
+  if (channel < kNumDigitalHeaders) {
+    return channel;
+    // 2nd group of 16 are mxp. So if mxp port, add 6, since they start at 10
+  } else if (channel < kNumDigitalMXPChannels) {
     return channel + 6;
-  // Assume SPI, so remove MXP channels
-  else
+    // Assume SPI, so remove MXP channels
+  } else {
     return channel - kNumDigitalMXPChannels;
+  }
 }
 
 /**

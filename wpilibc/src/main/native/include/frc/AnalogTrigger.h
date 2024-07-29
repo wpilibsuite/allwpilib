@@ -1,30 +1,24 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTriggerOutput.h"
-#include "frc/ErrorBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class AnalogInput;
 class DutyCycle;
-class SendableBuilder;
 
-class AnalogTrigger : public ErrorBase,
-                      public Sendable,
-                      public SendableHelper<AnalogTrigger> {
+class AnalogTrigger : public wpi::Sendable,
+                      public wpi::SendableHelper<AnalogTrigger> {
   friend class AnalogTriggerOutput;
 
  public:
@@ -42,21 +36,21 @@ class AnalogTrigger : public ErrorBase,
    * This should be used in the case of sharing an analog channel between the
    * trigger and an analog input object.
    *
-   * @param channel The pointer to the existing AnalogInput object
+   * @param input The pointer to the existing AnalogInput object
    */
-  explicit AnalogTrigger(AnalogInput* channel);
+  explicit AnalogTrigger(AnalogInput* input);
 
   /**
    * Construct an analog trigger given a duty cycle input.
    *
-   * @param channel The pointer to the existing DutyCycle object
+   * @param dutyCycle The pointer to the existing DutyCycle object
    */
   explicit AnalogTrigger(DutyCycle* dutyCycle);
 
   ~AnalogTrigger() override;
 
-  AnalogTrigger(AnalogTrigger&& rhs);
-  AnalogTrigger& operator=(AnalogTrigger&& rhs);
+  AnalogTrigger(AnalogTrigger&&) = default;
+  AnalogTrigger& operator=(AnalogTrigger&&) = default;
 
   /**
    * Set the upper and lower limits of the analog trigger.
@@ -154,9 +148,11 @@ class AnalogTrigger : public ErrorBase,
   std::shared_ptr<AnalogTriggerOutput> CreateOutput(
       AnalogTriggerType type) const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
+  int GetSourceChannel() const;
+
   hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
   AnalogInput* m_analogInput = nullptr;
   DutyCycle* m_dutyCycle = nullptr;

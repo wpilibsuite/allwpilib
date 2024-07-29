@@ -1,55 +1,53 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+#include <numbers>
+
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
-#include <wpi/math>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * Represents a mecanum drive style drivetrain.
  */
 class Drivetrain {
  public:
-  Drivetrain() { m_gyro.Reset(); }
-
-  /**
-   * Get the robot angle as a Rotation2d
-   */
-  frc::Rotation2d GetAngle() const {
-    // Negating the angle because WPILib Gyros are CW positive.
-    return frc::Rotation2d(units::degree_t(-m_gyro.GetAngle()));
+  Drivetrain() {
+    m_gyro.Reset();
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+    m_frontRightMotor.SetInverted(true);
+    m_backRightMotor.SetInverted(true);
   }
 
   frc::MecanumDriveWheelSpeeds GetCurrentState() const;
+  frc::MecanumDriveWheelPositions GetCurrentWheelDistances() const;
   void SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds);
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
-             bool fieldRelative);
+             bool fieldRelative, units::second_t period);
   void UpdateOdometry();
 
   static constexpr units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
-      wpi::math::pi};  // 1/2 rotation per second
+      std::numbers::pi};  // 1/2 rotation per second
 
  private:
-  frc::PWMVictorSPX m_frontLeftMotor{1};
-  frc::PWMVictorSPX m_frontRightMotor{2};
-  frc::PWMVictorSPX m_backLeftMotor{3};
-  frc::PWMVictorSPX m_backRightMotor{4};
+  frc::PWMSparkMax m_frontLeftMotor{1};
+  frc::PWMSparkMax m_frontRightMotor{2};
+  frc::PWMSparkMax m_backLeftMotor{3};
+  frc::PWMSparkMax m_backRightMotor{4};
 
   frc::Encoder m_frontLeftEncoder{0, 1};
   frc::Encoder m_frontRightEncoder{2, 3};
@@ -61,10 +59,10 @@ class Drivetrain {
   frc::Translation2d m_backLeftLocation{-0.381_m, 0.381_m};
   frc::Translation2d m_backRightLocation{-0.381_m, -0.381_m};
 
-  frc2::PIDController m_frontLeftPIDController{1.0, 0.0, 0.0};
-  frc2::PIDController m_frontRightPIDController{1.0, 0.0, 0.0};
-  frc2::PIDController m_backLeftPIDController{1.0, 0.0, 0.0};
-  frc2::PIDController m_backRightPIDController{1.0, 0.0, 0.0};
+  frc::PIDController m_frontLeftPIDController{1.0, 0.0, 0.0};
+  frc::PIDController m_frontRightPIDController{1.0, 0.0, 0.0};
+  frc::PIDController m_backLeftPIDController{1.0, 0.0, 0.0};
+  frc::PIDController m_backRightPIDController{1.0, 0.0, 0.0};
 
   frc::AnalogGyro m_gyro{0};
 
@@ -72,7 +70,8 @@ class Drivetrain {
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
       m_backRightLocation};
 
-  frc::MecanumDriveOdometry m_odometry{m_kinematics, GetAngle()};
+  frc::MecanumDriveOdometry m_odometry{m_kinematics, m_gyro.GetRotation2d(),
+                                       GetCurrentWheelDistances()};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

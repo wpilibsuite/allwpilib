@@ -1,13 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
 #include <cassert>
+
+#include <wpi/jni_util.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_DIOJNI.h"
@@ -16,7 +15,7 @@
 #include "hal/Ports.h"
 #include "hal/handles/HandlesInternal.h"
 
-using namespace frc;
+using namespace hal;
 
 extern "C" {
 
@@ -30,10 +29,10 @@ Java_edu_wpi_first_hal_DIOJNI_initializeDIOPort
   (JNIEnv* env, jclass, jint id, jboolean input)
 {
   int32_t status = 0;
-  auto dio = HAL_InitializeDIOPort((HAL_PortHandle)id,
-                                   static_cast<uint8_t>(input), &status);
-  CheckStatusRange(env, status, 0, HAL_GetNumDigitalChannels(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto dio = HAL_InitializeDIOPort(
+      (HAL_PortHandle)id, static_cast<uint8_t>(input), stack.c_str(), &status);
+  CheckStatusForceThrow(env, status);
   return (jint)dio;
 }
 
@@ -76,11 +75,11 @@ Java_edu_wpi_first_hal_DIOJNI_setDIOSimDevice
 /*
  * Class:     edu_wpi_first_hal_DIOJNI
  * Method:    setDIO
- * Signature: (IS)V
+ * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DIOJNI_setDIO
-  (JNIEnv* env, jclass, jint id, jshort value)
+  (JNIEnv* env, jclass, jint id, jboolean value)
 {
   int32_t status = 0;
   HAL_SetDIO((HAL_DigitalHandle)id, value, &status);
@@ -142,6 +141,20 @@ Java_edu_wpi_first_hal_DIOJNI_pulse
 {
   int32_t status = 0;
   HAL_Pulse((HAL_DigitalHandle)id, value, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DIOJNI
+ * Method:    pulseMultiple
+ * Signature: (JD)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DIOJNI_pulseMultiple
+  (JNIEnv* env, jclass, jlong channelMask, jdouble value)
+{
+  int32_t status = 0;
+  HAL_PulseMultiple(static_cast<uint32_t>(channelMask), value, &status);
   CheckStatus(env, status);
 }
 
@@ -244,6 +257,20 @@ Java_edu_wpi_first_hal_DIOJNI_setDigitalPWMDutyCycle
 {
   int32_t status = 0;
   HAL_SetDigitalPWMDutyCycle((HAL_DigitalPWMHandle)id, value, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DIOJNI
+ * Method:    setDigitalPWMPPS
+ * Signature: (ID)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DIOJNI_setDigitalPWMPPS
+  (JNIEnv* env, jclass, jint id, jdouble value)
+{
+  int32_t status = 0;
+  HAL_SetDigitalPWMPPS((HAL_DigitalPWMHandle)id, value, &status);
   CheckStatus(env, status);
 }
 

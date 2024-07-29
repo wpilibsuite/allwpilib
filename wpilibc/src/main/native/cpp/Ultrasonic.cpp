@@ -1,22 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/Ultrasonic.h"
 
+#include <utility>
+
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
+#include "frc/Errors.h"
 #include "frc/Timer.h"
-#include "frc/Utility.h"
-#include "frc/WPIErrors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -26,47 +25,40 @@ std::atomic<bool> Ultrasonic::m_automaticEnabled{false};
 std::vector<Ultrasonic*> Ultrasonic::m_sensors;
 std::thread Ultrasonic::m_thread;
 
-Ultrasonic::Ultrasonic(int pingChannel, int echoChannel, DistanceUnit units)
+Ultrasonic::Ultrasonic(int pingChannel, int echoChannel)
     : m_pingChannel(std::make_shared<DigitalOutput>(pingChannel)),
       m_echoChannel(std::make_shared<DigitalInput>(echoChannel)),
       m_counter(m_echoChannel) {
-  m_units = units;
   Initialize();
-  auto& registry = SendableRegistry::GetInstance();
-  registry.AddChild(this, m_pingChannel.get());
-  registry.AddChild(this, m_echoChannel.get());
+  wpi::SendableRegistry::AddChild(this, m_pingChannel.get());
+  wpi::SendableRegistry::AddChild(this, m_echoChannel.get());
 }
 
-Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel,
-                       DistanceUnit units)
-    : m_pingChannel(pingChannel, NullDeleter<DigitalOutput>()),
-      m_echoChannel(echoChannel, NullDeleter<DigitalInput>()),
+Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel)
+    : m_pingChannel(pingChannel, wpi::NullDeleter<DigitalOutput>()),
+      m_echoChannel(echoChannel, wpi::NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
-  if (pingChannel == nullptr || echoChannel == nullptr) {
-    wpi_setWPIError(NullParameter);
-    m_units = units;
-    return;
+  if (!pingChannel) {
+    throw FRC_MakeError(err::NullParameter, "pingChannel");
   }
-  m_units = units;
+  if (!echoChannel) {
+    throw FRC_MakeError(err::NullParameter, "echoChannel");
+  }
   Initialize();
 }
 
-Ultrasonic::Ultrasonic(DigitalOutput& pingChannel, DigitalInput& echoChannel,
-                       DistanceUnit units)
-    : m_pingChannel(&pingChannel, NullDeleter<DigitalOutput>()),
-      m_echoChannel(&echoChannel, NullDeleter<DigitalInput>()),
+Ultrasonic::Ultrasonic(DigitalOutput& pingChannel, DigitalInput& echoChannel)
+    : m_pingChannel(&pingChannel, wpi::NullDeleter<DigitalOutput>()),
+      m_echoChannel(&echoChannel, wpi::NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
-  m_units = units;
   Initialize();
 }
 
 Ultrasonic::Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
-                       std::shared_ptr<DigitalInput> echoChannel,
-                       DistanceUnit units)
-    : m_pingChannel(pingChannel),
-      m_echoChannel(echoChannel),
+                       std::shared_ptr<DigitalInput> echoChannel)
+    : m_pingChannel(std::move(pingChannel)),
+      m_echoChannel(std::move(echoChannel)),
       m_counter(m_echoChannel) {
-  m_units = units;
   Initialize();
 }
 
@@ -88,8 +80,12 @@ Ultrasonic::~Ultrasonic() {
   }
 }
 
+int Ultrasonic::GetEchoChannel() const {
+  return m_echoChannel->GetChannel();
+}
+
 void Ultrasonic::Ping() {
-  wpi_assert(!m_automaticEnabled);
+  SetAutomaticMode(false);  // turn off automatic round-robin if pinging
 
   // Reset the counter to zero (invalid data now)
   m_counter.Reset();
@@ -99,12 +95,16 @@ void Ultrasonic::Ping() {
 }
 
 bool Ultrasonic::IsRangeValid() const {
-  if (m_simRangeValid) return m_simRangeValid.Get();
+  if (m_simRangeValid) {
+    return m_simRangeValid.Get();
+  }
   return m_counter.Get() > 1;
 }
 
 void Ultrasonic::SetAutomaticMode(bool enabling) {
-  if (enabling == m_automaticEnabled) return;  // ignore the case of no change
+  if (enabling == m_automaticEnabled) {
+    return;  // ignore the case of no change
+  }
 
   m_automaticEnabled = enabling;
 
@@ -117,11 +117,6 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     }
 
     m_thread = std::thread(&Ultrasonic::UltrasonicChecker);
-
-    // TODO: Currently, lvuser does not have permissions to set task priorities.
-    // Until that is the case, uncommenting this will break user code that calls
-    // Ultrasonic::SetAutomicMode().
-    // m_task.SetPriority(kPriority);
   } else {
     // Wait for background task to stop running
     if (m_thread.joinable()) {
@@ -137,48 +132,30 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
   }
 }
 
-double Ultrasonic::GetRangeInches() const {
+units::meter_t Ultrasonic::GetRange() const {
   if (IsRangeValid()) {
-    if (m_simRange) return m_simRange.Get();
-    return m_counter.GetPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
+    if (m_simRange) {
+      return units::inch_t{m_simRange.Get()};
+    }
+    return m_counter.GetPeriod() * kSpeedOfSound / 2.0;
   } else {
-    return 0;
+    return 0_m;
   }
 }
 
-double Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
-
-bool Ultrasonic::IsEnabled() const { return m_enabled; }
-
-void Ultrasonic::SetEnabled(bool enable) { m_enabled = enable; }
-
-void Ultrasonic::SetDistanceUnits(DistanceUnit units) { m_units = units; }
-
-Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits() const {
-  return m_units;
+bool Ultrasonic::IsEnabled() const {
+  return m_enabled;
 }
 
-double Ultrasonic::PIDGet() {
-  switch (m_units) {
-    case Ultrasonic::kInches:
-      return GetRangeInches();
-    case Ultrasonic::kMilliMeters:
-      return GetRangeMM();
-    default:
-      return 0.0;
-  }
+void Ultrasonic::SetEnabled(bool enable) {
+  m_enabled = enable;
 }
 
-void Ultrasonic::SetPIDSourceType(PIDSourceType pidSource) {
-  if (wpi_assert(pidSource == PIDSourceType::kDisplacement)) {
-    m_pidSource = pidSource;
-  }
-}
-
-void Ultrasonic::InitSendable(SendableBuilder& builder) {
+void Ultrasonic::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Ultrasonic");
-  builder.AddDoubleProperty("Value", [=]() { return GetRangeInches(); },
-                            nullptr);
+  builder.AddDoubleProperty(
+      "Value", [=, this] { return units::inch_t{GetRange()}.value(); },
+      nullptr);
 }
 
 void Ultrasonic::Initialize() {
@@ -195,7 +172,7 @@ void Ultrasonic::Initialize() {
   // Link this instance on the list
   m_sensors.emplace_back(this);
 
-  m_counter.SetMaxPeriod(1.0);
+  m_counter.SetMaxPeriod(1_s);
   m_counter.SetSemiPeriodMode(true);
   m_counter.Reset();
   m_enabled = true;  // Make it available for round robin scheduling
@@ -204,20 +181,21 @@ void Ultrasonic::Initialize() {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_Ultrasonic, instances);
-  SendableRegistry::GetInstance().AddLW(this, "Ultrasonic",
-                                        m_echoChannel->GetChannel());
+  wpi::SendableRegistry::AddLW(this, "Ultrasonic", m_echoChannel->GetChannel());
 }
 
 void Ultrasonic::UltrasonicChecker() {
   while (m_automaticEnabled) {
     for (auto& sensor : m_sensors) {
-      if (!m_automaticEnabled) break;
+      if (!m_automaticEnabled) {
+        break;
+      }
 
       if (sensor->IsEnabled()) {
         sensor->m_pingChannel->Pulse(kPingTime);  // do the ping
       }
 
-      Wait(0.1);  // wait for ping to return
+      Wait(100_ms);  // wait for ping to return
     }
   }
 }

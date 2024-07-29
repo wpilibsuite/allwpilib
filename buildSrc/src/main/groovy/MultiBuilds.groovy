@@ -9,6 +9,7 @@ import org.gradle.language.base.internal.ProjectLayout;
 import org.gradle.language.base.plugins.ComponentModelBasePlugin;
 import org.gradle.language.nativeplatform.tasks.AbstractNativeSourceCompileTask;
 import org.gradle.model.ModelMap;
+import org.gradle.internal.os.OperatingSystem
 import edu.wpi.first.toolchain.ToolchainExtension
 import org.gradle.model.Mutate;
 import org.gradle.api.plugins.ExtensionContainer;
@@ -60,12 +61,16 @@ class MultiBuilds implements Plugin<Project> {
     @CompileStatic
     void disableReleaseGoogleTest(BinaryContainer binaries, ProjectLayout projectLayout) {
       def project = (Project) projectLayout.projectIdentifier
-      if (project.hasProperty('testRelease')) {
+      if (project.hasProperty('testOther')) {
         return
+      }
+      def check_string = 'release'
+      if (project.hasProperty('buildServer') && !OperatingSystem.current().isWindows()) {
+        check_string = 'debug'
       }
       binaries.withType(GoogleTestTestSuiteBinarySpec) { oSpec ->
         GoogleTestTestSuiteBinarySpec spec = (GoogleTestTestSuiteBinarySpec) oSpec
-        if (spec.buildType.name == 'release') {
+        if (spec.buildType.name == check_string) {
           Rules.setBuildableFalseDynamically(spec)
         }
       }

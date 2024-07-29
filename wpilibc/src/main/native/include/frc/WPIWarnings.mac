@@ -1,0 +1,24 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+S(SampleRateTooHigh, 1, "Analog module sample rate is too high")
+S(VoltageOutOfRange, 2,
+  "Voltage to convert to raw value is out of range [-10; 10]")
+S(CompressorTaskError, 3, "Compressor task won't start")
+S(LoopTimingError, 4, "Digital module loop timing is not the expected value")
+S(NonBinaryDigitalValue, 5, "Digital output value is not 0 or 1")
+S(IncorrectBatteryChannel, 6,
+  "Battery measurement channel is not correct value")
+S(BadJoystickIndex, 7, "Joystick index is out of range, should be 0-5")
+S(BadJoystickAxis, 8, "Joystick axis or POV is out of range")
+S(InvalidMotorIndex, 9, "Motor index is out of range, should be 0-3")
+S(DriverStationTaskError, 10, "Driver Station task won't start")
+S(EnhancedIOPWMPeriodOutOfRange, 11,
+  "Driver Station Enhanced IO PWM Output period out of range")
+S(SPIWriteNoMOSI, 12, "Cannot write to SPI port with no MOSI output")
+S(SPIReadNoMISO, 13, "Cannot read from SPI port with no MISO input")
+S(SPIReadNoData, 14, "No data available to read from SPI")
+S(IncompatibleState, 15,
+  "Incompatible State: The operation cannot be completed")
+S(Warning, 16, "Warning")

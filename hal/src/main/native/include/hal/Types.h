@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -65,10 +62,23 @@ typedef HAL_Handle HAL_AddressableLEDHandle;
 
 typedef HAL_CANHandle HAL_PDPHandle;
 
+typedef HAL_Handle HAL_PowerDistributionHandle;
+
+typedef HAL_Handle HAL_CTREPCMHandle;
+
+typedef HAL_Handle HAL_REVPDHHandle;
+
+typedef HAL_Handle HAL_REVPHHandle;
+
 typedef int32_t HAL_Bool;
 
 #ifdef __cplusplus
 #define HAL_ENUM(name) enum name : int32_t
+#elif defined(__clang__)
+#define HAL_ENUM(name)    \
+  enum name : int32_t;    \
+  typedef enum name name; \
+  enum name : int32_t
 #else
 #define HAL_ENUM(name)  \
   typedef int32_t name; \
@@ -86,7 +96,7 @@ template <typename CType, int32_t CInvalid = HAL_kInvalidHandle>
 class Handle {
  public:
   Handle() = default;
-  /*implicit*/ Handle(CType val) : m_handle(val) {}  // NOLINT(runtime/explicit)
+  /*implicit*/ Handle(CType val) : m_handle(val) {}  // NOLINT
 
   Handle(const Handle&) = delete;
   Handle& operator=(const Handle&) = delete;
@@ -99,7 +109,7 @@ class Handle {
     return *this;
   }
 
-  operator CType() const { return m_handle; }
+  operator CType() const { return m_handle; }  // NOLINT
 
  private:
   CType m_handle = CInvalid;

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -11,14 +8,15 @@ import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Class to write digital outputs. This class will write digital outputs. Other devices that are
  * implemented elsewhere will automatically allocate digital inputs and outputs as required.
  */
-public class DigitalOutput extends DigitalSource implements Sendable, AutoCloseable {
+public class DigitalOutput extends DigitalSource implements Sendable {
   private static final int invalidPwmGenerator = 0;
   private int m_pwmGenerator = invalidPwmGenerator;
 
@@ -26,12 +24,12 @@ public class DigitalOutput extends DigitalSource implements Sendable, AutoClosea
   private int m_handle;
 
   /**
-   * Create an instance of a digital output. Create an instance of a digital output given a
-   * channel.
+   * Create an instance of a digital output. Create an instance of a digital output given a channel.
    *
    * @param channel the DIO channel to use for the digital output. 0-9 are on-board, 10-25 are on
-   *                the MXP
+   *     the MXP
    */
+  @SuppressWarnings("this-escape")
   public DigitalOutput(int channel) {
     SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
@@ -60,7 +58,7 @@ public class DigitalOutput extends DigitalSource implements Sendable, AutoClosea
    * @param value true is on, off is false
    */
   public void set(boolean value) {
-    DIOJNI.setDIO(m_handle, (short) (value ? 1 : 0));
+    DIOJNI.setDIO(m_handle, value);
   }
 
   /**
@@ -83,12 +81,15 @@ public class DigitalOutput extends DigitalSource implements Sendable, AutoClosea
   }
 
   /**
-   * Generate a single pulse. There can only be a single pulse going at any time.
+   * Output a single pulse on the digital output line.
    *
-   * @param pulseLength The length of the pulse.
+   * <p>Send a single pulse on the digital output line where the pulse duration is specified in
+   * seconds. Maximum of 65535 microseconds.
+   *
+   * @param pulseLengthSeconds The pulse length in seconds
    */
-  public void pulse(final double pulseLength) {
-    DIOJNI.pulse(m_handle, pulseLength);
+  public void pulse(final double pulseLengthSeconds) {
+    DIOJNI.pulse(m_handle, pulseLengthSeconds);
   }
 
   /**
@@ -114,11 +115,31 @@ public class DigitalOutput extends DigitalSource implements Sendable, AutoClosea
   }
 
   /**
+   * Enable a PWM PPS (Pulse Per Second) Output on this line.
+   *
+   * <p>Allocate one of the 6 DO PWM generator resources.
+   *
+   * <p>Supply the duty-cycle to output.
+   *
+   * <p>The resolution of the duty cycle is 8-bit.
+   *
+   * @param dutyCycle The duty-cycle to start generating. [0..1]
+   */
+  public void enablePPS(double dutyCycle) {
+    if (m_pwmGenerator != invalidPwmGenerator) {
+      return;
+    }
+    m_pwmGenerator = DIOJNI.allocateDigitalPWM();
+    DIOJNI.setDigitalPWMPPS(m_pwmGenerator, dutyCycle);
+    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, m_channel);
+  }
+
+  /**
    * Enable a PWM Output on this line.
    *
    * <p>Allocate one of the 6 DO PWM generator resources.
    *
-   * <p>Supply the initial duty-cycle to output so as to avoid a glitch when first starting.
+   * <p>Supply the initial duty-cycle to output in order to avoid a glitch when first starting.
    *
    * <p>The resolution of the duty cycle is 8-bit for low frequencies (1kHz or less) but is reduced
    * the higher the frequency of the PWM signal is.
@@ -153,8 +174,7 @@ public class DigitalOutput extends DigitalSource implements Sendable, AutoClosea
    * Change the duty-cycle that is being generated on the line.
    *
    * <p>The resolution of the duty cycle is 8-bit for low frequencies (1kHz or less) but is reduced
-   * the
-   * higher the frequency of the PWM signal is.
+   * the higher the frequency of the PWM signal is.
    *
    * @param dutyCycle The duty-cycle to change to. [0..1]
    */

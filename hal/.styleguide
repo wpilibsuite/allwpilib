@@ -10,6 +10,7 @@ cppSrcFileInclude {
 
 generatedFileExclude {
   hal/src/main/native/athena/ctre/
+  hal/src/main/native/athena/rev/
   hal/src/main/native/athena/frccansae/
   hal/src/main/native/athena/visa/
   hal/src/main/native/include/ctre/
@@ -19,7 +20,6 @@ generatedFileExclude {
 modifiableFileExclude {
   \.patch$
   \.png$
-  \.py$
   \.so$
 }
 
@@ -30,6 +30,8 @@ repoRootNameOverride {
 includeOtherLibs {
   ^FRC_FPGA_ChipObject/
   ^FRC_NetworkCommunication/
+  ^fmt/
+  ^gtest/
   ^i2clib/
   ^llvm/
   ^opencv2/

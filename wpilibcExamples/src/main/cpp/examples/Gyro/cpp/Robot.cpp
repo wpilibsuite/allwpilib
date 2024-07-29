@@ -1,17 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
 
 #include <frc/AnalogGyro.h>
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a
@@ -20,7 +17,16 @@
  */
 class Robot : public frc::TimedRobot {
  public:
-  void RobotInit() override { m_gyro.SetSensitivity(kVoltsPerDegreePerSecond); }
+  Robot() {
+    m_gyro.SetSensitivity(kVoltsPerDegreePerSecond);
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+    m_right.SetInverted(true);
+
+    wpi::SendableRegistry::AddChild(&m_drive, &m_left);
+    wpi::SendableRegistry::AddChild(&m_drive, &m_right);
+  }
 
   /**
    * The motor speed is set from the joystick while the DifferentialDrive
@@ -29,9 +35,7 @@ class Robot : public frc::TimedRobot {
    */
   void TeleopPeriodic() override {
     double turningValue = (kAngleSetpoint - m_gyro.GetAngle()) * kP;
-    // Invert the direction of the turn if we are going backwards
-    turningValue = std::copysign(turningValue, m_joystick.GetY());
-    m_robotDrive.ArcadeDrive(m_joystick.GetY(), turningValue);
+    m_drive.ArcadeDrive(-m_joystick.GetY(), -turningValue);
   }
 
  private:
@@ -47,14 +51,17 @@ class Robot : public frc::TimedRobot {
   static constexpr int kGyroPort = 0;
   static constexpr int kJoystickPort = 0;
 
-  frc::PWMVictorSPX m_left{kLeftMotorPort};
-  frc::PWMVictorSPX m_right{kRightMotorPort};
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc::PWMSparkMax m_left{kLeftMotorPort};
+  frc::PWMSparkMax m_right{kRightMotorPort};
+  frc::DifferentialDrive m_drive{[&](double output) { m_left.Set(output); },
+                                 [&](double output) { m_right.Set(output); }};
 
   frc::AnalogGyro m_gyro{kGyroPort};
   frc::Joystick m_joystick{kJoystickPort};
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

@@ -1,16 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+#include <functional>
+
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
-#include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
@@ -25,14 +24,6 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void Periodic() override;
 
   // Subsystem methods go here.
-
-  /**
-   * Drives the robot using arcade controls.
-   *
-   * @param fwd the commanded forward movement
-   * @param rot the commanded rotation
-   */
-  void ArcadeDrive(double fwd, double rot);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
@@ -66,26 +57,24 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * @param maxOutput the maximum output to which the drive will be constrained
    */
-  void SetMaxOutput(double maxOutput);
+  frc2::CommandPtr SetMaxOutputCommand(double maxOutput);
+
+  frc2::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
+                                      std::function<double()> rot);
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  frc::PWMVictorSPX m_left1;
-  frc::PWMVictorSPX m_left2;
-  frc::PWMVictorSPX m_right1;
-  frc::PWMVictorSPX m_right2;
-
-  // The motors on the left side of the drive
-  frc::SpeedControllerGroup m_leftMotors{m_left1, m_left2};
-
-  // The motors on the right side of the drive
-  frc::SpeedControllerGroup m_rightMotors{m_right1, m_right2};
+  frc::PWMSparkMax m_left1;
+  frc::PWMSparkMax m_left2;
+  frc::PWMSparkMax m_right1;
+  frc::PWMSparkMax m_right2;
 
   // The robot's drive
-  frc::DifferentialDrive m_drive{m_leftMotors, m_rightMotors};
+  frc::DifferentialDrive m_drive{[&](double output) { m_left1.Set(output); },
+                                 [&](double output) { m_right1.Set(output); }};
 
   // The left-side drive encoder
   frc::Encoder m_leftEncoder;

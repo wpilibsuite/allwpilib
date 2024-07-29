@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.tables.*;
@@ -21,10 +18,13 @@ public class Client {
     NetworkTable.setPort(10000);
     NetworkTable.setClientMode();
     NetworkTable nt = NetworkTable.getTable("");
-    try { Thread.sleep(2000); } catch (InterruptedException e) {}
+    try {
+      Thread.sleep(2000);
+    } catch (InterruptedException e) {
+    }
     try {
       System.out.println("Got foo: " + nt.getNumber("foo"));
-    } catch(TableKeyNotDefinedException ex) {
+    } catch (TableKeyNotDefinedException ex) {
     }
     nt.putBoolean("bar", false);
     nt.setFlags("bar", NetworkTable.PERSISTENT);
@@ -41,6 +41,9 @@ public class Client {
     strs[0] = "Hello";
     strs[1] = "World";
     nt.putStringArray("strarray", strs);
-    try { Thread.sleep(10000); } catch (InterruptedException e) {}
+    try {
+      Thread.sleep(10000);
+    } catch (InterruptedException e) {
+    }
   }
 }

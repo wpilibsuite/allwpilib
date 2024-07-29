@@ -1,11 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/SequentialCommandGroup.h"
+
+#include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;
 
@@ -23,7 +22,9 @@ void SequentialCommandGroup::Initialize() {
 }
 
 void SequentialCommandGroup::Execute() {
-  if (m_commands.empty()) return;
+  if (m_commands.empty()) {
+    return;
+  }
 
   auto& currentCommand = m_commands[m_currentCommandIndex];
 
@@ -54,22 +55,35 @@ bool SequentialCommandGroup::RunsWhenDisabled() const {
   return m_runWhenDisabled;
 }
 
+Command::InterruptionBehavior SequentialCommandGroup::GetInterruptionBehavior()
+    const {
+  return m_interruptBehavior;
+}
+
 void SequentialCommandGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
-  if (!RequireUngrouped(commands)) {
-    return;
-  }
+  CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(commands);
 
   if (m_currentCommandIndex != invalid_index) {
-    wpi_setWPIErrorWithContext(CommandIllegalUse,
-                               "Commands cannot be added to a CommandGroup "
-                               "while the group is running");
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
+                        "Commands cannot be added to a CommandGroup "
+                        "while the group is running");
   }
 
   for (auto&& command : commands) {
-    command->SetGrouped(true);
+    command->SetComposed(true);
     AddRequirements(command->GetRequirements());
     m_runWhenDisabled &= command->RunsWhenDisabled();
+    if (command->GetInterruptionBehavior() ==
+        Command::InterruptionBehavior::kCancelSelf) {
+      m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+    }
     m_commands.emplace_back(std::move(command));
   }
+}
+
+void SequentialCommandGroup::InitSendable(wpi::SendableBuilder& builder) {
+  Command::InitSendable(builder);
+  builder.AddIntegerProperty(
+      "index", [this] { return m_currentCommandIndex; }, nullptr);
 }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 /*
 
@@ -36,7 +33,7 @@ SOFTWARE.
 
 #include "wpi/Signal.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using namespace wpi::sig;
 
@@ -71,7 +68,7 @@ struct o {
 
 namespace wpi {
 
-TEST(SignalExtended, FreeConnection) {
+TEST(SignalExtendedTest, FreeConnection) {
   sum = 0;
   Signal<int> sig;
   sig.connect_extended(f);
@@ -82,7 +79,7 @@ TEST(SignalExtended, FreeConnection) {
   ASSERT_EQ(sum, 1);
 }
 
-TEST(SignalExtended, StaticConnection) {
+TEST(SignalExtendedTest, StaticConnection) {
   sum = 0;
   Signal<int> sig;
   sig.connect_extended(&s::sf);
@@ -93,7 +90,7 @@ TEST(SignalExtended, StaticConnection) {
   ASSERT_EQ(sum, 1);
 }
 
-TEST(SignalExtended, PmfConnection) {
+TEST(SignalExtendedTest, PmfConnection) {
   sum = 0;
   Signal<int> sig;
   s p;
@@ -105,7 +102,7 @@ TEST(SignalExtended, PmfConnection) {
   ASSERT_EQ(sum, 1);
 }
 
-TEST(SignalExtended, FunctionObjectConnection) {
+TEST(SignalExtendedTest, FunctionObjectConnection) {
   sum = 0;
   Signal<int> sig;
   sig.connect_extended(o{});
@@ -116,7 +113,7 @@ TEST(SignalExtended, FunctionObjectConnection) {
   ASSERT_EQ(sum, 1);
 }
 
-TEST(SignalExtended, LambdaConnection) {
+TEST(SignalExtendedTest, LambdaConnection) {
   sum = 0;
   Signal<int> sig;
 

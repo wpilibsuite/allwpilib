@@ -1,6 +1,11 @@
 include(CMakeFindDependencyMacro)
 @FILENAME_DEP_REPLACE@
 @WPIUTIL_DEP_REPLACE@
+@WPINET_DEP_REPLACE@
 find_dependency(OpenCV)
 
+@FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/cscore.cmake)
+if(@WITH_JAVA@)
+    include(${SELF_DIR}/cscore_jar.cmake)
+endif()

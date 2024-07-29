@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 /*
 This example shows how to use the HAL directly, and what is needed to run a
@@ -65,36 +62,45 @@ int main(void) {
 
   // Create a Motor Controller
   status = 0;
-  HAL_DigitalHandle pwmPort = HAL_InitializePWMPort(HAL_GetPort(2), &status);
+  HAL_DigitalHandle pwmPort =
+      HAL_InitializePWMPort(HAL_GetPort(2), NULL, &status);
 
   if (status != 0) {
-    const char* message = HAL_GetErrorMessage(status);
+    const char* message = HAL_GetLastError(&status);
     printf("%s\n", message);
     return 1;
   }
 
   // Set PWM config to standard servo speeds
-  HAL_SetPWMConfig(pwmPort, 2.0, 1.501, 1.5, 1.499, 1.0, &status);
+  HAL_SetPWMConfigMicroseconds(pwmPort, 2000, 1501, 1500, 1499, 1000, &status);
 
   // Create an Input
   status = 0;
-  HAL_DigitalHandle dio = HAL_InitializeDIOPort(HAL_GetPort(2), 1, &status);
+  HAL_DigitalHandle dio =
+      HAL_InitializeDIOPort(HAL_GetPort(2), 1, NULL, &status);
 
   if (status != 0) {
-    const char* message = HAL_GetErrorMessage(status);
+    const char* message = HAL_GetLastError(&status);
     printf("%s\n", message);
     status = 0;
     HAL_FreePWMPort(pwmPort, &status);
     return 1;
   }
 
+  WPI_EventHandle eventHandle = WPI_CreateEvent(0, 0);
+  HAL_ProvideNewDataEventHandle(eventHandle);
+
   while (1) {
     // Wait for DS data, with a timeout
-    HAL_Bool validData = HAL_WaitForDSDataTimeout(1.0);
-    if (!validData) {
+    int timed_out = 0;
+    int signaled = WPI_WaitForObjectTimeout(eventHandle, 1.0, &timed_out);
+    if (!signaled) {
       // Do something here on no packet
       continue;
     }
+
+    HAL_RefreshDSData();
+
     enum DriverStationMode dsMode = getDSMode();
     switch (dsMode) {
       case DisabledMode:
@@ -117,6 +123,9 @@ int main(void) {
   }
 
   // Clean up resources
+  HAL_RemoveNewDataEventHandle(eventHandle);
+  WPI_DestroyEvent(eventHandle);
+
   status = 0;
   HAL_FreeDIOPort(dio);
   HAL_FreePWMPort(pwmPort, &status);

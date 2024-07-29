@@ -1,24 +1,31 @@
 <?xml version="1.0"?>
 <ruleset name="WPILibRuleset"
-         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+  xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 
   <description>PMD Ruleset for WPILib</description>
 
   <exclude-pattern>.*/*JNI.*</exclude-pattern>
   <exclude-pattern>.*/*IntegrationTests.*</exclude-pattern>
+  <exclude-pattern>.*/math/proto.*</exclude-pattern>
 
   <rule ref="category/java/bestpractices.xml">
     <exclude name="AccessorClassGeneration" />
     <exclude name="AccessorMethodGeneration" />
     <exclude name="AvoidPrintStackTrace" />
+    <exclude name="AvoidReassigningCatchVariables" />
     <exclude name="AvoidReassigningParameters" />
+    <exclude name="AvoidUsingHardCodedIP" />
+    <exclude name="ConstantsInInterface" />
     <exclude name="JUnitAssertionsShouldIncludeMessage" />
     <exclude name="JUnitTestContainsTooManyAsserts" />
+    <exclude name="JUnitTestsShouldIncludeAssert" />
     <exclude name="JUnit4TestShouldUseAfterAnnotation" />
     <exclude name="JUnit4TestShouldUseBeforeAnnotation" />
     <exclude name="JUnit4TestShouldUseTestAnnotation" />
+    <exclude name="LooseCoupling" />
+    <exclude name="PreserveStackTrace" />
     <exclude name="ReplaceHashtableWithMap" />
     <exclude name="ReplaceVectorWithList" />
     <exclude name="SwitchStmtsShouldHaveDefault" />
@@ -28,30 +35,48 @@
   <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod">
     <properties>
       <property name="violationSuppressRegex"
-                value=".*'.*Arguments\(\)'.*" />
+        value=".*'.*Arguments\(\)'.*" />
+    </properties>
+  </rule>
+  <rule ref="category/java/bestpractices.xml/UnusedLocalVariable">
+    <properties>
+      <property name="violationSuppressXPath" value="//Resource"/>
     </properties>
   </rule>
 
   <rule ref="category/java/design.xml">
+    <exclude name="AvoidThrowingRawExceptionTypes" />
+    <exclude name="AvoidThrowingNewInstanceOfSameException" />
+    <exclude name="CognitiveComplexity" />
+    <exclude name="CouplingBetweenObjects" />
+    <exclude name="CyclomaticComplexity" />
     <exclude name="DataClass" />
+    <exclude name="ExceptionAsFlowControl" />
+    <exclude name="ExcessiveImports" />
+    <exclude name="ExcessiveParameterList" />
+    <exclude name="ExcessivePublicCount" />
+    <exclude name="GodClass" />
     <exclude name="LawOfDemeter" />
     <exclude name="LoosePackageCoupling" />
-    <exclude name="NcssConstructorCount" />
+    <exclude name="NPathComplexity" />
     <exclude name="NcssCount" />
-    <exclude name="NcssMethodCount" />
+    <exclude name="TooManyFields" />
+    <exclude name="TooManyMethods" />
   </rule>
 
   <rule ref="category/java/errorprone.xml">
     <exclude name="AssignmentToNonFinalStatic" />
+    <exclude name="AvoidCatchingThrowable" />
     <exclude name="AvoidDuplicateLiterals" />
     <exclude name="AvoidLiteralsInIfCondition" />
-    <exclude name="BeanMembersShouldSerialize" />
+    <exclude name="CloseResource" />
     <exclude name="ConstructorCallsOverridableMethod" />
-    <exclude name="DataflowAnomalyAnalysis" />
-    <exclude name="DoNotCallSystemExit" />
+    <exclude name="DoNotTerminateVM" />
+    <exclude name="EmptyCatchBlock" />
     <exclude name="FinalizeDoesNotCallSuperFinalize" />
     <exclude name="JUnitSpelling" />
     <exclude name="MissingSerialVersionUID" />
+    <exclude name="NonSerializableClass" />
     <exclude name="NullAssignment" />
   </rule>
 
@@ -63,22 +88,20 @@
   </rule>
 
   <rule ref="category/java/performance.xml">
-    <exclude name="AvoidUsingShortType" />
+    <exclude name="AvoidInstantiatingObjectsInLoops" />
   </rule>
 
-  <rule name="UnnecessaryCastRule"
-        language="java"
-        message="Avoid unnecessary casts"
-        class="net.sourceforge.pmd.lang.java.rule.migrating.UnnecessaryCastRule"
-        externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/migrating/UnnecessaryCastRule.java" />
+  <rule name="UnnecessaryCastRule" language="java"
+    message="Avoid unnecessary casts"
+    class="net.sourceforge.pmd.lang.java.rule.codestyle.UnnecessaryCastRule"
+    externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/codestyle/UnnecessaryCastRule.java" />
 
   <!-- Custom Rules -->
   <rule name="UseRequireNonNull"
-        message="Use Objects.requireNonNull() instead of throwing a NullPointerException yourself."
-        language="java"
-        class="net.sourceforge.pmd.lang.rule.XPathRule">
+    message="Use Objects.requireNonNull() instead of throwing a NullPointerException yourself."
+    language="java" class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
     <description>Use Objects.requireNonNull() instead of throwing a
-    NullPointerException yourself.</description>
+      NullPointerException yourself.</description>
     <properties>
       <property name="xpath">
         <value>

@@ -1,25 +1,30 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/DriveSubsystem.h"
 
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : m_leftMaster{kLeftMotor1Port},
-      m_leftSlave{kLeftMotor2Port},
-      m_rightMaster{kRightMotor1Port},
-      m_rightSlave{kRightMotor2Port},
+    : m_leftLeader{kLeftMotor1Port},
+      m_leftFollower{kLeftMotor2Port},
+      m_rightLeader{kRightMotor1Port},
+      m_rightFollower{kRightMotor2Port},
       m_feedforward{ks, kv, ka} {
-  m_leftSlave.Follow(m_leftMaster);
-  m_rightSlave.Follow(m_rightMaster);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_leftLeader);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_rightLeader);
 
-  m_leftMaster.SetPID(kp, 0, 0);
-  m_rightMaster.SetPID(kp, 0, 0);
+  // We need to invert one side of the drivetrain so that positive voltages
+  // result in both sides moving forward. Depending on how your robot's
+  // gearbox is constructed, you might have to invert the left side instead.
+  m_rightLeader.SetInverted(true);
+
+  m_leftFollower.Follow(m_leftLeader);
+  m_rightFollower.Follow(m_rightLeader);
+
+  m_leftLeader.SetPID(kp, 0, 0);
+  m_rightLeader.SetPID(kp, 0, 0);
 }
 
 void DriveSubsystem::Periodic() {
@@ -29,11 +34,11 @@ void DriveSubsystem::Periodic() {
 void DriveSubsystem::SetDriveStates(
     frc::TrapezoidProfile<units::meters>::State left,
     frc::TrapezoidProfile<units::meters>::State right) {
-  m_leftMaster.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                           left.position.to<double>(),
+  m_leftLeader.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
+                           left.position.value(),
                            m_feedforward.Calculate(left.velocity) / 12_V);
-  m_rightMaster.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                            right.position.to<double>(),
+  m_rightLeader.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
+                            right.position.value(),
                             m_feedforward.Calculate(right.velocity) / 12_V);
 }
 
@@ -42,16 +47,16 @@ void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
 }
 
 void DriveSubsystem::ResetEncoders() {
-  m_leftMaster.ResetEncoder();
-  m_rightMaster.ResetEncoder();
+  m_leftLeader.ResetEncoder();
+  m_rightLeader.ResetEncoder();
 }
 
 units::meter_t DriveSubsystem::GetLeftEncoderDistance() {
-  return units::meter_t(m_leftMaster.GetEncoderDistance());
+  return units::meter_t{m_leftLeader.GetEncoderDistance()};
 }
 
 units::meter_t DriveSubsystem::GetRightEncoderDistance() {
-  return units::meter_t(m_rightMaster.GetEncoderDistance());
+  return units::meter_t{m_rightLeader.GetEncoderDistance()};
 }
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {

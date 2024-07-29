@@ -1,73 +1,79 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.potentiometerpid;
 
-import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /**
- * This is a sample program to demonstrate how to use a soft potentiometer and a
- * PID controller to reach and maintain position setpoints on an elevator
- * mechanism.
+ * This is a sample program to demonstrate how to use a soft potentiometer and a PID controller to
+ * reach and maintain position setpoints on an elevator mechanism.
  */
 public class Robot extends TimedRobot {
-  private static final int kPotChannel = 1;
-  private static final int kMotorChannel = 7;
-  private static final int kJoystickChannel = 0;
+  static final int kPotChannel = 1;
+  static final int kMotorChannel = 7;
+  static final int kJoystickChannel = 3;
 
-  // bottom, middle, and top elevator setpoints
-  private static final double[] kSetPoints = {1.0, 2.6, 4.3};
+  // The elevator can move 1.5 meters from top to bottom
+  static final double kFullHeightMeters = 1.5;
 
-  // proportional, integral, and derivative speed constants; motor inverted
+  // Bottom, middle, and top elevator setpoints
+  static final double[] kSetpointsMeters = {0.2, 0.8, 1.4};
+
+  // proportional, integral, and derivative speed constants
   // DANGER: when tuning PID constants, high/inappropriate values for kP, kI,
   // and kD may cause dangerous, uncontrollable, or undesired behavior!
-  // these may need to be positive for a non-inverted motor
-  private static final double kP = -5.0;
-  private static final double kI = -0.02;
-  private static final double kD = -2.0;
+  private static final double kP = 0.7;
+  private static final double kI = 0.35;
+  private static final double kD = 0.25;
 
-  private PIDController m_pidController;
-  private AnalogInput m_potentiometer;
-  private SpeedController m_elevatorMotor;
-  private Joystick m_joystick;
+  private final PIDController m_pidController = new PIDController(kP, kI, kD);
+  // Scaling is handled internally
+  private final AnalogPotentiometer m_potentiometer =
+      new AnalogPotentiometer(kPotChannel, kFullHeightMeters);
+  private final PWMSparkMax m_elevatorMotor = new PWMSparkMax(kMotorChannel);
+  private final Joystick m_joystick = new Joystick(kJoystickChannel);
 
   private int m_index;
-  private boolean m_previousButtonValue;
 
   @Override
-  public void robotInit() {
-    m_potentiometer = new AnalogInput(kPotChannel);
-    m_elevatorMotor = new PWMVictorSPX(kMotorChannel);
-    m_joystick = new Joystick(kJoystickChannel);
-
-    m_pidController = new PIDController(kP, kI, kD);
+  public void teleopInit() {
+    // Move to the bottom setpoint when teleop starts
+    m_index = 0;
+    m_pidController.setSetpoint(kSetpointsMeters[m_index]);
   }
 
   @Override
   public void teleopPeriodic() {
+    // Read from the sensor
+    double position = m_potentiometer.get();
+
     // Run the PID Controller
-    double pidOut
-        = m_pidController.calculate(m_potentiometer.getAverageVoltage());
+    double pidOut = m_pidController.calculate(position);
+
+    // Apply PID output
     m_elevatorMotor.set(pidOut);
 
-    // when the button is pressed once, the selected elevator setpoint
-    // is incremented
-    boolean currentButtonValue = m_joystick.getTrigger();
-    if (currentButtonValue && !m_previousButtonValue) {
+    // when the button is pressed once, the selected elevator setpoint is incremented
+    if (m_joystick.getTriggerPressed()) {
       // index of the elevator setpoint wraps around.
-      m_index = (m_index + 1) % kSetPoints.length;
+      m_index = (m_index + 1) % kSetpointsMeters.length;
+      System.out.println("m_index = " + m_index);
+      m_pidController.setSetpoint(kSetpointsMeters[m_index]);
     }
-    m_previousButtonValue = currentButtonValue;
+  }
 
-    m_pidController.setSetpoint(kSetPoints[m_index]);
+  @Override
+  public void close() {
+    m_elevatorMotor.close();
+    m_potentiometer.close();
+    m_pidController.close();
+    m_index = 0;
+    super.close();
   }
 }

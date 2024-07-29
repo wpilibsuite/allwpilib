@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -24,11 +21,14 @@ extern "C" {
 /**
  * Initializes the analog output port using the given port object.
  *
- * @param handle handle to the port
- * @return       the created analog output handle
+ * @param[in] portHandle handle to the port
+ * @param[in] allocationLocation the location where the allocation is occurring
+ *                               (can be null)
+ * @param[out] status Error status variable. 0 on success.
+ * @return the created analog output handle
  */
-HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
-                                                      int32_t* status);
+HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(
+    HAL_PortHandle portHandle, const char* allocationLocation, int32_t* status);
 
 /**
  * Frees an analog output port.
@@ -40,8 +40,9 @@ void HAL_FreeAnalogOutputPort(HAL_AnalogOutputHandle analogOutputHandle);
 /**
  * Sets an analog output value.
  *
- * @param analogOutputHandle the analog output handle
- * @param voltage            the voltage (0-5v) to output
+ * @param[in] analogOutputHandle the analog output handle
+ * @param[in] voltage            the voltage (0-5v) to output
+ * @param[out] status            Error status variable. 0 on success.
  */
 void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
                          double voltage, int32_t* status);
@@ -49,14 +50,15 @@ void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
 /**
  * Gets the current analog output value.
  *
- * @param analogOutputHandle the analog output handle
- * @return                   the current output voltage (0-5v)
+ * @param[in] analogOutputHandle the analog output handle
+ * @param[out] status            Error status variable. 0 on success.
+ * @return the current output voltage (0-5v)
  */
 double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
                            int32_t* status);
 
 /**
- * Checks that the analog output channel number is value.
+ * Checks that the analog output channel number is valid.
  *
  * Verifies that the analog channel number is one of the legal channel numbers.
  * Channel numbers are 0-based.

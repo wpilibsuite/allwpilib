@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+option java_package = "edu.wpi.first.math.proto";
+
+message ProtobufTranslation3d {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+}
+
+message ProtobufQuaternion {
+  double w = 1;
+  double x = 2;
+  double y = 3;
+  double z = 4;
+}
+
+message ProtobufRotation3d {
+  ProtobufQuaternion q = 1;
+}
+
+message ProtobufPose3d {
+  ProtobufTranslation3d translation = 1;
+  ProtobufRotation3d rotation = 2;
+}
+
+message ProtobufTransform3d {
+  ProtobufTranslation3d translation = 1;
+  ProtobufRotation3d rotation = 2;
+}
+
+message ProtobufTwist3d {
+  double dx = 1;
+  double dy = 2;
+  double dz = 3;
+  double rx = 4;
+  double ry = 5;
+  double rz = 6;
+}

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -11,49 +8,78 @@
 
 #include <string>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
-class DriverStation;
+class BooleanEvent;
+class EventLoop;
 
 /**
- * GenericHID Interface.
+ * Handle input from standard HID devices connected to the Driver Station.
+ *
+ * <p>This class handles standard input that comes from the Driver Station. Each
+ * time a value is requested the most recent value is returned. There is a
+ * single class instance for each device and the mapping of ports to hardware
+ * buttons depends on the code in the Driver Station.
  */
-class GenericHID : public ErrorBase {
+class GenericHID {
  public:
-  enum RumbleType { kLeftRumble, kRightRumble };
-
-  enum HIDType {
-    kUnknown = -1,
-    kXInputUnknown = 0,
-    kXInputGamepad = 1,
-    kXInputWheel = 2,
-    kXInputArcadeStick = 3,
-    kXInputFlightStick = 4,
-    kXInputDancePad = 5,
-    kXInputGuitar = 6,
-    kXInputGuitar2 = 7,
-    kXInputDrumKit = 8,
-    kXInputGuitar3 = 11,
-    kXInputArcadePad = 19,
-    kHIDJoystick = 20,
-    kHIDGamepad = 21,
-    kHIDDriving = 22,
-    kHIDFlight = 23,
-    kHID1stPerson = 24
+  /**
+   * Represents a rumble output on the Joystick.
+   */
+  enum RumbleType {
+    /// Left rumble motor.
+    kLeftRumble,
+    /// Right rumble motor.
+    kRightRumble,
+    /// Both left and right rumble motors.
+    kBothRumble
   };
 
-  enum JoystickHand { kLeftHand = 0, kRightHand = 1 };
+  /**
+   * USB HID interface type.
+   */
+  enum HIDType {
+    /// Unknown.
+    kUnknown = -1,
+    /// XInputUnknown.
+    kXInputUnknown = 0,
+    /// XInputGamepad.
+    kXInputGamepad = 1,
+    /// XInputWheel.
+    kXInputWheel = 2,
+    /// XInputArcadeStick.
+    kXInputArcadeStick = 3,
+    /// XInputFlightStick.
+    kXInputFlightStick = 4,
+    /// XInputDancePad.
+    kXInputDancePad = 5,
+    /// XInputGuitar.
+    kXInputGuitar = 6,
+    /// XInputGuitar2.
+    kXInputGuitar2 = 7,
+    /// XInputDrumKit.
+    kXInputDrumKit = 8,
+    /// XInputGuitar3.
+    kXInputGuitar3 = 11,
+    /// XInputArcadePad.
+    kXInputArcadePad = 19,
+    /// HIDJoystick.
+    kHIDJoystick = 20,
+    /// HIDGamepad.
+    kHIDGamepad = 21,
+    /// HIDDriving.
+    kHIDDriving = 22,
+    /// HIDFlight.
+    kHIDFlight = 23,
+    /// HID1stPerson.
+    kHID1stPerson = 24
+  };
 
   explicit GenericHID(int port);
   virtual ~GenericHID() = default;
 
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;
-
-  virtual double GetX(JoystickHand hand = kRightHand) const = 0;
-  virtual double GetY(JoystickHand hand = kRightHand) const = 0;
 
   /**
    * Get the button value (starting at button 1).
@@ -62,14 +88,21 @@ class GenericHID : public ErrorBase {
    * the state of each button. The appropriate button is returned as a boolean
    * value.
    *
+   * This method returns true if the button is being held down at the time
+   * that this method is being called.
+   *
    * @param button The button number to be read (starting at 1)
    * @return The state of the button.
    */
   bool GetRawButton(int button) const;
 
   /**
-   * Whether the button was pressed since the last check. Button indexes begin
+   * Whether the button was pressed since the last check. %Button indexes begin
    * at 1.
+   *
+   * This method returns true if the button went from not pressed to held down
+   * since the last time this method was called. This is useful if you only
+   * want to call a function once when you press the button.
    *
    * @param button The button index, beginning at 1.
    * @return Whether the button was pressed since the last check.
@@ -77,13 +110,27 @@ class GenericHID : public ErrorBase {
   bool GetRawButtonPressed(int button);
 
   /**
-   * Whether the button was released since the last check. Button indexes begin
+   * Whether the button was released since the last check. %Button indexes begin
    * at 1.
+   *
+   * This method returns true if the button went from held down to not pressed
+   * since the last time this method was called. This is useful if you only
+   * want to call a function once when you release the button.
    *
    * @param button The button index, beginning at 1.
    * @return Whether the button was released since the last check.
    */
   bool GetRawButtonReleased(int button);
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached
+   * to the given loop.
+   */
+  BooleanEvent Button(int button, EventLoop* loop) const;
 
   /**
    * Get the value of the axis.
@@ -105,6 +152,141 @@ class GenericHID : public ErrorBase {
   int GetPOV(int pov = 0) const;
 
   /**
+   * Constructs a BooleanEvent instance based around this angle of a POV on the
+   * HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise
+   * (eg right is 90, upper-left is 315).
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @param angle POV angle in degrees, or -1 for the center / not pressed.
+   * @return a BooleanEvent instance based around this angle of a POV on the
+   * HID.
+   */
+  BooleanEvent POV(int angle, EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around this angle of a POV on the
+   * HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise
+   * (eg right is 90, upper-left is 315).
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @param pov   index of the POV to read (starting at 0). Defaults to 0.
+   * @param angle POV angle in degrees, or -1 for the center / not pressed.
+   * @return a BooleanEvent instance based around this angle of a POV on the
+   * HID.
+   */
+  BooleanEvent POV(int pov, int angle, EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 0 degree angle (up) of
+   * the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 0 degree angle of a POV on
+   * the HID.
+   */
+  BooleanEvent POVUp(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 45 degree angle (right
+   * up) of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 45 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVUpRight(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 90 degree angle (right)
+   * of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 90 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVRight(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 135 degree angle (right
+   * down) of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 135 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVDownRight(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 180 degree angle (down)
+   * of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 180 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVDown(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 225 degree angle (down
+   * left) of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 225 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVDownLeft(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 270 degree angle (left)
+   * of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 270 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVLeft(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 315 degree angle (left
+   * up) of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 315 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVUpLeft(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the center (not pressed) of
+   * the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the center of a POV on the
+   * HID.
+   */
+  BooleanEvent POVCenter(EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance that is true when the axis value is less than
+   * threshold
+   *
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the axis value is less than the
+   * provided threshold.
+   */
+  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance that is true when the axis value is greater
+   * than threshold
+   *
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the axis value is greater than
+   * the provided threshold.
+   */
+  BooleanEvent AxisGreaterThan(int axis, double threshold,
+                               EventLoop* loop) const;
+
+  /**
    * Get the number of axes for the HID.
    *
    * @return the number of axis for the current HID
@@ -124,6 +306,13 @@ class GenericHID : public ErrorBase {
    * @return the number of buttons on the current HID
    */
   int GetButtonCount() const;
+
+  /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  bool IsConnected() const;
 
   /**
    * Get the type of the HID.
@@ -179,7 +368,6 @@ class GenericHID : public ErrorBase {
   void SetRumble(RumbleType type, double value);
 
  private:
-  DriverStation* m_ds;
   int m_port;
   int m_outputs = 0;
   uint16_t m_leftRumble = 0;

@@ -1,0 +1,199 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 14 Jul 2023 17:33:08 -0700
+Subject: [PATCH 01/10] Revert "win,process: write minidumps when sending
+ SIGQUIT (#3840)"
+
+This reverts commit 748d894e82abcdfff7429cf745003e182c47f163.
+---
+ CMakeLists.txt    |   5 +-
+ configure.ac      |   2 +-
+ include/uv/win.h  |   1 -
+ src/win/process.c | 125 ----------------------------------------------
+ 4 files changed, 2 insertions(+), 131 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5e8e0166d743bc23f446b180fdbe6843492c754b..4b6ff2477e494dde7a876d8b5bd3e8985c93f0e8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -188,10 +188,7 @@ if(WIN32)
+        advapi32
+        iphlpapi
+        userenv
+-       ws2_32
+-       dbghelp
+-       ole32
+-       shell32)
++       ws2_32)
+   list(APPEND uv_sources
+        src/win/async.c
+        src/win/core.c
+diff --git a/configure.ac b/configure.ac
+index d4cc003e34388de77fe1cfe2ebf12ab25b00b9b8..b215638506223e1c9edb1847bbcfccb7404be33f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -74,7 +74,7 @@ AM_CONDITIONAL([OS400],    [AS_CASE([$host_os],[os400],         [true], [false])
+ AM_CONDITIONAL([SUNOS],    [AS_CASE([$host_os],[solaris*],      [true], [false])])
+ AM_CONDITIONAL([WINNT],    [AS_CASE([$host_os],[mingw*],        [true], [false])])
+ AS_CASE([$host_os],[mingw*], [
+-    LIBS="$LIBS -lws2_32 -lpsapi -liphlpapi -luserenv -luser32 -ldbghelp -lole32 -lshell32"
++    LIBS="$LIBS -lws2_32 -lpsapi -liphlpapi -luserenv -luser32 -lshell32"
+ ])
+ AS_CASE([$host_os], [solaris2.10], [
+     CFLAGS="$CFLAGS -DSUNOS_NO_IFADDRS"
+diff --git a/include/uv/win.h b/include/uv/win.h
+index f4adaa216c6f0c17437ed42ca594acbf1b8c2c56..518b17606c3b0c114845594e6be9c3c4d95f1776 100644
+--- a/include/uv/win.h
++++ b/include/uv/win.h
+@@ -91,7 +91,6 @@ typedef struct pollfd {
+  * variants (Linux and Darwin)
+  */
+ #define SIGHUP                1
+-#define SIGQUIT               3
+ #define SIGKILL               9
+ #define SIGWINCH             28
+ 
+diff --git a/src/win/process.c b/src/win/process.c
+index 4e94dee90e13eede63d8e97ddc9992726f874ea9..4f0af83e83442bb905762361775abe05ab6beb4e 100644
+--- a/src/win/process.c
++++ b/src/win/process.c
+@@ -32,9 +32,6 @@
+ #include "internal.h"
+ #include "handle-inl.h"
+ #include "req-inl.h"
+-#include <dbghelp.h>
+-#include <shlobj.h>
+-#include <psapi.h>     /* GetModuleBaseNameW */
+ 
+ 
+ #define SIGKILL         9
+@@ -1179,129 +1176,7 @@ static int uv__kill(HANDLE process_handle, int signum) {
+     return UV_EINVAL;
+   }
+ 
+-  /* Create a dump file for the targeted process, if the registry key
+-   * `HKLM:Software\Microsoft\Windows\Windows Error Reporting\LocalDumps`
+-   * exists.  The location of the dumps can be influenced by the `DumpFolder`
+-   * sub-key, which has a default value of `%LOCALAPPDATA%\CrashDumps`, see [0]
+-   * for more detail.  Note that if the dump folder does not exist, we attempt
+-   * to create it, to match behavior with WER itself.
+-   * [0]: https://learn.microsoft.com/en-us/windows/win32/wer/collecting-user-mode-dumps */
+-  if (signum == SIGQUIT) {
+-    HKEY registry_key;
+-    DWORD pid, ret;
+-    WCHAR basename[MAX_PATH];
+-
+-    /* Get target process name. */
+-    GetModuleBaseNameW(process_handle, NULL, &basename[0], sizeof(basename));
+-
+-    /* Get PID of target process. */
+-    pid = GetProcessId(process_handle);
+-
+-    /* Get LocalDumps directory path. */
+-    ret = RegOpenKeyExW(
+-        HKEY_LOCAL_MACHINE,
+-        L"SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps",
+-        0,
+-        KEY_QUERY_VALUE,
+-        &registry_key);
+-    if (ret == ERROR_SUCCESS) {
+-      HANDLE hDumpFile = NULL;
+-      WCHAR dump_folder[MAX_PATH], dump_name[MAX_PATH];
+-      DWORD dump_folder_len = sizeof(dump_folder), key_type = 0;
+-      ret = RegGetValueW(registry_key,
+-                         NULL,
+-                         L"DumpFolder",
+-                         RRF_RT_ANY,
+-                         &key_type,
+-                         (PVOID) dump_folder,
+-                         &dump_folder_len);
+-      if (ret != ERROR_SUCCESS) {
+-        /* Workaround for missing uuid.dll on MinGW. */
+-        static const GUID FOLDERID_LocalAppData_libuv = {
+-          0xf1b32785, 0x6fba, 0x4fcf,
+-              {0x9d, 0x55, 0x7b, 0x8e, 0x7f, 0x15, 0x70, 0x91}
+-        };
+-
+-        /* Default value for `dump_folder` is `%LOCALAPPDATA%\CrashDumps`. */
+-        WCHAR* localappdata;
+-        SHGetKnownFolderPath(&FOLDERID_LocalAppData_libuv,
+-                             0,
+-                             NULL,
+-                             &localappdata);
+-        _snwprintf_s(dump_folder,
+-                     sizeof(dump_folder),
+-                     _TRUNCATE,
+-                     L"%ls\\CrashDumps",
+-                     localappdata);
+-        CoTaskMemFree(localappdata);
+-      }
+-      RegCloseKey(registry_key);
+-
+-      /* Create dump folder if it doesn't already exist. */
+-      CreateDirectoryW(dump_folder, NULL);
+-
+-      /* Construct dump filename from process name and PID. */
+-      _snwprintf_s(dump_name,
+-                   sizeof(dump_name),
+-                   _TRUNCATE,
+-                   L"%ls\\%ls.%d.dmp",
+-                   dump_folder,
+-                   basename,
+-                   pid);
+-
+-      hDumpFile = CreateFileW(dump_name,
+-                              GENERIC_WRITE,
+-                              0,
+-                              NULL,
+-                              CREATE_NEW,
+-                              FILE_ATTRIBUTE_NORMAL,
+-                              NULL);
+-      if (hDumpFile != INVALID_HANDLE_VALUE) {
+-        DWORD dump_options, sym_options;
+-        FILE_DISPOSITION_INFO DeleteOnClose = { TRUE };
+-
+-        /* If something goes wrong while writing it out, delete the file. */
+-        SetFileInformationByHandle(hDumpFile,
+-                                   FileDispositionInfo,
+-                                   &DeleteOnClose,
+-                                   sizeof(DeleteOnClose));
+-
+-        /* Tell wine to dump ELF modules as well. */
+-        sym_options = SymGetOptions();
+-        SymSetOptions(sym_options | 0x40000000);
+-
+-/* MiniDumpWithAvxXStateContext might be undef in server2012r2 or mingw < 12 */
+-#ifndef MiniDumpWithAvxXStateContext
+-#define MiniDumpWithAvxXStateContext 0x00200000
+-#endif
+-        /* We default to a fairly complete dump.  In the future, we may want to
+-         * allow clients to customize what kind of dump to create. */
+-        dump_options = MiniDumpWithFullMemory |
+-                       MiniDumpIgnoreInaccessibleMemory |
+-                       MiniDumpWithAvxXStateContext;
+-
+-        if (MiniDumpWriteDump(process_handle,
+-                              pid,
+-                              hDumpFile,
+-                              dump_options,
+-                              NULL,
+-                              NULL,
+-                              NULL)) {
+-          /* Don't delete the file on close if we successfully wrote it out. */
+-          FILE_DISPOSITION_INFO DontDeleteOnClose = { FALSE };
+-          SetFileInformationByHandle(hDumpFile,
+-                                     FileDispositionInfo,
+-                                     &DontDeleteOnClose,
+-                                     sizeof(DontDeleteOnClose));
+-        }
+-        SymSetOptions(sym_options);
+-        CloseHandle(hDumpFile);
+-      }
+-    }
+-  }
+-
+   switch (signum) {
+-    case SIGQUIT:
+     case SIGTERM:
+     case SIGKILL:
+     case SIGINT: {

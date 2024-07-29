@@ -1,13 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <frc2/command/CommandBase.h>
+#include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
 
 #include "subsystems/Wrist.h"
@@ -18,9 +15,9 @@
  * Other commands using the wrist should make sure they disable PID!
  */
 class SetWristSetpoint
-    : public frc2::CommandHelper<frc2::CommandBase, SetWristSetpoint> {
+    : public frc2::CommandHelper<frc2::Command, SetWristSetpoint> {
  public:
-  explicit SetWristSetpoint(double setpoint, Wrist* wrist);
+  explicit SetWristSetpoint(double setpoint, Wrist& wrist);
   void Initialize() override;
   bool IsFinished() override;
 

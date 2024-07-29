@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+import "geometry2d.proto";
+
+option java_package = "edu.wpi.first.math.proto";
+
+message ProtobufChassisSpeeds {
+  double vx = 1;
+  double vy = 2;
+  double omega = 3;
+}
+
+message ProtobufDifferentialDriveKinematics {
+  double track_width = 1;
+}
+
+message ProtobufDifferentialDriveWheelSpeeds {
+  double left = 1;
+  double right = 2;
+}
+
+message ProtobufDifferentialDriveWheelPositions {
+  double left = 1;
+  double right = 2;
+}
+
+message ProtobufMecanumDriveKinematics {
+  ProtobufTranslation2d front_left = 1;
+  ProtobufTranslation2d front_right = 2;
+  ProtobufTranslation2d rear_left = 3;
+  ProtobufTranslation2d rear_right = 4;
+}
+
+message ProtobufMecanumDriveMotorVoltages {
+  double front_left = 1;
+  double front_right = 2;
+  double rear_left = 3;
+  double rear_right = 4;
+}
+
+message ProtobufMecanumDriveWheelPositions {
+  double front_left = 1;
+  double front_right = 2;
+  double rear_left = 3;
+  double rear_right = 4;
+}
+
+message ProtobufMecanumDriveWheelSpeeds {
+  double front_left = 1;
+  double front_right = 2;
+  double rear_left = 3;
+  double rear_right = 4;
+}
+
+message ProtobufSwerveDriveKinematics {
+  repeated ProtobufTranslation2d modules = 1;
+}
+
+message ProtobufSwerveModulePosition {
+  double distance = 1;
+  ProtobufRotation2d angle = 2;
+}
+
+message ProtobufSwerveModuleState {
+  double speed = 1;
+  ProtobufRotation2d angle = 2;
+}

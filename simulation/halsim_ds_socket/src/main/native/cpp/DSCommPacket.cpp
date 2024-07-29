@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "DSCommPacket.h"
 
 #include <algorithm>
 #include <chrono>
 #include <cstring>
-#include <iostream>
+#include <span>
 #include <thread>
 #include <vector>
 
-#include <mockdata/DriverStationData.h>
-#include <mockdata/MockHooks.h>
-#include <wpi/ArrayRef.h>
-#include <wpi/Format.h>
+#include <hal/simulation/DriverStationData.h>
+#include <hal/simulation/MockHooks.h>
 
 using namespace halsim;
 
@@ -50,8 +45,10 @@ void DSCommPacket::SetAlliance(uint8_t station_code) {
   m_alliance_station = static_cast<HAL_AllianceStationID>(station_code);
 }
 
-void DSCommPacket::ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData) {
-  if (tagData.size() < 6) return;
+void DSCommPacket::ReadMatchtimeTag(std::span<const uint8_t> tagData) {
+  if (tagData.size() < 6) {
+    return;
+  }
 
   uint32_t store = tagData[2] << 24;
   store |= tagData[3] << 16;
@@ -66,7 +63,7 @@ void DSCommPacket::ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData) {
   m_match_time = matchTime;
 }
 
-void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput,
+void DSCommPacket::ReadJoystickTag(std::span<const uint8_t> dataInput,
                                    int index) {
   DSCommJoystickPacket& stick = m_joystick_packets[index];
   stick.ResetUdp();
@@ -75,7 +72,7 @@ void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput,
     return;
   }
 
-  dataInput = dataInput.slice(2);
+  dataInput = dataInput.subspan(2);
 
   // Read axes
   int axesLength = dataInput[0];
@@ -89,7 +86,7 @@ void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput,
   }
   stick.axes.count = axesLength;
 
-  dataInput = dataInput.slice(1 + axesLength);
+  dataInput = dataInput.subspan(1 + axesLength);
 
   // Read Buttons
   int buttonCount = dataInput[0];
@@ -100,7 +97,7 @@ void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput,
   }
   stick.buttons.count = buttonCount;
 
-  dataInput = dataInput.slice(1 + numBytes);
+  dataInput = dataInput.subspan(1 + numBytes);
 
   int povsLength = dataInput[0];
   for (int i = 0; i < povsLength * 2; i += 2) {
@@ -115,11 +112,11 @@ void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput,
 /*----------------------------------------------------------------------------
 **  Communication methods
 **--------------------------------------------------------------------------*/
-void DSCommPacket::DecodeTCP(wpi::ArrayRef<uint8_t> packet) {
+void DSCommPacket::DecodeTCP(std::span<const uint8_t> packet) {
   // No header
   while (!packet.empty()) {
     int tagLength = packet[0] << 8 | packet[1];
-    auto tagPacket = packet.slice(0, tagLength + 2);
+    auto tagPacket = packet.subspan(0, tagLength + 2);
 
     if (tagLength == 0) {
       return;
@@ -136,31 +133,37 @@ void DSCommPacket::DecodeTCP(wpi::ArrayRef<uint8_t> packet) {
         ReadNewMatchInfoTag(tagPacket);
         break;
     }
-    packet = packet.slice(tagLength + 2);
+    packet = packet.subspan(tagLength + 2);
   }
 }
 
-void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
-  if (packet.size() < 6) return;
+void DSCommPacket::DecodeUDP(std::span<const uint8_t> packet) {
+  if (packet.size() < 6) {
+    return;
+  }
   // Decode fixed header
   m_hi = packet[0];
   m_lo = packet[1];
   // Comm Version is packet 2, ignore
   SetControl(packet[3], packet[4]);
-  SetAlliance(packet[5]);
+  // DS sends values 0, 1, and 2 for Red, but kUnknown is 0, so the value needs
+  // to be offset by one
+  SetAlliance(packet[5] + 1);
 
   // Return if packet finished
-  if (packet.size() == 6) return;
+  if (packet.size() == 6) {
+    return;
+  }
 
   // Else, handle tagged data
-  packet = packet.slice(6);
+  packet = packet.subspan(6);
 
   int joystickNum = 0;
 
   // Loop to handle multiple tags
   while (!packet.empty()) {
     auto tagLength = packet[0];
-    auto tagPacket = packet.slice(0, tagLength + 1);
+    auto tagPacket = packet.subspan(0, tagLength + 1);
 
     switch (packet[1]) {
       case kJoystickDataTag:
@@ -171,13 +174,15 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
         ReadMatchtimeTag(tagPacket);
         break;
     }
-    packet = packet.slice(tagLength + 1);
+    packet = packet.subspan(tagLength + 1);
   }
 }
 
-void DSCommPacket::ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
+void DSCommPacket::ReadNewMatchInfoTag(std::span<const uint8_t> data) {
   // Size 2 bytes, tag 1 byte
-  if (data.size() <= 3) return;
+  if (data.size() <= 3) {
+    return;
+  }
 
   int nameLength = std::min<size_t>(data[3], sizeof(matchInfo.eventName) - 1);
 
@@ -187,9 +192,11 @@ void DSCommPacket::ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
 
   matchInfo.eventName[nameLength] = '\0';
 
-  data = data.slice(4 + nameLength);
+  data = data.subspan(4 + nameLength);
 
-  if (data.size() < 4) return;
+  if (data.size() < 4) {
+    return;
+  }
 
   matchInfo.matchType = static_cast<HAL_MatchType>(
       data[0]);  // None, Practice, Qualification, Elimination, Test
@@ -199,9 +206,11 @@ void DSCommPacket::ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
   HALSIM_SetMatchInfo(&matchInfo);
 }
 
-void DSCommPacket::ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data) {
+void DSCommPacket::ReadGameSpecificMessageTag(std::span<const uint8_t> data) {
   // Size 2 bytes, tag 1 byte
-  if (data.size() <= 3) return;
+  if (data.size() <= 3) {
+    return;
+  }
 
   int length = std::min<size_t>(((data[0] << 8) | data[1]) - 1,
                                 sizeof(matchInfo.gameSpecificMessage));
@@ -213,9 +222,11 @@ void DSCommPacket::ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data) {
 
   HALSIM_SetMatchInfo(&matchInfo);
 }
-void DSCommPacket::ReadJoystickDescriptionTag(wpi::ArrayRef<uint8_t> data) {
-  if (data.size() < 3) return;
-  data = data.slice(3);
+void DSCommPacket::ReadJoystickDescriptionTag(std::span<const uint8_t> data) {
+  if (data.size() < 3) {
+    return;
+  }
+  data = data.subspan(3);
   int joystickNum = data[0];
   DSCommJoystickPacket& packet = m_joystick_packets[joystickNum];
   packet.ResetTcp();
@@ -226,14 +237,16 @@ void DSCommPacket::ReadJoystickDescriptionTag(wpi::ArrayRef<uint8_t> data) {
   for (int i = 0; i < nameLength; i++) {
     packet.descriptor.name[i] = data[4 + i];
   }
-  data = data.slice(4 + nameLength);
+  data = data.subspan(4 + nameLength);
   packet.descriptor.name[nameLength] = '\0';
   int axesCount = data[0];
   packet.descriptor.axisCount = axesCount;
-  for (int i = 0; i < axesCount; i++) {
+  for (int i = 0,
+           len = std::min<int>(axesCount, sizeof(packet.descriptor.axisTypes));
+       i < len; i++) {
     packet.descriptor.axisTypes[i] = data[1 + i];
   }
-  data = data.slice(1 + axesCount);
+  data = data.subspan(1 + axesCount);
 
   packet.descriptor.buttonCount = data[0];
   packet.descriptor.povCount = data[1];
@@ -298,6 +311,10 @@ void DSCommPacket::SetupJoystickTag(wpi::raw_uv_ostream& buf) {
 
 void DSCommPacket::SendUDPToHALSim(void) {
   SendJoysticks();
+
+  if (!m_control_word.enabled) {
+    m_match_time = -1;
+  }
 
   HALSIM_SetDriverStationMatchTime(m_match_time);
   HALSIM_SetDriverStationEnabled(m_control_word.enabled);

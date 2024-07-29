@@ -1,17 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "Drivetrain.h"
 
 frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
-  return {units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_frontRightEncoder.GetRate()),
-          units::meters_per_second_t(m_backLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_backRightEncoder.GetRate())};
+  return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
+          units::meters_per_second_t{m_frontRightEncoder.GetRate()},
+          units::meters_per_second_t{m_backLeftEncoder.GetRate()},
+          units::meters_per_second_t{m_backRightEncoder.GetRate()}};
+}
+
+frc::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances() const {
+  return {units::meter_t{m_frontLeftEncoder.GetDistance()},
+          units::meter_t{m_frontRightEncoder.GetDistance()},
+          units::meter_t{m_backLeftEncoder.GetDistance()},
+          units::meter_t{m_backRightEncoder.GetDistance()}};
 }
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
@@ -25,13 +29,13 @@ void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
       m_feedforward.Calculate(wheelSpeeds.rearRight);
 
   const double frontLeftOutput = m_frontLeftPIDController.Calculate(
-      m_frontLeftEncoder.GetRate(), wheelSpeeds.frontLeft.to<double>());
+      m_frontLeftEncoder.GetRate(), wheelSpeeds.frontLeft.value());
   const double frontRightOutput = m_frontRightPIDController.Calculate(
-      m_frontRightEncoder.GetRate(), wheelSpeeds.frontRight.to<double>());
+      m_frontRightEncoder.GetRate(), wheelSpeeds.frontRight.value());
   const double backLeftOutput = m_backLeftPIDController.Calculate(
-      m_backLeftEncoder.GetRate(), wheelSpeeds.rearLeft.to<double>());
+      m_backLeftEncoder.GetRate(), wheelSpeeds.rearLeft.value());
   const double backRightOutput = m_backRightPIDController.Calculate(
-      m_backRightEncoder.GetRate(), wheelSpeeds.rearRight.to<double>());
+      m_backRightEncoder.GetRate(), wheelSpeeds.rearRight.value());
 
   m_frontLeftMotor.SetVoltage(units::volt_t{frontLeftOutput} +
                               frontLeftFeedforward);
@@ -45,15 +49,17 @@ void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
 
 void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                        units::meters_per_second_t ySpeed,
-                       units::radians_per_second_t rot, bool fieldRelative) {
-  auto wheelSpeeds = m_kinematics.ToWheelSpeeds(
+                       units::radians_per_second_t rot, bool fieldRelative,
+                       units::second_t period) {
+  auto wheelSpeeds = m_kinematics.ToWheelSpeeds(frc::ChassisSpeeds::Discretize(
       fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot, GetAngle())
-                    : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
-  wheelSpeeds.Normalize(kMaxSpeed);
+                          xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
+                    : frc::ChassisSpeeds{xSpeed, ySpeed, rot},
+      period));
+  wheelSpeeds.Desaturate(kMaxSpeed);
   SetSpeeds(wheelSpeeds);
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(GetAngle(), GetCurrentState());
+  m_odometry.Update(m_gyro.GetRotation2d(), GetCurrentWheelDistances());
 }

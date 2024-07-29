@@ -1,42 +1,48 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal;
 
+import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import edu.wpi.first.wpiutil.RuntimeLoader;
-
-/**
- * Base class for all JNI wrappers.
- */
+/** Base class for all JNI wrappers. */
 public class JNIWrapper {
   static boolean libraryLoaded = false;
-  static RuntimeLoader<JNIWrapper> loader = null;
 
+  /** Sets whether JNI should be loaded in the static block. */
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
 
+    /**
+     * Returns true if the JNI should be loaded in the static block.
+     *
+     * @return True if the JNI should be loaded in the static block.
+     */
     public static boolean getExtractOnStaticLoad() {
       return extractOnStaticLoad.get();
     }
 
+    /**
+     * Sets whether the JNI should be loaded in the static block.
+     *
+     * @param load Whether the JNI should be loaded in the static block.
+     */
     public static void setExtractOnStaticLoad(boolean load) {
       extractOnStaticLoad.set(load);
     }
+
+    /** Utility class. */
+    private Helper() {}
   }
 
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader = new RuntimeLoader<>("wpiHaljni", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
-        loader.loadLibrary();
-      } catch (IOException ex) {
+        RuntimeLoader.loadLibrary("wpiHaljni");
+      } catch (Exception ex) {
         ex.printStackTrace();
         System.exit(1);
       }
@@ -46,13 +52,19 @@ public class JNIWrapper {
 
   /**
    * Force load the library.
+   *
+   * @throws IOException if the library load failed
    */
   public static synchronized void forceLoad() throws IOException {
     if (libraryLoaded) {
       return;
     }
-    loader = new RuntimeLoader<>("wpiHaljni", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
-    loader.loadLibrary();
+    RuntimeLoader.loadLibrary("wpiHaljni");
     libraryLoaded = true;
   }
+
+  public static void suppressUnused(Object object) {}
+
+  /** Utility class. */
+  public JNIWrapper() {}
 }

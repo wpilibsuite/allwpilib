@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
 #include "frc2/command/RunCommand.h"
@@ -11,7 +8,7 @@
 using namespace frc2;
 class DefaultCommandTest : public CommandTestBase {};
 
-TEST_F(DefaultCommandTest, DefaultCommandScheduleTest) {
+TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem subsystem;
@@ -25,7 +22,7 @@ TEST_F(DefaultCommandTest, DefaultCommandScheduleTest) {
   EXPECT_TRUE(scheduler.IsScheduled(handle));
 }
 
-TEST_F(DefaultCommandTest, DefaultCommandInterruptResumeTest) {
+TEST_F(DefaultCommandTest, DefaultCommandInterruptResume) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem subsystem;

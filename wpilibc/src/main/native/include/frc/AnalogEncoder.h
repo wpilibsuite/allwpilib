@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -11,13 +8,8 @@
 
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
-#include <units/units.h>
-
-#include "frc/AnalogTrigger.h"
-#include "frc/Counter.h"
-#include "frc/ErrorBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 class AnalogInput;
@@ -25,12 +17,22 @@ class AnalogInput;
 /**
  * Class for supporting continuous analog encoders, such as the US Digital MA3.
  */
-class AnalogEncoder : public ErrorBase,
-                      public Sendable,
-                      public SendableHelper<AnalogEncoder> {
+class AnalogEncoder : public wpi::Sendable,
+                      public wpi::SendableHelper<AnalogEncoder> {
  public:
   /**
+   * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
+   * @param channel the analog input channel to attach to
+   */
+  explicit AnalogEncoder(int channel);
+
+  /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param analogInput the analog input to attach to
    */
@@ -39,6 +41,8 @@ class AnalogEncoder : public ErrorBase,
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
    * @param analogInput the analog input to attach to
    */
   explicit AnalogEncoder(AnalogInput* analogInput);
@@ -46,79 +50,99 @@ class AnalogEncoder : public ErrorBase,
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
+   * <p>This has a fullRange of 1 and an expectedZero of 0.
+   *
    * @param analogInput the analog input to attach to
    */
   explicit AnalogEncoder(std::shared_ptr<AnalogInput> analogInput);
 
-  ~AnalogEncoder() override = default;
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
+   *
+   * @param channel the analog input channel to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  AnalogEncoder(int channel, double fullRange, double expectedZero);
+
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * @param analogInput the analog input to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  AnalogEncoder(AnalogInput& analogInput, double fullRange,
+                double expectedZero);
+
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * @param analogInput the analog input to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  AnalogEncoder(AnalogInput* analogInput, double fullRange,
+                double expectedZero);
+
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * @param analogInput the analog input to attach to
+   * @param fullRange the value to report at maximum travel
+   * @param expectedZero the reading where you would expect a 0 from get()
+   */
+  AnalogEncoder(std::shared_ptr<AnalogInput> analogInput, double fullRange,
+                double expectedZero);
+
+  ~AnalogEncoder() override;
 
   AnalogEncoder(AnalogEncoder&&) = default;
   AnalogEncoder& operator=(AnalogEncoder&&) = default;
 
   /**
-   * Reset the Encoder distance to zero.
+   * Get the encoder value.
+   *
+   * @return the encoder value scaled by the full range input
    */
-  void Reset();
+  double Get() const;
 
   /**
-   * Get the encoder value since the last reset.
+   * Set the encoder voltage percentage range. Analog sensors are not always
+   * fully stable at the end of their travel ranges. Shrinking this range down
+   * can help mitigate issues with that.
    *
-   * This is reported in rotations since the last reset.
-   *
-   * @return the encoder value in rotations
+   * @param min minimum voltage percentage (0-1 range)
+   * @param max maximum voltage percentage (0-1 range)
    */
-  units::turn_t Get() const;
+  void SetVoltagePercentageRange(double min, double max);
 
   /**
-   * Get the offset of position relative to the last reset.
+   * Set if this encoder is inverted.
    *
-   * GetPositionInRotation() - GetPositionOffset() will give an encoder absolute
-   * position relative to the last reset. This could potentially be negative,
-   * which needs to be accounted for.
-   *
-   * @return the position offset
+   * @param inverted true to invert the encoder, false otherwise
    */
-  double GetPositionOffset() const;
+  void SetInverted(bool inverted);
 
   /**
-   * Set the distance per rotation of the encoder. This sets the multiplier used
-   * to determine the distance driven based on the rotation value from the
-   * encoder. Set this value based on the how far the mechanism travels in 1
-   * rotation of the encoder, and factor in gearing reductions following the
-   * encoder shaft. This distance can be in any units you like, linear or
-   * angular.
+   * Get the channel number.
    *
-   * @param distancePerRotation the distance per rotation of the encoder
+   * @return The channel number.
    */
-  void SetDistancePerRotation(double distancePerRotation);
+  int GetChannel() const;
 
-  /**
-   * Get the distance per rotation for this encoder.
-   *
-   * @return The scale factor that will be used to convert rotation to useful
-   * units.
-   */
-  double GetDistancePerRotation() const;
-
-  /**
-   * Get the distance the sensor has driven since the last reset as scaled by
-   * the value from SetDistancePerRotation.
-   *
-   * @return The distance driven since the last reset
-   */
-  double GetDistance() const;
-
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  void Init();
+  void Init(double fullRange, double expectedZero);
+  double MapSensorRange(double pos) const;
 
   std::shared_ptr<AnalogInput> m_analogInput;
-  AnalogTrigger m_analogTrigger;
-  Counter m_counter;
-  double m_positionOffset = 0;
-  double m_distancePerRotation = 1.0;
-  mutable units::turn_t m_lastPosition{0.0};
+  double m_fullRange;
+  double m_expectedZero;
+  double m_sensorMin{0.0};
+  double m_sensorMax{1.0};
+  bool m_isInverted{false};
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simPosition;

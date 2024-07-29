@@ -1,48 +1,44 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/DigitalGlitchFilter.h"  // NOLINT(build/include_order)
+
+#include <gtest/gtest.h>
 
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/Encoder.h"
-#include "gtest/gtest.h"
-
-using namespace frc;
 
 /**
  * Tests that configuring inputs to be filtered succeeds.
  *
  * This test actually tests everything except that the actual FPGA
  * implementation works as intended.  We configure the FPGA and then query it to
- * make sure that the acutal configuration matches.
+ * make sure that the actual configuration matches.
  */
-TEST(DigitalGlitchFilterTest, BasicTest) {
-  DigitalInput input1(1);
-  DigitalInput input2(2);
-  DigitalInput input3(3);
-  DigitalInput input4(4);
-  Encoder encoder5(5, 6);
-  Counter counter7(7);
+TEST(DigitalGlitchFilterTest, Basic) {
+  frc::DigitalInput input1{1};
+  frc::DigitalInput input2{2};
+  frc::DigitalInput input3{3};
+  frc::DigitalInput input4{4};
+  frc::Encoder encoder5{5, 6};
+  frc::Counter counter7{7};
 
   // Check that we can make a single filter and set the period.
-  DigitalGlitchFilter filter1;
+  frc::DigitalGlitchFilter filter1;
   filter1.Add(&input1);
   filter1.SetPeriodNanoSeconds(4200);
 
   // Check that we can make a second filter with 2 inputs.
-  DigitalGlitchFilter filter2;
+  frc::DigitalGlitchFilter filter2;
   filter2.Add(&input2);
   filter2.Add(&input3);
   filter2.SetPeriodNanoSeconds(97100);
 
   // Check that we can make a third filter with an input, an encoder, and a
   // counter.
-  DigitalGlitchFilter filter3;
+  frc::DigitalGlitchFilter filter3;
   filter3.Add(&input4);
   filter3.Add(&encoder5);
   filter3.Add(&counter7);

@@ -1,11 +1,12 @@
 ext {
     nativeName = 'wpilibNewCommands'
-    devMain = 'edu.wpi.first.wpilibj.commands.DevMain'
+    devMain = 'edu.wpi.first.wpilibj2.commands.DevMain'
 }
 
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
+evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':wpilibj')
@@ -14,49 +15,72 @@ apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
 dependencies {
     implementation project(':wpiutil')
+    implementation project(':wpinet')
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':hal')
+    implementation project(':wpimath')
     implementation project(':wpilibj')
-    devImplementation project(':wpiutil')
-    devImplementation project(':ntcore')
-    devImplementation project(':cscore')
-    devImplementation project(':hal')
-    devImplementation project(':wpilibj')
-    testImplementation 'com.google.guava:guava:19.0'
-    testImplementation 'org.mockito:mockito-core:2.27.0'
+    testImplementation 'org.mockito:mockito-core:4.1.0'
 }
+
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
 nativeUtils.exportsConfigs {
     wpilibNewCommands {
-        x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
-        x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        x64ExcludeSymbols = [
+            '_CT??_R0?AV_System_error',
+            '_CT??_R0?AVexception',
+            '_CT??_R0?AVfailure',
+            '_CT??_R0?AVruntime_error',
+            '_CT??_R0?AVsystem_error',
+            '_CTA5?AVfailure',
+            '_TI5?AVfailure',
+            '_CT??_R0?AVout_of_range',
+            '_CTA3?AVout_of_range',
+            '_TI3?AVout_of_range',
+            '_CT??_R0?AVbad_cast'
+        ]
     }
 }
 
-apply plugin: DisableBuildingGTest
-
 model {
-    components {}
+    components {
+        "${nativeName}Base" {
+            it.sources.cpp {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/include'
+                }
+            }
+        }
+        "${nativeName}" {
+            it.sources.cpp.exportedHeaders {
+                srcDirs 'src/generated/main/native/include'
+            }
+        }
+    }
     binaries {
         all {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
                 return
             }
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-            lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+            project(':ntcore').addNtcoreDependency(it, 'shared')
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
 
             if (it.component.name == "${nativeName}Dev") {
-              lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
-              project(':hal').addHalJniDependency(it)
+                project(':ntcore').addNtcoreJniDependency(it)
+                lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
+                project(':hal').addHalJniDependency(it)
             }
 
             if (it instanceof GoogleTestTestSuiteBinarySpec) {
@@ -64,7 +88,7 @@ model {
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
             }
             if ((it instanceof NativeExecutableBinarySpec || it instanceof GoogleTestTestSuiteBinarySpec) && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
             }
         }
     }

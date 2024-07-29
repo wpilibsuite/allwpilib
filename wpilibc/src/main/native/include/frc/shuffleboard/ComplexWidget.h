@@ -1,34 +1,35 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
-#include <wpi/Twine.h>
 
 #include "frc/shuffleboard/ShuffleboardWidget.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableBuilderImpl.h"
+
+namespace wpi {
+class Sendable;
+class SendableBuilder;
+}  // namespace wpi
 
 namespace frc {
 
-class Sendable;
 class ShuffleboardContainer;
 
 /**
- * A Shuffleboard widget that handles a {@link Sendable} object such as a speed
+ * A Shuffleboard widget that handles a Sendable object such as a motor
  * controller or sensor.
  */
 class ComplexWidget final : public ShuffleboardWidget<ComplexWidget> {
  public:
-  ComplexWidget(ShuffleboardContainer& parent, const wpi::Twine& title,
-                Sendable& sendable);
+  ComplexWidget(ShuffleboardContainer& parent, std::string_view title,
+                wpi::Sendable& sendable);
+
+  ~ComplexWidget() override;
 
   void EnableIfActuator() override;
 
@@ -38,9 +39,8 @@ class ComplexWidget final : public ShuffleboardWidget<ComplexWidget> {
                  std::shared_ptr<nt::NetworkTable> metaTable) override;
 
  private:
-  Sendable& m_sendable;
-  SendableBuilderImpl m_builder;
-  bool m_builderInit = false;
+  wpi::Sendable& m_sendable;
+  std::unique_ptr<wpi::SendableBuilder> m_builder;
 };
 
 }  // namespace frc

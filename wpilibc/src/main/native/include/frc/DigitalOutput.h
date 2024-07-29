@@ -1,21 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <hal/Types.h>
+#include <units/time.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/DigitalSource.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * Class to write to digital outputs.
@@ -25,8 +21,8 @@ class SendableBuilder;
  * shouldn't be done here.
  */
 class DigitalOutput : public DigitalSource,
-                      public Sendable,
-                      public SendableHelper<DigitalOutput> {
+                      public wpi::Sendable,
+                      public wpi::SendableHelper<DigitalOutput> {
  public:
   /**
    * Create an instance of a digital output.
@@ -84,11 +80,11 @@ class DigitalOutput : public DigitalSource,
    * Output a single pulse on the digital output line.
    *
    * Send a single pulse on the digital output line where the pulse duration is
-   * specified in seconds. Maximum pulse length is 0.0016 seconds.
+   * specified in seconds. Maximum of 65535 microseconds.
    *
-   * @param length The pulse length in seconds
+   * @param pulseLength The pulse length in seconds
    */
-  void Pulse(double length);
+  void Pulse(units::second_t pulseLength);
 
   /**
    * Determine if the pulse is still going.
@@ -108,6 +104,19 @@ class DigitalOutput : public DigitalSource,
    * @param rate The frequency to output all digital output PWM signals.
    */
   void SetPWMRate(double rate);
+
+  /**
+   * Enable a PWM PPS (Pulse Per Second) Output on this line.
+   *
+   * Allocate one of the 6 DO PWM generator resources from this module.
+   *
+   * Supply the duty-cycle to output.
+   *
+   * The resolution of the duty cycle is 8-bit.
+   *
+   * @param dutyCycle The duty-cycle to start generating. [0..1]
+   */
+  void EnablePPS(double dutyCycle);
 
   /**
    * Enable a PWM Output on this line.
@@ -148,7 +157,7 @@ class DigitalOutput : public DigitalSource,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int m_channel;

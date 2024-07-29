@@ -1,3 +1,3 @@
 tasks.register('testDesktopJava') {
-  dependsOn test
+    dependsOn test
 }

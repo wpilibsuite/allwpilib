@@ -1,11 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "wpi/Base64.h"
 #include "wpi/SmallString.h"
 
@@ -18,19 +16,19 @@ struct Base64TestParam {
 };
 
 std::ostream& operator<<(std::ostream& os, const Base64TestParam& param) {
-  os << "Base64TestParam(Len: " << param.plain_len << ", "
-     << "Plain: \"" << param.plain << "\", "
-     << "Encoded: \"" << param.encoded << "\")";
+  os << "Base64TestParam(Len: " << param.plain_len << ", " << "Plain: \""
+     << param.plain << "\", " << "Encoded: \"" << param.encoded << "\")";
   return os;
 }
 
 class Base64Test : public ::testing::TestWithParam<Base64TestParam> {
  protected:
-  StringRef GetPlain() {
-    if (GetParam().plain_len < 0)
-      return StringRef(GetParam().plain);
-    else
-      return StringRef(GetParam().plain, GetParam().plain_len);
+  std::string_view GetPlain() {
+    if (GetParam().plain_len < 0) {
+      return GetParam().plain;
+    } else {
+      return std::string_view(GetParam().plain, GetParam().plain_len);
+    }
   }
 };
 
@@ -53,7 +51,7 @@ TEST_P(Base64Test, EncodeSmallString) {
 
 TEST_P(Base64Test, DecodeStdString) {
   std::string s;
-  StringRef encoded = GetParam().encoded;
+  std::string_view encoded = GetParam().encoded;
   EXPECT_EQ(encoded.size(), Base64Decode(encoded, &s));
   ASSERT_EQ(GetPlain(), s);
 
@@ -64,9 +62,9 @@ TEST_P(Base64Test, DecodeStdString) {
 
 TEST_P(Base64Test, DecodeSmallString) {
   SmallString<128> buf;
-  StringRef encoded = GetParam().encoded;
+  std::string_view encoded = GetParam().encoded;
   size_t len;
-  StringRef plain = Base64Decode(encoded, &len, buf);
+  std::string_view plain = Base64Decode(encoded, &len, buf);
   EXPECT_EQ(encoded.size(), len);
   ASSERT_EQ(GetPlain(), plain);
 
@@ -85,7 +83,8 @@ static Base64TestParam sample[] = {
      "mQgc28gb24uLi4K"},
 };
 
-INSTANTIATE_TEST_SUITE_P(Base64Sample, Base64Test, ::testing::ValuesIn(sample));
+INSTANTIATE_TEST_SUITE_P(Base64SampleTests, Base64Test,
+                         ::testing::ValuesIn(sample));
 
 static Base64TestParam standard[] = {
     {0, "", ""},
@@ -98,7 +97,7 @@ static Base64TestParam standard[] = {
     {2, "\xff\xef", "/+8="},
 };
 
-INSTANTIATE_TEST_SUITE_P(Base64Standard, Base64Test,
+INSTANTIATE_TEST_SUITE_P(Base64StandardTests, Base64Test,
                          ::testing::ValuesIn(standard));
 
 }  // namespace wpi

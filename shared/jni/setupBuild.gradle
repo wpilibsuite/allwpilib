@@ -41,12 +41,15 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp'
-                        include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
+                        srcDirs 'src/main/native/cpp', "$buildDir/generated/source/proto/main/cpp"
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
+                        include '**/*.cpp', '**/*.cc'
+                        exclude '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDir 'src/main/native/include'
+                        srcDirs 'src/main/native/include', "$buildDir/generated/source/proto/main/cpp"
                         if (project.hasProperty('generatedHeaders')) {
                             srcDir generatedHeaders
                         }
@@ -59,8 +62,13 @@ model {
                     it.buildable = false
                     return
                 }
+                it.cppCompiler.define 'WPILIB_EXPORTS', 'SLEIPNIR_EXPORTS'
+                it.cCompiler.define 'WPILIB_EXPORTS', 'SLEIPNIR_EXPORTS'
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                }
+                it.tasks.withType(CppCompile) {
+                    it.dependsOn generateProto
                 }
                 if (project.hasProperty('splitSetup')) {
                     splitSetup(it)
@@ -99,16 +107,23 @@ model {
                 baseName = nativeName + 'jni'
             }
 
-            enableCheckTask true
+            if (project.hasProperty('skipJniSymbols')) {
+                checkSkipSymbols = skipJniSymbols
+            }
+
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
             sources {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
+                        include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -117,7 +132,6 @@ model {
                         }
                         include '**/*.h'
                     }
-
                 }
             }
             binaries.all {
@@ -141,16 +155,23 @@ model {
                 baseName = nativeName + 'jni'
             }
 
-            enableCheckTask true
+            if (project.hasProperty('skipJniSymbols')) {
+                checkSkipSymbols = skipJniSymbols
+            }
+
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
             sources {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
+                        include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -180,7 +201,6 @@ model {
             targetBuildTypes 'debug'
             sources {
                 cpp {
-
                     source {
                         srcDirs 'src/dev/native/cpp'
                         include '**/*.cpp'
@@ -198,9 +218,29 @@ model {
                 lib library: "${nativeName}JNIShared", linkage: 'shared'
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                    }
                 }
-                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                it.tasks.withType(CppCompile) {
+                    it.dependsOn generateProto
+                }
+                if (project.hasProperty('exeSplitSetup')) {
+                    exeSplitSetup(it)
+                }
+            }
+        }
+        "${nativeName}TestLib"(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/testlib/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/test/native/include'
+                    }
                 }
             }
         }
@@ -220,7 +260,7 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                        srcDirs 'src/test/native/include', 'src/main/native/cpp', "$buildDir/generated/source/proto/main/cpp"
                         if (project.hasProperty('generatedHeaders')) {
                             srcDir generatedHeaders
                         }
@@ -234,9 +274,16 @@ model {
             lib library: nativeName, linkage: 'shared'
             if (!project.hasProperty('noWpiutil')) {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                lib project: ':wpiutil', library: 'wpiutilTestLib', linkage: 'shared'
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
                 }
+            }
+            it.tasks.withType(CppCompile) {
+                it.dependsOn generateProto
+            }
+            if (project.hasProperty('exeSplitSetup')) {
+                exeSplitSetup(it)
             }
         }
     }
@@ -257,13 +304,18 @@ model {
                                 commandLine it.tasks.install.runScriptFile.get().asFile.toString()
                                 def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
                                 test.dependsOn it.tasks.install
+
+                                if (project.hasProperty('buildServer')) {
+                                    def folderDir = it.tasks.install.installDirectory.get().toString()
+                                    test.doLast {
+                                        def folder = file(folderDir)
+                                        folder.deleteDir()
+                                    }
+                                }
+
                                 test.systemProperty 'java.library.path', filePath
-                                test.environment 'LD_LIBRARY_PATH', filePath
-                                test.workingDir filePath
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
-                                run.environment 'LD_LIBRARY_PATH', filePath
-                                run.workingDir filePath
 
                                 found = true
                             }
@@ -275,8 +327,7 @@ model {
     }
 }
 
-apply from: "${rootDir}/shared/cppDesktopTestTask.gradle"
-apply from: "${rootDir}/shared/javaDesktopTestTask.gradle"
+apply from: "${rootDir}/shared/cppJavaDesktopTestTask.gradle"
 
 ext.getJniSpecClass = {
     return JniNativeLibrarySpec

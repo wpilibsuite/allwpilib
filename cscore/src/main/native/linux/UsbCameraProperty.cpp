@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "UsbCameraProperty.h"
 
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/StringExtras.h>
 
 #include "UsbUtil.h"
 
@@ -29,7 +27,9 @@ static int GetIntCtrlIoctl(int fd, unsigned id, int type, int64_t* value) {
     ctrls.count = 1;
     ctrls.controls = &ctrl;
     int rc = DoIoctl(fd, VIDIOC_G_EXT_CTRLS, &ctrls);
-    if (rc < 0) return rc;
+    if (rc < 0) {
+      return rc;
+    }
     *value = ctrl.value;
   } else {
     // Use normal control
@@ -37,7 +37,9 @@ static int GetIntCtrlIoctl(int fd, unsigned id, int type, int64_t* value) {
     std::memset(&ctrl, 0, sizeof(ctrl));
     ctrl.id = id;
     int rc = DoIoctl(fd, VIDIOC_G_CTRL, &ctrl);
-    if (rc < 0) return rc;
+    if (rc < 0) {
+      return rc;
+    }
     *value = ctrl.value;
   }
   return 0;
@@ -54,10 +56,11 @@ static int SetIntCtrlIoctl(int fd, unsigned id, int type, int64_t value) {
     std::memset(&ctrl, 0, sizeof(ctrl));
     std::memset(&ctrls, 0, sizeof(ctrls));
     ctrl.id = id;
-    if (type == V4L2_CTRL_TYPE_INTEGER64)
+    if (type == V4L2_CTRL_TYPE_INTEGER64) {
       ctrl.value64 = value;
-    else
+    } else {
       ctrl.value = static_cast<__s32>(value);
+    }
     ctrls.ctrl_class = ctrl_class;
     ctrls.count = 1;
     ctrls.controls = &ctrl;
@@ -90,15 +93,8 @@ static int GetStringCtrlIoctl(int fd, int id, int maximum, std::string* value) {
 }
 
 static int SetStringCtrlIoctl(int fd, int id, int maximum,
-                              const wpi::Twine& value) {
-  wpi::SmallString<64> strBuf, strBuf2;
-  wpi::StringRef str = value.toNullTerminatedStringRef(strBuf);
-  if (str.size() > static_cast<size_t>(maximum)) {
-    // don't know if strBuf was used, just recopy
-    strBuf2 = str.take_front(maximum);
-    str = strBuf2;
-    strBuf2.push_back('\0');  // null terminate
-  }
+                              std::string_view value) {
+  wpi::SmallString<64> str{wpi::substr(value, 0, maximum)};
 
   struct v4l2_ext_control ctrl;
   struct v4l2_ext_controls ctrls;
@@ -106,7 +102,7 @@ static int SetStringCtrlIoctl(int fd, int id, int maximum,
   std::memset(&ctrls, 0, sizeof(ctrls));
   ctrl.id = id;
   ctrl.size = str.size();
-  ctrl.string = const_cast<char*>(str.data());
+  ctrl.string = const_cast<char*>(str.c_str());
   ctrls.ctrl_class = V4L2_CTRL_ID2CLASS(id);
   ctrls.count = 1;
   ctrls.controls = &ctrl;
@@ -115,25 +111,26 @@ static int SetStringCtrlIoctl(int fd, int id, int maximum,
 
 // Removes non-alphanumeric characters and replaces spaces with underscores.
 // e.g. "Zoom, Absolute" -> "zoom_absolute", "Pan (Absolute)" -> "pan_absolute"
-static wpi::StringRef NormalizeName(wpi::StringRef name,
-                                    wpi::SmallVectorImpl<char>& buf) {
+static std::string_view NormalizeName(std::string_view name,
+                                      wpi::SmallVectorImpl<char>& buf) {
   bool newWord = false;
   for (auto ch : name) {
     if (std::isalnum(ch)) {
-      if (newWord) buf.push_back('_');
+      if (newWord) {
+        buf.push_back('_');
+      }
       newWord = false;
       buf.push_back(std::tolower(ch));
     } else if (!buf.empty()) {
       newWord = true;
     }
   }
-  return wpi::StringRef(buf.data(), buf.size());
+  return {buf.data(), buf.size()};
 }
 
 #ifdef VIDIOC_QUERY_EXT_CTRL
 UsbCameraProperty::UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl)
-    : PropertyImpl(wpi::StringRef{}, CS_PROP_NONE, ctrl.step,
-                   ctrl.default_value, 0),
+    : PropertyImpl({}, CS_PROP_NONE, ctrl.step, ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
       type(ctrl.type) {
   hasMinimum = true;
@@ -166,15 +163,16 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl)
 
   // name
   size_t len = 0;
-  while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') ++len;
+  while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') {
+    ++len;
+  }
   wpi::SmallString<64> name_buf;
-  name = NormalizeName(wpi::StringRef(ctrl.name, len), name_buf);
+  name = NormalizeName({ctrl.name, len}, name_buf);
 }
 #endif
 
 UsbCameraProperty::UsbCameraProperty(const struct v4l2_queryctrl& ctrl)
-    : PropertyImpl(wpi::StringRef{}, CS_PROP_NONE, ctrl.step,
-                   ctrl.default_value, 0),
+    : PropertyImpl({}, CS_PROP_NONE, ctrl.step, ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
       type(ctrl.type) {
   hasMinimum = true;
@@ -204,10 +202,12 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_queryctrl& ctrl)
 
   // name
   size_t len = 0;
-  while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') ++len;
+  while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') {
+    ++len;
+  }
   wpi::SmallString<64> name_buf;
-  name = NormalizeName(
-      wpi::StringRef(reinterpret_cast<const char*>(ctrl.name), len), name_buf);
+  name =
+      NormalizeName({reinterpret_cast<const char*>(ctrl.name), len}, name_buf);
 }
 
 std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
@@ -222,7 +222,9 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
   if (rc == 0) {
     *id = qc_ext.id;  // copy back
     // We don't support array types
-    if (qc_ext.elems > 1 || qc_ext.nr_of_dims > 0) return nullptr;
+    if (qc_ext.elems > 1 || qc_ext.nr_of_dims > 0) {
+      return nullptr;
+    }
     prop = std::make_unique<UsbCameraProperty>(qc_ext);
   }
 #endif
@@ -233,7 +235,9 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
     qc.id = *id;
     rc = TryIoctl(fd, VIDIOC_QUERYCTRL, &qc);
     *id = qc.id;  // copy back
-    if (rc != 0) return nullptr;
+    if (rc != 0) {
+      return nullptr;
+    }
     prop = std::make_unique<UsbCameraProperty>(qc);
   }
 
@@ -245,10 +249,11 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
     qmenu.id = *id;
     for (int i = prop->minimum; i <= prop->maximum; ++i) {
       qmenu.index = static_cast<__u32>(i);
-      if (TryIoctl(fd, VIDIOC_QUERYMENU, &qmenu) != 0) continue;
+      if (TryIoctl(fd, VIDIOC_QUERYMENU, &qmenu) != 0) {
+        continue;
+      }
       if (prop->intMenu) {
-        wpi::raw_string_ostream os(prop->enumChoices[i]);
-        os << qmenu.value;
+        prop->enumChoices[i] = fmt::to_string(qmenu.value);
       } else {
         prop->enumChoices[i] = reinterpret_cast<const char*>(qmenu.name);
       }
@@ -259,7 +264,9 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
 }
 
 bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock, int fd) {
-  if (fd < 0) return true;
+  if (fd < 0) {
+    return true;
+  }
   unsigned idCopy = id;
   int rv = 0;
 
@@ -272,7 +279,9 @@ bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock, int fd) {
       lock.unlock();
       rv = GetIntCtrlIoctl(fd, idCopy, typeCopy, &newValue);
       lock.lock();
-      if (rv >= 0) value = newValue;
+      if (rv >= 0) {
+        value = newValue;
+      }
       break;
     }
     case CS_PROP_STRING: {
@@ -281,7 +290,9 @@ bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock, int fd) {
       lock.unlock();
       rv = GetStringCtrlIoctl(fd, idCopy, maximumCopy, &newValueStr);
       lock.lock();
-      if (rv >= 0) valueStr = std::move(newValueStr);
+      if (rv >= 0) {
+        valueStr = std::move(newValueStr);
+      }
       break;
     }
     default:
@@ -295,13 +306,15 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
                                   int fd) const {
   // Make a copy of the string as we're about to release the lock
   wpi::SmallString<128> valueStrCopy{valueStr};
-  return DeviceSet(lock, fd, value, valueStrCopy);
+  return DeviceSet(lock, fd, value, valueStrCopy.str());
 }
 
 bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd,
                                   int newValue,
-                                  const wpi::Twine& newValueStr) const {
-  if (!device || fd < 0) return true;
+                                  std::string_view newValueStr) const {
+  if (!device || fd < 0) {
+    return true;
+  }
   unsigned idCopy = id;
   int rv = 0;
 

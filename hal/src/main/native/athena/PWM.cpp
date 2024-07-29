@@ -1,20 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/PWM.h"
 
+#include <algorithm>
 #include <cmath>
+#include <cstdio>
 #include <thread>
 
-#include <wpi/raw_ostream.h>
+#include <fmt/format.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"
@@ -61,24 +61,27 @@ static inline int32_t GetFullRangeScaleFactor(DigitalPort* port) {
   return GetMaxPositivePwm(port) - GetMinNegativePwm(port);
 }  ///< The scale for positions.
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePWM() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
+                                        const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
   initializeDigital(status);
 
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0) {
+    return HAL_kInvalidHandle;
+  }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex || channel >= kNumPWMChannels) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+                                     kNumPWMChannels, channel);
     return HAL_kInvalidHandle;
   }
 
@@ -90,16 +93,20 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
     channel = remapMXPPWMChannel(channel) + 10;  // remap MXP to proper channel
   }
 
-  auto handle =
-      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM, status);
+  HAL_DigitalHandle handle;
 
-  if (*status != 0)
+  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM,
+                                              &handle, status);
+
+  if (*status != 0) {
+    if (port) {
+      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", origChannel,
+                                           port->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+                                       kNumPWMChannels, origChannel);
+    }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-
-  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWM);
-  if (port == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
   }
 
   port->channel = origChannel;
@@ -113,7 +120,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   }
 
   // Defaults to allow an always valid config.
-  HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
+  HAL_SetPWMConfigMicroseconds(handle, 2000, 1501, 1500, 1499, 1000, status);
+
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }
@@ -131,8 +140,8 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   while (port.use_count() != 1) {
     auto current = hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
-      wpi::outs() << "PWM handle free timeout\n";
-      wpi::outs().flush();
+      std::puts("PWM handle free timeout");
+      std::fflush(stdout);
       break;
     }
     std::this_thread::yield();
@@ -151,60 +160,28 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
   return channel < kNumPWMChannels && channel >= 0;
 }
 
-void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double max,
-                      double deadbandMax, double center, double deadbandMin,
-                      double min, int32_t* status) {
+void HAL_SetPWMConfigMicroseconds(HAL_DigitalHandle pwmPortHandle, int32_t max,
+                                  int32_t deadbandMax, int32_t center,
+                                  int32_t deadbandMin, int32_t min,
+                                  int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
 
-  // calculate the loop time in milliseconds
-  double loopTime =
-      HAL_GetPWMLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
-  if (*status != 0) return;
-
-  int32_t maxPwm = static_cast<int32_t>((max - kDefaultPwmCenter) / loopTime +
-                                        kDefaultPwmStepsDown - 1);
-  int32_t deadbandMaxPwm = static_cast<int32_t>(
-      (deadbandMax - kDefaultPwmCenter) / loopTime + kDefaultPwmStepsDown - 1);
-  int32_t centerPwm = static_cast<int32_t>(
-      (center - kDefaultPwmCenter) / loopTime + kDefaultPwmStepsDown - 1);
-  int32_t deadbandMinPwm = static_cast<int32_t>(
-      (deadbandMin - kDefaultPwmCenter) / loopTime + kDefaultPwmStepsDown - 1);
-  int32_t minPwm = static_cast<int32_t>((min - kDefaultPwmCenter) / loopTime +
-                                        kDefaultPwmStepsDown - 1);
-
-  port->maxPwm = maxPwm;
-  port->deadbandMaxPwm = deadbandMaxPwm;
-  port->deadbandMinPwm = deadbandMinPwm;
-  port->centerPwm = centerPwm;
-  port->minPwm = minPwm;
+  port->maxPwm = max;
+  port->deadbandMaxPwm = deadbandMax;
+  port->deadbandMinPwm = deadbandMin;
+  port->centerPwm = center;
+  port->minPwm = min;
   port->configSet = true;
 }
 
-void HAL_SetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t maxPwm,
-                         int32_t deadbandMaxPwm, int32_t centerPwm,
-                         int32_t deadbandMinPwm, int32_t minPwm,
-                         int32_t* status) {
-  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
-  port->maxPwm = maxPwm;
-  port->deadbandMaxPwm = deadbandMaxPwm;
-  port->deadbandMinPwm = deadbandMinPwm;
-  port->centerPwm = centerPwm;
-  port->minPwm = minPwm;
-}
-
-void HAL_GetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t* maxPwm,
-                         int32_t* deadbandMaxPwm, int32_t* centerPwm,
-                         int32_t* deadbandMinPwm, int32_t* minPwm,
-                         int32_t* status) {
+void HAL_GetPWMConfigMicroseconds(HAL_DigitalHandle pwmPortHandle,
+                                  int32_t* maxPwm, int32_t* deadbandMaxPwm,
+                                  int32_t* centerPwm, int32_t* deadbandMinPwm,
+                                  int32_t* minPwm, int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -237,18 +214,30 @@ HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
   return port->eliminateDeadband;
 }
 
-void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
-                   int32_t* status) {
+void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
+                                     int32_t microsecondPulseTime,
+                                     int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
 
+  if (microsecondPulseTime < 0 ||
+      (microsecondPulseTime != 0xFFFF && microsecondPulseTime >= 4096)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(
+        status,
+        fmt::format("Pulse time {} out of range. Expect [0-4096) or 0xFFFF",
+                    microsecondPulseTime));
+    return;
+  }
+
   if (port->channel < tPWM::kNumHdrRegisters) {
-    pwmSystem->writeHdr(port->channel, value, status);
+    pwmSystem->writeHdr(port->channel, microsecondPulseTime, status);
   } else {
-    pwmSystem->writeMXP(port->channel - tPWM::kNumHdrRegisters, value, status);
+    pwmSystem->writeMXP(port->channel - tPWM::kNumHdrRegisters,
+                        microsecondPulseTime, status);
   }
 }
 
@@ -277,13 +266,13 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
   if (speed == 0.0) {
     rawValue = GetCenterPwm(dPort);
   } else if (speed > 0.0) {
-    rawValue = static_cast<int32_t>(
-        speed * static_cast<double>(GetPositiveScaleFactor(dPort)) +
-        static_cast<double>(GetMinPositivePwm(dPort)) + 0.5);
+    rawValue =
+        std::lround(speed * static_cast<double>(GetPositiveScaleFactor(dPort)) +
+                    static_cast<double>(GetMinPositivePwm(dPort)));
   } else {
-    rawValue = static_cast<int32_t>(
-        speed * static_cast<double>(GetNegativeScaleFactor(dPort)) +
-        static_cast<double>(GetMaxNegativePwm(dPort)) + 0.5);
+    rawValue =
+        std::lround(speed * static_cast<double>(GetNegativeScaleFactor(dPort)) +
+                    static_cast<double>(GetMaxNegativePwm(dPort)));
   }
 
   if (!((rawValue >= GetMinNegativePwm(dPort)) &&
@@ -293,7 +282,7 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
     return;
   }
 
-  HAL_SetPWMRaw(pwmPortHandle, rawValue, status);
+  HAL_SetPWMPulseTimeMicroseconds(pwmPortHandle, rawValue, status);
 }
 
 void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
@@ -326,14 +315,15 @@ void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
     return;
   }
 
-  HAL_SetPWMRaw(pwmPortHandle, rawValue, status);
+  HAL_SetPWMPulseTimeMicroseconds(pwmPortHandle, rawValue, status);
 }
 
 void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  HAL_SetPWMRaw(pwmPortHandle, kPwmDisabled, status);
+  HAL_SetPWMPulseTimeMicroseconds(pwmPortHandle, kPwmDisabled, status);
 }
 
-int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
+int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
+                                        int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -358,10 +348,11 @@ double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return 0;
   }
 
-  int32_t value = HAL_GetPWMRaw(pwmPortHandle, status);
-  if (*status != 0) return 0;
+  int32_t value = HAL_GetPWMPulseTimeMicroseconds(pwmPortHandle, status);
+  if (*status != 0) {
+    return 0;
+  }
   DigitalPort* dPort = port.get();
-
   if (value == kPwmDisabled) {
     return 0.0;
   } else if (value > GetMaxPositivePwm(dPort)) {
@@ -390,8 +381,10 @@ double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return 0;
   }
 
-  int32_t value = HAL_GetPWMRaw(pwmPortHandle, status);
-  if (*status != 0) return 0;
+  int32_t value = HAL_GetPWMPulseTimeMicroseconds(pwmPortHandle, status);
+  if (*status != 0) {
+    return 0;
+  }
   DigitalPort* dPort = port.get();
 
   if (value < GetMinNegativePwm(dPort)) {
@@ -431,24 +424,37 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
   }
 }
 
+void HAL_SetPWMAlwaysHighMode(HAL_DigitalHandle pwmPortHandle,
+                              int32_t* status) {
+  HAL_SetPWMPulseTimeMicroseconds(pwmPortHandle, kPwmAlwaysHigh, status);
+}
+
 int32_t HAL_GetPWMLoopTiming(int32_t* status) {
   initializeDigital(status);
-  if (*status != 0) return 0;
+  if (*status != 0) {
+    return 0;
+  }
   return pwmSystem->readLoopTiming(status);
 }
 
 uint64_t HAL_GetPWMCycleStartTime(int32_t* status) {
   initializeDigital(status);
-  if (*status != 0) return 0;
+  if (*status != 0) {
+    return 0;
+  }
 
   uint64_t upper1 = pwmSystem->readCycleStartTimeUpper(status);
   uint32_t lower = pwmSystem->readCycleStartTime(status);
   uint64_t upper2 = pwmSystem->readCycleStartTimeUpper(status);
-  if (*status != 0) return 0;
+  if (*status != 0) {
+    return 0;
+  }
   if (upper1 != upper2) {
     // Rolled over between the lower call, reread lower
     lower = pwmSystem->readCycleStartTime(status);
-    if (*status != 0) return 0;
+    if (*status != 0) {
+      return 0;
+    }
   }
   return (upper2 << 32) + lower;
 }

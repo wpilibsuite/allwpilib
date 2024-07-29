@@ -1,14 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/AddressableLED.h"
 
+#include <fmt/format.h>
+
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
@@ -27,8 +27,7 @@ static LimitedHandleResource<HAL_AddressableLEDHandle, AddressableLED,
                              kNumAddressableLEDs,
                              HAL_HandleEnum::AddressableLED>* ledHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAddressableLED() {
   static LimitedHandleResource<HAL_AddressableLEDHandle, AddressableLED,
                                kNumAddressableLEDs,
@@ -36,8 +35,7 @@ void InitializeAddressableLED() {
       dcH;
   ledHandles = &dcH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
@@ -86,7 +84,9 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
   auto led = ledHandles->Get(handle);
   ledHandles->Free(handle);
-  if (!led) return;
+  if (!led) {
+    return;
+  }
   SimAddressableLEDData[led->index].running = false;
   SimAddressableLEDData[led->index].initialized = false;
 }
@@ -113,8 +113,13 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (length > HAL_kAddressableLEDMaxLength) {
+  if (length > HAL_kAddressableLEDMaxLength || length < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(
+        status,
+        fmt::format(
+            "LED length must be less than or equal to {}. {} was requested",
+            HAL_kAddressableLEDMaxLength, length));
     return;
   }
   SimAddressableLEDData[led->index].length = length;
@@ -130,16 +135,21 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
   }
   if (length > SimAddressableLEDData[led->index].length) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(
+        status,
+        fmt::format(
+            "Data length must be less than or equal to {}. {} was requested",
+            SimAddressableLEDData[led->index].length.Get(), length));
     return;
   }
   SimAddressableLEDData[led->index].SetData(data, length);
 }
 
 void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
-                                    int32_t lowTime0NanoSeconds,
                                     int32_t highTime0NanoSeconds,
-                                    int32_t lowTime1NanoSeconds,
+                                    int32_t lowTime0NanoSeconds,
                                     int32_t highTime1NanoSeconds,
+                                    int32_t lowTime1NanoSeconds,
                                     int32_t* status) {}
 
 void HAL_SetAddressableLEDSyncTime(HAL_AddressableLEDHandle handle,

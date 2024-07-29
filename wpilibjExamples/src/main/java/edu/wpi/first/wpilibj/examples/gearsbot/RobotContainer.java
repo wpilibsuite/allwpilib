@@ -1,21 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.gearsbot;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.Autonomous;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.CloseClaw;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.OpenClaw;
@@ -26,36 +15,36 @@ import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetElevatorSetpoint;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetWristSetpoint;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.TankDrive;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
-import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final DriveTrain m_drivetrain = new DriveTrain();
+  private final Drivetrain m_drivetrain = new Drivetrain();
   private final Elevator m_elevator = new Elevator();
   private final Wrist m_wrist = new Wrist();
   private final Claw m_claw = new Claw();
 
-  private final Joystick m_joystick = new Joystick(0);
+  private final XboxController m_joystick = new XboxController(0);
 
-  private final CommandBase m_autonomousCommand =
+  private final Command m_autonomousCommand =
       new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator);
 
-  /**
-   * The container for the robot.  Contains subsystems, OI devices, and commands.
-   */
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Put Some buttons on the SmartDashboard
     SmartDashboard.putData("Elevator Bottom", new SetElevatorSetpoint(0, m_elevator));
-    SmartDashboard.putData("Elevator Platform", new SetElevatorSetpoint(0.2, m_elevator));
-    SmartDashboard.putData("Elevator Top", new SetElevatorSetpoint(0.3, m_elevator));
+    SmartDashboard.putData("Elevator Top", new SetElevatorSetpoint(0.25, m_elevator));
 
     SmartDashboard.putData("Wrist Horizontal", new SetWristSetpoint(0, m_wrist));
     SmartDashboard.putData("Raise Wrist", new SetWristSetpoint(-45, m_wrist));
@@ -63,12 +52,12 @@ public class RobotContainer {
     SmartDashboard.putData("Open Claw", new OpenClaw(m_claw));
     SmartDashboard.putData("Close Claw", new CloseClaw(m_claw));
 
-    SmartDashboard
-        .putData("Deliver Soda", new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator));
+    SmartDashboard.putData(
+        "Deliver Soda", new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator));
 
     // Assign default commands
-    m_drivetrain.setDefaultCommand(new TankDrive(() -> m_joystick.getY(Hand.kLeft),
-        () -> m_joystick.getY(Hand.kRight), m_drivetrain));
+    m_drivetrain.setDefaultCommand(
+        new TankDrive(() -> -m_joystick.getLeftY(), () -> -m_joystick.getRightY(), m_drivetrain));
 
     // Show what command your subsystem is running on the SmartDashboard
     SmartDashboard.putData(m_drivetrain);
@@ -81,10 +70,10 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings.  Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
-   * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Create some buttons
@@ -98,17 +87,16 @@ public class RobotContainer {
     final JoystickButton r1 = new JoystickButton(m_joystick, 12);
 
     // Connect the buttons to commands
-    dpadUp.whenPressed(new SetElevatorSetpoint(0.2, m_elevator));
-    dpadDown.whenPressed(new SetElevatorSetpoint(-0.2, m_elevator));
-    dpadRight.whenPressed(new CloseClaw(m_claw));
-    dpadLeft.whenPressed(new OpenClaw(m_claw));
+    dpadUp.onTrue(new SetElevatorSetpoint(0.25, m_elevator));
+    dpadDown.onTrue(new SetElevatorSetpoint(0.0, m_elevator));
+    dpadRight.onTrue(new CloseClaw(m_claw));
+    dpadLeft.onTrue(new OpenClaw(m_claw));
 
-    r1.whenPressed(new PrepareToPickup(m_claw, m_wrist, m_elevator));
-    r2.whenPressed(new Pickup(m_claw, m_wrist, m_elevator));
-    l1.whenPressed(new Place(m_claw, m_wrist, m_elevator));
-    l2.whenPressed(new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator));
+    r1.onTrue(new PrepareToPickup(m_claw, m_wrist, m_elevator));
+    r2.onTrue(new Pickup(m_claw, m_wrist, m_elevator));
+    l1.onTrue(new Place(m_claw, m_wrist, m_elevator));
+    l2.onTrue(new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator));
   }
-
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/shuffleboard/Shuffleboard.h"
 
@@ -13,15 +10,19 @@
 
 using namespace frc;
 
-void Shuffleboard::Update() { GetInstance().Update(); }
+void Shuffleboard::Update() {
+  GetInstance().Update();
+}
 
-ShuffleboardTab& Shuffleboard::GetTab(wpi::StringRef title) {
+ShuffleboardTab& Shuffleboard::GetTab(std::string_view title) {
   return GetInstance().GetTab(title);
 }
 
-void Shuffleboard::SelectTab(int index) { GetInstance().SelectTab(index); }
+void Shuffleboard::SelectTab(int index) {
+  GetInstance().SelectTab(index);
+}
 
-void Shuffleboard::SelectTab(wpi::StringRef title) {
+void Shuffleboard::SelectTab(std::string_view title) {
   GetInstance().SelectTab(title);
 }
 
@@ -39,9 +40,11 @@ void Shuffleboard::StartRecording() {
   GetRecordingController().StartRecording();
 }
 
-void Shuffleboard::StopRecording() { GetRecordingController().StopRecording(); }
+void Shuffleboard::StopRecording() {
+  GetRecordingController().StopRecording();
+}
 
-void Shuffleboard::SetRecordingFileNameFormat(wpi::StringRef format) {
+void Shuffleboard::SetRecordingFileNameFormat(std::string_view format) {
   GetRecordingController().SetRecordingFileNameFormat(format);
 }
 
@@ -49,21 +52,35 @@ void Shuffleboard::ClearRecordingFileNameFormat() {
   GetRecordingController().ClearRecordingFileNameFormat();
 }
 
-void Shuffleboard::AddEventMarker(wpi::StringRef name,
-                                  wpi::StringRef description,
+void Shuffleboard::AddEventMarker(std::string_view name,
+                                  std::string_view description,
                                   ShuffleboardEventImportance importance) {
   GetRecordingController().AddEventMarker(name, description, importance);
 }
 
-void Shuffleboard::AddEventMarker(wpi::StringRef name,
+void Shuffleboard::AddEventMarker(std::string_view name,
                                   ShuffleboardEventImportance importance) {
   AddEventMarker(name, "", importance);
 }
 
-detail::ShuffleboardInstance& Shuffleboard::GetInstance() {
-  static detail::ShuffleboardInstance inst(
+static std::unique_ptr<detail::ShuffleboardInstance>& GetInstanceHolder() {
+  static std::unique_ptr<detail::ShuffleboardInstance> instance =
+      std::make_unique<detail::ShuffleboardInstance>(
+          nt::NetworkTableInstance::GetDefault());
+  return instance;
+}
+
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetShuffleboardInstance() {
+  GetInstanceHolder() = std::make_unique<detail::ShuffleboardInstance>(
       nt::NetworkTableInstance::GetDefault());
-  return inst;
+}
+}  // namespace frc::impl
+#endif
+
+detail::ShuffleboardInstance& Shuffleboard::GetInstance() {
+  return *GetInstanceHolder();
 }
 
 detail::RecordingController& Shuffleboard::GetRecordingController() {

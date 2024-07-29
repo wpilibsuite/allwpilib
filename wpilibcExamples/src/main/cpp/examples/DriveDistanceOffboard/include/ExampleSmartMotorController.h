@@ -1,13 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-
-#include <frc/SpeedController.h>
 
 /**
  * A simplified stub class that simulates the API of a common "smart" motor
@@ -15,7 +10,7 @@
  *
  * <p>Has no actual functionality.
  */
-class ExampleSmartMotorController : public frc::SpeedController {
+class ExampleSmartMotorController {
  public:
   enum PIDMode { kPosition, kVelocity, kMovementWitchcraft };
 
@@ -48,9 +43,9 @@ class ExampleSmartMotorController : public frc::SpeedController {
   /**
    * Places this motor controller in follower mode.
    *
-   * @param master The master to follow.
+   * @param leader The leader to follow.
    */
-  void Follow(ExampleSmartMotorController master) {}
+  void Follow(ExampleSmartMotorController leader) {}
 
   /**
    * Returns the encoder distance.
@@ -71,17 +66,18 @@ class ExampleSmartMotorController : public frc::SpeedController {
    */
   void ResetEncoder() {}
 
-  void Set(double speed) override {}
+  void Set(double speed) { m_value = speed; }
 
-  double Get() const override { return 0; }
+  double Get() const { return m_value; }
 
-  void SetInverted(bool isInverted) override {}
+  void SetInverted(bool isInverted) {}
 
-  bool GetInverted() const override { return false; }
+  bool GetInverted() const { return false; }
 
-  void Disable() override {}
+  void Disable() {}
 
-  void StopMotor() override {}
+  void StopMotor() {}
 
-  void PIDWrite(double output) override {}
+ private:
+  double m_value = 0.0;
 };

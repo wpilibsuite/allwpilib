@@ -1,22 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "CanDataInternal.h"
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeCanData() {
   static CanData scd;
   ::hal::SimCanData = &scd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 CanData* hal::SimCanData;
 
@@ -31,7 +26,9 @@ void CanData::ResetData() {
 
 extern "C" {
 
-void HALSIM_ResetCanData(void) { SimCanData->ResetData(); }
+void HALSIM_ResetCanData(void) {
+  SimCanData->ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                             \
   HAL_SIMCALLBACKREGISTRY_DEFINE_CAPI_NOINDEX(TYPE, HALSIM, Can##CAPINAME, \

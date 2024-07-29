@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -24,33 +21,36 @@ extern "C" {
 /**
  * Initializes the analog input port using the given port object.
  *
- * @param portHandle Handle to the port to initialize.
- * @return           the created analog input handle
+ * @param[in] portHandle Handle to the port to initialize.
+ * @param[in] allocationLocation the location where the allocation is occurring
+ *                               (can be null)
+ * @param[out] status the error code, or 0 for success
+ * @return the created analog input handle
  */
-HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
-                                                    int32_t* status);
+HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
+    HAL_PortHandle portHandle, const char* allocationLocation, int32_t* status);
 
 /**
  * Frees an analog input port.
  *
- * @param analogPortHandle Handle to the analog port.
+ * @param[in,out] analogPortHandle Handle to the analog port.
  */
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle);
 
 /**
  * Checks that the analog module number is valid.
  *
- * @param module The analog module number.
+ * @param[in] module The analog module number.
  * @return Analog module is valid and present
  */
 HAL_Bool HAL_CheckAnalogModule(int32_t module);
 
 /**
- * Checks that the analog output channel number is value.
+ * Checks that the analog output channel number is valid.
  * Verifies that the analog channel number is one of the legal channel numbers.
  * Channel numbers are 0-based.
  *
- * @param channel The analog output channel number.
+ * @param[in] channel The analog output channel number.
  * @return Analog channel is valid
  */
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel);
@@ -69,7 +69,8 @@ void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
  *
  * This is a global setting for the Athena and effects all channels.
  *
- * @param samplesPerSecond The number of samples per channel per second.
+ * @param[in] samplesPerSecond The number of samples per channel per second.
+ * @param[out] status          the error code, or 0 for success
  */
 void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status);
 
@@ -79,6 +80,7 @@ void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status);
  * This assumes one entry in the scan list.
  * This is a global setting for the Athena and effects all channels.
  *
+ * @param[out] status the error code, or 0 for success
  * @return Sample rate.
  */
 double HAL_GetAnalogSampleRate(int32_t* status);
@@ -90,8 +92,9 @@ double HAL_GetAnalogSampleRate(int32_t* status);
  * is 2**bits. Use averaging to improve the stability of your measurement at the
  * expense of sampling rate. The averaging is done automatically in the FPGA.
  *
- * @param analogPortHandle Handle to the analog port to configure.
- * @param bits Number of bits to average.
+ * @param[in] analogPortHandle Handle to the analog port to configure.
+ * @param[in] bits Number of bits to average.
+ * @param[out] status the error code, or 0 for success
  */
 void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                               int32_t bits, int32_t* status);
@@ -102,7 +105,8 @@ void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
  * This gets the number of averaging bits from the FPGA. The actual number of
  * averaged samples is 2**bits. The averaging is done automatically in the FPGA.
  *
- * @param analogPortHandle Handle to the analog port to use.
+ * @param[in] analogPortHandle Handle to the analog port to use.
+ * @param[out] status the error code, or 0 for success
  * @return Bits to average.
  */
 int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
@@ -116,8 +120,9 @@ int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
  * measurements at the expense of sampling rate. The oversampling is done
  * automatically in the FPGA.
  *
- * @param analogPortHandle Handle to the analog port to use.
- * @param bits Number of bits to oversample.
+ * @param[in] analogPortHandle Handle to the analog port to use.
+ * @param[in] bits Number of bits to oversample.
+ * @param[out] status the error code, or 0 for success
  */
 void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t bits, int32_t* status);
@@ -129,7 +134,8 @@ void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
  * oversampled values is 2**bits. The oversampling is done automatically in the
  * FPGA.
  *
- * @param analogPortHandle Handle to the analog port to use.
+ * @param[in] analogPortHandle Handle to the analog port to use.
+ * @param[out] status          the error code, or 0 for success
  * @return Bits to oversample.
  */
 int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
@@ -142,7 +148,8 @@ int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
  * converter in the module. The units are in A/D converter codes.  Use
  * GetVoltage() to get the analog value in calibrated units.
  *
- * @param analogPortHandle Handle to the analog port to use.
+ * @param[in] analogPortHandle Handle to the analog port to use.
+ * @param[out] status the error code, or 0 for success
  * @return A sample straight from the channel on this module.
  */
 int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
@@ -155,11 +162,12 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
  * The sample is 12-bit + the value configured in SetOversampleBits().
  * The value configured in SetAverageBits() will cause this value to be averaged
  * 2**bits number of samples. This is not a sliding window.  The sample will not
- * change until 2**(OversamplBits + AverageBits) samples have been acquired from
- * the module on this channel. Use GetAverageVoltage() to get the analog value
- * in calibrated units.
+ * change until 2**(OversampleBits + AverageBits) samples have been acquired
+ * from the module on this channel. Use GetAverageVoltage() to get the analog
+ * value in calibrated units.
  *
- * @param analogPortHandle Handle to the analog port to use.
+ * @param[in] analogPortHandle Handle to the analog port to use.
+ * @param[out] status the error code, or 0 for success
  * @return A sample from the oversample and average engine for the channel.
  */
 int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
@@ -173,8 +181,9 @@ int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
  *
  * @todo This assumes raw values.  Oversampling not supported as is.
  *
- * @param analogPortHandle Handle to the analog port to use.
- * @param voltage The voltage to convert.
+ * @param[in] analogPortHandle Handle to the analog port to use.
+ * @param[in] voltage The voltage to convert.
+ * @param[out] status the error code, or 0 for success
  * @return The raw value for the channel.
  */
 int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analogPortHandle,
@@ -186,7 +195,8 @@ int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analogPortHandle,
  * The value is scaled to units of Volts using the calibrated scaling data from
  * GetLSBWeight() and GetOffset().
  *
- * @param analogPortHandle Handle to the analog port to use.
+ * @param[in] analogPortHandle Handle to the analog port to use.
+ * @param[out] status the error code, or 0 for success
  * @return A scaled sample straight from the channel on this module.
  */
 double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
@@ -201,7 +211,8 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
  * be higher resolution, but it will update more slowly. Using averaging will
  * cause this value to be more stable, but it will update more slowly.
  *
- * @param analogPortHandle Handle to the analog port to use.
+ * @param[in] analogPortHandle Handle to the analog port to use.
+ * @param[out] status the error code, or 0 for success
  * @return A scaled sample from the output of the oversample and average engine
  * for the channel.
  */
@@ -215,7 +226,8 @@ double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
  *
  * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
  *
- * @param analogPortHandle Handle to the analog port to use.
+ * @param[in] analogPortHandle Handle to the analog port to use.
+ * @param[out] status the error code, or 0 for success
  * @return Least significant bit weight.
  */
 int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
@@ -228,7 +240,8 @@ int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
  *
  * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
  *
- * @param analogPortHandle Handle to the analog port to use.
+ * @param[in] analogPortHandle Handle to the analog port to use.
+ * @param[out] status Error status variable. 0 on success.
  * @return Offset constant.
  */
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
@@ -237,9 +250,11 @@ int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
 /**
  *  Get the analog voltage from a raw value.
  *
- * @param analogPortHandle  Handle to the analog port the values were read from.
- * @param rawValue          The raw analog value
- * @return                  The voltage relating to the value
+ * @param[in] analogPortHandle  Handle to the analog port the values were read
+ *                              from.
+ * @param[in] rawValue          The raw analog value
+ * @param[out] status           Error status variable. 0 on success.
+ * @return The voltage relating to the value
  */
 double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t rawValue, int32_t* status);

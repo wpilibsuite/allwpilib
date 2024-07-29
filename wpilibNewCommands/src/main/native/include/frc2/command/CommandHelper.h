@@ -1,17 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+#include <concepts>
 #include <memory>
-#include <type_traits>
 #include <utility>
 
 #include "frc2/command/Command.h"
+#include "frc2/command/CommandPtr.h"
 
 namespace frc2 {
 
@@ -20,18 +18,19 @@ namespace frc2 {
  *
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
+ *
+ * This class is provided by the NewCommands VendorDep
  */
-template <typename Base, typename CRTP,
-          typename = std::enable_if_t<std::is_base_of_v<Command, Base>>>
+template <std::derived_from<Command> Base, typename CRTP>
 class CommandHelper : public Base {
   using Base::Base;
 
  public:
   CommandHelper() = default;
 
- protected:
-  std::unique_ptr<Command> TransferOwnership() && override {
-    return std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this)));
+  CommandPtr ToPtr() && override {
+    return CommandPtr(
+        std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this))));
   }
 };
 }  // namespace frc2

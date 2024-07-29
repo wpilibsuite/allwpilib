@@ -1,0 +1,137 @@
+apply from: "${rootDir}/shared/resources.gradle"
+
+apply plugin: 'c'
+
+ext {
+    nativeName = 'apriltag'
+    devMain = 'edu.wpi.first.apriltag.DevMain'
+    useJava = true
+    useCpp = true
+    sharedCvConfigs = [
+        apriltagDev : [],
+        apriltagTest: []]
+    staticCvConfigs = []
+
+    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'frc', project)
+
+    tasks.withType(CppCompile) {
+        dependsOn generateTask
+    }
+    splitSetup = {
+        it.sources {
+            resourcesCpp(CppSourceSet) {
+                source {
+                    srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
+                    include '*.cpp'
+                }
+            }
+            apriltagC(CSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/apriltag/src'
+                    include '**/*.c', '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/apriltag/include',
+                            'src/main/native/thirdparty/apriltag/include/common',
+                            'src/main/native/thirdparty/apriltag/src'
+                }
+            }
+        }
+    }
+}
+
+evaluationDependsOn(':wpimath')
+
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+apply from: "${rootDir}/shared/opencv.gradle"
+
+dependencies {
+    implementation project(':wpimath')
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs 'src/main/native/resources'
+        }
+    }
+}
+
+cppHeadersZip {
+    from('src/main/native/thirdparty/apriltag/include') {
+        into '/'
+    }
+}
+
+// Suppress sign-compare warnings
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) {
+        it.cCompiler.args.add("/wd2220")
+        it.cCompiler.args.add("/wd4005")
+        it.cCompiler.args.add("/wd4018")
+        it.cCompiler.args.add("/wd4244")
+        it.cCompiler.args.add("/wd4267")
+        it.cCompiler.args.add("/wd4996")
+    } else if (it.name.contains('osx')) {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.add("-Wno-gnu-zero-variadic-macro-arguments")
+        it.cCompiler.args.add("-Wno-uninitialized")
+        it.cCompiler.args.add("-Wno-sign-compare")
+        it.cCompiler.args.add("-Wno-type-limits")
+    } else {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.add("-Wno-gnu-zero-variadic-macro-arguments")
+        it.cCompiler.args.add("-Wno-maybe-uninitialized")
+        it.cCompiler.args.add("-Wno-sign-compare")
+        it.cCompiler.args.add("-Wno-type-limits")
+    }
+}
+
+model {
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/main/native/include',
+                            'src/main/native/thirdparty/apriltag/include',
+                            'src/main/native/thirdparty/apriltag/include/common'
+                }
+            }
+        }
+    }
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            it.cppCompiler.define 'WPILIB_EXPORTS'
+
+            if (it.component.name == "${nativeName}JNI") {
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+            } else {
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            }
+        }
+    }
+    tasks {
+        def c = $.components
+        def found = false
+        def systemArch = getCurrentArch()
+        c.each {
+            if (it in NativeExecutableSpec && it.name == "${nativeName}Dev") {
+                it.binaries.each {
+                    if (!found) {
+                        def arch = it.targetPlatform.name
+                        if (arch == systemArch) {
+                            def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
+
+                            found = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

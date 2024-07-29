@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -29,34 +26,34 @@ class SerialHelper {
   /**
    * Get the VISA name of a serial port.
    *
-   * @param port   the serial port index
-   * @param status status check
-   * @return       the VISA name
+   * @param[in] port    the serial port index
+   * @param[out] status status check
+   * @return the VISA name
    */
   std::string GetVISASerialPortName(HAL_SerialPort port, int32_t* status);
 
   /**
    * Get the OS name of a serial port.
    *
-   * @param port   the serial port index
-   * @param status status check
-   * @return       the OS name
+   * @param[in] port    the serial port index
+   * @param[out] status status check
+   * @return the OS name
    */
   std::string GetOSSerialPortName(HAL_SerialPort port, int32_t* status);
 
   /**
    * Get a vector of all serial port VISA names.
    *
-   * @param status status check
-   * @return       vector of serial port VISA names
+   * @param[out] status status check
+   * @return vector of serial port VISA names
    */
   std::vector<std::string> GetVISASerialPortList(int32_t* status);
 
   /**
    * Get a vector of all serial port OS names.
    *
-   * @param status status check
-   * @return       vector of serial port OS names
+   * @param[out] status status check
+   * @return vector of serial port OS names
    */
   std::vector<std::string> GetOSSerialPortList(int32_t* status);
 

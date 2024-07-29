@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/Demangle.h"
 
@@ -18,15 +15,16 @@
 
 namespace wpi {
 
-std::string Demangle(const Twine& mangledSymbol) {
+std::string Demangle(std::string_view mangledSymbol) {
   static wpi::mutex m;
   std::scoped_lock lock(m);
-  SmallString<128> buf;
+  SmallString<128> buf{mangledSymbol};
   char buffer[256];
-  DWORD sz =
-      UnDecorateSymbolName(mangledSymbol.toNullTerminatedStringRef(buf).data(),
-                           buffer, sizeof(buffer), UNDNAME_COMPLETE);
-  if (sz == 0) return mangledSymbol.str();
+  DWORD sz = UnDecorateSymbolName(buf.c_str(), buffer, sizeof(buffer),
+                                  UNDNAME_COMPLETE);
+  if (sz == 0) {
+    return std::string{mangledSymbol};
+  }
   return std::string(buffer, sz);
 }
 

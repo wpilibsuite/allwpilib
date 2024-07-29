@@ -1,19 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_PROPERTYIMPL_H_
 #define CSCORE_PROPERTYIMPL_H_
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <wpi/Signal.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 #include "cscore_c.h"
 
@@ -23,17 +19,17 @@ namespace cs {
 class PropertyImpl {
  public:
   PropertyImpl() = default;
-  explicit PropertyImpl(const wpi::Twine& name_);
-  PropertyImpl(const wpi::Twine& name_, CS_PropertyKind kind_, int step_,
+  explicit PropertyImpl(std::string_view name_);
+  PropertyImpl(std::string_view name_, CS_PropertyKind kind_, int step_,
                int defaultValue_, int value_);
-  PropertyImpl(const wpi::Twine& name_, CS_PropertyKind kind_, int minimum_,
+  PropertyImpl(std::string_view name_, CS_PropertyKind kind_, int minimum_,
                int maximum_, int step_, int defaultValue_, int value_);
   virtual ~PropertyImpl() = default;
   PropertyImpl(const PropertyImpl& oth) = delete;
   PropertyImpl& operator=(const PropertyImpl& oth) = delete;
 
   void SetValue(int v);
-  void SetValue(const wpi::Twine& v);
+  void SetValue(std::string_view v);
   void SetDefaultValue(int v);
 
   std::string name;

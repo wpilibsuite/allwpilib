@@ -1,26 +1,22 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <memory>
 
 #include <hal/Types.h>
+#include <units/time.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/CounterBase.h"
-#include "frc/ErrorBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalGlitchFilter;
-class SendableBuilder;
 class DMA;
 class DMASample;
 
@@ -34,10 +30,9 @@ class DMASample;
  * All counters will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Counter : public ErrorBase,
-                public CounterBase,
-                public Sendable,
-                public SendableHelper<Counter> {
+class Counter : public CounterBase,
+                public wpi::Sendable,
+                public wpi::SendableHelper<Counter> {
   friend class DMA;
   friend class DMASample;
 
@@ -82,7 +77,7 @@ class Counter : public ErrorBase,
    *
    * This is used if an existing digital input is to be shared by multiple other
    * objects such as encoders or if the Digital Source is not a Digital Input
-   * channel (such as an Analog Trigger).
+   * channel (such as an Analog %Trigger).
    *
    * The counter will start counting immediately.
    * @param source A pointer to the existing DigitalSource object. It will be
@@ -96,7 +91,7 @@ class Counter : public ErrorBase,
    *
    * This is used if an existing digital input is to be shared by multiple other
    * objects such as encoders or if the Digital Source is not a Digital Input
-   * channel (such as an Analog Trigger).
+   * channel (such as an Analog %Trigger).
    *
    * The counter will start counting immediately.
    *
@@ -348,6 +343,34 @@ class Counter : public ErrorBase,
 
   int GetFPGAIndex() const;
 
+  /**
+   * Set the distance per pulse for this counter. This sets the multiplier used
+   * to determine the distance driven based on the count value from the encoder.
+   * Set this value based on the Pulses per Revolution and factor in any gearing
+   * reductions. This distance can be in any units you like, linear or angular.
+   *
+   * @param distancePerPulse The scale factor that will be used to convert
+   * pulses to useful units.
+   */
+  void SetDistancePerPulse(double distancePerPulse);
+
+  /**
+   * Read the current scaled counter value. Read the value at this instant,
+   * scaled by the distance per pulse (defaults to 1).
+   *
+   * @return The distance since the last reset
+   */
+  double GetDistance() const;
+
+  /**
+   * Get the current rate of the Counter. Read the current rate of the counter
+   * accounting for the distance per pulse value. The default value for distance
+   * per pulse (1) yields units of pulses per second.
+   *
+   * @return The rate in units/sec
+   */
+  double GetRate() const;
+
   // CounterBase interface
   /**
    * Read the current counter value.
@@ -373,7 +396,7 @@ class Counter : public ErrorBase,
    *
    * @returns The period between the last two pulses in units of seconds.
    */
-  double GetPeriod() const override;
+  units::second_t GetPeriod() const override;
 
   /**
    * Set the maximum period where the device is still considered "moving".
@@ -385,7 +408,7 @@ class Counter : public ErrorBase,
    * @param maxPeriod The maximum period where the counted device is considered
    *                  moving in seconds.
    */
-  void SetMaxPeriod(double maxPeriod) override;
+  void SetMaxPeriod(units::second_t maxPeriod) final;
 
   /**
    * Select whether you want to continue updating the event timer output when
@@ -425,20 +448,24 @@ class Counter : public ErrorBase,
    */
   bool GetDirection() const override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
-  // Makes the counter count up.
+  /// Makes the counter count up.
   std::shared_ptr<DigitalSource> m_upSource;
 
-  // Makes the counter count down.
+  /// Makes the counter count down.
   std::shared_ptr<DigitalSource> m_downSource;
 
-  // The FPGA counter object
+  /// The FPGA counter object
   hal::Handle<HAL_CounterHandle> m_counter;
 
  private:
-  int m_index = 0;  // The index of this counter.
+  /// The index of this counter.
+  int m_index = 0;
+
+  /// Distance of travel for each tick.
+  double m_distancePerPulse = 1;
 
   friend class DigitalGlitchFilter;
 };

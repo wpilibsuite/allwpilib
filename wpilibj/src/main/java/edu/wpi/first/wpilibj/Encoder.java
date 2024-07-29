@@ -1,21 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
+
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.EncoderJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.util.AllocationException;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Class to read quadrature encoders.
@@ -30,11 +28,19 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable {
+public class Encoder implements CounterBase, Sendable, AutoCloseable {
+  /** Encoder indexing types. */
   public enum IndexingType {
-    kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
+    /** Reset while the signal is high. */
+    kResetWhileHigh(0),
+    /** Reset while the signal is low. */
+    kResetWhileLow(1),
+    /** Reset on falling edge of the signal. */
+    kResetOnFallingEdge(2),
+    /** Reset on rising edge of the signal. */
+    kResetOnRisingEdge(3);
 
-    @SuppressWarnings("MemberName")
+    /** IndexingType value. */
     public final int value;
 
     IndexingType(int value) {
@@ -42,27 +48,21 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
     }
   }
 
-  /**
-   * The a source.
-   */
-  @SuppressWarnings("MemberName")
+  /** The 'a' source. */
   protected DigitalSource m_aSource; // the A phase of the quad encoder
-  /**
-   * The b source.
-   */
-  @SuppressWarnings("MemberName")
+
+  /** The 'b' source. */
   protected DigitalSource m_bSource; // the B phase of the quad encoder
-  /**
-   * The index source.
-   */
+
+  /** The index source. */
   protected DigitalSource m_indexSource; // Index on some encoders
+
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;
-  private PIDSourceType m_pidSource;
+  private final EncodingType m_encodingType;
 
-  private int m_encoder; // the HAL encoder object
-
+  int m_encoder; // the HAL encoder object
 
   /**
    * Common initialization code for Encoders. This code allocates resources for Encoders and is
@@ -73,11 +73,14 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * @param reverseDirection If true, counts down instead of up (this is all relative)
    */
   private void initEncoder(boolean reverseDirection, final EncodingType type) {
-    m_encoder = EncoderJNI.initializeEncoder(m_aSource.getPortHandleForRouting(),
-        m_aSource.getAnalogTriggerTypeForRouting(), m_bSource.getPortHandleForRouting(),
-        m_bSource.getAnalogTriggerTypeForRouting(), reverseDirection, type.value);
-
-    m_pidSource = PIDSourceType.kDisplacement;
+    m_encoder =
+        EncoderJNI.initializeEncoder(
+            m_aSource.getPortHandleForRouting(),
+            m_aSource.getAnalogTriggerTypeForRouting(),
+            m_bSource.getPortHandleForRouting(),
+            m_bSource.getAnalogTriggerTypeForRouting(),
+            reverseDirection,
+            type.value);
 
     int fpgaIndex = getFPGAIndex();
     HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
@@ -89,17 +92,17 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA         The a channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
-   * @param channelB         The b channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
+   * @param channelA The 'a' channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
+   * @param channelB The 'b' channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
+   *     if necessary so forward represents positive values.
    */
   public Encoder(final int channelA, final int channelB, boolean reverseDirection) {
     this(channelA, channelB, reverseDirection, EncodingType.k4X);
   }
 
   /**
-   * Encoder constructor. Construct a Encoder given a and b channels.
+   * Encoder constructor. Construct an Encoder given a and b channels.
    *
    * <p>The encoder will start counting immediately.
    *
@@ -111,23 +114,26 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   }
 
   /**
-   * Encoder constructor. Construct a Encoder given a and b channels.
+   * Encoder constructor. Construct an Encoder given a and b channels.
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA         The a channel digital input channel.
-   * @param channelB         The b channel digital input channel.
+   * @param channelA The a channel digital input channel.
+   * @param channelB The b channel digital input channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
-   * @param encodingType     either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
-   *                         selected, then an encoder FPGA object is used and the returned counts
-   *                         will be 4x the encoder spec'd value since all rising and falling edges
-   *                         are counted. If 1X or 2X are selected then a m_counter object will be
-   *                         used and the returned value will either exactly match the spec'd count
-   *                         or be double (2x) the spec'd count.
+   *     if necessary so forward represents positive values.
+   * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+   *     selected, then an encoder FPGA object is used and the returned counts will be 4x the
+   *     encoder spec'd value since all rising and falling edges are counted. If 1X or 2X are
+   *     selected, then a counter object will be used and the returned value will either exactly
+   *     match the spec'd count or be double (2x) the spec'd count.
    */
-  public Encoder(final int channelA, final int channelB, boolean reverseDirection,
-                 final EncodingType encodingType) {
+  @SuppressWarnings("this-escape")
+  public Encoder(
+      final int channelA,
+      final int channelB,
+      boolean reverseDirection,
+      final EncodingType encodingType) {
     requireNonNullParam(encodingType, "encodingType", "Encoder");
 
     m_allocatedA = true;
@@ -135,25 +141,27 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
     m_allocatedI = false;
     m_aSource = new DigitalInput(channelA);
     m_bSource = new DigitalInput(channelB);
+    m_encodingType = encodingType;
     SendableRegistry.addChild(this, m_aSource);
     SendableRegistry.addChild(this, m_bSource);
     initEncoder(reverseDirection, encodingType);
   }
 
   /**
-   * Encoder constructor. Construct a Encoder given a and b channels. Using an index pulse forces 4x
-   * encoding
+   * Encoder constructor. Construct an Encoder given a and b channels. Using an index pulse forces
+   * 4x encoding
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA         The a channel digital input channel.
-   * @param channelB         The b channel digital input channel.
-   * @param indexChannel     The index channel digital input channel.
+   * @param channelA The a channel digital input channel.
+   * @param channelB The b channel digital input channel.
+   * @param indexChannel The index channel digital input channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
+   *     if necessary so forward represents positive values.
    */
-  public Encoder(final int channelA, final int channelB, final int indexChannel,
-                 boolean reverseDirection) {
+  @SuppressWarnings("this-escape")
+  public Encoder(
+      final int channelA, final int channelB, final int indexChannel, boolean reverseDirection) {
     this(channelA, channelB, reverseDirection);
     m_allocatedI = true;
     m_indexSource = new DigitalInput(indexChannel);
@@ -162,13 +170,13 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   }
 
   /**
-   * Encoder constructor. Construct a Encoder given a and b channels. Using an index pulse forces 4x
-   * encoding
+   * Encoder constructor. Construct an Encoder given a and b channels. Using an index pulse forces
+   * 4x encoding
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA     The a channel digital input channel.
-   * @param channelB     The b channel digital input channel.
+   * @param channelA The a channel digital input channel.
+   * @param channelB The b channel digital input channel.
    * @param indexChannel The index channel digital input channel.
    */
   public Encoder(final int channelA, final int channelB, final int indexChannel) {
@@ -176,55 +184,58 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   }
 
   /**
-   * Encoder constructor. Construct a Encoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The Encoder class will not allocate the
+   * Encoder constructor. Construct an Encoder given a and b channels as digital inputs. This is
+   * used in the case where the digital inputs are shared. The Encoder class will not allocate the
    * digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param sourceA          The source that should be used for the a channel.
-   * @param sourceB          the source that should be used for the b channel.
+   * @param sourceA The source that should be used for the 'a' channel.
+   * @param sourceB the source that should be used for the 'b' channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
+   *     if necessary so forward represents positive values.
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, boolean reverseDirection) {
     this(sourceA, sourceB, reverseDirection, EncodingType.k4X);
   }
 
   /**
-   * Encoder constructor. Construct a Encoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The Encoder class will not allocate the
+   * Encoder constructor. Construct an Encoder given a and b channels as digital inputs. This is
+   * used in the case where the digital inputs are shared. The Encoder class will not allocate the
    * digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param sourceA The source that should be used for the a channel.
-   * @param sourceB the source that should be used for the b channel.
+   * @param sourceA The source that should be used for the 'a' channel.
+   * @param sourceB the source that should be used for the 'b' channel.
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB) {
     this(sourceA, sourceB, false);
   }
 
   /**
-   * Encoder constructor. Construct a Encoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The Encoder class will not allocate the
+   * Encoder constructor. Construct an Encoder given a and b channels as digital inputs. This is
+   * used in the case where the digital inputs are shared. The Encoder class will not allocate the
    * digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param sourceA          The source that should be used for the a channel.
-   * @param sourceB          the source that should be used for the b channel.
+   * @param sourceA The source that should be used for the 'a' channel.
+   * @param sourceB the source that should be used for the 'b' channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
-   * @param encodingType     either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
-   *                         selected, then an encoder FPGA object is used and the returned counts
-   *                         will be 4x the encoder spec'd value since all rising and falling edges
-   *                         are counted. If 1X or 2X are selected then a m_counter object will be
-   *                         used and the returned value will either exactly match the spec'd count
-   *                         or be double (2x) the spec'd count.
+   *     if necessary so forward represents positive values.
+   * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+   *     selected, then an encoder FPGA object is used and the returned counts will be 4x the
+   *     encoder spec'd value since all rising and falling edges are counted. If 1X or 2X are
+   *     selected then a counter object will be used and the returned value will either exactly
+   *     match the spec'd count or be double (2x) the spec'd count.
    */
-  public Encoder(DigitalSource sourceA, DigitalSource sourceB, boolean reverseDirection,
-                 final EncodingType encodingType) {
+  @SuppressWarnings("this-escape")
+  public Encoder(
+      DigitalSource sourceA,
+      DigitalSource sourceB,
+      boolean reverseDirection,
+      final EncodingType encodingType) {
     requireNonNullParam(sourceA, "sourceA", "Encoder");
     requireNonNullParam(sourceB, "sourceB", "Encoder");
     requireNonNullParam(encodingType, "encodingType", "Encoder");
@@ -232,26 +243,30 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
     m_allocatedA = false;
     m_allocatedB = false;
     m_allocatedI = false;
+    m_encodingType = encodingType;
     m_aSource = sourceA;
     m_bSource = sourceB;
     initEncoder(reverseDirection, encodingType);
   }
 
   /**
-   * Encoder constructor. Construct a Encoder given a, b and index channels as digital inputs. This
+   * Encoder constructor. Construct an Encoder given a, b and index channels as digital inputs. This
    * is used in the case where the digital inputs are shared. The Encoder class will not allocate
    * the digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param sourceA          The source that should be used for the a channel.
-   * @param sourceB          the source that should be used for the b channel.
-   * @param indexSource      the source that should be used for the index channel.
+   * @param sourceA The source that should be used for the 'a' channel.
+   * @param sourceB the source that should be used for the 'b' channel.
+   * @param indexSource the source that should be used for the index channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
+   *     if necessary so forward represents positive values.
    */
-  public Encoder(DigitalSource sourceA, DigitalSource sourceB, DigitalSource indexSource,
-                 boolean reverseDirection) {
+  public Encoder(
+      DigitalSource sourceA,
+      DigitalSource sourceB,
+      DigitalSource indexSource,
+      boolean reverseDirection) {
     this(sourceA, sourceB, reverseDirection);
     m_allocatedI = false;
     m_indexSource = indexSource;
@@ -259,14 +274,14 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   }
 
   /**
-   * Encoder constructor. Construct a Encoder given a, b and index channels as digital inputs. This
+   * Encoder constructor. Construct an Encoder given a, b and index channels as digital inputs. This
    * is used in the case where the digital inputs are shared. The Encoder class will not allocate
    * the digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param sourceA     The source that should be used for the a channel.
-   * @param sourceB     the source that should be used for the b channel.
+   * @param sourceA The source that should be used for the 'a' channel.
+   * @param sourceB the source that should be used for the 'b' channel.
    * @param indexSource the source that should be used for the index channel.
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, DigitalSource indexSource) {
@@ -278,7 +293,6 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    *
    * @return The Encoder's FPGA index.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public int getFPGAIndex() {
     return EncoderJNI.getEncoderFPGAIndex(m_encoder);
   }
@@ -336,9 +350,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
     return EncoderJNI.getEncoder(m_encoder);
   }
 
-  /**
-   * Reset the Encoder distance to zero. Resets the current count to zero on the encoder.
-   */
+  /** Reset the Encoder distance to zero. Resets the current count to zero on the encoder. */
   @Override
   public void reset() {
     EncoderJNI.resetEncoder(m_encoder);
@@ -367,9 +379,12 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * compensates for the decoding type.
    *
    * @param maxPeriod The maximum time between rising and falling edges before the FPGA will report
-   *                  the device stopped. This is expressed in seconds.
+   *     the device stopped. This is expressed in seconds.
+   * @deprecated Use setMinRate() in favor of this method. This takes unscaled periods and
+   *     setMinRate() scales using value from setDistancePerPulse().
    */
   @Override
+  @Deprecated
   public void setMaxPeriod(double maxPeriod) {
     EncoderJNI.setEncoderMaxPeriod(m_encoder, maxPeriod);
   }
@@ -420,7 +435,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * Set the minimum rate of the device before the hardware reports it stopped.
    *
    * @param minRate The minimum rate. The units are in distance per second as scaled by the value
-   *                from setDistancePerPulse().
+   *     from setDistancePerPulse().
    */
   public void setMinRate(double minRate) {
     EncoderJNI.setEncoderMinRate(m_encoder, minRate);
@@ -481,45 +496,12 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   }
 
   /**
-   * Set which parameter of the encoder you are using as a process control variable. The encoder
-   * class supports the rate and distance parameters.
-   *
-   * @param pidSource An enum to select the parameter.
-   */
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Implement the PIDSource interface.
-   *
-   * @return The current value of the selected source parameter.
-   */
-  @Override
-  public double pidGet() {
-    switch (m_pidSource) {
-      case kDisplacement:
-        return getDistance();
-      case kRate:
-        return getRate();
-      default:
-        return 0.0;
-    }
-  }
-
-  /**
    * Set the index source for the encoder. When this source is activated, the encoder count
    * automatically resets.
    *
    * @param channel A DIO channel to set as the encoder index
    */
-  public void setIndexSource(int channel) {
+  public final void setIndexSource(int channel) {
     setIndexSource(channel, IndexingType.kResetOnRisingEdge);
   }
 
@@ -529,7 +511,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    *
    * @param source A digital source to set as the encoder index
    */
-  public void setIndexSource(DigitalSource source) {
+  public final void setIndexSource(DigitalSource source) {
     setIndexSource(source, IndexingType.kResetOnRisingEdge);
   }
 
@@ -538,9 +520,9 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * resets.
    *
    * @param channel A DIO channel to set as the encoder index
-   * @param type    The state that will cause the encoder to reset
+   * @param type The state that will cause the encoder to reset
    */
-  public void setIndexSource(int channel, IndexingType type) {
+  public final void setIndexSource(int channel, IndexingType type) {
     if (m_allocatedI) {
       throw new AllocationException("Digital Input for Indexing already allocated");
     }
@@ -555,11 +537,14 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * resets.
    *
    * @param source A digital source to set as the encoder index
-   * @param type   The state that will cause the encoder to reset
+   * @param type The state that will cause the encoder to reset
    */
-  public void setIndexSource(DigitalSource source, IndexingType type) {
-    EncoderJNI.setEncoderIndexSource(m_encoder, source.getPortHandleForRouting(),
-        source.getAnalogTriggerTypeForRouting(), type.value);
+  public final void setIndexSource(DigitalSource source, IndexingType type) {
+    EncoderJNI.setEncoderIndexSource(
+        m_encoder,
+        source.getPortHandleForRouting(),
+        source.getAnalogTriggerTypeForRouting(),
+        type.value);
   }
 
   /**
@@ -569,6 +554,19 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    */
   public void setSimDevice(SimDevice device) {
     EncoderJNI.setEncoderSimDevice(m_encoder, device.getNativeHandle());
+  }
+
+  /**
+   * Gets the decoding scale factor for scaling raw values to full counts.
+   *
+   * @return decoding scale factor
+   */
+  public double getDecodingScaleFactor() {
+    return switch (m_encodingType) {
+      case k1X -> 1.0;
+      case k2X -> 0.5;
+      case k4X -> 0.25;
+    };
   }
 
   @Override

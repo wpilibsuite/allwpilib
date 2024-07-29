@@ -1,18 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <hal/Types.h>
-#include <units/units.h>
-#include <wpi/deprecated.h>
+#include <chrono>
+#include <functional>
+#include <utility>
+#include <vector>
 
-#include "frc/ErrorBase.h"
+#include <hal/Types.h>
+#include <units/math.h>
+#include <units/time.h>
+#include <wpi/priority_queue.h>
+
 #include "frc/IterativeRobotBase.h"
+#include "frc/RobotController.h"
 
 namespace frc {
 
@@ -25,9 +28,10 @@ namespace frc {
  * Periodic() functions from the base class are called on an interval by a
  * Notifier instance.
  */
-class TimedRobot : public IterativeRobotBase, public ErrorBase {
+class TimedRobot : public IterativeRobotBase {
  public:
-  static constexpr units::second_t kDefaultPeriod = 20_ms;
+  /// Default loop period.
+  static constexpr auto kDefaultPeriod = 20_ms;
 
   /**
    * Provide an alternate "main loop" via StartCompetition().
@@ -38,19 +42,6 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
    * Ends the main loop in StartCompetition().
    */
   void EndCompetition() override;
-
-  /**
-   * Get the time period between calls to Periodic() functions.
-   */
-  units::second_t GetPeriod() const;
-
-  /**
-   * Constructor for TimedRobot.
-   *
-   * @param period Period in seconds.
-   */
-  WPI_DEPRECATED("Use constructor with unit-safety instead.")
-  explicit TimedRobot(double period);
 
   /**
    * Constructor for TimedRobot.
@@ -64,16 +55,56 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   TimedRobot(TimedRobot&&) = default;
   TimedRobot& operator=(TimedRobot&&) = default;
 
- private:
-  hal::Handle<HAL_NotifierHandle> m_notifier;
-
-  // The absolute expiration time
-  units::second_t m_expirationTime{0};
-
   /**
-   * Update the HAL alarm time.
+   * Add a callback to run at a specific period with a starting time offset.
+   *
+   * This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
+   * run synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param period   The period at which to run the callback.
+   * @param offset   The offset from the common starting time. This is useful
+   *                 for scheduling a callback in a different timeslot relative
+   *                 to TimedRobot.
    */
-  void UpdateAlarm();
+  void AddPeriodic(std::function<void()> callback, units::second_t period,
+                   units::second_t offset = 0_s);
+
+ private:
+  class Callback {
+   public:
+    std::function<void()> func;
+    std::chrono::microseconds period;
+    std::chrono::microseconds expirationTime;
+
+    /**
+     * Construct a callback container.
+     *
+     * @param func      The callback to run.
+     * @param startTime The common starting point for all callback scheduling.
+     * @param period    The period at which to run the callback.
+     * @param offset    The offset from the common starting time.
+     */
+    Callback(std::function<void()> func, std::chrono::microseconds startTime,
+             std::chrono::microseconds period, std::chrono::microseconds offset)
+        : func{std::move(func)},
+          period{period},
+          expirationTime(
+              startTime + offset + period +
+              (std::chrono::microseconds{frc::RobotController::GetFPGATime()} -
+               startTime) /
+                  period * period) {}
+
+    bool operator>(const Callback& rhs) const {
+      return expirationTime > rhs.expirationTime;
+    }
+  };
+
+  hal::Handle<HAL_NotifierHandle> m_notifier;
+  std::chrono::microseconds m_startTime;
+
+  wpi::priority_queue<Callback, std::vector<Callback>, std::greater<Callback>>
+      m_callbacks;
 };
 
 }  // namespace frc

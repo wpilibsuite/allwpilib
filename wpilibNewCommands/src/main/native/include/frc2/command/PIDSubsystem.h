@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -16,6 +13,8 @@ namespace frc2 {
  * A subsystem that uses a PIDController to control an output.  The controller
  * is run synchronously from the subsystem's periodic() method.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see PIDController
  */
 class PIDSubsystem : public SubsystemBase {
@@ -26,7 +25,8 @@ class PIDSubsystem : public SubsystemBase {
    * @param controller the PIDController to use
    * @param initialPosition the initial setpoint of the subsystem
    */
-  explicit PIDSubsystem(PIDController controller, double initialPosition = 0);
+  explicit PIDSubsystem(frc::PIDController controller,
+                        double initialPosition = 0);
 
   void Periodic() override;
 
@@ -36,6 +36,13 @@ class PIDSubsystem : public SubsystemBase {
    * @param setpoint the setpoint for the subsystem
    */
   void SetSetpoint(double setpoint);
+
+  /**
+   * Gets the setpoint for the subsystem.
+   *
+   * @return the setpoint for the subsystem
+   */
+  double GetSetpoint() const;
 
   /**
    * Enables the PID control.  Resets the controller.
@@ -59,10 +66,13 @@ class PIDSubsystem : public SubsystemBase {
    *
    * @return The controller.
    */
-  PIDController& GetController();
+  frc::PIDController& GetController();
 
  protected:
-  PIDController m_controller;
+  /// PID controller.
+  frc::PIDController m_controller;
+
+  /// Whether PID controller output is enabled.
   bool m_enabled{false};
 
   /**
@@ -79,8 +89,5 @@ class PIDSubsystem : public SubsystemBase {
    * @param setpoint the setpoint of the PIDController (for feedforward)
    */
   virtual void UseOutput(double output, double setpoint) = 0;
-
- private:
-  double m_setpoint{0};
 };
 }  // namespace frc2

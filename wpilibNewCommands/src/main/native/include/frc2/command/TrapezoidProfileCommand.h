@@ -1,32 +1,30 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <functional>
-#include <initializer_list>
 
+#include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <wpi/ArrayRef.h>
 
-#include "frc2/Timer.h"
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
+#include "frc2/command/Requirements.h"
 
 namespace frc2 {
 /**
  * A command that runs a TrapezoidProfile.  Useful for smoothly controlling
  * mechanism motion.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see TrapezoidProfile
  */
 template <class Distance>
 class TrapezoidProfileCommand
-    : public CommandHelper<CommandBase, TrapezoidProfileCommand<Distance>> {
+    : public CommandHelper<Command, TrapezoidProfileCommand<Distance>> {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
@@ -38,48 +36,42 @@ class TrapezoidProfileCommand
    * Creates a new TrapezoidProfileCommand that will execute the given
    * TrapezoidalProfile. Output will be piped to the provided consumer function.
    *
-   * @param profile The motion profile to execute.
-   * @param output  The consumer for the profile output.
+   * @param profile      The motion profile to execute.
+   * @param output       The consumer for the profile output.
+   * @param goal The supplier for the desired state
+   * @param currentState The current state
+   * @param requirements The list of requirements.
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
-                          std::initializer_list<Subsystem*> requirements)
-      : m_profile(profile), m_output(output) {
+                          std::function<State()> goal,
+                          std::function<State()> currentState,
+                          Requirements requirements = {})
+      : m_profile(profile),
+        m_output(output),
+        m_goal(goal),
+        m_currentState(currentState) {
     this->AddRequirements(requirements);
   }
 
-  /**
-   * Creates a new TrapezoidProfileCommand that will execute the given
-   * TrapezoidalProfile. Output will be piped to the provided consumer function.
-   *
-   * @param profile The motion profile to execute.
-   * @param output  The consumer for the profile output.
-   */
-  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
-                          std::function<void(State)> output,
-                          wpi::ArrayRef<Subsystem*> requirements = {})
-      : m_profile(profile), m_output(output) {
-    this->AddRequirements(requirements);
-  }
+  void Initialize() override { m_timer.Restart(); }
 
-  void Initialize() override {
-    m_timer.Reset();
-    m_timer.Start();
+  void Execute() override {
+    m_output(m_profile.Calculate(m_timer.Get(), m_currentState(), m_goal()));
   }
-
-  void Execute() override { m_output(m_profile.Calculate(m_timer.Get())); }
 
   void End(bool interrupted) override { m_timer.Stop(); }
 
   bool IsFinished() override {
-    return m_timer.HasPeriodPassed(m_profile.TotalTime());
+    return m_timer.HasElapsed(m_profile.TotalTime());
   }
 
  private:
   frc::TrapezoidProfile<Distance> m_profile;
   std::function<void(State)> m_output;
-
-  Timer m_timer;
+  std::function<State()> m_goal;
+  std::function<State()> m_currentState;
+  frc::Timer m_timer;
 };
 
 }  // namespace frc2

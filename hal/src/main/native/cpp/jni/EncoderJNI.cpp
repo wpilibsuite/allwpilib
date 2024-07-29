@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
@@ -14,7 +11,7 @@
 #include "hal/Encoder.h"
 #include "hal/Errors.h"
 
-using namespace frc;
+using namespace hal;
 
 extern "C" {
 
@@ -270,10 +267,6 @@ Java_edu_wpi_first_hal_EncoderJNI_setEncoderSamplesToAverage
 {
   int32_t status = 0;
   HAL_SetEncoderSamplesToAverage((HAL_EncoderHandle)id, value, &status);
-  if (status == PARAMETER_OUT_OF_RANGE) {
-    ThrowBoundaryException(env, value, 1, 127);
-    return;
-  }
   CheckStatus(env, status);
 }
 

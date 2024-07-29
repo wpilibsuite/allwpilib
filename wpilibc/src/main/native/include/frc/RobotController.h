@@ -1,13 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <stdint.h>
+
+#include <string>
+
+#include <units/temperature.h>
+#include <units/voltage.h>
 
 namespace frc {
 
@@ -18,6 +20,8 @@ struct CANStatus {
   int receiveErrorCount;
   int transmitErrorCount;
 };
+
+enum RadioLEDState { kOff = 0, kGreen = 1, kRed = 2, kOrange = 3 };
 
 class RobotController {
  public:
@@ -44,6 +48,31 @@ class RobotController {
   static int64_t GetFPGARevision();
 
   /**
+   * Return the serial number of the roboRIO.
+   *
+   * @return The serial number of the roboRIO.
+   */
+  static std::string GetSerialNumber();
+
+  /**
+   * Return the comments from the roboRIO web interface.
+   *
+   * The comments string is cached after the first call to this function on the
+   * RoboRIO - restart the robot code to reload the comments string after
+   * changing it in the web interface.
+   *
+   * @return The comments from the roboRIO web interface.
+   */
+  static std::string GetComments();
+
+  /**
+   * Returns the team number configured for the robot controller.
+   *
+   * @return team number, or 0 if not found.
+   */
+  static int32_t GetTeamNumber();
+
+  /**
    * Read the microsecond-resolution timer on the FPGA.
    *
    * @return The current time in microseconds according to the FPGA (since FPGA
@@ -54,9 +83,20 @@ class RobotController {
   /**
    * Get the state of the "USER" button on the roboRIO.
    *
+   * @warning the User Button is used to stop user programs from automatically
+   * loading if it is held for more then 5 seconds. Because of this, it's not
+   * recommended to be used by teams for any other purpose.
+   *
    * @return True if the button is currently pressed down
    */
   static bool GetUserButton();
+
+  /**
+   * Read the battery voltage.
+   *
+   * @return The battery voltage in Volts.
+   */
+  static units::volt_t GetBatteryVoltage();
 
   /**
    * Check if the FPGA outputs are enabled.
@@ -74,6 +114,19 @@ class RobotController {
    * @return True if the system is browned out
    */
   static bool IsBrownedOut();
+
+  /**
+   * Gets the current state of the Robot Signal Light (RSL)
+   * @return The current state of the RSL- true if on, false if off
+   */
+  static bool GetRSLState();
+
+  /**
+   * Gets if the system time is valid.
+   *
+   * @return True if the system time is valid, false otherwise
+   */
+  static bool IsSystemTimeValid();
 
   /**
    * Get the input voltage to the robot controller.
@@ -104,9 +157,16 @@ class RobotController {
   static double GetCurrent3V3();
 
   /**
-   * Get the enabled state of the 3.3V rail. The rail may be disabled due to a
-   * controller brownout, a short circuit on the rail, or controller
-   * over-voltage.
+   * Enables or disables the 3.3V rail.
+   *
+   * @param enabled whether to enable the 3.3V rail.
+   */
+  static void SetEnabled3V3(bool enabled);
+
+  /**
+   * Get the enabled state of the 3.3V rail. The rail may be disabled due to
+   * calling SetEnabled3V3(), a controller brownout, a short circuit on the
+   * rail, or controller over-voltage.
    *
    * @return The controller 3.3V rail enabled value. True for enabled.
    */
@@ -135,9 +195,16 @@ class RobotController {
   static double GetCurrent5V();
 
   /**
-   * Get the enabled state of the 5V rail. The rail may be disabled due to a
-   * controller brownout, a short circuit on the rail, or controller
-   * over-voltage.
+   * Enables or disables the 5V rail.
+   *
+   * @param enabled whether to enable the 5V rail.
+   */
+  static void SetEnabled5V(bool enabled);
+
+  /**
+   * Get the enabled state of the 5V rail. The rail may be disabled due to
+   * calling SetEnabled5V(), a controller brownout, a short circuit on the rail,
+   * or controller over-voltage.
    *
    * @return The controller 5V rail enabled value. True for enabled.
    */
@@ -166,9 +233,16 @@ class RobotController {
   static double GetCurrent6V();
 
   /**
-   * Get the enabled state of the 6V rail. The rail may be disabled due to a
-   * controller brownout, a short circuit on the rail, or controller
-   * over-voltage.
+   * Enables or disables the 6V rail.
+   *
+   * @param enabled whether to enable the 6V rail.
+   */
+  static void SetEnabled6V(bool enabled);
+
+  /**
+   * Get the enabled state of the 6V rail. The rail may be disabled due to
+   * calling SetEnabled6V(), a controller brownout, a short circuit on the rail,
+   * or controller over-voltage.
    *
    * @return The controller 6V rail enabled value. True for enabled.
    */
@@ -182,6 +256,52 @@ class RobotController {
    */
   static int GetFaultCount6V();
 
+  /**
+   * Get the current brownout voltage setting.
+   *
+   * @return The brownout voltage
+   */
+  static units::volt_t GetBrownoutVoltage();
+
+  /**
+   * Set the voltage the roboRIO will brownout and disable all outputs.
+   *
+   * Note that this only does anything on the roboRIO 2.
+   * On the roboRIO it is a no-op.
+   *
+   * @param brownoutVoltage The brownout voltage
+   */
+  static void SetBrownoutVoltage(units::volt_t brownoutVoltage);
+
+  /**
+   * Get the current CPU temperature.
+   *
+   * @return current CPU temperature
+   */
+  static units::celsius_t GetCPUTemp();
+
+  /**
+   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so
+   * this function should not be called multiple times per loop cycle to avoid
+   * overruns.
+   * @param state The state to set the LED to.
+   */
+  static void SetRadioLEDState(RadioLEDState state);
+
+  /**
+   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so
+   * this function should not be called multiple times per loop cycle to avoid
+   * overruns.
+   *
+   * @return The state of the LED.
+   */
+  static RadioLEDState GetRadioLEDState();
+
+  /**
+   * Get the current status of the CAN bus.
+   *
+   * @return The status of the CAN bus
+   */
   static CANStatus GetCANStatus();
 };
 

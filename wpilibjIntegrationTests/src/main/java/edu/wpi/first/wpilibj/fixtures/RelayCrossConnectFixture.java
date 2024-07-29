@@ -1,18 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.fixtures;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Relay;
 
-/**
- * A connection between a {@link Relay} and two {@link DigitalInput DigitalInputs}.
- */
+/** A connection between a {@link Relay} and two {@link DigitalInput DigitalInputs}. */
 public abstract class RelayCrossConnectFixture implements ITestFixture {
   private DigitalInput m_inputOne;
   private DigitalInput m_inputTwo;
@@ -20,7 +15,6 @@ public abstract class RelayCrossConnectFixture implements ITestFixture {
 
   private boolean m_initialized = false;
   private boolean m_freed = false;
-
 
   protected abstract Relay giveRelay();
 
@@ -60,9 +54,8 @@ public abstract class RelayCrossConnectFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
    */
   @Override
-  public boolean setup() {
+  public void setup() {
     initialize();
-    return true;
   }
 
   /*
@@ -71,9 +64,8 @@ public abstract class RelayCrossConnectFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
    */
   @Override
-  public boolean reset() {
+  public void reset() {
     initialize();
-    return true;
   }
 
   /*
@@ -82,16 +74,17 @@ public abstract class RelayCrossConnectFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
    */
   @Override
-  public boolean teardown() {
+  public void teardown() {
     if (!m_freed) {
       m_relay.close();
       m_inputOne.close();
       m_inputTwo.close();
       m_freed = true;
     } else {
-      throw new RuntimeException("You attempted to free the "
-          + RelayCrossConnectFixture.class.getSimpleName() + " multiple times");
+      throw new RuntimeException(
+          "You attempted to free the "
+              + RelayCrossConnectFixture.class.getSimpleName()
+              + " multiple times");
     }
-    return true;
   }
 }

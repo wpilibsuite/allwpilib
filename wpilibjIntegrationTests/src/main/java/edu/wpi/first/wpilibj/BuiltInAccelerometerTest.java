@@ -1,26 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.logging.Logger;
+import static org.junit.Assert.assertEquals;
 
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-
-import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class BuiltInAccelerometerTest extends AbstractComsSetup {
@@ -28,7 +22,7 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
   private static final double kAccelerationTolerance = 0.1;
   private final BuiltInAccelerometer m_accelerometer;
 
-  public BuiltInAccelerometerTest(Accelerometer.Range range) {
+  public BuiltInAccelerometerTest(BuiltInAccelerometer.Range range) {
     m_accelerometer = new BuiltInAccelerometer(range);
   }
 
@@ -41,13 +35,15 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
     Timer.delay(1.0);
   }
 
-  /**
-   * Test with all valid ranges to make sure unpacking is always done correctly.
-   */
+  /** Test with all valid ranges to make sure unpacking is always done correctly. */
   @Parameters
-  public static Collection<Accelerometer.Range[]> generateData() {
-    return Arrays.asList(new Accelerometer.Range[][]{{Accelerometer.Range.k2G},
-        {Accelerometer.Range.k4G}, {Accelerometer.Range.k8G}});
+  public static Collection<BuiltInAccelerometer.Range[]> generateData() {
+    return List.of(
+        new BuiltInAccelerometer.Range[][] {
+          {BuiltInAccelerometer.Range.k2G},
+          {BuiltInAccelerometer.Range.k4G},
+          {BuiltInAccelerometer.Range.k8G}
+        });
   }
 
   @Override
@@ -65,5 +61,4 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
     assertEquals(1.0, m_accelerometer.getY(), kAccelerationTolerance);
     assertEquals(0.0, m_accelerometer.getZ(), kAccelerationTolerance);
   }
-
 }

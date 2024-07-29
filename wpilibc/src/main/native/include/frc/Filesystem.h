@@ -1,34 +1,30 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <wpi/SmallVector.h>
+#include <string>
 
-namespace frc {
 /** WPILib FileSystem namespace */
-namespace filesystem {
+namespace frc::filesystem {
 
 /**
  * Obtains the current working path that the program was launched with.
  * This is analogous to the `pwd` command on unix.
  *
- * @param result The result of the current working path lookup.
+ * @return The result of the current working path lookup.
  */
-void GetLaunchDirectory(wpi::SmallVectorImpl<char>& result);
+std::string GetLaunchDirectory();
 
 /**
  * Obtains the operating directory of the program. On the roboRIO, this
  * is /home/lvuser. In simulation, it is where the simulation was launched
  * from (`pwd`).
  *
- * @param result The result of the operating directory lookup.
+ * @return The result of the operating directory lookup.
  */
-void GetOperatingDirectory(wpi::SmallVectorImpl<char>& result);
+std::string GetOperatingDirectory();
 
 /**
  * Obtains the deploy directory of the program, which is the remote location
@@ -36,9 +32,8 @@ void GetOperatingDirectory(wpi::SmallVectorImpl<char>& result);
  * /home/lvuser/deploy. In simulation, it is where the simulation was launched
  * from, in the subdirectory "src/main/deploy" (`pwd`/src/main/deploy).
  *
- * @param result The result of the operating directory lookup
+ * @return The result of the operating directory lookup
  */
-void GetDeployDirectory(wpi::SmallVectorImpl<char>& result);
+std::string GetDeployDirectory();
 
-}  // namespace filesystem
-}  // namespace frc
+}  // namespace frc::filesystem

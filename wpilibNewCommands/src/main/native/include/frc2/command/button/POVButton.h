@@ -1,23 +1,23 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+
 #include <frc/GenericHID.h>
 
-#include "Button.h"
+#include "Trigger.h"
 
 namespace frc2 {
 /**
  * A class used to bind command scheduling to joystick POV presses.  Can be
  * composed with other buttons with the operators in Trigger.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see Trigger
  */
-class POVButton : public Button {
+class POVButton : public Trigger {
  public:
   /**
    * Creates a POVButton that commands can be bound to.
@@ -27,7 +27,7 @@ class POVButton : public Button {
    * @param povNumber The number of the POV on the joystick.
    */
   POVButton(frc::GenericHID* joystick, int angle, int povNumber = 0)
-      : Button([joystick, angle, povNumber] {
+      : Trigger([joystick, angle, povNumber] {
           return joystick->GetPOV(povNumber) == angle;
         }) {}
 };

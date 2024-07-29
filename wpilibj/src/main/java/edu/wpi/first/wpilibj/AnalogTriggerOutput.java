@@ -1,18 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
+
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 /**
  * Class to represent a specific output from an analog trigger. This class is used to get the
@@ -24,11 +22,11 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * upper limit, then the output is true. If the analog value is in between, then the trigger output
  * state maintains its most recent value.
  *
- * <p>The InWindow output indicates whether or not the analog signal is inside the range defined by
- * the limits.
+ * <p>The InWindow output indicates whether the analog signal is inside the range defined by the
+ * limits.
  *
  * <p>The RisingPulse and FallingPulse outputs detect an instantaneous transition from above the
- * upper limit to below the lower limit, and vise versa. These pulses represent a rollover condition
+ * upper limit to below the lower limit, and vice versa. These pulses represent a rollover condition
  * of a sensor and can be routed to an up / down counter or to interrupts. Because the outputs
  * generate a pulse, they cannot be read directly. To help ensure that a rollover condition is not
  * missed, there is an average rejection filter available that operates on the upper 8 bits of a 12
@@ -41,9 +39,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * limited.
  */
 public class AnalogTriggerOutput extends DigitalSource implements Sendable {
-  /**
-   * Exceptions dealing with improper operation of the Analog trigger output.
-   */
+  /** Exceptions dealing with improper operation of the Analog trigger output. */
   public static class AnalogTriggerOutputException extends RuntimeException {
     /**
      * Create a new exception with the given message.
@@ -64,7 +60,7 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
    * <p>Because this class derives from DigitalSource, it can be passed into routing functions for
    * Counter, Encoder, etc.
    *
-   * @param trigger    The trigger for which this is an output.
+   * @param trigger The trigger for which this is an output.
    * @param outputType An enum that specifies the output on the trigger to represent.
    */
   public AnalogTriggerOutput(AnalogTrigger trigger, final AnalogTriggerType outputType) {
@@ -73,8 +69,10 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
 
     m_trigger = trigger;
     m_outputType = outputType;
-    HAL.report(tResourceType.kResourceType_AnalogTriggerOutput,
-        trigger.getIndex() + 1, outputType.value + 1);
+    HAL.report(
+        tResourceType.kResourceType_AnalogTriggerOutput,
+        trigger.getIndex() + 1,
+        outputType.value + 1);
   }
 
   /**
@@ -106,15 +104,17 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
     return true;
   }
 
-  /**
-   * Defines the state in which the AnalogTrigger triggers.
-   */
+  /** Defines the state in which the AnalogTrigger triggers. */
   public enum AnalogTriggerType {
-    kInWindow(AnalogJNI.AnalogTriggerType.kInWindow), kState(AnalogJNI.AnalogTriggerType.kState),
+    /** In window. */
+    kInWindow(AnalogJNI.AnalogTriggerType.kInWindow),
+    /** State. */
+    kState(AnalogJNI.AnalogTriggerType.kState),
+    /** Rising pulse. */
     kRisingPulse(AnalogJNI.AnalogTriggerType.kRisingPulse),
+    /** Falling pulse. */
     kFallingPulse(AnalogJNI.AnalogTriggerType.kFallingPulse);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     AnalogTriggerType(int value) {
@@ -123,6 +123,5 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-  }
+  public void initSendable(SendableBuilder builder) {}
 }

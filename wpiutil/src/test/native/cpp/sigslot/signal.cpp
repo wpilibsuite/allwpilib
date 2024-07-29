@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 /*
 
@@ -36,11 +33,11 @@ SOFTWARE.
 
 #include "wpi/Signal.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"  // NOLINT(build/include_order)
-
 #include <cmath>
 #include <sstream>
 #include <string>
+
+#include <gtest/gtest.h>
 
 using namespace wpi::sig;
 
@@ -48,8 +45,12 @@ namespace {
 
 int sum = 0;
 
-void f1(int i) { sum += i; }
-void f2(int i) /*noexcept*/ { sum += 2 * i; }
+void f1(int i) {
+  sum += i;
+}
+void f2(int i) /*noexcept*/ {
+  sum += 2 * i;
+}
 
 struct s {
   static void s1(int i) { sum += i; }
@@ -99,7 +100,7 @@ struct o8 {
 
 namespace wpi {
 
-TEST(Signal, FreeConnection) {
+TEST(SignalTest, FreeConnection) {
   sum = 0;
   Signal<int> sig;
 
@@ -112,7 +113,7 @@ TEST(Signal, FreeConnection) {
   ASSERT_EQ(sum, 4);
 }
 
-TEST(Signal, StaticConnection) {
+TEST(SignalTest, StaticConnection) {
   sum = 0;
   Signal<int> sig;
 
@@ -125,7 +126,7 @@ TEST(Signal, StaticConnection) {
   ASSERT_EQ(sum, 4);
 }
 
-TEST(Signal, PmfConnection) {
+TEST(SignalTest, PmfConnection) {
   sum = 0;
   Signal<int> sig;
   s p;
@@ -143,7 +144,7 @@ TEST(Signal, PmfConnection) {
   ASSERT_EQ(sum, 8);
 }
 
-TEST(Signal, ConstPmfConnection) {
+TEST(SignalTest, ConstPmfConnection) {
   sum = 0;
   Signal<int> sig;
   const s p;
@@ -157,7 +158,7 @@ TEST(Signal, ConstPmfConnection) {
   ASSERT_EQ(sum, 4);
 }
 
-TEST(Signal, FunctionObjectConnection) {
+TEST(SignalTest, FunctionObjectConnection) {
   sum = 0;
   Signal<int> sig;
 
@@ -174,7 +175,7 @@ TEST(Signal, FunctionObjectConnection) {
   ASSERT_EQ(sum, 8);
 }
 
-TEST(Signal, OverloadedFunctionObjectConnection) {
+TEST(SignalTest, OverloadedFunctionObjectConnection) {
   sum = 0;
   Signal<int> sig;
   Signal<double> sig1;
@@ -188,7 +189,7 @@ TEST(Signal, OverloadedFunctionObjectConnection) {
   ASSERT_EQ(sum, 5);
 }
 
-TEST(Signal, LambdaConnection) {
+TEST(SignalTest, LambdaConnection) {
   sum = 0;
   Signal<int> sig;
 
@@ -201,7 +202,7 @@ TEST(Signal, LambdaConnection) {
   ASSERT_EQ(sum, 4);
 }
 
-TEST(Signal, GenericLambdaConnection) {
+TEST(SignalTest, GenericLambdaConnection) {
   std::stringstream s;
 
   auto f = [&](auto a, auto... args) {
@@ -228,7 +229,7 @@ TEST(Signal, GenericLambdaConnection) {
   ASSERT_EQ(s.str(), "1foo4.1");
 }
 
-TEST(Signal, LvalueEmission) {
+TEST(SignalTest, LvalueEmission) {
   sum = 0;
   Signal<int> sig;
 
@@ -242,7 +243,7 @@ TEST(Signal, LvalueEmission) {
   ASSERT_EQ(sum, 4);
 }
 
-TEST(Signal, Mutation) {
+TEST(SignalTest, Mutation) {
   int res = 0;
   Signal<int&> sig;
 
@@ -255,7 +256,7 @@ TEST(Signal, Mutation) {
   ASSERT_EQ(res, 4);
 }
 
-TEST(Signal, CompatibleArgs) {
+TEST(SignalTest, CompatibleArgs) {
   long ll = 0;  // NOLINT(runtime/int)
   std::string ss;
   short ii = 0;  // NOLINT(runtime/int)
@@ -275,7 +276,7 @@ TEST(Signal, CompatibleArgs) {
   ASSERT_EQ(ii, 1);
 }
 
-TEST(Signal, Disconnection) {
+TEST(SignalTest, Disconnection) {
   // test removing only connected
   {
     sum = 0;
@@ -327,7 +328,7 @@ TEST(Signal, Disconnection) {
   }
 }
 
-TEST(Signal, ScopedConnection) {
+TEST(SignalTest, ScopedConnection) {
   sum = 0;
   Signal<int> sig;
 
@@ -360,7 +361,7 @@ TEST(Signal, ScopedConnection) {
   ASSERT_EQ(sum, 4);
 }
 
-TEST(Signal, ConnectionBlocking) {
+TEST(SignalTest, ConnectionBlocking) {
   sum = 0;
   Signal<int> sig;
 
@@ -378,7 +379,7 @@ TEST(Signal, ConnectionBlocking) {
   ASSERT_EQ(sum, 8);
 }
 
-TEST(Signal, ConnectionBlocker) {
+TEST(SignalTest, ConnectionBlocker) {
   sum = 0;
   Signal<int> sig;
 
@@ -397,7 +398,7 @@ TEST(Signal, ConnectionBlocker) {
   ASSERT_EQ(sum, 8);
 }
 
-TEST(Signal, SignalBlocking) {
+TEST(SignalTest, SignalBlocking) {
   sum = 0;
   Signal<int> sig;
 
@@ -415,7 +416,7 @@ TEST(Signal, SignalBlocking) {
   ASSERT_EQ(sum, 6);
 }
 
-TEST(Signal, AllDisconnection) {
+TEST(SignalTest, AllDisconnection) {
   sum = 0;
   Signal<int> sig;
 
@@ -429,7 +430,7 @@ TEST(Signal, AllDisconnection) {
   ASSERT_EQ(sum, 3);
 }
 
-TEST(Signal, ConnectionCopyingMoving) {
+TEST(SignalTest, ConnectionCopyingMoving) {
   sum = 0;
   Signal<int> sig;
 
@@ -458,7 +459,7 @@ TEST(Signal, ConnectionCopyingMoving) {
   ASSERT_EQ(sum, 9);
 }
 
-TEST(Signal, ScopedConnectionMoving) {
+TEST(SignalTest, ScopedConnectionMoving) {
   sum = 0;
   Signal<int> sig;
 
@@ -484,7 +485,7 @@ TEST(Signal, ScopedConnectionMoving) {
   ASSERT_EQ(sum, 10);
 }
 
-TEST(Signal, SignalMoving) {
+TEST(SignalTest, SignalMoving) {
   sum = 0;
   Signal<int> sig;
 
@@ -506,7 +507,7 @@ TEST(Signal, SignalMoving) {
 template <typename T>
 struct object {
   object();
-  object(T i) : v{i} {}  // NOLINT(runtime/explicit)
+  object(T i) : v{i} {}  // NOLINT
 
   const T& val() const { return v; }
   T& val() { return v; }
@@ -524,7 +525,7 @@ struct object {
   Signal<T> s;
 };
 
-TEST(Signal, Loop) {
+TEST(SignalTest, Loop) {
   object<int> i1(0);
   object<int> i2(3);
 

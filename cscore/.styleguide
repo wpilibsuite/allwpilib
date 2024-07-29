@@ -6,10 +6,15 @@ cppHeaderFileInclude {
   (?<!_c)\.h$
   \.hpp$
   \.inc$
+  \.inl$
 }
 
 cppSrcFileInclude {
   \.cpp$
+}
+
+modifiableFileExclude {
+  objcpp
 }
 
 licenseUpdateExclude {
@@ -30,8 +35,11 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
+  ^fmt/
+  ^gtest/
   ^opencv2/
   ^support/
   ^tcpsockets/
   ^wpi/
+  ^wpinet/
 }

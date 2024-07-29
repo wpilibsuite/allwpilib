@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#include <frc2/Timer.h>
 #include <frc2/command/Subsystem.h>
 #include <frc2/command/SwerveControllerCommand.h>
 
-#include <iostream>
+#include <numbers>
 
+#include <frc/Timer.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/geometry/Rotation2d.h>
@@ -18,10 +15,11 @@
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <wpi/math>
+#include <gtest/gtest.h>
 
-#include "gtest/gtest.h"
+#include "CommandTestBase.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
@@ -32,12 +30,16 @@ class SwerveControllerCommandTest : public ::testing::Test {
                            units::inverse<units::squared<units::second>>>;
 
  protected:
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
   frc::Rotation2d m_angle{0_rad};
 
-  std::array<frc::SwerveModuleState, 4> m_moduleStates{
+  wpi::array<frc::SwerveModuleState, 4> m_moduleStates{
       frc::SwerveModuleState{}, frc::SwerveModuleState{},
       frc::SwerveModuleState{}, frc::SwerveModuleState{}};
+
+  wpi::array<frc::SwerveModulePosition, 4> m_modulePositions{
+      frc::SwerveModulePosition{}, frc::SwerveModulePosition{},
+      frc::SwerveModulePosition{}, frc::SwerveModulePosition{}};
 
   frc::ProfiledPIDController<units::radians> m_rotController{
       1, 0, 0,
@@ -57,21 +59,21 @@ class SwerveControllerCommandTest : public ::testing::Test {
       frc::Translation2d{-kWheelBase / 2, kTrackWidth / 2},
       frc::Translation2d{-kWheelBase / 2, -kTrackWidth / 2}};
 
-  frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, 0_rad,
+  frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, 0_rad, m_modulePositions,
                                          frc::Pose2d{0_m, 0_m, 0_rad}};
 
-  std::array<frc::SwerveModuleState, 4> getCurrentWheelSpeeds() {
-    return m_moduleStates;
-  }
+  void SetUp() override { frc::sim::PauseTiming(); }
+
+  void TearDown() override { frc::sim::ResumeTiming(); }
 
   frc::Pose2d getRobotPose() {
-    m_odometry.UpdateWithTime(m_timer.Get(), m_angle, getCurrentWheelSpeeds());
+    m_odometry.Update(m_angle, m_modulePositions);
     return m_odometry.GetPose();
   }
 };
 
 TEST_F(SwerveControllerCommandTest, ReachesReference) {
-  frc2::Subsystem subsystem{};
+  frc2::TestSubsystem subsystem;
 
   auto waypoints =
       std::vector{frc::Pose2d{0_m, 0_m, 0_rad}, frc::Pose2d{1_m, 5_m, 3_rad}};
@@ -83,24 +85,29 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
   auto command = frc2::SwerveControllerCommand<4>(
       trajectory, [&]() { return getRobotPose(); }, m_kinematics,
 
-      frc2::PIDController(0.6, 0, 0), frc2::PIDController(0.6, 0, 0),
+      frc::PIDController(0.6, 0, 0), frc::PIDController(0.6, 0, 0),
       m_rotController,
       [&](auto moduleStates) { m_moduleStates = moduleStates; }, {&subsystem});
 
-  m_timer.Reset();
-  m_timer.Start();
+  m_timer.Restart();
+
   command.Initialize();
   while (!command.IsFinished()) {
     command.Execute();
     m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();
+
+    for (size_t i = 0; i < m_modulePositions.size(); i++) {
+      m_modulePositions[i].distance += m_moduleStates[i].speed * 5_ms;
+      m_modulePositions[i].angle = m_moduleStates[i].angle;
+    }
+
+    frc::sim::StepTiming(5_ms);
   }
   m_timer.Stop();
   command.End(false);
 
-  EXPECT_NEAR_UNITS(endState.pose.Translation().X(),
-                    getRobotPose().Translation().X(), kxTolerance);
-  EXPECT_NEAR_UNITS(endState.pose.Translation().Y(),
-                    getRobotPose().Translation().Y(), kyTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.X(), getRobotPose().X(), kxTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.Y(), getRobotPose().Y(), kyTolerance);
   EXPECT_NEAR_UNITS(endState.pose.Rotation().Radians(),
                     getRobotPose().Rotation().Radians(), kAngularTolerance);
 }

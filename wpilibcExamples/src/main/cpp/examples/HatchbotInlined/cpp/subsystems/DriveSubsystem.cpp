@@ -1,11 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/DriveSubsystem.h"
+
+#include <wpi/sendable/SendableBuilder.h>
 
 using namespace DriveConstants;
 
@@ -16,6 +15,17 @@ DriveSubsystem::DriveSubsystem()
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
       m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]} {
+  wpi::SendableRegistry::AddChild(&m_drive, &m_left1);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_right1);
+
+  m_left1.AddFollower(m_left2);
+  m_right1.AddFollower(m_right2);
+
+  // We need to invert one side of the drivetrain so that positive voltages
+  // result in both sides moving forward. Depending on how your robot's
+  // gearbox is constructed, you might have to invert the left side instead.
+  m_right1.SetInverted(true);
+
   // Set the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
@@ -38,10 +48,17 @@ double DriveSubsystem::GetAverageEncoderDistance() {
   return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.0;
 }
 
-frc::Encoder& DriveSubsystem::GetLeftEncoder() { return m_leftEncoder; }
-
-frc::Encoder& DriveSubsystem::GetRightEncoder() { return m_rightEncoder; }
-
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
+}
+
+void DriveSubsystem::InitSendable(wpi::SendableBuilder& builder) {
+  SubsystemBase::InitSendable(builder);
+
+  // Publish encoder distances to telemetry.
+  builder.AddDoubleProperty(
+      "leftDistance", [this] { return m_leftEncoder.GetDistance(); }, nullptr);
+  builder.AddDoubleProperty(
+      "rightDistance", [this] { return m_rightEncoder.GetDistance(); },
+      nullptr);
 }

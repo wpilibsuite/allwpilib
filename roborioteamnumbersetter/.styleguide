@@ -1,0 +1,30 @@
+cppHeaderFileInclude {
+  \.h$
+  \.inc$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  src/main/native/resources/
+  src/main/native/win/roborioteamnumbersetter.ico
+  src/main/native/mac/rtns.icns
+}
+
+repoRootNameOverride {
+  roborioteamnumbersetter
+}
+
+includeOtherLibs {
+  ^GLFW
+  ^fmt/
+  ^imgui
+  ^libssh/
+  ^ntcore
+  ^wpi/
+  ^wpigui
+  ^wpinet/
+}

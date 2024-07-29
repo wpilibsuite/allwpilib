@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "vision/VisionRunner.h"
 
@@ -23,7 +20,7 @@ VisionRunnerBase::VisionRunnerBase(cs::VideoSource videoSource)
 }
 
 // Located here and not in header due to cv::Mat forward declaration.
-VisionRunnerBase::~VisionRunnerBase() {}
+VisionRunnerBase::~VisionRunnerBase() = default;
 
 void VisionRunnerBase::RunOnce() {
   auto csShared = frc::GetCameraServerShared();
@@ -36,7 +33,7 @@ void VisionRunnerBase::RunOnce() {
   auto frameTime = m_cvSink.GrabFrame(*m_image);
   if (frameTime == 0) {
     auto error = m_cvSink.GetError();
-    csShared->ReportDriverStationError(error);
+    csShared->ReportDriverStationError(error.c_str());
   } else {
     DoProcess(*m_image);
   }
@@ -56,4 +53,6 @@ void VisionRunnerBase::RunForever() {
   }
 }
 
-void VisionRunnerBase::Stop() { m_enabled = false; }
+void VisionRunnerBase::Stop() {
+  m_enabled = false;
+}

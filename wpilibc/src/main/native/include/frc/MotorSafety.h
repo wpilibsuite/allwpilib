@@ -1,27 +1,28 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
+#include <string>
 
-#include "frc/ErrorBase.h"
+#include <units/time.h>
+#include <wpi/mutex.h>
+
 #include "frc/Timer.h"
 
 namespace frc {
 
 /**
- * This base class runs a watchdog timer and calls the subclass's StopMotor()
- * function if the timeout expires.
+ * The Motor Safety feature acts as a watchdog timer for an individual motor. It
+ * operates by maintaining a timer that tracks how long it has been since the
+ * feed() method has been called for that actuator. Code in the Driver Station
+ * class initiates a comparison of these timers to the timeout values for any
+ * actuator with safety enabled every 5 received packets (100ms nominal).
  *
  * The subclass should call Feed() whenever the motor value is updated.
  */
-class MotorSafety : public ErrorBase {
+class MotorSafety {
  public:
   MotorSafety();
   virtual ~MotorSafety();
@@ -39,16 +40,16 @@ class MotorSafety : public ErrorBase {
   /**
    * Set the expiration time for the corresponding motor safety object.
    *
-   * @param expirationTime The timeout value in seconds.
+   * @param expirationTime The timeout value.
    */
-  void SetExpiration(double expirationTime);
+  void SetExpiration(units::second_t expirationTime);
 
   /**
    * Retrieve the timeout value for the corresponding motor safety object.
    *
-   * @return the timeout value in seconds.
+   * @return the timeout value.
    */
-  double GetExpiration() const;
+  units::second_t GetExpiration() const;
 
   /**
    * Determine if the motor is still operating or has timed out.
@@ -92,20 +93,29 @@ class MotorSafety : public ErrorBase {
    */
   static void CheckMotors();
 
+  /**
+   * Called to stop the motor when the timeout expires.
+   */
   virtual void StopMotor() = 0;
-  virtual void GetDescription(wpi::raw_ostream& desc) const = 0;
+
+  /**
+   * Returns a description to print when an error occurs.
+   *
+   * @return Description to print when an error occurs.
+   */
+  virtual std::string GetDescription() const = 0;
 
  private:
-  static constexpr double kDefaultSafetyExpiration = 0.1;
+  static constexpr auto kDefaultSafetyExpiration = 100_ms;
 
   // The expiration time for this object
-  double m_expiration = kDefaultSafetyExpiration;
+  units::second_t m_expiration = kDefaultSafetyExpiration;
 
   // True if motor safety is enabled for this motor
   bool m_enabled = false;
 
   // The FPGA clock value when the motor has expired
-  double m_stopTime = Timer::GetFPGATimestamp();
+  units::second_t m_stopTime = Timer::GetFPGATimestamp();
 
   mutable wpi::mutex m_thisMutex;
 };

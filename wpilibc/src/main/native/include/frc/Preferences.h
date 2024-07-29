@@ -1,21 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <stdint.h>
 
-#include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <networktables/NetworkTable.h>
-
-#include "frc/ErrorBase.h"
 
 namespace frc {
 
@@ -30,24 +23,17 @@ namespace frc {
  *
  * This class is thread safe.
  *
- * This will also interact with {@link NetworkTable} by creating a table called
+ * This will also interact with NetworkTable by creating a table called
  * "Preferences" with all the key-value pairs.
  */
-class Preferences : public ErrorBase {
+class Preferences {
  public:
-  /**
-   * Get the one and only {@link Preferences} object.
-   *
-   * @return pointer to the {@link Preferences}
-   */
-  static Preferences* GetInstance();
-
   /**
    * Returns a vector of all the keys.
    *
    * @return a vector of the keys
    */
-  std::vector<std::string> GetKeys();
+  static std::vector<std::string> GetKeys();
 
   /**
    * Returns the string at the given key.  If this table does not have a value
@@ -57,7 +43,8 @@ class Preferences : public ErrorBase {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  std::string GetString(wpi::StringRef key, wpi::StringRef defaultValue = "");
+  static std::string GetString(std::string_view key,
+                               std::string_view defaultValue = "");
 
   /**
    * Returns the int at the given key.  If this table does not have a value for
@@ -67,7 +54,7 @@ class Preferences : public ErrorBase {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  int GetInt(wpi::StringRef key, int defaultValue = 0);
+  static int GetInt(std::string_view key, int defaultValue = 0);
 
   /**
    * Returns the double at the given key.  If this table does not have a value
@@ -77,7 +64,7 @@ class Preferences : public ErrorBase {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  double GetDouble(wpi::StringRef key, double defaultValue = 0.0);
+  static double GetDouble(std::string_view key, double defaultValue = 0.0);
 
   /**
    * Returns the float at the given key.  If this table does not have a value
@@ -87,7 +74,7 @@ class Preferences : public ErrorBase {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  float GetFloat(wpi::StringRef key, float defaultValue = 0.0);
+  static float GetFloat(std::string_view key, float defaultValue = 0.0);
 
   /**
    * Returns the boolean at the given key.  If this table does not have a value
@@ -97,7 +84,7 @@ class Preferences : public ErrorBase {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  bool GetBoolean(wpi::StringRef key, bool defaultValue = false);
+  static bool GetBoolean(std::string_view key, bool defaultValue = false);
 
   /**
    * Returns the long (int64_t) at the given key.  If this table does not have a
@@ -108,7 +95,7 @@ class Preferences : public ErrorBase {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  int64_t GetLong(wpi::StringRef key, int64_t defaultValue = 0);
+  static int64_t GetLong(std::string_view key, int64_t defaultValue = 0);
 
   /**
    * Puts the given string into the preferences table.
@@ -119,7 +106,13 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
-  void PutString(wpi::StringRef key, wpi::StringRef value);
+  static void SetString(std::string_view key, std::string_view value);
+
+  /**
+   * Puts the given string into the preferences table if it doesn't
+   * already exist.
+   */
+  static void InitString(std::string_view key, std::string_view value);
 
   /**
    * Puts the given int into the preferences table.
@@ -129,7 +122,13 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
-  void PutInt(wpi::StringRef key, int value);
+  static void SetInt(std::string_view key, int value);
+
+  /**
+   * Puts the given int into the preferences table if it doesn't
+   * already exist.
+   */
+  static void InitInt(std::string_view key, int value);
 
   /**
    * Puts the given double into the preferences table.
@@ -139,7 +138,13 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
-  void PutDouble(wpi::StringRef key, double value);
+  static void SetDouble(std::string_view key, double value);
+
+  /**
+   * Puts the given double into the preferences table if it doesn't
+   * already exist.
+   */
+  static void InitDouble(std::string_view key, double value);
 
   /**
    * Puts the given float into the preferences table.
@@ -149,7 +154,13 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
-  void PutFloat(wpi::StringRef key, float value);
+  static void SetFloat(std::string_view key, float value);
+
+  /**
+   * Puts the given float into the preferences table if it doesn't
+   * already exist.
+   */
+  static void InitFloat(std::string_view key, float value);
 
   /**
    * Puts the given boolean into the preferences table.
@@ -159,7 +170,13 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
-  void PutBoolean(wpi::StringRef key, bool value);
+  static void SetBoolean(std::string_view key, bool value);
+
+  /**
+   * Puts the given boolean into the preferences table if it doesn't
+   * already exist.
+   */
+  static void InitBoolean(std::string_view key, bool value);
 
   /**
    * Puts the given long (int64_t) into the preferences table.
@@ -169,7 +186,13 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
-  void PutLong(wpi::StringRef key, int64_t value);
+  static void SetLong(std::string_view key, int64_t value);
+
+  /**
+   * Puts the given long into the preferences table if it doesn't
+   * already exist.
+   */
+  static void InitLong(std::string_view key, int64_t value);
 
   /**
    * Returns whether or not there is a key with the given name.
@@ -177,30 +200,22 @@ class Preferences : public ErrorBase {
    * @param key the key
    * @return if there is a value at the given key
    */
-  bool ContainsKey(wpi::StringRef key);
+  static bool ContainsKey(std::string_view key);
 
   /**
    * Remove a preference.
    *
    * @param key the key
    */
-  void Remove(wpi::StringRef key);
+  static void Remove(std::string_view key);
 
   /**
    * Remove all preferences.
    */
-  void RemoveAll();
-
- protected:
-  Preferences();
-  virtual ~Preferences() = default;
-
-  Preferences(Preferences&&) = default;
-  Preferences& operator=(Preferences&&) = default;
+  static void RemoveAll();
 
  private:
-  std::shared_ptr<nt::NetworkTable> m_table;
-  NT_EntryListener m_listener;
+  Preferences() = default;
 };
 
 }  // namespace frc

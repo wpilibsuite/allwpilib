@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -12,10 +9,10 @@ import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.sim.AnalogInSim;
 import edu.wpi.first.hal.util.AllocationException;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Analog channel class.
@@ -29,19 +26,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * accumulated effectively increasing the resolution, while the averaged samples are divided by the
  * number of samples to retain the resolution, but get more stable values.
  */
-public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
+public class AnalogInput implements Sendable, AutoCloseable {
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
   private static final int[] kAccumulatorChannels = {0, 1};
   private long m_accumulatorOffset;
-  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
    * Construct an analog channel.
    *
    * @param channel The channel number to represent. 0-3 are on-board 4-7 are on the MXP port.
    */
+  @SuppressWarnings("this-escape")
   public AnalogInput(final int channel) {
     AnalogJNI.checkAnalogInputChannel(channel);
     m_channel = channel;
@@ -111,8 +108,8 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
   }
 
   /**
-   * Get the factory scaling least significant bit weight constant. The least significant bit weight
-   * constant for the channel that was calibrated in manufacturing and stored in an eeprom.
+   * Get the factory scaling the least significant bit weight constant. The least significant bit
+   * weight constant for the channel that was calibrated in manufacturing and stored in an eeprom.
    *
    * <p>Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
    *
@@ -184,13 +181,16 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
     return AnalogJNI.getAnalogOversampleBits(m_port);
   }
 
-  /**
-   * Initialize the accumulator.
-   */
+  /** Initialize the accumulator. */
   public void initAccumulator() {
     if (!isAccumulatorChannel()) {
-      throw new AllocationException("Accumulators are only available on slot " + kAccumulatorSlot
-          + " on channels " + kAccumulatorChannels[0] + ", " + kAccumulatorChannels[1]);
+      throw new AllocationException(
+          "Accumulators are only available on slot "
+              + kAccumulatorSlot
+              + " on channels "
+              + kAccumulatorChannels[0]
+              + ", "
+              + kAccumulatorChannels[1]);
     }
     m_accumulatorOffset = 0;
     AnalogJNI.initAccumulator(m_port);
@@ -207,9 +207,7 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
     m_accumulatorOffset = initialValue;
   }
 
-  /**
-   * Resets the accumulator to the initial value.
-   */
+  /** Resets the accumulator to the initial value. */
   public void resetAccumulator() {
     AnalogJNI.resetAccumulator(m_port);
 
@@ -219,7 +217,6 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
     final double overSamples = 1 << getOversampleBits();
     final double averageSamples = 1 << getAverageBits();
     Timer.delay(sampleTime * overSamples * averageSamples);
-
   }
 
   /**
@@ -232,6 +229,8 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
    * <p>This center value is based on the output of the oversampled and averaged source the
    * accumulator channel. Because of this, any non-zero oversample bits will affect the size of the
    * value for this field.
+   *
+   * @param center The accumulator's center value.
    */
   public void setAccumulatorCenter(int center) {
     AnalogJNI.setAccumulatorCenter(m_port, center);
@@ -326,26 +325,6 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
     return AnalogJNI.getAnalogSampleRate();
   }
 
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Get the average voltage for use with PIDController.
-   *
-   * @return the average voltage
-   */
-  @Override
-  public double pidGet() {
-    return getAverageVoltage();
-  }
-
   /**
    * Indicates this input is used by a simulated device.
    *
@@ -359,9 +338,5 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Analog Input");
     builder.addDoubleProperty("Value", this::getAverageVoltage, null);
-  }
-
-  public AnalogInSim getSimObject() {
-    return new AnalogInSim(m_channel);
   }
 }

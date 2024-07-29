@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "hal/CANAPI.h"
 #include "hal/HAL.h"
-#include "mockdata/CanData.h"
+#include "hal/simulation/CanData.h"
 
 namespace hal {
 struct CANTestStore {
@@ -41,7 +39,7 @@ struct CANSendCallbackStore {
   int32_t handle;
 };
 
-TEST(HALCanTests, CanIdPackingTest) {
+TEST(CANTest, CanIdPacking) {
   int32_t status = 0;
   int32_t deviceId = 12;
   CANTestStore testStore(deviceId, &status);

@@ -1,13 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <wpi/StringRef.h>
+#include <string_view>
 
 #include "frc/shuffleboard/RecordingController.h"
 #include "frc/shuffleboard/ShuffleboardEventImportance.h"
@@ -80,7 +77,7 @@ class Shuffleboard final {
    * @param title the title of the tab
    * @return the tab with the given title
    */
-  static ShuffleboardTab& GetTab(wpi::StringRef title);
+  static ShuffleboardTab& GetTab(std::string_view title);
 
   /**
    * Selects the tab in the dashboard with the given index in the range
@@ -96,10 +93,10 @@ class Shuffleboard final {
    *
    * @param title the title of the tab to select
    */
-  static void SelectTab(wpi::StringRef title);
+  static void SelectTab(std::string_view title);
 
   /**
-   * Enables user control of widgets containing actuators: speed controllers,
+   * Enables user control of widgets containing actuators: motor controllers,
    * relays, etc. This should only be used when the robot is in test mode.
    * IterativeRobotBase and SampleRobot are both configured to call this method
    * when entering test mode; most users should not need to use this method
@@ -144,13 +141,13 @@ class Shuffleboard final {
    *
    * @param format the format for the
    */
-  static void SetRecordingFileNameFormat(wpi::StringRef format);
+  static void SetRecordingFileNameFormat(std::string_view format);
 
   /**
    * Clears the custom name format for recording files. New recordings will use
    * the default format.
    *
-   * @see #setRecordingFileNameFormat(String)
+   * @see SetRecordingFileNameFormat(std::string_view)
    */
   static void ClearRecordingFileNameFormat();
 
@@ -166,7 +163,8 @@ class Shuffleboard final {
    * @param description a description of the event
    * @param importance  the importance of the event
    */
-  static void AddEventMarker(wpi::StringRef name, wpi::StringRef description,
+  static void AddEventMarker(std::string_view name,
+                             std::string_view description,
                              ShuffleboardEventImportance importance);
 
   /**
@@ -180,7 +178,7 @@ class Shuffleboard final {
    * @param name        the name of the event
    * @param importance  the importance of the event
    */
-  static void AddEventMarker(wpi::StringRef name,
+  static void AddEventMarker(std::string_view name,
                              ShuffleboardEventImportance importance);
 
  private:

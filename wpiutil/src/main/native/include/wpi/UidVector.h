@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_UIDVECTOR_H_
 #define WPIUTIL_WPI_UIDVECTOR_H_
@@ -27,7 +24,9 @@ class UidVectorIterator {
   UidVectorIterator() = default;
   explicit UidVectorIterator(It it, It end) : m_it(it), m_end(end) {
     // advance to first non-empty element
-    while (m_it != m_end && !*m_it) ++m_it;
+    while (m_it != m_end && !*m_it) {
+      ++m_it;
+    }
   }
 
   reference operator*() const noexcept { return *m_it; }
@@ -61,12 +60,15 @@ class UidVectorIterator {
 };
 }  // namespace impl
 
-// Vector which provides an integrated freelist for removal and reuse of
-// individual elements.
-// @tparam T element type; must be default-constructible and evaluate in
-//           boolean context to false when "empty"
-// @tparam reuse_threshold how many free elements to store up before starting
-//                         to recycle them
+/**
+ * Vector which provides an integrated freelist for removal and reuse of
+ * individual elements.
+ *
+ * @tparam T element type; must be default-constructible and evaluate in
+ *           boolean context to false when "empty"
+ * @tparam reuse_threshold how many free elements to store up before starting
+ *                         to recycle them
+ */
 template <typename T, typename std::vector<T>::size_type reuse_threshold>
 class UidVector {
  public:
@@ -81,8 +83,8 @@ class UidVector {
   using const_iterator =
       impl::UidVectorIterator<typename std::vector<T>::const_iterator>;
 
-  bool empty() const { return m_active_count == 0; }
-  size_type size() const { return m_vector.size(); }
+  bool empty() const noexcept { return m_active_count == 0; }
+  size_type size() const noexcept { return m_vector.size(); }
   T& operator[](size_type i) { return m_vector[i]; }
   const T& operator[](size_type i) const { return m_vector[i]; }
 
@@ -104,17 +106,25 @@ class UidVector {
     return uid;
   }
 
-  // Removes the identified element by replacing it with a default-constructed
-  // one.  The element is added to the freelist for later reuse.
-  void erase(size_type uid) {
-    if (uid >= m_vector.size() || !m_vector[uid]) return;
+  /**
+   * Removes the identified element by replacing it with a default-constructed
+   * one. The element is added to the freelist for later reuse.
+   */
+  T erase(size_type uid) {
+    if (uid >= m_vector.size() || !m_vector[uid]) {
+      return T();
+    }
     m_free.push_back(uid);
+    auto rv = std::move(m_vector[uid]);
     m_vector[uid] = T();
     --m_active_count;
+    return rv;
   }
 
-  // Removes all elements.
-  void clear() {
+  /**
+   * Removes all elements.
+   */
+  void clear() noexcept {
     m_vector.clear();
     m_free.clear();
     m_active_count = 0;

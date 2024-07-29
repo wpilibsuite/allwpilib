@@ -1,36 +1,36 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_HANDLE_H_
-#define NTCORE_HANDLE_H_
+#pragma once
+
+#include <wpi/Synchronization.h>
 
 #include "ntcore_c.h"
 
 namespace nt {
 
 // Handle data layout:
-// Bits 30-28: Type
-// Bits 27-20: Instance index
+// Bits 30-24: Type
+// Bits 23-20: Instance index
 // Bits 19-0:  Handle index (0/unused for instance handles)
 
 class Handle {
  public:
   enum Type {
-    kConnectionListener = 1,
-    kConnectionListenerPoller,
+    kListener = wpi::kHandleTypeNTBase,
+    kListenerPoller,
     kEntry,
-    kEntryListener,
-    kEntryListenerPoller,
     kInstance,
-    kLogger,
-    kLoggerPoller,
-    kRpcCall,
-    kRpcCallPoller
+    kDataLogger,
+    kConnectionDataLogger,
+    kMultiSubscriber,
+    kTopic,
+    kSubscriber,
+    kPublisher,
+    kTypeMax
   };
+  static_assert(kTypeMax <= wpi::kHandleTypeHALBase);
   enum { kIndexMax = 0xfffff };
 
   explicit Handle(NT_Handle handle) : m_handle(handle) {}
@@ -43,15 +43,17 @@ class Handle {
       m_handle = 0;
       return;
     }
-    m_handle = ((static_cast<int>(type) & 0xf) << 27) | ((inst & 0x7f) << 20) |
+    m_handle = ((static_cast<int>(type) & 0x7f) << 24) | ((inst & 0xf) << 20) |
                (index & 0xfffff);
   }
 
-  int GetIndex() const { return static_cast<int>(m_handle) & 0xfffff; }
-  Type GetType() const {
-    return static_cast<Type>((static_cast<int>(m_handle) >> 27) & 0xf);
+  unsigned int GetIndex() const {
+    return static_cast<unsigned int>(m_handle) & 0xfffff;
   }
-  int GetInst() const { return (static_cast<int>(m_handle) >> 20) & 0x7f; }
+  Type GetType() const {
+    return static_cast<Type>((static_cast<int>(m_handle) >> 24) & 0x7f);
+  }
+  int GetInst() const { return (static_cast<int>(m_handle) >> 20) & 0xf; }
   bool IsType(Type type) const { return type == GetType(); }
   int GetTypedIndex(Type type) const { return IsType(type) ? GetIndex() : -1; }
   int GetTypedInst(Type type) const { return IsType(type) ? GetInst() : -1; }
@@ -61,5 +63,3 @@ class Handle {
 };
 
 }  // namespace nt
-
-#endif  // NTCORE_HANDLE_H_

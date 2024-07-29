@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.drive;
 
@@ -11,22 +8,40 @@ import edu.wpi.first.wpilibj.MotorSafety;
 
 /**
  * Common base class for drive platforms.
+ *
+ * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default.
  */
 public abstract class RobotDriveBase extends MotorSafety {
+  /** Default input deadband. */
   public static final double kDefaultDeadband = 0.02;
+
+  /** Default maximum output. */
   public static final double kDefaultMaxOutput = 1.0;
 
+  /** Input deadband. */
   protected double m_deadband = kDefaultDeadband;
+
+  /** Maximum output. */
   protected double m_maxOutput = kDefaultMaxOutput;
 
-  /**
-   * The location of a motor on the robot for the purpose of driving.
-   */
+  /** The location of a motor on the robot for the purpose of driving. */
   public enum MotorType {
-    kFrontLeft(0), kFrontRight(1), kRearLeft(2), kRearRight(3), kLeft(0),
-    kRight(1), kBack(2);
+    /** Front left motor. */
+    kFrontLeft(0),
+    /** Front right motor. */
+    kFrontRight(1),
+    /** Rear left motor. */
+    kRearLeft(2),
+    /** Reat right motor. */
+    kRearRight(3),
+    /** Left motor. */
+    kLeft(0),
+    /** Right motor. */
+    kRight(1),
+    /** Back motor. */
+    kBack(2);
 
-    @SuppressWarnings("MemberName")
+    /** MotorType value. */
     public final int value;
 
     MotorType(int value) {
@@ -34,9 +49,8 @@ public abstract class RobotDriveBase extends MotorSafety {
     }
   }
 
-  /**
-   * RobotDriveBase constructor.
-   */
+  /** RobotDriveBase constructor. */
+  @SuppressWarnings("this-escape")
   public RobotDriveBase() {
     setSafetyEnabled(true);
   }
@@ -45,8 +59,8 @@ public abstract class RobotDriveBase extends MotorSafety {
    * Sets the deadband applied to the drive inputs (e.g., joystick values).
    *
    * <p>The default value is {@value #kDefaultDeadband}. Inputs smaller than the deadband are set to
-   * 0.0 while inputs larger than the deadband are scaled from 0.0 to 1.0. See
-   * {@link #applyDeadband}.
+   * 0.0 while inputs larger than the deadband are scaled from 0.0 to 1.0. See {@link
+   * edu.wpi.first.math.MathUtil#applyDeadband}.
    *
    * @param deadband The deadband to set.
    */
@@ -82,28 +96,11 @@ public abstract class RobotDriveBase extends MotorSafety {
   public abstract String getDescription();
 
   /**
-   * Returns 0.0 if the given value is within the specified range around zero. The remaining range
-   * between the deadband and 1.0 is scaled from 0.0 to 1.0.
-   *
-   * @param value    value to clip
-   * @param deadband range around zero
-   */
-  protected double applyDeadband(double value, double deadband) {
-    if (Math.abs(value) > deadband) {
-      if (value > 0.0) {
-        return (value - deadband) / (1.0 - deadband);
-      } else {
-        return (value + deadband) / (1.0 - deadband);
-      }
-    } else {
-      return 0.0;
-    }
-  }
-
-  /**
    * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
+   *
+   * @param wheelSpeeds List of wheel speeds to normalize.
    */
-  protected void normalize(double[] wheelSpeeds) {
+  protected static void normalize(double[] wheelSpeeds) {
     double maxMagnitude = Math.abs(wheelSpeeds[0]);
     for (int i = 1; i < wheelSpeeds.length; i++) {
       double temp = Math.abs(wheelSpeeds[i]);

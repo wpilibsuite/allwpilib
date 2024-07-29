@@ -1,4 +1,4 @@
-= Network Tables Protocol Specification, Version 2.0
+= NetworkTables Protocol Specification, Version 2.0
 WPILib Developers <wpilib@wpi.edu>
 Protocol Revision 2.0 (0x0200), 1/8/2013
 :toc:
@@ -19,9 +19,9 @@ updates which have a larger sequence number than its own, which guarantees that
 a client must have received a server's most recent state before it can replace
 it with a new value.
 
-This is a backwards-incompatible rework of the Network Tables network protocol
+This is a backwards-incompatible rework of the NetworkTables network protocol
 originally introduced for the 2012 FIRST Robotics Competition. Note that this
-revision of the Network Tables protocol no longer includes the concept of
+revision of the NetworkTables protocol no longer includes the concept of
 sub-tables. We suggest that instead of representing sub-tables as first-class
 data types in the network protocol, it would be easy for an implementation to
 provide a similar API abstraction by adding prefixes to keys. For example, we

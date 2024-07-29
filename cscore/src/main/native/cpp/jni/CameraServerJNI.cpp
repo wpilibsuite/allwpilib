@@ -1,21 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <exception>
+#include <span>
 
-#include <opencv2/core/core.hpp>
+#include <fmt/format.h>
+
+#define WPI_RAWFRAME_JNI
+#include <wpi/RawFrame.h>
 #include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
-#include <wpi/raw_ostream.h>
 
-#include "cscore_cpp.h"
-#include "cscore_cv.h"
 #include "cscore_raw.h"
-#include "edu_wpi_cscore_CameraServerJNI.h"
+#include "cscore_runloop.h"
+#include "edu_wpi_first_cscore_CameraServerJNI.h"
 
 namespace cv {
 class Mat;
@@ -34,6 +33,7 @@ static JClass videoModeCls;
 static JClass videoEventCls;
 static JClass rawFrameCls;
 static JException videoEx;
+static JException interruptedEx;
 static JException nullPointerEx;
 static JException unsupportedEx;
 static JException exceptionEx;
@@ -41,59 +41,43 @@ static JException exceptionEx;
 static JNIEnv* listenerEnv = nullptr;
 
 static const JClassInit classes[] = {
-    {"edu/wpi/cscore/UsbCameraInfo", &usbCameraInfoCls},
-    {"edu/wpi/cscore/VideoMode", &videoModeCls},
-    {"edu/wpi/cscore/VideoEvent", &videoEventCls},
-    {"edu/wpi/cscore/raw/RawFrame", &rawFrameCls}};
+    {"edu/wpi/first/cscore/UsbCameraInfo", &usbCameraInfoCls},
+    {"edu/wpi/first/cscore/VideoMode", &videoModeCls},
+    {"edu/wpi/first/cscore/VideoEvent", &videoEventCls},
+    {"edu/wpi/first/util/RawFrame", &rawFrameCls}};
 
 static const JExceptionInit exceptions[] = {
-    {"edu/wpi/cscore/VideoException", &videoEx},
+    {"edu/wpi/first/cscore/VideoException", &videoEx},
+    {"java/lang/InterruptedException", &interruptedEx},
     {"java/lang/NullPointerException", &nullPointerEx},
     {"java/lang/UnsupportedOperationException", &unsupportedEx},
     {"java/lang/Exception", &exceptionEx}};
 
 static void ListenerOnStart() {
-  if (!jvm) return;
+  if (!jvm) {
+    return;
+  }
   JNIEnv* env;
   JavaVMAttachArgs args;
   args.version = JNI_VERSION_1_2;
   args.name = const_cast<char*>("CSListener");
   args.group = nullptr;
   if (jvm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(&env), &args) !=
-      JNI_OK)
+      JNI_OK) {
     return;
-  if (!env || !env->functions) return;
+  }
+  if (!env || !env->functions) {
+    return;
+  }
   listenerEnv = env;
 }
 
 static void ListenerOnExit() {
   listenerEnv = nullptr;
-  if (!jvm) return;
-  jvm->DetachCurrentThread();
-}
-
-/// throw java exception
-static void ThrowJavaException(JNIEnv* env, const std::exception* e) {
-  wpi::SmallString<128> what;
-  jclass je = 0;
-
-  if (e) {
-    const char* exception_type = "std::exception";
-
-    if (dynamic_cast<const cv::Exception*>(e)) {
-      exception_type = "cv::Exception";
-      je = env->FindClass("org/opencv/core/CvException");
-    }
-
-    what = exception_type;
-    what += ": ";
-    what += e->what();
-  } else {
-    what = "unknown exception";
+  if (!jvm) {
+    return;
   }
-
-  if (!je) je = exceptionEx;
-  env->ThrowNew(je, what.c_str());
+  jvm->DetachCurrentThread();
 }
 
 extern "C" {
@@ -102,18 +86,23 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
+  }
 
   // Cache references to classes
   for (auto& c : classes) {
     *c.cls = JClass(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   for (auto& c : exceptions) {
     *c.cls = JException(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   // Initial configuration of listener start/exit
@@ -127,8 +116,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   cs::Shutdown();
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
+  }
   // Delete global references
   for (auto& c : classes) {
     c.cls->free(env);
@@ -150,22 +140,29 @@ class JCSGlobal {
   JCSGlobal(JNIEnv* env, T obj)
       : m_obj(static_cast<T>(env->NewGlobalRef(obj))) {}
   ~JCSGlobal() {
-    if (!jvm || cs::NotifierDestroyed()) return;
+    if (!jvm || cs::NotifierDestroyed()) {
+      return;
+    }
     JNIEnv* env;
     bool attached = false;
     // don't attach and de-attach if already attached to a thread.
     if (jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) ==
         JNI_EDETACHED) {
       if (jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) !=
-          JNI_OK)
+          JNI_OK) {
         return;
+      }
       attached = true;
     }
-    if (!env || !env->functions) return;
+    if (!env || !env->functions) {
+      return;
+    }
     env->DeleteGlobalRef(m_obj);
-    if (attached) jvm->DetachCurrentThread();
+    if (attached) {
+      jvm->DetachCurrentThread();
+    }
   }
-  operator T() { return m_obj; }
+  operator T() { return m_obj; }  // NOLINT
   T obj() { return m_obj; }
 
  private:
@@ -173,8 +170,11 @@ class JCSGlobal {
 };
 
 static void ReportError(JNIEnv* env, CS_Status status) {
-  if (status == CS_OK) return;
-  wpi::SmallString<64> msg;
+  if (status == CS_OK) {
+    return;
+  }
+  std::string_view msg;
+  std::string msgBuf;
   switch (status) {
     case CS_PROPERTY_WRITE_FAILED:
       msg = "property write failed";
@@ -207,8 +207,8 @@ static void ReportError(JNIEnv* env, CS_Status status) {
       msg = "telemetry not enabled";
       break;
     default: {
-      wpi::raw_svector_ostream oss{msg};
-      oss << "unknown error code=" << status;
+      msgBuf = fmt::format("unknown error code={}", status);
+      msg = msgBuf;
       break;
     }
   }
@@ -216,7 +216,9 @@ static void ReportError(JNIEnv* env, CS_Status status) {
 }
 
 static inline bool CheckStatus(JNIEnv* env, CS_Status status) {
-  if (status != CS_OK) ReportError(env, status);
+  if (status != CS_OK) {
+    ReportError(env, status);
+  }
   return status == CS_OK;
 }
 
@@ -245,7 +247,7 @@ static jobject MakeJObject(JNIEnv* env, const cs::VideoMode& videoMode) {
 static jobject MakeJObject(JNIEnv* env, const cs::RawEvent& event) {
   static jmethodID constructor =
       env->GetMethodID(videoEventCls, "<init>",
-                       "(IIILjava/lang/String;IIIIIIILjava/lang/String;)V");
+                       "(IIILjava/lang/String;IIIIIIILjava/lang/String;I)V");
   JLocal<jstring> name(env, MakeJString(env, event.name));
   JLocal<jstring> valueStr(env, MakeJString(env, event.valueStr));
   // clang-format off
@@ -263,19 +265,33 @@ static jobject MakeJObject(JNIEnv* env, const cs::RawEvent& event) {
       static_cast<jint>(event.propertyHandle),
       static_cast<jint>(event.propertyKind),
       static_cast<jint>(event.value),
-      valueStr.obj());
+      valueStr.obj(),
+      static_cast<jint>(event.listener));
   // clang-format on
+}
+
+static jobjectArray MakeJObject(JNIEnv* env,
+                                std::span<const cs::RawEvent> arr) {
+  jobjectArray jarr = env->NewObjectArray(arr.size(), videoEventCls, nullptr);
+  if (!jarr) {
+    return nullptr;
+  }
+  for (size_t i = 0; i < arr.size(); ++i) {
+    JLocal<jobject> elem{env, MakeJObject(env, arr[i])};
+    env->SetObjectArrayElement(jarr, i, elem.obj());
+  }
+  return jarr;
 }
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getPropertyKind
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getPropertyKind
+Java_edu_wpi_first_cscore_CameraServerJNI_getPropertyKind
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
@@ -285,28 +301,30 @@ Java_edu_wpi_cscore_CameraServerJNI_getPropertyKind
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getPropertyName
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getPropertyName
+Java_edu_wpi_first_cscore_CameraServerJNI_getPropertyName
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetPropertyName(property, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getProperty
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getProperty
+Java_edu_wpi_first_cscore_CameraServerJNI_getProperty
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
@@ -316,12 +334,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getProperty
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setProperty
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setProperty
+Java_edu_wpi_first_cscore_CameraServerJNI_setProperty
   (JNIEnv* env, jclass, jint property, jint value)
 {
   CS_Status status = 0;
@@ -330,12 +348,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setProperty
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getPropertyMin
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getPropertyMin
+Java_edu_wpi_first_cscore_CameraServerJNI_getPropertyMin
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
@@ -345,12 +363,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getPropertyMin
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getPropertyMax
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getPropertyMax
+Java_edu_wpi_first_cscore_CameraServerJNI_getPropertyMax
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
@@ -360,12 +378,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getPropertyMax
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getPropertyStep
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getPropertyStep
+Java_edu_wpi_first_cscore_CameraServerJNI_getPropertyStep
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
@@ -375,12 +393,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getPropertyStep
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getPropertyDefault
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getPropertyDefault
+Java_edu_wpi_first_cscore_CameraServerJNI_getPropertyDefault
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
@@ -390,28 +408,30 @@ Java_edu_wpi_cscore_CameraServerJNI_getPropertyDefault
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getStringProperty
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getStringProperty
+Java_edu_wpi_first_cscore_CameraServerJNI_getStringProperty
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetStringProperty(property, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setStringProperty
  * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setStringProperty
+Java_edu_wpi_first_cscore_CameraServerJNI_setStringProperty
   (JNIEnv* env, jclass, jint property, jstring value)
 {
   if (!value) {
@@ -424,27 +444,29 @@ Java_edu_wpi_cscore_CameraServerJNI_setStringProperty
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getEnumPropertyChoices
  * Signature: (I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getEnumPropertyChoices
+Java_edu_wpi_first_cscore_CameraServerJNI_getEnumPropertyChoices
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
   auto arr = cs::GetEnumPropertyChoices(property, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJStringArray(env, arr);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createUsbCameraDev
  * Signature: (Ljava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraDev
+Java_edu_wpi_first_cscore_CameraServerJNI_createUsbCameraDev
   (JNIEnv* env, jclass, jstring name, jint dev)
 {
   if (!name) {
@@ -458,12 +480,12 @@ Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraDev
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createUsbCameraPath
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraPath
+Java_edu_wpi_first_cscore_CameraServerJNI_createUsbCameraPath
   (JNIEnv* env, jclass, jstring name, jstring path)
 {
   if (!name) {
@@ -482,12 +504,12 @@ Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraPath
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createHttpCamera
  * Signature: (Ljava/lang/String;Ljava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createHttpCamera
+Java_edu_wpi_first_cscore_CameraServerJNI_createHttpCamera
   (JNIEnv* env, jclass, jstring name, jstring url, jint kind)
 {
   if (!name) {
@@ -507,12 +529,12 @@ Java_edu_wpi_cscore_CameraServerJNI_createHttpCamera
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createHttpCameraMulti
  * Signature: (Ljava/lang/String;[Ljava/lang/Object;I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createHttpCameraMulti
+Java_edu_wpi_first_cscore_CameraServerJNI_createHttpCameraMulti
   (JNIEnv* env, jclass, jstring name, jobjectArray urls, jint kind)
 {
   if (!name) {
@@ -533,7 +555,7 @@ Java_edu_wpi_cscore_CameraServerJNI_createHttpCameraMulti
       // TODO
       return 0;
     }
-    vec.push_back(JStringRef{env, elem}.str());
+    vec.emplace_back(JStringRef{env, elem}.str());
   }
   CS_Status status = 0;
   auto val =
@@ -544,39 +566,14 @@ Java_edu_wpi_cscore_CameraServerJNI_createHttpCameraMulti
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerCvJNI
- * Method:    createCvSource
- * Signature: (Ljava/lang/String;IIII)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerCvJNI_createCvSource
-  (JNIEnv* env, jclass, jstring name, jint pixelFormat, jint width, jint height,
-   jint fps)
-{
-  if (!name) {
-    nullPointerEx.Throw(env, "name cannot be null");
-    return 0;
-  }
-  CS_Status status = 0;
-  auto val = cs::CreateCvSource(
-      JStringRef{env, name}.str(),
-      cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(pixelFormat),
-                    static_cast<int>(width), static_cast<int>(height),
-                    static_cast<int>(fps)},
-      &status);
-  CheckStatus(env, status);
-  return val;
-}
-
-/*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createRawSource
- * Signature: (Ljava/lang/String;IIII)I
+ * Signature: (Ljava/lang/String;ZIIII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createRawSource
-  (JNIEnv* env, jclass, jstring name, jint pixelFormat, jint width, jint height,
-   jint fps)
+Java_edu_wpi_first_cscore_CameraServerJNI_createRawSource
+  (JNIEnv* env, jclass, jstring name, jboolean isCv, jint pixelFormat,
+   jint width, jint height, jint fps)
 {
   if (!name) {
     nullPointerEx.Throw(env, "name cannot be null");
@@ -584,7 +581,7 @@ Java_edu_wpi_cscore_CameraServerJNI_createRawSource
   }
   CS_Status status = 0;
   auto val = cs::CreateRawSource(
-      JStringRef{env, name}.str(),
+      JStringRef{env, name}.str(), isCv,
       cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(pixelFormat),
                     static_cast<int>(width), static_cast<int>(height),
                     static_cast<int>(fps)},
@@ -594,12 +591,12 @@ Java_edu_wpi_cscore_CameraServerJNI_createRawSource
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSourceKind
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSourceKind
+Java_edu_wpi_first_cscore_CameraServerJNI_getSourceKind
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -609,44 +606,48 @@ Java_edu_wpi_cscore_CameraServerJNI_getSourceKind
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSourceName
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSourceName
+Java_edu_wpi_first_cscore_CameraServerJNI_getSourceName
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetSourceName(source, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSourceDescription
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSourceDescription
+Java_edu_wpi_first_cscore_CameraServerJNI_getSourceDescription
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetSourceDescription(source, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSourceLastFrameTime
  * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSourceLastFrameTime
+Java_edu_wpi_first_cscore_CameraServerJNI_getSourceLastFrameTime
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -656,12 +657,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getSourceLastFrameTime
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSourceConnectionStrategy
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSourceConnectionStrategy
+Java_edu_wpi_first_cscore_CameraServerJNI_setSourceConnectionStrategy
   (JNIEnv* env, jclass, jint source, jint strategy)
 {
   CS_Status status = 0;
@@ -671,12 +672,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceConnectionStrategy
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    isSourceConnected
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_isSourceConnected
+Java_edu_wpi_first_cscore_CameraServerJNI_isSourceConnected
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -686,12 +687,12 @@ Java_edu_wpi_cscore_CameraServerJNI_isSourceConnected
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    isSourceEnabled
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_isSourceEnabled
+Java_edu_wpi_first_cscore_CameraServerJNI_isSourceEnabled
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -701,12 +702,12 @@ Java_edu_wpi_cscore_CameraServerJNI_isSourceEnabled
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSourceProperty
  * Signature: (ILjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSourceProperty
+Java_edu_wpi_first_cscore_CameraServerJNI_getSourceProperty
   (JNIEnv* env, jclass, jint source, jstring name)
 {
   if (!name) {
@@ -721,43 +722,47 @@ Java_edu_wpi_cscore_CameraServerJNI_getSourceProperty
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    enumerateSourceProperties
  * Signature: (I)[I
  */
 JNIEXPORT jintArray JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_enumerateSourceProperties
+Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSourceProperties
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   wpi::SmallVector<CS_Property, 32> buf;
   auto arr = cs::EnumerateSourceProperties(source, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJIntArray(env, arr);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSourceVideoMode
  * Signature: (I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSourceVideoMode
+Java_edu_wpi_first_cscore_CameraServerJNI_getSourceVideoMode
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   auto val = cs::GetSourceVideoMode(source, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJObject(env, val);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSourceVideoMode
  * Signature: (IIIII)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSourceVideoMode
+Java_edu_wpi_first_cscore_CameraServerJNI_setSourceVideoMode
   (JNIEnv* env, jclass, jint source, jint pixelFormat, jint width, jint height,
    jint fps)
 {
@@ -772,12 +777,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceVideoMode
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSourcePixelFormat
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSourcePixelFormat
+Java_edu_wpi_first_cscore_CameraServerJNI_setSourcePixelFormat
   (JNIEnv* env, jclass, jint source, jint pixelFormat)
 {
   CS_Status status = 0;
@@ -788,12 +793,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourcePixelFormat
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSourceResolution
  * Signature: (III)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSourceResolution
+Java_edu_wpi_first_cscore_CameraServerJNI_setSourceResolution
   (JNIEnv* env, jclass, jint source, jint width, jint height)
 {
   CS_Status status = 0;
@@ -803,12 +808,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceResolution
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSourceFPS
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSourceFPS
+Java_edu_wpi_first_cscore_CameraServerJNI_setSourceFPS
   (JNIEnv* env, jclass, jint source, jint fps)
 {
   CS_Status status = 0;
@@ -818,12 +823,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceFPS
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSourceConfigJson
  * Signature: (ILjava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSourceConfigJson
+Java_edu_wpi_first_cscore_CameraServerJNI_setSourceConfigJson
   (JNIEnv* env, jclass, jint source, jstring config)
 {
   CS_Status status = 0;
@@ -833,12 +838,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceConfigJson
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSourceConfigJson
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSourceConfigJson
+Java_edu_wpi_first_cscore_CameraServerJNI_getSourceConfigJson
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -848,19 +853,23 @@ Java_edu_wpi_cscore_CameraServerJNI_getSourceConfigJson
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    enumerateSourceVideoModes
  * Signature: (I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_enumerateSourceVideoModes
+Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSourceVideoModes
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   auto arr = cs::EnumerateSourceVideoModes(source, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   jobjectArray jarr = env->NewObjectArray(arr.size(), videoModeCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jobject> jelem{env, MakeJObject(env, arr[i])};
     env->SetObjectArrayElement(jarr, i, jelem);
@@ -869,28 +878,30 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateSourceVideoModes
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    enumerateSourceSinks
  * Signature: (I)[I
  */
 JNIEXPORT jintArray JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_enumerateSourceSinks
+Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSourceSinks
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   wpi::SmallVector<CS_Sink, 16> buf;
   auto arr = cs::EnumerateSourceSinks(source, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJIntArray(env, arr);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    copySource
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_copySource
+Java_edu_wpi_first_cscore_CameraServerJNI_copySource
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -900,12 +911,12 @@ Java_edu_wpi_cscore_CameraServerJNI_copySource
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    releaseSource
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_releaseSource
+Java_edu_wpi_first_cscore_CameraServerJNI_releaseSource
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -914,12 +925,12 @@ Java_edu_wpi_cscore_CameraServerJNI_releaseSource
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setCameraBrightness
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setCameraBrightness
+Java_edu_wpi_first_cscore_CameraServerJNI_setCameraBrightness
   (JNIEnv* env, jclass, jint source, jint brightness)
 {
   CS_Status status = 0;
@@ -928,12 +939,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setCameraBrightness
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getCameraBrightness
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getCameraBrightness
+Java_edu_wpi_first_cscore_CameraServerJNI_getCameraBrightness
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -943,12 +954,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getCameraBrightness
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setCameraWhiteBalanceAuto
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setCameraWhiteBalanceAuto
+Java_edu_wpi_first_cscore_CameraServerJNI_setCameraWhiteBalanceAuto
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -957,12 +968,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setCameraWhiteBalanceAuto
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setCameraWhiteBalanceHoldCurrent
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setCameraWhiteBalanceHoldCurrent
+Java_edu_wpi_first_cscore_CameraServerJNI_setCameraWhiteBalanceHoldCurrent
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -971,12 +982,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setCameraWhiteBalanceHoldCurrent
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setCameraWhiteBalanceManual
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setCameraWhiteBalanceManual
+Java_edu_wpi_first_cscore_CameraServerJNI_setCameraWhiteBalanceManual
   (JNIEnv* env, jclass, jint source, jint value)
 {
   CS_Status status = 0;
@@ -985,12 +996,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setCameraWhiteBalanceManual
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setCameraExposureAuto
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureAuto
+Java_edu_wpi_first_cscore_CameraServerJNI_setCameraExposureAuto
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -999,12 +1010,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureAuto
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setCameraExposureHoldCurrent
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureHoldCurrent
+Java_edu_wpi_first_cscore_CameraServerJNI_setCameraExposureHoldCurrent
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -1013,12 +1024,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureHoldCurrent
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setCameraExposureManual
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureManual
+Java_edu_wpi_first_cscore_CameraServerJNI_setCameraExposureManual
   (JNIEnv* env, jclass, jint source, jint value)
 {
   CS_Status status = 0;
@@ -1027,57 +1038,77 @@ Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureManual
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    setUsbCameraPath
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_setUsbCameraPath
+  (JNIEnv* env, jclass, jint source, jstring path)
+{
+  CS_Status status = 0;
+  cs::SetUsbCameraPath(source, JStringRef{env, path}.str(), &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getUsbCameraPath
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getUsbCameraPath
+Java_edu_wpi_first_cscore_CameraServerJNI_getUsbCameraPath
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   auto str = cs::GetUsbCameraPath(source, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getUsbCameraInfo
  * Signature: (I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getUsbCameraInfo
+Java_edu_wpi_first_cscore_CameraServerJNI_getUsbCameraInfo
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   auto info = cs::GetUsbCameraInfo(source, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJObject(env, info);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getHttpCameraKind
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getHttpCameraKind
+Java_edu_wpi_first_cscore_CameraServerJNI_getHttpCameraKind
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   auto kind = cs::GetHttpCameraKind(source, &status);
-  if (!CheckStatus(env, status)) return 0;
+  if (!CheckStatus(env, status)) {
+    return 0;
+  }
   return kind;
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setHttpCameraUrls
  * Signature: (I[Ljava/lang/Object;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setHttpCameraUrls
+Java_edu_wpi_first_cscore_CameraServerJNI_setHttpCameraUrls
   (JNIEnv* env, jclass, jint source, jobjectArray urls)
 {
   if (!urls) {
@@ -1094,7 +1125,7 @@ Java_edu_wpi_cscore_CameraServerJNI_setHttpCameraUrls
       // TODO
       return;
     }
-    vec.push_back(JStringRef{env, elem}.str());
+    vec.emplace_back(JStringRef{env, elem}.str());
   }
   CS_Status status = 0;
   cs::SetHttpCameraUrls(source, vec, &status);
@@ -1102,93 +1133,104 @@ Java_edu_wpi_cscore_CameraServerJNI_setHttpCameraUrls
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getHttpCameraUrls
  * Signature: (I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getHttpCameraUrls
+Java_edu_wpi_first_cscore_CameraServerJNI_getHttpCameraUrls
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   auto arr = cs::GetHttpCameraUrls(source, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJStringArray(env, arr);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerCvJNI
- * Method:    putSourceFrame
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    putRawSourceFrame
  * Signature: (IJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerCvJNI_putSourceFrame
-  (JNIEnv* env, jclass, jint source, jlong imageNativeObj)
+Java_edu_wpi_first_cscore_CameraServerJNI_putRawSourceFrame
+  (JNIEnv* env, jclass, jint source, jlong framePtr)
 {
-  try {
-    cv::Mat& image = *((cv::Mat*)imageNativeObj);
-    CS_Status status = 0;
-    cs::PutSourceFrame(source, image, &status);
-    CheckStatus(env, status);
-  } catch (const std::exception& e) {
-    ThrowJavaException(env, &e);
-  } catch (...) {
-    ThrowJavaException(env, 0);
+  auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
+  if (!frame) {
+    nullPointerEx.Throw(env, "frame is null");
+    return;
   }
+  CS_Status status = 0;
+  cs::PutSourceFrame(source, *frame, &status);
+  CheckStatus(env, status);
 }
 
-// int width, int height, int pixelFormat, int totalData
-
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    putRawSourceFrameBB
- * Signature: (ILjava/lang/Object;IIII)V
+ * Signature: (ILjava/lang/Object;IIIII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_putRawSourceFrameBB
-  (JNIEnv* env, jclass, jint source, jobject byteBuffer, jint width,
-   jint height, jint pixelFormat, jint totalData)
+Java_edu_wpi_first_cscore_CameraServerJNI_putRawSourceFrameBB
+  (JNIEnv* env, jclass, jint source, jobject data, jint size, jint width,
+   jint height, jint stride, jint pixelFormat)
 {
-  CS_RawFrame rawFrame;
-  rawFrame.data =
-      reinterpret_cast<char*>(env->GetDirectBufferAddress(byteBuffer));
-  rawFrame.totalData = totalData;
-  rawFrame.pixelFormat = pixelFormat;
-  rawFrame.width = width;
-  rawFrame.height = height;
+  WPI_RawFrame frame;  // use WPI_Frame because we don't want the destructor
+  frame.data = static_cast<uint8_t*>(env->GetDirectBufferAddress(data));
+  if (!frame.data) {
+    nullPointerEx.Throw(env, "data is null");
+    return;
+  }
+  frame.freeFunc = nullptr;
+  frame.freeCbData = nullptr;
+  frame.size = size;
+  frame.width = width;
+  frame.height = height;
+  frame.stride = stride;
+  frame.pixelFormat = pixelFormat;
   CS_Status status = 0;
-  cs::PutSourceFrame(source, rawFrame, &status);
+  cs::PutSourceFrame(source, frame, &status);
   CheckStatus(env, status);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    putRawSourceFrame
- * Signature: (IJIIII)V
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    putRawSourceFrameData
+ * Signature: (IJIIIII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_putRawSourceFrame
-  (JNIEnv* env, jclass, jint source, jlong ptr, jint width, jint height,
-   jint pixelFormat, jint totalData)
+Java_edu_wpi_first_cscore_CameraServerJNI_putRawSourceFrameData
+  (JNIEnv* env, jclass, jint source, jlong data, jint size, jint width,
+   jint height, jint stride, jint pixelFormat)
 {
-  CS_RawFrame rawFrame;
-  rawFrame.data = reinterpret_cast<char*>(static_cast<intptr_t>(ptr));
-  rawFrame.totalData = totalData;
-  rawFrame.pixelFormat = pixelFormat;
-  rawFrame.width = width;
-  rawFrame.height = height;
+  WPI_RawFrame frame;  // use WPI_Frame because we don't want the destructor
+  frame.data = reinterpret_cast<uint8_t*>(data);
+  if (!frame.data) {
+    nullPointerEx.Throw(env, "data is null");
+    return;
+  }
+  frame.freeFunc = nullptr;
+  frame.freeCbData = nullptr;
+  frame.size = size;
+  frame.width = width;
+  frame.height = height;
+  frame.stride = stride;
+  frame.pixelFormat = pixelFormat;
   CS_Status status = 0;
-  cs::PutSourceFrame(source, rawFrame, &status);
+  cs::PutSourceFrame(source, frame, &status);
   CheckStatus(env, status);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    notifySourceError
  * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_notifySourceError
+Java_edu_wpi_first_cscore_CameraServerJNI_notifySourceError
   (JNIEnv* env, jclass, jint source, jstring msg)
 {
   if (!msg) {
@@ -1201,12 +1243,12 @@ Java_edu_wpi_cscore_CameraServerJNI_notifySourceError
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSourceConnected
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSourceConnected
+Java_edu_wpi_first_cscore_CameraServerJNI_setSourceConnected
   (JNIEnv* env, jclass, jint source, jboolean connected)
 {
   CS_Status status = 0;
@@ -1215,12 +1257,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceConnected
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSourceDescription
  * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSourceDescription
+Java_edu_wpi_first_cscore_CameraServerJNI_setSourceDescription
   (JNIEnv* env, jclass, jint source, jstring description)
 {
   if (!description) {
@@ -1233,12 +1275,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceDescription
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createSourceProperty
  * Signature: (ILjava/lang/String;IIIIII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty
+Java_edu_wpi_first_cscore_CameraServerJNI_createSourceProperty
   (JNIEnv* env, jclass, jint source, jstring name, jint kind, jint minimum,
    jint maximum, jint step, jint defaultValue, jint value)
 {
@@ -1251,12 +1293,12 @@ Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSourceEnumPropertyChoices
  * Signature: (II[Ljava/lang/Object;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSourceEnumPropertyChoices
+Java_edu_wpi_first_cscore_CameraServerJNI_setSourceEnumPropertyChoices
   (JNIEnv* env, jclass, jint source, jint property, jobjectArray choices)
 {
   if (!choices) {
@@ -1273,7 +1315,7 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceEnumPropertyChoices
       // TODO
       return;
     }
-    vec.push_back(JStringRef{env, elem}.str());
+    vec.emplace_back(JStringRef{env, elem}.str());
   }
   CS_Status status = 0;
   cs::SetSourceEnumPropertyChoices(source, property, vec, &status);
@@ -1281,12 +1323,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceEnumPropertyChoices
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createMjpegServer
  * Signature: (Ljava/lang/String;Ljava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createMjpegServer
+Java_edu_wpi_first_cscore_CameraServerJNI_createMjpegServer
   (JNIEnv* env, jclass, jstring name, jstring listenAddress, jint port)
 {
   if (!name) {
@@ -1306,50 +1348,31 @@ Java_edu_wpi_cscore_CameraServerJNI_createMjpegServer
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerCvJNI
- * Method:    createCvSink
- * Signature: (Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerCvJNI_createCvSink
-  (JNIEnv* env, jclass, jstring name)
-{
-  if (!name) {
-    nullPointerEx.Throw(env, "name cannot be null");
-    return 0;
-  }
-  CS_Status status = 0;
-  auto val = cs::CreateCvSink(JStringRef{env, name}.str(), &status);
-  CheckStatus(env, status);
-  return val;
-}
-
-/*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    createRawSink
- * Signature: (Ljava/lang/String;)I
+ * Signature: (Ljava/lang/String;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createRawSink
-  (JNIEnv* env, jclass, jstring name)
+Java_edu_wpi_first_cscore_CameraServerJNI_createRawSink
+  (JNIEnv* env, jclass, jstring name, jboolean isCv)
 {
   if (!name) {
     nullPointerEx.Throw(env, "name cannot be null");
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::CreateRawSink(JStringRef{env, name}.str(), &status);
+  auto val = cs::CreateRawSink(JStringRef{env, name}.str(), isCv, &status);
   CheckStatus(env, status);
   return val;
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSinkKind
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSinkKind
+Java_edu_wpi_first_cscore_CameraServerJNI_getSinkKind
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
@@ -1359,44 +1382,48 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkKind
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSinkName
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSinkName
+Java_edu_wpi_first_cscore_CameraServerJNI_getSinkName
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkName(sink, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSinkDescription
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSinkDescription
+Java_edu_wpi_first_cscore_CameraServerJNI_getSinkDescription
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkDescription(sink, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSinkProperty
  * Signature: (ILjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSinkProperty
+Java_edu_wpi_first_cscore_CameraServerJNI_getSinkProperty
   (JNIEnv* env, jclass, jint sink, jstring name)
 {
   if (!name) {
@@ -1410,28 +1437,30 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkProperty
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    enumerateSinkProperties
  * Signature: (I)[I
  */
 JNIEXPORT jintArray JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_enumerateSinkProperties
+Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSinkProperties
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
   wpi::SmallVector<CS_Property, 32> buf;
   auto arr = cs::EnumerateSinkProperties(source, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJIntArray(env, arr);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSinkConfigJson
  * Signature: (ILjava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSinkConfigJson
+Java_edu_wpi_first_cscore_CameraServerJNI_setSinkConfigJson
   (JNIEnv* env, jclass, jint source, jstring config)
 {
   CS_Status status = 0;
@@ -1441,12 +1470,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSinkConfigJson
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSinkConfigJson
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSinkConfigJson
+Java_edu_wpi_first_cscore_CameraServerJNI_getSinkConfigJson
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
@@ -1456,12 +1485,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkConfigJson
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSinkSource
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSinkSource
+Java_edu_wpi_first_cscore_CameraServerJNI_setSinkSource
   (JNIEnv* env, jclass, jint sink, jint source)
 {
   CS_Status status = 0;
@@ -1470,12 +1499,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSinkSource
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSinkSourceProperty
  * Signature: (ILjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSinkSourceProperty
+Java_edu_wpi_first_cscore_CameraServerJNI_getSinkSourceProperty
   (JNIEnv* env, jclass, jint sink, jstring name)
 {
   if (!name) {
@@ -1490,12 +1519,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkSourceProperty
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSinkSource
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSinkSource
+Java_edu_wpi_first_cscore_CameraServerJNI_getSinkSource
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
@@ -1505,12 +1534,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkSource
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    copySink
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_copySink
+Java_edu_wpi_first_cscore_CameraServerJNI_copySink
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
@@ -1520,12 +1549,12 @@ Java_edu_wpi_cscore_CameraServerJNI_copySink
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    releaseSink
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_releaseSink
+Java_edu_wpi_first_cscore_CameraServerJNI_releaseSink
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
@@ -1534,27 +1563,29 @@ Java_edu_wpi_cscore_CameraServerJNI_releaseSink
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getMjpegServerListenAddress
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getMjpegServerListenAddress
+Java_edu_wpi_first_cscore_CameraServerJNI_getMjpegServerListenAddress
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
   auto str = cs::GetMjpegServerListenAddress(sink, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getMjpegServerPort
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getMjpegServerPort
+Java_edu_wpi_first_cscore_CameraServerJNI_getMjpegServerPort
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
@@ -1564,12 +1595,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getMjpegServerPort
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSinkDescription
  * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSinkDescription
+Java_edu_wpi_first_cscore_CameraServerJNI_setSinkDescription
   (JNIEnv* env, jclass, jint sink, jstring description)
 {
   if (!description) {
@@ -1582,145 +1613,74 @@ Java_edu_wpi_cscore_CameraServerJNI_setSinkDescription
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerCvJNI
- * Method:    grabSinkFrame
- * Signature: (IJ)J
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    grabRawSinkFrame
+ * Signature: (ILjava/lang/Object;J)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_cscore_CameraServerCvJNI_grabSinkFrame
-  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj)
+Java_edu_wpi_first_cscore_CameraServerJNI_grabRawSinkFrame
+  (JNIEnv* env, jclass, jint sink, jobject frameObj, jlong framePtr)
 {
-  try {
-    cv::Mat& image = *((cv::Mat*)imageNativeObj);
-    CS_Status status = 0;
-    auto rv = cs::GrabSinkFrame(sink, image, &status);
-    CheckStatus(env, status);
-    return rv;
-  } catch (const std::exception& e) {
-    ThrowJavaException(env, &e);
-    return 0;
-  } catch (...) {
-    ThrowJavaException(env, 0);
-    return 0;
-  }
-}
-
-/*
- * Class:     edu_wpi_cscore_CameraServerCvJNI
- * Method:    grabSinkFrameTimeout
- * Signature: (IJD)J
- */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_cscore_CameraServerCvJNI_grabSinkFrameTimeout
-  (JNIEnv* env, jclass, jint sink, jlong imageNativeObj, jdouble timeout)
-{
-  try {
-    cv::Mat& image = *((cv::Mat*)imageNativeObj);
-    CS_Status status = 0;
-    auto rv = cs::GrabSinkFrameTimeout(sink, image, timeout, &status);
-    CheckStatus(env, status);
-    return rv;
-  } catch (const std::exception& e) {
-    ThrowJavaException(env, &e);
-    return 0;
-  } catch (...) {
-    ThrowJavaException(env, 0);
-    return 0;
-  }
-}
-
-static void SetRawFrameData(JNIEnv* env, jobject rawFrameObj,
-                            jobject byteBuffer, bool didChangeDataPtr,
-                            const CS_RawFrame& frame) {
-  static jmethodID setMethod =
-      env->GetMethodID(rawFrameCls, "setData", "(Ljava/nio/ByteBuffer;JIIII)V");
-  jlong framePtr = static_cast<jlong>(reinterpret_cast<intptr_t>(frame.data));
-
-  if (didChangeDataPtr) {
-    byteBuffer = env->NewDirectByteBuffer(frame.data, frame.dataLength);
-  }
-
-  env->CallVoidMethod(
-      rawFrameObj, setMethod, byteBuffer, framePtr,
-      static_cast<jint>(frame.totalData), static_cast<jint>(frame.width),
-      static_cast<jint>(frame.height), static_cast<jint>(frame.pixelFormat));
-}
-
-/*
- * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    grabRawSinkFrameImpl
- * Signature: (ILjava/lang/Object;JLjava/lang/Object;III)J
- */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_grabRawSinkFrameImpl
-  (JNIEnv* env, jclass, jint sink, jobject rawFrameObj, jlong rawFramePtr,
-   jobject byteBuffer, jint width, jint height, jint pixelFormat)
-{
-  CS_RawFrame* ptr =
-      reinterpret_cast<CS_RawFrame*>(static_cast<intptr_t>(rawFramePtr));
-  auto origDataPtr = ptr->data;
-  ptr->width = width;
-  ptr->height = height;
-  ptr->pixelFormat = pixelFormat;
+  auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
+  auto origData = frame->data;
   CS_Status status = 0;
-  auto rv = cs::GrabSinkFrame(static_cast<CS_Sink>(sink), *ptr, &status);
+  auto rv = cs::GrabSinkFrame(static_cast<CS_Sink>(sink), *frame, &status);
   if (!CheckStatus(env, status)) {
     return 0;
   }
-  SetRawFrameData(env, rawFrameObj, byteBuffer, origDataPtr != ptr->data, *ptr);
+  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame,
+                    origData != frame->data);
   return rv;
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    grabRawSinkFrameTimeoutImpl
- * Signature: (ILjava/lang/Object;JLjava/lang/Object;IIID)J
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    grabRawSinkFrameTimeout
+ * Signature: (ILjava/lang/Object;JD)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_grabRawSinkFrameTimeoutImpl
-  (JNIEnv* env, jclass, jint sink, jobject rawFrameObj, jlong rawFramePtr,
-   jobject byteBuffer, jint width, jint height, jint pixelFormat,
+Java_edu_wpi_first_cscore_CameraServerJNI_grabRawSinkFrameTimeout
+  (JNIEnv* env, jclass, jint sink, jobject frameObj, jlong framePtr,
    jdouble timeout)
 {
-  CS_RawFrame* ptr =
-      reinterpret_cast<CS_RawFrame*>(static_cast<intptr_t>(rawFramePtr));
-  auto origDataPtr = ptr->data;
-  ptr->width = width;
-  ptr->height = height;
-  ptr->pixelFormat = pixelFormat;
+  auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
+  auto origData = frame->data;
   CS_Status status = 0;
-  auto rv = cs::GrabSinkFrameTimeout(static_cast<CS_Sink>(sink), *ptr, timeout,
-                                     &status);
+  auto rv = cs::GrabSinkFrameTimeout(static_cast<CS_Sink>(sink), *frame,
+                                     timeout, &status);
   if (!CheckStatus(env, status)) {
     return 0;
   }
-  SetRawFrameData(env, rawFrameObj, byteBuffer, origDataPtr != ptr->data, *ptr);
+  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame,
+                    origData != frame->data);
   return rv;
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getSinkError
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getSinkError
+Java_edu_wpi_first_cscore_CameraServerJNI_getSinkError
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkError(sink, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setSinkEnabled
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setSinkEnabled
+Java_edu_wpi_first_cscore_CameraServerJNI_setSinkEnabled
   (JNIEnv* env, jclass, jint sink, jboolean enabled)
 {
   CS_Status status = 0;
@@ -1729,12 +1689,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSinkEnabled
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    addListener
  * Signature: (Ljava/lang/Object;IZ)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_addListener
+Java_edu_wpi_first_cscore_CameraServerJNI_addListener
   (JNIEnv* envouter, jclass, jobject listener, jint eventMask,
    jboolean immediateNotify)
 {
@@ -1749,17 +1709,23 @@ Java_edu_wpi_cscore_CameraServerJNI_addListener
 
   // cls is a temporary here; cannot be used within callback functor
   jclass cls = envouter->GetObjectClass(listener);
-  if (!cls) return 0;
+  if (!cls) {
+    return 0;
+  }
 
   // method ids, on the other hand, are safe to retain
   jmethodID mid = envouter->GetMethodID(cls, "accept", "(Ljava/lang/Object;)V");
-  if (!mid) return 0;
+  if (!mid) {
+    return 0;
+  }
 
   CS_Status status = 0;
   CS_Listener handle = cs::AddListener(
       [=](const cs::RawEvent& event) {
         JNIEnv* env = listenerEnv;
-        if (!env || !env->functions) return;
+        if (!env || !env->functions) {
+          return;
+        }
 
         // get the handler
         auto handler = listener_global->obj();
@@ -1771,7 +1737,9 @@ Java_edu_wpi_cscore_CameraServerJNI_addListener
           env->ExceptionClear();
           return;
         }
-        if (!jobj) return;
+        if (!jobj) {
+          return;
+        }
 
         env->CallVoidMethod(handler, mid, jobj.obj());
         if (env->ExceptionCheck()) {
@@ -1785,12 +1753,12 @@ Java_edu_wpi_cscore_CameraServerJNI_addListener
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    removeListener
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_removeListener
+Java_edu_wpi_first_cscore_CameraServerJNI_removeListener
   (JNIEnv* env, jclass, jint handle)
 {
   CS_Status status = 0;
@@ -1799,36 +1767,122 @@ Java_edu_wpi_cscore_CameraServerJNI_removeListener
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    createListenerPoller
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_createListenerPoller
+  (JNIEnv*, jclass)
+{
+  return cs::CreateListenerPoller();
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    destroyListenerPoller
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_destroyListenerPoller
+  (JNIEnv*, jclass, jint poller)
+{
+  cs::DestroyListenerPoller(poller);
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    addPolledListener
+ * Signature: (IIZ)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_addPolledListener
+  (JNIEnv* env, jclass, jint poller, jint eventMask, jboolean immediateNotify)
+{
+  CS_Status status = 0;
+  auto rv = cs::AddPolledListener(poller, eventMask, immediateNotify, &status);
+  CheckStatus(env, status);
+  return rv;
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    pollListener
+ * Signature: (I)[Ljava/lang/Object;
+ */
+JNIEXPORT jobjectArray JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_pollListener
+  (JNIEnv* env, jclass, jint poller)
+{
+  auto events = cs::PollListener(poller);
+  if (events.empty()) {
+    interruptedEx.Throw(env, "PollListener interrupted");
+    return nullptr;
+  }
+  return MakeJObject(env, events);
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    pollListenerTimeout
+ * Signature: (ID)[Ljava/lang/Object;
+ */
+JNIEXPORT jobjectArray JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_pollListenerTimeout
+  (JNIEnv* env, jclass, jint poller, jdouble timeout)
+{
+  bool timed_out = false;
+  auto events = cs::PollListener(poller, timeout, &timed_out);
+  if (events.empty() && !timed_out) {
+    interruptedEx.Throw(env, "PollListener interrupted");
+    return nullptr;
+  }
+  return MakeJObject(env, events);
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    cancelPollListener
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_cancelPollListener
+  (JNIEnv*, jclass, jint poller)
+{
+  cs::CancelPollListener(poller);
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setTelemetryPeriod
  * Signature: (D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setTelemetryPeriod
+Java_edu_wpi_first_cscore_CameraServerJNI_setTelemetryPeriod
   (JNIEnv* env, jclass, jdouble seconds)
 {
   cs::SetTelemetryPeriod(seconds);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getTelemetryElapsedTime
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getTelemetryElapsedTime
+Java_edu_wpi_first_cscore_CameraServerJNI_getTelemetryElapsedTime
   (JNIEnv* env, jclass)
 {
   return cs::GetTelemetryElapsedTime();
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getTelemetryValue
  * Signature: (II)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getTelemetryValue
+Java_edu_wpi_first_cscore_CameraServerJNI_getTelemetryValue
   (JNIEnv* env, jclass, jint handle, jint kind)
 {
   CS_Status status = 0;
@@ -1839,12 +1893,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getTelemetryValue
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getTelemetryAverageValue
  * Signature: (II)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getTelemetryAverageValue
+Java_edu_wpi_first_cscore_CameraServerJNI_getTelemetryAverageValue
   (JNIEnv* env, jclass, jint handle, jint kind)
 {
   CS_Status status = 0;
@@ -1855,20 +1909,24 @@ Java_edu_wpi_cscore_CameraServerJNI_getTelemetryAverageValue
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    enumerateUsbCameras
  * Signature: ()[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_enumerateUsbCameras
+Java_edu_wpi_first_cscore_CameraServerJNI_enumerateUsbCameras
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
   auto arr = cs::EnumerateUsbCameras(&status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), usbCameraInfoCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jobject> jelem{env, MakeJObject(env, arr[i])};
     env->SetObjectArrayElement(jarr, i, jelem);
@@ -1877,56 +1935,60 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateUsbCameras
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    enumerateSources
  * Signature: ()[I
  */
 JNIEXPORT jintArray JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_enumerateSources
+Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSources
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
   wpi::SmallVector<CS_Source, 16> buf;
   auto arr = cs::EnumerateSourceHandles(buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJIntArray(env, arr);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    enumerateSinks
  * Signature: ()[I
  */
 JNIEXPORT jintArray JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_enumerateSinks
+Java_edu_wpi_first_cscore_CameraServerJNI_enumerateSinks
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
   wpi::SmallVector<CS_Sink, 16> buf;
   auto arr = cs::EnumerateSinkHandles(buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJIntArray(env, arr);
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getHostname
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getHostname
+Java_edu_wpi_first_cscore_CameraServerJNI_getHostname
   (JNIEnv* env, jclass)
 {
   return MakeJString(env, cs::GetHostname());
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    getNetworkInterfaces
  * Signature: ()[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_getNetworkInterfaces
+Java_edu_wpi_first_cscore_CameraServerJNI_getNetworkInterfaces
   (JNIEnv* env, jclass)
 {
   return MakeJStringArray(env, cs::GetNetworkInterfaces());
@@ -1945,8 +2007,8 @@ struct LogMessage {
   void CallJava(JNIEnv* env, jobject func, jmethodID mid) {
     JLocal<jstring> file{env, MakeJString(env, m_file)};
     JLocal<jstring> msg{env, MakeJString(env, m_msg)};
-    env->CallVoidMethod(func, mid, (jint)m_level, file.obj(), (jint)m_line,
-                        msg.obj());
+    env->CallVoidMethod(func, mid, static_cast<jint>(m_level), file.obj(),
+                        static_cast<jint>(m_line), msg.obj());
   }
 
   static const char* GetName() { return "CSLogger"; }
@@ -1959,19 +2021,19 @@ struct LogMessage {
   std::string m_msg;
 };
 
-typedef JSingletonCallbackManager<LogMessage> LoggerJNI;
+using LoggerJNI = JSingletonCallbackManager<LogMessage>;
 
 }  // namespace
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    setLogger
  * Signature: (Ljava/lang/Object;I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_setLogger
+Java_edu_wpi_first_cscore_CameraServerJNI_setLogger
   (JNIEnv* env, jclass, jobject func, jint minLevel)
 {
   if (!func) {
@@ -1980,12 +2042,16 @@ Java_edu_wpi_cscore_CameraServerJNI_setLogger
   }
   // cls is a temporary here; cannot be used within callback functor
   jclass cls = env->GetObjectClass(func);
-  if (!cls) return;
+  if (!cls) {
+    return;
+  }
 
   // method ids, on the other hand, are safe to retain
   jmethodID mid = env->GetMethodID(cls, "apply",
                                    "(ILjava/lang/String;ILjava/lang/String;)V");
-  if (!mid) return;
+  if (!mid) {
+    return;
+  }
 
   auto& logger = LoggerJNI::GetInstance();
   logger.Start();
@@ -2000,31 +2066,39 @@ Java_edu_wpi_cscore_CameraServerJNI_setLogger
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    allocateRawFrame
- * Signature: ()J
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    runMainRunLoop
+ * Signature: ()V
  */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_allocateRawFrame
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_runMainRunLoop
   (JNIEnv*, jclass)
 {
-  cs::RawFrame* rawFrame = new cs::RawFrame{};
-  intptr_t rawFrameIntPtr = reinterpret_cast<intptr_t>(rawFrame);
-  return static_cast<jlong>(rawFrameIntPtr);
+  cs::RunMainRunLoop();
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    freeRawFrame
- * Signature: (J)V
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    runMainRunLoopTimeout
+ * Signature: (D)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_runMainRunLoopTimeout
+  (JNIEnv*, jclass, jdouble timeoutSeconds)
+{
+  return cs::RunMainRunLoopTimeout(timeoutSeconds);
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    stopMainRunLoop
+ * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_freeRawFrame
-  (JNIEnv*, jclass, jlong rawFrame)
+Java_edu_wpi_first_cscore_CameraServerJNI_stopMainRunLoop
+  (JNIEnv*, jclass)
 {
-  cs::RawFrame* ptr =
-      reinterpret_cast<cs::RawFrame*>(static_cast<intptr_t>(rawFrame));
-  delete ptr;
+  return cs::StopMainRunLoop();
 }
 
 }  // extern "C"

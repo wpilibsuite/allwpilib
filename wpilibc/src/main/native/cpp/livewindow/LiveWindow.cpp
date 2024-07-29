@@ -1,163 +1,228 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/livewindow/LiveWindow.h"
 
+#include <networktables/BooleanTopic.h>
 #include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/StringTopic.h>
+#include <wpi/json.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableRegistry.h>
 
-#include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilderImpl.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-using wpi::Twine;
+static constexpr std::string_view kSmartDashboardType = "LW Subsystem";
 
-struct LiveWindow::Impl {
-  Impl();
+namespace {
+struct Component {
+  bool firstTime = true;
+  bool telemetryEnabled = false;
+  nt::StringPublisher namePub;
+  nt::StringPublisher typePub;
+};
 
-  struct Component {
-    bool firstTime = true;
-    bool telemetryEnabled = true;
-  };
+struct Instance {
+  Instance() {
+    wpi::SendableRegistry::SetLiveWindowBuilderFactory(
+        [] { return std::make_unique<SendableBuilderImpl>(); });
+    enabledPub.Set(false);
+  }
 
   wpi::mutex mutex;
 
-  SendableRegistry& registry;
-  int dataHandle;
+  int dataHandle = wpi::SendableRegistry::GetDataHandle();
 
-  std::shared_ptr<nt::NetworkTable> liveWindowTable;
-  std::shared_ptr<nt::NetworkTable> statusTable;
-  nt::NetworkTableEntry enabledEntry;
+  std::shared_ptr<nt::NetworkTable> liveWindowTable =
+      nt::NetworkTableInstance::GetDefault().GetTable("LiveWindow");
+  std::shared_ptr<nt::NetworkTable> statusTable =
+      liveWindowTable->GetSubTable(".status");
+  nt::BooleanPublisher enabledPub =
+      statusTable->GetBooleanTopic("LW Enabled").Publish();
 
   bool startLiveWindow = false;
   bool liveWindowEnabled = false;
-  bool telemetryEnabled = true;
+  bool telemetryEnabled = false;
 
-  std::shared_ptr<Component> GetOrAdd(Sendable* sendable);
+  std::function<void()> enabled;
+  std::function<void()> disabled;
+
+  std::shared_ptr<Component> GetOrAdd(wpi::Sendable* sendable);
 };
+}  // namespace
 
-LiveWindow::Impl::Impl()
-    : registry(SendableRegistry::GetInstance()),
-      dataHandle(registry.GetDataHandle()),
-      liveWindowTable(
-          nt::NetworkTableInstance::GetDefault().GetTable("LiveWindow")) {
-  statusTable = liveWindowTable->GetSubTable(".status");
-  enabledEntry = statusTable->GetEntry("LW Enabled");
+static std::unique_ptr<Instance>& GetInstanceHolder() {
+  static std::unique_ptr<Instance> instance = std::make_unique<Instance>();
+  return instance;
 }
 
-std::shared_ptr<LiveWindow::Impl::Component> LiveWindow::Impl::GetOrAdd(
-    Sendable* sendable) {
+static Instance& GetInstance() {
+  return *GetInstanceHolder();
+}
+
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetLiveWindow() {
+  std::make_unique<Instance>().swap(GetInstanceHolder());
+}
+}  // namespace frc::impl
+#endif
+
+std::shared_ptr<Component> Instance::GetOrAdd(wpi::Sendable* sendable) {
   auto data = std::static_pointer_cast<Component>(
-      registry.GetData(sendable, dataHandle));
+      wpi::SendableRegistry::GetData(sendable, dataHandle));
   if (!data) {
     data = std::make_shared<Component>();
-    registry.SetData(sendable, dataHandle, data);
+    wpi::SendableRegistry::SetData(sendable, dataHandle, data);
   }
   return data;
 }
 
-LiveWindow* LiveWindow::GetInstance() {
-  static LiveWindow instance;
-  return &instance;
+void LiveWindow::SetEnabledCallback(std::function<void()> func) {
+  ::GetInstance().enabled = func;
 }
 
-void LiveWindow::EnableTelemetry(Sendable* sendable) {
-  std::scoped_lock lock(m_impl->mutex);
+void LiveWindow::SetDisabledCallback(std::function<void()> func) {
+  ::GetInstance().disabled = func;
+}
+
+void LiveWindow::EnableTelemetry(wpi::Sendable* sendable) {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock(inst.mutex);
   // Re-enable global setting in case DisableAllTelemetry() was called.
-  m_impl->telemetryEnabled = true;
-  m_impl->GetOrAdd(sendable)->telemetryEnabled = true;
+  inst.telemetryEnabled = true;
+  inst.GetOrAdd(sendable)->telemetryEnabled = true;
 }
 
-void LiveWindow::DisableTelemetry(Sendable* sendable) {
-  std::scoped_lock lock(m_impl->mutex);
-  m_impl->GetOrAdd(sendable)->telemetryEnabled = false;
+void LiveWindow::DisableTelemetry(wpi::Sendable* sendable) {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  inst.GetOrAdd(sendable)->telemetryEnabled = false;
 }
 
 void LiveWindow::DisableAllTelemetry() {
-  std::scoped_lock lock(m_impl->mutex);
-  m_impl->telemetryEnabled = false;
-  m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
-    if (!cbdata.data) cbdata.data = std::make_shared<Impl::Component>();
-    std::static_pointer_cast<Impl::Component>(cbdata.data)->telemetryEnabled =
-        false;
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  inst.telemetryEnabled = false;
+  wpi::SendableRegistry::ForeachLiveWindow(inst.dataHandle, [&](auto& cbdata) {
+    if (!cbdata.data) {
+      cbdata.data = std::make_shared<Component>();
+    }
+    std::static_pointer_cast<Component>(cbdata.data)->telemetryEnabled = false;
   });
 }
 
-bool LiveWindow::IsEnabled() const {
-  std::scoped_lock lock(m_impl->mutex);
-  return m_impl->liveWindowEnabled;
+void LiveWindow::EnableAllTelemetry() {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  inst.telemetryEnabled = true;
+  wpi::SendableRegistry::ForeachLiveWindow(inst.dataHandle, [&](auto& cbdata) {
+    if (!cbdata.data) {
+      cbdata.data = std::make_shared<Component>();
+    }
+    std::static_pointer_cast<Component>(cbdata.data)->telemetryEnabled = true;
+  });
+}
+
+bool LiveWindow::IsEnabled() {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  return inst.liveWindowEnabled;
 }
 
 void LiveWindow::SetEnabled(bool enabled) {
-  std::scoped_lock lock(m_impl->mutex);
-  if (m_impl->liveWindowEnabled == enabled) return;
-  m_impl->startLiveWindow = enabled;
-  m_impl->liveWindowEnabled = enabled;
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  if (inst.liveWindowEnabled == enabled) {
+    return;
+  }
+  inst.startLiveWindow = enabled;
+  inst.liveWindowEnabled = enabled;
   // Force table generation now to make sure everything is defined
   UpdateValuesUnsafe();
   if (enabled) {
-    if (this->enabled) this->enabled();
+    if (inst.enabled) {
+      inst.enabled();
+    }
   } else {
-    m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
-      cbdata.builder.StopLiveWindowMode();
-    });
-    if (this->disabled) this->disabled();
+    wpi::SendableRegistry::ForeachLiveWindow(
+        inst.dataHandle, [&](auto& cbdata) {
+          static_cast<SendableBuilderImpl&>(cbdata.builder)
+              .StopLiveWindowMode();
+        });
+    if (inst.disabled) {
+      inst.disabled();
+    }
   }
-  m_impl->enabledEntry.SetBoolean(enabled);
+  inst.enabledPub.Set(enabled);
 }
 
 void LiveWindow::UpdateValues() {
-  std::scoped_lock lock(m_impl->mutex);
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock(inst.mutex);
   UpdateValuesUnsafe();
 }
 
 void LiveWindow::UpdateValuesUnsafe() {
+  auto& inst = ::GetInstance();
   // Only do this if either LiveWindow mode or telemetry is enabled.
-  if (!m_impl->liveWindowEnabled && !m_impl->telemetryEnabled) return;
+  if (!inst.liveWindowEnabled && !inst.telemetryEnabled) {
+    return;
+  }
 
-  m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
-    if (!cbdata.sendable || cbdata.parent) return;
+  wpi::SendableRegistry::ForeachLiveWindow(inst.dataHandle, [&](auto& cbdata) {
+    if (!cbdata.sendable || cbdata.parent) {
+      return;
+    }
 
-    if (!cbdata.data) cbdata.data = std::make_shared<Impl::Component>();
+    if (!cbdata.data) {
+      cbdata.data = std::make_shared<Component>();
+    }
 
-    auto& comp = *std::static_pointer_cast<Impl::Component>(cbdata.data);
+    auto& comp = *std::static_pointer_cast<Component>(cbdata.data);
 
-    if (!m_impl->liveWindowEnabled && !comp.telemetryEnabled) return;
+    if (!inst.liveWindowEnabled && !comp.telemetryEnabled) {
+      return;
+    }
 
     if (comp.firstTime) {
       // By holding off creating the NetworkTable entries, it allows the
       // components to be redefined. This allows default sensor and actuator
       // values to be created that are replaced with the custom names from
       // users calling setName.
-      if (cbdata.name.empty()) return;
-      auto ssTable = m_impl->liveWindowTable->GetSubTable(cbdata.subsystem);
-      std::shared_ptr<NetworkTable> table;
+      if (cbdata.name.empty()) {
+        return;
+      }
+      auto ssTable = inst.liveWindowTable->GetSubTable(cbdata.subsystem);
+      std::shared_ptr<nt::NetworkTable> table;
       // Treat name==subsystem as top level of subsystem
-      if (cbdata.name == cbdata.subsystem)
+      if (cbdata.name == cbdata.subsystem) {
         table = ssTable;
-      else
+      } else {
         table = ssTable->GetSubTable(cbdata.name);
-      table->GetEntry(".name").SetString(cbdata.name);
-      cbdata.builder.SetTable(table);
+      }
+      comp.namePub = nt::StringTopic{table->GetTopic(".name")}.Publish();
+      comp.namePub.Set(cbdata.name);
+      static_cast<SendableBuilderImpl&>(cbdata.builder).SetTable(table);
       cbdata.sendable->InitSendable(cbdata.builder);
-      ssTable->GetEntry(".type").SetString("LW Subsystem");
+      comp.typePub = nt::StringTopic{ssTable->GetTopic(".type")}.PublishEx(
+          nt::StringTopic::kTypeString,
+          {{"SmartDashboard", kSmartDashboardType}});
+      comp.typePub.Set(kSmartDashboardType);
 
       comp.firstTime = false;
     }
 
-    if (m_impl->startLiveWindow) cbdata.builder.StartLiveWindowMode();
-    cbdata.builder.UpdateTable();
+    if (inst.startLiveWindow) {
+      static_cast<SendableBuilderImpl&>(cbdata.builder).StartLiveWindowMode();
+    }
+    cbdata.builder.Update();
   });
 
-  m_impl->startLiveWindow = false;
+  inst.startLiveWindow = false;
 }
-
-LiveWindow::LiveWindow() : m_impl(new Impl) {}

@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/DriveSubsystem.h"
 
-#include <frc/geometry/Rotation2d.h>
-#include <units/units.h>
+#include <units/angle.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
 
 #include "Constants.h"
 
@@ -30,37 +28,40 @@ DriveSubsystem::DriveSubsystem()
       m_rearRightEncoder{kRearRightEncoderPorts[0], kRearRightEncoderPorts[1],
                          kRearRightEncoderReversed},
 
-      m_odometry{kDriveKinematics,
-                 frc::Rotation2d(units::degree_t(GetHeading())),
-                 frc::Pose2d()} {
+      m_odometry{kDriveKinematics, m_gyro.GetRotation2d(),
+                 getCurrentWheelDistances(), frc::Pose2d{}} {
+  wpi::SendableRegistry::AddChild(&m_drive, &m_frontLeft);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_rearLeft);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_frontRight);
+  wpi::SendableRegistry::AddChild(&m_drive, &m_rearRight);
+
   // Set the distance per pulse for the encoders
   m_frontLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rearLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_frontRightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rearRightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
+  // We need to invert one side of the drivetrain so that positive voltages
+  // result in both sides moving forward. Depending on how your robot's
+  // gearbox is constructed, you might have to invert the left side instead.
+  m_frontRight.SetInverted(true);
+  m_rearRight.SetInverted(true);
 }
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
-  m_odometry.Update(
-      frc::Rotation2d(units::degree_t(GetHeading())),
-      frc::MecanumDriveWheelSpeeds{
-          units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_rearLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_frontRightEncoder.GetRate()),
-          units::meters_per_second_t(m_rearRightEncoder.GetRate())});
+  m_odometry.Update(m_gyro.GetRotation2d(), getCurrentWheelDistances());
 }
 
 void DriveSubsystem::Drive(double xSpeed, double ySpeed, double rot,
-                           bool feildRelative) {
-  if (feildRelative) {
-    m_drive.DriveCartesian(ySpeed, xSpeed, rot, -m_gyro.GetAngle());
+                           bool fieldRelative) {
+  if (fieldRelative) {
+    m_drive.DriveCartesian(xSpeed, ySpeed, rot, m_gyro.GetRotation2d());
   } else {
-    m_drive.DriveCartesian(ySpeed, xSpeed, rot);
+    m_drive.DriveCartesian(xSpeed, ySpeed, rot);
   }
 }
 
-void DriveSubsystem::SetSpeedControllersVolts(units::volt_t frontLeftPower,
+void DriveSubsystem::SetMotorControllersVolts(units::volt_t frontLeftPower,
                                               units::volt_t rearLeftPower,
                                               units::volt_t frontRightPower,
                                               units::volt_t rearRightPower) {
@@ -81,7 +82,9 @@ frc::Encoder& DriveSubsystem::GetFrontLeftEncoder() {
   return m_frontLeftEncoder;
 }
 
-frc::Encoder& DriveSubsystem::GetRearLeftEncoder() { return m_rearLeftEncoder; }
+frc::Encoder& DriveSubsystem::GetRearLeftEncoder() {
+  return m_rearLeftEncoder;
+}
 
 frc::Encoder& DriveSubsystem::GetFrontRightEncoder() {
   return m_frontRightEncoder;
@@ -93,29 +96,41 @@ frc::Encoder& DriveSubsystem::GetRearRightEncoder() {
 
 frc::MecanumDriveWheelSpeeds DriveSubsystem::getCurrentWheelSpeeds() {
   return (frc::MecanumDriveWheelSpeeds{
-      units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
-      units::meters_per_second_t(m_rearLeftEncoder.GetRate()),
-      units::meters_per_second_t(m_frontRightEncoder.GetRate()),
-      units::meters_per_second_t(m_rearRightEncoder.GetRate())});
+      units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
+      units::meters_per_second_t{m_rearLeftEncoder.GetRate()},
+      units::meters_per_second_t{m_frontRightEncoder.GetRate()},
+      units::meters_per_second_t{m_rearRightEncoder.GetRate()}});
+}
+
+frc::MecanumDriveWheelPositions DriveSubsystem::getCurrentWheelDistances() {
+  return (frc::MecanumDriveWheelPositions{
+      units::meter_t{m_frontLeftEncoder.GetDistance()},
+      units::meter_t{m_rearLeftEncoder.GetDistance()},
+      units::meter_t{m_frontRightEncoder.GetDistance()},
+      units::meter_t{m_rearRightEncoder.GetDistance()}});
 }
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
 }
 
-double DriveSubsystem::GetHeading() {
-  return std::remainder(m_gyro.GetAngle(), 360) * (kGyroReversed ? -1. : 1.);
+units::degree_t DriveSubsystem::GetHeading() const {
+  return m_gyro.GetRotation2d().Degrees();
 }
 
-void DriveSubsystem::ZeroHeading() { m_gyro.Reset(); }
+void DriveSubsystem::ZeroHeading() {
+  m_gyro.Reset();
+}
 
 double DriveSubsystem::GetTurnRate() {
-  return m_gyro.GetRate() * (kGyroReversed ? -1. : 1.);
+  return -m_gyro.GetRate();
 }
 
-frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
+frc::Pose2d DriveSubsystem::GetPose() {
+  return m_odometry.GetPose();
+}
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
-  m_odometry.ResetPosition(pose,
-                           frc::Rotation2d(units::degree_t(GetHeading())));
+  m_odometry.ResetPosition(m_gyro.GetRotation2d(), getCurrentWheelDistances(),
+                           pose);
 }

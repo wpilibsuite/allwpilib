@@ -1,19 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
+
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.AnalogGyroJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position. The Gyro class
@@ -24,17 +23,15 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  *
  * <p>This class is for gyro sensors that connect to an analog input.
  */
-public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, AutoCloseable {
+public class AnalogGyro implements Sendable, AutoCloseable {
   private static final double kDefaultVoltsPerDegreePerSecond = 0.007;
-  protected AnalogInput m_analog;
+  private AnalogInput m_analog;
   private boolean m_channelAllocated;
 
   private int m_gyroHandle;
 
-  /**
-   * Initialize the gyro. Calibration is handled by calibrate().
-   */
-  public void initGyro() {
+  /** Initialize the gyro. Calibration is handled by calibrate(). */
+  private void initGyro() {
     if (m_gyroHandle == 0) {
       m_gyroHandle = AnalogGyroJNI.initializeAnalogGyro(m_analog.m_port);
     }
@@ -45,17 +42,43 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
     SendableRegistry.addLW(this, "AnalogGyro", m_analog.getChannel());
   }
 
-  @Override
+  /**
+   * Calibrate the gyro by running for a number of samples and computing the center value. Then use
+   * the center value as the Accumulator center value for subsequent measurements.
+   *
+   * <p>It's important to make sure that the robot is not moving while the centering calculations
+   * are in progress, this is typically done when the robot is first turned on while it's sitting at
+   * rest before the competition starts.
+   */
   public void calibrate() {
     AnalogGyroJNI.calibrateAnalogGyro(m_gyroHandle);
+  }
+
+  /**
+   * Return the heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
+   *
+   * <p>The angle is continuous, that is it will continue from 360 to 361 degrees. This allows
+   * algorithms that wouldn't want to see a discontinuity in the gyro output as it sweeps past from
+   * 360 to 0 on the second time around.
+   *
+   * <p>The angle is expected to increase as the gyro turns counterclockwise when looked at from the
+   * top. It needs to follow the NWU axis convention.
+   *
+   * <p>This heading is based on integration of the returned rate from the gyro.
+   *
+   * @return the current heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
+   */
+  public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(-getAngle());
   }
 
   /**
    * Gyro constructor using the channel number.
    *
    * @param channel The analog channel the gyro is connected to. Gyros can only be used on on-board
-   *                channels 0-1.
+   *     channels 0-1.
    */
+  @SuppressWarnings("this-escape")
   public AnalogGyro(int channel) {
     this(new AnalogInput(channel));
     m_channelAllocated = true;
@@ -67,8 +90,9 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
    * channel needs to be shared.
    *
    * @param channel The AnalogInput object that the gyro is connected to. Gyros can only be used on
-   *                on-board channels 0-1.
+   *     on-board channels 0-1.
    */
+  @SuppressWarnings("this-escape")
   public AnalogGyro(AnalogInput channel) {
     requireNonNullParam(channel, "channel", "AnalogGyro");
 
@@ -82,10 +106,11 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
    * offset values. Bypasses calibration.
    *
    * @param channel The analog channel the gyro is connected to. Gyros can only be used on on-board
-   *                channels 0-1.
-   * @param center  Preset uncalibrated value to use as the accumulator center value.
-   * @param offset  Preset uncalibrated value to use as the gyro offset.
+   *     channels 0-1.
+   * @param center Preset uncalibrated value to use as the accumulator center value.
+   * @param offset Preset uncalibrated value to use as the gyro offset.
    */
+  @SuppressWarnings("this-escape")
   public AnalogGyro(int channel, int center, double offset) {
     this(new AnalogInput(channel), center, offset);
     m_channelAllocated = true;
@@ -97,28 +122,33 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
    * the center and offset values. Bypasses calibration.
    *
    * @param channel The analog channel the gyro is connected to. Gyros can only be used on on-board
-   *                channels 0-1.
-   * @param center  Preset uncalibrated value to use as the accumulator center value.
-   * @param offset  Preset uncalibrated value to use as the gyro offset.
+   *     channels 0-1.
+   * @param center Preset uncalibrated value to use as the accumulator center value.
+   * @param offset Preset uncalibrated value to use as the gyro offset.
    */
+  @SuppressWarnings("this-escape")
   public AnalogGyro(AnalogInput channel, int center, double offset) {
     requireNonNullParam(channel, "channel", "AnalogGyro");
 
     m_analog = channel;
     initGyro();
-    AnalogGyroJNI.setAnalogGyroParameters(m_gyroHandle, kDefaultVoltsPerDegreePerSecond,
-                                          offset, center);
+    AnalogGyroJNI.setAnalogGyroParameters(
+        m_gyroHandle, kDefaultVoltsPerDegreePerSecond,
+        offset, center);
     reset();
   }
 
-  @Override
+  /**
+   * Reset the gyro.
+   *
+   * <p>Resets the gyro to a heading of zero. This can be used if there is significant drift in the
+   * gyro, and it needs to be recalibrated after it has been running.
+   */
   public void reset() {
     AnalogGyroJNI.resetAnalogGyro(m_gyroHandle);
   }
 
-  /**
-   * Delete (free) the accumulator and the analog components used for the gyro.
-   */
+  /** Delete (free) the accumulator and the analog components used for the gyro. */
   @Override
   public void close() {
     SendableRegistry.remove(this);
@@ -129,7 +159,20 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
     AnalogGyroJNI.freeAnalogGyro(m_gyroHandle);
   }
 
-  @Override
+  /**
+   * Return the heading of the robot in degrees.
+   *
+   * <p>The angle is continuous, that is it will continue from 360 to 361 degrees. This allows
+   * algorithms that wouldn't want to see a discontinuity in the gyro output as it sweeps past from
+   * 360 to 0 on the second time around.
+   *
+   * <p>The angle is expected to increase as the gyro turns clockwise when looked at from the top.
+   * It needs to follow the NED axis convention.
+   *
+   * <p>This heading is based on integration of the returned rate from the gyro.
+   *
+   * @return the current heading of the robot in degrees.
+   */
   public double getAngle() {
     if (m_analog == null) {
       return 0.0;
@@ -138,7 +181,16 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
     }
   }
 
-  @Override
+  /**
+   * Return the rate of rotation of the gyro.
+   *
+   * <p>The rate is based on the most recent reading of the gyro analog value
+   *
+   * <p>The rate is expected to be positive as the gyro turns clockwise when looked at from the top.
+   * It needs to follow the NED axis convention.
+   *
+   * @return the current rate in degrees per second
+   */
   public double getRate() {
     if (m_analog == null) {
       return 0.0;
@@ -173,8 +225,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
    * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second.
    */
   public void setSensitivity(double voltsPerDegreePerSecond) {
-    AnalogGyroJNI.setAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle,
-                                                       voltsPerDegreePerSecond);
+    AnalogGyroJNI.setAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle, voltsPerDegreePerSecond);
   }
 
   /**
@@ -184,7 +235,22 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
    *
    * @param volts The size of the deadband in volts
    */
-  void setDeadband(double volts) {
+  public void setDeadband(double volts) {
     AnalogGyroJNI.setAnalogGyroDeadband(m_gyroHandle, volts);
+  }
+
+  /**
+   * Gets the analog input for the gyro.
+   *
+   * @return AnalogInput
+   */
+  public AnalogInput getAnalogInput() {
+    return m_analog;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Gyro");
+    builder.addDoubleProperty("Value", this::getAngle, null);
   }
 }

@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sat, 29 Oct 2022 12:09:03 -0400
+Subject: [PATCH 1/4] Don't emit inline defs
+
+---
+ src/mpack/mpack-platform.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/mpack/mpack-platform.c b/src/mpack/mpack-platform.c
+index 6599e1fd444c381b9b72b20601c22488d7266b1f..d4a2fa3198f39fc964baeed4d15f6fd89affc24c 100644
+--- a/src/mpack/mpack-platform.c
++++ b/src/mpack/mpack-platform.c
+@@ -24,7 +24,7 @@
+ // standalone definitions of all (non-static) inline functions in MPack.
+ 
+ #define MPACK_INTERNAL 1
+-#define MPACK_EMIT_INLINE_DEFS 1
++#define MPACK_EMIT_INLINE_DEFS 0
+ 
+ #include "mpack-platform.h"
+ #include "mpack.h"

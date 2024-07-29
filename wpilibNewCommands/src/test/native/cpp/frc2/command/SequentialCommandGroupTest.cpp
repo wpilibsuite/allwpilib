@@ -1,11 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
+#include "CompositionTestBase.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitUntilCommand.h"
@@ -13,7 +11,7 @@
 using namespace frc2;
 class SequentialCommandGroupTest : public CommandTestBase {};
 
-TEST_F(SequentialCommandGroupTest, SequentialGroupScheduleTest) {
+TEST_F(SequentialCommandGroupTest, SequentialGroupSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -24,7 +22,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupScheduleTest) {
   MockCommand* command2 = command2Holder.get();
   MockCommand* command3 = command3Holder.get();
 
-  SequentialCommandGroup group{tcb::make_vector<std::unique_ptr<Command>>(
+  SequentialCommandGroup group{make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
@@ -52,7 +50,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupScheduleTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(SequentialCommandGroupTest, SequentialGroupInterruptTest) {
+TEST_F(SequentialCommandGroupTest, SequentialGroupInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -63,7 +61,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupInterruptTest) {
   MockCommand* command2 = command2Holder.get();
   MockCommand* command3 = command3Holder.get();
 
-  SequentialCommandGroup group{tcb::make_vector<std::unique_ptr<Command>>(
+  SequentialCommandGroup group{make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
@@ -91,7 +89,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupInterruptTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(SequentialCommandGroupTest, SequentialGroupNotScheduledCancelTest) {
+TEST_F(SequentialCommandGroupTest, SequentialGroupNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
   SequentialCommandGroup group{InstantCommand(), InstantCommand()};
@@ -99,7 +97,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupNotScheduledCancelTest) {
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
 }
 
-TEST_F(SequentialCommandGroupTest, SequentialGroupCopyTest) {
+TEST_F(SequentialCommandGroupTest, SequentialGroupCopy) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -115,7 +113,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupCopyTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(SequentialCommandGroupTest, SequentialGroupRequirementTest) {
+TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement1;
@@ -135,3 +133,6 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupRequirementTest) {
   EXPECT_TRUE(scheduler.IsScheduled(&command3));
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
+
+INSTANTIATE_MULTI_COMMAND_COMPOSITION_TEST_SUITE(SequentialCommandGroupTest,
+                                                 SequentialCommandGroup);

@@ -1,28 +1,26 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <hal/Types.h>
+#include <memory>
 
-#include "frc/ErrorBase.h"
+#include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
+#include "frc/CompressorConfigType.h"
+#include "frc/PneumaticsBase.h"
+#include "frc/PneumaticsModuleType.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class SendableBuilder;
-
 /**
- * Class for operating a compressor connected to a %PCM (Pneumatic Control
- * Module).
+ * Class for operating a compressor connected to a pneumatics module.
  *
- * The PCM will automatically run in closed loop mode by default whenever a
+ * The module will automatically run in closed loop mode by default whenever a
  * Solenoid object is created. For most cases, a Compressor object does not need
  * to be instantiated or used in a robot program. This class is only required in
  * cases where the robot program needs a more detailed status of the compressor
@@ -33,152 +31,151 @@ class SendableBuilder;
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public ErrorBase,
-                   public Sendable,
-                   public SendableHelper<Compressor> {
+class Compressor : public wpi::Sendable,
+                   public wpi::SendableHelper<Compressor> {
  public:
   /**
-   * Constructor. The default PCM ID is 0.
+   * Constructs a compressor for a specified module and type.
    *
-   * @param module The PCM ID to use (0-62)
+   * @param module The module ID to use.
+   * @param moduleType The module type to use.
    */
-  explicit Compressor(int pcmID = SensorUtil::GetDefaultSolenoidModule());
+  Compressor(int module, PneumaticsModuleType moduleType);
 
-  ~Compressor() override = default;
+  /**
+   * Constructs a compressor for a default module and specified type.
+   *
+   * @param moduleType The module type to use.
+   */
+  explicit Compressor(PneumaticsModuleType moduleType);
+
+  ~Compressor() override;
+
+  Compressor(const Compressor&) = delete;
+  Compressor& operator=(const Compressor&) = delete;
 
   Compressor(Compressor&&) = default;
   Compressor& operator=(Compressor&&) = default;
 
   /**
-   * Starts closed-loop control. Note that closed loop control is enabled by
-   * default.
-   */
-  void Start();
-
-  /**
-   * Stops closed-loop control. Note that closed loop control is enabled by
-   * default.
-   */
-  void Stop();
-
-  /**
-   * Check if compressor output is active.
+   * Returns whether the compressor is active or not.
    *
-   * @return true if the compressor is on
+   * @return true if the compressor is on - otherwise false.
    */
-  bool Enabled() const;
+  bool IsEnabled() const;
 
   /**
-   * Check if the pressure switch is triggered.
+   * Returns the state of the pressure switch.
    *
-   * @return true if pressure is low
+   * @return True if pressure switch indicates that the system is not full,
+   * otherwise false.
    */
   bool GetPressureSwitchValue() const;
 
   /**
-   * Query how much current the compressor is drawing.
+   * Get the current drawn by the compressor.
    *
-   * @return The current through the compressor, in amps
+   * @return Current drawn by the compressor.
    */
-  double GetCompressorCurrent() const;
+  units::ampere_t GetCurrent() const;
 
   /**
-   * Enables or disables automatically turning the compressor on when the
-   * pressure is low.
+   * If supported by the device, returns the analog input voltage (on channel
+   * 0).
    *
-   * @param on Set to true to enable closed loop control of the compressor.
-   *           False to disable.
+   * This function is only supported by the REV PH. On CTRE PCM, this will
+   * return 0.
+   *
+   * @return The analog input voltage, in volts.
    */
-  void SetClosedLoopControl(bool on);
+  units::volt_t GetAnalogVoltage() const;
 
   /**
-   * Returns true if the compressor will automatically turn on when the
-   * pressure is low.
+   * If supported by the device, returns the pressure read by the analog
+   * pressure sensor (on channel 0).
    *
-   * @return True if closed loop control of the compressor is enabled. False if
-   *         disabled.
+   * This function is only supported by the REV PH with the REV Analog Pressure
+   * Sensor. On CTRE PCM, this will return 0.
+   *
+   * @return The pressure read by the analog pressure sensor.
    */
-  bool GetClosedLoopControl() const;
+  units::pounds_per_square_inch_t GetPressure() const;
 
   /**
-   * Query if the compressor output has been disabled due to high current draw.
-   *
-   * @return true if PCM is in fault state : Compressor Drive is
-   *         disabled due to compressor current being too high.
+   * Disable the compressor.
    */
-  bool GetCompressorCurrentTooHighFault() const;
+  void Disable();
 
   /**
-   * Query if the compressor output has been disabled due to high current draw
-   * (sticky).
-   *
-   * A sticky fault will not clear on device reboot, it must be cleared through
-   * code or the webdash.
-   *
-   * @return true if PCM sticky fault is set : Compressor Drive is
-   *         disabled due to compressor current being too high.
+   * Enables the compressor in digital mode using the digital pressure switch.
+   * The compressor will turn on when the pressure switch indicates that the
+   * system is not full, and will turn off when the pressure switch indicates
+   * that the system is full.
    */
-  bool GetCompressorCurrentTooHighStickyFault() const;
+  void EnableDigital();
 
   /**
-   * Query if the compressor output has been disabled due to a short circuit
-   * (sticky).
+   * If supported by the device, enables the compressor in analog mode. This
+   * mode uses an analog pressure sensor connected to analog channel 0 to cycle
+   * the compressor. The compressor will turn on when the pressure drops below
+   * {@code minPressure} and will turn off when the pressure reaches {@code
+   * maxPressure}. This mode is only supported by the REV PH with the REV Analog
+   * Pressure Sensor connected to analog channel 0.
    *
-   * A sticky fault will not clear on device reboot, it must be cleared through
-   * code or the webdash.
+   * On CTRE PCM, this will enable digital control.
    *
-   * @return true if PCM sticky fault is set : Compressor output
-   *         appears to be shorted.
+   * @param minPressure The minimum pressure. The compressor will turn on when
+   * the pressure drops below this value.
+   * @param maxPressure The maximum pressure. The compressor will turn off when
+   * the pressure reaches this value.
    */
-  bool GetCompressorShortedStickyFault() const;
+  void EnableAnalog(units::pounds_per_square_inch_t minPressure,
+                    units::pounds_per_square_inch_t maxPressure);
 
   /**
-   * Query if the compressor output has been disabled due to a short circuit.
+   * If supported by the device, enables the compressor in hybrid mode. This
+   * mode uses both a digital pressure switch and an analog pressure sensor
+   * connected to analog channel 0 to cycle the compressor. This mode is only
+   * supported by the REV PH with the REV Analog Pressure Sensor connected to
+   * analog channel 0.
    *
-   * @return true if PCM is in fault state : Compressor output
-   *         appears to be shorted.
+   * The compressor will turn on when \a both:
+   *
+   * - The digital pressure switch indicates the system is not full AND
+   * - The analog pressure sensor indicates that the pressure in the system
+   * is below the specified minimum pressure.
+   *
+   * The compressor will turn off when \a either:
+   *
+   * - The digital pressure switch is disconnected or indicates that the system
+   * is full OR
+   * - The pressure detected by the analog sensor is greater than the specified
+   * maximum pressure.
+   *
+   * On CTRE PCM, this will enable digital control.
+   *
+   * @param minPressure The minimum pressure. The compressor will turn on
+   * when the pressure drops below this value and the pressure switch indicates
+   * that the system is not full.
+   * @param maxPressure The maximum pressure. The compressor will turn
+   * off when the pressure reaches this value or the pressure switch is
+   * disconnected or indicates that the system is full.
    */
-  bool GetCompressorShortedFault() const;
+  void EnableHybrid(units::pounds_per_square_inch_t minPressure,
+                    units::pounds_per_square_inch_t maxPressure);
 
   /**
-   * Query if the compressor output does not appear to be wired (sticky).
+   * Returns the active compressor configuration.
    *
-   * A sticky fault will not clear on device reboot, it must be cleared through
-   * code or the webdash.
-   *
-   * @return true if PCM sticky fault is set : Compressor does not
-   *         appear to be wired, i.e. compressor is not drawing enough current.
+   * @return The active compressor configuration.
    */
-  bool GetCompressorNotConnectedStickyFault() const;
+  CompressorConfigType GetConfigType() const;
 
-  /**
-   * Query if the compressor output does not appear to be wired.
-   *
-   * @return true if PCM is in fault state : Compressor does not
-   *         appear to be wired, i.e. compressor is not drawing enough current.
-   */
-  bool GetCompressorNotConnectedFault() const;
-
-  /**
-   * Clear ALL sticky faults inside PCM that Compressor is wired to.
-   *
-   * If a sticky fault is set, then it will be persistently cleared.  Compressor
-   * drive maybe momentarily disable while flags are being cleared. Care should
-   * be taken to not call this too frequently, otherwise normal compressor
-   * functionality may be prevented.
-   *
-   * If no sticky faults are set then this call will have no effect.
-   */
-  void ClearAllPCMStickyFaults();
-
-  void InitSendable(SendableBuilder& builder) override;
-
- protected:
-  hal::Handle<HAL_CompressorHandle> m_compressorHandle;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  void SetCompressor(bool on);
-  int m_module;
+  std::shared_ptr<PneumaticsBase> m_module;
+  PneumaticsModuleType m_moduleType;
 };
 
 }  // namespace frc

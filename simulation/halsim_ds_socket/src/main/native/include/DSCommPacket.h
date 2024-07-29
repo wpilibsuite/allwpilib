@@ -1,18 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <array>
+#include <span>
 
 #include <DSCommJoystickPacket.h>
-#include <mockdata/DriverStationData.h>
-#include <wpi/ArrayRef.h>
-#include <wpi/raw_uv_ostream.h>
+#include <hal/simulation/DriverStationData.h>
+#include <wpinet/raw_uv_ostream.h>
 
 class DSCommPacketTest;
 
@@ -23,8 +20,8 @@ class DSCommPacket {
 
  public:
   DSCommPacket(void);
-  void DecodeTCP(wpi::ArrayRef<uint8_t> packet);
-  void DecodeUDP(wpi::ArrayRef<uint8_t> packet);
+  void DecodeTCP(std::span<const uint8_t> packet);
+  void DecodeUDP(std::span<const uint8_t> packet);
   void SendUDPToHALSim(void);
   void SetupSendBuffer(wpi::raw_uv_ostream& buf);
 
@@ -56,11 +53,11 @@ class DSCommPacket {
   void SetAlliance(uint8_t station_code);
   void SetupSendHeader(wpi::raw_uv_ostream& buf);
   void SetupJoystickTag(wpi::raw_uv_ostream& buf);
-  void ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData);
-  void ReadJoystickTag(wpi::ArrayRef<uint8_t> data, int index);
-  void ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data);
-  void ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data);
-  void ReadJoystickDescriptionTag(wpi::ArrayRef<uint8_t> data);
+  void ReadMatchtimeTag(std::span<const uint8_t> tagData);
+  void ReadJoystickTag(std::span<const uint8_t> data, int index);
+  void ReadNewMatchInfoTag(std::span<const uint8_t> data);
+  void ReadGameSpecificMessageTag(std::span<const uint8_t> data);
+  void ReadJoystickDescriptionTag(std::span<const uint8_t> data);
 
   uint8_t m_hi;
   uint8_t m_lo;
@@ -69,7 +66,7 @@ class DSCommPacket {
   HAL_AllianceStationID m_alliance_station;
   HAL_MatchInfo matchInfo;
   std::array<DSCommJoystickPacket, HAL_kMaxJoysticks> m_joystick_packets;
-  double m_match_time;
+  double m_match_time = -1;
 };
 
 }  // namespace halsim

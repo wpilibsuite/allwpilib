@@ -1,33 +1,31 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.networktables.GenericPublisher;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableType;
+import edu.wpi.first.util.function.FloatSupplier;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-/**
- * A helper class for Shuffleboard containers to handle common child operations.
- */
-@SuppressWarnings("PMD.TooManyMethods")
+/** A helper class for Shuffleboard containers to handle common child operations. */
 final class ContainerHelper {
   private final ShuffleboardContainer m_container;
   private final Set<String> m_usedTitles = new HashSet<>();
@@ -44,7 +42,7 @@ final class ContainerHelper {
 
   ShuffleboardLayout getLayout(String title, String type) {
     if (!m_layouts.containsKey(title)) {
-      ShuffleboardLayout layout = new ShuffleboardLayout(m_container, type, title);
+      ShuffleboardLayout layout = new ShuffleboardLayout(m_container, title, type);
       m_components.add(layout);
       m_layouts.put(title, layout);
     }
@@ -60,13 +58,15 @@ final class ContainerHelper {
   }
 
   ComplexWidget add(String title, Sendable sendable) {
+    requireNonNullParam(sendable, "sendable", "add");
     checkTitle(title);
     ComplexWidget widget = new ComplexWidget(m_container, title, sendable);
     m_components.add(widget);
     return widget;
   }
 
-  ComplexWidget add(Sendable sendable) throws IllegalArgumentException {
+  ComplexWidget add(Sendable sendable) {
+    requireNonNullParam(sendable, "sendable", "add");
     String name = SendableRegistry.getName(sendable);
     if (name.isEmpty()) {
       throw new IllegalArgumentException("Sendable must have a name");
@@ -75,62 +75,101 @@ final class ContainerHelper {
   }
 
   SimpleWidget add(String title, Object defaultValue) {
-    Objects.requireNonNull(title, "Title cannot be null");
-    Objects.requireNonNull(defaultValue, "Default value cannot be null");
+    requireNonNullParam(defaultValue, "defaultValue", "add");
+    return add(title, NetworkTableType.getStringFromObject(defaultValue), defaultValue);
+  }
+
+  SimpleWidget add(String title, String typeString, Object defaultValue) {
+    requireNonNullParam(title, "title", "add");
+    requireNonNullParam(defaultValue, "defaultValue", "add");
     checkTitle(title);
     checkNtType(defaultValue);
 
     SimpleWidget widget = new SimpleWidget(m_container, title);
     m_components.add(widget);
-    widget.getEntry().setDefaultValue(defaultValue);
+    widget.getEntry(typeString).setDefaultValue(defaultValue);
     return widget;
   }
 
   SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier) {
-    precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier, NetworkTableEntry::setString);
+    precheck(title, valueSupplier, "addString");
+    return addSupplied(title, "string", valueSupplier, GenericPublisher::setString);
   }
 
   SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier) {
-    precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier::getAsDouble, NetworkTableEntry::setDouble);
+    requireNonNullParam(title, "title", "addNumber");
+    requireNonNullParam(valueSupplier, "valueSupplier", "addNumber");
+    return addDouble(title, valueSupplier);
+  }
+
+  SuppliedValueWidget<Double> addDouble(String title, DoubleSupplier valueSupplier) {
+    precheck(title, valueSupplier, "addDouble");
+    return addSupplied(title, "double", valueSupplier::getAsDouble, GenericPublisher::setDouble);
+  }
+
+  SuppliedValueWidget<Float> addFloat(String title, FloatSupplier valueSupplier) {
+    precheck(title, valueSupplier, "addFloat");
+    return addSupplied(title, "float", valueSupplier::getAsFloat, GenericPublisher::setFloat);
+  }
+
+  SuppliedValueWidget<Long> addInteger(String title, LongSupplier valueSupplier) {
+    precheck(title, valueSupplier, "addInteger");
+    return addSupplied(title, "int", valueSupplier::getAsLong, GenericPublisher::setInteger);
   }
 
   SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier) {
-    precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier::getAsBoolean, NetworkTableEntry::setBoolean);
+    precheck(title, valueSupplier, "addBoolean");
+    return addSupplied(title, "boolean", valueSupplier::getAsBoolean, GenericPublisher::setBoolean);
   }
 
   SuppliedValueWidget<String[]> addStringArray(String title, Supplier<String[]> valueSupplier) {
-    precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier, NetworkTableEntry::setStringArray);
+    precheck(title, valueSupplier, "addStringArray");
+    return addSupplied(title, "string[]", valueSupplier, GenericPublisher::setStringArray);
   }
 
   SuppliedValueWidget<double[]> addDoubleArray(String title, Supplier<double[]> valueSupplier) {
-    precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier, NetworkTableEntry::setDoubleArray);
+    precheck(title, valueSupplier, "addDoubleArray");
+    return addSupplied(title, "double[]", valueSupplier, GenericPublisher::setDoubleArray);
+  }
+
+  SuppliedValueWidget<float[]> addFloatArray(String title, Supplier<float[]> valueSupplier) {
+    precheck(title, valueSupplier, "addFloatArray");
+    return addSupplied(title, "float[]", valueSupplier, GenericPublisher::setFloatArray);
+  }
+
+  SuppliedValueWidget<long[]> addIntegerArray(String title, Supplier<long[]> valueSupplier) {
+    precheck(title, valueSupplier, "addIntegerArray");
+    return addSupplied(title, "int[]", valueSupplier, GenericPublisher::setIntegerArray);
   }
 
   SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier) {
-    precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier, NetworkTableEntry::setBooleanArray);
+    precheck(title, valueSupplier, "addBooleanArray");
+    return addSupplied(title, "boolean[]", valueSupplier, GenericPublisher::setBooleanArray);
   }
 
   SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier) {
-    precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier, NetworkTableEntry::setRaw);
+    return addRaw(title, "raw", valueSupplier);
   }
 
-  private void precheck(String title, Object valueSupplier) {
-    Objects.requireNonNull(title, "Title cannot be null");
-    Objects.requireNonNull(valueSupplier, "Value supplier cannot be null");
+  SuppliedValueWidget<byte[]> addRaw(
+      String title, String typeString, Supplier<byte[]> valueSupplier) {
+    precheck(title, valueSupplier, "addRaw");
+    return addSupplied(title, typeString, valueSupplier, GenericPublisher::setRaw);
+  }
+
+  private void precheck(String title, Object valueSupplier, String methodName) {
+    requireNonNullParam(title, "title", methodName);
+    requireNonNullParam(valueSupplier, "valueSupplier", methodName);
     checkTitle(title);
   }
 
-  private <T> SuppliedValueWidget<T> addSupplied(String title,
-                                                 Supplier<T> supplier,
-                                                 BiConsumer<NetworkTableEntry, T> setter) {
-    SuppliedValueWidget<T> widget = new SuppliedValueWidget<>(m_container, title, supplier, setter);
+  private <T> SuppliedValueWidget<T> addSupplied(
+      String title,
+      String typeString,
+      Supplier<T> supplier,
+      BiConsumer<GenericPublisher, T> setter) {
+    SuppliedValueWidget<T> widget =
+        new SuppliedValueWidget<>(m_container, title, typeString, supplier, setter);
     m_components.add(widget);
     return widget;
   }
@@ -148,5 +187,4 @@ final class ContainerHelper {
     }
     m_usedTitles.add(title);
   }
-
 }

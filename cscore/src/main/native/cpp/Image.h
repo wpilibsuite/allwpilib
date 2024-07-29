@@ -1,17 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_IMAGE_H_
 #define CSCORE_IMAGE_H_
 
+#include <string_view>
 #include <vector>
 
 #include <opencv2/core/core.hpp>
-#include <wpi/StringRef.h>
 
 #include "cscore_cpp.h"
 #include "default_init_allocator.h"
@@ -37,8 +34,10 @@ class Image {
   Image& operator=(const Image&) = delete;
 
   // Getters
-  operator wpi::StringRef() const { return str(); }
-  wpi::StringRef str() const { return wpi::StringRef(data(), size()); }
+  operator std::string_view() const {  // NOLINT
+    return str();
+  }
+  std::string_view str() const { return {data(), size()}; }
   size_t capacity() const { return m_data.capacity(); }
   const char* data() const {
     return reinterpret_cast<const char*>(m_data.data());
@@ -57,10 +56,15 @@ class Image {
     switch (pixelFormat) {
       case VideoMode::kYUYV:
       case VideoMode::kRGB565:
+      case VideoMode::kY16:
+      case VideoMode::kUYVY:
         type = CV_8UC2;
         break;
       case VideoMode::kBGR:
         type = CV_8UC3;
+        break;
+      case VideoMode::kBGRA:
+        type = CV_8UC4;
         break;
       case VideoMode::kGray:
       case VideoMode::kMJPEG:
@@ -69,6 +73,25 @@ class Image {
         break;
     }
     return cv::Mat{height, width, type, m_data.data()};
+  }
+
+  int GetStride() const {
+    switch (pixelFormat) {
+      case VideoMode::kYUYV:
+      case VideoMode::kRGB565:
+      case VideoMode::kY16:
+      case VideoMode::kUYVY:
+        return 2 * width;
+      case VideoMode::kBGR:
+        return 3 * width;
+      case VideoMode::kBGRA:
+        return 4 * width;
+      case VideoMode::kGray:
+        return width;
+      case VideoMode::kMJPEG:
+      default:
+        return 0;
+    }
   }
 
   cv::_InputArray AsInputArray() { return cv::_InputArray{m_data}; }

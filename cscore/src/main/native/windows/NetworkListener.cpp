@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "NetworkListener.h"
 
@@ -47,7 +44,9 @@ static void WINAPI OnInterfaceChange(PVOID callerContext,
 NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
     : m_impl(std::make_unique<Impl>(logger, notifier)) {}
 
-NetworkListener::~NetworkListener() { Stop(); }
+NetworkListener::~NetworkListener() {
+  Stop();
+}
 
 void NetworkListener::Start() {
   NotifyIpInterfaceChange(AF_INET, OnInterfaceChange, &m_impl->m_notifier, true,

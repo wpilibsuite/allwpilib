@@ -1,55 +1,65 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A CommandGroups that runs a list of commands in sequence.
+ * A command composition that runs a list of commands in sequence.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ * <p>The rules for command compositions apply: command instances that are passed to it cannot be
+ * added to any other composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
-public class SequentialCommandGroup extends CommandGroupBase {
+public class SequentialCommandGroup extends Command {
   private final List<Command> m_commands = new ArrayList<>();
   private int m_currentCommandIndex = -1;
   private boolean m_runWhenDisabled = true;
+  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
   /**
-   * Creates a new SequentialCommandGroup.  The given commands will be run sequentially, with
-   * the CommandGroup finishing when the last command finishes.
+   * Creates a new SequentialCommandGroup. The given commands will be run sequentially, with the
+   * composition finishing when the last command finishes.
    *
-   * @param commands the commands to include in this group.
+   * @param commands the commands to include in this composition.
    */
+  @SuppressWarnings("this-escape")
   public SequentialCommandGroup(Command... commands) {
     addCommands(commands);
   }
 
-  @Override
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add, in order of execution.
+   */
+  @SuppressWarnings("PMD.UseArraysAsList")
   public final void addCommands(Command... commands) {
-    requireUngrouped(commands);
-
     if (m_currentCommandIndex != -1) {
       throw new IllegalStateException(
-          "Commands cannot be added to a CommandGroup while the group is running");
+          "Commands cannot be added to a composition while it's running");
     }
 
-    registerGroupedCommands(commands);
+    CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
       m_commands.add(command);
-      m_requirements.addAll(command.getRequirements());
+      addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
+      if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
+        m_interruptBehavior = InterruptionBehavior.kCancelSelf;
+      }
     }
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_currentCommandIndex = 0;
 
     if (!m_commands.isEmpty()) {
@@ -58,7 +68,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     if (m_commands.isEmpty()) {
       return;
     }
@@ -76,22 +86,35 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
-    if (interrupted && !m_commands.isEmpty() && m_currentCommandIndex > -1
-        && m_currentCommandIndex < m_commands.size()
-    ) {
+  public final void end(boolean interrupted) {
+    if (interrupted
+        && !m_commands.isEmpty()
+        && m_currentCommandIndex > -1
+        && m_currentCommandIndex < m_commands.size()) {
       m_commands.get(m_currentCommandIndex).end(true);
     }
     m_currentCommandIndex = -1;
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_currentCommandIndex == m_commands.size();
   }
 
   @Override
   public boolean runsWhenDisabled() {
     return m_runWhenDisabled;
+  }
+
+  @Override
+  public InterruptionBehavior getInterruptionBehavior() {
+    return m_interruptBehavior;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+
+    builder.addIntegerProperty("index", () -> m_currentCommandIndex, null);
   }
 }

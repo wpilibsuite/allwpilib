@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 16 May 2023 13:49:18 -0700
+Subject: [PATCH] Suppress warnings we can't fix
+
+---
+ include/fmt/format.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/include/fmt/format.h b/include/fmt/format.h
+index 7c2a19b4084de8f8bb9376d91c9a508f396e50df..ed372239a24466d32d5f81514efbdbe2ddafdba8 100644
+--- a/include/fmt/format.h
++++ b/include/fmt/format.h
+@@ -1268,7 +1268,14 @@ inline auto equal2(const char* lhs, const char* rhs) -> bool {
+ template <typename Char>
+ FMT_CONSTEXPR20 FMT_INLINE void copy2(Char* dst, const char* src) {
+   if (!is_constant_evaluated() && sizeof(Char) == sizeof(char)) {
++#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1000
++#  pragma GCC diagnostic push
++#  pragma GCC diagnostic ignored "-Wstringop-overflow"
++#endif
+     memcpy(dst, src, 2);
++#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1000
++#  pragma GCC diagnostic pop
++#endif
+     return;
+   }
+   *dst++ = static_cast<Char>(*src++);

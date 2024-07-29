@@ -80,13 +80,19 @@ static const unsigned char pr2six[256] = {
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
     64, 64, 64, 64, 64, 64, 64, 64, 64};
 
-size_t Base64Decode(raw_ostream& os, StringRef encoded) {
-  const unsigned char* end = encoded.bytes_begin();
-  while (pr2six[*end] <= 63 && end != encoded.bytes_end()) ++end;
-  size_t nprbytes = end - encoded.bytes_begin();
-  if (nprbytes == 0) return 0;
+size_t Base64Decode(raw_ostream& os, std::string_view encoded) {
+  auto bytes_begin = reinterpret_cast<const unsigned char*>(encoded.data());
+  auto bytes_end = bytes_begin + encoded.size();
+  const unsigned char* end = bytes_begin;
+  while (pr2six[*end] <= 63 && end != bytes_end) {
+    ++end;
+  }
+  size_t nprbytes = end - bytes_begin;
+  if (nprbytes == 0) {
+    return 0;
+  }
 
-  const unsigned char* cur = encoded.bytes_begin();
+  const unsigned char* cur = bytes_begin;
 
   while (nprbytes > 4) {
     os << static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
@@ -97,17 +103,20 @@ size_t Base64Decode(raw_ostream& os, StringRef encoded) {
   }
 
   // Note: (nprbytes == 1) would be an error, so just ignore that case
-  if (nprbytes > 1)
+  if (nprbytes > 1) {
     os << static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
-  if (nprbytes > 2)
+  }
+  if (nprbytes > 2) {
     os << static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
-  if (nprbytes > 3)
+  }
+  if (nprbytes > 3) {
     os << static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+  }
 
-  return (end - encoded.bytes_begin()) + ((4 - nprbytes) & 3);
+  return (end - bytes_begin) + ((4 - nprbytes) & 3);
 }
 
-size_t Base64Decode(StringRef encoded, std::string* plain) {
+size_t Base64Decode(std::string_view encoded, std::string* plain) {
   plain->resize(0);
   raw_string_ostream os(*plain);
   size_t rv = Base64Decode(os, encoded);
@@ -115,19 +124,35 @@ size_t Base64Decode(StringRef encoded, std::string* plain) {
   return rv;
 }
 
-StringRef Base64Decode(StringRef encoded, size_t* num_read,
-                       SmallVectorImpl<char>& buf) {
+std::string_view Base64Decode(std::string_view encoded, size_t* num_read,
+                              SmallVectorImpl<char>& buf) {
   buf.clear();
   raw_svector_ostream os(buf);
   *num_read = Base64Decode(os, encoded);
   return os.str();
 }
 
+size_t Base64Decode(std::string_view encoded, std::vector<uint8_t>* plain) {
+  plain->resize(0);
+  raw_uvector_ostream os(*plain);
+  return Base64Decode(os, encoded);
+}
+
+std::span<uint8_t> Base64Decode(std::string_view encoded, size_t* num_read,
+                                SmallVectorImpl<uint8_t>& buf) {
+  buf.clear();
+  raw_usvector_ostream os(buf);
+  *num_read = Base64Decode(os, encoded);
+  return os.array();
+}
+
 static const char basis_64[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-void Base64Encode(raw_ostream& os, StringRef plain) {
-  if (plain.empty()) return;
+void Base64Encode(raw_ostream& os, std::string_view plain) {
+  if (plain.empty()) {
+    return;
+  }
   size_t len = plain.size();
 
   size_t i;
@@ -153,14 +178,35 @@ void Base64Encode(raw_ostream& os, StringRef plain) {
   }
 }
 
-void Base64Encode(StringRef plain, std::string* encoded) {
+void Base64Encode(std::string_view plain, std::string* encoded) {
   encoded->resize(0);
   raw_string_ostream os(*encoded);
   Base64Encode(os, plain);
   os.flush();
 }
 
-StringRef Base64Encode(StringRef plain, SmallVectorImpl<char>& buf) {
+std::string_view Base64Encode(std::string_view plain,
+                              SmallVectorImpl<char>& buf) {
+  buf.clear();
+  raw_svector_ostream os(buf);
+  Base64Encode(os, plain);
+  return os.str();
+}
+
+void Base64Encode(raw_ostream& os, std::span<const uint8_t> plain) {
+  Base64Encode(os, std::string_view{reinterpret_cast<const char*>(plain.data()),
+                                    plain.size()});
+}
+
+void Base64Encode(std::span<const uint8_t> plain, std::string* encoded) {
+  encoded->resize(0);
+  raw_string_ostream os(*encoded);
+  Base64Encode(os, plain);
+  os.flush();
+}
+
+std::string_view Base64Encode(std::span<const uint8_t> plain,
+                              SmallVectorImpl<char>& buf) {
   buf.clear();
   raw_svector_ostream os(buf);
   Base64Encode(os, plain);

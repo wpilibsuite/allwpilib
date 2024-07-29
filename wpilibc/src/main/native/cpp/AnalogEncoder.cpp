@@ -1,104 +1,124 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/AnalogEncoder.h"
 
+#include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+
 #include "frc/AnalogInput.h"
-#include "frc/Counter.h"
-#include "frc/DriverStation.h"
-#include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/Errors.h"
+#include "frc/MathUtil.h"
+#include "frc/RobotController.h"
 
 using namespace frc;
 
+AnalogEncoder::~AnalogEncoder() {}
+
+AnalogEncoder::AnalogEncoder(int channel)
+    : AnalogEncoder(std::make_shared<AnalogInput>(channel)) {}
+
 AnalogEncoder::AnalogEncoder(AnalogInput& analogInput)
-    : m_analogInput{&analogInput, NullDeleter<AnalogInput>{}},
-      m_analogTrigger{m_analogInput.get()},
-      m_counter{} {
-  Init();
+    : m_analogInput{&analogInput, wpi::NullDeleter<AnalogInput>{}} {
+  Init(1.0, 0.0);
 }
 
 AnalogEncoder::AnalogEncoder(AnalogInput* analogInput)
-    : m_analogInput{analogInput, NullDeleter<AnalogInput>{}},
-      m_analogTrigger{m_analogInput.get()},
-      m_counter{} {
-  Init();
+    : m_analogInput{analogInput, wpi::NullDeleter<AnalogInput>{}} {
+  Init(1.0, 0.0);
 }
 
 AnalogEncoder::AnalogEncoder(std::shared_ptr<AnalogInput> analogInput)
-    : m_analogInput{std::move(analogInput)},
-      m_analogTrigger{m_analogInput.get()},
-      m_counter{} {
-  Init();
+    : m_analogInput{std::move(analogInput)} {
+  Init(1.0, 0.0);
 }
 
-void AnalogEncoder::Init() {
+AnalogEncoder::AnalogEncoder(int channel, double fullRange, double expectedZero)
+    : AnalogEncoder(std::make_shared<AnalogInput>(channel), fullRange,
+                    expectedZero) {}
+
+AnalogEncoder::AnalogEncoder(AnalogInput& analogInput, double fullRange,
+                             double expectedZero)
+    : m_analogInput{&analogInput, wpi::NullDeleter<AnalogInput>{}} {
+  Init(fullRange, expectedZero);
+}
+
+AnalogEncoder::AnalogEncoder(AnalogInput* analogInput, double fullRange,
+                             double expectedZero)
+    : m_analogInput{analogInput, wpi::NullDeleter<AnalogInput>{}} {
+  Init(fullRange, expectedZero);
+}
+
+AnalogEncoder::AnalogEncoder(std::shared_ptr<AnalogInput> analogInput,
+                             double fullRange, double expectedZero)
+    : m_analogInput{std::move(analogInput)} {
+  Init(fullRange, expectedZero);
+}
+
+void AnalogEncoder::Init(double fullRange, double expectedZero) {
   m_simDevice = hal::SimDevice{"AnalogEncoder", m_analogInput->GetChannel()};
 
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
   }
 
-  m_analogTrigger.SetLimitsVoltage(1.25, 3.75);
-  m_counter.SetUpSource(
-      m_analogTrigger.CreateOutput(AnalogTriggerType::kRisingPulse));
-  m_counter.SetDownSource(
-      m_analogTrigger.CreateOutput(AnalogTriggerType::kFallingPulse));
+  m_fullRange = fullRange;
+  m_expectedZero = expectedZero;
 
-  SendableRegistry::GetInstance().AddLW(this, "DutyCycle Encoder",
-                                        m_analogInput->GetChannel());
+  wpi::SendableRegistry::AddLW(this, "Analog Encoder",
+                               m_analogInput->GetChannel());
 }
 
-units::turn_t AnalogEncoder::Get() const {
-  if (m_simPosition) return units::turn_t{m_simPosition.Get()};
-
-  // As the values are not atomic, keep trying until we get 2 reads of the same
-  // value If we don't within 10 attempts, error
-  for (int i = 0; i < 10; i++) {
-    auto counter = m_counter.Get();
-    auto pos = m_analogInput->GetVoltage();
-    auto counter2 = m_counter.Get();
-    auto pos2 = m_analogInput->GetVoltage();
-    if (counter == counter2 && pos == pos2) {
-      units::turn_t turns{counter + pos - m_positionOffset};
-      m_lastPosition = turns;
-      return turns;
-    }
+double AnalogEncoder::Get() const {
+  if (m_simPosition) {
+    return m_simPosition.Get();
   }
 
-  frc::DriverStation::GetInstance().ReportWarning(
-      "Failed to read Analog Encoder. Potential Speed Overrun. Returning last "
-      "value");
-  return m_lastPosition;
+  double analog = m_analogInput->GetVoltage();
+  double pos = analog / RobotController::GetVoltage5V();
+
+  // Map sensor range if range isn't full
+  pos = MapSensorRange(pos);
+
+  // Compute full range and offset
+  pos = pos * m_fullRange - m_expectedZero;
+
+  // Map from 0 - Full Range
+  double result = InputModulus(pos, 0.0, m_fullRange);
+  // Invert if necessary
+  if (m_isInverted) {
+    return m_fullRange - result;
+  }
+  return result;
 }
 
-double AnalogEncoder::GetPositionOffset() const { return m_positionOffset; }
-
-void AnalogEncoder::SetDistancePerRotation(double distancePerRotation) {
-  m_distancePerRotation = distancePerRotation;
+void AnalogEncoder::SetVoltagePercentageRange(double min, double max) {
+  m_sensorMin = std::clamp(min, 0.0, 1.0);
+  m_sensorMax = std::clamp(max, 0.0, 1.0);
 }
 
-double AnalogEncoder::GetDistancePerRotation() const {
-  return m_distancePerRotation;
+void AnalogEncoder::SetInverted(bool inverted) {
+  m_isInverted = inverted;
 }
 
-double AnalogEncoder::GetDistance() const {
-  return Get().to<double>() * GetDistancePerRotation();
+int AnalogEncoder::GetChannel() const {
+  return m_analogInput->GetChannel();
 }
 
-void AnalogEncoder::Reset() {
-  m_counter.Reset();
-  m_positionOffset = m_analogInput->GetVoltage();
+double AnalogEncoder::MapSensorRange(double pos) const {
+  if (pos < m_sensorMin) {
+    pos = m_sensorMin;
+  }
+  if (pos > m_sensorMax) {
+    pos = m_sensorMax;
+  }
+  pos = (pos - m_sensorMin) / (m_sensorMax - m_sensorMin);
+  return pos;
 }
 
-void AnalogEncoder::InitSendable(SendableBuilder& builder) {
+void AnalogEncoder::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
-  builder.AddDoubleProperty("Distance", [this] { return this->GetDistance(); },
-                            nullptr);
-  builder.AddDoubleProperty("Distance Per Rotation",
-                            [this] { return this->GetDistancePerRotation(); },
-                            nullptr);
+  builder.AddDoubleProperty(
+      "Position", [this] { return this->Get(); }, nullptr);
 }

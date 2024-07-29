@@ -1,26 +1,26 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_LOG_H_
-#define NTCORE_LOG_H_
+#pragma once
 
 #include <wpi/Logger.h>
 
-#define LOG(level, x) WPI_LOG(m_logger, level, x)
+#define LOG(level, format, ...) \
+  WPI_LOG(m_logger, level, format __VA_OPT__(, ) __VA_ARGS__)
 
-#undef ERROR
-#define ERROR(x) WPI_ERROR(m_logger, x)
-#define WARNING(x) WPI_WARNING(m_logger, x)
-#define INFO(x) WPI_INFO(m_logger, x)
+#define ERR(format, ...) WPI_ERROR(m_logger, format __VA_OPT__(, ) __VA_ARGS__)
+#define WARN(format, ...) \
+  WPI_WARNING(m_logger, format __VA_OPT__(, ) __VA_ARGS__)
+#define INFO(format, ...) WPI_INFO(m_logger, format __VA_OPT__(, ) __VA_ARGS__)
 
-#define DEBUG0(x) WPI_DEBUG(m_logger, x)
-#define DEBUG1(x) WPI_DEBUG1(m_logger, x)
-#define DEBUG2(x) WPI_DEBUG2(m_logger, x)
-#define DEBUG3(x) WPI_DEBUG3(m_logger, x)
-#define DEBUG4(x) WPI_DEBUG4(m_logger, x)
-
-#endif  // NTCORE_LOG_H_
+#define DEBUG0(format, ...) \
+  WPI_DEBUG(m_logger, format __VA_OPT__(, ) __VA_ARGS__)
+#define DEBUG1(format, ...) \
+  WPI_DEBUG1(m_logger, format __VA_OPT__(, ) __VA_ARGS__)
+#define DEBUG2(format, ...) \
+  WPI_DEBUG2(m_logger, format __VA_OPT__(, ) __VA_ARGS__)
+#define DEBUG3(format, ...) \
+  WPI_DEBUG3(m_logger, format __VA_OPT__(, ) __VA_ARGS__)
+#define DEBUG4(format, ...) \
+  WPI_DEBUG4(m_logger, format __VA_OPT__(, ) __VA_ARGS__)

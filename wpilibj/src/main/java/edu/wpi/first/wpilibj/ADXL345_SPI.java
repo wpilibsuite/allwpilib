@@ -1,14 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -16,16 +10,17 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleTopic;
+import edu.wpi.first.networktables.NTSendable;
+import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-/**
- * ADXL345 SPI Accelerometer.
- */
-@SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
+/** ADXL345 SPI Accelerometer. */
+@SuppressWarnings("TypeName")
+public class ADXL345_SPI implements NTSendable, AutoCloseable {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
   private static final int kDataRegister = 0x32;
@@ -34,26 +29,40 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
   private static final int kAddress_Read = 0x80;
   private static final int kAddress_MultiByte = 0x40;
 
-  private static final int kPowerCtl_Link = 0x20;
-  private static final int kPowerCtl_AutoSleep = 0x10;
+  // private static final int kPowerCtl_Link = 0x20;
+  // private static final int kPowerCtl_AutoSleep = 0x10;
   private static final int kPowerCtl_Measure = 0x08;
-  private static final int kPowerCtl_Sleep = 0x04;
+  // private static final int kPowerCtl_Sleep = 0x04;
 
-  private static final int kDataFormat_SelfTest = 0x80;
-  private static final int kDataFormat_SPI = 0x40;
-  private static final int kDataFormat_IntInvert = 0x20;
+  // private static final int kDataFormat_SelfTest = 0x80;
+  // private static final int kDataFormat_SPI = 0x40;
+  // private static final int kDataFormat_IntInvert = 0x20;
   private static final int kDataFormat_FullRes = 0x08;
-  private static final int kDataFormat_Justify = 0x04;
 
+  // private static final int kDataFormat_Justify = 0x04;
+
+  /** Accelerometer range. */
+  public enum Range {
+    /** 2 Gs max. */
+    k2G,
+    /** 4 Gs max. */
+    k4G,
+    /** 8 Gs max. */
+    k8G,
+    /** 16 Gs max. */
+    k16G
+  }
+
+  /** Accelerometer axes. */
   public enum Axes {
+    /** X axis. */
     kX((byte) 0x00),
+    /** Y axis. */
     kY((byte) 0x02),
+    /** Z axis. */
     kZ((byte) 0x04);
 
-    /**
-     * The integer value representing this enumeration.
-     */
-    @SuppressWarnings("MemberName")
+    /** The integer value representing this enumeration. */
     public final byte value;
 
     Axes(byte value) {
@@ -61,39 +70,64 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
     }
   }
 
+  /** Container type for accelerations from all axes. */
   @SuppressWarnings("MemberName")
   public static class AllAxes {
+    /** Acceleration along the X axis in g-forces. */
     public double XAxis;
+
+    /** Acceleration along the Y axis in g-forces. */
     public double YAxis;
+
+    /** Acceleration along the Z axis in g-forces. */
     public double ZAxis;
+
+    /** Default constructor. */
+    public AllAxes() {}
   }
 
-  protected SPI m_spi;
+  private SPI m_spi;
 
-  protected SimDevice m_simDevice;
-  protected SimEnum m_simRange;
-  protected SimDouble m_simX;
-  protected SimDouble m_simY;
-  protected SimDouble m_simZ;
+  private SimDevice m_simDevice;
+  private SimEnum m_simRange;
+  private SimDouble m_simX;
+  private SimDouble m_simY;
+  private SimDouble m_simZ;
 
   /**
    * Constructor.
    *
-   * @param port  The SPI port that the accelerometer is connected to
+   * @param port The SPI port that the accelerometer is connected to
    * @param range The range (+ or -) that the accelerometer will measure.
    */
+  @SuppressWarnings("this-escape")
   public ADXL345_SPI(SPI.Port port, Range range) {
     m_spi = new SPI(port);
     // simulation
-    m_simDevice = SimDevice.create("ADXL345_SPI", port.value);
+    m_simDevice = SimDevice.create("Accel:ADXL345_SPI", port.value);
     if (m_simDevice != null) {
-      m_simRange = m_simDevice.createEnum("Range", true, new String[] {"2G", "4G", "8G", "16G"}, 0);
-      m_simX = m_simDevice.createDouble("X Accel", false, 0.0);
-      m_simX = m_simDevice.createDouble("Y Accel", false, 0.0);
-      m_simZ = m_simDevice.createDouble("Z Accel", false, 0.0);
+      m_simRange =
+          m_simDevice.createEnumDouble(
+              "range",
+              SimDevice.Direction.kOutput,
+              new String[] {"2G", "4G", "8G", "16G"},
+              new double[] {2.0, 4.0, 8.0, 16.0},
+              0);
+      m_simX = m_simDevice.createDouble("x", SimDevice.Direction.kInput, 0.0);
+      m_simY = m_simDevice.createDouble("y", SimDevice.Direction.kInput, 0.0);
+      m_simZ = m_simDevice.createDouble("z", SimDevice.Direction.kInput, 0.0);
     }
     init(range);
     SendableRegistry.addLW(this, "ADXL345_SPI", port.value);
+  }
+
+  /**
+   * Returns the SPI port.
+   *
+   * @return The SPI port.
+   */
+  public int getPort() {
+    return m_spi.getPort();
   }
 
   @Override
@@ -116,9 +150,7 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
    */
   private void init(Range range) {
     m_spi.setClockRate(500000);
-    m_spi.setMSBFirst();
-    m_spi.setSampleDataOnTrailingEdge();
-    m_spi.setClockActiveLow();
+    m_spi.setMode(SPI.Mode.kMode3);
     m_spi.setChipSelectActiveHigh();
 
     // Turn on the measurements
@@ -132,29 +164,23 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
     HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_SPI);
   }
 
-  @Override
+  /**
+   * Set the measuring range of the accelerometer.
+   *
+   * @param range The maximum acceleration, positive or negative, that the accelerometer will
+   *     measure.
+   */
   public void setRange(Range range) {
-    final byte value;
-
-    switch (range) {
-      case k2G:
-        value = 0;
-        break;
-      case k4G:
-        value = 1;
-        break;
-      case k8G:
-        value = 2;
-        break;
-      case k16G:
-        value = 3;
-        break;
-      default:
-        throw new IllegalArgumentException(range + " unsupported");
-    }
+    final byte value =
+        switch (range) {
+          case k2G -> 0;
+          case k4G -> 1;
+          case k8G -> 2;
+          case k16G -> 3;
+        };
 
     // Specify the data format to read
-    byte[] commands = new byte[]{kDataFormatRegister, (byte) (kDataFormat_FullRes | value)};
+    byte[] commands = new byte[] {kDataFormatRegister, (byte) (kDataFormat_FullRes | value)};
     m_spi.write(commands, commands.length);
 
     if (m_simRange != null) {
@@ -162,17 +188,29 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
     }
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the X axis in g-forces.
+   *
+   * @return The acceleration along the X axis in g-forces.
+   */
   public double getX() {
     return getAcceleration(Axes.kX);
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the Y axis in g-forces.
+   *
+   * @return The acceleration along the Y axis in g-forces.
+   */
   public double getY() {
     return getAcceleration(Axes.kY);
   }
 
-  @Override
+  /**
+   * Returns the acceleration along the Z axis in g-forces.
+   *
+   * @return The acceleration along the Z axis in g-forces.
+   */
   public double getZ() {
     return getAcceleration(Axes.kZ);
   }
@@ -194,8 +232,8 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
       return m_simZ.get();
     }
     ByteBuffer transferBuffer = ByteBuffer.allocate(3);
-    transferBuffer.put(0,
-        (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value));
+    transferBuffer.put(
+        0, (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value));
     m_spi.transaction(transferBuffer, transferBuffer, 3);
     // Sensor is little endian
     transferBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -232,16 +270,20 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
+  public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("3AxisAccelerometer");
-    NetworkTableEntry entryX = builder.getEntry("X");
-    NetworkTableEntry entryY = builder.getEntry("Y");
-    NetworkTableEntry entryZ = builder.getEntry("Z");
-    builder.setUpdateTable(() -> {
-      AllAxes data = getAccelerations();
-      entryX.setDouble(data.XAxis);
-      entryY.setDouble(data.YAxis);
-      entryZ.setDouble(data.ZAxis);
-    });
+    DoublePublisher pubX = new DoubleTopic(builder.getTopic("X")).publish();
+    DoublePublisher pubY = new DoubleTopic(builder.getTopic("Y")).publish();
+    DoublePublisher pubZ = new DoubleTopic(builder.getTopic("Z")).publish();
+    builder.addCloseable(pubX);
+    builder.addCloseable(pubY);
+    builder.addCloseable(pubZ);
+    builder.setUpdateTable(
+        () -> {
+          AllAxes data = getAccelerations();
+          pubX.set(data.XAxis);
+          pubY.set(data.YAxis);
+          pubZ.set(data.ZAxis);
+        });
   }
 }

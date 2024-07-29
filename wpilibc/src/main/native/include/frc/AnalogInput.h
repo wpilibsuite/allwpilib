@@ -1,24 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <stdint.h>
 
 #include <hal/Types.h>
-
-#include "frc/ErrorBase.h"
-#include "frc/PIDSource.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 
-class SendableBuilder;
 class DMA;
 class DMASample;
 
@@ -34,10 +27,8 @@ class DMASample;
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public ErrorBase,
-                    public PIDSource,
-                    public Sendable,
-                    public SendableHelper<AnalogInput> {
+class AnalogInput : public wpi::Sendable,
+                    public wpi::SendableHelper<AnalogInput> {
   friend class AnalogTrigger;
   friend class AnalogGyro;
   friend class DMA;
@@ -207,8 +198,7 @@ class AnalogInput : public ErrorBase,
    *
    * This will be added to all values returned to the user.
    *
-   * @param initialValue The value that the accumulator should start from when
-   *                     reset.
+   * @param value The value that the accumulator should start from when reset.
    */
   void SetAccumulatorInitialValue(int64_t value);
 
@@ -284,20 +274,13 @@ class AnalogInput : public ErrorBase,
   static double GetSampleRate();
 
   /**
-   * Get the Average value for the PID Source base object.
-   *
-   * @return The average voltage.
-   */
-  double PIDGet() override;
-
-  /**
    * Indicates this input is used by a simulated device.
    *
    * @param device simulated device handle
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int m_channel;

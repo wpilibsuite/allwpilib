@@ -1,30 +1,30 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
+#include <networktables/BooleanTopic.h>
+#include <networktables/NTSendableBuilder.h>
 #include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableEntry.h>
-#include <networktables/NetworkTableValue.h>
-#include <wpi/ArrayRef.h>
+#include <networktables/StringTopic.h>
+#include <wpi/FunctionExtras.h>
 #include <wpi/SmallVector.h>
-#include <wpi/Twine.h>
-
-#include "frc/smartdashboard/SendableBuilder.h"
 
 namespace frc {
 
-class SendableBuilderImpl : public SendableBuilder {
+/**
+ * Implementation detail for SendableBuilder.
+ */
+class SendableBuilderImpl : public nt::NTSendableBuilder {
  public:
   SendableBuilderImpl() = default;
   ~SendableBuilderImpl() override = default;
@@ -43,13 +43,13 @@ class SendableBuilderImpl : public SendableBuilder {
    * Get the network table.
    * @return The network table
    */
-  std::shared_ptr<nt::NetworkTable> GetTable();
+  std::shared_ptr<nt::NetworkTable> GetTable() override;
 
   /**
    * Return whether this sendable has an associated table.
    * @return True if it has a table, false if not.
    */
-  bool HasTable() const;
+  bool IsPublished() const override;
 
   /**
    * Return whether this sendable should be treated as an actuator.
@@ -58,9 +58,10 @@ class SendableBuilderImpl : public SendableBuilder {
   bool IsActuator() const;
 
   /**
-   * Update the network table values by calling the getters for all properties.
+   * Synchronize with network table values by calling the getters for all
+   * properties and setters when the network table value has changed.
    */
-  void UpdateTable();
+  void Update() override;
 
   /**
    * Hook setters for all properties.
@@ -87,125 +88,165 @@ class SendableBuilderImpl : public SendableBuilder {
   /**
    * Clear properties.
    */
-  void ClearProperties();
+  void ClearProperties() override;
 
-  void SetSmartDashboardType(const wpi::Twine& type) override;
+  void SetSmartDashboardType(std::string_view type) override;
   void SetActuator(bool value) override;
   void SetSafeState(std::function<void()> func) override;
-  void SetUpdateTable(std::function<void()> func) override;
-  nt::NetworkTableEntry GetEntry(const wpi::Twine& key) override;
+  void SetUpdateTable(wpi::unique_function<void()> func) override;
+  nt::Topic GetTopic(std::string_view key) override;
 
-  void AddBooleanProperty(const wpi::Twine& key, std::function<bool()> getter,
+  void AddBooleanProperty(std::string_view key, std::function<bool()> getter,
                           std::function<void(bool)> setter) override;
 
-  void AddDoubleProperty(const wpi::Twine& key, std::function<double()> getter,
+  void PublishConstBoolean(std::string_view key, bool value) override;
+
+  void AddIntegerProperty(std::string_view key, std::function<int64_t()> getter,
+                          std::function<void(int64_t)> setter) override;
+
+  void PublishConstInteger(std::string_view key, int64_t value) override;
+
+  void AddFloatProperty(std::string_view key, std::function<float()> getter,
+                        std::function<void(float)> setter) override;
+
+  void PublishConstFloat(std::string_view key, float value) override;
+
+  void AddDoubleProperty(std::string_view key, std::function<double()> getter,
                          std::function<void(double)> setter) override;
 
-  void AddStringProperty(const wpi::Twine& key,
+  void PublishConstDouble(std::string_view key, double value) override;
+
+  void AddStringProperty(std::string_view key,
                          std::function<std::string()> getter,
-                         std::function<void(wpi::StringRef)> setter) override;
+                         std::function<void(std::string_view)> setter) override;
+
+  void PublishConstString(std::string_view key,
+                          std::string_view value) override;
 
   void AddBooleanArrayProperty(
-      const wpi::Twine& key, std::function<std::vector<int>()> getter,
-      std::function<void(wpi::ArrayRef<int>)> setter) override;
+      std::string_view key, std::function<std::vector<int>()> getter,
+      std::function<void(std::span<const int>)> setter) override;
+
+  void PublishConstBooleanArray(std::string_view key,
+                                std::span<const int> value) override;
+
+  void AddIntegerArrayProperty(
+      std::string_view key, std::function<std::vector<int64_t>()> getter,
+      std::function<void(std::span<const int64_t>)> setter) override;
+
+  void PublishConstIntegerArray(std::string_view key,
+                                std::span<const int64_t> value) override;
+
+  void AddFloatArrayProperty(
+      std::string_view key, std::function<std::vector<float>()> getter,
+      std::function<void(std::span<const float>)> setter) override;
+
+  void PublishConstFloatArray(std::string_view key,
+                              std::span<const float> value) override;
 
   void AddDoubleArrayProperty(
-      const wpi::Twine& key, std::function<std::vector<double>()> getter,
-      std::function<void(wpi::ArrayRef<double>)> setter) override;
+      std::string_view key, std::function<std::vector<double>()> getter,
+      std::function<void(std::span<const double>)> setter) override;
+
+  void PublishConstDoubleArray(std::string_view key,
+                               std::span<const double> value) override;
 
   void AddStringArrayProperty(
-      const wpi::Twine& key, std::function<std::vector<std::string>()> getter,
-      std::function<void(wpi::ArrayRef<std::string>)> setter) override;
+      std::string_view key, std::function<std::vector<std::string>()> getter,
+      std::function<void(std::span<const std::string>)> setter) override;
 
-  void AddRawProperty(const wpi::Twine& key,
-                      std::function<std::string()> getter,
-                      std::function<void(wpi::StringRef)> setter) override;
+  void PublishConstStringArray(std::string_view key,
+                               std::span<const std::string> value) override;
 
-  void AddValueProperty(
-      const wpi::Twine& key, std::function<std::shared_ptr<nt::Value>()> getter,
-      std::function<void(std::shared_ptr<nt::Value>)> setter) override;
+  void AddRawProperty(
+      std::string_view key, std::string_view typeString,
+      std::function<std::vector<uint8_t>()> getter,
+      std::function<void(std::span<const uint8_t>)> setter) override;
+
+  void PublishConstRaw(std::string_view key, std::string_view typeString,
+                       std::span<const uint8_t> value) override;
 
   void AddSmallStringProperty(
-      const wpi::Twine& key,
-      std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
-      std::function<void(wpi::StringRef)> setter) override;
+      std::string_view key,
+      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+      std::function<void(std::string_view)> setter) override;
 
   void AddSmallBooleanArrayProperty(
-      const wpi::Twine& key,
-      std::function<wpi::ArrayRef<int>(wpi::SmallVectorImpl<int>& buf)> getter,
-      std::function<void(wpi::ArrayRef<int>)> setter) override;
+      std::string_view key,
+      std::function<std::span<const int>(wpi::SmallVectorImpl<int>& buf)>
+          getter,
+      std::function<void(std::span<const int>)> setter) override;
+
+  void AddSmallIntegerArrayProperty(
+      std::string_view key,
+      std::function<
+          std::span<const int64_t>(wpi::SmallVectorImpl<int64_t>& buf)>
+          getter,
+      std::function<void(std::span<const int64_t>)> setter) override;
+
+  void AddSmallFloatArrayProperty(
+      std::string_view key,
+      std::function<std::span<const float>(wpi::SmallVectorImpl<float>& buf)>
+          getter,
+      std::function<void(std::span<const float>)> setter) override;
 
   void AddSmallDoubleArrayProperty(
-      const wpi::Twine& key,
-      std::function<wpi::ArrayRef<double>(wpi::SmallVectorImpl<double>& buf)>
+      std::string_view key,
+      std::function<std::span<const double>(wpi::SmallVectorImpl<double>& buf)>
           getter,
-      std::function<void(wpi::ArrayRef<double>)> setter) override;
+      std::function<void(std::span<const double>)> setter) override;
 
   void AddSmallStringArrayProperty(
-      const wpi::Twine& key,
+      std::string_view key,
       std::function<
-          wpi::ArrayRef<std::string>(wpi::SmallVectorImpl<std::string>& buf)>
+          std::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
           getter,
-      std::function<void(wpi::ArrayRef<std::string>)> setter) override;
+      std::function<void(std::span<const std::string>)> setter) override;
 
   void AddSmallRawProperty(
-      const wpi::Twine& key,
-      std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
-      std::function<void(wpi::StringRef)> setter) override;
+      std::string_view key, std::string_view typeString,
+      std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
+          getter,
+      std::function<void(std::span<const uint8_t>)> setter) override;
 
  private:
   struct Property {
-    Property(nt::NetworkTable& table, const wpi::Twine& key)
-        : entry(table.GetEntry(key)) {}
-
-    Property(const Property&) = delete;
-    Property& operator=(const Property&) = delete;
-
-    Property(Property&& other) noexcept
-        : entry(other.entry),
-          listener(other.listener),
-          update(std::move(other.update)),
-          createListener(std::move(other.createListener)) {
-      other.entry = nt::NetworkTableEntry();
-      other.listener = 0;
-    }
-
-    Property& operator=(Property&& other) noexcept {
-      entry = other.entry;
-      listener = other.listener;
-      other.entry = nt::NetworkTableEntry();
-      other.listener = 0;
-      update = std::move(other.update);
-      createListener = std::move(other.createListener);
-      return *this;
-    }
-
-    ~Property() { StopListener(); }
-
-    void StartListener() {
-      if (entry && listener == 0 && createListener)
-        listener = createListener(entry);
-    }
-
-    void StopListener() {
-      if (entry && listener != 0) {
-        entry.RemoveListener(listener);
-        listener = 0;
-      }
-    }
-
-    nt::NetworkTableEntry entry;
-    NT_EntryListener listener = 0;
-    std::function<void(nt::NetworkTableEntry entry, uint64_t time)> update;
-    std::function<NT_EntryListener(nt::NetworkTableEntry entry)> createListener;
+    virtual ~Property() = default;
+    virtual void Update(bool controllable, int64_t time) = 0;
   };
 
-  std::vector<Property> m_properties;
+  template <typename Topic>
+  struct PropertyImpl : public Property {
+    void Update(bool controllable, int64_t time) override;
+
+    using Publisher = typename Topic::PublisherType;
+    using Subscriber = typename Topic::SubscriberType;
+    Publisher pub;
+    Subscriber sub;
+    std::function<void(Publisher& pub, int64_t time)> updateNetwork;
+    std::function<void(Subscriber& sub)> updateLocal;
+  };
+
+  template <typename Topic, typename Getter, typename Setter>
+  void AddPropertyImpl(Topic topic, Getter getter, Setter setter);
+
+  template <typename Topic, typename Value>
+  void PublishConstImpl(Topic topic, Value value);
+
+  template <typename T, size_t Size, typename Topic, typename Getter,
+            typename Setter>
+  void AddSmallPropertyImpl(Topic topic, Getter getter, Setter setter);
+
+  std::vector<std::unique_ptr<Property>> m_properties;
   std::function<void()> m_safeState;
-  std::vector<std::function<void()>> m_updateTables;
+  std::vector<wpi::unique_function<void()>> m_updateTables;
   std::shared_ptr<nt::NetworkTable> m_table;
-  nt::NetworkTableEntry m_controllableEntry;
+  bool m_controllable = false;
   bool m_actuator = false;
+
+  nt::BooleanPublisher m_controllablePublisher;
+  nt::StringPublisher m_typePublisher;
+  nt::BooleanPublisher m_actuatorPublisher;
 };
 
 }  // namespace frc

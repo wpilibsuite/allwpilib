@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java-library'
-//apply plugin: 'net.ltgt.errorprone'
 apply plugin: 'jacoco'
+apply plugin: 'com.google.protobuf'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
@@ -10,12 +10,12 @@ def javaBaseName = "_GROUP_edu_wpi_first_${project.baseId}_ID_${project.baseId}-
 def outputsFolder = file("$project.buildDir/outputs")
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
@@ -28,14 +28,14 @@ task outputJar(type: Jar, dependsOn: classes) {
 task outputSourcesJar(type: Jar, dependsOn: classes) {
     archiveBaseName = javaBaseName
     destinationDirectory = outputsFolder
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task outputJavadocJar(type: Jar, dependsOn: javadoc) {
     archiveBaseName = javaBaseName
     destinationDirectory = outputsFolder
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
@@ -82,12 +82,14 @@ test {
     finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian') || project.hasProperty('onlylinuxaarch64bionic')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
     test.enabled = false
 }
 
 repositories {
-    mavenCentral()
+    maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
     //maven.url "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
@@ -95,36 +97,63 @@ sourceSets {
     dev
 }
 
+configurations {
+    devImplementation.extendsFrom(implementation)
+}
+
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs = ['--release', '11']
+    options.compilerArgs = [
+        '--release',
+        '17',
+        '-encoding',
+        'UTF8',
+        "-Werror",
+        "-Xlint:all",
+        // ignore AutoCloseable warnings
+        "-Xlint:-try",
+        // ignore missing serialVersionUID warnings
+        "-Xlint:-serial",
+        // ignore unclaimed annotation warning from annotation processing
+        "-Xlint:-processing",
+    ]
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     devImplementation sourceSets.main.output
-
-    //errorprone 'com.google.errorprone:error_prone_core:2.3.2-SNAPSHOT'
-    //errorproneJavac 'com.google.errorprone:error_prone_core:2.3.1'
 }
 
 task run(type: JavaExec) {
     classpath = sourceSets.dev.runtimeClasspath
 
-    main = project.devMain
+    mainClass = project.devMain
 }
 
 build.dependsOn devClasses
 
 jacoco {
-    toolVersion = "0.8.4"
+    toolVersion = "0.8.10"
 }
 
 jacocoTestReport {
     reports {
-        xml.enabled true
-        html.enabled true
+        xml.required = true
+        html.required = true
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.21.12'
+    }
+    generateProtoTasks {
+        all().configureEach { task ->
+            task.builtins {
+                cpp {}
+                remove java
+            }
+        }
     }
 }

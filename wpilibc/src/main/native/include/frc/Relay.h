@@ -1,25 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <hal/Types.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * Class for Spike style relay outputs.
@@ -34,11 +28,34 @@ class SendableBuilder;
  * a solenoid).
  */
 class Relay : public MotorSafety,
-              public Sendable,
-              public SendableHelper<Relay> {
+              public wpi::Sendable,
+              public wpi::SendableHelper<Relay> {
  public:
-  enum Value { kOff, kOn, kForward, kReverse };
-  enum Direction { kBothDirections, kForwardOnly, kReverseOnly };
+  /**
+   * The state to drive a Relay to.
+   */
+  enum Value {
+    /// Off.
+    kOff,
+    /// On.
+    kOn,
+    /// Forward.
+    kForward,
+    /// Reverse.
+    kReverse
+  };
+
+  /**
+   * The Direction(s) that a relay is configured to operate in.
+   */
+  enum Direction {
+    /// Both directions are valid.
+    kBothDirections,
+    /// Only forward is valid.
+    kForwardOnly,
+    /// Only reverse is valid.
+    kReverseOnly
+  };
 
   /**
    * Relay constructor given a channel.
@@ -95,9 +112,9 @@ class Relay : public MotorSafety,
   // MotorSafety interface
   void StopMotor() override;
 
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int m_channel;

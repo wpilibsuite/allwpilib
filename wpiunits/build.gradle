@@ -1,0 +1,14 @@
+ext {
+    useJava = true
+    useCpp = false
+    baseId = 'wpiunits'
+    groupId = 'edu.wpi.first.wpiunits'
+
+    nativeName = 'wpiunits'
+    devMain = 'edu.wpi.first.units.DevMain'
+}
+
+apply from: "${rootDir}/shared/java/javacommon.gradle"
+
+dependencies {
+}

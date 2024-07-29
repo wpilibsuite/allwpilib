@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/handles/HandlesInternal.h"
 
@@ -80,9 +77,13 @@ HAL_PortHandle createPortHandleForSPI(uint8_t channel) {
 }
 HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
                         int16_t version) {
-  if (index < 0) return HAL_kInvalidHandle;
+  if (index < 0) {
+    return HAL_kInvalidHandle;
+  }
   uint8_t hType = static_cast<uint8_t>(handleType);
-  if (hType == 0 || hType > 127) return HAL_kInvalidHandle;
+  if (hType == 0 || hType > 127) {
+    return HAL_kInvalidHandle;
+  }
   // set last 8 bits, then shift to first 8 bits
   HAL_Handle handle = hType;
   handle = handle << 8;

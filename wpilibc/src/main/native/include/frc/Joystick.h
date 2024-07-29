@@ -1,15 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <array>
 
-#include <wpi/deprecated.h>
+#include <units/angle.h>
 
 #include "frc/GenericHID.h"
 
@@ -25,14 +22,42 @@ namespace frc {
  */
 class Joystick : public GenericHID {
  public:
+  /// Default X axis channel.
   static constexpr int kDefaultXChannel = 0;
+  /// Default Y axis channel.
   static constexpr int kDefaultYChannel = 1;
+  /// Default Z axis channel.
   static constexpr int kDefaultZChannel = 2;
+  /// Default twist axis channel.
   static constexpr int kDefaultTwistChannel = 2;
+  /// Default throttle axis channel.
   static constexpr int kDefaultThrottleChannel = 3;
 
-  enum AxisType { kXAxis, kYAxis, kZAxis, kTwistAxis, kThrottleAxis };
-  enum ButtonType { kTriggerButton, kTopButton };
+  /**
+   * Represents an analog axis on a joystick.
+   */
+  enum AxisType {
+    /// X axis.
+    kXAxis,
+    /// Y axis.
+    kYAxis,
+    /// Z axis.
+    kZAxis,
+    /// Twist axis.
+    kTwistAxis,
+    /// Throttle axis.
+    kThrottleAxis
+  };
+
+  /**
+   * Represents a digital button on a joystick.
+   */
+  enum ButtonType {
+    /// kTrigger.
+    kTriggerButton,
+    /// kTop.
+    kTopButton
+  };
 
   /**
    * Construct an instance of a joystick.
@@ -44,7 +69,7 @@ class Joystick : public GenericHID {
    */
   explicit Joystick(int port);
 
-  virtual ~Joystick() = default;
+  ~Joystick() override = default;
 
   Joystick(Joystick&&) = default;
   Joystick& operator=(Joystick&&) = default;
@@ -59,7 +84,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the Y axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetYChannel(int channel);
@@ -67,7 +91,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the Z axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetZChannel(int channel);
@@ -75,7 +98,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the twist axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetTwistChannel(int channel);
@@ -83,7 +105,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the throttle axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetThrottleChannel(int channel);
@@ -124,24 +145,18 @@ class Joystick : public GenericHID {
   int GetThrottleChannel() const;
 
   /**
-   * Get the X value of the joystick.
+   * Get the X value of the current joystick.
    *
    * This depends on the mapping of the joystick connected to the current port.
-   *
-   * @param hand This parameter is ignored for the Joystick class and is only
-   *             here to complete the GenericHID interface.
    */
-  double GetX(JoystickHand hand = kRightHand) const override;
+  double GetX() const;
 
   /**
-   * Get the Y value of the joystick.
+   * Get the Y value of the current joystick.
    *
    * This depends on the mapping of the joystick connected to the current port.
-   *
-   * @param hand This parameter is ignored for the Joystick class and is only
-   *             here to complete the GenericHID interface.
    */
-  double GetY(JoystickHand hand = kRightHand) const override;
+  double GetY() const;
 
   /**
    * Get the Z value of the current joystick.
@@ -188,6 +203,15 @@ class Joystick : public GenericHID {
   bool GetTriggerReleased();
 
   /**
+   * Constructs an event instance around the trigger button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the trigger button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Trigger(EventLoop* loop) const;
+
+  /**
    * Read the state of the top button on the joystick.
    *
    * Look up which button has been assigned to the top and read its state.
@@ -211,6 +235,15 @@ class Joystick : public GenericHID {
   bool GetTopReleased();
 
   /**
+   * Constructs an event instance around the top button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the top button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Top(EventLoop* loop) const;
+
+  /**
    * Get the magnitude of the direction vector formed by the joystick's
    * current position relative to its origin.
    *
@@ -219,20 +252,11 @@ class Joystick : public GenericHID {
   double GetMagnitude() const;
 
   /**
-   * Get the direction of the vector formed by the joystick and its origin
-   * in radians.
+   * Get the direction of the vector formed by the joystick and its origin.
    *
-   * @return The direction of the vector in radians
+   * @return The direction of the vector.
    */
-  double GetDirectionRadians() const;
-
-  /**
-   * Get the direction of the vector formed by the joystick and its origin
-   * in degrees.
-   *
-   * @return The direction of the vector in degrees
-   */
-  double GetDirectionDegrees() const;
+  units::radian_t GetDirection() const;
 
  private:
   enum Axis { kX, kY, kZ, kTwist, kThrottle, kNumAxes };

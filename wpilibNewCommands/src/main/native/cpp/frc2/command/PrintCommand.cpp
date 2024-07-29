@@ -1,18 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/PrintCommand.h"
 
-#include <wpi/raw_ostream.h>
+#include <wpi/print.h>
 
 using namespace frc2;
 
-PrintCommand::PrintCommand(const wpi::Twine& message)
-    : CommandHelper{[str = message.str()] { wpi::outs() << str << "\n"; }, {}} {
-}
+PrintCommand::PrintCommand(std::string_view message)
+    : CommandHelper{[str = std::string(message)] { wpi::print("{}\n", str); },
+                    {}} {}
 
-bool PrintCommand::RunsWhenDisabled() const { return true; }
+bool PrintCommand::RunsWhenDisabled() const {
+  return true;
+}

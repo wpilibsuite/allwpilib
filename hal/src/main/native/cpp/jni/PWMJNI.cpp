@@ -1,13 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
 #include <cassert>
+
+#include <wpi/jni_util.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_PWMJNI.h"
@@ -16,7 +15,7 @@
 #include "hal/Ports.h"
 #include "hal/handles/HandlesInternal.h"
 
-using namespace frc;
+using namespace hal;
 
 extern "C" {
 
@@ -30,9 +29,9 @@ Java_edu_wpi_first_hal_PWMJNI_initializePWMPort
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  auto pwm = HAL_InitializePWMPort((HAL_PortHandle)id, &status);
-  CheckStatusRange(env, status, 0, HAL_GetNumPWMChannels(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto pwm = HAL_InitializePWMPort((HAL_PortHandle)id, stack.c_str(), &status);
+  CheckStatusForceThrow(env, status);
   return (jint)pwm;
 }
 
@@ -64,43 +63,27 @@ Java_edu_wpi_first_hal_PWMJNI_freePWMPort
 
 /*
  * Class:     edu_wpi_first_hal_PWMJNI
- * Method:    setPWMConfigRaw
+ * Method:    setPWMConfigMicroseconds
  * Signature: (IIIIII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PWMJNI_setPWMConfigRaw
+Java_edu_wpi_first_hal_PWMJNI_setPWMConfigMicroseconds
   (JNIEnv* env, jclass, jint id, jint maxPwm, jint deadbandMaxPwm,
    jint centerPwm, jint deadbandMinPwm, jint minPwm)
 {
   int32_t status = 0;
-  HAL_SetPWMConfigRaw((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm,
-                      deadbandMinPwm, minPwm, &status);
+  HAL_SetPWMConfigMicroseconds((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm,
+                               centerPwm, deadbandMinPwm, minPwm, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_PWMJNI
- * Method:    setPWMConfig
- * Signature: (IDDDDD)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PWMJNI_setPWMConfig
-  (JNIEnv* env, jclass, jint id, jdouble maxPwm, jdouble deadbandMaxPwm,
-   jdouble centerPwm, jdouble deadbandMinPwm, jdouble minPwm)
-{
-  int32_t status = 0;
-  HAL_SetPWMConfig((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm,
-                   deadbandMinPwm, minPwm, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_first_hal_PWMJNI
- * Method:    getPWMConfigRaw
+ * Method:    getPWMConfigMicroseconds
  * Signature: (I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_hal_PWMJNI_getPWMConfigRaw
+Java_edu_wpi_first_hal_PWMJNI_getPWMConfigMicroseconds
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -109,8 +92,8 @@ Java_edu_wpi_first_hal_PWMJNI_getPWMConfigRaw
   int32_t centerPwm = 0;
   int32_t deadbandMinPwm = 0;
   int32_t minPwm = 0;
-  HAL_GetPWMConfigRaw((HAL_DigitalHandle)id, &maxPwm, &deadbandMaxPwm,
-                      &centerPwm, &deadbandMinPwm, &minPwm, &status);
+  HAL_GetPWMConfigMicroseconds((HAL_DigitalHandle)id, &maxPwm, &deadbandMaxPwm,
+                               &centerPwm, &deadbandMinPwm, &minPwm, &status);
   CheckStatus(env, status);
   return CreatePWMConfigDataResult(env, maxPwm, deadbandMaxPwm, centerPwm,
                                    deadbandMinPwm, minPwm);
@@ -147,15 +130,15 @@ Java_edu_wpi_first_hal_PWMJNI_getPWMEliminateDeadband
 
 /*
  * Class:     edu_wpi_first_hal_PWMJNI
- * Method:    setPWMRaw
- * Signature: (IS)V
+ * Method:    setPulseTimeMicroseconds
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PWMJNI_setPWMRaw
-  (JNIEnv* env, jclass, jint id, jshort value)
+Java_edu_wpi_first_hal_PWMJNI_setPulseTimeMicroseconds
+  (JNIEnv* env, jclass, jint id, jint value)
 {
   int32_t status = 0;
-  HAL_SetPWMRaw((HAL_DigitalHandle)id, value, &status);
+  HAL_SetPWMPulseTimeMicroseconds((HAL_DigitalHandle)id, value, &status);
   CheckStatus(env, status);
 }
 
@@ -189,15 +172,16 @@ Java_edu_wpi_first_hal_PWMJNI_setPWMPosition
 
 /*
  * Class:     edu_wpi_first_hal_PWMJNI
- * Method:    getPWMRaw
- * Signature: (I)S
+ * Method:    getPulseTimeMicroseconds
+ * Signature: (I)I
  */
-JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_hal_PWMJNI_getPWMRaw
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PWMJNI_getPulseTimeMicroseconds
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  jshort returnValue = HAL_GetPWMRaw((HAL_DigitalHandle)id, &status);
+  int32_t returnValue =
+      HAL_GetPWMPulseTimeMicroseconds((HAL_DigitalHandle)id, &status);
   CheckStatus(env, status);
   return returnValue;
 }
@@ -257,6 +241,20 @@ Java_edu_wpi_first_hal_PWMJNI_latchPWMZero
 {
   int32_t status = 0;
   HAL_LatchPWMZero((HAL_DigitalHandle)id, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PWMJNI
+ * Method:    setAlwaysHighMode
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PWMJNI_setAlwaysHighMode
+  (JNIEnv* env, jclass, jint id)
+{
+  int32_t status = 0;
+  HAL_SetPWMAlwaysHighMode((HAL_DigitalHandle)id, &status);
   CheckStatus(env, status);
 }
 

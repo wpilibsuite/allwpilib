@@ -1,16 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <stdint.h>
 
 #include "hal/I2CTypes.h"
-#include "hal/Types.h"
 
 /**
  * @defgroup hal_i2c I2C Functions
@@ -28,7 +24,8 @@ extern "C" {
  * Opens the port if necessary and saves the handle.
  * If opening the MXP port, also sets up the channel functions appropriately.
  *
- * @param port The port to open, 0 for the on-board, 1 for the MXP.
+ * @param[in] port    The port to open, 0 for the on-board, 1 for the MXP.
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status);
 
@@ -39,6 +36,8 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status);
  * over each transaction.
  *
  * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+ * @param deviceAddress The address of the register on the device to be
+ *                      read/written.
  * @param dataToSend Buffer of data to send as part of the transaction.
  * @param sendSize Number of bytes to send as part of the transaction.
  * @param dataReceived Buffer to read data into.
@@ -56,9 +55,10 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
  *   transaction is complete.
  *
  * @param port The I2C port, 0 for the on-board, 1 for the MXP.
- * @param registerAddress The address of the register on the device to be
- * written.
- * @param data The byte to write to the register on the device.
+ * @param deviceAddress The address of the register on the device to be
+ *                      written.
+ * @param dataToSend The byte to write to the register on the device.
+ * @param sendSize Number of bytes to send.
  * @return >= 0 on success or -1 on transfer abort.
  */
 int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
@@ -72,7 +72,7 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
  *   you to read consecutive registers on a device in a single transaction.
  *
  * @param port The I2C port, 0 for the on-board, 1 for the MXP.
- * @param registerAddress The register to read first in the transaction.
+ * @param deviceAddress The register to read first in the transaction.
  * @param count The number of bytes to read in the transaction.
  * @param buffer A pointer to the array of bytes to store the data read from the
  * device.

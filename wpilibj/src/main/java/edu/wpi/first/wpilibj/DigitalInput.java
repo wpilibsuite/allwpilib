@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -11,8 +8,9 @@ import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Class to read a digital input. This class will read digital inputs and return the current value
@@ -20,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * elsewhere will automatically allocate digital inputs and outputs as required. This class is only
  * for devices like switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput extends DigitalSource implements Sendable, AutoCloseable {
+public class DigitalInput extends DigitalSource implements Sendable {
   private final int m_channel;
   private int m_handle;
 
@@ -29,6 +27,7 @@ public class DigitalInput extends DigitalSource implements Sendable, AutoCloseab
    *
    * @param channel the DIO channel for the digital input 0-9 are on-board, 10-25 are on the MXP
    */
+  @SuppressWarnings("this-escape")
   public DigitalInput(int channel) {
     SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
@@ -43,9 +42,6 @@ public class DigitalInput extends DigitalSource implements Sendable, AutoCloseab
   public void close() {
     super.close();
     SendableRegistry.remove(this);
-    if (m_interrupt != 0) {
-      cancelInterrupts();
-    }
     DIOJNI.freeDIOPort(m_handle);
     m_handle = 0;
   }

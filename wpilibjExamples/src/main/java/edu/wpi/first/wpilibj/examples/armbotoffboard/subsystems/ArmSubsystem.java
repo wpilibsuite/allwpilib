@@ -1,36 +1,32 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.armbotoffboard.subsystems;
 
-import edu.wpi.first.wpilibj.controller.ArmFeedforward;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
-
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.examples.armbotoffboard.Constants.ArmConstants;
 import edu.wpi.first.wpilibj.examples.armbotoffboard.ExampleSmartMotorController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 
-/**
- * A robot arm subsystem that moves with a motion profile.
- */
+/** A robot arm subsystem that moves with a motion profile. */
 public class ArmSubsystem extends TrapezoidProfileSubsystem {
   private final ExampleSmartMotorController m_motor =
       new ExampleSmartMotorController(ArmConstants.kMotorPort);
   private final ArmFeedforward m_feedforward =
-      new ArmFeedforward(ArmConstants.kSVolts, ArmConstants.kCosVolts,
-                         ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
+      new ArmFeedforward(
+          ArmConstants.kSVolts, ArmConstants.kGVolts,
+          ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
 
-  /**
-   * Create a new ArmSubsystem.
-   */
+  /** Create a new ArmSubsystem. */
   public ArmSubsystem() {
-    super(new TrapezoidProfile.Constraints(ArmConstants.kMaxVelocityRadPerSecond,
-                                           ArmConstants.kMaxAccelerationRadPerSecSquared),
-          ArmConstants.kArmOffsetRads);
+    super(
+        new TrapezoidProfile.Constraints(
+            ArmConstants.kMaxVelocityRadPerSecond, ArmConstants.kMaxAccelerationRadPerSecSquared),
+        ArmConstants.kArmOffsetRads);
     m_motor.setPID(ArmConstants.kP, 0, 0);
   }
 
@@ -39,7 +35,11 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem {
     // Calculate the feedforward from the sepoint
     double feedforward = m_feedforward.calculate(setpoint.position, setpoint.velocity);
     // Add the feedforward to the PID output to get the motor output
-    m_motor.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition, setpoint.position,
-                        feedforward / 12.0);
+    m_motor.setSetpoint(
+        ExampleSmartMotorController.PIDMode.kPosition, setpoint.position, feedforward / 12.0);
+  }
+
+  public Command setArmGoalCommand(double kArmOffsetRads) {
+    return Commands.runOnce(() -> setGoal(kArmOffsetRads), this);
   }
 }

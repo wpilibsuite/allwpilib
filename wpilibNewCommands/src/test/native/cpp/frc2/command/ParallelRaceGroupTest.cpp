@@ -1,11 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
+#include "CompositionTestBase.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/SequentialCommandGroup.h"
@@ -14,7 +12,7 @@
 using namespace frc2;
 class ParallelRaceGroupTest : public CommandTestBase {};
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -25,7 +23,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTest) {
   MockCommand* command2 = command2Holder.get();
   MockCommand* command3 = command3Holder.get();
 
-  ParallelRaceGroup group{tcb::make_vector<std::unique_ptr<Command>>(
+  ParallelRaceGroup group{make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
@@ -50,7 +48,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceInterruptTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -61,7 +59,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceInterruptTest) {
   MockCommand* command2 = command2Holder.get();
   MockCommand* command3 = command3Holder.get();
 
-  ParallelRaceGroup group{tcb::make_vector<std::unique_ptr<Command>>(
+  ParallelRaceGroup group{make_vector<std::unique_ptr<Command>>(
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
@@ -86,7 +84,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceInterruptTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancelTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
   ParallelRaceGroup group{InstantCommand(), InstantCommand()};
@@ -94,7 +92,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancelTest) {
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceCopyTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceCopy) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -110,7 +108,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceCopyTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, RaceGroupRequirementTest) {
+TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement1;
@@ -131,7 +129,7 @@ TEST_F(ParallelRaceGroupTest, RaceGroupRequirementTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished1 = false;
@@ -154,3 +152,57 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
   EXPECT_NO_FATAL_FAILURE(scheduler.Run());
   EXPECT_FALSE(scheduler.IsScheduled(&group2));
 }
+
+TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwice) {
+  CommandScheduler scheduler = GetScheduler();
+
+  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();
+
+  MockCommand* command1 = command1Holder.get();
+  MockCommand* command2 = command2Holder.get();
+  MockCommand* command3 = command3Holder.get();
+
+  ParallelRaceGroup group{make_vector<std::unique_ptr<Command>>(
+      std::move(command1Holder), std::move(command2Holder),
+      std::move(command3Holder))};
+
+  EXPECT_CALL(*command1, Initialize()).Times(2);
+  EXPECT_CALL(*command1, Execute()).Times(5);
+  EXPECT_CALL(*command1, End(true)).Times(2);
+
+  EXPECT_CALL(*command2, Initialize()).Times(2);
+  EXPECT_CALL(*command2, Execute()).Times(5);
+  EXPECT_CALL(*command2, End(false)).Times(2);
+
+  EXPECT_CALL(*command3, Initialize()).Times(2);
+  EXPECT_CALL(*command3, Execute()).Times(5);
+  EXPECT_CALL(*command3, End(true)).Times(2);
+
+  scheduler.Schedule(&group);
+
+  scheduler.Run();
+  command2->SetFinished(true);
+  scheduler.Run();
+
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+
+  command2->SetFinished(false);
+
+  scheduler.Schedule(&group);
+
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&group));
+
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&group));
+
+  command2->SetFinished(true);
+  scheduler.Run();
+
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
+
+INSTANTIATE_MULTI_COMMAND_COMPOSITION_TEST_SUITE(ParallelRaceGroupTest,
+                                                 ParallelRaceGroup);

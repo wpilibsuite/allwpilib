@@ -1,20 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/AnalogPotentiometer.h>
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/shuffleboard/ShuffleboardLayout.h>
 #include <frc/shuffleboard/ShuffleboardTab.h>
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/GenericEntry.h>
 #include <networktables/NetworkTableInstance.h>
 
 /**
@@ -32,7 +29,10 @@
  */
 class Robot : public frc::TimedRobot {
  public:
-  void RobotInit() override {
+  Robot() {
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_left);
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_right);
+
     // Add a widget titled 'Max Speed' with a number slider.
     m_maxSpeed = frc::Shuffleboard::GetTab("Configuration")
                      .Add("Max Speed", 1)
@@ -45,7 +45,7 @@ class Robot : public frc::TimedRobot {
 
     // Put encoders in a list layout.
     frc::ShuffleboardLayout& encoders =
-        driveBaseTab.GetLayout("List Layout", "Encoders")
+        driveBaseTab.GetLayout("Encoders", frc::BuiltInLayouts::kList)
             .WithPosition(0, 0)
             .WithSize(2, 2);
     encoders.Add("Left Encoder", m_leftEncoder);
@@ -60,15 +60,17 @@ class Robot : public frc::TimedRobot {
 
   void AutonomousInit() override {
     // Update the Max Output for the drivetrain.
-    m_robotDrive.SetMaxOutput(m_maxSpeed.GetDouble(1.0));
+    m_robotDrive.SetMaxOutput(m_maxSpeed->GetDouble(1.0));
   }
 
  private:
-  frc::PWMVictorSPX m_left{0};
-  frc::PWMVictorSPX m_right{1};
-  frc::PWMVictorSPX m_elevatorMotor{2};
+  frc::PWMSparkMax m_left{0};
+  frc::PWMSparkMax m_right{1};
+  frc::PWMSparkMax m_elevatorMotor{2};
 
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc::DifferentialDrive m_robotDrive{
+      [&](double output) { m_left.Set(output); },
+      [&](double output) { m_right.Set(output); }};
 
   frc::Joystick m_stick{0};
 
@@ -76,9 +78,11 @@ class Robot : public frc::TimedRobot {
   frc::Encoder m_rightEncoder{2, 3};
   frc::AnalogPotentiometer m_ElevatorPot{0};
 
-  nt::NetworkTableEntry m_maxSpeed;
+  nt::GenericEntry* m_maxSpeed;
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

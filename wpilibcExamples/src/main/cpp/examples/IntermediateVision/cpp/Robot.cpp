@@ -1,10 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
+#include <cstdio>
 #include <thread>
 
 #include <cameraserver/CameraServer.h>
@@ -12,7 +10,6 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <wpi/raw_ostream.h>
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The
@@ -21,21 +18,33 @@
  * processing.
  */
 class Robot : public frc::TimedRobot {
-#if defined(__linux__)
+ public:
+  Robot() {
+    // We need to run our vision program in a separate thread. If not, our robot
+    // program will not run.
+#if defined(__linux__) || defined(_WIN32)
+    std::thread visionThread(VisionThread);
+    visionThread.detach();
+#else
+    std::fputs("Vision only available on Linux or Windows.\n", stderr);
+    std::fflush(stderr);
+#endif
+  }
+
+#if defined(__linux__) || defined(_WIN32)
 
  private:
   static void VisionThread() {
     // Get the USB camera from CameraServer
-    cs::UsbCamera camera =
-        frc::CameraServer::GetInstance()->StartAutomaticCapture();
+    cs::UsbCamera camera = frc::CameraServer::StartAutomaticCapture();
     // Set the resolution
     camera.SetResolution(640, 480);
 
     // Get a CvSink. This will capture Mats from the Camera
-    cs::CvSink cvSink = frc::CameraServer::GetInstance()->GetVideo();
+    cs::CvSink cvSink = frc::CameraServer::GetVideo();
     // Setup a CvSource. This will send images back to the Dashboard
     cs::CvSource outputStream =
-        frc::CameraServer::GetInstance()->PutVideo("Rectangle", 640, 480);
+        frc::CameraServer::PutVideo("Rectangle", 640, 480);
 
     // Mats are very memory expensive. Lets reuse this Mat.
     cv::Mat mat;
@@ -59,20 +68,10 @@ class Robot : public frc::TimedRobot {
     }
   }
 #endif
-
-  void RobotInit() override {
-    // We need to run our vision program in a separate thread. If not, our robot
-    // program will not run.
-#if defined(__linux__)
-    std::thread visionThread(VisionThread);
-    visionThread.detach();
-#else
-    wpi::errs() << "Vision only available on Linux.\n";
-    wpi::errs().flush();
-#endif
-  }
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

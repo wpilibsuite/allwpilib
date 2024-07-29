@@ -1,12 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "JpegUtil.h"
 
+#include <wpi/StringExtras.h>
 #include <wpi/raw_istream.h>
 
 namespace cs {
@@ -49,56 +47,82 @@ static const unsigned char dhtData[] = {
     0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7,
     0xe8, 0xe9, 0xea, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa};
 
-bool IsJpeg(wpi::StringRef data) {
-  if (data.size() < 11) return false;
+bool IsJpeg(std::string_view data) {
+  if (data.size() < 11) {
+    return false;
+  }
 
   // Check for valid SOI
-  auto bytes = data.bytes_begin();
-  if (bytes[0] != 0xff || bytes[1] != 0xd8) return false;
+  auto bytes = reinterpret_cast<const unsigned char*>(data.data());
+  if (bytes[0] != 0xff || bytes[1] != 0xd8) {
+    return false;
+  }
   return true;
 }
 
-bool GetJpegSize(wpi::StringRef data, int* width, int* height) {
-  if (!IsJpeg(data)) return false;
+bool GetJpegSize(std::string_view data, int* width, int* height) {
+  if (!IsJpeg(data)) {
+    return false;
+  }
 
-  data = data.substr(2);  // Get to the first block
-  auto bytes = data.bytes_begin();
+  data = wpi::substr(data, 2);  // Get to the first block
   for (;;) {
-    if (data.size() < 4) return false;  // EOF
-    bytes = data.bytes_begin();
-    if (bytes[0] != 0xff) return false;  // not a tag
-    if (bytes[1] == 0xd9) return false;  // EOI without finding SOF?
-    if (bytes[1] == 0xda) return false;  // SOS without finding SOF?
+    if (data.size() < 4) {
+      return false;  // EOF
+    }
+    auto bytes = reinterpret_cast<const unsigned char*>(data.data());
+    if (bytes[0] != 0xff) {
+      return false;  // not a tag
+    }
+    if (bytes[1] == 0xd9) {
+      return false;  // EOI without finding SOF?
+    }
+    if (bytes[1] == 0xda) {
+      return false;  // SOS without finding SOF?
+    }
     if (bytes[1] == 0xc0) {
       // SOF contains the file size
-      if (data.size() < 9) return false;
+      if (data.size() < 9) {
+        return false;
+      }
       *height = bytes[5] * 256 + bytes[6];
       *width = bytes[7] * 256 + bytes[8];
       return true;
     }
     // Go to the next block
-    data = data.substr(bytes[2] * 256 + bytes[3] + 2);
+    data = wpi::substr(data, bytes[2] * 256 + bytes[3] + 2);
   }
 }
 
 bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
-  wpi::StringRef sdata(data, *size);
-  if (!IsJpeg(sdata)) return false;
+  std::string_view sdata(data, *size);
+  if (!IsJpeg(sdata)) {
+    return false;
+  }
 
   *locSOF = *size;
 
   // Search until SOS for DHT tag
-  sdata = sdata.substr(2);  // Get to the first block
-  auto bytes = sdata.bytes_begin();
+  sdata = wpi::substr(sdata, 2);  // Get to the first block
   for (;;) {
-    if (sdata.size() < 4) return false;  // EOF
-    bytes = sdata.bytes_begin();
-    if (bytes[0] != 0xff) return false;                   // not a tag
-    if (bytes[1] == 0xda) break;                          // SOS
-    if (bytes[1] == 0xc4) return false;                   // DHT
-    if (bytes[1] == 0xc0) *locSOF = sdata.data() - data;  // SOF
+    if (sdata.size() < 4) {
+      return false;  // EOF
+    }
+    auto bytes = reinterpret_cast<const unsigned char*>(sdata.data());
+    if (bytes[0] != 0xff) {
+      return false;  // not a tag
+    }
+    if (bytes[1] == 0xda) {
+      break;  // SOS
+    }
+    if (bytes[1] == 0xc4) {
+      return false;  // DHT
+    }
+    if (bytes[1] == 0xc0) {
+      *locSOF = sdata.data() - data;  // SOF
+    }
     // Go to the next block
-    sdata = sdata.substr(bytes[2] * 256 + bytes[3] + 2);
+    sdata = wpi::substr(sdata, bytes[2] * 256 + bytes[3] + 2);
   }
 
   // Only add DHT if we also found SOF (insertion point)
@@ -109,9 +133,8 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
   return false;
 }
 
-wpi::StringRef JpegGetDHT() {
-  return wpi::StringRef(reinterpret_cast<const char*>(dhtData),
-                        sizeof(dhtData));
+std::string_view JpegGetDHT() {
+  return {reinterpret_cast<const char*>(dhtData), sizeof(dhtData)};
 }
 
 static inline void ReadInto(wpi::raw_istream& is, std::string& buf,
@@ -129,18 +152,26 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height) {
   // read SOI and first marker
   buf.resize(4);
   is.read(&(*buf.begin()), 4);
-  if (is.has_error()) return false;
+  if (is.has_error()) {
+    return false;
+  }
 
   // Check for valid SOI
   auto bytes = reinterpret_cast<const unsigned char*>(buf.data());
-  if (bytes[0] != 0xff || bytes[1] != 0xd8) return false;
+  if (bytes[0] != 0xff || bytes[1] != 0xd8) {
+    return false;
+  }
   size_t pos = 2;  // point to first marker
   for (;;) {
     bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
-    if (bytes[0] != 0xff) return false;  // not a marker
+    if (bytes[0] != 0xff) {
+      return false;  // not a marker
+    }
     unsigned char marker = bytes[1];
 
-    if (marker == 0xd9) return true;  // EOI, we're done
+    if (marker == 0xd9) {
+      return true;  // EOI, we're done
+    }
 
     if (marker == 0xda) {
       // SOS: need to keep reading until we reach a normal marker.
@@ -150,12 +181,15 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height) {
       bool maybeMarker = false;
       for (;;) {
         ReadInto(is, buf, 1);
-        if (is.has_error()) return false;
+        if (is.has_error()) {
+          return false;
+        }
         bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
         if (maybeMarker) {
           if (bytes[0] != 0x00 && bytes[0] != 0xff &&
-              (bytes[0] < 0xd0 || bytes[0] > 0xd7))
+              (bytes[0] < 0xd0 || bytes[0] > 0xd7)) {
             break;
+          }
           maybeMarker = false;
         } else if (bytes[0] == 0xff) {
           maybeMarker = true;
@@ -168,7 +202,9 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height) {
 
     // A normal block. Read the length
     ReadInto(is, buf, 2);  // read length
-    if (is.has_error()) return false;
+    if (is.has_error()) {
+      return false;
+    }
 
     // Point to length
     pos += 2;
@@ -177,7 +213,9 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height) {
     // Read the block and the next marker
     size_t blockLength = bytes[0] * 256 + bytes[1];
     ReadInto(is, buf, blockLength);
-    if (is.has_error()) return false;
+    if (is.has_error()) {
+      return false;
+    }
     bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
 
     // Special block processing

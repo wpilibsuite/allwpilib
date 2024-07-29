@@ -1,19 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
-#include "frc/GyroBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include "frc/geometry/Rotation2d.h"
 
 namespace frc {
 
@@ -32,7 +29,8 @@ class AnalogInput;
  *
  * This class is for gyro sensors that connect to an analog input.
  */
-class AnalogGyro : public GyroBase {
+class AnalogGyro : public wpi::Sendable,
+                   public wpi::SendableHelper<AnalogGyro> {
  public:
   static constexpr int kOversampleBits = 10;
   static constexpr int kAverageBits = 0;
@@ -41,7 +39,7 @@ class AnalogGyro : public GyroBase {
   static constexpr double kDefaultVoltsPerDegreePerSecond = 0.007;
 
   /**
-   * Gyro constructor using the Analog Input channel number.
+   * %Gyro constructor using the Analog Input channel number.
    *
    * @param channel The analog channel the gyro is connected to. Gyros can only
    *                be used on on-board Analog Inputs 0-1.
@@ -63,7 +61,7 @@ class AnalogGyro : public GyroBase {
   explicit AnalogGyro(AnalogInput* channel);
 
   /**
-   * Gyro constructor with a precreated AnalogInput object.
+   * %Gyro constructor with a precreated AnalogInput object.
    *
    * Use this constructor when the analog channel needs to be shared.
    * This object will not clean up the AnalogInput object when using this
@@ -75,7 +73,7 @@ class AnalogGyro : public GyroBase {
   explicit AnalogGyro(std::shared_ptr<AnalogInput> channel);
 
   /**
-   * Gyro constructor using the Analog Input channel number with parameters for
+   * %Gyro constructor using the Analog Input channel number with parameters for
    * presetting the center and offset values. Bypasses calibration.
    *
    * @param channel The analog channel the gyro is connected to. Gyros can only
@@ -87,7 +85,7 @@ class AnalogGyro : public GyroBase {
   AnalogGyro(int channel, int center, double offset);
 
   /**
-   * Gyro constructor with a precreated AnalogInput object and calibrated
+   * %Gyro constructor with a precreated AnalogInput object and calibrated
    * parameters.
    *
    * Use this constructor when the analog channel needs to be shared.
@@ -104,8 +102,8 @@ class AnalogGyro : public GyroBase {
 
   ~AnalogGyro() override;
 
-  AnalogGyro(AnalogGyro&& rhs);
-  AnalogGyro& operator=(AnalogGyro&& rhs);
+  AnalogGyro(AnalogGyro&& rhs) = default;
+  AnalogGyro& operator=(AnalogGyro&& rhs) = default;
 
   /**
    * Return the actual angle in degrees that the robot is currently facing.
@@ -119,7 +117,7 @@ class AnalogGyro : public GyroBase {
    * @return The current heading of the robot in degrees. This heading is based
    *         on integration of the returned rate from the gyro.
    */
-  double GetAngle() const override;
+  double GetAngle() const;
 
   /**
    * Return the rate of rotation of the gyro
@@ -128,7 +126,7 @@ class AnalogGyro : public GyroBase {
    *
    * @return the current rate in degrees per second
    */
-  double GetRate() const override;
+  double GetRate() const;
 
   /**
    * Return the gyro center value. If run after calibration,
@@ -175,21 +173,53 @@ class AnalogGyro : public GyroBase {
    * significant drift in the gyro and it needs to be recalibrated after it has
    * been running.
    */
-  void Reset() override;
+  void Reset();
 
   /**
    * Initialize the gyro.
    *
    * Calibration is handled by Calibrate().
    */
-  virtual void InitGyro();
+  void InitGyro();
 
-  void Calibrate() override;
+  /**
+   * Calibrate the gyro by running for a number of samples and computing the
+   * center value. Then use the center value as the Accumulator center value for
+   * subsequent measurements.
+   *
+   * It's important to make sure that the robot is not moving while the
+   * centering calculations are in progress, this is typically done when the
+   * robot is first turned on while it's sitting at rest before the competition
+   * starts.
+   */
+  void Calibrate();
 
- protected:
-  std::shared_ptr<AnalogInput> m_analog;
+  /**
+   * Return the heading of the robot as a Rotation2d.
+   *
+   * The angle is continuous, that is it will continue from 360 to 361 degrees.
+   * This allows algorithms that wouldn't want to see a discontinuity in the
+   * gyro output as it sweeps past from 360 to 0 on the second time around.
+   *
+   * The angle is expected to increase as the gyro turns counterclockwise when
+   * looked at from the top. It needs to follow the NWU axis convention.
+   *
+   * @return the current heading of the robot as a Rotation2d. This heading is
+   *         based on integration of the returned rate from the gyro.
+   */
+  Rotation2d GetRotation2d() const;
+
+  /**
+   * Gets the analog input for the gyro.
+   *
+   * @return AnalogInput
+   */
+  std::shared_ptr<AnalogInput> GetAnalogInput() const;
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
+  std::shared_ptr<AnalogInput> m_analog;
   hal::Handle<HAL_GyroHandle> m_gyroHandle;
 };
 

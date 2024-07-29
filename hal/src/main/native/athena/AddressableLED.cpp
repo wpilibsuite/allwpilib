@@ -1,20 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/AddressableLED.h"
 
 #include <cstring>
 
-#include <FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga_HMB.h>
+#include <fmt/format.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
+#include "FPGACalls.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
+#include "hal/AddressableLEDTypes.h"
 #include "hal/ChipObject.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
@@ -34,8 +34,7 @@ static LimitedHandleResource<
     HAL_AddressableLEDHandle, AddressableLED, kNumAddressableLEDs,
     HAL_HandleEnum::AddressableLED>* addressableLEDHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAddressableLED() {
   static LimitedHandleResource<HAL_AddressableLEDHandle, AddressableLED,
                                kNumAddressableLEDs,
@@ -43,8 +42,9 @@ void InitializeAddressableLED() {
       alH;
   addressableLEDHandles = &alH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
+
+static constexpr const char* HmbName = "HMB_0_LED";
 
 extern "C" {
 
@@ -103,8 +103,8 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   uint32_t session = led->led->getSystemInterface()->getHandle();
 
-  *status = NiFpga_OpenHostMemoryBuffer(session, "HMB_0_LED", &led->ledBuffer,
-                                        &led->ledBufferSize);
+  *status = hal::HAL_NiFpga_OpenHmb(session, HmbName, &led->ledBufferSize,
+                                    &led->ledBuffer);
 
   if (*status != 0) {
     addressableLEDHandles->Free(handle);
@@ -115,6 +115,12 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 }
 
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
+  auto led = addressableLEDHandles->Get(handle);
+  if (!led) {
+    return;
+  }
+  uint32_t session = led->led->getSystemInterface()->getHandle();
+  hal::HAL_NiFpga_CloseHmb(session, HmbName);
   addressableLEDHandles->Free(handle);
 }
 
@@ -146,8 +152,13 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
     return;
   }
 
-  if (length > HAL_kAddressableLEDMaxLength) {
+  if (length > HAL_kAddressableLEDMaxLength || length < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(
+        status,
+        fmt::format(
+            "LED length must be less than or equal to {}. {} was requested",
+            HAL_kAddressableLEDMaxLength, length));
     return;
   }
 
@@ -177,8 +188,17 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
     return;
   }
 
-  if (length > led->stringLength) {
+  if (length > led->stringLength || length < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(
+        status,
+        fmt::format(
+            "Data length must be less than or equal to {}. {} was requested",
+            led->stringLength, length));
+    return;
+  }
+
+  if (length == 0) {
     return;
   }
 
@@ -190,10 +210,10 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
 }
 
 void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
-                                    int32_t lowTime0NanoSeconds,
                                     int32_t highTime0NanoSeconds,
-                                    int32_t lowTime1NanoSeconds,
+                                    int32_t lowTime0NanoSeconds,
                                     int32_t highTime1NanoSeconds,
+                                    int32_t lowTime1NanoSeconds,
                                     int32_t* status) {
   auto led = addressableLEDHandles->Get(handle);
   if (!led) {
@@ -201,10 +221,10 @@ void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
     return;
   }
 
-  led->led->writeLowBitTickTiming(1, highTime0NanoSeconds / 25, status);
-  led->led->writeLowBitTickTiming(0, lowTime0NanoSeconds / 25, status);
-  led->led->writeHighBitTickTiming(1, highTime1NanoSeconds / 25, status);
-  led->led->writeHighBitTickTiming(0, lowTime1NanoSeconds / 25, status);
+  led->led->writeLowBitTickTiming(0, highTime0NanoSeconds / 25, status);
+  led->led->writeLowBitTickTiming(1, lowTime0NanoSeconds / 25, status);
+  led->led->writeHighBitTickTiming(0, highTime1NanoSeconds / 25, status);
+  led->led->writeHighBitTickTiming(1, lowTime1NanoSeconds / 25, status);
 }
 
 void HAL_SetAddressableLEDSyncTime(HAL_AddressableLEDHandle handle,

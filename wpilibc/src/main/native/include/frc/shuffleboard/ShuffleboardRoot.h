@@ -1,13 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <wpi/StringRef.h>
+#include <string_view>
 
 namespace frc {
 
@@ -28,7 +25,7 @@ class ShuffleboardRoot {
    * @param title the title of the tab
    * @return the tab with the given title
    */
-  virtual ShuffleboardTab& GetTab(wpi::StringRef title) = 0;
+  virtual ShuffleboardTab& GetTab(std::string_view title) = 0;
 
   /**
    * Updates all tabs.
@@ -60,7 +57,7 @@ class ShuffleboardRoot {
    *
    * @param title the title of the tab to select
    */
-  virtual void SelectTab(wpi::StringRef title) = 0;
+  virtual void SelectTab(std::string_view title) = 0;
 };
 
 }  // namespace frc

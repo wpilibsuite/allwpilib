@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "cameraserver/CameraServerShared.h"
 
@@ -15,9 +12,12 @@ class DefaultCameraServerShared : public frc::CameraServerShared {
   void ReportUsbCamera(int id) override {}
   void ReportAxisCamera(int id) override {}
   void ReportVideoServer(int id) override {}
-  void SetCameraServerError(const wpi::Twine& error) override {}
-  void SetVisionRunnerError(const wpi::Twine& error) override {}
-  void ReportDriverStationError(const wpi::Twine& error) override {}
+  void SetCameraServerErrorV(fmt::string_view format,
+                             fmt::format_args args) override {}
+  void SetVisionRunnerErrorV(fmt::string_view format,
+                             fmt::format_args args) override {}
+  void ReportDriverStationErrorV(fmt::string_view format,
+                                 fmt::format_args args) override {}
   std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
     return std::make_pair(std::thread::id(), false);
   }

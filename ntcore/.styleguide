@@ -5,6 +5,7 @@ cHeaderFileInclude {
 cppHeaderFileInclude {
   (?<!_c)\.h$
   \.inc$
+  \.inl$
 }
 
 cppSrcFileInclude {
@@ -13,6 +14,8 @@ cppSrcFileInclude {
 
 generatedFileExclude {
   ntcore/doc/
+  ntcore/src/generated
+  .*\.jinja
 }
 
 repoRootNameOverride {
@@ -26,6 +29,9 @@ includeGuardRoots {
 }
 
 includeOtherLibs {
+  ^fmt/
+  ^gtest/
   ^support/
   ^wpi/
+  ^wpinet/
 }

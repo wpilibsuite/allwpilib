@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/AddressableLED.h"
 
@@ -12,22 +9,25 @@
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
+#include <wpi/StackTrace.h>
 
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
-AddressableLED::AddressableLED(int port) {
+AddressableLED::AddressableLED(int port) : m_port{port} {
   int32_t status = 0;
 
-  m_pwmHandle = HAL_InitializePWMPort(HAL_GetPort(port), &status);
-  wpi_setHALErrorWithRange(status, 0, HAL_GetNumPWMChannels(), port);
+  auto stack = wpi::GetStackTrace(1);
+  m_pwmHandle =
+      HAL_InitializePWMPort(HAL_GetPort(port), stack.c_str(), &status);
+  FRC_CheckErrorStatus(status, "Port {}", port);
   if (m_pwmHandle == HAL_kInvalidHandle) {
     return;
   }
 
   m_handle = HAL_InitializeAddressableLED(m_pwmHandle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Port {}", port);
   if (m_handle == HAL_kInvalidHandle) {
     HAL_FreePWMPort(m_pwmHandle, &status);
   }
@@ -39,91 +39,61 @@ AddressableLED::~AddressableLED() {
   HAL_FreeAddressableLED(m_handle);
   int32_t status = 0;
   HAL_FreePWMPort(m_pwmHandle, &status);
+  FRC_ReportError(status, "Port {}", m_port);
 }
 
 void AddressableLED::SetLength(int length) {
   int32_t status = 0;
   HAL_SetAddressableLEDLength(m_handle, length, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Port {} length {}", m_port, length);
 }
 
 static_assert(sizeof(AddressableLED::LEDData) == sizeof(HAL_AddressableLEDData),
               "LED Structs MUST be the same size");
 
-void AddressableLED::SetData(wpi::ArrayRef<LEDData> ledData) {
+void AddressableLED::SetData(std::span<const LEDData> ledData) {
   int32_t status = 0;
-  HAL_WriteAddressableLEDData(m_handle, ledData.begin(), ledData.size(),
+  HAL_WriteAddressableLEDData(m_handle, ledData.data(), ledData.size(),
                               &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 
 void AddressableLED::SetData(std::initializer_list<LEDData> ledData) {
   int32_t status = 0;
   HAL_WriteAddressableLEDData(m_handle, ledData.begin(), ledData.size(),
                               &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 
-void AddressableLED::SetBitTiming(units::nanosecond_t lowTime0,
-                                  units::nanosecond_t highTime0,
-                                  units::nanosecond_t lowTime1,
-                                  units::nanosecond_t highTime1) {
+void AddressableLED::SetBitTiming(units::nanosecond_t highTime0,
+                                  units::nanosecond_t lowTime0,
+                                  units::nanosecond_t highTime1,
+                                  units::nanosecond_t lowTime1) {
   int32_t status = 0;
   HAL_SetAddressableLEDBitTiming(
-      m_handle, lowTime0.to<int32_t>(), highTime0.to<int32_t>(),
-      lowTime1.to<int32_t>(), highTime1.to<int32_t>(), &status);
-  wpi_setHALError(status);
+      m_handle, highTime0.to<int32_t>(), lowTime0.to<int32_t>(),
+      highTime1.to<int32_t>(), lowTime1.to<int32_t>(), &status);
+  FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 
 void AddressableLED::SetSyncTime(units::microsecond_t syncTime) {
   int32_t status = 0;
   HAL_SetAddressableLEDSyncTime(m_handle, syncTime.to<int32_t>(), &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 
 void AddressableLED::Start() {
   int32_t status = 0;
   HAL_StartAddressableLEDOutput(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 
 void AddressableLED::Stop() {
   int32_t status = 0;
   HAL_StopAddressableLEDOutput(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 
 void AddressableLED::LEDData::SetHSV(int h, int s, int v) {
-  if (s == 0) {
-    SetRGB(v, v, v);
-    return;
-  }
-
-  int region = h / 30;
-  int remainder = (h - (region * 30)) * 6;
-
-  int p = (v * (255 - s)) >> 8;
-  int q = (v * (255 - ((s * remainder) >> 8))) >> 8;
-  int t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
-
-  switch (region) {
-    case 0:
-      SetRGB(v, t, p);
-      break;
-    case 1:
-      SetRGB(q, v, p);
-      break;
-    case 2:
-      SetRGB(p, v, t);
-      break;
-    case 3:
-      SetRGB(p, q, v);
-      break;
-    case 4:
-      SetRGB(t, p, v);
-      break;
-    default:
-      SetRGB(v, p, q);
-      break;
-  }
+  SetLED(Color::FromHSV(h, s, v));
 }

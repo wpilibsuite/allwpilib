@@ -1,23 +1,23 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include <gtest/gtest.h>
+#include <units/time.h>
+#include <wpi/deprecated.h>
 
 #include "TestBench.h"
 #include "frc/Encoder.h"
-#include "frc/Jaguar.h"
-#include "frc/Talon.h"
 #include "frc/Timer.h"
-#include "frc/Victor.h"
-#include "gtest/gtest.h"
-
-using namespace frc;
+#include "frc/motorcontrol/Jaguar.h"
+#include "frc/motorcontrol/Talon.h"
+#include "frc/motorcontrol/Victor.h"
 
 enum MotorInvertingTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
-static const double motorSpeed = 0.15;
-static const double delayTime = 0.5;
+
+static constexpr double kMotorSpeed = 0.15;
+static constexpr auto kDelayTime = 0.5_s;
+
 std::ostream& operator<<(std::ostream& os, MotorInvertingTestType const& type) {
   switch (type) {
     case TEST_VICTOR:
@@ -33,42 +33,45 @@ std::ostream& operator<<(std::ostream& os, MotorInvertingTestType const& type) {
 
   return os;
 }
+
+WPI_IGNORE_DEPRECATED
+
 class MotorInvertingTest
     : public testing::TestWithParam<MotorInvertingTestType> {
  protected:
-  SpeedController* m_speedController;
-  Encoder* m_encoder;
+  frc::MotorController* m_motorController;
+  frc::Encoder* m_encoder;
 
-  void SetUp() override {
+  MotorInvertingTest() {
     switch (GetParam()) {
       case TEST_VICTOR:
-        m_speedController = new Victor(TestBench::kVictorChannel);
-        m_encoder = new Encoder(TestBench::kVictorEncoderChannelA,
-                                TestBench::kVictorEncoderChannelB);
+        m_motorController = new frc::Victor(TestBench::kVictorChannel);
+        m_encoder = new frc::Encoder(TestBench::kVictorEncoderChannelA,
+                                     TestBench::kVictorEncoderChannelB);
         break;
 
       case TEST_JAGUAR:
-        m_speedController = new Jaguar(TestBench::kJaguarChannel);
-        m_encoder = new Encoder(TestBench::kJaguarEncoderChannelA,
-                                TestBench::kJaguarEncoderChannelB);
+        m_motorController = new frc::Jaguar(TestBench::kJaguarChannel);
+        m_encoder = new frc::Encoder(TestBench::kJaguarEncoderChannelA,
+                                     TestBench::kJaguarEncoderChannelB);
         break;
 
       case TEST_TALON:
-        m_speedController = new Talon(TestBench::kTalonChannel);
-        m_encoder = new Encoder(TestBench::kTalonEncoderChannelA,
-                                TestBench::kTalonEncoderChannelB);
+        m_motorController = new frc::Talon(TestBench::kTalonChannel);
+        m_encoder = new frc::Encoder(TestBench::kTalonEncoderChannelA,
+                                     TestBench::kTalonEncoderChannelB);
         break;
     }
   }
 
-  void TearDown() override {
-    delete m_speedController;
+  ~MotorInvertingTest() {
     delete m_encoder;
+    delete m_motorController;
   }
 
   void Reset() {
-    m_speedController->SetInverted(false);
-    m_speedController->Set(0.0);
+    m_motorController->SetInverted(false);
+    m_motorController->Set(0.0);
     m_encoder->Reset();
   }
 };
@@ -76,15 +79,15 @@ class MotorInvertingTest
 TEST_P(MotorInvertingTest, InvertingPositive) {
   Reset();
 
-  m_speedController->Set(motorSpeed);
+  m_motorController->Set(kMotorSpeed);
 
-  Wait(delayTime);
+  frc::Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
-  m_speedController->SetInverted(true);
-  m_speedController->Set(motorSpeed);
+  m_motorController->SetInverted(true);
+  m_motorController->Set(kMotorSpeed);
 
-  Wait(delayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() != initDirection)
       << "Inverting with Positive value does not change direction";
@@ -95,16 +98,16 @@ TEST_P(MotorInvertingTest, InvertingPositive) {
 TEST_P(MotorInvertingTest, InvertingNegative) {
   Reset();
 
-  m_speedController->SetInverted(false);
-  m_speedController->Set(-motorSpeed);
+  m_motorController->SetInverted(false);
+  m_motorController->Set(-kMotorSpeed);
 
-  Wait(delayTime);
+  frc::Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
-  m_speedController->SetInverted(true);
-  m_speedController->Set(-motorSpeed);
+  m_motorController->SetInverted(true);
+  m_motorController->Set(-kMotorSpeed);
 
-  Wait(delayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() != initDirection)
       << "Inverting with Negative value does not change direction";
@@ -115,16 +118,16 @@ TEST_P(MotorInvertingTest, InvertingNegative) {
 TEST_P(MotorInvertingTest, InvertingSwitchingPosToNeg) {
   Reset();
 
-  m_speedController->SetInverted(false);
-  m_speedController->Set(motorSpeed);
+  m_motorController->SetInverted(false);
+  m_motorController->Set(kMotorSpeed);
 
-  Wait(delayTime);
+  frc::Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
-  m_speedController->SetInverted(true);
-  m_speedController->Set(-motorSpeed);
+  m_motorController->SetInverted(true);
+  m_motorController->Set(-kMotorSpeed);
 
-  Wait(delayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() == initDirection)
       << "Inverting with Switching value does change direction";
@@ -135,16 +138,16 @@ TEST_P(MotorInvertingTest, InvertingSwitchingPosToNeg) {
 TEST_P(MotorInvertingTest, InvertingSwitchingNegToPos) {
   Reset();
 
-  m_speedController->SetInverted(false);
-  m_speedController->Set(-motorSpeed);
+  m_motorController->SetInverted(false);
+  m_motorController->Set(-kMotorSpeed);
 
-  Wait(delayTime);
+  frc::Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
-  m_speedController->SetInverted(true);
-  m_speedController->Set(motorSpeed);
+  m_motorController->SetInverted(true);
+  m_motorController->Set(kMotorSpeed);
 
-  Wait(delayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() == initDirection)
       << "Inverting with Switching value does change direction";
@@ -152,5 +155,7 @@ TEST_P(MotorInvertingTest, InvertingSwitchingNegToPos) {
   Reset();
 }
 
-INSTANTIATE_TEST_SUITE_P(Test, MotorInvertingTest,
+INSTANTIATE_TEST_SUITE_P(Tests, MotorInvertingTest,
                          testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));
+
+WPI_UNIGNORE_DEPRECATED

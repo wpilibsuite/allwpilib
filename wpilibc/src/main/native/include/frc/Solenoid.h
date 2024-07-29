@@ -1,46 +1,46 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <hal/Types.h>
+#include <memory>
 
-#include "frc/SolenoidBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <hal/Types.h>
+#include <units/time.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
+#include "frc/PneumaticsBase.h"
+#include "frc/PneumaticsModuleType.h"
 
 namespace frc {
 
-class SendableBuilder;
-
 /**
- * Solenoid class for running high voltage Digital Output (PCM).
+ * Solenoid class for running high voltage Digital Output on a pneumatics
+ * module.
  *
  * The Solenoid class is typically used for pneumatics solenoids, but could be
- * used for any device within the current spec of the PCM.
+ * used for any device within the current spec of the module.
  */
-class Solenoid : public SolenoidBase,
-                 public Sendable,
-                 public SendableHelper<Solenoid> {
+class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
  public:
   /**
-   * Constructor using the default PCM ID (0).
+   * Constructs a solenoid for a specified module and type.
    *
-   * @param channel The channel on the PCM to control (0..7).
+   * @param module The module ID to use.
+   * @param moduleType The module type to use.
+   * @param channel The channel the solenoid is on.
    */
-  explicit Solenoid(int channel);
+  Solenoid(int module, PneumaticsModuleType moduleType, int channel);
 
   /**
-   * Constructor.
+   * Constructs a solenoid for a default module and specified type.
    *
-   * @param moduleNumber The CAN ID of the PCM the solenoid is attached to
-   * @param channel      The channel on the PCM to control (0..7).
+   * @param moduleType The module type to use.
+   * @param channel The channel the solenoid is on.
    */
-  Solenoid(int moduleNumber, int channel);
+  Solenoid(PneumaticsModuleType moduleType, int channel);
 
   ~Solenoid() override;
 
@@ -62,42 +62,59 @@ class Solenoid : public SolenoidBase,
   virtual bool Get() const;
 
   /**
-   * Check if solenoid is blacklisted.
+   * Toggle the value of the solenoid.
    *
-   * If a solenoid is shorted, it is added to the blacklist and
+   * If the solenoid is set to on, it'll be turned off. If the solenoid is set
+   * to off, it'll be turned on.
+   */
+  void Toggle();
+
+  /**
+   * Get the channel this solenoid is connected to.
+   */
+  int GetChannel() const;
+
+  /**
+   * Check if solenoid is Disabled.
+   *
+   * If a solenoid is shorted, it is added to the DisabledList and
    * disabled until power cycle, or until faults are cleared.
    *
    * @see ClearAllPCMStickyFaults()
    *
    * @return If solenoid is disabled due to short.
    */
-  bool IsBlackListed() const;
+  bool IsDisabled() const;
 
   /**
-   * Set the pulse duration in the PCM. This is used in conjunction with
-   * the startPulse method to allow the PCM to control the timing of a pulse.
-   * The timing can be controlled in 0.01 second increments.
+   * Set the pulse duration in the pneumatics module. This is used in
+   * conjunction with the startPulse method to allow the pneumatics module to
+   * control the timing of a pulse.
    *
-   * @param durationSeconds The duration of the pulse, from 0.01 to 2.55
-   *                        seconds.
+   * On the PCM, the timing can be controlled in 0.01 second increments, with a
+   * maximum of 2.55 seconds. On the PH, the timing can be controlled in 0.001
+   * second increments, with a maximum of 65.534 seconds.
+   *
+   * @param duration The duration of the pulse.
    *
    * @see startPulse()
    */
-  void SetPulseDuration(double durationSeconds);
+  void SetPulseDuration(units::second_t duration);
 
   /**
-   * Trigger the PCM to generate a pulse of the duration set in
+   * %Trigger the pneumatics module to generate a pulse of the duration set in
    * setPulseDuration.
    *
    * @see setPulseDuration()
    */
   void StartPulse();
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  hal::Handle<HAL_SolenoidHandle> m_solenoidHandle;
-  int m_channel;  // The channel on the module to control
+  std::shared_ptr<PneumaticsBase> m_module;
+  int m_mask;
+  int m_channel;
 };
 
 }  // namespace frc

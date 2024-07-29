@@ -1,23 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <memory>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/AnalogInput.h"
-#include "frc/ErrorBase.h"
-#include "frc/PIDSource.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * Handle operation of an analog accelerometer.
@@ -26,10 +20,8 @@ class SendableBuilder;
  * sensors have multiple axis and can be treated as multiple devices. Each is
  * calibrated by finding the center value over a period of time.
  */
-class AnalogAccelerometer : public ErrorBase,
-                            public PIDSource,
-                            public Sendable,
-                            public SendableHelper<AnalogAccelerometer> {
+class AnalogAccelerometer : public wpi::Sendable,
+                            public wpi::SendableHelper<AnalogAccelerometer> {
  public:
   /**
    * Create a new instance of an accelerometer.
@@ -100,14 +92,7 @@ class AnalogAccelerometer : public ErrorBase,
    */
   void SetZero(double zero);
 
-  /**
-   * Get the Acceleration for the PID Source parent.
-   *
-   * @return The current acceleration in Gs.
-   */
-  double PIDGet() override;
-
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   /**

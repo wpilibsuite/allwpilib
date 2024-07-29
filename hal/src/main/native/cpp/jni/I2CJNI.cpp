@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
@@ -15,7 +12,7 @@
 #include "edu_wpi_first_hal_I2CJNI.h"
 #include "hal/I2C.h"
 
-using namespace frc;
+using namespace hal;
 using namespace wpi::java;
 
 extern "C" {
@@ -45,7 +42,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CTransaction
    jbyte sendSize, jobject dataReceived, jbyte receiveSize)
 {
   uint8_t* dataToSendPtr = nullptr;
-  if (dataToSend != 0) {
+  if (dataToSend != nullptr) {
     dataToSendPtr =
         reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataToSend));
   }
@@ -67,12 +64,22 @@ Java_edu_wpi_first_hal_I2CJNI_i2CTransactionB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataToSend,
    jbyte sendSize, jbyteArray dataReceived, jbyte receiveSize)
 {
+  if (sendSize < 0) {
+    ThrowIllegalArgumentException(env, "I2CJNI.i2cTransactionB() sendSize < 0");
+    return 0;
+  }
+  if (receiveSize < 0) {
+    ThrowIllegalArgumentException(env,
+                                  "I2CJNI.i2cTransactionB() receiveSize < 0");
+    return 0;
+  }
+
   wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue =
       HAL_TransactionI2C(static_cast<HAL_I2CPort>(port), address,
                          reinterpret_cast<const uint8_t*>(
-                             JByteArrayRef(env, dataToSend).array().data()),
+                             JSpan<const jbyte>(env, dataToSend).data()),
                          sendSize, recvBuf.data(), receiveSize);
   env->SetByteArrayRegion(dataReceived, 0, receiveSize,
                           reinterpret_cast<const jbyte*>(recvBuf.data()));
@@ -91,7 +98,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CWrite
 {
   uint8_t* dataToSendPtr = nullptr;
 
-  if (dataToSend != 0) {
+  if (dataToSend != nullptr) {
     dataToSendPtr =
         reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataToSend));
   }
@@ -113,7 +120,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CWriteB
   jint returnValue =
       HAL_WriteI2C(static_cast<HAL_I2CPort>(port), address,
                    reinterpret_cast<const uint8_t*>(
-                       JByteArrayRef(env, dataToSend).array().data()),
+                       JSpan<const jbyte>(env, dataToSend).data()),
                    sendSize);
   return returnValue;
 }
@@ -145,6 +152,11 @@ Java_edu_wpi_first_hal_I2CJNI_i2CReadB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataReceived,
    jbyte receiveSize)
 {
+  if (receiveSize < 0) {
+    ThrowIllegalArgumentException(env, "I2CJNI.i2cReadB() receiveSize < 0");
+    return 0;
+  }
+
   wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue = HAL_ReadI2C(static_cast<HAL_I2CPort>(port), address,

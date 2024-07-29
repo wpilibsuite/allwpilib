@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 //===- llvm/unittest/Support/LEB128Test.cpp - LEB128 function tests -------===//
 //
@@ -17,23 +14,24 @@
 #include <stdint.h>
 
 #include <string>
+#include <string_view>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "wpi/SmallString.h"
-#include "wpi/StringRef.h"
 #include "wpi/leb128.h"
 #include "wpi/raw_istream.h"
 
 namespace wpi {
 
 TEST(LEB128Test, WriteUleb128) {
-#define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD)         \
-  do {                                                  \
-    StringRef expected(EXPECTED, sizeof(EXPECTED) - 1); \
-    SmallString<32> buf;                                \
-    size_t size = WriteUleb128(buf, VALUE);             \
-    EXPECT_EQ(size, buf.size());                        \
-    EXPECT_EQ(expected, buf.str());                     \
+#define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD)                \
+  do {                                                         \
+    std::string_view expected(EXPECTED, sizeof(EXPECTED) - 1); \
+    SmallString<32> buf;                                       \
+    size_t size = WriteUleb128(buf, VALUE);                    \
+    EXPECT_EQ(size, buf.size());                               \
+    EXPECT_EQ(expected, buf.str());                            \
   } while (0)
 
   // Write ULEB128
@@ -48,6 +46,8 @@ TEST(LEB128Test, WriteUleb128) {
   EXPECT_ULEB128_EQ("\xff\x01", 0xff, 0);
   EXPECT_ULEB128_EQ("\x80\x02", 0x100, 0);
   EXPECT_ULEB128_EQ("\x81\x02", 0x101, 0);
+  EXPECT_ULEB128_EQ("\x80\x41", 0x2080, 0);
+  EXPECT_ULEB128_EQ("\x80\xc1\x80\x80\x10", 0x100002080, 0);
 
 #undef EXPECT_ULEB128_EQ
 }
@@ -73,7 +73,8 @@ TEST(LEB128Test, ReadUleb128) {
   EXPECT_READ_ULEB128_EQ(0xffu, "\xff\x01");
   EXPECT_READ_ULEB128_EQ(0x100u, "\x80\x02");
   EXPECT_READ_ULEB128_EQ(0x101u, "\x81\x02");
-  EXPECT_READ_ULEB128_EQ(8320u, "\x80\xc1\x80\x80\x10");
+  EXPECT_READ_ULEB128_EQ(0x2080u, "\x80\x41");
+  EXPECT_READ_ULEB128_EQ(0x100002080u, "\x80\xc1\x80\x80\x10");
 
 #undef EXPECT_READ_ULEB128_EQ
 }

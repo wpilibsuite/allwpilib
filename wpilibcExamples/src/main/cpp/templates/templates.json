@@ -1,37 +1,7 @@
 [
   {
-    "name": "Timed Robot",
-    "description": "Timed style",
-    "tags": [
-      "Timed"
-    ],
-    "foldername": "timed",
-    "gradlebase": "cpp",
-    "commandversion": 1
-  },
-  {
-    "name": "Timed Skeleton (Advanced)",
-    "description": "Skeleton (stub) code for TimedRobot",
-    "tags": [
-      "Timed", "Skeleton"
-    ],
-    "foldername": "timedskeleton",
-    "gradlebase": "cpp",
-    "commandversion": 1
-  },
-  {
-    "name": "RobotBase Skeleton (Advanced)",
-    "description": "Skeleton (stub) code for RobotBase",
-    "tags": [
-      "RobotBase", "Skeleton"
-    ],
-    "foldername": "robotbaseskeleton",
-    "gradlebase": "cpp",
-    "commandversion": 1
-  },
-  {
     "name": "Command Robot",
-    "description": "Command style",
+    "description": "Command-based, with explanatory comments and example code.",
     "tags": [
       "Command"
     ],
@@ -40,13 +10,123 @@
     "commandversion": 2
   },
   {
-    "name": "Old Command Robot",
-    "description": "Old-Command style (deprecated)",
+    "name": "Command Robot Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for Command-based, without explanatory comments and example code.",
     "tags": [
-      "Command"
+      "Command",
+      "Skeleton"
     ],
-    "foldername": "oldcommandbased",
+    "foldername": "commandbasedskeleton",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
+  },
+  {
+    "name": "Timed Robot",
+    "description": "Timed style, with explanatory comments and example code.",
+    "tags": [
+      "Timed"
+    ],
+    "foldername": "timed",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Timed Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for TimedRobot, without explanatory comments and example code.",
+    "tags": [
+      "Timed",
+      "Skeleton"
+    ],
+    "foldername": "timedskeleton",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Timeslice Robot",
+    "description": "Timeslice style",
+    "tags": [
+      "Timeslice"
+    ],
+    "foldername": "timeslice",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Timeslice Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for TimesliceRobot",
+    "tags": [
+      "Timeslice",
+      "Skeleton"
+    ],
+    "foldername": "timesliceskeleton",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "RobotBase Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for RobotBase - Not recommended for competition use",
+    "tags": [
+      "RobotBase",
+      "Skeleton"
+    ],
+    "foldername": "robotbaseskeleton",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Romi - Command Robot",
+    "description": "Romi - Command style",
+    "tags": [
+      "Command",
+      "Romi"
+    ],
+    "foldername": "commandbased",
+    "gradlebase": "cppromi",
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
+  },
+  {
+    "name": "Romi - Timed Robot",
+    "description": "Romi - Timed style",
+    "tags": [
+      "Timed",
+      "Romi"
+    ],
+    "foldername": "timed",
+    "gradlebase": "cppromi",
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
+  },
+  {
+    "name": "XRP - Command Robot",
+    "description": "XRP - Command style",
+    "tags": [
+      "Command",
+      "XRP"
+    ],
+    "foldername": "commandbased",
+    "gradlebase": "cppxrp",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  },
+  {
+    "name": "XRP - Timed Robot",
+    "description": "XRP - Timed style",
+    "tags": [
+      "Timed",
+      "XRP"
+    ],
+    "foldername": "timed",
+    "gradlebase": "cppxrp",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
   }
 ]

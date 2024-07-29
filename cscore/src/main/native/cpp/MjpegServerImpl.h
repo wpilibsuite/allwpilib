@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_MJPEGSERVERIMPL_H_
 #define CSCORE_MJPEGSERVERIMPL_H_
@@ -11,17 +8,17 @@
 #include <atomic>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 
-#include <wpi/NetworkAcceptor.h>
-#include <wpi/NetworkStream.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallVector.h>
-#include <wpi/Twine.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
-#include <wpi/raw_socket_ostream.h>
+#include <wpinet/NetworkAcceptor.h>
+#include <wpinet/NetworkStream.h>
+#include <wpinet/raw_socket_ostream.h>
 
 #include "SinkImpl.h"
 
@@ -31,9 +28,9 @@ class SourceImpl;
 
 class MjpegServerImpl : public SinkImpl {
  public:
-  MjpegServerImpl(const wpi::Twine& name, wpi::Logger& logger,
+  MjpegServerImpl(std::string_view name, wpi::Logger& logger,
                   Notifier& notifier, Telemetry& telemetry,
-                  const wpi::Twine& listenAddress, int port,
+                  std::string_view listenAddress, int port,
                   std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   ~MjpegServerImpl() override;
 

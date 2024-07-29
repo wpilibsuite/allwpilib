@@ -1,35 +1,27 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
-
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-
-import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
-
-/**
- * Have the robot drive tank style.
- */
-public class TankDrive extends CommandBase {
-  private final DriveTrain m_drivetrain;
+/** Have the robot drive tank style. */
+public class TankDrive extends Command {
+  private final Drivetrain m_drivetrain;
   private final DoubleSupplier m_left;
   private final DoubleSupplier m_right;
 
   /**
    * Creates a new TankDrive command.
    *
-   * @param left       The control input for the left side of the drive
-   * @param right      The control input for the right sight of the drive
+   * @param left The control input for the left side of the drive
+   * @param right The control input for the right sight of the drive
    * @param drivetrain The drivetrain subsystem to drive
    */
-  public TankDrive(DoubleSupplier left, DoubleSupplier right, DriveTrain drivetrain) {
+  public TankDrive(DoubleSupplier left, DoubleSupplier right, Drivetrain drivetrain) {
     m_drivetrain = drivetrain;
     m_left = left;
     m_right = right;

@@ -1,38 +1,52 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <chrono>
 #include <thread>
 
+#include <hal/DriverStation.h>
+#include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
-#include "frc/Base.h"
+#include "frc/Errors.h"
+#include "frc/RuntimeType.h"
 
 namespace frc {
-
-class DriverStation;
 
 int RunHALInitialization();
 
 namespace impl {
+#ifndef __FRC_ROBORIO__
+void ResetMotorSafety();
+#endif
 
 template <class Robot>
 void RunRobot(wpi::mutex& m, Robot** robot) {
-  static Robot theRobot;
-  {
-    std::scoped_lock lock{m};
-    *robot = &theRobot;
+  try {
+    static Robot theRobot;
+    {
+      std::scoped_lock lock{m};
+      *robot = &theRobot;
+    }
+    theRobot.StartCompetition();
+  } catch (const frc::RuntimeError& e) {
+    e.Report();
+    FRC_ReportError(
+        err::Error,
+        "The robot program quit unexpectedly."
+        " This is usually due to a code error.\n"
+        "  The above stacktrace can help determine where the error occurred.\n"
+        "  See https://wpilib.org/stacktrace for more information.\n");
+    throw;
+  } catch (const std::exception& e) {
+    HAL_SendError(1, err::Error, 0, e.what(), "", "", 1);
+    throw;
   }
-  theRobot.StartCompetition();
 }
 
 }  // namespace impl
@@ -76,52 +90,53 @@ int StartRobot() {
     HAL_RunMain();
 
     // signal loop to exit
-    if (robot) robot->EndCompetition();
+    if (robot) {
+      robot->EndCompetition();
+    }
 
     // prefer to join, but detach to exit if it doesn't exit in a timely manner
     using namespace std::chrono_literals;
     std::unique_lock lock{m};
-    if (cv.wait_for(lock, 1s, [] { return exited; }))
+    if (cv.wait_for(lock, 1s, [] { return exited; })) {
       thr.join();
-    else
+    } else {
       thr.detach();
+    }
   } else {
     impl::RunRobot<Robot>(m, &robot);
   }
 
+#ifndef __FRC_ROBORIO__
+  frc::impl::ResetMotorSafety();
+#endif
+  HAL_Shutdown();
+
   return 0;
 }
 
-#define START_ROBOT_CLASS(_ClassName_)                                 \
-  WPI_DEPRECATED("Call frc::StartRobot<" #_ClassName_                  \
-                 ">() in your own main() instead of using the "        \
-                 "START_ROBOT_CLASS(" #_ClassName_ ") macro.")         \
-  int StartRobotClassImpl() { return frc::StartRobot<_ClassName_>(); } \
-  int main() { return StartRobotClassImpl(); }
-
 /**
- * Implement a Robot Program framework.
+ * Implement a Robot Program framework. The RobotBase class is intended to be
+ * subclassed to create a robot program. The user must implement
+ * StartCompetition() which will be called once and is not expected to exit. The
+ * user must also implement EndCompetition(), which signals to the code in
+ * StartCompetition() that it should exit.
  *
- * The RobotBase class is intended to be subclassed by a user creating a robot
- * program. Overridden Autonomous() and OperatorControl() methods are called at
- * the appropriate time as the match proceeds. In the current implementation,
- * the Autonomous code will run to completion before the OperatorControl code
- * could start. In the future the Autonomous code might be spawned as a task,
- * then killed at the end of the Autonomous period.
+ * It is not recommended to subclass this class directly - instead subclass
+ * IterativeRobotBase or TimedRobot.
  */
 class RobotBase {
  public:
   /**
    * Determine if the Robot is currently enabled.
    *
-   * @return True if the Robot is currently enabled by the field controls.
+   * @return True if the Robot is currently enabled by the Driver Station.
    */
   bool IsEnabled() const;
 
   /**
    * Determine if the Robot is currently disabled.
    *
-   * @return True if the Robot is currently disabled by the field controls.
+   * @return True if the Robot is currently disabled by the Driver Station.
    */
   bool IsDisabled() const;
 
@@ -129,43 +144,78 @@ class RobotBase {
    * Determine if the robot is currently in Autonomous mode.
    *
    * @return True if the robot is currently operating Autonomously as determined
-   *         by the field controls.
+   *         by the Driver Station.
    */
   bool IsAutonomous() const;
+
+  /**
+   * Determine if the robot is currently in Autonomous mode and enabled.
+   *
+   * @return True if the robot us currently operating Autonomously while enabled
+   * as determined by the Driver Station.
+   */
+  bool IsAutonomousEnabled() const;
 
   /**
    * Determine if the robot is currently in Operator Control mode.
    *
    * @return True if the robot is currently operating in Tele-Op mode as
-   *         determined by the field controls.
+   *         determined by the Driver Station.
    */
-  bool IsOperatorControl() const;
+  bool IsTeleop() const;
+
+  /**
+   * Determine if the robot is current in Operator Control mode and enabled.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while
+   * enabled as determined by the Driver Station.
+   */
+  bool IsTeleopEnabled() const;
 
   /**
    * Determine if the robot is currently in Test mode.
    *
-   * @return True if the robot is currently running tests as determined by the
-   *         field controls.
+   * @return True if the robot is currently running in Test mode as determined
+   * by the Driver Station.
    */
   bool IsTest() const;
 
   /**
-   * Indicates if new data is available from the driver station.
+   * Determine if the robot is current in Test mode and enabled.
    *
-   * @return Has new data arrived over the network since the last time this
-   *         function was called?
+   * @return True if the robot is currently operating in Test mode while
+   * enabled as determined by the Driver Station.
    */
-  bool IsNewDataAvailable() const;
+  bool IsTestEnabled() const;
 
   /**
-   * Gets the ID of the main robot thread.
+   * Returns the main thread ID.
+   *
+   * @return The main thread ID.
    */
   static std::thread::id GetThreadId();
 
+  /**
+   * Start the main robot code. This function will be called once and should not
+   * exit until signalled by EndCompetition()
+   */
   virtual void StartCompetition() = 0;
 
+  /** Ends the main loop in StartCompetition(). */
   virtual void EndCompetition() = 0;
 
+  /**
+   * Get the current runtime type.
+   *
+   * @return Current runtime type.
+   */
+  static RuntimeType GetRuntimeType();
+
+  /**
+   * Get if the robot is real.
+   *
+   * @return If the robot is running in the real world.
+   */
   static constexpr bool IsReal() {
 #ifdef __FRC_ROBORIO__
     return true;
@@ -174,12 +224,23 @@ class RobotBase {
 #endif
   }
 
-  static constexpr bool IsSimulation() { return !IsReal(); }
+  /**
+   * Get if the robot is a simulation.
+   *
+   * @return If the robot is running in simulation.
+   */
+  static constexpr bool IsSimulation() {
+#ifdef __FRC_ROBORIO__
+    return false;
+#else
+    return true;
+#endif
+  }
 
   /**
    * Constructor for a generic robot program.
    *
-   * User code should be placed in the constructor that runs before the
+   * User code can be placed in the constructor that runs before the
    * Autonomous or Operator Control period starts. The constructor will run to
    * completion before Autonomous is entered.
    *
@@ -189,15 +250,11 @@ class RobotBase {
    */
   RobotBase();
 
-  virtual ~RobotBase();
+  virtual ~RobotBase() = default;
 
  protected:
-  // m_ds isn't moved in these because DriverStation is a singleton; every
-  // instance of RobotBase has a reference to the same object.
-  RobotBase(RobotBase&&) noexcept;
-  RobotBase& operator=(RobotBase&&) noexcept;
-
-  DriverStation& m_ds;
+  RobotBase(RobotBase&&) = default;
+  RobotBase& operator=(RobotBase&&) = default;
 
   static std::thread::id m_threadId;
 };

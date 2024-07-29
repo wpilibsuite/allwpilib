@@ -1,32 +1,29 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.hal.DigitalGlitchFilterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Class to enable glitch filtering on a set of digital inputs. This class will manage adding and
- * removing digital inputs from a FPGA glitch filter. The filter lets the user configure the time
+ * removing digital inputs from an FPGA glitch filter. The filter lets the user configure the time
  * that an input must remain high or low before it is classified as high or low.
  */
 public class DigitalGlitchFilter implements Sendable, AutoCloseable {
-  /**
-   * Configures the Digital Glitch Filter to its default settings.
-   */
+  /** Configures the Digital Glitch Filter to its default settings. */
+  @SuppressWarnings("this-escape")
   public DigitalGlitchFilter() {
-    synchronized (m_mutex) {
+    m_mutex.lock();
+    try {
       int index = 0;
       while (m_filterAllocated[index] && index < m_filterAllocated.length) {
         index++;
@@ -34,10 +31,11 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
       if (index != m_filterAllocated.length) {
         m_channelIndex = index;
         m_filterAllocated[index] = true;
-        HAL.report(tResourceType.kResourceType_DigitalGlitchFilter,
-            m_channelIndex + 1, 0);
+        HAL.report(tResourceType.kResourceType_DigitalGlitchFilter, m_channelIndex + 1, 0);
         SendableRegistry.addLW(this, "DigitalGlitchFilter", index);
       }
+    } finally {
+      m_mutex.unlock();
     }
   }
 
@@ -45,9 +43,13 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   public void close() {
     SendableRegistry.remove(this);
     if (m_channelIndex >= 0) {
-      synchronized (m_mutex) {
+      m_mutex.lock();
+      try {
         m_filterAllocated[m_channelIndex] = false;
+      } finally {
+        m_mutex.unlock();
       }
+
       m_channelIndex = -1;
     }
   }
@@ -62,8 +64,8 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
 
       int selected = DigitalGlitchFilterJNI.getFilterSelect(input.getPortHandleForRouting());
       if (selected != channelIndex) {
-        throw new IllegalStateException("DigitalGlitchFilterJNI.setFilterSelect("
-            + channelIndex + ") failed -> " + selected);
+        throw new IllegalStateException(
+            "DigitalGlitchFilterJNI.setFilterSelect(" + channelIndex + ") failed -> " + selected);
       }
     }
   }
@@ -143,8 +145,7 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
    * @param nanoseconds The number of nanoseconds.
    */
   public void setPeriodNanoSeconds(long nanoseconds) {
-    int fpgaCycles = (int) (nanoseconds * SensorUtil.kSystemClockTicksPerMicrosecond / 4
-        / 1000);
+    int fpgaCycles = (int) (nanoseconds * SensorUtil.kSystemClockTicksPerMicrosecond / 4 / 1000);
     setPeriodCycles(fpgaCycles);
   }
 
@@ -167,14 +168,11 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   public long getPeriodNanoSeconds() {
     int fpgaCycles = getPeriodCycles();
 
-    return (long) fpgaCycles * 1000L
-        / (long) (SensorUtil.kSystemClockTicksPerMicrosecond / 4);
+    return fpgaCycles * 1000L / (SensorUtil.kSystemClockTicksPerMicrosecond / 4);
   }
 
   @Override
-  @SuppressWarnings("PMD.UnusedFormalParameter")
-  public void initSendable(SendableBuilder builder) {
-  }
+  public void initSendable(SendableBuilder builder) {}
 
   private int m_channelIndex = -1;
   private static final Lock m_mutex = new ReentrantLock(true);

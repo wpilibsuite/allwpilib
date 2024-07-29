@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #define _CRT_NONSTDC_NO_WARNINGS
 
@@ -17,10 +14,10 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <string_view>
 
-#include "wpi/FileSystem.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
+#include "wpi/fs.h"
 
 #if defined(_MSC_VER)
 #ifndef STDIN_FILENO
@@ -36,22 +33,30 @@
 
 using namespace wpi;
 
-StringRef raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
+std::string_view raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
   buf.clear();
   for (int i = 0; i < maxLen; ++i) {
     char c;
     read(c);
-    if (has_error()) return StringRef{buf.data(), buf.size()};
-    if (c == '\r') continue;
+    if (has_error()) {
+      return {buf.data(), buf.size()};
+    }
+    if (c == '\r') {
+      continue;
+    }
     buf.push_back(c);
-    if (c == '\n') break;
+    if (c == '\n') {
+      break;
+    }
   }
-  return StringRef{buf.data(), buf.size()};
+  return {buf.data(), buf.size()};
 }
 
 void raw_mem_istream::close() {}
 
-size_t raw_mem_istream::in_avail() const { return m_left; }
+size_t raw_mem_istream::in_avail() const {
+  return m_left;
+}
 
 void raw_mem_istream::read_impl(void* data, size_t len) {
   if (len > m_left) {
@@ -64,25 +69,27 @@ void raw_mem_istream::read_impl(void* data, size_t len) {
   set_read_count(len);
 }
 
-static int getFD(const Twine& Filename, std::error_code& EC) {
+static int getFD(std::string_view Filename, std::error_code& EC) {
   // Handle "-" as stdin. Note that when we do this, we consider ourself
   // the owner of stdin. This means that we can do things like close the
   // file descriptor when we're done and set the "binary" flag globally.
-  if (Filename.isSingleStringRef() && Filename.getSingleStringRef() == "-") {
+  if (Filename == "-") {
     EC = std::error_code();
     return STDIN_FILENO;
   }
 
-  int FD;
-
-  EC = sys::fs::openFileForRead(Filename, FD);
-  if (EC) return -1;
-
-  EC = std::error_code();
+  fs::file_t F = fs::OpenFileForRead(Filename, EC);
+  if (EC) {
+    return -1;
+  }
+  int FD = fs::FileToFd(F, EC, fs::OF_None);
+  if (EC) {
+    return -1;
+  }
   return FD;
 }
 
-raw_fd_istream::raw_fd_istream(const Twine& filename, std::error_code& ec,
+raw_fd_istream::raw_fd_istream(std::string_view filename, std::error_code& ec,
                                size_t bufSize)
     : raw_fd_istream(getFD(filename, ec), true, bufSize) {}
 
@@ -92,7 +99,9 @@ raw_fd_istream::raw_fd_istream(int fd, bool shouldClose, size_t bufSize)
 }
 
 raw_fd_istream::~raw_fd_istream() {
-  if (m_shouldClose) close();
+  if (m_shouldClose) {
+    close();
+  }
   std::free(m_buf);
 }
 
@@ -103,7 +112,9 @@ void raw_fd_istream::close() {
   }
 }
 
-size_t raw_fd_istream::in_avail() const { return m_end - m_cur; }
+size_t raw_fd_istream::in_avail() const {
+  return m_end - m_cur;
+}
 
 void raw_fd_istream::read_impl(void* data, size_t len) {
   char* cdata = static_cast<char*>(data);

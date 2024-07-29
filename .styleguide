@@ -2,15 +2,26 @@ cppHeaderFileInclude {
   \.h$
   \.hpp$
   \.inc$
+  \.inl$
 }
 
 cppSrcFileInclude {
   \.cpp$
 }
 
+modifiableFileExclude {
+  cmake/toolchains/
+  thirdparty/
+  \.patch$
+  gradlew
+}
+
 generatedFileExclude {
   FRCNetComm\.java$
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
+  fieldImages/src/main/native/resources/
+  apriltag/src/test/resources/
+  wpilibc/src/generated/
 }
 
 repoRootNameOverride {
@@ -18,16 +29,25 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
+  ^Eigen/
   ^cameraserver/
   ^cscore
+  ^fmt/
+  ^gtest/
+  ^google/
   ^hal/
   ^imgui
+  ^implot
   ^mockdata/
   ^networktables/
   ^ntcore
   ^opencv2/
   ^support/
   ^units/
+  ^unsupported/
   ^vision/
   ^wpi/
+  ^wpigui
+  ^wpimath/
+  ^wpinet/
 }

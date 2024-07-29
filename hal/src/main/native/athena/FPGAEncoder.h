@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -40,7 +37,7 @@ int32_t HAL_GetFPGAEncoder(HAL_FPGAEncoderHandle fpgaEncoderHandle,
 /**
  * Returns the period of the most recent pulse.
  * Returns the period of the most recent Encoder pulse in seconds.
- * This method compenstates for the decoding type.
+ * This method compensates for the decoding type.
  *
  * @deprecated Use GetRate() in favor of this method.  This returns unscaled
  * periods and GetRate() scales using value from SetDistancePerPulse().

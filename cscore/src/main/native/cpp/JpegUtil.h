@@ -1,16 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_JPEGUTIL_H_
 #define CSCORE_JPEGUTIL_H_
 
 #include <string>
-
-#include <wpi/StringRef.h>
+#include <string_view>
 
 namespace wpi {
 class raw_istream;
@@ -18,13 +14,13 @@ class raw_istream;
 
 namespace cs {
 
-bool IsJpeg(wpi::StringRef data);
+bool IsJpeg(std::string_view data);
 
-bool GetJpegSize(wpi::StringRef data, int* width, int* height);
+bool GetJpegSize(std::string_view data, int* width, int* height);
 
 bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF);
 
-wpi::StringRef JpegGetDHT();
+std::string_view JpegGetDHT();
 
 bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height);
 

@@ -1,32 +1,30 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import java.util.Arrays;
-import java.util.Optional;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.RelayJNI;
+import edu.wpi.first.hal.util.HalHandleException;
 import edu.wpi.first.hal.util.UncleanStatusException;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Class for VEX Robotics Spike style relay outputs. Relays are intended to be connected to Spikes
  * or similar relays. The relay channels controls a pair of channels that are either both off, one
- * on, the other on, or both on. This translates into two Spike outputs at 0v, one at 12v and one
- * at 0v, one at 0v and the other at 12v, or two Spike outputs at 12V. This allows off, full
- * forward, or full reverse control of motors without variable speed. It also allows the two
- * channels (forward and reverse) to be used independently for something that does not care about
- * voltage polarity (like a solenoid).
+ * on, the other on, or both on. This translates into two Spike outputs at 0v, one at 12v and one at
+ * 0v, one at 0v and the other at 12v, or two Spike outputs at 12V. This allows off, full forward,
+ * or full reverse control of motors without variable speed. It also allows the two channels
+ * (forward and reverse) to be used independently for something that does not care about voltage
+ * polarity (like a solenoid).
  */
 public class Relay extends MotorSafety implements Sendable, AutoCloseable {
   /**
@@ -44,13 +42,15 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
     }
   }
 
-  /**
-   * The state to drive a Relay to.
-   */
+  /** The state to drive a Relay to. */
   public enum Value {
+    /** Off. */
     kOff("Off"),
+    /** On. */
     kOn("On"),
+    /** Forward. */
     kForward("Forward"),
+    /** Reverse. */
     kReverse("Reverse");
 
     private final String m_prettyValue;
@@ -59,31 +59,33 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
       m_prettyValue = prettyValue;
     }
 
+    /**
+     * Returns the pretty string representation of the value.
+     *
+     * @return The pretty string representation of the value.
+     */
     public String getPrettyValue() {
       return m_prettyValue;
     }
 
+    /**
+     * Returns the value for a given pretty string.
+     *
+     * @param value The pretty string.
+     * @return The value or an empty optional if there is no corresponding value.
+     */
     public static Optional<Value> getValueOf(String value) {
       return Arrays.stream(Value.values()).filter(v -> v.m_prettyValue.equals(value)).findFirst();
     }
   }
 
-  /**
-   * The Direction(s) that a relay is configured to operate in.
-   */
+  /** The Direction(s) that a relay is configured to operate in. */
   public enum Direction {
-    /**
-     * direction: both directions are valid.
-     */
-
+    /** Both directions are valid. */
     kBoth,
-    /**
-     * direction: Only forward is valid.
-     */
+    /** Only forward is valid. */
     kForward,
-    /**
-     * direction: only reverse is valid.
-     */
+    /** Only reverse is valid. */
     kReverse
   }
 
@@ -123,6 +125,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * @param channel The channel number for this relay (0 - 3).
    * @param direction The direction that the Relay object will control.
    */
+  @SuppressWarnings("this-escape")
   public Relay(final int channel, Direction direction) {
     m_channel = channel;
     m_direction = requireNonNullParam(direction, "direction", "Relay");
@@ -148,12 +151,12 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
   private void freeRelay() {
     try {
       RelayJNI.setRelay(m_forwardHandle, false);
-    } catch (UncleanStatusException ignored) {
+    } catch (UncleanStatusException | HalHandleException ignored) {
       // do nothing. Ignore
     }
     try {
       RelayJNI.setRelay(m_reverseHandle, false);
-    } catch (UncleanStatusException ignored) {
+    } catch (UncleanStatusException | HalHandleException ignored) {
       // do nothing. Ignore
     }
 
@@ -172,34 +175,33 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * <p>When set to kBothDirections, the relay can be set to any of the four states: 0v-0v, 12v-0v,
    * 0v-12v, 12v-12v
    *
-   * <p>When set to kForwardOnly or kReverseOnly, you can specify the constant for the direction or
+   * <p>When set to kForwardOnly or kReverseOnly, you can specify the constant for the direction, or
    * you can simply specify kOff and kOn. Using only kOff and kOn is recommended.
    *
    * @param value The state to set the relay.
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   public void set(Value value) {
     switch (value) {
-      case kOff:
+      case kOff -> {
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
           RelayJNI.setRelay(m_forwardHandle, false);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
           RelayJNI.setRelay(m_reverseHandle, false);
         }
-        break;
-      case kOn:
+      }
+      case kOn -> {
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
           RelayJNI.setRelay(m_forwardHandle, true);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
           RelayJNI.setRelay(m_reverseHandle, true);
         }
-        break;
-      case kForward:
+      }
+      case kForward -> {
         if (m_direction == Direction.kReverse) {
-          throw new InvalidValueException("A relay configured for reverse cannot be set to "
-              + "forward");
+          throw new InvalidValueException(
+              "A relay configured for reverse cannot be set to " + "forward");
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
           RelayJNI.setRelay(m_forwardHandle, true);
@@ -207,11 +209,11 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
         if (m_direction == Direction.kBoth) {
           RelayJNI.setRelay(m_reverseHandle, false);
         }
-        break;
-      case kReverse:
+      }
+      case kReverse -> {
         if (m_direction == Direction.kForward) {
-          throw new InvalidValueException("A relay configured for forward cannot be set to "
-              + "reverse");
+          throw new InvalidValueException(
+              "A relay configured for forward cannot be set to " + "reverse");
         }
         if (m_direction == Direction.kBoth) {
           RelayJNI.setRelay(m_forwardHandle, false);
@@ -219,9 +221,10 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
           RelayJNI.setRelay(m_reverseHandle, true);
         }
-        break;
-      default:
+      }
+      default -> {
         // Cannot hit this, limited by Value enum
+      }
     }
   }
 
@@ -293,6 +296,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    *
    * @param direction The direction for the relay to operate in
    */
+  @SuppressWarnings("this-escape")
   public void setDirection(Direction direction) {
     requireNonNullParam(direction, "direction", "setDirection");
     if (m_direction == direction) {
@@ -309,7 +313,9 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
     builder.setSmartDashboardType("Relay");
     builder.setActuator(true);
     builder.setSafeState(() -> set(Value.kOff));
-    builder.addStringProperty("Value", () -> get().getPrettyValue(),
+    builder.addStringProperty(
+        "Value",
+        () -> get().getPrettyValue(),
         value -> set(Value.getValueOf(value).orElse(Value.kOff)));
   }
 }

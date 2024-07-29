@@ -1,18 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
 #include <string>
+#include <string_view>
+#include <thread>
 #include <vector>
 
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/StringRef.h>
+#include <wpi/MemoryBuffer.h>
+#include <wpi/StringExtras.h>
+#include <wpi/fmt/raw_ostream.h>
 #include <wpi/json.h>
-#include <wpi/raw_istream.h>
+#include <wpi/print.h>
 #include <wpi/raw_ostream.h>
 
 #include "cameraserver/CameraServer.h"
@@ -63,10 +64,6 @@ struct CameraConfig {
 
 std::vector<CameraConfig> cameras;
 
-wpi::raw_ostream& ParseError() {
-  return wpi::errs() << "config error in '" << configFile << "': ";
-}
-
 bool ReadCameraConfig(const wpi::json& config) {
   CameraConfig c;
 
@@ -74,7 +71,8 @@ bool ReadCameraConfig(const wpi::json& config) {
   try {
     c.name = config.at("name").get<std::string>();
   } catch (const wpi::json::exception& e) {
-    ParseError() << "could not read camera name: " << e.what() << '\n';
+    wpi::print(stderr, "config error in '{}': could not read camera name: {}\n",
+               configFile, e.what());
     return false;
   }
 
@@ -82,8 +80,9 @@ bool ReadCameraConfig(const wpi::json& config) {
   try {
     c.path = config.at("path").get<std::string>();
   } catch (const wpi::json::exception& e) {
-    ParseError() << "camera '" << c.name
-                 << "': could not read path: " << e.what() << '\n';
+    wpi::print(stderr,
+               "config error in '{}': camera '{}': could not read path: {}\n",
+               configFile, c.name, e.what());
     return false;
   }
 
@@ -96,25 +95,27 @@ bool ReadCameraConfig(const wpi::json& config) {
 bool ReadConfig() {
   // open config file
   std::error_code ec;
-  wpi::raw_fd_istream is(configFile, ec);
-  if (ec) {
-    wpi::errs() << "could not open '" << configFile << "': " << ec.message()
-                << '\n';
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(configFile, ec);
+  if (fileBuffer == nullptr || ec) {
+    wpi::print(stderr, "could not open '{}': {}\n", configFile, ec.message());
     return false;
   }
 
   // parse file
   wpi::json j;
   try {
-    j = wpi::json::parse(is);
+    j = wpi::json::parse(fileBuffer->GetCharBuffer());
   } catch (const wpi::json::parse_error& e) {
-    ParseError() << "byte " << e.byte << ": " << e.what() << '\n';
+    wpi::print(stderr, "config error in '{}': byte {}: {}\n", configFile,
+               e.byte, e.what());
     return false;
   }
 
   // top level must be an object
   if (!j.is_object()) {
-    ParseError() << "must be JSON object\n";
+    wpi::print(stderr, "config error in '{}': must be JSON object\n",
+               configFile);
     return false;
   }
 
@@ -122,7 +123,8 @@ bool ReadConfig() {
   try {
     team = j.at("team").get<unsigned int>();
   } catch (const wpi::json::exception& e) {
-    ParseError() << "could not read team number: " << e.what() << '\n';
+    wpi::print(stderr, "config error in '{}': could not read team number: {}\n",
+               configFile, e.what());
     return false;
   }
 
@@ -130,26 +132,32 @@ bool ReadConfig() {
   if (j.count("ntmode") != 0) {
     try {
       auto str = j.at("ntmode").get<std::string>();
-      wpi::StringRef s(str);
-      if (s.equals_lower("client")) {
+      if (wpi::equals_lower(str, "client")) {
         server = false;
-      } else if (s.equals_lower("server")) {
+      } else if (wpi::equals_lower(str, "server")) {
         server = true;
       } else {
-        ParseError() << "could not understand ntmode value '" << str << "'\n";
+        wpi::print(
+            stderr,
+            "config error in '{}': could not understand ntmode value '{}'\n",
+            configFile, str);
       }
     } catch (const wpi::json::exception& e) {
-      ParseError() << "could not read ntmode: " << e.what() << '\n';
+      wpi::print(stderr, "config error in '{}': could not read ntmode: {}\n",
+                 configFile, e.what());
     }
   }
 
   // cameras
   try {
     for (auto&& camera : j.at("cameras")) {
-      if (!ReadCameraConfig(camera)) return false;
+      if (!ReadCameraConfig(camera)) {
+        return false;
+      }
     }
   } catch (const wpi::json::exception& e) {
-    ParseError() << "could not read cameras: " << e.what() << '\n';
+    wpi::print(stderr, "config error in '{}': could not read cameras: {}\n",
+               configFile, e.what());
     return false;
   }
 
@@ -157,34 +165,42 @@ bool ReadConfig() {
 }
 
 void StartCamera(const CameraConfig& config) {
-  wpi::outs() << "Starting camera '" << config.name << "' on " << config.path
-              << '\n';
-  auto camera = frc::CameraServer::GetInstance()->StartAutomaticCapture(
-      config.name, config.path);
+  wpi::print("Starting camera '{}' on {}\n", config.name, config.path);
+  auto camera =
+      frc::CameraServer::StartAutomaticCapture(config.name, config.path);
 
   camera.SetConfigJson(config.config);
 }
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  if (argc >= 2) configFile = argv[1];
+  if (argc >= 2) {
+    configFile = argv[1];
+  }
 
   // read configuration
-  if (!ReadConfig()) return EXIT_FAILURE;
+  if (!ReadConfig()) {
+    return EXIT_FAILURE;
+  }
 
   // start NetworkTables
   auto ntinst = nt::NetworkTableInstance::GetDefault();
   if (server) {
-    wpi::outs() << "Setting up NetworkTables server\n";
+    std::puts("Setting up NetworkTables server");
     ntinst.StartServer();
   } else {
-    wpi::outs() << "Setting up NetworkTables client for team " << team << '\n';
-    ntinst.StartClientTeam(team);
+    wpi::print("Setting up NetworkTables client for team {}\n", team);
+    ntinst.StartClient4("multicameraserver");
+    ntinst.SetServerTeam(team);
   }
 
   // start cameras
-  for (auto&& camera : cameras) StartCamera(camera);
+  for (auto&& camera : cameras) {
+    StartCamera(camera);
+  }
 
   // loop forever
-  for (;;) std::this_thread::sleep_for(std::chrono::seconds(10));
+  for (;;) {
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+  }
 }

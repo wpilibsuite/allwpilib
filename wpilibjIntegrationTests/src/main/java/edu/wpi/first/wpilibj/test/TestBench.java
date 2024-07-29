@@ -1,38 +1,29 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.test;
-
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
+import edu.wpi.first.wpilibj.motorcontrol.Jaguar;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.motorcontrol.Victor;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-/**
- * This class provides access to all of the elements on the test bench, for use in fixtures. This
- * class is a singleton, you should use {@link #getInstance()} to obtain a reference to the {@code
- * TestBench}.
- */
+/** This class provides access to all of the elements on the test bench, for use in fixtures. */
 public final class TestBench {
   /**
    * The time that it takes to have a motor go from rotating at full speed to completely stopped.
@@ -49,8 +40,7 @@ public final class TestBench {
   public static final int kTiltServoChannel = 9;
   public static final int kPanServoChannel = 8;
 
-
-  /* PowerDistributionPanel channels */
+  /* PowerDistribution channels */
   public static final int kJaguarPDPChannel = 6;
   public static final int kVictorPDPChannel = 8;
   public static final int kTalonPDPChannel = 10;
@@ -61,17 +51,15 @@ public final class TestBench {
   public static final int DIOCrossConnectA2 = 7;
   public static final int DIOCrossConnectA1 = 6;
 
-  /**
-   * The Singleton instance of the Test Bench.
-   */
+  /** The Singleton instance of the Test Bench. */
+  @SuppressWarnings("unused")
   private static TestBench instance = null;
 
   /**
    * The single constructor for the TestBench. This method is private in order to prevent multiple
    * TestBench objects from being allocated.
    */
-  protected TestBench() {
-  }
+  private TestBench() {}
 
   /**
    * Constructs a new set of objects representing a connected set of Talon controlled Motors and an
@@ -79,10 +67,10 @@ public final class TestBench {
    *
    * @return a freshly allocated Talon, Encoder pair
    */
-  public MotorEncoderFixture<Talon> getTalonPair() {
-    return new MotorEncoderFixture<Talon>() {
+  public static MotorEncoderFixture<Talon> getTalonPair() {
+    return new MotorEncoderFixture<>() {
       @Override
-      protected Talon giveSpeedController() {
+      protected Talon giveMotorController() {
         return new Talon(kTalonChannel);
       }
 
@@ -109,10 +97,10 @@ public final class TestBench {
    *
    * @return a freshly allocated Victor, Encoder pair
    */
-  public MotorEncoderFixture<Victor> getVictorPair() {
-    return new MotorEncoderFixture<Victor>() {
+  public static MotorEncoderFixture<Victor> getVictorPair() {
+    return new MotorEncoderFixture<>() {
       @Override
-      protected Victor giveSpeedController() {
+      protected Victor giveMotorController() {
         return new Victor(kVictorChannel);
       }
 
@@ -139,10 +127,10 @@ public final class TestBench {
    *
    * @return a freshly allocated Jaguar, Encoder pair
    */
-  public MotorEncoderFixture<Jaguar> getJaguarPair() {
-    return new MotorEncoderFixture<Jaguar>() {
+  public static MotorEncoderFixture<Jaguar> getJaguarPair() {
+    return new MotorEncoderFixture<>() {
       @Override
-      protected Jaguar giveSpeedController() {
+      protected Jaguar giveMotorController() {
         return new Jaguar(kJaguarChannel);
       }
 
@@ -168,8 +156,7 @@ public final class TestBench {
    *
    * @return a freshly allocated Servo's and a freshly allocated Gyroscope
    */
-  public TiltPanCameraFixture getTiltPanCam() {
-
+  public static TiltPanCameraFixture getTiltPanCam() {
     return new TiltPanCameraFixture() {
       @Override
       protected AnalogGyro giveGyro() {
@@ -197,31 +184,33 @@ public final class TestBench {
     };
   }
 
-  public DIOCrossConnectFixture getDIOCrossConnectFixture(int inputPort, int outputPort) {
+  public static DIOCrossConnectFixture getDIOCrossConnectFixture(int inputPort, int outputPort) {
     return new DIOCrossConnectFixture(inputPort, outputPort);
   }
 
-  /**
-   * Gets two lists of possible DIO pairs for the two pairs.
-   */
-  private List<List<Integer[]>> getDIOCrossConnect() {
-    List<List<Integer[]>> pairs = new ArrayList<List<Integer[]>>();
+  /** Gets two lists of possible DIO pairs for the two pairs. */
+  private static List<List<Integer[]>> getDIOCrossConnect() {
+    List<List<Integer[]>> pairs = new ArrayList<>();
     List<Integer[]> setA =
-        Arrays.asList(new Integer[][]{
-            {DIOCrossConnectA1, DIOCrossConnectA2},
-            {DIOCrossConnectA2, DIOCrossConnectA1}});
+        List.of(
+            new Integer[][] {
+              {DIOCrossConnectA1, DIOCrossConnectA2},
+              {DIOCrossConnectA2, DIOCrossConnectA1}
+            });
     pairs.add(setA);
 
     List<Integer[]> setB =
-        Arrays.asList(new Integer[][]{
-            {DIOCrossConnectB1, DIOCrossConnectB2},
-            {DIOCrossConnectB2, DIOCrossConnectB1}});
+        List.of(
+            new Integer[][] {
+              {DIOCrossConnectB1, DIOCrossConnectB2},
+              {DIOCrossConnectB2, DIOCrossConnectB1}
+            });
     pairs.add(setB);
     // NOTE: IF MORE DIOCROSSCONNECT PAIRS ARE ADDED ADD THEM HERE
     return pairs;
   }
 
-  @SuppressWarnings("JavadocMethod")
+  /** Returns the analog I/O cross-connect fixture. */
   public static AnalogCrossConnectFixture getAnalogCrossConnectFixture() {
     return new AnalogCrossConnectFixture() {
       @Override
@@ -236,7 +225,7 @@ public final class TestBench {
     };
   }
 
-  @SuppressWarnings("JavadocMethod")
+  /** Returns the relay cross-connect fixture. */
   public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
     return new RelayCrossConnectFixture() {
       @Override
@@ -262,8 +251,8 @@ public final class TestBench {
    *
    * @return pairs of DIOCrossConnectFixtures
    */
-  public Collection<Integer[]> getDIOCrossConnectCollection() {
-    Collection<Integer[]> pairs = new ArrayList<Integer[]>();
+  public static Collection<Integer[]> getDIOCrossConnectCollection() {
+    Collection<Integer[]> pairs = new ArrayList<>();
     for (Collection<Integer[]> collection : getDIOCrossConnect()) {
       pairs.addAll(collection);
     }
@@ -276,9 +265,9 @@ public final class TestBench {
    * @param flip whether this encoder needs to be flipped
    * @return A list of different inputs to use for the tests
    */
-  private Collection<Integer[]> getPairArray(List<Integer[]> listA, List<Integer[]> listB,
-                                             boolean flip) {
-    Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
+  private static Collection<Integer[]> getPairArray(
+      List<Integer[]> listA, List<Integer[]> listB, boolean flip) {
+    Collection<Integer[]> encoderPortPairs = new ArrayList<>();
     for (Integer[] portPairsA : listA) {
       Integer[] inputs = new Integer[5];
       inputs[0] = portPairsA[0]; // InputA
@@ -290,7 +279,7 @@ public final class TestBench {
         inputs[4] = flip ? 0 : 1; // The flip bit
       }
 
-      ArrayList<Integer[]> construtorInput = new ArrayList<Integer[]>();
+      ArrayList<Integer[]> construtorInput = new ArrayList<>();
       construtorInput.add(inputs);
 
       inputs = inputs.clone();
@@ -310,28 +299,15 @@ public final class TestBench {
    *
    * @return A collection of different input pairs to use for the encoder
    */
-  public Collection<Integer[]> getEncoderDIOCrossConnectCollection() {
-    Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
+  public static Collection<Integer[]> getEncoderDIOCrossConnectCollection() {
+    Collection<Integer[]> encoderPortPairs = new ArrayList<>();
     assert getDIOCrossConnect().size() == 2;
-    encoderPortPairs.addAll(getPairArray(getDIOCrossConnect().get(0), getDIOCrossConnect().get(1),
-        false));
-    encoderPortPairs.addAll(getPairArray(getDIOCrossConnect().get(1), getDIOCrossConnect().get(0),
-        false));
+    encoderPortPairs.addAll(
+        getPairArray(getDIOCrossConnect().get(0), getDIOCrossConnect().get(1), false));
+    encoderPortPairs.addAll(
+        getPairArray(getDIOCrossConnect().get(1), getDIOCrossConnect().get(0), false));
     assert encoderPortPairs.size() == 8;
     return encoderPortPairs;
-  }
-
-  /**
-   * Gets the singleton of the TestBench. If the TestBench is not already allocated in constructs an
-   * new instance of it. Otherwise it returns the existing instance.
-   *
-   * @return The Singleton instance of the TestBench
-   */
-  public static TestBench getInstance() {
-    if (instance == null) {
-      instance = new TestBench();
-    }
-    return instance;
   }
 
   /**

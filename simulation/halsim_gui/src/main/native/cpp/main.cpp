@@ -1,59 +1,178 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
+#include <glass/Context.h>
+#include <glass/Storage.h>
+#include <glass/hardware/Pneumatic.h>
+#include <glass/other/Plot.h>
+
+#include <cstdio>
+#include <string_view>
+
+#include <hal/Extensions.h>
 #include <hal/Main.h>
-#include <wpi/raw_ostream.h>
+#include <imgui.h>
+#include <wpigui.h>
 
-#include "AccelerometerGui.h"
+#include "AccelerometerSimGui.h"
 #include "AddressableLEDGui.h"
-#include "AnalogGyroGui.h"
-#include "AnalogInputGui.h"
-#include "AnalogOutGui.h"
-#include "CompressorGui.h"
-#include "DIOGui.h"
+#include "AnalogGyroSimGui.h"
+#include "AnalogInputSimGui.h"
+#include "AnalogOutputSimGui.h"
+#include "DIOSimGui.h"
 #include "DriverStationGui.h"
-#include "EncoderGui.h"
+#include "EncoderSimGui.h"
 #include "HALSimGui.h"
-#include "PDPGui.h"
-#include "PWMGui.h"
-#include "RelayGui.h"
-#include "RoboRioGui.h"
+#include "HALSimGuiExt.h"
+#include "NetworkTablesSimGui.h"
+#include "PCMSimGui.h"
+#include "PHSimGui.h"
+#include "PWMSimGui.h"
+#include "PowerDistributionSimGui.h"
+#include "RelaySimGui.h"
+#include "RoboRioSimGui.h"
 #include "SimDeviceGui.h"
-#include "SolenoidGui.h"
 #include "TimingGui.h"
 
 using namespace halsimgui;
+
+namespace gui = wpi::gui;
+
+static std::unique_ptr<glass::PlotProvider> gPlotProvider;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
 __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
-  HALSimGui::Add(AccelerometerGui::Initialize);
-  HALSimGui::Add(AddressableLEDGui::Initialize);
-  HALSimGui::Add(AnalogGyroGui::Initialize);
-  HALSimGui::Add(AnalogInputGui::Initialize);
-  HALSimGui::Add(AnalogOutGui::Initialize);
-  HALSimGui::Add(CompressorGui::Initialize);
-  HALSimGui::Add(DriverStationGui::Initialize);
-  HALSimGui::Add(DIOGui::Initialize);
-  HALSimGui::Add(EncoderGui::Initialize);
-  HALSimGui::Add(PDPGui::Initialize);
-  HALSimGui::Add(PWMGui::Initialize);
-  HALSimGui::Add(RelayGui::Initialize);
-  HALSimGui::Add(RoboRioGui::Initialize);
-  HALSimGui::Add(SimDeviceGui::Initialize);
-  HALSimGui::Add(SolenoidGui::Initialize);
-  HALSimGui::Add(TimingGui::Initialize);
+  std::puts("Simulator GUI Initializing.");
 
-  wpi::outs() << "Simulator GUI Initializing.\n";
-  if (!HALSimGui::Initialize()) return 0;
-  HAL_SetMain(nullptr, HALSimGui::Main, HALSimGui::Exit);
-  wpi::outs() << "Simulator GUI Initialized!\n";
+  gui::CreateContext();
+  glass::CreateContext();
+
+  glass::SetStorageName("simgui");
+
+  gui::AddInit([] { ImGui::GetIO().ConfigDockingWithShift = true; });
+
+  HAL_RegisterExtension(HALSIMGUI_EXT_ADDGUIINIT,
+                        reinterpret_cast<void*>((AddGuiInitFn)&AddGuiInit));
+  HAL_RegisterExtension(
+      HALSIMGUI_EXT_ADDGUILATEEXECUTE,
+      reinterpret_cast<void*>((AddGuiLateExecuteFn)&AddGuiLateExecute));
+  HAL_RegisterExtension(
+      HALSIMGUI_EXT_ADDGUIEARLYEXECUTE,
+      reinterpret_cast<void*>((AddGuiEarlyExecuteFn)&AddGuiEarlyExecute));
+  HAL_RegisterExtension(HALSIMGUI_EXT_GUIEXIT,
+                        reinterpret_cast<void*>((GuiExitFn)&GuiExit));
+
+  HALSimGui::GlobalInit();
+  DriverStationGui::GlobalInit();
+  gPlotProvider = std::make_unique<glass::PlotProvider>(
+      glass::GetStorageRoot().GetChild("Plot"));
+  gPlotProvider->GlobalInit();
+
+  // These need to initialize first
+  EncoderSimGui::Initialize();
+  SimDeviceGui::Initialize();
+
+  AccelerometerSimGui::Initialize();
+  AddressableLEDGui::Initialize();
+  AnalogGyroSimGui::Initialize();
+  AnalogInputSimGui::Initialize();
+  AnalogOutputSimGui::Initialize();
+  DIOSimGui::Initialize();
+  NetworkTablesSimGui::Initialize();
+  PCMSimGui::Initialize();
+  PowerDistributionSimGui::Initialize();
+  PWMSimGui::Initialize();
+  RelaySimGui::Initialize();
+  PHSimGui::Initialize();
+  RoboRioSimGui::Initialize();
+  TimingGui::Initialize();
+
+  HALSimGui::halProvider->RegisterModel(
+      "AllPneumaticControls",
+      [] {
+        return PCMSimGui::PCMsAnyInitialized() || PHSimGui::PHsAnyInitialized();
+      },
+      [] {
+        return std::make_unique<glass::AllPneumaticControlsModel>(
+            PCMSimGui::GetPCMsModel(), PHSimGui::GetPHsModel());
+      });
+
+  HALSimGui::halProvider->RegisterView(
+      "Solenoids", "AllPneumaticControls",
+      [](glass::Model* model) {
+        auto pneumaticModel =
+            static_cast<glass::AllPneumaticControlsModel*>(model);
+        return PCMSimGui::PCMsAnySolenoids(pneumaticModel->pcms.get()) ||
+               PHSimGui::PHsAnySolenoids(pneumaticModel->phs.get());
+      },
+      [](glass::Window* win, glass::Model* model) {
+        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+        win->SetDefaultPos(290, 20);
+        return glass::MakeFunctionView([=] {
+          auto pneumaticModel =
+              static_cast<glass::AllPneumaticControlsModel*>(model);
+          glass::DisplayPneumaticControlsSolenoids(
+              pneumaticModel->pcms.get(),
+              HALSimGui::halProvider->AreOutputsEnabled());
+          glass::DisplayPneumaticControlsSolenoids(
+              pneumaticModel->phs.get(),
+              HALSimGui::halProvider->AreOutputsEnabled());
+        });
+      });
+
+  HALSimGui::mainMenu.AddMainMenu([] {
+    if (ImGui::BeginMenu("Hardware")) {
+      HALSimGui::halProvider->DisplayMenu();
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("NetworkTables")) {
+      NetworkTablesSimGui::DisplayMenu();
+      ImGui::Separator();
+      HALSimGui::ntProvider->DisplayMenu();
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("DS")) {
+      DriverStationGui::dsManager->DisplayMenu();
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Plot")) {
+      bool paused = gPlotProvider->IsPaused();
+      if (ImGui::MenuItem("Pause All Plots", nullptr, &paused)) {
+        gPlotProvider->SetPaused(paused);
+      }
+      ImGui::Separator();
+      gPlotProvider->DisplayMenu();
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Window")) {
+      HALSimGui::manager->DisplayMenu();
+      ImGui::EndMenu();
+    }
+  });
+
+  if (!gui::Initialize("Robot Simulation", 1280, 720,
+                       ImGuiConfigFlags_DockingEnable)) {
+    return 0;
+  }
+  HAL_RegisterExtensionListener(
+      nullptr, [](void*, const char* name, void* data) {
+        if (std::string_view{name} == "ds_socket") {
+          DriverStationGui::SetDSSocketExtension(data);
+        }
+      });
+  HAL_SetMain(
+      nullptr,
+      [](void*) {
+        gui::Main();
+        glass::DestroyContext();
+        gui::DestroyContext();
+      },
+      [](void*) { gui::Exit(); });
+  std::puts("Simulator GUI Initialized!");
 
   return 0;
 }

@@ -1,0 +1,2005 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sun, 26 Nov 2023 18:09:12 -0800
+Subject: [PATCH 1/2] Call std functions if not constant-evaluated
+
+The subheaders now have namespace declarations so C++ standard library
+headers can be included in the global namespace. Doing otherwise can
+cause ambiguous declarations of cmath functions.
+---
+ include/gcem.hpp                              | 157 +++++++++---------
+ include/gcem_incl/abs.hpp                     |  12 ++
+ include/gcem_incl/acos.hpp                    |  12 ++
+ include/gcem_incl/acosh.hpp                   |  12 ++
+ include/gcem_incl/asin.hpp                    |  12 ++
+ include/gcem_incl/asinh.hpp                   |  11 ++
+ include/gcem_incl/atan.hpp                    |  12 ++
+ include/gcem_incl/atan2.hpp                   |  12 ++
+ include/gcem_incl/atanh.hpp                   |  12 ++
+ include/gcem_incl/beta.hpp                    |  16 ++
+ include/gcem_incl/binomial_coef.hpp           |   7 +-
+ include/gcem_incl/ceil.hpp                    |  12 ++
+ include/gcem_incl/copysign.hpp                |  12 ++
+ include/gcem_incl/cos.hpp                     |  12 ++
+ include/gcem_incl/cosh.hpp                    |  12 ++
+ include/gcem_incl/erf.hpp                     |  12 ++
+ include/gcem_incl/erf_inv.hpp                 |   4 +
+ include/gcem_incl/exp.hpp                     |  12 ++
+ include/gcem_incl/expm1.hpp                   |  12 ++
+ include/gcem_incl/fabs.hpp                    |   5 +
+ include/gcem_incl/fabsf.hpp                   |   5 +
+ include/gcem_incl/fabsl.hpp                   |   5 +
+ include/gcem_incl/factorial.hpp               |   5 +
+ include/gcem_incl/find_exponent.hpp           |   5 +
+ include/gcem_incl/find_fraction.hpp           |   5 +
+ include/gcem_incl/find_whole.hpp              |   5 +
+ include/gcem_incl/floor.hpp                   |  12 ++
+ include/gcem_incl/fmod.hpp                    |  12 ++
+ include/gcem_incl/gcd.hpp                     |   5 +
+ include/gcem_incl/hypot.hpp                   |  12 ++
+ include/gcem_incl/incomplete_beta.hpp         |   5 +
+ include/gcem_incl/incomplete_beta_inv.hpp     |   5 +
+ include/gcem_incl/incomplete_gamma.hpp        |   5 +
+ include/gcem_incl/incomplete_gamma_inv.hpp    |   5 +
+ include/gcem_incl/inv_sqrt.hpp                |   5 +
+ include/gcem_incl/is_even.hpp                 |   5 +
+ include/gcem_incl/is_finite.hpp               |   5 +
+ include/gcem_incl/is_inf.hpp                  |   5 +
+ include/gcem_incl/is_nan.hpp                  |   5 +
+ include/gcem_incl/is_odd.hpp                  |   5 +
+ include/gcem_incl/lbeta.hpp                   |   5 +
+ include/gcem_incl/lcm.hpp                     |   5 +
+ include/gcem_incl/lgamma.hpp                  |  12 ++
+ include/gcem_incl/lmgamma.hpp                 |   5 +
+ include/gcem_incl/log.hpp                     |  12 ++
+ include/gcem_incl/log10.hpp                   |  12 ++
+ include/gcem_incl/log1p.hpp                   |  12 ++
+ include/gcem_incl/log2.hpp                    |  12 ++
+ include/gcem_incl/log_binomial_coef.hpp       |   7 +-
+ include/gcem_incl/mantissa.hpp                |   5 +
+ include/gcem_incl/max.hpp                     |  12 ++
+ include/gcem_incl/min.hpp                     |  12 ++
+ include/gcem_incl/neg_zero.hpp                |   5 +
+ include/gcem_incl/pow.hpp                     |  12 ++
+ include/gcem_incl/pow_integral.hpp            |   5 +
+ .../quadrature/gauss_legendre_30.hpp          |   5 +
+ .../quadrature/gauss_legendre_50.hpp          |   5 +
+ include/gcem_incl/round.hpp                   |  12 ++
+ include/gcem_incl/sgn.hpp                     |   5 +
+ include/gcem_incl/signbit.hpp                 |  12 ++
+ include/gcem_incl/sin.hpp                     |  12 ++
+ include/gcem_incl/sinh.hpp                    |  12 ++
+ include/gcem_incl/sqrt.hpp                    |  12 ++
+ include/gcem_incl/tan.hpp                     |  12 ++
+ include/gcem_incl/tanh.hpp                    |  12 ++
+ include/gcem_incl/tgamma.hpp                  |  12 ++
+ include/gcem_incl/trunc.hpp                   |  12 ++
+ 67 files changed, 663 insertions(+), 82 deletions(-)
+
+diff --git a/include/gcem.hpp b/include/gcem.hpp
+index 4da27db32678d62515bd90846852df3d3cd3682c..fee151e28fb59bd37d0e45c4bc5aa6ce166843f9 100644
+--- a/include/gcem.hpp
++++ b/include/gcem.hpp
+@@ -23,85 +23,82 @@
+ 
+ #include "gcem_incl/gcem_options.hpp"
+ 
+-namespace gcem
+-{
+-    #include "gcem_incl/quadrature/gauss_legendre_50.hpp"
+-
+-    #include "gcem_incl/is_inf.hpp"
+-    #include "gcem_incl/is_nan.hpp"
+-    #include "gcem_incl/is_finite.hpp"
+-    
+-    #include "gcem_incl/signbit.hpp"
+-    #include "gcem_incl/copysign.hpp"
+-    #include "gcem_incl/neg_zero.hpp"
+-    #include "gcem_incl/sgn.hpp"
+-
+-    #include "gcem_incl/abs.hpp"
+-    #include "gcem_incl/fabs.hpp"
+-    #include "gcem_incl/fabsf.hpp"
+-    #include "gcem_incl/fabsl.hpp"
+-    #include "gcem_incl/ceil.hpp"
+-    #include "gcem_incl/floor.hpp"
+-    #include "gcem_incl/trunc.hpp"
+-    #include "gcem_incl/is_odd.hpp"
+-    #include "gcem_incl/is_even.hpp"
+-    #include "gcem_incl/max.hpp"
+-    #include "gcem_incl/min.hpp"
+-    #include "gcem_incl/sqrt.hpp"
+-    #include "gcem_incl/inv_sqrt.hpp"
+-    #include "gcem_incl/hypot.hpp"
+-
+-    #include "gcem_incl/find_exponent.hpp"
+-    #include "gcem_incl/find_fraction.hpp"
+-    #include "gcem_incl/find_whole.hpp"
+-    #include "gcem_incl/mantissa.hpp"
+-    #include "gcem_incl/round.hpp"
+-    #include "gcem_incl/fmod.hpp"
+-
+-    #include "gcem_incl/pow_integral.hpp"
+-    #include "gcem_incl/exp.hpp"
+-    #include "gcem_incl/expm1.hpp"
+-    #include "gcem_incl/log.hpp"
+-    #include "gcem_incl/log1p.hpp"
+-    #include "gcem_incl/log2.hpp"
+-    #include "gcem_incl/log10.hpp"
+-    #include "gcem_incl/pow.hpp"
+-
+-    #include "gcem_incl/gcd.hpp"
+-    #include "gcem_incl/lcm.hpp"
+-
+-    #include "gcem_incl/tan.hpp"
+-    #include "gcem_incl/cos.hpp"
+-    #include "gcem_incl/sin.hpp"
+-
+-    #include "gcem_incl/atan.hpp"
+-    #include "gcem_incl/atan2.hpp"
+-    #include "gcem_incl/acos.hpp"
+-    #include "gcem_incl/asin.hpp"
+-
+-    #include "gcem_incl/tanh.hpp"
+-    #include "gcem_incl/cosh.hpp"
+-    #include "gcem_incl/sinh.hpp"
+-
+-    #include "gcem_incl/atanh.hpp"
+-    #include "gcem_incl/acosh.hpp"
+-    #include "gcem_incl/asinh.hpp"
+-
+-    #include "gcem_incl/binomial_coef.hpp"
+-    #include "gcem_incl/lgamma.hpp"
+-    #include "gcem_incl/tgamma.hpp"
+-    #include "gcem_incl/factorial.hpp"
+-    #include "gcem_incl/lbeta.hpp"
+-    #include "gcem_incl/beta.hpp"
+-    #include "gcem_incl/lmgamma.hpp"
+-    #include "gcem_incl/log_binomial_coef.hpp"
+-
+-    #include "gcem_incl/erf.hpp"
+-    #include "gcem_incl/erf_inv.hpp"
+-    #include "gcem_incl/incomplete_beta.hpp"
+-    #include "gcem_incl/incomplete_beta_inv.hpp"
+-    #include "gcem_incl/incomplete_gamma.hpp"
+-    #include "gcem_incl/incomplete_gamma_inv.hpp"
+-}
++#include "gcem_incl/quadrature/gauss_legendre_50.hpp"
++
++#include "gcem_incl/is_inf.hpp"
++#include "gcem_incl/is_nan.hpp"
++#include "gcem_incl/is_finite.hpp"
++
++#include "gcem_incl/signbit.hpp"
++#include "gcem_incl/copysign.hpp"
++#include "gcem_incl/neg_zero.hpp"
++#include "gcem_incl/sgn.hpp"
++
++#include "gcem_incl/abs.hpp"
++#include "gcem_incl/fabs.hpp"
++#include "gcem_incl/fabsf.hpp"
++#include "gcem_incl/fabsl.hpp"
++#include "gcem_incl/ceil.hpp"
++#include "gcem_incl/floor.hpp"
++#include "gcem_incl/trunc.hpp"
++#include "gcem_incl/is_odd.hpp"
++#include "gcem_incl/is_even.hpp"
++#include "gcem_incl/max.hpp"
++#include "gcem_incl/min.hpp"
++#include "gcem_incl/sqrt.hpp"
++#include "gcem_incl/inv_sqrt.hpp"
++#include "gcem_incl/hypot.hpp"
++
++#include "gcem_incl/find_exponent.hpp"
++#include "gcem_incl/find_fraction.hpp"
++#include "gcem_incl/find_whole.hpp"
++#include "gcem_incl/mantissa.hpp"
++#include "gcem_incl/round.hpp"
++#include "gcem_incl/fmod.hpp"
++
++#include "gcem_incl/pow_integral.hpp"
++#include "gcem_incl/exp.hpp"
++#include "gcem_incl/expm1.hpp"
++#include "gcem_incl/log.hpp"
++#include "gcem_incl/log1p.hpp"
++#include "gcem_incl/log2.hpp"
++#include "gcem_incl/log10.hpp"
++#include "gcem_incl/pow.hpp"
++
++#include "gcem_incl/gcd.hpp"
++#include "gcem_incl/lcm.hpp"
++
++#include "gcem_incl/tan.hpp"
++#include "gcem_incl/cos.hpp"
++#include "gcem_incl/sin.hpp"
++
++#include "gcem_incl/atan.hpp"
++#include "gcem_incl/atan2.hpp"
++#include "gcem_incl/acos.hpp"
++#include "gcem_incl/asin.hpp"
++
++#include "gcem_incl/tanh.hpp"
++#include "gcem_incl/cosh.hpp"
++#include "gcem_incl/sinh.hpp"
++
++#include "gcem_incl/atanh.hpp"
++#include "gcem_incl/acosh.hpp"
++#include "gcem_incl/asinh.hpp"
++
++#include "gcem_incl/binomial_coef.hpp"
++#include "gcem_incl/lgamma.hpp"
++#include "gcem_incl/tgamma.hpp"
++#include "gcem_incl/factorial.hpp"
++#include "gcem_incl/lbeta.hpp"
++#include "gcem_incl/beta.hpp"
++#include "gcem_incl/lmgamma.hpp"
++#include "gcem_incl/log_binomial_coef.hpp"
++
++#include "gcem_incl/erf.hpp"
++#include "gcem_incl/erf_inv.hpp"
++#include "gcem_incl/incomplete_beta.hpp"
++#include "gcem_incl/incomplete_beta_inv.hpp"
++#include "gcem_incl/incomplete_gamma.hpp"
++#include "gcem_incl/incomplete_gamma_inv.hpp"
+ 
+ #endif
+diff --git a/include/gcem_incl/abs.hpp b/include/gcem_incl/abs.hpp
+index 26b055a5776e23f4f32d941d5f6821e4f6a4ae21..66532d90128ac739ea16ffeef4ef0f0370ea1ac4 100644
+--- a/include/gcem_incl/abs.hpp
++++ b/include/gcem_incl/abs.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_abs_HPP
+ #define _gcem_abs_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ /**
+  * Compile-time absolute value function
+  *
+@@ -34,12 +40,18 @@ T
+ abs(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return( // deal with signed-zeros
+             x == T(0) ? \
+                 T(0) :
+             // else
+             x < T(0) ? \
+                 - x : x );
++  } else {
++    return std::abs(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/acos.hpp b/include/gcem_incl/acos.hpp
+index 6bce7a599812b4641627ae152e177fe866e59251..6f9edc450e6ebe51d589c406b50b336be669340e 100644
+--- a/include/gcem_incl/acos.hpp
++++ b/include/gcem_incl/acos.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_acos_HPP
+ #define _gcem_acos_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -78,7 +84,13 @@ return_t<T>
+ acos(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::acos_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::acos(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/acosh.hpp b/include/gcem_incl/acosh.hpp
+index 10b1957f395faa8e0e55649d07122597b1b97cce..7059d4de907f61b089aa830b4cb0ef5756093e2e 100644
+--- a/include/gcem_incl/acosh.hpp
++++ b/include/gcem_incl/acosh.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_acosh_HPP
+ #define _gcem_acosh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -62,7 +68,13 @@ return_t<T>
+ acosh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::acosh_compute( static_cast<return_t<T>>(x) );
++  } else {
++    return std::acosh(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/asin.hpp b/include/gcem_incl/asin.hpp
+index be4ee1ec3fb911a94278f394228aea482ce7acef..798ab5f9ae7b4d4dd21ca537cde5c9f8bea82085 100644
+--- a/include/gcem_incl/asin.hpp
++++ b/include/gcem_incl/asin.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_asin_HPP
+ #define _gcem_asin_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -76,7 +82,13 @@ return_t<T>
+ asin(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::asin_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::asin(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/asinh.hpp b/include/gcem_incl/asinh.hpp
+index 15b1114b5118300cc78b43863b5e8e87cbf65d02..8e90dbbab65fecea0bb5fead133068005a951aa2 100644
+--- a/include/gcem_incl/asinh.hpp
++++ b/include/gcem_incl/asinh.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_asinh_HPP
+ #define _gcem_asinh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -59,8 +65,13 @@ return_t<T>
+ asinh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::asinh_compute( static_cast<return_t<T>>(x) );
++  } else {
++    return std::asinh(x);
++  }
+ }
+ 
++}
+ 
+ #endif
+diff --git a/include/gcem_incl/atan.hpp b/include/gcem_incl/atan.hpp
+index 3bfeab0d90464206838f2474937dac57e6203aaa..fdcb522825b7e3ecdf4cc103564b978d58ce2e87 100644
+--- a/include/gcem_incl/atan.hpp
++++ b/include/gcem_incl/atan.hpp
+@@ -29,6 +29,12 @@
+ #ifndef _gcem_atan_HPP
+ #define _gcem_atan_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -211,7 +217,13 @@ return_t<T>
+ atan(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::atan_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::atan(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/atan2.hpp b/include/gcem_incl/atan2.hpp
+index 4797de21348137cb50dc1974d90d72db9005ef33..79dccc83da93d25882168d8f4acba98d5cf55b96 100644
+--- a/include/gcem_incl/atan2.hpp
++++ b/include/gcem_incl/atan2.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_atan2_HPP
+ #define _gcem_atan2_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -82,7 +88,13 @@ common_return_t<T1,T2>
+ atan2(const T1 y, const T2 x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::atan2_type_check(x,y);
++  } else {
++    return std::atan2(y, x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/atanh.hpp b/include/gcem_incl/atanh.hpp
+index 54f7f4983f906e3e950222599f2f41d503308ad8..ea45df8f37bb55988dded9068743c8cb313f4e30 100644
+--- a/include/gcem_incl/atanh.hpp
++++ b/include/gcem_incl/atanh.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_atanh_HPP
+ #define _gcem_atanh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -73,7 +79,13 @@ return_t<T>
+ atanh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::atanh_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::atanh(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/beta.hpp b/include/gcem_incl/beta.hpp
+index d7222c7422737b913db48b7af6426d88ad270a1a..b135bdcd6201d5a0a3190c325e593e4f292d0d39 100644
+--- a/include/gcem_incl/beta.hpp
++++ b/include/gcem_incl/beta.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_beta_HPP
+ #define _gcem_beta_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ /**
+  * Compile-time beta function
+  *
+@@ -36,7 +42,17 @@ common_return_t<T1,T2>
+ beta(const T1 a, const T2 b)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
++    return exp( lbeta(a,b) );
++  } else {
++#ifdef __cpp_lib_math_special_functions
++    return std::beta(a, b);
++#else
+     return exp( lbeta(a,b) );
++#endif
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/binomial_coef.hpp b/include/gcem_incl/binomial_coef.hpp
+index 79200aa2e7367fb99565dff9a21def077b4b2499..c63d138f9de0d3fd21da66dc7a145d9deb69b445 100644
+--- a/include/gcem_incl/binomial_coef.hpp
++++ b/include/gcem_incl/binomial_coef.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_binomial_coef_HPP
+ #define _gcem_binomial_coef_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -88,4 +91,6 @@ noexcept
+     return internal::binomial_coef_type_check(n,k);
+ }
+ 
+-#endif
+\ No newline at end of file
++}
++
++#endif
+diff --git a/include/gcem_incl/ceil.hpp b/include/gcem_incl/ceil.hpp
+index eed0c1c76b6ff7ca41ba73b95977d63e30385e60..f8fd82b2550a84e1cfc6729e22935fe8efb4812a 100644
+--- a/include/gcem_incl/ceil.hpp
++++ b/include/gcem_incl/ceil.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_ceil_HPP
+ #define _gcem_ceil_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -124,7 +130,13 @@ return_t<T>
+ ceil(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::ceil_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::ceil(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/copysign.hpp b/include/gcem_incl/copysign.hpp
+index 43c189eee325278f624df613f89229d617e98e25..c97e024b4e5919089e090518d535d28e8c4511a6 100644
+--- a/include/gcem_incl/copysign.hpp
++++ b/include/gcem_incl/copysign.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_copysign_HPP
+ #define _gcem_copysign_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ /**
+  * Compile-time copy sign function
+  *
+@@ -35,7 +41,13 @@ T1
+ copysign(const T1 x, const T2 y)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return( signbit(x) != signbit(y) ? -x : x );
++  } else {
++    return std::copysign(x, y);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/cos.hpp b/include/gcem_incl/cos.hpp
+index 3f674602d737044f021a52b57b7f850c1ee7c59e..cf25ffef3b2a63ca3aca6876b19fa6973aacc5a4 100644
+--- a/include/gcem_incl/cos.hpp
++++ b/include/gcem_incl/cos.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_cos_HPP
+ #define _gcem_cos_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -77,7 +83,13 @@ return_t<T>
+ cos(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::cos_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::cos(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/cosh.hpp b/include/gcem_incl/cosh.hpp
+index 36a232072b35b73c9fb69784a076475eb1868857..d56d2bc4d277ed811a4e893511d49a80f05b8cc5 100644
+--- a/include/gcem_incl/cosh.hpp
++++ b/include/gcem_incl/cosh.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_cosh_HPP
+ #define _gcem_cosh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -59,7 +65,13 @@ return_t<T>
+ cosh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::cosh_compute( static_cast<return_t<T>>(x) );
++  } else {
++    return std::cosh(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/erf.hpp b/include/gcem_incl/erf.hpp
+index 7d74d2e9b78b3bfd9f88420ce3b364837ebf161b..d48edea430f2a5b5e695c0c3aeb57bff0b7626f9 100644
+--- a/include/gcem_incl/erf.hpp
++++ b/include/gcem_incl/erf.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_erf_HPP
+ #define _gcem_erf_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -185,7 +191,13 @@ return_t<T>
+ erf(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::erf_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::erf(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/erf_inv.hpp b/include/gcem_incl/erf_inv.hpp
+index be580e5aa8d08161986d1c09943b62be0fedbf83..f9b45e08fbb38109ba2ab39cb6485873b122517e 100644
+--- a/include/gcem_incl/erf_inv.hpp
++++ b/include/gcem_incl/erf_inv.hpp
+@@ -28,6 +28,9 @@
+ #ifndef _gcem_erf_inv_HPP
+ #define _gcem_erf_inv_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -260,5 +263,6 @@ noexcept
+     return internal::erf_inv_begin( static_cast<return_t<T>>(p) );
+ }
+ 
++}
+ 
+ #endif
+diff --git a/include/gcem_incl/exp.hpp b/include/gcem_incl/exp.hpp
+index 03a8db8a2ecbf95e91ae6b0b18de3a22b70f1d2b..d4a36f3c9b05d70a4fec6b8d2078c44c0871601a 100644
+--- a/include/gcem_incl/exp.hpp
++++ b/include/gcem_incl/exp.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_exp_HPP
+ #define _gcem_exp_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -124,7 +130,13 @@ return_t<T>
+ exp(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::exp_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::exp(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/expm1.hpp b/include/gcem_incl/expm1.hpp
+index a3bb7649195a48a2a58cc41f8a660046e35721e4..91c6a66163c668ea01c22307d0d30dce98e5b8f4 100644
+--- a/include/gcem_incl/expm1.hpp
++++ b/include/gcem_incl/expm1.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_expm1_HPP
+ #define _gcem_expm1_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -70,7 +76,13 @@ return_t<T>
+ expm1(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::expm1_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::expm1(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/fabs.hpp b/include/gcem_incl/fabs.hpp
+index 58db0466e0778c61fc1da8b83db588911e59eb65..515aa2197ce7d4cacbabe5ba12f38c8e9b1cb680 100644
+--- a/include/gcem_incl/fabs.hpp
++++ b/include/gcem_incl/fabs.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_fabs_HPP
+ #define _gcem_fabs_HPP
+ 
++namespace gcem
++{
++
+ /**
+  * Compile-time floating-point absolute value function
+  *
+@@ -37,4 +40,6 @@ noexcept
+     return gcem::abs( static_cast<return_t<T>>(x) );
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/fabsf.hpp b/include/gcem_incl/fabsf.hpp
+index 9377b0cef984cc817dc24440d803b8af0100ad26..e2086bc859ae0677cae2b399e45a63680d788e29 100644
+--- a/include/gcem_incl/fabsf.hpp
++++ b/include/gcem_incl/fabsf.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_fabsf_HPP
+ #define _gcem_fabsf_HPP
+ 
++namespace gcem
++{
++
+ /**
+  * Compile-time floating-point absolute value function
+  *
+@@ -37,4 +40,6 @@ noexcept
+     return gcem::abs( static_cast<float>(x) );
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/fabsl.hpp b/include/gcem_incl/fabsl.hpp
+index 99aae95f54511e5e8788b5ca89363dc540cbf5c9..9dcdc9485413b49971e979de33338e98c2063f52 100644
+--- a/include/gcem_incl/fabsl.hpp
++++ b/include/gcem_incl/fabsl.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_fabsl_HPP
+ #define _gcem_fabsl_HPP
+ 
++namespace gcem
++{
++
+ /**
+  * Compile-time floating-point absolute value function
+  *
+@@ -37,4 +40,6 @@ noexcept
+     return gcem::abs( static_cast<long double>(x) );
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/factorial.hpp b/include/gcem_incl/factorial.hpp
+index d7762539c1b77c92057870f9ae5bf9f39426dbee..5d74bc24e7b3a95cb77dd1e25df3baecbbd221cc 100644
+--- a/include/gcem_incl/factorial.hpp
++++ b/include/gcem_incl/factorial.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_factorial_HPP
+ #define _gcem_factorial_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -97,4 +100,6 @@ noexcept
+     return internal::factorial_recur(x);
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/find_exponent.hpp b/include/gcem_incl/find_exponent.hpp
+index fc14a6b516d37fd6440f04702b874989d4fb7f50..b8c09d22786cf94bc587eb3cbf30a11198c7b2b2 100644
+--- a/include/gcem_incl/find_exponent.hpp
++++ b/include/gcem_incl/find_exponent.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_find_exponent_HPP
+ #define _gcem_find_exponent_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -54,4 +57,6 @@ noexcept
+ 
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/find_fraction.hpp b/include/gcem_incl/find_fraction.hpp
+index 7af2d9df95fe25d4d32a85073e0b79983c9a7016..cf359711451f7b6c14c2b1d9fd28fd3a3425efc7 100644
+--- a/include/gcem_incl/find_fraction.hpp
++++ b/include/gcem_incl/find_fraction.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_find_fraction_HPP
+ #define _gcem_find_fraction_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -43,4 +46,6 @@ noexcept
+ 
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/find_whole.hpp b/include/gcem_incl/find_whole.hpp
+index d18133278132ba585f8778561605417ffeed55a8..b9a8ef6b3f9d9dba0078bd33de2a51dbfa87c3fc 100644
+--- a/include/gcem_incl/find_whole.hpp
++++ b/include/gcem_incl/find_whole.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_find_whole_HPP
+ #define _gcem_find_whole_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -43,4 +46,6 @@ noexcept
+ 
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/floor.hpp b/include/gcem_incl/floor.hpp
+index 45020be5de6778b4595262cde0faaae2bcd638d8..d4bb1d61aa89eb555b93222b9af6b7388c477cc4 100644
+--- a/include/gcem_incl/floor.hpp
++++ b/include/gcem_incl/floor.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_floor_HPP
+ #define _gcem_floor_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -124,7 +130,13 @@ return_t<T>
+ floor(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::floor_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::floor(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/fmod.hpp b/include/gcem_incl/fmod.hpp
+index 965cf4a48d95878ed004360c4eded3667df40ad4..db336a6958f3d6de5e801b277620131ec21b25b2 100644
+--- a/include/gcem_incl/fmod.hpp
++++ b/include/gcem_incl/fmod.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_fmod_HPP
+ #define _gcem_fmod_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -64,7 +70,13 @@ common_return_t<T1,T2>
+ fmod(const T1 x, const T2 y)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::fmod_type_check(x,y);
++  } else {
++    return std::fmod(x, y);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/gcd.hpp b/include/gcem_incl/gcd.hpp
+index cfa548a19a532a6f1d5946dc1a68eaadc6578cd7..41d07de2e51da5b86ad25e2c2b1e3539a8eba6ee 100644
+--- a/include/gcem_incl/gcd.hpp
++++ b/include/gcem_incl/gcd.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_gcd_HPP
+ #define _gcem_gcd_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -79,4 +82,6 @@ noexcept
+     return internal::gcd_type_check(a,b);
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/hypot.hpp b/include/gcem_incl/hypot.hpp
+index fe67c1bd43b0f04ef64f0be19cba2651958ed737..22a402066430f4fde68f9d622ccdf7c646a3cbd6 100644
+--- a/include/gcem_incl/hypot.hpp
++++ b/include/gcem_incl/hypot.hpp
+@@ -27,6 +27,12 @@
+ #ifndef _gcem_hypot_HPP
+ #define _gcem_hypot_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -84,7 +90,13 @@ common_return_t<T1,T2>
+ hypot(const T1 x, const T2 y)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::hypot_type_check(x,y);
++  } else {
++    return std::hypot(x, y);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/incomplete_beta.hpp b/include/gcem_incl/incomplete_beta.hpp
+index 12287f551e1f89ab9525517dcec0762cc341845e..2ead5a1c83d3d093b10627a4d05bbc0fe7249746 100644
+--- a/include/gcem_incl/incomplete_beta.hpp
++++ b/include/gcem_incl/incomplete_beta.hpp
+@@ -27,6 +27,9 @@
+ #ifndef _gcem_incomplete_beta_HPP
+ #define _gcem_incomplete_beta_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -191,4 +194,6 @@ noexcept
+     return internal::incomplete_beta_type_check(a,b,z);
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/incomplete_beta_inv.hpp b/include/gcem_incl/incomplete_beta_inv.hpp
+index f00b362622c1b92ac327734c3fa539345d401042..a8c6fef8a66311201479871fc174668f945a4aec 100644
+--- a/include/gcem_incl/incomplete_beta_inv.hpp
++++ b/include/gcem_incl/incomplete_beta_inv.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_incomplete_beta_inv_HPP
+ #define _gcem_incomplete_beta_inv_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -349,4 +352,6 @@ noexcept
+     return internal::incomplete_beta_inv_type_check(a,b,p);
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/incomplete_gamma.hpp b/include/gcem_incl/incomplete_gamma.hpp
+index 21d3de564749e0e4be45bf59c95528cda06c269b..10e1a320071eabd708a1ac46ef391dc155429e2d 100644
+--- a/include/gcem_incl/incomplete_gamma.hpp
++++ b/include/gcem_incl/incomplete_gamma.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_incomplete_gamma_HPP
+ #define _gcem_incomplete_gamma_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -244,4 +247,6 @@ noexcept
+     return internal::incomplete_gamma_type_check(a,x);
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/incomplete_gamma_inv.hpp b/include/gcem_incl/incomplete_gamma_inv.hpp
+index bad75cd21184a34e0ab981398fe2425da68a011c..0a5709741eaef577b8a27b082f1bcc8ea7e26040 100644
+--- a/include/gcem_incl/incomplete_gamma_inv.hpp
++++ b/include/gcem_incl/incomplete_gamma_inv.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_incomplete_gamma_inv_HPP
+ #define _gcem_incomplete_gamma_inv_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -268,4 +271,6 @@ noexcept
+     return internal::incomplete_gamma_inv_type_check(a,p);
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/inv_sqrt.hpp b/include/gcem_incl/inv_sqrt.hpp
+index 62fa56eb3f20fdc649e2bb3eb55f80f2dc77ba73..b18eb793f39e014b7f887d2002cc29b2ebe34274 100644
+--- a/include/gcem_incl/inv_sqrt.hpp
++++ b/include/gcem_incl/inv_sqrt.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_inv_sqrt_HPP
+ #define _gcem_inv_sqrt_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -85,4 +88,6 @@ noexcept
+     return internal::inv_sqrt_check( static_cast<return_t<T>>(x) );
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/is_even.hpp b/include/gcem_incl/is_even.hpp
+index 20c8cc96128c1da1c3943245579520eaaa726c43..8f9e7a4022f15ed0ea5ab01ed20bdafc6e941593 100644
+--- a/include/gcem_incl/is_even.hpp
++++ b/include/gcem_incl/is_even.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_is_even_HPP
+ #define _gcem_is_even_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -38,4 +41,6 @@ noexcept
+ 
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/is_finite.hpp b/include/gcem_incl/is_finite.hpp
+index ff39a4677887b113daaa3ec6dc6810421389c7b3..e94afbec9fe41fc1ff5748faec90089517eaed44 100644
+--- a/include/gcem_incl/is_finite.hpp
++++ b/include/gcem_incl/is_finite.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_is_finite_HPP
+ #define _gcem_is_finite_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -75,4 +78,6 @@ noexcept
+ 
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/is_inf.hpp b/include/gcem_incl/is_inf.hpp
+index 703e6a132f2a1f526d1c13c66153393e4f46e90b..2153abe6116af2cbe240004b4455902808cd71e4 100644
+--- a/include/gcem_incl/is_inf.hpp
++++ b/include/gcem_incl/is_inf.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_is_inf_HPP
+ #define _gcem_is_inf_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -169,4 +172,6 @@ noexcept
+ 
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/is_nan.hpp b/include/gcem_incl/is_nan.hpp
+index 2fb1ed5c603793f3d16e8beaea388b4e72da7316..2ba70e455f20320d9c57944a4e824d024f183ae2 100644
+--- a/include/gcem_incl/is_nan.hpp
++++ b/include/gcem_incl/is_nan.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_is_nan_HPP
+ #define _gcem_is_nan_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -77,4 +80,6 @@ noexcept
+ 
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/is_odd.hpp b/include/gcem_incl/is_odd.hpp
+index db9767c3f07704df8892bf6f39996c564a4499ba..114397ab499d81e0289b4f94cf9a665a807b14cb 100644
+--- a/include/gcem_incl/is_odd.hpp
++++ b/include/gcem_incl/is_odd.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_is_odd_HPP
+ #define _gcem_is_odd_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -39,4 +42,6 @@ noexcept
+ 
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/lbeta.hpp b/include/gcem_incl/lbeta.hpp
+index c111c05d4a561d4c21ea865036063662fe1caa35..8ada34d05fad2db3ad685a165df020652d9f13ed 100644
+--- a/include/gcem_incl/lbeta.hpp
++++ b/include/gcem_incl/lbeta.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_lbeta_HPP
+ #define _gcem_lbeta_HPP
+ 
++namespace gcem
++{
++
+ /**
+  * Compile-time log-beta function
+  *
+@@ -39,4 +42,6 @@ noexcept
+     return( (lgamma(a) + lgamma(b)) - lgamma(a+b) );
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/lcm.hpp b/include/gcem_incl/lcm.hpp
+index a122ed147a3918ecb4238c2337b4c77686b7e915..e99ae7152dbd096dd22c2c120329549b642c1695 100644
+--- a/include/gcem_incl/lcm.hpp
++++ b/include/gcem_incl/lcm.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_lcm_HPP
+ #define _gcem_lcm_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -62,4 +65,6 @@ noexcept
+     return internal::lcm_type_check(a,b);
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/lgamma.hpp b/include/gcem_incl/lgamma.hpp
+index c613d34e2cc22991347cfff778c31a3dabbf6263..5bcc90aed53d85875f945578b44c271e447ee98a 100644
+--- a/include/gcem_incl/lgamma.hpp
++++ b/include/gcem_incl/lgamma.hpp
+@@ -28,6 +28,12 @@
+ #ifndef _gcem_lgamma_HPP
+ #define _gcem_lgamma_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -129,7 +135,13 @@ return_t<T>
+ lgamma(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::lgamma_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::lgamma(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/lmgamma.hpp b/include/gcem_incl/lmgamma.hpp
+index c5899d4fab22d72ccaf2028c9285725f9246a9ee..f50ad734df1c1547ac8de515878d7fabcfc70d6b 100644
+--- a/include/gcem_incl/lmgamma.hpp
++++ b/include/gcem_incl/lmgamma.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_lmgamma_HPP
+ #define _gcem_lmgamma_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -70,4 +73,6 @@ noexcept
+     return internal::lmgamma_recur(static_cast<return_t<T1>>(a),p);
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/log.hpp b/include/gcem_incl/log.hpp
+index 41fc5db7fe52af36fa3c6d1eea6e33e73271e9eb..6d1b8609ed81da88a7676af2d590c74f64962e5d 100644
+--- a/include/gcem_incl/log.hpp
++++ b/include/gcem_incl/log.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_log_HPP
+ #define _gcem_log_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -180,7 +186,13 @@ return_t<T>
+ log(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::log_integral_check( x );
++  } else {
++    return std::log(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/log10.hpp b/include/gcem_incl/log10.hpp
+index b87da556c7dc4cb3772d23e6aa0e0c40e46b000a..b361f1485347077fdf050aff3760db9fe639af1e 100644
+--- a/include/gcem_incl/log10.hpp
++++ b/include/gcem_incl/log10.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_log10_HPP
+ #define _gcem_log10_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -53,7 +59,13 @@ return_t<T>
+ log10(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::log10_check( x );
++  } else {
++    return std::log10(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/log1p.hpp b/include/gcem_incl/log1p.hpp
+index 8b33686d9633c4c2445f5f1e5eea6e2eebbcb2a5..7186f214d5f96a30a1ee78e3b97f60b7a20aef08 100644
+--- a/include/gcem_incl/log1p.hpp
++++ b/include/gcem_incl/log1p.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_log1p_HPP
+ #define _gcem_log1p_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -74,7 +80,13 @@ return_t<T>
+ log1p(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::log1p_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::log1p(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/log2.hpp b/include/gcem_incl/log2.hpp
+index eb255fef0512be92f3b08631a6d5bd827ac9cfbc..5530344578d9dc700585c588eabcb67990d37ffd 100644
+--- a/include/gcem_incl/log2.hpp
++++ b/include/gcem_incl/log2.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_log2_HPP
+ #define _gcem_log2_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -53,7 +59,13 @@ return_t<T>
+ log2(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::log2_check( x );
++  } else {
++    return std::log2(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/log_binomial_coef.hpp b/include/gcem_incl/log_binomial_coef.hpp
+index 52606eeec77f7e3f461960eed747dc27d5848f4a..3766063c7d6178d577c15d5b05159785513d1d9b 100644
+--- a/include/gcem_incl/log_binomial_coef.hpp
++++ b/include/gcem_incl/log_binomial_coef.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_log_binomial_coef_HPP
+ #define _gcem_log_binomial_coef_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -62,4 +65,6 @@ noexcept
+     return internal::log_binomial_coef_type_check(n,k);
+ }
+ 
+-#endif
+\ No newline at end of file
++}
++
++#endif
+diff --git a/include/gcem_incl/mantissa.hpp b/include/gcem_incl/mantissa.hpp
+index 869c00b0089cde7b628033b4379b9d1680cc93c2..718170cffafa48eca46623a6599e481adac398ca 100644
+--- a/include/gcem_incl/mantissa.hpp
++++ b/include/gcem_incl/mantissa.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_mantissa_HPP
+ #define _gcem_mantissa_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -44,4 +47,6 @@ noexcept
+ 
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/max.hpp b/include/gcem_incl/max.hpp
+index 1e34c93667830fae913f254846dda0d330df10d7..7a3c42fb7894e5c251450b7c41ecfa8072b96cb0 100644
+--- a/include/gcem_incl/max.hpp
++++ b/include/gcem_incl/max.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_max_HPP
+ #define _gcem_max_HPP
+ 
++#include <algorithm>
++#include <type_traits>
++
++namespace gcem
++{
++
+ /**
+  * Compile-time pairwise maximum function
+  *
+@@ -35,7 +41,13 @@ common_t<T1,T2>
+ max(const T1 x, const T2 y)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return( y < x ? x : y );
++  } else {
++    return std::max(x, y);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/min.hpp b/include/gcem_incl/min.hpp
+index a41f6eb8b512647586cad10bb0b925c67ceac163..9e42b45d3b7612caa3914d6b1252d6791331bbc6 100644
+--- a/include/gcem_incl/min.hpp
++++ b/include/gcem_incl/min.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_min_HPP
+ #define _gcem_min_HPP
+ 
++#include <algorithm>
++#include <type_traits>
++
++namespace gcem
++{
++
+ /**
+  * Compile-time pairwise minimum function
+  *
+@@ -35,7 +41,13 @@ common_t<T1,T2>
+ min(const T1 x, const T2 y)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return( y > x ? x : y );
++  } else {
++    return std::min(x, y);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/neg_zero.hpp b/include/gcem_incl/neg_zero.hpp
+index 3c6d464393f372a124ee2a263f890bc197b9f190..97547ac73405da7313c0ad4b277fcff4f7ef8437 100644
+--- a/include/gcem_incl/neg_zero.hpp
++++ b/include/gcem_incl/neg_zero.hpp
+@@ -22,6 +22,9 @@
+  * extract signbit for signed zeros
+  */
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -35,3 +38,5 @@ noexcept
+ }
+ 
+ }
++
++}
+diff --git a/include/gcem_incl/pow.hpp b/include/gcem_incl/pow.hpp
+index b2b688c12d6a204b9305bb9ad02aac53908855de..293d9ae1bd3b300e7e281d64df8cf5a3749967cd 100644
+--- a/include/gcem_incl/pow.hpp
++++ b/include/gcem_incl/pow.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_pow_HPP
+ #define _gcem_pow_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -76,7 +82,13 @@ common_t<T1,T2>
+ pow(const T1 base, const T2 exp_term)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::pow_check(base,exp_term);
++  } else {
++    return std::pow(base, exp_term);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/pow_integral.hpp b/include/gcem_incl/pow_integral.hpp
+index ddb8643d0f48988ac41645d6c6306b222be2e6a7..765c30eb87c7f166227d1c586912d1e0bdc51383 100644
+--- a/include/gcem_incl/pow_integral.hpp
++++ b/include/gcem_incl/pow_integral.hpp
+@@ -25,6 +25,9 @@
+ #ifndef _gcem_pow_integral_HPP
+ #define _gcem_pow_integral_HPP
+ 
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -125,4 +128,6 @@ noexcept
+ 
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/quadrature/gauss_legendre_30.hpp b/include/gcem_incl/quadrature/gauss_legendre_30.hpp
+index 2c31fa5d3a104dcaf0dd1b82863ffd9030ea6d7d..987436892dbea0c43e6854db0a4aa16ec86537ac 100644
+--- a/include/gcem_incl/quadrature/gauss_legendre_30.hpp
++++ b/include/gcem_incl/quadrature/gauss_legendre_30.hpp
+@@ -22,6 +22,9 @@
+  * Gauss-Legendre quadrature: 30 points
+  */
+ 
++namespace gcem
++{
++
+ static const long double gauss_legendre_30_points[30] = \
+ {
+     -0.05147184255531769583302521316672L,
+@@ -89,3 +92,5 @@ static const long double gauss_legendre_30_weights[30] = \
+     0.00796819249616660561546588347467L,
+     0.00796819249616660561546588347467L\
+ };
++
++}
+diff --git a/include/gcem_incl/quadrature/gauss_legendre_50.hpp b/include/gcem_incl/quadrature/gauss_legendre_50.hpp
+index 953477e7c6eab7da3623bf042e0d3053fcb0e1bc..52df7c756d5935498cf50da75d596902557fd47e 100644
+--- a/include/gcem_incl/quadrature/gauss_legendre_50.hpp
++++ b/include/gcem_incl/quadrature/gauss_legendre_50.hpp
+@@ -22,6 +22,9 @@
+  * Gauss-Legendre quadrature: 50 points
+  */
+ 
++namespace gcem
++{
++
+ static const long double gauss_legendre_50_points[50] = \
+ {
+     -0.03109833832718887611232898966595L,
+@@ -129,3 +132,5 @@ static const long double gauss_legendre_50_weights[50] = \
+     0.00290862255315514095840072434286L,
+     0.00290862255315514095840072434286L\
+ };
++
++}
+diff --git a/include/gcem_incl/round.hpp b/include/gcem_incl/round.hpp
+index 8f85203adaa233c07be00d03fb8f39fa0be7ff2b..b52140a06ae97feda0dd451c9b3c1e257b9d3c49 100644
+--- a/include/gcem_incl/round.hpp
++++ b/include/gcem_incl/round.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_round_HPP
+ #define _gcem_round_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -119,7 +125,13 @@ return_t<T>
+ round(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::round_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::round(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/sgn.hpp b/include/gcem_incl/sgn.hpp
+index 8a516b263889769ee742e42967955fcd46c8cfd9..30ed611ece046b0004185c69af9247c95c1632c8 100644
+--- a/include/gcem_incl/sgn.hpp
++++ b/include/gcem_incl/sgn.hpp
+@@ -21,6 +21,9 @@
+ #ifndef _gcem_sgn_HPP
+ #define _gcem_sgn_HPP
+ 
++namespace gcem
++{
++
+ /**
+  * Compile-time sign function
+  *
+@@ -42,4 +45,6 @@ noexcept
+                 0 );
+ }
+ 
++}
++
+ #endif
+diff --git a/include/gcem_incl/signbit.hpp b/include/gcem_incl/signbit.hpp
+index 64db9c9051439f2c9349ef155d0b2e0784bed20c..b142384253a8bff04a3df239e49f9a843442e4d1 100644
+--- a/include/gcem_incl/signbit.hpp
++++ b/include/gcem_incl/signbit.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_signbit_HPP
+ #define _gcem_signbit_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ /**
+  * Compile-time sign bit detection function
+  *
+@@ -34,11 +40,17 @@ bool
+ signbit(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+ #ifdef _MSC_VER
+     return( (x == T(0)) ? (_fpclass(x) == _FPCLASS_NZ) : (x < T(0)) );
+ #else
+     return GCEM_SIGNBIT(x);
+ #endif
++  } else {
++    return std::signbit(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/sin.hpp b/include/gcem_incl/sin.hpp
+index 8aa352d261d8fc227783b3f77481d315c408c38e..b9e79829d09a54d8c54d36ce83798fe3ab6eae72 100644
+--- a/include/gcem_incl/sin.hpp
++++ b/include/gcem_incl/sin.hpp
+@@ -27,6 +27,12 @@
+ #ifndef _gcem_sin_HPP
+ #define _gcem_sin_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -79,7 +85,13 @@ return_t<T>
+ sin(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::sin_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::sin(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/sinh.hpp b/include/gcem_incl/sinh.hpp
+index c8c2ad86517b0d80d64f77e2691ce8d1741cec62..069a592819603c77bfde398249f2297132f30adb 100644
+--- a/include/gcem_incl/sinh.hpp
++++ b/include/gcem_incl/sinh.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_sinh_HPP
+ #define _gcem_sinh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -59,7 +65,13 @@ return_t<T>
+ sinh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::sinh_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::sinh(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/sqrt.hpp b/include/gcem_incl/sqrt.hpp
+index 4d5555dc3c55ff4c81e5f58a25b8dbb415b95b95..d2246bdd1b493adcf18ad37fbeb13bb87c05072d 100644
+--- a/include/gcem_incl/sqrt.hpp
++++ b/include/gcem_incl/sqrt.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_sqrt_HPP
+ #define _gcem_sqrt_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -103,7 +109,13 @@ return_t<T>
+ sqrt(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::sqrt_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::sqrt(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/tan.hpp b/include/gcem_incl/tan.hpp
+index 8872570b2ae72d265456f25d409ea75400f70763..bd47b78ae3b9706a9e61ffe0c3a1d9b785b5cc3d 100644
+--- a/include/gcem_incl/tan.hpp
++++ b/include/gcem_incl/tan.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_tan_HPP
+ #define _gcem_tan_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -134,7 +140,13 @@ return_t<T>
+ tan(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::tan_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::tan(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/tanh.hpp b/include/gcem_incl/tanh.hpp
+index 3904921fe40ba9f13c2cde22bcd47c56f9884a8c..a4c20c16c2e7f825a6fcd0555d042b09c8d5cec3 100644
+--- a/include/gcem_incl/tanh.hpp
++++ b/include/gcem_incl/tanh.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_tanh_HPP
+ #define _gcem_tanh_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -107,7 +113,13 @@ return_t<T>
+ tanh(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::tanh_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::tanh(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/tgamma.hpp b/include/gcem_incl/tgamma.hpp
+index 1ce05ba58628a4c187149bd33e3b7ad9f8415e96..bdec6f881810ebe2fb7c795c5912a61340545a48 100644
+--- a/include/gcem_incl/tgamma.hpp
++++ b/include/gcem_incl/tgamma.hpp
+@@ -25,6 +25,12 @@
+ #ifndef _gcem_tgamma_HPP
+ #define _gcem_tgamma_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -74,7 +80,13 @@ return_t<T>
+ tgamma(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::tgamma_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::tgamma(x);
++  }
++}
++
+ }
+ 
+ #endif
+diff --git a/include/gcem_incl/trunc.hpp b/include/gcem_incl/trunc.hpp
+index 1d58cb3761cd9c4a8a451882b847a48697eaa2ee..396e95e3867d592d23717c6805ed0d0d9bcd8ff3 100644
+--- a/include/gcem_incl/trunc.hpp
++++ b/include/gcem_incl/trunc.hpp
+@@ -21,6 +21,12 @@
+ #ifndef _gcem_trunc_HPP
+ #define _gcem_trunc_HPP
+ 
++#include <cmath>
++#include <type_traits>
++
++namespace gcem
++{
++
+ namespace internal
+ {
+ 
+@@ -115,7 +121,13 @@ return_t<T>
+ trunc(const T x)
+ noexcept
+ {
++  if (std::is_constant_evaluated()) {
+     return internal::trunc_check( static_cast<return_t<T>>(x) );
++  } else {
++    return std::trunc(x);
++  }
++}
++
+ }
+ 
+ #endif

@@ -1,0 +1,148 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 26 Apr 2022 15:19:14 -0400
+Subject: [PATCH 04/10] Preprocessor cleanup
+
+---
+ include/uv.h        | 12 ------------
+ include/uv/unix.h   |  8 --------
+ src/unix/internal.h |  2 ++
+ src/win/fs.c        |  1 +
+ src/win/tty.c       |  2 ++
+ src/win/util.c      |  8 ++++++++
+ src/win/winsock.c   |  1 +
+ 7 files changed, 14 insertions(+), 20 deletions(-)
+
+diff --git a/include/uv.h b/include/uv.h
+index a62b3fa69b1087847f37c7093954e19a07959b74..931c96262b33090422cc1f6c519f8eb4bfc4f9b3 100644
+--- a/include/uv.h
++++ b/include/uv.h
+@@ -23,9 +23,6 @@
+ 
+ #ifndef UV_H
+ #define UV_H
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+ 
+ #if defined(BUILDING_UV_SHARED) && defined(USING_UV_SHARED)
+ #error "Define either BUILDING_UV_SHARED or USING_UV_SHARED, not both."
+@@ -796,16 +793,10 @@ UV_EXTERN int uv_tty_get_winsize(uv_tty_t*, int* width, int* height);
+ UV_EXTERN void uv_tty_set_vterm_state(uv_tty_vtermstate_t state);
+ UV_EXTERN int uv_tty_get_vterm_state(uv_tty_vtermstate_t* state);
+ 
+-#ifdef __cplusplus
+-extern "C++" {
+-
+ inline int uv_tty_set_mode(uv_tty_t* handle, int mode) {
+   return uv_tty_set_mode(handle, static_cast<uv_tty_mode_t>(mode));
+ }
+ 
+-}
+-#endif
+-
+ UV_EXTERN uv_handle_type uv_guess_handle(uv_file file);
+ 
+ enum {
+@@ -1936,7 +1927,4 @@ void uv_wtf8_to_utf16(const char* wtf8,
+ #undef UV_LOOP_PRIVATE_PLATFORM_FIELDS
+ #undef UV__ERR
+ 
+-#ifdef __cplusplus
+-}
+-#endif
+ #endif /* UV_H */
+diff --git a/include/uv/unix.h b/include/uv/unix.h
+index 538f98b6c5d657169e2750a549dd82bf0b948542..2073fe61a569386cc850d733a6c94cbb77a0a369 100644
+--- a/include/uv/unix.h
++++ b/include/uv/unix.h
+@@ -47,14 +47,6 @@
+ 
+ #if defined(__linux__)
+ # include "uv/linux.h"
+-#elif defined (__MVS__)
+-# include "uv/os390.h"
+-#elif defined(__PASE__)  /* __PASE__ and _AIX are both defined on IBM i */
+-# include "uv/posix.h"  /* IBM i needs uv/posix.h, not uv/aix.h */
+-#elif defined(_AIX)
+-# include "uv/aix.h"
+-#elif defined(__sun)
+-# include "uv/sunos.h"
+ #elif defined(__APPLE__)
+ # include "uv/darwin.h"
+ #elif defined(__DragonFly__)       || \
+diff --git a/src/unix/internal.h b/src/unix/internal.h
+index 4c167f5e529cb38a7418fc35dbbafc2a2cea626c..35ac6d1f6da75522d4bd69dcde696a8d0fd42bce 100644
+--- a/src/unix/internal.h
++++ b/src/unix/internal.h
+@@ -233,6 +233,8 @@ struct uv__statx {
+ #if defined(__linux__) && O_NDELAY != O_NONBLOCK
+ #undef uv__nonblock
+ #define uv__nonblock uv__nonblock_fcntl
++#undef UV__NONBLOCK_IS_IOCTL
++#define UV__NONBLOCK_IS_FCNTL
+ #endif
+ 
+ /* core */
+diff --git a/src/win/fs.c b/src/win/fs.c
+index b812293048e60264f3e849367b7a129c306f8502..05488e5d67101adba611f882ded4f6dc5a462d9a 100644
+--- a/src/win/fs.c
++++ b/src/win/fs.c
+@@ -43,6 +43,7 @@
+ #include "handle-inl.h"
+ #include "fs-fd-hash-inl.h"
+ 
++#pragma comment(lib, "Advapi32.lib")
+ 
+ #define UV_FS_FREE_PATHS         0x0002
+ #define UV_FS_FREE_PTR           0x0008
+diff --git a/src/win/tty.c b/src/win/tty.c
+index 67df01396ab50260b986fc9e7aff0368f6ceb308..7294f311e17d5d02e5873e60f8f0cdd551f6d34d 100644
+--- a/src/win/tty.c
++++ b/src/win/tty.c
+@@ -37,6 +37,8 @@
+ #include "stream-inl.h"
+ #include "req-inl.h"
+ 
++#pragma comment(lib, "User32.lib")
++
+ #ifndef InterlockedOr
+ # define InterlockedOr _InterlockedOr
+ #endif
+diff --git a/src/win/util.c b/src/win/util.c
+index 924d878e89260c2d3cf9a30b7151abeaf735b8be..5767c66c988c67edaf17155d5cb299a1936870ee 100644
+--- a/src/win/util.c
++++ b/src/win/util.c
+@@ -64,12 +64,20 @@
+ 
+ 
+ /* A RtlGenRandom() by any other name... */
++extern "C" {
+ extern BOOLEAN NTAPI SystemFunction036(PVOID Buffer, ULONG BufferLength);
++}
+ 
+ /* Cached copy of the process title, plus a mutex guarding it. */
+ static char *process_title;
+ static CRITICAL_SECTION process_title_lock;
+ 
++#pragma comment(lib, "Advapi32.lib")
++#pragma comment(lib, "IPHLPAPI.lib")
++#pragma comment(lib, "Psapi.lib")
++#pragma comment(lib, "Userenv.lib")
++#pragma comment(lib, "kernel32.lib")
++
+ /* Frequency of the high-resolution clock. */
+ static uint64_t hrtime_frequency_ = 0;
+ 
+diff --git a/src/win/winsock.c b/src/win/winsock.c
+index a68b095366a78e78675b49a078749f45dbad6015..7843e9f13321c32419cebaacde82d30f471e11d7 100644
+--- a/src/win/winsock.c
++++ b/src/win/winsock.c
+@@ -25,6 +25,7 @@
+ #include "uv.h"
+ #include "internal.h"
+ 
++#pragma comment(lib, "Ws2_32.lib")
+ 
+ /* Whether there are any non-IFS LSPs stacked on TCP */
+ int uv_tcp_non_ifs_lsp_ipv4;

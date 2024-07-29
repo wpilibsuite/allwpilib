@@ -1,64 +1,30 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <wpi/raw_ostream.h>
+#include <functional>
+#include <string>
+
+#include <wpi/deprecated.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/drive/RobotDriveBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class SpeedController;
+class MotorController;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as
  * the Kit of Parts drive base, "tank drive", or West Coast Drive.
  *
  * These drive bases typically have drop-center / skid-steer with two or more
- * wheels per side (e.g., 6WD or 8WD). This class takes a SpeedController per
- * side. For four and six motor drivetrains, construct and pass in
- * SpeedControllerGroup instances as follows.
- *
- * Four motor drivetrain:
- * @code{.cpp}
- * class Robot {
- *  public:
- *   frc::PWMVictorSPX m_frontLeft{1};
- *   frc::PWMVictorSPX m_rearLeft{2};
- *   frc::SpeedControllerGroup m_left{m_frontLeft, m_rearLeft};
- *
- *   frc::PWMVictorSPX m_frontRight{3};
- *   frc::PWMVictorSPX m_rearRight{4};
- *   frc::SpeedControllerGroup m_right{m_frontRight, m_rearRight};
- *
- *   frc::DifferentialDrive m_drive{m_left, m_right};
- * };
- * @endcode
- *
- * Six motor drivetrain:
- * @code{.cpp}
- * class Robot {
- *  public:
- *   frc::PWMVictorSPX m_frontLeft{1};
- *   frc::PWMVictorSPX m_midLeft{2};
- *   frc::PWMVictorSPX m_rearLeft{3};
- *   frc::SpeedControllerGroup m_left{m_frontLeft, m_midLeft, m_rearLeft};
- *
- *   frc::PWMVictorSPX m_frontRight{4};
- *   frc::PWMVictorSPX m_midRight{5};
- *   frc::PWMVictorSPX m_rearRight{6};
- *   frc::SpeedControllerGroup m_right{m_frontRight, m_midRight, m_rearRight};
- *
- *   frc::DifferentialDrive m_drive{m_left, m_right};
- * };
- * @endcode
+ * wheels per side (e.g., 6WD or 8WD). This class takes a setter per side. For
+ * four and six motor drivetrains, use CAN motor controller followers or
+ * PWMMotorController::AddFollower().
  *
  * A differential drive robot has left and right wheels separated by an
  * arbitrary width.
@@ -72,46 +38,67 @@ class SpeedController;
  * |       |
  * </pre>
  *
- * Each Drive() function provides different inverse kinematic relations for a
- * differential drive robot. Motor outputs for the right side are negated, so
- * motor direction inversion by the user is usually unnecessary.
+ * Each drive function provides different inverse kinematic relations for a
+ * differential drive robot.
  *
- * This library uses the NED axes convention (North-East-Down as external
- * reference in the world frame):
- * http://www.nuclearprojects.com/ins/images/axis_big.png.
- *
- * The positive X axis points ahead, the positive Y axis points to the right,
- * and the positive Z axis points down. Rotations follow the right-hand rule, so
- * clockwise rotation around the Z axis is positive.
+ * This library uses the NWU axes convention (North-West-Up as external
+ * reference in the world frame). The positive X axis points ahead, the positive
+ * Y axis points to the left, and the positive Z axis points up. Rotations
+ * follow the right-hand rule, so counterclockwise rotation around the Z axis is
+ * positive.
  *
  * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().
  *
- * <p>RobotDrive porting guide:
- * <br>TankDrive(double, double, bool) is equivalent to
- * RobotDrive#TankDrive(double, double, bool) if a deadband of 0 is used.
- * <br>ArcadeDrive(double, double, bool) is equivalent to
- * RobotDrive#ArcadeDrive(double, double, bool) if a deadband of 0 is used
- * and the the rotation input is inverted eg ArcadeDrive(y, -rotation, false)
- * <br>CurvatureDrive(double, double, bool) is similar in concept to
- * RobotDrive#Drive(double, double) with the addition of a quick turn
- * mode. However, it is not designed to give exactly the same response.
+ * MotorSafety is enabled by default. The tankDrive, arcadeDrive,
+ * or curvatureDrive methods should be called periodically to avoid Motor
+ * Safety timeouts.
  */
 class DifferentialDrive : public RobotDriveBase,
-                          public Sendable,
-                          public SendableHelper<DifferentialDrive> {
+                          public wpi::Sendable,
+                          public wpi::SendableHelper<DifferentialDrive> {
  public:
-  static constexpr double kDefaultQuickStopThreshold = 0.2;
-  static constexpr double kDefaultQuickStopAlpha = 0.1;
+  /**
+   * Wheel speeds for a differential drive.
+   *
+   * Uses normalized voltage [-1.0..1.0].
+   */
+  struct WheelSpeeds {
+    /// Left wheel speed.
+    double left = 0.0;
+    /// Right wheel speed.
+    double right = 0.0;
+  };
+
+  WPI_IGNORE_DEPRECATED
 
   /**
    * Construct a DifferentialDrive.
    *
-   * To pass multiple motors per side, use a SpeedControllerGroup. If a motor
-   * needs to be inverted, do so before passing it in.
+   * To pass multiple motors per side, use CAN motor controller followers or
+   * PWMSpeedController::AddFollower(). If a motor needs to be inverted, do so
+   * before passing it in.
+   *
+   * @param leftMotor Left motor.
+   * @param rightMotor Right motor.
    */
-  DifferentialDrive(SpeedController& leftMotor, SpeedController& rightMotor);
+  DifferentialDrive(MotorController& leftMotor, MotorController& rightMotor);
+
+  WPI_UNIGNORE_DEPRECATED
+
+  /**
+   * Construct a DifferentialDrive.
+   *
+   * To pass multiple motors per side, use CAN motor controller followers or
+   * PWMSpeedController::AddFollower(). If a motor needs to be inverted, do so
+   * before passing it in.
+   *
+   * @param leftMotor Left motor setter.
+   * @param rightMotor Right motor setter.
+   */
+  DifferentialDrive(std::function<void(double)> leftMotor,
+                    std::function<void(double)> rightMotor);
 
   ~DifferentialDrive() override = default;
 
@@ -127,7 +114,7 @@ class DifferentialDrive : public RobotDriveBase,
    * @param xSpeed        The speed at which the robot should drive along the X
    *                      axis [-1.0..1.0]. Forward is positive.
    * @param zRotation     The rotation rate of the robot around the Z axis
-   *                      [-1.0..1.0]. Clockwise is positive.
+   *                      [-1.0..1.0]. Counterclockwise is positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
   void ArcadeDrive(double xSpeed, double zRotation, bool squareInputs = true);
@@ -137,17 +124,17 @@ class DifferentialDrive : public RobotDriveBase,
    *
    * The rotation argument controls the curvature of the robot's path rather
    * than its rate of heading change. This makes the robot more controllable at
-   * high speeds. Also handles the robot's quick turn functionality - "quick
-   * turn" overrides constant-curvature turning for turn-in-place maneuvers.
+   * high speeds.
    *
-   * @param xSpeed      The robot's speed along the X axis [-1.0..1.0]. Forward
-   *                    is positive.
-   * @param zRotation   The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                    Clockwise is positive.
-   * @param isQuickTurn If set, overrides constant-curvature turning for
-   *                    turn-in-place maneuvers.
+   * @param xSpeed           The robot's speed along the X axis [-1.0..1.0].
+   *                         Forward is positive.
+   * @param zRotation        The normalized curvature [-1.0..1.0].
+   *                         Counterclockwise is positive.
+   * @param allowTurnInPlace If set, overrides constant-curvature turning for
+   *                         turn-in-place maneuvers. zRotation will control
+   *                         turning rate instead of curvature.
    */
-  void CurvatureDrive(double xSpeed, double zRotation, bool isQuickTurn);
+  void CurvatureDrive(double xSpeed, double zRotation, bool allowTurnInPlace);
 
   /**
    * Tank drive method for differential drive platform.
@@ -161,64 +148,65 @@ class DifferentialDrive : public RobotDriveBase,
   void TankDrive(double leftSpeed, double rightSpeed, bool squareInputs = true);
 
   /**
-   * Sets the QuickStop speed threshold in curvature drive.
+   * Arcade drive inverse kinematics for differential drive platform.
    *
-   * QuickStop compensates for the robot's moment of inertia when stopping after
-   * a QuickTurn.
+   * Note: Some drivers may prefer inverted rotation controls. This can be done
+   * by negating the value passed for rotation.
    *
-   * While QuickTurn is enabled, the QuickStop accumulator takes on the rotation
-   * rate value outputted by the low-pass filter when the robot's speed along
-   * the X axis is below the threshold. When QuickTurn is disabled, the
-   * accumulator's value is applied against the computed angular power request
-   * to slow the robot's rotation.
-   *
-   * @param threshold X speed below which quick stop accumulator will receive
-   *                  rotation rate values [0..1.0].
+   * @param xSpeed       The speed at which the robot should drive along the X
+   *                     axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation    The rotation rate of the robot around the Z axis
+   *                     [-1.0..1.0]. Clockwise is positive.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @return Wheel speeds [-1.0..1.0].
    */
-  void SetQuickStopThreshold(double threshold);
+  static WheelSpeeds ArcadeDriveIK(double xSpeed, double zRotation,
+                                   bool squareInputs = true);
 
   /**
-   * Sets the low-pass filter gain for QuickStop in curvature drive.
+   * Curvature drive inverse kinematics for differential drive platform.
    *
-   * The low-pass filter filters incoming rotation rate commands to smooth out
-   * high frequency changes.
+   * The rotation argument controls the curvature of the robot's path rather
+   * than its rate of heading change. This makes the robot more controllable at
+   * high speeds.
    *
-   * @param alpha Low-pass filter gain [0.0..2.0]. Smaller values result in
-   *              slower output changes. Values between 1.0 and 2.0 result in
-   *              output oscillation. Values below 0.0 and above 2.0 are
-   *              unstable.
+   * @param xSpeed           The robot's speed along the X axis [-1.0..1.0].
+   *                         Forward is positive.
+   * @param zRotation        The normalized curvature [-1.0..1.0]. Clockwise is
+   *                         positive.
+   * @param allowTurnInPlace If set, overrides constant-curvature turning for
+   *                         turn-in-place maneuvers. zRotation will control
+   *                         turning rate instead of curvature.
+   * @return Wheel speeds [-1.0..1.0].
    */
-  void SetQuickStopAlpha(double alpha);
+  static WheelSpeeds CurvatureDriveIK(double xSpeed, double zRotation,
+                                      bool allowTurnInPlace);
 
   /**
-   * Gets if the power sent to the right side of the drivetrain is multipled by
-   * -1.
+   * Tank drive inverse kinematics for differential drive platform.
    *
-   * @return true if the right side is inverted
+   * @param leftSpeed    The robot left side's speed along the X axis
+   *                     [-1.0..1.0]. Forward is positive.
+   * @param rightSpeed   The robot right side's speed along the X axis
+   *                     [-1.0..1.0]. Forward is positive.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @return Wheel speeds [-1.0..1.0].
    */
-  bool IsRightSideInverted() const;
-
-  /**
-   * Sets if the power sent to the right side of the drivetrain should be
-   * multipled by -1.
-   *
-   * @param rightSideInverted true if right side power should be multipled by -1
-   */
-  void SetRightSideInverted(bool rightSideInverted);
+  static WheelSpeeds TankDriveIK(double leftSpeed, double rightSpeed,
+                                 bool squareInputs = true);
 
   void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  SpeedController* m_leftMotor;
-  SpeedController* m_rightMotor;
+  std::function<void(double)> m_leftMotor;
+  std::function<void(double)> m_rightMotor;
 
-  double m_quickStopThreshold = kDefaultQuickStopThreshold;
-  double m_quickStopAlpha = kDefaultQuickStopAlpha;
-  double m_quickStopAccumulator = 0.0;
-  double m_rightSideInvertMultiplier = -1.0;
+  // Used for Sendable property getters
+  double m_leftOutput = 0.0;
+  double m_rightOutput = 0.0;
 };
 
 }  // namespace frc

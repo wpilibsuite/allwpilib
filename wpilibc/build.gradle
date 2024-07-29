@@ -60,18 +60,21 @@ staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
-apply plugin: DisableBuildingGTest
-
 nativeUtils.exportsConfigs {
     wpilibc {
-        x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
-        x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        x64ExcludeSymbols = [
+            '_CT??_R0?AV_System_error',
+            '_CT??_R0?AVexception',
+            '_CT??_R0?AVfailure',
+            '_CT??_R0?AVruntime_error',
+            '_CT??_R0?AVsystem_error',
+            '_CTA5?AVfailure',
+            '_TI5?AVfailure',
+            '_CT??_R0?AVout_of_range',
+            '_CTA3?AVout_of_range',
+            '_TI3?AVout_of_range',
+            '_CT??_R0?AVbad_cast'
+        ]
     }
 }
 
@@ -81,11 +84,17 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs = ['src/main/native/cpp', "$buildDir/generated/cpp"]
+                        srcDirs = [
+                            'src/main/native/cpp',
+                            'src/generated/main/native/cpp'
+                        ]
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs = [
+                            'src/main/native/include',
+                            'src/generated/main/native/include'
+                        ]
                     }
                 }
             }
@@ -94,10 +103,28 @@ model {
                     it.buildable = false
                     return
                 }
+
+                it.sources {
+                    versionSources(CppSourceSet) {
+                        source {
+                            srcDirs = [
+                                "${rootDir}/shared/singlelib",
+                                "$buildDir/generated/cpp"
+                            ]
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/native/include'
+                        }
+                    }
+                }
+
                 cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(it, 'shared')
                 project(':hal').addHalDependency(it, 'shared')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             }
         }
         "${nativeName}"(NativeLibrarySpec) {
@@ -108,14 +135,16 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', '../cameraserver/src/main/native/include'
+                        srcDirs 'src/main/native/include', 'src/generated/main/native/include', '../cameraserver/src/main/native/include'
                     }
                 }
             }
             binaries.all {
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(it, 'shared')
                 project(':hal').addHalDependency(it, 'shared')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
 
                 if (it instanceof SharedLibraryBinarySpec) {
                     cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
@@ -127,7 +156,6 @@ model {
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 }
-
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -148,14 +176,16 @@ model {
                 }
             }
             binaries.all {
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(it, 'shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                    nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
                 }
             }
         }
@@ -197,15 +227,17 @@ model {
             }
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+            project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             lib library: nativeName, linkage: 'shared'
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
             }
         }
     }
@@ -220,7 +252,7 @@ model {
                             def arch = it.targetPlatform.architecture.name
                             if (arch == 'x86-64' || arch == 'x86') {
                                 dependsOn it.tasks.install
-
+                                commandLine it.tasks.install.runScriptFile.get().asFile.toString()
                                 found = true
                             }
                         }

@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "RoboRioDataInternal.h"
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeRoboRioData() {
-  static RoboRioData srrd[1];
-  ::hal::SimRoboRioData = srrd;
+  static RoboRioData srrd;
+  ::hal::SimRoboRioData = &srrd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 RoboRioData* hal::SimRoboRioData;
 void RoboRioData::ResetData() {
@@ -36,16 +31,83 @@ void RoboRioData::ResetData() {
   userFaults6V.Reset(0);
   userFaults5V.Reset(0);
   userFaults3V3.Reset(0);
+  brownoutVoltage.Reset(6.75);
+  cpuTemp.Reset(45.0);
+  teamNumber.Reset(0);
+  m_serialNumber = "";
+  m_comments = "";
+}
+
+int32_t RoboRioData::RegisterSerialNumberCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_serialNumberMutex);
+  int32_t uid = m_serialNumberCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(GetSerialNumberName(), param, m_serialNumber.c_str(),
+             m_serialNumber.size());
+  }
+  return uid;
+}
+
+void RoboRioData::CancelSerialNumberCallback(int32_t uid) {
+  m_serialNumberCallbacks.Cancel(uid);
+}
+
+void RoboRioData::GetSerialNumber(struct WPI_String* serialNumber) {
+  std::scoped_lock lock(m_serialNumberMutex);
+  auto write = WPI_AllocateString(serialNumber, m_serialNumber.size());
+  m_serialNumber.copy(write, m_serialNumber.size());
+}
+
+void RoboRioData::SetSerialNumber(std::string_view serialNumber) {
+  // Limit serial number to 8 characters internally- serialnum environment
+  // variable is always 8 characters
+  if (serialNumber.size() > 8) {
+    serialNumber = serialNumber.substr(0, 8);
+  }
+  std::scoped_lock lock(m_serialNumberMutex);
+  m_serialNumber = std::string(serialNumber);
+  m_serialNumberCallbacks(m_serialNumber.c_str(), m_serialNumber.size());
+}
+
+int32_t RoboRioData::RegisterCommentsCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_commentsMutex);
+  int32_t uid = m_commentsCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(GetCommentsName(), param, m_comments.c_str(),
+             m_serialNumber.size());
+  }
+  return uid;
+}
+
+void RoboRioData::CancelCommentsCallback(int32_t uid) {
+  m_commentsCallbacks.Cancel(uid);
+}
+
+void RoboRioData::GetComments(struct WPI_String* comments) {
+  std::scoped_lock lock(m_commentsMutex);
+  auto write = WPI_AllocateString(comments, m_comments.size());
+  m_comments.copy(write, m_comments.size());
+}
+
+void RoboRioData::SetComments(std::string_view comments) {
+  if (comments.size() > 64) {
+    comments = comments.substr(0, 64);
+  }
+  std::scoped_lock lock(m_commentsMutex);
+  m_comments = std::string(comments);
+  m_commentsCallbacks(m_comments.c_str(), m_comments.size());
 }
 
 extern "C" {
-void HALSIM_ResetRoboRioData(int32_t index) {
-  SimRoboRioData[index].ResetData();
+void HALSIM_ResetRoboRioData(void) {
+  SimRoboRioData->ResetData();
 }
 
-#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                  \
-  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, RoboRio##CAPINAME, \
-                               SimRoboRioData, LOWERNAME)
+#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
+  HAL_SIMDATAVALUE_DEFINE_CAPI_NOINDEX(TYPE, HALSIM, RoboRio##CAPINAME, \
+                                       SimRoboRioData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, FPGAButton, fpgaButton)
 DEFINE_CAPI(double, VInVoltage, vInVoltage)
@@ -62,12 +124,48 @@ DEFINE_CAPI(HAL_Bool, UserActive3V3, userActive3V3)
 DEFINE_CAPI(int32_t, UserFaults6V, userFaults6V)
 DEFINE_CAPI(int32_t, UserFaults5V, userFaults5V)
 DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
+DEFINE_CAPI(double, BrownoutVoltage, brownoutVoltage)
+DEFINE_CAPI(double, CPUTemp, cpuTemp)
+DEFINE_CAPI(int32_t, TeamNumber, teamNumber)
+DEFINE_CAPI(HAL_RadioLEDState, RadioLEDState, radioLedState)
+
+int32_t HALSIM_RegisterRoboRioSerialNumberCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
+  return SimRoboRioData->RegisterSerialNumberCallback(callback, param,
+                                                      initialNotify);
+}
+void HALSIM_CancelRoboRioSerialNumberCallback(int32_t uid) {
+  return SimRoboRioData->CancelSerialNumberCallback(uid);
+}
+void HALSIM_GetRoboRioSerialNumber(struct WPI_String* serialNumber) {
+  SimRoboRioData->GetSerialNumber(serialNumber);
+}
+void HALSIM_SetRoboRioSerialNumber(const struct WPI_String* serialNumber) {
+  SimRoboRioData->SetSerialNumber(wpi::to_string_view(serialNumber));
+}
+
+int32_t HALSIM_RegisterRoboRioCommentsCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
+  return SimRoboRioData->RegisterCommentsCallback(callback, param,
+                                                  initialNotify);
+}
+void HALSIM_CancelRoboRioCommentsCallback(int32_t uid) {
+  SimRoboRioData->CancelCommentsCallback(uid);
+}
+void HALSIM_GetRoboRioComments(struct WPI_String* comments) {
+  SimRoboRioData->GetComments(comments);
+}
+void HALSIM_SetRoboRioComments(const struct WPI_String* comments) {
+  SimRoboRioData->SetComments(wpi::to_string_view(comments));
+}
+
+void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
+                                        void* param, HAL_Bool initialNotify);
 
 #define REGISTER(NAME) \
-  SimRoboRioData[index].NAME.RegisterCallback(callback, param, initialNotify)
+  SimRoboRioData->NAME.RegisterCallback(callback, param, initialNotify)
 
-void HALSIM_RegisterRoboRioAllCallbacks(int32_t index,
-                                        HAL_NotifyCallback callback,
+void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify) {
   REGISTER(fpgaButton);
   REGISTER(vInVoltage);
@@ -84,5 +182,8 @@ void HALSIM_RegisterRoboRioAllCallbacks(int32_t index,
   REGISTER(userFaults6V);
   REGISTER(userFaults5V);
   REGISTER(userFaults3V3);
+  REGISTER(brownoutVoltage);
+  REGISTER(cpuTemp);
+  REGISTER(radioLedState);
 }
 }  // extern "C"

@@ -1,23 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <stdint.h>
 
 #include <hal/CANAPITypes.h>
-#include <wpi/ArrayRef.h>
-
-#include "frc/ErrorBase.h"
 
 namespace frc {
 struct CANData {
+  /** Contents of the CAN packet. */
   uint8_t data[8];
+  /** Length of packet in bytes. */
   int32_t length;
+  /** CAN frame timestamp in milliseconds. */
   uint64_t timestamp;
 };
 
@@ -31,7 +28,7 @@ struct CANData {
  * All methods are thread save, however the buffer objects passed in
  * by the user need to not be modified for the duration of their calls.
  */
-class CAN : public ErrorBase {
+class CAN {
  public:
   /**
    * Create a new CAN communication interface with the specific device ID.
@@ -56,7 +53,7 @@ class CAN : public ErrorBase {
   /**
    * Closes the CAN communication.
    */
-  ~CAN() override;
+  ~CAN();
 
   CAN(CAN&&) = default;
   CAN& operator=(CAN&&) = default;
@@ -92,6 +89,38 @@ class CAN : public ErrorBase {
    * @param apiId The API ID to write.
    */
   void WriteRTRFrame(int length, int apiId);
+
+  /**
+   * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
+   *
+   * @param data The data to write (8 bytes max)
+   * @param length The data length to write
+   * @param apiId The API ID to write.
+   */
+  int WritePacketNoError(const uint8_t* data, int length, int apiId);
+
+  /**
+   * Write a repeating packet to the CAN device with a specific ID. This ID is
+   * 10 bits. The RoboRIO will automatically repeat the packet at the specified
+   * interval
+   *
+   * @param data The data to write (8 bytes max)
+   * @param length The data length to write
+   * @param apiId The API ID to write.
+   * @param repeatMs The period to repeat the packet at.
+   */
+  int WritePacketRepeatingNoError(const uint8_t* data, int length, int apiId,
+                                  int repeatMs);
+
+  /**
+   * Write an RTR frame to the CAN device with a specific ID. This ID is 10
+   * bits. The length by spec must match what is returned by the responding
+   * device
+   *
+   * @param length The length to request (0 to 8)
+   * @param apiId The API ID to write.
+   */
+  int WriteRTRFrameNoError(int length, int apiId);
 
   /**
    * Stop a repeating packet with a specific ID. This ID is 10 bits.
@@ -132,7 +161,19 @@ class CAN : public ErrorBase {
    */
   bool ReadPacketTimeout(int apiId, int timeoutMs, CANData* data);
 
+  /**
+   * Reads the current value of the millisecond-resolution timer that CANData
+   * timestamps are based on
+   *
+   * @return Current value of timer used as a base time for CANData timestamps
+   * in milliseconds
+   */
+  static uint64_t GetTimestampBaseTime();
+
+  /// Team manufacturer.
   static constexpr HAL_CANManufacturer kTeamManufacturer = HAL_CAN_Man_kTeamUse;
+
+  /// Team device type.
   static constexpr HAL_CANDeviceType kTeamDeviceType =
       HAL_CAN_Dev_kMiscellaneous;
 

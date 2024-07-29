@@ -1,13 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+#include <functional>
 #include <memory>
+#include <utility>
+
+#include "frc2/command/SwerveControllerCommand.h"
 
 namespace frc2 {
 
@@ -15,18 +16,16 @@ template <size_t NumModules>
 SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
-    frc2::PIDController xController, frc2::PIDController yController,
+    frc::PIDController xController, frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
+    std::function<frc::Rotation2d()> desiredRotation,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
-    std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    Requirements requirements)
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_kinematics(kinematics),
-      m_xController(std::make_unique<frc2::PIDController>(xController)),
-      m_yController(std::make_unique<frc2::PIDController>(yController)),
-      m_thetaController(
-          std::make_unique<frc::ProfiledPIDController<units::radians>>(
-              thetaController)),
+      m_controller(xController, yController, thetaController),
+      m_desiredRotation(std::move(desiredRotation)),
       m_outputStates(output) {
   this->AddRequirements(requirements);
 }
@@ -35,61 +34,67 @@ template <size_t NumModules>
 SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
-    frc2::PIDController xController, frc2::PIDController yController,
+    frc::PIDController xController, frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
-    wpi::ArrayRef<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    Requirements requirements)
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_kinematics(kinematics),
-      m_xController(std::make_unique<frc2::PIDController>(xController)),
-      m_yController(std::make_unique<frc2::PIDController>(yController)),
-      m_thetaController(
-          std::make_unique<frc::ProfiledPIDController<units::radians>>(
-              thetaController)),
+      m_controller(xController, yController, thetaController),
+      m_outputStates(output) {
+  this->AddRequirements(requirements);
+}
+
+template <size_t NumModules>
+SwerveControllerCommand<NumModules>::SwerveControllerCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::SwerveDriveKinematics<NumModules> kinematics,
+    frc::HolonomicDriveController controller,
+    std::function<frc::Rotation2d()> desiredRotation,
+    std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
+    Requirements requirements)
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
+      m_kinematics(kinematics),
+      m_controller(std::move(controller)),
+      m_desiredRotation(std::move(desiredRotation)),
+      m_outputStates(output) {
+  this->AddRequirements(requirements);
+}
+
+template <size_t NumModules>
+SwerveControllerCommand<NumModules>::SwerveControllerCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::SwerveDriveKinematics<NumModules> kinematics,
+    frc::HolonomicDriveController controller,
+    std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
+    Requirements requirements)
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
+      m_kinematics(kinematics),
+      m_controller(std::move(controller)),
       m_outputStates(output) {
   this->AddRequirements(requirements);
 }
 
 template <size_t NumModules>
 void SwerveControllerCommand<NumModules>::Initialize() {
-  m_finalPose = m_trajectory.Sample(m_trajectory.TotalTime()).pose;
-
-  m_timer.Reset();
-  m_timer.Start();
+  if (m_desiredRotation == nullptr) {
+    m_desiredRotation = [&] {
+      return m_trajectory.States().back().pose.Rotation();
+    };
+  }
+  m_timer.Restart();
 }
 
 template <size_t NumModules>
 void SwerveControllerCommand<NumModules>::Execute() {
-  auto curTime = units::second_t(m_timer.Get());
-
+  auto curTime = m_timer.Get();
   auto m_desiredState = m_trajectory.Sample(curTime);
-  auto m_desiredPose = m_desiredState.pose;
-
-  auto m_poseError = m_desiredPose.RelativeTo(m_pose());
-
-  auto targetXVel = units::meters_per_second_t(m_xController->Calculate(
-      (m_pose().Translation().X().template to<double>()),
-      (m_desiredPose.Translation().X().template to<double>())));
-  auto targetYVel = units::meters_per_second_t(m_yController->Calculate(
-      (m_pose().Translation().Y().template to<double>()),
-      (m_desiredPose.Translation().Y().template to<double>())));
-
-  // Profiled PID Controller only takes meters as setpoint and measurement
-  // The robot will go to the desired rotation of the final pose in the
-  // trajectory, not following the poses at individual states.
-  auto targetAngularVel =
-      units::radians_per_second_t(m_thetaController->Calculate(
-          m_pose().Rotation().Radians(), m_finalPose.Rotation().Radians()));
-
-  auto vRef = m_desiredState.velocity;
-
-  targetXVel += vRef * m_poseError.Rotation().Cos();
-  targetYVel += vRef * m_poseError.Rotation().Sin();
 
   auto targetChassisSpeeds =
-      frc::ChassisSpeeds{targetXVel, targetYVel, targetAngularVel};
-
+      m_controller.Calculate(m_pose(), m_desiredState, m_desiredRotation());
   auto targetModuleStates =
       m_kinematics.ToSwerveModuleStates(targetChassisSpeeds);
 
@@ -103,7 +108,7 @@ void SwerveControllerCommand<NumModules>::End(bool interrupted) {
 
 template <size_t NumModules>
 bool SwerveControllerCommand<NumModules>::IsFinished() {
-  return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
+  return m_timer.HasElapsed(m_trajectory.TotalTime());
 }
 
 }  // namespace frc2

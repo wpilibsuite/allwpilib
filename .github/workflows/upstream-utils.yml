@@ -1,0 +1,126 @@
+name: Upstream utils
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    name: "Update"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch all history and metadata
+        run: |
+          git checkout -b pr
+          git branch -f main origin/main
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+      - name: Configure committer identity
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+      - name: Run apriltag.py
+        run: |
+          cd upstream_utils
+          ./apriltag.py clone
+          ./apriltag.py copy-upstream-to-thirdparty
+      - name: Run eigen.py
+        run: |
+          cd upstream_utils
+          ./eigen.py clone
+          ./eigen.py copy-upstream-to-thirdparty
+      - name: Run fmt.py
+        run: |
+          cd upstream_utils
+          ./fmt.py clone
+          ./fmt.py copy-upstream-to-thirdparty
+      - name: Run gcem.py
+        run: |
+          cd upstream_utils
+          ./gcem.py clone
+          ./gcem.py copy-upstream-to-thirdparty
+      - name: Run gl3w.py
+        run: |
+          cd upstream_utils
+          ./gl3w.py clone
+          ./gl3w.py copy-upstream-to-thirdparty
+      - name: Run glfw.py
+        run: |
+          cd upstream_utils
+          ./glfw.py clone
+          ./glfw.py copy-upstream-to-thirdparty
+      - name: Run googletest.py
+        run: |
+          cd upstream_utils
+          ./googletest.py clone
+          ./googletest.py copy-upstream-to-thirdparty
+      - name: Run imgui.py
+        run: |
+          cd upstream_utils
+          ./imgui.py clone
+          ./imgui.py copy-upstream-to-thirdparty
+      - name: Run implot.py
+        run: |
+          cd upstream_utils
+          ./implot.py clone
+          ./implot.py copy-upstream-to-thirdparty
+      - name: Run json.py
+        run: |
+          cd upstream_utils
+          ./json.py clone
+          ./json.py copy-upstream-to-thirdparty
+      - name: Run libuv.py
+        run: |
+          cd upstream_utils
+          ./libuv.py clone
+          ./libuv.py copy-upstream-to-thirdparty
+      - name: Run llvm.py
+        run: |
+          cd upstream_utils
+          ./llvm.py clone
+          ./llvm.py copy-upstream-to-thirdparty
+      - name: Run mpack.py
+        run: |
+          cd upstream_utils
+          ./mpack.py clone
+          ./mpack.py copy-upstream-to-thirdparty
+      - name: Run stack_walker.py
+        run: |
+          cd upstream_utils
+          ./stack_walker.py clone
+          ./stack_walker.py copy-upstream-to-thirdparty
+      - name: Run memory.py
+        run: |
+          cd upstream_utils
+          ./memory.py clone
+          ./memory.py copy-upstream-to-thirdparty
+      - name: Run protobuf.py
+        run: |
+          cd upstream_utils
+          ./protobuf.py clone
+          ./protobuf.py copy-upstream-to-thirdparty
+      - name: Run sleipnir.py
+        run: |
+          cd upstream_utils
+          ./sleipnir.py clone
+          ./sleipnir.py copy-upstream-to-thirdparty
+      - name: Run stb.py
+        run: |
+          cd upstream_utils
+          ./stb.py clone
+          ./stb.py copy-upstream-to-thirdparty
+      - name: Add untracked files to index so they count as changes
+        run: git add -A
+      - name: Check output
+        run: git --no-pager diff --exit-code HEAD

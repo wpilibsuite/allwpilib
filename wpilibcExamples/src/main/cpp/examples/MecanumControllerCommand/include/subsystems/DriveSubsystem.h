@@ -1,21 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
-#include <frc/interfaces/Gyro.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
@@ -42,7 +38,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to
    *                      the field.
    */
-  void Drive(double xSpeed, double ySpeed, double rot, bool feildRelative);
+  void Drive(double xSpeed, double ySpeed, double rot, bool fieldRelative);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
@@ -85,9 +81,16 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::MecanumDriveWheelSpeeds getCurrentWheelSpeeds();
 
   /**
-   * Sets the drive SpeedControllers to a desired voltage.
+   * Gets the distances travelled by each wheel.
+   *
+   * @return the distances travelled by each wheel.
    */
-  void SetSpeedControllersVolts(units::volt_t frontLeftPower,
+  frc::MecanumDriveWheelPositions getCurrentWheelDistances();
+
+  /**
+   * Sets the drive MotorControllers to a desired voltage.
+   */
+  void SetMotorControllersVolts(units::volt_t frontLeftPower,
                                 units::volt_t rearLeftPower,
                                 units::volt_t frontRightPower,
                                 units::volt_t rearRightPower);
@@ -103,9 +106,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading in degrees, from 180 to 180
+   * @return the robot's heading in degrees, from -180 to 180
    */
-  double GetHeading();
+  units::degree_t GetHeading() const;
 
   /**
    * Zeroes the heading of the robot.
@@ -138,13 +141,16 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  frc::PWMVictorSPX m_frontLeft;
-  frc::PWMVictorSPX m_rearLeft;
-  frc::PWMVictorSPX m_frontRight;
-  frc::PWMVictorSPX m_rearRight;
+  frc::PWMSparkMax m_frontLeft;
+  frc::PWMSparkMax m_rearLeft;
+  frc::PWMSparkMax m_frontRight;
+  frc::PWMSparkMax m_rearRight;
 
   // The robot's drive
-  frc::MecanumDrive m_drive{m_frontLeft, m_rearLeft, m_frontRight, m_rearRight};
+  frc::MecanumDrive m_drive{[&](double output) { m_frontLeft.Set(output); },
+                            [&](double output) { m_rearLeft.Set(output); },
+                            [&](double output) { m_frontRight.Set(output); },
+                            [&](double output) { m_rearRight.Set(output); }};
 
   // The front-left-side drive encoder
   frc::Encoder m_frontLeftEncoder;

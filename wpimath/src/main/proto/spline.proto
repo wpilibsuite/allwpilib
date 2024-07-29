@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+option java_package = "edu.wpi.first.math.proto";
+
+message ProtobufCubicHermiteSpline {
+  repeated double x_initial = 1;
+  repeated double x_final = 2;
+  repeated double y_initial = 3;
+  repeated double y_final = 4;
+}
+
+message ProtobufQuinticHermiteSpline {
+  repeated double x_initial = 1;
+  repeated double x_final = 2;
+  repeated double y_initial = 3;
+  repeated double y_final = 4;
+}

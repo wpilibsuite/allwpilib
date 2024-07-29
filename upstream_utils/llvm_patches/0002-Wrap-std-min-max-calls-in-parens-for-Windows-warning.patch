@@ -1,0 +1,152 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sat, 7 May 2022 22:12:41 -0400
+Subject: [PATCH 02/37] Wrap std::min/max calls in parens, for Windows warnings
+
+---
+ llvm/include/llvm/ADT/DenseMap.h       |  4 ++--
+ llvm/include/llvm/ADT/SmallVector.h    |  6 +++---
+ llvm/include/llvm/Support/ConvertUTF.h |  2 +-
+ llvm/include/llvm/Support/MathExtras.h | 18 +++++++++---------
+ 4 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
+index 3ef6a7cd1b4b587e61fcb9475d9f3516018bf2ee..108193f04486425f3b7f039cd9d2004be6facafb 100644
+--- a/llvm/include/llvm/ADT/DenseMap.h
++++ b/llvm/include/llvm/ADT/DenseMap.h
+@@ -416,7 +416,7 @@ protected:
+       return 0;
+     // +1 is required because of the strict equality.
+     // For example if NumEntries is 48, we need to return 401.
+-    return NextPowerOf2(NumEntries * 4 / 3 + 1);
++    return static_cast<unsigned>(NextPowerOf2(NumEntries * 4 / 3 + 1));
+   }
+ 
+   void moveFromOldBuckets(BucketT *OldBucketsBegin, BucketT *OldBucketsEnd) {
+@@ -852,7 +852,7 @@ public:
+     // Reduce the number of buckets.
+     unsigned NewNumBuckets = 0;
+     if (OldNumEntries)
+-      NewNumBuckets = std::max(64, 1 << (Log2_32_Ceil(OldNumEntries) + 1));
++      NewNumBuckets = (std::max)(64, 1 << (Log2_32_Ceil(OldNumEntries) + 1));
+     if (NewNumBuckets == NumBuckets) {
+       this->BaseT::initEmpty();
+       return;
+diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
+index c96fd0e4956ee6d586f85dc79623de137e781ce0..d7600fe209a58deb07c63e2553f9dad62e06e973 100644
+--- a/llvm/include/llvm/ADT/SmallVector.h
++++ b/llvm/include/llvm/ADT/SmallVector.h
+@@ -55,7 +55,7 @@ protected:
+ 
+   /// The maximum value of the Size_T used.
+   static constexpr size_t SizeTypeMax() {
+-    return std::numeric_limits<Size_T>::max();
++    return (std::numeric_limits<Size_T>::max)();
+   }
+ 
+   SmallVectorBase() = delete;
+@@ -289,7 +289,7 @@ public:
+ 
+   size_type size_in_bytes() const { return size() * sizeof(T); }
+   size_type max_size() const {
+-    return std::min(this->SizeTypeMax(), size_type(-1) / sizeof(T));
++    return (std::min)(this->SizeTypeMax(), size_type(-1) / sizeof(T));
+   }
+ 
+   size_t capacity_in_bytes() const { return capacity() * sizeof(T); }
+@@ -721,7 +721,7 @@ public:
+     }
+ 
+     // Assign over existing elements.
+-    std::fill_n(this->begin(), std::min(NumElts, this->size()), Elt);
++    std::fill_n(this->begin(), (std::min)(NumElts, this->size()), Elt);
+     if (NumElts > this->size())
+       std::uninitialized_fill_n(this->end(), NumElts - this->size(), Elt);
+     else if (NumElts < this->size())
+diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
+index 5c0e3009c25446a34882fb98329b1d955231bb39..72321022beb373945f7935ed72944fd68eb7d02f 100644
+--- a/llvm/include/llvm/Support/ConvertUTF.h
++++ b/llvm/include/llvm/Support/ConvertUTF.h
+@@ -127,7 +127,7 @@ namespace llvm {
+ typedef unsigned int    UTF32;  /* at least 32 bits */
+ typedef unsigned short  UTF16;  /* at least 16 bits */
+ typedef unsigned char   UTF8;   /* typically 8 bits */
+-typedef unsigned char   Boolean; /* 0 or 1 */
++typedef bool   Boolean; /* 0 or 1 */
+ 
+ /* Some fundamental constants */
+ #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index aa4f4d2ed42e262f27e3f7f5ce275baf7e556c2d..5cabfdd6493fee33fbc74b831dc1fa3c91ba725d 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -311,26 +311,26 @@ template <> constexpr inline size_t CTLog2<1>() { return 0; }
+ /// (32 bit edition.)
+ /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
+ inline unsigned Log2_32(uint32_t Value) {
+-  return 31 - llvm::countl_zero(Value);
++  return static_cast<unsigned>(31 - llvm::countl_zero(Value));
+ }
+ 
+ /// Return the floor log base 2 of the specified value, -1 if the value is zero.
+ /// (64 bit edition.)
+ inline unsigned Log2_64(uint64_t Value) {
+-  return 63 - llvm::countl_zero(Value);
++  return static_cast<unsigned>(63 - llvm::countl_zero(Value));
+ }
+ 
+ /// Return the ceil log base 2 of the specified value, 32 if the value is zero.
+ /// (32 bit edition).
+ /// Ex. Log2_32_Ceil(32) == 5, Log2_32_Ceil(1) == 0, Log2_32_Ceil(6) == 3
+ inline unsigned Log2_32_Ceil(uint32_t Value) {
+-  return 32 - llvm::countl_zero(Value - 1);
++  return static_cast<unsigned>(32 - llvm::countl_zero(Value - 1));
+ }
+ 
+ /// Return the ceil log base 2 of the specified value, 64 if the value is zero.
+ /// (64 bit edition.)
+ inline unsigned Log2_64_Ceil(uint64_t Value) {
+-  return 64 - llvm::countl_zero(Value - 1);
++  return static_cast<unsigned>(64 - llvm::countl_zero(Value - 1));
+ }
+ 
+ /// A and B are either alignments or offsets. Return the minimum alignment that
+@@ -482,7 +482,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
+   T Z = X + Y;
+   Overflowed = (Z < X || Z < Y);
+   if (Overflowed)
+-    return std::numeric_limits<T>::max();
++    return (std::numeric_limits<T>::max)();
+   else
+     return Z;
+ }
+@@ -495,7 +495,7 @@ std::enable_if_t<std::is_unsigned_v<T>, T> SaturatingAdd(T X, T Y, T Z,
+   bool Overflowed = false;
+   T XY = SaturatingAdd(X, Y, &Overflowed);
+   if (Overflowed)
+-    return SaturatingAdd(std::numeric_limits<T>::max(), T(1), Args...);
++    return SaturatingAdd((std::numeric_limits<T>::max)(), T(1), Args...);
+   return SaturatingAdd(XY, Z, Args...);
+ }
+ 
+@@ -519,7 +519,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
+   // Special case: if X or Y is 0, Log2_64 gives -1, and Log2Z
+   // will necessarily be less than Log2Max as desired.
+   int Log2Z = Log2_64(X) + Log2_64(Y);
+-  const T Max = std::numeric_limits<T>::max();
++  const T Max = (std::numeric_limits<T>::max)();
+   int Log2Max = Log2_64(Max);
+   if (Log2Z < Log2Max) {
+     return X * Y;
+@@ -639,9 +639,9 @@ std::enable_if_t<std::is_signed_v<T>, T> MulOverflow(T X, T Y, T &Result) {
+   // Check how the max allowed absolute value (2^n for negative, 2^(n-1) for
+   // positive) divided by an argument compares to the other.
+   if (IsNegative)
+-    return UX > (static_cast<U>(std::numeric_limits<T>::max()) + U(1)) / UY;
++    return UX > (static_cast<U>((std::numeric_limits<T>::max)()) + U(1)) / UY;
+   else
+-    return UX > (static_cast<U>(std::numeric_limits<T>::max())) / UY;
++    return UX > (static_cast<U>((std::numeric_limits<T>::max)())) / UY;
+ }
+ 
+ } // End llvm namespace

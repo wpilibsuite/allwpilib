@@ -1,25 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <memory>
-
-#include <wpi/ArrayRef.h>
-#include <wpi/raw_ostream.h>
+#include <span>
+#include <string>
 
 #include "frc/MotorSafety.h"
 
 namespace frc {
 
-class SpeedController;
-
 /**
  * Common base class for drive platforms.
+ *
+ * MotorSafety is enabled by default.
  */
 class RobotDriveBase : public MotorSafety {
  public:
@@ -27,12 +23,19 @@ class RobotDriveBase : public MotorSafety {
    * The location of a motor on the robot for the purpose of driving.
    */
   enum MotorType {
+    /// Front-left motor.
     kFrontLeft = 0,
+    /// Front-right motor.
     kFrontRight = 1,
+    /// Rear-left motor.
     kRearLeft = 2,
+    /// Rear-right motor.
     kRearRight = 3,
+    /// Left motor.
     kLeft = 0,
+    /// Right motor.
     kRight = 1,
+    /// Back motor.
     kBack = 2
   };
 
@@ -47,7 +50,7 @@ class RobotDriveBase : public MotorSafety {
    *
    * The default value is 0.02. Inputs smaller than the deadband are set to 0.0
    * while inputs larger than the deadband are scaled from 0.0 to 1.0. See
-   * ApplyDeadband().
+   * frc::ApplyDeadband().
    *
    * @param deadband The deadband to set.
    */
@@ -71,26 +74,26 @@ class RobotDriveBase : public MotorSafety {
   void FeedWatchdog();
 
   void StopMotor() override = 0;
-  void GetDescription(wpi::raw_ostream& desc) const override = 0;
+  std::string GetDescription() const override = 0;
 
  protected:
-  /**
-   * Returns 0.0 if the given value is within the specified range around zero.
-   * The remaining range between the deadband and 1.0 is scaled from 0.0 to 1.0.
-   *
-   * @param value    value to clip
-   * @param deadband range around zero
-   */
-  double ApplyDeadband(double number, double deadband);
+  /// Default input deadband.
+  static constexpr double kDefaultDeadband = 0.02;
+
+  /// Default maximum output.
+  static constexpr double kDefaultMaxOutput = 1.0;
 
   /**
-   * Normalize all wheel speeds if the magnitude of any wheel is greater than
+   * Renormalize all wheel speeds if the magnitude of any wheel is greater than
    * 1.0.
    */
-  void Normalize(wpi::MutableArrayRef<double> wheelSpeeds);
+  static void Desaturate(std::span<double> wheelSpeeds);
 
-  double m_deadband = 0.02;
-  double m_maxOutput = 1.0;
+  /// Input deadband.
+  double m_deadband = kDefaultDeadband;
+
+  /// Maximum output.
+  double m_maxOutput = kDefaultMaxOutput;
 };
 
 }  // namespace frc

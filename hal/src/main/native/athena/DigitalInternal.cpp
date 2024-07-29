@@ -1,13 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "DigitalInternal.h"
 
 #include <atomic>
+#include <cmath>
 #include <thread>
 
 #include <FRC_NetworkCommunication/LoadOut.h>
@@ -46,8 +44,12 @@ void InitializeDigitalInternal() {
 }  // namespace init
 
 namespace detail {
-wpi::mutex& UnsafeGetDIOMutex() { return digitalDIOMutex; }
-tDIO* UnsafeGetDigialSystem() { return digitalSystem.get(); }
+wpi::mutex& UnsafeGetDIOMutex() {
+  return digitalDIOMutex;
+}
+tDIO* UnsafeGetDigialSystem() {
+  return digitalSystem.get();
+}
 int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status) {
   auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
@@ -72,11 +74,15 @@ void initializeDigital(int32_t* status) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (initialized) return;
+  if (initialized) {
+    return;
+  }
 
   std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (initialized) return;
+  if (initialized) {
+    return;
+  }
 
   digitalSystem.reset(tDIO::create(status));
 
@@ -92,7 +98,9 @@ void initializeDigital(int32_t* status) {
 
   // Make sure that the 9403 IONode has had a chance to initialize before
   // continuing.
-  while (pwmSystem->readLoopTiming(status) == 0) std::this_thread::yield();
+  while (pwmSystem->readLoopTiming(status) == 0) {
+    std::this_thread::yield();
+  }
 
   if (pwmSystem->readLoopTiming(status) != kExpectedLoopTiming) {
     *status = LOOP_TIMING_ERROR;  // NOTE: Doesn't display the error
@@ -102,11 +110,9 @@ void initializeDigital(int32_t* status) {
   double loopTime = pwmSystem->readLoopTiming(status) /
                     (kSystemClockTicksPerMicrosecond * 1e3);
 
-  pwmSystem->writeConfig_Period(
-      static_cast<uint16_t>(kDefaultPwmPeriod / loopTime + 0.5), status);
-  uint16_t minHigh = static_cast<uint16_t>(
-      (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime + 0.5);
-  pwmSystem->writeConfig_MinHigh(minHigh, status);
+  pwmSystem->writeConfig_Period(std::lround(kDefaultPwmPeriod / loopTime),
+                                status);
+  pwmSystem->writeConfig_MinHigh(0, status);
   // Ensure that PWM output values are set to OFF
   for (uint8_t pwmIndex = 0; pwmIndex < kNumPWMChannels; pwmIndex++) {
     // Copy of SetPWM
@@ -158,12 +164,22 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
     }
     analogTrigger = false;
     return true;
-  } else {
-    return false;
+  } else if (isHandleType(digitalSourceHandle, HAL_HandleEnum::PWM)) {
+    // PWM's on MXP port are supported as a digital source
+    int32_t index = getHandleIndex(digitalSourceHandle);
+    if (index >= kNumPWMHeaders) {
+      channel = remapMXPPWMChannel(index);
+      module = 1;
+      analogTrigger = false;
+      return true;
+    }
   }
+  return false;
 }
 
-int32_t remapMXPChannel(int32_t channel) { return channel - 10; }
+int32_t remapMXPChannel(int32_t channel) {
+  return channel - 10;
+}
 
 int32_t remapMXPPWMChannel(int32_t channel) {
   if (channel < 14) {
@@ -173,7 +189,9 @@ int32_t remapMXPPWMChannel(int32_t channel) {
   }
 }
 
-int32_t remapSPIChannel(int32_t channel) { return channel - 26; }
+int32_t remapSPIChannel(int32_t channel) {
+  return channel - 26;
+}
 
 }  // namespace hal
 

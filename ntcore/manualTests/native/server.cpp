@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <chrono>
 #include <climits>
@@ -14,12 +11,13 @@
 
 int main() {
   auto inst = nt::GetDefaultInstance();
-  nt::AddLogger(inst,
-                [](const nt::LogMessage& msg) {
-                  std::fputs(msg.message.c_str(), stderr);
-                  std::fputc('\n', stderr);
-                },
-                0, UINT_MAX);
+  nt::AddLogger(
+      inst,
+      [](const nt::LogMessage& msg) {
+        std::fputs(msg.message.c_str(), stderr);
+        std::fputc('\n', stderr);
+      },
+      0, UINT_MAX);
   nt::StartServer(inst, "persistent.ini", "", 10000);
   std::this_thread::sleep_for(std::chrono::seconds(1));
 

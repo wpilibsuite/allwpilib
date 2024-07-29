@@ -9,14 +9,14 @@ We provide two repositories. These repositories are:
 * (Development) https://frcmaven.wpi.edu/artifactory/development/
 
 The release repository is where official WPILib releases are pushed.
-The development repository is where development releases of every commit to [master](https://github.com/wpilibsuite/allwpilib/tree/master) is pushed.
+The development repository is where development releases of every commit to [main](https://github.com/wpilibsuite/allwpilib/tree/main) is pushed.
 
 ## Artifact classifiers
 We provide two base types of artifacts.
 
 The first types are Java artifacts. These are usually published as `jar` files. Usually, the actual jar file is published with no classifier. The sources are published with the `-sources` classifier, and the javadocs are published with the `-javadoc` classifier.
 
-The second types are native artifacts. These are usually published as `zip` files (except for the `JNI` artifact types, which are `jar` files. See below for information on this). The `-sources` and `-headers` classifiers contain the sources and headers respecively for the library. Each artifact also contains a classifier for each platform we publish. This platform is in the format `{os}{arch}`. The platform artifact only contains the binaries for a specific platform. In addition, we provide a `-all` classifier. This classifer combines all of the platform artifacts into a single artifact. This is useful for tools that cannot determine what version to use during builds. However, we recommend using the platform specific classifier when possible. Note that the binary artifacts never contain the headers, you always need the `-headers` classifier to get those.
+The second types are native artifacts. These are usually published as `zip` files (except for the `JNI` artifact types, which are `jar` files. See below for information on this). The `-sources` and `-headers` classifiers contain the sources and headers respectively for the library. Each artifact also contains a classifier for each platform we publish. This platform is in the format `{os}{arch}`. The platform artifact only contains the binaries for a specific platform. In addition, we provide a `-all` classifier. This classifier combines all of the platform artifacts into a single artifact. This is useful for tools that cannot determine what version to use during builds. However, we recommend using the platform specific classifier when possible. Note that the binary artifacts never contain the headers, you always need the `-headers` classifier to get those.
 
 ## Artifact Names
 
@@ -69,24 +69,53 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 
 * wpiutil
 
-* hal
+* wpigui
+  * imgui
+
+* wpimath
   * wpiutil
 
-* halsim
-  * imgui
+* wpinet
   * wpiutil
 
 * ntcore
   * wpiutil
+  * wpinet
+
+* glass/libglass
+  * wpiutil
+  * wpimath
+  * wpigui
+
+* glass/libglassnt
+  * wpiutil
+  * wpinet
+  * ntcore
+  * wpimath
+  * wpigui
+
+* hal
+  * wpiutil
+
+* halsim
+  * wpiutil
+  * wpinet
+  * ntcore
+  * wpimath
+  * wpigui
+  * libglass
+  * libglassnt
 
 * cscore
   * opencv
+  * wpinet
   * wpiutil
 
 * cameraserver
   * ntcore
   * cscore
   * opencv
+  * wpinet
   * wpiutil
 
 * wpilibj
@@ -94,6 +123,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cameraserver
   * ntcore
   * cscore
+  * wpinet
   * wpiutil
 
 * wpilibc
@@ -101,6 +131,8 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cameraserver
   * ntcore
   * cscore
+  * wpimath
+  * wpinet
   * wpiutil
 
 * wpilibNewCommands
@@ -109,15 +141,15 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cameraserver
   * ntcore
   * cscore
+  * wpimath
+  * wpinet
   * wpiutil
 
-* wpilibNewCommands
-  * wpilibc
-  * hal
-  * cameraserver
-  * ntcore
-  * cscore
+* wpiunits
+
+* apriltag
   * wpiutil
+  * wpimath
 
 ### Third Party Artifacts
 
@@ -125,6 +157,8 @@ This repository provides the builds of the following third party software.
 
 All artifacts are based at `edu.wpi.first.thirdparty.frcYEAR` in the repository.
 
+* apriltaglib
 * googletest
 * imgui
 * opencv
+* libssh

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/priority_mutex.h>  // NOLINT(build/include_order)
 
@@ -11,7 +8,7 @@
 #include <condition_variable>
 #include <thread>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 namespace wpi {
 
@@ -58,7 +55,7 @@ void SetProcessorAffinity(int32_t core_id) {
 
 void SetThreadRealtimePriorityOrDie(int32_t priority) {
   struct sched_param param;
-  // Set realtime priority for this thread
+  // Set real-time priority for this thread
   param.sched_priority = priority + sched_get_priority_min(SCHED_RR);
   ASSERT_EQ(pthread_setschedparam(pthread_self(), SCHED_RR, &param), 0)
       << ": Failed to set scheduler priority.";
@@ -160,7 +157,7 @@ class HighPriorityThread {
 //
 // To run the test, we need 3 threads, and then 1 thread to kick the test off.
 // The threads must all run on the same core, otherwise they wouldn't starve
-// eachother. The threads and their roles are as follows:
+// each other. The threads and their roles are as follows:
 //
 // Low priority thread:
 //   Holds a lock that the high priority thread needs, and releases it upon
@@ -225,7 +222,7 @@ class InversionTestRunner {
 // TODO: Fix roborio permissions to run as root.
 
 // Priority inversion test.
-TEST(MutexTest, DISABLED_PriorityInversionTest) {
+TEST(MutexTest, DISABLED_PriorityInversion) {
   InversionTestRunner<priority_mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
@@ -233,7 +230,7 @@ TEST(MutexTest, DISABLED_PriorityInversionTest) {
 }
 
 // Verify that the non-priority inversion mutex doesn't pass the test.
-TEST(MutexTest, DISABLED_StdMutexPriorityInversionTest) {
+TEST(MutexTest, DISABLED_StdMutexPriorityInversion) {
   InversionTestRunner<std::mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
@@ -250,7 +247,7 @@ TEST(MutexTest, TryLock) {
 }
 
 // Priority inversion test.
-TEST(MutexTest, DISABLED_ReentrantPriorityInversionTest) {
+TEST(MutexTest, DISABLED_ReentrantPriorityInversion) {
   InversionTestRunner<priority_recursive_mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();

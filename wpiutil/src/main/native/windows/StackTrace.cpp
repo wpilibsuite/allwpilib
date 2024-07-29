@@ -1,15 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/StackTrace.h"
 
 #include "StackWalker.h"
 #include "wpi/ConvertUTF.h"
 #include "wpi/SmallString.h"
+
+#if defined(_MSC_VER)
 
 namespace {
 class StackTraceWalker : public StackWalker {
@@ -24,18 +23,12 @@ class StackTraceWalker : public StackWalker {
 }  // namespace
 
 void StackTraceWalker::OnOutput(LPCTSTR szText) {
-#ifdef _UNICODE
-  wpi::SmallString<128> utf8;
-  wpi::sys::windows::UTF16ToUTF8(szText, wcslen(szText), utf8);
-  m_output.append(utf8.data(), utf8.size());
-#else
   m_output.append(szText);
-#endif
 }
 
 namespace wpi {
 
-std::string GetStackTrace(int offset) {
+std::string GetStackTraceDefault(int offset) {
   // TODO: implement offset
   std::string output;
   StackTraceWalker walker(output);
@@ -43,3 +36,5 @@ std::string GetStackTrace(int offset) {
 }
 
 }  // namespace wpi
+
+#endif  // defined(_MSC_VER)

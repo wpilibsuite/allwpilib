@@ -1,218 +1,98 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/Compressor.h"
 
-#include <hal/Compressor.h>
+#include <frc/PneumaticHub.h>
+
 #include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
-#include <hal/Solenoid.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
-#include "frc/WPIErrors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
-Compressor::Compressor(int pcmID) : m_module(pcmID) {
-  int32_t status = 0;
-  m_compressorHandle = HAL_InitializeCompressor(m_module, &status);
-  if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumPCMModules(), pcmID);
-    return;
-  }
-  SetClosedLoopControl(true);
-
-  HAL_Report(HALUsageReporting::kResourceType_Compressor, pcmID + 1);
-  SendableRegistry::GetInstance().AddLW(this, "Compressor", pcmID);
-}
-
-void Compressor::Start() {
-  if (StatusIsFatal()) return;
-  SetClosedLoopControl(true);
-}
-
-void Compressor::Stop() {
-  if (StatusIsFatal()) return;
-  SetClosedLoopControl(false);
-}
-
-bool Compressor::Enabled() const {
-  if (StatusIsFatal()) return false;
-  int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressor(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
+Compressor::Compressor(int module, PneumaticsModuleType moduleType)
+    : m_module{PneumaticsBase::GetForType(module, moduleType)},
+      m_moduleType{moduleType} {
+  if (!m_module->ReserveCompressor()) {
+    throw FRC_MakeError(err::ResourceAlreadyAllocated, "{}", module);
   }
 
-  return value;
+  m_module->EnableCompressorDigital();
+
+  HAL_Report(HALUsageReporting::kResourceType_Compressor, module + 1);
+  wpi::SendableRegistry::AddLW(this, "Compressor", module);
+}
+
+Compressor::Compressor(PneumaticsModuleType moduleType)
+    : Compressor{PneumaticsBase::GetDefaultForType(moduleType), moduleType} {}
+
+Compressor::~Compressor() {
+  if (m_module) {
+    m_module->UnreserveCompressor();
+  }
+}
+
+bool Compressor::IsEnabled() const {
+  return m_module->GetCompressor();
 }
 
 bool Compressor::GetPressureSwitchValue() const {
-  if (StatusIsFatal()) return false;
-  int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorPressureSwitch(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
-  return value;
+  return m_module->GetPressureSwitch();
 }
 
-double Compressor::GetCompressorCurrent() const {
-  if (StatusIsFatal()) return 0;
-  int32_t status = 0;
-  double value;
-
-  value = HAL_GetCompressorCurrent(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
-  return value;
+units::ampere_t Compressor::GetCurrent() const {
+  return m_module->GetCompressorCurrent();
 }
 
-void Compressor::SetClosedLoopControl(bool on) {
-  if (StatusIsFatal()) return;
-  int32_t status = 0;
-
-  HAL_SetCompressorClosedLoopControl(m_compressorHandle, on, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
+units::volt_t Compressor::GetAnalogVoltage() const {
+  return m_module->GetAnalogVoltage(0);
 }
 
-bool Compressor::GetClosedLoopControl() const {
-  if (StatusIsFatal()) return false;
-  int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorClosedLoopControl(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
-  return value;
+units::pounds_per_square_inch_t Compressor::GetPressure() const {
+  return m_module->GetPressure(0);
 }
 
-bool Compressor::GetCompressorCurrentTooHighFault() const {
-  if (StatusIsFatal()) return false;
-  int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorCurrentTooHighFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
-  return value;
+void Compressor::Disable() {
+  m_module->DisableCompressor();
 }
 
-bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
-  if (StatusIsFatal()) return false;
-  int32_t status = 0;
-  bool value;
-
-  value =
-      HAL_GetCompressorCurrentTooHighStickyFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
-  return value;
+void Compressor::EnableDigital() {
+  m_module->EnableCompressorDigital();
 }
 
-bool Compressor::GetCompressorShortedStickyFault() const {
-  if (StatusIsFatal()) return false;
-  int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorShortedStickyFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
-  return value;
+void Compressor::EnableAnalog(units::pounds_per_square_inch_t minPressure,
+                              units::pounds_per_square_inch_t maxPressure) {
+  m_module->EnableCompressorAnalog(minPressure, maxPressure);
 }
 
-bool Compressor::GetCompressorShortedFault() const {
-  if (StatusIsFatal()) return false;
-  int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorShortedFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
-  return value;
+void Compressor::EnableHybrid(units::pounds_per_square_inch_t minPressure,
+                              units::pounds_per_square_inch_t maxPressure) {
+  m_module->EnableCompressorHybrid(minPressure, maxPressure);
 }
 
-bool Compressor::GetCompressorNotConnectedStickyFault() const {
-  if (StatusIsFatal()) return false;
-  int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorNotConnectedStickyFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
-  return value;
+CompressorConfigType Compressor::GetConfigType() const {
+  return m_module->GetCompressorConfigType();
 }
 
-bool Compressor::GetCompressorNotConnectedFault() const {
-  if (StatusIsFatal()) return false;
-  int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorNotConnectedFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
-  return value;
-}
-
-void Compressor::ClearAllPCMStickyFaults() {
-  if (StatusIsFatal()) return;
-  int32_t status = 0;
-
-  HAL_ClearAllPCMStickyFaults(m_module, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-}
-
-void Compressor::InitSendable(SendableBuilder& builder) {
+void Compressor::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Compressor");
-  builder.AddBooleanProperty("Enabled", [=]() { return Enabled(); },
-                             [=](bool value) {
-                               if (value)
-                                 Start();
-                               else
-                                 Stop();
-                             });
   builder.AddBooleanProperty(
-      "Pressure switch", [=]() { return GetPressureSwitchValue(); }, nullptr);
+      "Enabled", [this] { return IsEnabled(); }, nullptr);
+  builder.AddBooleanProperty(
+      "Pressure switch", [this] { return GetPressureSwitchValue(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Current (A)", [this] { return GetCurrent().value(); }, nullptr);
+  // These are not supported by the CTRE PCM
+  if (m_moduleType == PneumaticsModuleType::REVPH) {
+    builder.AddDoubleProperty(
+        "Analog Voltage", [this] { return GetAnalogVoltage().value(); },
+        nullptr);
+    builder.AddDoubleProperty(
+        "Pressure (PSI)", [this] { return GetPressure().value(); }, nullptr);
+  }
 }

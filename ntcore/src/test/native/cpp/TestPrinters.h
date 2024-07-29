@@ -1,54 +1,39 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_TESTPRINTERS_H_
-#define NTCORE_TESTPRINTERS_H_
+#pragma once
 
-#include <memory>
 #include <ostream>
+#include <span>
+#include <string>
+#include <string_view>
 
-#include <wpi/StringRef.h>
-
-#include "gtest/gtest.h"
-
-namespace wpi {
-
-inline void PrintTo(StringRef str, ::std::ostream* os) {
-  ::testing::internal::PrintStringTo(str.str(), os);
-}
-
-}  // namespace wpi
+#include <gtest/gtest.h>
+#include <wpi/TestPrinters.h>
 
 namespace nt {
 
-class EntryNotification;
+namespace net3 {
+class Message3;
+}  // namespace net3
+
+namespace net {
+struct ClientMessage;
+struct ServerMessage;
+}  // namespace net
+
+class Event;
 class Handle;
-class Message;
+class PubSubOptionsImpl;
 class Value;
 
-void PrintTo(const EntryNotification& event, std::ostream* os);
+void PrintTo(const Event& event, std::ostream* os);
 void PrintTo(const Handle& handle, std::ostream* os);
-
-void PrintTo(const Message& msg, std::ostream* os);
-
-inline void PrintTo(std::shared_ptr<Message> msg, std::ostream* os) {
-  *os << "shared_ptr{";
-  if (msg) PrintTo(*msg, os);
-  *os << '}';
-}
-
+void PrintTo(const net3::Message3& msg, std::ostream* os);
+void PrintTo(const net::ClientMessage& msg, std::ostream* os);
+void PrintTo(const net::ServerMessage& msg, std::ostream* os);
 void PrintTo(const Value& value, std::ostream* os);
-
-inline void PrintTo(std::shared_ptr<Value> value, std::ostream* os) {
-  *os << "shared_ptr{";
-  if (value) PrintTo(*value, os);
-  *os << '}';
-}
+void PrintTo(const PubSubOptionsImpl& options, std::ostream* os);
 
 }  // namespace nt
-
-#endif  // NTCORE_TESTPRINTERS_H_

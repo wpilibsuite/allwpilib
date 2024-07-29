@@ -1,20 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/shuffleboard/ShuffleboardContainer.h"
 
-#include <wpi/SmallVector.h>
-#include <wpi/raw_ostream.h>
+#include <ntcore_cpp.h>
+#include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/Errors.h"
 #include "frc/shuffleboard/ComplexWidget.h"
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 #include "frc/shuffleboard/SimpleWidget.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -24,7 +21,7 @@ static constexpr const char* GetStringFromBuiltInLayout(BuiltInLayouts layout) {
   return layoutStrings[static_cast<int>(layout)];
 }
 
-ShuffleboardContainer::ShuffleboardContainer(const wpi::Twine& title)
+ShuffleboardContainer::ShuffleboardContainer(std::string_view title)
     : ShuffleboardValue(title) {}
 
 const std::vector<std::unique_ptr<ShuffleboardComponentBase>>&
@@ -32,41 +29,37 @@ ShuffleboardContainer::GetComponents() const {
   return m_components;
 }
 
-ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title,
+ShuffleboardLayout& ShuffleboardContainer::GetLayout(std::string_view title,
                                                      BuiltInLayouts type) {
   return GetLayout(title, GetStringFromBuiltInLayout(type));
 }
 
-ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title,
+ShuffleboardLayout& ShuffleboardContainer::GetLayout(std::string_view title,
                                                      const LayoutType& type) {
   return GetLayout(title, type.GetLayoutName());
 }
 
-ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title,
-                                                     const wpi::Twine& type) {
-  wpi::SmallVector<char, 16> storage;
-  auto titleRef = title.toStringRef(storage);
-  if (m_layouts.count(titleRef) == 0) {
-    auto layout = std::make_unique<ShuffleboardLayout>(*this, type, titleRef);
+ShuffleboardLayout& ShuffleboardContainer::GetLayout(std::string_view title,
+                                                     std::string_view type) {
+  if (m_layouts.count(title) == 0) {
+    auto layout = std::make_unique<ShuffleboardLayout>(*this, title, type);
     auto ptr = layout.get();
     m_components.emplace_back(std::move(layout));
-    m_layouts.insert(std::make_pair(titleRef, ptr));
+    m_layouts.insert(std::make_pair(title, ptr));
   }
-  return *m_layouts[titleRef];
+  return *m_layouts[title];
 }
 
-ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title) {
-  wpi::SmallVector<char, 16> storage;
-  auto titleRef = title.toStringRef(storage);
-  if (m_layouts.count(titleRef) == 0) {
-    wpi_setWPIErrorWithContext(
-        InvalidParameter, "No layout with the given title has been defined");
+ShuffleboardLayout& ShuffleboardContainer::GetLayout(std::string_view title) {
+  if (m_layouts.count(title) == 0) {
+    throw FRC_MakeError(err::InvalidParameter,
+                        "No layout with title {} has been defined", title);
   }
-  return *m_layouts[titleRef];
+  return *m_layouts[title];
 }
 
-ComplexWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
-                                          Sendable& sendable) {
+ComplexWidget& ShuffleboardContainer::Add(std::string_view title,
+                                          wpi::Sendable& sendable) {
   CheckTitle(title);
   auto widget = std::make_unique<ComplexWidget>(*this, title, sendable);
   auto ptr = widget.get();
@@ -74,102 +67,151 @@ ComplexWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
   return *ptr;
 }
 
-ComplexWidget& ShuffleboardContainer::Add(Sendable& sendable) {
-  auto name = SendableRegistry::GetInstance().GetName(&sendable);
+ComplexWidget& ShuffleboardContainer::Add(wpi::Sendable& sendable) {
+  auto name = wpi::SendableRegistry::GetName(&sendable);
   if (name.empty()) {
-    wpi::outs() << "Sendable must have a name\n";
+    FRC_ReportError(err::Error, "Sendable must have a name");
   }
   return Add(name, sendable);
 }
 
-SimpleWidget& ShuffleboardContainer::Add(
-    const wpi::Twine& title, std::shared_ptr<nt::Value> defaultValue) {
+SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
+                                         const nt::Value& defaultValue) {
   CheckTitle(title);
 
   auto widget = std::make_unique<SimpleWidget>(*this, title);
   auto ptr = widget.get();
   m_components.emplace_back(std::move(widget));
-  ptr->GetEntry().SetDefaultValue(defaultValue);
+  ptr->GetEntry(nt::GetStringFromType(defaultValue.type()))
+      ->SetDefault(defaultValue);
   return *ptr;
 }
 
-SimpleWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
+SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
                                          bool defaultValue) {
   return Add(title, nt::Value::MakeBoolean(defaultValue));
 }
 
-SimpleWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
+SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
                                          double defaultValue) {
   return Add(title, nt::Value::MakeDouble(defaultValue));
 }
 
-SimpleWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
-                                         int defaultValue) {
-  return Add(title, nt::Value::MakeDouble(defaultValue));
+SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
+                                         float defaultValue) {
+  return Add(title, nt::Value::MakeFloat(defaultValue));
 }
 
-SimpleWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
-                                         const wpi::Twine& defaultValue) {
+SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
+                                         int defaultValue) {
+  return Add(title, nt::Value::MakeInteger(defaultValue));
+}
+
+SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
+                                         std::string_view defaultValue) {
   return Add(title, nt::Value::MakeString(defaultValue));
 }
 
-SimpleWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
+SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
                                          const char* defaultValue) {
   return Add(title, nt::Value::MakeString(defaultValue));
 }
 
-SimpleWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
-                                         wpi::ArrayRef<bool> defaultValue) {
+SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
+                                         std::span<const bool> defaultValue) {
   return Add(title, nt::Value::MakeBooleanArray(defaultValue));
 }
 
-SimpleWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
-                                         wpi::ArrayRef<double> defaultValue) {
+SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
+                                         std::span<const double> defaultValue) {
   return Add(title, nt::Value::MakeDoubleArray(defaultValue));
 }
 
+SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
+                                         std::span<const float> defaultValue) {
+  return Add(title, nt::Value::MakeFloatArray(defaultValue));
+}
+
 SimpleWidget& ShuffleboardContainer::Add(
-    const wpi::Twine& title, wpi::ArrayRef<std::string> defaultValue) {
+    std::string_view title, std::span<const int64_t> defaultValue) {
+  return Add(title, nt::Value::MakeIntegerArray(defaultValue));
+}
+
+SimpleWidget& ShuffleboardContainer::Add(
+    std::string_view title, std::span<const std::string> defaultValue) {
   return Add(title, nt::Value::MakeStringArray(defaultValue));
 }
 
 SuppliedValueWidget<std::string>& ShuffleboardContainer::AddString(
-    const wpi::Twine& title, std::function<std::string()> supplier) {
-  static auto setter = [](nt::NetworkTableEntry entry, std::string value) {
+    std::string_view title, std::function<std::string()> supplier) {
+  static auto setter = [](nt::GenericPublisher& entry, std::string value) {
     entry.SetString(value);
   };
 
   CheckTitle(title);
   auto widget = std::make_unique<SuppliedValueWidget<std::string>>(
-      *this, title, supplier, setter);
+      *this, title, "string", supplier, setter);
   auto ptr = widget.get();
   m_components.emplace_back(std::move(widget));
   return *ptr;
 }
 
 SuppliedValueWidget<double>& ShuffleboardContainer::AddNumber(
-    const wpi::Twine& title, std::function<double()> supplier) {
-  static auto setter = [](nt::NetworkTableEntry entry, double value) {
+    std::string_view title, std::function<double()> supplier) {
+  return AddDouble(title, std::move(supplier));
+}
+
+SuppliedValueWidget<double>& ShuffleboardContainer::AddDouble(
+    std::string_view title, std::function<double()> supplier) {
+  static auto setter = [](nt::GenericPublisher& entry, double value) {
     entry.SetDouble(value);
   };
 
   CheckTitle(title);
-  auto widget = std::make_unique<SuppliedValueWidget<double>>(*this, title,
-                                                              supplier, setter);
+  auto widget = std::make_unique<SuppliedValueWidget<double>>(
+      *this, title, "double", supplier, setter);
+  auto ptr = widget.get();
+  m_components.emplace_back(std::move(widget));
+  return *ptr;
+}
+
+SuppliedValueWidget<float>& ShuffleboardContainer::AddFloat(
+    std::string_view title, std::function<float()> supplier) {
+  static auto setter = [](nt::GenericPublisher& entry, float value) {
+    entry.SetFloat(value);
+  };
+
+  CheckTitle(title);
+  auto widget = std::make_unique<SuppliedValueWidget<float>>(
+      *this, title, "float", supplier, setter);
+  auto ptr = widget.get();
+  m_components.emplace_back(std::move(widget));
+  return *ptr;
+}
+
+SuppliedValueWidget<int64_t>& ShuffleboardContainer::AddInteger(
+    std::string_view title, std::function<int64_t()> supplier) {
+  static auto setter = [](nt::GenericPublisher& entry, int64_t value) {
+    entry.SetInteger(value);
+  };
+
+  CheckTitle(title);
+  auto widget = std::make_unique<SuppliedValueWidget<int64_t>>(
+      *this, title, "int", supplier, setter);
   auto ptr = widget.get();
   m_components.emplace_back(std::move(widget));
   return *ptr;
 }
 
 SuppliedValueWidget<bool>& ShuffleboardContainer::AddBoolean(
-    const wpi::Twine& title, std::function<bool()> supplier) {
-  static auto setter = [](nt::NetworkTableEntry entry, bool value) {
+    std::string_view title, std::function<bool()> supplier) {
+  static auto setter = [](nt::GenericPublisher& entry, bool value) {
     entry.SetBoolean(value);
   };
 
   CheckTitle(title);
-  auto widget = std::make_unique<SuppliedValueWidget<bool>>(*this, title,
-                                                            supplier, setter);
+  auto widget = std::make_unique<SuppliedValueWidget<bool>>(
+      *this, title, "boolean", supplier, setter);
   auto ptr = widget.get();
   m_components.emplace_back(std::move(widget));
   return *ptr;
@@ -177,103 +219,161 @@ SuppliedValueWidget<bool>& ShuffleboardContainer::AddBoolean(
 
 SuppliedValueWidget<std::vector<std::string>>&
 ShuffleboardContainer::AddStringArray(
-    const wpi::Twine& title,
+    std::string_view title,
     std::function<std::vector<std::string>()> supplier) {
-  static auto setter = [](nt::NetworkTableEntry entry,
+  static auto setter = [](nt::GenericPublisher& entry,
                           std::vector<std::string> value) {
     entry.SetStringArray(value);
   };
 
   CheckTitle(title);
   auto widget = std::make_unique<SuppliedValueWidget<std::vector<std::string>>>(
-      *this, title, supplier, setter);
+      *this, title, "string[]", supplier, setter);
   auto ptr = widget.get();
   m_components.emplace_back(std::move(widget));
   return *ptr;
 }
 
 SuppliedValueWidget<std::vector<double>>& ShuffleboardContainer::AddNumberArray(
-    const wpi::Twine& title, std::function<std::vector<double>()> supplier) {
-  static auto setter = [](nt::NetworkTableEntry entry,
+    std::string_view title, std::function<std::vector<double>()> supplier) {
+  return AddDoubleArray(title, std::move(supplier));
+}
+
+SuppliedValueWidget<std::vector<double>>& ShuffleboardContainer::AddDoubleArray(
+    std::string_view title, std::function<std::vector<double>()> supplier) {
+  static auto setter = [](nt::GenericPublisher& entry,
                           std::vector<double> value) {
     entry.SetDoubleArray(value);
   };
 
   CheckTitle(title);
   auto widget = std::make_unique<SuppliedValueWidget<std::vector<double>>>(
-      *this, title, supplier, setter);
+      *this, title, "double[]", supplier, setter);
+  auto ptr = widget.get();
+  m_components.emplace_back(std::move(widget));
+  return *ptr;
+}
+
+SuppliedValueWidget<std::vector<float>>& ShuffleboardContainer::AddFloatArray(
+    std::string_view title, std::function<std::vector<float>()> supplier) {
+  static auto setter = [](nt::GenericPublisher& entry,
+                          std::vector<float> value) {
+    entry.SetFloatArray(value);
+  };
+
+  CheckTitle(title);
+  auto widget = std::make_unique<SuppliedValueWidget<std::vector<float>>>(
+      *this, title, "float[]", supplier, setter);
+  auto ptr = widget.get();
+  m_components.emplace_back(std::move(widget));
+  return *ptr;
+}
+
+SuppliedValueWidget<std::vector<int64_t>>&
+ShuffleboardContainer::AddIntegerArray(
+    std::string_view title, std::function<std::vector<int64_t>()> supplier) {
+  static auto setter = [](nt::GenericPublisher& entry,
+                          std::vector<int64_t> value) {
+    entry.SetIntegerArray(value);
+  };
+
+  CheckTitle(title);
+  auto widget = std::make_unique<SuppliedValueWidget<std::vector<int64_t>>>(
+      *this, title, "int[]", supplier, setter);
   auto ptr = widget.get();
   m_components.emplace_back(std::move(widget));
   return *ptr;
 }
 
 SuppliedValueWidget<std::vector<int>>& ShuffleboardContainer::AddBooleanArray(
-    const wpi::Twine& title, std::function<std::vector<int>()> supplier) {
-  static auto setter = [](nt::NetworkTableEntry entry, std::vector<int> value) {
+    std::string_view title, std::function<std::vector<int>()> supplier) {
+  static auto setter = [](nt::GenericPublisher& entry, std::vector<int> value) {
     entry.SetBooleanArray(value);
   };
 
   CheckTitle(title);
   auto widget = std::make_unique<SuppliedValueWidget<std::vector<int>>>(
-      *this, title, supplier, setter);
+      *this, title, "boolean[]", supplier, setter);
   auto ptr = widget.get();
   m_components.emplace_back(std::move(widget));
   return *ptr;
 }
 
-SuppliedValueWidget<wpi::StringRef>& ShuffleboardContainer::AddRaw(
-    const wpi::Twine& title, std::function<wpi::StringRef()> supplier) {
-  static auto setter = [](nt::NetworkTableEntry entry, wpi::StringRef value) {
-    entry.SetRaw(value);
-  };
+SuppliedValueWidget<std::vector<uint8_t>>& ShuffleboardContainer::AddRaw(
+    std::string_view title, std::function<std::vector<uint8_t>()> supplier) {
+  return AddRaw(title, "raw", std::move(supplier));
+}
+
+SuppliedValueWidget<std::vector<uint8_t>>& ShuffleboardContainer::AddRaw(
+    std::string_view title, std::string_view typeString,
+    std::function<std::vector<uint8_t>()> supplier) {
+  static auto setter = [](nt::GenericPublisher& entry,
+                          std::vector<uint8_t> value) { entry.SetRaw(value); };
 
   CheckTitle(title);
-  auto widget = std::make_unique<SuppliedValueWidget<wpi::StringRef>>(
-      *this, title, supplier, setter);
+  auto widget = std::make_unique<SuppliedValueWidget<std::vector<uint8_t>>>(
+      *this, title, typeString, supplier, setter);
   auto ptr = widget.get();
   m_components.emplace_back(std::move(widget));
   return *ptr;
 }
 
 SimpleWidget& ShuffleboardContainer::AddPersistent(
-    const wpi::Twine& title, std::shared_ptr<nt::Value> defaultValue) {
+    std::string_view title, const nt::Value& defaultValue) {
   auto& widget = Add(title, defaultValue);
-  widget.GetEntry().SetPersistent();
+  widget.GetEntry(nt::GetStringFromType(defaultValue.type()))
+      ->GetTopic()
+      .SetPersistent(true);
   return widget;
 }
 
-SimpleWidget& ShuffleboardContainer::AddPersistent(const wpi::Twine& title,
+SimpleWidget& ShuffleboardContainer::AddPersistent(std::string_view title,
                                                    bool defaultValue) {
   return AddPersistent(title, nt::Value::MakeBoolean(defaultValue));
 }
 
-SimpleWidget& ShuffleboardContainer::AddPersistent(const wpi::Twine& title,
+SimpleWidget& ShuffleboardContainer::AddPersistent(std::string_view title,
                                                    double defaultValue) {
   return AddPersistent(title, nt::Value::MakeDouble(defaultValue));
 }
 
-SimpleWidget& ShuffleboardContainer::AddPersistent(const wpi::Twine& title,
+SimpleWidget& ShuffleboardContainer::AddPersistent(std::string_view title,
+                                                   float defaultValue) {
+  return AddPersistent(title, nt::Value::MakeFloat(defaultValue));
+}
+
+SimpleWidget& ShuffleboardContainer::AddPersistent(std::string_view title,
                                                    int defaultValue) {
-  return AddPersistent(title, nt::Value::MakeDouble(defaultValue));
+  return AddPersistent(title, nt::Value::MakeInteger(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::AddPersistent(
-    const wpi::Twine& title, const wpi::Twine& defaultValue) {
+    std::string_view title, std::string_view defaultValue) {
   return AddPersistent(title, nt::Value::MakeString(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::AddPersistent(
-    const wpi::Twine& title, wpi::ArrayRef<bool> defaultValue) {
+    std::string_view title, std::span<const bool> defaultValue) {
   return AddPersistent(title, nt::Value::MakeBooleanArray(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::AddPersistent(
-    const wpi::Twine& title, wpi::ArrayRef<double> defaultValue) {
+    std::string_view title, std::span<const double> defaultValue) {
   return AddPersistent(title, nt::Value::MakeDoubleArray(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::AddPersistent(
-    const wpi::Twine& title, wpi::ArrayRef<std::string> defaultValue) {
+    std::string_view title, std::span<const float> defaultValue) {
+  return AddPersistent(title, nt::Value::MakeFloatArray(defaultValue));
+}
+
+SimpleWidget& ShuffleboardContainer::AddPersistent(
+    std::string_view title, std::span<const int64_t> defaultValue) {
+  return AddPersistent(title, nt::Value::MakeIntegerArray(defaultValue));
+}
+
+SimpleWidget& ShuffleboardContainer::AddPersistent(
+    std::string_view title, std::span<const std::string> defaultValue) {
   return AddPersistent(title, nt::Value::MakeStringArray(defaultValue));
 }
 
@@ -289,12 +389,11 @@ void ShuffleboardContainer::DisableIfActuator() {
   }
 }
 
-void ShuffleboardContainer::CheckTitle(const wpi::Twine& title) {
-  wpi::SmallVector<char, 16> storage;
-  auto titleRef = title.toStringRef(storage);
-  if (m_usedTitles.count(titleRef) > 0) {
-    wpi::errs() << "Title is already in use: " << title << "\n";
+void ShuffleboardContainer::CheckTitle(std::string_view title) {
+  std::string titleStr{title};
+  if (m_usedTitles.count(titleStr) > 0) {
+    FRC_ReportError(err::Error, "Title is already in use: {}", title);
     return;
   }
-  m_usedTitles.insert(titleRef);
+  m_usedTitles.insert(titleStr);
 }

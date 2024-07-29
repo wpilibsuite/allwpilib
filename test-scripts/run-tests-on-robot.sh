@@ -9,7 +9,9 @@
 # This file is intended to be run in the DEFAULT_TEST_DIR on the roboRIO.
 # Do not attempt to run this file on your local system.
 # There is one file (delploy-and-run-test-on-robot.sh) that is designed to
-# deploy this file allong with the compiled tests for you.
+# deploy this file along with the compiled tests for you.
+
+set -e
 
 # Configurable variables
 source config.sh
@@ -24,9 +26,9 @@ Where:
     -h    Show this help text
     -d    The directory where the tests have been placed.
           This is done to prevent overwriting an already running program.
-          This scrip will automatically move the test into the ${DEFAULT_TEST_DIR}
+          This script will automatically move the test into the ${DEFAULT_TEST_DIR}
           directory.
-          Default: Assumes the test is in the same directory as this scrip.
+          Default: Assumes the test is in the same directory as this script.
     -A    Do not use the default arguments for the given language.
     arg   The arguments to be passed to test."
 
@@ -42,7 +44,7 @@ fi
 LANGUAGE=none
 TEST_FILE=none
 TEST_DIR="$DEFAULT_TEST_DIR"
-# Begin searching for options from the second paramater on
+# Begin searching for options from the second parameter on
 PARAM_ARGS=${@:2}
 # Where the test arguments start
 TEST_RUN_ARGS=${@:2}
@@ -71,7 +73,7 @@ fi
 PARAM_COUNTER=1
 printf "Param Args ${PARAM_ARGS}\n"
 
-# Check for optional paramaters
+# Check for optional parameters
 while  getopts ':hmd:A' option $PARAM_ARGS ; do
     case "$option" in
     h)
@@ -103,7 +105,7 @@ if [[ "$RUN_WITH_DEFAULT_ARGS" == true ]]; then
     TEST_RUN_ARGS="${DEFAULT_ARGS} ${TEST_RUN_ARGS}"
 fi
 
-# Make sure at least two paramaters are passed or four if running with -d option
+# Make sure at least two parameters are passed or four if running with -d option
 if [[ $# -lt $PARAM_COUNTER ]]; then
     printf "Invalid arg count. Should be %s, was %s.\n" "${PARAM_COUNTER}" "$#"
     echo "$usage"
@@ -114,7 +116,7 @@ fi
 /usr/local/natinst/etc/init.d/systemWebServer stop
 
 # Kill all running robot programs
-killall java FRCUserProgram
+killall java FRCUserProgram || true
 
 # If we are running with the -d argument move the test to the DEFAULT_TEST_DIR
 if [[ ! -e "${TEST_DIR}/${TEST_FILE}" ]]; then
@@ -125,7 +127,7 @@ elif [[ $TEST_DIR != "$DEFAULT_TEST_DIR" ]]; then
     mv "${TEST_DIR}/${TEST_FILE}" "${DEFAULT_TEST_DIR}"
 fi
 
-# Make sure the excecutable file has permission to run
+# Make sure the executable file has permission to run
 
 # Get the serial number and FPGADeviceCode for this rio
 export serialnum=`/sbin/fw_printenv -n serial#`

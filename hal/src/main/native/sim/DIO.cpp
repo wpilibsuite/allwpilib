@@ -1,16 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/DIO.h"
 
-#include <cmath>
-
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
@@ -23,8 +19,7 @@ static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
                              kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>*
     digitalPWMHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDIO() {
   static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
                                kNumDigitalPWMOutputs,
@@ -32,32 +27,38 @@ void InitializeDIO() {
       dpH;
   digitalPWMHandles = &dpH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input, int32_t* status) {
+                                        HAL_Bool input,
+                                        const char* allocationLocation,
+                                        int32_t* status) {
   hal::init::CheckInit();
-  if (*status != 0) return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                     kNumDigitalChannels, channel);
     return HAL_kInvalidHandle;
   }
 
-  auto handle =
-      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO, status);
+  HAL_DigitalHandle handle;
 
-  if (*status != 0)
+  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO,
+                                              &handle, status);
+
+  if (*status != 0) {
+    if (port) {
+      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+                                           port->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                       kNumDigitalChannels, channel);
+    }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-
-  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
   }
 
   port->channel = static_cast<uint8_t>(channel);
@@ -65,6 +66,8 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   SimDIOData[channel].initialized = true;
   SimDIOData[channel].isInput = input;
   SimDIOData[channel].simDevice = 0;
+  SimDIOData[channel].value = true;
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }
@@ -77,13 +80,17 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   // no status, so no need to check for a proper free.
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
-  if (port == nullptr) return;
+  if (port == nullptr) {
+    return;
+  }
   SimDIOData[port->channel].initialized = false;
 }
 
 void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
   auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
-  if (port == nullptr) return;
+  if (port == nullptr) {
+    return;
+  }
   SimDIOData[port->channel].simDevice = device;
 }
 
@@ -109,7 +116,9 @@ HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
 void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status) {
   auto port = digitalPWMHandles->Get(pwmGenerator);
   digitalPWMHandles->Free(pwmGenerator);
-  if (port == nullptr) return;
+  if (port == nullptr) {
+    return;
+  }
   int32_t id = *port;
   SimDigitalPWMData[id].initialized = false;
 }
@@ -119,9 +128,7 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
   // higher freq.
   // TODO: Round in the linear rate domain.
   // uint8_t pwmPeriodPower = static_cast<uint8_t>(
-  //    std::log(1.0 / (kExpectedLoopTiming * 0.25E-6 * rate)) /
-  //        std::log(2.0) +
-  //    0.5);
+  //     std::log2(1.0 / (kExpectedLoopTiming * 0.25E-6 * rate)) + 0.5);
   // TODO(THAD) : Add a case to set this in the simulator
   // digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
 }
@@ -134,8 +141,29 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
     return;
   }
   int32_t id = *port;
-  if (dutyCycle > 1.0) dutyCycle = 1.0;
-  if (dutyCycle < 0.0) dutyCycle = 0.0;
+  if (dutyCycle > 1.0) {
+    dutyCycle = 1.0;
+  }
+  if (dutyCycle < 0.0) {
+    dutyCycle = 0.0;
+  }
+  SimDigitalPWMData[id].dutyCycle = dutyCycle;
+}
+
+void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
+                          int32_t* status) {
+  auto port = digitalPWMHandles->Get(pwmGenerator);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  int32_t id = *port;
+  if (dutyCycle > 1.0) {
+    dutyCycle = 1.0;
+  }
+  if (dutyCycle < 0.0) {
+    dutyCycle = 0.0;
+  }
   SimDigitalPWMData[id].dutyCycle = dutyCycle;
 }
 
@@ -158,7 +186,14 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
     return;
   }
   if (value != 0 && value != 1) {
-    if (value != 0) value = 1;
+    if (value != 0) {
+      value = 1;
+    }
+  }
+  if (SimDIOData[port->channel].isInput) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Cannot set output of an input channel");
+    return;
   }
   SimDIOData[port->channel].value = value;
 }
@@ -181,8 +216,12 @@ HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status) {
     return false;
   }
   HAL_Bool value = SimDIOData[port->channel].value;
-  if (value > 1) value = 1;
-  if (value < 0) value = 0;
+  if (value > 1) {
+    value = 1;
+  }
+  if (value < 0) {
+    value = 0;
+  }
   return value;
 }
 
@@ -193,18 +232,27 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
     return false;
   }
   HAL_Bool value = SimDIOData[port->channel].isInput;
-  if (value > 1) value = 1;
-  if (value < 0) value = 0;
+  if (value > 1) {
+    value = 1;
+  }
+  if (value < 0) {
+    value = 0;
+  }
   return value;
 }
 
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
                int32_t* status) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
+  // TODO (Thad) Add this
+}
+
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+                       int32_t* status) {
   // TODO (Thad) Add this
 }
 

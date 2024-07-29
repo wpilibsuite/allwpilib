@@ -1,16 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/AnalogTriggerOutput.h"
 
+#include <hal/AnalogTrigger.h>
 #include <hal/FRCUsageReporting.h>
 
 #include "frc/AnalogTrigger.h"
-#include "frc/WPIErrors.h"
+#include "frc/AnalogTriggerType.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
@@ -19,7 +18,7 @@ bool AnalogTriggerOutput::Get() const {
   bool result = HAL_GetAnalogTriggerOutput(
       m_trigger->m_trigger, static_cast<HAL_AnalogTriggerType>(m_outputType),
       &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Get");
   return result;
 }
 
@@ -31,11 +30,15 @@ AnalogTriggerType AnalogTriggerOutput::GetAnalogTriggerTypeForRouting() const {
   return m_outputType;
 }
 
-bool AnalogTriggerOutput::IsAnalogTrigger() const { return true; }
+bool AnalogTriggerOutput::IsAnalogTrigger() const {
+  return true;
+}
 
-int AnalogTriggerOutput::GetChannel() const { return m_trigger->GetIndex(); }
+int AnalogTriggerOutput::GetChannel() const {
+  return m_trigger->GetIndex();
+}
 
-void AnalogTriggerOutput::InitSendable(SendableBuilder&) {}
+void AnalogTriggerOutput::InitSendable(wpi::SendableBuilder&) {}
 
 AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger& trigger,
                                          AnalogTriggerType outputType)

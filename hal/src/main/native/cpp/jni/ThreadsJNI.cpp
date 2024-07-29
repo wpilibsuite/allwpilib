@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
@@ -13,7 +10,7 @@
 #include "edu_wpi_first_hal_ThreadsJNI.h"
 #include "hal/Threads.h"
 
-using namespace frc;
+using namespace hal;
 
 extern "C" {
 /*
@@ -29,7 +26,7 @@ Java_edu_wpi_first_hal_ThreadsJNI_getCurrentThreadPriority
   HAL_Bool isRT = false;
   auto ret = HAL_GetCurrentThreadPriority(&isRT, &status);
   CheckStatus(env, status);
-  return (jint)ret;
+  return static_cast<jint>(ret);
 }
 
 /*
@@ -45,7 +42,7 @@ Java_edu_wpi_first_hal_ThreadsJNI_getCurrentThreadIsRealTime
   HAL_Bool isRT = false;
   HAL_GetCurrentThreadPriority(&isRT, &status);
   CheckStatus(env, status);
-  return (jboolean)isRT;
+  return static_cast<jboolean>(isRT);
 }
 
 /*
@@ -59,9 +56,9 @@ Java_edu_wpi_first_hal_ThreadsJNI_setCurrentThreadPriority
 {
   int32_t status = 0;
   auto ret = HAL_SetCurrentThreadPriority(
-      (HAL_Bool)realTime, static_cast<int32_t>(priority), &status);
-  CheckStatus(env, status);
-  return (jboolean)ret;
+      static_cast<HAL_Bool>(realTime), static_cast<int32_t>(priority), &status);
+  CheckStatus(env, status, false);
+  return static_cast<jboolean>(ret);
 }
 
 }  // extern "C"

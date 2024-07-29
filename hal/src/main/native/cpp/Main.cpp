@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Main.h"
 
@@ -36,14 +33,12 @@ static void DefaultExit(void*) {
   mainObj->gExitCv.notify_all();
 }
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeMain() {
   static MainObj mO;
   mainObj = &mO;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
@@ -55,10 +50,16 @@ void HAL_SetMain(void* param, void (*mainFunc)(void*),
   gExitFunc = exitFunc;
 }
 
-HAL_Bool HAL_HasMain(void) { return gHasMain; }
+HAL_Bool HAL_HasMain(void) {
+  return gHasMain;
+}
 
-void HAL_RunMain(void) { gMainFunc(gMainParam); }
+void HAL_RunMain(void) {
+  gMainFunc(gMainParam);
+}
 
-void HAL_ExitMain(void) { gExitFunc(gMainParam); }
+void HAL_ExitMain(void) {
+  gExitFunc(gMainParam);
+}
 
 }  // extern "C"

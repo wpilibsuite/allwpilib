@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+#include <units/angle.h>
+
 #include "frc/PWM.h"
-#include "frc/SpeedController.h"
 
 namespace frc {
 
@@ -21,6 +19,11 @@ namespace frc {
 class Servo : public PWM {
  public:
   /**
+   * Constructor.
+   *
+   * By default, 2.4 ms is used as the max PWM value and 0.6 ms is used as the
+   * min PWM value.
+   *
    * @param channel The PWM channel to which the servo is attached. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
@@ -50,7 +53,8 @@ class Servo : public PWM {
    * Get the servo position.
    *
    * Servo values range from 0.0 to 1.0 corresponding to the range of full left
-   * to full right.
+   * to full right. This returns the commanded position, not the position that
+   * the servo is actually at, as the servo does not report its own position.
    *
    * @return Position from 0.0 to 1.0.
    */
@@ -59,8 +63,8 @@ class Servo : public PWM {
   /**
    * Set the servo angle.
    *
-   * Assume that the servo angle is linear with respect to the PWM value (big
-   * assumption, need to test).
+   * The angles are based on the HS-322HD Servo, and have a range of 0 to 180
+   * degrees.
    *
    * Servo angles that are out of the supported range of the servo simply
    * "saturate" in that direction. In other words, if the servo has a range of
@@ -68,15 +72,15 @@ class Servo : public PWM {
    * X being set and angles of more than Y degrees result in an angle of Y being
    * set.
    *
-   * @param degrees The angle in degrees to set the servo.
+   * @param angle The angle in degrees to set the servo.
    */
   void SetAngle(double angle);
 
   /**
    * Get the servo angle.
    *
-   * Assume that the servo angle is linear with respect to the PWM value (big
-   * assumption, need to test).
+   * This returns the commanded angle, not the angle that the servo is actually
+   * at, as the servo does not report its own angle.
    *
    * @return The angle in degrees to which the servo is set.
    */
@@ -96,16 +100,16 @@ class Servo : public PWM {
    */
   double GetMinAngle() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   double GetServoAngleRange() const;
 
-  static constexpr double kMaxServoAngle = 180.0;
+  static constexpr double kMaxServoAngle = 180.;
   static constexpr double kMinServoAngle = 0.0;
 
-  static constexpr double kDefaultMaxServoPWM = 2.4;
-  static constexpr double kDefaultMinServoPWM = 0.6;
+  static constexpr units::millisecond_t kDefaultMaxServoPWM = 2.4_ms;
+  static constexpr units::millisecond_t kDefaultMinServoPWM = 0.6_ms;
 };
 
 }  // namespace frc

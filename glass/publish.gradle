@@ -1,0 +1,202 @@
+apply plugin: 'maven-publish'
+
+def baseArtifactId = 'Glass'
+def artifactGroupId = 'edu.wpi.first.tools'
+def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_Glass_CLS'
+
+def libBaseArtifactId = 'libglass'
+def libArtifactGroupId = 'edu.wpi.first.glass'
+def libZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglass_CLS'
+
+def libntBaseArtifactId = 'libglassnt'
+def libntArtifactGroupId = 'edu.wpi.first.glass'
+def libntZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglassnt_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+task libCppSourcesZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = libZipBaseName
+    archiveClassifier = "sources"
+
+    from(licenseFile) { into '/' }
+    from('src/lib/native/cpp') { into '/' }
+}
+
+task libCppHeadersZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = libZipBaseName
+    archiveClassifier = "headers"
+
+    from(licenseFile) { into '/' }
+    from('src/lib/native/include') { into '/' }
+}
+
+task libntCppSourcesZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = libntZipBaseName
+    archiveClassifier = "sources"
+
+    from(licenseFile) { into '/' }
+    from('src/libnt/native/cpp') { into '/' }
+}
+
+task libntCppHeadersZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = libntZipBaseName
+    archiveClassifier = "headers"
+
+    from(licenseFile) { into '/' }
+    from('src/libnt/native/include') { into '/' }
+}
+
+build.dependsOn libCppHeadersZip
+build.dependsOn libCppSourcesZip
+build.dependsOn libntCppHeadersZip
+build.dependsOn libntCppSourcesZip
+
+addTaskToCopyAllOutputs(libCppHeadersZip)
+addTaskToCopyAllOutputs(libCppSourcesZip)
+addTaskToCopyAllOutputs(libntCppHeadersZip)
+addTaskToCopyAllOutputs(libntCppSourcesZip)
+
+model {
+    tasks {
+        // Create the run task.
+        $.components.glassApp.binaries.each { bin ->
+            if (bin.buildable && bin.name.toLowerCase().contains("debug") && nativeUtils.isNativeDesktopPlatform(bin.targetPlatform)) {
+
+                Task run = project.tasks.create("run", Exec) {
+                    commandLine bin.tasks.install.runScriptFile.get().asFile.toString()
+                }
+                run.dependsOn bin.tasks.install
+            }
+        }
+    }
+    publishing {
+        def glassAppTaskList = []
+        $.components.each { component ->
+            component.binaries.each { binary ->
+                if (binary in NativeExecutableBinarySpec && binary.component.name.contains("glassApp")) {
+                    if (binary.buildable && (binary.name.contains('Release') || binary.name.contains('release'))) {
+                        // We are now in the binary that we want.
+                        // This is the default application path for the ZIP task.
+                        def applicationPath = binary.executable.file
+                        def icon = file("$project.projectDir/src/app/native/mac/glass.icns")
+
+                        // Create the ZIP.
+                        def task = project.tasks.create("copyGlassExecutable" + binary.targetPlatform.operatingSystem.name + binary.targetPlatform.architecture.name, Zip) {
+                            description("Copies the Glass executable to the outputs directory.")
+                            destinationDirectory = outputsFolder
+
+                            archiveBaseName = '_M_' + zipBaseName
+                            duplicatesStrategy = 'exclude'
+                            archiveClassifier = nativeUtils.getPublishClassifier(binary)
+
+                            from(licenseFile) {
+                                into '/'
+                            }
+
+                            if (binary.targetPlatform.operatingSystem.isWindows()) {
+                                def exePath = binary.executable.file.absolutePath
+                                exePath = exePath.substring(0, exePath.length() - 4)
+                                def pdbPath = new File(exePath + '.pdb')
+                                from(pdbPath)
+                            }
+
+                            into(nativeUtils.getPlatformPath(binary))
+                        }
+
+                        if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+                            // Create the macOS bundle.
+                            def bundleTask = project.tasks.create("bundleGlassOsxApp" + binary.targetPlatform.architecture.name, Copy) {
+                                description("Creates a macOS application bundle for Glass")
+                                from(file("$project.projectDir/Info.plist"))
+                                into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/Glass.app/Contents"))
+                                into("MacOS") {
+                                    with copySpec {
+                                        from binary.executable.file
+                                    }
+                                }
+                                into("Resources") {
+                                    with copySpec {
+                                        from icon
+                                    }
+                                }
+
+                                inputs.property "HasDeveloperId", project.hasProperty("developerID")
+
+                                doLast {
+                                    if (project.hasProperty("developerID")) {
+                                        // Get path to binary.
+                                        exec {
+                                            workingDir rootDir
+                                            def args = [
+                                                "sh",
+                                                "-c",
+                                                "codesign --force --strict --deep " +
+                                                "--timestamp --options=runtime " +
+                                                "--verbose -s ${project.findProperty("developerID")} " +
+                                                "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/Glass.app/"
+                                            ]
+                                            commandLine args
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Reset the application path if we are creating a bundle.
+                            applicationPath = file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name")
+                            task.from(applicationPath)
+                            project.build.dependsOn bundleTask
+
+                            bundleTask.dependsOn binary.tasks.link
+                            task.dependsOn(bundleTask)
+                        } else {
+                            task.from(applicationPath)
+                        }
+
+                        task.dependsOn binary.tasks.link
+                        glassAppTaskList.add(task)
+                        project.build.dependsOn task
+                        project.artifacts { task }
+                        addTaskToCopyAllOutputs(task)
+                    }
+                }
+            }
+        }
+
+        def libGlassTaskList = createComponentZipTasks($.components, ['glass'], libZipBaseName, Zip, project, includeStandardZipFormat)
+        def libGlassntTaskList = createComponentZipTasks($.components, ['glassnt'], libntZipBaseName, Zip, project, includeStandardZipFormat)
+
+        publications {
+            glassApp(MavenPublication) {
+                glassAppTaskList.each { artifact it }
+
+                artifactId = baseArtifactId
+                groupId = artifactGroupId
+                version wpilibVersioning.version.get()
+            }
+            libglass(MavenPublication) {
+                libGlassTaskList.each { artifact it }
+
+                artifact libCppHeadersZip
+                artifact libCppSourcesZip
+
+                artifactId = libBaseArtifactId
+                groupId = libArtifactGroupId
+                version wpilibVersioning.version.get()
+            }
+            libglassnt(MavenPublication) {
+                libGlassntTaskList.each { artifact it }
+
+                artifact libntCppHeadersZip
+                artifact libntCppSourcesZip
+
+                artifactId = libntBaseArtifactId
+                groupId = libntArtifactGroupId
+                version wpilibVersioning.version.get()
+            }
+        }
+    }
+}

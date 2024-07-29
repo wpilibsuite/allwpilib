@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/PWM.h"
 
@@ -13,123 +10,97 @@
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
+#include <wpi/StackTrace.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/Utility.h"
-#include "frc/WPIErrors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-PWM::PWM(int channel) {
+PWM::PWM(int channel, bool registerSendable) {
   if (!SensorUtil::CheckPWMChannel(channel)) {
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "PWM Channel " + wpi::Twine(channel));
-    return;
+    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
 
+  auto stack = wpi::GetStackTrace(1);
   int32_t status = 0;
-  m_handle = HAL_InitializePWMPort(HAL_GetPort(channel), &status);
-  if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumPWMChannels(), channel);
-    m_channel = std::numeric_limits<int>::max();
-    m_handle = HAL_kInvalidHandle;
-    return;
-  }
+  m_handle =
+      HAL_InitializePWMPort(HAL_GetPort(channel), stack.c_str(), &status);
+  FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   m_channel = channel;
 
   HAL_SetPWMDisabled(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", channel);
   status = 0;
   HAL_SetPWMEliminateDeadband(m_handle, false, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_Report(HALUsageReporting::kResourceType_PWM, channel + 1);
-  SendableRegistry::GetInstance().AddLW(this, "PWM", channel);
-
-  SetSafetyEnabled(false);
+  if (registerSendable) {
+    wpi::SendableRegistry::AddLW(this, "PWM", channel);
+  }
 }
 
 PWM::~PWM() {
   int32_t status = 0;
 
   HAL_SetPWMDisabled(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_ReportError(status, "Channel {}", m_channel);
 
   HAL_FreePWMPort(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_ReportError(status, "Channel {}", m_channel);
 }
 
-void PWM::StopMotor() { SetDisabled(); }
-
-void PWM::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "PWM " << GetChannel();
-}
-
-void PWM::SetRaw(uint16_t value) {
-  if (StatusIsFatal()) return;
-
+void PWM::SetPulseTime(units::microsecond_t time) {
   int32_t status = 0;
-  HAL_SetPWMRaw(m_handle, value, &status);
-  wpi_setHALError(status);
+  HAL_SetPWMPulseTimeMicroseconds(m_handle, time.value(), &status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-uint16_t PWM::GetRaw() const {
-  if (StatusIsFatal()) return 0;
-
+units::microsecond_t PWM::GetPulseTime() const {
   int32_t status = 0;
-  uint16_t value = HAL_GetPWMRaw(m_handle, &status);
-  wpi_setHALError(status);
+  double value = HAL_GetPWMPulseTimeMicroseconds(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
-  return value;
+  return units::microsecond_t{value};
 }
 
 void PWM::SetPosition(double pos) {
-  if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMPosition(m_handle, pos, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 double PWM::GetPosition() const {
-  if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double position = HAL_GetPWMPosition(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   return position;
 }
 
 void PWM::SetSpeed(double speed) {
-  if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMSpeed(m_handle, speed, &status);
-  wpi_setHALError(status);
-
-  Feed();
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 double PWM::GetSpeed() const {
-  if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double speed = HAL_GetPWMSpeed(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   return speed;
 }
 
 void PWM::SetDisabled() {
-  if (StatusIsFatal()) return;
-
   int32_t status = 0;
-
   HAL_SetPWMDisabled(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
-  if (StatusIsFatal()) return;
-
   int32_t status = 0;
 
   switch (mult) {
@@ -145,60 +116,74 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
       HAL_SetPWMPeriodScale(m_handle, 0, &status);  // Don't squelch any outputs
       break;
     default:
-      wpi_assert(false);
+      throw FRC_MakeError(err::InvalidParameter, "PeriodMultiplier value {}",
+                          static_cast<int>(mult));
   }
 
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 void PWM::SetZeroLatch() {
-  if (StatusIsFatal()) return;
-
   int32_t status = 0;
-
   HAL_LatchPWMZero(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
-  if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMEliminateDeadband(m_handle, eliminateDeadband, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void PWM::SetBounds(double max, double deadbandMax, double center,
-                    double deadbandMin, double min) {
-  if (StatusIsFatal()) return;
+void PWM::SetBounds(units::microsecond_t max, units::microsecond_t deadbandMax,
+                    units::microsecond_t center,
+                    units::microsecond_t deadbandMin,
+                    units::microsecond_t min) {
   int32_t status = 0;
-  HAL_SetPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min,
-                   &status);
-  wpi_setHALError(status);
+  HAL_SetPWMConfigMicroseconds(m_handle, max.value(), deadbandMax.value(),
+                               center.value(), deadbandMin.value(), min.value(),
+                               &status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void PWM::SetRawBounds(int max, int deadbandMax, int center, int deadbandMin,
-                       int min) {
-  if (StatusIsFatal()) return;
+void PWM::GetBounds(units::microsecond_t* max,
+                    units::microsecond_t* deadbandMax,
+                    units::microsecond_t* center,
+                    units::microsecond_t* deadbandMin,
+                    units::microsecond_t* min) {
   int32_t status = 0;
-  HAL_SetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
-                      &status);
-  wpi_setHALError(status);
+  int32_t rawMax, rawDeadbandMax, rawCenter, rawDeadbandMin, rawMin;
+  HAL_GetPWMConfigMicroseconds(m_handle, &rawMax, &rawDeadbandMax, &rawCenter,
+                               &rawDeadbandMin, &rawMin, &status);
+  *max = units::microsecond_t{static_cast<double>(rawMax)};
+  *deadbandMax = units::microsecond_t{static_cast<double>(rawDeadbandMax)};
+  *center = units::microsecond_t{static_cast<double>(rawCenter)};
+  *deadbandMin = units::microsecond_t{static_cast<double>(rawDeadbandMin)};
+  *min = units::microsecond_t{static_cast<double>(rawMin)};
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void PWM::GetRawBounds(int* max, int* deadbandMax, int* center,
-                       int* deadbandMin, int* min) {
+void PWM::SetAlwaysHighMode() {
   int32_t status = 0;
-  HAL_GetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
-                      &status);
-  wpi_setHALError(status);
+  HAL_SetPWMAlwaysHighMode(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-int PWM::GetChannel() const { return m_channel; }
+int PWM::GetChannel() const {
+  return m_channel;
+}
 
-void PWM::InitSendable(SendableBuilder& builder) {
+void PWM::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");
   builder.SetActuator(true);
-  builder.SetSafeState([=]() { SetDisabled(); });
-  builder.AddDoubleProperty("Value", [=]() { return GetRaw(); },
-                            [=](double value) { SetRaw(value); });
+  builder.SetSafeState([=, this] { SetDisabled(); });
+  builder.AddDoubleProperty(
+      "Value", [=, this] { return GetPulseTime().value(); },
+      [=, this](double value) { SetPulseTime(units::millisecond_t{value}); });
+  builder.AddDoubleProperty(
+      "Speed", [=, this] { return GetSpeed(); },
+      [=, this](double value) { SetSpeed(value); });
+  builder.AddDoubleProperty(
+      "Position", [=, this] { return GetPosition(); },
+      [=, this](double value) { SetPosition(value); });
 }

@@ -1,15 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "commands/HalveDriveSpeed.h"
 
 HalveDriveSpeed::HalveDriveSpeed(DriveSubsystem* subsystem)
     : m_drive(subsystem) {}
 
-void HalveDriveSpeed::Initialize() { m_drive->SetMaxOutput(0.5); }
+void HalveDriveSpeed::Initialize() {
+  m_drive->SetMaxOutput(0.5);
+}
 
-void HalveDriveSpeed::End(bool interrupted) { m_drive->SetMaxOutput(1); }
+void HalveDriveSpeed::End(bool interrupted) {
+  m_drive->SetMaxOutput(1);
+}

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
@@ -13,7 +10,7 @@
 #include "edu_wpi_first_hal_AddressableLEDJNI.h"
 #include "hal/AddressableLED.h"
 
-using namespace frc;
+using namespace hal;
 using namespace wpi::java;
 
 static_assert(sizeof(jbyte) * 4 == sizeof(HAL_AddressableLEDData));
@@ -72,12 +69,11 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
   (JNIEnv* env, jclass, jint handle, jbyteArray arr)
 {
   int32_t status = 0;
-  JByteArrayRef jArrRef{env, arr};
-  auto arrRef = jArrRef.array();
+  JSpan<const jbyte> jArrRef{env, arr};
   HAL_WriteAddressableLEDData(
       static_cast<HAL_AddressableLEDHandle>(handle),
-      reinterpret_cast<const HAL_AddressableLEDData*>(arrRef.data()),
-      arrRef.size() / 4, &status);
+      reinterpret_cast<const HAL_AddressableLEDData*>(jArrRef.data()),
+      jArrRef.size() / 4, &status);
   CheckStatus(env, status);
 }
 
@@ -88,12 +84,12 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AddressableLEDJNI_setBitTiming
-  (JNIEnv* env, jclass, jint handle, jint lowTime0, jint highTime0,
-   jint lowTime1, jint highTime1)
+  (JNIEnv* env, jclass, jint handle, jint highTime0, jint lowTime0,
+   jint highTime1, jint lowTime1)
 {
   int32_t status = 0;
   HAL_SetAddressableLEDBitTiming(static_cast<HAL_AddressableLEDHandle>(handle),
-                                 lowTime0, highTime0, lowTime1, highTime1,
+                                 highTime0, lowTime0, highTime1, lowTime1,
                                  &status);
   CheckStatus(env, status);
 }

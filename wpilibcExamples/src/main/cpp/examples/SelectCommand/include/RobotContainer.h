@@ -1,15 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
-#include <frc2/command/PrintCommand.h>
-#include <frc2/command/SelectCommand.h>
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/Commands.h>
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -28,10 +26,8 @@ class RobotContainer {
   // The enum used as keys for selecting the command to run.
   enum CommandSelector { ONE, TWO, THREE };
 
-  // An example selector method for the selectcommand.  Returns the selector
-  // that will select which command to run.  Can base this choice on logical
-  // conditions evaluated at runtime.
-  CommandSelector Select() { return ONE; }
+  // An example of how command selector may be used with SendableChooser
+  frc::SendableChooser<CommandSelector> m_chooser;
 
   // The robot's subsystems and commands are defined here...
 
@@ -39,12 +35,12 @@ class RobotContainer {
   // value returned by the selector method at runtime.  Note that selectcommand
   // takes a generic type, so the selector does not have to be an enum; it could
   // be any desired type (string, integer, boolean, double...)
-  frc2::SelectCommand<CommandSelector> m_exampleSelectCommand{
-      [this] { return Select(); },
+  frc2::CommandPtr m_exampleSelectCommand = frc2::cmd::Select<CommandSelector>(
+      [this] { return m_chooser.GetSelected(); },
       // Maps selector values to commands
-      std::pair{ONE, frc2::PrintCommand{"Command one was selected!"}},
-      std::pair{TWO, frc2::PrintCommand{"Command two was selected!"}},
-      std::pair{THREE, frc2::PrintCommand{"Command three was selected!"}}};
+      std::pair{ONE, frc2::cmd::Print("Command one was selected!")},
+      std::pair{TWO, frc2::cmd::Print("Command two was selected!")},
+      std::pair{THREE, frc2::cmd::Print("Command three was selected!")});
 
   void ConfigureButtonBindings();
 };

@@ -1,26 +1,24 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#include <frc2/Timer.h>
 #include <frc2/command/MecanumControllerCommand.h>
 #include <frc2/command/Subsystem.h>
 
-#include <iostream>
+#include <numbers>
 
+#include <frc/Timer.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
+#include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <wpi/math>
+#include <gtest/gtest.h>
 
-#include "gtest/gtest.h"
+#include "CommandTestBase.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
@@ -31,13 +29,17 @@ class MecanumControllerCommandTest : public ::testing::Test {
                            units::inverse<units::squared<units::second>>>;
 
  protected:
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
   frc::Rotation2d m_angle{0_rad};
 
   units::meters_per_second_t m_frontLeftSpeed = 0.0_mps;
+  units::meter_t m_frontLeftDistance = 0.0_m;
   units::meters_per_second_t m_rearLeftSpeed = 0.0_mps;
+  units::meter_t m_rearLeftDistance = 0.0_m;
   units::meters_per_second_t m_frontRightSpeed = 0.0_mps;
+  units::meter_t m_frontRightDistance = 0.0_m;
   units::meters_per_second_t m_rearRightSpeed = 0.0_mps;
+  units::meter_t m_rearRightDistance = 0.0_m;
 
   frc::ProfiledPIDController<units::radians> m_rotController{
       1, 0, 0,
@@ -58,21 +60,35 @@ class MecanumControllerCommandTest : public ::testing::Test {
       frc::Translation2d{-kWheelBase / 2, -kTrackWidth / 2}};
 
   frc::MecanumDriveOdometry m_odometry{m_kinematics, 0_rad,
+                                       getCurrentWheelDistances(),
                                        frc::Pose2d{0_m, 0_m, 0_rad}};
+
+  void SetUp() override { frc::sim::PauseTiming(); }
+
+  void TearDown() override { frc::sim::ResumeTiming(); }
 
   frc::MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
     return frc::MecanumDriveWheelSpeeds{m_frontLeftSpeed, m_frontRightSpeed,
                                         m_rearLeftSpeed, m_rearRightSpeed};
   }
 
+  frc::MecanumDriveWheelPositions getCurrentWheelDistances() {
+    return frc::MecanumDriveWheelPositions{
+        m_frontLeftDistance,
+        m_rearLeftDistance,
+        m_frontRightDistance,
+        m_rearRightDistance,
+    };
+  }
+
   frc::Pose2d getRobotPose() {
-    m_odometry.UpdateWithTime(m_timer.Get(), m_angle, getCurrentWheelSpeeds());
+    m_odometry.Update(m_angle, getCurrentWheelDistances());
     return m_odometry.GetPose();
   }
 };
 
 TEST_F(MecanumControllerCommandTest, ReachesReference) {
-  frc2::Subsystem subsystem{};
+  frc2::TestSubsystem subsystem;
 
   auto waypoints =
       std::vector{frc::Pose2d{0_m, 0_m, 0_rad}, frc::Pose2d{1_m, 5_m, 3_rad}};
@@ -84,8 +100,8 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
   auto command = frc2::MecanumControllerCommand(
       trajectory, [&]() { return getRobotPose(); }, m_kinematics,
 
-      frc2::PIDController(0.6, 0, 0), frc2::PIDController(0.6, 0, 0),
-      m_rotController, units::meters_per_second_t(8.8),
+      frc::PIDController(0.6, 0, 0), frc::PIDController(0.6, 0, 0),
+      m_rotController, 8.8_mps,
       [&](units::meters_per_second_t frontLeft,
           units::meters_per_second_t rearLeft,
           units::meters_per_second_t frontRight,
@@ -97,20 +113,23 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
       },
       {&subsystem});
 
-  m_timer.Reset();
-  m_timer.Start();
+  m_timer.Restart();
+
   command.Initialize();
   while (!command.IsFinished()) {
     command.Execute();
     m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();
+    m_frontLeftDistance += m_frontLeftSpeed * 5_ms;
+    m_rearLeftDistance += m_rearLeftSpeed * 5_ms;
+    m_frontRightDistance += m_frontRightSpeed * 5_ms;
+    m_rearRightDistance += m_rearRightSpeed * 5_ms;
+    frc::sim::StepTiming(5_ms);
   }
   m_timer.Stop();
   command.End(false);
 
-  EXPECT_NEAR_UNITS(endState.pose.Translation().X(),
-                    getRobotPose().Translation().X(), kxTolerance);
-  EXPECT_NEAR_UNITS(endState.pose.Translation().Y(),
-                    getRobotPose().Translation().Y(), kyTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.X(), getRobotPose().X(), kxTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.Y(), getRobotPose().Y(), kyTolerance);
   EXPECT_NEAR_UNITS(endState.pose.Rotation().Radians(),
                     getRobotPose().Rotation().Radians(), kAngularTolerance);
 }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/Elevator.h"
 
@@ -12,7 +9,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 Elevator::Elevator()
-    : frc2::PIDSubsystem(frc2::PIDController(kP_real, kI_real, 0)) {
+    : frc2::PIDSubsystem{frc::PIDController{kP_real, kI_real, 0}} {
 #ifdef SIMULATION  // Check for simulation and update PID values
   GetPIDController()->SetPID(kP_simulation, kI_simulation, 0, 0);
 #endif
@@ -24,12 +21,18 @@ Elevator::Elevator()
   AddChild("Pot", &m_pot);
 }
 
-void Elevator::Log() { frc::SmartDashboard::PutData("Wrist Pot", &m_pot); }
+void Elevator::Log() {
+  frc::SmartDashboard::PutData("Wrist Pot", &m_pot);
+}
 
-double Elevator::GetMeasurement() { return m_pot.Get(); }
+double Elevator::GetMeasurement() {
+  return m_pot.Get();
+}
 
 void Elevator::UseOutput(double output, double setpoint) {
   m_motor.Set(output);
 }
 
-void Elevator::Periodic() { Log(); }
+void Elevator::Periodic() {
+  Log();
+}

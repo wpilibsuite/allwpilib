@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 /*
 
@@ -36,13 +33,13 @@ SOFTWARE.
 
 #include "wpi/Signal.h"  // NOLINT(build/include_order)
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 namespace {
 
 template <typename T>
 struct object {
-  object(T i) : v{i} {}  // NOLINT(runtime/explicit)
+  object(T i) : v{i} {}  // NOLINT
 
   void inc_val(const T& i) {
     if (i != v) {
@@ -66,7 +63,7 @@ struct object {
 
 namespace wpi {
 
-TEST(Signal, Recursive) {
+TEST(SignalTest, Recursive) {
   object<int> i1(-1);
   object<int> i2(10);
 
@@ -78,7 +75,7 @@ TEST(Signal, Recursive) {
   ASSERT_EQ(i1.v, i2.v);
 }
 
-TEST(Signal, SelfRecursive) {
+TEST(SignalTest, SelfRecursive) {
   int i = 0;
 
   wpi::sig::Signal_r<int> s;

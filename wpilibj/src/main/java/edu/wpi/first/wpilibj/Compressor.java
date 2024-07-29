@@ -1,211 +1,205 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.CompressorJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.hal.util.AllocationException;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Class for operating a compressor connected to a PCM (Pneumatic Control Module). The PCM will
- * automatically run in closed loop mode by default whenever a {@link Solenoid} object is created.
- * For most cases, a Compressor object does not need to be instantiated or used in a robot program.
- * This class is only required in cases where the robot program needs a more detailed status of the
- * compressor or to enable/disable closed loop control.
+ * Class for operating a compressor connected to a pneumatics module. The module will automatically
+ * run in closed loop mode by default whenever a {@link Solenoid} object is created. For most cases,
+ * a Compressor object does not need to be instantiated or used in a robot program. This class is
+ * only required in cases where the robot program needs a more detailed status of the compressor or
+ * to enable/disable closed loop control.
  *
  * <p>Note: you cannot operate the compressor directly from this class as doing so would circumvent
  * the safety provided by using the pressure switch and closed loop control. You can only turn off
  * closed loop control, thereby stopping the compressor from operating.
  */
 public class Compressor implements Sendable, AutoCloseable {
-  private int m_compressorHandle;
-  private byte m_module;
+  private PneumaticsBase m_module;
+  private PneumaticsModuleType m_moduleType;
 
   /**
-   * Makes a new instance of the compressor using the provided CAN device ID.  Use this constructor
-   * when you have more than one PCM.
+   * Constructs a compressor for a specified module and type.
    *
-   * @param module The PCM CAN device ID (0 - 62 inclusive)
+   * @param module The module ID to use.
+   * @param moduleType The module type to use.
    */
-  public Compressor(int module) {
-    m_module = (byte) module;
+  @SuppressWarnings("this-escape")
+  public Compressor(int module, PneumaticsModuleType moduleType) {
+    m_module = PneumaticsBase.getForType(module, moduleType);
+    m_moduleType = moduleType;
 
-    m_compressorHandle = CompressorJNI.initializeCompressor((byte) module);
+    if (!m_module.reserveCompressor()) {
+      m_module.close();
+      throw new AllocationException("Compressor already allocated");
+    }
+
+    m_module.enableCompressorDigital();
 
     HAL.report(tResourceType.kResourceType_Compressor, module + 1);
     SendableRegistry.addLW(this, "Compressor", module);
   }
 
   /**
-   * Makes a new instance of the compressor using the default PCM ID of 0.
+   * Constructs a compressor for a default module and specified type.
    *
-   * <p>Additional modules can be supported by making a new instance and {@link #Compressor(int)
-   * specifying the CAN ID.}
+   * @param moduleType The module type to use.
    */
-  public Compressor() {
-    this(SensorUtil.getDefaultSolenoidModule());
+  public Compressor(PneumaticsModuleType moduleType) {
+    this(PneumaticsBase.getDefaultForType(moduleType), moduleType);
   }
 
   @Override
   public void close() {
     SendableRegistry.remove(this);
+    m_module.unreserveCompressor();
+    m_module.close();
+    m_module = null;
   }
 
   /**
-   * Start the compressor running in closed loop control mode.
+   * Returns whether the compressor is active or not.
    *
-   * <p>Use the method in cases where you would like to manually stop and start the compressor for
-   * applications such as conserving battery or making sure that the compressor motor doesn't start
-   * during critical operations.
+   * @return true if the compressor is on - otherwise false.
    */
-  public void start() {
-    setClosedLoopControl(true);
+  public boolean isEnabled() {
+    return m_module.getCompressor();
   }
 
   /**
-   * Stop the compressor from running in closed loop control mode.
+   * Returns the state of the pressure switch.
    *
-   * <p>Use the method in cases where you would like to manually stop and start the compressor for
-   * applications such as conserving battery or making sure that the compressor motor doesn't start
-   * during critical operations.
-   */
-  public void stop() {
-    setClosedLoopControl(false);
-  }
-
-  /**
-   * Get the status of the compressor.
-   *
-   * @return true if the compressor is on
-   */
-  public boolean enabled() {
-    return CompressorJNI.getCompressor(m_compressorHandle);
-  }
-
-  /**
-   * Get the pressure switch value.
-   *
-   * @return true if the pressure is low
+   * @return True if pressure switch indicates that the system is not full, otherwise false.
    */
   public boolean getPressureSwitchValue() {
-    return CompressorJNI.getCompressorPressureSwitch(m_compressorHandle);
+    return m_module.getPressureSwitch();
   }
 
   /**
-   * Get the current being used by the compressor.
+   * Get the current drawn by the compressor.
    *
-   * @return current consumed by the compressor in amps
+   * @return Current drawn by the compressor in amps.
    */
-  public double getCompressorCurrent() {
-    return CompressorJNI.getCompressorCurrent(m_compressorHandle);
+  public double getCurrent() {
+    return m_module.getCompressorCurrent();
   }
 
   /**
-   * Set the PCM in closed loop control mode.
+   * If supported by the device, returns the analog input voltage (on channel 0).
    *
-   * @param on if true sets the compressor to be in closed loop control mode (default)
+   * <p>This function is only supported by the REV PH. On CTRE PCM, this will return 0.
+   *
+   * @return The analog input voltage, in volts.
    */
-  public void setClosedLoopControl(boolean on) {
-    CompressorJNI.setCompressorClosedLoopControl(m_compressorHandle, on);
+  public double getAnalogVoltage() {
+    return m_module.getAnalogVoltage(0);
   }
 
   /**
-   * Gets the current operating mode of the PCM.
+   * If supported by the device, returns the pressure (in PSI) read by the analog pressure sensor
+   * (on channel 0).
    *
-   * @return true if compressor is operating on closed-loop mode
+   * <p>This function is only supported by the REV PH with the REV Analog Pressure Sensor. On CTRE
+   * PCM, this will return 0.
+   *
+   * @return The pressure (in PSI) read by the analog pressure sensor.
    */
-  public boolean getClosedLoopControl() {
-    return CompressorJNI.getCompressorClosedLoopControl(m_compressorHandle);
+  public double getPressure() {
+    return m_module.getPressure(0);
+  }
+
+  /** Disable the compressor. */
+  public void disable() {
+    m_module.disableCompressor();
   }
 
   /**
-   * If PCM is in fault state : Compressor Drive is disabled due to compressor current being too
-   * high.
-   *
-   * @return true if PCM is in fault state.
+   * Enables the compressor in digital mode using the digital pressure switch. The compressor will
+   * turn on when the pressure switch indicates that the system is not full, and will turn off when
+   * the pressure switch indicates that the system is full.
    */
-  public boolean getCompressorCurrentTooHighFault() {
-    return CompressorJNI.getCompressorCurrentTooHighFault(m_compressorHandle);
+  public void enableDigital() {
+    m_module.enableCompressorDigital();
   }
 
   /**
-   * If PCM sticky fault is set : Compressor is disabled due to compressor current being too
-   * high.
+   * If supported by the device, enables the compressor in analog mode. This mode uses an analog
+   * pressure sensor connected to analog channel 0 to cycle the compressor. The compressor will turn
+   * on when the pressure drops below {@code minPressure} and will turn off when the pressure
+   * reaches {@code maxPressure}. This mode is only supported by the REV PH with the REV Analog
+   * Pressure Sensor connected to analog channel 0.
    *
-   * @return true if PCM sticky fault is set.
+   * <p>On CTRE PCM, this will enable digital control.
+   *
+   * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
+   *     drops below this value.
+   * @param maxPressure The maximum pressure in PSI. The compressor will turn off when the pressure
+   *     reaches this value.
    */
-  public boolean getCompressorCurrentTooHighStickyFault() {
-    return CompressorJNI.getCompressorCurrentTooHighStickyFault(m_compressorHandle);
+  public void enableAnalog(double minPressure, double maxPressure) {
+    m_module.enableCompressorAnalog(minPressure, maxPressure);
   }
 
   /**
-   * If PCM sticky fault is set : Compressor output appears to be shorted.
+   * If supported by the device, enables the compressor in hybrid mode. This mode uses both a
+   * digital pressure switch and an analog pressure sensor connected to analog channel 0 to cycle
+   * the compressor. This mode is only supported by the REV PH with the REV Analog Pressure Sensor
+   * connected to analog channel 0.
    *
-   * @return true if PCM sticky fault is set.
+   * <p>The compressor will turn on when <i>both</i>:
+   *
+   * <ul>
+   *   <li>The digital pressure switch indicates the system is not full AND
+   *   <li>The analog pressure sensor indicates that the pressure in the system is below the
+   *       specified minimum pressure.
+   * </ul>
+   *
+   * <p>The compressor will turn off when <i>either</i>:
+   *
+   * <ul>
+   *   <li>The digital pressure switch is disconnected or indicates that the system is full OR
+   *   <li>The pressure detected by the analog sensor is greater than the specified maximum
+   *       pressure.
+   * </ul>
+   *
+   * <p>On CTRE PCM, this will enable digital control.
+   *
+   * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
+   *     drops below this value and the pressure switch indicates that the system is not full.
+   * @param maxPressure The maximum pressure in PSI. The compressor will turn off when the pressure
+   *     reaches this value or the pressure switch is disconnected or indicates that the system is
+   *     full.
    */
-  public boolean getCompressorShortedStickyFault() {
-    return CompressorJNI.getCompressorShortedStickyFault(m_compressorHandle);
+  public void enableHybrid(double minPressure, double maxPressure) {
+    m_module.enableCompressorHybrid(minPressure, maxPressure);
   }
 
   /**
-   * If PCM is in fault state : Compressor output appears to be shorted.
+   * Returns the active compressor configuration.
    *
-   * @return true if PCM is in fault state.
+   * @return The active compressor configuration.
    */
-  public boolean getCompressorShortedFault() {
-    return CompressorJNI.getCompressorShortedFault(m_compressorHandle);
-  }
-
-  /**
-   * If PCM sticky fault is set : Compressor does not appear to be wired, i.e. compressor is not
-   * drawing enough current.
-   *
-   * @return true if PCM sticky fault is set.
-   */
-  public boolean getCompressorNotConnectedStickyFault() {
-    return CompressorJNI.getCompressorNotConnectedStickyFault(m_compressorHandle);
-  }
-
-  /**
-   * If PCM is in fault state : Compressor does not appear to be wired, i.e. compressor is not
-   * drawing enough current.
-   *
-   * @return true if PCM is in fault state.
-   */
-  public boolean getCompressorNotConnectedFault() {
-    return CompressorJNI.getCompressorNotConnectedFault(m_compressorHandle);
-  }
-
-  /**
-   * Clear ALL sticky faults inside PCM that Compressor is wired to.
-   *
-   * <p>If a sticky fault is set, then it will be persistently cleared. The compressor might
-   * momentarily disable while the flags are being cleared. Doo not call this method too
-   * frequently, otherwise normal compressor functionality may be prevented.
-   *
-   * <p>If no sticky faults are set then this call will have no effect.
-   */
-  public void clearAllPCMStickyFaults() {
-    CompressorJNI.clearAllPCMStickyFaults(m_module);
+  public CompressorConfigType getConfigType() {
+    return m_module.getCompressorConfigType();
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Compressor");
-    builder.addBooleanProperty("Enabled", this::enabled, value -> {
-      if (value) {
-        start();
-      } else {
-        stop();
-      }
-    });
+    builder.addBooleanProperty("Enabled", this::isEnabled, null);
     builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
+    builder.addDoubleProperty("Current (A)", this::getCurrent, null);
+    if (m_moduleType == PneumaticsModuleType.REVPH) { // These are not supported by the CTRE PCM
+      builder.addDoubleProperty("Analog Voltage", this::getAnalogVoltage, null);
+      builder.addDoubleProperty("Pressure (PSI)", this::getPressure, null);
+    }
   }
 }

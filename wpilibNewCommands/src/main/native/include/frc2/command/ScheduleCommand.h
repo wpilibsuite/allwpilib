@@ -1,27 +1,26 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <wpi/ArrayRef.h>
-#include <wpi/SmallVector.h>
+#include <span>
 
-#include "frc2/command/CommandBase.h"
+#include <wpi/SmallSet.h>
+
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
-#include "frc2/command/SetUtilities.h"
 
 namespace frc2 {
 /**
- * Schedules the given commands when this command is initialized.  Useful for
- * forking off from CommandGroups.  Note that if run from a CommandGroup, the
- * group will not know about the status of the scheduled commands, and will
- * treat this command as finishing instantly.
+ * Schedules the given commands when this command is initialized. Useful for
+ * forking off from CommandGroups. Note that if run from a composition, the
+ * composition will not know about the status of the scheduled commands, and
+ * will treat this command as finishing instantly.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
-class ScheduleCommand : public CommandHelper<CommandBase, ScheduleCommand> {
+class ScheduleCommand : public CommandHelper<Command, ScheduleCommand> {
  public:
   /**
    * Creates a new ScheduleCommand that schedules the given commands when
@@ -29,7 +28,9 @@ class ScheduleCommand : public CommandHelper<CommandBase, ScheduleCommand> {
    *
    * @param toSchedule the commands to schedule
    */
-  explicit ScheduleCommand(wpi::ArrayRef<Command*> toSchedule);
+  explicit ScheduleCommand(std::span<Command* const> toSchedule);
+
+  explicit ScheduleCommand(Command* toSchedule);
 
   ScheduleCommand(ScheduleCommand&& other) = default;
 
@@ -42,6 +43,6 @@ class ScheduleCommand : public CommandHelper<CommandBase, ScheduleCommand> {
   bool RunsWhenDisabled() const override;
 
  private:
-  wpi::SmallVector<Command*, 4> m_toSchedule;
+  wpi::SmallSet<Command*, 4> m_toSchedule;
 };
 }  // namespace frc2

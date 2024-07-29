@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_RAW_ISTREAM_H_
 #define WPIUTIL_WPI_RAW_ISTREAM_H_
@@ -12,14 +9,13 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <span>
 #include <string>
+#include <string_view>
 #include <system_error>
 #include <vector>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
-#include "wpi/Twine.h"
 
 namespace wpi {
 
@@ -50,7 +46,9 @@ class raw_istream {
 
   size_t readsome(void* data, size_t len) {
     size_t readlen = (std::min)(in_avail(), len);
-    if (readlen == 0) return 0;
+    if (readlen == 0) {
+      return 0;
+    }
     read_impl(data, readlen);
     return m_read_count;
   }
@@ -101,7 +99,7 @@ class raw_istream {
   // @param buf Buffer for output
   // @param maxLen Maximum length
   // @return Line
-  StringRef getline(SmallVectorImpl<char>& buf, int maxLen);
+  std::string_view getline(SmallVectorImpl<char>& buf, int maxLen);
 
   virtual void close() = 0;
 
@@ -135,9 +133,9 @@ class raw_mem_istream : public raw_istream {
   // not const as we don't want to allow temporaries
   explicit raw_mem_istream(std::string& str)
       : raw_mem_istream(str.data(), str.size()) {}
-  explicit raw_mem_istream(ArrayRef<char> mem)
+  explicit raw_mem_istream(std::span<const char> mem)
       : raw_mem_istream(mem.data(), mem.size()) {}
-  explicit raw_mem_istream(ArrayRef<uint8_t> mem)
+  explicit raw_mem_istream(std::span<const uint8_t> mem)
       : raw_mem_istream(reinterpret_cast<const char*>(mem.data()), mem.size()) {
   }
   explicit raw_mem_istream(const char* str)
@@ -155,11 +153,11 @@ class raw_mem_istream : public raw_istream {
 
 class raw_fd_istream : public raw_istream {
  public:
-  raw_fd_istream(const Twine& filename, std::error_code& ec,
+  raw_fd_istream(std::string_view filename, std::error_code& ec,
                  size_t bufSize = 4096);
   raw_fd_istream(int fd, bool shouldClose, size_t bufSize = 4096);
   ~raw_fd_istream() override;
-  void close() override;
+  void close() final;
   size_t in_avail() const override;
 
  private:

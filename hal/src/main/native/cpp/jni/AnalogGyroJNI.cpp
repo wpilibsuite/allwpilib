@@ -1,20 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
 #include <cassert>
+
+#include <wpi/jni_util.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_AnalogGyroJNI.h"
 #include "hal/AnalogGyro.h"
 #include "hal/handles/HandlesInternal.h"
 
-using namespace frc;
+using namespace hal;
 
 extern "C" {
 /*
@@ -27,8 +26,9 @@ Java_edu_wpi_first_hal_AnalogGyroJNI_initializeAnalogGyro
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  HAL_GyroHandle handle =
-      HAL_InitializeAnalogGyro((HAL_AnalogInputHandle)id, &status);
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  HAL_GyroHandle handle = HAL_InitializeAnalogGyro((HAL_AnalogInputHandle)id,
+                                                   stack.c_str(), &status);
   // Analog input does range checking, so we don't need to do so.
   CheckStatusForceThrow(env, status);
   return (jint)handle;

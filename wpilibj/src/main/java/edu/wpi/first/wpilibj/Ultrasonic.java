@@ -1,24 +1,22 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import java.util.ArrayList;
-import java.util.List;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-import static java.util.Objects.requireNonNull;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Ultrasonic rangefinder class. The Ultrasonic rangefinder measures absolute distance based on the
@@ -29,21 +27,7 @@ import static java.util.Objects.requireNonNull;
  * echo is received. The time that the line is high determines the round trip distance (time of
  * flight).
  */
-public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
-  /**
-   * The units to return when PIDGet is called.
-   */
-  public enum Unit {
-    /**
-     * Use inches for PIDGet.
-     */
-    kInches,
-    /**
-     * Use millimeters for PIDGet.
-     */
-    kMillimeters
-  }
-
+public class Ultrasonic implements Sendable, AutoCloseable {
   // Time (sec) for the ping trigger pulse.
   private static final double kPingTime = 10 * 1e-6;
   private static final double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;
@@ -53,16 +37,16 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   private static volatile boolean m_automaticEnabled;
   private DigitalInput m_echoChannel;
   private DigitalOutput m_pingChannel;
-  private boolean m_allocatedChannels;
+  private final boolean m_allocatedChannels;
   private boolean m_enabled;
   private Counter m_counter;
   // task doing the round-robin automatic sensing
   private static Thread m_task;
-  private Unit m_units;
   private static int m_instances;
-  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
+  @SuppressWarnings("PMD.SingularField")
   private SimDevice m_simDevice;
+
   private SimBoolean m_simRangeValid;
   private SimDouble m_simRange;
 
@@ -75,20 +59,20 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    * certainly break. Make sure to disable automatic mode before changing anything with the
    * sensors!!
    */
-  private static class UltrasonicChecker extends Thread {
+  private static final class UltrasonicChecker extends Thread {
     @Override
     public synchronized void run() {
       while (m_automaticEnabled) {
-        for (Ultrasonic sensor: m_sensors) {
+        for (Ultrasonic sensor : m_sensors) {
           if (!m_automaticEnabled) {
             break;
           }
 
           if (sensor.isEnabled()) {
-            sensor.m_pingChannel.pulse(kPingTime);  // do the ping
+            sensor.m_pingChannel.pulse(kPingTime); // do the ping
           }
 
-          Timer.delay(0.1);  // wait for ping to return
+          Timer.delay(0.1); // wait for ping to return
         }
       }
     }
@@ -97,19 +81,16 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   /**
    * Initialize the Ultrasonic Sensor. This is the common code that initializes the ultrasonic
    * sensor given that there are two digital I/O channels allocated. If the system was running in
-   * automatic mode (round robin) when the new sensor is added, it is stopped, the sensor is added,
+   * automatic mode (round-robin) when the new sensor is added, it is stopped, the sensor is added,
    * then automatic mode is restored.
    */
   private synchronized void initialize() {
     m_simDevice = SimDevice.create("Ultrasonic", m_echoChannel.getChannel());
     if (m_simDevice != null) {
-      m_simRangeValid = m_simDevice.createBoolean("Range Valid", false, true);
-      m_simRange = m_simDevice.createDouble("Range (in)", false, 0.0);
+      m_simRangeValid = m_simDevice.createBoolean("Range Valid", Direction.kInput, true);
+      m_simRange = m_simDevice.createDouble("Range (in)", Direction.kInput, 0.0);
       m_pingChannel.setSimDevice(m_simDevice);
       m_echoChannel.setSimDevice(m_simDevice);
-    }
-    if (m_task == null) {
-      m_task = new UltrasonicChecker();
     }
     final boolean originalMode = m_automaticEnabled;
     setAutomaticMode(false); // kill task when adding a new sensor
@@ -121,7 +102,7 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
     m_counter.setMaxPeriod(1.0);
     m_counter.setSemiPeriodMode(true);
     m_counter.reset();
-    m_enabled = true; // make it available for round robin scheduling
+    m_enabled = true; // make it available for round-robin scheduling
     setAutomaticMode(originalMode);
 
     m_instances++;
@@ -130,38 +111,31 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   }
 
   /**
-   * Create an instance of the Ultrasonic Sensor. This is designed to supchannel the Daventech SRF04
+   * Returns the echo channel.
+   *
+   * @return The echo channel.
+   */
+  public int getEchoChannel() {
+    return m_echoChannel.getChannel();
+  }
+
+  /**
+   * Create an instance of the Ultrasonic Sensor. This is designed to support the Daventech SRF04
    * and Vex ultrasonic sensors.
    *
    * @param pingChannel The digital output channel that sends the pulse to initiate the sensor
-   *                    sending the ping.
+   *     sending the ping.
    * @param echoChannel The digital input channel that receives the echo. The length of time that
-   *                    the echo is high represents the round trip time of the ping, and the
-   *                    distance.
-   * @param units       The units returned in either kInches or kMilliMeters
+   *     the echo is high represents the round trip time of the ping, and the distance.
    */
-  public Ultrasonic(final int pingChannel, final int echoChannel, Unit units) {
+  @SuppressWarnings("this-escape")
+  public Ultrasonic(final int pingChannel, final int echoChannel) {
     m_pingChannel = new DigitalOutput(pingChannel);
     m_echoChannel = new DigitalInput(echoChannel);
     SendableRegistry.addChild(this, m_pingChannel);
     SendableRegistry.addChild(this, m_echoChannel);
     m_allocatedChannels = true;
-    m_units = units;
     initialize();
-  }
-
-  /**
-   * Create an instance of the Ultrasonic Sensor. This is designed to supchannel the Daventech SRF04
-   * and Vex ultrasonic sensors. Default unit is inches.
-   *
-   * @param pingChannel The digital output channel that sends the pulse to initiate the sensor
-   *                    sending the ping.
-   * @param echoChannel The digital input channel that receives the echo. The length of time that
-   *                    the echo is high represents the round trip time of the ping, and the
-   *                    distance.
-   */
-  public Ultrasonic(final int pingChannel, final int echoChannel) {
-    this(pingChannel, echoChannel, Unit.kInches);
   }
 
   /**
@@ -169,38 +143,23 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    * DigitalOutput for the ping channel.
    *
    * @param pingChannel The digital output object that starts the sensor doing a ping. Requires a
-   *                    10uS pulse to start.
-   * @param echoChannel The digital input object that times the return pulse to determine the
-   *                    range.
-   * @param units       The units returned in either kInches or kMilliMeters
+   *     10uS pulse to start.
+   * @param echoChannel The digital input object that times the return pulse to determine the range.
    */
-  public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel, Unit units) {
-    requireNonNull(pingChannel, "Provided ping channel was null");
-    requireNonNull(echoChannel, "Provided echo channel was null");
+  @SuppressWarnings("this-escape")
+  public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel) {
+    requireNonNullParam(pingChannel, "pingChannel", "Ultrasonic");
+    requireNonNullParam(echoChannel, "echoChannel", "Ultrasonic");
 
     m_allocatedChannels = false;
     m_pingChannel = pingChannel;
     m_echoChannel = echoChannel;
-    m_units = units;
     initialize();
   }
 
   /**
-   * Create an instance of an Ultrasonic Sensor from a DigitalInput for the echo channel and a
-   * DigitalOutput for the ping channel. Default unit is inches.
-   *
-   * @param pingChannel The digital output object that starts the sensor doing a ping. Requires a
-   *                    10uS pulse to start.
-   * @param echoChannel The digital input object that times the return pulse to determine the
-   *                    range.
-   */
-  public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel) {
-    this(pingChannel, echoChannel, Unit.kInches);
-  }
-
-  /**
    * Destructor for the ultrasonic sensor. Delete the instance of the ultrasonic sensor by freeing
-   * the allocated digital channels. If the system was in automatic mode (round robin), then it is
+   * the allocated digital channels. If the system was in automatic mode (round-robin), then it is
    * stopped, then started again after this sensor is removed (provided this wasn't the last
    * sensor).
    */
@@ -239,16 +198,17 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   }
 
   /**
-   * Turn Automatic mode on/off. When in Automatic mode, all sensors will fire in round robin,
-   * waiting a set time between each sensor.
+   * Turn Automatic mode on/off for all sensors.
    *
-   * @param enabling Set to true if round robin scheduling should start for all the ultrasonic
-   *                 sensors. This scheduling method assures that the sensors are non-interfering
-   *                 because no two sensors fire at the same time. If another scheduling algorithm
-   *                 is preferred, it can be implemented by pinging the sensors manually and waiting
-   *                 for the results to come back.
+   * <p>When in Automatic mode, all sensors will fire in round-robin, waiting a set time between
+   * each sensor.
+   *
+   * @param enabling Set to true if round-robin scheduling should start for all the ultrasonic
+   *     sensors. This scheduling method assures that the sensors are non-interfering because no two
+   *     sensors fire at the same time. If another scheduling algorithm is preferred, it can be
+   *     implemented by pinging the sensors manually and waiting for the results to come back.
    */
-  public void setAutomaticMode(boolean enabling) {
+  public static synchronized void setAutomaticMode(boolean enabling) {
     if (enabling == m_automaticEnabled) {
       return; // ignore the case of no change
     }
@@ -263,14 +223,18 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
       }
 
       // Start round robin task
+      m_task = new UltrasonicChecker();
       m_task.start();
     } else {
-      // Wait for background task to stop running
-      try {
-        m_task.join();
-      } catch (InterruptedException ex) {
-        Thread.currentThread().interrupt();
-        ex.printStackTrace();
+      if (m_task != null) {
+        // Wait for background task to stop running
+        try {
+          m_task.join();
+          m_task = null;
+        } catch (InterruptedException ex) {
+          Thread.currentThread().interrupt();
+          ex.printStackTrace();
+        }
       }
 
       /* Clear all the counters (data now invalid) since automatic mode is
@@ -285,12 +249,12 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
 
   /**
    * Single ping to ultrasonic sensor. Send out a single ping to the ultrasonic sensor. This only
-   * works if automatic (round robin) mode is disabled. A single ping is sent out, and the counter
+   * works if automatic (round-robin) mode is disabled. A single ping is sent out, and the counter
    * should count the semi-period when it comes in. The counter is reset to make the current value
    * invalid.
    */
   public void ping() {
-    setAutomaticMode(false); // turn off automatic round robin if pinging
+    setAutomaticMode(false); // turn off automatic round-robin if pinging
     // single sensor
     m_counter.reset(); // reset the counter to zero (invalid data now)
     // do the ping to start getting a single range
@@ -336,54 +300,6 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    */
   public double getRangeMM() {
     return getRangeInches() * 25.4;
-  }
-
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    if (!pidSource.equals(PIDSourceType.kDisplacement)) {
-      throw new IllegalArgumentException("Only displacement PID is allowed for ultrasonics.");
-    }
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Get the range in the current DistanceUnit for the PIDSource base object.
-   *
-   * @return The range in DistanceUnit
-   */
-  @Override
-  public double pidGet() {
-    switch (m_units) {
-      case kInches:
-        return getRangeInches();
-      case kMillimeters:
-        return getRangeMM();
-      default:
-        return 0.0;
-    }
-  }
-
-  /**
-   * Set the current DistanceUnit that should be used for the PIDSource base object.
-   *
-   * @param units The DistanceUnit that should be used.
-   */
-  public void setDistanceUnits(Unit units) {
-    m_units = units;
-  }
-
-  /**
-   * Get the current DistanceUnit that is used for the PIDSource base object.
-   *
-   * @return The type of DistanceUnit that is being used.
-   */
-  public Unit getDistanceUnits() {
-    return m_units;
   }
 
   /**

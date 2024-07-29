@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sat, 20 Jul 2024 23:18:56 -0700
+Subject: [PATCH 2/2] Disable docs build by default
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f5e538bf7cc1807e85a53361ee732122650708b7..cf2dc45788d75adc90c3bc9e49964462740e0723 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -25,7 +25,7 @@ endif()
+ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+ option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" ${GLFW_STANDALONE})
+ option(GLFW_BUILD_TESTS "Build the GLFW test programs" ${GLFW_STANDALONE})
+-option(GLFW_BUILD_DOCS "Build the GLFW documentation" ON)
++option(GLFW_BUILD_DOCS "Build the GLFW documentation" OFF)
+ option(GLFW_INSTALL "Generate installation target" ON)
+ 
+ include(GNUInstallDirs)

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -15,21 +12,19 @@
 
 #include <wpi/mutex.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
 /**
  * The Resource class is a convenient way to track allocated resources.
  *
- * It tracks them as indicies in the range [0 .. elements - 1]. E.g. the library
+ * It tracks them as indices in the range [0 .. elements - 1]. E.g. the library
  * uses this to track hardware channel allocation.
  *
  * The Resource class does not allocate the hardware channels or other
  * resources; it just tracks which indices were marked in use by Allocate and
  * not yet freed by Free.
  */
-class Resource : public ErrorBase {
+class Resource {
  public:
   virtual ~Resource() = default;
 
@@ -51,7 +46,7 @@ class Resource : public ErrorBase {
    * Allocate storage for a new instance of Resource.
    *
    * Allocate a bool array of values that will get initialized to indicate that
-   * no resources have been allocated yet. The indicies of the resources are
+   * no resources have been allocated yet. The indices of the resources are
    * [0 .. elements - 1].
    */
   explicit Resource(uint32_t size);

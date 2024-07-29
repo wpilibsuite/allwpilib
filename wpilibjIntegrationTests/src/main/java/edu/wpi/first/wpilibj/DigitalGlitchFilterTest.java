@@ -1,26 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import java.util.logging.Logger;
-
-import org.junit.Test;
-
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-
 import static org.junit.Assert.assertEquals;
 
-/**
- * Test for the DigitalGlitchFilter class.
- */
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import java.util.logging.Logger;
+import org.junit.Test;
+
+/** Test for the DigitalGlitchFilter class. */
 public class DigitalGlitchFilterTest extends AbstractComsSetup {
-  private static final Logger logger = Logger.getLogger(
-      DigitalGlitchFilterTest.class.getName());
+  private static final Logger logger = Logger.getLogger(DigitalGlitchFilterTest.class.getName());
 
   @Override
   protected Logger getClassLogger() {
@@ -29,9 +21,9 @@ public class DigitalGlitchFilterTest extends AbstractComsSetup {
 
   /**
    * This is a test to make sure that filters can be created and are consistent. This assumes that
-   * the FPGA implementation to actually implement the filter has been tested.  It does validate
-   * that we are successfully able to set and get the active filters for ports and makes sure that
-   * the FPGA filter is changed correctly, and does the same for the period.
+   * the FPGA implementation to actually implement the filter has been tested. It does validate that
+   * we are successfully able to set and get the active filters for ports and makes sure that the
+   * FPGA filter is changed correctly, and does the same for the period.
    */
   @Test
   public void testDigitalGlitchFilterBasic() {

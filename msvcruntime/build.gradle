@@ -1,0 +1,80 @@
+import org.gradle.nativeplatform.toolchain.internal.msvcpp.VisualStudioLocator
+import org.gradle.internal.os.OperatingSystem
+import org.gradle.util.VersionNumber
+
+plugins {
+    id 'cpp'
+    id 'maven-publish'
+}
+
+if (OperatingSystem.current().isWindows()) {
+    def outputsFolder = file("$buildDir/outputs")
+
+    def baseArtifactId = 'runtime'
+    def artifactGroupId = "edu.wpi.first.msvc"
+    def zipBaseName = "_GROUP_edu_wpi_first_msvc_ID_runtime_CLS"
+
+    def vsLocator = gradle.services.get(VisualStudioLocator)
+
+    def vsLocationResult = vsLocator.locateComponent(null)
+
+    if (!vsLocationResult.available) {
+        return
+    }
+
+    def vsLocation = vsLocationResult.component
+
+    def visualCppVersion = vsLocation.visualCpp.version
+
+    def vsDirectory = vsLocation.visualStudioDir
+
+    def defaultRedistFile = file("$vsDirectory\\VC\\Auxiliary\\Build\\Microsoft.VCRedistVersion.default.txt")
+
+    if (!defaultRedistFile.exists()) {
+        logger.warn("Version file for VS Compiler not found")
+        logger.warn("Expected at $defaultRedistFile")
+        return
+    }
+
+    def expectedVersion = defaultRedistFile.text.trim()
+
+    def runtimeLocation = file("$vsDirectory\\VC\\Redist\\MSVC\\$expectedVersion")
+
+    if (runtimeLocation.exists()) {
+
+        def x64Folder = null
+
+        file("$runtimeLocation\\x64").eachFile {
+            if (it.name.endsWith('.CRT')) {
+                x64Folder = it
+            }
+        }
+
+        def x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
+            destinationDirectory = outputsFolder
+            archiveBaseName = zipBaseName
+            archiveClassifier = 'x64'
+
+            from x64Folder
+        }
+
+        addTaskToCopyAllOutputs(x64ZipTask)
+
+        build.dependsOn x64ZipTask
+
+        publishing {
+            publications {
+
+                runtime(MavenPublication) {
+                    artifact x64ZipTask
+
+                    artifactId = "${baseArtifactId}"
+                    groupId artifactGroupId
+                    version wpilibVersioning.version.get()
+                }
+            }
+        }
+    } else if (project.hasProperty('buildServer')) {
+        throw new GradleException("Must find a runtime in CI. Expected at $runtimeLocation")
+    }
+}

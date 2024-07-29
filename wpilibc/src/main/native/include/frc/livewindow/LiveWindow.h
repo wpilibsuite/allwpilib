@@ -1,66 +1,74 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <functional>
-#include <memory>
+
+namespace wpi {
+class Sendable;
+}  // namespace wpi
 
 namespace frc {
-
-class Sendable;
 
 /**
  * The LiveWindow class is the public interface for putting sensors and
  * actuators on the LiveWindow.
  */
-class LiveWindow {
+class LiveWindow final {
  public:
-  LiveWindow(const LiveWindow&) = delete;
-  LiveWindow& operator=(const LiveWindow&) = delete;
-
-  std::function<void()> enabled;
-  std::function<void()> disabled;
+  /**
+   * Sets function to be called when LiveWindow is enabled.
+   *
+   * @param func function (or nullptr for none)
+   */
+  static void SetEnabledCallback(std::function<void()> func);
 
   /**
-   * Get an instance of the LiveWindow main class.
+   * Sets function to be called when LiveWindow is disabled.
    *
-   * This is a singleton to guarantee that there is only a single instance
-   * regardless of how many times GetInstance is called.
+   * @param func function (or nullptr for none)
    */
-  static LiveWindow* GetInstance();
+  static void SetDisabledCallback(std::function<void()> func);
 
   /**
    * Enable telemetry for a single component.
    *
-   * @param sendable component
+   * @param component sendable
    */
-  void EnableTelemetry(Sendable* component);
+  static void EnableTelemetry(wpi::Sendable* component);
 
   /**
    * Disable telemetry for a single component.
    *
-   * @param sendable component
+   * @param component sendable
    */
-  void DisableTelemetry(Sendable* component);
+  static void DisableTelemetry(wpi::Sendable* component);
 
   /**
    * Disable ALL telemetry.
    */
-  void DisableAllTelemetry();
+  static void DisableAllTelemetry();
 
-  bool IsEnabled() const;
+  /**
+   * Enable ALL telemetry.
+   */
+  static void EnableAllTelemetry();
+
+  /**
+   * Returns true if LiveWindow is enabled.
+   *
+   * @return True if LiveWindow is enabled.
+   */
+  static bool IsEnabled();
 
   /**
    * Change the enabled status of LiveWindow.
    *
    * If it changes to enabled, start livewindow running otherwise stop it
    */
-  void SetEnabled(bool enabled);
+  static void SetEnabled(bool enabled);
 
   /**
    * Tell all the sensors to update (send) their values.
@@ -68,18 +76,15 @@ class LiveWindow {
    * Actuators are handled through callbacks on their value changing from the
    * SmartDashboard widgets.
    */
-  void UpdateValues();
+  static void UpdateValues();
 
  private:
-  LiveWindow();
-
-  struct Impl;
-  std::unique_ptr<Impl> m_impl;
+  LiveWindow() = default;
 
   /**
    * Updates the entries, without using a mutex or lock.
    */
-  void UpdateValuesUnsafe();
+  static void UpdateValuesUnsafe();
 };
 
 }  // namespace frc

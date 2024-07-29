@@ -1,38 +1,64 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-@SuppressWarnings("JavadocMethod")
+/** Robot state utility functions. */
 public final class RobotState {
+  /**
+   * Returns true if the robot is disabled.
+   *
+   * @return True if the robot is disabled.
+   */
   public static boolean isDisabled() {
-    return DriverStation.getInstance().isDisabled();
+    return DriverStation.isDisabled();
   }
 
+  /**
+   * Returns true if the robot is enabled.
+   *
+   * @return True if the robot is enabled.
+   */
   public static boolean isEnabled() {
-    return DriverStation.getInstance().isEnabled();
+    return DriverStation.isEnabled();
   }
 
+  /**
+   * Returns true if the robot is E-stopped.
+   *
+   * @return True if the robot is E-stopped.
+   */
   public static boolean isEStopped() {
-    return DriverStation.getInstance().isEStopped();
+    return DriverStation.isEStopped();
   }
 
-  public static boolean isOperatorControl() {
-    return DriverStation.getInstance().isOperatorControl();
+  /**
+   * Returns true if the robot is in teleop mode.
+   *
+   * @return True if the robot is in teleop mode.
+   */
+  public static boolean isTeleop() {
+    return DriverStation.isTeleop();
   }
 
+  /**
+   * Returns true if the robot is in autonomous mode.
+   *
+   * @return True if the robot is in autonomous mode.
+   */
   public static boolean isAutonomous() {
-    return DriverStation.getInstance().isAutonomous();
+    return DriverStation.isAutonomous();
   }
 
+  /**
+   * Returns true if the robot is in test mode.
+   *
+   * @return True if the robot is in test mode.
+   */
   public static boolean isTest() {
-    return DriverStation.getInstance().isTest();
+    return DriverStation.isTest();
   }
 
-  private RobotState() {
-  }
+  private RobotState() {}
 }

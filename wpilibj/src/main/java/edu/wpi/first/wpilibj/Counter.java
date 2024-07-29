@@ -1,58 +1,44 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-import static java.util.Objects.requireNonNull;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Class for counting the number of ticks on a digital input channel.
  *
  * <p>This is a general purpose class for counting repetitive events. It can return the number of
- * counts, the period of the most recent cycle, and detect when the signal being counted has
- * stopped by supplying a maximum cycle time.
+ * counts, the period of the most recent cycle, and detect when the signal being counted has stopped
+ * by supplying a maximum cycle time.
  *
  * <p>All counters will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable {
-  /**
-   * Mode determines how and what the counter counts.
-   */
+public class Counter implements CounterBase, Sendable, AutoCloseable {
+  /** Mode determines how and what the counter counts. */
   public enum Mode {
-    /**
-     * mode: two pulse.
-     */
+    /** mode: two pulse. */
     kTwoPulse(0),
-    /**
-     * mode: semi period.
-     */
+    /** mode: semi period. */
     kSemiperiod(1),
-    /**
-     * mode: pulse length.
-     */
+    /** mode: pulse length. */
     kPulseLength(2),
-    /**
-     * mode: external direction.
-     */
+    /** mode: external direction. */
     kExternalDirection(3);
 
-    @SuppressWarnings("MemberName")
+    /** Mode value. */
     public final int value;
 
     Mode(int value) {
@@ -60,18 +46,30 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
     }
   }
 
-  protected DigitalSource m_upSource; // /< What makes the counter count up.
-  protected DigitalSource m_downSource; // /< What makes the counter count down.
+  /** What makes the counter count up. */
+  protected DigitalSource m_upSource;
+
+  /** What makes the counter count down. */
+  protected DigitalSource m_downSource;
+
   private boolean m_allocatedUpSource;
   private boolean m_allocatedDownSource;
-  private int m_counter; // /< The FPGA counter object.
-  private int m_index; // /< The index of this counter.
-  private PIDSourceType m_pidSource;
-  private double m_distancePerPulse; // distance of travel for each tick
+
+  /** The FPGA counter object. */
+  int m_counter;
+
+  /** The index of this counter. */
+  private int m_index;
+
+  /** Distance of travel for each tick. */
+  private double m_distancePerPulse = 1;
 
   /**
    * Create an instance of a counter with the given mode.
+   *
+   * @param mode The counter mode.
    */
+  @SuppressWarnings("this-escape")
   public Counter(final Mode mode) {
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order
@@ -109,6 +107,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    *
    * @param source the digital source to count
    */
+  @SuppressWarnings("this-escape")
   public Counter(DigitalSource source) {
     this();
 
@@ -123,6 +122,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    *
    * @param channel the DIO channel to use as the up source. 0-9 are on-board, 10-25 are on the MXP
    */
+  @SuppressWarnings("this-escape")
   public Counter(int channel) {
     this();
     setUpSource(channel);
@@ -135,12 +135,16 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * <p>The counter will start counting immediately.
    *
    * @param encodingType which edges to count
-   * @param upSource     first source to count
-   * @param downSource   second source for direction
-   * @param inverted     true to invert the count
+   * @param upSource first source to count
+   * @param downSource second source for direction
+   * @param inverted true to invert the count
    */
-  public Counter(EncodingType encodingType, DigitalSource upSource, DigitalSource downSource,
-                 boolean inverted) {
+  @SuppressWarnings("this-escape")
+  public Counter(
+      EncodingType encodingType,
+      DigitalSource upSource,
+      DigitalSource downSource,
+      boolean inverted) {
     this(Mode.kExternalDirection);
 
     requireNonNullParam(encodingType, "encodingType", "Counter");
@@ -173,6 +177,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    *
    * @param trigger the analog trigger to count
    */
+  @SuppressWarnings("this-escape")
   public Counter(AnalogTrigger trigger) {
     this();
 
@@ -202,7 +207,6 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    *
    * @return the Counter's FPGA index
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public int getFPGAIndex() {
     return m_index;
   }
@@ -212,7 +216,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    *
    * @param channel the DIO channel to count 0-9 are on-board, 10-25 are on the MXP
    */
-  public void setUpSource(int channel) {
+  public final void setUpSource(int channel) {
     setUpSource(new DigitalInput(channel));
     m_allocatedUpSource = true;
     SendableRegistry.addChild(this, m_upSource);
@@ -229,15 +233,15 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
       m_allocatedUpSource = false;
     }
     m_upSource = source;
-    CounterJNI.setCounterUpSource(m_counter, source.getPortHandleForRouting(),
-        source.getAnalogTriggerTypeForRouting());
+    CounterJNI.setCounterUpSource(
+        m_counter, source.getPortHandleForRouting(), source.getAnalogTriggerTypeForRouting());
   }
 
   /**
    * Set the up counting source to be an analog trigger.
    *
    * @param analogTrigger The analog trigger object that is used for the Up Source
-   * @param triggerType   The analog trigger output that will trigger the counter.
+   * @param triggerType The analog trigger output that will trigger the counter.
    */
   public void setUpSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
     requireNonNullParam(analogTrigger, "analogTrigger", "setUpSource");
@@ -251,7 +255,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * Set the edge sensitivity on an up counting source. Set the up source to either detect rising
    * edges or falling edges.
    *
-   * @param risingEdge  true to count rising edge
+   * @param risingEdge true to count rising edge
    * @param fallingEdge true to count falling edge
    */
   public void setUpSourceEdge(boolean risingEdge, boolean fallingEdge) {
@@ -261,9 +265,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
     CounterJNI.setCounterUpSourceEdge(m_counter, risingEdge, fallingEdge);
   }
 
-  /**
-   * Disable the up counting source to the counter.
-   */
+  /** Disable the up counting source to the counter. */
   public void clearUpSource() {
     if (m_upSource != null && m_allocatedUpSource) {
       m_upSource.close();
@@ -292,14 +294,14 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * @param source the digital source to count
    */
   public void setDownSource(DigitalSource source) {
-    requireNonNull(source, "The Digital Source given was null");
+    requireNonNullParam(source, "source", "setDownSource");
 
     if (m_downSource != null && m_allocatedDownSource) {
       m_downSource.close();
       m_allocatedDownSource = false;
     }
-    CounterJNI.setCounterDownSource(m_counter, source.getPortHandleForRouting(),
-        source.getAnalogTriggerTypeForRouting());
+    CounterJNI.setCounterDownSource(
+        m_counter, source.getPortHandleForRouting(), source.getAnalogTriggerTypeForRouting());
     m_downSource = source;
   }
 
@@ -307,7 +309,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * Set the down counting source to be an analog trigger.
    *
    * @param analogTrigger The analog trigger object that is used for the Down Source
-   * @param triggerType   The analog trigger output that will trigger the counter.
+   * @param triggerType The analog trigger output that will trigger the counter.
    */
   public void setDownSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
     requireNonNullParam(analogTrigger, "analogTrigger", "setDownSource");
@@ -321,18 +323,18 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * Set the edge sensitivity on a down counting source. Set the down source to either detect rising
    * edges or falling edges.
    *
-   * @param risingEdge  true to count the rising edge
+   * @param risingEdge true to count the rising edge
    * @param fallingEdge true to count the falling edge
    */
   public void setDownSourceEdge(boolean risingEdge, boolean fallingEdge) {
-    requireNonNull(m_downSource, "Down Source must be set before setting the edge!");
+    if (m_downSource == null) {
+      throw new IllegalStateException("Down Source must be set before setting the edge!");
+    }
 
     CounterJNI.setCounterDownSourceEdge(m_counter, risingEdge, fallingEdge);
   }
 
-  /**
-   * Disable the down counting source to the counter.
-   */
+  /** Disable the down counting source to the counter. */
   public void clearDownSource() {
     if (m_downSource != null && m_allocatedDownSource) {
       m_downSource.close();
@@ -373,7 +375,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * is most useful for direction sensitive gear tooth sensors.
    *
    * @param threshold The pulse length beyond which the counter counts the opposite direction. Units
-   *                  are seconds.
+   *     are seconds.
    */
   public void setPulseLengthMode(double threshold) {
     CounterJNI.setCounterPulseLengthMode(m_counter, threshold);
@@ -399,7 +401,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
   }
 
   /**
-   * Reset the Counter to zero. Set the counter value to zero. This doesn't effect the running state
+   * Reset the Counter to zero. Set the counter value to zero. This doesn't affect the running state
    * of the counter, just sets the current value to zero.
    */
   @Override
@@ -415,7 +417,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * @param maxPeriod The maximum period where the counted device is considered moving in seconds.
    */
   @Override
-  public void setMaxPeriod(double maxPeriod) {
+  public final void setMaxPeriod(double maxPeriod) {
     CounterJNI.setCounterMaxPeriod(m_counter, maxPeriod);
   }
 
@@ -439,7 +441,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
   /**
    * Determine if the clock is stopped. Determine if the clocked input is stopped based on the
    * MaxPeriod value set using the SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the
-   * device (and counter) are assumed to be stopped and it returns true.
+   * device (and counter) are assumed to be stopped and the method will return true.
    *
    * @return true if the most recent counter period exceeds the MaxPeriod value set by SetMaxPeriod.
    */
@@ -523,39 +525,6 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    */
   public void setDistancePerPulse(double distancePerPulse) {
     m_distancePerPulse = distancePerPulse;
-  }
-
-  /**
-   * Set which parameter of the encoder you are using as a process control variable. The counter
-   * class supports the rate and distance parameters.
-   *
-   * @param pidSource An enum to select the parameter.
-   */
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    requireNonNullParam(pidSource, "pidSource", "setPIDSourceType");
-    if (pidSource != PIDSourceType.kDisplacement && pidSource != PIDSourceType.kRate) {
-      throw new IllegalArgumentException("PID Source parameter was not valid type: " + pidSource);
-    }
-
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  @Override
-  public double pidGet() {
-    switch (m_pidSource) {
-      case kDisplacement:
-        return getDistance();
-      case kRate:
-        return getRate();
-      default:
-        return 0.0;
-    }
   }
 
   @Override

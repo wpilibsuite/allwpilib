@@ -1,15 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <hal/Types.h>
 
-#include "frc/InterruptableSensorBase.h"
+#include "frc/AnalogTriggerType.h"
 
 namespace frc {
 
@@ -22,7 +19,7 @@ namespace frc {
  * constructed and freed when finished for the source. The source can either be
  * a digital input or analog trigger but not both.
  */
-class DigitalSource : public InterruptableSensorBase {
+class DigitalSource {
  public:
   DigitalSource() = default;
   DigitalSource(DigitalSource&&) = default;

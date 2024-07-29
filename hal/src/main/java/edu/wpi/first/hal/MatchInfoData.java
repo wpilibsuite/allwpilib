@@ -1,52 +1,45 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal;
 
-/**
- * Structure for holding the match info data request.
- */
+/** Structure for holding the match info data request. */
+@SuppressWarnings("MemberName")
 public class MatchInfoData {
-  /**
-   * Stores the event name.
-   */
-  @SuppressWarnings("MemberName")
+  /** Stores the event name. */
   public String eventName = "";
 
-  /**
-   * Stores the game specific message.
-   */
-  @SuppressWarnings("MemberName")
+  /** Stores the game specific message. */
   public String gameSpecificMessage = "";
 
-  /**
-   * Stores the match number.
-   */
-  @SuppressWarnings("MemberName")
+  /** Stores the match number. */
   public int matchNumber;
 
-  /**
-   * Stores the replay number.
-   */
-  @SuppressWarnings("MemberName")
+  /** Stores the replay number. */
   public int replayNumber;
 
-  /**
-   * Stores the match type.
-   */
-  @SuppressWarnings("MemberName")
+  /** Stores the match type. */
   public int matchType;
+
+  /** Default constructor. */
+  public MatchInfoData() {}
 
   /**
    * Called from JNI to set the structure data.
+   *
+   * @param eventName Event name.
+   * @param gameSpecificMessage Game-specific message.
+   * @param matchNumber Match number.
+   * @param replayNumber Replay number.
+   * @param matchType Match type.
    */
-  @SuppressWarnings("JavadocMethod")
-  public void setData(String eventName, String gameSpecificMessage,
-                      int matchNumber, int replayNumber, int matchType) {
+  public void setData(
+      String eventName,
+      String gameSpecificMessage,
+      int matchNumber,
+      int replayNumber,
+      int matchType) {
     this.eventName = eventName;
     this.gameSpecificMessage = gameSpecificMessage;
     this.matchNumber = matchNumber;

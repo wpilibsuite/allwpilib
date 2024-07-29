@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_RAWSINKIMPL_H_
 #define CSCORE_RAWSINKIMPL_H_
@@ -12,9 +9,9 @@
 
 #include <atomic>
 #include <functional>
+#include <string_view>
 #include <thread>
 
-#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 
 #include "Frame.h"
@@ -26,22 +23,22 @@ class SourceImpl;
 
 class RawSinkImpl : public SinkImpl {
  public:
-  RawSinkImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+  RawSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
               Telemetry& telemetry);
-  RawSinkImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+  RawSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
               Telemetry& telemetry,
               std::function<void(uint64_t time)> processFrame);
   ~RawSinkImpl() override;
 
   void Stop();
 
-  uint64_t GrabFrame(CS_RawFrame& frame);
-  uint64_t GrabFrame(CS_RawFrame& frame, double timeout);
+  uint64_t GrabFrame(WPI_RawFrame& frame);
+  uint64_t GrabFrame(WPI_RawFrame& frame, double timeout);
 
  private:
   void ThreadMain();
 
-  uint64_t GrabFrameImpl(CS_RawFrame& rawFrame, Frame& incomingFrame);
+  uint64_t GrabFrameImpl(WPI_RawFrame& rawFrame, Frame& incomingFrame);
 
   std::atomic_bool m_active;  // set to false to terminate threads
   std::thread m_thread;

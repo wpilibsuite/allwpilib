@@ -1,11 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+
+#include <units/time.h>
 
 namespace frc {
 
@@ -30,8 +29,8 @@ class CounterBase {
 
   virtual int Get() const = 0;
   virtual void Reset() = 0;
-  virtual double GetPeriod() const = 0;
-  virtual void SetMaxPeriod(double maxPeriod) = 0;
+  virtual units::second_t GetPeriod() const = 0;
+  virtual void SetMaxPeriod(units::second_t maxPeriod) = 0;
   virtual bool GetStopped() const = 0;
   virtual bool GetDirection() const = 0;
 };

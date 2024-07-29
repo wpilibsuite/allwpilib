@@ -1,15 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/AnalogTrigger.h"
 
 #include "AnalogInternal.h"
+#include "ConstantsInternal.h"
 #include "DutyCycleInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogInput.h"
 #include "hal/DutyCycle.h"
@@ -33,8 +32,7 @@ static LimitedHandleResource<HAL_AnalogTriggerHandle, AnalogTrigger,
                              kNumAnalogTriggers, HAL_HandleEnum::AnalogTrigger>*
     analogTriggerHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogTrigger() {
   static LimitedHandleResource<HAL_AnalogTriggerHandle, AnalogTrigger,
                                kNumAnalogTriggers,
@@ -42,8 +40,7 @@ void InitializeAnalogTrigger() {
       atH;
   analogTriggerHandles = &atH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
@@ -143,19 +140,18 @@ void HAL_SetAnalogTriggerLimitsDutyCycle(
 
   if (lower < 0.0 || upper > 1.0) {
     *status = PARAMETER_OUT_OF_RANGE;
+    auto lowerStr = std::to_string(lower);
+    auto upperStr = std::to_string(upper);
+    hal::SetLastError(
+        status, "Lower must be >= 0 and upper must be <=1. Requested lower " +
+                    lowerStr + " Requested upper " + upperStr);
     return;
   }
 
-  int32_t scaleFactor =
-      HAL_GetDutyCycleOutputScaleFactor(trigger->handle, status);
-  if (*status != 0) {
-    return;
-  }
-
-  trigger->trigger->writeLowerLimit(static_cast<int32_t>(scaleFactor * lower),
-                                    status);
-  trigger->trigger->writeUpperLimit(static_cast<int32_t>(scaleFactor * upper),
-                                    status);
+  trigger->trigger->writeLowerLimit(
+      static_cast<int32_t>(kDutyCycleScaleFactor * lower), status);
+  trigger->trigger->writeUpperLimit(
+      static_cast<int32_t>(kDutyCycleScaleFactor * upper), status);
 }
 
 void HAL_SetAnalogTriggerLimitsVoltage(

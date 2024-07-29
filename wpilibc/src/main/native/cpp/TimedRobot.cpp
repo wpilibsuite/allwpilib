@@ -1,47 +1,73 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/TimedRobot.h"
 
 #include <stdint.h>
 
+#include <cstdio>
 #include <utility>
 
 #include <hal/DriverStation.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
 
-#include "frc/Timer.h"
-#include "frc/Utility.h"
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
 void TimedRobot::StartCompetition() {
   RobotInit();
 
-  // Tell the DS that the robot is ready to be enabled
-  HAL_ObserveUserProgramStarting();
+  if constexpr (IsSimulation()) {
+    SimulationInit();
+  }
 
-  m_expirationTime = units::second_t{Timer::GetFPGATimestamp()} + m_period;
-  UpdateAlarm();
+  // Tell the DS that the robot is ready to be enabled
+  std::puts("\n********** Robot program startup complete **********");
+  HAL_ObserveUserProgramStarting();
 
   // Loop forever, calling the appropriate mode-dependent function
   while (true) {
+    // We don't have to check there's an element in the queue first because
+    // there's always at least one (the constructor adds one). It's reenqueued
+    // at the end of the loop.
+    auto callback = m_callbacks.pop();
+
     int32_t status = 0;
-    uint64_t curTime = HAL_WaitForNotifierAlarm(m_notifier, &status);
-    if (curTime == 0 || status != 0) break;
+    HAL_UpdateNotifierAlarm(m_notifier, callback.expirationTime.count(),
+                            &status);
+    FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
 
-    m_expirationTime += m_period;
+    std::chrono::microseconds currentTime{
+        HAL_WaitForNotifierAlarm(m_notifier, &status)};
+    if (currentTime.count() == 0 || status != 0) {
+      break;
+    }
 
-    UpdateAlarm();
+    callback.func();
 
-    // Call callback
-    LoopFunc();
+    // Increment the expiration time by the number of full periods it's behind
+    // plus one to avoid rapid repeat fires from a large loop overrun. We assume
+    // currentTime ≥ expirationTime rather than checking for it since the
+    // callback wouldn't be running otherwise.
+    callback.expirationTime +=
+        callback.period + (currentTime - callback.expirationTime) /
+                              callback.period * callback.period;
+    m_callbacks.push(std::move(callback));
+
+    // Process all other callbacks that are ready to run
+    while (m_callbacks.top().expirationTime <= currentTime) {
+      callback = m_callbacks.pop();
+
+      callback.func();
+
+      callback.expirationTime +=
+          callback.period + (currentTime - callback.expirationTime) /
+                                callback.period * callback.period;
+      m_callbacks.push(std::move(callback));
+    }
   }
 }
 
@@ -50,16 +76,13 @@ void TimedRobot::EndCompetition() {
   HAL_StopNotifier(m_notifier, &status);
 }
 
-units::second_t TimedRobot::GetPeriod() const {
-  return units::second_t(m_period);
-}
-
-TimedRobot::TimedRobot(double period) : TimedRobot(units::second_t(period)) {}
-
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
+  m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
+  AddPeriodic([=, this] { LoopFunc(); }, period);
+
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "InitializeNotifier");
   HAL_SetNotifierName(m_notifier, "TimedRobot", &status);
 
   HAL_Report(HALUsageReporting::kResourceType_Framework,
@@ -70,14 +93,15 @@ TimedRobot::~TimedRobot() {
   int32_t status = 0;
 
   HAL_StopNotifier(m_notifier, &status);
-  wpi_setHALError(status);
+  FRC_ReportError(status, "StopNotifier");
 
   HAL_CleanNotifier(m_notifier, &status);
 }
 
-void TimedRobot::UpdateAlarm() {
-  int32_t status = 0;
-  HAL_UpdateNotifierAlarm(
-      m_notifier, static_cast<uint64_t>(m_expirationTime * 1e6), &status);
-  wpi_setHALError(status);
+void TimedRobot::AddPeriodic(std::function<void()> callback,
+                             units::second_t period, units::second_t offset) {
+  m_callbacks.emplace(
+      callback, m_startTime,
+      std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},
+      std::chrono::microseconds{static_cast<int64_t>(offset.value() * 1e6)});
 }

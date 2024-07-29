@@ -1,31 +1,28 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.networktables.StringPublisher;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 final class ShuffleboardInstance implements ShuffleboardRoot {
   private final Map<String, ShuffleboardTab> m_tabs = new LinkedHashMap<>();
-
+  private boolean m_reported = false; // NOPMD redundant field initializer
   private boolean m_tabsChanged = false; // NOPMD redundant field initializer
   private final NetworkTable m_rootTable;
   private final NetworkTable m_rootMetaTable;
-  private final NetworkTableEntry m_selectedTabEntry;
+  private final StringPublisher m_selectedTabPub;
 
   /**
    * Creates a new Shuffleboard instance.
@@ -36,13 +33,17 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
     requireNonNullParam(ntInstance, "ntInstance", "ShuffleboardInstance");
     m_rootTable = ntInstance.getTable(Shuffleboard.kBaseTableName);
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
-    m_selectedTabEntry = m_rootMetaTable.getEntry("Selected");
-    HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
+    m_selectedTabPub =
+        m_rootMetaTable.getStringTopic("Selected").publish(PubSubOption.keepDuplicates(true));
   }
 
   @Override
   public ShuffleboardTab getTab(String title) {
     requireNonNullParam(title, "title", "getTab");
+    if (!m_reported) {
+      HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
+      m_reported = true;
+    }
     if (!m_tabs.containsKey(title)) {
       m_tabs.put(title, new ShuffleboardTab(this, title));
       m_tabsChanged = true;
@@ -53,11 +54,9 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
   @Override
   public void update() {
     if (m_tabsChanged) {
-      String[] tabTitles = m_tabs.values()
-          .stream()
-          .map(ShuffleboardTab::getTitle)
-          .toArray(String[]::new);
-      m_rootMetaTable.getEntry("Tabs").forceSetStringArray(tabTitles);
+      String[] tabTitles =
+          m_tabs.values().stream().map(ShuffleboardTab::getTitle).toArray(String[]::new);
+      m_rootMetaTable.getEntry("Tabs").setStringArray(tabTitles);
       m_tabsChanged = false;
     }
     for (ShuffleboardTab tab : m_tabs.values()) {
@@ -78,12 +77,12 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
 
   @Override
   public void selectTab(int index) {
-    m_selectedTabEntry.forceSetDouble(index);
+    selectTab(Integer.toString(index));
   }
 
   @Override
   public void selectTab(String title) {
-    m_selectedTabEntry.forceSetString(title);
+    m_selectedTabPub.set(title);
   }
 
   /**
@@ -104,11 +103,11 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
    */
   private void apply(ShuffleboardContainer container, Consumer<ComplexWidget> func) {
     for (ShuffleboardComponent<?> component : container.getComponents()) {
-      if (component instanceof ComplexWidget) {
-        func.accept((ComplexWidget) component);
+      if (component instanceof ComplexWidget widget) {
+        func.accept(widget);
       }
-      if (component instanceof ShuffleboardContainer) {
-        apply((ShuffleboardContainer) component, func);
+      if (component instanceof ShuffleboardContainer nestedContainer) {
+        apply(nestedContainer, func);
       }
     }
   }

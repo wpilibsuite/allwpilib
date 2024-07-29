@@ -1,0 +1,10 @@
+include(CMakeFindDependencyMacro)
+@FILENAME_DEP_REPLACE@
+@WPIMATH_DEP_REPLACE@
+@WPIUTIL_DEP_REPLACE@
+
+@FILENAME_DEP_REPLACE@
+include(${SELF_DIR}/apriltag.cmake)
+if(@WITH_JAVA@)
+    include(${SELF_DIR}/apriltag_jar.cmake)
+endif()

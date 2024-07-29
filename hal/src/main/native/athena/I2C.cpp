@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/I2C.h"
 
@@ -15,8 +12,11 @@
 
 #include <cstring>
 
+#include <wpi/print.h>
+
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "hal/DIO.h"
 #include "hal/HAL.h"
 
@@ -33,44 +33,54 @@ static int i2CMXPHandle{-1};
 static HAL_DigitalHandle i2CMXPDigitalHandle1{HAL_kInvalidHandle};
 static HAL_DigitalHandle i2CMXPDigitalHandle2{HAL_kInvalidHandle};
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeI2C() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   hal::init::CheckInit();
   initializeDigital(status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
 
   if (port < 0 || port > 1) {
-    // Set port out of range error here
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for I2C", 0, 1,
+                                     port);
     return;
   }
 
   if (port == HAL_I2C_kOnboard) {
+    HAL_SendError(0, 0, 0,
+                  "Onboard I2C port is subject to system lockups. See Known "
+                  "Issues page for details",
+                  "", "", true);
     std::scoped_lock lock(digitalI2COnBoardMutex);
     i2COnboardObjCount++;
-    if (i2COnboardObjCount > 1) return;
+    if (i2COnboardObjCount > 1) {
+      return;
+    }
     int handle = open("/dev/i2c-2", O_RDWR);
     if (handle < 0) {
-      std::printf("Failed to open onboard i2c bus: %s\n", std::strerror(errno));
+      wpi::print("Failed to open onboard i2c bus: {}\n", std::strerror(errno));
       return;
     }
     i2COnBoardHandle = handle;
   } else {
     std::scoped_lock lock(digitalI2CMXPMutex);
     i2CMXPObjCount++;
-    if (i2CMXPObjCount > 1) return;
+    if (i2CMXPObjCount > 1) {
+      return;
+    }
     if ((i2CMXPDigitalHandle1 = HAL_InitializeDIOPort(
-             HAL_GetPort(24), false, status)) == HAL_kInvalidHandle) {
+             HAL_GetPort(24), false, nullptr, status)) == HAL_kInvalidHandle) {
       return;
     }
     if ((i2CMXPDigitalHandle2 = HAL_InitializeDIOPort(
-             HAL_GetPort(25), false, status)) == HAL_kInvalidHandle) {
+             HAL_GetPort(25), false, nullptr, status)) == HAL_kInvalidHandle) {
       HAL_FreeDIOPort(i2CMXPDigitalHandle1);  // free the first port allocated
       return;
     }
@@ -78,7 +88,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
         digitalSystem->readEnableMXPSpecialFunction(status) | 0xC000, status);
     int handle = open("/dev/i2c-1", O_RDWR);
     if (handle < 0) {
-      std::printf("Failed to open MXP i2c bus: %s\n", std::strerror(errno));
+      wpi::print("Failed to open MXP i2c bus: {}\n", std::strerror(errno));
       return;
     }
     i2CMXPHandle = handle;
@@ -89,7 +99,9 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
                            const uint8_t* dataToSend, int32_t sendSize,
                            uint8_t* dataReceived, int32_t receiveSize) {
   if (port < 0 || port > 1) {
-    // Set port out of range error here
+    int32_t status = 0;
+    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 1,
+                                     port);
     return -1;
   }
 
@@ -119,7 +131,9 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
 int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
                      const uint8_t* dataToSend, int32_t sendSize) {
   if (port < 0 || port > 1) {
-    // Set port out of range error here
+    int32_t status = 0;
+    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 1,
+                                     port);
     return -1;
   }
 
@@ -145,7 +159,9 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
 int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
                     int32_t count) {
   if (port < 0 || port > 1) {
-    // Set port out of range error here
+    int32_t status = 0;
+    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 1,
+                                     port);
     return -1;
   }
 
@@ -170,7 +186,9 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
 
 void HAL_CloseI2C(HAL_I2CPort port) {
   if (port < 0 || port > 1) {
-    // Set port out of range error here
+    int32_t status = 0;
+    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 1,
+                                     port);
     return;
   }
 

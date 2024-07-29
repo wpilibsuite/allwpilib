@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Interrupts.h"
 
@@ -13,88 +10,43 @@
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"
+#include "hal/HALBase.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "hal/roborio/InterruptManager.h"
 
 using namespace hal;
 
 namespace {
-// Safe thread to allow callbacks to run on their own thread
-class InterruptThread : public wpi::SafeThread {
- public:
-  void Main() {
-    std::unique_lock lock(m_mutex);
-    while (m_active) {
-      m_cond.wait(lock, [&] { return !m_active || m_notify; });
-      if (!m_active) break;
-      m_notify = false;
-      HAL_InterruptHandlerFunction handler = m_handler;
-      uint32_t mask = m_mask;
-      void* param = m_param;
-      lock.unlock();  // don't hold mutex during callback execution
-      handler(mask, param);
-      lock.lock();
-    }
-  }
-
-  bool m_notify = false;
-  HAL_InterruptHandlerFunction m_handler;
-  void* m_param;
-  uint32_t m_mask;
-};
-
-class InterruptThreadOwner : public wpi::SafeThreadOwner<InterruptThread> {
- public:
-  void SetFunc(HAL_InterruptHandlerFunction handler, void* param) {
-    auto thr = GetThread();
-    if (!thr) return;
-    thr->m_handler = handler;
-    thr->m_param = param;
-  }
-
-  void Notify(uint32_t mask) {
-    auto thr = GetThread();
-    if (!thr) return;
-    thr->m_mask = mask;
-    thr->m_notify = true;
-    thr->m_cond.notify_one();
-  }
-};
 
 struct Interrupt {
   std::unique_ptr<tInterrupt> anInterrupt;
-  std::unique_ptr<tInterruptManager> manager;
-  std::unique_ptr<InterruptThreadOwner> threadOwner = nullptr;
-  void* param = nullptr;
+  InterruptManager& manager = InterruptManager::GetInstance();
+  NiFpga_IrqContext irqContext = nullptr;
+  uint32_t mask;
 };
 
 }  // namespace
 
-static void threadedInterruptHandler(uint32_t mask, void* param) {
-  static_cast<InterruptThreadOwner*>(param)->Notify(mask);
-}
-
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                              HAL_HandleEnum::Interrupt>* interruptHandles;
 
-namespace hal {
-namespace init {
-void InitialzeInterrupts() {
+namespace hal::init {
+void InitializeInterrupts() {
   static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                                HAL_HandleEnum::Interrupt>
       iH;
   interruptHandles = &iH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
-HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
-                                             int32_t* status) {
+HAL_InterruptHandle HAL_InitializeInterrupts(int32_t* status) {
   hal::init::CheckInit();
   HAL_InterruptHandle handle = interruptHandles->Allocate();
   if (handle == HAL_kInvalidHandle) {
@@ -106,25 +58,20 @@ HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
   // Expects the calling leaf class to allocate an interrupt index.
   anInterrupt->anInterrupt.reset(tInterrupt::create(interruptIndex, status));
   anInterrupt->anInterrupt->writeConfig_WaitForAck(false, status);
-  anInterrupt->manager = std::make_unique<tInterruptManager>(
-      (1u << interruptIndex) | (1u << (interruptIndex + 8u)), watcher, status);
+  anInterrupt->irqContext = anInterrupt->manager.GetContext();
+  anInterrupt->mask = (1u << interruptIndex) | (1u << (interruptIndex + 8u));
   return handle;
 }
 
-void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle,
-                          int32_t* status) {
+void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle) {
   auto anInterrupt = interruptHandles->Get(interruptHandle);
   interruptHandles->Free(interruptHandle);
   if (anInterrupt == nullptr) {
-    return nullptr;
+    return;
   }
-
-  if (anInterrupt->manager->isEnabled(status)) {
-    anInterrupt->manager->disable(status);
+  if (anInterrupt->irqContext) {
+    anInterrupt->manager.ReleaseContext(anInterrupt->irqContext);
   }
-
-  void* param = anInterrupt->param;
-  return param;
 }
 
 int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
@@ -137,8 +84,9 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
     return 0;
   }
 
-  result = anInterrupt->manager->watch(static_cast<int32_t>(timeout * 1e3),
-                                       ignorePrevious, status);
+  result = anInterrupt->manager.WaitForInterrupt(
+      anInterrupt->irqContext, anInterrupt->mask, ignorePrevious,
+      static_cast<uint32_t>(timeout * 1e3), status);
 
   // Don't report a timeout as an error - the return code is enough to tell
   // that a timeout happened.
@@ -149,29 +97,28 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
   return result;
 }
 
-void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle,
-                          int32_t* status) {
+int64_t HAL_WaitForMultipleInterrupts(HAL_InterruptHandle interruptHandle,
+                                      int64_t mask, double timeout,
+                                      HAL_Bool ignorePrevious,
+                                      int32_t* status) {
+  uint32_t result;
   auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return;
+    return 0;
   }
 
-  if (!anInterrupt->manager->isEnabled(status)) {
-    anInterrupt->manager->enable(status);
-  }
-}
+  result = anInterrupt->manager.WaitForInterrupt(
+      anInterrupt->irqContext, mask, ignorePrevious,
+      static_cast<uint32_t>(timeout * 1e3), status);
 
-void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
-                           int32_t* status) {
-  auto anInterrupt = interruptHandles->Get(interruptHandle);
-  if (anInterrupt == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
+  // Don't report a timeout as an error - the return code is enough to tell
+  // that a timeout happened.
+  if (*status == -NiFpga_Status_IrqTimeout) {
+    *status = NiFpga_Status_Success;
   }
-  if (anInterrupt->manager->isEnabled(status)) {
-    anInterrupt->manager->disable(status);
-  }
+
+  return result;
 }
 
 int64_t HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
@@ -222,40 +169,6 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
   anInterrupt->anInterrupt->writeConfig_Source_Module(routingModule, status);
 }
 
-void HAL_AttachInterruptHandler(HAL_InterruptHandle interruptHandle,
-                                HAL_InterruptHandlerFunction handler,
-                                void* param, int32_t* status) {
-  auto anInterrupt = interruptHandles->Get(interruptHandle);
-  if (anInterrupt == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  anInterrupt->manager->registerHandler(handler, param, status);
-  anInterrupt->param = param;
-}
-
-void HAL_AttachInterruptHandlerThreaded(HAL_InterruptHandle interrupt_handle,
-                                        HAL_InterruptHandlerFunction handler,
-                                        void* param, int32_t* status) {
-  auto anInterrupt = interruptHandles->Get(interrupt_handle);
-  if (anInterrupt == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
-  anInterrupt->threadOwner = std::make_unique<InterruptThreadOwner>();
-  anInterrupt->threadOwner->Start();
-  anInterrupt->threadOwner->SetFunc(handler, param);
-
-  HAL_AttachInterruptHandler(interrupt_handle, threadedInterruptHandler,
-                             anInterrupt->threadOwner.get(), status);
-
-  if (*status != 0) {
-    anInterrupt->threadOwner = nullptr;
-  }
-  anInterrupt->param = param;
-}
-
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
                                   HAL_Bool risingEdge, HAL_Bool fallingEdge,
                                   int32_t* status) {
@@ -266,6 +179,21 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
   }
   anInterrupt->anInterrupt->writeConfig_RisingEdge(risingEdge, status);
   anInterrupt->anInterrupt->writeConfig_FallingEdge(fallingEdge, status);
+}
+
+void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle,
+                                 int32_t* status) {
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
+  if (anInterrupt == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  uint32_t interruptIndex =
+      static_cast<uint32_t>(getHandleIndex(interruptHandle));
+
+  hal::ReleaseFPGAInterrupt(interruptIndex);
+  hal::ReleaseFPGAInterrupt(interruptIndex + 8);
 }
 
 }  // extern "C"

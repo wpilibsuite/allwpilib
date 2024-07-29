@@ -1,19 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/DIO.h"
 
 #include <cmath>
+#include <cstdio>
 #include <thread>
-
-#include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"
@@ -28,8 +25,7 @@ static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
                              kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>*
     digitalPWMHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDIO() {
   static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
                                kNumDigitalPWMOutputs,
@@ -37,34 +33,43 @@ void InitializeDIO() {
       dpH;
   digitalPWMHandles = &dpH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input, int32_t* status) {
+                                        HAL_Bool input,
+                                        const char* allocationLocation,
+                                        int32_t* status) {
   hal::init::CheckInit();
   initializeDigital(status);
 
-  if (*status != 0) return HAL_kInvalidHandle;
-
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex || channel >= kNumDigitalChannels) {
-    *status = PARAMETER_OUT_OF_RANGE;
+  if (*status != 0) {
     return HAL_kInvalidHandle;
   }
 
-  auto handle =
-      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO, status);
-
-  if (*status != 0)
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-
-  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
+  int16_t channel = getPortHandleChannel(portHandle);
+  if (channel == InvalidHandleIndex || channel >= kNumDigitalChannels) {
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                     kNumDigitalChannels, channel);
     return HAL_kInvalidHandle;
+  }
+
+  HAL_DigitalHandle handle;
+
+  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO,
+                                              &handle, status);
+
+  if (*status != 0) {
+    if (port) {
+      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+                                           port->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                       kNumDigitalChannels, channel);
+    }
+    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
   port->channel = static_cast<uint8_t>(channel);
@@ -116,6 +121,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   }
 
   digitalSystem->writeOutputEnable(outputEnable, status);
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }
@@ -127,7 +133,9 @@ HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   // no status, so no need to check for a proper free.
-  if (port == nullptr) return;
+  if (port == nullptr) {
+    return;
+  }
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
 
   // Wait for no other object to hold this handle.
@@ -135,8 +143,8 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   while (port.use_count() != 1) {
     auto current = hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
-      wpi::outs() << "DIO handle free timeout\n";
-      wpi::outs().flush();
+      std::puts("DIO handle free timeout");
+      std::fflush(stdout);
       break;
     }
     std::this_thread::yield();
@@ -189,9 +197,10 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
   // higher freq.
   // TODO: Round in the linear rate domain.
   initializeDigital(status);
-  if (*status != 0) return;
-  uint16_t pwmPeriodPower = static_cast<uint16_t>(
-      std::log(1.0 / (16 * 1.0E-6 * rate)) / std::log(2.0) + 0.5);
+  if (*status != 0) {
+    return;
+  }
+  uint16_t pwmPeriodPower = std::lround(std::log2(1.0 / (16 * 1.0E-6 * rate)));
   digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
 }
 
@@ -203,10 +212,16 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
     return;
   }
   int32_t id = *port;
-  if (dutyCycle > 1.0) dutyCycle = 1.0;
-  if (dutyCycle < 0.0) dutyCycle = 0.0;
+  if (dutyCycle > 1.0) {
+    dutyCycle = 1.0;
+  }
+  if (dutyCycle < 0.0) {
+    dutyCycle = 0.0;
+  }
   double rawDutyCycle = 256.0 * dutyCycle;
-  if (rawDutyCycle > 255.5) rawDutyCycle = 255.5;
+  if (rawDutyCycle > 255.5) {
+    rawDutyCycle = 255.5;
+  }
   {
     std::scoped_lock lock(digitalPwmMutex);
     uint16_t pwmPeriodPower = digitalSystem->readPWMPeriodPower(status);
@@ -215,12 +230,38 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
       // frequencies.
       rawDutyCycle = rawDutyCycle / std::pow(2.0, 4 - pwmPeriodPower);
     }
-    if (id < 4)
+    if (id < 4) {
       digitalSystem->writePWMDutyCycleA(id, static_cast<uint8_t>(rawDutyCycle),
                                         status);
-    else
+    } else {
       digitalSystem->writePWMDutyCycleB(
           id - 4, static_cast<uint8_t>(rawDutyCycle), status);
+    }
+  }
+}
+
+void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
+                          int32_t* status) {
+  auto port = digitalPWMHandles->Get(pwmGenerator);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  int32_t id = *port;
+  digitalSystem->writePWMPeriodPower(0xffff, status);
+  double rawDutyCycle = 31.0 * dutyCycle;
+  if (rawDutyCycle > 30.5) {
+    rawDutyCycle = 30.5;
+  }
+  {
+    std::scoped_lock lock(digitalPwmMutex);
+    if (id < 4) {
+      digitalSystem->writePWMDutyCycleA(id, static_cast<uint8_t>(rawDutyCycle),
+                                        status);
+    } else {
+      digitalSystem->writePWMDutyCycleB(
+          id - 4, static_cast<uint8_t>(rawDutyCycle), status);
+    }
   }
 }
 
@@ -251,10 +292,35 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
     return;
   }
   if (value != 0 && value != 1) {
-    if (value != 0) value = 1;
+    if (value != 0) {
+      value = 1;
+    }
   }
   {
     std::scoped_lock lock(digitalDIOMutex);
+
+    tDIO::tOutputEnable currentOutputEnable =
+        digitalSystem->readOutputEnable(status);
+
+    HAL_Bool isInput = false;
+
+    if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
+      isInput =
+          ((currentOutputEnable.SPIPort >> remapSPIChannel(port->channel)) &
+           1) == 0;
+    } else if (port->channel < kNumDigitalHeaders) {
+      isInput = ((currentOutputEnable.Headers >> port->channel) & 1) == 0;
+    } else {
+      isInput = ((currentOutputEnable.MXP >> remapMXPChannel(port->channel)) &
+                 1) == 0;
+    }
+
+    if (isInput) {
+      *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, "Cannot set output of an input channel");
+      return;
+    }
+
     tDIO::tDO currentDIO = digitalSystem->readDO(status);
 
     if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
@@ -358,22 +424,33 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
 
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
     return ((currentOutputEnable.SPIPort >> remapSPIChannel(port->channel)) &
-            1) != 0;
+            1) == 0;
   } else if (port->channel < kNumDigitalHeaders) {
-    return ((currentOutputEnable.Headers >> port->channel) & 1) != 0;
+    return ((currentOutputEnable.Headers >> port->channel) & 1) == 0;
   } else {
-    return ((currentOutputEnable.MXP >> remapMXPChannel(port->channel)) & 1) !=
+    return ((currentOutputEnable.MXP >> remapMXPChannel(port->channel)) & 1) ==
            0;
   }
 }
 
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
                int32_t* status) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
+
+  uint32_t pulseLengthMicroseconds =
+      static_cast<uint32_t>(pulseLengthSeconds * 1e6);
+
+  if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status,
+                      "Length must be between 1 and 65535 microseconds");
+    return;
+  }
+
   tDIO::tPulse pulse;
 
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
@@ -385,9 +462,29 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
   }
 
   digitalSystem->writePulseLength(
-      static_cast<uint16_t>(1.0e9 * pulseLength /
-                            (pwmSystem->readLoopTiming(status) * 25)),
-      status);
+      static_cast<uint16_t>(pulseLengthMicroseconds), status);
+  digitalSystem->writePulse(pulse, status);
+}
+
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+                       int32_t* status) {
+  uint32_t pulseLengthMicroseconds =
+      static_cast<uint32_t>(pulseLengthSeconds * 1e6);
+
+  if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status,
+                      "Length must be between 1 and 65535 microseconds");
+    return;
+  }
+
+  tDIO::tPulse pulse;
+  pulse.Headers = channelMask & 0x2FF;
+  pulse.MXP = (channelMask & 0xFFFF) >> 10;
+  pulse.SPIPort = (channelMask & 0x1F) >> 26;
+
+  digitalSystem->writePulseLength(
+      static_cast<uint16_t>(pulseLengthMicroseconds), status);
   digitalSystem->writePulse(pulse, status);
 }
 
@@ -410,7 +507,9 @@ HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status) {
 
 HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
   initializeDigital(status);
-  if (*status != 0) return false;
+  if (*status != 0) {
+    return false;
+  }
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
   return pulseRegister.Headers != 0 && pulseRegister.MXP != 0 &&
          pulseRegister.SPIPort != 0;
@@ -459,7 +558,9 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
 
 void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
   initializeDigital(status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
   std::scoped_lock lock(digitalDIOMutex);
   digitalSystem->writeFilterPeriodHdr(filterIndex, value, status);
   if (*status == 0) {
@@ -469,7 +570,9 @@ void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
 
 int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
   initializeDigital(status);
-  if (*status != 0) return 0;
+  if (*status != 0) {
+    return 0;
+  }
   uint32_t hdrPeriod = 0;
   uint32_t mxpPeriod = 0;
   {

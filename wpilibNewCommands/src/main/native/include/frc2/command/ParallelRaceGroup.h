@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -13,37 +10,40 @@
 #endif
 
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
-#include "frc2/command/CommandGroupBase.h"
+#include <wpi/DecayedDerivedFrom.h>
+
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
- * A CommandGroup that runs a set of commands in parallel, ending when any one
- * of the commands ends and interrupting all the others.
+ * A composition that runs a set of commands in parallel, ending when any one of
+ * the commands ends and interrupting all the others.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their
- * component commands.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
-class ParallelRaceGroup
-    : public CommandHelper<CommandGroupBase, ParallelRaceGroup> {
+class ParallelRaceGroup : public CommandHelper<Command, ParallelRaceGroup> {
  public:
   /**
-   * Creates a new ParallelCommandRace.  The given commands will be executed
+   * Creates a new ParallelCommandRace. The given commands will be executed
    * simultaneously, and will "race to the finish" - the first command to finish
    * ends the entire command, with all other commands being interrupted.
    *
-   * @param commands the commands to include in this group.
+   * @param commands the commands to include in this composition.
    */
   explicit ParallelRaceGroup(std::vector<std::unique_ptr<Command>>&& commands);
 
-  template <class... Types,
-            typename = std::enable_if_t<std::conjunction_v<
-                std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
-  explicit ParallelRaceGroup(Types&&... commands) {
-    AddCommands(std::forward<Types>(commands)...);
+  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  explicit ParallelRaceGroup(Commands&&... commands) {
+    AddCommands(std::forward<Commands>(commands)...);
   }
 
   ParallelRaceGroup(ParallelRaceGroup&& other) = default;
@@ -54,30 +54,39 @@ class ParallelRaceGroup
   // Prevent template expansion from emulating copy ctor
   ParallelRaceGroup(ParallelRaceGroup&) = delete;
 
-  template <class... Types>
-  void AddCommands(Types&&... commands) {
+  /**
+   * Adds the given commands to the group.
+   *
+   * @param commands Commands to add to the group.
+   */
+  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
-    ((void)foo.emplace_back(std::make_unique<std::remove_reference_t<Types>>(
-         std::forward<Types>(commands))),
+    ((void)foo.emplace_back(std::make_unique<std::decay_t<Commands>>(
+         std::forward<Commands>(commands))),
      ...);
     AddCommands(std::move(foo));
   }
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
   bool RunsWhenDisabled() const override;
 
+  Command::InterruptionBehavior GetInterruptionBehavior() const override;
+
  private:
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override;
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
 
   std::vector<std::unique_ptr<Command>> m_commands;
   bool m_runWhenDisabled{true};
+  Command::InterruptionBehavior m_interruptBehavior{
+      Command::InterruptionBehavior::kCancelIncoming};
   bool m_finished{false};
   bool isRunning = false;
 };

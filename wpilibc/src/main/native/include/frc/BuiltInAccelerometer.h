@@ -1,31 +1,34 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include "frc/ErrorBase.h"
-#include "frc/interfaces/Accelerometer.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * Built-in accelerometer.
  *
  * This class allows access to the roboRIO's internal accelerometer.
  */
-class BuiltInAccelerometer : public ErrorBase,
-                             public Accelerometer,
-                             public Sendable,
-                             public SendableHelper<BuiltInAccelerometer> {
+class BuiltInAccelerometer : public wpi::Sendable,
+                             public wpi::SendableHelper<BuiltInAccelerometer> {
  public:
+  /**
+   * Accelerometer range.
+   */
+  enum Range {
+    /// 2 Gs max.
+    kRange_2G = 0,
+    /// 4 Gs max.
+    kRange_4G = 1,
+    /// 8 Gs max.
+    kRange_8G = 2
+  };
+
   /**
    * Constructor.
    *
@@ -36,32 +39,30 @@ class BuiltInAccelerometer : public ErrorBase,
   BuiltInAccelerometer(BuiltInAccelerometer&&) = default;
   BuiltInAccelerometer& operator=(BuiltInAccelerometer&&) = default;
 
-  // Accelerometer interface
   /**
    * Set the measuring range of the accelerometer.
    *
    * @param range The maximum acceleration, positive or negative, that the
-   *              accelerometer will measure. Not all accelerometers support all
-   *              ranges.
+   *     accelerometer will measure.
    */
-  void SetRange(Range range) override;
+  void SetRange(Range range);
 
   /**
    * @return The acceleration of the roboRIO along the X axis in g-forces
    */
-  double GetX() override;
+  double GetX();
 
   /**
    * @return The acceleration of the roboRIO along the Y axis in g-forces
    */
-  double GetY() override;
+  double GetY();
 
   /**
    * @return The acceleration of the roboRIO along the Z axis in g-forces
    */
-  double GetZ() override;
+  double GetZ();
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc

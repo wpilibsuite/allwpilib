@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -163,8 +160,8 @@ enum class BuiltInWidgets {
    */
   kVoltageView,
   /**
-   * Displays a PowerDistributionPanel. <br>Supported types: <ul> <li>
-   * PowerDistributionPanel</li>
+   * Displays a PowerDistribution. <br>Supported types: <ul> <li>
+   * PowerDistribution</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -173,7 +170,7 @@ enum class BuiltInWidgets {
    * <td>Whether or not to display the voltage and current draw</td></tr>
    * </table>
    */
-  kPowerDistributionPanel,
+  kPowerDistribution,
   /**
    * Displays a SendableChooser with a dropdown combo box with a list of
    * options.
@@ -203,10 +200,10 @@ enum class BuiltInWidgets {
    */
   kEncoder,
   /**
-   * Displays a SpeedController.
-   * The speed controller will be controllable from the dashboard when test mode
+   * Displays a MotorController.
+   * The motor controller will be controllable from the dashboard when test mode
    * is enabled, but will otherwise be view-only. <br>Supported types: <ul>
-   * <li>PWMSpeedController</li>
+   * <li>PWMMotorController</li>
    * <li>DMC60</li>
    * <li>Jaguar</li>
    * <li>PWMTalonSRX</li>
@@ -216,7 +213,7 @@ enum class BuiltInWidgets {
    * <li>Talon</li>
    * <li>Victor</li>
    * <li>VictorSP</li>
-   * <li>SpeedControllerGroup</li>
+   * <li>MotorControllerGroup</li>
    * <li>Any custom subclass of {@code SpeedContorller}</li>
    * </ul>
    * <br>Custom properties:
@@ -226,7 +223,7 @@ enum class BuiltInWidgets {
    * <td>One of {@code ["HORIZONTAL", "VERTICAL"]}</td></tr>
    * </table>
    */
-  kSpeedController,
+  kMotorController,
   /**
    * Displays a command with a toggle button. Pressing the button will start the
    * command, and the button will automatically release when the command
@@ -283,7 +280,7 @@ enum class BuiltInWidgets {
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Range</td><td>{@link Range}</td><td>k16G</td><td>The accelerometer
+   * <tr><td>Range</td><td>Range</td><td>k16G</td><td>The accelerometer
    * range</td></tr> <tr><td>Show value</td><td>Boolean</td><td>true</td>
    * <td>Show or hide the acceleration values</td></tr>
    * <tr><td>Precision</td><td>Number</td><td>2</td>
@@ -373,7 +370,16 @@ enum class BuiltInWidgets {
    * </td></tr>
    * </table>
    */
-  kCameraStream
+  kCameraStream,
+  /**
+   * Displays a field2d object.<br>
+   * Supported types:
+   *
+   * <ul>
+   *   <li>Field2d
+   * </ul>
+   */
+  kField,
 };
 
 }  // namespace frc
