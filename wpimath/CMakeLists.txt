@@ -139,6 +139,10 @@ target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
 target_compile_features(wpimath PUBLIC cxx_std_20)
 if(MSVC)
     target_compile_options(wpimath PUBLIC /utf-8 /bigobj)
+    target_link_options(
+        wpimath
+        PRIVATE /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/exports.def>
+    )
 endif()
 wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)

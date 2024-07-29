@@ -6,13 +6,17 @@ package edu.wpi.first.math.controller;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.math.controller.proto.SimpleMotorFeedforwardProto;
+import edu.wpi.first.math.controller.struct.SimpleMotorFeedforwardStruct;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
-public class SimpleMotorFeedforward {
+public class SimpleMotorFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain. */
   private final double ks;
 
@@ -287,4 +291,10 @@ public class SimpleMotorFeedforward {
   public double minAchievableAcceleration(double maxVoltage, double velocity) {
     return maxAchievableAcceleration(-maxVoltage, velocity);
   }
+
+  /** SimpleMotorFeedforward struct for serialization. */
+  public static final SimpleMotorFeedforwardStruct struct = new SimpleMotorFeedforwardStruct();
+
+  /** SimpleMotorFeedforward protobuf for serialization. */
+  public static final SimpleMotorFeedforwardProto proto = new SimpleMotorFeedforwardProto();
 }

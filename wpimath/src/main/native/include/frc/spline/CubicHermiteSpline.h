@@ -114,3 +114,6 @@ class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
   }
 };
 }  // namespace frc
+
+#include "frc/spline/proto/CubicHermiteSplineProto.h"
+#include "frc/spline/struct/CubicHermiteSplineStruct.h"
