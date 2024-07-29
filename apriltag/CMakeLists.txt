@@ -128,13 +128,12 @@ target_link_libraries(apriltag wpimath)
 target_include_directories(
     apriltag
     PUBLIC
-        $<BUILD_INTERFACE:${apriltaglib_SOURCE_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/apriltag>
 )
 
 install(
-    DIRECTORY src/main/native/thirdparty/apriltag/include/
+    DIRECTORY src/main/native/include/ src/main/native/thirdparty/apriltag/include/
     DESTINATION "${include_dest}/apriltag"
 )
 target_include_directories(
@@ -143,12 +142,10 @@ target_include_directories(
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include/common>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/src>
 )
 
 install(TARGETS apriltag EXPORT apriltag)
 export(TARGETS apriltag FILE apriltag.cmake NAMESPACE apriltag::)
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/apriltag")
 
 configure_file(apriltag-config.cmake.in ${WPILIB_BINARY_DIR}/apriltag-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/apriltag)
