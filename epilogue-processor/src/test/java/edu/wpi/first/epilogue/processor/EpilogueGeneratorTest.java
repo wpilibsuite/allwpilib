@@ -30,6 +30,8 @@ class EpilogueGeneratorTest {
         """
         package edu.wpi.first.epilogue;
 
+        import static edu.wpi.first.units.Units.Seconds;
+
         import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epilogue {
@@ -77,6 +79,8 @@ class EpilogueGeneratorTest {
         """
         package edu.wpi.first.epilogue;
 
+        import static edu.wpi.first.units.Units.Seconds;
+
         import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epilogue {
@@ -119,6 +123,8 @@ class EpilogueGeneratorTest {
         """
         package edu.wpi.first.epilogue;
 
+        import static edu.wpi.first.units.Units.Seconds;
+
         import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epilogue {
@@ -152,9 +158,15 @@ class EpilogueGeneratorTest {
           public static void bind(edu.wpi.first.epilogue.Example robot) {
             robot.addPeriodic(() -> {
               long start = System.nanoTime();
+              if (config.loggingPeriod == null) {
+                config.loggingPeriod = Seconds.of(robot.getPeriod());
+              }
+              if (config.loggingPeriodOffset == null) {
+                config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              }
               exampleLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
               edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
-            }, robot.getPeriod(), robot.getPeriod() / 2);
+            }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
         }
         """;
@@ -178,6 +190,8 @@ class EpilogueGeneratorTest {
     String expected =
         """
         package edu.wpi.first.epilogue;
+
+        import static edu.wpi.first.units.Units.Seconds;
 
         import edu.wpi.first.epilogue.AlphaBotLogger;
         import edu.wpi.first.epilogue.BetaBotLogger;
@@ -214,9 +228,15 @@ class EpilogueGeneratorTest {
           public static void bind(edu.wpi.first.epilogue.AlphaBot robot) {
             robot.addPeriodic(() -> {
               long start = System.nanoTime();
+              if (config.loggingPeriod == null) {
+                config.loggingPeriod = Seconds.of(robot.getPeriod());
+              }
+              if (config.loggingPeriodOffset == null) {
+                config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              }
               alphaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
               edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
-            }, robot.getPeriod(), robot.getPeriod() / 2);
+            }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
 
           /**
@@ -230,9 +250,15 @@ class EpilogueGeneratorTest {
           public static void bind(edu.wpi.first.epilogue.BetaBot robot) {
             robot.addPeriodic(() -> {
               long start = System.nanoTime();
+              if (config.loggingPeriod == null) {
+                config.loggingPeriod = Seconds.of(robot.getPeriod());
+              }
+              if (config.loggingPeriodOffset == null) {
+                config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              }
               betaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
               edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
-            }, robot.getPeriod(), robot.getPeriod() / 2);
+            }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
         }
         """;
@@ -271,6 +297,8 @@ class EpilogueGeneratorTest {
     String expected =
         """
         package edu.wpi.first.epilogue;
+
+        import static edu.wpi.first.units.Units.Seconds;
 
         import edu.wpi.first.epilogue.ExampleLogger;
         import edu.wpi.first.epilogue.CustomLogger;
