@@ -254,4 +254,9 @@ void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
                               HAL_REVPHStickyFaults* stickyFaults,
                               int32_t* status) {}
 
+int32_t HAL_GetREVPHSolenoidDisabledList(HAL_REVPHHandle handle,
+                                         int32_t* status) {
+  return 0;
+}
+
 void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status) {}

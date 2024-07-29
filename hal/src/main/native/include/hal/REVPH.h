@@ -369,6 +369,16 @@ void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
  */
 void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status);
 
+/**
+ * Get a bitmask of disabled solenoids.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return Bitmask indicating disabled solenoids. The LSB represents solenoid 0.
+ */
+int32_t HAL_GetREVPHSolenoidDisabledList(HAL_REVPHHandle handle,
+                                         int32_t* status);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
