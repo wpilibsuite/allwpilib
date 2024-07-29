@@ -11,6 +11,9 @@ simgui.json
 
 networktables.json
 
+ntcore/connectionlistenertest.json
+ntcore/timesynctest.json
+
 # Created by the jenkins test script
 test-reports
 
