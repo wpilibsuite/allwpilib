@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj.templates.romieducational;
 
 /**
- * The VM is configured to automatically run this class, and to call the run() function when the
- * robot is enabled. If you change the name of this class or the package after creating this
- * project, you must also update the Main.java file in the project.
+ * The run() function is called automatically when the robot is enabled. If you change the name of
+ * this class or the package after creating this project, you must also update the Main.java file in
+ * the project.
  */
 public class Robot extends EducationalRobot {
   /**
