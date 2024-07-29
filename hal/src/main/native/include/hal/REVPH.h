@@ -311,7 +311,8 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
  *
  * @param[in] handle  the PH handle
  * @param[out] status Error status variable. 0 on success.
- * @return solenoid values
+ * @return Bitmask containing the state of the solenoids. The LSB represents
+ * solenoid 0.
  */
 int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status);
 
@@ -319,8 +320,10 @@ int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status);
  * Sets solenoids on a PH.
  *
  * @param[in] handle  the PH handle
- * @param[in] mask bitmask to set
- * @param[in] values solenoid values
+ * @param[in] mask Bitmask indicating which solenoids to set. The LSB represents
+ * solenoid 0.
+ * @param[in] values Bitmask indicating the desired states of the solenoids. The
+ * LSB represents solenoid 0.
  * @param[out] status Error status variable. 0 on success.
  */
 void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
@@ -365,6 +368,16 @@ void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
  * @param[out] status Error status variable. 0 on success.
  */
 void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status);
+
+/**
+ * Get a bitmask of disabled solenoids.
+ *
+ * @param[in] handle  the PH handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return Bitmask indicating disabled solenoids. The LSB represents solenoid 0.
+ */
+int32_t HAL_GetREVPHSolenoidDisabledList(HAL_REVPHHandle handle,
+                                         int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

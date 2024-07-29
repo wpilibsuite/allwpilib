@@ -12,10 +12,15 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.proto.SwerveDriveKinematicsProto;
+import edu.wpi.first.math.kinematics.struct.SwerveDriveKinematicsStruct;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -41,7 +46,9 @@ import org.ejml.simple.SimpleMatrix;
  */
 @SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]> {
+    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]>,
+        ProtobufSerializable,
+        StructSerializable {
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
@@ -393,6 +400,17 @@ public class SwerveDriveKinematics
   }
 
   @Override
+  public void copyInto(SwerveModulePosition[] positions, SwerveModulePosition[] output) {
+    if (positions.length != output.length) {
+      throw new IllegalArgumentException("Inconsistent number of modules!");
+    }
+    for (int i = 0; i < positions.length; ++i) {
+      output[i].distanceMeters = positions[i].distanceMeters;
+      output[i].angle = positions[i].angle;
+    }
+  }
+
+  @Override
   public SwerveModulePosition[] interpolate(
       SwerveModulePosition[] startValue, SwerveModulePosition[] endValue, double t) {
     if (endValue.length != startValue.length) {
@@ -403,5 +421,29 @@ public class SwerveDriveKinematics
       newPositions[i] = startValue[i].interpolate(endValue[i], t);
     }
     return newPositions;
+  }
+
+  /**
+   * Gets the locations of the modules relative to the center of rotation.
+   *
+   * @return The locations of the modules relative to the center of rotation. This array should not
+   *     be modified.
+   */
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
+  public Translation2d[] getModules() {
+    return m_modules;
+  }
+
+  /** SwerveDriveKinematics protobuf for serialization. */
+  public static final SwerveDriveKinematicsProto proto = new SwerveDriveKinematicsProto();
+
+  /**
+   * Creates an implementation of the {@link Struct} interface for swerve drive kinematics objects.
+   *
+   * @param numModules The number of modules of the kinematics objects this serializer processes.
+   * @return The struct implementation.
+   */
+  public static final SwerveDriveKinematicsStruct getStruct(int numModules) {
+    return new SwerveDriveKinematicsStruct(numModules);
   }
 }

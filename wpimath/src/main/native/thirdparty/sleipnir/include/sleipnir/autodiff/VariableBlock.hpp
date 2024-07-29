@@ -131,12 +131,10 @@ class VariableBlock {
    *
    * @param value Value to assign.
    */
-  VariableBlock<Mat>& SetValue(double value) {
+  void SetValue(double value) {
     Assert(Rows() == 1 && Cols() == 1);
 
     (*this)(0, 0).SetValue(value);
-
-    return *this;
   }
 
   /**
@@ -165,7 +163,7 @@ class VariableBlock {
    */
   template <typename Derived>
     requires std::same_as<typename Derived::Scalar, double>
-  VariableBlock<Mat>& SetValue(const Eigen::MatrixBase<Derived>& values) {
+  void SetValue(const Eigen::MatrixBase<Derived>& values) {
     Assert(Rows() == values.rows());
     Assert(Cols() == values.cols());
 
@@ -174,8 +172,6 @@ class VariableBlock {
         (*this)(row, col).SetValue(values(row, col));
       }
     }
-
-    return *this;
   }
 
   /**

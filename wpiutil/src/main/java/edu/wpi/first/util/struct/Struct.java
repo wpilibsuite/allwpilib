@@ -4,6 +4,7 @@
 
 package edu.wpi.first.util.struct;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 
 /**
@@ -48,12 +49,22 @@ public interface Struct<T> {
   Class<T> getTypeClass();
 
   /**
+   * Gets the type name (e.g. for schemas of other structs). This should be globally unique among
+   * structs.
+   *
+   * @return type name
+   */
+  String getTypeName();
+
+  /**
    * Gets the type string (e.g. for NetworkTables). This should be globally unique and start with
    * "struct:".
    *
    * @return type string
    */
-  String getTypeString();
+  default String getTypeString() {
+    return "struct:" + getTypeName();
+  }
 
   /**
    * Gets the serialized size (in bytes). This should always be a constant.
@@ -112,6 +123,73 @@ public interface Struct<T> {
    */
   default void unpackInto(T out, ByteBuffer bb) {
     throw new UnsupportedOperationException("object does not support unpackInto");
+  }
+
+  /**
+   * Deserializes an array from a raw struct serialized ByteBuffer starting at the current position.
+   * Will increment the ByteBuffer position by size * struct.size() bytes. Will not otherwise modify
+   * the ByteBuffer (e.g. byte order will not be changed).
+   *
+   * @param <T> Object type
+   * @param bb ByteBuffer
+   * @param size Size of the array
+   * @param struct Struct implementation
+   * @return Deserialized array
+   */
+  static <T> T[] unpackArray(ByteBuffer bb, int size, Struct<T> struct) {
+    @SuppressWarnings("unchecked")
+    T[] arr = (T[]) Array.newInstance(struct.getTypeClass(), size);
+    for (int i = 0; i < arr.length; i++) {
+      arr[i] = struct.unpack(bb);
+    }
+    return arr;
+  }
+
+  /**
+   * Deserializes a double array from a raw struct serialized ByteBuffer starting at the current
+   * position. Will increment the ByteBuffer position by size * kSizeDouble bytes. Will not
+   * otherwise modify the ByteBuffer (e.g. byte order will not be changed).
+   *
+   * @param bb ByteBuffer
+   * @param size Size of the array
+   * @return Double array
+   */
+  static double[] unpackDoubleArray(ByteBuffer bb, int size) {
+    double[] arr = new double[size];
+    for (int i = 0; i < size; i++) {
+      arr[i] = bb.getDouble();
+    }
+    return arr;
+  }
+
+  /**
+   * Puts array contents to a ByteBuffer starting at the current position. Will increment the
+   * ByteBuffer position by size * struct.size() bytes. Will not otherwise modify the ByteBuffer
+   * (e.g. byte order will not be changed).
+   *
+   * @param <T> Object type
+   * @param bb ByteBuffer
+   * @param arr Array to serialize
+   * @param struct Struct implementation
+   */
+  static <T> void packArray(ByteBuffer bb, T[] arr, Struct<T> struct) {
+    for (T obj : arr) {
+      struct.pack(bb, obj);
+    }
+  }
+
+  /**
+   * Puts array contents to a ByteBuffer starting at the current position. Will increment the
+   * ByteBuffer position by size * kSizeDouble bytes. Will not otherwise modify the ByteBuffer (e.g.
+   * byte order will not be changed).
+   *
+   * @param bb ByteBuffer
+   * @param arr Array to serialize
+   */
+  static void packArray(ByteBuffer bb, double[] arr) {
+    for (double obj : arr) {
+      bb.putDouble(obj);
+    }
   }
 
   /**

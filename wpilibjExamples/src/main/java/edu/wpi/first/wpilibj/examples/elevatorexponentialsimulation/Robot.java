@@ -18,9 +18,6 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void robotInit() {}
-
-  @Override
   public void robotPeriodic() {
     // Update the telemetry, including mechanism visualization, regardless of mode.
     m_elevator.updateTelemetry();

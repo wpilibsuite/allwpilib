@@ -40,7 +40,8 @@ class SLEIPNIR_DLLEXPORT PoolResource {
    * @param alignment Alignment of the block (unused).
    */
   [[nodiscard]]
-  void* allocate(size_t bytes, size_t alignment = alignof(std::max_align_t)) {
+  void* allocate(size_t bytes, [[maybe_unused]] size_t alignment =
+                                   alignof(std::max_align_t)) {
     if (m_freeList.empty()) {
       AddChunk(bytes);
     }
@@ -57,8 +58,9 @@ class SLEIPNIR_DLLEXPORT PoolResource {
    * @param bytes Number of bytes in the block (unused).
    * @param alignment Alignment of the block (unused).
    */
-  void deallocate(void* p, size_t bytes,
-                  size_t alignment = alignof(std::max_align_t)) {
+  void deallocate(
+      void* p, [[maybe_unused]] size_t bytes,
+      [[maybe_unused]] size_t alignment = alignof(std::max_align_t)) {
     m_freeList.emplace_back(p);
   }
 

@@ -17,8 +17,8 @@ public class Pose3dStruct implements Struct<Pose3d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Pose3d";
+  public String getTypeName() {
+    return "Pose3d";
   }
 
   @Override

@@ -40,6 +40,7 @@ public class ParallelDeadlineGroup extends Command {
    * @param otherCommands the other commands to be executed
    * @throws IllegalArgumentException if the deadline command is also in the otherCommands argument
    */
+  @SuppressWarnings("this-escape")
   public ParallelDeadlineGroup(Command deadline, Command... otherCommands) {
     setDeadline(deadline);
     addCommands(otherCommands);
@@ -80,12 +81,12 @@ public class ParallelDeadlineGroup extends Command {
     CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
-      if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
+      if (!Collections.disjoint(command.getRequirements(), getRequirements())) {
         throw new IllegalArgumentException(
             "Multiple commands in a parallel group cannot require the same subsystems");
       }
       m_commands.put(command, false);
-      m_requirements.addAll(command.getRequirements());
+      addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
       if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
         m_interruptBehavior = InterruptionBehavior.kCancelSelf;

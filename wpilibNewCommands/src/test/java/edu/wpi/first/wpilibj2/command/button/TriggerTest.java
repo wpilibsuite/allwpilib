@@ -63,6 +63,32 @@ class TriggerTest extends CommandTestBase {
   }
 
   @Test
+  void onChangeTest() {
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+    AtomicBoolean finished = new AtomicBoolean(false);
+    Command command1 = new WaitUntilCommand(finished::get);
+
+    InternalButton button = new InternalButton();
+    button.setPressed(true);
+    button.onChange(command1);
+    scheduler.run();
+    assertFalse(command1.isScheduled());
+    button.setPressed(false);
+    scheduler.run();
+    assertTrue(command1.isScheduled());
+    finished.set(true);
+    scheduler.run();
+    assertFalse(command1.isScheduled());
+    finished.set(false);
+    button.setPressed(true);
+    scheduler.run();
+    assertTrue(command1.isScheduled());
+    finished.set(true);
+    scheduler.run();
+    assertFalse(command1.isScheduled());
+  }
+
+  @Test
   void whileTrueRepeatedlyTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger inits = new AtomicInteger(0);

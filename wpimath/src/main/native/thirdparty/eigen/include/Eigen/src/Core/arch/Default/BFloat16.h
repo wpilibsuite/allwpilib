@@ -139,15 +139,11 @@ struct numeric_limits_bfloat16_impl {
   static EIGEN_CONSTEXPR const bool has_infinity = true;
   static EIGEN_CONSTEXPR const bool has_quiet_NaN = true;
   static EIGEN_CONSTEXPR const bool has_signaling_NaN = true;
-#if __cplusplus >= 202302L
   EIGEN_DIAGNOSTICS(push)
   EIGEN_DISABLE_DEPRECATED_WARNING
-#endif
   static EIGEN_CONSTEXPR const std::float_denorm_style has_denorm = std::denorm_present;
   static EIGEN_CONSTEXPR const bool has_denorm_loss = false;
-#if __cplusplus >= 202302L
   EIGEN_DIAGNOSTICS(pop)
-#endif
   static EIGEN_CONSTEXPR const std::float_round_style round_style = std::numeric_limits<float>::round_style;
   static EIGEN_CONSTEXPR const bool is_iec559 = true;
   // The C++ standard defines this as "true if the set of values representable
@@ -194,17 +190,13 @@ template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_bfloat16_impl<T>::has_quiet_NaN;
 template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_bfloat16_impl<T>::has_signaling_NaN;
-#if __cplusplus >= 202302L
 EIGEN_DIAGNOSTICS(push)
 EIGEN_DISABLE_DEPRECATED_WARNING
-#endif
 template <typename T>
 EIGEN_CONSTEXPR const std::float_denorm_style numeric_limits_bfloat16_impl<T>::has_denorm;
 template <typename T>
 EIGEN_CONSTEXPR const bool numeric_limits_bfloat16_impl<T>::has_denorm_loss;
-#if __cplusplus >= 202302L
 EIGEN_DIAGNOSTICS(pop)
-#endif
 template <typename T>
 EIGEN_CONSTEXPR const std::float_round_style numeric_limits_bfloat16_impl<T>::round_style;
 template <typename T>

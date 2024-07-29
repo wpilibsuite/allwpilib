@@ -4,12 +4,16 @@
 
 package edu.wpi.first.math.controller;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.units.MutableMeasure;
 import org.junit.jupiter.api.Test;
 
 class SimpleMotorFeedforwardTest {
@@ -24,22 +28,46 @@ class SimpleMotorFeedforwardTest {
     var B = MatBuilder.fill(Nat.N1(), Nat.N1(), 1.0 / Ka);
 
     var plantInversion = new LinearPlantInversionFeedforward<N1, N1, N1>(A, B, dt);
-    var simpleMotor = new SimpleMotorFeedforward(Ks, Kv, Ka);
+    var simpleMotor = new SimpleMotorFeedforward(Ks, Kv, Ka, dt);
 
     var r = VecBuilder.fill(2.0);
     var nextR = VecBuilder.fill(3.0);
+    var currentVelocity = MutableMeasure.ofBaseUnits(2.0, RadiansPerSecond);
+    var nextVelocity = MutableMeasure.ofBaseUnits(3.0, RadiansPerSecond);
 
-    assertEquals(37.52499583432516 + 0.5, simpleMotor.calculate(2.0, 3.0, dt), 0.002);
+    assertEquals(
+        37.52499583432516 + 0.5,
+        simpleMotor.calculate(currentVelocity, nextVelocity).magnitude(),
+        0.002);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
-        simpleMotor.calculate(2.0, 3.0, dt),
+        simpleMotor.calculate(currentVelocity, nextVelocity).magnitude(),
         0.002);
 
     // These won't match exactly. It's just an approximation to make sure they're
     // in the same ballpark.
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
-        simpleMotor.calculate(2.0, 1.0 / dt),
+        simpleMotor.calculate(currentVelocity, nextVelocity).magnitude(),
         2.0);
+  }
+
+  @Test
+  void testNegativeGains() {
+    double Ks = 0.5;
+    double Kv = 3.5;
+    double Ka = 3.5;
+    double dt = 0.02;
+
+    assertAll(
+        () ->
+            assertThrows(
+                IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, -Kv, Ka, dt)),
+        () ->
+            assertThrows(
+                IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, Kv, -Ka, dt)),
+        () ->
+            assertThrows(
+                IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, Kv, Ka, 0)));
   }
 }

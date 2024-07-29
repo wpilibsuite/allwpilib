@@ -179,7 +179,8 @@ HAL_Bool HAL_GetCTREPCMCompressorNotConnectedFault(HAL_CTREPCMHandle handle,
  *
  * @param[in] handle  the PCM handle
  * @param[out] status Error status variable. 0 on success.
- * @return solenoid values
+ * @return Bitmask containing the state of the solenoids. The LSB represents
+ * solenoid 0.
  */
 int32_t HAL_GetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t* status);
 
@@ -187,8 +188,10 @@ int32_t HAL_GetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t* status);
  * Sets solenoids on a pneumatics module.
  *
  * @param[in] handle  the PCM handle
- * @param[in] mask bitmask to set
- * @param[in] values solenoid values
+ * @param[in] mask Bitmask indicating which solenoids to set. The LSB represents
+ * solenoid 0.
+ * @param[in] values Bitmask indicating the desired states of the solenoids. The
+ * LSB represents solenoid 0.
  * @param[out] status Error status variable. 0 on success.
  */
 void HAL_SetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t mask,
@@ -199,7 +202,7 @@ void HAL_SetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t mask,
  *
  * @param[in] handle  the PCM handle
  * @param[out] status Error status variable. 0 on success.
- * @return bitmask of disabled solenoids
+ * @return Bitmask indicating disabled solenoids. The LSB represents solenoid 0.
  */
 int32_t HAL_GetCTREPCMSolenoidDisabledList(HAL_CTREPCMHandle handle,
                                            int32_t* status);

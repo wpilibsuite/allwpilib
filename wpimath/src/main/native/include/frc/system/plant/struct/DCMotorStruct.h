@@ -11,7 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::DCMotor> {
-  static constexpr std::string_view GetTypeString() { return "struct:DCMotor"; }
+  static constexpr std::string_view GetTypeName() { return "DCMotor"; }
   static constexpr size_t GetSize() { return 40; }
   static constexpr std::string_view GetSchema() {
     return "double nominal_voltage;double stall_torque;double "

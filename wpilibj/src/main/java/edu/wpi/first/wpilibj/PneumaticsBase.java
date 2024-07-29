@@ -36,15 +36,16 @@ public interface PneumaticsBase extends AutoCloseable {
   /**
    * Sets solenoids on a pneumatics module.
    *
-   * @param mask mask
-   * @param values values
+   * @param mask Bitmask indicating which solenoids to set. The LSB represents solenoid 0.
+   * @param values Bitmask indicating the desired states of the solenoids. The LSB represents
+   *     solenoid 0.
    */
   void setSolenoids(int mask, int values);
 
   /**
    * Gets a bitmask of solenoid values.
    *
-   * @return values
+   * @return Bitmask containing the state of the solenoids. The LSB represents solenoid 0.
    */
   int getSolenoids();
 
@@ -58,7 +59,7 @@ public interface PneumaticsBase extends AutoCloseable {
   /**
    * Get a bitmask of disabled solenoids.
    *
-   * @return bitmask of disabled solenoids
+   * @return Bitmask indicating disabled solenoids. The LSB represents solenoid 0.
    */
   int getSolenoidDisabledList();
 
@@ -194,17 +195,17 @@ public interface PneumaticsBase extends AutoCloseable {
   boolean checkSolenoidChannel(int channel);
 
   /**
-   * Check to see if the masked solenoids can be reserved, and if not reserve them.
+   * Check to see if the solenoids marked in the bitmask can be reserved, and if so, reserve them.
    *
-   * @param mask The bitmask of solenoids to reserve
+   * @param mask The bitmask of solenoids to reserve. The LSB represents solenoid 0.
    * @return 0 if successful; mask of solenoids that couldn't be allocated otherwise
    */
   int checkAndReserveSolenoids(int mask);
 
   /**
-   * Unreserve the masked solenoids.
+   * Unreserve the solenoids marked in the bitmask.
    *
-   * @param mask The bitmask of solenoids to unreserve
+   * @param mask The bitmask of solenoids to unreserve. The LSB represents solenoid 0.
    */
   void unreserveSolenoids(int mask);
 

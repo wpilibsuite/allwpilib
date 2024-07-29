@@ -47,11 +47,29 @@ public class DataLogJNI extends WPIUtilJNI {
   static native long fgCreate(String filename, String extraHeader) throws IOException;
 
   /**
+   * Create a new Data Log foreground writer to a memory buffer.
+   *
+   * @param extraHeader extra header data
+   * @return data log writer implementation handle
+   */
+  static native long fgCreateMemory(String extraHeader);
+
+  /**
    * Explicitly flushes the log data to disk.
    *
    * @param impl data log background writer implementation handle
    */
   static native void flush(long impl);
+
+  /**
+   * Flushes the log data to a memory buffer (only valid with fgCreateMemory data logs).
+   *
+   * @param impl data log background writer implementation handle
+   * @param buf output data buffer
+   * @param pos position in write buffer to start copying from
+   * @return Number of bytes written to buffer; 0 if no more to copy
+   */
+  static native int copyWriteBuffer(long impl, byte[] buf, int pos);
 
   /**
    * Pauses appending of data records to the log. While paused, no data records are saved (e.g.

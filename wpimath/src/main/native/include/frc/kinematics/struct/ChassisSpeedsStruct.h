@@ -11,9 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::ChassisSpeeds> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:ChassisSpeeds";
-  }
+  static constexpr std::string_view GetTypeName() { return "ChassisSpeeds"; }
   static constexpr size_t GetSize() { return 24; }
   static constexpr std::string_view GetSchema() {
     return "double vx;double vy;double omega";

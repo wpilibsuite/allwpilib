@@ -11,10 +11,16 @@ package edu.wpi.first.hal.can;
 public class CANMessageNotFoundException extends RuntimeException {
   private static final long serialVersionUID = 8249780881928189975L;
 
+  /** Constructs a new CANMessageNotFoundException with no message. */
   public CANMessageNotFoundException() {
     super();
   }
 
+  /**
+   * Constructs a new CANMessageNotFoundException with {@code msg} as its detail message.
+   *
+   * @param msg the message
+   */
   public CANMessageNotFoundException(String msg) {
     super(msg);
   }

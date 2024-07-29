@@ -6,6 +6,12 @@ package edu.wpi.first.math;
 
 import edu.wpi.first.math.jni.EigenJNI;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.proto.MatrixProto;
+import edu.wpi.first.math.struct.MatrixStruct;
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 import org.ejml.MatrixDimensionException;
 import org.ejml.data.DMatrixRMaj;
@@ -24,7 +30,8 @@ import org.ejml.simple.SimpleMatrix;
  * @param <R> The number of rows in this matrix.
  * @param <C> The number of columns in this matrix.
  */
-public class Matrix<R extends Num, C extends Num> {
+public class Matrix<R extends Num, C extends Num>
+    implements ProtobufSerializable, StructSerializable {
   /** Storage for underlying EJML matrix. */
   protected final SimpleMatrix m_storage;
 
@@ -737,5 +744,33 @@ public class Matrix<R extends Num, C extends Num> {
   @Override
   public int hashCode() {
     return Objects.hash(m_storage);
+  }
+
+  /**
+   * Creates an implementation of the {@link Protobuf} interface for matrices.
+   *
+   * @param <R> The number of rows of the matrices this serializer processes.
+   * @param <C> The number of cols of the matrices this serializer processes.
+   * @param rows The number of rows of the matrices this serializer processes.
+   * @param cols The number of cols of the matrices this serializer processes.
+   * @return The protobuf implementation.
+   */
+  public static <R extends Num, C extends Num> MatrixProto<R, C> getProto(
+      Nat<R> rows, Nat<C> cols) {
+    return new MatrixProto<>(rows, cols);
+  }
+
+  /**
+   * Creates an implementation of the {@link Struct} interfaces for matrices.
+   *
+   * @param <R> The number of rows of the matrices this serializer processes.
+   * @param <C> The number of cols of the matrices this serializer processes.
+   * @param rows The number of rows of the matrices this serializer processes.
+   * @param cols The number of cols of the matrices this serializer processes.
+   * @return The struct implementation.
+   */
+  public static <R extends Num, C extends Num> MatrixStruct<R, C> getStruct(
+      Nat<R> rows, Nat<C> cols) {
+    return new MatrixStruct<>(rows, cols);
   }
 }

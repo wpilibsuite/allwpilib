@@ -35,8 +35,7 @@ public class AnalogInputSim {
    *
    * @param callback the callback that will be called whenever the analog input is initialized
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AnalogInDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
@@ -66,8 +65,7 @@ public class AnalogInputSim {
    *
    * @param callback the callback that will be called whenever the number of average bits is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerAverageBitsCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AnalogInDataJNI.registerAverageBitsCallback(m_index, callback, initialNotify);
@@ -97,8 +95,7 @@ public class AnalogInputSim {
    *
    * @param callback the callback that will be called whenever the oversampling bits are changed.
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerOversampleBitsCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -129,8 +126,7 @@ public class AnalogInputSim {
    *
    * @param callback the callback that will be called whenever the voltage is changed.
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerVoltageCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AnalogInDataJNI.registerVoltageCallback(m_index, callback, initialNotify);
@@ -160,8 +156,7 @@ public class AnalogInputSim {
    *
    * @param callback the callback that will be called whenever the accumulator is initialized
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerAccumulatorInitializedCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -193,8 +188,7 @@ public class AnalogInputSim {
    *
    * @param callback the callback that will be called whenever the accumulator value is changed.
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerAccumulatorValueCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -225,8 +219,7 @@ public class AnalogInputSim {
    *
    * @param callback the callback that will be called whenever the accumulator count is changed.
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerAccumulatorCountCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -257,8 +250,7 @@ public class AnalogInputSim {
    *
    * @param callback the callback that will be called whenever the accumulator center is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerAccumulatorCenterCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -289,8 +281,7 @@ public class AnalogInputSim {
    *
    * @param callback the callback that will be called whenever the accumulator deadband is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerAccumulatorDeadbandCallback(
       NotifyCallback callback, boolean initialNotify) {

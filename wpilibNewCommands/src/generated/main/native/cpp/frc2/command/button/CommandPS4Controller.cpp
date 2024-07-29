@@ -16,59 +16,59 @@ frc::PS4Controller& CommandPS4Controller::GetHID() {
 }
 
 Trigger CommandPS4Controller::Square(frc::EventLoop* loop) const {
-  return m_hid.Square(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kSquare, loop);
 }
 
 Trigger CommandPS4Controller::Cross(frc::EventLoop* loop) const {
-  return m_hid.Cross(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kCross, loop);
 }
 
 Trigger CommandPS4Controller::Circle(frc::EventLoop* loop) const {
-  return m_hid.Circle(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kCircle, loop);
 }
 
 Trigger CommandPS4Controller::Triangle(frc::EventLoop* loop) const {
-  return m_hid.Triangle(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kTriangle, loop);
 }
 
 Trigger CommandPS4Controller::L1(frc::EventLoop* loop) const {
-  return m_hid.L1(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kL1, loop);
 }
 
 Trigger CommandPS4Controller::R1(frc::EventLoop* loop) const {
-  return m_hid.R1(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kR1, loop);
 }
 
 Trigger CommandPS4Controller::L2(frc::EventLoop* loop) const {
-  return m_hid.L2(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kL2, loop);
 }
 
 Trigger CommandPS4Controller::R2(frc::EventLoop* loop) const {
-  return m_hid.R2(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kR2, loop);
 }
 
 Trigger CommandPS4Controller::Share(frc::EventLoop* loop) const {
-  return m_hid.Share(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kShare, loop);
 }
 
 Trigger CommandPS4Controller::Options(frc::EventLoop* loop) const {
-  return m_hid.Options(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kOptions, loop);
 }
 
 Trigger CommandPS4Controller::L3(frc::EventLoop* loop) const {
-  return m_hid.L3(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kL3, loop);
 }
 
 Trigger CommandPS4Controller::R3(frc::EventLoop* loop) const {
-  return m_hid.R3(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kR3, loop);
 }
 
 Trigger CommandPS4Controller::PS(frc::EventLoop* loop) const {
-  return m_hid.PS(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kPS, loop);
 }
 
 Trigger CommandPS4Controller::Touchpad(frc::EventLoop* loop) const {
-  return m_hid.Touchpad(loop).CastTo<Trigger>();
+  return Button(frc::PS4Controller::Button::kTouchpad, loop);
 }
 
 double CommandPS4Controller::GetLeftX() const {

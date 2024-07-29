@@ -28,10 +28,10 @@ public class Robot extends TimedRobot {
   private final Drivetrain m_drive = new Drivetrain();
   private final LTVUnicycleController m_feedback = new LTVUnicycleController(0.020);
   private final Timer m_timer = new Timer();
-  private Trajectory m_trajectory;
+  private final Trajectory m_trajectory;
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     m_trajectory =
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(2, 2, Rotation2d.kZero),

@@ -7,6 +7,7 @@
 #include "frc/XboxController.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/event/BooleanEvent.h"
 
@@ -238,4 +239,25 @@ bool XboxController::GetLeftBumperReleased() {
 
 bool XboxController::GetRightBumperReleased() {
   return GetRawButtonReleased(Button::kRightBumper);
+}
+
+void XboxController::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("HID");
+  builder.PublishConstString("ControllerType", "Xbox");
+  builder.AddDoubleProperty("LeftTrigger", [this] { return GetLeftTriggerAxis(); }, nullptr);
+  builder.AddDoubleProperty("RightTrigger", [this] { return GetRightTriggerAxis(); }, nullptr);
+  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
+  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
+  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
+  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
+  builder.AddBooleanProperty("A", [this] { return GetAButton(); }, nullptr);
+  builder.AddBooleanProperty("B", [this] { return GetBButton(); }, nullptr);
+  builder.AddBooleanProperty("X", [this] { return GetXButton(); }, nullptr);
+  builder.AddBooleanProperty("Y", [this] { return GetYButton(); }, nullptr);
+  builder.AddBooleanProperty("LeftBumper", [this] { return GetLeftBumperButton(); }, nullptr);
+  builder.AddBooleanProperty("RightBumper", [this] { return GetRightBumperButton(); }, nullptr);
+  builder.AddBooleanProperty("Back", [this] { return GetBackButton(); }, nullptr);
+  builder.AddBooleanProperty("Start", [this] { return GetStartButton(); }, nullptr);
+  builder.AddBooleanProperty("LeftStick", [this] { return GetLeftStickButton(); }, nullptr);
+  builder.AddBooleanProperty("RightStick", [this] { return GetRightStickButton(); }, nullptr);
 }

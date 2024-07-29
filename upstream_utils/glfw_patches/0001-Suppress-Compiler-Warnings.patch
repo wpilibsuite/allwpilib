@@ -1,0 +1,119 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 10 Jul 2024 03:16:58 -0400
+Subject: [PATCH 1/2] Suppress Compiler Warnings
+
+---
+ src/input.c        | 4 ++++
+ src/mappings.h     | 8 ++++++++
+ src/null_window.c  | 4 ++++
+ src/posix_module.c | 2 ++
+ src/x11_init.c     | 1 +
+ src/x11_monitor.c  | 1 +
+ src/x11_window.c   | 3 +++
+ 7 files changed, 23 insertions(+)
+
+diff --git a/src/input.c b/src/input.c
+index 36128e10c34391a1c03342bfc3e9be9cc70a3e12..8726aa7ebc3b47621d9be7c9f6abc75cef54dbe8 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -36,6 +36,10 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
++#endif
++
+ // Internal key state used for sticky keys
+ #define _GLFW_STICK 3
+ 
+diff --git a/src/mappings.h b/src/mappings.h
+index 553fe2a28dcd95d3003c859aa2492c39255b7e9d..d7c16579ad23e78aaf73286d9b8a3be45c546f65 100644
+--- a/src/mappings.h
++++ b/src/mappings.h
+@@ -58,6 +58,11 @@
+ //
+ // 3. This notice may not be removed or altered from any source distribution.
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wpedantic"
++#endif
++
+ const char* _glfwDefaultMappings[] =
+ {
+ #if defined(GLFW_BUILD_WIN32_MAPPINGS)
+@@ -999,3 +1004,6 @@ const char* _glfwDefaultMappings[] =
+ #endif // GLFW_BUILD_LINUX_MAPPINGS
+ };
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic pop
++#endif
+diff --git a/src/null_window.c b/src/null_window.c
+index 5cdf3e236e585a1f5f30d0bfc0d6e9e949b13d44..7a40192931d51588a28bf1322c0bd30fbc436759 100644
+--- a/src/null_window.c
++++ b/src/null_window.c
+@@ -31,6 +31,10 @@
+ 
+ #include <stdlib.h>
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic ignored "-Wsign-compare"
++#endif
++
+ static void applySizeLimits(_GLFWwindow* window, int* width, int* height)
+ {
+     if (window->numer != GLFW_DONT_CARE && window->denom != GLFW_DONT_CARE)
+diff --git a/src/posix_module.c b/src/posix_module.c
+index 7079e5b45d56b1a48e671d24757e311d2ac44469..e838c1d10d5c601004cfde05d15315d499aed1e9 100644
+--- a/src/posix_module.c
++++ b/src/posix_module.c
+@@ -30,6 +30,8 @@
+ 
+ #include <dlfcn.h>
+ 
++#pragma GCC diagnostic ignored "-Wpedantic"
++
+ //////////////////////////////////////////////////////////////////////////
+ //////                       GLFW platform API                      //////
+ //////////////////////////////////////////////////////////////////////////
+diff --git a/src/x11_init.c b/src/x11_init.c
+index 11aeb9e5254224f0a424b309d835a31888bcb803..d8ebe90a20b23ad875389f19a4a9f976cacb781f 100644
+--- a/src/x11_init.c
++++ b/src/x11_init.c
+@@ -39,6 +39,7 @@
+ #include <errno.h>
+ #include <assert.h>
+ 
++#pragma GCC diagnostic ignored "-Wsign-compare"
+ 
+ // Translate the X11 KeySyms for a key to a GLFW key code
+ // NOTE: This is only used as a fallback, in case the XKB method fails
+diff --git a/src/x11_monitor.c b/src/x11_monitor.c
+index b031c83c0e4075a0eddee03efd70522a48d9e44e..14baada9c541745af368083dafc7c09477f5855d 100644
+--- a/src/x11_monitor.c
++++ b/src/x11_monitor.c
+@@ -34,6 +34,7 @@
+ #include <string.h>
+ #include <math.h>
+ 
++#pragma GCC diagnostic ignored "-Wsign-compare"
+ 
+ // Check whether the display mode should be included in enumeration
+ //
+diff --git a/src/x11_window.c b/src/x11_window.c
+index 8a689ed109343e37eba81a4f8427a3cac16d3748..89c30d3b6a4b297d51ce044d5d13fa89d4659ec3 100644
+--- a/src/x11_window.c
++++ b/src/x11_window.c
+@@ -41,6 +41,9 @@
+ #include <errno.h>
+ #include <assert.h>
+ 
++#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
++#pragma GCC diagnostic ignored "-Wsign-compare"
++
+ // Action for EWMH client messages
+ #define _NET_WM_STATE_REMOVE        0
+ #define _NET_WM_STATE_ADD           1

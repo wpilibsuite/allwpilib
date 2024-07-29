@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 19 Jul 2023 21:28:43 -0700
+Subject: [PATCH 6/9] Avoid incompatible pointer warning
+
+---
+ common/getopt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/common/getopt.c b/common/getopt.c
+index 7613b69c346f3f818688bb9f4704463367d877f6..71ae57bd83b2ed50c7f80f3e3952ddfcc53cb7bc 100644
+--- a/common/getopt.c
++++ b/common/getopt.c
+@@ -76,8 +76,9 @@ getopt_t *getopt_create()
+     return gopt;
+ }
+ 
+-void getopt_option_destroy(getopt_option_t *goo)
++void getopt_option_destroy(void *vgoo)
+ {
++    getopt_option_t* goo = (getopt_option_t*)vgoo;
+     free(goo->sname);
+     free(goo->lname);
+     free(goo->svalue);

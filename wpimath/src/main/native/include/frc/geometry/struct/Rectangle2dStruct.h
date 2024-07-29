@@ -11,9 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Rectangle2d> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:Rectangle2d";
-  }
+  static constexpr std::string_view GetTypeName() { return "Rectangle2d"; }
   static constexpr size_t GetSize() {
     return wpi::GetStructSize<frc::Pose2d>() + 16;
   }

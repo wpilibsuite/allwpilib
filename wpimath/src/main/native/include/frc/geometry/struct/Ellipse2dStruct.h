@@ -11,9 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Ellipse2d> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:Ellipse2d";
-  }
+  static constexpr std::string_view GetTypeName() { return "Ellipse2d"; }
   static constexpr size_t GetSize() {
     return wpi::GetStructSize<frc::Pose2d>() + 16;
   }

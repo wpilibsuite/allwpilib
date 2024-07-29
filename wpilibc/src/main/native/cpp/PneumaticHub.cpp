@@ -243,14 +243,9 @@ int PneumaticHub::GetModuleNumber() const {
 
 int PneumaticHub::GetSolenoidDisabledList() const {
   int32_t status = 0;
-  HAL_REVPHStickyFaults faults;
-  std::memset(&faults, 0, sizeof(faults));
-  HAL_GetREVPHStickyFaults(m_handle, &faults, &status);
+  auto result = HAL_GetREVPHSolenoidDisabledList(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  uint32_t intFaults = 0;
-  static_assert(sizeof(faults) == sizeof(intFaults));
-  std::memcpy(&intFaults, &faults, sizeof(faults));
-  return intFaults & 0xFFFF;
+  return result;
 }
 
 void PneumaticHub::FireOneShot(int index) {

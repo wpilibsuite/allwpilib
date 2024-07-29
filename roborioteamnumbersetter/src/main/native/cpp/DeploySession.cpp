@@ -4,12 +4,10 @@
 
 #include "DeploySession.h"
 
-#include <memory>
-#include <mutex>
 #include <string_view>
 #include <unordered_map>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpinet/uv/Error.h>

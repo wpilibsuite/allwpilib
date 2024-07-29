@@ -36,6 +36,8 @@ public final class LiveWindow {
     StringPublisher m_typePub;
   }
 
+  private static final String kSmartDashboardType = "LW Subsystem";
+
   private static final int dataHandle = SendableRegistry.getDataHandle();
   private static final NetworkTable liveWindowTable =
       NetworkTableInstance.getDefault().getTable("LiveWindow");
@@ -224,8 +226,12 @@ public final class LiveWindow {
             component.m_namePub.set(cbdata.name);
             ((SendableBuilderImpl) cbdata.builder).setTable(table);
             cbdata.sendable.initSendable(cbdata.builder);
-            component.m_typePub = new StringTopic(ssTable.getTopic(".type")).publish();
-            component.m_typePub.set("LW Subsystem");
+            component.m_typePub =
+                new StringTopic(ssTable.getTopic(".type"))
+                    .publishEx(
+                        StringTopic.kTypeString,
+                        "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
+            component.m_typePub.set(kSmartDashboardType);
 
             component.m_firstTime = false;
           }

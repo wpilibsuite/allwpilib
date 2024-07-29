@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 19 Jul 2023 20:48:21 -0700
+Subject: [PATCH 5/9] Fix signed left shift warning
+
+---
+ common/pjpeg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/common/pjpeg.c b/common/pjpeg.c
+index 4a5dd028ee8a3d79fbe7a5abed30886cc6e40dae..1941c27b7752a6a2420e8370451b0d29268f324d 100644
+--- a/common/pjpeg.c
++++ b/common/pjpeg.c
+@@ -594,7 +594,7 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
+ 
+                                         // if high bit is clear, it's negative
+                                         if ((value & (1 << (ssss-1))) == 0)
+-                                            value += ((-1) << ssss) + 1;
++                                            value += (int32_t)(UINT32_MAX << ssss) + 1;
+ 
+                                         dcpred[nsidx] += value;
+                                         block[0] = dcpred[nsidx] * pjd->qtab[qtabidx][0];
+@@ -620,7 +620,7 @@ static int pjpeg_decode_buffer(struct pjpeg_decode_state *pjd)
+ 
+                                             // if high bit is clear, it's negative
+                                             if ((value & (1 << (ssss-1))) == 0)
+-                                                value += ((-1) << ssss) + 1;
++                                                value += (int32_t)(UINT32_MAX << ssss) + 1;
+ 
+                                             coeff += rrrr;
+ 

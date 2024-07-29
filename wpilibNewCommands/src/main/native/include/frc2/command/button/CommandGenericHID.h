@@ -230,6 +230,23 @@ class CommandGenericHID {
       frc::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
+  /**
+   * Set the rumble output for the HID.
+   *
+   * The DS currently supports 2 rumble values, left rumble and right rumble.
+   *
+   * @param type  Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  void SetRumble(frc::GenericHID::RumbleType type, double value);
+
+  /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  bool IsConnected() const;
+
  private:
   frc::GenericHID m_hid;
 };

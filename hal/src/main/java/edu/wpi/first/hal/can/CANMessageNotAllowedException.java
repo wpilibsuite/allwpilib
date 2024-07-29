@@ -11,6 +11,11 @@ package edu.wpi.first.hal.can;
 public class CANMessageNotAllowedException extends RuntimeException {
   private static final long serialVersionUID = -638450112427013494L;
 
+  /**
+   * Constructs a new CANMessageNotAllowedException with {@code msg} as its detail message.
+   *
+   * @param msg the message
+   */
   public CANMessageNotAllowedException(String msg) {
     super(msg);
   }

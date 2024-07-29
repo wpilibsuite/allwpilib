@@ -14,11 +14,11 @@ frc::Joystick& CommandJoystick::GetHID() {
 }
 
 Trigger CommandJoystick::Trigger(frc::EventLoop* loop) const {
-  return m_hid.Trigger(loop).CastTo<class Trigger>();
+  return Button(frc::Joystick::ButtonType::kTriggerButton, loop);
 }
 
 Trigger CommandJoystick::Top(frc::EventLoop* loop) const {
-  return m_hid.Top(loop).CastTo<class Trigger>();
+  return Button(frc::Joystick::ButtonType::kTopButton, loop);
 }
 
 double CommandJoystick::GetMagnitude() const {

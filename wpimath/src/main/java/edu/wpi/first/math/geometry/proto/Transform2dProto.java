@@ -23,11 +23,6 @@ public class Transform2dProto implements Protobuf<Transform2d, ProtobufTransform
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Translation2d.proto, Rotation2d.proto};
-  }
-
-  @Override
   public ProtobufTransform2d createMessage() {
     return ProtobufTransform2d.newInstance();
   }
