@@ -261,7 +261,7 @@ public class Joystick extends GenericHID {
    *     given loop.
    */
   public BooleanEvent trigger(EventLoop loop) {
-    return new BooleanEvent(loop, this::getTrigger);
+    return button(ButtonType.kTrigger.value, loop);
   }
 
   /**
@@ -299,7 +299,7 @@ public class Joystick extends GenericHID {
    *     loop.
    */
   public BooleanEvent top(EventLoop loop) {
-    return new BooleanEvent(loop, this::getTop);
+    return button(ButtonType.kTop.value, loop);
   }
 
   /**
