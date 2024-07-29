@@ -11,8 +11,8 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::QuinticHermiteSpline> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:QuinticHermiteSpline";
+  static constexpr std::string_view GetTypeName() {
+    return "QuinticHermiteSpline";
   }
   static constexpr size_t GetSize() { return 4 * 3 * 8; }
   static constexpr std::string_view GetSchema() {

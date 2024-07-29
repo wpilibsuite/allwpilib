@@ -17,8 +17,8 @@ public class Transform3dStruct implements Struct<Transform3d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Transform3d";
+  public String getTypeName() {
+    return "Transform3d";
   }
 
   @Override

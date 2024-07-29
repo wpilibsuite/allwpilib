@@ -11,8 +11,8 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::CubicHermiteSpline> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:CubicHermiteSpline";
+  static constexpr std::string_view GetTypeName() {
+    return "CubicHermiteSpline";
   }
   static constexpr size_t GetSize() { return 4 * 2 * 8; }
   static constexpr std::string_view GetSchema() {

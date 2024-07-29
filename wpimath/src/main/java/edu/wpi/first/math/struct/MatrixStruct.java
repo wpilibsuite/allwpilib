@@ -33,19 +33,9 @@ public final class MatrixStruct<R extends Num, C extends Num> implements Struct<
     return clazz;
   }
 
-  /**
-   * Returns the type name.
-   *
-   * @return The type name. This is meant for use as a type name in a struct schema. Other uses
-   *     should use {@link #getTypeString()}
-   */
+  @Override
   public String getTypeName() {
     return "Matrix__" + m_rows.getNum() + "_" + m_cols.getNum();
-  }
-
-  @Override
-  public String getTypeString() {
-    return "struct:" + getTypeName();
   }
 
   @Override

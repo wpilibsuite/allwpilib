@@ -15,8 +15,8 @@ public final class CubicHermiteSplineStruct implements Struct<CubicHermiteSpline
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:CubicHermiteSpline";
+  public String getTypeName() {
+    return "CubicHermiteSpline";
   }
 
   @Override

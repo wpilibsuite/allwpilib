@@ -13,11 +13,11 @@
 
 template <int States, int Inputs, int Outputs>
 struct wpi::Struct<frc::LinearSystem<States, Inputs, Outputs>> {
-  static constexpr ct_string kTypeString = wpi::Concat(
-      "struct:LinearSystem__"_ct_string, wpi::NumToCtString<States>(),
-      "_"_ct_string, wpi::NumToCtString<Inputs>(), "_"_ct_string,
-      wpi::NumToCtString<Outputs>());
-  static constexpr std::string_view GetTypeString() { return kTypeString; }
+  static constexpr ct_string kTypeName =
+      wpi::Concat("LinearSystem__"_ct_string, wpi::NumToCtString<States>(),
+                  "_"_ct_string, wpi::NumToCtString<Inputs>(), "_"_ct_string,
+                  wpi::NumToCtString<Outputs>());
+  static constexpr std::string_view GetTypeName() { return kTypeName; }
   static constexpr size_t GetSize() {
     return wpi::Struct<frc::Matrixd<States, States>>::GetSize() +
            wpi::Struct<frc::Matrixd<States, Inputs>>::GetSize() +

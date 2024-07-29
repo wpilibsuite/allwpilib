@@ -31,8 +31,8 @@ public final class VectorStruct<R extends Num> implements Struct<Vector<R>> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Vector__" + m_rows;
+  public String getTypeName() {
+    return "Vector__" + m_rows;
   }
 
   @Override

@@ -177,50 +177,11 @@ def main():
     url = "https://github.com/llvm/llvm-project"
     tag = "llvmorg-18.1.8"
 
-    patch_list = [
-        "0001-Remove-StringRef-ArrayRef-and-Optional.patch",
-        "0002-Wrap-std-min-max-calls-in-parens-for-Windows-warning.patch",
-        "0003-Change-unique_function-storage-size.patch",
-        "0004-Threading-updates.patch",
-        "0005-ifdef-guard-safety.patch",
-        "0006-Explicitly-use-std.patch",
-        "0007-Remove-format_provider.patch",
-        "0008-Add-compiler-warning-pragmas.patch",
-        "0009-Remove-unused-functions.patch",
-        "0010-Detemplatize-SmallVectorBase.patch",
-        "0011-Add-vectors-to-raw_ostream.patch",
-        "0012-Extra-collections-features.patch",
-        "0013-EpochTracker-ABI-macro.patch",
-        "0014-Delete-numbers-from-MathExtras.patch",
-        "0015-Add-lerp-and-sgn.patch",
-        "0016-Fixup-includes.patch",
-        "0017-Use-std-is_trivially_copy_constructible.patch",
-        "0018-Windows-support.patch",
-        "0019-Prefer-fmtlib.patch",
-        "0020-Prefer-wpi-s-fs.h.patch",
-        "0021-Remove-unused-functions.patch",
-        "0022-OS-specific-changes.patch",
-        "0023-Use-SmallVector-for-UTF-conversion.patch",
-        "0024-Prefer-to-use-static-pointers-in-raw_ostream.patch",
-        "0025-constexpr-endian-byte-swap.patch",
-        "0026-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch",
-        "0027-Remove-StringMap-test-for-llvm-sort.patch",
-        "0028-Unused-variable-in-release-mode.patch",
-        "0029-Use-C-20-bit-header.patch",
-        "0030-Remove-DenseMap-GTest-printer-test.patch",
-        "0031-Replace-deprecated-std-aligned_storage_t.patch",
-        "0032-raw_ostream-Add-SetNumBytesInBuffer.patch",
-        "0033-type_traits.h-Add-is_constexpr.patch",
-        "0034-Add-back-removed-raw_string_ostream-write_impl.patch",
-        "0035-Remove-auto-conversion-from-raw_ostream.patch",
-        "0036-Add-SmallVector-erase_if.patch",
-        "0037-Fix-AlignedCharArrayUnion-for-C-23.patch",
-    ]
     patch_options = {
         "use_threeway": True,
     }
 
-    llvm = Lib(name, url, tag, patch_list, copy_upstream_src, patch_options)
+    llvm = Lib(name, url, tag, copy_upstream_src, patch_options)
     llvm.main()
 
 

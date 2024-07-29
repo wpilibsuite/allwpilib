@@ -11,8 +11,8 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::MecanumDriveWheelPositions> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:MecanumDriveWheelPositions";
+  static constexpr std::string_view GetTypeName() {
+    return "MecanumDriveWheelPositions";
   }
   static constexpr size_t GetSize() { return 32; }
   static constexpr std::string_view GetSchema() {

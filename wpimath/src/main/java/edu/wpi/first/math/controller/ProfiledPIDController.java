@@ -187,6 +187,15 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Returns the accumulated error used in the integral calculation of this controller.
+   *
+   * @return The accumulated error of this controller.
+   */
+  public double getAccumulatedError() {
+    return m_controller.getAccumulatedError();
+  }
+
+  /**
    * Sets the goal for the ProfiledPIDController.
    *
    * @param goal The desired goal state.

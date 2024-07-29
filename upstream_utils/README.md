@@ -76,7 +76,7 @@ Update the `upstream_utils` patch files.
 ./<lib>.py format-patch
 ```
 
-Update the list of patch files in `<lib>.py`, then rerun `<lib>.py` to reimport the thirdparty files.
+Rerun `<lib>.py` to reimport the thirdparty files.
 ```bash
 ./<lib>.py copy-upstream-to-thirdparty
 ```

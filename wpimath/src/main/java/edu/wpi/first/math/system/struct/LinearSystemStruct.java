@@ -47,8 +47,8 @@ public final class LinearSystemStruct<States extends Num, Inputs extends Num, Ou
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:LinearSystem__" + m_states + "_" + m_inputs + "_" + m_outputs;
+  public String getTypeName() {
+    return "LinearSystem__" + m_states + "_" + m_inputs + "_" + m_outputs;
   }
 
   @Override

@@ -14,8 +14,8 @@
 
 template <class Distance>
 struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:SimpleMotorFeedforward";
+  static constexpr std::string_view GetTypeName() {
+    return "SimpleMotorFeedforward";
   }
   static constexpr size_t GetSize() { return 32; }
   static constexpr std::string_view GetSchema() {

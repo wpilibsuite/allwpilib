@@ -16,8 +16,7 @@ struct wpi::Struct<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
   static constexpr ct_string kTypeName =
       wpi::Concat("Matrix__"_ct_string, wpi::NumToCtString<Rows>(),
                   "_"_ct_string, wpi::NumToCtString<Cols>());
-  static constexpr ct_string kTypeString = "struct:"_ct_string + kTypeName;
-  static constexpr std::string_view GetTypeString() { return kTypeString; }
+  static constexpr std::string_view GetTypeName() { return kTypeName; }
   static constexpr size_t GetSize() { return Rows * Cols * 8; }
   static constexpr ct_string kSchema =
       wpi::Concat("double data["_ct_string, wpi::NumToCtString<Rows * Cols>(),

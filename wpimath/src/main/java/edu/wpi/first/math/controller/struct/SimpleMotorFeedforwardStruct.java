@@ -15,8 +15,8 @@ public final class SimpleMotorFeedforwardStruct implements Struct<SimpleMotorFee
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:SimpleMotorFeedforward";
+  public String getTypeName() {
+    return "SimpleMotorFeedforward";
   }
 
   @Override

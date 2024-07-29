@@ -15,8 +15,8 @@ public final class MecanumDriveMotorVoltagesStruct implements Struct<MecanumDriv
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:MecanumDriveMotorVoltages";
+  public String getTypeName() {
+    return "MecanumDriveMotorVoltages";
   }
 
   @Override

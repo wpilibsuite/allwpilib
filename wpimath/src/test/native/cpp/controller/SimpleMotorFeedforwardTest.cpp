@@ -42,4 +42,15 @@ TEST(SimpleMotorFeedforwardTest, Calculate) {
               simpleMotor.Calculate(2_mps, 3_mps).value(), 2.0);
 }
 
+TEST(SimpleMotorFeedforwardTest, NegativeGains) {
+  constexpr auto Ks = 0.5_V;
+  constexpr auto Kv = -3_V / 1_mps;
+  constexpr auto Ka = -0.6_V / 1_mps_sq;
+  constexpr units::second_t dt = 0_ms;
+  frc::SimpleMotorFeedforward<units::meter> simpleMotor{Ks, Kv, Ka, dt};
+  EXPECT_EQ(simpleMotor.GetKv().value(), 0);
+  EXPECT_EQ(simpleMotor.GetKa().value(), 0);
+  EXPECT_EQ(simpleMotor.GetDt().value(), 0.02);
+}
+
 }  // namespace frc

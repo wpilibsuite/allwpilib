@@ -52,6 +52,30 @@ TEST_F(TriggerTest, OnFalse) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
+TEST_F(TriggerTest, OnChange) {
+  auto& scheduler = CommandScheduler::GetInstance();
+  bool finished = false;
+  bool pressed = true;
+  WaitUntilCommand command([&finished] { return finished; });
+
+  Trigger([&pressed] { return pressed; }).OnChange(&command);
+  scheduler.Run();
+  EXPECT_FALSE(command.IsScheduled());
+  pressed = false;
+  scheduler.Run();
+  EXPECT_TRUE(command.IsScheduled());
+  finished = true;
+  scheduler.Run();
+  EXPECT_FALSE(command.IsScheduled());
+  finished = false;
+  pressed = true;
+  scheduler.Run();
+  EXPECT_TRUE(command.IsScheduled());
+  finished = true;
+  scheduler.Run();
+  EXPECT_FALSE(command.IsScheduled());
+}
+
 TEST_F(TriggerTest, WhileTrueRepeatedly) {
   auto& scheduler = CommandScheduler::GetInstance();
   int inits = 0;

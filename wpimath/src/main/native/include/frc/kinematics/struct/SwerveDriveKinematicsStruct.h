@@ -12,10 +12,9 @@
 
 template <size_t NumModules>
 struct wpi::Struct<frc::SwerveDriveKinematics<NumModules>> {
-  static constexpr ct_string kTypeString =
-      wpi::Concat("struct:SwerveDriveKinematics__"_ct_string,
-                  wpi::NumToCtString<NumModules>());
-  static constexpr std::string_view GetTypeString() { return kTypeString; }
+  static constexpr ct_string kTypeName = wpi::Concat(
+      "SwerveDriveKinematics__"_ct_string, wpi::NumToCtString<NumModules>());
+  static constexpr std::string_view GetTypeName() { return kTypeName; }
   static constexpr size_t GetSize() {
     return NumModules * wpi::Struct<frc::Translation2d>::GetSize();
   }

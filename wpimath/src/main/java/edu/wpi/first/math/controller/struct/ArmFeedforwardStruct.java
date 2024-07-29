@@ -15,8 +15,8 @@ public class ArmFeedforwardStruct implements Struct<ArmFeedforward> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:ArmFeedforward";
+  public String getTypeName() {
+    return "ArmFeedforward";
   }
 
   @Override

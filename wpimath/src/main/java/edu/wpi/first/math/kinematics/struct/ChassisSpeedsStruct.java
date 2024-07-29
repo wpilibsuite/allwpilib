@@ -15,8 +15,8 @@ public class ChassisSpeedsStruct implements Struct<ChassisSpeeds> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:ChassisSpeeds";
+  public String getTypeName() {
+    return "ChassisSpeeds";
   }
 
   @Override

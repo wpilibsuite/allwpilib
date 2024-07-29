@@ -45,13 +45,13 @@ class ElevatorFeedforward {
     if (kV.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kV must be a non-negative number, got {}!", kV.value());
-      kV = units::unit_t<kv_unit>{0};
+      this->kV = units::unit_t<kv_unit>{0};
       wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
     }
     if (kA.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kA must be a non-negative number, got {}!", kA.value());
-      kA = units::unit_t<ka_unit>{0};
+      this->kA = units::unit_t<ka_unit>{0};
       wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
     }
   }

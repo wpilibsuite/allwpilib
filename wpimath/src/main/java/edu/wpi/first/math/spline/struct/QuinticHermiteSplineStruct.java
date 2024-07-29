@@ -15,8 +15,8 @@ public final class QuinticHermiteSplineStruct implements Struct<QuinticHermiteSp
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:QuinticHermiteSpline";
+  public String getTypeName() {
+    return "QuinticHermiteSpline";
   }
 
   @Override

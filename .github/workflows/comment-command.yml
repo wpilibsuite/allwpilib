@@ -73,9 +73,14 @@ jobs:
               content: "rocket",
             });
       - uses: actions/checkout@v4
+      - name: Checkout PR
         with:
-          fetch-depth: 0
           token: ${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}
+        run: |
+          gh pr checkout $NUMBER
+        env:
+          GITHUB_TOKEN: "${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}"
+          NUMBER: ${{ github.event.issue.number }}
       - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
@@ -94,6 +99,10 @@ jobs:
         run: ./wpilibj/generate_hids.py && ./wpilibc/generate_hids.py && ./wpilibNewCommands/generate_hids.py
       - name: Run PWM Controllers
         run: ./wpilibj/generate_pwm_motor_controllers.py && ./wpilibc/generate_pwm_motor_controllers.py
+      - name: Run imgui gl3w
+        run: ./thirdparty/imgui_suite/generate_gl3w.py
+      - name: Run imgui fonts
+        run: ./thirdparty/imgui_suite/generate_fonts.sh
       - name: Commit
         run: |
           # Set credentials

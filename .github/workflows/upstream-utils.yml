@@ -30,6 +30,11 @@ jobs:
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
+      - name: Run apriltag.py
+        run: |
+          cd upstream_utils
+          ./apriltag.py clone
+          ./apriltag.py copy-upstream-to-thirdparty
       - name: Run eigen.py
         run: |
           cd upstream_utils
@@ -45,11 +50,31 @@ jobs:
           cd upstream_utils
           ./gcem.py clone
           ./gcem.py copy-upstream-to-thirdparty
+      - name: Run gl3w.py
+        run: |
+          cd upstream_utils
+          ./gl3w.py clone
+          ./gl3w.py copy-upstream-to-thirdparty
+      - name: Run glfw.py
+        run: |
+          cd upstream_utils
+          ./glfw.py clone
+          ./glfw.py copy-upstream-to-thirdparty
       - name: Run googletest.py
         run: |
           cd upstream_utils
           ./googletest.py clone
           ./googletest.py copy-upstream-to-thirdparty
+      - name: Run imgui.py
+        run: |
+          cd upstream_utils
+          ./imgui.py clone
+          ./imgui.py copy-upstream-to-thirdparty
+      - name: Run implot.py
+        run: |
+          cd upstream_utils
+          ./implot.py clone
+          ./implot.py copy-upstream-to-thirdparty
       - name: Run json.py
         run: |
           cd upstream_utils
@@ -90,6 +115,11 @@ jobs:
           cd upstream_utils
           ./sleipnir.py clone
           ./sleipnir.py copy-upstream-to-thirdparty
+      - name: Run stb.py
+        run: |
+          cd upstream_utils
+          ./stb.py clone
+          ./stb.py copy-upstream-to-thirdparty
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

@@ -27,8 +27,8 @@ public final class SwerveDriveKinematicsStruct implements Struct<SwerveDriveKine
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:SwerveDriveKinematics__" + m_numModules;
+  public String getTypeName() {
+    return "SwerveDriveKinematics__" + m_numModules;
   }
 
   @Override

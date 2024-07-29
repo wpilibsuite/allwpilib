@@ -49,12 +49,22 @@ public interface Struct<T> {
   Class<T> getTypeClass();
 
   /**
+   * Gets the type name (e.g. for schemas of other structs). This should be globally unique among
+   * structs.
+   *
+   * @return type name
+   */
+  String getTypeName();
+
+  /**
    * Gets the type string (e.g. for NetworkTables). This should be globally unique and start with
    * "struct:".
    *
    * @return type string
    */
-  String getTypeString();
+  default String getTypeString() {
+    return "struct:" + getTypeName();
+  }
 
   /**
    * Gets the serialized size (in bytes). This should always be a constant.

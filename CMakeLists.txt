@@ -287,7 +287,7 @@ endif()
 
 if(WITH_GUI)
     add_subdirectory(fieldImages)
-    add_subdirectory(imgui)
+    add_subdirectory(thirdparty/imgui_suite)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
     add_subdirectory(outlineviewer)

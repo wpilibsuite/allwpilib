@@ -45,14 +45,7 @@ def main():
     url = "https://github.com/ludocode/mpack"
     tag = "v1.1.1"
 
-    patch_list = [
-        "0001-Don-t-emit-inline-defs.patch",
-        "0002-Update-amalgamation-script.patch",
-        "0003-Use-namespace-for-C.patch",
-        "0004-Group-doxygen-into-MPack-module.patch",
-    ]
-
-    mpack = Lib(name, url, tag, patch_list, copy_upstream_src)
+    mpack = Lib(name, url, tag, copy_upstream_src)
     mpack.main()
 
 

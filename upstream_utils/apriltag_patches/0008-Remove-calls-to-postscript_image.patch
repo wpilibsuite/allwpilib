@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 19 Jul 2024 21:45:29 -0700
+Subject: [PATCH 8/9] Remove calls to postscript_image()
+
+---
+ apriltag.c             | 5 -----
+ apriltag_quad_thresh.c | 3 ---
+ 2 files changed, 8 deletions(-)
+
+diff --git a/apriltag.c b/apriltag.c
+index 3086228868281eaad5cc5382d305227757d4a5cf..b514d974971827e6a4f4f0a4fa12e6b0392d7282 100644
+--- a/apriltag.c
++++ b/apriltag.c
+@@ -51,8 +51,6 @@ either expressed or implied, of the Regents of The University of Michigan.
+ 
+ #include "apriltag_math.h"
+ 
+-#include "common/postscript_utils.h"
+-
+ #ifndef M_PI
+ # define M_PI 3.141592653589793238462643383279502884196
+ #endif
+@@ -1282,7 +1280,6 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
+         fprintf(f, "%f %f scale\n", scale, scale);
+         fprintf(f, "0 %d translate\n", darker->height);
+         fprintf(f, "1 -1 scale\n");
+-        postscript_image(f, darker);
+ 
+         image_u8_destroy(darker);
+ 
+@@ -1365,8 +1362,6 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
+         fprintf(f, "0 %d translate\n", darker->height);
+         fprintf(f, "1 -1 scale\n");
+ 
+-        postscript_image(f, darker);
+-
+         image_u8_destroy(darker);
+ 
+         for (int i = 0; i < zarray_size(quads); i++) {
+diff --git a/apriltag_quad_thresh.c b/apriltag_quad_thresh.c
+index 735520c6b1dd7387c837e8922d2ecd68130b9b5c..677f365765493bcbf043b0841bb28016a0d3acde 100644
+--- a/apriltag_quad_thresh.c
++++ b/apriltag_quad_thresh.c
+@@ -40,7 +40,6 @@ either expressed or implied, of the Regents of The University of Michigan.
+ #include "common/unionfind.h"
+ #include "common/timeprofile.h"
+ #include "common/zmaxheap.h"
+-#include "common/postscript_utils.h"
+ #include "common/math_util.h"
+ 
+ #ifdef _WIN32
+@@ -1979,8 +1978,6 @@ zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
+         fprintf(f, "0 %d translate\n", im2->height);
+         fprintf(f, "1 -1 scale\n");
+ 
+-        postscript_image(f, im2);
+-
+         image_u8_destroy(im2);
+ 
+         for (int i = 0; i < zarray_size(quads); i++) {

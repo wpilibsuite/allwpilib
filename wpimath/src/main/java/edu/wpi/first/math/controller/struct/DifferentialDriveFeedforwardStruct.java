@@ -16,8 +16,8 @@ public final class DifferentialDriveFeedforwardStruct
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:DifferentialDriveFeedforward";
+  public String getTypeName() {
+    return "DifferentialDriveFeedforward";
   }
 
   @Override

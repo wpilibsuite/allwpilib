@@ -11,8 +11,8 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveFeedforward> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:DifferentialDriveFeedforward";
+  static constexpr std::string_view GetTypeName() {
+    return "DifferentialDriveFeedforward";
   }
   static constexpr size_t GetSize() { return 32; }
   static constexpr std::string_view GetSchema() {
