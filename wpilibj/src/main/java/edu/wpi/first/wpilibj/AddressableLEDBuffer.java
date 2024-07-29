@@ -16,6 +16,7 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    */
   public AddressableLEDBuffer(int length) {
     m_buffer = new byte[length * 4];
+    m_colorOrder = AddressableLEDColorOrder.kRGB;
   }
 
   /**
@@ -25,8 +26,8 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    * @param colorOrder The order the pixels display colors in
    */
   public AddressableLEDBuffer(int length, AddressableLEDColorOrder colorOrder) {
-      m_buffer = new byte[length * 4];
-      m_colorOrder = colorOrder;
+    m_buffer = new byte[length * 4];
+    m_colorOrder = colorOrder;
   }
 
   /**
@@ -69,6 +70,8 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
         m_buffer[index * 4] = (byte) r;
         m_buffer[(index * 4) + 1] = (byte) g;
         m_buffer[(index * 4) + 2] = (byte) b;
+        break;
+      default:
         break;
     }
     m_buffer[(index * 4) + 3] = 0;

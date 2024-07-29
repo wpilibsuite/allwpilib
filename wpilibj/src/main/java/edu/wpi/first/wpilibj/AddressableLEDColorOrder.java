@@ -4,14 +4,18 @@
 
 package edu.wpi.first.wpilibj;
 
-/**
- * Defines the order in which the LED strip displays colors
- */
+/** Defines the order in which the LED strip displays colors. */
 public enum AddressableLEDColorOrder {
-    kRGB,
-    kRBG,
-    kGBR,
-    kGRB,
-    kBRG,
-    kBGR
+  /** RGB color order. */
+  kRGB,
+  /** RBG color order. */
+  kRBG,
+  /** GBR color order. */
+  kGBR,
+  /** GRB color order. */
+  kGRB,
+  /** BRG color order. */
+  kBRG,
+  /** BGR color order. */
+  kBGR
 }
