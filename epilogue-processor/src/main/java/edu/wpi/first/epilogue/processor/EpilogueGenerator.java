@@ -52,6 +52,9 @@ public class EpilogueGenerator {
         out.println("package edu.wpi.first.epilogue;");
         out.println();
 
+        out.println("import static edu.wpi.first.units.Units.Seconds;");
+        out.println();
+
         loggerClassNames.stream()
             .sorted()
             .forEach(
@@ -152,13 +155,20 @@ public class EpilogueGenerator {
             out.println("  public static void bind(" + robotClassName + " robot) {");
             out.println("    robot.addPeriodic(() -> {");
             out.println("      long start = System.nanoTime();");
+            out.println("      if (config.loggingPeriod == null) {");
+            out.println("        config.loggingPeriod = Seconds.of(robot.getPeriod());");
+            out.println("      }");
+            out.println("      if (config.loggingPeriodOffset == null) {");
+            out.println("        config.loggingPeriodOffset = config.loggingPeriod.divide(2);");
+            out.println("      }");
             out.println(
                 "      "
                     + StringUtils.loggerFieldName(mainRobotClass)
                     + ".tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);");
             out.println(
                 "      edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry(\"Epilogue/Stats/Last Run\").setDouble((System.nanoTime() - start) / 1e6);");
-            out.println("    }, robot.getPeriod(), robot.getPeriod() / 2);");
+            out.println(
+                "    }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));");
             out.println("  }");
           }
         }
