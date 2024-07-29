@@ -77,7 +77,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: TestResults
+          name: RobotBuilderTestResults
           path: |
             build/reports/
       - uses: actions/upload-artifact@v4
