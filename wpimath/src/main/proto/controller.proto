@@ -29,6 +29,7 @@ message ProtobufSimpleMotorFeedforward {
   double ks = 1;
   double kv = 2;
   double ka = 3;
+  double dt = 4;
 }
 
 message ProtobufDifferentialDriveWheelVoltages {

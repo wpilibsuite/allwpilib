@@ -26,8 +26,8 @@ TEST(ArmFeedforwardStructTest, Roundtrip) {
 
   ArmFeedforward unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.kS.value(), unpacked_data.kS.value());
-  EXPECT_EQ(kExpectedData.kG.value(), unpacked_data.kG.value());
-  EXPECT_EQ(kExpectedData.kV.value(), unpacked_data.kV.value());
-  EXPECT_EQ(kExpectedData.kA.value(), unpacked_data.kA.value());
+  EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data.GetKs().value());
+  EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data.GetKg().value());
+  EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data.GetKv().value());
+  EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data.GetKa().value());
 }

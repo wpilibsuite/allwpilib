@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Fri, 14 Jul 2023 16:40:18 -0700
-Subject: [PATCH 9/9] Add pragmas for missing libraries and set _WIN32_WINNT to
- Windows 10
+Subject: [PATCH 09/10] Add pragmas for missing libraries and set _WIN32_WINNT
+ to Windows 10
 
 This makes GetSystemTimePreciseAsFileTime() available.
 
@@ -14,7 +14,7 @@ https://learn.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt.
  2 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/include/uv/win.h b/include/uv/win.h
-index 6d0afe69e7dd4caf4c9459e548fe75cf0c51b501..613065df435d813cd517efbc138b13ee46f01f2d 100644
+index 9a8c990c1b182633f23890cb5f4532b6bee2b22c..f17abc1f92681971da8ec603f7a20204fd53e5d1 100644
 --- a/include/uv/win.h
 +++ b/include/uv/win.h
 @@ -20,7 +20,7 @@
@@ -27,7 +27,7 @@ index 6d0afe69e7dd4caf4c9459e548fe75cf0c51b501..613065df435d813cd517efbc138b13ee
  
  #if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
 diff --git a/src/win/util.c b/src/win/util.c
-index 8828857db76a54d6e184c7f5714a091e92eba8ed..14295c41342b6dda16f39c5c548a6cc8269bfa0b 100644
+index 52c31979589e4ed7fe12af200f7e8daab9e02797..6529aa36f32eab1114488b7445a6bd872975b97b 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
 @@ -73,7 +73,9 @@ static char *process_title;

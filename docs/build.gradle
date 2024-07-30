@@ -6,6 +6,7 @@ plugins {
 evaluationDependsOn(':apriltag')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':cscore')
+evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':wpilibNewCommands')
@@ -68,6 +69,9 @@ doxygen {
     cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
     if (project.hasProperty('docWarningsAsErrors')) {
+        // apriltag
+        exclude 'apriltag_pose.h'
+
         // Eigen
         exclude 'Eigen/**'
         exclude 'unsupported/**'
@@ -214,16 +218,20 @@ task generateJavaDocs(type: Javadoc) {
     options.addBooleanOption("Xdoclint/package:" +
             // TODO: v Document these, then remove them from the list
             "-edu.wpi.first.hal," +
-            "-edu.wpi.first.hal.can," +
             "-edu.wpi.first.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
             "-edu.wpi.first.math.proto," +
+            "-edu.wpi.first.math.struct," +
             "-edu.wpi.first.math.controller.proto," +
             "-edu.wpi.first.math.controller.struct," +
             "-edu.wpi.first.math.geometry.proto," +
             "-edu.wpi.first.math.geometry.struct," +
             "-edu.wpi.first.math.kinematics.proto," +
             "-edu.wpi.first.math.kinematics.struct," +
+            "-edu.wpi.first.math.spline.proto," +
+            "-edu.wpi.first.math.spline.struct," +
+            "-edu.wpi.first.math.system.proto," +
+            "-edu.wpi.first.math.system.struct," +
             "-edu.wpi.first.math.system.plant.proto," +
             "-edu.wpi.first.math.system.plant.struct," +
             "-edu.wpi.first.math.trajectory.proto", true)
@@ -234,6 +242,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':apriltag').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
+    source project(':epilogue-runtime').sourceSets.main.java
     source project(':hal').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
     source project(':wpilibNewCommands').sourceSets.main.java

@@ -4,9 +4,10 @@
 
 #include <span>
 
+#include <wpi/SmallVector.h>
+
 #include "sleipnir/autodiff/Expression.hpp"
 #include "sleipnir/util/FunctionRef.hpp"
-#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir::detail {
@@ -36,7 +37,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
     // https://en.wikipedia.org/wiki/Breadth-first_search
 
     // BFS list sorted from parent to child.
-    small_vector<Expression*> stack;
+    wpi::SmallVector<Expression*> stack;
 
     stack.emplace_back(root.Get());
 
@@ -119,7 +120,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
    *
    * @param wrt Variables with respect to which to compute the gradient.
    */
-  small_vector<ExpressionPtr> GenerateGradientTree(
+  wpi::SmallVector<ExpressionPtr> GenerateGradientTree(
       std::span<const ExpressionPtr> wrt) const {
     // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
     // for background on reverse accumulation automatic differentiation.
@@ -128,7 +129,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
       wrt[row]->row = row;
     }
 
-    small_vector<ExpressionPtr> grad;
+    wpi::SmallVector<ExpressionPtr> grad;
     grad.reserve(wrt.size());
     for (size_t row = 0; row < wrt.size(); ++row) {
       grad.emplace_back(MakeExpressionPtr());
@@ -192,7 +193,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
    * @param func A function that takes two arguments: an int for the gradient
    *   row, and a double for the adjoint (gradient value).
    */
-  void ComputeAdjoints(function_ref<void(int, double)> func) {
+  void ComputeAdjoints(function_ref<void(int row, double adjoint)> func) {
     // Zero adjoints. The root node's adjoint is 1.0 as df/df is always 1.
     m_adjointList[0]->adjoint = 1.0;
     for (auto it = m_adjointList.begin() + 1; it != m_adjointList.end(); ++it) {
@@ -231,13 +232,13 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
 
  private:
   // List that maps nodes to their respective row.
-  small_vector<int> m_rowList;
+  wpi::SmallVector<int> m_rowList;
 
   // List for updating adjoints
-  small_vector<Expression*> m_adjointList;
+  wpi::SmallVector<Expression*> m_adjointList;
 
   // List for updating values
-  small_vector<Expression*> m_valueList;
+  wpi::SmallVector<Expression*> m_valueList;
 };
 
 }  // namespace sleipnir::detail

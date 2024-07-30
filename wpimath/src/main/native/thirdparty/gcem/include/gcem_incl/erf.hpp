@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2016-2023 Keith O'Hara
+  ##   Copyright (C) 2016-2024 Keith O'Hara
   ##
   ##   This file is part of the GCE-Math C++ library.
   ##
@@ -37,6 +37,28 @@ namespace internal
 // see
 // http://functions.wolfram.com/GammaBetaErf/Erf/10/01/0007/
 
+#if __cplusplus >= 201402L // C++14 version
+
+template<typename T>
+constexpr
+T
+erf_cf_large_recur(const T x, const int depth_end)
+noexcept
+{
+    int depth = GCEM_ERF_MAX_ITER - 1;
+    T res = x;
+
+    while (depth > depth_end - 1) {
+        res = x + 2 * depth / res;
+
+        --depth;
+    }
+
+    return res;
+}
+
+#else // C++11 version
+
 template<typename T>
 constexpr
 T
@@ -45,10 +67,12 @@ noexcept
 {
     return( depth < GCEM_ERF_MAX_ITER ? \
             // if
-                x + 2*depth/erf_cf_large_recur(x,depth+1) :
+                x + 2 * depth / erf_cf_large_recur(x,depth+1) :
             // else
                 x );
 }
+
+#endif
 
 template<typename T>
 constexpr
@@ -63,6 +87,28 @@ noexcept
 // see
 // http://functions.wolfram.com/GammaBetaErf/Erf/10/01/0005/
 
+#if __cplusplus >= 201402L // C++14 version
+
+template<typename T>
+constexpr
+T
+erf_cf_small_recur(const T xx, const int depth_end)
+noexcept
+{
+    int depth = GCEM_ERF_MAX_ITER - 1;
+    T res = T(2*(depth+1) - 1) - 2 * xx;
+
+    while (depth > depth_end - 1) {
+        res = T(2*depth - 1) - 2 * xx + 4 * depth * xx / res;
+
+        --depth;
+    }
+
+    return res;
+}
+
+#else // C++11 version
+
 template<typename T>
 constexpr
 T
@@ -71,11 +117,13 @@ noexcept
 {
     return( depth < GCEM_ERF_MAX_ITER ? \
             // if
-                (2*depth - T(1)) - 2*xx \
-                    + 4*depth*xx / erf_cf_small_recur(xx,depth+1) :
+                (2*depth - T(1)) - 2 * xx \
+                    + 4 * depth * xx / erf_cf_small_recur(xx,depth+1) :
             // else
                 (2*depth - T(1)) - 2*xx );
 }
+
+#endif
 
 template<typename T>
 constexpr

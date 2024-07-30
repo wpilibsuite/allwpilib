@@ -7,6 +7,11 @@ package edu.wpi.first.hal.can;
 import edu.wpi.first.hal.CANStreamMessage;
 import java.io.IOException;
 
+/**
+ * Exception indicating that a CAN stream overflowed at some point between reads, therefore some
+ * messages were lost. This exception contains any messages that were successfully read during the
+ * operation that threw the exception.
+ */
 public class CANStreamOverflowException extends IOException {
   /** The messages. */
   private final CANStreamMessage[] m_messages;
@@ -17,8 +22,8 @@ public class CANStreamOverflowException extends IOException {
   /**
    * Constructs a new CANStreamOverflowException.
    *
-   * @param messages The messages
-   * @param messagesRead The length of messages read
+   * @param messages The messages that were read successfully.
+   * @param messagesRead The length of messages read successfully.
    */
   @SuppressWarnings("PMD.ArrayIsStoredDirectly")
   public CANStreamOverflowException(CANStreamMessage[] messages, int messagesRead) {
@@ -27,11 +32,22 @@ public class CANStreamOverflowException extends IOException {
     this.m_messagesRead = messagesRead;
   }
 
+  /**
+   * Gets the messages that were successfully read. Use {@link #getMessagesRead()} to determine how
+   * many messages in the returned array are valid.
+   *
+   * @return the messages
+   */
   @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public CANStreamMessage[] getMessages() {
     return m_messages;
   }
 
+  /**
+   * Gets the count of messages that were successfully read.
+   *
+   * @return count of messages
+   */
   public int getMessagesRead() {
     return m_messagesRead;
   }

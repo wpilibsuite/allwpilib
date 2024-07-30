@@ -97,9 +97,8 @@ public abstract class IterativeRobotBase extends RobotBase {
    * <p>Users should override this method for default Robot-wide initialization which will be called
    * when the robot is first powered on. It will be called exactly one time.
    *
-   * <p>Warning: the Driver Station "Robot Code" light and FMS "Robot Ready" indicators will be off
-   * until RobotInit() exits. Code in RobotInit() that waits for enable will cause the robot to
-   * never indicate that the code is ready, causing the robot to be bypassed in a match.
+   * <p>Note: This method is functionally identical to the class constructor so that should be used
+   * instead.
    */
   public void robotInit() {}
 

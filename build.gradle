@@ -6,9 +6,6 @@ buildscript {
             url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
         }
     }
-    dependencies {
-        classpath 'com.hubspot.jinjava:jinjava:2.7.1'
-    }
 }
 
 plugins {

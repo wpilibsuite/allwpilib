@@ -30,7 +30,7 @@ class CubicHermiteSplineTest : public ::testing::Test {
         SplineHelper::CubicSplinesFromControlVectors(startCV, waypoints, endCV);
     std::vector<Spline<3>::PoseWithCurvature> poses;
 
-    poses.push_back(splines[0].GetPoint(0.0));
+    poses.push_back(splines[0].GetPoint(0.0).value());
 
     for (auto&& spline : splines) {
       auto x = SplineParameterizer::Parameterize(spline);

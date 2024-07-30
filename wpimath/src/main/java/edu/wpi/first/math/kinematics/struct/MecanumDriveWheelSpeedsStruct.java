@@ -15,8 +15,8 @@ public class MecanumDriveWheelSpeedsStruct implements Struct<MecanumDriveWheelSp
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:MecanumDriveWheelSpeeds";
+  public String getTypeName() {
+    return "MecanumDriveWheelSpeeds";
   }
 
   @Override

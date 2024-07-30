@@ -25,8 +25,7 @@ public class SPIAccelerometerSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerActiveCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = SPIAccelerometerDataJNI.registerActiveCallback(m_index, callback, initialNotify);
@@ -56,8 +55,7 @@ public class SPIAccelerometerSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerRangeCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = SPIAccelerometerDataJNI.registerRangeCallback(m_index, callback, initialNotify);
@@ -87,8 +85,7 @@ public class SPIAccelerometerSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerXCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = SPIAccelerometerDataJNI.registerXCallback(m_index, callback, initialNotify);
@@ -118,8 +115,7 @@ public class SPIAccelerometerSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerYCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = SPIAccelerometerDataJNI.registerYCallback(m_index, callback, initialNotify);
@@ -149,8 +145,7 @@ public class SPIAccelerometerSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerZCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = SPIAccelerometerDataJNI.registerZCallback(m_index, callback, initialNotify);

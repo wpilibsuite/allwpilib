@@ -19,10 +19,10 @@ I2C::I2C(Port port, int deviceAddress)
   int32_t status = 0;
 
   if (port == I2C::Port::kOnboard) {
-    FRC_ReportError(warn::Warning,
-                    "Onboard I2C port is subject to system lockups. See Known "
-                    "Issues page for "
-                    "details");
+    FRC_ReportWarning(
+        "Onboard I2C port is subject to system lockups. See Known "
+        "Issues page for "
+        "details");
   }
 
   HAL_InitializeI2C(m_port, &status);

@@ -81,6 +81,13 @@ class DataLogWriter final : public DataLog {
    */
   void Stop() final;
 
+  /**
+   * Gets the output stream.
+   *
+   * @return output stream
+   */
+  wpi::raw_ostream& GetStream() { return *m_os; }
+
  private:
   bool BufferFull() final;
 

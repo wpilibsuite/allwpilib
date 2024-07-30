@@ -45,13 +45,13 @@ class ElevatorFeedforward {
     if (kV.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kV must be a non-negative number, got {}!", kV.value());
-      kV = units::unit_t<kv_unit>{0};
+      this->kV = units::unit_t<kv_unit>{0};
       wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
     }
     if (kA.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kA must be a non-negative number, got {}!", kA.value());
-      kA = units::unit_t<ka_unit>{0};
+      this->kA = units::unit_t<ka_unit>{0};
       wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
     }
   }
@@ -182,17 +182,46 @@ class ElevatorFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 
+  /**
+   * Returns the static gain.
+   *
+   * @return The static gain.
+   */
+  units::volt_t GetKs() const { return kS; }
+
+  /**
+   * Returns the gravity gain.
+   *
+   * @return The gravity gain.
+   */
+  units::volt_t GetKg() const { return kG; }
+
+  /**
+   * Returns the velocity gain.
+   *
+   * @return The velocity gain.
+   */
+  units::unit_t<kv_unit> GetKv() const { return kV; }
+
+  /**
+   * Returns the acceleration gain.
+   *
+   * @return The acceleration gain.
+   */
+  units::unit_t<ka_unit> GetKa() const { return kA; }
+
+ private:
   /// The static gain.
-  const units::volt_t kS;
+  units::volt_t kS;
 
   /// The gravity gain.
-  const units::volt_t kG;
+  units::volt_t kG;
 
   /// The velocity gain.
-  const units::unit_t<kv_unit> kV;
+  units::unit_t<kv_unit> kV;
 
   /// The acceleration gain.
-  const units::unit_t<ka_unit> kA;
+  units::unit_t<ka_unit> kA;
 };
 }  // namespace frc
 

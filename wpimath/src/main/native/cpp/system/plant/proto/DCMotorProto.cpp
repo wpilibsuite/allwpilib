@@ -4,12 +4,13 @@
 
 #include "frc/system/plant/proto/DCMotorProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "plant.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::DCMotor>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufDCMotor>(
-      arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufDCMotor>(arena);
 }
 
 frc::DCMotor wpi::Protobuf<frc::DCMotor>::Unpack(

@@ -186,8 +186,6 @@ nativeUtils.exportsConfigs {
     }
 }
 
-apply from: "${rootDir}/shared/imgui.gradle"
-
 model {
     components {
         examplesMap.each { key, value ->
@@ -200,7 +198,7 @@ model {
                             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                             lib library: 'cscore', linkage: 'shared'
-                            nativeUtils.useRequiredLibrary(it, 'imgui')
+                            lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
                             if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                                 it.buildable = false
                                 return

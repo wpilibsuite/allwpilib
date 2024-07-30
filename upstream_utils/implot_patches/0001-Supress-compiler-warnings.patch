@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 10 Jul 2024 03:16:19 -0400
+Subject: [PATCH] Supress compiler warnings
+
+---
+ implot_internal.h | 8 ++++++++
+ implot_items.cpp  | 4 ++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/implot_internal.h b/implot_internal.h
+index fb01204819348fde5477359e3b7b87055b944811..1333085423a88b9fefc8192d4b2e04db1cc1b10c 100644
+--- a/implot_internal.h
++++ b/implot_internal.h
+@@ -38,6 +38,10 @@
+ #error Must include implot.h before implot_internal.h
+ #endif
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
++#endif
+ 
+ // Support for pre-1.84 versions. ImPool's GetSize() -> GetBufSize()
+ #if (IMGUI_VERSION_NUM < 18303)
+@@ -1665,3 +1669,7 @@ void Locator_Log10(ImPlotTicker& ticker, const ImPlotRange& range, float pixels,
+ void Locator_SymLog(ImPlotTicker& ticker, const ImPlotRange& range, float pixels, bool vertical, ImPlotFormatter formatter, void* formatter_data);
+ 
+ } // namespace ImPlot
++
++#ifdef __GNUC__
++#pragma GCC diagnostic pop
++#endif
+diff --git a/implot_items.cpp b/implot_items.cpp
+index c57ca9d4d669501bd2d9a54ee39ac6cfb707e29a..a56f5b89912460008c4a108e26c1e764d21678f2 100644
+--- a/implot_items.cpp
++++ b/implot_items.cpp
+@@ -26,6 +26,10 @@
+ #include "implot.h"
+ #include "implot_internal.h"
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
++#endif
++
+ //-----------------------------------------------------------------------------
+ // [SECTION] Macros and Defines
+ //-----------------------------------------------------------------------------

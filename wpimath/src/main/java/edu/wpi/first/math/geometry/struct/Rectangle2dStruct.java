@@ -16,8 +16,8 @@ public class Rectangle2dStruct implements Struct<Rectangle2d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Rectangle2d";
+  public String getTypeName() {
+    return "Rectangle2d";
   }
 
   @Override

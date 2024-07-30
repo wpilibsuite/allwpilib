@@ -16,7 +16,6 @@ ext {
 }
 
 apply from: "${rootDir}/shared/config.gradle"
-apply from: "${rootDir}/shared/imgui.gradle"
 
 nativeUtils.exportsConfigs {
     wpigui {
@@ -49,7 +48,7 @@ model {
                 }
             }
             binaries.all {
-                nativeUtils.useRequiredLibrary(it, 'imgui')
+                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     it.buildable = false
                     return
@@ -113,7 +112,7 @@ model {
             }
             binaries.all {
                 lib library: 'wpigui'
-                nativeUtils.useRequiredLibrary(it, 'imgui')
+                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
             }
         }
     }

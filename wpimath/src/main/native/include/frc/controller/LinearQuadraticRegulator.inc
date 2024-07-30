@@ -44,8 +44,7 @@ LinearQuadraticRegulator<States, Inputs>::LinearQuadraticRegulator(
 
   if (!IsStabilizable<States, Inputs>(discA, discB)) {
     std::string msg = fmt::format(
-        "The system passed to the LQR is uncontrollable!\n\nA =\n{}\nB "
-        "=\n{}\n",
+        "The system passed to the LQR is unstabilizable!\n\nA =\n{}\nB =\n{}\n",
         discA, discB);
 
     wpi::math::MathSharedStore::ReportError(msg);

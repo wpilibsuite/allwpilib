@@ -58,3 +58,9 @@ TEST(ElevatorFeedforwardTest, AchievableAcceleration) {
   EXPECT_NEAR(elevatorFF.MinAchievableAcceleration(12_V, -2_m / 1_s).value(),
               -4.75, 0.002);
 }
+
+TEST(ElevatorFeedforwardTest, NegativeGains) {
+  frc::ElevatorFeedforward elevatorFF{Ks, Kg, -Kv, -Ka};
+  EXPECT_EQ(elevatorFF.GetKv().value(), 0);
+  EXPECT_EQ(elevatorFF.GetKa().value(), 0);
+}

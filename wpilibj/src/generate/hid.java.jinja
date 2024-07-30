@@ -10,6 +10,8 @@ package edu.wpi.first.wpilibj;
 
 {{ "// " if SkipReporting }}import edu.wpi.first.hal.FRCNetComm.tResourceType;
 {{ "// " if SkipReporting }}import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
@@ -24,7 +26,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class {{ ConsoleName }}Controller extends GenericHID {
+public class {{ ConsoleName }}Controller extends GenericHID implements Sendable {
   /** Represents a digital button on a {{ ConsoleName }}Controller. */
   public enum Button {
 {%- for button in buttons %}
@@ -131,7 +133,7 @@ public class {{ ConsoleName }}Controller extends GenericHID {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent {{ trigger.name }}(double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> get{{ capitalize_first(trigger.name) }}Axis() > threshold);
+    return axisGreaterThan(Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
   }
 
   /**
@@ -183,7 +185,7 @@ public class {{ ConsoleName }}Controller extends GenericHID {
    *     attached to the given loop.
    */
   public BooleanEvent {{ button.name }}(EventLoop loop) {
-    return new BooleanEvent(loop, this::get{{ capitalize_first(button.name) }}Button);
+    return button(Button.k{{ capitalize_first(button.name) }}.value, loop);
   }
 {% endfor -%}
 {% if ConsoleName == "Xbox" or ConsoleName == "Stadia" %}
@@ -252,7 +254,7 @@ public class {{ ConsoleName }}Controller extends GenericHID {
   public boolean getRightBumperReleased() {
     return getRawButtonReleased(Button.kRightBumper.value);
   }
-{% elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
+{%- elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
   /**
    * Read the value of the touchpad on the controller.
    *
@@ -285,5 +287,20 @@ public class {{ ConsoleName }}Controller extends GenericHID {
   public boolean getTouchpadReleased() {
     return getRawButtonReleased(Button.kTouchpad.value);
   }
-{% endif -%}
+{%- endif %}
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("HID");
+    builder.publishConstString("ControllerType", "{{ ConsoleName }}");
+{%- for trigger in triggers %}
+    builder.addDoubleProperty("{{ capitalize_first(trigger.name) }}", this::get{{ capitalize_first(trigger.name) }}Axis, null);
+{%- endfor -%}
+{% for stick in sticks %}
+    builder.addDoubleProperty("{{ stick.NameParts|map("capitalize")|join }}", this::get{{ stick.NameParts|map("capitalize")|join }}, null);
+{%- endfor -%}
+{% for button in buttons %}
+    builder.addBooleanProperty("{{ capitalize_first(button.name) }}", this::get{{ capitalize_first(button.name) }}Button, null);
+{%- endfor %}
+  }
 }

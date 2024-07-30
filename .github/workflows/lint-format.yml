@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.34
+        run: pip3 install wpiformat==2024.39
       - name: Run
         run: wpiformat
       - name: Check output
@@ -66,7 +66,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.34
+        run: pip3 install wpiformat==2024.39
       - name: Create compile_commands.json
         run: |
           ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
@@ -98,6 +98,19 @@ jobs:
       - name: Generate diff
         run: git diff HEAD > javaformat-fixes.patch
         if: ${{ failure() }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: javaformat fixes
+          path: javaformat-fixes.patch
+        if: ${{ failure() }}
+      - name: Write to job summary
+        run: |
+          echo '```diff' >> $GITHUB_STEP_SUMMARY
+          cat javaformat-fixes.patch >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        if: ${{ failure() }}
+
   documentation:
     name: "Documentation"
     runs-on: ubuntu-22.04

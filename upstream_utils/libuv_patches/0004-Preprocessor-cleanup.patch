@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:19:14 -0400
-Subject: [PATCH 4/9] Preprocessor cleanup
+Subject: [PATCH 04/10] Preprocessor cleanup
 
 ---
  include/uv.h        | 12 ------------
@@ -14,7 +14,7 @@ Subject: [PATCH 4/9] Preprocessor cleanup
  7 files changed, 14 insertions(+), 20 deletions(-)
 
 diff --git a/include/uv.h b/include/uv.h
-index 5642101c10c351a602a195d3b74027b53bf641d2..aff06cb7f4352eb4fcf93c938f09a789318bddc3 100644
+index a62b3fa69b1087847f37c7093954e19a07959b74..931c96262b33090422cc1f6c519f8eb4bfc4f9b3 100644
 --- a/include/uv.h
 +++ b/include/uv.h
 @@ -23,9 +23,6 @@
@@ -44,7 +44,7 @@ index 5642101c10c351a602a195d3b74027b53bf641d2..aff06cb7f4352eb4fcf93c938f09a789
  UV_EXTERN uv_handle_type uv_guess_handle(uv_file file);
  
  enum {
-@@ -1918,7 +1909,4 @@ void uv_wtf8_to_utf16(const char* wtf8,
+@@ -1936,7 +1927,4 @@ void uv_wtf8_to_utf16(const char* wtf8,
  #undef UV_LOOP_PRIVATE_PLATFORM_FIELDS
  #undef UV__ERR
  
@@ -53,7 +53,7 @@ index 5642101c10c351a602a195d3b74027b53bf641d2..aff06cb7f4352eb4fcf93c938f09a789
 -#endif
  #endif /* UV_H */
 diff --git a/include/uv/unix.h b/include/uv/unix.h
-index 09f88a5674280d762c094d956e5dec6971c6a33e..e334cabe0280ef94bacbb1171049c71f17bf56ff 100644
+index 538f98b6c5d657169e2750a549dd82bf0b948542..2073fe61a569386cc850d733a6c94cbb77a0a369 100644
 --- a/include/uv/unix.h
 +++ b/include/uv/unix.h
 @@ -47,14 +47,6 @@
@@ -72,7 +72,7 @@ index 09f88a5674280d762c094d956e5dec6971c6a33e..e334cabe0280ef94bacbb1171049c71f
  # include "uv/darwin.h"
  #elif defined(__DragonFly__)       || \
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index 98c437dcadec5b5106d697e82d5394d459f55e47..854d98a16a74c45e0b6cb92b17782de6803f6e28 100644
+index 4c167f5e529cb38a7418fc35dbbafc2a2cea626c..35ac6d1f6da75522d4bd69dcde696a8d0fd42bce 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
 @@ -233,6 +233,8 @@ struct uv__statx {
@@ -85,7 +85,7 @@ index 98c437dcadec5b5106d697e82d5394d459f55e47..854d98a16a74c45e0b6cb92b17782de6
  
  /* core */
 diff --git a/src/win/fs.c b/src/win/fs.c
-index 7df1df2b9ba23c0ecb96e82a6cfcaae824826b69..26ba539936786902af5830c2811594292815d2d7 100644
+index b812293048e60264f3e849367b7a129c306f8502..05488e5d67101adba611f882ded4f6dc5a462d9a 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -43,6 +43,7 @@
@@ -97,7 +97,7 @@ index 7df1df2b9ba23c0ecb96e82a6cfcaae824826b69..26ba539936786902af5830c281159429
  #define UV_FS_FREE_PATHS         0x0002
  #define UV_FS_FREE_PTR           0x0008
 diff --git a/src/win/tty.c b/src/win/tty.c
-index c90995afb6166a7cab0a267f5eb513705ce05148..7adf3cd3ba81a9c41064f4ef2af01667092f27d1 100644
+index 67df01396ab50260b986fc9e7aff0368f6ceb308..7294f311e17d5d02e5873e60f8f0cdd551f6d34d 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -37,6 +37,8 @@
@@ -110,7 +110,7 @@ index c90995afb6166a7cab0a267f5eb513705ce05148..7adf3cd3ba81a9c41064f4ef2af01667
  # define InterlockedOr _InterlockedOr
  #endif
 diff --git a/src/win/util.c b/src/win/util.c
-index 5fbc70f52952f90b36fb22ee03ec7f70e6ed5954..f505cfad4987768fa6470ca27612312c2ba0729d 100644
+index 924d878e89260c2d3cf9a30b7151abeaf735b8be..5767c66c988c67edaf17155d5cb299a1936870ee 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
 @@ -64,12 +64,20 @@

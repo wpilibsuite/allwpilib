@@ -115,8 +115,6 @@ inline constexpr FeedbackControllerPreset kWPILib{kDefault};
  *
  * Total delay = 50 ms + 31.5 ms = 81.5 ms.
  */
-inline constexpr FeedbackControllerPreset kCTREv5CANCoder{1.0 / 12.0, 60.0,
-                                                          1_ms, true, 81.5_ms};
 inline constexpr FeedbackControllerPreset kCTREv5{1023.0 / 12.0, 0.1, 1_ms,
                                                   false, 81.5_ms};
 /**

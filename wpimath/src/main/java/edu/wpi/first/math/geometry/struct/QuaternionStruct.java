@@ -15,8 +15,8 @@ public class QuaternionStruct implements Struct<Quaternion> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Quaternion";
+  public String getTypeName() {
+    return "Quaternion";
   }
 
   @Override

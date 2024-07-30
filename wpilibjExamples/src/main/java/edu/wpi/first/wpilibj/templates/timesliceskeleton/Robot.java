@@ -8,10 +8,9 @@ import edu.wpi.first.wpilibj.TimesliceRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimesliceRobot documentation. If you change the name of this class
- * or the package after creating this project, you must also update the build.gradle file in the
- * project.
+ * The methods in this class are called automatically corresponding to each mode, as described in
+ * the TimesliceRobot documentation. If you change the name of this class or the package after
+ * creating this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimesliceRobot {
   /** Robot constructor. */
@@ -33,13 +32,6 @@ public class Robot extends TimesliceRobot {
     // 5 ms (robot) + 2 ms (controller 1) + 2 ms (controller 2) = 9 ms
     // 9 ms / 10 ms -> 90% allocated
   }
-
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  @Override
-  public void robotInit() {}
 
   @Override
   public void robotPeriodic() {}

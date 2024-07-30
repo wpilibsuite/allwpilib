@@ -11,10 +11,16 @@ package edu.wpi.first.hal.can;
 public class CANNotInitializedException extends RuntimeException {
   private static final long serialVersionUID = -5982895147092686594L;
 
+  /** Constructs a new CANNotInitializedException with no message. */
   public CANNotInitializedException() {
     super();
   }
 
+  /**
+   * Constructs a new CANNotInitializedException with {@code msg} as its detail message.
+   *
+   * @param msg the message
+   */
   public CANNotInitializedException(String msg) {
     super(msg);
   }

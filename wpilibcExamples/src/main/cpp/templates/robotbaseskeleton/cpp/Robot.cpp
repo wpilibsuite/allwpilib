@@ -11,7 +11,7 @@
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTable.h>
 
-void Robot::RobotInit() {}
+Robot::Robot() {}
 
 void Robot::Disabled() {}
 
@@ -22,8 +22,6 @@ void Robot::Teleop() {}
 void Robot::Test() {}
 
 void Robot::StartCompetition() {
-  RobotInit();
-
   frc::internal::DriverStationModeThread modeThread;
 
   wpi::Event event{false, false};
