@@ -18,9 +18,13 @@
  * The compressor configuration type
  */
 HAL_ENUM(HAL_REVPHCompressorConfigType) {
+  /** Disabled. */
   HAL_REVPHCompressorConfigType_kDisabled = 0,
+  /** Digital. */
   HAL_REVPHCompressorConfigType_kDigital = 1,
+  /** Analog. */
   HAL_REVPHCompressorConfigType_kAnalog = 2,
+  /** Hybrid. */
   HAL_REVPHCompressorConfigType_kHybrid = 3,
 };
 
@@ -28,11 +32,17 @@ HAL_ENUM(HAL_REVPHCompressorConfigType) {
  * Storage for REV PH Version
  */
 struct HAL_REVPHVersion {
+  /** The firmware major version */
   uint32_t firmwareMajor;
+  /** The firmware minor version */
   uint32_t firmwareMinor;
+  /** The firmware fix version */
   uint32_t firmwareFix;
+  /** The hardware minor version */
   uint32_t hardwareMinor;
+  /** The hardware major version*/
   uint32_t hardwareMajor;
+  /** The device's unique ID */
   uint32_t uniqueId;
 };
 
@@ -50,27 +60,49 @@ struct HAL_REVPHCompressorConfig {
  * Storage for REV PH Faults
  */
 struct HAL_REVPHFaults {
+  /** Fault on channel 0 */
   uint32_t channel0Fault : 1;
+  /** Fault on channel 1 */
   uint32_t channel1Fault : 1;
+  /** Fault on channel 2 */
   uint32_t channel2Fault : 1;
+  /** Fault on channel 3 */
   uint32_t channel3Fault : 1;
+  /** Fault on channel 4 */
   uint32_t channel4Fault : 1;
+  /** Fault on channel 5 */
   uint32_t channel5Fault : 1;
+  /** Fault on channel 6 */
   uint32_t channel6Fault : 1;
+  /** Fault on channel 7 */
   uint32_t channel7Fault : 1;
+  /** Fault on channel 8 */
   uint32_t channel8Fault : 1;
+  /** Fault on channel 9 */
   uint32_t channel9Fault : 1;
+  /** Fault on channel 10 */
   uint32_t channel10Fault : 1;
+  /** Fault on channel 11 */
   uint32_t channel11Fault : 1;
+  /** Fault on channel 12 */
   uint32_t channel12Fault : 1;
+  /** Fault on channel 13 */
   uint32_t channel13Fault : 1;
+  /** Fault on channel 14 */
   uint32_t channel14Fault : 1;
+  /** Fault on channel 15 */
   uint32_t channel15Fault : 1;
+  /** An overcurrent event occurred on the compressor output */
   uint32_t compressorOverCurrent : 1;
+  /** The compressor output has an open circuit */
   uint32_t compressorOpen : 1;
+  /** An overcurrent event occurred on a solenoid ouput */
   uint32_t solenoidOverCurrent : 1;
+  /** The input voltage is below the minimum voltage */
   uint32_t brownout : 1;
+  /** A warning was raised by the device's CAN controller */
   uint32_t canWarning : 1;
+  /** The hardware on the device has malfunctioned */
   uint32_t hardwareFault : 1;
 };
 
@@ -78,12 +110,19 @@ struct HAL_REVPHFaults {
  * Storage for REV PH Sticky Faults
  */
 struct HAL_REVPHStickyFaults {
+  /** An overcurrent event occurred on the compressor output */
   uint32_t compressorOverCurrent : 1;
+  /** The compressor output has an open circuit */
   uint32_t compressorOpen : 1;
+  /** An overcurrent event occurred on a solenoid ouput */
   uint32_t solenoidOverCurrent : 1;
+  /** The input voltage is below the minimum voltage */
   uint32_t brownout : 1;
+  /** A warning was raised by the device's CAN controller */
   uint32_t canWarning : 1;
+  /** The device's CAN controller experienced a "Bus Off" event */
   uint32_t canBusOff : 1;
+  /** The device has rebooted */
   uint32_t hasReset : 1;
 };
 
