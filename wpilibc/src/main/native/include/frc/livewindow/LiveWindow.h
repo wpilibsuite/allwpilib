@@ -15,8 +15,11 @@ namespace frc {
 /**
  * The LiveWindow class is the public interface for putting sensors and
  * actuators on the LiveWindow.
+ *
+ * @deprecated LiveWindow is being removed with no replacement.
  */
-class LiveWindow final {
+class [[deprecated("LiveWindow is being removed with no replacement.")]]
+LiveWindow final {
  public:
   /**
    * Sets function to be called when LiveWindow is enabled.

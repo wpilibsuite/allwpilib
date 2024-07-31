@@ -15,7 +15,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
 /**
  * The LiveWindow class is the public interface for putting sensors and actuators on the LiveWindow.
+ *
+ * @deprecated LiveWindow is being removed with no replacement.
  */
+@Deprecated(forRemoval = true, since = "2025")
 public final class LiveWindow {
   private static final class Component implements AutoCloseable {
     @Override
