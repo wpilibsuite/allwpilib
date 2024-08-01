@@ -173,6 +173,10 @@ class PowerDistribution : public wpi::Sendable,
 
   Version GetVersion() const;
 
+  /**
+   * Faults for a PowerDistribution device. These faults are only active while
+   * the condition is active.
+   */
   struct Faults {
     /** Breaker fault on channel 0 */
     uint32_t Channel0BreakerFault : 1;
@@ -248,6 +252,10 @@ class PowerDistribution : public wpi::Sendable,
    */
   Faults GetFaults() const;
 
+  /**
+   * Sticky faults for a PowerDistribution device. These faults will remain
+   * active until they are reset by the user.
+   */
   struct StickyFaults {
     /** Breaker fault on channel 0 */
     uint32_t Channel0BreakerFault : 1;

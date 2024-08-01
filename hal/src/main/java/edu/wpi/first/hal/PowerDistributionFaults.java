@@ -4,7 +4,10 @@
 
 package edu.wpi.first.hal;
 
-/** Faults for a PowerDistribution device */
+/**
+ * Faults for a PowerDistribution device. These faults are only active while the condition is
+ * active.
+ */
 @SuppressWarnings("MemberName")
 public class PowerDistributionFaults {
   /** Breaker fault on channel 0 */

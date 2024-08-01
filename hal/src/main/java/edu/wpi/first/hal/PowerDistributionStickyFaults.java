@@ -4,6 +4,10 @@
 
 package edu.wpi.first.hal;
 
+/**
+ * Sticky faults for a PowerDistribution device. These faults will remain active until they are
+ * reset by the user.
+ */
 @SuppressWarnings("MemberName")
 public class PowerDistributionStickyFaults {
   /** Breaker fault on channel 0 */
