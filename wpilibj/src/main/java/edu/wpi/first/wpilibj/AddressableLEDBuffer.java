@@ -41,38 +41,39 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
   @Override
   public void setRGB(int index, int r, int g, int b) {
     switch (m_colorOrder) {
-      case kRGB:
+      case kRGB -> {
         m_buffer[index * 4] = (byte) b;
         m_buffer[(index * 4) + 1] = (byte) g;
         m_buffer[(index * 4) + 2] = (byte) r;
-        break;
-      case kRBG:
+      }
+      case kRBG -> {
         m_buffer[index * 4] = (byte) g;
         m_buffer[(index * 4) + 1] = (byte) b;
         m_buffer[(index * 4) + 2] = (byte) r;
-        break;
-      case kGBR:
+      }
+      case kGBR -> {
         m_buffer[index * 4] = (byte) r;
         m_buffer[(index * 4) + 1] = (byte) b;
         m_buffer[(index * 4) + 2] = (byte) g;
-        break;
-      case kGRB:
+      }
+      case kGRB -> {
         m_buffer[index * 4] = (byte) b;
         m_buffer[(index * 4) + 1] = (byte) r;
         m_buffer[(index * 4) + 2] = (byte) g;
-        break;
-      case kBRG:
+      }
+      case kBRG -> {
         m_buffer[index * 4] = (byte) g;
         m_buffer[(index * 4) + 1] = (byte) r;
         m_buffer[(index * 4) + 2] = (byte) b;
-        break;
-      case kBGR:
+      }
+      case kBGR -> {
         m_buffer[index * 4] = (byte) r;
         m_buffer[(index * 4) + 1] = (byte) g;
         m_buffer[(index * 4) + 2] = (byte) b;
-        break;
-      default:
-        break;
+      }
+      default -> {
+        // Unreachable
+      }
     }
     m_buffer[(index * 4) + 3] = 0;
   }
