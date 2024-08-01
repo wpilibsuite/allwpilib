@@ -227,7 +227,7 @@ HAL_Bool HAL_RefreshDSData(void);
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle);
 
 /**
- * Removes the event handle from being singalled when new data arrives.
+ * Removes the event handle from being signalled when new data arrives.
  *
  * @param handle the event handle to remove
  */

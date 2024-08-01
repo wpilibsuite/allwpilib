@@ -379,7 +379,7 @@ public class DriverStationJNI extends JNIWrapper {
   public static native void provideNewDataEventHandle(int handle);
 
   /**
-   * Removes the event handle from being singalled when new data arrives.
+   * Removes the event handle from being signalled when new data arrives.
    *
    * @param handle the event handle to remove
    */
