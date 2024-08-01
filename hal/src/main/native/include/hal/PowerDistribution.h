@@ -362,7 +362,7 @@ struct HAL_PowerDistributionStickyFaults {
   uint32_t canWarning : 1;
   /** The device's CAN controller experienced a "Bus Off" event */
   uint32_t canBusOff : 1;
-  /** The device has reset since the last time sticky faults were cleared */
+  /** The device has rebooted */
   uint32_t hasReset : 1;
 };
 
