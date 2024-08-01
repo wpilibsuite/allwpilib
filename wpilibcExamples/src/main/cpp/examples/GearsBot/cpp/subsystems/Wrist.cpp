@@ -4,16 +4,10 @@
 
 #include "subsystems/Wrist.h"
 
-#include <frc/RobotBase.h>
 #include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 Wrist::Wrist() : frc2::PIDSubsystem{frc::PIDController{kP, 0, 0}} {
-  if constexpr (frc::RobotBase::IsSimulation()) {
-    // Conversion value of potentiometer varies between the real world and
-    // simulation
-    m_pot = frc::AnalogPotentiometer{3};  // Defaults to meters
-  }
   m_controller.SetTolerance(2.5);
 
   SetName("Wrist");

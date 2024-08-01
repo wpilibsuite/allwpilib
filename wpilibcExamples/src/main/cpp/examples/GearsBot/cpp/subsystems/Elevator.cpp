@@ -4,7 +4,6 @@
 
 #include "subsystems/Elevator.h"
 
-#include <frc/RobotBase.h>
 #include <frc/controller/PIDController.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -14,9 +13,6 @@ Elevator::Elevator()
   if constexpr (frc::RobotBase::IsSimulation()) {
     // Check for simulation and update PID values
     GetController().SetPID(kP_simulation, kI_simulation, 0);
-    // Conversion value of potentiometer varies between the real world and
-    // simulation
-    m_pot = frc::AnalogPotentiometer{2};  // Defaults to degrees
   }
 
   m_controller.SetTolerance(0.005);
