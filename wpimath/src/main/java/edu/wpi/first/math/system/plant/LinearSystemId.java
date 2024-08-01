@@ -123,9 +123,9 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a DC motor system. The states of the system are [angular
-   * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
-   * velocity].
+   * Create a state-space model of a DC motor system from its kV (volts/(unit/sec)) and kA
+   * (volts/(unit/sec²)). These constants can be found using SysId. the states of the system are
+   * [position, velocity], inputs are [voltage], and outputs are [position].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
    * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
