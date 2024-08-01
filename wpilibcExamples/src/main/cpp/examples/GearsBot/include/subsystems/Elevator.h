@@ -45,13 +45,7 @@ class Elevator : public frc2::PIDSubsystem {
  private:
   frc::PWMSparkMax m_motor{5};
 
-// Conversion value of potentiometer varies between the real world and
-// simulation
-#ifndef SIMULATION
   frc::AnalogPotentiometer m_pot{2, -2.0 / 5};
-#else
-  frc::AnalogPotentiometer m_pot{2};  // Defaults to meters
-#endif
 
   static constexpr double kP_real = 4;
   static constexpr double kI_real = 0.07;

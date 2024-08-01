@@ -41,14 +41,7 @@ class Wrist : public frc2::PIDSubsystem {
 
  private:
   frc::PWMSparkMax m_motor{6};
-
-// Conversion value of potentiometer varies between the real world and
-// simulation
-#ifndef SIMULATION
   frc::AnalogPotentiometer m_pot{3, -270.0 / 5};
-#else
-  frc::AnalogPotentiometer m_pot{3};  // Defaults to degrees
-#endif
 
   static constexpr double kP = 1;
 };
