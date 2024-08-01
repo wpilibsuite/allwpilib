@@ -6,6 +6,7 @@ package edu.wpi.first.util.sendable2;
 
 /** Sendable publish/subscribe option. */
 public class SendableOption {
+  /** The option kind. */
   public enum Kind {
     kPeriodic,
     kTypeString,
@@ -123,22 +124,47 @@ public class SendableOption {
     return new SendableOption(Kind.kDisableLocal, disabled);
   }
 
+  /**
+   * Gets the kind of option.
+   *
+   * @return option kind
+   */
   public Kind getKind() {
     return m_kind;
   }
 
+  /**
+   * Gets the stored boolean value. Value is unspecified for non-boolean kinds.
+   *
+   * @return boolean value
+   */
   public boolean getBooleanValue() {
     return m_bValue;
   }
 
+  /**
+   * Gets the stored integer value. Value is unspecified for non-integer kinds.
+   *
+   * @return integer value
+   */
   public int getIntValue() {
     return m_iValue;
   }
 
+  /**
+   * Gets the stored double value. Value is unspecified for non-double kinds.
+   *
+   * @return double value
+   */
   public double getDoubleValue() {
     return m_dValue;
   }
 
+  /**
+   * Gets the stored string value. Value is unspecified for non-string kinds.
+   *
+   * @return string value
+   */
   public String getStringValue() {
     return m_sValue;
   }

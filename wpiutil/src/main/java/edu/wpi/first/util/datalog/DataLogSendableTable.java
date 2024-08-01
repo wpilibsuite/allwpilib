@@ -30,7 +30,7 @@ import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-/** NetworkTables-backed implementation of SendableTable. */
+/** DataLog-backed implementation of SendableTable. */
 public class DataLogSendableTable implements SendableTable {
   private static final char PATH_SEPARATOR = '/';
 
@@ -38,28 +38,16 @@ public class DataLogSendableTable implements SendableTable {
   private final String m_pathWithSep;
   private final DataLog m_log;
 
-  private enum DataType {
-    kNone,
-    kBoolean,
-    kInteger,
-    kFloat,
-    kDouble,
-    kString,
-    kBooleanArray,
-    kIntegerArray,
-    kFloatArray,
-    kDoubleArray,
-    kStringArray,
-    kRaw,
-    kStruct,
-    kProtobuf;
-  }
-
   private static class EntryData {
+    EntryData(DataLog log, String path) {
+      m_log = log;
+      m_path = path;
+    }
+
     synchronized void close() {
-      if (m_entry != 0) {
-        m_log.finish(m_entry);
-        m_entry = 0;
+      if (m_entry != null) {
+        m_entry.finish();
+        m_entry = null;
       }
     }
 
@@ -77,79 +65,264 @@ public class DataLogSendableTable implements SendableTable {
       // replace the trailing comma with a }
       sb.setCharAt(sb.length() - 1, '}');
       m_properties = sb.toString();
-      if (m_entry != 0) {
-        m_log.setMetadata(m_entry, m_properties);
+      if (m_entry != null) {
+        m_entry.setMetadata(m_properties);
+      }
+    }
+
+    synchronized BooleanLogEntry initBoolean() {
+      if (m_entry == null) {
+        BooleanLogEntry entry = new BooleanLogEntry(m_log, m_path, m_properties);
+        m_entry = entry;
+        return entry;
+      } else if (m_entry instanceof BooleanLogEntry) {
+        return (BooleanLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized IntegerLogEntry initInteger() {
+      if (m_entry == null) {
+        IntegerLogEntry entry = new IntegerLogEntry(m_log, m_path, m_properties);
+        m_entry = entry;
+        return entry;
+      } else if (m_entry instanceof IntegerLogEntry) {
+        return (IntegerLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized FloatLogEntry initFloat() {
+      if (m_entry == null) {
+        FloatLogEntry entry = new FloatLogEntry(m_log, m_path, m_properties);
+        m_entry = entry;
+        return entry;
+      } else if (m_entry instanceof FloatLogEntry) {
+        return (FloatLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized DoubleLogEntry initDouble() {
+      if (m_entry == null) {
+        DoubleLogEntry entry = new DoubleLogEntry(m_log, m_path, m_properties);
+        m_entry = entry;
+        return entry;
+      } else if (m_entry instanceof DoubleLogEntry) {
+        return (DoubleLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized StringLogEntry initString() {
+      if (m_entry == null) {
+        StringLogEntry entry = new StringLogEntry(m_log, m_path, m_properties);
+        m_entry = entry;
+        return entry;
+      } else if (m_entry instanceof StringLogEntry) {
+        return (StringLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized BooleanArrayLogEntry initBooleanArray() {
+      if (m_entry == null) {
+        BooleanArrayLogEntry entry = new BooleanArrayLogEntry(m_log, m_path, m_properties);
+        m_entry = entry;
+        return entry;
+      } else if (m_entry instanceof BooleanArrayLogEntry) {
+        return (BooleanArrayLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized IntegerArrayLogEntry initIntegerArray() {
+      if (m_entry == null) {
+        IntegerArrayLogEntry entry = new IntegerArrayLogEntry(m_log, m_path, m_properties);
+        m_entry = entry;
+        return entry;
+      } else if (m_entry instanceof IntegerArrayLogEntry) {
+        return (IntegerArrayLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized FloatArrayLogEntry initFloatArray() {
+      if (m_entry == null) {
+        FloatArrayLogEntry entry = new FloatArrayLogEntry(m_log, m_path, m_properties);
+        m_entry = entry;
+        return entry;
+      } else if (m_entry instanceof FloatArrayLogEntry) {
+        return (FloatArrayLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized DoubleArrayLogEntry initDoubleArray() {
+      if (m_entry == null) {
+        DoubleArrayLogEntry entry = new DoubleArrayLogEntry(m_log, m_path, m_properties);
+        m_entry = entry;
+        return entry;
+      } else if (m_entry instanceof DoubleArrayLogEntry) {
+        return (DoubleArrayLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized StringArrayLogEntry initStringArray() {
+      if (m_entry == null) {
+        StringArrayLogEntry entry = new StringArrayLogEntry(m_log, m_path, m_properties);
+        m_entry = entry;
+        return entry;
+      } else if (m_entry instanceof StringArrayLogEntry) {
+        return (StringArrayLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized RawLogEntry initRaw(String typeString) {
+      if (m_entry == null) {
+        RawLogEntry entry = new RawLogEntry(m_log, m_path, m_properties, typeString);
+        m_entry = entry;
+        m_typeString = typeString;
+        return entry;
+      } else if (m_entry instanceof RawLogEntry && typeString.equals(m_typeString)) {
+        return (RawLogEntry) m_entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized <T> StructLogEntry<T> initStruct(Struct<T> struct) {
+      if (m_entry == null) {
+        StructLogEntry<T> entry = StructLogEntry.create(m_log, m_path, struct, m_properties);
+        m_entry = entry;
+        m_structBuffer = StructBuffer.create(struct);
+        m_log.addSchema(struct);
+        return entry;
+      } else if (m_structBuffer != null && m_structBuffer.getStruct().equals(struct)) {
+        @SuppressWarnings("unchecked")
+        StructLogEntry<T> entry = (StructLogEntry<T>) m_entry;
+        return entry;
+      } else {
+        return null;
+      }
+    }
+
+    synchronized <T> ProtobufLogEntry<T> initProtobuf(Protobuf<T, ?> proto) {
+      if (m_entry == null) {
+        ProtobufLogEntry<T> entry = ProtobufLogEntry.create(m_log, m_path, proto, m_properties);
+        m_entry = entry;
+        m_protobufBuffer = ProtobufBuffer.create(proto);
+        m_log.addSchema(proto);
+        return entry;
+      } else if (m_protobufBuffer != null && m_protobufBuffer.getProto().equals(proto)) {
+        @SuppressWarnings("unchecked")
+        ProtobufLogEntry<T> entry = (ProtobufLogEntry<T>) m_entry;
+        return entry;
+      } else {
+        return null;
       }
     }
 
     void setBoolean(boolean value) {
-      if (m_type != DataType.kBoolean) {
-        return;
+      BooleanLogEntry entry = (BooleanLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value);
+      } else {
+        entry.update(value);
       }
-      m_log.appendBoolean(m_entry, value, 0);
     }
 
     void setInteger(long value) {
-      if (m_type != DataType.kInteger) {
-        return;
+      IntegerLogEntry entry = (IntegerLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value);
+      } else {
+        entry.update(value);
       }
-      m_log.appendInteger(m_entry, value, 0);
     }
 
     void setFloat(float value) {
-      if (m_type != DataType.kFloat) {
-        return;
+      FloatLogEntry entry = (FloatLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value);
+      } else {
+        entry.update(value);
       }
-      m_log.appendFloat(m_entry, value, 0);
     }
 
     void setDouble(double value) {
-      if (m_type != DataType.kDouble) {
-        return;
+      DoubleLogEntry entry = (DoubleLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value);
+      } else {
+        entry.update(value);
       }
-      m_log.appendDouble(m_entry, value, 0);
     }
 
     void setString(String value) {
-      if (m_type != DataType.kString) {
-        return;
+      StringLogEntry entry = (StringLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value);
+      } else {
+        entry.update(value);
       }
-      m_log.appendString(m_entry, value, 0);
     }
 
     void setBooleanArray(boolean[] value) {
-      if (m_type != DataType.kBooleanArray) {
-        return;
+      BooleanArrayLogEntry entry = (BooleanArrayLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value);
+      } else {
+        entry.update(value);
       }
-      m_log.appendBooleanArray(m_entry, value, 0);
     }
 
     void setIntegerArray(long[] value) {
-      if (m_type != DataType.kIntegerArray) {
-        return;
+      IntegerArrayLogEntry entry = (IntegerArrayLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value);
+      } else {
+        entry.update(value);
       }
-      m_log.appendIntegerArray(m_entry, value, 0);
     }
 
     void setFloatArray(float[] value) {
-      if (m_type != DataType.kFloatArray) {
-        return;
+      FloatArrayLogEntry entry = (FloatArrayLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value);
+      } else {
+        entry.update(value);
       }
-      m_log.appendFloatArray(m_entry, value, 0);
     }
 
     void setDoubleArray(double[] value) {
-      if (m_type != DataType.kDoubleArray) {
-        return;
+      DoubleArrayLogEntry entry = (DoubleArrayLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value);
+      } else {
+        entry.update(value);
       }
-      m_log.appendDoubleArray(m_entry, value, 0);
     }
 
     void setStringArray(String[] value) {
-      if (m_type != DataType.kStringArray) {
-        return;
+      StringArrayLogEntry entry = (StringArrayLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value);
+      } else {
+        entry.update(value);
       }
-      m_log.appendStringArray(m_entry, value, 0);
     }
 
     void setRaw(byte[] value) {
@@ -157,10 +330,12 @@ public class DataLogSendableTable implements SendableTable {
     }
 
     void setRaw(byte[] value, int start, int len) {
-      if (m_type != DataType.kRaw && m_type != DataType.kStruct && m_type != DataType.kProtobuf) {
-        return;
+      RawLogEntry entry = (RawLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value, start, len);
+      } else {
+        entry.update(value, start, len);
       }
-      m_log.appendRaw(m_entry, value, start, len, 0);
     }
 
     void setRaw(ByteBuffer value) {
@@ -169,10 +344,12 @@ public class DataLogSendableTable implements SendableTable {
     }
 
     void setRaw(ByteBuffer value, int start, int len) {
-      if (m_type != DataType.kRaw && m_type != DataType.kStruct && m_type != DataType.kProtobuf) {
-        return;
+      RawLogEntry entry = (RawLogEntry) m_entry;
+      if (m_appendAll) {
+        entry.append(value, start, len);
+      } else {
+        entry.update(value, start, len);
       }
-      m_log.appendRaw(m_entry, value, start, len, 0);
     }
 
     void setPolledUpdate(Consumer<EntryData> consumer) {
@@ -183,17 +360,19 @@ public class DataLogSendableTable implements SendableTable {
       return m_polledUpdate.get();
     }
 
-    DataLog m_log;
-    int m_entry;
-    DataType m_type = DataType.kNone;
-
+    final DataLog m_log;
+    final String m_path;
     final Map<String, String> m_propertiesMap = new HashMap<>();
+    final AtomicReference<Consumer<EntryData>> m_polledUpdate = new AtomicReference<>();
+
+    DataLogEntry m_entry;
+    String m_typeString;
+
     String m_properties = "{}";
     StructBuffer<?> m_structBuffer;
     ProtobufBuffer<?, ?> m_protobufBuffer;
-    final AtomicReference<Consumer<EntryData>> m_polledUpdate = new AtomicReference<>();
 
-    // boolean m_appendAll;
+    boolean m_appendAll;
   }
 
   private final ConcurrentMap<String, EntryData> m_entries = new ConcurrentHashMap<>();
@@ -201,16 +380,18 @@ public class DataLogSendableTable implements SendableTable {
   private Consumer<SendableTable> m_closeSendable;
   private boolean m_closed;
 
-  private EntryData start(String name, String typeString, DataType type) {
-    EntryData data = m_entries.computeIfAbsent(name, k -> new EntryData());
-    synchronized (data) {
-      if (data.m_entry == 0) {
-        data.m_log = m_log;
-        data.m_entry = m_log.start(m_pathWithSep + name, typeString, data.m_properties, 0);
-        data.m_type = type;
-      }
+  private <T extends DataLogEntry> T get(String name, Class<T> cls) {
+    EntryData data = m_entries.get(name);
+    if (data == null || data.m_entry == null || data.m_entry.getClass() != cls) {
+      return null;
     }
-    return data;
+    @SuppressWarnings("unchecked")
+    T entry = (T) data.m_entry;
+    return entry;
+  }
+
+  private EntryData getOrNew(String name) {
+    return m_entries.computeIfAbsent(name, k -> new EntryData(m_log, m_pathWithSep + name));
   }
 
   public DataLogSendableTable(DataLog log, String path) {
@@ -235,62 +416,112 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public boolean getBoolean(String name, boolean defaultValue) {
-    return defaultValue; // TODO
+    BooleanLogEntry entry = get(name, BooleanLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public long getInteger(String name, long defaultValue) {
-    return defaultValue; // TODO
+    IntegerLogEntry entry = get(name, IntegerLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public float getFloat(String name, float defaultValue) {
-    return defaultValue; // TODO
+    FloatLogEntry entry = get(name, FloatLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public double getDouble(String name, double defaultValue) {
-    return defaultValue; // TODO
+    DoubleLogEntry entry = get(name, DoubleLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public String getString(String name, String defaultValue) {
-    return defaultValue; // TODO
+    StringLogEntry entry = get(name, StringLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public boolean[] getBooleanArray(String name, boolean[] defaultValue) {
-    return defaultValue; // TODO
+    BooleanArrayLogEntry entry = get(name, BooleanArrayLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public long[] getIntegerArray(String name, long[] defaultValue) {
-    return defaultValue; // TODO
+    IntegerArrayLogEntry entry = get(name, IntegerArrayLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public float[] getFloatArray(String name, float[] defaultValue) {
-    return defaultValue; // TODO
+    FloatArrayLogEntry entry = get(name, FloatArrayLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public double[] getDoubleArray(String name, double[] defaultValue) {
-    return defaultValue; // TODO
+    DoubleArrayLogEntry entry = get(name, DoubleArrayLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public String[] getStringArray(String name, String[] defaultValue) {
-    return defaultValue; // TODO
+    StringArrayLogEntry entry = get(name, StringArrayLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public byte[] getRaw(String name, String typeString, byte[] defaultValue) {
-    return defaultValue; // TODO
+    RawLogEntry entry = get(name, RawLogEntry.class);
+    if (entry == null) {
+      return defaultValue;
+    }
+    return entry.getLastValue();
   }
 
   @Override
   public <T> T getStruct(String name, Struct<T> struct, T defaultValue) {
-    return defaultValue; // TODO
+    EntryData data = m_entries.get(name);
+    if (data == null || data.m_structBuffer == null || !data.m_structBuffer.getStruct().equals(struct)) {
+      return defaultValue;
+    }
+    @SuppressWarnings("unchecked")
+    StructLogEntry<T> entry = (StructLogEntry<T>) data.m_entry;
+    return entry.getLastValue();
   }
 
   @Override
@@ -300,7 +531,13 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public <T> T getProtobuf(String name, Protobuf<T, ?> proto, T defaultValue) {
-    return defaultValue; // TODO
+    EntryData data = m_entries.get(name);
+    if (data == null || data.m_protobufBuffer == null || !data.m_protobufBuffer.getProto().equals(proto)) {
+      return defaultValue;
+    }
+    @SuppressWarnings("unchecked")
+    ProtobufLogEntry<T> entry = (ProtobufLogEntry<T>) data.m_entry;
+    return entry.getLastValue();
   }
 
   @Override
@@ -310,405 +547,503 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public void setBoolean(String name, boolean value) {
-    start(name, "boolean", DataType.kBoolean).setBoolean(value);
+    EntryData data = getOrNew(name);
+    if (data.initBoolean() != null) {
+      data.setBoolean(value);
+    }
   }
 
   @Override
   public void setInteger(String name, long value) {
-    start(name, "int64", DataType.kInteger).setInteger(value);
+    EntryData data = getOrNew(name);
+    if (data.initInteger() != null) {
+      data.setInteger(value);
+    }
   }
 
   @Override
   public void setFloat(String name, float value) {
-    start(name, "float", DataType.kFloat).setFloat(value);
+    EntryData data = getOrNew(name);
+    if (data.initFloat() != null) {
+      data.setFloat(value);
+    }
   }
 
   @Override
   public void setDouble(String name, double value) {
-    start(name, "double", DataType.kDouble).setDouble(value);
+    EntryData data = getOrNew(name);
+    if (data.initDouble() != null) {
+      data.setDouble(value);
+    }
   }
 
   @Override
   public void setString(String name, String value) {
-    start(name, "string", DataType.kString).setString(value);
+    EntryData data = getOrNew(name);
+    if (data.initString() != null) {
+      data.setString(value);
+    }
   }
 
   @Override
   public void setBooleanArray(String name, boolean[] value) {
-    start(name, "boolean[]", DataType.kBooleanArray).setBooleanArray(value);
+    EntryData data = getOrNew(name);
+    if (data.initBooleanArray() != null) {
+      data.setBooleanArray(value);
+    }
   }
 
   @Override
   public void setIntegerArray(String name, long[] value) {
-    start(name, "int64[]", DataType.kIntegerArray).setIntegerArray(value);
+    EntryData data = getOrNew(name);
+    if (data.initIntegerArray() != null) {
+      data.setIntegerArray(value);
+    }
   }
 
   @Override
   public void setFloatArray(String name, float[] value) {
-    start(name, "float[]", DataType.kFloatArray).setFloatArray(value);
+    EntryData data = getOrNew(name);
+    if (data.initFloatArray() != null) {
+      data.setFloatArray(value);
+    }
   }
 
   @Override
   public void setDoubleArray(String name, double[] value) {
-    start(name, "double[]", DataType.kDoubleArray).setDoubleArray(value);
+    EntryData data = getOrNew(name);
+    if (data.initDoubleArray() != null) {
+      data.setDoubleArray(value);
+    }
   }
 
   @Override
   public void setStringArray(String name, String[] value) {
-    start(name, "string[]", DataType.kStringArray).setStringArray(value);
+    EntryData data = getOrNew(name);
+    if (data.initStringArray() != null) {
+      data.setStringArray(value);
+    }
   }
 
   @Override
   public void setRaw(String name, String typeString, byte[] value, int start, int len) {
-    start(name, typeString, DataType.kRaw).setRaw(value, start, len);
+    EntryData data = getOrNew(name);
+    if (data.initRaw(typeString) != null) {
+      data.setRaw(value, start, len);
+    }
   }
 
   @Override
   public void setRaw(String name, String typeString, ByteBuffer value, int start, int len) {
-    start(name, typeString, DataType.kRaw).setRaw(value, start, len);
+    EntryData data = getOrNew(name);
+    if (data.initRaw(typeString) != null) {
+      data.setRaw(value, start, len);
+    }
   }
 
   @Override
   public <T> void setStruct(String name, T value, Struct<T> struct) {
-    EntryData td = start(name, struct.getTypeString(), DataType.kStruct);
-    synchronized (td) {
-      if (td.m_structBuffer == null) {
-        td.m_structBuffer = StructBuffer.create(struct);
-        addSchema(struct);
-      } else if (!td.m_structBuffer.getStruct().equals(struct)) {
-        return;
+    EntryData data = getOrNew(name);
+    if (data.initStruct(struct) != null) {
+      synchronized (data) {
+        @SuppressWarnings("unchecked")
+        StructBuffer<T> buf = (StructBuffer<T>) data.m_structBuffer;
+        ByteBuffer bb = buf.write(value);
+        data.setRaw(bb, 0, bb.position());
       }
-      @SuppressWarnings("unchecked")
-      StructBuffer<T> buf = (StructBuffer<T>) td.m_structBuffer;
-      ByteBuffer bb = buf.write(value);
-      td.setRaw(bb, 0, bb.position());
     }
   }
 
   @Override
   public <T> void setProtobuf(String name, T value, Protobuf<T, ?> proto) {
-    EntryData td = start(name, proto.getTypeString(), DataType.kProtobuf);
-    synchronized (td) {
-      if (td.m_protobufBuffer == null) {
-        td.m_protobufBuffer = ProtobufBuffer.create(proto);
-        addSchema(proto);
-      } else if (!td.m_protobufBuffer.getProto().equals(proto)) {
-        return;
-      }
-      @SuppressWarnings("unchecked")
-      ProtobufBuffer<T, ?> buf = (ProtobufBuffer<T, ?>) td.m_protobufBuffer;
-      try {
-        ByteBuffer bb = buf.write(value);
-        td.setRaw(bb, 0, bb.position());
-      } catch (IOException e) {
-        // ignore
+    EntryData data = getOrNew(name);
+    if (data.initProtobuf(proto) != null) {
+      synchronized (data) {
+        @SuppressWarnings("unchecked")
+        ProtobufBuffer<T, ?> buf = (ProtobufBuffer<T, ?>) data.m_protobufBuffer;
+        try {
+          ByteBuffer bb = buf.write(value);
+          data.setRaw(bb, 0, bb.position());
+        } catch (IOException e) {
+          // ignore
+        }
       }
     }
   }
 
   @Override
   public void publishBoolean(String name, BooleanSupplier supplier) {
-    EntryData data = start(name, "boolean", DataType.kBoolean);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setBoolean(supplier.getAsBoolean());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initBoolean() != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setBoolean(supplier.getAsBoolean());
+          });
+    }
   }
 
   @Override
   public void publishInteger(String name, LongSupplier supplier) {
-    EntryData data = start(name, "int64", DataType.kInteger);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setInteger(supplier.getAsLong());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initInteger() != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setInteger(supplier.getAsLong());
+          });
+    }
   }
 
   @Override
   public void publishFloat(String name, FloatSupplier supplier) {
-    EntryData data = start(name, "float", DataType.kFloat);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setFloat(supplier.getAsFloat());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initFloat() != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setFloat(supplier.getAsFloat());
+          });
+    }
   }
 
   @Override
   public void publishDouble(String name, DoubleSupplier supplier) {
-    EntryData data = start(name, "double", DataType.kDouble);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setDouble(supplier.getAsDouble());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initDouble() != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setDouble(supplier.getAsDouble());
+          });
+    }
   }
 
   @Override
   public void publishString(String name, Supplier<String> supplier) {
-    EntryData data = start(name, "string", DataType.kString);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setString(supplier.get());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initString() != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setString(supplier.get());
+          });
+    }
   }
 
   @Override
   public void publishBooleanArray(String name, Supplier<boolean[]> supplier) {
-    EntryData data = start(name, "boolean[]", DataType.kBooleanArray);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setBooleanArray(supplier.get());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initBooleanArray() != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setBooleanArray(supplier.get());
+          });
+    }
   }
 
   @Override
   public void publishIntegerArray(String name, Supplier<long[]> supplier) {
-    EntryData data = start(name, "int64[]", DataType.kStringArray);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setIntegerArray(supplier.get());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initIntegerArray() != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setIntegerArray(supplier.get());
+          });
+    }
   }
 
   @Override
   public void publishFloatArray(String name, Supplier<float[]> supplier) {
-    EntryData data = start(name, "float[]", DataType.kFloatArray);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setFloatArray(supplier.get());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initFloatArray() != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setFloatArray(supplier.get());
+          });
+    }
   }
 
   @Override
   public void publishDoubleArray(String name, Supplier<double[]> supplier) {
-    EntryData data = start(name, "double[]", DataType.kDoubleArray);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setDoubleArray(supplier.get());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initDoubleArray() != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setDoubleArray(supplier.get());
+          });
+    }
   }
 
   @Override
   public void publishStringArray(String name, Supplier<String[]> supplier) {
-    EntryData data = start(name, "string[]", DataType.kStringArray);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setStringArray(supplier.get());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initStringArray() != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setStringArray(supplier.get());
+          });
+    }
   }
 
   @Override
   public void publishRawBytes(String name, String typeString, Supplier<byte[]> supplier) {
-    EntryData data = start(name, typeString, DataType.kRaw);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setRaw(supplier.get());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initRaw(typeString) != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setRaw(supplier.get());
+          });
+    }
   }
 
   @Override
   public void publishRawBuffer(String name, String typeString, Supplier<ByteBuffer> supplier) {
-    EntryData data = start(name, typeString, DataType.kRaw);
-    data.setPolledUpdate(
-        entry -> {
-          entry.setRaw(supplier.get());
-        });
+    EntryData data = getOrNew(name);
+    if (data.initRaw(typeString) != null) {
+      data.setPolledUpdate(
+          entry -> {
+            entry.setRaw(supplier.get());
+          });
+    }
   }
 
   @Override
   public <T> void publishStruct(String name, Struct<T> struct, Supplier<T> supplier) {
-    EntryData td = start(name, struct.getTypeString(), DataType.kStruct);
-    addSchema(struct);
-    final StructBuffer<T> buf = StructBuffer.create(struct);
-    td.setPolledUpdate(
-        entry -> {
-          entry.setRaw(buf.write(supplier.get()));
-        });
+    EntryData data = getOrNew(name);
+    if (data.initRaw(struct.getTypeString()) != null) {
+      addSchema(struct);
+      final StructBuffer<T> buf = StructBuffer.create(struct);
+      data.setPolledUpdate(
+          entry -> {
+            entry.setRaw(buf.write(supplier.get()));
+          });
+    }
   }
 
   @Override
   public <T> void publishProtobuf(String name, Protobuf<T, ?> proto, Supplier<T> supplier) {
-    EntryData td = start(name, proto.getTypeString(), DataType.kProtobuf);
-    addSchema(proto);
-    ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
-    td.setPolledUpdate(
-        entry -> {
-          try {
-            entry.setRaw(buf.write(supplier.get()));
-          } catch (IOException e) {
-            return; // ignore
-          }
-        });
+    EntryData data = getOrNew(name);
+    if (data.initRaw(proto.getTypeString()) != null) {
+      addSchema(proto);
+      ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
+      data.setPolledUpdate(
+          entry -> {
+            try {
+              entry.setRaw(buf.write(supplier.get()));
+            } catch (IOException e) {
+              return; // ignore
+            }
+          });
+    }
   }
 
   @Override
   public BooleanConsumer addBooleanPublisher(String name) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, "boolean", DataType.kBoolean));
+    EntryData data = getOrNew(name);
+    if (data.initBoolean() == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setBoolean(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setBoolean(value);
       }
     };
   }
 
   @Override
   public LongConsumer addIntegerPublisher(String name) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, "int64", DataType.kInteger));
+    EntryData data = getOrNew(name);
+    if (data.initInteger() == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setInteger(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setInteger(value);
       }
     };
   }
 
   @Override
   public FloatConsumer addFloatPublisher(String name) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, "float", DataType.kFloat));
+    EntryData data = getOrNew(name);
+    if (data.initFloat() == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setFloat(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setFloat(value);
       }
     };
   }
 
   @Override
   public DoubleConsumer addDoublePublisher(String name) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, "double", DataType.kDouble));
+    EntryData data = getOrNew(name);
+    if (data.initDouble() == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setDouble(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setDouble(value);
       }
     };
   }
 
   @Override
   public Consumer<String> addStringPublisher(String name) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, "string", DataType.kString));
+    EntryData data = getOrNew(name);
+    if (data.initString() == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setString(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setString(value);
       }
     };
   }
 
   @Override
   public Consumer<boolean[]> addBooleanArrayPublisher(String name) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, "boolean[]", DataType.kBooleanArray));
+    EntryData data = getOrNew(name);
+    if (data.initBooleanArray() == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setBooleanArray(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setBooleanArray(value);
       }
     };
   }
 
   @Override
   public Consumer<long[]> addIntegerArrayPublisher(String name) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, "int64[]", DataType.kIntegerArray));
+    EntryData data = getOrNew(name);
+    if (data.initIntegerArray() == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setIntegerArray(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setIntegerArray(value);
       }
     };
   }
 
   @Override
   public Consumer<float[]> addFloatArrayPublisher(String name) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, "float[]", DataType.kFloatArray));
+    EntryData data = getOrNew(name);
+    if (data.initFloatArray() == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setFloatArray(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setFloatArray(value);
       }
     };
   }
 
   @Override
   public Consumer<double[]> addDoubleArrayPublisher(String name) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, "double[]", DataType.kDoubleArray));
+    EntryData data = getOrNew(name);
+    if (data.initDoubleArray() == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setDoubleArray(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setDoubleArray(value);
       }
     };
   }
 
   @Override
   public Consumer<String[]> addStringArrayPublisher(String name) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, "string[]", DataType.kStringArray));
+    EntryData data = getOrNew(name);
+    if (data.initStringArray() == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setStringArray(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setStringArray(value);
       }
     };
   }
 
   @Override
   public Consumer<byte[]> addRawBytesPublisher(String name, String typeString) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, typeString, DataType.kRaw));
+    EntryData data = getOrNew(name);
+    if (data.initRaw(typeString) == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setRaw(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setRaw(value);
       }
     };
   }
 
   @Override
   public Consumer<ByteBuffer> addRawBufferPublisher(String name, String typeString) {
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, typeString, DataType.kRaw));
+    EntryData data = getOrNew(name);
+    if (data.initRaw(typeString) == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setRaw(value);
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        d.setRaw(value);
       }
     };
   }
 
   @Override
   public <T> Consumer<T> addStructPublisher(String name, Struct<T> struct) {
-    addSchema(struct);
+    EntryData data = getOrNew(name);
+    if (data.initStruct(struct) == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     final StructBuffer<T> buf = StructBuffer.create(struct);
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, struct.getTypeString(), DataType.kStruct));
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
-        data.setRaw(buf.write(value));
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
+        ByteBuffer bb = buf.write(value);
+        data.setRaw(bb, 0, bb.position());
       }
     };
   }
 
   @Override
   public <T> Consumer<T> addProtobufPublisher(String name, Protobuf<T, ?> proto) {
-    addSchema(proto);
+    EntryData data = getOrNew(name);
+    if (data.initProtobuf(proto) == null) {
+      return value -> {};
+    }
+    final WeakReference<EntryData> dataRef = new WeakReference<>(data);
     final ProtobufBuffer<T, ?> buf = ProtobufBuffer.create(proto);
-    final WeakReference<EntryData> dataRef =
-        new WeakReference<>(start(name, proto.getTypeString(), DataType.kProtobuf));
     return value -> {
-      EntryData data = dataRef.get();
-      if (data != null && data.m_entry != 0) {
+      EntryData d = dataRef.get();
+      if (d != null && d.m_entry != null) {
         try {
-          data.setRaw(buf.write(value));
+          ByteBuffer bb = buf.write(value);
+          data.setRaw(bb, 0, bb.position());
         } catch (IOException e) {
           // ignore
         }
@@ -790,7 +1125,10 @@ public class DataLogSendableTable implements SendableTable {
     if (data == null) {
       return "null";
     }
-    String value = data.m_propertiesMap.get(propName);
+    String value;
+    synchronized (data) {
+      value = data.m_propertiesMap.get(propName);
+    }
     return value != null ? value : "null";
   }
 
@@ -804,7 +1142,7 @@ public class DataLogSendableTable implements SendableTable {
    */
   @Override
   public void setProperty(String name, String propName, String value) {
-    EntryData data = m_entries.computeIfAbsent(name, k -> new EntryData());
+    EntryData data = m_entries.computeIfAbsent(name, k -> new EntryData(m_log, name));
     synchronized (data) {
       data.m_propertiesMap.put(propName, value);
       data.refreshProperties();
@@ -862,7 +1200,7 @@ public class DataLogSendableTable implements SendableTable {
     if (properties.isEmpty()) {
       return;
     }
-    EntryData data = m_entries.computeIfAbsent(name, k -> new EntryData());
+    EntryData data = m_entries.computeIfAbsent(name, k -> new EntryData(m_log, name));
     synchronized (data) {
       properties.forEach(
           (k, v) -> {
@@ -904,7 +1242,7 @@ public class DataLogSendableTable implements SendableTable {
   public void update() {
     for (EntryData data : m_entries.values()) {
       Consumer<EntryData> consumer = data.getPolledUpdate();
-      if (consumer != null && data.m_entry != 0) {
+      if (consumer != null && data.m_entry != null) {
         consumer.accept(data);
       }
     }
