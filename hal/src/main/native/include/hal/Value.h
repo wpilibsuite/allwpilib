@@ -8,17 +8,17 @@
 
 /** HAL data types. */
 enum HAL_Type {
-  /** Unassigned type */
+  /** Unassigned type. */
   HAL_UNASSIGNED = 0,
-  /** Boolean */
+  /** Boolean. */
   HAL_BOOLEAN = 0x01,
-  /** Double */
+  /** Double. */
   HAL_DOUBLE = 0x02,
-  /** Enum */
+  /** Enum. */
   HAL_ENUM = 0x04,
-  /** Int */
+  /** Int. */
   HAL_INT = 0x08,
-  /** Long */
+  /** Long. */
   HAL_LONG = 0x10,
 };
 

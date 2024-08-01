@@ -42,6 +42,6 @@ public class SimValue {
     SimDeviceJNI.setSimValue(m_handle, value);
   }
 
-  /** The native handle for this SimValue */
+  /** The native handle for this SimValue. */
   protected final int m_handle;
 }

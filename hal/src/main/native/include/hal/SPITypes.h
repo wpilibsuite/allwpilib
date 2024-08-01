@@ -16,7 +16,7 @@
 
 /** SPI port. */
 HAL_ENUM(HAL_SPIPort) {
-  /** Invalid port number */
+  /** Invalid port number. */
   HAL_SPI_kInvalid = -1,
   /** Onboard SPI bus port CS0. */
   HAL_SPI_kOnboardCS0,

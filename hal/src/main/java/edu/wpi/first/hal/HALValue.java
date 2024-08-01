@@ -4,24 +4,24 @@
 
 package edu.wpi.first.hal;
 
-/** Represents a HAL entry value */
+/** Represents a HAL entry value. */
 public final class HALValue {
-  /** Unassigned type */
+  /** Unassigned type. */
   public static final int kUnassigned = 0;
 
-  /** Boolean */
+  /** Boolean. */
   public static final int kBoolean = 0x01;
 
-  /** Double */
+  /** Double. */
   public static final int kDouble = 0x02;
 
-  /** Enum */
+  /** Enum. */
   public static final int kEnum = 0x04;
 
-  /** Int */
+  /** Int. */
   public static final int kInt = 0x08;
 
-  /** Long */
+  /** Long. */
   public static final int kLong = 0x10;
 
   private int m_type;

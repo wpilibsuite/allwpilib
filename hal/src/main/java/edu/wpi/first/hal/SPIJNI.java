@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  * @see "SPI.h"
  */
 public class SPIJNI extends JNIWrapper {
-  /** Invalid port number */
+  /** Invalid port number. */
   public static final int INVALID_PORT = -1;
 
   /** Onboard SPI bus port CS0. */

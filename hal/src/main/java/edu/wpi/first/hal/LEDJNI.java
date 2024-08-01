@@ -10,16 +10,16 @@ package edu.wpi.first.hal;
  * @see "hal/LEDs.h"
  */
 public class LEDJNI extends JNIWrapper {
-  /** LED Off state */
+  /** LED Off state. */
   public static final int RADIO_LED_STATE_OFF = 0;
 
-  /** LED Green state */
+  /** LED Green state. */
   public static final int RADIO_LED_STATE_GREEN = 1;
 
-  /** LED Red state */
+  /** LED Red state. */
   public static final int RADIO_LED_STATE_RED = 2;
 
-  /** LED Orange state */
+  /** LED Orange state. */
   public static final int RADIO_LED_STATE_ORANGE = 3;
 
   /**

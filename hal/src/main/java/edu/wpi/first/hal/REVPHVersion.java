@@ -7,22 +7,22 @@ package edu.wpi.first.hal;
 /** Version and device data received from a REV PH. */
 @SuppressWarnings("MemberName")
 public class REVPHVersion {
-  /** The firmware major version */
+  /** The firmware major version. */
   public final int firmwareMajor;
 
-  /** The firmware minor version */
+  /** The firmware minor version. */
   public final int firmwareMinor;
 
-  /** The firmware fix version */
+  /** The firmware fix version. */
   public final int firmwareFix;
 
-  /** The hardware minor version */
+  /** The hardware minor version. */
   public final int hardwareMinor;
 
-  /** The hardware major version */
+  /** The hardware major version. */
   public final int hardwareMajor;
 
-  /** The device's unique ID */
+  /** The device's unique ID. */
   public final int uniqueId;
 
   /**

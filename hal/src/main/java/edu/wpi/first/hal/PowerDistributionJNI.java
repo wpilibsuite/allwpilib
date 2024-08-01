@@ -10,7 +10,7 @@ package edu.wpi.first.hal;
  * @see "hal/PowerDistribution.h"
  */
 public class PowerDistributionJNI extends JNIWrapper {
-  /** Automatically determines the module type */
+  /** Automatically determines the module type. */
   public static final int AUTOMATIC_TYPE = 0;
 
   /** CTRE (Cross The Road Electronics) Power Distribution Panel (PDP). */
@@ -19,7 +19,7 @@ public class PowerDistributionJNI extends JNIWrapper {
   /** REV Power Distribution Hub (PDH). */
   public static final int REV_TYPE = 2;
 
-  /** Use the default module number for the selected module type */
+  /** Use the default module number for the selected module type. */
   public static final int DEFAULT_MODULE = -1;
 
   /**

@@ -248,59 +248,59 @@ struct HAL_PowerDistributionVersion {
 };
 
 struct HAL_PowerDistributionFaults {
-  /** Breaker fault on channel 0 */
+  /** Breaker fault on channel 0. */
   uint32_t channel0BreakerFault : 1;
-  /** Breaker fault on channel 1 */
+  /** Breaker fault on channel 1. */
   uint32_t channel1BreakerFault : 1;
-  /** Breaker fault on channel 2 */
+  /** Breaker fault on channel 2. */
   uint32_t channel2BreakerFault : 1;
-  /** Breaker fault on channel 3 */
+  /** Breaker fault on channel 3. */
   uint32_t channel3BreakerFault : 1;
-  /** Breaker fault on channel 4 */
+  /** Breaker fault on channel 4. */
   uint32_t channel4BreakerFault : 1;
-  /** Breaker fault on channel 5 */
+  /** Breaker fault on channel 5. */
   uint32_t channel5BreakerFault : 1;
-  /** Breaker fault on channel 6 */
+  /** Breaker fault on channel 6. */
   uint32_t channel6BreakerFault : 1;
-  /** Breaker fault on channel 7 */
+  /** Breaker fault on channel 7. */
   uint32_t channel7BreakerFault : 1;
-  /** Breaker fault on channel 8 */
+  /** Breaker fault on channel 8. */
   uint32_t channel8BreakerFault : 1;
-  /** Breaker fault on channel 9 */
+  /** Breaker fault on channel 9. */
   uint32_t channel9BreakerFault : 1;
-  /** Breaker fault on channel 10 */
+  /** Breaker fault on channel 10. */
   uint32_t channel10BreakerFault : 1;
-  /** Breaker fault on channel 12 */
+  /** Breaker fault on channel 12. */
   uint32_t channel11BreakerFault : 1;
-  /** Breaker fault on channel 13 */
+  /** Breaker fault on channel 13. */
   uint32_t channel12BreakerFault : 1;
-  /** Breaker fault on channel 14 */
+  /** Breaker fault on channel 14. */
   uint32_t channel13BreakerFault : 1;
-  /** Breaker fault on channel 15 */
+  /** Breaker fault on channel 15. */
   uint32_t channel14BreakerFault : 1;
-  /** Breaker fault on channel 16 */
+  /** Breaker fault on channel 16. */
   uint32_t channel15BreakerFault : 1;
-  /** Breaker fault on channel 17 */
+  /** Breaker fault on channel 17. */
   uint32_t channel16BreakerFault : 1;
-  /** Breaker fault on channel 18 */
+  /** Breaker fault on channel 18. */
   uint32_t channel17BreakerFault : 1;
-  /** Breaker fault on channel 19 */
+  /** Breaker fault on channel 19. */
   uint32_t channel18BreakerFault : 1;
-  /** Breaker fault on channel 20 */
+  /** Breaker fault on channel 20. */
   uint32_t channel19BreakerFault : 1;
-  /** Breaker fault on channel 21 */
+  /** Breaker fault on channel 21. */
   uint32_t channel20BreakerFault : 1;
-  /** Breaker fault on channel 22 */
+  /** Breaker fault on channel 22. */
   uint32_t channel21BreakerFault : 1;
-  /** Breaker fault on channel 23 */
+  /** Breaker fault on channel 23. */
   uint32_t channel22BreakerFault : 1;
-  /** Breaker fault on channel 24 */
+  /** Breaker fault on channel 24. */
   uint32_t channel23BreakerFault : 1;
-  /** The input voltage is below the minimum voltage */
+  /** The input voltage is below the minimum voltage. */
   uint32_t brownout : 1;
-  /** A warning was raised by the device's CAN controller */
+  /** A warning was raised by the device's CAN controller. */
   uint32_t canWarning : 1;
-  /** The hardware on the device has malfunctioned */
+  /** The hardware on the device has malfunctioned. */
   uint32_t hardwareFault : 1;
 };
 
@@ -308,61 +308,61 @@ struct HAL_PowerDistributionFaults {
  * Storage for REV PDH Sticky Faults
  */
 struct HAL_PowerDistributionStickyFaults {
-  /** Breaker fault on channel 0 */
+  /** Breaker fault on channel 0. */
   uint32_t channel0BreakerFault : 1;
-  /** Breaker fault on channel 1 */
+  /** Breaker fault on channel 1. */
   uint32_t channel1BreakerFault : 1;
-  /** Breaker fault on channel 2 */
+  /** Breaker fault on channel 2. */
   uint32_t channel2BreakerFault : 1;
-  /** Breaker fault on channel 3 */
+  /** Breaker fault on channel 3. */
   uint32_t channel3BreakerFault : 1;
-  /** Breaker fault on channel 4 */
+  /** Breaker fault on channel 4. */
   uint32_t channel4BreakerFault : 1;
-  /** Breaker fault on channel 5 */
+  /** Breaker fault on channel 5. */
   uint32_t channel5BreakerFault : 1;
-  /** Breaker fault on channel 6 */
+  /** Breaker fault on channel 6. */
   uint32_t channel6BreakerFault : 1;
-  /** Breaker fault on channel 7 */
+  /** Breaker fault on channel 7. */
   uint32_t channel7BreakerFault : 1;
-  /** Breaker fault on channel 8 */
+  /** Breaker fault on channel 8. */
   uint32_t channel8BreakerFault : 1;
-  /** Breaker fault on channel 9 */
+  /** Breaker fault on channel 9. */
   uint32_t channel9BreakerFault : 1;
-  /** Breaker fault on channel 10 */
+  /** Breaker fault on channel 10. */
   uint32_t channel10BreakerFault : 1;
-  /** Breaker fault on channel 12 */
+  /** Breaker fault on channel 12. */
   uint32_t channel11BreakerFault : 1;
-  /** Breaker fault on channel 13 */
+  /** Breaker fault on channel 13. */
   uint32_t channel12BreakerFault : 1;
-  /** Breaker fault on channel 14 */
+  /** Breaker fault on channel 14. */
   uint32_t channel13BreakerFault : 1;
-  /** Breaker fault on channel 15 */
+  /** Breaker fault on channel 15. */
   uint32_t channel14BreakerFault : 1;
-  /** Breaker fault on channel 16 */
+  /** Breaker fault on channel 16. */
   uint32_t channel15BreakerFault : 1;
-  /** Breaker fault on channel 17 */
+  /** Breaker fault on channel 17. */
   uint32_t channel16BreakerFault : 1;
-  /** Breaker fault on channel 18 */
+  /** Breaker fault on channel 18. */
   uint32_t channel17BreakerFault : 1;
-  /** Breaker fault on channel 19 */
+  /** Breaker fault on channel 19. */
   uint32_t channel18BreakerFault : 1;
-  /** Breaker fault on channel 20 */
+  /** Breaker fault on channel 20. */
   uint32_t channel19BreakerFault : 1;
-  /** Breaker fault on channel 21 */
+  /** Breaker fault on channel 21. */
   uint32_t channel20BreakerFault : 1;
-  /** Breaker fault on channel 22 */
+  /** Breaker fault on channel 22. */
   uint32_t channel21BreakerFault : 1;
-  /** Breaker fault on channel 23 */
+  /** Breaker fault on channel 23. */
   uint32_t channel22BreakerFault : 1;
-  /** Breaker fault on channel 24 */
+  /** Breaker fault on channel 24. */
   uint32_t channel23BreakerFault : 1;
-  /** The input voltage is below the minimum voltage */
+  /** The input voltage is below the minimum voltage. */
   uint32_t brownout : 1;
-  /** A warning was raised by the device's CAN controller */
+  /** A warning was raised by the device's CAN controller. */
   uint32_t canWarning : 1;
-  /** The device's CAN controller experienced a "Bus Off" event */
+  /** The device's CAN controller experienced a "Bus Off" event. */
   uint32_t canBusOff : 1;
-  /** The device has rebooted */
+  /** The device has rebooted. */
   uint32_t hasReset : 1;
 };
 

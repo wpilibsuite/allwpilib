@@ -10,7 +10,7 @@ package edu.wpi.first.hal;
  * @see "hal/Interrupts.h"
  */
 public class InterruptJNI extends JNIWrapper {
-  /** Invalid handle value */
+  /** Invalid handle value. */
   public static final int HalInvalidHandle = 0;
 
   /**

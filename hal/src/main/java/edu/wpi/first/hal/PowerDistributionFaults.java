@@ -10,85 +10,85 @@ package edu.wpi.first.hal;
  */
 @SuppressWarnings("MemberName")
 public class PowerDistributionFaults {
-  /** Breaker fault on channel 0 */
+  /** Breaker fault on channel 0. */
   public final boolean Channel0BreakerFault;
 
-  /** Breaker fault on channel 1 */
+  /** Breaker fault on channel 1. */
   public final boolean Channel1BreakerFault;
 
-  /** Breaker fault on channel 2 */
+  /** Breaker fault on channel 2. */
   public final boolean Channel2BreakerFault;
 
-  /** Breaker fault on channel 3 */
+  /** Breaker fault on channel 3. */
   public final boolean Channel3BreakerFault;
 
-  /** Breaker fault on channel 4 */
+  /** Breaker fault on channel 4. */
   public final boolean Channel4BreakerFault;
 
-  /** Breaker fault on channel 5 */
+  /** Breaker fault on channel 5. */
   public final boolean Channel5BreakerFault;
 
-  /** Breaker fault on channel 6 */
+  /** Breaker fault on channel 6. */
   public final boolean Channel6BreakerFault;
 
-  /** Breaker fault on channel 7 */
+  /** Breaker fault on channel 7. */
   public final boolean Channel7BreakerFault;
 
-  /** Breaker fault on channel 8 */
+  /** Breaker fault on channel 8. */
   public final boolean Channel8BreakerFault;
 
-  /** Breaker fault on channel 9 */
+  /** Breaker fault on channel 9. */
   public final boolean Channel9BreakerFault;
 
-  /** Breaker fault on channel 10 */
+  /** Breaker fault on channel 10. */
   public final boolean Channel10BreakerFault;
 
-  /** Breaker fault on channel 11 */
+  /** Breaker fault on channel 11. */
   public final boolean Channel11BreakerFault;
 
-  /** Breaker fault on channel 12 */
+  /** Breaker fault on channel 12. */
   public final boolean Channel12BreakerFault;
 
-  /** Breaker fault on channel 13 */
+  /** Breaker fault on channel 13. */
   public final boolean Channel13BreakerFault;
 
-  /** Breaker fault on channel 14 */
+  /** Breaker fault on channel 14. */
   public final boolean Channel14BreakerFault;
 
-  /** Breaker fault on channel 15 */
+  /** Breaker fault on channel 15. */
   public final boolean Channel15BreakerFault;
 
-  /** Breaker fault on channel 16 */
+  /** Breaker fault on channel 16. */
   public final boolean Channel16BreakerFault;
 
-  /** Breaker fault on channel 17 */
+  /** Breaker fault on channel 17. */
   public final boolean Channel17BreakerFault;
 
-  /** Breaker fault on channel 18 */
+  /** Breaker fault on channel 18. */
   public final boolean Channel18BreakerFault;
 
-  /** Breaker fault on channel 19 */
+  /** Breaker fault on channel 19. */
   public final boolean Channel19BreakerFault;
 
-  /** Breaker fault on channel 20 */
+  /** Breaker fault on channel 20. */
   public final boolean Channel20BreakerFault;
 
-  /** Breaker fault on channel 21 */
+  /** Breaker fault on channel 21. */
   public final boolean Channel21BreakerFault;
 
-  /** Breaker fault on channel 22 */
+  /** Breaker fault on channel 22. */
   public final boolean Channel22BreakerFault;
 
-  /** Breaker fault on channel 23 */
+  /** Breaker fault on channel 23. */
   public final boolean Channel23BreakerFault;
 
-  /** The input voltage is below the minimum voltage */
+  /** The input voltage is below the minimum voltage. */
   public final boolean Brownout;
 
-  /** A warning was raised by the device's CAN controller */
+  /** A warning was raised by the device's CAN controller. */
   public final boolean CanWarning;
 
-  /** The hardware on the device has malfunctioned */
+  /** The hardware on the device has malfunctioned. */
   public final boolean HardwareFault;
 
   /**

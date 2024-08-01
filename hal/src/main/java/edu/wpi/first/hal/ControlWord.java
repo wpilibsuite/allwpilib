@@ -46,7 +46,7 @@ public class ControlWord {
   }
 
   /**
-   * Gets the Enabled flag
+   * Gets the Enabled flag.
    *
    * @return the Enabled flag
    */
@@ -55,7 +55,7 @@ public class ControlWord {
   }
 
   /**
-   * Gets the Autonomous mode flag
+   * Gets the Autonomous mode flag.
    *
    * @return the Autonomous mode flag
    */
@@ -64,7 +64,7 @@ public class ControlWord {
   }
 
   /**
-   * Gets the Test mode flag
+   * Gets the Test mode flag.
    *
    * @return the Test mode flag
    */
@@ -73,7 +73,7 @@ public class ControlWord {
   }
 
   /**
-   * Gets the E-Stop flag
+   * Gets the E-Stop flag.
    *
    * @return the E-Stop flag
    */
@@ -82,7 +82,7 @@ public class ControlWord {
   }
 
   /**
-   * Gets the FMS attached flag
+   * Gets the FMS attached flag.
    *
    * @return the FMS attached flag
    */
@@ -91,7 +91,7 @@ public class ControlWord {
   }
 
   /**
-   * Gets the DS attached flag
+   * Gets the DS attached flag.
    *
    * @return the DS attached flag
    */

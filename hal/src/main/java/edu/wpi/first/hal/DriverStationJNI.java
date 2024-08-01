@@ -147,25 +147,25 @@ public class DriverStationJNI extends JNIWrapper {
    */
   private static native int nativeGetAllianceStation();
 
-  /** Unknown Alliance Station ID */
+  /** Unknown Alliance Station ID. */
   public static final int kUnknownAllianceStation = 0;
 
-  /** Red Alliance Station 1 ID */
+  /** Red Alliance Station 1 ID. */
   public static final int kRed1AllianceStation = 1;
 
-  /** Red Alliance Station 2 ID */
+  /** Red Alliance Station 2 ID. */
   public static final int kRed2AllianceStation = 2;
 
-  /** Red Alliance Station 3 ID */
+  /** Red Alliance Station 3 ID. */
   public static final int kRed3AllianceStation = 3;
 
-  /** Blue Alliance Station 1 ID */
+  /** Blue Alliance Station 1 ID. */
   public static final int kBlue1AllianceStation = 4;
 
-  /** Blue Alliance Station 2 ID */
+  /** Blue Alliance Station 2 ID. */
   public static final int kBlue2AllianceStation = 5;
 
-  /** Blue Alliance Station 3 ID */
+  /** Blue Alliance Station 3 ID. */
   public static final int kBlue3AllianceStation = 6;
 
   /**
