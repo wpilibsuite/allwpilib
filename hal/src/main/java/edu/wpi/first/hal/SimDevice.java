@@ -25,6 +25,7 @@ public class SimDevice implements AutoCloseable {
     /** Bidirectional direction for simulation devices. */
     kBidir(SimDeviceJNI.kBidir);
 
+    /** The native value of this Direction. */
     public final int m_value;
 
     Direction(int value) {

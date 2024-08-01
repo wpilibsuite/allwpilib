@@ -4,9 +4,19 @@
 
 package edu.wpi.first.hal;
 
+/**
+ * SimDevice JNI Functions.
+ *
+ * @see "hal/SimDevice.h"
+ */
 public class SimDeviceJNI extends JNIWrapper {
+  /** Input to user code from the simulator. */
   public static final int kInput = 0;
+
+  /** Output from user code to the simulator. */
   public static final int kOutput = 1;
+
+  /** Bidirectional between user code and simulator. */
   public static final int kBidir = 2;
 
   /**
