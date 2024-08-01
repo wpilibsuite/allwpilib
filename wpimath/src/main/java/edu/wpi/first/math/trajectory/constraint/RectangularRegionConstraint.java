@@ -5,12 +5,12 @@
 package edu.wpi.first.math.trajectory.constraint;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 /** Enforces a particular constraint only within a rectangular region. */
 public class RectangularRegionConstraint implements TrajectoryConstraint {
-  private final Translation2d m_bottomLeftPoint;
-  private final Translation2d m_topRightPoint;
+  private final Rectangle2d m_rectangle;
   private final TrajectoryConstraint m_constraint;
 
   /**
@@ -21,18 +21,29 @@ public class RectangularRegionConstraint implements TrajectoryConstraint {
    * @param topRightPoint The top right point of the rectangular region in which to enforce the
    *     constraint.
    * @param constraint The constraint to enforce when the robot is within the region.
+   * @deprecated Use constructor taking Rectangle2d instead.
    */
+  @Deprecated(since = "2025", forRemoval = true)
   public RectangularRegionConstraint(
       Translation2d bottomLeftPoint, Translation2d topRightPoint, TrajectoryConstraint constraint) {
-    m_bottomLeftPoint = bottomLeftPoint;
-    m_topRightPoint = topRightPoint;
+    this(new Rectangle2d(bottomLeftPoint, topRightPoint), constraint);
+  }
+
+  /**
+   * Constructs a new RectangularRegionConstraint.
+   *
+   * @param rectangle The rectangular region in which to enforce the constraint.
+   * @param constraint The constraint to enforce when the robot is within the region.
+   */
+  public RectangularRegionConstraint(Rectangle2d rectangle, TrajectoryConstraint constraint) {
+    m_rectangle = rectangle;
     m_constraint = constraint;
   }
 
   @Override
   public double getMaxVelocityMetersPerSecond(
       Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
-    if (isPoseInRegion(poseMeters)) {
+    if (m_rectangle.contains(poseMeters.getTranslation())) {
       return m_constraint.getMaxVelocityMetersPerSecond(
           poseMeters, curvatureRadPerMeter, velocityMetersPerSecond);
     } else {
@@ -43,25 +54,11 @@ public class RectangularRegionConstraint implements TrajectoryConstraint {
   @Override
   public MinMax getMinMaxAccelerationMetersPerSecondSq(
       Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
-    if (isPoseInRegion(poseMeters)) {
+    if (m_rectangle.contains(poseMeters.getTranslation())) {
       return m_constraint.getMinMaxAccelerationMetersPerSecondSq(
           poseMeters, curvatureRadPerMeter, velocityMetersPerSecond);
     } else {
       return new MinMax();
     }
-  }
-
-  /**
-   * Returns whether the specified robot pose is within the region that the constraint is enforced
-   * in.
-   *
-   * @param robotPose The robot pose.
-   * @return Whether the robot pose is within the constraint region.
-   */
-  public boolean isPoseInRegion(Pose2d robotPose) {
-    return robotPose.getX() >= m_bottomLeftPoint.getX()
-        && robotPose.getX() <= m_topRightPoint.getX()
-        && robotPose.getY() >= m_bottomLeftPoint.getY()
-        && robotPose.getY() <= m_topRightPoint.getY();
   }
 }
