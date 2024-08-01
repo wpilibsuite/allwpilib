@@ -4,6 +4,7 @@
 
 package edu.wpi.first.hal;
 
+/** Represents a CAN message read from a stream */
 public class CANStreamMessage {
   /** The message data */
   @SuppressWarnings("MemberName")

@@ -82,6 +82,7 @@ public final class HAL extends JNIWrapper {
 
   private static final List<Runnable> s_simPeriodicBefore = new ArrayList<>();
 
+  /** A callback to be run by IterativeRobotBase prior to the user's simulationPeriodic code. */
   public static final class SimPeriodicBeforeCallback implements AutoCloseable {
     private SimPeriodicBeforeCallback(Runnable r) {
       m_run = r;
@@ -128,6 +129,7 @@ public final class HAL extends JNIWrapper {
 
   private static final List<Runnable> s_simPeriodicAfter = new ArrayList<>();
 
+  /** A callback to be run by IterativeRobotBase after the user's simulationPeriodic code. */
   public static final class SimPeriodicAfterCallback implements AutoCloseable {
     private SimPeriodicAfterCallback(Runnable r) {
       m_run = r;

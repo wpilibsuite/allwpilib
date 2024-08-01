@@ -4,6 +4,11 @@
 
 package edu.wpi.first.hal;
 
+/**
+ * LED JNI Functions.
+ *
+ * @see "hal/LEDs.h"
+ */
 public class LEDJNI extends JNIWrapper {
   /** LED Off state */
   public static final int RADIO_LED_STATE_OFF = 0;

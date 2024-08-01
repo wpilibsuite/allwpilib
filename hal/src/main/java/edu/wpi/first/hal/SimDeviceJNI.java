@@ -4,9 +4,19 @@
 
 package edu.wpi.first.hal;
 
+/**
+ * SimDevice JNI Functions.
+ *
+ * @see "hal/SimDevice.h"
+ */
 public class SimDeviceJNI extends JNIWrapper {
+  /** Input direction */
   public static final int kInput = 0;
+
+  /** Output direction */
   public static final int kOutput = 1;
+
+  /** Bidirectional */
   public static final int kBidir = 2;
 
   /**

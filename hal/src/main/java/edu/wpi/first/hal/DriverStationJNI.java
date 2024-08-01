@@ -371,8 +371,18 @@ public class DriverStationJNI extends JNIWrapper {
    */
   public static native boolean refreshDSData();
 
+  /**
+   * Adds an event handle to be signalled when new data arrives.
+   *
+   * @param handle the event handle to be signalled
+   */
   public static native void provideNewDataEventHandle(int handle);
 
+  /**
+   * Removes the event handle from being singalled when new data arrives.
+   *
+   * @param handle the event handle to remove
+   */
   public static native void removeNewDataEventHandle(int handle);
 
   /**
