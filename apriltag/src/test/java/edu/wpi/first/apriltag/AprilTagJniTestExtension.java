@@ -6,7 +6,6 @@ package edu.wpi.first.apriltag;
 
 import edu.wpi.first.apriltag.jni.AprilTagJNI;
 import edu.wpi.first.util.WPIUtilJNI;
-
 import java.io.IOException;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;

@@ -410,12 +410,25 @@ public abstract class RobotBase implements AutoCloseable {
     NetworkTablesJNI.forceLoad();
   }
 
+  /**
+   * Sets the static load behavior for all of the vision libraries
+   *
+   * @param loadOnStaticInitialization true to load on static initialization, false to disable (default)
+   */
   public static void setVisionNativeLibrariesStaticLoadBehavior(boolean loadOnStaticInitialization) {
     CameraServerJNI.Helper.setExtractOnStaticLoad(true);
     OpenCvLoader.Helper.setExtractOnStaticLoad(true);
     AprilTagJNI.Helper.setExtractOnStaticLoad(true);
   }
 
+  /**
+   * Configure all native libraries to match how a robot program works.
+   *
+   * <p>This will load all the base JNI libraries, set the vision libaries
+   * to load on static initialization, and initialize the HAL.
+   *
+   * @return HAL initialization result, true for success.
+   */
   public static boolean loadLibrariesAndInitializeHal() {
     try {
       loadBaseNativeLibraries();

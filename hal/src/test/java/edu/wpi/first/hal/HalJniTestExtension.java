@@ -5,7 +5,6 @@
 package edu.wpi.first.hal;
 
 import edu.wpi.first.util.WPIUtilJNI;
-
 import java.io.IOException;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
