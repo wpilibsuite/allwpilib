@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants.BoxAlignConstants;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
@@ -23,7 +24,7 @@ public class SetDistanceToBox extends PIDCommand {
    */
   public SetDistanceToBox(double distance, Drivetrain drivetrain) {
     super(
-        new PIDController(-2, 0, 0),
+        new PIDController(BoxAlignConstants.kP, BoxAlignConstants.kI, BoxAlignConstants.kD),
         drivetrain::getDistanceToObstacle,
         distance,
         d -> drivetrain.drive(d, d));
@@ -31,7 +32,7 @@ public class SetDistanceToBox extends PIDCommand {
     m_drivetrain = drivetrain;
     addRequirements(m_drivetrain);
 
-    getController().setTolerance(0.01);
+    getController().setTolerance(BoxAlignConstants.kTolerance);
   }
 
   // Called just before this Command runs the first time

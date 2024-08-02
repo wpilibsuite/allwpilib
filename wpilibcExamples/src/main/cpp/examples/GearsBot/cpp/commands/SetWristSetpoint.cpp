@@ -6,7 +6,7 @@
 
 #include "Robot.h"
 
-SetWristSetpoint::SetWristSetpoint(double setpoint, Wrist& wrist)
+SetWristSetpoint::SetWristSetpoint(units::degree_t setpoint, Wrist& wrist)
     : m_setpoint(setpoint), m_wrist(&wrist) {
   SetName("SetWristSetpoint");
   AddRequirements(m_wrist);
