@@ -375,14 +375,15 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 #ifdef _WIN32
   // https://stackoverflow.com/questions/3141556/how-to-setup-timer-resolution-to-0-5-ms
   ULONG min, max, current;
-  NtQueryTimerResolution(&min, &max, &current);
-
-  static ULONG currentRes;
-  NtSetTimerResolution(max, TRUE, &currentRes);
-  std::atexit([]() {
-    ULONG ignore;
-    NtSetTimerResolution(currentRes, TRUE, &ignore);
-  });
+  if (NtQueryTimerResolution(&min, &max, &current) == STATUS_SUCCESS) {
+    static ULONG currentRes;
+    if (NtSetTimerResolution(max, TRUE, &currentRes) == STATUS_SUCCESS) {
+      std::atexit([]() {
+        ULONG ignore;
+        NtSetTimerResolution(currentRes, TRUE, &ignore);
+      });
+    }
+  }
 
   // https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setprocessinformation
   // Enable HighQoS to achieve maximum performance, and turn off power saving.
