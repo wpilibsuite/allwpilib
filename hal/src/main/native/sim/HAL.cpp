@@ -13,6 +13,7 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#pragma comment(lib, "Winmm.lib")
 #pragma comment(lib, "ntdll.lib")
 extern "C" NTSYSAPI NTSTATUS NTAPI NtSetTimerResolution(
     ULONG DesiredResolution, BOOLEAN SetResolution, PULONG CurrentResolution);
@@ -371,6 +372,18 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
 // Set Timer Precision to 0.5ms on Windows
 #ifdef _WIN32
+  TIMECAPS tc;
+  if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
+    UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
+    timeBeginPeriod(target);
+    std::atexit([]() {
+      TIMECAPS tc;
+      if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
+        UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
+        timeEndPeriod(target);
+      }
+    });
+  }
   // https://stackoverflow.com/questions/3141556/how-to-setup-timer-resolution-to-0-5-ms
   ULONG min, max, current;
   if (NtQueryTimerResolution(&min, &max, &current) == 0) {
