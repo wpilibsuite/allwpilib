@@ -374,10 +374,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   ULONG min, max, current;
   if (NtQueryTimerResolution(&min, &max, &current) == 0) {
     static ULONG desired = max;
-    ULONG currentRes;
+    static ULONG currentRes;
     if (NtSetTimerResolution(desired, TRUE, &currentRes) == 0) {
       std::atexit([]() {
-        ULONG currentRes;
         NtSetTimerResolution(desired, FALSE, &currentRes);
       });
     }
