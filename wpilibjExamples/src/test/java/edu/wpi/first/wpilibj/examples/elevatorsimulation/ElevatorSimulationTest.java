@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.examples.elevatorsimulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;
@@ -30,7 +30,8 @@ class ElevatorSimulationTest {
 
   @BeforeEach
   void startThread() {
-    HAL.initialize(500, 0);
+    RobotBase.loadLibrariesAndInitializeHal();
+
     SimHooks.pauseTiming();
     DriverStationSim.resetData();
     m_robot = new Robot();

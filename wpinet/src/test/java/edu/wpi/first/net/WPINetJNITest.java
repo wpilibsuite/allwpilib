@@ -4,12 +4,13 @@
 
 package edu.wpi.first.net;
 
-import java.io.IOException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import org.junit.jupiter.api.Test;
 
 public class WPINetJNITest {
   @Test
-  void jniLinkTest() throws IOException {
-    WPINetJNI.forceLoad();
+  void jniLinkTest() {
+    assertDoesNotThrow(WPINetJNI::forceLoad);
   }
 }
