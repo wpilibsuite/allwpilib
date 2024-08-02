@@ -379,7 +379,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   static ULONG currentRes;
   NtSetTimerResolution(max, TRUE, &currentRes);
-  std::atext([]() {
+  std::atexit([]() {
     ULONG ignore;
     NtSetTimerResolution(currentRes, TRUE, &ignore);
   });
