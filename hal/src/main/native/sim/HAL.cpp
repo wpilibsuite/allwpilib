@@ -372,6 +372,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
 // Set Timer Precision to 0.5ms on Windows
 #ifdef _WIN32
+  // Use timeGetDevCaps as well to prevent Java from interfering
   TIMECAPS tc;
   if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
     UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
