@@ -13,6 +13,7 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#pragma comment(lib, "ntdll.lib")
 extern "C" NTSYSAPI NTSTATUS NTAPI NtSetTimerResolution(
     ULONG DesiredResolution, BOOLEAN SetResolution, PULONG CurrentResolution);
 extern "C" NTSYSAPI NTSTATUS NTAPI
