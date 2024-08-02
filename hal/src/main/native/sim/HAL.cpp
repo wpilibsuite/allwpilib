@@ -373,11 +373,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   // https://stackoverflow.com/questions/3141556/how-to-setup-timer-resolution-to-0-5-ms
   ULONG min, max, current;
   if (NtQueryTimerResolution(&min, &max, &current) == 0) {
-    static ULONG desired = max;
-    static ULONG currentRes;
+    ULONG currentRes;
     if (NtSetTimerResolution(desired, TRUE, &currentRes) == 0) {
       std::atexit([]() {
-        NtSetTimerResolution(desired, FALSE, &currentRes);
+        ULONG currentRes;
+        NtSetTimerResolution(0, FALSE, &currentRes);
       });
     }
   }
