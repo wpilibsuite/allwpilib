@@ -13,6 +13,11 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+extern "C" NTSYSAPI NTSTATUS NTAPI NtSetTimerResolution(
+    ULONG DesiredResolution, BOOLEAN SetResolution, PULONG CurrentResolution);
+extern "C" NTSYSAPI NTSTATUS NTAPI
+NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
+                       PULONG CurrentResolution);
 #endif  // _WIN32
 
 #include "ErrorsInternal.h"
@@ -25,14 +30,6 @@
 #include "hal/simulation/DriverStationData.h"
 #include "hal/simulation/SimCallbackRegistry.h"
 #include "mockdata/RoboRioDataInternal.h"
-
-#ifdef _WIN32
-extern "C" NTSYSAPI NTSTATUS NTAPI NtSetTimerResolution(
-    ULONG DesiredResolution, BOOLEAN SetResolution, PULONG CurrentResolution);
-extern "C" NTSYSAPI NTSTATUS NTAPI
-NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
-                       PULONG CurrentResolution);
-#endif  // _WIN32
 
 using namespace hal;
 
