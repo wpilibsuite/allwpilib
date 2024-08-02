@@ -375,12 +375,12 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   // Use timeGetDevCaps as well to prevent Java from interfering
   TIMECAPS tc;
   if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
-    UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
+    UINT target = (std::max)(static_cast<UINT>(1), tc.wPeriodMin);
     timeBeginPeriod(target);
     std::atexit([]() {
       TIMECAPS tc;
       if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
-        UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
+        UINT target = (std::max)(static_cast<UINT>(1), tc.wPeriodMin);
         timeEndPeriod(target);
       }
     });
