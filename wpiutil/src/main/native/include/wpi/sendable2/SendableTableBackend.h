@@ -27,7 +27,10 @@ class SendableWrapper;
 
 class SendableTableBackend {
  public:
+  SendableTableBackend() = default;
   virtual ~SendableTableBackend() = default;
+  SendableTableBackend(const SendableTableBackend&) = delete;
+  SendableTableBackend& operator=(const SendableTableBackend&) = delete;
 
   virtual void SetBoolean(std::string_view name, bool value) = 0;
 

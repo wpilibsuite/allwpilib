@@ -18,11 +18,16 @@
 
 namespace wpi::log {
 
+/** DataLog-backed implementation of SendableTable. */
 class DataLogSendableTableBackend : public wpi2::SendableTableBackend {
  public:
-  DataLogSendableTableBackend(DataLog& log, std::string_view path)
-      : m_log{log}, m_path{path} {}
-
+  /**
+   * Constructs a DataLog-backed sendable table.
+   *
+   * @param log DataLog
+   * @param path path to sendable table, excluding trailing '/'
+   */
+  DataLogSendableTableBackend(DataLog& log, std::string_view path);
   ~DataLogSendableTableBackend();
 
   /**

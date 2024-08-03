@@ -394,6 +394,12 @@ public class DataLogSendableTable implements SendableTable {
     return m_entries.computeIfAbsent(name, k -> new EntryData(m_log, m_pathWithSep + name));
   }
 
+  /**
+   * Constructs a DataLog-backed sendable table.
+   *
+   * @param log DataLog
+   * @param path path to sendable table, excluding trailing '/'
+   */
   public DataLogSendableTable(DataLog log, String path) {
     m_path = path;
     m_pathWithSep = path + PATH_SEPARATOR;
@@ -1219,6 +1225,10 @@ public class DataLogSendableTable implements SendableTable {
     EntryData data = m_entries.remove(name);
     if (data != null) {
       data.close();
+    }
+    DataLogSendableTable table = m_tables.remove(name);
+    if (table != null) {
+      table.close();
     }
   }
 

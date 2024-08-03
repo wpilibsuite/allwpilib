@@ -7,14 +7,14 @@
 #include <variant>
 
 #include "wpi/json.h"
-#include "wpi/sendable2/SendableWrapper.h"
+#include "wpi/sendable2/SendableTable.h"
 #include "wpi/SmallString.h"
 
 using namespace wpi::log;
 
 struct DataLogSendableTableBackend::EntryData
     : public std::enable_shared_from_this<EntryData> {
-  EntryData(DataLog& log, std::string_view path);
+  EntryData(DataLog& log, std::string_view path) : m_log{log}, m_path{path} {}
 
   template <typename LogEntryType>
   LogEntryType* Init() {
@@ -25,13 +25,24 @@ struct DataLogSendableTableBackend::EntryData
     return std::get_if<LogEntryType>(&m_entry);
   }
 
+  RawLogEntry* InitRaw(std::string_view typeString) {
+    std::scoped_lock lock{m_mutex};
+    if (m_entry.index() == 0) {
+      m_entry = RawLogEntry{m_log, m_path, m_propertiesStr, typeString};
+      m_typeString = typeString;
+    } else if (m_typeString != typeString) {
+      return nullptr;
+    }
+    return std::get_if<RawLogEntry>(&m_entry);
+  }
+
   template <typename LogEntryType, typename T>
   void Set(T value) {
     if (auto entry = std::get_if<LogEntryType>(&m_entry)) {
       if (m_appendAll) {
-        entry.Append(value);
+        entry->Append(value);
       } else {
-        entry.Update(value);
+        entry->Update(value);
       }
     }
   }
@@ -43,11 +54,39 @@ struct DataLogSendableTableBackend::EntryData
     }
   }
 
+  void InitAndSetRaw(std::string_view typeString,
+                     std::span<const uint8_t> value) {
+    if (InitRaw(typeString)) {
+      Set<RawLogEntry>(value);
+    }
+  }
+
   template <typename LogEntryType, typename T>
   void InitAndPublish(std::function<T()> supplier) {
     if (Init<LogEntryType>()) {
       SetPolledUpdate([supplier = std::move(supplier)](auto& entry) {
         entry.template Set<LogEntryType>(supplier());
+      });
+    }
+  }
+
+  void InitAndPublishRaw(std::string_view typeString,
+                         std::function<std::vector<uint8_t>()> supplier) {
+    if (InitRaw(typeString)) {
+      SetPolledUpdate([supplier = std::move(supplier)](auto& entry) {
+        entry.template Set<RawLogEntry>(supplier());
+      });
+    }
+  }
+
+  void InitAndPublishRawSmall(
+      std::string_view typeString,
+      std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>&)>
+          supplier) {
+    if (InitRaw(typeString)) {
+      SetPolledUpdate([supplier = std::move(supplier)](auto& entry) {
+        wpi::SmallVector<uint8_t, 128> buf;
+        entry.template Set<RawLogEntry>(supplier(buf));
       });
     }
   }
@@ -65,10 +104,25 @@ struct DataLogSendableTableBackend::EntryData
     };
   }
 
+  std::function<void(std::span<const uint8_t>)> AddPublisherRaw(
+      std::string_view typeString) {
+    auto entry = InitRaw(typeString);
+    if (!entry) {
+      return [](auto) {};
+    }
+    return [weak = weak_from_this()](auto value) {
+      if (auto self = weak.lock()) {
+        self->Set<RawLogEntry>(value);
+      }
+    };
+  }
+
   void SetPolledUpdate(std::function<void(EntryData&)> function) {
     std::scoped_lock lock{m_mutex};
     m_polledUpdate = std::move(function);
   }
+
+  void RefreshProperties();
 
   std::variant<std::monostate, RawLogEntry, BooleanLogEntry, IntegerLogEntry,
                FloatLogEntry, DoubleLogEntry, StringLogEntry,
@@ -84,6 +138,42 @@ struct DataLogSendableTableBackend::EntryData
   std::function<void(EntryData&)> m_polledUpdate;
   bool m_appendAll{false};
 };
+
+void DataLogSendableTableBackend::EntryData::RefreshProperties() {
+  std::scoped_lock lock{m_mutex};
+  m_propertiesStr.clear();
+  wpi::raw_string_ostream os{m_propertiesStr};
+  m_properties.dump(os);
+  if (auto entry = std::get_if<RawLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<BooleanLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<BooleanLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<IntegerLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<FloatLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<DoubleLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<StringLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<BooleanArrayLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<IntegerArrayLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<FloatArrayLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<DoubleArrayLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  } else if (auto entry = std::get_if<StringArrayLogEntry>(&m_entry)) {
+    entry->SetMetadata(m_propertiesStr);
+  }
+}
+
+DataLogSendableTableBackend::DataLogSendableTableBackend(DataLog& log,
+                                                         std::string_view path)
+    : m_log{log}, m_path{path} {}
 
 DataLogSendableTableBackend::~DataLogSendableTableBackend() = default;
 
@@ -113,7 +203,9 @@ void DataLogSendableTableBackend::SetString(std::string_view name,
 
 void DataLogSendableTableBackend::SetRaw(std::string_view name,
                                          std::string_view typeString,
-                                         std::span<const uint8_t> value);
+                                         std::span<const uint8_t> value) {
+  GetOrNew(name).InitAndSetRaw(typeString, value);
+}
 
 void DataLogSendableTableBackend::PublishBoolean(
     std::string_view name, std::function<bool()> supplier) {
@@ -142,12 +234,16 @@ void DataLogSendableTableBackend::PublishString(
 
 void DataLogSendableTableBackend::PublishRaw(
     std::string_view name, std::string_view typeString,
-    std::function<std::vector<uint8_t>()> supplier);
+    std::function<std::vector<uint8_t>()> supplier) {
+  GetOrNew(name).InitAndPublishRaw(typeString, std::move(supplier));
+}
 
 void DataLogSendableTableBackend::PublishRawSmall(
     std::string_view name, std::string_view typeString,
     std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
-        supplier);
+        supplier) {
+  GetOrNew(name).InitAndPublishRawSmall(typeString, std::move(supplier));
+}
 
 [[nodiscard]]
 std::function<void(bool)> DataLogSendableTableBackend::AddBooleanPublisher(
@@ -182,7 +278,9 @@ DataLogSendableTableBackend::AddStringPublisher(std::string_view name) {
 [[nodiscard]]
 std::function<void(std::span<const uint8_t>)>
 DataLogSendableTableBackend::AddRawPublisher(std::string_view name,
-                                             std::string_view typeString);
+                                             std::string_view typeString) {
+  return GetOrNew(name).AddPublisherRaw(typeString);
+}
 
 void DataLogSendableTableBackend::SubscribeBoolean(
     std::string_view name, std::function<void(bool)> consumer) {}
@@ -288,25 +386,55 @@ bool DataLogSendableTableBackend::SetProperties(std::string_view name,
     }
   }
   data.RefreshProperties();
+  return true;
 }
 
-void DataLogSendableTableBackend::Remove(std::string_view name);
+void DataLogSendableTableBackend::Remove(std::string_view name) {
+  std::scoped_lock lock{m_mutex};
+  m_entries.erase(name);
+  m_tables.erase(name);
+}
 
-bool DataLogSendableTableBackend::IsPublished() const;
+bool DataLogSendableTableBackend::IsPublished() const {
+  return true;
+}
 
-void DataLogSendableTableBackend::Update();
+void DataLogSendableTableBackend::Update() {
+  std::scoped_lock lock{m_mutex};
+  for (auto&& data : m_entries) {
+    std::scoped_lock lock{data.second->m_mutex};
+    auto& consumer = data.second->m_polledUpdate;
+    if (consumer &&
+        !std::holds_alternative<std::monostate>(data.second->m_entry)) {
+      consumer(*data.second);
+    }
+  }
+  for (auto&& table : m_tables) {
+    table.second->Update();
+  }
+}
 
-void DataLogSendableTableBackend::Clear();
+void DataLogSendableTableBackend::Clear() {
+  std::scoped_lock lock{m_mutex};
+  m_entries.clear();
+  m_tables.clear();
+}
 
-bool DataLogSendableTableBackend::HasSchema(std::string_view name) const;
+bool DataLogSendableTableBackend::HasSchema(std::string_view name) const {
+  return m_log.HasSchema(name);
+}
 
 void DataLogSendableTableBackend::AddSchema(std::string_view name,
                                             std::string_view type,
-                                            std::span<const uint8_t> schema);
+                                            std::span<const uint8_t> schema) {
+  m_log.AddSchema(name, type, schema);
+}
 
 void DataLogSendableTableBackend::AddSchema(std::string_view name,
                                             std::string_view type,
-                                            std::string_view schema);
+                                            std::string_view schema) {
+  m_log.AddSchema(name, type, schema);
+}
 
 DataLogSendableTableBackend::EntryData& DataLogSendableTableBackend::GetOrNew(
     std::string_view name) {
@@ -316,9 +444,9 @@ DataLogSendableTableBackend::EntryData& DataLogSendableTableBackend::GetOrNew(
     wpi::SmallString<128> path{m_path};
     path += '/';
     path += name;
-    entry = std::make_unique<EntryData>(m_log, path);
+    entry = std::make_shared<EntryData>(m_log, path);
   }
-  return entry;
+  return *entry;
 }
 
 std::shared_ptr<DataLogSendableTableBackend>

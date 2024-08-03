@@ -6,7 +6,6 @@
 
 #include "wpi/json.h"
 #include "wpi/sendable2/SendableTableBackend.h"
-#include "wpi/sendable2/SendableWrapper.h"
 
 using namespace wpi2;
 
