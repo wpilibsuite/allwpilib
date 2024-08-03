@@ -162,7 +162,7 @@ class DataLogSendableTableBackend : public wpi2::SendableTableBackend {
 
   DataLog& m_log;
   std::string m_path;
-  wpi::recursive_mutex m_mutex;
+  mutable wpi::recursive_mutex m_mutex;
   wpi::StringMap<std::shared_ptr<EntryData>> m_entries;
   wpi::StringMap<std::shared_ptr<DataLogSendableTableBackend>> m_tables;
   std::unique_ptr<wpi2::SendableWrapper> m_sendable;
