@@ -10,7 +10,7 @@
 using namespace frc;
 
 wpi2::SendableTable& Telemetry::GetTableHolder() {
-  static wpi2::SendableTable instance{nullptr}; // FIXME
+  static wpi2::SendableTable instance{nullptr};  // FIXME
   return instance;
 }
 
@@ -148,12 +148,14 @@ wpi2::SendableTable Telemetry::GetChild(std::string_view name) {
   return GetTableHolder().GetChild(name);
 }
 
-void Telemetry::SetPublishOptions(const wpi2::SendableOptions& options) {
-  GetTableHolder().SetPublishOptions(options);
+void Telemetry::SetPublishOptions(std::string_view name,
+                                  const wpi2::SendableOptions& options) {
+  GetTableHolder().SetPublishOptions(name, options);
 }
 
-void Telemetry::SetSubscribeOptions(const wpi2::SendableOptions& options) {
-  GetTableHolder().SetSubscribeOptions(options);
+void Telemetry::SetSubscribeOptions(std::string_view name,
+                                    const wpi2::SendableOptions& options) {
+  GetTableHolder().SetSubscribeOptions(name, options);
 }
 
 wpi::json Telemetry::GetProperty(std::string_view name,

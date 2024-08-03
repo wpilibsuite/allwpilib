@@ -155,9 +155,11 @@ class Telemetry {
 
   static wpi2::SendableTable GetChild(std::string_view name);
 
-  static void SetPublishOptions(const wpi2::SendableOptions& options);
+  static void SetPublishOptions(std::string_view name,
+                                const wpi2::SendableOptions& options);
 
-  static void SetSubscribeOptions(const wpi2::SendableOptions& options);
+  static void SetSubscribeOptions(std::string_view name,
+                                  const wpi2::SendableOptions& options);
 
   /**
    * Gets the current value of a property (as a JSON object).

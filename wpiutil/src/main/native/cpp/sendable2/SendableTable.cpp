@@ -137,12 +137,14 @@ SendableTable SendableTable::GetChild(std::string_view name) {
   return SendableTable{m_backend->GetChild(name)};
 }
 
-void SendableTable::SetPublishOptions(const SendableOptions& options) {
-  m_backend->SetPublishOptions(options);
+void SendableTable::SetPublishOptions(std::string_view name,
+                                      const SendableOptions& options) {
+  m_backend->SetPublishOptions(name, options);
 }
 
-void SendableTable::SetSubscribeOptions(const SendableOptions& options) {
-  m_backend->SetSubscribeOptions(options);
+void SendableTable::SetSubscribeOptions(std::string_view name,
+                                        const SendableOptions& options) {
+  m_backend->SetSubscribeOptions(name, options);
 }
 
 wpi::json SendableTable::GetProperty(std::string_view name,

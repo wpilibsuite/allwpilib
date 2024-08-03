@@ -151,9 +151,10 @@ class SendableTable {
 
   SendableTable GetChild(std::string_view name);
 
-  void SetPublishOptions(const SendableOptions& options);
+  void SetPublishOptions(std::string_view name, const SendableOptions& options);
 
-  void SetSubscribeOptions(const SendableOptions& options);
+  void SetSubscribeOptions(std::string_view name,
+                           const SendableOptions& options);
 
   /**
    * Gets the current value of a property (as a JSON object).
