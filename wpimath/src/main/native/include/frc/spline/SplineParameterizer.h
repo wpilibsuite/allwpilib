@@ -127,9 +127,9 @@ class WPILIB_DLLEXPORT SplineParameterizer {
 
  private:
   // Constraints for spline parameterization.
-  static constexpr units::meter_t kMaxDx = 5_in;
-  static constexpr units::meter_t kMaxDy = 0.05_in;
-  static constexpr units::radian_t kMaxDtheta = 0.0872_rad;
+  static inline constexpr units::meter_t kMaxDx = 5_in;
+  static inline constexpr units::meter_t kMaxDy = 0.05_in;
+  static inline constexpr units::radian_t kMaxDtheta = 0.0872_rad;
 
   struct StackContents {
     double t0;
