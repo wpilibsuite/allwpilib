@@ -91,7 +91,7 @@ public class ADXL362 implements SendableSerializable, AutoCloseable {
       }
 
       @Override
-      public String getTypeString() {
+      public String getTypeName() {
         return "ADXL362.AllAxes";
       }
 

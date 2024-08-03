@@ -91,7 +91,7 @@ public class ADXL345_SPI implements SendableSerializable, AutoCloseable {
       }
 
       @Override
-      public String getTypeString() {
+      public String getTypeName() {
         return "ADXL345_SPI.AllAxes";
       }
 
