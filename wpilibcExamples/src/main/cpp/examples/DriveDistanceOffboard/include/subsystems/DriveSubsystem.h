@@ -29,11 +29,15 @@ class DriveSubsystem : public frc2::SubsystemBase {
   /**
    * Attempts to follow the given drive states using offboard PID.
    *
-   * @param left The left wheel state.
-   * @param right The right wheel state.
+   * @param currentLeft The current left wheel state.
+   * @param currentRight The current right wheel state.
+   * @param nextLeft The next left wheel state.
+   * @param nextRight The next right wheel state.
    */
-  void SetDriveStates(frc::TrapezoidProfile<units::meters>::State left,
-                      frc::TrapezoidProfile<units::meters>::State right);
+  void SetDriveStates(frc::TrapezoidProfile<units::meters>::State currentLeft,
+                      frc::TrapezoidProfile<units::meters>::State currentRight,
+                      frc::TrapezoidProfile<units::meters>::State nextLeft,
+                      frc::TrapezoidProfile<units::meters>::State nextRight);
 
   /**
    * Drives the robot using arcade controls.
