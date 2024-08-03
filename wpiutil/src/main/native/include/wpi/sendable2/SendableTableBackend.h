@@ -118,9 +118,11 @@ class SendableTableBackend {
   virtual std::shared_ptr<SendableTableBackend> GetChild(
       std::string_view name) = 0;
 
-  virtual void SetPublishOptions(const SendableOptions& options) = 0;
+  virtual void SetPublishOptions(std::string_view name,
+                                 const SendableOptions& options) = 0;
 
-  virtual void SetSubscribeOptions(const SendableOptions& options) = 0;
+  virtual void SetSubscribeOptions(std::string_view name,
+                                   const SendableOptions& options) = 0;
 
   /**
    * Gets the current value of a property (as a JSON object).

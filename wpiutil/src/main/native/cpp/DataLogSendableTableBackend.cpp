@@ -320,20 +320,24 @@ DataLogSendableTableBackend::GetChild(std::string_view name) {
 }
 
 void DataLogSendableTableBackend::SetPublishOptions(
-    const wpi2::SendableOptions& options) {
-  // TODO
+    std::string_view name, const wpi2::SendableOptions& options) {
+  auto& entry = GetOrNew(name);
+  if (options.keepDuplicates) {
+    entry.m_appendAll = true;
+  }
 }
 
 void DataLogSendableTableBackend::SetSubscribeOptions(
-    const wpi2::SendableOptions& options) {}
+    std::string_view name, const wpi2::SendableOptions& options) {}
 
 wpi::json DataLogSendableTableBackend::GetProperty(
     std::string_view name, std::string_view propName) const {
+  std::scoped_lock lock{m_mutex};
   auto entryIt = m_entries.find(name);
   if (entryIt == m_entries.end()) {
     return {};
   }
-  std::scoped_lock lock{entryIt->second->m_mutex};
+  std::scoped_lock lock2{entryIt->second->m_mutex};
   auto valueIt = entryIt->second->m_properties.find(propName);
   if (valueIt == entryIt->second->m_properties.end()) {
     return {};
@@ -360,11 +364,12 @@ void DataLogSendableTableBackend::DeleteProperty(std::string_view name,
 
 wpi::json DataLogSendableTableBackend::GetProperties(
     std::string_view name) const {
+  std::scoped_lock lock{m_mutex};
   auto entryIt = m_entries.find(name);
   if (entryIt == m_entries.end()) {
     return wpi::json::object();
   }
-  std::scoped_lock lock{entryIt->second->m_mutex};
+  std::scoped_lock lock2{entryIt->second->m_mutex};
   return entryIt->second->m_properties;
 }
 

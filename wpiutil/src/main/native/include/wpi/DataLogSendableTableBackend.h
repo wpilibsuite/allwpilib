@@ -121,9 +121,11 @@ class DataLogSendableTableBackend : public wpi2::SendableTableBackend {
   std::shared_ptr<wpi2::SendableTableBackend> GetChild(
       std::string_view name) override;
 
-  void SetPublishOptions(const wpi2::SendableOptions& options) override;
+  void SetPublishOptions(std::string_view name,
+                         const wpi2::SendableOptions& options) override;
 
-  void SetSubscribeOptions(const wpi2::SendableOptions& options) override;
+  void SetSubscribeOptions(std::string_view name,
+                           const wpi2::SendableOptions& options) override;
 
   wpi::json GetProperty(std::string_view name,
                         std::string_view propName) const override;

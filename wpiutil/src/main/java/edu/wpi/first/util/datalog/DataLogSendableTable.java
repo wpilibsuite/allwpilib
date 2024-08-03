@@ -1112,7 +1112,12 @@ public class DataLogSendableTable implements SendableTable {
 
   @Override
   public void setPublishOptions(String name, SendableOption... options) {
-    // TODO
+    EntryData data = getOrNew(name);
+    for (SendableOption option : options) {
+      if (option.getKind() == SendableOption.Kind.kKeepDuplicates) {
+        data.m_appendAll = option.getBooleanValue();
+      }
+    }
   }
 
   @Override
