@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
@@ -74,18 +75,33 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Attempts to follow the given drive states using offboard PID.
    *
-   * @param left The left wheel state.
-   * @param right The right wheel state.
+   * @param currentLeft The current left wheel state.
+   * @param currentRight The current right wheel state.
+   * @param nextLeft The next left wheel state.
+   * @param nextRight The next right wheel state.
    */
-  public void setDriveStates(TrapezoidProfile.State left, TrapezoidProfile.State right) {
+  public void setDriveStates(
+      TrapezoidProfile.State currentLeft,
+      TrapezoidProfile.State currentRight,
+      TrapezoidProfile.State nextLeft,
+      TrapezoidProfile.State nextRight) {
+    // Feedforward is divided by battery voltage to normalize it to [-1, 1]
     m_leftLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
-        left.position,
-        m_feedforward.calculate(MetersPerSecond.of(left.velocity)).in(Volts));
+        currentLeft.position,
+        m_feedforward
+                .calculate(
+                    MetersPerSecond.of(currentLeft.velocity), MetersPerSecond.of(nextLeft.velocity))
+                .in(Volts)
+            / RobotController.getBatteryVoltage());
     m_rightLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
-        right.position,
-        m_feedforward.calculate(MetersPerSecond.of(right.velocity)).in(Volts));
+        currentRight.position,
+        m_feedforward
+                .calculate(
+                    MetersPerSecond.of(currentLeft.velocity), MetersPerSecond.of(nextLeft.velocity))
+                .in(Volts)
+            / RobotController.getBatteryVoltage());
   }
 
   /**
@@ -143,8 +159,13 @@ public class DriveSubsystem extends SubsystemBase {
             () -> {
               // Current state never changes, so we need to use a timer to get the setpoints we need
               // to be at
-              var setpoint = profile.calculate(timer.get(), new State(), new State(distance, 0));
-              setDriveStates(setpoint, setpoint);
+              var currentTime = timer.get();
+              var currentSetpoint =
+                  profile.calculate(currentTime, new State(), new State(distance, 0));
+              var nextSetpoint =
+                  profile.calculate(
+                      currentTime + DriveConstants.kDt, new State(), new State(distance, 0));
+              setDriveStates(currentSetpoint, currentSetpoint, nextSetpoint, nextSetpoint);
             })
         .until(() -> profile.isFinished(0));
   }
@@ -175,19 +196,31 @@ public class DriveSubsystem extends SubsystemBase {
               m_initialRightDistance = getRightEncoderDistance();
             },
             () -> {
-              // Current state never changes, so we need to use a timer to get the setpoints we need
-              // to be at
-              var leftSetpoint =
+              // Current state never changes for the duration of the command, so we need to use a
+              // timer to get the setpoints we need to be at
+              var currentTime = timer.get();
+              var currentLeftSetpoint =
                   profile.calculate(
-                      timer.get(),
+                      currentTime,
                       new State(m_initialLeftDistance, 0),
                       new State(m_initialLeftDistance + distance, 0));
-              var rightSetpoint =
+              var currentRightSetpoint =
                   profile.calculate(
-                      timer.get(),
+                      currentTime,
                       new State(m_initialRightDistance, 0),
                       new State(m_initialRightDistance + distance, 0));
-              setDriveStates(leftSetpoint, rightSetpoint);
+              var nextLeftSetpoint =
+                  profile.calculate(
+                      currentTime + DriveConstants.kDt,
+                      new State(m_initialLeftDistance, 0),
+                      new State(m_initialLeftDistance + distance, 0));
+              var nextRightSetpoint =
+                  profile.calculate(
+                      currentTime + DriveConstants.kDt,
+                      new State(m_initialRightDistance, 0),
+                      new State(m_initialRightDistance + distance, 0));
+              setDriveStates(
+                  currentLeftSetpoint, currentRightSetpoint, nextLeftSetpoint, nextRightSetpoint);
             })
         .until(() -> profile.isFinished(0));
   }
