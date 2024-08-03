@@ -140,7 +140,6 @@ struct DataLogSendableTableBackend::EntryData
 };
 
 void DataLogSendableTableBackend::EntryData::RefreshProperties() {
-  std::scoped_lock lock{m_mutex};
   m_propertiesStr.clear();
   wpi::raw_string_ostream os{m_propertiesStr};
   m_properties.dump(os);
