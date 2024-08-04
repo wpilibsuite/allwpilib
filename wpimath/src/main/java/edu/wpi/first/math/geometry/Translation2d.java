@@ -265,6 +265,46 @@ public class Translation2d
     return Collections.min(translations, Comparator.comparing(this::getDistance));
   }
 
+  /**
+   * The 2-dimensiional version of {@link edu.wpi.first.math.MathUtil#applyDeadband applyDeadband}.
+   * Returns a zero Translation2d if the given translation is within the circle
+   * of specified radius centered at the origin.
+   * The remaining range between the deadband and the maximum magnitude
+   * is scaled from 0.0 to the maximum magnitude.
+   * @param translation translation to clip.
+   * @param deadband radius of the circle.
+   * @param maxMagnitude The maximum norm of the translation. Can be infinite.
+   * @return the translation after the deadband is applied.
+   */
+  public static Translation2d applyDeadband(Translation2d translation, double deadband, double maxMagnitude) {
+    double norm=translation.getNorm();
+    deadband=Math.abs(deadband);
+    if (norm > deadband) {
+      if (maxMagnitude / deadband > 1.0e12) {
+        // If max magnitude is sufficiently large, the implementation encounters
+        // roundoff error.  Implementing the limiting behavior directly avoids
+        // the problem.
+        return translation.times(norm - deadband).div(norm);
+      }
+      return translation.div(norm).times(maxMagnitude).times(norm - deadband).div(maxMagnitude - deadband);
+    } else {
+      return new Translation2d();
+    }
+  }
+
+  /**
+   * The 2-dimensiional version of {@link edu.wpi.first.math.MathUtil#applyDeadband applyDeadband}.
+   * Returns a zero Translation2d if the given translation is within the circle
+   * of specified radius centered at the origin.
+   * The remaining range between the deadband and 1.0
+   * is scaled from 0.0 to 1.0.
+   * @param translation translation to clip.
+   * @param deadband radius of the circle.
+   * @return the translation after the deadband is applied.
+   */
+  public static Translation2d applyDeadband(Translation2d translation, double deadband) {
+    return applyDeadband(translation,deadband,1);
+  }
   @Override
   public String toString() {
     return String.format("Translation2d(X: %.2f, Y: %.2f)", m_x, m_y);

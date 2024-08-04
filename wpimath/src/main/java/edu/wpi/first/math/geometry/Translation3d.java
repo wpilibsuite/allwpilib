@@ -248,6 +248,47 @@ public class Translation3d
     return new Translation3d(m_x / scalar, m_y / scalar, m_z / scalar);
   }
 
+  /**
+   * The 3-dimensiional version of {@link edu.wpi.first.math.MathUtil#applyDeadband applyDeadband}.
+   * Returns a zero Translation3d if the given translation is within the sphere
+   * of specified radius centered at the origin.
+   * The remaining range between the deadband and the maximum magnitude
+   * is scaled from 0.0 to the maximum magnitude.
+   * @param translation translation to clip.
+   * @param deadband radius of the circle.
+   * @param maxMagnitude The maximum norm of the translation. Can be infinite.
+   * @return the translation after the deadband is applied.
+   */
+  public static Translation3d applyDeadband(Translation3d translation, double deadband, double maxMagnitude) {
+    double norm=translation.getNorm();
+    deadband=Math.abs(deadband);
+    if (norm > deadband) {
+      if (maxMagnitude / deadband > 1.0e12) {
+        // If max magnitude is sufficiently large, the implementation encounters
+        // roundoff error.  Implementing the limiting behavior directly avoids
+        // the problem.
+        return translation.times(norm - deadband).div(norm);
+      }
+      return translation.div(norm).times(maxMagnitude).times(norm - deadband).div(maxMagnitude - deadband);
+    } else {
+      return new Translation2d();
+    }
+  }
+
+  /**
+   * The 3-dimensiional version of {@link edu.wpi.first.math.MathUtil#applyDeadband applyDeadband}.
+   * Returns a zero Translation3d if the given translation is within the sphere
+   * of specified radius centered at the origin.
+   * The remaining range between the deadband and 1.0
+   * is scaled from 0.0 to 1.0.
+   * @param translation translation to clip.
+   * @param deadband radius of the sphere.
+   * @return the translation after the deadband is applied.
+   */
+  public static Translation3d applyDeadband(Translation3d translation, double deadband) {
+    return applyDeadband(translation,deadband,1);
+  }
+
   @Override
   public String toString() {
     return String.format("Translation3d(X: %.2f, Y: %.2f, Z: %.2f)", m_x, m_y, m_z);
