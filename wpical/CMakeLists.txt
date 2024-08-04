@@ -17,13 +17,7 @@ elseif(APPLE)
     set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
-add_executable(
-    wpical
-    ${wpical_src}
-    ${wpical_resources_src}
-    ${wpical_rc}
-    ${APP_ICON_MACOSX}
-)
+add_executable(wpical ${wpical_src} ${wpical_resources_src} ${wpical_rc} ${APP_ICON_MACOSX})
 wpilib_link_macos_gui(wpical)
 wpilib_target_warnings(wpical)
 target_link_libraries(wpical libglassnt libglass)
