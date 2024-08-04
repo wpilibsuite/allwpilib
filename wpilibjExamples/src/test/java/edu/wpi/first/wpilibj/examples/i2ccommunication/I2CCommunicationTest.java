@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.AllianceStationID;
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.CallbackStore;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.I2CSim;
@@ -34,7 +34,8 @@ class I2CCommunicationTest {
 
   @BeforeEach
   void startThread() {
-    HAL.initialize(500, 0);
+    RobotBase.loadLibrariesAndInitializeHal();
+
     SimHooks.pauseTiming();
     DriverStationSim.resetData();
     m_future = new CompletableFuture<>();

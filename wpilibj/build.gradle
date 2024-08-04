@@ -70,6 +70,7 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
+    implementation project(':apriltag')
     testImplementation 'org.mockito:mockito-core:4.1.0'
     devImplementation sourceSets.main.output
 }

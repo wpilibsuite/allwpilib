@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.AllianceStationID;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
@@ -31,7 +31,8 @@ class DigitalCommunicationTest {
 
   @BeforeEach
   void startThread() {
-    HAL.initialize(500, 0);
+    RobotBase.loadLibrariesAndInitializeHal();
+
     SimHooks.pauseTiming();
     DriverStationSim.resetData();
     m_robot = new Robot();

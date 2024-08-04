@@ -7,9 +7,9 @@ package edu.wpi.first.wpilibj.examples.armsimulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;
@@ -33,7 +33,8 @@ class ArmSimulationTest {
 
   @BeforeEach
   void startThread() {
-    HAL.initialize(500, 0);
+    RobotBase.loadLibrariesAndInitializeHal();
+
     SimHooks.pauseTiming();
     DriverStationSim.resetData();
     m_robot = new Robot();

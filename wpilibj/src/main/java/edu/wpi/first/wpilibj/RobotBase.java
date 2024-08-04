@@ -4,17 +4,24 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.apriltag.jni.AprilTagJNI;
 import edu.wpi.first.cameraserver.CameraServerShared;
 import edu.wpi.first.cameraserver.CameraServerSharedStore;
+import edu.wpi.first.cscore.CameraServerJNI;
+import edu.wpi.first.cscore.OpenCvLoader;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.hal.JNIWrapper;
 import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.jni.WPIMathJNI;
+import edu.wpi.first.net.WPINetJNI;
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -391,13 +398,57 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
+   * Loads base native libraries needed by WPILib in all robot projects.
+   *
+   * @throws IOException If any library was not found
+   */
+  public static void loadBaseNativeLibraries() throws IOException {
+    WPIUtilJNI.forceLoad();
+    WPINetJNI.forceLoad();
+    WPIMathJNI.forceLoad();
+    JNIWrapper.forceLoad();
+    NetworkTablesJNI.forceLoad();
+  }
+
+  /**
+   * Sets the static load behavior for all of the vision libraries
+   *
+   * @param loadOnStaticInitialization true to load on static initialization, false to disable (default)
+   */
+  public static void setVisionNativeLibrariesStaticLoadBehavior(boolean loadOnStaticInitialization) {
+    CameraServerJNI.Helper.setExtractOnStaticLoad(true);
+    OpenCvLoader.Helper.setExtractOnStaticLoad(true);
+    AprilTagJNI.Helper.setExtractOnStaticLoad(true);
+  }
+
+  /**
+   * Configure all native libraries to match how a robot program works.
+   *
+   * <p>This will load all the base JNI libraries, set the vision libaries
+   * to load on static initialization, and initialize the HAL.
+   *
+   * @return HAL initialization result, true for success.
+   */
+  public static boolean loadLibrariesAndInitializeHal() {
+    try {
+      loadBaseNativeLibraries();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    setVisionNativeLibrariesStaticLoadBehavior(true);
+
+    return HAL.initialize(500, 0);
+  }
+
+  /**
    * Starting point for the applications.
    *
    * @param <T> Robot subclass.
    * @param robotSupplier Function that returns an instance of the robot subclass.
    */
   public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
-    if (!HAL.initialize(500, 0)) {
+    if (!loadLibrariesAndInitializeHal()) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }
 

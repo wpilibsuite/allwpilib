@@ -16,8 +16,8 @@ public class CameraServerJNI {
   static boolean libraryLoaded = false;
 
   /** Sets whether JNI should be loaded in the static block. */
-  public static class Helper {
-    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
+  public static final class Helper {
+    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(false);
 
     /**
      * Returns true if the JNI should be loaded in the static block.

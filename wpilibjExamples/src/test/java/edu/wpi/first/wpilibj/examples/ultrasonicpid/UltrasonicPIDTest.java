@@ -11,6 +11,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HAL.SimPeriodicBeforeCallback;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
@@ -50,7 +51,8 @@ class UltrasonicPIDTest {
 
   // We're not using @BeforeEach so m_startToObject gets initialized properly
   private void startThread() {
-    HAL.initialize(500, 0);
+    RobotBase.loadLibrariesAndInitializeHal();
+
     SimHooks.pauseTiming();
     DriverStationSim.resetData();
     m_robot = new Robot();
