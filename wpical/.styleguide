@@ -20,15 +20,19 @@ repoRootNameOverride {
 
 includeOtherLibs {
   ^GLFW
+  ^ceres/
   ^fmt/
   ^frc/
   ^glass/
+  ^glog/
   ^gtest/
   ^imgui
   ^implot\.h$
+  ^mrcal_wrapper\.h$
   ^networktables/
-  ^portable-file-dialogs\.h$
   ^ntcore
+  ^portable-file-dialogs\.h$
+  ^tagpose\.h$
   ^units/
   ^wpi/
   ^wpigui

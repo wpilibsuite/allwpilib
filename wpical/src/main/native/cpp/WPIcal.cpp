@@ -2,39 +2,37 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cameracalibration.h>
+#include <fieldcalibration.h>
+#include <fieldmap.h>
+#include <fmap.h>
+
 #include <iostream>
 #include <numbers>
 
-#include <fieldcalibration.h>
-#include <cameracalibration.h>
-
 #include <GLFW/glfw3.h>
 #include <imgui.h>
-#include <wpigui.h>
 #include <portable-file-dialogs.h>
-#include <fieldmap.h>
 #include <tagpose.h>
-#include <fmap.h>
+#include <wpigui.h>
 
 namespace gui = wpi::gui;
 
-const char *GetWPILibVersion();
+const char* GetWPILibVersion();
 
-namespace ov
-{
-  std::string_view GetResource_ov_16_png();
-  std::string_view GetResource_ov_32_png();
-  std::string_view GetResource_ov_48_png();
-  std::string_view GetResource_ov_64_png();
-  std::string_view GetResource_ov_128_png();
-  std::string_view GetResource_ov_256_png();
-  std::string_view GetResource_ov_512_png();
-} // namespace ov
+namespace ov {
+std::string_view GetResource_ov_16_png();
+std::string_view GetResource_ov_32_png();
+std::string_view GetResource_ov_48_png();
+std::string_view GetResource_ov_64_png();
+std::string_view GetResource_ov_128_png();
+std::string_view GetResource_ov_256_png();
+std::string_view GetResource_ov_512_png();
+}  // namespace ov
 
-void drawCheck()
-{
+void drawCheck() {
   ImGui::SameLine();
-  ImDrawList *draw_list = ImGui::GetWindowDrawList();
+  ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
   ImVec2 pos = ImGui::GetCursorScreenPos();
   float size = ImGui::GetFontSize();
@@ -46,12 +44,13 @@ void drawCheck()
   float thickness = 3.0f;
   draw_list->AddLine(p1, p2, IM_COL32(0, 255, 0, 255), thickness);
   draw_list->AddLine(p2, p3, IM_COL32(0, 255, 0, 255), thickness);
-  draw_list->AddLine(ImVec2(p1.x, p1.y + thickness * 0.5f), ImVec2(p2.x, p2.y + thickness * 0.5f), IM_COL32(0, 255, 0, 255), thickness);
+  draw_list->AddLine(ImVec2(p1.x, p1.y + thickness * 0.5f),
+                     ImVec2(p2.x, p2.y + thickness * 0.5f),
+                     IM_COL32(0, 255, 0, 255), thickness);
   ImGui::NewLine();
 }
 
-static void DisplayGui()
-{
+static void DisplayGui() {
   ImGui::GetStyle().WindowRounding = 0;
 
   // fill entire OS window with this window
@@ -69,8 +68,7 @@ static void DisplayGui()
   // main menu
   ImGui::BeginMenuBar();
   gui::EmitViewMenu();
-  if (ImGui::BeginMenu("View"))
-  {
+  if (ImGui::BeginMenu("View")) {
     ImGui::EndMenu();
   }
   ImGui::EndMenuBar();
@@ -109,8 +107,7 @@ static void DisplayGui()
   static fieldmap currentReferenceMap;
 
   // camera matrix selector button
-  if (ImGui::Button("Upload Camera Matrix"))
-  {
+  if (ImGui::Button("Upload Camera Matrix")) {
     configFileSelector = std::make_unique<pfd::open_file>(
         "Select Camera Matrix JSON", "",
         std::vector<std::string>{"JSON", "*.json"}, pfd::opt::none);
@@ -121,69 +118,57 @@ static void DisplayGui()
   ImGui::SameLine();
 
   // camera calibration button
-  if (ImGui::Button("Calibrate Camera"))
-  {
+  if (ImGui::Button("Calibrate Camera")) {
     selectedConfigFile.clear();
     ImGui::OpenPopup("Camera Calibration");
   }
 
-  if (configFileSelector)
-  {
+  if (configFileSelector) {
     auto selectedFiles = configFileSelector->result();
-    if (!selectedFiles.empty())
-    {
+    if (!selectedFiles.empty()) {
       selectedConfigFile = selectedFiles[0];
     }
     configFileSelector.reset();
   }
 
-  if (!selectedConfigFile.empty())
-  {
+  if (!selectedConfigFile.empty()) {
     drawCheck();
   }
 
   // field json selector button
-  if (ImGui::Button("Select Field Map JSON"))
-  {
+  if (ImGui::Button("Select Field Map JSON")) {
     fieldMapSelector = std::make_unique<pfd::open_file>(
         "Select Json File", "",
         std::vector<std::string>{"JSON Files", "*.json"}, pfd::opt::none);
   }
 
-  if (fieldMapSelector)
-  {
+  if (fieldMapSelector) {
     auto selectedFiles = fieldMapSelector->result();
-    if (!selectedFiles.empty())
-    {
+    if (!selectedFiles.empty()) {
       selectedFieldMap = selectedFiles[0];
     }
     fieldMapSelector.reset();
   }
 
-  if (!selectedFieldMap.empty())
-  {
+  if (!selectedFieldMap.empty()) {
     drawCheck();
   }
 
   // field calibration directory selector button
-  if (ImGui::Button("Select Field Calibration Folder"))
-  {
+  if (ImGui::Button("Select Field Calibration Folder")) {
     calibrationDirectorySelector = std::make_unique<pfd::select_folder>(
         "Select Field Calibration Folder", "");
   }
 
-  if (calibrationDirectorySelector)
-  {
+  if (calibrationDirectorySelector) {
     auto selectedFiles = calibrationDirectorySelector->result();
-    if (!selectedFiles.empty())
-    {
+    if (!selectedFiles.empty()) {
       selectedCalibrationDirectory = selectedFiles;
     }
     calibrationDirectorySelector.reset();
   }
 
-  if (!selectedCalibrationDirectory.empty())
-  {
+  if (!selectedCalibrationDirectory.empty()) {
     drawCheck();
   }
 
@@ -191,12 +176,9 @@ static void DisplayGui()
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
   ImGui::InputInt("Pinned Tag", &pinnedTag);
 
-  if (pinnedTag < 1)
-  {
+  if (pinnedTag < 1) {
     pinnedTag = 1;
-  }
-  else if (pinnedTag > 16)
-  {
+  } else if (pinnedTag > 16) {
     pinnedTag = 16;
   }
 
@@ -205,18 +187,14 @@ static void DisplayGui()
   ImGui::InputInt("Calibration FPS", &fps);
 
   // calibrate button
-  if (ImGui::Button("Calibrate!!!"))
-  {
+  if (ImGui::Button("Calibrate!!!")) {
     if (!selectedCalibrationDirectory.empty() && !selectedConfigFile.empty() &&
-        !selectedFieldMap.empty() && pinnedTag > 0 && pinnedTag <= 16)
-    {
-
-      downloadDirectorySelector = std::make_unique<pfd::select_folder>("Select Download Folder", "");
-      if (downloadDirectorySelector)
-      {
+        !selectedFieldMap.empty() && pinnedTag > 0 && pinnedTag <= 16) {
+      downloadDirectorySelector =
+          std::make_unique<pfd::select_folder>("Select Download Folder", "");
+      if (downloadDirectorySelector) {
         auto selectedFiles = downloadDirectorySelector->result();
-        if (!selectedFiles.empty())
-        {
+        if (!selectedFiles.empty()) {
           selectedDownloadFolder = selectedFiles;
         }
         downloadDirectorySelector.reset();
@@ -225,18 +203,15 @@ static void DisplayGui()
       calibrationJsonPath = selectedDownloadFolder + "/output.json";
 
       int calibrationOutput = fieldcalibration::calibrate(
-          selectedCalibrationDirectory.c_str(),
-          calibrationJsonPath,
+          selectedCalibrationDirectory.c_str(), calibrationJsonPath,
           selectedConfigFile, selectedFieldMap.c_str(), pinnedTag, fps);
 
-      if (calibrationOutput == -1)
-      {
+      if (calibrationOutput == -1) {
         ImGui::OpenPopup("Error");
-      }
-      else if (calibrationOutput == 0)
-      {
+      } else if (calibrationOutput == 0) {
         std::ifstream caljsonpath(calibrationJsonPath);
-        std::string fmap = fmap::convertfmap(nlohmann::json::parse(caljsonpath));
+        std::string fmap =
+            fmap::convertfmap(nlohmann::json::parse(caljsonpath));
         std::ofstream out(selectedDownloadFolder + "/output.fmap");
         out << fmap;
         out.close();
@@ -245,41 +220,31 @@ static void DisplayGui()
       }
     }
   }
-  if (ImGui::Button("Visualize"))
-  {
+  if (ImGui::Button("Visualize")) {
     ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
     ImGui::OpenPopup("Visualize Calibration");
   }
   if (selectedCalibrationDirectory.empty() || selectedConfigFile.empty() ||
-      selectedFieldMap.empty())
-  {
+      selectedFieldMap.empty()) {
     ImGui::TextWrapped(
         "Some inputs are empty! please enter your camera calibration video, "
         "field map, and field calibration directory");
-  }
-  else if (!(pinnedTag > 0 && pinnedTag <= 16))
-  {
+  } else if (!(pinnedTag > 0 && pinnedTag <= 16)) {
     ImGui::TextWrapped("Make sure the pinned tag is a valid april tag (1-16)");
-  }
-  else if (fps < 0)
-  {
+  } else if (fps < 0) {
     ImGui::TextWrapped("Make sure FPS is at least 1");
-  }
-  else
-  {
+  } else {
     ImGui::TextWrapped("Calibration Ready");
   }
 
   // error popup window
   if (ImGui::BeginPopupModal("Error", NULL,
-                             ImGuiWindowFlags_AlwaysAutoResize))
-  {
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::TextWrapped(
         "Please ensure that the detection FPS is smaller than the field video "
         "FPS.");
     ImGui::Separator();
-    if (ImGui::Button("OK", ImVec2(120, 0)))
-    {
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
@@ -287,13 +252,10 @@ static void DisplayGui()
 
   // successful field calibration popup window
   if (ImGui::BeginPopupModal("Success", NULL,
-                             ImGuiWindowFlags_AlwaysAutoResize))
-  {
-    ImGui::TextWrapped(
-        "Success, output JSON generated in selected directory");
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::TextWrapped("Success, output JSON generated in selected directory");
     ImGui::Separator();
-    if (ImGui::Button("OK", ImVec2(120, 0)))
-    {
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
@@ -301,10 +263,8 @@ static void DisplayGui()
 
   // camera calibration popup window
   if (ImGui::BeginPopupModal("Camera Calibration", NULL,
-                             ImGuiWindowFlags_AlwaysAutoResize))
-  {
-    if (ImGui::Button("MRcal"))
-    {
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::Button("MRcal")) {
       mrcal = true;
     }
 
@@ -312,26 +272,21 @@ static void DisplayGui()
     ImGui::Text("or");
     ImGui::SameLine();
 
-    if (ImGui::Button("OpenCV"))
-    {
+    if (ImGui::Button("OpenCV")) {
       mrcal = false;
     }
 
-    if (mrcal)
-    {
-      if (ImGui::Button("Select Camera Calibration Video"))
-      {
+    if (mrcal) {
+      if (ImGui::Button("Select Camera Calibration Video")) {
         configFileSelector = std::make_unique<pfd::open_file>(
             "Select Camera Calibration Video", "",
             std::vector<std::string>{"Video Files", "*.mp4 *.mov *.m4v *.mkv"},
             pfd::opt::none);
       }
 
-      if (configFileSelector)
-      {
+      if (configFileSelector) {
         auto selectedFiles = configFileSelector->result();
-        if (!selectedFiles.empty())
-        {
+        if (!selectedFiles.empty()) {
           selectedConfigFile = selectedFiles[0];
         }
         configFileSelector.reset();
@@ -351,23 +306,19 @@ static void DisplayGui()
       ImGui::InputDouble("Focal Length Estimate (pixels)", &focalLengthGuess);
 
       ImGui::Separator();
-      if (ImGui::Button("Calibrate") && !selectedConfigFile.empty())
-      {
+      if (ImGui::Button("Calibrate") && !selectedConfigFile.empty()) {
         std::cout << "calibration button pressed" << std::endl;
-        nlohmann::json cameraJson =
-            cameracalibration::calibrate(selectedConfigFile.c_str(), squareWidth,
-                                         boardWidth, boardHeight, imagerWidth, imagerHeight, focalLengthGuess);
+        nlohmann::json cameraJson = cameracalibration::calibrate(
+            selectedConfigFile.c_str(), squareWidth, boardWidth, boardHeight,
+            imagerWidth, imagerHeight, focalLengthGuess);
 
         std::string output_filename = selectedConfigFile;
 
         size_t pos = output_filename.rfind('/');
 
-        if (pos != std::string::npos)
-        {
+        if (pos != std::string::npos) {
           output_filename = output_filename.erase(pos);
-        }
-        else
-        {
+        } else {
           pos = output_filename.rfind('\\');
           output_filename = output_filename.erase(pos);
         }
@@ -378,22 +329,17 @@ static void DisplayGui()
         selectedConfigFile = output_filename;
         ImGui::CloseCurrentPopup();
       }
-    }
-    else
-    {
-      if (ImGui::Button("Select Camera Calibration Video"))
-      {
+    } else {
+      if (ImGui::Button("Select Camera Calibration Video")) {
         configFileSelector = std::make_unique<pfd::open_file>(
             "Select Camera Calibration Video", "",
             std::vector<std::string>{"Video Files", "*.mp4 *.mov *.m4v *.mkv"},
             pfd::opt::none);
       }
 
-      if (configFileSelector)
-      {
+      if (configFileSelector) {
         auto selectedFiles = configFileSelector->result();
-        if (!selectedFiles.empty())
-        {
+        if (!selectedFiles.empty()) {
           selectedConfigFile = selectedFiles[0];
         }
         configFileSelector.reset();
@@ -409,23 +355,19 @@ static void DisplayGui()
       ImGui::InputInt("Board Height (squares)", &boardHeight);
 
       ImGui::Separator();
-      if (ImGui::Button("Calibrate") && !selectedConfigFile.empty())
-      {
+      if (ImGui::Button("Calibrate") && !selectedConfigFile.empty()) {
         std::cout << "calibration button pressed" << std::endl;
-        nlohmann::json cameraJson =
-            cameracalibration::calibrate(selectedConfigFile.c_str(), squareWidth, markerWidth,
-                                         boardWidth, boardHeight);
+        nlohmann::json cameraJson = cameracalibration::calibrate(
+            selectedConfigFile.c_str(), squareWidth, markerWidth, boardWidth,
+            boardHeight);
 
         std::string output_filename = selectedConfigFile;
 
         size_t pos = output_filename.rfind('/');
 
-        if (pos != std::string::npos)
-        {
+        if (pos != std::string::npos) {
           output_filename = output_filename.erase(pos);
-        }
-        else
-        {
+        } else {
           pos = output_filename.rfind('\\');
           output_filename = output_filename.erase(pos);
         }
@@ -439,8 +381,7 @@ static void DisplayGui()
     }
 
     ImGui::SameLine();
-    if (ImGui::Button("Close"))
-    {
+    if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
@@ -449,33 +390,29 @@ static void DisplayGui()
   // visualize calibration popup
   ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
   if (ImGui::BeginPopupModal("Visualize Calibration", NULL,
-                             ImGuiWindowFlags_AlwaysAutoResize))
-  {
-
-    if (ImGui::Button("Load Calibrated Field"))
-    {
-      calibrationJsonPath = std::make_unique<pfd::open_file>(
-                                "Select Json File", "",
-                                std::vector<std::string>{"JSON Files", "*.json"}, pfd::opt::none)
-                                ->result()[0];
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::Button("Load Calibrated Field")) {
+      calibrationJsonPath =
+          std::make_unique<pfd::open_file>(
+              "Select Json File", "",
+              std::vector<std::string>{"JSON Files", "*.json"}, pfd::opt::none)
+              ->result()[0];
     }
 
-    if (!calibrationJsonPath.empty())
-    {
+    if (!calibrationJsonPath.empty()) {
       ImGui::SameLine();
       drawCheck();
     }
 
-    if (ImGui::Button("Load Reference Field"))
-    {
-      selectedFieldMap = std::make_unique<pfd::open_file>(
-                             "Select Json File", "",
-                             std::vector<std::string>{"JSON Files", "*.json"}, pfd::opt::none)
-                             ->result()[0];
+    if (ImGui::Button("Load Reference Field")) {
+      selectedFieldMap =
+          std::make_unique<pfd::open_file>(
+              "Select Json File", "",
+              std::vector<std::string>{"JSON Files", "*.json"}, pfd::opt::none)
+              ->result()[0];
     }
 
-    if (!selectedFieldMap.empty())
-    {
+    if (!selectedFieldMap.empty()) {
       ImGui::SameLine();
       drawCheck();
     }
@@ -485,54 +422,72 @@ static void DisplayGui()
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
     ImGui::InputInt("Reference Tag", &referenceTag);
 
-    if (focusedTag < 1)
-    {
+    if (focusedTag < 1) {
       focusedTag = 1;
-    }
-    else if (focusedTag > 16)
-    {
+    } else if (focusedTag > 16) {
       focusedTag = 16;
     }
 
-    if (referenceTag < 1)
-    {
+    if (referenceTag < 1) {
       referenceTag = 1;
-    }
-    else if (referenceTag > 16)
-    {
+    } else if (referenceTag > 16) {
       referenceTag = 16;
     }
 
-    if (!calibrationJsonPath.empty() && !selectedFieldMap.empty())
-    {
+    if (!calibrationJsonPath.empty() && !selectedFieldMap.empty()) {
       std::ifstream calJson(calibrationJsonPath);
       std::ifstream refJson(selectedFieldMap);
 
       currentCalibrationMap = fieldmap(nlohmann::json::parse(calJson));
       currentReferenceMap = fieldmap(nlohmann::json::parse(refJson));
 
-      double xDiff = currentReferenceMap.getTag(focusedTag).xPos - currentCalibrationMap.getTag(focusedTag).xPos;
-      double yDiff = currentReferenceMap.getTag(focusedTag).yPos - currentCalibrationMap.getTag(focusedTag).yPos;
-      double zDiff = currentReferenceMap.getTag(focusedTag).zPos - currentCalibrationMap.getTag(focusedTag).zPos;
-      double yawDiff = currentReferenceMap.getTag(focusedTag).yawRot - currentCalibrationMap.getTag(focusedTag).yawRot;
-      double pitchDiff = currentReferenceMap.getTag(focusedTag).pitchRot - currentCalibrationMap.getTag(focusedTag).pitchRot;
-      double rollDiff = currentReferenceMap.getTag(focusedTag).rollRot - currentCalibrationMap.getTag(focusedTag).rollRot;
+      double xDiff = currentReferenceMap.getTag(focusedTag).xPos -
+                     currentCalibrationMap.getTag(focusedTag).xPos;
+      double yDiff = currentReferenceMap.getTag(focusedTag).yPos -
+                     currentCalibrationMap.getTag(focusedTag).yPos;
+      double zDiff = currentReferenceMap.getTag(focusedTag).zPos -
+                     currentCalibrationMap.getTag(focusedTag).zPos;
+      double yawDiff = currentReferenceMap.getTag(focusedTag).yawRot -
+                       currentCalibrationMap.getTag(focusedTag).yawRot;
+      double pitchDiff = currentReferenceMap.getTag(focusedTag).pitchRot -
+                         currentCalibrationMap.getTag(focusedTag).pitchRot;
+      double rollDiff = currentReferenceMap.getTag(focusedTag).rollRot -
+                        currentCalibrationMap.getTag(focusedTag).rollRot;
 
-      double xRef = currentCalibrationMap.getTag(referenceTag).xPos - currentCalibrationMap.getTag(focusedTag).xPos;
-      double yRef = currentCalibrationMap.getTag(referenceTag).yPos - currentCalibrationMap.getTag(focusedTag).yPos;
-      double zRef = currentCalibrationMap.getTag(referenceTag).zPos - currentCalibrationMap.getTag(focusedTag).zPos;
+      double xRef = currentCalibrationMap.getTag(referenceTag).xPos -
+                    currentCalibrationMap.getTag(focusedTag).xPos;
+      double yRef = currentCalibrationMap.getTag(referenceTag).yPos -
+                    currentCalibrationMap.getTag(focusedTag).yPos;
+      double zRef = currentCalibrationMap.getTag(referenceTag).zPos -
+                    currentCalibrationMap.getTag(focusedTag).zPos;
 
       ImGui::TextWrapped("X Difference: %s (m)", std::to_string(xDiff).c_str());
       ImGui::TextWrapped("Y Difference: %s (m)", std::to_string(yDiff).c_str());
       ImGui::TextWrapped("Z Difference: %s (m)", std::to_string(zDiff).c_str());
 
-      // ImGui::TextWrapped("Yaw %s°", std::to_string(currentCalibrationMap.minimizeAngle(currentCalibrationMap.getTag(focusedTag).yawRot * (180.0 / std::numbers::pi))));
-      // ImGui::TextWrapped("Pitch %s°", std::to_string(currentCalibrationMap.minimizeAngle(currentCalibrationMap.getTag(focusedTag).pitchRot * (180.0 / std::numbers::pi))));
-      // ImGui::TextWrapped("Roll %s°", std::to_string(currentCalibrationMap.minimizeAngle(currentCalibrationMap.getTag(focusedTag).rollRot * (180.0 / std::numbers::pi))));
+      // ImGui::TextWrapped("Yaw %s°",
+      // std::to_string(currentCalibrationMap.minimizeAngle(currentCalibrationMap.getTag(focusedTag).yawRot
+      // * (180.0 / std::numbers::pi)))); ImGui::TextWrapped("Pitch %s°",
+      // std::to_string(currentCalibrationMap.minimizeAngle(currentCalibrationMap.getTag(focusedTag).pitchRot
+      // * (180.0 / std::numbers::pi)))); ImGui::TextWrapped("Roll %s°",
+      // std::to_string(currentCalibrationMap.minimizeAngle(currentCalibrationMap.getTag(focusedTag).rollRot
+      // * (180.0 / std::numbers::pi))));
 
-      ImGui::TextWrapped("Yaw Difference %s°", std::to_string(currentCalibrationMap.minimizeAngle(yawDiff * (180.0 / std::numbers::pi))).c_str());
-      ImGui::TextWrapped("Pitch Difference %s°", std::to_string(currentCalibrationMap.minimizeAngle(pitchDiff * (180.0 / std::numbers::pi))).c_str());
-      ImGui::TextWrapped("Roll Difference %s°", std::to_string(currentCalibrationMap.minimizeAngle(rollDiff * (180.0 / std::numbers::pi))).c_str());
+      ImGui::TextWrapped(
+          "Yaw Difference %s°",
+          std::to_string(currentCalibrationMap.minimizeAngle(
+                             yawDiff * (180.0 / std::numbers::pi)))
+              .c_str());
+      ImGui::TextWrapped(
+          "Pitch Difference %s°",
+          std::to_string(currentCalibrationMap.minimizeAngle(
+                             pitchDiff * (180.0 / std::numbers::pi)))
+              .c_str());
+      ImGui::TextWrapped(
+          "Roll Difference %s°",
+          std::to_string(currentCalibrationMap.minimizeAngle(
+                             rollDiff * (180.0 / std::numbers::pi)))
+              .c_str());
 
       ImGui::NewLine();
 
@@ -541,8 +496,7 @@ static void DisplayGui()
       ImGui::TextWrapped("Z Reference: %s (m)", std::to_string(zRef).c_str());
     }
 
-    if (ImGui::Button("Close"))
-    {
+    if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
@@ -553,22 +507,19 @@ static void DisplayGui()
 
 #ifdef _WIN32
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                      LPSTR pCmdLine, int nCmdShow)
-{
+                      LPSTR pCmdLine, int nCmdShow) {
   // AllocConsole();
-  // FILE *f;
+  // std::FILE *f;
   // freopen_s(&f, "CONOUT$", "w", stdout);
   // freopen_s(&f, "CONOUT$", "w", stderr);
   // freopen_s(&f, "CONIN$", "r", stdin);
   int argc = __argc;
-  char **argv = __argv;
+  char** argv = __argv;
 #else
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
 #endif
   std::string_view saveDir;
-  if (argc == 2)
-  {
+  if (argc == 2) {
     saveDir = argv[1];
   }
 
