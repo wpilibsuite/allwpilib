@@ -9,8 +9,8 @@ Subject: [PATCH 4/5] Use wpi::SmallVector
  include/sleipnir/autodiff/ExpressionGraph.hpp     | 15 ++++++++-------
  include/sleipnir/autodiff/Hessian.hpp             |  4 ++--
  include/sleipnir/autodiff/Jacobian.hpp            | 10 +++++-----
+ include/sleipnir/autodiff/Variable.hpp            | 10 +++++-----
  include/sleipnir/autodiff/VariableMatrix.hpp      |  4 ++--
- include/sleipnir/optimization/Constraints.hpp     | 11 ++++++-----
  include/sleipnir/optimization/Multistart.hpp      |  7 ++++---
  .../sleipnir/optimization/OptimizationProblem.hpp |  8 ++++----
  include/sleipnir/util/Pool.hpp                    |  7 ++++---
@@ -19,7 +19,7 @@ Subject: [PATCH 4/5] Use wpi::SmallVector
  src/optimization/solver/InteriorPoint.cpp         |  4 ++--
  .../solver/util/FeasibilityRestoration.hpp        | 10 +++++-----
  src/optimization/solver/util/Filter.hpp           |  4 ++--
- 15 files changed, 51 insertions(+), 44 deletions(-)
+ 15 files changed, 50 insertions(+), 44 deletions(-)
 
 diff --git a/include/.styleguide b/include/.styleguide
 index 6a7f8ed28f9cb037c9746a7e0ef5e110481d9825..efa36cee1fb593ae810032340c64f1854fbbc523 100644
@@ -32,7 +32,7 @@ index 6a7f8ed28f9cb037c9746a7e0ef5e110481d9825..efa36cee1fb593ae810032340c64f185
 +  ^wpi/
  }
 diff --git a/include/sleipnir/autodiff/Expression.hpp b/include/sleipnir/autodiff/Expression.hpp
-index e65b689559d01324fc4218c26144521832719025..2be666e7c87731d2633576d4a066efba4906502d 100644
+index dff8e2a6ef24413e3e6356bf0ec57286e50654cf..bdbeb4730223f88cfdc0c424a8f7b852b34742f7 100644
 --- a/include/sleipnir/autodiff/Expression.hpp
 +++ b/include/sleipnir/autodiff/Expression.hpp
 @@ -11,11 +11,12 @@
@@ -49,7 +49,7 @@ index e65b689559d01324fc4218c26144521832719025..2be666e7c87731d2633576d4a066efba
  
  namespace sleipnir::detail {
  
-@@ -415,7 +416,7 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
+@@ -427,7 +428,7 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
    // Expression destructor when expr's refcount reaches zero can cause a stack
    // overflow. Instead, we iterate over its children to decrement their
    // refcounts and deallocate them.
@@ -196,53 +196,27 @@ index ac00c11ef8c947cbe95c58081bdbfb42bf901051..0c660156c80f94539383b8f0d01d7853
  
    Profiler m_profiler;
  };
-diff --git a/include/sleipnir/autodiff/VariableMatrix.hpp b/include/sleipnir/autodiff/VariableMatrix.hpp
-index a7e89e5d7a24fb1295eb3ff04d8f22824c0884f1..bac9fe4f5ecf08bb4c0e3dfa8822125bcf854803 100644
---- a/include/sleipnir/autodiff/VariableMatrix.hpp
-+++ b/include/sleipnir/autodiff/VariableMatrix.hpp
-@@ -11,13 +11,13 @@
+diff --git a/include/sleipnir/autodiff/Variable.hpp b/include/sleipnir/autodiff/Variable.hpp
+index c04d629f482efe59497570ca1fd9b09a4af2ae1e..d192fb96e7984b7c0ca30262668c41e5e84ca34e 100644
+--- a/include/sleipnir/autodiff/Variable.hpp
++++ b/include/sleipnir/autodiff/Variable.hpp
+@@ -10,6 +10,7 @@
  #include <vector>
  
  #include <Eigen/Core>
 +#include <wpi/SmallVector.h>
  
- #include "sleipnir/autodiff/Variable.hpp"
- #include "sleipnir/autodiff/VariableBlock.hpp"
- #include "sleipnir/util/Assert.hpp"
- #include "sleipnir/util/FunctionRef.hpp"
- #include "sleipnir/util/SymbolExports.hpp"
--#include "sleipnir/util/small_vector.hpp"
- 
- namespace sleipnir {
- 
-@@ -884,7 +884,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
-   }
- 
-  private:
--  small_vector<Variable> m_storage;
-+  wpi::SmallVector<Variable> m_storage;
-   int m_rows = 0;
-   int m_cols = 0;
- };
-diff --git a/include/sleipnir/optimization/Constraints.hpp b/include/sleipnir/optimization/Constraints.hpp
-index 80da66bfef55bfc54cfdcd0478432658f60f7610..b940fcc4deb76c282b27564332db5e5935fbfbc6 100644
---- a/include/sleipnir/optimization/Constraints.hpp
-+++ b/include/sleipnir/optimization/Constraints.hpp
-@@ -8,11 +8,12 @@
- #include <type_traits>
- #include <vector>
- 
-+#include <wpi/SmallVector.h>
-+
- #include "sleipnir/autodiff/Variable.hpp"
- #include "sleipnir/util/Assert.hpp"
+ #include "sleipnir/autodiff/Expression.hpp"
+ #include "sleipnir/autodiff/ExpressionGraph.hpp"
+@@ -17,7 +18,6 @@
  #include "sleipnir/util/Concepts.hpp"
+ #include "sleipnir/util/Print.hpp"
  #include "sleipnir/util/SymbolExports.hpp"
 -#include "sleipnir/util/small_vector.hpp"
  
  namespace sleipnir {
  
-@@ -32,8 +33,8 @@ template <typename LHS, typename RHS>
+@@ -445,8 +445,8 @@ template <typename LHS, typename RHS>
            (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
            (!std::same_as<std::decay_t<LHS>, double> ||
             !std::same_as<std::decay_t<RHS>, double>)
@@ -253,7 +227,7 @@ index 80da66bfef55bfc54cfdcd0478432658f60f7610..b940fcc4deb76c282b27564332db5e59
  
    if constexpr (ScalarLike<std::decay_t<LHS>> &&
                  ScalarLike<std::decay_t<RHS>>) {
-@@ -121,7 +122,7 @@ small_vector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
+@@ -534,7 +534,7 @@ small_vector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
   */
  struct SLEIPNIR_DLLEXPORT EqualityConstraints {
    /// A vector of scalar equality constraints.
@@ -262,7 +236,7 @@ index 80da66bfef55bfc54cfdcd0478432658f60f7610..b940fcc4deb76c282b27564332db5e59
  
    /**
     * Concatenates multiple equality constraints.
-@@ -183,7 +184,7 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
+@@ -596,7 +596,7 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
   */
  struct SLEIPNIR_DLLEXPORT InequalityConstraints {
    /// A vector of scalar inequality constraints.
@@ -271,6 +245,35 @@ index 80da66bfef55bfc54cfdcd0478432658f60f7610..b940fcc4deb76c282b27564332db5e59
  
    /**
     * Concatenates multiple inequality constraints.
+diff --git a/include/sleipnir/autodiff/VariableMatrix.hpp b/include/sleipnir/autodiff/VariableMatrix.hpp
+index 47452b8988b3a1a96a78d28644200b1c4cdc89c9..57b09913d15e9590873ad7bf62e2baff9fbc5df9 100644
+--- a/include/sleipnir/autodiff/VariableMatrix.hpp
++++ b/include/sleipnir/autodiff/VariableMatrix.hpp
+@@ -11,6 +11,7 @@
+ #include <vector>
+ 
+ #include <Eigen/Core>
++#include <wpi/SmallVector.h>
+ 
+ #include "sleipnir/autodiff/Slice.hpp"
+ #include "sleipnir/autodiff/Variable.hpp"
+@@ -18,7 +19,6 @@
+ #include "sleipnir/util/Assert.hpp"
+ #include "sleipnir/util/FunctionRef.hpp"
+ #include "sleipnir/util/SymbolExports.hpp"
+-#include "sleipnir/util/small_vector.hpp"
+ 
+ namespace sleipnir {
+ 
+@@ -946,7 +946,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+   }
+ 
+  private:
+-  small_vector<Variable> m_storage;
++  wpi::SmallVector<Variable> m_storage;
+   int m_rows = 0;
+   int m_cols = 0;
+ };
 diff --git a/include/sleipnir/optimization/Multistart.hpp b/include/sleipnir/optimization/Multistart.hpp
 index 8055713a2492a9c8473f047a2fb9fe7ca57753c3..09b1b2f3bf33c35ae0aeddb9b5d47c0d80c68cec 100644
 --- a/include/sleipnir/optimization/Multistart.hpp
@@ -305,7 +308,7 @@ index 8055713a2492a9c8473f047a2fb9fe7ca57753c3..09b1b2f3bf33c35ae0aeddb9b5d47c0d
  
    for (auto& future : futures) {
 diff --git a/include/sleipnir/optimization/OptimizationProblem.hpp b/include/sleipnir/optimization/OptimizationProblem.hpp
-index 7d387e02af386a3cbfaf0294d5be78e73fb05628..b78b3761898088235cf335bf5cc111f4cafbe29a 100644
+index 28b2943f5842229335e79eae14abbda6ff5b7000..e812fa5e3454903d4dfb8572539ebf1b506bdf11 100644
 --- a/include/sleipnir/optimization/OptimizationProblem.hpp
 +++ b/include/sleipnir/optimization/OptimizationProblem.hpp
 @@ -11,6 +11,7 @@
@@ -316,7 +319,7 @@ index 7d387e02af386a3cbfaf0294d5be78e73fb05628..b78b3761898088235cf335bf5cc111f4
  
  #include "sleipnir/autodiff/Variable.hpp"
  #include "sleipnir/autodiff/VariableMatrix.hpp"
-@@ -22,7 +23,6 @@
+@@ -21,7 +22,6 @@
  #include "sleipnir/optimization/solver/InteriorPoint.hpp"
  #include "sleipnir/util/Print.hpp"
  #include "sleipnir/util/SymbolExports.hpp"
@@ -324,7 +327,7 @@ index 7d387e02af386a3cbfaf0294d5be78e73fb05628..b78b3761898088235cf335bf5cc111f4
  
  namespace sleipnir {
  
-@@ -359,16 +359,16 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
+@@ -358,16 +358,16 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
   private:
    // The list of decision variables, which are the root of the problem's
    // expression tree
