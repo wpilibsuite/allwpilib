@@ -25,6 +25,12 @@ public class REVPHStickyFaults {
   /** The device's CAN controller experienced a "Bus Off" event. */
   public final boolean CanBusOff;
 
+  /** The hardware on the device has malfunctioned. */
+  public final boolean HardwareFault;
+
+  /** The firmware on the device has malfunctioned. */
+  public final boolean FirmwareFault;
+
   /** The device has rebooted. */
   public final boolean HasReset;
 
@@ -40,6 +46,8 @@ public class REVPHStickyFaults {
     Brownout = (faults & 0x8) != 0;
     CanWarning = (faults & 0x10) != 0;
     CanBusOff = (faults & 0x20) != 0;
-    HasReset = (faults & 0x40) != 0;
+    HardwareFault = (faults & 0x40) != 0;
+    FirmwareFault = (faults & 0x80) != 0;
+    HasReset = (faults & 0x100) != 0;
   }
 }

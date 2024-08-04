@@ -10,9 +10,11 @@
 
 Elevator::Elevator()
     : frc2::PIDSubsystem{frc::PIDController{kP_real, kI_real, 0}} {
-#ifdef SIMULATION  // Check for simulation and update PID values
-  GetPIDController()->SetPID(kP_simulation, kI_simulation, 0, 0);
-#endif
+  if constexpr (frc::RobotBase::IsSimulation()) {
+    // Check for simulation and update PID values
+    GetController().SetPID(kP_simulation, kI_simulation, 0);
+  }
+
   m_controller.SetTolerance(0.005);
 
   SetName("Elevator");

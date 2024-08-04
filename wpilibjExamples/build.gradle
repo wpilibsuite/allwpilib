@@ -186,6 +186,7 @@ model {
                                         excludeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
                                         setFailOnNoMatchingTests(false)
                                     }
+                                    testTask.testClassesDirs = sourceSets.test.output.classesDirs
                                     testTask.classpath = sourceSets.test.runtimeClasspath
                                     testTask.dependsOn it.tasks.install
 

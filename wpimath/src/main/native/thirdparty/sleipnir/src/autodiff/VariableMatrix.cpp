@@ -4,30 +4,6 @@
 
 #include <Eigen/QR>
 
-namespace Eigen {
-
-template <>
-struct NumTraits<sleipnir::Variable> : NumTraits<double> {
-  using Real = sleipnir::Variable;
-  using NonInteger = sleipnir::Variable;
-  using Nested = sleipnir::Variable;
-
-  enum {
-    IsComplex = 0,
-    IsInteger = 0,
-    IsSigned = 1,
-    RequireInitialization = 1,
-    ReadCost = 1,
-    AddCost = 3,
-    MulCost = 3
-  };
-};
-
-}  // namespace Eigen
-
-// For Variable equality operator
-#include "sleipnir/optimization/Constraints.hpp"
-
 namespace sleipnir {
 
 VariableMatrix Solve(const VariableMatrix& A, const VariableMatrix& B) {

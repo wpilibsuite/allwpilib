@@ -64,7 +64,7 @@ class gemv_traits {
 
 /* Optimized col-major matrix * vector product:
  * This algorithm processes the matrix per vertical panels,
- * which are then processed horizontally per chunck of 8*PacketSize x 1 vertical segments.
+ * which are then processed horizontally per chunk of 8*PacketSize x 1 vertical segments.
  *
  * Mixing type logic: C += alpha * A * B
  *  |  A  |  B  |alpha| comments
@@ -112,7 +112,7 @@ general_matrix_vector_product<Index, LhsScalar, LhsMapper, ColMajor, ConjugateLh
   eigen_internal_assert(resIncr == 1);
 
   // The following copy tells the compiler that lhs's attributes are not modified outside this function
-  // This helps GCC to generate propoer code.
+  // This helps GCC to generate proper code.
   LhsMapper lhs(alhs);
 
   conj_helper<LhsScalar, RhsScalar, ConjugateLhs, ConjugateRhs> cj;
@@ -302,7 +302,7 @@ general_matrix_vector_product<Index, LhsScalar, LhsMapper, RowMajor, ConjugateLh
                               Version>::run(Index rows, Index cols, const LhsMapper& alhs, const RhsMapper& rhs,
                                             ResScalar* res, Index resIncr, ResScalar alpha) {
   // The following copy tells the compiler that lhs's attributes are not modified outside this function
-  // This helps GCC to generate propoer code.
+  // This helps GCC to generate proper code.
   LhsMapper lhs(alhs);
 
   eigen_internal_assert(rhs.stride() == 1);

@@ -17,6 +17,6 @@ modifiableFileExclude {
 includeOtherLibs {
   ^Eigen/
   ^catch2/
-  ^pybind11/
+  ^nanobind/
   ^sleipnir/
 }

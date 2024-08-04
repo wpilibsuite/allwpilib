@@ -1655,7 +1655,7 @@ EIGEN_STRONG_INLINE void twoprod(const Packet& x_hi, const Packet& x_lo, const P
 }
 
 // This function implements the division of double word {x_hi, x_lo}
-// by float y. This is Algorithm 15 from "Tight and rigourous error bounds
+// by float y. This is Algorithm 15 from "Tight and rigorous error bounds
 // for basic building blocks of double-word arithmetic", Joldes, Muller, & Popescu,
 // 2017. https://hal.archives-ouvertes.fr/hal-01351529
 template <typename Packet>
@@ -2376,7 +2376,7 @@ template <typename Packet, typename ScalarExponent,
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet handle_negative_exponent(const Packet& x, const ScalarExponent& exponent) {
   using Scalar = typename unpacket_traits<Packet>::type;
 
-  // singed integer base, signed integer exponent case
+  // signed integer base, signed integer exponent case
 
   // This routine handles negative exponents.
   // The return value is either 0, 1, or -1.

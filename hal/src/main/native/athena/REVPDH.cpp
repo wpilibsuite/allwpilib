@@ -624,6 +624,8 @@ void HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
   stickyFaults->brownout = status4.sticky_brownout_fault;
   stickyFaults->canWarning = status4.sticky_can_warning_fault;
   stickyFaults->canBusOff = status4.sticky_can_bus_off_fault;
+  stickyFaults->hardwareFault = status4.sticky_hardware_fault;
+  stickyFaults->firmwareFault = status4.sticky_firmware_fault;
   stickyFaults->hasReset = status4.sticky_has_reset_fault;
 }
 

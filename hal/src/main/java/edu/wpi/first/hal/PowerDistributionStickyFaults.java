@@ -91,6 +91,12 @@ public class PowerDistributionStickyFaults {
   /** The device's CAN controller experienced a "Bus Off" event. */
   public final boolean CanBusOff;
 
+  /** The hardware on the device has malfunctioned. */
+  public final boolean HardwareFault;
+
+  /** The firmware on the device has malfunctioned. */
+  public final boolean FirmwareFault;
+
   /** The device has rebooted. */
   public final boolean HasReset;
 
@@ -166,6 +172,8 @@ public class PowerDistributionStickyFaults {
     Brownout = (faults & 0x1000000) != 0;
     CanWarning = (faults & 0x2000000) != 0;
     CanBusOff = (faults & 0x4000000) != 0;
-    HasReset = (faults & 0x8000000) != 0;
+    HardwareFault = (faults & 0x8000000) != 0;
+    FirmwareFault = (faults & 0x10000000) != 0;
+    HasReset = (faults & 0x20000000) != 0;
   }
 }

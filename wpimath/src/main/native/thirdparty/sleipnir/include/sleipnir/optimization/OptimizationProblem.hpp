@@ -15,7 +15,6 @@
 
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableMatrix.hpp"
-#include "sleipnir/optimization/Constraints.hpp"
 #include "sleipnir/optimization/SolverConfig.hpp"
 #include "sleipnir/optimization/SolverExitCondition.hpp"
 #include "sleipnir/optimization/SolverIterationInfo.hpp"

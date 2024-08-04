@@ -810,7 +810,7 @@ struct diagonal_product_evaluator_base : evaluator_base<Derived> {
                     : (Derived::MaxColsAtCompileTime == 1 && Derived::MaxRowsAtCompileTime != 1) ? ColMajor
                     : MatrixFlags & RowMajorBit                                                  ? RowMajor
                                                                                                  : ColMajor,
-    SameStorageOrder_ = StorageOrder_ == (MatrixFlags & RowMajorBit ? RowMajor : ColMajor),
+    SameStorageOrder_ = int(StorageOrder_) == ((MatrixFlags & RowMajorBit) ? RowMajor : ColMajor),
 
     ScalarAccessOnDiag_ = !((int(StorageOrder_) == ColMajor && int(ProductOrder) == OnTheLeft) ||
                             (int(StorageOrder_) == RowMajor && int(ProductOrder) == OnTheRight)),

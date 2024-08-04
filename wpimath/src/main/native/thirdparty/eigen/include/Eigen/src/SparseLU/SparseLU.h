@@ -257,7 +257,7 @@ class SparseLU : public SparseSolverBase<SparseLU<MatrixType_, OrderingType_>>,
   /** \brief Give the number of rows.
    */
   inline Index rows() const { return m_mat.rows(); }
-  /** \brief Give the numver of columns.
+  /** \brief Give the number of columns.
    */
   inline Index cols() const { return m_mat.cols(); }
   /** \brief Let you set that the pattern of the input matrix is symmetric
@@ -600,7 +600,7 @@ void SparseLU<MatrixType, OrderingType>::analyzePattern(const MatrixType& mat) {
  * This exit was 0 if successful factorization.
  * > 0 if info = i, and i is been completed, but the factor U is exactly singular,
  * and division by zero will occur if it is used to solve a system of equation.
- * > A->ncol: number of bytes allocated when memory allocation failure occured, plus A->ncol.
+ * > A->ncol: number of bytes allocated when memory allocation failure occurred, plus A->ncol.
  * If lwork = -1, it is the estimated amount of space needed, plus A->ncol.
  *
  * It seems that A was the name of the matrix in the past.

@@ -311,6 +311,10 @@ class PowerDistribution : public wpi::Sendable,
     uint32_t CanWarning : 1;
     /** The device's CAN controller experienced a "Bus Off" event. */
     uint32_t CanBusOff : 1;
+    /** The hardware on the device has malfunctioned. */
+    uint32_t HardwareFault : 1;
+    /** The firmware on the device has malfunctioned. */
+    uint32_t FirmwareFault : 1;
     /** The device has rebooted. */
     uint32_t HasReset : 1;
 

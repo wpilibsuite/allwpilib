@@ -253,7 +253,7 @@ public class DataLogJNI extends WPIUtilJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
-   * @param arr Boolean array to record
+   * @param value Boolean array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendBooleanArray(long impl, int entry, boolean[] value, long timestamp);
@@ -263,7 +263,7 @@ public class DataLogJNI extends WPIUtilJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
-   * @param arr Integer array to record
+   * @param value Integer array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendIntegerArray(long impl, int entry, long[] value, long timestamp);
@@ -273,7 +273,7 @@ public class DataLogJNI extends WPIUtilJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
-   * @param arr Float array to record
+   * @param value Float array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendFloatArray(long impl, int entry, float[] value, long timestamp);
@@ -283,7 +283,7 @@ public class DataLogJNI extends WPIUtilJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
-   * @param arr Double array to record
+   * @param value Double array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendDoubleArray(long impl, int entry, double[] value, long timestamp);
@@ -293,7 +293,7 @@ public class DataLogJNI extends WPIUtilJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
-   * @param arr String array to record
+   * @param value String array to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static native void appendStringArray(long impl, int entry, String[] value, long timestamp);

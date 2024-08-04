@@ -143,7 +143,7 @@ class SparseSelfAdjointView : public EigenBase<SparseSelfAdjointView<MatrixType,
     return *this = src.twistedBy(pnull);
   }
 
-  // Since we override the copy-assignment operator, we need to explicitly re-declare the copy-constructor
+  // Since we override the copy-assignment operator, we need to explicitly redeclare the copy-constructor
   EIGEN_DEFAULT_COPY_CONSTRUCTOR(SparseSelfAdjointView)
 
   template <typename SrcMatrixType, unsigned int SrcMode>

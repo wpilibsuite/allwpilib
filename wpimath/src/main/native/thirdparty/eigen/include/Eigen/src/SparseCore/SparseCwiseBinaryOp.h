@@ -834,7 +834,7 @@ struct sparse_disjunction_evaluator<XprType, IteratorBased, IndexBased> : evalua
   const XprType& m_expr;
 };
 
-// when DupFunc is wrapped with scalar_dup_op, use disjunction evaulator
+// when DupFunc is wrapped with scalar_dup_op, use disjunction evaluator
 template <typename T1, typename T2, typename DupFunc, typename Lhs, typename Rhs>
 struct binary_evaluator<CwiseBinaryOp<scalar_disjunction_op<DupFunc, T1, T2>, Lhs, Rhs>, IteratorBased, IteratorBased>
     : sparse_disjunction_evaluator<CwiseBinaryOp<scalar_disjunction_op<DupFunc, T1, T2>, Lhs, Rhs> > {

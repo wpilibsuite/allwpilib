@@ -6,27 +6,28 @@
 
 #include <Eigen/Core>
 
-#include "sleipnir/autodiff/Variable.hpp"
-#include "sleipnir/autodiff/VariableMatrix.hpp"
-
 namespace sleipnir {
 
 template <typename T>
-concept ScalarLike = std::same_as<T, double> || std::same_as<T, int> ||
-                     std::same_as<T, Variable>;
+concept ScalarLike = requires(T t) {
+  t + 1.0;
+  t = 1.0;
+};
 
 template <typename T>
-concept SleipnirMatrixLike = std::same_as<T, VariableMatrix> ||
-                             std::same_as<T, VariableBlock<VariableMatrix>>;
-
-template <typename Derived>
-concept EigenMatrixLike =
-    std::derived_from<Derived, Eigen::MatrixBase<Derived>>;
+concept SleipnirMatrixLike = requires(T t, int rows, int cols) {
+  t.Rows();
+  t.Cols();
+  t(rows, cols);
+};
 
 template <typename T>
-concept EigenSolver = requires(T t) { t.solve(Eigen::VectorXd{}); };
+concept EigenMatrixLike = std::derived_from<T, Eigen::MatrixBase<T>>;
 
 template <typename T>
 concept MatrixLike = SleipnirMatrixLike<T> || EigenMatrixLike<T>;
+
+template <typename T>
+concept EigenSolver = requires(T t) { t.solve(Eigen::VectorXd{}); };
 
 }  // namespace sleipnir

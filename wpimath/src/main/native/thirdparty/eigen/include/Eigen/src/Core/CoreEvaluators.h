@@ -402,7 +402,7 @@ struct nullary_wrapper<Scalar, NullaryOp, false, false, false> {};
 #if 0 && EIGEN_COMP_MSVC > 0
 // Disable this ugly workaround. This is now handled in traits<Ref>::match,
 // but this piece of code might still become handly if some other weird compilation
-// erros pop up again.
+// errors pop up again.
 
 // MSVC exhibits a weird compilation error when
 // compiling:
@@ -645,7 +645,7 @@ struct unary_evaluator<CwiseUnaryOp<core_cast_op<SrcType, DstType>, ArgType>, In
   // There is no source packet type with equal or fewer elements than DstPacketType.
   // This is problematic as the evaluation loop may attempt to access data outside the bounds of the array.
   // For example, consider the cast utilizing pcast<Packet4f,Packet2d> with an array of size 4: {0.0f,1.0f,2.0f,3.0f}.
-  // The first iteration of the evaulation loop will load 16 bytes: {0.0f,1.0f,2.0f,3.0f} and cast to {0.0,1.0}, which
+  // The first iteration of the evaluation loop will load 16 bytes: {0.0f,1.0f,2.0f,3.0f} and cast to {0.0,1.0}, which
   // is acceptable. The second iteration will load 16 bytes: {2.0f,3.0f,?,?}, which is outside the bounds of the array.
 
   // Instead, perform runtime check to determine if the load would access data outside the bounds of the array.
@@ -701,7 +701,7 @@ struct unary_evaluator<CwiseUnaryOp<core_cast_op<SrcType, DstType>, ArgType>, In
         srcPacket<SrcLoadMode>(row, col, 6), srcPacket<SrcLoadMode>(row, col, 7));
   }
 
-  // Analagous routines for linear access.
+  // Analogous routines for linear access.
   template <int LoadMode, typename DstPacketType, AltSrcScalarOp<DstPacketType> = true>
   EIGEN_STRONG_INLINE DstPacketType packet(Index index) const {
     constexpr int DstPacketSize = unpacket_traits<DstPacketType>::size;
@@ -838,7 +838,7 @@ struct ternary_evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3>, IndexBased
   Data m_d;
 };
 
-// specialization for expresions like (a < b).select(c, d) to enable full vectorization
+// specialization for expressions like (a < b).select(c, d) to enable full vectorization
 template <typename Arg1, typename Arg2, typename Scalar, typename CmpLhsType, typename CmpRhsType, ComparisonName cmp>
 struct evaluator<CwiseTernaryOp<scalar_boolean_select_op<Scalar, Scalar, bool>, Arg1, Arg2,
                                 CwiseBinaryOp<scalar_cmp_op<Scalar, Scalar, cmp, false>, CmpLhsType, CmpRhsType>>>

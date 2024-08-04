@@ -23,7 +23,7 @@ class SolveWithGuess;
  *
  * \brief Pseudo expression representing a solving operation
  *
- * \tparam Decomposition the type of the matrix or decomposion object
+ * \tparam Decomposition the type of the matrix or decomposition object
  * \tparam Rhstype the type of the right-hand side
  *
  * This class represents an expression of A.solve(B)

@@ -13,6 +13,7 @@
 #include <Eigen/Core>
 #include <wpi/SmallVector.h>
 
+#include "sleipnir/autodiff/Slice.hpp"
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableBlock.hpp"
 #include "sleipnir/util/Assert.hpp"
@@ -334,7 +335,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
   }
 
   /**
-   * Returns a block slice of the variable matrix.
+   * Returns a block of the variable matrix.
    *
    * @param rowOffset The row offset of the block selection.
    * @param colOffset The column offset of the block selection.
@@ -351,7 +352,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
   }
 
   /**
-   * Returns a block slice of the variable matrix.
+   * Returns a block of the variable matrix.
    *
    * @param rowOffset The row offset of the block selection.
    * @param colOffset The column offset of the block selection.
@@ -366,6 +367,69 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
     Assert(blockRows >= 0 && blockRows <= Rows() - rowOffset);
     Assert(blockCols >= 0 && blockCols <= Cols() - colOffset);
     return VariableBlock{*this, rowOffset, colOffset, blockRows, blockCols};
+  }
+
+  /**
+   * Returns a slice of the variable matrix.
+   *
+   * @param rowSlice The row slice.
+   * @param colSlice The column slice.
+   */
+  VariableBlock<VariableMatrix> operator()(Slice rowSlice, Slice colSlice) {
+    int rowSliceLength = rowSlice.Adjust(Rows());
+    int colSliceLength = colSlice.Adjust(Cols());
+    return VariableBlock{*this, std::move(rowSlice), rowSliceLength,
+                         std::move(colSlice), colSliceLength};
+  }
+
+  /**
+   * Returns a slice of the variable matrix.
+   *
+   * @param rowSlice The row slice.
+   * @param colSlice The column slice.
+   */
+  const VariableBlock<const VariableMatrix> operator()(Slice rowSlice,
+                                                       Slice colSlice) const {
+    int rowSliceLength = rowSlice.Adjust(Rows());
+    int colSliceLength = colSlice.Adjust(Cols());
+    return VariableBlock{*this, std::move(rowSlice), rowSliceLength,
+                         std::move(colSlice), colSliceLength};
+  }
+
+  /**
+   * Returns a slice of the variable matrix.
+   *
+   * The given slices aren't adjusted. This overload is for Python bindings
+   * only.
+   *
+   * @param rowSlice The row slice.
+   * @param rowSliceLength The row slice length.
+   * @param colSlice The column slice.
+   * @param colSliceLength The column slice length.
+   *
+   */
+  VariableBlock<VariableMatrix> operator()(Slice rowSlice, int rowSliceLength,
+                                           Slice colSlice, int colSliceLength) {
+    return VariableBlock{*this, std::move(rowSlice), rowSliceLength,
+                         std::move(colSlice), colSliceLength};
+  }
+
+  /**
+   * Returns a slice of the variable matrix.
+   *
+   * The given slices aren't adjusted. This overload is for Python bindings
+   * only.
+   *
+   * @param rowSlice The row slice.
+   * @param rowSliceLength The row slice length.
+   * @param colSlice The column slice.
+   * @param colSliceLength The column slice length.
+   */
+  const VariableBlock<const VariableMatrix> operator()(
+      Slice rowSlice, int rowSliceLength, Slice colSlice,
+      int colSliceLength) const {
+    return VariableBlock{*this, std::move(rowSlice), rowSliceLength,
+                         std::move(colSlice), colSliceLength};
   }
 
   /**
@@ -736,7 +800,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param unaryOp The unary operator to use for the transform operation.
    */
   VariableMatrix CwiseTransform(
-      function_ref<Variable(const Variable&)> unaryOp) const {
+      function_ref<Variable(const Variable& x)> unaryOp) const {
     VariableMatrix result{Rows(), Cols()};
 
     for (int row = 0; row < Rows(); ++row) {
@@ -896,7 +960,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
  */
 SLEIPNIR_DLLEXPORT inline VariableMatrix CwiseReduce(
     const VariableMatrix& lhs, const VariableMatrix& rhs,
-    function_ref<Variable(const Variable&, const Variable&)> binaryOp) {
+    function_ref<Variable(const Variable& x, const Variable& y)> binaryOp) {
   Assert(lhs.Rows() == rhs.Rows());
   Assert(lhs.Rows() == rhs.Rows());
 
