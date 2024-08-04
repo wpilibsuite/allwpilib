@@ -82,7 +82,7 @@ struct AssignmentWithDevice<DstXprType, SrcXprType, Functor, Device, Dense2Dense
   }
 };
 
-// this allows us to use the default evaulation scheme if it is not specialized for the device
+// this allows us to use the default evaluation scheme if it is not specialized for the device
 template <typename Kernel, typename Device, int Traversal = Kernel::AssignmentTraits::Traversal,
           int Unrolling = Kernel::AssignmentTraits::Unrolling>
 struct dense_assignment_loop_with_device {

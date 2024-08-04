@@ -319,7 +319,7 @@ namespace half_impl {
 #if (defined(EIGEN_HAS_CUDA_FP16) && defined(EIGEN_CUDA_ARCH) && EIGEN_CUDA_ARCH >= 530) || \
     (defined(EIGEN_HAS_HIP_FP16) && defined(HIP_DEVICE_COMPILE))
 // Note: We deliberately do *not* define this to 1 even if we have Arm's native
-// fp16 type since GPU halfs are rather different from native CPU halfs.
+// fp16 type since GPU half types are rather different from native CPU half types.
 // TODO: Rename to something like EIGEN_HAS_NATIVE_GPU_FP16
 #define EIGEN_HAS_NATIVE_FP16
 #endif
@@ -677,7 +677,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half log(const half& a) {
 #if (defined(EIGEN_HAS_CUDA_FP16) && EIGEN_CUDA_SDK_VER >= 80000 && defined(EIGEN_CUDA_ARCH) && \
      EIGEN_CUDA_ARCH >= 530) ||                                                                 \
     (defined(EIGEN_HAS_HIP_FP16) && defined(EIGEN_HIP_DEVICE_COMPILE))
-  return half(::hlog(a));
+  return half(hlog(a));
 #else
   return half(::logf(float(a)));
 #endif
