@@ -79,7 +79,7 @@ public class TimesliceRobot extends TimedRobot {
    * @param controllerPeriod The controller period in seconds. The sum of all scheduler allocations
    *     should be less than or equal to this value.
    */
-  public TimesliceRobot(double robotPeriodicAllocation, double controllerPeriod) {
+  protected TimesliceRobot(double robotPeriodicAllocation, double controllerPeriod) {
     m_nextOffset = robotPeriodicAllocation;
     m_controllerPeriod = controllerPeriod;
   }
