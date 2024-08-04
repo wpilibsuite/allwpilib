@@ -91,8 +91,13 @@ def unsupported_inclusions(dp, f):
     if f == "CMakeLists.txt" or "README" in f:
         return False
 
-    # Include the MatrixFunctions module
-    return "MatrixFunctions" in abspath
+    # Include the following modules
+    modules = [
+        "MatrixFunctions",
+        "SpecialFunctions",
+        "Tensor",
+    ]
+    return bool(re.search(r"|".join("/" + m for m in modules), abspath))
 
 
 def copy_upstream_src(wpilib_root):

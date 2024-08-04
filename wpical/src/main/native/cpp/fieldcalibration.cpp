@@ -293,7 +293,9 @@ bool fieldcalibration::process_video_file(
     return false;
   }
 
+  [[maybe_unused]]
   int video_width = video_input.get(cv::CAP_PROP_FRAME_WIDTH);
+  [[maybe_unused]]
   int video_height = video_input.get(cv::CAP_PROP_FRAME_HEIGHT);
   int video_fps = video_input.get(cv::CAP_PROP_FPS);
 

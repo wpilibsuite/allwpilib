@@ -21,7 +21,16 @@ add_executable(wpical ${wpical_src} ${wpical_resources_src} ${wpical_rc} ${APP_I
 wpilib_link_macos_gui(wpical)
 wpilib_target_warnings(wpical)
 target_include_directories(wpical PRIVATE src/main/native/include)
-target_link_libraries(wpical wpimath libglassnt libglass)
+
+find_package(OpenCV REQUIRED)
+target_link_libraries(
+    wpical
+    wpimath
+    libglassnt
+    libglass
+    apriltaglib
+    ${OpenCV_LIBS}
+)
 
 if(WIN32)
     set_target_properties(wpical PROPERTIES WIN32_EXECUTABLE YES)
