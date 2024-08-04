@@ -296,6 +296,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /** Loop function. */
+  @SuppressWarnings("removal")
   protected void loopFunc() {
     DriverStation.refreshData();
     m_watchdog.reset();

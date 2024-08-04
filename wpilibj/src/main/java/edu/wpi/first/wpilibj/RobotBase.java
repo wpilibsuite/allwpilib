@@ -16,7 +16,6 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 import java.io.File;
@@ -158,7 +157,6 @@ public abstract class RobotBase implements AutoCloseable {
       System.err.println("timed out while waiting for NT server to start");
     }
 
-    LiveWindow.setEnabled(false);
     Shuffleboard.disableActuatorWidgets();
   }
 

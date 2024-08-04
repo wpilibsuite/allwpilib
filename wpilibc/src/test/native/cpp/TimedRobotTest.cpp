@@ -10,6 +10,7 @@
 #include <thread>
 
 #include <gtest/gtest.h>
+#include <wpi/deprecated.h>
 
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/simulation/DriverStationSim.h"
@@ -307,7 +308,7 @@ TEST_F(TimedRobotTest, TeleopMode) {
   robot.EndCompetition();
   robotThread.join();
 }
-
+WPI_IGNORE_DEPRECATED
 TEST_P(TimedRobotTest, TestMode) {
   bool isTestLW = GetParam();
 
@@ -416,6 +417,7 @@ TEST_P(TimedRobotTest, TestMode) {
   robot.EndCompetition();
   robotThread.join();
 }
+WPI_UNIGNORE_DEPRECATED
 
 TEST_F(TimedRobotTest, ModeChange) {
   MockRobot robot;
