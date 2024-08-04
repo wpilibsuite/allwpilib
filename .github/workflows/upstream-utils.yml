@@ -95,11 +95,6 @@ jobs:
           cd upstream_utils
           ./mpack.py clone
           ./mpack.py copy-upstream-to-thirdparty
-      - name: Run stack_walker.py
-        run: |
-          cd upstream_utils
-          ./stack_walker.py clone
-          ./stack_walker.py copy-upstream-to-thirdparty
       - name: Run memory.py
         run: |
           cd upstream_utils
