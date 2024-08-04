@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj;
 /** Buffer storage for Addressable LEDs. */
 public class AddressableLEDBuffer implements LEDReader, LEDWriter {
   byte[] m_buffer;
+  final AddressableLEDColorOrder m_colorOrder;
 
   /**
    * Constructs a new LED buffer with the specified length.
@@ -15,6 +16,18 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    */
   public AddressableLEDBuffer(int length) {
     m_buffer = new byte[length * 4];
+    m_colorOrder = AddressableLEDColorOrder.kRGB;
+  }
+
+  /**
+   * Constructs a new LED buffer with the specified length and color order.
+   *
+   * @param length The length of the buffer in pixels
+   * @param colorOrder The order the pixels display colors in
+   */
+  public AddressableLEDBuffer(int length, AddressableLEDColorOrder colorOrder) {
+    m_buffer = new byte[length * 4];
+    m_colorOrder = colorOrder;
   }
 
   /**
@@ -27,9 +40,41 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    */
   @Override
   public void setRGB(int index, int r, int g, int b) {
-    m_buffer[index * 4] = (byte) b;
-    m_buffer[(index * 4) + 1] = (byte) g;
-    m_buffer[(index * 4) + 2] = (byte) r;
+    switch (m_colorOrder) {
+      case kRGB -> {
+        m_buffer[index * 4] = (byte) b;
+        m_buffer[(index * 4) + 1] = (byte) g;
+        m_buffer[(index * 4) + 2] = (byte) r;
+      }
+      case kRBG -> {
+        m_buffer[index * 4] = (byte) g;
+        m_buffer[(index * 4) + 1] = (byte) b;
+        m_buffer[(index * 4) + 2] = (byte) r;
+      }
+      case kGBR -> {
+        m_buffer[index * 4] = (byte) r;
+        m_buffer[(index * 4) + 1] = (byte) b;
+        m_buffer[(index * 4) + 2] = (byte) g;
+      }
+      case kGRB -> {
+        m_buffer[index * 4] = (byte) b;
+        m_buffer[(index * 4) + 1] = (byte) r;
+        m_buffer[(index * 4) + 2] = (byte) g;
+      }
+      case kBRG -> {
+        m_buffer[index * 4] = (byte) g;
+        m_buffer[(index * 4) + 1] = (byte) r;
+        m_buffer[(index * 4) + 2] = (byte) b;
+      }
+      case kBGR -> {
+        m_buffer[index * 4] = (byte) r;
+        m_buffer[(index * 4) + 1] = (byte) g;
+        m_buffer[(index * 4) + 2] = (byte) b;
+      }
+      default -> {
+        // Unreachable
+      }
+    }
     m_buffer[(index * 4) + 3] = 0;
   }
 
