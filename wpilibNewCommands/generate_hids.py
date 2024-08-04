@@ -24,7 +24,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
     # Java files
     java_subdirectory = "main/java/edu/wpi/first/wpilibj2/command/button"
     env = Environment(
-        loader=FileSystemLoader(template_directory / java_subdirectory),
+        loader=FileSystemLoader(template_directory / "main/java"),
         autoescape=False,
         keep_trailing_newline=True,
     )
