@@ -4,7 +4,7 @@
 
 #include "fieldmap.h"
 
-fieldmap::fieldmap(nlohmann::json json) {
+fieldmap::fieldmap(wpi::json json) {
   for (auto& tag : json["tags"].items()) {
     double tagXPos = tag.value()["pose"]["translation"]["x"];
     double tagYPos = tag.value()["pose"]["translation"]["y"];

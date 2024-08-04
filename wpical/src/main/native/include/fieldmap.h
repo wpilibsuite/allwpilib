@@ -6,13 +6,13 @@
 
 #include <vector>
 
-#include <nlohmann/json.hpp>
 #include <tagpose.h>
+#include <wpi/json.h>
 
 class fieldmap {
  public:
   fieldmap() = default;
-  explicit fieldmap(nlohmann::json map);
+  explicit fieldmap(wpi::json map);
   tag::pose getTag(int tag);
   int getNumTags();
   double minimizeAngle(double angle);

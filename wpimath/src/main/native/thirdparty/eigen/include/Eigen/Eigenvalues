@@ -14,7 +14,7 @@
 #include "Jacobi"
 #include "Householder"
 #include "LU"
-// #include "Geometry"
+#include "Geometry"
 
 #include "src/Core/util/DisableStupidWarnings.h"
 

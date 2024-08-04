@@ -21,7 +21,7 @@ pose::pose(double xpos, double ypos, double zpos, double w, double x, double y,
   transformMatrixFmap(3, 0) = 0;
   transformMatrixFmap(3, 1) = 0;
   transformMatrixFmap(3, 2) = 0;
-  Eigen::Vector3d eulerAngles = rotationMatrix.eulerAngles(0, 1, 2);
+  Eigen::Vector3d eulerAngles = rotationMatrix.canonicalEulerAngles(0, 1, 2);
   rollRot = eulerAngles[0];
   pitchRot = eulerAngles[1];
   yawRot = eulerAngles[2];

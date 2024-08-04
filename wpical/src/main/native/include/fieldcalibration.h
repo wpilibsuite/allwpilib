@@ -17,13 +17,13 @@
 #include <Eigen/Geometry>
 #include <ceres/ceres.h>
 #include <glog/export.h>
-#include <nlohmann/json.hpp>
 #include <opencv2/calib3d.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/core/utils/logger.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
+#include <wpi/json.h>
 
 extern "C" {
 #include "apriltag/apriltag.h"
@@ -47,10 +47,10 @@ namespace fieldcalibration {
 std::tuple<Eigen::Matrix<double, 3, 3>, Eigen::Matrix<double, 8, 1>>
 load_camera_model(std::string path);
 std::tuple<Eigen::Matrix<double, 3, 3>, Eigen::Matrix<double, 8, 1>>
-load_camera_model(nlohmann::json json_data);
-std::map<int, nlohmann::json> load_ideal_map(std::string path);
+load_camera_model(wpi::json json_data);
+std::map<int, wpi::json> load_ideal_map(std::string path);
 Eigen::Matrix<double, 4, 4> get_tag_transform(
-    std::map<int, nlohmann::json>& ideal_map, int tag_id);
+    std::map<int, wpi::json>& ideal_map, int tag_id);
 Eigen::Matrix<double, 4, 4> estimate_tag_pose(
     apriltag_detection_t* tag_detection,
     const Eigen::Matrix<double, 3, 3>& camera_matrix,
@@ -72,6 +72,6 @@ int calibrate(std::string input_dir_path, std::string output_file_path,
               int pinned_tag_id, int detection_fps);
 
 int calibrate(std::string input_dir_path, std::string output_file_path,
-              nlohmann::json camera_model, std::string ideal_map_path,
+              wpi::json camera_model, std::string ideal_map_path,
               int pinned_tag_id, int detection_fps);
 }  // namespace fieldcalibration

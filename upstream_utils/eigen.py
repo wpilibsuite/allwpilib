@@ -53,7 +53,9 @@ def eigen_inclusions(dp, f):
     modules = [
         "Cholesky",
         "Core",
+        "Dense",
         "Eigenvalues",
+        "Geometry",
         "Householder",
         "IterativeLinearSolvers",
         "Jacobi",
@@ -65,6 +67,7 @@ def eigen_inclusions(dp, f):
         "SparseCore",
         "SparseLU",
         "SparseQR",
+        "StdVector",
         "misc",
         "plugins",
     ]

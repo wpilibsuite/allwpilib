@@ -59,11 +59,11 @@ fieldcalibration::load_camera_model(std::string path) {
 
   std::ifstream file(path);
 
-  nlohmann::json json_data;
+  wpi::json json_data;
 
   try {
-    json_data = nlohmann::json::parse(file);
-  } catch (const nlohmann::json::parse_error& e) {
+    json_data = wpi::json::parse(file);
+  } catch (const wpi::json::parse_error& e) {
     std::cout << e.what() << std::endl;
   }
 
@@ -118,7 +118,7 @@ fieldcalibration::load_camera_model(std::string path) {
 }
 
 std::tuple<Eigen::Matrix<double, 3, 3>, Eigen::Matrix<double, 8, 1>>
-fieldcalibration::load_camera_model(nlohmann::json json_data) {
+fieldcalibration::load_camera_model(wpi::json json_data) {
   // Camera matrix
   Eigen::Matrix<double, 3, 3> camera_matrix;
 
@@ -142,11 +142,10 @@ fieldcalibration::load_camera_model(nlohmann::json json_data) {
   return std::make_tuple(camera_matrix, camera_distortion);
 }
 
-std::map<int, nlohmann::json> fieldcalibration::load_ideal_map(
-    std::string path) {
+std::map<int, wpi::json> fieldcalibration::load_ideal_map(std::string path) {
   std::ifstream file(path);
-  nlohmann::json json_data = nlohmann::json::parse(file);
-  std::map<int, nlohmann::json> ideal_map;
+  wpi::json json_data = wpi::json::parse(file);
+  std::map<int, wpi::json> ideal_map;
 
   for (const auto& element : json_data["tags"]) {
     ideal_map[element["ID"]] = element;
@@ -156,7 +155,7 @@ std::map<int, nlohmann::json> fieldcalibration::load_ideal_map(
 }
 
 Eigen::Matrix<double, 4, 4> fieldcalibration::get_tag_transform(
-    std::map<int, nlohmann::json>& ideal_map, int tag_id) {
+    std::map<int, wpi::json>& ideal_map, int tag_id) {
   Eigen::Matrix<double, 4, 4> transform =
       Eigen::Matrix<double, 4, 4>::Identity();
 
@@ -417,7 +416,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
       load_camera_model(camera_model_path);
 
   // Load ideal field map
-  std::map<int, nlohmann::json> ideal_map = load_ideal_map(ideal_map_path);
+  std::map<int, wpi::json> ideal_map = load_ideal_map(ideal_map_path);
 
   // Apriltag detector
   apriltag_detector_t* tag_detector = apriltag_detector_create();
@@ -493,7 +492,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
   std::cout << summary.BriefReport() << std::endl;
 
   // Output
-  std::map<int, nlohmann::json> observed_map = ideal_map;
+  std::map<int, wpi::json> observed_map = ideal_map;
 
   Eigen::Matrix<double, 4, 4> correction_a;
   correction_a << 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1;
@@ -535,7 +534,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
         corrected_transform_q.w();
   }
 
-  nlohmann::json observed_map_json;
+  wpi::json observed_map_json;
 
   for (const auto& [tag_id, tag_json] : observed_map) {
     observed_map_json["tags"].push_back(tag_json);
@@ -545,7 +544,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
 
   // for (const auto& constraint : constraints)
   // {
-  // nlohmann::json output_constraint;
+  // wpi::json output_constraint;
 
   // output_constraint["from_id"] = constraint.id_begin;
   // output_constraint["to_id"] = constraint.id_end;
@@ -580,7 +579,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
 
 int fieldcalibration::calibrate(std::string input_dir_path,
                                 std::string output_file_path,
-                                nlohmann::json camera_model,
+                                wpi::json camera_model,
                                 std::string ideal_map_path, int pinned_tag_id,
                                 int detection_fps) {
   // Silence OpenCV logging
@@ -592,7 +591,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
       load_camera_model(camera_model);
 
   // Load ideal field map
-  std::map<int, nlohmann::json> ideal_map = load_ideal_map(ideal_map_path);
+  std::map<int, wpi::json> ideal_map = load_ideal_map(ideal_map_path);
 
   // Apriltag detector
   apriltag_detector_t* tag_detector = apriltag_detector_create();
@@ -672,7 +671,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
   std::cout << summary.BriefReport() << std::endl;
 
   // Output
-  std::map<int, nlohmann::json> observed_map = ideal_map;
+  std::map<int, wpi::json> observed_map = ideal_map;
 
   Eigen::Matrix<double, 4, 4> correction_a;
   correction_a << 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1;
@@ -714,7 +713,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
         corrected_transform_q.w();
   }
 
-  nlohmann::json observed_map_json;
+  wpi::json observed_map_json;
 
   for (const auto& [tag_id, tag_json] : observed_map) {
     observed_map_json["tags"].push_back(tag_json);
@@ -724,7 +723,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
 
   // for (const auto& constraint : constraints)
   // {
-  // nlohmann::json output_constraint;
+  // wpi::json output_constraint;
 
   // output_constraint["from_id"] = constraint.id_begin;
   // output_constraint["to_id"] = constraint.id_end;
