@@ -192,22 +192,6 @@
     "commandversion": 2
   },
   {
-    "name": "TrapezoidProfileCommand",
-    "description": "A command that executes a trapezoidal motion profile.",
-    "tags": [
-      "trapezoidprofilecommand"
-    ],
-    "foldername": "trapezoidprofilecommand",
-    "headers": [
-      "ReplaceMeTrapezoidProfileCommand.h"
-    ],
-    "source": [
-      "ReplaceMeTrapezoidProfileCommand.cpp"
-    ],
-    "replacename": "ReplaceMeTrapezoidProfileCommand",
-    "commandversion": 2
-  },
-  {
     "name": "TrapezoidProfileSubsystem",
     "description": "A subsystem that executes a trapezoidal motion profile.",
     "tags": [

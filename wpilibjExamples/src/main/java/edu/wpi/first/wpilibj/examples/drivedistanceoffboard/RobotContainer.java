@@ -4,15 +4,11 @@
 
 package edu.wpi.first.wpilibj.examples.drivedistanceoffboard;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.OIConstants;
-import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.commands.DriveDistanceProfiled;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -61,28 +57,10 @@ public class RobotContainer {
     m_driverController.rightBumper().onTrue(m_driveHalfSpeed).onFalse(m_driveFullSpeed);
 
     // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of 10 seconds
-    m_driverController.a().onTrue(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
+    m_driverController.a().onTrue(m_robotDrive.profiledDriveDistance(3).withTimeout(10));
 
-    // Do the same thing as above when the 'B' button is pressed, but defined inline
-    m_driverController
-        .b()
-        .onTrue(
-            new TrapezoidProfileCommand(
-                    new TrapezoidProfile(
-                        // Limit the max acceleration and velocity
-                        new TrapezoidProfile.Constraints(
-                            DriveConstants.kMaxSpeedMetersPerSecond,
-                            DriveConstants.kMaxAccelerationMetersPerSecondSquared)),
-                    // Pipe the profile state to the drive
-                    setpointState -> m_robotDrive.setDriveStates(setpointState, setpointState),
-                    // End at desired position in meters; implicitly starts at 0
-                    () -> new TrapezoidProfile.State(3, 0),
-                    // Current position
-                    TrapezoidProfile.State::new,
-                    // Require the drive
-                    m_robotDrive)
-                .beforeStarting(m_robotDrive::resetEncoders)
-                .withTimeout(10));
+    // Do the same thing as above when the 'B' button is pressed, but without resetting the encoders
+    m_driverController.b().onTrue(m_robotDrive.dynamicProfiledDriveDistance(3).withTimeout(10));
   }
 
   /**
