@@ -210,8 +210,7 @@ static void DisplayGui() {
         ImGui::OpenPopup("Error");
       } else if (calibrationOutput == 0) {
         std::ifstream caljsonpath(calibrationJsonPath);
-        std::string fmap =
-            fmap::convertfmap(nlohmann::json::parse(caljsonpath));
+        std::string fmap = fmap::convertfmap(wpi::json::parse(caljsonpath));
         std::ofstream out(selectedDownloadFolder + "/output.fmap");
         out << fmap;
         out.close();
@@ -308,7 +307,7 @@ static void DisplayGui() {
       ImGui::Separator();
       if (ImGui::Button("Calibrate") && !selectedConfigFile.empty()) {
         std::cout << "calibration button pressed" << std::endl;
-        nlohmann::json cameraJson = cameracalibration::calibrate(
+        wpi::json cameraJson = cameracalibration::calibrate(
             selectedConfigFile.c_str(), squareWidth, boardWidth, boardHeight,
             imagerWidth, imagerHeight, focalLengthGuess);
 
@@ -357,7 +356,7 @@ static void DisplayGui() {
       ImGui::Separator();
       if (ImGui::Button("Calibrate") && !selectedConfigFile.empty()) {
         std::cout << "calibration button pressed" << std::endl;
-        nlohmann::json cameraJson = cameracalibration::calibrate(
+        wpi::json cameraJson = cameracalibration::calibrate(
             selectedConfigFile.c_str(), squareWidth, markerWidth, boardWidth,
             boardHeight);
 
@@ -438,8 +437,8 @@ static void DisplayGui() {
       std::ifstream calJson(calibrationJsonPath);
       std::ifstream refJson(selectedFieldMap);
 
-      currentCalibrationMap = fieldmap(nlohmann::json::parse(calJson));
-      currentReferenceMap = fieldmap(nlohmann::json::parse(refJson));
+      currentCalibrationMap = fieldmap(wpi::json::parse(calJson));
+      currentReferenceMap = fieldmap(wpi::json::parse(refJson));
 
       double xDiff = currentReferenceMap.getTag(focusedTag).xPos -
                      currentCalibrationMap.getTag(focusedTag).xPos;

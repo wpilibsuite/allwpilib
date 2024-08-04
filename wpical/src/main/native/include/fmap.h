@@ -7,13 +7,13 @@
 #include <cmath>
 #include <string>
 
-#include <nlohmann/json.hpp>
 #include <opencv2/opencv.hpp>
 #include <tagpose.h>
+#include <wpi/json.h>
 
 #include "fieldmap.h"
 
 namespace fmap {
 std::string singleTag(int tag, tag::pose tagpose, bool endTag);
-std::string convertfmap(nlohmann::json json);
+std::string convertfmap(wpi::json json);
 }  // namespace fmap

@@ -7,18 +7,17 @@
 #include <string_view>
 
 #include <mrcal_wrapper.h>
-#include <nlohmann/json.hpp>
 #include <opencv2/aruco.hpp>
 #include <opencv2/aruco/charuco.hpp>
 #include <opencv2/objdetect/aruco_board.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
+#include <wpi/json.h>
 
 namespace cameracalibration {
-nlohmann::json calibrate(std::string_view input_video, float square_width,
-                         float marker_width, int board_width, int board_height);
-nlohmann::json calibrate(std::string_view input_video, float square_width,
-                         int board_width, int board_height,
-                         double imagerWidthPixels, double imagerHeightPixels,
-                         double focal_length_guess);
+wpi::json calibrate(std::string_view input_video, float square_width,
+                    float marker_width, int board_width, int board_height);
+wpi::json calibrate(std::string_view input_video, float square_width,
+                    int board_width, int board_height, double imagerWidthPixels,
+                    double imagerHeightPixels, double focal_length_guess);
 }  // namespace cameracalibration

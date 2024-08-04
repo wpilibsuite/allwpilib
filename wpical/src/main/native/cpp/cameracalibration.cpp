@@ -6,10 +6,9 @@
 
 #include <iostream>
 
-nlohmann::json cameracalibration::calibrate(std::string_view input_video,
-                                            float square_width,
-                                            float marker_width, int board_width,
-                                            int board_height) {
+wpi::json cameracalibration::calibrate(std::string_view input_video,
+                                       float square_width, float marker_width,
+                                       int board_width, int board_height) {
   std::cout << "test print" << std::endl;
   // Aruco Board
   cv::aruco::Dictionary aruco_dict =
@@ -96,7 +95,7 @@ nlohmann::json cameracalibration::calibrate(std::string_view input_video,
   std::cout << "Completed camera calibration" << std::endl;
 
   // Save calibration output
-  nlohmann::json camera_model = {
+  wpi::json camera_model = {
       {"camera_matrix", std::vector<double>(camera_matrix.begin<double>(),
                                             camera_matrix.end<double>())},
       {"distortion_coefficients",
@@ -107,12 +106,12 @@ nlohmann::json cameracalibration::calibrate(std::string_view input_video,
   return camera_model;
 }
 
-nlohmann::json cameracalibration::calibrate(std::string_view input_video,
-                                            float square_width, int board_width,
-                                            int board_height,
-                                            double imagerWidthPixels,
-                                            double imagerHeightPixels,
-                                            double focal_length_guess) {
+wpi::json cameracalibration::calibrate(std::string_view input_video,
+                                       float square_width, int board_width,
+                                       int board_height,
+                                       double imagerWidthPixels,
+                                       double imagerHeightPixels,
+                                       double focal_length_guess) {
   // Video capture
   cv::VideoCapture video_capture(input_video);
   int frame_count = 0;
@@ -218,9 +217,9 @@ nlohmann::json cameracalibration::calibrate(std::string_view input_video,
                                                 0.0,
                                                 0.0};
 
-  nlohmann::json result = {{"camera_matrix", cameraMatrix},
-                           {"distortion_coefficients", distortionCoefficients},
-                           {"avg_reprojection_error", stats.rms_error}};
+  wpi::json result = {{"camera_matrix", cameraMatrix},
+                      {"distortion_coefficients", distortionCoefficients},
+                      {"avg_reprojection_error", stats.rms_error}};
 
   return result;
 }

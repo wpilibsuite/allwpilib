@@ -29,7 +29,7 @@ std::string fmap::singleTag(int tag, tag::pose tagpose, bool endTag) {
   return fmapTag;
 }
 
-std::string fmap::convertfmap(nlohmann::json json) {
+std::string fmap::convertfmap(wpi::json json) {
   std::string fmapstart = "{\"fiducials\":[";
 
   std::string fmapend = "],\"type\":\"frc\"}";
