@@ -17,7 +17,7 @@
 
 #include "SshSession.h"
 
-using namespace sysid;
+using namespace rtns;
 
 #ifdef ERROR
 #undef ERROR

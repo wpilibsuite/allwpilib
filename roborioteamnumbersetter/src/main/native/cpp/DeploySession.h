@@ -13,7 +13,7 @@
 
 #include <wpi/Logger.h>
 
-namespace sysid {
+namespace rtns {
 // Define an integer for a successful message in the log (shown in green on the
 // GUI).
 static constexpr unsigned int kLogSuccess = 31;
@@ -77,4 +77,4 @@ class DeploySession {
   // attempts.
   std::atomic_int m_visited = 0;
 };
-}  // namespace sysid
+}  // namespace rtns

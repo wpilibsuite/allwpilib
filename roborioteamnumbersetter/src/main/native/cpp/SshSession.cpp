@@ -16,7 +16,7 @@
 #include <libssh/sftp.h>
 #include <wpi/Logger.h>
 
-using namespace sysid;
+using namespace rtns;
 
 #define INFO(fmt, ...) WPI_INFO(m_logger, fmt __VA_OPT__(, ) __VA_ARGS__)
 
