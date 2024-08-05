@@ -1,5 +1,6 @@
 project(fieldImages)
 
+include(AddTest)
 include(CompileWarnings)
 include(GenResources)
 
@@ -66,3 +67,7 @@ export(TARGETS fieldImages FILE fieldimages.cmake NAMESPACE fieldimages::)
 configure_file(fieldimages-config.cmake.in ${WPILIB_BINARY_DIR}/fieldimages-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/fieldimages-config.cmake DESTINATION share/fieldImages)
 install(EXPORT fieldimages DESTINATION share/fieldImages)
+
+if(WITH_TESTS AND WITH_JAVA)
+    wpilib_add_java_test(field_images INCLUDE_JARS ${JACKSON_JARS})
+endif()

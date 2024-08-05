@@ -152,6 +152,25 @@ install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/april
 install(EXPORT apriltag DESTINATION share/apriltag)
 
 if(WITH_TESTS)
+    if(WITH_JAVA)
+        file(GLOB JAVA_TEST_RESOURCES src/test/resources/edu/wpi/first/apriltag/*)
+        file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
+        wpilib_add_java_test(
+            apriltag
+            INCLUDE_JARS
+                wpimath_jar
+                wpiunits_jar
+                wpiutil_jar
+                ${EJML_JARS}
+                ${OPENCV_JAR_FILE}
+                ${JACKSON_JARS}
+                ${QUICKBUF_JAR}
+                RESOURCES
+                NAMESPACE
+                "edu/wpi/first/apriltag"
+                ${JAVA_TEST_RESOURCES}
+        )
+    endif()
     wpilib_add_test(apriltag src/test/native/cpp)
     target_include_directories(apriltag_test PRIVATE src/test/native/include)
     target_link_libraries(apriltag_test apriltag googletest)

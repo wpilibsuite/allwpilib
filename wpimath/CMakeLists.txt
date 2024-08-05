@@ -234,6 +234,12 @@ install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimat
 install(EXPORT wpimath DESTINATION share/wpimath)
 
 if(WITH_TESTS)
+    if(WITH_JAVA)
+        wpilib_add_java_test(
+            wpimath
+            INCLUDE_JARS wpiutil_jar wpiunits_jar ${EJML_JARS} ${JACKSON_JARS} ${QUICKBUF_JAR}
+        )
+    endif()
     wpilib_add_test(wpimath src/test/native/cpp)
     target_include_directories(wpimath_test PRIVATE src/test/native/include)
     target_link_libraries(wpimath_test wpimath googletest)
