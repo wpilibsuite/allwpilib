@@ -173,20 +173,14 @@ else()
 endif()
 
 install(
-    DIRECTORY src/main/native/thirdparty/tcpsockets/include/
+    DIRECTORY src/main/native/include/ src/main/native/thirdparty/tcpsockets/include/
     DESTINATION "${include_dest}/wpinet"
 )
 target_include_directories(
     wpinet
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
-)
-
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpinet")
-target_include_directories(
-    wpinet
-    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
         $<INSTALL_INTERFACE:${include_dest}/wpinet>
 )
 

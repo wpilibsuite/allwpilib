@@ -184,49 +184,26 @@ else()
 endif()
 
 install(
-    DIRECTORY src/main/native/thirdparty/expected/include/
+    DIRECTORY
+        src/main/native/include/
+        src/main/native/thirdparty/expected/include/
+        src/main/native/thirdparty/json/include/
+        src/main/native/thirdparty/llvm/include/
+        src/main/native/thirdparty/memory/include/
+        src/main/native/thirdparty/mpack/include/
+        src/main/native/thirdparty/sigslot/include/
     DESTINATION "${include_dest}/wpiutil"
 )
 target_include_directories(
     wpiutil
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
-)
-install(DIRECTORY src/main/native/thirdparty/memory/include/ DESTINATION "${include_dest}/wpiutil")
-target_include_directories(
-    wpiutil
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
-)
-
-install(DIRECTORY src/main/native/thirdparty/json/include/ DESTINATION "${include_dest}/wpiutil")
-target_include_directories(
-    wpiutil
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
-)
-
-install(DIRECTORY src/main/native/thirdparty/llvm/include/ DESTINATION "${include_dest}/wpiutil")
-target_include_directories(
-    wpiutil
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
-)
-
-install(DIRECTORY src/main/native/thirdparty/mpack/include/ DESTINATION "${include_dest}/wpiutil")
-target_include_directories(
-    wpiutil
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
-)
-
-install(DIRECTORY src/main/native/thirdparty/sigslot/include/ DESTINATION "${include_dest}/wpiutil")
-target_include_directories(
-    wpiutil
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>
-)
-
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpiutil")
-target_include_directories(
-    wpiutil
-    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>
         $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )
 

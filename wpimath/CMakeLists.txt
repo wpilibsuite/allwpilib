@@ -157,7 +157,6 @@ if(NOT USE_SYSTEM_EIGEN)
         SYSTEM
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/eigen/include>
-            $<INSTALL_INTERFACE:${include_dest}/wpimath>
     )
 else()
     find_package(Eigen3 CONFIG REQUIRED)
@@ -165,22 +164,16 @@ else()
 endif()
 
 install(
-    DIRECTORY src/main/native/thirdparty/sleipnir/include/
+    DIRECTORY src/main/native/thirdparty/gcem/include/ src/main/native/thirdparty/sleipnir/include/
     DESTINATION "${include_dest}/wpimath"
 )
 target_include_directories(
     wpimath
     SYSTEM
     PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
-)
-
-install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
-target_include_directories(
-    wpimath
-    SYSTEM
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
 )
 
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
