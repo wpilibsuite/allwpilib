@@ -152,6 +152,9 @@ doxygen {
     exclude 'Eigen/**'
     exclude 'google/protobuf/**'
 
+    exclude '**/.clang-tidy'
+    exclude '**/.clang-format'
+
     aliases 'effects=\\par <i>Effects:</i>^^',
             'notes=\\par <i>Notes:</i>^^',
             'requires=\\par <i>Requires:</i>^^',
