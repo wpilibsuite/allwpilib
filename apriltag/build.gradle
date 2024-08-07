@@ -32,8 +32,7 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/apriltag/include',
-                            'src/main/native/thirdparty/apriltag/include/common',
-                            'src/main/native/thirdparty/apriltag/src'
+                            'src/main/native/thirdparty/apriltag/include/common'
                 }
             }
         }
