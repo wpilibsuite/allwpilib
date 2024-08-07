@@ -25,7 +25,7 @@ ext {
             ceresCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/ceres/src'
-                    include '**/*.cc'
+                    include '**/*.cpp'
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/eigen/include',

@@ -125,7 +125,7 @@ file(
     GLOB_RECURSE wpimath_native_src
     src/main/native/cpp/*.cpp
     src/main/native/thirdparty/sleipnir/src/*.cpp
-    src/main/native/thirdparty/ceres/src/*.cc
+    src/main/native/thirdparty/ceres/src/*.cpp
 )
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
