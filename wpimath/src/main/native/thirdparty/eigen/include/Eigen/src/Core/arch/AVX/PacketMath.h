@@ -1180,7 +1180,7 @@ EIGEN_STRONG_INLINE Packet8i psign(const Packet8i& a) {
 }
 #endif
 
-// Add specializations for min/max with prescribed NaN progation.
+// Add specializations for min/max with prescribed NaN propagation.
 template <>
 EIGEN_STRONG_INLINE Packet8f pmin<PropagateNumbers, Packet8f>(const Packet8f& a, const Packet8f& b) {
   return pminmax_propagate_numbers(a, b, pmin<Packet8f>);

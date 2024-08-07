@@ -45,26 +45,56 @@ public class ControlWord {
     m_dsAttached = word.m_dsAttached;
   }
 
+  /**
+   * Gets the Enabled flag.
+   *
+   * @return the Enabled flag
+   */
   public boolean getEnabled() {
     return m_enabled;
   }
 
+  /**
+   * Gets the Autonomous mode flag.
+   *
+   * @return the Autonomous mode flag
+   */
   public boolean getAutonomous() {
     return m_autonomous;
   }
 
+  /**
+   * Gets the Test mode flag.
+   *
+   * @return the Test mode flag
+   */
   public boolean getTest() {
     return m_test;
   }
 
+  /**
+   * Gets the E-Stop flag.
+   *
+   * @return the E-Stop flag
+   */
   public boolean getEStop() {
     return m_emergencyStop;
   }
 
+  /**
+   * Gets the FMS attached flag.
+   *
+   * @return the FMS attached flag
+   */
   public boolean getFMSAttached() {
     return m_fmsAttached;
   }
 
+  /**
+   * Gets the DS attached flag.
+   *
+   * @return the DS attached flag
+   */
   public boolean getDSAttached() {
     return m_dsAttached;
   }

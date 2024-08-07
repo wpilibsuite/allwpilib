@@ -13,7 +13,7 @@ file(
 if(MSVC)
     set_source_files_properties(
         ${apriltaglib_src}
-        PROPERTIES COMPILE_FLAGS "/wd2220 /wd4005 /wd4018 /wd4244 /wd4267 /wd4996"
+        PROPERTIES COMPILE_FLAGS "/wd4005 /wd4018 /wd4244 /wd4267 /wd4996"
     )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set_source_files_properties(

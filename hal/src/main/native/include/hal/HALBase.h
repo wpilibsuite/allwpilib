@@ -24,9 +24,15 @@
  * @{
  */
 
+/**
+ * Runtime type.
+ */
 HAL_ENUM(HAL_RuntimeType) {
+  /** roboRIO 1.0 */
   HAL_Runtime_RoboRIO,
+  /** roboRIO 2.0 */
   HAL_Runtime_RoboRIO2,
+  /** Simulation runtime */
   HAL_Runtime_Simulation
 };
 

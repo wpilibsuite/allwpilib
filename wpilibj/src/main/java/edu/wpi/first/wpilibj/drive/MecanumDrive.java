@@ -44,9 +44,6 @@ import java.util.function.DoubleConsumer;
  * positive Z axis points up. Rotations follow the right-hand rule, so counterclockwise rotation
  * around the Z axis is positive.
  *
- * <p>Note: the axis conventions used in this class differ from DifferentialDrive. This may change
- * in a future year's WPILib release.
- *
  * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
  * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
  * value can be changed with {@link #setDeadband}.
