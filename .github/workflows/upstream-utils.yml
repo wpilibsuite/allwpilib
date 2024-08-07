@@ -35,6 +35,11 @@ jobs:
           cd upstream_utils
           ./apriltag.py clone
           ./apriltag.py copy-upstream-to-thirdparty
+      - name: Run ceres.py
+        run: |
+          cd upstream_utils
+          ./ceres.py clone
+          ./ceres.py copy-upstream-to-thirdparty
       - name: Run eigen.py
         run: |
           cd upstream_utils

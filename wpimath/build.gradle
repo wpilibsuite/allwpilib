@@ -21,6 +21,19 @@ ext {
                             'src/main/native/thirdparty/sleipnir/src'
                 }
             }
+
+            ceresCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/ceres/src'
+                    include '**/*.cc'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/eigen/include',
+                            'src/main/native/thirdparty/fmt/include',
+                            'src/main/native/thirdparty/ceres/include',
+                            'src/main/native/thirdparty/ceres/src'
+                }
+            }
         }
     }
 }
@@ -53,7 +66,8 @@ model {
                     srcDirs 'src/main/native/include',
                             'src/main/native/thirdparty/eigen/include',
                             'src/main/native/thirdparty/gcem/include',
-                            'src/main/native/thirdparty/sleipnir/include'
+                            'src/main/native/thirdparty/sleipnir/include',
+                            'src/main/native/thirdparty/ceres/include'
                 }
             }
         }

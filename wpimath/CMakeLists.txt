@@ -125,6 +125,7 @@ file(
     GLOB_RECURSE wpimath_native_src
     src/main/native/cpp/*.cpp
     src/main/native/thirdparty/sleipnir/src/*.cpp
+    src/main/native/thirdparty/ceres/src/*.cc
 )
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
@@ -166,6 +167,7 @@ endif()
 
 install(
     DIRECTORY src/main/native/thirdparty/sleipnir/include/
+    DIRECTORY src/main/native/thirdparty/ceres/include/
     DESTINATION "${include_dest}/wpimath"
 )
 target_include_directories(
@@ -174,6 +176,8 @@ target_include_directories(
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/ceres/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/ceres/src>
 )
 
 install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
