@@ -15,7 +15,7 @@
 namespace nt {
 
 inline DoubleSubscriber::DoubleSubscriber(
-    NT_Subscriber handle, double defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue} {}
 
@@ -24,7 +24,7 @@ inline double DoubleSubscriber::Get() const {
 }
 
 inline double DoubleSubscriber::Get(
-    double defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetDouble(m_subHandle, defaultValue);
 }
 
@@ -33,7 +33,7 @@ inline TimestampedDouble DoubleSubscriber::GetAtomic() const {
 }
 
 inline TimestampedDouble DoubleSubscriber::GetAtomic(
-    double defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicDouble(m_subHandle, defaultValue);
 }
 
@@ -49,12 +49,12 @@ inline DoubleTopic DoubleSubscriber::GetTopic() const {
 inline DoublePublisher::DoublePublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void DoublePublisher::Set(double value,
+inline void DoublePublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetDouble(m_pubHandle, value, time);
 }
 
-inline void DoublePublisher::SetDefault(double value) {
+inline void DoublePublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultDouble(m_pubHandle, value);
 }
 
@@ -63,7 +63,7 @@ inline DoubleTopic DoublePublisher::GetTopic() const {
 }
 
 inline DoubleEntry::DoubleEntry(
-    NT_Entry handle, double defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : DoubleSubscriber{handle, defaultValue},
       DoublePublisher{handle} {}
 

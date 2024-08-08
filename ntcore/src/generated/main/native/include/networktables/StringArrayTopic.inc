@@ -15,7 +15,7 @@
 namespace nt {
 
 inline StringArraySubscriber::StringArraySubscriber(
-    NT_Subscriber handle, std::span<const std::string> defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue.begin(), defaultValue.end()} {}
 
@@ -24,7 +24,7 @@ inline std::vector<std::string> StringArraySubscriber::Get() const {
 }
 
 inline std::vector<std::string> StringArraySubscriber::Get(
-    std::span<const std::string> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetStringArray(m_subHandle, defaultValue);
 }
 
@@ -33,7 +33,7 @@ inline TimestampedStringArray StringArraySubscriber::GetAtomic() const {
 }
 
 inline TimestampedStringArray StringArraySubscriber::GetAtomic(
-    std::span<const std::string> defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicStringArray(m_subHandle, defaultValue);
 }
 
@@ -49,12 +49,12 @@ inline StringArrayTopic StringArraySubscriber::GetTopic() const {
 inline StringArrayPublisher::StringArrayPublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void StringArrayPublisher::Set(std::span<const std::string> value,
+inline void StringArrayPublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetStringArray(m_pubHandle, value, time);
 }
 
-inline void StringArrayPublisher::SetDefault(std::span<const std::string> value) {
+inline void StringArrayPublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultStringArray(m_pubHandle, value);
 }
 
@@ -63,7 +63,7 @@ inline StringArrayTopic StringArrayPublisher::GetTopic() const {
 }
 
 inline StringArrayEntry::StringArrayEntry(
-    NT_Entry handle, std::span<const std::string> defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : StringArraySubscriber{handle, defaultValue},
       StringArrayPublisher{handle} {}
 
