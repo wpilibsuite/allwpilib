@@ -261,6 +261,11 @@ public final class Units {
   public static final Dimensionless Percent =
       derive(Value).splitInto(100).named("Percent").symbol("%").make();
 
+  // Frequency
+  /** The unit of frequency. */
+  public static final Velocity<Dimensionless> Hertz =
+      derive(Value.per(Second)).named("Hertz").symbol("Hz").make();
+
   // Voltage
   /** The base unit of electric potential. */
   public static final Voltage Volts = BaseUnits.Voltage;

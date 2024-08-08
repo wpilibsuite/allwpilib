@@ -231,6 +231,20 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Returns the inverse of this measure.
+   *
+   * @return the resulting measure
+   * @throws IllegalArgumentException if the unit is of type {@link Temperature}
+   */
+  default Measure<?> inverse() {
+    // Taking the inverse of a temperature breaks and doesn't make sense
+    if (unit() instanceof Temperature) {
+      throw new IllegalArgumentException("Can't take the inverse of a Temperature!");
+    }
+    return Units.Value.of(1).divide(this);
+  }
+
+  /**
    * Returns an immutable copy of this measure. The copy can be used freely and is guaranteed never
    * to change.
    *
