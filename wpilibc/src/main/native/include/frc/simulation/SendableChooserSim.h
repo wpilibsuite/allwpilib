@@ -14,7 +14,7 @@
 namespace frc::sim {
 
 /**
- * Class that allows you to control a SendableChooser's selected option in
+ * Class that facilitates control of a SendableChooser's selected option in
  * simulation.
  */
 class SendableChooserSim {
