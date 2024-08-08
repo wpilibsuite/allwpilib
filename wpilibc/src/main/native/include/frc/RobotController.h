@@ -174,7 +174,7 @@ class RobotController {
 
   /**
    * Get the count of the total current faults on the 3.3V rail since the
-   * controller has booted.
+   * code started.
    *
    * @return The number of faults
    */
@@ -212,7 +212,7 @@ class RobotController {
 
   /**
    * Get the count of the total current faults on the 5V rail since the
-   * controller has booted.
+   * code started.
    *
    * @return The number of faults
    */
@@ -250,11 +250,14 @@ class RobotController {
 
   /**
    * Get the count of the total current faults on the 6V rail since the
-   * controller has booted.
+   * code started.
    *
    * @return The number of faults.
    */
   static int GetFaultCount6V();
+
+  /** Reset the overcurrent fault counters for all user rails to 0. */
+  static void ResetRailFaultCounts();
 
   /**
    * Get the current brownout voltage setting.

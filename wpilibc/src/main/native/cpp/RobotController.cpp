@@ -214,6 +214,12 @@ int RobotController::GetFaultCount6V() {
   return retVal;
 }
 
+void RobotController::ResetRailFaultCounts() {
+  int32_t status = 0;
+  HAL_ResetUserCurrentFaults(&status);
+  FRC_CheckErrorStatus(status, "ResetRailFaultCounts");
+}
+
 units::volt_t RobotController::GetBrownoutVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetBrownoutVoltage(&status);
