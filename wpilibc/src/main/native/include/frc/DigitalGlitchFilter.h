@@ -120,7 +120,14 @@ class DigitalGlitchFilter : public wpi::Sendable,
   // Sets the filter for the input to be the requested index. A value of 0
   // disables the filter, and the filter value must be between 1 and 3,
   // inclusive.
-  void DoAdd(DigitalSource* input, int requested_index);
+  static void DoAdd(DigitalSource* input, int requested_index);
+
+  /**
+   * Allocates the next available filter index, or -1 if there are no filters
+   * available.
+   * @return the filter index
+   */
+  static int AllocateFilterIndex();
 
   int m_channelIndex = -1;
   static wpi::mutex m_mutex;
