@@ -117,6 +117,29 @@ class MeasureTest {
 
     assertEquals(2.5 * 1.25, result.magnitude());
     assertEquals(2.5 * 1.25 * 6, result.baseUnitMagnitude());
+
+    // the reverse should also be equivalent
+    result = multiplier.times(measure);
+    assertSame(unit, result.unit());
+
+    assertEquals(2.5 * 1.25, result.magnitude());
+    assertEquals(2.5 * 1.25 * 6, result.baseUnitMagnitude());
+  }
+
+  @Test
+  void testPerUnitlessTimesUnitless() {
+    var measure = Units.Seconds.per(Units.Value).of(2.5);
+    var multiplier = Units.Percent.of(125); // 125% or 1.25x
+    Measure<?> result = measure.times(multiplier);
+    assertSame(result.unit(), Units.Seconds);
+
+    assertEquals(2.5 * 1.25, result.magnitude());
+
+    // the reverse should also be equivalent
+    result = multiplier.times(measure);
+    assertSame(result.unit(), Units.Seconds);
+
+    assertEquals(2.5 * 1.25, result.magnitude());
   }
 
   @Test
@@ -154,6 +177,7 @@ class MeasureTest {
     // 19 ft/ms = 19,000 ft/s
     // 19,000 ft/s * 44s = 836,000 ft
     assertTrue(Units.Feet.of(836_000).isNear(m1.times(m2), 1e-12));
+    assertTrue(Units.Feet.of(836_000).isNear(m2.times(m1), 1e-12));
 
     // 42 ex per foot * 17mm = 42 ex * 17mm / (304.8mm/ft) = 42 * 17 / 304.8 = 2.34252
     var exampleUnit = new ExampleUnit(1);
@@ -164,36 +188,112 @@ class MeasureTest {
 
   @Test
   void testDivideMeasure() {
-    // Dimensionless divide
-    var m1 = Units.Meters.of(6);
-    var m2 = Units.Value.of(3);
-    var result = m1.divide(m2);
-    assertEquals(m1.divide(m2).magnitude(), 2);
-    assertEquals(result.unit(), Units.Meters);
-    // Velocity divide
-    var m3 = Units.Meters.of(8);
-    var m4 = Units.Meters.per(Units.Second).of(4);
-    result = m3.divide(m4);
-    assertEquals(result.magnitude(), 2);
-    assertEquals(result.unit(), Units.Second);
-    // Per divide
-    var m5 = Units.Volts.of(6);
-    var m6 = Units.Volts.per(Units.Meter).of(2);
-    result = m5.divide(m6);
-    assertEquals(result.magnitude(), 3);
-    assertEquals(result.unit(), Units.Meter);
     // Fallthrough divide
-    var m7 = Units.Seconds.of(10);
-    var m8 = Units.Amps.of(2);
-    result = m7.divide(m8);
+    var num = Units.Seconds.of(10);
+    var denom = Units.Amps.of(2);
+    var result = num.divide(denom);
     assertEquals(result.magnitude(), 5);
     assertEquals(result.unit(), Units.Seconds.per(Units.Amps));
+  }
+
+  @Test
+  void testDivideDimensionless() {
+    // Divide by dimensionless
+    var num = Units.Meters.of(6);
+    var denom = Units.Value.of(3);
+    var result = num.divide(denom);
+    assertEquals(result.magnitude(), 2);
+    assertEquals(result.unit(), Units.Meters);
+  }
+
+  @Test
+  void testDivideSameBaseUnit() {
     // Same base unit divide
-    var m9 = Units.Meters.of(8);
-    var m10 = Units.Meters.of(4);
-    result = m9.divide(m10);
+    var num = Units.Meters.of(8);
+    var denom = Units.Meters.of(4);
+    var result = num.divide(denom);
     assertEquals(result.magnitude(), 2);
     assertEquals(result.unit(), Units.Value);
+  }
+
+  @Test
+  void testDivideVelocity() {
+    // Velocity divide
+    var num = Units.Meters.of(6);
+    var denom = Units.Meters.per(Units.Second).of(3);
+    var result = num.divide(denom);
+    assertEquals(result.magnitude(), 2);
+    assertEquals(result.unit(), Units.Second);
+  }
+
+  @Test
+  void testDimensionlessDivideVelocity() {
+    // Dimensionless divided by Velocity
+    var num = Units.Value.of(8);
+    var denom = Units.Meters.per(Units.Second).of(4);
+    var result = num.divide(denom);
+    assertEquals(result.magnitude(), 2);
+    assertEquals(result.unit(), Units.Seconds.per(Units.Meter));
+  }
+
+  @Test
+  void testDivideVelocityDimensionless() {
+    // Dimensionless divided by Velocity<Dimensionless>
+    var num = Units.Value.of(10);
+    var denom = Units.Value.per(Units.Second).of(2);
+    var result = num.divide(denom);
+    assertEquals(result.magnitude(), 5);
+    assertEquals(result.unit(), Units.Seconds);
+  }
+
+  @Test
+  void testDivideTimeMeasure() {
+    // Time divide
+    var num = Units.Meters.of(12);
+    var denom = Units.Seconds.of(2);
+    var result = num.divide(denom);
+    assertEquals(result.magnitude(), 6);
+    assertEquals(result.unit(), Units.Meters.per(Units.Second));
+  }
+
+  @Test
+  void testDividePerMeasure() {
+    // Per divide
+    var num = Units.Volts.of(6);
+    var denom = Units.Volts.per(Units.Meter).of(2);
+    var result = num.divide(denom);
+    assertEquals(result.magnitude(), 3);
+    assertEquals(result.unit(), Units.Meter);
+  }
+
+  @Test
+  void testDimensionlessDividePer() {
+    // Dimensionless divided by Per
+    var num = Units.Value.of(8);
+    var denom = Units.Volts.per(Units.Meter).of(2);
+    var result = num.divide(denom);
+    assertEquals(result.magnitude(), 4);
+    assertEquals(result.unit(), Units.Meters.per(Units.Volt));
+  }
+
+  @Test
+  void testDividePerDimensionless() {
+    // Dimensionless divided by Per<Dimensionless, U>
+    var num = Units.Value.of(10);
+    var denom = Units.Value.per(Units.Meter).of(2);
+    var result = num.divide(denom);
+    assertEquals(result.magnitude(), 5);
+    assertEquals(result.unit(), Units.Meters);
+  }
+
+  @Test
+  void testDivideTimePerMeasure() {
+    // Dimensionless divided by Per<Time, U>
+    var num = Units.Value.of(12);
+    var denom = Units.Milliseconds.per(Units.Meter).of(2);
+    var result = num.divide(denom);
+    assertEquals(result.magnitude(), 6);
+    assertEquals(result.unit(), Units.Meters.per(Units.Millisecond));
   }
 
   @Test
