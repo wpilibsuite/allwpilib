@@ -476,8 +476,8 @@ void NT_GetEntryValueType(NT_Entry entry, unsigned int types,
 /**
  * Set Default Entry Value.
  *
- * Returns copy of current entry value if it exists.
- * Otherwise, sets passed in value, and returns set value.
+ * Returns 0 if name exists.
+ * Otherwise, sets passed in value, and returns 1.
  * Note that one of the type options is "unassigned".
  *
  * @param entry     entry handle
