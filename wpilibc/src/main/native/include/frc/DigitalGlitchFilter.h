@@ -117,6 +117,8 @@ class DigitalGlitchFilter : public wpi::Sendable,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
+  int m_channelIndex;
+
   // Sets the filter for the input to be the requested index. A value of 0
   // disables the filter, and the filter value must be between 1 and 3,
   // inclusive.
@@ -129,7 +131,6 @@ class DigitalGlitchFilter : public wpi::Sendable,
    */
   static int AllocateFilterIndex();
 
-  int m_channelIndex = -1;
   static wpi::mutex m_mutex;
   static std::array<bool, 3> m_filterAllocated;
 };

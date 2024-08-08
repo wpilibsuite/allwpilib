@@ -186,7 +186,7 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {}
 
-  private int m_channelIndex = -1;
+  private int m_channelIndex;
   private static final Lock m_mutex = new ReentrantLock(true);
   private static final boolean[] m_filterAllocated = new boolean[3];
 }
