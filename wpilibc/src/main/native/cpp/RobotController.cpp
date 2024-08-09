@@ -84,6 +84,13 @@ bool RobotController::IsBrownedOut() {
   return retVal;
 }
 
+int RobotController::GetCommsDisableCount() {
+  int32_t status = 0;
+  int retVal = HAL_GetCommsDisableCount(&status);
+  FRC_CheckErrorStatus(status, "GetCommsDisableCount");
+  return retVal;
+}
+
 bool RobotController::GetRSLState() {
   int32_t status = 0;
   bool retVal = HAL_GetRSLState(&status);

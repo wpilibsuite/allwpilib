@@ -118,6 +118,16 @@ public final class RobotController {
   }
 
   /**
+   * Gets the number of times the system has been disabled due to communication errors with the
+   * Driver Station.
+   *
+   * @return number of disables due to communication errors.
+   */
+  public static int getCommsDisableCount() {
+    return HAL.getCommsDisableCount();
+  }
+
+  /**
    * Gets the current state of the Robot Signal Light (RSL).
    *
    * @return The current state of the RSL- true if on, false if off

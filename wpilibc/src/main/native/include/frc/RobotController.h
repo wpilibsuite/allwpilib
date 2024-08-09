@@ -116,6 +116,13 @@ class RobotController {
   static bool IsBrownedOut();
 
   /**
+   * Gets the number of times the system has been disabled due to communication errors with the Driver Station.
+   *
+   * @return number of disables due to communication errors.
+   */
+  static int GetCommsDisableCount();
+
+  /**
    * Gets the current state of the Robot Signal Light (RSL)
    * @return The current state of the RSL- true if on, false if off
    */
