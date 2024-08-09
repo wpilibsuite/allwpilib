@@ -17,6 +17,7 @@ void InitializePowerDistributionData() {
 PowerDistributionData* hal::SimPowerDistributionData;
 void PowerDistributionData::ResetData() {
   initialized.Reset(false);
+  channelCount.Reset(kNumPDSimChannels);
   temperature.Reset(0.0);
   voltage.Reset(12.0);
   for (int i = 0; i < kNumPDSimChannels; i++) {
@@ -34,6 +35,7 @@ void HALSIM_ResetPowerDistributionData(int32_t index) {
                                SimPowerDistributionData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
+DEFINE_CAPI(int, ChannelCount, channelCount)
 DEFINE_CAPI(double, Temperature, temperature)
 DEFINE_CAPI(double, Voltage, voltage)
 HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(double, HALSIM, PowerDistributionCurrent,
@@ -42,7 +44,8 @@ HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(double, HALSIM, PowerDistributionCurrent,
 void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents,
                                             int length) {
   auto& data = SimPowerDistributionData[index].current;
-  int toCopy = (std::min)(length, kNumPDSimChannels);
+  int channelCount = SimPowerDistributionData[index].channelCount;
+  int toCopy = (std::min)(length, channelCount);
   for (int i = 0; i < toCopy; i++) {
     currents[i] = data[i];
   }
@@ -52,7 +55,8 @@ void HALSIM_SetPowerDistributionAllCurrents(int32_t index,
                                             const double* currents,
                                             int length) {
   auto& data = SimPowerDistributionData[index].current;
-  int toCopy = (std::min)(length, kNumPDSimChannels);
+  int channelCount = SimPowerDistributionData[index].channelCount;
+  int toCopy = (std::min)(length, channelCount);
   for (int i = 0; i < toCopy; i++) {
     data[i] = currents[i];
   }
