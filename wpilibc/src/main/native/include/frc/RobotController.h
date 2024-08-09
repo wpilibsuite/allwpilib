@@ -116,7 +116,8 @@ class RobotController {
   static bool IsBrownedOut();
 
   /**
-   * Gets the number of times the system has been disabled due to communication errors with the Driver Station.
+   * Gets the number of times the system has been disabled due to communication
+   * errors with the Driver Station.
    *
    * @return number of disables due to communication errors.
    */
