@@ -253,7 +253,9 @@ public abstract class IterativeRobotBase extends RobotBase {
    * Enables or disables flushing NetworkTables every loop iteration. By default, this is enabled.
    *
    * @param enabled True to enable, false to disable
+   * @deprecated Deprecated without replacement.
    */
+  @Deprecated(forRemoval = true, since = "2025")
   public void setNetworkTablesFlushEnabled(boolean enabled) {
     m_ntFlushEnabled = enabled;
   }
