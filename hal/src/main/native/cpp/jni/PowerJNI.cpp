@@ -266,6 +266,20 @@ Java_edu_wpi_first_hal_PowerJNI_getUserCurrentFaults3V3
 
 /*
  * Class:     edu_wpi_first_hal_PowerJNI
+ * Method:    resetUserCurrentFaults
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PowerJNI_resetUserCurrentFaults
+  (JNIEnv* env, jclass)
+{
+  int32_t status = 0;
+  HAL_ResetUserCurrentFaults(&status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerJNI
  * Method:    setBrownoutVoltage
  * Signature: (D)V
  */
