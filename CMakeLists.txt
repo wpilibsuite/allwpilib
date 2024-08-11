@@ -117,7 +117,17 @@ wpilib_config(OPTIONS WITH_WPIMATH WITH_JAVA REQUIRES WITH_WPIUNITS)
 set(include_dest include)
 set(java_lib_dest java)
 if(WITH_JAVA OR WITH_JAVA_SOURCE)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
+    set(CMAKE_JAVA_COMPILE_FLAGS
+        "--release"
+        "17"
+        "-encoding"
+        "UTF8"
+        "-Werror"
+        "-Xlint:all"
+        "-Xlint:-try" # ignore AutoCloseable warnings
+        "-Xlint:-serial" # ignore missing serialVersionUID warnings
+        "-Xlint:-processing" # ignore unclaimed annotation warning from annotation processing
+    )
     find_package(Java REQUIRED COMPONENTS Development)
     find_package(JNI REQUIRED COMPONENTS JVM)
 endif()

@@ -30,6 +30,12 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java libprotobuf-dev protobuf-compiler ninja-build
 
+      - uses: actions/setup-java@v4
+        if: runner.os == 'Linux'
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
       - name: Install dependencies (macOS)
         run: brew install opencv protobuf@3 ninja
         if: runner.os == 'macOS'
