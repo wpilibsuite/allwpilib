@@ -50,6 +50,7 @@ struct DigitalPort {
   int32_t centerPwm = 0;
   int32_t deadbandMinPwm = 0;
   int32_t minPwm = 0;
+  int32_t filterIndex = 0;
   std::string previousAllocation;
 };
 
