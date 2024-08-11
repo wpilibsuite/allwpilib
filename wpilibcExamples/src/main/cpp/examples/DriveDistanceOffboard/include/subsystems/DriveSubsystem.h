@@ -5,6 +5,7 @@
 #pragma once
 
 #include <frc/Encoder.h>
+#include <frc/Timer.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/trajectory/TrapezoidProfile.h>
@@ -95,6 +96,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc2::CommandPtr DynamicProfiledDriveDistance(units::meter_t distance);
 
  private:
+  frc::TrapezoidProfile<units::meters> m_profile{
+      {DriveConstants::kMaxSpeed, DriveConstants::kMaxAcceleration}};
+  frc::Timer m_timer;
   units::meter_t m_initialLeftDistance;
   units::meter_t m_initialRightDistance;
   // Components (e.g. motor controllers and sensors) should generally be

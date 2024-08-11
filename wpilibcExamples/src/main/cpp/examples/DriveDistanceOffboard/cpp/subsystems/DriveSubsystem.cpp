@@ -5,7 +5,6 @@
 #include "subsystems/DriveSubsystem.h"
 
 #include <frc/RobotController.h>
-#include <frc/Timer.h>
 
 using namespace DriveConstants;
 
@@ -75,38 +74,32 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
 
 frc2::CommandPtr DriveSubsystem::ProfiledDriveDistance(
     units::meter_t distance) {
-  auto profile =
-      frc::TrapezoidProfile<units::meters>{{kMaxSpeed, kMaxAcceleration}};
-  frc::Timer timer{};
   return StartRun(
              [&] {
                // Restart timer so profile setpoints start at the beginning
-               timer.Restart();
+               m_timer.Restart();
                ResetEncoders();
              },
              [&] {
                // Current state never changes, so we need to use a timer to get
                // the setpoints we need to be at
-               auto currentTime = timer.Get();
+               auto currentTime = m_timer.Get();
                auto currentSetpoint =
-                   profile.Calculate(currentTime, {}, {distance, 0_mps});
-               auto nextSetpoint =
-                   profile.Calculate(currentTime + kDt, {}, {distance, 0_mps});
+                   m_profile.Calculate(currentTime, {}, {distance, 0_mps});
+               auto nextSetpoint = m_profile.Calculate(currentTime + kDt, {},
+                                                       {distance, 0_mps});
                SetDriveStates(currentSetpoint, currentSetpoint, nextSetpoint,
                               nextSetpoint);
              })
-      .Until([&] { return profile.IsFinished(0_s); });
+      .Until([&] { return m_profile.IsFinished(0_s); });
 }
 
 frc2::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
     units::meter_t distance) {
-  auto profile =
-      frc::TrapezoidProfile<units::meters>{{kMaxSpeed, kMaxAcceleration}};
-  frc::Timer timer{};
   return StartRun(
              [&] {
                // Restart timer so profile setpoints start at the beginning
-               timer.Restart();
+               m_timer.Restart();
                // Store distance so we know the target distance for each encoder
                m_initialLeftDistance = GetLeftEncoderDistance();
                m_initialRightDistance = GetRightEncoderDistance();
@@ -115,23 +108,23 @@ frc2::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
                // Current state never changes for the duration of the command,
                // so we need to use a timer to get the setpoints we need to be
                // at
-               auto currentTime = timer.Get();
+               auto currentTime = m_timer.Get();
 
-               auto currentLeftSetpoint = profile.Calculate(
+               auto currentLeftSetpoint = m_profile.Calculate(
                    currentTime, {m_initialLeftDistance, 0_mps},
                    {m_initialLeftDistance + distance, 0_mps});
-               auto currentRightSetpoint = profile.Calculate(
+               auto currentRightSetpoint = m_profile.Calculate(
                    currentTime, {m_initialRightDistance, 0_mps},
                    {m_initialRightDistance + distance, 0_mps});
 
-               auto nextLeftSetpoint = profile.Calculate(
+               auto nextLeftSetpoint = m_profile.Calculate(
                    currentTime + kDt, {m_initialLeftDistance, 0_mps},
                    {m_initialLeftDistance + distance, 0_mps});
-               auto nextRightSetpoint = profile.Calculate(
+               auto nextRightSetpoint = m_profile.Calculate(
                    currentTime + kDt, {m_initialRightDistance, 0_mps},
                    {m_initialRightDistance + distance, 0_mps});
                SetDriveStates(currentLeftSetpoint, currentRightSetpoint,
                               nextLeftSetpoint, nextRightSetpoint);
              })
-      .Until([&] { return profile.IsFinished(0_s); });
+      .Until([&] { return m_profile.IsFinished(0_s); });
 }

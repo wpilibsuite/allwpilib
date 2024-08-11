@@ -45,6 +45,16 @@ public class DriveSubsystem extends SubsystemBase {
   private final DifferentialDrive m_drive =
       new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
 
+  // The trapezoid profile
+  private final TrapezoidProfile m_profile =
+      new TrapezoidProfile(
+          new TrapezoidProfile.Constraints(
+              DriveConstants.kMaxSpeedMetersPerSecond,
+              DriveConstants.kMaxAccelerationMetersPerSecondSquared));
+
+  // The timer
+  private final Timer m_timer = new Timer();
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     SendableRegistry.addChild(m_drive, m_leftLeader);
@@ -144,30 +154,24 @@ public class DriveSubsystem extends SubsystemBase {
    * @return A command.
    */
   public Command profiledDriveDistance(double distance) {
-    var profile =
-        new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxSpeedMetersPerSecond,
-                DriveConstants.kMaxAccelerationMetersPerSecondSquared));
-    var timer = new Timer();
     return startRun(
             () -> {
               // Restart timer so profile setpoints start at the beginning
-              timer.restart();
+              m_timer.restart();
               resetEncoders();
             },
             () -> {
               // Current state never changes, so we need to use a timer to get the setpoints we need
               // to be at
-              var currentTime = timer.get();
+              var currentTime = m_timer.get();
               var currentSetpoint =
-                  profile.calculate(currentTime, new State(), new State(distance, 0));
+                  m_profile.calculate(currentTime, new State(), new State(distance, 0));
               var nextSetpoint =
-                  profile.calculate(
+                  m_profile.calculate(
                       currentTime + DriveConstants.kDt, new State(), new State(distance, 0));
               setDriveStates(currentSetpoint, currentSetpoint, nextSetpoint, nextSetpoint);
             })
-        .until(() -> profile.isFinished(0));
+        .until(() -> m_profile.isFinished(0));
   }
 
   private double m_initialLeftDistance;
@@ -181,16 +185,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @return A command.
    */
   public Command dynamicProfiledDriveDistance(double distance) {
-    var profile =
-        new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxSpeedMetersPerSecond,
-                DriveConstants.kMaxAccelerationMetersPerSecondSquared));
-    var timer = new Timer();
     return startRun(
             () -> {
               // Restart timer so profile setpoints start at the beginning
-              timer.restart();
+              m_timer.restart();
               // Store distance so we know the target distance for each encoder
               m_initialLeftDistance = getLeftEncoderDistance();
               m_initialRightDistance = getRightEncoderDistance();
@@ -198,30 +196,30 @@ public class DriveSubsystem extends SubsystemBase {
             () -> {
               // Current state never changes for the duration of the command, so we need to use a
               // timer to get the setpoints we need to be at
-              var currentTime = timer.get();
+              var currentTime = m_timer.get();
               var currentLeftSetpoint =
-                  profile.calculate(
+                  m_profile.calculate(
                       currentTime,
                       new State(m_initialLeftDistance, 0),
                       new State(m_initialLeftDistance + distance, 0));
               var currentRightSetpoint =
-                  profile.calculate(
+                  m_profile.calculate(
                       currentTime,
                       new State(m_initialRightDistance, 0),
                       new State(m_initialRightDistance + distance, 0));
               var nextLeftSetpoint =
-                  profile.calculate(
+                  m_profile.calculate(
                       currentTime + DriveConstants.kDt,
                       new State(m_initialLeftDistance, 0),
                       new State(m_initialLeftDistance + distance, 0));
               var nextRightSetpoint =
-                  profile.calculate(
+                  m_profile.calculate(
                       currentTime + DriveConstants.kDt,
                       new State(m_initialRightDistance, 0),
                       new State(m_initialRightDistance + distance, 0));
               setDriveStates(
                   currentLeftSetpoint, currentRightSetpoint, nextLeftSetpoint, nextRightSetpoint);
             })
-        .until(() -> profile.isFinished(0));
+        .until(() -> m_profile.isFinished(0));
   }
 }
