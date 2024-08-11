@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.util.ErrorMessages;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -94,6 +95,56 @@ public interface LEDReader {
     int bufLen = getLength();
     for (int i = 0; i < bufLen; i++) {
       iterator.accept(i, getRed(i), getGreen(i), getBlue(i));
+    }
+  }
+
+  /**
+   * An LED reader implementation that operates on offset indexes. Offsets are circular and will
+   * wrap around the end of the base reader back to the start.
+   */
+  class OffsetLEDReader implements LEDReader {
+    private final LEDReader m_reader;
+    private final long m_offset;
+
+    /**
+     * Creates a new offset LED reader based on an existing reader and the integer offset.
+     *
+     * @param reader the backing reader to use
+     * @param offset the offset to use when reading data
+     */
+    public OffsetLEDReader(LEDReader reader, long offset) {
+      m_reader = ErrorMessages.requireNonNullParam(reader, "reader", "OffsetLEDReader");
+      m_offset = offset;
+    }
+
+    @Override
+    public int getLength() {
+      return m_reader.getLength();
+    }
+
+    @Override
+    public int getRed(int index) {
+      return m_reader.getRed(remapIndex(index));
+    }
+
+    @Override
+    public int getGreen(int index) {
+      return m_reader.getGreen(remapIndex(index));
+    }
+
+    @Override
+    public int getBlue(int index) {
+      return m_reader.getBlue(remapIndex(index));
+    }
+
+    /**
+     * Remaps an input index to the corresponding offset index.
+     *
+     * @param index the input index to remap
+     * @return the remapped index
+     */
+    public int remapIndex(int index) {
+      return Math.floorMod(index + m_offset, getLength());
     }
   }
 }
