@@ -452,6 +452,15 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return !(watchdog->readStatus_PowerAlive(status));
 }
 
+int32_t HAL_GetCommsDisableCount(int32_t* status) {
+  hal::init::CheckInit();
+  if (!watchdog) {
+    *status = NiFpga_Status_ResourceNotInitialized;
+    return 0;
+  }
+  return watchdog->readStatus_SysDisableCount(status);
+}
+
 HAL_Bool HAL_GetRSLState(int32_t* status) {
   hal::init::CheckInit();
   if (!global) {
