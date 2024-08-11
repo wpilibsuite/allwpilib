@@ -235,7 +235,14 @@ static void DisplayGui() {
         ImGui::Text("Refreshing Status");
         const auto fs = futureStatus->wait_for(std::chrono::seconds(0));
         if (fs == std::future_status::ready) {
-          deviceStatuses[i.first] = futureStatus->get();
+          // DeploySession may throw exceptions. They've already been logged, so
+          // we can ignore them.
+          try {
+            deviceStatuses[i.first] = futureStatus->get();
+          } catch (const std::exception&) {
+            // pass, already been logged
+          }
+          // Always destroy the future so the UI updates
           deploySession.DestroyStatusFuture(i.first);
         }
       } else {
