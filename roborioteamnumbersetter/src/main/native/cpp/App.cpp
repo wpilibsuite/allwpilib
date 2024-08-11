@@ -57,10 +57,10 @@ struct TeamNumberRefHolder {
 static std::unique_ptr<TeamNumberRefHolder> teamNumberRef;
 static std::unordered_map<std::string, std::pair<unsigned int, std::string>>
     foundDevices;
-static std::unordered_map<std::string, std::optional<sysid::DeviceStatus>>
+static std::unordered_map<std::string, std::optional<rtns::DeviceStatus>>
     deviceStatuses;
 static wpi::Logger logger;
-static sysid::DeploySession deploySession{logger};
+static rtns::DeploySession deploySession{logger};
 static std::unique_ptr<wpi::MulticastServiceResolver> multicastResolver;
 static glass::MainMenuBar gMainMenu;
 
@@ -182,7 +182,7 @@ static void DisplayGui() {
 
     for (auto&& i : foundDevices) {
       std::future<int>* future = deploySession.GetFuture(i.first);
-      std::future<sysid::DeviceStatus>* futureStatus =
+      std::future<rtns::DeviceStatus>* futureStatus =
           deploySession.GetStatusFuture(i.first);
       if (ImGui::BeginTable("Table", 4)) {
         ImGui::TableSetupColumn(
