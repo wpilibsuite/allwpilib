@@ -84,7 +84,7 @@ public class RamseteCommand extends Command {
    * @param requirements The subsystems to require.
    * @deprecated Use LTVUnicycleController instead.
    */
-  @Deprecated(since = "2024", forRemoval = true)
+  @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings("this-escape")
   public RamseteCommand(
       Trajectory trajectory,
@@ -126,7 +126,7 @@ public class RamseteCommand extends Command {
    * @param requirements The subsystems to require.
    * @deprecated Use LTVUnicycleController instead.
    */
-  @Deprecated(since = "2024", forRemoval = true)
+  @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings("this-escape")
   public RamseteCommand(
       Trajectory trajectory,
