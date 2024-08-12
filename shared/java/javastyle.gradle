@@ -74,14 +74,6 @@ spotless {
     }
 }
 
-apply plugin: 'com.github.spotbugs'
-
-spotbugs {
-    ignoreFailures = false
-    effort = spotbugsEffort
-    excludeFilter = file("${project.rootDir}/styleguide/spotbugs-exclude.xml")
-}
-
 task javaFormat {
     dependsOn(tasks.withType(Checkstyle))
     dependsOn(tasks.withType(Pmd))

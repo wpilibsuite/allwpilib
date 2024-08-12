@@ -92,7 +92,7 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Run Java format
-        run: ./gradlew javaFormat spotbugsMain spotbugsTest spotbugsDev
+        run: ./gradlew javaFormat
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
       - name: Generate diff

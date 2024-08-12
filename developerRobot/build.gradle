@@ -56,10 +56,6 @@ dependencies {
     implementation project(':apriltag')
 }
 
-tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
-    onlyIf { false }
-}
-
 def simProjects = ['halsim_gui']
 
 deploy {
