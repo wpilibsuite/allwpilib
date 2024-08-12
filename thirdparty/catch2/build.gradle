@@ -1,0 +1,60 @@
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+ext {
+    nativeName = 'catch2'
+}
+
+apply from: "${rootDir}/shared/config.gradle"
+
+def catch2UserConfigInput = file("src/main/native/include/catch2/catch_user_config.hpp.in")
+def catch2UserConfigOutput  = file("$buildDir/generated-includes/catch2/catch_user_config.hpp")
+
+task generateCatchUserConfig() {
+    description = 'Generates the Catch2 user config file.'
+    group = 'catch2'
+
+    outputs.file catch2UserConfigOutput
+    inputs.file catch2UserConfigInput
+
+    doLast {
+        println "Writing config to $catch2UserConfigOutput"
+
+        if (catch2UserConfigOutput.exists()) {
+            catch2UserConfigOutput.delete()
+        }
+
+        def read = catch2UserConfigInput.text
+        read = read.replace('@CATCH_CONFIG_DEFAULT_REPORTER@', "console")
+        read = read.replace('@CATCH_CONFIG_CONSOLE_WIDTH@', "80")
+        read = read.replaceAll("#cmakedefine", "//")
+
+        catch2UserConfigOutput.write(read)
+    }
+}
+
+model {
+    components {
+        "${nativeName}"(NativeLibrarySpec) {
+            sources.cpp {
+                source {
+                    srcDirs "src/main/native/cpp"
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include',
+                            "$buildDir/generated-includes/"
+                }
+            }
+        }
+    }
+}
+
+project(':').libraryBuild.dependsOn build
+
+tasks.withType(CppCompile) {
+    dependsOn generateCatchUserConfig
+}
+
+apply from: 'publish.gradle'
