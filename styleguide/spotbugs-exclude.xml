@@ -160,4 +160,7 @@
   <Match>
     <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
   </Match>
+  <Match>
+    <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
+  </Match>
 </FindBugsFilter>
