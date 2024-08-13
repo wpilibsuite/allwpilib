@@ -66,7 +66,7 @@ public abstract class MutableMeasureBase<
 
   @Override
   public boolean equals(Object o) {
-    return this == o || (o instanceof Measure<?> m && isEquivalent(m));
+    return this == o || o instanceof Measure<?> m && isEquivalent(m);
   }
 
   @Override
