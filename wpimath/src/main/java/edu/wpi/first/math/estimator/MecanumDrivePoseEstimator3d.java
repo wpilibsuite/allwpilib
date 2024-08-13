@@ -21,7 +21,7 @@ import edu.wpi.first.math.numbers.N4;
  * This class wraps {@link MecanumDriveOdometry3d Mecanum Drive Odometry} to fuse
  * latency-compensated vision measurements with mecanum drive encoder distance measurements. It will
  * correct for noisy measurements and encoder drift. It is intended to be a drop-in replacement for
- * {@link edu.wpi.first.math.kinematics.MecanumDriveOdometry3d}.
+ * {@link MecanumDriveOdometry3d}.
  *
  * <p>{@link MecanumDrivePoseEstimator3d#update} should be called every robot loop.
  *

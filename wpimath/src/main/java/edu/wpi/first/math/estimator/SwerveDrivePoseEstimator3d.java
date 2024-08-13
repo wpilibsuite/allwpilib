@@ -20,7 +20,7 @@ import edu.wpi.first.math.numbers.N4;
 /**
  * This class wraps {@link SwerveDriveOdometry3d Swerve Drive Odometry} to fuse latency-compensated
  * vision measurements with swerve drive encoder distance measurements. It is intended to be a
- * drop-in replacement for {@link edu.wpi.first.math.kinematics.SwerveDriveOdometry3d}.
+ * drop-in replacement for {@link SwerveDriveOdometry3d}.
  *
  * <p>{@link SwerveDrivePoseEstimator3d#update} should be called every robot loop.
  *
