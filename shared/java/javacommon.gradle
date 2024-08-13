@@ -123,6 +123,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     devImplementation sourceSets.main.output
+
+    compileOnly 'com.github.spotbugs:spotbugs-annotations:4.8.2' // should be kept inline with spotbugs version
 }
 
 task run(type: JavaExec) {

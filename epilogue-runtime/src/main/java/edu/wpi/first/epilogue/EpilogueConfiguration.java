@@ -4,6 +4,7 @@
 
 package edu.wpi.first.epilogue;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import edu.wpi.first.epilogue.logging.DataLogger;
 import edu.wpi.first.epilogue.logging.NTDataLogger;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
@@ -26,10 +27,10 @@ public class EpilogueConfiguration {
   public DataLogger dataLogger = new NTDataLogger(NetworkTableInstance.getDefault());
 
   /** The period Epilogue will log at. */
-  public Measure<Time> loggingPeriod;
+  @SuppressFBWarnings public Measure<Time> loggingPeriod;
 
   /** The offset from the periodic run that Epilogue will log at. */
-  public Measure<Time> loggingPeriodOffset;
+  @SuppressFBWarnings public Measure<Time> loggingPeriodOffset;
 
   /**
    * The minimum importance level of data to be logged. Defaults to debug, which logs data of all
