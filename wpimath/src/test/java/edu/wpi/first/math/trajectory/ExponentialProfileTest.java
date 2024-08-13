@@ -45,8 +45,8 @@ class ExponentialProfileTest {
   private static ExponentialProfile.State checkDynamics(
       ExponentialProfile profile, ExponentialProfile.State current, ExponentialProfile.State goal) {
     var next = profile.calculate(kDt, current, goal);
-    var currentVelocity = MutableMeasure.ofBaseUnits(current.velocity, RadiansPerSecond);
-    var nextVelocity = MutableMeasure.ofBaseUnits(next.velocity, RadiansPerSecond);
+    var currentVelocity = RadiansPerSecond.mutable(current.velocity);
+    var nextVelocity = RadiansPerSecond.mutable(next.velocity);
     var signal = feedforward.calculate(currentVelocity, nextVelocity);
 
     assertTrue(Math.abs(signal.magnitude()) < constraints.maxInput + 1e-9);

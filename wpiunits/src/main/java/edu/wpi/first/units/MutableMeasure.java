@@ -20,18 +20,6 @@ public interface MutableMeasure<
         U extends Unit, Base extends Measure<U>, MutSelf extends MutableMeasure<U, Base, MutSelf>>
     extends Measure<U> {
   /**
-   * Creates a new mutable measure starting with the given initial magnitude and unit.
-   *
-   * @param initialValue the initial magnitude of the measure, in terms of the initial unit
-   * @param unit the initial unit of the measurement
-   * @param <U> the unit of measurement
-   * @return a new mutable measure
-   */
-  static <U extends Unit> MutableMeasure<U, ?, ?> ofRelativeUnits(double initialValue, U unit) {
-    return new GenericMutableMeasureImpl<>(initialValue, unit.toBaseUnits(initialValue), unit);
-  }
-
-  /**
    * Overwrites the state of this measure with new values.
    *
    * @param magnitude the new magnitude in terms of the new unit
