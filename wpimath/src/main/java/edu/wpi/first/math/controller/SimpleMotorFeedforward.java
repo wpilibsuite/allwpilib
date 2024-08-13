@@ -12,7 +12,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.VelocityUnit;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;

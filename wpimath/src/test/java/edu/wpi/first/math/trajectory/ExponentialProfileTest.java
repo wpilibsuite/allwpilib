@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.MutableMeasure;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

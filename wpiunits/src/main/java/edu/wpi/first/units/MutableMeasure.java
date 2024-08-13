@@ -5,7 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.Dimensionless;
-import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
 
 /**
  * A mutable measurement can be used to keep a single object allocation and reference whose state is
