@@ -13,9 +13,8 @@ SwerveDriveOdometry3d<NumModules>::SwerveDriveOdometry3d(
     SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
     const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
     const Pose2d& initialPose)
-    : Odometry3d<wpi::array<SwerveModuleState, NumModules>,
-                 wpi::array<SwerveModulePosition, NumModules>>(
-          m_kinematicsImpl, gyroAngle, modulePositions, initialPose),
+    : SwerveDriveOdometry3d::Odometry3d(m_kinematicsImpl, gyroAngle,
+                                        modulePositions, initialPose),
       m_kinematicsImpl(kinematics) {
   wpi::math::MathSharedStore::ReportUsage(
       wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
@@ -26,9 +25,8 @@ SwerveDriveOdometry3d<NumModules>::SwerveDriveOdometry3d(
     SwerveDriveKinematics<NumModules> kinematics, const Rotation3d& gyroAngle,
     const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
     const Pose3d& initialPose)
-    : Odometry3d<wpi::array<SwerveModuleState, NumModules>,
-                 wpi::array<SwerveModulePosition, NumModules>>(
-          m_kinematicsImpl, gyroAngle, modulePositions, initialPose),
+    : SwerveDriveOdometry3d::Odometry3d(m_kinematicsImpl, gyroAngle,
+                                        modulePositions, initialPose),
       m_kinematicsImpl(kinematics) {
   wpi::math::MathSharedStore::ReportUsage(
       wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);

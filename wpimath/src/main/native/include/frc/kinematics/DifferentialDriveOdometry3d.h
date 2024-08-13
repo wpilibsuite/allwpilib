@@ -78,11 +78,7 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                      units::meter_t rightDistance, const Pose2d& pose) {
-    Odometry3d<DifferentialDriveWheelSpeeds,
-               DifferentialDriveWheelPositions>::ResetPosition(gyroAngle,
-                                                               {leftDistance,
-                                                                rightDistance},
-                                                               pose);
+    Odometry3d::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
   /**
@@ -101,11 +97,7 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    */
   void ResetPosition(const Rotation3d& gyroAngle, units::meter_t leftDistance,
                      units::meter_t rightDistance, const Pose3d& pose) {
-    Odometry3d<DifferentialDriveWheelSpeeds,
-               DifferentialDriveWheelPositions>::ResetPosition(gyroAngle,
-                                                               {leftDistance,
-                                                                rightDistance},
-                                                               pose);
+    Odometry3d::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
   /**
@@ -121,10 +113,7 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    */
   const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                        units::meter_t rightDistance) {
-    return Odometry3d<DifferentialDriveWheelSpeeds,
-                      DifferentialDriveWheelPositions>::Update(gyroAngle,
-                                                               {leftDistance,
-                                                                rightDistance});
+    return Odometry3d::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
   /**
@@ -140,10 +129,7 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    */
   const Pose3d& Update(const Rotation3d& gyroAngle, units::meter_t leftDistance,
                        units::meter_t rightDistance) {
-    return Odometry3d<DifferentialDriveWheelSpeeds,
-                      DifferentialDriveWheelPositions>::Update(gyroAngle,
-                                                               {leftDistance,
-                                                                rightDistance});
+    return Odometry3d::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
  private:

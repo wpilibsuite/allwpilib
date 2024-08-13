@@ -82,8 +82,7 @@ class SwerveDrivePoseEstimator3d
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs)
-      : PoseEstimator3d<wpi::array<SwerveModuleState, NumModules>,
-                        wpi::array<SwerveModulePosition, NumModules>>(
+      : SwerveDrivePoseEstimator3d::PoseEstimator3d(
             kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
         m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {}
 
@@ -137,8 +136,7 @@ class SwerveDrivePoseEstimator3d
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose3d& initialPose, const wpi::array<double, 4>& stateStdDevs,
       const wpi::array<double, 4>& visionMeasurementStdDevs)
-      : PoseEstimator3d<wpi::array<SwerveModuleState, NumModules>,
-                        wpi::array<SwerveModulePosition, NumModules>>(
+      : SwerveDrivePoseEstimator3d::PoseEstimator3d(
             kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
         m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {}
 

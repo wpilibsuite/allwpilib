@@ -13,9 +13,8 @@ SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
     SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
     const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
     const Pose2d& initialPose)
-    : Odometry<wpi::array<SwerveModuleState, NumModules>,
-               wpi::array<SwerveModulePosition, NumModules>>(
-          m_kinematicsImpl, gyroAngle, modulePositions, initialPose),
+    : SwerveDriveOdometry::Odometry(m_kinematicsImpl, gyroAngle,
+                                    modulePositions, initialPose),
       m_kinematicsImpl(kinematics) {
   wpi::math::MathSharedStore::ReportUsage(
       wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);

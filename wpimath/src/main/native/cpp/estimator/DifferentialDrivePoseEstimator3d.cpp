@@ -19,9 +19,8 @@ DifferentialDrivePoseEstimator3d::DifferentialDrivePoseEstimator3d(
     units::meter_t leftDistance, units::meter_t rightDistance,
     const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
-    : PoseEstimator3d<DifferentialDriveWheelSpeeds,
-                      DifferentialDriveWheelPositions>(
-          kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
+    : PoseEstimator3d(kinematics, m_odometryImpl, stateStdDevs,
+                      visionMeasurementStdDevs),
       m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {}
 
 DifferentialDrivePoseEstimator3d::DifferentialDrivePoseEstimator3d(
@@ -38,7 +37,6 @@ DifferentialDrivePoseEstimator3d::DifferentialDrivePoseEstimator3d(
     units::meter_t leftDistance, units::meter_t rightDistance,
     const Pose3d& initialPose, const wpi::array<double, 4>& stateStdDevs,
     const wpi::array<double, 4>& visionMeasurementStdDevs)
-    : PoseEstimator3d<DifferentialDriveWheelSpeeds,
-                      DifferentialDriveWheelPositions>(
-          kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
+    : PoseEstimator3d(kinematics, m_odometryImpl, stateStdDevs,
+                      visionMeasurementStdDevs),
       m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {}
