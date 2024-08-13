@@ -46,7 +46,13 @@ public final class OpenCvLoader {
         RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME);
       } catch (IOException ex) {
         ex.printStackTrace();
-        System.exit(1);
+        try {
+          // Try adding a debug postfix
+          RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME + "d");
+        } catch (IOException e) {
+          e.printStackTrace();
+          System.exit(1);
+        }
       }
       libraryLoaded = true;
     }
@@ -70,7 +76,13 @@ public final class OpenCvLoader {
     if (libraryLoaded) {
       return;
     }
-    RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    try {
+      RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    } catch (IOException e) {
+      e.printStackTrace();
+      // Try adding a debug postfix
+      RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME + "d");
+    }
     libraryLoaded = true;
   }
 

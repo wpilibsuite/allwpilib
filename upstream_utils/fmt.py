@@ -35,7 +35,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "fmt"
     url = "https://github.com/fmtlib/fmt"
-    tag = "11.0.1"
+    tag = "11.0.2"
 
     fmt = Lib(name, url, tag, copy_upstream_src)
     fmt.main()

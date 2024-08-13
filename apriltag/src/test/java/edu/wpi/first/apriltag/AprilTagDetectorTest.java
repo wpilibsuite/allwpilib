@@ -33,8 +33,13 @@ class AprilTagDetectorTest {
   static void beforeAll() {
     try {
       RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    } catch (IOException ex) {
-      fail(ex);
+    } catch (IOException e) {
+      try {
+        // Try adding a debug postfix
+        RuntimeLoader.loadLibrary(Core.NATIVE_LIBRARY_NAME + "d");
+      } catch (IOException ex) {
+        fail(ex);
+      }
     }
   }
 

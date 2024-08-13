@@ -11,7 +11,7 @@
 #include <libssh/libssh.h>
 #include <wpi/Logger.h>
 
-namespace sysid {
+namespace rtns {
 /**
  * This class is a C++ implementation of the SshSessionController in
  * wpilibsuite/deploy-utils. It handles connecting to an SSH server, running
@@ -79,4 +79,4 @@ class SshSession {
 
   wpi::Logger& m_logger;
 };
-}  // namespace sysid
+}  // namespace rtns
