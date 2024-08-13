@@ -26,7 +26,12 @@ public final class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit
       new CombinatoryUnitCache<>(AccelerationUnit::new);
 
   AccelerationUnit(VelocityUnit<D> velocity, TimeUnit period) {
-    super(velocity, period);
+    super(
+        velocity.isBaseUnit() && period.isBaseUnit()
+            ? null
+            : combine(velocity.getBaseUnit(), period.getBaseUnit()),
+        velocity,
+        period);
   }
 
   AccelerationUnit(
@@ -56,6 +61,28 @@ public final class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit
   @Override
   public VelocityUnit<AccelerationUnit<D>> per(TimeUnit time) {
     return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<AccelerationUnit<D>, U> per(U other) {
+    return PerUnit.combine(this, other);
+  }
+
+  /**
+   * Converts a measurement value in terms of another time unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other time unit
+   * @param otherUnit the other time unit
+   * @return the value of the measurement in terms of this unit
+   */
+  public double convertFrom(double magnitude, AccelerationUnit<D> otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
   /**

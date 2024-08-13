@@ -14,14 +14,12 @@ public final class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> 
       new CombinatoryUnitCache<>(ForceUnit::new);
 
   ForceUnit(MassUnit mass, LinearAccelerationUnit acceleration) {
-    this(
+    super(
         mass.isBaseUnit() && acceleration.isBaseUnit()
             ? null
             : combine(mass.getBaseUnit(), acceleration.getBaseUnit()),
-        mass.getConverterToBase().div(acceleration.getConverterToBase()),
-        mass.getConverterFromBase().div(acceleration.getConverterFromBase()),
-        mass.name() + "-" + acceleration.name(),
-        mass.symbol() + "-" + acceleration.symbol());
+        mass,
+        acceleration);
   }
 
   ForceUnit(
@@ -82,5 +80,27 @@ public final class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> 
   @Override
   public VelocityUnit<ForceUnit> per(TimeUnit time) {
     return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<ForceUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
+  }
+
+  /**
+   * Converts a measurement value in terms of another unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
+   * @return the value of the measurement in terms of this unit
+   */
+  public double convertFrom(double magnitude, ForceUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 }

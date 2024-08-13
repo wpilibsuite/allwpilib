@@ -31,6 +31,11 @@ public final class VoltageUnit extends Unit {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  @Override
+  public VoltageUnit getBaseUnit() {
+    return (VoltageUnit) super.getBaseUnit();
+  }
+
   /**
    * Constructs a unit of power equivalent to this unit of voltage multiplied by another unit of
    * electrical current. For example, {@code Volts.times(Amps)} will return a unit of power
@@ -42,7 +47,7 @@ public final class VoltageUnit extends Unit {
    * @param symbol the symbol used to represent the unit of power
    * @return the power unit
    */
-  public PowerUnit times(CurrentUnit current, String name, String symbol) {
+  public PowerUnit mult(CurrentUnit current, String name, String symbol) {
     return Units.derive(PowerUnit.combine(this, current)).named(name).symbol(symbol).make();
   }
 

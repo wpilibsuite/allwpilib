@@ -28,6 +28,11 @@ public final class TemperatureUnit extends Unit {
   }
 
   @Override
+  public TemperatureUnit getBaseUnit() {
+    return (TemperatureUnit) super.getBaseUnit();
+  }
+
+  @Override
   public Temperature of(double magnitude) {
     return new ImmutableTemperature(magnitude, toBaseUnits(magnitude), this);
   }
@@ -45,6 +50,17 @@ public final class TemperatureUnit extends Unit {
   @Override
   public VelocityUnit<TemperatureUnit> per(TimeUnit period) {
     return VelocityUnit.combine(this, period);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<TemperatureUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
   }
 
   /**

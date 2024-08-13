@@ -14,7 +14,12 @@ public final class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
       new CombinatoryUnitCache<>(TorqueUnit::new);
 
   TorqueUnit(DistanceUnit distanceUnit, ForceUnit forceUnit) {
-    super(distanceUnit, forceUnit);
+    super(
+        distanceUnit.isBaseUnit() && forceUnit.isBaseUnit()
+            ? null
+            : combine(distanceUnit, forceUnit),
+        distanceUnit,
+        forceUnit);
   }
 
   TorqueUnit(
@@ -38,6 +43,11 @@ public final class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   }
 
   @Override
+  public TorqueUnit getBaseUnit() {
+    return (TorqueUnit) super.getBaseUnit();
+  }
+
+  @Override
   public Torque of(double magnitude) {
     return new ImmutableTorque(magnitude, toBaseUnits(magnitude), this);
   }
@@ -55,5 +65,27 @@ public final class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   @Override
   public VelocityUnit<TorqueUnit> per(TimeUnit time) {
     return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<TorqueUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
+  }
+
+  /**
+   * Converts a measurement value in terms of another unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
+   * @return the value of the measurement in terms of this unit
+   */
+  public double convertFrom(double magnitude, TorqueUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 }

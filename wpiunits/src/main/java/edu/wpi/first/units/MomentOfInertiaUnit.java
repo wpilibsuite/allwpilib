@@ -19,7 +19,12 @@ public final class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, Angu
       cache = new CombinatoryUnitCache<>(MomentOfInertiaUnit::new);
 
   MomentOfInertiaUnit(AngularMomentumUnit numerator, AngularVelocityUnit denominator) {
-    super(numerator, denominator);
+    super(
+        numerator.isBaseUnit() && denominator.isBaseUnit()
+            ? null
+            : combine(numerator.getBaseUnit(), denominator.getBaseUnit()),
+        numerator,
+        denominator);
   }
 
   MomentOfInertiaUnit(
@@ -44,6 +49,11 @@ public final class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, Angu
   }
 
   @Override
+  public MomentOfInertiaUnit getBaseUnit() {
+    return (MomentOfInertiaUnit) super.getBaseUnit();
+  }
+
+  @Override
   public MomentOfInertia of(double magnitude) {
     return new ImmutableMomentOfInertia(magnitude, toBaseUnits(magnitude), this);
   }
@@ -61,5 +71,27 @@ public final class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, Angu
   @Override
   public VelocityUnit<MomentOfInertiaUnit> per(TimeUnit time) {
     return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<MomentOfInertiaUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
+  }
+
+  /**
+   * Converts a measurement value in terms of another unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
+   * @return the value of the measurement in terms of this unit
+   */
+  public double convertFrom(double magnitude, MomentOfInertiaUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 }

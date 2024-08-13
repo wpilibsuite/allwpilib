@@ -54,7 +54,7 @@ public final class TimeUnit extends Unit {
   }
 
   /**
-   * Creates a ratio unit between this unit of time an arbitrary other unit.
+   * Creates a ratio unit between this unit and an arbitrary other unit.
    *
    * @param other the other unit
    * @param <U> the type of the other unit
@@ -65,10 +65,10 @@ public final class TimeUnit extends Unit {
   }
 
   /**
-   * Converts a measurement value in terms of another time unit to this unit.
+   * Converts a measurement value in terms of another unit to this unit.
    *
-   * @param magnitude the magnitude of the measurement in terms of the other time unit
-   * @param otherUnit the other time unit
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
    * @return the value of the measurement in terms of this unit
    */
   public double convertFrom(double magnitude, TimeUnit otherUnit) {

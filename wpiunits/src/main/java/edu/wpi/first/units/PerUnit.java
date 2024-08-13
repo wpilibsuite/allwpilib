@@ -34,11 +34,30 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    * @param numerator the numerator unit
    * @param denominator the denominator unit
    */
-  protected PerUnit(N numerator, D denominator) {
+  private PerUnit(N numerator, D denominator) {
     super(
         numerator.isBaseUnit() && denominator.isBaseUnit()
             ? null
             : combine(numerator.getBaseUnit(), denominator.getBaseUnit()),
+        numerator.toBaseUnits(1) / denominator.toBaseUnits(1),
+        numerator.name() + " per " + denominator.name(),
+        numerator.symbol() + "/" + denominator.symbol());
+    m_numerator = numerator;
+    m_denominator = denominator;
+  }
+
+  /**
+   * Creates a new proportional unit derived from the ratio of one unit to another. Subclasses of
+   * {@code PerUnit} should use this constructor.
+   *
+   * @param baseUnit the base unit. Set this to null if the unit being constructed is its own base
+   *     unit
+   * @param numerator the numerator unit
+   * @param denominator the denominator unit
+   */
+  protected PerUnit(PerUnit<N, D> baseUnit, N numerator, D denominator) {
+    super(
+        baseUnit,
         numerator.toBaseUnits(1) / denominator.toBaseUnits(1),
         numerator.name() + " per " + denominator.name(),
         numerator.symbol() + "/" + denominator.symbol());

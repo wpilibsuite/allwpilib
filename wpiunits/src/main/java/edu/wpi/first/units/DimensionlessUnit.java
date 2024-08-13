@@ -34,6 +34,11 @@ public final class DimensionlessUnit extends Unit {
   }
 
   @Override
+  public DimensionlessUnit getBaseUnit() {
+    return (DimensionlessUnit) super.getBaseUnit();
+  }
+
+  @Override
   public Dimensionless of(double magnitude) {
     return new ImmutableDimensionless(magnitude, toBaseUnits(magnitude), this);
   }
@@ -69,5 +74,16 @@ public final class DimensionlessUnit extends Unit {
   @Override
   public FrequencyUnit per(TimeUnit period) {
     return FrequencyUnit.combine(this, period);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<DimensionlessUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
   }
 }

@@ -14,7 +14,12 @@ public final class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityU
       cache = new CombinatoryUnitCache<>(LinearMomentumUnit::new);
 
   LinearMomentumUnit(MassUnit unit, LinearVelocityUnit linearVelocityUnit) {
-    super(unit, linearVelocityUnit);
+    super(
+        unit.isBaseUnit() && linearVelocityUnit.isBaseUnit()
+            ? null
+            : combine(unit, linearVelocityUnit),
+        unit,
+        linearVelocityUnit);
   }
 
   LinearMomentumUnit(
@@ -38,6 +43,11 @@ public final class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityU
   }
 
   @Override
+  public LinearMomentumUnit getBaseUnit() {
+    return (LinearMomentumUnit) super.getBaseUnit();
+  }
+
+  @Override
   public LinearMomentum of(double magnitude) {
     return new ImmutableLinearMomentum(magnitude, toBaseUnits(magnitude), this);
   }
@@ -55,6 +65,28 @@ public final class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityU
   @Override
   public VelocityUnit<LinearMomentumUnit> per(TimeUnit time) {
     return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<LinearMomentumUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
+  }
+
+  /**
+   * Converts a measurement value in terms of another unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
+   * @return the value of the measurement in terms of this unit
+   */
+  public double convertFrom(double magnitude, LinearMomentumUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
   /**

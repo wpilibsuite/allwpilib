@@ -25,14 +25,12 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
       new CombinatoryUnitCache<>(PowerUnit::new);
 
   PowerUnit(EnergyUnit energy, TimeUnit time) {
-    this(
+    super(
         energy.isBaseUnit() && time.isBaseUnit()
             ? null
             : combine(energy.getBaseUnit(), time.getBaseUnit()),
-        x -> x * energy.toBaseUnits(1) / time.toBaseUnits(1),
-        x -> x * time.toBaseUnits(1) / energy.toBaseUnits(1),
-        energy.name() + " per " + time.name(),
-        energy.symbol() + "/" + time.symbol());
+        energy,
+        time);
   }
 
   PowerUnit(
@@ -108,6 +106,11 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
   }
 
   @Override
+  public PowerUnit getBaseUnit() {
+    return (PowerUnit) super.getBaseUnit();
+  }
+
+  @Override
   public Power of(double magnitude) {
     return new ImmutablePower(magnitude, toBaseUnits(magnitude), this);
   }
@@ -125,6 +128,17 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
   @Override
   public VelocityUnit<PowerUnit> per(TimeUnit time) {
     return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<PowerUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
   }
 
   /**

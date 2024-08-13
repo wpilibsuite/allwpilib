@@ -23,8 +23,14 @@ public final class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
   private static final CombinatoryUnitCache<Unit, TimeUnit, VelocityUnit> cache =
       new CombinatoryUnitCache<>(VelocityUnit::new);
 
-  VelocityUnit(D unit, TimeUnit period) {
-    super(unit, period);
+  @SuppressWarnings("unchecked")
+  VelocityUnit(D numerator, TimeUnit denominator) {
+    super(
+        numerator.isBaseUnit() && denominator.isBaseUnit()
+            ? null
+            : combine((D) numerator.getBaseUnit(), denominator.getBaseUnit()),
+        numerator,
+        denominator);
   }
 
   VelocityUnit(
@@ -47,6 +53,11 @@ public final class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
   @SuppressWarnings("unchecked")
   public static <D extends Unit> VelocityUnit<D> combine(D unit, TimeUnit period) {
     return cache.combine(unit, period);
+  }
+
+  @Override
+  public VelocityUnit<D> getBaseUnit() {
+    return (VelocityUnit<D>) super.getBaseUnit();
   }
 
   /**
@@ -91,6 +102,17 @@ public final class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
   @Override
   public AccelerationUnit<D> per(TimeUnit period) {
     return AccelerationUnit.combine(this, period);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<VelocityUnit<D>, U> per(U other) {
+    return PerUnit.combine(this, other);
   }
 
   /**

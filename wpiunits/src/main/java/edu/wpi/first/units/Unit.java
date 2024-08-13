@@ -101,6 +101,9 @@ public abstract class Unit {
    * Gets the base unit of measurement that this unit is derived from. If the unit is the base unit,
    * the unit will be returned.
    *
+   * <p><strong>NOTE:</strong> Subclasses <strong>must</strong> override this method to provide the
+   * correct return type. Failing to do say will make combination
+   *
    * <pre><code>
    *   Unit baseUnit = new Unit(null, ...);
    *   baseUnit.getBaseUnit(); // returns baseUnit

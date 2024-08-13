@@ -16,7 +16,12 @@ public final class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
       new CombinatoryUnitCache<>(FrequencyUnit::new);
 
   FrequencyUnit(DimensionlessUnit numerator, TimeUnit denominator) {
-    super(numerator, denominator);
+    super(
+        numerator.isBaseUnit() && denominator.isBaseUnit()
+            ? null
+            : combine(numerator.getBaseUnit(), denominator.getBaseUnit()),
+        numerator,
+        denominator);
   }
 
   FrequencyUnit(
@@ -37,6 +42,11 @@ public final class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
    */
   public static FrequencyUnit combine(DimensionlessUnit dim, TimeUnit period) {
     return cache.combine(dim, period);
+  }
+
+  @Override
+  public FrequencyUnit getBaseUnit() {
+    return (FrequencyUnit) super.getBaseUnit();
   }
 
   /**
@@ -68,5 +78,27 @@ public final class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
   @Override
   public VelocityUnit<FrequencyUnit> per(TimeUnit time) {
     return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<FrequencyUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
+  }
+
+  /**
+   * Converts a measurement value in terms of another unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
+   * @return the value of the measurement in terms of this unit
+   */
+  public double convertFrom(double magnitude, FrequencyUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 }

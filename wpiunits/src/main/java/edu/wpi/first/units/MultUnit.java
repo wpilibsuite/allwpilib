@@ -31,9 +31,27 @@ public class MultUnit<A extends Unit, B extends Unit> extends Unit {
    * @param a the first unit of the product
    * @param b the second unit of the product
    */
-  protected MultUnit(A a, B b) {
+  private MultUnit(A a, B b) {
     super(
         a.isBaseUnit() && b.isBaseUnit() ? null : combine(a.getBaseUnit(), b.getBaseUnit()),
+        a.toBaseUnits(1) * b.toBaseUnits(1),
+        a.name() + "-" + b.name(),
+        a.symbol() + "*" + b.symbol());
+    m_unitA = a;
+    m_unitB = b;
+  }
+
+  /**
+   * Creates a new product unit. Subclasses of {@code MultUnit} should use this constructor.
+   *
+   * @param baseUnit the base unit. Set this to null if the unit being constructed is its own base
+   *     unit
+   * @param a the first unit of the product
+   * @param b the second unit of the product
+   */
+  protected MultUnit(MultUnit<A, B> baseUnit, A a, B b) {
+    super(
+        baseUnit,
         a.toBaseUnits(1) * b.toBaseUnits(1),
         a.name() + "-" + b.name(),
         a.symbol() + "*" + b.symbol());
@@ -88,6 +106,17 @@ public class MultUnit<A extends Unit, B extends Unit> extends Unit {
   @Override
   public Unit per(TimeUnit time) {
     return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Converts a measurement value in terms of another unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
+   * @return the value of the measurement in terms of this unit
+   */
+  public double convertFrom(double magnitude, MultUnit<A, B> otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
   @Override

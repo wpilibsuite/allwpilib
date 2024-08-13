@@ -35,6 +35,11 @@ public final class AngleUnit extends Unit {
   }
 
   @Override
+  public AngleUnit getBaseUnit() {
+    return (AngleUnit) super.getBaseUnit();
+  }
+
+  @Override
   public Angle of(double magnitude) {
     return Angle.ofRelativeUnits(magnitude, this);
   }
@@ -52,6 +57,17 @@ public final class AngleUnit extends Unit {
   @Override
   public AngularVelocityUnit per(TimeUnit period) {
     return AngularVelocityUnit.combine(this, period);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<AngleUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
   }
 
   /**

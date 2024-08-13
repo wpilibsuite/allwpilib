@@ -31,6 +31,11 @@ public final class CurrentUnit extends Unit {
     super(baseUnit, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
+  @Override
+  public CurrentUnit getBaseUnit() {
+    return (CurrentUnit) super.getBaseUnit();
+  }
+
   /**
    * Constructs a unit of power equivalent to this unit of electrical current multiplied by another
    * unit of voltage. For example, {@code Amps.times(Volts)} will return a unit of power equivalent
@@ -42,7 +47,7 @@ public final class CurrentUnit extends Unit {
    * @param symbol the symbol used to represent the unit of power
    * @return the power unit
    */
-  public PowerUnit times(VoltageUnit voltage, String name, String symbol) {
+  public PowerUnit mult(VoltageUnit voltage, String name, String symbol) {
     return Units.derive(PowerUnit.combine(voltage, this)).named(name).symbol(symbol).make();
   }
 
@@ -64,6 +69,17 @@ public final class CurrentUnit extends Unit {
   @Override
   public VelocityUnit<CurrentUnit> per(TimeUnit time) {
     return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<CurrentUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
   }
 
   /**

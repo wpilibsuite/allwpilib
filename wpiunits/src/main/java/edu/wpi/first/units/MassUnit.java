@@ -58,6 +58,17 @@ public final class MassUnit extends Unit {
   }
 
   /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<MassUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
+  }
+
+  /**
    * Converts a measurement value in terms of another mass unit to this unit.
    *
    * @param magnitude the magnitude of the measurement in terms of the other mass unit

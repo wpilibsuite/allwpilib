@@ -14,7 +14,12 @@ public final class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
       new CombinatoryUnitCache<>(AngularVelocityUnit::new);
 
   AngularVelocityUnit(AngleUnit numerator, TimeUnit denominator) {
-    super(numerator, denominator);
+    super(
+        numerator.isBaseUnit() && denominator.isBaseUnit()
+            ? null
+            : combine(numerator.getBaseUnit(), denominator.getBaseUnit()),
+        numerator,
+        denominator);
   }
 
   AngularVelocityUnit(
@@ -38,6 +43,11 @@ public final class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
   }
 
   @Override
+  public AngularVelocityUnit getBaseUnit() {
+    return (AngularVelocityUnit) super.getBaseUnit();
+  }
+
+  @Override
   public AngularVelocity of(double magnitude) {
     return new ImmutableAngularVelocity(magnitude, toBaseUnits(magnitude), this);
   }
@@ -55,5 +65,27 @@ public final class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
   @Override
   public AngularAccelerationUnit per(TimeUnit period) {
     return AngularAccelerationUnit.combine(this, period);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<AngularVelocityUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
+  }
+
+  /**
+   * Converts a measurement value in terms of another unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
+   * @return the value of the measurement in terms of this unit
+   */
+  public double convertFrom(double magnitude, AngularVelocityUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 }

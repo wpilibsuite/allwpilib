@@ -16,7 +16,12 @@ public final class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, Ti
       cache = new CombinatoryUnitCache<>(LinearAccelerationUnit::new);
 
   LinearAccelerationUnit(LinearVelocityUnit numerator, TimeUnit denominator) {
-    super(numerator, denominator);
+    super(
+        numerator.isBaseUnit() && denominator.isBaseUnit()
+            ? null
+            : combine(numerator.getBaseUnit(), denominator.getBaseUnit()),
+        numerator,
+        denominator);
   }
 
   LinearAccelerationUnit(
@@ -63,6 +68,28 @@ public final class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, Ti
   @Override
   public VelocityUnit<LinearAccelerationUnit> per(TimeUnit time) {
     return VelocityUnit.combine(this, time);
+  }
+
+  /**
+   * Creates a ratio unit between this unit and an arbitrary other unit.
+   *
+   * @param other the other unit
+   * @param <U> the type of the other unit
+   * @return the ratio unit
+   */
+  public <U extends Unit> PerUnit<LinearAccelerationUnit, U> per(U other) {
+    return PerUnit.combine(this, other);
+  }
+
+  /**
+   * Converts a measurement value in terms of another unit to this unit.
+   *
+   * @param magnitude the magnitude of the measurement in terms of the other unit
+   * @param otherUnit the other unit
+   * @return the value of the measurement in terms of this unit
+   */
+  public double convertFrom(double magnitude, LinearAccelerationUnit otherUnit) {
+    return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
   /**

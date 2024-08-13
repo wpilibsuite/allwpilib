@@ -11,13 +11,12 @@ import org.junit.jupiter.api.Test;
 class VoltageUnitTest {
   @Test
   void testVoltsTimesAmps() {
-    assertTrue(Units.Volts.times(Units.Amps, "", "").equivalent(Units.Watts));
+    assertTrue(Units.Volts.mult(Units.Amps, "", "").equivalent(Units.Watts));
   }
 
   @Test
   void testMilliVoltsTimesMilliAmps() {
     // results in microwatts
-    assertTrue(
-        Units.Millivolts.times(Units.Milliamps, "", "").equivalent(Units.Micro(Units.Watts)));
+    assertTrue(Units.Millivolts.mult(Units.Milliamps, "", "").equivalent(Units.Micro(Units.Watts)));
   }
 }
