@@ -17,7 +17,7 @@ public final class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityU
     super(
         unit.isBaseUnit() && linearVelocityUnit.isBaseUnit()
             ? null
-            : combine(unit, linearVelocityUnit),
+            : combine(unit.getBaseUnit(), linearVelocityUnit.getBaseUnit()),
         unit,
         linearVelocityUnit);
   }

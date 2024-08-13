@@ -17,7 +17,7 @@ public final class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
     super(
         distanceUnit.isBaseUnit() && forceUnit.isBaseUnit()
             ? null
-            : combine(distanceUnit, forceUnit),
+            : combine(distanceUnit.getBaseUnit(), forceUnit.getBaseUnit()),
         distanceUnit,
         forceUnit);
   }

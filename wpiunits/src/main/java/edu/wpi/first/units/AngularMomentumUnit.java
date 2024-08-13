@@ -20,7 +20,7 @@ public final class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, Dist
     super(
         momentumUnit.isBaseUnit() && distanceUnit.isBaseUnit()
             ? null
-            : combine(momentumUnit, distanceUnit),
+            : combine(momentumUnit.getBaseUnit(), distanceUnit.getBaseUnit()),
         momentumUnit,
         distanceUnit);
   }
