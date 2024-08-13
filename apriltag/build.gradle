@@ -32,8 +32,7 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/apriltag/include',
-                            'src/main/native/thirdparty/apriltag/include/common',
-                            'src/main/native/thirdparty/apriltag/src'
+                            'src/main/native/thirdparty/apriltag/include/common'
                 }
             }
         }
@@ -66,7 +65,6 @@ cppHeadersZip {
 // Suppress sign-compare warnings
 nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) {
-        it.cCompiler.args.add("/wd2220")
         it.cCompiler.args.add("/wd4005")
         it.cCompiler.args.add("/wd4018")
         it.cCompiler.args.add("/wd4244")

@@ -13,7 +13,7 @@ frc::GenericHID& CommandGenericHID::GetHID() {
 }
 
 Trigger CommandGenericHID::Button(int button, frc::EventLoop* loop) const {
-  return m_hid.Button(button, loop).CastTo<Trigger>();
+  return Trigger(loop, [this, button] { return m_hid.GetRawButton(button); });
 }
 
 Trigger CommandGenericHID::POV(int angle, frc::EventLoop* loop) const {

@@ -219,7 +219,18 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
  */
 HAL_Bool HAL_RefreshDSData(void);
 
+/**
+ * Adds an event handle to be signalled when new data arrives.
+ *
+ * @param handle the event handle to be signalled
+ */
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle);
+
+/**
+ * Removes the event handle from being signalled when new data arrives.
+ *
+ * @param handle the event handle to remove
+ */
 void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle);
 
 /**

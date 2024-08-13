@@ -152,6 +152,9 @@ doxygen {
     exclude 'Eigen/**'
     exclude 'google/protobuf/**'
 
+    exclude '**/.clang-tidy'
+    exclude '**/.clang-format'
+
     aliases 'effects=\\par <i>Effects:</i>^^',
             'notes=\\par <i>Notes:</i>^^',
             'requires=\\par <i>Requires:</i>^^',
@@ -218,16 +221,20 @@ task generateJavaDocs(type: Javadoc) {
     options.addBooleanOption("Xdoclint/package:" +
             // TODO: v Document these, then remove them from the list
             "-edu.wpi.first.hal," +
-            "-edu.wpi.first.hal.can," +
             "-edu.wpi.first.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
             "-edu.wpi.first.math.proto," +
+            "-edu.wpi.first.math.struct," +
             "-edu.wpi.first.math.controller.proto," +
             "-edu.wpi.first.math.controller.struct," +
             "-edu.wpi.first.math.geometry.proto," +
             "-edu.wpi.first.math.geometry.struct," +
             "-edu.wpi.first.math.kinematics.proto," +
             "-edu.wpi.first.math.kinematics.struct," +
+            "-edu.wpi.first.math.spline.proto," +
+            "-edu.wpi.first.math.spline.struct," +
+            "-edu.wpi.first.math.system.proto," +
+            "-edu.wpi.first.math.system.struct," +
             "-edu.wpi.first.math.system.plant.proto," +
             "-edu.wpi.first.math.system.plant.struct," +
             "-edu.wpi.first.math.trajectory.proto", true)

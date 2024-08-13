@@ -16,63 +16,63 @@ frc::StadiaController& CommandStadiaController::GetHID() {
 }
 
 Trigger CommandStadiaController::A(frc::EventLoop* loop) const {
-  return m_hid.A(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kA, loop);
 }
 
 Trigger CommandStadiaController::B(frc::EventLoop* loop) const {
-  return m_hid.B(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kB, loop);
 }
 
 Trigger CommandStadiaController::X(frc::EventLoop* loop) const {
-  return m_hid.X(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kX, loop);
 }
 
 Trigger CommandStadiaController::Y(frc::EventLoop* loop) const {
-  return m_hid.Y(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kY, loop);
 }
 
 Trigger CommandStadiaController::LeftBumper(frc::EventLoop* loop) const {
-  return m_hid.LeftBumper(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kLeftBumper, loop);
 }
 
 Trigger CommandStadiaController::RightBumper(frc::EventLoop* loop) const {
-  return m_hid.RightBumper(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kRightBumper, loop);
 }
 
 Trigger CommandStadiaController::LeftStick(frc::EventLoop* loop) const {
-  return m_hid.LeftStick(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kLeftStick, loop);
 }
 
 Trigger CommandStadiaController::RightStick(frc::EventLoop* loop) const {
-  return m_hid.RightStick(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kRightStick, loop);
 }
 
 Trigger CommandStadiaController::Ellipses(frc::EventLoop* loop) const {
-  return m_hid.Ellipses(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kEllipses, loop);
 }
 
 Trigger CommandStadiaController::Hamburger(frc::EventLoop* loop) const {
-  return m_hid.Hamburger(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kHamburger, loop);
 }
 
 Trigger CommandStadiaController::Stadia(frc::EventLoop* loop) const {
-  return m_hid.Stadia(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kStadia, loop);
 }
 
 Trigger CommandStadiaController::RightTrigger(frc::EventLoop* loop) const {
-  return m_hid.RightTrigger(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kRightTrigger, loop);
 }
 
 Trigger CommandStadiaController::LeftTrigger(frc::EventLoop* loop) const {
-  return m_hid.LeftTrigger(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kLeftTrigger, loop);
 }
 
 Trigger CommandStadiaController::Google(frc::EventLoop* loop) const {
-  return m_hid.Google(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kGoogle, loop);
 }
 
 Trigger CommandStadiaController::Frame(frc::EventLoop* loop) const {
-  return m_hid.Frame(loop).CastTo<Trigger>();
+  return Button(frc::StadiaController::Button::kFrame, loop);
 }
 
 double CommandStadiaController::GetLeftX() const {

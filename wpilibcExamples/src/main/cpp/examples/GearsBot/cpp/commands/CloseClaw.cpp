@@ -4,6 +4,8 @@
 
 #include "commands/CloseClaw.h"
 
+#include <frc/RobotBase.h>
+
 #include "Robot.h"
 
 CloseClaw::CloseClaw(Claw& claw) : m_claw(&claw) {
@@ -23,10 +25,10 @@ bool CloseClaw::IsFinished() {
 
 // Called once after isFinished returns true
 void CloseClaw::End(bool) {
-// NOTE: Doesn't stop in simulation due to lower friction causing the can to
-// fall out
-// + there is no need to worry about stalling the motor or crushing the can.
-#ifndef SIMULATION
-  m_claw->Stop();
-#endif
+  // NOTE: Doesn't stop in simulation due to lower friction causing the can to
+  // fall out + there is no need to worry about stalling the motor or crushing
+  // the can.
+  if constexpr (frc::RobotBase::IsSimulation()) {
+    m_claw->Stop();
+  }
 }

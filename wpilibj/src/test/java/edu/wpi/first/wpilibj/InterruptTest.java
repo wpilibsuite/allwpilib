@@ -62,9 +62,8 @@ class InterruptTest {
       interrupt.setInterruptEdges(true, true);
       DIOSim digitalSim = new DIOSim(di);
       digitalSim.setValue(false);
-      Timer.delay(0.5);
       interrupt.enable();
-      Timer.delay(0.02);
+      Timer.delay(0.5);
       digitalSim.setValue(true);
       Timer.delay(0.02);
 
@@ -99,9 +98,8 @@ class InterruptTest {
       interrupt.setInterruptEdges(true, true);
       DIOSim digitalSim = new DIOSim(di);
       digitalSim.setValue(true);
-      Timer.delay(0.5);
       interrupt.enable();
-      Timer.delay(0.02);
+      Timer.delay(0.5);
       digitalSim.setValue(false);
       Timer.delay(0.02);
 

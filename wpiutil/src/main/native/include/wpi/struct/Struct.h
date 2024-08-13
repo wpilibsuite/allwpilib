@@ -18,6 +18,7 @@
 #include <fmt/format.h>
 
 #include "wpi/Endian.h"
+#include "wpi/array.h"
 #include "wpi/bit.h"
 #include "wpi/ct_string.h"
 #include "wpi/function_ref.h"
@@ -157,6 +158,37 @@ inline T UnpackStruct(std::span<const uint8_t> data, const I&... info) {
 }
 
 /**
+ * Unpack a serialized struct array starting at a given offset within the data.
+ * This is primarily useful in unpack implementations to unpack nested struct
+ * arrays.
+ *
+ * @tparam T object type
+ * @tparam Offset starting offset
+ * @tparam N number of objects
+ * @param data raw struct data
+ * @return Desrialized array
+ */
+template <StructSerializable T, size_t Offset, size_t N>
+inline wpi::array<T, N> UnpackStructArray(std::span<const uint8_t> data) {
+  if (is_constexpr([] { Struct<std::remove_cvref_t<T>>::GetSize(); })) {
+    constexpr auto StructSize = Struct<std::remove_cvref_t<T>>::GetSize();
+    wpi::array<T, N> arr(wpi::empty_array);
+    [&]<size_t... Is>(std::index_sequence<Is...>) {
+      ((arr[Is] = UnpackStruct<T, Offset + Is * StructSize>(data)), ...);
+    }(std::make_index_sequence<N>{});
+    return arr;
+  } else {
+    auto size = Struct<std::remove_cvref_t<T>>::GetSize();
+    wpi::array<T, N> arr(wpi::empty_array);
+    for (size_t i = 0; i < N; i++) {
+      arr[i] = UnpackStruct<T>(data);
+      data = data.subspan(size);
+    }
+    return arr;
+  }
+}
+
+/**
  * Pack a serialized struct.
  *
  * @param data struct storage (mutable, output)
@@ -186,6 +218,33 @@ inline void PackStruct(std::span<uint8_t> data, T&& value, const I&... info) {
   using S = Struct<typename std::remove_cvref_t<T>,
                    typename std::remove_cvref_t<I>...>;
   S::Pack(data.subspan(Offset), std::forward<T>(value), info...);
+}
+
+/**
+ * Pack a serialized struct array starting at a given offset within the data.
+ * This is primarily useful in pack implementations to pack nested struct
+ * arrays.
+ *
+ * @tparam Offset starting offset
+ * @tparam N number of objects
+ * @param data struct storage (mutable, output)
+ * @param arr array of object
+ */
+template <size_t Offset, size_t N, StructSerializable T>
+inline void PackStructArray(std::span<uint8_t> data,
+                            const wpi::array<T, N>& arr) {
+  if (is_constexpr([] { Struct<std::remove_cvref_t<T>>::GetSize(); })) {
+    constexpr auto StructSize = Struct<std::remove_cvref_t<T>>::GetSize();
+    [&]<size_t... Is>(std::index_sequence<Is...>) {
+      (PackStruct<Offset + Is * StructSize>(data, arr[Is]), ...);
+    }(std::make_index_sequence<N>{});
+  } else {
+    auto size = Struct<std::remove_cvref_t<T>>::GetSize();
+    for (auto&& val : arr) {
+      PackStruct(data, val);
+      data = data.subspan(size);
+    }
+  }
 }
 
 /**

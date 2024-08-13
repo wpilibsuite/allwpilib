@@ -19,9 +19,13 @@
  * The counter mode.
  */
 HAL_ENUM(HAL_Counter_Mode) {
+  /** Two pulse mode. */
   HAL_Counter_kTwoPulse = 0,
+  /** Semi-period mode. */
   HAL_Counter_kSemiperiod = 1,
+  /** Pulse length mode. */
   HAL_Counter_kPulseLength = 2,
+  /** External direction mode. */
   HAL_Counter_kExternalDirection = 3
 };
 

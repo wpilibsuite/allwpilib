@@ -19,12 +19,6 @@ target_include_directories(
     hal
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/hal>
-)
-
-target_include_directories(
-    hal
-    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/hal>
 )

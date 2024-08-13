@@ -133,7 +133,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    *     threshold, attached to the given event loop
    */
   public BooleanEvent {{ trigger.name }}(double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> get{{ capitalize_first(trigger.name) }}Axis() > threshold);
+    return axisGreaterThan(Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
   }
 
   /**
@@ -185,7 +185,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    *     attached to the given loop.
    */
   public BooleanEvent {{ button.name }}(EventLoop loop) {
-    return new BooleanEvent(loop, this::get{{ capitalize_first(button.name) }}Button);
+    return button(Button.k{{ capitalize_first(button.name) }}.value, loop);
   }
 {% endfor -%}
 {% if ConsoleName == "Xbox" or ConsoleName == "Stadia" %}

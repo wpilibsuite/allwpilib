@@ -4,11 +4,14 @@
 
 package edu.wpi.first.util.protobuf;
 
+import java.lang.reflect.Array;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 import us.hebi.quickbuf.Descriptors.FileDescriptor;
 import us.hebi.quickbuf.ProtoMessage;
+import us.hebi.quickbuf.RepeatedDouble;
+import us.hebi.quickbuf.RepeatedMessage;
 
 /**
  * Interface for Protobuf serialization.
@@ -18,7 +21,8 @@ import us.hebi.quickbuf.ProtoMessage;
  * code is auto-generated from .proto interface descriptions (the MessageType generic parameter).
  *
  * <p>Idiomatically, classes that support protobuf serialization should provide a static final
- * member named "proto" that provides an instance of an implementation of this interface.
+ * member named "proto" that provides an instance of an implementation of this interface, or a
+ * static final method named "getProto" if the class is generic.
  *
  * @param <T> object type
  * @param <MessageType> protobuf message type
@@ -141,5 +145,68 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
       forEachDescriptorImpl(dep, exists, fn);
     }
     fn.accept(name, desc.toProtoBytes());
+  }
+
+  /**
+   * Unpack a serialized protobuf array message.
+   *
+   * @param <T> object type
+   * @param <MessageType> element type of the protobuf array
+   * @param msg protobuf array message
+   * @param proto protobuf implementation
+   * @return Deserialized array
+   */
+  static <T, MessageType extends ProtoMessage<MessageType>> T[] unpackArray(
+      RepeatedMessage<MessageType> msg, Protobuf<T, MessageType> proto) {
+    @SuppressWarnings("unchecked")
+    T[] result = (T[]) Array.newInstance(proto.getTypeClass(), msg.length());
+    for (int i = 0; i < result.length; i++) {
+      result[i] = proto.unpack(msg.get(i));
+    }
+    return result;
+  }
+
+  /**
+   * Unpack a serialized protobuf double array message.
+   *
+   * @param msg protobuf double array message
+   * @return Deserialized array
+   */
+  static double[] unpackArray(RepeatedDouble msg) {
+    double[] result = new double[msg.length()];
+    for (int i = 0; i < result.length; i++) {
+      result[i] = msg.get(i);
+    }
+    return result;
+  }
+
+  /**
+   * Pack a serialized protobuf array message.
+   *
+   * @param <T> object type
+   * @param <MessageType> element type of the protobuf array
+   * @param msg protobuf array message
+   * @param arr array of objects
+   * @param proto protobuf implementation
+   */
+  static <T, MessageType extends ProtoMessage<MessageType>> void packArray(
+      RepeatedMessage<MessageType> msg, T[] arr, Protobuf<T, MessageType> proto) {
+    msg.clear();
+    msg.reserve(arr.length);
+    for (var obj : arr) {
+      proto.pack(msg.next(), obj);
+    }
+  }
+
+  /**
+   * Pack a serialized protobuf double array message.
+   *
+   * @param msg protobuf double array message
+   * @param arr array of objects
+   */
+  static void packArray(RepeatedDouble msg, double[] arr) {
+    msg.clear();
+    msg.reserve(arr.length);
+    msg.addAll(arr);
   }
 }

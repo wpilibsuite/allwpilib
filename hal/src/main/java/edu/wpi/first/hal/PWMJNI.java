@@ -4,6 +4,11 @@
 
 package edu.wpi.first.hal;
 
+/**
+ * PWM JNI Functions.
+ *
+ * @see "hal/PWM.h"
+ */
 public class PWMJNI extends DIOJNI {
   /**
    * Initializes a PWM port.

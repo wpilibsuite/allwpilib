@@ -57,9 +57,8 @@ TEST(InterruptTest, RisingEdge) {
   interrupt.SetInterruptEdges(true, true);
   DIOSim digitalSim{di};
   digitalSim.SetValue(false);
-  frc::Wait(0.5_s);
   interrupt.Enable();
-  frc::Wait(20_ms);
+  frc::Wait(0.5_s);
   digitalSim.SetValue(true);
   frc::Wait(20_ms);
 
@@ -87,9 +86,8 @@ TEST(InterruptTest, FallingEdge) {
   interrupt.SetInterruptEdges(true, true);
   DIOSim digitalSim{di};
   digitalSim.SetValue(true);
-  frc::Wait(0.5_s);
   interrupt.Enable();
-  frc::Wait(20_ms);
+  frc::Wait(0.5_s);
   digitalSim.SetValue(false);
   frc::Wait(20_ms);
 

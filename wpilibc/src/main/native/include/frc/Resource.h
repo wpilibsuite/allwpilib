@@ -23,8 +23,9 @@ namespace frc {
  * The Resource class does not allocate the hardware channels or other
  * resources; it just tracks which indices were marked in use by Allocate and
  * not yet freed by Free.
+ * @deprecated Use the HandleResource classes instead
  */
-class Resource {
+class [[deprecated("Use the HandleResource classes instead")]] Resource {
  public:
   virtual ~Resource() = default;
 

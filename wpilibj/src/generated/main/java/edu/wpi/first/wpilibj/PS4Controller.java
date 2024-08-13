@@ -219,7 +219,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent square(EventLoop loop) {
-    return new BooleanEvent(loop, this::getSquareButton);
+    return button(Button.kSquare.value, loop);
   }
 
   /**
@@ -257,7 +257,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent cross(EventLoop loop) {
-    return new BooleanEvent(loop, this::getCrossButton);
+    return button(Button.kCross.value, loop);
   }
 
   /**
@@ -295,7 +295,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent circle(EventLoop loop) {
-    return new BooleanEvent(loop, this::getCircleButton);
+    return button(Button.kCircle.value, loop);
   }
 
   /**
@@ -333,7 +333,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent triangle(EventLoop loop) {
-    return new BooleanEvent(loop, this::getTriangleButton);
+    return button(Button.kTriangle.value, loop);
   }
 
   /**
@@ -371,7 +371,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent L1(EventLoop loop) {
-    return new BooleanEvent(loop, this::getL1Button);
+    return button(Button.kL1.value, loop);
   }
 
   /**
@@ -409,7 +409,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent R1(EventLoop loop) {
-    return new BooleanEvent(loop, this::getR1Button);
+    return button(Button.kR1.value, loop);
   }
 
   /**
@@ -447,7 +447,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent L2(EventLoop loop) {
-    return new BooleanEvent(loop, this::getL2Button);
+    return button(Button.kL2.value, loop);
   }
 
   /**
@@ -485,7 +485,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent R2(EventLoop loop) {
-    return new BooleanEvent(loop, this::getR2Button);
+    return button(Button.kR2.value, loop);
   }
 
   /**
@@ -523,7 +523,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent share(EventLoop loop) {
-    return new BooleanEvent(loop, this::getShareButton);
+    return button(Button.kShare.value, loop);
   }
 
   /**
@@ -561,7 +561,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent options(EventLoop loop) {
-    return new BooleanEvent(loop, this::getOptionsButton);
+    return button(Button.kOptions.value, loop);
   }
 
   /**
@@ -599,7 +599,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent L3(EventLoop loop) {
-    return new BooleanEvent(loop, this::getL3Button);
+    return button(Button.kL3.value, loop);
   }
 
   /**
@@ -637,7 +637,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent R3(EventLoop loop) {
-    return new BooleanEvent(loop, this::getR3Button);
+    return button(Button.kR3.value, loop);
   }
 
   /**
@@ -675,7 +675,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent PS(EventLoop loop) {
-    return new BooleanEvent(loop, this::getPSButton);
+    return button(Button.kPS.value, loop);
   }
 
   /**
@@ -713,7 +713,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent touchpad(EventLoop loop) {
-    return new BooleanEvent(loop, this::getTouchpadButton);
+    return button(Button.kTouchpad.value, loop);
   }
 
   /**

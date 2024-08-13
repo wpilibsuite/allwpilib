@@ -143,6 +143,9 @@ public class PowerJNI extends JNIWrapper {
    */
   public static native int getUserCurrentFaults3V3();
 
+  /** Resets the overcurrent fault counters for all user rails to 0. */
+  public static native void resetUserCurrentFaults();
+
   /**
    * Set the voltage the roboRIO will brownout and disable all outputs.
    *

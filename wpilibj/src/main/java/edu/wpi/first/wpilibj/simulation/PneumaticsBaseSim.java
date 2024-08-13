@@ -64,8 +64,7 @@ public abstract class PneumaticsBaseSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public abstract CallbackStore registerInitializedCallback(
       NotifyCallback callback, boolean initialNotify);
@@ -89,8 +88,7 @@ public abstract class PneumaticsBaseSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public abstract CallbackStore registerCompressorOnCallback(
       NotifyCallback callback, boolean initialNotify);
@@ -117,8 +115,7 @@ public abstract class PneumaticsBaseSim {
    * @param channel the channel to monitor
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public abstract CallbackStore registerSolenoidOutputCallback(
       int channel, NotifyCallback callback, boolean initialNotify);
@@ -142,8 +139,7 @@ public abstract class PneumaticsBaseSim {
    *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public abstract CallbackStore registerPressureSwitchCallback(
       NotifyCallback callback, boolean initialNotify);
@@ -167,8 +163,7 @@ public abstract class PneumaticsBaseSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public abstract CallbackStore registerCompressorCurrentCallback(
       NotifyCallback callback, boolean initialNotify);

@@ -147,12 +147,25 @@ public class DriverStationJNI extends JNIWrapper {
    */
   private static native int nativeGetAllianceStation();
 
+  /** Unknown Alliance Station ID. */
   public static final int kUnknownAllianceStation = 0;
+
+  /** Red Alliance Station 1 ID. */
   public static final int kRed1AllianceStation = 1;
+
+  /** Red Alliance Station 2 ID. */
   public static final int kRed2AllianceStation = 2;
+
+  /** Red Alliance Station 3 ID. */
   public static final int kRed3AllianceStation = 3;
+
+  /** Blue Alliance Station 1 ID. */
   public static final int kBlue1AllianceStation = 4;
+
+  /** Blue Alliance Station 2 ID. */
   public static final int kBlue2AllianceStation = 5;
+
+  /** Blue Alliance Station 3 ID. */
   public static final int kBlue3AllianceStation = 6;
 
   /**
@@ -174,8 +187,13 @@ public class DriverStationJNI extends JNIWrapper {
     };
   }
 
+  /** The maximum number of axes. */
   public static final int kMaxJoystickAxes = 12;
+
+  /** The maximum number of POVs. */
   public static final int kMaxJoystickPOVs = 12;
+
+  /** The maximum number of joysticks. */
   public static final int kMaxJoysticks = 6;
 
   /**
@@ -353,8 +371,18 @@ public class DriverStationJNI extends JNIWrapper {
    */
   public static native boolean refreshDSData();
 
+  /**
+   * Adds an event handle to be signalled when new data arrives.
+   *
+   * @param handle the event handle to be signalled
+   */
   public static native void provideNewDataEventHandle(int handle);
 
+  /**
+   * Removes the event handle from being signalled when new data arrives.
+   *
+   * @param handle the event handle to remove
+   */
   public static native void removeNewDataEventHandle(int handle);
 
   /**

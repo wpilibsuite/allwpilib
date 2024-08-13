@@ -8,11 +8,17 @@
 
 /** HAL data types. */
 enum HAL_Type {
+  /** Unassigned type. */
   HAL_UNASSIGNED = 0,
+  /** Boolean. */
   HAL_BOOLEAN = 0x01,
+  /** Double. */
   HAL_DOUBLE = 0x02,
+  /** Enum. */
   HAL_ENUM = 0x04,
+  /** Int. */
   HAL_INT = 0x08,
+  /** Long. */
   HAL_LONG = 0x10,
 };
 
@@ -31,7 +37,12 @@ struct HAL_Value {
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+/**
+ * Build a HAL boolean value.
+ *
+ * @param v value
+ * @return HAL value
+ */
 inline struct HAL_Value HAL_MakeBoolean(HAL_Bool v) {
   struct HAL_Value value;
   value.type = HAL_BOOLEAN;
@@ -39,6 +50,12 @@ inline struct HAL_Value HAL_MakeBoolean(HAL_Bool v) {
   return value;
 }
 
+/**
+ * Build a HAL enum value.
+ *
+ * @param v value
+ * @return HAL value
+ */
 inline struct HAL_Value HAL_MakeEnum(int v) {
   struct HAL_Value value;
   value.type = HAL_ENUM;
@@ -46,6 +63,12 @@ inline struct HAL_Value HAL_MakeEnum(int v) {
   return value;
 }
 
+/**
+ * Build a HAL int value.
+ *
+ * @param v value
+ * @return HAL value
+ */
 inline struct HAL_Value HAL_MakeInt(int v) {
   struct HAL_Value value;
   value.type = HAL_INT;
@@ -53,6 +76,12 @@ inline struct HAL_Value HAL_MakeInt(int v) {
   return value;
 }
 
+/**
+ * Build a HAL long value.
+ *
+ * @param v value
+ * @return HAL value
+ */
 inline struct HAL_Value HAL_MakeLong(int64_t v) {
   struct HAL_Value value;
   value.type = HAL_LONG;
@@ -60,6 +89,12 @@ inline struct HAL_Value HAL_MakeLong(int64_t v) {
   return value;
 }
 
+/**
+ * Build a HAL double value.
+ *
+ * @param v value
+ * @return HAL value
+ */
 inline struct HAL_Value HAL_MakeDouble(double v) {
   struct HAL_Value value;
   value.type = HAL_DOUBLE;

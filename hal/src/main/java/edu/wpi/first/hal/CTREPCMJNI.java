@@ -150,7 +150,7 @@ public class CTREPCMJNI extends JNIWrapper {
    * Gets a bitmask of solenoid values.
    *
    * @param handle the PCM handle
-   * @return solenoid values
+   * @return Bitmask containing the state of the solenoids. The LSB represents solenoid 0.
    * @see "HAL_GetCTREPCMSolenoids"
    */
   public static native int getSolenoids(int handle);
@@ -159,8 +159,9 @@ public class CTREPCMJNI extends JNIWrapper {
    * Sets solenoids on a pneumatics module.
    *
    * @param handle the PCM handle
-   * @param mask bitmask to set
-   * @param values solenoid values
+   * @param mask Bitmask indicating which solenoids to set. The LSB represents solenoid 0.
+   * @param values Bitmask indicating the desired states of the solenoids. The LSB represents
+   *     solenoid 0.
    * @see "HAL_SetCTREPCMSolenoids"
    */
   public static native void setSolenoids(int handle, int mask, int values);
@@ -169,7 +170,7 @@ public class CTREPCMJNI extends JNIWrapper {
    * Get a bitmask of disabled solenoids.
    *
    * @param handle the PCM handle
-   * @return bitmask of disabled solenoids
+   * @return Bitmask indicating disabled solenoids. The LSB represents solenoid 0.
    * @see "HAL_GetCTREPCMSolenoidDisabledList"
    */
   public static native int getSolenoidDisabledList(int handle);
