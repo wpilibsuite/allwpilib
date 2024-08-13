@@ -217,7 +217,7 @@ public interface LEDPattern {
    *
    * <pre>
    *   // LEDs per meter, a known value taken from the spec sheet of our particular LED strip
-   *   Measure&lt;DistanceUnit&gt; LED_SPACING = Meters.of(1.0 / 60);
+   *   Distance LED_SPACING = Meters.of(1.0 / 60);
    *
    *   LEDPattern rainbow = LEDPattern.rainbow();
    *   LEDPattern scrollingRainbow =
