@@ -153,14 +153,15 @@ public class EpilogueGenerator {
                    */
                 """);
             out.println("  public static void bind(" + robotClassName + " robot) {");
+            out.println("    if (config.loggingPeriod == null) {");
+            out.println("      config.loggingPeriod = Seconds.of(robot.getPeriod());");
+            out.println("    }");
+            out.println("    if (config.loggingPeriodOffset == null) {");
+            out.println("      config.loggingPeriodOffset = config.loggingPeriod.divide(2);");
+            out.println("    }");
+            out.println();
             out.println("    robot.addPeriodic(() -> {");
             out.println("      long start = System.nanoTime();");
-            out.println("      if (config.loggingPeriod == null) {");
-            out.println("        config.loggingPeriod = Seconds.of(robot.getPeriod());");
-            out.println("      }");
-            out.println("      if (config.loggingPeriodOffset == null) {");
-            out.println("        config.loggingPeriodOffset = config.loggingPeriod.divide(2);");
-            out.println("      }");
             out.println(
                 "      "
                     + StringUtils.loggerFieldName(mainRobotClass)

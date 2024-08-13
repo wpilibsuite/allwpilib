@@ -156,14 +156,15 @@ class EpilogueGeneratorTest {
            * loop.
            */
           public static void bind(edu.wpi.first.epilogue.Example robot) {
+            if (config.loggingPeriod == null) {
+              config.loggingPeriod = Seconds.of(robot.getPeriod());
+            }
+            if (config.loggingPeriodOffset == null) {
+              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+            }
+
             robot.addPeriodic(() -> {
               long start = System.nanoTime();
-              if (config.loggingPeriod == null) {
-                config.loggingPeriod = Seconds.of(robot.getPeriod());
-              }
-              if (config.loggingPeriodOffset == null) {
-                config.loggingPeriodOffset = config.loggingPeriod.divide(2);
-              }
               exampleLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
               edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
@@ -226,14 +227,15 @@ class EpilogueGeneratorTest {
            * loop.
            */
           public static void bind(edu.wpi.first.epilogue.AlphaBot robot) {
+            if (config.loggingPeriod == null) {
+              config.loggingPeriod = Seconds.of(robot.getPeriod());
+            }
+            if (config.loggingPeriodOffset == null) {
+              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+            }
+
             robot.addPeriodic(() -> {
               long start = System.nanoTime();
-              if (config.loggingPeriod == null) {
-                config.loggingPeriod = Seconds.of(robot.getPeriod());
-              }
-              if (config.loggingPeriodOffset == null) {
-                config.loggingPeriodOffset = config.loggingPeriod.divide(2);
-              }
               alphaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
               edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
@@ -248,14 +250,15 @@ class EpilogueGeneratorTest {
            * loop.
            */
           public static void bind(edu.wpi.first.epilogue.BetaBot robot) {
+            if (config.loggingPeriod == null) {
+              config.loggingPeriod = Seconds.of(robot.getPeriod());
+            }
+            if (config.loggingPeriodOffset == null) {
+              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+            }
+
             robot.addPeriodic(() -> {
               long start = System.nanoTime();
-              if (config.loggingPeriod == null) {
-                config.loggingPeriod = Seconds.of(robot.getPeriod());
-              }
-              if (config.loggingPeriodOffset == null) {
-                config.loggingPeriodOffset = config.loggingPeriod.divide(2);
-              }
               betaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
               edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));

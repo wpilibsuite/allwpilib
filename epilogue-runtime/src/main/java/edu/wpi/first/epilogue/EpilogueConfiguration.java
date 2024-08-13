@@ -4,7 +4,6 @@
 
 package edu.wpi.first.epilogue;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import edu.wpi.first.epilogue.logging.DataLogger;
 import edu.wpi.first.epilogue.logging.NTDataLogger;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
@@ -26,11 +25,17 @@ public class EpilogueConfiguration {
    */
   public DataLogger dataLogger = new NTDataLogger(NetworkTableInstance.getDefault());
 
-  /** The period Epilogue will log at. */
-  @SuppressFBWarnings public Measure<Time> loggingPeriod;
+  /**
+   * The period Epilogue will log at. By default this is the period that the robot runs at. This is
+   * the field used by bind to configure speed when adding the periodic logging function
+   */
+  public Measure<Time> loggingPeriod;
 
-  /** The offset from the periodic run that Epilogue will log at. */
-  @SuppressFBWarnings public Measure<Time> loggingPeriodOffset;
+  /**
+   * The offset from the periodic run that Epilogue will log at. By default this will be half of the
+   * robots period. This is the field used by bind when adding the periodic logging function
+   */
+  public Measure<Time> loggingPeriodOffset;
 
   /**
    * The minimum importance level of data to be logged. Defaults to debug, which logs data of all
