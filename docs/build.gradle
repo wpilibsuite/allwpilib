@@ -66,7 +66,6 @@ doxygen {
             cppIncludeRoots.add(it.absolutePath)
         }
     }
-    cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
     if (project.hasProperty('docWarningsAsErrors')) {
         // apriltag
