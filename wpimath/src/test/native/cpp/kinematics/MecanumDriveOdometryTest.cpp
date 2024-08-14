@@ -97,7 +97,7 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  units::second_t dt = 0.02_s;
+  units::second_t dt = 20_ms;
   units::second_t t = 0_s;
 
   double maxError = -std::numeric_limits<double>::max();
@@ -160,7 +160,7 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  units::second_t dt = 0.02_s;
+  units::second_t dt = 20_ms;
   units::second_t t = 0_s;
 
   double maxError = -std::numeric_limits<double>::max();

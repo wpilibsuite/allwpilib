@@ -818,7 +818,7 @@ units::degree_t ADIS16470_IMU::GetAngle(IMUAxis axis) const {
       break;
   }
 
-  return units::degree_t{0.0};
+  return 0_deg;
 }
 
 units::degrees_per_second_t ADIS16470_IMU::GetRate(IMUAxis axis) const {
