@@ -4,13 +4,14 @@
 
 #pragma once
 
+#ifndef FIELDCALIBRATION_H
+#define FIELDCALIBRATION_H
+
 #include <filesystem>
 #include <fstream>
-#include <functional>
 #include <map>
 #include <string>
 #include <tuple>
-#include <utility>
 #include <vector>
 
 #include <Eigen/Core>
@@ -25,8 +26,8 @@
 #include <wpi/json.h>
 
 extern "C" {
-#include "apriltag.h"
-#include "tag36h11.h"
+#include "apriltag/apriltag.h"
+#include "apriltag/tag36h11.h"
 }  // extern "C"
 
 struct Pose {
@@ -46,10 +47,11 @@ namespace fieldcalibration {
 std::tuple<Eigen::Matrix<double, 3, 3>, Eigen::Matrix<double, 8, 1>>
 load_camera_model(std::string path);
 std::tuple<Eigen::Matrix<double, 3, 3>, Eigen::Matrix<double, 8, 1>>
-load_camera_model(wpi::json json_data);
-std::map<int, wpi::json> load_ideal_map(std::string path);
+load_camera_model(nlohmann::json json_data);
+std::map<int, nlohmann::json> load_ideal_map(std::string path);
+std::vector<Eigen::Vector3d> get_model_corners(double tag_size);
 Eigen::Matrix<double, 4, 4> get_tag_transform(
-    std::map<int, wpi::json>& ideal_map, int tag_id);
+    std::map<int, nlohmann::json>& ideal_map, int tag_id);
 Eigen::Matrix<double, 4, 4> estimate_tag_pose(
     apriltag_detection_t* tag_detection,
     const Eigen::Matrix<double, 3, 3>& camera_matrix,
@@ -65,12 +67,10 @@ bool process_video_file(
     const std::string& path,
     std::map<int, Pose, std::less<int>,
              Eigen::aligned_allocator<std::pair<const int, Pose>>>& poses,
-    std::vector<Constraint, Eigen::aligned_allocator<Constraint>>& constraints);
+    std::vector<Constraint, Eigen::aligned_allocator<Constraint>>& constraints,
+    bool show_debug_window);
 int calibrate(std::string input_dir_path, std::string output_file_path,
               std::string camera_model_path, std::string ideal_map_path,
-              int pinned_tag_id, int detection_fps);
-
-int calibrate(std::string input_dir_path, std::string output_file_path,
-              wpi::json camera_model, std::string ideal_map_path,
-              int pinned_tag_id, int detection_fps);
+              int pinned_tag_id, int detection_fps, bool show_debug_window);
 }  // namespace fieldcalibration
+#endif  // FIELDCALIBRATION_H

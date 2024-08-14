@@ -61,7 +61,7 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     }
 }
 
-def generateTask = createGenerateResourcesTask('main', 'OV', 'ov', project)
+def generateTask = createGenerateResourcesTask('main', 'WPIcal', 'wpical', project)
 
 project(':').libraryBuild.dependsOn build
 tasks.withType(CppCompile) {
@@ -74,7 +74,7 @@ model {
         // By default, a development executable will be generated. This is to help the case of
         // testing specific functionality of the library.
         "${nativeName}"(NativeExecutableSpec) {
-            baseName = 'outlineviewer'
+            baseName = 'wpical'
             sources {
                 cpp {
                     source {

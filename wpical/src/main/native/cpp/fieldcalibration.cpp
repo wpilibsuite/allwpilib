@@ -6,7 +6,7 @@
 
 class PoseGraphError {
  public:
-  explicit PoseGraphError(Pose t_ab_observed)
+  PoseGraphError(Pose t_ab_observed)
       : m_t_ab_observed(std::move(t_ab_observed)) {}
 
   template <typename T>
@@ -283,8 +283,8 @@ bool fieldcalibration::process_video_file(
     const std::string& path,
     std::map<int, Pose, std::less<int>,
              Eigen::aligned_allocator<std::pair<const int, Pose>>>& poses,
-    std::vector<Constraint, Eigen::aligned_allocator<Constraint>>&
-        constraints) {
+    std::vector<Constraint, Eigen::aligned_allocator<Constraint>>& constraints,
+    bool show_debug_window) {
   cv::namedWindow("Processing Frame", cv::WINDOW_NORMAL);
   cv::VideoCapture video_input(path);
 
@@ -293,9 +293,7 @@ bool fieldcalibration::process_video_file(
     return false;
   }
 
-  [[maybe_unused]]
   int video_width = video_input.get(cv::CAP_PROP_FRAME_WIDTH);
-  [[maybe_unused]]
   int video_height = video_input.get(cv::CAP_PROP_FRAME_HEIGHT);
   int video_fps = video_input.get(cv::CAP_PROP_FPS);
 
@@ -394,8 +392,10 @@ bool fieldcalibration::process_video_file(
     apriltag_detections_destroy(tag_detections);
 
     // Show debug
-    cv::imshow("Processing Frame", frame_debug);
-    cv::waitKey(1);
+    if (show_debug_window) {
+      cv::imshow("Processing Frame", frame_debug);
+      cv::waitKey(1);
+    }
   }
 
   video_input.release();
@@ -408,17 +408,35 @@ int fieldcalibration::calibrate(std::string input_dir_path,
                                 std::string output_file_path,
                                 std::string camera_model_path,
                                 std::string ideal_map_path, int pinned_tag_id,
-                                int detection_fps) {
+                                int detection_fps, bool show_debug_window) {
   // Silence OpenCV logging
   cv::utils::logging::setLogLevel(
       cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
 
   // Load camera model
-  const auto [camera_matrix, camera_distortion] =
-      load_camera_model(camera_model_path);
+  Eigen::Matrix3d camera_matrix;
+  Eigen::Matrix<double, 8, 1> camera_distortion;
+
+  try {
+    auto camera_model = load_camera_model(camera_model_path);
+    camera_matrix = std::get<0>(camera_model);
+    camera_distortion = std::get<1>(camera_model);
+  } catch (...) {
+    return 1;
+  }
+
+  wpi::json json = wpi::json::parse(std::ifstream(ideal_map_path));
+  if (!json.contains("tags")) {
+    return 1;
+  }
 
   // Load ideal field map
-  std::map<int, wpi::json> ideal_map = load_ideal_map(ideal_map_path);
+  std::map<int, wpi::json> ideal_map;
+  try {
+    ideal_map = load_ideal_map(ideal_map_path);
+  } catch (...) {
+    return 1;
+  }
 
   // Apriltag detector
   apriltag_detector_t* tag_detector = apriltag_detector_create();
@@ -441,192 +459,13 @@ int fieldcalibration::calibrate(std::string input_dir_path,
 
     const std::string path = entry.path().string();
 
-    bool success =
-        process_video_file(tag_detector, detection_fps, camera_matrix,
-                           camera_distortion, 0.1651, path, poses, constraints);
+    bool success = process_video_file(
+        tag_detector, detection_fps, camera_matrix, camera_distortion, 0.1651,
+        path, poses, constraints, show_debug_window);
 
     if (!success) {
       std::cout << "Unable to process video" << std::endl;
-      return -1;
-    }
-  }
-
-  // Build optimization problem
-  ceres::Problem problem;
-  ceres::Manifold* quaternion_manifold = new ceres::EigenQuaternionManifold;
-
-  for (const auto& constraint : constraints) {
-    auto pose_begin_iter = poses.find(constraint.id_begin);
-    auto pose_end_iter = poses.find(constraint.id_end);
-
-    ceres::CostFunction* cost_function =
-        PoseGraphError::Create(constraint.t_begin_end);
-
-    problem.AddResidualBlock(cost_function, nullptr,
-                             pose_begin_iter->second.p.data(),
-                             pose_begin_iter->second.q.coeffs().data(),
-                             pose_end_iter->second.p.data(),
-                             pose_end_iter->second.q.coeffs().data());
-
-    problem.SetManifold(pose_begin_iter->second.q.coeffs().data(),
-                        quaternion_manifold);
-    problem.SetManifold(pose_end_iter->second.q.coeffs().data(),
-                        quaternion_manifold);
-  }
-
-  // Pin tag
-  auto pinned_tag_iter = poses.find(pinned_tag_id);
-  if (pinned_tag_iter != poses.end()) {
-    problem.SetParameterBlockConstant(pinned_tag_iter->second.p.data());
-    problem.SetParameterBlockConstant(
-        pinned_tag_iter->second.q.coeffs().data());
-  }
-
-  // Solve
-  ceres::Solver::Options options;
-  options.max_num_iterations = 200;
-  options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
-  options.num_threads = 10;
-
-  ceres::Solver::Summary summary;
-  ceres::Solve(options, &problem, &summary);
-
-  std::cout << summary.BriefReport() << std::endl;
-
-  // Output
-  std::map<int, wpi::json> observed_map = ideal_map;
-
-  Eigen::Matrix<double, 4, 4> correction_a;
-  correction_a << 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1;
-
-  Eigen::Matrix<double, 4, 4> correction_b;
-  correction_b << 0, 1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 1;
-
-  Eigen::Matrix<double, 4, 4> pinned_tag_transform =
-      get_tag_transform(ideal_map, pinned_tag_id);
-
-  for (const auto& [tag_id, pose] : poses) {
-    // Transformation from pinned tag
-    Eigen::Matrix<double, 4, 4> transform =
-        Eigen::Matrix<double, 4, 4>::Identity();
-
-    transform.block<3, 3>(0, 0) = pose.q.toRotationMatrix();
-    transform.block<3, 1>(0, 3) = pose.p;
-
-    // Transformation from world
-    Eigen::Matrix<double, 4, 4> corrected_transform =
-        pinned_tag_transform * correction_a * transform * correction_b;
-    Eigen::Quaternion<double> corrected_transform_q(
-        corrected_transform.block<3, 3>(0, 0));
-
-    observed_map[tag_id]["pose"]["translation"]["x"] =
-        corrected_transform(0, 3);
-    observed_map[tag_id]["pose"]["translation"]["y"] =
-        corrected_transform(1, 3);
-    observed_map[tag_id]["pose"]["translation"]["z"] =
-        corrected_transform(2, 3);
-
-    observed_map[tag_id]["pose"]["rotation"]["quaternion"]["X"] =
-        corrected_transform_q.x();
-    observed_map[tag_id]["pose"]["rotation"]["quaternion"]["Y"] =
-        corrected_transform_q.y();
-    observed_map[tag_id]["pose"]["rotation"]["quaternion"]["Z"] =
-        corrected_transform_q.z();
-    observed_map[tag_id]["pose"]["rotation"]["quaternion"]["W"] =
-        corrected_transform_q.w();
-  }
-
-  wpi::json observed_map_json;
-
-  for (const auto& [tag_id, tag_json] : observed_map) {
-    observed_map_json["tags"].push_back(tag_json);
-  }
-
-  observed_map_json["field"] = {{"length", 16.541}, {"width", 8.211}};
-
-  // for (const auto& constraint : constraints)
-  // {
-  // wpi::json output_constraint;
-
-  // output_constraint["from_id"] = constraint.id_begin;
-  // output_constraint["to_id"] = constraint.id_end;
-
-  // output_constraint["transform"]["translation"]["x"] =
-  // constraint.t_begin_end.p[0];
-  // output_constraint["transform"]["translation"]["y"] =
-  // constraint.t_begin_end.p[1];
-  // output_constraint["transform"]["translation"]["z"] =
-  // constraint.t_begin_end.p[2];
-
-  // output_constraint["transform"]["rotation"]["x"] =
-  // constraint.t_begin_end.q.x();
-  // output_constraint["transform"]["rotation"]["y"] =
-  // constraint.t_begin_end.q.y();
-  // output_constraint["transform"]["rotation"]["z"] =
-  // constraint.t_begin_end.q.z();
-  // output_constraint["transform"]["rotation"]["w"] =
-  // constraint.t_begin_end.q.w();
-
-  // output["constraints"].push_back(output_constraint);
-
-  // std::cout << constraint.id_begin << " -- " << constraint.id_end <<
-  // std::endl;
-  // }
-
-  std::ofstream output_file(output_file_path);
-  output_file << observed_map_json.dump(4) << std::endl;
-
-  return 0;
-}
-
-int fieldcalibration::calibrate(std::string input_dir_path,
-                                std::string output_file_path,
-                                wpi::json camera_model,
-                                std::string ideal_map_path, int pinned_tag_id,
-                                int detection_fps) {
-  // Silence OpenCV logging
-  cv::utils::logging::setLogLevel(
-      cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
-
-  // Load camera model
-  const auto [camera_matrix, camera_distortion] =
-      load_camera_model(camera_model);
-
-  // Load ideal field map
-  std::map<int, wpi::json> ideal_map = load_ideal_map(ideal_map_path);
-
-  // Apriltag detector
-  apriltag_detector_t* tag_detector = apriltag_detector_create();
-  tag_detector->nthreads = 8;
-
-  apriltag_family_t* tag_family = tag36h11_create();
-  apriltag_detector_add_family(tag_detector, tag_family);
-
-  // Find tag poses
-  std::map<int, Pose, std::less<int>,
-           Eigen::aligned_allocator<std::pair<const int, Pose>>>
-      poses;
-  std::vector<Constraint, Eigen::aligned_allocator<Constraint>> constraints;
-
-  for (const auto& entry :
-       std::filesystem::directory_iterator(input_dir_path)) {
-    if (entry.path().filename().string()[0] == '.' ||
-        (entry.path().extension().string() != ".mp4" &&
-         entry.path().extension().string() != ".mov" &&
-         entry.path().extension().string() != ".m4v" &&
-         entry.path().extension().string() != ".mkv")) {
-      continue;
-    }
-
-    const std::string path = entry.path().string();
-
-    bool success =
-        process_video_file(tag_detector, detection_fps, camera_matrix,
-                           camera_distortion, 0.1651, path, poses, constraints);
-
-    if (!success) {
-      std::cout << "Unable to process video" << std::endl;
-      return -1;
+      return 1;
     }
   }
 
