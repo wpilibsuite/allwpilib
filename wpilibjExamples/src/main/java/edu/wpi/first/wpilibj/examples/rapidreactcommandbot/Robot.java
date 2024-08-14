@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot;
 
-import static edu.wpi.first.units.Units.Milliseconds;
-
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -34,10 +32,6 @@ public class Robot extends TimedRobot {
 
     // Initialize data logging.
     DataLogManager.start();
-    Epilogue.configure(
-        config -> {
-          config.loggingPeriodOffset = Milliseconds.of(10); // Logs 10ms after each main loop run
-        });
     Epilogue.bind(this);
   }
 
