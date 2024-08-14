@@ -62,7 +62,7 @@ frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
 }
 
 TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
-  constexpr auto kDt = 0.02_s;
+  constexpr units::second_t kDt = 20_ms;
 
   frc::LTVDifferentialDriveController controller{
       plant, kTrackwidth, {0.0625, 0.125, 2.5, 0.95, 0.95}, {12.0, 12.0}, kDt};

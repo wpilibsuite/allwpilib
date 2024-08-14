@@ -56,15 +56,12 @@ class TrapezoidProfileCommand
   void Initialize() override {}
 
   void Execute() override {
-    m_output(
-        m_profile.Calculate(units::second_t{0.02}, m_currentState(), m_goal()));
+    m_output(m_profile.Calculate(20_ms, m_currentState(), m_goal()));
   }
 
   void End(bool interrupted) override {}
 
-  bool IsFinished() override {
-    return m_profile.IsFinished(units::second_t{0});
-  }
+  bool IsFinished() override { return m_profile.IsFinished(0_s); }
 
  private:
   frc::TrapezoidProfile<Distance> m_profile;

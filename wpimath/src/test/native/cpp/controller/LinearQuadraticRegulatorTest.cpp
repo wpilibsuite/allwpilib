@@ -180,9 +180,9 @@ TEST(LinearQuadraticRegulatorTest, LatencyCompensate) {
 
     return frc::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
   }();
-  LinearQuadraticRegulator<2, 1> controller{plant, {0.1, 0.2}, {12.0}, 0.02_s};
+  LinearQuadraticRegulator<2, 1> controller{plant, {0.1, 0.2}, {12.0}, 20_ms};
 
-  controller.LatencyCompensate(plant, 0.02_s, 0.01_s);
+  controller.LatencyCompensate(plant, 20_ms, 10_ms);
 
   EXPECT_NEAR(8.97115941, controller.K(0, 0), 1e-3);
   EXPECT_NEAR(0.07904881, controller.K(0, 1), 1e-3);
