@@ -77,12 +77,12 @@ The following build options are available:
 
 ## Build Setup
 
-The WPILib CMake build does not allow in source builds. Because the `build` directory is used by Gradle, we recommend a `build-cmake` directory in the root. This folder is included in the gitignore.
+The WPILib CMake build does not allow in source builds. Because the `build` directory is used by Gradle, we recommend a `build-cmake` directory in the root. This folder is included in the gitignore. We support building with Ninja, other options like Makefiles may be broken.
 
 Once you have a build folder, run CMake configuration in that build directory with the following command.
 
 ```
-cmake path/to/allwpilib/root
+cmake path/to/allwpilib/root -G Ninja
 ```
 
 If you want to change any of the options, add `-DOPTIONHERE=VALUE` to the `cmake` command. This will check for any dependencies. If everything works properly this will succeed. If not, please check out the troubleshooting section for help.
