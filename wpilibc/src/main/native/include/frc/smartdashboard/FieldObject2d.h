@@ -85,7 +85,6 @@ class FieldObject2d {
   /**
    * Get multiple poses.
    *
-   * @param obj Object entry
    * @return vector of 2D poses
    */
   std::vector<Pose2d> GetPoses() const;

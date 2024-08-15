@@ -37,7 +37,7 @@ Update the `upstream_utils` patch files and the tag in the script.
 
 Copy the updated upstream files into the thirdparty files within allwpilib.
 ```bash
-./<lib>.py copy-upstream-to-thirdparty
+./<lib>.py copy-src
 ```
 
 ## Adding patch to thirdparty library
@@ -78,5 +78,5 @@ Update the `upstream_utils` patch files.
 
 Rerun `<lib>.py` to reimport the thirdparty files.
 ```bash
-./<lib>.py copy-upstream-to-thirdparty
+./<lib>.py copy-src
 ```
