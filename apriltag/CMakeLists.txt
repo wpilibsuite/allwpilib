@@ -31,6 +31,16 @@ else()
     )
 endif()
 
+add_library(apriltaglib ${apriltaglib_src})
+target_include_directories(
+    apriltaglib
+    SYSTEM
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include/common>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/src>
+)
+
 file(GLOB apriltag_jni_src src/main/native/cpp/jni/AprilTagJNI.cpp)
 
 if(WITH_JAVA)
