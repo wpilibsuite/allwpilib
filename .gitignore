@@ -249,3 +249,6 @@ imgui.ini
 /bazel-*
 user.bazelrc
 coverage_report/
+
+# ctest
+/Testing/
