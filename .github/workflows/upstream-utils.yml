@@ -34,92 +34,92 @@ jobs:
         run: |
           cd upstream_utils
           ./apriltag.py clone
-          ./apriltag.py copy-upstream-to-thirdparty
+          ./apriltag.py copy-src
       - name: Run eigen.py
         run: |
           cd upstream_utils
           ./eigen.py clone
-          ./eigen.py copy-upstream-to-thirdparty
+          ./eigen.py copy-src
       - name: Run fmt.py
         run: |
           cd upstream_utils
           ./fmt.py clone
-          ./fmt.py copy-upstream-to-thirdparty
+          ./fmt.py copy-src
       - name: Run gcem.py
         run: |
           cd upstream_utils
           ./gcem.py clone
-          ./gcem.py copy-upstream-to-thirdparty
+          ./gcem.py copy-src
       - name: Run gl3w.py
         run: |
           cd upstream_utils
           ./gl3w.py clone
-          ./gl3w.py copy-upstream-to-thirdparty
+          ./gl3w.py copy-src
       - name: Run glfw.py
         run: |
           cd upstream_utils
           ./glfw.py clone
-          ./glfw.py copy-upstream-to-thirdparty
+          ./glfw.py copy-src
       - name: Run googletest.py
         run: |
           cd upstream_utils
           ./googletest.py clone
-          ./googletest.py copy-upstream-to-thirdparty
+          ./googletest.py copy-src
       - name: Run imgui.py
         run: |
           cd upstream_utils
           ./imgui.py clone
-          ./imgui.py copy-upstream-to-thirdparty
+          ./imgui.py copy-src
       - name: Run implot.py
         run: |
           cd upstream_utils
           ./implot.py clone
-          ./implot.py copy-upstream-to-thirdparty
+          ./implot.py copy-src
       - name: Run json.py
         run: |
           cd upstream_utils
           ./json.py clone
-          ./json.py copy-upstream-to-thirdparty
+          ./json.py copy-src
       - name: Run libuv.py
         run: |
           cd upstream_utils
           ./libuv.py clone
-          ./libuv.py copy-upstream-to-thirdparty
+          ./libuv.py copy-src
       - name: Run llvm.py
         run: |
           cd upstream_utils
           ./llvm.py clone
-          ./llvm.py copy-upstream-to-thirdparty
+          ./llvm.py copy-src
       - name: Run mpack.py
         run: |
           cd upstream_utils
           ./mpack.py clone
-          ./mpack.py copy-upstream-to-thirdparty
+          ./mpack.py copy-src
       - name: Run stack_walker.py
         run: |
           cd upstream_utils
           ./stack_walker.py clone
-          ./stack_walker.py copy-upstream-to-thirdparty
+          ./stack_walker.py copy-src
       - name: Run memory.py
         run: |
           cd upstream_utils
           ./memory.py clone
-          ./memory.py copy-upstream-to-thirdparty
+          ./memory.py copy-src
       - name: Run protobuf.py
         run: |
           cd upstream_utils
           ./protobuf.py clone
-          ./protobuf.py copy-upstream-to-thirdparty
+          ./protobuf.py copy-src
       - name: Run sleipnir.py
         run: |
           cd upstream_utils
           ./sleipnir.py clone
-          ./sleipnir.py copy-upstream-to-thirdparty
+          ./sleipnir.py copy-src
       - name: Run stb.py
         run: |
           cd upstream_utils
           ./stb.py clone
-          ./stb.py copy-upstream-to-thirdparty
+          ./stb.py copy-src
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

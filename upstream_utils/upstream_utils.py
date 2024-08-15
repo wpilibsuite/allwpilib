@@ -564,7 +564,7 @@ class Lib:
         )
 
         subparsers.add_parser(
-            "copy-upstream-to-thirdparty",
+            "copy-src",
             help="Copies files from the upstream repository into the thirdparty directory in allwpilib",
         )
 
@@ -581,5 +581,5 @@ class Lib:
             self.rebase(args.new_tag)
         elif args.subcommand == "format-patch":
             self.format_patch()
-        elif args.subcommand == "copy-upstream-to-thirdparty":
+        elif args.subcommand == "copy-src":
             self.copy_upstream_to_thirdparty()
