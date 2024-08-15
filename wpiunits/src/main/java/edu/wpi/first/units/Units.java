@@ -272,11 +272,11 @@ public final class Units {
   // Force
 
   /**
-   * The standard unit of force, equivalent to the standard force of gravity applied to a one {@link
-   * #Kilogram} mass.
+   * The standard unit of force, equivalent to accelerating a mass of one {@link #Kilogram} at a
+   * rate of one {@link #MetersPerSecondPerSecond meter per second per second}.
    */
   public static final ForceUnit Newtons =
-      derive(Kilograms.mult(Gs)).named("Newton").symbol("N").make();
+      derive(Kilograms.mult(MetersPerSecondPerSecond)).named("Newton").symbol("N").make();
 
   /**
    * The standard unit of force, equivalent to the standard force of gravity applied to a one {@link
