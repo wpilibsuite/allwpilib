@@ -3,7 +3,7 @@ apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
 
 ext {
-    nativeName = 'Catch2'
+    nativeName = 'catch2'
 }
 
 apply from: "${rootDir}/shared/config.gradle"
@@ -13,7 +13,7 @@ def catch2UserConfigOutput  = file("$buildDir/generated-includes/catch2/catch_us
 
 task generateCatchUserConfig() {
     description = 'Generates the Catch2 user config file.'
-    group = 'Catch2'
+    group = 'catch2'
 
     outputs.file catch2UserConfigOutput
     inputs.file catch2UserConfigInput
