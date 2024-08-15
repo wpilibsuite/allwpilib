@@ -21,6 +21,9 @@ public abstract class Unit {
   private final String m_name;
   private final String m_symbol;
 
+  private final Measure<?> m_zero;
+  private final Measure<?> m_one;
+
   /**
    * Creates a new unit defined by its relationship to some base unit.
    *
@@ -42,6 +45,9 @@ public abstract class Unit {
     m_fromBaseConverter = Objects.requireNonNull(fromBaseConverter);
     m_name = Objects.requireNonNull(name);
     m_symbol = Objects.requireNonNull(symbol);
+
+    m_zero = of(0);
+    m_one = of(1);
   }
 
   /**
@@ -89,6 +95,28 @@ public abstract class Unit {
   public abstract MutableMeasure<?, ?, ?> mutable(double initialMagnitude);
 
   /**
+   * Gets a measure of zero magnitude in terms of this unit. The returned object is guaranteed to be
+   * of the same type returned by {@link #of(double)}. Subclasses are encouraged to override this
+   * method to sharpen the return type.
+   *
+   * @return a zero-magnitude measure of this unit
+   */
+  public Measure<?> zero() {
+    return m_zero;
+  }
+
+  /**
+   * Gets a measure with a magnitude of 1.0 in terms of this unit. The returned object is guaranteed
+   * to be of the same type returned by {@link #of(double)}. Subclasses are encouraged to override
+   * this method to sharpen the return type.
+   *
+   * @return a measure of magnitude 1.0 in terms of this unit
+   */
+  public Measure<?> one() {
+    return m_one;
+  }
+
+  /**
    * Combines this unit with a unit of time. This often - but not always - results in a velocity.
    * Subclasses should sharpen the return type to be unit-specific.
    *
@@ -102,7 +130,8 @@ public abstract class Unit {
    * the unit will be returned.
    *
    * <p><strong>NOTE:</strong> Subclasses <strong>must</strong> override this method to provide the
-   * correct return type. Failing to do say will make combination
+   * correct return type. Failing to do say will make unit combinations that use it break at
+   * runtime!
    *
    * <pre><code>
    *   Unit baseUnit = new Unit(null, ...);

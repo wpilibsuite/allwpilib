@@ -58,6 +58,18 @@ public final class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<LinearVelocityUnit> zero() {
+    return (Measure<LinearVelocityUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<LinearVelocityUnit> one() {
+    return (Measure<LinearVelocityUnit>) super.one();
+  }
+
+  @Override
   public MutLinearVelocity mutable(double value) {
     return new MutLinearVelocity(value, toBaseUnits(value), this);
   }

@@ -62,6 +62,18 @@ public final class CurrentUnit extends Unit {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<CurrentUnit> zero() {
+    return (Measure<CurrentUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<CurrentUnit> one() {
+    return (Measure<CurrentUnit>) super.one();
+  }
+
+  @Override
   public MutCurrent mutable(double initialMagnitude) {
     return new MutCurrent(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

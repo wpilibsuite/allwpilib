@@ -64,6 +64,18 @@ public final class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, Angu
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<MomentOfInertiaUnit> zero() {
+    return (Measure<MomentOfInertiaUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<MomentOfInertiaUnit> one() {
+    return (Measure<MomentOfInertiaUnit>) super.one();
+  }
+
+  @Override
   public MutMomentOfInertia mutable(double initialMagnitude) {
     return new MutMomentOfInertia(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

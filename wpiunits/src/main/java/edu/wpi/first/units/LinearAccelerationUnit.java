@@ -61,6 +61,18 @@ public final class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, Ti
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<LinearAccelerationUnit> zero() {
+    return (Measure<LinearAccelerationUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<LinearAccelerationUnit> one() {
+    return (Measure<LinearAccelerationUnit>) super.one();
+  }
+
+  @Override
   public MutLinearAcceleration mutable(double initialMagnitude) {
     return new MutLinearAcceleration(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

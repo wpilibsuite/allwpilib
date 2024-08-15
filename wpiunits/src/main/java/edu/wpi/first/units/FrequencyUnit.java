@@ -71,6 +71,18 @@ public final class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<FrequencyUnit> zero() {
+    return (Measure<FrequencyUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<FrequencyUnit> one() {
+    return (Measure<FrequencyUnit>) super.one();
+  }
+
+  @Override
   public MutFrequency mutable(double initialMagnitude) {
     return new MutFrequency(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

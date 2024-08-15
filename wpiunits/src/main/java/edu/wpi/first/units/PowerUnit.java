@@ -121,6 +121,18 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<PowerUnit> zero() {
+    return (Measure<PowerUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<PowerUnit> one() {
+    return (Measure<PowerUnit>) super.one();
+  }
+
+  @Override
   public MutPower mutable(double initialMagnitude) {
     return new MutPower(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

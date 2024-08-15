@@ -43,6 +43,18 @@ public final class TemperatureUnit extends Unit {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<TemperatureUnit> zero() {
+    return (Measure<TemperatureUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<TemperatureUnit> one() {
+    return (Measure<TemperatureUnit>) super.one();
+  }
+
+  @Override
   public MutTemperature mutable(double initialMagnitude) {
     return new MutTemperature(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

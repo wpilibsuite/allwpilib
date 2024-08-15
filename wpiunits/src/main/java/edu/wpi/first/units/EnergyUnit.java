@@ -80,6 +80,18 @@ public final class EnergyUnit extends Unit {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<EnergyUnit> zero() {
+    return (Measure<EnergyUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<EnergyUnit> one() {
+    return (Measure<EnergyUnit>) super.one();
+  }
+
+  @Override
   public MutEnergy mutable(double initialMagnitude) {
     return new MutEnergy(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

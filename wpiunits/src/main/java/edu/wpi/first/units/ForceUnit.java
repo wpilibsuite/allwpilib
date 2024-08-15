@@ -73,6 +73,18 @@ public final class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> 
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<ForceUnit> zero() {
+    return (Measure<ForceUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<ForceUnit> one() {
+    return (Measure<ForceUnit>) super.one();
+  }
+
+  @Override
   public MutForce mutable(double initialMagnitude) {
     return new MutForce(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

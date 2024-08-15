@@ -62,6 +62,18 @@ public final class VoltageUnit extends Unit {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<VoltageUnit> zero() {
+    return (Measure<VoltageUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<VoltageUnit> one() {
+    return (Measure<VoltageUnit>) super.one();
+  }
+
+  @Override
   public MutVoltage mutable(double magnitude) {
     return new MutVoltage(magnitude, toBaseUnits(magnitude), this);
   }

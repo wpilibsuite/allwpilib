@@ -178,6 +178,18 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
     return new ImmutablePer<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<? extends PerUnit<N, D>> zero() {
+    return (Measure<? extends PerUnit<N, D>>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<? extends PerUnit<N, D>> one() {
+    return (Measure<? extends PerUnit<N, D>>) super.one();
+  }
+
   /**
    * Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
    * method will always return a {@link edu.wpi.first.units.measure.MutPer} instance.

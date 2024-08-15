@@ -99,6 +99,18 @@ public class MultUnit<A extends Unit, B extends Unit> extends Unit {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<? extends MultUnit<A, B>> zero() {
+    return (Measure<? extends MultUnit<A, B>>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<? extends MultUnit<A, B>> one() {
+    return (Measure<? extends MultUnit<A, B>>) super.one();
+  }
+
+  @Override
   public MutableMeasure<? extends MultUnit<A, B>, ?, ?> mutable(double initialMagnitude) {
     return new MutMult<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

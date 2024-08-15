@@ -58,6 +58,18 @@ public final class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<AngularVelocityUnit> zero() {
+    return (Measure<AngularVelocityUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<AngularVelocityUnit> one() {
+    return (Measure<AngularVelocityUnit>) super.one();
+  }
+
+  @Override
   public MutAngularVelocity mutable(double initialMagnitude) {
     return new MutAngularVelocity(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

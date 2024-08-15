@@ -47,6 +47,18 @@ public final class DimensionlessUnit extends Unit {
   public Dimensionless ofBaseUnits(double baseUnitMagnitude) {
     return new ImmutableDimensionless(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
+  
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<DimensionlessUnit> zero() {
+    return (Measure<DimensionlessUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<DimensionlessUnit> one() {
+    return (Measure<DimensionlessUnit>) super.one();
+  }
 
   @Override
   public MutDimensionless mutable(double initialMagnitude) {

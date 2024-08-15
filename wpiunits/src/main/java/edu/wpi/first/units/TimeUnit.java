@@ -86,6 +86,18 @@ public final class TimeUnit extends Unit {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<TimeUnit> zero() {
+    return (Measure<TimeUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<TimeUnit> one() {
+    return (Measure<TimeUnit>) super.one();
+  }
+
+  @Override
   public MutTime mutable(double initialMagnitude) {
     return new MutTime(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

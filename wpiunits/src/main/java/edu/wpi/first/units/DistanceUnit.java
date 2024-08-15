@@ -74,6 +74,18 @@ public final class DistanceUnit extends Unit {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<DistanceUnit> zero() {
+    return (Measure<DistanceUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<DistanceUnit> one() {
+    return (Measure<DistanceUnit>) super.one();
+  }
+
+  @Override
   public MutDistance mutable(double initialMagnitude) {
     return new MutDistance(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
@@ -90,14 +102,5 @@ public final class DistanceUnit extends Unit {
    */
   public TorqueUnit mult(ForceUnit force) {
     return TorqueUnit.combine(this, force);
-  }
-
-  /**
-   * Creates a measurement of zero magnitude in terms of this unit.
-   *
-   * @return the zero-valued measure
-   */
-  public Distance zero() {
-    return of(0);
   }
 }

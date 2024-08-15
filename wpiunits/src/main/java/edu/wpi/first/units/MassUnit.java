@@ -48,6 +48,18 @@ public final class MassUnit extends Unit {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<MassUnit> zero() {
+    return (Measure<MassUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<MassUnit> one() {
+    return (Measure<MassUnit>) super.one();
+  }
+
+  @Override
   public MutMass mutable(double initialMagnitude) {
     return new MutMass(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

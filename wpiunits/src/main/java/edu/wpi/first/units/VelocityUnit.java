@@ -89,6 +89,18 @@ public final class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<? extends VelocityUnit<D>> zero() {
+    return (Measure<? extends VelocityUnit<D>>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<? extends VelocityUnit<D>> one() {
+    return (Measure<? extends VelocityUnit<D>>) super.one();
+  }
+
+  @Override
   public MutableMeasure<VelocityUnit<D>, ?, ?> mutable(double initialMagnitude) {
     return new MutVelocity<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

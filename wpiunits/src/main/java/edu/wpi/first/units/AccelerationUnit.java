@@ -54,6 +54,18 @@ public final class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<AccelerationUnit<D>> zero() {
+    return (Measure<AccelerationUnit<D>>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<AccelerationUnit<D>> one() {
+    return (Measure<AccelerationUnit<D>>) super.one();
+  }
+
+  @Override
   public MutAcceleration<D> mutable(double initialMagnitude) {
     return new MutAcceleration<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }

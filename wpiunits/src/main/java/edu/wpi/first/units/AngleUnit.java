@@ -80,4 +80,14 @@ public final class AngleUnit extends Unit {
   public double convertFrom(double magnitude, AngleUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
+
+  @Override
+  public Angle zero() {
+    return (Angle) super.zero();
+  }
+
+  @Override
+  public Angle one() {
+    return (Angle) super.one();
+  }
 }

@@ -58,6 +58,18 @@ public final class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Measure<TorqueUnit> zero() {
+    return (Measure<TorqueUnit>) super.zero();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Measure<TorqueUnit> one() {
+    return (Measure<TorqueUnit>) super.one();
+  }
+
+  @Override
   public MutTorque mutable(double initialMagnitude) {
     return new MutTorque(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
