@@ -231,7 +231,7 @@ if(WITH_TESTS)
     target_include_directories(wpiutil_testlib INTERFACE src/test/native/include)
 
     wpilib_add_test(wpiutil src/test/native/cpp)
-    target_link_libraries(wpiutil_test wpiutil googletest wpiutil_testlib)
+    target_link_libraries(wpiutil_test wpiutil googletest catch2 wpiutil_testlib)
     if(MSVC)
         target_compile_options(wpiutil_test PRIVATE /utf-8)
     endif()
