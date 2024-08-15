@@ -49,8 +49,8 @@ doxygen {
     String arch = System.getProperty("os.arch");
     if (arch.equals("x86_64") || arch.equals("amd64")) {
         executables {
-            doxygen version : '1.12.0'
-            //baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+            doxygen version : '1.12.0',
+            baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
         }
     }
 }
@@ -141,9 +141,6 @@ doxygen {
         // units
         exclude 'units/**'
     }
-
-    //TODO: building memory docs causes search to break
-    //exclude 'wpi/memory/**'
 
     exclude '*.pb.h'
 
