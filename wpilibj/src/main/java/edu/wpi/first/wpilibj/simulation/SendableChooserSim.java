@@ -8,7 +8,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
 
-/** Class that allows you to control a SendableChooser's selected option in simulation. */
+/** Class that facilitates control of a SendableChooser's selected option in simulation. */
 public class SendableChooserSim implements AutoCloseable {
   private StringPublisher m_publisher;
 
