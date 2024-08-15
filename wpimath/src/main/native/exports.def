@@ -7,3 +7,19 @@ EXPORTS
     ??$CreateMaybeMessage@VProtobufVector@proto@wpi@@$$V@Arena@protobuf@google@@CAPEAVProtobufVector@proto@wpi@@PEAV012@@Z
     ??$CreateMaybeMessage@VProtobufLinearSystem@proto@wpi@@$$V@Arena@protobuf@google@@CAPEAVProtobufLinearSystem@proto@wpi@@PEAV012@@Z
     ?_ProtobufMatrix_default_instance_@proto@wpi@@3UProtobufMatrixDefaultTypeInternal@12@A
+    ??0ProtobufTranslation2d@proto@wpi@@IEAA@PEAVArena@protobuf@google@@@Z
+    ??0ProtobufLinearSystem@proto@wpi@@IEAA@PEAVArena@protobuf@google@@@Z
+    ??0ProtobufVector@proto@wpi@@IEAA@PEAVArena@protobuf@google@@@Z
+    ??0ProtobufMatrix@proto@wpi@@IEAA@PEAVArena@protobuf@google@@@Z
+    ??0ProtobufSwerveDriveKinematics@proto@wpi@@IEAA@PEAVArena@protobuf@google@@@Z
+    ??0ProtobufSimpleMotorFeedforward@proto@wpi@@IEAA@PEAVArena@protobuf@google@@@Z
+    ??1ProtobufSimpleMotorFeedforward@proto@wpi@@UEAA@XZ
+    ??1ProtobufMatrix@proto@wpi@@UEAA@XZ
+    ??1ProtobufVector@proto@wpi@@UEAA@XZ
+    ??1ProtobufLinearSystem@proto@wpi@@UEAA@XZ
+    ??1ProtobufSwerveDriveKinematics@proto@wpi@@UEAA@XZ
+    ??_7ProtobufSimpleMotorFeedforward@proto@wpi@@6B@
+    ??_7ProtobufSwerveDriveKinematics@proto@wpi@@6B@
+    ??_7ProtobufLinearSystem@proto@wpi@@6B@
+    ??_7ProtobufVector@proto@wpi@@6B@
+    ??_7ProtobufMatrix@proto@wpi@@6B@
