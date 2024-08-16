@@ -15,7 +15,7 @@ jobs:
           - os: ubuntu-22.04
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2024-22.04
-            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=ON -DWITH_EXAMPLES=ON"
           - os: macOS-14
             name: macOS
             container: ""

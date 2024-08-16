@@ -26,6 +26,7 @@ endif()
 
 set(WPILIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
+include(CMakeDependentOption)
 include(CPack)
 include(OptionValidation)
 
@@ -55,12 +56,18 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Options for building certain parts of the repo. Everything is built by default.
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
-option(WITH_JAVA "Include Java and JNI in the build" ON)
+option(WITH_JAVA "Include Java and JNI in the build" OFF)
 option(WITH_JAVA_SOURCE "Build Java source jars" ${WITH_JAVA})
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
-option(WITH_WPIUNITS "Build wpiunits" ON)
+cmake_dependent_option(
+    WITH_WPIUNITS
+    "Build wpiunits"
+    ON
+    WITH_JAVA
+    OFF
+)
 option(WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
