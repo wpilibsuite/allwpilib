@@ -399,6 +399,7 @@ class JSpanBase {
     return {reinterpret_cast<U*>(arr.data()), arr.size()};
   }
 
+  //FIXME doxygen gives error parsing initializer list
   //! @cond Doxygen_Suppress
  private:
   bool m_valid;
