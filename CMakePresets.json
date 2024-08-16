@@ -1,0 +1,27 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 23,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "description": "Default build using Ninja generator",
+      "generator": "Ninja",
+      "cacheVariables": {}
+    },
+    {
+      "name": "sccache",
+      "displayName": "",
+      "description": "Ninja config with sccache",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER_LAUNCHER": "sccache",
+        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache",
+      }
+    }
+  ]
+}
