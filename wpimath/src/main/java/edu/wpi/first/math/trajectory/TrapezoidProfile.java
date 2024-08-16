@@ -268,8 +268,7 @@ public class TrapezoidProfile {
 
     double decelTime =
         (-decelVelocity
-                + Math.sqrt(
-                    Math.abs(decelVelocity * decelVelocity + 2 * deceleration * decelDist)))
+                + Math.sqrt(Math.abs(decelVelocity * decelVelocity + 2 * deceleration * decelDist)))
             / deceleration;
 
     double fullSpeedTime = fullSpeedDist / m_constraints.maxVelocity;
