@@ -52,7 +52,7 @@ The following build options are available:
   * This option will build C++ examples.
 * `WITH_GUI` (ON Default)
   * This option will build GUI items. If this is off, and `WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built.
-* `WITH_JAVA` (ON Default)
+* `WITH_JAVA` (OFF Default)
   * This option will enable Java and JNI builds. If this is on, `BUILD_SHARED_LIBS` must be on. Otherwise CMake will error.
 * `WITH_JAVA_SOURCE` (`WITH_JAVA` Default)
   * This option will build Java source JARs for each enabled Java library. This does not require `WITH_JAVA` to be on, allowing source JARs to be built without the compiled JARs if desired.
@@ -66,7 +66,7 @@ The following build options are available:
   * This option will build the HAL and wpilibc/j during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for the roboRIO.
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
-* `WITH_WPIUNITS` (ON Default)
+* `WITH_WPIUNITS` (`WITH_JAVA` Default)
   * This option will build the wpiunits library. This option must be on to build the Java wpimath library and requires `WITH_JAVA` to also be on.
 * `OPENCV_JAVA_INSTALL_DIR`
   * Set this option to the location of the archive of the OpenCV Java bindings (it should be called opencv-xxx.jar, with the x'es being version numbers). NOTE: set it to the LOCATION of the file, not the file itself!
