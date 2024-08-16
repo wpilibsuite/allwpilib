@@ -10,7 +10,6 @@ file(GLOB wpigui_unix_src src/main/native/opengl3/*.cpp)
 
 add_library(wpigui STATIC ${wpigui_src})
 set_target_properties(wpigui PROPERTIES DEBUG_POSTFIX "d")
-set_property(TARGET wpigui PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 set_property(TARGET wpigui PROPERTY FOLDER "libraries")
 
