@@ -1127,7 +1127,7 @@ EIGEN_STRONG_INLINE Packet pminmax_propagate_nan(const Packet& a, const Packet& 
   return pselect<Packet>(not_nan_mask_a, m, a);
 }
 
-// Add specializations for min/max with prescribed NaN progation.
+// Add specializations for min/max with prescribed NaN propagation.
 template <>
 EIGEN_STRONG_INLINE Packet4f pmin<PropagateNumbers, Packet4f>(const Packet4f& a, const Packet4f& b) {
   return pminmax_propagate_numbers(a, b, pmin<Packet4f>);

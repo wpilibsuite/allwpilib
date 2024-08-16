@@ -49,7 +49,7 @@ doxygen {
     String arch = System.getProperty("os.arch");
     if (arch.equals("x86_64") || arch.equals("amd64")) {
         executables {
-            doxygen version : '1.9.4',
+            doxygen version : '1.12.0',
             baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
         }
     }
@@ -66,7 +66,6 @@ doxygen {
             cppIncludeRoots.add(it.absolutePath)
         }
     }
-    cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
     if (project.hasProperty('docWarningsAsErrors')) {
         // apriltag
@@ -143,14 +142,14 @@ doxygen {
         exclude 'units/**'
     }
 
-    //TODO: building memory docs causes search to break
-    exclude 'wpi/memory/**'
-
     exclude '*.pb.h'
 
     // Save space by excluding protobuf and eigen
     exclude 'Eigen/**'
     exclude 'google/protobuf/**'
+
+    exclude '**/.clang-tidy'
+    exclude '**/.clang-format'
 
     aliases 'effects=\\par <i>Effects:</i>^^',
             'notes=\\par <i>Notes:</i>^^',

@@ -38,6 +38,15 @@
 #define EIGEN_ALIGNOF(x) alignof(x)
 #endif
 
+// Align to the boundary that avoids false sharing.
+// https://en.cppreference.com/w/cpp/thread/hardware_destructive_interference_size
+#ifdef __cpp_lib_hardware_interference_size
+#define EIGEN_ALIGN_TO_AVOID_FALSE_SHARING EIGEN_ALIGN_TO_BOUNDARY(std::hardware_destructive_interference_size)
+#else
+// Overalign for the cache line size of 128 bytes (Apple M1)
+#define EIGEN_ALIGN_TO_AVOID_FALSE_SHARING EIGEN_ALIGN_TO_BOUNDARY(128)
+#endif
+
 // If the user explicitly disable vectorization, then we also disable alignment
 #if defined(EIGEN_DONT_VECTORIZE)
 #if defined(EIGEN_GPUCC)

@@ -10,6 +10,7 @@ simgui-window.json
 simgui.json
 
 networktables.json
+*.bck
 
 ntcore/connectionlistenertest.json
 ntcore/timesynctest.json
@@ -248,3 +249,6 @@ imgui.ini
 /bazel-*
 user.bazelrc
 coverage_report/
+
+# ctest
+/Testing/

@@ -140,6 +140,13 @@ HAL_Bool HAL_GetSystemActive(int32_t* status);
 HAL_Bool HAL_GetBrownedOut(int32_t* status);
 
 /**
+ * Gets the number of times the system has been disabled due to communication
+ * errors with the Driver Station.
+ * @return number of disables due to communication errors.
+ */
+int32_t HAL_GetCommsDisableCount(int32_t* status);
+
+/**
  * Gets a port handle for a specific channel.
  *
  * The created handle does not need to be freed.

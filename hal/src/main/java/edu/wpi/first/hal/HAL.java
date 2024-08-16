@@ -196,6 +196,14 @@ public final class HAL extends JNIWrapper {
   public static native boolean getRSLState();
 
   /**
+   * Gets the number of times the system has been disabled due to communication errors with the
+   * Driver Station.
+   *
+   * @return number of disables due to communication errors.
+   */
+  public static native int getCommsDisableCount();
+
+  /**
    * Gets if the system time is valid.
    *
    * @return True if the system time is valid, false otherwise

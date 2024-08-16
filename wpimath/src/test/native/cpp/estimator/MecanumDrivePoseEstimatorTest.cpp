@@ -162,8 +162,8 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
                                   state.velocity * state.curvature};
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
-      trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s,
-      0.1_s, 0.25_s, true, false);
+      trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms,
+      100_ms, 250_ms, true, false);
 }
 
 TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
@@ -204,8 +204,8 @@ TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
                                       state.velocity * state.curvature};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, 0.1_s,
-          0.25_s, false, false);
+          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms, 100_ms,
+          250_ms, false, false);
     }
   }
 }
@@ -276,7 +276,7 @@ TEST(MecanumDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
       frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
-  for (auto time = 0.0_s; time < 4_s; time += 0.02_s) {
+  for (auto time = 0_s; time < 4_s; time += 20_ms) {
     estimator.UpdateWithTime(time, frc::Rotation2d{},
                              frc::MecanumDriveWheelPositions{});
   }

@@ -169,7 +169,7 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
       {0_m, 0_m, frc::Rotation2d{45_deg}}, {0_m, 0_m, frc::Rotation2d{45_deg}},
-      0.02_s, 0.1_s, 0.25_s, true, false);
+      20_ms, 100_ms, 250_ms, true, false);
 }
 
 TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
@@ -213,8 +213,8 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
                                       state.velocity * state.curvature};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, 0.1_s,
-          0.25_s, false, false);
+          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms, 100_ms,
+          250_ms, false, false);
     }
   }
 }
@@ -293,7 +293,7 @@ TEST(SwerveDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
       frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
-  for (auto time = 0.0_s; time < 4_s; time += 0.02_s) {
+  for (auto time = 0_s; time < 4_s; time += 20_ms) {
     estimator.UpdateWithTime(time, frc::Rotation2d{}, {fl, fr, bl, br});
   }
 

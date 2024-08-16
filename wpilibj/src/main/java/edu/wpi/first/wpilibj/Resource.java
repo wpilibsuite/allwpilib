@@ -19,7 +19,10 @@ import edu.wpi.first.hal.util.CheckedAllocationException;
  * created. Then, when the program actually starts - in the Robot constructor, all resources are
  * initialized. This ensures that the program is restartable in memory without having to
  * unload/reload.
+ *
+ * @deprecated Will be removed with no replacement.
  */
+@Deprecated(forRemoval = true, since = "2025")
 public final class Resource {
   private static Resource resourceList;
   private final boolean[] m_numAllocated;

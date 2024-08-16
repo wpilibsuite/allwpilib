@@ -362,6 +362,10 @@ struct HAL_PowerDistributionStickyFaults {
   uint32_t canWarning : 1;
   /** The device's CAN controller experienced a "Bus Off" event. */
   uint32_t canBusOff : 1;
+  /** The hardware on the device has malfunctioned. */
+  uint32_t hardwareFault : 1;
+  /** The firmware on the device has malfunctioned. */
+  uint32_t firmwareFault : 1;
   /** The device has rebooted. */
   uint32_t hasReset : 1;
 };

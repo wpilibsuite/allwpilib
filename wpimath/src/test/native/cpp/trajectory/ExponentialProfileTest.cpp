@@ -306,7 +306,7 @@ TEST(ExponentialProfileTest, TimingToGoal) {
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
     if (!reachedGoal && state == goal) {
-      EXPECT_NEAR_UNITS(prediction, i * 0.01_s, 0.25_s);
+      EXPECT_NEAR_UNITS(prediction, i * 10_ms, 250_ms);
       reachedGoal = true;
     }
   }
@@ -329,7 +329,7 @@ TEST(ExponentialProfileTest, TimingToNegativeGoal) {
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
     if (!reachedGoal && state == goal) {
-      EXPECT_NEAR_UNITS(prediction, i * 0.01_s, 0.25_s);
+      EXPECT_NEAR_UNITS(prediction, i * 10_ms, 250_ms);
       reachedGoal = true;
     }
   }

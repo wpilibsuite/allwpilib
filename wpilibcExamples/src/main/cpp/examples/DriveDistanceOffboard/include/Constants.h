@@ -22,6 +22,7 @@
  */
 
 namespace DriveConstants {
+inline constexpr units::second_t kDt{0.02};
 inline constexpr int kLeftMotor1Port = 0;
 inline constexpr int kLeftMotor2Port = 1;
 inline constexpr int kRightMotor1Port = 2;

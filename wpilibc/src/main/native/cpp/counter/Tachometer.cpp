@@ -45,7 +45,7 @@ Tachometer::~Tachometer() {
 units::hertz_t Tachometer::GetFrequency() const {
   auto period = GetPeriod();
   if (period.value() == 0) {
-    return units::hertz_t{0.0};
+    return 0_Hz;
   }
   return 1 / period;
 }
@@ -67,11 +67,11 @@ void Tachometer::SetEdgesPerRevolution(int edges) {
 units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
   auto period = GetPeriod();
   if (period.value() == 0) {
-    return units::turns_per_second_t{0.0};
+    return 0_tps;
   }
   int edgesPerRevolution = GetEdgesPerRevolution();
   if (edgesPerRevolution == 0) {
-    return units::turns_per_second_t{0.0};
+    return 0_tps;
   }
   auto rotationHz = ((1.0 / edgesPerRevolution) / period);
   return units::turns_per_second_t{rotationHz.value()};

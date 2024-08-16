@@ -54,7 +54,7 @@ class Robot : public frc::TimedRobot {
     m_flywheelSim.SetInputVoltage(
         m_flywheelMotor.Get() *
         units::volt_t{frc::RobotController::GetInputVoltage()});
-    m_flywheelSim.Update(0.02_s);
+    m_flywheelSim.Update(20_ms);
     m_encoderSim.SetRate(m_flywheelSim.GetAngularVelocity().value());
   }
 

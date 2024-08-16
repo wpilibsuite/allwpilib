@@ -23,7 +23,7 @@ namespace internal {
  Preconditions:
    1. The starting guess provided in approx_a_recip must have at least half
       the leading mantissa bits in the correct result, such that a single
-      Newton-Raphson step is sufficient to get within 1-2 ulps of the currect
+      Newton-Raphson step is sufficient to get within 1-2 ulps of the correct
       result.
    2. If a is zero, approx_a_recip must be infinite with the same sign as a.
    3. If a is infinite, approx_a_recip must be zero with the same sign as a.
@@ -61,7 +61,7 @@ struct generic_reciprocal_newton_step<Packet, 0> {
  Preconditions:
    1. The starting guess provided in approx_a_recip must have at least half
       the leading mantissa bits in the correct result, such that a single
-      Newton-Raphson step is sufficient to get within 1-2 ulps of the currect
+      Newton-Raphson step is sufficient to get within 1-2 ulps of the correct
       result.
    2. If a is zero, approx_a_recip must be infinite with the same sign as a.
    3. If a is infinite, approx_a_recip must be zero with the same sign as a.
@@ -112,7 +112,7 @@ struct generic_rsqrt_newton_step<Packet, 0> {
    1. The starting guess for the reciprocal sqrt provided in approx_rsqrt must
       have at least half the leading mantissa bits in the correct result, such
       that a single Newton-Raphson step is sufficient to get within 1-2 ulps of
-      the currect result.
+      the correct result.
    2. If a is zero, approx_rsqrt must be infinite.
    3. If a is infinite, approx_rsqrt must be zero.
 

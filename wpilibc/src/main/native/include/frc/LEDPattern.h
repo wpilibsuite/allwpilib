@@ -112,7 +112,7 @@ class LEDPattern {
    *
    *   frc::LEDPattern rainbow = frc::LEDPattern::Rainbow();
    *   frc::LEDPattern scrollingRainbow =
-   *     rainbow.ScrollAtAbsoluteSpeed(units::inches_per_second_t{4},
+   *     rainbow.ScrollAtAbsoluteSpeed(units::feet_per_second_t{1 / 3.0},
    * LED_SPACING);
    * </pre>
    *
