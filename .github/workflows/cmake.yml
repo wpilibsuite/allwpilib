@@ -45,13 +45,12 @@ jobs:
           SCCACHE_GHA_ENABLED: "true"
 
       - name: build
-        working-directory: build
-        run: cmake --build . --parallel $(nproc)
+        run: cmake --build build-cmake --parallel $(nproc)
         env:
           SCCACHE_GHA_ENABLED: "true"
 
       - name: test
-        working-directory: build
+        working-directory: build-cmake
         run: ctest --output-on-failure
 
   build-windows:
@@ -80,12 +79,11 @@ jobs:
           SCCACHE_GHA_ENABLED: "true"
 
       - name: build
-        working-directory: build
-        run: cmake --build . --parallel $(nproc)
+        run: cmake --build build-cmake --parallel $(nproc)
         env:
           SCCACHE_GHA_ENABLED: "true"
 
       - name: test
-        working-directory: build
+        working-directory: build-cmake
         # UnitTest_test segfaults on exit occasionally
         run: ctest --output-on-failure -E 'UnitTest'
