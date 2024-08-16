@@ -21,6 +21,7 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER_LAUNCHER": "sccache",
         "CMAKE_CXX_COMPILER_LAUNCHER": "sccache",
+      }
     },
     {
       "name": "with-java",
