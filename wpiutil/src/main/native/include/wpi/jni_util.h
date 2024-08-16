@@ -196,15 +196,15 @@ struct ArrayHelper {};
     }                                                                         \
   };
 
-WPI_JNI_ARRAYHELPER(jboolean, Boolean);
-WPI_JNI_ARRAYHELPER(jbyte, Byte);
-WPI_JNI_ARRAYHELPER(jshort, Short);
-WPI_JNI_ARRAYHELPER(jint, Int);
-WPI_JNI_ARRAYHELPER(jlong, Long);
-WPI_JNI_ARRAYHELPER(jfloat, Float);
-WPI_JNI_ARRAYHELPER(jdouble, Double);
+WPI_JNI_ARRAYHELPER(jboolean, Boolean)
+WPI_JNI_ARRAYHELPER(jbyte, Byte)
+WPI_JNI_ARRAYHELPER(jshort, Short)
+WPI_JNI_ARRAYHELPER(jint, Int)
+WPI_JNI_ARRAYHELPER(jlong, Long)
+WPI_JNI_ARRAYHELPER(jfloat, Float)
+WPI_JNI_ARRAYHELPER(jdouble, Double)
 
-#undef WPI_JNI_ARRAYHELPER;
+#undef WPI_JNI_ARRAYHELPER
 
 template <typename T>
 concept JArrayType =
@@ -595,13 +595,13 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, std::span<const bool> arr) {
     return jarr;                                                         \
   }
 
-WPI_JNI_MAKEJARRAY(jboolean, Boolean);
-WPI_JNI_MAKEJARRAY(jbyte, Byte);
-WPI_JNI_MAKEJARRAY(jshort, Short);
-WPI_JNI_MAKEJARRAY(jfloat, Float);
-WPI_JNI_MAKEJARRAY(jdouble, Double);
+WPI_JNI_MAKEJARRAY(jboolean, Boolean)
+WPI_JNI_MAKEJARRAY(jbyte, Byte)
+WPI_JNI_MAKEJARRAY(jshort, Short)
+WPI_JNI_MAKEJARRAY(jfloat, Float)
+WPI_JNI_MAKEJARRAY(jdouble, Double)
 
-#undef WPI_JNI_MAKEJARRAY;
+#undef WPI_JNI_MAKEJARRAY
 
 template <class T>
   requires(sizeof(typename T::value_type) == sizeof(jlong) &&
