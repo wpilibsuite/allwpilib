@@ -20,7 +20,7 @@
       "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_C_COMPILER_LAUNCHER": "sccache",
-        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache",
+        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache"
       }
     },
     {
@@ -29,18 +29,17 @@
       "description": "Ninja config with Java",
       "generator": "Ninja",
       "cacheVariables": {
-        "WITH_JAVA": "ON",
+        "WITH_JAVA": "ON"
       }
     },
     {
-      "name": "with-java+sccache",
+      "name": "with-java-sccache",
       "displayName": "",
       "description": "Ninja config with Java and sccache",
       "generator": "Ninja",
+      "inherits": "sccache",
       "cacheVariables": {
-        "WITH_JAVA": "ON",
-        "CMAKE_C_COMPILER_LAUNCHER": "sccache",
-        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache",
+        "WITH_JAVA": "ON"
       }
     }
   ]
