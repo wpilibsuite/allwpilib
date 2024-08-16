@@ -10,6 +10,7 @@
       "name": "default",
       "displayName": "Default Config",
       "description": "Default build using Ninja generator",
+      "binaryDir": "build-cmake",
       "generator": "Ninja",
       "cacheVariables": {}
     },
@@ -18,6 +19,7 @@
       "displayName": "",
       "description": "Ninja config with sccache",
       "generator": "Ninja",
+      "binaryDir": "build-cmake",
       "cacheVariables": {
         "CMAKE_C_COMPILER_LAUNCHER": "sccache",
         "CMAKE_CXX_COMPILER_LAUNCHER": "sccache"
@@ -28,6 +30,7 @@
       "displayName": "",
       "description": "Ninja config with Java",
       "generator": "Ninja",
+      "binaryDir": "build-cmake",
       "cacheVariables": {
         "WITH_JAVA": "ON"
       }
@@ -38,6 +41,7 @@
       "description": "Ninja config with Java and sccache",
       "generator": "Ninja",
       "inherits": "sccache",
+      "binaryDir": "build-cmake",
       "cacheVariables": {
         "WITH_JAVA": "ON"
       }
