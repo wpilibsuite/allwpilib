@@ -30,7 +30,7 @@ class Robot : public frc::TimedRobot {
 
     // Set setpoint and measurement of the bang-bang controller
     units::volt_t bangOutput =
-        m_bangBangControler.Calculate(m_encoder.GetRate(), setpoint.value()) *
+        m_bangBangController.Calculate(m_encoder.GetRate(), setpoint.value()) *
         12_V;
 
     // Controls a motor with the output of the BangBang controller and a
@@ -41,8 +41,8 @@ class Robot : public frc::TimedRobot {
   }
 
   Robot() {
-    // Add bang-bang controler to SmartDashboard and networktables.
-    frc::SmartDashboard::PutData("BangBangControler", &m_bangBangControler);
+    // Add bang-bang controller to SmartDashboard and networktables.
+    frc::SmartDashboard::PutData("BangBangController", &m_bangBangController);
   }
 
   /**
@@ -72,7 +72,7 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_flywheelMotor{kMotorPort};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
 
-  frc::BangBangController m_bangBangControler;
+  frc::BangBangController m_bangBangController;
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

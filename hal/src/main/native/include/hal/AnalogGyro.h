@@ -129,7 +129,7 @@ double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status);
  *
  * @param[in] handle the gyro handle
  * @param[out] status Error status variable. 0 on success.
- * @return the gryo offset
+ * @return the gyro offset
  */
 double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status);
 

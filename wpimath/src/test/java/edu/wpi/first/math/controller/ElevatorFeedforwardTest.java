@@ -43,13 +43,13 @@ class ElevatorFeedforwardTest {
   }
 
   @Test
-  void testAcheviableVelocity() {
+  void testAchievableVelocity() {
     assertEquals(5, m_elevatorFF.maxAchievableVelocity(11, 1), 0.002);
     assertEquals(-9, m_elevatorFF.minAchievableVelocity(11, 1), 0.002);
   }
 
   @Test
-  void testAcheviableAcceleration() {
+  void testAchievableAcceleration() {
     assertEquals(3.75, m_elevatorFF.maxAchievableAcceleration(12, 2), 0.002);
     assertEquals(7.25, m_elevatorFF.maxAchievableAcceleration(12, -2), 0.002);
     assertEquals(-8.25, m_elevatorFF.minAchievableAcceleration(12, 2), 0.002);

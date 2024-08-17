@@ -176,7 +176,7 @@ After that, run `cmake --build .` to create your JAR file. To execute the JAR fi
 
 ## Using vendordeps
 
-Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVenderdep`. Note that wpilibNewCommands, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
+Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVendordep`. Note that wpilibNewCommands, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
 
 ## Troubleshooting
 Below are some common issues that are run into when building.

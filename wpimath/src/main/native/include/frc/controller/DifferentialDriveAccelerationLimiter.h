@@ -59,7 +59,7 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
       units::radians_per_second_squared_t maxAngularAccel);
 
   /**
-   * Returns the next voltage pair subject to acceleraiton constraints.
+   * Returns the next voltage pair subject to acceleration constraints.
    *
    * @param leftVelocity The left wheel velocity.
    * @param rightVelocity The right wheel velocity.

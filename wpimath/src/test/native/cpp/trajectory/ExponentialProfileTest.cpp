@@ -65,7 +65,7 @@ TEST(ExponentialProfileTest, ReachesGoal) {
 
 // Tests that decreasing the maximum velocity in the middle when it is already
 // moving faster than the new max is handled correctly
-TEST(ExponentialProfileTest, PosContinousUnderVelChange) {
+TEST(ExponentialProfileTest, PosContinuousUnderVelChange) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
@@ -88,7 +88,7 @@ TEST(ExponentialProfileTest, PosContinousUnderVelChange) {
 
 // Tests that decreasing the maximum velocity in the middle when it is already
 // moving faster than the new max is handled correctly
-TEST(ExponentialProfileTest, PosContinousUnderVelChangeBackward) {
+TEST(ExponentialProfileTest, PosContinuousUnderVelChangeBackward) {
   frc::ExponentialProfile<units::meter, units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};

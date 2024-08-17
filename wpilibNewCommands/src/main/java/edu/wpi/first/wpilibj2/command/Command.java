@@ -319,7 +319,7 @@ public abstract class Command implements Sendable {
    * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
    * returned from this method can be further decorated without issue.
    *
-   * @param parallel the commands to run in parallel. Note the parallel commands will be interupted
+   * @param parallel the commands to run in parallel. Note the parallel commands will be interrupted
    *     when the deadline command ends
    * @return the decorated command
    */

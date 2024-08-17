@@ -5,7 +5,7 @@
 package edu.wpi.first.hal.util;
 
 /**
- * Exception indicating that the resource is already allocated This is meant to be thrown by the
+ * Exception indicating that the resource is already allocated. This is meant to be thrown by the
  * resource class.
  */
 public class CheckedAllocationException extends Exception {

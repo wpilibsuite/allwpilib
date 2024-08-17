@@ -230,7 +230,7 @@ inline void CvSource::PutFrame(cv::Mat& image) {
   int channels = finalImage.channels();
   VideoMode::PixelFormat format;
   if (channels == 1) {
-    // 1 channel is assumed Graysacle
+    // 1 channel is assumed Grayscale
     format = VideoMode::PixelFormat::kGray;
   } else if (channels == 2) {
     // 2 channels is assumed YUYV

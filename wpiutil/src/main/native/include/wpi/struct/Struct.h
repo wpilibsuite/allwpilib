@@ -166,7 +166,7 @@ inline T UnpackStruct(std::span<const uint8_t> data, const I&... info) {
  * @tparam Offset starting offset
  * @tparam N number of objects
  * @param data raw struct data
- * @return Desrialized array
+ * @return Deserialized array
  */
 template <StructSerializable T, size_t Offset, size_t N>
 inline wpi::array<T, N> UnpackStructArray(std::span<const uint8_t> data) {

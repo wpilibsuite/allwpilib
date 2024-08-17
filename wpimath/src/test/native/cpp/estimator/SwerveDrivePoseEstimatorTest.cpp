@@ -220,7 +220,7 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
 }
 
 TEST(SwerveDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
-  // This tests for multiple vision measurements appled at the same time.
+  // This tests for multiple vision measurements applied at the same time.
   // The expected behavior is that all measurements affect the estimated pose.
   // The alternative result is that only one vision measurement affects the
   // outcome. If that were the case, after 1000 measurements, the estimated

@@ -58,7 +58,7 @@ if(WITH_JAVA_SOURCE)
     # Generate version file if it wasn't generated already
     if(NOT WITH_JAVA)
         configure_file(
-            src/generate/WPILi1bVersion.java.in
+            src/generate/WPILibVersion.java.in
             generated/main/java/edu/wpi/first/wpilibj/WPILibVersion.java
         )
     endif()

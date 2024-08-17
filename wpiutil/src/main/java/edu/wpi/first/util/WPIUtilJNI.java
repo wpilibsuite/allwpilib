@@ -138,7 +138,7 @@ public class WPIUtilJNI {
    * multiple-consumer scenario.
    *
    * @param initialCount initial value for the semaphore's internal counter
-   * @param maximumCount maximum value for the samephore's internal counter
+   * @param maximumCount maximum value for the semaphore's internal counter
    * @return Semaphore handle
    */
   public static native int createSemaphore(int initialCount, int maximumCount);

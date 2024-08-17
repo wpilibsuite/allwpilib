@@ -27,7 +27,7 @@ public class REVPHJNI extends JNIWrapper {
    *
    * @param module the CAN ID to initialize
    * @return the created PH handle
-   * @see "HAL_InitializeREVP"
+   * @see "HAL_InitializeREVPH"
    */
   public static native int initialize(int module);
 

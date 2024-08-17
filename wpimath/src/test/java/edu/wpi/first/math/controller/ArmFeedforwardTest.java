@@ -90,13 +90,13 @@ class ArmFeedforwardTest {
   }
 
   @Test
-  void testAcheviableVelocity() {
+  void testAchievableVelocity() {
     assertEquals(6, m_armFF.maxAchievableVelocity(12, Math.PI / 3, 1), 0.002);
     assertEquals(-9, m_armFF.minAchievableVelocity(11.5, Math.PI / 3, 1), 0.002);
   }
 
   @Test
-  void testAcheviableAcceleration() {
+  void testAchievableAcceleration() {
     assertEquals(4.75, m_armFF.maxAchievableAcceleration(12, Math.PI / 3, 1), 0.002);
     assertEquals(6.75, m_armFF.maxAchievableAcceleration(12, Math.PI / 3, -1), 0.002);
     assertEquals(-7.25, m_armFF.minAchievableAcceleration(12, Math.PI / 3, 1), 0.002);

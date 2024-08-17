@@ -32,7 +32,7 @@ public abstract class RobotDriveBase extends MotorSafety {
     kFrontRight(1),
     /** Rear left motor. */
     kRearLeft(2),
-    /** Reat right motor. */
+    /** Rear right motor. */
     kRearRight(3),
     /** Left motor. */
     kLeft(0),
