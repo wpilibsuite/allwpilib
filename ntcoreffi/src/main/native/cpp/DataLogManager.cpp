@@ -14,6 +14,7 @@
 #include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/DataLogBackgroundWriter.h>
+#include <wpi/FileLogger.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
@@ -191,6 +192,8 @@ struct Thread final : public wpi::SafeThread {
 
   void StartNTLog();
   void StopNTLog();
+  void StartConsoleLog();
+  void StopConsoleLog();
 
   std::string m_logDir;
   bool m_filenameOverride;
@@ -198,6 +201,8 @@ struct Thread final : public wpi::SafeThread {
   bool m_ntLoggerEnabled = false;
   NT_DataLogger m_ntEntryLogger = 0;
   NT_ConnectionDataLogger m_ntConnLogger = 0;
+  bool m_consoleLoggerEnabled = false;
+  wpi::FileLogger m_consoleLogger;
   wpi::log::StringLogEntry m_messageLog;
 };
 
@@ -452,6 +457,20 @@ void Thread::StopNTLog() {
   }
 }
 
+void Thread::StartConsoleLog() {
+  if (!m_consoleLoggerEnabled) {
+    m_consoleLoggerEnabled = true;
+    m_consoleLogger = {"/home/lvuser/FRC_UserProgram.log", m_log, "output"};
+  }
+}
+
+void Thread::StopConsoleLog() {
+  if (m_consoleLoggerEnabled) {
+    m_consoleLoggerEnabled = false;
+    m_consoleLogger = {};
+  }
+}
+
 Instance::Instance(std::string_view dir, std::string_view filename,
                    double period) {
   // Delete all previously existing FRC_TBD_*.wpilog files. These only exist
@@ -516,6 +535,16 @@ void DataLogManager::LogNetworkTables(bool enabled) {
   }
 }
 
+void DataLogManager::LogConsoleOutput(bool enabled) {
+  if (auto thr = GetInstance().owner.GetThread()) {
+    if (enabled) {
+      thr->StartConsoleLog();
+    } else if (!enabled) {
+      thr->StopConsoleLog();
+    }
+  }
+}
+
 void DataLogManager::SignalNewDSDataOccur() {
   wpi::SetSignalObject(DriverStation::gNewDataEvent);
 }
@@ -544,6 +573,10 @@ const char* DLM_GetLogDir(void) {
 
 void DLM_LogNetworkTables(int enabled) {
   DataLogManager::LogNetworkTables(enabled);
+}
+
+void DLM_LogConsoleOutput(int enabled) {
+  DataLogManager::LogConsoleOutput(enabled);
 }
 
 void DLM_SignalNewDSDataOccur(void) {
