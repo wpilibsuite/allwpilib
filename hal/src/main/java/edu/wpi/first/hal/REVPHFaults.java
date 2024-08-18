@@ -61,7 +61,7 @@ public class REVPHFaults {
   /** The compressor output has an open circuit. */
   public final boolean CompressorOpen;
 
-  /** An overcurrent event occurred on a solenoid ouput. */
+  /** An overcurrent event occurred on a solenoid output. */
   public final boolean SolenoidOverCurrent;
 
   /** The input voltage is below the minimum voltage. */

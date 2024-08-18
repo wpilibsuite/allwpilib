@@ -96,7 +96,7 @@ struct HAL_REVPHFaults {
   uint32_t compressorOverCurrent : 1;
   /** The compressor output has an open circuit. */
   uint32_t compressorOpen : 1;
-  /** An overcurrent event occurred on a solenoid ouput. */
+  /** An overcurrent event occurred on a solenoid output. */
   uint32_t solenoidOverCurrent : 1;
   /** The input voltage is below the minimum voltage. */
   uint32_t brownout : 1;
@@ -114,7 +114,7 @@ struct HAL_REVPHStickyFaults {
   uint32_t compressorOverCurrent : 1;
   /** The compressor output has an open circuit. */
   uint32_t compressorOpen : 1;
-  /** An overcurrent event occurred on a solenoid ouput. */
+  /** An overcurrent event occurred on a solenoid output. */
   uint32_t solenoidOverCurrent : 1;
   /** The input voltage is below the minimum voltage. */
   uint32_t brownout : 1;

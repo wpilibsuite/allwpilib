@@ -183,7 +183,7 @@ class PneumaticHub : public PneumaticsBase {
     uint32_t CompressorOverCurrent : 1;
     /** The compressor output has an open circuit. */
     uint32_t CompressorOpen : 1;
-    /** An overcurrent event occurred on a solenoid ouput. */
+    /** An overcurrent event occurred on a solenoid output. */
     uint32_t SolenoidOverCurrent : 1;
     /** The input voltage is below the minimum voltage. */
     uint32_t Brownout : 1;
@@ -218,7 +218,7 @@ class PneumaticHub : public PneumaticsBase {
     uint32_t CompressorOverCurrent : 1;
     /** The compressor output has an open circuit. */
     uint32_t CompressorOpen : 1;
-    /** An overcurrent event occurred on a solenoid ouput. */
+    /** An overcurrent event occurred on a solenoid output. */
     uint32_t SolenoidOverCurrent : 1;
     /** The input voltage is below the minimum voltage. */
     uint32_t Brownout : 1;
