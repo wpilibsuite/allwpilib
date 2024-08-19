@@ -144,12 +144,26 @@ jacocoTestReport {
     }
 }
 
+evaluationDependsOn(':protoplugin')
+
 protobuf {
     protoc {
         artifact = 'com.google.protobuf:protoc:3.21.12'
     }
+    plugins {
+        wpilib {
+            path = project(":protoplugin").tasks.shadowJar.archiveFile.get()
+        }
+    }
     generateProtoTasks {
         all().configureEach { task ->
+            task.dependsOn(":protoplugin:shadowJar")
+            task.inputs.file(project(":protoplugin").tasks.shadowJar.archiveFile)
+            task.plugins {
+                wpilib {
+                    outputSubDir = 'cpp'
+                }
+            }
             task.builtins {
                 cpp {}
                 remove java

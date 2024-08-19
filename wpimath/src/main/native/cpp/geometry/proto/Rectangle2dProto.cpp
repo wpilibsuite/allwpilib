@@ -17,7 +17,7 @@ frc::Rectangle2d wpi::Protobuf<frc::Rectangle2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufRectangle2d*>(&msg);
   return frc::Rectangle2d{
-      wpi::UnpackProtobuf<frc::Pose2d>(m->center()),
+      wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_center()),
       units::meter_t{m->xwidth()},
       units::meter_t{m->ywidth()},
   };

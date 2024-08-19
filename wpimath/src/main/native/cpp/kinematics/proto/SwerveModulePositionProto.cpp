@@ -18,7 +18,7 @@ frc::SwerveModulePosition wpi::Protobuf<frc::SwerveModulePosition>::Unpack(
   auto m = static_cast<const wpi::proto::ProtobufSwerveModulePosition*>(&msg);
   return frc::SwerveModulePosition{
       units::meter_t{m->distance()},
-      wpi::UnpackProtobuf<frc::Rotation2d>(m->angle()),
+      wpi::UnpackProtobuf<frc::Rotation2d>(m->wpi_angle()),
   };
 }
 

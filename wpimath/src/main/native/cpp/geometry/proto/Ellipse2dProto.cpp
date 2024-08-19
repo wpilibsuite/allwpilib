@@ -17,7 +17,7 @@ frc::Ellipse2d wpi::Protobuf<frc::Ellipse2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufEllipse2d*>(&msg);
   return frc::Ellipse2d{
-      wpi::UnpackProtobuf<frc::Pose2d>(m->center()),
+      wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_center()),
       units::meter_t{m->xsemiaxis()},
       units::meter_t{m->ysemiaxis()},
   };
