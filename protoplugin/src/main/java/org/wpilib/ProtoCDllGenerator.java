@@ -35,7 +35,6 @@ public final class ProtoCDllGenerator {
     CodeGeneratorResponse.Builder response = CodeGeneratorResponse.newBuilder();
 
     for (var genFile : request.getFileToGenerateList()) {
-
       var desc = descriptors.get(genFile);
 
       for (var msg : desc.getMessageTypes()) {
