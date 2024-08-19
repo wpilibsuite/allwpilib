@@ -27,9 +27,11 @@ public final class ProtoCDllGenerator {
 
     Map<String, Descriptors.FileDescriptor> descriptors = new HashMap<>();
 
+    Descriptors.FileDescriptor[] tmpArray = new Descriptors.FileDescriptor[0];
+
     for (FileDescriptorProto proto : request.getProtoFileList()) {
       // Make array of file descriptors that exists
-      Descriptors.FileDescriptor[] depArray = descriptors.values().toArray(Descriptors.FileDescriptor[]::new);
+      Descriptors.FileDescriptor[] depArray = descriptors.values().toArray(tmpArray);
       Descriptors.FileDescriptor desc = Descriptors.FileDescriptor.buildFrom(proto, depArray);
       descriptors.put(proto.getName(), desc);
     }
