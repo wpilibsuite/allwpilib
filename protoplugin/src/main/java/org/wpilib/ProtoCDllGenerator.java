@@ -10,8 +10,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
+import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor.Type;
 import com.google.protobuf.compiler.PluginProtos.CodeGeneratorRequest;
 
@@ -24,25 +27,25 @@ public final class ProtoCDllGenerator {
 
     Map<String, Descriptors.FileDescriptor> descriptors = new HashMap<>();
 
-    for (var proto : request.getProtoFileList()) {
+    for (FileDescriptorProto proto : request.getProtoFileList()) {
       // Make array of file descriptors that exists
-      var depArray = descriptors.values().toArray(Descriptors.FileDescriptor[]::new);
-      var desc = Descriptors.FileDescriptor.buildFrom(proto, depArray);
+      Descriptors.FileDescriptor[] depArray = descriptors.values().toArray(Descriptors.FileDescriptor[]::new);
+      Descriptors.FileDescriptor desc = Descriptors.FileDescriptor.buildFrom(proto, depArray);
       descriptors.put(proto.getName(), desc);
     }
 
     // Filter to generated descriptors
     CodeGeneratorResponse.Builder response = CodeGeneratorResponse.newBuilder();
 
-    for (var genFile : request.getFileToGenerateList()) {
+    for (String genFile : request.getFileToGenerateList()) {
 
-      var desc = descriptors.get(genFile);
+      Descriptors.FileDescriptor desc = descriptors.get(genFile);
 
-      for (var msg : desc.getMessageTypes()) {
-        for (var field : msg.getFields()) {
+      for (Descriptor msg : desc.getMessageTypes()) {
+        for (FieldDescriptor field : msg.getFields()) {
           if (field.getType() == Type.MESSAGE && !field.isRepeated()) {
             // If we have a nested non repeated field, we need a custom accessor
-            var type = field.getMessageType().getFullName();
+            String type = field.getMessageType().getFullName();
             type = "::" + type.replaceAll("\\.", "::");
 
             // Add definition

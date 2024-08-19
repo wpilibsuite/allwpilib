@@ -16,6 +16,11 @@ dependencies {
     implementation "com.google.protobuf:protobuf-java:3.21.12"
 }
 
+java {
+    sourceCompatibility = 8
+    targetCompatibility = 8
+}
+
 def cshadow = project.tasks.register("copyShadow", Copy) {
     from(tasks.shadowJar.archiveFile) {
         rename {
@@ -23,8 +28,6 @@ def cshadow = project.tasks.register("copyShadow", Copy) {
         }
     }
     into layout.projectDirectory.dir("binary")
-
-
 }
 
 build.dependsOn cshadow
