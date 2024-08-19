@@ -129,7 +129,7 @@ protobuf_generate(
     "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
     PROTOS
     ${wpimath_proto_src}
-    PLUGIN "protoc-gen-wpilib=D:/allwpilib/protoc-gen-export.bat"
+    PLUGIN "protoc-gen-wpilib=${PROTOC_WPILIB_PLUGIN}"
     PROTOC_OPTIONS "--cpp_out=${CMAKE_CURRENT_BINARY_DIR}/protobuf"
     GENERATE_EXTENSIONS ".pb.h" ".pb.cc"
     LANGUAGE wpilib
