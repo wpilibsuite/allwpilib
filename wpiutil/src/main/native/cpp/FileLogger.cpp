@@ -28,9 +28,9 @@ FileLogger::FileLogger(std::string_view file,
 }
 FileLogger::FileLogger(FileLogger&& other)
 #ifdef __linux__
-    : m_fileHandle{std::move(other.m_fileHandle)},
-      m_inotifyHandle{std::move(other.m_inotifyHandle)},
-      m_inotifyWatchHandle{std::move(other.m_inotifyWatchHandle)},
+    : m_fileHandle{std::exchange(other.m_fileHandle, -1)},
+      m_inotifyHandle{std::exchange(other.m_inotifyHandle, -1)},
+      m_inotifyWatchHandle{std::exchange(other.m_inotifyWatchHandle, -1)},
       m_thread{std::move(other.m_thread)}
 #endif
 {
