@@ -252,3 +252,6 @@ coverage_report/
 
 # ctest
 /Testing/
+
+# protobuf
+!wpiprotoplugin.jar
