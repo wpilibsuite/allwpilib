@@ -56,4 +56,4 @@ TYPED_TEST_P(ProtoTest, DoubleUnpack) {
   }
 }
 
-REGISTER_TYPED_TEST_SUITE_P(ProtoTest, RoundTrip);
+REGISTER_TYPED_TEST_SUITE_P(ProtoTest, RoundTrip, DoublePack, DoubleUnpack);
