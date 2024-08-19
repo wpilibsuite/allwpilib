@@ -8,14 +8,6 @@ include(DownloadAndCheck)
 # workaround for makefiles - for some reason parent directories aren't created.
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
 file(GLOB wpimath_proto_src src/main/proto/*.proto)
-protobuf_generate_cpp(
-    WPIMATH_PROTO_SRCS
-    WPIMATH_PROTO_HDRS
-    PROTOC_OUT_DIR
-    "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
-    PROTOS
-    ${wpimath_proto_src}
-)
 
 file(
     GLOB wpimath_jni_src
@@ -129,7 +121,21 @@ file(
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
-add_library(wpimath ${wpimath_native_src} ${WPIMATH_PROTO_SRCS})
+add_library(wpimath ${wpimath_native_src})
+
+protobuf_generate(
+    TARGET wpimath
+    PROTOC_OUT_DIR
+    "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
+    PROTOS
+    ${wpimath_proto_src}
+    PLUGIN "protoc-gen-wpilib=D:/allwpilib/protoc-gen-export.bat"
+    PROTOC_OPTIONS "--cpp_out=${CMAKE_CURRENT_BINARY_DIR}/protobuf"
+    GENERATE_EXTENSIONS ".pb.h" ".pb.cc"
+    LANGUAGE wpilib
+    APPEND_PATH
+)
+
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
