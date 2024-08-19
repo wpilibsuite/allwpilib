@@ -38,7 +38,6 @@ public final class ProtoCDllGenerator {
     CodeGeneratorResponse.Builder response = CodeGeneratorResponse.newBuilder();
 
     for (String genFile : request.getFileToGenerateList()) {
-
       Descriptors.FileDescriptor desc = descriptors.get(genFile);
 
       for (Descriptor msg : desc.getMessageTypes()) {
