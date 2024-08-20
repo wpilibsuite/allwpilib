@@ -125,6 +125,8 @@ add_library(wpimath ${wpimath_native_src})
 
 add_library(protobuf OBJECT)
 target_link_libraries(protobuf wpiutil)
+target_link_libraries(wpimath $<TARGET_OBJECTS:protobuf>)
+
 protobuf_generate(
     TARGET protobuf
     PROTOS ${wpimath_proto_src}
@@ -135,6 +137,7 @@ protobuf_generate(
     LANGUAGE wpilib # Adds a --wpilib_out arg to let our plugin modify the generated protobuf code
     APPEND_PATH
 )
+
 if(MSVC)
     file(
         GENERATE OUTPUT
