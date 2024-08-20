@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#pragma once
+
 #include <arm_neon.h>
 
 #include <cstddef>
@@ -12,17 +14,6 @@
 
 // SimdMemory.h
 namespace Simd {
-SIMD_INLINE size_t DivHi(size_t value, size_t divider) {
-  return (value + divider - 1) / divider;
-}
-
-SIMD_INLINE size_t Pow2Hi(size_t value) {
-  size_t pow2 = 1;
-  for (; pow2 < value; pow2 *= 2)
-    ;
-  return pow2;
-}
-
 SIMD_INLINE size_t AlignHiAny(size_t size, size_t align) {
   return (size + align - 1) / align * align;
 }
@@ -64,17 +55,7 @@ SIMD_INLINE bool Aligned(const void* ptr, size_t align = sizeof(uint8x16_t)) {
   return Simd::Aligned(ptr, align);
 }
 }  // namespace Simd::Neon
-// SimdInit.h
-#define SIMD_VEC_SET1_EPI8(a) \
-  { a, a, a, a, a, a, a, a, a, a, a, a, a, a, a, a }
-#define SIMD_VEC_SET1_EPI16(a) \
-  { a, a, a, a, a, a, a, a }
-#define SIMD_VEC_SET1_EPI32(a) \
-  { a, a, a, a }
-#define SIMD_VEC_SETR_EPI32(a0, a1, a2, a3) \
-  { a0, a1, a2, a3 }
-#define SIMD_VEC_SET1_EPI64(a) \
-  { a, a }
+
 // SimdConst.h
 namespace Simd::Neon {
 const size_t A = sizeof(uint8x16_t);
@@ -82,15 +63,7 @@ const size_t DA = 2 * A;
 const size_t QA = 4 * A;
 const size_t OA = 8 * A;
 const size_t HA = A / 2;
-
-const size_t F = sizeof(float32x4_t) / sizeof(float);
-const size_t DF = 2 * F;
-const size_t QF = 4 * F;
-const size_t HF = F / 2;
 }  // namespace Simd::Neon
-
-// SimdDefs.h
-#define SIMD_ALIGN 16
 
 // SimdLoad.h
 namespace Simd::Neon {
@@ -188,21 +161,3 @@ SIMD_INLINE void Store4<true>(uint8_t* p, uint8x8x4_t a) {
 }
 
 }  // namespace Simd::Neon
-
-using namespace Simd::Neon;
-void RGBToBGR_16(uint8_t* rgb, uint8_t* bgr) {
-  uint8x16x4_t _rgb = Load4<false>(rgb);
-  uint8x16_t tmp = _rgb.val[0];  // tmp = r
-  _rgb.val[0] = _rgb.val[2];     // r = r;
-  _rgb.val[2] = tmp;
-  Store4<false>(bgr, _rgb);
-}
-
-using namespace Simd::Neon;
-void RGBToBGR_8(uint8_t* rgb, uint8_t* bgr) {
-  uint8x8x4_t _rgb = LoadHalf4<false>(rgb);
-  uint8x8_t tmp = _rgb.val[0];  // tmp = r
-  _rgb.val[0] = _rgb.val[2];    // r = r;
-  _rgb.val[2] = tmp;
-  Store4<false>(bgr, _rgb);
-}

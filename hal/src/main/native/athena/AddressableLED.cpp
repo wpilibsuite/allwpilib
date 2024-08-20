@@ -9,6 +9,7 @@
 
 #include <fmt/format.h>
 
+#include "AddressableLEDSimd.h"
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "FPGACalls.h"
@@ -28,6 +29,7 @@ struct AddressableLED {
   void* ledBuffer;
   size_t ledBufferSize;
   int32_t stringLength = 1;
+  HAL_AddressableLEDColorOrder colorOrder = HAL_ALED_RGB;
 };
 }  // namespace
 
@@ -46,6 +48,37 @@ void InitializeAddressableLED() {
 }  // namespace hal::init
 
 static constexpr const char* HmbName = "HMB_0_LED";
+
+inline void ConvertAndCopyLEDData(void* dst,
+                                  const struct HAL_AddressableLEDData* src,
+                                  int32_t len,
+                                  HAL_AddressableLEDColorOrder order) {
+  switch (order) {
+    case HAL_ALED_RGB:
+      std::memcpy(dst, src, len * sizeof(HAL_AddressableLEDData));
+      break;
+    case HAL_ALED_RBG:
+      RGBConvert<HAL_ALED_RBG>(reinterpret_cast<const uint8_t*>(src),
+                               reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_BGR:
+      RGBConvert<HAL_ALED_BGR>(reinterpret_cast<const uint8_t*>(src),
+                               reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_BRG:
+      RGBConvert<HAL_ALED_BRG>(reinterpret_cast<const uint8_t*>(src),
+                               reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_GRB:
+      RGBConvert<HAL_ALED_GRB>(reinterpret_cast<const uint8_t*>(src),
+                               reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_GBR:
+      RGBConvert<HAL_ALED_GBR>(reinterpret_cast<const uint8_t*>(src),
+                               reinterpret_cast<uint8_t*>(dst), len);
+      break;
+  }
+}
 
 extern "C" {
 
@@ -123,6 +156,19 @@ void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
   uint32_t session = led->led->getSystemInterface()->getHandle();
   hal::HAL_NiFpga_CloseHmb(session, HmbName);
   addressableLEDHandles->Free(handle);
+}
+
+void HAL_SetAddressableLEDColorOrder(HAL_AddressableLEDHandle handle,
+                                     HAL_AddressableLEDColorOrder colorOrder,
+                                     int32_t* status) {
+  auto led = addressableLEDHandles->Get(handle);
+
+  if (!led) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  led->colorOrder = colorOrder;
 }
 
 void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
@@ -203,7 +249,7 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
     return;
   }
 
-  std::memcpy(led->ledBuffer, data, length * sizeof(HAL_AddressableLEDData));
+  ConvertAndCopyLEDData(led->ledBuffer, data, length, led->colorOrder);
 
   asm("dmb");
 
