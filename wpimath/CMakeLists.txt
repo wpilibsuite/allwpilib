@@ -121,11 +121,12 @@ file(
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
-add_library(wpimath ${wpimath_native_src})
+
 
 add_library(protobuf OBJECT)
 target_link_libraries(protobuf wpiutil)
-target_link_libraries(wpimath $<TARGET_OBJECTS:protobuf>)
+
+add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
 
 protobuf_generate(
     TARGET protobuf
