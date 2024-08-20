@@ -122,7 +122,6 @@ list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
 
-
 add_library(protobuf OBJECT)
 target_link_libraries(protobuf wpiutil)
 
