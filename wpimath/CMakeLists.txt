@@ -153,7 +153,7 @@ if(MSVC)
     )
     target_link_options(
         wpimath
-        PRIVATE /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/exports.def>
+        PRIVATE /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports.def>
     )
 endif()
 
