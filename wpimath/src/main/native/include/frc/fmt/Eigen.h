@@ -10,6 +10,10 @@
 #include <Eigen/SparseCore>
 #include <fmt/format.h>
 
+// FIXME: Doxygen gives internal inconsistency errors:
+
+//! @cond Doxygen_Suppress
+
 /**
  * Formatter for classes derived from Eigen::DenseBase<Derived> or
  * Eigen::SparseCompressedBase<Derived>.
@@ -44,3 +48,4 @@ struct fmt::formatter<Derived, CharT> {
  private:
   fmt::formatter<typename Derived::Scalar, CharT> m_underlying;
 };
+//! @endcond

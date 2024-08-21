@@ -185,9 +185,9 @@ doxygen {
     strip_from_inc_path cppIncludeRoots as String[]
     strip_from_path cppIncludeRoots as String[]
     use_mathjax true
-    warnings false
+    warnings true
     warn_if_incomplete_doc true
-    warn_if_undocumented false
+    warn_if_undocumented true
     warn_no_paramdoc true
 
     enable_preprocessing true
