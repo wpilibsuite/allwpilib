@@ -79,10 +79,10 @@ The following build options are available:
 
 The WPILib CMake build does not allow in source builds. Because the `build` directory is used by Gradle, we recommend a `build-cmake` directory in the root. This folder is included in the gitignore. We support building with Ninja; other options like Makefiles may be broken.
 
-Once you have a build folder, run CMake configuration in that build directory with the following command.
+Once you have a build folder, run CMake configuration in the root directory with the following command.
 
 ```
-cmake path/to/allwpilib/root -G Ninja
+cmake --preset default
 ```
 
 If you want to change any of the options, add `-DOPTIONHERE=VALUE` to the `cmake` command. This will check for any dependencies. If everything works properly this will succeed. If not, please check out the troubleshooting section for help.
@@ -90,6 +90,10 @@ If you want to change any of the options, add `-DOPTIONHERE=VALUE` to the `cmake
 If you want, you can also use `ccmake` in order to visually set these properties as well. [Here](https://cmake.org/cmake/help/v3.0/manual/ccmake.1.html) is the link to the documentation for that program. On Windows, you can use `cmake-gui` instead.
 
 Note that if you are cross-compiling, you will need to override the protobuf options manually to point to the libraries for the target platform. Leave the protoc binary location as the path to the binary for the host platform, since protoc needs to execute on the host platform.
+
+## Presets
+
+The WPILib CMake setup has a variety of presets for common configurations and options used. The default sets the generator to Ninja and build directory to `build-cmake`. The other presets are `with-java` (sets `WITH_JAVA=ON`), `sccache` (sets the C/C++ compiler launcher to sccache), and `with-java-sccache` (a comibination of `with-java` and `sccache`.
 
 ## Building
 
