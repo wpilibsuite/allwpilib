@@ -17,7 +17,7 @@ frc::Rotation3d wpi::Protobuf<frc::Rotation3d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufRotation3d*>(&msg);
   return frc::Rotation3d{
-      wpi::UnpackProtobuf<frc::Quaternion>(m->q()),
+      wpi::UnpackProtobuf<frc::Quaternion>(m->wpi_q()),
   };
 }
 

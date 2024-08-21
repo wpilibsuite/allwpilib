@@ -8,14 +8,6 @@ include(DownloadAndCheck)
 # workaround for makefiles - for some reason parent directories aren't created.
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
 file(GLOB wpimath_proto_src src/main/proto/*.proto)
-protobuf_generate_cpp(
-    WPIMATH_PROTO_SRCS
-    WPIMATH_PROTO_HDRS
-    PROTOC_OUT_DIR
-    "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
-    PROTOS
-    ${wpimath_proto_src}
-)
 
 file(
     GLOB wpimath_jni_src
@@ -129,20 +121,53 @@ file(
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
-add_library(wpimath ${wpimath_native_src} ${WPIMATH_PROTO_SRCS})
+
+add_library(protobuf OBJECT)
+target_link_libraries(protobuf wpiutil)
+
+add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
+
+protobuf_generate(
+    TARGET protobuf
+    PROTOS ${wpimath_proto_src}
+    PLUGIN "protoc-gen-wpilib=${PROTOC_WPILIB_PLUGIN}"
+    PROTOC_OPTIONS "--cpp_out=${CMAKE_CURRENT_BINARY_DIR}/protobuf" # Needed to generate C++ source
+    PROTOC_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
+    GENERATE_EXTENSIONS ".pb.h" ".pb.cc" # Enables CMake to add the generated sources to the target
+    LANGUAGE wpilib # Adds a --wpilib_out arg to let our plugin modify the generated protobuf code
+    APPEND_PATH
+)
+
+if(MSVC)
+    file(
+        GENERATE OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects.txt
+        CONTENT $<LIST:JOIN,$<TARGET_OBJECTS:protobuf>,\n>
+    )
+    add_custom_command(
+        TARGET wpimath
+        PRE_LINK
+        COMMAND
+            cmake -E __create_def ${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports.def
+            ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects.txt
+    )
+    target_link_options(
+        wpimath
+        PRIVATE /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports.def>
+    )
+endif()
+
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
 target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
 
+target_compile_features(protobuf PUBLIC cxx_std_20)
 target_compile_features(wpimath PUBLIC cxx_std_20)
 if(MSVC)
     target_compile_options(wpimath PUBLIC /utf-8 /bigobj)
-    target_link_options(
-        wpimath
-        PRIVATE /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/exports.def>
-    )
+    target_compile_options(protobuf PUBLIC /utf-8 /bigobj)
 endif()
 wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)

@@ -148,8 +148,19 @@ protobuf {
     protoc {
         artifact = 'com.google.protobuf:protoc:3.21.12'
     }
+    plugins {
+        wpilib {
+            path = rootProject.file("protoplugin/binary/wpiprotoplugin.jar")
+        }
+    }
     generateProtoTasks {
         all().configureEach { task ->
+            task.inputs.file(rootProject.file("protoplugin/binary/wpiprotoplugin.jar"))
+            task.plugins {
+                wpilib {
+                    outputSubDir = 'cpp'
+                }
+            }
             task.builtins {
                 cpp {}
                 remove java

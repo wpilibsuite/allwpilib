@@ -17,10 +17,10 @@ frc::MecanumDriveKinematics wpi::Protobuf<frc::MecanumDriveKinematics>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufMecanumDriveKinematics*>(&msg);
   return frc::MecanumDriveKinematics{
-      wpi::UnpackProtobuf<frc::Translation2d>(m->front_left()),
-      wpi::UnpackProtobuf<frc::Translation2d>(m->front_right()),
-      wpi::UnpackProtobuf<frc::Translation2d>(m->rear_left()),
-      wpi::UnpackProtobuf<frc::Translation2d>(m->rear_right()),
+      wpi::UnpackProtobuf<frc::Translation2d>(m->wpi_front_left()),
+      wpi::UnpackProtobuf<frc::Translation2d>(m->wpi_front_right()),
+      wpi::UnpackProtobuf<frc::Translation2d>(m->wpi_rear_left()),
+      wpi::UnpackProtobuf<frc::Translation2d>(m->wpi_rear_right()),
   };
 }
 
