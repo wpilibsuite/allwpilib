@@ -7,79 +7,88 @@
 
 #include "hal/AddressableLEDTypes.h"
 #include "simd/simd.h"
-//https://developer.arm.com/documentation/ddi0409/g/Instruction-Timing/Instruction-specific-scheduling/Advanced-SIMD-load-store-instructions?lang=en
+//https://developer.arm.com/documentation/ddi0409/i/instruction-timing/instruction-specific-scheduling/advanced-simd-load-store-instructions?lang=en
 //https://developer.arm.com/documentation/ddi0406/c/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-instructions/VLD4--single-4-element-structure-to-one-lane-
+
 namespace {
 using namespace Simd::Neon;
-template <bool align>
-void RGBToRBG_16(const uint8_t* rgb, uint8_t* bgr) {
-  uint8x16x4_t _rgb = Load4<align>(rgb);
-  std::swap(_rgb.val[1], _rgb.val[2]);  // swap G and B
-  Store4<align>(bgr, _rgb);
+
+template<typename T>
+using ConvertFunc = void(*)(T);
+
+template <typename T>
+void RGBToRBG(T val) {
+  std::swap(val[0], val[1]); // swap G and B
 }
 
-template <bool align>
-void RGBToBGR_16(const uint8_t* rgb, uint8_t* bgr) {
-  uint8x16x4_t _rgb = Load4<align>(rgb);
-  std::swap(_rgb.val[0], _rgb.val[2]);  // swap R and B
-  Store4<align>(bgr, _rgb);
+template <typename T>
+void RGBToBGR(T val) {
+  std::swap(val[0], val[2]); // swap R and B
 }
 
-template <bool align>
-void RGBToBRG_16(const uint8_t* rgb, uint8_t* bgr) {
-  uint8x16x4_t _rgb = Load4<align>(rgb);
-  std::swap(_rgb.val[0], _rgb.val[2]);  // swap R and B
-  std::swap(_rgb.val[1], _rgb.val[2]);  // swap G and R
-  Store4<align>(bgr, _rgb);
+template <typename T>
+void RGBToBRG(T val) {
+  std::swap(val[0], val[2]); // swap R and B
+  std::swap(val[0], val[1]); // swap G and R
 }
 
-template <bool align>
-void RGBToGRB_16(const uint8_t* rgb, uint8_t* bgr) {
-  uint8x16x4_t _rgb = Load4<align>(rgb);
-  std::swap(_rgb.val[0], _rgb.val[1]);  // swap G and R
-  Store4<align>(bgr, _rgb);
+template <typename T>
+void RGBToGRB(T val) {
+  std::swap(val[1], val[2]); // swap R and G
 }
 
-template <bool align>
-void RGBToGBR_16(const uint8_t* rgb, uint8_t* bgr) {
-  uint8x16x4_t _rgb = Load4<align>(rgb);
-  std::swap(_rgb.val[0], _rgb.val[2]);  // swap R and B
-  std::swap(_rgb.val[0], _rgb.val[1]);  // swap B and G
-  Store4<align>(bgr, _rgb);
+template <typename T>
+void RGBToGBR(T val) {
+  std::swap(val[0], val[2]); // swap R and B
+  std::swap(val[1], val[2]); // swap B and G
 }
 
-template <HAL_AddressableLEDColorOrder order, bool align>
+template <bool inAlign, bool outAlign, ConvertFunc<uint8x16_t*> Convert>
+void ConvertNEON_16(const uint8_t* in, uint8_t* out) {
+  uint8x16x4_t rgb = Load4<inAlign>(in);
+  Convert(rgb.val);
+  Store4<outAlign>(out, rgb);
+}
+
+template <bool inAlign, bool outAlign, ConvertFunc<uint8x8_t*> Convert>
+void ConvertNEON_8(const uint8_t* in, uint8_t* out) {
+  uint8x8x4_t rgb = LoadHalf4<inAlign>(in);
+  Convert(rgb.val);
+  StoreHalf4<outAlign>(out, rgb);
+}
+
+template <HAL_AddressableLEDColorOrder order, bool inAlign, bool outAlign>
 void RGBConvert_16(const uint8_t* src, uint8_t* dst) {
   switch (order) {
     case HAL_ALED_RBG:
-      RGBToRBG_16<align>(src, dst);
+      ConvertNEON_16<inAlign, outAlign, RGBToRBG>(src, dst);
       break;
     case HAL_ALED_BGR:
-      RGBToBGR_16<align>(src, dst);
+      ConvertNEON_16<inAlign, outAlign, RGBToBGR>(src, dst);
       break;
     case HAL_ALED_BRG:
-      RGBToBRG_16<align>(src, dst);
+      ConvertNEON_16<inAlign, outAlign, RGBToBRG>(src, dst);
       break;
     case HAL_ALED_GRB:
-      RGBToGRB_16<align>(src, dst);
+      ConvertNEON_16<inAlign, outAlign, RGBToGRB>(src, dst);
       break;
     case HAL_ALED_GBR:
-      RGBToGBR_16<align>(src, dst);
+      ConvertNEON_16<inAlign, outAlign, RGBToGBR>(src, dst);
       break;
   }
 }
 
-template <HAL_AddressableLEDColorOrder order, bool align>
+template <HAL_AddressableLEDColorOrder order, bool inAlign, bool outAlign>
 void RGBConvert(const uint8_t* src, uint8_t* dst, size_t len) {
-  if(len > 16) {
+  if(len >= 16) {
     const size_t A4 = A * 4;
     size_t size = len * 4;
     size_t aligned = Simd::AlignLo(size, A4);
     for (size_t i = 0; i < aligned; i += A4) {
-      RGBConvert_16<order, align>(src + i, dst + i);
+      RGBConvert_16<order, inAlign, outAlign>(src + i, dst + i);
     }
     if (aligned < size) {
-      RGBConvert_16<order, false>(
+      RGBConvert_16<order, false, false>(
           src + size - A4,
           dst + size - A4);  // copy last 16 pixels, possibly recopying.
     }
@@ -94,9 +103,13 @@ void RGBConvert(const uint8_t* src, uint8_t* dst, size_t len) {
 template <HAL_AddressableLEDColorOrder order>
 void RGBConvert(const uint8_t* src, uint8_t* dst, size_t pixelCount) {
   if (Aligned(src) && Aligned(dst)) {
-    RGBConvert<order, true>(src, dst, pixelCount);
+    RGBConvert<order, true, true>(src, dst, pixelCount);
+  } else if(Aligned(src)) {
+    RGBConvert<order, true, false>(src, dst, pixelCount);
+  } else if(Aligned(dst)) {
+    RGBConvert<order, false, true>(src, dst, pixelCount);
   } else {
-    RGBConvert<order, false>(src, dst, pixelCount);
+    RGBConvert<order, false, false>(src, dst, pixelCount);
   }
 }
 }  // namespace

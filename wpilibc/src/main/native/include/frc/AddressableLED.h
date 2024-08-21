@@ -95,6 +95,8 @@ class AddressableLED {
   AddressableLED(AddressableLED&&) = default;
   AddressableLED& operator=(AddressableLED&&) = default;
 
+  void SetOrder(HAL_AddressableLEDColorOrder);
+
   /**
    * Sets the length of the LED strip.
    *
