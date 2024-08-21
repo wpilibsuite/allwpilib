@@ -71,7 +71,7 @@ void PoseEstimator<WheelSpeeds, WheelPositions>::ResetTranslation(
 template <typename WheelSpeeds, typename WheelPositions>
 void PoseEstimator<WheelSpeeds, WheelPositions>::ResetRotation(
     const Rotation2d& rotation) {
-  m_odometry.ResetTranslation(rotation);
+  m_odometry.ResetRotation(rotation);
   m_odometryPoseBuffer.Clear();
 }
 
