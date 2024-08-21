@@ -26,3 +26,9 @@ HAL_ENUM(HAL_AddressableLEDColorOrder) {
   HAL_ALED_GBR,
   HAL_ALED_RGB
 };
+
+#ifdef __cplusplus
+inline auto format_as(HAL_AddressableLEDColorOrder order) {
+  return static_cast<int32_t>(order);
+}
+#endif
