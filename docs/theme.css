@@ -1,3 +1,9 @@
+/*
+This file includes both doxygen-awesome.css and doxygen-awesome-sidebar-only.css
+from https://github.com/jothepro/doxygen-awesome-css/blob/28ed396de19cd3d803bcb483dceefdb6d03b1b2b/
+*/
+
+/* doxygen-awesome.css */
 /**
 
 Doxygen Awesome
@@ -2675,6 +2681,8 @@ h2:hover a.anchorlink, h1:hover a.anchorlink, h3:hover a.anchorlink, h4:hover a.
         border-radius: 0 var(--border-radius-medium) var(--border-radius-medium) 0;
     }
 }
+
+/* doxygen-awesome-sidebar-only.css */
 
 /**
 
