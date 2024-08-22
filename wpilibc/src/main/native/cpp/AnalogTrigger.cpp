@@ -58,9 +58,7 @@ AnalogTrigger::AnalogTrigger(std::shared_ptr<DutyCycle> input)
 }
 
 AnalogTrigger::~AnalogTrigger() {
-  int32_t status = 0;
-  HAL_CleanAnalogTrigger(m_trigger, &status);
-  FRC_ReportError(status, "Channel {}", GetSourceChannel());
+  HAL_CleanAnalogTrigger(m_trigger);
 }
 
 void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {

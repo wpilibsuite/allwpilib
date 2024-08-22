@@ -62,8 +62,7 @@ ExternalDirectionCounter::ExternalDirectionCounter(
 }
 
 ExternalDirectionCounter::~ExternalDirectionCounter() {
-  int32_t status = 0;
-  HAL_FreeCounter(m_handle, &status);
+  HAL_FreeCounter(m_handle);
 }
 
 int ExternalDirectionCounter::GetCount() const {

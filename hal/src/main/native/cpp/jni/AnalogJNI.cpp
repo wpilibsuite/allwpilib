@@ -540,9 +540,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AnalogJNI_cleanAnalogTrigger
   (JNIEnv* env, jclass, jint id)
 {
-  int32_t status = 0;
-  HAL_CleanAnalogTrigger((HAL_AnalogTriggerHandle)id, &status);
-  CheckStatus(env, status);
+  HAL_CleanAnalogTrigger((HAL_AnalogTriggerHandle)id);
 }
 
 /*

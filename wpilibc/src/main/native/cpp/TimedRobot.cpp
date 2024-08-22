@@ -95,7 +95,7 @@ TimedRobot::~TimedRobot() {
   HAL_StopNotifier(m_notifier, &status);
   FRC_ReportError(status, "StopNotifier");
 
-  HAL_CleanNotifier(m_notifier, &status);
+  HAL_CleanNotifier(m_notifier);
 }
 
 void TimedRobot::AddPeriodic(std::function<void()> callback,

@@ -95,10 +95,7 @@ struct AnalogTriggerHandle {
   AnalogTriggerHandle(AnalogTriggerHandle&&) = default;
   AnalogTriggerHandle& operator=(AnalogTriggerHandle&&) = default;
 
-  ~AnalogTriggerHandle() {
-    int32_t status = 0;
-    HAL_CleanAnalogTrigger(handle, &status);
-  }
+  ~AnalogTriggerHandle() { HAL_CleanAnalogTrigger(handle); }
 
   operator HAL_AnalogTriggerHandle() const { return handle; }
 
@@ -160,10 +157,7 @@ struct PWMHandle {
     handle = HAL_InitializePWMPort(HAL_GetPort(port), nullptr, status);
   }
 
-  ~PWMHandle() {
-    int32_t status = 0;
-    HAL_FreePWMPort(handle, &status);
-  }
+  ~PWMHandle() { HAL_FreePWMPort(handle); }
 
   operator HAL_DigitalHandle() const { return handle; }
 

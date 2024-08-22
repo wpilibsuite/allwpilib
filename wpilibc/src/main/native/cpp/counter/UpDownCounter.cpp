@@ -56,8 +56,7 @@ UpDownCounter::UpDownCounter(std::shared_ptr<DigitalSource> upSource,
 }
 
 UpDownCounter::~UpDownCounter() {
-  int32_t status = 0;
-  HAL_FreeCounter(m_handle, &status);
+  HAL_FreeCounter(m_handle);
 }
 
 int UpDownCounter::GetCount() const {

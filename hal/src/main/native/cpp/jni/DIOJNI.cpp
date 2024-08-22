@@ -227,9 +227,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DIOJNI_freeDigitalPWM
   (JNIEnv* env, jclass, jint id)
 {
-  int32_t status = 0;
-  HAL_FreeDigitalPWM((HAL_DigitalPWMHandle)id, &status);
-  CheckStatus(env, status);
+  HAL_FreeDigitalPWM((HAL_DigitalPWMHandle)id);
 }
 
 /*

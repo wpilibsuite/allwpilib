@@ -75,9 +75,7 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
 }
 
 SerialPort::~SerialPort() {
-  int32_t status = 0;
-  HAL_CloseSerial(m_portHandle, &status);
-  FRC_ReportError(status, "CloseSerial");
+  HAL_CloseSerial(m_portHandle);
 }
 
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {

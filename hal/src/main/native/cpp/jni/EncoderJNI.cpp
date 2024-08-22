@@ -46,9 +46,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_EncoderJNI_freeEncoder
   (JNIEnv* env, jclass, jint id)
 {
-  int32_t status = 0;
-  HAL_FreeEncoder((HAL_EncoderHandle)id, &status);
-  CheckStatus(env, status);
+  HAL_FreeEncoder((HAL_EncoderHandle)id);
 }
 
 /*

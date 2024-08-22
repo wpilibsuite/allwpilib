@@ -38,8 +38,7 @@ Tachometer::Tachometer(std::shared_ptr<DigitalSource> source) {
 }
 
 Tachometer::~Tachometer() {
-  int32_t status = 0;
-  HAL_FreeCounter(m_handle, &status);
+  HAL_FreeCounter(m_handle);
 }
 
 units::hertz_t Tachometer::GetFrequency() const {

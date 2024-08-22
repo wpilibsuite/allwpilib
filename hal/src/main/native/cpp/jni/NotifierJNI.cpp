@@ -88,7 +88,7 @@ Java_edu_wpi_first_hal_NotifierJNI_cleanNotifier
   (JNIEnv* env, jclass, jint notifierHandle)
 {
   int32_t status = 0;
-  HAL_CleanNotifier((HAL_NotifierHandle)notifierHandle, &status);
+  HAL_CleanNotifier((HAL_NotifierHandle)notifierHandle);
   CheckStatus(env, status);
 }
 
