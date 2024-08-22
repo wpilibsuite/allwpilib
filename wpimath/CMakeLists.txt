@@ -4,6 +4,7 @@ include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
+include(WpiProtobuf)
 
 # workaround for makefiles - for some reason parent directories aren't created.
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
@@ -127,15 +128,12 @@ target_link_libraries(protobuf wpiutil)
 
 add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
 
-protobuf_generate(
-    TARGET protobuf
+wpi_protobuf_generate(
+    TARGET
+    protobuf
     PROTOS ${wpimath_proto_src}
-    PLUGIN "protoc-gen-wpilib=${PROTOC_WPILIB_PLUGIN}"
-    PROTOC_OPTIONS "--cpp_out=${CMAKE_CURRENT_BINARY_DIR}/protobuf" # Needed to generate C++ source
+    PLUGIN ${PROTOC_WPILIB_PLUGIN}
     PROTOC_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
-    GENERATE_EXTENSIONS ".pb.h" ".pb.cc" # Enables CMake to add the generated sources to the target
-    LANGUAGE wpilib # Adds a --wpilib_out arg to let our plugin modify the generated protobuf code
-    APPEND_PATH
 )
 
 if(MSVC)
