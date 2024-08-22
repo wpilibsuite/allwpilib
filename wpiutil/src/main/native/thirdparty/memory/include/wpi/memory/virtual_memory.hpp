@@ -76,7 +76,7 @@ namespace wpi
         /// \ingroup memory_allocator
         void virtual_memory_decommit(void* memory, std::size_t no_pages) noexcept;
 
-        /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory using the virtual memory allocation functions.
+        /// A stateless RawAllocator that allocates memory using the virtual memory allocation functions.
         /// It does not prereserve any memory and will always reserve and commit combined.
         /// \ingroup memory_allocator
         class virtual_memory_allocator
@@ -94,17 +94,17 @@ namespace wpi
                 return *this;
             }
 
-            /// \effects A \concept{concept_rawallocator,RawAllocator} allocation function.
+            /// \effects A RawAllocator allocation function.
             /// It uses \ref virtual_memory_reserve followed by \ref virtual_memory_commit for the allocation.
             /// The number of pages allocated will be the minimum to hold \c size continuous bytes,
             /// i.e. \c size will be rounded up to the next multiple.
             /// If debug fences are activated, one additional page before and after the memory will be allocated.
-            /// \returns A pointer to a \concept{concept_node,node}, it will never be \c nullptr.
+            /// \returns A pointer to a node, it will never be \c nullptr.
             /// It will always be aligned on a fence boundary, regardless of the alignment parameter.
             /// \throws An exception of type \ref out_of_memory or whatever is thrown by its handler if the allocation fails.
             void* allocate_node(std::size_t size, std::size_t alignment);
 
-            /// \effects A \concept{concept_rawallocator,RawAllocator} deallocation function.
+            /// \effects A RawAllocator deallocation function.
             /// It calls \ref virtual_memory_decommit followed by \ref virtual_memory_release for the deallocation.
             void deallocate_node(void* node, std::size_t size, std::size_t alignment) noexcept;
 
@@ -122,7 +122,7 @@ namespace wpi
         struct memory_block;
         struct allocator_info;
 
-        /// A \concept{concept_blockallocator,BlockAllocator} that reserves virtual memory and commits it part by part.
+        /// A BlockAllocator that reserves virtual memory and commits it part by part.
         /// It is similar to \ref memory_stack but does not support growing and uses virtual memory,
         /// also meant for big blocks not small allocations.
         /// \ingroup memory_allocator

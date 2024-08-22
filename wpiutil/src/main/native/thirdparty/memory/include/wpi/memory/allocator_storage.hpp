@@ -85,8 +85,8 @@ namespace wpi
             }
         } // namespace detail
 
-        /// A \concept{concept_rawallocator,RawAllocator} that stores another allocator.
-        /// The \concept{concept_storagepolicy,StoragePolicy} defines the allocator type being stored and how it is stored.
+        /// A RawAllocator that stores another allocator.
+        /// The StoragePolicy defines the allocator type being stored and how it is stored.
         /// The \c Mutex controls synchronization of the access.
         /// \ingroup memory_storage
         template <class StoragePolicy, class Mutex>
@@ -322,7 +322,7 @@ namespace wpi
         {
         };
 
-        /// A \concept{concept_storagepolicy,StoragePolicy} that stores the allocator directly.
+        /// A StoragePolicy that stores the allocator directly.
         /// It embeds the allocator inside it, i.e. moving the storage policy will move the allocator.
         /// \ingroup memory_storage
         template <class RawAllocator>
@@ -379,7 +379,7 @@ namespace wpi
         };
 
         /// An alias template for \ref allocator_storage using the \ref direct_storage policy without a mutex.
-        /// It has the effect of giving any \concept{concept_rawallocator,RawAllocator} the interface with all member functions,
+        /// It has the effect of giving any RawAllocator the interface with all member functions,
         /// avoiding the need to wrap it inside the \ref allocator_traits.
         /// \ingroup memory_storage
         template <class RawAllocator>
@@ -521,7 +521,7 @@ namespace wpi
             };
         } // namespace detail
 
-        /// Specifies whether or not a \concept{concept_rawallocator,RawAllocator} has shared semantics.
+        /// Specifies whether or not a RawAllocator has shared semantics.
         /// It is shared, if - like \ref allocator_reference - if multiple objects refer to the same internal allocator and if it can be copied.
         /// This sharing is stateful, however, stateless allocators are not considered shared in the meaning of this traits. <br>
         /// If a \c RawAllocator is shared, it will be directly embedded inside \ref reference_storage since it already provides \ref allocator_reference like semantics, so there is no need to add them manually,<br>
@@ -534,7 +534,7 @@ namespace wpi
         {
         };
 
-        /// A \concept{concept_storagepolicy,StoragePolicy} that stores a reference to an allocator.
+        /// A StoragePolicy that stores a reference to an allocator.
         /// For stateful allocators it only stores a pointer to an allocator object and copying/moving only copies the pointer.
         /// For stateless allocators it does not store anything, an allocator will be constructed as needed.
         /// For allocators that are already shared (determined through \ref is_shared_allocator) it will store the allocator type directly.
@@ -711,7 +711,7 @@ namespace wpi
         public:
             using allocator_type = WPI_IMPL_DEFINED(base_allocator);
 
-            /// \effects Creates it from a reference to any stateful \concept{concept_rawallocator,RawAllocator}.
+            /// \effects Creates it from a reference to any stateful RawAllocator.
             /// It will store a pointer to this allocator object.
             /// \note The user has to take care that the lifetime of the reference does not exceed the allocator lifetime.
             template <class RawAllocator>
@@ -723,7 +723,7 @@ namespace wpi
                 ::new (static_cast<void*>(&storage_)) basic_allocator<RawAllocator>(alloc);
             }
 
-            // \effects Creates it from any stateless \concept{concept_rawallocator,RawAllocator}.
+            // \effects Creates it from any stateless RawAllocator.
             /// It will not store anything, only creates the allocator as needed.
             /// \requires The \c RawAllocator is stateless.
             template <class RawAllocator>
@@ -771,7 +771,7 @@ namespace wpi
 
             /// \returns A reference to the allocator.
             /// The actual type is implementation-defined since it is the base class used in the type-erasure,
-            /// but it provides the full \concept{concept_rawallocator,RawAllocator} member functions.
+            /// but it provides the full RawAllocator member functions.
             /// \note There is no way to access any custom member functions of the allocator type.
             allocator_type& get_allocator() const noexcept
             {
@@ -913,7 +913,7 @@ namespace wpi
         using any_reference_storage = reference_storage<any_allocator>;
 
         /// An alias for \ref allocator_storage using the \ref any_reference_storage.
-        /// It will store a reference to any \concept{concept_rawallocator,RawAllocator}.
+        /// It will store a reference to any RawAllocator.
         /// This is the same as passing the tag type \ref any_allocator to the alias \ref allocator_reference.
         /// Wrap the allocator in a \ref thread_safe_allocator if you want thread safety.
         /// \ingroup memory_storage

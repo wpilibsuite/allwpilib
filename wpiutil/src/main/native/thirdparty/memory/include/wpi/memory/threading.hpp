@@ -35,7 +35,7 @@ namespace wpi
             void unlock() noexcept {}
         };
 
-        /// Specifies whether or not a \concept{concept_rawallocator,RawAllocator} is thread safe as-is.
+        /// Specifies whether or not a RawAllocator is thread safe as-is.
         /// This allows to use \ref no_mutex as an optimization.
         /// Note that stateless allocators are implictly thread-safe.
         /// Specialize it only for your own stateful allocators.

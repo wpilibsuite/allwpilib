@@ -90,7 +90,7 @@ namespace wpi
         /// \ingroup memory_adapter
         WPI_ALIAS_TEMPLATE(memory_resource, foonathan_memory_pmr::memory_resource);
 
-        /// Wraps a \concept{concept_rawallocator,RawAllocator} and makes it a \ref memory_resource.
+        /// Wraps a RawAllocator and makes it a \ref memory_resource.
         /// \ingroup memory_adapter
         template <class RawAllocator>
         class memory_resource_adapter
@@ -124,7 +124,7 @@ namespace wpi
 
             /// \effects Allocates raw memory with given size and alignment.
             /// It forwards to \c allocate_node() or \c allocate_array() depending on the size.
-            /// \returns The new memory as returned by the \concept{concept_rawallocator,RawAllocator}.
+            /// \returns The new memory as returned by the RawAllocator.
             /// \throws Anything thrown by the allocation function.
             void* do_allocate(std::size_t bytes, std::size_t alignment) override
             {
@@ -162,7 +162,7 @@ namespace wpi
             }
         };
 
-        /// Wraps a \ref memory_resource and makes it a \concept{concept_rawallocator,RawAllocator}.
+        /// Wraps a \ref memory_resource and makes it a RawAllocator.
         /// \ingroup memory_adapter
         class memory_resource_allocator
         {

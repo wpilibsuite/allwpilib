@@ -5,7 +5,7 @@
 #define WPI_MEMORY_SMART_PTR_HPP_INCLUDED
 
 /// \file
-/// \c std::make_unique() / \c std::make_shared() replacement allocating memory through a \concept{concept_rawallocator,RawAllocator}.
+/// \c std::make_unique() / \c std::make_shared() replacement allocating memory through a RawAllocator.
 /// \note Only available on a hosted implementation.
 
 #include "config.hpp"
@@ -85,7 +85,7 @@ namespace wpi
             }
         } // namespace detail
 
-        /// A \c std::unique_ptr that deletes using a \concept{concept_rawallocator,RawAllocator}.
+        /// A \c std::unique_ptr that deletes using a RawAllocator.
         ///
         /// It is an alias template using \ref allocator_deleter as \c Deleter class.
         /// \ingroup memory_adapter
@@ -93,7 +93,7 @@ namespace wpi
         WPI_ALIAS_TEMPLATE(unique_ptr,
                                  std::unique_ptr<T, allocator_deleter<T, RawAllocator>>);
 
-        /// A \c std::unique_ptr that deletes using a \concept{concept_rawallocator,RawAllocator} and allows polymorphic types.
+        /// A \c std::unique_ptr that deletes using a RawAllocator and allows polymorphic types.
         ///
         /// It can only be created by converting a regular unique pointer to a pointer to a derived class,
         /// and is meant to be used inside containers.
@@ -105,7 +105,7 @@ namespace wpi
             unique_base_ptr,
             std::unique_ptr<BaseType, allocator_polymorphic_deleter<BaseType, RawAllocator>>);
 
-        /// Creates a \c std::unique_ptr using a \concept{concept_rawallocator,RawAllocator} for the allocation.
+        /// Creates a \c std::unique_ptr using a RawAllocator for the allocation.
         /// \effects Allocates memory for the given type using the allocator
         /// and creates a new object inside it passing the given arguments to its constructor.
         /// \returns A \c std::unique_ptr owning that memory.
@@ -122,7 +122,7 @@ namespace wpi
                                               detail::forward<Args>(args)...);
         }
 
-        /// Creates a \c std::unique_ptr using a type-erased \concept{concept_rawallocator,RawAllocator} for the allocation.
+        /// Creates a \c std::unique_ptr using a type-erased RawAllocator for the allocation.
         /// It is the same as the other overload but stores the reference to the allocator type-erased inside the \c std::unique_ptr.
         /// \effects Allocates memory for the given type using the allocator
         /// and creates a new object inside it passing the given arguments to its constructor.
@@ -141,7 +141,7 @@ namespace wpi
                                                              detail::forward<Args>(args)...);
         }
 
-        /// Creates a \c std::unique_ptr owning an array using a \concept{concept_rawallocator,RawAllocator} for the allocation.
+        /// Creates a \c std::unique_ptr owning an array using a RawAllocator for the allocation.
         /// \effects Allocates memory for an array of given size and value initializes each element inside of it.
         /// \returns A \c std::unique_ptr owning that array.
         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the deleter,
@@ -158,7 +158,7 @@ namespace wpi
                                                           detail::forward<RawAllocator>(alloc)));
         }
 
-        /// Creates a \c std::unique_ptr owning an array using a type-erased \concept{concept_rawallocator,RawAllocator} for the allocation.
+        /// Creates a \c std::unique_ptr owning an array using a type-erased RawAllocator for the allocation.
         /// It is the same as the other overload but stores the reference to the allocator type-erased inside the \c std::unique_ptr.
         /// \effects Allocates memory for an array of given size and value initializes each element inside of it.
         /// \returns A \c std::unique_ptr with a type-erased allocator reference owning that array.
@@ -177,7 +177,7 @@ namespace wpi
                                                                         alloc)));
         }
 
-        /// Creates a \c std::shared_ptr using a \concept{concept_rawallocator,RawAllocator} for the allocation.
+        /// Creates a \c std::shared_ptr using a RawAllocator for the allocation.
         /// It is similar to \c std::allocate_shared but uses a \c RawAllocator (and thus also supports any \c Allocator).
         /// \effects Calls \ref std_allocator::make_std_allocator to wrap the allocator and forwards to \c std::allocate_shared.
         /// \returns A \c std::shared_ptr created using \c std::allocate_shared.

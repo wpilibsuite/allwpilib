@@ -205,7 +205,7 @@ namespace wpi
         /// make sure that you do not call their regular copy/move constructors,
         /// but instead the version where you pass an allocator.
         ///
-        /// The memory block will be managed by the given \concept{concept_rawallocator,RawAllocator},
+        /// The memory block will be managed by the given RawAllocator,
         /// it is stored in an \ref allocator_reference and not owned by the pointer directly.
         /// \ingroup memory_allocator
         template <typename T, class RawAllocator>
@@ -220,7 +220,7 @@ namespace wpi
 
             //=== constructors/destructor/assignment ===//
             /// @{
-            /// \effects Creates it with a \concept{concept_rawallocator,RawAllocator}, but does not own a new object.
+            /// \effects Creates it with a RawAllocator, but does not own a new object.
             explicit joint_ptr(allocator_type& alloc) noexcept
             : allocator_reference<RawAllocator>(alloc), ptr_(nullptr)
             {
@@ -235,7 +235,7 @@ namespace wpi
             /// @{
             /// \effects Reserves memory for the object and the additional size,
             /// and creates the object by forwarding the arguments to its constructor.
-            /// The \concept{concept_rawallocator,RawAllocator} will be used for the allocation.
+            /// The RawAllocator will be used for the allocation.
             template <typename... Args>
             joint_ptr(allocator_type& alloc, joint_size additional_size, Args&&... args)
             : joint_ptr(alloc)
@@ -493,7 +493,7 @@ namespace wpi
         }
         /// @}
 
-        /// A \concept{concept_rawallocator,RawAllocator} that uses the additional joint memory for its allocation.
+        /// A RawAllocator that uses the additional joint memory for its allocation.
         ///
         /// It is somewhat limited and allows only allocation once.
         /// All joint allocators for an object share the joint memory and must not be used in multiple threads.

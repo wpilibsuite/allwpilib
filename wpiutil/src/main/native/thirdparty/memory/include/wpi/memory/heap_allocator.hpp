@@ -65,7 +65,7 @@ namespace wpi
                                                        heap_alloator_leak_checker)
         } // namespace detail
 
-        /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory from the heap.
+        /// A stateless RawAllocator that allocates memory from the heap.
         /// It uses the two functions \ref heap_alloc and \ref heap_dealloc for the allocation,
         /// which default to \c std::malloc and \c std::free.
         /// \ingroup memory_allocator

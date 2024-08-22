@@ -24,7 +24,7 @@ namespace wpi
                 make_block_allocator_t<BlockOrRawAllocator, fixed_block_allocator>;
         } // namespace detail
 
-        /// A stateful \concept{concept_rawallocator,RawAllocator} that is designed for allocations in a loop.
+        /// A stateful RawAllocator that is designed for allocations in a loop.
         /// It uses `N` stacks for the allocation, one of them is always active.
         /// Allocation uses the currently active stack.
         /// Calling \ref iteration_allocator::next_iteration() at the end of the loop,
@@ -40,7 +40,7 @@ namespace wpi
         public:
             using allocator_type = detail::iteration_block_allocator<BlockOrRawAllocator>;
 
-            /// \effects Creates it with a given initial block size and and other constructor arguments for the \concept{concept_blockallocator,BlockAllocator}.
+            /// \effects Creates it with a given initial block size and and other constructor arguments for the BlockAllocator.
             /// It will allocate the first (and only) block and evenly divide it on all the stacks it uses.
             template <typename... Args>
             explicit iteration_allocator(std::size_t block_size, Args&&... args)
@@ -89,7 +89,7 @@ namespace wpi
 
             /// \effects Allocates a memory block of given size and alignment.
             /// It simply moves the top marker of the currently active stack.
-            /// \returns A \concept{concept_node,node} with given size and alignment.
+            /// \returns A node with given size and alignment.
             /// \throws \ref out_of_fixed_memory if the current stack does not have any memory left.
             /// \requires \c size and \c alignment must be valid.
             void* allocate(std::size_t size, std::size_t alignment)
@@ -106,7 +106,7 @@ namespace wpi
 
             /// \effects Allocates a memory block of given size and alignment
             /// similar to \ref allocate().
-            /// \returns A \concept{concept_node,node} with given size and alignment
+            /// \returns A node with given size and alignment
             /// or `nullptr` if the current stack does not have any memory left.
             void* try_allocate(std::size_t size, std::size_t alignment) noexcept
             {
@@ -139,7 +139,7 @@ namespace wpi
                 return cur_;
             }
 
-            /// \returns A reference to the \concept{concept_blockallocator,BlockAllocator} used for managing the memory.
+            /// \returns A reference to the BlockAllocator used for managing the memory.
             /// \requires It is undefined behavior to move this allocator out into another object.
             allocator_type& get_allocator() noexcept
             {

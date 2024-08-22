@@ -50,7 +50,7 @@ namespace wpi
             };
         } // namespace detail
 
-        /// Traits class that checks whether or not a standard \c Allocator can be used as \concept{concept_rawallocator,RawAllocator}.
+        /// Traits class that checks whether or not a standard \c Allocator can be used as RawAllocator.
         /// It checks the existence of a custom \c construct(), \c destroy() function, if provided,
         /// it cannot be used since it would not be called.<br>
         /// Specialize it for custom \c Allocator types to override this check.
@@ -283,7 +283,7 @@ namespace wpi
             }
         } // namespace traits_detail
 
-        /// The default specialization of the allocator_traits for a \concept{concept_rawallocator,RawAllocator}.
+        /// The default specialization of the allocator_traits for a RawAllocator.
         /// See the last link for the requirements on types that do not specialize this class and the interface documentation.
         /// Any specialization must provide the same interface.
         /// \ingroup memory_core
@@ -408,7 +408,7 @@ namespace wpi
             };
         } // namespace detail
 
-        /// Traits that check whether a type models concept \concept{concept_rawallocator,RawAllocator}.<br>
+        /// Traits that check whether a type models concept RawAllocator.<br>
         /// It must either provide the necessary functions for the default traits specialization or has specialized it.
         /// \ingroup memory_core
         template <typename T>
@@ -491,7 +491,7 @@ namespace wpi
             }
         } // namespace traits_detail
 
-        /// The default specialization of the composable_allocator_traits for a \concept{concept_composableallocator,ComposableAllocator}.
+        /// The default specialization of the composable_allocator_traits for a ComposableAllocator.
         /// See the last link for the requirements on types that do not specialize this class and the interface documentation.
         /// Any specialization must provide the same interface.
         /// \ingroup memory_core
@@ -586,8 +586,8 @@ namespace wpi
             };
         } // namespace detail
 
-        /// Traits that check whether a type models concept \concept{concept_rawallocator,ComposableAllocator}.<br>
-        /// It must be a \concept{concept_rawallocator,RawAllocator} and either provide the necessary functions for the default traits specialization or has specialized it.
+        /// Traits that check whether a type models concept ComposableAllocator.<br>
+        /// It must be a RawAllocator and either provide the necessary functions for the default traits specialization or has specialized it.
         /// \ingroup memory_core
         template <typename T>
         struct is_composable_allocator

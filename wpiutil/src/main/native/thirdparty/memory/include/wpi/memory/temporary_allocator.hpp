@@ -209,7 +209,7 @@ namespace wpi
         temporary_stack& get_temporary_stack(
             std::size_t initial_size = temporary_stack_initializer::default_stack_size);
 
-        /// A stateful \concept{concept_rawallocator,RawAllocator} that handles temporary allocations.
+        /// A stateful RawAllocator that handles temporary allocations.
         /// It works similar to \c alloca() but uses a seperate \ref memory_stack for the allocations,
         /// instead of the actual program stack.
         /// This avoids the stack overflow error and is portable,
