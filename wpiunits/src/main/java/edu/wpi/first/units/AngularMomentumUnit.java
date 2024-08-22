@@ -59,7 +59,7 @@ public final class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, Dist
   public AngularMomentum ofBaseUnits(double baseUnitMagnitude) {
     return new ImmutableAngularMomentum(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
-  
+
   @Override
   @SuppressWarnings("unchecked")
   public Measure<AngularMomentumUnit> zero() {
