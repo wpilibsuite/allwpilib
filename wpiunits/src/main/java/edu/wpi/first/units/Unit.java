@@ -34,6 +34,7 @@ public abstract class Unit {
    * @param name the name of the unit. This should be a singular noun (so "Meter", not "Meters")
    * @param symbol the short symbol for the unit, such as "m" for meters or "lb." for pounds
    */
+  @SuppressWarnings("this-escape")
   protected Unit(
       Unit baseUnit,
       UnaryFunction toBaseConverter,
