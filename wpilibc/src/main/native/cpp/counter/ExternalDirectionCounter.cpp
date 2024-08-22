@@ -61,10 +61,6 @@ ExternalDirectionCounter::ExternalDirectionCounter(
   wpi::SendableRegistry::AddLW(this, "External Direction Counter", m_index);
 }
 
-ExternalDirectionCounter::~ExternalDirectionCounter() {
-  HAL_FreeCounter(m_handle);
-}
-
 int ExternalDirectionCounter::GetCount() const {
   int32_t status = 0;
   int val = HAL_GetCounter(m_handle, &status);

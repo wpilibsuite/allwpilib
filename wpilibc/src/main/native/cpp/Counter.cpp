@@ -89,8 +89,6 @@ Counter::~Counter() {
   } catch (const RuntimeError& e) {
     e.Report();
   }
-
-  HAL_FreeCounter(m_counter);
 }
 
 void Counter::SetUpSource(int channel) {

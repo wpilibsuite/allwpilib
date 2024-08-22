@@ -57,10 +57,6 @@ AnalogTrigger::AnalogTrigger(std::shared_ptr<DutyCycle> input)
   wpi::SendableRegistry::AddLW(this, "AnalogTrigger", index);
 }
 
-AnalogTrigger::~AnalogTrigger() {
-  HAL_CleanAnalogTrigger(m_trigger);
-}
-
 void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsVoltage(m_trigger, lower, upper, &status);

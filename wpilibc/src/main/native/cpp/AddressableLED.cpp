@@ -35,11 +35,6 @@ AddressableLED::AddressableLED(int port) : m_port{port} {
   HAL_Report(HALUsageReporting::kResourceType_AddressableLEDs, port + 1);
 }
 
-AddressableLED::~AddressableLED() {
-  HAL_FreeAddressableLED(m_handle);
-  HAL_FreePWMPort(m_pwmHandle);
-}
-
 void AddressableLED::SetLength(int length) {
   int32_t status = 0;
   HAL_SetAddressableLEDLength(m_handle, length, &status);

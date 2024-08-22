@@ -43,8 +43,6 @@ DigitalOutput::~DigitalOutput() {
   } catch (const RuntimeError& e) {
     e.Report();
   }
-
-  HAL_FreeDIOPort(m_handle);
 }
 
 void DigitalOutput::Set(bool value) {

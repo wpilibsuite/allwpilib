@@ -55,10 +55,6 @@ UpDownCounter::UpDownCounter(std::shared_ptr<DigitalSource> upSource,
   wpi::SendableRegistry::AddLW(this, "UpDown Counter", m_index);
 }
 
-UpDownCounter::~UpDownCounter() {
-  HAL_FreeCounter(m_handle);
-}
-
 int UpDownCounter::GetCount() const {
   int32_t status = 0;
   int val = HAL_GetCounter(m_handle, &status);

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <hal/DIO.h>
 #include <hal/Types.h>
 #include <units/time.h>
 #include <wpi/sendable/Sendable.h>
@@ -34,10 +35,10 @@ class DigitalOutput : public DigitalSource,
    */
   explicit DigitalOutput(int channel);
 
-  ~DigitalOutput() override;
-
   DigitalOutput(DigitalOutput&&) = default;
   DigitalOutput& operator=(DigitalOutput&&) = default;
+
+  ~DigitalOutput() override;
 
   /**
    * Set the value of a digital output.
@@ -161,7 +162,7 @@ class DigitalOutput : public DigitalSource,
 
  private:
   int m_channel;
-  hal::Handle<HAL_DigitalHandle> m_handle;
+  hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
   hal::Handle<HAL_DigitalPWMHandle> m_pwmGenerator;
 };
 

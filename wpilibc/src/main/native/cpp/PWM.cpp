@@ -46,11 +46,8 @@ PWM::PWM(int channel, bool registerSendable) {
 
 PWM::~PWM() {
   int32_t status = 0;
-
   HAL_SetPWMDisabled(m_handle, &status);
   FRC_ReportError(status, "Channel {}", m_channel);
-
-  HAL_FreePWMPort(m_handle);
 }
 
 void PWM::SetPulseTime(units::microsecond_t time) {

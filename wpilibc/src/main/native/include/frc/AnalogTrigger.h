@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/AnalogTrigger.h>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -84,7 +85,7 @@ class AnalogTrigger : public wpi::Sendable,
   AnalogTrigger(AnalogTrigger&&) = default;
   AnalogTrigger& operator=(AnalogTrigger&&) = default;
 
-  ~AnalogTrigger() override;
+  ~AnalogTrigger() override = default;
 
   /**
    * Set the upper and lower limits of the analog trigger.
@@ -186,7 +187,7 @@ class AnalogTrigger : public wpi::Sendable,
 
   std::shared_ptr<AnalogInput> m_analogInput;
   std::shared_ptr<DutyCycle> m_dutyCycle;
-  hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
+  hal::Handle<HAL_AnalogTriggerHandle, HAL_CleanAnalogTrigger> m_trigger;
   bool m_ownsAnalog = false;
 };
 
