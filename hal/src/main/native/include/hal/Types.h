@@ -87,12 +87,12 @@ typedef int32_t HAL_Bool;
 
 #ifdef __cplusplus
 namespace hal {
-
 /**
  * A move-only C++ wrapper around a HAL handle.
- * Does not ensure destruction.
+ * Will free the handle if FreeFunction is provided
  */
-template <typename CType, int32_t CInvalid = HAL_kInvalidHandle>
+template <typename CType, void (*FreeFunction)(CType) = nullptr,
+          int32_t CInvalid = HAL_kInvalidHandle>
 class Handle {
  public:
   Handle() = default;
@@ -107,6 +107,21 @@ class Handle {
     m_handle = rhs.m_handle;
     rhs.m_handle = CInvalid;
     return *this;
+  }
+
+  ~Handle() {
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress"
+#endif  // __GNUC__
+    if constexpr (FreeFunction != nullptr) {
+#if __GNUC__
+#pragma GCC diagnostic pop
+#endif  // __GNUC__
+      if (m_handle != CInvalid) {
+        FreeFunction(m_handle);
+      }
+    }
   }
 
   operator CType() const { return m_handle; }  // NOLINT
