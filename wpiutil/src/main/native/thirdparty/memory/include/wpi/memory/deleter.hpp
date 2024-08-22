@@ -20,7 +20,7 @@ namespace wpi
         /// A deleter class that deallocates the memory through a specified \concept{concept_rawallocator,RawAllocator}.
         ///
         /// It deallocates memory for a specified type but does not call its destructors.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename Type, class RawAllocator>
         class allocator_deallocator : WPI_EBO(allocator_reference<RawAllocator>)
         {
@@ -63,7 +63,7 @@ namespace wpi
 
         /// Specialization of \ref allocator_deallocator for array types.
         /// Otherwise the same behavior.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename Type, class RawAllocator>
         class allocator_deallocator<Type[], RawAllocator>
         : WPI_EBO(allocator_reference<RawAllocator>)
@@ -119,7 +119,7 @@ namespace wpi
         /// A deleter class that deallocates the memory of a derived type through a specified \concept{concept_rawallocator,RawAllocator}.
         ///
         /// It can only be created from a \ref allocator_deallocator and thus must only be used for smart pointers initialized by derived-to-base conversion of the pointer.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename BaseType, class RawAllocator>
         class allocator_polymorphic_deallocator : WPI_EBO(allocator_reference<RawAllocator>)
         {
@@ -159,7 +159,7 @@ namespace wpi
 
         /// Similar to \ref allocator_deallocator but calls the destructors of the object.
         /// Otherwise behaves the same.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename Type, class RawAllocator>
         class allocator_deleter : WPI_EBO(allocator_reference<RawAllocator>)
         {
@@ -203,7 +203,7 @@ namespace wpi
 
         /// Specialization of \ref allocator_deleter for array types.
         /// Otherwise the same behavior.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename Type, class RawAllocator>
         class allocator_deleter<Type[], RawAllocator>
         : WPI_EBO(allocator_reference<RawAllocator>)
@@ -260,7 +260,7 @@ namespace wpi
         /// Similar to \ref allocator_polymorphic_deallocator but calls the destructors of the object.
         /// Otherwise behaves the same.
         /// \note It has a relatively high space overhead, so only use it if you have to.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename BaseType, class RawAllocator>
         class allocator_polymorphic_deleter : WPI_EBO(allocator_reference<RawAllocator>)
         {

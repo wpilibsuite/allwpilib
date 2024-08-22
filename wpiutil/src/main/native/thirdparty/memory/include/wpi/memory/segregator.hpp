@@ -18,7 +18,7 @@ namespace wpi
     namespace memory
     {
         /// A \concept{concept_segregatable,Segregatable} that allocates until a maximum size.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <class RawAllocator>
         class threshold_segregatable : WPI_EBO(allocator_traits<RawAllocator>::allocator_type)
         {
@@ -78,7 +78,7 @@ namespace wpi
 
         /// A composable \concept{concept_rawallocator,RawAllocator} that will always fail.
         /// This is useful for compositioning or as last resort in \ref binary_segregator.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         class null_allocator
         {
         public:
@@ -119,7 +119,7 @@ namespace wpi
         /// A \concept{concept_rawallocator,RawAllocator} that either uses the \concept{concept_segregatable,Segregatable} or the other `RawAllocator`.
         /// It is a faster alternative to \ref fallback_allocator that doesn't require a composable allocator
         /// and decides about the allocator to use purely with the `Segregatable` based on size and alignment.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <class Segregatable, class RawAllocator>
         class binary_segregator
         : WPI_EBO(
@@ -375,7 +375,7 @@ namespace wpi
         /// the result is `binary_segregator<Head, segregator<Tail...>>`.
         /// \note It will result in an allocator that tries each `Segregatable` in the order specified
         /// using the last parameter as final fallback.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <class... Allocators>
         WPI_ALIAS_TEMPLATE(segregator,
                                  typename detail::make_segregator_t<Allocators...>::type);

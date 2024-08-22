@@ -21,7 +21,7 @@ namespace wpi
         /// it uses `Fallback`.
         /// \requires `Default` must be a composable \concept{concept_rawallocator,RawAllocator},
         /// `Fallback` must be a \concept{concept_rawallocator,RawAllocator}.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <class Default, class Fallback>
         class fallback_allocator
         : WPI_EBO(detail::ebo_storage<0, typename allocator_traits<Default>::allocator_type>),

@@ -34,7 +34,7 @@ namespace wpi
         /// A \c BucketDistribution for \ref memory_pool_collection defining that there is a bucket, i.e. pool, for each size.
         /// That means that for each possible size up to an upper bound there will be a seperate free list.
         /// Allocating a node will not waste any memory.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         struct identity_buckets
         {
             using type = detail::identity_access_policy;
@@ -43,7 +43,7 @@ namespace wpi
         /// A \c BucketDistribution for \ref memory_pool_collection defining that there is a bucket, i.e. pool, for each power of two.
         /// That means for each power of two up to an upper bound there will be a separate free list.
         /// Allocating a node will only waste half of the memory.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         struct log2_buckets
         {
             using type = detail::log2_access_policy;
@@ -55,7 +55,7 @@ namespace wpi
         /// Allocating a node of given size will use the appropriate free list.<br>
         /// This allocator is ideal for \concept{concept_node,node} allocations in any order but with a predefined set of sizes,
         /// not only one size like \ref memory_pool.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class PoolType, class BucketDistribution,
                   class BlockOrRawAllocator = default_allocator>
         class memory_pool_collection
@@ -398,7 +398,7 @@ namespace wpi
 
         /// An alias for \ref memory_pool_collection using the \ref identity_buckets policy
         /// and a \c PoolType defaulting to \ref node_pool.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class PoolType = node_pool, class ImplAllocator = default_allocator>
         WPI_ALIAS_TEMPLATE(bucket_allocator,
                                  memory_pool_collection<PoolType, identity_buckets, ImplAllocator>);
@@ -409,7 +409,7 @@ namespace wpi
         /// Specialization of the \ref allocator_traits for \ref memory_pool_collection classes.
         /// \note It is not allowed to mix calls through the specialization and through the member functions,
         /// i.e. \ref memory_pool_collection::allocate_node() and this \c allocate_node().
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class Pool, class BucketDist, class RawAllocator>
         class allocator_traits<memory_pool_collection<Pool, BucketDist, RawAllocator>>
         {
@@ -484,7 +484,7 @@ namespace wpi
         };
 
         /// Specialization of the \ref composable_allocator_traits for \ref memory_pool_collection classes.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class Pool, class BucketDist, class RawAllocator>
         class composable_allocator_traits<memory_pool_collection<Pool, BucketDist, RawAllocator>>
         {

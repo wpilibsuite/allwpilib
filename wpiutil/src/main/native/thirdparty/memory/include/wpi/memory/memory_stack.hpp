@@ -97,7 +97,7 @@ namespace wpi
         /// and saves a marker to the current top.
         /// Allocation simply moves this marker by the appropriate number of bytes and returns the pointer at the old marker position,
         /// deallocation is not directly supported, only setting the marker to a previously queried position.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class BlockOrRawAllocator = default_allocator>
         class memory_stack
         : WPI_EBO(detail::default_leak_checker<detail::memory_stack_leak_handler>)
@@ -276,7 +276,7 @@ namespace wpi
         /// A `Stack` is anything that provides a `marker`, a `top()` function returning a `marker`
         /// and an `unwind()` function to unwind to a `marker`,
         /// like a \ref wpi::memory::memory_stack
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class Stack = memory_stack<>>
         class memory_stack_raii_unwind
         {
@@ -379,7 +379,7 @@ namespace wpi
         /// Specialization of the \ref allocator_traits for \ref memory_stack classes.
         /// \note It is not allowed to mix calls through the specialization and through the member functions,
         /// i.e. \ref memory_stack::allocate() and this \c allocate_node().
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class BlockAllocator>
         class allocator_traits<memory_stack<BlockAllocator>>
         {
@@ -441,7 +441,7 @@ namespace wpi
         };
 
         /// Specialization of the \ref composable_allocator_traits for \ref memory_stack classes.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class BlockAllocator>
         class composable_allocator_traits<memory_stack<BlockAllocator>>
         {

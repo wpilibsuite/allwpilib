@@ -36,14 +36,14 @@ namespace wpi
         /// The page size of the virtual memory.
         /// All virtual memory allocations must be multiple of this size.
         /// It is usually 4KiB.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         /// \deprecated use \ref get_virtual_memory_page_size instead.
         extern const std::size_t virtual_memory_page_size;
 
         /// \returns the page size of the virtual memory.
         /// All virtual memory allocations must be multiple of this size.
         /// It is usually 4KiB.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         std::size_t get_virtual_memory_page_size() noexcept;
 
         /// Reserves virtual memory.
@@ -52,33 +52,33 @@ namespace wpi
         /// \returns The address of the first reserved page,
         /// or \c nullptr in case of error.
         /// \note The memory may not be used, it must first be commited.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         void* virtual_memory_reserve(std::size_t no_pages) noexcept;
 
         /// Releases reserved virtual memory.
         /// \effects Returns previously reserved pages to the system.
         /// \requires \c pages must come from a previous call to \ref virtual_memory_reserve with the same \c calc_no_pages,
         /// it must not be \c nullptr.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         void virtual_memory_release(void* pages, std::size_t no_pages) noexcept;
 
         /// Commits reserved virtual memory.
         /// \effects Marks \c calc_no_pages pages starting at the given address available for use.
         /// \returns The beginning of the committed area, i.e. \c memory, or \c nullptr in case of error.
         /// \requires The memory must be previously reserved.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         void* virtual_memory_commit(void* memory, std::size_t no_pages) noexcept;
 
         /// Decommits commited virtual memory.
         /// \effects Puts commited memory back in the reserved state.
         /// \requires \c memory must come from a previous call to \ref virtual_memory_commit with the same \c calc_no_pages
         /// it must not be \c nullptr.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         void virtual_memory_decommit(void* memory, std::size_t no_pages) noexcept;
 
         /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory using the virtual memory allocation functions.
         /// It does not prereserve any memory and will always reserve and commit combined.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         class virtual_memory_allocator
         : WPI_EBO(detail::global_leak_checker<detail::virtual_memory_allocator_leak_handler>)
         {
@@ -125,7 +125,7 @@ namespace wpi
         /// A \concept{concept_blockallocator,BlockAllocator} that reserves virtual memory and commits it part by part.
         /// It is similar to \ref memory_stack but does not support growing and uses virtual memory,
         /// also meant for big blocks not small allocations.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         class virtual_block_allocator
         {
         public:

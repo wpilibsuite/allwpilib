@@ -42,7 +42,7 @@ namespace wpi
         /// for example in a node based container like \c std::list.
         /// It is not so good for different allocation sizes and has some drawbacks for arrays
         /// as described in \ref memory_pool_type.hpp.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <typename PoolType = node_pool, class BlockOrRawAllocator = default_allocator>
         class memory_pool
         : WPI_EBO(detail::default_leak_checker<detail::memory_pool_leak_handler>)
@@ -280,7 +280,7 @@ namespace wpi
         /// Specialization of the \ref allocator_traits for \ref memory_pool classes.
         /// \note It is not allowed to mix calls through the specialization and through the member functions,
         /// i.e. \ref memory_pool::allocate_node() and this \c allocate_node().
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <typename PoolType, class ImplRawAllocator>
         class allocator_traits<memory_pool<PoolType, ImplRawAllocator>>
         {
@@ -360,7 +360,7 @@ namespace wpi
         };
 
         /// Specialization of the \ref composable_allocator_traits for \ref memory_pool classes.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <typename PoolType, class BlockOrRawAllocator>
         class composable_allocator_traits<memory_pool<PoolType, BlockOrRawAllocator>>
         {

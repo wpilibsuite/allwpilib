@@ -32,7 +32,7 @@ namespace wpi
         /// effectively releasing all of its memory.
         /// Any memory allocated will thus be usable for `N` iterations of the loop.
         /// This type of allocator is a generalization of the double frame allocator.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <std::size_t N, class BlockOrRawAllocator = default_allocator>
         class iteration_allocator
         : WPI_EBO(detail::iteration_block_allocator<BlockOrRawAllocator>)
@@ -187,7 +187,7 @@ namespace wpi
         };
 
         /// An alias for \ref iteration_allocator for two iterations.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class BlockOrRawAllocator = default_allocator>
         WPI_ALIAS_TEMPLATE(double_frame_allocator,
                                  iteration_allocator<2, BlockOrRawAllocator>);
@@ -199,7 +199,7 @@ namespace wpi
         /// Specialization of the \ref allocator_traits for \ref iteration_allocator.
         /// \note It is not allowed to mix calls through the specialization and through the member functions,
         /// i.e. \ref memory_stack::allocate() and this \c allocate_node().
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <std::size_t N, class BlockAllocator>
         class allocator_traits<iteration_allocator<N, BlockAllocator>>
         {
@@ -256,7 +256,7 @@ namespace wpi
         };
 
         /// Specialization of the \ref composable_allocator_traits for \ref iteration_allocator classes.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <std::size_t N, class BlockAllocator>
         class composable_allocator_traits<iteration_allocator<N, BlockAllocator>>
         {

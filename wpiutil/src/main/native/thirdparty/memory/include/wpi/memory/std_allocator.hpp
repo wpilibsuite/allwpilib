@@ -44,7 +44,7 @@ namespace wpi
         } // namespace traits_detail
 
         /// Controls the propagation of a \ref std_allocator for a certain \concept{concept_rawallocator,RawAllocator}.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <class RawAllocator>
         struct propagation_traits
         {
@@ -69,7 +69,7 @@ namespace wpi
 
         /// Wraps a \concept{concept_rawallocator,RawAllocator} and makes it a "normal" \c Allocator.
         /// It allows using a \c RawAllocator anywhere a \c Allocator is required.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename T, class RawAllocator>
         class std_allocator :
 #if defined _MSC_VER && defined __clang__
@@ -344,7 +344,7 @@ namespace wpi
         /// An alias template for \ref std_allocator using a type-erased \concept{concept_rawallocator,RawAllocator}.
         /// This is the same as using a \ref std_allocator with the tag type \ref any_allocator.
         /// The implementation is optimized to call fewer virtual functions.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename T>
         WPI_ALIAS_TEMPLATE(any_std_allocator, std_allocator<T, any_allocator>);
 

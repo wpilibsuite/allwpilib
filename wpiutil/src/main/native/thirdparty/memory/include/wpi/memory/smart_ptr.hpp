@@ -88,7 +88,7 @@ namespace wpi
         /// A \c std::unique_ptr that deletes using a \concept{concept_rawallocator,RawAllocator}.
         ///
         /// It is an alias template using \ref allocator_deleter as \c Deleter class.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename T, class RawAllocator>
         WPI_ALIAS_TEMPLATE(unique_ptr,
                                  std::unique_ptr<T, allocator_deleter<T, RawAllocator>>);
@@ -99,7 +99,7 @@ namespace wpi
         /// and is meant to be used inside containers.
         /// It is an alias template using \ref allocator_polymorphic_deleter as \c Deleter class.
         /// \note It has a relatively high overhead, so only use it if you have to.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <class BaseType, class RawAllocator>
         WPI_ALIAS_TEMPLATE(
             unique_base_ptr,
@@ -111,7 +111,7 @@ namespace wpi
         /// \returns A \c std::unique_ptr owning that memory.
         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the deleter,
         /// the caller has to ensure that the object lives as long as the smart pointer.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename T, class RawAllocator, typename... Args>
         auto allocate_unique(RawAllocator&& alloc, Args&&... args) -> WPI_REQUIRES_RET(
             !std::is_array<T>::value,
@@ -129,7 +129,7 @@ namespace wpi
         /// \returns A \c std::unique_ptr with a type-erased allocator reference owning that memory.
         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the deleter,
         /// the caller has to ensure that the object lives as long as the smart pointer.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename T, class RawAllocator, typename... Args>
         auto allocate_unique(any_allocator, RawAllocator&& alloc, Args&&... args)
             -> WPI_REQUIRES_RET(!std::is_array<T>::value,
@@ -146,7 +146,7 @@ namespace wpi
         /// \returns A \c std::unique_ptr owning that array.
         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the deleter,
         /// the caller has to ensure that the object lives as long as the smart pointer.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename T, class RawAllocator>
         auto allocate_unique(RawAllocator&& alloc, std::size_t size) -> WPI_REQUIRES_RET(
             std::is_array<T>::value,
@@ -164,7 +164,7 @@ namespace wpi
         /// \returns A \c std::unique_ptr with a type-erased allocator reference owning that array.
         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the deleter,
         /// the caller has to ensure that the object lives as long as the smart pointer.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename T, class RawAllocator>
         auto allocate_unique(any_allocator, RawAllocator&& alloc, std::size_t size)
             -> WPI_REQUIRES_RET(std::is_array<T>::value,
@@ -183,7 +183,7 @@ namespace wpi
         /// \returns A \c std::shared_ptr created using \c std::allocate_shared.
         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the shared pointer,
         /// the caller has to ensure that the object lives as long as the smart pointer.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <typename T, class RawAllocator, typename... Args>
         std::shared_ptr<T> allocate_shared(RawAllocator&& alloc, Args&&... args)
         {

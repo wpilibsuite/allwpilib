@@ -88,7 +88,7 @@ namespace wpi
         /// A \concept{concept_rawallocator,RawAllocator} that stores another allocator.
         /// The \concept{concept_storagepolicy,StoragePolicy} defines the allocator type being stored and how it is stored.
         /// The \c Mutex controls synchronization of the access.
-        /// \ingroup storage
+        /// \ingroup memory_storage
         template <class StoragePolicy, class Mutex>
         class allocator_storage
         : WPI_EBO(StoragePolicy,
@@ -317,14 +317,14 @@ namespace wpi
 
         /// Tag type that enables type-erasure in \ref reference_storage.
         /// It can be used everywhere a \ref allocator_reference is used internally.
-        /// \ingroup storage
+        /// \ingroup memory_storage
         struct any_allocator
         {
         };
 
         /// A \concept{concept_storagepolicy,StoragePolicy} that stores the allocator directly.
         /// It embeds the allocator inside it, i.e. moving the storage policy will move the allocator.
-        /// \ingroup storage
+        /// \ingroup memory_storage
         template <class RawAllocator>
         class direct_storage : WPI_EBO(allocator_traits<RawAllocator>::allocator_type)
         {
@@ -381,7 +381,7 @@ namespace wpi
         /// An alias template for \ref allocator_storage using the \ref direct_storage policy without a mutex.
         /// It has the effect of giving any \concept{concept_rawallocator,RawAllocator} the interface with all member functions,
         /// avoiding the need to wrap it inside the \ref allocator_traits.
-        /// \ingroup storage
+        /// \ingroup memory_storage
         template <class RawAllocator>
         WPI_ALIAS_TEMPLATE(allocator_adapter,
                                  allocator_storage<direct_storage<RawAllocator>, no_mutex>);
@@ -399,7 +399,7 @@ namespace wpi
 /// It has a similar effect as \ref allocator_adapter but performs synchronization.
 /// The \c Mutex will default to \c std::mutex if threading is supported,
 /// otherwise there is no default.
-/// \ingroup storage
+/// \ingroup memory_storage
 #if WPI_HOSTED_IMPLEMENTATION
         template <class RawAllocator, class Mutex = std::mutex>
         WPI_ALIAS_TEMPLATE(thread_safe_allocator,
@@ -528,7 +528,7 @@ namespace wpi
         /// Specialize it for your own types, if they provide sharing semantics and can be copied.
         /// They also must provide an `operator==` to check whether two allocators refer to the same shared one.
         /// \note This makes no guarantees about the lifetime of the shared object, the sharing allocators can either own or refer to a shared object.
-        /// \ingroup storage
+        /// \ingroup memory_storage
         template <class RawAllocator>
         struct is_shared_allocator : std::false_type
         {
@@ -540,7 +540,7 @@ namespace wpi
         /// For allocators that are already shared (determined through \ref is_shared_allocator) it will store the allocator type directly.
         /// \note It does not take ownership over the allocator in the stateful case, the user has to ensure that the allocator object stays valid.
         /// In the other cases the lifetime does not matter.
-        /// \ingroup storage
+        /// \ingroup memory_storage
         template <class RawAllocator>
         class reference_storage
 #ifndef DOXYGEN
@@ -611,7 +611,7 @@ namespace wpi
         /// Specialization of the class template \ref reference_storage that is type-erased.
         /// It is triggered by the tag type \ref any_allocator.
         /// The specialization can store a reference to any allocator type.
-        /// \ingroup storage
+        /// \ingroup memory_storage
         template <>
         class reference_storage<any_allocator>
         {
@@ -894,7 +894,7 @@ namespace wpi
         /// An alias template for \ref allocator_storage using the \ref reference_storage policy.
         /// It will store a reference to the given allocator type. The tag type \ref any_allocator enables type-erasure.
         /// Wrap the allocator in a \ref thread_safe_allocator if you want thread safety.
-        /// \ingroup storage
+        /// \ingroup memory_storage
         template <class RawAllocator>
         WPI_ALIAS_TEMPLATE(allocator_reference,
                                  allocator_storage<reference_storage<RawAllocator>, no_mutex>);
@@ -909,14 +909,14 @@ namespace wpi
         }
 
         /// An alias for the \ref reference_storage specialization using type-erasure.
-        /// \ingroup storage
+        /// \ingroup memory_storage
         using any_reference_storage = reference_storage<any_allocator>;
 
         /// An alias for \ref allocator_storage using the \ref any_reference_storage.
         /// It will store a reference to any \concept{concept_rawallocator,RawAllocator}.
         /// This is the same as passing the tag type \ref any_allocator to the alias \ref allocator_reference.
         /// Wrap the allocator in a \ref thread_safe_allocator if you want thread safety.
-        /// \ingroup storage
+        /// \ingroup memory_storage
         using any_allocator_reference = allocator_storage<any_reference_storage, no_mutex>;
 
         /// \returns A new \ref any_allocator_reference object by forwarding the allocator to the constructor.
