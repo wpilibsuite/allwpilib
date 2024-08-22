@@ -129,7 +129,8 @@ target_link_libraries(protobuf wpiutil)
 add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
 
 wpi_protobuf_generate(
-    TARGET protobuf
+    TARGET
+    protobuf
     PROTOS ${wpimath_proto_src}
     PLUGIN ${PROTOC_WPILIB_PLUGIN}
     PROTOC_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
