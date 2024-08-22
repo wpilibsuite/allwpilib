@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "org.ysb33r.doxygen" version "0.7.0"
+    id "org.ysb33r.doxygen" version "1.0.3"
 }
 
 evaluationDependsOn(':apriltag')
@@ -51,15 +51,15 @@ doxygen {
     String arch = System.getProperty("os.arch");
     if (arch.equals("x86_64") || arch.equals("amd64")) {
         executables {
-            doxygen version : '1.10.0',
-            baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+            doxygen {
+                executableByVersion('1.12.0')
+            }
         }
     }
 }
 
 doxygen {
-    generate_html true
-    html_extra_stylesheet 'theme.css'
+    template 'Doxyfile'
 
     cppProjectZips.each {
         dependsOn it
@@ -156,48 +156,14 @@ doxygen {
     exclude '**/.clang-tidy'
     exclude '**/.clang-format'
 
-    aliases 'effects=\\par <i>Effects:</i>^^',
-            'notes=\\par <i>Notes:</i>^^',
-            'requires=\\par <i>Requires:</i>^^',
-            'requiredbe=\\par <i>Required Behavior:</i>^^',
-            'concept{2}=<a href=\"md_doc_concepts.html#\1\">\2</a>',
-            'defaultbe=\\par <i>Default Behavior:</i>^^'
-    case_sense_names false
-    extension_mapping 'inc=C++', 'no_extension=C++'
-    extract_all true
-    extract_static true
-    file_patterns '*'
-    full_path_names true
-    full_sidebar false
-    generate_html true
-    generate_latex false
-    generate_treeview true
-    html_extra_stylesheet 'theme.css'
-    html_colorstyle 'LIGHT'
-    html_timestamp true
-    javadoc_autobrief true
-    project_name 'WPILibC++'
-    project_logo '../wpiutil/src/main/native/resources/wpilib-128.png'
-    project_number wpilibVersioning.version.get()
-    quiet true
-    recursive true
-    strip_code_comments false
-    strip_from_inc_path cppIncludeRoots as String[]
-    strip_from_path cppIncludeRoots as String[]
-    use_mathjax true
-    warnings true
-    warn_if_incomplete_doc true
-    warn_if_undocumented true
-    warn_no_paramdoc true
-
-    enable_preprocessing true
-    macro_expansion true
-    expand_only_predef true
-    predefined "__cplusplus\"\\\n" +
-            "\"HAL_ENUM(name)=enum name : int32_t"
+    option 'project_name', 'WPILibC++'
+    option 'project_logo', '../wpiutil/src/main/native/resources/wpilib-128.png'
+    option 'project_number', wpilibVersioning.version.get()
+    option 'strip_from_inc_path', cppIncludeRoots
+    option 'strip_from_path', cppIncludeRoots
 
     if (project.hasProperty('docWarningsAsErrors')) {
-        warn_as_error 'FAIL_ON_WARNINGS'
+        option 'warn_as_error', 'FAIL_ON_WARNINGS_PRINT'
     }
 }
 
