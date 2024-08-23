@@ -1,0 +1,5 @@
+filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
+    visibility = ["//wpilibj:__subpackages__"],
+)

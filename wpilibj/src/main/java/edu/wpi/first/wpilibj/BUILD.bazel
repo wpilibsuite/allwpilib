@@ -1,0 +1,19 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "wpilibj",
+    srcs = ["//wpilibj/src/generate:generate-version"] + glob(["**/*.java"]) + ["//wpilibj:generated_java"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cameraserver/src/main/java/edu/wpi/first:cameraserver",
+        "//cscore/src/main/java/edu/wpi/first/cscore",
+        "//hal/src/main/java/edu/wpi/first/hal",
+        "//ntcore/src/main/java/edu/wpi/first/networktables",
+        "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
+        "//wpinet/src/main/java/edu/wpi/first/net:wpinet",
+        "//wpiunits/src/main/java/edu/wpi/first/units:wpiunits",
+        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+        "@maven//:org_ejml_ejml_core",
+        "@maven//:org_ejml_ejml_simple",
+    ],
+)

@@ -1,0 +1,12 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+
+java_binary(
+    name = "DevMain",
+    srcs = ["DevMain.java"],
+    deps = [
+        "//hal/src/main/java/edu/wpi/first/hal",
+        "//ntcore/src/main/java/edu/wpi/first/networktables",
+        "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
+        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+    ],
+)
