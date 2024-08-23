@@ -1,0 +1,118 @@
+name: Bazel
+
+on: [pull_request, push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "--noenable_bzlmod --config=windows",     }
+          - { name: "Windows (arm)",                os: windows-2022, action: "build", config: "--noenable_bzlmod --config=windows_arm", }
+          - { name: "Windows (roborio)",            os: windows-2022, action: "build", config: "--noenable_bzlmod --config=roborio",     }
+
+    name: "Build ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 17
+          architecture: x64
+
+      - name: Build
+        run: bazel --output_user_root=C:\\bazelroot ${{ matrix.action }} -k ...   --config=ci ${{ matrix.config }} --verbose_failures
+        shell: bash
+
+  build-mac:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: "Mac (native)",            os: macos-14,   action: "test",  config: "--noenable_bzlmod --config=osx -c opt",      }
+          - { name: "Mac (roborio)",           os: macos-14,   action: "build", config: "--noenable_bzlmod --config=roborio -c opt",  }
+
+    name: "${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Build
+        run: bazel ${{ matrix.action }} -k ...   --config=ci ${{ matrix.config }} --nojava_header_compilation --verbose_failures
+        shell: bash
+
+  build-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: "Linux (native)",  os: ubuntu-22.04,   action: "test",  config: "--noenable_bzlmod --config=linux -c opt",    }
+          - { name: "Linux (roborio)", os: ubuntu-22.04,   action: "build", config: "--noenable_bzlmod --config=roborio -c opt",  }
+    name: "${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Build and Test
+        run: bazel ${{ matrix.action }} ... --config=ci ${{ matrix.config }} -k --verbose_failures
+
+  build-sanitizers:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - config: "asan"
+          - config: "ubsan"
+    runs-on: ubuntu-22.04
+    container: wpilib/ubuntu-base:22.04
+    name: "Sanitizer ${{ matrix.config }}"
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: bazelbuild/setup-bazelisk@v3
+      - name: Build and Test
+        run: bazel test  -k --config=ci --noenable_bzlmod --config=linux --config=${{ matrix.config }} //...
+
+  buildifier:
+    name: "buildifier"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up Go 1.15.x
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.15.x
+        id: go
+
+      - name: Install Buildifier
+        run: |
+          cd $(mktemp -d)
+          GO111MODULE=on go get github.com/bazelbuild/buildtools/buildifier@6.0.0
+
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Run buildifier
+        run: buildifier -warnings all --lint=fix -r .
+
+      - name: Check Output
+        run: git --no-pager diff --exit-code HEAD
+
+      - name: Generate diff
+        run: git diff HEAD > bazel-lint-fixes.patch
+        if: ${{ failure() }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-bazel-lint-fixes
+          path: bazel-lint-fixes.patch
+        if: ${{ failure() }}

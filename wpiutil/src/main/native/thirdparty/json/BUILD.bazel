@@ -1,0 +1,11 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "json-headers",
+    hdrs = glob([
+        "include/**/*.h",
+    ]),
+    includes = ["include"],
+    strip_include_prefix = "include",
+    visibility = ["//wpiutil:__subpackages__"],
+)
