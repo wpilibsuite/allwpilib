@@ -39,7 +39,7 @@ index a513cb98b69b9cc1b7b74ecc10ce5ab1feccc541..2f9846437619897c871d267963f14388
  
          for (int i = 0; i < zarray_size(quads); i++) {
 diff --git a/apriltag_quad_thresh.c b/apriltag_quad_thresh.c
-index a70c5df7827245351d8f080ec8d062217348deef..c7c016915df778c300d4e42e2344ec6fc10e5832 100644
+index 2b57774065d231abd5129acbc97e1a63e9e53d95..f8f6aff721ced5edad460512db7bb953296b92c6 100644
 --- a/apriltag_quad_thresh.c
 +++ b/apriltag_quad_thresh.c
 @@ -41,7 +41,6 @@ either expressed or implied, of the Regents of The University of Michigan.
@@ -50,7 +50,7 @@ index a70c5df7827245351d8f080ec8d062217348deef..c7c016915df778c300d4e42e2344ec6f
  #include "common/math_util.h"
  
  #ifdef _WIN32
-@@ -1960,8 +1959,6 @@ zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
+@@ -1961,8 +1960,6 @@ zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
          fprintf(f, "0 %d translate\n", im2->height);
          fprintf(f, "1 -1 scale\n");
  

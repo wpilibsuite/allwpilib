@@ -262,17 +262,17 @@ index 8016386ed214de371eae619f4e887aef01852408..197d6ceb330a4414483bd9db66e091d4
      timeprofile_t *tp = (timeprofile_t*) calloc(1, sizeof(timeprofile_t));
      tp->stamps = zarray_create(sizeof(struct timeprofile_entry));
 diff --git a/common/workerpool.c b/common/workerpool.c
-index 359abfefe345a94ec960f6a5b1a35f3d246f3a95..ecb2782e1eabac686b9a1a7693767a88956f81b8 100644
+index 6b73541c09025ef907e2c3c598343955a14c3e7e..25dccd0a341cfb3991e735d7a3b2bd6b8f6c299a 100644
 --- a/common/workerpool.c
 +++ b/common/workerpool.c
-@@ -196,7 +196,7 @@ void workerpool_run(workerpool_t *wp)
+@@ -213,7 +213,7 @@ void workerpool_run(workerpool_t *wp)
      }
  }
  
 -int workerpool_get_nprocs()
 +int workerpool_get_nprocs(void)
  {
- #ifdef WIN32
+ #ifdef _WIN32
      SYSTEM_INFO sysinfo;
 diff --git a/common/workerpool.h b/common/workerpool.h
 index 2c32ab1eb7f9fe1e803aef187d4af3aea9284238..070a983cbb0ce24450297dba2f58a903977c5a24 100644
@@ -350,10 +350,10 @@ index 9197c8b367d4b2047cb7d9882dfc11092f0b3dce..6e0107d28f3c3da6ae148a9005077427
  
  #ifdef __cplusplus
 diff --git a/tag36h10.c b/tag36h10.c
-index 44a129e74b135e803e2324cea179ac3001718e14..843dc4e9dcb3fbde3d86ce0a7d18703f7c358c15 100644
+index 9c02c34c5db82f693191acc8975ef514f04588d5..e103748df2ac11201959747e182a17c3f4710b11 100644
 --- a/tag36h10.c
 +++ b/tag36h10.c
-@@ -2323,7 +2323,7 @@ static uint64_t codedata[2320] = {
+@@ -2350,7 +2350,7 @@ static uint64_t codedata[2320] = {
     0x0000000447b9e7acUL,
     0x0000000d9f564f30UL,
  };
