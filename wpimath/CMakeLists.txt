@@ -137,21 +137,24 @@ wpi_protobuf_generate(
 )
 
 if(MSVC)
+    get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+    set(CONFIG_SUFFIX "$<$<BOOL:${IS_MULTI_CONFIG}>:_$<CONFIG>>")
     file(
         GENERATE OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/protobuf_objects.txt
+        ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
         CONTENT $<LIST:JOIN,$<TARGET_OBJECTS:protobuf>,\n>
     )
     add_custom_command(
         TARGET wpimath
         PRE_LINK
         COMMAND
-            cmake -E __create_def ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/protobuf_exports.def
-            ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/protobuf_objects.txt
+            cmake -E __create_def ${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports${CONFIG_SUFFIX}.def
+            ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
     )
     target_link_options(
         wpimath
-        PRIVATE /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/protobuf_exports.def>
+        PRIVATE
+            /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports${CONFIG_SUFFIX}.def>
     )
 endif()
 
