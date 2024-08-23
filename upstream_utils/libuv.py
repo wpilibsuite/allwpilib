@@ -24,7 +24,8 @@ def copy_upstream_src(wpilib_root):
     ]
 
     walk_cwd_and_copy_if(
-        lambda dp, f: dp.startswith(os.path.join(".", "include")) and f not in include_ignorelist,
+        lambda dp, f: dp.startswith(os.path.join(".", "include"))
+        and f not in include_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
     )
 
@@ -45,7 +46,8 @@ def copy_upstream_src(wpilib_root):
         "sysinfo-memory.c",
     ]
     walk_cwd_and_copy_if(
-        lambda dp, f: dp.startswith(os.path.join(".", "src")) and f not in src_ignorelist,
+        lambda dp, f: dp.startswith(os.path.join(".", "src"))
+        and f not in src_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
         rename_c_to_cpp=True,
     )

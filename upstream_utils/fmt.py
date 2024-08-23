@@ -21,7 +21,9 @@ def copy_upstream_src(wpilib_root):
 
     # Copy fmt source files into allwpilib
     walk_cwd_and_copy_if(
-        lambda dp, f: dp.startswith(os.path.join(".","src")) and f.endswith(".cc") and f != "fmt.cc",
+        lambda dp, f: dp.startswith(os.path.join(".", "src"))
+        and f.endswith(".cc")
+        and f != "fmt.cc",
         os.path.join(wpiutil, "src/main/native/thirdparty/fmtlib"),
     )
 
