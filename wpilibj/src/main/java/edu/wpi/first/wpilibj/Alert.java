@@ -22,6 +22,9 @@ import java.util.Map;
  * <p>Alerts should be created once and stored persistently, then updated to "active" or "inactive"
  * as necessary. {@link #set(boolean)} can be safely called periodically.
  *
+ * <p><b>This API is new for 2025, but is likely to change in future seasons to facilitate deeper
+ * integration with the robot control system.</b>
+ *
  * <pre>
  * class Robot {
  *   Alert alert = new Alert("Something went wrong", AlertType.kWarning);

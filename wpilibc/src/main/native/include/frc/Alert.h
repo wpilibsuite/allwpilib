@@ -26,6 +26,9 @@ namespace frc {
  * Alerts should be created once and stored persistently, then updated to
  * "active" or "inactive" as necessary. Set(bool) can be safely called
  * periodically.
+ * 
+ * This API is new for 2025, but is likely to change in future seasons to
+ * facilitate deeper integration with the robot control system.
  *
  * <pre>
  * class Robot {
