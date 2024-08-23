@@ -39,7 +39,7 @@ def copy_upstream_src(wpilib_root):
         if f.endswith("CMakeLists.txt"):
             return False
 
-        if dp.startswith("./src"):
+        if dp.startswith(os.path.join(".", "src")):
             return True
 
         return False
@@ -50,7 +50,7 @@ def copy_upstream_src(wpilib_root):
     )
 
     def cmake_filter(dp, f):
-        if dp.startswith("./CMake"):
+        if dp.startswith(os.path.join(".", "CMake")):
             return True
 
         path = os.path.join(dp, f)

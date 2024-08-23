@@ -19,7 +19,7 @@ def eigen_inclusions(dp, f):
     dp -- directory path
     f -- filename
     """
-    if not dp.startswith("./Eigen"):
+    if not dp.startswith(os.path.join(".", "Eigen")):
         return False
 
     abspath = os.path.join(dp, f)
@@ -79,7 +79,7 @@ def unsupported_inclusions(dp, f):
     dp -- directory path
     f -- filename
     """
-    if not dp.startswith("./unsupported"):
+    if not dp.startswith(os.path.join(".", "unsupported")):
         return False
 
     abspath = os.path.join(dp, f)
