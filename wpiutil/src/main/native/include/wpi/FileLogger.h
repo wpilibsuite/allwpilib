@@ -16,6 +16,8 @@
 #include <utility>
 
 #include "wpi/DataLog.h"
+#include "wpi/SmallVector.h"
+#include "wpi/StringExtras.h"
 
 namespace wpi {
 /**
@@ -46,7 +48,11 @@ class FileLogger {
   FileLogger(std::string_view file, log::DataLog& log, std::string_view key)
       : FileLogger(file, [entry = log.Start(key, "string"),
                           &log](std::string_view data) {
-          log.AppendString(entry, data, 0);
+          wpi::SmallVector<std::string_view, 16> parts;
+          wpi::split(data, parts, "\n");
+          for (auto line : parts) {
+            log.AppendString(entry, line, 0);
+          }
         }) {}
   FileLogger(FileLogger&& other);
   FileLogger& operator=(FileLogger&& rhs);
