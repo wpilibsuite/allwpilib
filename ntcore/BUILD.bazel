@@ -1,0 +1,24 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "generated_cc_headers",
+    hdrs = glob(["src/generated/main/native/include/**"]),
+    includes = ["src/generated/main/native/include"],
+    strip_include_prefix = "src/generated/main/native/include",
+    visibility = ["//ntcore:__subpackages__"],
+)
+
+filegroup(
+    name = "generated_cc_source",
+    srcs = glob(
+        ["src/generated/main/native/cpp/**"],
+        exclude = ["src/generated/main/native/cpp/jni/**"],
+    ),
+    visibility = ["//ntcore:__subpackages__"],
+)
+
+filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
+    visibility = ["//ntcore:__subpackages__"],
+)

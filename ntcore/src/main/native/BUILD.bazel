@@ -1,0 +1,30 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "private_includes",
+    hdrs = glob([
+        "cpp/*.h",
+        "cpp/net/*.h",
+        "cpp/net/*.inc",
+        "cpp/net3/*.h",
+    ]),
+    strip_include_prefix = "cpp",
+)
+
+cc_library(
+    name = "ntcore.static",
+    srcs = glob(
+        ["cpp/**"],
+        exclude = ["cpp/jni/**"],
+    ) + ["//ntcore:generated_cc_source"],
+    hdrs = glob(["include/**/*"]),
+    includes = ["include"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":private_includes",
+        "//ntcore:generated_cc_headers",
+        "//wpinet/src/main/native:wpinet.static",
+        "//wpiutil/src/main/native:wpiutil.static",
+    ],
+)
