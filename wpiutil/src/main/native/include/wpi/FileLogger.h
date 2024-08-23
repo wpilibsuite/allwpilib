@@ -4,20 +4,11 @@
 
 #pragma once
 
-#ifdef __linux__
-#include <fcntl.h>
-#include <sys/inotify.h>
-#include <unistd.h>
-#endif
-
 #include <functional>
 #include <string_view>
 #include <thread>
-#include <utility>
 
 #include "wpi/DataLog.h"
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
 
 namespace wpi {
 /**
@@ -45,15 +36,7 @@ class FileLogger {
    * @param log A data log.
    * @param key The log key to append data to.
    */
-  FileLogger(std::string_view file, log::DataLog& log, std::string_view key)
-      : FileLogger(file, [entry = log.Start(key, "string"),
-                          &log](std::string_view data) {
-          wpi::SmallVector<std::string_view, 16> parts;
-          wpi::split(data, parts, "\n");
-          for (auto line : parts) {
-            log.AppendString(entry, line, 0);
-          }
-        }) {}
+  FileLogger(std::string_view file, log::DataLog& log, std::string_view key);
   FileLogger(FileLogger&& other);
   FileLogger& operator=(FileLogger&& rhs);
   ~FileLogger();

@@ -4,6 +4,21 @@
 
 #include "wpi/FileLogger.h"
 
+#ifdef __linux__
+#include <fcntl.h>
+#include <sys/inotify.h>
+#include <unistd.h>
+#endif
+
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <utility>
+
+#include <fmt/format.h>
+
+#include "wpi/StringExtras.h"
+
 namespace wpi {
 FileLogger::FileLogger(std::string_view file,
                        std::function<void(std::string_view)> callback)
@@ -26,6 +41,24 @@ FileLogger::FileLogger(std::string_view file,
 #endif
 {
 }
+FileLogger::FileLogger(std::string_view file, log::DataLog& log,
+                       std::string_view key)
+    : FileLogger(file, [entry = log.Start(key, "string"),
+                        buf = wpi::SmallVector<char, 16>{},
+                        &log](std::string_view data) mutable {
+        if (!wpi::contains(data, "\n")) {
+          buf.append(data.begin(), data.end());
+          return;
+        }
+        std::string_view line;
+        std::string combinedData = fmt::format("{}{}", buf.data(), data);
+        buf.clear();
+        do {
+          std::tie(line, combinedData) = wpi::split(combinedData, "\n");
+          log.AppendString(entry, line, 0);
+        } while (wpi::contains(combinedData, "\n"));
+        buf.append(combinedData.begin(), combinedData.end());
+      }) {}
 FileLogger::FileLogger(FileLogger&& other)
 #ifdef __linux__
     : m_fileHandle{std::exchange(other.m_fileHandle, -1)},
