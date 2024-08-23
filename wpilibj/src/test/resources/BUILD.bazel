@@ -1,0 +1,8 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "resources",
+    testonly = True,
+    resources = glob(["**"]),
+    visibility = ["//wpilibj/src/test:__subpackages__"],
+)
