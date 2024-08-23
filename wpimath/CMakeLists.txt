@@ -139,19 +139,19 @@ wpi_protobuf_generate(
 if(MSVC)
     file(
         GENERATE OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects.txt
+        ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/protobuf_objects.txt
         CONTENT $<LIST:JOIN,$<TARGET_OBJECTS:protobuf>,\n>
     )
     add_custom_command(
         TARGET wpimath
         PRE_LINK
         COMMAND
-            cmake -E __create_def ${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports.def
-            ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects.txt
+            cmake -E __create_def ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/protobuf_exports.def
+            ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/protobuf_objects.txt
     )
     target_link_options(
         wpimath
-        PRIVATE /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports.def>
+        PRIVATE /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/protobuf_exports.def>
     )
 endif()
 
