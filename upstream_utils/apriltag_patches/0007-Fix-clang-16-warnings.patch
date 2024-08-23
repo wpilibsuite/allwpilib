@@ -1,56 +1,51 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Thu, 29 Jun 2023 22:14:05 -0700
-Subject: [PATCH 9/9] Fix clang 16 warnings
+Subject: [PATCH 7/7] Fix clang 16 warnings
 
 ---
- apriltag.c                | 2 +-
- apriltag.h                | 2 +-
- common/g2d.c              | 2 +-
- common/g2d.h              | 2 +-
- common/getopt.c           | 2 +-
- common/getopt.h           | 2 +-
- common/math_util.h        | 4 ++--
- common/pthreads_cross.cpp | 6 +++---
- common/pthreads_cross.h   | 2 +-
- common/string_util.c      | 2 +-
- common/string_util.h      | 2 +-
- common/time_util.c        | 4 ++--
- common/time_util.h        | 4 ++--
- common/timeprofile.h      | 2 +-
- common/workerpool.c       | 8 ++++----
- common/workerpool.h       | 2 +-
- common/zarray.c           | 2 +-
- common/zarray.h           | 2 +-
- common/zhash.c            | 8 ++++----
- common/zhash.h            | 8 ++++----
- common/zmaxheap.c         | 4 ++--
- common/zmaxheap.h         | 2 +-
- tag16h5.c                 | 2 +-
- tag16h5.h                 | 2 +-
- tag25h9.c                 | 2 +-
- tag25h9.h                 | 2 +-
- tag36h10.c                | 2 +-
- tag36h10.h                | 2 +-
- tag36h11.c                | 2 +-
- tag36h11.h                | 2 +-
- tagCircle21h7.c           | 2 +-
- tagCircle21h7.h           | 2 +-
- tagCircle49h12.c          | 2 +-
- tagCircle49h12.h          | 2 +-
- tagCustom48h12.c          | 2 +-
- tagCustom48h12.h          | 2 +-
- tagStandard41h12.c        | 2 +-
- tagStandard41h12.h        | 2 +-
- tagStandard52h13.c        | 2 +-
- tagStandard52h13.h        | 2 +-
- 40 files changed, 55 insertions(+), 55 deletions(-)
+ apriltag.c              | 2 +-
+ apriltag.h              | 2 +-
+ common/g2d.c            | 2 +-
+ common/g2d.h            | 2 +-
+ common/getopt.c         | 2 +-
+ common/getopt.h         | 2 +-
+ common/math_util.h      | 4 ++--
+ common/pthreads_cross.c | 6 +++---
+ common/pthreads_cross.h | 2 +-
+ common/string_util.c    | 2 +-
+ common/string_util.h    | 2 +-
+ common/time_util.c      | 4 ++--
+ common/time_util.h      | 4 ++--
+ common/timeprofile.h    | 2 +-
+ common/workerpool.c     | 2 +-
+ common/workerpool.h     | 2 +-
+ common/zmaxheap.c       | 2 +-
+ tag16h5.c               | 2 +-
+ tag16h5.h               | 2 +-
+ tag25h9.c               | 2 +-
+ tag25h9.h               | 2 +-
+ tag36h10.c              | 2 +-
+ tag36h10.h              | 2 +-
+ tag36h11.c              | 2 +-
+ tag36h11.h              | 2 +-
+ tagCircle21h7.c         | 2 +-
+ tagCircle21h7.h         | 2 +-
+ tagCircle49h12.c        | 2 +-
+ tagCircle49h12.h        | 2 +-
+ tagCustom48h12.c        | 2 +-
+ tagCustom48h12.h        | 2 +-
+ tagStandard41h12.c      | 2 +-
+ tagStandard41h12.h      | 2 +-
+ tagStandard52h13.c      | 2 +-
+ tagStandard52h13.h      | 2 +-
+ 35 files changed, 40 insertions(+), 40 deletions(-)
 
 diff --git a/apriltag.c b/apriltag.c
-index b514d974971827e6a4f4f0a4fa12e6b0392d7282..bfff1ea9d502b8ef08d00e61d4c75a967c06462b 100644
+index 2f9846437619897c871d267963f143886f71b577..b7e24c4bc279643f478d810d494345216be991f1 100644
 --- a/apriltag.c
 +++ b/apriltag.c
-@@ -352,7 +352,7 @@ void apriltag_detector_clear_families(apriltag_detector_t *td)
+@@ -349,7 +349,7 @@ void apriltag_detector_clear_families(apriltag_detector_t *td)
      zarray_clear(td->tag_families);
  }
  
@@ -60,7 +55,7 @@ index b514d974971827e6a4f4f0a4fa12e6b0392d7282..bfff1ea9d502b8ef08d00e61d4c75a96
      apriltag_detector_t *td = (apriltag_detector_t*) calloc(1, sizeof(apriltag_detector_t));
  
 diff --git a/apriltag.h b/apriltag.h
-index 2d772cda60185de81fb279e83134074284b8e491..eb58a71d976ee84b94a232e3c778120a52f2b609 100644
+index 164ad8618f10ab2cbe489b813c9eed64be6e96e0..895b3459b8a84064989378fe533fd676964a1687 100644
 --- a/apriltag.h
 +++ b/apriltag.h
 @@ -231,7 +231,7 @@ struct apriltag_detection
@@ -73,10 +68,10 @@ index 2d772cda60185de81fb279e83134074284b8e491..eb58a71d976ee84b94a232e3c778120a
  // add a family to the apriltag detector. caller still "owns" the family.
  // a single instance should only be provided to one apriltag detector instance.
 diff --git a/common/g2d.c b/common/g2d.c
-index 4645f206e52ff14c20c04ec9601d20725339197b..e0106437717b872b8b9823135c076da7ba0a1e84 100644
+index ebb85e55975fd91c6fd6cde7830efa5185580e98..64c9b1b3342cc4b56de91733d720098bc9f09fff 100644
 --- a/common/g2d.c
 +++ b/common/g2d.c
-@@ -45,7 +45,7 @@ double g2d_distance(const double a[2], const double b[2])
+@@ -38,7 +38,7 @@ double g2d_distance(const double a[2], const double b[2])
      return sqrtf(sq(a[0]-b[0]) + sq(a[1]-b[1]));
  }
  
@@ -99,7 +94,7 @@ index 21c21ac64d8988578f3c2d108a7a07d54e780954..5a0dd0b59869099e24453eda78ada1e5
  void g2d_polygon_add(zarray_t *poly, double v[2]);
  
 diff --git a/common/getopt.c b/common/getopt.c
-index 71ae57bd83b2ed50c7f80f3e3952ddfcc53cb7bc..458ef7705019b73dcd4c9fa03fe15555ea087fcf 100644
+index 339d43f171b50af97201e934e8bfdafc0fc833cc..51fe9b9a8f61708cfd0704673fb95cac1b66ec75 100644
 --- a/common/getopt.c
 +++ b/common/getopt.c
 @@ -64,7 +64,7 @@ struct getopt
@@ -112,7 +107,7 @@ index 71ae57bd83b2ed50c7f80f3e3952ddfcc53cb7bc..458ef7705019b73dcd4c9fa03fe15555
      getopt_t *gopt = (getopt_t*) calloc(1, sizeof(getopt_t));
  
 diff --git a/common/getopt.h b/common/getopt.h
-index 69dbb05c8286a9d5d301382fc44fdea8c8f7875e..75266f033a0485b22cc34ec08e894781b6658894 100644
+index 1f0366283bf5edd4f01b4dfcd9254ec2cc2abd8e..1b2d69c982d6ba0ca4a960eea9e03340ba753e0e 100644
 --- a/common/getopt.h
 +++ b/common/getopt.h
 @@ -36,7 +36,7 @@ extern "C" {
@@ -122,13 +117,13 @@ index 69dbb05c8286a9d5d301382fc44fdea8c8f7875e..75266f033a0485b22cc34ec08e894781
 -getopt_t *getopt_create();
 +getopt_t *getopt_create(void);
  void getopt_destroy(getopt_t *gopt);
+ void getopt_option_destroy_void(void *goo);
  
- // Parse args. Returns 1 on success
 diff --git a/common/math_util.h b/common/math_util.h
-index 9271a01834501a311f28525ca460f61117524eab..5434355a512c1a6225bbfbf335caa279d17ed7aa 100644
+index aa08883608a8aca5cc7828134ecb4cd6e9f06a61..a68ed8bf8eda0a9e23cc4d2784ccc6b7d82701c4 100644
 --- a/common/math_util.h
 +++ b/common/math_util.h
-@@ -86,13 +86,13 @@ static inline double sgn(double v)
+@@ -74,13 +74,13 @@ static inline double sgn(double v)
  }
  
  // random number between [0, 1)
@@ -144,11 +139,11 @@ index 9271a01834501a311f28525ca460f61117524eab..5434355a512c1a6225bbfbf335caa279
  {
      return randf()*2 - 1;
  }
-diff --git a/common/pthreads_cross.cpp b/common/pthreads_cross.cpp
-index f7721912f9088bf84224943aa836a69356949f18..09d6ce6e97074f4ffbcef1ef6e06fd53ee22ff0f 100644
---- a/common/pthreads_cross.cpp
-+++ b/common/pthreads_cross.cpp
-@@ -216,7 +216,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
+diff --git a/common/pthreads_cross.c b/common/pthreads_cross.c
+index 3403863f385c96d089db9652079b038fea3e5f51..d48b81a1bbafa15f1c8a5b4fec6a755847947ce6 100644
+--- a/common/pthreads_cross.c
++++ b/common/pthreads_cross.c
+@@ -218,7 +218,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
      return 0;
  }
  
@@ -157,8 +152,8 @@ index f7721912f9088bf84224943aa836a69356949f18..09d6ce6e97074f4ffbcef1ef6e06fd53
      return (int)SwitchToThread();
  }
  
-@@ -241,7 +241,7 @@ unsigned int timespec_to_ms(const struct timespec *abstime)
-     return t;
+@@ -238,7 +238,7 @@ unsigned int timespec_to_ms(const struct timespec *abstime)
+     return ((abstime->tv_sec - time(NULL)) * 1000) + (abstime->tv_nsec / 1000000);
  }
  
 -unsigned int pcthread_get_num_procs()
@@ -166,7 +161,7 @@ index f7721912f9088bf84224943aa836a69356949f18..09d6ce6e97074f4ffbcef1ef6e06fd53
  {
      SYSTEM_INFO sysinfo;
  
-@@ -252,7 +252,7 @@ unsigned int pcthread_get_num_procs()
+@@ -249,7 +249,7 @@ unsigned int pcthread_get_num_procs()
  #else
  
  #include <unistd.h>
@@ -176,10 +171,10 @@ index f7721912f9088bf84224943aa836a69356949f18..09d6ce6e97074f4ffbcef1ef6e06fd53
      return (unsigned int)sysconf(_SC_NPROCESSORS_ONLN);
  }
 diff --git a/common/pthreads_cross.h b/common/pthreads_cross.h
-index 897a333573e88263b6ba58ec3d31031304c50e54..209c28f855efcbdf41424f11a302ba2794836796 100644
+index 5970c679316037505ee4dc1e96ab9fda1f4f60d5..89ff7cc79ba93a5676fbc8663fcd7127cd1757d9 100644
 --- a/common/pthreads_cross.h
 +++ b/common/pthreads_cross.h
-@@ -70,7 +70,7 @@ int sched_yield(void);
+@@ -71,7 +71,7 @@ int sched_yield(void);
  #ifdef __cplusplus
  extern "C" {
  #endif
@@ -189,7 +184,7 @@ index 897a333573e88263b6ba58ec3d31031304c50e54..209c28f855efcbdf41424f11a302ba27
  void ms_to_timespec(struct timespec *ts, unsigned int ms);
  unsigned int timespec_to_ms(const struct timespec *abstime);
 diff --git a/common/string_util.c b/common/string_util.c
-index 3d86eb2f2d602a5b00c29952808368dc73c0b0cd..14726e7a7f66a330b28ef326734cd7fd25e8d4dd 100644
+index 492eabfa09ef6219c6e74bfc7de6d4407ed913c7..f7da2b8d77960febe07c52f770a9c4e3bbda29f0 100644
 --- a/common/string_util.c
 +++ b/common/string_util.c
 @@ -314,7 +314,7 @@ char *str_touppercase(char *s)
@@ -202,7 +197,7 @@ index 3d86eb2f2d602a5b00c29952808368dc73c0b0cd..14726e7a7f66a330b28ef326734cd7fd
      string_buffer_t *sb = (string_buffer_t*) calloc(1, sizeof(string_buffer_t));
      assert(sb != NULL);
 diff --git a/common/string_util.h b/common/string_util.h
-index 9a7cd1e4509e3eba102316330cd50df918f56aed..d0363b03f23a94c35ed3581ea40f6d8f3f2d4110 100644
+index 6b5835553617ba16fc987edee5d2bc19e2824766..765f5a1d75e9327e6005e6d04db0c1da864ae91d 100644
 --- a/common/string_util.h
 +++ b/common/string_util.h
 @@ -262,7 +262,7 @@ char *str_replace(const char *haystack, const char *needle, const char *replacem
@@ -237,10 +232,10 @@ index 7a25f424068d798a8c65c69c6c17dd05b2e2b950..f3e3b0849bb8442ca1be6fda29ffcc79
      struct timeval tv;
      gettimeofday (&tv, NULL); // blacklist-ignore
 diff --git a/common/time_util.h b/common/time_util.h
-index 207e95838126a503567bf21b4bc8a3f32774afd8..c42466b3a0acdd322bd33aa9c77df09adc6585f1 100644
+index c1840495a370e196e30d0ab432ddda12f4cc4819..58da911010f0030e81c2a33d6a5002f671d38145 100644
 --- a/common/time_util.h
 +++ b/common/time_util.h
-@@ -56,10 +56,10 @@ extern "C" {
+@@ -58,10 +58,10 @@ extern "C" {
  #endif
  
  typedef struct timeutil_rest timeutil_rest_t;
@@ -267,35 +262,10 @@ index 8016386ed214de371eae619f4e887aef01852408..197d6ceb330a4414483bd9db66e091d4
      timeprofile_t *tp = (timeprofile_t*) calloc(1, sizeof(timeprofile_t));
      tp->stamps = zarray_create(sizeof(struct timeprofile_entry));
 diff --git a/common/workerpool.c b/common/workerpool.c
-index a0170ef87978cb4cd2d3d8a198ffea471b6e40b2..23415eb5610751ae7f861f1deb7b25c8e56774a3 100644
+index 359abfefe345a94ec960f6a5b1a35f3d246f3a95..ecb2782e1eabac686b9a1a7693767a88956f81b8 100644
 --- a/common/workerpool.c
 +++ b/common/workerpool.c
-@@ -66,7 +66,7 @@ void *worker_thread(void *p)
- {
-     workerpool_t *wp = (workerpool_t*) p;
- 
--    int cnt = 0;
-+//    int cnt = 0;
- 
-     while (1) {
-         struct task *task;
-@@ -77,13 +77,13 @@ void *worker_thread(void *p)
- //          printf("%"PRId64" thread %d did %d\n", utime_now(), pthread_self(), cnt);
-             pthread_cond_broadcast(&wp->endcond);
-             pthread_cond_wait(&wp->startcond, &wp->mutex);
--            cnt = 0;
-+//            cnt = 0;
- //            printf("%"PRId64" thread %d awake\n", utime_now(), pthread_self());
-         }
- 
-         zarray_get_volatile(wp->tasks, wp->taskspos, &task);
-         wp->taskspos++;
--        cnt++;
-+//        cnt++;
-         pthread_mutex_unlock(&wp->mutex);
- //        pthread_yield();
-         sched_yield();
-@@ -203,7 +203,7 @@ void workerpool_run(workerpool_t *wp)
+@@ -196,7 +196,7 @@ void workerpool_run(workerpool_t *wp)
      }
  }
  
@@ -314,126 +284,11 @@ index 2c32ab1eb7f9fe1e803aef187d4af3aea9284238..070a983cbb0ce24450297dba2f58a903
  
 -int workerpool_get_nprocs();
 +int workerpool_get_nprocs(void);
-diff --git a/common/zarray.c b/common/zarray.c
-index 43e6a7e0c6fb6d06414d6910e511d362ccc35354..fa1f8a25b6cad5661d70aa81b40b991126a9ac7c 100644
---- a/common/zarray.c
-+++ b/common/zarray.c
-@@ -41,7 +41,7 @@ int zstrcmp(const void * a_pp, const void * b_pp)
-     return strcmp(a,b);
- }
- 
--void zarray_vmap(zarray_t *za, void (*f)())
-+void zarray_vmap(zarray_t *za, void (*f)(void*))
- {
-     assert(za != NULL);
-     assert(f != NULL);
-diff --git a/common/zarray.h b/common/zarray.h
-index 22b4c2bb4773d5d80e33c14a7b4945ab18586939..411ee7b6495b4b37813d08dc42848ce96734fb39 100644
---- a/common/zarray.h
-+++ b/common/zarray.h
-@@ -355,7 +355,7 @@ static inline void zarray_map(zarray_t *za, void (*f)(void*))
-  *
-  * void map_function(element_type *element)
-  */
--    void zarray_vmap(zarray_t *za, void (*f)());
-+    void zarray_vmap(zarray_t *za, void (*f)(void*));
- 
- /**
-  * Removes all elements from the array and sets its size to zero. Pointers to
-diff --git a/common/zhash.c b/common/zhash.c
-index faf52233ed92f64b87ddbab255121c8202b13019..10eb6eb8a6e3ce70e51a117009dcbea3aa381d4c 100644
---- a/common/zhash.c
-+++ b/common/zhash.c
-@@ -352,7 +352,7 @@ void zhash_iterator_remove(zhash_iterator_t *zit)
-     zit->last_entry--;
- }
- 
--void zhash_map_keys(zhash_t *zh, void (*f)())
-+void zhash_map_keys(zhash_t *zh, void (*f)(void *))
- {
-     assert(zh != NULL);
-     if (f == NULL)
-@@ -368,7 +368,7 @@ void zhash_map_keys(zhash_t *zh, void (*f)())
-     }
- }
- 
--void zhash_vmap_keys(zhash_t * zh, void (*f)())
-+void zhash_vmap_keys(zhash_t * zh, void (*f)(void *))
- {
-     assert(zh != NULL);
-     if (f == NULL)
-@@ -385,7 +385,7 @@ void zhash_vmap_keys(zhash_t * zh, void (*f)())
-     }
- }
- 
--void zhash_map_values(zhash_t * zh, void (*f)())
-+void zhash_map_values(zhash_t * zh, void (*f)(void *))
- {
-     assert(zh != NULL);
-     if (f == NULL)
-@@ -400,7 +400,7 @@ void zhash_map_values(zhash_t * zh, void (*f)())
-     }
- }
- 
--void zhash_vmap_values(zhash_t * zh, void (*f)())
-+void zhash_vmap_values(zhash_t * zh, void (*f)(void *))
- {
-     assert(zh != NULL);
-     if (f == NULL)
-diff --git a/common/zhash.h b/common/zhash.h
-index f3dee1aa40f6f2717fa23d7e7f856bd8864a99b3..9993a66e4aed22d998d58e10a5d0db0193fcff95 100644
---- a/common/zhash.h
-+++ b/common/zhash.h
-@@ -259,7 +259,7 @@ void zhash_iterator_remove(zhash_iterator_t *zit);
-  * for the key, which the caller should not modify, as the hash table will not be
-  * re-indexed. The function may be NULL, in which case no action is taken.
-  */
--void zhash_map_keys(zhash_t *zh, void (*f)());
-+void zhash_map_keys(zhash_t *zh, void (*f)(void *));
- 
- /**
-  * Calls the supplied function with a pointer to every value in the hash table in
-@@ -267,7 +267,7 @@ void zhash_map_keys(zhash_t *zh, void (*f)());
-  * for the value, which the caller may safely modify. The function may be NULL,
-  * in which case no action is taken.
-  */
--void zhash_map_values(zhash_t *zh, void (*f)());
-+void zhash_map_values(zhash_t *zh, void (*f)(void *));
- 
- /**
-  * Calls the supplied function with a copy of every key in the hash table in
-@@ -280,7 +280,7 @@ void zhash_map_values(zhash_t *zh, void (*f)());
-  * Use with non-pointer keys (i.e. integer, double, etc.) will likely cause a
-  * segmentation fault.
-  */
--void zhash_vmap_keys(zhash_t *vh, void (*f)());
-+void zhash_vmap_keys(zhash_t *vh, void (*f)(void *));
- 
- /**
-  * Calls the supplied function with a copy of every value in the hash table in
-@@ -293,7 +293,7 @@ void zhash_vmap_keys(zhash_t *vh, void (*f)());
-  * Use with non-pointer values (i.e. integer, double, etc.) will likely cause a
-  * segmentation fault.
-  */
--void zhash_vmap_values(zhash_t *vh, void (*f)());
-+void zhash_vmap_values(zhash_t *vh, void (*f)(void *));
- 
- /**
-  * Returns an array which contains copies of all of the hash table's keys, in no
 diff --git a/common/zmaxheap.c b/common/zmaxheap.c
-index ed271420d229a98b56c7027f47d9830a78a97db1..a073ae5a17fdd5f11f4e17d56cc05548113f6a6c 100644
+index abbb549e41b6073f581b5c3216f024ed370b9212..af0cc1eedfc63670c51e5818444b6bc2d67d2c3a 100644
 --- a/common/zmaxheap.c
 +++ b/common/zmaxheap.c
-@@ -167,7 +167,7 @@ void zmaxheap_add(zmaxheap_t *heap, void *p, float v)
-     }
- }
- 
--void zmaxheap_vmap(zmaxheap_t *heap, void (*f)())
-+void zmaxheap_vmap(zmaxheap_t *heap, void (*f)(void*))
- {
-     assert(heap != NULL);
-     assert(f != NULL);
-@@ -358,7 +358,7 @@ void zmaxheap_iterator_finish(zmaxheap_iterator_t *it)
+@@ -357,7 +357,7 @@ void zmaxheap_iterator_finish(zmaxheap_iterator_t *it)
          maxheapify(heap, i);
  }
  
@@ -442,19 +297,6 @@ index ed271420d229a98b56c7027f47d9830a78a97db1..a073ae5a17fdd5f11f4e17d56cc05548
  {
      int cap = 10000;
      int sz = 0;
-diff --git a/common/zmaxheap.h b/common/zmaxheap.h
-index f0020f92e7a46c4814f30d77c189931e0e276d18..af9d1458c518e365828a5dd3bb7050cf57d2ce9b 100644
---- a/common/zmaxheap.h
-+++ b/common/zmaxheap.h
-@@ -39,7 +39,7 @@ struct zmaxheap_iterator {
- 
- zmaxheap_t *zmaxheap_create(size_t el_sz);
- 
--void zmaxheap_vmap(zmaxheap_t *heap, void (*f)());
-+void zmaxheap_vmap(zmaxheap_t *heap, void (*f)(void*));
- 
- void zmaxheap_destroy(zmaxheap_t *heap);
- 
 diff --git a/tag16h5.c b/tag16h5.c
 index 775f33c7e2d91af83e4a62949cadebdce34e3eb9..e38302a1d2ca2a2344a775569aed266d063a8861 100644
 --- a/tag16h5.c
