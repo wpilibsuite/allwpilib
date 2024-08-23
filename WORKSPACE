@@ -20,6 +20,7 @@ maven_artifacts = [
     "com.fasterxml.jackson.core:jackson-core:2.15.2",
     "com.fasterxml.jackson.core:jackson-databind:2.15.2",
     "us.hebi.quickbuf:quickbuf-runtime:1.3.3",
+    "com.google.code.gson:gson:2.10.1",
 ]
 
 maven_install(
