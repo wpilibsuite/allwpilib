@@ -1,0 +1,35 @@
+
+build:roborio --platforms=@rules_bzlmodrio_toolchains//platforms/roborio
+build:roborio --build_tag_filters=-no-roborio
+build:roborio --features=compiler_param_file
+build:roborio --platform_suffix=roborio
+build:roborio --incompatible_enable_cc_toolchain_resolution
+
+# C++ only
+build:roborio --cxxopt=-std=c++20
+build:roborio --cxxopt=-Wformat=2
+build:roborio --cxxopt=-pedantic
+build:roborio --cxxopt=-Wno-psabi
+build:roborio --cxxopt=-Wno-unused-parameter
+build:roborio --cxxopt=-fPIC
+build:roborio --cxxopt=-pthread
+
+build:roborio --cxxopt=-Wno-error=deprecated-declarations
+
+# Extra 11
+build:roborio --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+
+# C Only
+build:roborio --conlyopt=-Wformat=2
+build:roborio --conlyopt=-pedantic
+build:roborio --conlyopt=-Wno-psabi
+build:roborio --conlyopt=-Wno-unused-parameter
+build:roborio --conlyopt=-fPIC
+build:roborio --conlyopt=-pthread
+
+# Linker
+build:roborio --linkopt=-rdynamic
+build:roborio --linkopt=-pthread
+build:roborio --linkopt=-ldl
+build:roborio --linkopt=-latomic
+build:roborio --linkopt=-Wl,-rpath,'$ORIGIN'

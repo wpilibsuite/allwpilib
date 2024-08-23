@@ -1,0 +1,41 @@
+try-import %workspace%/user.bazelrc
+
+build --java_language_version=17
+build --java_runtime_version=roboriojdk_17
+build --tool_java_language_version=17
+build --tool_java_runtime_version=remotejdk_17
+
+test --test_output=errors
+test --test_verbose_timeout_warnings
+
+import shared/bazel/compiler_flags/sanitizers.rc
+import shared/bazel/compiler_flags/linux_flags.rc
+import shared/bazel/compiler_flags/osx_flags.rc
+import shared/bazel/compiler_flags/roborio_flags.rc
+import shared/bazel/compiler_flags/windows_flags.rc
+import shared/bazel/compiler_flags/windows_arm_flags.rc
+import shared/bazel/compiler_flags/coverage_flags.rc
+
+build:build_java --test_tag_filters=allwpilib-build-java --build_tag_filters=allwpilib-build-java
+build:build_cpp --test_tag_filters=+allwpilib-build-cpp --build_tag_filters=+allwpilib-build-cpp
+build:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
+test:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
+
+
+build:remote --bes_results_url=https://app.buildbuddy.io/invocation/
+build:remote --bes_backend=grpcs://cloud.buildbuddy.io
+build:remote --remote_cache=grpcs://cloud.buildbuddy.io
+build:remote --remote_timeout=3600
+
+# This config should be used locally. It downloads more than the CI version
+build:remote_user --config=remote
+build:remote_user --remote_download_toplevel
+
+# This config should be used on CI. It downloads at little as possible to complete the build
+build:ci --config=remote
+build:ci --remote_download_minimal
+
+build --proto_toolchain_for_cc=//:proto_cc_toolchain
+
+build:linux --per_file_copt=external/com_google_protobuf/...@-Wno-missing-field-initializers,-Wno-deprecated-enum-enum-conversion
+build:macos --per_file_copt=external/com_google_protobuf/...@-Wno-deprecated-non-prototype
