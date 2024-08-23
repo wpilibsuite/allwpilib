@@ -39,6 +39,7 @@ def copy_upstream_src(wpilib_root):
     src_files = walk_cwd_and_copy_if(
         lambda dp, f: (f.endswith(".c") or f.endswith(".cpp"))
         and not dp.startswith("./example")
+        and not dp.startswith("./test")
         and not f.endswith("getopt.c")
         and not "py" in f
         and not remove_tag(f),
