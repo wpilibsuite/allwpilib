@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ryan Blue <ryanzblue@gmail.com>
+Date: Fri, 23 Aug 2024 02:50:24 -0400
+Subject: [PATCH 8/8] Remove GCC diagnostic pragmas on windows
+
+---
+ common/pthreads_cross.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/common/pthreads_cross.c b/common/pthreads_cross.c
+index d48b81a1bbafa15f1c8a5b4fec6a755847947ce6..907fa62f3cf11f8afbe51a3ca5a492111720d707 100644
+--- a/common/pthreads_cross.c
++++ b/common/pthreads_cross.c
+@@ -44,10 +44,7 @@ int pthread_create(pthread_t *thread, pthread_attr_t *attr, void *(*start_routin
+     if (thread == NULL || start_routine == NULL)
+         return 1;
+ 
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wcast-function-type"
+     *thread = (HANDLE) CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, arg, 0, NULL);
+-#pragma GCC diagnostic pop
+     if (*thread == NULL)
+         return 1;
+     return 0;
