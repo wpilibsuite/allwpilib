@@ -1,0 +1,53 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+ATHENA_SRCS = glob([
+    "athena/*.cpp",
+    "athena/*.h",
+    "athena/cpp/*.cpp",
+    "athena/ctre/*.cpp",
+    "athena/ctre/*.h",
+    "athena/rev/*.cpp",
+    "athena/rev/*.h",
+    "athena/frccansae/*.h",
+    "athena/mockdata/*.cpp",
+])
+
+ATHENA_DEPS = ["@bzlmodrio-ni//libraries/cpp/ni:shared"]
+
+SIM_SRCS = glob([
+    "sim/*.cpp",
+    "sim/mockdata/*.cpp",
+    "sim/*.h",
+    "sim/mockdata/*.h",
+])
+
+SIM_DEPS = []
+
+HAL_DEPS = select({
+    "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ATHENA_DEPS,
+    "//conditions:default": SIM_DEPS,
+})
+
+filegroup(
+    name = "platform-srcs",
+    srcs = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ATHENA_SRCS,
+        "//conditions:default": SIM_SRCS,
+    }),
+)
+
+cc_library(
+    name = "wpiHal.static",
+    srcs = ["platform-srcs"] + glob(
+        ["cpp/**"],
+        exclude = ["cpp/jni/**"],
+    ),
+    hdrs = glob(["include/**/*"]),
+    includes = ["include"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//hal:generated_cc_headers",
+        "//wpiutil/src/main/native:wpiutil.static",
+    ] + HAL_DEPS,
+)
