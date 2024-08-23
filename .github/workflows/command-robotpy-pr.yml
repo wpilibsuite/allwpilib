@@ -1,16 +1,15 @@
 name: Comment on PR for robotpy
 
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
     paths:
-      - 'wpilibNewCommands/**'
+      - 'wpilibNewCommands/src/**/*.java'
 
 jobs:
   comment:
     permissions:
-      issues: write
       pull-requests: write
 
     runs-on: ubuntu-latest

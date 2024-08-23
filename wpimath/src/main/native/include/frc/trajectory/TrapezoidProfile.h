@@ -113,22 +113,6 @@ class TrapezoidProfile {
    *
    * @param t How long to advance from the current state toward the desired
    *     state.
-   * @return The position and velocity of the profile at time t.
-   * @deprecated Pass the desired and current state into calculate instead of
-   * constructing a new TrapezoidProfile with the desired and current state
-   */
-  [[deprecated(
-      "Pass the desired and current state into calculate instead of "
-      "constructing a new TrapezoidProfile with the desired and current "
-      "state")]]
-  State Calculate(units::second_t t) const;
-
-  /**
-   * Calculates the position and velocity for the profile at a time t where the
-   * current state is at time t = 0.
-   *
-   * @param t How long to advance from the current state toward the desired
-   *     state.
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
@@ -148,7 +132,7 @@ class TrapezoidProfile {
    *
    * @return The total time the profile takes to reach the goal.
    */
-  units::second_t TotalTime() const { return m_endDeccel; }
+  units::second_t TotalTime() const { return m_endDecel; }
 
   /**
    * Returns true if the profile has reached the goal.
@@ -190,7 +174,7 @@ class TrapezoidProfile {
 
   units::second_t m_endAccel;
   units::second_t m_endFullSpeed;
-  units::second_t m_endDeccel;
+  units::second_t m_endDecel;
 };
 }  // namespace frc
 

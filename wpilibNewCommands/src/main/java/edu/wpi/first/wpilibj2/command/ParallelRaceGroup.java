@@ -32,6 +32,7 @@ public class ParallelRaceGroup extends Command {
    *
    * @param commands the commands to include in this composition.
    */
+  @SuppressWarnings("this-escape")
   public ParallelRaceGroup(Command... commands) {
     addCommands(commands);
   }
@@ -41,6 +42,7 @@ public class ParallelRaceGroup extends Command {
    *
    * @param commands Commands to add to the group.
    */
+  @SuppressWarnings("PMD.UseArraysAsList")
   public final void addCommands(Command... commands) {
     if (!m_finished) {
       throw new IllegalStateException(
@@ -50,12 +52,12 @@ public class ParallelRaceGroup extends Command {
     CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
-      if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
+      if (!Collections.disjoint(command.getRequirements(), getRequirements())) {
         throw new IllegalArgumentException(
             "Multiple commands in a parallel composition cannot require the same subsystems");
       }
       m_commands.add(command);
-      m_requirements.addAll(command.getRequirements());
+      addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
       if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
         m_interruptBehavior = InterruptionBehavior.kCancelSelf;

@@ -26,26 +26,26 @@ public class TimedRobot extends IterativeRobotBase {
   @SuppressWarnings("MemberName")
   static class Callback implements Comparable<Callback> {
     public Runnable func;
-    public double period;
-    public double expirationTime;
+    public long period;
+    public long expirationTime;
 
     /**
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param startTimeSeconds The common starting point for all callback scheduling in seconds.
-     * @param periodSeconds The period at which to run the callback in seconds.
-     * @param offsetSeconds The offset from the common starting time in seconds.
+     * @param startTimeSeconds The common starting point for all callback scheduling in
+     *     microseconds.
+     * @param periodSeconds The period at which to run the callback in microseconds.
+     * @param offsetSeconds The offset from the common starting time in microseconds.
      */
-    Callback(Runnable func, double startTimeSeconds, double periodSeconds, double offsetSeconds) {
+    Callback(Runnable func, long startTimeUs, long periodUs, long offsetUs) {
       this.func = func;
-      this.period = periodSeconds;
+      this.period = periodUs;
       this.expirationTime =
-          startTimeSeconds
-              + offsetSeconds
-              + Math.floor((Timer.getFPGATimestamp() - startTimeSeconds) / this.period)
-                  * this.period
-              + this.period;
+          startTimeUs
+              + offsetUs
+              + this.period
+              + (RobotController.getFPGATime() - startTimeUs) / this.period * this.period;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class TimedRobot extends IterativeRobotBase {
     public int compareTo(Callback rhs) {
       // Elements with sooner expiration times are sorted as lesser. The head of
       // Java's PriorityQueue is the least element.
-      return Double.compare(expirationTime, rhs.expirationTime);
+      return Long.compare(expirationTime, rhs.expirationTime);
     }
   }
 
@@ -73,7 +73,7 @@ public class TimedRobot extends IterativeRobotBase {
   // just passed to the JNI bindings.
   private final int m_notifier = NotifierJNI.initializeNotifier();
 
-  private double m_startTime;
+  private long m_startTimeUs;
 
   private final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
@@ -89,7 +89,7 @@ public class TimedRobot extends IterativeRobotBase {
    */
   protected TimedRobot(double period) {
     super(period);
-    m_startTime = Timer.getFPGATimestamp();
+    m_startTimeUs = RobotController.getFPGATime();
     addPeriodic(this::loopFunc, period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
@@ -122,25 +122,33 @@ public class TimedRobot extends IterativeRobotBase {
       // at the end of the loop.
       var callback = m_callbacks.poll();
 
-      NotifierJNI.updateNotifierAlarm(m_notifier, (long) (callback.expirationTime * 1e6));
+      NotifierJNI.updateNotifierAlarm(m_notifier, callback.expirationTime);
 
-      long curTime = NotifierJNI.waitForNotifierAlarm(m_notifier);
-      if (curTime == 0) {
+      long currentTime = NotifierJNI.waitForNotifierAlarm(m_notifier);
+      if (currentTime == 0) {
         break;
       }
 
       callback.func.run();
 
-      callback.expirationTime += callback.period;
+      // Increment the expiration time by the number of full periods it's behind
+      // plus one to avoid rapid repeat fires from a large loop overrun. We
+      // assume currentTime ≥ expirationTime rather than checking for it since
+      // the callback wouldn't be running otherwise.
+      callback.expirationTime +=
+          callback.period
+              + (currentTime - callback.expirationTime) / callback.period * callback.period;
       m_callbacks.add(callback);
 
       // Process all other callbacks that are ready to run
-      while ((long) (m_callbacks.peek().expirationTime * 1e6) <= curTime) {
+      while (m_callbacks.peek().expirationTime <= currentTime) {
         callback = m_callbacks.poll();
 
         callback.func.run();
 
-        callback.expirationTime += callback.period;
+        callback.expirationTime +=
+            callback.period
+                + (currentTime - callback.expirationTime) / callback.period * callback.period;
         m_callbacks.add(callback);
       }
     }
@@ -162,7 +170,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param periodSeconds The period at which to run the callback in seconds.
    */
   public final void addPeriodic(Runnable callback, double periodSeconds) {
-    m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, 0.0));
+    m_callbacks.add(new Callback(callback, m_startTimeUs, (long) (periodSeconds * 1e6), 0));
   }
 
   /**
@@ -177,7 +185,9 @@ public class TimedRobot extends IterativeRobotBase {
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
   public final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
-    m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));
+    m_callbacks.add(
+        new Callback(
+            callback, m_startTimeUs, (long) (periodSeconds * 1e6), (long) (offsetSeconds * 1e6)));
   }
 
   /**

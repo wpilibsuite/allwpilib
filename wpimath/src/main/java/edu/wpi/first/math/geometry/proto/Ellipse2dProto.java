@@ -22,11 +22,6 @@ public class Ellipse2dProto implements Protobuf<Ellipse2d, ProtobufEllipse2d> {
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Pose2d.proto};
-  }
-
-  @Override
   public ProtobufEllipse2d createMessage() {
     return ProtobufEllipse2d.newInstance();
   }

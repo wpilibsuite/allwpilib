@@ -102,7 +102,7 @@ public class DifferentialDrivetrainSim {
    * @param driveMotor A {@link DCMotor} representing the drivetrain.
    * @param gearing The gearingRatio ratio of the robot, as output over input. This must be the same
    *     ratio as the ratio used to identify or create the drivetrainPlant.
-   * @param trackWidthMeters The distance between the two sides of the drivetrian. Can be found with
+   * @param trackWidthMeters The distance between the two sides of the drivetrain. Can be found with
    *     SysId.
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,

@@ -5,6 +5,7 @@
 package edu.wpi.first.math.system;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N10;
@@ -26,6 +27,12 @@ import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.numbers.N8;
 import edu.wpi.first.math.numbers.N9;
+import edu.wpi.first.math.system.proto.LinearSystemProto;
+import edu.wpi.first.math.system.struct.LinearSystemStruct;
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +51,8 @@ import org.ejml.simple.SimpleMatrix;
  * @param <Inputs> Number of inputs.
  * @param <Outputs> Number of outputs.
  */
-public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num> {
+public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num>
+    implements ProtobufSerializable, StructSerializable {
   /** Continuous system matrix. */
   private final Matrix<States, States> m_A;
 
@@ -360,5 +368,39 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
     return String.format(
         "Linear System: A\n%s\n\nB:\n%s\n\nC:\n%s\n\nD:\n%s\n",
         m_A.toString(), m_B.toString(), m_C.toString(), m_D.toString());
+  }
+
+  /**
+   * Creates an implementation of the {@link Protobuf} interface for linear systems.
+   *
+   * @param <States> The number of states of the linear systems this serializer processes.
+   * @param <Inputs> The number of inputs of the linear systems this serializer processes.
+   * @param <Outputs> The number of outputs of the linear systems this serializer processes.
+   * @param states The number of states of the linear systems this serializer processes.
+   * @param inputs The number of inputs of the linear systems this serializer processes.
+   * @param outputs The number of outputs of the linear systems this serializer processes.
+   * @return The protobuf implementation.
+   */
+  public static <States extends Num, Inputs extends Num, Outputs extends Num>
+      LinearSystemProto<States, Inputs, Outputs> getProto(
+          Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs) {
+    return new LinearSystemProto<>(states, inputs, outputs);
+  }
+
+  /**
+   * Creates an implementation of the {@link Struct} interface for linear systems.
+   *
+   * @param <States> The number of states of the linear systems this serializer processes.
+   * @param <Inputs> The number of inputs of the linear systems this serializer processes.
+   * @param <Outputs> The number of outputs of the linear systems this serializer processes.
+   * @param states The number of states of the linear systems this serializer processes.
+   * @param inputs The number of inputs of the linear systems this serializer processes.
+   * @param outputs The number of outputs of the linear systems this serializer processes.
+   * @return The struct implementation.
+   */
+  public static <States extends Num, Inputs extends Num, Outputs extends Num>
+      LinearSystemStruct<States, Inputs, Outputs> getStruct(
+          Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs) {
+    return new LinearSystemStruct<>(states, inputs, outputs);
   }
 }

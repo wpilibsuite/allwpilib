@@ -14,7 +14,7 @@
 namespace wpi {
 
 /**
- * Parses a URL into its constiuent components.
+ * Parses a URL into its constituent components.
  * `schema://userinfo@host:port/the/path?query#fragment`
  */
 class UrlParser {

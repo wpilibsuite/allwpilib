@@ -24,6 +24,8 @@ dependencies {
     implementation project(':wpilibNewCommands')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
+    implementation project(':epilogue-runtime')
+    annotationProcessor project(':epilogue-processor')
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -154,9 +156,6 @@ model {
                                 commandLine it.tasks.install.runScriptFile.get().asFile.toString()
                                 test.dependsOn it.tasks.install
                                 test.systemProperty 'java.library.path', filePath
-                                test.environment 'LD_LIBRARY_PATH', filePath
-                                test.environment 'DYLD_LIBRARY_PATH', filePath
-                                test.workingDir filePath
                             }
 
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
@@ -166,9 +165,6 @@ model {
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
-                                    run.environment 'LD_LIBRARY_PATH', filePath
-                                    run.environment 'DYLD_LIBRARY_PATH', filePath
-                                    run.workingDir filePath
                                     doFirst { doFirstTask(run) }
 
                                     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
@@ -190,6 +186,7 @@ model {
                                         excludeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
                                         setFailOnNoMatchingTests(false)
                                     }
+                                    testTask.testClassesDirs = sourceSets.test.output.classesDirs
                                     testTask.classpath = sourceSets.test.runtimeClasspath
                                     testTask.dependsOn it.tasks.install
 
@@ -199,9 +196,6 @@ model {
                                         exceptionFormat "full"
                                     }
                                     testTask.systemProperty 'java.library.path', filePath
-                                    testTask.environment 'LD_LIBRARY_PATH', filePath
-                                    testTask.environment 'DYLD_LIBRARY_PATH', filePath
-                                    testTask.workingDir filePath
 
                                     if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
                                         testTask.enabled = false

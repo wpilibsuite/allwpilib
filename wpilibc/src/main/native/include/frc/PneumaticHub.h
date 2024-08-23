@@ -119,12 +119,19 @@ class PneumaticHub : public PneumaticsBase {
                                     int reverseChannel) override;
   Compressor MakeCompressor() override;
 
+  /** Version and device data received from a REV PH. */
   struct Version {
+    /** The firmware major version. */
     uint32_t FirmwareMajor;
+    /** The firmware minor version. */
     uint32_t FirmwareMinor;
+    /** The firmware fix version. */
     uint32_t FirmwareFix;
+    /** The hardware minor version. */
     uint32_t HardwareMinor;
+    /** The hardware major version. */
     uint32_t HardwareMajor;
+    /** The device's unique ID. */
     uint32_t UniqueId;
   };
 
@@ -135,28 +142,54 @@ class PneumaticHub : public PneumaticsBase {
    */
   Version GetVersion() const;
 
+  /**
+   * Faults for a REV PH. These faults are only active while the condition is
+   * active.
+   */
   struct Faults {
+    /** Fault on channel 0. */
     uint32_t Channel0Fault : 1;
+    /** Fault on channel 1. */
     uint32_t Channel1Fault : 1;
+    /** Fault on channel 2. */
     uint32_t Channel2Fault : 1;
+    /** Fault on channel 3. */
     uint32_t Channel3Fault : 1;
+    /** Fault on channel 4. */
     uint32_t Channel4Fault : 1;
+    /** Fault on channel 5. */
     uint32_t Channel5Fault : 1;
+    /** Fault on channel 6. */
     uint32_t Channel6Fault : 1;
+    /** Fault on channel 7. */
     uint32_t Channel7Fault : 1;
+    /** Fault on channel 8. */
     uint32_t Channel8Fault : 1;
+    /** Fault on channel 9. */
     uint32_t Channel9Fault : 1;
+    /** Fault on channel 10. */
     uint32_t Channel10Fault : 1;
+    /** Fault on channel 11. */
     uint32_t Channel11Fault : 1;
+    /** Fault on channel 12. */
     uint32_t Channel12Fault : 1;
+    /** Fault on channel 13. */
     uint32_t Channel13Fault : 1;
+    /** Fault on channel 14. */
     uint32_t Channel14Fault : 1;
+    /** Fault on channel 15. */
     uint32_t Channel15Fault : 1;
+    /** An overcurrent event occurred on the compressor output. */
     uint32_t CompressorOverCurrent : 1;
+    /** The compressor output has an open circuit. */
     uint32_t CompressorOpen : 1;
+    /** An overcurrent event occurred on a solenoid output. */
     uint32_t SolenoidOverCurrent : 1;
+    /** The input voltage is below the minimum voltage. */
     uint32_t Brownout : 1;
+    /** A warning was raised by the device's CAN controller. */
     uint32_t CanWarning : 1;
+    /** The hardware on the device has malfunctioned. */
     uint32_t HardwareFault : 1;
 
     /**
@@ -176,13 +209,28 @@ class PneumaticHub : public PneumaticsBase {
    */
   Faults GetFaults() const;
 
+  /**
+   * Sticky faults for a REV PH. These faults will remain active until they
+   * are reset by the user.
+   */
   struct StickyFaults {
+    /** An overcurrent event occurred on the compressor output. */
     uint32_t CompressorOverCurrent : 1;
+    /** The compressor output has an open circuit. */
     uint32_t CompressorOpen : 1;
+    /** An overcurrent event occurred on a solenoid output. */
     uint32_t SolenoidOverCurrent : 1;
+    /** The input voltage is below the minimum voltage. */
     uint32_t Brownout : 1;
+    /** A warning was raised by the device's CAN controller. */
     uint32_t CanWarning : 1;
+    /** The device's CAN controller experienced a "Bus Off" event. */
     uint32_t CanBusOff : 1;
+    /** The hardware on the device has malfunctioned. */
+    uint32_t HardwareFault : 1;
+    /** The firmware on the device has malfunctioned. */
+    uint32_t FirmwareFault : 1;
+    /** The device has rebooted. */
     uint32_t HasReset : 1;
   };
 

@@ -16,8 +16,7 @@ nativeUtils {
             opencvYear = "frc2024"
             googleTestYear = "frc2024"
             niLibVersion = "2024.2.1"
-            opencvVersion = "4.8.0-2"
-            googleTestVersion = "1.14.0-1"
+            opencvVersion = "4.8.0-4"
         }
     }
 }
@@ -34,15 +33,6 @@ nativeUtils.enableSourceLink()
 
 nativeUtils.wpi.addMacMinimumVersionArg()
 
-nativeUtils.platformConfigs.each {
-    if (it.name.contains('osx')) {
-        it.linker.args << '-Wl,-rpath,\'@loader_path\''
-        it.linker.args << "-headerpad_max_install_names"
-    } else if (it.name.contains('linux')) {
-        it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
-    }
-}
-
 // Compress debug info on Linux
 nativeUtils.platformConfigs.each {
   if (it.name.contains('linux')) {
@@ -50,10 +40,10 @@ nativeUtils.platformConfigs.each {
   }
 }
 
-// NativeUtils adds the following OpenCV warning suppression for Linux, but not
-// for macOS
-// https://github.com/opencv/opencv/issues/20269
-nativeUtils.platformConfigs.osxuniversal.cppCompiler.args.add("-Wno-deprecated-anon-enum-enum-conversion")
+// Disable std::mutex constexpr constructor on MSVC
+nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configure {
+    it.cppCompiler.args.add("/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR")
+}
 
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
 

@@ -22,11 +22,6 @@ public class TrajectoryStateProto implements Protobuf<Trajectory.State, Protobuf
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Pose2d.proto};
-  }
-
-  @Override
   public ProtobufTrajectoryState createMessage() {
     return ProtobufTrajectoryState.newInstance();
   }

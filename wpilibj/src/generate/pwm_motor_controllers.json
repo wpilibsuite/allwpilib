@@ -1,0 +1,172 @@
+[
+  {
+    "name": "DMC60",
+    "Manufacturer": "Digilent",
+    "DisplayName": "DMC 60",
+    "ResourceName": "DigilentDMC60",
+    "pulse_width_ms": {
+      "max": 2.004,
+      "deadbandMax": 1.520,
+      "center": 1.500,
+      "deadbandMin": 1.480,
+      "min": 0.997
+    }
+  },
+  {
+    "name": "Jaguar",
+    "Manufacturer": "Luminary Micro / Vex Robotics",
+    "DisplayName": "Jaguar",
+    "ResourceName": "Jaguar",
+    "pulse_width_ms": {
+      "max": 2.310,
+      "deadbandMax": 1.550,
+      "center": 1.507,
+      "deadbandMin": 1.454,
+      "min": 0.697
+    }
+  },
+  {
+    "name": "PWMSparkFlex",
+    "Manufacturer": "REV Robotics",
+    "DisplayName": "SPARK Flex",
+    "ResourceName": "RevSparkFlexPWM",
+    "pulse_width_ms": {
+      "max": 2.003,
+      "deadbandMax": 1.550,
+      "center": 1.500,
+      "deadbandMin": 1.460,
+      "min": 0.999
+    }
+  },
+  {
+    "name": "PWMSparkMax",
+    "Manufacturer": "REV Robotics",
+    "DisplayName": "SPARK MAX",
+    "ResourceName": "RevSparkMaxPWM",
+    "pulse_width_ms": {
+      "max": 2.003,
+      "deadbandMax": 1.550,
+      "center": 1.500,
+      "deadbandMin": 1.460,
+      "min": 0.999
+    }
+  },
+  {
+    "name": "PWMTalonFX",
+    "Manufacturer": "Cross the Road Electronics (CTRE)",
+    "DisplayName": "Talon FX",
+    "ResourceName": "TalonFX",
+    "pulse_width_ms": {
+      "max": 2.004,
+      "deadbandMax": 1.520,
+      "center": 1.500,
+      "deadbandMin": 1.480,
+      "min": 0.997
+    }
+  },
+  {
+    "name": "PWMTalonSRX",
+    "Manufacturer": "Cross the Road Electronics (CTRE)",
+    "DisplayName": "Talon SRX",
+    "ResourceName": "PWMTalonSRX",
+    "pulse_width_ms": {
+      "max": 2.004,
+      "deadbandMax": 1.520,
+      "center": 1.500,
+      "deadbandMin": 1.480,
+      "min": 0.997
+    }
+  },
+  {
+    "name": "PWMVenom",
+    "Manufacturer": "Playing with Fusion",
+    "DisplayName": "Venom",
+    "ResourceName": "FusionVenom",
+    "pulse_width_ms": {
+      "max": 2.004,
+      "deadbandMax": 1.520,
+      "center": 1.500,
+      "deadbandMin": 1.480,
+      "min": 0.997
+    }
+  },
+  {
+    "name": "PWMVictorSPX",
+    "Manufacturer": "Cross the Road Electronics (CTRE)",
+    "DisplayName": "Victor SPX",
+    "ResourceName": "PWMVictorSPX",
+    "pulse_width_ms": {
+      "max": 2.004,
+      "deadbandMax": 1.520,
+      "center": 1.500,
+      "deadbandMin": 1.480,
+      "min": 0.997
+    }
+  },
+  {
+    "name": "SD540",
+    "Manufacturer": "Mindsensors",
+    "DisplayName": "SD540",
+    "ResourceName": "MindsensorsSD540",
+    "pulse_width_ms": {
+      "max": 2.05,
+      "deadbandMax": 1.55,
+      "center": 1.50,
+      "deadbandMin": 1.44,
+      "min": 0.94
+    }
+  },
+  {
+    "name": "Spark",
+    "Manufacturer": "REV Robotics",
+    "DisplayName": "SPARK",
+    "ResourceName": "RevSPARK",
+    "pulse_width_ms": {
+      "max": 2.003,
+      "deadbandMax": 1.550,
+      "center": 1.500,
+      "deadbandMin": 1.460,
+      "min": 0.999
+    }
+  },
+  {
+    "name": "Talon",
+    "Manufacturer": "Cross the Road Electronics (CTRE)",
+    "DisplayName": "Talon",
+    "ResourceName": "Talon",
+    "pulse_width_ms": {
+      "max": 2.037,
+      "deadbandMax": 1.539,
+      "center": 1.513,
+      "deadbandMin": 1.487,
+      "min": 0.989
+    }
+  },
+  {
+    "name": "Victor",
+    "Manufacturer": "Vex Robotics",
+    "DisplayName": "Victor 888",
+    "ResourceName": "Victor",
+    "PeriodMultiplier": 2,
+    "pulse_width_ms": {
+      "max": 2.027,
+      "deadbandMax": 1.525,
+      "center": 1.507,
+      "deadbandMin": 1.490,
+      "min": 1.026
+    }
+  },
+  {
+    "name": "VictorSP",
+    "Manufacturer": "Vex Robotics",
+    "DisplayName": "Victor SP",
+    "ResourceName": "VictorSP",
+    "pulse_width_ms": {
+      "max": 2.004,
+      "deadbandMax": 1.520,
+      "center": 1.500,
+      "deadbandMin": 1.480,
+      "min": 0.997
+    }
+  }
+]

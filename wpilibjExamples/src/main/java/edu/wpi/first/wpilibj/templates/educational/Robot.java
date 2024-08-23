@@ -5,17 +5,16 @@
 package edu.wpi.first.wpilibj.templates.educational;
 
 /**
- * The VM is configured to automatically run this class, and to call the run() function when the
- * robot is enabled. If you change the name of this class or the package after creating this
- * project, you must also update the build.gradle file in the project.
+ * The run() function is called automatically when the robot is enabled. If you change the name of
+ * this class or the package after creating this project, you must also update the Main.java file in
+ * the project.
  */
 public class Robot extends EducationalRobot {
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  @Override
-  public void robotInit() {}
+  public Robot() {}
 
   /** This function is run when the robot is enabled. */
   @Override

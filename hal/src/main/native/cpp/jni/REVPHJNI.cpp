@@ -383,6 +383,21 @@ Java_edu_wpi_first_hal_REVPHJNI_getFaultsNative
 
 /*
  * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    getSolenoidDisabledList
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_REVPHJNI_getSolenoidDisabledList
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto result = HAL_GetREVPHSolenoidDisabledList(handle, &status);
+  CheckStatus(env, status, false);
+  return result;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
  * Method:    getVersion
  * Signature: (I)Ljava/lang/Object;
  */

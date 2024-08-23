@@ -172,7 +172,7 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
                                     int32_t* status);
 
 /**
- * Get the FPGA index for the AnlogTrigger.
+ * Get the FPGA index for the AnalogTrigger.
  *
  * @param[in] analogTriggerHandle the trigger handle
  * @param[out] status              Error status variable. 0 on success.

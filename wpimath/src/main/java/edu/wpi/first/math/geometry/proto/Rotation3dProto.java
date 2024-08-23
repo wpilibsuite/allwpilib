@@ -22,11 +22,6 @@ public class Rotation3dProto implements Protobuf<Rotation3d, ProtobufRotation3d>
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Quaternion.proto};
-  }
-
-  @Override
   public ProtobufRotation3d createMessage() {
     return ProtobufRotation3d.newInstance();
   }

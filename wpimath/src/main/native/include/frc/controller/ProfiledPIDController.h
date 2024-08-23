@@ -175,6 +175,16 @@ class ProfiledPIDController
   }
 
   /**
+   * Gets the accumulated error used in the integral calculation of this
+   * controller.
+   *
+   * @return The accumulated error of this controller.
+   */
+  double GetAccumulatedError() const {
+    return m_controller.GetAccumulatedError();
+  }
+
+  /**
    * Sets the goal for the ProfiledPIDController.
    *
    * @param goal The desired unprofiled setpoint.

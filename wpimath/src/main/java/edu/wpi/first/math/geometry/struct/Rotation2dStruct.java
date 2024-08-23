@@ -15,8 +15,8 @@ public class Rotation2dStruct implements Struct<Rotation2d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Rotation2d";
+  public String getTypeName() {
+    return "Rotation2d";
   }
 
   @Override

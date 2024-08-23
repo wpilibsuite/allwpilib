@@ -23,11 +23,6 @@ public class SwerveModulePositionProto
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Rotation2d.proto};
-  }
-
-  @Override
   public ProtobufSwerveModulePosition createMessage() {
     return ProtobufSwerveModulePosition.newInstance();
   }

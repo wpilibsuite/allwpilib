@@ -448,7 +448,7 @@ public final class NetworkTablesJNI {
   public static native void releaseEntry(int entry);
 
   /**
-   * Relesaes pubsub entry.
+   * Releases pubsub entry.
    *
    * @param pubsubentry Pubsub entry handle.
    */
@@ -1542,7 +1542,7 @@ public final class NetworkTablesJNI {
   /**
    * Returns the current timestamp in microseconds.
    *
-   * @return The current timestsamp in microseconds.
+   * @return The current timestamp in microseconds.
    */
   public static native long now();
 

@@ -47,8 +47,8 @@ class Counter : public CounterBase,
   /**
    * Create an instance of a counter where no sources are selected.
    *
-   * They all must be selected by calling functions to specify the upsource and
-   * the downsource independently.
+   * They all must be selected by calling functions to specify the up source and
+   * the down source independently.
    *
    * This creates a ChipObject counter and initializes status variables
    * appropriately.
@@ -148,7 +148,7 @@ class Counter : public CounterBase,
   Counter& operator=(Counter&&) = default;
 
   /**
-   * Set the upsource for the counter as a digital input channel.
+   * Set the up source for the counter as a digital input channel.
    *
    * @param channel The DIO channel to use as the up source. 0-9 are on-board,
    *                10-25 are on the MXP

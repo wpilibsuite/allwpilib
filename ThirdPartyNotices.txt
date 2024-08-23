@@ -15,7 +15,6 @@ licenses, and/or restrictions:
 
 Program               Locations
 -------               ---------
-RoboRIO Libraries     ni-libraries
 Google Test           gtest
 LLVM                  wpiutil/src/main/native/thirdparty/llvm
                       wpiutil/src/test/native/cpp/llvm/

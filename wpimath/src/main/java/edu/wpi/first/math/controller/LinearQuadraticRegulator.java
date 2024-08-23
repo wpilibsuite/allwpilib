@@ -47,7 +47,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
-   * @throws IllegalArgumentException If the system is uncontrollable.
+   * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
       LinearSystem<States, Inputs, Outputs> plant,
@@ -74,7 +74,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
-   * @throws IllegalArgumentException If the system is uncontrollable.
+   * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
       Matrix<States, States> A,
@@ -98,7 +98,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param Q The state cost matrix.
    * @param R The input cost matrix.
    * @param dtSeconds Discretization timestep.
-   * @throws IllegalArgumentException If the system is uncontrollable.
+   * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
       Matrix<States, States> A,
@@ -112,7 +112,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     if (!StateSpaceUtil.isStabilizable(discA, discB)) {
       var msg =
-          "The system passed to the LQR is uncontrollable!\n\nA =\n"
+          "The system passed to the LQR is unstabilizable!\n\nA =\n"
               + discA.getStorage().toString()
               + "\nB =\n"
               + discB.getStorage().toString()
@@ -147,7 +147,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param R The input cost matrix.
    * @param N The state-input cross-term cost matrix.
    * @param dtSeconds Discretization timestep.
-   * @throws IllegalArgumentException If the system is uncontrollable.
+   * @throws IllegalArgumentException If the system is unstabilizable.
    */
   public LinearQuadraticRegulator(
       Matrix<States, States> A,

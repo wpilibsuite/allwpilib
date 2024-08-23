@@ -6,13 +6,13 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <wpi/SmallVector.h>
 
 #include "sleipnir/autodiff/ExpressionGraph.hpp"
 #include "sleipnir/autodiff/Jacobian.hpp"
 #include "sleipnir/autodiff/Profiler.hpp"
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableMatrix.hpp"
-#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir {
@@ -36,7 +36,7 @@ class SLEIPNIR_DLLEXPORT Hessian {
   Hessian(Variable variable, const VariableMatrix& wrt) noexcept
       : m_jacobian{
             [&] {
-              small_vector<detail::ExpressionPtr> wrtVec;
+              wpi::SmallVector<detail::ExpressionPtr> wrtVec;
               wrtVec.reserve(wrt.size());
               for (auto& elem : wrt) {
                 wrtVec.emplace_back(elem.expr);
@@ -66,11 +66,6 @@ class SLEIPNIR_DLLEXPORT Hessian {
    * Evaluates the Hessian at wrt's value.
    */
   const Eigen::SparseMatrix<double>& Value() { return m_jacobian.Value(); }
-
-  /**
-   * Updates the values of the gradient tree.
-   */
-  void Update() { m_jacobian.Update(); }
 
   /**
    * Returns the profiler.

@@ -4,20 +4,34 @@
 
 package edu.wpi.first.hal;
 
+/** Sticky faults for a REV PH. These faults will remain active until they are reset by the user. */
 @SuppressWarnings("MemberName")
 public class REVPHStickyFaults {
+  /** An overcurrent event occurred on the compressor output. */
   public final boolean CompressorOverCurrent;
 
+  /** The compressor output has an open circuit. */
   public final boolean CompressorOpen;
 
+  /** An overcurrent event occurred on a solenoid output. */
   public final boolean SolenoidOverCurrent;
 
+  /** The input voltage is below the minimum voltage. */
   public final boolean Brownout;
 
+  /** A warning was raised by the device's CAN controller. */
   public final boolean CanWarning;
 
+  /** The device's CAN controller experienced a "Bus Off" event. */
   public final boolean CanBusOff;
 
+  /** The hardware on the device has malfunctioned. */
+  public final boolean HardwareFault;
+
+  /** The firmware on the device has malfunctioned. */
+  public final boolean FirmwareFault;
+
+  /** The device has rebooted. */
   public final boolean HasReset;
 
   /**
@@ -32,6 +46,8 @@ public class REVPHStickyFaults {
     Brownout = (faults & 0x8) != 0;
     CanWarning = (faults & 0x10) != 0;
     CanBusOff = (faults & 0x20) != 0;
-    HasReset = (faults & 0x40) != 0;
+    HardwareFault = (faults & 0x40) != 0;
+    FirmwareFault = (faults & 0x80) != 0;
+    HasReset = (faults & 0x100) != 0;
   }
 }

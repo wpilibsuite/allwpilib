@@ -48,7 +48,7 @@ class SteadyStateKalmanFilter {
   using OutputArray = wpi::array<double, Outputs>;
 
   /**
-   * Constructs a staeady-state Kalman filter with the given plant.
+   * Constructs a steady-state Kalman filter with the given plant.
    *
    * See
    * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
@@ -58,7 +58,7 @@ class SteadyStateKalmanFilter {
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
-   * @throws std::invalid_argument If the system is unobservable.
+   * @throws std::invalid_argument If the system is undetectable.
    */
   SteadyStateKalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                           const StateArray& stateStdDevs,

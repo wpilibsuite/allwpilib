@@ -4,12 +4,24 @@
 
 package edu.wpi.first.hal;
 
+/** Represents a HAL entry value. */
 public final class HALValue {
+  /** Unassigned type. */
   public static final int kUnassigned = 0;
+
+  /** Boolean. */
   public static final int kBoolean = 0x01;
+
+  /** Double. */
   public static final int kDouble = 0x02;
+
+  /** Enum. */
   public static final int kEnum = 0x04;
+
+  /** Int. */
   public static final int kInt = 0x08;
+
+  /** Long. */
   public static final int kLong = 0x10;
 
   private int m_type;
@@ -132,6 +144,11 @@ public final class HALValue {
     return new HALValue(value, kDouble);
   }
 
+  /**
+   * Build a HAL unassigned value.
+   *
+   * @return HAL value
+   */
   public static HALValue makeUnassigned() {
     return new HALValue();
   }

@@ -4,39 +4,8 @@
 
 package edu.wpi.first.math.jni;
 
-import edu.wpi.first.util.RuntimeLoader;
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /** DARE JNI. */
-public final class DAREJNI {
-  static boolean libraryLoaded = false;
-
-  static {
-    if (Helper.getExtractOnStaticLoad()) {
-      try {
-        RuntimeLoader.loadLibrary("wpimathjni");
-      } catch (Exception ex) {
-        ex.printStackTrace();
-        System.exit(1);
-      }
-      libraryLoaded = true;
-    }
-  }
-
-  /**
-   * Force load the library.
-   *
-   * @throws IOException If the library could not be loaded or found.
-   */
-  public static synchronized void forceLoad() throws IOException {
-    if (libraryLoaded) {
-      return;
-    }
-    RuntimeLoader.loadLibrary("wpimathjni");
-    libraryLoaded = true;
-  }
-
+public final class DAREJNI extends WPIMathJNI {
   /**
    * Computes the unique stabilizing solution X to the discrete-time algebraic Riccati equation.
    *
@@ -53,7 +22,7 @@ public final class DAREJNI {
    * </ul>
    *
    * <p>Only use this function if you're sure the preconditions are met. Solves the discrete
-   * alegebraic Riccati equation.
+   * algebraic Riccati equation.
    *
    * @param A Array containing elements of A in row-major order.
    * @param B Array containing elements of B in row-major order.
@@ -201,32 +170,6 @@ public final class DAREJNI {
       int states,
       int inputs,
       double[] S);
-
-  /** Sets whether JNI should be loaded in the static block. */
-  public static class Helper {
-    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
-
-    /**
-     * Returns true if the JNI should be loaded in the static block.
-     *
-     * @return True if the JNI should be loaded in the static block.
-     */
-    public static boolean getExtractOnStaticLoad() {
-      return extractOnStaticLoad.get();
-    }
-
-    /**
-     * Sets whether the JNI should be loaded in the static block.
-     *
-     * @param load Whether the JNI should be loaded in the static block.
-     */
-    public static void setExtractOnStaticLoad(boolean load) {
-      extractOnStaticLoad.set(load);
-    }
-
-    /** Utility class. */
-    private Helper() {}
-  }
 
   /** Utility class. */
   private DAREJNI() {}

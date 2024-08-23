@@ -1,5 +1,7 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
+apply plugin: 'c'
+
 ext {
     nativeName = 'apriltag'
     devMain = 'edu.wpi.first.apriltag.DevMain'
@@ -23,6 +25,16 @@ ext {
                     include '*.cpp'
                 }
             }
+            apriltagC(CSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/apriltag/src'
+                    include '**/*.c', '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/apriltag/include',
+                            'src/main/native/thirdparty/apriltag/include/common'
+                }
+            }
         }
     }
 }
@@ -30,7 +42,6 @@ ext {
 evaluationDependsOn(':wpimath')
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
-apply from: "${rootDir}/shared/apriltaglib.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
@@ -45,8 +56,47 @@ sourceSets {
     }
 }
 
+cppHeadersZip {
+    from('src/main/native/thirdparty/apriltag/include') {
+        into '/'
+    }
+}
+
+// Suppress sign-compare warnings
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) {
+        it.cCompiler.args.add("/wd4005")
+        it.cCompiler.args.add("/wd4018")
+        it.cCompiler.args.add("/wd4244")
+        it.cCompiler.args.add("/wd4267")
+        it.cCompiler.args.add("/wd4996")
+    } else if (it.name.contains('osx')) {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.add("-Wno-gnu-zero-variadic-macro-arguments")
+        it.cCompiler.args.add("-Wno-uninitialized")
+        it.cCompiler.args.add("-Wno-sign-compare")
+        it.cCompiler.args.add("-Wno-type-limits")
+    } else {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.add("-Wno-gnu-zero-variadic-macro-arguments")
+        it.cCompiler.args.add("-Wno-maybe-uninitialized")
+        it.cCompiler.args.add("-Wno-sign-compare")
+        it.cCompiler.args.add("-Wno-type-limits")
+    }
+}
+
 model {
-    components {}
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/main/native/include',
+                            'src/main/native/thirdparty/apriltag/include',
+                            'src/main/native/thirdparty/apriltag/include/common'
+                }
+            }
+        }
+    }
     binaries {
         all {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
@@ -61,8 +111,6 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
-
-            nativeUtils.useRequiredLibrary(it, 'apriltaglib')
         }
     }
     tasks {

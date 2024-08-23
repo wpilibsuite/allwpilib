@@ -4,12 +4,13 @@
 
 #include "frc/geometry/proto/Rotation2dProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "geometry2d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Rotation2d>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufRotation2d>(
-      arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufRotation2d>(arena);
 }
 
 frc::Rotation2d wpi::Protobuf<frc::Rotation2d>::Unpack(

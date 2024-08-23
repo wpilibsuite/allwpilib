@@ -28,7 +28,7 @@
 #include <signal.h>
 #include <limits.h>
 #include <wchar.h>
-#include <malloc.h>    /* alloca */
+#include <malloc.h>    /* _alloca */
 
 #include "uv.h"
 #include "internal.h"
@@ -303,8 +303,9 @@ static WCHAR* path_search_walk_ext(const WCHAR *dir,
  * - If there's really only a filename, check the current directory for file,
  *   then search all path directories.
  *
- * - If filename specified has *any* extension, search for the file with the
- *   specified extension first.
+ * - If filename specified has *any* extension, or already contains a path
+ *   and the UV_PROCESS_WINDOWS_FILE_PATH_EXACT_NAME flag is specified,
+ *   search for the file with the exact specified filename first.
  *
  * - If the literal filename is not found in a directory, try *appending*
  *   (not replacing) .com first and then .exe.
@@ -330,7 +331,8 @@ static WCHAR* path_search_walk_ext(const WCHAR *dir,
  */
 static WCHAR* search_path(const WCHAR *file,
                             WCHAR *cwd,
-                            const WCHAR *path) {
+                            const WCHAR *path,
+                            unsigned int flags) {
   int file_has_dir;
   WCHAR* result = NULL;
   WCHAR *file_name_start;
@@ -371,16 +373,18 @@ static WCHAR* search_path(const WCHAR *file,
         file, file_name_start - file,
         file_name_start, file_len - (file_name_start - file),
         cwd, cwd_len,
-        name_has_ext);
+        name_has_ext || (flags & UV_PROCESS_WINDOWS_FILE_PATH_EXACT_NAME));
 
   } else {
     dir_end = path;
 
-    /* The file is really only a name; look in cwd first, then scan path */
-    result = path_search_walk_ext(L"", 0,
-                                  file, file_len,
-                                  cwd, cwd_len,
-                                  name_has_ext);
+    if (NeedCurrentDirectoryForExePathW(L"")) {
+      /* The file is really only a name; look in cwd first, then scan path */
+      result = path_search_walk_ext(L"", 0,
+                                    file, file_len,
+                                    cwd, cwd_len,
+                                    name_has_ext);
+    }
 
     while (result == NULL) {
       if (dir_end == NULL || *dir_end == L'\0') {
@@ -508,7 +512,7 @@ WCHAR* quote_cmd_arg(const WCHAR *source, WCHAR *target) {
     }
   }
   target[0] = L'\0';
-  wcsrev(start);
+  _wcsrev(start);
   *(target++) = L'"';
   return target;
 }
@@ -612,8 +616,8 @@ int env_strncmp(const wchar_t* a, int na, const wchar_t* b) {
   assert(b_eq);
   nb = b_eq - b;
 
-  A = (wchar_t*)alloca((na+1) * sizeof(wchar_t));
-  B = (wchar_t*)alloca((nb+1) * sizeof(wchar_t));
+  A = (wchar_t*)_alloca((na+1) * sizeof(wchar_t));
+  B = (wchar_t*)_alloca((nb+1) * sizeof(wchar_t));
 
   r = LCMapStringW(LOCALE_INVARIANT, LCMAP_UPPERCASE, a, na, A, na);
   assert(r==na);
@@ -690,7 +694,7 @@ int make_program_env(char* env_block[], WCHAR** dst_ptr) {
   if (dst_copy == NULL && env_len > 0) {
     return UV_ENOMEM;
   }
-  env_copy = (WCHAR**)alloca(env_block_count * sizeof(WCHAR*));
+  env_copy = (WCHAR**)_alloca(env_block_count * sizeof(WCHAR*));
 
   ptr = dst_copy;
   ptr_copy = env_copy;
@@ -932,6 +936,7 @@ int uv_spawn(uv_loop_t* loop,
   assert(!(options->flags & ~(UV_PROCESS_DETACHED |
                               UV_PROCESS_SETGID |
                               UV_PROCESS_SETUID |
+                              UV_PROCESS_WINDOWS_FILE_PATH_EXACT_NAME |
                               UV_PROCESS_WINDOWS_HIDE |
                               UV_PROCESS_WINDOWS_HIDE_CONSOLE |
                               UV_PROCESS_WINDOWS_HIDE_GUI |
@@ -1011,7 +1016,8 @@ int uv_spawn(uv_loop_t* loop,
 
   application_path = search_path(application,
                                  cwd,
-                                 path);
+                                 path,
+                                 options->flags);
   if (application_path == NULL) {
     /* Not found. */
     err = ERROR_FILE_NOT_FOUND;
@@ -1178,7 +1184,6 @@ static int uv__kill(HANDLE process_handle, int signum) {
     case SIGINT: {
       /* Unconditionally terminate the process. On Windows, killed processes
        * normally return 1. */
-      DWORD status;
       int err;
 
       if (TerminateProcess(process_handle, 1))
@@ -1188,8 +1193,7 @@ static int uv__kill(HANDLE process_handle, int signum) {
        * TerminateProcess will fail with ERROR_ACCESS_DENIED. */
       err = GetLastError();
       if (err == ERROR_ACCESS_DENIED &&
-          GetExitCodeProcess(process_handle, &status) &&
-          status != STILL_ACTIVE) {
+          WaitForSingleObject(process_handle, 0) == WAIT_OBJECT_0) {
         return UV_ESRCH;
       }
 
@@ -1198,15 +1202,16 @@ static int uv__kill(HANDLE process_handle, int signum) {
 
     case 0: {
       /* Health check: is the process still alive? */
-      DWORD status;
-
-      if (!GetExitCodeProcess(process_handle, &status))
-        return uv_translate_sys_error(GetLastError());
-
-      if (status != STILL_ACTIVE)
-        return UV_ESRCH;
-
-      return 0;
+      switch (WaitForSingleObject(process_handle, 0)) {
+        case WAIT_OBJECT_0:
+          return UV_ESRCH;
+        case WAIT_FAILED:
+          return uv_translate_sys_error(GetLastError());
+        case WAIT_TIMEOUT:
+          return 0;
+        default:
+          return UV_UNKNOWN;
+      }
     }
 
     default:
@@ -1241,7 +1246,7 @@ int uv_kill(int pid, int signum) {
   if (pid == 0) {
     process_handle = GetCurrentProcess();
   } else {
-    process_handle = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION,
+    process_handle = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION | SYNCHRONIZE,
                                  FALSE,
                                  pid);
   }

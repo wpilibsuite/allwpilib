@@ -24,9 +24,15 @@
  * @{
  */
 
+/**
+ * Runtime type.
+ */
 HAL_ENUM(HAL_RuntimeType) {
+  /** roboRIO 1.0 */
   HAL_Runtime_RoboRIO,
+  /** roboRIO 2.0 */
   HAL_Runtime_RoboRIO2,
+  /** Simulation runtime */
   HAL_Runtime_Simulation
 };
 
@@ -132,6 +138,13 @@ HAL_Bool HAL_GetSystemActive(int32_t* status);
  * @return true if the system is in a low voltage brown out, false otherwise
  */
 HAL_Bool HAL_GetBrownedOut(int32_t* status);
+
+/**
+ * Gets the number of times the system has been disabled due to communication
+ * errors with the Driver Station.
+ * @return number of disables due to communication errors.
+ */
+int32_t HAL_GetCommsDisableCount(int32_t* status);
 
 /**
  * Gets a port handle for a specific channel.

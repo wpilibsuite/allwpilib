@@ -60,11 +60,6 @@ class SLEIPNIR_DLLEXPORT Gradient {
   }
 
   /**
-   * Updates the value of the variable.
-   */
-  void Update() { m_jacobian.Update(); }
-
-  /**
    * Returns the profiler.
    */
   Profiler& GetProfiler() { return m_jacobian.GetProfiler(); }

@@ -6,6 +6,7 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 * apriltag
 * cameraserver
 * cscore
+* fieldImages
 * hal (simulation HAL only)
 * ntcore
 * romiVendordep
@@ -51,7 +52,7 @@ The following build options are available:
   * This option will build C++ examples.
 * `WITH_GUI` (ON Default)
   * This option will build GUI items. If this is off, and `WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built.
-* `WITH_JAVA` (ON Default)
+* `WITH_JAVA` (OFF Default)
   * This option will enable Java and JNI builds. If this is on, `BUILD_SHARED_LIBS` must be on. Otherwise CMake will error.
 * `WITH_JAVA_SOURCE` (`WITH_JAVA` Default)
   * This option will build Java source JARs for each enabled Java library. This does not require `WITH_JAVA` to be on, allowing source JARs to be built without the compiled JARs if desired.
@@ -65,25 +66,23 @@ The following build options are available:
   * This option will build the HAL and wpilibc/j during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for the roboRIO.
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
-* `WITH_WPIUNITS` (ON Default)
+* `WITH_WPIUNITS` (`WITH_JAVA` Default)
   * This option will build the wpiunits library. This option must be on to build the Java wpimath library and requires `WITH_JAVA` to also be on.
-* `WITH_EXTERNAL_HAL` (OFF Default)
-  * This option will build wpilib with an externally built HAL.
-* `EXTERNAL_HAL_FILE`
-  * Set this option to the CMake File of the externally built HAL. NOTE: set it to the file itself, not the folder the file is located in!
 * `OPENCV_JAVA_INSTALL_DIR`
   * Set this option to the location of the archive of the OpenCV Java bindings (it should be called opencv-xxx.jar, with the x'es being version numbers). NOTE: set it to the LOCATION of the file, not the file itself!
 * `NO_WERROR` (OFF Default)
   * This option will disable the `-Werror` compilation flag for non-MSVC builds.
+* `WPILIB_TARGET_WARNINGS`
+  * Add compiler flags to this option to customize compiler options like warnings.
 
 ## Build Setup
 
-The WPILib CMake build does not allow in source builds. Because the `build` directory is used by Gradle, we recommend a `build-cmake` directory in the root. This folder is included in the gitignore.
+The WPILib CMake build does not allow in source builds. Because the `build` directory is used by Gradle, we recommend a `build-cmake` directory in the root. This folder is included in the gitignore. We support building with Ninja; other options like Makefiles may be broken.
 
-Once you have a build folder, run CMake configuration in that build directory with the following command.
+Once you have a build folder, run CMake configuration in the root directory with the following command.
 
 ```
-cmake path/to/allwpilib/root
+cmake --preset default
 ```
 
 If you want to change any of the options, add `-DOPTIONHERE=VALUE` to the `cmake` command. This will check for any dependencies. If everything works properly this will succeed. If not, please check out the troubleshooting section for help.
@@ -91,6 +90,10 @@ If you want to change any of the options, add `-DOPTIONHERE=VALUE` to the `cmake
 If you want, you can also use `ccmake` in order to visually set these properties as well. [Here](https://cmake.org/cmake/help/v3.0/manual/ccmake.1.html) is the link to the documentation for that program. On Windows, you can use `cmake-gui` instead.
 
 Note that if you are cross-compiling, you will need to override the protobuf options manually to point to the libraries for the target platform. Leave the protoc binary location as the path to the binary for the host platform, since protoc needs to execute on the host platform.
+
+## Presets
+
+The WPILib CMake setup has a variety of presets for common configurations and options used. The default sets the generator to Ninja and build directory to `build-cmake`. The other presets are `with-java` (sets `WITH_JAVA=ON`), `sccache` (sets the C/C++ compiler launcher to sccache), and `with-java-sccache` (a comibination of `with-java` and `sccache`.
 
 ## Building
 
@@ -111,6 +114,12 @@ After build, the easiest way to use the libraries is to install them. Run the fo
 ```
 sudo cmake --build . --target install
 ```
+
+## Preparing to use the installed libraries
+
+On Windows, make sure the directories for the libraries you built are on PATH. For wpilib, the default install location is `C:\Program Files (x86)\allwpilib`. If you built other libraries like OpenCV and protobuf from source, install them, and add the install directories to PATH. This ensures CMake can locate the libraries.
+
+You will also want to add the directories where the DLLs are located (usually the `bin` subdirectory of the install directory) to PATH so they can be loaded by your program. If you are using OpenCV and Java, the `opencv_java` DLL is located in either the `lib` subdirectory if you built but didn't install OpenCV, or the `java` subdirectory if you did install OpenCV.
 
 ## Using the installed libraries for C++.
 
@@ -138,12 +147,11 @@ cmake /path/to/folder/containing/CMakeLists
 
 After that, run `cmake --build .`. That will create your executable. Then you should be able to run `./my_vision_app` to run your application.
 
-
 ## Using the installed libraries for Java
 
-Using the built JARs is move involved than using the C++ libraries, but mostly consists of adding the correct directories to PATH.
+Using the built JARs is more involved than using the C++ libraries, but the additional work involves providing the paths to various libraries and JARs when needed.
 
-Add the directory where the JARs are located (e.g, `/usr/local/java`) to PATH. If you are on Windows, you also need to add the `lib`, `bin`, and `share` directories to PATH. Then, create a new folder to contain your project. Add the following code below to a `CMakeLists.txt` file in that directory.
+Create a new folder to contain your project. Add the following code below to a `CMakeLists.txt` file in that directory.
 
 ```cmake
 cmake_minimum_required(VERSION 3.11)
@@ -172,7 +180,7 @@ After that, run `cmake --build .` to create your JAR file. To execute the JAR fi
 
 ## Using vendordeps
 
-Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVenderdep`. Note that wpilibNewCommands, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
+Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVendordep`. Note that wpilibNewCommands, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
 
 ## Troubleshooting
 Below are some common issues that are run into when building.

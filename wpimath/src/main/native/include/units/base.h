@@ -175,7 +175,7 @@ namespace units
  * @param		namespaceName namespace in which the new units will be encapsulated.
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		abbrev - abbreviated unit name, e.g. 'm'
- * @note		When UNIT_LIB_ENABLE_IOSTREAM isn't defined, the macro does not generate any code
+ * @note		When UNIT_LIB_DISABLE_FMT is defined and UNIT_LIB_ENABLE_IOSTREAM isn't defined, the macro does not generate any code
  */
 #if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
@@ -184,9 +184,10 @@ namespace units
 	struct fmt::formatter<units::namespaceName::nameSingular ## _t> \
 		: fmt::formatter<double> \
 	{\
-		template <typename FormatContext>\
-		auto format(const units::namespaceName::nameSingular ## _t& obj,\
-								FormatContext& ctx) -> decltype(ctx.out()) \
+		template <typename FmtContext>\
+		auto format(\
+				const units::namespaceName::nameSingular ## _t& obj,\
+				FmtContext& ctx) const\
 		{\
 			auto out = ctx.out();\
 			out = fmt::formatter<double>::format(obj(), ctx);\
@@ -202,8 +203,7 @@ namespace units
 			return units::detail::to_string(obj()) + std::string(" "#abbrev);\
 		}\
 	}
-#endif
-#if defined(UNIT_LIB_ENABLE_IOSTREAM)
+#elif defined(UNIT_LIB_ENABLE_IOSTREAM)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	namespace namespaceName\
 	{\
@@ -216,6 +216,8 @@ namespace units
 			return units::detail::to_string(obj()) + std::string(" "#abbrev);\
 		}\
 	}
+#else
+    #define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)
 #endif
 
  /**
@@ -2881,9 +2883,10 @@ namespace units
 template <>
 struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 {
-	template <typename FormatContext>
-	auto format(const units::dimensionless::dB_t& obj,
-							FormatContext& ctx) -> decltype(ctx.out())
+	template <typename FmtContext>
+	auto format(
+			const units::dimensionless::dB_t& obj,
+			FmtContext& ctx) const
 	{
 		auto out = ctx.out();
 		out = fmt::formatter<double>::format(obj(), ctx);

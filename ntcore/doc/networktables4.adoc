@@ -12,7 +12,7 @@ A pub/sub WebSockets protocol based on NetworkTables concepts.
 
 While NetworkTables 4.0 made a large number of improvements to the 3.0 protocol, a few weaknesses have been discovered in "real world" use:
 
-* Keep alives are not required. This can result in very long timeframes before a disconnect is detected.
+* Keepalives are not required. This can result in very long timeframes before a disconnect is detected.
 * Periodic synchronization of timestamps is impacted by high variability of round trip time measurements on a stream connection shared with other data (due to network queueing in adverse network connections), resulting in values being "too old" even if actually more recent due to a change in base time
 * Disconnect loops can be caused by large amounts of data values being sent in response to a "subscribe all" type of message (e.g. subscribe with empty or `$` prefix), resulting in data transmission being blocked for an excessive amount of time
 * Publishing operations are not clearly subscriber-driven; the information is available via metatopics but not automatically sent to clients when clients publish

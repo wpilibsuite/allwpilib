@@ -45,9 +45,6 @@ class MotorController;
  * follow the right-hand rule, so counterclockwise rotation around the Z axis is
  * positive.
  *
- * Note: the axis conventions used in this class differ from DifferentialDrive.
- * This may change in a future year's WPILib release.
- *
  * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().

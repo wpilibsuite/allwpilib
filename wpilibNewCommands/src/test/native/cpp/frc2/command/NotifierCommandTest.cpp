@@ -18,11 +18,11 @@ TEST_F(NotifierCommandTest, NotifierCommandSchedule) {
   frc::sim::PauseTiming();
 
   int counter = 0;
-  NotifierCommand command([&] { counter++; }, 0.01_s, {});
+  NotifierCommand command([&] { counter++; }, 10_ms, {});
 
   scheduler.Schedule(&command);
   for (int i = 0; i < 5; ++i) {
-    frc::sim::StepTiming(0.005_s);
+    frc::sim::StepTiming(5_ms);
   }
   scheduler.Cancel(&command);
 

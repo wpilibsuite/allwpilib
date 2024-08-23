@@ -11,18 +11,26 @@
 #include <numbers>
 #include <utility>
 
+#include <wpi/SmallVector.h>
+
 #include "sleipnir/autodiff/ExpressionType.hpp"
 #include "sleipnir/util/IntrusiveSharedPtr.hpp"
 #include "sleipnir/util/Pool.hpp"
-#include "sleipnir/util/SmallVector.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir::detail {
 
+// The global pool allocator uses a thread-local static pool resource, which
+// isn't guaranteed to be initialized properly across DLL boundaries on Windows
+#ifdef _WIN32
+inline constexpr bool kUsePoolAllocator = false;
+#else
+inline constexpr bool kUsePoolAllocator = true;
+#endif
+
 struct SLEIPNIR_DLLEXPORT Expression;
 
-inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr);
-// FIXME: Make constexpr after upgrading to GCC 12+
+inline void IntrusiveSharedPtrIncRefCount(Expression* expr);
 inline void IntrusiveSharedPtrDecRefCount(Expression* expr);
 
 /**
@@ -38,8 +46,12 @@ using ExpressionPtr = IntrusiveSharedPtr<Expression>;
  */
 template <typename... Args>
 static ExpressionPtr MakeExpressionPtr(Args&&... args) {
-  return AllocateIntrusiveShared<Expression>(GlobalPoolAllocator<Expression>(),
-                                             std::forward<Args>(args)...);
+  if constexpr (kUsePoolAllocator) {
+    return AllocateIntrusiveShared<Expression>(
+        GlobalPoolAllocator<Expression>(), std::forward<Args>(args)...);
+  } else {
+    return MakeIntrusiveShared<Expression>(std::forward<Args>(args)...);
+  }
 }
 
 /**
@@ -226,15 +238,15 @@ struct SLEIPNIR_DLLEXPORT Expression {
 
     return MakeExpressionPtr(
         type, [](double lhs, double rhs) { return lhs * rhs; },
-        [](double lhs, double rhs, double parentAdjoint) {
+        [](double, double rhs, double parentAdjoint) {
           return parentAdjoint * rhs;
         },
-        [](double lhs, double rhs, double parentAdjoint) {
+        [](double lhs, double, double parentAdjoint) {
           return parentAdjoint * lhs;
         },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](const ExpressionPtr&, const ExpressionPtr& rhs,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint * rhs; },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](const ExpressionPtr& lhs, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint * lhs; },
         lhs, rhs);
   }
@@ -271,13 +283,13 @@ struct SLEIPNIR_DLLEXPORT Expression {
 
     return MakeExpressionPtr(
         type, [](double lhs, double rhs) { return lhs / rhs; },
-        [](double lhs, double rhs, double parentAdjoint) {
+        [](double, double rhs, double parentAdjoint) {
           return parentAdjoint / rhs;
         },
         [](double lhs, double rhs, double parentAdjoint) {
           return parentAdjoint * -lhs / (rhs * rhs);
         },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](const ExpressionPtr&, const ExpressionPtr& rhs,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint / rhs; },
         [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
            const ExpressionPtr& parentAdjoint) {
@@ -310,15 +322,11 @@ struct SLEIPNIR_DLLEXPORT Expression {
     return MakeExpressionPtr(
         std::max(lhs->type, rhs->type),
         [](double lhs, double rhs) { return lhs + rhs; },
-        [](double lhs, double rhs, double parentAdjoint) {
-          return parentAdjoint;
-        },
-        [](double lhs, double rhs, double parentAdjoint) {
-          return parentAdjoint;
-        },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](double, double, double parentAdjoint) { return parentAdjoint; },
+        [](double, double, double parentAdjoint) { return parentAdjoint; },
+        [](const ExpressionPtr&, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint; },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](const ExpressionPtr&, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint; },
         lhs, rhs);
   }
@@ -352,15 +360,11 @@ struct SLEIPNIR_DLLEXPORT Expression {
     return MakeExpressionPtr(
         std::max(lhs->type, rhs->type),
         [](double lhs, double rhs) { return lhs - rhs; },
-        [](double lhs, double rhs, double parentAdjoint) {
-          return parentAdjoint;
-        },
-        [](double lhs, double rhs, double parentAdjoint) {
-          return -parentAdjoint;
-        },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](double, double, double parentAdjoint) { return parentAdjoint; },
+        [](double, double, double parentAdjoint) { return -parentAdjoint; },
+        [](const ExpressionPtr&, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return parentAdjoint; },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](const ExpressionPtr&, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return -parentAdjoint; },
         lhs, rhs);
   }
@@ -384,8 +388,8 @@ struct SLEIPNIR_DLLEXPORT Expression {
 
     return MakeExpressionPtr(
         lhs->type, [](double lhs, double) { return -lhs; },
-        [](double lhs, double, double parentAdjoint) { return -parentAdjoint; },
-        [](const ExpressionPtr& lhs, const ExpressionPtr& rhs,
+        [](double, double, double parentAdjoint) { return -parentAdjoint; },
+        [](const ExpressionPtr&, const ExpressionPtr&,
            const ExpressionPtr& parentAdjoint) { return -parentAdjoint; },
         lhs);
   }
@@ -410,7 +414,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(const ExpressionPtr& x);
  *
  * @param expr The shared pointer's managed object.
  */
-inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr) {
+inline void IntrusiveSharedPtrIncRefCount(Expression* expr) {
   ++expr->refCount;
 }
 
@@ -419,13 +423,12 @@ inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr) {
  *
  * @param expr The shared pointer's managed object.
  */
-// FIXME: Make constexpr after upgrading to GCC 12+
 inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
   // If a deeply nested tree is being deallocated all at once, calling the
   // Expression destructor when expr's refcount reaches zero can cause a stack
   // overflow. Instead, we iterate over its children to decrement their
   // refcounts and deallocate them.
-  small_vector<Expression*> stack;
+  wpi::SmallVector<Expression*> stack;
   stack.emplace_back(expr);
 
   while (!stack.empty()) {
@@ -446,9 +449,11 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
 
       // Not calling the destructor here is safe because it only decrements
       // refcounts, which was already done above.
-      auto alloc = GlobalPoolAllocator<Expression>();
-      std::allocator_traits<decltype(alloc)>::deallocate(alloc, elem,
-                                                         sizeof(Expression));
+      if constexpr (kUsePoolAllocator) {
+        auto alloc = GlobalPoolAllocator<Expression>();
+        std::allocator_traits<decltype(alloc)>::deallocate(alloc, elem,
+                                                           sizeof(Expression));
+      }
     }
   }
 }
@@ -941,9 +946,8 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sign(const ExpressionPtr& x) {
           return 1.0;
         }
       },
-      [](double x, double, double parentAdjoint) { return 0.0; },
-      [](const ExpressionPtr& x, const ExpressionPtr&,
-         const ExpressionPtr& parentAdjoint) {
+      [](double, double, double) { return 0.0; },
+      [](const ExpressionPtr&, const ExpressionPtr&, const ExpressionPtr&) {
         // Return zero
         return MakeExpressionPtr();
       },

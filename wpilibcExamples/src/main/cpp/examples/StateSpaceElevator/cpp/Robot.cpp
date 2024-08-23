@@ -92,7 +92,7 @@ class Robot : public frc::TimedRobot {
   frc::TrapezoidProfile<units::meters>::State m_lastProfiledReference;
 
  public:
-  void RobotInit() override {
+  Robot() {
     // Circumference = pi * d, so distance per click = pi * d / counts
     m_encoder.SetDistancePerPulse(2.0 * std::numbers::pi * kDrumRadius.value() /
                                   4096.0);
@@ -110,7 +110,7 @@ class Robot : public frc::TimedRobot {
     // Sets the target height of our elevator. This is similar to setting the
     // setpoint of a PID controller.
     frc::TrapezoidProfile<units::meters>::State goal;
-    if (m_joystick.GetRightBumper()) {
+    if (m_joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
       goal = {kRaisedPosition, 0_fps};
     } else {

@@ -12,7 +12,7 @@
 namespace sysid {
 
 struct OLSResult {
-  /// Regression coeficients.
+  /// Regression coefficients.
   std::vector<double> coeffs;
 
   /// R² (coefficient of determination)

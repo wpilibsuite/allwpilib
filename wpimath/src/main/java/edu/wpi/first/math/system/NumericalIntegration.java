@@ -88,7 +88,7 @@ public final class NumericalIntegration {
   /**
    * Performs 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
    *
-   * @param <States> A Num prepresenting the states of the system.
+   * @param <States> A Num representing the states of the system.
    * @param f The function to integrate. It must take one argument x.
    * @param x The initial value of x.
    * @param dtSeconds The time over which to integrate.

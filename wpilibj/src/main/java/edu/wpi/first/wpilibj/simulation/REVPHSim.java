@@ -57,8 +57,7 @@ public class REVPHSim extends PneumaticsBaseSim {
    *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerCompressorConfigTypeCallback(
       NotifyCallback callback, boolean initialNotify) {

@@ -8,6 +8,7 @@
 
 #include <Eigen/Core>
 
+#include "sleipnir/autodiff/Slice.hpp"
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/util/Assert.hpp"
 #include "sleipnir/util/FunctionRef.hpp"
@@ -26,6 +27,8 @@ class VariableBlock {
 
   /**
    * Assigns a VariableBlock to the block.
+   *
+   * @param values VariableBlock of values.
    */
   VariableBlock<Mat>& operator=(const VariableBlock<Mat>& values) {
     if (this == &values) {
@@ -34,10 +37,10 @@ class VariableBlock {
 
     if (m_mat == nullptr) {
       m_mat = values.m_mat;
-      m_rowOffset = values.m_rowOffset;
-      m_colOffset = values.m_colOffset;
-      m_blockRows = values.m_blockRows;
-      m_blockCols = values.m_blockCols;
+      m_rowSlice = values.m_rowSlice;
+      m_rowSliceLength = values.m_rowSliceLength;
+      m_colSlice = values.m_colSlice;
+      m_colSliceLength = values.m_colSliceLength;
     } else {
       Assert(Rows() == values.Rows());
       Assert(Cols() == values.Cols());
@@ -56,6 +59,8 @@ class VariableBlock {
 
   /**
    * Assigns a VariableBlock to the block.
+   *
+   * @param values VariableBlock of values.
    */
   VariableBlock<Mat>& operator=(VariableBlock<Mat>&& values) {
     if (this == &values) {
@@ -64,10 +69,10 @@ class VariableBlock {
 
     if (m_mat == nullptr) {
       m_mat = values.m_mat;
-      m_rowOffset = values.m_rowOffset;
-      m_colOffset = values.m_colOffset;
-      m_blockRows = values.m_blockRows;
-      m_blockCols = values.m_blockCols;
+      m_rowSlice = values.m_rowSlice;
+      m_rowSliceLength = values.m_rowSliceLength;
+      m_colSlice = values.m_colSlice;
+      m_colSliceLength = values.m_colSliceLength;
     } else {
       Assert(Rows() == values.Rows());
       Assert(Cols() == values.Cols());
@@ -88,7 +93,11 @@ class VariableBlock {
    * @param mat The matrix to which to point.
    */
   VariableBlock(Mat& mat)  // NOLINT
-      : m_mat{&mat}, m_blockRows{mat.Rows()}, m_blockCols{mat.Cols()} {}
+      : m_mat{&mat},
+        m_rowSlice{0, mat.Rows(), 1},
+        m_rowSliceLength{m_rowSlice.Adjust(mat.Rows())},
+        m_colSlice{0, mat.Cols(), 1},
+        m_colSliceLength{m_colSlice.Adjust(mat.Cols())} {}
 
   /**
    * Constructs a Variable block pointing to a subset of the given matrix.
@@ -102,10 +111,29 @@ class VariableBlock {
   VariableBlock(Mat& mat, int rowOffset, int colOffset, int blockRows,
                 int blockCols)
       : m_mat{&mat},
-        m_rowOffset{rowOffset},
-        m_colOffset{colOffset},
-        m_blockRows{blockRows},
-        m_blockCols{blockCols} {}
+        m_rowSlice{rowOffset, rowOffset + blockRows, 1},
+        m_rowSliceLength{m_rowSlice.Adjust(mat.Rows())},
+        m_colSlice{colOffset, colOffset + blockCols, 1},
+        m_colSliceLength{m_colSlice.Adjust(mat.Cols())} {}
+
+  /**
+   * Constructs a Variable block pointing to a subset of the given matrix.
+   *
+   * Note that the slices are taken as is rather than adjusted.
+   *
+   * @param mat The matrix to which to point.
+   * @param rowSlice The block's row slice.
+   * @param rowSliceLength The block's row length.
+   * @param colSlice The block's column slice.
+   * @param colSliceLength The block's column length.
+   */
+  VariableBlock(Mat& mat, Slice rowSlice, int rowSliceLength, Slice colSlice,
+                int colSliceLength)
+      : m_mat{&mat},
+        m_rowSlice{std::move(rowSlice)},
+        m_rowSliceLength{rowSliceLength},
+        m_colSlice{std::move(colSlice)},
+        m_colSliceLength{colSliceLength} {}
 
   /**
    * Assigns a double to the block.
@@ -124,17 +152,19 @@ class VariableBlock {
    * Assigns a double to the block.
    *
    * This only works for blocks with one row and one column.
+   *
+   * @param value Value to assign.
    */
-  VariableBlock<Mat>& SetValue(double value) {
+  void SetValue(double value) {
     Assert(Rows() == 1 && Cols() == 1);
 
     (*this)(0, 0).SetValue(value);
-
-    return *this;
   }
 
   /**
    * Assigns an Eigen matrix to the block.
+   *
+   * @param values Eigen matrix of values to assign.
    */
   template <typename Derived>
   VariableBlock<Mat>& operator=(const Eigen::MatrixBase<Derived>& values) {
@@ -152,10 +182,12 @@ class VariableBlock {
 
   /**
    * Sets block's internal values.
+   *
+   * @param values Eigen matrix of values.
    */
   template <typename Derived>
     requires std::same_as<typename Derived::Scalar, double>
-  VariableBlock<Mat>& SetValue(const Eigen::MatrixBase<Derived>& values) {
+  void SetValue(const Eigen::MatrixBase<Derived>& values) {
     Assert(Rows() == values.rows());
     Assert(Cols() == values.cols());
 
@@ -164,12 +196,12 @@ class VariableBlock {
         (*this)(row, col).SetValue(values(row, col));
       }
     }
-
-    return *this;
   }
 
   /**
    * Assigns a VariableMatrix to the block.
+   *
+   * @param values VariableMatrix of values.
    */
   VariableBlock<Mat>& operator=(const Mat& values) {
     Assert(Rows() == values.Rows());
@@ -185,6 +217,8 @@ class VariableBlock {
 
   /**
    * Assigns a VariableMatrix to the block.
+   *
+   * @param values VariableMatrix of values.
    */
   VariableBlock<Mat>& operator=(Mat&& values) {
     Assert(Rows() == values.Rows());
@@ -204,12 +238,13 @@ class VariableBlock {
    * @param row The scalar subblock's row.
    * @param col The scalar subblock's column.
    */
-  template <typename Mat2 = Mat>
-    requires(!std::is_const_v<Mat2>)
-  Variable& operator()(int row, int col) {
+  Variable& operator()(int row, int col)
+    requires(!std::is_const_v<Mat>)
+  {
     Assert(row >= 0 && row < Rows());
     Assert(col >= 0 && col < Cols());
-    return (*m_mat)(m_rowOffset + row, m_colOffset + col);
+    return (*m_mat)(m_rowSlice.start + row * m_rowSlice.step,
+                    m_colSlice.start + col * m_colSlice.step);
   }
 
   /**
@@ -221,7 +256,8 @@ class VariableBlock {
   const Variable& operator()(int row, int col) const {
     Assert(row >= 0 && row < Rows());
     Assert(col >= 0 && col < Cols());
-    return (*m_mat)(m_rowOffset + row, m_colOffset + col);
+    return (*m_mat)(m_rowSlice.start + row * m_rowSlice.step,
+                    m_colSlice.start + col * m_colSlice.step);
   }
 
   /**
@@ -229,9 +265,9 @@ class VariableBlock {
    *
    * @param row The scalar subblock's row.
    */
-  template <typename Mat2 = Mat>
-    requires(!std::is_const_v<Mat2>)
-  Variable& operator()(int row) {
+  Variable& operator()(int row)
+    requires(!std::is_const_v<Mat>)
+  {
     Assert(row >= 0 && row < Rows() * Cols());
     return (*this)(row / Cols(), row % Cols());
   }
@@ -247,7 +283,7 @@ class VariableBlock {
   }
 
   /**
-   * Returns a block slice of the variable matrix.
+   * Returns a block of the variable matrix.
    *
    * @param rowOffset The row offset of the block selection.
    * @param colOffset The column offset of the block selection.
@@ -260,8 +296,8 @@ class VariableBlock {
     Assert(colOffset >= 0 && colOffset <= Cols());
     Assert(blockRows >= 0 && blockRows <= Rows() - rowOffset);
     Assert(blockCols >= 0 && blockCols <= Cols() - colOffset);
-    return VariableBlock{*m_mat, m_rowOffset + rowOffset,
-                         m_colOffset + colOffset, blockRows, blockCols};
+    return (*this)({rowOffset, rowOffset + blockRows, 1},
+                   {colOffset, colOffset + blockCols, 1});
   }
 
   /**
@@ -278,8 +314,118 @@ class VariableBlock {
     Assert(colOffset >= 0 && colOffset <= Cols());
     Assert(blockRows >= 0 && blockRows <= Rows() - rowOffset);
     Assert(blockCols >= 0 && blockCols <= Cols() - colOffset);
-    return VariableBlock{*m_mat, m_rowOffset + rowOffset,
-                         m_colOffset + colOffset, blockRows, blockCols};
+    return (*this)({rowOffset, rowOffset + blockRows, 1},
+                   {colOffset, colOffset + blockCols, 1});
+  }
+
+  /**
+   * Returns a slice of the variable matrix.
+   *
+   * @param rowSlice The row slice.
+   * @param colSlice The column slice.
+   */
+  VariableBlock<Mat> operator()(Slice rowSlice, Slice colSlice) {
+    int rowSliceLength = rowSlice.Adjust(m_rowSliceLength);
+    int colSliceLength = colSlice.Adjust(m_colSliceLength);
+    return VariableBlock{
+        *m_mat,
+        {m_rowSlice.start + rowSlice.start * m_rowSlice.step,
+         m_rowSlice.start + rowSlice.stop, m_rowSlice.step * rowSlice.step},
+        rowSliceLength,
+        {m_colSlice.start + colSlice.start * m_colSlice.step,
+         m_colSlice.start + colSlice.stop, m_colSlice.step * colSlice.step},
+        colSliceLength};
+  }
+
+  /**
+   * Returns a slice of the variable matrix.
+   *
+   * @param rowSlice The row slice.
+   * @param colSlice The column slice.
+   */
+  const VariableBlock<const Mat> operator()(Slice rowSlice,
+                                            Slice colSlice) const {
+    int rowSliceLength = rowSlice.Adjust(m_rowSliceLength);
+    int colSliceLength = colSlice.Adjust(m_colSliceLength);
+    return VariableBlock{
+        *m_mat,
+        {m_rowSlice.start + rowSlice.start * m_rowSlice.step,
+         m_rowSlice.start + rowSlice.stop, m_rowSlice.step * rowSlice.step},
+        rowSliceLength,
+        {m_colSlice.start + colSlice.start * m_colSlice.step,
+         m_colSlice.start + colSlice.stop, m_colSlice.step * colSlice.step},
+        colSliceLength};
+  }
+
+  /**
+   * Returns a slice of the variable matrix.
+   *
+   * The given slices aren't adjusted. This overload is for Python bindings
+   * only.
+   *
+   * @param rowSlice The row slice.
+   * @param rowSliceLength The row slice length.
+   * @param colSlice The column slice.
+   * @param colSliceLength The column slice length.
+   */
+  VariableBlock<Mat> operator()(Slice rowSlice, int rowSliceLength,
+                                Slice colSlice, int colSliceLength) {
+    return VariableBlock{
+        *m_mat,
+        {m_rowSlice.start + rowSlice.start * m_rowSlice.step,
+         m_rowSlice.start + rowSlice.stop, m_rowSlice.step * rowSlice.step},
+        rowSliceLength,
+        {m_colSlice.start + colSlice.start * m_colSlice.step,
+         m_colSlice.start + colSlice.stop, m_colSlice.step * colSlice.step},
+        colSliceLength};
+  }
+
+  /**
+   * Returns a slice of the variable matrix.
+   *
+   * The given slices aren't adjusted. This overload is for Python bindings
+   * only.
+   *
+   * @param rowSlice The row slice.
+   * @param rowSliceLength The row slice length.
+   * @param colSlice The column slice.
+   * @param colSliceLength The column slice length.
+   */
+  const VariableBlock<const Mat> operator()(Slice rowSlice, int rowSliceLength,
+                                            Slice colSlice,
+                                            int colSliceLength) const {
+    return VariableBlock{
+        *m_mat,
+        {m_rowSlice.start + rowSlice.start * m_rowSlice.step,
+         m_rowSlice.start + rowSlice.stop, m_rowSlice.step * rowSlice.step},
+        rowSliceLength,
+        {m_colSlice.start + colSlice.start * m_colSlice.step,
+         m_colSlice.start + colSlice.stop, m_colSlice.step * colSlice.step},
+        colSliceLength};
+  }
+
+  /**
+   * Returns a segment of the variable vector.
+   *
+   * @param offset The offset of the segment.
+   * @param length The length of the segment.
+   */
+  VariableBlock<Mat> Segment(int offset, int length) {
+    Assert(offset >= 0 && offset < Rows() * Cols());
+    Assert(length >= 0 && length <= Rows() * Cols() - offset);
+    return Block(offset, 0, length, 1);
+  }
+
+  /**
+   * Returns a segment of the variable vector.
+   *
+   * @param offset The offset of the segment.
+   * @param length The length of the segment.
+   */
+  const VariableBlock<Mat> Segment(int offset, int length) const {
+    Assert(offset >= 0 && offset < Rows() * Cols());
+    Assert(length >= 0 && length <= Rows() * Cols() - offset);
+    return Block(offset, 0, length, 1);
   }
 
   /**
@@ -441,12 +587,12 @@ class VariableBlock {
   /**
    * Returns number of rows in the matrix.
    */
-  int Rows() const { return m_blockRows; }
+  int Rows() const { return m_rowSliceLength; }
 
   /**
    * Returns number of columns in the matrix.
    */
-  int Cols() const { return m_blockCols; }
+  int Cols() const { return m_colSliceLength; }
 
   /**
    * Returns an element of the variable matrix.
@@ -454,10 +600,12 @@ class VariableBlock {
    * @param row The row of the element to return.
    * @param col The column of the element to return.
    */
-  double Value(int row, int col) const {
+  double Value(int row, int col) {
     Assert(row >= 0 && row < Rows());
     Assert(col >= 0 && col < Cols());
-    return (*m_mat)(m_rowOffset + row, m_colOffset + col).Value();
+    return (*m_mat)(m_rowSlice.start + row * m_rowSlice.step,
+                    m_colSlice.start + col * m_colSlice.step)
+        .Value();
   }
 
   /**
@@ -465,17 +613,15 @@ class VariableBlock {
    *
    * @param index The index of the element to return.
    */
-  double Value(int index) const {
+  double Value(int index) {
     Assert(index >= 0 && index < Rows() * Cols());
-    return (*m_mat)(m_rowOffset + index / m_blockCols,
-                    m_colOffset + index % m_blockCols)
-        .Value();
+    return Value(index / Cols(), index % Cols());
   }
 
   /**
    * Returns the contents of the variable matrix.
    */
-  Eigen::MatrixXd Value() const {
+  Eigen::MatrixXd Value() {
     Eigen::MatrixXd result{Rows(), Cols()};
 
     for (int row = 0; row < Rows(); ++row) {
@@ -493,7 +639,7 @@ class VariableBlock {
    * @param unaryOp The unary operator to use for the transform operation.
    */
   std::remove_cv_t<Mat> CwiseTransform(
-      function_ref<Variable(const Variable&)> unaryOp) const {
+      function_ref<Variable(const Variable& x)> unaryOp) const {
     std::remove_cv_t<Mat> result{Rows(), Cols()};
 
     for (int row = 0; row < Rows(); ++row) {
@@ -604,14 +750,16 @@ class VariableBlock {
   /**
    * Returns number of elements in matrix.
    */
-  size_t size() const { return m_blockRows * m_blockCols; }
+  size_t size() const { return Rows() * Cols(); }
 
  private:
   Mat* m_mat = nullptr;
-  int m_rowOffset = 0;
-  int m_colOffset = 0;
-  int m_blockRows = 0;
-  int m_blockCols = 0;
+
+  Slice m_rowSlice;
+  int m_rowSliceLength = 0;
+
+  Slice m_colSlice;
+  int m_colSliceLength = 0;
 };
 
 }  // namespace sleipnir

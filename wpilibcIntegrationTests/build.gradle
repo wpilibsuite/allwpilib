@@ -24,7 +24,6 @@ model {
         wpilibcIntegrationTests(NativeExecutableSpec) {
             targetBuildTypes 'debug'
             baseName = 'FRCUserProgram'
-            nativeUtils.useRequiredLibrary(it, 'googletest_static')
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     binary.sources {
@@ -53,6 +52,7 @@ model {
                     lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                     }

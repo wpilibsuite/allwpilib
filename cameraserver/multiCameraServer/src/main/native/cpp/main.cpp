@@ -8,7 +8,6 @@
 #include <thread>
 #include <vector>
 
-#include <fmt/core.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/StringExtras.h>

@@ -4,39 +4,8 @@
 
 package edu.wpi.first.math.jni;
 
-import edu.wpi.first.util.RuntimeLoader;
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /** Eigen JNI. */
-public final class EigenJNI {
-  static boolean libraryLoaded = false;
-
-  static {
-    if (Helper.getExtractOnStaticLoad()) {
-      try {
-        RuntimeLoader.loadLibrary("wpimathjni");
-      } catch (Exception ex) {
-        ex.printStackTrace();
-        System.exit(1);
-      }
-      libraryLoaded = true;
-    }
-  }
-
-  /**
-   * Force load the library.
-   *
-   * @throws IOException If the library could not be loaded or found.
-   */
-  public static synchronized void forceLoad() throws IOException {
-    if (libraryLoaded) {
-      return;
-    }
-    RuntimeLoader.loadLibrary("wpimathjni");
-    libraryLoaded = true;
-  }
-
+public final class EigenJNI extends WPIMathJNI {
   /**
    * Computes the matrix exp.
    *
@@ -82,32 +51,6 @@ public final class EigenJNI {
    */
   public static native void solveFullPivHouseholderQr(
       double[] A, int Arows, int Acols, double[] B, int Brows, int Bcols, double[] dst);
-
-  /** Sets whether JNI should be loaded in the static block. */
-  public static class Helper {
-    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
-
-    /**
-     * Returns true if the JNI should be loaded in the static block.
-     *
-     * @return True if the JNI should be loaded in the static block.
-     */
-    public static boolean getExtractOnStaticLoad() {
-      return extractOnStaticLoad.get();
-    }
-
-    /**
-     * Sets whether the JNI should be loaded in the static block.
-     *
-     * @param load Whether the JNI should be loaded in the static block.
-     */
-    public static void setExtractOnStaticLoad(boolean load) {
-      extractOnStaticLoad.set(load);
-    }
-
-    /** Utility class. */
-    private Helper() {}
-  }
 
   /** Utility class. */
   private EigenJNI() {}

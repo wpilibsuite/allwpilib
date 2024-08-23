@@ -13,20 +13,16 @@
 #ifndef WPIUTIL_WPI_ALIGNOF_H
 #define WPIUTIL_WPI_ALIGNOF_H
 
-#include <type_traits>
+#include <algorithm>
+#include <cstddef>
 
 namespace wpi {
 
 /// A suitably aligned and sized character array member which can hold elements
 /// of any type.
-///
-/// This template is equivalent to std::aligned_union_t<1, ...>, but we cannot
-/// use it due to a bug in the MSVC x86 compiler:
-/// https://github.com/microsoft/STL/issues/1533
-/// Using `alignas` here works around the bug.
-template <typename T, typename... Ts> struct AlignedCharArrayUnion {
-  using AlignedUnion = std::aligned_union_t<1, T, Ts...>;
-  alignas(alignof(AlignedUnion)) char buffer[sizeof(AlignedUnion)];
+template <typename... Ts> struct AlignedCharArrayUnion {
+  alignas((std::max)({alignof(Ts)...}))
+      std::byte buffer[(std::max)({static_cast<size_t>(1), sizeof(Ts)...})];
 };
 
 } // end namespace wpi

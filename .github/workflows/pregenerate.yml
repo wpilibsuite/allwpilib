@@ -31,7 +31,15 @@ jobs:
       - name: Run ntcore
         run: ./ntcore/generate_topics.py
       - name: Run wpimath
-        run: ./wpimath/generate_numbers.py && ./wpimath/generate_quickbuf.py protoc protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
+        run: ./wpimath/generate_numbers.py && ./wpimath/generate_quickbuf.py --quickbuf_plugin=protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
+      - name: Run HIDs
+        run: ./wpilibj/generate_hids.py && ./wpilibc/generate_hids.py && ./wpilibNewCommands/generate_hids.py
+      - name: Run PWM Controllers
+        run: ./wpilibj/generate_pwm_motor_controllers.py && ./wpilibc/generate_pwm_motor_controllers.py
+      - name: Run imgui gl3w
+        run: ./thirdparty/imgui_suite/generate_gl3w.py
+      - name: Run imgui fonts
+        run: ./thirdparty/imgui_suite/generate_fonts.sh
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

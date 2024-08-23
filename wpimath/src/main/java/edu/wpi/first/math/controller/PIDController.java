@@ -242,6 +242,15 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Returns the accumulated error used in the integral calculation of this controller.
+   *
+   * @return The accumulated error of this controller.
+   */
+  public double getAccumulatedError() {
+    return m_totalError;
+  }
+
+  /**
    * Sets the setpoint for the PIDController.
    *
    * @param setpoint The desired setpoint.

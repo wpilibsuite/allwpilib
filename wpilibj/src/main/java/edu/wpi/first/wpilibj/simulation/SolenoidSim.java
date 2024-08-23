@@ -68,8 +68,7 @@ public class SolenoidSim {
    *
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
+   * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerOutputCallback(NotifyCallback callback, boolean initialNotify) {
     return m_module.registerSolenoidOutputCallback(m_channel, callback, initialNotify);

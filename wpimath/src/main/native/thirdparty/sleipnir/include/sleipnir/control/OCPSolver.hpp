@@ -17,18 +17,6 @@
 namespace sleipnir {
 
 /**
- * Function representing an explicit or implicit ODE, or a discrete state
- * transition function.
- *
- * - Explicit: dx/dt = f(t, x, u, *)
- * - Implicit: f(t, [x dx/dt]', u, *) = 0
- * - State transition: xₖ₊₁ = f(t, xₖ, uₖ, dt)
- */
-using DynamicsFunction =
-    function_ref<VariableMatrix(const Variable&, const VariableMatrix&,
-                                const VariableMatrix&, const Variable&)>;
-
-/**
  * Performs 4th order Runge-Kutta integration of dx/dt = f(t, x, u) for dt.
  *
  * @param f  The function to integrate. It must take two arguments x and u.
@@ -122,15 +110,61 @@ class SLEIPNIR_DLLEXPORT OCPSolver : public OptimizationProblem {
    * @param numInputs The number of system inputs.
    * @param dt The timestep for fixed-step integration.
    * @param numSteps The number of control points.
-   * @param dynamics The system evolution function, either an explicit ODE or a
-   * discrete state transition function.
+   * @param dynamics Function representing an explicit or implicit ODE, or a
+   *   discrete state transition function.
+   *   - Explicit: dx/dt = f(x, u, *)
+   *   - Implicit: f([x dx/dt]', u, *) = 0
+   *   - State transition: xₖ₊₁ = f(xₖ, uₖ)
    * @param dynamicsType The type of system evolution function.
    * @param timestepMethod The timestep method.
    * @param method The transcription method.
    */
   OCPSolver(
       int numStates, int numInputs, std::chrono::duration<double> dt,
-      int numSteps, DynamicsFunction dynamics,
+      int numSteps,
+      function_ref<VariableMatrix(const VariableMatrix& x,
+                                  const VariableMatrix& u)>
+          dynamics,
+      DynamicsType dynamicsType = DynamicsType::kExplicitODE,
+      TimestepMethod timestepMethod = TimestepMethod::kFixed,
+      TranscriptionMethod method = TranscriptionMethod::kDirectTranscription)
+      : OCPSolver{numStates,
+                  numInputs,
+                  dt,
+                  numSteps,
+                  [=]([[maybe_unused]] const VariableMatrix& t,
+                      const VariableMatrix& x, const VariableMatrix& u,
+                      [[maybe_unused]]
+                      const VariableMatrix& dt) -> VariableMatrix {
+                    return dynamics(x, u);
+                  },
+                  dynamicsType,
+                  timestepMethod,
+                  method} {}
+
+  /**
+   * Build an optimization problem using a system evolution function (explicit
+   * ODE or discrete state transition function).
+   *
+   * @param numStates The number of system states.
+   * @param numInputs The number of system inputs.
+   * @param dt The timestep for fixed-step integration.
+   * @param numSteps The number of control points.
+   * @param dynamics Function representing an explicit or implicit ODE, or a
+   *   discrete state transition function.
+   *   - Explicit: dx/dt = f(t, x, u, *)
+   *   - Implicit: f(t, [x dx/dt]', u, *) = 0
+   *   - State transition: xₖ₊₁ = f(t, xₖ, uₖ, dt)
+   * @param dynamicsType The type of system evolution function.
+   * @param timestepMethod The timestep method.
+   * @param method The transcription method.
+   */
+  OCPSolver(
+      int numStates, int numInputs, std::chrono::duration<double> dt,
+      int numSteps,
+      function_ref<VariableMatrix(const Variable& t, const VariableMatrix& x,
+                                  const VariableMatrix& u, const Variable& dt)>
+          dynamics,
       DynamicsType dynamicsType = DynamicsType::kExplicitODE,
       TimestepMethod timestepMethod = TimestepMethod::kFixed,
       TranscriptionMethod method = TranscriptionMethod::kDirectTranscription)
@@ -208,12 +242,30 @@ class SLEIPNIR_DLLEXPORT OCPSolver : public OptimizationProblem {
    * `numSteps+1` times, with the corresponding state and input
    * VariableMatrices.
    *
+   * @param callback The callback f(x, u) where x is the state and u is the
+   *     input vector.
+   */
+  void ForEachStep(
+      const function_ref<void(const VariableMatrix& x, const VariableMatrix& u)>
+          callback) {
+    for (int i = 0; i < m_numSteps + 1; ++i) {
+      auto x = X().Col(i);
+      auto u = U().Col(i);
+      callback(x, u);
+    }
+  }
+
+  /**
+   * Set the constraint evaluation function. This function is called
+   * `numSteps+1` times, with the corresponding state and input
+   * VariableMatrices.
+   *
    * @param callback The callback f(t, x, u, dt) where t is time, x is the state
    *   vector, u is the input vector, and dt is the timestep duration.
    */
   void ForEachStep(
-      const function_ref<void(const Variable&, const VariableMatrix&,
-                              const VariableMatrix&, const Variable&)>
+      const function_ref<void(const Variable& t, const VariableMatrix& x,
+                              const VariableMatrix& u, const Variable& dt)>
           callback) {
     Variable time = 0.0;
 
@@ -256,21 +308,21 @@ class SLEIPNIR_DLLEXPORT OCPSolver : public OptimizationProblem {
   }
 
   /**
-   * Convenience function to set an upper bound on the timestep.
-   *
-   * @param maxTimestep The maximum timestep.
-   */
-  void SetMaxTimestep(std::chrono::duration<double> maxTimestep) {
-    SubjectTo(DT() <= maxTimestep.count());
-  }
-
-  /**
    * Convenience function to set a lower bound on the timestep.
    *
    * @param minTimestep The minimum timestep.
    */
   void SetMinTimestep(std::chrono::duration<double> minTimestep) {
     SubjectTo(DT() >= minTimestep.count());
+  }
+
+  /**
+   * Convenience function to set an upper bound on the timestep.
+   *
+   * @param maxTimestep The maximum timestep.
+   */
+  void SetMaxTimestep(std::chrono::duration<double> maxTimestep) {
+    SubjectTo(DT() <= maxTimestep.count());
   }
 
   /**
@@ -325,26 +377,33 @@ class SLEIPNIR_DLLEXPORT OCPSolver : public OptimizationProblem {
 
     Variable time = 0.0;
 
+    // Derivation at https://mec560sbu.github.io/2016/09/30/direct_collocation/
     for (int i = 0; i < m_numSteps; ++i) {
+      Variable h = DT()(0, i);
+
+      auto& f = m_dynamicsFunction;
+
+      auto t_begin = time;
+      auto t_end = t_begin + h;
+
       auto x_begin = X().Col(i);
       auto x_end = X().Col(i + 1);
+
       auto u_begin = U().Col(i);
-      Variable dt = DT()(0, i);
-      auto t_begin = time;
-      auto t_end = time + dt;
-      auto t_c = t_begin + dt / 2.0;
+      auto u_end = U().Col(i + 1);
 
-      time += dt;
+      auto xdot_begin = f(t_begin, x_begin, u_begin, h);
+      auto xdot_end = f(t_end, x_end, u_end, h);
+      auto xdot_c =
+          -3 / (2 * h) * (x_begin - x_end) - 0.25 * (xdot_begin + xdot_end);
 
-      // Use u_begin on the end point as well because we are approaching a
-      // discontinuity from the left
-      auto f_begin = m_dynamicsFunction(t_begin, x_begin, u_begin, dt);
-      auto f_end = m_dynamicsFunction(t_end, x_end, u_begin, dt);
-      auto x_c = (x_begin + x_end) / 2.0 + (f_begin - f_end) * (dt / 8.0);
-      auto xprime_c =
-          (x_begin - x_end) * (-3.0 / (2.0 * dt)) - (f_begin + f_end) / 4.0;
-      auto f_c = m_dynamicsFunction(t_c, x_c, u_begin, dt);
-      SubjectTo(f_c == xprime_c);
+      auto t_c = t_begin + 0.5 * h;
+      auto x_c = 0.5 * (x_begin + x_end) + h / 8 * (xdot_begin - xdot_end);
+      auto u_c = 0.5 * (u_begin + u_end);
+
+      SubjectTo(xdot_c == f(t_c, x_c, u_c, h));
+
+      time += h;
     }
   }
 
@@ -358,9 +417,9 @@ class SLEIPNIR_DLLEXPORT OCPSolver : public OptimizationProblem {
       Variable dt = DT()(0, i);
 
       if (m_dynamicsType == DynamicsType::kExplicitODE) {
-        SubjectTo(x_end ==
-                  RK4<const DynamicsFunction&, VariableMatrix, VariableMatrix,
-                      Variable>(m_dynamicsFunction, x_begin, u, time, dt));
+        SubjectTo(x_end == RK4<const decltype(m_dynamicsFunction)&,
+                               VariableMatrix, VariableMatrix, Variable>(
+                               m_dynamicsFunction, x_begin, u, time, dt));
       } else if (m_dynamicsType == DynamicsType::kDiscrete) {
         SubjectTo(x_end == m_dynamicsFunction(time, x_begin, u, dt));
       }
@@ -379,8 +438,9 @@ class SLEIPNIR_DLLEXPORT OCPSolver : public OptimizationProblem {
       Variable dt = DT()(0, i);
 
       if (m_dynamicsType == DynamicsType::kExplicitODE) {
-        x_end = RK4<const DynamicsFunction&, VariableMatrix, VariableMatrix,
-                    Variable>(m_dynamicsFunction, x_begin, u, time, dt);
+        x_end = RK4<const decltype(m_dynamicsFunction)&, VariableMatrix,
+                    VariableMatrix, Variable>(m_dynamicsFunction, x_begin, u,
+                                              time, dt);
       } else if (m_dynamicsType == DynamicsType::kDiscrete) {
         x_end = m_dynamicsFunction(time, x_begin, u, dt);
       }
@@ -396,7 +456,10 @@ class SLEIPNIR_DLLEXPORT OCPSolver : public OptimizationProblem {
   TranscriptionMethod m_transcriptionMethod;
 
   DynamicsType m_dynamicsType;
-  DynamicsFunction m_dynamicsFunction;
+
+  function_ref<VariableMatrix(const Variable& t, const VariableMatrix& x,
+                              const VariableMatrix& u, const Variable& dt)>
+      m_dynamicsFunction;
 
   TimestepMethod m_timestepMethod;
 

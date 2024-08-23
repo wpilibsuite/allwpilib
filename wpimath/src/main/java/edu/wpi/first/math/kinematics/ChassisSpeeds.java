@@ -159,7 +159,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /**
    * Discretizes a continuous-time chassis speed.
    *
-   * <p>This function converts a continous-time chassis speed into a discrete-time one such that
+   * <p>This function converts a continuous-time chassis speed into a discrete-time one such that
    * when the discrete-time chassis speed is applied for one timestep, the robot moves as if the
    * velocity components are independent (i.e., the robot moves v_x * dt along the x-axis, v_y * dt
    * along the y-axis, and omega * dt around the z-axis).
@@ -391,13 +391,11 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
 
   @Override
   public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    }
-    return o instanceof ChassisSpeeds c
-        && vxMetersPerSecond == c.vxMetersPerSecond
-        && vyMetersPerSecond == c.vyMetersPerSecond
-        && omegaRadiansPerSecond == c.omegaRadiansPerSecond;
+    return o == this
+        || o instanceof ChassisSpeeds c
+            && vxMetersPerSecond == c.vxMetersPerSecond
+            && vyMetersPerSecond == c.vyMetersPerSecond
+            && omegaRadiansPerSecond == c.omegaRadiansPerSecond;
   }
 
   @Override
