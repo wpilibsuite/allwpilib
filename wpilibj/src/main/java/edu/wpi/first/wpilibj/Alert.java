@@ -70,6 +70,7 @@ public class Alert {
    * @param text Text to be displayed when the alert is active.
    * @param type Alert urgency level.
    */
+  @SuppressWarnings("this-escape")
   public Alert(String group, String text, AlertType type) {
     if (!groups.containsKey(group)) {
       groups.put(group, new SendableAlerts());
