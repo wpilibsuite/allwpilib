@@ -21,6 +21,7 @@ SOFTWARE.
  */
 
 #include "common/pthreads_cross.h"
+#include <time.h>
 
 #ifdef _WIN32
 
@@ -229,10 +230,15 @@ void ms_to_timespec(struct timespec *ts, unsigned int ms)
 
 unsigned int timespec_to_ms(const struct timespec *abstime)
 {
+    DWORD t;
+
     if (abstime == NULL)
         return INFINITE;
 
-    return ((abstime->tv_sec - time(NULL)) * 1000) + (abstime->tv_nsec / 1000000);
+    t = ((abstime->tv_sec - time(NULL)) * 1000) + (abstime->tv_nsec / 1000000);
+    if (t < 0)
+        t = 1;
+    return t;
 }
 
 unsigned int pcthread_get_num_procs(void)

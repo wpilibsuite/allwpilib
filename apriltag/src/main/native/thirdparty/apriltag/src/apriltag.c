@@ -32,7 +32,6 @@ either expressed or implied, of the Regents of The University of Michigan.
 
 #include "apriltag.h"
 
-#define _USE_MATH_DEFINES
 #include <math.h>
 #include <assert.h>
 #include <stdint.h>
@@ -51,6 +50,10 @@ either expressed or implied, of the Regents of The University of Michigan.
 #include "common/debug_print.h"
 
 #include "apriltag_math.h"
+
+#ifndef M_PI
+# define M_PI 3.141592653589793238462643383279502884196
+#endif
 
 #ifdef _WIN32
 static inline void srandom(unsigned int seed)
@@ -226,7 +229,7 @@ static void quick_decode_init(apriltag_family_t *family, int maxhamming)
 
     errno = 0;
 
-    for (uint32_t i = 0; i < family->ncodes; i++) {
+    for (int i = 0; i < family->ncodes; i++) {
         uint64_t code = family->codes[i];
 
         // add exact code (hamming = 0)
@@ -443,10 +446,6 @@ static matd_t* homography_compute2(double c[4][4]) {
             }
         }
 
-        if (max_val_idx < 0) {
-            return NULL;
-        }
-
         if (max_val < epsilon) {
             debug_print("WRN: Matrix is singular.\n");
             return NULL;
@@ -623,7 +622,7 @@ static float quad_decode(apriltag_detector_t* td, apriltag_family_t *family, ima
     graymodel_init(&whitemodel);
     graymodel_init(&blackmodel);
 
-    for (long unsigned int pattern_idx = 0; pattern_idx < sizeof(patterns)/(5*sizeof(float)); pattern_idx ++) {
+    for (int pattern_idx = 0; pattern_idx < sizeof(patterns)/(5*sizeof(float)); pattern_idx ++) {
         float *pattern = &patterns[pattern_idx * 5];
 
         int is_white = pattern[4];
@@ -684,7 +683,7 @@ static float quad_decode(apriltag_detector_t* td, apriltag_family_t *family, ima
     double *values = calloc(family->total_width*family->total_width, sizeof(double));
 
     int min_coord = (family->width_at_border - family->total_width)/2;
-    for (uint32_t i = 0; i < family->nbits; i++) {
+    for (int i = 0; i < family->nbits; i++) {
         int bity = family->bit_y[i];
         int bitx = family->bit_x[i];
 
@@ -717,7 +716,7 @@ static float quad_decode(apriltag_detector_t* td, apriltag_family_t *family, ima
     sharpen(td, values, family->total_width);
 
     uint64_t rcode = 0;
-    for (uint32_t i = 0; i < family->nbits; i++) {
+    for (int i = 0; i < family->nbits; i++) {
         int bity = family->bit_y[i];
         int bitx = family->bit_x[i];
         rcode = (rcode << 1);
@@ -1339,7 +1338,8 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
                 int k = (j + 1) & 3;
                 image_u8x3_draw_line(out,
                                      det->p[j][0], det->p[j][1], det->p[k][0], det->p[k][1],
-                                     (uint8_t[]) { rgb[0], rgb[1], rgb[2] });
+                                     (uint8_t[]) { rgb[0], rgb[1], rgb[2] },
+                                     1);
             }
         }
 
@@ -1419,10 +1419,10 @@ void apriltag_detections_destroy(zarray_t *detections)
     zarray_destroy(detections);
 }
 
-image_u8_t *apriltag_to_image(apriltag_family_t *fam, uint32_t idx)
+image_u8_t *apriltag_to_image(apriltag_family_t *fam, int idx)
 {
     assert(fam != NULL);
-    assert(idx < fam->ncodes);
+    assert(idx >= 0 && idx < fam->ncodes);
 
     uint64_t code = fam->codes[idx];
 
@@ -1439,7 +1439,7 @@ image_u8_t *apriltag_to_image(apriltag_family_t *fam, uint32_t idx)
     }
 
     int border_start = (fam->total_width - fam->width_at_border)/2;
-    for (uint32_t i = 0; i < fam->nbits; i++) {
+    for (int i = 0; i < fam->nbits; i++) {
         if (code & (APRILTAG_U64_ONE << (fam->nbits - i - 1))) {
             im->buf[(fam->bit_y[i] + border_start)*im->stride + fam->bit_x[i] + border_start] = 255;
         }

@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sun, 23 Jun 2024 05:53:42 -0700
+Subject: [PATCH 7/9] Fix GCC 14 calloc() warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+```
+/home/tav/frc/wpilib/allwpilib/build-cmake-release/_deps/apriltaglib-src/common/zmaxheap.c: In function ‘zmaxheap_test’:
+/home/tav/frc/wpilib/allwpilib/build-cmake-release/_deps/apriltaglib-src/common/zmaxheap.c:365:35: error: ‘calloc’ sizes specified with ‘sizeof’ in the earlier argument and not in the later argument [-Werror=calloc-transposed-args]
+  365 |     int32_t *vals = calloc(sizeof(int32_t), cap);
+      |                                   ^~~~~~~
+/home/tav/frc/wpilib/allwpilib/build-cmake-release/_deps/apriltaglib-src/common/zmaxheap.c:365:35: note: earlier argument should specify number of elements, later size of each element
+```
+---
+ common/zmaxheap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common/zmaxheap.c b/common/zmaxheap.c
+index 2c671236bf07ed4c43e15c02f4bf10df76880cb9..ed271420d229a98b56c7027f47d9830a78a97db1 100644
+--- a/common/zmaxheap.c
++++ b/common/zmaxheap.c
+@@ -362,7 +362,7 @@ void zmaxheap_test()
+ {
+     int cap = 10000;
+     int sz = 0;
+-    int32_t *vals = calloc(sizeof(int32_t), cap);
++    int32_t *vals = calloc(cap, sizeof(int32_t));
+ 
+     zmaxheap_t *heap = zmaxheap_create(sizeof(int32_t));
+ 
