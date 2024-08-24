@@ -144,9 +144,6 @@ doxygen {
         exclude 'units/**'
     }
 
-    //TODO: building memory docs causes search to break
-    exclude 'wpi/memory/**'
-
     exclude '*.pb.h'
 
     // Save space by excluding protobuf and eigen

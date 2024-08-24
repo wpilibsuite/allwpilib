@@ -18,9 +18,9 @@ namespace wpi
 {
     namespace memory
     {
-        /// A \concept{concept_rawallocator,RawAllocator} adapter that ensures a minimum alignment.
+        /// A RawAllocator adapter that ensures a minimum alignment.
         /// It adjusts the alignment value so that it is always larger than the minimum and forwards to the specified allocator.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <class RawAllocator>
         class aligned_allocator : WPI_EBO(allocator_traits<RawAllocator>::allocator_type)
         {

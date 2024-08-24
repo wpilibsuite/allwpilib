@@ -1,0 +1,1459 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ryan Blue <ryanzblue@gmail.com>
+Date: Wed, 21 Aug 2024 21:47:32 -0400
+Subject: [PATCH 2/2] Remove conflicting doxygen 'concept' alias
+
+\concept was added as a doxygen command in 1.9.2 and is meant to be applied to concepts. Inserting them into standard comment paragraphs causes doxygen to interpret the following text as a concept name and add it to the documentation, as well as remove the text from the paragraph.
+In the upstream repo, this alias links to markdown documentation, so it's not usable for us anyways.
+---
+ .../foonathan/memory/aligned_allocator.hpp    |  2 +-
+ .../foonathan/memory/allocator_storage.hpp    | 20 +++----
+ include/foonathan/memory/allocator_traits.hpp | 12 ++---
+ include/foonathan/memory/container.hpp        |  8 +--
+ .../foonathan/memory/default_allocator.hpp    |  4 +-
+ include/foonathan/memory/deleter.hpp          |  6 +--
+ .../foonathan/memory/fallback_allocator.hpp   |  6 +--
+ include/foonathan/memory/heap_allocator.hpp   |  2 +-
+ .../foonathan/memory/iteration_allocator.hpp  | 10 ++--
+ include/foonathan/memory/joint_allocator.hpp  |  8 +--
+ include/foonathan/memory/malloc_allocator.hpp |  2 +-
+ include/foonathan/memory/memory_arena.hpp     | 42 +++++++--------
+ include/foonathan/memory/memory_pool.hpp      | 46 ++++++++--------
+ .../memory/memory_pool_collection.hpp         | 52 +++++++++----------
+ .../memory/memory_resource_adapter.hpp        |  6 +--
+ include/foonathan/memory/memory_stack.hpp     | 18 +++----
+ include/foonathan/memory/new_allocator.hpp    |  2 +-
+ include/foonathan/memory/segregator.hpp       | 28 +++++-----
+ include/foonathan/memory/smart_ptr.hpp        | 16 +++---
+ include/foonathan/memory/static_allocator.hpp | 10 ++--
+ include/foonathan/memory/std_allocator.hpp    | 10 ++--
+ .../foonathan/memory/temporary_allocator.hpp  |  2 +-
+ include/foonathan/memory/threading.hpp        |  2 +-
+ include/foonathan/memory/tracking.hpp         | 28 +++++-----
+ include/foonathan/memory/virtual_memory.hpp   | 10 ++--
+ 25 files changed, 176 insertions(+), 176 deletions(-)
+
+diff --git a/include/foonathan/memory/aligned_allocator.hpp b/include/foonathan/memory/aligned_allocator.hpp
+index 5ca3f29b20575a36ef11327bb1219cb4013fc5e4..f9b190de4877df70c564dc5984b1f70d4fa925cf 100644
+--- a/include/foonathan/memory/aligned_allocator.hpp
++++ b/include/foonathan/memory/aligned_allocator.hpp
+@@ -18,7 +18,7 @@ namespace foonathan
+ {
+     namespace memory
+     {
+-        /// A \concept{concept_rawallocator,RawAllocator} adapter that ensures a minimum alignment.
++        /// A RawAllocator adapter that ensures a minimum alignment.
+         /// It adjusts the alignment value so that it is always larger than the minimum and forwards to the specified allocator.
+         /// \ingroup memory_adapter
+         template <class RawAllocator>
+diff --git a/include/foonathan/memory/allocator_storage.hpp b/include/foonathan/memory/allocator_storage.hpp
+index 11747a5b15c500243764094dba3163cc9e014390..a7931503369110298602e8919c37b34577d7b6be 100644
+--- a/include/foonathan/memory/allocator_storage.hpp
++++ b/include/foonathan/memory/allocator_storage.hpp
+@@ -85,8 +85,8 @@ namespace foonathan
+             }
+         } // namespace detail
+ 
+-        /// A \concept{concept_rawallocator,RawAllocator} that stores another allocator.
+-        /// The \concept{concept_storagepolicy,StoragePolicy} defines the allocator type being stored and how it is stored.
++        /// A RawAllocator that stores another allocator.
++        /// The StoragePolicy defines the allocator type being stored and how it is stored.
+         /// The \c Mutex controls synchronization of the access.
+         /// \ingroup memory_storage
+         template <class StoragePolicy, class Mutex>
+@@ -322,7 +322,7 @@ namespace foonathan
+         {
+         };
+ 
+-        /// A \concept{concept_storagepolicy,StoragePolicy} that stores the allocator directly.
++        /// A StoragePolicy that stores the allocator directly.
+         /// It embeds the allocator inside it, i.e. moving the storage policy will move the allocator.
+         /// \ingroup memory_storage
+         template <class RawAllocator>
+@@ -379,7 +379,7 @@ namespace foonathan
+         };
+ 
+         /// An alias template for \ref allocator_storage using the \ref direct_storage policy without a mutex.
+-        /// It has the effect of giving any \concept{concept_rawallocator,RawAllocator} the interface with all member functions,
++        /// It has the effect of giving any RawAllocator the interface with all member functions,
+         /// avoiding the need to wrap it inside the \ref allocator_traits.
+         /// \ingroup memory_storage
+         template <class RawAllocator>
+@@ -521,7 +521,7 @@ namespace foonathan
+             };
+         } // namespace detail
+ 
+-        /// Specifies whether or not a \concept{concept_rawallocator,RawAllocator} has shared semantics.
++        /// Specifies whether or not a RawAllocator has shared semantics.
+         /// It is shared, if - like \ref allocator_reference - if multiple objects refer to the same internal allocator and if it can be copied.
+         /// This sharing is stateful, however, stateless allocators are not considered shared in the meaning of this traits. <br>
+         /// If a \c RawAllocator is shared, it will be directly embedded inside \ref reference_storage since it already provides \ref allocator_reference like semantics, so there is no need to add them manually,<br>
+@@ -534,7 +534,7 @@ namespace foonathan
+         {
+         };
+ 
+-        /// A \concept{concept_storagepolicy,StoragePolicy} that stores a reference to an allocator.
++        /// A StoragePolicy that stores a reference to an allocator.
+         /// For stateful allocators it only stores a pointer to an allocator object and copying/moving only copies the pointer.
+         /// For stateless allocators it does not store anything, an allocator will be constructed as needed.
+         /// For allocators that are already shared (determined through \ref is_shared_allocator) it will store the allocator type directly.
+@@ -711,7 +711,7 @@ namespace foonathan
+         public:
+             using allocator_type = FOONATHAN_IMPL_DEFINED(base_allocator);
+ 
+-            /// \effects Creates it from a reference to any stateful \concept{concept_rawallocator,RawAllocator}.
++            /// \effects Creates it from a reference to any stateful RawAllocator.
+             /// It will store a pointer to this allocator object.
+             /// \note The user has to take care that the lifetime of the reference does not exceed the allocator lifetime.
+             template <class RawAllocator>
+@@ -723,7 +723,7 @@ namespace foonathan
+                 ::new (static_cast<void*>(&storage_)) basic_allocator<RawAllocator>(alloc);
+             }
+ 
+-            // \effects Creates it from any stateless \concept{concept_rawallocator,RawAllocator}.
++            // \effects Creates it from any stateless RawAllocator.
+             /// It will not store anything, only creates the allocator as needed.
+             /// \requires The \c RawAllocator is stateless.
+             template <class RawAllocator>
+@@ -771,7 +771,7 @@ namespace foonathan
+ 
+             /// \returns A reference to the allocator.
+             /// The actual type is implementation-defined since it is the base class used in the type-erasure,
+-            /// but it provides the full \concept{concept_rawallocator,RawAllocator} member functions.
++            /// but it provides the full RawAllocator member functions.
+             /// \note There is no way to access any custom member functions of the allocator type.
+             allocator_type& get_allocator() const noexcept
+             {
+@@ -913,7 +913,7 @@ namespace foonathan
+         using any_reference_storage = reference_storage<any_allocator>;
+ 
+         /// An alias for \ref allocator_storage using the \ref any_reference_storage.
+-        /// It will store a reference to any \concept{concept_rawallocator,RawAllocator}.
++        /// It will store a reference to any RawAllocator.
+         /// This is the same as passing the tag type \ref any_allocator to the alias \ref allocator_reference.
+         /// Wrap the allocator in a \ref thread_safe_allocator if you want thread safety.
+         /// \ingroup memory_storage
+diff --git a/include/foonathan/memory/allocator_traits.hpp b/include/foonathan/memory/allocator_traits.hpp
+index 03b7ecdebc3511a07a1305b3101f28a6e304abc3..46a77ebac31ff33d451890b12f3530cefe42e151 100644
+--- a/include/foonathan/memory/allocator_traits.hpp
++++ b/include/foonathan/memory/allocator_traits.hpp
+@@ -50,7 +50,7 @@ namespace foonathan
+             };
+         } // namespace detail
+ 
+-        /// Traits class that checks whether or not a standard \c Allocator can be used as \concept{concept_rawallocator,RawAllocator}.
++        /// Traits class that checks whether or not a standard \c Allocator can be used as RawAllocator.
+         /// It checks the existence of a custom \c construct(), \c destroy() function, if provided,
+         /// it cannot be used since it would not be called.<br>
+         /// Specialize it for custom \c Allocator types to override this check.
+@@ -283,7 +283,7 @@ namespace foonathan
+             }
+         } // namespace traits_detail
+ 
+-        /// The default specialization of the allocator_traits for a \concept{concept_rawallocator,RawAllocator}.
++        /// The default specialization of the allocator_traits for a RawAllocator.
+         /// See the last link for the requirements on types that do not specialize this class and the interface documentation.
+         /// Any specialization must provide the same interface.
+         /// \ingroup memory_core
+@@ -408,7 +408,7 @@ namespace foonathan
+             };
+         } // namespace detail
+ 
+-        /// Traits that check whether a type models concept \concept{concept_rawallocator,RawAllocator}.<br>
++        /// Traits that check whether a type models concept RawAllocator.<br>
+         /// It must either provide the necessary functions for the default traits specialization or has specialized it.
+         /// \ingroup memory_core
+         template <typename T>
+@@ -491,7 +491,7 @@ namespace foonathan
+             }
+         } // namespace traits_detail
+ 
+-        /// The default specialization of the composable_allocator_traits for a \concept{concept_composableallocator,ComposableAllocator}.
++        /// The default specialization of the composable_allocator_traits for a ComposableAllocator.
+         /// See the last link for the requirements on types that do not specialize this class and the interface documentation.
+         /// Any specialization must provide the same interface.
+         /// \ingroup memory_core
+@@ -586,8 +586,8 @@ namespace foonathan
+             };
+         } // namespace detail
+ 
+-        /// Traits that check whether a type models concept \concept{concept_rawallocator,ComposableAllocator}.<br>
+-        /// It must be a \concept{concept_rawallocator,RawAllocator} and either provide the necessary functions for the default traits specialization or has specialized it.
++        /// Traits that check whether a type models concept ComposableAllocator.<br>
++        /// It must be a RawAllocator and either provide the necessary functions for the default traits specialization or has specialized it.
+         /// \ingroup memory_core
+         template <typename T>
+         struct is_composable_allocator
+diff --git a/include/foonathan/memory/container.hpp b/include/foonathan/memory/container.hpp
+index c954ca5deece3f4430fb934642b60e2e4550deff..307ca115ea529655666c81766f385dda5ac68c3b 100644
+--- a/include/foonathan/memory/container.hpp
++++ b/include/foonathan/memory/container.hpp
+@@ -5,7 +5,7 @@
+ #define FOONATHAN_MEMORY_CONTAINER_HPP_INCLUDED
+ 
+ /// \file
+-/// Aliasas for STL containers using a certain \concept{concept_rawallocator,RawAllocator}.
++/// Aliasas for STL containers using a certain RawAllocator.
+ /// \note Only available on a hosted implementation.
+ 
+ #include "config.hpp"
+@@ -40,7 +40,7 @@ namespace foonathan
+         /// @{
+ 
+         /// Alias template for an STL container that uses a certain
+-        /// \concept{concept_rawallocator,RawAllocator}. It is just a shorthand for a passing in the \c
++        /// RawAllocator. It is just a shorthand for a passing in the \c
+         /// RawAllocator wrapped in a \ref foonathan::memory::std_allocator.
+         template <typename T, class RawAllocator>
+         FOONATHAN_ALIAS_TEMPLATE(vector, std::vector<T, std_allocator<T, RawAllocator>>);
+@@ -212,7 +212,7 @@ namespace foonathan
+ 
+         /// @{
+         /// Convenience function to create a container adapter using a certain
+-        /// \concept{concept_rawallocator,RawAllocator}. \returns An empty adapter with an
++        /// RawAllocator. \returns An empty adapter with an
+         /// implementation container using a reference to a given allocator. \ingroup memory_adapter
+         template <typename T, class RawAllocator, class Container = deque<T, RawAllocator>>
+         std::stack<T, Container> make_stack(RawAllocator& allocator)
+@@ -355,7 +355,7 @@ namespace foonathan
+ #if !defined(FOONATHAN_MEMORY_NO_NODE_SIZE)
+         /// The node size required by \ref allocate_shared.
+         /// \note This is similar to \ref shared_ptr_node_size but takes a
+-        /// \concept{concept_rawallocator,RawAllocator} instead.
++        /// RawAllocator instead.
+         template <typename T, class RawAllocator>
+         struct allocate_shared_node_size : shared_ptr_node_size<T, std_allocator<T, RawAllocator>>
+         {
+diff --git a/include/foonathan/memory/default_allocator.hpp b/include/foonathan/memory/default_allocator.hpp
+index 8466bc3a6ecac6cc1ef7c95cb78206b2e56dbf57..f61d3a1385ffafd3d9ffde6322e6cd99c56a9d21 100644
+--- a/include/foonathan/memory/default_allocator.hpp
++++ b/include/foonathan/memory/default_allocator.hpp
+@@ -21,9 +21,9 @@ namespace foonathan
+ {
+     namespace memory
+     {
+-        /// The default \concept{concept_rawallocator,RawAllocator} that will be used as \concept{concept_blockallocator,BlockAllocator} in memory arenas.
++        /// The default RawAllocator that will be used as BlockAllocator in memory arenas.
+         /// Arena allocators like \ref memory_stack or \ref memory_pool allocate memory by subdividing a huge block.
+-        /// They get a \concept{concept_blockallocator,BlockAllocator} that will be used for their internal allocation,
++        /// They get a BlockAllocator that will be used for their internal allocation,
+         /// this type is the default value.
+         /// \requiredbe Its type can be changed via the CMake option \c FOONATHAN_MEMORY_DEFAULT_ALLCOATOR,
+         /// but it must be one of the following: \ref heap_allocator, \ref new_allocator, \ref malloc_allocator, \ref static_allocator, \ref virtual_memory_allocator.
+diff --git a/include/foonathan/memory/deleter.hpp b/include/foonathan/memory/deleter.hpp
+index fe3ce220dc751ed86b2f4822693f4524f53d47d1..1d87323a522216e484f8fc94a0db38fac1d1bd7c 100644
+--- a/include/foonathan/memory/deleter.hpp
++++ b/include/foonathan/memory/deleter.hpp
+@@ -5,7 +5,7 @@
+ #define FOONATHAN_MEMORY_DELETER_HPP_INCLUDED
+ 
+ /// \file
+-/// \c Deleter classes using a \concept{concept_rawallocator,RawAllocator}.
++/// \c Deleter classes using a RawAllocator.
+ 
+ #include <type_traits>
+ 
+@@ -17,7 +17,7 @@ namespace foonathan
+ {
+     namespace memory
+     {
+-        /// A deleter class that deallocates the memory through a specified \concept{concept_rawallocator,RawAllocator}.
++        /// A deleter class that deallocates the memory through a specified RawAllocator.
+         ///
+         /// It deallocates memory for a specified type but does not call its destructors.
+         /// \ingroup memory_adapter
+@@ -116,7 +116,7 @@ namespace foonathan
+             std::size_t size_;
+         };
+ 
+-        /// A deleter class that deallocates the memory of a derived type through a specified \concept{concept_rawallocator,RawAllocator}.
++        /// A deleter class that deallocates the memory of a derived type through a specified RawAllocator.
+         ///
+         /// It can only be created from a \ref allocator_deallocator and thus must only be used for smart pointers initialized by derived-to-base conversion of the pointer.
+         /// \ingroup memory_adapter
+diff --git a/include/foonathan/memory/fallback_allocator.hpp b/include/foonathan/memory/fallback_allocator.hpp
+index b4157062d42060be4fe649fe1e84af5aec0567cf..5e164cb8af2db919b2e0c3c101bf708880aa0545 100644
+--- a/include/foonathan/memory/fallback_allocator.hpp
++++ b/include/foonathan/memory/fallback_allocator.hpp
+@@ -16,11 +16,11 @@ namespace foonathan
+ {
+     namespace memory
+     {
+-        /// A \concept{raw_allocator,RawAllocator} with a fallback.
++        /// A RawAllocator with a fallback.
+         /// Allocation first tries `Default`, if it fails,
+         /// it uses `Fallback`.
+-        /// \requires `Default` must be a composable \concept{concept_rawallocator,RawAllocator},
+-        /// `Fallback` must be a \concept{concept_rawallocator,RawAllocator}.
++        /// \requires `Default` must be a composable RawAllocator,
++        /// `Fallback` must be a RawAllocator.
+         /// \ingroup memory_adapter
+         template <class Default, class Fallback>
+         class fallback_allocator
+diff --git a/include/foonathan/memory/heap_allocator.hpp b/include/foonathan/memory/heap_allocator.hpp
+index ed8f2fb9af2d593fde141b3bdb8b17e8074f8c9c..88e8d7cb5711fd564caa9262d3390af81b3bd4df 100644
+--- a/include/foonathan/memory/heap_allocator.hpp
++++ b/include/foonathan/memory/heap_allocator.hpp
+@@ -65,7 +65,7 @@ namespace foonathan
+                                                        heap_alloator_leak_checker)
+         } // namespace detail
+ 
+-        /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory from the heap.
++        /// A stateless RawAllocator that allocates memory from the heap.
+         /// It uses the two functions \ref heap_alloc and \ref heap_dealloc for the allocation,
+         /// which default to \c std::malloc and \c std::free.
+         /// \ingroup memory_allocator
+diff --git a/include/foonathan/memory/iteration_allocator.hpp b/include/foonathan/memory/iteration_allocator.hpp
+index fdfcfa0f80d9fe5b4ea6fbec06420697f20b77b4..dbcc8f74b9feed75dc579845b23a58c828013920 100644
+--- a/include/foonathan/memory/iteration_allocator.hpp
++++ b/include/foonathan/memory/iteration_allocator.hpp
+@@ -24,7 +24,7 @@ namespace foonathan
+                 make_block_allocator_t<BlockOrRawAllocator, fixed_block_allocator>;
+         } // namespace detail
+ 
+-        /// A stateful \concept{concept_rawallocator,RawAllocator} that is designed for allocations in a loop.
++        /// A stateful RawAllocator that is designed for allocations in a loop.
+         /// It uses `N` stacks for the allocation, one of them is always active.
+         /// Allocation uses the currently active stack.
+         /// Calling \ref iteration_allocator::next_iteration() at the end of the loop,
+@@ -40,7 +40,7 @@ namespace foonathan
+         public:
+             using allocator_type = detail::iteration_block_allocator<BlockOrRawAllocator>;
+ 
+-            /// \effects Creates it with a given initial block size and and other constructor arguments for the \concept{concept_blockallocator,BlockAllocator}.
++            /// \effects Creates it with a given initial block size and and other constructor arguments for the BlockAllocator.
+             /// It will allocate the first (and only) block and evenly divide it on all the stacks it uses.
+             template <typename... Args>
+             explicit iteration_allocator(std::size_t block_size, Args&&... args)
+@@ -89,7 +89,7 @@ namespace foonathan
+ 
+             /// \effects Allocates a memory block of given size and alignment.
+             /// It simply moves the top marker of the currently active stack.
+-            /// \returns A \concept{concept_node,node} with given size and alignment.
++            /// \returns A node with given size and alignment.
+             /// \throws \ref out_of_fixed_memory if the current stack does not have any memory left.
+             /// \requires \c size and \c alignment must be valid.
+             void* allocate(std::size_t size, std::size_t alignment)
+@@ -106,7 +106,7 @@ namespace foonathan
+ 
+             /// \effects Allocates a memory block of given size and alignment
+             /// similar to \ref allocate().
+-            /// \returns A \concept{concept_node,node} with given size and alignment
++            /// \returns A node with given size and alignment
+             /// or `nullptr` if the current stack does not have any memory left.
+             void* try_allocate(std::size_t size, std::size_t alignment) noexcept
+             {
+@@ -139,7 +139,7 @@ namespace foonathan
+                 return cur_;
+             }
+ 
+-            /// \returns A reference to the \concept{concept_blockallocator,BlockAllocator} used for managing the memory.
++            /// \returns A reference to the BlockAllocator used for managing the memory.
+             /// \requires It is undefined behavior to move this allocator out into another object.
+             allocator_type& get_allocator() noexcept
+             {
+diff --git a/include/foonathan/memory/joint_allocator.hpp b/include/foonathan/memory/joint_allocator.hpp
+index 894ac381e82950637783ebe9f7100a95d3240da3..09e3230f9cdff7de0b5e29e4267358fb1c076698 100644
+--- a/include/foonathan/memory/joint_allocator.hpp
++++ b/include/foonathan/memory/joint_allocator.hpp
+@@ -205,7 +205,7 @@ namespace foonathan
+         /// make sure that you do not call their regular copy/move constructors,
+         /// but instead the version where you pass an allocator.
+         ///
+-        /// The memory block will be managed by the given \concept{concept_rawallocator,RawAllocator},
++        /// The memory block will be managed by the given RawAllocator,
+         /// it is stored in an \ref allocator_reference and not owned by the pointer directly.
+         /// \ingroup memory_allocator
+         template <typename T, class RawAllocator>
+@@ -220,7 +220,7 @@ namespace foonathan
+ 
+             //=== constructors/destructor/assignment ===//
+             /// @{
+-            /// \effects Creates it with a \concept{concept_rawallocator,RawAllocator}, but does not own a new object.
++            /// \effects Creates it with a RawAllocator, but does not own a new object.
+             explicit joint_ptr(allocator_type& alloc) noexcept
+             : allocator_reference<RawAllocator>(alloc), ptr_(nullptr)
+             {
+@@ -235,7 +235,7 @@ namespace foonathan
+             /// @{
+             /// \effects Reserves memory for the object and the additional size,
+             /// and creates the object by forwarding the arguments to its constructor.
+-            /// The \concept{concept_rawallocator,RawAllocator} will be used for the allocation.
++            /// The RawAllocator will be used for the allocation.
+             template <typename... Args>
+             joint_ptr(allocator_type& alloc, joint_size additional_size, Args&&... args)
+             : joint_ptr(alloc)
+@@ -493,7 +493,7 @@ namespace foonathan
+         }
+         /// @}
+ 
+-        /// A \concept{concept_rawallocator,RawAllocator} that uses the additional joint memory for its allocation.
++        /// A RawAllocator that uses the additional joint memory for its allocation.
+         ///
+         /// It is somewhat limited and allows only allocation once.
+         /// All joint allocators for an object share the joint memory and must not be used in multiple threads.
+diff --git a/include/foonathan/memory/malloc_allocator.hpp b/include/foonathan/memory/malloc_allocator.hpp
+index cc3700cfe2f2339aca2808a745ae1d02b3f11ffb..f4e4c5d2eb35c62e41212d4d1491c06079c08624 100644
+--- a/include/foonathan/memory/malloc_allocator.hpp
++++ b/include/foonathan/memory/malloc_allocator.hpp
+@@ -54,7 +54,7 @@ namespace foonathan
+                                                        malloc_alloator_leak_checker)
+         } // namespace detail
+ 
+-        /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory using <tt>std::malloc()</tt>.
++        /// A stateless RawAllocator that allocates memory using <tt>std::malloc()</tt>.
+         /// It throws \ref out_of_memory when the allocation fails.
+         /// \ingroup memory_allocator
+         using malloc_allocator =
+diff --git a/include/foonathan/memory/memory_arena.hpp b/include/foonathan/memory/memory_arena.hpp
+index 645796bece4f81fd7c84c6c039b1ee619499daff..eb969a677329b5b2d536f39f9a15817f040cf79f 100644
+--- a/include/foonathan/memory/memory_arena.hpp
++++ b/include/foonathan/memory/memory_arena.hpp
+@@ -5,7 +5,7 @@
+ #define FOONATHAN_MEMORY_MEMORY_ARENA_HPP_INCLUDED
+ 
+ /// \file
+-/// Class \ref foonathan::memory::memory_arena and related functionality regarding \concept{concept_blockallocator,BlockAllocators}.
++/// Class \ref foonathan::memory::memory_arena and related functionality regarding BlockAllocators.
+ 
+ #include <type_traits>
+ 
+@@ -66,7 +66,7 @@ namespace foonathan
+             std::false_type is_block_allocator_impl(short);
+         } // namespace detail
+ 
+-        /// Traits that check whether a type models concept \concept{concept_blockallocator,BlockAllocator}.
++        /// Traits that check whether a type models concept BlockAllocator.
+         /// \ingroup memory_core
+         template <typename T>
+         struct is_block_allocator : decltype(detail::is_block_allocator_impl<T>(0))
+@@ -264,7 +264,7 @@ namespace foonathan
+         /// A memory arena that manages huge memory blocks for a higher-level allocator.
+         /// Some allocators like \ref memory_stack work on huge memory blocks,
+         /// this class manages them fro those allocators.
+-        /// It uses a \concept{concept_blockallocator,BlockAllocator} for the allocation of those blocks.
++        /// It uses a BlockAllocator for the allocation of those blocks.
+         /// The memory blocks in use are put onto a stack like structure, deallocation will pop from the top,
+         /// so it is only possible to deallocate the last allocated block of the arena.
+         /// By default, blocks are not really deallocated but stored in a cache.
+@@ -292,9 +292,9 @@ namespace foonathan
+                 return detail::memory_block_stack::implementation_offset() + byte_size;
+             }
+ 
+-            /// \effects Creates it by giving it the size and other arguments for the \concept{concept_blockallocator,BlockAllocator}.
++            /// \effects Creates it by giving it the size and other arguments for the BlockAllocator.
+             /// It forwards these arguments to its constructor.
+-            /// \requires \c block_size must be greater than \c min_block_size(0) and other requirements depending on the \concept{concept_blockallocator,BlockAllocator}.
++            /// \requires \c block_size must be greater than \c min_block_size(0) and other requirements depending on the BlockAllocator.
+             /// \throws Anything thrown by the constructor of the \c BlockAllocator.
+             template <typename... Args>
+             explicit memory_arena(std::size_t block_size, Args&&... args)
+@@ -303,7 +303,7 @@ namespace foonathan
+                 FOONATHAN_MEMORY_ASSERT(block_size > min_block_size(0));
+             }
+ 
+-            /// \effects Deallocates all memory blocks that where requested back to the \concept{concept_blockallocator,BlockAllocator}.
++            /// \effects Deallocates all memory blocks that where requested back to the BlockAllocator.
+             ~memory_arena() noexcept
+             {
+                 // clear cache
+@@ -346,7 +346,7 @@ namespace foonathan
+             /// It first uses a cache of previously deallocated blocks, if caching is enabled,
+             /// if it is empty, allocates a new one.
+             /// \returns The new \ref memory_block.
+-            /// \throws Anything thrown by the \concept{concept_blockallocator,BlockAllocator} allocation function.
++            /// \throws Anything thrown by the BlockAllocator allocation function.
+             memory_block allocate_block()
+             {
+                 if (!this->take_from_cache(used_))
+@@ -411,7 +411,7 @@ namespace foonathan
+             /// \returns The size of the next memory block,
+             /// i.e. of the next call to \ref allocate_block().
+             /// If there are blocks in the cache, returns size of the next one.
+-            /// Otherwise forwards to the \concept{concept_blockallocator,BlockAllocator} and subtracts an implementation offset.
++            /// Otherwise forwards to the BlockAllocator and subtracts an implementation offset.
+             std::size_t next_block_size() const noexcept
+             {
+                 return this->cache_empty() ?
+@@ -420,7 +420,7 @@ namespace foonathan
+                            this->cached_block_size();
+             }
+ 
+-            /// \returns A reference of the \concept{concept_blockallocator,BlockAllocator} object.
++            /// \returns A reference of the BlockAllocator object.
+             /// \requires It is undefined behavior to move this allocator out into another object.
+             allocator_type& get_allocator() noexcept
+             {
+@@ -438,7 +438,7 @@ namespace foonathan
+         extern template class memory_arena<virtual_block_allocator, false>;
+ #endif
+ 
+-        /// A \concept{concept_blockallocator,BlockAllocator} that uses a given \concept{concept_rawallocator,RawAllocator} for allocating the blocks.
++        /// A BlockAllocator that uses a given RawAllocator for allocating the blocks.
+         /// It calls the \c allocate_array() function with a node of size \c 1 and maximum alignment on the used allocator for the block allocation.
+         /// The size of the next memory block will grow by a given factor after each allocation,
+         /// allowing an amortized constant allocation time in the higher level allocator.
+@@ -466,7 +466,7 @@ namespace foonathan
+ 
+             /// \effects Allocates a new memory block and increases the block size for the next allocation.
+             /// \returns The new \ref memory_block.
+-            /// \throws Anything thrown by the \c allocate_array() function of the \concept{concept_rawallocator,RawAllocator}.
++            /// \throws Anything thrown by the \c allocate_array() function of the RawAllocator.
+             memory_block allocate_block()
+             {
+                 auto memory =
+@@ -491,7 +491,7 @@ namespace foonathan
+                 return block_size_;
+             }
+ 
+-            /// \returns A reference to the used \concept{concept_rawallocator,RawAllocator} object.
++            /// \returns A reference to the used RawAllocator object.
+             allocator_type& get_allocator() noexcept
+             {
+                 return *this;
+@@ -519,9 +519,9 @@ namespace foonathan
+         extern template class memory_arena<growing_block_allocator<>, false>;
+ #endif
+ 
+-        /// A \concept{concept_blockallocator,BlockAllocator} that allows only one block allocation.
++        /// A BlockAllocator that allows only one block allocation.
+         /// It can be used to prevent higher-level allocators from expanding.
+-        /// The one block allocation is performed through the \c allocate_array() function of the given \concept{concept_rawallocator,RawAllocator}.
++        /// The one block allocation is performed through the \c allocate_array() function of the given RawAllocator.
+         /// \ingroup memory_adapter
+         template <class RawAllocator = default_allocator>
+         class fixed_block_allocator : FOONATHAN_EBO(allocator_traits<RawAllocator>::allocator_type)
+@@ -541,7 +541,7 @@ namespace foonathan
+ 
+             /// \effects Allocates a new memory block or throws an exception if there was already one allocation.
+             /// \returns The new \ref memory_block.
+-            /// \throws Anything thrown by the \c allocate_array() function of the \concept{concept_rawallocator,RawAllocator} or \ref out_of_memory if this is not the first call.
++            /// \throws Anything thrown by the \c allocate_array() function of the RawAllocator or \ref out_of_memory if this is not the first call.
+             memory_block allocate_block()
+             {
+                 if (block_size_)
+@@ -572,7 +572,7 @@ namespace foonathan
+                 return block_size_;
+             }
+ 
+-            /// \returns A reference to the used \concept{concept_rawallocator,RawAllocator} object.
++            /// \returns A reference to the used RawAllocator object.
+             allocator_type& get_allocator() noexcept
+             {
+                 return *this;
+@@ -613,9 +613,9 @@ namespace foonathan
+             }
+         } // namespace detail
+ 
+-        /// Takes either a \concept{concept_blockallocator,BlockAllocator} or a \concept{concept_rawallocator,RawAllocator}.
+-        /// In the first case simply aliases the type unchanged, in the second to \ref growing_block_allocator (or the template in `BlockAllocator`) with the \concept{concept_rawallocator,RawAllocator}.
+-        /// Using this allows passing normal \concept{concept_rawallocator,RawAllocators} as \concept{concept_blockallocator,BlockAllocators}.
++        /// Takes either a BlockAllocator or a RawAllocator.
++        /// In the first case simply aliases the type unchanged, in the second to \ref growing_block_allocator (or the template in `BlockAllocator`) with the RawAllocator.
++        /// Using this allows passing normal RawAllocators as BlockAllocators.
+         /// \ingroup memory_core
+         template <class BlockOrRawAllocator,
+                   template <typename...> class BlockAllocator = detail::default_block_wrapper>
+@@ -625,8 +625,8 @@ namespace foonathan
+                                       BlockAllocator<BlockOrRawAllocator>>::type);
+ 
+         /// @{
+-        /// Helper function make a \concept{concept_blockallocator,BlockAllocator}.
+-        /// \returns A \concept{concept_blockallocator,BlockAllocator} of the given type created with the given arguments.
++        /// Helper function make a BlockAllocator.
++        /// \returns A BlockAllocator of the given type created with the given arguments.
+         /// \requires Same requirements as the constructor.
+         /// \ingroup memory_core
+         template <class BlockOrRawAllocator, typename... Args>
+diff --git a/include/foonathan/memory/memory_pool.hpp b/include/foonathan/memory/memory_pool.hpp
+index 7e833a6e55ee3fb4315b693303a9252a494426f1..3ac5fe7a826d2ee2a58182a0630f82e816c364e6 100644
+--- a/include/foonathan/memory/memory_pool.hpp
++++ b/include/foonathan/memory/memory_pool.hpp
+@@ -32,7 +32,7 @@ namespace foonathan
+             };
+         } // namespace detail
+ 
+-        /// A stateful \concept{concept_rawallocator,RawAllocator} that manages \concept{concept_node,nodes} of fixed size.
++        /// A stateful RawAllocator that manages nodes of fixed size.
+         /// It uses a \ref memory_arena with a given \c BlockOrRawAllocator defaulting to \ref growing_block_allocator,
+         /// subdivides them in small nodes of given size and puts them onto a free list.
+         /// Allocation and deallocation simply remove or add nodes from this list and are thus fast.
+@@ -57,8 +57,8 @@ namespace foonathan
+             static constexpr std::size_t min_node_size =
+                 FOONATHAN_IMPL_DEFINED(free_list::min_element_size);
+ 
+-            /// \returns The minimum block size required for certain number of \concept{concept_node,node}.
+-            /// \requires \c node_size must be a valid \concept{concept_node,node size}
++            /// \returns The minimum block size required for certain number of node.
++            /// \requires \c node_size must be a valid node size
+             /// and \c number_of_nodes must be a non-zero value.
+             /// \note MSVC's implementation of \c std::list for example is never empty and always allocates proxy nodes.
+             /// To get enough memory for \c N elements of a list, \c number_of_nodes needs to include the proxy count in addition to \c N.
+@@ -69,12 +69,12 @@ namespace foonathan
+                        + free_list::min_block_size(node_size, number_of_nodes);
+             }
+ 
+-            /// \effects Creates it by specifying the size each \concept{concept_node,node} will have,
+-            /// the initial block size for the arena and other constructor arguments for the \concept{concept_blockallocator,BlockAllocator}.
++            /// \effects Creates it by specifying the size each node will have,
++            /// the initial block size for the arena and other constructor arguments for the BlockAllocator.
+             /// If the \c node_size is less than the \c min_node_size, the \c min_node_size will be the actual node size.
+-            /// It will allocate an initial memory block with given size from the \concept{concept_blockallocator,BlockAllocator}
++            /// It will allocate an initial memory block with given size from the BlockAllocator
+             /// and puts it onto the free list.
+-            /// \requires \c node_size must be a valid \concept{concept_node,node size}
++            /// \requires \c node_size must be a valid node size
+             /// and \c block_size must be at least \c min_block_size(node_size, 1).
+             template <typename... Args>
+             memory_pool(std::size_t node_size, std::size_t block_size, Args&&... args)
+@@ -84,7 +84,7 @@ namespace foonathan
+             }
+ 
+             /// \effects Destroys the \ref memory_pool by returning all memory blocks,
+-            /// regardless of properly deallocated back to the \concept{concept_blockallocator,BlockAllocator}.
++            /// regardless of properly deallocated back to the BlockAllocator.
+             ~memory_pool() noexcept {}
+ 
+             /// @{
+@@ -108,12 +108,12 @@ namespace foonathan
+             }
+             /// @}
+ 
+-            /// \effects Allocates a single \concept{concept_node,node} by removing it from the free list.
++            /// \effects Allocates a single node by removing it from the free list.
+             /// If the free list is empty, a new memory block will be allocated from the arena and put onto it.
+             /// The new block size will be \ref next_capacity() big.
+             /// \returns A node of size \ref node_size() suitable aligned,
+             /// i.e. suitable for any type where <tt>sizeof(T) < node_size()</tt>.
+-            /// \throws Anything thrown by the used \concept{concept_blockallocator,BlockAllocator}'s allocation function if a growth is needed.
++            /// \throws Anything thrown by the used BlockAllocator's allocation function if a growth is needed.
+             void* allocate_node()
+             {
+                 if (free_list_.empty())
+@@ -122,7 +122,7 @@ namespace foonathan
+                 return free_list_.allocate();
+             }
+ 
+-            /// \effects Allocates a single \concept{concept_node,node} similar to \ref allocate_node().
++            /// \effects Allocates a single node similar to \ref allocate_node().
+             /// But if the free list is empty, a new block will *not* be allocated.
+             /// \returns A suitable aligned node of size \ref node_size() or `nullptr`.
+             void* try_allocate_node() noexcept
+@@ -130,13 +130,13 @@ namespace foonathan
+                 return free_list_.empty() ? nullptr : free_list_.allocate();
+             }
+ 
+-            /// \effects Allocates an \concept{concept_array,array} of nodes by searching for \c n continuous nodes on the list and removing them.
++            /// \effects Allocates an array of nodes by searching for \c n continuous nodes on the list and removing them.
+             /// Depending on the \c PoolType this can be a slow operation or not allowed at all.
+             /// This can sometimes lead to a growth, even if technically there is enough continuous memory on the free list.
+             /// \returns An array of \c n nodes of size \ref node_size() suitable aligned.
+-            /// \throws Anything thrown by the used \concept{concept_blockallocator,BlockAllocator}'s allocation function if a growth is needed,
++            /// \throws Anything thrown by the used BlockAllocator's allocation function if a growth is needed,
+             /// or \ref bad_array_size if <tt>n * node_size()</tt> is too big.
+-            /// \requires \c n must be valid \concept{concept_array,array count}.
++            /// \requires \c n must be valid array count.
+             void* allocate_array(std::size_t n)
+             {
+                 detail::check_allocation_size<bad_array_size>(
+@@ -145,7 +145,7 @@ namespace foonathan
+                 return allocate_array(n, node_size());
+             }
+ 
+-            /// \effects Allocates an \concept{concept_array,array} of nodes similar to \ref allocate_array().
++            /// \effects Allocates an array of nodes similar to \ref allocate_array().
+             /// But it will never allocate a new memory block.
+             /// \returns An array of \c n nodes of size \ref node_size() suitable aligned
+             /// or `nullptr`.
+@@ -154,7 +154,7 @@ namespace foonathan
+                 return try_allocate_array(n, node_size());
+             }
+ 
+-            /// \effects Deallocates a single \concept{concept_node,node} by putting it back onto the free list.
++            /// \effects Deallocates a single node by putting it back onto the free list.
+             /// \requires \c ptr must be a result from a previous call to \ref allocate_node() on the same free list,
+             /// i.e. either this allocator object or a new object created by moving this to it.
+             void deallocate_node(void* ptr) noexcept
+@@ -162,7 +162,7 @@ namespace foonathan
+                 free_list_.deallocate(ptr);
+             }
+ 
+-            /// \effects Deallocates a single \concept{concept_node,node} but it does not be a result of a previous call to \ref allocate_node().
++            /// \effects Deallocates a single node but it does not be a result of a previous call to \ref allocate_node().
+             /// \returns `true` if the node could be deallocated, `false` otherwise.
+             /// \note Some free list implementations can deallocate any memory,
+             /// doesn't matter where it is coming from.
+@@ -174,7 +174,7 @@ namespace foonathan
+                 return true;
+             }
+ 
+-            /// \effects Deallocates an \concept{concept_array,array} by putting it back onto the free list.
++            /// \effects Deallocates an array by putting it back onto the free list.
+             /// \requires \c ptr must be a result from a previous call to \ref allocate_array() with the same \c n on the same free list,
+             /// i.e. either this allocator object or a new object created by moving this to it.
+             void deallocate_array(void* ptr, std::size_t n) noexcept
+@@ -183,7 +183,7 @@ namespace foonathan
+                 free_list_.deallocate(ptr, n * node_size());
+             }
+ 
+-            /// \effects Deallocates an \concept{concept_array,array} but it does not be a result of a previous call to \ref allocate_array().
++            /// \effects Deallocates an array but it does not be a result of a previous call to \ref allocate_array().
+             /// \returns `true` if the node could be deallocated, `false` otherwise.
+             /// \note Some free list implementations can deallocate any memory,
+             /// doesn't matter where it is coming from.
+@@ -192,7 +192,7 @@ namespace foonathan
+                 return try_deallocate_array(ptr, n, node_size());
+             }
+ 
+-            /// \returns The size of each \concept{concept_node,node} in the pool,
++            /// \returns The size of each node in the pool,
+             /// this is either the same value as in the constructor or \c min_node_size if the value was too small.
+             std::size_t node_size() const noexcept
+             {
+@@ -215,7 +215,7 @@ namespace foonathan
+                 return free_list_.usable_size(arena_.next_block_size());
+             }
+ 
+-            /// \returns A reference to the \concept{concept_blockallocator,BlockAllocator} used for managing the arena.
++            /// \returns A reference to the BlockAllocator used for managing the arena.
+             /// \requires It is undefined behavior to move this allocator out into another object.
+             allocator_type& get_allocator() noexcept
+             {
+@@ -306,7 +306,7 @@ namespace foonathan
+             /// \effects Forwards to \ref memory_pool::allocate_array()
+             /// with the number of nodes adjusted to be the minimum,
+             /// i.e. when the \c size is less than the \ref memory_pool::node_size().
+-            /// \returns A \concept{concept_array,array} with specified properties.
++            /// \returns A array with specified properties.
+             /// \requires The \ref memory_pool has to support array allocations.
+             /// \throws Anything thrown by the pool allocation function.
+             static void* allocate_array(allocator_type& state, std::size_t count, std::size_t size,
+@@ -382,7 +382,7 @@ namespace foonathan
+             /// \effects Forwards to \ref memory_pool::try_allocate_array()
+             /// with the number of nodes adjusted to be the minimum,
+             /// if the \c size is less than the \ref memory_pool::node_size().
+-            /// \returns A \concept{concept_array,array} with specified properties
++            /// \returns A array with specified properties
+             /// or `nullptr` if it was unable to allocate.
+             static void* try_allocate_array(allocator_type& state, std::size_t count,
+                                             std::size_t size, std::size_t alignment) noexcept
+diff --git a/include/foonathan/memory/memory_pool_collection.hpp b/include/foonathan/memory/memory_pool_collection.hpp
+index 5467efe6c865a49563aa877d417641e6b1c840e9..2951a560c29771ba45c0fce501eb17baf2430048 100644
+--- a/include/foonathan/memory/memory_pool_collection.hpp
++++ b/include/foonathan/memory/memory_pool_collection.hpp
+@@ -49,11 +49,11 @@ namespace foonathan
+             using type = detail::log2_access_policy;
+         };
+ 
+-        /// A stateful \concept{concept_rawallocator,RawAllocator} that behaves as a collection of multiple \ref memory_pool objects.
++        /// A stateful RawAllocator that behaves as a collection of multiple \ref memory_pool objects.
+         /// It maintains a list of multiple free lists, whose types are controlled via the \c PoolType tags defined in \ref memory_pool_type.hpp,
+         /// each of a different size as defined in the \c BucketDistribution (\ref identity_buckets or \ref log2_buckets).
+         /// Allocating a node of given size will use the appropriate free list.<br>
+-        /// This allocator is ideal for \concept{concept_node,node} allocations in any order but with a predefined set of sizes,
++        /// This allocator is ideal for node allocations in any order but with a predefined set of sizes,
+         /// not only one size like \ref memory_pool.
+         /// \ingroup memory_allocator
+         template <class PoolType, class BucketDistribution,
+@@ -72,10 +72,10 @@ namespace foonathan
+             using bucket_distribution = BucketDistribution;
+ 
+             /// \effects Creates it by giving it the maximum node size it should be able to allocate,
+-            /// the size of the initial memory block and other constructor arguments for the \concept{concept_blockallocator,BlockAllocator}.
++            /// the size of the initial memory block and other constructor arguments for the BlockAllocator.
+             /// The \c BucketDistribution controls how many free lists are created,
+             /// but unlike in \ref memory_pool all free lists are initially empty and the first memory block queued.
+-            /// \requires \c block_size must be non-zero and \c max_node_size must be a valid \concept{concept_node,node} size and smaller than \c block_size divided by the number of pools.
++            /// \requires \c block_size must be non-zero and \c max_node_size must be a valid node size and smaller than \c block_size divided by the number of pools.
+             template <typename... Args>
+             memory_pool_collection(std::size_t max_node_size, std::size_t block_size,
+                                    Args&&... args)
+@@ -87,7 +87,7 @@ namespace foonathan
+             }
+ 
+             /// \effects Destroys the \ref memory_pool_collection by returning all memory blocks,
+-            /// regardless of properly deallocated back to the \concept{concept_blockallocator,BlockAllocator}.
++            /// regardless of properly deallocated back to the BlockAllocator.
+             ~memory_pool_collection() noexcept = default;
+ 
+             /// @{
+@@ -113,16 +113,16 @@ namespace foonathan
+             }
+             /// @}
+ 
+-            /// \effects Allocates a \concept{concept_node,node} of given size.
++            /// \effects Allocates a node of given size.
+             /// It first finds the appropriate free list as defined in the \c BucketDistribution.
+             /// If it is empty, it will use an implementation defined amount of memory from the arena
+             /// and inserts it in it.
+-            /// If the arena is empty too, it will request a new memory block from the \concept{concept_blockallocator,BlockAllocator}
++            /// If the arena is empty too, it will request a new memory block from the BlockAllocator
+             /// of size \ref next_capacity() and puts part of it onto this free list.
+             /// Then it removes a node from it.
+-            /// \returns A \concept{concept_node,node} of given size suitable aligned,
++            /// \returns A node of given size suitable aligned,
+             /// i.e. suitable for any type where <tt>sizeof(T) < node_size</tt>.
+-            /// \throws Anything thrown by the \concept{concept_blockallocator,BlockAllocator} if a growth is needed or a \ref bad_node_size exception if the node size is too big.
++            /// \throws Anything thrown by the BlockAllocator if a growth is needed or a \ref bad_node_size exception if the node size is too big.
+             void* allocate_node(std::size_t node_size)
+             {
+                 detail::check_allocation_size<bad_node_size>(
+@@ -139,10 +139,10 @@ namespace foonathan
+                 return mem;
+             }
+ 
+-            /// \effects Allocates a \concept{concept_node,node} of given size.
++            /// \effects Allocates a node of given size.
+             /// It is similar to \ref allocate_node() but will return `nullptr` on any failure,
+             /// instead of growing the arnea and possibly throwing.
+-            /// \returns A \concept{concept_node,node} of given size suitable aligned
++            /// \returns A node of given size suitable aligned
+             /// or `nullptr` in case of failure.
+             void* try_allocate_node(std::size_t node_size) noexcept
+             {
+@@ -158,15 +158,15 @@ namespace foonathan
+                     return pool.allocate();
+             }
+ 
+-            /// \effects Allocates an \concept{concept_array,array} of nodes by searching for \c n continuous nodes on the appropriate free list and removing them.
++            /// \effects Allocates an array of nodes by searching for \c n continuous nodes on the appropriate free list and removing them.
+             /// Depending on the \c PoolType this can be a slow operation or not allowed at all.
+             /// This can sometimes lead to a growth on the free list, even if technically there is enough continuous memory on the free list.
+             /// Otherwise has the same behavior as \ref allocate_node().
+             /// \returns An array of \c n nodes of size \c node_size suitable aligned.
+-            /// \throws Anything thrown by the used \concept{concept_blockallocator,BlockAllocator}'s allocation function if a growth is needed,
++            /// \throws Anything thrown by the used BlockAllocator's allocation function if a growth is needed,
+             /// or a \ref bad_allocation_size exception.
+-            /// \requires \c count must be valid \concept{concept_array,array count} and
+-            /// \c node_size must be valid \concept{concept_node,node size}.
++            /// \requires \c count must be valid array count and
++            /// \c node_size must be valid node size.
+             void* allocate_array(std::size_t count, std::size_t node_size)
+             {
+                 detail::check_allocation_size<bad_node_size>(
+@@ -202,10 +202,10 @@ namespace foonathan
+                 return mem;
+             }
+ 
+-            /// \effects Allocates a \concept{concept_array,array} of given size.
++            /// \effects Allocates a array of given size.
+             /// It is similar to \ref allocate_node() but will return `nullptr` on any failure,
+             /// instead of growing the arnea and possibly throwing.
+-            /// \returns A \concept{concept_array,array} of given size suitable aligned
++            /// \returns A array of given size suitable aligned
+             /// or `nullptr` in case of failure.
+             void* try_allocate_array(std::size_t count, std::size_t node_size) noexcept
+             {
+@@ -221,7 +221,7 @@ namespace foonathan
+                     return pool.allocate(count * node_size);
+             }
+ 
+-            /// \effects Deallocates a \concept{concept_node,node} by putting it back onto the appropriate free list.
++            /// \effects Deallocates a node by putting it back onto the appropriate free list.
+             /// \requires \c ptr must be a result from a previous call to \ref allocate_node() with the same size on the same free list,
+             /// i.e. either this allocator object or a new object created by moving this to it.
+             void deallocate_node(void* ptr, std::size_t node_size) noexcept
+@@ -229,7 +229,7 @@ namespace foonathan
+                 pools_.get(node_size).deallocate(ptr);
+             }
+ 
+-            /// \effects Deallocates a \concept{concept_node,node} similar to \ref deallocate_node().
++            /// \effects Deallocates a node similar to \ref deallocate_node().
+             /// But it checks if it can deallocate this memory.
+             /// \returns `true` if the node could be deallocated,
+             /// `false` otherwise.
+@@ -241,7 +241,7 @@ namespace foonathan
+                 return true;
+             }
+ 
+-            /// \effects Deallocates an \concept{concept_array,array} by putting it back onto the free list.
++            /// \effects Deallocates an array by putting it back onto the free list.
+             /// \requires \c ptr must be a result from a previous call to \ref allocate_array() with the same sizes on the same free list,
+             /// i.e. either this allocator object or a new object created by moving this to it.
+             void deallocate_array(void* ptr, std::size_t count, std::size_t node_size) noexcept
+@@ -249,7 +249,7 @@ namespace foonathan
+                 pools_.get(node_size).deallocate(ptr, count * node_size);
+             }
+ 
+-            /// \effects Deallocates a \concept{concept_array,array} similar to \ref deallocate_array().
++            /// \effects Deallocates a array similar to \ref deallocate_array().
+             /// But it checks if it can deallocate this memory.
+             /// \returns `true` if the array could be deallocated,
+             /// `false` otherwise.
+@@ -263,10 +263,10 @@ namespace foonathan
+ 
+             /// \effects Inserts more memory on the free list for nodes of given size.
+             /// It will try to put \c capacity_left bytes from the arena onto the free list defined over the \c BucketDistribution,
+-            /// if the arena is empty, a new memory block is requested from the \concept{concept_blockallocator,BlockAllocator}
++            /// if the arena is empty, a new memory block is requested from the BlockAllocator
+             /// and it will be used.
+-            /// \throws Anything thrown by the \concept{concept_blockallocator,BlockAllocator} if a growth is needed.
+-            /// \requires \c node_size must be valid \concept{concept_node,node size} less than or equal to \ref max_node_size(),
++            /// \throws Anything thrown by the BlockAllocator if a growth is needed.
++            /// \requires \c node_size must be valid node size less than or equal to \ref max_node_size(),
+             /// \c capacity_left must be less than \ref next_capacity().
+             void reserve(std::size_t node_size, std::size_t capacity)
+             {
+@@ -294,7 +294,7 @@ namespace foonathan
+ 
+             /// \returns The amount of memory available in the arena not inside the free lists.
+             /// This is the number of bytes that can be inserted into the free lists
+-            /// without requesting more memory from the \concept{concept_blockallocator,BlockAllocator}.
++            /// without requesting more memory from the BlockAllocator.
+             /// \note Array allocations may lead to a growth even if the capacity is big enough.
+             std::size_t capacity_left() const noexcept
+             {
+@@ -309,7 +309,7 @@ namespace foonathan
+                 return arena_.next_block_size();
+             }
+ 
+-            /// \returns A reference to the \concept{concept_blockallocator,BlockAllocator} used for managing the arena.
++            /// \returns A reference to the BlockAllocator used for managing the arena.
+             /// \requires It is undefined behavior to move this allocator out into another object.
+             allocator_type& get_allocator() noexcept
+             {
+diff --git a/include/foonathan/memory/memory_resource_adapter.hpp b/include/foonathan/memory/memory_resource_adapter.hpp
+index cf58eed1f0134c5236ae20be4f095bb31244a4a1..41135bc55bedc58f4d496b0d3047b2ec5778ac18 100644
+--- a/include/foonathan/memory/memory_resource_adapter.hpp
++++ b/include/foonathan/memory/memory_resource_adapter.hpp
+@@ -90,7 +90,7 @@ namespace foonathan
+         /// \ingroup memory_adapter
+         FOONATHAN_ALIAS_TEMPLATE(memory_resource, foonathan_memory_pmr::memory_resource);
+ 
+-        /// Wraps a \concept{concept_rawallocator,RawAllocator} and makes it a \ref memory_resource.
++        /// Wraps a RawAllocator and makes it a \ref memory_resource.
+         /// \ingroup memory_adapter
+         template <class RawAllocator>
+         class memory_resource_adapter
+@@ -124,7 +124,7 @@ namespace foonathan
+ 
+             /// \effects Allocates raw memory with given size and alignment.
+             /// It forwards to \c allocate_node() or \c allocate_array() depending on the size.
+-            /// \returns The new memory as returned by the \concept{concept_rawallocator,RawAllocator}.
++            /// \returns The new memory as returned by the RawAllocator.
+             /// \throws Anything thrown by the allocation function.
+             void* do_allocate(std::size_t bytes, std::size_t alignment) override
+             {
+@@ -162,7 +162,7 @@ namespace foonathan
+             }
+         };
+ 
+-        /// Wraps a \ref memory_resource and makes it a \concept{concept_rawallocator,RawAllocator}.
++        /// Wraps a \ref memory_resource and makes it a RawAllocator.
+         /// \ingroup memory_adapter
+         class memory_resource_allocator
+         {
+diff --git a/include/foonathan/memory/memory_stack.hpp b/include/foonathan/memory/memory_stack.hpp
+index dc9f1226ab504546e06d471ac48bee4a1b50fcda..7f0eb56f9e628ab2e7324306a08b17d778d176cb 100644
+--- a/include/foonathan/memory/memory_stack.hpp
++++ b/include/foonathan/memory/memory_stack.hpp
+@@ -92,7 +92,7 @@ namespace foonathan
+             };
+         } // namespace detail
+ 
+-        /// A stateful \concept{concept_rawallocator,RawAllocator} that provides stack-like (LIFO) allocations.
++        /// A stateful RawAllocator that provides stack-like (LIFO) allocations.
+         /// It uses a \ref memory_arena with a given \c BlockOrRawAllocator defaulting to \ref growing_block_allocator to allocate huge blocks
+         /// and saves a marker to the current top.
+         /// Allocation simply moves this marker by the appropriate number of bytes and returns the pointer at the old marker position,
+@@ -116,7 +116,7 @@ namespace foonathan
+                 return detail::memory_block_stack::implementation_offset() + byte_size;
+             }
+ 
+-            /// \effects Creates it with a given initial block size and and other constructor arguments for the \concept{concept_blockallocator,BlockAllocator}.
++            /// \effects Creates it with a given initial block size and and other constructor arguments for the BlockAllocator.
+             /// It will allocate the first block and sets the top to its beginning.
+             /// \requires \c block_size must be at least \c min_block_size(1).
+             template <typename... Args>
+@@ -129,10 +129,10 @@ namespace foonathan
+             /// \effects Allocates a memory block of given size and alignment.
+             /// It simply moves the top marker.
+             /// If there is not enough space on the current memory block,
+-            /// a new one will be allocated by the \concept{concept_blockallocator,BlockAllocator} or taken from a cache
++            /// a new one will be allocated by the BlockAllocator or taken from a cache
+             /// and used for the allocation.
+-            /// \returns A \concept{concept_node,node} with given size and alignment.
+-            /// \throws Anything thrown by the \concept{concept_blockallocator,BlockAllocator} on growth
++            /// \returns A node with given size and alignment.
++            /// \throws Anything thrown by the BlockAllocator on growth
+             /// or \ref bad_allocation_size if \c size is too big.
+             /// \requires \c size and \c alignment must be valid.
+             void* allocate(std::size_t size, std::size_t alignment)
+@@ -160,7 +160,7 @@ namespace foonathan
+             /// \effects Allocates a memory block of given size and alignment,
+             /// similar to \ref allocate().
+             /// But it does not attempt a growth if the arena is empty.
+-            /// \returns A \concept{concept_node,node} with given size and alignment
++            /// \returns A node with given size and alignment
+             /// or `nullptr` if there wasn't enough memory available.
+             void* try_allocate(std::size_t size, std::size_t alignment) noexcept
+             {
+@@ -221,7 +221,7 @@ namespace foonathan
+                 }
+             }
+ 
+-            /// \effects \ref unwind() does not actually do any deallocation of blocks on the \concept{concept_blockallocator,BlockAllocator},
++            /// \effects \ref unwind() does not actually do any deallocation of blocks on the BlockAllocator,
+             /// unused memory is stored in a cache for later reuse.
+             /// This function clears that cache.
+             void shrink_to_fit() noexcept
+@@ -231,7 +231,7 @@ namespace foonathan
+ 
+             /// \returns The amount of memory remaining in the current block.
+             /// This is the number of bytes that are available for allocation
+-            /// before the cache or \concept{concept_blockallocator,BlockAllocator} needs to be used.
++            /// before the cache or BlockAllocator needs to be used.
+             std::size_t capacity_left() const noexcept
+             {
+                 return std::size_t(block_end() - stack_.top());
+@@ -246,7 +246,7 @@ namespace foonathan
+                 return arena_.next_block_size();
+             }
+ 
+-            /// \returns A reference to the \concept{concept_blockallocator,BlockAllocator} used for managing the arena.
++            /// \returns A reference to the BlockAllocator used for managing the arena.
+             /// \requires It is undefined behavior to move this allocator out into another object.
+             allocator_type& get_allocator() noexcept
+             {
+diff --git a/include/foonathan/memory/new_allocator.hpp b/include/foonathan/memory/new_allocator.hpp
+index 5d11038ae6fce0379c7aeddd470ea1ad4744f5b7..1d0dbe9ca584ba844dfa80b367168dda8e992471 100644
+--- a/include/foonathan/memory/new_allocator.hpp
++++ b/include/foonathan/memory/new_allocator.hpp
+@@ -37,7 +37,7 @@ namespace foonathan
+                                                        new_alloator_leak_checker)
+         } // namespace detail
+ 
+-        /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory using (nothrow) <tt>operator new</tt>.
++        /// A stateless RawAllocator that allocates memory using (nothrow) <tt>operator new</tt>.
+         /// If the operator returns \c nullptr, it behaves like \c new and loops calling \c std::new_handler,
+         /// but instead of throwing a \c std::bad_alloc exception, it throws \ref out_of_memory.
+         /// \ingroup memory_allocator
+diff --git a/include/foonathan/memory/segregator.hpp b/include/foonathan/memory/segregator.hpp
+index 75dad5ebbb795b91b919c2e3ac72de396a77c88e..883fd8ce723d0fcf91aebc2ff933773f237061fe 100644
+--- a/include/foonathan/memory/segregator.hpp
++++ b/include/foonathan/memory/segregator.hpp
+@@ -17,7 +17,7 @@ namespace foonathan
+ {
+     namespace memory
+     {
+-        /// A \concept{concept_segregatable,Segregatable} that allocates until a maximum size.
++        /// A Segregatable that allocates until a maximum size.
+         /// \ingroup memory_adapter
+         template <class RawAllocator>
+         class threshold_segregatable : FOONATHAN_EBO(allocator_traits<RawAllocator>::allocator_type)
+@@ -76,7 +76,7 @@ namespace foonathan
+                                                          std::forward<RawAllocator>(alloc));
+         }
+ 
+-        /// A composable \concept{concept_rawallocator,RawAllocator} that will always fail.
++        /// A composable RawAllocator that will always fail.
+         /// This is useful for compositioning or as last resort in \ref binary_segregator.
+         /// \ingroup memory_allocator
+         class null_allocator
+@@ -116,7 +116,7 @@ namespace foonathan
+             }
+         };
+ 
+-        /// A \concept{concept_rawallocator,RawAllocator} that either uses the \concept{concept_segregatable,Segregatable} or the other `RawAllocator`.
++        /// A RawAllocator that either uses the Segregatable or the other `RawAllocator`.
+         /// It is a faster alternative to \ref fallback_allocator that doesn't require a composable allocator
+         /// and decides about the allocator to use purely with the `Segregatable` based on size and alignment.
+         /// \ingroup memory_adapter
+@@ -133,8 +133,8 @@ namespace foonathan
+             using segregatable_allocator_type = typename segregatable::allocator_type;
+             using fallback_allocator_type = typename allocator_traits<RawAllocator>::allocator_type;
+ 
+-            /// \effects Creates it by giving the \concept{concept_segregatable,Segregatable}
+-            /// and the \concept{concept_rawallocator,RawAllocator}.
++            /// \effects Creates it by giving the Segregatable
++            /// and the RawAllocator.
+             explicit binary_segregator(segregatable            s,
+                                        fallback_allocator_type fallback = fallback_allocator_type())
+             : detail::ebo_storage<1, fallback_allocator_type>(detail::move(fallback)),
+@@ -143,7 +143,7 @@ namespace foonathan
+             }
+ 
+             /// @{
+-            /// \effects Uses the \concept{concept_segregatable,Segregatable} to decide which allocator to use.
++            /// \effects Uses the Segregatable to decide which allocator to use.
+             /// Then forwards to the chosen allocator.
+             void* allocate_node(std::size_t size, std::size_t alignment)
+             {
+@@ -223,7 +223,7 @@ namespace foonathan
+ 
+             /// @{
+             /// \returns A reference to the fallback allocator.
+-            /// It will be used if the \concept{concept_segregator,Segregator} doesn't want the alloction.
++            /// It will be used if the Segregator doesn't want the alloction.
+             fallback_allocator_type& get_fallback_allocator() noexcept
+             {
+                 return detail::ebo_storage<1, fallback_allocator_type>::get();
+@@ -366,10 +366,10 @@ namespace foonathan
+         } // namespace detail
+ 
+         /// Creates multiple nested \ref binary_segregator.
+-        /// If you pass one type, it must be a \concept{concept_segregatable,Segregatable}.
++        /// If you pass one type, it must be a Segregatable.
+         /// Then the result is a \ref binary_segregator with that `Segregatable` and \ref null_allocator as fallback.
+         /// If you pass two types, the first one must be a `Segregatable`,
+-        /// the second one a \concept{concept_rawallocator,RawAllocator}.
++        /// the second one a RawAllocator.
+         /// Then the result is a simple \ref binary_segregator with those arguments.
+         /// If you pass more than one, the last one must be a `RawAllocator` all others `Segregatable`,
+         /// the result is `binary_segregator<Head, segregator<Tail...>>`.
+@@ -388,7 +388,7 @@ namespace foonathan
+             return detail::make_segregator(std::forward<Args>(args)...);
+         }
+ 
+-        /// The number of \concept{concept_segregatable,Segregatable} a \ref segregator has.
++        /// The number of Segregatable a \ref segregator has.
+         /// \relates segregator
+         template <class Segregator>
+         struct segregator_size
+@@ -396,13 +396,13 @@ namespace foonathan
+             static const std::size_t value = detail::fallback_type<Segregator>::size;
+         };
+ 
+-        /// The type of the `I`th \concept{concept_segregatable,Segregatable}.
++        /// The type of the `I`th Segregatable.
+         /// \relates segregator
+         template <std::size_t I, class Segregator>
+         using segregatable_allocator_type = typename detail::segregatable_type<I, Segregator>::type;
+ 
+         /// @{
+-        /// \returns The `I`th \concept{concept_segregatable,Segregatable}.
++        /// \returns The `I`th Segregatable.
+         /// \relates segregrator
+         template <std::size_t I, class Segregator, class Fallback>
+         auto get_segregatable_allocator(binary_segregator<Segregator, Fallback>& s)
+@@ -419,13 +419,13 @@ namespace foonathan
+         }
+         /// @}
+ 
+-        /// The type of the final fallback \concept{concept_rawallocator,RawAllocator}.
++        /// The type of the final fallback RawAllocator.
+         /// \relates segregator
+         template <class Segregator>
+         using fallback_allocator_type = typename detail::fallback_type<Segregator>::type;
+ 
+         /// @{
+-        /// \returns The final fallback \concept{concept_rawallocator,RawAllocator}.
++        /// \returns The final fallback RawAllocator.
+         /// \relates segregator
+         template <class Segregator, class Fallback>
+         auto get_fallback_allocator(binary_segregator<Segregator, Fallback>& s)
+diff --git a/include/foonathan/memory/smart_ptr.hpp b/include/foonathan/memory/smart_ptr.hpp
+index f8508a404e9476b449b7ed5853b0dcdd65630e2f..9747a5133314db6f88a3120bd18619b09dd7b971 100644
+--- a/include/foonathan/memory/smart_ptr.hpp
++++ b/include/foonathan/memory/smart_ptr.hpp
+@@ -5,7 +5,7 @@
+ #define FOONATHAN_MEMORY_SMART_PTR_HPP_INCLUDED
+ 
+ /// \file
+-/// \c std::make_unique() / \c std::make_shared() replacement allocating memory through a \concept{concept_rawallocator,RawAllocator}.
++/// \c std::make_unique() / \c std::make_shared() replacement allocating memory through a RawAllocator.
+ /// \note Only available on a hosted implementation.
+ 
+ #include "config.hpp"
+@@ -85,7 +85,7 @@ namespace foonathan
+             }
+         } // namespace detail
+ 
+-        /// A \c std::unique_ptr that deletes using a \concept{concept_rawallocator,RawAllocator}.
++        /// A \c std::unique_ptr that deletes using a RawAllocator.
+         ///
+         /// It is an alias template using \ref allocator_deleter as \c Deleter class.
+         /// \ingroup memory_adapter
+@@ -93,7 +93,7 @@ namespace foonathan
+         FOONATHAN_ALIAS_TEMPLATE(unique_ptr,
+                                  std::unique_ptr<T, allocator_deleter<T, RawAllocator>>);
+ 
+-        /// A \c std::unique_ptr that deletes using a \concept{concept_rawallocator,RawAllocator} and allows polymorphic types.
++        /// A \c std::unique_ptr that deletes using a RawAllocator and allows polymorphic types.
+         ///
+         /// It can only be created by converting a regular unique pointer to a pointer to a derived class,
+         /// and is meant to be used inside containers.
+@@ -105,7 +105,7 @@ namespace foonathan
+             unique_base_ptr,
+             std::unique_ptr<BaseType, allocator_polymorphic_deleter<BaseType, RawAllocator>>);
+ 
+-        /// Creates a \c std::unique_ptr using a \concept{concept_rawallocator,RawAllocator} for the allocation.
++        /// Creates a \c std::unique_ptr using a RawAllocator for the allocation.
+         /// \effects Allocates memory for the given type using the allocator
+         /// and creates a new object inside it passing the given arguments to its constructor.
+         /// \returns A \c std::unique_ptr owning that memory.
+@@ -122,7 +122,7 @@ namespace foonathan
+                                               detail::forward<Args>(args)...);
+         }
+ 
+-        /// Creates a \c std::unique_ptr using a type-erased \concept{concept_rawallocator,RawAllocator} for the allocation.
++        /// Creates a \c std::unique_ptr using a type-erased RawAllocator for the allocation.
+         /// It is the same as the other overload but stores the reference to the allocator type-erased inside the \c std::unique_ptr.
+         /// \effects Allocates memory for the given type using the allocator
+         /// and creates a new object inside it passing the given arguments to its constructor.
+@@ -141,7 +141,7 @@ namespace foonathan
+                                                              detail::forward<Args>(args)...);
+         }
+ 
+-        /// Creates a \c std::unique_ptr owning an array using a \concept{concept_rawallocator,RawAllocator} for the allocation.
++        /// Creates a \c std::unique_ptr owning an array using a RawAllocator for the allocation.
+         /// \effects Allocates memory for an array of given size and value initializes each element inside of it.
+         /// \returns A \c std::unique_ptr owning that array.
+         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the deleter,
+@@ -158,7 +158,7 @@ namespace foonathan
+                                                           detail::forward<RawAllocator>(alloc)));
+         }
+ 
+-        /// Creates a \c std::unique_ptr owning an array using a type-erased \concept{concept_rawallocator,RawAllocator} for the allocation.
++        /// Creates a \c std::unique_ptr owning an array using a type-erased RawAllocator for the allocation.
+         /// It is the same as the other overload but stores the reference to the allocator type-erased inside the \c std::unique_ptr.
+         /// \effects Allocates memory for an array of given size and value initializes each element inside of it.
+         /// \returns A \c std::unique_ptr with a type-erased allocator reference owning that array.
+@@ -177,7 +177,7 @@ namespace foonathan
+                                                                         alloc)));
+         }
+ 
+-        /// Creates a \c std::shared_ptr using a \concept{concept_rawallocator,RawAllocator} for the allocation.
++        /// Creates a \c std::shared_ptr using a RawAllocator for the allocation.
+         /// It is similar to \c std::allocate_shared but uses a \c RawAllocator (and thus also supports any \c Allocator).
+         /// \effects Calls \ref std_allocator::make_std_allocator to wrap the allocator and forwards to \c std::allocate_shared.
+         /// \returns A \c std::shared_ptr created using \c std::allocate_shared.
+diff --git a/include/foonathan/memory/static_allocator.hpp b/include/foonathan/memory/static_allocator.hpp
+index 580fa2be8f5b1a291d1864558cb75328c4baff3f..472bdeb99fdbfc973e614ffbe6903a50a1193c70 100644
+--- a/include/foonathan/memory/static_allocator.hpp
++++ b/include/foonathan/memory/static_allocator.hpp
+@@ -39,7 +39,7 @@ namespace foonathan
+ 
+         struct allocator_info;
+ 
+-        /// A stateful \concept{concept_rawallocator,RawAllocator} that uses a fixed sized storage for the allocations.
++        /// A stateful RawAllocator that uses a fixed sized storage for the allocations.
+         /// It works on a \ref static_allocator_storage and uses its memory for all allocations.
+         /// Deallocations are not supported, memory cannot be marked as freed.<br>
+         /// \note It is not allowed to share an \ref static_allocator_storage between multiple \ref static_allocator objects.
+@@ -60,13 +60,13 @@ namespace foonathan
+             {
+             }
+ 
+-            /// \effects A \concept{concept_rawallocator,RawAllocator} allocation function.
++            /// \effects A RawAllocator allocation function.
+             /// It uses the specified \ref static_allocator_storage.
+-            /// \returns A pointer to a \concept{concept_node,node}, it will never be \c nullptr.
++            /// \returns A pointer to a node, it will never be \c nullptr.
+             /// \throws An exception of type \ref out_of_memory or whatever is thrown by its handler if the storage is exhausted.
+             void* allocate_node(std::size_t size, std::size_t alignment);
+ 
+-            /// \effects A \concept{concept_rawallocator,RawAllocator} deallocation function.
++            /// \effects A RawAllocator deallocation function.
+             /// It does nothing, deallocation is not supported by this allocator.
+             void deallocate_node(void*, std::size_t, std::size_t) noexcept {}
+ 
+@@ -96,7 +96,7 @@ namespace foonathan
+ 
+         struct memory_block;
+ 
+-        /// A \concept{concept_blockallocator,BlockAllocator} that allocates the blocks from a fixed size storage.
++        /// A BlockAllocator that allocates the blocks from a fixed size storage.
+         /// It works on a \ref static_allocator_storage and uses it for all allocations,
+         /// deallocations are only allowed in reversed order which is guaranteed by \ref memory_arena.
+         /// \note It is not allowed to share an \ref static_allocator_storage between multiple \ref static_allocator objects.
+diff --git a/include/foonathan/memory/std_allocator.hpp b/include/foonathan/memory/std_allocator.hpp
+index 33b2f5489b290f9cf3d3ad710373e2f982928f12..a465c7ad38d481e0cff93ea4f8892fd4dc58f920 100644
+--- a/include/foonathan/memory/std_allocator.hpp
++++ b/include/foonathan/memory/std_allocator.hpp
+@@ -43,7 +43,7 @@ namespace foonathan
+             auto propagate_on_container_copy_assignment(min_concept) -> std::true_type;
+         } // namespace traits_detail
+ 
+-        /// Controls the propagation of a \ref std_allocator for a certain \concept{concept_rawallocator,RawAllocator}.
++        /// Controls the propagation of a \ref std_allocator for a certain RawAllocator.
+         /// \ingroup memory_adapter
+         template <class RawAllocator>
+         struct propagation_traits
+@@ -67,7 +67,7 @@ namespace foonathan
+             }
+         };
+ 
+-        /// Wraps a \concept{concept_rawallocator,RawAllocator} and makes it a "normal" \c Allocator.
++        /// Wraps a RawAllocator and makes it a "normal" \c Allocator.
+         /// It allows using a \c RawAllocator anywhere a \c Allocator is required.
+         /// \ingroup memory_adapter
+         template <typename T, class RawAllocator>
+@@ -186,7 +186,7 @@ namespace foonathan
+             }
+ 
+             //=== allocation/deallocation ===//
+-            /// \effects Allocates memory using the underlying \concept{concept_rawallocator,RawAllocator}.
++            /// \effects Allocates memory using the underlying RawAllocator.
+             /// If \c n is \c 1, it will call <tt>allocate_node(sizeof(T), alignof(T))</tt>,
+             /// otherwise <tt>allocate_array(n, sizeof(T), alignof(T))</tt>.
+             /// \returns A pointer to a memory block suitable for \c n objects of type \c T.
+@@ -196,7 +196,7 @@ namespace foonathan
+                 return static_cast<pointer>(allocate_impl(is_any{}, n));
+             }
+ 
+-            /// \effects Deallcoates memory using the underlying \concept{concept_rawallocator,RawAllocator}.
++            /// \effects Deallcoates memory using the underlying RawAllocator.
+             /// It will forward to the deallocation function in the same way as in \ref allocate().
+             /// \requires The pointer must come from a previous call to \ref allocate() with the same \c n on this object or any copy of it.
+             void deallocate(pointer p, size_type n) noexcept
+@@ -341,7 +341,7 @@ namespace foonathan
+             return {detail::forward<RawAllocator>(allocator)};
+         }
+ 
+-        /// An alias template for \ref std_allocator using a type-erased \concept{concept_rawallocator,RawAllocator}.
++        /// An alias template for \ref std_allocator using a type-erased RawAllocator.
+         /// This is the same as using a \ref std_allocator with the tag type \ref any_allocator.
+         /// The implementation is optimized to call fewer virtual functions.
+         /// \ingroup memory_adapter
+diff --git a/include/foonathan/memory/temporary_allocator.hpp b/include/foonathan/memory/temporary_allocator.hpp
+index 135d250bc15ee074a22b3c210b541dcff98e6d83..d8f9f18795568462bbc27dba6581585c537f5742 100644
+--- a/include/foonathan/memory/temporary_allocator.hpp
++++ b/include/foonathan/memory/temporary_allocator.hpp
+@@ -209,7 +209,7 @@ namespace foonathan
+         temporary_stack& get_temporary_stack(
+             std::size_t initial_size = temporary_stack_initializer::default_stack_size);
+ 
+-        /// A stateful \concept{concept_rawallocator,RawAllocator} that handles temporary allocations.
++        /// A stateful RawAllocator that handles temporary allocations.
+         /// It works similar to \c alloca() but uses a seperate \ref memory_stack for the allocations,
+         /// instead of the actual program stack.
+         /// This avoids the stack overflow error and is portable,
+diff --git a/include/foonathan/memory/threading.hpp b/include/foonathan/memory/threading.hpp
+index 52b3998b2c7b7ee5c4b0def5857ddaf6f65e8435..7fadd8ae80b28a3ff2ae564fba4555d0d2745f63 100644
+--- a/include/foonathan/memory/threading.hpp
++++ b/include/foonathan/memory/threading.hpp
+@@ -35,7 +35,7 @@ namespace foonathan
+             void unlock() noexcept {}
+         };
+ 
+-        /// Specifies whether or not a \concept{concept_rawallocator,RawAllocator} is thread safe as-is.
++        /// Specifies whether or not a RawAllocator is thread safe as-is.
+         /// This allows to use \ref no_mutex as an optimization.
+         /// Note that stateless allocators are implictly thread-safe.
+         /// Specialize it only for your own stateful allocators.
+diff --git a/include/foonathan/memory/tracking.hpp b/include/foonathan/memory/tracking.hpp
+index 222e6105bf35d884fa4e472f077ebf58a721894a..80d509af506b0b173238d2beb12570c9b9530090 100644
+--- a/include/foonathan/memory/tracking.hpp
++++ b/include/foonathan/memory/tracking.hpp
+@@ -69,11 +69,11 @@ namespace foonathan
+             };
+         } // namespace detail
+ 
+-        /// A \concept{concept_blockallocator,BlockAllocator} adapter that tracks another allocator using a \concept{concept_tracker,tracker}.
+-        /// It wraps another \concept{concept_blockallocator,BlockAllocator} and calls the tracker function before forwarding to it.
+-        /// The class can then be used anywhere a \concept{concept_blockallocator,BlockAllocator} is required and the memory usage will be tracked.<br>
++        /// A BlockAllocator adapter that tracks another allocator using a tracker.
++        /// It wraps another BlockAllocator and calls the tracker function before forwarding to it.
++        /// The class can then be used anywhere a BlockAllocator is required and the memory usage will be tracked.<br>
+         /// It will only call the <tt>on_allocator_growth()</tt> and <tt>on_allocator_shrinking()</tt> tracking functions,
+-        /// since a \concept{concept_blockallocator,BlockAllocator} is normally used inside higher allocators only.
++        /// since a BlockAllocator is normally used inside higher allocators only.
+         /// \ingroup memory_adapter
+         template <class Tracker, class BlockOrRawAllocator>
+         class tracked_block_allocator
+@@ -84,7 +84,7 @@ namespace foonathan
+             using tracker        = Tracker;
+ 
+             /// @{
+-            /// \effects Creates it by giving it a \concept{concept_tracker,tracker} and the tracked \concept{concept_rawallocator,RawAllocator}.
++            /// \effects Creates it by giving it a tracker and the tracked RawAllocator.
+             /// It will embed both objects.
+             explicit tracked_block_allocator(tracker t = {}) noexcept : tracker(detail::move(t)) {}
+ 
+@@ -160,10 +160,10 @@ namespace foonathan
+             detail::deeply_tracked_block_allocator<Tracker,
+                                                    make_block_allocator_t<BlockOrRawAllocator>>);
+ 
+-        /// A \concept{concept_rawallocator,RawAllocator} adapter that tracks another allocator using a \concept{concept_tracker,tracker}.
+-        /// It wraps another \concept{concept_rawallocator,RawAllocator} and calls the tracker function before forwarding to it.
+-        /// The class can then be used anywhere a \concept{concept_rawallocator,RawAllocator} is required and the memory usage will be tracked.<br>
+-        /// If the \concept{concept_rawallocator,RawAllocator} uses \ref deeply_tracked_block_allocator as \concept{concept_blockallocator,BlockAllocator},
++        /// A RawAllocator adapter that tracks another allocator using a tracker.
++        /// It wraps another RawAllocator and calls the tracker function before forwarding to it.
++        /// The class can then be used anywhere a RawAllocator is required and the memory usage will be tracked.<br>
++        /// If the RawAllocator uses \ref deeply_tracked_block_allocator as BlockAllocator,
+         /// it will also track growth and shrinking of the allocator.
+         /// \ingroup memory_adapter
+         template <class Tracker, class RawAllocator>
+@@ -181,7 +181,7 @@ namespace foonathan
+                                                                  || !std::is_empty<Tracker>::value>;
+ 
+             /// @{
+-            /// \effects Creates it by giving it a \concept{concept_tracker,tracker} and the tracked \concept{concept_rawallocator,RawAllocator}.
++            /// \effects Creates it by giving it a tracker and the tracked RawAllocator.
+             /// It will embed both objects.
+             /// \note This will never call the <tt>Tracker::on_allocator_growth()</tt> function.
+             explicit tracked_allocator(tracker t = {}) noexcept
+@@ -350,7 +350,7 @@ namespace foonathan
+             /// @}
+         };
+ 
+-        /// \effects Takes a \concept{concept_rawallocator,RawAllocator} and wraps it with a \concept{concept_tracker,tracker}.
++        /// \effects Takes a RawAllocator and wraps it with a tracker.
+         /// \returns A \ref tracked_allocator with the corresponding parameters forwarded to the constructor.
+         /// \relates tracked_allocator
+         template <class Tracker, class RawAllocator>
+@@ -403,16 +403,16 @@ namespace foonathan
+                 RawAllocator, deeply_tracked_block_allocator_for<Tracker, RawAllocator>>::type;
+         } // namespace detail
+ 
+-        /// A \ref tracked_allocator that has rebound any \concept{concept_blockallocator,BlockAllocator} to the corresponding \ref deeply_tracked_block_allocator.
++        /// A \ref tracked_allocator that has rebound any BlockAllocator to the corresponding \ref deeply_tracked_block_allocator.
+         /// This makes it a deeply tracked allocator.<br>
+-        /// It replaces each template argument of the given \concept{concept_rawallocator,RawAllocator} for which \ref is_block_allocator or \ref is_raw_allocator is \c true with a \ref deeply_tracked_block_allocator.
++        /// It replaces each template argument of the given RawAllocator for which \ref is_block_allocator or \ref is_raw_allocator is \c true with a \ref deeply_tracked_block_allocator.
+         /// \ingroup memory_adapter
+         template <class Tracker, class RawAllocator>
+         FOONATHAN_ALIAS_TEMPLATE(
+             deeply_tracked_allocator,
+             tracked_allocator<Tracker, detail::rebound_allocator<Tracker, RawAllocator>>);
+ 
+-        /// \effects Takes a \concept{concept_rawallocator,RawAllocator} and deeply wraps it with a \concept{concept_tracker,tracker}.
++        /// \effects Takes a RawAllocator and deeply wraps it with a tracker.
+         /// \returns A \ref deeply_tracked_allocator with the corresponding parameters forwarded to the constructor.
+         /// \relates deeply_tracked_allocator
+         template <class RawAllocator, class Tracker, typename... Args>
+diff --git a/include/foonathan/memory/virtual_memory.hpp b/include/foonathan/memory/virtual_memory.hpp
+index 35f7ccd54fdda08c504696b0719d16ec27d6c9e9..c1d3cbc882bf29e023770c9b8699c655f4119a64 100644
+--- a/include/foonathan/memory/virtual_memory.hpp
++++ b/include/foonathan/memory/virtual_memory.hpp
+@@ -76,7 +76,7 @@ namespace foonathan
+         /// \ingroup memory_allocator
+         void virtual_memory_decommit(void* memory, std::size_t no_pages) noexcept;
+ 
+-        /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory using the virtual memory allocation functions.
++        /// A stateless RawAllocator that allocates memory using the virtual memory allocation functions.
+         /// It does not prereserve any memory and will always reserve and commit combined.
+         /// \ingroup memory_allocator
+         class virtual_memory_allocator
+@@ -94,17 +94,17 @@ namespace foonathan
+                 return *this;
+             }
+ 
+-            /// \effects A \concept{concept_rawallocator,RawAllocator} allocation function.
++            /// \effects A RawAllocator allocation function.
+             /// It uses \ref virtual_memory_reserve followed by \ref virtual_memory_commit for the allocation.
+             /// The number of pages allocated will be the minimum to hold \c size continuous bytes,
+             /// i.e. \c size will be rounded up to the next multiple.
+             /// If debug fences are activated, one additional page before and after the memory will be allocated.
+-            /// \returns A pointer to a \concept{concept_node,node}, it will never be \c nullptr.
++            /// \returns A pointer to a node, it will never be \c nullptr.
+             /// It will always be aligned on a fence boundary, regardless of the alignment parameter.
+             /// \throws An exception of type \ref out_of_memory or whatever is thrown by its handler if the allocation fails.
+             void* allocate_node(std::size_t size, std::size_t alignment);
+ 
+-            /// \effects A \concept{concept_rawallocator,RawAllocator} deallocation function.
++            /// \effects A RawAllocator deallocation function.
+             /// It calls \ref virtual_memory_decommit followed by \ref virtual_memory_release for the deallocation.
+             void deallocate_node(void* node, std::size_t size, std::size_t alignment) noexcept;
+ 
+@@ -122,7 +122,7 @@ namespace foonathan
+         struct memory_block;
+         struct allocator_info;
+ 
+-        /// A \concept{concept_blockallocator,BlockAllocator} that reserves virtual memory and commits it part by part.
++        /// A BlockAllocator that reserves virtual memory and commits it part by part.
+         /// It is similar to \ref memory_stack but does not support growing and uses virtual memory,
+         /// also meant for big blocks not small allocations.
+         /// \ingroup memory_allocator

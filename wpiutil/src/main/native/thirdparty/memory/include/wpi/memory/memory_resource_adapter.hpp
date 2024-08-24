@@ -87,11 +87,11 @@ namespace wpi
     namespace memory
     {
         /// The \c memory_resource abstract base class used in the implementation.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         WPI_ALIAS_TEMPLATE(memory_resource, foonathan_memory_pmr::memory_resource);
 
-        /// Wraps a \concept{concept_rawallocator,RawAllocator} and makes it a \ref memory_resource.
-        /// \ingroup adapter
+        /// Wraps a RawAllocator and makes it a \ref memory_resource.
+        /// \ingroup memory_adapter
         template <class RawAllocator>
         class memory_resource_adapter
         : public memory_resource,
@@ -124,7 +124,7 @@ namespace wpi
 
             /// \effects Allocates raw memory with given size and alignment.
             /// It forwards to \c allocate_node() or \c allocate_array() depending on the size.
-            /// \returns The new memory as returned by the \concept{concept_rawallocator,RawAllocator}.
+            /// \returns The new memory as returned by the RawAllocator.
             /// \throws Anything thrown by the allocation function.
             void* do_allocate(std::size_t bytes, std::size_t alignment) override
             {
@@ -162,8 +162,8 @@ namespace wpi
             }
         };
 
-        /// Wraps a \ref memory_resource and makes it a \concept{concept_rawallocator,RawAllocator}.
-        /// \ingroup adapter
+        /// Wraps a \ref memory_resource and makes it a RawAllocator.
+        /// \ingroup memory_adapter
         class memory_resource_allocator
         {
         public:
@@ -227,7 +227,7 @@ namespace wpi
 
         /// Specialization of \ref is_shared_allocator to mark \ref memory_resource_allocator as shared.
         /// This allows using it as \ref allocator_reference directly.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <>
         struct is_shared_allocator<memory_resource_allocator> : std::true_type
         {

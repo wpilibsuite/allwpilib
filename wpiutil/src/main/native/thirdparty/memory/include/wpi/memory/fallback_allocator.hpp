@@ -16,12 +16,12 @@ namespace wpi
 {
     namespace memory
     {
-        /// A \concept{raw_allocator,RawAllocator} with a fallback.
+        /// A RawAllocator with a fallback.
         /// Allocation first tries `Default`, if it fails,
         /// it uses `Fallback`.
-        /// \requires `Default` must be a composable \concept{concept_rawallocator,RawAllocator},
-        /// `Fallback` must be a \concept{concept_rawallocator,RawAllocator}.
-        /// \ingroup adapter
+        /// \requires `Default` must be a composable RawAllocator,
+        /// `Fallback` must be a RawAllocator.
+        /// \ingroup memory_adapter
         template <class Default, class Fallback>
         class fallback_allocator
         : WPI_EBO(detail::ebo_storage<0, typename allocator_traits<Default>::allocator_type>),
