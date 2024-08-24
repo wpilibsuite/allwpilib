@@ -32,7 +32,7 @@ namespace wpi
             };
         } // namespace detail
 
-        /// A stateful \concept{concept_rawallocator,RawAllocator} that manages \concept{concept_node,nodes} of fixed size.
+        /// A stateful RawAllocator that manages nodes of fixed size.
         /// It uses a \ref memory_arena with a given \c BlockOrRawAllocator defaulting to \ref growing_block_allocator,
         /// subdivides them in small nodes of given size and puts them onto a free list.
         /// Allocation and deallocation simply remove or add nodes from this list and are thus fast.
@@ -42,7 +42,7 @@ namespace wpi
         /// for example in a node based container like \c std::list.
         /// It is not so good for different allocation sizes and has some drawbacks for arrays
         /// as described in \ref memory_pool_type.hpp.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <typename PoolType = node_pool, class BlockOrRawAllocator = default_allocator>
         class memory_pool
         : WPI_EBO(detail::default_leak_checker<detail::memory_pool_leak_handler>)
@@ -57,8 +57,8 @@ namespace wpi
             static constexpr std::size_t min_node_size =
                 WPI_IMPL_DEFINED(free_list::min_element_size);
 
-            /// \returns The minimum block size required for certain number of \concept{concept_node,node}.
-            /// \requires \c node_size must be a valid \concept{concept_node,node size}
+            /// \returns The minimum block size required for certain number of node.
+            /// \requires \c node_size must be a valid node size
             /// and \c number_of_nodes must be a non-zero value.
             /// \note MSVC's implementation of \c std::list for example is never empty and always allocates proxy nodes.
             /// To get enough memory for \c N elements of a list, \c number_of_nodes needs to include the proxy count in addition to \c N.
@@ -69,12 +69,12 @@ namespace wpi
                        + free_list::min_block_size(node_size, number_of_nodes);
             }
 
-            /// \effects Creates it by specifying the size each \concept{concept_node,node} will have,
-            /// the initial block size for the arena and other constructor arguments for the \concept{concept_blockallocator,BlockAllocator}.
+            /// \effects Creates it by specifying the size each node will have,
+            /// the initial block size for the arena and other constructor arguments for the BlockAllocator.
             /// If the \c node_size is less than the \c min_node_size, the \c min_node_size will be the actual node size.
-            /// It will allocate an initial memory block with given size from the \concept{concept_blockallocator,BlockAllocator}
+            /// It will allocate an initial memory block with given size from the BlockAllocator
             /// and puts it onto the free list.
-            /// \requires \c node_size must be a valid \concept{concept_node,node size}
+            /// \requires \c node_size must be a valid node size
             /// and \c block_size must be at least \c min_block_size(node_size, 1).
             template <typename... Args>
             memory_pool(std::size_t node_size, std::size_t block_size, Args&&... args)
@@ -84,7 +84,7 @@ namespace wpi
             }
 
             /// \effects Destroys the \ref memory_pool by returning all memory blocks,
-            /// regardless of properly deallocated back to the \concept{concept_blockallocator,BlockAllocator}.
+            /// regardless of properly deallocated back to the BlockAllocator.
             ~memory_pool() noexcept {}
 
             /// @{
@@ -108,12 +108,12 @@ namespace wpi
             }
             /// @}
 
-            /// \effects Allocates a single \concept{concept_node,node} by removing it from the free list.
+            /// \effects Allocates a single node by removing it from the free list.
             /// If the free list is empty, a new memory block will be allocated from the arena and put onto it.
             /// The new block size will be \ref next_capacity() big.
             /// \returns A node of size \ref node_size() suitable aligned,
             /// i.e. suitable for any type where <tt>sizeof(T) < node_size()</tt>.
-            /// \throws Anything thrown by the used \concept{concept_blockallocator,BlockAllocator}'s allocation function if a growth is needed.
+            /// \throws Anything thrown by the used BlockAllocator's allocation function if a growth is needed.
             void* allocate_node()
             {
                 if (free_list_.empty())
@@ -122,7 +122,7 @@ namespace wpi
                 return free_list_.allocate();
             }
 
-            /// \effects Allocates a single \concept{concept_node,node} similar to \ref allocate_node().
+            /// \effects Allocates a single node similar to \ref allocate_node().
             /// But if the free list is empty, a new block will *not* be allocated.
             /// \returns A suitable aligned node of size \ref node_size() or `nullptr`.
             void* try_allocate_node() noexcept
@@ -130,13 +130,13 @@ namespace wpi
                 return free_list_.empty() ? nullptr : free_list_.allocate();
             }
 
-            /// \effects Allocates an \concept{concept_array,array} of nodes by searching for \c n continuous nodes on the list and removing them.
+            /// \effects Allocates an array of nodes by searching for \c n continuous nodes on the list and removing them.
             /// Depending on the \c PoolType this can be a slow operation or not allowed at all.
             /// This can sometimes lead to a growth, even if technically there is enough continuous memory on the free list.
             /// \returns An array of \c n nodes of size \ref node_size() suitable aligned.
-            /// \throws Anything thrown by the used \concept{concept_blockallocator,BlockAllocator}'s allocation function if a growth is needed,
+            /// \throws Anything thrown by the used BlockAllocator's allocation function if a growth is needed,
             /// or \ref bad_array_size if <tt>n * node_size()</tt> is too big.
-            /// \requires \c n must be valid \concept{concept_array,array count}.
+            /// \requires \c n must be valid array count.
             void* allocate_array(std::size_t n)
             {
                 detail::check_allocation_size<bad_array_size>(
@@ -145,7 +145,7 @@ namespace wpi
                 return allocate_array(n, node_size());
             }
 
-            /// \effects Allocates an \concept{concept_array,array} of nodes similar to \ref allocate_array().
+            /// \effects Allocates an array of nodes similar to \ref allocate_array().
             /// But it will never allocate a new memory block.
             /// \returns An array of \c n nodes of size \ref node_size() suitable aligned
             /// or `nullptr`.
@@ -154,7 +154,7 @@ namespace wpi
                 return try_allocate_array(n, node_size());
             }
 
-            /// \effects Deallocates a single \concept{concept_node,node} by putting it back onto the free list.
+            /// \effects Deallocates a single node by putting it back onto the free list.
             /// \requires \c ptr must be a result from a previous call to \ref allocate_node() on the same free list,
             /// i.e. either this allocator object or a new object created by moving this to it.
             void deallocate_node(void* ptr) noexcept
@@ -162,7 +162,7 @@ namespace wpi
                 free_list_.deallocate(ptr);
             }
 
-            /// \effects Deallocates a single \concept{concept_node,node} but it does not be a result of a previous call to \ref allocate_node().
+            /// \effects Deallocates a single node but it does not be a result of a previous call to \ref allocate_node().
             /// \returns `true` if the node could be deallocated, `false` otherwise.
             /// \note Some free list implementations can deallocate any memory,
             /// doesn't matter where it is coming from.
@@ -174,7 +174,7 @@ namespace wpi
                 return true;
             }
 
-            /// \effects Deallocates an \concept{concept_array,array} by putting it back onto the free list.
+            /// \effects Deallocates an array by putting it back onto the free list.
             /// \requires \c ptr must be a result from a previous call to \ref allocate_array() with the same \c n on the same free list,
             /// i.e. either this allocator object or a new object created by moving this to it.
             void deallocate_array(void* ptr, std::size_t n) noexcept
@@ -183,7 +183,7 @@ namespace wpi
                 free_list_.deallocate(ptr, n * node_size());
             }
 
-            /// \effects Deallocates an \concept{concept_array,array} but it does not be a result of a previous call to \ref allocate_array().
+            /// \effects Deallocates an array but it does not be a result of a previous call to \ref allocate_array().
             /// \returns `true` if the node could be deallocated, `false` otherwise.
             /// \note Some free list implementations can deallocate any memory,
             /// doesn't matter where it is coming from.
@@ -192,7 +192,7 @@ namespace wpi
                 return try_deallocate_array(ptr, n, node_size());
             }
 
-            /// \returns The size of each \concept{concept_node,node} in the pool,
+            /// \returns The size of each node in the pool,
             /// this is either the same value as in the constructor or \c min_node_size if the value was too small.
             std::size_t node_size() const noexcept
             {
@@ -215,7 +215,7 @@ namespace wpi
                 return free_list_.usable_size(arena_.next_block_size());
             }
 
-            /// \returns A reference to the \concept{concept_blockallocator,BlockAllocator} used for managing the arena.
+            /// \returns A reference to the BlockAllocator used for managing the arena.
             /// \requires It is undefined behavior to move this allocator out into another object.
             allocator_type& get_allocator() noexcept
             {
@@ -280,7 +280,7 @@ namespace wpi
         /// Specialization of the \ref allocator_traits for \ref memory_pool classes.
         /// \note It is not allowed to mix calls through the specialization and through the member functions,
         /// i.e. \ref memory_pool::allocate_node() and this \c allocate_node().
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <typename PoolType, class ImplRawAllocator>
         class allocator_traits<memory_pool<PoolType, ImplRawAllocator>>
         {
@@ -306,7 +306,7 @@ namespace wpi
             /// \effects Forwards to \ref memory_pool::allocate_array()
             /// with the number of nodes adjusted to be the minimum,
             /// i.e. when the \c size is less than the \ref memory_pool::node_size().
-            /// \returns A \concept{concept_array,array} with specified properties.
+            /// \returns A array with specified properties.
             /// \requires The \ref memory_pool has to support array allocations.
             /// \throws Anything thrown by the pool allocation function.
             static void* allocate_array(allocator_type& state, std::size_t count, std::size_t size,
@@ -360,7 +360,7 @@ namespace wpi
         };
 
         /// Specialization of the \ref composable_allocator_traits for \ref memory_pool classes.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <typename PoolType, class BlockOrRawAllocator>
         class composable_allocator_traits<memory_pool<PoolType, BlockOrRawAllocator>>
         {
@@ -382,7 +382,7 @@ namespace wpi
             /// \effects Forwards to \ref memory_pool::try_allocate_array()
             /// with the number of nodes adjusted to be the minimum,
             /// if the \c size is less than the \ref memory_pool::node_size().
-            /// \returns A \concept{concept_array,array} with specified properties
+            /// \returns A array with specified properties
             /// or `nullptr` if it was unable to allocate.
             static void* try_allocate_array(allocator_type& state, std::size_t count,
                                             std::size_t size, std::size_t alignment) noexcept

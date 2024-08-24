@@ -94,11 +94,7 @@ public class VideoSink implements AutoCloseable {
     if (other == null) {
       return false;
     }
-    if (getClass() != other.getClass()) {
-      return false;
-    }
-    VideoSink sink = (VideoSink) other;
-    return m_handle == sink.m_handle;
+    return other instanceof VideoSink sink && m_handle == sink.m_handle;
   }
 
   @Override

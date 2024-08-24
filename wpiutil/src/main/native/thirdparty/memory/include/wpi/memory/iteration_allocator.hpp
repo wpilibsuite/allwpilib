@@ -24,7 +24,7 @@ namespace wpi
                 make_block_allocator_t<BlockOrRawAllocator, fixed_block_allocator>;
         } // namespace detail
 
-        /// A stateful \concept{concept_rawallocator,RawAllocator} that is designed for allocations in a loop.
+        /// A stateful RawAllocator that is designed for allocations in a loop.
         /// It uses `N` stacks for the allocation, one of them is always active.
         /// Allocation uses the currently active stack.
         /// Calling \ref iteration_allocator::next_iteration() at the end of the loop,
@@ -32,7 +32,7 @@ namespace wpi
         /// effectively releasing all of its memory.
         /// Any memory allocated will thus be usable for `N` iterations of the loop.
         /// This type of allocator is a generalization of the double frame allocator.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <std::size_t N, class BlockOrRawAllocator = default_allocator>
         class iteration_allocator
         : WPI_EBO(detail::iteration_block_allocator<BlockOrRawAllocator>)
@@ -40,7 +40,7 @@ namespace wpi
         public:
             using allocator_type = detail::iteration_block_allocator<BlockOrRawAllocator>;
 
-            /// \effects Creates it with a given initial block size and and other constructor arguments for the \concept{concept_blockallocator,BlockAllocator}.
+            /// \effects Creates it with a given initial block size and and other constructor arguments for the BlockAllocator.
             /// It will allocate the first (and only) block and evenly divide it on all the stacks it uses.
             template <typename... Args>
             explicit iteration_allocator(std::size_t block_size, Args&&... args)
@@ -89,7 +89,7 @@ namespace wpi
 
             /// \effects Allocates a memory block of given size and alignment.
             /// It simply moves the top marker of the currently active stack.
-            /// \returns A \concept{concept_node,node} with given size and alignment.
+            /// \returns A node with given size and alignment.
             /// \throws \ref out_of_fixed_memory if the current stack does not have any memory left.
             /// \requires \c size and \c alignment must be valid.
             void* allocate(std::size_t size, std::size_t alignment)
@@ -106,7 +106,7 @@ namespace wpi
 
             /// \effects Allocates a memory block of given size and alignment
             /// similar to \ref allocate().
-            /// \returns A \concept{concept_node,node} with given size and alignment
+            /// \returns A node with given size and alignment
             /// or `nullptr` if the current stack does not have any memory left.
             void* try_allocate(std::size_t size, std::size_t alignment) noexcept
             {
@@ -139,7 +139,7 @@ namespace wpi
                 return cur_;
             }
 
-            /// \returns A reference to the \concept{concept_blockallocator,BlockAllocator} used for managing the memory.
+            /// \returns A reference to the BlockAllocator used for managing the memory.
             /// \requires It is undefined behavior to move this allocator out into another object.
             allocator_type& get_allocator() noexcept
             {
@@ -187,7 +187,7 @@ namespace wpi
         };
 
         /// An alias for \ref iteration_allocator for two iterations.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <class BlockOrRawAllocator = default_allocator>
         WPI_ALIAS_TEMPLATE(double_frame_allocator,
                                  iteration_allocator<2, BlockOrRawAllocator>);
@@ -199,7 +199,7 @@ namespace wpi
         /// Specialization of the \ref allocator_traits for \ref iteration_allocator.
         /// \note It is not allowed to mix calls through the specialization and through the member functions,
         /// i.e. \ref memory_stack::allocate() and this \c allocate_node().
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <std::size_t N, class BlockAllocator>
         class allocator_traits<iteration_allocator<N, BlockAllocator>>
         {
@@ -256,7 +256,7 @@ namespace wpi
         };
 
         /// Specialization of the \ref composable_allocator_traits for \ref iteration_allocator classes.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <std::size_t N, class BlockAllocator>
         class composable_allocator_traits<iteration_allocator<N, BlockAllocator>>
         {

@@ -54,9 +54,9 @@ namespace wpi
                                                        malloc_alloator_leak_checker)
         } // namespace detail
 
-        /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory using <tt>std::malloc()</tt>.
+        /// A stateless RawAllocator that allocates memory using <tt>std::malloc()</tt>.
         /// It throws \ref out_of_memory when the allocation fails.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         using malloc_allocator =
             WPI_IMPL_DEFINED(detail::lowlevel_allocator<detail::malloc_allocator_impl>);
 

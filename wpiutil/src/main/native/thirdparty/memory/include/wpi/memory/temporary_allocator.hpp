@@ -91,7 +91,7 @@ namespace wpi
 
         /// A wrapper around the \ref memory_stack that is used by the \ref temporary_allocator.
         /// There should be at least one per-thread.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         class temporary_stack : WPI_EBO(detail::temporary_stack_list_node)
         {
         public:
@@ -209,13 +209,13 @@ namespace wpi
         temporary_stack& get_temporary_stack(
             std::size_t initial_size = temporary_stack_initializer::default_stack_size);
 
-        /// A stateful \concept{concept_rawallocator,RawAllocator} that handles temporary allocations.
+        /// A stateful RawAllocator that handles temporary allocations.
         /// It works similar to \c alloca() but uses a seperate \ref memory_stack for the allocations,
         /// instead of the actual program stack.
         /// This avoids the stack overflow error and is portable,
         /// with a similar speed.
         /// All allocations done in the scope of the allocator object are automatically freed when the object is destroyed.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         class temporary_allocator
         {
         public:
@@ -267,7 +267,7 @@ namespace wpi
         /// Specialization of the \ref allocator_traits for \ref temporary_allocator classes.
         /// \note It is not allowed to mix calls through the specialization and through the member functions,
         /// i.e. \ref temporary_allocator::allocate() and this \c allocate_node().
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <>
         class allocator_traits<temporary_allocator>
         {

@@ -7,13 +7,18 @@
 /// \file
 /// Convenient namespace alias.
 
-/// \defgroup core Core components
+/// \defgroup memory Memory Allocator Library
+/// @{
 
-/// \defgroup allocator Allocator implementations
+/// \defgroup memory_core Core components
 
-/// \defgroup adapter Adapters and Wrappers
+/// \defgroup memory_allocator Allocator implementations
 
-/// \defgroup storage Allocator storage
+/// \defgroup memory_adapter Adapters and Wrappers
+
+/// \defgroup memory_storage Allocator storage
+
+/// @}
 
 /// \namespace wpi
 /// Foonathan namespace.
@@ -32,5 +37,5 @@ namespace wpi
 } // namespace wpi
 
 namespace memory = wpi::memory;
-
+///@}
 #endif // WPI_MEMORY_NAMESPACE_ALIAS_HPP_INCLUDED

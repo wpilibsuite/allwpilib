@@ -117,31 +117,34 @@ public final class CameraServer {
 
     @Override
     public void close() {
-      if (m_booleanValueEntry != null) {
-        m_booleanValueEntry.close();
+      try {
+        if (m_booleanValueEntry != null) {
+          m_booleanValueEntry.close();
+        }
+        if (m_integerValueEntry != null) {
+          m_integerValueEntry.close();
+        }
+        if (m_stringValueEntry != null) {
+          m_stringValueEntry.close();
+        }
+        if (m_minPublisher != null) {
+          m_minPublisher.close();
+        }
+        if (m_maxPublisher != null) {
+          m_maxPublisher.close();
+        }
+        if (m_stepPublisher != null) {
+          m_stepPublisher.close();
+        }
+        if (m_defaultPublisher != null) {
+          m_defaultPublisher.close();
+        }
+        if (m_choicesPublisher != null) {
+          m_choicesPublisher.close();
+        }
+      } finally {
+        Reference.reachabilityFence(m_videoListener);
       }
-      if (m_integerValueEntry != null) {
-        m_integerValueEntry.close();
-      }
-      if (m_stringValueEntry != null) {
-        m_stringValueEntry.close();
-      }
-      if (m_minPublisher != null) {
-        m_minPublisher.close();
-      }
-      if (m_maxPublisher != null) {
-        m_maxPublisher.close();
-      }
-      if (m_stepPublisher != null) {
-        m_stepPublisher.close();
-      }
-      if (m_defaultPublisher != null) {
-        m_defaultPublisher.close();
-      }
-      if (m_choicesPublisher != null) {
-        m_choicesPublisher.close();
-      }
-      Reference.reachabilityFence(m_videoListener);
     }
 
     BooleanEntry m_booleanValueEntry;

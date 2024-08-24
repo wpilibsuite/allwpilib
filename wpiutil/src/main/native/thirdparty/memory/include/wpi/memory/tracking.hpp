@@ -69,12 +69,12 @@ namespace wpi
             };
         } // namespace detail
 
-        /// A \concept{concept_blockallocator,BlockAllocator} adapter that tracks another allocator using a \concept{concept_tracker,tracker}.
-        /// It wraps another \concept{concept_blockallocator,BlockAllocator} and calls the tracker function before forwarding to it.
-        /// The class can then be used anywhere a \concept{concept_blockallocator,BlockAllocator} is required and the memory usage will be tracked.<br>
+        /// A BlockAllocator adapter that tracks another allocator using a tracker.
+        /// It wraps another BlockAllocator and calls the tracker function before forwarding to it.
+        /// The class can then be used anywhere a BlockAllocator is required and the memory usage will be tracked.<br>
         /// It will only call the <tt>on_allocator_growth()</tt> and <tt>on_allocator_shrinking()</tt> tracking functions,
-        /// since a \concept{concept_blockallocator,BlockAllocator} is normally used inside higher allocators only.
-        /// \ingroup adapter
+        /// since a BlockAllocator is normally used inside higher allocators only.
+        /// \ingroup memory_adapter
         template <class Tracker, class BlockOrRawAllocator>
         class tracked_block_allocator
         : WPI_EBO(Tracker, make_block_allocator_t<BlockOrRawAllocator>)
@@ -84,7 +84,7 @@ namespace wpi
             using tracker        = Tracker;
 
             /// @{
-            /// \effects Creates it by giving it a \concept{concept_tracker,tracker} and the tracked \concept{concept_rawallocator,RawAllocator}.
+            /// \effects Creates it by giving it a tracker and the tracked RawAllocator.
             /// It will embed both objects.
             explicit tracked_block_allocator(tracker t = {}) noexcept : tracker(detail::move(t)) {}
 
@@ -154,18 +154,18 @@ namespace wpi
         /// Similar to \ref tracked_block_allocator, but shares the tracker with the higher level allocator.
         /// This allows tracking both (de-)allocations and growth with one tracker.
         /// \note Due to implementation reasons, it cannot track growth and shrinking in the constructor/destructor of the higher level allocator.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <class Tracker, class BlockOrRawAllocator>
         using deeply_tracked_block_allocator = WPI_IMPL_DEFINED(
             detail::deeply_tracked_block_allocator<Tracker,
                                                    make_block_allocator_t<BlockOrRawAllocator>>);
 
-        /// A \concept{concept_rawallocator,RawAllocator} adapter that tracks another allocator using a \concept{concept_tracker,tracker}.
-        /// It wraps another \concept{concept_rawallocator,RawAllocator} and calls the tracker function before forwarding to it.
-        /// The class can then be used anywhere a \concept{concept_rawallocator,RawAllocator} is required and the memory usage will be tracked.<br>
-        /// If the \concept{concept_rawallocator,RawAllocator} uses \ref deeply_tracked_block_allocator as \concept{concept_blockallocator,BlockAllocator},
+        /// A RawAllocator adapter that tracks another allocator using a tracker.
+        /// It wraps another RawAllocator and calls the tracker function before forwarding to it.
+        /// The class can then be used anywhere a RawAllocator is required and the memory usage will be tracked.<br>
+        /// If the RawAllocator uses \ref deeply_tracked_block_allocator as BlockAllocator,
         /// it will also track growth and shrinking of the allocator.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <class Tracker, class RawAllocator>
         class tracked_allocator
         : WPI_EBO(Tracker, allocator_traits<RawAllocator>::allocator_type)
@@ -181,7 +181,7 @@ namespace wpi
                                                                  || !std::is_empty<Tracker>::value>;
 
             /// @{
-            /// \effects Creates it by giving it a \concept{concept_tracker,tracker} and the tracked \concept{concept_rawallocator,RawAllocator}.
+            /// \effects Creates it by giving it a tracker and the tracked RawAllocator.
             /// It will embed both objects.
             /// \note This will never call the <tt>Tracker::on_allocator_growth()</tt> function.
             explicit tracked_allocator(tracker t = {}) noexcept
@@ -350,7 +350,7 @@ namespace wpi
             /// @}
         };
 
-        /// \effects Takes a \concept{concept_rawallocator,RawAllocator} and wraps it with a \concept{concept_tracker,tracker}.
+        /// \effects Takes a RawAllocator and wraps it with a tracker.
         /// \returns A \ref tracked_allocator with the corresponding parameters forwarded to the constructor.
         /// \relates tracked_allocator
         template <class Tracker, class RawAllocator>
@@ -403,16 +403,16 @@ namespace wpi
                 RawAllocator, deeply_tracked_block_allocator_for<Tracker, RawAllocator>>::type;
         } // namespace detail
 
-        /// A \ref tracked_allocator that has rebound any \concept{concept_blockallocator,BlockAllocator} to the corresponding \ref deeply_tracked_block_allocator.
+        /// A \ref tracked_allocator that has rebound any BlockAllocator to the corresponding \ref deeply_tracked_block_allocator.
         /// This makes it a deeply tracked allocator.<br>
-        /// It replaces each template argument of the given \concept{concept_rawallocator,RawAllocator} for which \ref is_block_allocator or \ref is_raw_allocator is \c true with a \ref deeply_tracked_block_allocator.
-        /// \ingroup adapter
+        /// It replaces each template argument of the given RawAllocator for which \ref is_block_allocator or \ref is_raw_allocator is \c true with a \ref deeply_tracked_block_allocator.
+        /// \ingroup memory_adapter
         template <class Tracker, class RawAllocator>
         WPI_ALIAS_TEMPLATE(
             deeply_tracked_allocator,
             tracked_allocator<Tracker, detail::rebound_allocator<Tracker, RawAllocator>>);
 
-        /// \effects Takes a \concept{concept_rawallocator,RawAllocator} and deeply wraps it with a \concept{concept_tracker,tracker}.
+        /// \effects Takes a RawAllocator and deeply wraps it with a tracker.
         /// \returns A \ref deeply_tracked_allocator with the corresponding parameters forwarded to the constructor.
         /// \relates deeply_tracked_allocator
         template <class RawAllocator, class Tracker, typename... Args>

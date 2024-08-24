@@ -27,7 +27,7 @@ namespace wpi
         /// Its constructor will take a reference to it and use it for its allocation.
         /// The storage type is simply a \c char array aligned for maximum alignment.
         /// \note It is not allowed to access the memory of the storage.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         template <std::size_t Size>
         struct static_allocator_storage
         {
@@ -39,11 +39,11 @@ namespace wpi
 
         struct allocator_info;
 
-        /// A stateful \concept{concept_rawallocator,RawAllocator} that uses a fixed sized storage for the allocations.
+        /// A stateful RawAllocator that uses a fixed sized storage for the allocations.
         /// It works on a \ref static_allocator_storage and uses its memory for all allocations.
         /// Deallocations are not supported, memory cannot be marked as freed.<br>
         /// \note It is not allowed to share an \ref static_allocator_storage between multiple \ref static_allocator objects.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         class static_allocator
         {
         public:
@@ -60,13 +60,13 @@ namespace wpi
             {
             }
 
-            /// \effects A \concept{concept_rawallocator,RawAllocator} allocation function.
+            /// \effects A RawAllocator allocation function.
             /// It uses the specified \ref static_allocator_storage.
-            /// \returns A pointer to a \concept{concept_node,node}, it will never be \c nullptr.
+            /// \returns A pointer to a node, it will never be \c nullptr.
             /// \throws An exception of type \ref out_of_memory or whatever is thrown by its handler if the storage is exhausted.
             void* allocate_node(std::size_t size, std::size_t alignment);
 
-            /// \effects A \concept{concept_rawallocator,RawAllocator} deallocation function.
+            /// \effects A RawAllocator deallocation function.
             /// It does nothing, deallocation is not supported by this allocator.
             void deallocate_node(void*, std::size_t, std::size_t) noexcept {}
 
@@ -96,11 +96,11 @@ namespace wpi
 
         struct memory_block;
 
-        /// A \concept{concept_blockallocator,BlockAllocator} that allocates the blocks from a fixed size storage.
+        /// A BlockAllocator that allocates the blocks from a fixed size storage.
         /// It works on a \ref static_allocator_storage and uses it for all allocations,
         /// deallocations are only allowed in reversed order which is guaranteed by \ref memory_arena.
         /// \note It is not allowed to share an \ref static_allocator_storage between multiple \ref static_allocator objects.
-        /// \ingroup allocator
+        /// \ingroup memory_allocator
         class static_block_allocator
         {
         public:

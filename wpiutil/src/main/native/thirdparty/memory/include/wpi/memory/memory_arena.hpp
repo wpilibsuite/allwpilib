@@ -5,7 +5,7 @@
 #define WPI_MEMORY_MEMORY_ARENA_HPP_INCLUDED
 
 /// \file
-/// Class \ref wpi::memory::memory_arena and related functionality regarding \concept{concept_blockallocator,BlockAllocators}.
+/// Class \ref wpi::memory::memory_arena and related functionality regarding BlockAllocators.
 
 #include <type_traits>
 
@@ -23,7 +23,7 @@ namespace wpi
     {
         /// A memory block.
         /// It is defined by its starting address and size.
-        /// \ingroup core
+        /// \ingroup memory_core
         struct memory_block
         {
             void*       memory; ///< The address of the memory block (might be \c nullptr).
@@ -66,8 +66,8 @@ namespace wpi
             std::false_type is_block_allocator_impl(short);
         } // namespace detail
 
-        /// Traits that check whether a type models concept \concept{concept_blockallocator,BlockAllocator}.
-        /// \ingroup core
+        /// Traits that check whether a type models concept BlockAllocator.
+        /// \ingroup memory_core
         template <typename T>
         struct is_block_allocator : decltype(detail::is_block_allocator_impl<T>(0))
         {
@@ -85,7 +85,7 @@ namespace wpi
         /// This can be useful, e.g. if there will never be blocks available for deallocation.
         /// The (tiny) overhead for the cache can then be disabled.
         /// An example is \ref memory_pool.
-        /// \ingroup core
+        /// \ingroup memory_core
         constexpr bool cached_arena   = true;
         constexpr bool uncached_arena = false;
         /// @}
@@ -264,14 +264,14 @@ namespace wpi
         /// A memory arena that manages huge memory blocks for a higher-level allocator.
         /// Some allocators like \ref memory_stack work on huge memory blocks,
         /// this class manages them fro those allocators.
-        /// It uses a \concept{concept_blockallocator,BlockAllocator} for the allocation of those blocks.
+        /// It uses a BlockAllocator for the allocation of those blocks.
         /// The memory blocks in use are put onto a stack like structure, deallocation will pop from the top,
         /// so it is only possible to deallocate the last allocated block of the arena.
         /// By default, blocks are not really deallocated but stored in a cache.
         /// This can be disabled with the second template parameter,
         /// passing it \ref uncached_arena (or \c false) disables it,
         /// \ref cached_arena (or \c true) enables it explicitly.
-        /// \ingroup core
+        /// \ingroup memory_core
         template <class BlockAllocator, bool Cached /* = true */>
         class memory_arena : WPI_EBO(BlockAllocator),
                              WPI_EBO(detail::memory_arena_cache<Cached>)
@@ -292,9 +292,9 @@ namespace wpi
                 return detail::memory_block_stack::implementation_offset() + byte_size;
             }
 
-            /// \effects Creates it by giving it the size and other arguments for the \concept{concept_blockallocator,BlockAllocator}.
+            /// \effects Creates it by giving it the size and other arguments for the BlockAllocator.
             /// It forwards these arguments to its constructor.
-            /// \requires \c block_size must be greater than \c min_block_size(0) and other requirements depending on the \concept{concept_blockallocator,BlockAllocator}.
+            /// \requires \c block_size must be greater than \c min_block_size(0) and other requirements depending on the BlockAllocator.
             /// \throws Anything thrown by the constructor of the \c BlockAllocator.
             template <typename... Args>
             explicit memory_arena(std::size_t block_size, Args&&... args)
@@ -303,7 +303,7 @@ namespace wpi
                 WPI_MEMORY_ASSERT(block_size > min_block_size(0));
             }
 
-            /// \effects Deallocates all memory blocks that where requested back to the \concept{concept_blockallocator,BlockAllocator}.
+            /// \effects Deallocates all memory blocks that where requested back to the BlockAllocator.
             ~memory_arena() noexcept
             {
                 // clear cache
@@ -346,7 +346,7 @@ namespace wpi
             /// It first uses a cache of previously deallocated blocks, if caching is enabled,
             /// if it is empty, allocates a new one.
             /// \returns The new \ref memory_block.
-            /// \throws Anything thrown by the \concept{concept_blockallocator,BlockAllocator} allocation function.
+            /// \throws Anything thrown by the BlockAllocator allocation function.
             memory_block allocate_block()
             {
                 if (!this->take_from_cache(used_))
@@ -411,7 +411,7 @@ namespace wpi
             /// \returns The size of the next memory block,
             /// i.e. of the next call to \ref allocate_block().
             /// If there are blocks in the cache, returns size of the next one.
-            /// Otherwise forwards to the \concept{concept_blockallocator,BlockAllocator} and subtracts an implementation offset.
+            /// Otherwise forwards to the BlockAllocator and subtracts an implementation offset.
             std::size_t next_block_size() const noexcept
             {
                 return this->cache_empty() ?
@@ -420,7 +420,7 @@ namespace wpi
                            this->cached_block_size();
             }
 
-            /// \returns A reference of the \concept{concept_blockallocator,BlockAllocator} object.
+            /// \returns A reference of the BlockAllocator object.
             /// \requires It is undefined behavior to move this allocator out into another object.
             allocator_type& get_allocator() noexcept
             {
@@ -438,12 +438,12 @@ namespace wpi
         extern template class memory_arena<virtual_block_allocator, false>;
 #endif
 
-        /// A \concept{concept_blockallocator,BlockAllocator} that uses a given \concept{concept_rawallocator,RawAllocator} for allocating the blocks.
+        /// A BlockAllocator that uses a given RawAllocator for allocating the blocks.
         /// It calls the \c allocate_array() function with a node of size \c 1 and maximum alignment on the used allocator for the block allocation.
         /// The size of the next memory block will grow by a given factor after each allocation,
         /// allowing an amortized constant allocation time in the higher level allocator.
         /// The factor can be given as rational in the template parameter, default is \c 2.
-        /// \ingroup adapter
+        /// \ingroup memory_adapter
         template <class RawAllocator = default_allocator, unsigned Num = 2, unsigned Den = 1>
         class growing_block_allocator
         : WPI_EBO(allocator_traits<RawAllocator>::allocator_type)
@@ -466,7 +466,7 @@ namespace wpi
 
             /// \effects Allocates a new memory block and increases the block size for the next allocation.
             /// \returns The new \ref memory_block.
-            /// \throws Anything thrown by the \c allocate_array() function of the \concept{concept_rawallocator,RawAllocator}.
+            /// \throws Anything thrown by the \c allocate_array() function of the RawAllocator.
             memory_block allocate_block()
             {
                 auto memory =
@@ -491,7 +491,7 @@ namespace wpi
                 return block_size_;
             }
 
-            /// \returns A reference to the used \concept{concept_rawallocator,RawAllocator} object.
+            /// \returns A reference to the used RawAllocator object.
             allocator_type& get_allocator() noexcept
             {
                 return *this;
@@ -519,10 +519,10 @@ namespace wpi
         extern template class memory_arena<growing_block_allocator<>, false>;
 #endif
 
-        /// A \concept{concept_blockallocator,BlockAllocator} that allows only one block allocation.
+        /// A BlockAllocator that allows only one block allocation.
         /// It can be used to prevent higher-level allocators from expanding.
-        /// The one block allocation is performed through the \c allocate_array() function of the given \concept{concept_rawallocator,RawAllocator}.
-        /// \ingroup adapter
+        /// The one block allocation is performed through the \c allocate_array() function of the given RawAllocator.
+        /// \ingroup memory_adapter
         template <class RawAllocator = default_allocator>
         class fixed_block_allocator : WPI_EBO(allocator_traits<RawAllocator>::allocator_type)
         {
@@ -541,7 +541,7 @@ namespace wpi
 
             /// \effects Allocates a new memory block or throws an exception if there was already one allocation.
             /// \returns The new \ref memory_block.
-            /// \throws Anything thrown by the \c allocate_array() function of the \concept{concept_rawallocator,RawAllocator} or \ref out_of_memory if this is not the first call.
+            /// \throws Anything thrown by the \c allocate_array() function of the RawAllocator or \ref out_of_memory if this is not the first call.
             memory_block allocate_block()
             {
                 if (block_size_)
@@ -572,7 +572,7 @@ namespace wpi
                 return block_size_;
             }
 
-            /// \returns A reference to the used \concept{concept_rawallocator,RawAllocator} object.
+            /// \returns A reference to the used RawAllocator object.
             allocator_type& get_allocator() noexcept
             {
                 return *this;
@@ -613,10 +613,10 @@ namespace wpi
             }
         } // namespace detail
 
-        /// Takes either a \concept{concept_blockallocator,BlockAllocator} or a \concept{concept_rawallocator,RawAllocator}.
-        /// In the first case simply aliases the type unchanged, in the second to \ref growing_block_allocator (or the template in `BlockAllocator`) with the \concept{concept_rawallocator,RawAllocator}.
-        /// Using this allows passing normal \concept{concept_rawallocator,RawAllocators} as \concept{concept_blockallocator,BlockAllocators}.
-        /// \ingroup core
+        /// Takes either a BlockAllocator or a RawAllocator.
+        /// In the first case simply aliases the type unchanged, in the second to \ref growing_block_allocator (or the template in `BlockAllocator`) with the RawAllocator.
+        /// Using this allows passing normal RawAllocators as BlockAllocators.
+        /// \ingroup memory_core
         template <class BlockOrRawAllocator,
                   template <typename...> class BlockAllocator = detail::default_block_wrapper>
         using make_block_allocator_t = WPI_IMPL_DEFINED(
@@ -625,10 +625,10 @@ namespace wpi
                                       BlockAllocator<BlockOrRawAllocator>>::type);
 
         /// @{
-        /// Helper function make a \concept{concept_blockallocator,BlockAllocator}.
-        /// \returns A \concept{concept_blockallocator,BlockAllocator} of the given type created with the given arguments.
+        /// Helper function make a BlockAllocator.
+        /// \returns A BlockAllocator of the given type created with the given arguments.
         /// \requires Same requirements as the constructor.
-        /// \ingroup core
+        /// \ingroup memory_core
         template <class BlockOrRawAllocator, typename... Args>
         make_block_allocator_t<BlockOrRawAllocator> make_block_allocator(std::size_t block_size,
                                                                          Args&&... args)
@@ -654,7 +654,7 @@ namespace wpi
         {
             /// Syntax sugar to express sizes with unit prefixes.
             /// \returns The number of bytes `value` is in the given unit.
-            /// \ingroup core
+            /// \ingroup memory_core
             /// @{
             constexpr std::size_t operator"" _KiB(unsigned long long value) noexcept
             {
