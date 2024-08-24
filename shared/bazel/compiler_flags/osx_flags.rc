@@ -1,44 +1,44 @@
 
 # Warning level
-build:osx --copt=-Wall
-build:osx --copt=-Wextra
-build:osx --copt=-Werror
+build:macos --copt=-Wall
+build:macos --copt=-Wextra
+build:macos --copt=-Werror
 
 
 # C++ only
-build:osx --cxxopt=-std=c++20
-build:osx --cxxopt=-pedantic
-build:osx --cxxopt=-fPIC
-build:osx --cxxopt=-Wno-unused-parameter
-build:osx --cxxopt=-Wno-error=deprecated-enum-enum-conversion
-build:osx --cxxopt=-Wno-missing-field-initializers
-build:osx --cxxopt=-Wno-unused-private-field
-build:osx --cxxopt=-Wno-unused-const-variable
-build:osx --cxxopt=-Wno-error=c11-extensions
-build:osx --cxxopt=-pthread
-build:osx --cxxopt=-Wno-deprecated-anon-enum-enum-conversion
+build:macos --cxxopt=-std=c++20
+build:macos --cxxopt=-pedantic
+build:macos --cxxopt=-fPIC
+build:macos --cxxopt=-Wno-unused-parameter
+build:macos --cxxopt=-Wno-error=deprecated-enum-enum-conversion
+build:macos --cxxopt=-Wno-missing-field-initializers
+build:macos --cxxopt=-Wno-unused-private-field
+build:macos --cxxopt=-Wno-unused-const-variable
+build:macos --cxxopt=-Wno-error=c11-extensions
+build:macos --cxxopt=-pthread
+build:macos --cxxopt=-Wno-deprecated-anon-enum-enum-conversion
 
 # C only
-build:osx --conlyopt=-pedantic
-build:osx --conlyopt=-fPIC
-build:osx --conlyopt=-Wno-unused-parameter
-build:osx --conlyopt=-Wno-missing-field-initializers
-build:osx --conlyopt=-Wno-unused-private-field
-build:osx --conlyopt=-Wno-fixed-enum-extension"
+build:macos --conlyopt=-pedantic
+build:macos --conlyopt=-fPIC
+build:macos --conlyopt=-Wno-unused-parameter
+build:macos --conlyopt=-Wno-missing-field-initializers
+build:macos --conlyopt=-Wno-unused-private-field
+build:macos --conlyopt=-Wno-fixed-enum-extension"
 
 
-build:osx --linkopt=-framework
-build:osx --linkopt=CoreFoundation
-build:osx --linkopt=-framework
-build:osx --linkopt=AVFoundation
-build:osx --linkopt=-framework
-build:osx --linkopt=Foundation
-build:osx --linkopt=-framework
-build:osx --linkopt=CoreMedia
-build:osx --linkopt=-framework
-build:osx --linkopt=CoreVideo
-build:osx --linkopt=-headerpad_max_install_names
-build:osx --linkopt=-Wl,-rpath,'@loader_path'"
+build:macos --linkopt=-framework
+build:macos --linkopt=CoreFoundation
+build:macos --linkopt=-framework
+build:macos --linkopt=AVFoundation
+build:macos --linkopt=-framework
+build:macos --linkopt=Foundation
+build:macos --linkopt=-framework
+build:macos --linkopt=CoreMedia
+build:macos --linkopt=-framework
+build:macos --linkopt=CoreVideo
+build:macos --linkopt=-headerpad_max_install_names
+build:macos --linkopt=-Wl,-rpath,'@loader_path'"
 
 # Things not in nativetools
-build:osx --copt=-Wno-shorten-64-to-32
+build:macos --copt=-Wno-shorten-64-to-32

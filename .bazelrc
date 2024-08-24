@@ -1,5 +1,7 @@
 try-import %workspace%/user.bazelrc
 
+common --noenable_bzlmod
+
 build --java_language_version=17
 build --java_runtime_version=roboriojdk_17
 build --tool_java_language_version=17
