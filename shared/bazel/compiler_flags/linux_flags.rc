@@ -1,31 +1,14 @@
 
+
+###############################
+# Linux
+###############################
+build:linux --config=base_linux
+
 # Warning level
 build:linux --copt=-Wall
 build:linux --copt=-Wextra
 build:linux --copt=-Werror
 
-# C++ args
-build:linux --cxxopt=-std=c++20
-build:linux --cxxopt=-Wformat=2
-build:linux --cxxopt=-pedantic
-build:linux --cxxopt=-Wno-psabi
-build:linux --cxxopt=-Wno-unused-parameter
-# build:linux --cxxopt=-Wno-error=deprecated-declarations
-build:linux --cxxopt=-Wno-error=deprecated-enum-enum-conversion
-build:linux --cxxopt=-fPIC
-build:linux --cxxopt=-pthread
-
-# C only
-build:linux --conlyopt=-Wformat=2
-build:linux --conlyopt=-pedantic
-build:linux --conlyopt=-Wno-psabi
-build:linux --conlyopt=-Wno-unused-parameter
-build:linux --conlyopt=-fPIC
-build:linux --conlyopt=-pthread
-
-# Linker
-build:linux --linkopt=-rdynamic
-build:linux --linkopt=-pthread
-build:linux --linkopt=-ldl
-build:linux --linkopt=-latomic
-build:linux --linkopt=-Wl,-rpath,'$ORIGIN'
+# Not in nativetools
+build:linux --copt=-Wno-deprecated-enum-enum-conversion
