@@ -12,9 +12,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "--noenable_bzlmod --config=windows",     }
-          - { name: "Windows (arm)",                os: windows-2022, action: "build", config: "--noenable_bzlmod --config=windows_arm", }
-          - { name: "Windows (roborio)",            os: windows-2022, action: "build", config: "--noenable_bzlmod --config=roborio",     }
+          - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "--config=windows",     }
+          - { name: "Windows (arm)",                os: windows-2022, action: "build", config: "--config=windows_arm", }
+          - { name: "Windows (roborio)",            os: windows-2022, action: "build", config: "--config=roborio",     }
 
     name: "Build ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -36,8 +36,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Mac (native)",            os: macos-14,   action: "test",  config: "--noenable_bzlmod --config=osx -c opt",      }
-          - { name: "Mac (roborio)",           os: macos-14,   action: "build", config: "--noenable_bzlmod --config=roborio -c opt",  }
+          - { name: "Mac (native)",            os: macos-14,   action: "test",  config: "--config=macos -c opt",      }
+          - { name: "Mac (roborio)",           os: macos-14,   action: "build", config: "--config=roborio -c opt",  }
 
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -54,8 +54,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux (native)",  os: ubuntu-22.04,   action: "test",  config: "--noenable_bzlmod --config=linux -c opt",    }
-          - { name: "Linux (roborio)", os: ubuntu-22.04,   action: "build", config: "--noenable_bzlmod --config=roborio -c opt",  }
+          - { name: "Linux (native)",  os: ubuntu-22.04,   action: "test",  config: "--config=linux -c opt",    }
+          - { name: "Linux (roborio)", os: ubuntu-22.04,   action: "build", config: "--config=roborio -c opt",  }
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     steps:
@@ -81,7 +81,7 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: bazelbuild/setup-bazelisk@v3
       - name: Build and Test
-        run: bazel test  -k --config=ci --noenable_bzlmod --config=linux --config=${{ matrix.config }} //...
+        run: bazel test  -k --config=ci --config=linux --config=${{ matrix.config }} //...
 
   buildifier:
     name: "buildifier"
