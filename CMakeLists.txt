@@ -17,6 +17,12 @@ if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
     message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
 endif()
 
+# Set default build type to release with debug info (i.e. release mode optimizations
+# are performed, but debug info still exists).
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
+endif()
+
 cmake_minimum_required(VERSION 3.21)
 project(allwpilib)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
@@ -86,12 +92,6 @@ set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar
 
 # Options for compilation flags.
 option(NO_WERROR "Disable -Werror flag during compilation" OFF)
-
-# Set default build type to release with debug info (i.e. release mode optimizations
-# are performed, but debug info still exists).
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
-endif()
 
 if(NOT WITH_JAVA OR NOT WITH_CSCORE)
     if(NOT "${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
