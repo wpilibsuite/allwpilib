@@ -39,7 +39,6 @@ def copy_upstream_src(wpilib_root):
     src_files = walk_cwd_and_copy_if(
         lambda dp, f: (f.endswith(".c") or f.endswith(".cpp"))
         and not dp.startswith("./example")
-        and not dp.startswith("./test")
         and not f.endswith("getopt.c")
         and not "py" in f
         and not remove_tag(f),
@@ -70,7 +69,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "apriltag"
     url = "https://github.com/AprilRobotics/apriltag.git"
-    tag = "3806edf38ac4400153677e510c9f9dcb81f472c8"
+    tag = "ebdb2017e04b8e36f7d8a12ce60060416a905e12"
 
     patch_options = {
         "ignore_whitespace": True,

@@ -38,7 +38,7 @@ either expressed or implied, of the Regents of The University of Michigan.
 struct string_buffer
 {
     char *s;
-    size_t alloc;
+    int alloc;
     size_t size; // as if strlen() was called; not counting terminating \0
 };
 
@@ -130,7 +130,7 @@ int str_diff_idx(const char * a, const char * b)
     assert(a != NULL);
     assert(b != NULL);
 
-    size_t i = 0;
+    int i = 0;
 
     size_t lena = strlen(a);
     size_t lenb = strlen(b);
@@ -293,7 +293,7 @@ char *str_tolowercase(char *s)
 	assert(s != NULL);
 
     size_t slen = strlen(s);
-    for (size_t i = 0; i < slen; i++) {
+    for (int i = 0; i < slen; i++) {
         if (s[i] >= 'A' && s[i] <= 'Z')
             s[i] = s[i] + 'a' - 'A';
     }
@@ -306,7 +306,7 @@ char *str_touppercase(char *s)
     assert(s != NULL);
 
     size_t slen = strlen(s);
-    for (size_t i = 0; i < slen; i++) {
+    for (int i = 0; i < slen; i++) {
         if (s[i] >= 'a' && s[i] <= 'z')
             s[i] = s[i] - ('a' - 'A');
     }
@@ -499,13 +499,14 @@ char string_feeder_next(string_feeder_t *sf)
 char *string_feeder_next_length(string_feeder_t *sf, size_t length)
 {
     assert(sf != NULL);
+    assert(length >= 0);
     assert(sf->pos <= sf->len);
 
     if (sf->pos + length > sf->len)
         length = sf->len - sf->pos;
 
     char *substr = calloc(length+1, sizeof(char));
-    for (size_t i = 0 ; i < length ; i++)
+    for (int i = 0 ; i < length ; i++)
         substr[i] = string_feeder_next(sf);
     return substr;
 }
@@ -521,6 +522,7 @@ char string_feeder_peek(string_feeder_t *sf)
 char *string_feeder_peek_length(string_feeder_t *sf, size_t length)
 {
     assert(sf != NULL);
+    assert(length >= 0);
     assert(sf->pos <= sf->len);
 
     if (sf->pos + length > sf->len)
@@ -548,11 +550,10 @@ void string_feeder_require(string_feeder_t *sf, const char *str)
 
     size_t len = strlen(str);
 
-    for (size_t i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
         char c = string_feeder_next(sf);
         (void) c;
         assert(c == str[i]);
-        (void)c;
     }
 }
 
@@ -620,12 +621,15 @@ bool str_matches_any(const char *haystack, const char **needles, int num_needles
     return false;
 }
 
-char *str_substring(const char *str, size_t startidx, size_t endidx)
+char *str_substring(const char *str, size_t startidx, long endidx)
 {
     assert(str != NULL);
-    assert(startidx <= strlen(str)+1);
-    assert(endidx >= startidx);
-    assert(endidx <= strlen(str)+1);
+    assert(startidx >= 0 && startidx <= strlen(str)+1);
+    assert(endidx < 0 || endidx >= startidx);
+    assert(endidx < 0 || endidx <= strlen(str)+1);
+
+    if (endidx < 0)
+        endidx = (long) strlen(str);
 
     size_t blen = endidx - startidx; // not counting \0
     char *b = malloc(blen + 1);
