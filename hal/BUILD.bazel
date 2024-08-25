@@ -16,24 +16,24 @@ filegroup(
 )
 
 ATHENA_SRCS = glob([
-    "athena/*.cpp",
-    "athena/*.h",
-    "athena/cpp/*.cpp",
-    "athena/ctre/*.cpp",
-    "athena/ctre/*.h",
-    "athena/rev/*.cpp",
-    "athena/rev/*.h",
-    "athena/frccansae/*.h",
-    "athena/mockdata/*.cpp",
+    "src/main/native/athena/*.cpp",
+    "src/main/native/athena/*.h",
+    "src/main/native/athena/cpp/*.cpp",
+    "src/main/native/athena/ctre/*.cpp",
+    "src/main/native/athena/ctre/*.h",
+    "src/main/native/athena/rev/*.cpp",
+    "src/main/native/athena/rev/*.h",
+    "src/main/native/athena/frccansae/*.h",
+    "src/main/native/athena/mockdata/*.cpp",
 ])
 
 ATHENA_DEPS = ["@bzlmodrio-ni//libraries/cpp/ni:shared"]
 
 SIM_SRCS = glob([
-    "sim/*.cpp",
-    "sim/mockdata/*.cpp",
-    "sim/*.h",
-    "sim/mockdata/*.h",
+    "src/main/native/sim/*.cpp",
+    "src/main/native/sim/mockdata/*.cpp",
+    "src/main/native/sim/*.h",
+    "src/main/native/sim/mockdata/*.h",
 ])
 
 SIM_DEPS = []
@@ -62,17 +62,17 @@ cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        "//hal:generated_cc_headers",
-        "//wpiutil/src/main/native:wpiutil.static",
+        ":generated_cc_headers",
+        "//wpiutil:wpiutil.static",
     ] + HAL_DEPS,
 )
 
 java_library(
-    name = "hal",
+    name = "hal-java",
     srcs = ["//hal:generated_java"] + glob(["src/main/java/**/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+        "//wpiutil:wpiutil-java",
     ],
 )
 
@@ -80,17 +80,17 @@ cc_test(
     name = "hal-cpp-test",
     size = "small",
     srcs = glob([
-        "**/*.cpp",
-        "**/*.h",
+        "src/test/native/**/*.cpp",
+        "src/test/native/**/*.h",
     ]),
     deps = [
-        "//hal/src/main/native:wpiHal.static",
+        ":wpiHal.static",
         "//thirdparty/googletest",
     ],
 )
 
 cc_binary(
-    name = "DevMain-Cpp",
+    name = "DevMain",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
         ":wpiHal.static",
@@ -98,8 +98,9 @@ cc_binary(
 )
 
 java_binary(
-    name = "DevMain-Java",
+    name = "DevMain-java",
     srcs = ["src/dev/java/edu/wpi/first/hal/DevMain.java"],
+    main_class = "edu.wpi.first.hal.DevMain",
     deps = [
     ],
 )
