@@ -354,7 +354,7 @@ class SchedulingRecursionTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new SubsystemBase() {};
-      InstantCommand other = requirement.runOnce(() -> {});
+      Command other = requirement.runOnce(() -> {});
       FunctionalCommand selfCancels =
           new FunctionalCommand(
               () -> {},
@@ -380,8 +380,8 @@ class SchedulingRecursionTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new Subsystem() {};
-      InstantCommand other = requirement.runOnce(() -> {});
-      InstantCommand selfCancels = requirement.runOnce(() -> {});
+      Command other = requirement.runOnce(() -> {});
+      Command selfCancels = requirement.runOnce(() -> {});
       scheduler.onCommandInterrupt(
           cmd -> {
             counter.incrementAndGet();
