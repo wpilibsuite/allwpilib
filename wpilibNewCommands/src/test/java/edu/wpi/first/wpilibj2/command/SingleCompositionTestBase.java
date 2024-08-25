@@ -20,7 +20,7 @@ public abstract class SingleCompositionTestBase<T extends Command> extends Comma
   void interruptible(Command.InterruptionBehavior interruptionBehavior) {
     var command =
         composeSingle(
-            new WaitUntilCommand(() -> false).withInterruptBehavior(interruptionBehavior));
+            Commands.idle().withInterruptBehavior(interruptionBehavior));
     assertEquals(interruptionBehavior, command.getInterruptionBehavior());
   }
 
@@ -28,27 +28,27 @@ public abstract class SingleCompositionTestBase<T extends Command> extends Comma
   @ParameterizedTest
   void runWhenDisabled(boolean runsWhenDisabled) {
     var command =
-        composeSingle(new WaitUntilCommand(() -> false).ignoringDisable(runsWhenDisabled));
+        composeSingle(Commands.idle().ignoringDisable(runsWhenDisabled));
     assertEquals(runsWhenDisabled, command.runsWhenDisabled());
   }
 
   @Test
   void commandInOtherCompositionTest() {
-    var command = new InstantCommand();
+    var command = Commands.none();
     new WrapperCommand(command) {};
     assertThrows(IllegalArgumentException.class, () -> composeSingle(command));
   }
 
   @Test
   void commandInMultipleCompositionsTest() {
-    var command = new InstantCommand();
+    var command = Commands.none();
     composeSingle(command);
     assertThrows(IllegalArgumentException.class, () -> composeSingle(command));
   }
 
   @Test
   void composeThenScheduleTest() {
-    var command = new InstantCommand();
+    var command = Commands.none();
     composeSingle(command);
     assertThrows(
         IllegalArgumentException.class, () -> CommandScheduler.getInstance().schedule(command));
@@ -56,7 +56,7 @@ public abstract class SingleCompositionTestBase<T extends Command> extends Comma
 
   @Test
   void scheduleThenComposeTest() {
-    var command = new RunCommand(() -> {});
+    var command = Commands.idle();
     CommandScheduler.getInstance().schedule(command);
     assertThrows(IllegalArgumentException.class, () -> composeSingle(command));
   }
