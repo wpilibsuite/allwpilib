@@ -141,7 +141,7 @@ java_library(
 )
 
 cc_test(
-    name = "wpinet-test",
+    name = "wpinet-cpp-test",
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
@@ -164,7 +164,7 @@ cc_binary(
 )
 
 java_binary(
-    name = "DevMain-Java",
+    name = "DevMain-java",
     srcs = ["src/dev/java/edu/wpi/first/net/DevMain.java"],
     main_class = "edu.wpi.first.net.DevMain",
     deps = [

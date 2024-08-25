@@ -11,4 +11,4 @@ build:linux --copt=-Wextra
 build:linux --copt=-Werror
 
 # Not in nativetools
-build:linux --copt=-Wno-deprecated-enum-enum-conversion
+build:linux --cxxopt=-Wno-deprecated-enum-enum-conversion

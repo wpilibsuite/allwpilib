@@ -64,7 +64,7 @@ java_library(
 )
 
 cc_test(
-    name = "ntcore-test",
+    name = "ntcore-cpp-test",
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
@@ -83,7 +83,7 @@ cc_test(
 )
 
 cc_binary(
-    name = "DevMain-cpp",
+    name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
         ":ntcore.static",
@@ -91,7 +91,7 @@ cc_binary(
 )
 
 java_binary(
-    name = "DevMain-java",
+    name = "DevMain-Java",
     srcs = ["src/dev/java/edu/wpi/first/ntcore/DevMain.java"],
     main_class = "edu.wpi.first.ntcore.DevMain",
     deps = [
