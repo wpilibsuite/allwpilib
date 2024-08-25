@@ -32,8 +32,7 @@ class ScheduleCommandTest extends CommandTestBase {
     try (CommandScheduler scheduler = CommandScheduler.getInstance()) {
       Command toSchedule = Commands.none();
       ScheduleCommand scheduleCommand = new ScheduleCommand(toSchedule);
-      Command group =
-        Commands.sequence(Commands.none(), scheduleCommand);
+      Command group = Commands.sequence(Commands.none(), scheduleCommand);
 
       scheduler.schedule(group);
       scheduler.schedule(Commands.idle());
