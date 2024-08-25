@@ -1,9 +1,0 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
-
-cc_binary(
-    name = "DevMain",
-    srcs = ["main.cpp"],
-    deps = [
-        "//ntcore/src/main/native:ntcore.static",
-    ],
-)
