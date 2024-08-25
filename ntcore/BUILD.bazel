@@ -1,4 +1,5 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 
 cc_library(
     name = "generated_cc_headers",
@@ -21,4 +22,79 @@ filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//ntcore:__subpackages__"],
+)
+
+cc_library(
+    name = "private_includes",
+    hdrs = glob([
+        "src/main/native/cpp/*.h",
+        "src/main/native/cpp/net/*.h",
+        "src/main/native/cpp/net/*.inc",
+        "src/main/native/cpp/net3/*.h",
+    ]),
+    strip_include_prefix = "cpp",
+)
+
+cc_library(
+    name = "ntcore.static",
+    srcs = glob(
+        ["src/main/native/cpp/**"],
+        exclude = ["src/main/native/cpp/jni/**"],
+    ) + ["//ntcore:generated_cc_source"],
+    hdrs = glob(["src/main/native/include/**/*"]),
+    includes = ["src/main/native/include"],
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":private_includes",
+        "//ntcore:generated_cc_headers",
+        "//wpinet/src/main/native:wpinet.static",
+        "//wpiutil/src/main/native:wpiutil.static",
+    ],
+)
+
+java_library(
+    name = "networktables",
+    srcs = glob(["src/main/java/**/*.java"]) + ["//ntcore:generated_java"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+cc_test(
+    name = "ntcore-test",
+    size = "small",
+    srcs = glob([
+        "**/*.cpp",
+        "**/*.h",
+    ]),
+    tags = [
+        "exclusive",
+        "no-asan",
+        "no-tsan",
+    ],
+    deps = [
+        "//ntcore/src/main/native:ntcore.static",
+        "//thirdparty/googletest",
+        "//wpiutil/src/test/native:wpiutil-testlib",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+        ":ntcore.static",
+    ],
+)
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["src/dev/java/edu/wpi/first/ntcore/DevMain.java"],
+    deps = [
+        "//ntcore/src/main/java/edu/wpi/first/networktables",
+        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+    ],
 )
