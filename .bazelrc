@@ -36,8 +36,3 @@ build:remote_user --remote_download_toplevel
 # This config should be used on CI. It downloads at little as possible to complete the build
 build:ci --config=remote
 build:ci --remote_download_minimal
-
-build --proto_toolchain_for_cc=//:proto_cc_toolchain
-
-build:linux --per_file_copt=external/com_google_protobuf/...@-Wno-missing-field-initializers,-Wno-deprecated-enum-enum-conversion
-build:macos --per_file_copt=external/com_google_protobuf/...@-Wno-deprecated-non-prototype
