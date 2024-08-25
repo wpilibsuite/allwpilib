@@ -34,14 +34,14 @@ java_library(
 )
 
 cc_binary(
-    name = "DevMain-cpp",
+    name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
     ],
 )
 
 java_binary(
-    name = "DevMain-java",
+    name = "DevMain-Java",
     srcs = ["src/dev/java/edu/wpi/first/wpilibj/DevMain.java"],
     main_class = "edu.wpi.first.wpilibj.DevMain",
     deps = [
@@ -76,11 +76,4 @@ filegroup(
         ":pwm_schema",
     ],
     visibility = ["//visibility:public"],
-)
-
-java_library(
-    name = "resources",
-    testonly = True,
-    resources = glob(["src/test/resources/**"]),
-    visibility = ["//wpilibj/src/test:__subpackages__"],
 )

@@ -74,7 +74,6 @@ jobs:
           - config: "asan"
           - config: "ubsan"
     runs-on: ubuntu-22.04
-    container: wpilib/ubuntu-base:22.04
     name: "Sanitizer ${{ matrix.config }}"
     steps:
       - uses: actions/checkout@v4
@@ -91,7 +90,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: 1.15.x
-        id: go
 
       - name: Install Buildifier
         run: |

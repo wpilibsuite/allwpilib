@@ -17,14 +17,14 @@ java_library(
 )
 
 cc_binary(
-    name = "DevMain-cpp",
+    name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
     ],
 )
 
 java_binary(
-    name = "DevMain-java",
+    name = "DevMain-Java",
     srcs = ["src/dev/java/edu/wpi/first/cameraserver/DevMain.java"],
     main_class = "edu.wpi.first.cameraserver.DevMain",
     deps = [
@@ -32,7 +32,7 @@ java_binary(
 )
 
 java_binary(
-    name = "multiCameraServer",
+    name = "multiCameraServer-java",
     srcs = ["multiCameraServer/src/main/java/edu/wpi/Main.java"],
     main_class = "edu.wpi.Main",
     deps = [

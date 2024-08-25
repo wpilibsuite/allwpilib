@@ -11,7 +11,7 @@ java_library(
 )
 
 java_binary(
-    name = "DevMain",
+    name = "DevMain-Java",
     srcs = ["src/dev/java/edu/wpi/first/cscore/DevMain.java"],
     main_class = "edu.wpi.first.cscore.DevMain",
     deps = [
