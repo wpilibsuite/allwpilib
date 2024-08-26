@@ -31,6 +31,7 @@ FileLogger::FileLogger(std::string_view file,
         char buf[4000];
         struct inotify_event ev;
         int len = 0;
+        lseek(m_fileHandle, 0, SEEK_END);
         while ((len = read(m_inotifyHandle, &ev, sizeof(ev))) > 0) {
           int bufLen = 0;
           if ((bufLen = read(m_fileHandle, buf, sizeof(buf)) > 0)) {
