@@ -40,7 +40,7 @@ TSP Ping
 TSP Pong
 
 |====
-| Offset | Format | Data
+| Offset | Format | Data | Notes
 | 0 | uint8 | Protocol version | This field shall always set to 1 (0b1) for TSP Version 1.
 | 1 | uint8 | Message ID | This field shall always be set to 2 (0b2).
 | 2 | uint64 | Client Local Time | The client's local time value from the Ping message that this Pong is generated in response to.
