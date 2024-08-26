@@ -31,6 +31,8 @@ Communication between server and clients shall occur over the User Datagram Prot
 TODO: Should I have an arbitrary magic value? do i need checksums? should we include a sequence number or other way to check if a message was replied to besides checking if we got the timestamp we expected back?
 also need to spefify endienness 
 
+**TSP Ping** and **TSP Pong** messages shall be endoded in a manor compatible with a WPILib packed struct (todo: just use struct syntax instead of a table.) with respect to byte alignment and endienness.
+
 TSP Ping
 
 |====
