@@ -18,8 +18,6 @@ When the server recieves a **TSP Ping Message** from any client, it shall respon
 
 When the client receives a **TSP Pong Message** from the server, it shall compute the round trip time (RTT) from the delta between the message's data value and the current local time.  If the RTT is less than that from previous measurements, the client shall use the timestamp in the message plus ½ the RTT as the server time equivalent to the current local time, and use this equivalence to compute server time base timestamps from local time for future messages.
 
-todo (matt): do we want to keep the "minimum delay" verbiage? that seems potentially dangerous with clock drift. 
-
 [[transport]]
 === Transport
 
