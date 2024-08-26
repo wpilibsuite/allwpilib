@@ -8,7 +8,7 @@ Protocol Revision 1.0, 08/25/2024
 [[roles]]
 === Roles
 
-Roles assumed by Time Syncronization Protocol (TSP) participants consists of exactly one server and zero or more clients per network. The server role is responsible for listening for incoming time synchronization requests from clients and replying approriately. The client role is responsible for sending "Ping" messages to the server and listening for "Pong" replies to estimate the offset between the server and client time bases. 
+Time Syncronization Protocol (TSP) participants can assume either a server role or a client role. Each network consists of exactly one server and zero or more clients. The server role is responsible for listening for incoming time synchronization requests from clients and replying approriately. The client role is responsible for sending "Ping" messages to the server and listening for "Pong" replies to estimate the offset between the server and client time bases.
 
 All time values shall use units of microseconds. The epoch of the time base this is measured against is unspecified.
 
