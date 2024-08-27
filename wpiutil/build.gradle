@@ -249,7 +249,6 @@ model {
                 targetBuildTypes 'debug'
                 binaries.all {
                     lib library: 'wpiutil', linkage: 'shared'
-                    lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
                 }
                 sources {
                     cpp {
