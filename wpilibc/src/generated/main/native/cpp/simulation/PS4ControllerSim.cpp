@@ -103,3 +103,7 @@ void PS4ControllerSim::SetPSButton(bool value) {
 void PS4ControllerSim::SetTouchpadButton(bool value) {
   SetRawButton(PS4Controller::Button::kTouchpad, value);
 }
+
+void PS4ControllerSim::SetTouchpad(bool value) {
+  SetRawButton(PS4Controller::Button::kTouchpad, value);
+}
