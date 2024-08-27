@@ -15,26 +15,11 @@ filegroup(
     visibility = ["//hal:__subpackages__"],
 )
 
-ATHENA_SRCS = glob([
-    "src/main/native/athena/*.cpp",
-    "src/main/native/athena/*.h",
-    "src/main/native/athena/cpp/*.cpp",
-    "src/main/native/athena/ctre/*.cpp",
-    "src/main/native/athena/ctre/*.h",
-    "src/main/native/athena/rev/*.cpp",
-    "src/main/native/athena/rev/*.h",
-    "src/main/native/athena/frccansae/*.h",
-    "src/main/native/athena/mockdata/*.cpp",
-])
+ATHENA_SRCS = glob(["src/main/native/athena/**"])
 
 ATHENA_DEPS = ["@bzlmodrio-ni//libraries/cpp/ni:shared"]
 
-SIM_SRCS = glob([
-    "src/main/native/sim/*.cpp",
-    "src/main/native/sim/mockdata/*.cpp",
-    "src/main/native/sim/*.h",
-    "src/main/native/sim/mockdata/*.h",
-])
+SIM_SRCS = glob(["src/main/native/sim/**"])
 
 SIM_DEPS = []
 
