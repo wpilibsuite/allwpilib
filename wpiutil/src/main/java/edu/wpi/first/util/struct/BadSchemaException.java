@@ -73,7 +73,7 @@ public class BadSchemaException extends Exception {
   }
 
   @Override
-  public String toString() {
-    return m_field.isEmpty() ? getMessage() : "field " + m_field + ": " + getMessage();
+  public String getMessage() {
+    return m_field.isEmpty() ? super.getMessage() : "field " + m_field + ": " + super.getMessage();
   }
 }

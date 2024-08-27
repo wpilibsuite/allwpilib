@@ -53,7 +53,7 @@ public class ParseException extends Exception {
   }
 
   @Override
-  public String toString() {
-    return m_pos + ": " + getMessage();
+  public String getMessage() {
+    return m_pos + ": " + super.getMessage();
   }
 }

@@ -103,3 +103,7 @@ void PS5ControllerSim::SetPSButton(bool value) {
 void PS5ControllerSim::SetTouchpadButton(bool value) {
   SetRawButton(PS5Controller::Button::kTouchpad, value);
 }
+
+void PS5ControllerSim::SetTouchpad(bool value) {
+  SetRawButton(PS5Controller::Button::kTouchpad, value);
+}

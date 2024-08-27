@@ -87,3 +87,11 @@ void XboxControllerSim::SetLeftStickButton(bool value) {
 void XboxControllerSim::SetRightStickButton(bool value) {
   SetRawButton(XboxController::Button::kRightStick, value);
 }
+
+void XboxControllerSim::SetLeftBumper(bool value) {
+  SetRawButton(XboxController::Button::kLeftBumper, value);
+}
+
+void XboxControllerSim::SetRightBumper(bool value) {
+  SetRawButton(XboxController::Button::kRightBumper, value);
+}
