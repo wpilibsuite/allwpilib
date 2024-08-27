@@ -88,8 +88,8 @@ filegroup(
 
 generate_resources(
     name = "generate-resources",
-    namespace = "dlt",
-    prefix = "DLT",
+    namespace = "wpi",
+    prefix = "WPI",
     resource_files = glob(["src/main/native/resources/*"]),
 )
 
