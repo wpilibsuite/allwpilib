@@ -46,13 +46,12 @@ model {
                             "$buildDir/generated-includes/"
                 }
             }
-            binaries.all {
-                tasks.withType(CppCompile) {
-                    dependsOn generateCatchUserConfig
-                }
-            }
         }
     }
+}
+
+tasks.withType(CppCompile) {
+    dependsOn generateCatchUserConfig
 }
 
 apply from: 'publish.gradle'
