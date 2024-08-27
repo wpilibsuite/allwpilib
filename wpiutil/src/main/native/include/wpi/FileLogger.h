@@ -40,6 +40,15 @@ class FileLogger {
   FileLogger(FileLogger&& other);
   FileLogger& operator=(FileLogger&& rhs);
   ~FileLogger();
+  /**
+   * Creates a function that chunks incoming data into lines before calling the
+   * callback with the individual line.
+   *
+   * @param callback The callback that logs lines.
+   * @return The function.
+   */
+  static std::function<void(std::string_view)> LineBuffer(
+      std::function<void(std::string_view)> callback);
 
  private:
 #ifdef __linux__

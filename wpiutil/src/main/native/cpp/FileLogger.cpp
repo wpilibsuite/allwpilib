@@ -15,8 +15,6 @@
 #include <tuple>
 #include <utility>
 
-#include <fmt/format.h>
-
 #include "wpi/StringExtras.h"
 
 namespace wpi {
@@ -44,22 +42,10 @@ FileLogger::FileLogger(std::string_view file,
 }
 FileLogger::FileLogger(std::string_view file, log::DataLog& log,
                        std::string_view key)
-    : FileLogger(file, [entry = log.Start(key, "string"),
-                        buf = wpi::SmallVector<char, 16>{},
-                        &log](std::string_view data) mutable {
-        if (!wpi::contains(data, "\n")) {
-          buf.append(data.begin(), data.end());
-          return;
-        }
-        std::string_view line;
-        std::string combinedData = fmt::format("{}{}", buf.data(), data);
-        buf.clear();
-        do {
-          std::tie(line, combinedData) = wpi::split(combinedData, "\n");
-          log.AppendString(entry, line, 0);
-        } while (wpi::contains(combinedData, "\n"));
-        buf.append(combinedData.begin(), combinedData.end());
-      }) {}
+    : FileLogger(file, LineBuffer([entry = log.Start(key, "string"),
+                                   &log](std::string_view line) {
+                   log.AppendString(entry, line, 0);
+                 })) {}
 FileLogger::FileLogger(FileLogger&& other)
 #ifdef __linux__
     : m_fileHandle{std::exchange(other.m_fileHandle, -1)},
@@ -93,5 +79,27 @@ FileLogger::~FileLogger() {
     m_thread.join();
   }
 #endif
+}
+std::function<void(std::string_view)> FileLogger::LineBuffer(
+    std::function<void(std::string_view)> callback) {
+  return [callback,
+          buf = wpi::SmallVector<char, 32>{}](std::string_view data) mutable {
+    if (!wpi::contains(data, "\n")) {
+      buf.append(data.begin(), data.end());
+      return;
+    }
+    std::string_view line;
+    std::string_view remainingData;
+    std::tie(line, remainingData) = wpi::split(data, "\n");
+    buf.append(line.begin(), line.end());
+    callback(std::string_view{buf.data(), buf.size()});
+
+    while (wpi::contains(remainingData, "\n")) {
+      std::tie(line, remainingData) = wpi::split(remainingData, "\n");
+      callback(line);
+    }
+    buf.clear();
+    buf.append(remainingData.begin(), remainingData.end());
+  };
 }
 }  // namespace wpi
