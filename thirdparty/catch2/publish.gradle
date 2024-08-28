@@ -15,7 +15,7 @@ task cppSourcesZip(type: Zip) {
         into '/'
     }
 
-    from('src') {
+    from('src/main/native/cpp') {
         into '/'
     }
 }
@@ -29,7 +29,7 @@ task cppHeadersZip(type: Zip) {
         into '/'
     }
 
-    from('include') {
+    from('src/main/native/include') {
         into '/'
     }
 }
@@ -42,11 +42,11 @@ addTaskToCopyAllOutputs(cppSourcesZip)
 
 model {
     publishing {
-        def googletestTaskList = createComponentZipTasks($.components, ['catch2'], zipBaseName, Zip, project, includeStandardZipFormat)
+        def catch2TaskList = createComponentZipTasks($.components, ['catch2'], zipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {
-                googletestTaskList.each {
+                catch2TaskList.each {
                     artifact it
                 }
 

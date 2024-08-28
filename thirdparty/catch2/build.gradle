@@ -38,8 +38,8 @@ model {
         "${nativeName}"(NativeLibrarySpec) {
             sources.cpp {
                 source {
-                    srcDirs "src/main/native/cpp/**/*.cpp"
-                    include '*.cpp'
+                    srcDirs "src/main/native/cpp"
+                    include '**/*.cpp'
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/include',
