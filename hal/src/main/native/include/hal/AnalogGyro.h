@@ -43,7 +43,7 @@ void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status);
 /**
  * Frees an analog gyro.
  *
- * @param[in,out] handle the gyro handle
+ * @param handle the gyro handle
  */
 void HAL_FreeAnalogGyro(HAL_GyroHandle handle);
 
