@@ -8,7 +8,6 @@
 #include <span>
 #include <string>
 #include <string_view>
-#include <span>
 
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
@@ -47,16 +46,16 @@ class UDPClient {
   // The passed in address MUST be a resolved IP address.
   int send(std::span<const uint8_t> data, std::string_view server, int port);
   int send(std::string_view data, std::string_view server, int port);
-  inline int send(std::span<const uint8_t> data, sockaddr_in &addr) {
-    return sendto(m_lsd, reinterpret_cast<const char*>(data.data()), data.size(), 0,
-             reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
-  }
+  inline int send(std::span<const uint8_t> data, sockaddr_in& addr) {
+    return sendto(m_lsd, reinterpret_cast<const char*>(data.data()),
+                  data.size(), 0, reinterpret_cast<sockaddr*>(&addr),
+                  sizeof(addr));
 
   int receive(uint8_t* data_received, int receive_len);
   int receive(uint8_t* data_received, int receive_len,
               SmallVectorImpl<char>* addr_received, int* port_received);
   int receive(uint8_t* data_received, int receive_len,
-              sockaddr_in *addr_recieved);
+              sockaddr_in* addr_recieved);
   int set_timeout(double timeout);
 };
 
