@@ -10,12 +10,18 @@ TEST(TimeSyncProtocolTest, TestClient) {
   using namespace wpi;
   using namespace std::chrono_literals;
 
+  TimeSyncServer server{5810};
   TimeSyncClient client{"127.0.0.1", 5810, 1s};
 
+  server.Start();
+  std::this_thread::sleep_for(0.5s);
   client.Start();
 
   for (int i = 0; i < 10; i++) {
-    wpi::println("Got offset {}", client.GetOffset());
+    // wpi::println("Unit Test: current offset = {} uS", client.GetOffset());
     std::this_thread::sleep_for(1s);
   }
+
+  server.Stop();
+  client.Stop();
 }

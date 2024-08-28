@@ -195,9 +195,11 @@ int UDPClient::send(std::string_view data, std::string_view server, int port) {
 }
 
 int UDPClient::receive(uint8_t* data_received, int receive_len) {
-  if (m_port == 0) {
-    return -1;  // return if not receiving
-  }
+  // TODO: why is this behavior here? start() binds to a random port, is this ever not valid?
+  // if (m_port == 0) {
+  //   return -1;  // return if not receiving
+  // }
+
   return recv(m_lsd, reinterpret_cast<char*>(data_received), receive_len, 0);
 }
 
@@ -207,12 +209,12 @@ int UDPClient::receive(uint8_t* data_received, int receive_len,
     return -1;  // return if not receiving
   }
 
-  socklen_t remote_len = sizeof(remote);
-  std::memset(&remote, 0, sizeof(remote));
+  socklen_t remote_len = sizeof(sockaddr_in);
+  std::memset(remote, 0, sizeof(sockaddr_in));
 
   return
       recvfrom(m_lsd, reinterpret_cast<char*>(data_received), receive_len, 0,
-               reinterpret_cast<sockaddr*>(&remote), &remote_len);
+               reinterpret_cast<sockaddr*>(remote), &remote_len);
 
 }
 

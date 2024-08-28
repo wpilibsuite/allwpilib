@@ -114,7 +114,8 @@ void wpi::TimeSyncServer::Go() {
   struct sockaddr_in client_addr;
 
   while (m_running) {
-    wpi::SmallVector<uint8_t, wpi::Struct<TspPing>::GetSize()> pingData;
+    wpi::SmallVector<uint8_t, wpi::Struct<TspPing>::GetSize()> pingData(
+        wpi::Struct<TspPing>::GetSize());
 
     int n = m_udp.receive(pingData.data(), pingData.size(), &client_addr);
 
@@ -143,13 +144,18 @@ void wpi::TimeSyncServer::Go() {
     TspPong pong{ping, current_time};
     pong.message_id = 2;
 
-    wpi::SmallVector<uint8_t, wpi::Struct<TspPong>::GetSize()> pongData;
+    wpi::SmallVector<uint8_t, wpi::Struct<TspPong>::GetSize()> pongData(
+        wpi::Struct<TspPong>::GetSize());
     wpi::PackStruct(pongData, pong);
 
     m_udp.send(std::span<uint8_t>{pongData}, client_addr);
 
-    std::cout << "Sent current time (microseconds since epoch) to client: "
-              << current_time << std::endl;
+    // fmt::println("Sent current time (microseconds since epoch) to client:
+    // {}", current_time);
+    fmt::println("->[server] Got ping: {} {} {}", ping.version, ping.message_id,
+                 ping.client_time);
+    fmt::println("->[server] Sent pong: {} {} {}", pong.version,
+                 pong.message_id, pong.client_time, pong.server_time);
   }
 
   // Close the socket
@@ -177,8 +183,6 @@ void wpi::TimeSyncServer::Stop() {
 }
 
 void wpi::TimeSyncClient::Go(std::chrono::milliseconds loop_time) {
-  struct sockaddr_in client_addr;
-
   while (m_running) {
     auto start{std::chrono::high_resolution_clock::now()};
 
@@ -187,7 +191,8 @@ void wpi::TimeSyncClient::Go(std::chrono::milliseconds loop_time) {
 
     TspPing ping{.version = 1, .message_id = 1, .client_time = ping_local_time};
 
-    wpi::SmallVector<uint8_t, wpi::Struct<TspPing>::GetSize()> pingData;
+    wpi::SmallVector<uint8_t, wpi::Struct<TspPing>::GetSize()> pingData(
+        wpi::Struct<TspPing>::GetSize());
     wpi::PackStruct(pingData, ping);
 
     // TODO: cache sockaddr instead of recalculating?
@@ -199,12 +204,13 @@ void wpi::TimeSyncClient::Go(std::chrono::milliseconds loop_time) {
     }
 
     // wait for our pong
-    wpi::SmallVector<uint8_t, wpi::Struct<TspPong>::GetSize()> pongData;
-    int n2 = m_udp.receive(pongData.data(), pongData.size(), &client_addr);
+    wpi::SmallVector<uint8_t, wpi::Struct<TspPong>::GetSize()> pongData(
+        wpi::Struct<TspPong>::GetSize());
+    int n2 = m_udp.receive(pongData.data(), pongData.size());
     uint64_t pong_local_time = m_timeProvider();
 
     if (n2 < 0) {
-      std::perror("Failed to receive message");
+      std::perror("[client] Failed to receive message");
       auto end{std::chrono::high_resolution_clock::now()};
       auto sleep_duration = m_loopDelay - (end - start);
       std::this_thread::sleep_for(sleep_duration);
@@ -219,14 +225,27 @@ void wpi::TimeSyncClient::Go(std::chrono::milliseconds loop_time) {
     }
 
     TspPong pong{
-        wpi::UnpackStruct<TspPong>(pingData),
+        wpi::UnpackStruct<TspPong>(pongData),
     };
 
+    fmt::println("->[client] Sent ping: {} {} {}", ping.version,
+                 ping.message_id, ping.client_time);
+    fmt::println("->[client] Got pong: {} {} {}", pong.version, pong.message_id,
+                 pong.client_time, pong.server_time);
+
     if (pong.version != 1) {
-      std::perror("Bad version from client?");
+      fmt::println("Bad version from server?");
+      auto end{std::chrono::high_resolution_clock::now()};
+      auto sleep_duration = m_loopDelay - (end - start);
+      std::this_thread::sleep_for(sleep_duration);
+      continue;
     }
     if (pong.message_id != 2) {
-      std::perror("Bad message id from client?");
+      fmt::println("Bad message id from server?");
+      auto end{std::chrono::high_resolution_clock::now()};
+      auto sleep_duration = m_loopDelay - (end - start);
+      std::this_thread::sleep_for(sleep_duration);
+      continue;
     }
 
     // when time = send_time+rtt2/2, server time = server time
