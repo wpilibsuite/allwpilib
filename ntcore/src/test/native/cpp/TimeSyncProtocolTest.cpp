@@ -10,8 +10,8 @@ TEST(TimeSyncProtocolTest, TestClient) {
   using namespace wpi;
   using namespace std::chrono_literals;
 
-  static auto server_bogus_offset = nt::Now();
-  TimeSyncServer server{5810, []() { return nt::Now() - server_bogus_offset; }};
+  static auto server_bogus_offset = -nt::Now();
+  TimeSyncServer server{5810, []() { return nt::Now() + server_bogus_offset; }};
   TimeSyncClient client{"127.0.0.1", 5810, 1s};
 
   server.Start();
@@ -19,7 +19,9 @@ TEST(TimeSyncProtocolTest, TestClient) {
   client.Start();
 
   for (int i = 0; i < 10; i++) {
-    // wpi::println("Unit Test: current offset = {} uS", client.GetOffset());
+    auto off = client.GetOffset();
+    wpi::println("Unit Test: current offset = {} uS, error = {} uS", off,
+                 off - static_cast<int64_t>(server_bogus_offset));
     std::this_thread::sleep_for(1s);
   }
 
