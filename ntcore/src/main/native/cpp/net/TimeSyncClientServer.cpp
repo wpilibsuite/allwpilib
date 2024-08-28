@@ -154,7 +154,7 @@ void wpi::TimeSyncServer::Go() {
     // {}", current_time);
     fmt::println("->[server] Got ping: {} {} {}", ping.version, ping.message_id,
                  ping.client_time);
-    fmt::println("->[server] Sent pong: {} {} {}", pong.version,
+    fmt::println("->[server] Sent pong: {} {} {} {}", pong.version,
                  pong.message_id, pong.client_time, pong.server_time);
   }
 
@@ -230,8 +230,8 @@ void wpi::TimeSyncClient::Go(std::chrono::milliseconds loop_time) {
 
     fmt::println("->[client] Sent ping: {} {} {}", ping.version,
                  ping.message_id, ping.client_time);
-    fmt::println("->[client] Got pong: {} {} {}", pong.version, pong.message_id,
-                 pong.client_time, pong.server_time);
+    fmt::println("->[client] Got pong: {} {} {} {}", pong.version,
+                 pong.message_id, pong.client_time, pong.server_time);
 
     if (pong.version != 1) {
       fmt::println("Bad version from server?");

@@ -10,7 +10,8 @@ TEST(TimeSyncProtocolTest, TestClient) {
   using namespace wpi;
   using namespace std::chrono_literals;
 
-  TimeSyncServer server{5810};
+  static auto server_bogus_offset = nt::Now();
+  TimeSyncServer server{5810, []() { return nt::Now() - server_bogus_offset; }};
   TimeSyncClient client{"127.0.0.1", 5810, 1s};
 
   server.Start();
