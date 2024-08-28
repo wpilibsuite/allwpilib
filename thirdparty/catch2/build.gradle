@@ -54,6 +54,4 @@ tasks.withType(CppCompile) {
     dependsOn generateCatchUserConfig
 }
 
-cppHeadersZip.dependsOn generateProto
-
 apply from: 'publish.gradle'
