@@ -531,6 +531,28 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Multiplies this measure by a conversion factor, returning the converted measurement. Unlike
+   * {@link #times(Per)}, this allows for basic unit cancellation to return measurements of a known
+   * dimension.
+   *
+   * @param conversionFactor the conversion factor by which to multiply
+   * @param <Other> the unit type to convert to
+   * @param <M> the concrete return unit type. <strong>Note: the conversion factor's numerator unit
+   *     must return instances of this type from {@link Unit#ofBaseUnits(double)}}</strong>
+   * @return the converted result
+   */
+  @SuppressWarnings("unchecked")
+  default <Other extends Unit, M extends Measure<Other>> M timesConversionFactor(
+      Measure<? extends PerUnit<Other, U>> conversionFactor) {
+    return (M)
+        conversionFactor
+            .unit()
+            .getBaseUnit()
+            .numerator()
+            .ofBaseUnits(baseUnitMagnitude() * conversionFactor.baseUnitMagnitude());
+  }
+
+  /**
    * Multiplies this measure by another measurement of the inverse unit type (eg Time multiplied by
    * Frequency) and returns the resulting dimensionless measure.
    *

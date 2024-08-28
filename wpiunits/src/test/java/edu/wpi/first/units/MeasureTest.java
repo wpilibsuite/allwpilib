@@ -11,7 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularMomentum;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Time;
 import org.junit.jupiter.api.Test;
 
 class MeasureTest {
@@ -30,6 +35,37 @@ class MeasureTest {
     Distance m2 = m.times(10);
     assertEquals(10, m2.in(Units.Feet), 1e-12);
     assertNotSame(m2, m); // make sure state wasn't changed
+  }
+
+  @Test
+  void testTimesConversionFactor() {
+    Distance m = Units.Feet.of(10);
+
+    Per<AngleUnit, DistanceUnit> conversion = Units.Degrees.of(10).divide(Units.Feet.of(1));
+    Angle result = m.timesConversionFactor(conversion);
+    assertEquals(Units.Degrees.of(100), result);
+  }
+
+  @Test
+  void testTimesConversionFactorComplex() {
+    Distance m = Units.Feet.of(1);
+
+    // Using a complex compound unit here
+    // (Per<Mult<Mult<Mass, Per<Distance, Time>>, Distance>, Distance>)
+    Per<AngularMomentumUnit, DistanceUnit> conversion =
+        Units.KilogramMetersSquaredPerSecond.of(1).divide(Units.Foot.one());
+
+    AngularMomentum result = m.timesConversionFactor(conversion);
+    assertEquals(Units.KilogramMetersSquaredPerSecond.of(1), result);
+  }
+
+  @Test
+  void testTimesVelocityConversionFactor() {
+    Time m = Units.Seconds.of(10);
+
+    LinearVelocity conversion = Units.MetersPerSecond.of(10);
+    Distance result = m.timesConversionFactor(conversion);
+    assertEquals(Units.Meters.of(100), result);
   }
 
   @Test
