@@ -74,15 +74,13 @@ public final class DistanceUnit extends Unit {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<DistanceUnit> zero() {
-    return (Measure<DistanceUnit>) super.zero();
+  public Distance zero() {
+    return (Distance) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<DistanceUnit> one() {
-    return (Measure<DistanceUnit>) super.one();
+  public Distance one() {
+    return (Distance) super.one();
   }
 
   @Override

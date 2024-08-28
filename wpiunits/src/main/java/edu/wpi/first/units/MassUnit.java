@@ -48,15 +48,13 @@ public final class MassUnit extends Unit {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<MassUnit> zero() {
-    return (Measure<MassUnit>) super.zero();
+  public Mass zero() {
+    return (Mass) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<MassUnit> one() {
-    return (Measure<MassUnit>) super.one();
+  public Mass one() {
+    return (Mass) super.one();
   }
 
   @Override

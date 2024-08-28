@@ -62,15 +62,13 @@ public final class CurrentUnit extends Unit {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<CurrentUnit> zero() {
-    return (Measure<CurrentUnit>) super.zero();
+  public Current zero() {
+    return (Current) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<CurrentUnit> one() {
-    return (Measure<CurrentUnit>) super.one();
+  public Current one() {
+    return (Current) super.one();
   }
 
   @Override

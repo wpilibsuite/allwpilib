@@ -43,15 +43,13 @@ public final class TemperatureUnit extends Unit {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<TemperatureUnit> zero() {
-    return (Measure<TemperatureUnit>) super.zero();
+  public Temperature zero() {
+    return (Temperature) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<TemperatureUnit> one() {
-    return (Measure<TemperatureUnit>) super.one();
+  public Temperature one() {
+    return (Temperature) super.one();
   }
 
   @Override

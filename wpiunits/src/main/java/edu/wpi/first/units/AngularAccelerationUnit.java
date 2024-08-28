@@ -59,15 +59,13 @@ public final class AngularAccelerationUnit extends PerUnit<AngularVelocityUnit, 
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<AngularAccelerationUnit> zero() {
-    return (Measure<AngularAccelerationUnit>) super.zero();
+  public AngularAcceleration zero() {
+    return (AngularAcceleration) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<AngularAccelerationUnit> one() {
-    return (Measure<AngularAccelerationUnit>) super.one();
+  public AngularAcceleration one() {
+    return (AngularAcceleration) super.one();
   }
 
   @Override

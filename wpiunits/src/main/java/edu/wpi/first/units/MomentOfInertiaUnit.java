@@ -64,15 +64,13 @@ public final class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, Angu
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<MomentOfInertiaUnit> zero() {
-    return (Measure<MomentOfInertiaUnit>) super.zero();
+  public MomentOfInertia zero() {
+    return (MomentOfInertia) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<MomentOfInertiaUnit> one() {
-    return (Measure<MomentOfInertiaUnit>) super.one();
+  public MomentOfInertia one() {
+    return (MomentOfInertia) super.one();
   }
 
   @Override

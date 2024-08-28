@@ -62,15 +62,13 @@ public final class VoltageUnit extends Unit {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<VoltageUnit> zero() {
-    return (Measure<VoltageUnit>) super.zero();
+  public Voltage zero() {
+    return (Voltage) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<VoltageUnit> one() {
-    return (Measure<VoltageUnit>) super.one();
+  public Voltage one() {
+    return (Voltage) super.one();
   }
 
   @Override

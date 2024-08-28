@@ -86,15 +86,13 @@ public final class TimeUnit extends Unit {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<TimeUnit> zero() {
-    return (Measure<TimeUnit>) super.zero();
+  public Time zero() {
+    return (Time) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<TimeUnit> one() {
-    return (Measure<TimeUnit>) super.one();
+  public Time one() {
+    return (Time) super.one();
   }
 
   @Override

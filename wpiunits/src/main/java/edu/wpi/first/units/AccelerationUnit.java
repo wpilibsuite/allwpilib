@@ -54,15 +54,15 @@ public final class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<AccelerationUnit<D>> zero() {
-    return (Measure<AccelerationUnit<D>>) super.zero();
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public Acceleration<D> zero() {
+    return (Acceleration<D>) (Acceleration) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<AccelerationUnit<D>> one() {
-    return (Measure<AccelerationUnit<D>>) super.one();
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public Acceleration<D> one() {
+    return (Acceleration<D>) (Acceleration) super.one();
   }
 
   @Override

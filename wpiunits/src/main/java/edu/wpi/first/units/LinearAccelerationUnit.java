@@ -61,15 +61,13 @@ public final class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, Ti
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<LinearAccelerationUnit> zero() {
-    return (Measure<LinearAccelerationUnit>) super.zero();
+  public LinearAcceleration zero() {
+    return (LinearAcceleration) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<LinearAccelerationUnit> one() {
-    return (Measure<LinearAccelerationUnit>) super.one();
+  public LinearAcceleration one() {
+    return (LinearAcceleration) super.one();
   }
 
   @Override

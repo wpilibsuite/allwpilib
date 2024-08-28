@@ -58,15 +58,13 @@ public final class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityU
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<LinearMomentumUnit> zero() {
-    return (Measure<LinearMomentumUnit>) super.zero();
+  public LinearMomentum zero() {
+    return (LinearMomentum) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<LinearMomentumUnit> one() {
-    return (Measure<LinearMomentumUnit>) super.one();
+  public LinearMomentum one() {
+    return (LinearMomentum) super.one();
   }
 
   @Override

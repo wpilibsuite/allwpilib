@@ -58,15 +58,13 @@ public final class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<TorqueUnit> zero() {
-    return (Measure<TorqueUnit>) super.zero();
+  public Torque zero() {
+    return (Torque) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<TorqueUnit> one() {
-    return (Measure<TorqueUnit>) super.one();
+  public Torque one() {
+    return (Torque) super.one();
   }
 
   @Override

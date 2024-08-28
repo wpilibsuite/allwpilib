@@ -49,15 +49,13 @@ public final class DimensionlessUnit extends Unit {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<DimensionlessUnit> zero() {
-    return (Measure<DimensionlessUnit>) super.zero();
+  public Dimensionless zero() {
+    return (Dimensionless) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<DimensionlessUnit> one() {
-    return (Measure<DimensionlessUnit>) super.one();
+  public Dimensionless one() {
+    return (Dimensionless) super.one();
   }
 
   @Override

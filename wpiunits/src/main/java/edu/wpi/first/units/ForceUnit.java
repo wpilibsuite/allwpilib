@@ -73,15 +73,13 @@ public final class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> 
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<ForceUnit> zero() {
-    return (Measure<ForceUnit>) super.zero();
+  public Force zero() {
+    return (Force) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<ForceUnit> one() {
-    return (Measure<ForceUnit>) super.one();
+  public Force one() {
+    return (Force) super.one();
   }
 
   @Override

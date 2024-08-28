@@ -61,15 +61,13 @@ public final class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, Dist
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<AngularMomentumUnit> zero() {
-    return (Measure<AngularMomentumUnit>) super.zero();
+  public AngularMomentum zero() {
+    return (AngularMomentum) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<AngularMomentumUnit> one() {
-    return (Measure<AngularMomentumUnit>) super.one();
+  public AngularMomentum one() {
+    return (AngularMomentum) super.one();
   }
 
   @Override

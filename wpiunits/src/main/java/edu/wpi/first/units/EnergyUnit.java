@@ -80,15 +80,13 @@ public final class EnergyUnit extends Unit {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<EnergyUnit> zero() {
-    return (Measure<EnergyUnit>) super.zero();
+  public Energy zero() {
+    return (Energy) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<EnergyUnit> one() {
-    return (Measure<EnergyUnit>) super.one();
+  public Energy one() {
+    return (Energy) super.one();
   }
 
   @Override

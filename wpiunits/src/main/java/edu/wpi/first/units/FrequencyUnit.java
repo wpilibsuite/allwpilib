@@ -71,15 +71,13 @@ public final class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<FrequencyUnit> zero() {
-    return (Measure<FrequencyUnit>) super.zero();
+  public Frequency zero() {
+    return (Frequency) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<FrequencyUnit> one() {
-    return (Measure<FrequencyUnit>) super.one();
+  public Frequency one() {
+    return (Frequency) super.one();
   }
 
   @Override

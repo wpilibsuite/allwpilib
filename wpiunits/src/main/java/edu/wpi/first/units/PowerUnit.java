@@ -121,15 +121,13 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<PowerUnit> zero() {
-    return (Measure<PowerUnit>) super.zero();
+  public Power zero() {
+    return (Power) super.zero();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Measure<PowerUnit> one() {
-    return (Measure<PowerUnit>) super.one();
+  public Power one() {
+    return (Power) super.one();
   }
 
   @Override
