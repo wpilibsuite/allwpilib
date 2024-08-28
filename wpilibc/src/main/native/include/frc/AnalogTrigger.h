@@ -36,7 +36,17 @@ class AnalogTrigger : public wpi::Sendable,
    * This should be used in the case of sharing an analog channel between the
    * trigger and an analog input object.
    *
-   * @param input The pointer to the existing AnalogInput object
+   * @param input A reference to the existing AnalogInput object
+   */
+  explicit AnalogTrigger(AnalogInput& input);
+
+  /**
+   * Construct an analog trigger using an existing analog input.
+   *
+   * This should be used in the case of sharing an analog channel between the
+   * trigger and an analog input object.
+   *
+   * @param input A pointer to the existing AnalogInput object
    */
   explicit AnalogTrigger(AnalogInput* input);
 
@@ -46,16 +56,30 @@ class AnalogTrigger : public wpi::Sendable,
    * This should be used in the case of sharing an analog channel between the
    * trigger and an analog input object.
    *
-   * @param input The shared_ptr to the existing AnalogInput object
+   * @param input A shared_ptr to the existing AnalogInput object
    */
   explicit AnalogTrigger(std::shared_ptr<AnalogInput> input);
 
   /**
-   * Construct an analog trigger given a duty cycle input.
+   * Construct an analog trigger using an existing duty cycle input.
    *
-   * @param dutyCycle The pointer to the existing DutyCycle object
+   * @param dutyCycle A reference to the existing DutyCycle object
+   */
+  explicit AnalogTrigger(DutyCycle& dutyCycle);
+
+  /**
+   * Construct an analog trigger using an existing duty cycle input.
+   *
+   * @param dutyCycle A pointer to the existing DutyCycle object
    */
   explicit AnalogTrigger(DutyCycle* dutyCycle);
+
+  /**
+   * Construct an analog trigger using an existing duty cycle input.
+   *
+   * @param dutyCycle A shared_ptr to the existing DutyCycle object
+   */
+  explicit AnalogTrigger(std::shared_ptr<DutyCycle> dutyCycle);
 
   AnalogTrigger(AnalogTrigger&&) = default;
   AnalogTrigger& operator=(AnalogTrigger&&) = default;
@@ -160,8 +184,8 @@ class AnalogTrigger : public wpi::Sendable,
  private:
   int GetSourceChannel() const;
 
-  std::shared_ptr<AnalogInput> m_analogInput = nullptr;
-  DutyCycle* m_dutyCycle = nullptr;
+  std::shared_ptr<AnalogInput> m_analogInput;
+  std::shared_ptr<DutyCycle> m_dutyCycle;
   hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
   bool m_ownsAnalog = false;
 };

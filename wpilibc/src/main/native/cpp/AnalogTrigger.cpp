@@ -23,6 +23,9 @@ AnalogTrigger::AnalogTrigger(int channel)
   wpi::SendableRegistry::AddChild(this, m_analogInput.get());
 }
 
+AnalogTrigger::AnalogTrigger(AnalogInput& input)
+    : AnalogTrigger{{&input, wpi::NullDeleter<AnalogInput>{}}} {}
+
 AnalogTrigger::AnalogTrigger(AnalogInput* input)
     : AnalogTrigger{{input, wpi::NullDeleter<AnalogInput>{}}} {}
 
@@ -37,8 +40,14 @@ AnalogTrigger::AnalogTrigger(std::shared_ptr<AnalogInput> input)
   wpi::SendableRegistry::AddLW(this, "AnalogTrigger", index);
 }
 
-AnalogTrigger::AnalogTrigger(DutyCycle* input) {
-  m_dutyCycle = input;
+AnalogTrigger::AnalogTrigger(DutyCycle& input)
+    : AnalogTrigger{{&input, wpi::NullDeleter<DutyCycle>{}}} {}
+
+AnalogTrigger::AnalogTrigger(DutyCycle* input)
+    : AnalogTrigger{{input, wpi::NullDeleter<DutyCycle>{}}} {}
+
+AnalogTrigger::AnalogTrigger(std::shared_ptr<DutyCycle> input)
+    : m_dutyCycle{input} {
   int32_t status = 0;
   m_trigger = HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_dutyCycle->GetSourceChannel());
