@@ -4,6 +4,7 @@ include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
+include(WpiProtobuf)
 
 # workaround for makefiles - for some reason parent directories aren't created.
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
@@ -127,33 +128,33 @@ target_link_libraries(protobuf wpiutil)
 
 add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
 
-protobuf_generate(
-    TARGET protobuf
+wpi_protobuf_generate(
+    TARGET
+    protobuf
     PROTOS ${wpimath_proto_src}
-    PLUGIN "protoc-gen-wpilib=${PROTOC_WPILIB_PLUGIN}"
-    PROTOC_OPTIONS "--cpp_out=${CMAKE_CURRENT_BINARY_DIR}/protobuf" # Needed to generate C++ source
+    PLUGIN ${PROTOC_WPILIB_PLUGIN}
     PROTOC_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
-    GENERATE_EXTENSIONS ".pb.h" ".pb.cc" # Enables CMake to add the generated sources to the target
-    LANGUAGE wpilib # Adds a --wpilib_out arg to let our plugin modify the generated protobuf code
-    APPEND_PATH
 )
 
 if(MSVC)
+    get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+    set(CONFIG_SUFFIX "$<$<BOOL:${IS_MULTI_CONFIG}>:_$<CONFIG>>")
     file(
         GENERATE OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects.txt
+        ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
         CONTENT $<LIST:JOIN,$<TARGET_OBJECTS:protobuf>,\n>
     )
     add_custom_command(
         TARGET wpimath
         PRE_LINK
         COMMAND
-            cmake -E __create_def ${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports.def
-            ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects.txt
+            cmake -E __create_def ${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports${CONFIG_SUFFIX}.def
+            ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
     )
     target_link_options(
         wpimath
-        PRIVATE /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports.def>
+        PRIVATE
+            /DEF:$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf_exports${CONFIG_SUFFIX}.def>
     )
 endif()
 

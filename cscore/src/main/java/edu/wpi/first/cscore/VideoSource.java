@@ -131,11 +131,7 @@ public class VideoSource implements AutoCloseable {
     if (other == null) {
       return false;
     }
-    if (getClass() != other.getClass()) {
-      return false;
-    }
-    VideoSource source = (VideoSource) other;
-    return m_handle == source.m_handle;
+    return other instanceof VideoSource source && m_handle == source.m_handle;
   }
 
   @Override

@@ -1,0 +1,1391 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ryan Blue <ryanzblue@gmail.com>
+Date: Wed, 21 Aug 2024 20:50:15 -0400
+Subject: [PATCH 1/2] Group doxygen into memory module
+
+---
+ .../foonathan/memory/aligned_allocator.hpp    |  2 +-
+ .../foonathan/memory/allocator_storage.hpp    | 22 ++++++++---------
+ include/foonathan/memory/allocator_traits.hpp | 12 +++++-----
+ include/foonathan/memory/config.hpp           | 24 +++++++++----------
+ include/foonathan/memory/container.hpp        |  6 ++---
+ include/foonathan/memory/debugging.hpp        | 20 ++++++++--------
+ .../foonathan/memory/default_allocator.hpp    |  2 +-
+ include/foonathan/memory/deleter.hpp          | 12 +++++-----
+ include/foonathan/memory/error.hpp            | 14 +++++------
+ .../foonathan/memory/fallback_allocator.hpp   |  2 +-
+ include/foonathan/memory/heap_allocator.hpp   |  6 ++---
+ .../foonathan/memory/iteration_allocator.hpp  |  8 +++----
+ include/foonathan/memory/joint_allocator.hpp  | 20 ++++++++--------
+ include/foonathan/memory/malloc_allocator.hpp |  2 +-
+ include/foonathan/memory/memory_arena.hpp     | 18 +++++++-------
+ include/foonathan/memory/memory_pool.hpp      |  6 ++---
+ .../memory/memory_pool_collection.hpp         | 12 +++++-----
+ include/foonathan/memory/memory_pool_type.hpp |  6 ++---
+ .../memory/memory_resource_adapter.hpp        |  8 +++----
+ include/foonathan/memory/memory_stack.hpp     |  8 +++----
+ include/foonathan/memory/namespace_alias.hpp  | 15 ++++++++----
+ include/foonathan/memory/new_allocator.hpp    |  2 +-
+ include/foonathan/memory/segregator.hpp       |  8 +++----
+ include/foonathan/memory/smart_ptr.hpp        | 14 +++++------
+ include/foonathan/memory/static_allocator.hpp |  6 ++---
+ include/foonathan/memory/std_allocator.hpp    |  6 ++---
+ .../foonathan/memory/temporary_allocator.hpp  |  6 ++---
+ include/foonathan/memory/threading.hpp        |  4 ++--
+ include/foonathan/memory/tracking.hpp         |  8 +++----
+ include/foonathan/memory/virtual_memory.hpp   | 16 ++++++-------
+ 30 files changed, 150 insertions(+), 145 deletions(-)
+
+diff --git a/include/foonathan/memory/aligned_allocator.hpp b/include/foonathan/memory/aligned_allocator.hpp
+index fe724aa9c7ce11c6b3078605728ec1ea3d07c1fe..5ca3f29b20575a36ef11327bb1219cb4013fc5e4 100644
+--- a/include/foonathan/memory/aligned_allocator.hpp
++++ b/include/foonathan/memory/aligned_allocator.hpp
+@@ -20,7 +20,7 @@ namespace foonathan
+     {
+         /// A \concept{concept_rawallocator,RawAllocator} adapter that ensures a minimum alignment.
+         /// It adjusts the alignment value so that it is always larger than the minimum and forwards to the specified allocator.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class RawAllocator>
+         class aligned_allocator : FOONATHAN_EBO(allocator_traits<RawAllocator>::allocator_type)
+         {
+diff --git a/include/foonathan/memory/allocator_storage.hpp b/include/foonathan/memory/allocator_storage.hpp
+index 57f128ab0a79ea53b5bd7bd11d72de7c97dcfd4c..11747a5b15c500243764094dba3163cc9e014390 100644
+--- a/include/foonathan/memory/allocator_storage.hpp
++++ b/include/foonathan/memory/allocator_storage.hpp
+@@ -88,7 +88,7 @@ namespace foonathan
+         /// A \concept{concept_rawallocator,RawAllocator} that stores another allocator.
+         /// The \concept{concept_storagepolicy,StoragePolicy} defines the allocator type being stored and how it is stored.
+         /// The \c Mutex controls synchronization of the access.
+-        /// \ingroup storage
++        /// \ingroup memory_storage
+         template <class StoragePolicy, class Mutex>
+         class allocator_storage
+         : FOONATHAN_EBO(StoragePolicy,
+@@ -317,14 +317,14 @@ namespace foonathan
+ 
+         /// Tag type that enables type-erasure in \ref reference_storage.
+         /// It can be used everywhere a \ref allocator_reference is used internally.
+-        /// \ingroup storage
++        /// \ingroup memory_storage
+         struct any_allocator
+         {
+         };
+ 
+         /// A \concept{concept_storagepolicy,StoragePolicy} that stores the allocator directly.
+         /// It embeds the allocator inside it, i.e. moving the storage policy will move the allocator.
+-        /// \ingroup storage
++        /// \ingroup memory_storage
+         template <class RawAllocator>
+         class direct_storage : FOONATHAN_EBO(allocator_traits<RawAllocator>::allocator_type)
+         {
+@@ -381,7 +381,7 @@ namespace foonathan
+         /// An alias template for \ref allocator_storage using the \ref direct_storage policy without a mutex.
+         /// It has the effect of giving any \concept{concept_rawallocator,RawAllocator} the interface with all member functions,
+         /// avoiding the need to wrap it inside the \ref allocator_traits.
+-        /// \ingroup storage
++        /// \ingroup memory_storage
+         template <class RawAllocator>
+         FOONATHAN_ALIAS_TEMPLATE(allocator_adapter,
+                                  allocator_storage<direct_storage<RawAllocator>, no_mutex>);
+@@ -399,7 +399,7 @@ namespace foonathan
+ /// It has a similar effect as \ref allocator_adapter but performs synchronization.
+ /// The \c Mutex will default to \c std::mutex if threading is supported,
+ /// otherwise there is no default.
+-/// \ingroup storage
++/// \ingroup memory_storage
+ #if FOONATHAN_HOSTED_IMPLEMENTATION
+         template <class RawAllocator, class Mutex = std::mutex>
+         FOONATHAN_ALIAS_TEMPLATE(thread_safe_allocator,
+@@ -528,7 +528,7 @@ namespace foonathan
+         /// Specialize it for your own types, if they provide sharing semantics and can be copied.
+         /// They also must provide an `operator==` to check whether two allocators refer to the same shared one.
+         /// \note This makes no guarantees about the lifetime of the shared object, the sharing allocators can either own or refer to a shared object.
+-        /// \ingroup storage
++        /// \ingroup memory_storage
+         template <class RawAllocator>
+         struct is_shared_allocator : std::false_type
+         {
+@@ -540,7 +540,7 @@ namespace foonathan
+         /// For allocators that are already shared (determined through \ref is_shared_allocator) it will store the allocator type directly.
+         /// \note It does not take ownership over the allocator in the stateful case, the user has to ensure that the allocator object stays valid.
+         /// In the other cases the lifetime does not matter.
+-        /// \ingroup storage
++        /// \ingroup memory_storage
+         template <class RawAllocator>
+         class reference_storage
+ #ifndef DOXYGEN
+@@ -611,7 +611,7 @@ namespace foonathan
+         /// Specialization of the class template \ref reference_storage that is type-erased.
+         /// It is triggered by the tag type \ref any_allocator.
+         /// The specialization can store a reference to any allocator type.
+-        /// \ingroup storage
++        /// \ingroup memory_storage
+         template <>
+         class reference_storage<any_allocator>
+         {
+@@ -894,7 +894,7 @@ namespace foonathan
+         /// An alias template for \ref allocator_storage using the \ref reference_storage policy.
+         /// It will store a reference to the given allocator type. The tag type \ref any_allocator enables type-erasure.
+         /// Wrap the allocator in a \ref thread_safe_allocator if you want thread safety.
+-        /// \ingroup storage
++        /// \ingroup memory_storage
+         template <class RawAllocator>
+         FOONATHAN_ALIAS_TEMPLATE(allocator_reference,
+                                  allocator_storage<reference_storage<RawAllocator>, no_mutex>);
+@@ -909,14 +909,14 @@ namespace foonathan
+         }
+ 
+         /// An alias for the \ref reference_storage specialization using type-erasure.
+-        /// \ingroup storage
++        /// \ingroup memory_storage
+         using any_reference_storage = reference_storage<any_allocator>;
+ 
+         /// An alias for \ref allocator_storage using the \ref any_reference_storage.
+         /// It will store a reference to any \concept{concept_rawallocator,RawAllocator}.
+         /// This is the same as passing the tag type \ref any_allocator to the alias \ref allocator_reference.
+         /// Wrap the allocator in a \ref thread_safe_allocator if you want thread safety.
+-        /// \ingroup storage
++        /// \ingroup memory_storage
+         using any_allocator_reference = allocator_storage<any_reference_storage, no_mutex>;
+ 
+         /// \returns A new \ref any_allocator_reference object by forwarding the allocator to the constructor.
+diff --git a/include/foonathan/memory/allocator_traits.hpp b/include/foonathan/memory/allocator_traits.hpp
+index 78f5ccf0669ae5a1fdc1ee0a868291a68b97ccd9..03b7ecdebc3511a07a1305b3101f28a6e304abc3 100644
+--- a/include/foonathan/memory/allocator_traits.hpp
++++ b/include/foonathan/memory/allocator_traits.hpp
+@@ -54,7 +54,7 @@ namespace foonathan
+         /// It checks the existence of a custom \c construct(), \c destroy() function, if provided,
+         /// it cannot be used since it would not be called.<br>
+         /// Specialize it for custom \c Allocator types to override this check.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <class Allocator>
+         struct allocator_is_raw_allocator
+         : FOONATHAN_EBO(detail::check_standard_allocator<Allocator>::valid)
+@@ -62,7 +62,7 @@ namespace foonathan
+         };
+ 
+         /// Specialization of \ref allocator_is_raw_allocator that allows \c std::allocator again.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <typename T>
+         struct allocator_is_raw_allocator<std::allocator<T>> : std::true_type
+         {
+@@ -286,7 +286,7 @@ namespace foonathan
+         /// The default specialization of the allocator_traits for a \concept{concept_rawallocator,RawAllocator}.
+         /// See the last link for the requirements on types that do not specialize this class and the interface documentation.
+         /// Any specialization must provide the same interface.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <class Allocator>
+         class allocator_traits
+         {
+@@ -410,7 +410,7 @@ namespace foonathan
+ 
+         /// Traits that check whether a type models concept \concept{concept_rawallocator,RawAllocator}.<br>
+         /// It must either provide the necessary functions for the default traits specialization or has specialized it.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <typename T>
+         struct is_raw_allocator
+         : detail::is_raw_allocator<T,
+@@ -494,7 +494,7 @@ namespace foonathan
+         /// The default specialization of the composable_allocator_traits for a \concept{concept_composableallocator,ComposableAllocator}.
+         /// See the last link for the requirements on types that do not specialize this class and the interface documentation.
+         /// Any specialization must provide the same interface.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <class Allocator>
+         class composable_allocator_traits
+         {
+@@ -588,7 +588,7 @@ namespace foonathan
+ 
+         /// Traits that check whether a type models concept \concept{concept_rawallocator,ComposableAllocator}.<br>
+         /// It must be a \concept{concept_rawallocator,RawAllocator} and either provide the necessary functions for the default traits specialization or has specialized it.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <typename T>
+         struct is_composable_allocator
+         : detail::is_composable_allocator<T, decltype(detail::composable_alloc_uses_default_traits(
+diff --git a/include/foonathan/memory/config.hpp b/include/foonathan/memory/config.hpp
+index 233caf6d22f6a1ded169fdc7808daebb0f53d526..56a6cd4e267cdb9ed1530942df028e3ef1ad8abf 100644
+--- a/include/foonathan/memory/config.hpp
++++ b/include/foonathan/memory/config.hpp
+@@ -83,54 +83,54 @@
+ // dummy definitions of config macros for doxygen
+ 
+ /// The major version number.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_VERSION_MAJOR 1
+ 
+ /// The minor version number.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_VERSION_MINOR 1
+ 
+ /// The total version number of the form \c Mmm.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_VERSION                                                                   \
+     (FOONATHAN_MEMORY_VERSION_MAJOR * 100 + FOONATHAN_MEMORY_VERSION_MINOR)
+ 
+ /// Whether or not the allocation size will be checked,
+ /// i.e. the \ref foonathan::memory::bad_allocation_size thrown.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_CHECK_ALLOCATION_SIZE 1
+ 
+ /// Whether or not internal assertions in the library are enabled.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_DEBUG_ASSERT 1
+ 
+ /// Whether or not allocated memory will be filled with special values.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_DEBUG_FILL 1
+ 
+ /// The size of the fence memory, it has no effect if \ref FOONATHAN_MEMORY_DEBUG_FILL is \c false.
+ /// \note For most allocators, the actual value doesn't matter and they use appropriate defaults to ensure alignment etc.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_DEBUG_FENCE 1
+ 
+ /// Whether or not leak checking is enabled.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_DEBUG_LEAK_CHECK 1
+ 
+ /// Whether or not the deallocation functions will check for pointers that were never allocated by an allocator.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_DEBUG_POINTER_CHECK 1
+ 
+ /// Whether or not the deallocation functions will check for double free errors.
+ /// This option makes no sense if \ref FOONATHAN_MEMORY_DEBUG_POINTER_CHECK is \c false.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_DEBUG_DOUBLE_DEALLOC_CHECK 1
+ 
+ /// Whether or not everything is in namespace <tt>foonathan::memory</tt>.
+ /// If \c false, a namespace alias <tt>namespace memory = foonathan::memory</tt> is automatically inserted into each header,
+ /// allowing to qualify everything with <tt>foonathan::</tt>.
+ /// \note This option breaks in combination with using <tt>using namespace foonathan;</tt>.
+-/// \ingroup core
++/// \ingroup memory_core
+ #define FOONATHAN_MEMORY_NAMESPACE_PREFIX 1
+ 
+ /// The mode of the automatic \ref foonathan::memory::temporary_stack creation.
+@@ -140,7 +140,7 @@
+ /// requires managing it through the \ref foonathan::memory::temporary_stack_initializer.
+ /// Set to `0` to disable the per-thread stack completely.
+ /// \ref foonathan::memory::get_temporary_stack() will abort the program upon call.
+-/// \ingroup allocator
++/// \ingroup memory_allocator
+ #define FOONATHAN_MEMORY_TEMPORARY_STACK_MODE 2
+ #endif
+ 
+diff --git a/include/foonathan/memory/container.hpp b/include/foonathan/memory/container.hpp
+index 5c77ddb4bd6a377dbcced4de781a772a7a2e6ff4..c954ca5deece3f4430fb934642b60e2e4550deff 100644
+--- a/include/foonathan/memory/container.hpp
++++ b/include/foonathan/memory/container.hpp
+@@ -36,7 +36,7 @@ namespace foonathan
+ {
+     namespace memory
+     {
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         /// @{
+ 
+         /// Alias template for an STL container that uses a certain
+@@ -213,7 +213,7 @@ namespace foonathan
+         /// @{
+         /// Convenience function to create a container adapter using a certain
+         /// \concept{concept_rawallocator,RawAllocator}. \returns An empty adapter with an
+-        /// implementation container using a reference to a given allocator. \ingroup adapter
++        /// implementation container using a reference to a given allocator. \ingroup memory_adapter
+         template <typename T, class RawAllocator, class Container = deque<T, RawAllocator>>
+         std::stack<T, Container> make_stack(RawAllocator& allocator)
+         {
+@@ -271,7 +271,7 @@ namespace foonathan
+ #endif
+ 
+ #else
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         /// @{
+ 
+         /// Contains the node size of a node based STL container with a specific type.
+diff --git a/include/foonathan/memory/debugging.hpp b/include/foonathan/memory/debugging.hpp
+index bb9af985ea32f3c6a2d55eb41d19eb7e9ae418e2..20f5e0a9625e25dbd704634a5b34034f88106117 100644
+--- a/include/foonathan/memory/debugging.hpp
++++ b/include/foonathan/memory/debugging.hpp
+@@ -18,7 +18,7 @@ namespace foonathan
+         /// The magic values that are used for debug filling.
+         /// If \ref FOONATHAN_MEMORY_DEBUG_FILL is \c true, memory will be filled to help detect use-after-free or missing initialization errors.
+         /// These are the constants for the different types.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         enum class debug_magic : unsigned char
+         {
+             /// Marks internal memory used by the allocator - "allocated block".
+@@ -47,19 +47,19 @@ namespace foonathan
+         /// It must not throw any exceptions since it is called in the cleanup process.
+         /// \defaultbe On a hosted implementation it logs the leak to \c stderr and returns, continuing execution.
+         /// On a freestanding implementation it does nothing.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         using leak_handler = void (*)(const allocator_info& info, std::ptrdiff_t amount);
+ 
+         /// Exchanges the \ref leak_handler.
+         /// \effects Sets \c h as the new \ref leak_handler in an atomic operation.
+         /// A \c nullptr sets the default \ref leak_handler.
+         /// \returns The previous \ref leak_handler. This is never \c nullptr.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         leak_handler set_leak_handler(leak_handler h);
+ 
+         /// Returns the \ref leak_handler.
+         /// \returns The current \ref leak_handler. This is never \c nullptr.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         leak_handler get_leak_handler();
+ 
+         /// The type of the handler called when an invalid pointer is passed to a deallocation function.
+@@ -69,19 +69,19 @@ namespace foonathan
+         /// It must not throw any exceptions since it might be called in the cleanup process.
+         /// \defaultbe On a hosted implementation it logs the information to \c stderr and calls \c std::abort().
+         /// On a freestanding implementation it only calls \c std::abort().
+-        /// \ingroup core
++        /// \ingroup memory_core
+         using invalid_pointer_handler = void (*)(const allocator_info& info, const void* ptr);
+ 
+         /// Exchanges the \ref invalid_pointer_handler.
+         /// \effects Sets \c h as the new \ref invalid_pointer_handler in an atomic operation.
+         /// A \c nullptr sets the default \ref invalid_pointer_handler.
+         /// \returns The previous \ref invalid_pointer_handler. This is never \c nullptr.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         invalid_pointer_handler set_invalid_pointer_handler(invalid_pointer_handler h);
+ 
+         /// Returns the \ref invalid_pointer_handler.
+         /// \returns The current \ref invalid_pointer_handler. This is never \c nullptr.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         invalid_pointer_handler get_invalid_pointer_handler();
+ 
+         /// The type of the handler called when a buffer under/overflow is detected.
+@@ -92,7 +92,7 @@ namespace foonathan
+         /// It must not throw any exceptions since it me be called in the cleanup process.
+         /// \defaultbe On a hosted implementation it logs the information to \c stderr and calls \c std::abort().
+         /// On a freestanding implementation it only calls \c std::abort().
+-        /// \ingroup core
++        /// \ingroup memory_core
+         using buffer_overflow_handler = void (*)(const void* memory, std::size_t size,
+                                                  const void* write_ptr);
+ 
+@@ -100,12 +100,12 @@ namespace foonathan
+         /// \effects Sets \c h as the new \ref buffer_overflow_handler in an atomic operation.
+         /// A \c nullptr sets the default \ref buffer_overflow_handler.
+         /// \returns The previous \ref buffer_overflow_handler. This is never \c nullptr.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         buffer_overflow_handler set_buffer_overflow_handler(buffer_overflow_handler h);
+ 
+         /// Returns the \ref buffer_overflow_handler.
+         /// \returns The current \ref buffer_overflow_handler. This is never \c nullptr.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         buffer_overflow_handler get_buffer_overflow_handler();
+     } // namespace memory
+ } // namespace foonathan
+diff --git a/include/foonathan/memory/default_allocator.hpp b/include/foonathan/memory/default_allocator.hpp
+index 29a2139439966d7b65c2bcb45b91c0a37a4b6cec..8466bc3a6ecac6cc1ef7c95cb78206b2e56dbf57 100644
+--- a/include/foonathan/memory/default_allocator.hpp
++++ b/include/foonathan/memory/default_allocator.hpp
+@@ -28,7 +28,7 @@ namespace foonathan
+         /// \requiredbe Its type can be changed via the CMake option \c FOONATHAN_MEMORY_DEFAULT_ALLCOATOR,
+         /// but it must be one of the following: \ref heap_allocator, \ref new_allocator, \ref malloc_allocator, \ref static_allocator, \ref virtual_memory_allocator.
+         /// \defaultbe The default is \ref heap_allocator.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         using default_allocator = FOONATHAN_IMPL_DEFINED(FOONATHAN_MEMORY_IMPL_DEFAULT_ALLOCATOR);
+     } // namespace memory
+ } // namespace foonathan
+diff --git a/include/foonathan/memory/deleter.hpp b/include/foonathan/memory/deleter.hpp
+index 6c9cf5fb96401f9bdea930fe4cfc1deae83db205..fe3ce220dc751ed86b2f4822693f4524f53d47d1 100644
+--- a/include/foonathan/memory/deleter.hpp
++++ b/include/foonathan/memory/deleter.hpp
+@@ -20,7 +20,7 @@ namespace foonathan
+         /// A deleter class that deallocates the memory through a specified \concept{concept_rawallocator,RawAllocator}.
+         ///
+         /// It deallocates memory for a specified type but does not call its destructors.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename Type, class RawAllocator>
+         class allocator_deallocator : FOONATHAN_EBO(allocator_reference<RawAllocator>)
+         {
+@@ -63,7 +63,7 @@ namespace foonathan
+ 
+         /// Specialization of \ref allocator_deallocator for array types.
+         /// Otherwise the same behavior.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename Type, class RawAllocator>
+         class allocator_deallocator<Type[], RawAllocator>
+         : FOONATHAN_EBO(allocator_reference<RawAllocator>)
+@@ -119,7 +119,7 @@ namespace foonathan
+         /// A deleter class that deallocates the memory of a derived type through a specified \concept{concept_rawallocator,RawAllocator}.
+         ///
+         /// It can only be created from a \ref allocator_deallocator and thus must only be used for smart pointers initialized by derived-to-base conversion of the pointer.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename BaseType, class RawAllocator>
+         class allocator_polymorphic_deallocator : FOONATHAN_EBO(allocator_reference<RawAllocator>)
+         {
+@@ -159,7 +159,7 @@ namespace foonathan
+ 
+         /// Similar to \ref allocator_deallocator but calls the destructors of the object.
+         /// Otherwise behaves the same.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename Type, class RawAllocator>
+         class allocator_deleter : FOONATHAN_EBO(allocator_reference<RawAllocator>)
+         {
+@@ -203,7 +203,7 @@ namespace foonathan
+ 
+         /// Specialization of \ref allocator_deleter for array types.
+         /// Otherwise the same behavior.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename Type, class RawAllocator>
+         class allocator_deleter<Type[], RawAllocator>
+         : FOONATHAN_EBO(allocator_reference<RawAllocator>)
+@@ -260,7 +260,7 @@ namespace foonathan
+         /// Similar to \ref allocator_polymorphic_deallocator but calls the destructors of the object.
+         /// Otherwise behaves the same.
+         /// \note It has a relatively high space overhead, so only use it if you have to.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename BaseType, class RawAllocator>
+         class allocator_polymorphic_deleter : FOONATHAN_EBO(allocator_reference<RawAllocator>)
+         {
+diff --git a/include/foonathan/memory/error.hpp b/include/foonathan/memory/error.hpp
+index d3152dc7aea8f2e1e48e652f1510fa02b10634f0..df6fa8ee4ee8f2576d5ee9c52e5677b3ac4cd59b 100644
+--- a/include/foonathan/memory/error.hpp
++++ b/include/foonathan/memory/error.hpp
+@@ -18,7 +18,7 @@ namespace foonathan
+     {
+         /// Contains information about an allocator.
+         /// It can be used for logging in the various handler functions.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         struct allocator_info
+         {
+             /// The name of the allocator.
+@@ -60,7 +60,7 @@ namespace foonathan
+         /// It is derived from \c std::bad_alloc.
+         /// This can happen if a low level allocation function like \c std::malloc() runs out of memory.
+         /// Throwing can be prohibited by the handler function.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         class out_of_memory : public std::bad_alloc
+         {
+         public:
+@@ -116,7 +116,7 @@ namespace foonathan
+         /// thrown when a low-level allocator with a fixed size runs out of memory.
+         /// For example, thrown by \ref fixed_block_allocator or \ref static_allocator.<br>
+         /// It is derived from \ref out_of_memory but does not provide its own handler.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         class out_of_fixed_memory : public out_of_memory
+         {
+         public:
+@@ -142,7 +142,7 @@ namespace foonathan
+         /// since it always depends on fence memory, alignment buffer and the like.
+         /// \note A user should only \c catch for \c bad_allocation_size, not the derived classes.
+         /// \note Most checks will only be done if \ref FOONATHAN_MEMORY_CHECK_ALLOCATION_SIZE is \c true.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         class bad_allocation_size : public std::bad_alloc
+         {
+         public:
+@@ -206,7 +206,7 @@ namespace foonathan
+         /// The exception class thrown when the node size exceeds the supported maximum,
+         /// i.e. it is bigger than \c max_node_size().
+         /// It is derived from \ref bad_allocation_size but does not override the handler.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         class bad_node_size : public bad_allocation_size
+         {
+         public:
+@@ -224,7 +224,7 @@ namespace foonathan
+         /// The exception class thrown when the array size exceeds the supported maximum,
+         /// i.e. it is bigger than \c max_array_size().
+         /// It is derived from \ref bad_allocation_size but does not override the handler.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         class bad_array_size : public bad_allocation_size
+         {
+         public:
+@@ -242,7 +242,7 @@ namespace foonathan
+         /// The exception class thrown when the alignment exceeds the supported maximum,
+         /// i.e. it is bigger than \c max_alignment().
+         /// It is derived from \ref bad_allocation_size but does not override the handler.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         class bad_alignment : public bad_allocation_size
+         {
+         public:
+diff --git a/include/foonathan/memory/fallback_allocator.hpp b/include/foonathan/memory/fallback_allocator.hpp
+index 7ae86eaa79b9f1d85002de767e27d9f75eee3343..b4157062d42060be4fe649fe1e84af5aec0567cf 100644
+--- a/include/foonathan/memory/fallback_allocator.hpp
++++ b/include/foonathan/memory/fallback_allocator.hpp
+@@ -21,7 +21,7 @@ namespace foonathan
+         /// it uses `Fallback`.
+         /// \requires `Default` must be a composable \concept{concept_rawallocator,RawAllocator},
+         /// `Fallback` must be a \concept{concept_rawallocator,RawAllocator}.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class Default, class Fallback>
+         class fallback_allocator
+         : FOONATHAN_EBO(detail::ebo_storage<0, typename allocator_traits<Default>::allocator_type>),
+diff --git a/include/foonathan/memory/heap_allocator.hpp b/include/foonathan/memory/heap_allocator.hpp
+index 87532c45c8f608042a7c7536eb4ff8d0e0ae6d08..ed8f2fb9af2d593fde141b3bdb8b17e8074f8c9c 100644
+--- a/include/foonathan/memory/heap_allocator.hpp
++++ b/include/foonathan/memory/heap_allocator.hpp
+@@ -28,7 +28,7 @@ namespace foonathan
+         /// It shall return a \c nullptr if no memory is available.
+         /// It must be thread safe.
+         /// \defaultbe On a hosted implementation this function uses OS specific facilities, \c std::malloc is used as fallback.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         void* heap_alloc(std::size_t size) noexcept;
+ 
+         /// Deallocates heap memory.
+@@ -39,7 +39,7 @@ namespace foonathan
+         /// The pointer will not be zero.
+         /// It must be thread safe.
+         /// \defaultbe On a hosted implementation this function uses OS specific facilities, \c std::free is used as fallback.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         void heap_dealloc(void* ptr, std::size_t size) noexcept;
+ 
+         namespace detail
+@@ -68,7 +68,7 @@ namespace foonathan
+         /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory from the heap.
+         /// It uses the two functions \ref heap_alloc and \ref heap_dealloc for the allocation,
+         /// which default to \c std::malloc and \c std::free.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         using heap_allocator =
+             FOONATHAN_IMPL_DEFINED(detail::lowlevel_allocator<detail::heap_allocator_impl>);
+ 
+diff --git a/include/foonathan/memory/iteration_allocator.hpp b/include/foonathan/memory/iteration_allocator.hpp
+index 37cb4cc3531ad70a024c30c0457273ff42d37e3d..fdfcfa0f80d9fe5b4ea6fbec06420697f20b77b4 100644
+--- a/include/foonathan/memory/iteration_allocator.hpp
++++ b/include/foonathan/memory/iteration_allocator.hpp
+@@ -32,7 +32,7 @@ namespace foonathan
+         /// effectively releasing all of its memory.
+         /// Any memory allocated will thus be usable for `N` iterations of the loop.
+         /// This type of allocator is a generalization of the double frame allocator.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <std::size_t N, class BlockOrRawAllocator = default_allocator>
+         class iteration_allocator
+         : FOONATHAN_EBO(detail::iteration_block_allocator<BlockOrRawAllocator>)
+@@ -187,7 +187,7 @@ namespace foonathan
+         };
+ 
+         /// An alias for \ref iteration_allocator for two iterations.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <class BlockOrRawAllocator = default_allocator>
+         FOONATHAN_ALIAS_TEMPLATE(double_frame_allocator,
+                                  iteration_allocator<2, BlockOrRawAllocator>);
+@@ -199,7 +199,7 @@ namespace foonathan
+         /// Specialization of the \ref allocator_traits for \ref iteration_allocator.
+         /// \note It is not allowed to mix calls through the specialization and through the member functions,
+         /// i.e. \ref memory_stack::allocate() and this \c allocate_node().
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <std::size_t N, class BlockAllocator>
+         class allocator_traits<iteration_allocator<N, BlockAllocator>>
+         {
+@@ -256,7 +256,7 @@ namespace foonathan
+         };
+ 
+         /// Specialization of the \ref composable_allocator_traits for \ref iteration_allocator classes.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <std::size_t N, class BlockAllocator>
+         class composable_allocator_traits<iteration_allocator<N, BlockAllocator>>
+         {
+diff --git a/include/foonathan/memory/joint_allocator.hpp b/include/foonathan/memory/joint_allocator.hpp
+index 377bc81c20c532ff268360284672a4103594ed29..894ac381e82950637783ebe9f7100a95d3240da3 100644
+--- a/include/foonathan/memory/joint_allocator.hpp
++++ b/include/foonathan/memory/joint_allocator.hpp
+@@ -97,7 +97,7 @@ namespace foonathan
+         /// Tag type that can't be created.
+         ///
+         /// It isued by \ref joint_ptr.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         class joint
+         {
+             joint(std::size_t cap) noexcept : capacity(cap) {}
+@@ -113,7 +113,7 @@ namespace foonathan
+         /// Tag type to make the joint size more explicit.
+         ///
+         /// It is used by \ref joint_ptr.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         struct joint_size
+         {
+             std::size_t size;
+@@ -125,7 +125,7 @@ namespace foonathan
+         ///
+         /// This will disable default copy/move operations
+         /// and inserts additional members for the joint memory management.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <typename T>
+         class joint_type
+         {
+@@ -207,7 +207,7 @@ namespace foonathan
+         ///
+         /// The memory block will be managed by the given \concept{concept_rawallocator,RawAllocator},
+         /// it is stored in an \ref allocator_reference and not owned by the pointer directly.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <typename T, class RawAllocator>
+         class joint_ptr : FOONATHAN_EBO(allocator_reference<RawAllocator>)
+         {
+@@ -450,7 +450,7 @@ namespace foonathan
+         /// @{
+         /// \returns A new \ref joint_ptr as if created with the same arguments passed to the constructor.
+         /// \relatesalso joint_ptr
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <typename T, class RawAllocator, typename... Args>
+         auto allocate_joint(RawAllocator& alloc, joint_size additional_size, Args&&... args)
+             -> joint_ptr<T, RawAllocator>
+@@ -471,7 +471,7 @@ namespace foonathan
+         /// @{
+         /// \returns A new \ref joint_ptr that points to a copy of `joint`.
+         /// It will allocate as much memory as needed and forward to the copy constructor.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <class RawAllocator, typename T>
+         auto clone_joint(RawAllocator& alloc, const joint_type<T>& joint)
+             -> joint_ptr<T, RawAllocator>
+@@ -498,7 +498,7 @@ namespace foonathan
+         /// It is somewhat limited and allows only allocation once.
+         /// All joint allocators for an object share the joint memory and must not be used in multiple threads.
+         /// The memory it returns is owned by a \ref joint_ptr and will be destroyed through it.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         class joint_allocator
+         {
+         public:
+@@ -567,7 +567,7 @@ namespace foonathan
+ 
+         /// Specialization of \ref is_shared_allocator to mark \ref joint_allocator as shared.
+         /// This allows using it as \ref allocator_reference directly.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <>
+         struct is_shared_allocator<joint_allocator> : std::true_type
+         {
+@@ -594,7 +594,7 @@ namespace foonathan
+         /// \note This is required because the container constructor will end up copying/moving the allocator.
+         /// But this is not allowed as you need the allocator with the correct joined memory.
+         /// Copying can be customized (i.e. forbidden), but sadly not move, so keep that in mind.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <>
+         struct propagation_traits<joint_allocator>
+         {
+@@ -624,7 +624,7 @@ namespace foonathan
+         ///
+         /// It has a dynamic, but fixed size,
+         /// it cannot grow after it has been created.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <typename T>
+         class joint_array
+         {
+diff --git a/include/foonathan/memory/malloc_allocator.hpp b/include/foonathan/memory/malloc_allocator.hpp
+index ef8a1b03fe5f767298024aa680722648caa48b82..cc3700cfe2f2339aca2808a745ae1d02b3f11ffb 100644
+--- a/include/foonathan/memory/malloc_allocator.hpp
++++ b/include/foonathan/memory/malloc_allocator.hpp
+@@ -56,7 +56,7 @@ namespace foonathan
+ 
+         /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory using <tt>std::malloc()</tt>.
+         /// It throws \ref out_of_memory when the allocation fails.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         using malloc_allocator =
+             FOONATHAN_IMPL_DEFINED(detail::lowlevel_allocator<detail::malloc_allocator_impl>);
+ 
+diff --git a/include/foonathan/memory/memory_arena.hpp b/include/foonathan/memory/memory_arena.hpp
+index 4c277d816abd550d165e5df40161e313e543fd36..645796bece4f81fd7c84c6c039b1ee619499daff 100644
+--- a/include/foonathan/memory/memory_arena.hpp
++++ b/include/foonathan/memory/memory_arena.hpp
+@@ -23,7 +23,7 @@ namespace foonathan
+     {
+         /// A memory block.
+         /// It is defined by its starting address and size.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         struct memory_block
+         {
+             void*       memory; ///< The address of the memory block (might be \c nullptr).
+@@ -67,7 +67,7 @@ namespace foonathan
+         } // namespace detail
+ 
+         /// Traits that check whether a type models concept \concept{concept_blockallocator,BlockAllocator}.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <typename T>
+         struct is_block_allocator : decltype(detail::is_block_allocator_impl<T>(0))
+         {
+@@ -85,7 +85,7 @@ namespace foonathan
+         /// This can be useful, e.g. if there will never be blocks available for deallocation.
+         /// The (tiny) overhead for the cache can then be disabled.
+         /// An example is \ref memory_pool.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         constexpr bool cached_arena   = true;
+         constexpr bool uncached_arena = false;
+         /// @}
+@@ -271,7 +271,7 @@ namespace foonathan
+         /// This can be disabled with the second template parameter,
+         /// passing it \ref uncached_arena (or \c false) disables it,
+         /// \ref cached_arena (or \c true) enables it explicitly.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <class BlockAllocator, bool Cached /* = true */>
+         class memory_arena : FOONATHAN_EBO(BlockAllocator),
+                              FOONATHAN_EBO(detail::memory_arena_cache<Cached>)
+@@ -443,7 +443,7 @@ namespace foonathan
+         /// The size of the next memory block will grow by a given factor after each allocation,
+         /// allowing an amortized constant allocation time in the higher level allocator.
+         /// The factor can be given as rational in the template parameter, default is \c 2.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class RawAllocator = default_allocator, unsigned Num = 2, unsigned Den = 1>
+         class growing_block_allocator
+         : FOONATHAN_EBO(allocator_traits<RawAllocator>::allocator_type)
+@@ -522,7 +522,7 @@ namespace foonathan
+         /// A \concept{concept_blockallocator,BlockAllocator} that allows only one block allocation.
+         /// It can be used to prevent higher-level allocators from expanding.
+         /// The one block allocation is performed through the \c allocate_array() function of the given \concept{concept_rawallocator,RawAllocator}.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class RawAllocator = default_allocator>
+         class fixed_block_allocator : FOONATHAN_EBO(allocator_traits<RawAllocator>::allocator_type)
+         {
+@@ -616,7 +616,7 @@ namespace foonathan
+         /// Takes either a \concept{concept_blockallocator,BlockAllocator} or a \concept{concept_rawallocator,RawAllocator}.
+         /// In the first case simply aliases the type unchanged, in the second to \ref growing_block_allocator (or the template in `BlockAllocator`) with the \concept{concept_rawallocator,RawAllocator}.
+         /// Using this allows passing normal \concept{concept_rawallocator,RawAllocators} as \concept{concept_blockallocator,BlockAllocators}.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <class BlockOrRawAllocator,
+                   template <typename...> class BlockAllocator = detail::default_block_wrapper>
+         using make_block_allocator_t = FOONATHAN_IMPL_DEFINED(
+@@ -628,7 +628,7 @@ namespace foonathan
+         /// Helper function make a \concept{concept_blockallocator,BlockAllocator}.
+         /// \returns A \concept{concept_blockallocator,BlockAllocator} of the given type created with the given arguments.
+         /// \requires Same requirements as the constructor.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <class BlockOrRawAllocator, typename... Args>
+         make_block_allocator_t<BlockOrRawAllocator> make_block_allocator(std::size_t block_size,
+                                                                          Args&&... args)
+@@ -654,7 +654,7 @@ namespace foonathan
+         {
+             /// Syntax sugar to express sizes with unit prefixes.
+             /// \returns The number of bytes `value` is in the given unit.
+-            /// \ingroup core
++            /// \ingroup memory_core
+             /// @{
+             constexpr std::size_t operator"" _KiB(unsigned long long value) noexcept
+             {
+diff --git a/include/foonathan/memory/memory_pool.hpp b/include/foonathan/memory/memory_pool.hpp
+index d764365b22a498cfad37522e63c84b02f639800a..7e833a6e55ee3fb4315b693303a9252a494426f1 100644
+--- a/include/foonathan/memory/memory_pool.hpp
++++ b/include/foonathan/memory/memory_pool.hpp
+@@ -42,7 +42,7 @@ namespace foonathan
+         /// for example in a node based container like \c std::list.
+         /// It is not so good for different allocation sizes and has some drawbacks for arrays
+         /// as described in \ref memory_pool_type.hpp.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <typename PoolType = node_pool, class BlockOrRawAllocator = default_allocator>
+         class memory_pool
+         : FOONATHAN_EBO(detail::default_leak_checker<detail::memory_pool_leak_handler>)
+@@ -280,7 +280,7 @@ namespace foonathan
+         /// Specialization of the \ref allocator_traits for \ref memory_pool classes.
+         /// \note It is not allowed to mix calls through the specialization and through the member functions,
+         /// i.e. \ref memory_pool::allocate_node() and this \c allocate_node().
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <typename PoolType, class ImplRawAllocator>
+         class allocator_traits<memory_pool<PoolType, ImplRawAllocator>>
+         {
+@@ -360,7 +360,7 @@ namespace foonathan
+         };
+ 
+         /// Specialization of the \ref composable_allocator_traits for \ref memory_pool classes.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <typename PoolType, class BlockOrRawAllocator>
+         class composable_allocator_traits<memory_pool<PoolType, BlockOrRawAllocator>>
+         {
+diff --git a/include/foonathan/memory/memory_pool_collection.hpp b/include/foonathan/memory/memory_pool_collection.hpp
+index e6952e9d8b5a10ff9ecc1d01ddf322683acefe25..5467efe6c865a49563aa877d417641e6b1c840e9 100644
+--- a/include/foonathan/memory/memory_pool_collection.hpp
++++ b/include/foonathan/memory/memory_pool_collection.hpp
+@@ -34,7 +34,7 @@ namespace foonathan
+         /// A \c BucketDistribution for \ref memory_pool_collection defining that there is a bucket, i.e. pool, for each size.
+         /// That means that for each possible size up to an upper bound there will be a seperate free list.
+         /// Allocating a node will not waste any memory.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         struct identity_buckets
+         {
+             using type = detail::identity_access_policy;
+@@ -43,7 +43,7 @@ namespace foonathan
+         /// A \c BucketDistribution for \ref memory_pool_collection defining that there is a bucket, i.e. pool, for each power of two.
+         /// That means for each power of two up to an upper bound there will be a separate free list.
+         /// Allocating a node will only waste half of the memory.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         struct log2_buckets
+         {
+             using type = detail::log2_access_policy;
+@@ -55,7 +55,7 @@ namespace foonathan
+         /// Allocating a node of given size will use the appropriate free list.<br>
+         /// This allocator is ideal for \concept{concept_node,node} allocations in any order but with a predefined set of sizes,
+         /// not only one size like \ref memory_pool.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <class PoolType, class BucketDistribution,
+                   class BlockOrRawAllocator = default_allocator>
+         class memory_pool_collection
+@@ -398,7 +398,7 @@ namespace foonathan
+ 
+         /// An alias for \ref memory_pool_collection using the \ref identity_buckets policy
+         /// and a \c PoolType defaulting to \ref node_pool.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <class PoolType = node_pool, class ImplAllocator = default_allocator>
+         FOONATHAN_ALIAS_TEMPLATE(bucket_allocator,
+                                  memory_pool_collection<PoolType, identity_buckets, ImplAllocator>);
+@@ -409,7 +409,7 @@ namespace foonathan
+         /// Specialization of the \ref allocator_traits for \ref memory_pool_collection classes.
+         /// \note It is not allowed to mix calls through the specialization and through the member functions,
+         /// i.e. \ref memory_pool_collection::allocate_node() and this \c allocate_node().
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <class Pool, class BucketDist, class RawAllocator>
+         class allocator_traits<memory_pool_collection<Pool, BucketDist, RawAllocator>>
+         {
+@@ -484,7 +484,7 @@ namespace foonathan
+         };
+ 
+         /// Specialization of the \ref composable_allocator_traits for \ref memory_pool_collection classes.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <class Pool, class BucketDist, class RawAllocator>
+         class composable_allocator_traits<memory_pool_collection<Pool, BucketDist, RawAllocator>>
+         {
+diff --git a/include/foonathan/memory/memory_pool_type.hpp b/include/foonathan/memory/memory_pool_type.hpp
+index 714edea4104810189752efb5fe42f08422ee4f06..990c8ac2f7b8bb6f57cc532e3c65a9fd547f6cd9 100644
+--- a/include/foonathan/memory/memory_pool_type.hpp
++++ b/include/foonathan/memory/memory_pool_type.hpp
+@@ -20,7 +20,7 @@ namespace foonathan
+         /// Tag type defining a memory pool optimized for nodes.
+         /// It does not support array allocations that great and may trigger a growth even if there is enough memory.
+         /// But it is the fastest pool type.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         struct node_pool : FOONATHAN_EBO(std::true_type)
+         {
+             using type = detail::node_free_memory_list;
+@@ -31,7 +31,7 @@ namespace foonathan
+         /// Array allocations are still pretty slow, if the array gets big enough it can get slower than \c new.
+         /// Node allocations are still fast, unless there is deallocation in random order.
+         /// \note Use this tag type only if you really need to have a memory pool!
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         struct array_pool : FOONATHAN_EBO(std::true_type)
+         {
+             using type = detail::array_free_memory_list;
+@@ -41,7 +41,7 @@ namespace foonathan
+         /// The free list is intrusive and thus requires that each node has at least the size of a pointer.
+         /// This tag type does not have this requirement and thus allows zero-memory-overhead allocations of small nodes.
+         /// It is a little bit slower than \ref node_pool and does not support arrays.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         struct small_node_pool : FOONATHAN_EBO(std::false_type)
+         {
+             using type = detail::small_free_memory_list;
+diff --git a/include/foonathan/memory/memory_resource_adapter.hpp b/include/foonathan/memory/memory_resource_adapter.hpp
+index 7ff48f16f71068435ea52b385f27af3a76976343..cf58eed1f0134c5236ae20be4f095bb31244a4a1 100644
+--- a/include/foonathan/memory/memory_resource_adapter.hpp
++++ b/include/foonathan/memory/memory_resource_adapter.hpp
+@@ -87,11 +87,11 @@ namespace foonathan
+     namespace memory
+     {
+         /// The \c memory_resource abstract base class used in the implementation.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         FOONATHAN_ALIAS_TEMPLATE(memory_resource, foonathan_memory_pmr::memory_resource);
+ 
+         /// Wraps a \concept{concept_rawallocator,RawAllocator} and makes it a \ref memory_resource.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class RawAllocator>
+         class memory_resource_adapter
+         : public memory_resource,
+@@ -163,7 +163,7 @@ namespace foonathan
+         };
+ 
+         /// Wraps a \ref memory_resource and makes it a \concept{concept_rawallocator,RawAllocator}.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         class memory_resource_allocator
+         {
+         public:
+@@ -227,7 +227,7 @@ namespace foonathan
+ 
+         /// Specialization of \ref is_shared_allocator to mark \ref memory_resource_allocator as shared.
+         /// This allows using it as \ref allocator_reference directly.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <>
+         struct is_shared_allocator<memory_resource_allocator> : std::true_type
+         {
+diff --git a/include/foonathan/memory/memory_stack.hpp b/include/foonathan/memory/memory_stack.hpp
+index b3dcd0f2ec40be759c93be2c58942ae6a8da639b..dc9f1226ab504546e06d471ac48bee4a1b50fcda 100644
+--- a/include/foonathan/memory/memory_stack.hpp
++++ b/include/foonathan/memory/memory_stack.hpp
+@@ -97,7 +97,7 @@ namespace foonathan
+         /// and saves a marker to the current top.
+         /// Allocation simply moves this marker by the appropriate number of bytes and returns the pointer at the old marker position,
+         /// deallocation is not directly supported, only setting the marker to a previously queried position.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <class BlockOrRawAllocator = default_allocator>
+         class memory_stack
+         : FOONATHAN_EBO(detail::default_leak_checker<detail::memory_stack_leak_handler>)
+@@ -276,7 +276,7 @@ namespace foonathan
+         /// A `Stack` is anything that provides a `marker`, a `top()` function returning a `marker`
+         /// and an `unwind()` function to unwind to a `marker`,
+         /// like a \ref foonathan::memory::memory_stack
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <class Stack = memory_stack<>>
+         class memory_stack_raii_unwind
+         {
+@@ -379,7 +379,7 @@ namespace foonathan
+         /// Specialization of the \ref allocator_traits for \ref memory_stack classes.
+         /// \note It is not allowed to mix calls through the specialization and through the member functions,
+         /// i.e. \ref memory_stack::allocate() and this \c allocate_node().
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <class BlockAllocator>
+         class allocator_traits<memory_stack<BlockAllocator>>
+         {
+@@ -441,7 +441,7 @@ namespace foonathan
+         };
+ 
+         /// Specialization of the \ref composable_allocator_traits for \ref memory_stack classes.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <class BlockAllocator>
+         class composable_allocator_traits<memory_stack<BlockAllocator>>
+         {
+diff --git a/include/foonathan/memory/namespace_alias.hpp b/include/foonathan/memory/namespace_alias.hpp
+index a3e0354a7532e9c1d74c6c9dff27485d30b8d525..9a688f550d736aa8328e27c970e9018ec0869c5f 100644
+--- a/include/foonathan/memory/namespace_alias.hpp
++++ b/include/foonathan/memory/namespace_alias.hpp
+@@ -7,13 +7,18 @@
+ /// \file
+ /// Convenient namespace alias.
+ 
+-/// \defgroup core Core components
++/// \defgroup memory Memory Allocator Library
++/// @{
+ 
+-/// \defgroup allocator Allocator implementations
++/// \defgroup memory_core Core components
+ 
+-/// \defgroup adapter Adapters and Wrappers
++/// \defgroup memory_allocator Allocator implementations
+ 
+-/// \defgroup storage Allocator storage
++/// \defgroup memory_adapter Adapters and Wrappers
++
++/// \defgroup memory_storage Allocator storage
++
++/// @}
+ 
+ /// \namespace foonathan
+ /// Foonathan namespace.
+@@ -32,5 +37,5 @@ namespace foonathan
+ } // namespace foonathan
+ 
+ namespace memory = foonathan::memory;
+-
++///@}
+ #endif // FOONATHAN_MEMORY_NAMESPACE_ALIAS_HPP_INCLUDED
+diff --git a/include/foonathan/memory/new_allocator.hpp b/include/foonathan/memory/new_allocator.hpp
+index 61fb5dbceff04639a8092519f0af5ec40ea2032d..5d11038ae6fce0379c7aeddd470ea1ad4744f5b7 100644
+--- a/include/foonathan/memory/new_allocator.hpp
++++ b/include/foonathan/memory/new_allocator.hpp
+@@ -40,7 +40,7 @@ namespace foonathan
+         /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory using (nothrow) <tt>operator new</tt>.
+         /// If the operator returns \c nullptr, it behaves like \c new and loops calling \c std::new_handler,
+         /// but instead of throwing a \c std::bad_alloc exception, it throws \ref out_of_memory.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         using new_allocator =
+             FOONATHAN_IMPL_DEFINED(detail::lowlevel_allocator<detail::new_allocator_impl>);
+ 
+diff --git a/include/foonathan/memory/segregator.hpp b/include/foonathan/memory/segregator.hpp
+index 80e066bf0a6178e2404ebd65332dde01a3606fab..75dad5ebbb795b91b919c2e3ac72de396a77c88e 100644
+--- a/include/foonathan/memory/segregator.hpp
++++ b/include/foonathan/memory/segregator.hpp
+@@ -18,7 +18,7 @@ namespace foonathan
+     namespace memory
+     {
+         /// A \concept{concept_segregatable,Segregatable} that allocates until a maximum size.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class RawAllocator>
+         class threshold_segregatable : FOONATHAN_EBO(allocator_traits<RawAllocator>::allocator_type)
+         {
+@@ -78,7 +78,7 @@ namespace foonathan
+ 
+         /// A composable \concept{concept_rawallocator,RawAllocator} that will always fail.
+         /// This is useful for compositioning or as last resort in \ref binary_segregator.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         class null_allocator
+         {
+         public:
+@@ -119,7 +119,7 @@ namespace foonathan
+         /// A \concept{concept_rawallocator,RawAllocator} that either uses the \concept{concept_segregatable,Segregatable} or the other `RawAllocator`.
+         /// It is a faster alternative to \ref fallback_allocator that doesn't require a composable allocator
+         /// and decides about the allocator to use purely with the `Segregatable` based on size and alignment.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class Segregatable, class RawAllocator>
+         class binary_segregator
+         : FOONATHAN_EBO(
+@@ -375,7 +375,7 @@ namespace foonathan
+         /// the result is `binary_segregator<Head, segregator<Tail...>>`.
+         /// \note It will result in an allocator that tries each `Segregatable` in the order specified
+         /// using the last parameter as final fallback.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class... Allocators>
+         FOONATHAN_ALIAS_TEMPLATE(segregator,
+                                  typename detail::make_segregator_t<Allocators...>::type);
+diff --git a/include/foonathan/memory/smart_ptr.hpp b/include/foonathan/memory/smart_ptr.hpp
+index 9964495583e9f024b5242d08bb03f06ddae96a3d..f8508a404e9476b449b7ed5853b0dcdd65630e2f 100644
+--- a/include/foonathan/memory/smart_ptr.hpp
++++ b/include/foonathan/memory/smart_ptr.hpp
+@@ -88,7 +88,7 @@ namespace foonathan
+         /// A \c std::unique_ptr that deletes using a \concept{concept_rawallocator,RawAllocator}.
+         ///
+         /// It is an alias template using \ref allocator_deleter as \c Deleter class.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename T, class RawAllocator>
+         FOONATHAN_ALIAS_TEMPLATE(unique_ptr,
+                                  std::unique_ptr<T, allocator_deleter<T, RawAllocator>>);
+@@ -99,7 +99,7 @@ namespace foonathan
+         /// and is meant to be used inside containers.
+         /// It is an alias template using \ref allocator_polymorphic_deleter as \c Deleter class.
+         /// \note It has a relatively high overhead, so only use it if you have to.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class BaseType, class RawAllocator>
+         FOONATHAN_ALIAS_TEMPLATE(
+             unique_base_ptr,
+@@ -111,7 +111,7 @@ namespace foonathan
+         /// \returns A \c std::unique_ptr owning that memory.
+         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the deleter,
+         /// the caller has to ensure that the object lives as long as the smart pointer.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename T, class RawAllocator, typename... Args>
+         auto allocate_unique(RawAllocator&& alloc, Args&&... args) -> FOONATHAN_REQUIRES_RET(
+             !std::is_array<T>::value,
+@@ -129,7 +129,7 @@ namespace foonathan
+         /// \returns A \c std::unique_ptr with a type-erased allocator reference owning that memory.
+         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the deleter,
+         /// the caller has to ensure that the object lives as long as the smart pointer.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename T, class RawAllocator, typename... Args>
+         auto allocate_unique(any_allocator, RawAllocator&& alloc, Args&&... args)
+             -> FOONATHAN_REQUIRES_RET(!std::is_array<T>::value,
+@@ -146,7 +146,7 @@ namespace foonathan
+         /// \returns A \c std::unique_ptr owning that array.
+         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the deleter,
+         /// the caller has to ensure that the object lives as long as the smart pointer.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename T, class RawAllocator>
+         auto allocate_unique(RawAllocator&& alloc, std::size_t size) -> FOONATHAN_REQUIRES_RET(
+             std::is_array<T>::value,
+@@ -164,7 +164,7 @@ namespace foonathan
+         /// \returns A \c std::unique_ptr with a type-erased allocator reference owning that array.
+         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the deleter,
+         /// the caller has to ensure that the object lives as long as the smart pointer.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename T, class RawAllocator>
+         auto allocate_unique(any_allocator, RawAllocator&& alloc, std::size_t size)
+             -> FOONATHAN_REQUIRES_RET(std::is_array<T>::value,
+@@ -183,7 +183,7 @@ namespace foonathan
+         /// \returns A \c std::shared_ptr created using \c std::allocate_shared.
+         /// \note If the allocator is stateful a reference to the \c RawAllocator will be stored inside the shared pointer,
+         /// the caller has to ensure that the object lives as long as the smart pointer.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename T, class RawAllocator, typename... Args>
+         std::shared_ptr<T> allocate_shared(RawAllocator&& alloc, Args&&... args)
+         {
+diff --git a/include/foonathan/memory/static_allocator.hpp b/include/foonathan/memory/static_allocator.hpp
+index 17552b439a560cb576787c94fb7ae0593a2fedd4..580fa2be8f5b1a291d1864558cb75328c4baff3f 100644
+--- a/include/foonathan/memory/static_allocator.hpp
++++ b/include/foonathan/memory/static_allocator.hpp
+@@ -27,7 +27,7 @@ namespace foonathan
+         /// Its constructor will take a reference to it and use it for its allocation.
+         /// The storage type is simply a \c char array aligned for maximum alignment.
+         /// \note It is not allowed to access the memory of the storage.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <std::size_t Size>
+         struct static_allocator_storage
+         {
+@@ -43,7 +43,7 @@ namespace foonathan
+         /// It works on a \ref static_allocator_storage and uses its memory for all allocations.
+         /// Deallocations are not supported, memory cannot be marked as freed.<br>
+         /// \note It is not allowed to share an \ref static_allocator_storage between multiple \ref static_allocator objects.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         class static_allocator
+         {
+         public:
+@@ -100,7 +100,7 @@ namespace foonathan
+         /// It works on a \ref static_allocator_storage and uses it for all allocations,
+         /// deallocations are only allowed in reversed order which is guaranteed by \ref memory_arena.
+         /// \note It is not allowed to share an \ref static_allocator_storage between multiple \ref static_allocator objects.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         class static_block_allocator
+         {
+         public:
+diff --git a/include/foonathan/memory/std_allocator.hpp b/include/foonathan/memory/std_allocator.hpp
+index e865915b133b1cb046d484471990c49b7bb2babe..33b2f5489b290f9cf3d3ad710373e2f982928f12 100644
+--- a/include/foonathan/memory/std_allocator.hpp
++++ b/include/foonathan/memory/std_allocator.hpp
+@@ -44,7 +44,7 @@ namespace foonathan
+         } // namespace traits_detail
+ 
+         /// Controls the propagation of a \ref std_allocator for a certain \concept{concept_rawallocator,RawAllocator}.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class RawAllocator>
+         struct propagation_traits
+         {
+@@ -69,7 +69,7 @@ namespace foonathan
+ 
+         /// Wraps a \concept{concept_rawallocator,RawAllocator} and makes it a "normal" \c Allocator.
+         /// It allows using a \c RawAllocator anywhere a \c Allocator is required.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename T, class RawAllocator>
+         class std_allocator :
+ #if defined _MSC_VER && defined __clang__
+@@ -344,7 +344,7 @@ namespace foonathan
+         /// An alias template for \ref std_allocator using a type-erased \concept{concept_rawallocator,RawAllocator}.
+         /// This is the same as using a \ref std_allocator with the tag type \ref any_allocator.
+         /// The implementation is optimized to call fewer virtual functions.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <typename T>
+         FOONATHAN_ALIAS_TEMPLATE(any_std_allocator, std_allocator<T, any_allocator>);
+ 
+diff --git a/include/foonathan/memory/temporary_allocator.hpp b/include/foonathan/memory/temporary_allocator.hpp
+index 3b6269d7ff139a073aa5dc7cb7d27360a567871b..135d250bc15ee074a22b3c210b541dcff98e6d83 100644
+--- a/include/foonathan/memory/temporary_allocator.hpp
++++ b/include/foonathan/memory/temporary_allocator.hpp
+@@ -91,7 +91,7 @@ namespace foonathan
+ 
+         /// A wrapper around the \ref memory_stack that is used by the \ref temporary_allocator.
+         /// There should be at least one per-thread.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         class temporary_stack : FOONATHAN_EBO(detail::temporary_stack_list_node)
+         {
+         public:
+@@ -215,7 +215,7 @@ namespace foonathan
+         /// This avoids the stack overflow error and is portable,
+         /// with a similar speed.
+         /// All allocations done in the scope of the allocator object are automatically freed when the object is destroyed.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         class temporary_allocator
+         {
+         public:
+@@ -267,7 +267,7 @@ namespace foonathan
+         /// Specialization of the \ref allocator_traits for \ref temporary_allocator classes.
+         /// \note It is not allowed to mix calls through the specialization and through the member functions,
+         /// i.e. \ref temporary_allocator::allocate() and this \c allocate_node().
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         template <>
+         class allocator_traits<temporary_allocator>
+         {
+diff --git a/include/foonathan/memory/threading.hpp b/include/foonathan/memory/threading.hpp
+index 4cf507c45296a0d60847c285865473024633b0d0..52b3998b2c7b7ee5c4b0def5857ddaf6f65e8435 100644
+--- a/include/foonathan/memory/threading.hpp
++++ b/include/foonathan/memory/threading.hpp
+@@ -22,7 +22,7 @@ namespace foonathan
+     {
+         /// A dummy \c Mutex class that does not lock anything.
+         /// It is a valid \c Mutex and can be used to disable locking anywhere a \c Mutex is requested.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         struct no_mutex
+         {
+             void lock() noexcept {}
+@@ -39,7 +39,7 @@ namespace foonathan
+         /// This allows to use \ref no_mutex as an optimization.
+         /// Note that stateless allocators are implictly thread-safe.
+         /// Specialize it only for your own stateful allocators.
+-        /// \ingroup core
++        /// \ingroup memory_core
+         template <class RawAllocator>
+         struct is_thread_safe_allocator
+         : std::integral_constant<bool, !allocator_traits<RawAllocator>::is_stateful::value>
+diff --git a/include/foonathan/memory/tracking.hpp b/include/foonathan/memory/tracking.hpp
+index 57fb0d1cb477d8a188a5681b59710436dc34f541..222e6105bf35d884fa4e472f077ebf58a721894a 100644
+--- a/include/foonathan/memory/tracking.hpp
++++ b/include/foonathan/memory/tracking.hpp
+@@ -74,7 +74,7 @@ namespace foonathan
+         /// The class can then be used anywhere a \concept{concept_blockallocator,BlockAllocator} is required and the memory usage will be tracked.<br>
+         /// It will only call the <tt>on_allocator_growth()</tt> and <tt>on_allocator_shrinking()</tt> tracking functions,
+         /// since a \concept{concept_blockallocator,BlockAllocator} is normally used inside higher allocators only.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class Tracker, class BlockOrRawAllocator>
+         class tracked_block_allocator
+         : FOONATHAN_EBO(Tracker, make_block_allocator_t<BlockOrRawAllocator>)
+@@ -154,7 +154,7 @@ namespace foonathan
+         /// Similar to \ref tracked_block_allocator, but shares the tracker with the higher level allocator.
+         /// This allows tracking both (de-)allocations and growth with one tracker.
+         /// \note Due to implementation reasons, it cannot track growth and shrinking in the constructor/destructor of the higher level allocator.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class Tracker, class BlockOrRawAllocator>
+         using deeply_tracked_block_allocator = FOONATHAN_IMPL_DEFINED(
+             detail::deeply_tracked_block_allocator<Tracker,
+@@ -165,7 +165,7 @@ namespace foonathan
+         /// The class can then be used anywhere a \concept{concept_rawallocator,RawAllocator} is required and the memory usage will be tracked.<br>
+         /// If the \concept{concept_rawallocator,RawAllocator} uses \ref deeply_tracked_block_allocator as \concept{concept_blockallocator,BlockAllocator},
+         /// it will also track growth and shrinking of the allocator.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class Tracker, class RawAllocator>
+         class tracked_allocator
+         : FOONATHAN_EBO(Tracker, allocator_traits<RawAllocator>::allocator_type)
+@@ -406,7 +406,7 @@ namespace foonathan
+         /// A \ref tracked_allocator that has rebound any \concept{concept_blockallocator,BlockAllocator} to the corresponding \ref deeply_tracked_block_allocator.
+         /// This makes it a deeply tracked allocator.<br>
+         /// It replaces each template argument of the given \concept{concept_rawallocator,RawAllocator} for which \ref is_block_allocator or \ref is_raw_allocator is \c true with a \ref deeply_tracked_block_allocator.
+-        /// \ingroup adapter
++        /// \ingroup memory_adapter
+         template <class Tracker, class RawAllocator>
+         FOONATHAN_ALIAS_TEMPLATE(
+             deeply_tracked_allocator,
+diff --git a/include/foonathan/memory/virtual_memory.hpp b/include/foonathan/memory/virtual_memory.hpp
+index 68705e9738a166da04c159a3a8f04e7ce33d94ad..35f7ccd54fdda08c504696b0719d16ec27d6c9e9 100644
+--- a/include/foonathan/memory/virtual_memory.hpp
++++ b/include/foonathan/memory/virtual_memory.hpp
+@@ -36,14 +36,14 @@ namespace foonathan
+         /// The page size of the virtual memory.
+         /// All virtual memory allocations must be multiple of this size.
+         /// It is usually 4KiB.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         /// \deprecated use \ref get_virtual_memory_page_size instead.
+         extern const std::size_t virtual_memory_page_size;
+ 
+         /// \returns the page size of the virtual memory.
+         /// All virtual memory allocations must be multiple of this size.
+         /// It is usually 4KiB.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         std::size_t get_virtual_memory_page_size() noexcept;
+ 
+         /// Reserves virtual memory.
+@@ -52,33 +52,33 @@ namespace foonathan
+         /// \returns The address of the first reserved page,
+         /// or \c nullptr in case of error.
+         /// \note The memory may not be used, it must first be commited.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         void* virtual_memory_reserve(std::size_t no_pages) noexcept;
+ 
+         /// Releases reserved virtual memory.
+         /// \effects Returns previously reserved pages to the system.
+         /// \requires \c pages must come from a previous call to \ref virtual_memory_reserve with the same \c calc_no_pages,
+         /// it must not be \c nullptr.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         void virtual_memory_release(void* pages, std::size_t no_pages) noexcept;
+ 
+         /// Commits reserved virtual memory.
+         /// \effects Marks \c calc_no_pages pages starting at the given address available for use.
+         /// \returns The beginning of the committed area, i.e. \c memory, or \c nullptr in case of error.
+         /// \requires The memory must be previously reserved.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         void* virtual_memory_commit(void* memory, std::size_t no_pages) noexcept;
+ 
+         /// Decommits commited virtual memory.
+         /// \effects Puts commited memory back in the reserved state.
+         /// \requires \c memory must come from a previous call to \ref virtual_memory_commit with the same \c calc_no_pages
+         /// it must not be \c nullptr.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         void virtual_memory_decommit(void* memory, std::size_t no_pages) noexcept;
+ 
+         /// A stateless \concept{concept_rawallocator,RawAllocator} that allocates memory using the virtual memory allocation functions.
+         /// It does not prereserve any memory and will always reserve and commit combined.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         class virtual_memory_allocator
+         : FOONATHAN_EBO(detail::global_leak_checker<detail::virtual_memory_allocator_leak_handler>)
+         {
+@@ -125,7 +125,7 @@ namespace foonathan
+         /// A \concept{concept_blockallocator,BlockAllocator} that reserves virtual memory and commits it part by part.
+         /// It is similar to \ref memory_stack but does not support growing and uses virtual memory,
+         /// also meant for big blocks not small allocations.
+-        /// \ingroup allocator
++        /// \ingroup memory_allocator
+         class virtual_block_allocator
+         {
+         public:
