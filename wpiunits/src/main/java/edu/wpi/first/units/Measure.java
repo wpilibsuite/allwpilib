@@ -459,7 +459,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   }
 
   /**
-   * Multiplies this measure by a generic ratio measreument and returns the resulting measure in the
+   * Multiplies this measure by a generic ratio measurement and returns the resulting measure in the
    * most appropriate unit.
    *
    * @param multiplier the measurement to multiply by.
