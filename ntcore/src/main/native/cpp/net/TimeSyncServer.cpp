@@ -227,14 +227,14 @@ class TimeSyncClient {
 
       // wait for our pong
       wpi::SmallVector<uint8_t, wpi::Struct<TspPong>::GetSize()> pongData;
-      int n = m_udp.receive(pongData.data(), pongData.size(), &client_addr);
+      int n2 = m_udp.receive(pongData.data(), pongData.size(), &client_addr);
       uint64_t pong_local_time = m_timeProvider();
 
-      if (n < 0) {
+      if (n2 < 0) {
         std::perror("Failed to receive message");
         continue;
       }
-      if (static_cast<size_t>(n) != pongData.size()) {
+      if (static_cast<size_t>(n2) != pongData.size()) {
         std::perror("Didn't get enough bytes from client?");
         continue;
       }
@@ -261,9 +261,8 @@ class TimeSyncClient {
       using std::cout;
       fmt::println("Ping-ponged! RTT2 {} uS, offset {} uS", rtt2,
                    serverTimeOffsetUs);
-      cout << "Estimated server time "
-           << (m_timeProvider() + serverTimeOffsetUs) / 1000000.0 << " s"
-           << endl;
+      fmt::println("Estimated server time {} s",
+                   (m_timeProvider() + serverTimeOffsetUs) / 1000000.0);
 
       auto end{std::chrono::high_resolution_clock::now()};
       auto sleep_duration = m_loopDelay - (end - start);
