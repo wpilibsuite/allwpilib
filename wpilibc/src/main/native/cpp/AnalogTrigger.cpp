@@ -18,16 +18,19 @@
 using namespace frc;
 
 AnalogTrigger::AnalogTrigger(int channel)
-    : AnalogTrigger(new AnalogInput(channel)) {
+    : AnalogTrigger(std::make_shared<AnalogInput>(channel)) {
   m_ownsAnalog = true;
-  wpi::SendableRegistry::AddChild(this, m_analogInput);
+  wpi::SendableRegistry::AddChild(this, m_analogInput.get());
 }
 
-AnalogTrigger::AnalogTrigger(AnalogInput* input) {
-  m_analogInput = input;
+AnalogTrigger::AnalogTrigger(AnalogInput* input)
+    : AnalogTrigger{{input, wpi::NullDeleter<AnalogInput>{}}} {}
+
+AnalogTrigger::AnalogTrigger(std::shared_ptr<AnalogInput> input)
+    : m_analogInput{std::move(input)} {
   int32_t status = 0;
-  m_trigger = HAL_InitializeAnalogTrigger(input->m_port, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", input->GetChannel());
+  m_trigger = HAL_InitializeAnalogTrigger(m_analogInput->m_port, &status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_analogInput->GetChannel());
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
@@ -49,10 +52,6 @@ AnalogTrigger::~AnalogTrigger() {
   int32_t status = 0;
   HAL_CleanAnalogTrigger(m_trigger, &status);
   FRC_ReportError(status, "Channel {}", GetSourceChannel());
-
-  if (m_ownsAnalog) {
-    delete m_analogInput;
-  }
 }
 
 void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
