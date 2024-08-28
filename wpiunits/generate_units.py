@@ -201,6 +201,18 @@ UNIT_CONFIGURATIONS = {
         "generics": {"Dividend": {"extends": "Unit"}, "Divisor": {"extends": "Unit"}},
         "multiply": {},
         "divide": {},
+        "extra": inspect.cleandoc(
+            """
+          default Measure<Dividend> timesDivisor(Measure<? extends Divisor> multiplier) {
+            return (Measure<Dividend>) baseUnit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+          }
+
+          default Measure<? extends PerUnit<Divisor, Dividend>> reciprocal() {
+            // May return a velocity if Divisor == TimeUnit, so we can't guarantee a "Per" instance
+            return baseUnit().reciprocal().ofBaseUnits(1 / baseUnitMagnitude());
+          }
+        """
+        ),
     },
     "Power": {
         "base_unit": "Watts",
