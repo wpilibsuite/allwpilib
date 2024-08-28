@@ -48,19 +48,16 @@ public final class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> 
   }
 
   /**
-   * Multiplies this force unit by a unit of distance to create a unit of energy.
-   *
-   * <p>Note: because torque and energy have the same dimensions (force multiplied by distance), we
-   * cannot define methods with the same name for both. Instead, use {@link
-   * DistanceUnit#mult(ForceUnit)} if you want a unit of torque.
+   * Multiplies this force unit by a unit of distance to create a unit of torque.
    *
    * @param distance the unit of distance
-   * @return the combined energy unit
+   * @return the combined torque unit
    */
-  public EnergyUnit mult(DistanceUnit distance) {
-    // TODO
-    throw new UnsupportedOperationException();
+  public TorqueUnit multAsTorque(DistanceUnit distance) {
+    return TorqueUnit.combine(distance, this);
   }
+
+  // TODO: Add a multAsEnergy equivalent
 
   @Override
   public Force of(double magnitude) {

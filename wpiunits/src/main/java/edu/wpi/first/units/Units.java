@@ -313,7 +313,7 @@ public final class Units {
   // Torque
 
   /** The standard SI unit for torque. */
-  public static final TorqueUnit NewtonMeters = Meters.mult(Newtons);
+  public static final TorqueUnit NewtonMeters = Meters.multAsTorque(Newtons);
 
   /** The standard SI unit for torque. */
   public static final TorqueUnit NewtonMeter = NewtonMeters;
@@ -322,7 +322,7 @@ public final class Units {
    * The equivalent of one {@link #PoundsForce pound of force} applied to an object one {@link
    * #Foot} away from its center of rotation.
    */
-  public static final TorqueUnit PoundFeet = Feet.mult(PoundsForce);
+  public static final TorqueUnit PoundFeet = Feet.multAsTorque(PoundsForce);
 
   /**
    * The equivalent of one {@link #PoundsForce pound of force} applied to an object one {@link
@@ -334,7 +334,7 @@ public final class Units {
    * The equivalent of one {@link #PoundsForce pound of force} applied to an object one {@link
    * #Inch} away from its center of rotation.
    */
-  public static final TorqueUnit PoundInches = Inches.mult(PoundsForce);
+  public static final TorqueUnit PoundInches = Inches.multAsTorque(PoundsForce);
 
   /**
    * The equivalent of one {@link #PoundsForce pound of force} applied to an object one {@link
@@ -346,7 +346,7 @@ public final class Units {
    * The equivalent of one {@link #OunceForce ounce of force} applied to an object one {@link #Inch}
    * away from its center of rotation.
    */
-  public static final TorqueUnit OunceInches = Inches.mult(OuncesForce);
+  public static final TorqueUnit OunceInches = Inches.multAsTorque(OuncesForce);
 
   /**
    * The equivalent of one {@link #OunceForce ounce of force} applied to an object one {@link #Inch}
