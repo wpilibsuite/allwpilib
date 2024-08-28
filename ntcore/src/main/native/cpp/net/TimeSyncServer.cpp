@@ -9,10 +9,12 @@
 #include <unistd.h>
 
 #include <atomic>
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <iostream>
+#include <mutex>
 #include <thread>
 
 #include <wpi/Logger.h>
@@ -28,10 +30,9 @@ struct TspPing {
   uint64_t client_time;
 };
 
-struct TspPong {
-  uint8_t version;
-  uint8_t message_id;
-  uint64_t client_time;
+struct TspPong : public TspPing {
+  TspPong(TspPing ping, uint64_t servertime)
+      : TspPing{ping}, server_time{servertime} {}
   uint64_t server_time;
 };
 
@@ -57,8 +58,6 @@ struct wpi::Struct<TspPing> {
   }
 };
 
-static_assert(wpi::StructSerializable<TspPing>);
-
 template <>
 struct wpi::Struct<TspPong> {
   static constexpr std::string_view GetTypeName() { return "TspPong"; }
@@ -70,9 +69,11 @@ struct wpi::Struct<TspPong> {
 
   static TspPong Unpack(std::span<const uint8_t> data) {
     return TspPong{
-        wpi::UnpackStruct<uint8_t, 0>(data),
-        wpi::UnpackStruct<uint8_t, 1>(data),
-        wpi::UnpackStruct<uint64_t, 2>(data),
+        TspPing{
+            wpi::UnpackStruct<uint8_t, 0>(data),
+            wpi::UnpackStruct<uint8_t, 1>(data),
+            wpi::UnpackStruct<uint64_t, 2>(data),
+        },
         wpi::UnpackStruct<uint64_t, 10>(data),
     };
   }
@@ -85,6 +86,7 @@ struct wpi::Struct<TspPong> {
 };
 
 static_assert(wpi::StructSerializable<TspPong>);
+static_assert(wpi::StructSerializable<TspPing>);
 
 static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {
@@ -121,27 +123,39 @@ class TimeSyncServer {
     struct sockaddr_in client_addr;
 
     while (m_running) {
-      wpi::SmallVector<uint8_t, wpi::Struct<TspPing>::GetSize()> buffer;
+      wpi::SmallVector<uint8_t, wpi::Struct<TspPing>::GetSize()> pingData;
 
-      int n = m_udp.receive(buffer.data(), buffer.size(), &client_addr);
+      int n = m_udp.receive(pingData.data(), pingData.size(), &client_addr);
 
       if (n < 0) {
         std::perror("Failed to receive message");
         continue;
       }
-      if (static_cast<size_t>(n) != buffer.size()) {
+      if (static_cast<size_t>(n) != pingData.size()) {
         std::perror("Didn't get enough bytes from client?");
         continue;
       }
 
-      // Get the current time as a 64-bit integer
+      TspPing ping{
+          wpi::UnpackStruct<TspPing>(pingData),
+      };
+
+      if (ping.version != 1) {
+        std::perror("Bad version from client?");
+      }
+      if (ping.message_id != 1) {
+        std::perror("Bad message id from client?");
+      }
+
       uint64_t current_time = m_timeProvider();
 
-      TspPong pong;
+      TspPong pong{ping, current_time};
+      pong.message_id = 2;
 
-      m_udp.send(
-          std::span<uint8_t>{reinterpret_cast<uint8_t*>(&pong), sizeof(pong)},
-          client_addr);
+      wpi::SmallVector<uint8_t, wpi::Struct<TspPong>::GetSize()> pongData;
+      wpi::PackStruct(pongData, pong);
+
+      m_udp.send(std::span<uint8_t>{pongData}, client_addr);
 
       std::cout << "Sent current time (microseconds since epoch) to client: "
                 << current_time << std::endl;
@@ -158,72 +172,139 @@ class TimeSyncServer {
     // This will bind to "port". Set port to 0 if you don't care about the local
     // port it binds to
     m_udp.start(port);
+  }
 
+  void Start() {
     m_running.store(true);
     m_listener = std::thread{[this] { this->Go(); }};
   }
+
+  void Stop() {
+    m_running.store(false);
+    m_listener.join();
+  }
 };
+
+class TimeSyncClient {
+  wpi::Logger m_logger{::LoggerFunc};
+  std::function<uint64_t()> m_timeProvider;
+  UDPClient m_udp;
+
+  std::string m_serverIP;
+  int m_serverPort;
+  std::chrono::milliseconds m_loopDelay;
+
+  std::atomic_bool m_running;
+  std::thread m_listener;
+
+  int64_t m_offset{0};
+  std::mutex m_offsetMutex;
+
+ private:
+  void Go(std::chrono::milliseconds loop_time) {
+    struct sockaddr_in client_addr;
+
+    while (m_running) {
+      auto start{std::chrono::high_resolution_clock::now()};
+
+      // Send a ping to the server
+      uint64_t ping_local_time{m_timeProvider()};
+
+      TspPing ping{
+          .version = 1, .message_id = 1, .client_time = ping_local_time};
+
+      wpi::SmallVector<uint8_t, wpi::Struct<TspPing>::GetSize()> pingData;
+      wpi::PackStruct(pingData, ping);
+
+      // TODO: cache sockaddr instead of recalculating?
+      int n =
+          m_udp.send(std::span<uint8_t>{pingData}, m_serverIP, m_serverPort);
+
+      if (n < 0) {
+        std::perror("Failed to send ping");
+        continue;
+      }
+
+      // wait for our pong
+      wpi::SmallVector<uint8_t, wpi::Struct<TspPong>::GetSize()> pongData;
+      int n = m_udp.receive(pongData.data(), pongData.size(), &client_addr);
+      uint64_t pong_local_time = m_timeProvider();
+
+      if (n < 0) {
+        std::perror("Failed to receive message");
+        continue;
+      }
+      if (static_cast<size_t>(n) != pongData.size()) {
+        std::perror("Didn't get enough bytes from client?");
+        continue;
+      }
+
+      TspPong pong{
+          wpi::UnpackStruct<TspPong>(pingData),
+      };
+
+      if (pong.version != 1) {
+        std::perror("Bad version from client?");
+      }
+      if (pong.message_id != 2) {
+        std::perror("Bad message id from client?");
+      }
+
+      // when time = send_time+rtt2/2, server time = server time
+      // server time = local time + offset
+      // offset = (server time - local time) = (server time) - (send_time +
+      // rtt2/2)
+      auto rtt2 = pong_local_time - ping_local_time;
+      int64_t serverTimeOffsetUs =
+          pong.server_time - rtt2 / 2 - ping_local_time;
+
+      using std::cout;
+      fmt::println("Ping-ponged! RTT2 {} uS, offset {} uS", rtt2,
+                   serverTimeOffsetUs);
+      cout << "Estimated server time "
+           << (m_timeProvider() + serverTimeOffsetUs) / 1000000.0 << " s"
+           << endl;
+
+      auto end{std::chrono::high_resolution_clock::now()};
+      auto sleep_duration = m_loopDelay - (end - start);
+      std::this_thread::sleep_for(sleep_duration);
+    }
+
+    // Close the socket
+    m_udp.shutdown();
+  }
+
+ public:
+  TimeSyncClient(std::string_view server, int remote_port,
+                 std::chrono::milliseconds ping_delay,
+                 std::function<uint64_t()> timeProvider = nt::Now)
+      : m_timeProvider(timeProvider),
+        m_udp("", m_logger),
+        m_serverIP{server},
+        m_serverPort{remote_port},
+        m_loopDelay(ping_delay) {
+    // we don't care about the local port. In fact if i refactor udpclient, i
+    // could just implicitly bind
+    m_udp.start(0);
+
+    // Set a super conservative 1-second timeout by default
+    m_udp.set_timeout(1);
+  }
+
+  void Start() {
+    m_running.store(true);
+    m_listener = std::thread{[this] { this->Go(m_loopDelay); }};
+  }
+
+  void Stop() {
+    m_running.store(false);
+    m_listener.join();
+  }
+
+  int64_t GetOffset() {
+    std::lock_guard lock{m_offsetMutex};
+    return m_offset;
+  }
+};
+
 }  // namespace wpi
-
-// #define PORT 5810
-// #define BUFFER_SIZE 8
-
-// uint64_t getCurrentTimeInMicroseconds() {
-//   struct timeval tv;
-//   gettimeofday(&tv, nullptr);
-//   return static_cast<uint64_t>(tv.tv_sec) * 1000000 + tv.tv_usec;
-// }
-
-// uint64_t startTime = getCurrentTimeInMicroseconds();
-
-// int main() {
-//   int sockfd;
-//   struct sockaddr_in server_addr, client_addr;
-//   char buffer[BUFFER_SIZE];
-//   socklen_t client_len = sizeof(client_addr);
-
-//   // Create a UDP socket
-//   if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-//     std::perror("Socket creation failed");
-//     std::exit(EXIT_FAILURE);
-//   }
-
-//   // Set up the server address and bind it to the socket
-//   std::memset(&server_addr, 0, sizeof(server_addr));
-//   server_addr.sin_family = AF_INET;
-//   server_addr.sin_addr.s_addr = INADDR_ANY;
-//   server_addr.sin_port = htons(PORT);
-
-//   if (bind(sockfd, (const struct sockaddr*)&server_addr, sizeof(server_addr))
-//   <
-//       0) {
-//     std::perror("Bind failed");
-//     close(sockfd);
-//     std::exit(EXIT_FAILURE);
-//   }
-
-//   while (true) {
-//     std::memset(buffer, 0, BUFFER_SIZE);
-//     int n = recvfrom(sockfd, buffer, BUFFER_SIZE, 0,
-//                      (struct sockaddr*)&client_addr, &client_len);
-
-//     if (n < 0) {
-//       std::perror("Failed to receive message");
-//       continue;
-//     }
-
-//     // Get the current time as a 64-bit integer
-//     uint64_t current_time = getCurrentTimeInMicroseconds() - startTime;
-
-//     // Send the current time back to the client as a uint64_t
-//     sendto(sockfd, &current_time, sizeof(current_time), 0,
-//            (struct sockaddr*)&client_addr, client_len);
-
-//     std::cout << "Sent current time (microseconds since epoch) to client: "
-//               << current_time << std::endl;
-//   }
-
-//   // Close the socket
-//   close(sockfd);
-//   return 0;
-// }
