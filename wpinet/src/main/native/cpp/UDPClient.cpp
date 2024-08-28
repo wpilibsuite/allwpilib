@@ -202,19 +202,31 @@ int UDPClient::receive(uint8_t* data_received, int receive_len) {
 }
 
 int UDPClient::receive(uint8_t* data_received, int receive_len,
-                       SmallVectorImpl<char>* addr_received,
-                       int* port_received) {
+            sockaddr_in *remote) {
   if (m_port == 0) {
     return -1;  // return if not receiving
   }
 
-  struct sockaddr_in remote;
   socklen_t remote_len = sizeof(remote);
   std::memset(&remote, 0, sizeof(remote));
 
-  int result =
+  return
       recvfrom(m_lsd, reinterpret_cast<char*>(data_received), receive_len, 0,
                reinterpret_cast<sockaddr*>(&remote), &remote_len);
+
+}
+
+int UDPClient::receive(uint8_t* data_received, int receive_len,
+                       SmallVectorImpl<char>* addr_received,
+                       int* port_received) {
+  struct sockaddr_in remote;
+  std::memset(&remote, 0, sizeof(remote));
+
+  int result = receive(data_received, receive_len, &remote);
+
+  if (result < 0) {
+    return result;
+  }
 
   char ip[50];
 #ifdef _WIN32
