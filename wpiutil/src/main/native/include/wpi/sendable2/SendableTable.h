@@ -36,6 +36,20 @@ class SendableTable {
   explicit SendableTable(std::shared_ptr<SendableTableBackend> backend)
       : m_backend{std::move(backend)} {}
 
+  bool GetBoolean(std::string_view name, bool defaultValue);
+
+  int64_t GetInteger(std::string_view name, int64_t defaultValue);
+
+  float GetFloat(std::string_view name, float defaultValue);
+
+  double GetDouble(std::string_view name, double defaultValue);
+
+  std::string GetString(std::string_view name, std::string_view defaultValue);
+
+  std::vector<uint8_t> GetRaw(std::string_view name,
+                              std::string_view typeString,
+                              std::span<const uint8_t> defaultValue);
+
   void SetBoolean(std::string_view name, bool value);
 
   void SetInteger(std::string_view name, int64_t value);

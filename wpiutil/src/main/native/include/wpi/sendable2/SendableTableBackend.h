@@ -32,6 +32,21 @@ class SendableTableBackend {
   SendableTableBackend(const SendableTableBackend&) = delete;
   SendableTableBackend& operator=(const SendableTableBackend&) = delete;
 
+  virtual bool GetBoolean(std::string_view name, bool defaultValue) = 0;
+
+  virtual int64_t GetInteger(std::string_view name, int64_t defaultValue) = 0;
+
+  virtual float GetFloat(std::string_view name, float defaultValue) = 0;
+
+  virtual double GetDouble(std::string_view name, double defaultValue) = 0;
+
+  virtual std::string GetString(std::string_view name,
+                                std::string_view defaultValue) = 0;
+
+  virtual std::vector<uint8_t> GetRaw(
+      std::string_view name, std::string_view typeString,
+      std::span<const uint8_t> defaultValue) = 0;
+
   virtual void SetBoolean(std::string_view name, bool value) = 0;
 
   virtual void SetInteger(std::string_view name, int64_t value) = 0;

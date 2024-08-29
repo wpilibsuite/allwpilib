@@ -117,6 +117,15 @@ struct DataLogSendableTableBackend::EntryData
     };
   }
 
+  template <typename LogEntryType>
+  LogEntryType* Get() {
+    std::scoped_lock lock{m_mutex};
+    if (m_entry.index() == 0) {
+      return nullptr;
+    }
+    return std::get_if<LogEntryType>(&m_entry);
+  }
+
   void SetPolledUpdate(std::function<void(EntryData&)> function) {
     std::scoped_lock lock{m_mutex};
     m_polledUpdate = std::move(function);
@@ -175,6 +184,91 @@ DataLogSendableTableBackend::DataLogSendableTableBackend(DataLog& log,
     : m_log{log}, m_path{path} {}
 
 DataLogSendableTableBackend::~DataLogSendableTableBackend() = default;
+
+bool DataLogSendableTableBackend::GetBoolean(std::string_view name,
+                                             bool defaultValue) {
+  std::scoped_lock lock{m_mutex};
+  auto it = m_entries.find(name);
+  if (it != m_entries.end()) {
+    if (auto entry = it->second->Get<BooleanLogEntry>()) {
+      if (auto val = entry->GetLastValue()) {
+        return *val;
+      }
+    }
+  }
+  return defaultValue;
+}
+
+int64_t DataLogSendableTableBackend::GetInteger(std::string_view name,
+                                                int64_t defaultValue) {
+  std::scoped_lock lock{m_mutex};
+  auto it = m_entries.find(name);
+  if (it != m_entries.end()) {
+    if (auto entry = it->second->Get<IntegerLogEntry>()) {
+      if (auto val = entry->GetLastValue()) {
+        return *val;
+      }
+    }
+  }
+  return defaultValue;
+}
+
+float DataLogSendableTableBackend::GetFloat(std::string_view name,
+                                            float defaultValue) {
+  std::scoped_lock lock{m_mutex};
+  auto it = m_entries.find(name);
+  if (it != m_entries.end()) {
+    if (auto entry = it->second->Get<FloatLogEntry>()) {
+      if (auto val = entry->GetLastValue()) {
+        return *val;
+      }
+    }
+  }
+  return defaultValue;
+}
+
+double DataLogSendableTableBackend::GetDouble(std::string_view name,
+                                              double defaultValue) {
+  std::scoped_lock lock{m_mutex};
+  auto it = m_entries.find(name);
+  if (it != m_entries.end()) {
+    if (auto entry = it->second->Get<DoubleLogEntry>()) {
+      if (auto val = entry->GetLastValue()) {
+        return *val;
+      }
+    }
+  }
+  return defaultValue;
+}
+
+std::string DataLogSendableTableBackend::GetString(
+    std::string_view name, std::string_view defaultValue) {
+  std::scoped_lock lock{m_mutex};
+  auto it = m_entries.find(name);
+  if (it != m_entries.end()) {
+    if (auto entry = it->second->Get<StringLogEntry>()) {
+      if (auto val = entry->GetLastValue()) {
+        return *val;
+      }
+    }
+  }
+  return {defaultValue.data(), defaultValue.size()};
+}
+
+std::vector<uint8_t> DataLogSendableTableBackend::GetRaw(
+    std::string_view name, std::string_view typeString,
+    std::span<const uint8_t> defaultValue) {
+  std::scoped_lock lock{m_mutex};
+  auto it = m_entries.find(name);
+  if (it != m_entries.end()) {
+    if (auto entry = it->second->Get<RawLogEntry>()) {
+      if (auto val = entry->GetLastValue()) {
+        return *val;
+      }
+    }
+  }
+  return {defaultValue.begin(), defaultValue.end()};
+}
 
 void DataLogSendableTableBackend::SetBoolean(std::string_view name,
                                              bool value) {

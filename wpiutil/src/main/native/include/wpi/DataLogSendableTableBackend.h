@@ -37,6 +37,21 @@ class DataLogSendableTableBackend : public wpi2::SendableTableBackend {
    */
   DataLog& GetLog() const { return m_log; }
 
+  bool GetBoolean(std::string_view name, bool defaultValue) override;
+
+  int64_t GetInteger(std::string_view name, int64_t defaultValue) override;
+
+  float GetFloat(std::string_view name, float defaultValue) override;
+
+  double GetDouble(std::string_view name, double defaultValue) override;
+
+  std::string GetString(std::string_view name,
+                        std::string_view defaultValue) override;
+
+  std::vector<uint8_t> GetRaw(std::string_view name,
+                              std::string_view typeString,
+                              std::span<const uint8_t> defaultValue) override;
+
   void SetBoolean(std::string_view name, bool value) override;
 
   void SetInteger(std::string_view name, int64_t value) override;
