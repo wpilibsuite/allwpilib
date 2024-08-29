@@ -206,7 +206,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiClose
   (JNIEnv*, jclass, jint port)
 {
-  HAL_CloseSPI(static_cast<HAL_SPIPort>(port));
+  if (port != HAL_kInvalidHandle) {
+    HAL_CloseSPI(static_cast<HAL_SPIPort>(port));
+  }
 }
 
 /*
@@ -298,7 +300,9 @@ Java_edu_wpi_first_hal_SPIJNI_spiFreeAuto
   (JNIEnv* env, jclass, jint port)
 {
   int32_t status = 0;
-  HAL_FreeSPIAuto(static_cast<HAL_SPIPort>(port), &status);
+  if (port != HAL_kInvalidHandle) {
+    HAL_FreeSPIAuto(static_cast<HAL_SPIPort>(port), &status);
+  }
   CheckStatus(env, status);
 }
 

@@ -41,7 +41,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_CTREPCMJNI_free
   (JNIEnv* env, jclass, jint handle)
 {
-  HAL_FreeCTREPCM(handle);
+  if (handle != HAL_kInvalidHandle) {
+    HAL_FreeCTREPCM(handle);
+  }
 }
 
 /*

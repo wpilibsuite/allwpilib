@@ -57,7 +57,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DIOJNI_freeDIOPort
   (JNIEnv* env, jclass, jint id)
 {
-  HAL_FreeDIOPort((HAL_DigitalHandle)id);
+  if (id != HAL_kInvalidHandle) {
+    HAL_FreeDIOPort((HAL_DigitalHandle)id);
+  }
 }
 
 /*
@@ -227,7 +229,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DIOJNI_freeDigitalPWM
   (JNIEnv* env, jclass, jint id)
 {
-  HAL_FreeDigitalPWM((HAL_DigitalPWMHandle)id);
+  if (id != HAL_kInvalidHandle) {
+    HAL_FreeDigitalPWM((HAL_DigitalPWMHandle)id);
+  }
 }
 
 /*

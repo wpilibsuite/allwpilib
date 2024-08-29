@@ -306,7 +306,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialClose
   (JNIEnv* env, jclass, jint handle)
 {
-  HAL_CloseSerial(static_cast<HAL_SerialPortHandle>(handle));
+  if (handle != HAL_kInvalidHandle) {
+    HAL_CloseSerial(static_cast<HAL_SerialPortHandle>(handle));
+  }
 }
 
 }  // extern "C"
