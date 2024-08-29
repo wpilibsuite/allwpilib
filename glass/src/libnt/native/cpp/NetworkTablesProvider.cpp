@@ -26,7 +26,7 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
       m_poller{inst},
       m_typeCache{storage.GetChild("types")} {
   storage.SetCustomApply([this] {
-    m_listener = m_poller.AddListener({{""}}, nt::EventFlags::kImmediate);
+    m_listener = m_poller.AddListener({{""}}, nt::EventFlags::kImmediate | nt::EventFlags::kTopic);
     for (auto&& childIt : m_storage.GetChildren()) {
       auto id = childIt.key();
       auto typePtr = m_typeCache.FindValue(id);
