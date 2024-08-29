@@ -1,0 +1,289 @@
+name: Gradle
+
+on: [pull_request, push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-docker:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - container: wpilib/roborio-cross-ubuntu:2024-22.04
+            artifact-name: Athena
+            build-options: "-Ponlylinuxathena"
+          - container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
+            artifact-name: Arm32
+            build-options: "-Ponlylinuxarm32"
+          - container: wpilib/aarch64-cross-ubuntu:bullseye-22.04
+            artifact-name: Arm64
+            build-options: "-Ponlylinuxarm64"
+          - container: wpilib/ubuntu-base:22.04
+            artifact-name: Linux
+            build-options: "-Ponlylinuxx86-64"
+    name: "Build - ${{ matrix.artifact-name }}"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set release environment variable
+        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Build with Gradle
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.container }}
+          options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF -e CI
+          run: df . && rm -f semicolon_delimited_script && echo $GITHUB_REF && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - name: Check free disk space
+        run: df .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: build/allOutputs
+
+  build-host:
+    env:
+      MACOSX_DEPLOYMENT_TARGET: 13.3
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            artifact-name: Win64Debug
+            architecture: x64
+            task: "build"
+            build-options: "-PciDebugOnly"
+            outputs: "build/allOutputs"
+          - os: windows-2022
+            artifact-name: Win64Release
+            architecture: x64
+            build-options: "-PciReleaseOnly"
+            task: "copyAllOutputs"
+            outputs: "build/allOutputs"
+          - os: windows-2022
+            artifact-name: WinArm64Debug
+            architecture: x64
+            task: "build"
+            build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64"
+            outputs: "build/allOutputs"
+          - os: windows-2022
+            artifact-name: WinArm64Release
+            architecture: x64
+            build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
+            task: "copyAllOutputs"
+            outputs: "build/allOutputs"
+          - os: macOS-14
+            artifact-name: macOS
+            architecture: aarch64
+            task: "build"
+            outputs: "build/allOutputs"
+          - os: windows-2022
+            artifact-name: Win32
+            architecture: x86
+            task: ":ntcoreffi:build"
+            outputs: "ntcoreffi/build/outputs"
+    name: "Build - ${{ matrix.artifact-name }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          architecture: ${{ matrix.architecture }}
+      - name: Import Developer ID Certificate
+        uses: wpilibsuite/import-signing-certificate@v2
+        with:
+          certificate-data: ${{ secrets.APPLE_CERTIFICATE_DATA }}
+          certificate-passphrase: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
+        if: |
+          matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+      - name: Set Keychain Lock Timeout
+        run: security set-keychain-settings -lut 3600
+        if: |
+          matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+      - name: Set release environment variable
+        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+        shell: bash
+        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Set Java Heap Size
+        run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
+        if: matrix.artifact-name == 'Win32'
+      - name: Check disk free space (Windows)
+        run: wmic logicaldisk get caption, freespace
+        if: matrix.os == 'windows-2022'
+      - name: Check disk free space pre-cleanup (macOS)
+        run: df -h .
+        if: matrix.os == 'macOS-14'
+      - name: Cleanup disk space
+        # CodeQL: 5G
+        # go: 748M
+        # Android: 12G
+        run: |
+          rm -rf /Users/runner/hostedtoolcache/CodeQL
+          rm -rf /Users/runner/hostedtoolcache/go
+          rm -rf /Users/runner/Library/Android
+        if: matrix.os == 'macOS-14'
+      - name: Check disk free space post-cleanup (macOS)
+        run: df -h .
+        if: matrix.os == 'macOS-14'
+      - name: Build with Gradle
+        run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - name: Sign Libraries with Developer ID
+        run: ./gradlew copyAllOutputs --build-cache -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        if: |
+          matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+      - name: Check disk free space (Windows)
+        run: wmic logicaldisk get caption, freespace
+        if: matrix.os == 'windows-2022'
+      - name: Check disk free space (macOS)
+        run: df -h .
+        if: matrix.os == 'macOS-14'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.outputs }}
+
+  build-documentation:
+    name: "Build - Documentation"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Set release environment variable
+        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Build with Gradle
+        run: ./gradlew docs:zipDocs --build-cache -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Documentation
+          path: docs/build/outputs
+
+  combine:
+    name: Combine
+    needs: [build-docker, build-host, build-documentation]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Free Disk Space
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+      - uses: actions/checkout@v4
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        with:
+          repository: wpilibsuite/build-tools
+      - uses: actions/download-artifact@v4
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        with:
+          path: combiner/products/build/allOutputs
+      - name: Flatten Artifacts
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        run: rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
+      - name: Check version number exists
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        run: |
+          cat combiner/products/build/allOutputs/version.txt
+          test -s combiner/products/build/allOutputs/version.txt
+      - uses: actions/setup-java@v4
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Combine (Main)
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          github.ref == 'refs/heads/main'
+        run: cd combiner && ./gradlew publish -Pallwpilib
+        env:
+          RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - name: Combine (Release)
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          startsWith(github.ref, 'refs/tags/v')
+        run: cd combiner && ./gradlew publish -Pallwpilib -PreleaseRepoPublish
+        env:
+          RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - uses: actions/upload-artifact@v4
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        with:
+          name: Maven
+          path: ~/releases
+
+  dispatch:
+    name: dispatch
+    needs: [combine]
+    strategy:
+      matrix:
+        repo: ['SmartDashboard', 'PathWeaver', 'Shuffleboard', 'RobotBuilder']
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: peter-evans/repository-dispatch@v3
+        if: |
+          github.repository == 'wpilibsuite/allwpilib' &&
+          startsWith(github.ref, 'refs/tags/v')
+        with:
+          token: ${{ secrets.TOOL_REPO_ACCESS_TOKEN }}
+          repository: wpilibsuite/${{ matrix.repo }}
+          event-type: tag
+          client-payload: '{"package_name": "allwpilib", "package_version": "${{ github.ref_name }}"}'
