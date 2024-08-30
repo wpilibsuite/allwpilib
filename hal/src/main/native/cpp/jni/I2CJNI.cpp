@@ -175,9 +175,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_I2CJNI_i2CClose
   (JNIEnv*, jclass, jint port)
 {
-  if (port != HAL_kInvalidHandle) {
-    HAL_CloseI2C(static_cast<HAL_I2CPort>(port));
-  }
+  HAL_CloseI2C(static_cast<HAL_I2CPort>(port));
 }
 
 }  // extern "C"

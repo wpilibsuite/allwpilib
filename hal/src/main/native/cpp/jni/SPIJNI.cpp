@@ -206,9 +206,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiClose
   (JNIEnv*, jclass, jint port)
 {
-  if (port != HAL_kInvalidHandle) {
-    HAL_CloseSPI(static_cast<HAL_SPIPort>(port));
-  }
+  HAL_CloseSPI(static_cast<HAL_SPIPort>(port));
 }
 
 /*
