@@ -12,6 +12,6 @@ java_binary(
     srcs = ["src/dev/java/edu/wpi/first/units/DevMain.java"],
     main_class = "edu.wpi.first.units.DevMain",
     deps = [
-        ":wpiunits-java",
+        ":wpiunits",
     ],
 )
