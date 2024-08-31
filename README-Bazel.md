@@ -5,8 +5,6 @@ WPILib is normally built with Gradle, but [Bazel](https://www.bazel.build/) can 
 
 ## Prerequisites
 - Install [Bazelisk](https://github.com/bazelbuild/bazelisk/releases) and add it to your path. Bazelisk is a wrapper that will download the correct version of bazel specified in the repository. Note: You can alias/rename the binary to `bazel` if you want to keep the familiar `bazel build` vs `bazelisk build` syntax.
-- Java8+. The build will hermetically use java11, but bazel requires some version of the JRE be installed to run.
-- Python 3
 
 ## Building
 To build the entire repository, simply run `bazel build //...`. To run all of the unit tests, run `bazel test //...`
