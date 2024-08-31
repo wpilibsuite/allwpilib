@@ -30,18 +30,3 @@ java_binary(
     deps = [
     ],
 )
-
-java_binary(
-    name = "multiCameraServer-java",
-    srcs = ["multiCameraServer/src/main/java/edu/wpi/Main.java"],
-    main_class = "edu.wpi.Main",
-    deps = [
-        ":cameraserver-java",
-        "//cscore:cscore-java",
-        "//hal:hal-java",
-        "//ntcore:networktables-java",
-        "//wpimath:wpimath-java",
-        "//wpiutil:wpiutil-java",
-        "@maven//:com_google_code_gson_gson",
-    ],
-)
