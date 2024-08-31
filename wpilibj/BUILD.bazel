@@ -26,7 +26,7 @@ java_library(
         "//ntcore:networktables-java",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
-        "//wpiunits:wpiunits-java",
+        "//wpiunits",
         "//wpiutil:wpiutil-java",
         "@maven//:org_ejml_ejml_core",
         "@maven//:org_ejml_ejml_simple",
