@@ -17,7 +17,10 @@ filegroup(
 
 java_library(
     name = "wpilibj",
-    srcs = [":generate-version", ":generated_java"] + glob(["src/main/java/**/*.java"]),
+    srcs = [
+        ":generate-version",
+        ":generated_java",
+    ] + glob(["src/main/java/**/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
         "//cameraserver:cameraserver-java",
