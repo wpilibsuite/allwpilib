@@ -50,6 +50,7 @@ class UDPClient {
     return sendto(m_lsd, reinterpret_cast<const char*>(data.data()),
                   data.size(), 0, reinterpret_cast<sockaddr*>(&addr),
                   sizeof(addr));
+  }
 
   int receive(uint8_t* data_received, int receive_len);
   int receive(uint8_t* data_received, int receive_len,

@@ -4,12 +4,6 @@
 
 #include "net/TimeSyncClientServer.h"
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <unistd.h>
-
 #include <atomic>
 #include <chrono>
 #include <cstdlib>
@@ -110,76 +104,65 @@ static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
   wpi::print(stderr, "DS: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
-void wpi::TimeSyncServer::Go() {
-  struct sockaddr_in client_addr;
+void wpi::TimeSyncServer::UdpCallback(uv::Buffer& data, size_t n,
+                                      const sockaddr& sender, unsigned flags) {
+  wpi::println("Hello from a ping!");
 
-  while (m_running) {
-    wpi::SmallVector<uint8_t, wpi::Struct<TspPing>::GetSize()> pingData(
-        wpi::Struct<TspPing>::GetSize());
-
-    int n = m_udp.receive(pingData.data(), pingData.size(), &client_addr);
-
-    if (n < 0) {
-      std::perror("Failed to receive message");
-      continue;
-    }
-    if (static_cast<size_t>(n) != pingData.size()) {
-      std::perror("Didn't get enough bytes from client?");
-      continue;
-    }
-
-    TspPing ping{
-        wpi::UnpackStruct<TspPing>(pingData),
-    };
-
-    if (ping.version != 1) {
-      std::perror("Bad version from client?");
-    }
-    if (ping.message_id != 1) {
-      std::perror("Bad message id from client?");
-    }
-
-    uint64_t current_time = m_timeProvider();
-
-    TspPong pong{ping, current_time};
-    pong.message_id = 2;
-
-    wpi::SmallVector<uint8_t, wpi::Struct<TspPong>::GetSize()> pongData(
-        wpi::Struct<TspPong>::GetSize());
-    wpi::PackStruct(pongData, pong);
-
-    m_udp.send(std::span<uint8_t>{pongData}, client_addr);
-
-    // fmt::println("Sent current time (microseconds since epoch) to client:
-    // {}", current_time);
-    fmt::println("->[server] Got ping: {} {} {}", ping.version, ping.message_id,
-                 ping.client_time);
-    fmt::println("->[server] Sent pong: {} {} {} {}", pong.version,
-                 pong.message_id, pong.client_time, pong.server_time);
+  if (static_cast<size_t>(n) != data.len) {
+    WPI_ERROR(m_logger, "Didn't get right num bytes from client?");
+    return;
   }
 
-  // Close the socket
-  m_udp.shutdown();
+  TspPing ping{wpi::UnpackStruct<TspPing>(data.bytes())};
+
+  if (ping.version != 1) {
+    WPI_ERROR(m_logger, "Bad version from client?");
+    return;
+  }
+  if (ping.message_id != 1) {
+    WPI_ERROR(m_logger, "Bad message id from client?");
+    return;
+  }
+
+  uint64_t current_time = m_timeProvider();
+
+  TspPong pong{ping, current_time};
+  pong.message_id = 2;
+
+  wpi::SmallVector<uint8_t, wpi::Struct<TspPong>::GetSize()> pongData(
+      wpi::Struct<TspPong>::GetSize());
+  wpi::PackStruct(pongData, pong);
+
+  // Wrap our buffer - pongData should free itself for free
+  wpi::uv::Buffer pongBuf{pongData};
+  int sent =
+      m_udp->TrySend(sender, wpi::SmallVector<wpi::uv::Buffer, 1>{pongBuf});
+  wpi::println("Pong ret: {}", sent);
+  if (static_cast<size_t>(sent) != wpi::Struct<TspPong>::GetSize()) {
+    WPI_ERROR(m_logger, "Didn't send the whole pong back?");
+    return;
+  }
+
+  WPI_INFO(m_logger, "->[server] Got ping: {} {} {}", ping.version,
+           ping.message_id, ping.client_time);
+  WPI_INFO(m_logger, "->[server] Sent pong: {} {} {} {}", pong.version,
+           pong.message_id, pong.client_time, pong.server_time);
 }
 
 wpi::TimeSyncServer::TimeSyncServer(int port,
                                     std::function<uint64_t()> timeProvider)
-    : m_logger(::LoggerFunc),
-      m_timeProvider(timeProvider),
-      m_udp("", m_logger) {
-  // This will bind to "port". Set port to 0 if you don't care about the local
-  // port it binds to
-  m_udp.start(port);
+    : m_logger{::LoggerFunc},
+      m_timeProvider{timeProvider},
+      m_udp{wpi::uv::Udp::Create(m_loopRunner.GetLoop(), AF_INET)} {
+  m_udp->Bind("0.0.0.0", port);
 }
 
 void wpi::TimeSyncServer::Start() {
-  m_running.store(true);
-  m_listener = std::thread{[this] { this->Go(); }};
+  m_udp->received.connect(&wpi::TimeSyncServer::UdpCallback, this);
 }
 
 void wpi::TimeSyncServer::Stop() {
-  m_running.store(false);
-  m_listener.join();
+  m_loopRunner.Stop();
 }
 
 void wpi::TimeSyncClient::Go(std::chrono::milliseconds loop_time) {

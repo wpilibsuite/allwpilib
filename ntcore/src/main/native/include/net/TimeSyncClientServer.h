@@ -4,12 +4,6 @@
 
 #pragma once
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <unistd.h>
-
 #include <atomic>
 #include <chrono>
 #include <cstdlib>
@@ -25,27 +19,39 @@
 #include <wpi/print.h>
 #include <wpi/struct/Struct.h>
 #include <wpinet/UDPClient.h>
+#include <wpinet/EventLoopRunner.h>
+#include <wpinet/uv/Udp.h>
+#include <wpinet/uv/Buffer.h>
 
 #include "ntcore_cpp.h"
 
 namespace wpi {
 
 class TimeSyncServer {
+  using SharedUdpPtr = std::shared_ptr<uv::Udp>;
+
+  EventLoopRunner m_loopRunner {};
+
   wpi::Logger m_logger;
   std::function<uint64_t()> m_timeProvider;
-  UDPClient m_udp;
+  SharedUdpPtr m_udp;
 
-  std::atomic_bool m_running;
   std::thread m_listener;
 
  private:
-  void Go();
+  void UdpCallback(uv::Buffer& buf, size_t nbytes, const sockaddr& sender, unsigned flags);
 
  public:
   TimeSyncServer(int port = 5810,
                  std::function<uint64_t()> timeProvider = nt::Now);
 
+  /**
+   * Start listening for pings
+   */
   void Start();
+  /**
+   * Stop our loop runner. After stopping, we cannot restart.
+   */
   void Stop();
 };
 
