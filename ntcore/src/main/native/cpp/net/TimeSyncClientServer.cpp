@@ -108,10 +108,10 @@ void wpi::TimeSyncServer::UdpCallback(uv::Buffer& data, size_t n,
                                       const sockaddr& sender, unsigned flags) {
   wpi::println("Hello from a ping!");
 
-  if (static_cast<size_t>(n) != data.len) {
-    WPI_ERROR(m_logger, "Didn't get right num bytes from client?");
-    return;
-  }
+  // if (static_cast<size_t>(n) != data.len) {
+  //   WPI_ERROR(m_logger, "Didn't get right num bytes from client? Got {} != {}", n, data.len);
+  //   return;
+  // }
 
   TspPing ping{wpi::UnpackStruct<TspPing>(data.bytes())};
 
@@ -159,6 +159,7 @@ wpi::TimeSyncServer::TimeSyncServer(int port,
 
 void wpi::TimeSyncServer::Start() {
   m_udp->received.connect(&wpi::TimeSyncServer::UdpCallback, this);
+  m_udp->StartRecv();
 }
 
 void wpi::TimeSyncServer::Stop() {
