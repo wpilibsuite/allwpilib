@@ -57,7 +57,7 @@ class TimeSyncServer {
                    unsigned flags);
 
  public:
-  TimeSyncServer(int port = 5810,
+  explicit TimeSyncServer(int port = 5810,
                  std::function<uint64_t()> timeProvider = nt::Now);
 
   /**
@@ -92,8 +92,8 @@ class TimeSyncClient {
   SharedTimerPtr m_pingTimer;
 
   std::string m_serverIP;
-
   int m_serverPort;
+
   std::chrono::milliseconds m_loopDelay;
 
   std::mutex m_offsetMutex;

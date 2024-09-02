@@ -220,7 +220,6 @@ void wpi::TimeSyncClient::UdpCallback(uv::Buffer& buf, size_t nbytes,
 
   if (pong.version != 1) {
     fmt::println("Bad version from server?");
-    auto end{std::chrono::high_resolution_clock::now()};
     return;
   }
   if (pong.message_id != 2) {
@@ -282,7 +281,8 @@ void wpi::TimeSyncClient::Start() {
   using namespace std::chrono_literals;
   m_pingTimer->timeout.connect(&wpi::TimeSyncClient::Tick, this);
 
-  m_loopRunner.ExecSync([this](uv::Loop&) { m_pingTimer->Start(1s, 1s); });
+  m_loopRunner.ExecSync(
+      [this](uv::Loop&) { m_pingTimer->Start(m_loopDelay, m_loopDelay); });
 }
 
 void wpi::TimeSyncClient::Stop() {
