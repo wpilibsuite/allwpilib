@@ -27,6 +27,4 @@ TEST(TimeSyncProtocolTest, TestClient) {
 
   server.Stop();
   client.Stop();
-
-  ASSERT_TRUE(false);
 }
