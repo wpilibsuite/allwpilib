@@ -98,7 +98,7 @@ public final class Controller {
     /**
      * <code>optional double dt = 4;</code>
      */
-    private double dt;      
+    private double dt;    
 
     private ProtobufArmFeedforward() {
     }
@@ -293,7 +293,7 @@ public final class Controller {
       bitField0_ |= 0x00000008;
       dt = value;
       return this;
-    }    
+    }
 
     @Override
     public ProtobufArmFeedforward copyFrom(final ProtobufArmFeedforward other) {
@@ -594,7 +594,8 @@ public final class Controller {
       return ProtoMessage.mergeFrom(new ProtobufArmFeedforward(), data).checkInitialized();
     }
 
-    public static ProtobufArmFeedforward parseFrom(final ProtoSource input) throws IOException {
+    public static ProtobufArmFeedforward parseFrom(final ProtoSource input) throws
+        IOException {
       return ProtoMessage.mergeFrom(new ProtobufArmFeedforward(), input).checkInitialized();
     }
 
@@ -638,7 +639,6 @@ public final class Controller {
       static final FieldName ka = FieldName.forField("ka");
 
       static final FieldName dt = FieldName.forField("dt");
-
     }
   }
 
