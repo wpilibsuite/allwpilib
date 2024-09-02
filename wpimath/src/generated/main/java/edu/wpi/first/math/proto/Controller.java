@@ -1089,6 +1089,11 @@ public final class Controller {
      */
     private double ka;
 
+    /**
+     * <code>optional double dt = 4;</code>
+     */
+    private double dt;    
+
     private ProtobufElevatorFeedforward() {
     }
 
@@ -1247,6 +1252,43 @@ public final class Controller {
       return this;
     }
 
+    /**
+     * <code>optional double dt = 4;</code>
+     * @return whether the dt field is set
+     */
+    public boolean hasDt() {
+      return (bitField0_ & 0x00000008) != 0;
+    }
+
+    /**
+     * <code>optional double dt = 4;</code>
+     * @return this
+     */
+    public ProtobufElevatorFeedforward clearDt() {
+      bitField0_ &= ~0x00000008;
+      dt = 0D;
+      return this;
+    }
+
+    /**
+     * <code>optional double dt = 4;</code>
+     * @return the dt
+     */
+    public double getDt() {
+      return dt;
+    }
+
+    /**
+     * <code>optional double dt = 4;</code>
+     * @param value the dt to set
+     * @return this
+     */
+    public ProtobufElevatorFeedforward setDt(final double value) {
+      bitField0_ |= 0x00000008;
+      dt = value;
+      return this;
+    }
+
     @Override
     public ProtobufElevatorFeedforward copyFrom(final ProtobufElevatorFeedforward other) {
       cachedSize = other.cachedSize;
@@ -1256,6 +1298,7 @@ public final class Controller {
         kg = other.kg;
         kv = other.kv;
         ka = other.ka;
+        dt = other.dt;
       }
       return this;
     }
@@ -1278,6 +1321,9 @@ public final class Controller {
       if (other.hasKa()) {
         setKa(other.ka);
       }
+      if (other.hasDt()) {
+        setDt(other.dt);
+      }      
       return this;
     }
 
@@ -1292,6 +1338,7 @@ public final class Controller {
       kg = 0D;
       kv = 0D;
       ka = 0D;
+      dt = 0D;
       return this;
     }
 
@@ -1318,7 +1365,8 @@ public final class Controller {
         && (!hasKs() || ProtoUtil.isEqual(ks, other.ks))
         && (!hasKg() || ProtoUtil.isEqual(kg, other.kg))
         && (!hasKv() || ProtoUtil.isEqual(kv, other.kv))
-        && (!hasKa() || ProtoUtil.isEqual(ka, other.ka));
+        && (!hasKa() || ProtoUtil.isEqual(ka, other.ka))
+        && (!hasDt() || ProtoUtil.isEqual(dt, other.dt));
     }
 
     @Override
@@ -1339,6 +1387,10 @@ public final class Controller {
         output.writeRawByte((byte) 33);
         output.writeDoubleNoTag(ka);
       }
+      if ((bitField0_ & 0x00000008) != 0) {
+        output.writeRawByte((byte) 33);
+        output.writeDoubleNoTag(dt);
+      }      
     }
 
     @Override
@@ -1402,6 +1454,15 @@ public final class Controller {
               break;
             }
           }
+          case 41: {
+            // dt
+            dt = input.readDouble();
+            bitField0_ |= 0x00000010;
+            tag = input.readTag();
+            if (tag != 0) {
+              break;
+            }
+          }          
           case 0: {
             return this;
           }
@@ -1431,6 +1492,9 @@ public final class Controller {
       if ((bitField0_ & 0x00000008) != 0) {
         output.writeDouble(FieldNames.ka, ka);
       }
+      if ((bitField0_ & 0x00000008) != 0) {
+        output.writeDouble(FieldNames.dt, dt);
+      }      
       output.endObject();
     }
 
@@ -1485,6 +1549,17 @@ public final class Controller {
             }
             break;
           }
+          case 3216: {
+            if (input.isAtField(FieldNames.dt)) {
+              if (!input.trySkipNullValue()) {
+                dt = input.readDouble();
+                bitField0_ |= 0x00000010;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }          
           default: {
             input.skipUnknownField();
             break;
@@ -1553,6 +1628,8 @@ public final class Controller {
       static final FieldName kv = FieldName.forField("kv");
 
       static final FieldName ka = FieldName.forField("ka");
+
+      static final FieldName dt = FieldName.forField("dt");
     }
   }
 

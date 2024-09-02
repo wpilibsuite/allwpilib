@@ -81,7 +81,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * @param kv The velocity gain.
    */
   public SimpleMotorFeedforward(double ks, double kv) {
-    this(ks, kv, 0, 0.020);
+    this(ks, kv, 0);
   }
 
   /**
@@ -163,6 +163,8 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   /**
    * Calculates the feedforward from the gains and setpoints assuming discrete control.
    *
+   * <p>Note this method is inaccurate when the velocity crosses 0.
+   * 
    * @param <U> The velocity parameter either as distance or angle.
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity The next velocity setpoint.
@@ -170,36 +172,47 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    */
   public <U extends Unit<U>> Measure<Voltage> calculate(
       Measure<Velocity<U>> currentVelocity, Measure<Velocity<U>> nextVelocity) {
-    if (ka == 0.0) {
-      // Given the following discrete feedforward model
-      //
-      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      // For a simple DC motor with the model
+      //   dx/dt = −kᵥ/kₐ x + 1/kₐ u - kₛ/kₐ sgn(x),
       //
       // where
-      //
-      //   A_d = eᴬᵀ
-      //   B_d = A⁻¹(eᴬᵀ - I)B
       //   A = −kᵥ/kₐ
       //   B = 1/kₐ
+      //   c = -kₛ/kₐ sgn(x))        
+      //   A_d = eᴬᵀ
+      //   B_d = A⁻¹(eᴬᵀ - I)B
+      //   dx/dt = Ax + Bu + c
+      // 
+      // Discretize the affine model.
+      //   dx/dt = Ax + Bu + c
+      //   dx/dt = Ax + B(u + B⁺c)
+      //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+      //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+      //   xₖ₊₁ = A_d xₖ + B_d uₖ + B_d B⁺cₖ
       //
-      // We want the feedforward model when kₐ = 0.
+      // Solve for uₖ.
+      //   B_d uₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+      //
+      // Substitute in B assuming sgn(x) is a constant for the duration of the step.
+      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kₛ/kₐ sgn(x)))
+      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kₛ/kₐ sgn(x))
+      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)     
+    if (ka == 0.0) {
+      // Simplify the model when kₐ = 0.
       //
       // Simplify A.
-      //
       //   A = −kᵥ/kₐ
-      //
-      // As kₐ approaches zero, A approaches -∞.
-      //
+      //   As kₐ approaches zero, A approaches -∞.
       //   A = −∞
       //
       // Simplify A_d.
-      //
       //   A_d = eᴬᵀ
       //   A_d = exp(−∞)
       //   A_d = 0
       //
       // Simplify B_d.
-      //
       //   B_d = A⁻¹(eᴬᵀ - I)B
       //   B_d = A⁻¹((0) - I)B
       //   B_d = A⁻¹(-I)B
@@ -210,20 +223,15 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
       //   B_d = 1/kᵥ
       //
       // Substitute these into the feedforward equation.
-      //
-      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
-      //   uₖ = (1/kᵥ)⁺(rₖ₊₁ − (0) rₖ)
-      //   uₖ = kᵥrₖ₊₁
+      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)     
+      //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kₛ sgn(x)  
+      //   uₖ = kᵥxₖ₊₁  + kₛ sgn(x)    
       return Volts.of(ks * Math.signum(nextVelocity.magnitude()) + kv * nextVelocity.magnitude());
     } else {
-      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
-      //
-      // where
-      //
+      //   A = −kᵥ/kₐ
+      //   B = 1/kₐ      
       //   A_d = eᴬᵀ
       //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   A = −kᵥ/kₐ
-      //   B = 1/kₐ
       double A = -kv / ka;
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
