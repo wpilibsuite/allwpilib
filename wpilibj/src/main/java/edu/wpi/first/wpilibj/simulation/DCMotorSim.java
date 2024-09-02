@@ -64,7 +64,6 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
 
-
     // By theorem 6.10.1 of https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
     // the DC motor state-space model is:
     //
