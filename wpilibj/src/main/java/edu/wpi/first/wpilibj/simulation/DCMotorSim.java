@@ -53,7 +53,6 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
    *     is used, the distance unit must be radians.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
-   * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
