@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.controller;
 
+import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -11,6 +12,7 @@ import edu.wpi.first.math.controller.proto.ElevatorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ElevatorFeedforwardStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -35,6 +37,9 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
 
   /** The period, in seconds. */
   private final double m_dt;
+
+  // ** The calculated output voltage measure */
+  private final MutableMeasure<Voltage> output = mutable(Volts.of(0.0));
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains and period.
@@ -242,10 +247,12 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
       //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kg + kₛ sgn(x)
       //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kg + kₛ sgn(x)
       //   uₖ = kᵥxₖ₊₁  + kg + kₛ sgn(x)
-      return Volts.of(
+      output.mut_replace(
           kg
               + ks * Math.signum(nextVelocity.in(MetersPerSecond))
-              + kv * nextVelocity.in(MetersPerSecond));
+              + kv * nextVelocity.in(MetersPerSecond),
+          Volts);
+      return output;
     } else {
       //   A = −kᵥ/kₐ
       //   B = 1/kₐ
@@ -255,12 +262,14 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
       double B_d = 1.0 / A * (A_d - 1.0) * B;
-      return Volts.of(
+      output.mut_replace(
           kg
               + ks * Math.signum(currentVelocity.magnitude())
               + 1.0
                   / B_d
-                  * (nextVelocity.in(MetersPerSecond) - A_d * currentVelocity.in(MetersPerSecond)));
+                  * (nextVelocity.in(MetersPerSecond) - A_d * currentVelocity.in(MetersPerSecond)),
+          Volts);
+      return output;
     }
   }
 
