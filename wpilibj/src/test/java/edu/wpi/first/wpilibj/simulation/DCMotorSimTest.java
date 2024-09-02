@@ -23,7 +23,7 @@ class DCMotorSimTest {
     RoboRioSim.resetData();
 
     DCMotor gearbox = DCMotor.getNEO(1);
-    LinearSystem<N2, N1, N2> plant = LinearSystemId.createDCMotorSystem(gearbox, 0.005, 1);
+    LinearSystem<N2, N1, N2> plant = LinearSystemId.createDCMotorSystem(gearbox, 0.0005, 1);
     DCMotorSim sim = new DCMotorSim(plant, gearbox);
 
     try (var motor = new PWMVictorSPX(0);
@@ -64,7 +64,7 @@ class DCMotorSimTest {
     RoboRioSim.resetData();
 
     DCMotor gearbox = DCMotor.getNEO(1);
-    LinearSystem<N2, N1, N2> plant = LinearSystemId.createDCMotorSystem(gearbox, 0.005, 1);
+    LinearSystem<N2, N1, N2> plant = LinearSystemId.createDCMotorSystem(gearbox, 0.0005, 1);
     DCMotorSim sim = new DCMotorSim(plant, gearbox);
 
     try (var motor = new PWMVictorSPX(0);

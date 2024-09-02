@@ -33,9 +33,9 @@ DCMotorSim::DCMotorSim(const LinearSystem<2, 1, 2>& plant,
       //
       //   B = GKₜ/(RJ)
       //   J = GKₜ/(RB)
-      m_gearing(-gearbox.Kv.value() * m_plant.A(0, 0) / m_plant.B(0, 0)),
+      m_gearing(-gearbox.Kv.value() * m_plant.A(1, 1) / m_plant.B(1, 0)),
       m_j(m_gearing * gearbox.Kt.value() /
-          (gearbox.R.value() * m_plant.B(0, 0))) {}
+          (gearbox.R.value() * m_plant.B(1, 0))) {}
 
 void DCMotorSim::SetState(units::radian_t angularPosition,
                           units::radians_per_second_t angularVelocity) {
