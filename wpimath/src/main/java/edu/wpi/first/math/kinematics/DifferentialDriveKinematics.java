@@ -11,7 +11,8 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveKinematicsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveKinematicsStruct;
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -57,7 +58,7 @@ public class DifferentialDriveKinematics
    *     between the left wheels and right wheels. However, the empirical value may be larger than
    *     the physical measured value due to scrubbing effects.
    */
-  public DifferentialDriveKinematics(Distance trackWidth) {
+  public DifferentialDriveKinematics(Measure<DistanceUnit> trackWidth) {
     this(trackWidth.in(Meters));
   }
 

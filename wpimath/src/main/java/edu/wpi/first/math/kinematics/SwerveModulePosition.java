@@ -11,7 +11,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.SwerveModulePositionProto;
 import edu.wpi.first.math.kinematics.struct.SwerveModulePositionStruct;
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -54,7 +55,7 @@ public class SwerveModulePosition
    * @param distance The distance measured by the wheel of the module.
    * @param angle The angle of the module.
    */
-  public SwerveModulePosition(Distance distance, Rotation2d angle) {
+  public SwerveModulePosition(Measure<DistanceUnit> distance, Rotation2d angle) {
     this(distance.in(Meters), angle);
   }
 

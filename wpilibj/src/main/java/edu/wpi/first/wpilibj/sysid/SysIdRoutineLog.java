@@ -12,14 +12,15 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularAccelerationUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.units.CurrentUnit;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.LinearAccelerationUnit;
+import edu.wpi.first.units.LinearVelocityUnit;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -116,7 +117,7 @@ public class SysIdRoutineLog {
      * @param voltage The voltage to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog voltage(Voltage voltage) {
+    public MotorLog voltage(Measure<VoltageUnit> voltage) {
       return value("voltage", voltage.in(Volts), Volts.name());
     }
 
@@ -126,7 +127,7 @@ public class SysIdRoutineLog {
      * @param position The linear position to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearPosition(Distance position) {
+    public MotorLog linearPosition(Measure<DistanceUnit> position) {
       return value("position", position.in(Meters), Meters.name());
     }
 
@@ -136,7 +137,7 @@ public class SysIdRoutineLog {
      * @param position The angular position to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularPosition(Angle position) {
+    public MotorLog angularPosition(Measure<AngleUnit> position) {
       return value("position", position.in(Rotations), Rotations.name());
     }
 
@@ -146,7 +147,7 @@ public class SysIdRoutineLog {
      * @param velocity The linear velocity to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearVelocity(LinearVelocity velocity) {
+    public MotorLog linearVelocity(Measure<LinearVelocityUnit> velocity) {
       return value("velocity", velocity.in(MetersPerSecond), MetersPerSecond.name());
     }
 
@@ -156,7 +157,7 @@ public class SysIdRoutineLog {
      * @param velocity The angular velocity to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularVelocity(AngularVelocity velocity) {
+    public MotorLog angularVelocity(Measure<AngularVelocityUnit> velocity) {
       return value("velocity", velocity.in(RotationsPerSecond), RotationsPerSecond.name());
     }
 
@@ -168,7 +169,7 @@ public class SysIdRoutineLog {
      * @param acceleration The linear acceleration to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearAcceleration(LinearAcceleration acceleration) {
+    public MotorLog linearAcceleration(Measure<LinearAccelerationUnit> acceleration) {
       return value(
           "acceleration",
           acceleration.in(MetersPerSecond.per(Second)),
@@ -183,7 +184,7 @@ public class SysIdRoutineLog {
      * @param acceleration The angular acceleration to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularAcceleration(AngularAcceleration acceleration) {
+    public MotorLog angularAcceleration(Measure<AngularAccelerationUnit> acceleration) {
       return value(
           "acceleration",
           acceleration.in(RotationsPerSecond.per(Second)),
@@ -198,7 +199,7 @@ public class SysIdRoutineLog {
      * @param current The current to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog current(Current current) {
+    public MotorLog current(Measure<CurrentUnit> current) {
       value("current", current.in(Amps), Amps.name());
       return this;
     }
