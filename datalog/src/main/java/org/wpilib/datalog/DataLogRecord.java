@@ -124,7 +124,6 @@ public class DataLogRecord {
    * Data contained in a start control record as created by DataLog.start() when writing the log.
    * This can be read by calling getStartData().
    */
-  @SuppressWarnings("MemberName")
   public static class StartRecordData {
     StartRecordData(int entry, String name, String type, String metadata) {
       this.entry = entry;
@@ -169,7 +168,6 @@ public class DataLogRecord {
    * Data contained in a set metadata control record as created by DataLog.setMetadata(). This can
    * be read by calling getSetMetadataData().
    */
-  @SuppressWarnings("MemberName")
   public static class MetadataRecordData {
     MetadataRecordData(int entry, String metadata) {
       this.entry = entry;

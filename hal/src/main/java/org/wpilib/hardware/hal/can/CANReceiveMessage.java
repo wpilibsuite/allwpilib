@@ -7,19 +7,15 @@ package org.wpilib.hardware.hal.can;
 /** Represents a CAN message read from a stream. */
 public class CANReceiveMessage {
   /** The message data. */
-  @SuppressWarnings("MemberName")
   public final byte[] data = new byte[64];
 
   /** The length of the data received (0-8 bytes). */
-  @SuppressWarnings("MemberName")
   public int length;
 
   /** The flags of the message. */
-  @SuppressWarnings("MemberName")
   public int flags;
 
   /** Timestamp message was received, in microseconds (wpi time). */
-  @SuppressWarnings("MemberName")
   public long timestamp;
 
   /** Default constructor. */

@@ -23,7 +23,6 @@ public class Storage extends SubsystemBase {
   // inter-subsystem communications
   /** Whether the ball storage is full. */
   @Logged(name = "Has Cargo")
-  @SuppressWarnings("checkstyle:MemberName")
   public final Trigger hasCargo = new Trigger(m_ballSensor::get);
 
   /** Create a new Storage subsystem. */

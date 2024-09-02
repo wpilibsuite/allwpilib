@@ -10,7 +10,6 @@ package org.wpilib.networktables;
  * <p>There are different kinds of events. When creating a listener, a combination of event kinds
  * can be listened to by building an EnumSet of NetworkTableEvent.Kind.
  */
-@SuppressWarnings("MemberName")
 public final class NetworkTableEvent {
   /** NetworkTable event kind. */
   public enum Kind {

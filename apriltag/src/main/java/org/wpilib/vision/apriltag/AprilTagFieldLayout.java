@@ -264,11 +264,9 @@ public class AprilTagFieldLayout {
   }
 
   static class FieldDimensions {
-    @SuppressWarnings("MemberName")
     @Json.Property(value = "length")
     public final double fieldLength;
 
-    @SuppressWarnings("MemberName")
     @Json.Property(value = "width")
     public final double fieldWidth;
 
