@@ -235,61 +235,145 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the maximum achievable velocity given a maximum voltage supply and an acceleration.
-   * Useful for ensuring that velocity and acceleration constraints for a trapezoidal profile are
-   * simultaneously achievable - enter the acceleration constraint, and this will give you a
-   * simultaneously-achievable velocity constraint.
+   * Calculates the maximum achievable velocity given a maximum voltage supply, an acceleration, and
+   * the feedforward gains. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the acceleration constraint, and this
+   * will give you a simultaneously-achievable velocity constraint.
    *
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The maximum possible velocity at the given acceleration.
    */
-  public double maxAchievableVelocity(double maxVoltage, double acceleration) {
+  public static double maxAchievableVelocity(
+      double ks, double kv, double ka, double maxVoltage, double acceleration) {
     // Assume max velocity is positive
     return (maxVoltage - ks - acceleration * ka) / kv;
   }
 
   /**
-   * Calculates the minimum achievable velocity given a maximum voltage supply and an acceleration.
-   * Useful for ensuring that velocity and acceleration constraints for a trapezoidal profile are
-   * simultaneously achievable - enter the acceleration constraint, and this will give you a
-   * simultaneously-achievable velocity constraint.
+   * Calculates the maximum achievable velocity given a maximum voltage supply, an acceleration, and
+   * a feedforward object. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the acceleration constraint, and this
+   * will give you a simultaneously-achievable velocity constraint.
    *
+   * @param feedforward The feedforward object.
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param acceleration The acceleration of the motor.
+   * @return The maximum possible velocity at the given acceleration.
+   */
+  public static double maxAchievableVelocity(
+      SimpleMotorFeedforward feedforward, double maxVoltage, double acceleration) {
+    // Assume max velocity is positive
+    return maxAchievableVelocity(feedforward.getKs(), feedforward.getKv(), feedforward.getKa(), maxVoltage, acceleration);
+  }
+
+  /**
+   * Calculates the minimum achievable velocity given a maximum voltage supply, an acceleration, and
+   * the feedforward gains. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the acceleration constraint, and this
+   * will give you a simultaneously-achievable velocity constraint.
+   *
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The minimum possible velocity at the given acceleration.
    */
-  public double minAchievableVelocity(double maxVoltage, double acceleration) {
+  public static double minAchievableVelocity(
+      double ks, double kv, double ka, double maxVoltage, double acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + ks - acceleration * ka) / kv;
+    return maxAchievableVelocity(-ks, kv, ka, -maxVoltage, acceleration);
   }
 
   /**
-   * Calculates the maximum achievable acceleration given a maximum voltage supply and a velocity.
-   * Useful for ensuring that velocity and acceleration constraints for a trapezoidal profile are
-   * simultaneously achievable - enter the velocity constraint, and this will give you a
-   * simultaneously-achievable acceleration constraint.
+   * Calculates the minimum achievable velocity given a maximum voltage supply, an acceleration, and
+   * a feedforward object. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the acceleration constraint, and this
+   * will give you a simultaneously-achievable velocity constraint.
    *
+   * @param feedforward The feedforward object.
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param acceleration The acceleration of the motor.
+   * @return The minimum possible velocity at the given acceleration.
+   */
+  public static double minAchievableVelocity(
+      SimpleMotorFeedforward feedforward, double maxVoltage, double acceleration) {
+    // Assume min velocity is negative, ks flips sign
+    return minAchievableVelocity(feedforward.getKs(), feedforward.getKv(), feedforward.getKa(), maxVoltage, acceleration);
+
+  }
+
+  /**
+   * Calculates the maximum achievable acceleration given a maximum voltage supply, a velocity, and
+   * the feedforward gains. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the velocity constraint, and this
+   * will give you a simultaneously-achievable acceleration constraint.
+   *
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param velocity The velocity of the motor.
    * @return The maximum possible acceleration at the given velocity.
    */
-  public double maxAchievableAcceleration(double maxVoltage, double velocity) {
+  public static double maxAchievableAcceleration(
+      double ks, double kv, double ka, double maxVoltage, double velocity) {
     return (maxVoltage - ks * Math.signum(velocity) - velocity * kv) / ka;
   }
 
   /**
-   * Calculates the minimum achievable acceleration given a maximum voltage supply and a velocity.
-   * Useful for ensuring that velocity and acceleration constraints for a trapezoidal profile are
-   * simultaneously achievable - enter the velocity constraint, and this will give you a
-   * simultaneously-achievable acceleration constraint.
+   * Calculates the maximum achievable acceleration given a maximum voltage supply, a velocity, and
+   * a feedforward object. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the velocity constraint, and this
+   * will give you a simultaneously-achievable acceleration constraint.
    *
+   * @param feedforward The feedforward object.
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param velocity The velocity of the motor.
+   * @return The maximum possible acceleration at the given velocity.
+   */
+  public static double maxAchievableAcceleration(
+      SimpleMotorFeedforward feedforward, double maxVoltage, double velocity) {
+    return maxAchievableAcceleration(feedforward.getKs(), feedforward.getKv(), feedforward.getKa(), maxVoltage, velocity);
+
+  }
+
+  /**
+   * Calculates the minimum achievable acceleration given a maximum voltage supply, a velocity, and
+   * the feedforward gains. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the velocity constraint, and this
+   * will give you a simultaneously-achievable acceleration constraint.
+   *
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param velocity The velocity of the motor.
    * @return The minimum possible acceleration at the given velocity.
    */
-  public double minAchievableAcceleration(double maxVoltage, double velocity) {
-    return maxAchievableAcceleration(-maxVoltage, velocity);
+  public static double minAchievableAcceleration(
+      double ks, double kv, double ka, double maxVoltage, double velocity) {
+    return maxAchievableAcceleration(ks, kv, ka, -maxVoltage, velocity);
+  }
+
+  /**
+   * Calculates the minimum achievable acceleration given a maximum voltage supply, a velocity, and
+   * a feedforward object. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the velocity constraint, and this
+   * will give you a simultaneously-achievable acceleration constraint.
+   *
+   * @param feedforward The feedforward object.
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param velocity The velocity of the motor.
+   * @return The minimum possible acceleration at the given velocity.
+   */
+  public static double minAchievableAcceleration(
+      SimpleMotorFeedforward feedforward, double maxVoltage, double velocity) {
+    return minAchievableAcceleration(feedforward.getKs(), feedforward.getKv(), feedforward.getKa(), maxVoltage, velocity);
   }
 
   /** SimpleMotorFeedforward struct for serialization. */

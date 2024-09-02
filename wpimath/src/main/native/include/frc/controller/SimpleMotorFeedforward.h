@@ -169,71 +169,148 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the maximum achievable velocity given a maximum voltage supply
-   * and an acceleration.  Useful for ensuring that velocity and
+   * an acceleration, and the feedforward gains.  Useful for ensuring that velocity and
    * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The maximum possible velocity at the given acceleration.
    */
-  constexpr units::unit_t<Velocity> MaxAchievableVelocity(
+  static units::unit_t<Velocity> MaxAchievableVelocity(
+      units::volt_t ks,
+      units::unit_t<kv_unit> kv,
+      units::unit_t<ka_unit> ka,
       units::volt_t maxVoltage,
-      units::unit_t<Acceleration> acceleration) const {
-    // Assume max velocity is positive
-    return (maxVoltage - kS - kA * acceleration) / kV;
-  }
+      units::unit_t<Acceleration> acceleration);
 
   /**
-   * Calculates the minimum achievable velocity given a maximum voltage supply
-   * and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
-   * achievable - enter the acceleration constraint, and this will give you
-   * a simultaneously-achievable velocity constraint.
+   * Calculates the maximum achievable velocity given a maximum voltage supply, an acceleration, and
+   * a feedforward object. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the acceleration constraint, and this
+   * will give you a simultaneously-achievable velocity constraint.
    *
+   * @param feedforward The feedforward object.
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param acceleration The acceleration of the motor.
+   * @return The maximum possible velocity at the given acceleration.
+   */
+  static units::unit_t<Velocity> MaxAchievableVelocity(
+      SimpleMotorFeedforward feedforward,
+      units::volt_t maxVoltage,
+      units::unit_t<Acceleration> acceleration);
+
+  /**
+   * Calculates the minimum achievable velocity given a maximum voltage supply, an acceleration, and
+   * the feedforward gains. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the acceleration constraint, and this
+   * will give you a simultaneously-achievable velocity constraint.
+   *
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The minimum possible velocity at the given acceleration.
    */
-  constexpr units::unit_t<Velocity> MinAchievableVelocity(
+  static units::unit_t<Velocity> MinAchievableVelocity(
+      units::volt_t ks,
+      units::unit_t<kv_unit> kv,
+      units::unit_t<ka_unit> ka,
       units::volt_t maxVoltage,
-      units::unit_t<Acceleration> acceleration) const {
-    // Assume min velocity is positive, ks flips sign
-    return (-maxVoltage + kS - kA * acceleration) / kV;
-  }
+      units::unit_t<Acceleration> acceleration);
 
   /**
-   * Calculates the maximum achievable acceleration given a maximum voltage
-   * supply and a velocity. Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
-   * achievable - enter the velocity constraint, and this will give you
-   * a simultaneously-achievable acceleration constraint.
+   * Calculates the minimum achievable velocity given a maximum voltage supply, an acceleration, and
+   * a feedforward object. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the acceleration constraint, and this
+   * will give you a simultaneously-achievable velocity constraint.
    *
+   * @param feedforward The feedforward object.
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param acceleration The acceleration of the motor.
+   * @return The minimum possible velocity at the given acceleration.
+   */
+  static units::unit_t<Velocity> MinAchievableVelocity(
+      SimpleMotorFeedforward feedforward,
+      units::volt_t maxVoltage,
+      units::unit_t<Acceleration> acceleration);  
+
+  /**
+   * Calculates the maximum achievable acceleration given a maximum voltage supply, a velocity, and
+   * the feedforward gains. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the velocity constraint, and this
+   * will give you a simultaneously-achievable acceleration constraint.
+   *
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param velocity The velocity of the motor.
    * @return The maximum possible acceleration at the given velocity.
    */
-  constexpr units::unit_t<Acceleration> MaxAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) const {
-    return (maxVoltage - kS * wpi::sgn(velocity) - kV * velocity) / kA;
-  }
+  static units::unit_t<Acceleration> MaxAchievableAcceleration(
+      units::volt_t ks,
+      units::unit_t<kv_unit> kv,
+      units::unit_t<ka_unit> ka,
+      units::volt_t maxVoltage,
+      units::unit_t<Velocity> velocity);
 
   /**
-   * Calculates the minimum achievable acceleration given a maximum voltage
-   * supply and a velocity. Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
-   * achievable - enter the velocity constraint, and this will give you
-   * a simultaneously-achievable acceleration constraint.
+   * Calculates the maximum achievable acceleration given a maximum voltage supply, a velocity, and
+   * a feedforward object. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the velocity constraint, and this
+   * will give you a simultaneously-achievable acceleration constraint.
    *
+   * @param feedforward The feedforward object.
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param velocity The velocity of the motor.
+   * @return The maximum possible acceleration at the given velocity.
+   */
+  static units::unit_t<Acceleration> MaxAchievableAcceleration(
+      SimpleMotorFeedforward feedforward,
+      units::volt_t maxVoltage,
+      units::unit_t<Velocity> velocity);
+
+  /**
+   * Calculates the minimum achievable acceleration given a maximum voltage supply, a velocity, and
+   * the feedforward gains. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the velocity constraint, and this
+   * will give you a simultaneously-achievable acceleration constraint.
+   *
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param velocity The velocity of the motor.
    * @return The minimum possible acceleration at the given velocity.
    */
-  constexpr units::unit_t<Acceleration> MinAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) const {
-    return MaxAchievableAcceleration(-maxVoltage, velocity);
-  }
+  static units::unit_t<Acceleration> MinAchievableAcceleration(
+      units::volt_t ks,
+      units::unit_t<kv_unit> kv,
+      units::unit_t<ka_unit> ka,
+      units::volt_t maxVoltage,
+      units::unit_t<Velocity> velocity);
+
+  /**
+   * Calculates the minimum achievable acceleration given a maximum voltage supply, a velocity, and
+   * a feedforward object. Useful for ensuring that velocity and acceleration constraints for a
+   * trapezoidal profile are simultaneously achievable - enter the velocity constraint, and this
+   * will give you a simultaneously-achievable acceleration constraint.
+   *
+   * @param feedforward The feedforward object.
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param velocity The velocity of the motor.
+   * @return The minimum possible acceleration at the given velocity.
+   */
+  static units::unit_t<Acceleration> MinAchievableAcceleration(
+      SimpleMotorFeedforward feedforward,
+      units::volt_t maxVoltage,
+      units::unit_t<Velocity> velocity);
 
   /**
    * Returns the static gain.

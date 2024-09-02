@@ -39,9 +39,9 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
   // Calculate maximum/minimum possible accelerations from motor dynamics
   // and max/min wheel speeds
   auto maxWheelAcceleration =
-      m_feedforward.MaxAchievableAcceleration(m_maxVoltage, maxWheelSpeed);
+      SimpleMotorFeedforward<units::meter>.MaxAchievableAcceleration(m_feedforward, m_maxVoltage, maxWheelSpeed);
   auto minWheelAcceleration =
-      m_feedforward.MinAchievableAcceleration(m_maxVoltage, minWheelSpeed);
+      SimpleMotorFeedforward<units::meter>.MinAchievableAcceleration(m_feedforward, m_maxVoltage, minWheelSpeed);
 
   // Robot chassis turning on radius = 1/|curvature|.  Outer wheel has radius
   // increased by half of the trackwidth T.  Inner wheel has radius decreased
