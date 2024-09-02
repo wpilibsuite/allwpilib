@@ -195,40 +195,26 @@ int UDPClient::send(std::string_view data, std::string_view server, int port) {
 }
 
 int UDPClient::receive(uint8_t* data_received, int receive_len) {
-  // TODO: why is this behavior here? start() binds to a random port, is this ever not valid?
-  // if (m_port == 0) {
-  //   return -1;  // return if not receiving
-  // }
-
-  return recv(m_lsd, reinterpret_cast<char*>(data_received), receive_len, 0);
-}
-
-int UDPClient::receive(uint8_t* data_received, int receive_len,
-            sockaddr_in *remote) {
   if (m_port == 0) {
     return -1;  // return if not receiving
   }
-
-  socklen_t remote_len = sizeof(sockaddr_in);
-  std::memset(remote, 0, sizeof(sockaddr_in));
-
-  return
-      recvfrom(m_lsd, reinterpret_cast<char*>(data_received), receive_len, 0,
-               reinterpret_cast<sockaddr*>(remote), &remote_len);
-
+  return recv(m_lsd, reinterpret_cast<char*>(data_received), receive_len, 0);
 }
 
 int UDPClient::receive(uint8_t* data_received, int receive_len,
                        SmallVectorImpl<char>* addr_received,
                        int* port_received) {
+  if (m_port == 0) {
+    return -1;  // return if not receiving
+  }
+
   struct sockaddr_in remote;
+  socklen_t remote_len = sizeof(remote);
   std::memset(&remote, 0, sizeof(remote));
 
-  int result = receive(data_received, receive_len, &remote);
-
-  if (result < 0) {
-    return result;
-  }
+  int result =
+      recvfrom(m_lsd, reinterpret_cast<char*>(data_received), receive_len, 0,
+               reinterpret_cast<sockaddr*>(&remote), &remote_len);
 
   char ip[50];
 #ifdef _WIN32
