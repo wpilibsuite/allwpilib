@@ -11,6 +11,7 @@
 #include <ctime>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -18,11 +19,11 @@
 #include <wpi/Logger.h>
 #include <wpi/print.h>
 #include <wpi/struct/Struct.h>
-#include <wpinet/UDPClient.h>
 #include <wpinet/EventLoopRunner.h>
-#include <wpinet/uv/Udp.h>
-#include <wpinet/uv/Timer.h>
+#include <wpinet/UDPClient.h>
 #include <wpinet/uv/Buffer.h>
+#include <wpinet/uv/Timer.h>
+#include <wpinet/uv/Udp.h>
 
 #include "ntcore_cpp.h"
 
@@ -43,7 +44,7 @@ namespace wpi {
 class TimeSyncServer {
   using SharedUdpPtr = std::shared_ptr<uv::Udp>;
 
-  EventLoopRunner m_loopRunner {};
+  EventLoopRunner m_loopRunner{};
 
   wpi::Logger m_logger;
   std::function<uint64_t()> m_timeProvider;
@@ -52,7 +53,8 @@ class TimeSyncServer {
   std::thread m_listener;
 
  private:
-  void UdpCallback(uv::Buffer& buf, size_t nbytes, const sockaddr& sender, unsigned flags);
+  void UdpCallback(uv::Buffer& buf, size_t nbytes, const sockaddr& sender,
+                   unsigned flags);
 
  public:
   TimeSyncServer(int port = 5810,
@@ -69,7 +71,7 @@ class TimeSyncServer {
 };
 
 class TimeSyncClient {
-  public:
+ public:
   struct Metadata {
     int64_t offset{0};
     size_t pingsSent;
@@ -77,11 +79,11 @@ class TimeSyncClient {
     uint64_t lastPongTime;
   };
 
-  private:
+ private:
   using SharedUdpPtr = std::shared_ptr<uv::Udp>;
   using SharedTimerPtr = std::shared_ptr<uv::Timer>;
 
-  EventLoopRunner m_loopRunner {};
+  EventLoopRunner m_loopRunner{};
 
   wpi::Logger m_logger;
   std::function<uint64_t()> m_timeProvider;
@@ -98,11 +100,12 @@ class TimeSyncClient {
   Metadata m_metadata;
 
   // We only allow the most recent ping to stay alive, so only keep track of it
-  TspPing m_lastPing {0};
+  TspPing m_lastPing;
 
   void Tick();
 
-  void UdpCallback(uv::Buffer& buf, size_t nbytes, const sockaddr& sender, unsigned flags);
+  void UdpCallback(uv::Buffer& buf, size_t nbytes, const sockaddr& sender,
+                   unsigned flags);
 
  public:
   TimeSyncClient(std::string_view server, int remote_port,
