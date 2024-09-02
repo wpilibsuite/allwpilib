@@ -15,7 +15,7 @@ DCMotorSim::DCMotorSim(const LinearSystem<2, 1, 2>& plant,
                        const DCMotor& gearbox,
                        const std::array<double, 2>& measurementStdDevs)
     : LinearSystemSim<2, 1, 2>(plant, measurementStdDevs),
-      m_gearbox(gearbox),      
+      m_gearbox(gearbox),
       // By theorem 6.10.1 of
       // https://file.tavsys.net/control/controls-engineering-in-frc.pdf, the
       // flywheel state-space model is:
@@ -50,8 +50,7 @@ units::radians_per_second_t DCMotorSim::GetAngularVelocity() const {
   return units::radians_per_second_t{GetOutput(1)};
 }
 
-units::radians_per_second_squared_t DCMotorSim::GetAngularAcceleration()
-    const {
+units::radians_per_second_squared_t DCMotorSim::GetAngularAcceleration() const {
   return units::radians_per_second_squared_t{
       (m_plant.A() * m_x + m_plant.B() * m_u)(0, 0)};
 }

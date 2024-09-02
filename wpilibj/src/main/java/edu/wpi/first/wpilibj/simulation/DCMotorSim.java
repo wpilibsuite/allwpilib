@@ -32,7 +32,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   private final double m_jKgMetersSquared;
 
   // The angle of the system.
-  private final MutableMeasure<Angle> m_angle = 
+  private final MutableMeasure<Angle> m_angle =
       MutableMeasure.zero(Radians);
 
   // The angular velocity of the system.
@@ -65,7 +65,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
 
-    
+
     // By theorem 6.10.1 of https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
     // the DC motor state-space model is:
     //
@@ -83,7 +83,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
     //   B = GKₜ/(RJ)
     //   J = GKₜ/(RB)
     m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0);
-    m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(0, 0));  
+    m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(0, 0));
   }
 
   /**
@@ -92,7 +92,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param angularPositionRad The new position in radians.
    * @param angularVelocityRadPerSec The new velocity in radians per second.
    * @return this simulated DC motor with applied state.
-   */                    
+   */
   public DCMotorSim setState(double angularPositionRad, double angularVelocityRadPerSec) {
     setState(VecBuilder.fill(angularPositionRad, angularVelocityRadPerSec));
     return this;
@@ -103,7 +103,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @param angularPositionRad The new position in radians.
    * @return this simulated DC motor with applied position.
-   */      
+   */
   public DCMotorSim setAngle(double angularPositionRad){
     return setState(angularPositionRad, getAngularVelocityRadPerSec());
   }
@@ -113,7 +113,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @param angularVelocityRadPerSec The new velocity in radians per second.
    * @return this simulated DC motor with applied position.
-   */        
+   */
   public DCMotorSim setAngularVelocity(double angularVelocityRadPerSec){
     return setState(getAngularPositionRad(), angularVelocityRadPerSec);
   }
@@ -171,7 +171,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   public Measure<Angle> getAngularPosition() {
     m_angle.mut_setMagnitude(getAngularPositionRad());
     return m_angle;
-  }  
+  }
 
   /**
    * Returns the DC motor's velocity.
@@ -199,7 +199,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   public Measure<Velocity<Angle>> getAngularVelocity() {
     m_angularVelocity.mut_setMagnitude(getAngularVelocityRadPerSec());
     return m_angularVelocity;
-  }  
+  }
 
   /**
    * Returns the DC motor's acceleration in Radians Per Second Squared.
@@ -219,7 +219,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   public Measure<Velocity<Velocity<Angle>>> getAngularAcceleration() {
     m_angularAcceleration.mut_setMagnitude(getAngularAccelerationRadPerSecSq());
     return m_angularAcceleration;
-  }  
+  }
 
   /**
    * Returns the DC motor's torque in Newton-Meters.
@@ -228,7 +228,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    */
   public double getTorqueNewtonMeters() {
     return getAngularAccelerationRadPerSecSq() * m_jKgMetersSquared;
-  }  
+  }
 
   /**
    * Returns the DC motor's current draw.
@@ -250,7 +250,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    */
   public double getInputVoltage() {
     return getInput(0);
-  }  
+  }
 
   /**
    * Sets the input voltage for the DC motor.

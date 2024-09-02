@@ -16,10 +16,9 @@
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
   frc::DCMotor gearbox = frc::DCMotor::NEO(1);
-  auto plant = frc::LinearSystemId::DCMotorSystem(frc::DCMotor::NEO(1),
-                                                  units::kilogram_square_meter_t{0.0005}, 1.0);      
-  frc::sim::DCMotorSim sim{plant, gearbox};                    
-                             
+  auto plant = frc::LinearSystemId::DCMotorSystem(
+      frc::DCMotor::NEO(1), units::kilogram_square_meter_t{0.0005}, 1.0);
+  frc::sim::DCMotorSim sim{plant, gearbox};
 
   frc::Encoder encoder{0, 1};
   frc::sim::EncoderSim encoderSim{encoder};
@@ -63,9 +62,9 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 
 TEST(DCMotorSimTest, PositionFeedbackControl) {
   frc::DCMotor gearbox = frc::DCMotor::NEO(1);
-  auto plant = frc::LinearSystemId::DCMotorSystem(frc::DCMotor::NEO(1),
-                                                  units::kilogram_square_meter_t{0.0005}, 1.0);      
-  frc::sim::DCMotorSim sim{plant, gearbox};   
+  auto plant = frc::LinearSystemId::DCMotorSystem(
+      frc::DCMotor::NEO(1), units::kilogram_square_meter_t{0.0005}, 1.0);
+  frc::sim::DCMotorSim sim{plant, gearbox};
 
   frc::PIDController controller{0.04, 0.0, 0.001};
 

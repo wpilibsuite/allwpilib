@@ -107,7 +107,7 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Returns the moment of inertia
    */
-  units::kilogram_square_meter_t J() const { return m_j; }  
+  units::kilogram_square_meter_t J() const { return m_j; }
 
  private:
   DCMotor m_gearbox;
