@@ -17,25 +17,26 @@ import edu.wpi.first.util.struct.StructSerializable;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
 public class SimpleMotorFeedforward implements ProtobufSerializable, StructSerializable {
-  /** The static gain. */
+  /** The static gain, in volts. */
   private final double ks;
 
-  /** The velocity gain. */
+  /** The velocity gain, in V/(units/s). */
   private final double kv;
 
-  /** The acceleration gain. */
+  /** The acceleration gain, in V/(units/s²). */
   private final double ka;
 
-  /** The period. */
+  /** The period, in seconds. */
   private final double m_dt;
 
   /**
-   * Creates a new SimpleMotorFeedforward with the specified gains and period. Units of the gain
-   * values will dictate units of the computed feedforward.
+   * Creates a new SimpleMotorFeedforward with the specified gains and period.
    *
-   * @param ks The static gain.
-   * @param kv The velocity gain.
-   * @param ka The acceleration gain.
+   * <p>The units should be radians for angular systems and meters for linear systems.
+   *
+   * @param ks The static gain in volts.
+   * @param kv The velocity gain in V/(units/s).
+   * @param ka The acceleration gain in V/(units/s²).
    * @param dtSeconds The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
@@ -60,11 +61,13 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains and period. The period is
-   * defaulted to 20 ms. Units of the gain values will dictate units of the computed feedforward.
+   * defaulted to 20 ms.
    *
-   * @param ks The static gain.
-   * @param kv The velocity gain.
-   * @param ka The acceleration gain.
+   * <p>The units should be radians for angular systems and meters for linear systems.
+   *
+   * @param ks The static gain in volts.
+   * @param kv The velocity gain in V/(units/s).
+   * @param ka The acceleration gain in V/(units/s²).
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
    */
@@ -74,45 +77,51 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains. Acceleration gain is defaulted
-   * to zero. The period is defaulted to 20 ms. Units of the gain values will dictate units of the
-   * computed feedforward.
+   * to zero. The period is defaulted to 20 ms.
    *
-   * @param ks The static gain.
-   * @param kv The velocity gain.
+   * <p>The units should be radians for angular systems and meters for linear systems.
+   *
+   * @param ks The static gain in volts.
+   * @param kv The velocity gain in V/(units/s).
+   * @throws IllegalArgumentException for kv &lt; zero.
    */
   public SimpleMotorFeedforward(double ks, double kv) {
     this(ks, kv, 0);
   }
 
   /**
-   * Returns the static gain.
+   * Returns the static gain in volts.
    *
-   * @return The static gain.
+   * @return The static gain in volts.
    */
   public double getKs() {
     return ks;
   }
 
   /**
-   * Returns the velocity gain.
+   * Returns the velocity gain in V/(units/s).
    *
-   * @return The velocity gain.
+   * <p>The units should be radians for angular systems and meters for linear systems.
+   *
+   * @return The velocity gain in V/(units/s).
    */
   public double getKv() {
     return kv;
   }
 
   /**
-   * Returns the acceleration gain.
+   * Returns the acceleration gain in V/(units/s²).
    *
-   * @return The acceleration gain.
+   * <p>The units should be radians for angular systems and meters for linear systems.
+   *
+   * @return The acceleration gain in V/(units/s²).
    */
   public double getKa() {
     return ka;
   }
 
   /**
-   * Returns the period.
+   * Returns the period in seconds.
    *
    * @return The period in seconds.
    */
@@ -164,7 +173,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * Calculates the feedforward from the gains and setpoints assuming discrete control.
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
-   * 
+   *
    * @param <U> The velocity parameter either as distance or angle.
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity The next velocity setpoint.
@@ -172,33 +181,33 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    */
   public <U extends Unit<U>> Measure<Voltage> calculate(
       Measure<Velocity<U>> currentVelocity, Measure<Velocity<U>> nextVelocity) {
-      // For a simple DC motor with the model
-      //   dx/dt = −kᵥ/kₐ x + 1/kₐ u - kₛ/kₐ sgn(x),
-      //
-      // where
-      //   A = −kᵥ/kₐ
-      //   B = 1/kₐ
-      //   c = -kₛ/kₐ sgn(x))        
-      //   A_d = eᴬᵀ
-      //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   dx/dt = Ax + Bu + c
-      // 
-      // Discretize the affine model.
-      //   dx/dt = Ax + Bu + c
-      //   dx/dt = Ax + B(u + B⁺c)
-      //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
-      //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
-      //   xₖ₊₁ = A_d xₖ + B_d uₖ + B_d B⁺cₖ
-      //
-      // Solve for uₖ.
-      //   B_d uₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
-      //
-      // Substitute in B assuming sgn(x) is a constant for the duration of the step.
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kₛ/kₐ sgn(x)))
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kₛ/kₐ sgn(x))
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)     
+    // For a simple DC motor with the model
+    //   dx/dt = −kᵥ/kₐ x + 1/kₐ u - kₛ/kₐ sgn(x),
+    //
+    // where
+    //   A = −kᵥ/kₐ
+    //   B = 1/kₐ
+    //   c = -kₛ/kₐ sgn(x))
+    //   A_d = eᴬᵀ
+    //   B_d = A⁻¹(eᴬᵀ - I)B
+    //   dx/dt = Ax + Bu + c
+    //
+    // Discretize the affine model.
+    //   dx/dt = Ax + Bu + c
+    //   dx/dt = Ax + B(u + B⁺c)
+    //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_d uₖ + B_d B⁺cₖ
+    //
+    // Solve for uₖ.
+    //   B_d uₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+    //
+    // Substitute in B assuming sgn(x) is a constant for the duration of the step.
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kₛ/kₐ sgn(x)))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kₛ/kₐ sgn(x))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)
     if (ka == 0.0) {
       // Simplify the model when kₐ = 0.
       //
@@ -223,13 +232,13 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
       //   B_d = 1/kᵥ
       //
       // Substitute these into the feedforward equation.
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)     
-      //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kₛ sgn(x)  
-      //   uₖ = kᵥxₖ₊₁  + kₛ sgn(x)    
+      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)
+      //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kₛ sgn(x)
+      //   uₖ = kᵥxₖ₊₁  + kₛ sgn(x)
       return Volts.of(ks * Math.signum(nextVelocity.magnitude()) + kv * nextVelocity.magnitude());
     } else {
       //   A = −kᵥ/kₐ
-      //   B = 1/kₐ      
+      //   B = 1/kₐ
       //   A_d = eᴬᵀ
       //   B_d = A⁻¹(eᴬᵀ - I)B
       double A = -kv / ka;
@@ -248,9 +257,11 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * simultaneously achievable - enter the acceleration constraint, and this will give you a
    * simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the motor.
-   * @param acceleration The acceleration of the motor.
-   * @return The maximum possible velocity at the given acceleration.
+   * <p>The units should be radians for angular systems and meters for linear systems.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the motor, in volts.
+   * @param acceleration The acceleration of the motor, in (units/s²).
+   * @return The maximum possible velocity in (units/s) at the given acceleration.
    */
   public double maxAchievableVelocity(double maxVoltage, double acceleration) {
     // Assume max velocity is positive
@@ -263,9 +274,11 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * simultaneously achievable - enter the acceleration constraint, and this will give you a
    * simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the motor.
-   * @param acceleration The acceleration of the motor.
-   * @return The minimum possible velocity at the given acceleration.
+   * <p>The units should be radians for angular systems and meters for linear systems.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the motor, in volts.
+   * @param acceleration The acceleration of the motor, in (units/s²).
+   * @return The maximum possible velocity in (units/s) at the given acceleration.
    */
   public double minAchievableVelocity(double maxVoltage, double acceleration) {
     // Assume min velocity is negative, ks flips sign
@@ -278,9 +291,11 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * simultaneously achievable - enter the velocity constraint, and this will give you a
    * simultaneously-achievable acceleration constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the motor.
-   * @param velocity The velocity of the motor.
-   * @return The maximum possible acceleration at the given velocity.
+   * <p>The units should be radians for angular systems and meters for linear systems.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the motor, in volts.
+   * @param velocity The velocity of the motor, in (units/s).
+   * @return The maximum possible acceleration in (units/s²) at the given velocity.
    */
   public double maxAchievableAcceleration(double maxVoltage, double velocity) {
     return (maxVoltage - ks * Math.signum(velocity) - velocity * kv) / ka;
@@ -292,9 +307,11 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * simultaneously achievable - enter the velocity constraint, and this will give you a
    * simultaneously-achievable acceleration constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the motor.
-   * @param velocity The velocity of the motor.
-   * @return The minimum possible acceleration at the given velocity.
+   * <p>The units should be radians for angular systems and meters for linear systems.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the motor, in volts.
+   * @param velocity The velocity of the motor, in (units/s).
+   * @return The maximum possible acceleration in (units/s²) at the given velocity.
    */
   public double minAchievableAcceleration(double maxVoltage, double velocity) {
     return maxAchievableAcceleration(-maxVoltage, velocity);
