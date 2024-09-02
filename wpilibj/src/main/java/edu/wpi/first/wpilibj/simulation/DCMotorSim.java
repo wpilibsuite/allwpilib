@@ -32,8 +32,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   private final double m_jKgMetersSquared;
 
   // The angle of the system.
-  private final MutableMeasure<Angle> m_angle =
-      MutableMeasure.zero(Radians);
+  private final MutableMeasure<Angle> m_angle = MutableMeasure.zero(Radians);
 
   // The angular velocity of the system.
   private final MutableMeasure<Velocity<Angle>> m_angularVelocity =
@@ -57,10 +56,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *     noise is desired. If present must have 2 elements. The first element is for position. The
    *     second element is for velocity.
    */
-  public DCMotorSim(
-      LinearSystem<N2, N1, N2> plant,
-      DCMotor gearbox,
-      double... measurementStdDevs) {
+  public DCMotorSim(LinearSystem<N2, N1, N2> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
 
