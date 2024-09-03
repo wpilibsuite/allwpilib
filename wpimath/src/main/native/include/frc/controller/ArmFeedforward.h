@@ -37,7 +37,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param kG The gravity gain, in volts.
    * @param kV The velocity gain, in volt seconds per radian.
    * @param kA The acceleration gain, in volt seconds² per radian.
-   * @param dtSeconds The period in seconds.
+   * @param dt The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le; zero.
