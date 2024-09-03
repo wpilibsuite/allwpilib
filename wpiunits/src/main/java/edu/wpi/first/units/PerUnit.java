@@ -7,7 +7,6 @@ package edu.wpi.first.units;
 import edu.wpi.first.units.measure.ImmutablePer;
 import edu.wpi.first.units.measure.MutPer;
 import edu.wpi.first.units.measure.Per;
-
 import java.util.Objects;
 
 /**
@@ -151,8 +150,8 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
     return Units.derive(numerator())
         .toBase(denom.getConverterToBase().div(denominator().getConverterToBase()))
         .fromBase(denom.getConverterFromBase().div(denominator().getConverterFromBase()))
-        .named(name() + " per " + denom.name())
-        .symbol(symbol() + "/" + denom.symbol())
+        .named(name() + " " + denom.name())
+        .symbol(symbol() + "-" + denom.symbol())
         .make();
   }
 
