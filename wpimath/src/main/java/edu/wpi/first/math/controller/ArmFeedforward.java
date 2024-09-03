@@ -96,7 +96,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @throws IllegalArgumentException for kv &lt; zero.
    */
   public ArmFeedforward(double ks, double kg, double kv) {
-    this(ks, kg, kv, 0.0);
+    this(ks, kg, kv, 0);
   }
 
   /**
@@ -154,6 +154,8 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param accelRadPerSecSquared The acceleration setpoint.
    * @return The computed feedforward.
    */
+  @SuppressWarnings("removal")
+  @Deprecated(forRemoval = true, since = "2025")
   public double calculate(
       double positionRadians, double velocityRadPerSec, double accelRadPerSecSquared) {
     return ks * Math.signum(velocityRadPerSec)

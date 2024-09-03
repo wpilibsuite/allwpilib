@@ -37,6 +37,10 @@ class ElevatorFeedforward {
    * @param kG The gravity gain, in volts.
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds² per distance.
+   * @param dt The period in seconds.
+   * @throws IllegalArgumentException for kv &lt; zero.
+   * @throws IllegalArgumentException for ka &lt; zero.
+   * @throws IllegalArgumentException for period &le; zero.
    */
   constexpr ElevatorFeedforward(
       units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
@@ -72,7 +76,7 @@ class ElevatorFeedforward {
    * @deprecated Use the current/next velocity overload instead.
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
-  constexpr units::volt_t Calculate(
+  units::volt_t Calculate(
       units::unit_t<Velocity> velocity,
       units::unit_t<Acceleration> acceleration) const {
     return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
