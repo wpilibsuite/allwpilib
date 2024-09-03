@@ -74,13 +74,16 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
-    AnalogJNI.cleanAnalogTrigger(m_port);
-    m_port = 0;
-    if (m_ownsAnalog && m_analogInput != null) {
-      m_analogInput.close();
+    try {
+      SendableRegistry.remove(this);
+      AnalogJNI.cleanAnalogTrigger(m_port);
+      m_port = 0;
+      if (m_ownsAnalog && m_analogInput != null) {
+        m_analogInput.close();
+      }
+    } finally {
+      Reference.reachabilityFence(m_dutyCycle);
     }
-    Reference.reachabilityFence(m_dutyCycle);
   }
 
   /**

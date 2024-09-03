@@ -10,9 +10,16 @@ package edu.wpi.first.hal;
  * @see "REVPH.h"
  */
 public class REVPHJNI extends JNIWrapper {
+  /** Disabled. */
   public static final int COMPRESSOR_CONFIG_TYPE_DISABLED = 0;
+
+  /** Digital. */
   public static final int COMPRESSOR_CONFIG_TYPE_DIGITAL = 1;
+
+  /** Analog. */
   public static final int COMPRESSOR_CONFIG_TYPE_ANALOG = 2;
+
+  /** Hybrid. */
   public static final int COMPRESSOR_CONFIG_TYPE_HYBRID = 3;
 
   /**
@@ -20,7 +27,7 @@ public class REVPHJNI extends JNIWrapper {
    *
    * @param module the CAN ID to initialize
    * @return the created PH handle
-   * @see "HAL_InitializeREVP"
+   * @see "HAL_InitializeREVPH"
    */
   public static native int initialize(int module);
 

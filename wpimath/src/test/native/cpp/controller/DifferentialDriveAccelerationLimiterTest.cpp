@@ -171,7 +171,7 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   }
 }
 
-TEST(DifferentialDriveAccelerationLimiterTest, SeperateMinMaxLowLimits) {
+TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
   constexpr auto trackwidth = 0.9_m;
   constexpr auto dt = 5_ms;
   constexpr auto minA = -1_mps_sq;

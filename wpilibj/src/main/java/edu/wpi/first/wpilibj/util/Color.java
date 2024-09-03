@@ -117,12 +117,12 @@ public class Color {
     if (this == other) {
       return true;
     }
-    if (other == null || getClass() != other.getClass()) {
+    if (other == null) {
       return false;
     }
 
-    Color color = (Color) other;
-    return Double.compare(color.red, red) == 0
+    return other instanceof Color color
+        && Double.compare(color.red, red) == 0
         && Double.compare(color.green, green) == 0
         && Double.compare(color.blue, blue) == 0;
   }

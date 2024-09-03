@@ -18,7 +18,7 @@ namespace frc {
  * version seen in most publications. Unless you know better, this should be
  * your default choice.
  *
- * [1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilitic
+ * [1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilistic
  *     Inference in Dynamic State-Space Models" (Doctoral dissertation)
  *
  * @tparam States The dimensionality of the state. 2 * States + 1 weights will

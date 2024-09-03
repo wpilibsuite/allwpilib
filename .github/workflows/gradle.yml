@@ -135,6 +135,21 @@ jobs:
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'
+      - name: Check disk free space pre-cleanup (macOS)
+        run: df -h .
+        if: matrix.os == 'macOS-14'
+      - name: Cleanup disk space
+        # CodeQL: 5G
+        # go: 748M
+        # Android: 12G
+        run: |
+          rm -rf /Users/runner/hostedtoolcache/CodeQL
+          rm -rf /Users/runner/hostedtoolcache/go
+          rm -rf /Users/runner/Library/Android
+        if: matrix.os == 'macOS-14'
+      - name: Check disk free space post-cleanup (macOS)
+        run: df -h .
+        if: matrix.os == 'macOS-14'
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
@@ -148,6 +163,9 @@ jobs:
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'
+      - name: Check disk free space (macOS)
+        run: df -h .
+        if: matrix.os == 'macOS-14'
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}

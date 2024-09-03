@@ -118,6 +118,11 @@ void HAL_SetUserRailEnabled3V3(HAL_Bool enabled, int32_t* status) {
   power->writeDisable_User3V3(!enabled, status);
 }
 
+void HAL_ResetUserCurrentFaults(int32_t* status) {
+  initializePower(status);
+  power->strobeResetFaultCounts(status);
+}
+
 void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
   initializePower(status);
   if (voltage < 0) {

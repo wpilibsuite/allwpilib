@@ -52,9 +52,8 @@ struct traits<BDCSVD<MatrixType_, Options> > : svd_traits<MatrixType_, Options> 
 
 template <typename MatrixType, int Options>
 struct allocate_small_svd {
-  static void run(JacobiSVD<MatrixType, Options>& smallSvd, Index rows, Index cols, unsigned int computationOptions) {
-    (void)computationOptions;
-    smallSvd = JacobiSVD<MatrixType, Options>(rows, cols);
+  static void run(JacobiSVD<MatrixType, Options>& smallSvd, Index rows, Index cols, unsigned int) {
+    internal::construct_at(&smallSvd, rows, cols);
   }
 };
 
@@ -64,7 +63,7 @@ EIGEN_DISABLE_DEPRECATED_WARNING
 template <typename MatrixType>
 struct allocate_small_svd<MatrixType, 0> {
   static void run(JacobiSVD<MatrixType>& smallSvd, Index rows, Index cols, unsigned int computationOptions) {
-    smallSvd = JacobiSVD<MatrixType>(rows, cols, computationOptions);
+    internal::construct_at(&smallSvd, rows, cols, computationOptions);
   }
 };
 
@@ -164,10 +163,10 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
    * Like the default constructor but with preallocation of the internal data
    * according to the specified problem size and the \a computationOptions.
    *
-   * One \b cannot request unitiaries using both the \a Options template parameter
+   * One \b cannot request unitaries using both the \a Options template parameter
    * and the constructor. If possible, prefer using the \a Options template parameter.
    *
-   * \param computationOptions specifification for computing Thin/Full unitaries U/V
+   * \param computationOptions specification for computing Thin/Full unitaries U/V
    * \sa BDCSVD()
    *
    * \deprecated Will be removed in the next major Eigen version. Options should
@@ -179,7 +178,7 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
   }
 
   /** \brief Constructor performing the decomposition of given matrix, using the custom options specified
-   *         with the \a Options template paramter.
+   *         with the \a Options template parameter.
    *
    * \param matrix the matrix to decompose
    */
@@ -190,11 +189,11 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
   /** \brief Constructor performing the decomposition of given matrix using specified options
    *         for computing unitaries.
    *
-   *  One \b cannot request unitiaries using both the \a Options template parameter
+   *  One \b cannot request unitaries using both the \a Options template parameter
    *  and the constructor. If possible, prefer using the \a Options template parameter.
    *
    * \param matrix the matrix to decompose
-   * \param computationOptions specifification for computing Thin/Full unitaries U/V
+   * \param computationOptions specification for computing Thin/Full unitaries U/V
    *
    * \deprecated Will be removed in the next major Eigen version. Options should
    * be specified in the \a Options template parameter.
@@ -1048,7 +1047,7 @@ void BDCSVD<MatrixType, Options>::computeSingVals(const ArrayRef& col0, const Ar
       } else {
         // We have a problem as shifting on the left or right give either a positive or negative value
         // at the middle of [left,right]...
-        // Instead fo abbording or entering an infinite loop,
+        // Instead of abbording or entering an infinite loop,
         // let's just use the middle as the estimated zero-crossing:
         muCur = (right - left) * RealScalar(0.5);
         // we can test exact equality here, because shift comes from `... ? left : right`

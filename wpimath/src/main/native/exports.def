@@ -1,9 +1,0 @@
-EXPORTS
-    ??$CreateMaybeMessage@VProtobufSimpleMotorFeedforward@proto@wpi@@$$V@Arena@protobuf@google@@CAPEAVProtobufSimpleMotorFeedforward@proto@wpi@@PEAV012@@Z
-    ??$CreateMaybeMessage@VProtobufTranslation2d@proto@wpi@@$$V@Arena@protobuf@google@@CAPEAVProtobufTranslation2d@proto@wpi@@PEAV012@@Z
-    ?Clear@ProtobufTranslation2d@proto@wpi@@UEAAXXZ
-    ??$CreateMaybeMessage@VProtobufSwerveDriveKinematics@proto@wpi@@$$V@Arena@protobuf@google@@CAPEAVProtobufSwerveDriveKinematics@proto@wpi@@PEAV012@@Z
-    ??$CreateMaybeMessage@VProtobufMatrix@proto@wpi@@$$V@Arena@protobuf@google@@CAPEAVProtobufMatrix@proto@wpi@@PEAV012@@Z
-    ??$CreateMaybeMessage@VProtobufVector@proto@wpi@@$$V@Arena@protobuf@google@@CAPEAVProtobufVector@proto@wpi@@PEAV012@@Z
-    ??$CreateMaybeMessage@VProtobufLinearSystem@proto@wpi@@$$V@Arena@protobuf@google@@CAPEAVProtobufLinearSystem@proto@wpi@@PEAV012@@Z
-    ?_ProtobufMatrix_default_instance_@proto@wpi@@3UProtobufMatrixDefaultTypeInternal@12@A

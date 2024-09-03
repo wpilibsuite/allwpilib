@@ -90,7 +90,7 @@ void ResetEvent(WPI_EventHandle handle);
  * multiple-consumer scenario.
  *
  * @param initialCount initial value for the semaphore's internal counter
- * @param maximumCount maximum value for the samephore's internal counter
+ * @param maximumCount maximum value for the semaphore's internal counter
  * @return Semaphore handle
  */
 WPI_SemaphoreHandle CreateSemaphore(int initialCount = 0,
@@ -318,7 +318,7 @@ class Semaphore final {
    * Constructor.
    *
    * @param initialCount initial value for the semaphore's internal counter
-   * @param maximumCount maximum value for the samephore's internal counter
+   * @param maximumCount maximum value for the semaphore's internal counter
    */
   explicit Semaphore(int initialCount = 0, int maximumCount = INT_MAX)
       : m_handle{CreateSemaphore(initialCount, maximumCount)} {}
@@ -491,7 +491,7 @@ void WPI_ResetEvent(WPI_EventHandle handle);
  * multiple-consumer scenario.
  *
  * @param initial_count initial value for the semaphore's internal counter
- * @param maximum_count maximum value for the samephore's internal counter
+ * @param maximum_count maximum value for the semaphore's internal counter
  * @return Semaphore handle
  */
 WPI_SemaphoreHandle WPI_CreateSemaphore(int initial_count, int maximum_count);

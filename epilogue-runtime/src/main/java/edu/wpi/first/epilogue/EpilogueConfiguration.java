@@ -9,6 +9,8 @@ import edu.wpi.first.epilogue.logging.NTDataLogger;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
 import edu.wpi.first.epilogue.logging.errors.ErrorPrinter;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 
 /**
  * A configuration object to be used by the generated {@code Epilogue} class to customize its
@@ -22,6 +24,18 @@ public class EpilogueConfiguration {
    * DataLogManager.start()} in your {@code robotInit} method.
    */
   public DataLogger dataLogger = new NTDataLogger(NetworkTableInstance.getDefault());
+
+  /**
+   * The period Epilogue will log at. By default this is the period that the robot runs at. This is
+   * the field used by bind to configure speed when adding the periodic logging function
+   */
+  public Measure<Time> loggingPeriod;
+
+  /**
+   * The offset from the periodic run that Epilogue will log at. By default this will be half of the
+   * robots period. This is the field used by bind when adding the periodic logging function
+   */
+  public Measure<Time> loggingPeriodOffset;
 
   /**
    * The minimum importance level of data to be logged. Defaults to debug, which logs data of all

@@ -65,12 +65,12 @@ def get_repo_root():
 
     An empty string is returned if no repository root was found.
     """
-    current_dir = os.path.abspath(os.getcwd())
-    while current_dir != os.path.dirname(current_dir):
-        if os.path.exists(current_dir + os.sep + ".git"):
-            return current_dir
-        current_dir = os.path.dirname(current_dir)
-    return ""
+    return subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        encoding="ascii",
+    ).stdout.rstrip()
 
 
 def walk_if(top, pred):
@@ -564,7 +564,7 @@ class Lib:
         )
 
         subparsers.add_parser(
-            "copy-upstream-to-thirdparty",
+            "copy-src",
             help="Copies files from the upstream repository into the thirdparty directory in allwpilib",
         )
 
@@ -581,5 +581,5 @@ class Lib:
             self.rebase(args.new_tag)
         elif args.subcommand == "format-patch":
             self.format_patch()
-        elif args.subcommand == "copy-upstream-to-thirdparty":
+        elif args.subcommand == "copy-src":
             self.copy_upstream_to_thirdparty()

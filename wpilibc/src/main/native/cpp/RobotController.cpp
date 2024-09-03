@@ -84,6 +84,13 @@ bool RobotController::IsBrownedOut() {
   return retVal;
 }
 
+int RobotController::GetCommsDisableCount() {
+  int32_t status = 0;
+  int retVal = HAL_GetCommsDisableCount(&status);
+  FRC_CheckErrorStatus(status, "GetCommsDisableCount");
+  return retVal;
+}
+
 bool RobotController::GetRSLState() {
   int32_t status = 0;
   bool retVal = HAL_GetRSLState(&status);
@@ -212,6 +219,12 @@ int RobotController::GetFaultCount6V() {
   int retVal = HAL_GetUserCurrentFaults6V(&status);
   FRC_CheckErrorStatus(status, "GetFaultCount6V");
   return retVal;
+}
+
+void RobotController::ResetRailFaultCounts() {
+  int32_t status = 0;
+  HAL_ResetUserCurrentFaults(&status);
+  FRC_CheckErrorStatus(status, "ResetRailFaultCounts");
 }
 
 units::volt_t RobotController::GetBrownoutVoltage() {

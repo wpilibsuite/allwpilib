@@ -7,7 +7,7 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Watts;
 
 /**
- * Unit of electic current dimension.
+ * Unit of electric current dimension.
  *
  * <p>This is the base type for units of current dimension. It is also used to specify the dimension
  * for {@link Measure}: <code>Measure&lt;Current&gt;</code>.

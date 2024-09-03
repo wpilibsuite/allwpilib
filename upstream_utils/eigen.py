@@ -19,7 +19,7 @@ def eigen_inclusions(dp, f):
     dp -- directory path
     f -- filename
     """
-    if not dp.startswith("./Eigen"):
+    if not dp.startswith(os.path.join(".", "Eigen")):
         return False
 
     abspath = os.path.join(dp, f)
@@ -79,7 +79,7 @@ def unsupported_inclusions(dp, f):
     dp -- directory path
     f -- filename
     """
-    if not dp.startswith("./unsupported"):
+    if not dp.startswith(os.path.join(".", "unsupported")):
         return False
 
     abspath = os.path.join(dp, f)
@@ -129,7 +129,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "eigen"
     url = "https://gitlab.com/libeigen/eigen.git"
-    tag = "c4d84dfddc9f9edef0fdbe7cf9966d2f4a303198"
+    tag = "d14b0a4e531760b6aeccf20b666eaec8bd0b8461"
 
     eigen = Lib(name, url, tag, copy_upstream_src)
     eigen.main()

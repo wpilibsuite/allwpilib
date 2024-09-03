@@ -23,11 +23,11 @@ public class DifferentialDriveWheelPositions
   /** Distance measured by the right side. */
   public double rightMeters;
 
-  /** DifferentialDriveWheelPostions struct for serialization. */
+  /** DifferentialDriveWheelPositions struct for serialization. */
   public static final DifferentialDriveWheelPositionsStruct struct =
       new DifferentialDriveWheelPositionsStruct();
 
-  /** DifferentialDriveWheelPostions struct for serialization. */
+  /** DifferentialDriveWheelPositions struct for serialization. */
   public static final DifferentialDriveWheelPositionsProto proto =
       new DifferentialDriveWheelPositionsProto();
 

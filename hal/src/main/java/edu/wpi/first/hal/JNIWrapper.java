@@ -63,6 +63,11 @@ public class JNIWrapper {
     libraryLoaded = true;
   }
 
+  /**
+   * Dummy function to suppress unused variable warnings.
+   *
+   * @param object variable to suppress
+   */
   public static void suppressUnused(Object object) {}
 
   /** Utility class. */

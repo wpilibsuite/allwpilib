@@ -58,7 +58,7 @@ TrapezoidProfile<Distance>::Calculate(units::second_t t, State current,
 
   m_endAccel = accelerationTime - cutoffBegin;
   m_endFullSpeed = m_endAccel + fullSpeedDist / m_constraints.maxVelocity;
-  m_endDeccel = m_endFullSpeed + accelerationTime - cutoffEnd;
+  m_endDecel = m_endFullSpeed + accelerationTime - cutoffEnd;
   State result = m_current;
 
   if (t < m_endAccel) {
@@ -71,10 +71,10 @@ TrapezoidProfile<Distance>::Calculate(units::second_t t, State current,
                         m_endAccel * m_constraints.maxAcceleration / 2.0) *
                            m_endAccel +
                        m_constraints.maxVelocity * (t - m_endAccel);
-  } else if (t <= m_endDeccel) {
+  } else if (t <= m_endDecel) {
     result.velocity =
-        goal.velocity + (m_endDeccel - t) * m_constraints.maxAcceleration;
-    units::second_t timeLeft = m_endDeccel - t;
+        goal.velocity + (m_endDecel - t) * m_constraints.maxAcceleration;
+    units::second_t timeLeft = m_endDecel - t;
     result.position =
         goal.position -
         (goal.velocity + timeLeft * m_constraints.maxAcceleration / 2.0) *
@@ -105,7 +105,7 @@ units::second_t TrapezoidProfile<Distance>::TimeLeftUntil(
   endFullSpeed = units::math::max(endFullSpeed, 0_s);
 
   const Acceleration_t acceleration = m_constraints.maxAcceleration;
-  const Acceleration_t decceleration = -m_constraints.maxAcceleration;
+  const Acceleration_t deceleration = -m_constraints.maxAcceleration;
 
   Distance_t distToTarget = units::math::abs(target - position);
 
@@ -116,26 +116,26 @@ units::second_t TrapezoidProfile<Distance>::TimeLeftUntil(
   Distance_t accelDist =
       velocity * endAccel + 0.5 * acceleration * endAccel * endAccel;
 
-  Velocity_t deccelVelocity;
+  Velocity_t decelVelocity;
   if (endAccel > 0_s) {
-    deccelVelocity = units::math::sqrt(
+    decelVelocity = units::math::sqrt(
         units::math::abs(velocity * velocity + 2 * acceleration * accelDist));
   } else {
-    deccelVelocity = velocity;
+    decelVelocity = velocity;
   }
 
   Distance_t fullSpeedDist = m_constraints.maxVelocity * endFullSpeed;
-  Distance_t deccelDist;
+  Distance_t decelDist;
 
   if (accelDist > distToTarget) {
     accelDist = distToTarget;
     fullSpeedDist = Distance_t{0};
-    deccelDist = Distance_t{0};
+    decelDist = Distance_t{0};
   } else if (accelDist + fullSpeedDist > distToTarget) {
     fullSpeedDist = distToTarget - accelDist;
-    deccelDist = Distance_t{0};
+    decelDist = Distance_t{0};
   } else {
-    deccelDist = distToTarget - fullSpeedDist - accelDist;
+    decelDist = distToTarget - fullSpeedDist - accelDist;
   }
 
   units::second_t accelTime =
@@ -143,14 +143,14 @@ units::second_t TrapezoidProfile<Distance>::TimeLeftUntil(
                        velocity * velocity + 2 * acceleration * accelDist))) /
       acceleration;
 
-  units::second_t deccelTime =
-      (-deccelVelocity +
-       units::math::sqrt(units::math::abs(deccelVelocity * deccelVelocity +
-                                          2 * decceleration * deccelDist))) /
-      decceleration;
+  units::second_t decelTime =
+      (-decelVelocity +
+       units::math::sqrt(units::math::abs(decelVelocity * decelVelocity +
+                                          2 * deceleration * decelDist))) /
+      deceleration;
 
   units::second_t fullSpeedTime = fullSpeedDist / m_constraints.maxVelocity;
 
-  return accelTime + fullSpeedTime + deccelTime;
+  return accelTime + fullSpeedTime + decelTime;
 }
 }  // namespace frc

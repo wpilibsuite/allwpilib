@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.simulation.SendableChooserSim;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,10 +29,9 @@ class SendableChooserTest {
   @ParameterizedTest
   void returnsSelected(int toSelect) {
     try (var chooser = new SendableChooser<Integer>();
-        var publisher =
-            m_inst
-                .getStringTopic("/SmartDashboard/returnsSelectedChooser" + toSelect + "/selected")
-                .publish()) {
+        var chooserSim =
+            new SendableChooserSim(
+                m_inst, "/SmartDashboard/returnsSelectedChooser" + toSelect + "/")) {
       for (int i = 1; i <= 3; i++) {
         chooser.addOption(String.valueOf(i), i);
       }
@@ -39,7 +39,7 @@ class SendableChooserTest {
 
       SmartDashboard.putData("returnsSelectedChooser" + toSelect, chooser);
       SmartDashboard.updateValues();
-      publisher.set(String.valueOf(toSelect));
+      chooserSim.setSelected(String.valueOf(toSelect));
       SmartDashboard.updateValues();
       assertEquals(toSelect, chooser.getSelected());
     }
@@ -70,7 +70,8 @@ class SendableChooserTest {
 
   @Test
   void testChangeListener() {
-    try (var chooser = new SendableChooser<Integer>()) {
+    try (var chooser = new SendableChooser<Integer>();
+        var chooserSim = new SendableChooserSim(m_inst, "/SmartDashboard/changeListenerChooser/")) {
       for (int i = 1; i <= 3; i++) {
         chooser.addOption(String.valueOf(i), i);
       }
@@ -79,7 +80,7 @@ class SendableChooserTest {
 
       SmartDashboard.putData("changeListenerChooser", chooser);
       SmartDashboard.updateValues();
-      SmartDashboard.putString("changeListenerChooser/selected", "3");
+      chooserSim.setSelected("3");
       SmartDashboard.updateValues();
       assertEquals(3, currentVal.get());
     }

@@ -90,6 +90,9 @@ class AddressableLED {
    */
   explicit AddressableLED(int port);
 
+  AddressableLED(AddressableLED&&) = default;
+  AddressableLED& operator=(AddressableLED&&) = default;
+
   ~AddressableLED();
 
   /**

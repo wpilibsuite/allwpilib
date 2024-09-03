@@ -4,7 +4,6 @@
 
 package edu.wpi.first.epilogue.processor;
 
-import com.google.auto.service.AutoService;
 import edu.wpi.first.epilogue.CustomLoggerFor;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -40,7 +38,6 @@ import javax.tools.Diagnostic;
   "edu.wpi.first.epilogue.Logged"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
-@AutoService(Processor.class)
 public class AnnotationProcessor extends AbstractProcessor {
   private static final String kCustomLoggerFqn = "edu.wpi.first.epilogue.CustomLoggerFor";
   private static final String kClassSpecificLoggerFqn =

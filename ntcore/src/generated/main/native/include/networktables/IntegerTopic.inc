@@ -15,7 +15,7 @@
 namespace nt {
 
 inline IntegerSubscriber::IntegerSubscriber(
-    NT_Subscriber handle, int64_t defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue} {}
 
@@ -24,7 +24,7 @@ inline int64_t IntegerSubscriber::Get() const {
 }
 
 inline int64_t IntegerSubscriber::Get(
-    int64_t defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetInteger(m_subHandle, defaultValue);
 }
 
@@ -33,7 +33,7 @@ inline TimestampedInteger IntegerSubscriber::GetAtomic() const {
 }
 
 inline TimestampedInteger IntegerSubscriber::GetAtomic(
-    int64_t defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicInteger(m_subHandle, defaultValue);
 }
 
@@ -49,12 +49,12 @@ inline IntegerTopic IntegerSubscriber::GetTopic() const {
 inline IntegerPublisher::IntegerPublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void IntegerPublisher::Set(int64_t value,
+inline void IntegerPublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetInteger(m_pubHandle, value, time);
 }
 
-inline void IntegerPublisher::SetDefault(int64_t value) {
+inline void IntegerPublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultInteger(m_pubHandle, value);
 }
 
@@ -63,7 +63,7 @@ inline IntegerTopic IntegerPublisher::GetTopic() const {
 }
 
 inline IntegerEntry::IntegerEntry(
-    NT_Entry handle, int64_t defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : IntegerSubscriber{handle, defaultValue},
       IntegerPublisher{handle} {}
 

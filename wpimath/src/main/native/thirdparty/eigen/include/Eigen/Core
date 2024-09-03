@@ -348,6 +348,7 @@ using std::ptrdiff_t;
 #include "src/Core/TriangularMatrix.h"
 #include "src/Core/SelfAdjointView.h"
 #include "src/Core/products/GeneralBlockPanelKernel.h"
+#include "src/Core/DeviceWrapper.h"
 #ifdef EIGEN_GEMM_THREADPOOL
 // #include "ThreadPool"
 #endif
@@ -404,7 +405,6 @@ using std::ptrdiff_t;
 #endif
 
 #include "src/Core/GlobalFunctions.h"
-#include "src/Core/DeviceWrapper.h"
 // IWYU pragma: end_exports
 
 #include "src/Core/util/ReenableStupidWarnings.h"

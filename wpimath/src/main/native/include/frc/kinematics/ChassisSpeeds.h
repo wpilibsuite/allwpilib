@@ -50,7 +50,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   }
 
   /**
-   * Disretizes a continuous-time chassis speed.
+   * Discretizes a continuous-time chassis speed.
    *
    * This function converts a continuous-time chassis speed into a discrete-time
    * one such that when the discrete-time chassis speed is applied for one
@@ -85,7 +85,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   }
 
   /**
-   * Disretizes a continuous-time chassis speed.
+   * Discretizes a continuous-time chassis speed.
    *
    * This function converts a continuous-time chassis speed into a discrete-time
    * one such that when the discrete-time chassis speed is applied for one

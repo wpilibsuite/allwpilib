@@ -15,7 +15,7 @@
 namespace nt {
 
 inline FloatSubscriber::FloatSubscriber(
-    NT_Subscriber handle, float defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue} {}
 
@@ -24,7 +24,7 @@ inline float FloatSubscriber::Get() const {
 }
 
 inline float FloatSubscriber::Get(
-    float defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetFloat(m_subHandle, defaultValue);
 }
 
@@ -33,7 +33,7 @@ inline TimestampedFloat FloatSubscriber::GetAtomic() const {
 }
 
 inline TimestampedFloat FloatSubscriber::GetAtomic(
-    float defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicFloat(m_subHandle, defaultValue);
 }
 
@@ -49,12 +49,12 @@ inline FloatTopic FloatSubscriber::GetTopic() const {
 inline FloatPublisher::FloatPublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void FloatPublisher::Set(float value,
+inline void FloatPublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetFloat(m_pubHandle, value, time);
 }
 
-inline void FloatPublisher::SetDefault(float value) {
+inline void FloatPublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultFloat(m_pubHandle, value);
 }
 
@@ -63,7 +63,7 @@ inline FloatTopic FloatPublisher::GetTopic() const {
 }
 
 inline FloatEntry::FloatEntry(
-    NT_Entry handle, float defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : FloatSubscriber{handle, defaultValue},
       FloatPublisher{handle} {}
 

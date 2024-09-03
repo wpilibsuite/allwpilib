@@ -22,7 +22,7 @@ public final class DAREJNI extends WPIMathJNI {
    * </ul>
    *
    * <p>Only use this function if you're sure the preconditions are met. Solves the discrete
-   * alegebraic Riccati equation.
+   * algebraic Riccati equation.
    *
    * @param A Array containing elements of A in row-major order.
    * @param B Array containing elements of B in row-major order.

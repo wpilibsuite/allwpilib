@@ -212,7 +212,7 @@
 
 /// \internal EIGEN_COMP_FCC set to FCC version if the compiler is Fujitsu Compiler (traditional mode)
 /// \note The Fujitsu C/C++ compiler uses the traditional mode based
-/// on EDG g++ 6.1 by default or if envoked with the -Nnoclang flag
+/// on EDG g++ 6.1 by default or if invoked with the -Nnoclang flag
 #if defined(__FUJITSU)
 #define EIGEN_COMP_FCC (__FCC_major__ * 100 + __FCC_minor__ * 10 + __FCC_patchlevel__)
 #else
@@ -221,7 +221,7 @@
 
 /// \internal EIGEN_COMP_CLANGFCC set to FCC version if the compiler is Fujitsu Compiler (Clang mode)
 /// \note The Fujitsu C/C++ compiler uses the non-traditional mode
-/// based on Clang 7.1.0 if envoked with the -Nclang flag
+/// based on Clang 7.1.0 if invoked with the -Nclang flag
 #if defined(__CLANG_FUJITSU)
 #define EIGEN_COMP_CLANGFCC (__FCC_major__ * 100 + __FCC_minor__ * 10 + __FCC_patchlevel__)
 #else

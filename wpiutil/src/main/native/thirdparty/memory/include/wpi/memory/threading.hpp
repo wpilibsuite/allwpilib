@@ -22,7 +22,7 @@ namespace wpi
     {
         /// A dummy \c Mutex class that does not lock anything.
         /// It is a valid \c Mutex and can be used to disable locking anywhere a \c Mutex is requested.
-        /// \ingroup core
+        /// \ingroup memory_core
         struct no_mutex
         {
             void lock() noexcept {}
@@ -35,11 +35,11 @@ namespace wpi
             void unlock() noexcept {}
         };
 
-        /// Specifies whether or not a \concept{concept_rawallocator,RawAllocator} is thread safe as-is.
+        /// Specifies whether or not a RawAllocator is thread safe as-is.
         /// This allows to use \ref no_mutex as an optimization.
         /// Note that stateless allocators are implictly thread-safe.
         /// Specialize it only for your own stateful allocators.
-        /// \ingroup core
+        /// \ingroup memory_core
         template <class RawAllocator>
         struct is_thread_safe_allocator
         : std::integral_constant<bool, !allocator_traits<RawAllocator>::is_stateful::value>

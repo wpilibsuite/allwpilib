@@ -4,8 +4,11 @@
 
 #include "frc/Resource.h"
 
+#include <wpi/deprecated.h>
+
 #include "frc/Errors.h"
 
+WPI_IGNORE_DEPRECATED
 using namespace frc;
 
 wpi::mutex Resource::m_createMutex;
@@ -17,6 +20,7 @@ void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
     r = std::make_unique<Resource>(elements);
   }
 }
+WPI_UNIGNORE_DEPRECATED
 
 Resource::Resource(uint32_t elements) {
   m_isAllocated = std::vector<bool>(elements, false);

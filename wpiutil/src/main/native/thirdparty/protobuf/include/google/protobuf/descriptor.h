@@ -976,13 +976,13 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
     mutable std::atomic<const Message*> default_generated_instance_;
   };
 
-  static const CppType kTypeToCppTypeMap[MAX_TYPE + 1];
+  static const CppType *GetTypeToCppTypeMap();
 
-  static const char* const kTypeToName[MAX_TYPE + 1];
+  static const char* const *GetTypeToName();
 
-  static const char* const kCppTypeToName[MAX_CPPTYPE + 1];
+  static const char* const *GetCppTypeToName();
 
-  static const char* const kLabelToName[MAX_LABEL + 1];
+  static const char* const *GetLabelToName();
 
   // Must be constructed using DescriptorPool.
   FieldDescriptor() {}
@@ -2392,27 +2392,27 @@ inline int MethodDescriptor::index() const {
 }
 
 inline const char* FieldDescriptor::type_name() const {
-  return kTypeToName[type()];
+  return GetTypeToName()[type()];
 }
 
 inline FieldDescriptor::CppType FieldDescriptor::cpp_type() const {
-  return kTypeToCppTypeMap[type()];
+  return GetTypeToCppTypeMap()[type()];
 }
 
 inline const char* FieldDescriptor::cpp_type_name() const {
-  return kCppTypeToName[kTypeToCppTypeMap[type()]];
+  return GetCppTypeToName()[GetTypeToCppTypeMap()[type()]];
 }
 
 inline FieldDescriptor::CppType FieldDescriptor::TypeToCppType(Type type) {
-  return kTypeToCppTypeMap[type];
+  return GetTypeToCppTypeMap()[type];
 }
 
 inline const char* FieldDescriptor::TypeName(Type type) {
-  return kTypeToName[type];
+  return GetTypeToName()[type];
 }
 
 inline const char* FieldDescriptor::CppTypeName(CppType cpp_type) {
-  return kCppTypeToName[cpp_type];
+  return GetCppTypeToName()[cpp_type];
 }
 
 inline bool FieldDescriptor::IsTypePackable(Type field_type) {
