@@ -159,9 +159,9 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
   /**
    * {@inheritDoc}
    *
-   * Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link edu.wpi.first.units.measure.Per} instance. If you want
-   * to avoid casting, use {@link #ofNative(double)} that returns a {@code Per} instance directly.
+   * <p>Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
+   * method will always return a {@link edu.wpi.first.units.measure.Per} instance. If you want to
+   * avoid casting, use {@link #ofNative(double)} that returns a {@code Per} instance directly.
    *
    * @param magnitude the magnitude of the measure
    * @return the ratio measure
@@ -174,9 +174,9 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
   /**
    * {@inheritDoc}
    *
-   * Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link edu.wpi.first.units.measure.Per} instance. If you want
-   * to avoid casting, use {@link #ofNativeBaseUnits(double)} that returns a {@code Per} instance
+   * <p>Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
+   * method will always return a {@link edu.wpi.first.units.measure.Per} instance. If you want to
+   * avoid casting, use {@link #ofNativeBaseUnits(double)} that returns a {@code Per} instance
    * directly.
    *
    * @param baseUnitMagnitude the magnitude of the measure in terms of its base units.
@@ -193,7 +193,7 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    *
    * @param magnitude the magnitude of the measurement.
    * @return the measurement object
-   * @see #of(double) 
+   * @see #of(double)
    */
   public final Per<N, D> ofNative(double magnitude) {
     return new ImmutablePer<>(magnitude, toBaseUnits(magnitude), this);
