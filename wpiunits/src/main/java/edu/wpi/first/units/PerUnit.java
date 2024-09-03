@@ -6,6 +6,8 @@ package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.ImmutablePer;
 import edu.wpi.first.units.measure.MutPer;
+import edu.wpi.first.units.measure.Per;
+
 import java.util.Objects;
 
 /**
@@ -155,26 +157,57 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
   }
 
   /**
+   * {@inheritDoc}
+   *
    * Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link edu.wpi.first.units.measure.Per} instance.
+   * method will always return a {@link edu.wpi.first.units.measure.Per} instance. If you want
+   * to avoid casting, use {@link #ofNative(double)} that returns a {@code Per} instance directly.
    *
    * @param magnitude the magnitude of the measure
    * @return the ratio measure
    */
   @Override
   public Measure<? extends PerUnit<N, D>> of(double magnitude) {
-    return new ImmutablePer<>(magnitude, toBaseUnits(magnitude), this);
+    return ofNative(magnitude);
   }
 
   /**
+   * {@inheritDoc}
+   *
    * Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link edu.wpi.first.units.measure.Per} instance.
+   * method will always return a {@link edu.wpi.first.units.measure.Per} instance. If you want
+   * to avoid casting, use {@link #ofNativeBaseUnits(double)} that returns a {@code Per} instance
+   * directly.
    *
    * @param baseUnitMagnitude the magnitude of the measure in terms of its base units.
    * @return the ratio measure
    */
   @Override
   public Measure<? extends PerUnit<N, D>> ofBaseUnits(double baseUnitMagnitude) {
+    return ofNativeBaseUnits(baseUnitMagnitude);
+  }
+
+  /**
+   * Creates a new immutable measurement of the given magnitude in terms of the ratio unit. This
+   * will always return a {@code Per} object and cannot be overridden by subclasses.
+   *
+   * @param magnitude the magnitude of the measurement.
+   * @return the measurement object
+   * @see #of(double) 
+   */
+  public final Per<N, D> ofNative(double magnitude) {
+    return new ImmutablePer<>(magnitude, toBaseUnits(magnitude), this);
+  }
+
+  /**
+   * Creates a new immutable measurement of the given magnitude in terms of the ratio unit's base
+   * unit. This will always return a {@code Per} object and cannot be overridden by subclasses.
+   *
+   * @param baseUnitMagnitude the magnitude of the measure in terms of its base units.
+   * @return the measurement object
+   * @see #ofBaseUnits(double)
+   */
+  public final Per<N, D> ofNativeBaseUnits(double baseUnitMagnitude) {
     return new ImmutablePer<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
@@ -191,7 +224,9 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
   }
 
   /**
-   * Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
+   * {@inheritDoc}
+   *
+   * <p>Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
    * method will always return a {@link edu.wpi.first.units.measure.MutPer} instance.
    *
    * @param initialMagnitude the starting magnitude of the measure
@@ -199,6 +234,18 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    */
   @Override
   public MutableMeasure<? extends PerUnit<N, D>, ?, ?> mutable(double initialMagnitude) {
+    return mutableNative(initialMagnitude);
+  }
+
+  /**
+   * Creates a new mutable measurement of the given magnitude in terms of the ratio unit. This will
+   * always return a {@code Per} object and cannot be overridden by subclasses.
+   *
+   * @param initialMagnitude the starting magnitude of the measure
+   * @return the ratio measure
+   * @see #mutable(double)
+   */
+  public final MutPer<N, D> mutableNative(double initialMagnitude) {
     return new MutPer<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
