@@ -115,8 +115,11 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param setpoint The velocity setpoint.
    * @return The computed feedforward in volts.
    */
-  units::volt_t Calculate(units::unit_t<Angle> currentAngle,
-                          units::unit_t<Velocity> setpoint) const;
+  constexpr units::volt_t Calculate(units::unit_t<Angle> currentAngle,
+                                    units::unit_t<Velocity> setpoint) const {
+    return kS * wpi::sgn(setpoint) + kG * units::math::cos(currentAngle) +
+           kV * setpoint;
+  }
 
   /**
    * Calculates the feedforward from the gains and setpoints.
