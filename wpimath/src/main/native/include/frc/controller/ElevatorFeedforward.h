@@ -40,8 +40,9 @@ class ElevatorFeedforward {
    */
   constexpr ElevatorFeedforward(
       units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
-      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : kS(kS), kG(kG), kV(kV), kA(kA) {
+      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
+      units::second_t dt = 20_ms)
+      : kS(kS), kG(kG), kV(kV), kA(kA), m_dt(dt) {
     if (kV.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kV must be a non-negative number, got {}!", kV.value());
@@ -54,6 +55,12 @@ class ElevatorFeedforward {
       this->kA = units::unit_t<ka_unit>{0};
       wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
     }
+    if (dt <= 0_ms) {
+      wpi::math::MathSharedStore::ReportError(
+          "period must be a positive number, got {}!", dt.value());
+      this->m_dt = 20_ms;
+      wpi::math::MathSharedStore::ReportWarning("period defaulted to 20 ms.");
+    }    
   }
 
   /**
@@ -62,10 +69,12 @@ class ElevatorFeedforward {
    * @param velocity     The velocity setpoint, in distance per second.
    * @param acceleration The acceleration setpoint, in distance per second².
    * @return The computed feedforward, in volts.
+   * @deprecated Use the current/next velocity overload instead.
    */
-  constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
-                                    units::unit_t<Acceleration> acceleration =
-                                        units::unit_t<Acceleration>(0)) {
+  [[deprecated("Use the current/next velocity overload instead.")]]
+  constexpr units::volt_t Calculate(
+      units::unit_t<Velocity> velocity,
+      units::unit_t<Acceleration> acceleration) const {
     return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
   }
 
@@ -78,6 +87,7 @@ class ElevatorFeedforward {
    * @param dt              Time between velocity setpoints in seconds.
    * @return The computed feedforward, in volts.
    */
+  [[deprecated("Use the current/next velocity overload instead.")]]
   units::volt_t Calculate(units::unit_t<Velocity> currentVelocity,
                           units::unit_t<Velocity> nextVelocity,
                           units::second_t dt) const {
@@ -111,6 +121,105 @@ class ElevatorFeedforward {
 
     return kG + kS * wpi::sgn(currentVelocity.value()) +
            units::volt_t{feedforward.Calculate(r, nextR)(0)};
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoint assuming discrete
+   * control. Use this method when the setpoint does not change.
+   *
+   * @param setpoint The velocity setpoint, in distance per
+   *                        second.
+   * @return The computed feedforward, in volts.
+   */
+  constexpr units::volt_t Calculate(units::unit_t<Velocity> setpoint) const {
+    return Calculate(setpoint, setpoint);
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints assuming discrete
+   * control.
+   *
+   * <p>Note this method is inaccurate when the velocity crosses 0.
+   *
+   * @param currentVelocity The current velocity setpoint, in distance per
+   *                        second.
+   * @param nextVelocity    The next velocity setpoint, in distance per second.
+   * @return The computed feedforward, in volts.
+   */
+  constexpr units::volt_t Calculate(
+      units::unit_t<Velocity> currentVelocity,
+      units::unit_t<Velocity> nextVelocity) const {
+    // For an elevator with the model
+    //   dx/dt = −kᵥ/kₐ x + 1/kₐ u - kg/kₐ - kₛ/kₐ sgn(x),
+    //
+    // where
+    //   A = −kᵥ/kₐ
+    //   B = 1/kₐ
+    //   c = -(kg/kₐ + kₛ/kₐ sgn(x))
+    //   A_d = eᴬᵀ
+    //   B_d = A⁻¹(eᴬᵀ - I)B
+    //   dx/dt = Ax + Bu + c
+    //
+    // Discretize the affine model.
+    //   dx/dt = Ax + Bu + c
+    //   dx/dt = Ax + B(u + B⁺c)
+    //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_d uₖ + B_d B⁺cₖ
+    //
+    // Solve for uₖ.
+    //   B_d uₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+    //
+    // Substitute in B assuming sgn(x) is a constant for the duration of the step.
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kg/kₐ + kₛ/kₐ sgn(x)))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kg/kₐ + kₛ/kₐ sgn(x))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kg + kₛ sgn(x)
+    if (kA == decltype(kA)(0)) {
+      // Simplify the model when kₐ = 0.
+      //
+      // Simplify A.
+      //   A = −kᵥ/kₐ
+      //   As kₐ approaches zero, A approaches -∞.
+      //   A = −∞
+      //
+      // Simplify A_d.
+      //
+      //   A_d = eᴬᵀ
+      //   A_d = exp(−∞)
+      //   A_d = 0
+      //
+      // Simplify B_d.
+      //   B_d = A⁻¹(eᴬᵀ - I)B
+      //   B_d = A⁻¹((0) - I)B
+      //   B_d = A⁻¹(-I)B
+      //   B_d = -A⁻¹B
+      //   B_d = -(−kᵥ/kₐ)⁻¹(1/kₐ)
+      //   B_d = (kᵥ/kₐ)⁻¹(1/kₐ)
+      //   B_d = kₐ/kᵥ(1/kₐ)
+      //   B_d = 1/kᵥ
+      //
+      // Substitute these into the feedforward equation.
+      //
+      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kg + kₛ sgn(x)
+      //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kg + kₛ sgn(x)
+      //   uₖ = kᵥxₖ₊₁  + kg + kₛ sgn(x)
+      return kS * wpi::sgn(nextVelocity) + kG + kV * nextVelocity;
+    } else {
+      //   A = −kᵥ/kₐ
+      //   B = 1/kₐ
+      //   A_d = eᴬᵀ
+      //   B_d = A⁻¹(eᴬᵀ - I)B
+      double A = -kV.value() / kA.value();
+      double B = 1.0 / kA.value();
+      double A_d = gcem::exp(A * m_dt.value());
+      double B_d = 1.0 / A * (A_d - 1.0) * B;
+      return kG + kS * wpi::sgn(currentVelocity) +
+             units::volt_t{
+                 1.0 / B_d *
+                 (nextVelocity.value() - A_d * currentVelocity.value())};
+    }
   }
 
   // Rearranging the main equation from the calculate() method yields the
@@ -222,6 +331,9 @@ class ElevatorFeedforward {
 
   /// The acceleration gain.
   units::unit_t<ka_unit> kA;
+
+  /** The period. */
+  units::second_t m_dt;  
 };
 }  // namespace frc
 
