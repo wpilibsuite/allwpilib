@@ -21,6 +21,7 @@ macro(wpilib_target_warnings target)
                 /wd4244
                 /wd4251
                 /wd4267
+                /wd4324
                 /WX
                 /D_CRT_SECURE_NO_WARNINGS
                 ${WPILIB_TARGET_WARNINGS}
