@@ -76,9 +76,8 @@ class ElevatorFeedforward {
    * @deprecated Use the current/next velocity overload instead.
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
-  units::volt_t Calculate(
-      units::unit_t<Velocity> velocity,
-      units::unit_t<Acceleration> acceleration) const {
+  units::volt_t Calculate(units::unit_t<Velocity> velocity,
+                          units::unit_t<Acceleration> acceleration) const {
     return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
   }
 
