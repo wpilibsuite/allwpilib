@@ -37,6 +37,10 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param kG The gravity gain, in volts.
    * @param kV The velocity gain, in volt seconds per radian.
    * @param kA The acceleration gain, in volt seconds² per radian.
+   * @param dtSeconds The period in seconds.
+   * @throws IllegalArgumentException for kv &lt; zero.
+   * @throws IllegalArgumentException for ka &lt; zero.
+   * @throws IllegalArgumentException for period &le; zero.
    */
   constexpr ArmFeedforward(
       units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
@@ -111,7 +115,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param setpoint The velocity setpoint.
    * @return The computed feedforward in volts.
    */
-  units::volt_t Calculate(units::unit_t<Angle> angle,
+  units::volt_t Calculate(units::unit_t<Angle> currentAngle,
                           units::unit_t<Velocity> setpoint) const;
 
   /**
