@@ -20,8 +20,8 @@ namespace frc {
  * permanent-magnet DC motor.
  */
 template <class Distance>
-    requires std::same_as<units::meter, Distance> ||
-             std::same_as<units::radian, Distance>
+  requires std::same_as<units::meter, Distance> ||
+           std::same_as<units::radian, Distance>
 class SimpleMotorFeedforward {
  public:
   using Velocity =
@@ -84,8 +84,8 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoint assuming discrete control.
-   * Use this method when the setpoint does not change.
+   * Calculates the feedforward from the gains and setpoint assuming discrete
+   * control. Use this method when the setpoint does not change.
    *
    * @param setpoint The velocity setpoint, in distance per
    *                        second.
@@ -96,10 +96,11 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete control.
+   * Calculates the feedforward from the gains and setpoints assuming discrete
+   * control.
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
-   * 
+   *
    * @param currentVelocity The current velocity setpoint, in distance per
    *                        second.
    * @param nextVelocity    The next velocity setpoint, in distance per second.
@@ -108,33 +109,34 @@ class SimpleMotorFeedforward {
   constexpr units::volt_t Calculate(
       units::unit_t<Velocity> currentVelocity,
       units::unit_t<Velocity> nextVelocity) const {
-      // For a simple DC motor with the model
-      //   dx/dt = −kᵥ/kₐ x + 1/kₐ u - kₛ/kₐ sgn(x),
-      //
-      // where
-      //   A = −kᵥ/kₐ
-      //   B = 1/kₐ
-      //   c = -kₛ/kₐ sgn(x))
-      //   A_d = eᴬᵀ
-      //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   dx/dt = Ax + Bu + c
-      //
-      // Discretize the affine model.
-      //   dx/dt = Ax + Bu + c
-      //   dx/dt = Ax + B(u + B⁺c)
-      //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
-      //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
-      //   xₖ₊₁ = A_d xₖ + B_d uₖ + B_d B⁺cₖ
-      //
-      // Solve for uₖ.
-      //   B_d uₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
-      //
-      // Substitute in B assuming sgn(x) is a constant for the duration of the step.
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kₛ/kₐ sgn(x)))
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kₛ/kₐ sgn(x))
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)        
+    // For a simple DC motor with the model
+    //   dx/dt = −kᵥ/kₐ x + 1/kₐ u - kₛ/kₐ sgn(x),
+    //
+    // where
+    //   A = −kᵥ/kₐ
+    //   B = 1/kₐ
+    //   c = -kₛ/kₐ sgn(x))
+    //   A_d = eᴬᵀ
+    //   B_d = A⁻¹(eᴬᵀ - I)B
+    //   dx/dt = Ax + Bu + c
+    //
+    // Discretize the affine model.
+    //   dx/dt = Ax + Bu + c
+    //   dx/dt = Ax + B(u + B⁺c)
+    //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+    //   xₖ₊₁ = A_d xₖ + B_d uₖ + B_d B⁺cₖ
+    //
+    // Solve for uₖ.
+    //   B_d uₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+    //
+    // Substitute in B assuming sgn(x) is a constant for the duration of the
+    // step.
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kₛ/kₐ sgn(x)))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kₛ/kₐ sgn(x))
+    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)
     if (kA == decltype(kA)(0)) {
       // Simplify the model when kₐ = 0.
       //
@@ -145,7 +147,7 @@ class SimpleMotorFeedforward {
       //
       // Simplify A_d.
       //   A_d = eᴬᵀ
-      //   A_d = exp(−∞)
+      //   A_d = std::exp(−∞)
       //   A_d = 0
       //
       // Simplify B_d.
