@@ -9,19 +9,21 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Cleanup
+      - name: Delete largest caches
         run: |
-          gh extension install actions/gh-actions-cache
-
-          cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH -L 100 | cut -f 1)
+          # Get up to 100 largest cache entries for PR, extract ID column
+          cacheIdsForPR=$(gh cache list -R $REPO --ref $BRANCH -L 100 -O desc -S size_in_bytes | cut -f 1)
 
           # Turn off errexit to not fail the workflow while deleting cache keys.
           set +e
-          echo "Deleting caches..."
-          for cacheKey in $cacheKeysForPR
-          do
-              gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
-          done
+          echo "Deleting $(echo $cacheIdsForPR | wc -w) caches..."
+          parallel -j8 gh cache delete {} -R $REPO ::: $cacheIdsForPR
+          status=$?
+          if [ $status -ge 1 ] && [ $status -le 100 ]; then
+            echo $status cache entries could not be deleted.
+          elif [ $status -eq 101 ]; then
+            echo More than 100 cache entries could not be deleted.
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
