@@ -61,7 +61,7 @@ inline constexpr double kP = 1;
 
 inline constexpr units::volt_t kS = 0.05_V;
 // Should have value 12V at free speed
-inline constexpr auto kV = 12_V / kShooterFree;
+inline constexpr auto kV = 12_V / units::radians_per_second_t{kShooterFree};
 
 inline constexpr double kFeederSpeed = 0.5;
 }  // namespace ShooterConstants
