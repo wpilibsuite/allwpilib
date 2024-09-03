@@ -89,10 +89,6 @@ class ArmFeedforwardTest {
     assertEquals(
         2.5, m_armFF.calculate(Radians.of(Math.PI / 3), RadiansPerSecond.of(1)).in(Volts), 0.002);
 
-    // calculate(angle, angular velocity, angular acceleration)
-    assertEquals(6.5, m_armFF.calculate(Math.PI / 3, 1, 2), 0.002);
-    assertEquals(2.5, m_armFF.calculate(Math.PI / 3, -1, 2), 0.002);
-
     // calculate(currentAngle, currentVelocity, nextAngle, dt)
     calculateAndSimulate(Math.PI / 3, 1.0, 1.05, 0.020);
     calculateAndSimulate(Math.PI / 3, 1.0, 0.95, 0.020);
