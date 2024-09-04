@@ -5,6 +5,7 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.ImmutableMult;
+import edu.wpi.first.units.measure.Mult;
 import edu.wpi.first.units.measure.MutMult;
 import java.util.Objects;
 
@@ -88,13 +89,59 @@ public class MultUnit<A extends Unit, B extends Unit> extends Unit {
     return cache.combine(a, b);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Note: When called on an object of type {@code MultUnit} (and <i>not</i> a subclass!), this
+   * method will always return a {@link edu.wpi.first.units.measure.Mult} instance. If you want to
+   * avoid casting, use {@link #ofNativeBaseUnits(double)} that returns a {@code Per} instance
+   * directly.
+   *
+   * @param magnitude the magnitude of the measure in terms of its base units.
+   * @return the measurement object
+   */
   @Override
   public Measure<? extends MultUnit<A, B>> of(double magnitude) {
+    return ofNative(magnitude);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Note: When called on an object of type {@code MultUnit} (and <i>not</i> a subclass!), this
+   * method will always return a {@link edu.wpi.first.units.measure.Mult} instance. If you want to
+   * avoid casting, use {@link #ofNativeBaseUnits(double)} that returns a {@code Per} instance
+   * directly.
+   *
+   * @param baseUnitMagnitude the magnitude of the measure in terms of its base units.
+   * @return the measurement object
+   */
+  @Override
+  public Measure<? extends MultUnit<A, B>> ofBaseUnits(double baseUnitMagnitude) {
+    return ofNativeBaseUnits(baseUnitMagnitude);
+  }
+
+  /**
+   * Creates a new immutable measurement of the given magnitude in terms of this unit. This
+   * will always return a {@code Mult} object and cannot be overridden by subclasses.
+   *
+   * @param magnitude the magnitude of the measurement.
+   * @return the measurement object
+   * @see #of(double)
+   */
+  public final Mult<A, B> ofNative(double magnitude) {
     return new ImmutableMult<>(magnitude, toBaseUnits(magnitude), this);
   }
 
-  @Override
-  public Measure<? extends MultUnit<A, B>> ofBaseUnits(double baseUnitMagnitude) {
+  /**
+   * Creates a new immutable measurement of the given magnitude in terms of the unit's base
+   * unit. This will always return a {@code Mult} object and cannot be overridden by subclasses.
+   *
+   * @param baseUnitMagnitude the magnitude of the measure in terms of its base units.
+   * @return the measurement object
+   * @see #ofBaseUnits(double)
+   */
+  public final Mult<A, B> ofNativeBaseUnits(double baseUnitMagnitude) {
     return new ImmutableMult<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
