@@ -98,6 +98,11 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
 }
 
 units::volt_t ArmFeedforward::Calculate(
+    units::unit_t<Angle> currentAngle, units::unit_t<Velocity> setpoint) const {
+      return Calculate(currentAngle, setpoint);
+    }
+
+units::volt_t ArmFeedforward::Calculate(
     units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity,
     units::unit_t<Velocity> nextVelocity) const {
   using VarMat = sleipnir::VariableMatrix;
