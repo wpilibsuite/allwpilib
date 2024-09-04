@@ -27,8 +27,8 @@ wpi::util::Struct<wpi::math::DifferentialDriveFeedforward>::Unpack(
 void wpi::util::Struct<wpi::math::DifferentialDriveFeedforward>::Pack(
     std::span<uint8_t> data,
     const wpi::math::DifferentialDriveFeedforward& value) {
-  wpi::util::PackStruct<kKvLinearOff>(data, value.m_kVLinear.value());
-  wpi::util::PackStruct<kKaLinearOff>(data, value.m_kALinear.value());
-  wpi::util::PackStruct<kKvAngularOff>(data, value.m_kVAngular.value());
-  wpi::util::PackStruct<kKaAngularOff>(data, value.m_kAAngular.value());
+  wpi::util::PackStruct<kKvLinearOff>(data, value.kVLinear.value());
+  wpi::util::PackStruct<kKaLinearOff>(data, value.kALinear.value());
+  wpi::util::PackStruct<kKvAngularOff>(data, value.kVAngular.value());
+  wpi::util::PackStruct<kKaAngularOff>(data, value.kAAngular.value());
 }

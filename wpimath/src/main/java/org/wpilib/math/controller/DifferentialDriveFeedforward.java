@@ -18,16 +18,16 @@ public class DifferentialDriveFeedforward implements ProtobufSerializable, Struc
   private final LinearSystem<N2, N2, N2> m_plant;
 
   /** The linear velocity gain in volts per (meters per second). */
-  public final double m_kVLinear;
+  public final double kVLinear;
 
   /** The linear acceleration gain in volts per (meters per second squared). */
-  public final double m_kALinear;
+  public final double kALinear;
 
   /** The angular velocity gain in volts per (radians per second). */
-  public final double m_kVAngular;
+  public final double kVAngular;
 
   /** The angular acceleration gain in volts per (radians per second squared). */
-  public final double m_kAAngular;
+  public final double kAAngular;
 
   /**
    * Creates a new DifferentialDriveFeedforward with the specified parameters.
@@ -56,10 +56,10 @@ public class DifferentialDriveFeedforward implements ProtobufSerializable, Struc
   public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular) {
     m_plant = Models.differentialDriveFromSysId(kVLinear, kALinear, kVAngular, kAAngular);
-    m_kVLinear = kVLinear;
-    m_kALinear = kALinear;
-    m_kVAngular = kVAngular;
-    m_kAAngular = kAAngular;
+    this.kVLinear = kVLinear;
+    this.kALinear = kALinear;
+    this.kVAngular = kVAngular;
+    this.kAAngular = kAAngular;
   }
 
   /**

@@ -17,10 +17,10 @@ struct DifferentialDriveFeedforwardProtoTestData {
       decltype(1_V / 1_mps){4.4}, decltype(1_V / 1_mps_sq){4.5}};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.m_kVLinear.value(), data.m_kVLinear.value());
-    EXPECT_EQ(testData.m_kALinear.value(), data.m_kALinear.value());
-    EXPECT_EQ(testData.m_kVAngular.value(), data.m_kVAngular.value());
-    EXPECT_EQ(testData.m_kAAngular.value(), data.m_kAAngular.value());
+    EXPECT_EQ(testData.kVLinear.value(), data.kVLinear.value());
+    EXPECT_EQ(testData.kALinear.value(), data.kALinear.value());
+    EXPECT_EQ(testData.kVAngular.value(), data.kVAngular.value());
+    EXPECT_EQ(testData.kAAngular.value(), data.kAAngular.value());
   }
 };
 
