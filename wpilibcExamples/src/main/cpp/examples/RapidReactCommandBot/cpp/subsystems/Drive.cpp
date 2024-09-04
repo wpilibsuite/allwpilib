@@ -50,3 +50,15 @@ frc2::CommandPtr Drive::DriveDistanceCommand(units::meter_t distance,
       // Stop the drive when the command ends
       .FinallyDo([this](bool interrupted) { m_drive.StopMotor(); });
 }
+
+frc2::CommandPtr Drive::TurnToAngleCommand(units::degree_t angle) {
+  return StartRun(
+             [this] { m_controller.Reset(m_gyro.GetRotation2d().Radians()); },
+             [this, angle] {
+               m_drive.ArcadeDrive(
+                   0, m_controller.Calculate(m_gyro.GetRotation2d().Radians(),
+                                             angle));
+             })
+      .Until([this] { return m_controller.AtGoal(); })
+      .FinallyDo([this] { m_drive.ArcadeDrive(0, 0); });
+}
