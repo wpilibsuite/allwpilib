@@ -112,8 +112,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * the horizontal (i.e. if the provided angle is 0, the arm should be parallel
    * to the floor). If your encoder does not follow this convention, an offset
    * should be added.
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity The next velocity setpoint.
+   * @param setpoint The current velocity setpoint.
    * @return The computed feedforward in volts.
    */
   units::volt_t Calculate(units::unit_t<Angle> currentAngle,
