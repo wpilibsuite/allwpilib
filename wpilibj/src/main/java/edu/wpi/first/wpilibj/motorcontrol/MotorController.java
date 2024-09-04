@@ -6,8 +6,7 @@ package edu.wpi.first.wpilibj.motorcontrol;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Interface for motor controlling devices. */
@@ -45,7 +44,7 @@ public interface MotorController {
    *
    * @param outputVoltage The voltage to output.
    */
-  default void setVoltage(Measure<VoltageUnit> outputVoltage) {
+  default void setVoltage(Voltage outputVoltage) {
     setVoltage(outputVoltage.in(Volts));
   }
 

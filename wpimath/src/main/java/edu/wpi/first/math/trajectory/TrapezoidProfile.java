@@ -10,7 +10,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.measure.Velocity;
 import java.util.Objects;
 
 /**
@@ -118,7 +117,8 @@ public class TrapezoidProfile {
      * @param position The position at this state.
      * @param velocity The velocity at this state.
      */
-    public <U extends Unit> State(Measure<U> position, Velocity<U> velocity) {
+    public <U extends Unit> State(
+        Measure<U> position, Measure<? extends PerUnit<? extends U, TimeUnit>> velocity) {
       this(position.baseUnitMagnitude(), velocity.baseUnitMagnitude());
     }
 
