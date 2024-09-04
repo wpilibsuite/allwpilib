@@ -407,6 +407,7 @@
       "Pneumatics",
       "Digital Input",
       "PID",
+      "Profiled PID",
       "XboxController"
     ],
     "foldername": "rapidreactcommandbot",

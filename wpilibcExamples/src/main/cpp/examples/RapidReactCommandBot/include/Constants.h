@@ -29,6 +29,15 @@ inline constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     ((kWheelDiameter * std::numbers::pi) / kEncoderCPR).value();
 
+inline constexpr double kTurnP = 1;
+inline constexpr double kTurnI = 0;
+inline constexpr double kTurnD = 0;
+
+inline constexpr auto kTurnTolerance = 5_deg;
+inline constexpr auto kTurnRateTolerance = 10_deg_per_s;
+
+inline constexpr auto kMaxTurnRate = 100_deg_per_s;
+inline constexpr auto kMaxTurnAcceleration = 300_deg_per_s / 1_s;
 }  // namespace DriveConstants
 
 namespace IntakeConstants {
