@@ -210,13 +210,13 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    */
   public Measure<Voltage> calculate(
       Measure<Angle> currentAngle, Measure<Velocity<Angle>> setpoint) {
-        output.mut_replace(
-          kg * Math.cos(currentAngle.in(Radians))
-              + ks * Math.signum(setpoint.in(RadiansPerSecond))
-              + kv * setpoint.in(RadiansPerSecond),
-          Volts);
-      return output;  
-    }
+    output.mut_replace(
+        kg * Math.cos(currentAngle.in(Radians))
+            + ks * Math.signum(setpoint.in(RadiansPerSecond))
+            + kv * setpoint.in(RadiansPerSecond),
+        Volts);
+    return output;
+  }
 
   /**
    * Calculates the feedforward from the gains and setpoints.

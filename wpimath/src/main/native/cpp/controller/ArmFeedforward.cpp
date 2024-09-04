@@ -99,8 +99,8 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
 
 units::volt_t ArmFeedforward::Calculate(
     units::unit_t<Angle> currentAngle, units::unit_t<Velocity> setpoint) const {
-    return kS * wpi::sgn(setpoint) + kG * units::math::cos(currentAngle) +
-           kV * setpoint;
+  return kS * wpi::sgn(setpoint) + kG * units::math::cos(currentAngle) +
+         kV * setpoint;
 }
 
 units::volt_t ArmFeedforward::Calculate(
