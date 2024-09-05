@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <frc/geometry/Rotation2d.h>
+
 #include <hal/SimDevice.h>
 
 namespace frc {
@@ -39,6 +41,13 @@ class XRPGyro {
    * @return the current heading of the robot in degrees.
    */
   double GetAngle() const;
+
+  /**
+   * Gets the angle the robot is facing.
+   *
+   * @return A Rotation2d with the current heading.
+   */
+  frc::Rotation2d GetRotation2d() const;
 
   /**
    * Return the rate of rotation of the gyro
