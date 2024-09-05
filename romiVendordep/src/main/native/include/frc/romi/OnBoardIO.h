@@ -24,7 +24,8 @@ namespace frc {
  */
 class OnBoardIO {
  public:
-  enum ChannelMode { INPUT, OUTPUT };
+  /** Mode for Romi onboard IO */
+  enum ChannelMode { /** Input */ INPUT, /** Output */ OUTPUT };
   OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2);
 
   static constexpr auto kMessageInterval = 1_s;

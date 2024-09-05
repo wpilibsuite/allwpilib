@@ -20,6 +20,11 @@ WPI_IGNORE_DEPRECATED
 
 class XRPMotor : public frc::MotorController, public frc::MotorSafety {
  public:
+  /**
+   * Constructs an XRPMotor.
+   *
+   * @param deviceNum the motor channel
+   */
   explicit XRPMotor(int deviceNum);
 
   void Set(double value) override;

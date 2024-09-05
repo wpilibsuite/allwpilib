@@ -12,14 +12,45 @@
 
 namespace frc {
 
+/**
+ * XRPServo.
+ *
+ * <p>A SimDevice based servo
+ */
 class XRPServo {
  public:
+  /**
+   * Constructs an XRPServo.
+   * @param deviceNum the servo channel
+   */
   explicit XRPServo(int deviceNum);
 
+  /**
+   * Set the servo angle.
+   *
+   * @param angleDegrees Desired angle in degrees
+   */
   void SetAngle(double angleDegrees);
+
+  /**
+   * Get the servo angle.
+   *
+   * @return Current servo angle
+   */
   double GetAngle() const;
 
+  /**
+   * Set the servo position.
+   *
+   * @param position Desired position (Between 0.0 and 1.0)
+   */
   void SetPosition(double position);
+
+  /**
+   * Get the servo position.
+   *
+   * @return Current servo position
+   */
   double GetPosition() const;
 
  private:

@@ -16,6 +16,11 @@ namespace frc {
  */
 class XRPGyro {
  public:
+  /**
+   * Constructs an XRPGyro.
+   *
+   * <p>Only one instance of a XRPGyro is supported.
+   */
   XRPGyro();
 
   /**
