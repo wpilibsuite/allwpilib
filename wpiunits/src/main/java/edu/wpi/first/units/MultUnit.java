@@ -122,8 +122,8 @@ public class MultUnit<A extends Unit, B extends Unit> extends Unit {
   }
 
   /**
-   * Creates a new immutable measurement of the given magnitude in terms of this unit. This
-   * will always return a {@code Mult} object and cannot be overridden by subclasses.
+   * Creates a new immutable measurement of the given magnitude in terms of this unit. This will
+   * always return a {@code Mult} object and cannot be overridden by subclasses.
    *
    * @param magnitude the magnitude of the measurement.
    * @return the measurement object
@@ -134,8 +134,8 @@ public class MultUnit<A extends Unit, B extends Unit> extends Unit {
   }
 
   /**
-   * Creates a new immutable measurement of the given magnitude in terms of the unit's base
-   * unit. This will always return a {@code Mult} object and cannot be overridden by subclasses.
+   * Creates a new immutable measurement of the given magnitude in terms of the unit's base unit.
+   * This will always return a {@code Mult} object and cannot be overridden by subclasses.
    *
    * @param baseUnitMagnitude the magnitude of the measure in terms of its base units.
    * @return the measurement object
