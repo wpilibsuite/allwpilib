@@ -1268,7 +1268,7 @@ void ServerImpl::RemoveClient(int clientId) {
       topic->clients.erase(tcdIt);
     }
 
-    if (!topic->IsPublished()) {
+    if (topic->IsLastPublisher()) {
       toDelete.push_back(topic.get());
     } else {
       if (pubChanged) {

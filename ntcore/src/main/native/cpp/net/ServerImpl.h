@@ -110,6 +110,10 @@ class ServerImpl final {
       RefreshProperties();
     }
 
+    bool IsLastPublisher() const {
+      return !persistent && !retained && publisherCount <= 1;
+    }
+
     bool IsPublished() const {
       return persistent || retained || publisherCount != 0;
     }
