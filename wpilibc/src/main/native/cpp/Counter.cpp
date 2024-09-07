@@ -89,10 +89,6 @@ Counter::~Counter() {
   } catch (const RuntimeError& e) {
     e.Report();
   }
-
-  int32_t status = 0;
-  HAL_FreeCounter(m_counter, &status);
-  FRC_ReportError(status, "Counter destructor");
 }
 
 void Counter::SetUpSource(int channel) {

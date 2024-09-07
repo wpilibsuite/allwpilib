@@ -62,10 +62,10 @@ class SPI {
    */
   explicit SPI(Port port);
 
-  ~SPI();
-
   SPI(SPI&&) = default;
   SPI& operator=(SPI&&) = default;
+
+  ~SPI();
 
   /**
    * Returns the SPI port.

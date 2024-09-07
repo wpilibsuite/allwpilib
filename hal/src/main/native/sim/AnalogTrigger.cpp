@@ -93,8 +93,7 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
   return HAL_kInvalidHandle;
 }
 
-void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
-                            int32_t* status) {
+void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle) {
   auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
   analogTriggerHandles->Free(analogTriggerHandle);
   if (trigger == nullptr) {
