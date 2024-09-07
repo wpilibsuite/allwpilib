@@ -49,7 +49,7 @@ class ChassisSpeedsTest {
   @Test
   void testMeasureConstructor() {
     var vx = InchesPerSecond.of(14.52);
-    var vy = InchesPerSecond.zero();
+    var vy = InchesPerSecond.of(0);
     var omega = RPM.of(0.02);
     var speeds = new ChassisSpeeds(vx, vy, omega);
 
