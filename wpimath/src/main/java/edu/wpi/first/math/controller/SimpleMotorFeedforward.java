@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.controller;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.proto.SimpleMotorFeedforwardProto;
@@ -13,6 +12,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -32,7 +32,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   private final double m_dt;
 
   // ** The calculated output voltage measure */
-  private final MutableMeasure<Voltage> output = mutable(Volts.of(0.0));
+  private final MutVoltage output = Volts.mutable(0.0);
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains and period.

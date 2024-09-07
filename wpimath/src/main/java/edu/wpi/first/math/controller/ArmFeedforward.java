@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.controller;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -12,11 +11,10 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
 import edu.wpi.first.math.jni.ArmFeedforwardJNI;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -41,7 +39,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   private final double m_dt;
 
   // ** The calculated output voltage measure */
-  private final MutableMeasure<Voltage> output = mutable(Volts.of(0.0));
+  private final MutVoltage output = Volts.mutable(0.0);
 
   /**
    * Creates a new ArmFeedforward with the specified gains and period.
@@ -208,8 +206,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param setpoint The velocity setpoint.
    * @return The computed feedforward in volts.
    */
-  public Measure<Voltage> calculate(
-      Measure<Angle> currentAngle, Measure<Velocity<Angle>> setpoint) {
+  public Voltage calculate(Angle currentAngle, AngularVelocity setpoint) {
     output.mut_replace(
         kg * Math.cos(currentAngle.in(Radians))
             + ks * Math.signum(setpoint.in(RadiansPerSecond))
@@ -228,10 +225,8 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param nextVelocity The next velocity setpoint.
    * @return The computed feedforward in volts.
    */
-  public Measure<Voltage> calculate(
-      Measure<Angle> currentAngle,
-      Measure<Velocity<Angle>> currentVelocity,
-      Measure<Velocity<Angle>> nextVelocity) {
+  public Voltage calculate(
+      Angle currentAngle, AngularVelocity currentVelocity, AngularVelocity nextVelocity) {
     output.mut_replace(
         ArmFeedforwardJNI.calculate(
             ks,

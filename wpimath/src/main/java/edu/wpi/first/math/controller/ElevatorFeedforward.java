@@ -4,17 +4,14 @@
 
 package edu.wpi.first.math.controller;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.proto.ElevatorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ElevatorFeedforwardStruct;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -39,7 +36,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
   private final double m_dt;
 
   // ** The calculated output voltage measure */
-  private final MutableMeasure<Voltage> output = mutable(Volts.of(0.0));
+  private final MutVoltage output = Volts.mutable(0.0);
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains and period.
@@ -176,7 +173,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    * @param setpoint The velocity setpoint.
    * @return The computed feedforward.
    */
-  public Measure<Voltage> calculate(Measure<Velocity<Distance>> setpoint) {
+  public Voltage calculate(LinearVelocity setpoint) {
     return calculate(setpoint, setpoint);
   }
 
@@ -189,64 +186,63 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    * @param nextVelocity The next velocity setpoint.
    * @return The computed feedforward.
    */
-  public Measure<Voltage> calculate(
-      Measure<Velocity<Distance>> currentVelocity, Measure<Velocity<Distance>> nextVelocity) {
+  public Voltage calculate(LinearVelocity currentVelocity, LinearVelocity nextVelocity) {
     // For an elevator with the model
-    //   dx/dt = −kᵥ/kₐ x + 1/kₐ u - kg/kₐ - kₛ/kₐ sgn(x),
+    // dx/dt = −kᵥ/kₐ x + 1/kₐ u - kg/kₐ - kₛ/kₐ sgn(x),
     //
     // where
-    //   A = −kᵥ/kₐ
-    //   B = 1/kₐ
-    //   c = -(kg/kₐ + kₛ/kₐ sgn(x))
-    //   A_d = eᴬᵀ
-    //   B_d = A⁻¹(eᴬᵀ - I)B
-    //   dx/dt = Ax + Bu + c
+    // A = −kᵥ/kₐ
+    // B = 1/kₐ
+    // c = -(kg/kₐ + kₛ/kₐ sgn(x))
+    // A_d = eᴬᵀ
+    // B_d = A⁻¹(eᴬᵀ - I)B
+    // dx/dt = Ax + Bu + c
     //
     // Discretize the affine model.
-    //   dx/dt = Ax + Bu + c
-    //   dx/dt = Ax + B(u + B⁺c)
-    //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
-    //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
-    //   xₖ₊₁ = A_d xₖ + B_d uₖ + B_d B⁺cₖ
+    // dx/dt = Ax + Bu + c
+    // dx/dt = Ax + B(u + B⁺c)
+    // xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+    // xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+    // xₖ₊₁ = A_d xₖ + B_d uₖ + B_d B⁺cₖ
     //
     // Solve for uₖ.
-    //   B_d uₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
-    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
-    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+    // B_d uₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
     //
     // Substitute in B assuming sgn(x) is a constant for the duration of the step.
-    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kg/kₐ + kₛ/kₐ sgn(x)))
-    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kg/kₐ + kₛ/kₐ sgn(x))
-    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kg + kₛ sgn(x)
+    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kg/kₐ + kₛ/kₐ sgn(x)))
+    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kg/kₐ + kₛ/kₐ sgn(x))
+    // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kg + kₛ sgn(x)
     if (ka == 0.0) {
       // Simplify the model when kₐ = 0.
       //
       // Simplify A.
-      //   A = −kᵥ/kₐ
-      //   As kₐ approaches zero, A approaches -∞.
-      //   A = −∞
+      // A = −kᵥ/kₐ
+      // As kₐ approaches zero, A approaches -∞.
+      // A = −∞
       //
       // Simplify A_d.
       //
-      //   A_d = eᴬᵀ
-      //   A_d = exp(−∞)
-      //   A_d = 0
+      // A_d = eᴬᵀ
+      // A_d = exp(−∞)
+      // A_d = 0
       //
       // Simplify B_d.
-      //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   B_d = A⁻¹((0) - I)B
-      //   B_d = A⁻¹(-I)B
-      //   B_d = -A⁻¹B
-      //   B_d = -(−kᵥ/kₐ)⁻¹(1/kₐ)
-      //   B_d = (kᵥ/kₐ)⁻¹(1/kₐ)
-      //   B_d = kₐ/kᵥ(1/kₐ)
-      //   B_d = 1/kᵥ
+      // B_d = A⁻¹(eᴬᵀ - I)B
+      // B_d = A⁻¹((0) - I)B
+      // B_d = A⁻¹(-I)B
+      // B_d = -A⁻¹B
+      // B_d = -(−kᵥ/kₐ)⁻¹(1/kₐ)
+      // B_d = (kᵥ/kₐ)⁻¹(1/kₐ)
+      // B_d = kₐ/kᵥ(1/kₐ)
+      // B_d = 1/kᵥ
       //
       // Substitute these into the feedforward equation.
       //
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kg + kₛ sgn(x)
-      //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kg + kₛ sgn(x)
-      //   uₖ = kᵥxₖ₊₁  + kg + kₛ sgn(x)
+      // uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kg + kₛ sgn(x)
+      // uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kg + kₛ sgn(x)
+      // uₖ = kᵥxₖ₊₁ + kg + kₛ sgn(x)
       output.mut_replace(
           kg
               + ks * Math.signum(nextVelocity.in(MetersPerSecond))
@@ -254,10 +250,10 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
           Volts);
       return output;
     } else {
-      //   A = −kᵥ/kₐ
-      //   B = 1/kₐ
-      //   A_d = eᴬᵀ
-      //   B_d = A⁻¹(eᴬᵀ - I)B
+      // A = −kᵥ/kₐ
+      // B = 1/kₐ
+      // A_d = eᴬᵀ
+      // B_d = A⁻¹(eᴬᵀ - I)B
       double A = -kv / ka;
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
