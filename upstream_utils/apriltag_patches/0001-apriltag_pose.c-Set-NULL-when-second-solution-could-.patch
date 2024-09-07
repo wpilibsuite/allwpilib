@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sun, 4 Dec 2022 11:01:56 -0800
-Subject: [PATCH 1/9] apriltag_pose.c: Set NULL when second solution could not
+Subject: [PATCH 1/8] apriltag_pose.c: Set NULL when second solution could not
  be determined
 
 ---

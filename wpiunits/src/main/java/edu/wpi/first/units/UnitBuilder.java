@@ -18,7 +18,7 @@ import java.util.Objects;
  *
  * @param <U> the type of the unit
  */
-public final class UnitBuilder<U extends Unit<U>> {
+public final class UnitBuilder<U extends Unit> {
   private final U m_base;
   private UnaryFunction m_fromBase = UnaryFunction.IDENTITY;
   private UnaryFunction m_toBase = UnaryFunction.IDENTITY;
@@ -191,7 +191,7 @@ public final class UnitBuilder<U extends Unit<U>> {
    * @param <U> the type of the unit
    */
   @FunctionalInterface
-  public interface UnitConstructorFunction<U extends Unit<U>> {
+  public interface UnitConstructorFunction<U extends Unit> {
     /**
      * Creates a new unit instance based on its relation to the base unit of measure.
      *
@@ -220,6 +220,7 @@ public final class UnitBuilder<U extends Unit<U>> {
    * @return the new derived unit
    * @throws NullPointerException if the unit conversions, unit name, or unit symbol were not set
    */
+  @SuppressWarnings("unchecked")
   public U make(UnitConstructorFunction<U> constructor) {
     Objects.requireNonNull(m_fromBase, "fromBase function was not set");
     Objects.requireNonNull(m_toBase, "toBase function was not set");
@@ -227,7 +228,7 @@ public final class UnitBuilder<U extends Unit<U>> {
     Objects.requireNonNull(m_symbol, "new unit symbol was not set");
 
     return constructor.create(
-        m_base.getBaseUnit(),
+        (U) m_base.getBaseUnit(),
         m_toBase.pipeTo(m_base.getConverterToBase()),
         m_base.getConverterFromBase().pipeTo(m_fromBase),
         m_name,
@@ -242,7 +243,6 @@ public final class UnitBuilder<U extends Unit<U>> {
    * @throws RuntimeException if the base unit does not define a constructor accepting the
    *     conversion functions, unit name, and unit symbol - in that order
    */
-  @SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "unchecked"})
   public U make() {
     return make(
         (baseUnit, toBaseUnits, fromBaseUnits, name, symbol) -> {
@@ -251,7 +251,7 @@ public final class UnitBuilder<U extends Unit<U>> {
           try {
             var ctor = getConstructor(baseUnit);
 
-            return (U) ctor.newInstance(baseUnit, toBaseUnits, fromBaseUnits, name, symbol);
+            return ctor.newInstance(baseUnit, toBaseUnits, fromBaseUnits, name, symbol);
           } catch (InstantiationException e) {
             throw new RuntimeException("Could not instantiate class " + baseClass.getName(), e);
           } catch (IllegalAccessException e) {
@@ -272,7 +272,7 @@ public final class UnitBuilder<U extends Unit<U>> {
   }
 
   @SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
-  private static <U extends Unit<U>> Constructor<? extends Unit<U>> getConstructor(U baseUnit)
+  private static <U extends Unit> Constructor<? extends U> getConstructor(U baseUnit)
       throws NoSuchMethodException {
     var baseClass = baseUnit.getClass();
 
@@ -288,6 +288,6 @@ public final class UnitBuilder<U extends Unit<U>> {
     // and protected constructors
     ctor.setAccessible(true);
 
-    return (Constructor<? extends Unit<U>>) ctor;
+    return (Constructor<? extends U>) ctor;
   }
 }

@@ -15,8 +15,7 @@ HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
     HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
     HAL_Bool reverseDirection, int32_t* index, int32_t* status);
-void HAL_FreeFPGAEncoder(HAL_FPGAEncoderHandle fpgaEncoderHandle,
-                         int32_t* status);
+void HAL_FreeFPGAEncoder(HAL_FPGAEncoderHandle fpgaEncoderHandle);
 
 /**
  * Reset the Encoder distance to zero.

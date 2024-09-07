@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/DutyCycle.h>
 #include <hal/Types.h>
 #include <units/time.h>
 #include <wpi/sendable/Sendable.h>
@@ -59,13 +60,13 @@ class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
    */
   explicit DutyCycle(std::shared_ptr<DigitalSource> source);
 
+  DutyCycle(DutyCycle&&) = default;
+  DutyCycle& operator=(DutyCycle&&) = default;
+
   /**
    * Close the DutyCycle and free all resources.
    */
-  ~DutyCycle() override;
-
-  DutyCycle(DutyCycle&&) = default;
-  DutyCycle& operator=(DutyCycle&&) = default;
+  ~DutyCycle() override = default;
 
   /**
    * Get the frequency of the duty cycle signal.
@@ -121,6 +122,6 @@ class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
  private:
   void InitDutyCycle();
   std::shared_ptr<DigitalSource> m_source;
-  hal::Handle<HAL_DutyCycleHandle> m_handle;
+  hal::Handle<HAL_DutyCycleHandle, HAL_FreeDutyCycle> m_handle;
 };
 }  // namespace frc
