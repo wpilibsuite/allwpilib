@@ -13,6 +13,11 @@
 namespace frc {
 
 /**
+ * @ingroup xrp_api
+ * @{
+ */
+
+/**
  * XRPServo.
  *
  * <p>A SimDevice based servo
@@ -64,5 +69,7 @@ class XRPServo {
 
   static void CheckDeviceAllocation(int deviceNum);
 };
+
+/** @} */
 
 }  // namespace frc

@@ -13,6 +13,11 @@
 namespace frc {
 
 /**
+ * @ingroup romi_api
+ * @{
+ */
+
+/**
  * This class represents the onboard IO of the Romi
  * reference robot. This includes the pushbuttons and
  * LEDs.
@@ -73,5 +78,7 @@ class OnBoardIO {
   std::unique_ptr<frc::DigitalInput> m_buttonC;
   std::unique_ptr<frc::DigitalOutput> m_redLed;
 };
+
+/** @} */
 
 }  // namespace frc
