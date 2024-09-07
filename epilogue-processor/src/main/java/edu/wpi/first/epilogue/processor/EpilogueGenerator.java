@@ -144,7 +144,7 @@ public class EpilogueGenerator {
             out.print(
                 """
                   /**
-                   * Updates Epilogue. This must be called periodically in order for Epilogue to receive
+                   * Updates Epilogue. This must be called periodically in order for Epilogue to record
                    * new values. Alternatively, {@code bind()} can be used to update at an offset from
                    * the main robot loop.
                    */
