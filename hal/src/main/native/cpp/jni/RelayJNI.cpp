@@ -44,7 +44,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_RelayJNI_freeRelayPort
   (JNIEnv* env, jclass, jint id)
 {
-  HAL_FreeRelayPort((HAL_RelayHandle)id);
+  if (id != HAL_kInvalidHandle) {
+    HAL_FreeRelayPort((HAL_RelayHandle)id);
+  }
 }
 
 /*

@@ -166,7 +166,7 @@ class EpilogueGeneratorTest {
             robot.addPeriodic(() -> {
               long start = System.nanoTime();
               exampleLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-              edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
+              config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
         }
@@ -237,7 +237,7 @@ class EpilogueGeneratorTest {
             robot.addPeriodic(() -> {
               long start = System.nanoTime();
               alphaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-              edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
+              config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
 
@@ -260,7 +260,7 @@ class EpilogueGeneratorTest {
             robot.addPeriodic(() -> {
               long start = System.nanoTime();
               betaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-              edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry("Epilogue/Stats/Last Run").setDouble((System.nanoTime() - start) / 1e6);
+              config.dataLogger.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
           }
         }

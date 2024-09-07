@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/Counter.h>
 #include <hal/Types.h>
 #include <units/angular_velocity.h>
 #include <units/frequency.h>
@@ -42,10 +43,10 @@ class Tachometer : public wpi::Sendable,
    */
   explicit Tachometer(std::shared_ptr<DigitalSource> source);
 
-  ~Tachometer() override;
-
   Tachometer(Tachometer&&) = default;
   Tachometer& operator=(Tachometer&&) = default;
+
+  ~Tachometer() override = default;
 
   /**
    * Gets the tachometer frequency.
@@ -133,7 +134,7 @@ class Tachometer : public wpi::Sendable,
 
  private:
   std::shared_ptr<DigitalSource> m_source;
-  hal::Handle<HAL_CounterHandle> m_handle;
+  hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
   int m_edgesPerRevolution;
   int32_t m_index;
 };

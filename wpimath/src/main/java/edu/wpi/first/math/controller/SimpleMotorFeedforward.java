@@ -10,10 +10,10 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.controller.proto.SimpleMotorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.SimpleMotorFeedforwardStruct;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.PerUnit;
+import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -170,7 +170,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * @param setpoint The velocity setpoint.
    * @return The computed feedforward.
    */
-  public <U extends Unit<U>> Measure<Voltage> calculate(Measure<Velocity<U>> setpoint) {
+  public <U extends Unit> Voltage calculate(Measure<? extends PerUnit<U, TimeUnit>> setpoint) {
     return calculate(setpoint, setpoint);
   }
 
@@ -184,8 +184,9 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * @param nextVelocity The next velocity setpoint.
    * @return The computed feedforward.
    */
-  public <U extends Unit<U>> Measure<Voltage> calculate(
-      Measure<Velocity<U>> currentVelocity, Measure<Velocity<U>> nextVelocity) {
+  public <U extends Unit> Voltage calculate(
+      Measure<? extends PerUnit<U, TimeUnit>> currentVelocity,
+      Measure<? extends PerUnit<U, TimeUnit>> nextVelocity) {
     // For a simple DC motor with the model
     //   dx/dt = −kᵥ/kₐ x + 1/kₐ u - kₛ/kₐ sgn(x),
     //

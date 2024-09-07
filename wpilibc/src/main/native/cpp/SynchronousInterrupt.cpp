@@ -49,10 +49,6 @@ void SynchronousInterrupt::InitSynchronousInterrupt() {
   FRC_CheckErrorStatus(status, "Interrupt setting up source edge failed");
 }
 
-SynchronousInterrupt::~SynchronousInterrupt() {
-  HAL_CleanInterrupts(m_handle);
-}
-
 inline SynchronousInterrupt::WaitResult operator|(
     SynchronousInterrupt::WaitResult lhs,
     SynchronousInterrupt::WaitResult rhs) {

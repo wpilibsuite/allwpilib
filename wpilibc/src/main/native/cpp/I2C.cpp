@@ -31,10 +31,6 @@ I2C::I2C(Port port, int deviceAddress)
   HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
 }
 
-I2C::~I2C() {
-  HAL_CloseI2C(m_port);
-}
-
 I2C::Port I2C::GetPort() const {
   return static_cast<Port>(static_cast<int>(m_port));
 }

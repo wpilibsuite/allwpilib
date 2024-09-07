@@ -6,6 +6,7 @@
 
 #include <vector>
 
+#include <hal/PowerDistribution.h>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -48,9 +49,10 @@ class PowerDistribution : public wpi::Sendable,
    */
   PowerDistribution(int module, ModuleType moduleType);
 
-  ~PowerDistribution() override;
   PowerDistribution(PowerDistribution&&) = default;
   PowerDistribution& operator=(PowerDistribution&&) = default;
+
+  ~PowerDistribution() override = default;
 
   /**
    * Gets the number of channels for this power distribution object.
@@ -341,7 +343,7 @@ class PowerDistribution : public wpi::Sendable,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  hal::Handle<HAL_PowerDistributionHandle> m_handle;
+  hal::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution> m_handle;
   int m_module;
 };
 

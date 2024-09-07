@@ -48,9 +48,8 @@ HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
  * Frees a counter.
  *
  * @param[in] counterHandle the counter handle
- * @param[out] status       Error status variable. 0 on success.
  */
-void HAL_FreeCounter(HAL_CounterHandle counterHandle, int32_t* status);
+void HAL_FreeCounter(HAL_CounterHandle counterHandle);
 
 /**
  * Sets the average sample size of a counter.

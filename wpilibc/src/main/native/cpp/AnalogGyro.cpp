@@ -58,10 +58,6 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
   Reset();
 }
 
-AnalogGyro::~AnalogGyro() {
-  HAL_FreeAnalogGyro(m_gyroHandle);
-}
-
 double AnalogGyro::GetAngle() const {
   int32_t status = 0;
   double value = HAL_GetAnalogGyroAngle(m_gyroHandle, &status);

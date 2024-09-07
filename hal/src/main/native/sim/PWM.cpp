@@ -111,10 +111,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   return handle;
 }
-void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
+void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
     return;
   }
 

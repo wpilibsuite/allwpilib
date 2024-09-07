@@ -16,9 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.BiConsumer;
@@ -51,14 +49,10 @@ public class RamseteCommand extends Command {
   private final PIDController m_rightController;
   private final BiConsumer<Double, Double> m_output;
   private DifferentialDriveWheelSpeeds m_prevSpeeds = new DifferentialDriveWheelSpeeds();
-  private final MutableMeasure<Velocity<Distance>> m_prevLeftSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_prevRightSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_leftSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
-  private final MutableMeasure<Velocity<Distance>> m_rightSpeedSetpoint =
-      MutableMeasure.zero(MetersPerSecond);
+  private final MutLinearVelocity m_prevLeftSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_prevRightSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_leftSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_rightSpeedSetpoint = MetersPerSecond.mutable(0);
   private double m_prevTime;
 
   /**
