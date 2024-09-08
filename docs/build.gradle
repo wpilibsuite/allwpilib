@@ -152,7 +152,7 @@ doxygen {
 
     // Save space by excluding protobuf and eigen
     exclude 'Eigen/**'
-
+    exclude 'unsupported/**'
     exclude 'google/protobuf/**'
 
     exclude '**/.clang-tidy'
