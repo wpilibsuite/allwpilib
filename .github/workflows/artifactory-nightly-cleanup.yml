@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
       - uses: jfrog/setup-jfrog-cli@v4
         env:
-          JF_ENV_1: !! REPLACE ME !!
+          JF_ENV_1: ${{ secrets.ARTIFACTORY_CLI_SECRET }}
       - name: Cleanup
         run: jf rt del --spec=.github/workflows/aql/wpilib-mvn-development_unused.aql
 
@@ -28,6 +28,6 @@ jobs:
           fetch-depth: 0
       - uses: jfrog/setup-jfrog-cli@v4
         env:
-          JF_ENV_1:  !! REPLACE ME !!
+          JF_ENV_1: ${{ secrets.ARTIFACTORY_CLI_SECRET }}
       - name: Cleanup
         run: jf rt del --spec=.github/workflows/aql/wpilib-generic-gradle-cache_unused.aql
