@@ -135,6 +135,24 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
   }
 
   /**
+   * Returns the X component of the pose's translation in a measure.
+   *
+   * @return The x component of the pose's translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return m_translation.getMeasureX();
+  }
+
+  /**
+   * Returns the Y component of the pose's translation in a measure.
+   *
+   * @return The y component of the pose's translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return m_translation.getMeasureY();
+  }
+
+  /**
    * Returns the rotational component of the transformation.
    *
    * @return The rotational component of the pose.
