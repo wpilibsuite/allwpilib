@@ -118,9 +118,7 @@ void ClientImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
               msg->properties, msg->options);
       m_outgoing.SendMessage(msg->pubHandle, std::move(elem));
     } else if (auto msg = std::get_if<UnpublishMsg>(&elem.contents)) {
-      if (Unpublish(msg->pubHandle, msg->topicHandle)) {
-        m_outgoing.SendMessage(msg->pubHandle, std::move(elem));
-      }
+      Unpublish(msg->pubHandle, msg->topicHandle, std::move(elem));
     } else {
       m_outgoing.SendMessage(0, std::move(elem));
     }
@@ -199,12 +197,12 @@ void ClientImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
   UpdatePeriodic();
 }
 
-bool ClientImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
+void ClientImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle,
+                           ClientMessage&& msg) {
   unsigned int index = Handle{pubHandle}.GetIndex();
   if (index >= m_publishers.size()) {
-    return false;
+    return;
   }
-  bool doSend = true;
   m_publishers[index].reset();
 
   // loop over all publishers to update period
@@ -216,10 +214,10 @@ bool ClientImpl::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
   }
   UpdatePeriodic();
 
+  m_outgoing.SendMessage(pubHandle, std::move(msg));
+
   // remove from outgoing handle map
   m_outgoing.EraseHandle(pubHandle);
-
-  return doSend;
 }
 
 void ClientImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
