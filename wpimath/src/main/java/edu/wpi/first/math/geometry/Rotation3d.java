@@ -464,7 +464,7 @@ public class Rotation3d
    *
    * @return The angle in a measure in the axis-angle representation of this rotation.
    */
-  public Angle getMeasure() {
+  public Angle getMeasureAngle() {
     return Radians.of(getAngle());
   }
 
