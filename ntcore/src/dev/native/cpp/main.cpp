@@ -19,10 +19,10 @@
 #include <wpi/timestamp.h>
 
 #include "networktables/DoubleArrayTopic.h"
+#include "networktables/NetworkTableInstance.h"
 #include "ntcore.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
-#include "networktables/NetworkTableInstance.h"
 
 void bench();
 void bench2();
