@@ -211,13 +211,13 @@ void ServerImpl::ClientData4Base::ClientPublish(int64_t pubuid,
       pubuid, std::make_unique<PublisherData>(this, topic, pubuid));
   if (!isNew) {
     WARN("client {} duplicate publish of pubuid {}", m_id, pubuid);
+  } else {
+    // add publisher to topic
+    topic->AddPublisher(this, publisherIt->getSecond().get());
+
+    // update meta data
+    m_server.UpdateMetaTopicPub(topic);
   }
-
-  // add publisher to topic
-  topic->AddPublisher(this, publisherIt->getSecond().get());
-
-  // update meta data
-  m_server.UpdateMetaTopicPub(topic);
 
   // respond with announce with pubuid to client
   DEBUG4("client {}: announce {} pubuid {}", m_id, topic->name, pubuid);
