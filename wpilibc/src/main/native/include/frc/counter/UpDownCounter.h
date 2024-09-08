@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/Counter.h>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -41,10 +42,10 @@ class UpDownCounter : public wpi::Sendable,
   UpDownCounter(std::shared_ptr<DigitalSource> upSource,
                 std::shared_ptr<DigitalSource> downSource);
 
-  ~UpDownCounter() override;
-
   UpDownCounter(UpDownCounter&&) = default;
   UpDownCounter& operator=(UpDownCounter&&) = default;
+
+  ~UpDownCounter() override = default;
 
   /**
    * Gets the current count.
@@ -84,7 +85,7 @@ class UpDownCounter : public wpi::Sendable,
   void InitUpDownCounter();
   std::shared_ptr<DigitalSource> m_upSource;
   std::shared_ptr<DigitalSource> m_downSource;
-  hal::Handle<HAL_CounterHandle> m_handle;
+  hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
   int32_t m_index = 0;
 };
 }  // namespace frc

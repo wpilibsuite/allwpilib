@@ -35,10 +35,6 @@ DutyCycle::DutyCycle(std::shared_ptr<DigitalSource> source)
   InitDutyCycle();
 }
 
-DutyCycle::~DutyCycle() {
-  HAL_FreeDutyCycle(m_handle);
-}
-
 void DutyCycle::InitDutyCycle() {
   int32_t status = 0;
   m_handle =

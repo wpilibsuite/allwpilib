@@ -29,17 +29,10 @@ AddressableLED::AddressableLED(int port) : m_port{port} {
   m_handle = HAL_InitializeAddressableLED(m_pwmHandle, &status);
   FRC_CheckErrorStatus(status, "Port {}", port);
   if (m_handle == HAL_kInvalidHandle) {
-    HAL_FreePWMPort(m_pwmHandle, &status);
+    HAL_FreePWMPort(m_pwmHandle);
   }
 
   HAL_Report(HALUsageReporting::kResourceType_AddressableLEDs, port + 1);
-}
-
-AddressableLED::~AddressableLED() {
-  HAL_FreeAddressableLED(m_handle);
-  int32_t status = 0;
-  HAL_FreePWMPort(m_pwmHandle, &status);
-  FRC_ReportError(status, "Port {}", m_port);
 }
 
 void AddressableLED::SetLength(int length) {

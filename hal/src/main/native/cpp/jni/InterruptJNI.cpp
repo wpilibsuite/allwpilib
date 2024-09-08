@@ -44,7 +44,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_InterruptJNI_cleanInterrupts
   (JNIEnv* env, jclass, jint interruptHandle)
 {
-  HAL_CleanInterrupts((HAL_InterruptHandle)interruptHandle);
+  if (interruptHandle != HAL_kInvalidHandle) {
+    HAL_CleanInterrupts((HAL_InterruptHandle)interruptHandle);
+  }
 }
 
 /*

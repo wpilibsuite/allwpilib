@@ -77,7 +77,7 @@ model {
                             description("Copies the SysId executable to the outputs directory.")
                             destinationDirectory = outputsFolder
 
-                            archiveBaseName = '_M_' + zipBaseName
+                            archiveBaseName = zipBaseName
                             duplicatesStrategy = 'exclude'
                             archiveClassifier = nativeUtils.getPublishClassifier(binary)
 

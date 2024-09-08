@@ -11,8 +11,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
+import edu.wpi.first.units.measure.Time;
 import java.util.PriorityQueue;
 
 /**
@@ -199,7 +198,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param callback The callback to run.
    * @param period The period at which to run the callback.
    */
-  public final void addPeriodic(Runnable callback, Measure<Time> period) {
+  public final void addPeriodic(Runnable callback, Time period) {
     addPeriodic(callback, period.in(Seconds));
   }
 
@@ -214,7 +213,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param offset The offset from the common starting time. This is useful for scheduling a
    *     callback in a different timeslot relative to TimedRobot.
    */
-  public final void addPeriodic(Runnable callback, Measure<Time> period, Measure<Time> offset) {
+  public final void addPeriodic(Runnable callback, Time period, Time offset) {
     addPeriodic(callback, period.in(Seconds), offset.in(Seconds));
   }
 }

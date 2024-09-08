@@ -745,7 +745,7 @@ class LEDPatternTest {
 
   @Test
   void zeroBrightness() {
-    var pattern = LEDPattern.solid(kRed).atBrightness(Percent.zero());
+    var pattern = LEDPattern.solid(kRed).atBrightness(Percent.of(0));
     var buffer = new AddressableLEDBuffer(1);
     pattern.applyTo(buffer);
 

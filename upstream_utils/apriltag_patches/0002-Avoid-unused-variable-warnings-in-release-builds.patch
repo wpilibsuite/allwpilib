@@ -1,0 +1,70 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sun, 4 Dec 2022 11:42:13 -0800
+Subject: [PATCH 2/8] Avoid unused variable warnings in release builds
+
+---
+ common/matd.c        | 4 +++-
+ common/pjpeg.c       | 1 +
+ common/string_util.c | 1 +
+ common/zmaxheap.c    | 1 +
+ 4 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/common/matd.c b/common/matd.c
+index 6b8a0405ce094536c395ad667fa640bda335fb6a..7c9088235aed537f5ecdc95f49424e362fb842eb 100644
+--- a/common/matd.c
++++ b/common/matd.c
+@@ -870,7 +870,8 @@ double matd_vec_dist_n(const matd_t *a, const matd_t *b, int n)
+ 
+     int lena = a->nrows*a->ncols;
+     int lenb = b->nrows*b->ncols;
+-
++    (void) lena;
++    (void) lenb;
+     assert(n <= lena && n <= lenb);
+     (void)lena;
+     (void)lenb;
+@@ -907,6 +908,7 @@ double matd_vec_dot_product(const matd_t *a, const matd_t *b)
+     assert(matd_is_vector(a) && matd_is_vector(b));
+     int adim = a->ncols*a->nrows;
+     int bdim = b->ncols*b->nrows;
++    (void) bdim;
+     assert(adim == bdim);
+     (void)bdim;
+ 
+diff --git a/common/pjpeg.c b/common/pjpeg.c
+index 924ac04dd7602aea2eaad76076002785c7b32ba2..d410c11bf84b12fca6a38544d05b446879f8a38b 100644
+--- a/common/pjpeg.c
++++ b/common/pjpeg.c
+@@ -863,6 +863,7 @@ pjpeg_t *pjpeg_create_from_buffer(uint8_t *buf, int buflen, uint32_t flags, int
+         pjd.in = mjpeg_dht;
+         pjd.inlen = sizeof(mjpeg_dht);
+         int result = pjpeg_decode_buffer(&pjd);
++        (void) result;
+         assert(result == 0);
+         (void)result;
+     }
+diff --git a/common/string_util.c b/common/string_util.c
+index 16a9ffb7b02e37df6f09231e67914422af89f2a4..492eabfa09ef6219c6e74bfc7de6d4407ed913c7 100644
+--- a/common/string_util.c
++++ b/common/string_util.c
+@@ -550,6 +550,7 @@ void string_feeder_require(string_feeder_t *sf, const char *str)
+ 
+     for (size_t i = 0; i < len; i++) {
+         char c = string_feeder_next(sf);
++        (void) c;
+         assert(c == str[i]);
+         (void)c;
+     }
+diff --git a/common/zmaxheap.c b/common/zmaxheap.c
+index 75de99502a70ec88b4dc51fda567c7e0c7bd852c..abbb549e41b6073f581b5c3216f024ed370b9212 100644
+--- a/common/zmaxheap.c
++++ b/common/zmaxheap.c
+@@ -397,6 +397,7 @@ void zmaxheap_test()
+             float outfv = 0;
+             int res = zmaxheap_remove_max(heap, &outv, &outfv);
+             if (sz == 0) {
++                (void) res;
+                 assert(res == 0);
+                 (void)res;
+             } else {

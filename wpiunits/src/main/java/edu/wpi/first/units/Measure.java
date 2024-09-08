@@ -4,7 +4,32 @@
 
 package edu.wpi.first.units;
 
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Value;
+
+import edu.wpi.first.units.measure.Acceleration;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularMomentum;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Dimensionless;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Energy;
+import edu.wpi.first.units.measure.Force;
+import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearMomentum;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Mult;
+import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Power;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Torque;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
 
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. Two
@@ -12,7 +37,7 @@ import static edu.wpi.first.units.Units.Seconds;
  *
  * @param <U> the unit type of the measure
  */
-public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
+public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   /**
    * The threshold for two measures to be considered equivalent if converted to the same unit. This
    * is only needed due to floating-point error.
@@ -53,7 +78,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @param unit the unit to convert this measure to
    * @return the value of this measure in the given unit
    */
-  default double in(Unit<U> unit) {
+  default double in(U unit) {
     if (this.unit().equals(unit)) {
       return magnitude();
     } else {
@@ -62,172 +87,14 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   }
 
   /**
-   * Multiplies this measurement by some constant multiplier and returns the result. The magnitude
-   * of the result will be the <i>base</i> magnitude multiplied by the scalar value. If the measure
-   * uses a unit with a non-linear relation to its base unit (such as Fahrenheit for temperature),
-   * then the result will only be a multiple <i>in terms of the base unit</i>.
+   * A convenience method to get the base unit of the measurement. Equivalent to {@code
+   * unit().getBaseUnit()}.
    *
-   * @param multiplier the constant to multiply by
-   * @return the resulting measure
+   * @return the base unit of measure.
    */
-  default Measure<U> times(double multiplier) {
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude() * multiplier, unit());
-  }
-
-  /**
-   * Generates a new measure that is equal to this measure multiplied by another. Some dimensional
-   * analysis is performed to reduce the units down somewhat; for example, multiplying a {@code
-   * Measure<Time>} by a {@code Measure<Velocity<Distance>>} will return just a {@code
-   * Measure<Distance>} instead of the naive {@code Measure<Mult<Time, Velocity<Distance>>}. This is
-   * not guaranteed to perform perfect dimensional analysis.
-   *
-   * @param <U2> the type of the other measure to multiply by
-   * @param other the unit to multiply by
-   * @return the multiplicative unit
-   */
-  default <U2 extends Unit<U2>> Measure<?> times(Measure<U2> other) {
-    if (other.unit() instanceof Dimensionless) {
-      // scalar multiplication
-      return times(other.baseUnitMagnitude());
-    }
-
-    if (unit() instanceof Per<?, ?> per
-        && other.unit().getBaseUnit().equals(per.denominator().getBaseUnit())) {
-      // denominator of the Per cancels out, return with just the units of the numerator
-      Unit<?> numerator = per.numerator();
-      return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (unit() instanceof Velocity<?> v && other.unit().getBaseUnit().equals(Seconds)) {
-      // Multiplying a velocity by a time, return the scalar unit (eg Distance)
-      Unit<?> numerator = v.getUnit();
-      return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (other.unit() instanceof Per<?, ?> per
-        && unit().getBaseUnit().equals(per.denominator().getBaseUnit())) {
-      Unit<?> numerator = per.numerator();
-      return numerator.ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-    } else if (unit() instanceof Per<?, ?> per
-        && other.unit() instanceof Per<?, ?> otherPer
-        && per.denominator().getBaseUnit().equals(otherPer.numerator().getBaseUnit())
-        && per.numerator().getBaseUnit().equals(otherPer.denominator().getBaseUnit())) {
-      // multiplying eg meters per second * milliseconds per foot
-      // return a scalar
-      return Units.Value.of(baseUnitMagnitude() * other.baseUnitMagnitude());
-    }
-
-    // Dimensional analysis fallthrough, do a basic unit multiplication
-    return unit().mult(other.unit()).ofBaseUnits(baseUnitMagnitude() * other.baseUnitMagnitude());
-  }
-
-  /**
-   * Divides this measurement by some constant divisor and returns the result. This is equivalent to
-   * {@code times(1 / divisor)}
-   *
-   * @param divisor the constant to divide by
-   * @return the resulting measure
-   * @see #times(double)
-   */
-  default Measure<U> divide(double divisor) {
-    return times(1 / divisor);
-  }
-
-  /**
-   * Divides this measurement by another measure and performs some dimensional analysis to reduce
-   * the units.
-   *
-   * @param <U2> the type of the other measure to multiply by
-   * @param other the unit to multiply by
-   * @return the resulting measure
-   */
-  default <U2 extends Unit<U2>> Measure<?> divide(Measure<U2> other) {
-    if (unit().getBaseUnit().equals(other.unit().getBaseUnit())) {
-      return Units.Value.ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
-    }
-    if (other.unit() instanceof Dimensionless) {
-      return divide(other.baseUnitMagnitude());
-    }
-    if (other.unit() instanceof Velocity<?> velocity
-        && velocity.getUnit().getBaseUnit().equals(unit().getBaseUnit())) {
-      return times(velocity.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
-    }
-    if (other.unit() instanceof Per<?, ?> per
-        && per.numerator().getBaseUnit().equals(unit().getBaseUnit())) {
-      return times(per.reciprocal().ofBaseUnits(1 / other.baseUnitMagnitude()));
-    }
-    return unit().per(other.unit()).ofBaseUnits(baseUnitMagnitude() / other.baseUnitMagnitude());
-  }
-
-  /**
-   * Creates a velocity measure by dividing this one by a time period measure.
-   *
-   * <pre>
-   *   Meters.of(1).per(Second) // Measure&lt;Velocity&lt;Distance&gt;&gt;
-   * </pre>
-   *
-   * @param period the time period to divide by.
-   * @return the velocity result
-   */
-  default Measure<Velocity<U>> per(Measure<Time> period) {
-    var newUnit = unit().per(period.unit());
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude() / period.baseUnitMagnitude(), newUnit);
-  }
-
-  /**
-   * Creates a relational measure equivalent to this one per some other unit.
-   *
-   * <pre>
-   *   Volts.of(1.05).per(Meter) // V/m, potential PID constant
-   * </pre>
-   *
-   * @param <U2> the type of the denominator unit
-   * @param denominator the denominator unit being divided by
-   * @return the relational measure
-   */
-  default <U2 extends Unit<U2>> Measure<Per<U, U2>> per(U2 denominator) {
-    var newUnit = unit().per(denominator);
-    return newUnit.of(magnitude());
-  }
-
-  /**
-   * Creates a velocity measure equivalent to this one per a unit of time.
-   *
-   * <pre>
-   *   Radians.of(3.14).per(Second) // Velocity&lt;Angle&gt; equivalent to RadiansPerSecond.of(3.14)
-   * </pre>
-   *
-   * @param time the unit of time
-   * @return the velocity measure
-   */
-  default Measure<Velocity<U>> per(Time time) {
-    var newUnit = unit().per(time);
-    return newUnit.of(magnitude());
-  }
-
-  /**
-   * Adds another measure to this one. The resulting measure has the same unit as this one.
-   *
-   * @param other the measure to add to this one
-   * @return a new measure containing the result
-   */
-  default Measure<U> plus(Measure<U> other) {
-    return unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
-  }
-
-  /**
-   * Subtracts another measure from this one. The resulting measure has the same unit as this one.
-   *
-   * @param other the measure to subtract from this one
-   * @return a new measure containing the result
-   */
-  default Measure<U> minus(Measure<U> other) {
-    return unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
-  }
-
-  /**
-   * Negates this measure and returns the result.
-   *
-   * @return the resulting measure
-   */
-  default Measure<U> negate() {
-    return times(-1);
+  @SuppressWarnings("unchecked")
+  default U baseUnit() {
+    return (U) unit().getBaseUnit();
   }
 
   /**
@@ -239,12 +106,881 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   Measure<U> copy();
 
   /**
-   * Creates a new mutable copy of this measure.
+   * Returns a mutable copy of this measure. It will be initialized to the current state of this
+   * measure, but can be changed over time without needing to allocate new measurement objects.
    *
-   * @return a mutable measure initialized to be identical to this measure
+   * @return the copied measure
    */
-  default MutableMeasure<U> mutableCopy() {
-    return MutableMeasure.mutable(this);
+  MutableMeasure<U, ?, ?> mutableCopy();
+
+  /**
+   * Returns a measure equivalent to this one equal to zero minus its current value. For non-linear
+   * unit types like temperature, the zero point is treated as the zero value of the base unit (eg
+   * Kelvin). In effect, this means code like {@code Celsius.of(10).unaryMinus()} returns a value
+   * equivalent to -10 Kelvin, and <i>not</i> -10° Celsius.
+   *
+   * @return a measure equal to zero minus this measure
+   */
+  Measure<U> unaryMinus();
+
+  /**
+   * Adds another measure of the same unit type to this one.
+   *
+   * @param other the measurement to add
+   * @return a measure of the sum of both measures
+   */
+  Measure<U> plus(Measure<? extends U> other);
+
+  /**
+   * Subtracts another measure of the same unit type from this one.
+   *
+   * @param other the measurement to subtract
+   * @return a measure of the difference between the measures
+   */
+  Measure<U> minus(Measure<? extends U> other);
+
+  /**
+   * Multiplies this measure by a scalar unitless multiplier.
+   *
+   * @param multiplier the scalar multiplication factor
+   * @return the scaled result
+   */
+  Measure<U> times(double multiplier);
+
+  /**
+   * Multiplies this measure by a scalar dimensionless multiplier.
+   *
+   * @param multiplier the scalar multiplication factor
+   * @return the scaled result
+   */
+  Measure<U> times(Dimensionless multiplier);
+
+  /**
+   * Generates a new measure that is equal to this measure multiplied by another. Some dimensional
+   * analysis is performed to reduce the units down somewhat; for example, multiplying a {@code
+   * Measure<Time>} by a {@code Measure<Velocity<Distance>>} will return just a {@code
+   * Measure<Distance>} instead of the naive {@code Measure<Mult<Time, Velocity<Distance>>}. This is
+   * not guaranteed to perform perfect dimensional analysis.
+   *
+   * @param multiplier the unit to multiply by
+   * @return the multiplicative unit
+   */
+  default Measure<?> times(Measure<?> multiplier) {
+    final double baseUnitResult = baseUnitMagnitude() * multiplier.baseUnitMagnitude();
+
+    // First try to eliminate any common units
+    if (unit() instanceof PerUnit<?, ?> ratio
+        && multiplier.baseUnit().equals(ratio.denominator().getBaseUnit())) {
+      // Per<N, D> * D -> yield N
+      // Case 1: denominator of the Per cancels out, return with just the units of the numerator
+      return ratio.numerator().ofBaseUnits(baseUnitResult);
+    } else if (multiplier.baseUnit() instanceof PerUnit<?, ?> ratio
+        && baseUnit().equals(ratio.denominator().getBaseUnit())) {
+      // D * Per<N, D) -> yield N
+      // Case 2: Same as Case 1, just flipped between this and the multiplier
+      return ratio.numerator().ofBaseUnits(baseUnitResult);
+    } else if (unit() instanceof PerUnit<?, ?> per
+        && multiplier.unit() instanceof PerUnit<?, ?> otherPer
+        && per.denominator().getBaseUnit().equals(otherPer.numerator().getBaseUnit())
+        && per.numerator().getBaseUnit().equals(otherPer.denominator().getBaseUnit())) {
+      // multiplying eg meters per second * milliseconds per foot
+      // return a scalar
+      return Value.of(baseUnitResult);
+    }
+
+    // No common units to eliminate, is one of them dimensionless?
+    // Note that this must come *after* the multiplier cases, otherwise
+    // Per<U, Dimensionless> * Dimensionless will not return a U
+    if (multiplier.unit() instanceof DimensionlessUnit) {
+      // scalar multiplication of this
+      return times(multiplier.baseUnitMagnitude());
+    } else if (unit() instanceof DimensionlessUnit) {
+      // scalar multiplication of multiplier
+      return multiplier.times(baseUnitMagnitude());
+    }
+
+    if (multiplier instanceof Acceleration<?> acceleration) {
+      return times(acceleration);
+    } else if (multiplier instanceof Angle angle) {
+      return times(angle);
+    } else if (multiplier instanceof AngularAcceleration angularAcceleration) {
+      return times(angularAcceleration);
+    } else if (multiplier instanceof AngularMomentum angularMomentum) {
+      return times(angularMomentum);
+    } else if (multiplier instanceof AngularVelocity angularVelocity) {
+      return times(angularVelocity);
+    } else if (multiplier instanceof Current current) {
+      return times(current);
+    } else if (multiplier instanceof Dimensionless dimensionless) {
+      // n.b. this case should already be covered
+      return times(dimensionless);
+    } else if (multiplier instanceof Distance distance) {
+      return times(distance);
+    } else if (multiplier instanceof Energy energy) {
+      return times(energy);
+    } else if (multiplier instanceof Force force) {
+      return times(force);
+    } else if (multiplier instanceof Frequency frequency) {
+      return times(frequency);
+    } else if (multiplier instanceof LinearAcceleration linearAcceleration) {
+      return times(linearAcceleration);
+    } else if (multiplier instanceof LinearVelocity linearVelocity) {
+      return times(linearVelocity);
+    } else if (multiplier instanceof Mass mass) {
+      return times(mass);
+    } else if (multiplier instanceof MomentOfInertia momentOfInertia) {
+      return times(momentOfInertia);
+    } else if (multiplier instanceof Mult<?, ?> mult) {
+      return times(mult);
+    } else if (multiplier instanceof Per<?, ?> per) {
+      return times(per);
+    } else if (multiplier instanceof Power power) {
+      return times(power);
+    } else if (multiplier instanceof Temperature temperature) {
+      return times(temperature);
+    } else if (multiplier instanceof Time time) {
+      return times(time);
+    } else if (multiplier instanceof Torque torque) {
+      return times(torque);
+    } else if (multiplier instanceof Velocity<?> velocity) {
+      return times(velocity);
+    } else if (multiplier instanceof Voltage voltage) {
+      return times(voltage);
+    } else {
+      // Dimensional analysis fallthrough or a generic input measure type
+      // Do a basic unit multiplication
+      return MultUnit.combine(unit(), multiplier.unit()).ofBaseUnits(baseUnitResult);
+    }
+  }
+
+  /**
+   * Multiplies this measure by an acceleration and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Acceleration<?> multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by an angle and returns the resulting measure in the most appropriate
+   * unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Angle multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by an angular acceleration and returns the resulting measure in the
+   * most appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(AngularAcceleration multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by an angular momentum and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(AngularMomentum multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by an angular velocity and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(AngularVelocity multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by an electric current and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Current multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a distance and returns the resulting measure in the most appropriate
+   * unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Distance multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by an energy and returns the resulting measure in the most appropriate
+   * unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Energy multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a force and returns the resulting measure in the most appropriate
+   * unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Force multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a frequency and returns the resulting measure in the most
+   * appropriate unit. This often - but not always - means implementations return a variation of a
+   * {@link Per} measure.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Frequency multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a linear acceleration and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(LinearAcceleration multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a linear momentum and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(LinearMomentum multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a linear velocity and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(LinearVelocity multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a mass and returns the resulting measure in the most appropriate
+   * unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Mass multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a moment of intertia and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(MomentOfInertia multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a generic multiplied measure and returns the resulting measure in
+   * the most appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Mult<?, ?> multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a power and returns the resulting measure in the most appropriate
+   * unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Power multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a generic ratio measurement and returns the resulting measure in the
+   * most appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Per<?, ?> multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a temperature and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Temperature multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a time and returns the resulting measure in the most appropriate
+   * unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Time multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a torque and returns the resulting measure in the most appropriate
+   * unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Torque multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a generic velocity and returns the resulting measure in the most
+   * appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Velocity<?> multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a voltage and returns the resulting measure in the most appropriate
+   * unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(Voltage multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by a conversion factor, returning the converted measurement. Unlike
+   * {@link #times(Per)}, this allows for basic unit cancellation to return measurements of a known
+   * dimension.
+   *
+   * @param conversionFactor the conversion factor by which to multiply
+   * @param <Other> the unit type to convert to
+   * @param <M> the concrete return unit type. <strong>Note: the conversion factor's numerator unit
+   *     must return instances of this type from {@link Unit#ofBaseUnits(double)}}</strong>
+   * @return the converted result
+   */
+  @SuppressWarnings("unchecked")
+  default <Other extends Unit, M extends Measure<Other>> M timesConversionFactor(
+      Measure<? extends PerUnit<Other, U>> conversionFactor) {
+    return (M)
+        conversionFactor
+            .unit()
+            .getBaseUnit()
+            .numerator()
+            .ofBaseUnits(baseUnitMagnitude() * conversionFactor.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by another measurement of the inverse unit type (eg Time multiplied by
+   * Frequency) and returns the resulting dimensionless measure.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Dimensionless timesInverse(
+      Measure<? extends PerUnit<DimensionlessUnit, ? extends U>> multiplier) {
+    return Value.ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
+   * Multiplies this measure by another measurement of something over the unit type (eg Time
+   * multiplied by LinearVelocity) and returns the resulting measure of the ratio's dividend unit.
+   *
+   * @param ratio the measurement to multiply by.
+   * @param <Other> other unit that the results are in terms of
+   * @return the multiplication result
+   */
+  default <Other extends Unit> Measure<Other> timesRatio(
+      Measure<? extends PerUnit<? extends Other, U>> ratio) {
+    return ImmutableMeasure.ofBaseUnits(
+        baseUnitMagnitude() * ratio.baseUnitMagnitude(), ratio.unit().numerator());
+  }
+
+  /**
+   * Divides this measure by a unitless scalar and returns the result.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  Measure<U> divide(double divisor);
+
+  /**
+   * Divides this measure by a dimensionless scalar and returns the result.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  Measure<U> divide(Dimensionless divisor);
+
+  /**
+   * Divides this measurement by another measure and performs some dimensional analysis to reduce
+   * the units.
+   *
+   * @param divisor the unit to divide by
+   * @return the resulting measure
+   */
+  default Measure<?> divide(Measure<?> divisor) {
+    final double baseUnitResult = baseUnitMagnitude() / divisor.baseUnitMagnitude();
+
+    if (unit().getBaseUnit().equals(divisor.unit().getBaseUnit())) {
+      // These are the same unit, return a dimensionless
+      return Value.ofBaseUnits(baseUnitResult);
+    }
+
+    if (divisor instanceof Dimensionless) {
+      // Dividing by a dimensionless, do a scalar division
+      return unit().ofBaseUnits(baseUnitResult);
+    }
+
+    if (unit() instanceof DimensionlessUnit) {
+      // Numerator is a dimensionless
+      if (divisor.unit() instanceof PerUnit<?, ?> ratio) {
+        // Dividing by a ratio, return its reciprocal scaled by this
+        return ratio.reciprocal().ofBaseUnits(baseUnitResult);
+      }
+      if (divisor.unit() instanceof PerUnit<?, ?> ratio) {
+        // Dividing by a Per<Time, U>, return its reciprocal velocity scaled by this
+        // Note: Per<Time, U>.reciprocal() is coded to return a Velocity<U>
+        return ratio.reciprocal().ofBaseUnits(baseUnitResult);
+      }
+    }
+
+    if (divisor.unit() instanceof PerUnit<?, ?> ratio
+        && ratio.numerator().getBaseUnit().equals(baseUnit())) {
+      // Numerator of the ratio cancels out
+      // N / (N / D) -> N * D / N -> D
+      // Note: all Velocity and Acceleration units inherit from PerUnit
+      return ratio.denominator().ofBaseUnits(baseUnitResult);
+    }
+
+    if (divisor.unit() instanceof TimeUnit time) {
+      // Dividing by a time, return a Velocity
+      return VelocityUnit.combine(unit(), time).ofBaseUnits(baseUnitResult);
+    }
+
+    if (divisor instanceof Acceleration<?> acceleration) {
+      return divide(acceleration);
+    } else if (divisor instanceof Angle angle) {
+      return divide(angle);
+    } else if (divisor instanceof AngularAcceleration angularAcceleration) {
+      return divide(angularAcceleration);
+    } else if (divisor instanceof AngularMomentum angularMomentum) {
+      return divide(angularMomentum);
+    } else if (divisor instanceof AngularVelocity angularVelocity) {
+      return divide(angularVelocity);
+    } else if (divisor instanceof Current current) {
+      return divide(current);
+    } else if (divisor instanceof Dimensionless dimensionless) {
+      // n.b. this case should already be covered
+      return divide(dimensionless);
+    } else if (divisor instanceof Distance distance) {
+      return divide(distance);
+    } else if (divisor instanceof Energy energy) {
+      return divide(energy);
+    } else if (divisor instanceof Force force) {
+      return divide(force);
+    } else if (divisor instanceof Frequency frequency) {
+      return divide(frequency);
+    } else if (divisor instanceof LinearAcceleration linearAcceleration) {
+      return divide(linearAcceleration);
+    } else if (divisor instanceof LinearVelocity linearVelocity) {
+      return divide(linearVelocity);
+    } else if (divisor instanceof Mass mass) {
+      return divide(mass);
+    } else if (divisor instanceof MomentOfInertia momentOfInertia) {
+      return divide(momentOfInertia);
+    } else if (divisor instanceof Mult<?, ?> mult) {
+      return divide(mult);
+    } else if (divisor instanceof Per<?, ?> per) {
+      return divide(per);
+    } else if (divisor instanceof Power power) {
+      return divide(power);
+    } else if (divisor instanceof Temperature temperature) {
+      return divide(temperature);
+    } else if (divisor instanceof Time time) {
+      return divide(time);
+    } else if (divisor instanceof Torque torque) {
+      return divide(torque);
+    } else if (divisor instanceof Velocity<?> velocity) {
+      return divide(velocity);
+    } else if (divisor instanceof Voltage voltage) {
+      return divide(voltage);
+    } else {
+      // Dimensional analysis fallthrough or a generic input measure type
+      // Do a basic unit multiplication
+      return PerUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitResult);
+    }
+  }
+
+  /**
+   * Divides this measure by a generic acceleration and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Acceleration<?> divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by an angle and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Angle divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by an angular acceleration and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(AngularAcceleration divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by an angular momentum and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(AngularMomentum divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by an angular velocity and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(AngularVelocity divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by an electric current and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Current divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a distance and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Distance divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by an energy and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Energy divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a force and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Force divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a frequency and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Frequency divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a linear acceleration and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(LinearAcceleration divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a linear momentum and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(LinearMomentum divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a linear velocity and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(LinearVelocity divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a mass and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Mass divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a moment of inertia and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(MomentOfInertia divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a generic multiplication and returns the result in the most appropriate
+   * unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Mult<?, ?> divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a power and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Power divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a generic ratio and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Per<?, ?> divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a temperature and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Temperature divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a time and returns the result in the most appropriate unit. This will
+   * often - but not always - result in a {@link Per} type like {@link LinearVelocity} or {@link
+   * Acceleration}.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Time divisor) {
+    return VelocityUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a torque and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Torque divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a generic velocity and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Velocity<?> divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a voltage and returns the result in the most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(Voltage divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a ratio in terms of this measurement's unit to another unit, returning
+   * a measurement in terms of the other unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @param <Other> the other unit that results are in terms of
+   * @return the division result
+   */
+  // eg Dimensionless / (Dimensionless / Time) -> Time
+  default <Other extends Unit> Measure<Other> divideRatio(
+      Measure<? extends PerUnit<? extends U, Other>> divisor) {
+    return ImmutableMeasure.ofBaseUnits(
+        baseUnitMagnitude() / divisor.baseUnitMagnitude(), divisor.unit().denominator());
+  }
+
+  /**
+   * Divides this measure by a time period and returns the result in the most appropriate unit. This
+   * is equivalent to {@code divide(period.of(1))}.
+   *
+   * @param period the time period measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> per(TimeUnit period) {
+    return divide(period.of(1));
   }
 
   /**
@@ -358,7 +1094,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @return the measure with the greatest positive magnitude, or null if no measures were provided
    */
   @SafeVarargs
-  static <U extends Unit<U>> Measure<U> max(Measure<U>... measures) {
+  static <U extends Unit> Measure<U> max(Measure<U>... measures) {
     if (measures.length == 0) {
       return null; // nothing to compare
     }
@@ -381,7 +1117,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @return the measure with the greatest negative magnitude
    */
   @SafeVarargs
-  static <U extends Unit<U>> Measure<U> min(Measure<U>... measures) {
+  static <U extends Unit> Measure<U> min(Measure<U>... measures) {
     if (measures.length == 0) {
       return null; // nothing to compare
     }

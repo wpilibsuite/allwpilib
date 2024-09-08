@@ -52,10 +52,8 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
  * Frees an analog trigger.
  *
  * @param[in] analogTriggerHandle the trigger handle
- * @param[out] status Error status variable. 0 on success.
  */
-void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
-                            int32_t* status);
+void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle);
 
 /**
  * Sets the raw ADC upper and lower limits of the analog trigger.

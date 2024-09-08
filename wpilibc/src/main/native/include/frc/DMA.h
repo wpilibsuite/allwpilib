@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <hal/Types.h>
+#include <hal/DMA.h>
 #include <units/time.h>
 
 namespace frc {
@@ -25,7 +25,6 @@ class DMA {
 
  public:
   DMA();
-  ~DMA();
 
   DMA& operator=(DMA&& other) = default;
   DMA(DMA&& other) = default;
@@ -189,6 +188,6 @@ class DMA {
   void Stop();
 
  private:
-  hal::Handle<HAL_DMAHandle> dmaHandle;
+  hal::Handle<HAL_DMAHandle, HAL_FreeDMA> dmaHandle;
 };
 }  // namespace frc

@@ -77,9 +77,8 @@ void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status);
  * Note this also stops a notifier if it is already running.
  *
  * @param[in] notifierHandle the notifier handle
- * @param[out] status Error status variable. 0 on success.
  */
-void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status);
+void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle);
 
 /**
  * Updates the trigger time for a notifier.

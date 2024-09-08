@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/Encoder.h>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -138,10 +139,10 @@ class Encoder : public CounterBase,
           std::shared_ptr<DigitalSource> bSource, bool reverseDirection = false,
           EncodingType encodingType = k4X);
 
-  ~Encoder() override;
-
   Encoder(Encoder&&) = default;
   Encoder& operator=(Encoder&&) = default;
+
+  ~Encoder() override = default;
 
   // CounterBase interface
   /**
@@ -378,7 +379,7 @@ class Encoder : public CounterBase,
   std::shared_ptr<DigitalSource> m_aSource;  // The A phase of the quad encoder
   std::shared_ptr<DigitalSource> m_bSource;  // The B phase of the quad encoder
   std::shared_ptr<DigitalSource> m_indexSource = nullptr;
-  hal::Handle<HAL_EncoderHandle> m_encoder;
+  hal::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
 
   friend class DigitalGlitchFilter;
 };

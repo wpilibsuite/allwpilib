@@ -128,7 +128,7 @@ Notifier::~Notifier() {
     m_thread.join();
   }
 
-  HAL_CleanNotifier(handle, &status);
+  HAL_CleanNotifier(handle);
 }
 
 Notifier::Notifier(Notifier&& rhs)

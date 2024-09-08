@@ -141,7 +141,7 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
   return handle;
 }
 
-void HAL_CloseSerial(HAL_SerialPortHandle handle, int32_t* status) {
+void HAL_CloseSerial(HAL_SerialPortHandle handle) {
   auto port = serialPortHandles->Get(handle);
   serialPortHandles->Free(handle);
 

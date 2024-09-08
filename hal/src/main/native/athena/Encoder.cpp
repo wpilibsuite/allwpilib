@@ -94,11 +94,9 @@ void Encoder::SetupCounter(HAL_Handle digitalSourceHandleA,
 
 Encoder::~Encoder() {
   if (m_counter != HAL_kInvalidHandle) {
-    int32_t status = 0;
-    HAL_FreeCounter(m_counter, &status);
+    HAL_FreeCounter(m_counter);
   } else {
-    int32_t status = 0;
-    HAL_FreeFPGAEncoder(m_encoder, &status);
+    HAL_FreeFPGAEncoder(m_encoder);
   }
 }
 
@@ -285,7 +283,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(
   return handle;
 }
 
-void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
+void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle) {
   encoderHandles->Free(encoderHandle);
 }
 

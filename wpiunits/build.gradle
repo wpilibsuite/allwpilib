@@ -12,3 +12,5 @@ apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 dependencies {
 }
+
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"

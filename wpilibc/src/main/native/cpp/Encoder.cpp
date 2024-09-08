@@ -59,12 +59,6 @@ Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
   InitEncoder(reverseDirection, encodingType);
 }
 
-Encoder::~Encoder() {
-  int32_t status = 0;
-  HAL_FreeEncoder(m_encoder, &status);
-  FRC_ReportError(status, "FreeEncoder");
-}
-
 int Encoder::Get() const {
   int32_t status = 0;
   int value = HAL_GetEncoder(m_encoder, &status);

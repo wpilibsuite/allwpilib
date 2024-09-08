@@ -31,7 +31,7 @@ HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
   hal::init::CheckInit();
   return 0;
 }
-void HAL_FreeCounter(HAL_CounterHandle counterHandle, int32_t* status) {}
+void HAL_FreeCounter(HAL_CounterHandle counterHandle) {}
 void HAL_SetCounterAverageSize(HAL_CounterHandle counterHandle, int32_t size,
                                int32_t* status) {}
 void HAL_SetCounterUpSource(HAL_CounterHandle counterHandle,

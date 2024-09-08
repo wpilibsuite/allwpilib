@@ -46,7 +46,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DMAJNI_free
   (JNIEnv* env, jclass, jint handle)
 {
-  HAL_FreeDMA(handle);
+  if (handle != HAL_kInvalidHandle) {
+    HAL_FreeDMA(handle);
+  }
 }
 
 /*

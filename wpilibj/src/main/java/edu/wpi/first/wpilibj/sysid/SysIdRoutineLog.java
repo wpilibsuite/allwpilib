@@ -12,12 +12,14 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Current;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -114,7 +116,7 @@ public class SysIdRoutineLog {
      * @param voltage The voltage to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog voltage(Measure<Voltage> voltage) {
+    public MotorLog voltage(Voltage voltage) {
       return value("voltage", voltage.in(Volts), Volts.name());
     }
 
@@ -124,7 +126,7 @@ public class SysIdRoutineLog {
      * @param position The linear position to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearPosition(Measure<Distance> position) {
+    public MotorLog linearPosition(Distance position) {
       return value("position", position.in(Meters), Meters.name());
     }
 
@@ -134,7 +136,7 @@ public class SysIdRoutineLog {
      * @param position The angular position to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularPosition(Measure<Angle> position) {
+    public MotorLog angularPosition(Angle position) {
       return value("position", position.in(Rotations), Rotations.name());
     }
 
@@ -144,7 +146,7 @@ public class SysIdRoutineLog {
      * @param velocity The linear velocity to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearVelocity(Measure<Velocity<Distance>> velocity) {
+    public MotorLog linearVelocity(LinearVelocity velocity) {
       return value("velocity", velocity.in(MetersPerSecond), MetersPerSecond.name());
     }
 
@@ -154,7 +156,7 @@ public class SysIdRoutineLog {
      * @param velocity The angular velocity to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularVelocity(Measure<Velocity<Angle>> velocity) {
+    public MotorLog angularVelocity(AngularVelocity velocity) {
       return value("velocity", velocity.in(RotationsPerSecond), RotationsPerSecond.name());
     }
 
@@ -166,7 +168,7 @@ public class SysIdRoutineLog {
      * @param acceleration The linear acceleration to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearAcceleration(Measure<Velocity<Velocity<Distance>>> acceleration) {
+    public MotorLog linearAcceleration(LinearAcceleration acceleration) {
       return value(
           "acceleration",
           acceleration.in(MetersPerSecond.per(Second)),
@@ -181,7 +183,7 @@ public class SysIdRoutineLog {
      * @param acceleration The angular acceleration to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularAcceleration(Measure<Velocity<Velocity<Angle>>> acceleration) {
+    public MotorLog angularAcceleration(AngularAcceleration acceleration) {
       return value(
           "acceleration",
           acceleration.in(RotationsPerSecond.per(Second)),
@@ -196,7 +198,7 @@ public class SysIdRoutineLog {
      * @param current The current to record.
      * @return The motor log (for call chaining).
      */
-    public MotorLog current(Measure<Current> current) {
+    public MotorLog current(Current current) {
       value("current", current.in(Amps), Amps.name());
       return this;
     }

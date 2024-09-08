@@ -33,7 +33,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
 /**
  * Frees an analog input port.
  *
- * @param[in,out] analogPortHandle Handle to the analog port.
+ * @param analogPortHandle Handle to the analog port.
  */
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle);
 

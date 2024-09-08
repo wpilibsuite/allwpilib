@@ -37,11 +37,6 @@ Tachometer::Tachometer(std::shared_ptr<DigitalSource> source) {
   wpi::SendableRegistry::AddLW(this, "Tachometer", m_index);
 }
 
-Tachometer::~Tachometer() {
-  int32_t status = 0;
-  HAL_FreeCounter(m_handle, &status);
-}
-
 units::hertz_t Tachometer::GetFrequency() const {
   auto period = GetPeriod();
   if (period.value() == 0) {

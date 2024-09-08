@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/AnalogTrigger.h>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -31,26 +32,60 @@ class AnalogTrigger : public wpi::Sendable,
   explicit AnalogTrigger(int channel);
 
   /**
-   * Construct an analog trigger given an analog input.
+   * Construct an analog trigger using an existing analog input.
    *
    * This should be used in the case of sharing an analog channel between the
    * trigger and an analog input object.
    *
-   * @param input The pointer to the existing AnalogInput object
+   * @param input A reference to the existing AnalogInput object
+   */
+  explicit AnalogTrigger(AnalogInput& input);
+
+  /**
+   * Construct an analog trigger using an existing analog input.
+   *
+   * This should be used in the case of sharing an analog channel between the
+   * trigger and an analog input object.
+   *
+   * @param input A pointer to the existing AnalogInput object
    */
   explicit AnalogTrigger(AnalogInput* input);
 
   /**
-   * Construct an analog trigger given a duty cycle input.
+   * Construct an analog trigger using an existing analog input.
    *
-   * @param dutyCycle The pointer to the existing DutyCycle object
+   * This should be used in the case of sharing an analog channel between the
+   * trigger and an analog input object.
+   *
+   * @param input A shared_ptr to the existing AnalogInput object
+   */
+  explicit AnalogTrigger(std::shared_ptr<AnalogInput> input);
+
+  /**
+   * Construct an analog trigger using an existing duty cycle input.
+   *
+   * @param dutyCycle A reference to the existing DutyCycle object
+   */
+  explicit AnalogTrigger(DutyCycle& dutyCycle);
+
+  /**
+   * Construct an analog trigger using an existing duty cycle input.
+   *
+   * @param dutyCycle A pointer to the existing DutyCycle object
    */
   explicit AnalogTrigger(DutyCycle* dutyCycle);
 
-  ~AnalogTrigger() override;
+  /**
+   * Construct an analog trigger using an existing duty cycle input.
+   *
+   * @param dutyCycle A shared_ptr to the existing DutyCycle object
+   */
+  explicit AnalogTrigger(std::shared_ptr<DutyCycle> dutyCycle);
 
   AnalogTrigger(AnalogTrigger&&) = default;
   AnalogTrigger& operator=(AnalogTrigger&&) = default;
+
+  ~AnalogTrigger() override = default;
 
   /**
    * Set the upper and lower limits of the analog trigger.
@@ -139,9 +174,6 @@ class AnalogTrigger : public wpi::Sendable,
   /**
    * Creates an AnalogTriggerOutput object.
    *
-   * Gets an output object that can be used for routing. Caller is responsible
-   * for deleting the AnalogTriggerOutput object.
-   *
    * @param type An enum of the type of output object to create.
    * @return A pointer to a new AnalogTriggerOutput object.
    */
@@ -153,9 +185,9 @@ class AnalogTrigger : public wpi::Sendable,
  private:
   int GetSourceChannel() const;
 
-  hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
-  AnalogInput* m_analogInput = nullptr;
-  DutyCycle* m_dutyCycle = nullptr;
+  std::shared_ptr<AnalogInput> m_analogInput;
+  std::shared_ptr<DutyCycle> m_dutyCycle;
+  hal::Handle<HAL_AnalogTriggerHandle, HAL_CleanAnalogTrigger> m_trigger;
   bool m_ownsAnalog = false;
 };
 

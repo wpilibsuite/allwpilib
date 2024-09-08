@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <hal/AnalogInput.h>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -47,10 +48,10 @@ class AnalogInput : public wpi::Sendable,
    */
   explicit AnalogInput(int channel);
 
-  ~AnalogInput() override;
-
   AnalogInput(AnalogInput&&) = default;
   AnalogInput& operator=(AnalogInput&&) = default;
+
+  ~AnalogInput() override = default;
 
   /**
    * Get a sample straight from this channel.
@@ -284,7 +285,7 @@ class AnalogInput : public wpi::Sendable,
 
  private:
   int m_channel;
-  hal::Handle<HAL_AnalogInputHandle> m_port;
+  hal::Handle<HAL_AnalogInputHandle, HAL_FreeAnalogInputPort> m_port;
   int64_t m_accumulatorOffset;
 };
 

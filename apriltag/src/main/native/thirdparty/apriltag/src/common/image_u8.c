@@ -211,7 +211,7 @@ int image_u8_write_pnm(const image_u8_t *im, const char *path)
     fprintf(f, "P5\n%d %d\n255\n", im->width, im->height);
 
     for (int y = 0; y < im->height; y++) {
-        if (im->width != fwrite(&im->buf[y*im->stride], 1, im->width, f)) {
+        if (im->width != (int32_t)fwrite(&im->buf[y*im->stride], 1, im->width, f)) {
             res = -2;
             goto finish;
         }
@@ -265,6 +265,9 @@ void image_u8_draw_annulus(image_u8_t *im, float x0, float y0, float r0, float r
 void image_u8_draw_line(image_u8_t *im, float x0, float y0, float x1, float y1, int v, int width)
 {
     double dist = sqrtf((y1-y0)*(y1-y0) + (x1-x0)*(x1-x0));
+    if (dist == 0) {
+        return;
+    }
     double delta = 0.5 / dist;
 
     // terrible line drawing code

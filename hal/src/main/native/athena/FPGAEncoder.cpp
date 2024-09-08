@@ -96,8 +96,7 @@ HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
   return handle;
 }
 
-void HAL_FreeFPGAEncoder(HAL_FPGAEncoderHandle fpgaEncoderHandle,
-                         int32_t* status) {
+void HAL_FreeFPGAEncoder(HAL_FPGAEncoderHandle fpgaEncoderHandle) {
   fpgaEncoderHandles->Free(fpgaEncoderHandle);
 }
 

@@ -4,7 +4,7 @@ project(wpiunits)
 if(WITH_JAVA)
     include(UseJava)
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
 
     add_jar(
         wpiunits_jar
@@ -24,7 +24,9 @@ if(WITH_JAVA_SOURCE)
     include(CreateSourceJar)
     add_source_jar(
         wpiunits_src_jar
-        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+        BASE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
         OUTPUT_NAME wpiunits-sources
     )
     set_property(TARGET wpiunits_src_jar PROPERTY FOLDER "java")

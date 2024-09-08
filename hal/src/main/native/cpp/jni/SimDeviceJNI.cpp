@@ -60,7 +60,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SimDeviceJNI_freeSimDevice
   (JNIEnv*, jclass, jint handle)
 {
-  HAL_FreeSimDevice(handle);
+  if (handle != HAL_kInvalidHandle) {
+    HAL_FreeSimDevice(handle);
+  }
 }
 
 /*

@@ -63,7 +63,7 @@ void estimate_tag_pose_orthogonal_iteration(
         apriltag_pose_t* pose1,
         double* err2,
         apriltag_pose_t* pose2,
-        int nIters, 
+        int nIters,
         double min_improvement_per_iteration);
 
 /**

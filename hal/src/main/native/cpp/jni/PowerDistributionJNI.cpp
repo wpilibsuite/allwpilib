@@ -51,7 +51,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_PowerDistributionJNI_free
   (JNIEnv*, jclass, jint handle)
 {
-  HAL_CleanPowerDistribution(handle);
+  if (handle != HAL_kInvalidHandle) {
+    HAL_CleanPowerDistribution(handle);
+  }
 }
 
 /*

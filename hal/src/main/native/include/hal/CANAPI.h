@@ -47,7 +47,7 @@ HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
 /**
  * Frees a CAN device
  *
- * @param[in,out] handle the CAN handle
+ * @param handle the CAN handle
  */
 void HAL_CleanCAN(HAL_CANHandle handle);
 

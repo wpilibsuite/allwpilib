@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <hal/PWM.h>
 #include <hal/Types.h>
 #include <units/time.h>
 #include <wpi/sendable/Sendable.h>
@@ -59,15 +60,15 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    */
   explicit PWM(int channel, bool registerSendable = true);
 
+  PWM(PWM&&) = default;
+  PWM& operator=(PWM&&) = default;
+
   /**
    * Free the PWM channel.
    *
    * Free the resource associated with the PWM channel and set the value to 0.
    */
   ~PWM() override;
-
-  PWM(PWM&&) = default;
-  PWM& operator=(PWM&&) = default;
 
   /**
    * Set the PWM pulse time directly to the hardware.
@@ -206,7 +207,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
 
  private:
   int m_channel;
-  hal::Handle<HAL_DigitalHandle> m_handle;
+  hal::Handle<HAL_DigitalHandle, HAL_FreePWMPort> m_handle;
 };
 
 }  // namespace frc

@@ -1,0 +1,533 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Thu, 29 Jun 2023 22:14:05 -0700
+Subject: [PATCH 7/8] Fix clang 16 warnings
+
+---
+ apriltag.c              | 2 +-
+ apriltag.h              | 2 +-
+ common/g2d.c            | 2 +-
+ common/g2d.h            | 2 +-
+ common/getopt.c         | 2 +-
+ common/getopt.h         | 2 +-
+ common/math_util.h      | 4 ++--
+ common/pthreads_cross.c | 6 +++---
+ common/pthreads_cross.h | 2 +-
+ common/string_util.c    | 2 +-
+ common/string_util.h    | 2 +-
+ common/time_util.c      | 4 ++--
+ common/time_util.h      | 4 ++--
+ common/timeprofile.h    | 2 +-
+ common/workerpool.c     | 2 +-
+ common/workerpool.h     | 2 +-
+ common/zmaxheap.c       | 2 +-
+ tag16h5.c               | 2 +-
+ tag16h5.h               | 2 +-
+ tag25h9.c               | 2 +-
+ tag25h9.h               | 2 +-
+ tag36h10.c              | 2 +-
+ tag36h10.h              | 2 +-
+ tag36h11.c              | 2 +-
+ tag36h11.h              | 2 +-
+ tagCircle21h7.c         | 2 +-
+ tagCircle21h7.h         | 2 +-
+ tagCircle49h12.c        | 2 +-
+ tagCircle49h12.h        | 2 +-
+ tagCustom48h12.c        | 2 +-
+ tagCustom48h12.h        | 2 +-
+ tagStandard41h12.c      | 2 +-
+ tagStandard41h12.h      | 2 +-
+ tagStandard52h13.c      | 2 +-
+ tagStandard52h13.h      | 2 +-
+ 35 files changed, 40 insertions(+), 40 deletions(-)
+
+diff --git a/apriltag.c b/apriltag.c
+index 2f9846437619897c871d267963f143886f71b577..b7e24c4bc279643f478d810d494345216be991f1 100644
+--- a/apriltag.c
++++ b/apriltag.c
+@@ -349,7 +349,7 @@ void apriltag_detector_clear_families(apriltag_detector_t *td)
+     zarray_clear(td->tag_families);
+ }
+ 
+-apriltag_detector_t *apriltag_detector_create()
++apriltag_detector_t *apriltag_detector_create(void)
+ {
+     apriltag_detector_t *td = (apriltag_detector_t*) calloc(1, sizeof(apriltag_detector_t));
+ 
+diff --git a/apriltag.h b/apriltag.h
+index 164ad8618f10ab2cbe489b813c9eed64be6e96e0..895b3459b8a84064989378fe533fd676964a1687 100644
+--- a/apriltag.h
++++ b/apriltag.h
+@@ -231,7 +231,7 @@ struct apriltag_detection
+ };
+ 
+ // don't forget to add a family!
+-apriltag_detector_t *apriltag_detector_create();
++apriltag_detector_t *apriltag_detector_create(void);
+ 
+ // add a family to the apriltag detector. caller still "owns" the family.
+ // a single instance should only be provided to one apriltag detector instance.
+diff --git a/common/g2d.c b/common/g2d.c
+index ebb85e55975fd91c6fd6cde7830efa5185580e98..64c9b1b3342cc4b56de91733d720098bc9f09fff 100644
+--- a/common/g2d.c
++++ b/common/g2d.c
+@@ -38,7 +38,7 @@ double g2d_distance(const double a[2], const double b[2])
+     return sqrtf(sq(a[0]-b[0]) + sq(a[1]-b[1]));
+ }
+ 
+-zarray_t *g2d_polygon_create_empty()
++zarray_t *g2d_polygon_create_empty(void)
+ {
+     return zarray_create(sizeof(double[2]));
+ }
+diff --git a/common/g2d.h b/common/g2d.h
+index 21c21ac64d8988578f3c2d108a7a07d54e780954..5a0dd0b59869099e24453eda78ada1e565fe7aae 100644
+--- a/common/g2d.h
++++ b/common/g2d.h
+@@ -96,7 +96,7 @@ zarray_t *g2d_polygon_create_data(double v[][2], int sz);
+ 
+ zarray_t *g2d_polygon_create_zeros(int sz);
+ 
+-zarray_t *g2d_polygon_create_empty();
++zarray_t *g2d_polygon_create_empty(void);
+ 
+ void g2d_polygon_add(zarray_t *poly, double v[2]);
+ 
+diff --git a/common/getopt.c b/common/getopt.c
+index 339d43f171b50af97201e934e8bfdafc0fc833cc..51fe9b9a8f61708cfd0704673fb95cac1b66ec75 100644
+--- a/common/getopt.c
++++ b/common/getopt.c
+@@ -64,7 +64,7 @@ struct getopt
+     zarray_t   *options;
+ };
+ 
+-getopt_t *getopt_create()
++getopt_t *getopt_create(void)
+ {
+     getopt_t *gopt = (getopt_t*) calloc(1, sizeof(getopt_t));
+ 
+diff --git a/common/getopt.h b/common/getopt.h
+index 1f0366283bf5edd4f01b4dfcd9254ec2cc2abd8e..1b2d69c982d6ba0ca4a960eea9e03340ba753e0e 100644
+--- a/common/getopt.h
++++ b/common/getopt.h
+@@ -36,7 +36,7 @@ extern "C" {
+ 
+ typedef struct getopt getopt_t;
+ 
+-getopt_t *getopt_create();
++getopt_t *getopt_create(void);
+ void getopt_destroy(getopt_t *gopt);
+ void getopt_option_destroy_void(void *goo);
+ 
+diff --git a/common/math_util.h b/common/math_util.h
+index aa08883608a8aca5cc7828134ecb4cd6e9f06a61..a68ed8bf8eda0a9e23cc4d2784ccc6b7d82701c4 100644
+--- a/common/math_util.h
++++ b/common/math_util.h
+@@ -74,13 +74,13 @@ static inline double sgn(double v)
+ }
+ 
+ // random number between [0, 1)
+-static inline float randf()
++static inline float randf(void)
+ {
+     return (float)(rand() / (RAND_MAX + 1.0));
+ }
+ 
+ 
+-static inline float signed_randf()
++static inline float signed_randf(void)
+ {
+     return randf()*2 - 1;
+ }
+diff --git a/common/pthreads_cross.c b/common/pthreads_cross.c
+index 3403863f385c96d089db9652079b038fea3e5f51..d48b81a1bbafa15f1c8a5b4fec6a755847947ce6 100644
+--- a/common/pthreads_cross.c
++++ b/common/pthreads_cross.c
+@@ -218,7 +218,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
+     return 0;
+ }
+ 
+-int sched_yield() {
++int sched_yield(void) {
+     return (int)SwitchToThread();
+ }
+ 
+@@ -238,7 +238,7 @@ unsigned int timespec_to_ms(const struct timespec *abstime)
+     return ((abstime->tv_sec - time(NULL)) * 1000) + (abstime->tv_nsec / 1000000);
+ }
+ 
+-unsigned int pcthread_get_num_procs()
++unsigned int pcthread_get_num_procs(void)
+ {
+     SYSTEM_INFO sysinfo;
+ 
+@@ -249,7 +249,7 @@ unsigned int pcthread_get_num_procs()
+ #else
+ 
+ #include <unistd.h>
+-unsigned int pcthread_get_num_procs()
++unsigned int pcthread_get_num_procs(void)
+ {
+     return (unsigned int)sysconf(_SC_NPROCESSORS_ONLN);
+ }
+diff --git a/common/pthreads_cross.h b/common/pthreads_cross.h
+index 5970c679316037505ee4dc1e96ab9fda1f4f60d5..89ff7cc79ba93a5676fbc8663fcd7127cd1757d9 100644
+--- a/common/pthreads_cross.h
++++ b/common/pthreads_cross.h
+@@ -71,7 +71,7 @@ int sched_yield(void);
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+-unsigned int pcthread_get_num_procs();
++unsigned int pcthread_get_num_procs(void);
+ 
+ void ms_to_timespec(struct timespec *ts, unsigned int ms);
+ unsigned int timespec_to_ms(const struct timespec *abstime);
+diff --git a/common/string_util.c b/common/string_util.c
+index 492eabfa09ef6219c6e74bfc7de6d4407ed913c7..f7da2b8d77960febe07c52f770a9c4e3bbda29f0 100644
+--- a/common/string_util.c
++++ b/common/string_util.c
+@@ -314,7 +314,7 @@ char *str_touppercase(char *s)
+     return s;
+ }
+ 
+-string_buffer_t* string_buffer_create()
++string_buffer_t* string_buffer_create(void)
+ {
+     string_buffer_t *sb = (string_buffer_t*) calloc(1, sizeof(string_buffer_t));
+     assert(sb != NULL);
+diff --git a/common/string_util.h b/common/string_util.h
+index 6b5835553617ba16fc987edee5d2bc19e2824766..765f5a1d75e9327e6005e6d04db0c1da864ae91d 100644
+--- a/common/string_util.h
++++ b/common/string_util.h
+@@ -262,7 +262,7 @@ char *str_replace(const char *haystack, const char *needle, const char *replacem
+  * It is the caller's responsibility to free the string buffer resources with
+  * a call to string_buffer_destroy() when it is no longer needed.
+  */
+-string_buffer_t *string_buffer_create();
++string_buffer_t *string_buffer_create(void);
+ 
+ /**
+  * Frees the resources associated with a string buffer object, including space
+diff --git a/common/time_util.c b/common/time_util.c
+index 7a25f424068d798a8c65c69c6c17dd05b2e2b950..f3e3b0849bb8442ca1be6fda29ffcc79d52ec949 100644
+--- a/common/time_util.c
++++ b/common/time_util.c
+@@ -35,7 +35,7 @@ struct timeutil_rest
+     int64_t start_time;
+ };
+ 
+-timeutil_rest_t *timeutil_rest_create()
++timeutil_rest_t *timeutil_rest_create(void)
+ {
+     timeutil_rest_t *rest = calloc(1, sizeof(timeutil_rest_t));
+     return rest;
+@@ -46,7 +46,7 @@ void timeutil_rest_destroy(timeutil_rest_t *rest)
+     free(rest);
+ }
+ 
+-int64_t utime_now() // blacklist-ignore
++int64_t utime_now(void) // blacklist-ignore
+ {
+     struct timeval tv;
+     gettimeofday (&tv, NULL); // blacklist-ignore
+diff --git a/common/time_util.h b/common/time_util.h
+index c1840495a370e196e30d0ab432ddda12f4cc4819..58da911010f0030e81c2a33d6a5002f671d38145 100644
+--- a/common/time_util.h
++++ b/common/time_util.h
+@@ -58,10 +58,10 @@ extern "C" {
+ #endif
+ 
+ typedef struct timeutil_rest timeutil_rest_t;
+-timeutil_rest_t *timeutil_rest_create();
++timeutil_rest_t *timeutil_rest_create(void);
+ void timeutil_rest_destroy(timeutil_rest_t * rest);
+ 
+-int64_t utime_now(); // blacklist-ignore
++int64_t utime_now(void); // blacklist-ignore
+ int64_t utime_get_seconds(int64_t v);
+ int64_t utime_get_useconds(int64_t v);
+ void    utime_to_timeval(int64_t v, struct timeval *tv);
+diff --git a/common/timeprofile.h b/common/timeprofile.h
+index 8016386ed214de371eae619f4e887aef01852408..197d6ceb330a4414483bd9db66e091d4fe911bf2 100644
+--- a/common/timeprofile.h
++++ b/common/timeprofile.h
+@@ -51,7 +51,7 @@ struct timeprofile
+     zarray_t *stamps;
+ };
+ 
+-static inline timeprofile_t *timeprofile_create()
++static inline timeprofile_t *timeprofile_create(void)
+ {
+     timeprofile_t *tp = (timeprofile_t*) calloc(1, sizeof(timeprofile_t));
+     tp->stamps = zarray_create(sizeof(struct timeprofile_entry));
+diff --git a/common/workerpool.c b/common/workerpool.c
+index 6b73541c09025ef907e2c3c598343955a14c3e7e..25dccd0a341cfb3991e735d7a3b2bd6b8f6c299a 100644
+--- a/common/workerpool.c
++++ b/common/workerpool.c
+@@ -213,7 +213,7 @@ void workerpool_run(workerpool_t *wp)
+     }
+ }
+ 
+-int workerpool_get_nprocs()
++int workerpool_get_nprocs(void)
+ {
+ #ifdef _WIN32
+     SYSTEM_INFO sysinfo;
+diff --git a/common/workerpool.h b/common/workerpool.h
+index 2c32ab1eb7f9fe1e803aef187d4af3aea9284238..070a983cbb0ce24450297dba2f58a903977c5a24 100644
+--- a/common/workerpool.h
++++ b/common/workerpool.h
+@@ -46,4 +46,4 @@ void workerpool_run_single(workerpool_t *wp);
+ 
+ int workerpool_get_nthreads(workerpool_t *wp);
+ 
+-int workerpool_get_nprocs();
++int workerpool_get_nprocs(void);
+diff --git a/common/zmaxheap.c b/common/zmaxheap.c
+index abbb549e41b6073f581b5c3216f024ed370b9212..af0cc1eedfc63670c51e5818444b6bc2d67d2c3a 100644
+--- a/common/zmaxheap.c
++++ b/common/zmaxheap.c
+@@ -357,7 +357,7 @@ void zmaxheap_iterator_finish(zmaxheap_iterator_t *it)
+         maxheapify(heap, i);
+ }
+ 
+-void zmaxheap_test()
++void zmaxheap_test(void)
+ {
+     int cap = 10000;
+     int sz = 0;
+diff --git a/tag16h5.c b/tag16h5.c
+index 775f33c7e2d91af83e4a62949cadebdce34e3eb9..e38302a1d2ca2a2344a775569aed266d063a8861 100644
+--- a/tag16h5.c
++++ b/tag16h5.c
+@@ -60,7 +60,7 @@ static uint64_t codedata[30] = {
+    0x000000000000154dUL,
+    0x000000000000b57aUL,
+ };
+-apriltag_family_t *tag16h5_create()
++apriltag_family_t *tag16h5_create(void)
+ {
+    apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tag16h5");
+diff --git a/tag16h5.h b/tag16h5.h
+index d868c81839d0f982ed1f7de129efe3a3a7d92c71..6661080b66cae147b2b63be5d6d2d0b8b4f2a85d 100644
+--- a/tag16h5.h
++++ b/tag16h5.h
+@@ -34,7 +34,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ extern "C" {
+ #endif
+ 
+-apriltag_family_t *tag16h5_create();
++apriltag_family_t *tag16h5_create(void);
+ void tag16h5_destroy(apriltag_family_t *tf);
+ 
+ #ifdef __cplusplus
+diff --git a/tag25h9.c b/tag25h9.c
+index ddf31a2e45cb64934000f42d15ba62619ee9c68e..2478f4ab17bbbe6e224e14ed2dcd593eb0dbba9f 100644
+--- a/tag25h9.c
++++ b/tag25h9.c
+@@ -65,7 +65,7 @@ static uint64_t codedata[35] = {
+    0x0000000001bcc0f6UL,
+    0x0000000000a64f8dUL,
+ };
+-apriltag_family_t *tag25h9_create()
++apriltag_family_t *tag25h9_create(void)
+ {
+    apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tag25h9");
+diff --git a/tag25h9.h b/tag25h9.h
+index 9197c8b367d4b2047cb7d9882dfc11092f0b3dce..6e0107d28f3c3da6ae148a90050774277147addd 100644
+--- a/tag25h9.h
++++ b/tag25h9.h
+@@ -34,7 +34,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ extern "C" {
+ #endif
+ 
+-apriltag_family_t *tag25h9_create();
++apriltag_family_t *tag25h9_create(void);
+ void tag25h9_destroy(apriltag_family_t *tf);
+ 
+ #ifdef __cplusplus
+diff --git a/tag36h10.c b/tag36h10.c
+index 9c02c34c5db82f693191acc8975ef514f04588d5..e103748df2ac11201959747e182a17c3f4710b11 100644
+--- a/tag36h10.c
++++ b/tag36h10.c
+@@ -2350,7 +2350,7 @@ static uint64_t codedata[2320] = {
+    0x0000000447b9e7acUL,
+    0x0000000d9f564f30UL,
+ };
+-apriltag_family_t *tag36h10_create()
++apriltag_family_t *tag36h10_create(void)
+ {
+    apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tag36h10");
+diff --git a/tag36h10.h b/tag36h10.h
+index a60ae6c5ade78804ed2ba406fcbef83a086e32c1..cc8a2805a1836550d5a0530497ae007797fb71b6 100644
+--- a/tag36h10.h
++++ b/tag36h10.h
+@@ -34,7 +34,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ extern "C" {
+ #endif
+ 
+-apriltag_family_t *tag36h10_create();
++apriltag_family_t *tag36h10_create(void);
+ void tag36h10_destroy(apriltag_family_t *tf);
+ 
+ #ifdef __cplusplus
+diff --git a/tag36h11.c b/tag36h11.c
+index 94acacaaa473d5b1bc530dee625eb7ea388f4928..f1347a5bc141ff88a831147114c0d78c374d9607 100644
+--- a/tag36h11.c
++++ b/tag36h11.c
+@@ -617,7 +617,7 @@ static uint64_t codedata[587] = {
+    0x00000002164f73a0UL,
+    0x0000000e8b772fe0UL,
+ };
+-apriltag_family_t *tag36h11_create()
++apriltag_family_t *tag36h11_create(void)
+ {
+    apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tag36h11");
+diff --git a/tag36h11.h b/tag36h11.h
+index 620387822dfd1a43fac265dd3609ead848bdeb2e..45f9e5698e2657f10e7887ae1ee67debf0d69de7 100644
+--- a/tag36h11.h
++++ b/tag36h11.h
+@@ -34,7 +34,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ extern "C" {
+ #endif
+ 
+-apriltag_family_t *tag36h11_create();
++apriltag_family_t *tag36h11_create(void);
+ void tag36h11_destroy(apriltag_family_t *tf);
+ 
+ #ifdef __cplusplus
+diff --git a/tagCircle21h7.c b/tagCircle21h7.c
+index 8dad3feb11b3e9d9cea9e2863bec087b806bd3d2..9459176e00ad898edc85c3fcb01a0985fc242f5a 100644
+--- a/tagCircle21h7.c
++++ b/tagCircle21h7.c
+@@ -68,7 +68,7 @@ static uint64_t codedata[38] = {
+    0x0000000000015b39UL,
+    0x00000000001ec1e3UL,
+ };
+-apriltag_family_t *tagCircle21h7_create()
++apriltag_family_t *tagCircle21h7_create(void)
+ {
+    apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tagCircle21h7");
+diff --git a/tagCircle21h7.h b/tagCircle21h7.h
+index a051db64f9119983d95e59bd5f2569c78435cd70..f002a51abde4cc27a7113d6822be2d7a71cad5c3 100644
+--- a/tagCircle21h7.h
++++ b/tagCircle21h7.h
+@@ -34,7 +34,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ extern "C" {
+ #endif
+ 
+-apriltag_family_t *tagCircle21h7_create();
++apriltag_family_t *tagCircle21h7_create(void);
+ void tagCircle21h7_destroy(apriltag_family_t *tf);
+ 
+ #ifdef __cplusplus
+diff --git a/tagCircle49h12.c b/tagCircle49h12.c
+index 02456fab0ff32fba8d9ed5fcca0a1e09a4017228..c703431e3d7237d22b8231f72b80b63ae3702027 100644
+--- a/tagCircle49h12.c
++++ b/tagCircle49h12.c
+@@ -65565,7 +65565,7 @@ static uint64_t codedata[65535] = {
+    0x0001719f5eec237fUL,
+    0x0001e520c2997b43UL,
+ };
+-apriltag_family_t *tagCircle49h12_create()
++apriltag_family_t *tagCircle49h12_create(void)
+ {
+    apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tagCircle49h12");
+diff --git a/tagCircle49h12.h b/tagCircle49h12.h
+index 4b4c0846b670d94eee7dc8996130b41dd7a1a2ee..c69e57065e55182f81629fdd82c03ea281e3d907 100644
+--- a/tagCircle49h12.h
++++ b/tagCircle49h12.h
+@@ -34,7 +34,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ extern "C" {
+ #endif
+ 
+-apriltag_family_t *tagCircle49h12_create();
++apriltag_family_t *tagCircle49h12_create(void);
+ void tagCircle49h12_destroy(apriltag_family_t *tf);
+ 
+ #ifdef __cplusplus
+diff --git a/tagCustom48h12.c b/tagCustom48h12.c
+index cd908e10772663732f8130aa9d100908ce8e3825..7b31f014f69ed34261549a2c178d3d3f504d4637 100644
+--- a/tagCustom48h12.c
++++ b/tagCustom48h12.c
+@@ -42241,7 +42241,7 @@ static uint64_t codedata[42211] = {
+    0x0000bb8c4e2f373cUL,
+    0x000018bccac8b0f5UL,
+ };
+-apriltag_family_t *tagCustom48h12_create()
++apriltag_family_t *tagCustom48h12_create(void)
+ {
+    apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tagCustom48h12");
+diff --git a/tagCustom48h12.h b/tagCustom48h12.h
+index 564a98a6869677e020261ba39a0e0bbe8468e3a5..5fca82d4d67d6eaceee7b1e8640ad233dd3b5284 100644
+--- a/tagCustom48h12.h
++++ b/tagCustom48h12.h
+@@ -34,7 +34,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ extern "C" {
+ #endif
+ 
+-apriltag_family_t *tagCustom48h12_create();
++apriltag_family_t *tagCustom48h12_create(void);
+ void tagCustom48h12_destroy(apriltag_family_t *tf);
+ 
+ #ifdef __cplusplus
+diff --git a/tagStandard41h12.c b/tagStandard41h12.c
+index 6d77eb95aa3d3c6235e66ddc67da83c794a4800e..f9c0b896360068074da23f1a36ebb3404dbbb650 100644
+--- a/tagStandard41h12.c
++++ b/tagStandard41h12.c
+@@ -2145,7 +2145,7 @@ static uint64_t codedata[2115] = {
+    0x0000015cff6a6f12UL,
+    0x000001ee40155a64UL,
+ };
+-apriltag_family_t *tagStandard41h12_create()
++apriltag_family_t *tagStandard41h12_create(void)
+ {
+    apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tagStandard41h12");
+diff --git a/tagStandard41h12.h b/tagStandard41h12.h
+index 7f2c33b209faf16d0c27589420baab6300342da3..a764fcb9a3dde966985ffb8abe3f489028861a1c 100644
+--- a/tagStandard41h12.h
++++ b/tagStandard41h12.h
+@@ -34,7 +34,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ extern "C" {
+ #endif
+ 
+-apriltag_family_t *tagStandard41h12_create();
++apriltag_family_t *tagStandard41h12_create(void);
+ void tagStandard41h12_destroy(apriltag_family_t *tf);
+ 
+ #ifdef __cplusplus
+diff --git a/tagStandard52h13.c b/tagStandard52h13.c
+index 30e2b62f3121d1ab8c7a846157f1e97d0c2cb353..ce5ea491ebbb4c15536bb0f6ffac8706cdb4ea25 100644
+--- a/tagStandard52h13.c
++++ b/tagStandard52h13.c
+@@ -48744,7 +48744,7 @@ static uint64_t codedata[48714] = {
+    0x000c0d162da0e26dUL,
+    0x000cdc7a163acc66UL,
+ };
+-apriltag_family_t *tagStandard52h13_create()
++apriltag_family_t *tagStandard52h13_create(void)
+ {
+    apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
+    tf->name = strdup("tagStandard52h13");
+diff --git a/tagStandard52h13.h b/tagStandard52h13.h
+index aeeb8e3e1d6b6e76288ce1ce673be9189d5acafd..0f239f3d866e49a66d1dc385438d6f12f755f3a3 100644
+--- a/tagStandard52h13.h
++++ b/tagStandard52h13.h
+@@ -34,7 +34,7 @@ either expressed or implied, of the Regents of The University of Michigan.
+ extern "C" {
+ #endif
+ 
+-apriltag_family_t *tagStandard52h13_create();
++apriltag_family_t *tagStandard52h13_create(void);
+ void tagStandard52h13_destroy(apriltag_family_t *tf);
+ 
+ #ifdef __cplusplus

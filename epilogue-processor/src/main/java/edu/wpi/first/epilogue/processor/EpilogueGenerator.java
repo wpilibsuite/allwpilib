@@ -167,7 +167,7 @@ public class EpilogueGenerator {
                     + StringUtils.loggerFieldName(mainRobotClass)
                     + ".tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);");
             out.println(
-                "      edu.wpi.first.networktables.NetworkTableInstance.getDefault().getEntry(\"Epilogue/Stats/Last Run\").setDouble((System.nanoTime() - start) / 1e6);");
+                "      config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
             out.println(
                 "    }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));");
             out.println("  }");

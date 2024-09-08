@@ -57,13 +57,6 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 }
 
-PowerDistribution::~PowerDistribution() {
-  if (m_handle != HAL_kInvalidHandle) {
-    HAL_CleanPowerDistribution(m_handle);
-    m_handle = HAL_kInvalidHandle;
-  }
-}
-
 int PowerDistribution::GetNumChannels() const {
   int32_t status = 0;
   int32_t size = HAL_GetPowerDistributionNumChannels(m_handle, &status);

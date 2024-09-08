@@ -17,8 +17,7 @@ import edu.wpi.first.math.geometry.proto.Translation3dProto;
 import edu.wpi.first.math.geometry.struct.Translation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -89,7 +88,7 @@ public class Translation3d
    * @param y The y component of the translation.
    * @param z The z component of the translation.
    */
-  public Translation3d(Measure<Distance> x, Measure<Distance> y, Measure<Distance> z) {
+  public Translation3d(Distance x, Distance y, Distance z) {
     this(x.in(Meters), y.in(Meters), z.in(Meters));
   }
 

@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include <hal/Notifier.h>
 #include <hal/Types.h>
 #include <units/math.h>
 #include <units/time.h>
@@ -50,10 +51,10 @@ class TimedRobot : public IterativeRobotBase {
    */
   explicit TimedRobot(units::second_t period = kDefaultPeriod);
 
-  ~TimedRobot() override;
-
   TimedRobot(TimedRobot&&) = default;
   TimedRobot& operator=(TimedRobot&&) = default;
+
+  ~TimedRobot() override;
 
   /**
    * Add a callback to run at a specific period with a starting time offset.
@@ -100,7 +101,7 @@ class TimedRobot : public IterativeRobotBase {
     }
   };
 
-  hal::Handle<HAL_NotifierHandle> m_notifier;
+  hal::Handle<HAL_NotifierHandle, HAL_CleanNotifier> m_notifier;
   std::chrono::microseconds m_startTime;
 
   wpi::priority_queue<Callback, std::vector<Callback>, std::greater<Callback>>

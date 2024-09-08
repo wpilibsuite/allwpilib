@@ -65,9 +65,8 @@ HAL_EncoderHandle HAL_InitializeEncoder(
  * Frees an encoder.
  *
  * @param[in] encoderHandle the encoder handle
- * @param[out] status Error status variable. 0 on success.
  */
-void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status);
+void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle);
 
 /**
  * Indicates the encoder is used by a simulated device.

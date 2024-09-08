@@ -37,10 +37,6 @@ AnalogOutput::AnalogOutput(int channel) {
   wpi::SendableRegistry::AddLW(this, "AnalogOutput", m_channel);
 }
 
-AnalogOutput::~AnalogOutput() {
-  HAL_FreeAnalogOutputPort(m_port);
-}
-
 void AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;
   HAL_SetAnalogOutput(m_port, voltage, &status);

@@ -7,7 +7,9 @@
 #include <initializer_list>
 #include <span>
 
+#include <hal/AddressableLED.h>
 #include <hal/AddressableLEDTypes.h>
+#include <hal/PWM.h>
 #include <hal/Types.h>
 #include <units/time.h>
 
@@ -93,8 +95,6 @@ class AddressableLED {
   AddressableLED(AddressableLED&&) = default;
   AddressableLED& operator=(AddressableLED&&) = default;
 
-  ~AddressableLED();
-
   /**
    * Sets the length of the LED strip.
    *
@@ -165,8 +165,8 @@ class AddressableLED {
   void Stop();
 
  private:
-  hal::Handle<HAL_DigitalHandle> m_pwmHandle;
-  hal::Handle<HAL_AddressableLEDHandle> m_handle;
+  hal::Handle<HAL_DigitalHandle, HAL_FreePWMPort> m_pwmHandle;
+  hal::Handle<HAL_AddressableLEDHandle, HAL_FreeAddressableLED> m_handle;
   int m_port;
 };
 }  // namespace frc

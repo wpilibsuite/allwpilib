@@ -43,8 +43,6 @@ DigitalOutput::~DigitalOutput() {
   } catch (const RuntimeError& e) {
     e.Report();
   }
-
-  HAL_FreeDIOPort(m_handle);
 }
 
 void DigitalOutput::Set(bool value) {
@@ -141,8 +139,7 @@ void DigitalOutput::DisablePWM() {
                                  &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
-  HAL_FreeDigitalPWM(m_pwmGenerator, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+  HAL_FreeDigitalPWM(m_pwmGenerator);
 
   m_pwmGenerator = HAL_kInvalidHandle;
 }

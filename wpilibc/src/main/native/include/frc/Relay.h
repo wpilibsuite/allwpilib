@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 
+#include <hal/Relay.h>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -68,15 +69,15 @@ class Relay : public MotorSafety,
    */
   explicit Relay(int channel, Direction direction = kBothDirections);
 
+  Relay(Relay&&) = default;
+  Relay& operator=(Relay&&) = default;
+
   /**
    * Free the resource associated with a relay.
    *
    * The relay channels are set to free and the relay output is turned off.
    */
   ~Relay() override;
-
-  Relay(Relay&&) = default;
-  Relay& operator=(Relay&&) = default;
 
   /**
    * Set the relay state.
@@ -120,8 +121,8 @@ class Relay : public MotorSafety,
   int m_channel;
   Direction m_direction;
 
-  hal::Handle<HAL_RelayHandle> m_forwardHandle;
-  hal::Handle<HAL_RelayHandle> m_reverseHandle;
+  hal::Handle<HAL_RelayHandle, HAL_FreeRelayPort> m_forwardHandle;
+  hal::Handle<HAL_RelayHandle, HAL_FreeRelayPort> m_reverseHandle;
 };
 
 }  // namespace frc

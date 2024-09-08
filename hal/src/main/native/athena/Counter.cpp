@@ -63,7 +63,7 @@ HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
   return handle;
 }
 
-void HAL_FreeCounter(HAL_CounterHandle counterHandle, int32_t* status) {
+void HAL_FreeCounter(HAL_CounterHandle counterHandle) {
   counterHandles->Free(counterHandle);
 }
 

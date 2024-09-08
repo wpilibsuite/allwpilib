@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <hal/DIO.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -35,10 +36,10 @@ class DigitalInput : public DigitalSource,
    */
   explicit DigitalInput(int channel);
 
-  ~DigitalInput() override;
-
   DigitalInput(DigitalInput&&) = default;
   DigitalInput& operator=(DigitalInput&&) = default;
+
+  ~DigitalInput() override = default;
 
   /**
    * Get the value from a digital input channel.
@@ -79,7 +80,7 @@ class DigitalInput : public DigitalSource,
 
  private:
   int m_channel;
-  hal::Handle<HAL_DigitalHandle> m_handle;
+  hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
 
   friend class DigitalGlitchFilter;
 };

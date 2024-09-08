@@ -56,9 +56,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_PWMJNI_freePWMPort
   (JNIEnv* env, jclass, jint id)
 {
-  int32_t status = 0;
-  HAL_FreePWMPort((HAL_DigitalHandle)id, &status);
-  CheckStatus(env, status);
+  if (id != HAL_kInvalidHandle) {
+    HAL_FreePWMPort((HAL_DigitalHandle)id);
+  }
 }
 
 /*
