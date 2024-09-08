@@ -20,8 +20,7 @@ import edu.wpi.first.math.geometry.proto.Rotation3dProto;
 import edu.wpi.first.math.geometry.struct.Rotation3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -103,7 +102,7 @@ public class Rotation3d
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch).
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw).
    */
-  public Rotation3d(Measure<Angle> roll, Measure<Angle> pitch, Measure<Angle> yaw) {
+  public Rotation3d(Angle roll, Angle pitch, Angle yaw) {
     this(roll.in(Radians), pitch.in(Radians), yaw.in(Radians));
   }
 
@@ -144,7 +143,7 @@ public class Rotation3d
    * @param axis The rotation axis.
    * @param angle The rotation around the axis.
    */
-  public Rotation3d(Vector<N3> axis, Measure<Angle> angle) {
+  public Rotation3d(Vector<N3> axis, Angle angle) {
     this(axis, angle.in(Radians));
   }
 
@@ -412,7 +411,7 @@ public class Rotation3d
    *
    * @return The counterclockwise rotation angle around the x axis (roll) in a measure.
    */
-  public Measure<Angle> getMeasureX() {
+  public Angle getMeasureX() {
     return Radians.of(getX());
   }
 
@@ -421,7 +420,7 @@ public class Rotation3d
    *
    * @return The counterclockwise rotation angle around the y axis (pitch) in a measure.
    */
-  public Measure<Angle> getMeasureY() {
+  public Angle getMeasureY() {
     return Radians.of(getY());
   }
 
@@ -430,7 +429,7 @@ public class Rotation3d
    *
    * @return The counterclockwise rotation angle around the z axis (yaw) in a measure.
    */
-  public Measure<Angle> getMeasureZ() {
+  public Angle getMeasureZ() {
     return Radians.of(getZ());
   }
 
@@ -465,7 +464,7 @@ public class Rotation3d
    *
    * @return The angle in a measure in the axis-angle representation of this rotation.
    */
-  public Measure<Angle> getMeasure() {
+  public Angle getMeasure() {
     return Radians.of(getAngle());
   }
 

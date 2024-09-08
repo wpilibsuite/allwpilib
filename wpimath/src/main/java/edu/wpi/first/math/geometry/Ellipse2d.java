@@ -10,8 +10,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.proto.Ellipse2dProto;
 import edu.wpi.first.math.geometry.struct.Ellipse2dStruct;
 import edu.wpi.first.math.jni.Ellipse2dJNI;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -47,7 +46,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @param xSemiAxis The x semi-axis.
    * @param ySemiAxis The y semi-axis.
    */
-  public Ellipse2d(Pose2d center, Measure<Distance> xSemiAxis, Measure<Distance> ySemiAxis) {
+  public Ellipse2d(Pose2d center, Distance xSemiAxis, Distance ySemiAxis) {
     this(center, xSemiAxis.in(Meters), ySemiAxis.in(Meters));
   }
 
@@ -68,7 +67,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @param center The center of the circle.
    * @param radius The radius of the circle.
    */
-  public Ellipse2d(Translation2d center, Measure<Distance> radius) {
+  public Ellipse2d(Translation2d center, Distance radius) {
     this(new Pose2d(center, Rotation2d.kZero), radius, radius);
   }
 
@@ -113,7 +112,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    *
    * @return The x semi-axis in a measure.
    */
-  public Measure<Distance> getMeasureXSemiAxis() {
+  public Distance getMeasureXSemiAxis() {
     return Meters.of(m_xSemiAxis);
   }
 
@@ -122,7 +121,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    *
    * @return The y semi-axis in a measure.
    */
-  public Measure<Distance> getMeasureYSemiAxis() {
+  public Distance getMeasureYSemiAxis() {
     return Meters.of(m_ySemiAxis);
   }
 
@@ -209,7 +208,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @param point The point to check.
    * @return The distance (0, if the point is contained by the ellipse) in a measure.
    */
-  public Measure<Distance> getMeasureDistance(Translation2d point) {
+  public Distance getMeasureDistance(Translation2d point) {
     return Meters.of(getDistance(point));
   }
 

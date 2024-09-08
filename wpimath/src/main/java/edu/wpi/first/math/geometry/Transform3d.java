@@ -8,8 +8,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.proto.Transform3dProto;
 import edu.wpi.first.math.geometry.struct.Transform3dStruct;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -77,8 +76,7 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    * @param z The z component of the translational component of the transform.
    * @param rotation The rotational component of the transform.
    */
-  public Transform3d(
-      Measure<Distance> x, Measure<Distance> y, Measure<Distance> z, Rotation3d rotation) {
+  public Transform3d(Distance x, Distance y, Distance z, Rotation3d rotation) {
     this(x.in(Meters), y.in(Meters), z.in(Meters), rotation);
   }
 
@@ -160,7 +158,7 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    *
    * @return The x component of the transformation's translation in a measure.
    */
-  public Measure<Distance> getMeasureX() {
+  public Distance getMeasureX() {
     return m_translation.getMeasureX();
   }
 
@@ -169,7 +167,7 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    *
    * @return The y component of the transformation's translation in a measure.
    */
-  public Measure<Distance> getMeasureY() {
+  public Distance getMeasureY() {
     return m_translation.getMeasureY();
   }
 
@@ -178,7 +176,7 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    *
    * @return The z component of the transformation's translation in a measure.
    */
-  public Measure<Distance> getMeasureZ() {
+  public Distance getMeasureZ() {
     return m_translation.getMeasureZ();
   }
 

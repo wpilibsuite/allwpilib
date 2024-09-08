@@ -147,7 +147,7 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
    *
    * @return The x component of the transformation's translation in a measure.
    */
-  public Measure<Distance> getMeasureX() {
+  public Distance getMeasureX() {
     return m_translation.getMeasureX();
   }
 
@@ -156,7 +156,7 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
    *
    * @return The y component of the transformation's translation in a measure.
    */
-  public Measure<Distance> getMeasureY() {
+  public Distance getMeasureY() {
     return m_translation.getMeasureY();
   }
 

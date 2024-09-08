@@ -9,8 +9,7 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.proto.Rectangle2dProto;
 import edu.wpi.first.math.geometry.struct.Rectangle2dStruct;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -48,7 +47,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @param xWidth The x size component of the rectangle, in unrotated coordinate frame.
    * @param yWidth The y size component of the rectangle, in unrotated coordinate frame.
    */
-  public Rectangle2d(Pose2d center, Measure<Distance> xWidth, Measure<Distance> yWidth) {
+  public Rectangle2d(Pose2d center, Distance xWidth, Distance yWidth) {
     this(center, xWidth.in(Meters), yWidth.in(Meters));
   }
 
@@ -107,7 +106,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    *
    * @return The x size component of the rectangle in a measure.
    */
-  public Measure<Distance> getMeasureXWidth() {
+  public Distance getMeasureXWidth() {
     return Meters.of(m_xWidth);
   }
 
@@ -116,7 +115,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    *
    * @return The y size component of the rectangle in a measure.
    */
-  public Measure<Distance> getMeasureYWidth() {
+  public Distance getMeasureYWidth() {
     return Meters.of(m_yWidth);
   }
 
@@ -196,7 +195,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    * @param point The point to check.
    * @return The distance (0, if the point is contained by the rectangle) in a measure.
    */
-  public Measure<Distance> getMeasureDistance(Translation2d point) {
+  public Distance getMeasureDistance(Translation2d point) {
     return Meters.of(getDistance(point));
   }
 

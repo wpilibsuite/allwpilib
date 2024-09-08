@@ -14,8 +14,7 @@ import edu.wpi.first.math.geometry.proto.Pose3dProto;
 import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.jni.Pose3dJNI;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -76,8 +75,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * @param z The z component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  public Pose3d(
-      Measure<Distance> x, Measure<Distance> y, Measure<Distance> z, Rotation3d rotation) {
+  public Pose3d(Distance x, Distance y, Distance z, Rotation3d rotation) {
     this(x.in(Meters), y.in(Meters), z.in(Meters), rotation);
   }
 
@@ -157,7 +155,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The x component of the pose's translation in a measure.
    */
-  public Measure<Distance> getMeasureX() {
+  public Distance getMeasureX() {
     return m_translation.getMeasureX();
   }
 
@@ -166,7 +164,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The y component of the pose's translation in a measure.
    */
-  public Measure<Distance> getMeasureY() {
+  public Distance getMeasureY() {
     return m_translation.getMeasureY();
   }
 
@@ -175,7 +173,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The z component of the pose's translation in a measure.
    */
-  public Measure<Distance> getMeasureZ() {
+  public Distance getMeasureZ() {
     return m_translation.getMeasureZ();
   }
 
