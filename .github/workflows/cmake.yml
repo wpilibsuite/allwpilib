@@ -6,6 +6,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
+env:
+  SCCACHE_WEBDAV_ENDPOINT: "https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-cmake"
+
 jobs:
   build:
     strategy:
@@ -34,7 +37,7 @@ jobs:
         run: brew install opencv protobuf@3 ninja
         if: runner.os == 'macOS'
 
-      - name: Run sccache-cache
+      - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.5
 
       - uses: actions/checkout@v4
@@ -42,12 +45,14 @@ jobs:
       - name: configure
         run: cmake ${{ matrix.flags }}
         env:
-          SCCACHE_GHA_ENABLED: "true"
+          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_USERNAME }}
 
       - name: build
         run: cmake --build build-cmake --parallel $(nproc)
         env:
-          SCCACHE_GHA_ENABLED: "true"
+          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_USERNAME }}
 
       - name: test
         working-directory: build-cmake
@@ -76,12 +81,14 @@ jobs:
       - name: configure
         run: cmake --preset sccache -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release
         env:
-          SCCACHE_GHA_ENABLED: "true"
+          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_USERNAME }}
 
       - name: build
         run: cmake --build build-cmake --parallel $(nproc)
         env:
-          SCCACHE_GHA_ENABLED: "true"
+          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_USERNAME }}
 
       - name: test
         working-directory: build-cmake
