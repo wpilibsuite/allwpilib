@@ -8,7 +8,7 @@ on:
 jobs:
   wpilib-mvn-development_unused_cleanup:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main'
+    if: github.repository == 'wpilibsuite/allwpilib' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,7 +21,7 @@ jobs:
 
   wpilib-generic-gradle-cache_unused_cleanup:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main'
+    if: github.repository == 'wpilibsuite/allwpilib' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
         with:
