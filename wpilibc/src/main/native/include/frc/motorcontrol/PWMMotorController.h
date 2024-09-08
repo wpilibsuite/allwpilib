@@ -72,6 +72,15 @@ class PWMMotorController : public MotorController,
    */
   double Get() const override;
 
+  /**
+   * Gets the voltage output of the motor controller, nominally between -12 V
+   * and 12 V.
+   *
+   * @return The voltage of the motor controller, nominally between -12 V and 12
+   *   V.
+   */
+  virtual units::volt_t GetVoltage() const;
+
   void SetInverted(bool isInverted) override;
 
   bool GetInverted() const override;
