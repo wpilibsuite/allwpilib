@@ -193,7 +193,7 @@ cc_test(
     deps = [
         ":wpiutil.static",
         ":wpiutil-testlib",
-        "//thirdparty/googletest",
+        "//thirdparty/googletest:googletest.static",
     ],
 )
 
