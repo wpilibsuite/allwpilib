@@ -90,7 +90,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Returns the X semi-axis.
+   * Returns the x semi-axis.
    *
    * @return The x semi-axis.
    */
@@ -99,7 +99,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Returns the Y semi-axis.
+   * Returns the y semi-axis.
    *
    * @return The y semi-axis.
    */
