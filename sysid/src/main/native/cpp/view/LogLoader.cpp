@@ -35,15 +35,16 @@ void LogLoader::Display() {
     if (!m_opener->result().empty()) {
       m_filename = m_opener->result()[0];
 
-      std::error_code ec;
-      auto buf = wpi::MemoryBuffer::GetFile(m_filename, ec);
-      if (ec) {
+      std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
+      if (auto buf = wpi::MemoryBuffer::GetFile(m_filename)) {
+        fileBuffer = std::move(*buf);
+      } else {
         ImGui::OpenPopup("Error");
-        m_error = fmt::format("Could not open file: {}", ec.message());
+        m_error = fmt::format("Could not open file: {}", buf.error().message());
         return;
       }
 
-      wpi::log::DataLogReader reader{std::move(buf)};
+      wpi::log::DataLogReader reader{std::move(fileBuffer)};
       if (!reader.IsValid()) {
         ImGui::OpenPopup("Error");
         m_error = "Not a valid datalog file";

@@ -180,17 +180,18 @@ InputFile::~InputFile() {
 }
 
 static std::unique_ptr<InputFile> LoadDataLog(std::string_view filename) {
-  std::error_code ec;
-  auto buf = wpi::MemoryBuffer::GetFile(filename, ec);
-  std::string fn{filename};
-  if (ec) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
+  if (auto buf = wpi::MemoryBuffer::GetFile(filename)) {
+    fileBuffer = std::move(*buf);
+  } else {
     return std::make_unique<InputFile>(
-        fn, fmt::format("Could not open file: {}", ec.message()));
+        filename,
+        fmt::format("Could not open file: {}", buf.error().message()));
   }
 
-  wpi::log::DataLogReader reader{std::move(buf)};
+  wpi::log::DataLogReader reader{std::move(fileBuffer)};
   if (!reader.IsValid()) {
-    return std::make_unique<InputFile>(fn, "Not a valid datalog file");
+    return std::make_unique<InputFile>(filename, "Not a valid datalog file");
   }
 
   return std::make_unique<InputFile>(

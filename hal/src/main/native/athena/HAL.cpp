@@ -297,12 +297,11 @@ void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
 
 void InitializeRoboRioComments(void) {
   if (!roboRioCommentsStringInitialized) {
-    std::error_code ec;
-    std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-        wpi::MemoryBuffer::GetFile("/etc/machine-info", ec);
-
+    // Store pointer to make sure buffer isn't freed
+    std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
     std::string_view fileContents;
-    if (fileBuffer && !ec) {
+    if (auto buf = wpi::MemoryBuffer::GetFile("/etc/machine-info")) {
+      fileBuffer = std::move(*buf);
       fileContents =
           std::string_view(reinterpret_cast<const char*>(fileBuffer->begin()),
                            fileBuffer->size());

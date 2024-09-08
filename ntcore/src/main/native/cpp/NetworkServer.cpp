@@ -351,15 +351,16 @@ void NetworkServer::HandleLocal() {
 }
 
 void NetworkServer::LoadPersistent() {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(m_persistentFilename, ec);
-  if (fileBuffer == nullptr || ec.value() != 0) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
+  if (auto buf = wpi::MemoryBuffer::GetFile(m_persistentFilename)) {
+    fileBuffer = std::move(*buf);
+  } else {
     INFO(
         "could not open persistent file '{}': {} "
         "(this can be ignored if you aren't expecting persistent values)",
-        m_persistentFilename, ec.message());
+        m_persistentFilename, buf.error().message());
     // backup file
+    std::error_code ec;
     fs::copy_file(m_persistentFilename, m_persistentFilename + ".bak",
                   std::filesystem::copy_options::overwrite_existing, ec);
     // try to write an empty file so it doesn't happen again

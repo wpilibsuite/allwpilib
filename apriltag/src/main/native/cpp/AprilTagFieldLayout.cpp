@@ -15,10 +15,10 @@
 using namespace frc;
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(path, ec);
-  if (fileBuffer == nullptr || ec) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
+  if (auto buf = wpi::MemoryBuffer::GetFile(path)) {
+    fileBuffer = std::move(*buf);
+  } else {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 

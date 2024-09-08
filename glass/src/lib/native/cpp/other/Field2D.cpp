@@ -540,10 +540,10 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
 }
 
 void FieldInfo::LoadJsonFile(std::string_view jsonfile) {
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(jsonfile, ec);
-  if (fileBuffer == nullptr || ec) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
+  if (auto buf = wpi::MemoryBuffer::GetFile(jsonfile)) {
+    fileBuffer = std::move(buf);
+  } else {
     std::fputs("GUI: could not open field JSON file\n", stderr);
     return;
   }

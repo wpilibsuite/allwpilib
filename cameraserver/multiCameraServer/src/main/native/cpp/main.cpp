@@ -94,11 +94,12 @@ bool ReadCameraConfig(const wpi::json& config) {
 
 bool ReadConfig() {
   // open config file
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(configFile, ec);
-  if (fileBuffer == nullptr || ec) {
-    wpi::print(stderr, "could not open '{}': {}\n", configFile, ec.message());
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
+  if (auto buf = wpi::MemoryBuffer::GetFile(configFile)) {
+    fileBuffer = std::move(*buf);
+  } else {
+    wpi::print(stderr, "could not open '{}': {}\n", configFile,
+               buf.error().message());
     return false;
   }
 

@@ -125,9 +125,10 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
   }
 
   // open file
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(filename, ec);
-  if (fileBuffer == nullptr || ec) {
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
+  if (auto buf = wpi::MemoryBuffer::GetFile(filename)) {
+    fileBuffer = std::move(*buf);
+  } else {
     MySendError(404, "error opening file");
     return;
   }
