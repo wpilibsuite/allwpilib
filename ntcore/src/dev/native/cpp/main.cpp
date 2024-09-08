@@ -18,12 +18,16 @@
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
 
+#include "networktables/DoubleArrayTopic.h"
 #include "ntcore.h"
+#include "ntcore_c.h"
 #include "ntcore_cpp.h"
+#include "networktables/NetworkTableInstance.h"
 
 void bench();
 void bench2();
 void stress();
+void stress2();
 
 int main(int argc, char* argv[]) {
   wpi::impl::SetupNowDefaultOnRio();
@@ -38,6 +42,10 @@ int main(int argc, char* argv[]) {
   }
   if (argc == 2 && std::string_view{argv[1]} == "stress") {
     stress();
+    return EXIT_SUCCESS;
+  }
+  if (argc == 2 && std::string_view{argv[1]} == "stress2") {
+    stress2();
     return EXIT_SUCCESS;
   }
 
@@ -265,4 +273,55 @@ void stress() {
   }
 
   std::this_thread::sleep_for(100s);
+}
+
+void stress2() {
+  using namespace std::chrono_literals;
+
+  auto testTopicName = "testTopic";
+  auto count = 1000;
+  std::atomic_bool isDone{false};
+  nt::PubSubOptions pubSubOptions{
+      .periodic = std::numeric_limits<double>::min(),
+      .sendAll = true,
+      .keepDuplicates = true};
+  auto server = nt::NetworkTableInstance::Create();
+  server.StartServer();
+  auto serverTopic = server.GetDoubleArrayTopic(testTopicName);
+  auto subscriber = serverTopic.Subscribe({}, pubSubOptions);
+  std::atomic_int receivedCount{0};
+  server.AddListener(subscriber, NT_EVENT_VALUE_REMOTE, [&](auto event) {
+    if (receivedCount.fetch_add(1) == count) {
+      isDone = true;
+    }
+    // Warnings about duplicate pubs occur if I either introduce this short
+    // delay...
+    std::this_thread::sleep_for(1ms);
+    // ...or a little IO
+    // System.out.println("Got %d: %s"
+    // .formatted(receivedCount.get(), Arrays.toString(
+    // event.valueData.value.getDoubleArray())));
+  });
+
+  auto client = nt::NetworkTableInstance::Create();
+  client.SetServer("localhost");
+  auto clientName = "test client";
+  client.StartClient4(clientName);
+  std::this_thread::sleep_for(2s);  // Startup time.
+  int sentCount = 0;
+  while (sentCount < count) {
+    auto clientTopic = client.GetDoubleArrayTopic(testTopicName);
+    {
+      auto publisher = clientTopic.Publish(pubSubOptions);
+      publisher.Set(
+          {{static_cast<double>(sentCount), static_cast<double>(sentCount),
+            static_cast<double>(sentCount)}});
+      // client.Flush();
+      sentCount++;
+    }
+    std::this_thread::yield();
+  }
+
+  std::this_thread::sleep_for(10s);
+  fmt::print("isDone: {}", isDone.load());
 }
