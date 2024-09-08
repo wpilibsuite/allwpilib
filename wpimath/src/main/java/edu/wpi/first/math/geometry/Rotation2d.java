@@ -10,13 +10,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.proto.Rotation2dProto;
 import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -118,6 +118,8 @@ public class Rotation2d
     } else {
       m_sin = 0.0;
       m_cos = 1.0;
+      MathSharedStore.reportError(
+          "x and y components of Rotation2d are zero\n", Thread.currentThread().getStackTrace());
     }
     m_value = Math.atan2(m_sin, m_cos);
   }
@@ -127,7 +129,7 @@ public class Rotation2d
    *
    * @param angle The angle of the rotation.
    */
-  public Rotation2d(Measure<Angle> angle) {
+  public Rotation2d(Angle angle) {
     this(angle.in(Radians));
   }
 
@@ -241,7 +243,7 @@ public class Rotation2d
    *
    * @return The measure of the Rotation2d.
    */
-  public Measure<Angle> getMeasure() {
+  public Angle getMeasure() {
     return Radians.of(getRadians());
   }
 

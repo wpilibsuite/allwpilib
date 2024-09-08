@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -256,7 +257,7 @@ public class AprilTagFieldLayout {
       // Class.getResourceAsStream() returns null if the resource does not exist.
       throw new IOException("Could not locate resource: " + resourcePath);
     }
-    InputStreamReader reader = new InputStreamReader(stream);
+    InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
     try {
       return new ObjectMapper().readerFor(AprilTagFieldLayout.class).readValue(reader);
     } catch (IOException e) {

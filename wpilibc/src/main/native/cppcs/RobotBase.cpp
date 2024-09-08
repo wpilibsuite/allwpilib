@@ -47,8 +47,7 @@ int frc::RunHALInitialization() {
              HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
 
   if (!frc::Notifier::SetHALThreadPriority(true, 40)) {
-    FRC_ReportError(warn::Warning,
-                    "Setting HAL Notifier RT priority to 40 failed\n");
+    FRC_ReportWarning("Setting HAL Notifier RT priority to 40 failed\n");
   }
 
   std::puts("\n********** Robot program starting **********");

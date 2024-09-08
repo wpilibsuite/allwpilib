@@ -11,11 +11,11 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
 
 /**
- * The VM is configured to automatically run this class. If you change the name of this class or the
- * package after creating this project, you must also update the build.gradle file in the project.
+ * This class is run automatically. If you change the name of this class or the package after
+ * creating this project, you must also update the Main.java file in the project.
  */
 public class Robot extends RobotBase {
-  public void robotInit() {}
+  public Robot() {}
 
   public void disabled() {}
 
@@ -29,8 +29,6 @@ public class Robot extends RobotBase {
 
   @Override
   public void startCompetition() {
-    robotInit();
-
     DriverStationModeThread modeThread = new DriverStationModeThread();
 
     int event = WPIUtilJNI.createEvent(false, false);

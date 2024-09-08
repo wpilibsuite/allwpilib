@@ -69,12 +69,14 @@ public class Color8Bit {
     if (this == other) {
       return true;
     }
-    if (other == null || getClass() != other.getClass()) {
+    if (other == null) {
       return false;
     }
 
-    Color8Bit color8Bit = (Color8Bit) other;
-    return red == color8Bit.red && green == color8Bit.green && blue == color8Bit.blue;
+    return other instanceof Color8Bit color8Bit
+        && red == color8Bit.red
+        && green == color8Bit.green
+        && blue == color8Bit.blue;
   }
 
   @Override

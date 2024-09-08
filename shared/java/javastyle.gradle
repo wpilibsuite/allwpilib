@@ -48,7 +48,7 @@ spotless {
         target fileTree('.') {
             include '**/*.json'
             exclude '**/build/**', '**/build-*/**', '**/bin/**'
-            exclude '**/simgui-ds.json', '**/simgui-window.json', '**/simgui.json', '**/networktables.json'
+            exclude '**/simgui-ds.json', '**/simgui-window.json', '**/simgui.json', '**/networktables.json', '**/*test.json'
         }
         gson()
           .indentWithSpaces(2)

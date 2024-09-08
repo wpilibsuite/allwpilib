@@ -699,7 +699,7 @@ void uv_process_tty_read_raw_req(uv_loop_t* loop, uv_tty_t* handle,
 
   DWORD records_left, records_read;
   uv_buf_t buf;
-  off_t buf_used;
+  _off_t buf_used;
 
   assert(handle->type == UV_TTY);
   assert(handle->flags & UV_HANDLE_TTY_READABLE);
@@ -1055,7 +1055,7 @@ int uv__tty_read_stop(uv_tty_t* handle) {
     return 0;
 
   if (handle->flags & UV_HANDLE_TTY_RAW) {
-    /* Cancel raw read. Write some bullshit event to force the console wait to
+    /* Cancel raw read. Write some event to force the console wait to
      * return. */
     memset(&record, 0, sizeof record);
     record.EventType = FOCUS_EVENT;
@@ -2250,7 +2250,7 @@ void uv__tty_close(uv_tty_t* handle) {
   if (handle->u.fd == -1)
     CloseHandle(handle->handle);
   else
-    close(handle->u.fd);
+    _close(handle->u.fd);
 
   handle->u.fd = -1;
   handle->handle = INVALID_HANDLE_VALUE;

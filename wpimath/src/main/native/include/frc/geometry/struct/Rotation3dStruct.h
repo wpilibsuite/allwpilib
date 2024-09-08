@@ -11,9 +11,7 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Rotation3d> {
-  static constexpr std::string_view GetTypeString() {
-    return "struct:Rotation3d";
-  }
+  static constexpr std::string_view GetTypeName() { return "Rotation3d"; }
   static constexpr size_t GetSize() {
     return wpi::GetStructSize<frc::Quaternion>();
   }

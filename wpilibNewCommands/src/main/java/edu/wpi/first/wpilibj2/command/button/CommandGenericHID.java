@@ -4,9 +4,12 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A version of {@link GenericHID} with {@link Trigger} factories for command-based.
@@ -15,6 +18,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class CommandGenericHID {
   private final GenericHID m_hid;
+  private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisLessThanCache =
+      new HashMap<>();
+  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisGreaterThanCache =
+      new HashMap<>();
+  private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
 
   /**
    * Construct an instance of a device.
@@ -43,7 +52,7 @@ public class CommandGenericHID {
    * @see #button(int, EventLoop)
    */
   public Trigger button(int button) {
-    return this.button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
+    return button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -54,7 +63,8 @@ public class CommandGenericHID {
    * @return an event instance representing the button's digital signal attached to the given loop.
    */
   public Trigger button(int button, EventLoop loop) {
-    return new Trigger(loop, () -> m_hid.getRawButton(button));
+    var cache = m_buttonCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(button, k -> new Trigger(loop, () -> m_hid.getRawButton(k)));
   }
 
   /**
@@ -85,7 +95,10 @@ public class CommandGenericHID {
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
   public Trigger pov(int pov, int angle, EventLoop loop) {
-    return new Trigger(loop, () -> m_hid.getPOV(pov) == angle);
+    var cache = m_povCache.computeIfAbsent(loop, k -> new HashMap<>());
+    // angle can be -1, so use 3600 instead of 360
+    return cache.computeIfAbsent(
+        pov * 3600 + angle, k -> new Trigger(loop, () -> m_hid.getPOV(pov) == angle));
   }
 
   /**
@@ -212,7 +225,9 @@ public class CommandGenericHID {
    *     threshold.
    */
   public Trigger axisLessThan(int axis, double threshold, EventLoop loop) {
-    return m_hid.axisLessThan(axis, threshold, loop).castTo(Trigger::new);
+    var cache = m_axisLessThanCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(
+        Pair.of(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) < threshold));
   }
 
   /**
@@ -240,7 +255,9 @@ public class CommandGenericHID {
    *     threshold.
    */
   public Trigger axisGreaterThan(int axis, double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(axis, threshold, loop).castTo(Trigger::new);
+    var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
+    return cache.computeIfAbsent(
+        Pair.of(axis, threshold), k -> new Trigger(loop, () -> getRawAxis(axis) > threshold));
   }
 
   /**
@@ -251,5 +268,25 @@ public class CommandGenericHID {
    */
   public double getRawAxis(int axis) {
     return m_hid.getRawAxis(axis);
+  }
+
+  /**
+   * Set the rumble output for the HID. The DS currently supports 2 rumble values, left rumble and
+   * right rumble.
+   *
+   * @param type Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  public void setRumble(GenericHID.RumbleType type, double value) {
+    m_hid.setRumble(type, value);
+  }
+
+  /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  public boolean isConnected() {
+    return m_hid.isConnected();
   }
 }

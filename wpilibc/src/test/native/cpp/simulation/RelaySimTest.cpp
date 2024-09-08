@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(RelaySimTest, InitializationBidrectional) {
+TEST(RelaySimTest, InitializationBidirectional) {
   HAL_Initialize(500, 0);
 
   RelaySim sim(0);

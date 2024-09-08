@@ -4,12 +4,13 @@
 
 #include "frc/geometry/proto/Translation3dProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "geometry3d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Translation3d>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufTranslation3d>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufTranslation3d>(arena);
 }
 
 frc::Translation3d wpi::Protobuf<frc::Translation3d>::Unpack(

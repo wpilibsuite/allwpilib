@@ -6,8 +6,6 @@
 
 #include <frc2/command/Commands.h>
 
-#include "commands/DriveDistanceProfiled.h"
-
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
@@ -34,32 +32,12 @@ void RobotContainer::ConfigureButtonBindings() {
   // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of
   // 10 seconds
   m_driverController.A().OnTrue(
-      DriveDistanceProfiled(3_m, &m_drive).WithTimeout(10_s));
+      m_drive.ProfiledDriveDistance(3_m).WithTimeout(10_s));
 
-  // Do the same thing as above when the 'B' button is pressed, but defined
-  // inline
+  // Do the same thing as above when the 'B' button is pressed, but without
+  // resetting the encoders
   m_driverController.B().OnTrue(
-      frc2::TrapezoidProfileCommand<units::meters>(
-          frc::TrapezoidProfile<units::meters>(
-              // Limit the max acceleration and velocity
-              {DriveConstants::kMaxSpeed, DriveConstants::kMaxAcceleration}),
-          // Pipe the profile state to the drive
-          [this](auto setpointState) {
-            m_drive.SetDriveStates(setpointState, setpointState);
-          },
-          // End at desired position in meters; implicitly starts at 0
-          [] {
-            return frc::TrapezoidProfile<units::meters>::State{3_m, 0_mps};
-          },
-          // Current position
-          [] { return frc::TrapezoidProfile<units::meters>::State{}; },
-          // Require the drive
-          {&m_drive})
-          // Convert to CommandPtr
-          .ToPtr()
-          .BeforeStarting(
-              frc2::cmd::RunOnce([this]() { m_drive.ResetEncoders(); }, {}))
-          .WithTimeout(10_s));
+      m_drive.DynamicProfiledDriveDistance(3_m).WithTimeout(10_s));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

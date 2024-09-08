@@ -4,15 +4,15 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -29,7 +29,7 @@ import java.util.function.BooleanSupplier;
  */
 public abstract class Command implements Sendable {
   /** Requirements set. */
-  protected Set<Subsystem> m_requirements = new HashSet<>();
+  private final Set<Subsystem> m_requirements = new HashSet<>();
 
   /** Default constructor. */
   @SuppressWarnings("this-escape")
@@ -94,6 +94,19 @@ public abstract class Command implements Sendable {
     for (Subsystem requirement : requirements) {
       m_requirements.add(requireNonNullParam(requirement, "requirement", "addRequirements"));
     }
+  }
+
+  /**
+   * Adds the specified subsystems to the requirements of the command. The scheduler will prevent
+   * two commands that require the same subsystem from being scheduled simultaneously.
+   *
+   * <p>Note that the scheduler determines the requirements of a command when it is scheduled, so
+   * this method should normally be called from the command's constructor.
+   *
+   * @param requirements the requirements to add
+   */
+  public final void addRequirements(Collection<Subsystem> requirements) {
+    m_requirements.addAll(requirements);
   }
 
   /**
@@ -165,8 +178,8 @@ public abstract class Command implements Sendable {
    * @param time the timeout duration
    * @return the command with the timeout added
    */
-  public ParallelRaceGroup withTimeout(Measure<Time> time) {
-    return withTimeout(time.in(Second));
+  public ParallelRaceGroup withTimeout(Time time) {
+    return withTimeout(time.in(Seconds));
   }
 
   /**
@@ -305,7 +318,7 @@ public abstract class Command implements Sendable {
    * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
    * returned from this method can be further decorated without issue.
    *
-   * @param parallel the commands to run in parallel. Note the parallel commands will be interupted
+   * @param parallel the commands to run in parallel. Note the parallel commands will be interrupted
    *     when the deadline command ends
    * @return the decorated command
    */

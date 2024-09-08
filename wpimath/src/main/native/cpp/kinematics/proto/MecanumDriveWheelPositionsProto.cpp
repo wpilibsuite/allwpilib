@@ -4,12 +4,14 @@
 
 #include "frc/kinematics/proto/MecanumDriveWheelPositionsProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "kinematics.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::MecanumDriveWheelPositions>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufMecanumDriveWheelPositions>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufMecanumDriveWheelPositions>(
+      arena);
 }
 
 frc::MecanumDriveWheelPositions

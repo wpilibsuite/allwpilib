@@ -2,10 +2,20 @@
 
 #pragma once
 
+#include <algorithm>
+#include <concepts>
+#include <initializer_list>
+#include <type_traits>
 #include <utility>
+#include <vector>
+
+#include <Eigen/Core>
+#include <wpi/SmallVector.h>
 
 #include "sleipnir/autodiff/Expression.hpp"
 #include "sleipnir/autodiff/ExpressionGraph.hpp"
+#include "sleipnir/util/Assert.hpp"
+#include "sleipnir/util/Concepts.hpp"
 #include "sleipnir/util/Print.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
@@ -33,13 +43,6 @@ class SLEIPNIR_DLLEXPORT Variable {
   Variable(double value) : expr{detail::MakeExpressionPtr(value)} {}  // NOLINT
 
   /**
-   * Constructs a Variable from an int.
-   *
-   * @param value The value of the Variable.
-   */
-  Variable(int value) : expr{detail::MakeExpressionPtr(value)} {}  // NOLINT
-
-  /**
    * Constructs a Variable pointing to the specified expression.
    *
    * @param expr The autodiff variable.
@@ -65,22 +68,11 @@ class SLEIPNIR_DLLEXPORT Variable {
   }
 
   /**
-   * Assignment operator for int.
-   *
-   * @param value The value of the Variable.
-   */
-  Variable& operator=(int value) {
-    expr = detail::MakeExpressionPtr(value);
-
-    return *this;
-  }
-
-  /**
    * Sets Variable's internal value.
    *
    * @param value The value of the Variable.
    */
-  Variable& SetValue(double value) {
+  void SetValue(double value) {
     if (expr->IsConstant(0.0)) {
       expr = detail::MakeExpressionPtr(value);
     } else {
@@ -94,29 +86,6 @@ class SLEIPNIR_DLLEXPORT Variable {
       }
       expr->value = value;
     }
-    return *this;
-  }
-
-  /**
-   * Sets Variable's internal value.
-   *
-   * @param value The value of the Variable.
-   */
-  Variable& SetValue(int value) {
-    if (expr->IsConstant(0.0)) {
-      expr = detail::MakeExpressionPtr(value);
-    } else {
-      // We only need to check the first argument since unary and binary
-      // operators both use it
-      if (expr->args[0] != nullptr && !expr->args[0]->IsConstant(0.0)) {
-        sleipnir::println(
-            stderr,
-            "WARNING: {}:{}: Modified the value of a dependent variable",
-            __FILE__, __LINE__);
-      }
-      expr->value = value;
-    }
-    return *this;
   }
 
   /**
@@ -224,23 +193,19 @@ class SLEIPNIR_DLLEXPORT Variable {
   /**
    * Returns the value of this variable.
    */
-  double Value() const { return expr->value; }
+  double Value() {
+    // Updates the value of this variable based on the values of its dependent
+    // variables
+    detail::ExpressionGraph{expr}.Update();
+
+    return expr->value;
+  }
 
   /**
    * Returns the type of this expression (constant, linear, quadratic, or
    * nonlinear).
    */
   ExpressionType Type() const { return expr->type; }
-
-  /**
-   * Updates the value of this variable based on the values of its dependent
-   * variables.
-   */
-  void Update() {
-    if (!expr->IsConstant(0.0)) {
-      detail::ExpressionGraph{expr}.Update();
-    }
-  }
 
  private:
   /// The expression node.
@@ -464,4 +429,333 @@ SLEIPNIR_DLLEXPORT inline Variable hypot(const Variable& x, const Variable& y,
                                  sleipnir::pow(z, 2))};
 }
 
+/**
+ * Make a list of constraints.
+ *
+ * The standard form for equality constraints is c(x) = 0, and the standard form
+ * for inequality constraints is c(x) ≥ 0. This function takes constraints of
+ * the form lhs = rhs or lhs ≥ rhs and converts them to lhs - rhs = 0 or
+ * lhs - rhs ≥ 0.
+ *
+ * @param lhs Left-hand side.
+ * @param rhs Right-hand side.
+ */
+template <typename LHS, typename RHS>
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+wpi::SmallVector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
+  wpi::SmallVector<Variable> constraints;
+
+  if constexpr (ScalarLike<std::decay_t<LHS>> &&
+                ScalarLike<std::decay_t<RHS>>) {
+    constraints.emplace_back(lhs - rhs);
+  } else if constexpr (ScalarLike<std::decay_t<LHS>> &&
+                       MatrixLike<std::decay_t<RHS>>) {
+    int rows;
+    int cols;
+    if constexpr (EigenMatrixLike<std::decay_t<RHS>>) {
+      rows = rhs.rows();
+      cols = rhs.cols();
+    } else {
+      rows = rhs.Rows();
+      cols = rhs.Cols();
+    }
+
+    constraints.reserve(rows * cols);
+
+    for (int row = 0; row < rows; ++row) {
+      for (int col = 0; col < cols; ++col) {
+        // Make right-hand side zero
+        constraints.emplace_back(lhs - rhs(row, col));
+      }
+    }
+  } else if constexpr (MatrixLike<std::decay_t<LHS>> &&
+                       ScalarLike<std::decay_t<RHS>>) {
+    int rows;
+    int cols;
+    if constexpr (EigenMatrixLike<std::decay_t<LHS>>) {
+      rows = lhs.rows();
+      cols = lhs.cols();
+    } else {
+      rows = lhs.Rows();
+      cols = lhs.Cols();
+    }
+
+    constraints.reserve(rows * cols);
+
+    for (int row = 0; row < rows; ++row) {
+      for (int col = 0; col < cols; ++col) {
+        // Make right-hand side zero
+        constraints.emplace_back(lhs(row, col) - rhs);
+      }
+    }
+  } else if constexpr (MatrixLike<std::decay_t<LHS>> &&
+                       MatrixLike<std::decay_t<RHS>>) {
+    int lhsRows;
+    int lhsCols;
+    if constexpr (EigenMatrixLike<std::decay_t<LHS>>) {
+      lhsRows = lhs.rows();
+      lhsCols = lhs.cols();
+    } else {
+      lhsRows = lhs.Rows();
+      lhsCols = lhs.Cols();
+    }
+
+    [[maybe_unused]]
+    int rhsRows;
+    [[maybe_unused]]
+    int rhsCols;
+    if constexpr (EigenMatrixLike<std::decay_t<RHS>>) {
+      rhsRows = rhs.rows();
+      rhsCols = rhs.cols();
+    } else {
+      rhsRows = rhs.Rows();
+      rhsCols = rhs.Cols();
+    }
+
+    Assert(lhsRows == rhsRows && lhsCols == rhsCols);
+    constraints.reserve(lhsRows * lhsCols);
+
+    for (int row = 0; row < lhsRows; ++row) {
+      for (int col = 0; col < lhsCols; ++col) {
+        // Make right-hand side zero
+        constraints.emplace_back(lhs(row, col) - rhs(row, col));
+      }
+    }
+  }
+
+  return constraints;
+}
+
+/**
+ * A vector of equality constraints of the form cₑ(x) = 0.
+ */
+struct SLEIPNIR_DLLEXPORT EqualityConstraints {
+  /// A vector of scalar equality constraints.
+  wpi::SmallVector<Variable> constraints;
+
+  /**
+   * Concatenates multiple equality constraints.
+   *
+   * @param equalityConstraints The list of EqualityConstraints to concatenate.
+   */
+  EqualityConstraints(  // NOLINT
+      std::initializer_list<EqualityConstraints> equalityConstraints) {
+    for (const auto& elem : equalityConstraints) {
+      constraints.insert(constraints.end(), elem.constraints.begin(),
+                         elem.constraints.end());
+    }
+  }
+
+  /**
+   * Concatenates multiple equality constraints.
+   *
+   * This overload is for Python bindings only.
+   *
+   * @param equalityConstraints The list of EqualityConstraints to concatenate.
+   */
+  explicit EqualityConstraints(
+      const std::vector<EqualityConstraints>& equalityConstraints) {
+    for (const auto& elem : equalityConstraints) {
+      constraints.insert(constraints.end(), elem.constraints.begin(),
+                         elem.constraints.end());
+    }
+  }
+
+  /**
+   * Constructs an equality constraint from a left and right side.
+   *
+   * The standard form for equality constraints is c(x) = 0. This function takes
+   * a constraint of the form lhs = rhs and converts it to lhs - rhs = 0.
+   *
+   * @param lhs Left-hand side.
+   * @param rhs Right-hand side.
+   */
+  template <typename LHS, typename RHS>
+    requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+            (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+            (!std::same_as<std::decay_t<LHS>, double> ||
+             !std::same_as<std::decay_t<RHS>, double>)
+  EqualityConstraints(LHS&& lhs, RHS&& rhs)
+      : constraints{MakeConstraints(lhs, rhs)} {}
+
+  /**
+   * Implicit conversion operator to bool.
+   */
+  operator bool() {  // NOLINT
+    return std::all_of(
+        constraints.begin(), constraints.end(),
+        [](auto& constraint) { return constraint.Value() == 0.0; });
+  }
+};
+
+/**
+ * A vector of inequality constraints of the form cᵢ(x) ≥ 0.
+ */
+struct SLEIPNIR_DLLEXPORT InequalityConstraints {
+  /// A vector of scalar inequality constraints.
+  wpi::SmallVector<Variable> constraints;
+
+  /**
+   * Concatenates multiple inequality constraints.
+   *
+   * @param inequalityConstraints The list of InequalityConstraints to
+   * concatenate.
+   */
+  InequalityConstraints(  // NOLINT
+      std::initializer_list<InequalityConstraints> inequalityConstraints) {
+    for (const auto& elem : inequalityConstraints) {
+      constraints.insert(constraints.end(), elem.constraints.begin(),
+                         elem.constraints.end());
+    }
+  }
+
+  /**
+   * Concatenates multiple inequality constraints.
+   *
+   * This overload is for Python bindings only.
+   *
+   * @param inequalityConstraints The list of InequalityConstraints to
+   * concatenate.
+   */
+  explicit InequalityConstraints(
+      const std::vector<InequalityConstraints>& inequalityConstraints) {
+    for (const auto& elem : inequalityConstraints) {
+      constraints.insert(constraints.end(), elem.constraints.begin(),
+                         elem.constraints.end());
+    }
+  }
+
+  /**
+   * Constructs an inequality constraint from a left and right side.
+   *
+   * The standard form for inequality constraints is c(x) ≥ 0. This function
+   * takes a constraints of the form lhs ≥ rhs and converts it to lhs - rhs ≥ 0.
+   *
+   * @param lhs Left-hand side.
+   * @param rhs Right-hand side.
+   */
+  template <typename LHS, typename RHS>
+    requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+            (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+            (!std::same_as<std::decay_t<LHS>, double> ||
+             !std::same_as<std::decay_t<RHS>, double>)
+  InequalityConstraints(LHS&& lhs, RHS&& rhs)
+      : constraints{MakeConstraints(lhs, rhs)} {}
+
+  /**
+   * Implicit conversion operator to bool.
+   */
+  operator bool() {  // NOLINT
+    return std::all_of(
+        constraints.begin(), constraints.end(),
+        [](auto& constraint) { return constraint.Value() >= 0.0; });
+  }
+};
+
+/**
+ * Equality operator that returns an equality constraint for two Variables.
+ *
+ * @param lhs Left-hand side.
+ * @param rhs Left-hand side.
+ */
+template <typename LHS, typename RHS>
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+EqualityConstraints operator==(LHS&& lhs, RHS&& rhs) {
+  return EqualityConstraints{lhs, rhs};
+}
+
+/**
+ * Less-than comparison operator that returns an inequality constraint for two
+ * Variables.
+ *
+ * @param lhs Left-hand side.
+ * @param rhs Left-hand side.
+ */
+template <typename LHS, typename RHS>
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+InequalityConstraints operator<(LHS&& lhs, RHS&& rhs) {
+  return rhs >= lhs;
+}
+
+/**
+ * Less-than-or-equal-to comparison operator that returns an inequality
+ * constraint for two Variables.
+ *
+ * @param lhs Left-hand side.
+ * @param rhs Left-hand side.
+ */
+template <typename LHS, typename RHS>
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+InequalityConstraints operator<=(LHS&& lhs, RHS&& rhs) {
+  return rhs >= lhs;
+}
+
+/**
+ * Greater-than comparison operator that returns an inequality constraint for
+ * two Variables.
+ *
+ * @param lhs Left-hand side.
+ * @param rhs Left-hand side.
+ */
+template <typename LHS, typename RHS>
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+InequalityConstraints operator>(LHS&& lhs, RHS&& rhs) {
+  return lhs >= rhs;
+}
+
+/**
+ * Greater-than-or-equal-to comparison operator that returns an inequality
+ * constraint for two Variables.
+ *
+ * @param lhs Left-hand side.
+ * @param rhs Left-hand side.
+ */
+template <typename LHS, typename RHS>
+  requires(ScalarLike<std::decay_t<LHS>> || MatrixLike<std::decay_t<LHS>>) &&
+          (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
+          (!std::same_as<std::decay_t<LHS>, double> ||
+           !std::same_as<std::decay_t<RHS>, double>)
+InequalityConstraints operator>=(LHS&& lhs, RHS&& rhs) {
+  return InequalityConstraints{lhs, rhs};
+}
+
 }  // namespace sleipnir
+
+namespace Eigen {
+
+/**
+ * NumTraits specialization that allows instantiating Eigen types with Variable.
+ */
+template <>
+struct NumTraits<sleipnir::Variable> : NumTraits<double> {
+  using Real = sleipnir::Variable;
+  using NonInteger = sleipnir::Variable;
+  using Nested = sleipnir::Variable;
+
+  enum {
+    IsComplex = 0,
+    IsInteger = 0,
+    IsSigned = 1,
+    RequireInitialization = 1,
+    ReadCost = 1,
+    AddCost = 3,
+    MulCost = 3
+  };
+};
+
+}  // namespace Eigen

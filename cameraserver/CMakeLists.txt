@@ -3,21 +3,21 @@ project(cameraserver)
 include(CompileWarnings)
 include(AddTest)
 
-find_package(OpenCV REQUIRED)
-
 # Java bindings
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
 
-    #find java files, copy them locally
-
-    set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/OpenCV/java/)
+    #find JAR file, copy it locally
+    set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/java/opencv4)
 
     find_file(
         OPENCV_JAR_FILE
         NAMES opencv-${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.jar
-        PATHS ${OPENCV_JAVA_INSTALL_DIR} ${OpenCV_INSTALL_PATH}/bin
+        PATHS
+            ${OPENCV_JAVA_INSTALL_DIR}
+            ${OpenCV_INSTALL_PATH}/bin
+            ${OpenCV_INSTALL_PATH}/share/java
+            ${OpenCV_INSTALL_PATH}/share/OpenCV/java
         NO_DEFAULT_PATH
     )
 
@@ -28,6 +28,7 @@ if(WITH_JAVA)
         ${JAVA_SOURCES}
         INCLUDE_JARS wpiutil_jar cscore_jar ntcore_jar ${OPENCV_JAR_FILE}
         OUTPUT_NAME cameraserver
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
     set_property(TARGET cameraserver_jar PROPERTY FOLDER "java")
 
@@ -40,22 +41,17 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB CAMERASERVER_SOURCES src/main/java/edu/wpi/first/cameraserver/*.java)
-    file(GLOB VISION_SOURCES src/main/java/edu/wpi/first/vision/*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         cameraserver_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/cameraserver" ${CAMERASERVER_SOURCES}
-        NAMESPACE "edu/wpi/first/vision" ${VISION_SOURCES}
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME cameraserver-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(CAMERASERVER_SRC_JAR_FILE TARGET cameraserver_src_jar PROPERTY JAR_FILE)
-    install(FILES ${CAMERASERVER_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET cameraserver_src_jar PROPERTY FOLDER "java")
+
+    install_jar(cameraserver_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 file(GLOB_RECURSE cameraserver_native_src src/main/native/cpp/*.cpp)
@@ -89,5 +85,5 @@ set_property(TARGET multiCameraServer PROPERTY FOLDER "examples")
 
 if(WITH_TESTS)
     wpilib_add_test(cameraserver src/test/native/cpp)
-    target_link_libraries(cameraserver_test cameraserver gtest)
+    target_link_libraries(cameraserver_test cameraserver googletest)
 endif()

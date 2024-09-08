@@ -10,12 +10,12 @@ import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Value;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.Dimensionless;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Time;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.collections.LongToObjectHashMap;
+import edu.wpi.first.units.measure.Dimensionless;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.util.Color;
 import java.util.Map;
@@ -99,9 +99,9 @@ public interface LEDPattern {
    *
    * <p>This method is intentionally designed to use separate objects for reading and writing data.
    * By splitting them up, we can easily modify the behavior of some base pattern to make it {@link
-   * #scrollAtRelativeSpeed(Measure) scroll}, {@link #blink(Measure, Measure) blink}, or {@link
-   * #breathe(Measure) breathe} by intercepting the data writes to transform their behavior to
-   * whatever we like.
+   * #scrollAtRelativeSpeed(Frequency) scroll}, {@link #blink(Time, Time) blink}, or {@link
+   * #breathe(Time) breathe} by intercepting the data writes to transform their behavior to whatever
+   * we like.
    *
    * @param reader data reader for accessing buffer length and current colors
    * @param writer data writer for setting new LED colors on the buffer
@@ -186,8 +186,8 @@ public interface LEDPattern {
    *     scroll along the length of LEDs and return back to the starting position
    * @return the scrolling pattern
    */
-  default LEDPattern scrollAtRelativeSpeed(Measure<Velocity<Dimensionless>> velocity) {
-    final double periodMicros = 1 / velocity.in(Value.per(Microsecond));
+  default LEDPattern scrollAtRelativeSpeed(Frequency velocity) {
+    final double periodMicros = velocity.asPeriod().in(Microseconds);
 
     return (reader, writer) -> {
       int bufLen = reader.getLength();
@@ -217,7 +217,7 @@ public interface LEDPattern {
    *
    * <pre>
    *   // LEDs per meter, a known value taken from the spec sheet of our particular LED strip
-   *   Measure&lt;Distance&gt; LED_SPACING = Meters.of(1.0 / 60);
+   *   Distance LED_SPACING = Meters.of(1.0 / 60);
    *
    *   LEDPattern rainbow = LEDPattern.rainbow();
    *   LEDPattern scrollingRainbow =
@@ -232,8 +232,7 @@ public interface LEDPattern {
    * @param ledSpacing the distance between adjacent LEDs on the physical LED strip
    * @return the scrolling pattern
    */
-  default LEDPattern scrollAtAbsoluteSpeed(
-      Measure<Velocity<Distance>> velocity, Measure<Distance> ledSpacing) {
+  default LEDPattern scrollAtAbsoluteSpeed(LinearVelocity velocity, Distance ledSpacing) {
     // eg velocity = 10 m/s, spacing = 0.01m
     // meters per micro = 1e-5 m/us
     // micros per LED = 1e-2 m / (1e-5 m/us) = 1e-3 us
@@ -267,7 +266,7 @@ public interface LEDPattern {
    * @param offTime how long the pattern should be turned off for, per cycle
    * @return the blinking pattern
    */
-  default LEDPattern blink(Measure<Time> onTime, Measure<Time> offTime) {
+  default LEDPattern blink(Time onTime, Time offTime) {
     final long totalTimeMicros = (long) (onTime.in(Microseconds) + offTime.in(Microseconds));
     final long onTimeMicros = (long) onTime.in(Microseconds);
 
@@ -281,13 +280,13 @@ public interface LEDPattern {
   }
 
   /**
-   * Like {@link #blink(Measure, Measure) blink(onTime, offTime)}, but where the "off" time is
-   * exactly equal to the "on" time.
+   * Like {@link #blink(Time, Time) blink(onTime, offTime)}, but where the "off" time is exactly
+   * equal to the "on" time.
    *
    * @param onTime how long the pattern should play for (and be turned off for), per cycle
    * @return the blinking pattern
    */
-  default LEDPattern blink(Measure<Time> onTime) {
+  default LEDPattern blink(Time onTime) {
     return blink(onTime, onTime);
   }
 
@@ -316,7 +315,7 @@ public interface LEDPattern {
    * @param period how fast the breathing pattern should complete a single cycle
    * @return the breathing pattern
    */
-  default LEDPattern breathe(Measure<Time> period) {
+  default LEDPattern breathe(Time period) {
     final long periodMicros = (long) period.in(Microseconds);
 
     return (reader, writer) -> {
@@ -444,7 +443,7 @@ public interface LEDPattern {
    * @param relativeBrightness the multiplier to apply to all channels to modify brightness
    * @return the input pattern, displayed at
    */
-  default LEDPattern atBrightness(Measure<Dimensionless> relativeBrightness) {
+  default LEDPattern atBrightness(Dimensionless relativeBrightness) {
     double multiplier = relativeBrightness.in(Value);
 
     return (reader, writer) -> {

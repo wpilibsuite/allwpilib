@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 16 May 2023 13:49:18 -0700
-Subject: [PATCH 1/2] Suppress warnings we can't fix
+Subject: [PATCH] Suppress warnings we can't fix
 
 ---
  include/fmt/format.h | 7 +++++++
  1 file changed, 7 insertions(+)
 
 diff --git a/include/fmt/format.h b/include/fmt/format.h
-index 7637c8a0d0687ae3b77a145c2e1ceadf7fe5f67d..bfc6d70d1c5de100b3e413d61f7394cbb3b644f1 100644
+index 67f0ab739b0de55d03ab3e71424f1eb9e9c9bdfc..cf5ad9820683130ce9895f5d216d9b9efd0185ac 100644
 --- a/include/fmt/format.h
 +++ b/include/fmt/format.h
-@@ -1289,7 +1289,14 @@ inline auto equal2(const char* lhs, const char* rhs) -> bool {
+@@ -1276,7 +1276,14 @@ inline auto equal2(const char* lhs, const char* rhs) -> bool {
  template <typename Char>
  FMT_CONSTEXPR20 FMT_INLINE void copy2(Char* dst, const char* src) {
    if (!is_constant_evaluated() && sizeof(Char) == sizeof(char)) {

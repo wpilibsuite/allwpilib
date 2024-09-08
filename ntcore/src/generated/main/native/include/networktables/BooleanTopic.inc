@@ -15,7 +15,7 @@
 namespace nt {
 
 inline BooleanSubscriber::BooleanSubscriber(
-    NT_Subscriber handle, bool defaultValue)
+    NT_Subscriber handle, ParamType defaultValue)
     : Subscriber{handle},
       m_defaultValue{defaultValue} {}
 
@@ -24,7 +24,7 @@ inline bool BooleanSubscriber::Get() const {
 }
 
 inline bool BooleanSubscriber::Get(
-    bool defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetBoolean(m_subHandle, defaultValue);
 }
 
@@ -33,7 +33,7 @@ inline TimestampedBoolean BooleanSubscriber::GetAtomic() const {
 }
 
 inline TimestampedBoolean BooleanSubscriber::GetAtomic(
-    bool defaultValue) const {
+    ParamType defaultValue) const {
   return ::nt::GetAtomicBoolean(m_subHandle, defaultValue);
 }
 
@@ -49,12 +49,12 @@ inline BooleanTopic BooleanSubscriber::GetTopic() const {
 inline BooleanPublisher::BooleanPublisher(NT_Publisher handle)
     : Publisher{handle} {}
 
-inline void BooleanPublisher::Set(bool value,
+inline void BooleanPublisher::Set(ParamType value,
                                          int64_t time) {
   ::nt::SetBoolean(m_pubHandle, value, time);
 }
 
-inline void BooleanPublisher::SetDefault(bool value) {
+inline void BooleanPublisher::SetDefault(ParamType value) {
   ::nt::SetDefaultBoolean(m_pubHandle, value);
 }
 
@@ -63,7 +63,7 @@ inline BooleanTopic BooleanPublisher::GetTopic() const {
 }
 
 inline BooleanEntry::BooleanEntry(
-    NT_Entry handle, bool defaultValue)
+    NT_Entry handle, ParamType defaultValue)
     : BooleanSubscriber{handle, defaultValue},
       BooleanPublisher{handle} {}
 

@@ -37,10 +37,6 @@ AnalogInput::AnalogInput(int channel) {
   wpi::SendableRegistry::AddLW(this, "AnalogInput", channel);
 }
 
-AnalogInput::~AnalogInput() {
-  HAL_FreeAnalogInputPort(m_port);
-}
-
 int AnalogInput::GetValue() const {
   int32_t status = 0;
   int value = HAL_GetAnalogValue(m_port, &status);

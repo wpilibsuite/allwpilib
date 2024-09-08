@@ -16,9 +16,4 @@ public class VideoException extends RuntimeException {
   public VideoException(String msg) {
     super(msg);
   }
-
-  @Override
-  public String toString() {
-    return "VideoException [" + super.toString() + "]";
-  }
 }

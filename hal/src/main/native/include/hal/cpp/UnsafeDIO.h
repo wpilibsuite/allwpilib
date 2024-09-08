@@ -57,7 +57,7 @@ struct DIOSetProxy {
 };
 namespace detail {
 wpi::mutex& UnsafeGetDIOMutex();
-tDIO* UnsafeGetDigialSystem();
+tDIO* UnsafeGetDigitalSystem();
 int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status);
 }  // namespace detail
 
@@ -81,7 +81,7 @@ void UnsafeManipulateDIO(HAL_DigitalHandle handle, int32_t* status,
     return;
   }
   wpi::mutex& dioMutex = detail::UnsafeGetDIOMutex();
-  tDIO* dSys = detail::UnsafeGetDigialSystem();
+  tDIO* dSys = detail::UnsafeGetDigitalSystem();
   auto mask = detail::ComputeDigitalMask(handle, status);
   if (*status != 0) {
     return;

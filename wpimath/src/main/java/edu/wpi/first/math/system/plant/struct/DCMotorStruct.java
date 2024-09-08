@@ -15,8 +15,8 @@ public class DCMotorStruct implements Struct<DCMotor> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:DCMotor";
+  public String getTypeName() {
+    return "DCMotor";
   }
 
   @Override

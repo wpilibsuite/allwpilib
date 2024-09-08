@@ -90,7 +90,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
 
   /**
    * Create an instance of a counter where no sources are selected. Then they all must be selected
-   * by calling functions to specify the upsource and the downsource independently.
+   * by calling functions to specify the up source and the down source independently.
    *
    * <p>The counter will start counting immediately.
    */
@@ -212,7 +212,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Set the upsource for the counter as a digital input channel.
+   * Set the up source for the counter as a digital input channel.
    *
    * @param channel the DIO channel to count 0-9 are on-board, 10-25 are on the MXP
    */

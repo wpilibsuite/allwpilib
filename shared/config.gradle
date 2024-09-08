@@ -17,7 +17,6 @@ nativeUtils {
             googleTestYear = "frc2024"
             niLibVersion = "2024.2.1"
             opencvVersion = "4.8.0-4"
-            googleTestVersion = "1.14.0-1"
         }
     }
 }
@@ -39,6 +38,11 @@ nativeUtils.platformConfigs.each {
   if (it.name.contains('linux')) {
     it.cppCompiler.debugArgs.add("-gz=zlib")
   }
+}
+
+// Disable std::mutex constexpr constructor on MSVC
+nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configure {
+    it.cppCompiler.args.add("/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR")
 }
 
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
@@ -127,7 +131,7 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
             description = 'Creates component archive for platform ' + key
             destinationDirectory = outputsFolder
             archiveClassifier = key
-            archiveBaseName = '_M_' + base
+            archiveBaseName = base
             duplicatesStrategy = 'exclude'
 
             from(licenseFile) {

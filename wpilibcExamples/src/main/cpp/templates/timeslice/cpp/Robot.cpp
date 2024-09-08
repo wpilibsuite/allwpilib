@@ -23,9 +23,7 @@ Robot::Robot() : frc::TimesliceRobot{5_ms, 10_ms} {
   // Total usage:
   // 5 ms (robot) + 2 ms (controller 1) + 2 ms (controller 2) = 9 ms
   // 9 ms / 10 ms -> 90% allocated
-}
 
-void Robot::RobotInit() {
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);

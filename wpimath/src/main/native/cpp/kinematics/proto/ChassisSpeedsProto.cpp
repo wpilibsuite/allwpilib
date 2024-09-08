@@ -4,12 +4,13 @@
 
 #include "frc/kinematics/proto/ChassisSpeedsProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "kinematics.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::ChassisSpeeds>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufChassisSpeeds>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufChassisSpeeds>(arena);
 }
 
 frc::ChassisSpeeds wpi::Protobuf<frc::ChassisSpeeds>::Unpack(

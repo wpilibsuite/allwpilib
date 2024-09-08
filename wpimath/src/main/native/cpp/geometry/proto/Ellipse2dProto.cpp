@@ -4,19 +4,20 @@
 
 #include "frc/geometry/proto/Ellipse2dProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "geometry2d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Ellipse2d>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufEllipse2d>(
-      arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufEllipse2d>(arena);
 }
 
 frc::Ellipse2d wpi::Protobuf<frc::Ellipse2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufEllipse2d*>(&msg);
   return frc::Ellipse2d{
-      wpi::UnpackProtobuf<frc::Pose2d>(m->center()),
+      wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_center()),
       units::meter_t{m->xsemiaxis()},
       units::meter_t{m->ysemiaxis()},
   };

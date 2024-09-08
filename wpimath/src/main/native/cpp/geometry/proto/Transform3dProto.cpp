@@ -4,20 +4,21 @@
 
 #include "frc/geometry/proto/Transform3dProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "geometry3d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Transform3d>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<
-      wpi::proto::ProtobufTransform3d>(arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufTransform3d>(arena);
 }
 
 frc::Transform3d wpi::Protobuf<frc::Transform3d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTransform3d*>(&msg);
   return frc::Transform3d{
-      wpi::UnpackProtobuf<frc::Translation3d>(m->translation()),
-      wpi::UnpackProtobuf<frc::Rotation3d>(m->rotation()),
+      wpi::UnpackProtobuf<frc::Translation3d>(m->wpi_translation()),
+      wpi::UnpackProtobuf<frc::Rotation3d>(m->wpi_rotation()),
   };
 }
 

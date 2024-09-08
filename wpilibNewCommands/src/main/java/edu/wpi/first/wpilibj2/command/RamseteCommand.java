@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -14,6 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.BiConsumer;
@@ -46,6 +49,10 @@ public class RamseteCommand extends Command {
   private final PIDController m_rightController;
   private final BiConsumer<Double, Double> m_output;
   private DifferentialDriveWheelSpeeds m_prevSpeeds = new DifferentialDriveWheelSpeeds();
+  private final MutLinearVelocity m_prevLeftSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_prevRightSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_leftSpeedSetpoint = MetersPerSecond.mutable(0);
+  private final MutLinearVelocity m_rightSpeedSetpoint = MetersPerSecond.mutable(0);
   private double m_prevTime;
 
   /**
@@ -71,7 +78,7 @@ public class RamseteCommand extends Command {
    * @param requirements The subsystems to require.
    * @deprecated Use LTVUnicycleController instead.
    */
-  @Deprecated(since = "2024", forRemoval = true)
+  @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings("this-escape")
   public RamseteCommand(
       Trajectory trajectory,
@@ -113,7 +120,7 @@ public class RamseteCommand extends Command {
    * @param requirements The subsystems to require.
    * @deprecated Use LTVUnicycleController instead.
    */
-  @Deprecated(since = "2024", forRemoval = true)
+  @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings("this-escape")
   public RamseteCommand(
       Trajectory trajectory,
@@ -149,6 +156,8 @@ public class RamseteCommand extends Command {
                 initialState.velocityMetersPerSecond,
                 0,
                 initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
+    m_prevLeftSpeedSetpoint.mut_setMagnitude(m_prevSpeeds.leftMetersPerSecond);
+    m_prevRightSpeedSetpoint.mut_setMagnitude(m_prevSpeeds.rightMetersPerSecond);
     m_timer.restart();
     if (m_usePID) {
       m_leftController.reset();
@@ -159,7 +168,6 @@ public class RamseteCommand extends Command {
   @Override
   public void execute() {
     double curTime = m_timer.get();
-    double dt = curTime - m_prevTime;
 
     if (m_prevTime < 0) {
       m_output.accept(0.0, 0.0);
@@ -174,17 +182,18 @@ public class RamseteCommand extends Command {
     var leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
     var rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;
 
+    m_leftSpeedSetpoint.mut_setMagnitude(targetWheelSpeeds.leftMetersPerSecond);
+    m_rightSpeedSetpoint.mut_setMagnitude(targetWheelSpeeds.rightMetersPerSecond);
+
     double leftOutput;
     double rightOutput;
 
     if (m_usePID) {
       double leftFeedforward =
-          m_feedforward.calculate(
-              leftSpeedSetpoint, (leftSpeedSetpoint - m_prevSpeeds.leftMetersPerSecond) / dt);
+          m_feedforward.calculate(m_prevLeftSpeedSetpoint, m_leftSpeedSetpoint).in(Volts);
 
       double rightFeedforward =
-          m_feedforward.calculate(
-              rightSpeedSetpoint, (rightSpeedSetpoint - m_prevSpeeds.rightMetersPerSecond) / dt);
+          m_feedforward.calculate(m_prevRightSpeedSetpoint, m_rightSpeedSetpoint).in(Volts);
 
       leftOutput =
           leftFeedforward

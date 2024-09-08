@@ -1328,6 +1328,14 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
   return {std::begin(Range), std::end(Range)};
 }
 
+template <typename T, typename Pred>
+typename SmallVectorImpl<T>::size_type erase_if(
+    SmallVectorImpl<T>& c, Pred pred) {
+  const auto original_size = c.size();
+  c.erase(std::remove_if(c.begin(), c.end(), pred), c.end());
+  return original_size - c.size();
+}
+
 } // end namespace wpi
 
 namespace std {

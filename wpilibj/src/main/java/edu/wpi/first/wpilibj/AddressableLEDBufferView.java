@@ -134,7 +134,7 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
    *
    * @param viewIndex the view-local index
    * @return the corresponding global index
-   * @throws IndexOutOfBoundsException if the view index is not contained withing the bounds of this
+   * @throws IndexOutOfBoundsException if the view index is not contained within the bounds of this
    *     view
    */
   private int nativeIndex(int viewIndex) {

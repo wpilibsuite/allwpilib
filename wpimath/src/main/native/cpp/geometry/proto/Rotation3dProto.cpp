@@ -4,19 +4,20 @@
 
 #include "frc/geometry/proto/Rotation3dProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "geometry3d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Rotation3d>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufRotation3d>(
-      arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufRotation3d>(arena);
 }
 
 frc::Rotation3d wpi::Protobuf<frc::Rotation3d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufRotation3d*>(&msg);
   return frc::Rotation3d{
-      wpi::UnpackProtobuf<frc::Quaternion>(m->q()),
+      wpi::UnpackProtobuf<frc::Quaternion>(m->wpi_q()),
   };
 }
 

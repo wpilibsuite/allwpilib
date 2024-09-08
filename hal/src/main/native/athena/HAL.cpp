@@ -18,7 +18,6 @@
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <FRC_NetworkCommunication/UsageReporting.h>
-#include <fmt/format.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
@@ -453,6 +452,15 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return !(watchdog->readStatus_PowerAlive(status));
 }
 
+int32_t HAL_GetCommsDisableCount(int32_t* status) {
+  hal::init::CheckInit();
+  if (!watchdog) {
+    *status = NiFpga_Status_ResourceNotInitialized;
+    return 0;
+  }
+  return watchdog->readStatus_SysDisableCount(status);
+}
+
 HAL_Bool HAL_GetRSLState(int32_t* status) {
   hal::init::CheckInit();
   if (!global) {
@@ -471,7 +479,7 @@ HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
 static bool killExistingProgram(int timeout, int mode) {
   // Kill any previous robot programs
   std::fstream fs;
-  // By making this both in/out, it won't give us an error if it doesnt exist
+  // By making this both in/out, it won't give us an error if it doesn't exist
   fs.open("/var/lock/frc.pid", std::fstream::in | std::fstream::out);
   if (fs.bad()) {
     return false;
@@ -582,7 +590,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   });
 
   if (!SetupNowRio()) {
-    fmt::print(stderr,
+    wpi::print(stderr,
                "Failed to run SetupNowRio(). This is a fatal error. The "
                "process is being terminated.\n");
     std::fflush(stderr);

@@ -22,11 +22,6 @@ public class Rectangle2dProto implements Protobuf<Rectangle2d, ProtobufRectangle
   }
 
   @Override
-  public Protobuf<?, ?>[] getNested() {
-    return new Protobuf<?, ?>[] {Pose2d.proto};
-  }
-
-  @Override
   public ProtobufRectangle2d createMessage() {
     return ProtobufRectangle2d.newInstance();
   }

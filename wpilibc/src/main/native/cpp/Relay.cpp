@@ -63,13 +63,6 @@ Relay::~Relay() {
   int32_t status = 0;
   HAL_SetRelay(m_forwardHandle, false, &status);
   HAL_SetRelay(m_reverseHandle, false, &status);
-  // ignore errors, as we want to make sure a free happens.
-  if (m_forwardHandle != HAL_kInvalidHandle) {
-    HAL_FreeRelayPort(m_forwardHandle);
-  }
-  if (m_reverseHandle != HAL_kInvalidHandle) {
-    HAL_FreeRelayPort(m_reverseHandle);
-  }
 }
 
 void Relay::Set(Relay::Value value) {

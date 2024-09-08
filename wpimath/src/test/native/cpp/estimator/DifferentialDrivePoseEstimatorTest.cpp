@@ -167,8 +167,8 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
                                   state.velocity * state.curvature};
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
-      trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s,
-      0.1_s, 0.25_s, true, false);
+      trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms,
+      100_ms, 250_ms, true, false);
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
@@ -205,14 +205,14 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
                                       state.velocity * state.curvature};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, 0.1_s,
-          0.25_s, false, false);
+          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms, 100_ms,
+          250_ms, false, false);
     }
   }
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
-  // This tests for multiple vision measurements appled at the same time.
+  // This tests for multiple vision measurements applied at the same time.
   // The expected behavior is that all measurements affect the estimated pose.
   // The alternative result is that only one vision measurement affects the
   // outcome. If that were the case, after 1000 measurements, the estimated
@@ -275,7 +275,7 @@ TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
       {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
-  for (auto time = 0.0_s; time < 4_s; time += 0.02_s) {
+  for (auto time = 0_s; time < 4_s; time += 20_ms) {
     estimator.UpdateWithTime(time, frc::Rotation2d{}, 0_m, 0_m);
   }
 

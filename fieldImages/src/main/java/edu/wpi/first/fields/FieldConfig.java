@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -81,7 +82,7 @@ public class FieldConfig {
    */
   public static FieldConfig loadFromResource(String resourcePath) throws IOException {
     try (InputStream stream = FieldConfig.class.getResourceAsStream(resourcePath);
-        InputStreamReader reader = new InputStreamReader(stream)) {
+        InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
       return new ObjectMapper().readerFor(FieldConfig.class).readValue(reader);
     }
   }

@@ -8,9 +8,9 @@
 #include <utility>
 
 #include <Eigen/Core>
+#include <wpi/SmallVector.h>
 
 #include "sleipnir/autodiff/Variable.hpp"
-#include "sleipnir/util/SmallVector.hpp"
 
 namespace sleipnir {
 
@@ -44,7 +44,7 @@ struct FilterEntry {
    * @param c_e The equality constraint values (nonzero means violation).
    * @param c_i The inequality constraint values (negative means violation).
    */
-  FilterEntry(const Variable& f, double μ, const Eigen::VectorXd& s,
+  FilterEntry(Variable& f, double μ, const Eigen::VectorXd& s,
               const Eigen::VectorXd& c_e, const Eigen::VectorXd& c_i)
       : cost{f.Value() - μ * s.array().log().sum()},
         constraintViolation{c_e.lpNorm<1>() + (c_i - s).lpNorm<1>()} {}
@@ -182,7 +182,7 @@ class Filter {
  private:
   Variable* m_f = nullptr;
   double m_μ = 0.0;
-  small_vector<FilterEntry> m_filter;
+  wpi::SmallVector<FilterEntry> m_filter;
 };
 
 }  // namespace sleipnir

@@ -15,8 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   private final PowerDistribution m_pdp = new PowerDistribution();
 
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Put the PDP itself to the dashboard
     SmartDashboard.putData("PDP", m_pdp);
   }

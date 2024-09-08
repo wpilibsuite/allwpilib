@@ -26,10 +26,10 @@ public class Robot extends TimedRobot {
 
   private final PWMSparkMax m_elevatorMotor = new PWMSparkMax(2);
   private final AnalogPotentiometer m_elevatorPot = new AnalogPotentiometer(0);
-  private GenericEntry m_maxSpeed;
+  private final GenericEntry m_maxSpeed;
 
-  @Override
-  public void robotInit() {
+  /** Called once at the beginning of the robot program. */
+  public Robot() {
     SendableRegistry.addChild(m_tankDrive, m_leftDriveMotor);
     SendableRegistry.addChild(m_tankDrive, m_rightDriveMotor);
 

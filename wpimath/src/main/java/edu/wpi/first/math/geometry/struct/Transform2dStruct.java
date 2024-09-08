@@ -17,8 +17,8 @@ public class Transform2dStruct implements Struct<Transform2d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Transform2d";
+  public String getTypeName() {
+    return "Transform2d";
   }
 
   @Override

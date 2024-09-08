@@ -50,7 +50,7 @@ public class RamseteController {
    *     more damping in response.
    * @deprecated Use LTVUnicycleController instead.
    */
-  @Deprecated(since = "2024", forRemoval = true)
+  @Deprecated(since = "2025", forRemoval = true)
   public RamseteController(double b, double zeta) {
     m_b = b;
     m_zeta = zeta;
@@ -62,7 +62,7 @@ public class RamseteController {
    *
    * @deprecated Use LTVUnicycleController instead.
    */
-  @Deprecated(since = "2024", forRemoval = true)
+  @Deprecated(since = "2025", forRemoval = true)
   public RamseteController() {
     this(2.0, 0.7);
   }

@@ -16,8 +16,8 @@ public class Rotation3dStruct implements Struct<Rotation3d> {
   }
 
   @Override
-  public String getTypeString() {
-    return "struct:Rotation3d";
+  public String getTypeName() {
+    return "Rotation3d";
   }
 
   @Override

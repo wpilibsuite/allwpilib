@@ -1,7 +1,7 @@
 model {
     binaries {
         withType(GoogleTestTestSuiteBinarySpec).all {
-            nativeUtils.useRequiredLibrary(it, 'googletest_static')
+            lib project: ':thirdparty:googletest', library: 'googletest', linkage: 'static'
         }
     }
 }

@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <hal/Counter.h>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -43,10 +44,10 @@ class ExternalDirectionCounter
   ExternalDirectionCounter(std::shared_ptr<DigitalSource> countSource,
                            std::shared_ptr<DigitalSource> directionSource);
 
-  ~ExternalDirectionCounter() override;
-
   ExternalDirectionCounter(ExternalDirectionCounter&&) = default;
   ExternalDirectionCounter& operator=(ExternalDirectionCounter&&) = default;
+
+  ~ExternalDirectionCounter() override = default;
 
   /**
    * Gets the current count.
@@ -78,7 +79,7 @@ class ExternalDirectionCounter
  private:
   std::shared_ptr<DigitalSource> m_countSource;
   std::shared_ptr<DigitalSource> m_directionSource;
-  hal::Handle<HAL_CounterHandle> m_handle;
+  hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
   int32_t m_index = 0;
 };
 }  // namespace frc

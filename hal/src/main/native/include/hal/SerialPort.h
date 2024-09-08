@@ -255,9 +255,8 @@ void HAL_ClearSerial(HAL_SerialPortHandle handle, int32_t* status);
  * Closes a serial port.
  *
  * @param[in] handle  the serial port handle to close
- * @param[out] status the error code, or 0 for success
  */
-void HAL_CloseSerial(HAL_SerialPortHandle handle, int32_t* status);
+void HAL_CloseSerial(HAL_SerialPortHandle handle);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

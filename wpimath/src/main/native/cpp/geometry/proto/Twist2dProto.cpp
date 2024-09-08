@@ -4,12 +4,13 @@
 
 #include "frc/geometry/proto/Twist2dProto.h"
 
+#include <wpi/ProtoHelper.h>
+
 #include "geometry2d.pb.h"
 
 google::protobuf::Message* wpi::Protobuf<frc::Twist2d>::New(
     google::protobuf::Arena* arena) {
-  return google::protobuf::Arena::CreateMessage<wpi::proto::ProtobufTwist2d>(
-      arena);
+  return wpi::CreateMessage<wpi::proto::ProtobufTwist2d>(arena);
 }
 
 frc::Twist2d wpi::Protobuf<frc::Twist2d>::Unpack(

@@ -39,8 +39,8 @@ SteadyStateKalmanFilter<States, Inputs, Outputs>::SteadyStateKalmanFilter(
 
   if (!IsDetectable<States, Outputs>(discA, C)) {
     std::string msg = fmt::format(
-        "The system passed to the Kalman filter is "
-        "unobservable!\n\nA =\n{}\nC =\n{}\n",
+        "The system passed to the Kalman filter is undetectable!\n\n"
+        "A =\n{}\nC =\n{}\n",
         discA, C);
 
     wpi::math::MathSharedStore::ReportError(msg);
