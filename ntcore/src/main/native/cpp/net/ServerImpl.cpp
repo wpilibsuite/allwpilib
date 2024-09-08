@@ -1265,6 +1265,7 @@ void ServerImpl::RemoveClient(int clientId) {
     if (tcdIt != topic->clients.end()) {
       pubChanged = !tcdIt->second.publishers.empty();
       subChanged = !tcdIt->second.subscribers.empty();
+      topic->publisherCount -= tcdIt->second.publishers.size();
       topic->clients.erase(tcdIt);
     }
 
