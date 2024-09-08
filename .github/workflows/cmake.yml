@@ -46,13 +46,13 @@ jobs:
         run: cmake ${{ matrix.flags }}
         env:
           SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - name: build
         run: cmake --build build-cmake --parallel $(nproc)
         env:
           SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - name: test
         working-directory: build-cmake
@@ -82,13 +82,13 @@ jobs:
         run: cmake --preset sccache -DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release
         env:
           SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - name: build
         run: cmake --build build-cmake --parallel $(nproc)
         env:
           SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - name: test
         working-directory: build-cmake
