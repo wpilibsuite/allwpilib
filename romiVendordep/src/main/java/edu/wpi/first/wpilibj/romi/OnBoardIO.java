@@ -31,11 +31,11 @@ public class OnBoardIO {
   private static final double MESSAGE_INTERVAL = 1.0;
   private double m_nextMessageTime;
 
-  /** Mode for Romi onboard IO channel */
+  /** Mode for Romi onboard IO channel. */
   public enum ChannelMode {
-    /** Input */
+    /** Input. */
     INPUT,
-    /** Output */
+    /** Output. */
     OUTPUT
   }
 
