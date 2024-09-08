@@ -9,6 +9,11 @@
 namespace frc {
 
 /**
+ * @ingroup xrp_api
+ * @{
+ */
+
+/**
  * Use a rate gyro to return the robots heading relative to a starting position.
  *
  * This class is for the XRP onboard gyro, and will only work in
@@ -16,6 +21,11 @@ namespace frc {
  */
 class XRPGyro {
  public:
+  /**
+   * Constructs an XRPGyro.
+   *
+   * <p>Only one instance of a XRPGyro is supported.
+   */
   XRPGyro();
 
   /**
@@ -87,5 +97,7 @@ class XRPGyro {
   double m_angleYOffset = 0;
   double m_angleZOffset = 0;
 };
+
+/** @} */
 
 }  // namespace frc

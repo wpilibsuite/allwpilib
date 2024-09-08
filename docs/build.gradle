@@ -16,6 +16,8 @@ evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpinet')
 evaluationDependsOn(':wpiunits')
 evaluationDependsOn(':wpiutil')
+evaluationDependsOn(':romiVendordep')
+evaluationDependsOn(':xrpVendordep')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
@@ -40,6 +42,8 @@ cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpinet').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
+cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
+cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
 
 doxygen {
     // Doxygen binaries are only provided for x86_64 platforms
@@ -224,6 +228,8 @@ task generateJavaDocs(type: Javadoc) {
     source project(':wpinet').sourceSets.main.java
     source project(':wpiunits').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
+    source project(':romiVendordep').sourceSets.main.java
+    source project(':xrpVendordep').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true
