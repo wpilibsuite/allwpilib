@@ -1,0 +1,20 @@
+{
+  "files": [
+    {
+      "aql": {
+        "items.find": {
+          "repo": "wpilib-generic-gradlecache",
+          "$or":[
+            {
+                "stat.downloaded": { "$before":"1mo" }
+            },
+            {
+                "stat.downloaded": { "$eq":null }
+            }
+          ],
+          "created": { "$before":"1mo" }
+        }
+      }
+    }
+  ]
+}
