@@ -7,8 +7,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SCCACHE_WEBDAV_ENDPOINT: "https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-cmake"
-
+  SCCACHE_WEBDAV_ENDPOINT: "https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-cmake-local"
+  SCCACHE_WEBDAV_KEY_PREFIX: "sccache"
 jobs:
   build:
     strategy:
