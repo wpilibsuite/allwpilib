@@ -46,7 +46,6 @@ MATH_OPERATION_UNITS = [
     "LinearAcceleration",
     "LinearMomentum",
     "LinearVelocity",
-    "LinearVelocityFeedForward",
     "Mass",
     "MomentOfInertia",
     "Mult<?, ?>",
@@ -57,6 +56,7 @@ MATH_OPERATION_UNITS = [
     "Torque",
     "Velocity<?>",
     "Voltage",
+    "VoltagePerDistancePerTime",
 ]
 
 # Configurations for all generated units
@@ -75,7 +75,10 @@ UNIT_CONFIGURATIONS = {
     "AngularAcceleration": {
         "base_unit": "RadiansPerSecondPerSecond",
         "multiply": {"Time": "AngularVelocity"},
-        "divide": {"Frequency": "AngularVelocity"},
+        "divide": {
+            "Frequency": "AngularVelocity",
+            "VoltagePerAnglePerTimeSquared": "Voltage",
+        },
     },
     "AngularMomentum": {
         "base_unit": "KilogramMetersSquaredPerSecond",
@@ -85,7 +88,10 @@ UNIT_CONFIGURATIONS = {
     "AngularVelocity": {
         "base_unit": "RadiansPerSecond",
         "multiply": {"Time": "Angle", "Frequency": "AngularAcceleration"},
-        "divide": {"Time": "AngularAcceleration"},
+        "divide": {
+            "Time": "AngularAcceleration",
+            "VoltagePerAnglePerTime": "Voltage",
+        },
         "extra": inspect.cleandoc(
             """
           default Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
@@ -172,7 +178,10 @@ UNIT_CONFIGURATIONS = {
     },
     "LinearAcceleration": {
         "base_unit": "MetersPerSecondPerSecond",
-        "multiply": {"Time": "LinearVelocity"},
+        "multiply": {
+            "Time": "LinearVelocity",
+            "VoltagePerDistancePerTimeSquared": "Voltage",
+        },
         "divide": {"Frequency": "LinearVelocity"},
     },
     "LinearMomentum": {
@@ -185,13 +194,8 @@ UNIT_CONFIGURATIONS = {
         "multiply": {"Time": "Distance", "Frequency": "LinearAcceleration"},
         "divide": {
             "Time": "LinearAcceleration",
-            "LinearVelocityFeedForward": "Voltage",
+            "VoltagePerDistancePerTime": "Voltage",
         },
-    },
-    "LinearVelocityFeedForward": {
-        "base_unit": "VoltsPerMetersPerSecond",
-        "multiply": {"LinearVelocity": "Voltage"},
-        "divide": {},
     },
     "Mass": {
         "base_unit": "Kilograms",
@@ -274,9 +278,32 @@ UNIT_CONFIGURATIONS = {
         "base_unit": "Volts",
         "multiply": {"Current": "Power"},
         "divide": {
-            "LinearVelocity": "LinearVelocityFeedForward",
-            "LinearVelocityFeedForward": "LinearVelocity",
+            "LinearVelocity": "VoltagePerDistancePerTime",
+            "VoltagePerDistancePerTime": "LinearVelocity",
+            "VoltagePerAnglePerTime": "AngularVelocity",
+            "VoltagePerAnglePerTimeSquared": "AngularAcceleration",
+            "VoltagePerDistancePerTimeSquared": "LinearAcceleration",
         },
+    },
+    "VoltagePerAnglePerTime": {
+        "base_unit": "VoltsPerRadiansPerSecond",
+        "multiply": {"AngularVelocity": "Voltage"},
+        "divide": {},
+    },
+    "VoltagePerDistancePerTime": {
+        "base_unit": "VoltsPerMetersPerSecond",
+        "multiply": {"LinearVelocity": "Voltage"},
+        "divide": {},
+    },
+    "VoltagePerAnglePerTimeSquared": {
+        "base_unit": "VoltsPerRadiansPerSecondSquared",
+        "multiply": {"AngularAcceleration": "Voltage"},
+        "divide": {},
+    },
+    "VoltagePerDistancePerTimeSquared": {
+        "base_unit": "VoltsPerMetersPerSecondSquared",
+        "multiply": {"LinearAcceleration": "Voltage"},
+        "divide": {},
     },
 }
 
