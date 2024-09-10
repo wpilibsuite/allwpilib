@@ -81,6 +81,7 @@ option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
+option(WITH_PROTOBUF "Build protobuf support" ON)
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
 option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
@@ -131,9 +132,11 @@ endif()
 find_package(LIBSSH 0.7.1)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
-set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
-find_package(Protobuf REQUIRED)
-find_program(PROTOC_COMPILER protoc REQUIRED)
+if(WITH_PROTOBUF)
+    set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
+    find_package(Protobuf REQUIRED)
+    find_program(PROTOC_COMPILER protoc REQUIRED)
+endif()
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)

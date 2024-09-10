@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include "frc/system/plant/DCMotor.h"
-#include "plant.pb.h"
 
 using namespace frc;
 

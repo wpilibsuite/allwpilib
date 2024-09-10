@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include "controller.pb.h"
 #include "frc/controller/ArmFeedforward.h"
 
 using namespace frc;

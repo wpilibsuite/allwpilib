@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include "frc/kinematics/SwerveModulePosition.h"
-#include "kinematics.pb.h"
 
 using namespace frc;
 

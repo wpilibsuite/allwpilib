@@ -200,5 +200,7 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
 
 }  // namespace frc
 
+#ifndef NO_PROTOBUF
 #include "frc/kinematics/proto/MecanumDriveKinematicsProto.h"
+#endif
 #include "frc/kinematics/struct/MecanumDriveKinematicsStruct.h"

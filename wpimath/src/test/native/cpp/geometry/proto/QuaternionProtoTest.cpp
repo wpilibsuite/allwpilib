@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include "frc/geometry/Quaternion.h"
-#include "geometry3d.pb.h"
 
 using namespace frc;
 

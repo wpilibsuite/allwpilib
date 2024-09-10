@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include "frc/geometry/Ellipse2d.h"
-#include "geometry2d.pb.h"
 
 using namespace frc;
 

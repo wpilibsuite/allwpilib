@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include "frc/trajectory/Trajectory.h"
-#include "trajectory.pb.h"
 
 using namespace frc;
 

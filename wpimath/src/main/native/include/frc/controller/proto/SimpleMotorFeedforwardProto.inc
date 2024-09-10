@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <google/protobuf/arena.h>
+#include <google/protobuf/message.h>
 #include <wpi/ProtoHelper.h>
 
 #include "controller.pb.h"
