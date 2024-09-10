@@ -46,6 +46,7 @@ MATH_OPERATION_UNITS = [
     "LinearAcceleration",
     "LinearMomentum",
     "LinearVelocity",
+    "LinearVelocityFeedForward",
     "Mass",
     "MomentOfInertia",
     "Mult<?, ?>",
@@ -182,7 +183,15 @@ UNIT_CONFIGURATIONS = {
     "LinearVelocity": {
         "base_unit": "MetersPerSecond",
         "multiply": {"Time": "Distance", "Frequency": "LinearAcceleration"},
-        "divide": {"Time": "LinearAcceleration"},
+        "divide": {
+            "Time": "LinearAcceleration",
+            "LinearVelocityFeedForward": "Voltage",
+        },
+    },
+    "LinearVelocityFeedForward": {
+        "base_unit": "VoltsPerMetersPerSecond",
+        "multiply": {"LinearVelocity": "Voltage"},
+        "divide": {},
     },
     "Mass": {
         "base_unit": "Kilograms",
@@ -261,7 +270,14 @@ UNIT_CONFIGURATIONS = {
         "multiply": {},
         "divide": {},
     },
-    "Voltage": {"base_unit": "Volts", "multiply": {"Current": "Power"}, "divide": {}},
+    "Voltage": {
+        "base_unit": "Volts",
+        "multiply": {"Current": "Power"},
+        "divide": {
+            "LinearVelocity": "LinearVelocityFeedForward",
+            "LinearVelocityFeedForward": "LinearVelocity",
+        },
+    },
 }
 
 
@@ -311,7 +327,6 @@ def mtou(measure_name):
 
 
 def main():
-
     dirname, _ = os.path.split(os.path.abspath(__file__))
 
     env = Environment(
