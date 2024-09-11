@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,6 +14,7 @@ import edu.wpi.first.math.geometry.proto.Pose3dProto;
 import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.jni.Pose3dJNI;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -61,6 +64,19 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   public Pose3d(double x, double y, double z, Rotation3d rotation) {
     m_translation = new Translation3d(x, y, z);
     m_rotation = rotation;
+  }
+
+  /**
+   * Constructs a pose with x, y, and z translations instead of a separate Translation3d. The X, Y,
+   * and Z translations will be converted to and tracked as meters.
+   *
+   * @param x The x component of the translational component of the pose.
+   * @param y The y component of the translational component of the pose.
+   * @param z The z component of the translational component of the pose.
+   * @param rotation The rotational component of the pose.
+   */
+  public Pose3d(Distance x, Distance y, Distance z, Rotation3d rotation) {
+    this(x.in(Meters), y.in(Meters), z.in(Meters), rotation);
   }
 
   /**
@@ -132,6 +148,33 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    */
   public double getZ() {
     return m_translation.getZ();
+  }
+
+  /**
+   * Returns the X component of the pose's translation in a measure.
+   *
+   * @return The x component of the pose's translation in a measure.
+   */
+  public Distance getMeasureX() {
+    return m_translation.getMeasureX();
+  }
+
+  /**
+   * Returns the Y component of the pose's translation in a measure.
+   *
+   * @return The y component of the pose's translation in a measure.
+   */
+  public Distance getMeasureY() {
+    return m_translation.getMeasureY();
+  }
+
+  /**
+   * Returns the Z component of the pose's translation in a measure.
+   *
+   * @return The z component of the pose's translation in a measure.
+   */
+  public Distance getMeasureZ() {
+    return m_translation.getMeasureZ();
   }
 
   /**

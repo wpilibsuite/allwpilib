@@ -14,6 +14,11 @@
 namespace frc {
 
 /**
+ * @ingroup xrp_api
+ * @{
+ */
+
+/**
  * This class represents the onboard IO of the XRP
  * reference robot. This the USER push button and
  * LED.
@@ -42,5 +47,7 @@ class XRPOnBoardIO {
   frc::DigitalInput m_userButton{0};
   frc::DigitalOutput m_led{1};
 };
+
+/** @} */
 
 }  // namespace frc

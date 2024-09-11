@@ -12,6 +12,13 @@ public class XRPRangefinder {
   private final AnalogInput m_rangefinder = new AnalogInput(2);
 
   /**
+   * Constructs an XRPRangefinder.
+   *
+   * <p>Only one instance of a XRPRangefinder is supported.
+   */
+  public XRPRangefinder() {}
+
+  /**
    * Get the measured distance in meters. Distance further than 4m will be reported as 4m.
    *
    * @return distance in meters

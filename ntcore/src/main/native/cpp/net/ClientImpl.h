@@ -75,7 +75,8 @@ class ClientImpl final : private ServerMessageHandler {
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
                const wpi::json& properties, const PubSubOptionsImpl& options);
-  bool Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
+  void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle,
+                 ClientMessage&& msg);
   void SetValue(NT_Publisher pubHandle, const Value& value);
 
   int m_inst;

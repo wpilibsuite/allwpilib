@@ -1,0 +1,23 @@
+{
+  "files": [
+    {
+      "aql": {
+        "items.find": {
+          "$or":[
+            { "repo": "wpilib-generic-gradlecache" },
+            { "repo": "wpilib-generic-cache-cmake" }
+          ],
+          "$or":[
+            {
+                "stat.downloaded": { "$before":"1mo" }
+            },
+            {
+                "stat.downloaded": { "$eq":null }
+            }
+          ],
+          "created": { "$before":"1mo" }
+        }
+      }
+    }
+  ]
+}

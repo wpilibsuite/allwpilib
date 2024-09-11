@@ -12,6 +12,13 @@ public class XRPReflectanceSensor {
   private final AnalogInput m_rightSensor = new AnalogInput(1);
 
   /**
+   * Constructs an XRPReflectanceSensor.
+   *
+   * <p>Only one instance of a XRPReflectanceSensor is supported.
+   */
+  public XRPReflectanceSensor() {}
+
+  /**
    * Returns the reflectance value of the left sensor.
    *
    * @return value between 0.0 (white) and 1.0 (black).

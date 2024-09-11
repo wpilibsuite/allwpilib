@@ -27,7 +27,11 @@ public class XRPGyro {
   private double m_angleYOffset;
   private double m_angleZOffset;
 
-  /** Create a new XRPGyro. */
+  /**
+   * Constructs an XRPGyro.
+   *
+   * <p>Only one instance of a XRPGyro is supported.
+   */
   public XRPGyro() {
     m_simDevice = SimDevice.create("Gyro:XRPGyro");
     if (m_simDevice != null) {

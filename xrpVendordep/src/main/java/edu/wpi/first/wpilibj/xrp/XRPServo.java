@@ -38,7 +38,11 @@ public class XRPServo {
 
   private final SimDouble m_simPosition;
 
-  /** XRPServo. */
+  /**
+   * Constructs an XRPServo.
+   *
+   * @param deviceNum the servo channel
+   */
   public XRPServo(int deviceNum) {
     checkDeviceAllocation(deviceNum);
 
@@ -58,18 +62,18 @@ public class XRPServo {
   /**
    * Set the servo angle.
    *
-   * @param angle Desired angle in degrees
+   * @param angleDegrees Desired angle in degrees
    */
-  public void setAngle(double angle) {
-    if (angle < 0.0) {
-      angle = 0.0;
+  public void setAngle(double angleDegrees) {
+    if (angleDegrees < 0.0) {
+      angleDegrees = 0.0;
     }
 
-    if (angle > 180.0) {
-      angle = 180.0;
+    if (angleDegrees > 180.0) {
+      angleDegrees = 180.0;
     }
 
-    double pos = angle / 180.0;
+    double pos = angleDegrees / 180.0;
 
     if (m_simPosition != null) {
       m_simPosition.set(pos);
@@ -92,19 +96,19 @@ public class XRPServo {
   /**
    * Set the servo position.
    *
-   * @param pos Desired position (Between 0.0 and 1.0)
+   * @param position Desired position (Between 0.0 and 1.0)
    */
-  public void setPosition(double pos) {
-    if (pos < 0.0) {
-      pos = 0.0;
+  public void setPosition(double position) {
+    if (position < 0.0) {
+      position = 0.0;
     }
 
-    if (pos > 1.0) {
-      pos = 1.0;
+    if (position > 1.0) {
+      position = 1.0;
     }
 
     if (m_simPosition != null) {
-      m_simPosition.set(pos);
+      m_simPosition.set(position);
     }
   }
 

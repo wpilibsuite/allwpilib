@@ -101,10 +101,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   /**
    * Get the encoder value.
    *
-   * <p>By default, this will not count rollovers. If that behavior is necessary, call
-   * configureRolloverCounting(true).
-   *
-   * @return the encoder value
+   * @return the encoder value scaled by the full range input
    */
   public double get() {
     if (m_simPosition != null) {

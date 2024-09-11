@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "aql": {
+        "items.find": {
+          "repo": "wpilib-mvn-development",
+          "path": { "$nmatch":"*edu/wpi/first/thirdparty*" },
+          "$or":[
+            {
+                "artifact.module.build.name": { "$eq":"allwpilib" }
+            },
+            {
+                "artifact.module.build.name": { "$eq":"combiner" }
+            }
+          ],
+          "$or":[
+            {
+                "stat.downloaded": { "$before":"3mo" }
+            },
+            {
+                "stat.downloaded": { "$eq":null }
+            }
+          ],
+          "created": { "$before":"3mo" }
+        }
+      }
+    }
+  ]
+}

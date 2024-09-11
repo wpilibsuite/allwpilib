@@ -9,6 +9,11 @@
 namespace frc {
 
 /**
+ * @defgroup romi_api Romi Hardware API
+ * @{
+ */
+
+/**
  * RomiMotor
  *
  * A general use PWM motor controller representing the motors on a Romi robot
@@ -26,5 +31,7 @@ class RomiMotor : public PWMMotorController {
   RomiMotor(RomiMotor&&) = default;
   RomiMotor& operator=(RomiMotor&&) = default;
 };
+
+/** @} */
 
 }  // namespace frc
