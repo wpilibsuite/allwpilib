@@ -344,6 +344,17 @@ public interface Torque extends Measure<TorqueUnit> {
 
 
   @Override
+  default Mult<TorqueUnit, VoltagePerAnglePerTimeSquaredUnit> times(VoltagePerAnglePerTimeSquared multiplier) {
+    return (Mult<TorqueUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TorqueUnit, VoltagePerAnglePerTimeSquaredUnit> divide(VoltagePerAnglePerTimeSquared divisor) {
+    return (Per<TorqueUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<TorqueUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
     return (Mult<TorqueUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
   }

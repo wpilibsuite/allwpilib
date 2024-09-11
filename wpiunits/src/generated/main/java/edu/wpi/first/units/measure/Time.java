@@ -344,6 +344,17 @@ public interface Time extends Measure<TimeUnit> {
 
 
   @Override
+  default Mult<TimeUnit, VoltagePerAnglePerTimeSquaredUnit> times(VoltagePerAnglePerTimeSquared multiplier) {
+    return (Mult<TimeUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TimeUnit, VoltagePerAnglePerTimeSquaredUnit> divide(VoltagePerAnglePerTimeSquared divisor) {
+    return (Per<TimeUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<TimeUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
     return (Mult<TimeUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
   }

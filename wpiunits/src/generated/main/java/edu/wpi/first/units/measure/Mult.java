@@ -344,6 +344,17 @@ public interface Mult<A extends Unit, B extends Unit> extends Measure<MultUnit<A
 
 
   @Override
+  default Mult<MultUnit<A, B>, VoltagePerAnglePerTimeSquaredUnit> times(VoltagePerAnglePerTimeSquared multiplier) {
+    return (Mult<MultUnit<A, B>, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<MultUnit<A, B>, VoltagePerAnglePerTimeSquaredUnit> divide(VoltagePerAnglePerTimeSquared divisor) {
+    return (Per<MultUnit<A, B>, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<MultUnit<A, B>, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
     return (Mult<MultUnit<A, B>, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
   }

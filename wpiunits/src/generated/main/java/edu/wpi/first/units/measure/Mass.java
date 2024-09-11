@@ -344,6 +344,17 @@ public interface Mass extends Measure<MassUnit> {
 
 
   @Override
+  default Mult<MassUnit, VoltagePerAnglePerTimeSquaredUnit> times(VoltagePerAnglePerTimeSquared multiplier) {
+    return (Mult<MassUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<MassUnit, VoltagePerAnglePerTimeSquaredUnit> divide(VoltagePerAnglePerTimeSquared divisor) {
+    return (Per<MassUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<MassUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
     return (Mult<MassUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
   }

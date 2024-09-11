@@ -344,6 +344,17 @@ public interface Temperature extends Measure<TemperatureUnit> {
 
 
   @Override
+  default Mult<TemperatureUnit, VoltagePerAnglePerTimeSquaredUnit> times(VoltagePerAnglePerTimeSquared multiplier) {
+    return (Mult<TemperatureUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TemperatureUnit, VoltagePerAnglePerTimeSquaredUnit> divide(VoltagePerAnglePerTimeSquared divisor) {
+    return (Per<TemperatureUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<TemperatureUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
     return (Mult<TemperatureUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
   }

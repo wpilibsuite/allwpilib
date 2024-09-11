@@ -344,6 +344,17 @@ public interface LinearMomentum extends Measure<LinearMomentumUnit> {
 
 
   @Override
+  default Mult<LinearMomentumUnit, VoltagePerAnglePerTimeSquaredUnit> times(VoltagePerAnglePerTimeSquared multiplier) {
+    return (Mult<LinearMomentumUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<LinearMomentumUnit, VoltagePerAnglePerTimeSquaredUnit> divide(VoltagePerAnglePerTimeSquared divisor) {
+    return (Per<LinearMomentumUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<LinearMomentumUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
     return (Mult<LinearMomentumUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
   }

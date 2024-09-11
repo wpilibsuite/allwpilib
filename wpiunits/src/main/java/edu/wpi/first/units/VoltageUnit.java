@@ -93,6 +93,17 @@ public final class VoltageUnit extends Unit {
   }
 
   /**
+   * Combines this voltage with an angular acceleration unit to form a unit of voltage per angle per
+   * time squared.
+   *
+   * @param angularAccelerationUnit the angular acceleration unit
+   * @return the voltage per angle per time squared unit
+   */
+  public VoltagePerAnglePerTimeSquaredUnit per(AngularAccelerationUnit angularAccelerationUnit) {
+    return VoltagePerAnglePerTimeSquaredUnit.combine(this, angularAccelerationUnit);
+  }
+
+  /**
    * Combines this voltage with a linear velocity unit to form a unit of voltage per distance per
    * time.
    *

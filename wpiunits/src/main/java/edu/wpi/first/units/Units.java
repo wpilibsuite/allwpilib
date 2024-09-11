@@ -520,7 +520,7 @@ public final class Units {
    * A standard unit for measuring angular mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded angular acceleration.
    */
-  public static final PerUnit<VoltageUnit, AngularAccelerationUnit> VoltsPerRadianPerSecondSquared =
+  public static final VoltagePerAnglePerTimeSquaredUnit VoltsPerRadianPerSecondSquared =
       Volts.per(RadiansPerSecond.per(Second));
 
   /**

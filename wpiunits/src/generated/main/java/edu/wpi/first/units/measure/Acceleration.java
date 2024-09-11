@@ -344,6 +344,17 @@ public interface Acceleration<D extends Unit> extends Measure<AccelerationUnit<D
 
 
   @Override
+  default Mult<AccelerationUnit<D>, VoltagePerAnglePerTimeSquaredUnit> times(VoltagePerAnglePerTimeSquared multiplier) {
+    return (Mult<AccelerationUnit<D>, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AccelerationUnit<D>, VoltagePerAnglePerTimeSquaredUnit> divide(VoltagePerAnglePerTimeSquared divisor) {
+    return (Per<AccelerationUnit<D>, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<AccelerationUnit<D>, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
     return (Mult<AccelerationUnit<D>, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
   }

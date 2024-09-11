@@ -344,6 +344,17 @@ public interface VoltagePerDistancePerTime extends Measure<VoltagePerDistancePer
 
 
   @Override
+  default Mult<VoltagePerDistancePerTimeUnit, VoltagePerAnglePerTimeSquaredUnit> times(VoltagePerAnglePerTimeSquared multiplier) {
+    return (Mult<VoltagePerDistancePerTimeUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<VoltagePerDistancePerTimeUnit, VoltagePerAnglePerTimeSquaredUnit> divide(VoltagePerAnglePerTimeSquared divisor) {
+    return (Per<VoltagePerDistancePerTimeUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<VoltagePerDistancePerTimeUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
     return (Mult<VoltagePerDistancePerTimeUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
   }

@@ -344,6 +344,17 @@ public interface Frequency extends Measure<FrequencyUnit> {
 
 
   @Override
+  default Mult<FrequencyUnit, VoltagePerAnglePerTimeSquaredUnit> times(VoltagePerAnglePerTimeSquared multiplier) {
+    return (Mult<FrequencyUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<FrequencyUnit, VoltagePerAnglePerTimeSquaredUnit> divide(VoltagePerAnglePerTimeSquared divisor) {
+    return (Per<FrequencyUnit, VoltagePerAnglePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
+
+  @Override
   default Mult<FrequencyUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
     return (Mult<FrequencyUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
   }
