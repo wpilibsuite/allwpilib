@@ -125,6 +125,10 @@ UNIT_CONFIGURATIONS = {
             "Time": "Time",
             "Torque": "Torque",
             "Voltage": "Voltage",
+            "VoltagePerAnglePerTime": "VoltagePerAnglePerTime",
+            "VoltagePerAnglePerTimeSquared": "VoltagePerAnglePerTimeSquared",
+            "VoltagePerDistancePerTime": "VoltagePerDistancePerTime",
+            "VoltagePerDistancePerTimeSquared": "VoltagePerDistancePerTimeSquared",
         },
         "divide": {
             "Time": "Frequency",
