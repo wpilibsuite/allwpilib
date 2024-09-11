@@ -342,4 +342,15 @@ public interface Current extends Measure<CurrentUnit> {
     return (Per<CurrentUnit, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default Mult<CurrentUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
+    return (Mult<CurrentUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<CurrentUnit, VoltagePerDistancePerTimeUnit> divide(VoltagePerDistancePerTime divisor) {
+    return (Per<CurrentUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
+  }
+
 }

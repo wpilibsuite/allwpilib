@@ -342,4 +342,15 @@ public interface AngularMomentum extends Measure<AngularMomentumUnit> {
     return (Per<AngularMomentumUnit, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default Mult<AngularMomentumUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
+    return (Mult<AngularMomentumUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AngularMomentumUnit, VoltagePerDistancePerTimeUnit> divide(VoltagePerDistancePerTime divisor) {
+    return (Per<AngularMomentumUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
+  }
+
 }

@@ -342,4 +342,15 @@ public interface Velocity<D extends Unit> extends Measure<VelocityUnit<D>> {
     return (Per<VelocityUnit<D>, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default Mult<VelocityUnit<D>, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
+    return (Mult<VelocityUnit<D>, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<VelocityUnit<D>, VoltagePerDistancePerTimeUnit> divide(VoltagePerDistancePerTime divisor) {
+    return (Per<VelocityUnit<D>, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
+  }
+
 }

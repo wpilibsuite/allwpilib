@@ -342,4 +342,15 @@ public interface Energy extends Measure<EnergyUnit> {
     return (Per<EnergyUnit, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default Mult<EnergyUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
+    return (Mult<EnergyUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<EnergyUnit, VoltagePerDistancePerTimeUnit> divide(VoltagePerDistancePerTime divisor) {
+    return (Per<EnergyUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
+  }
+
 }

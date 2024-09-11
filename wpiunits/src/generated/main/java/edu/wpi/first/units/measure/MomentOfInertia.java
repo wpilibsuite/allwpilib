@@ -342,4 +342,15 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return (Per<MomentOfInertiaUnit, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default Mult<MomentOfInertiaUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
+    return (Mult<MomentOfInertiaUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, VoltagePerDistancePerTimeUnit> divide(VoltagePerDistancePerTime divisor) {
+    return (Per<MomentOfInertiaUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
+  }
+
 }

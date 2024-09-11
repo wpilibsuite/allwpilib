@@ -499,7 +499,7 @@ public final class Units {
    * A standard unit for measuring linear mechanisms' feedforward voltages based on a model of the
    * system and a desired commanded linear velocity.
    */
-  public static final PerUnit<VoltageUnit, LinearVelocityUnit> VoltsPerMeterPerSecond =
+  public static final VoltagePerDistancePerTimeUnit VoltsPerMeterPerSecond =
       Volts.per(MetersPerSecond);
 
   /**

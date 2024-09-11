@@ -341,5 +341,16 @@ public interface Time extends Measure<TimeUnit> {
   default Per<TimeUnit, VoltagePerAnglePerTimeUnit> divide(VoltagePerAnglePerTime divisor) {
     return (Per<TimeUnit, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
   }
+
+
+  @Override
+  default Mult<TimeUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
+    return (Mult<TimeUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TimeUnit, VoltagePerDistancePerTimeUnit> divide(VoltagePerDistancePerTime divisor) {
+    return (Per<TimeUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
+  }
 default Frequency asFrequency() { return Hertz.of(1 / baseUnitMagnitude()); }
 }

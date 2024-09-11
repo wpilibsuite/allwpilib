@@ -341,5 +341,16 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   default Per<AngularVelocityUnit, VoltagePerAnglePerTimeUnit> divide(VoltagePerAnglePerTime divisor) {
     return (Per<AngularVelocityUnit, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
   }
+
+
+  @Override
+  default Mult<AngularVelocityUnit, VoltagePerDistancePerTimeUnit> times(VoltagePerDistancePerTime multiplier) {
+    return (Mult<AngularVelocityUnit, VoltagePerDistancePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, VoltagePerDistancePerTimeUnit> divide(VoltagePerDistancePerTime divisor) {
+    return (Per<AngularVelocityUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
+  }
 default Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
 }
