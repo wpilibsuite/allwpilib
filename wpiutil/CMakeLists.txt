@@ -186,6 +186,7 @@ endif()
 install(
     DIRECTORY
         src/main/native/include/
+        src/main/native/thirdparty/concurrentqueue/include/
         src/main/native/thirdparty/expected/include/
         src/main/native/thirdparty/json/include/
         src/main/native/thirdparty/llvm/include/
@@ -198,6 +199,7 @@ target_include_directories(
     wpiutil
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/concurrentqueue/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
