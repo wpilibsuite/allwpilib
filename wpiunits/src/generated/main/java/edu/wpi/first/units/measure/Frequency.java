@@ -363,6 +363,17 @@ public interface Frequency extends Measure<FrequencyUnit> {
   default Per<FrequencyUnit, VoltagePerDistancePerTimeUnit> divide(VoltagePerDistancePerTime divisor) {
     return (Per<FrequencyUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
   }
+
+
+  @Override
+  default Mult<FrequencyUnit, VoltagePerDistancePerTimeSquaredUnit> times(VoltagePerDistancePerTimeSquared multiplier) {
+    return (Mult<FrequencyUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<FrequencyUnit, VoltagePerDistancePerTimeSquaredUnit> divide(VoltagePerDistancePerTimeSquared divisor) {
+    return (Per<FrequencyUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
 /** Converts this frequency to the time period between cycles. */
 default Time asPeriod() { return Seconds.of(1 / baseUnitMagnitude()); }
 }

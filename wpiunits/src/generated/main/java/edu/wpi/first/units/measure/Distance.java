@@ -364,4 +364,15 @@ public interface Distance extends Measure<DistanceUnit> {
     return (Per<DistanceUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default Mult<DistanceUnit, VoltagePerDistancePerTimeSquaredUnit> times(VoltagePerDistancePerTimeSquared multiplier) {
+    return (Mult<DistanceUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<DistanceUnit, VoltagePerDistancePerTimeSquaredUnit> divide(VoltagePerDistancePerTimeSquared divisor) {
+    return (Per<DistanceUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
 }

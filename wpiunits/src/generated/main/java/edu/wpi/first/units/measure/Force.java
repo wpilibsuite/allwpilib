@@ -364,4 +364,15 @@ public interface Force extends Measure<ForceUnit> {
     return (Per<ForceUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default Mult<ForceUnit, VoltagePerDistancePerTimeSquaredUnit> times(VoltagePerDistancePerTimeSquared multiplier) {
+    return (Mult<ForceUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<ForceUnit, VoltagePerDistancePerTimeSquaredUnit> divide(VoltagePerDistancePerTimeSquared divisor) {
+    return (Per<ForceUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
 }

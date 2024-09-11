@@ -364,4 +364,15 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return (Per<LinearVelocityUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default Mult<LinearVelocityUnit, VoltagePerDistancePerTimeSquaredUnit> times(VoltagePerDistancePerTimeSquared multiplier) {
+    return (Mult<LinearVelocityUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, VoltagePerDistancePerTimeSquaredUnit> divide(VoltagePerDistancePerTimeSquared divisor) {
+    return (Per<LinearVelocityUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
 }

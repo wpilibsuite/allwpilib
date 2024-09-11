@@ -115,6 +115,17 @@ public final class VoltageUnit extends Unit {
   }
 
   /**
+   * Combines this voltage with an linear acceleration unit to form a unit of voltage per distance
+   * per time squared.
+   *
+   * @param linearAccelerationUnit the linear acceleration unit
+   * @return the voltage per distance per time squared unit
+   */
+  public VoltagePerDistancePerTimeSquaredUnit per(LinearAccelerationUnit linearAccelerationUnit) {
+    return VoltagePerDistancePerTimeSquaredUnit.combine(this, linearAccelerationUnit);
+  }
+
+  /**
    * Creates a generic ratio unit of this voltage to a different unit type.
    *
    * @param other the other unit type

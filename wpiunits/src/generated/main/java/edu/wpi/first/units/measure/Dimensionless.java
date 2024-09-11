@@ -364,4 +364,15 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, VoltagePerDistancePerTimeUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default VoltagePerDistancePerTimeSquared times(VoltagePerDistancePerTimeSquared multiplier) {
+    return VoltsPerMeterPerSecondSquared.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  @Override
+  default Per<DimensionlessUnit, VoltagePerDistancePerTimeSquaredUnit> divide(VoltagePerDistancePerTimeSquared divisor) {
+    return (Per<DimensionlessUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
 }

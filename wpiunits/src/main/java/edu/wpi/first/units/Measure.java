@@ -33,6 +33,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.VoltagePerAnglePerTime;
 import edu.wpi.first.units.measure.VoltagePerAnglePerTimeSquared;
 import edu.wpi.first.units.measure.VoltagePerDistancePerTime;
+import edu.wpi.first.units.measure.VoltagePerDistancePerTimeSquared;
 
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. Two
@@ -255,6 +256,9 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       return times(voltagePerDistancePerTime);
     } else if (multiplier instanceof VoltagePerAnglePerTimeSquared voltagePerAnglePerTimeSquared) {
       return times(voltagePerAnglePerTimeSquared);
+    } else if (multiplier
+        instanceof VoltagePerDistancePerTimeSquared voltagePerDistancePerTimeSquared) {
+      return times(voltagePerDistancePerTimeSquared);
     } else {
       // Dimensional analysis fallthrough or a generic input measure type
       // Do a basic unit multiplication
@@ -576,6 +580,18 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   }
 
   /**
+   * Multiplies this measure by a voltage per distance per time squared and returns the resulting
+   * measure in the most appropriate unit.
+   *
+   * @param multiplier the measurement to multiply by.
+   * @return the multiplication result
+   */
+  default Measure<?> times(VoltagePerDistancePerTimeSquared multiplier) {
+    return MultUnit.combine(unit(), multiplier.unit())
+        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  /**
    * Multiplies this measure by a conversion factor, returning the converted measurement. Unlike
    * {@link #times(Per)}, this allows for basic unit cancellation to return measurements of a known
    * dimension.
@@ -738,6 +754,9 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       return divide(voltagePerDistancePerTime);
     } else if (divisor instanceof VoltagePerAnglePerTimeSquared voltagePerAnglePerTimeSquared) {
       return divide(voltagePerAnglePerTimeSquared);
+    } else if (divisor
+        instanceof VoltagePerDistancePerTimeSquared voltagePerDistancePerTimeSquared) {
+      return divide(voltagePerDistancePerTimeSquared);
     } else {
       // Dimensional analysis fallthrough or a generic input measure type
       // Do a basic unit multiplication
@@ -1040,6 +1059,18 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @return the division result
    */
   default Measure<?> divide(VoltagePerDistancePerTime divisor) {
+    return PerUnit.combine(unit(), divisor.unit())
+        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+  /**
+   * Divides this measure by a voltage per distance per time squared and returns the result in the
+   * most appropriate unit.
+   *
+   * @param divisor the measurement to divide by.
+   * @return the division result
+   */
+  default Measure<?> divide(VoltagePerDistancePerTimeSquared divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }

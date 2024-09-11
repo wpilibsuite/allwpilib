@@ -364,4 +364,15 @@ public interface VoltagePerDistancePerTime extends Measure<VoltagePerDistancePer
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
+
+  @Override
+  default Mult<VoltagePerDistancePerTimeUnit, VoltagePerDistancePerTimeSquaredUnit> times(VoltagePerDistancePerTimeSquared multiplier) {
+    return (Mult<VoltagePerDistancePerTimeUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<VoltagePerDistancePerTimeUnit, VoltagePerDistancePerTimeSquaredUnit> divide(VoltagePerDistancePerTimeSquared divisor) {
+    return (Per<VoltagePerDistancePerTimeUnit, VoltagePerDistancePerTimeSquaredUnit>) Measure.super.divide(divisor);
+  }
+
 }
