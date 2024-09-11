@@ -56,7 +56,10 @@ MATH_OPERATION_UNITS = [
     "Torque",
     "Velocity<?>",
     "Voltage",
+    "VoltagePerAnglePerTime",
+    "VoltagePerAnglePerTimeSquared",
     "VoltagePerDistancePerTime",
+    "VoltagePerDistancePerTimeSquared",
 ]
 
 # Configurations for all generated units
