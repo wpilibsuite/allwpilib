@@ -11,7 +11,8 @@ def copy_upstream_src(wpilib_root):
 
     # Copy header into allwpilib
     dest_filename = os.path.join(
-        wpiutil, f"src/main/native/thirdparty/concurrentqueue/include/wpi/concurrentqueue.h"
+        wpiutil,
+        f"src/main/native/thirdparty/concurrentqueue/include/wpi/concurrentqueue.h",
     )
     shutil.copyfile("concurrentqueue.h", dest_filename)
     # Rename namespace from moodycamel to wpi
