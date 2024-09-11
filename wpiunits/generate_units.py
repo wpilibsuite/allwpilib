@@ -77,10 +77,12 @@ UNIT_CONFIGURATIONS = {
     },
     "AngularAcceleration": {
         "base_unit": "RadiansPerSecondPerSecond",
-        "multiply": {"Time": "AngularVelocity"},
+        "multiply": {
+            "Time": "AngularVelocity",
+            "VoltagePerAnglePerTimeSquared": "Voltage",
+        },
         "divide": {
             "Frequency": "AngularVelocity",
-            "VoltagePerAnglePerTimeSquared": "Voltage",
         },
     },
     "AngularMomentum": {
@@ -90,10 +92,13 @@ UNIT_CONFIGURATIONS = {
     },
     "AngularVelocity": {
         "base_unit": "RadiansPerSecond",
-        "multiply": {"Time": "Angle", "Frequency": "AngularAcceleration"},
+        "multiply": {
+            "Time": "Angle",
+            "Frequency": "AngularAcceleration",
+            "VoltagePerAnglePerTime": "Voltage",
+        },
         "divide": {
             "Time": "AngularAcceleration",
-            "VoltagePerAnglePerTime": "Voltage",
         },
         "extra": inspect.cleandoc(
             """
@@ -198,10 +203,13 @@ UNIT_CONFIGURATIONS = {
     },
     "LinearVelocity": {
         "base_unit": "MetersPerSecond",
-        "multiply": {"Time": "Distance", "Frequency": "LinearAcceleration"},
+        "multiply": {
+            "Time": "Distance",
+            "Frequency": "LinearAcceleration",
+            "VoltagePerDistancePerTime": "Voltage",
+        },
         "divide": {
             "Time": "LinearAcceleration",
-            "VoltagePerDistancePerTime": "Voltage",
         },
     },
     "Mass": {
@@ -290,6 +298,10 @@ UNIT_CONFIGURATIONS = {
             "VoltagePerAnglePerTime": "AngularVelocity",
             "VoltagePerAnglePerTimeSquared": "AngularAcceleration",
             "VoltagePerDistancePerTimeSquared": "LinearAcceleration",
+            "LinearVelocity": "VoltagePerDistancePerTime",
+            "AngularVelocity": "VoltagePerAnglePerTime",
+            "AngularAcceleration": "VoltagePerAnglePerTimeSquared",
+            "LinearAcceleration": "VoltagePerDistancePerTimeSquared",
         },
     },
     "VoltagePerAnglePerTime": {
