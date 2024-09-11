@@ -40,6 +40,11 @@ jobs:
           cd upstream_utils
           ./eigen.py clone
           ./eigen.py copy-src
+      - name: Run expected.py
+        run: |
+          cd upstream_utils
+          ./expected.py clone
+          ./expected.py copy-src
       - name: Run fmt.py
         run: |
           cd upstream_utils
