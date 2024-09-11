@@ -331,4 +331,15 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Per<DimensionlessUnit, VoltageUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default VoltagePerAnglePerTime times(VoltagePerAnglePerTime multiplier) {
+    return VoltsPerRadianPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  @Override
+  default Per<DimensionlessUnit, VoltagePerAnglePerTimeUnit> divide(VoltagePerAnglePerTime divisor) {
+    return (Per<DimensionlessUnit, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
+  }
+
 }

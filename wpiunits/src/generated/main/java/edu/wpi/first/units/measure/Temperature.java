@@ -331,4 +331,15 @@ public interface Temperature extends Measure<TemperatureUnit> {
     return (Per<TemperatureUnit, VoltageUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default Mult<TemperatureUnit, VoltagePerAnglePerTimeUnit> times(VoltagePerAnglePerTime multiplier) {
+    return (Mult<TemperatureUnit, VoltagePerAnglePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<TemperatureUnit, VoltagePerAnglePerTimeUnit> divide(VoltagePerAnglePerTime divisor) {
+    return (Per<TemperatureUnit, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
+  }
+
 }

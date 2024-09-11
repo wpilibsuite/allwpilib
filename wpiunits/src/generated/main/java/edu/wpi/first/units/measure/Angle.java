@@ -331,4 +331,15 @@ public interface Angle extends Measure<AngleUnit> {
     return (Per<AngleUnit, VoltageUnit>) Measure.super.divide(divisor);
   }
 
+
+  @Override
+  default Mult<AngleUnit, VoltagePerAnglePerTimeUnit> times(VoltagePerAnglePerTime multiplier) {
+    return (Mult<AngleUnit, VoltagePerAnglePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<AngleUnit, VoltagePerAnglePerTimeUnit> divide(VoltagePerAnglePerTime divisor) {
+    return (Per<AngleUnit, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
+  }
+
 }

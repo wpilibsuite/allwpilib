@@ -119,8 +119,8 @@ public interface Voltage extends Measure<VoltageUnit> {
   }
 
   @Override
-  default Per<VoltageUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
-    return (Per<VoltageUnit, AngularVelocityUnit>) Measure.super.divide(divisor);
+  default VoltagePerAnglePerTime divide(AngularVelocity divisor) {
+    return VoltsPerRadianPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
 
@@ -329,6 +329,17 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Dimensionless divide(Voltage divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  }
+
+
+  @Override
+  default Mult<VoltageUnit, VoltagePerAnglePerTimeUnit> times(VoltagePerAnglePerTime multiplier) {
+    return (Mult<VoltageUnit, VoltagePerAnglePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default AngularVelocity divide(VoltagePerAnglePerTime divisor) {
+    return RadiansPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
 }

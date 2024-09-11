@@ -330,6 +330,17 @@ public interface Per<Dividend extends Unit, Divisor extends Unit> extends Measur
   default Per<PerUnit<Dividend, Divisor>, VoltageUnit> divide(Voltage divisor) {
     return (Per<PerUnit<Dividend, Divisor>, VoltageUnit>) Measure.super.divide(divisor);
   }
+
+
+  @Override
+  default Mult<PerUnit<Dividend, Divisor>, VoltagePerAnglePerTimeUnit> times(VoltagePerAnglePerTime multiplier) {
+    return (Mult<PerUnit<Dividend, Divisor>, VoltagePerAnglePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<PerUnit<Dividend, Divisor>, VoltagePerAnglePerTimeUnit> divide(VoltagePerAnglePerTime divisor) {
+    return (Per<PerUnit<Dividend, Divisor>, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
+  }
 default Measure<Dividend> timesDivisor(Measure<? extends Divisor> multiplier) {
   return (Measure<Dividend>) baseUnit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
 }

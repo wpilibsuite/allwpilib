@@ -57,9 +57,6 @@ MATH_OPERATION_UNITS = [
     "Velocity<?>",
     "Voltage",
     "VoltagePerAnglePerTime",
-    "VoltagePerAnglePerTimeSquared",
-    "VoltagePerDistancePerTime",
-    "VoltagePerDistancePerTimeSquared",
 ]
 
 # Configurations for all generated units
@@ -79,7 +76,6 @@ UNIT_CONFIGURATIONS = {
         "base_unit": "RadiansPerSecondPerSecond",
         "multiply": {
             "Time": "AngularVelocity",
-            "VoltagePerAnglePerTimeSquared": "Voltage",
         },
         "divide": {
             "Frequency": "AngularVelocity",
@@ -131,9 +127,6 @@ UNIT_CONFIGURATIONS = {
             "Torque": "Torque",
             "Voltage": "Voltage",
             "VoltagePerAnglePerTime": "VoltagePerAnglePerTime",
-            "VoltagePerAnglePerTimeSquared": "VoltagePerAnglePerTimeSquared",
-            "VoltagePerDistancePerTime": "VoltagePerDistancePerTime",
-            "VoltagePerDistancePerTimeSquared": "VoltagePerDistancePerTimeSquared",
         },
         "divide": {
             "Time": "Frequency",
@@ -192,7 +185,6 @@ UNIT_CONFIGURATIONS = {
         "base_unit": "MetersPerSecondPerSecond",
         "multiply": {
             "Time": "LinearVelocity",
-            "VoltagePerDistancePerTimeSquared": "Voltage",
         },
         "divide": {"Frequency": "LinearVelocity"},
     },
@@ -206,7 +198,6 @@ UNIT_CONFIGURATIONS = {
         "multiply": {
             "Time": "Distance",
             "Frequency": "LinearAcceleration",
-            "VoltagePerDistancePerTime": "Voltage",
         },
         "divide": {
             "Time": "LinearAcceleration",
@@ -293,35 +284,13 @@ UNIT_CONFIGURATIONS = {
         "base_unit": "Volts",
         "multiply": {"Current": "Power"},
         "divide": {
-            "LinearVelocity": "VoltagePerDistancePerTime",
-            "VoltagePerDistancePerTime": "LinearVelocity",
             "VoltagePerAnglePerTime": "AngularVelocity",
-            "VoltagePerAnglePerTimeSquared": "AngularAcceleration",
-            "VoltagePerDistancePerTimeSquared": "LinearAcceleration",
-            "LinearVelocity": "VoltagePerDistancePerTime",
             "AngularVelocity": "VoltagePerAnglePerTime",
-            "AngularAcceleration": "VoltagePerAnglePerTimeSquared",
-            "LinearAcceleration": "VoltagePerDistancePerTimeSquared",
         },
     },
     "VoltagePerAnglePerTime": {
-        "base_unit": "VoltsPerRadiansPerSecond",
+        "base_unit": "VoltsPerRadianPerSecond",
         "multiply": {"AngularVelocity": "Voltage"},
-        "divide": {},
-    },
-    "VoltagePerDistancePerTime": {
-        "base_unit": "VoltsPerMetersPerSecond",
-        "multiply": {"LinearVelocity": "Voltage"},
-        "divide": {},
-    },
-    "VoltagePerAnglePerTimeSquared": {
-        "base_unit": "VoltsPerRadiansPerSecondSquared",
-        "multiply": {"AngularAcceleration": "Voltage"},
-        "divide": {},
-    },
-    "VoltagePerDistancePerTimeSquared": {
-        "base_unit": "VoltsPerMetersPerSecondSquared",
-        "multiply": {"LinearAcceleration": "Voltage"},
         "divide": {},
     },
 }

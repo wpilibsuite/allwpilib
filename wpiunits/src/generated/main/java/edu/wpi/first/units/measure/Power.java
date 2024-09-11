@@ -331,4 +331,15 @@ public interface Power extends Measure<PowerUnit> {
     return Amps.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
+
+  @Override
+  default Mult<PowerUnit, VoltagePerAnglePerTimeUnit> times(VoltagePerAnglePerTime multiplier) {
+    return (Mult<PowerUnit, VoltagePerAnglePerTimeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  default Per<PowerUnit, VoltagePerAnglePerTimeUnit> divide(VoltagePerAnglePerTime divisor) {
+    return (Per<PowerUnit, VoltagePerAnglePerTimeUnit>) Measure.super.divide(divisor);
+  }
+
 }
