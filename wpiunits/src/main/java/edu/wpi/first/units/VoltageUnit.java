@@ -81,6 +81,10 @@ public final class VoltageUnit extends Unit {
     return VelocityUnit.combine(this, period);
   }
 
+  public ResistanceUnit per(CurrentUnit currentUnit) {
+    return ResistanceUnit.combine(this, currentUnit);
+  }
+
   /**
    * Creates a generic ratio unit of this voltage to a different unit type.
    *

@@ -523,6 +523,19 @@ public final class Units {
   public static final PerUnit<VoltageUnit, AngularAccelerationUnit> VoltsPerRadianPerSecondSquared =
       Volts.per(RadiansPerSecond.per(Second));
 
+  // ResistanceUnit
+  /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
+  public static final ResistanceUnit Ohms = derive(Volts.per(Amp)).named("Ohm").symbol("Ω").make();
+
+  /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
+  public static final ResistanceUnit Ohm = Ohms; // alias
+
+  /** A unit equal to 1,000 {@link #Ohms}. */
+  public static final ResistanceUnit Kiloohms = Kilo(Ohms);
+
+  /** A unit equal to 1,000 {@link #Ohms}. */
+  public static final ResistanceUnit Kiloohm = Kiloohms; // alias
+
   /**
    * Creates a unit equal to a thousandth of the base unit, eg Milliseconds = Milli(Units.Seconds).
    *
