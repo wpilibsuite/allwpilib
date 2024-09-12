@@ -11,7 +11,7 @@ TEST(ArgparseTest, Basic) {
 
   program.add_argument("test").help("Test argument").scan<'i', int>();
 
-  const char* args[] = {"foo", "42"};
+  constexpr const char* args[] = {"foo", "42"};
   EXPECT_NO_THROW(program.parse_args(2, args));
   auto result = program.get<int>("test");
   EXPECT_EQ(42, result);
