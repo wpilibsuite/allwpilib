@@ -23,6 +23,8 @@ add_executable(
     ${APP_ICON_MACOSX}
 )
 
+target_include_directories(wpilogcli PUBLIC src/main/native/cpp)
+
 target_link_libraries(wpilogcli PRIVATE wpiutil)
 
 if(WIN32)
