@@ -28,14 +28,12 @@ void TrajectoryUtil::ToPathweaverJson(const Trajectory& trajectory,
 }
 
 Trajectory TrajectoryUtil::FromPathweaverJson(std::string_view path) {
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
-  if (auto buf = wpi::MemoryBuffer::GetFile(path)) {
-    fileBuffer = std::move(*buf);
-  } else {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(path);
+  if (!fileBuffer) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
+  wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
 
   return Trajectory{json.get<std::vector<Trajectory::State>>()};
 }

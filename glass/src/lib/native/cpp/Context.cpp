@@ -128,16 +128,14 @@ static bool JsonToWindow(const wpi::json& jfile, const char* filename) {
 }
 
 static bool LoadWindowStorageImpl(const std::string& filename) {
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
-  if (auto buf = wpi::MemoryBuffer::GetFile(filename)) {
-    fileBuffer = std::move(*buf);
-  } else {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(filename);
+  if (!fileBuffer) {
     ImGui::LogText("error opening %s: %s", filename.c_str(),
-                   buf.error().message().c_str());
+                   fileBuffer.error().message().c_str());
     return false;
   }
   try {
-    return JsonToWindow(wpi::json::parse(fileBuffer->GetCharBuffer()),
+    return JsonToWindow(wpi::json::parse(fileBuffer.value()->GetCharBuffer()),
                         filename.c_str());
   } catch (wpi::json::parse_error& e) {
     ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
@@ -147,12 +145,10 @@ static bool LoadWindowStorageImpl(const std::string& filename) {
 
 static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
                                 std::string_view rootName) {
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
-  if (auto buf = wpi::MemoryBuffer::GetFile(filename)) {
-    fileBuffer = std::move(*buf);
-  } else {
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(filename);
+  if (!fileBuffer) {
     ImGui::LogText("error opening %s: %s", filename.c_str(),
-                   buf.error().message().c_str());
+                   fileBuffer.error().message().c_str());
     return false;
   }
   auto& storage = ctx->storageRoots[rootName];
@@ -162,7 +158,7 @@ static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
     createdStorage = true;
   }
   try {
-    storage->FromJson(wpi::json::parse(fileBuffer->GetCharBuffer()),
+    storage->FromJson(wpi::json::parse(fileBuffer.value()->GetCharBuffer()),
                       filename.c_str());
   } catch (wpi::json::parse_error& e) {
     ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());

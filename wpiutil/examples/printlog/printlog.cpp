@@ -18,14 +18,13 @@ int main(int argc, const char** argv) {
     wpi::print(stderr, "Usage: printlog <file>\n");
     return EXIT_FAILURE;
   }
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer;
-  if (auto buf = wpi::MemoryBuffer::GetFile(argv[1])) {
-    fileBuffer = std::move(*buf);
-  } else {
-    wpi::print(stderr, "could not open file: {}\n", buf.error().message());
+  auto fileBuffer = wpi::MemoryBuffer::GetFile(argv[1]);
+  if (!fileBuffer) {
+    wpi::print(stderr, "could not open file: {}\n",
+               fileBuffer.error().message());
     return EXIT_FAILURE;
   }
-  wpi::log::DataLogReader reader{std::move(fileBuffer)};
+  wpi::log::DataLogReader reader{std::move(*fileBuffer)};
   if (!reader) {
     wpi::print(stderr, "not a log file\n");
     return EXIT_FAILURE;
