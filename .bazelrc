@@ -23,12 +23,6 @@ build:build_cpp --test_tag_filters=+allwpilib-build-cpp --build_tag_filters=+all
 build:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
 test:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
 
-
-build:remote --bes_results_url=https://app.buildbuddy.io/invocation/
-build:remote --bes_backend=grpcs://cloud.buildbuddy.io
-build:remote --remote_cache=grpcs://cloud.buildbuddy.io
-build:remote --remote_timeout=3600
-
 # This config should be used locally. It downloads more than the CI version
 build:remote_user --config=remote
 build:remote_user --remote_download_toplevel
