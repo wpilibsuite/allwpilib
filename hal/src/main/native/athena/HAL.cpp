@@ -304,7 +304,8 @@ void InitializeRoboRioComments(void) {
       return;
     }
     std::string_view fileContents{
-        reinterpret_cast<const char*>(fileBuffer.value()->begin())};
+        reinterpret_cast<const char*>(fileBuffer.value()->begin()),
+        fileBuffer.value()->size()};
     std::string_view searchString = "PRETTY_HOSTNAME=\"";
 
     size_t start = fileContents.find(searchString);
