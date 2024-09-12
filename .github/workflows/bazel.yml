@@ -78,7 +78,7 @@ jobs:
       - uses: bazelbuild/setup-bazelisk@v3
           
       - name: Set artifactory cache key
-        run: echo "build:ci --remote_header=https://${{ secrets.ARTIFACTORY_USERNAME }}:${{ secrets.ARTIFACTORY_PASSWORD }}@wpilib.jfrog.io/wpilib-generic-cache-bazel-local" > bazel_auth.rc
+        run: echo "build:ci --remote_header=https://wpilib.jfrog.io/wpilib-generic-cache-bazel-local" > bazel_auth.rc
 
       - name: Build and Test Release
         run: bazel ${{ matrix.action }} ... --config=ci -c opt ${{ matrix.config }} -k --verbose_failures
