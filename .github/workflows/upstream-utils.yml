@@ -35,6 +35,11 @@ jobs:
           cd upstream_utils
           ./apriltag.py clone
           ./apriltag.py copy-src
+      - name: Run argparse-lib.py
+        run: |
+          cd upstream_utils
+          ./argparse-lib.py clone
+          ./argparse-lib.py copy-src
       - name: Run concurrentqueue.py
         run: |
           cd upstream_utils
