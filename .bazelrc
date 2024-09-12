@@ -28,5 +28,4 @@ build:remote_user --config=remote
 build:remote_user --remote_download_toplevel
 
 # This config should be used on CI. It downloads at little as possible to complete the build
-build:ci --config=remote
 build:ci --remote_download_minimal
