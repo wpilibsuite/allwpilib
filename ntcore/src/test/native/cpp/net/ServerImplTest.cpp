@@ -18,6 +18,7 @@
 #include "../TestPrinters.h"
 #include "../ValueMatcher.h"
 #include "Handle.h"
+#include "MockClientMessageQueue.h"
 #include "MockMessageHandler.h"
 #include "MockWireConnection.h"
 #include "gmock/gmock.h"
@@ -45,6 +46,7 @@ namespace nt {
 class ServerImplTest : public ::testing::Test {
  public:
   ::testing::StrictMock<net::MockServerMessageHandler> local;
+  ::testing::StrictMock<net::MockClientMessageQueue> queue;
   wpi::MockLogger logger;
   net::ServerImpl server{logger};
 };
@@ -144,7 +146,7 @@ static std::vector<uint8_t> EncodeServerBinary(const T& msgs) {
 
 TEST_F(ServerImplTest, PublishLocal) {
   // publish before client connect
-  server.SetLocal(&local);
+  server.SetLocal(&local, &queue);
   constexpr int pubuid = 1;
   constexpr int pubuid2 = 2;
   constexpr int pubuid3 = 3;
@@ -165,10 +167,9 @@ TEST_F(ServerImplTest, PublishLocal) {
   }
 
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{
+    queue.msgs.emplace_back(net::ClientMessage{
         net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
-    server.HandleLocal(msgs);
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   // client connect; it should get already-published topic as soon as it
@@ -213,20 +214,18 @@ TEST_F(ServerImplTest, PublishLocal) {
 
   // publish before send control
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{
+    queue.msgs.emplace_back(net::ClientMessage{
         net::PublishMsg{pubuid2, "test2", "double", wpi::json::object(), {}}});
-    server.HandleLocal(msgs);
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   server.SendAllOutgoing(100, false);
 
   // publish after send control
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{
+    queue.msgs.emplace_back(net::ClientMessage{
         net::PublishMsg{pubuid3, "test3", "double", wpi::json::object(), {}}});
-    server.HandleLocal(msgs);
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   server.SendAllOutgoing(200, false);
@@ -234,7 +233,7 @@ TEST_F(ServerImplTest, PublishLocal) {
 
 TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
   // publish before client connect
-  server.SetLocal(&local);
+  server.SetLocal(&local, &queue);
   constexpr int pubuid = 1;
   EXPECT_CALL(
       local,
@@ -242,12 +241,11 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
                      wpi::json::object(), std::optional<int>{pubuid}));
 
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{
+    queue.msgs.emplace_back(net::ClientMessage{
         net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
-    msgs.emplace_back(net::ClientMessage{
+    queue.msgs.emplace_back(net::ClientMessage{
         net::ClientValueMsg{pubuid, Value::MakeDouble(1.0, 10)}});
-    server.HandleLocal(msgs);
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   ::testing::StrictMock<net::MockWireConnection> wire;
@@ -306,7 +304,7 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
 }
 
 TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
-  server.SetLocal(&local);
+  server.SetLocal(&local, &queue);
   constexpr int pubuidLocal = 1;
   constexpr int subuid = 1;
   {
@@ -323,19 +321,17 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
   }
 
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
+    queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
         pubuidLocal, "test2", "double", wpi::json::object(), {}}});
-    msgs.emplace_back(net::ClientMessage{
+    queue.msgs.emplace_back(net::ClientMessage{
         net::ClientValueMsg{pubuidLocal, Value::MakeDouble(1.0, 10)}});
-    server.HandleLocal(msgs);
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(
+    queue.msgs.emplace_back(
         net::ClientMessage{net::SubscribeMsg{subuid, {"test"}, {}}});
-    server.HandleLocal(msgs);
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   ::testing::StrictMock<net::MockWireConnection> wire;
@@ -374,7 +370,7 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
 
 TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   // publish before client connect
-  server.SetLocal(&local);
+  server.SetLocal(&local, &queue);
   constexpr int pubuid = 1;
   NT_Topic topicHandle = nt::Handle{0, 1, nt::Handle::kTopic};
   constexpr int subuid = 1;
@@ -394,14 +390,13 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   }
 
   {
-    std::vector<net::ClientMessage> msgs;
-    msgs.emplace_back(net::ClientMessage{
+    queue.msgs.emplace_back(net::ClientMessage{
         net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
-    msgs.emplace_back(
+    queue.msgs.emplace_back(
         net::ClientMessage{net::ClientValueMsg{pubuid, defaultValue}});
-    msgs.emplace_back(
+    queue.msgs.emplace_back(
         net::ClientMessage{net::SubscribeMsg{subuid, {"test"}, {}}});
-    server.HandleLocal(msgs);
+    EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
   // client connect; it should get already-published topic as soon as it

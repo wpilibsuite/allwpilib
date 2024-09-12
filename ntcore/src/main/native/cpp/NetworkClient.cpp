@@ -43,8 +43,6 @@ NetworkClientBase::NetworkClientBase(int inst, std::string_view id,
       m_id{id},
       m_localQueue{logger},
       m_loop{*m_loopRunner.GetLoop()} {
-  m_localMsgs.reserve(net::NetworkLoopQueue::kInitialQueueSize);
-
   INFO("starting network client");
 }
 
@@ -194,9 +192,14 @@ NetworkClient3::~NetworkClient3() {
 }
 
 void NetworkClient3::HandleLocal() {
-  m_localQueue.ReadQueue(&m_localMsgs);
-  if (m_clientImpl) {
-    m_clientImpl->HandleLocal(m_localMsgs);
+  for (;;) {
+    auto msgs = m_localQueue.ReadQueue(m_localMsgs);
+    if (msgs.empty()) {
+      return;
+    }
+    if (m_clientImpl) {
+      m_clientImpl->HandleLocal(msgs);
+    }
   }
 }
 
@@ -358,9 +361,14 @@ NetworkClient::~NetworkClient() {
 }
 
 void NetworkClient::HandleLocal() {
-  m_localQueue.ReadQueue(&m_localMsgs);
-  if (m_clientImpl) {
-    m_clientImpl->HandleLocal(std::move(m_localMsgs));
+  for (;;) {
+    auto msgs = m_localQueue.ReadQueue(m_localMsgs);
+    if (msgs.empty()) {
+      return;
+    }
+    if (m_clientImpl) {
+      m_clientImpl->HandleLocal(msgs);
+    }
   }
 }
 

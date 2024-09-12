@@ -45,7 +45,7 @@ class ClientImpl final : private ServerMessageHandler {
 
   void ProcessIncomingText(std::string_view data);
   void ProcessIncomingBinary(uint64_t curTimeMs, std::span<const uint8_t> data);
-  void HandleLocal(std::vector<ClientMessage>&& msgs);
+  void HandleLocal(std::span<ClientMessage> msgs);
 
   void SendOutgoing(uint64_t curTimeMs, bool flush);
 
