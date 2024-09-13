@@ -215,7 +215,7 @@ class ElevatorFeedforward {
       //
       //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kg + kₛ sgn(x)
       //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kg + kₛ sgn(x)
-      //   uₖ = kᵥxₖ₊₁ + kg + kₛ sgn(x)
+      //   uₖ = kₛ sgn(x) + kg + kᵥxₖ₊₁ 
       return kS * wpi::sgn(nextVelocity) + kG + kV * nextVelocity;
     } else {
       //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)

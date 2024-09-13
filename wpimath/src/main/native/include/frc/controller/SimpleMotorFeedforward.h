@@ -172,7 +172,7 @@ class SimpleMotorFeedforward {
       //
       //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)
       //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kₛ sgn(x)
-      //   uₖ = kᵥxₖ₊₁  + kₛ sgn(x)
+      //   uₖ = kₛ sgn(x) + kᵥxₖ₊₁
       return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
     } else {
       //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
