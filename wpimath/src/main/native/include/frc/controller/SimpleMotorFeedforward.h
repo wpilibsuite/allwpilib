@@ -134,7 +134,8 @@ class SimpleMotorFeedforward {
     //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
     //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
     //
-    // Substitute in B assuming sgn(x) is a constant for the duration of the step.
+    // Substitute in B assuming sgn(x) is a constant for the duration of the
+    // step.
     //
     //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kₛ/kₐ sgn(x)))
     //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kₛ/kₐ sgn(x))
@@ -153,7 +154,7 @@ class SimpleMotorFeedforward {
       // Simplify A_d.
       //
       //   A_d = eᴬᵀ
-      //   A_d = exp(−∞)
+      //   A_d = std::exp(−∞)
       //   A_d = 0
       //
       // Simplify B_d.
