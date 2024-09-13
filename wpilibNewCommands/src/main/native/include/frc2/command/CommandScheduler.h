@@ -24,7 +24,6 @@ namespace frc2 {
 class Command;
 class CommandPtr;
 class Subsystem;
-
 /**
  * The scheduler responsible for running Commands.  A Command-based robot should
  * call Run() on the singleton instance in its periodic block in order to run
@@ -88,6 +87,8 @@ class CommandScheduler final : public wpi::Sendable,
    * interruptible. If this is the case, they will be interrupted and the
    * command will be scheduled.
    *
+   * @warning Using this function directly is often a footgun and should be avoided. Instead Triggers should be used to schedule Commands.
+   *
    * @param command the command to schedule
    */
   void Schedule(const CommandPtr& command);
@@ -112,6 +113,8 @@ class CommandScheduler final : public wpi::Sendable,
    *
    * The pointer must remain valid through the entire lifecycle of the command.
    *
+   * @warning Using this function directly is often a footgun and should be avoided. Instead Triggers should be used to schedule Commands.
+   *
    * @param command the command to schedule
    */
   void Schedule(Command* command);
@@ -120,6 +123,8 @@ class CommandScheduler final : public wpi::Sendable,
    * Schedules multiple commands for execution. Does nothing for commands
    * already scheduled.
    *
+   * @warning Using this function directly is often a footgun and should be avoided. Instead Triggers should be used to schedule Commands.
+   *
    * @param commands the commands to schedule
    */
   void Schedule(std::span<Command* const> commands);
@@ -127,6 +132,8 @@ class CommandScheduler final : public wpi::Sendable,
   /**
    * Schedules multiple commands for execution. Does nothing for commands
    * already scheduled.
+   *
+   * @warning Using this function directly is often a footgun and should be avoided. Instead Triggers should be used to schedule Commands.
    *
    * @param commands the commands to schedule
    */
