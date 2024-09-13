@@ -107,17 +107,17 @@ class WPILIB_DLLEXPORT ArmFeedforward {
 
   /**
    * Calculates the feedforward from the gains and setpoint assuming discrete
-   * control. Use this method when the setpoint does not change.
+   * control. Use this method when the velocity does not change.
    *
    * @param currentAngle The current angle. This angle should be measured from
    * the horizontal (i.e. if the provided angle is 0, the arm should be parallel
    * to the floor). If your encoder does not follow this convention, an offset
    * should be added.
-   * @param setpoint The velocity setpoint.
+   * @param currentVelocity The current velocity.
    * @return The computed feedforward in volts.
    */
   units::volt_t Calculate(units::unit_t<Angle> currentAngle,
-                          units::unit_t<Velocity> setpoint) const;
+                          units::unit_t<Velocity> currentVelocity) const;
 
   /**
    * Calculates the feedforward from the gains and setpoints assuming discrete

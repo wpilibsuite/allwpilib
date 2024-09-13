@@ -18,6 +18,18 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
                                         units::unit_t<Velocity> currentVelocity,
                                         units::unit_t<Velocity> nextVelocity,
                                         units::second_t dt) const {
+  return Calculate(currentAngle, currentVelocity, nextVelocity);
+}
+
+units::volt_t ArmFeedforward::Calculate(
+    units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity) const {
+  return kS * wpi::sgn(currentVelocity) + kG * units::math::cos(currentAngle) +
+         kV * currentVelocity;
+}
+
+units::volt_t ArmFeedforward::Calculate(
+    units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity,
+    units::unit_t<Velocity> nextVelocity) const {
   using VarMat = sleipnir::VariableMatrix;
 
   // Arm dynamics
@@ -95,16 +107,5 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
   }
 
   return units::volt_t{u_k.Value()};
-}
 
-units::volt_t ArmFeedforward::Calculate(
-    units::unit_t<Angle> currentAngle, units::unit_t<Velocity> setpoint) const {
-  return kS * wpi::sgn(setpoint) + kG * units::math::cos(currentAngle) +
-         kV * setpoint;
-}
-
-units::volt_t ArmFeedforward::Calculate(
-    units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity,
-    units::unit_t<Velocity> nextVelocity) const {
-      return Calculate(currentAngle, currentVelocity, nextVelocity, m_dt);
 }

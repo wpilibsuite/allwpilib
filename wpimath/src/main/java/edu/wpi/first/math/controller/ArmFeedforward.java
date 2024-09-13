@@ -198,19 +198,19 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
 
   /**
    * Calculates the feedforward from the gains and setpoints assuming discrete control when the
-   * setpoint does not change.
+   * velocity does not change.
    *
    * @param currentAngle The current angle. This angle should be measured from the horizontal (i.e.
    *     if the provided angle is 0, the arm should be parallel to the floor). If your encoder does
    *     not follow this convention, an offset should be added.
-   * @param setpoint The velocity setpoint.
+   * @param currentVelocity The current velocity.
    * @return The computed feedforward in volts.
    */
-  public Voltage calculate(Angle currentAngle, AngularVelocity setpoint) {
+  public Voltage calculate(Angle currentAngle, AngularVelocity currentVelocity) {
     output.mut_replace(
         kg * Math.cos(currentAngle.in(Radians))
-            + ks * Math.signum(setpoint.in(RadiansPerSecond))
-            + kv * setpoint.in(RadiansPerSecond),
+            + ks * Math.signum(currentVelocity.in(RadiansPerSecond))
+            + kv * currentVelocity.in(RadiansPerSecond),
         Volts);
     return output;
   }
