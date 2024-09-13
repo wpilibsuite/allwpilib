@@ -75,8 +75,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    *                     angle is 0, the arm should be parallel to the floor).
    *                     If your encoder does not follow this convention, an
    *                     offset should be added.
-   * @param velocity     The velocity setpoint, in radians per second.
-   * @param acceleration The acceleration setpoint, in radians per second².
+   * @param velocity     The velocity setpoint.
+   * @param acceleration The acceleration setpoint.
    * @return The computed feedforward, in volts.
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
@@ -94,8 +94,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    *   measured from the horizontal (i.e. if the provided angle is 0, the arm
    *   should be parallel to the floor). If your encoder does not follow this
    *   convention, an offset should be added.
-   * @param currentVelocity The current velocity setpoint in radians per second.
-   * @param nextVelocity The next velocity setpoint in radians per second.
+   * @param currentVelocity The current velocity setpoint.
+   * @param nextVelocity The next velocity setpoint.
    * @param dt Time between velocity setpoints in seconds.
    * @return The computed feedforward in volts.
    */

@@ -71,8 +71,8 @@ class SimpleMotorFeedforward {
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param velocity     The velocity setpoint, in distance per second.
-   * @param acceleration The acceleration setpoint, in distance per second².
+   * @param velocity     The velocity setpoint.
+   * @param acceleration The acceleration setpoint.
    * @return The computed feedforward, in volts.
    * @deprecated Use the current/next velocity overload instead.
    */
@@ -87,8 +87,7 @@ class SimpleMotorFeedforward {
    * Calculates the feedforward from the gains and setpoint assuming discrete
    * control. Use this method when the setpoint does not change.
    *
-   * @param setpoint The velocity setpoint, in distance per
-   *                        second.
+   * @param setpoint The velocity setpoint.
    * @return The computed feedforward, in volts.
    */
   constexpr units::volt_t Calculate(units::unit_t<Velocity> setpoint) const {
@@ -101,75 +100,85 @@ class SimpleMotorFeedforward {
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
    *
-   * @param currentVelocity The current velocity setpoint, in distance per
-   *                        second.
-   * @param nextVelocity    The next velocity setpoint, in distance per second.
+   * @param currentVelocity The current velocity setpoint.
+   * @param nextVelocity    The next velocity setpoint.
    * @return The computed feedforward, in volts.
    */
   constexpr units::volt_t Calculate(
       units::unit_t<Velocity> currentVelocity,
       units::unit_t<Velocity> nextVelocity) const {
     // For a simple DC motor with the model
-    //   dx/dt = −kᵥ/kₐ x + 1/kₐ u - kₛ/kₐ sgn(x),
+    //
+    //  dx/dt = −kᵥ/kₐ x + 1/kₐ u - kₛ/kₐ sgn(x),
     //
     // where
-    //   A = −kᵥ/kₐ
-    //   B = 1/kₐ
-    //   c = -kₛ/kₐ sgn(x))
-    //   A_d = eᴬᵀ
-    //   B_d = A⁻¹(eᴬᵀ - I)B
-    //   dx/dt = Ax + Bu + c
+    //
+    //  A = −kᵥ/kₐ
+    //  B = 1/kₐ
+    //  c = -kₛ/kₐ sgn(x))
+    //  A_d = eᴬᵀ
+    //  B_d = A⁻¹(eᴬᵀ - I)B
+    //  dx/dt = Ax + Bu + c
     //
     // Discretize the affine model.
-    //   dx/dt = Ax + Bu + c
-    //   dx/dt = Ax + B(u + B⁺c)
-    //   xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
-    //   xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
-    //   xₖ₊₁ = A_d xₖ + B_d uₖ + B_d B⁺cₖ
+    //
+    //  dx/dt = Ax + Bu + c
+    //  dx/dt = Ax + B(u + B⁺c)
+    //  xₖ₊₁ = eᴬᵀxₖ + A⁻¹(eᴬᵀ - I)B(uₖ + B⁺cₖ)
+    //  xₖ₊₁ = A_d xₖ + B_d (uₖ + B⁺cₖ)
+    //  xₖ₊₁ = A_d xₖ + B_d uₖ + B_d B⁺cₖ
     //
     // Solve for uₖ.
-    //   B_d uₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
-    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
-    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
+    //
+    //  B_d uₖ = xₖ₊₁ − A_d xₖ − B_d B⁺cₖ
+    //  uₖ = B_d⁺(xₖ₊₁ − A_d xₖ − B_d B⁺cₖ)
+    //  uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − B⁺cₖ
     //
     // Substitute in B assuming sgn(x) is a constant for the duration of the
     // step.
-    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kₛ/kₐ sgn(x)))
-    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kₛ/kₐ sgn(x))
-    //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)
+    //
+    //  uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) − kₐ(-(kₛ/kₐ sgn(x)))
+    //  uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₐ(kₛ/kₐ sgn(x))
+    //  uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)
     if (kA == decltype(kA)(0)) {
       // Simplify the model when kₐ = 0.
       //
       // Simplify A.
-      //   A = −kᵥ/kₐ
-      //   As kₐ approaches zero, A approaches -∞.
-      //   A = −∞
+      //
+      //  A = −kᵥ/kₐ
+      //
+      // As kₐ approaches zero, A approaches -∞.
+      //   
+      //  A = −∞
       //
       // Simplify A_d.
-      //   A_d = eᴬᵀ
-      //   A_d = std::exp(−∞)
-      //   A_d = 0
+      //
+      //  A_d = eᴬᵀ
+      //  A_d = std::exp(−∞)
+      //  A_d = 0
       //
       // Simplify B_d.
-      //   B_d = A⁻¹(eᴬᵀ - I)B
-      //   B_d = A⁻¹((0) - I)B
-      //   B_d = A⁻¹(-I)B
-      //   B_d = -A⁻¹B
-      //   B_d = -(−kᵥ/kₐ)⁻¹(1/kₐ)
-      //   B_d = (kᵥ/kₐ)⁻¹(1/kₐ)
-      //   B_d = kₐ/kᵥ(1/kₐ)
-      //   B_d = 1/kᵥ
+      //
+      //  B_d = A⁻¹(eᴬᵀ - I)B
+      //  B_d = A⁻¹((0) - I)B
+      //  B_d = A⁻¹(-I)B
+      //  B_d = -A⁻¹B
+      //  B_d = -(−kᵥ/kₐ)⁻¹(1/kₐ)
+      //  B_d = (kᵥ/kₐ)⁻¹(1/kₐ)
+      //  B_d = kₐ/kᵥ(1/kₐ)
+      //  B_d = 1/kᵥ
       //
       // Substitute these into the feedforward equation.
-      //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)
-      //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kₛ sgn(x)
-      //   uₖ = kᵥxₖ₊₁  + kₛ sgn(x)
+      //
+      //  uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kₛ sgn(x)
+      //  uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kₛ sgn(x)
+      //  uₖ = kᵥxₖ₊₁  + kₛ sgn(x)
       return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
     } else {
-      //   A = −kᵥ/kₐ
-      //   B = 1/kₐ
-      //   A_d = eᴬᵀ
-      //   B_d = A⁻¹(eᴬᵀ - I)B
+      //  A = −kᵥ/kₐ
+      //  B = 1/kₐ
+      //  A_d = eᴬᵀ
+      //  B_d = A⁻¹(eᴬᵀ - I)B
       double A = -kV.value() / kA.value();
       double B = 1.0 / kA.value();
       double A_d = gcem::exp(A * m_dt.value());
