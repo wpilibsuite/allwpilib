@@ -97,7 +97,7 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Returns the gearbox.
    */
-  DCMotor Gearbox() const { return m_gearbox; }
+  const DCMotor& Gearbox() const { return m_gearbox; }
 
   /**
    * Returns the gearing;
