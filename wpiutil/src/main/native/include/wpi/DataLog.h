@@ -876,7 +876,7 @@ class StringLogEntry : public DataLogValueEntryImpl<std::string> {
    * @param value Value to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Update(std::string value, int64_t timestamp = 0) {
+  void Update(std::string_view value, int64_t timestamp = 0) {
     std::scoped_lock lock{m_mutex};
     if (m_lastValue != value) {
       m_lastValue = value;
