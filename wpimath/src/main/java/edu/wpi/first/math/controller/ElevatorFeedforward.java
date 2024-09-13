@@ -258,6 +258,10 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
           Volts);
       return output;
     } else {
+      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      //
+      // where
+      //
       //   A = −kᵥ/kₐ
       //   B = 1/kₐ
       //   A_d = eᴬᵀ

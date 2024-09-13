@@ -256,6 +256,10 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
           ks * Math.signum(nextVelocity.magnitude()) + kv * nextVelocity.magnitude(), Volts);
       return output;
     } else {
+      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      //
+      // where
+      //
       //   A = −kᵥ/kₐ
       //   B = 1/kₐ
       //   A_d = eᴬᵀ

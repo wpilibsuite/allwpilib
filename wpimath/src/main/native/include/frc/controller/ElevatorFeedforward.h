@@ -218,6 +218,10 @@ class ElevatorFeedforward {
       //   uₖ = kᵥxₖ₊₁ + kg + kₛ sgn(x)
       return kS * wpi::sgn(nextVelocity) + kG + kV * nextVelocity;
     } else {
+      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      //
+      // where
+      //
       //   A = −kᵥ/kₐ
       //   B = 1/kₐ
       //   A_d = eᴬᵀ

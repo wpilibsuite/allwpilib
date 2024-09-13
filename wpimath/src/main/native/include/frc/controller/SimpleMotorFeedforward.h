@@ -175,6 +175,10 @@ class SimpleMotorFeedforward {
       //   uₖ = kᵥxₖ₊₁  + kₛ sgn(x)
       return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
     } else {
+      //   uₖ = B_d⁺(rₖ₊₁ − A_d rₖ)
+      //
+      // where
+      //
       //   A = −kᵥ/kₐ
       //   B = 1/kₐ
       //   A_d = eᴬᵀ
