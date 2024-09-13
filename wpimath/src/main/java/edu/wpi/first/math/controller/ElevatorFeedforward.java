@@ -250,7 +250,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
       //
       //   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ) + kg + kₛ sgn(x)
       //   uₖ = (1/kᵥ)⁺(xₖ₊₁ − (0) xₖ) + kg + kₛ sgn(x)
-      //   uₖ = kₛ sgn(x) + kg + kᵥxₖ₊₁ 
+      //   uₖ = kₛ sgn(x) + kg + kᵥxₖ₊₁
       output.mut_replace(
           kg
               + ks * Math.signum(nextVelocity.in(MetersPerSecond))
